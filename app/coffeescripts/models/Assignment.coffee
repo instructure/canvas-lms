@@ -143,6 +143,9 @@ define [
       sub = @get('submission')
       return sub.excused if sub
 
+    isNewAssignment: =>
+      return ENV.new_assignment
+
     gradingType: (gradingType) =>
       return @get('grading_type') || 'points' unless gradingType
       @set 'grading_type', gradingType
@@ -408,7 +411,7 @@ define [
         'acceptsOnlineUpload', 'acceptsMediaRecording', 'submissionType',
         'acceptsOnlineTextEntries', 'acceptsOnlineURL', 'allowedExtensions',
         'restrictFileExtensions', 'isOnlineSubmission', 'isNotGraded',
-        'isExternalTool', 'externalToolUrl', 'externalToolNewTab',
+        'isExternalTool', 'isNewAssignment', 'externalToolUrl', 'externalToolNewTab',
         'turnitinAvailable', 'turnitinEnabled', 'vericiteAvailable',
         'vericiteEnabled', 'gradeGroupStudentsIndividually', 'groupCategoryId',
         'frozen', 'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',

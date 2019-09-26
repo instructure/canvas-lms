@@ -463,6 +463,7 @@ class AssignmentsController < ApplicationController
         ),
         ALL_STUDENTS: ExcusedService.students_in_course(@context),
         EXCLUDED_STUDENTS: ExcusedService.excused_students(@assignment),
+        UNASSIGNED_STUDENTS: ExcusedService.formatted_unassigned_students(@assignment),
         COURSE_ID: @context.id,
         GROUP_CATEGORIES: group_categories,
         HAS_GRADED_SUBMISSIONS: @assignment.graded_submissions_exist?,

@@ -24,7 +24,7 @@ define [
 
       getExcludedStudents: () =>
         @model.excludes
-      
+
       render: ->
         div = @$el[0]
         return unless div
@@ -32,6 +32,8 @@ define [
           StudentExemptions,
           syncWithBackbone: @setNewExcludesCollection,
           students: @model.students,
-          exemptions: @model.excludes
+          exemptions: @model.excludes,
+          delayMessage: true,
+          labelMessage: "Excuse these students from this assignment"
         )
         ReactDOM.render(StudentExemptionsElement, div)

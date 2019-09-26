@@ -128,7 +128,7 @@
               </div>
             </a>
             <ul class="dropdown-menu pull-right" aria-labelledby="sm-profile-dropdown">
-              <% if js_env[:SETTINGS][:enable_profiles] %>
+              <% if js_env[:SETTINGS]&.fetch(:enable_profiles, nil) %>
                 <li class="ic-NavMenu-list-item">
                   <a href="/profile" class="sm-profile-dropdown-link"><%= t('Profile') %></a>
                 </li>
@@ -139,7 +139,7 @@
               <li class="ic-NavMenu-list-item">
                 <a href="/files" class="sm-profile-dropdown-link"><%= t('Files') %></a>
               </li>
-              <% if js_env[:SETTINGS][:enable_profiles] %>
+              <% if js_env[:SETTINGS]&.fetch(:enable_profiles, nil) %>
               <li class="ic-NavMenu-list-item">
                 <a href="/dashboard/eportfolios" class="sm-profile-dropdown-link"><%= t('ePortfolios') %></a>
               </li>

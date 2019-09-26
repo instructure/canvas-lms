@@ -494,6 +494,7 @@ class DiscussionTopicsController < ApplicationController
         js_hash[:group_user_type] = 'student'
         js_hash['EXCLUDED_STUDENTS'] = ExcusedService.excused_students(@assignment)
         js_hash['ALL_STUDENTS'] = ExcusedService.students_in_course(@context)
+        js_hash['UNASSIGNED_STUDENTS'] = ExcusedService.formatted_unassigned_students(@assignment)
       end
       js_env(js_hash)
 

@@ -68,3 +68,34 @@ body {
         }
     }
 }
+
+#unassign-wrapper {
+  margin-bottom: 1.5em;
+  position: relative;
+  z-index: 200;
+
+  .form-column-left {
+    margin-top: 0;
+  }
+}
+
+#exempt-label {
+  font-size: 0.75rem;
+  margin-bottom: 0.3rem;
+}
+
+#exclude-students-wrapper {
+  position: relative;
+  z-index: 100;
+
+  .js-exclude-students {
+    margin-top: 1em;
+    padding-top: 2em;
+    border-top: 1px dashed #d8d8d8;
+  }
+
+  .form-column-left {
+    margin-top: 1em;
+    padding-top: 2em;
+  }
+}

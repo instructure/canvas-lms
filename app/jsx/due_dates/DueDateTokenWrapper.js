@@ -289,6 +289,12 @@ import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
 
     selectableOption(set, index){
       var displayName = set.name || this.props.defaultSectionNamer(set.course_section_id)
+      var included = OverrideStudentStore.getCurrentUnassignments().some(item => item.id === set.id)
+
+      if (set.enrollments && included) {
+        return <ComboboxOption></ComboboxOption>
+      }
+
       return <ComboboxOption key={set.key || `${displayName}-${index}`} value={set.name} set_props={set}>
                {displayName}
              </ComboboxOption>

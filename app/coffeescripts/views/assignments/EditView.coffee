@@ -153,6 +153,7 @@ define [
       @setDefaultsIfNew()
       @dueDateOverrideView = options.views['js-assignment-overrides']
       @excludeStudentsView = options.views['js-exclude-students']
+      @unassignStudentsView = options.views['js-unassign-students']
       
       @on 'success', @redirectAfterSave
       @gradingTypeSelector.on 'change:gradingType', @handleGradingTypeChange
@@ -374,6 +375,7 @@ define [
       data.only_visible_to_overrides = !@dueDateOverrideView.overridesContainDefault()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
       data.excluded_students = @excludeStudentsView.getExcludedStudents()
+      data.bulk_unassign = @unassignStudentsView.getExcludedStudents()
       data.published = true if @shouldPublish
       data.points_possible = round(numberHelper.parse(data.points_possible), 2)
       data.peer_review_count = numberHelper.parse(data.peer_review_count) if data.peer_review_count

@@ -192,15 +192,24 @@
 
   <div id="overrides-wrapper">
     <div class="form-column-left">
-      {{#t}}Assign{{/t}}
+        {{#t}}Assign{{/t}}
     </div>
     <div class="overrides-column-right js-assignment-overrides overrideFormFlex">
     </div>
   </div>
+
+  {{#unless isNewAssignment}}
+    <div id="unassign-wrapper">
+      <div class="form-column-left">
+        {{#t}}Unassign{{/t}}
+      </div>
+      <div class="overrides-column-right js-unassign-students"></div>
+    </div>
+  {{/unless}}
 </div>
 
 <div id="exclude-students-wrapper">
-    <div class="form-column-left">{{#t}}Exemptions{{/t}}</div>
+    <div class="form-column-left">{{#t}}Exempt{{/t}}</div>
     <div class="form-column-right js-exclude-students" />
   </div>
 </div>

@@ -156,8 +156,8 @@ class StudentExemptions extends React.Component {
           <div>
             <div style={this.rowStyle()}>
               <div style={this.containerStyle()}>
-                <div id="exempt-label" class="ic-Label" title="Exempt these students" aria-label="Exempt these students">
-                  Exempt these students
+                <div id="exempt-label" class="ic-Label" title={this.props.labelMessage} aria-label={this.props.labelMessage}>
+                  {this.props.labelMessage}
                 </div>
                 <TokenInput
                     menuContent = {this.renderComboboxOptions()}
@@ -170,9 +170,11 @@ class StudentExemptions extends React.Component {
                 />
               </div>
             </div>
-            <div style={this.messageStyle()}>
-              <p>Note: It may take up to 15 minutes for the excuse tag to show in all student areas.</p>
-            </div>
+            {this.props.delayMessage &&
+              <div style={this.messageStyle()}>
+                <p>Note: It may take up to 15 minutes for the excuse tag to show in all student areas.</p>
+              </div>
+            }
           </div>
         )
     }
