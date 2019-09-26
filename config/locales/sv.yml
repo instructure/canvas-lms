@@ -8431,7 +8431,7 @@ sv:
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Antingen är du en ny användare eller så har *användarvillkoren* ändrats sedan du senast godkände dem. Vänligen godkänn *användarvillkoren* och **intergritetspolicyn** innan du fortsätter."
   either_you_re_a_new_user_or_the_terms_of_use_have__2bbebdef: "Antingen är du en ny användare, eller så har *användarvillkoren* ändrats sedan du godkände dem. Vänligen godkänn *användarvillkoren* innan du fortsätter"
   el_salvador_503_b0907d30: "El Salvador (+503)"
-  element_option_missing_error_an_element_to_attach__be433478: "`element` alternativet saknar fel: Ett element att bifoga TreeBrowserView till måste specificeras när inställningen för render-alternativet ställs in som 'sann' för BBTreeBrowserView"
+  element_option_missing_error_an_element_to_attach__be433478: "Fel: alternativet `element` saknas- Ett element att bifoga TreeBrowserView till måste specificeras när renderingsalternativet ställs in som \"sann\" för BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
   email_22a7d52d: E-post
@@ -15911,7 +15911,7 @@ sv:
       description: "BigBlueBotton webb-konferenssupport"
       name: BigBlueButton
     big_blue_button_settings: 
-      description: "Du kommer behöva till gång till en [BigBlueButton](%{url}) instans."
+      description: "Du behöver åtkomst till en [BigBlueButton](%{url})-instans."
       domain_description: "**värdnamn** eller **ip-adress** för din BigBlueButton-installation (t.ex bigbluebutton.mycompany.com)"
       labels: 
         domain: Domän
