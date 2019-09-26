@@ -119,8 +119,8 @@ pipeline {
                 GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
                   git fetch origin $GERRIT_BRANCH
 
-                git config user.name $GERRIT_EVENT_ACCOUNT_NAME
-                git config user.email $GERRIT_EVENT_ACCOUNT_EMAIL
+                git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
+                git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
                 # this helps current build issues where cleanup is needed before proceeding.
                 # however the later git rebase --abort should be enough once this has
