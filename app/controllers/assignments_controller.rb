@@ -96,12 +96,21 @@ class AssignmentsController < ApplicationController
           # TODO: Look at how the `@locked` stuff is used bellow, in A1 the pre-reqs are only being
           #       calculated if needed, but we are doing it every time here.
           assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+          submission = @assignment.submissions.find_by(user: @current_user)
+          graphql_submisison_id = nil
+          if submission
+            graphql_submisison_id = CanvasSchema.id_from_object(
+              submission,
+              CanvasSchema.resolve_type(submission, nil),
+              nil
+            )
+          end
 
           js_env({
             ASSIGNMENT_ID: params[:id],
             COURSE_ID: @context.id,
             PREREQS: assignment_prereqs,
-            SUBMISSION_ID: @assignment.submissions.where(user: @current_user).pluck(:id).first
+            SUBMISSION_ID: graphql_submisison_id
           })
           css_bundle :assignments_2_student
           js_bundle :assignments_2_show_student
