@@ -152,7 +152,7 @@ module Lti
     #
     # @argument subscription[TransportType] [Optional, String]
     #   Must be either 'sqs' or 'https'.
-    # 
+    #
     # @argument subscription[State] [Optional, String]
     #   Must be either 'Active' or 'Deleted"
     #
@@ -180,12 +180,14 @@ module Lti
     # You can retrieve the next result set by setting a 'StartKey' header in your next request
     # with the value of the 'EndKey' header in the response.
     #
+    # Note that this will return all active subscription and the last 90 days of deleted subscriptions.
+    #
     # Example use of a 'StartKey' header object:
     #   { "Id":"71d6dfba-0547-477d-b41d-db8cb528c6d1","OwnerId":"domain.instructure.com" }
     #
     # @returns DataServiceSubscription
     def index
-      response = Services::LiveEventsSubscriptionService.index(jwt_body)
+      response = Services::LiveEventsSubscriptionService.index(jwt_body, query: { limit_deleted: 90 })
       forward_service_response(response)
     end
 
