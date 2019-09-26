@@ -348,12 +348,11 @@ import_to_quizzes_next:
   applies_to: RootAccount
   root_opt_in: true
 newquizzes_on_quiz_page:
-  state: allowed
+  state: hidden
   display_name: New Quizzes on the Quizzes page
   description: Show New Quizzes on the Quizzes page
   applies_to: Account
   root_opt_in: true
-  hidden: true
 common_cartridge_page_conversion:
   state: hidden
   display_name: Common Cartridge HTML File to Page Conversion
