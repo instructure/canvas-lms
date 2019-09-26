@@ -36,7 +36,7 @@ export const RubricAssessmentRating = {
   `,
 
   shape: shape({
-    _id: string.isRequired,
+    _id: string,
     criterion: shape({
       id: string.isRequired
     }),
@@ -46,7 +46,7 @@ export const RubricAssessmentRating = {
     outcome: shape({
       id: string.isRequired
     }),
-    points: number.isRequired
+    points: number
   })
 }
 
