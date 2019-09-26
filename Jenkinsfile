@@ -62,6 +62,7 @@ pipeline {
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
+    CACHE_TAG = "canvas-lms:previous-image"
   }
 
   stages {
@@ -148,7 +149,11 @@ pipeline {
     stage('Build Image') {
       steps {
         timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
-          sh 'docker build -t $PATCHSET_TAG .'
+          dockerCacheLoad(image: "$CACHE_TAG")
+          sh '''
+            docker build -t $PATCHSET_TAG .
+            docker tag $PATCHSET_TAG $CACHE_TAG
+          '''
         }
       }
     }
@@ -265,6 +270,7 @@ pipeline {
                 docker tag $PATCHSET_TAG $MERGE_TAG
                 docker push $MERGE_TAG
               '''
+              dockerCacheStore(image: "$CACHE_TAG")
             }
           }
         }
