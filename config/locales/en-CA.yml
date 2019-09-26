@@ -1601,6 +1601,7 @@ en-CA:
   add_attribute_6d6d4a65: "Add Attribute"
   add_bank: 
     default_name: "No Name"
+  add_cc_subtitle_a9ef4a66: "Add CC/Subtitle"
   add_collaboration_da9665ac: "Add Collaboration"
   add_contact_method_d2dfea03: "Add Contact Method"
   add_content_58b4305a: "Add Content"
@@ -1800,6 +1801,7 @@ en-CA:
   all_student_groups_f74cd6c3: "All Student Groups"
   all_students_have_taken_the_quiz_b558f8b4: "All Students have taken the quiz"
   all_students_have_taken_the_survey_494f9f42: "All Students have taken the survey"
+  all_submission_comments_have_been_marked_as_read_7595389d: "All submission comments have been marked as read."
   all_submissions_must_have_a_selected_grade_3a84e5a9: "All submissions must have a selected grade."
   all_terms_cd27b0fb: "All Terms"
   all_timezones_5e8afa7b: "All Timezones"
@@ -1845,6 +1847,9 @@ en-CA:
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Allows a user to view the SIS ID in a user’s login details."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Allows a user to view user SIS IDs in a course People page."
   allows_admin_user_to_view_account_statistics_341f00d9: "Allows admin user to view account statistics."
+  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+      Allows admins to view a log containing information about all recently run
+      GraphQL mutations
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Allows assessors to view the assessment audit tray in SpeedGrader for anonymous or moderated assignments."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Allows creating announcements for a specific section"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Allows creating discussions for a specific section"
@@ -2061,8 +2066,8 @@ en-CA:
   allows_user_to_view_course_status_choose_home_page_b97cee14: |-
       Allows user to view Course Status, Choose Home Page, and Course Setup
       Checklist buttons in the Home page.
-  allows_user_to_view_create_edit_delete_and_publish_48716e21: "Allows user to view, create, edit, delete, and publish/unpublish pages.\n\n\
-      \x20     Allows user to view page history and set front page. "
+  allows_user_to_view_create_edit_delete_and_publish_48716e21: "Allows user to view, create, edit, delete, and publish/unpublish pages.\n\
+      Allows user to view page history and set front page. "
   allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
       Allows user to view, create, edit, delete, and publish/unpublish pages.
       Allows user to view page history and set front page.
@@ -2125,7 +2130,7 @@ en-CA:
   an_assignment_name_dc624e70: "An Assignment Name"
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "An auto-generated chronological summary of your course"
   an_error_occured_please_try_again_e59b65b: "An error occured. Please try again."
-  an_error_occured_saving_the_assignment_d71cb3d2: "An error occurred saving the assignment"
+  an_error_occured_saving_the_assignment_d71cb3d2: "An error occured saving the assignment"
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "An error occured while deleting the grading period set"
   an_error_occured_while_deleting_the_grading_period_c8343484: "An error occured while deleting the grading period"
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "An error occured while fetching enrollment terms."
@@ -3448,6 +3453,7 @@ en-CA:
   before_publishing_your_course_you_must_either_publ_cdfdc78c: "Before publishing your course, you must either publish a module or choose a different home page."
   before_publishing_your_course_you_must_either_publ_cf84cad9: "Before publishing your course, you must either publish a module in the Modules page, or choose a different home page."
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to re-send the email*, and make sure to check your spam box."
+  begin_typing_to_search_7daa7b1: "Begin typing to search"
   beginning_date_2d2a29ac: "Beginning date"
   behind_31e4e0fe: Behind
   belarusian_b2f19c76: Belarusian
@@ -3471,8 +3477,8 @@ en-CA:
   blueprint_course_information_term_course_10d5cf30: "Blueprint Course Information: %{term} - %{course}"
   blueprint_courses_9dd321b8: "Blueprint Courses"
   blueprint_courses_add_edit_associate_delete_bc26d5c2: "Blueprint Courses - add / edit / associate / delete"
-  blueprint_courses_are_an_account_level_feature_opt_3388f731: "Blueprint Courses are an account-level feature option.\n\n\n\
-      \x20     To edit blueprint lock settings from the Discussions index page, Course - add / edit / delete and Discussions - moderate must also be enabled. "
+  blueprint_courses_are_an_account_level_feature_opt_3388f731: "Blueprint Courses are an account-level feature option.\n\n\
+      To edit blueprint lock settings from the Discussions index page, Course - add / edit / delete and Discussions - moderate must also be enabled. "
   blueprint_courses_create_edit_associate_delete_bf41988e: "Blueprint Courses (create / edit / associate / delete)"
   blueprint_courses_is_an_account_level_feature_opti_38676924: "Blueprint Courses is an account-level feature option. Course roles can only manage Blueprint Courses if they are added to the Blueprint Course as an teacher, TA, or designer role. To access the Blueprint Courses sidebar, Courses - add / edit / delete courses must be enabled. To add an associated course, Courses - view list a​nd Courses - add / edit / delete must also be enabled. To edit lock settings on any blueprint object type, Courses - add / edit / delete must be enabled."
   blueprint_courses_is_an_account_level_feature_opti_3bf307d: "Blueprint Courses is an account-level feature option. To edit blueprint lock settings on the Discussions index page, Courses - add / edit / delete​ and Discussions - view​ must also be enabled. If this permission is not enabled, and Courses - add / edit / delete​ and Discussions - view​ are enabled, blueprint lock settings can be edited on individual discussions."
@@ -4058,14 +4064,15 @@ en-CA:
   can_destroy_subscription_to_data_service_data_b8dfca27: "Can destroy subscription to data service data."
   can_edit_this_page_role_selection_6ccec3c7: "Can edit this page role selection"
   can_interact_with_users_in_their_section_only_48cb8c43: "Can interact with users in their section only"
+  can_list_categorized_event_types_52596f7: "Can list categorized event types."
   can_list_subscriptions_to_data_service_data_b52d5e37: "Can list subscriptions to data service data."
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Can retrieve user data associated with the context the tool is installed in."
   can_show_subscription_to_data_service_data_688ce3: "Can show subscription to data service data."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Can't compute score until an assignment has points possible"
-  can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
-      \x20                   Can't delete alignments based on rubric associations.\n\n\
-      \x20                   To remove these associations you need to remove the row from the asset's rubric\"\n\n\
-      \x20                 "
+  can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
+      \x20             Can't delete alignments based on rubric associations.\n\
+      \x20             To remove these associations you need to remove the row from the asset's rubric\"\n\
+      \x20           "
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Can't delete alignments based on rubric associations.  To remove these associations you need to remove the row from the asset's rubric"
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: "Can't enable anonymous grading and group assignments together"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Can't perform diffing against more than one file of the same type"
@@ -4501,7 +4508,7 @@ en-CA:
     to_now: now
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Comment by replying to this message, or join the conversation using this link: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion."
-  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the announcement."
+  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Comment by replying to this message, or join the conversation using this link: %{link}.When allowed, if you need to include an attachment, please log in to Canvas and reply to the announcement."
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Comment failed to post! Please try again later."
   comment_input_box_b8c7e58b: "Comment input box"
   comment_submitted_d9934b: "Comment submitted!"
@@ -4548,7 +4555,7 @@ en-CA:
       details: 
         account_exists: |-
             There's a user account already associated with %{email}.
-            
+              
               **Are you %{name}?**
         account_needed: "You've been invited to join **%{course}**. To accept this request you need a Canvas account. Click the link below to create a Canvas account."
         add_email: "Would you like to add this email address to your current account?"
@@ -5455,6 +5462,7 @@ en-CA:
   copy_quiz_to_course_74f9c8c1: "Copy Quiz to Course"
   copy_this_module_item_to_a_course_790a0cf4: "Copy this module item to a course..."
   copy_this_module_to_a_course_ddd12cc7: "Copy this module to a course..."
+  copy_title_to_course_2a41a2f4: "Copy %{title} to course"
   copy_title_to_course_ac71981a: "Copy {%title} to course"
   copy_to_64f8456b: "Copy To..."
   copy_to_a5396a6f: "Copy to..."
@@ -5541,6 +5549,7 @@ en-CA:
   count_options_190d6373: 
     one: "1 Option"
     other: "%{count} Options"
+  count_options_loaded_cd59cc3b: "%{count} options loaded."
   count_page_views_b40102b3: 
     one: "1 page view"
     other: "%{count} page views"
@@ -6404,11 +6413,11 @@ en-CA:
     plugins: Plugins
     prior_users: "Prior Users"
     question_banks: "Question Banks"
-    quizzes: ~
+    quizzes: Quizzes
     registered_services: "Registered Services"
     revisions: Revisions
     rubrics: Rubrics
-    settings: ~
+    settings: Settings
     site_admin: "Site Admin"
     stats: Statistics
     syllabus: Syllabus
@@ -6626,9 +6635,11 @@ en-CA:
       - December
   date_at_time_25a04cd2: "%{date} at %{time}"
   date_created_87e265bc: "Date Created"
+  date_created_b93b76fb: ", date created: "
   date_ee500367: Date
   date_error_7b38f8ff: "Date Error"
   date_is_required_9c6f5e83: "Date is required!"
+  date_modified_4d065406: ", date modified: "
   date_modified_e1c8ac8f: "Date Modified"
   date_of_most_recent_bounce_b23d0119: "Date of most recent bounce"
   datepicker: 
@@ -8299,6 +8310,7 @@ en-CA:
         no_preview_available: "No preview is available for this file."
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "File(s) will be included on all pages in the Canvas desktop application."
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "File(s) will be included when user content is displayed within the Canvas iOS or Android apps, and in third-party apps built on our API."
+  file_select_filename_folder_contents_9146bab7: "File select, %{filename} folder contents"
   file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit} user file quota applies"
   file_status: 
     hidden_status: "Hidden. Available with a link"
@@ -8551,6 +8563,7 @@ en-CA:
   grade_change_activity_75fb525: "Grade Change Activity"
   grade_change_log_231f90e4: "Grade Change Log"
   grade_change_notifications_98461261: "Grade change notifications"
+  grade_changes_and_new_comments_released_for_title__f1350f92: "Grade changes and new comments released for: %{title}, %{course}"
   grade_changes_cb5a57a8: "Grade Changes"
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -9418,14 +9431,14 @@ en-CA:
   hebrew_88fbf778: Hebrew
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       Hello %{name},
-      
+            
             Your outcomes import failed due to an error with your import. Please examine your file and attempt the upload again at %{url}
-      
+            
             The following error occurred: 
             %{row}
-      
+            
             To view the proper import format, please review the Canvas API Docs at %{doc_url}
-      
+            
             Thank you,
             Instructure
   hello_name_your_outcomes_import_failed_due_to_erro_4c3f236b: |-
@@ -9442,20 +9455,20 @@ en-CA:
       Instructure
   hello_name_your_outcomes_were_successfully_importe_a510e0d: |-
       Hello %{name},
-      
+              
               Your outcomes were successfully imported. You can now manage them at %{url}
-      
+              
               Thank you,
               Instructure
   hello_name_your_outcomes_were_successfully_importe_d0c37335: |-
       Hello %{name},
-      
+              
               Your outcomes were successfully imported, but with the following issues (up to the first 100 warnings): 
-      
+              
               %{rows}
-      
+              
               You can now manage them at %{url}
-      
+              
               Thank you,
               Instructure
   help_4c4968b1: Help
@@ -9646,10 +9659,10 @@ en-CA:
   if_disabled_user_can_still_view_and_download_files_336ffc30: "If disabled, user can still view and download files into a zip file."
   if_disabled_user_will_still_have_access_to_course__6816d525: |-
       If disabled, user will still have access to Course Settings.
-      
+              
               User cannot manage individual course content without the appropriate
               permission for that content item.
-      
+              
               If course visibility is limited to users enrolled in the course, this permission
               allows a user to view course content without being enrolled in the course.
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "If enabled, access to LTI 1.3 and LTI Advantage will be enabled."
@@ -9696,7 +9709,7 @@ en-CA:
       If you made changes to the student submission files you downloaded
         before, just zip them back up and upload the zip with the form below.
         Students will see the modified files in their comments for the submission.
-      
+        
         *Make sure you don't change the names of the submission files so we can recognize them.*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "If you wish, you can rename \"SIS\" to something more familiar to your staff"
@@ -10231,7 +10244,7 @@ en-CA:
   learning_outcome_rating_8143e88c: "learning outcome rating"
   learning_outcome_rating_points_c453bb8a: "learning outcome rating points"
   learning_outcomes_add_edit_delete_b686457a: "Learning Outcomes - add / edit / delete"
-  learning_outcomes_can_be_included_in_assignment_ru_a48bb903: |-
+  learning_outcomes_can_be_included_in_assignment_ru_a48bb903: |
       
       Learning outcomes can be included in assignment rubrics as an easy way to assess
       mastery of outcomes aligned to specific assignments.  When you define a learning
@@ -10313,13 +10326,13 @@ en-CA:
       failure_message: 
         body: |-
             The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
-            
+                      
                       Thank you,
                       Canvas Support
       locked_topic: 
         body: |-
             The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
-            
+                      
                       Thank you,
                       Canvas Support
     progress_runner: 
@@ -10395,6 +10408,7 @@ en-CA:
     other: 
       one: "1 other"
       other: "%{count} others"
+  list_collapsed_5f19f5bb: "List Collapsed"
   list_collapsed_9ac35920: "List collapsed."
   list_collapsed_dde87718: "List collapsed"
   list_expanded_efec2d0: "List expanded."
@@ -10447,6 +10461,7 @@ en-CA:
   loading_more_results_def6df65: "Loading more results..."
   loading_more_sub_accounts_d0a30903: "Loading more sub accounts..."
   loading_more_terms_4053e31f: "Loading more terms..."
+  loading_options_c823e98b: "Loading options..."
   loading_outcome_results_96e21ce4: "Loading outcome results"
   loading_permissions_28495bdb: "Loading Permissions"
   loading_permissions_failed_73983eb3: "Loading permissions failed"
@@ -12348,6 +12363,11 @@ en-CA:
         submitted_date: "submitted: %{date}"
       twitter: 
         body: "Canvas Alert - Quiz Submitted: %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "Your instructor has released grade changes and new comments for %{title}. These changes are now viewable."
+          link: "You can view it here"
     summaries: 
       email: 
         daily_body: "You're signed up to receive a daily report of some notifications from your Canvas account.  Below is the report for %{date}:"
@@ -12526,6 +12546,8 @@ en-CA:
   moderation_page_4061aa2b: "Moderation Page"
   moderator_49b9f2e1: Moderator
   moderator_sortorder_18063692: "Moderator %{sortOrder}"
+  modified_by_52d699e9: ", modified by: "
+  modified_by_c1584b3c: "Modified By"
   module_90d9fd32: Module
   module_completed_50c50762: "Module Completed"
   module_filter_63b17d11: "Module Filter"
@@ -12716,6 +12738,7 @@ en-CA:
   name: "Academic Benchmark Importer"
   name_1aed4a1b: Name
   name_3806192d: "Name:"
+  name_4dee4600: ", name: "
   name_app_has_been_deleted_fb2d9426: "%{name} app has been deleted"
   name_badfe525: name
   name_count_users_ccc93c3d: "%{name} (%{count} Users)"
@@ -12737,6 +12760,7 @@ en-CA:
   name_only_5f56718e: "Name Only"
   name_options_bc5c95ce: "%{name} Options"
   name_override_score_7f6a5216: "%{name} override score"
+  name_parent_directory_b61d10a9: ", name: parent directory "
   name_quiz_15f55961: "%{name} (Quiz)"
   name_unposted_current_score_e98e95fd: "%{name} unposted current score"
   name_unposted_final_score_124708d2: "%{name} unposted final score"
@@ -12886,6 +12910,7 @@ en-CA:
   no_placements_enabled_f705f28: "No Placements Enabled"
   no_points_possible_368669d: "No Points Possible"
   no_points_possible_72db3a55: "No points possible"
+  no_results_3cda4e72: "No Results"
   no_results_f36777ee: "No results"
   no_results_found_58717065: "No results found"
   no_results_found_e4b686bd: "No results found."
@@ -12927,6 +12952,7 @@ en-CA:
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Not all sections will be assigned this item."
   not_all_settings_options_are_available_at_the_suba_20efaa98: "Not all settings options are available at the subaccount level, including the Notifications tab."
   not_anonymously_graded_87574f91: "Not anonymously graded"
+  not_applicable_d5dfd285: "not applicable"
   not_available_487d3648: "Not available"
   not_available_assignment_is_anonymous_94e77edf: "Not available; assignment is anonymous"
   not_available_at_the_subaccount_level_3fc74ab: "Not available at the subaccount level."
@@ -13405,6 +13431,7 @@ en-CA:
   option_3_30adfebc: "Option 3"
   option_4_aec96b1f: "Option 4"
   option_index_6308524d: "Option %{index}"
+  option_selected_737b6f72: "Option selected:"
   option_selected_list_collapsed_70a356b4: "%{option} selected. List collapsed."
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Optionally include a byte-order mark in compatible spreadsheet exports so they can be imported into Excel for users in some locales."
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Optionally include a byte-order mark in Gradebook exports so they can be imported into Excel for users in some locales."
@@ -13986,7 +14013,7 @@ en-CA:
       name: "Grade Export"
     grade_export_settings: 
       description: |-
-          This plugin allows final grades to be published back to a student information system (SIS).  When enabled, the user will be given an option in the gradebook to publish these grades.  This will occur via a POST request to the specified publish endpoint.  Each type defines its own content format and mime type.  The response from the endpoint does not matter and is currently ignored.
+          This plugin allows final grades to be published back to a student information system (SIS).  When enabled, the user will be given an option in the gradebook to publish these grades.  This will occur via a POST request to the specified publish endpoint.  Each type defines it's own content format and mime type.  The response from the endpoint does not matter and is currently ignored.
           
           For example, the Instructure formatted CSV will POST a csv file with mime type 'text/csv' to the specified endpoint, containing the following columns: 
           
@@ -16898,6 +16925,7 @@ en-CA:
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "See some LTI tools that work great with Canvas."
   see_turnitin_results_cd9d4a6c: "See Turnitin results"
   select_1e849959: "[ Select ]"
+  select_a_course_4710371f: "Select a Course"
   select_a_grading_period_5ea50f1: "Select a Grading Period..."
   select_a_grading_period_aab25483: "Select a Grading Period"
   select_a_log_type_to_search_247fc6b4: "Select a log type to search."
@@ -17046,6 +17074,7 @@ en-CA:
   send_this_module_item_to_another_user_14d4fd60: "Send this module item to another user..."
   send_this_module_to_another_user_50cb27c8: "Send this module to another user..."
   send_title_to_user_526320bb: "Send {%title} to user"
+  send_title_to_user_d952e233: "Send %{title} to user"
   send_to_7881bf0e: "Send to..."
   send_to_b940900a: "Send To..."
   send_to_ce05b460: "Send to"
@@ -17849,6 +17878,7 @@ en-CA:
       page_title: "Institution Suspended"
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Site Admin Only. Send to 1 / %{denominator} users in enabled accounts each month."
   size_b30e1077: Size
+  size_f1873a2: ", size: "
   skipped_file_filename_due_to_error_94f0194: "Skipped file %{filename} due to error"
   skipping_unknown_file_type_cd1086ee: "Skipping unknown file type"
   skype_18850ba7: Skype
@@ -18027,6 +18057,8 @@ en-CA:
   starts_at_29843f98: "Starts at"
   starts_ce584f1c: "Starts:"
   state_66a67ba2: State
+  state_published_e8914697: ", state: published"
+  state_unpublished_83c18d01: ", state: unpublished"
   statistics: 
     csv_columns: 
       attempt: attempt
@@ -18240,6 +18272,7 @@ en-CA:
   submission_items_b2db1b8d: "Submission Items"
   submission_locked_a6074f8b: "Submission Locked"
   submission_locked_image_93aced38: "Submission Locked Image"
+  submission_posted_title_course_138bd744: "Submission Posted: %{title}, %{course}"
   submission_preview_383473ec: "Submission Preview"
   submission_requirement_8ba1ee08: "Submission Requirement"
   submission_score_b7a291e8: "submission score"
@@ -18671,12 +18704,12 @@ en-CA:
   the_maximum_number_of_graders_has_been_reached_for_a9302ebb: "The maximum number of graders has been reached for this assignment."
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
       The message titled "%{subject}" could not be delivered because the discussion topic has been deleted. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
-      
+                
                 Thank you,
                 Canvas Support
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address [See https://community.canvaslms.com/docs/DOC-2281]. You may also contact this person via the Canvas Inbox [See https://community.canvaslms.com/docs/DOC-2670].
-      
+                
                 Thank you,
                 Canvas Support
   the_module_item_is_locked_27fe420b: "The module item is locked."
@@ -18748,6 +18781,7 @@ en-CA:
   there_was_a_problem_loading_students_5bdb6cf2: "There was a problem loading students."
   there_was_a_problem_loading_submissions_39855ff0: "There was a problem loading submissions."
   there_was_a_problem_logging_in_at_institution_5a298155: "There was a problem logging in at %{institution}"
+  there_was_a_problem_marking_submission_comments_as_d4ba6711: "There was a problem marking submission comments as read."
   there_was_a_problem_overriding_the_grade_f6d83c4d: "There was a problem overriding the grade."
   there_was_a_problem_posting_assignment_grades_958669e8: "There was a problem posting assignment grades."
   there_was_a_problem_posting_the_comment_75d15646: "There was a problem posting the comment"
@@ -18842,6 +18876,9 @@ en-CA:
   this_feature_creates_a_siteadmin_release_flag_tab__15215be9: "This feature creates a SiteAdmin Release Flag tab to be able to release features to users through the UI. It also reworks the UI for the old Feature Options tabs."
   this_feature_enables_users_of_right_to_left_rtl_la_17bd0fae: "This feature enables users of right-to-left (RTL) languages to see the RTL layout under development. Eventually, this will become the default behavior and this option will be removed."
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "This feature flag is something an account can turn on if they want to allow the users of their account that speak languages that are normally written right to left (for example: Arabic, Hebrew, Farsi) to see the RTL layout while we are working on it. Once the feature is \"ready\" this feature flag will go away and anyone that speaks one of those languages will always see the RTL interface."
+  this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
+      This feature makes the submissions file upload api check the filetype against
+      the allowed extensions of the associated assignment.
   this_field_is_required_fa58c4a: "This field is required"
   this_field_name_is_required_988caebc: "This field \"%{name}\" is required."
   this_field_name_is_required_b9196401: "This field \"name\" is required."
@@ -19516,10 +19553,14 @@ en-CA:
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
   type_a_few_letters_to_start_searching_3334657b: "Type a few letters to start searching"
+  type_at_least_3_characters_to_search_f3df561c: "Type at least 3 characters to search."
   type_c8106334: Type
+  type_file_14f017c9: "type: file"
+  type_folder_115f3b07: "type: folder"
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' is not a valid image type (try jpg, png, or gif)"
   type_of_change_1cb24a0e: "Type of Change"
   type_of_item_8a37f69d: "Type of Item"
+  type_to_search_de63ad38: "Type to search"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Uh oh! Contact your friendly Catalog Developer. Error message: %{message}"
   ukrainian_945b00b7: Ukrainian
   unable_to_accept_update_fd53a7e2: "Unable to accept update"
@@ -20731,6 +20772,15 @@ en-CA:
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Your custom theme has been successfully applied."
   your_email_address_f881e583: "Your email address"
   your_email_b5364bee: "Your Email"
+  your_instructor_has_released_grade_changes_and_new_218d61bb: |-
+      Your instructor has released grade changes and new comments for %{title}, %{course}.
+      
+      More info at %{url}
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
+      
+      Your can view it here: 
+      %{url}
   your_message_has_been_sent_thank_you_e0284316: "Your message has been sent. Thank you!"
   your_message_was_sent_977f6583: "Your message was sent!"
   your_name_7665e1d8: "Your Name"
