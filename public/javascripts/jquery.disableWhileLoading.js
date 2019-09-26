@@ -37,78 +37,99 @@ import $ from 'jquery'
 import './jquery.ajaxJSON'
 import 'spin.js/jquery.spin'
 
-function eraseFromArray (array, victim) {
+function eraseFromArray(array, victim) {
   array.forEach((prospect, index) => {
     if (prospect === victim) array.splice(index, 1)
   })
 }
 
-  $.fn.disableWhileLoading = function(deferred, options) {
-    return this.each(function() {
-      var opts = $.extend(true, {}, $.fn.disableWhileLoading.defaults, options),
-          $this = $(this),
-          data = $this.data(),
-          thingsToWaitOn = data.disabledWhileLoadingDeferreds || (data.disabledWhileLoadingDeferreds = []),
-          myDeferred = $.Deferred();
+$.fn.disableWhileLoading = function(deferred, options) {
+  return this.each(function() {
+    const opts = $.extend(true, {}, $.fn.disableWhileLoading.defaults, options)
+    const $this = $(this)
+    const data = $this.data()
+    const thingsToWaitOn =
+      data.disabledWhileLoadingDeferreds || (data.disabledWhileLoadingDeferreds = [])
+    const myDeferred = $.Deferred()
 
-      $.when.apply($, thingsToWaitOn).done(function() {
-        var dataKey      = 'disabled_' + $.guid++,
-            $disabledArea    = $this.add($this.nextAll('.ui-dialog-buttonpane')),
-            //  todo: replace .andSelf with .addBack when JQuery is upgraded.
-            $inputsToDisable = $disabledArea.find('*').andSelf().filter(':input').not(':disabled,[type=file]'),
-            $foundSpinHolder = $this.find('.spin_holder'),
-            $spinHolder = $foundSpinHolder.length ? $foundSpinHolder : $this,
-            previousSpinHolderDisplay = $spinHolder.css('display'),
-            disabled = false;
+    $.when(...thingsToWaitOn).done(() => {
+      let dataKey
+      let $disabledArea
+      let $inputsToDisable
+      let $spinHolder
+      let previousSpinHolderDisplay
+      let disabled = false
 
-        var disabler = setTimeout(function() {
-          disabled = true;
-          $inputsToDisable.prop('disabled', true);
-          $spinHolder.show().spin(options);
-          $($spinHolder.data().spinner.el).css({'max-width':'100px'});
-          $disabledArea.css('opacity', function(i, currentOpacity){
-            $(this).data(dataKey+'opacityBefore', this.style.opacity || 1);
-            return opts.opacity;
-          });
-          $.each(opts.buttons, function(selector, text) {
-            //if you pass an array to $.each the first arg is indexInArray, we need second arg
-            if ($.isArray(opts.buttons)){ selector = text, text = null }
-            $disabledArea.find(selector).text(function(i, currentText) {
-              $(this).data(dataKey, currentText);
-              return text ||
-                     $(this).data('textWhileLoading') ||
-                     ( $(this).is('.ui-button-text') && $(this).closest('.ui-button').data('textWhileLoading') ) ||
-                     // if nothing was passed in as the text value or if they pass an array for opts.buttons,
-                     // just use a default loading... text.
-                     I18n.t('loading', 'Loading...');
-            });
-          });
-        }, 13);
+      const disabler = setTimeout(() => {
+        dataKey = 'disabled_' + $.guid++
+        $disabledArea = $this.add($this.nextAll('.ui-dialog-buttonpane'))
+        disabled = true
+        //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+        $inputsToDisable = $disabledArea
+          .find('*')
+          .andSelf()
+          .filter(':input')
+          .not(':disabled,[type=file]')
+        const $foundSpinHolder = $this.find('.spin_holder')
+        $spinHolder = $foundSpinHolder.length ? $foundSpinHolder : $this
+        previousSpinHolderDisplay = $spinHolder.css('display')
 
-        $.when(deferred).always(function() {
-          clearTimeout(disabler);
-          if (disabled) {
-            $spinHolder.css('display', previousSpinHolderDisplay).spin(false); // stop spinner
-            $disabledArea.css('opacity', function(){
-              return $(this).data(dataKey+'opacityBefore') || 1;
-            });
-            $inputsToDisable.prop('disabled', false);
-            $.each(opts.buttons, function(selector, text) {
-              if(typeof selector === 'number') var selector = ''+this; // for arrays
-              $disabledArea.find(selector).text(function() { return $(this).data(dataKey) });
-            });
-            eraseFromArray(thingsToWaitOn, myDeferred); //speed up so that $.when doesn't have to look at myDeferred any more
-            myDeferred.resolve();
-            if (opts.onComplete) {
-              opts.onComplete();
-            }
+        $inputsToDisable.prop('disabled', true)
+        $spinHolder.show().spin(options)
+        $($spinHolder.data().spinner.el).css({'max-width': '100px'})
+        $disabledArea.css('opacity', function(i, currentOpacity) {
+          $(this).data(dataKey + 'opacityBefore', this.style.opacity || 1)
+          return opts.opacity
+        })
+        $.each(opts.buttons, function(selector, text) {
+          // if you pass an array to $.each the first arg is indexInArray, we need second arg
+          if ($.isArray(opts.buttons)) {
+            selector = text
+            text = null
           }
-        });
-      });
-      thingsToWaitOn.push(myDeferred);
-    });
-  };
-  $.fn.disableWhileLoading.defaults = {
-    opacity: 0.5,
-    buttons: ['button[type="submit"], .ui-dialog-buttonpane .ui-button .ui-button-text']
-  };
+          $disabledArea.find(selector).text(function(i, currentText) {
+            $(this).data(dataKey, currentText)
+            return (
+              text ||
+              $(this).data('textWhileLoading') ||
+              ($(this).is('.ui-button-text') &&
+                $(this)
+                  .closest('.ui-button')
+                  .data('textWhileLoading')) ||
+              // if nothing was passed in as the text value or if they pass an array for opts.buttons,
+              // just use a default loading... text.
+              I18n.t('loading', 'Loading...')
+            )
+          })
+        })
+      }, 13)
+
+      $.when(deferred).always(function() {
+        clearTimeout(disabler)
+        if (disabled) {
+          $spinHolder.css('display', previousSpinHolderDisplay).spin(false) // stop spinner
+          $disabledArea.css('opacity', function() {
+            return $(this).data(dataKey + 'opacityBefore') || 1
+          })
+          $inputsToDisable.prop('disabled', false)
+          $.each(opts.buttons, function(selector, text) {
+            if (typeof selector === 'number') selector = '' + this // for arrays
+            $disabledArea.find(selector).text(function() {
+              return $(this).data(dataKey)
+            })
+          })
+          eraseFromArray(thingsToWaitOn, myDeferred) // speed up so that $.when doesn't have to look at myDeferred any more
+          myDeferred.resolve()
+          if (opts.onComplete) {
+            opts.onComplete()
+          }
+        }
+      })
+    })
+    thingsToWaitOn.push(myDeferred)
+  })
+}
+$.fn.disableWhileLoading.defaults = {
+  opacity: 0.5,
+  buttons: ['button[type="submit"], .ui-dialog-buttonpane .ui-button .ui-button-text']
+}

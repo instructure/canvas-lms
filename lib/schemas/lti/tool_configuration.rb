@@ -32,6 +32,7 @@ module Schemas::Lti
         "title" => {
           "type" => "string"
         }.freeze,
+        # "public_jwk" => verified in ToolConfiguration model
         "public_jwk_url" => {
           "type" => "string"
         }.freeze,
@@ -188,32 +189,6 @@ module Schemas::Lti
             {"type" => "string"}.freeze,
             {"type" => "object"}.freeze
           ].freeze
-        }.freeze,
-        "public_jwk" => {
-          'type' => 'object',
-          'required' => %w[kty e n kid alg use].freeze,
-          'properties' => {
-            'kty' => {
-              'type' => 'string',
-              'const' => Lti::RSAKeyPair::KTY
-            }.freeze,
-            'alg' => {
-              'type' => 'string',
-              'const' => Lti::RSAKeyPair::ALG
-            }.freeze,
-            'e' => {
-              'type' => 'string'
-            }.freeze,
-            'n' => {
-              'type' => 'string'
-            }.freeze,
-            'kid' => {
-              'type' => 'string'
-            }.freeze,
-            'use' => {
-              'type' => 'string'
-            }.freeze
-          }.freeze
         }.freeze
       }.freeze
     }.freeze

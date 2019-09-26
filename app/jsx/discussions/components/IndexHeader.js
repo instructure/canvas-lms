@@ -29,7 +29,7 @@ import select from '../../shared/select'
 import {Button} from '@instructure/ui-buttons'
 import DiscussionSettings from './DiscussionSettings'
 import {FormField} from '@instructure/ui-form-field'
-import {Grid, GridCol, GridRow, View} from '@instructure/ui-layout'
+import {Grid, View} from '@instructure/ui-layout'
 import {IconPlusLine, IconSearchLine} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextInput} from '@instructure/ui-forms'
@@ -93,8 +93,8 @@ export default class IndexHeader extends Component {
       <View>
         <View display="block">
           <Grid>
-            <GridRow hAlign="space-between">
-              <GridCol width={2}>
+            <Grid.Row hAlign="space-between">
+              <Grid.Col width={2}>
                 <FormField
                   id="discussion-filter"
                   label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
@@ -114,8 +114,8 @@ export default class IndexHeader extends Component {
                     ))}
                   </select>
                 </FormField>
-              </GridCol>
-              <GridCol width={4}>
+              </Grid.Col>
+              <Grid.Col width={4}>
                 <TextInput
                   label={
                     <ScreenReaderContent>
@@ -127,8 +127,8 @@ export default class IndexHeader extends Component {
                   onChange={this.onSearchStringChange}
                   name="discussion_search"
                 />
-              </GridCol>
-              <GridCol width={6} textAlign="end">
+              </Grid.Col>
+              <Grid.Col width={6} textAlign="end">
                 {this.props.permissions.create && (
                   <Button
                     href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
@@ -151,8 +151,8 @@ export default class IndexHeader extends Component {
                     isSavingSettings={this.props.isSavingSettings}
                   />
                 ) : null}
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </View>
       </View>

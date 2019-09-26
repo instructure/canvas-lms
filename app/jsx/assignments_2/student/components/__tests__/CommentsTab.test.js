@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import * as apollo from 'react-apollo'
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import CommentContent from '../CommentsTab/CommentContent'
 import CommentsTab from '../CommentsTab'
 import {
@@ -56,26 +57,53 @@ function createUnreadCommentMock() {
   ]
 }
 
+let mockedSetOnFailure = null
+let mockedSetOnSuccess = null
+
+function mockContext(children) {
+  return (
+    <AlertManagerContext.Provider
+      value={{
+        setOnFailure: mockedSetOnFailure,
+        setOnSuccess: mockedSetOnSuccess
+      }}
+    >
+      {children}
+    </AlertManagerContext.Provider>
+  )
+}
+
 describe('CommentsTab', () => {
   beforeAll(() => {
     $('body').append('<div role="alert" id=flash_screenreader_holder />')
   })
 
+  beforeEach(() => {
+    mockedSetOnFailure = jest.fn().mockResolvedValue({})
+    mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+  })
+
   it('renders error alert when data returned from mutation fails', async () => {
     const errorMock = commentGraphqlMock(mockComments())
-    errorMock[1].result = {errors: [{message: 'Error!'}]}
+    errorMock[1].error = new Error('aw shucks')
     const {getByPlaceholderText, getByText} = render(
-      <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={errorMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider
+          defaultOptions={{mutate: {errorPolicy: 'all'}}}
+          mocks={errorMock}
+          addTypename
+        >
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
     fireEvent.click(getByText('Send Comment'))
 
-    expect(
-      await waitForElement(() => getByText('Error sending submission comment'))
-    ).toBeInTheDocument()
+    await wait(() =>
+      expect(mockedSetOnFailure).toHaveBeenCalledWith('Error sending submission comment')
+    )
   })
 
   it('renders Comments', async () => {
@@ -103,23 +131,29 @@ describe('CommentsTab', () => {
   it('notifies user when comment successfully sent', async () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getByPlaceholderText, getByText} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={basicMock} addTypename>
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
     fireEvent.click(getByText('Send Comment'))
 
-    expect(await waitForElement(() => getByText('Submission comment sent'))).toBeInTheDocument()
+    await waitForElement(() => getByText('sent user'))
+
+    expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent')
   })
 
   it('renders the optimistic response with env current user', async () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {findByPlaceholderText, getByText, findByText} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={basicMock} addTypename>
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
     const textArea = await findByPlaceholderText('Submit a Comment')
     fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -131,9 +165,11 @@ describe('CommentsTab', () => {
   it('renders the message when sent', async () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getAllByTestId, getByPlaceholderText, getByText} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={basicMock} addTypename>
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
@@ -147,9 +183,11 @@ describe('CommentsTab', () => {
   it('renders loading indicator when loading query', () => {
     const basicMock = commentGraphqlMock(mockComments())
     const {getByTitle} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={basicMock} addTypename>
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
     expect(getByTitle('Loading')).toBeInTheDocument()
   })
@@ -158,9 +196,11 @@ describe('CommentsTab', () => {
     const noDataMock = commentGraphqlMock(mockComments())
     noDataMock[0].result = {data: null}
     const {getByText} = render(
-      <MockedProvider mocks={noDataMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={noDataMock} addTypename>
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
     expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
   })
@@ -170,9 +210,11 @@ describe('CommentsTab', () => {
     errorMock[0].result = null
     errorMock[0].error = new Error('aw shucks')
     const {getByText} = render(
-      <MockedProvider mocks={errorMock} removeTypename addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={errorMock}>
+          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        </MockedProvider>
+      )
     )
 
     expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
@@ -189,16 +231,17 @@ describe('CommentsTab', () => {
     apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
 
     render(
-      <MockedProvider mocks={createUnreadCommentMock()} addTypename>
-        <CommentsTab {...props} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={createUnreadCommentMock()} addTypename>
+          <CommentsTab {...props} />
+        </MockedProvider>
+      )
     )
 
-    act(() => jest.runAllTimers())
-
-    await wait(() =>
+    await wait(() => {
+      act(() => jest.runAllTimers())
       expect(mockMutation).toHaveBeenCalledWith({variables: {commentIds: ['1'], submissionId: '1'}})
-    )
+    })
   })
 
   it('renders an error when submission comments fail to be marked as read', async () => {
@@ -210,19 +253,19 @@ describe('CommentsTab', () => {
 
     apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: true}])
 
-    const {getAllByText} = render(
-      <MockedProvider mocks={createUnreadCommentMock()} addTypename>
-        <CommentsTab {...props} />
-      </MockedProvider>
+    render(
+      mockContext(
+        <MockedProvider mocks={createUnreadCommentMock()} addTypename>
+          <CommentsTab {...props} />
+        </MockedProvider>
+      )
     )
 
     act(() => jest.advanceTimersByTime(3000))
 
-    expect(
-      await waitForElement(
-        () => getAllByText('There was a problem marking submission comments as read.')[0]
-      )
-    ).toBeInTheDocument()
+    expect(mockedSetOnFailure).toHaveBeenCalledWith(
+      'There was a problem marking submission comments as read'
+    )
   })
 
   it('alerts the screen reader when submission comments are marked as read', async () => {
@@ -234,20 +277,21 @@ describe('CommentsTab', () => {
 
     apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: false}])
 
-    const {getAllByText} = render(
-      <MockedProvider mocks={createUnreadCommentMock()} addTypename>
-        <CommentsTab {...props} />
-      </MockedProvider>
+    render(
+      mockContext(
+        <MockedProvider mocks={createUnreadCommentMock()} addTypename>
+          <CommentsTab {...props} />
+        </MockedProvider>
+      )
     )
 
     act(() => jest.advanceTimersByTime(3000))
 
-    expect(
-      await waitForElement(
-        () => getAllByText('All submission comments have been marked as read.')[0]
-      )
-    ).toBeInTheDocument()
+    expect(mockedSetOnSuccess).toHaveBeenCalledWith(
+      'All submission comments have been marked as read'
+    )
   })
+
   // the arc media player has some custom needs for rendering in jsdom that we will need to investigate.  Uncomment when
   // we take this more serious
   // it('renders a media Comment', async () => {
@@ -295,7 +339,9 @@ describe('CommentsTab', () => {
   // })
 
   it('renders place holder text when no comments', async () => {
-    const {getByText} = render(<CommentContent comments={[]} submission={legacyMockSubmission()} />)
+    const {getByText} = render(
+      mockContext(<CommentContent comments={[]} submission={legacyMockSubmission()} />)
+    )
 
     expect(
       await waitForElement(() =>
@@ -307,7 +353,7 @@ describe('CommentsTab', () => {
   it('renders comment rows when provided', () => {
     const comments = [singleComment({_id: '6'}), singleComment()]
     const {getAllByTestId} = render(
-      <CommentContent comments={comments} submission={legacyMockSubmission()} />
+      mockContext(<CommentContent comments={comments} submission={legacyMockSubmission()} />)
     )
     const rows = getAllByTestId('comment-row')
 
@@ -316,7 +362,9 @@ describe('CommentsTab', () => {
 
   it('renders shortname when shortname is provided', () => {
     const {getAllByText} = render(
-      <CommentContent comments={[singleComment()]} submission={legacyMockSubmission()} />
+      mockContext(
+        <CommentContent comments={[singleComment()]} submission={legacyMockSubmission()} />
+      )
     )
     expect(getAllByText('bob builder')).toHaveLength(1)
   })
@@ -325,7 +373,7 @@ describe('CommentsTab', () => {
     const comment = singleComment()
     comment.author = null
     const {getAllByText, queryAllByText} = render(
-      <CommentContent comments={[comment]} submission={legacyMockSubmission()} />
+      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
     )
 
     expect(queryAllByText('bob builder')).toHaveLength(0)
@@ -337,7 +385,7 @@ describe('CommentsTab', () => {
     const attachment = singleAttachment()
     comment.attachments = [attachment]
     const {container, getByText} = render(
-      <CommentContent comments={[comment]} submission={legacyMockSubmission()} />
+      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
     )
 
     const renderedAttachment = container.querySelector(`a[href*='${attachment.url}']`)
@@ -355,7 +403,7 @@ describe('CommentsTab', () => {
     })
     comment.attachments = [attachment1, attachment2]
     const {container, getByText} = render(
-      <CommentContent comments={[comment]} submission={legacyMockSubmission()} />
+      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
     )
 
     const renderedAttachment1 = container.querySelector(`a[href*='${attachment1.url}']`)
@@ -370,7 +418,7 @@ describe('CommentsTab', () => {
   it('does not display attachments if there are none', () => {
     const comment = singleComment()
     const {container} = render(
-      <CommentContent comments={[comment]} submission={legacyMockSubmission()} />
+      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
     )
 
     expect(container.querySelector('a[href]')).toBeNull()
@@ -389,7 +437,7 @@ describe('CommentsTab', () => {
       })
     )
     const {getAllByTestId} = render(
-      <CommentContent comments={comments} submission={legacyMockSubmission()} />
+      mockContext(<CommentContent comments={comments} submission={legacyMockSubmission()} />)
     )
 
     const rows = getAllByTestId('comment-row')
@@ -409,7 +457,7 @@ describe('CommentsTab', () => {
     comment.attachments = [attachment]
 
     const {container, getByText} = render(
-      <CommentContent comments={[comment]} submission={legacyMockSubmission()} />
+      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
     )
 
     const renderedAttachment = container.querySelector(`a[href*='${attachment.url}']`)

@@ -146,7 +146,6 @@ describe('The Ratings component', () => {
 
 
   const ratingComponent = (overrides) => (
-    // eslint-disable-next-line react/prop-types
     <Rating {...props.tiers[0]} isSummary={false} assessing {...overrides} />
   )
 

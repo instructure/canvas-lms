@@ -19,7 +19,7 @@
 import I18n from 'i18n!assignments_2_login_action_prompt'
 import React from 'react'
 
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 
@@ -32,28 +32,28 @@ const navigateToLogin = () => {
 function LoginActionPrompt() {
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
-      <FlexItem>
+      <Flex.Item>
         <View margin="medium" as="div">
           <img alt={I18n.t('Submission Locked Image')} src={lockedSVG} />
         </View>
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <Text margin="small" size="x-large">
           {I18n.t('Submission Locked')}
         </Text>
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <Text margin="small" size="medium">
           {I18n.t('Log in to submit')}
         </Text>
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <View margin="medium" as="div">
           <Button variant="primary" onClick={navigateToLogin}>
             {I18n.t('Log in')}
           </Button>
         </View>
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }

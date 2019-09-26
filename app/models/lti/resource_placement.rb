@@ -58,6 +58,7 @@ module Lti
                   :student_context_card,
                   :tool_configuration,
                   :user_navigation,
+                  :wiki_index_menu,
                   :wiki_page_menu].freeze
 
     PLACEMENT_LOOKUP = {

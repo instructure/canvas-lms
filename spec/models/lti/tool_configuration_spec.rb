@@ -37,11 +37,6 @@ module Lti
     let(:tool_configuration) { described_class.new(settings: settings) }
     let(:developer_key) { DeveloperKey.create }
 
-    before do
-      settings[:public_jwk_url] = 'https://test.com'
-      settings
-    end
-
     describe 'validations' do
       subject { tool_configuration.save }
 
@@ -135,6 +130,51 @@ module Lti
         end
 
         it { is_expected.to eq true }
+      end
+
+      context 'when public_jwk is not present' do
+        let (:settings) do
+          s = super()
+          s.delete('public_jwk')
+          s['public_jwk_url'] = "https://test.com"
+          s
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to eq true }
+      end
+
+      context 'when public_jwk_url is not present' do
+        let (:settings) do
+          s = super()
+          s.delete('public_jwk_url')
+          s['public_jwk'] = public_jwk
+          s
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to eq true }
+      end
+
+      context 'when public_jwk_url and public_jwk are not present' do
+        let (:settings) do
+          s = super()
+          s.delete('public_jwk_url')
+          s.delete('public_jwk')
+          s
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to eq false }
       end
     end
 

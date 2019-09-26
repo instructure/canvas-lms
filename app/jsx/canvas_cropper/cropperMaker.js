@@ -30,13 +30,13 @@ import CanvasCropper from './cropper'
     // @param props: properties
     //    imgFile: the File object returned from the native file open dialog
     //    width: desired width in px of the final cropped image
-    //    height: desired height in px if the final cropped image
+    //    height: desired height in px of the final cropped image
     constructor (root, props) {
       this.root = root;                     // DOM node we render into
       this.imgFile = props.imgFile;
       this.onImageLoaded = props.onImageLoaded;
       this.width = props.width || 128;
-      this.height = props.width || 128;
+      this.height = props.height || 128;
       this.cropper = null;
     }
     unmount () {

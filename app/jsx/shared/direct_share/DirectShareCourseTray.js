@@ -24,7 +24,7 @@ import CanvasTray from 'jsx/shared/components/CanvasTray'
 
 const DirectShareCoursePanel = lazy(() => import('jsx/shared/direct_share/DirectShareCoursePanel'))
 
-export default function DirectShareCourseTray({...trayProps}) {
+export default function DirectShareCourseTray({sourceCourseId, contentSelection, onDismiss, ...trayProps}) {
   const suspenseFallback = (
     <View as="div" textAlign="center">
       <Spinner renderTitle={I18n.t('Loading...')} />
@@ -32,10 +32,14 @@ export default function DirectShareCourseTray({...trayProps}) {
   )
 
   return (
-    <CanvasTray label={I18n.t('Copy To...')} placement="end" {...trayProps}>
+    <CanvasTray label={I18n.t('Copy To...')} placement="end" onDismiss={onDismiss} {...trayProps}>
       <View as="div" padding="small 0 0 0">
         <Suspense fallback={suspenseFallback}>
-          <DirectShareCoursePanel onCancel={trayProps.onDismiss} />
+          <DirectShareCoursePanel
+            sourceCourseId={sourceCourseId}
+            contentSelection={contentSelection}
+            onCancel={onDismiss}
+          />
         </Suspense>
       </View>
     </CanvasTray>

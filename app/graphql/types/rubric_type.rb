@@ -18,20 +18,26 @@
 
 module Types
   class RubricType < ApplicationObjectType
-    graphql_name 'Rubric'
-
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface
 
     global_id_field :id
-    field :context_id, String, null: false
 
-    field :criteria, [CriterionType], null: false
-    def criteria
-      object.data
+    field :criteria, [RubricCriterionType], <<~DESC, null: false
+      The different criteria that makes up this rubric
+    DESC
+
+    field :free_form_criterion_comments, Boolean, null: false
+    def free_form_criterion_comments
+      !!object.free_form_criterion_comments
     end
 
-    field :free_form_criterion_comments, Boolean, null: true
-    field :points_possible, Int, null: false
-    field :title, String, null: false
+    field :hide_score_total, Boolean, null: false
+    def hide_score_total
+      !!object.hide_score_total
+    end
+
+    field :points_possible, Float, null: true
+    field :title, String, null: true
   end
 end

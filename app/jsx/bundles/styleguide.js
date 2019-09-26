@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import _ from 'underscore'
 import preventDefault from 'compiled/fn/preventDefault'
 import PublishButtonView from 'compiled/views/PublishButtonView'
@@ -28,6 +29,7 @@ import 'jqueryui/tooltip'
 import 'jqueryui/progressbar'
 import 'jquery.instructure_date_and_time'
 
+ready(() => {
 const dialog = $('#dialog-buttons-dialog').dialog({
   autoOpen: false,
   height: 200
@@ -167,3 +169,4 @@ function selectCategory (event) {
 }
 
 $('.Sg-header__Navigation a').on('click', selectCategory)
+})

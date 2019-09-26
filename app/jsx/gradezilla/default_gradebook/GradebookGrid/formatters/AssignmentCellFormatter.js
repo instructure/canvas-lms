@@ -22,7 +22,7 @@ import I18n from 'i18n!gradezilla'
 import htmlEscape from 'str/htmlEscape'
 import {extractDataTurnitin} from 'compiled/gradezilla/Turnitin'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
-import {isHidden} from '../../../../grading/helpers/SubmissionHelper'
+import {extractSimilarityInfo, isHidden} from '../../../../grading/helpers/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
 
 function getTurnitinState(submission) {
@@ -62,6 +62,26 @@ function formatGrade(submissionData, assignment, options) {
   return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions)
 }
 
+function renderSimilarityIcon(similarityData) {
+  const {status, similarity_score} = similarityData.entries[0].data
+
+  let iconClass
+  if (status === 'error') {
+    iconClass = 'icon-warning'
+  } else if (status === 'pending') {
+    iconClass = 'icon-clock'
+  } else if (similarity_score > 60) {
+    iconClass = 'icon-empty icon-Solid'
+  } else if (similarity_score > 20) {
+    iconClass = 'icon-oval-half icon-Solid'
+  } else {
+    iconClass = 'icon-complete icon-Solid'
+  }
+
+  // xsslint safeString.identifier iconClass
+  return `<i class="${iconClass}"></i>`
+}
+
 function renderStartContainer(options) {
   let content = ''
 
@@ -71,7 +91,12 @@ function renderStartContainer(options) {
 
   if (options.invalid) {
     content += '<div class="Grid__GradeCell__InvalidGrade"><i class="icon-warning"></i></div>'
+  } else if (options.similarityData != null) {
+    // xsslint safeString.function renderSimilarityIcon
+    const similarityIconHtml = renderSimilarityIcon(options.similarityData)
+    content += `<div class="Grid__GradeCell__OriginalityScore">${similarityIconHtml}</div>`
   }
+
   // xsslint safeString.identifier content
   return `<div class="Grid__GradeCell__StartContainer">${content}</div>`
 }
@@ -92,6 +117,9 @@ function renderTemplate(grade, options = {}) {
     classNames.push('cannot_edit')
   }
 
+  // This is the "old" turnitin visualization (the grade-like indicator with
+  // plagiarism levels indicated by different colors); the updated version is
+  // rendered in renderStartContainer if the feature flag is set
   if (options.turnitinState) {
     classNames.push('turnitin')
     // xsslint safeString.property turnitinState
@@ -129,6 +157,9 @@ export default class AssignmentCellFormatter {
       },
       getSubmissionState(submission) {
         return gradebook.submissionStateMap.getSubmissionState(submission)
+      },
+      showUpdatedSimilarityScore() {
+        return gradebook.options.show_similarity_score
       }
     }
 
@@ -191,8 +222,13 @@ export default class AssignmentCellFormatter {
       disabled: student.isConcluded || submissionState.locked,
       hidden: submissionState.hideGrade,
       invalid: !!pendingGradeInfo && !pendingGradeInfo.valid,
-      showUnpostedIndicator,
-      turnitinState: getTurnitinState(submission)
+      showUnpostedIndicator
+    }
+
+    if (this.options.showUpdatedSimilarityScore()) {
+      options.similarityData = extractSimilarityInfo(submission)
+    } else {
+      options.turnitinState = getTurnitinState(submission)
     }
 
     if (needsGrading(submission, pendingGradeInfo)) {

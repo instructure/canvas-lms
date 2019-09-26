@@ -106,7 +106,7 @@ export default class CSPSelectionBox extends Component {
     return (
       <div>
         {this.state.loading ? (
-          <Spinner title={I18n.t('Loading')} size="x-small" />
+          <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
         ) : this.props.canManage ? (
           checkbox
         ) : (

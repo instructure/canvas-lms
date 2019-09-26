@@ -20,9 +20,9 @@ import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!IndividualStudentMasteryOutcome'
-import {View, Flex, FlexItem} from '@instructure/ui-layout'
+import {View, Flex} from '@instructure/ui-layout'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {List, ListItem, Pill, Text, TruncateText} from '@instructure/ui-elements'
+import {List, Pill, Text, TruncateText} from '@instructure/ui-elements'
 import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
 import UnassessedAssignment from './UnassessedAssignment'
@@ -57,26 +57,26 @@ export default class Outcome extends React.Component {
 
     return (
       <Flex direction="row" justifyItems="space-between" data-selenium="outcome">
-        <FlexItem shrink>
+        <Flex.Item shrink>
           <Flex direction="column">
-            <FlexItem>
+            <Flex.Item>
               <Text size="medium">
                 <Flex>
-                  <FlexItem>
+                  <Flex.Item>
                     <OutcomePopover outcome={outcome} outcomeProficiency={outcomeProficiency}/>
-                  </FlexItem>
-                  <FlexItem shrink padding="0 x-small"><TruncateText>{ display_name || title }</TruncateText></FlexItem>
+                  </Flex.Item>
+                  <Flex.Item shrink padding="0 x-small"><TruncateText>{ display_name || title }</TruncateText></Flex.Item>
                 </Flex>
               </Text>
-            </FlexItem>
-            <FlexItem><Text size="small">{ I18n.t({
+            </Flex.Item>
+            <Flex.Item><Text size="small">{ I18n.t({
               zero: 'No alignments',
               one: '%{count} alignment',
               other: '%{count} alignments'
-            }, { count: I18n.n(numAlignments) }) }</Text></FlexItem>
+            }, { count: I18n.n(numAlignments) }) }</Text></Flex.Item>
           </Flex>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
         {
           (_.isNumber(score) && !_.every(results, ['hide_points', true]) ) &&
           <span>
@@ -85,7 +85,7 @@ export default class Outcome extends React.Component {
           </span>
         }
         <Pill {...pillAttributes} />
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }
@@ -105,9 +105,9 @@ export default class Outcome extends React.Component {
       <List variant="unstyled" delimiter="dashed">
       {
         results.sort(natcompare.byKey('submitted_or_assessed_at')).reverse().map((result) => (
-          <ListItem key={result.id}>
+          <List.Item key={result.id}>
             <AssignmentResult result={result} outcome={outcome} outcomeProficiency={outcomeProficiency} />
-          </ListItem>
+          </List.Item>
         ))
       }
       {

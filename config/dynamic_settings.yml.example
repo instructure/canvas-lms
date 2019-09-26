@@ -25,6 +25,8 @@ development:
         use_for_mml: 'false'
       rich-content-service:
         app-host: "rce.docker"
+      common_cartridge_viewer:
+        base_url: "http://localhost:3300"
     # another service
     inst-fs:
       app-host: "http://api.instfs.docker"

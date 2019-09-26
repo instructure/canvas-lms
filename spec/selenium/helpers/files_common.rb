@@ -111,6 +111,7 @@ module FilesCommon
         ff('.ui-datepicker-trigger.btn')[0].click
         fln("15").click
         ff('.ui-datepicker-trigger.btn')[0].send_keys(:enter) # close the calendar
+        wait_for_ajaximations
         ff('.ui-datepicker-trigger.btn')[1].click
         fln("25").click
         ff('.ui-datepicker-trigger.btn')[1].send_keys(:enter) # close the calendar

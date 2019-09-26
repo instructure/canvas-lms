@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {Billboard} from '@instructure/ui-billboard'
-import {Pagination, PaginationButton} from '@instructure/ui-pagination'
+import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-elements'
 import {array, func, string, shape, oneOf} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
@@ -85,18 +85,18 @@ export default class SearchMessage extends Component {
       ? pageNumber === this.state.pageBecomingCurrent
       : pageNumber === this.currentPage()
     return (
-      <PaginationButton
+      <Pagination.Page
         key={pageNumber}
         onClick={() => this.handleSetPage(pageNumber)}
         current={isCurrent}
         aria-label={I18n.t('Page %{pageNum}', {pageNum: pageNumber})}
       >
         {isCurrent && this.state.pageBecomingCurrent ? (
-          <Spinner size="x-small" title={I18n.t('Loading...')} />
+          <Spinner size="x-small" renderTitle={I18n.t('Loading...')} />
         ) : (
           I18n.n(pageNumber)
         )}
-      </PaginationButton>
+      </Pagination.Page>
     )
   }
 

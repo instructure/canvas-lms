@@ -67,7 +67,7 @@ module LearningOutcomeContext
 
     def has_outcomes?
       Rails.cache.fetch(['has_outcomes', self].cache_key) do
-        linked_learning_outcomes.count > 0
+        linked_learning_outcomes.exists?
       end
     end
 

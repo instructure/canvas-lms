@@ -20,7 +20,7 @@ import I18n from 'i18n!new_nav'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-layout'
-import {Heading, List, ListItem, Spinner, Text} from '@instructure/ui-elements'
+import {Heading, List, Spinner, Text} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 
 export default function CoursesTray({courses, hasLoaded}) {
@@ -31,22 +31,22 @@ export default function CoursesTray({courses, hasLoaded}) {
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           courses.map(course =>
-            <ListItem key={course.id}>
+            <List.Item key={course.id}>
               <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/courses/${course.id}`}>{course.name}</Button>
               {course.enrollment_term_id > 1 &&
                 <Text as="div" size="x-small" weight="light">{course.term.name}</Text>
               }
-            </ListItem>
+            </List.Item>
           ).concat([
-            <ListItem key="hr"><hr role="presentation"/></ListItem>,
-            <ListItem key="all">
+            <List.Item key="hr"><hr role="presentation"/></List.Item>,
+            <List.Item key="all">
               <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/courses">{I18n.t('All Courses')}</Button>
-            </ListItem>
+            </List.Item>
           ])
         ) : (
-          <ListItem>
-            <Spinner size="small" title={I18n.t('Loading')} />
-          </ListItem>
+          <List.Item>
+            <Spinner size="small" renderTitle={I18n.t('Loading')} />
+          </List.Item>
         )}
       </List>
       <br />

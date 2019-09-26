@@ -1,0 +1,19 @@
+{
+  "name": "@instructure/ready",
+  "version": "1.0.0",
+  "description": "runs cb after domready or immediately if the dom is already ready",
+  "author": "Instructure, Inc.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --eval \"let called; require('.')(() => called=true); assert(called)\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/instructure/canvas-lms.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/instructure/canvas-lms/issues"
+  },
+  "homepage": "https://github.com/instructure/canvas-lms#readme"
+}

@@ -625,11 +625,7 @@ en:
   duplicate_modules_8ea35557: Duplicate Modules
   allows_the_duplicating_of_modules_in_canvas_2e15b444: Allows the duplicating of modules in Canvas
   allow_opt_out_of_inbox: Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences.
-  public_course_index_59270e80: Public Course Index
-  display_course_catalog: Show a searchable list of courses in this root account with the "Include this course in the public course index" flag enabled.
   enable_gradebook_list_students_by_sortable_name: List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings.
-  require_usage_rights_for_uploaded_files_4507865b: Require Usage Rights for Uploaded Files
-  if_enabled_copyright_and_license_information_must__2a551827: If enabled, copyright and license information must be provided for files before they are published.
   lti_2_reregistration_afabde25: LTI 2 Reregistration
   enable_reregistration_for_lti_2_b2a10444: Enable reregistration for LTI 2
   don_t_move_lti_query_params_to_post_body_5c80e037: Don't Move LTI Query Params to POST Body
@@ -690,6 +686,8 @@ en:
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: If enabled, submission history for New Quizzes quizzes is dealt with separately.
   new_quizzes_importing_c167dce0: New Quizzes Importing
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: Allow importing of QTI and Common Cartridge into New Quizzes.
+  new_quizzes_on_the_quizzes_page_b21f338d: New Quizzes on the Quizzes page
+  show_new_quizzes_on_the_quizzes_page_b2db14d8: Show New Quizzes on the Quizzes page
   common_cartridge_html_file_to_page_conversion_7bf9678: Common Cartridge HTML File to Page Conversion
   if_enabled_common_cartridge_importers_will_convert_9bffff09: If enabled, Common Cartridge importers will convert HTML files into Pages
   non_scoring_rubrics_9f2033ad: Non-scoring Rubrics
@@ -712,6 +710,10 @@ en:
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: Allows users to enable the "Launch SpeedGrader Filtered by Student Group" option for courses on the course settings page. When active and a student group has been selected in New Gradebook, SpeedGrader will only load students in the selected group.
   remove_null_values_from_live_event_payloads_3c826f: Remove null values from live event payloads
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: Canvas will remove keys with null values from live event payloads if this feature is enabled.
+  new_course_and_user_analytics_ffbc508c: New Course and User Analytics
+  show_new_analytics_for_course_and_user_data_18e92636: Show new analytics for course and user data
+  new_gradebook_plagiarism_indicator_8dd22971: New Gradebook Plagiarism Indicator
+  enables_display_of_plagiarism_reports_and_similari_3211dd8b: Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray.
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
           to view a log of those events once a submission is made.
@@ -1031,6 +1033,7 @@ en:
         users_can_edit_name: Users can edit their name
         edit_institution_email: Users can delete their institution-assigned email address
         author_email_in_notifications: Show the email address of sender for user interaction Notifications
+        enable_course_catalog: Show a searchable list of courses in this root account with the "Include this course in the public course index" flag enabled.
         equella: Equella
         enable_turnitin: Turnitin
         equella_endpoint: Equella Endpoint
@@ -3153,6 +3156,7 @@ en:
         grading_scheme: Grading Scheme
         grading_standard_enabled: Enable course grading scheme
         license: License
+        usage_rights_required: File Copyright
         course_visibility: Visibility
         custom_course_visibility: Customize
         indexed: Include this course in the public course index
@@ -4956,6 +4960,8 @@ en:
         notification_preferences: Notification Preferences
       confirm_email_instructions: Before you can receive any notifications, you need to verify your email address (%{email}) by clicking the link in the email we sent you. If you don't see it, *click to re-send the email*, and make sure to check your spam box.
       weekly_notification_range: Your weekly notifications will be sent %{weekday} between %{start_time} and %{end_time}.
+    content_shares:
+      page_title: Shared Content
     profile:
       links:
         edit_settings: Edit Settings
@@ -5920,8 +5926,6 @@ en:
     index_view:
       quizzes_title: Quizzes
       search_for_quiz: Search for Quiz
-      title_add_quiz: Add Quiz
-      add_quiz: Quiz
       links:
         manage_question_banks: Manage Question Banks
         publish_multiple_quizzes: Publish Multiple Quizzes
@@ -6506,6 +6510,7 @@ en:
         pages: Pages
     revisions:
       page_revisions_title: "%{title} revisions: %{context_name}"
+  an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: An object of type %{graphql_type} was hidden due to insufficient scopes on access token
   no_attachments_found_for_the_following_ids_ids_49c9192f: 'No attachments found for the following ids: %{ids}'
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: You must attach at least one file to this assignment
   invalid_file_type_881cc9b2: Invalid file type
@@ -7899,7 +7904,6 @@ en:
       submitted: submitted
       unsubmitted: unsubmitted
       graded: graded
-    media_comment: This is a media comment.
     attached_files_comment: See attached files.
     atom_no_author: No Author
   student_5da6bfd1: Student
@@ -7923,6 +7927,7 @@ en:
       settings: Settings
       profile: Profile
     profile_title_too_long: Title is too long
+  shared_content_803ac37b: Shared Content
   user_service:
     descriptions:
       google_drive: Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations.
@@ -8564,6 +8569,8 @@ en:
     report_header_token_last_used: last used
     report_header_token_dev_key_id: dev key id
     report_header_token_dev_key_name: dev key name
+    report_header_restrict_section_dates: restrict_enrollments_to_section_dates
+    report_header_restrict_course_dates: restrict_enrollments_to_course_dates
     report_header_student_name: student name
     report_header_student_id: student id
     report_header_student_sis: student sis
@@ -8784,6 +8791,8 @@ en:
   orbis_report_header_submission_score: submission score
   orbis_report_header_points_possible: points possible
   orbis_report_header_date_submitted: date submitted
+  created_by_sis_b590894c: Created by SIS;
+  always_include_dates_74b3721d: Always Include Dates;
   canvas_demo_7a005cf3: Canvas Demo
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} left in your Instant Trial *(extend now)*"
   time_left_in_your_instant_trial_5dd0392b: "%{time} left in your Instant Trial"
@@ -9064,7 +9073,7 @@ en:
   nav_badge_text_574b6eb: Nav Badge Text
   nav_logo_background_ba33fb7f: Nav Logo Background
   nav_logo_4b255c91: Nav Logo
-  mobile_global_nav_logo_a189f7bb: Mobile Global Nav Logo
+  responsive_global_nav_logo_99488e92: Responsive Global Nav Logo
   watermark_c93fae0d: Watermark
   watermark_opacity_ce3d3097: Watermark Opacity
   favicon_6e658914: Favicon
@@ -11017,6 +11026,7 @@ en:
   restrict_students_from_accessing_courses_before_st_f7c22c00: Restrict students from accessing courses before start date
   restrict_students_from_accessing_courses_after_end_7dd66bce: Restrict students from accessing courses after end date
   allow_students_to_download_course_content_and_view_810e66ec: Allow students to download course content and view offline
+  copyright_and_license_information_must_be_provided_5feffaf: Copyright and license information must be provided for files before they are published.
   slack_api_key_92f0c667: Slack Api Key
   current_slack_api_key_9eba6a5: 'Current Slack Api Key:'
   new_slack_api_key_453d04d: New Slack Api Key
@@ -12373,6 +12383,10 @@ en:
   id_del_alumno_bc4bcf8a: ID del Alumno
   sis_del_alumno_716babc5: SIS del Alumno
   this_report_displays_teacher_engagement_activity_f_5888d45b: This report displays teacher engagement activity for each teacher enrollment.
+  models_to_include_9fb154ca: Models to include
+  additional_options_7cefee79: Additional Options
+  always_include_dates_1ae2935e: Always Include Dates
+  the_default_report_only_includes_course_section_da_729092f0: The default report only includes Course/Section dates if Enrollment restrictions are enabled
   demos:
     demos_add:
       labels:
@@ -15086,6 +15100,9 @@ en:
   preview_unavailable_aacd459a: Preview Unavailable
   download_c7ffdfb9: Download
   no_submission_fb131a40: No Submission
+  error_adding_canvas_file_to_submission_draft_de258021: Error adding canvas file to submission draft
+  error_updating_submission_draft_1d40ade7: Error updating submission draft
+  error_adding_files_to_submission_draft_6acac337: Error adding files to submission draft
   upload_file_fd2361b8: Upload File
   file_permitted_filetypes_714e4e8d: 'File permitted: %{fileTypes}'
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
@@ -15094,17 +15111,16 @@ en:
   add_media_cfa37b54: Add Media
   record_upload_35dfb2ab: Record/Upload
   file_select_filename_folder_contents_9146bab7: File select, %{filename} folder contents
-  name_4dee4600: ", name: "
-  date_created_b93b76fb: ", date created: "
-  date_modified_4d065406: ", date modified: "
-  modified_by_52d699e9: ", modified by: "
-  size_f1873a2: ", size: "
-  state_unpublished_83c18d01: ", state: unpublished"
-  state_published_e8914697: ", state: published"
-  not_applicable_d5dfd285: not applicable
   type_file_14f017c9: 'type: file'
+  name_name_913c785b: 'name: %{name}'
+  date_created_createdat_265a0dfa: 'date created: %{createdAt}'
+  date_modified_modifiedat_b839cc8b: 'date modified: %{modifiedAt}'
+  modified_by_user_e6c8ade3: 'modified by: %{user}'
+  size_size_a77bd760: 'size: %{size}'
+  state_unpublished_e19c06e6: 'state: unpublished'
+  state_published_e42697da: 'state: published'
   type_folder_115f3b07: 'type: folder'
-  name_parent_directory_b61d10a9: ", name: parent directory "
+  return_to_parent_folder_4ece2184: return to parent folder
   date_created_87e265bc: Date Created
   date_modified_e1c8ac8f: Date Modified
   modified_by_c1584b3c: Modified By
@@ -15117,17 +15133,21 @@ en:
   text_entry_e1808b2f: Text Entry
   remove_submission_draft_f5c7f58b: Remove submission draft
   start_entry_4b491f60: Start Entry
-  all_submission_comments_have_been_marked_as_read_7595389d: All submission comments have been marked as read.
-  there_was_a_problem_marking_submission_comments_as_d4ba6711: There was a problem marking submission comments as read.
+  please_enter_a_url_d2c868b5: Please enter a url
+  website_url_input_1a3eab25: Website url input
+  paste_url_8213b83: Paste URL
+  preview_website_url_eb5b8a5f: Preview website url
+  website_url_b995c5b6: Website Url
+  all_submission_comments_have_been_marked_as_read_74c0683b: All submission comments have been marked as read
+  there_was_a_problem_marking_submission_comments_as_27c2f5c7: There was a problem marking submission comments as read
   send_a_comment_to_your_instructor_about_this_assig_83fd5960: Send a comment to your instructor about this assignment.
   at_791460b3: at
-  submission_comment_sent_3f2af3d0: Submission comment sent
   error_sending_submission_comment_dc15d24f: Error sending submission comment
+  submission_comment_sent_3f2af3d0: Submission comment sent
   comment_input_box_b8c7e58b: Comment input box
   submit_a_comment_7edbf648: Submit a Comment
   attach_a_file_86a4fc00: Attach a File
-  record_video_70dc8439: Record Video
-  record_audio_14666880: Record Audio
+  record_audio_video_d9993f6c: Record Audio/Video
   send_comment_4e05f2fb: Send Comment
   submitted_318fad53: Submitted
   not_submitted_fff47f17: Not submitted
@@ -15136,9 +15156,9 @@ en:
   comments_e07bcbe3: Comments
   rubric_fc39da76: Rubric
   due_5d7267be: 'Due:'
-  ungraded_out_of_pointspossible_2d6d81da: ungraded out of %{pointsPossible}
+  ungraded_pointspossible_e2f86bd9: ungraded/%{pointsPossible}
   ungraded_147a0dce: ungraded
-  points_e63de520: " Points"
+  formattedgrade_points_90505a61: "%{formattedGrade} Points"
   attempt_attempt_grade_c01f45df: 'Attempt %{attempt}: %{grade}'
   late_penalty_minus_count_points_810572fe:
     one: 'Late Penalty: minus 1 Point'
@@ -15163,11 +15183,15 @@ en:
   assignment_locked_with_prerequisite_5b8cb148: Assignment Locked with Prerequisite
   prerequisite_completion_period_c562d63: Prerequisite Completion Period
   go_to_prerequisite_175c1f3f: Go to Prerequisite
+  ta_8d966626: TA
   assignments_2_student_initial_query_error_52aa5ebd: Assignments 2 Student initial query error
   not_graded_yet_82f63c67: Not Graded Yet
   unavailable_46d2c344: Unavailable
   new_attempt_57eae3d9: New Attempt
-  failed_to_laod_more_submissions_990aacee: Failed to laod more submissions
+  failed_to_load_more_submissions_148ff11f: Failed to load more submissions
+  submission_draft_updated_e953166a: Submission draft updated
+  submission_sent_3f0d2ee1: Submission sent
+  error_sending_submission_d32dc075: Error sending submission
   points_is_required_9a9d05b2: Points is required
   points_must_be_a_number_0_daa4f7dc: Points must be a number >= 0
   points_must_0_3bff353: Points must >= 0
@@ -15472,6 +15496,7 @@ en:
   course_catalog_4cc7c8ce: Course Catalog
   recent_announcements_8becc59c: Recent Announcements
   please_upload_files_as_a_zip_5a2c799f: Please upload files as a .zip
+  content_shares_received_view_error_page_c7021a4a: Content Shares Received View Error Page
   are_you_sure_you_want_to_archive_your_copies_of_th_7d219afe:
     one: Are you sure you want to archive your copy of this conversation?
     other: Are you sure you want to archive your copies of these conversations?
@@ -15572,6 +15597,13 @@ en:
   submitted_submitdate_bdd3bf09: 'Submitted: %{submitDate}'
   view_submission_ff3da5d: View Submission
   select_student_name_caaff244: Select student %{name}
+  content_share_preview_166f6562: Content Share Preview
+  retrieval_of_received_shares_failed_6c5583e3: Retrieval of Received Shares failed
+  received_content_53049822: Received Content
+  the_list_below_is_content_that_has_been_shared_wit_2b2648bc: The list below is content that has been shared with you. You can preview the content, import it into your course, or remove it from the list.
+  manage_options_for_name_83278ad0: Manage options for %{name}
+  content_shared_by_others_to_you_5a40bb2c: Content shared by others to you
+  received_7689640e: Received
   last_login_b7bc0479: 'Last login:'
   high_b5cbd048: High
   low_eab1cadd: Low
@@ -16044,6 +16076,7 @@ en:
   quiz_menu_4fcd5e61: Quiz Menu
   user_navigation_a097be0f: User Navigation
   page_menu_2f8bee0: Page Menu
+  pages_index_menu_f391bf04: Pages Index Menu
   app_placements_6d877225: App Placements
   no_placements_enabled_f705f28: No Placements Enabled
   view_toolname_placements_4a5724d1: View %{toolName} Placements
@@ -16238,6 +16271,7 @@ en:
     other: Score does not include %{groups} because they have no points possible
   can_t_compute_score_until_an_assignment_has_points_f34dd600: Can't compute score until an assignment has points possible
   out_of_pointspossible_3fb5ee20: Out of %{pointsPossible}
+  manual_8c2665de: Manual
   muted_3ff94739: Muted
   no_grades_to_post_91425bfd: No grades to post
   post_grades_3e692d46: Post grades
@@ -16327,6 +16361,10 @@ en:
   day_9d999bec: Day
   hour_34d02553: Hour
   lowest_possible_grade_percent_20474418: Lowest possible grade percent
+  error_submitting_to_plagiarism_service_you_may_res_3c89e82d: Error submitting to plagiarism service. You may resubmit from SpeedGrader.
+  submission_is_being_processed_by_plagiarism_servic_df4aa603: Submission is being processed by plagiarism service.
+  score_similarity_score_2c25b94b: "%{score}% similarity score"
+  this_submission_has_plagiarism_data_for_multiple_a_335c881d: This submission has plagiarism data for multiple attachments. To see all reports, open SpeedGrader.
   status_color_picker_9ea0156b: "%{status} Color Picker"
   statuses_f41543d8: Statuses
   cancel_submitting_comment_2666e98b: Cancel Submitting Comment
@@ -17671,8 +17709,11 @@ en:
   list_expanded_efec2d0: List expanded.
   list_collapsed_dde87718: List collapsed
   option_selected_list_collapsed_70a356b4: "%{option} selected. List collapsed."
+  no_results_3cda4e72: No Results
+  enter_at_least_count_characters_1c7a0b36: Enter at least %{count} characters
+  send_to_a879095e: 'Send to:'
+  begin_typing_to_search_7daa7b1: Begin typing to search
   filter_conversations_by_type_1ce8c064: Filter conversations by type
-  manage_options_for_name_83278ad0: Manage options for %{name}
   username_saved_successfully_they_should_receive_an_877e31e: "*%{userName}* saved successfully! They should receive an email confirmation shortly."
   username_saved_successfully_9303974f: "*%{userName}* saved successfully!"
   full_name_23fdfb6d: Full Name
@@ -17695,10 +17736,7 @@ en:
   report_issue_b5f1db0e: Report Issue
   comment_failed_to_post_please_try_again_later_e2d19a0a: Comment failed to post! Please try again later.
   comment_submitted_d9934b: Comment submitted!
-  no_results_3cda4e72: No Results
-  type_at_least_3_characters_to_search_f3df561c: Type at least 3 characters to search.
   select_a_course_4710371f: Select a Course
-  begin_typing_to_search_7daa7b1: Begin typing to search
   common_timezones_2b00baba: Common Timezones
   all_timezones_5e8afa7b: All Timezones
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"
@@ -17712,6 +17750,13 @@ en:
   gpa_scale_6710e2ee: GPA scale
   other_ddacb37d: other
   score_pts_adcb1af3: "%{score} pts"
+  there_was_a_problem_starting_the_copy_operation_dd599cdd: There was a problem starting the copy operation
+  copy_operation_started_successfully_b2f236a1: Copy operation started successfully
+  starting_copy_operation_cc46d911: Starting copy operation
+  starting_content_share_2d8c2999: Starting content share
+  content_share_started_successfully_2c37fb79: Content share started successfully
+  error_starting_content_share_18fb1532: Error starting content share
+  remove_name_624e06be: Remove %{name}
   yyyy_mm_dd_hh_mm_a01b6081: YYYY-MM-DD hh:mm
   other_1c6d9c79: Other
   wiki_6603e81b: Wiki
@@ -17808,6 +17853,10 @@ en:
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} starting at %{time}"
   assessment_audit_tray_5dd11721: Assessment audit tray
   loading_assessment_audit_trail_5cf4c10: Loading assessment audit trail
+  the_group_groupname_was_selected_because_the_stude_bcf7ba7c: The group "%{groupName}" was selected because the student you requested is not in the previously-selected group. You can change the selected group in the Gradebook.
+  the_group_groupname_was_selected_because_the_previ_e080c168: The group "%{groupName}" was selected because the previously-selected group contains no students. You can change the selected group in the Gradebook.
+  the_group_groupname_was_automatically_selected_bec_450689f: The group "%{groupName}" was automatically selected because no group was previously chosen. You can change the selected group in the Gradebook.
+  the_selected_group_was_cleared_because_the_student_656e4f1c: The selected group was cleared because the student you requested is not part of any groups. You can select a group in the Gradebook.
   post_or_hide_grades_2d1d7815: Post or Hide Grades
   all_grades_posted_d5b8cb68: All Grades Posted
   no_grades_to_post_fc148c1b: No Grades to Post
@@ -18437,6 +18486,9 @@ en:
       some_scores_reduced: Only award points for the correct answer (*some students' scores may be reduced*)
       give_everyone_full_credit: Give everyone full credit for this question
       update_question_without_regrading: Update question without regrading
+  add_quiz_cebfa28b: Add Quiz
+  add_old_quiz_f4c546a: Add Old Quiz
+  old_quiz_e8dafede: Old Quiz
   quiz_settings_4e17f005: Quiz Settings
   view_question_banks_188a9e0f: View Question Banks
   edit_mastery_paths_for_title_label_41d81451: Edit Mastery Paths for %{title_label}
@@ -18496,6 +18548,7 @@ en:
       file: File
   can_edit_this_page_role_selection_6ccec3c7: Can edit this page role selection
   allow_in_mastery_paths_5332c786: Allow in mastery paths
+  pages_settings_968392a3: Pages Settings
   master_lock_590266b6: Master Lock
   remove_as_front_page_2698aa12: Remove as Front Page
   use_as_front_page_274a488b: Use as Front Page

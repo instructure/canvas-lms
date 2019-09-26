@@ -17,8 +17,10 @@
  */
 
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import 'jquery.fancyplaceholder'
 
+ready(() => {
 $('.field-with-fancyplaceholder input').fancyPlaceholder()
 $('#login_form').find(':text:first').select()
 
@@ -37,4 +39,5 @@ $('#back_to_choose_number_link').click((event) => {
   $select_phone_form.show()
   $phone_select.find('option:first').attr('selected', 'selected')
   event.preventDefault()
+})
 })

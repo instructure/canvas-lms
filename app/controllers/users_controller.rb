@@ -457,8 +457,8 @@ class UsersController < ApplicationController
   #
   # @argument enrollment_type [String]
   #   When set, only return users enrolled with the specified course-level base role.
-  #   This can be a base role type of 'StudentEnrollment', 'TeacherEnrollment',
-  #   'TaEnrollment', 'ObserverEnrollment', or 'DesignerEnrollment'.
+  #   This can be a base role type of 'student', 'teacher',
+  #   'ta', 'observer', or 'designer'.
   #
   # @argument sort [String, "username"|"email"|"sis_id"|"last_login"]
   #   The column to sort results by.
@@ -2498,6 +2498,8 @@ class UsersController < ApplicationController
   #
   # @argument include[] [String, "assignment"]
   #   Associations to include with the group.
+  # @argument only_current_enrollments [boolean]
+  #   Returns submissions for only currently active enrollments
   #
   # @returns [Submission]
   #
@@ -2505,10 +2507,17 @@ class UsersController < ApplicationController
     @user = api_find(User, params[:id])
     if authorized_action(@user, @current_user, :read_grades)
       collections = []
+      only_current_enrollments = value_to_boolean(params[:only_current_enrollments])
+
       # Plannable Bookmarker enables descending order
       bookmarker = Plannable::Bookmarker.new(Submission, true, :graded_at, :id)
       Shard.with_each_shard(@user.associated_shards) do
-        collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, Submission.for_user(@user).graded)]
+        submissions = if only_current_enrollments
+          Submission.joins(assignment: { course: :student_enrollments }).merge(Enrollment.current.for_user(@user))
+        else
+          Submission.all
+        end
+        collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, submissions.for_user(@user).graded)]
       end
 
       scope = BookmarkedCollection.merge(*collections)

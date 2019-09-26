@@ -18,7 +18,7 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import AvailabilityDates from '../../shared/AvailabilityDates'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import I18n from 'i18n!assignments_2'
 import lockedSVG from '../SVG/Locked.svg'
 import React from 'react'
@@ -28,17 +28,17 @@ function LockedAssignment(props) {
   const {assignment} = props
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
-      <FlexItem>
+      <Flex.Item>
         <img alt={I18n.t('Assignment Locked')} src={lockedSVG} />
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <Text size="x-large">{I18n.t('Availability Dates')}</Text>
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <Text size="large">
           <AvailabilityDates assignment={assignment} formatStyle="short" />
         </Text>
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }

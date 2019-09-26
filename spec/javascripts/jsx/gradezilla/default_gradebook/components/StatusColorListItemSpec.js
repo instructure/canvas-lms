@@ -19,7 +19,7 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 import {Text} from '@instructure/ui-elements'
-import {IconMore} from '@instructure/ui-icons'
+import {IconMoreSolid} from '@instructure/ui-icons'
 import StatusColorListItem from 'jsx/gradezilla/default_gradebook/components/StatusColorListItem'
 
 function defaultProps(props = {}) {
@@ -60,7 +60,7 @@ test('status is displayed', function() {
 })
 
 test('popover trigger is a kabob', function() {
-  ok(this.wrapper.find('PopoverTrigger Button').contains(<IconMore />))
+  ok(this.wrapper.find('PopoverTrigger Button').contains(<IconMoreSolid />))
 })
 
 test('setColor sets the ColorPicker color', function() {

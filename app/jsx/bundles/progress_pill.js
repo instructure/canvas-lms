@@ -21,7 +21,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Tooltip} from '@instructure/ui-overlays'
 import {IconUploadLine, IconWarningLine} from '@instructure/ui-icons'
+import ready from '@instructure/ready'
 
+ready(() => {
 const presenter = document.querySelectorAll(".assignment_presenter_for_submission")
 const progressIcon = (presenterObject) => {
   switch (presenterObject.innerText) {
@@ -45,3 +47,4 @@ for (let i = 0; i < progressElements.length; i++) {
     ), progressElements[i])
   }
 }
+})

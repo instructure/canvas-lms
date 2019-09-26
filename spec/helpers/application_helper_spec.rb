@@ -516,12 +516,28 @@ describe ApplicationHelper do
     it "should return hash of tools if in group" do
       @course = course_model
       @group = @course.groups.create!(:name => "some group")
-      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+      tool = @course.context_external_tools.new(
+        :name => "bob",
+        :consumer_key => "test",
+        :shared_secret => "secret",
+        :url => "http://example.com",
+        :description => "the description."
+      )
       tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons'}
       tool.save!
       @context = @group
 
-      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons', :width=>800, :height=>400, :use_tray => false}])
+      expect(editor_buttons).to eq([{
+        :name=>"bob",
+        :id=>tool.id,
+        :url=>"http://example.com",
+        :icon_url=>"http://example.com",
+        :canvas_icon_class => 'icon-commons',
+        :width=>800,
+        :height=>400,
+        :use_tray => false,
+        :description => "<p>the description.</p>\n"
+      }])
     end
 
     it "should return hash of tools if in course" do
@@ -532,7 +548,17 @@ describe ApplicationHelper do
       allow(controller).to receive(:group_external_tool_path).and_return('http://dummy')
       @context = @course
 
-      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons', :width=>800, :height=>400, :use_tray => false}])
+      expect(editor_buttons).to eq([{
+        :name=>"bob",
+        :id=>tool.id,
+        :url=>"http://example.com",
+        :icon_url=>"http://example.com",
+        :canvas_icon_class => 'icon-commons',
+        :width=>800,
+        :height=>400,
+        :use_tray => false,
+        :description => ""
+      }])
     end
 
     it "should not include tools from the domain_root_account for users" do

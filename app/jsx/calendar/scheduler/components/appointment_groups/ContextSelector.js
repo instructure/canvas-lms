@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import {Button} from '@instructure/ui-buttons'
 import {IconMiniArrowEndSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
-import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 
   class ContextSelector extends React.Component {
     static propTypes = {
@@ -280,16 +280,16 @@ import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
           </Button>
           <div id="context-selector-dropdown" className={`ContextSelector__Dropdown ${this.state.showDropdown ? 'show' : 'hidden'}`}>
             <Grid>
-              <GridRow hAlign="start">
-                <GridCol>
+              <Grid.Row hAlign="start">
+                <Grid.Col>
                   {this.renderListItems()}
-                </GridCol>
-              </GridRow>
-              <GridRow hAlign="end">
-                <GridCol width="auto">
+                </Grid.Col>
+              </Grid.Row>
+              <Grid.Row hAlign="end">
+                <Grid.Col width="auto">
                   <Button onClick={this.handleDoneClick} size="small" >{I18n.t('Done')}</Button>
-                </GridCol>
-              </GridRow>
+                </Grid.Col>
+              </Grid.Row>
             </Grid>
           </div>
         </div>

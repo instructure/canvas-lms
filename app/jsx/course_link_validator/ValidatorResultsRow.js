@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {Flex, FlexItem} from '@instructure/ui-layout'
-import {List, ListItem, Text, Link, Heading} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-layout'
+import {List, Text, Link, Heading} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 import {
   IconSettingsLine,
@@ -94,21 +94,21 @@ export default function ValidatorResultsRow(props) {
     errors.forEach(error => {
       const IconClass = error.image ? IconImageSolid : IconLinkSolid
       const link_text = getLinkText(error)
-      const link = <ListItem key={error.url}>
+      const link = <List.Item key={error.url}>
           <IconClass color="success"/>
           &ensp;
           <Link href={error.url}>{link_text}</Link>
-        </ListItem>
+        </List.Item>
       links.push(link)
     })
 
     rows.push(
-      <ListItem key={reason}>
+      <List.Item key={reason}>
         {REASON_DESCRIPTION[reason]}
         <List variant="unstyled" margin="none x-small small small">
           {links}
         </List>
-      </ListItem>
+      </List.Item>
     )
   })
 
@@ -125,10 +125,10 @@ export default function ValidatorResultsRow(props) {
   return (
     <div className="result">
       <Flex>
-        <FlexItem align="start">
+        <Flex.Item align="start">
           <TypeIcon color="success" size="small"/>
-        </FlexItem>
-        <FlexItem margin="none none none small">
+        </Flex.Item>
+        <Flex.Item margin="none none none small">
           <Heading level="h3" as="h2">
             <Button
               variant="link"
@@ -139,7 +139,7 @@ export default function ValidatorResultsRow(props) {
             </Button>
           </Heading>
           <Text size="x-small" transform="uppercase" lineHeight="condensed" letterSpacing="expanded">{label}</Text>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
       <List margin="none x-small small x-large">
         {rows}

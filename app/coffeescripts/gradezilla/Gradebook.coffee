@@ -741,10 +741,11 @@ export default do ->
     studentsThatCanSeeAssignment: (assignmentId) ->
       @courseContent.assignmentStudentVisibility[assignmentId] ||= (
         assignment = @getAssignment(assignmentId)
+        allStudents = Object.assign({}, @students, @studentViewStudents)
         if assignment.only_visible_to_overrides
-          _.pick @students, assignment.assignment_visibility...
+          _.pick allStudents, assignment.assignment_visibility...
         else
-          @students
+          allStudents
       )
 
     isInvalidSort: =>
@@ -2373,6 +2374,7 @@ export default do ->
       selectPreviousAssignment: => @loadTrayAssignment('previous')
       selectNextStudent: => @loadTrayStudent('next')
       selectPreviousStudent: => @loadTrayStudent('previous')
+      showSimilarityScore: @options.show_similarity_score
       speedGraderEnabled: @options.speed_grader_enabled
       student:
         id: student.id

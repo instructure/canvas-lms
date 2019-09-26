@@ -6,6 +6,20 @@
       <div class="header-bar-right">
         {{#if CAN.CREATE}}
           <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">{{#t 'buttons.new_page'}}Page{{/t}}</a>
+          {{#if hasWikiIndexPlacements}}
+          <div class="header-bar-right">
+            <div class="inline-block">
+              <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+                <i class="icon-more" aria-hidden="true"></i>
+                <span class="screenreader-only">{{#t}}Pages Settings{{/t}}</span>
+              </a>
+
+              <ul id="toolbar-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false">
+                {{>ExternalTools/external_tools_menu wikiIndexPlacements}}
+              </ul>
+            </div>
+          </div>
+          {{/if}}
         {{/if}}
       </div>
     </div>

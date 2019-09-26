@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Pagination, PaginationButton} from '@instructure/ui-pagination'
+import {Pagination} from '@instructure/ui-pagination'
 
 const Paginator = ({loadPage, page, pageCount}) => {
   if (pageCount <= 1) {
@@ -28,9 +28,9 @@ const Paginator = ({loadPage, page, pageCount}) => {
   return (
     <Pagination variant="compact">
       {Array.from(Array(pageCount)).map((v, i) => (
-        <PaginationButton onClick={() => loadPage(i + 1)} key={i + 1} current={page === i + 1}>
+        <Pagination.Page onClick={() => loadPage(i + 1)} key={i + 1} current={page === i + 1}>
           {i + 1}
-        </PaginationButton>
+        </Pagination.Page>
       ))}
     </Pagination>
   )

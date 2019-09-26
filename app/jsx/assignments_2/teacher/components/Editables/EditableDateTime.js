@@ -25,7 +25,7 @@ import {Button} from '@instructure/ui-buttons'
 import {DateTimeInput} from '@instructure/ui-forms'
 import {IconCalendarMonthLine} from '@instructure/ui-icons'
 import {Editable} from '@instructure/ui-editable'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {FocusableView} from '@instructure/ui-focusable'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
@@ -249,11 +249,11 @@ export default class EditableDateTime extends React.Component {
         {...containerProps}
       >
         <Flex inline direction="row" justifyItems="space-between" width="100%">
-          <FlexItem grow shrink>
+          <Flex.Item grow shrink>
             {this.renderEditor(getEditorProps())}
             {this.renderViewer(getViewerProps())}
-          </FlexItem>
-          <FlexItem margin="0 0 0 xx-small">{this.renderEditButton(getEditButtonProps())}</FlexItem>
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 xx-small">{this.renderEditButton(getEditButtonProps())}</Flex.Item>
         </Flex>
       </View>
     )

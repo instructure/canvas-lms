@@ -37,6 +37,16 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
   end
 end
 
+class SubmissionRubricAssessmentFilterInputType < Types::BaseInputObject
+  graphql_name 'SubmissionRubricAssessmentFilterInput'
+
+  argument :for_attempt, Integer, <<~DESC, required: false, default_value: nil
+    What submission attempt the rubric assessment should be returned for. If not
+    specified, it will return the rubric assessment for the current submisssion
+    or submission history.
+  DESC
+end
+
 module Interfaces::SubmissionInterface
   include GraphQL::Schema::Interface
   description 'Types for submission or submission history'
@@ -198,4 +208,40 @@ module Interfaces::SubmissionInterface
       drafts.select { |draft| draft.submission_attempt == target_attempt }.first
     end
   end
+
+  field :rubric_assessments_connection, Types::RubricAssessmentType.connection_type, null: true do
+    argument :filter, SubmissionRubricAssessmentFilterInputType, required: false, default_value: {}
+  end
+  def rubric_assessments_connection(filter:)
+    filter = filter.to_h
+    target_attempt = filter[:for_attempt] || object.attempt
+
+    Promise.all([
+      load_association(:assignment),
+      load_association(:rubric_assessments)
+    ]).then do
+      assessments_needing_versions_loaded = submission.rubric_assessments.reject do |ra|
+        ra.artifact_attempt == target_attempt
+      end
+
+      versionable_loader_promise =
+        if assessments_needing_versions_loaded.empty?
+          Promise.resolve(nil)
+        else
+          Loaders::AssociationLoader.for(RubricAssessment, :versions).
+            load_many(assessments_needing_versions_loaded)
+        end
+
+      Promise.all([
+        versionable_loader_promise,
+        Loaders::AssociationLoader.for(Assignment, :rubric_association).load(submission.assignment),
+        Loaders::AssociationLoader.for(RubricAssessment, :rubric_association).
+          load_many(submission.rubric_assessments)
+      ]).then do
+        submission.visible_rubric_assessments_for(current_user, attempt: target_attempt)
+      end
+    end
+  end
+
+  field :url, Types::UrlType, null: true
 end

@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
-import {IconMoreSolid, IconOffLine, IconOffSolid} from '@instructure/ui-icons'
+import {IconMoreSolid, IconOffSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
-import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
+import {Grid} from '@instructure/ui-layout'
+import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
 import 'message_students'
 import I18n from 'i18n!gradezilla'
@@ -53,6 +53,15 @@ function SecondaryDetailLine(props) {
           {I18n.t('Out of %{pointsPossible}', {pointsPossible})}
         </Text>
       </span>
+
+      {props.postPoliciesEnabled && props.assignment.postManually && (
+        <span>
+          &nbsp;
+          <Text size="x-small" transform="uppercase" weight="bold">
+            {I18n.t('Manual')}
+          </Text>
+        </span>
+      )}
 
       {!props.postPoliciesEnabled && props.assignment.muted && (
         <span>
@@ -147,8 +156,9 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
     students: arrayOf(
       shape({
-        isInactive: bool.isRequired,
         id: string.isRequired,
+        isInactive: bool.isRequired,
+        isTestStudent: bool.isRequired,
         name: string.isRequired,
         sortableName: string.isRequired,
         submission: shape({
@@ -279,7 +289,9 @@ export default class AssignmentColumnHeader extends ColumnHeader {
   }
 
   activeStudentDetails() {
-    const activeStudents = this.props.students.filter(student => !student.isInactive)
+    const activeStudents = this.props.students.filter(
+      student => !student.isInactive && !student.isTestStudent
+    )
     return activeStudents.map(student => {
       const {excused, latePolicyStatus, score, submittedAt} = student.submission
       return {
@@ -342,80 +354,80 @@ export default class AssignmentColumnHeader extends ColumnHeader {
         onDismiss={this.props.onMenuDismiss}
       >
         <Menu contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
-          <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
-            <MenuItem
+          <Menu.Group label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+            <Menu.Item
               selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByGradeAscending}
             >
               {I18n.t('Grade - Low to High')}
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuItem
+            <Menu.Item
               selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByGradeDescending}
             >
               {I18n.t('Grade - High to Low')}
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuItem
+            <Menu.Item
               selected={selectedSortSetting === 'missing'}
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByMissing}
             >
               {I18n.t('Missing')}
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuItem
+            <Menu.Item
               selected={selectedSortSetting === 'late'}
               disabled={sortBySetting.disabled}
               onSelect={sortBySetting.onSortByLate}
             >
               {I18n.t('Late')}
-            </MenuItem>
+            </Menu.Item>
 
             {this.props.showUnpostedMenuItem && (
-              <MenuItem
+              <Menu.Item
                 selected={selectedSortSetting === 'unposted'}
                 disabled={sortBySetting.disabled}
                 onSelect={sortBySetting.onSortByUnposted}
               >
                 {I18n.t('Unposted')}
-              </MenuItem>
+              </Menu.Item>
             )}
-          </MenuItemGroup>
+          </Menu.Group>
         </Menu>
 
-        <MenuItem
+        <Menu.Item
           disabled={!this.props.submissionsLoaded}
           onSelect={this.showMessageStudentsWhoDialog}
         >
           <span data-menu-item-id="message-students-who">{I18n.t('Message Students Who')}</span>
-        </MenuItem>
+        </Menu.Item>
 
-        <MenuItem disabled={this.props.curveGradesAction.isDisabled} onSelect={this.curveGrades}>
+        <Menu.Item disabled={this.props.curveGradesAction.isDisabled} onSelect={this.curveGrades}>
           <span data-menu-item-id="curve-grades">{I18n.t('Curve Grades')}</span>
-        </MenuItem>
+        </Menu.Item>
 
-        <MenuItem
+        <Menu.Item
           disabled={this.props.setDefaultGradeAction.disabled}
           onSelect={this.setDefaultGrades}
         >
           <span data-menu-item-id="set-default-grade">{I18n.t('Set Default Grade')}</span>
-        </MenuItem>
+        </Menu.Item>
 
         {this.props.postGradesAction.featureEnabled ? (
-          <MenuItem
+          <Menu.Item
             disabled={
               !this.props.postGradesAction.hasGradesToPost || !this.props.postGradesAction.hasGrades
             }
             onSelect={this.postGrades}
           >
             {labelForPostGradesAction(this.props.postGradesAction)}
-          </MenuItem>
+          </Menu.Item>
         ) : (
-          <MenuItem
+          <Menu.Item
             disabled={this.props.muteAssignmentAction.disabled}
             onSelect={this.muteAssignment}
           >
@@ -424,62 +436,62 @@ export default class AssignmentColumnHeader extends ColumnHeader {
                 ? I18n.t('Unmute Assignment')
                 : I18n.t('Mute Assignment')}
             </span>
-          </MenuItem>
+          </Menu.Item>
         )}
 
         {this.props.postGradesAction.featureEnabled && (
-          <MenuItem
+          <Menu.Item
             disabled={
               !this.props.hideGradesAction.hasGradesToHide || !this.props.hideGradesAction.hasGrades
             }
             onSelect={this.hideGrades}
           >
             {labelForHideGradesAction(this.props.hideGradesAction)}
-          </MenuItem>
+          </Menu.Item>
         )}
 
-        {!this.props.enterGradesAsSetting.hidden && <MenuItemSeparator />}
+        {!this.props.enterGradesAsSetting.hidden && <Menu.Separator />}
 
         {!this.props.enterGradesAsSetting.hidden && (
           <Menu contentRef={this.bindEnterGradesAsMenuContent} label={I18n.t('Enter Grades as')}>
-            <MenuItemGroup
+            <Menu.Group
               label={<ScreenReaderContent>{I18n.t('Enter Grades as')}</ScreenReaderContent>}
               onSelect={this.onEnterGradesAsSettingSelect}
               selected={[this.props.enterGradesAsSetting.selected]}
             >
-              <MenuItem value="points">{I18n.t('Points')}</MenuItem>
+              <Menu.Item value="points">{I18n.t('Points')}</Menu.Item>
 
-              <MenuItem value="percent">{I18n.t('Percentage')}</MenuItem>
+              <Menu.Item value="percent">{I18n.t('Percentage')}</Menu.Item>
 
               {this.props.enterGradesAsSetting.showGradingSchemeOption && (
-                <MenuItem value="gradingScheme">{I18n.t('Grading Scheme')}</MenuItem>
+                <Menu.Item value="gradingScheme">{I18n.t('Grading Scheme')}</Menu.Item>
               )}
-            </MenuItemGroup>
+            </Menu.Group>
           </Menu>
         )}
 
         {!(
           this.props.downloadSubmissionsAction.hidden && this.props.reuploadSubmissionsAction.hidden
-        ) && <MenuItemSeparator />}
+        ) && <Menu.Separator />}
 
         {!this.props.downloadSubmissionsAction.hidden && (
-          <MenuItem onSelect={this.downloadSubmissions}>
+          <Menu.Item onSelect={this.downloadSubmissions}>
             <span data-menu-item-id="download-submissions">{I18n.t('Download Submissions')}</span>
-          </MenuItem>
+          </Menu.Item>
         )}
 
         {!this.props.reuploadSubmissionsAction.hidden && (
-          <MenuItem onSelect={this.reuploadSubmissions}>
+          <Menu.Item onSelect={this.reuploadSubmissions}>
             <span data-menu-item-id="reupload-submissions">{I18n.t('Re-Upload Submissions')}</span>
-          </MenuItem>
+          </Menu.Item>
         )}
 
-        {this.props.postGradesAction.featureEnabled && <MenuItemSeparator />}
+        {this.props.postGradesAction.featureEnabled && <Menu.Separator />}
 
         {this.props.postGradesAction.featureEnabled && (
-          <MenuItem onSelect={this.showGradePostingPolicy}>
+          <Menu.Item onSelect={this.showGradePostingPolicy}>
             {I18n.t('Grade Posting Policy')}
-          </MenuItem>
+          </Menu.Item>
         )}
       </Menu>
     )
@@ -492,12 +504,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
     const submissions = this.props.students.map(student => student.submission)
     const postableSubmissionsPresent = submissions.some(isHidden)
-
-    // Assignment is manually-posted and has no graded-but-unposted submissions
-    // (i.e., no unposted submissions that are in a suitable state to post)
-    if (this.props.assignment.postManually && !postableSubmissionsPresent) {
-      return <IconOffLine size="x-small" />
-    }
 
     // Assignment has at least one hidden submission that can be posted
     // (regardless of whether it's manually or automatically posted)
@@ -520,14 +526,14 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       >
         <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
-            <GridRow>
-              <GridCol textAlign="center" width="auto" vAlign="top">
+            <Grid.Row>
+              <Grid.Col textAlign="center" width="auto" vAlign="top">
                 <div className="Gradebook__ColumnHeaderIndicators">
                   {postPoliciesEnabled && this.renderUnpostedSubmissionsIcon()}
                 </div>
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center">
+              <Grid.Col textAlign="center">
                 <span className="Gradebook__ColumnHeaderDetail">
                   <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--primary">
                     {this.renderAssignmentLink()}
@@ -538,12 +544,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
                     postPoliciesEnabled={postPoliciesEnabled}
                   />
                 </span>
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center" width="auto">
+              <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>{this.renderMenu()}</div>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </div>
       </div>

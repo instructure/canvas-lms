@@ -19,13 +19,14 @@
 import {Assignment} from '../graphqlData/Assignment'
 import {bool, func} from 'prop-types'
 import LoadingIndicator from '../../shared/LoadingIndicator'
-import MediaAttempt from './AttemptType/MediaAttempt'
 import React, {Component, lazy, Suspense} from 'react'
 import {Submission} from '../graphqlData/Submission'
 
 const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
 const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
+const MediaAttempt = lazy(() => import('./AttemptType/MediaAttempt'))
 const TextEntry = lazy(() => import('./AttemptType/TextEntry'))
+const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
 
 export default class AttemptTab extends Component {
   static propTypes = {
@@ -79,8 +80,20 @@ export default class AttemptTab extends Component {
     )
   }
 
+  renderUrlAttempt = () => {
+    return (
+      <Suspense fallback={<LoadingIndicator />}>
+        <UrlEntry />
+      </Suspense>
+    )
+  }
+
   renderMediaAttempt = () => {
-    return <MediaAttempt assignment={this.props.assignment} />
+    return (
+      <Suspense fallback={<LoadingIndicator />}>
+        <MediaAttempt assignment={this.props.assignment} />
+      </Suspense>
+    )
   }
 
   renderByType() {
@@ -92,6 +105,8 @@ export default class AttemptTab extends Component {
         return this.renderTextAttempt()
       case 'online_upload':
         return this.renderFileAttempt()
+      case 'online_url':
+        return this.renderUrlAttempt()
       default:
         throw new Error('submission type not yet supported in A2')
     }

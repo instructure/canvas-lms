@@ -164,6 +164,7 @@ describe "assignment rubrics" do
       f('#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
       wait_for_ajaximations
       expect(f('#rubric_'+@rubric.id.to_s+' .rubric_title .title')).to include_text(@rubric.title)
+      expect(f('#rubrics span .rubric_total').text).to eq '8'
     end
 
     it "should not adjust points when importing an outcome to an assignment", priority: "1", test_id: 2896223 do

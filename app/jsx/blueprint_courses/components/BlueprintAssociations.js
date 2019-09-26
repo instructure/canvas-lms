@@ -114,7 +114,7 @@ export default class BlueprintAssociations extends React.Component {
       return (
         <div className="bca__overlay">
           <div className="bca__overlay__save-wrapper">
-            <Spinner title={title} />
+            <Spinner renderTitle={title} />
             <Text as="p">{title}</Text>
           </div>
         </div>

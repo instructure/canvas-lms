@@ -24,12 +24,12 @@ import {ApplyTheme} from '@instructure/ui-themeable'
 import {View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
 import {IconAssignmentLine, IconQuizLine} from '@instructure/ui-icons'
-import {ListItem} from '@instructure/ui-elements'
+import {List} from '@instructure/ui-elements'
 
 const UnassessedAssignment = ({ assignment }) => {
   const { id, url, submission_types, title } = assignment
   return (
-    <ListItem key={id}>
+    <List.Item key={id}>
       <View padding="small" display="block">
         <ApplyTheme theme={{[Button.theme]: {linkColor: '#68777D', fontWeight: '700'}}}>
           <Button
@@ -45,7 +45,7 @@ const UnassessedAssignment = ({ assignment }) => {
           </Button>
         </ApplyTheme>
       </View>
-    </ListItem>
+    </List.Item>
   )
 }
 

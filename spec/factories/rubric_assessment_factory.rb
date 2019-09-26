@@ -18,12 +18,12 @@
 
 module Factories
   def rubric_assessment_model(opts={})
-    rubric_association_model(opts)
-    @rubric_assessment = @rubric_association.assess(
+    rubric_association = opts[:rubric_association] || rubric_association_model(opts)
+    @rubric_assessment = rubric_association.assess(
       user: opts[:user],
-      assessor: opts[:user],
-      artifact: @rubric_association.association_object.submit_homework(opts[:user]),
-      assessment: @rubric_association.rubric.criteria_object.map {|x| ["criterion_#{x.id}".to_sym, {}] }.to_h.merge(
+      assessor: opts[:assessor] || opts[:user],
+      artifact: rubric_association.association_object.submit_homework(opts[:user]),
+      assessment: rubric_association.rubric.criteria_object.map {|x| ["criterion_#{x.id}".to_sym, {}] }.to_h.merge(
         assessment_type: (opts[:assessment_type] || 'no_reason')
       )
     )

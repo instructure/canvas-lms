@@ -1411,21 +1411,27 @@ describe MasterCourses::MasterMigration do
       @copy_to2.update_attribute(:syllabus_body, child_syllabus1)
 
       master_syllabus1 = "<p>some original syllabus</p>"
-      @copy_from.update_attribute(:syllabus_body, master_syllabus1)
-      run_master_migration
-      expect(@copy_to1.reload.syllabus_body).to eq master_syllabus1 # use the master syllabus
-      expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1 # keep the existing one
+      Timecop.freeze(1.minute.from_now) do
+        @copy_from.update_attribute(:syllabus_body, master_syllabus1)
+        run_master_migration
+        expect(@copy_to1.reload.syllabus_body).to eq master_syllabus1 # use the master syllabus
+        expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1 # keep the existing one
+      end
 
       master_syllabus2 = "<p>some new syllabus</p>"
-      @copy_from.update_attribute(:syllabus_body, master_syllabus2)
-      run_master_migration
-      expect(@copy_to1.reload.syllabus_body).to eq master_syllabus2 # keep syncing
-      expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1
+      Timecop.freeze(2.minutes.from_now) do
+        @copy_from.update_attribute(:syllabus_body, master_syllabus2)
+        run_master_migration
+        expect(@copy_to1.reload.syllabus_body).to eq master_syllabus2 # keep syncing
+        expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1
+      end
 
       child_syllabus2 = "<p>syllabus is a weird word</p>"
-      @copy_to1.update_attribute(:syllabus_body, child_syllabus2)
-      run_master_migration
-      expect(@copy_to1.reload.syllabus_body).to eq child_syllabus2 # preserve the downstream change
+      Timecop.freeze(3.minutes.from_now) do
+        @copy_to1.update_attribute(:syllabus_body, child_syllabus2)
+        run_master_migration
+        expect(@copy_to1.reload.syllabus_body).to eq child_syllabus2 # preserve the downstream change
+      end
     end
 
     it "should trigger folder locking data cache invalidation" do

@@ -24,7 +24,9 @@ import 'communication_channels'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import GeneratePairingCode from '../profiles/GeneratePairingCode'
+import ready from '@instructure/ready'
 
+ready(() => {
 const hiddenFlags = [];
 if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
   hiddenFlags.push('new_user_tutorial_on_off')
@@ -37,3 +39,4 @@ const container = document.querySelector('#pairing-code')
 if (container) {
   ReactDOM.render(<GeneratePairingCode userId={ENV.current_user.id} />, container)
 }
+})

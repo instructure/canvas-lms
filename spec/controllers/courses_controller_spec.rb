@@ -877,6 +877,19 @@ describe CoursesController do
       assert_unauthorized
     end
 
+    it 'includes analytics 2 link if installed' do
+      tool = analytics_2_tool_factory
+      Account.default.enable_feature!(:analytics_2)
+
+      get 'show', params: {id: @course.id}
+      expect(controller.course_custom_links).to include({
+        text: "Analytics 2",
+        url: "http://test.host/courses/#{@course.id}/external_tools/#{tool.id}?launch_type=course_navigation",
+        icon_class: "icon-analytics",
+        tool_id: ContextExternalTool::ANALYTICS_2
+      })
+    end
+
     def check_course_show(should_show)
       controller.instance_variable_set(:@context_all_permissions, nil)
       controller.instance_variable_set(:@js_env, nil)
@@ -1752,6 +1765,14 @@ describe CoursesController do
       @course.save!
       put 'update', params: {:id => @course.id, :course => { :lock_all_announcements => 0 }}
       expect(assigns[:course].lock_all_announcements).to be_falsey
+    end
+
+    it "should update its usage_rights_required setting" do
+      user_session(@teacher)
+      @course.usage_rights_required = true
+      @course.save!
+      put 'update', params: {:id => @course.id, :course => { :usage_rights_required => 0 }}
+      expect(assigns[:course].usage_rights_required).to be_falsey
     end
 
     it "should let sub-account admins move courses to other accounts within their sub-account" do

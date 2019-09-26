@@ -29,18 +29,18 @@ import toUnderscore from '../str/underscore'
 // declare all used i18n keys here to cluttering up the logic
 const keys = {
   limited: {
-    TeacherEnrollment: I18n.t('enrolled_as_limited_teacher', 'enrolled as a teacher with section-only access'),
-    TaEnrollment: I18n.t('enrolled_as_limited_ta', 'enrolled as a TA with section-only access'),
-    ObserverEnrollment: I18n.t('enrolled_as_limited_observer', 'enrolled as a observer with section-only access'),
-    DesignerEnrollment: I18n.t('enrolled_as_limited_designer', 'enrolled as a designer with section-only access'),
-    StudentEnrollment: I18n.t('enrolled_as_limited_student', 'enrolled as a student with section-only access'),
+    get TeacherEnrollment(){ return I18n.t('enrolled_as_limited_teacher', 'enrolled as a teacher with section-only access')},
+    get TaEnrollment(){ return I18n.t('enrolled_as_limited_ta', 'enrolled as a TA with section-only access')},
+    get ObserverEnrollment(){ return I18n.t('enrolled_as_limited_observer', 'enrolled as a observer with section-only access')},
+    get DesignerEnrollment(){ return I18n.t('enrolled_as_limited_designer', 'enrolled as a designer with section-only access')},
+    get StudentEnrollment(){ return I18n.t('enrolled_as_limited_student', 'enrolled as a student with section-only access')},
   },
   standard: {
-    TeacherEnrollment: I18n.t('enrolled_as_teacher', 'enrolled as a teacher'),
-    TaEnrollment: I18n.t('enrolled_as_ta', 'enrolled as a TA'),
-    ObserverEnrollment: I18n.t('enrolled_as_observer', 'enrolled as a observer'),
-    DesignerEnrollment: I18n.t('enrolled_as_designer', 'enrolled as a designer'),
-    StudentEnrollment: I18n.t('enrolled_as_student', 'enrolled as a student'),
+    get TeacherEnrollment(){ return I18n.t('enrolled_as_teacher', 'enrolled as a teacher')},
+    get TaEnrollment(){ return I18n.t('enrolled_as_ta', 'enrolled as a TA')},
+    get ObserverEnrollment(){ return I18n.t('enrolled_as_observer', 'enrolled as a observer')},
+    get DesignerEnrollment(){ return I18n.t('enrolled_as_designer', 'enrolled as a designer')},
+    get StudentEnrollment(){ return I18n.t('enrolled_as_student', 'enrolled as a student')},
   },
 }
 

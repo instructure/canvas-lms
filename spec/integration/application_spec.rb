@@ -38,12 +38,6 @@ describe "site-wide" do
     assert_status(404)
   end
 
-  it "should set the x-ua-compatible http header" do
-    get "/login"
-    key = 'X-UA-Compatible'
-    expect(response[key]).to eq "IE=Edge,chrome=1"
-  end
-
   it "should set no-cache headers for html requests" do
     get "/login"
     expect(response['Pragma']).to match(/no-cache/)

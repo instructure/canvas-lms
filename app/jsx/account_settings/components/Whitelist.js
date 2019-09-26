@@ -21,9 +21,9 @@ import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
-import {Heading, List, ListItem, Table} from '@instructure/ui-elements'
+import {Heading, List, Table} from '@instructure/ui-elements'
 import {TextInput} from '@instructure/ui-forms'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
 import {IconPlusSolid, IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -162,7 +162,7 @@ export class Whitelist extends Component {
           )}
 
           <Flex>
-            <FlexItem grow shrink padding="0 medium 0 0">
+            <Flex.Item grow shrink padding="0 medium 0 0">
               <TextInput
                 label={I18n.t('Domain Name')}
                 placeholder="http://somedomain.com"
@@ -173,8 +173,8 @@ export class Whitelist extends Component {
                   this.setState({addDomainInputValue: e.currentTarget.value})
                 }}
               />
-            </FlexItem>
-            <FlexItem align={this.state.errors.length ? 'center' : 'end'}>
+            </Flex.Item>
+            <Flex.Item align={this.state.errors.length ? 'center' : 'end'}>
               <Button
                 aria-label={I18n.t('Add Domain')}
                 ref={c => (this.addDomainBtn = c)}
@@ -185,7 +185,7 @@ export class Whitelist extends Component {
               >
                 {I18n.t('Domain')}
               </Button>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         </form>
         {whitelistToShow.length <= 0 ? (
@@ -265,7 +265,7 @@ export class Whitelist extends Component {
                     <td>
                       <List variant="unstyled">
                         {this.props.whitelistedDomains.tools[domain].map(associatedTool => (
-                          <ListItem key={associatedTool.id}>{associatedTool.name}</ListItem>
+                          <List.Item key={associatedTool.id}>{associatedTool.name}</List.Item>
                         ))}
                       </List>
                     </td>

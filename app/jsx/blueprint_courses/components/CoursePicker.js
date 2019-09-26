@@ -146,7 +146,7 @@ export default class CoursePicker extends React.Component {
             onToggle={this.onToggleCoursePicker}
           >
             {this.props.isLoadingCourses && (<div className="bca-course-picker__loading">
-              <Spinner title={I18n.t('Loading Courses')} />
+              <Spinner renderTitle={I18n.t('Loading Courses')} />
             </div>)}
             <CoursePickerTable
               courses={this.props.courses}

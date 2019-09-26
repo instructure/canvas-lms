@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Menu,  MenuItem, MenuItemSeparator, MenuItemGroup } from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!RubricAddCriterionPopover'
 import $ from 'jquery'
@@ -46,18 +46,18 @@ class RubricAddCriterionPopover extends React.Component {
             <a className="icon-plus" href="#" >{I18n.t("Criterion")}</a>
           }
         >
-          <MenuItem id="add_criterion_button" onClick={() => $("#add_criterion_link").trigger("click")}>
+          <Menu.Item id="add_criterion_button" onClick={() => $("#add_criterion_link").trigger("click")}>
             <Text size="small" weight="bold">{I18n.t("New Criterion")}</Text>
-          </MenuItem>
-          <MenuItemSeparator />
-          <MenuItemGroup id="criterion_duplicate_menu" label={I18n.t("Duplicate")}>
+          </Menu.Item>
+          <Menu.Separator />
+          <Menu.Group id="criterion_duplicate_menu" label={I18n.t("Duplicate")}>
             {rubric_data.map(
-              item => <MenuItem
+              item => <Menu.Item
                         onClick={() => duplicateFunction(rubric, item.index)}
                         key={item.index}><div className="ellipsis popover_menu_width">{item.description}</div>
-                      </MenuItem>
+                      </Menu.Item>
             )}
-          </MenuItemGroup>
+          </Menu.Group>
         </Menu>
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#" id="add_learning_outcome_link" className="icon-search find_outcome_link outcome">{I18n.t("Find Outcome")}</a>

@@ -67,6 +67,10 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (this.contextAssetString) {
       ;[this.contextName, this.contextId] = Array.from(splitAssetString(this.contextAssetString))
     }
+
+    this.wikiIndexPlacements = options != null ? options.wikiIndexPlacements : []
+    if (!this.wikiIndexPlacements) this.wikiIndexPlacements = []
+
     this.itemViewOptions.contextName = this.contextName
 
     this.collection.on('fetch', () => {
@@ -200,6 +204,8 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     json.fetched = !!this.fetched
     json.fetchedLast = !!this.fetchedLast
     json.collectionHasTodoDate = this.collectionHasTodoDate()
+    json.hasWikiIndexPlacements = this.wikiIndexPlacements.length > 0
+    json.wikiIndexPlacements = this.wikiIndexPlacements
     return json
   }
 }

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import ready from '@instructure/ready'
 import I18n from 'i18n!roster_publicjs'
 import { Model } from 'Backbone'
 import CreateUserList from 'compiled/models/CreateUserList'
@@ -54,7 +55,7 @@ const usersView = new PaginatedCollectionView({
   itemViewOptions: {
     course: ENV.course
   },
-  canViewLoginIdColumn: ENV.permissions.manage_admin_users || ENV.permissions.manage_students,
+  canViewLoginIdColumn: ENV.permissions.view_user_logins,
   canViewSisIdColumn: ENV.permissions.read_sis,
   buffer: 1000,
   template: rosterUsersTemplate
@@ -118,5 +119,5 @@ users.once('reset', () =>
 )
 
 app.render()
-app.$el.appendTo($('#content'))
+ready(() => app.$el.appendTo($('#content')))
 users.fetch()

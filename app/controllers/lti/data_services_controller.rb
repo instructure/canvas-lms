@@ -133,30 +133,33 @@ module Lti
     # Updates a Data Service Event subscription for the specified event type and
     # context.
     #
-    # @argument subscription[ContextId] [Required, String]
+    # @argument subscription[ContextId] [Optional, String]
     #   The id of the context for the subscription.
     #
-    # @argument subscription[ContextType] [Required, String]
+    # @argument subscription[ContextType] [Optional, String]
     #   The type of context for the subscription. Must be 'assignment',
     #   'account', or 'course'.
     #
-    # @argument subscription[EventTypes] [Required, Array]
+    # @argument subscription[EventTypes] [Optional, Array]
     #   Array of strings representing the event types for
     #   the subscription.
     #
-    # @argument subscription[Format] [Required, String]
+    # @argument subscription[Format] [Optional, String]
     #   Format to deliver the live events. Must be 'live-event' or 'caliper'.
     #
-    # @argument subscription[TransportMetadata] [Required, Object]
+    # @argument subscription[TransportMetadata] [Optional, Object]
     #   An object with a single key: 'Url'. Example: { "Url": "sqs.example" }
     #
-    # @argument subscription[TransportType] [Required, String]
+    # @argument subscription[TransportType] [Optional, String]
     #   Must be either 'sqs' or 'https'.
+    # 
+    # @argument subscription[State] [Optional, String]
+    #   Must be either 'Active' or 'Deleted"
     #
     # @returns DataServiceSubscription
     def update
       sub = params.require(:subscription)
-      SubscriptionsValidator.validate_subscription_context!(sub)
+      SubscriptionsValidator.validate_subscription_context!(sub) if sub[:ContextType]
       updates = { 'Id': params[:id] }.merge(sub.to_unsafe_h)
       response = Services::LiveEventsSubscriptionService.update(jwt_body, updates)
       forward_service_response(response)

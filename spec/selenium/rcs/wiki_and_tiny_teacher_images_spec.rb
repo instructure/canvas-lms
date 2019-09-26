@@ -97,7 +97,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       wait_for_tiny(f("form.edit-form .edit-content"))
       wiki_page_body = clear_wiki_rce
 
-      upload_image_to_files_in_rce
+      upload_to_files_in_rce(true)
       @root_folder = Folder.root_folders(@course).first
       @image = @root_folder.attachments.last
       expect(sidebar_files.length).to eq 5

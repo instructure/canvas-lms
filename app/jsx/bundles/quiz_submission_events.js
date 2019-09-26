@@ -18,7 +18,9 @@
 
 import $ from 'jquery'
 import app from 'canvas_quizzes/apps/events'
+import ready from '@instructure/ready'
 
+ready(() => {
 app.configure({
   ajax: $.ajax,
   loadOnStartup: true,
@@ -32,3 +34,4 @@ app.configure({
 app.mount(document.body.querySelector('#content')).then(() =>
   console.log('Yeah, a canvas quiz app has been loaded!!!')
 )
+})

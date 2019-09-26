@@ -23,7 +23,7 @@ import {scopeTab, AccessibleContent} from '@instructure/ui-a11y'
 import keycode from 'keycode';
 
 import Opportunity from '../Opportunity';
-import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {TabList} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
 import { array, string, func, number, oneOfType} from 'prop-types';
 import formatMessage from '../../format-message';
@@ -188,12 +188,12 @@ export class Opportunities extends Component {
       >
         {this.renderCloseButton()}
         <TabList variant="minimal" focus={false}>
-          <TabPanel title={this.renderTitle("new")} maxHeight={this.state.innerMaxHeight}>
+          <TabList.Panel title={this.renderTitle("new")} maxHeight={this.state.innerMaxHeight}>
             {this.renderNewOpportunities()}
-          </TabPanel>
-          <TabPanel title={this.renderTitle("dismissed")} maxHeight={this.state.innerMaxHeight}>
+          </TabList.Panel>
+          <TabList.Panel title={this.renderTitle("dismissed")} maxHeight={this.state.innerMaxHeight}>
               {this.renderDismissedOpportunities()}
-          </TabPanel>
+          </TabList.Panel>
         </TabList>
       </div>
     );

@@ -1764,7 +1764,8 @@ describe Attachment do
       cc.confirm!
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
-      @course.enable_feature! :usage_rights_required
+      @course.usage_rights_required = true
+      @course.save!
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
       @attachment.set_publish_state_for_usage_rights
       @attachment.save!

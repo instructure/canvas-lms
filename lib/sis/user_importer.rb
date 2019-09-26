@@ -262,6 +262,8 @@ module SIS
           pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
           user_touched = false
 
+          user.sortable_name_explicitly_set = true if user_row.sortable_name.present?
+
           begin
             User.transaction(:requires_new => true) do
               if user.changed?

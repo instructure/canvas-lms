@@ -441,6 +441,7 @@ class Message < ActiveRecord::Base
     path = Canvas::MessageHelper.find_message_path(filename)
 
     if !(File.exist?(path) rescue false)
+      return false if filename.include?('slack')
       filename = self.notification.name.downcase.gsub(/\s/, '_') + ".email.erb"
       path = Canvas::MessageHelper.find_message_path(filename)
     end
@@ -499,8 +500,7 @@ class Message < ActiveRecord::Base
   # Returns message body
   def populate_body(message_body_template, path_type, binding, filename)
     # Build the body content based on the path type
-    self.body = eval(Erubi::Engine.new(message_body_template,
-      bufvar: '@output_buffer').src, binding, filename)
+    self.body = eval(Erubi::Engine.new(message_body_template, bufvar: '@output_buffer').src, binding, filename)
     self.html_body = apply_html_template(binding) if path_type == 'email'
 
     # Append a footer to the body if the path type is email
@@ -545,8 +545,12 @@ class Message < ActiveRecord::Base
     path_type ||= communication_channel.try(:path_type) || 'email'
 
     # Determine the message template file to be used in the message
-    filename = path_type == 'slack' ? template_filename('sms') : template_filename(path_type)
+    filename = template_filename(path_type)
     message_body_template = get_template(filename)
+    if !message_body_template && path_type == 'slack'
+      filename = template_filename('sms')
+      message_body_template = get_template(filename)
+    end
 
     context, asset, user, delayed_messages, data = [self.context,
       self.context, self.user, @delayed_messages, @data]

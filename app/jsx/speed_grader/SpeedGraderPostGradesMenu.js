@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {IconEyeLine, IconOffLine} from '@instructure/ui-icons'
-import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!SpeedGraderPostGradesMenu'
 
@@ -37,23 +37,23 @@ export default function SpeedGraderPostGradesMenu(props) {
   return (
     <Menu placement="bottom end" trigger={menuTrigger}>
       {props.allowPostingGrades && props.hasGrades ? (
-        <MenuItem name="postGrades" onSelect={props.onPostGrades}>
+        <Menu.Item name="postGrades" onSelect={props.onPostGrades}>
           <Text>{I18n.t('Post Grades')}</Text>
-        </MenuItem>
+        </Menu.Item>
       ) : (
-        <MenuItem name="postGrades" disabled>
+        <Menu.Item name="postGrades" disabled>
           <Text>{props.hasGrades ? I18n.t('All Grades Posted') : I18n.t('No Grades to Post')}</Text>
-        </MenuItem>
+        </Menu.Item>
       )}
 
       {props.allowHidingGrades && props.hasGrades ? (
-        <MenuItem name="hideGrades" onSelect={props.onHideGrades}>
+        <Menu.Item name="hideGrades" onSelect={props.onHideGrades}>
           <Text>{I18n.t('Hide Grades')}</Text>
-        </MenuItem>
+        </Menu.Item>
       ) : (
-        <MenuItem name="hideGrades" disabled>
+        <Menu.Item name="hideGrades" disabled>
           <Text>{props.hasGrades ? I18n.t('All Grades Hidden') : I18n.t('No Grades to Hide')}</Text>
-        </MenuItem>
+        </Menu.Item>
       )}
     </Menu>
   )

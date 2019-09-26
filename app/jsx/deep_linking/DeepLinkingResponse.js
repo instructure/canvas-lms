@@ -20,7 +20,7 @@ import I18n from 'i18n!external_content.success'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Spinner, Text} from '@instructure/ui-elements'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 
 export class RetrievingContent extends React.Component {
   static messageType = 'LtiDeepLinkingResponse'
@@ -43,16 +43,16 @@ export class RetrievingContent extends React.Component {
     return (
       <div>
         <Flex justifyItems="center" margin="x-large 0 large 0">
-          <FlexItem>
-            <Spinner title={message} size="large" />
-          </FlexItem>
+          <Flex.Item>
+            <Spinner renderTitle={message} size="large" />
+          </Flex.Item>
         </Flex>
         <Flex justifyItems="center" margin="0 0 large">
-          <FlexItem>
+          <Flex.Item>
             <Text size="x-large" fontStyle="italic">
               {message}
             </Text>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </div>
     )

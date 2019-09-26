@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import * as uploadFileModule from '../../../../../shared/upload_file'
+import {AlertManagerContext} from '../../../../../shared/components/AlertManager'
 import {DEFAULT_ICON} from '../../../../../shared/helpers/mimeClassIconHelper'
 import FileUpload from '../FileUpload'
 import {fireEvent, render, wait} from '@testing-library/react'
@@ -126,6 +127,25 @@ describe('FileUpload', () => {
     })
   })
 
+  it('creates an error alert when the API fails to upload files', async () => {
+    const setOnFailure = jest.fn()
+    const props = await makeProps()
+    uploadFileModule.uploadFiles.mock.results = () => {
+      throw new Error('no')
+    }
+
+    const {container} = render(
+      <AlertManagerContext.Provider value={{setOnFailure}}>
+        <FileUpload {...props} />
+      </AlertManagerContext.Provider>
+    )
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+
+    uploadFiles(fileInput, [file])
+    expect(setOnFailure).toHaveBeenCalledWith('Error updating submission draft')
+  })
+
   it('uploads files received through the LtiDeepLinkingResponse message event', async () => {
     const props = await makeProps({
       Submission: () => ({attempt: 0})
@@ -159,6 +179,28 @@ describe('FileUpload', () => {
         }
       })
     })
+  })
+
+  it('creates an error alert when given no file id through the Lti response', async () => {
+    const setOnFailure = jest.fn()
+    const props = await makeProps()
+    render(
+      <AlertManagerContext.Provider value={{setOnFailure}}>
+        <FileUpload {...props} />
+      </AlertManagerContext.Provider>
+    )
+
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'A2ExternalContentReady',
+          content_items: []
+        }
+      })
+    )
+
+    expect(setOnFailure).toHaveBeenCalledWith('Error adding files to submission draft')
   })
 
   // Byproduct of how the dummy submissions are being handled. Check out ViewManager

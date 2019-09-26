@@ -23,10 +23,12 @@ import axios from 'axios'
 import {Spinner, Heading} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import AnnouncementRow from '../shared/components/AnnouncementRow'
+import ready from '@instructure/ready'
 
 if (ENV.SHOW_ANNOUNCEMENTS) {
+  ready(() => {
   const container = document.querySelector('#announcements_on_home_page')
-  ReactDOM.render(<Spinner title={I18n.t('Loading Announcements')} size="small" />, container)
+  ReactDOM.render(<Spinner renderTitle={I18n.t('Loading Announcements')} size="small" />, container)
 
   const url = '/api/v1/announcements'
 
@@ -49,5 +51,6 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
         ))}
       </View>,
     container)
+  })
   })
 }

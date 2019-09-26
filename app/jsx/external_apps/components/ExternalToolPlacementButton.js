@@ -98,7 +98,8 @@ export default class ExternalToolPlacementButton extends React.Component {
       student_context_card: I18n.t('Student Context Card'),
       tool_configuration: I18n.t('Tool Configuration'),
       user_navigation: I18n.t('User Navigation'),
-      wiki_page_menu: I18n.t('Page Menu')
+      wiki_page_menu: I18n.t('Page Menu'),
+      wiki_index_menu: I18n.t('Pages Index Menu')
     }
 
     const tool = this.state.tool

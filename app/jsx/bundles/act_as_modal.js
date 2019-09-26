@@ -19,7 +19,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ActAsModal from '../actAs/ActAsModal'
+import ready from '@instructure/ready'
 
+ready(() => {
 ReactDOM.render((
   <ActAsModal user={ENV.act_as_user_data.user} />
 ), document.getElementById('act_as_modal'))
+})

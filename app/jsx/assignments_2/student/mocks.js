@@ -30,7 +30,16 @@ import {FileDefaultMocks} from './graphqlData/File'
 import {LockInfoDefaultMocks} from './graphqlData/LockInfo'
 import {MediaObjectDefaultMocks} from './graphqlData/MediaObject'
 import {MediaSourceDefaultMocks} from './graphqlData/MediaSource'
+import {MediaTrackDefaultMocks} from './graphqlData/MediaTrack'
 import {ModuleDefaultMocks} from './graphqlData/Module'
+import {MutationDefaultMocks} from './graphqlData/Mutations'
+import {ProficiencyRatingDefaultMocks} from './graphqlData/ProficiencyRating'
+import {RubricAssessmentDefaultMocks} from './graphqlData/RubricAssessment'
+import {RubricAssessmentRatingDefaultMocks} from './graphqlData/RubricAssessmentRating'
+import {RubricAssociationDefaultMocks} from './graphqlData/RubricAssociation'
+import {RubricCriterionDefaultMocks} from './graphqlData/RubricCriterion'
+import {RubricDefaultMocks} from './graphqlData/Rubric'
+import {RubricRatingDefaultMocks} from './graphqlData/RubricRating'
 import {Submission, SubmissionDefaultMocks} from './graphqlData/Submission'
 import {SubmissionCommentDefaultMocks} from './graphqlData/SubmissionComment'
 import {SubmissionDraftDefaultMocks} from './graphqlData/SubmissionDraft'
@@ -54,7 +63,16 @@ function defaultMocks() {
     ...LockInfoDefaultMocks,
     ...MediaObjectDefaultMocks,
     ...MediaSourceDefaultMocks,
+    ...MediaTrackDefaultMocks,
     ...ModuleDefaultMocks,
+    ...MutationDefaultMocks,
+    ...ProficiencyRatingDefaultMocks,
+    ...RubricAssessmentDefaultMocks,
+    ...RubricAssessmentRatingDefaultMocks,
+    ...RubricAssociationDefaultMocks,
+    ...RubricCriterionDefaultMocks,
+    ...RubricDefaultMocks,
+    ...RubricRatingDefaultMocks,
     ...SubmissionDefaultMocks,
     ...SubmissionCommentDefaultMocks,
     ...SubmissionDraftDefaultMocks,

@@ -43,6 +43,7 @@ RSpec.describe Types::SubmissionDraftType do
                 body
                 meetsAssignmentCriteria
                 submissionAttempt
+                url
               }
             }
           }
@@ -84,5 +85,13 @@ RSpec.describe Types::SubmissionDraftType do
   it 'returns the meetsAssignmentCriteria field' do
     submission_draft = resolve_submission_draft
     expect(submission_draft['meetsAssignmentCriteria']).to eq(false)
+  end
+
+  it 'returns the draft url' do
+    @submission_draft.url = 'http://www.google.com'
+    @submission_draft.save!
+
+    submission_draft = resolve_submission_draft
+    expect(submission_draft['url']).to eq('http://www.google.com')
   end
 end

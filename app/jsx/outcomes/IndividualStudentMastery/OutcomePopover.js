@@ -19,7 +19,7 @@
 import React from 'react'
 import _ from 'lodash'
 import I18n from 'i18n!IndividualStudentMasteryOutcomePopover'
-import {View, Flex, FlexItem} from '@instructure/ui-layout'
+import {View, Flex} from '@instructure/ui-layout'
 import {Text, Link} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import CalculationMethodContent from 'compiled/models/grade_summary/CalculationMethodContent'
@@ -101,7 +101,7 @@ export default class OutcomePopover extends React.Component {
             direction='row'
             justifyItems='space-between'
           >
-            <FlexItem grow shrink>
+            <Flex.Item grow shrink>
               { /* word-wrap used for IE support */ }
               <div style={{wordWrap: 'break-word', overflowWrap: 'break-word'}}>{outcome.title}</div>
               <div>{I18n.t('Last Assessment: ')}
@@ -110,8 +110,8 @@ export default class OutcomePopover extends React.Component {
                   I18n.t('No submissions')
                 }
               </div>
-            </FlexItem>
-            <FlexItem grow shrink align='stretch'>
+            </Flex.Item>
+            <Flex.Item grow shrink align='stretch'>
               <Text size='small' weight='bold'>
                 <div>
                   {selectedRating &&
@@ -120,7 +120,7 @@ export default class OutcomePopover extends React.Component {
                   </div>}
                 </div>
               </Text>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
           <hr role='presentation'/>
           <div>

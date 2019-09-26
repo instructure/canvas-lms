@@ -20,6 +20,7 @@ class OnlineSubmissionType < Types::BaseEnum
   VALID_SUBMISSION_TYPES = %w[
     online_text_entry
     online_upload
+    online_url
   ].freeze
 
   graphql_name 'OnlineSubmissionType'
@@ -35,6 +36,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
   argument :body, String, required: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
   argument :submission_type, OnlineSubmissionType, required: true
+  argument :url, String, required: false
 
   field :submission, Types::SubmissionType, null: true
 
@@ -52,6 +54,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
       body: '',
       require_submission_type_is_valid: true,
       submission_type: submission_type,
+      url: nil
     }
 
     case submission_type
@@ -76,6 +79,8 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
       return upload_errors if upload_errors
 
       submission_params[:attachments] = copy_attachments_to_submissions_folder(context, attachments)
+    when 'online_url'
+      submission_params[:url] = input[:url]
     end
 
     submission = assignment.submit_homework(current_user, submission_params)

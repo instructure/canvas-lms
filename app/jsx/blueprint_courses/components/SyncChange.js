@@ -21,7 +21,7 @@ import React, { Component } from 'react'
 import cx from 'classnames'
 
 import get from 'lodash/get'
-import {Grid,  GridRow, GridCol } from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
@@ -105,11 +105,11 @@ class SyncChange extends Component {
           </div>
           <div className="bcs__history-item__content-grid">
             <Grid colSpacing="none">
-              <GridRow>
-                <GridCol width={6}>{this.renderText(asset_name)}</GridCol>
-                <GridCol width={2}>{this.renderText(itemTypeLabels[asset_type])}</GridCol>
-                <GridCol width={2}>{this.renderText(changeTypeLabels[change_type])}</GridCol>
-                <GridCol width={2}>
+              <Grid.Row>
+                <Grid.Col width={6}>{this.renderText(asset_name)}</Grid.Col>
+                <Grid.Col width={2}>{this.renderText(itemTypeLabels[asset_type])}</Grid.Col>
+                <Grid.Col width={2}>{this.renderText(changeTypeLabels[change_type])}</Grid.Col>
+                <Grid.Col width={2}>
                   <div style={{textAlign: 'right'}}>
                     {hasExceptions ? (
                       <Text size="x-small" color="secondary">
@@ -119,8 +119,8 @@ class SyncChange extends Component {
                       </Text>
                     ) : this.renderText(I18n.t('Applied'))}
                   </div>
-                </GridCol>
-              </GridRow>
+                </Grid.Col>
+              </Grid.Row>
             </Grid>
           </div>
         </div>

@@ -263,7 +263,8 @@ shared_context "in-process server selenium tests" do
         "The google.com/jsapi JavaScript loader is deprecat",
         "Uncaught Error: Not Found", # for canvas-rce when no backend is set up
         "Uncaught Error: Minified React error #200", # this is coming from canvas-rce, but we should fix it
-        "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/"
+        "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/",
+        "Access to XMLHttpRequest at 'http://www.example.com/' from origin"
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

@@ -59,9 +59,13 @@ const indexView = function(assignments, open, surveys) {
     create: true,
     manage: true
   }
-  const flags = {question_banks: true}
+  const flags = {
+    question_banks: true,
+    quiz_lti_enabled: false || ENV.flags.quiz_lti_enabled
+  }
   const urls = {
     new_quiz_url: '/courses/1/quizzes/new?fresh=1',
+    new_assignment_url: '/courses/1/assignments/new',
     question_banks_url: '/courses/1/question_banks'
   }
   const view = new IndexView({
@@ -79,7 +83,20 @@ const indexView = function(assignments, open, surveys) {
 QUnit.module('IndexView', {
   setup() {
     fixtures = $('#fixtures')
-    fakeENV.setup()
+    fakeENV.setup({
+      permissions: {
+        create: true,
+        manage: true
+      },
+      flags: {
+        question_banks: true
+      },
+      urls: {
+        new_quiz_url: '/courses/1/quizzes/new?fresh=1',
+        new_assignment_url: '/courses/1/assignments/new',
+        question_banks_url: '/courses/1/question_banks'
+      }
+    })
   },
   teardown() {
     fakeENV.teardown()
@@ -92,7 +109,7 @@ test('#hasNoQuizzes if assignment and open quizzes are empty', () => {
   const view = indexView(assignments, open)
   ok(view.options.hasNoQuizzes)
 })
-test('#hasNoQuizzes to false if has assignement quizzes', () => {
+test('#hasNoQuizzes to false if has assignment quizzes', () => {
   const assignments = new QuizCollection([{id: 1}])
   const open = new QuizCollection([])
   const view = indexView(assignments, open)
@@ -118,6 +135,18 @@ test('#hasSurveys if has surveys', () => {
   const surveys = new QuizCollection([{id: 1}])
   const view = indexView(null, null, surveys)
   ok(view.options.hasSurveys)
+})
+test("shows '+ Quiz' button if quiz lti enabled", () => {
+  ENV.flags.quiz_lti_enabled = true
+  const view = indexView(null, null, null)
+  const $button = view.$('.new_quiz_lti')
+  equal($button.length, 1)
+  ok(/\?quiz_lti$/.test($button.attr('href')))
+})
+test("does not show '+ Quiz' button when quiz lti disabled", () => {
+  ENV.flags.quiz_lti_enabled = false
+  const view = indexView(null, null, null)
+  equal(view.$('.new_quiz_lti').length, 0)
 })
 test('should render the view', () => {
   const assignments = new QuizCollection([

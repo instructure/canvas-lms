@@ -40,7 +40,7 @@ import BarGraph from './breakdown-graph-bar'
       if (this.props.isLoading) {
         return (
           <div className='crs-breakdown-graph__loading'>
-            <Spinner title={I18n.t('Loading')} size='small' />
+            <Spinner renderTitle={I18n.t('Loading')} size='small' />
             <p>{I18n.t('Loading Data..')}</p>
           </div>
         )

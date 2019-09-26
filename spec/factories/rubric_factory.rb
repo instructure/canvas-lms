@@ -84,5 +84,6 @@ module Factories
         }
     ]
     @rubric.save!
+    @rubric
   end
 end

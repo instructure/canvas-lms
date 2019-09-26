@@ -226,7 +226,7 @@ describe('api actions', () => {
     const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
     const getState = () => state
     actions.createNewRole('steven', 'StudentRoll')(mockDispatch, getState)
-    return moxiosWait(() => {
+    moxiosWait(() => {
       const request = moxios.requests.mostRecent()
       request
         .respondWith({
@@ -287,7 +287,7 @@ describe('api actions', () => {
     const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
     const getState = () => state
     actions.updateRoleNameAndBaseType('1', 'steven', 'StudentRoll')(mockDispatch, getState)
-    return moxiosWait(() => {
+    moxiosWait(() => {
       const request = moxios.requests.mostRecent()
       request
         .respondWith({
@@ -321,7 +321,7 @@ describe('api actions', () => {
     const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
     const getState = () => state
     actions.createNewRole('steven', 'StudentRoll')(mockDispatch, getState)
-    return moxiosWait(() => {
+    moxiosWait(() => {
       const request = moxios.requests.mostRecent()
       request
         .respondWith({
@@ -387,7 +387,7 @@ describe('api actions', () => {
       explicit: true,
       inTray: false
     })(dispatchMock, () => state)
-    return moxiosWait(() => {
+    moxiosWait(() => {
       const request = moxios.requests.mostRecent()
       request
         .respondWith({
@@ -412,7 +412,7 @@ describe('api actions', () => {
     const failCallbackMock = jest.fn()
     const mockDispatch = jest.fn()
     actions.deleteRole(ROLES[1], successCallbackMock, failCallbackMock)(mockDispatch, () => state)
-    return moxiosWait(() => {
+    moxiosWait(() => {
       const request = moxios.requests.mostRecent()
       request.respondWith({status: 200, response: {data: 'who cares'}}).then(() => {
         expect(successCallbackMock).toHaveBeenCalledTimes(1)
@@ -434,7 +434,7 @@ describe('api actions', () => {
     const failCallbackMock = jest.fn()
     const mockDispatch = jest.fn()
     actions.deleteRole(ROLES[1], successCallbackMock, failCallbackMock)(mockDispatch, () => state)
-    return moxiosWait(() => {
+    moxiosWait(() => {
       const request = moxios.requests.mostRecent()
       request.respondWith({status: 400, response: {data: 'who cares'}}).then(() => {
         expect(successCallbackMock).toHaveBeenCalledTimes(0)

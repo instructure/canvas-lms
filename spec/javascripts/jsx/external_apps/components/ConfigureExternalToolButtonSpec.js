@@ -124,3 +124,9 @@ test('sets the iframe allowances', () => {
   ok(wrapper.instance().iframe.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
   wrapper.unmount()
 })
+
+test("sets the 'data-lti-launch' attribute on the iframe", () => {
+  const wrapper = mount(<ConfigureExternalToolButton tool={tool} modalIsOpen />)
+  equal(wrapper.instance().iframe.getAttribute('data-lti-launch'), 'true')
+  wrapper.unmount()
+})

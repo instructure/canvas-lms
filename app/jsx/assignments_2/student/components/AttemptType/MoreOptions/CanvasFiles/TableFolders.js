@@ -20,6 +20,7 @@ import FriendlyDatetime from '../../../../../../shared/FriendlyDatetime'
 import {func, object, shape, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import React from 'react'
+import tz from 'timezone'
 
 import {Flex} from '@instructure/ui-layout'
 import {
@@ -53,34 +54,40 @@ const FolderButton = props => {
   )
 }
 
-const renderFolderName = (folderName, altSRText) => (
+const renderFolderName = folderName => (
   <Text size="small">
-    <ScreenReaderContent>{altSRText || I18n.t(', name: ')}</ScreenReaderContent>
-    <TruncateText>
-      <div aria-hidden={!!altSRText}>{folderName}</div>
-    </TruncateText>
+    <TruncateText>{folderName}</TruncateText>
   </Text>
 )
 
 const renderCreatedAt = createdAt => (
   <Text size="small">
-    <ScreenReaderContent>{I18n.t(', date created: ')}</ScreenReaderContent>
     <FriendlyDatetime dateTime={createdAt} format={I18n.t('#date.formats.medium')} />
   </Text>
 )
 
 const renderPublishedIcon = locked => {
-  return locked ? (
-    <>
-      <ScreenReaderContent>{I18n.t(', state: unpublished')}</ScreenReaderContent>
-      <IconUnpublishedLine />
-    </>
-  ) : (
-    <>
-      <ScreenReaderContent>{I18n.t(', state: published')}</ScreenReaderContent>
-      <IconPublishSolid color="success" />
-    </>
-  )
+  return locked ? <IconUnpublishedLine /> : <IconPublishSolid color="success" />
+}
+
+const formattedDateTime = dateTime => {
+  return tz.format(tz.parse(dateTime), I18n.t('#date.formats.medium'))
+}
+
+const renderSRContents = folder => {
+  const description = []
+  description.push(I18n.t('type: folder'))
+  description.push(I18n.t('name: %{name}', {name: folder.name}))
+  if (folder.hasOwnProperty('created_at')) {
+    description.push(
+      I18n.t('date created: %{createdAt}', {createdAt: formattedDateTime(folder.created_at)})
+    )
+  }
+  if (folder.hasOwnProperty('locked')) {
+    description.push(folder.locked ? I18n.t('state: unpublished') : I18n.t('state: published'))
+  }
+
+  return <ScreenReaderContent>{description.join(', ')}</ScreenReaderContent>
 }
 
 const renderParentFolder = (folder, handleFolderSelect, columnWidths) => {
@@ -91,13 +98,13 @@ const renderParentFolder = (folder, handleFolderSelect, columnWidths) => {
         handleFolderSelect={handleFolderSelect}
         tip="../"
       >
-        <ScreenReaderContent>{I18n.t('type: folder')}</ScreenReaderContent>
-        <Flex>
+        {renderSRContents({name: I18n.t('return to parent folder')})}
+        <Flex aria-hidden>
           <Flex.Item padding="xx-small" size={columnWidths.thumbnailWidth}>
             <IconFolderLine size="small" />
           </Flex.Item>
           <Flex.Item padding="xx-small" size={columnWidths.nameWidth} grow>
-            {renderFolderName('../', I18n.t(', name: parent directory '))}
+            {renderFolderName('../')}
           </Flex.Item>
           <Flex.Item padding="xx-small" size={columnWidths.dateCreatedWidth}>
             <IconCheckMarkIndeterminateLine />
@@ -137,8 +144,8 @@ const TableFolders = props => {
             handleFolderSelect={props.handleFolderSelect}
             tip={folder.name}
           >
-            <ScreenReaderContent>{I18n.t('type: folder')}</ScreenReaderContent>
-            <Flex>
+            {renderSRContents(folder)}
+            <Flex aria-hidden>
               <Flex.Item padding="xx-small" size={props.columnWidths.thumbnailWidth}>
                 <IconFolderLine size="small" />
               </Flex.Item>
@@ -179,7 +186,6 @@ TableFolders.propTypes = {
     fileSizeWidth: string,
     publishedWidth: string
   }),
-  // eslint-disable-next-line react/forbid-prop-types
   folders: object,
   handleFolderSelect: func,
   selectedFolderID: string

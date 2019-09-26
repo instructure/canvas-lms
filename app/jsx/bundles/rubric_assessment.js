@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Rubric from '../rubrics/Rubric'
 import { fillAssessment } from '../rubrics/helpers'
+import ready from '@instructure/ready'
 
 const findRubric = (id) => {
   if (ENV.rubrics) {
@@ -35,6 +36,7 @@ const findRubricAssessment = (id) => {
   return null
 }
 
+ready(() => {
 const rubricElements = document.querySelectorAll(".react_rubric_container")
 Array.prototype.forEach.call(rubricElements, (rubricElement) => {
   const rubric = findRubric(rubricElement.dataset.rubricId)
@@ -48,4 +50,5 @@ Array.prototype.forEach.call(rubricElements, (rubricElement) => {
       flexWidth={ENV.gradebook_non_scoring_rubrics_enabled}
     />
   ), rubricElement)
+})
 })

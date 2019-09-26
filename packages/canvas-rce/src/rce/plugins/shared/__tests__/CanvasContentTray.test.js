@@ -83,9 +83,9 @@ describe('RCE Plugins > CanvasContentTray', () => {
       expect(getTrayLabel()).toEqual('Course Images')
     })
 
-    it.skip('is labeled with "Media" when using the "media" content type', async () => {
-      await showTrayForPlugin('media')
-      expect(getTrayLabel()).toEqual('Media')
+    it('is labeled with "Course Media" when using the "media" content type', async () => {
+      await showTrayForPlugin('course_media')
+      expect(getTrayLabel()).toEqual('Course Media')
     })
 
     it('is labeled with "Course Documents" when using the "course_documents" content type', async () => {
@@ -99,14 +99,39 @@ describe('RCE Plugins > CanvasContentTray', () => {
       expect(getTrayLabel()).toEqual('User Images')
     })
 
-    it.skip('is labeled with "User Media" when using the "user_media" content type', async () => {
-      await showTrayForPlugin('media')
+    it('is labeled with "User Media" when using the "user_media" content type', async () => {
+      await showTrayForPlugin('user_media')
       expect(getTrayLabel()).toEqual('User Media')
     })
 
     it('is labeled with "User Documents" when using the "user_documents" content type', async () => {
       await showTrayForPlugin('user_documents')
       expect(getTrayLabel()).toEqual('User Documents')
+    })
+  })
+
+  describe('content panel', () => {
+    beforeEach(() => {
+      renderComponent()
+    })
+    it('is the links panel for links content types', async () => {
+      await showTrayForPlugin('links')
+      expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+    })
+
+    it('is the documents panel for document content types', async () => {
+      await showTrayForPlugin('course_documents')
+      expect(component.getByTestId('instructure_links-DocumentsPanel')).toBeInTheDocument()
+    })
+
+    it('is the images panel for image content types', async () => {
+      await showTrayForPlugin('images')
+      expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
+    })
+
+    it.only('is the media panel for media content types', async () => {
+      await showTrayForPlugin('course_media')
+      expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
     })
   })
 

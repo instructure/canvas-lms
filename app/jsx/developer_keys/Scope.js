@@ -18,7 +18,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Checkbox} from '@instructure/ui-forms'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import I18n from 'i18n!react_developer_keys'
 import ScopesMethod from './ScopesMethod'
@@ -30,7 +30,7 @@ const DeveloperKeyScope = props => {
       data-automation="developer-key-scope"
     >
       <Flex alignItems="start" padding="small medium small none">
-        <FlexItem padding="none">
+        <Flex.Item padding="none">
           <Checkbox
             label={<ScreenReaderContent>{props.checked ? I18n.t('Disable scope') : I18n.t('Enable scope')}</ScreenReaderContent>}
             value={props.scope.scope}
@@ -38,13 +38,13 @@ const DeveloperKeyScope = props => {
             checked={props.checked}
             inline
           />
-        </FlexItem>
-        <FlexItem grow shrink>
+        </Flex.Item>
+        <Flex.Item grow shrink>
           {props.scope.scope}
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <ScopesMethod method={props.scope.verb} />
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </View>
   )

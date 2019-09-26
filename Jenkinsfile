@@ -94,9 +94,15 @@ pipeline {
             fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             sh '''
               mv gerrit_builder/canvas-lms/config/* config/
+              mv config/knapsack_rspec_report.json ./
               rm config/cache_store.yml
               rmdir -p gerrit_builder/canvas-lms/config
               cp docker-compose/config/selenium.yml config/
+              cp -R docker-compose/config/new-jenkins config/new-jenkins
+              cp config/delayed_jobs.yml.example config/delayed_jobs.yml
+              cp config/domain.yml.example config/domain.yml
+              cp config/external_migration.yml.example config/external_migration.yml
+              cp config/outgoing_mail.yml.example config/outgoing_mail.yml
             '''
           }
         }
@@ -122,6 +128,7 @@ pipeline {
                 if [ -d .git/rebase-merge ]; then
                   echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
                   git rebase --abort
+                  git checkout $GERRIT_REFSPEC
                 fi
 
                 # store exit_status inline to  ensures the script doesn't exit here on failures

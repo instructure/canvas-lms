@@ -28,7 +28,7 @@ import OperatorType from './SubmissionTypes/OperatorType'
 import SimpleType from './SubmissionTypes/SimpleType'
 import {Heading, Pill} from '@instructure/ui-elements'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-layout'
 import AddHorizontalRuleButton from '../AddHorizontalRuleButton'
 
@@ -183,12 +183,12 @@ export default class OverrideSubmissionTypes extends React.Component {
     return OverrideSubmissionTypes.submissionTypes.map(t => {
       const Icon = t.icon
       return (
-        <MenuItem key={t.value} value={t.value}>
+        <Menu.Item key={t.value} value={t.value}>
           <div>
             <Icon />
             <View margin="0 0 0 x-small">{t.name}</View>
           </div>
-        </MenuItem>
+        </Menu.Item>
       )
     })
   }
@@ -222,23 +222,23 @@ export default class OverrideSubmissionTypes extends React.Component {
           <AddHorizontalRuleButton label={I18n.t('Add submission type')} onClick={() => {}} />
         }
       >
-        <MenuItemGroup label={I18n.t('Submission Type')} onSelect={this.onSelectSubmissionType}>
+        <Menu.Group label={I18n.t('Submission Type')} onSelect={this.onSelectSubmissionType}>
           {this.getMenuItems()}
-        </MenuItemGroup>
-        <MenuItemSeparator />
-        <MenuItemGroup label={I18n.t('Default')} onSelect={() => {}} selected={['or']}>
-          <MenuItem key="or" value="or">
+        </Menu.Group>
+        <Menu.Separator />
+        <Menu.Group label={I18n.t('Default')} onSelect={() => {}} selected={['or']}>
+          <Menu.Item key="or" value="or">
             <div>{I18n.t('Or')}</div>
-          </MenuItem>
-          <MenuItem key="and" value="and" disabled>
+          </Menu.Item>
+          <Menu.Item key="and" value="and" disabled>
             <div>
               {I18n.t('And')}
               <View margin="0 0 0 small">
                 <Pill variant="primary" text={I18n.t('COMING SOON')} />
               </View>
             </div>
-          </MenuItem>
-        </MenuItemGroup>
+          </Menu.Item>
+        </Menu.Group>
       </Menu>
     )
   }

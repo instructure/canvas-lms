@@ -14133,6 +14133,7 @@ ja:
     submission_posted: 
       email: 
         html: 
+          body: "講師が、%{title} の成績変更と新しいコメントをリリースしました。これらの変更が閲覧可能になりました。"
           link: ここで表示できます
     summaries: 
       email: 

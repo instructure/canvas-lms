@@ -285,7 +285,7 @@ export default class AssociationsTable extends React.Component {
       const title = I18n.t('Loading Associations')
       return (
         <div className="bca__overlay">
-          <Spinner title={title} />
+          <Spinner renderTitle={title} />
           <Text as="p">{title}</Text>
         </div>
       )

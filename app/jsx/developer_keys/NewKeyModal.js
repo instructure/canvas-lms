@@ -94,7 +94,7 @@ export default class DeveloperKeyModal extends React.Component {
 
   saveCustomizations = () => {
     const { store, actions, createLtiKeyState } = this.props
-    if(this.state.toolConfiguration.custom_fields === null) {
+    if(this.state.toolConfiguration?.custom_fields === null) {
       this.setState({showCustomizationMessages: true})
       return Promise.reject()
     }
@@ -267,7 +267,7 @@ export default class DeveloperKeyModal extends React.Component {
           <Modal.Body>
             {this.isSaving
               ? <View as="div" textAlign="center">
-                  <Spinner title={I18n.t('Creating Key')} margin="0 0 0 medium" />
+                  <Spinner renderTitle={I18n.t('Creating Key')} margin="0 0 0 medium" />
                 </View>
               : <NewKeyForm
                   ref={this.setNewFormRef}

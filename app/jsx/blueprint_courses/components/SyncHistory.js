@@ -80,7 +80,7 @@ export default class SyncHistory extends Component {
       const title = I18n.t('Loading Sync History')
       return (
         <div style={{textAlign: 'center'}}>
-          <Spinner title={title} />
+          <Spinner renderTitle={title} />
           <Text as="p">{title}</Text>
         </div>
       )

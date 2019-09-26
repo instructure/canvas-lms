@@ -18,7 +18,7 @@
 
 import axios from 'axios'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '../../../graphqlData/Queries'
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../../mocks'
 import MoreOptions from '../MoreOptions'
@@ -122,7 +122,9 @@ beforeEach(() => {
 
 describe('MoreOptions', () => {
   it('renders a button for more options', () => {
-    const {getByText} = render(<MoreOptions assignmentID="1" courseID="1" userID="1" />)
+    const {getByText} = render(
+      <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
+    )
     expect(getByText('More Options')).toBeInTheDocument()
   })
 
@@ -133,15 +135,15 @@ describe('MoreOptions', () => {
       })
     }
     const mocks = await createGraphqlMocks(overrides)
-    const {getByTestId} = render(
+    const {findByTestId, getByTestId} = render(
       <MockedProvider mocks={mocks}>
-        <MoreOptions assignmentID="1" courseID="1" userID="1" />
+        <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
       </MockedProvider>
     )
     const moreOptionsButton = getByTestId('more-options-button')
     fireEvent.click(moreOptionsButton)
 
-    expect(await waitForElement(() => getByTestId('more-options-modal'))).toBeInTheDocument()
+    expect(await findByTestId('more-options-modal')).toBeInTheDocument()
   })
 
   describe('LTI Tools', () => {
@@ -152,15 +154,15 @@ describe('MoreOptions', () => {
         })
       }
       const mocks = await createGraphqlMocks(overrides)
-      const {getByTestId, getAllByRole} = render(
+      const {findAllByRole, getByTestId} = render(
         <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" />
+          <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
         </MockedProvider>
       )
       const moreOptionsButton = getByTestId('more-options-button')
       fireEvent.click(moreOptionsButton)
 
-      const tabs = await waitForElement(() => getAllByRole('tab'))
+      const tabs = await findAllByRole('tab')
       expect(tabs[1]).toContainHTML('Tool 1')
       expect(tabs[2]).toContainHTML('Tool 2')
     })
@@ -172,15 +174,15 @@ describe('MoreOptions', () => {
         })
       }
       const mocks = await createGraphqlMocks(overrides)
-      const {getByTestId, queryByTestId} = render(
+      const {findByTestId, getByTestId, queryByTestId} = render(
         <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" />
+          <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
         </MockedProvider>
       )
       const moreOptionsButton = getByTestId('more-options-button')
       fireEvent.click(moreOptionsButton)
 
-      const modal = await waitForElement(() => getByTestId('more-options-modal'))
+      const modal = await findByTestId('more-options-modal')
       expect(modal).toBeInTheDocument()
 
       fireEvent(
@@ -193,6 +195,15 @@ describe('MoreOptions', () => {
   })
 
   describe('Canvas Files', () => {
+    let selectedCanvasFiles = []
+    const handleCanvasFiles = fileID => {
+      selectedCanvasFiles.push(fileID)
+    }
+
+    beforeEach(() => {
+      selectedCanvasFiles = []
+    })
+
     it('renders the canvas files tab', async () => {
       const overrides = {
         ExternalToolConnection: () => ({
@@ -200,15 +211,20 @@ describe('MoreOptions', () => {
         })
       }
       const mocks = await createGraphqlMocks(overrides)
-      const {getByTestId, getAllByRole} = render(
+      const {findAllByRole, getByTestId} = render(
         <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" />
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            userID="1"
+            handleCanvasFiles={handleCanvasFiles}
+          />
         </MockedProvider>
       )
       const moreOptionsButton = getByTestId('more-options-button')
       fireEvent.click(moreOptionsButton)
 
-      const tabs = await waitForElement(() => getAllByRole('tab'))
+      const tabs = await findAllByRole('tab')
       expect(tabs[0]).toContainHTML('Canvas Files')
     })
 
@@ -219,18 +235,23 @@ describe('MoreOptions', () => {
         })
       }
       const mocks = await createGraphqlMocks(overrides)
-      const {getAllByText, getByTestId} = render(
+      const {findAllByText, getByTestId} = render(
         <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" />
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            userID="1"
+            handleCanvasFiles={handleCanvasFiles}
+          />
         </MockedProvider>
       )
       const moreOptionsButton = getByTestId('more-options-button')
       fireEvent.click(moreOptionsButton)
 
-      expect(await waitForElement(() => getAllByText('my files')[0])).toBeInTheDocument()
-      expect(await waitForElement(() => getAllByText('course files')[0])).toBeInTheDocument()
+      expect((await findAllByText('my files'))[0]).toBeInTheDocument()
+      expect((await findAllByText('course files'))[0]).toBeInTheDocument()
       expect(
-        await waitForElement(() => getAllByText(mocks[2].result.data.legacyNode.groups[0].name)[0])
+        (await findAllByText(mocks[2].result.data.legacyNode.groups[0].name))[0]
       ).toBeInTheDocument()
     })
 
@@ -241,21 +262,26 @@ describe('MoreOptions', () => {
         })
       }
       const mocks = await createGraphqlMocks(overrides)
-      const {getAllByText, getByTestId} = render(
+      const {findAllByText, findByTestId, getByTestId} = render(
         <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" />
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            userID="1"
+            handleCanvasFiles={handleCanvasFiles}
+          />
         </MockedProvider>
       )
       const moreOptionsButton = getByTestId('more-options-button')
       fireEvent.click(moreOptionsButton)
 
-      const myFilesButton = await waitForElement(() => getAllByText('my files')[0])
+      const myFilesButton = (await findAllByText('my files'))[0]
       fireEvent.click(myFilesButton)
 
-      const fileSelect = await waitForElement(() => getByTestId('more-options-file-select'))
-      expect(fileSelect).toContainElement(await waitForElement(() => getAllByText('dank memes')[0]))
+      const fileSelect = await findByTestId('more-options-file-select')
+      expect(fileSelect).toContainElement((await findAllByText('dank memes'))[0])
       expect(fileSelect).toContainElement(
-        await waitForElement(() => getAllByText('www.creedthoughts.gov.www/creedthoughts')[0])
+        (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
       )
     })
 
@@ -266,28 +292,97 @@ describe('MoreOptions', () => {
         })
       }
       const mocks = await createGraphqlMocks(overrides)
-      const {getAllByText, getByTestId} = render(
+      const {findAllByText, findByTestId, getByTestId} = render(
         <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" />
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            userID="1"
+            handleCanvasFiles={handleCanvasFiles}
+          />
         </MockedProvider>
       )
       const moreOptionsButton = getByTestId('more-options-button')
       fireEvent.click(moreOptionsButton)
 
-      const myFilesButton = await waitForElement(() => getAllByText('my files')[0])
+      const myFilesButton = (await findAllByText('my files'))[0]
       fireEvent.click(myFilesButton)
 
-      const fileSelect = await waitForElement(() => getByTestId('more-options-file-select'))
-      expect(fileSelect).toContainElement(await waitForElement(() => getAllByText('dank memes')[0]))
+      const fileSelect = await findByTestId('more-options-file-select')
+      expect(fileSelect).toContainElement((await findAllByText('dank memes'))[0])
 
-      const rootFolderBreadcrumbLink = await waitForElement(() => getAllByText('Root')[0])
+      const rootFolderBreadcrumbLink = (await findAllByText('Root'))[0]
       fireEvent.click(rootFolderBreadcrumbLink)
 
-      expect(await waitForElement(() => getAllByText('my files')[0])).toBeInTheDocument()
-      expect(await waitForElement(() => getAllByText('course files')[0])).toBeInTheDocument()
+      expect((await findAllByText('my files'))[0]).toBeInTheDocument()
+      expect((await findAllByText('course files'))[0]).toBeInTheDocument()
       expect(
-        await waitForElement(() => getAllByText(mocks[2].result.data.legacyNode.groups[0].name)[0])
+        (await findAllByText(mocks[2].result.data.legacyNode.groups[0].name))[0]
       ).toBeInTheDocument()
+    })
+
+    it('hides the upload button until a file has been selected', async () => {
+      const overrides = {
+        ExternalToolConnection: () => ({
+          nodes: [{}]
+        })
+      }
+      const mocks = await createGraphqlMocks(overrides)
+      const {findAllByText, findByText, getByTestId, queryByText} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            userID="1"
+            handleCanvasFiles={handleCanvasFiles}
+          />
+        </MockedProvider>
+      )
+      const moreOptionsButton = getByTestId('more-options-button')
+      fireEvent.click(moreOptionsButton)
+
+      const myFilesButton = (await findAllByText('my files'))[0]
+      fireEvent.click(myFilesButton)
+
+      const file = (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
+      expect(file).toBeInTheDocument()
+
+      expect(queryByText('Upload')).not.toBeInTheDocument()
+
+      fireEvent.click(file)
+      expect(await findByText('Upload')).toBeInTheDocument()
+    })
+
+    it('calls the handleCanvasFiles prop function when the upload button is clicked', async () => {
+      const overrides = {
+        ExternalToolConnection: () => ({
+          nodes: [{}]
+        })
+      }
+      const mocks = await createGraphqlMocks(overrides)
+      const {findAllByText, findByText, getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            userID="1"
+            handleCanvasFiles={handleCanvasFiles}
+          />
+        </MockedProvider>
+      )
+      const moreOptionsButton = getByTestId('more-options-button')
+      fireEvent.click(moreOptionsButton)
+
+      const myFilesButton = (await findAllByText('my files'))[0]
+      fireEvent.click(myFilesButton)
+
+      const file = (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
+      fireEvent.click(file)
+
+      const uploadButton = await findByText('Upload')
+      fireEvent.click(uploadButton)
+
+      expect(selectedCanvasFiles).toEqual(['11'])
     })
   })
 })

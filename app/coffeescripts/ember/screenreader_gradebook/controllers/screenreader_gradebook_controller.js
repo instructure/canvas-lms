@@ -1309,7 +1309,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     return this.get('selectedSubmission.hidden') || false
   }.property('selectedStudent', 'selectedAssignment'),
 
-  hideComments: function() {
+  anonymizeStudents: function() {
     return this.get('selectedAssignment.anonymize_students')
   }.property('selectedAssignment'),
 

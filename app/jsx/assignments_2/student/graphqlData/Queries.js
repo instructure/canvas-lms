@@ -19,7 +19,9 @@ import gql from 'graphql-tag'
 
 import {Assignment, AssignmentSubmissionsConnection} from './Assignment'
 import {ExternalTool} from './ExternalTool'
+import {ProficiencyRating} from './ProficiencyRating'
 import {Rubric} from './Rubric'
+import {RubricAssessment} from './RubricAssessment'
 import {SubmissionComment} from './SubmissionComment'
 import {SubmissionHistory} from './SubmissionHistory'
 import {UserGroups} from './UserGroups'
@@ -38,14 +40,32 @@ export const EXTERNAL_TOOLS_QUERY = gql`
 `
 
 export const RUBRIC_QUERY = gql`
-  query GetRubric($assignmentID: ID!) {
-    assignment(id: $assignmentID) {
-      rubric {
+  query GetRubric($rubricID: ID!, $submissionID: ID!, $courseID: ID!, $submissionAttempt: Int!) {
+    rubric: node(id: $rubricID) {
+      ... on Rubric {
         ...Rubric
+      }
+    }
+    submission(id: $submissionID) {
+      rubricAssessmentsConnection(filter: {forAttempt: $submissionAttempt}) {
+        nodes {
+          ...RubricAssessment
+        }
+      }
+    }
+    course(id: $courseID) {
+      account {
+        proficiencyRatingsConnection {
+          nodes {
+            ...ProficiencyRating
+          }
+        }
       }
     }
   }
   ${Rubric.fragment}
+  ${RubricAssessment.fragment}
+  ${ProficiencyRating.fragment}
 `
 
 export const STUDENT_VIEW_QUERY = gql`
@@ -95,21 +115,6 @@ export const SUBMISSION_HISTORIES_QUERY = gql`
     }
   }
   ${SubmissionHistory.fragment}
-`
-
-export const SUBMISSION_ID_QUERY = gql`
-  query GetAssignmentSubmissionID($assignmentLid: ID!) {
-    assignment(id: $assignmentLid) {
-      submissionsConnection(
-        last: 1
-        filter: {states: [unsubmitted, graded, pending_review, submitted]}
-      ) {
-        nodes {
-          id
-        }
-      }
-    }
-  }
 `
 
 export const USER_GROUPS_QUERY = gql`

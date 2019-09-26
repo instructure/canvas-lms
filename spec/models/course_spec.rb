@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../lti2_course_spec_helper.rb')
+require 'sharding_spec_helper'
+require 'lti2_course_spec_helper'
 
 require 'csv'
 require 'socket'
@@ -4018,6 +4018,17 @@ describe Course, 'tabs_available' do
     settings = @course.external_tool_tabs({}, User.new).first
     expect(settings).to include(:visibility=>"admins")
     expect(settings).to include(:hidden=>false)
+  end
+
+  it 'hides tabs for feature flagged external tools' do
+    tool = analytics_2_tool_factory
+
+    tabs = @course.external_tool_tabs({}, User.new)
+    expect(tabs.map{|t| t[:id]}).not_to include(tool.asset_string)
+
+    @course.root_account.enable_feature!(:analytics_2)
+    tabs = @course.external_tool_tabs({}, User.new)
+    expect(tabs.map{|t| t[:id]}).to include(tool.asset_string)
   end
 
 end

@@ -17,9 +17,9 @@
  */
 
 import ExternalToolsQuery from './ExternalToolsQuery'
+import {func, string} from 'prop-types'
 import I18n from 'i18n!assignments_2_initial_query'
 import React from 'react'
-import {string} from 'prop-types'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-elements'
@@ -27,7 +27,8 @@ import {Modal} from '@instructure/ui-overlays'
 
 class MoreOptions extends React.Component {
   state = {
-    open: false
+    open: false,
+    selectedCanvasFileID: null
   }
 
   _isMounted = false
@@ -39,16 +40,22 @@ class MoreOptions extends React.Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    window.removeEventListener('message', this.handleIframeTask)
+  }
+
+  handleCanvasFileSelect = fileID => {
+    if (this._isMounted) {
+      this.setState({selectedCanvasFileID: fileID})
+    }
   }
 
   handleIframeTask = e => {
     if (
-      e.data.messageType === 'LtiDeepLinkingResponse' ||
-      e.data.messageType === 'A2ExternalContentReady'
+      this._isMounted &&
+      (e.data.messageType === 'LtiDeepLinkingResponse' ||
+        e.data.messageType === 'A2ExternalContentReady')
     ) {
-      if (this._isMounted) {
-        this.setState({open: false})
-      }
+      this.handleModalClose()
     }
   }
 
@@ -60,7 +67,7 @@ class MoreOptions extends React.Component {
 
   handleModalClose = () => {
     if (this._isMounted) {
-      this.setState({open: false})
+      this.setState({open: false, selectedCanvasFileID: null})
     }
   }
 
@@ -100,6 +107,7 @@ class MoreOptions extends React.Component {
               <ExternalToolsQuery
                 assignmentID={this.props.assignmentID}
                 courseID={this.props.courseID}
+                handleCanvasFileSelect={this.handleCanvasFileSelect}
                 userID={this.props.userID}
               />
             </Modal.Body>
@@ -107,9 +115,18 @@ class MoreOptions extends React.Component {
               <Button onClick={this.handleModalClose} margin="0 xx-small 0 0">
                 {I18n.t('Cancel')}
               </Button>
-              <Button variant="primary" type="submit">
-                {I18n.t('Upload')}
-              </Button>
+              {this.state.selectedCanvasFileID && (
+                <Button
+                  variant="primary"
+                  type="submit"
+                  onClick={() => {
+                    this.props.handleCanvasFiles(this.state.selectedCanvasFileID)
+                    this.handleModalClose()
+                  }}
+                >
+                  {I18n.t('Upload')}
+                </Button>
+              )}
             </Modal.Footer>
           </Modal>
         )}
@@ -120,6 +137,7 @@ class MoreOptions extends React.Component {
 MoreOptions.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
+  handleCanvasFiles: func.isRequired,
   userID: string.isRequired
 }
 

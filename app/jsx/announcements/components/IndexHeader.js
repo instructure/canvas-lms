@@ -24,7 +24,7 @@ import I18n from 'i18n!announcements_v2'
 import React, {Component} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
-import {Grid, GridCol, GridRow, View} from '@instructure/ui-layout'
+import {Grid, View} from '@instructure/ui-layout'
 import {
   IconLockLine,
   IconPlusLine,
@@ -111,8 +111,8 @@ export default class IndexHeader extends Component {
       <View>
         <View margin="0 0 medium" display="block">
           <Grid>
-            <GridRow hAlign="space-between">
-              <GridCol width={2}>
+            <Grid.Row hAlign="space-between">
+              <Grid.Col width={2}>
                 <FormField
                   id="announcement-filter"
                   label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
@@ -132,8 +132,8 @@ export default class IndexHeader extends Component {
                     ))}
                   </select>
                 </FormField>
-              </GridCol>
-              <GridCol width={4}>
+              </Grid.Col>
+              <Grid.Col width={4}>
                 <TextInput
                   label={
                     <ScreenReaderContent>
@@ -146,8 +146,8 @@ export default class IndexHeader extends Component {
                   onChange={this.onSearch}
                   name="announcements_search"
                 />
-              </GridCol>
-              <GridCol width={6} textAlign="end">
+              </Grid.Col>
+              <Grid.Col width={6} textAlign="end">
                 {this.props.permissions.manage_content &&
                   !this.props.announcementsLocked &&
                   (this.props.isToggleLocking ? (
@@ -205,8 +205,8 @@ export default class IndexHeader extends Component {
                     <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
                   </Button>
                 )}
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </View>
         <ExternalFeedsTray

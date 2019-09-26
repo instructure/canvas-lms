@@ -50,18 +50,22 @@ describe('ManagedCourseSelector', () => {
   })
 
   it('renders a loading spinner in the combo box while searching', () => {
+    useManagedCourseSearchApi.mockImplementationOnce(({loading}) => loading(true))
     const {getByText, getByLabelText} = render(<ManagedCourseSelector />)
     fireEvent.click(getByLabelText(/select a course/i))
     expect(getByText(/loading/i)).toBeInTheDocument()
   })
 
   it('renders a loading spinner and searches with a specific search term when typed', () => {
-    const {getByText, getByLabelText} = render(<ManagedCourseSelector />)
+    const {getAllByText, getByLabelText} = render(<ManagedCourseSelector />)
     const selectInput = getByLabelText(/select a course/i)
     fireEvent.click(selectInput)
     fireEvent.change(selectInput, {target: {value: 'abc'}})
-    expect(getByText(/loading/i)).toBeInTheDocument()
+    useManagedCourseSearchApi.mockImplementationOnce(({loading}) => loading(true))
     act(() => jest.runAllTimers()) // let the debounce happen
+    const loadingTexts = getAllByText(/loading/i)
+    const loadingTextForSpinner = loadingTexts.find(loading => loading.closest('svg'))
+    expect(loadingTextForSpinner).toBeInTheDocument()
     expect(useManagedCourseSearchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         params: {term: 'abc'}

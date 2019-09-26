@@ -22,7 +22,7 @@ import {bool, func} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
 import {Checkbox} from '@instructure/ui-forms'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconTrashLine} from '@instructure/ui-icons'
@@ -107,13 +107,13 @@ export default class Toolbox extends React.Component {
     return (
       <div data-testid="teacher-toolbox">
         <Flex direction="column">
-          <FlexItem padding="xx-small xx-small small">
+          <Flex.Item padding="xx-small xx-small small">
             {this.renderPublished()}
             {this.renderDelete()}
-          </FlexItem>
-          <FlexItem padding="medium xx-small large" align="end">
+          </Flex.Item>
+          <Flex.Item padding="medium xx-small large" align="end">
             {this.renderPoints()}
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </div>
     )

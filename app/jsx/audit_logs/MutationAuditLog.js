@@ -176,7 +176,7 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
           return <p>{I18n.t('Something went wrong.')}</p>
         }
         if (loading || !data) {
-          return <Spinner title={I18n.t('Loading...')} />
+          return <Spinner renderTitle={I18n.t('Loading...')} />
         }
 
         const {nodes: logEntries, pageInfo} = data.auditLogs.mutationLogs

@@ -62,4 +62,6 @@ group :test do
   gem 'pact-messages', '0.2.0'
   gem 'pact_broker-client'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
+
+  gem 'knapsack', '1.18.0'
 end

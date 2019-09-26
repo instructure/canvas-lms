@@ -80,7 +80,7 @@ class ContextModulesController < ApplicationController
         :FILES_CONTEXTS => [{asset_string: @context.asset_string}],
         :MODULE_FILE_DETAILS => module_file_details,
         :MODULE_FILE_PERMISSIONS => {
-           usage_rights_required: @context.feature_enabled?(:usage_rights_required),
+           usage_rights_required: @context.usage_rights_required?,
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
         }
 

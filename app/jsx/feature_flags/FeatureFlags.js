@@ -102,7 +102,7 @@ export default class FeatureFlags extends React.Component {
         </Button>
 
         <View as="div" width="80%">
-          {this.state.isLoading ? <Spinner title={I18n.t("Loading features")} /> : (
+          {this.state.isLoading ? <Spinner renderTitle={I18n.t("Loading features")} /> : (
             <Table caption={I18n.t('Feature Preview')} margin="medium 0 0">
               <Head>
                 <Row>

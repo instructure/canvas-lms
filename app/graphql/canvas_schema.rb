@@ -64,6 +64,7 @@ class CanvasSchema < GraphQL::Schema
     when DiscussionTopic then Types::DiscussionType
     when Quizzes::Quiz then Types::QuizType
     when Progress then Types::ProgressType
+    when Rubric then Types::RubricType
     when MediaObject then Types::MediaObjectType
     when ContentTag
       if type&.name == "ModuleItemInterface"
@@ -77,6 +78,12 @@ class CanvasSchema < GraphQL::Schema
       end
     when ContextExternalTool then Types::ExternalToolType
     end
+  end
+
+  def self.unauthorized_object(error)
+    raise GraphQL::ExecutionError,
+      I18n.t("An object of type %{graphql_type} was hidden due to insufficient scopes on access token",
+             graphql_type: error.type.graphql_name)
   end
 
   orphan_types [Types::PageType, Types::FileType, Types::ExternalUrlType,

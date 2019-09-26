@@ -21,6 +21,7 @@ import Backbone from 'Backbone'
 import Account from '../models/Account'
 import QuotasView from '../views/accounts/settings/QuotasView'
 import ManualQuotasView from '../views/accounts/settings/ManualQuotasView'
+import ready from '@instructure/ready'
 
 if ENV.ACCOUNT
   account = new Account(ENV.ACCOUNT)
@@ -30,12 +31,13 @@ if ENV.ACCOUNT
     id: @get('id')
     account: _.pick(@attributes, 'default_storage_quota_mb', 'default_user_storage_quota_mb', 'default_group_storage_quota_mb')
 
-  quotasView = new QuotasView
-    model: account
-  $('#tab-quotas').append(quotasView.el)
-  quotasView.render()
+  ready ->
+    quotasView = new QuotasView
+      model: account
+    $('#tab-quotas').append(quotasView.el)
+    quotasView.render()
 
-  manualQuotasView = new ManualQuotasView()
-  $('#tab-quotas').append(manualQuotasView.el)
-  manualQuotasView.render()
+    manualQuotasView = new ManualQuotasView()
+    $('#tab-quotas').append(manualQuotasView.el)
+    manualQuotasView.render()
 export default {}

@@ -791,6 +791,88 @@ describe SpeedGrader::Assignment do
     end
   end
 
+  describe "filtering students by section" do
+    let_once(:course) { Course.create! }
+    let_once(:teacher) { course.enroll_teacher(User.create, enrollment_state: :active).user }
+
+    let_once(:section1) { course.course_sections.create!(name: "first") }
+
+    let_once(:section2) { course.course_sections.create!(name: "second") }
+
+    let_once(:section1_student) { User.create! }
+    let_once(:section2_student) { User.create! }
+    let_once(:default_section_student) { User.create! }
+    let_once(:sectionless_student) { User.create! }
+
+    let_once(:assignment) { course.assignments.create! }
+
+    let(:json) { SpeedGrader::Assignment.new(assignment, teacher).json }
+    let(:returned_student_ids) { json.dig(:context, :students).pluck(:id) }
+    let(:all_course_student_ids) { course.students.pluck(:id).map(&:to_s) }
+
+    before(:once) do
+      course.enroll_student(section1_student, enrollment_state: :active, section: section1)
+      course.enroll_student(section2_student, enrollment_state: :active, section: section2)
+      course.enroll_student(default_section_student, enrollment_state: :active)
+    end
+
+    before(:each) do
+      user_session(teacher)
+    end
+
+    context "for a course with New Gradebook enabled" do
+      before(:once) do
+        course.enable_feature!(:new_gradebook)
+      end
+
+      it "only returns students from the selected section if the user has selected one" do
+        teacher.preferences.deep_merge!(gradebook_settings: {
+          course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
+        })
+        expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
+      end
+
+      it "returns all eligible students if the user has not selected a section" do
+        expect(returned_student_ids).to match_array(all_course_student_ids)
+      end
+
+      it "returns all eligible students if the selected section is set to nil" do
+        teacher.preferences.deep_merge!(gradebook_settings: {
+          course.id => {'filter_rows_by' => {'section_id' => nil}}
+        })
+        expect(returned_student_ids).to match_array(all_course_student_ids)
+      end
+
+      context "when the user is filtering by both section and group" do
+        let_once(:group) do
+          category = course.group_categories.create!(name: "Group Set")
+          category.create_groups(2)
+
+          group = category.groups.first
+          group.add_user(section1_student)
+          group.add_user(section2_student)
+          group
+        end
+
+        it "restricts by both section and group when section_id and group_id are both specified" do
+          teacher.preferences.deep_merge!(gradebook_settings: {
+            course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s, 'student_group_id' => group.id.to_s}}
+          })
+          expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
+        end
+      end
+    end
+
+    context "for a course not using New Gradebook" do
+      it "does not attempt to filter by section" do
+        teacher.preferences.deep_merge!(gradebook_settings: {
+          course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
+        })
+        expect(returned_student_ids).to match_array(all_course_student_ids)
+      end
+    end
+  end
+
   context "quizzes" do
     it "works for quizzes without quiz_submissions" do
       quiz = @course.quizzes.create! :title => "Final",

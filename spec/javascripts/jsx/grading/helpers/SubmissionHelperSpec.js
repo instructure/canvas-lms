@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isHidden} from 'jsx/grading/helpers/SubmissionHelper'
+import {isHidden, extractSimilarityInfo} from 'jsx/grading/helpers/SubmissionHelper'
 
 QUnit.module('SubmissionHelper', suiteHooks => {
   let submission
@@ -56,6 +56,203 @@ QUnit.module('SubmissionHelper', suiteHooks => {
         submission.workflowState = 'graded'
         strictEqual(isHidden(submission), false)
       })
+    })
+  })
+
+  QUnit.module('.extractSimilarityInfo', () => {
+    QUnit.module('"type" return value', () => {
+      test('returns "originality_report" if the submission has hasOriginalityReport set to true', () => {
+        const originalityReportSubmission = {
+          has_originality_report: true,
+          id: '1001',
+          submission_type: 'online_text_entry',
+          turnitinData: {
+            submission_1001: {state: 'scored', similarity_score: 50.0}
+          }
+        }
+
+        strictEqual(extractSimilarityInfo(originalityReportSubmission).type, 'originality_report')
+      })
+
+      test('returns "turnitin" if the submission has turnitinData', () => {
+        const turnitinSubmission = {
+          id: '1001',
+          submission_type: 'online_text_entry',
+          turnitin_data: {
+            submission_1001: {state: 'scored', similarity_score: 50.0}
+          }
+        }
+        strictEqual(extractSimilarityInfo(turnitinSubmission).type, 'turnitin')
+      })
+
+      test('returns "vericite" if the submission has vericiteData and the provider is "vericite"', () => {
+        const vericiteSubmission = {
+          id: '1001',
+          submission_type: 'online_text_entry',
+          vericite_data: {
+            provider: 'vericite',
+            submission_1001: {state: 'scored', similarity_score: 50.0}
+          }
+        }
+        strictEqual(extractSimilarityInfo(vericiteSubmission).type, 'vericite')
+      })
+    })
+
+    QUnit.module('"entries" return value', () => {
+      QUnit.module('for a submission that accepts online attachments', attachmentHooks => {
+        let submissionWithAttachments
+        let submissionWithNestedAttachment
+
+        attachmentHooks.beforeEach(() => {
+          submissionWithAttachments = {
+            attachments: [{id: '2001'}, {id: '2002'}, {id: '2003'}, {id: '2004'}, {id: '9999'}],
+            id: '1001',
+            submission_type: 'online_upload',
+            turnitin_data: {
+              attachment_2001: {status: 'scored', similarity_score: 25},
+              attachment_2002: {status: 'scored', similarity_score: 75},
+              attachment_2003: {status: 'pending'},
+              attachment_2004: {status: 'error'}
+            }
+          }
+
+          submissionWithNestedAttachment = {
+            attachments: [{attachment: {id: '3001'}}],
+            id: '1001',
+            submission_type: 'online_upload',
+            turnitin_data: {
+              attachment_3001: {status: 'scored', similarity_score: 40}
+            }
+          }
+        })
+
+        test('returns an item for each attachment with plagiarism data', () => {
+          strictEqual(extractSimilarityInfo(submissionWithAttachments).entries.length, 4)
+        })
+
+        test('sorts entries by status', () => {
+          const entries = extractSimilarityInfo(submissionWithAttachments).entries
+          const orderedStatuses = entries.map(entry => entry.data.status)
+          deepEqual(orderedStatuses, ['error', 'pending', 'scored', 'scored'])
+        })
+
+        test('sorts scored entries by decreasing similarity score', () => {
+          const entries = extractSimilarityInfo(submissionWithAttachments).entries
+          const scoredEntries = entries.filter(entry => entry.data.status === 'scored')
+          deepEqual(scoredEntries.map(entry => entry.data.similarity_score), [75, 25])
+        })
+
+        test('sets the "id" field for each entry to the ID of the attachment for that entry', () => {
+          const entries = extractSimilarityInfo(submissionWithAttachments).entries
+          deepEqual(entries.map(entry => entry.id), [
+            'attachment_2004',
+            'attachment_2003',
+            'attachment_2002',
+            'attachment_2001'
+          ])
+        })
+
+        test('uses data from the "attachment" field nested inside the attachment if present', () => {
+          const entry = extractSimilarityInfo(submissionWithNestedAttachment).entries[0]
+          strictEqual(entry.id, 'attachment_3001')
+        })
+      })
+
+      QUnit.module('for a text entry submission', textEntryHooks => {
+        let unversionedSubmission
+        let versionedSubmission
+        let versionKey
+
+        textEntryHooks.beforeEach(() => {
+          unversionedSubmission = {
+            id: '1001',
+            submission_type: 'online_text_entry',
+            turnitinData: {
+              submission_1001: {status: 'error'}
+            }
+          }
+
+          versionKey = 'submission_1001_1997-10-01T11:22:00Z'
+          versionedSubmission = {
+            id: '1001',
+            submission_type: 'online_text_entry',
+            submitted_at: '01 October 1997 11:22 UTC',
+            turnitinData: {
+              submission_1001: {status: 'pending'}
+            }
+          }
+          versionedSubmission.turnitinData[versionKey] = {
+            status: 'scored',
+            similarity_score: 50.0
+          }
+        })
+
+        test('returns plagiarism data for the current version of the submission if it exists', () => {
+          const entry = extractSimilarityInfo(versionedSubmission).entries[0]
+          deepEqual(entry.data, {status: 'scored', similarity_score: 50.0})
+        })
+
+        test('returns an "id" field corresponding to the current version of the submission if it exists', () => {
+          const entry = extractSimilarityInfo(versionedSubmission).entries[0]
+          strictEqual(entry.id, versionKey)
+        })
+
+        test('returns at most one plagiarism entry even if data exists for multiple versions', () => {
+          strictEqual(extractSimilarityInfo(versionedSubmission).entries.length, 1)
+        })
+
+        test('returns plagiarism data for the base submission if no version-specific data exists', () => {
+          const entry = extractSimilarityInfo(unversionedSubmission).entries[0]
+          deepEqual(entry.data, {status: 'error'})
+        })
+
+        test('returns an "id" field corresponding to the base submission if no version-specific data exists', () => {
+          const entry = extractSimilarityInfo(unversionedSubmission).entries[0]
+          strictEqual(entry.id, 'submission_1001')
+        })
+      })
+    })
+
+    test('returns null if the submission has no turnitinData or vericiteData', () => {
+      const submissionWithNoPlagiarismInfo = {
+        id: '1001'
+      }
+      strictEqual(extractSimilarityInfo(submissionWithNoPlagiarismInfo), null)
+    })
+
+    test('returns null if the submission has no plagiarism data matching known attachments', () => {
+      const submissionWithImmaterialPlagiarismInfo = {
+        attachments: [{id: '2001'}],
+        id: '1001',
+        submission_type: 'online_upload',
+        turnitin_data: {
+          attachment_9999: {status: 'error'}
+        }
+      }
+      strictEqual(extractSimilarityInfo(submissionWithImmaterialPlagiarismInfo), null)
+    })
+
+    test('returns null for a versioned text submission with only plagiarism data for older versions', () => {
+      const otherVersionKey = 'submission_1001_1995-10-01T11:22:00Z'
+      const submissionWithOldVersionInfo = {
+        id: '1001',
+        submission_type: 'online_text_entry',
+        submitted_at: '01 October 1997 11:22 UTC',
+        turnitinData: {}
+      }
+      submissionWithOldVersionInfo.turnitinData[otherVersionKey] = {status: 'error'}
+      strictEqual(extractSimilarityInfo(submissionWithOldVersionInfo), null)
+    })
+
+    test('returns null if the submission is not an upload or text entry submission', () => {
+      const submissionWithNoSubmissions = {
+        id: '1001',
+        submission_type: 'on_paper',
+        turnitin_data: {
+          submission_1001: {status: 'error'}
+        }
+      }
+      strictEqual(extractSimilarityInfo(submissionWithNoSubmissions), null)
     })
   })
 })

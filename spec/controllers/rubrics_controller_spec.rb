@@ -275,6 +275,7 @@ describe RubricsController do
       expect(assigns[:rubric]).not_to eql(@rubric)
       expect(assigns[:rubric].title).to eql("new title")
     end
+
     it "should not update the rubric if not updateable (should make a new one instead)" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
@@ -288,6 +289,23 @@ describe RubricsController do
       expect(assigns[:rubric].title).to eql("new title")
       expect(response).to be_successful
     end
+
+    it "should mark the blueprint associated assignment as having it's rubric changed if moved to a new rubric" do
+      course_with_teacher_logged_in(:active_all => true)
+      rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
+
+      @rubric_association_object.update_attributes(:migration_id => "#{MasterCourses::MIGRATION_ID_PREFIX}_blah")
+      mc_course = Course.create!
+      @template = MasterCourses::MasterTemplate.set_as_master_course(mc_course)
+      sub = @template.add_child_course!(@course)
+      child_tag = sub.content_tag_for(@rubric_association_object) # create a fake content tag
+
+      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association_object => @course)
+      put 'update', params: {:course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id}
+      expect(response).to be_successful
+      expect(child_tag.reload.downstream_changes).to include("rubric")
+    end
+
     it "should not update the rubric and not create a new one if the parameters don't change the rubric" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')

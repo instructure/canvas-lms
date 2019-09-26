@@ -20,15 +20,13 @@ import I18n from 'i18n!tray'
 import React from 'react'
 import {string, node} from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Heading} from '@instructure/ui-elements'
 import {Tray} from '@instructure/ui-overlays'
 
 import ErrorBoundary from './ErrorBoundary'
 import GenericErrorPage from './GenericErrorPage'
-
-// TODO: should put an official image in a better place as a generic default
-import errorShipUrl from 'jsx/assignments_2/student/SVG/ErrorShip.svg'
+import errorShipUrl from '../svg/ErrorShip.svg'
 
 /**
 This is a wrapper around an InstUi Tray component that provides:
@@ -68,12 +66,12 @@ export default function CanvasTray({
     <Tray label={label} onDismiss={onDismiss} {...otherTrayProps}>
       <View as="div" padding={padding}>
         <Flex>
-          <FlexItem grow>
+          <Flex.Item grow>
             <Heading>{label}</Heading>
-          </FlexItem>
-          <FlexItem>
+          </Flex.Item>
+          <Flex.Item>
             <CloseButton onClick={onDismiss}>{I18n.t('Close')}</CloseButton>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
         <ErrorBoundary
           errorComponent={

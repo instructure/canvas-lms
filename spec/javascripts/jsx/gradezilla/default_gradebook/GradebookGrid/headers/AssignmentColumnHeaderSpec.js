@@ -133,6 +133,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         {
           id: '1001',
           isInactive: false,
+          isTestStudent: false,
           name: 'Adam Jones',
           sortableName: 'Jones, Adam',
           submission: {
@@ -147,6 +148,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         {
           id: '1002',
           isInactive: false,
+          isTestStudent: false,
           name: 'Betty Ford',
           sortableName: 'Ford, Betty',
           submission: {
@@ -161,6 +163,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         {
           id: '1003',
           isInactive: false,
+          isTestStudent: false,
           name: 'Charlie Xi',
           sortableName: 'Xi, Charlie',
           submission: {
@@ -238,44 +241,20 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         props.postGradesAction.featureEnabled = true
       })
 
-      QUnit.module('when the assignment is auto-posted', () => {
-        test('displays no icon when no submissions are graded but unposted', () => {
-          props.students.forEach(student => {
-            if (student.submission.score != null) {
-              student.submission.postedAt = new Date()
-            }
-          })
-
-          mountComponent()
-          notOk(getColumnHeaderIcon())
+      test('displays no icon when no submissions are graded but unposted', () => {
+        props.students.forEach(student => {
+          if (student.submission.score != null) {
+            student.submission.postedAt = new Date()
+          }
         })
 
-        test('displays an "off" icon when submissions are graded but unposted', () => {
-          mountComponent()
-          ok(getColumnHeaderIcon('IconOff'))
-        })
+        mountComponent()
+        notOk(getColumnHeaderIcon())
       })
 
-      QUnit.module('when the assignment is manually-posted', manualPostingHooks => {
-        manualPostingHooks.beforeEach(() => {
-          props.assignment.postManually = true
-        })
-
-        test('displays an "off" icon when no submissions are graded but unposted', () => {
-          props.students.forEach(student => {
-            if (student.submission.workflowState === 'graded') {
-              student.submission.postedAt = new Date()
-            }
-          })
-
-          mountComponent()
-          ok(getColumnHeaderIcon('IconOff'))
-        })
-
-        test('displays an "off" icon when at least one submission is graded but unposted', () => {
-          mountComponent()
-          ok(getColumnHeaderIcon('IconOff'))
-        })
+      test('displays an "off" icon when submissions are graded but unposted', () => {
+        mountComponent()
+        ok(getColumnHeaderIcon('IconOff'))
       })
 
       test('displays no icon when submissions have not been loaded', () => {
@@ -309,16 +288,50 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       equal(getSecondaryDetailText(), 'Out of 0')
     })
 
-    QUnit.module('when the assignment is muted', () => {
-      test('displays a muted status when post policies are not enabled', () => {
+    QUnit.module('when post policies are enabled', postPoliciesEnabledHooks => {
+      postPoliciesEnabledHooks.beforeEach(() => {
+        props.postGradesAction.featureEnabled = true
+      })
+
+      test('displays a status of "Manual" for manually-posted assignments if published and non-anonymous', () => {
+        props.assignment.postManually = true
+        mountComponent()
+        ok(getSecondaryDetailText().includes('Manual'))
+      })
+
+      test('displays no status text for auto-posted assignments if published and non-anonymous', () => {
+        mountComponent()
+        notOk(getSecondaryDetailText().includes('Manual'))
+      })
+
+      test('displays points possible', () => {
+        mountComponent()
+        ok(getSecondaryDetailText().includes('Out of 10'))
+      })
+
+      test('displays the status text "Anonymous" if the assignment is anonymized and manually-posted', () => {
+        props.assignment.anonymizeStudents = true
+        props.assignment.postManually = true
+        mountComponent()
+        strictEqual(getSecondaryDetailText(), 'Anonymous')
+      })
+
+      test('displays the status text "Unpublished" if the assignment is unpublished and manually-posted', () => {
+        props.assignment.published = false
+        props.assignment.postManually = true
+        mountComponent()
+        strictEqual(getSecondaryDetailText(), 'Unpublished')
+      })
+    })
+
+    QUnit.module('when post policies are not enabled', () => {
+      test('displays a muted status when the assignment is muted', () => {
         props.assignment.muted = true
         mountComponent()
         ok(getSecondaryDetailText().includes('Muted'))
       })
 
-      test('does not display a muted status when post policies are enabled', () => {
-        props.assignment.muted = true
-        props.postGradesAction.featureEnabled = true
+      test('displays no status text when the assignment is not muted', () => {
         mountComponent()
         notOk(getSecondaryDetailText().includes('Muted'))
       })
@@ -327,6 +340,20 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         props.assignment.muted = true
         mountComponent()
         ok(getSecondaryDetailText().includes('Out of 10'))
+      })
+
+      test('displays the status text "Anonymous" if the assignment is anonymized and muted', () => {
+        props.assignment.anonymizeStudents = true
+        props.assignment.muted = true
+        mountComponent()
+        strictEqual(getSecondaryDetailText(), 'Anonymous')
+      })
+
+      test('displays the status text "Unpublished" if the assignment is unpublished and muted', () => {
+        props.assignment.published = false
+        props.assignment.muted = true
+        mountComponent()
+        strictEqual(getSecondaryDetailText(), 'Unpublished')
       })
     })
 
@@ -800,6 +827,22 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         const [settings] = window.messageStudents.lastCall.args
         settings.onClose()
         strictEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+
+      test('includes non-test students in the "settings" hash', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        const [settings] = window.messageStudents.lastCall.args
+        strictEqual(settings.students.length, 3)
+      })
+
+      test('excludes test students from the "settings" hash', () => {
+        props.students[0].isTestStudent = true
+
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        const [settings] = window.messageStudents.lastCall.args
+        deepEqual(settings.students.map(student => student.name), ['Betty Ford', 'Charlie Xi'])
       })
     })
   })

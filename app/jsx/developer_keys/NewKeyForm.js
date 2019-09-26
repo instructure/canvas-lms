@@ -18,7 +18,7 @@
 
 import {Checkbox, TextArea, TextInput} from '@instructure/ui-forms'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import I18n from 'i18n!react_developer_keys'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import React from 'react'
@@ -70,8 +70,8 @@ export default class NewKeyForm extends React.Component {
     return (
       <form ref={this.setKeyFormRef}>
         <Grid hAlign="center">
-          <GridRow>
-            <GridCol width={3}>
+          <Grid.Row>
+            <Grid.Col width={3}>
               <FormFieldGroup
                 rowSpacing="small"
                 vAlign="middle"
@@ -142,8 +142,8 @@ export default class NewKeyForm extends React.Component {
                   : null
                 }
               </FormFieldGroup>
-            </GridCol>
-            <GridCol width={8}>
+            </Grid.Col>
+            <Grid.Col width={8}>
               {createLtiKeyState.isLtiKey
                 ? <ToolConfiguration
                     ref={this.setToolConfigRef}
@@ -171,8 +171,8 @@ export default class NewKeyForm extends React.Component {
                     listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
                   />
               }
-            </GridCol>
-          </GridRow>
+            </Grid.Col>
+          </Grid.Row>
         </Grid>
       </form>
     )

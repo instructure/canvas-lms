@@ -21,7 +21,7 @@ import I18n from 'i18n!new_nav'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-layout'
-import {Heading, List, ListItem, Spinner} from '@instructure/ui-elements'
+import {Heading, List, Spinner} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 
 export default function GroupsTray({groups, hasLoaded}) {
@@ -32,19 +32,19 @@ export default function GroupsTray({groups, hasLoaded}) {
       <List variant="unstyled"  margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           groups.map(group =>
-            <ListItem key={group.id}>
+            <List.Item key={group.id}>
               <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/groups/${group.id}`}>{group.name}</Button>
-            </ListItem>
+            </List.Item>
           ).concat([
-            <ListItem key="hr"><hr role="presentation"/></ListItem>,
-            <ListItem key="all">
+            <List.Item key="hr"><hr role="presentation"/></List.Item>,
+            <List.Item key="all">
               <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/groups">{I18n.t('All Groups')}</Button>
-            </ListItem>
+            </List.Item>
           ])
         ) : (
-          <ListItem>
-            <Spinner size="small" title={I18n.t('Loading')} />
-          </ListItem>
+          <List.Item>
+            <Spinner size="small" renderTitle={I18n.t('Loading')} />
+          </List.Item>
         )}
       </List>
     </View>

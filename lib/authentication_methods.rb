@@ -110,6 +110,15 @@ module AuthenticationMethods
     end
   end
 
+  def self.graphql_type_authorized?(access_token, type)
+    if access_token&.developer_key&.require_scopes
+      # allowing the root query type for now, but any other type is forbidden
+      type == "Query"
+    else
+      true
+    end
+  end
+
   def load_pseudonym_from_access_token
     return unless api_request? ||
       (params[:controller] == 'oauth2_provider' && params[:action] == 'destroy') ||

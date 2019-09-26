@@ -19,11 +19,14 @@
 import CanvasMediaPlayer from '../shared/media/CanvasMediaPlayer'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import ready from '@instructure/ready'
 
 // get the media_id from something like `http://canvas.example.com/media_objects_iframe/m-48jGWTHdvcV5YPdZ9CKsqbtRzu1jURgu`
 const media_id = window.location.pathname.split('media_objects_iframe/').pop()
 
+ready(() => {
 ReactDOM.render(
   <CanvasMediaPlayer media_id={media_id} media_sources={ENV.media_sources} />,
   document.body.appendChild(document.createElement('div'))
 )
+})

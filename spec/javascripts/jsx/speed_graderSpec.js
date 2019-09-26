@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom'
 import _ from 'underscore'
 
 import SpeedGrader from 'speed_grader'
+import SpeedGraderAlerts from 'jsx/speed_grader/SpeedGraderAlerts'
 import SpeedGraderHelpers from 'speed_grader_helpers'
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache'
 import fakeENV from 'helpers/fakeENV'
@@ -3793,6 +3794,68 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
           ReactDOM.render.restore()
         })
       })
+
+      QUnit.module('when SpeedGrader is loaded with no students', noStudentsHooks => {
+        let oldStudentData
+
+        noStudentsHooks.beforeEach(() => {
+          oldStudentData = windowJsonData.context.students
+          windowJsonData.context.students = []
+
+          sinon.stub(window, 'alert')
+        })
+
+        noStudentsHooks.afterEach(() => {
+          window.alert.restore()
+          windowJsonData.context.students = oldStudentData
+        })
+
+        QUnit.module('when not filtering by a section', () => {
+          test('displays a message indicating there are no students in the course', () => {
+            SpeedGrader.EG.jsonReady()
+            const [message] = window.alert.firstCall.args
+            ok(message.includes('Sorry, there are either no active students in the course'))
+          })
+
+          test('calls back() on the browser history', () => {
+            SpeedGrader.EG.jsonReady()
+            strictEqual(history.back.callCount, 1)
+          })
+        })
+      })
+
+      QUnit.module('student group change alert', hooks => {
+        let changeAlertStub
+
+        hooks.beforeEach(() => {
+          fakeENV.setup({
+            ...ENV,
+            selected_student_group: {name: 'Some Group or Other'},
+            student_group_reason_for_change: 'student_not_in_selected_group',
+          })
+
+          changeAlertStub = sandbox.stub(SpeedGraderAlerts, 'showStudentGroupChangeAlert')
+        })
+
+        hooks.afterEach(() => {
+          changeAlertStub.restore()
+        })
+
+        test('always calls showStudentGroupChangeAlert during setup', () => {
+          SpeedGrader.EG.jsonReady()
+          strictEqual(changeAlertStub.callCount, 1)
+        })
+
+        test('passes the value of ENV.selected_student_group as selectedStudentGroup', () => {
+          SpeedGrader.EG.jsonReady()
+          deepEqual(changeAlertStub.firstCall.args[0].selectedStudentGroup, {name: 'Some Group or Other'})
+        })
+
+        test('passes the value of ENV.student_group_reason_for_change as reasonForChange', () => {
+          SpeedGrader.EG.jsonReady()
+          strictEqual(changeAlertStub.firstCall.args[0].reasonForChange, 'student_not_in_selected_group')
+        })
+      })
     })
 
     QUnit.module('#skipRelativeToCurrentIndex', hooks => {
@@ -5600,6 +5663,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
             {
               id: 4,
               name: 'Guy B. Studying'
+            },
+            {
+              id: 5,
+              name: 'Fella B. Indolent'
             }
           ],
           enrollments: [
@@ -5617,6 +5684,11 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
               user_id: 4,
               workflow_state: 'active',
               course_section_id: 3
+            },
+            {
+              user_id: 5,
+              workflow_state: 'active',
+              course_section_id: 2
             }
           ],
           active_course_sections: [
@@ -5782,6 +5854,20 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
 
         const [sectionId] = SpeedGrader.EG.changeToSection.firstCall.args
         strictEqual(sectionId, 'all')
+      })
+    })
+
+    QUnit.module('filtering by section', () => {
+      test('filters the list of students by the section ID specified in userSettings if set', () => {
+        SpeedGrader.EG.jsonReady()
+
+        strictEqual(window.jsonData.studentsWithSubmissions.length, 1)
+      })
+
+      test('does not filter the list of students if no section ID is specified in userSettings', () => {
+        userSettings.contextGet.returns(null)
+        SpeedGrader.EG.jsonReady()
+        strictEqual(window.jsonData.studentsWithSubmissions.length, 2)
       })
     })
   })

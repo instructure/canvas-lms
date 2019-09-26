@@ -30,7 +30,7 @@
 
   <div class="ic-Action-header content--hasMarginTop">
     <div class="ic-Action-header__Secondary">
-      <% if @domain_root_account.feature_enabled?(:course_catalog) %>
+      <% if @domain_root_account.enable_course_catalog? %>
         <%= link_to t('browse_more_courses', 'Browse More Courses'), "/search/all_courses/", class:"Button" %>
       <% end %>
 

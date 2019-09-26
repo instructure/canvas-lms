@@ -77,3 +77,7 @@ test("doesn't show infos or add border to iframe by default", () => {
 test("sets the proper values for the iframe 'allow' attribute", () => {
   equal(iframe.attr('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
 })
+
+test("sets the proper values for the iframe 'data-lti-launch' attribute", () => {
+  equal(iframe.attr('data-lti-launch'), "true")
+})

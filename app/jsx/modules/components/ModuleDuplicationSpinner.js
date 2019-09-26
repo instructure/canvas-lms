@@ -19,24 +19,24 @@
 import I18n from 'i18n!modules'
 
 import React from 'react'
-import {Grid, GridRow, GridCol} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import {Spinner, Text} from '@instructure/ui-elements'
 
 export default function ModuleDuplicationSpinner(_props) {
   return (
     <Grid startAt="medium" vAlign="middle" rowSpacing="none" colSpacing="none">
-      <GridRow vAlign="middle" rowSpacing="none">
-        <GridCol hAlign='center' textAlign='center'>
-          <Spinner title={I18n.t('Duplicating Module')}/>
-        </GridCol>
-      </GridRow>
-      <GridRow>
-        <GridCol hAlign='center' textAlign='center'>
+      <Grid.Row vAlign="middle" rowSpacing="none">
+        <Grid.Col hAlign='center' textAlign='center'>
+          <Spinner renderTitle={I18n.t('Duplicating Module')}/>
+        </Grid.Col>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Col hAlign='center' textAlign='center'>
           <Text>
             {I18n.t('Duplicating Module...')}
           </Text>
-        </GridCol>
-      </GridRow>
+        </Grid.Col>
+      </Grid.Row>
     </Grid>
   )
 }

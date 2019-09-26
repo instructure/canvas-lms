@@ -34,9 +34,9 @@ module SectionTabHelper
     :view_all_grades
   ].freeze
 
-  def available_section_tabs(context, precalculated_permissions=nil)
-    AvailableSectionTabs.new(
-      context, @current_user, @domain_root_account, session, precalculated_permissions
+  def available_section_tabs
+    @available_section_tabs ||= AvailableSectionTabs.new(
+      @context, @current_user, @domain_root_account, session
     ).to_a
   end
 
@@ -56,13 +56,13 @@ module SectionTabHelper
 
   def section_tabs
     @section_tabs ||= begin
-      if @context && available_section_tabs(@context).any?
+      if @context && available_section_tabs.any?
         content_tag(:nav, {
           :role => 'navigation',
           :'aria-label' => nav_name
         }) do
           concat(content_tag(:ul, id: 'section-tabs') do
-            available_section_tabs(@context).map do |tab|
+            available_section_tabs.map do |tab|
               section_tab_tag(tab, @context, get_active_tab)
             end
           end)

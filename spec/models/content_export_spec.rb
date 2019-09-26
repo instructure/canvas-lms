@@ -220,6 +220,12 @@ describe ContentExport do
       ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
       expect(@ce.reload).not_to be_expired
     end
+
+    it "does not mark expired if part of a ContentShare" do
+      @teacher.sent_content_shares.create!(read_state: 'read', name: 'test', content_export_id: @ce.id)
+      ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
+      expect(@ce.reload).not_to be_expired
+    end
   end
 
   describe "#expired" do

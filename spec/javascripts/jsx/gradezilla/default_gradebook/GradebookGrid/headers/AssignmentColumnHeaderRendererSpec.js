@@ -616,6 +616,24 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       strictEqual(studentProp.submission.postedAt, null)
     })
 
+    test('"isTestStudent" is true if the student is enrolled via a StudentViewEnrollment', () => {
+      buildGradebook()
+      student.enrollments = [{type: 'StudentViewEnrollment'}]
+      gradebook.gotChunkOfStudents([student])
+      render()
+      const studentProp = component.props.students.find(s => s.id === student.id)
+      strictEqual(studentProp.isTestStudent, true)
+    })
+
+    test('"isTestStudent" is false if the student is not enrolled via a StudentViewEnrollment', () => {
+      buildGradebook()
+      student.enrollments = [{type: 'StudentEnrollment'}]
+      gradebook.gotChunkOfStudents([student])
+      render()
+      const studentProp = component.props.students.find(s => s.id === student.id)
+      strictEqual(studentProp.isTestStudent, false)
+    })
+
     test('includes a callback for keyDown events', () => {
       buildGradebook()
       sinon.stub(gradebook, 'handleHeaderKeyDown')

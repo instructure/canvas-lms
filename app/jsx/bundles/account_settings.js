@@ -26,7 +26,9 @@ import {View} from '@instructure/ui-layout'
 import 'account_settings'
 import 'compiled/modules/account_quota_settings'
 import FeatureFlags from "../feature_flags/FeatureFlags"
+import ready from '@instructure/ready'
 
+ready(() => {
 if (window.ENV.NEW_FEATURES_UI) {
   ReactDOM.render(<FeatureFlags/>, document.getElementById('tab-features'))
 } else {
@@ -56,7 +58,7 @@ if (document.getElementById('tab-security')) {
       padding="large"
       textAlign="center"
     >
-    <Spinner size="large" title={I18n.t('Loading')} />
+    <Spinner size="large" renderTitle={I18n.t('Loading')} />
   </View>, document.getElementById('tab-security'))
 }
-
+})

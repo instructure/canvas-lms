@@ -36,7 +36,7 @@ describe('ContentTabs', () => {
 
   it('renders the tabs in the correct order when the assignment has a rubric', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({attempt: 1})
+      Assignment: () => ({rubric: {}})
     })
 
     const {getAllByRole, getByText, getAllByText} = render(
@@ -139,6 +139,22 @@ describe('ContentTabs', () => {
     expect(getByText('Submitted')).toBeInTheDocument()
     expect(getByTestId('friendly-date-time')).toBeInTheDocument()
     expect(getByTestId('grade-display')).toBeInTheDocument()
+  })
+
+  it('does not display the grade of the current submission if it is submitted but not graded', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: () => SubmissionMocks.submitted
+    })
+    const {queryByTestId, queryByText} = render(
+      <MockedProvider>
+        <ContentTabs {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByText('Submitted')).toBeInTheDocument()
+    expect(queryByTestId('friendly-date-time')).toBeInTheDocument()
+    expect(queryByTestId('grade-display')).toBeInTheDocument()
+    expect(queryByText('–/10 Points')).toBeInTheDocument()
   })
 
   it('does not display the submitted time or grade of the current submission if it is unsubmitted', async () => {

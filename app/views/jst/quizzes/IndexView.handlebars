@@ -6,41 +6,62 @@
   </div>
 
   {{#ifAny permissions.create permissions.manage}}
-  <div class="header-bar-right">
-    <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
-      <input type="hidden" name="authenticity_token" />
-      <button class="btn btn-primary new-quiz-link"
-         title='{{#t "title_add_quiz"}}Add Quiz{{/t}}'
-         aria-label='{{#t "title_add_quiz"}}Add Quiz{{/t}}'>
-        <i class="icon-plus" />&nbsp;{{#t "add_quiz"}}Quiz{{/t}}
-      </button>
-    </form>
+    <div class="header-bar-right">
+      {{#if flags.quiz_lti_enabled}}
+        <span class="new_quiz_lti_wrapper">
+          <a
+            href="{{ENV.URLS.new_assignment_url}}?quiz_lti"
+            class="new_quiz_lti btn icon-plus"
+            role="button"
+            title='{{#t}}Add Quiz{{/t}}'
+            aria-label='{{#t}}Add Quiz{{/t}}'
+          >{{#t}}Quiz{{/t}}</a>
+        </span>
 
-    <div class="inline-block">
-      <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
-        <i class="icon-more" aria-hidden="true"></i>
-        <span class="screenreader-only">{{#t}}Quiz Settings{{/t}}</span>
-      </a>
+        <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
+          <input type="hidden" name="authenticity_token" />
+          <button class="btn btn-primary new-quiz-link"
+            title='{{#t}}Add Old Quiz{{/t}}'
+            aria-label='{{#t}}Add Old Quiz{{/t}}'>
+            <i class="icon-plus" />&nbsp;{{#t}}Old Quiz{{/t}}
+          </button>
+        </form>
+      {{else}}
+        <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
+          <input type="hidden" name="authenticity_token" />
+          <button class="btn btn-primary new-quiz-link"
+            title='{{#t}}Add Quiz{{/t}}'
+            aria-label='{{#t}}Add Quiz{{/t}}'>
+            <i class="icon-plus" />&nbsp;{{#t}}Quiz{{/t}}
+          </button>
+        </form>
+      {{/if}}
 
-      <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
-        {{#ifAll permissions.read_question_banks flags.question_banks}}
-        <li role="presentation">
-          <a href="{{urls.question_banks_url}}" class="icon-question" tabindex="-1" role="menuitem">
-            {{#t "links.manage_question_banks"}}Manage Question Banks{{/t}}
-          </a>
-        </li>
-        {{/ifAll}}
+      <div class="inline-block">
+        <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+          <i class="icon-more" aria-hidden="true"></i>
+          <span class="screenreader-only">{{#t}}Quiz Settings{{/t}}</span>
+        </a>
 
-        {{#ifAll permissions.manage flags.publish_multiple}}
-        <li role="presentation">
-          <a href="#" class="publish_multiple_quizzes_link icon-unpublished" tabindex="-1" role="menuitem">
-            {{#t "links.publish_multiple_quizzes"}}Publish Multiple Quizzes{{/t}}
-          </a>
-        </li>
-        {{/ifAll}}
-      </ul>
+        <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+          {{#ifAll permissions.read_question_banks flags.question_banks}}
+          <li role="presentation">
+            <a href="{{urls.question_banks_url}}" class="icon-question" tabindex="-1" role="menuitem">
+              {{#t "links.manage_question_banks"}}Manage Question Banks{{/t}}
+            </a>
+          </li>
+          {{/ifAll}}
+
+          {{#ifAll permissions.manage flags.publish_multiple}}
+          <li role="presentation">
+            <a href="#" class="publish_multiple_quizzes_link icon-unpublished" tabindex="-1" role="menuitem">
+              {{#t "links.publish_multiple_quizzes"}}Publish Multiple Quizzes{{/t}}
+            </a>
+          </li>
+          {{/ifAll}}
+        </ul>
+      </div>
     </div>
-  </div>
   {{else}}
     {{#if permissions.read_question_banks}}
       <div class="header-bar-right form-inline">

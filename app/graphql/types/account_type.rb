@@ -24,5 +24,12 @@ module Types
     global_id_field :id
 
     field :name, String, null: true
+
+    field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: true
+    def proficiency_ratings_connection
+      # This does a recursive lookup of parent accounts, not sure how we could
+      # batch load it in a reasonable way.
+      object.resolved_outcome_proficiency&.outcome_proficiency_ratings
+    end
   end
 end

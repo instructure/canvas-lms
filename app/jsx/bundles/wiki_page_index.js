@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import I18n from 'i18n!pages'
 import WikiPageCollection from 'compiled/collections/WikiPageCollection'
 import WikiPageIndexView from 'compiled/views/wiki/WikiPageIndexView'
@@ -34,11 +35,14 @@ const view = new WikiPageIndexView({
   collection: new WikiPageCollection(),
   contextAssetString: ENV.context_asset_string,
   default_editing_roles: ENV.DEFAULT_EDITING_ROLES,
+  wikiIndexPlacements: ENV.wiki_index_menu_tools,
   WIKI_RIGHTS: ENV.WIKI_RIGHTS
 })
 
 view.collection.setParams({sort: 'title', per_page: 30})
 view.collection.fetch()
 
+ready(() => {
 $('#content').append(view.$el)
 view.render()
+})

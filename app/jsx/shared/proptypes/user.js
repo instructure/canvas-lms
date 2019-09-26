@@ -18,6 +18,14 @@
 
 import { shape, string } from 'prop-types'
 
+const basicUser = shape({
+  id: string.isRequired,
+  display_name: string.isRequired,
+  avatar_image_url: string,
+  email: string
+})
+export default basicUser
+
 // we might add more comprehensive user shapes in the future
 export const author = shape({
   id: string.isRequired,

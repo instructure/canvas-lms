@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {func, instanceOf} from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Heading, Spinner} from '@instructure/ui-elements'
 import {Tray} from '@instructure/ui-overlays'
 
@@ -98,15 +98,15 @@ export default class AssessmentAuditTray extends Component {
       >
         <View as="div" padding="small">
           <Flex as="div" margin="0 0 medium 0">
-            <FlexItem>
+            <Flex.Item>
               <CloseButton onClick={this.dismiss}>{I18n.t('Close')}</CloseButton>
-            </FlexItem>
+            </Flex.Item>
 
-            <FlexItem margin="0 0 0 small">
+            <Flex.Item margin="0 0 0 small">
               <Heading as="h2" level="h3">
                 {I18n.t('Assessment audit')}
               </Heading>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
 
           {this.state.auditEventsLoaded ? (
@@ -126,7 +126,7 @@ export default class AssessmentAuditTray extends Component {
               </View>
             </>
           ) : (
-            <Spinner title={I18n.t('Loading assessment audit trail')} />
+            <Spinner renderTitle={I18n.t('Loading assessment audit trail')} />
           )}
         </View>
       </Tray>

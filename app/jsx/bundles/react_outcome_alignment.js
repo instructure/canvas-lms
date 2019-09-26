@@ -17,10 +17,12 @@
  */
 
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import OutcomeAlignmentDeleteLink from '../outcomes/OutcomeAlignmentDeleteLink'
 
+ready(() => {
 $('li.alignment').each((_, li) => {
   const $div = $(li).find('div.links')[0]
 
@@ -31,4 +33,5 @@ $('li.alignment').each((_, li) => {
     />,
     $div
   )
+})
 })

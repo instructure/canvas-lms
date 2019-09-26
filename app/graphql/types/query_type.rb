@@ -35,7 +35,7 @@ module Types
       argument :id, ID, "a graphql or legacy id", required: true,
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
     end
-    def account
+    def account(id:)
       GraphQLNodeLoader.load("Account", id, context)
     end
 
@@ -61,6 +61,14 @@ module Types
     end
     def assignment_group(id:)
       GraphQLNodeLoader.load("AssignmentGroup", id, context)
+    end
+
+    field :submission, Types::SubmissionType, null: true do
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
+    end
+    def submission(id:)
+      GraphQLNodeLoader.load("Submission", id, context)
     end
 
     field :term, Types::TermType, null: true do
