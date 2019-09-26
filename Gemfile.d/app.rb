@@ -135,6 +135,8 @@ gem 'graphql-batch', '0.4.1'
 
 gem 'prawn-rails', '1.3.0'
 
+gem 'redcarpet', '3.4.0', require: false
+
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'
 gem 'adheres_to_policy', path: 'gems/adheres_to_policy'
