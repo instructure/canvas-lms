@@ -34,7 +34,7 @@ describe "jquery ui" do
 
   def create_simple_modal
     driver.execute_script(<<-JS)
-      return $('<div><select /><input /></div>')
+      $('<div><select /><input /></div>')
         .dialog()
         .find('select')
         .focus()
