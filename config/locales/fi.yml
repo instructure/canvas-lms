@@ -983,6 +983,9 @@ fi:
         other: "%{count} erää odottaa käsittelyä."
       pending_batches_title: "Odottavat erät"
       process_data_button: Käsittelytiedot
+      select_file_instructions: |-
+          Valitse zip-tiedosto, jonka haluat tuoda.  
+          Fti kuvaus siitä, kuinka luoda nämä zip-tiedostot, [katso tämä dokumentointi](%{url}).
       sis_import_crumb: SIS-tuonti
       started_at_message: "Alkoi: %{started_at}"
       title: SIS-tuonti
@@ -3591,6 +3594,10 @@ fi:
         update: "Päivitä yhteistyö"
       collaboration_name: "%{course_or_group_name} Yhteistyö"
       descriptions: 
+        etherpad: |-
+            EtherPad on avoimen lähteen projekti, joka antaa sinun nopeasti määrittää jaettuja asiakirjoja.  Se on tarpeeksi nopea, niin että voit nähdä, mitä muut kirjoittavat, kun he ovat kirjoittamassa sitä. Toisaalta "muistilehtiöitä" ei ole suojattu salasanalla, niin kaikki, jolla on linkki, voi muokata niitä. EtherPad soveltuu paremmin kuin Google Docs -sovellus, jos haluat tukea nimettömyyttä ja/tai sallia sellaisten henkilöiden osallistuvan, jolla ei ole Google-tilejä.  
+              
+            **Varoitus**: varmista, että tunnet [EtherPadin poistokäytäntö](%{etherpad_deletion_policy_url}) ja varmista, että työ on suojattu.
         google_docs: |-
             Google Docs on upea paikka tehdä yhteistyötä ryhmäprojektissa.  Se on kuten Microsoft Word, mutta antaa sinun tehdä yhteistyötä samalla tiedostolla samaan aikaa ilman, että sitä täytyy lähetellä sähköpostitse ympäriinsä.  
               
@@ -6350,6 +6357,7 @@ fi:
   either_the_url_or_domain_should_be_set_c29cf8c1: "Joko url tai verkkotunnus pitäisi määrittää."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Olet joko uusi käyttäjä tai *käyttöehdot* ovat muuttuneet sen jälkeen, kun viimeksi hyväksyit ne. Hyväksy *käyttöehdot* ennen kuin jatkat."
   el_salvador_503_b0907d30: "El Salvador (+503)"
+  element_option_missing_error_an_element_to_attach__be433478: "`element`-asetus puuttuu -virhe: TreeBrowserView-näkymän liittämisessä käytettävä elementti täytyy määrittää, kun määritetään hahmontamisasetusta arvoon \"tosi\" BBTreeBrowserView-näkymälle"
   email: 
     default_from_name: "Instructure Canvas"
   email_22a7d52d: Sähköposti
