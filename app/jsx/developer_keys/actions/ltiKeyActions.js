@@ -155,6 +155,9 @@ actions.ltiKeysUpdateCustomizations = (developerKey, disabled_placements, develo
   return axios
     .put(url, {
       developer_key: {
+        name: developerKey.name,
+        notes: developerKey.notes,
+        email: developerKey.email,
         scopes: developerKey.scopes,
         redirect_uris: developerKey.redirect_uris
       },

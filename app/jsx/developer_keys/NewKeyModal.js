@@ -182,9 +182,9 @@ export default class DeveloperKeyModal extends React.Component {
         return
       }
       settings = this.manualForm.generateToolConfiguration();
-      developer_key.scopes = settings.scopes
       this.setState({toolConfiguration: settings})
     }
+    developer_key.scopes = settings.scopes
 
     if (this.props.createOrEditDeveloperKeyState.editing) {
       this.saveLTIKeyEdit(settings, developer_key)

@@ -89,7 +89,11 @@ describe('ltiKeysUpdateCustomizations', () => {
   const customFields = 'foo=bar\r\nkey=value'
   const developerKey = {
     scopes,
-    redirect_uris: redirectUris
+    redirect_uris: redirectUris,
+    name: 'Test',
+    notes: 'This is a test',
+    email: 'test@example.com',
+    access_token_count: 1
   }
 
   const update = dispatch => {
@@ -110,7 +114,10 @@ describe('ltiKeysUpdateCustomizations', () => {
       {
         developer_key: {
           scopes,
-          redirect_uris: redirectUris
+          redirect_uris: redirectUris,
+          name: developerKey.name,
+          notes: developerKey.notes,
+          email: developerKey.email
         },
         tool_configuration: {
           disabled_placements: disabledPlacements,
