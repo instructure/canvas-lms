@@ -16527,6 +16527,7 @@ pl:
       description: "Usługa wyszukiwania obrazów Unsplash"
       name: Unsplash
     unsplash_settings: 
+      description: "[Wykonaj te czynności](%{unsplash_wiki_url}), aby skonfigurować nową aplikację na Unsplash."
       labels: 
         access_key: "Klucz dostępu"
         application_name: "Nazwa aplikacji"
