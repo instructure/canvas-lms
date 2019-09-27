@@ -79,6 +79,18 @@ export default class ZipUploader extends BaseUploader {
       if (results.workflow_state === 'failed') {
         return this.deferred.reject()
       } else if (results.completion < 100) {
+        // The progress bar defaults to 50% complete to account for the actual
+        // file upload. When we start polling the progress and the job hasn't
+        // been worked, the completion is 0. So without this check, the progress
+        // bar would start at 50%, then render to 0%, then render to 50% once
+        // the job starts getting worked.
+        if (results.completion > 0) {
+          const progress = {
+            loaded: results.completion,
+            total: 100
+          }
+          this.trackProgress(progress)
+        }
         setTimeout(() => {
           this.pullMigrationProgress(url)
         }, 1000)

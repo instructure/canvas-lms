@@ -36,10 +36,18 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
 
       folder = cm.context.folders.find(cm.migration_settings[:folder_id])
 
-      progress = 0.0
       update_callback = lambda{|pct|
-        if pct - progress >= 1.0
-          cm.update_import_progress(pct)
+        percent_complete = pct * 100
+
+        scaled = percent_complete
+
+        if cm.import_immediately?
+          scaled = scaled / 2 + 50
+        end
+
+        # Only update if progress has incremented 1 percent
+        if scaled - cm.progress >= 1
+          cm.update_import_progress(percent_complete)
         end
       }
 
