@@ -40,4 +40,10 @@ describe "jquery" do
     expect(driver.execute_script("return $('form').attr('method', 'delete').attr('method')").downcase).to  eq "post"
     expect(driver.execute_script("return $('form input[name=_method]').val()")).to eq "delete"
   end
+
+  it "should be able to handle ':hidden' and ':visible' pseudo-selector on window" do
+    get('/login')
+    expect(driver.execute_script("return $(window).is(':visible')")).to eq true
+    expect(driver.execute_script("return $(window).is(':hidden')")).to eq false
+  end
 end
