@@ -1234,6 +1234,7 @@ fa:
         domain: "دامنه:"
         edit_institution_email: "کاربران می توانند نشانی پست الکترونیکی تخصیص داده شده توسط دانشگاه حذف کنند"
         enable_alerts: "هشدارها (بتا)"
+        enable_course_catalog: "فهرست قابل جستجوی درس های موجود در این حساب ریشه را در حالی که پرچم «شامل سازی این درس در فهرست عمومی درس» فعال شده است»، نمایش دهید."
         enable_eportfolios: "مجموعه های اسناد الکترونیکی"
         enable_profiles: "فعال سازی رخ نماها"
         enable_turnitin: Turnitin
@@ -1716,6 +1717,7 @@ fa:
   add_new_term_d2217c0d: "افزودن نیمسال جدید"
   add_people_7ee4b2ec: "افزودن افراد"
   add_people_to_coursename_5ea234e1: "افزودن افراد به %{courseName}"
+  add_quiz_cebfa28b: "افزودن آزمون"
   add_quiz_ip_filter_c7b37dc5: "افزودن فیلتر آی پی آزمون"
   add_rating_89d7fbde: "افزودن رتبه بندی"
   add_recipient_ff135ed7: "افزودن گیرنده"
@@ -10370,6 +10372,7 @@ fa:
   manage_update_for_toolname_f8e3b2fb: "مدیریت بهنگام سازی برای %{toolName}"
   manage_usage_rights_c5a8c216: "مدیریت حقوق استفاده"
   manage_your_course_details_664c335f: "مدیریت جزئیات درس خود"
+  manual_8c2665de: راهنما
   manual_entry_e4a4f99a: "ورودی دستی"
   manually_mark_posts_as_read_afa5d035: "علامتگذاری دستی ارسال ها به عنوان خوانده شده"
   mark_as_done_6fa48d2f: "علامتگذاری به عنوان انجام شده"
@@ -18370,6 +18373,7 @@ fa:
   syncing_grades_to_sis_d63112e0: "در حال همگام سازی نمره ها با سامانه اطلاعات دانشجو..."
   syncing_message_416fdc58: "در حال همگام سازی: %{message}"
   system_default_language_28a1052d: "پیش فرض سیستم (%{language})"
+  ta_8d966626: "دستیار آموزشی"
   tab_1_3d6b3fb: "زبانه 1"
   tab_1_content_8944c219: "محتوای زبانه 1"
   tab_2_9adfe241: "زبانه 2"

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
-import {IconMoreSolid, IconOffSolid} from '@instructure/ui-icons'
+import {IconMoreSolid, IconOffLine, IconOffSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-layout'
 import {Menu} from '@instructure/ui-menu'
@@ -53,15 +53,6 @@ function SecondaryDetailLine(props) {
           {I18n.t('Out of %{pointsPossible}', {pointsPossible})}
         </Text>
       </span>
-
-      {props.postPoliciesEnabled && props.assignment.postManually && (
-        <span>
-          &nbsp;
-          <Text size="x-small" transform="uppercase" weight="bold">
-            {I18n.t('Manual')}
-          </Text>
-        </span>
-      )}
 
       {!props.postPoliciesEnabled && props.assignment.muted && (
         <span>
@@ -504,6 +495,12 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
     const submissions = this.props.students.map(student => student.submission)
     const postableSubmissionsPresent = submissions.some(isHidden)
+
+    // Assignment is manually-posted and has no graded-but-unposted submissions
+    // (i.e., no unposted submissions that are in a suitable state to post)
+    if (this.props.assignment.postManually && !postableSubmissionsPresent) {
+      return <IconOffLine size="x-small" />
+    }
 
     // Assignment has at least one hidden submission that can be posted
     // (regardless of whether it's manually or automatically posted)
