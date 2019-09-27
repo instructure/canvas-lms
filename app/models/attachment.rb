@@ -1962,6 +1962,17 @@ class Attachment < ActiveRecord::Base
     false
   end
 
+  def self.copy_attachments_to_submissions_folder(assignment_context, attachments)
+    attachments.map do |attachment|
+      if attachment.context.respond_to?(:submissions_folder)
+        # if its already in the submission folder, then we need to make a copy of it.
+        attachment.copy_to_folder!(attachment.context.submissions_folder(assignment_context))
+      else
+        attachment # in a weird context; leave it alone
+      end
+    end
+  end
+
   def set_publish_state_for_usage_rights
     if self.context &&
        (!self.folder || !self.folder.for_submissions?) &&
