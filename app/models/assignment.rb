@@ -3258,7 +3258,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def a2_enabled?
-    return false unless course.feature_enabled?(:assignments_2)
+    return false unless course.feature_enabled?(:assignments_2_student)
     return false if external_tool? || quiz? || discussion_topic? || wiki_page? ||
       group_category? || peer_reviews?
     true
