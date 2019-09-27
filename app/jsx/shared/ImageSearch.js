@@ -183,7 +183,7 @@ export default class ImageSearch extends React.Component {
           <TextInput
             inputRef={(e) => this._imageSearchInput = e}
             placeholder={I18n.t('Search')}
-            label={<ScreenReaderContent>{I18n.t("Search")}</ScreenReaderContent>}
+            renderLabel={<ScreenReaderContent>{I18n.t("Search")}</ScreenReaderContent>}
             value={this.state.searchTerm}
             type="search"
             layout="inline"

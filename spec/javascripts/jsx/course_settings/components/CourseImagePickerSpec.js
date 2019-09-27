@@ -19,9 +19,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
+import { getByText } from '@testing-library/dom'
 import CourseImagePicker from 'jsx/course_settings/components/CourseImagePicker'
 
 const wrapper = document.getElementById('fixtures');
+const reset_env = window.ENV;
 
 QUnit.module('CourseImagePicker Component', {
   renderComponent(props = {}) {
@@ -37,6 +39,7 @@ QUnit.module('CourseImagePicker Component', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper);
+    window.ENV = reset_env;
   }
 });
 
@@ -94,4 +97,14 @@ test('calls the handleFileUpload prop when drop occurs', function() {
   TestUtils.Simulate.drop(area);
 
   ok(called, 'handleFileUpload was called');
+});
+
+test('Unsplash tab can be selected', function() {
+  window.ENV.use_unsplash_image_search = true;
+  const component = this.renderComponent({ courseId: "101"});
+  const imageSearchTab = getByText(wrapper, 'Unsplash');
+
+  TestUtils.Simulate.click(imageSearchTab);
+
+  strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(component, 'Unsplash__logo').length, 1, 'the Unsplash tab content should appear')
 });
