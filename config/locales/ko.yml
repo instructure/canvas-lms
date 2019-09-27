@@ -1194,6 +1194,7 @@ ko:
   add_feed_49ed1cb2: "피드 추가"
   add_group_c84f9e9d: "그룹 추가"
   add_group_set_f9809e11: "그룹 집합 추가"
+  add_quiz_cebfa28b: "퀴즈 추가"
   add_students_to_the_course_874be8fb: "과목에 학생 추가"
   add_tas_to_the_course_2aac6e02: "과목에 조교 추가"
   after_date_981cd41b: "%{date} 이후"
@@ -12505,6 +12506,7 @@ ko:
       networking_academy_faqs: "Networking Academy FAQ"
       support_desk_livechat: "지원 데스크 라이브 채팅"
   syllabus: "과목 요강"
+  ta_8d966626: 조교
   table_headings: 
     name: 이름
     total: 전체
