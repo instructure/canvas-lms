@@ -23,6 +23,7 @@ def setDockerUp () {
     echo 'Running containers'
     sh 'docker ps'
     sh 'printenv | sort'
+    sh 'build/new-jenkins/docker-compose-pull.sh'
     sh 'build/new-jenkins/docker-compose-build-up.sh'
   }
 }
@@ -34,7 +35,7 @@ def cleanupDocker () {
     sh 'docker rmi frontend_karma'
     // Clean up all the other stuff
     sh 'build/new-jenkins/docker-cleanup.sh'
-  }  
+  }
 }
 
 def isMerge () {
@@ -84,7 +85,7 @@ pipeline {
         COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
       }
       steps {
-        setDockerUp() 
+        setDockerUp()
       }
     }
     stage('Tests') {

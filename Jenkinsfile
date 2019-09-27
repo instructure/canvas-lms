@@ -169,6 +169,8 @@ pipeline {
         stage('Smoke Test') {
           steps {
             timeout(time: 10) {
+              sh 'build/new-jenkins/docker-compose-pull.sh'
+              sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
               sh 'build/new-jenkins/docker-compose-build-up.sh'
               sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
               sh 'build/new-jenkins/smoke-test.sh'

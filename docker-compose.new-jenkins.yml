@@ -25,12 +25,12 @@ services:
       KNAPSACK_GENERATE_REPORT: $KNAPSACK_GENERATE_REPORT
 
   redis:
-    image: redis:alpine
+    image: starlord.inscloudgate.net/jenkins/redis:alpine
 
   postgres:
-    build: ./build/docker-compose/postgres/9.5
+    image: starlord.inscloudgate.net/jenkins/postgres:9.5
 
   cassandra:
-    build: ./build/docker-compose/cassandra
+    image: starlord.inscloudgate.net/jenkins/cassandra:2.2
     environment:
       CASSANDRA_START_RPC: 'true'
