@@ -1268,6 +1268,7 @@ tr:
         domain: "Alan Adı:"
         edit_institution_email: "Kullanıcılar kurumları tarafından atanan eposta adreslerini silebilirler"
         enable_alerts: "Uyarılar (beta)"
+        enable_course_catalog: "Bu kök hesapta \"Bu dersi herkese açık dersler listesi\" işareti etkinleştirilmiş olarak aranabilir ders listesi göster."
         enable_eportfolios: ePortfolyolar
         enable_profiles: "Profilleri Etkinleştir"
         enable_turnitin: Turnitin
@@ -1749,6 +1750,7 @@ tr:
   add_new_term_d2217c0d: "Yeni Dönem Ekle"
   add_people_7ee4b2ec: "Katılımcı Ekle"
   add_people_to_coursename_5ea234e1: "%{courseName}'e kişileri ekleyin"
+  add_quiz_cebfa28b: "Kısa Sınav Ekle"
   add_quiz_ip_filter_c7b37dc5: "Kısa Sınav IP Filtresi Ekle"
   add_rating_89d7fbde: "Puanlama Ekle"
   add_recipient_ff135ed7: "Alıcı Ekle"
@@ -10043,6 +10045,7 @@ tr:
   manage_update_for_toolname_f8e3b2fb: "%{toolName} için güncellemeyi yönet"
   manage_usage_rights_c5a8c216: "Kullanım Şartlarını Yönet"
   manage_your_course_details_664c335f: "Dersinizin ayrıntılarını yönetin"
+  manual_8c2665de: Kılavuz
   manual_entry_e4a4f99a: "Elle Giriş"
   manually_mark_posts_as_read_afa5d035: "Elle okundu olarak işaretle"
   mark_as_done_6fa48d2f: "Tamamlandı olarak işaretle"
@@ -17234,6 +17237,7 @@ tr:
   syllabus: "Ders Programı"
   syllabus_f191f65b: "Ders Programı"
   system_default_language_28a1052d: "Sistem Varsayılanı (%{language})"
+  ta_8d966626: "Asistan Öğretmen"
   tab_1_3d6b3fb: "Sekme 1"
   tab_1_content_8944c219: "Sekme 1 içeriği"
   tab_2_9adfe241: "Sekme 2"
