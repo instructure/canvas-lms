@@ -1204,15 +1204,15 @@ zh-Hans:
             field: "班级 ID"
     settings: 
       about_google_docs: |-
-          谷歌文档预览允许用户从Canvas查看文件,
-          而不必下载它们
-          以及打开相应的程序 (例如 Word 或 Excel).
+          谷歌文档预览允许用户从Canvas
+          查看文件,而不必下载它们以及打
+          开相应的程序 (例如 Word 或 Excel).
           
           谷歌文档预览还可以令文件的类型
           不被Canvas文件预览者的支持.
           
-          要使用此服务，您
-          需要确认您已经阅读并同意
+          要使用此服务，您需要确认您已经阅读
+          并同意
           [谷歌文档查看器的服务条款](%{terms_url})。
       about_google_docs_tooltip: 关于谷歌文档预览
       account_admins_title: 帐户管理员

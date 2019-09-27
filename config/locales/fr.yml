@@ -20548,7 +20548,7 @@ fr:
       loud_late: "EN RETARD"
       see_all_quiz_attempts: "Voir toutes les tentatives pour le questionnaire"
       submission_to_view: "Envoi à afficher :"
-      submitted: "*Envoi :* %{submittedAt}"
+      submitted: "*soumis :* %{submittedAt}"
     submit: Soumettre
     titles: 
       click_to_record: "Transcription écrite de la parole"
