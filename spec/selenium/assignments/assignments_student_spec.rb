@@ -254,6 +254,10 @@ describe "assignments" do
         setup_google_drive()
       end
 
+      after(:each) do
+        click_away_accept_alert
+      end
+
       it "should have a google doc tab if google docs is enabled", priority: "1", test_id: 161884 do
         @assignment.update_attributes(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
