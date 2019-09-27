@@ -100,6 +100,14 @@ module RCENextPage
     fj("[aria-label='Course Images'] button:contains('#{title}')")
   end
 
+  def image_links
+    ff("[aria-label='Course Images'] button")
+  end
+
+  def user_image_links
+    ff("[data-testid='instructure_links-ImagesPanel'] button")
+  end
+
   def document_link(title)
     fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')")
   end
@@ -152,6 +160,10 @@ module RCENextPage
 
   def course_images
     f('[role="menuitem"][title="Course Images"]')
+  end
+
+  def user_images
+    f('[role="menuitem"][title="My Images"]')
   end
 
   def upload_image_button
@@ -414,6 +426,11 @@ module RCENextPage
 
   def click_course_images
     course_images.click
+    wait_for_ajaximations
+  end
+
+  def click_user_images
+    user_images.click
     wait_for_ajaximations
   end
 
