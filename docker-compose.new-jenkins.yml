@@ -8,6 +8,7 @@ services:
       - postgres
       - redis
       - cassandra
+      - dynamodb
     environment:
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       RAILS_ENV: test
@@ -39,3 +40,7 @@ services:
     image: starlord.inscloudgate.net/jenkins/cassandra:2.2
     environment:
       CASSANDRA_START_RPC: 'true'
+
+  dynamodb:
+    image: starlord.inscloudgate.net/jenkins/dynamodb-local
+    command: -jar DynamoDBLocal.jar #-dbPath /home/dynamodblocal

@@ -13,3 +13,7 @@ docker pull $REGISTRY_BASE/postgres:9.5 || \
 docker pull $REGISTRY_BASE/cassandra:2.2 || \
   (docker build -t $REGISTRY_BASE/cassandra:2.2 build/docker-compose/cassandra && \
   docker push $REGISTRY_BASE/cassandra:2.2)
+docker pull $REGISTRY_BASE/dynamodb-local || \
+  (docker pull amazon/dynamodb-local && \
+  docker tag amazon/dynamodb-local $REGISTRY_BASE/dynamodb-local && \
+  docker push $REGISTRY_BASE/dynamodb-local)
