@@ -68,6 +68,7 @@ class GradebooksController < ApplicationController
     css_bundle :grade_summary
 
     @google_analytics_page_title = t("Grades for Student")
+    load_grade_summary_data
     render stream: can_stream_template?
   end
 
@@ -159,7 +160,6 @@ class GradebooksController < ApplicationController
 
     js_env(js_hash)
   end
-  helper_method :load_grade_summary_data
 
   def save_assignment_order
     if authorized_action(@context, @current_user, :read)
