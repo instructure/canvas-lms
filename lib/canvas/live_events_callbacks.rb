@@ -61,9 +61,18 @@ module Canvas::LiveEventsCallbacks
     when ContextModule
       Canvas::LiveEvents.module_created(obj)
     when ContentTag
-      Canvas::LiveEvents.module_item_created(obj) if obj.tag_type == "context_module"
+      case obj.tag_type
+      when 'context_module'
+        Canvas::LiveEvents.module_item_created(obj)
+      when 'learning_outcome_association'
+        Canvas::LiveEvents.learning_outcome_link_created(obj)
+      end
     when LearningOutcomeResult
       Canvas::LiveEvents.learning_outcome_result_created(obj)
+    when LearningOutcome
+      Canvas::LiveEvents.learning_outcome_created(obj)
+    when LearningOutcomeGroup
+      Canvas::LiveEvents.learning_outcome_group_created(obj)
     end
   end
 
@@ -137,9 +146,18 @@ module Canvas::LiveEventsCallbacks
         end
       end
     when ContentTag
-      Canvas::LiveEvents.module_item_updated(obj) if obj.tag_type == "context_module"
+      case obj.tag_type
+      when 'context_module'
+        Canvas::LiveEvents.module_item_updated(obj)
+      when 'learning_outcome_association'
+        Canvas::LiveEvents.learning_outcome_link_updated(obj)
+      end
     when LearningOutcomeResult
       Canvas::LiveEvents.learning_outcome_result_updated(obj)
+    when LearningOutcome
+      Canvas::LiveEvents.learning_outcome_updated(obj)
+    when LearningOutcomeGroup
+      Canvas::LiveEvents.learning_outcome_group_updated(obj)
     end
   end
 
