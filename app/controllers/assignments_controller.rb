@@ -31,8 +31,12 @@ class AssignmentsController < ApplicationController
   include KalturaHelper
   include SyllabusHelper
   before_action :require_context
-  add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
-  before_action { |c| c.active_tab = "assignments" }
+  add_crumb(
+    proc { t '#crumbs.assignments', "Assignments" },
+    except: [:destroy, :syllabus, :index, :new]
+  ) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
+  before_action(except: [:new]) { |c| c.active_tab = "assignments" }
+  before_action(only: [:new]) { |c| setup_active_tab(c) }
   before_action :normalize_title_param, :only => [:new, :edit]
 
   def index
@@ -519,7 +523,7 @@ class AssignmentsController < ApplicationController
   def new
     @assignment ||= @context.assignments.temp_record
     @assignment.workflow_state = 'unpublished'
-    add_crumb t "Create new"
+    add_crumb_on_new_page
 
     if params[:submission_types] == 'discussion_topic'
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
@@ -789,5 +793,29 @@ class AssignmentsController < ApplicationController
     return false if @assignment.group_category? && !@assignment.grade_group_students_individually?
 
     @context.filter_speed_grader_by_student_group?
+  end
+
+  def add_crumb_on_new_page
+    if on_quizzes_page? && params.key?(:quiz_lti)
+      add_crumb(t('#crumbs.quizzes', "Quizzes"), course_quizzes_path(@context))
+    else
+      add_crumb(t('#crumbs.assignments', "Assignments"), course_assignments_path(@context))
+    end
+
+    add_crumb(t('Create new'))
+  end
+
+  def setup_active_tab(controller)
+    if on_quizzes_page? && params.key?(:quiz_lti)
+      controller.active_tab = "quizzes"
+      return
+    end
+
+    controller.active_tab = "assignments"
+  end
+
+  def on_quizzes_page?
+    @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && \
+      @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?
   end
 end

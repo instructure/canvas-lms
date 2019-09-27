@@ -1101,6 +1101,39 @@ describe AssignmentsController do
         expect(assigns[:assignment].quiz_lti?).to be false
       end
     end
+
+    it 'set active_tab to assignments' do
+      get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+      expect(assigns[:active_tab]).to eq('assignments')
+    end
+
+    context "when newquizzes_on_quiz_page FF is set" do
+      before do
+        @course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+        @course.root_account.settings[:provision] = {'lti' => 'lti url'}
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.root_account.enable_feature! :newquizzes_on_quiz_page
+      end
+
+      it 'sets active tab to quizzes' do
+        user_session(@teacher)
+        get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+        expect(assigns[:active_tab]).to eq('quizzes')
+      end
+
+      it 'sets crumb to Quizzes' do
+        user_session(@teacher)
+        get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+        expect(assigns[:_crumbs]).to include(['Quizzes', "/courses/#{@course.id}/quizzes", {}])
+      end
+    end
   end
 
   describe "POST 'create'" do
