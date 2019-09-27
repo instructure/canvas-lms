@@ -88,8 +88,10 @@ describe ContentSharesController do
   describe "rest of CRUD" do
     before :once do
       @export = @course_1.content_exports.create!(settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment) => '1'}}})
+      @export_2 = @course_1.content_exports.create!(settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment) => '1'}}})
       @sent_share = @teacher_1.sent_content_shares.create! name: 'booga', content_export: @export, read_state: 'read'
       @received_share = @teacher_2.received_content_shares.create! name: 'booga', content_export: @export, sender: @teacher_1, read_state: 'unread'
+      @teacher_2.received_content_shares.create! name: 'u read me', content_export: @export_2, sender: @teacher_1, read_state: 'read'
     end
 
     describe "GET #index" do
@@ -144,15 +146,15 @@ describe ContentSharesController do
         get :index, params: { user_id: @teacher_2.id, list: 'received' }
         expect(response).to be_successful
         json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
-        expect(json.length).to eq 1
-        expect(json[0]['id']).to eq @received_share.id
-        expect(json[0]['name']).to eq 'booga'
-        expect(json[0]['read_state']).to eq 'unread'
-        expect(json[0]['sender']['id']).to eq @teacher_1.id
-        expect(json[0]['receivers']).to eq([])
-        expect(json[0]['content_type']).to eq 'assignment'
-        expect(json[0]['source_course']).to eq({'id' => @course_1.id, 'name' => @course_1.name})
-        expect(json[0]['content_export']).to be_present
+        expect(json.length).to eq 2
+        expect(json[1]['id']).to eq @received_share.id
+        expect(json[1]['name']).to eq 'booga'
+        expect(json[1]['read_state']).to eq 'unread'
+        expect(json[1]['sender']['id']).to eq @teacher_1.id
+        expect(json[1]['receivers']).to eq([])
+        expect(json[1]['content_type']).to eq 'assignment'
+        expect(json[1]['source_course']).to eq({'id' => @course_1.id, 'name' => @course_1.name})
+        expect(json[1]['content_export']).to be_present
       end
 
       it "paginates received content shares" do
@@ -162,26 +164,26 @@ describe ContentSharesController do
         end
         user_session @teacher_2
 
-        get :index, params: { user_id: 'self', list: 'received', per_page: 1 }
+        get :index, params: { user_id: 'self', list: 'received', per_page: 2 }
         json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
-        expect(json.length).to eq 1
-        expect(json[0]['name']).to eq 'booga'
+        expect(json.length).to eq 2
+        expect(json[0]['name']).to eq 'u read me'
         expect(json[0]['content_type']).to eq 'assignment'
 
         links = Api.parse_pagination_links(response.headers['Link'])
-        link = links.detect { |link| link[:rel] == 'next' }
+        link = links.detect { |l| l[:rel] == 'next' }
         expect(link[:uri].path).to eq '/api/v1/users/self/content_shares/received'
         expect(link[:uri].query).to include 'page=2'
-        expect(link[:uri].query).to include 'per_page=1'
+        expect(link[:uri].query).to include 'per_page=2'
 
-        get :index, params: { user_id: 'self', list: 'received', per_page: 1, page: 2 }
+        get :index, params: { user_id: 'self', list: 'received', per_page: 2, page: 2 }
         json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
         expect(json.length).to eq 1
         expect(json[0]['name']).to eq 'ooga'
         expect(json[0]['content_type']).to eq 'module'
 
         links = Api.parse_pagination_links(response.headers['Link'])
-        expect(links.detect { |link| link[:rel] == 'next' }).to be_nil
+        expect(links.detect { |l| l[:rel] == 'next' }).to be_nil
       end
 
       it "requires permission on user" do
@@ -292,6 +294,16 @@ describe ContentSharesController do
         user_session @teacher_2
         post :add_users, params: { user_id: @teacher_1.id, id: @sent_share.id, receiver_ids: [@teacher_3.id] }
         expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    describe "GET #unread_count" do
+      it "returns the correct count" do
+        user_session @teacher_2
+        get :unread_count, params: { user_id: @teacher_2 }
+        expect(response).to be_successful
+        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        expect(json["unread_count"]).to eq 1
       end
     end
 
