@@ -243,8 +243,12 @@ module ApplicationHelper
   end
 
   def include_css_bundles
-    unless css_bundles.empty?
-      bundles = css_bundles.map do |(bundle,plugin)|
+    @rendered_css_bundles ||= []
+    new_css_bundles = css_bundles - @rendered_css_bundles
+    @rendered_css_bundles += new_css_bundles
+
+    unless new_css_bundles.empty?
+      bundles = new_css_bundles.map do |(bundle,plugin)|
         css_url_for(bundle, plugin)
       end
       bundles << css_url_for("disable_transitions") if disable_css_transitions?
