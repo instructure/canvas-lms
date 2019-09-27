@@ -55,10 +55,22 @@ ready(() => {
     course_id: ENV.COURSE_ID,
     course_home: ENV.COURSE_HOME,
     course_title: ENV.COURSE_TITLE,
-    display_show_all_pages: ENV.DISPLAY_SHOW_ALL_LINK
+    display_show_all_pages: ENV.DISPLAY_SHOW_ALL_LINK,
+    show_immersive_reader: ENV.IMMERSIVE_READER_ENABLED
   })
 
   wikiPageView.render()
+
+  const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+  if (immersive_reader_mount_point) {
+    import('../shared/components/ImmersiveReader')
+      .then(ImmersiveReader => {
+        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point)
+      })
+      .catch(e => {
+        console.log('Error loading immersive readers.', e)
+      })
+  }
 })
 
 monitorLtiMessages()
