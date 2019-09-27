@@ -59,6 +59,7 @@ export default class WikiPageView extends Backbone.View {
     this.optionProperty('course_home')
     this.optionProperty('course_title')
     this.optionProperty('display_show_all_pages')
+    this.optionProperty('show_immersive_reader')
   }
 
   initialize() {
@@ -190,6 +191,7 @@ export default class WikiPageView extends Backbone.View {
     json.wiki_page_history_path = this.wiki_page_history_path
     json.course_home = this.course_home
     json.course_title = this.course_title
+    json.show_immersive_reader = this.show_immersive_reader
     json.CAN = {
       VIEW_ALL_PAGES: !!this.display_show_all_pages || !!this.WIKI_RIGHTS.manage,
       VIEW_PAGES: !!this.WIKI_RIGHTS.read,
