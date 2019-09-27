@@ -31,7 +31,6 @@ import './jquery.instructure_date_and_time' /* date_field, time_field, datetime_
 import './jquery.instructure_misc_helpers' /* /\$\.uniq/ */
 import 'compiled/jquery.rails_flash_notifications'
 import './vendor/jquery.scrollTo'
-import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
 
   // Intercepts the default form submission process.  Uses the form tag's
   // current action and method attributes to know where to submit to.
@@ -303,7 +302,8 @@ import { uploadFile as rawUploadFile } from 'jsx/shared/upload_file'
       // the upload_url. the latter doesn't work with the new ajax mechanism
       parameters.no_redirect = true;
       file = file.files[0]
-      rawUploadFile(uploadUrl, parameters, file)
+      import('jsx/shared/upload_file')
+        .then(({uploadFile}) => uploadFile(uploadUrl, parameters, file))
         .then((data) => {
           attachments.push(data);
           next.call($this);
