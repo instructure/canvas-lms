@@ -1662,7 +1662,7 @@ class ApplicationController < ActionController::Base
           @return_url = success_url
         else
           if @context
-            @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
+            @return_url = set_return_url
           else
             @return_url = external_content_success_url('external_tool_redirect')
           end
@@ -1730,6 +1730,19 @@ class ApplicationController < ActionController::Base
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
       redirect_to named_context_url(context, error_redirect_symbol)
     end
+  end
+
+  def set_return_url
+    ref = request.referer
+    # when flag is enabled, new quizzes quiz creation can only be initiated from quizzes page
+    # but we still use the assignment#new page to create the quiz.
+    # also handles launch from existing quiz on quizzes page.
+    if @assignment&.quiz_lti?
+      if (ref.include?('assignments/new') || ref.include?('quiz')) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+        return polymorphic_url([@context, :quizzes])
+      end
+    end
+    named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
   end
 
   def lti_launch_params(adapter)
