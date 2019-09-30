@@ -704,7 +704,9 @@ define [
         @staticCellFormatter(row, col, '')
       else
         cellAttributes = @submissionStateMap.getSubmissionState(submission)
-        if cellAttributes.hideGrade
+        if !Object.keys(submission).includes("cached_due_date")
+          @unassignedCellFormatter(row, col, "UN")
+        else if cellAttributes.hideGrade
           @lockedAndHiddenGradeCellFormatter(row, col, cellAttributes.tooltip)
         else
           assignment = @assignments[submission.assignment_id]
@@ -724,6 +726,9 @@ define [
 
     staticCellFormatter: (row, col, val) ->
       "<div class='cell-content gradebook-cell'>#{htmlEscape(val)}</div>"
+
+    unassignedCellFormatter: (row, col, val) ->
+      "<div class='cell-content gradebook-cell grayed-out cannot_edit gradebook-cell'>#{htmlEscape(val)}</div>"
 
     lockedAndHiddenGradeCellFormatter: (row, col, tooltipKey) ->
       if tooltipKey
