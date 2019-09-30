@@ -1,0 +1,7 @@
+---
+new_post_policy_icons:
+  state: hidden
+  display_name: New Post Policy Icons
+  description: Updates the display of Post Policy icons in the New Gradebook
+    assignment column header.
+  applies_to: RootAccount

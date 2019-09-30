@@ -1024,6 +1024,32 @@ describe GradebooksController do
         end
       end
 
+      describe "new_post_policy_icons_enabled" do
+        it "is set to true if the course has Post Policies and the New Post Policy Icons root account feature flag enabled" do
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
+          @course.root_account.enable_feature!(:new_post_policy_icons)
+
+          get :show, params: {course_id: @course.id}
+          expect(gradebook_options[:new_post_policy_icons_enabled]).to be true
+        end
+
+        it "is set to false if the New Post Policy Icons root account feature flag is not enabled" do
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
+
+          get :show, params: {course_id: @course.id}
+          expect(gradebook_options[:new_post_policy_icons_enabled]).to be false
+        end
+
+        it "is not present if the course does not have Post Policies enabled" do
+          @course.root_account.enable_feature!(:new_post_policy_icons)
+
+          get :show, params: {course_id: @course.id}
+          expect(gradebook_options).not_to include(:new_post_policy_icons_enabled)
+        end
+      end
+
       describe "post_manually" do
         it "is set to true if post policies are enabled and the course is manually-posted" do
           @course.enable_feature!(:new_gradebook)

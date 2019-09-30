@@ -117,6 +117,7 @@ function getProps(column, gradebook, options) {
       featureEnabled: gradebook.postPolicies != null,
       hasGrades,
       hasGradesToPost: students.some(student => isHidden(student.submission)),
+      newIconsEnabled: !!gradebook.options.new_post_policy_icons_enabled,
       onSelect(onExited) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showPostAssignmentGradesTray({assignmentId, onExited})

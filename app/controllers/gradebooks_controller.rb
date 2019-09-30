@@ -913,7 +913,11 @@ class GradebooksController < ApplicationController
       sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
       show_similarity_score: @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
     }
-    new_gradebook_options[:post_manually] = @context.post_manually? if @context.post_policies_enabled?
+
+    if @context.post_policies_enabled?
+      new_gradebook_options[:post_manually] = @context.post_manually?
+      new_gradebook_options[:new_post_policy_icons_enabled] = @context.root_account.feature_enabled?(:new_post_policy_icons)
+    end
 
     {GRADEBOOK_OPTIONS: new_gradebook_options}
   end
