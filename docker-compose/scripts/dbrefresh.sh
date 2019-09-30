@@ -27,10 +27,11 @@ rm $dbfilepathgz
 # - Make the timeout to wait for the SSO server 15 seconds since dev can be slow, especially on first start.
 # - Disable Canvas analytics which relies on a Cassandra DB. No need for this and it clutter the error log.
 cat <<EOF | docker-compose exec -T canvasdb psql -U canvas canvas
-  insert into settings (name, value, created_at, updated_at).
+  insert into settings (name, value, created_at, updated_at)
   select 'cas_timelimit', '15', NOW(), NOW()
   where not exists (select id from settings where name = 'cas_timelimit');
 
   delete from settings where name = 'enable_page_views';
 EOF
 
+./docker-compose/scripts/restart.sh

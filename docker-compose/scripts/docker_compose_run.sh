@@ -32,9 +32,10 @@ else
   echo "Ok!"
 fi
 
-# Not sure exactly why I need this, but after stopping and starting the container it dies with
-# an error saying i have to run this.  So just do it.
-bundle exec rake db:reset_encryption_key_hash
+echo "### If you get error messages telling you to run: bundle exec rake db:reset_encryption_key_hash"
+echo "That will make the Canvas API access tokens invalid. The way this works is that the value of:"
+echo "    select value from settings where name = 'encryption_key_hash';"
+echo "Used when generating the access tokens (e.g. CANVAS_ACCESS_TOKEN) is set when creating the dev DB on the admin server"
 
 # TODO: check if the database is already setup and if not, download and load the latest dev db.
 #bundle exec rake db:create; bundle exec rake db:migrate; bundle exec rake db:initial_setup
