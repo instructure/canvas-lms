@@ -9,6 +9,7 @@ new_post_policy_icons:
 gradebook_reserved_importer_bugfix:
   state: hidden
   display_name: Gradebook Import Reserved Names Bugfix (APG-122)
-  description: Behaviour change related to the bugfix in APG-122. Don't allow custom columns to be created that
-    are titled the same as gradebook importer reserved names
+  description: Behaviour change related to the bugfix in APG-122. Do not allow custom columns to be created that
+    are titled the same as gradebook importer reserved names, also ignore non-active custom columns on gradebook
+    import as well as those that use reserved names.
   applies_to: SiteAdmin
