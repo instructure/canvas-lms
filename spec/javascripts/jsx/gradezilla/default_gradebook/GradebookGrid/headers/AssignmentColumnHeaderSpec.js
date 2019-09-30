@@ -264,15 +264,34 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
           props.assignment.postManually = true
         })
 
-        test('displays an "off" icon when no submissions are graded but unposted', () => {
-          props.students.forEach(student => {
-            if (student.submission.workflowState === 'graded') {
-              student.submission.postedAt = new Date()
-            }
+        QUnit.module('when new icons are enabled', newIconsEnabledHooks => {
+          newIconsEnabledHooks.beforeEach(() => {
+            props.postGradesAction.newIconsEnabled = true
           })
 
-          mountComponent()
-          ok(getColumnHeaderIcon('IconOff'))
+          test('does not display an "off" icon when no submissions are graded but unposted', () => {
+            props.students.forEach(student => {
+              if (student.submission.workflowState === 'graded') {
+                student.submission.postedAt = new Date()
+              }
+            })
+
+            mountComponent()
+            notOk(getColumnHeaderIcon('IconOff'))
+          })
+        })
+
+        QUnit.module('when new icons are not enabled', () => {
+          test('displays an "off" icon when no submissions are graded but unposted', () => {
+            props.students.forEach(student => {
+              if (student.submission.workflowState === 'graded') {
+                student.submission.postedAt = new Date()
+              }
+            })
+
+            mountComponent()
+            ok(getColumnHeaderIcon('IconOff'))
+          })
         })
 
         test('displays an "off" icon when at least one submission is graded but unposted', () => {
@@ -359,6 +378,42 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         props.assignment.anonymizeStudents = true
         mountComponent()
         equal(getSecondaryDetailText(), 'Unpublished')
+      })
+    })
+
+    QUnit.module('when post policies are enabled', postPoliciesEnabledHooks => {
+      postPoliciesEnabledHooks.beforeEach(() => {
+        props.postGradesAction.featureEnabled = true
+      })
+
+      QUnit.module('when the assignment is manually posted', manualPostHooks => {
+        manualPostHooks.beforeEach(() => {
+          props.assignment.postManually = true
+        })
+
+        test('displays "Manual" text when new post policy icons are enabled', () => {
+          props.postGradesAction.newIconsEnabled = true
+          mountComponent()
+          ok(getSecondaryDetailText().includes('Manual'))
+        })
+
+        test('prioritizes "Anonymous" text when new post policy icons are enabled and the assignment is anonymized', () => {
+          props.postGradesAction.newIconsEnabled = true
+          props.assignment.anonymizeStudents = true
+          mountComponent()
+          equal(getSecondaryDetailText(), 'Anonymous')
+        })
+
+        test('does not display "Manual" text when the new post policy icons are not enabled', () => {
+          mountComponent()
+          notOk(getSecondaryDetailText().includes('Manual'))
+        })
+      })
+
+      test('does not display "Manual" text when icons are enabled but the assignment is auto-posted', () => {
+        props.postGradesAction.newIconsEnabled = true
+        mountComponent()
+        notOk(getSecondaryDetailText().includes('Manual'))
       })
     })
   })
