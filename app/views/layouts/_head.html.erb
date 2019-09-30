@@ -59,7 +59,7 @@
   <%= include_custom_meta_tags %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
-  <%= include_css_bundles %>
+  <%= benchmark("include_css_bundles") { include_css_bundles } %>
   <%= include_account_css %>
   <script>
     <%#
@@ -86,11 +86,11 @@
 
   <% js_env(active_context_tab: get_active_tab) %>
   <script>
-    INST = <%= raw(inst_env.to_json) %>;
-    ENV = <%= raw(render_js_env) %>;
+    INST = <%= benchmark("rendering INST") { raw(inst_env.to_json) } %>;
+    ENV = <%= benchmark("rendering ENV") { raw(render_js_env) } %>;
   </script>
 
-  <%= include_head_js %>
+  <%= benchmark("include_head_js") { include_head_js } %>
   <% @xhrs_to_prefetch_from_controller&.each do |args| %>
     <%= prefetch_xhr(*args) %>
   <% end %>
