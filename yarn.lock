@@ -2555,6 +2555,11 @@
     npm-package-arg "^6.1.0"
     write-pkg "^3.1.0"
 
+"@microsoft/immersive-reader-sdk@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@microsoft/immersive-reader-sdk/-/immersive-reader-sdk-0.0.3.tgz#7f6f1170e7069729a4ac4f7733755f6c95d022ee"
+  integrity sha512-r+Mp088mLdBB//Zsfqyof46tcDSyorE6nXEZUMELUoFNtoUE8NgoTmnYBeoQduT/VvCQFKIGrPVm3D8+lnIchg==
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"

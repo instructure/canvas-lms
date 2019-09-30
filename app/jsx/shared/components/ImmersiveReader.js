@@ -20,6 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Button} from '@instructure/ui-buttons'
 import {SVGIcon} from '@instructure/ui-svg-images'
+import I18n from 'i18n!ImmersiveReader'
+import {showFlashError} from '../FlashAlert'
 
 /**
  * This comes from https://github.com/microsoft/immersive-reader-sdk/blob/master/assets/icon.svg
@@ -40,6 +42,41 @@ const LOGO = `
 </svg>
 `
 
-export function initializeReaderButton(mountPoint) {
-  ReactDOM.render(<Button icon={<SVGIcon src={LOGO} />}>Immersive Reader</Button>, mountPoint)
+function handleClick({title, content}, readerSDK) {
+  ;(readerSDK || import('@microsoft/immersive-reader-sdk'))
+    .then(({launchAsync}) => {
+      fetch('/api/v1/immersive_reader/authenticate', {
+        headers: {Accept: 'application/json'}
+      })
+        .then(response => response.json())
+        .then(({token, subdomain}) => {
+          const requestContent = {
+            title,
+            chunks: [{content, mimeType: 'text/html'}]
+          }
+          launchAsync(token, subdomain, requestContent)
+        })
+        .catch(e => {
+          // eslint-disable-next-line no-console
+          console.error('Getting authentication details failed', e)
+          showFlashError(I18n.t('Immersive Reader Failed to Load'))()
+        })
+    })
+    .catch(e => {
+      // eslint-disable-next-line no-console
+      console.error('Loading the Immersive Reader SDK failed', e)
+      showFlashError(I18n.t('Immersive Reader Failed to Load'))()
+    })
+}
+
+export function ImmersiveReaderButton({content, readerSDK}) {
+  return (
+    <Button onClick={() => handleClick(content, readerSDK)} icon={<SVGIcon src={LOGO} />}>
+      Immersive Reader
+    </Button>
+  )
+}
+
+export function initializeReaderButton(mountPoint, content) {
+  ReactDOM.render(<ImmersiveReaderButton content={content} />, mountPoint)
 }

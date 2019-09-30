@@ -65,7 +65,10 @@ ready(() => {
   if (immersive_reader_mount_point) {
     import('../shared/components/ImmersiveReader')
       .then(ImmersiveReader => {
-        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point)
+        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {
+          title: document.querySelector('.page-title').textContent,
+          content: document.querySelector('.show-content').innerHTML
+        })
       })
       .catch(e => {
         console.log('Error loading immersive readers.', e)

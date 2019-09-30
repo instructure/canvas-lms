@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {initializeReaderButton} from '../ImmersiveReader'
+import React from 'react'
+import {initializeReaderButton, ImmersiveReaderButton} from '../ImmersiveReader'
+import {render, fireEvent} from '@testing-library/react'
 
 describe('#initializeReaderButton', () => {
   it('renders the immersive reader button into the given mount point', () => {
@@ -24,5 +25,41 @@ describe('#initializeReaderButton', () => {
     initializeReaderButton(document.getElementById('mount_point'))
     const buttonElement = document.querySelector('button')
     expect(buttonElement.textContent).toMatch(/Immersive Reader/)
+    document.body.innerHTML = ''
+  })
+
+  describe('ImmersiveReaderButton', () => {
+    const fakeContent = {
+      title: 'fake title',
+      content: '<p>Some fake content yay</p>'
+    }
+    describe('onClick', () => {
+      it('calls to launch the Immersive Reader with the proper content', async () => {
+        expect.assertions(1)
+        fetch.mockResponseOnce(JSON.stringify({token: 'fakeToken', subdomain: 'fakeSubdomain'}))
+        const fakeLaunchAsync = (...args) =>
+          expect(args).toEqual([
+            'fakeToken',
+            'fakeSubdomain',
+            {
+              title: 'fake title',
+              chunks: [
+                {
+                  content: fakeContent.content,
+                  mimeType: 'text/html'
+                }
+              ]
+            }
+          ])
+        const fakeReaderLib = Promise.resolve({
+          launchAsync: fakeLaunchAsync
+        })
+        const {findByText} = render(
+          <ImmersiveReaderButton content={fakeContent} readerSDK={fakeReaderLib} />
+        )
+        const button = await findByText(/Immersive Reader/)
+        fireEvent.click(button)
+      })
+    })
   })
 })
