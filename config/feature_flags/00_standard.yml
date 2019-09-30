@@ -396,7 +396,6 @@ rce_enhancements:
   description: Allow switching to the enhanced RCE
   applies_to: Course
   root_opt_in: true
-  beta: true
   environments:
     production:
       state: disabled
