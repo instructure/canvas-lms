@@ -34,3 +34,4 @@ cat <<EOF | docker-compose exec -T canvasdb psql -U canvas canvas
   delete from settings where name = 'enable_page_views';
 EOF
 
+./docker-compose/scripts/restart.sh
