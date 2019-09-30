@@ -2714,8 +2714,9 @@ class Submission < ActiveRecord::Base
   def comment_causes_posting?(author:, draft:, provisional:)
     return false if posted? || assignment.post_manually?
     return false if draft || provisional
+    return false if author.blank?
 
-    author.present? && assignment.context.instructor_ids.include?(author.id)
+    assignment.context.instructor_ids.include?(author.id) || assignment.context.account_membership_allows(author)
   end
 
   def handle_posted_at_changed
