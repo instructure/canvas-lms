@@ -18,6 +18,7 @@
 
 class MigrateUsageRightsAndCourseCatalog < ActiveRecord::Migration[5.2]
   tag :predeploy
+  disable_ddl_transaction!
 
   def change
     DataFixup::MoveFeatureFlagsToSettings.run(:course_catalog, "RootAccount", :enable_course_catalog)

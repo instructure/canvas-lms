@@ -20,12 +20,17 @@ module DataFixup::MoveFeatureFlagsToSettings
   def self.run(feature_flag_name, context_going_to, setting_name)
     case context_going_to
     when "RootAccount"
-      Account.root_accounts.find_each do |context|
+      Account.root_accounts.non_shadow.find_each do |context|
         figure_setting_from_override(context, feature_flag_name, setting_name, inherited: false)
       end
     when "AccountAndCourseInherited"
-      Account.root_accounts.find_each do |root_account|
-        migrate_ff_overrides_to_inherited_recurse(root_account, feature_flag_name, setting_name)
+      Account.root_accounts.non_shadow.find_each do |root_account|
+        Account.suspend_callbacks(:invalidate_caches_if_changed) do
+          migrate_ff_overrides_to_inherited_recurse(root_account, feature_flag_name, setting_name)
+        end
+        Rails.cache.delete([feature_flag_name, root_account.global_id].cache_key)
+        # queue one job on the root account to clear all the caches recursively
+        Account.send_later_if_production(:invalidate_inherited_caches, root_account, [feature_flag_name])
       end
     else
       raise "invalid setting level"
@@ -36,17 +41,25 @@ module DataFixup::MoveFeatureFlagsToSettings
     figure_setting_from_override(account, feature_flag_name, setting_name, inherited: true)
     return if account.settings.dig(setting_name, :locked)
 
-    account.sub_accounts.find_each do |sub_account|
-      migrate_ff_overrides_to_inherited_recurse(sub_account, feature_flag_name, setting_name)
+    account.sub_accounts.find_in_batches do |sub_accounts|
+      ActiveRecord::Associations::Preloader.new.preload(sub_accounts, :feature_flags, FeatureFlag.where(:feature => feature_flag_name))
+      sub_accounts.each do |sub_account|
+        migrate_ff_overrides_to_inherited_recurse(sub_account, feature_flag_name, setting_name)
+      end
     end
-    account.courses.find_each do |course|
-      figure_setting_from_override(course, feature_flag_name, setting_name, inherited: false)
+    account.courses.find_in_batches do |courses|
+      ActiveRecord::Associations::Preloader.new.preload(courses, :feature_flags, FeatureFlag.where(:feature => feature_flag_name))
+      courses.each do |course|
+        figure_setting_from_override(course, feature_flag_name, setting_name, inherited: false)
+      end
     end
   end
   private_class_method :migrate_ff_overrides_to_inherited_recurse
 
   def self.figure_setting_from_override(context, feature_flag_name, setting_name, inherited:)
-    override = context.feature_flags.where(:feature => feature_flag_name.to_s).take
+    override = context.feature_flags.loaded? ?
+      context.feature_flags.detect{|ff| ff.feature == feature_flag_name.to_s} :
+      context.feature_flags.where(:feature => feature_flag_name.to_s).take
     override_value = nil
     if override
       case override.state
