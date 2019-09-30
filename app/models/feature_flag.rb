@@ -34,7 +34,7 @@ class FeatureFlag < ActiveRecord::Base
   def unhides_feature?
     return false unless Feature.definitions[feature].hidden?
     return true if context.is_a?(Account) && context.site_admin?
-    parent_setting = Account.find(context.feature_flag_account_ids.last).lookup_feature_flag(feature, true)
+    parent_setting = Account.find(context.feature_flag_account_ids.last).lookup_feature_flag(feature, override_hidden: true)
     parent_setting.nil? || parent_setting.hidden?
   end
 
