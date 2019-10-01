@@ -85,6 +85,7 @@ describe('TextEntry', () => {
         expect(props.createSubmissionDraft).toHaveBeenCalledWith({
           variables: {
             id: '1',
+            activeSubmissionType: 'online_text_entry',
             attempt: 1,
             body: null
           }

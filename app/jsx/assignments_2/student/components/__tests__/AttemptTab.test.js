@@ -135,5 +135,19 @@ describe('ContentTabs', () => {
       await getByTestId('text-entry')
       expect(getByText('Choose One')).toBeInTheDocument()
     })
+
+    it('renders the active submission type if available', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: () => ({submissionTypes: ['online_text_entry', 'online_upload']}),
+        Submission: () => ({
+          submissionDraft: {
+            activeSubmissionType: 'online_text_entry'
+          }
+        })
+      })
+      const {getByTestId} = render(<AttemptTab {...props} />)
+
+      expect(await getByTestId('text-entry')).toBeInTheDocument()
+    })
   })
 })

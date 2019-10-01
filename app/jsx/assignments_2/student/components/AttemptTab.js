@@ -45,7 +45,7 @@ export default class AttemptTab extends Component {
   }
 
   state = {
-    activeSubmissionType: null
+    activeSubmissionType: this.props.submission?.submissionDraft?.activeSubmissionType || null
   }
 
   friendlyTypeName = type => {
@@ -176,7 +176,8 @@ export default class AttemptTab extends Component {
       return (
         <div data-testid="attempt-tab">
           {this.renderSubmissionTypeSelector()}
-          {this.state.activeSubmissionType !== null
+          {this.state.activeSubmissionType !== null &&
+          this.props.assignment.submissionTypes.includes(this.state.activeSubmissionType)
             ? this.renderByType(this.state.activeSubmissionType)
             : this.renderUnselectedType()}
         </div>

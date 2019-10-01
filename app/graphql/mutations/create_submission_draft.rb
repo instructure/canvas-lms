@@ -28,6 +28,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
   # specifying the attempt, if that race condition does ever happen it will
   # create the `SubmissionDraft` for an old attempt and not return it back in
   # subsequent graphql queries for submission drafts.
+  argument :active_submission_type, Types::DraftableSubmissionType, required: true
   argument :attempt, Integer, required: false
   argument :body, String, required: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
@@ -46,10 +47,22 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
       submission: submission,
       submission_attempt: input[:attempt] || (submission.attempt + 1)
     ).first_or_create!
-    submission_draft.attachments = attachments
+
+    # TODO: we should research if we should split this mutation into a separate
+    #       mutation for each draft type. the primary concern is the confusion
+    #       of ignoring potentially included input types if they don't match
+    #       the active submission.
+    submission_draft.active_submission_type = input[:active_submission_type]
+    case input[:active_submission_type]
+    when 'online_text_entry'
+      submission_draft.body = input[:body]
+    when 'online_upload'
+      submission_draft.attachments = attachments
+    when 'online_url'
+      submission_draft.url = input[:url]
+    end
+
     # for drafts we allow the body and url to be null or empty, so there's nothing to validate
-    submission_draft.body = input[:body]
-    submission_draft.url = input[:url]
     submission_draft.save!
 
     {submission_draft: submission_draft}

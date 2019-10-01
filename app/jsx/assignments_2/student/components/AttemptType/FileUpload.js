@@ -137,6 +137,7 @@ export default class FileUpload extends Component {
     await this.props.createSubmissionDraft({
       variables: {
         id: this.props.submission.id,
+        activeSubmissionType: 'online_upload',
         attempt: this.props.submission.attempt || 1,
         fileIds: this.getDraftAttachments()
           .map(file => file._id)
@@ -155,6 +156,7 @@ export default class FileUpload extends Component {
     await this.props.createSubmissionDraft({
       variables: {
         id: this.props.submission.id,
+        activeSubmissionType: 'online_upload',
         attempt: this.props.submission.attempt,
         fileIds: updatedFiles.map(file => file._id)
       }

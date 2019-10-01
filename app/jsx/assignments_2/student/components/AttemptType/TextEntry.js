@@ -166,6 +166,7 @@ export default class TextEntry extends React.Component {
     await this.props.createSubmissionDraft({
       variables: {
         id: this.props.submission.id,
+        activeSubmissionType: 'online_text_entry',
         attempt: this.props.submission.attempt || 1,
         body: rceText
       }

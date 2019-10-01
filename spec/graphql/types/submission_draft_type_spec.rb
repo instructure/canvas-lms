@@ -36,6 +36,7 @@ RSpec.describe Types::SubmissionDraftType do
             nodes {
               submissionDraft {
                 _id
+                activeSubmissionType
                 attachments {
                   _id
                   displayName
@@ -93,5 +94,13 @@ RSpec.describe Types::SubmissionDraftType do
 
     submission_draft = resolve_submission_draft
     expect(submission_draft['url']).to eq('http://www.google.com')
+  end
+
+  it 'returns the active submission type' do
+    @submission_draft.active_submission_type = 'online_upload'
+    @submission_draft.save!
+
+    submission_draft = resolve_submission_draft
+    expect(submission_draft['activeSubmissionType']).to eq('online_upload')
   end
 end

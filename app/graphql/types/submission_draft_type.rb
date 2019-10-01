@@ -22,6 +22,8 @@ module Types
 
     implements Interfaces::LegacyIDInterface
 
+    field :active_submission_type, Types::DraftableSubmissionType, null: true
+
     field :attachments, [Types::FileType], null: true
     def attachments
       load_association(:attachments)
