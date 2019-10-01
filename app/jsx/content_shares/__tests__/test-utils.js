@@ -41,10 +41,12 @@ export function mockShare(overrides = {}) {
 }
 
 export const assignmentShare = mockShare()
-export const discussionShare = mockShare({
+export const readDiscussionShare = mockShare({
   id: '2',
   name: 'A Course Discussion',
+  read_state: 'read',
   content_type: 'discussion_topic',
   created_at: '2019-07-05T12:00:00Z',
   updated_at: '2019-07-25T12:00:00Z'
 })
+export const unreadDiscussionShare = {...readDiscussionShare, read_state: 'unread'}

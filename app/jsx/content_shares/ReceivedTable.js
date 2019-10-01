@@ -26,7 +26,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconMoreLine, IconEyeLine, IconImportLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-layout'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
-import {Avatar, Text} from '@instructure/ui-elements'
+import {Avatar, Badge, Text} from '@instructure/ui-elements'
 import contentShareShape from 'jsx/shared/proptypes/contentShare'
 
 ReceivedTable.propTypes = {
@@ -58,9 +58,21 @@ export default function ReceivedTable({shares, onPreview, onImport}) {
     )
   }
 
+  function renderUnreadBadge(state) {
+    if (state !== 'read')
+      return (
+        <div data-testid="received-table-row-unread">
+          <Badge margin="0 0 xxx-small 0" standalone type="notification" />
+          <ScreenReaderContent>{I18n.t('unread')}</ScreenReaderContent>
+        </div>
+      )
+    else return <ScreenReaderContent>{I18n.t('read')}</ScreenReaderContent>
+  }
+
   function renderRow(share) {
     return (
       <Table.Row key={share.id}>
+        <Table.Cell textAlign="end">{renderUnreadBadge(share.read_state)}</Table.Cell>
         <Table.Cell>{share.name}</Table.Cell>
         <Table.Cell>
           <Text transform="capitalize">{share.content_type}</Text>
@@ -86,6 +98,9 @@ export default function ReceivedTable({shares, onPreview, onImport}) {
     <Table caption={I18n.t('Content shared by others to you')} layout="auto" hover>
       <Table.Head>
         <Table.Row>
+          <Table.ColHeader id="unread">
+            <ScreenReaderContent>{I18n.t('Status')}</ScreenReaderContent>
+          </Table.ColHeader>
           <Table.ColHeader id="title">{I18n.t('Title')}</Table.ColHeader>
           <Table.ColHeader id="type">{I18n.t('Type')}</Table.ColHeader>
           <Table.ColHeader id="from">{I18n.t('From')}</Table.ColHeader>
