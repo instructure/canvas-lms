@@ -42,6 +42,6 @@
     describe('sharing content', () => {
         it('displays loading state when message is beng sent', () => {})
         it('displays success and closes the dialog when the api call succeeds', async () => {})
-        it('displays an error and closes the dialog when the api call fails', async () => {})
+        it('displays an error on the dialog', async () => {})
     })
  })
