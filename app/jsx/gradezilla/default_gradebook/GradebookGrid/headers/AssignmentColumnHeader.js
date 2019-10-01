@@ -54,6 +54,17 @@ function SecondaryDetailLine(props) {
         </Text>
       </span>
 
+      {props.postPoliciesEnabled &&
+        props.newPostPolicyIconsEnabled &&
+        props.assignment.postManually && (
+          <span>
+            &nbsp;
+            <Text size="x-small" transform="uppercase" weight="bold">
+              {I18n.t('Manual')}
+            </Text>
+          </span>
+        )}
+
       {!props.postPoliciesEnabled && props.assignment.muted && (
         <span>
           &nbsp;
@@ -73,6 +84,7 @@ SecondaryDetailLine.propTypes = {
     pointsPossible: number,
     published: bool.isRequired
   }).isRequired,
+  newPostPolicyIconsEnabled: bool.isRequired,
   postPoliciesEnabled: bool.isRequired
 }
 
@@ -126,6 +138,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     postGradesAction: shape({
       featureEnabled: bool.isRequired,
       hasGradesToPost: bool.isRequired,
+      newIconsEnabled: bool.isRequired,
       onSelect: func.isRequired
     }).isRequired,
 
@@ -488,7 +501,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     )
   }
 
-  renderUnpostedSubmissionsIcon() {
+  renderUnpostedSubmissionsIcon(newIconsEnabled) {
     if (!this.props.submissionsLoaded) {
       return null
     }
@@ -496,16 +509,24 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     const submissions = this.props.students.map(student => student.submission)
     const postableSubmissionsPresent = submissions.some(isHidden)
 
-    // Assignment is manually-posted and has no graded-but-unposted submissions
-    // (i.e., no unposted submissions that are in a suitable state to post)
-    if (this.props.assignment.postManually && !postableSubmissionsPresent) {
-      return <IconOffLine size="x-small" />
-    }
+    if (newIconsEnabled) {
+      // Assignment has at least one hidden submission that can be posted
+      // and "new icons" are enabled so use the line version of the icon
+      if (postableSubmissionsPresent) {
+        return <IconOffLine size="x-small" />
+      }
+    } else {
+      // Assignment is manually-posted and has no graded-but-unposted submissions
+      // (i.e., no unposted submissions that are in a suitable state to post)
+      if (this.props.assignment.postManually && !postableSubmissionsPresent) {
+        return <IconOffLine size="x-small" />
+      }
 
-    // Assignment has at least one hidden submission that can be posted
-    // (regardless of whether it's manually or automatically posted)
-    if (postableSubmissionsPresent) {
-      return <IconOffSolid color="warning" size="x-small" />
+      // Assignment has at least one hidden submission that can be posted
+      // (regardless of whether it's manually or automatically posted)
+      if (postableSubmissionsPresent) {
+        return <IconOffSolid color="warning" size="x-small" />
+      }
     }
 
     return null
@@ -513,6 +534,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
   render() {
     const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`
+    const newPostPolicyIconsEnabled = this.props.postGradesAction.newIconsEnabled
     const postPoliciesEnabled = this.props.postGradesAction.featureEnabled
 
     return (
@@ -526,7 +548,8 @@ export default class AssignmentColumnHeader extends ColumnHeader {
             <Grid.Row>
               <Grid.Col textAlign="center" width="auto" vAlign="top">
                 <div className="Gradebook__ColumnHeaderIndicators">
-                  {postPoliciesEnabled && this.renderUnpostedSubmissionsIcon()}
+                  {postPoliciesEnabled &&
+                    this.renderUnpostedSubmissionsIcon(newPostPolicyIconsEnabled)}
                 </div>
               </Grid.Col>
 
@@ -538,6 +561,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
                   <SecondaryDetailLine
                     assignment={this.props.assignment}
+                    newPostPolicyIconsEnabled={newPostPolicyIconsEnabled}
                     postPoliciesEnabled={postPoliciesEnabled}
                   />
                 </span>

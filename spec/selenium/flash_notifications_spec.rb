@@ -14,14 +14,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class MigrateUsageRightsAndCourseCatalog < ActiveRecord::Migration[5.2]
-  tag :predeploy
-  disable_ddl_transaction!
+require_relative 'common'
 
-  def change
-    DataFixup::MoveFeatureFlagsToSettings.run(:course_catalog, "RootAccount", :enable_course_catalog)
-    DataFixup::MoveFeatureFlagsToSettings.run(:usage_rights_required, "AccountAndCourseInherited", :usage_rights_required)
+describe "flash notifications" do
+  include_context "in-process server selenium tests"
+
+  it "should show unsupported browser message but allow you to dismiss it" do
+    allow_any_instance_of(ApplicationController).to receive(:browser_supported?).and_return(false)
+    get "/login"
+    expect(f(flash_message_selector)).to include_text "Your browser does not meet the minimum requirements for Canvas"
+    dismiss_flash_messages
+
+    get "/login"
+    expect(f('body')).not_to contain_css(flash_message_selector)
   end
 end
