@@ -199,5 +199,24 @@ describe('CanvasMediaPlayer', () => {
       expect(queryByText('Source Chooser')).not.toBeInTheDocument()
       expect(queryByText('Full Screen')).toBeInTheDocument()
     })
+
+    it('includes the CC button when there are subtitle track(s)', () => {
+      const {queryByText, queryByLabelText} = render(
+        <CanvasMediaPlayer
+          media_id="dummy_media_id"
+          media_sources={[defaultMediaObject()]}
+          media_tracks={[
+            {label: 'English', language: 'en', src: '/media_objects/more/stuff', type: 'subtitles'}
+          ]}
+        />
+      )
+      expect(queryByText('Play')).toBeInTheDocument()
+      expect(queryByLabelText('Timebar')).toBeInTheDocument()
+      expect(queryByText('Unmuted')).toBeInTheDocument()
+      expect(queryByText('Playback Speed')).toBeInTheDocument()
+      expect(queryByText('Source Chooser')).not.toBeInTheDocument()
+      expect(queryByText('Video Track')).toBeInTheDocument()
+      expect(queryByText('CC')).toBeInTheDocument()
+    })
   })
 })

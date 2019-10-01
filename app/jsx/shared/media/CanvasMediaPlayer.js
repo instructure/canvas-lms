@@ -149,7 +149,11 @@ export default function CanvasMediaPlayer(props) {
   return (
     <div ref={containerRef}>
       {media_sources.length ? (
-        <VideoPlayer sources={media_sources} controls={renderControls} />
+        <VideoPlayer
+          sources={media_sources}
+          tracks={props.media_tracks}
+          controls={renderControls}
+        />
       ) : (
         <LoadingIndicator
           translatedTitle={I18n.t('Loading')}
@@ -181,6 +185,7 @@ export function sizeMediaPlayer(player, type, playerContainer) {
 CanvasMediaPlayer.propTypes = {
   media_id: string.isRequired,
   media_sources: VideoPlayer.propTypes.sources,
+  media_tracks: VideoPlayer.propTypes.tracks,
   type: oneOf(['audio', 'video'])
 }
 

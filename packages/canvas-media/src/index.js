@@ -102,7 +102,7 @@ export default class UploadMedia extends React.Component {
     } else {
       try {
         if (this.subtitles.length > 0) {
-          await saveClosedCaptions(data.media_object.media_id, this.subtitles)
+          await saveClosedCaptions(data.mediaObject.media_object.media_id, this.subtitles)
         }
         this.props.onDismiss && this.props.onDismiss()
         this.props.onComplete && this.props.onComplete(null, data)
