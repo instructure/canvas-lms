@@ -284,6 +284,21 @@ class RCEWrapper extends React.Component {
     this.contentInserted(element)
   }
 
+  // inserting an iframe in tinymce (as is often the case with
+  // embedded content) causes it to wrap it in a span
+  // and it's often inserted into a <p> on top of that.  Find the
+  // iframe and use it to flash the indicator.
+  insertEmbedCode(code) {
+    const editor = this.mceInstance()
+    const element = contentInsertion.insertContent(editor, code)
+    const ifr = element && element.querySelector && element.querySelector('iframe')
+    if (ifr) {
+      this.contentInserted(ifr)
+    } else {
+      this.contentInserted(element)
+    }
+  }
+
   insertImage(image) {
     const editor = this.mceInstance()
     const element = contentInsertion.insertImage(editor, image)

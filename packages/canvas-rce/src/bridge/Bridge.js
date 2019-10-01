@@ -186,6 +186,10 @@ export default class Bridge {
     }
   }
 
+  insertEmbedCode = embedCode => {
+    this.focusedEditor.insertEmbedCode(embedCode)
+  }
+
   insertVideo = video => {
     if (this.focusedEditor) {
       this.focusedEditor.insertVideo(video)

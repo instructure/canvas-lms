@@ -51,7 +51,8 @@ export default class UploadMedia extends React.Component {
     contextId: string,
     contextType: string,
     onStartUpload: func,
-    onComplete: func,
+    onUploadComplete: func,
+    onEmbed: func,
     onDismiss: func,
     open: bool,
     tabs: shape({
@@ -89,6 +90,7 @@ export default class UploadMedia extends React.Component {
       }
       case PANELS.EMBED: {
         this.props.onDismiss()
+        this.props.onEmbed(this.state.embedCode)
         break
       }
       default:
@@ -105,7 +107,7 @@ export default class UploadMedia extends React.Component {
           await saveClosedCaptions(data.mediaObject.media_object.media_id, this.subtitles)
         }
         this.props.onDismiss && this.props.onDismiss()
-        this.props.onComplete && this.props.onComplete(null, data)
+        this.props.onUploadComplete && this.props.onUploadComplete(null, data)
       } catch (ex) {
         // Handle error
         console.error(ex) // eslint-disable-line no-console

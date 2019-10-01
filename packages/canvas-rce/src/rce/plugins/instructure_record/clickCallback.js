@@ -62,9 +62,12 @@ export default function(ed, document) {
             open
             liveRegion={() => document.getElementById('flash_screenreader_holder')}
             onStartUpload={fileProps => handleStartUpload(fileProps)}
-            onComplete={(err, data) => handleUpload(err, data, contentProps.mediaUploadComplete)}
+            onUploadComplete={(err, data) =>
+              handleUpload(err, data, contentProps.mediaUploadComplete)
+            }
+            onEmbed={embedCode => Bridge.insertEmbedCode(embedCode)}
             onDismiss={handleDismiss}
-            tabs={{embed: false, record: true, upload: true}}
+            tabs={{embed: true, record: true, upload: true}}
             uploadMediaTranslations={{
               UploadMediaStrings: {
                 ADD_CLOSED_CAPTIONS_OR_SUBTITLES: formatMessage('Add CC/Subtitles'),

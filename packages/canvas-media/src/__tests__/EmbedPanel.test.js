@@ -35,7 +35,7 @@ describe('EmbedPanel', () => {
     expect(getByText('the best value of the embed')).toBeInTheDocument()
   })
 
-  it('on change calls setEmbedCode', () => {
+  it('on blur calls setEmbedCode', () => {
     const handleChange = jest.fn()
     const {getByPlaceholderText} = render(
       <EmbedPanel
@@ -45,9 +45,9 @@ describe('EmbedPanel', () => {
       />
     )
     const textArea = getByPlaceholderText('embed label')
-    fireEvent.change(textArea, {target: {value: 'TEST VALUE'}})
+    fireEvent.blur(textArea)
 
     expect(handleChange).toHaveBeenCalledTimes(1)
-    expect(handleChange.mock.calls[0][0]).toBe('TEST VALUE')
+    expect(handleChange.mock.calls[0][0]).toBe('the best value of the embed')
   })
 })
