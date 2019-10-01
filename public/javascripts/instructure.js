@@ -706,7 +706,7 @@ function handleYoutubeLink () {
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     var timeAgoEvents  = [];
     function timeAgoRefresh() {
-      timeAgoEvents = $(".time_ago_date:visible").toArray();
+      timeAgoEvents = [...document.querySelectorAll('.time_ago_date')].filter($.expr.filters.visible)
       processNextTimeAgoEvent();
     }
     function processNextTimeAgoEvent() {
