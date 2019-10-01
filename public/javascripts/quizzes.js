@@ -2719,6 +2719,14 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
       $dialog.find("button").attr('disabled', true).filter(".submit_button").text(I18n.t('buttons.creating_group', "Creating Group..."));
 
       var params = $dialog.getFormData();
+      var quizGroupQuestionPoints = numberHelper.parse(params['quiz_group[question_points]']);
+      if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
+        $(this).find("input[name='quiz_group[question_points]']").errorBox(I18n.t('question.positive_points', "Must be zero or greater"));
+        return false;
+      } else {
+        params['quiz_group[question_points]'] = quizGroupQuestionPoints;
+      }
+
       var newParams = {};
       _.each(params, (val, key) => {
         newParams[key.replace('quiz_group[', 'quiz_groups[][')] = val;
