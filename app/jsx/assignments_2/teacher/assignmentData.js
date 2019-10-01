@@ -108,6 +108,7 @@ export const TEACHER_QUERY = gql`
       submissionTypes
       allowedExtensions
       allowedAttempts
+      anonymizeStudents
       course {
         lid: _id
         modulesConnection(first: 0) {

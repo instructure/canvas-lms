@@ -169,6 +169,7 @@ export function mockAssignment(overrides) {
     submissionTypes: ['online_text_entry'],
     allowedExtensions: [],
     allowedAttempts: null,
+    anonymizeStudents: false,
     onlyVisibleToOverrides: false,
     assignmentOverrides: {
       pageInfo: mockPageInfo(),

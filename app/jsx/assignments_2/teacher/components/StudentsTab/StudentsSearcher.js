@@ -140,8 +140,9 @@ export default class StudentsSearcher extends React.Component {
   renderMessageStudentsWhoButton() {
     return (
       <Button
-        key="messageStudentsWho"
+        disabled={this.props.assignment.anonymizeStudents}
         icon={IconEmailLine}
+        key="messageStudentsWho"
         onClick={this.props.onMessageStudentsClick}
       >
         {I18n.t('Message Students')}
