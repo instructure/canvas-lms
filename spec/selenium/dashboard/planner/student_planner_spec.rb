@@ -175,8 +175,9 @@ describe "student planner" do
       go_to_list_view
 
       validate_object_displayed(@course.name,'Peer Review')
-      expect(list_view_planner_items.second).to contain_css(peer_review_icon_selector)
-      expect(list_view_planner_items.second).to contain_jqcss(peer_review_reminder_selector)
+      expect(list_view_planner_item("Planner Course Peer Review")).to contain_css(peer_review_icon_selector)
+      expect(list_view_planner_item("Planner Course Peer Review")).to contain_jqcss(peer_review_reminder_selector)
+      expect(list_view_planner_item("Planner Course Assignment")).not_to contain_css(peer_review_icon_selector)
     end
 
     it "navigates to peer review submission when clicked" do
