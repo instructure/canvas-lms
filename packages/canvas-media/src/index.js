@@ -76,7 +76,8 @@ export default class UploadMedia extends React.Component {
 
   handleSubmit = () => {
     switch (this.state.selectedPanel) {
-      case PANELS.COMPUTER: {
+      case PANELS.COMPUTER:
+      case PANELS.RECORD: {
         this.props.onStartUpload && this.props.onStartUpload(this.state.theFile)
         saveMediaRecording(
           this.state.theFile,
@@ -120,7 +121,7 @@ export default class UploadMedia extends React.Component {
       EMBED_VIDEO_CODE_TEXT,
       LOADING_MEDIA,
       RECORD_PANEL_TITLE,
-      UPLOADING_ERROR
+      MEDIA_RECORD_NOT_AVAILABLE
     } = this.props.uploadMediaTranslations.UploadMediaStrings
 
     return (
@@ -163,10 +164,8 @@ export default class UploadMedia extends React.Component {
             <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
               <MediaRecorder
                 MediaCaptureStrings={this.props.uploadMediaTranslations.MediaCaptureStrings}
-                contextType={this.props.contextType}
-                contextId={this.props.contextId}
-                errorMessage={UPLOADING_ERROR}
-                dismiss={this.props.onDismiss}
+                errorMessage={MEDIA_RECORD_NOT_AVAILABLE}
+                onSave={file => this.setState({theFile: file}, this.handleSubmit)}
               />
             </Suspense>
           </Tabs.Panel>

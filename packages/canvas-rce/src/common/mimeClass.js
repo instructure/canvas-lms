@@ -99,6 +99,7 @@ export function mimeClass(file) {
         "video/x-sgi-movie": "video",
         "video/3gpp": "video",
         "video/mp4": "video",
+        "video/webm": "video",
         "application/x-shockwave-flash": "flash"
       }[contentType] || "file"
     );

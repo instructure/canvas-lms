@@ -34,7 +34,8 @@ const uploadMediaTranslations = {
     RECORD_PANEL_TITLE: 'Record',
     SUBMIT_TEXT: 'Submit',
     UPLOADING_ERROR: 'Upload Error',
-    UPLOAD_MEDIA_LABEL: 'Upload Media'
+    UPLOAD_MEDIA_LABEL: 'Upload Media',
+    MEDIA_RECORD_NOT_AVAILABLE: 'Record not available'
   }
 }
 

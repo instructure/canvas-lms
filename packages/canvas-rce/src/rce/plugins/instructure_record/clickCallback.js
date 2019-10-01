@@ -64,7 +64,7 @@ export default function(ed, document) {
             onStartUpload={fileProps => handleStartUpload(fileProps)}
             onComplete={(err, data) => handleUpload(err, data, contentProps.mediaUploadComplete)}
             onDismiss={handleDismiss}
-            tabs={{embed: false, record: false, upload: true}}
+            tabs={{embed: false, record: true, upload: true}}
             uploadMediaTranslations={
               {UploadMediaStrings: {
                 ADD_CLOSED_CAPTIONS_OR_SUBTITLES: formatMessage('Add CC/Subtitles'),
@@ -82,7 +82,8 @@ export default function(ed, document) {
                 RECORD_PANEL_TITLE: formatMessage('Record'),
                 SUBMIT_TEXT: formatMessage('Submit'),
                 UPLOADING_ERROR: formatMessage('Upload Error'),
-                UPLOAD_MEDIA_LABEL: formatMessage('Upload Media')
+                UPLOAD_MEDIA_LABEL: formatMessage('Upload Media'),
+                MEDIA_RECORD_NOT_AVAILABLE: formatMessage('Audio and Video recording is not available.')
               }
             }}
           />
