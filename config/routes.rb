@@ -991,6 +991,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/folders/by_path', controller: :folders, action: :resolve_path
       get 'courses/:course_id/folders/media', controller: :folders, action: :media_folder
       get 'courses/:course_id/folders/:id', controller: :folders, action: :show, as: 'course_folder'
+      get 'media_objects', controller: 'media_objects', action: :index, as: :media_objects
       put 'accounts/:account_id/courses', action: :batch_update
       post 'courses/:course_id/ping', action: :ping, as: 'course_ping'
 

@@ -35,6 +35,9 @@ describe MediaObjectsController do
       get 'show', params: {:media_object_id => missing_media_id}
       expect(json_parse(response.body)).to eq({
               'can_add_captions' => false,
+              'media_id' => missing_media_id,
+              'user_entered_title' => nil,
+              'title' => nil,
               'media_tracks' => [],
               'media_sources' => [{"bitrate"=>12345, "label"=>"12 kbps", "src"=>"whatever man", "url"=>"whatever man"}]
       })
@@ -51,9 +54,77 @@ describe MediaObjectsController do
       get 'show', params: {:media_object_id => deleted_media_id}
       expect(json_parse(response.body)).to eq({
           'can_add_captions' => false,
+          'media_id' => deleted_media_id,
+          'title' => nil,
+          'user_entered_title' => nil,
           'media_tracks' => [],
           'media_sources' => [{"bitrate"=>12345, "label"=>"12 kbps", "src"=>"whatever man", "url"=>"whatever man"}]
       })
+    end
+
+  end
+
+  describe "GET 'index'" do
+    before do
+      # We don't actually want to ping kaltura during these tests
+      allow(MediaObject).to receive(:media_id_exists?).and_return(true)
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return([{:url => "whatever man", :bitrate => 12345}])
+    end
+
+    it "should retrieve all MediaObjects user has created" do
+      user_factory
+      user_session(@user)
+      MediaObject.create!(:user_id => @user, :media_id => "test")
+      MediaObject.create!(:user_id => @user, :media_id => "test2")
+      MediaObject.create!(:user_id => @user, :media_id => "test3")
+
+      get 'index'
+      expect(json_parse(response.body)).to eq([
+        {
+          "can_add_captions"=>true,
+         "media_id"=>"test3",
+         "media_sources"=>
+          [{"bitrate"=>12345,
+            "label"=>"12 kbps",
+            "src"=>"whatever man",
+            "url"=>"whatever man"}],
+         "media_tracks"=>[],
+         "title"=>nil,
+         "user_entered_title"=>nil
+        },
+        {"can_add_captions"=>true,
+         "media_id"=>"test2",
+         "media_sources"=>
+          [{"bitrate"=>12345,
+            "label"=>"12 kbps",
+            "src"=>"whatever man",
+            "url"=>"whatever man"}],
+         "media_tracks"=>[],
+         "title"=>nil,
+         "user_entered_title"=>nil},
+        {"can_add_captions"=>true,
+         "media_id"=>"test",
+         "media_sources"=>
+          [{"bitrate"=>12345,
+            "label"=>"12 kbps",
+            "src"=>"whatever man",
+            "url"=>"whatever man"}],
+         "media_tracks"=>[],
+         "title"=>nil,
+         "user_entered_title"=>nil}
+      ])
+    end
+
+    it "will not retrive items you did not create" do
+      user1 = user_factory
+      user2 = user_factory
+      user_session(user1)
+      MediaObject.create!(:user_id => user2, :media_id => "test")
+      MediaObject.create!(:user_id => user2, :media_id => "test2")
+      MediaObject.create!(:user_id => user2, :media_id => "test3")
+
+      get 'index'
+      expect(json_parse(response.body)).to eq([])
     end
   end
 end
