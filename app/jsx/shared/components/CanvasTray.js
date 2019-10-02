@@ -65,7 +65,7 @@ export default function CanvasTray({
   return (
     <Tray label={label} onDismiss={onDismiss} {...otherTrayProps}>
       <View as="div" padding={padding}>
-        <Flex>
+        <Flex padding="0 0 small 0">
           <Flex.Item grow>
             <Heading>{label}</Heading>
           </Flex.Item>

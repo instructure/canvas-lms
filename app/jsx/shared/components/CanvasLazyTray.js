@@ -16,30 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!direct_share_course_tray'
-import React, {lazy} from 'react'
-import CanvasLazyTray from 'jsx/shared/components/CanvasLazyTray'
+import I18n from 'i18n!canvas_lazy_tray'
+import React, {Suspense} from 'react'
+import CanvasTray from 'jsx/shared/components/CanvasTray'
+import {Spinner} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
-const DirectShareCoursePanel = lazy(() => import('jsx/shared/direct_share/DirectShareCoursePanel'))
+// children should be a react `lazy`. This won't work properly otherwise.
+export default function CanvasLazyTray({children, ...trayProps}) {
+  const suspenseFallback = (
+    <View as="div" textAlign="center">
+      <Spinner renderTitle={I18n.t('Loading...')} />
+    </View>
+  )
 
-export default function DirectShareCourseTray({
-  sourceCourseId,
-  contentSelection,
-  onDismiss,
-  ...trayProps
-}) {
   return (
-    <CanvasLazyTray
-      label={I18n.t('Copy To...')}
-      placement="end"
-      onDismiss={onDismiss}
-      {...trayProps}
-    >
-      <DirectShareCoursePanel
-        sourceCourseId={sourceCourseId}
-        contentSelection={contentSelection}
-        onCancel={onDismiss}
-      />
-    </CanvasLazyTray>
+    <CanvasTray {...trayProps}>
+      <Suspense fallback={suspenseFallback}>{children}</Suspense>
+    </CanvasTray>
   )
 }
