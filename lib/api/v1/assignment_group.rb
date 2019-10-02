@@ -40,6 +40,11 @@ module Api::V1::AssignmentGroup
     if includes.include?('assignments')
       assignments = opts[:assignments] || group.visible_assignments(user)
 
+      # Preload assignments' post policies for Assignment#assignment_json.
+      if assignments.present? && assignments.first.context.post_policies_enabled?
+        ActiveRecord::Associations::Preloader.new.preload(assignments, :post_policy)
+      end
+
       user_content_attachments = opts[:preloaded_user_content_attachments]
       unless opts[:exclude_response_fields].include?('description')
         user_content_attachments ||= api_bulk_load_user_content_attachments(assignments.map(&:description), group.context)
