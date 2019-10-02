@@ -1097,7 +1097,7 @@ describe ApplicationController do
         course_factory
         student_in_course(:user => @user, :course => @course)
         expect(@course).to_not be_available
-        expect(@user.cached_current_enrollments).to be_empty
+        expect(@user.cached_currentish_enrollments).to be_empty
         @other_group = group_model(:context => @course)
         group_model(:context => @course)
         @group.add_user(@user)

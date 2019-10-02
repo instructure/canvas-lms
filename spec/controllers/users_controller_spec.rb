@@ -284,37 +284,6 @@ describe UsersController do
     end
   end
 
-  context "todo items" do
-
-    it "should respect grading permissions" do
-      course_with_student_logged_in(:course_name => "some-course", :active_all => 1)
-      @student = @user
-      course_with_teacher(course: @course, :active_all => 1)
-      @teacher = @user
-      course_with_ta(course: @course, :active_all => 1)
-      @ta = @user
-      assignment = @course.assignments.create!(grading_type: "points", points_possible: 10.0, submission_types: "online_text_entry", workflow_state: "published")
-      assignment.submit_homework(@student, submission_type: "online_text_entry", body: "<p>blah blah blah</p>")
-
-      user_session(@ta)
-
-      get "todo_items"
-      expect(response).to be_successful
-      response_json = json_parse(response.body)
-      expect(response_json.length).to eq 1
-
-      RoleOverride.create!(:context => @course.account,
-                           :permission => 'manage_grades',
-                           :role => ta_role,
-                           :enabled => false)
-
-      get "todo_items"
-      expect(response).to be_successful
-      response_json = json_parse(response.body)
-      expect(response_json.length).to eq 0
-    end
-  end
-
   describe "POST 'create'" do
     it "should not allow creating when self_registration is disabled and you're not an admin'" do
       post 'create', params: {:pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }}

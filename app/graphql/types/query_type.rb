@@ -85,7 +85,7 @@ module Types
     def all_courses
         # TODO: really need a way to share similar logic like this
         # with controllers in api/v1
-        current_user&.cached_current_enrollments(preload_courses: true).
+        current_user&.cached_currentish_enrollments(preload_courses: true).
           index_by(&:course_id).values.
           sort_by! { |enrollment|
             Canvas::ICU.collation_key(enrollment.course.nickname_for(current_user))

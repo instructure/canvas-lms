@@ -3109,7 +3109,7 @@ class CoursesController < ApplicationController
       enrollments = user.participating_enrollments
       ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
     else
-      enrollments = user.cached_current_enrollments(preload_courses: true)
+      enrollments = user.cached_currentish_enrollments(preload_courses: true)
     end
 
     if include_observed
