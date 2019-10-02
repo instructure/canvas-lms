@@ -618,8 +618,12 @@ class FilesController < ApplicationController
   # a canvas URL are at least on a separate subdomain and the javascript
   # won't be able to access or update data with AJAX requests.
   def safer_domain_available?
-    if !@files_domain && request.host_with_port != HostUrl.file_host(@domain_root_account, request.host_with_port)
-      @safer_domain_host = HostUrl.file_host_with_shard(@domain_root_account, request.host_with_port)
+    # In the dev env, we use a port but we don't want to redirect to another domain. So ignore the port
+    # when checking the files domain in the dev env. This could prob be done in prod, i'm just unfamiliar
+    # with this feature and this change touches all file handling, so i'm being safe and only ignoring the port in dev.
+    effective_host_with_port = (Rails.env.production? ? request.host_with_port : request.host)
+    if !@files_domain && effective_host_with_port != HostUrl.file_host(@domain_root_account, effective_host_with_port)
+      @safer_domain_host = HostUrl.file_host_with_shard(@domain_root_account, effective_host_with_port)
     end
     !!@safer_domain_host
   end
@@ -655,6 +659,7 @@ class FilesController < ApplicationController
       if params[:file_path] || !params[:wrap]
         send_stored_file(attachment)
       else
+
         # If the file is inlineable then redirect to the 'show' action
         # so we can wrap it in all the Canvas header/footer stuff
         redirect_to(named_context_url(@context, :context_file_url, attachment.id))
