@@ -23,7 +23,7 @@ import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../sidebar/sources/fake'
 import CanvasContentTray from '../CanvasContentTray'
 
-describe.skip('RCE Plugins > CanvasContentTray', () => {
+describe('RCE Plugins > CanvasContentTray', () => {
   let component
   let props
 
@@ -125,7 +125,7 @@ describe.skip('RCE Plugins > CanvasContentTray', () => {
     })
 
     it('is the images panel for image content types', async () => {
-      await showTrayForPlugin('images')
+      await showTrayForPlugin('course_images')
       expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
     })
 
