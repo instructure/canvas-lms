@@ -21,11 +21,9 @@ import I18n from 'i18n!direct_share_course_panel'
 import React, {useState} from 'react'
 import {func, string} from 'prop-types'
 
-import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
-
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 import contentSelectionShape from 'jsx/shared/proptypes/contentSelection'
+import ConfirmActionButtonBar from '../components/ConfirmActionButtonBar'
 import ManagedCourseSelector from '../components/ManagedCourseSelector'
 import DirectShareOperationStatus from './DirectShareOperationStatus'
 
@@ -56,12 +54,6 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
     )
   }
 
-  const copyButton = startCopyOperationPromise ? null : (
-    <Button variant="primary" disabled={selectedCourse === null} onClick={startCopyOperation}>
-      {I18n.t('Copy')}
-    </Button>
-  )
-
   return (
     <>
       <DirectShareOperationStatus
@@ -71,14 +63,14 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
         errorMsg={I18n.t('There was a problem starting the copy operation')}
       />
       <ManagedCourseSelector onCourseSelected={setSelectedCourse} />
-      <Flex justifyItems="end" padding="small 0 0 0">
-        <Flex.Item>
-          {copyButton}
-          <Button margin="0 0 0 x-small" onClick={onCancel}>
-            {startCopyOperationPromise ? I18n.t('Close') : I18n.t('Cancel')}
-          </Button>
-        </Flex.Item>
-      </Flex>
+      <ConfirmActionButtonBar
+        padding="small 0 0 0"
+        primaryLabel={startCopyOperationPromise ? null : I18n.t('Copy')}
+        primaryDisabled={selectedCourse === null}
+        secondaryLabel={startCopyOperationPromise ? I18n.t('Close') : I18n.t('Cancel')}
+        onPrimaryClick={startCopyOperation}
+        onSecondaryClick={onCancel}
+      />
     </>
   )
 }
