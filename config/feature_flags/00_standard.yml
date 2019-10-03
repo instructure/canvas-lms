@@ -437,6 +437,7 @@ analytics_2:
   applies_to: RootAccount
   display_name: New Course and User Analytics
   description: Show new analytics for course and user data
+  after_state_change_proc: analytics_2_after_state_change_hook
 new_gradebook_plagiarism_indicator:
   state: hidden
   applies_to: RootAccount

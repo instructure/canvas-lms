@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require_relative '../../sharding_spec_helper'
+require 'apis/api_spec_helper'
+require 'sharding_spec_helper'
 
 describe "Feature Flags API", type: :request do
   let_once(:t_site_admin) { Account.site_admin }
@@ -445,7 +445,8 @@ describe "Feature Flags API", type: :request do
     it "should delete a feature flag" do
       t_root_account.feature_flags.create! feature: 'course_feature'
       api_call_as_user(t_root_admin, :delete, "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature",
-               { controller: 'feature_flags', action: 'delete', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature' })
+               { controller: 'feature_flags', action: 'delete', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature' },
+               {}, {}, { expected_status: 200 })
       expect(t_root_account.feature_flags.where(feature: 'course_feature')).to be_empty
     end
 
@@ -533,6 +534,15 @@ describe "Feature Flags API", type: :request do
            { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'custom_feature', state: 'on' })
       }.to change(t_state_changes, :size).by(1)
       expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'off', 'on']
+    end
+
+    it 'should fire when deleting a feature flag override (because of a hidden feature or otherwise)' do
+      t_course.enable_feature! 'custom_feature'
+      expect {
+        api_call_as_user(t_root_admin, :delete, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature",
+           { controller: 'feature_flags', action: 'delete', format: 'json', course_id: t_course.to_param, feature: 'custom_feature' })
+      }.to change(t_state_changes, :size).by(1)
+      expect(t_state_changes.last).to eql [t_root_admin.id, t_course.id, 'on', 'allowed']
     end
   end
 
