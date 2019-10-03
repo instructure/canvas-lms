@@ -174,7 +174,7 @@ window.rubricAssessment = {
           $ratingsContainers.css('height', (maxHeight - 10) + 'px');
         }
       });
-      $("html,body").scrollTop(scrollTop); 
+      //$("html,body").scrollTop(scrollTop);
     }
   },
 
