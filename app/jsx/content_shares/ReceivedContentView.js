@@ -16,21 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, lazy} from 'react'
 import I18n from 'i18n!content_share'
+import CanvasLazyTray from 'jsx/shared/components/CanvasLazyTray'
 import ContentHeading from './ContentHeading'
 import ReceivedTable from './ReceivedTable'
 import PreviewModal from './PreviewModal'
 import {Spinner, Text} from '@instructure/ui-elements'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 
+const CourseImportPanel = lazy(() => import('./CourseImportPanel'))
 const NoContent = () => <Text size="large">{I18n.t('No content has been shared with you.')}</Text>
 
 export default function ReceivedContentView() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [shares, setShares] = useState([])
-  const [currentPreviewShare, setCurrentPreviewShare] = useState(null)
+  const [currentContentShare, setCurrentContentShare] = useState(null)
+  const [whichModalOpen, setWhichModalOpen] = useState(null)
 
   const getSharesUrl = '/api/v1/users/self/content_shares/received'
 
@@ -42,11 +45,17 @@ export default function ReceivedContentView() {
   })
 
   function onPreview(share) {
-    setCurrentPreviewShare(share)
+    setCurrentContentShare(share)
+    setWhichModalOpen('preview')
   }
 
-  function onImport(shareId) {
-    console.log(`onImport action for ${shareId}`)
+  function onImport(share) {
+    setCurrentContentShare(share)
+    setWhichModalOpen('import')
+  }
+
+  function closeModal() {
+    setWhichModalOpen(null)
   }
 
   function renderBody() {
@@ -72,10 +81,18 @@ export default function ReceivedContentView() {
       />
       {renderBody()}
       <PreviewModal
-        open={currentPreviewShare !== null}
-        share={currentPreviewShare}
-        onDismiss={() => setCurrentPreviewShare(null)}
+        open={whichModalOpen === 'preview'}
+        share={currentContentShare}
+        onDismiss={closeModal}
       />
+      <CanvasLazyTray
+        label={I18n.t('Import...')}
+        open={whichModalOpen === 'import'}
+        placement="end"
+        onDismiss={closeModal}
+      >
+        <CourseImportPanel contentShare={currentContentShare} onClose={closeModal} />
+      </CanvasLazyTray>
     </>
   )
 }

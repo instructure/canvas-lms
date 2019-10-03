@@ -90,7 +90,7 @@ describe('content shares table', () => {
     const previewOption = getByTestId('import-menu-action')
     fireEvent.click(previewOption)
     expect(onImport).toHaveBeenCalledTimes(1)
-    expect(onImport).toHaveBeenCalledWith(assignmentShare.id)
+    expect(onImport).toHaveBeenCalledWith(assignmentShare)
     expect(onPreview).toHaveBeenCalledTimes(0)
   })
 })

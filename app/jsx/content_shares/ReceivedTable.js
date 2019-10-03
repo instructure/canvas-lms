@@ -51,7 +51,7 @@ export default function ReceivedTable({shares, onPreview, onImport}) {
         <Menu.Item data-testid="preview-menu-action" onSelect={() => onPreview(share)}>
           <IconEyeLine /> <View margin="0 0 0 x-small">{I18n.t('Preview')}</View>
         </Menu.Item>
-        <Menu.Item data-testid="import-menu-action" onSelect={() => onImport(share.id)}>
+        <Menu.Item data-testid="import-menu-action" onSelect={() => onImport(share)}>
           <IconImportLine /> <View margin="0 0 0 x-small">{I18n.t('Import')}</View>
         </Menu.Item>
       </Menu>

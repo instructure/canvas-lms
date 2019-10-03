@@ -25,6 +25,19 @@ import {assignmentShare} from 'jsx/content_shares/__tests__/test-utils'
 jest.mock('jsx/shared/effects/useFetchApi')
 
 describe('view of received content', () => {
+  let liveRegion
+
+  beforeAll(() => {
+    liveRegion = document.createElement('div')
+    liveRegion.id = 'flash_screenreader_holder'
+    liveRegion.setAttribute('role', 'alert')
+    document.body.appendChild(liveRegion)
+  })
+
+  afterAll(() => {
+    if (liveRegion) liveRegion.remove()
+  })
+
   it('renders spinner while loading', () => {
     useFetchApi.mockImplementationOnce(({loading}) => loading(true))
     const {getByText} = render(<ReceivedContentView />)
@@ -77,5 +90,17 @@ describe('view of received content', () => {
     fireEvent.click(getByText(/manage options/i))
     fireEvent.click(getByText('Preview'))
     expect(document.querySelector('iframe')).toBeInTheDocument()
+  })
+
+  it('displays the import tray when requested', async () => {
+    const shares = [assignmentShare]
+    useFetchApi.mockImplementationOnce(({loading, success}) => {
+      loading(false)
+      success(shares)
+    })
+    const {getByText, findByText} = render(<ReceivedContentView />)
+    fireEvent.click(getByText(/manage options/i))
+    fireEvent.click(getByText('Import'))
+    expect(await findByText(/select a course/i)).toBeInTheDocument()
   })
 })

@@ -20,11 +20,12 @@ import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useManagedCourseSearchApi from 'jsx/shared/effects/useManagedCourseSearchApi'
-import DirectShareCoursePanel from '../DirectShareCoursePanel'
+import CourseImportPanel from '../CourseImportPanel'
+import {mockShare} from 'jsx/content_shares/__tests__/test-utils'
 
 jest.mock('jsx/shared/effects/useManagedCourseSearchApi')
 
-describe('DirectShareCoursePanel', () => {
+describe('CourseImportPanel', () => {
   let ariaLive
 
   beforeAll(() => {
@@ -48,71 +49,61 @@ describe('DirectShareCoursePanel', () => {
     fetchMock.restore()
   })
 
-  it('disables the copy button initially', () => {
-    const {getByText} = render(<DirectShareCoursePanel />)
+  it('disables the import button initially', () => {
+    const {getByText} = render(<CourseImportPanel contentShare={mockShare()} />)
     expect(
-      getByText(/copy/i)
+      getByText(/import/i)
         .closest('button')
         .getAttribute('disabled')
     ).toBe('')
   })
 
-  it('enables the copy button when a course is selected', () => {
-    const {getByText} = render(<DirectShareCoursePanel />)
+  it('enables the import button when a course is selected', () => {
+    const {getByText} = render(<CourseImportPanel contentShare={mockShare()} />)
     fireEvent.click(getByText(/select a course/i))
     fireEvent.click(getByText('abc'))
-    const copyButton = getByText(/copy/i).closest('button')
+    const copyButton = getByText(/import/i).closest('button')
     expect(copyButton.getAttribute('disabled')).toBe(null)
   })
 
-  it('disables the copy button again when a course search is initiated', () => {
-    const {getByText, getByLabelText} = render(<DirectShareCoursePanel />)
+  it('disables the import button again when a course search is initiated', () => {
+    const {getByText, getByLabelText} = render(<CourseImportPanel contentShare={mockShare()} />)
     const input = getByLabelText(/select a course/i)
     fireEvent.click(input)
     fireEvent.click(getByText('abc'))
     fireEvent.change(input, {target: {value: 'foo'}})
     expect(
-      getByText(/copy/i)
+      getByText(/import/i)
         .closest('button')
         .getAttribute('disabled')
     ).toBe('')
   })
 
-  it('calls the onCancel property', () => {
-    const handleCancel = jest.fn()
-    const {getByText} = render(<DirectShareCoursePanel onCancel={handleCancel} />)
-    fireEvent.click(getByText(/cancel/i))
-    expect(handleCancel).toHaveBeenCalled()
-  })
-
-  it('starts a copy operation and reports status', async () => {
+  it('starts an import operation and reports status', async () => {
+    const share = mockShare()
     fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', {
       id: '8',
       workflow_state: 'running'
     })
     const {getByText, getByLabelText, queryByText} = render(
-      <DirectShareCoursePanel
-        sourceCourseId="42"
-        contentSelection={{discussion_topics: ['1123']}}
-      />
+      <CourseImportPanel contentShare={share} />
     )
     const input = getByLabelText(/select a course/i)
     fireEvent.click(input)
     fireEvent.click(getByText('abc'))
-    fireEvent.click(getByText(/copy/i))
-    expect(queryByText('Copy')).toBeNull()
+    fireEvent.click(getByText(/import/i))
+    expect(queryByText('Import')).toBeNull()
     expect(getByText('Close')).toBeInTheDocument()
     const [, fetchOptions] = fetchMock.lastCall()
     expect(fetchOptions.method).toBe('POST')
     expect(JSON.parse(fetchOptions.body)).toMatchObject({
-      migration_type: 'course_copy_importer',
-      select: {discussion_topics: ['1123']},
-      settings: {source_course_id: '42'}
+      migration_type: 'canvas_cartridge_importer',
+      settings: {content_export_id: share.content_export.id}
     })
     expect(getByText(/start/i)).toBeInTheDocument()
     await act(() => fetchMock.flush(true))
     expect(getByText(/success/)).toBeInTheDocument()
-    expect(queryByText('Copy')).toBeNull()
+    expect(queryByText('Import')).toBeNull()
     expect(getByText('Close')).toBeInTheDocument()
   })
 
@@ -128,15 +119,15 @@ describe('DirectShareCoursePanel', () => {
     it('reports an error if the fetch fails', async () => {
       fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
       const {getByText, getByLabelText, queryByText} = render(
-        <DirectShareCoursePanel sourceCourseId="42" />
+        <CourseImportPanel contentShare={mockShare()} />
       )
       const input = getByLabelText(/select a course/i)
       fireEvent.click(input)
       fireEvent.click(getByText('abc'))
-      fireEvent.click(getByText('Copy'))
+      fireEvent.click(getByText('Import'))
       await act(() => fetchMock.flush(true))
       expect(getByText(/problem/i)).toBeInTheDocument()
-      expect(queryByText('Copy')).toBeNull()
+      expect(queryByText('Import')).toBeNull()
       expect(getByText('Close')).toBeInTheDocument()
     })
   })
