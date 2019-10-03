@@ -185,6 +185,10 @@ module Importers
         if data['external_content']
           Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data['external_content'])
         end
+        migration.update_import_progress(98)
+
+        insert_into_module(course, migration)
+        migration.update_import_progress(99)
 
         adjust_dates(course, migration)
 
@@ -211,6 +215,21 @@ module Importers
       migration.imported_migration_items
     ensure
       ActiveRecord::Base.skip_touch_context(false)
+    end
+
+    def self.insert_into_module(course, migration)
+      module_id = migration.migration_settings[:insert_into_module_id]
+      return unless module_id.present?
+
+      mod = course.context_modules.find_by_id(module_id)
+      return unless mod
+
+      imported_items = migration.imported_migration_items
+      return unless imported_items.any?
+
+      start_pos = migration.migration_settings[:insert_into_module_position]
+      start_pos = start_pos.to_i unless start_pos.nil? # 0 = start; nil = end
+      mod.insert_items(imported_items, start_pos)
     end
 
     def self.adjust_dates(course, migration)

@@ -272,6 +272,15 @@ class ContentMigrationsController < ApplicationController
   #   The question bank to import questions into if not specified in the content
   #   package, if both bank id and name are set, id will take precedence.
   #
+  # @argument settings[insert_into_module_id] [Integer]
+  #   The id of a module in the target course. This will add all imported items
+  #   (that can be added to a module) to the given module.
+  #
+  # @argument settings[insert_into_module_position] [Integer]
+  #   The (1-based) position to insert the imported items into the course
+  #   (if +insert_into_module_id+ is supplied). If this parameter
+  #   is omitted, items will be added to the end of the module.
+  #
   # @argument date_shift_options[shift_dates] [Boolean]
   #   Whether to shift dates in the copied course
   #
