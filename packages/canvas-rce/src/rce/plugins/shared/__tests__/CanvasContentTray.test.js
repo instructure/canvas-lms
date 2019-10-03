@@ -23,7 +23,7 @@ import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../sidebar/sources/fake'
 import CanvasContentTray from '../CanvasContentTray'
 
-describe('RCE Plugins > CanvasContentTray', () => {
+describe.skip('RCE Plugins > CanvasContentTray', () => {
   let component
   let props
 
@@ -129,7 +129,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
       expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
     })
 
-    it.only('is the media panel for media content types', async () => {
+    it('is the media panel for media content types', async () => {
       await showTrayForPlugin('course_media')
       expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
     })
