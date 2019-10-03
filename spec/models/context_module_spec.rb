@@ -373,6 +373,46 @@ describe ContextModule do
     end
   end
 
+  describe "insert_items" do
+    before :once do
+      course_module
+      @attach = attachment_model context: @course, display_name: 'attach'
+      @assign = @course.assignments.create! title: 'assign'
+      @page = @course.wiki_pages.create! title: 'page'
+      @quiz = @course.quizzes.create! title: 'quiz'
+      @topic = @course.discussion_topics.create! title: 'topic'
+      @tool = @course.context_external_tools.create! name: 'tool', consumer_key: '1', shared_secret: '1', url: 'http://example.com/'
+      @module.add_item(type: 'context_module_sub_header', title: 'one')
+      @module.add_item(type: 'context_module_sub_header', title: 'two')
+      @module.add_item(type: 'context_module_sub_header', title: 'three')
+    end
+
+    it "appends items to the end of a module" do
+      @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool])
+      expect(@module.content_tags.order(:position).pluck(:title)).to eq(
+        %w(one two three attach assign page quiz topic tool))
+    end
+
+
+    it "inserts items into a module" do
+      @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool], 2)
+      expect(@module.content_tags.order(:position).pluck(:title)).to eq(
+        %w(one attach assign page quiz topic tool two three))
+    end
+
+    it "adds things to an empty module" do
+      empty = @course.context_modules.create! name: 'empty'
+      empty.insert_items([@attach, @assign])
+      expect(empty.content_tags.order(:position).pluck(:title)).to eq(%w(attach assign))
+    end
+
+    it "doesn't add weird things to a module" do
+      @module.insert_items([@attach, user_model, 'foo', @assign])
+      expect(@module.content_tags.order(:position).pluck(:title)).to eq(
+        %w(one two three attach assign))
+    end
+  end
+
   describe "completion_requirements=" do
     it "should assign completion requirements" do
       course_module
