@@ -159,6 +159,11 @@ module Interfaces::SubmissionInterface
   field :posted, Boolean, method: :posted?, null: false
   field :state, Types::SubmissionStateType, method: :workflow_state, null: false
 
+  field :grade_hidden, Boolean, null: false
+  def grade_hidden
+    !submission.user_can_read_grade?(current_user, session)
+  end
+
   field :submission_status, String, null: true
   def submission_status
     if submission.submission_type == 'online_quiz'

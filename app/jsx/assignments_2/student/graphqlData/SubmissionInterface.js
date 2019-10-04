@@ -31,9 +31,9 @@ export const SubmissionInterface = {
       deductedPoints
       enteredGrade
       grade
+      gradeHidden
       gradingStatus
       latePolicyStatus
-      posted
       state
       submissionDraft {
         ...SubmissionDraft
@@ -54,9 +54,9 @@ export const SubmissionInterface = {
     deductedPoints: number,
     enteredGrade: string,
     grade: string,
+    gradeHidden: bool.isRequired,
     gradingStatus: string,
     latePolicyStatus: string,
-    posted: bool.isRequired,
     state: string.isRequired,
     submissionDraft: SubmissionDraft.shape,
     submissionStatus: string,
@@ -73,10 +73,10 @@ export const DefaultMocks = {
     body: null,
     deductedPoints: null,
     enteredGrade: null,
+    gradeHidden: false,
     grade: null,
     gradingStatus: null,
     latePolicyStatus: null,
-    posted: true,
     state: 'unsubmitted',
     submissionDraft: null,
     submissionStatus: 'unsubmitted',

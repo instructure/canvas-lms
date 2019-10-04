@@ -2704,6 +2704,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   """
   excused: Boolean
   grade: String
+  gradeHidden: Boolean!
 
   """
   was the grade given on the current submission (resubmission)
@@ -2949,6 +2950,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   """
   excused: Boolean
   grade: String
+  gradeHidden: Boolean!
 
   """
   was the grade given on the current submission (resubmission)
@@ -3096,6 +3098,7 @@ interface SubmissionInterface {
   """
   excused: Boolean
   grade: String
+  gradeHidden: Boolean!
 
   """
   was the grade given on the current submission (resubmission)

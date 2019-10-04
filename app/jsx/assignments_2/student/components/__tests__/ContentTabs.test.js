@@ -170,9 +170,9 @@ describe('ContentTabs', () => {
     expect(queryByTestId('grade-display')).toBeNull()
   })
 
-  it('displays the correct message if the submission grade has not been posted', async () => {
+  it('displays the correct message if the submission grade is hidden', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: {posted: false}
+      Submission: {gradeHidden: true}
     })
 
     const {getAllByText, getByText} = render(
