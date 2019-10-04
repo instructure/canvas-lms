@@ -96,13 +96,19 @@ function getSourcesAndTracks (id) {
   $.getJSON(`/media_objects/${id}/info`, (data) => {
     // this 'when ...' is because right now in canvas, none of the mp3 urls actually work.
     // see: CNVS-12998
-    const sources = data.media_sources.filter(source => source.content_type !== 'audio/mp3').map((source) =>
-    // xsslint safeString.function sanitizeUrl
-    `<source
-        type='${htmlEscape(source.content_type)}'
-        src='${sanitizeUrl(htmlEscape(source.url))}'
-        title='${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(Math.floor(source.bitrate / 1024))} kbps'
-      />`
+    const sources = data.media_sources
+      .filter(source => source.content_type !== 'audio/mp3')
+      // mediaplayer plays the first source by default, which tends to be the highest
+      // resolution. sort so we play the lowest res. by default
+      .sort((a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10))
+      .map((source) => (
+        // xsslint safeString.function sanitizeUrl
+        `<source
+            type='${htmlEscape(source.content_type)}'
+            src='${sanitizeUrl(htmlEscape(source.url))}'
+            title='${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(Math.floor(source.bitrate / 1024))} kbps'
+          />`
+      )
     )
 
     const tracks = _.map(data.media_tracks, (track) => {
