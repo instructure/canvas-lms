@@ -32,10 +32,15 @@ import {useMutation} from 'react-apollo'
 function CommentContent(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
-  const [markCommentsRead, {called: mutationCalled, error: mutationError}] = useMutation(
+  const [markCommentsRead, {data, called: mutationCalled, error: mutationError}] = useMutation(
     MARK_SUBMISSION_COMMENT_READ,
     {
       update(cache) {
+        // ValidationError, different then the mutationError
+        if (data?.markSubmissionCommentsRead?.errors) {
+          return
+        }
+
         const submissionQueryVariables = {
           id: props.submission.id,
           fragment: Submission.fragment,
@@ -84,12 +89,12 @@ function CommentContent(props) {
   }, [markCommentsRead, props.comments, props.submission])
 
   useEffect(() => {
-    if (mutationCalled && !mutationError) {
+    if (mutationCalled && !mutationError && !data?.markSubmissionCommentsRead?.errors) {
       setOnSuccess(I18n.t('All submission comments have been marked as read'))
-    } else if (mutationError) {
+    } else if (mutationError || data?.markSubmissionCommentsRead?.errors) {
       setOnFailure(I18n.t('There was a problem marking submission comments as read'))
     }
-  }, [mutationCalled, mutationError, setOnFailure, setOnSuccess])
+  }, [data, mutationCalled, mutationError, setOnFailure, setOnSuccess])
 
   return (
     <>
