@@ -142,21 +142,52 @@ describe AssignmentConfigurationToolLookup do
     describe '#recreate_missing_subscriptions' do
       let(:initial_id) { 'initial-id-string' }
 
+      # Only create a tool for the root account and call
+      # recreate_missing_subscriptions for the root_account, because plagiarism
+      # tools are never really installed on individual subaccouts.
+      # `tool_proxy` is normally created with `account`, so we override `account` to be
+      # the root account, and Override `course` to use the subaccount
+      let(:account) { root_account }
+      let(:subaccount) { Account.create!(name: 'account', root_account: root_account) }
+      let(:course) { Course.create!(account: subaccount) }
+
       before { lookup.update!(subscription_id: initial_id) }
 
-      it 'creates a new subscription' do
-        expect do
-          AssignmentConfigurationToolLookup.recreate_missing_subscriptions(account, message_handler)
-        end.to change { lookup.reload.subscription_id }
+      context 'for a course in the subaccount' do
+        it 'creates a new subscription' do
+          expect do
+            AssignmentConfigurationToolLookup.recreate_missing_subscriptions(root_account, message_handler)
+          end.to change { lookup.reload.subscription_id }
+        end
+
+        context 'when no subscription existed' do
+          let(:initial_id) { nil }
+
+          it 'creates a new subscription' do
+            expect do
+              AssignmentConfigurationToolLookup.recreate_missing_subscriptions(root_account, message_handler)
+            end.to change { lookup.reload.subscription_id }
+          end
+        end
       end
 
-      context 'when no subscription existed' do
-        let(:initial_id) { nil }
+      context 'for a course in the root account' do
+        let(:course) { Course.create!(account: root_account) }
 
         it 'creates a new subscription' do
           expect do
-            AssignmentConfigurationToolLookup.recreate_missing_subscriptions(account, message_handler)
+            AssignmentConfigurationToolLookup.recreate_missing_subscriptions(root_account, message_handler)
           end.to change { lookup.reload.subscription_id }
+        end
+
+        context 'when no subscription existed' do
+          let(:initial_id) { nil }
+
+          it 'creates a new subscription' do
+            expect do
+              AssignmentConfigurationToolLookup.recreate_missing_subscriptions(root_account, message_handler)
+            end.to change { lookup.reload.subscription_id }
+          end
         end
       end
     end
