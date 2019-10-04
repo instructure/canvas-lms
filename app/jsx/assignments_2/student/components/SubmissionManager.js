@@ -49,7 +49,11 @@ export default class SubmissionManager extends Component {
     this.setState({uploadingFiles})
   }
 
-  updateSubmissionDraftCache = (cache, mutationResult) => {
+  updateSubmissionDraftCache = (cache, result) => {
+    if (result.data.createSubmissionDraft.errors) {
+      return
+    }
+
     const {assignment} = JSON.parse(
       JSON.stringify(
         cache.readQuery({
@@ -62,7 +66,7 @@ export default class SubmissionManager extends Component {
       )
     )
 
-    const newDraft = mutationResult.data.createSubmissionDraft.submissionDraft
+    const newDraft = result.data.createSubmissionDraft.submissionDraft
     assignment.submissionsConnection.nodes[0].submissionDraft = newDraft
 
     cache.writeQuery({
@@ -174,7 +178,7 @@ export default class SubmissionManager extends Component {
     return (
       <Mutation
         mutation={CREATE_SUBMISSION_DRAFT}
-        onCompleted={() => this.handleDraftComplete(true)}
+        onCompleted={data => this.handleDraftComplete(!data.createSubmissionDraft.errors)}
         onError={() => this.handleDraftComplete(false)}
         update={this.updateSubmissionDraftCache}
       >
