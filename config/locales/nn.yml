@@ -2549,6 +2549,7 @@ nn:
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Er du sikker på at du vil deaktivere Sync til %{sisName}for alle oppgåver?"
   are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: "Er du sikker på at du vil vise vurderingane for denne oppgåva til studentane?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Er du sikker på at du vil gjennomføre dette? Det kan ikkje angrast og overstyrer eksisterande vurderingar i vurderingsoversikta."
+  are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Er du sikker på at du vil vise vurderingane for denne oppgåva til studentane? "
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Er du sikker på at du vil publisere denne kommentaren?"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på at du vil fjerne karaktersetjingsperioden?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne verktøyet?"
@@ -3485,6 +3486,7 @@ nn:
   authorize_e3f25bb4: Autoriser
   authorize_url_f28167a3: "Godkjenn URL"
   auto_leader_7791c30a: auto_leader
+  autodetect_field_separators_in_compatible_spreadsh_768067e1: "Autogjenkjenn feltskilje i kompatible reknearkeksportar"
   autodetect_field_separators_in_gradebook_exports_ed9a9d77: "Autogjenkjenn feltskilje ved eksport av vurderingsoversikt"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Bruk automatisk resultatutrekning på for seine innleveringar"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Bruk automatisk vurdering for manglande innleveringar"
@@ -15151,6 +15153,7 @@ nn:
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "Posta den:"
   posted_to_student_861beec9: "Sende til student"
+  posting_grades_cd7cd758: "Postar vurderingsresultat"
   posting_grades_is_not_allowed_because_grades_have__229d9c9e: "Kan ikkje poste vurderingar fordi vurderingane for oppgåva ikkje er opna for innsyn enno."
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Nettlesaren oppdaterast når du postar vurderingsresultat. Det kan ta litt tid. "
   posting_to_students_eaa57964: "Postar til studentar"
@@ -18914,6 +18917,7 @@ nn:
       aria_stop: "Klikk \"Stopp\" for å avslutte innspeling."
     edit_view_rubric: "Vis vurderingsskjema"
     group: Gruppe
+    mic_blocked_message: "Løyve til å bruke mikrofon er sperra. Dersom du vil endre, må du gå til chrome://settings/content/microphone"
     mute_assignment: "Skjul oppgåve"
     no_submission_time: "inga tid for innlevering"
     nodetect_message: "Fann ikkje innspelt tale. Du må justere mikrofoninnstillingane."
@@ -21607,6 +21611,7 @@ nn:
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Ved å bruke \"Kva-skjer-dersom\"-utrekning, kan du sjå korleis sluttresultatet ditt vert påverka av komande innleveringar eller innleveringar som leverast på nytt. Du kan rekne ut resultat for ei oppgåve som allereie har fått ei vurdering, eller ei oppgåve som ikkje er vurdert enno. "
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Du kan ikkje tilordne ei gruppe utanfor oppgåva sitt gruppesett"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan ikkje redigere emne for denne underkontoen."
+  you_cannot_leave_leave_comments_until_you_submit_t_d3dcb44c: "Du kan ikkje kommentere før du har levert oppgåva"
   you_cannot_publish_this_assignment_while_there_are_e3dee69a: "Du kan ikkje publisere oppgåve med feil"
   you_cannot_remove_this_enrollment_c87be1cb: "Du kan ikkje fjerne denne påmeldinga."
   you_cannot_remove_your_default_email_address_8ed68e52: "Du kan ikkje fjerne standard e-postadresse"
