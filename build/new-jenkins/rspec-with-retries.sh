@@ -10,7 +10,7 @@ test_failure_status=99
 
 max_failures=${MAX_FAIL:=200} # TODO: need to get env variable setup, MAX number of failures before quit
 rerun_number=0
-runs_remaining=$((1+${RERUNS_RETRY:=2})) # TODO: get env variable setup, number of retries
+runs_remaining=$((1+${RERUNS_RETRY:=2}))
 
 rerun_line="adding spec to rerun (\./[^ ]+)"
 exempt_from_rerun_threshold_line="exceptions are exempt from rerun thresholds"
@@ -32,9 +32,17 @@ while true; do
     docker-compose exec -T web bash -c "grep -hnr 'failed' /usr/src/app/tmp/rspec"
     echo "CAT THE ENTIRE FILE"
     docker-compose exec -T web bash -c "cat /usr/src/app/tmp/rspec"
-    command="build/new-jenkins/rspec-tests.sh only-failures"
+    if [ $1 ] && [ $1 = 'performance' ]; then
+      command="docker-compose exec -T web bundle exec rspec -O spec/spec.opts spec/selenium/performance/ --only-failures --failure-exit-code 99";
+    else
+      command="build/new-jenkins/rspec-tests.sh only-failures";
+    fi
   else
-    command="build/new-jenkins/rspec-tests.sh"
+    if [ $1 ] && [ $1 = 'performance' ]; then
+      command="docker-compose exec -T web bundle exec rspec -O spec/spec.opts spec/selenium/performance/ --failure-exit-code 99"
+    else
+      command="build/new-jenkins/rspec-tests.sh"
+    fi
   fi
   echo "Running $command"
   $command >$pipe 2>&1 &
