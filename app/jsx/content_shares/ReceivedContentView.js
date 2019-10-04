@@ -40,19 +40,33 @@ export default function ReceivedContentView() {
   const [currentContentShare, setCurrentContentShare] = useState(null)
   const [whichModalOpen, setWhichModalOpen] = useState(null)
 
-  const getSharesUrl = '/api/v1/users/self/content_shares/received'
+  const sharesUrl = '/api/v1/users/self/content_shares'
 
   useFetchApi({
     success: setShares,
     meta: setResponseMeta,
     error: setError,
     loading: setIsLoading,
-    path: getSharesUrl,
+    path: `${sharesUrl}/received`,
     params: {page: currentPage}
   })
 
   function removeShareFromList(doomedShare) {
     setShares(shares.filter(share => share.id !== doomedShare.id))
+  }
+
+  // Handle an update to a read state from the displayed table
+  function onUpdate(share_id, updateParms) {
+    doFetchApi({
+      method: 'PUT',
+      path: `${sharesUrl}/${share_id}`,
+      body: updateParms
+    })
+      .then(r => {
+        const {id, read_state} = r.json
+        setShares(shares.map(share => (share.id === id ? {...share, read_state} : share)))
+      })
+      .catch(setError)
   }
 
   function onPreview(share) {
@@ -69,7 +83,7 @@ export default function ReceivedContentView() {
     // eslint-disable-next-line no-alert
     const shouldRemove = window.confirm(I18n.t('Are you sure you wan to remove this item?'))
     if (shouldRemove) {
-      doFetchApi({path: `/api/v1/users/self/content_shares/${share.id}`, method: 'DELETE'})
+      doFetchApi({path: `${sharesUrl}/${share.id}`, method: 'DELETE'})
         .then(() => removeShareFromList(share))
         .catch(err =>
           showFlashAlert({message: I18n.t('There was an error removing the item'), err})
@@ -92,6 +106,7 @@ export default function ReceivedContentView() {
           onPreview={onPreview}
           onImport={onImport}
           onRemove={onRemove}
+          onUpdate={onUpdate}
         />
       )
     return <NoContent />

@@ -41,10 +41,11 @@ ReceivedTable.propTypes = {
   shares: arrayOf(contentShareShape),
   onPreview: func,
   onImport: func,
-  onRemove: func
+  onRemove: func,
+  onUpdate: func
 }
 
-export default function ReceivedTable({shares, onPreview, onImport, onRemove}) {
+export default function ReceivedTable({shares, onPreview, onImport, onUpdate, onRemove}) {
   function renderActionMenu(share) {
     return (
       <Menu
@@ -70,21 +71,42 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove}) {
     )
   }
 
-  function renderUnreadBadge(state) {
-    if (state !== 'read')
+  function renderUnreadBadge({id, name, read_state}) {
+    function setReadState() {
+      if (typeof onUpdate === 'function') onUpdate(id, {read_state: 'read'})
+    }
+
+    function srText() {
+      if (read_state === 'unread') {
+        return I18n.t('%{name} is unread, click to mark as read', {name})
+      }
+      return I18n.t('%{name} has been read', {name})
+    }
+
+    if (read_state !== 'read')
       return (
-        <div data-testid="received-table-row-unread">
-          <Badge margin="0 0 xxx-small 0" standalone type="notification" />
-          <ScreenReaderContent>{I18n.t('unread')}</ScreenReaderContent>
-        </div>
+        <Button
+          variant="link"
+          size="small"
+          data-testid="received-table-row-unread"
+          onClick={setReadState}
+        >
+          <Badge standalone type="notification" />
+          <ScreenReaderContent>{srText()}</ScreenReaderContent>
+        </Button>
       )
-    else return <ScreenReaderContent>{I18n.t('read')}</ScreenReaderContent>
+    else
+      return (
+        <Button variant="link" size="small" data-testid="received-table-row-read" disabled>
+          <ScreenReaderContent>{srText()}</ScreenReaderContent>
+        </Button>
+      )
   }
 
   function renderRow(share) {
     return (
       <Table.Row key={share.id}>
-        <Table.Cell textAlign="end">{renderUnreadBadge(share.read_state)}</Table.Cell>
+        <Table.Cell textAlign="end">{renderUnreadBadge(share)}</Table.Cell>
         <Table.Cell>{share.name}</Table.Cell>
         <Table.Cell>
           <Text>{friendlyShareNames[share.content_type]}</Text>
