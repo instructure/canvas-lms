@@ -59,7 +59,7 @@ module Api::V1::AssignmentGroup
 
       unless opts[:exclude_response_fields].include?('in_closed_grading_period')
         closed_grading_period_hash = opts[:closed_grading_period_hash] ||
-          in_closed_grading_period_hash(group.context, assignments)
+          EffectiveDueDates.for_course(group.context, assignments).to_hash([:in_closed_grading_period])
       end
 
       hash['assignments'] = assignments.map do |assignment|
@@ -102,43 +102,6 @@ module Api::V1::AssignmentGroup
     end
 
     hash
-  end
-
-  def in_closed_grading_period_hash(context, assignments)
-    current_time = Time.zone.now
-    grading_periods = GradingPeriodGroup.for_course(context)&.grading_periods
-    closed_grading_periods = grading_periods&.where("? > close_date", current_time)
-
-    # If there are no closed grading periods, assignments can't be considered
-    # to be in a closed grading period.
-    return {} if closed_grading_periods.blank?
-
-    assignments_hash = {}
-    last_grading_period = grading_periods.order(end_date: :desc).first
-
-    submissions = Submission.
-      where(assignment: assignments.pluck(:id)).
-      where(
-        "grading_period_id IN (?) OR (grading_period_id IS NULL AND NOW() > ?)",
-        closed_grading_periods.pluck(:id),
-        last_grading_period.close_date
-      )
-
-    # This index_by will only have 1 submission per assignment, but that works
-    # fine for our purposes as an assignment is considered in a closed grading
-    # grading period if at least 1 submission is in a closed grading period.
-    # This is defined behavior from the
-    # `assignment_closed_grading_period_hash.any?` check in
-    # #assignment_group_json.
-    # Assignments that do not have at least 1 submission in a closed period
-    # will not be present in this hash.
-    submissions.index_by(&:assignment_id).each do |assignment_id, submission|
-      submission_hash = {in_closed_grading_period: true}
-      assignments_hash[assignment_id] = {}
-      assignments_hash[assignment_id][submission.user_id] = submission_hash
-    end
-
-    assignments_hash
   end
 
   def update_assignment_group(assignment_group, params)
