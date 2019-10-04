@@ -200,6 +200,7 @@ class Account < ActiveRecord::Base
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
+  add_setting :can_add_pronouns, :boolean => true, :root_only => true, :default => false
 
   add_setting :self_enrollment
   add_setting :equella_endpoint
@@ -300,6 +301,12 @@ class Account < ActiveRecord::Base
       global_includes?
     else
       root_account.try(:sub_account_includes?) && root_account.try(:allow_global_includes?)
+    end
+  end
+
+  def pronouns
+    self.shard.activate do
+      AccountPronoun.where(account: [self, nil]).to_a
     end
   end
 

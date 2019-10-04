@@ -56,6 +56,17 @@ describe Account do
     # account_model
     # @a.to_atom.should be_is_a(Atom::Entry)
   # end
+  #
+  it "should list all account pronouns" do
+    account1 = Account.create!
+    account2 = Account.create!
+    AccountPronoun.create_defaults
+    ap1 = AccountPronoun.create!(pronoun: "account 1 pronoun", account: account1)
+    AccountPronoun.create!(pronoun: "account 2 pronoun", account: account2)
+    expect(account1.pronouns.count).to eq 4
+    expect(account1.pronouns).to include(ap1)
+    expect(account2.pronouns).not_to include(ap1)
+  end
 
   context "course lists" do
     before :once do

@@ -172,6 +172,7 @@ class User < ActiveRecord::Base
   has_many :past_lti_ids, class_name: 'UserPastLtiId', inverse_of: :user
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
+  belongs_to :account_pronoun
 
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
