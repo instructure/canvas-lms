@@ -22,37 +22,35 @@ import {ExternalTool} from '../../../graphqlData/ExternalTool'
 import GenericErrorPage from '../../../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2_initial_query'
 import LoadingIndicator from '../../../../shared/LoadingIndicator'
-import {Query} from 'react-apollo'
+import {useQuery} from 'react-apollo'
 import React from 'react'
 import Tools from './Tools'
 import {USER_GROUPS_QUERY} from '../../../graphqlData/Queries'
 
 const UserGroupsQuery = props => {
-  return (
-    <Query query={USER_GROUPS_QUERY} variables={{userID: props.userID}}>
-      {({loading, error, data}) => {
-        if (loading) return <LoadingIndicator />
-        if (error) {
-          return (
-            <GenericErrorPage
-              imageUrl={errorShipUrl}
-              errorSubject={I18n.t('User groups query error')}
-              errorCategory={I18n.t('Assignments 2 Student Error Page')}
-            />
-          )
-        }
+  const {loading, error, data} = useQuery(USER_GROUPS_QUERY, {
+    variables: {userID: props.userID}
+  })
 
-        return (
-          <Tools
-            assignmentID={props.assignmentID}
-            courseID={props.courseID}
-            handleCanvasFileSelect={props.handleCanvasFileSelect}
-            tools={props.tools}
-            userGroups={data.legacyNode}
-          />
-        )
-      }}
-    </Query>
+  if (loading) return <LoadingIndicator />
+  if (error) {
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorSubject={I18n.t('User groups query error')}
+        errorCategory={I18n.t('Assignments 2 Student Error Page')}
+      />
+    )
+  }
+
+  return (
+    <Tools
+      assignmentID={props.assignmentID}
+      courseID={props.courseID}
+      handleCanvasFileSelect={props.handleCanvasFileSelect}
+      tools={props.tools}
+      userGroups={data.legacyNode}
+    />
   )
 }
 UserGroupsQuery.propTypes = {
