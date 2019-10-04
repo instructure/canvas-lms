@@ -59,8 +59,10 @@ module LiveEvents
       @queue << {
         data: event_json,
         partition_key: partition_key,
-        statsd_prefix: "live_events.events.#{event[:attributes][:event_name]}",
-        total_bytes: total_bytes
+        statsd_prefix: "live_events.events",
+        tags: { event: event[:attributes][:event_name] },
+        total_bytes: total_bytes,
+        request_id: event[:attributes][:request_id]
       }
       true
     end
@@ -146,18 +148,28 @@ module LiveEvents
 
     def process_results(res, records)
       res.records.each_with_index do |r, i|
+        rec = records[i]
         if r.error_code.present?
-          log_unprocessed(records[i])
+          log_unprocessed(rec, r.error_code, r.error_message)
         else
-          LiveEvents&.statsd&.increment("#{records[i][:statsd_prefix]}.sends")
+          LiveEvents&.statsd&.increment("#{rec[:statsd_prefix]}.sends", tags: rec[:tags])
           nil
         end
       end.compact
     end
 
-    def log_unprocessed(record)
-      logger.error("Error posting event #{record[:statsd_prefix]} with partition key #{record[:partition_key]}: #{record[:data]}")
-      LiveEvents&.statsd&.increment("#{record[:statsd_prefix]}.send_errors")
+    def log_unprocessed(record, error_code, error_message)
+      logger.error(
+        "Error posting event #{record.dig(:tags, :event)} with partition key #{record[:partition_key]}. Error Code: #{error_code} | Error Message: #{error_message}"
+      )
+      logger.debug(
+        "Failed event data: #{record[:data]}"
+      )
+      LiveEvents&.error_reporter&.capture(:dropped_live_event, message: { request_id: record[:request_id], error_code: error_code, error_message: error_message }.to_json)
+      LiveEvents&.statsd&.increment(
+        "#{record[:statsd_prefix]}.send_errors",
+        tags: rec[:tags].merge(error_code: error_code)
+      )
     end
   end
 end
