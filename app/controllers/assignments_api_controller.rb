@@ -635,7 +635,7 @@ class AssignmentsApiController < ApplicationController
   # @argument bucket [String, "past"|"overdue"|"undated"|"ungraded"|"unsubmitted"|"upcoming"|"future"]
   #   If included, only return certain assignments depending on due date and submission status.
   # @argument assignment_ids[] if set, return only assignments specified
-  # @argument order_by [String, "position"|"name"]
+  # @argument order_by [String, "position"|"name"|"due_at"]
   #   Determines the order of the assignments. Defaults to "position".
   # @argument post_to_sis [Boolean]
   #   Return only assignments that have post_to_sis set or not set.
@@ -745,7 +745,16 @@ class AssignmentsApiController < ApplicationController
         end
         scope = scope.where(id: params[:assignment_ids])
       end
-      scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id")) if params[:order_by] == 'name'
+      case params[:order_by]
+      when 'name'
+        scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+      when 'due_at'
+        if @context.grants_right?(user, :read_as_admin)
+          scope = scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+        else
+          scope = scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+        end
+      end
 
       assignments = if params[:assignment_group_id].present?
         assignment_group_id = params[:assignment_group_id]

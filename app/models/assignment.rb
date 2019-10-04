@@ -2571,6 +2571,15 @@ class Assignment < ActiveRecord::Base
           WHERE s.user_id = #{User.connection.quote(user)} AND s.workflow_state <> 'deleted') AS assignments")
   end
 
+  scope :with_latest_due_date, -> do
+    from("(SELECT GREATEST(a.due_at, MAX(ao.due_at)) latest_due_date, a.*
+          FROM #{Assignment.quoted_table_name} a
+          LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON ao.assignment_id = a.id
+          AND ao.due_at_overridden
+          GROUP BY a.id) AS assignments")
+  end
+
   scope :updated_after, lambda { |*args|
     if args.first
       where("assignments.updated_at IS NULL OR assignments.updated_at>?", args.first)

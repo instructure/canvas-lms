@@ -5802,6 +5802,38 @@ describe Assignment do
     end
   end
 
+  context "with_latest_due_date" do
+    before :once do
+      course_factory
+      @s2 = @course.course_sections.create! name: 'other section'
+      @dates = (0..7).map { |x| DateTime.new(2020, 1, 10 + x, 12, 0, 0) }
+      @a1 = @course.assignments.create!(title: 'no due date')
+      @a2 = @course.assignments.create!(title: 'no overrides', due_at: @dates[0])
+      @a3 = @course.assignments.create!(title: 'latest is override', due_at: @dates[1])
+      assignment_override_model(assignment: @a3, set: @course.default_section, due_at: @dates[2])
+      @a4 = @course.assignments.create!(title: 'latest is base', due_at: @dates[4])
+      assignment_override_model(assignment: @a4, set: @course.default_section, due_at: @dates[3])
+      @a5 = @course.assignments.create!(title: 'two overrides', due_at: @dates[5])
+      assignment_override_model(assignment: @a5, set: @course.default_section, due_at: @dates[4])
+      assignment_override_model(assignment: @a5, set: @s2, due_at: @dates[6])
+      @a6 = @course.assignments.create!(title: 'only overrides')
+      assignment_override_model(assignment: @a6, set: @s2, due_at: @dates[6])
+      assignment_override_model(assignment: @a6, set: @course.default_section, due_at: @dates[7])
+    end
+
+    it "returns the latest override in each circumstance" do
+      assignments = @course.assignments.with_latest_due_date.reorder('latest_due_date').to_a
+      expect(assignments.map { |a| [a.title, a.latest_due_date] }).to eq([
+        ['no overrides', @dates[0]],
+        ['latest is override', @dates[2]],
+        ['latest is base', @dates[4]],
+        ['two overrides', @dates[6]],
+        ['only overrides', @dates[7]],
+        ['no due date', nil]
+      ])
+    end
+  end
+
   context "due_between_with_overrides" do
     before :once do
       @assignment = @course.assignments.create!(:title => 'assignment', :due_at => Time.now)
