@@ -57,10 +57,7 @@ export default function SectionsTooltip ({ sections, totalUserCount}) {
   return (
     <span className='ic-section-tooltip'>
       <Tooltip tip={tipContent} placement='bottom'>
-        <Button
-          variant="link"
-          theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
-        >
+        <Button variant="link">
           {
             <Text size='small'>{sectionsCountText}
               {nonNullSections.map(sec => (
