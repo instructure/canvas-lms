@@ -272,6 +272,7 @@ class ApplicationController < ActionController::Base
     }.merge(url_params)
 
     hash = {
+      :id => tool.id,
       :title => tool.label_for(type, I18n.locale),
       :base_url =>  polymorphic_url([context, :external_tool], url_params)
     }

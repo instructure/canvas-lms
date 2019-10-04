@@ -7,7 +7,7 @@
         {{#if CAN.CREATE}}
           <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">{{#t 'buttons.new_page'}}Page{{/t}}</a>
           {{#if hasWikiIndexPlacements}}
-          <div class="header-bar-right">
+          <span id="externalToolMountPoint"></span>
             <div class="inline-block">
               <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
                 <i class="icon-more" aria-hidden="true"></i>
@@ -18,7 +18,6 @@
                 {{>ExternalTools/external_tools_menu wikiIndexPlacements}}
               </ul>
             </div>
-          </div>
           {{/if}}
         {{/if}}
       </div>
