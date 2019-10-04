@@ -54,7 +54,7 @@ export function LtiToolsModal(props) {
       data-mce-component
       liveRegion={getLiveRegion}
       size="medium"
-      label={formatMessage('LTI Tools')}
+      label={formatMessage('Apps')}
       onDismiss={props.onDismiss}
       open
       shouldCloseOnDocumentClick

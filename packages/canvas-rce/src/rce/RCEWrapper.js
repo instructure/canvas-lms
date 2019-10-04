@@ -790,7 +790,7 @@ class RCEWrapper extends React.Component {
           ]
         },
         {
-          name: formatMessage('Miscellaneous and LTI'),
+          name: formatMessage('Miscellaneous and Apps'),
           items: ['removeformat', 'table', 'instructure_equation', `${lti_tool_dropdown}`]
         }
       ],

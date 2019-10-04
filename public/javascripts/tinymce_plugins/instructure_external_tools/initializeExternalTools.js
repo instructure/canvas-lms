@@ -90,7 +90,7 @@ const ExternalToolsPlugin = {
           document.dispatchEvent(ev)
         },
         icon: 'lti',
-        tooltip: 'LTI Tools'
+        tooltip: 'Apps'
       })
     }
     if (clumpedButtons.length) {

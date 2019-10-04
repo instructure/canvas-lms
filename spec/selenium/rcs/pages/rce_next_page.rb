@@ -143,11 +143,11 @@ module RCENextPage
   end
 
   def lti_tools_button
-    possibly_hidden_toolbar_button('button[aria-label="LTI Tools"')
+    possibly_hidden_toolbar_button('button[aria-label="Apps"')
   end
 
   def lti_tools_modal
-    f('[role="dialog"][aria-label="LTI Tools"]')
+    f('[role="dialog"][aria-label="Apps"]')
   end
 
   def course_images
