@@ -72,7 +72,11 @@ export default class SubmissionManager extends Component {
     })
   }
 
-  clearSubmissionHistoriesCache = cache => {
+  clearSubmissionHistoriesCache = (cache, result) => {
+    if (result.data.createSubmission.errors) {
+      return
+    }
+
     // Clear the submission histories cache so that we don't lose the currently
     // displayed submission when a new submission is created and the current
     // submission gets transitioned over to a submission history.
@@ -226,7 +230,11 @@ export default class SubmissionManager extends Component {
         <div style={innerFooterStyle}>
           <Mutation
             mutation={CREATE_SUBMISSION}
-            onCompleted={() => this.context.setOnSuccess(I18n.t('Submission sent'))}
+            onCompleted={data =>
+              data.createSubmission.errors
+                ? this.context.setOnFailure(I18n.t('Error sending submission'))
+                : this.context.setOnSuccess(I18n.t('Submission sent'))
+            }
             onError={() => this.context.setOnFailure(I18n.t('Error sending submission'))}
             update={this.clearSubmissionHistoriesCache}
           >
