@@ -42,21 +42,17 @@ describe "conversations new" do
     end
 
     it "should start a group conversation when there is only one recipient", priority: "2", test_id: 201499 do
-      skip_if_chrome('fragile in chrome')
       conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
       c = @s1.conversations.last.conversation
       expect(c.subject).to eq('single recipient')
-      expect(c.private?).to be_falsey
     end
 
     it "should start a group conversation when there is more than one recipient", priority: "2", test_id: 201500 do
-      skip_if_chrome('fragile in chrome')
       conversations
       compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'
       c = @s1.conversations.last.conversation
       expect(c.subject).to eq('multiple recipients')
-      expect(c.private?).to be_falsey
       expect(c.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @s1, @s2].collect(&:id).sort)
     end
 
@@ -75,16 +71,16 @@ describe "conversations new" do
       RoleOverride.manage_role_override(Account.default, Role.get_built_in_role('AccountAdmin'), 'read_roster', override: false, locked: false)
       user_logged_in({:user => user})
       conversations
-      fj('#compose-btn').click
+      f('#compose-btn').click
       wait_for_animations
-      expect(fj('#recipient-row')).to have_attribute(:style, 'display: none;')
+      expect(f('#recipient-row')).to have_attribute(:style, 'display: none;')
     end
 
     it "should not allow non-admins to send a message without picking a context", priority: "1", test_id: 138678 do
       conversations
-      fj('#compose-btn').click
+      f('#compose-btn').click
       wait_for_animations
-      expect(fj('#recipient-row')).to have_attribute(:style, 'display: none;')
+      expect(f('#recipient-row')).to have_attribute(:style, 'display: none;')
     end
 
     it "should allow non-admins to send a message to an account-level group", priority: "2", test_id: 201506 do
@@ -94,7 +90,7 @@ describe "conversations new" do
       @group.save
       user_logged_in({:user => @s1})
       conversations
-      fj('#compose-btn').click
+      f('#compose-btn').click
       wait_for_ajaximations
       select_message_course(@group, true)
       add_message_recipient @s2
@@ -113,7 +109,7 @@ describe "conversations new" do
       @group.save
       user_logged_in({:user => @s1})
       conversations
-      fj('#compose-btn').click
+      f('#compose-btn').click
       wait_for_ajaximations
       select_message_course(@group, true)
       add_message_recipient @s2
@@ -130,7 +126,7 @@ describe "conversations new" do
       user = account_admin_user
       user_logged_in({:user => user})
 
-      get "/accounts/#{Account.default.id}/users"
+      wait_for_new_page_load { get "/accounts/#{Account.default.id}/users" }
       wait_for_ajaximations
       fj('[data-automation="users list"] tr a:has([name="IconMessage"])').click
       wait_for_ajaximations
@@ -138,9 +134,8 @@ describe "conversations new" do
     end
 
     it "should allow selecting multiple recipients in one search", priority: "2", test_id: 201941 do
-      skip_if_chrome('fragile in chrome')
       conversations
-      fj('#compose-btn').click
+      f('#compose-btn').click
       wait_for_ajaximations
       select_message_course(@course)
       message_recipients_input.send_keys('student')
@@ -152,7 +147,6 @@ describe "conversations new" do
     end
 
     it "should not send the message on shift-enter", priority: "1", test_id: 206019 do
-      skip_if_chrome('fragile in chrome')
       conversations
       compose course: @course, to: [@s1], subject: 'context-free', body: 'hallo!', send: false
       driver.action.key_down(:shift).perform
@@ -209,7 +203,6 @@ describe "conversations new" do
       end
 
       it "should check and lock the bulk_message checkbox when over the max size", priority: "2", test_id: 206022 do
-        skip('COMMS-1164')
         conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 
@@ -232,7 +225,6 @@ describe "conversations new" do
       end
 
       it "should leave the value the same as before after unlocking", priority: "2", test_id: 206023 do
-        skip_if_chrome('fragile in chrome')
         conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 
@@ -303,21 +295,18 @@ describe "conversations new" do
         end
 
         it "categorizes enrolled teachers", priority: "1", test_id: 476933 do
-          skip_if_chrome('fails in chrome')
           assert_categories('Teachers')
           assert_result_names(true, [@t1_name, @t2_name])
           assert_result_names(false, [@s1.name, @s2.name])
         end
 
         it "categorizes enrolled students", priority: "1", test_id: 476934 do
-          skip_if_chrome('fails in chrome')
           assert_categories('Students')
           assert_result_names(false, [@t1_name, @t2_name])
           assert_result_names(true, [@s1.name, @s2.name])
         end
 
         it "categorizes enrolled students in groups", priority: "1", test_id: 476935 do
-          skip_if_chrome('fails in chrome')
           assert_categories('Student Groups')
           assert_categories('the group')
           assert_result_names(false, [@t1_name, @t2_name])
