@@ -5,7 +5,6 @@ new_post_policy_icons:
   description: Updates the display of Post Policy icons in the New Gradebook
     assignment column header.
   applies_to: RootAccount
-
 gradebook_reserved_importer_bugfix:
   state: hidden
   display_name: Gradebook Import Reserved Names Bugfix (APG-122)
@@ -13,3 +12,8 @@ gradebook_reserved_importer_bugfix:
     are titled the same as gradebook importer reserved names, also ignore non-active custom columns on gradebook
     import as well as those that use reserved names.
   applies_to: SiteAdmin
+add_grading_scheme_to_admin_grade_reports:
+  state: hidden
+  display_name: Add Grading Scheme to Admin Grade Reports
+  description: Includes grade values in the admin grade reports.
+  applies_to: RootAccount
