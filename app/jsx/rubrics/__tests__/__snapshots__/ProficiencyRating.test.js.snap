@@ -48,21 +48,22 @@ exports[`renders the ProficiencyRating component 1`] = `
   >
     <TextInput
       defaultValue="Stellar"
-      disabled={false}
-      inline={false}
+      display="block"
+      inputContainerRef={[Function]}
       inputRef={[Function]}
-      label={
+      interaction="enabled"
+      isRequired={false}
+      messages={null}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      renderLabel={
         <ScreenReaderContent
           as="span"
         >
           Change description
         </ScreenReaderContent>
       }
-      layout="stacked"
-      messages={null}
-      onChange={[Function]}
-      readOnly={false}
-      required={false}
       size="medium"
       textAlign="start"
       type="text"
@@ -78,21 +79,22 @@ exports[`renders the ProficiencyRating component 1`] = `
   >
     <TextInput
       defaultValue="10"
-      disabled={false}
-      inline={false}
+      display="block"
+      inputContainerRef={[Function]}
       inputRef={[Function]}
-      label={
+      interaction="enabled"
+      isRequired={false}
+      messages={null}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      renderLabel={
         <ScreenReaderContent
           as="span"
         >
           Change points
         </ScreenReaderContent>
       }
-      layout="stacked"
-      messages={null}
-      onChange={[Function]}
-      readOnly={false}
-      required={false}
       size="medium"
       textAlign="start"
       type="text"

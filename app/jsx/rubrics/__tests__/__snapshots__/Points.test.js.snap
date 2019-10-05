@@ -23,21 +23,22 @@ exports[`The Points component renders the component when assessing with the expe
       size="4rem"
     >
       <TextInput
-        disabled={false}
-        inline={true}
+        display="inline-block"
+        inputContainerRef={[Function]}
         inputRef={[Function]}
-        label={
+        interaction="enabled"
+        isRequired={false}
+        messages={Array []}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        renderLabel={
           <ScreenReaderContent
             as="span"
           >
             Points
           </ScreenReaderContent>
         }
-        layout="stacked"
-        messages={Array []}
-        onChange={[Function]}
-        readOnly={false}
-        required={false}
         size="medium"
         textAlign="start"
         type="text"

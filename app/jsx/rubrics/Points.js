@@ -19,7 +19,7 @@ import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {TextInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-layout'
 import I18n from 'i18n!edit_rubricPoints'
 
@@ -80,8 +80,8 @@ const Points = (props) => {
           <Flex alignItems="end" wrapItems>
             <Flex.Item size="4rem" margin="none small none none">
               <TextInput
-                inline
-                label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
+                display='inline-block'
+                renderLabel={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
                 messages={[
                   ...pointError(points),
                   ...extraCreditError(points, pointsPossible, allowExtraCredit)

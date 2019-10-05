@@ -22,7 +22,8 @@ import {Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!ProficiencyRating'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-overlays'
-import {RadioInput, TextInput} from '@instructure/ui-forms'
+import {RadioInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import ColorPicker, { PREDEFINED_COLORS } from '../shared/ColorPicker'
 
@@ -155,7 +156,7 @@ export default class ProficiencyRating extends React.Component {
         <td className="description" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setDescriptionRef}
-            label={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
+            renderLabel={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
             messages={this.errorMessage(descriptionError)}
             onChange={this.handleDescriptionChange}
             defaultValue={description}
@@ -164,7 +165,7 @@ export default class ProficiencyRating extends React.Component {
         <td className="points" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setPointsRef}
-            label={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
+            renderLabel={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
             messages={this.errorMessage(pointsError)}
             onChange={this.handlePointChange}
             defaultValue={I18n.n(points)}
