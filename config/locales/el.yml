@@ -1379,6 +1379,8 @@ el:
     errors: 
       messages: 
         record_invalid: "Η επικύρωση απέτυχε: %{errors}"
+        restrict_dependent_destroy: 
+          has_one: "Δεν είναι δυνατή η διαγραφή της καταχώρισης επειδή υπάρχει εξαρτώμενη καταγραφή %{record}"
   activity_by_category_9c2033d1: "Δραστηριότητα ανά Κατηγορία"
   activity_by_date_878c5b49: "Δραστηριότητα ανά ημερομηνία"
   add_2nd_review_ea988088: "Προσθήκη 2ης Κριτικής"
@@ -2232,7 +2234,7 @@ el:
         google_drives_auth_required: "Πριν μπορέσετε να υποβάλετε εργασίες απευθείας από το Google Drive, θα πρέπει να εξουσιοδοτήσετε το Canvas να έχει πρόσβαση στον λογαριασμό σας στο Google Drive:"
         media_recording_ready: "Όλα Έτοιμα για Υποβολή! Κάντε κλικ στο κουμπί «Υποβολή Εργασίας» για ολοκλήρωση."
         media_recordings_disabled: "Οι ηχογραφήσεις αρχείων πολυμέσων δεν είναι ενεργοποιημένες σε αυτή την ιστοσελίδα του Canvas και δεν θα μπορέσετε να υποβάλετε εργασίες αυτού του τύπου. Παρακαλώ επικοινωνήστε με τον εκπαιδευτή σας για να αλλάξετε τις ρυθμίσεις αυτής της εργασίας ή με τον διαχειριστή των υπολογιστικών συστημάτων σας για την ενεργοποίηση των ηχογραφήσεων αρχείων πολυμέσων."
-        submitting: Υποβάλεται...
+        submitting: "Υποβολή σε εξέλιξη..."
         uploading: "Γίνεται ανάκτηση αντιγράφου του Google Doc σας για υποβολή για αυτή την εργασία. Αυτό μπορεί να πάρει λίγη ώρα, ανάλογα με το μέγεθος του αρχείου..."
       no_submission: "Δεν έχει Επιλεγεί Υποβολή"
       submission_url: "Υποβολή:"
@@ -4820,7 +4822,13 @@ el:
   database_error_err_6393d244: "Σφάλμα βάσης δεδομένων (%{err})"
   date: 
     abbr_day_names: 
-      - ""
+      - Κυρ
+      - Δευ
+      - Τρι
+      - Τετ
+      - Πέμ
+      - Παρ
+      - Σαβ
     abbr_month_names: 
       - ~
       - Ιαν
@@ -5849,7 +5857,7 @@ el:
     messages: 
       accepted: "πρέπει να το αποδεχτείτε"
       blank: "δεν πρέπει να παραμείνει κενό"
-      confirmation: "δεν ταιριάζει %{attribute}"
+      confirmation: "δεν ταιριάζει με την επιβεβαίωση %{attribute}"
       empty: "δεν πρέπει να παραμείνει κενό"
       equal_to: "πρέπει να είναι ίσο με %{count}"
       even: "πρέπει να είναι άρτιος"
@@ -7270,6 +7278,8 @@ el:
     auth: 
       api: 
         bad_request_status: κακό_αίτημα
+        not_found_message: not_found
+        not_found_status: not_found
       authentication_required: "απαιτείται εξουσιοδότηση χρήστη"
       errors: 
         not_authenticated: "Θα πρέπει να έχετε συνδεθεί για να έχετε πρόσβαση σε αυτή τη σελίδα"
@@ -9428,6 +9438,7 @@ el:
   not_graded_e027c866: "Δεν έχει βαθμολογηθεί"
   not_installed_37a21a76: "Δεν εγκαταστάθηκε"
   not_published_73f7079: "Μη δημοσιευμένο"
+  not_synced_529cbf29: "Δεν έχει συγχρονιστεί"
   not_yet_completed_345a0bca: "Δεν έχει ολοκληρωθεί ακόμη"
   note_8b73ce09: Σημείωση
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "<mrk mid=\"6194\" mtype=\"seg\">Σημείωση:</mrk> <mrk mid=\"6195\" mtype=\"seg\">Μπορεί να χρειαστεί έως και μία εβδομάδα για την παροχή του Beta URL, ανάλογα με τον κύκλο ανανέωσης Beta.</mrk>"
@@ -11551,7 +11562,7 @@ el:
         place: "Τοποθέτηση:"
         question_group: "Σε ομάδα ερωτήσεων:"
         save: Αποθήκευση
-        saving: Αποθήκευση...
+        saving: "Αποθήκευση σε εξέλιξη..."
         where_to_move: "Πού θα θέλατε να μετακινήσετε το %{quiz_item};"
       multi_answer: 
         choose_answer: Επιλογή
@@ -14809,11 +14820,11 @@ el:
       multi_page_html: "Προβολή %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> από <b>%{count}</b> συνολικά"
       single_page: 
         one: "Προβολή 1 %{model}"
-        other: "Προβολή και των %{count} %{model}"
+        other: "Προβολή όλων %{count} %{model}"
         zero: "Δεν βρέθηκε %{model}"
       single_page_html: 
         one: "Προβολή <b>1</b> %{model}"
-        other: "Προβολή <b>all&nbsp;%{count}</b> %{model}"
+        other: "Προβολή <b>όλων&nbsp;%{count}</b> %{model}"
         zero: "Δεν βρέθηκε %{model}"
     page_gap: "&hellip;"
     previous_label: "&#8592; Προηγούμενο"
