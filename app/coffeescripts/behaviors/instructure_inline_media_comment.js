@@ -23,15 +23,17 @@ import htmlEscape from 'str/htmlEscape'
 import '../jquery/mediaComment'
 
 const inlineMediaComment = {
-  buildMinimizerLink: () => $(
-    `<a href="#" style="font-size: 0.8em;">
+  buildMinimizerLink: () =>
+    $(
+      `<a href="#" style="font-size: 0.8em;">
       ${htmlEscape(I18n.t('links.minimize_embedded_kaltura_content', 'Minimize embedded content'))}
     </a>`
-  ),
+    ),
 
-  buildCommentHolder: ($link) => $('<div><div class="innerholder" tabindex="-1" style="margin-bottom: 15px;"></div></div>'),
+  buildCommentHolder: $link =>
+    $('<div><div class="innerholder" tabindex="-1" style="margin-bottom: 15px;"></div></div>'),
 
-  getMediaCommentId ($link) {
+  getMediaCommentId($link) {
     let idAttr
     let id = $link.data('media_comment_id') || $link.find('.media_comment_id:first').text()
     if (!id) idAttr = $link.attr('id')
@@ -39,81 +41,97 @@ const inlineMediaComment = {
     return id
   },
 
-  collapseComment ($holder) {
+  collapseComment($holder) {
     __guard__($holder.find('video,audio').data('mediaelementplayer'), x => x.pause())
     $holder.remove()
     trackEvent('hide_embedded_content', 'hide_media')
-  },
+  }
 }
 
-const initialFocusInnerhold = (e) => {
-  $(e.target).find('div.mejs-audio').focus()
+const initialFocusInnerhold = e => {
+  $(e.target)
+    .find('div.mejs-audio')
+    .focus()
 }
 
 const minTdWidth = 300
 
-const isVideoInTd = ($link) => {
+const isVideoInTd = $link => {
   const $closestTd = $link.closest('td')
   return $closestTd.length > 0
 }
 
-const isContainingTdSmall = ($link) => {
-  const tdWidth = $link.closest('td').css('width').replace('px', '')
+const isContainingTdSmall = $link => {
+  const tdWidth = $link
+    .closest('td')
+    .css('width')
+    .replace('px', '')
   return tdWidth < minTdWidth
 }
 
-const shouldResizeTd = ($link) => {
+const shouldResizeTd = $link => {
   return isVideoInTd($link) && isContainingTdSmall($link)
 }
 
-const resizeContainingTd = ($link) => {
+const resizeContainingTd = $link => {
   const $closestTd = $link.closest('td')
   const tdWidth = $closestTd.css('width')
   $closestTd.data('orig-width', tdWidth)
   $closestTd.css('width', `${minTdWidth}px`)
 }
 
-$(document).on('click', 'a.instructure_inline_media_comment', preventDefault(function () {
-  if (!INST.kalturaSettings) {
-    alert(I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site'))
-    return
-  }
+$(document).on(
+  'click',
+  'a.instructure_inline_media_comment',
+  preventDefault(function() {
+    if (!INST.kalturaSettings) {
+      alert(I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site'))
+      return
+    }
 
-  const $link = $(this)
+    const $link = $(this)
 
-  let mediaType = 'video'
-  const id = inlineMediaComment.getMediaCommentId($link)
-  const $holder = inlineMediaComment.buildCommentHolder($link)
+    let mediaType = 'video'
+    const id = inlineMediaComment.getMediaCommentId($link)
+    const $holder = inlineMediaComment.buildCommentHolder($link)
 
-  if (shouldResizeTd($link)) {
-    resizeContainingTd($link)
-  }
+    if (shouldResizeTd($link)) {
+      resizeContainingTd($link)
+    }
 
-  $link.after($holder)
-  $link.hide()
+    $link.after($holder)
+    $link.hide()
 
-  if ($link.data('media_comment_type') === 'audio' || $link.is('.audio_playback, .audio_comment, .instructure_audio_link')) {
-    mediaType = 'audio'
-  }
+    if (
+      $link.data('media_comment_type') === 'audio' ||
+      $link.is('.audio_playback, .audio_comment, .instructure_audio_link')
+    ) {
+      mediaType = 'audio'
+    }
 
-  $holder.children('div').mediaComment('show_inline', id, mediaType, $link.data('download') || $link.attr('href'))
+    $holder
+      .children('div')
+      .mediaComment('show_inline', id, mediaType, $link.data('download') || $link.attr('href'))
 
-  const $minimizer = inlineMediaComment.buildMinimizerLink()
+    const $minimizer = inlineMediaComment.buildMinimizerLink()
 
-  $minimizer.appendTo($holder).click(preventDefault(() => {
-    const $closestTd = $link.closest('td')
-    $link.show().focus()
-    $closestTd.css('width', $closestTd.data('orig-width'))
-    inlineMediaComment.collapseComment($holder)
-  }))
+    $minimizer.appendTo($holder).click(
+      preventDefault(() => {
+        const $closestTd = $link.closest('td')
+        $link.show().focus()
+        $closestTd.css('width', $closestTd.data('orig-width'))
+        inlineMediaComment.collapseComment($holder)
+      })
+    )
 
-  trackEvent('show_embedded_content', 'show_media')
-  $holder.find('.innerholder').css('outline', 'none')
-  $holder.find('.innerholder').on('focus', initialFocusInnerhold)
-}))
+    trackEvent('show_embedded_content', 'show_media')
+    $holder.find('.innerholder').css('outline', 'none')
+    $holder.find('.innerholder').on('focus', initialFocusInnerhold)
+  })
+)
 
 export default inlineMediaComment
 
-function __guard__ (value, transform) {
+function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
 }

@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from  'jquery'
+import $ from 'jquery'
 import KyleMenu from '../jquery.kylemenu'
 
 // this is a behaviour that will automatically set up a set of .admin-links
 // when the button is clicked, see _admin_links.scss for markup
-$(document).on('mousedown click keydown', '.al-trigger', function (event) {
+$(document).on('mousedown click keydown', '.al-trigger', function(event) {
   const $trigger = $(this)
   if ($trigger.data('kyleMenu')) return
 
@@ -32,7 +32,7 @@ $(document).on('mousedown click keydown', '.al-trigger', function (event) {
       position: {
         my: $trigger.data('popup-my'),
         at: $trigger.data('popup-at'),
-        within: $trigger.data('popup-within'),
+        within: $trigger.data('popup-within')
       }
     }
   })

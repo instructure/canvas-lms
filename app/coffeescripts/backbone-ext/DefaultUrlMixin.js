@@ -30,17 +30,19 @@ import splitAssetString from '../str/splitAssetString'
 // /api/v1/courses/1/discussion_topics (since ENV.context_asset_string will
 // be already set)
 export default {
-  _contextPath () {
+  _contextPath() {
     const assetString = this.contextAssetString || ENV.context_asset_string
     const [contextType, contextId] = splitAssetString(assetString)
     return `${encodeURIComponent(contextType)}/${encodeURIComponent(contextId)}`
   },
 
-  _defaultUrl () {
+  _defaultUrl() {
     const resourceName = this.resourceName || this.model.prototype.resourceName
     if (!resourceName) {
-      throw new Error('Must define a `resourceName` property on collection or model prototype to use defaultUrl')
+      throw new Error(
+        'Must define a `resourceName` property on collection or model prototype to use defaultUrl'
+      )
     }
     return `/api/v1/${this._contextPath()}/${resourceName}`
-  },
+  }
 }

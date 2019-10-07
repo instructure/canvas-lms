@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import '../jquery.rails_flash_notifications'
 
-
 describe('FlashNotifications', () => {
   let holder = null
   beforeEach(() => {
@@ -35,22 +34,29 @@ describe('FlashNotifications', () => {
 
   test('text notification', () => {
     $.flashMessage('here is a thing')
-    expect(document.querySelector('#flash_message_holder .ic-flash-success')).toHaveTextContent('here is a thing')
+    expect(document.querySelector('#flash_message_holder .ic-flash-success')).toHaveTextContent(
+      'here is a thing'
+    )
   })
 
   test('html sanitization', () => {
     $.flashWarning('<script>evil()</script>')
-    expect(document.querySelector('#flash_message_holder .ic-flash-warning')).toContainHTML('&lt;script&gt;')
+    expect(document.querySelector('#flash_message_holder .ic-flash-warning')).toContainHTML(
+      '&lt;script&gt;'
+    )
   })
 
   test('html messages', () => {
     $.flashError({html: '<div class="blah">test</div>'})
-    expect(document.querySelector('#flash_message_holder .ic-flash-error div.blah')).toHaveTextContent('test')
+    expect(
+      document.querySelector('#flash_message_holder .ic-flash-error div.blah')
+    ).toHaveTextContent('test')
   })
 
   test('screenreader message', () => {
     $.screenReaderFlashMessage('<script>evil()</script>')
-    expect(document.querySelector('#flash_screenreader_holder span')).toContainHTML('&lt;script&gt;')
+    expect(document.querySelector('#flash_screenreader_holder span')).toContainHTML(
+      '&lt;script&gt;'
+    )
   })
-
 })

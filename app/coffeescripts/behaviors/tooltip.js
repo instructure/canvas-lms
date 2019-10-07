@@ -36,11 +36,12 @@ import htmlEscape from 'str/htmlEscape'
 import 'jqueryui/tooltip'
 
 const tooltipsToShortCirtuit = {}
-const shortCircutTooltip = target => tooltipsToShortCirtuit[target] || tooltipsToShortCirtuit[target[0]]
+const shortCircutTooltip = target =>
+  tooltipsToShortCirtuit[target] || tooltipsToShortCirtuit[target[0]]
 
 const tooltipUtils = {
-  setPosition (opts) {
-    function caret () {
+  setPosition(opts) {
+    function caret() {
       if ((opts.tooltipClass || '').match('popover')) {
         return 30
       } else {
@@ -53,23 +54,23 @@ const tooltipUtils = {
       right: {
         my: 'left center',
         at: `right+${caret()} center`,
-        collision,
+        collision
       },
       left: {
         my: 'right center',
         at: `left-${caret()} center`,
-        collision,
+        collision
       },
       top: {
         my: 'center bottom',
         at: `center top-${caret()}`,
-        collision,
+        collision
       },
       bottom: {
         my: 'center top',
         at: `center bottom+${caret()}`,
-        collision,
-      },
+        collision
+      }
     }
     if (opts.position in positions) {
       opts.position = positions[opts.position]
@@ -82,7 +83,7 @@ const tooltipUtils = {
 // that our browser can scroll to the tabbed focus element before
 // positioning the tooltip relative to window.
 $.widget('custom.timeoutTooltip', $.ui.tooltip, {
-  _open (event, target, content) {
+  _open(event, target, content) {
     if (shortCircutTooltip(target)) return null
 
     // Converts arguments to an array
@@ -106,52 +107,56 @@ $.widget('custom.timeoutTooltip', $.ui.tooltip, {
     return this._on(target, {
       mouseleave: 'close',
       focusout: 'close',
-      keyup (event) {
+      keyup(event) {
         if (event.keyCode === $.ui.keyCode.ESCAPE) {
           const fakeEvent = $.Event(event)
           fakeEvent.currentTarget = target[0]
           return this.close(fakeEvent, true)
         }
-      },
+      }
     })
   },
 
-  close (event) {
+  close(event) {
     if (this.timeout) {
       clearTimeout(this.timeout)
       delete this.timeout
       return
     }
     return this._superApply([event, true])
-  },
+  }
 })
-
 
 // you can provide a 'using' option to jqueryUI position (which gets called by jqueryui Tooltip to
 // position it on the screen), it will be passed the position cordinates and a feedback object which,
 // among other things, tells you where it positioned it relative to the target. we use it to add some
 // css classes that handle putting the pointer triangle (aka: caret) back to the trigger.
-function using (position, feedback) {
-  return $(this).css(position).removeClass('left right top bottom center middle vertical horizontal').addClass([
-    // one of: "left", "right", "center"
-    feedback.horizontal,
+function using(position, feedback) {
+  return $(this)
+    .css(position)
+    .removeClass('left right top bottom center middle vertical horizontal')
+    .addClass(
+      [
+        // one of: "left", "right", "center"
+        feedback.horizontal,
 
-    // one of "top", "bottom", "middle"
-    feedback.vertical,
+        // one of "top", "bottom", "middle"
+        feedback.vertical,
 
-    // if tooltip was positioned mostly above/below trigger then: "vertical"
-    // else since the tooltip was positioned more to the left or right: "horizontal"
-    feedback.important,
-  ].join(' '))
+        // if tooltip was positioned mostly above/below trigger then: "vertical"
+        // else since the tooltip was positioned more to the left or right: "horizontal"
+        feedback.important
+      ].join(' ')
+    )
 }
 
-$('body').on('mouseenter focusin', '[data-tooltip]', function (event) {
+$('body').on('mouseenter focusin', '[data-tooltip]', function(event) {
   const $this = $(this)
   let opts = $this.data('tooltip')
 
   // allow specifying position by simply doing <a data-tooltip="left">
   // and allow shorthand top|bottom|left|right positions like <a data-tooltip='{"position":"left"}'>
-  if (['right', 'left', 'top', 'bottom'].includes(opts)) opts = { position: opts}
+  if (['right', 'left', 'top', 'bottom'].includes(opts)) opts = {position: opts}
   if (!opts) opts = {}
   if (!opts.position) opts.position = 'top'
 
@@ -161,7 +166,7 @@ $('body').on('mouseenter focusin', '[data-tooltip]', function (event) {
   if (!opts.position.using) opts.position.using = using
 
   if ($this.data('html-tooltip-title')) {
-    opts.content = function () {
+    opts.content = function() {
       return $.raw($(this).data('html-tooltip-title'))
     }
     opts.items = '[data-html-tooltip-title]'
@@ -169,7 +174,11 @@ $('body').on('mouseenter focusin', '[data-tooltip]', function (event) {
 
   if ($this.data('tooltip-class')) opts.tooltipClass = $this.data('tooltip-class')
 
-  $this.removeAttr('data-tooltip').timeoutTooltip(opts).timeoutTooltip('open').click(() => $this.timeoutTooltip('close'))
+  $this
+    .removeAttr('data-tooltip')
+    .timeoutTooltip(opts)
+    .timeoutTooltip('open')
+    .click(() => $this.timeoutTooltip('close'))
 })
 
 const restartTooltip = event => (tooltipsToShortCirtuit[event.target] = false)
