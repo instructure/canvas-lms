@@ -18,7 +18,7 @@
 import PaginatedCollection from '../collections/PaginatedCollection'
 import AssignmentGroup from '../models/AssignmentGroup'
 import _ from 'underscore'
-import SubmissionCollection from '../collections/SubmissionCollection'
+import SubmissionCollection from './SubmissionCollection'
 import ModuleCollection from '../collections/ModuleCollection'
 
 const PER_PAGE_LIMIT = 50

@@ -51,11 +51,11 @@ export default {
     //   @obj.cache.use 'localStorage'
     //
     // @api public
-    use (store) {
+    use(store) {
       const possibleStores = {
         memory: {},
         sessionStorage,
-        localStorage,
+        localStorage
       }
       this.store = possibleStores[store]
     },
@@ -66,8 +66,13 @@ export default {
     //
     // @return String
     // @api private
-    toKey (...key) {
-      return this.prefix + _.flatten(key).map(arg => JSON.stringify(arg)).join('|')
+    toKey(...key) {
+      return (
+        this.prefix +
+        _.flatten(key)
+          .map(arg => JSON.stringify(arg))
+          .join('|')
+      )
     },
 
     // #
@@ -82,7 +87,7 @@ export default {
     //
     // @return String|Object|Array|Boolean
     // @api public
-    get (...key) {
+    get(...key) {
       const val = this.store[this.toKey(key)]
       if (val) {
         return JSON.parse(val)
@@ -105,7 +110,7 @@ export default {
     //   .set('value2', 'key2')
     //
     // @api public
-    set (...args) {
+    set(...args) {
       const key = args.slice(0, args.length - 1)
       const value = args[args.length - 1]
       this.store[this.toKey(key)] = JSON.stringify(value)
@@ -114,7 +119,7 @@ export default {
 
     // #
     // given a key, remove its contents from the cache
-    remove (...key) {
+    remove(...key) {
       delete this.store[this.toKey(key)]
     }
   }

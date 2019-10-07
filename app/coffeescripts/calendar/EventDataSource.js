@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import _ from 'lodash'
 import fcUtil from '../util/fcUtil'
-import commonEventFactory from '../calendar/commonEventFactory'
+import commonEventFactory from './commonEventFactory'
 import 'jquery.ajaxJSON'
 import 'vendor/jquery.ba-tinypubsub'
 
@@ -290,10 +290,7 @@ export default class EventDataSource {
 
   processAppointmentData(group) {
     const {id} = group
-    if (
-      this.cache.appointmentGroups[id] &&
-      this.cache.appointmentGroups[id].is_manageable
-    ) {
+    if (this.cache.appointmentGroups[id] && this.cache.appointmentGroups[id].is_manageable) {
       group.is_manageable = true
     } else {
       group.is_scheduleable = true
@@ -490,24 +487,29 @@ export default class EventDataSource {
       list.requestID = options.requestID
       return donecb(list)
     }
-    const eventDataSources = [
-      ['/api/v1/calendar_events', this.indexParams(params)]
-    ]
-    params.context_codes = params.context_codes.filter(context => !context.match(/^appointment_group_/))
+    const eventDataSources = [['/api/v1/calendar_events', this.indexParams(params)]]
+    params.context_codes = params.context_codes.filter(
+      context => !context.match(/^appointment_group_/)
+    )
     eventDataSources.push(['/api/v1/calendar_events', this.assignmentParams(params)])
     if (ENV.STUDENT_PLANNER_ENABLED) {
       eventDataSources.push(['/api/v1/planner_notes', params])
     }
     if (ENV.PLANNER_ENABLED) {
-      const [admin_contexts, student_contexts] = _.partition(params.context_codes, (cc) => (
-        ENV.CALENDAR.MANAGE_CONTEXTS.indexOf(cc) >= 0
-      ))
+      const [admin_contexts, student_contexts] = _.partition(
+        params.context_codes,
+        cc => ENV.CALENDAR.MANAGE_CONTEXTS.indexOf(cc) >= 0
+      )
       if (student_contexts.length) {
         const pparams = {filter: 'ungraded_todo_items', ...params, context_codes: student_contexts}
         eventDataSources.push(['/api/v1/planner/items', pparams])
       }
       if (admin_contexts.length) {
-        const pparams = {filter: 'all_ungraded_todo_items', ...params, context_codes: admin_contexts}
+        const pparams = {
+          filter: 'all_ungraded_todo_items',
+          ...params,
+          context_codes: admin_contexts
+        }
         eventDataSources.push(['/api/v1/planner/items', pparams])
       }
     }

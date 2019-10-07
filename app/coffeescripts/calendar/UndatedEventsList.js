@@ -19,7 +19,7 @@
 import I18n from 'i18n!calendar'
 import $ from 'jquery'
 import undatedEventsTemplate from 'jst/calendar/undatedEvents'
-import ShowEventDetailsDialog from '../calendar/ShowEventDetailsDialog'
+import ShowEventDetailsDialog from './ShowEventDetailsDialog'
 import 'jqueryui/draggable'
 import 'jqueryui/droppable'
 import 'jquery.disableWhileLoading'

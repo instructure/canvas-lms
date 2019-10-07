@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!calendar'
-import EditAppointmentGroupDetails from '../calendar/EditAppointmentGroupDetails'
+import EditAppointmentGroupDetails from './EditAppointmentGroupDetails'
 import 'jqueryui/dialog'
 
 const dialog = $('<div id="edit_event"><div class="wrapper"></div>')

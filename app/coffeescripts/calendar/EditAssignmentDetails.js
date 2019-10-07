@@ -20,7 +20,7 @@ import I18n from 'i18n!calendar'
 import $ from 'jquery'
 import moment from 'moment'
 import natcompare from '../util/natcompare'
-import commonEventFactory from '../calendar/commonEventFactory'
+import commonEventFactory from './commonEventFactory'
 import ValidatedFormView from '../views/ValidatedFormView'
 import SisValidationHelper from '../util/SisValidationHelper'
 import editAssignmentTemplate from 'jst/calendar/editAssignment'
@@ -33,10 +33,9 @@ import withinMomentDates from 'jsx/shared/helpers/momentDateHelper'
 import 'jquery.instructure_date_and_time'
 import 'jquery.instructure_forms'
 import 'jquery.instructure_misc_helpers'
-import '../calendar/fcMomentHandlebarsHelpers'
+import './fcMomentHandlebarsHelpers'
 
 export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
-
   initialize(selector, event, contextChangeCB, closeCB) {
     this.event = event
     this.contextChangeCB = contextChangeCB

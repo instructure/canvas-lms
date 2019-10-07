@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!calendar'
 import $ from 'jquery'
-import CommonEvent from '../calendar/CommonEvent'
+import CommonEvent from './CommonEvent'
 import fcUtil from '../util/fcUtil'
 import {extend} from '../legacyCoffeesScriptHelpers'
 import 'jquery.instructure_date_and_time'

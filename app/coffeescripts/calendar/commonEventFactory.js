@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CommonEvent from '../calendar/CommonEvent'
-import Assignment from '../calendar/CommonEvent.Assignment'
-import AssignmentOverride from '../calendar/CommonEvent.AssignmentOverride'
-import CalendarEvent from '../calendar/CommonEvent.CalendarEvent'
-import PlannerNote from '../calendar/CommonEvent.PlannerNote'
-import ToDoItem from '../calendar/CommonEvent.ToDoItem'
+import CommonEvent from './CommonEvent'
+import Assignment from './CommonEvent.Assignment'
+import AssignmentOverride from './CommonEvent.AssignmentOverride'
+import CalendarEvent from './CommonEvent.CalendarEvent'
+import PlannerNote from './CommonEvent.PlannerNote'
+import ToDoItem from './CommonEvent.ToDoItem'
 import splitAssetString from '../str/splitAssetString'
 
 export default function commonEventFactory(data, contexts) {
@@ -36,11 +36,15 @@ export default function commonEventFactory(data, contexts) {
   let actualContextCode = data.context_code
   let contextCode = data.effective_context_code || actualContextCode
 
-  const type = data.assignment_overrides ? 'assignment_override' :
-    data.assignment || data.assignment_group_id ? 'assignment' :
-    data.type === 'planner_note' ? 'planner_note' :
-    data.plannable ? 'todo_item' :
-    'calendar_event'
+  const type = data.assignment_overrides
+    ? 'assignment_override'
+    : data.assignment || data.assignment_group_id
+    ? 'assignment'
+    : data.type === 'planner_note'
+    ? 'planner_note'
+    : data.plannable
+    ? 'todo_item'
+    : 'calendar_event'
 
   data = data.assignment_overrides
     ? {assignment: data.assignment, assignment_override: data.assignment_overrides[0]}

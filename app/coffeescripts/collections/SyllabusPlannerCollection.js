@@ -18,34 +18,32 @@
 import PaginatedCollection from '../collections/PaginatedCollection'
 
 export default class SyllabusCalendarEventsCollection extends PaginatedCollection {
-
-  constructor (context_codes) {
+  constructor(context_codes) {
     super()
     this.url = '/api/v1/planner/items'
     this.context_codes = context_codes
   }
 
-  fetch (options) {
-    const mergedData = Object.assign({}, options.data, {
+  fetch(options) {
+    const mergedData = {
+      ...options.data,
       context_codes: this.context_codes,
-      filter: 'all_ungraded_todo_items',
-    })
-    const mergedOptions = Object.assign({}, options, {
-      data: mergedData,
-    })
+      filter: 'all_ungraded_todo_items'
+    }
+    const mergedOptions = {...options, data: mergedData}
     return super.fetch(mergedOptions)
   }
 
   // Overridden to make the id unique when aggregated in a collection with other
   // models and to match the fields used by the SyllabusView and template.
-  parse (apiNote) {
+  parse(apiNote) {
     return apiNote.map(note => ({
       id: `planner_${note.plannable_type}_${note.plannable_id}`,
       type: note.plannable_type,
       title: note.plannable.title,
       todo_at: note.plannable.todo_date,
       start_at: note.plannable.todo_date,
-      html_url: note.html_url,
+      html_url: note.html_url
     }))
   }
 }
