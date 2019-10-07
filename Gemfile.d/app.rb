@@ -73,7 +73,7 @@ gem 'inst-jobs-autoscaling', '1.0.5'
 gem 'ffi', '1.9.18', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.10', require: false
-gem 'httparty', '0.16.1'
+gem 'httparty', '0.17.1'
 gem 'i18n', '1.0.0'
 gem 'i18nliner', '0.1.0'
   gem 'ruby2ruby', '2.4.1', require: false
