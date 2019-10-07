@@ -39,7 +39,15 @@ export default function UsersListHeader(props) {
           theme={{fontWeight: '700', mediumPadding: '0', mediumHeight: '1.5rem'}}
         >
           {label}
-          {sort === id ? order === 'asc' ? <IconMiniArrowUpSolid /> : <IconMiniArrowDownSolid /> : ''}
+          {sort === id ? (
+            order === 'asc' ? (
+              <IconMiniArrowUpSolid />
+            ) : (
+              <IconMiniArrowDownSolid />
+            )
+          ) : (
+            ''
+          )}
         </Button>
       </Tooltip>
     </th>

@@ -124,17 +124,16 @@ export default class UsersPane extends React.Component {
           />
         }
 
-        {!_.isEmpty(users) &&
-          !isLoading && (
-            <UsersList
-              searchFilter={this.state.userList.searchFilter}
-              onUpdateFilters={this.handleUpdateSearchFilter}
-              accountId={accountId.toString()}
-              users={users}
-              handleSubmitEditUserForm={this.handleSubmitEditUserForm}
-              permissions={this.state.userList.permissions}
-            />
-          )}
+        {!_.isEmpty(users) && !isLoading && (
+          <UsersList
+            searchFilter={this.state.userList.searchFilter}
+            onUpdateFilters={this.handleUpdateSearchFilter}
+            accountId={accountId.toString()}
+            users={users}
+            handleSubmitEditUserForm={this.handleSubmitEditUserForm}
+            permissions={this.state.userList.permissions}
+          />
+        )}
         <SearchMessage
           collection={{data: users, loading: isLoading, links}}
           setPage={this.handleSetPage}

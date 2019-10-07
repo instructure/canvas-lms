@@ -107,9 +107,11 @@ export default class AddPeople extends React.Component {
     }
     this.content = null
   }
+
   componentDidMount() {
     this.manageFocus()
   }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.usersEnrolled) this.close()
     if (nextProps.apiState && nextProps.apiState.error) {
@@ -118,6 +120,7 @@ export default class AddPeople extends React.Component {
       })
     }
   }
+
   componentDidUpdate() {
     this.manageFocus()
   }
@@ -125,9 +128,10 @@ export default class AddPeople extends React.Component {
   // event handlers  ---------------------
   // search input changes
   onChangeSearchInput = newValue => {
-    const inputParams = Object.assign({}, this.props.inputParams, newValue)
+    const inputParams = {...this.props.inputParams, ...newValue}
     this.props.setInputParams(inputParams)
   }
+
   // dispensation of duplicate results change
   onChangeDuplicate = newValues => {
     if ('selectedUserId' in newValues) {
@@ -147,18 +151,20 @@ export default class AddPeople extends React.Component {
       this.props.skipDuplicate(newValues.address)
     }
   }
+
   // our user is updating the new user data for a missing result
   onChangeMissing = ({address, newUserInfo}) => {
     this.props.enqueueNewForMissing({address, newUserInfo})
   }
+
   // for a11y, whenever the user changes panels, move focus to the top of the content
   manageFocus() {
     if (this.state.focusToTop) {
       if (this.content) this.content.focus()
       this.setState({focusToTop: false})
     } else if (this.state.focusToClose) {
-      if (this.modalCloseBtn) this.modalCloseBtn.focus();
-      this.setState({focusToClose: false});
+      if (this.modalCloseBtn) this.modalCloseBtn.focus()
+      this.setState({focusToClose: false})
     }
   }
 
@@ -168,11 +174,13 @@ export default class AddPeople extends React.Component {
     this.setState({currentPage: PEOPLEVALIDATIONISSUES, focusToClose: true})
     this.props.validateUsers()
   }
+
   // on next callback from PeopleValidationIssues page
   validationIssuesNext = () => {
     this.setState({currentPage: PEOPLEREADYLIST, focusToTop: true})
     this.props.resolveValidationIssues()
   }
+
   // on next callback from the ready list of users
   enrollUsers = () => {
     this.props.enrollUsers()
@@ -197,13 +205,16 @@ export default class AddPeople extends React.Component {
     this.props.reset(stateResets)
     this.setState({currentPage: pagename, focusToTop: true})
   }
+
   // different panels go back slightly differently
   apiErrorOnBack = () => {
     this.goBack(PEOPLESEARCH, [])
   }
+
   peopleReadyOnBack = () => {
     this.goBack(PEOPLESEARCH, undefined)
   }
+
   peopleValidationIssuesOnBack = () => {
     this.goBack(PEOPLESEARCH, ['userValidationResult'])
   }
@@ -262,7 +273,9 @@ export default class AddPeople extends React.Component {
         onNext = this.searchNext
         readyForNext = this.props.inputParams.nameList.length > 0
         panelLabel = I18n.t('User search panel')
-        panelDescription = I18n.t('Use this panel to search for people you wish to add to this course.')
+        panelDescription = I18n.t(
+          'Use this panel to search for people you wish to add to this course.'
+        )
         break
       case PEOPLEVALIDATIONISSUES:
         currentPanel = (
@@ -278,7 +291,9 @@ export default class AddPeople extends React.Component {
         onBack = this.peopleValidationIssuesOnBack
         readyForNext = arePeopleValidationIssuesResolved(this.props)
         panelLabel = I18n.t('User vaildation issues panel')
-        panelDescription = I18n.t('Use this panel to resolve duplicate results or people not found with your search.')
+        panelDescription = I18n.t(
+          'Use this panel to resolve duplicate results or people not found with your search.'
+        )
         break
       case PEOPLEREADYLIST:
         currentPanel = (
@@ -308,7 +323,9 @@ export default class AddPeople extends React.Component {
         open={this.props.isOpen}
         label={modalTitle}
         onDismiss={this.close}
-        ref={node => { this.node = node }}
+        ref={node => {
+          this.node = node
+        }}
         shouldCloseOnDocumentClick={false}
         size="medium"
         tabIndex="-1"
@@ -316,7 +333,9 @@ export default class AddPeople extends React.Component {
       >
         <Modal.Header>
           <CloseButton
-            buttonRef={c => { this.modalCloseBtn = c }}
+            buttonRef={c => {
+              this.modalCloseBtn = c
+            }}
             placement="end"
             offset="medium"
             variant="icon"
@@ -330,7 +349,9 @@ export default class AddPeople extends React.Component {
           <div
             className="addpeople"
             tabIndex="-1"
-            ref={elem => { this.content = elem }}
+            ref={elem => {
+              this.content = elem
+            }}
             aria-label={panelLabel}
             aria-describedby="addpeople_panelDescription"
           >

@@ -17,19 +17,28 @@
  */
 
 import React from 'react'
-import { mount, shallow } from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import MissingPeopleSection from '../missing_people_section'
 
 describe('MissingPeopleSection', () => {
-
   const missingLogins = {
     addr1: {address: 'addr1', type: 'unique_id', createNew: false, newUserInfo: undefined},
-    addr2: {address: 'addr2', type: 'unique_id', createNew: true, newUserInfo: {name: 'the name2', email: 'email2'}}
+    addr2: {
+      address: 'addr2',
+      type: 'unique_id',
+      createNew: true,
+      newUserInfo: {name: 'the name2', email: 'email2'}
+    }
   }
   const missingEmails = {
-    addr1: {address: 'addr1', type: 'email', createNew: true, newUserInfo: {name: 'Searched Name1', email: 'addr1'}}
+    addr1: {
+      address: 'addr1',
+      type: 'email',
+      createNew: true,
+      newUserInfo: {name: 'Searched Name1', email: 'addr1'}
+    }
   }
-  const noop = function () {}
+  const noop = function() {}
   const inviteUsersURL = '/courses/#/invite_users'
 
   test('renders the component', () => {
@@ -39,7 +48,8 @@ describe('MissingPeopleSection', () => {
         inviteUsersURL={inviteUsersURL}
         missing={missingLogins}
         onChange={noop}
-      />)
+      />
+    )
     expect(wrapper.find('.namelist').exists()).toBeTruthy()
   })
 
@@ -63,7 +73,7 @@ describe('MissingPeopleSection', () => {
     expect(missingPeopleSection.find('input[type="email"]')).toHaveLength(1) // email input
   })
 
-  test('cannot create users because we don\'t have the URL', () => {
+  test("cannot create users because we don't have the URL", () => {
     const wrapper = mount(
       <MissingPeopleSection
         searchType="unique_id"

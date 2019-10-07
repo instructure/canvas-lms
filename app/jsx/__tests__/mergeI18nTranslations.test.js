@@ -30,10 +30,10 @@ describe('mergeI18nTranslations', () => {
   })
 
   it('overwrites the key that is there', () => {
-    i18nObj.translations.en.anotherKey = "original value"
+    i18nObj.translations.en.anotherKey = 'original value'
     mergeI18nTranslations({
       en: {anotherKey: 'new value'}
     })
-    expect(i18nObj.translations.en.anotherKey).toEqual("new value")
+    expect(i18nObj.translations.en.anotherKey).toEqual('new value')
   })
 })

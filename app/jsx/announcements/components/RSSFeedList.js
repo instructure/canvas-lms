@@ -140,11 +140,10 @@ export default class RSSFeedList extends React.Component {
   }
 }
 
-const connectState = state =>
-  Object.assign({
-    feeds: state.externalRssFeed.feeds,
-    hasLoadedFeed: state.externalRssFeed.hasLoadedFeed
-  })
+const connectState = state => ({
+  feeds: state.externalRssFeed.feeds,
+  hasLoadedFeed: state.externalRssFeed.hasLoadedFeed
+})
 const connectActions = dispatch =>
   bindActionCreators(
     Object.assign(select(actions, ['getExternalFeeds', 'deleteExternalFeed'])),

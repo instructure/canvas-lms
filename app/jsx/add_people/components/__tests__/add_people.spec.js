@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { mount } from "enzyme";
-import React from "react";
-import AddPeople from "../add_people";
+import {mount} from 'enzyme'
+import React from 'react'
+import AddPeople from '../add_people'
 
-describe("Focus Handling", () => {
-  it("sends focus to the modal close button when an api error occurs", () => {
+describe('Focus Handling', () => {
+  it('sends focus to the modal close button when an api error occurs', () => {
     const props = {
       isOpen: true,
       courseParams: {
@@ -32,25 +32,25 @@ describe("Focus Handling", () => {
         isPending: 0
       },
       inputParams: {
-        nameList: ""
+        nameList: ''
       },
       validateUsers() {},
       enrollUsers() {},
       reset() {}
-    };
+    }
 
-    const wrapper = mount(<AddPeople {...props} />);
+    const wrapper = mount(<AddPeople {...props} />)
 
     wrapper.setProps({
       apiState: {
-        error: "Some random error"
+        error: 'Some random error'
       }
-    });
+    })
 
-    expect(document.activeElement.textContent).toEqual("Cancel");
-  });
+    expect(document.activeElement.textContent).toEqual('Cancel')
+  })
 
-  it("sends focus to the modal close button when people validation issues happen", () => {
+  it('sends focus to the modal close button when people validation issues happen', () => {
     const props = {
       isOpen: true,
       courseParams: {
@@ -61,28 +61,28 @@ describe("Focus Handling", () => {
         isPending: 0
       },
       inputParams: {
-        nameList: "",
-        searchType: "unique_id",
-        role: "student",
-        section: "1"
+        nameList: '',
+        searchType: 'unique_id',
+        role: 'student',
+        section: '1'
       },
       userValidationResult: {
         missing: {
-          "gotta have": "something missing"
+          'gotta have': 'something missing'
         },
         duplicates: {}
       },
       validateUsers() {},
       enrollUsers() {},
       reset() {}
-    };
+    }
 
-    const wrapper = mount(<AddPeople {...props} />);
+    const wrapper = mount(<AddPeople {...props} />)
 
     wrapper.setState({
-      currentPage: "peoplevalidationissues"
-    });
+      currentPage: 'peoplevalidationissues'
+    })
 
-    expect(document.activeElement.textContent).toEqual("Cancel");
-  });
-});
+    expect(document.activeElement.textContent).toEqual('Cancel')
+  })
+})

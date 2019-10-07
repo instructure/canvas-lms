@@ -180,7 +180,6 @@ export default class CoursesListRow extends React.Component {
             {name}
             {blueprint && (
               <Tooltip tip={blueprintTip}>
-                {' '}
                 <IconBlueprintLine />
                 <ScreenReaderContent>{blueprintTip}</ScreenReaderContent>
               </Tooltip>
