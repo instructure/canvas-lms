@@ -34,7 +34,7 @@ async function mockStudentViewResult(overrides = {}) {
 
 async function mockSubmissionHistoriesResult(overrides = {}) {
   const variables = {submissionID: '1', cursor: null}
-  const allOverrides = [overrides, {Node: () => ({__typename: 'Submission'})}]
+  const allOverrides = [overrides, {Node: {__typename: 'Submission'}}]
   const result = await mockQuery(SUBMISSION_HISTORIES_QUERY, allOverrides, variables)
   return result.data
 }
@@ -50,15 +50,15 @@ async function makeProps(opts = {}) {
   const submittedStateOverrides = currentAttempt === 0 ? {} : SubmissionMocks.submitted
   const studentViewOverrides = [
     {
-      Submission: () => ({
+      Submission: {
         ...submittedStateOverrides,
         attempt: currentAttempt
-      })
+      }
     }
   ]
   if (withDraft) {
     studentViewOverrides.push({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
     })
   }
   const studentViewResult = await mockStudentViewResult(studentViewOverrides)
@@ -73,8 +73,8 @@ async function makeProps(opts = {}) {
     }))
 
     submissionHistoriesResult = await mockSubmissionHistoriesResult({
-      SubmissionHistoryConnection: () => ({nodes: mockedNodeResults}),
-      PageInfo: () => ({hasPreviousPage})
+      SubmissionHistoryConnection: {nodes: mockedNodeResults},
+      PageInfo: {hasPreviousPage}
     })
   }
 

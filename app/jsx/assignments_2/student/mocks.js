@@ -87,6 +87,7 @@ async function createMocks(overrides = []) {
     if (typeof overrideObj !== 'object') {
       throw new Error(`overrides must be an object, not ${typeof overrideObj}`)
     }
+
     Object.keys(overrideObj).forEach(key => {
       // Sanity check. If someone tries to add an override that doesn't exist in
       // the schema, we are going to fail hard here instead of having unexpected
@@ -100,7 +101,8 @@ async function createMocks(overrides = []) {
 
       const defaultFunction = mocks[key] || (() => undefined)
       const defaultValues = defaultFunction()
-      const overrideFunction = overrideObj[key]
+      const overrideFunction =
+        typeof overrideObj[key] === 'function' ? overrideObj[key] : () => overrideObj[key]
       const overrideValues = overrideFunction()
 
       // This if statement handles scalar types. For example, saying that all URL

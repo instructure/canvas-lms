@@ -26,9 +26,9 @@ async function makeProps(opts = {}) {
   const mockedSubmission =
     opts.submission ||
     (await mockSubmission({
-      Submission: () => ({
+      Submission: {
         submissionDraft: {body: 'words'}
-      })
+      }
     }))
 
   return {
@@ -149,10 +149,10 @@ describe('TextEntry', () => {
 
   it('displays the submitted text body when the text has been submitted', async () => {
     const mockedSubmission = await mockSubmission({
-      Submission: () => ({
+      Submission: {
         body: '<p>thundercougarfalconbird</p>',
         state: 'submitted'
-      })
+      }
     })
     const props = await makeProps({submission: mockedSubmission})
     const {getByTestId, getByText} = render(<TextEntry {...props} />)
@@ -163,10 +163,10 @@ describe('TextEntry', () => {
 
   it('displays the submitted text body when the submission has been graded', async () => {
     const mockedSubmission = await mockSubmission({
-      Submission: () => ({
+      Submission: {
         body: '<p>thundercougarfalconbird</p>',
         state: 'graded'
-      })
+      }
     })
     const props = await makeProps({submission: mockedSubmission})
     const {getByTestId, getByText} = render(<TextEntry {...props} />)

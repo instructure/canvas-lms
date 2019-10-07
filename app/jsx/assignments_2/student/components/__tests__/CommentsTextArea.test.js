@@ -267,17 +267,17 @@ describe('CommentTextArea', () => {
       mediaObjectId: null
     }
     const overrides = {
-      Node: () => ({__typename: 'Submission'}),
-      SubmissionCommentConnection: () => ({
+      Node: {__typename: 'Submission'},
+      SubmissionCommentConnection: {
         nodes: [{_id: '1'}, {_id: '2'}],
         errors: null
-      })
+      }
     }
 
     const mutationOverrides = {
-      CreateSubmissionCommentPayload: () => ({
+      CreateSubmissionCommentPayload: {
         errors: null
-      })
+      }
     }
 
     const result = await mockQuery(SUBMISSION_COMMENT_QUERY, overrides, variables)

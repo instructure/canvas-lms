@@ -36,7 +36,7 @@ describe('ContentTabs', () => {
 
   it('renders the tabs in the correct order when the assignment has a rubric', async () => {
     const props = await mockAssignmentAndSubmission({
-      Assignment: () => ({rubric: {}})
+      Assignment: {rubric: {}}
     })
 
     const {getAllByRole, getByText, getAllByText} = render(
@@ -54,7 +54,7 @@ describe('ContentTabs', () => {
 
   it('does not render the Rubric tab when the assignment has no rubric', async () => {
     const props = await mockAssignmentAndSubmission({
-      Assignment: () => ({rubric: null})
+      Assignment: {rubric: null}
     })
 
     const {getAllByRole, getByText, getAllByText} = render(
@@ -71,7 +71,7 @@ describe('ContentTabs', () => {
 
   it('titles the attempt tab as Attempt 1 on a brand new submission', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({attempt: 0})
+      Submission: {attempt: 0}
     })
     const {getAllByRole, getByText} = render(
       <MockedProvider>
@@ -84,7 +84,7 @@ describe('ContentTabs', () => {
 
   it('titles the attempt tab with the correct attempt number on a submission with multiple attempts', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({attempt: 50})
+      Submission: {attempt: 50}
     })
     const {getAllByRole, getByText} = render(
       <MockedProvider>
@@ -97,7 +97,7 @@ describe('ContentTabs', () => {
 
   it('displays the submitted time and grade of the current submission if it has been submitted', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => SubmissionMocks.submitted
+      Submission: SubmissionMocks.submitted
     })
 
     const {getByTestId, getByText} = render(
@@ -113,7 +113,7 @@ describe('ContentTabs', () => {
 
   it('displays Not submitted if the submission has been graded but not submitted', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({state: 'graded'})
+      Submission: {state: 'graded'}
     })
     const {getByText, queryByTestId} = render(
       <MockedProvider>
@@ -127,7 +127,7 @@ describe('ContentTabs', () => {
 
   it('displays the submitted time and grade of the current submission if it has been graded', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => SubmissionMocks.graded
+      Submission: SubmissionMocks.graded
     })
 
     const {getByTestId, getByText} = render(
@@ -143,7 +143,7 @@ describe('ContentTabs', () => {
 
   it('does not display the grade of the current submission if it is submitted but not graded', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => SubmissionMocks.submitted
+      Submission: SubmissionMocks.submitted
     })
     const {queryByTestId, queryByText} = render(
       <MockedProvider>
@@ -172,7 +172,7 @@ describe('ContentTabs', () => {
 
   it('displays the correct message if the submission grade has not been posted', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({posted: false})
+      Submission: {posted: false}
     })
 
     const {getAllByText, getByText} = render(
@@ -190,10 +190,7 @@ describe('ContentTabs', () => {
 
   it('does not let you create comments if a dummy submission is being displayed', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({
-        attempt: 2,
-        state: 'unsubmitted'
-      })
+      Submission: {attempt: 2, state: 'unsubmitted'}
     })
 
     const {getAllByText, queryByTestId, getByText} = render(

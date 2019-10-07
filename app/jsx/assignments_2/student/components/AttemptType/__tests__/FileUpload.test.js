@@ -70,8 +70,8 @@ describe('FileUpload', () => {
 
   it('renders the submission draft files if there are any', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
-      File: () => ({displayName: 'foobarbaz'})
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
+      File: {displayName: 'foobarbaz'}
     })
 
     const {getByTestId, getAllByText} = render(<FileUpload {...props} />)
@@ -81,8 +81,8 @@ describe('FileUpload', () => {
 
   it('renders in an img tag if the file type is an image', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
-      File: () => ({displayName: 'foobarbaz', mimeClass: 'image'})
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
+      File: {displayName: 'foobarbaz', mimeClass: 'image'}
     })
     const {container, getByTestId} = render(<FileUpload {...props} />)
     const uploadRender = getByTestId('non-empty-upload')
@@ -91,8 +91,8 @@ describe('FileUpload', () => {
 
   it('renders an icon if a non-image file is uploaded', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
-      File: () => ({displayName: 'foobarbaz', mimeClass: 'pdf'})
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
+      File: {displayName: 'foobarbaz', mimeClass: 'pdf'}
     })
 
     const {container, getByTestId} = render(<FileUpload {...props} />)
@@ -149,7 +149,7 @@ describe('FileUpload', () => {
 
   it('uploads files received through the LtiDeepLinkingResponse message event', async () => {
     const props = await makeProps({
-      Submission: () => ({attempt: 0})
+      Submission: {attempt: 0}
     })
     uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'LemonRules.jpg'}])
 
@@ -209,7 +209,7 @@ describe('FileUpload', () => {
   // for some context around this
   it('creates a submission draft for the current attempt when not on attempt 0', async () => {
     const props = await makeProps({
-      Submission: () => ({attempt: 2})
+      Submission: {attempt: 2}
     })
     uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
 
@@ -232,7 +232,7 @@ describe('FileUpload', () => {
 
   it('creates a submission draft for attempt one when on attempt 0', async () => {
     const props = await makeProps({
-      Submission: () => ({attempt: 0})
+      Submission: {attempt: 0}
     })
     uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
 
@@ -255,8 +255,8 @@ describe('FileUpload', () => {
 
   it('renders a button to remove the file', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
-      File: () => ({_id: '1', displayName: 'foobarbaz'})
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
+      File: {_id: '1', displayName: 'foobarbaz'}
     })
 
     const {container, getByText} = render(<FileUpload {...props} />)
@@ -272,9 +272,9 @@ describe('FileUpload', () => {
       {_id: '2', displayName: 'foobarbaz2'}
     ]
     const props = await makeProps({
-      Submission: () => ({
+      Submission: {
         submissionDraft: {attachments: attachmentOverrides}
-      })
+      }
     })
 
     const {container, getByText} = render(<FileUpload {...props} />)
@@ -287,8 +287,8 @@ describe('FileUpload', () => {
 
   it('elides filenames for files greater than 21 characters', async () => {
     const props = await makeProps({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
-      File: () => ({displayName: 'c'.repeat(22)})
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
+      File: {displayName: 'c'.repeat(22)}
     })
 
     const {getByText} = render(<FileUpload {...props} />)
@@ -299,8 +299,8 @@ describe('FileUpload', () => {
   it('does not elide filenames for files less than or equal to 21 characters', async () => {
     const filename = 'c'.repeat(21)
     const props = await makeProps({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit,
-      File: () => ({displayName: filename})
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
+      File: {displayName: filename}
     })
 
     const {getAllByText} = render(<FileUpload {...props} />)
@@ -309,7 +309,7 @@ describe('FileUpload', () => {
   })
 
   it('displays the more options button in the upload box', async () => {
-    const props = await mockAssignmentAndSubmission()
+    const props = await makeProps()
     const {getByTestId, getByText} = render(<FileUpload {...props} />)
     const emptyRender = getByTestId('upload-box')
 
@@ -318,7 +318,7 @@ describe('FileUpload', () => {
 
   it('displays allowed extensions in the upload box', async () => {
     const props = await makeProps({
-      Assignment: () => ({allowedExtensions: ['jpg, png']})
+      Assignment: {allowedExtensions: ['jpg, png']}
     })
     const {getByTestId, getByText} = render(<FileUpload {...props} />)
     const emptyRender = getByTestId('upload-box')
@@ -336,7 +336,7 @@ describe('FileUpload', () => {
 
   it('renders an error when adding a file that is not an allowed extension', async () => {
     const props = await makeProps({
-      Assignment: () => ({allowedExtensions: ['jpg']})
+      Assignment: {allowedExtensions: ['jpg']}
     })
     const {container, getByText, queryByTestId} = render(<FileUpload {...props} />)
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
@@ -350,7 +350,7 @@ describe('FileUpload', () => {
 
   it('does not render an error when adding a file that is an allowed extension', async () => {
     const props = await makeProps({
-      Assignment: () => ({allowedExtensions: ['jpg']})
+      Assignment: {allowedExtensions: ['jpg']}
     })
     const {container, queryByText} = render(<FileUpload {...props} />)
     const fileInput = container.querySelector('input[id="inputFileDrop"]')

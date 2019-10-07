@@ -224,7 +224,7 @@ describe('CommentsTab', () => {
     jest.useFakeTimers()
 
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({unreadCommentCount: 1})
+      Submission: {unreadCommentCount: 1}
     })
 
     const mockMutation = jest.fn()
@@ -248,7 +248,7 @@ describe('CommentsTab', () => {
     jest.useFakeTimers()
 
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({unreadCommentCount: 1})
+      Submission: {unreadCommentCount: 1}
     })
 
     apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: true}])
@@ -272,7 +272,7 @@ describe('CommentsTab', () => {
     jest.useFakeTimers()
 
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({unreadCommentCount: 1})
+      Submission: {unreadCommentCount: 1}
     })
 
     apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: false}])

@@ -27,7 +27,7 @@ import {SubmissionMocks} from '../../graphqlData/Submission'
 
 describe('SubmissionManager', () => {
   it('renders the AttemptTab', async () => {
-    const props = await mockAssignmentAndSubmission({})
+    const props = await mockAssignmentAndSubmission()
     const {getByTestId} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
@@ -38,7 +38,7 @@ describe('SubmissionManager', () => {
   })
 
   it('does not render a submit button when the draft criteria is not met', async () => {
-    const props = await mockAssignmentAndSubmission({})
+    const props = await mockAssignmentAndSubmission()
     const {queryByText} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
@@ -50,7 +50,7 @@ describe('SubmissionManager', () => {
 
   it('renders a submit button when the draft criteria is met', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
     })
     const {getByText} = render(
       <MockedProvider>
@@ -63,7 +63,7 @@ describe('SubmissionManager', () => {
 
   it('disables the submit button after it is pressed', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
     })
 
     const variables = {
