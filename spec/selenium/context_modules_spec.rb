@@ -319,7 +319,6 @@ describe "context modules" do
 
     it "should set usage rights on a file in a module", priority: "1", test_id: 369251 do
       get "/courses/#{@course.id}/modules"
-      make_full_screen
       add_existing_module_item('#attachments_select', 'File', FILE_NAME)
       ff('.icon-publish')[0].click
       wait_for_ajaximations

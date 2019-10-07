@@ -299,7 +299,6 @@ describe "RCE next tests" do
 
       visit_front_page_edit(@course)
 
-      click_more_toolbar_button
       click_images_toolbar_button
       click_course_images
 
@@ -475,7 +474,6 @@ describe "RCE next tests" do
     it "should open upload image modal when clicking upload option" do
       visit_front_page_edit(@course)
 
-      click_more_toolbar_button
       click_images_toolbar_button
       click_upload_image
 
@@ -486,7 +484,6 @@ describe "RCE next tests" do
       skip('Unskip after adding upload option back COREFE-268')
       visit_front_page_edit(@course)
 
-      click_more_toolbar_button
       click_media_toolbar_button
       click_upload_media
 
@@ -497,7 +494,6 @@ describe "RCE next tests" do
       skip('Causing flakiness - CORE-3186')
       visit_front_page_edit(@course)
 
-      click_more_toolbar_button
       click_document_toolbar_button
       click_upload_document
 

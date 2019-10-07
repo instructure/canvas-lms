@@ -204,7 +204,7 @@ describe "Gradezilla" do
       Gradezilla.visit(@course)
 
       # chrome fails to find the download submissions link because it does not fit normal screen
-      make_full_screen
+
 
       # And I click the download submissions button
       Gradezilla.click_assignment_header_menu_element(@first_assignment.id,"download submissions")

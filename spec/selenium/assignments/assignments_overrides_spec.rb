@@ -30,7 +30,7 @@ describe "assignment groups" do
 
     before(:each) do
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([])
-      make_full_screen
+
       course_with_teacher_logged_in
     end
 
@@ -209,7 +209,7 @@ describe "assignment groups" do
     let(:lock_at) { Time.zone.now + 4.days }
 
     before(:each) do
-      make_full_screen
+
       course_with_student_logged_in(:active_all => true)
     end
 

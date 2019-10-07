@@ -124,7 +124,7 @@ describe "calendar2" do
 
       it "should create an event that is recurring", priority: "1", test_id: 223510 do
         Account.default.enable_feature!(:recurring_calendar_events)
-        make_full_screen
+
         get '/calendar2'
         expect(f('#context-list li:nth-of-type(1)').text).to include(@teacher.name)
         expect(f('#context-list li:nth-of-type(2)').text).to include(@course.name)
@@ -277,7 +277,7 @@ describe "calendar2" do
       end
 
       it "respects the calendars checkboxes" do
-        make_full_screen
+
         get "/calendar2"
         expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
 

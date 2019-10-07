@@ -37,7 +37,7 @@ describe "scheduler" do
 
     before(:each) do
       user_session(@student)
-      make_full_screen
+
     end
 
     def reserve_appointment_manual(n, comment = nil)

@@ -24,7 +24,7 @@ describe "calendar2" do
 
   before(:each) do
     # or some stuff we need to click is "below the fold"
-    make_full_screen
+
 
     Account.default.tap do |a|
       a.settings[:show_scheduler] = true
