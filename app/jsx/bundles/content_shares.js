@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import ReactDOM from "react-dom"
+import ReactDOM from 'react-dom'
 import I18n from 'i18n!content_share'
-import ReceivedContentView from "../content_shares/ReceivedContentView"
+import ReceivedContentView from '../content_shares/ReceivedContentView'
 import ErrorBoundary from 'jsx/shared/components/ErrorBoundary'
 import GenericErrorPage from 'jsx/shared/components/GenericErrorPage'
 import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
@@ -36,4 +36,5 @@ ReactDOM.render(
   >
     <ReceivedContentView />
   </ErrorBoundary>,
-  container)
+  container
+)

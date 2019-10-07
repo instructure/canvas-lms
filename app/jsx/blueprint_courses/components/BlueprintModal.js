@@ -70,6 +70,7 @@ export default class BlueprintModal extends Component {
   }
 
   bodyOverflow = ''
+
   fixBodyScroll(isOpen) {
     if (isOpen) {
       this.bodyOverflow = document.body.style.overflowY

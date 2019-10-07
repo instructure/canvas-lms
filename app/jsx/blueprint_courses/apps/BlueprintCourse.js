@@ -18,46 +18,53 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
+import {Provider} from 'react-redux'
 
-import { ConnectedCourseSidebar } from '../components/CourseSidebar'
+import {ConnectedCourseSidebar} from '../components/CourseSidebar'
 import FlashNotifications from '../flashNotifications'
 import createStore from '../store'
 import Router from '../router'
 
 export default class BlueprintCourse {
-  constructor (root, data) {
+  constructor(root, data) {
     this.root = root
     this.store = createStore(data)
     this.router = new Router()
   }
 
-  routes = [{
-    path: Router.PATHS.singleMigration,
-    onEnter: ({ params }) => this.app.showChangeLog(params),
-    onExit: () => this.app.hideChangeLog(),
-  }]
+  routes = [
+    {
+      path: Router.PATHS.singleMigration,
+      onEnter: ({params}) => this.app.showChangeLog(params),
+      onExit: () => this.app.hideChangeLog()
+    }
+  ]
 
-  setupRouter () {
+  setupRouter() {
     this.router.registerRoutes(this.routes)
     this.router.start()
   }
 
-  unmount () {
+  unmount() {
     ReactDOM.unmountComponentAtNode(this.root)
   }
 
-  render () {
+  render() {
     const routeTo = isBlueprintShabang() ? this.router.page : noop
     ReactDOM.render(
       <Provider store={this.store}>
-        <ConnectedCourseSidebar routeTo={routeTo} realRef={(c) => { this.app = c }} />
+        <ConnectedCourseSidebar
+          routeTo={routeTo}
+          realRef={c => {
+            this.app = c
+          }}
+        />
       </Provider>,
       this.root
     )
   }
 
-  start () {
+  start() {
     FlashNotifications.subscribe(this.store)
     this.render()
     if (isBlueprintShabang()) {

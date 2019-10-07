@@ -29,7 +29,7 @@ const previewDefaults = {
 }
 
 ready(() => {
-const previewDiv = $('#doc_preview')
-previewDiv.fillWindowWithMe()
-previewDiv.loadDocPreview($.merge(previewDefaults, previewDiv.data()))
+  const previewDiv = $('#doc_preview')
+  previewDiv.fillWindowWithMe()
+  previewDiv.loadDocPreview($.merge(previewDefaults, previewDiv.data()))
 })

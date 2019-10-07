@@ -22,15 +22,15 @@ import ReactDOM from 'react-dom'
 import TermsOfServiceModal from '../shared/TermsOfServiceModal'
 
 ready(() => {
-let container = document.querySelector('#terms_of_service_preview_link')
-if (container) {
-  ReactDOM.render(<TermsOfServiceModal preview/>, container)
-} else {
-  container = document.querySelectorAll('.terms_of_service_link')
-  if (container.length) {
-    for(let i = 0; i < container.length; i++) {
-      ReactDOM.render(<TermsOfServiceModal />, container[i])
+  let container = document.querySelector('#terms_of_service_preview_link')
+  if (container) {
+    ReactDOM.render(<TermsOfServiceModal preview />, container)
+  } else {
+    container = document.querySelectorAll('.terms_of_service_link')
+    if (container.length) {
+      for (let i = 0; i < container.length; i++) {
+        ReactDOM.render(<TermsOfServiceModal />, container[i])
+      }
     }
   }
-}
 })

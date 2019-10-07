@@ -21,13 +21,15 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import 'jqueryui/dialog'
 
-function fetchCourses () {
+function fetchCourses() {
   $('#catalog_content').load(window.location.href)
 }
 
-function handleNav (e) {
+function handleNav(e) {
   let url
-  if (!history.pushState) { return }
+  if (!history.pushState) {
+    return
+  }
   if (this.href) {
     url = this.href
   } else {
@@ -38,7 +40,7 @@ function handleNav (e) {
   e.preventDefault()
 }
 
-function handleCourseClick (e) {
+function handleCourseClick(e) {
   const link = $(e.target).closest('.course_enrollment_link')[0]
   if (!link) {
     const $course = $(e.target).closest('.course_summary')
@@ -63,9 +65,9 @@ function handleCourseClick (e) {
 }
 
 ready(() => {
-$('#course_filter').submit(handleNav)
-$('#catalog_content').on('click', '#previous-link', handleNav)
-$('#catalog_content').on('click', '#next-link', handleNav)
-$('#catalog_content').on('click', '#course_summaries', handleCourseClick)
-window.addEventListener('popstate', fetchCourses)
+  $('#course_filter').submit(handleNav)
+  $('#catalog_content').on('click', '#previous-link', handleNav)
+  $('#catalog_content').on('click', '#next-link', handleNav)
+  $('#catalog_content').on('click', '#course_summaries', handleCourseClick)
+  window.addEventListener('popstate', fetchCourses)
 })

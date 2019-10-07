@@ -20,5 +20,5 @@ import DeepLinkingResponse from '../deep_linking/DeepLinkingResponse'
 import ready from '@instructure/ready'
 
 ready(() => {
-DeepLinkingResponse.mount()
+  DeepLinkingResponse.mount()
 })

@@ -25,7 +25,7 @@ ready(() => {
   const $warningLink = $('i.locale-warning')
   $warningLink.hide()
 
-  function checkWarningIcon () {
+  function checkWarningIcon() {
     if (Array.from(ENV.crowdsourced_locales).includes($select.val())) {
       $warningLink.show()
     } else {
@@ -37,4 +37,3 @@ ready(() => {
 
   return checkWarningIcon()
 })
-

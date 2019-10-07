@@ -29,7 +29,7 @@ import LockBanner from '../components/LockBanner'
 import LockToggle from '../components/LockToggle'
 
 export default class LockManager {
-  constructor () {
+  constructor() {
     this.state = {
       isLocked: false,
       itemLocks: [],
@@ -38,57 +38,63 @@ export default class LockManager {
       itemId: ''
     }
   }
-  init (options) {
-    if (!this.shouldInit()) return;
+
+  init(options) {
+    if (!this.shouldInit()) return
     this.props = buildProps(options)
     this.setupState()
-    if (this.state.itemId !== undefined) {  // will be undefined if creating a new assignment, discussion, etc.
+    if (this.state.itemId !== undefined) {
+      // will be undefined if creating a new assignment, discussion, etc.
       this.render()
     }
   }
 
-  shouldInit () {
-    return ENV.MASTER_COURSE_DATA &&
-           (ENV.MASTER_COURSE_DATA.is_master_course_master_content ||
-           ENV.MASTER_COURSE_DATA.is_master_course_child_content)
+  shouldInit() {
+    return (
+      ENV.MASTER_COURSE_DATA &&
+      (ENV.MASTER_COURSE_DATA.is_master_course_master_content ||
+        ENV.MASTER_COURSE_DATA.is_master_course_child_content)
+    )
   }
 
-  setupState () {
+  setupState() {
     this.state = {
       isLocked: ENV.MASTER_COURSE_DATA.restricted_by_master_course,
-      itemLocks: ENV.MASTER_COURSE_DATA.master_course_restrictions || ENV.MASTER_COURSE_DATA.default_restrictions,
+      itemLocks:
+        ENV.MASTER_COURSE_DATA.master_course_restrictions ||
+        ENV.MASTER_COURSE_DATA.default_restrictions,
       isMasterContent: ENV.MASTER_COURSE_DATA.is_master_course_master_content,
       isChildContent: ENV.MASTER_COURSE_DATA.is_master_course_child_content,
       courseId: ENV.COURSE_ID,
-      itemId: get(ENV, this.props.itemIdPath),
+      itemId: get(ENV, this.props.itemIdPath)
     }
   }
 
-  setState (newState) {
+  setState(newState) {
     this.state = Object.assign(this.state, newState)
     this.render()
   }
 
-  getItemLocks () {
-    return { ...this.state.itemLocks }
+  getItemLocks() {
+    return {...this.state.itemLocks}
   }
 
-  isMasterContent () {
+  isMasterContent() {
     return this.state.isMasterContent
   }
 
-  isChildContent () {
+  isChildContent() {
     return this.state.isChildContent
   }
 
   toggleLocked = () => {
-    const { itemType } = this.props
-    const { courseId, isLocked, itemId } = this.state
-    ApiClient.toggleLocked({ courseId, itemType, itemId, isLocked: !isLocked })
-      .then((res) => {
+    const {itemType} = this.props
+    const {courseId, isLocked, itemId} = this.state
+    ApiClient.toggleLocked({courseId, itemType, itemId, isLocked: !isLocked})
+      .then(res => {
         if (res.data.success) {
           this.setState({
-            isLocked: !isLocked,
+            isLocked: !isLocked
           })
         } else {
           this.showToggleError()
@@ -99,44 +105,49 @@ export default class LockManager {
       })
   }
 
-  showToggleError () {
+  showToggleError() {
     $.flashError(I18n.t('There was a problem toggling the content lock.'))
   }
 
-  setupToggle (cb) {
-    if (!this.props.toggleWrapperSelector) return;
+  setupToggle(cb) {
+    if (!this.props.toggleWrapperSelector) return
     if (!this.toggleNode) {
-      LockToggle.setupRootNode(this.props.toggleWrapperSelector, this.props.toggleWrapperChildIndex || 0, (node) => {
-        this.toggleNode = node
-        cb()
-      })
+      LockToggle.setupRootNode(
+        this.props.toggleWrapperSelector,
+        this.props.toggleWrapperChildIndex || 0,
+        node => {
+          this.toggleNode = node
+          cb()
+        }
+      )
     } else {
       cb()
     }
   }
 
-  renderLockToggle () {
-    if (!this.props.toggleWrapperSelector) return;
+  renderLockToggle() {
+    if (!this.props.toggleWrapperSelector) return
     this.setupToggle(() => {
       ReactDOM.render(
         <LockToggle
           isLocked={this.state.isLocked}
           isToggleable={this.props.page === 'show' && this.state.isMasterContent}
           onClick={this.toggleLocked}
-        />, this.toggleNode)
+        />,
+        this.toggleNode
+      )
     })
   }
 
-  renderBanner () {
+  renderBanner() {
     if (!this.bannerNode) this.bannerNode = LockBanner.setupRootNode()
     ReactDOM.render(
-      <LockBanner
-        isLocked={this.state.isLocked}
-        itemLocks={this.state.itemLocks}
-      />, this.bannerNode)
+      <LockBanner isLocked={this.state.isLocked} itemLocks={this.state.itemLocks} />,
+      this.bannerNode
+    )
   }
 
-  render () {
+  render() {
     this.renderBanner()
     this.renderLockToggle()
   }

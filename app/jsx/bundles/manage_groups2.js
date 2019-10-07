@@ -22,10 +22,10 @@ import GroupCategoryCollection from 'compiled/collections/GroupCategoryCollectio
 import ready from '@instructure/ready'
 
 ready(() => {
-const groupCategories = new GroupCategoryCollection(
-  ENV.group_categories, { markInactiveStudents: true }
-)
-const app = new GroupCategoriesView({collection: groupCategories})
-app.render()
-$('#content').html(app.$el)
+  const groupCategories = new GroupCategoryCollection(ENV.group_categories, {
+    markInactiveStudents: true
+  })
+  const app = new GroupCategoriesView({collection: groupCategories})
+  app.render()
+  $('#content').html(app.$el)
 })

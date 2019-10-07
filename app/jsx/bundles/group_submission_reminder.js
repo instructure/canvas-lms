@@ -24,11 +24,12 @@ import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 import ready from '@instructure/ready'
 
-
-export default function GroupSubmissionAlert ({groupType}) {
+export default function GroupSubmissionAlert({groupType}) {
   return (
     <Alert variant="warning" margin="medium 0">
-     {I18n.t('Keep in mind, this submission will count for everyone in your %{groupType} group.', {groupType})}
+      {I18n.t('Keep in mind, this submission will count for everyone in your %{groupType} group.', {
+        groupType
+      })}
     </Alert>
   )
 }
@@ -38,10 +39,10 @@ GroupSubmissionAlert.propTypes = {
 }
 
 ready(() => {
-$('.group_submission_alert').each((idx, alertContainer) => {
-  ReactDOM.render(
-    <GroupSubmissionAlert groupType={alertContainer.getAttribute('data-group-type')} />,
-    alertContainer
-  )
-})
+  $('.group_submission_alert').each((idx, alertContainer) => {
+    ReactDOM.render(
+      <GroupSubmissionAlert groupType={alertContainer.getAttribute('data-group-type')} />,
+      alertContainer
+    )
+  })
 })

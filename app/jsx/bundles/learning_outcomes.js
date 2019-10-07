@@ -30,11 +30,13 @@ import {showOutcomesImporter, showOutcomesImporterIfInProgress} from '../outcome
 const renderInstructions = ENV.PERMISSIONS.manage_outcomes
 
 const $el = $('#outcomes')
-$el.html(browserTemplate({
-  canManageOutcomes: ENV.PERMISSIONS.manage_outcomes,
-  canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
-  contextUrlRoot: ENV.CONTEXT_URL_ROOT
-}))
+$el.html(
+  browserTemplate({
+    canManageOutcomes: ENV.PERMISSIONS.manage_outcomes,
+    canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
+  })
+)
 
 export const toolbar = new ToolbarView({el: $el.find('.toolbar')})
 
@@ -70,20 +72,25 @@ toolbar.on('add', sidebar.addAndSelect.bind(sidebar))
 toolbar.on('add', content.add.bind(content))
 toolbar.on('find', () => sidebar.findDialog(FindDialog))
 toolbar.on('import', () => showImportOutcomesModal({toolbar}))
-toolbar.on('start_sync', (file) => showOutcomesImporter({
-  file,
-  disableOutcomeViews,
-  resetOutcomeViews,
-  mount: content.$el[0],
-  contextUrlRoot: ENV.CONTEXT_URL_ROOT
-}))
+toolbar.on('start_sync', file =>
+  showOutcomesImporter({
+    file,
+    disableOutcomeViews,
+    resetOutcomeViews,
+    mount: content.$el[0],
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
+  })
+)
 
-showOutcomesImporterIfInProgress({
-  disableOutcomeViews,
-  resetOutcomeViews,
-  mount: content.$el[0],
-  contextUrlRoot: ENV.CONTEXT_URL_ROOT
-}, ENV.current_user.id)
+showOutcomesImporterIfInProgress(
+  {
+    disableOutcomeViews,
+    resetOutcomeViews,
+    mount: content.$el[0],
+    contextUrlRoot: ENV.CONTEXT_URL_ROOT
+  },
+  ENV.current_user.id
+)
 
 // sidebar events
 sidebar.on('select', model => content.show(model))

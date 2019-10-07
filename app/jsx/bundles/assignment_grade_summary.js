@@ -23,6 +23,6 @@ import ready from '@instructure/ready'
 import GradeSummary from '../assignments/GradeSummary'
 
 ready(() => {
-const $container = document.getElementById('content')
-ReactDOM.render(<GradeSummary />, $container)
+  const $container = document.getElementById('content')
+  ReactDOM.render(<GradeSummary />, $container)
 })

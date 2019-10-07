@@ -31,7 +31,7 @@ import 'grading_standards'
 import LockManager from '../blueprint_courses/apps/LockManager'
 
 const lockManager = new LockManager()
-lockManager.init({ itemType: 'assignment', page: 'edit' })
+lockManager.init({itemType: 'assignment', page: 'edit'})
 const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
 ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
@@ -46,7 +46,8 @@ const dueDateList = new DueDateList(assignment.get('assignment_overrides'), sect
 
 const assignmentGroupSelector = new AssignmentGroupSelector({
   parentModel: assignment,
-  assignmentGroups: (typeof ENV !== 'undefined' && ENV !== null ? ENV.ASSIGNMENT_GROUPS : undefined) || []
+  assignmentGroups:
+    (typeof ENV !== 'undefined' && ENV !== null ? ENV.ASSIGNMENT_GROUPS : undefined) || []
 })
 const gradingTypeSelector = new GradingTypeSelector({
   parentModel: assignment,
@@ -55,14 +56,17 @@ const gradingTypeSelector = new GradingTypeSelector({
 })
 const groupCategorySelector = new GroupCategorySelector({
   parentModel: assignment,
-  groupCategories: (typeof ENV !== 'undefined' && ENV !== null ? ENV.GROUP_CATEGORIES : undefined) || [],
+  groupCategories:
+    (typeof ENV !== 'undefined' && ENV !== null ? ENV.GROUP_CATEGORIES : undefined) || [],
   inClosedGradingPeriod: assignment.inClosedGradingPeriod()
 })
 const peerReviewsSelector = new PeerReviewsSelector({
   parentModel: assignment
 })
 
-const headerEl = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED ? '#edit_assignment_header-cr' : '#edit_assignment_header'
+const headerEl = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+  ? '#edit_assignment_header-cr'
+  : '#edit_assignment_header'
 
 const editView = new EditView({
   el: '#edit_assignment_form',

@@ -27,16 +27,16 @@ import GeneratePairingCode from '../profiles/GeneratePairingCode'
 import ready from '@instructure/ready'
 
 ready(() => {
-const hiddenFlags = [];
-if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
-  hiddenFlags.push('new_user_tutorial_on_off')
-}
+  const hiddenFlags = []
+  if (!ENV.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT) {
+    hiddenFlags.push('new_user_tutorial_on_off')
+  }
 
-const view = new FeatureFlagAdminView({el: '.feature-flag-wrapper', hiddenFlags})
-view.collection.fetchAll()
+  const view = new FeatureFlagAdminView({el: '.feature-flag-wrapper', hiddenFlags})
+  view.collection.fetchAll()
 
-const container = document.querySelector('#pairing-code')
-if (container) {
-  ReactDOM.render(<GeneratePairingCode userId={ENV.current_user.id} />, container)
-}
+  const container = document.querySelector('#pairing-code')
+  if (container) {
+    ReactDOM.render(<GeneratePairingCode userId={ENV.current_user.id} />, container)
+  }
 })

@@ -23,5 +23,8 @@ import FileNotFound from '../shared/FileNotFound'
 import ready from '@instructure/ready'
 
 ready(() => {
-ReactDOM.render(<FileNotFound contextCode={window.ENV.context_asset_string} />, $('#sendMessageForm')[0])
+  ReactDOM.render(
+    <FileNotFound contextCode={window.ENV.context_asset_string} />,
+    $('#sendMessageForm')[0]
+  )
 })

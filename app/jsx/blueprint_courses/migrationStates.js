@@ -18,18 +18,17 @@
 
 const loadingStates = ['queued', 'exporting', 'imports_queued']
 const endStates = ['completed', 'exports_failed', 'imports_failed']
-const statesList = [
-  'void', 'unknown',
-  ...loadingStates,
-  ...endStates,
-]
+const statesList = ['void', 'unknown', ...loadingStates, ...endStates]
 
 const migrationStates = {
   statesList,
-  states: statesList.reduce((map, state) =>
-    Object.assign(map, {
-      [state]: state,
-    }), {})
+  states: statesList.reduce(
+    (map, state) =>
+      Object.assign(map, {
+        [state]: state
+      }),
+    {}
+  )
 }
 
 migrationStates.isEndState = state => endStates.includes(state)

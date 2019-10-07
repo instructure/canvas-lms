@@ -17,10 +17,10 @@
  */
 
 import I18n from 'i18n!blueprint_settingsMigrationSync'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 import cx from 'classnames'
 import 'compiled/jquery.rails_flash_notifications'
@@ -54,18 +54,18 @@ export default class MigrationSync extends Component {
     onClick: null
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.intId = null
   }
 
-  componentWillMount () {
+  componentWillMount() {
     if (!this.props.hasCheckedMigration) {
       this.props.checkMigration(true)
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.stopMigrationStatusPoll()
   }
 
@@ -76,36 +76,44 @@ export default class MigrationSync extends Component {
     }
   }
 
-  render () {
-    const { migrationStatus } = this.props
-    const isSyncing = MigrationStates.isLoadingState(migrationStatus) || this.props.isLoadingBeginMigration
+  render() {
+    const {migrationStatus} = this.props
+    const isSyncing =
+      MigrationStates.isLoadingState(migrationStatus) || this.props.isLoadingBeginMigration
     const iconClasses = cx({
       'bcs__sync-btn-icon': true,
-      'bcs__sync-btn-icon__active': isSyncing,
+      'bcs__sync-btn-icon__active': isSyncing
     })
     return (
       <div id={this.props.id} className="bcs__migration-sync">
-        { this.props.showProgress && isSyncing && (
+        {this.props.showProgress && isSyncing && (
           <div className="bcs__migration-sync__loading">
             <Text as="p">{I18n.t('Processing')}</Text>
-            <Text as="p" size="small">{I18n.t('This may take a bit...')}</Text>
+            <Text as="p" size="small">
+              {I18n.t('This may take a bit...')}
+            </Text>
             <Progress
               label={I18n.t('Sync in progress')}
               size="x-small"
               valueNow={MigrationStates.getLoadingValue(migrationStatus)}
               valueMax={MigrationStates.maxLoadingValue}
             />
-            {this.props.willSendNotification &&
+            {this.props.willSendNotification && (
               <Text as="p" size="small">
-                {I18n.t('You can leave the page and you will get a notification when the sync process is complete.')}
-              </Text>}
+                {I18n.t(
+                  'You can leave the page and you will get a notification when the sync process is complete.'
+                )}
+              </Text>
+            )}
           </div>
         )}
         <div className="bcs__migration-sync__button">
           <Button
             variant="primary"
             onClick={this.handleSyncClick}
-            ref={(c) => { this.syncBtn = c }}
+            ref={c => {
+              this.syncBtn = c
+            }}
             disabled={isSyncing}
           >
             <span className={iconClasses}>
@@ -128,7 +136,10 @@ const connectState = state =>
     'migrationStatus',
     'isLoadingBeginMigration',
     'hasCheckedMigration',
-    'willSendNotification',
+    'willSendNotification'
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedMigrationSync = connect(connectState, connectActions)(MigrationSync)
+export const ConnectedMigrationSync = connect(
+  connectState,
+  connectActions
+)(MigrationSync)

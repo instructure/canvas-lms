@@ -22,25 +22,25 @@ import PageViewView from 'compiled/views/contexts/PageViewView'
 import ready from '@instructure/ready'
 
 ready(() => {
-const $container = $('#pageviews')
-const $table = $container.find('table')
-const userId = $table.attr('data-user-id')
+  const $container = $('#pageviews')
+  const $table = $container.find('table')
+  const userId = $table.attr('data-user-id')
 
-const pageViews = new PageViewCollection()
-pageViews.url = `/api/v1/users/${userId}/page_views`
+  const pageViews = new PageViewCollection()
+  pageViews.url = `/api/v1/users/${userId}/page_views`
 
-const fetchOptions = {reset: true}
+  const fetchOptions = {reset: true}
 
-const pageViewsView = new PageViewView({
-  collection: pageViews,
-  el: $table,
-  fetchOptions
-})
+  const pageViewsView = new PageViewView({
+    collection: pageViews,
+    el: $table,
+    fetchOptions
+  })
 
   // Add events
-pageViews.on('reset', pageViewsView.render, pageViewsView)
+  pageViews.on('reset', pageViewsView.render, pageViewsView)
 
   // Fetch page views
-const fetchParams = {per_page: 100}
-pageViewsView.$el.disableWhileLoading(pageViews.fetch({data: fetchParams}))
+  const fetchParams = {per_page: 100}
+  pageViewsView.$el.disableWhileLoading(pageViews.fetch({data: fetchParams}))
 })

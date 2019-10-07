@@ -20,15 +20,16 @@ import createAnnouncementsIndex from '../announcements'
 import ready from '@instructure/ready'
 
 ready(() => {
-const root = document.querySelector('#content')
-const [contextType, contextId] = ENV.context_asset_string.split('_')
-const app = createAnnouncementsIndex(root, {
-  atomFeedUrl: ENV.atom_feed_url,
-  contextType, contextId,
-  masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
-  permissions: ENV.permissions,
-  announcementsLocked: ENV.ANNOUNCEMENTS_LOCKED,
-})
+  const root = document.querySelector('#content')
+  const [contextType, contextId] = ENV.context_asset_string.split('_')
+  const app = createAnnouncementsIndex(root, {
+    atomFeedUrl: ENV.atom_feed_url,
+    contextType,
+    contextId,
+    masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
+    permissions: ENV.permissions,
+    announcementsLocked: ENV.ANNOUNCEMENTS_LOCKED
+  })
 
-app.render()
+  app.render()
 })

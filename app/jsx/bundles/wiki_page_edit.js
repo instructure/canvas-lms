@@ -23,7 +23,7 @@ import WikiPageEditView from 'compiled/views/wiki/WikiPageEditView'
 import LockManager from '../blueprint_courses/apps/LockManager'
 
 const lockManager = new LockManager()
-lockManager.init({ itemType: 'wiki_page', page: 'edit' })
+lockManager.init({itemType: 'wiki_page', page: 'edit'})
 
 $('body').addClass('edit')
 
@@ -40,21 +40,23 @@ const wikiPageEditView = new WikiPageEditView({
   wiki_pages_path: ENV.WIKI_PAGES_PATH,
   WIKI_RIGHTS: ENV.WIKI_RIGHTS,
   PAGE_RIGHTS: ENV.PAGE_RIGHTS,
-  lockedItems,
+  lockedItems
 })
 
 ready(() => {
-$('#content').append(wikiPageEditView.$el)
+  $('#content').append(wikiPageEditView.$el)
 
-wikiPageEditView.on('cancel', () => {
-  const created_at = wikiPage.get('created_at')
-  const html_url = wikiPage.get('html_url')
-  if (!created_at || !html_url) {
-    if (ENV.WIKI_PAGES_PATH) { window.location.href = ENV.WIKI_PAGES_PATH }
-  } else {
-    window.location.href = html_url
-  }
-})
+  wikiPageEditView.on('cancel', () => {
+    const created_at = wikiPage.get('created_at')
+    const html_url = wikiPage.get('html_url')
+    if (!created_at || !html_url) {
+      if (ENV.WIKI_PAGES_PATH) {
+        window.location.href = ENV.WIKI_PAGES_PATH
+      }
+    } else {
+      window.location.href = html_url
+    }
+  })
 
-wikiPageEditView.render()
+  wikiPageEditView.render()
 })

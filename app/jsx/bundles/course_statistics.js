@@ -22,7 +22,9 @@ import RecentStudentCollectionView from 'compiled/views/RecentStudents/RecentStu
 import 'jqueryui/tabs'
 
 $(() => {
-  $('#reports-tabs').tabs().show()
+  $('#reports-tabs')
+    .tabs()
+    .show()
 
   const recentStudentCollection = new UserCollection()
   recentStudentCollection.url = ENV.RECENT_STUDENTS_URL

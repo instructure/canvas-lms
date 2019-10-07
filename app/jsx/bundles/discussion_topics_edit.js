@@ -31,12 +31,18 @@ import LockManager from '../blueprint_courses/apps/LockManager'
 import SectionsAutocomplete from '../shared/SectionsAutocomplete'
 
 const lockManager = new LockManager()
-lockManager.init({ itemType: 'discussion_topic', page: 'edit' })
+lockManager.init({itemType: 'discussion_topic', page: 'edit'})
 
 const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
-const isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES != null ? ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement : undefined
-const model = new (isAnnouncement ? Announcement : DiscussionTopic)(ENV.DISCUSSION_TOPIC.ATTRIBUTES, {parse: true})
+const isAnnouncement =
+  ENV.DISCUSSION_TOPIC.ATTRIBUTES != null
+    ? ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
+    : undefined
+const model = new (isAnnouncement ? Announcement : DiscussionTopic)(
+  ENV.DISCUSSION_TOPIC.ATTRIBUTES,
+  {parse: true}
+)
 model.urlRoot = ENV.DISCUSSION_TOPIC.URL_ROOT
 const assignment = model.get('assignment')
 
@@ -46,13 +52,13 @@ const dueDateList = new DueDateList(assignment.get('assignment_overrides'), sect
 
 const [contextType] = splitAssetString(ENV.context_asset_string)
 
-function renderSectionsAutocomplete (view) {
+function renderSectionsAutocomplete(view) {
   if (sectionSpecificEnabled()) {
     const container = document.querySelector('#sections_autocomplete_root')
     if (container) {
       const gcs = view.groupCategorySelector
       const isGradedDiscussion = view.gradedChecked()
-      const isGroupDiscussion = (gcs !== undefined) ? gcs.groupDiscussionChecked() : false
+      const isGroupDiscussion = gcs !== undefined ? gcs.groupDiscussionChecked() : false
       const enableDiscussionOptions = () => {
         view.enableGradedCheckBox()
         if (gcs !== undefined) {
@@ -74,8 +80,8 @@ function renderSectionsAutocomplete (view) {
           disableDiscussionOptions={disableDiscussionOptions}
           enableDiscussionOptions={enableDiscussionOptions}
           sections={ENV.SECTION_LIST}
-        />
-        , container
+        />,
+        container
       )
     }
   }
@@ -93,13 +99,13 @@ const view = new EditView({
       availabilityDatesReadonly: !!lockedItems.availability_dates
     })
   },
-  lockedItems: model.id ? lockedItems : {},  // if no id, creating a new discussion
+  lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion
   announcementsLocked
 })
 view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
 
 function sectionSpecificEnabled() {
-  if (!ENV.context_asset_string.startsWith("course")) {
+  if (!ENV.context_asset_string.startsWith('course')) {
     return false
   }
 
@@ -107,13 +113,16 @@ function sectionSpecificEnabled() {
   return isAnnouncement || ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED
 }
 
-if ((contextType === 'courses') && !isAnnouncement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT) {
-  const agc = new AssignmentGroupCollection();
-  agc.options.params = {};
-  agc.contextAssetString = ENV.context_asset_string;
-  view.assignmentGroupCollection = agc;
+if (
+  contextType === 'courses' &&
+  !isAnnouncement &&
+  ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
+) {
+  const agc = new AssignmentGroupCollection()
+  agc.options.params = {}
+  agc.contextAssetString = ENV.context_asset_string
+  view.assignmentGroupCollection = agc
 }
-
 
 $(() => {
   view.render().$el.appendTo('#content')

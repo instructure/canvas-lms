@@ -38,7 +38,9 @@ if (blueprint) {
       generalRestrictions={ENV.BLUEPRINT_RESTRICTIONS}
       useRestrictionsbyType={ENV.USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE}
       restrictionsByType={ENV.BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE}
-    />, blueprint)
+    />,
+    blueprint
+  )
 }
 
 const navView = new NavigationView({el: $('#tab-navigation')})
@@ -52,9 +54,7 @@ if (ENV.COURSE_IMAGES_ENABLED) {
   const courseImageStore = configureStore(initialState)
 
   ReactDOM.render(
-    <CourseImageSelector
-      store={courseImageStore}
-      name="course[image]"
-      courseId={ENV.COURSE_ID}
-    />, $('.CourseImageSelector__Container')[0])
+    <CourseImageSelector store={courseImageStore} name="course[image]" courseId={ENV.COURSE_ID} />,
+    $('.CourseImageSelector__Container')[0]
+  )
 }

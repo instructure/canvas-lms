@@ -25,7 +25,7 @@ import {Grid} from '@instructure/ui-layout'
 import CanvasSelect from 'jsx/shared/components/CanvasSelect'
 import propTypes from '../propTypes'
 
-const { func } = PropTypes
+const {func} = PropTypes
 const MIN_SEACH = 3 // min search term length for API
 
 export default class CourseFilter extends React.Component {
@@ -33,28 +33,30 @@ export default class CourseFilter extends React.Component {
     onChange: func,
     onActivate: func,
     terms: propTypes.termList.isRequired,
-    subAccounts: propTypes.accountList.isRequired,
+    subAccounts: propTypes.accountList.isRequired
   }
 
   static defaultProps = {
     onChange: () => {},
-    onActivate: () => {},
+    onActivate: () => {}
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       isActive: false,
       search: '',
       term: '',
-      subAccount: '',
+      subAccount: ''
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (prevState.search !== this.state.search ||
-        prevState.term !== this.state.term ||
-        prevState.subAccount !== this.state.subAccount) {
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.search !== this.state.search ||
+      prevState.term !== this.state.term ||
+      prevState.subAccount !== this.state.subAccount
+    ) {
       this.props.onChange(this.state)
     }
   }
@@ -65,18 +67,21 @@ export default class CourseFilter extends React.Component {
     })
   }
 
-  getSearchText () {
+  getSearchText() {
     const searchText = this.searchInput.value.trim().toLowerCase()
     return searchText.length >= MIN_SEACH ? searchText : ''
   }
 
   handleFocus = () => {
     if (!this.state.isActive) {
-      this.setState({
-        isActive: true,
-      }, () => {
-        this.props.onActivate()
-      })
+      this.setState(
+        {
+          isActive: true
+        },
+        () => {
+          this.props.onActivate()
+        }
+      )
     }
   }
 
@@ -89,43 +94,56 @@ export default class CourseFilter extends React.Component {
 
         if (isEmpty && !this.wrapper.contains(document.activeElement)) {
           this.setState({
-            isActive: false,
+            isActive: false
           })
         }
       }
     }, 0)
   }
 
-  render () {
+  render() {
     const termOptions = [
-      <CanvasSelect.Option key="all" id="all" value="">{I18n.t('Any Term')}</CanvasSelect.Option>,
+      <CanvasSelect.Option key="all" id="all" value="">
+        {I18n.t('Any Term')}
+      </CanvasSelect.Option>,
       ...this.props.terms.map(term => (
-          <CanvasSelect.Option key={term.id} id={term.id} value={term.id}>{term.name}</CanvasSelect.Option>
-        ))
+        <CanvasSelect.Option key={term.id} id={term.id} value={term.id}>
+          {term.name}
+        </CanvasSelect.Option>
+      ))
     ]
 
     const subAccountOptions = [
-      <CanvasSelect.Option key="all" id="all" value="">{I18n.t('Any Sub-Account')}</CanvasSelect.Option>,
+      <CanvasSelect.Option key="all" id="all" value="">
+        {I18n.t('Any Sub-Account')}
+      </CanvasSelect.Option>,
       ...this.props.subAccounts.map(account => (
-          <CanvasSelect.Option key={account.id} id={account.id} value={account.id}>{account.name}</CanvasSelect.Option>
-        ))
+        <CanvasSelect.Option key={account.id} id={account.id} value={account.id}>
+          {account.name}
+        </CanvasSelect.Option>
+      ))
     ]
 
     return (
-      <div className="bca-course-filter" ref={(c) => { this.wrapper = c }}>
+      <div
+        className="bca-course-filter"
+        ref={c => {
+          this.wrapper = c
+        }}
+      >
         <Grid colSpacing="none">
           <Grid.Row>
             <Grid.Col width={7}>
               <TextInput
-                ref={(c) => { this.searchInput = c }}
+                ref={c => {
+                  this.searchInput = c
+                }}
                 type="search"
                 onChange={this.onChange}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
                 placeholder={I18n.t('Search by title, short name, or SIS ID')}
-                label={
-                  <ScreenReaderContent>{I18n.t('Search Courses')}</ScreenReaderContent>
-                }
+                label={<ScreenReaderContent>{I18n.t('Search Courses')}</ScreenReaderContent>}
               />
             </Grid.Col>
             <Grid.Col width={2}>
@@ -134,9 +152,7 @@ export default class CourseFilter extends React.Component {
                 key="terms"
                 value={this.state.term}
                 onChange={(e, value) => this.setState({term: value})}
-                label={
-                  <ScreenReaderContent>{I18n.t('Select Term')}</ScreenReaderContent>
-                }
+                label={<ScreenReaderContent>{I18n.t('Select Term')}</ScreenReaderContent>}
               >
                 {termOptions}
               </CanvasSelect>
@@ -147,9 +163,7 @@ export default class CourseFilter extends React.Component {
                 key="subAccounts"
                 value={this.state.subAccount}
                 onChange={(e, value) => this.setState({subAccount: value})}
-                label={
-                  <ScreenReaderContent>{I18n.t('Select Sub-Account')}</ScreenReaderContent>
-                }
+                label={<ScreenReaderContent>{I18n.t('Select Sub-Account')}</ScreenReaderContent>}
               >
                 {subAccountOptions}
               </CanvasSelect>

@@ -36,7 +36,6 @@ const daySubCollectionView = new CollectionView({
   template
 })
 
-
 const dateShiftView = new DateShiftView({
   model: new ContentMigration(),
   collection: daySubCollection,
@@ -53,11 +52,11 @@ dateShiftView.$oldEndDate.val(ENV.OLD_END_DATE).trigger('change')
 const $start = $('#course_start_at')
 const $end = $('#course_conclude_at')
 
-function validateDates () {
+function validateDates() {
   const startAt = $start.data('unfudged-date')
   const endAt = $end.data('unfudged-date')
 
-  if (startAt && endAt && (endAt < startAt)) {
+  if (startAt && endAt && endAt < startAt) {
     $('button[type=submit]').attr('disabled', true)
     return $end.errorBox(I18n.t('End date cannot be before start date'))
   }
@@ -65,12 +64,12 @@ function validateDates () {
   return $('#copy_course_form').hideErrors()
 }
 
-$start.on('change', function () {
+$start.on('change', function() {
   validateDates()
   dateShiftView.$newStartDate.val($(this).val()).trigger('change')
 })
 
-$end.on('change', function () {
+$end.on('change', function() {
   validateDates()
   dateShiftView.$newEndDate.val($(this).val()).trigger('change')
 })

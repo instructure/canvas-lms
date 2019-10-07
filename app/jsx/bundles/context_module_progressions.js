@@ -48,15 +48,17 @@ const indexView = new PaginatedCollectionView({
 if (!ENV.RESTRICTED_LIST) {
   // attach the view's scroll container once it's populated
   students.fetch({
-    success () {
+    success() {
       if (students.length === 0) return
-      indexView.resetScrollContainer(indexView.$el.find('#progression_students .collectionViewItems'))
+      indexView.resetScrollContainer(
+        indexView.$el.find('#progression_students .collectionViewItems')
+      )
     }
   })
 }
 
 indexView.render()
-if (ENV.RESTRICTED_LIST && (ENV.VISIBLE_STUDENTS.length === 1)) {
+if (ENV.RESTRICTED_LIST && ENV.VISIBLE_STUDENTS.length === 1) {
   indexView.$el.find('#progression_students').hide()
 }
 indexView.$el.appendTo($('#content'))

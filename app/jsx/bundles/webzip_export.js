@@ -23,5 +23,5 @@ import ReactDOM from 'react-dom'
 import WebZipExportApp from '../webzip_export/App'
 
 ready(() => {
-ReactDOM.render(<WebZipExportApp />, $('#course-webzip-export-app')[0])
+  ReactDOM.render(<WebZipExportApp />, $('#course-webzip-export-app')[0])
 })

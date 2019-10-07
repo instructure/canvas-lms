@@ -22,5 +22,5 @@ import GradebookHistoryApp from '../gradebook-history/GradebookHistoryApp'
 import ready from '@instructure/ready'
 
 ready(() => {
-ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'))
+  ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'))
 })

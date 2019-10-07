@@ -60,14 +60,14 @@ function updateDocumentTitleBreadcrumbAndActiveTab(activeTab) {
   $('#breadcrumbs a:last span').text(activeTab.title)
 }
 ready(() => {
-const content = document.getElementById('content')
-store.subscribe(() => {
-  const tabState = store.getState().tabList
-  const selectedTab = tabState.tabs[tabState.selected]
-  updateDocumentTitleBreadcrumbAndActiveTab(selectedTab)
+  const content = document.getElementById('content')
+  store.subscribe(() => {
+    const tabState = store.getState().tabList
+    const selectedTab = tabState.tabs[tabState.selected]
+    updateDocumentTitleBreadcrumbAndActiveTab(selectedTab)
 
-  ReactDOM.render(<App {...props} />, content)
-})
+    ReactDOM.render(<App {...props} />, content)
+  })
 
-router.start(store)
+  router.start(store)
 })

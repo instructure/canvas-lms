@@ -21,5 +21,5 @@ import StudentView from '../groups/StudentView'
 import ready from '@instructure/ready'
 
 ready(() => {
-ReactDOM.render(StudentView, document.getElementById('content'))
+  ReactDOM.render(StudentView, document.getElementById('content'))
 })
