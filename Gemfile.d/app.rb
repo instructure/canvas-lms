@@ -117,7 +117,7 @@ gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.1', require: false
 gem 'shackles', '1.4.2'
 
-gem 'browser', '2.5.3', require: false
+gem 'browser', '2.6.1', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'sentry-raven', '2.7.2', require: false
