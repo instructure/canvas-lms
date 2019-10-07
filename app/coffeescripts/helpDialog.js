@@ -38,13 +38,13 @@ const helpDialog = {
 
   animateDuration: 100,
 
-  initDialog () {
+  initDialog() {
     helpDialog.defaultTitle = ENV.help_link_name || helpDialog.defaultTitle
     helpDialog.$dialog = $('<div style="padding:0; overflow: visible;" />').dialog({
       resizable: false,
       width: 400,
       title: helpDialog.defaultTitle,
-      close: () => helpDialog.switchTo('#help-dialog-options'),
+      close: () => helpDialog.switchTo('#help-dialog-options')
     })
 
     helpDialog.$dialog.dialog('widget').delegate(
@@ -55,17 +55,21 @@ const helpDialog = {
       preventDefault(({currentTarget}) => helpDialog.switchTo($(currentTarget).attr('href')))
     )
 
-    helpDialog.helpLinksDfd = $.getJSON('/help_links').done((links) => {
+    helpDialog.helpLinksDfd = $.getJSON('/help_links').done(links => {
       // only show the links that are available to the roles of this user
       links = $.grep(links, link =>
-        _.find(link.available_to, role => role === 'user' || (ENV.current_user_roles && ENV.current_user_roles.includes(role)))
+        _.find(
+          link.available_to,
+          role =>
+            role === 'user' || (ENV.current_user_roles && ENV.current_user_roles.includes(role))
+        )
       )
       const locals = {
         showEmail: helpDialog.showEmail(),
         helpLinks: links,
         url: window.location,
         contextAssetString: ENV.context_asset_string,
-        userRoles: ENV.current_user_roles,
+        userRoles: ENV.current_user_roles
       }
 
       helpDialog.$dialog.html(helpDialogTemplate(locals))
@@ -81,7 +85,7 @@ const helpDialog = {
     helpDialog.dialogInited = true
   },
 
-  initTicketForm () {
+  initTicketForm() {
     const required = ['error[subject]', 'error[comments]', 'error[user_perceived_severity]']
     if (helpDialog.showEmail()) required.push('error[email]')
 
@@ -95,29 +99,38 @@ const helpDialog = {
     })
   },
 
-  switchTo (panelId) {
+  switchTo(panelId) {
     let newTitle
     const toggleablePanels = '#teacher_feedback, #create_ticket'
     const homePanel = '#help-dialog-options'
     helpDialog.$dialog.find(toggleablePanels).hide()
     const newPanel = helpDialog.$dialog.find(panelId)
     const newHeight = newPanel.show().outerHeight()
-    helpDialog.$dialog.animate({left: toggleablePanels.match(panelId) ? -400 : 0, height: newHeight}, {
-      step: () => {
-        // reposition vertically to reflect current height
-        if (!(helpDialog.dialogInited && helpDialog.$dialog && helpDialog.$dialog.hasClass('ui-dialog-content'))) {
-          helpDialog.initDialog()
+    helpDialog.$dialog.animate(
+      {left: toggleablePanels.match(panelId) ? -400 : 0, height: newHeight},
+      {
+        step: () => {
+          // reposition vertically to reflect current height
+          if (
+            !(
+              helpDialog.dialogInited &&
+              helpDialog.$dialog &&
+              helpDialog.$dialog.hasClass('ui-dialog-content')
+            )
+          ) {
+            helpDialog.initDialog()
+          }
+          helpDialog.$dialog && helpDialog.$dialog.dialog('option', 'position', 'center')
+        },
+        duration: helpDialog.animateDuration,
+        complete() {
+          let toFocus = newPanel.find(':input').not(':disabled')
+          if (!toFocus.length) toFocus = newPanel.find(':focusable')
+          toFocus.first().focus()
+          if (panelId !== homePanel) $(homePanel).hide()
         }
-        helpDialog.$dialog && helpDialog.$dialog.dialog('option', 'position', 'center')
-      },
-      duration: helpDialog.animateDuration,
-      complete () {
-        let toFocus = newPanel.find(':input').not(':disabled')
-        if (!toFocus.length) toFocus = newPanel.find(':focusable')
-        toFocus.first().focus()
-        if (panelId !== homePanel) $(homePanel).hide()
       }
-    })
+    )
 
     if ((newTitle = helpDialog.$dialog.find(`a[href='${panelId}'] .text`).text())) {
       newTitle = $(
@@ -134,31 +147,43 @@ const helpDialog = {
     helpDialog.$dialog.dialog('option', 'title', newTitle)
   },
 
-  open () {
-    if (!(helpDialog.dialogInited && helpDialog.$dialog && helpDialog.$dialog.hasClass('ui-dialog-content'))) {
+  open() {
+    if (
+      !(
+        helpDialog.dialogInited &&
+        helpDialog.$dialog &&
+        helpDialog.$dialog.hasClass('ui-dialog-content')
+      )
+    ) {
       helpDialog.initDialog()
     }
     helpDialog.$dialog.dialog('open')
     helpDialog.initTeacherFeedback()
   },
 
-  initTeacherFeedback () {
-    const currentUserIsStudent = ENV.current_user_roles && ENV.current_user_roles.includes('student')
+  initTeacherFeedback() {
+    const currentUserIsStudent =
+      ENV.current_user_roles && ENV.current_user_roles.includes('student')
     if (!helpDialog.teacherFeedbackInited && currentUserIsStudent) {
       helpDialog.teacherFeedbackInited = true
       const coursesDfd = $.getJSON('/api/v1/courses.json')
       let $form
       helpDialog.helpLinksDfd.done(() => {
-        $form = helpDialog.$dialog.find('#teacher_feedback').disableWhileLoading(coursesDfd).formSubmit({
-          disableWhileLoading: true,
-          required: ['recipients[]', 'body'],
-          success: () => helpDialog.$dialog.dialog('close')
-        })
+        $form = helpDialog.$dialog
+          .find('#teacher_feedback')
+          .disableWhileLoading(coursesDfd)
+          .formSubmit({
+            disableWhileLoading: true,
+            required: ['recipients[]', 'body'],
+            success: () => helpDialog.$dialog.dialog('close')
+          })
       })
 
       $.when(coursesDfd, helpDialog.helpLinksDfd).done(([courses]) => {
-        const optionsHtml = $.map(courses, c =>
-          `<option
+        const optionsHtml = $.map(
+          courses,
+          c =>
+            `<option
             value='course_${c.id}_admins'
             ${$.raw(ENV.context_id === c.id ? 'selected' : '')}
           >
@@ -170,7 +195,7 @@ const helpDialog = {
     }
   },
 
-  initTriggers () {
+  initTriggers() {
     $('.help_dialog_trigger').click(preventDefault(helpDialog.open))
   }
 }

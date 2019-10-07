@@ -13,6 +13,7 @@ function appAndSpecFilesFor(path) {
 const PRETTIER_WHITELIST = (module.exports = [
   './*.js',
   'app/jsx/*.js',
+  'app/coffeescripts/**/*.js',
   'frontend_build/**/*.js',
   'packages/canvas-media/src/**/*.js',
   'script/**/*.js',

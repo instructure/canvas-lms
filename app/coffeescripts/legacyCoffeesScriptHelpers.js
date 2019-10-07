@@ -18,8 +18,8 @@
 
 const hasProp = {}.hasOwnProperty
 
-export function extend (child, parent) {
-  for (let key in parent) {
+export function extend(child, parent) {
+  for (const key in parent) {
     if (hasProp.call(parent, key)) child[key] = parent[key]
   }
   function ctor() {

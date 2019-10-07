@@ -37,7 +37,6 @@ import Spinner from 'spin.js'
 import htmlEscape from 'str/htmlEscape'
 
 export default class PaginatedList {
-
   // #
   // I18n keys used by class
   keys = {
@@ -69,7 +68,6 @@ export default class PaginatedList {
   }
   // should be replaced by url to json data
 
-
   // #
   // PaginatedList constructor
   // @param el {element} a wrapped DOM element. should be a <div />
@@ -83,7 +81,7 @@ export default class PaginatedList {
   //   * presenter: a function that formats the returned data for display.
   //       function should accept an array or object parsed from JSON.
   //   * start: call getData if true. defaults to true.
-  constructor (el, options) {
+  constructor(el, options) {
     this.cacheElements(el)
     this.options = $.extend({}, this.defaultOptions, options)
     this.addEvents()
@@ -93,7 +91,7 @@ export default class PaginatedList {
   // #
   // cache all DOM elements for future use
   // @api private
-  cacheElements (el) {
+  cacheElements(el) {
     this.el = {
       wrapper: el,
       list: el.find('ul:first')
@@ -106,7 +104,7 @@ export default class PaginatedList {
   // #
   // attach events to DOM objects
   // @api private
-  addEvents () {
+  addEvents() {
     this.el.wrapper.delegate('.view-more-link', 'click', this.getData.bind(this))
   }
 
@@ -114,16 +112,20 @@ export default class PaginatedList {
   // make ajax call to return paginated data
   // @return jqXHR (see http://api.jquery.com/jQuery.ajax/#jqXHR)
   // @api public
-  getData (e) {
+  getData(e) {
     if (e) e.preventDefault()
     this.startSpinner(e)
-    return (this.currentRequest = $.getJSON(this.options.url, this.options.requestParams, this.onResponse.bind(this)))
+    return (this.currentRequest = $.getJSON(
+      this.options.url,
+      this.options.requestParams,
+      this.onResponse.bind(this)
+    ))
   }
 
   // #
   // given paginated data, format and display it
   // @api private
-  onResponse (data) {
+  onResponse(data) {
     this.stopSpinner()
     if (data.length === 0) {
       return this.noResults()
@@ -138,12 +140,12 @@ export default class PaginatedList {
   // #
   // start wait spinner
   // @api private
-  startSpinner (spinnerOnBottom) {
+  startSpinner(spinnerOnBottom) {
     this.spinner = new Spinner(this.spinnerOptions).spin(this.el.wrapper[0]).el
     if (spinnerOnBottom) {
       return $(this.spinner).css({
         bottom: 10,
-        top: 'auto',
+        top: 'auto'
       })
     }
   }
@@ -151,14 +153,14 @@ export default class PaginatedList {
   // #
   // stop wait spinner
   // @api private
-  stopSpinner () {
+  stopSpinner() {
     return $(this.spinner).remove()
   }
 
   // #
   // animate loaded results
   // @api private
-  animateInResults ($results) {
+  animateInResults($results) {
     $results.css('display', 'none')
     this.el.list.append($results)
     return $results.slideDown()
@@ -168,7 +170,7 @@ export default class PaginatedList {
   // keep track of what page we're on. when the last page
   // has been loaded, remove the 'view more' link.
   // @api private
-  updatePaging () {
+  updatePaging() {
     if (this.hasNextPage()) {
       this.options.requestParams.page++
       if (!this.pageLinkPresent) {
@@ -184,7 +186,7 @@ export default class PaginatedList {
   // given a response, check the headers to see if there's another page.
   // @return boolean
   // @api private
-  hasNextPage () {
+  hasNextPage() {
     return this.currentRequest.getAllResponseHeaders().match(/rel="next"/)
   }
 
@@ -192,7 +194,7 @@ export default class PaginatedList {
   // template for view more link
   // @return String
   // @api private
-  viewMoreLinkHtml () {
+  viewMoreLinkHtml() {
     return `<a class="view-more-link" href="#">${htmlEscape(this.keys.viewMore)}</a>`
   }
 
@@ -200,7 +202,7 @@ export default class PaginatedList {
   // template for no results notification
   // @return String
   // @api private
-  noResults () {
+  noResults() {
     return this.el.list.append(`<li>${htmlEscape(this.keys.noResults)}</li>`)
   }
 }

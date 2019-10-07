@@ -115,9 +115,7 @@ export default class SubmissionDetailsDialog {
         )
       })
 
-    const url = `${
-      this.url
-    }&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment`
+    const url = `${this.url}&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment`
     const deferred = $.ajaxJSON(url, 'GET', {}, this.update)
     this.dialog.find('.submission_details_comments').disableWhileLoading(deferred)
   }

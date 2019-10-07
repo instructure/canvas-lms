@@ -51,14 +51,14 @@ class FlavorGrid {
 
   setTimer = () => {
     return setTimeout(() => this.refresh(this.setTimer), this.options.refresh_rate)
-  };
+  }
 
   saveSelection = () => {
     if (this.type_name === 'running') {
       this.oldSelected = {}
       return this.grid.getSelectedRows().map(row => (this.oldSelected[this.data[row].id] = true))
     }
-  };
+  }
 
   restoreSelection = () => {
     if (this.type_name === 'running') {
@@ -74,7 +74,7 @@ class FlavorGrid {
       this.grid.setSelectedRows(newSelected)
       return (this.restoringSelection = false)
     }
-  };
+  }
 
   refresh = cb => {
     return this.$element.queue(() =>
@@ -111,7 +111,7 @@ class FlavorGrid {
         return this.$element.dequeue()
       })
     )
-  };
+  }
 
   change_flavor(flavor) {
     this.options.flavor = flavor
