@@ -51,6 +51,10 @@ describe LiveEvents::AsyncWorker do
     def error(data)
       data
     end
+
+    def debug(data)
+      data
+    end
   end
 
   before(:each) do
@@ -110,6 +114,24 @@ describe LiveEvents::AsyncWorker do
       5.times { expect(@worker.push(event, partition_key)).to be_truthy }
 
       expect(@worker.push(event, partition_key)).to be false
+    end
+
+    context 'with error putting to kinesis' do
+      it "should write errors to logger" do
+        results = OpenStruct.new(records: [
+          OpenStruct.new(error_code: 'failure', error_message: 'failure message')
+        ])
+        allow(stream_client).to receive(:put_records).once.and_return(results)
+        statsd_double = double
+        LiveEvents.statsd = statsd_double
+        expect(statsd_double).to receive(:time).and_yield
+        expect(statsd_double).to receive(:increment).with('live_events.events.send_errors', any_args)
+        @worker.start!
+
+        4.times { @worker.push event, partition_key }
+
+        @worker.stop!
+      end
     end
   end
 
