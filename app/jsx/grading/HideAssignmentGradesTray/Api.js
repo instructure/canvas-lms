@@ -70,6 +70,5 @@ export function resolveHideAssignmentGradesStatus(progress) {
   return resolveProgress({
     url: `/api/v1/progress/${progress.id}`,
     workflow_state: progress.workflowState
-  })
-  .then(results => camelize(results))
+  }).then(results => camelize(results))
 }

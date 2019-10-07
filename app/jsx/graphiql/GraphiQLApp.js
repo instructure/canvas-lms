@@ -19,20 +19,18 @@
 import React from 'react'
 import GraphiQL from 'graphiql'
 import GraphiQLExplorer from 'graphiql-explorer'
-import {getIntrospectionQuery, buildClientSchema} from 'graphql';
+import {getIntrospectionQuery, buildClientSchema} from 'graphql'
 import axios from 'axios'
 import 'graphiql/graphiql.css'
-import {makeDefaultArg, getDefaultScalarArgValue} from './CustomArgs';
+import {makeDefaultArg, getDefaultScalarArgValue} from './CustomArgs'
 import StorageAPI from 'graphiql/dist/utility/StorageAPI'
 
-function fetcher (params) {
-  return axios.post(
-    '/api/graphql',
-    JSON.stringify(params),
-    {
-      headers: {'Content-Type': 'application/json'},
-    }
-  ).then(({data}) => data)
+function fetcher(params) {
+  return axios
+    .post('/api/graphql', JSON.stringify(params), {
+      headers: {'Content-Type': 'application/json'}
+    })
+    .then(({data}) => data)
 }
 
 export default class GraphiQLApp extends React.Component {
@@ -53,7 +51,7 @@ export default class GraphiQLApp extends React.Component {
 
   componentDidMount() {
     return fetcher({
-      query: getIntrospectionQuery(),
+      query: getIntrospectionQuery()
     }).then(result => {
       this.setState({
         schema: buildClientSchema(result.data)
@@ -61,7 +59,7 @@ export default class GraphiQLApp extends React.Component {
     })
   }
 
-  _handleEditQuery = (query) => {
+  _handleEditQuery = query => {
     this.setState({query})
   }
 
@@ -88,7 +86,9 @@ export default class GraphiQLApp extends React.Component {
           makeDefaultArg={makeDefaultArg}
         />
         <GraphiQL
-          ref={ref => {this._graphiql = ref}}
+          ref={ref => {
+            this._graphiql = ref
+          }}
           fetcher={fetcher}
           schema={schema}
           query={query}

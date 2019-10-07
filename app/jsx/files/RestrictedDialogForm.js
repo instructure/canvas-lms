@@ -20,9 +20,9 @@ import React from 'react'
 import createReactClass from 'create-react-class'
 import I18n from 'i18n!restrict_student_access'
 import classNames from 'classnames'
-import UsageRightsSelectBox from '../files/UsageRightsSelectBox'
-import RestrictedRadioButtons from '../files/RestrictedRadioButtons'
-import DialogPreview from '../files/DialogPreview'
+import UsageRightsSelectBox from './UsageRightsSelectBox'
+import RestrictedRadioButtons from './RestrictedRadioButtons'
+import DialogPreview from './DialogPreview'
 import RestrictedDialogForm from 'compiled/react_files/components/RestrictedDialogForm'
 
 RestrictedDialogForm.renderUsageRightsWarning = function() {
@@ -95,14 +95,14 @@ RestrictedDialogForm.render = function() {
         <div className="RestrictedDialogForm__preview col-xs-3">
           <DialogPreview itemsToShow={this.props.models} />
         </div>
-        {/* If showUsageRights then show the select box for it.*/}
+        {/* If showUsageRights then show the select box for it. */}
         {!!showUsageRights && (
           <div className="RestrictedDialogForm__usageRights col-xs-9">
             <UsageRightsSelectBox ref={e => (this.usageSelection = e)} />
             <hr />
           </div>
         )}
-        {/* Not showing usage rights?, then show the form here.*/}
+        {/* Not showing usage rights?, then show the form here. */}
         {!showUsageRights && this.renderRestrictedAccessForm()}
       </div>
       {/* If showUsageRights,] it needs to be here instead */}

@@ -21,9 +21,9 @@ import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
 import createReactClass from 'create-react-class'
-import BackboneState from '../../groups/mixins/BackboneState'
-import PaginatedUserCheckList from '../../groups/components/PaginatedUserCheckList'
-import InfiniteScroll from '../../groups/mixins/InfiniteScroll'
+import BackboneState from '../mixins/BackboneState'
+import PaginatedUserCheckList from './PaginatedUserCheckList'
+import InfiniteScroll from '../mixins/InfiniteScroll'
 import 'jquery.instructure_forms'
 
 const ManageGroupDialog = createReactClass({

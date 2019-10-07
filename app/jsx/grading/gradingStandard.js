@@ -228,12 +228,7 @@ class GradingStandard extends React.Component {
   renderSaveButton = () => {
     if (this.state.saving) {
       return (
-        <button
-          type="button"
-          ref="saveButton"
-          className="btn btn-primary save_button"
-          disabled
-        >
+        <button type="button" ref="saveButton" className="btn btn-primary save_button" disabled>
           {I18n.t('Saving...')}
         </button>
       )

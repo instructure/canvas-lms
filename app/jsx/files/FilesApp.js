@@ -23,10 +23,10 @@ import page from 'page'
 import FilesApp from 'compiled/react_files/components/FilesApp'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import I18n from 'i18n!react_files'
-import Breadcrumbs from '../files/Breadcrumbs'
-import FolderTree from '../files/FolderTree'
-import FilesUsage from '../files/FilesUsage'
-import Toolbar from '../files/Toolbar'
+import Breadcrumbs from './Breadcrumbs'
+import FolderTree from './FolderTree'
+import FilesUsage from './FilesUsage'
+import Toolbar from './Toolbar'
 
 FilesApp.previewItem = function(item) {
   this.clearSelectedItems(() => {

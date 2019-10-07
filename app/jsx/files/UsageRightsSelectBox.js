@@ -92,9 +92,7 @@ export default class UsageRightsSelectBox extends React.Component {
     let x
     const obj = {
       use_justification: this.usageRightSelection.value,
-      copyright: this.state.showTextBox
-        ? (x = this.copyright) && x.value
-        : undefined,
+      copyright: this.state.showTextBox ? (x = this.copyright) && x.value : undefined,
       cc_license: this.state.showCreativeCommonsOptions
         ? (x = this.creativeCommons) && x.value
         : undefined

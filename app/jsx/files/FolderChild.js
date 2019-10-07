@@ -22,11 +22,11 @@ import createReactClass from 'create-react-class'
 import FolderChild from 'compiled/react_files/components/FolderChild'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import classnames from 'classnames'
-import ItemCog from '../files/ItemCog'
+import ItemCog from './ItemCog'
 import PublishCloud from '../shared/PublishCloud'
 import MasterCourseLock from '../shared/MasterCourseLock'
-import FilesystemObjectThumbnail from '../files/FilesystemObjectThumbnail'
-import UsageRightsIndicator from '../files/UsageRightsIndicator'
+import FilesystemObjectThumbnail from './FilesystemObjectThumbnail'
+import UsageRightsIndicator from './UsageRightsIndicator'
 import Folder from 'compiled/models/Folder'
 import preventDefault from 'compiled/fn/preventDefault'
 import FriendlyDatetime from '../shared/FriendlyDatetime'
@@ -104,7 +104,7 @@ FolderChild.renderEditingState = function() {
             }
             defaultValue={this.props.model.displayName()}
             maxLength="255"
-            onKeyUp={(event) => {
+            onKeyUp={event => {
               if (event.keyCode === 27) {
                 this.cancelEditingName()
               }
@@ -192,7 +192,9 @@ FolderChild.renderUsageRightsIndicator = function() {
 
 FolderChild.render = function() {
   const user = this.props.model.get('user') || {}
-  const selectCheckboxLabel = I18n.t('Select %{itemName}', {itemName: this.props.model.displayName()})
+  const selectCheckboxLabel = I18n.t('Select %{itemName}', {
+    itemName: this.props.model.displayName()
+  })
   const keyboardCheckboxClass = classnames({
     'screenreader-only': this.state.hideKeyboardCheck,
     'multiselectable-toggler': true

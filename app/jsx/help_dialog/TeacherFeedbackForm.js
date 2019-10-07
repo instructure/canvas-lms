@@ -76,15 +76,17 @@ class TeacherFeedbackForm extends React.Component {
   }
 
   renderCourseOptions = () => {
-    const options = this.state.courses.filter(c => !c.access_restricted_by_date).map(c => {
-      const value = `course_${c.id}_admins`
+    const options = this.state.courses
+      .filter(c => !c.access_restricted_by_date)
+      .map(c => {
+        const value = `course_${c.id}_admins`
 
-      return (
-        <option key={value} value={value} selected={window.ENV.context_id == c.id}>
-          {c.name}
-        </option>
-      )
-    })
+        return (
+          <option key={value} value={value} selected={window.ENV.context_id == c.id}>
+            {c.name}
+          </option>
+        )
+      })
 
     if (!this.state.coursesLoaded) {
       options.push(<option key="loading">{I18n.t('Loading courses...')}</option>)

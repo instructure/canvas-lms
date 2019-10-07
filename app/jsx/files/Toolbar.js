@@ -22,9 +22,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import page from 'page'
 import FocusStore from 'compiled/react_files/modules/FocusStore'
-import openMoveDialog from '../files/utils/openMoveDialog'
+import openMoveDialog from './utils/openMoveDialog'
 import deleteStuff from 'compiled/react_files/utils/deleteStuff'
-import UploadButton from '../files/UploadButton'
+import UploadButton from './UploadButton'
 import classnames from 'classnames'
 import preventDefault from 'compiled/fn/preventDefault'
 import Folder from 'compiled/models/Folder'
@@ -144,7 +144,8 @@ export default class Toolbar extends React.Component {
             className="btn btn-add-folder"
             aria-label={I18n.t('Add Folder')}
           >
-            <i className="icon-plus" />&nbsp;
+            <i className="icon-plus" />
+            &nbsp;
             <span className={phoneHiddenSet}>{I18n.t('Folder')}</span>
           </button>
 
@@ -158,6 +159,7 @@ export default class Toolbar extends React.Component {
       )
     }
   }
+
   renderDeleteButton(canManage) {
     if (canManage) {
       return (
@@ -178,6 +180,7 @@ export default class Toolbar extends React.Component {
       )
     }
   }
+
   renderManageUsageRightsButton() {
     if (this.props.userCanManageFilesForContext && this.props.usageRightsRequiredForContext) {
       return (
@@ -196,6 +199,7 @@ export default class Toolbar extends React.Component {
       )
     }
   }
+
   renderCopyCourseButton(canManage) {
     if (canManage) {
       return (
@@ -344,7 +348,7 @@ export default class Toolbar extends React.Component {
             <a
               ref="previewLink"
               href="#"
-              onClick={!selectedItemIsFolder ? preventDefault(() => this.openPreview()) : (() => {})}
+              onClick={!selectedItemIsFolder ? preventDefault(() => this.openPreview()) : () => {}}
               className={viewBtnClasses}
               title={label}
               role="button"

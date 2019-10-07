@@ -24,11 +24,11 @@ import I18n from 'i18n!student_groups'
 import {Spinner} from '@instructure/ui-elements'
 import UserCollection from 'compiled/collections/UserCollection'
 import ContextGroupCollection from 'compiled/collections/ContextGroupCollection'
-import BackboneState from '../groups/mixins/BackboneState'
-import PaginatedGroupList from '../groups/components/PaginatedGroupList'
-import Filter from '../groups/components/Filter'
-import NewGroupDialog from '../groups/components/NewGroupDialog'
-import ManageGroupDialog from '../groups/components/ManageGroupDialog'
+import BackboneState from './mixins/BackboneState'
+import PaginatedGroupList from './components/PaginatedGroupList'
+import Filter from './components/Filter'
+import NewGroupDialog from './components/NewGroupDialog'
+import ManageGroupDialog from './components/ManageGroupDialog'
 
 const StudentView = createReactClass({
   displayName: 'StudentView',
@@ -150,7 +150,7 @@ const StudentView = createReactClass({
   },
 
   _extendAttribute(model, attribute, hash) {
-    const copy = Object.assign({}, model.get(attribute))
+    const copy = {...model.get(attribute)}
     model.set(attribute, Object.assign(copy, hash))
   },
 

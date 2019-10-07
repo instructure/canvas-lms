@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
-import FilesystemObjectThumbnail from '../files/FilesystemObjectThumbnail'
+import FilesystemObjectThumbnail from './FilesystemObjectThumbnail'
 
 const MAX_THUMBNAILS_TO_SHOW = 5
 

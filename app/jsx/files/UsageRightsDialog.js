@@ -20,9 +20,9 @@ import React from 'react'
 import createReactClass from 'create-react-class'
 import UsageRightsDialog from 'compiled/react_files/components/UsageRightsDialog'
 import I18n from 'i18n!usage_rights_modal'
-import UsageRightsSelectBox from '../files/UsageRightsSelectBox'
-import RestrictedRadioButtons from '../files/RestrictedRadioButtons'
-import DialogPreview from '../files/DialogPreview'
+import UsageRightsSelectBox from './UsageRightsSelectBox'
+import RestrictedRadioButtons from './RestrictedRadioButtons'
+import DialogPreview from './DialogPreview'
 import Folder from 'compiled/models/Folder'
 import {Modal} from '@instructure/ui-overlays'
 import {CloseButton, Button} from '@instructure/ui-buttons'
@@ -66,9 +66,10 @@ UsageRightsDialog.renderFolderTooltip = function(folders) {
   const toolTipFolders = folders.slice(MAX_FOLDERS_TO_SHOW)
 
   if (toolTipFolders.length) {
-    const renderItems = toolTipFolders.map(item => (
-      {cid: item.cid, displayName: htmlEscape(item.displayName()).toString()}
-    ))
+    const renderItems = toolTipFolders.map(item => ({
+      cid: item.cid,
+      displayName: htmlEscape(item.displayName()).toString()
+    }))
     // Doing it this way so commas, don't show up when rendering the list out in the tooltip.
     const renderedNames = renderItems.map(item => item.displayName).join('<br />')
 
@@ -85,7 +86,10 @@ UsageRightsDialog.renderFolderTooltip = function(folders) {
         <span className="screenreader-only">
           <ul>
             {renderItems.map((item, i) => (
-              <li key={item.cid} ref={e => (this[`displayNameTooltip${i}-screenreader`] = e)}> {item.displayName}</li>
+              <li key={item.cid} ref={e => (this[`displayNameTooltip${i}-screenreader`] = e)}>
+                {' '}
+                {item.displayName}
+              </li>
             ))}
           </ul>
         </span>

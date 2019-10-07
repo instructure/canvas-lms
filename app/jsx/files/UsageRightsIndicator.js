@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import Folder from 'compiled/models/Folder'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
-import UsageRightsDialog from '../files/UsageRightsDialog'
+import UsageRightsDialog from './UsageRightsDialog'
 
 export default class UsageRightsIndicator extends React.Component {
   warningMessage = I18n.t('Before publishing this file, you must specify usage rights.')

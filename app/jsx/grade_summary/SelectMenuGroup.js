@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-elements'
 
 import {showFlashError} from '../shared/FlashAlert'
 import I18n from 'i18n!grade_summary'
-import SelectMenu from "./SelectMenu"
+import SelectMenu from './SelectMenu'
 
 export default class SelectMenuGroup extends React.Component {
   static propTypes = {

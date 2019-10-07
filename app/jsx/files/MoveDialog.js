@@ -18,74 +18,70 @@
 
 import I18n from 'i18n!react_files'
 import React from 'react'
-import createReactClass from 'create-react-class';
+import createReactClass from 'create-react-class'
 import MoveDialog from 'compiled/react_files/components/MoveDialog'
 import Modal from '../shared/modal'
 import ModalContent from '../shared/modal-content'
 import ModalButtons from '../shared/modal-buttons'
-import BBTreeBrowser from '../files/BBTreeBrowser'
+import BBTreeBrowser from './BBTreeBrowser'
 import classnames from 'classnames'
 
-  MoveDialog.renderMoveButton = function () {
-    const buttonClassNames = classnames({
-      'disabled': !this.state.destinationFolder,
-      'btn': true,
-      'btn-primary': true
-    });
-    if (this.state.isCopyingFile) {
-      return (
-        <button
-          type='submit'
-          aria-disabled={!this.state.destinationFolder}
-          className={buttonClassNames}
-          data-text-while-loading={I18n.t('Copying...')}
-        >
-          {I18n.t('Copy to Folder')}
-        </button>
-      );
-    } else {
-      return (
-        <button
-          type='submit'
-          aria-disabled={!this.state.destinationFolder}
-          className={buttonClassNames}
-          data-text-while-loading={I18n.t('Moving...')}
-        >
-          {I18n.t('Move')}
-        </button>
-      );
-    }
-  };
-
-  MoveDialog.render = function () {
+MoveDialog.renderMoveButton = function() {
+  const buttonClassNames = classnames({
+    disabled: !this.state.destinationFolder,
+    btn: true,
+    'btn-primary': true
+  })
+  if (this.state.isCopyingFile) {
     return (
-      <Modal
-        className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
-        overlayClassName='ReactModal__Overlay--canvas'
-        ref='canvasModal'
-        isOpen={this.state.isOpen}
-        title={this.getTitle()}
-        onRequestClose={this.closeDialog}
-        onSubmit={this.submit}
+      <button
+        type="submit"
+        aria-disabled={!this.state.destinationFolder}
+        className={buttonClassNames}
+        data-text-while-loading={I18n.t('Copying...')}
       >
-        <ModalContent>
-          <BBTreeBrowser
-            rootFoldersToShow={this.props.rootFoldersToShow}
-            onSelectFolder={this.onSelectFolder}
-          />
-        </ModalContent>
-        <ModalButtons>
-          <button
-            type='button'
-            className='btn'
-            onClick={this.closeDialog}
-          >
-            {I18n.t('Cancel')}
-          </button>
-          {this.renderMoveButton()}
-        </ModalButtons>
-      </Modal>
-    );
-  };
+        {I18n.t('Copy to Folder')}
+      </button>
+    )
+  } else {
+    return (
+      <button
+        type="submit"
+        aria-disabled={!this.state.destinationFolder}
+        className={buttonClassNames}
+        data-text-while-loading={I18n.t('Moving...')}
+      >
+        {I18n.t('Move')}
+      </button>
+    )
+  }
+}
 
-export default createReactClass(MoveDialog);
+MoveDialog.render = function() {
+  return (
+    <Modal
+      className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
+      overlayClassName="ReactModal__Overlay--canvas"
+      ref="canvasModal"
+      isOpen={this.state.isOpen}
+      title={this.getTitle()}
+      onRequestClose={this.closeDialog}
+      onSubmit={this.submit}
+    >
+      <ModalContent>
+        <BBTreeBrowser
+          rootFoldersToShow={this.props.rootFoldersToShow}
+          onSelectFolder={this.onSelectFolder}
+        />
+      </ModalContent>
+      <ModalButtons>
+        <button type="button" className="btn" onClick={this.closeDialog}>
+          {I18n.t('Cancel')}
+        </button>
+        {this.renderMoveButton()}
+      </ModalButtons>
+    </Modal>
+  )
+}
+
+export default createReactClass(MoveDialog)
