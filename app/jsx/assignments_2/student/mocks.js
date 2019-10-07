@@ -49,56 +49,64 @@ import {UserDefaultMocks} from './graphqlData/User'
 import {UserGroupsDefaultMocks} from './graphqlData/UserGroups'
 
 function defaultMocks() {
-  return {
+  return [
     // Custom scalar types defined in our graphql schema
-    URL: () => 'http://graphql-mocked-url.com',
-    DateTime: () => null,
+    {URL: () => 'http://graphql-mocked-url.com'},
+    {DateTime: () => null},
 
     // Custom mocks for type specific data we are querying
-    ...AssignmentDefaultMocks,
-    ...AssignmentGroupDefaultMocks,
-    ...ErrorDefaultMocks,
-    ...ExternalToolDefaultMocks,
-    ...FileDefaultMocks,
-    ...LockInfoDefaultMocks,
-    ...MediaObjectDefaultMocks,
-    ...MediaSourceDefaultMocks,
-    ...MediaTrackDefaultMocks,
-    ...ModuleDefaultMocks,
-    ...MutationDefaultMocks,
-    ...ProficiencyRatingDefaultMocks,
-    ...RubricAssessmentDefaultMocks,
-    ...RubricAssessmentRatingDefaultMocks,
-    ...RubricAssociationDefaultMocks,
-    ...RubricCriterionDefaultMocks,
-    ...RubricDefaultMocks,
-    ...RubricRatingDefaultMocks,
-    ...SubmissionDefaultMocks,
-    ...SubmissionCommentDefaultMocks,
-    ...SubmissionDraftDefaultMocks,
-    ...SubmissionHistoryDefaultMocks,
-    ...SubmissionInterfaceDefaultMocks,
-    ...UserDefaultMocks,
-    ...UserGroupsDefaultMocks
-  }
+    AssignmentDefaultMocks,
+    AssignmentGroupDefaultMocks,
+    ErrorDefaultMocks,
+    ExternalToolDefaultMocks,
+    FileDefaultMocks,
+    LockInfoDefaultMocks,
+    MediaObjectDefaultMocks,
+    MediaSourceDefaultMocks,
+    MediaTrackDefaultMocks,
+    ModuleDefaultMocks,
+    MutationDefaultMocks,
+    ProficiencyRatingDefaultMocks,
+    RubricAssessmentDefaultMocks,
+    RubricAssessmentRatingDefaultMocks,
+    RubricAssociationDefaultMocks,
+    RubricCriterionDefaultMocks,
+    RubricDefaultMocks,
+    RubricRatingDefaultMocks,
+    SubmissionDefaultMocks,
+    SubmissionCommentDefaultMocks,
+    SubmissionDraftDefaultMocks,
+    SubmissionHistoryDefaultMocks,
+    SubmissionInterfaceDefaultMocks,
+    UserDefaultMocks,
+    UserGroupsDefaultMocks
+  ]
 }
 
 function createMocks(overrides = []) {
-  const mocks = defaultMocks()
+  const mocks = {}
   if (!Array.isArray(overrides)) {
     overrides = [overrides]
   }
 
-  overrides.forEach(overrideObj => {
+  const allOverrides = [...defaultMocks(), ...overrides]
+  allOverrides.forEach(overrideObj => {
     if (typeof overrideObj !== 'object') {
       throw new Error(`overrides must be an object, not ${typeof overrideObj}`)
     }
     Object.keys(overrideObj).forEach(key => {
-      const defaultFunction = mocks[key] || (() => {})
+      const defaultFunction = mocks[key] || (() => undefined)
       const defaultValues = defaultFunction()
       const overrideFunction = overrideObj[key]
       const overrideValues = overrideFunction()
-      mocks[key] = () => ({...defaultValues, ...overrideValues})
+
+      // This if statement handles scalar types. For example, saying that all URL
+      // types resolve to a dummy url, regardless of where they show up in the query
+      if (typeof overrideValues !== 'object' || overrideValues === null) {
+        mocks[key] = () => overrideValues
+      } else {
+        mocks[key] = () => ({...defaultValues, ...overrideValues})
+      }
     })
   })
 
