@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-export default function coupleTimeFields ($start, $end, $date) {
+export default function coupleTimeFields($start, $end, $date) {
   // construct blur callback that couples them in order so that $start can
   // never be less than $end
-  function blur ($blurred) {
+  function blur($blurred) {
     if ($date && $blurred === $date) {
       const date = $date.data('unfudged-date')
       if (date) {
-        [$start, $end].forEach((el) => {
+        ;[$start, $end].forEach(el => {
           const instance = el.data('instance')
           if (instance) instance.setDate(date)
         })

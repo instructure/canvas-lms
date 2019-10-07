@@ -24,7 +24,7 @@ export default class FileUploader extends BaseUploader {
   onUploadPosted = fileJson => {
     const file = this.addFileToCollection(fileJson)
     return this.deferred.resolve(file)
-  };
+  }
 
   addFileToCollection = attrs => {
     const uploadedFile = new BBFile(attrs, 'no/url/needed/') // we've already done the upload, no preflight needed
@@ -39,5 +39,5 @@ export default class FileUploader extends BaseUploader {
       }
     }
     return uploadedFile
-  };
+  }
 }

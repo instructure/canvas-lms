@@ -29,26 +29,52 @@ import toUnderscore from '../str/underscore'
 // declare all used i18n keys here to cluttering up the logic
 const keys = {
   limited: {
-    get TeacherEnrollment(){ return I18n.t('enrolled_as_limited_teacher', 'enrolled as a teacher with section-only access')},
-    get TaEnrollment(){ return I18n.t('enrolled_as_limited_ta', 'enrolled as a TA with section-only access')},
-    get ObserverEnrollment(){ return I18n.t('enrolled_as_limited_observer', 'enrolled as a observer with section-only access')},
-    get DesignerEnrollment(){ return I18n.t('enrolled_as_limited_designer', 'enrolled as a designer with section-only access')},
-    get StudentEnrollment(){ return I18n.t('enrolled_as_limited_student', 'enrolled as a student with section-only access')},
+    get TeacherEnrollment() {
+      return I18n.t('enrolled_as_limited_teacher', 'enrolled as a teacher with section-only access')
+    },
+    get TaEnrollment() {
+      return I18n.t('enrolled_as_limited_ta', 'enrolled as a TA with section-only access')
+    },
+    get ObserverEnrollment() {
+      return I18n.t(
+        'enrolled_as_limited_observer',
+        'enrolled as a observer with section-only access'
+      )
+    },
+    get DesignerEnrollment() {
+      return I18n.t(
+        'enrolled_as_limited_designer',
+        'enrolled as a designer with section-only access'
+      )
+    },
+    get StudentEnrollment() {
+      return I18n.t('enrolled_as_limited_student', 'enrolled as a student with section-only access')
+    }
   },
   standard: {
-    get TeacherEnrollment(){ return I18n.t('enrolled_as_teacher', 'enrolled as a teacher')},
-    get TaEnrollment(){ return I18n.t('enrolled_as_ta', 'enrolled as a TA')},
-    get ObserverEnrollment(){ return I18n.t('enrolled_as_observer', 'enrolled as a observer')},
-    get DesignerEnrollment(){ return I18n.t('enrolled_as_designer', 'enrolled as a designer')},
-    get StudentEnrollment(){ return I18n.t('enrolled_as_student', 'enrolled as a student')},
-  },
+    get TeacherEnrollment() {
+      return I18n.t('enrolled_as_teacher', 'enrolled as a teacher')
+    },
+    get TaEnrollment() {
+      return I18n.t('enrolled_as_ta', 'enrolled as a TA')
+    },
+    get ObserverEnrollment() {
+      return I18n.t('enrolled_as_observer', 'enrolled as a observer')
+    },
+    get DesignerEnrollment() {
+      return I18n.t('enrolled_as_designer', 'enrolled as a designer')
+    },
+    get StudentEnrollment() {
+      return I18n.t('enrolled_as_student', 'enrolled as a student')
+    }
+  }
 }
 
 // #
 // begin returned function here
 // @param {array} array of enrollments returned from /courses/:course_id/enrollments
 export default data =>
-  _.map(data, (enrollment) => {
+  _.map(data, enrollment => {
     const scope = enrollment.limit_privileges_to_course_section ? 'limited' : 'standard'
 
     // add extra fields to enrollments

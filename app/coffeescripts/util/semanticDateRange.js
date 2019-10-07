@@ -22,22 +22,18 @@ import tz from 'timezone'
 import htmlEscape from 'str/htmlEscape'
 import 'jquery.instructure_date_and_time'
 
-
-export default function semanticDateRange (startISO, endISO) {
+export default function semanticDateRange(startISO, endISO) {
   if (!startISO) {
-    return (
-`<span class="date-range date-range-no-date">
+    return `<span class="date-range date-range-no-date">
   ${htmlEscape(I18n.t('no_date', 'No Date'))}
 </span>`
-    )
   }
 
   const startAt = tz.parse(startISO)
   const endAt = tz.parse(endISO)
   if (+startAt !== +endAt) {
     if (!$.sameDate(startAt, endAt)) {
-      return (
-`<span class="date-range">
+      return `<span class="date-range">
   <time datetime='${startAt.toISOString()}'>
     ${$.datetimeString(startAt)}
   </time> -
@@ -45,10 +41,8 @@ export default function semanticDateRange (startISO, endISO) {
     ${$.datetimeString(endAt)}
   </time>
 </span>`
-      )
     } else {
-      return (
-`<span class="date-range">
+      return `<span class="date-range">
   <time datetime='${startAt.toISOString()}'>
     ${$.dateString(startAt)}, ${$.timeString(startAt)}
   </time> -
@@ -56,15 +50,12 @@ export default function semanticDateRange (startISO, endISO) {
     ${$.timeString(endAt)}
   </time>
 </span>`
-      )
     }
   } else {
-    return (
-`<span class="date-range">
+    return `<span class="date-range">
   <time datetime='${startAt.toISOString()}'>
     ${$.datetimeString(startAt)}
   </time>
 </span>`
-    )
   }
 }

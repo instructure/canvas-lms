@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-export default function generateUUID () {
+export default function generateUUID() {
   let now = Date.now()
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
-    const r = ((now + Math.random() * 16) % 16) | 0
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, char => {
+    const r = (now + Math.random() * 16) % 16 | 0
     now = Math.floor(now / 16)
     const newChar = char === 'x' ? r : (r & 0x7) | 0x8
     return newChar.toString(16)

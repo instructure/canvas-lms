@@ -24,22 +24,30 @@ import '../jquery.rails_flash_notifications'
 $(() => {
   let resending = false
 
-  $('.re_send_confirmation_link').click(preventDefault(function () {
-    const $this = $(this)
-    const text = $this.text()
+  $('.re_send_confirmation_link').click(
+    preventDefault(function() {
+      const $this = $(this)
+      const text = $this.text()
 
-    if (resending) return
-    resending = true
-    $this.text(I18n.t('resending', 'resending...'))
+      if (resending) return
+      resending = true
+      $this.text(I18n.t('resending', 'resending...'))
 
-    $.ajaxJSON($this.attr('href'), 'POST', {}, (data) => {
-      resending = false
-      $this.text(text)
-      $.flashMessage(I18n.t('done_resending', 'Done! Message delivery may take a few minutes.'))
-    }, (data) => {
-      resending = false
-      $this.text(text)
-      $.flashError(I18n.t('failed_resending', 'Request failed. Try again.'))
+      $.ajaxJSON(
+        $this.attr('href'),
+        'POST',
+        {},
+        data => {
+          resending = false
+          $this.text(text)
+          $.flashMessage(I18n.t('done_resending', 'Done! Message delivery may take a few minutes.'))
+        },
+        data => {
+          resending = false
+          $this.text(text)
+          $.flashError(I18n.t('failed_resending', 'Request failed. Try again.'))
+        }
+      )
     })
-  }))
+  )
 })

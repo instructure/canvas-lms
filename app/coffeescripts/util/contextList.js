@@ -18,17 +18,17 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import h from 'str/htmlEscape'
-import listWithOthers from '../util/listWithOthers'
+import listWithOthers from './listWithOthers'
 import 'jquery.instructure_misc_helpers'
 
-function prepare (context, filters) {
+function prepare(context, filters) {
   context = _.clone(context)
   context.activeFilter = _.includes(filters, `${context.type}_${context.id}`)
   context.sortBy = `${context.activeFilter ? 0 : 1}_${context.name.toLowerCase()}`
   return context
 }
 
-function format (context, linkToContexts) {
+function format(context, linkToContexts) {
   let html = h(context.name)
   if (context.activeFilter) {
     html = `<span class='active-filter'>${html}</span>`
@@ -43,7 +43,7 @@ function format (context, linkToContexts) {
 // and a map of possible contexts by type,
 // return an html sentence/list of the contexts (maybe links, etc., see
 // options)
-export default function contextList (contextMap, allContexts, options = {}) {
+export default function contextList(contextMap, allContexts, options = {}) {
   const filters = options.filters != null ? options.filters : []
   let contexts = []
   for (const type in contextMap) {

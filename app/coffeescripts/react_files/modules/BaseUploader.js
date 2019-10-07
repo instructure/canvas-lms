@@ -52,7 +52,7 @@ export default class BaseUploader {
   onPreflightComplete = data => {
     this.uploadData = data
     return this._actualUpload()
-  };
+  }
 
   // kickoff / preflight upload process
   upload() {
@@ -79,14 +79,14 @@ export default class BaseUploader {
       .catch(this.deferred.reject)
   }
 
-  onUploadPosted = event => {};
+  onUploadPosted = event => {}
 
   // should be implemented in extensions
 
   trackProgress = e => {
     this.progress = e.loaded / e.total
     return this.onProgress(this.progress, this.file)
-  };
+  }
 
   getProgress() {
     return this.progress

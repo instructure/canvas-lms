@@ -25,42 +25,71 @@ import DateHelper from 'jsx/shared/helpers/dateHelper'
 const DATE_RANGE_ERRORS = {
   due_at: {
     start_range: {
-      get section(){ return I18n.t('Due date cannot be before section start')},
-      get course(){ return I18n.t('Due date cannot be before course start')},
-      get term(){ return I18n.t('Due date cannot be before term start')},
+      get section() {
+        return I18n.t('Due date cannot be before section start')
+      },
+      get course() {
+        return I18n.t('Due date cannot be before course start')
+      },
+      get term() {
+        return I18n.t('Due date cannot be before term start')
+      }
     },
     end_range: {
-      get section(){ return I18n.t('Due date cannot be after section end')},
-      get course(){ return I18n.t('Due date cannot be after course end')},
-      get term(){ return I18n.t('Due date cannot be after term end')},
-    },
+      get section() {
+        return I18n.t('Due date cannot be after section end')
+      },
+      get course() {
+        return I18n.t('Due date cannot be after course end')
+      },
+      get term() {
+        return I18n.t('Due date cannot be after term end')
+      }
+    }
   },
   unlock_at: {
     start_range: {
-      get section(){ return I18n.t('Unlock date cannot be before section start')},
-      get course(){ return I18n.t('Unlock date cannot be before course start')},
-      get term(){ return I18n.t('Unlock date cannot be before term start')},
+      get section() {
+        return I18n.t('Unlock date cannot be before section start')
+      },
+      get course() {
+        return I18n.t('Unlock date cannot be before course start')
+      },
+      get term() {
+        return I18n.t('Unlock date cannot be before term start')
+      }
     },
     end_range: {
-      get due(){ return I18n.t('Unlock date cannot be after due date')},
-      get lock(){ return I18n.t('Unlock date cannot be after lock date')},
-    },
+      get due() {
+        return I18n.t('Unlock date cannot be after due date')
+      },
+      get lock() {
+        return I18n.t('Unlock date cannot be after lock date')
+      }
+    }
   },
   lock_at: {
     start_range: {
-      get due(){ return I18n.t('Lock date cannot be before due date')},
+      get due() {
+        return I18n.t('Lock date cannot be before due date')
+      }
     },
     end_range: {
-      get section(){ return I18n.t('Lock date cannot be after section end')},
-      get course(){ return I18n.t('Lock date cannot be after course end')},
-      get term(){ return I18n.t('Lock date cannot be after term end')},
-    },
-  },
+      get section() {
+        return I18n.t('Lock date cannot be after section end')
+      },
+      get course() {
+        return I18n.t('Lock date cannot be after course end')
+      },
+      get term() {
+        return I18n.t('Lock date cannot be after term end')
+      }
+    }
+  }
 }
 
 export default class DateValidator {
-
-  constructor (params) {
+  constructor(params) {
     this.dateRange = params.date_range
     this.data = params.data
     this.forIndividualStudents = params.forIndividualStudents
@@ -70,7 +99,7 @@ export default class DateValidator {
     this.dueDateRequired = params.postToSIS && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
   }
 
-  validateDatetimes () {
+  validateDatetimes() {
     const lockAt = this.data.lock_at
     const unlockAt = this.data.unlock_at
     const dueAt = this.data.due_at
@@ -78,15 +107,19 @@ export default class DateValidator {
     const currentDateRange = section ? this.getSectionRange(section) : this.dateRange
     const datetimesToValidate = []
 
-    if (currentDateRange.start_at && currentDateRange.start_at.date && !this.forIndividualStudents) {
+    if (
+      currentDateRange.start_at &&
+      currentDateRange.start_at.date &&
+      !this.forIndividualStudents
+    ) {
       datetimesToValidate.push({
         date: currentDateRange.start_at.date,
         validationDates: {
           due_at: dueAt,
-          unlock_at: unlockAt,
+          unlock_at: unlockAt
         },
         range: 'start_range',
-        type: currentDateRange.start_at.date_context,
+        type: currentDateRange.start_at.date_context
       })
     }
     if (currentDateRange.end_at && currentDateRange.end_at.date && !this.forIndividualStudents) {
@@ -94,42 +127,42 @@ export default class DateValidator {
         date: currentDateRange.end_at.date,
         validationDates: {
           due_at: dueAt,
-          lock_at: lockAt,
+          lock_at: lockAt
         },
         range: 'end_range',
-        type: currentDateRange.end_at.date_context,
+        type: currentDateRange.end_at.date_context
       })
     }
     if (dueAt) {
       datetimesToValidate.push({
         date: dueAt,
         validationDates: {
-          lock_at: lockAt,
+          lock_at: lockAt
         },
         range: 'start_range',
-        type: 'due',
+        type: 'due'
       })
       datetimesToValidate.push({
         date: dueAt,
         validationDates: {
-          unlock_at: unlockAt,
+          unlock_at: unlockAt
         },
         range: 'end_range',
-        type: 'due',
+        type: 'due'
       })
     }
 
     if (this.dueDateRequired) {
       datetimesToValidate.push({
         date: dueAt,
-        dueDateRequired: this.dueDateRequired,
+        dueDateRequired: this.dueDateRequired
       })
     }
 
     if (this.hasGradingPeriods && !this.userIsAdmin && this.data.persisted === false) {
       datetimesToValidate.push({
         date: dueAt,
-        range: 'grading_period_range',
+        range: 'grading_period_range'
       })
     }
 
@@ -137,36 +170,36 @@ export default class DateValidator {
       datetimesToValidate.push({
         date: lockAt,
         validationDates: {
-          unlock_at: unlockAt,
+          unlock_at: unlockAt
         },
         range: 'end_range',
-        type: 'lock',
+        type: 'lock'
       })
     }
     const errs = {}
     return this._validateDatetimeSequences(datetimesToValidate, errs)
   }
 
-  getSectionRange (section) {
+  getSectionRange(section) {
     if (!section.override_course_and_term_dates) return this.dateRange
 
     if (section.start_at) {
       this.dateRange.start_at = {
         date: section.start_at,
-        date_context: 'section',
+        date_context: 'section'
       }
     }
     if (section.end_at) {
       this.dateRange.end_at = {
         date: section.end_at,
-        date_context: 'section',
+        date_context: 'section'
       }
     }
 
     return this.dateRange
   }
 
-  _validateMultipleGradingPeriods (date, errs) {
+  _validateMultipleGradingPeriods(date, errs) {
     const helper = new GradingPeriodsHelper(this.gradingPeriods)
     const dueAt = date === null ? null : new Date(this._formatDatetime(date))
     if (!helper.isDateInClosedGradingPeriod(dueAt)) return
@@ -175,15 +208,15 @@ export default class DateValidator {
     if (earliestDate) {
       const formatted = DateHelper.formatDateForDisplay(earliestDate)
       errs.due_at = I18n.t('Please enter a due date on or after %{earliestDate}', {
-        earliestDate: formatted,
+        earliestDate: formatted
       })
     } else {
       errs.due_at = I18n.t('Due date cannot fall in a closed grading period')
     }
   }
 
-  _validateDatetimeSequences (datetimesToValidate, errs) {
-    datetimesToValidate.forEach((datetimeSet) => {
+  _validateDatetimeSequences(datetimesToValidate, errs) {
+    datetimesToValidate.forEach(datetimeSet => {
       if (datetimeSet.dueDateRequired && !datetimeSet.date) {
         errs.due_at = I18n.t('Please add a due date')
       }
@@ -193,14 +226,20 @@ export default class DateValidator {
         switch (datetimeSet.range) {
           case 'start_range':
             _.each(datetimeSet.validationDates, (validationDate, dateType) => {
-              if (validationDate && this._formatDatetime(datetimeSet.date) > this._formatDatetime(validationDate)) {
+              if (
+                validationDate &&
+                this._formatDatetime(datetimeSet.date) > this._formatDatetime(validationDate)
+              ) {
                 errs[dateType] = DATE_RANGE_ERRORS[dateType][datetimeSet.range][datetimeSet.type]
               }
             })
             break
           case 'end_range':
             _.each(datetimeSet.validationDates, (validationDate, dateType) => {
-              if (validationDate && this._formatDatetime(datetimeSet.date) < this._formatDatetime(validationDate)) {
+              if (
+                validationDate &&
+                this._formatDatetime(datetimeSet.date) < this._formatDatetime(validationDate)
+              ) {
                 errs[dateType] = DATE_RANGE_ERRORS[dateType][datetimeSet.range][datetimeSet.type]
               }
             })
@@ -211,7 +250,7 @@ export default class DateValidator {
     return errs
   }
 
-  _formatDatetime (date) {
+  _formatDatetime(date) {
     return tz.format(tz.parse(date), '%F %R')
   }
 }

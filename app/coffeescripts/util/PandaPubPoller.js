@@ -30,7 +30,7 @@ export default class PandaPubPoller {
   //   wrap your normal poll method. It is passed another function that should
   //   be called when the poll is complete.
 
-  constructor (pollInterval, rarePollInterval, pollCB) {
+  constructor(pollInterval, rarePollInterval, pollCB) {
     this.pollInterval = pollInterval
     this.rarePollInterval = rarePollInterval
     this.pollCB = pollCB
@@ -55,7 +55,7 @@ export default class PandaPubPoller {
   // Set the function to call when data is received via the streaming
   // channel.
 
-  setOnData = (streamingCB) => {
+  setOnData = streamingCB => {
     this.streamingCB = streamingCB
   }
 
@@ -82,8 +82,7 @@ export default class PandaPubPoller {
   //
   // @api private
 
-  startTimeout = () => this.timeout = setTimeout(this.considerPoll, this.pollInterval)
-
+  startTimeout = () => (this.timeout = setTimeout(this.considerPoll, this.pollInterval))
 
   // Stop the timeout
   //
@@ -126,7 +125,7 @@ export default class PandaPubPoller {
     // don't attempt to subscribe until we get a channel and a token
     if (!this.channel || !this.token) return
 
-    this.subscription = pandapub.subscribe(this.channel, this.token, (message) => {
+    this.subscription = pandapub.subscribe(this.channel, this.token, message => {
       this.lastUpdate = Date.now()
       this.streamingCB(message)
     })

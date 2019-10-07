@@ -52,7 +52,7 @@ class KalturaAnalytics {
     data['event:eventTimestamp'] = new Date().getTime()
 
     return this.queueApiCall(this.apiUrl + $.param(data))
-  };
+  }
 
   // kaltura expects a persistent analytic session token for the user
   // this generates a simple session id for analytic purposes
@@ -67,7 +67,7 @@ class KalturaAnalytics {
       ).replace(/\./g, '')
       return $.cookie('kaltura_analytic_tracker', this.kaSession, {path: '/'})
     }
-  };
+  }
 
   // pulls the kaltura domain from the plugin settins and sets up the base
   // url for sending analytics events
@@ -80,7 +80,7 @@ class KalturaAnalytics {
     }
 
     return (this.apiUrl = `${domain}/api_v3/index.php?`)
-  };
+  }
 
   // Since the analytic call is a cross-domain call, set the url in an iFrame
   setupApiIframes = count => {
@@ -95,16 +95,16 @@ class KalturaAnalytics {
       // iframe, so just send them every 4 seconds
       const queue = []
       const f = ((iframe, queue) =>
-        (function() {
+        function() {
           let url
           if ((url = queue.shift())) {
             return (iframe.src = url)
           }
-        }))(iframe, queue)
+        })(iframe, queue)
       this.iframes[i] = {iframe, queue, pinger: _.throttle(f, 4000)}
     }
     return this.iframes
-  };
+  }
 
   queueApiCall = url => {
     if (!this.iframes) {
@@ -114,7 +114,7 @@ class KalturaAnalytics {
     this.iframes[this.qIndex].pinger()
     this.qIndex = (this.qIndex + 1) % this.iframes.length
     return this.qIndex
-  };
+  }
 
   // Adds event listenrs to the mediaElement player
   //
@@ -208,7 +208,7 @@ class KalturaAnalytics {
       },
       false
     )
-  };
+  }
 }
 
 export default function(mediaId, mediaElement, pluginSettings) {

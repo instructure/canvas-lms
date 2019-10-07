@@ -21,7 +21,7 @@ import $ from 'jquery'
 // it will be passed the position cordinates and a feedback object which,
 // among other things, tells you where it positioned it relative to the target. we use it to add some
 // css classes that handle putting the pointer triangle (aka: caret) back to the trigger.
-function using (position, feedback) {
+function using(position, feedback) {
   if (position.top < 0) position.top = 0
   return $(this)
     .css(position)
@@ -32,63 +32,61 @@ let idCounter = 0
 const activePopovers = []
 
 function trapFocus(element) {
-  const focusableEls = element.querySelectorAll('a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select');
-  const firstFocusableEl = focusableEls[0];
-  const lastFocusableEl = focusableEls[focusableEls.length - 1];
-  const KEYCODE_TAB = 9;
+  const focusableEls = element.querySelectorAll(
+    'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
+  )
+  const firstFocusableEl = focusableEls[0]
+  const lastFocusableEl = focusableEls[focusableEls.length - 1]
+  const KEYCODE_TAB = 9
 
   element.addEventListener('keydown', e => {
-      const isTabPressed = (e.key === 'Tab' || e.keyCode === KEYCODE_TAB);
-      if (!isTabPressed) {
-          return;
+    const isTabPressed = e.key === 'Tab' || e.keyCode === KEYCODE_TAB
+    if (!isTabPressed) {
+      return
+    }
+    if (e.shiftKey) {
+      /* shift + tab */ if (document.activeElement === firstFocusableEl) {
+        lastFocusableEl.focus()
+        e.preventDefault()
       }
-      if ( e.shiftKey ) /* shift + tab */ {
-          if (document.activeElement === firstFocusableEl) {
-              lastFocusableEl.focus();
-              e.preventDefault();
-          }
-      } else /* tab */ {
-          if (document.activeElement === lastFocusableEl) {
-              setTimeout(() => {
-                firstFocusableEl.focus();
-              })
-              e.preventDefault();
-          }
-      }
-
-  });
+    } /* tab */ else if (document.activeElement === lastFocusableEl) {
+      setTimeout(() => {
+        firstFocusableEl.focus()
+      })
+      e.preventDefault()
+    }
+  })
 }
 
-
 export default class Popover {
-
   ignoreOutsideClickSelector = '.ui-dialog'
 
-  constructor (triggerEvent, content, options = {}) {
+  constructor(triggerEvent, content, options = {}) {
     this.content = content
     this.options = options
     this.trigger = $(triggerEvent.currentTarget)
     this.triggerAction = triggerEvent.type
     this.focusTrapped = false
-    this.el = $(this.content).addClass('carat-bottom').data('popover', this).keydown((event) => {
-      // if the user hits the escape key, reset the focus to what it was.
-      if (event.keyCode === $.ui.keyCode.ESCAPE) this.hide()
+    this.el = $(this.content)
+      .addClass('carat-bottom')
+      .data('popover', this)
+      .keydown(event => {
+        // if the user hits the escape key, reset the focus to what it was.
+        if (event.keyCode === $.ui.keyCode.ESCAPE) this.hide()
 
-      // If the user tabs or shift-tabs away, close.
-      if (event.keyCode !== $.ui.keyCode.TAB) return
+        // If the user tabs or shift-tabs away, close.
+        if (event.keyCode !== $.ui.keyCode.TAB) return
 
-      const tabbables = $(':tabbable', this.el)
-      const index = $.inArray(event.target, tabbables)
-      if (index === -1) return
+        const tabbables = $(':tabbable', this.el)
+        const index = $.inArray(event.target, tabbables)
+        if (index === -1) return
 
-      if (event.shiftKey) {
-        if (!this.focusTrapped && index === 0) this.hide()
-      } else {
-        if (!this.focusTrapped && index === tabbables.length - 1) this.hide()
-      }
-    })
+        if (event.shiftKey) {
+          if (!this.focusTrapped && index === 0) this.hide()
+        } else if (!this.focusTrapped && index === tabbables.length - 1) this.hide()
+      })
 
-    this.el.delegate('.popover_close', 'keyclick click', (event) => {
+    this.el.delegate('.popover_close', 'keyclick click', event => {
       event.preventDefault()
       this.hide()
     })
@@ -96,12 +94,12 @@ export default class Popover {
     this.show(triggerEvent)
   }
 
-  trapFocus (element) {
+  trapFocus(element) {
     this.focusTrapped = true
     trapFocus(element)
   }
 
-  show (triggerEvent) {
+  show(triggerEvent) {
     // when the popover is open, we don't want SR users to be able to navigate to the flash messages
     let popoverToHide
     $.screenReaderFlashMessageExclusive('')
@@ -113,7 +111,7 @@ export default class Popover {
     const id = `popover-${idCounter++}`
     this.trigger.attr({
       'aria-expanded': true,
-      'aria-controls': id,
+      'aria-controls': id
     })
     this.previousTarget = triggerEvent.currentTarget
 
@@ -123,8 +121,18 @@ export default class Popover {
       .show()
     this.position()
     if (triggerEvent.type !== 'mouseenter') {
-      this.el.find(':tabbable').first().focus()
-      setTimeout(() => this.el.find(':tabbable').first().focus(), 100)
+      this.el
+        .find(':tabbable')
+        .first()
+        .focus()
+      setTimeout(
+        () =>
+          this.el
+            .find(':tabbable')
+            .first()
+            .focus(),
+        100
+      )
     }
 
     document.querySelector('#application').setAttribute('aria-hidden', 'true')
@@ -136,14 +144,19 @@ export default class Popover {
     const actualOffset = triggerEvent.pageX - this.trigger.offset().left
     const leftBound = Math.max(0, this.trigger.width() / 2 - this.el.width() / 2) + 20
     const rightBound = this.trigger.width() - leftBound
-    const caratOffset = Math.min(Math.max(leftBound, actualOffset), rightBound) + differenceInOffset + additionalOffset
-    $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(this.el)
+    const caratOffset =
+      Math.min(Math.max(leftBound, actualOffset), rightBound) +
+      differenceInOffset +
+      additionalOffset
+    $('<span class="ui-menu-carat"><span /></span>')
+      .css('left', caratOffset)
+      .prependTo(this.el)
 
     this.positionInterval = setInterval(this.position, 200)
     $(window).click(this.outsideClickHandler)
   }
 
-  hide () {
+  hide() {
     // remove this from the activePopovers array
     for (let index = 0; index < activePopovers.length; index++) {
       const popover = activePopovers[index]
@@ -164,23 +177,27 @@ export default class Popover {
   }
 
   // uses a fat arrow so that it has a unique guid per-instance for jquery event unbinding
-  outsideClickHandler = (event) => {
-    if (!$(event.target).closest(this.el.add(this.trigger).add(this.ignoreOutsideClickSelector)).length) {
+  outsideClickHandler = event => {
+    if (
+      !$(event.target).closest(this.el.add(this.trigger).add(this.ignoreOutsideClickSelector))
+        .length
+    ) {
       this.hide()
     }
   }
 
-  position = () => this.el.position({
-    my: `center ${this.options.verticalSide === 'bottom' ? 'top' : 'bottom'}`,
-    at: `center ${this.options.verticalSide || 'top'}`,
-    of: this.trigger,
-    offset: `0px ${this.offsetPx()}px`,
-    within: 'body',
-    collision: `flipfit ${this.options.verticalSide ? 'none' : 'flipfit'}`,
-    using,
-  })
+  position = () =>
+    this.el.position({
+      my: `center ${this.options.verticalSide === 'bottom' ? 'top' : 'bottom'}`,
+      at: `center ${this.options.verticalSide || 'top'}`,
+      of: this.trigger,
+      offset: `0px ${this.offsetPx()}px`,
+      within: 'body',
+      collision: `flipfit ${this.options.verticalSide ? 'none' : 'flipfit'}`,
+      using
+    })
 
-  offsetPx () {
+  offsetPx() {
     const offset = this.options.verticalSide === 'bottom' ? 10 : -10
     if (this.options.invertOffset) {
       return offset * -1
@@ -189,7 +206,7 @@ export default class Popover {
     }
   }
 
-  restoreFocus () {
+  restoreFocus() {
     // set focus back to the previously focused item.
     if (this.previousTarget && $(this.previousTarget).is(':visible')) {
       this.previousTarget.focus()
