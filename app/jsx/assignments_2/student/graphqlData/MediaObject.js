@@ -46,7 +46,7 @@ export const MediaObject = {
   })
 }
 
-export const MediaObjectDefaultMocks = {
+export const DefaultMocks = {
   MediaObject: () => ({
     mediaSources: [{}],
     mediaType: 'video',

@@ -22,74 +22,37 @@ import {makeExecutableSchema, addMockFunctionsToSchema} from 'graphql-tools'
 import {print} from 'graphql/language/printer'
 import schemaString from '../../../../schema.graphql'
 
-import {Assignment, AssignmentDefaultMocks} from './graphqlData/Assignment'
-import {AssignmentGroupDefaultMocks} from './graphqlData/AssignmentGroup'
-import {ErrorDefaultMocks} from './graphqlData/Error'
-import {ExternalToolDefaultMocks} from './graphqlData/ExternalTool'
-import {FileDefaultMocks} from './graphqlData/File'
-import {LockInfoDefaultMocks} from './graphqlData/LockInfo'
-import {MediaObjectDefaultMocks} from './graphqlData/MediaObject'
-import {MediaSourceDefaultMocks} from './graphqlData/MediaSource'
-import {MediaTrackDefaultMocks} from './graphqlData/MediaTrack'
-import {ModuleDefaultMocks} from './graphqlData/Module'
-import {MutationDefaultMocks} from './graphqlData/Mutations'
-import {ProficiencyRatingDefaultMocks} from './graphqlData/ProficiencyRating'
-import {RubricAssessmentDefaultMocks} from './graphqlData/RubricAssessment'
-import {RubricAssessmentRatingDefaultMocks} from './graphqlData/RubricAssessmentRating'
-import {RubricAssociationDefaultMocks} from './graphqlData/RubricAssociation'
-import {RubricCriterionDefaultMocks} from './graphqlData/RubricCriterion'
-import {RubricDefaultMocks} from './graphqlData/Rubric'
-import {RubricRatingDefaultMocks} from './graphqlData/RubricRating'
-import {Submission, SubmissionDefaultMocks} from './graphqlData/Submission'
-import {SubmissionCommentDefaultMocks} from './graphqlData/SubmissionComment'
-import {SubmissionDraftDefaultMocks} from './graphqlData/SubmissionDraft'
-import {SubmissionHistoryDefaultMocks} from './graphqlData/SubmissionHistory'
-import {SubmissionInterfaceDefaultMocks} from './graphqlData/SubmissionInterface'
-import {UserDefaultMocks} from './graphqlData/User'
-import {UserGroupsDefaultMocks} from './graphqlData/UserGroups'
+import {Assignment} from './graphqlData/Assignment'
+import {Submission} from './graphqlData/Submission'
 
-function defaultMocks() {
+import glob from 'glob'
+
+const filesToImport = glob.sync('./graphqlData/**.js', {cwd: './app/jsx/assignments_2/student'})
+const importPromises = filesToImport.map(async file => {
+  const fileImport = await import(file)
+  return fileImport.DefaultMocks || {}
+})
+
+async function makeDefaultMocks() {
+  const defaultMockImports = await Promise.all(importPromises)
   return [
     // Custom scalar types defined in our graphql schema
     {URL: () => 'http://graphql-mocked-url.com'},
     {DateTime: () => null},
 
-    // Custom mocks for type specific data we are querying
-    AssignmentDefaultMocks,
-    AssignmentGroupDefaultMocks,
-    ErrorDefaultMocks,
-    ExternalToolDefaultMocks,
-    FileDefaultMocks,
-    LockInfoDefaultMocks,
-    MediaObjectDefaultMocks,
-    MediaSourceDefaultMocks,
-    MediaTrackDefaultMocks,
-    ModuleDefaultMocks,
-    MutationDefaultMocks,
-    ProficiencyRatingDefaultMocks,
-    RubricAssessmentDefaultMocks,
-    RubricAssessmentRatingDefaultMocks,
-    RubricAssociationDefaultMocks,
-    RubricCriterionDefaultMocks,
-    RubricDefaultMocks,
-    RubricRatingDefaultMocks,
-    SubmissionDefaultMocks,
-    SubmissionCommentDefaultMocks,
-    SubmissionDraftDefaultMocks,
-    SubmissionHistoryDefaultMocks,
-    SubmissionInterfaceDefaultMocks,
-    UserDefaultMocks,
-    UserGroupsDefaultMocks
+    // DefaultMocks as defined in the ./graphqlData javascript files
+    ...defaultMockImports
   ]
 }
 
-function createMocks(overrides = []) {
+async function createMocks(overrides = []) {
   const mocks = {}
   if (!Array.isArray(overrides)) {
     overrides = [overrides]
   }
 
-  const allOverrides = [...defaultMocks(), ...overrides]
+  const defaultMocks = await makeDefaultMocks()
+  const allOverrides = [...defaultMocks, ...overrides]
   allOverrides.forEach(overrideObj => {
     if (typeof overrideObj !== 'object') {
       throw new Error(`overrides must be an object, not ${typeof overrideObj}`)
@@ -128,7 +91,7 @@ function createMocks(overrides = []) {
  *       }
  *       ```
  */
-export function mockQuery(query, overrides = [], variables = {}) {
+export async function mockQuery(query, overrides = [], variables = {}) {
   // Turn the processed / normalized graphql-tag (gql) query back into a
   // string that can be used to make a query using graphql.js. Using gql is
   // super helpful for things like removing duplicate fragments, so we still
@@ -140,7 +103,7 @@ export function mockQuery(query, overrides = [], variables = {}) {
       requireResolversForResolveType: false
     }
   })
-  const mocks = createMocks(overrides)
+  const mocks = await createMocks(overrides)
   addMockFunctionsToSchema({schema, mocks})
   return graphql(schema, queryStr, null, null, variables) // Returns a promise
 }

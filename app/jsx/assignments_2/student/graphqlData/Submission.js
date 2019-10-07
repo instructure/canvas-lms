@@ -17,7 +17,10 @@
  */
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
-import {SubmissionInterface, SubmissionInterfaceDefaultMocks} from './SubmissionInterface'
+import {
+  SubmissionInterface,
+  DefaultMocks as SubmissionInterfaceDefaultMocks
+} from './SubmissionInterface'
 
 export const Submission = {
   fragment: gql`
@@ -34,7 +37,7 @@ export const Submission = {
   })
 }
 
-export const SubmissionDefaultMocks = {
+export const DefaultMocks = {
   Submission: () => ({
     ...SubmissionInterfaceDefaultMocks.SubmissionInterface(),
     id: '1'

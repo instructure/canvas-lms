@@ -66,7 +66,7 @@ export const SubmissionInterface = {
   })
 }
 
-export const SubmissionInterfaceDefaultMocks = {
+export const DefaultMocks = {
   SubmissionInterface: () => ({
     attachments: () => [],
     attempt: 0,

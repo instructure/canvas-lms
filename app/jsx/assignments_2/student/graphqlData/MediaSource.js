@@ -38,7 +38,7 @@ export const MediaSource = {
 
 // NOTE: For the overrides here, they have to be performed on the actual
 //       graphql type instead of the alias, ie `contentType` instead of `type`
-export const MediaSourceDefaultMocks = {
+export const DefaultMocks = {
   MediaSource: () => ({
     content_type: 'video/mp4',
     height: '360',
