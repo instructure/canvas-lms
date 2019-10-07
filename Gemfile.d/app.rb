@@ -34,7 +34,7 @@ gem 'tzinfo', '1.2.5'
 gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
-gem 'authlogic', '5.0.2'
+gem 'authlogic', '5.0.4'
   gem 'scrypt', '3.0.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'switchman', '1.14.7'
