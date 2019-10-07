@@ -37,20 +37,22 @@ import {
 import I18n from 'i18n!link_validator'
 
 const TYPE_INFO = {
-  course_card_image:    { icon: IconSettingsLine,      label: I18n.t('Course Settings') },
-  syllabus:             { icon: IconSyllabusLine,      label: I18n.t('Syllabus') },
-  assignment:           { icon: IconAssignmentLine,    label: I18n.t('Assignment') },
-  calendar_event:       { icon: IconCalendarMonthLine, label: I18n.t('Event') },
-  discussion_topic:     { icon: IconDiscussionLine,    label: I18n.t('Discussion') },
-  module:               { icon: IconModuleLine,        label: I18n.t('Module') },
-  quiz:                 { icon: IconQuizLine,          label: I18n.t('Quiz') },
-  wiki_page:            { icon: IconDocumentLine,      label: I18n.t('Page') },
-  assessment_question:  { icon: IconQuestionLine,      label: I18n.t('Assessment Question') },
-  quiz_question:        { icon: IconQuestionLine,      label: I18n.t('Quiz Question') }
+  course_card_image: {icon: IconSettingsLine, label: I18n.t('Course Settings')},
+  syllabus: {icon: IconSyllabusLine, label: I18n.t('Syllabus')},
+  assignment: {icon: IconAssignmentLine, label: I18n.t('Assignment')},
+  calendar_event: {icon: IconCalendarMonthLine, label: I18n.t('Event')},
+  discussion_topic: {icon: IconDiscussionLine, label: I18n.t('Discussion')},
+  module: {icon: IconModuleLine, label: I18n.t('Module')},
+  quiz: {icon: IconQuizLine, label: I18n.t('Quiz')},
+  wiki_page: {icon: IconDocumentLine, label: I18n.t('Page')},
+  assessment_question: {icon: IconQuestionLine, label: I18n.t('Assessment Question')},
+  quiz_question: {icon: IconQuestionLine, label: I18n.t('Quiz Question')}
 }
 
 const REASON_DESCRIPTION = {
-  course_mismatch: I18n.t('Links to other courses in this resource may not be accessible by the students in this course:'),
+  course_mismatch: I18n.t(
+    'Links to other courses in this resource may not be accessible by the students in this course:'
+  ),
   unpublished_item: I18n.t('Unpublished content referenced in this resource:'),
   missing_item: I18n.t('Non-existent content referenced in this resource:'),
   broken_link: I18n.t('External links in this resource were unreachable:'),
@@ -59,7 +61,7 @@ const REASON_DESCRIPTION = {
 }
 
 function simplifyReason(link) {
-  switch(link.reason) {
+  switch (link.reason) {
     case 'course_mismatch':
     case 'unpublished_item':
     case 'deleted':
@@ -94,11 +96,13 @@ export default function ValidatorResultsRow(props) {
     errors.forEach(error => {
       const IconClass = error.image ? IconImageSolid : IconLinkSolid
       const link_text = getLinkText(error)
-      const link = <List.Item key={error.url}>
-          <IconClass color="success"/>
+      const link = (
+        <List.Item key={error.url}>
+          <IconClass color="success" />
           &ensp;
           <Link href={error.url}>{link_text}</Link>
         </List.Item>
+      )
       links.push(link)
     })
 
@@ -126,7 +130,7 @@ export default function ValidatorResultsRow(props) {
     <div className="result">
       <Flex>
         <Flex.Item align="start">
-          <TypeIcon color="success" size="small"/>
+          <TypeIcon color="success" size="small" />
         </Flex.Item>
         <Flex.Item margin="none none none small">
           <Heading level="h3" as="h2">
@@ -138,12 +142,17 @@ export default function ValidatorResultsRow(props) {
               {props.result.name}
             </Button>
           </Heading>
-          <Text size="x-small" transform="uppercase" lineHeight="condensed" letterSpacing="expanded">{label}</Text>
+          <Text
+            size="x-small"
+            transform="uppercase"
+            lineHeight="condensed"
+            letterSpacing="expanded"
+          >
+            {label}
+          </Text>
         </Flex.Item>
       </Flex>
-      <List margin="none x-small small x-large">
-        {rows}
-      </List>
+      <List margin="none x-small small x-large">{rows}</List>
     </div>
   )
 }

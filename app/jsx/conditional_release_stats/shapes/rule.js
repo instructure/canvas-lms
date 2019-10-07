@@ -18,9 +18,9 @@
 
 import PropTypes from 'prop-types'
 
-const { shape, string } = PropTypes
+const {shape, string} = PropTypes
 
 export default shape({
   course_id: string.isRequired,
-  trigger_assignment: string.isRequired,
+  trigger_assignment: string.isRequired
 })

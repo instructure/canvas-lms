@@ -20,36 +20,37 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!react_collaborations'
-  class DeleteConfirmation extends React.Component {
-    componentDidMount () {
-      ReactDOM.findDOMNode(this).focus()
-    }
 
-    render () {
-      return (
-        <div className='DeleteConfirmation' tabIndex='0'>
-          <p className='DeleteConfirmation-message'>
-            {I18n.t('Remove "%{collaborationTitle}"?', {
-              collaborationTitle: this.props.collaboration.title
-            })}
-          </p>
-          <div className='DeleteConfirmation-actions'>
-            <button className='Button Button--danger' onClick={this.props.onDelete}>
-              {I18n.t('Yes, remove')}
-            </button>
-            <button className='Button' onClick={this.props.onCancel}>
-              {I18n.t('Cancel')}
-            </button>
-          </div>
-        </div>
-      )
-    }
-  };
-
-  DeleteConfirmation.propTypes = {
-    collaboration: PropTypes.object,
-    onCancel: PropTypes.func,
-    onDelete: PropTypes.func
+class DeleteConfirmation extends React.Component {
+  componentDidMount() {
+    ReactDOM.findDOMNode(this).focus()
   }
+
+  render() {
+    return (
+      <div className="DeleteConfirmation" tabIndex="0">
+        <p className="DeleteConfirmation-message">
+          {I18n.t('Remove "%{collaborationTitle}"?', {
+            collaborationTitle: this.props.collaboration.title
+          })}
+        </p>
+        <div className="DeleteConfirmation-actions">
+          <button className="Button Button--danger" onClick={this.props.onDelete}>
+            {I18n.t('Yes, remove')}
+          </button>
+          <button className="Button" onClick={this.props.onCancel}>
+            {I18n.t('Cancel')}
+          </button>
+        </div>
+      </div>
+    )
+  }
+}
+
+DeleteConfirmation.propTypes = {
+  collaboration: PropTypes.object,
+  onCancel: PropTypes.func,
+  onDelete: PropTypes.func
+}
 
 export default DeleteConfirmation

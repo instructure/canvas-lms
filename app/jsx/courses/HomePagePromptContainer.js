@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import CourseHomeDialog from '../courses/CourseHomeDialog'
+import CourseHomeDialog from './CourseHomeDialog'
 import I18n from 'i18n!home_page_prompt'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
@@ -31,29 +31,33 @@ class HomePagePromptContainer extends React.Component {
     wikiUrl: PropTypes.string.isRequired,
     courseId: PropTypes.string.isRequired,
     forceOpen: PropTypes.bool.isRequired,
-    returnFocusTo: PropTypes.instanceOf(Element).isRequired,
+    returnFocusTo: PropTypes.instanceOf(Element).isRequired
   }
 
   state = {
     dialogOpen: true
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.flashScreenReaderAlert()
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (nextProps.forceOpen) {
       this.setState({dialogOpen: true})
       this.flashScreenReaderAlert()
     }
   }
 
-  flashScreenReaderAlert () {
-    $.screenReaderFlashMessage(I18n.t('Before publishing your course, you must either publish a module or choose a different home page.'))
+  flashScreenReaderAlert() {
+    $.screenReaderFlashMessage(
+      I18n.t(
+        'Before publishing your course, you must either publish a module or choose a different home page.'
+      )
+    )
   }
 
-  render () {
+  render() {
     return (
       <CourseHomeDialog
         store={this.props.store}

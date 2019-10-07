@@ -24,11 +24,11 @@ class UploadArea extends React.Component {
     this.props.handleFileUpload(e, this.props.courseId)
     e.preventDefault()
     e.stopPropagation()
-  };
+  }
 
   uploadFile = () => {
     this.refs.courseImagefileUpload.click()
-  };
+  }
 
   render() {
     return (

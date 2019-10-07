@@ -19,9 +19,9 @@
 import PropTypes from 'prop-types'
 import assignmentShape from './assignment-shape'
 
-const { shape, number, arrayOf } = PropTypes
+const {shape, number, arrayOf} = PropTypes
 
 export default shape({
   setId: number.isRequired,
-  assignments: arrayOf(assignmentShape).isRequired,
+  assignments: arrayOf(assignmentShape).isRequired
 })
