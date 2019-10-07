@@ -43,7 +43,7 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.1.7', require: false
 
-gem 'addressable', '2.5.2', require: false
+gem 'addressable', '2.7.0', require: false
 gem "after_transaction_commit", '2.0.0'
 gem "aws-sdk-dynamodb", "1.34.0"
 gem "aws-sdk-kinesis", '1.18.0', require: false
@@ -127,7 +127,7 @@ gem 'inst_statsd', '2.1.6'
   gem 'dogstatsd-ruby', '4.3.0'
 gem 'inst-jobs-statsd', '1.2.3'
 gem 'gepub', '1.0.1'
-gem 'imperium', '0.5.0', require: false
+gem 'imperium', '0.5.1', require: false
 gem 'academic_benchmarks', '0.0.11', require: false
   gem 'sprockets', '3.7.2'
 
