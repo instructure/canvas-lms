@@ -38,7 +38,7 @@ export default class FinalGraderSelectMenu extends React.Component {
 
   handleSelectFinalGrader = ({target: {value: selectedValue}}) => {
     this.setState({selectedValue})
-  };
+  }
 
   render() {
     return (

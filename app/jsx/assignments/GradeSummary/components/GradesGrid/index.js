@@ -115,7 +115,7 @@ export default class GradesGrid extends Component {
 
   setPage = page => {
     this.setState({currentPageIndex: page - 1})
-  };
+  }
 
   render() {
     const rows = this.state.pages[this.state.currentPageIndex]

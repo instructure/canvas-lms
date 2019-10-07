@@ -253,7 +253,9 @@ export default class EditableDateTime extends React.Component {
             {this.renderEditor(getEditorProps())}
             {this.renderViewer(getViewerProps())}
           </Flex.Item>
-          <Flex.Item margin="0 0 0 xx-small">{this.renderEditButton(getEditButtonProps())}</Flex.Item>
+          <Flex.Item margin="0 0 0 xx-small">
+            {this.renderEditButton(getEditButtonProps())}
+          </Flex.Item>
         </Flex>
       </View>
     )

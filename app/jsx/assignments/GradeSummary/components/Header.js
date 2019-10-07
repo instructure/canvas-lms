@@ -65,14 +65,14 @@ class Header extends Component {
     if (window.confirm(message)) {
       this.props.releaseGrades()
     }
-  };
+  }
 
   handleUnmuteClick = () => {
     const message = I18n.t('Are you sure you want to post grades for this assignment to students?')
     if (window.confirm(message)) {
       this.props.unmuteAssignment()
     }
-  };
+  }
 
   render() {
     return (

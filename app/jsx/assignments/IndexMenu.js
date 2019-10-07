@@ -23,7 +23,6 @@ import ExternalToolModalLauncher from '../shared/ExternalToolModalLauncher'
 import Actions from './actions/IndexMenuActions'
 
 export default class IndexMenu extends React.Component {
-
   static propTypes = {
     store: PropTypes.object.isRequired,
     contextType: PropTypes.string.isRequired,
@@ -39,7 +38,7 @@ export default class IndexMenu extends React.Component {
 
   state = this.props.store.getState()
 
-  componentWillMount () {
+  componentWillMount() {
     this.setState(this.props.store.getState())
   }
 
@@ -71,9 +70,9 @@ export default class IndexMenu extends React.Component {
   }
 
   onLaunchTool = tool => e => {
-      e.preventDefault()
-      this.props.store.dispatch(Actions.launchTool(tool))
-    }
+    e.preventDefault()
+    this.props.store.dispatch(Actions.launchTool(tool))
+  }
 
   closeModal = () => {
     this.props.store.dispatch(Actions.setModalOpen(false))
@@ -112,7 +111,8 @@ export default class IndexMenu extends React.Component {
     }
   }
 
-  renderTools = () => this.state.externalTools.map(tool => (
+  renderTools = () =>
+    this.state.externalTools.map(tool => (
       <li key={tool.definition_id} role="menuitem">
         <a aria-label={tool.name} href="#" onClick={this.onLaunchTool(tool)}>
           <i className="icon-import" />

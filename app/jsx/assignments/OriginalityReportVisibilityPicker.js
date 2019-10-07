@@ -24,21 +24,21 @@ export default class OriginalityReportVisibilityPicker extends React.Component {
   static propTypes = {
     isEnabled: PropTypes.bool.isRequired,
     selectedOption: PropTypes.string
-  };
+  }
 
   static defaultProps = {
     selectedOption: null
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedOption: props.selectedOption
-    };
   }
 
-  setSelectedOption = (e) => {
-    this.setState({selectedOption: e.target.value});
+  constructor(props) {
+    super(props)
+    this.state = {
+      selectedOption: props.selectedOption
+    }
+  }
+
+  setSelectedOption = e => {
+    this.setState({selectedOption: e.target.value})
   }
 
   render() {
@@ -52,12 +52,14 @@ export default class OriginalityReportVisibilityPicker extends React.Component {
           <select
             id="report_visibility_picker_select"
             name="report_visibility"
-            ref={(c) => { this.visibilityPicker = c; }}
+            ref={c => {
+              this.visibilityPicker = c
+            }}
             disabled={!this.props.isEnabled}
             value={this.state.selectedOption}
             onChange={this.setSelectedOption}
           >
-            <option title={I18n.t('Immediately')} value="immediate" >
+            <option title={I18n.t('Immediately')} value="immediate">
               {I18n.t('Immediately')}
             </option>
             <option title={I18n.t('After the assignment is graded')} value="after_grading">
@@ -72,6 +74,6 @@ export default class OriginalityReportVisibilityPicker extends React.Component {
           </select>
         </div>
       </div>
-    );
+    )
   }
 }

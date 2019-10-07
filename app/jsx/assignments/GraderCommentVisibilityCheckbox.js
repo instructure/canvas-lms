@@ -39,7 +39,7 @@ export default class GraderCommentVisibilityCheckbox extends React.Component {
 
   handleChange = ({target: checkbox}) => {
     this.setState({checked: checkbox.checked})
-  };
+  }
 
   render() {
     return (

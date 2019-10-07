@@ -58,11 +58,11 @@ const DefaultToolForm = props => {
       setLaunchDefinitions(result.data)
     }
     fetchData()
-  }, [])
+  }, [launchDefinitionUrl])
 
   useEffect(() => {
     $('#default-tool').data('tool', defaultToolData)
-  }, [launchDefinitions])
+  }, [defaultToolData, launchDefinitions])
 
   const handleLaunchButton = event => {
     SelectContentDialog.Events.onContextExternalToolSelect(event, $('#default-tool'))
@@ -95,19 +95,13 @@ const DefaultToolForm = props => {
       </Button>
 
       {toolMessageData || props.previouslySelected ? (
-        <Alert
-          variant="success"
-          margin="small small 0 0"
-        >
+        <Alert variant="success" margin="small small 0 0">
           <Text weight="bold">{contentTitle()}</Text>
           <br />
           <Text>{I18n.t('Successfully Added')}</Text>
         </Alert>
       ) : (
-        <Alert
-          variant="info"
-          margin="small small 0 0"
-        >
+        <Alert variant="info" margin="small small 0 0">
           {props.toolInfoMessage}
         </Alert>
       )}

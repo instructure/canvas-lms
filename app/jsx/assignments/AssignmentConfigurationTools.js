@@ -110,9 +110,7 @@ class AssignmentConfigurationTools extends React.Component {
       endpoint = `/courses/${this.props.courseId}/external_tools/retrieve`
     } else {
       query = `?display=borderless&secure_params=${this.props.secureParams}`
-      endpoint = `/courses/${this.props.courseId}/lti/basic_lti_launch_request/${
-        tool.definition_id
-      }`
+      endpoint = `/courses/${this.props.courseId}/lti/basic_lti_launch_request/${tool.definition_id}`
     }
 
     return endpoint + query
@@ -198,12 +196,8 @@ class AssignmentConfigurationTools extends React.Component {
   )
 
   renderConfigTool = () => {
-    const beforeAlertStyles = `before_external_content_info_alert ${
-      this.state.beforeExternalContentAlertClass
-    }`
-    const afterAlertStyles = `after_external_content_info_alert ${
-      this.state.afterExternalContentAlertClass
-    }`
+    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
     return (
       <div style={{display: this.state.toolLaunchUrl === 'about:blank' ? 'none' : 'block'}}>
         <div

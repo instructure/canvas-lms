@@ -46,7 +46,8 @@ class ModuleSequenceFooter extends Component {
   }
 
   render() {
-    const disabled = this.props.filterSpeedGraderByStudentGroup && this.state.selectedStudentGroupId === '0'
+    const disabled =
+      this.props.filterSpeedGraderByStudentGroup && this.state.selectedStudentGroupId === '0'
 
     return (
       <>

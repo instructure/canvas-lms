@@ -38,12 +38,15 @@ export default function ModeratedGradingCheckbox(props) {
     return ''
   }
 
-  const isDisabled = props.gradedSubmissionsExist || props.isGroupAssignment || props.isPeerReviewAssignment
+  const isDisabled =
+    props.gradedSubmissionsExist || props.isGroupAssignment || props.isPeerReviewAssignment
   let disabledLabel
   if (isDisabled) {
-    disabledLabel = <div className="ModeratedGrading__CheckboxDescription" style={{fontSize: '0.9em'}}>
-      {tooltipMessage()}
-    </div>
+    disabledLabel = (
+      <div className="ModeratedGrading__CheckboxDescription" style={{fontSize: '0.9em'}}>
+        {tooltipMessage()}
+      </div>
+    )
   }
   const body = (
     <label className="ModeratedGrading__CheckboxLabel" htmlFor="assignment_moderated_grading">
@@ -70,11 +73,7 @@ export default function ModeratedGradingCheckbox(props) {
 
   if (isDisabled) {
     return (
-      <Tooltip
-        on={['hover']}
-        tip={tooltipMessage()}
-        variant="inverse"
-      >
+      <Tooltip on={['hover']} tip={tooltipMessage()} variant="inverse">
         {body}
       </Tooltip>
     )

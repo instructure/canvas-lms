@@ -28,7 +28,8 @@ import {direction} from '../shared/helpers/rtlHelper'
 
 export default class ModeratedGradingFormFieldGroup extends React.Component {
   static propTypes = {
-    availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired})).isRequired,
+    availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired}))
+      .isRequired,
     currentGraderCount: number,
     finalGraderID: string,
     graderCommentsVisibleToGraders: bool.isRequired,
@@ -63,7 +64,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
 
   handleModeratedGradingChange = moderatedGradingChecked => {
     this.setState({moderatedGradingChecked})
-  };
+  }
 
   render() {
     return (

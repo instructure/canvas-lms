@@ -27,7 +27,7 @@ import {asJson, getPrefetchedXHR, defaultFetchOptions} from '@instructure/js-uti
 
 class AssignmentExternalTools extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       tools: [],
       beforeExternalContentAlertClass: 'screenreader-only',
@@ -37,14 +37,14 @@ class AssignmentExternalTools extends React.Component {
   }
 
   componentWillMount() {
-    this.getTools();
+    this.getTools()
   }
 
   componentDidMount() {
     if (this.state.tools) {
       for (let i = 0; i < this.state.tools.length; i++) {
         const tool = this.state.tools[i]
-        this[`tool_iframe_${tool.definition_id}`].setAttribute('allow', iframeAllowances());
+        this[`tool_iframe_${tool.definition_id}`].setAttribute('allow', iframeAllowances())
       }
     }
   }
@@ -55,11 +55,11 @@ class AssignmentExternalTools extends React.Component {
       for (let i = 0; i < this.state.tools.length; i++) {
         const tool = this.state.tools[i]
         const width = this[`tool_iframe_${tool.definition_id}`].offsetWidth
-        if (width > max_width) max_width = width;
+        if (width > max_width) max_width = width
       }
-      return max_width;
+      return max_width
     }
-    return null;
+    return null
   }
 
   async getTools() {
@@ -76,24 +76,24 @@ class AssignmentExternalTools extends React.Component {
   }
 
   getDefinitionsUrl() {
-    return `/api/v1/courses/${this.props.courseId}/lti_apps/launch_definitions`;
+    return `/api/v1/courses/${this.props.courseId}/lti_apps/launch_definitions`
   }
 
   getLaunch(tool) {
     const url = tool.placements[this.props.placement].url
 
-    let query = `?borderless=true&url=${encodeURIComponent(url)}&placement=${this.props.placement}`;
+    let query = `?borderless=true&url=${encodeURIComponent(url)}&placement=${this.props.placement}`
     if (this.props.assignmentId) {
       query += `&assignment_id=${this.props.assignmentId}`
     }
-    const endpoint = `/courses/${this.props.courseId}/external_tools/retrieve`;
+    const endpoint = `/courses/${this.props.courseId}/external_tools/retrieve`
 
-    return endpoint + query;
+    return endpoint + query
   }
 
-  handleAlertFocus = (event) => {
+  handleAlertFocus = event => {
     const newState = {
-      iframeStyle: { border: '2px solid #008EE2', width: `${this.getMaxIFrameWidth() - 4}px` }
+      iframeStyle: {border: '2px solid #008EE2', width: `${this.getMaxIFrameWidth() - 4}px`}
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -103,9 +103,9 @@ class AssignmentExternalTools extends React.Component {
     this.setState(newState)
   }
 
-  handleAlertBlur = (event) => {
+  handleAlertBlur = event => {
     const newState = {
-      iframeStyle: { border: 'none', width: '100%' }
+      iframeStyle: {border: 'none', width: '100%'}
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'
@@ -125,14 +125,16 @@ class AssignmentExternalTools extends React.Component {
     if (tool.placements[this.props.placement].launch_width) {
       styles.width = tool.placements[this.props.placement].launch_width
     }
-    return(
+    return (
       <iframe
         src={tool.launch}
         className="tool_launch"
         style={styles}
         key={tool.definition_id}
         title={I18n.t('External Tool %{tool_id}', {tool_id: tool.definition_id})}
-        ref={(e) => { this[`tool_iframe_${tool.definition_id}`] = e; }}
+        ref={e => {
+          this[`tool_iframe_${tool.definition_id}`] = e
+        }}
         data-lti-launch="true"
       />
     )
@@ -142,24 +144,22 @@ class AssignmentExternalTools extends React.Component {
     const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
     const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
 
-    return(
-      <div style={{ display: this.state.toolLaunchUrl === 'about:blank' ? 'none' : 'block' }}>
+    return (
+      <div style={{display: this.state.toolLaunchUrl === 'about:blank' ? 'none' : 'block'}}>
         <div
           onFocus={this.handleAlertFocus}
           onBlur={this.handleAlertBlur}
           className={beforeAlertStyles}
           tabIndex="0"
         >
-          <div className="ic-flash-info" style={{ width: 'auto', margin: '20px' }}>
+          <div className="ic-flash-info" style={{width: 'auto', margin: '20px'}}>
             <div className="ic-flash__icon" aria-hidden="true">
               <i className="icon-info" />
             </div>
             {I18n.t('The following content is partner provided')}
           </div>
         </div>
-        {
-          this.state.tools.map(tool => this.renderTool(tool))
-        }
+        {this.state.tools.map(tool => this.renderTool(tool))}
 
         <div
           onFocus={this.handleAlertFocus}
@@ -167,7 +167,7 @@ class AssignmentExternalTools extends React.Component {
           className={afterAlertStyles}
           tabIndex="0"
         >
-          <div className="ic-flash-info" style={{ width: 'auto', margin: '20px' }}>
+          <div className="ic-flash-info" style={{width: 'auto', margin: '20px'}}>
             <div className="ic-flash__icon" aria-hidden="true">
               <i className="icon-info" />
             </div>
@@ -175,18 +175,16 @@ class AssignmentExternalTools extends React.Component {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   render() {
     if (this.state.tools.length === 0) {
-      return (<div />)
+      return <div />
     }
     return (
       <div>
-        <div className="border border-trbl border-round">
-          {this.renderToolsContainer()}
-        </div>
+        <div className="border border-trbl border-round">{this.renderToolsContainer()}</div>
       </div>
     )
   }
@@ -198,7 +196,6 @@ AssignmentExternalTools.propTypes = {
   assignmentId: PropTypes.number
 }
 
-
 AssignmentExternalTools.defaultProps = {
   assignmentId: undefined
 }
@@ -207,16 +204,16 @@ const attach = function(element, placement, courseId, assignmentId) {
   const configTools = (
     <AssignmentExternalTools
       placement={placement}
-      courseId ={courseId}
+      courseId={courseId}
       assignmentId={assignmentId}
     />
-  );
-  ReactDOM.render(configTools, element);
-};
+  )
+  ReactDOM.render(configTools, element)
+}
 
 const ConfigurationTools = {
   configTools: AssignmentExternalTools,
   attach
-};
+}
 
 export default ConfigurationTools
