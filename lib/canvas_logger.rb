@@ -52,15 +52,16 @@ class CanvasLogger < ActiveSupport::Logger
     end
   end
 
-  # On production we're running the server as a particular user, but we have the log
-  # file permissions to be group writable. This is because Capistrano deploys run
-  # as a different user and have to write to the logs while running rake tasks.
-  # This LogDevice overrides the default permissions on file create from 644 to 664.
-  # 
-  # Note: when the Rails.logger rotates the log b/c it hits the shift_size (instead of waiting for
-  # logrotate to run on the machine) it fubar's the permissions b/c it just let's the kernel do it's
-  # thing based on umask. It feels risky to muck with the umask, so this is a safer hack to keep
-  # the thing group writable.
+  # This LogDevice overrides the default permissions to be group writable when the logs 
+  # are rotated and the new file is created.  By default, this happens when the log size 
+  # hits 1MB. The size is controlled by the shift_size parameter.
+  #
+  # Note: when the Rails.logger rotates the log it just let's the kernel do it's thing in
+  # terms of permissions for rotated file. This messes up our Capistrano deploys up b/c
+  # the deploy runs as a different user than the Apache server and the deploy has to write to
+  # the log while running rake tasks. We handle this by having the log file group writeable by
+  # a group that the Capistrano deploy user is in. This feels safer than mucking with umasks.
+  # But don't forget to set the setgid bit on the log file directory! E.g. chmod g+s /log/file/dir
   class GroupWritableLogDevice < Logger::LogDevice
     def create_logfile(filename)
       super.tap {|f| f.chmod(0664) }
