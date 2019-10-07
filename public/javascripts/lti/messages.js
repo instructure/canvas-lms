@@ -103,6 +103,7 @@ export function ltiMessageHandler(e) {
               message.height = window.innerHeight;
               message.width = window.innerWidth;
               message.offset = $('.tool_content_wrapper').offset();
+              message.footer = $('#fixed_bottom').height() || 0;
               message.scrollY = window.scrollY;
               const strMessage = JSON.stringify(message);
 

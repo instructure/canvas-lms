@@ -72,7 +72,8 @@ module LiveEvents
     end
 
     def post_event(event_name, payload, time = Time.now, ctx = {}, partition_key = nil)
-      statsd_prefix = "live_events.events.#{event_name}"
+      statsd_prefix = "live_events.events"
+      tags = { event: event_name }
 
       ctx ||= {}
       attributes = ctx.except(*ATTRIBUTE_BLACKLIST).merge({
@@ -92,8 +93,12 @@ module LiveEvents
       pusher = @worker || LiveEvents.worker
 
       unless pusher.push(event, partition_key)
-        LiveEvents.logger.error("Error queueing job for worker event: #{event_json}")
-        LiveEvents&.statsd&.increment("#{statsd_prefix}.queue_full_errors")
+        LiveEvents.logger.error("Error queueing job for live event: #{event.to_json}")
+        LiveEvents&.error_reporter&.capture(
+          :dropped_live_event,
+          message: "Error queueing job for live event with request id: #{attributes[:request_id]}"
+        )
+        LiveEvents&.statsd&.increment("#{statsd_prefix}.queue_full_errors", tags: tags)
       end
     end
   end
