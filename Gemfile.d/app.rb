@@ -22,7 +22,7 @@ else
   gem 'rails', '6.0.0'
 end
 
-gem 'rack', '2.0.6'
+gem 'rack', '2.0.7'
 
 gem 'oauth2', '1.4.1', require: false
 
