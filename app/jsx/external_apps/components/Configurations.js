@@ -35,7 +35,7 @@ export default class Configurations extends React.Component {
     this.headerRef.focus()
   }
 
-  setHeaderRef = (node) => {
+  setHeaderRef = node => {
     this.headerRef = node
   }
 

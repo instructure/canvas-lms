@@ -22,109 +22,107 @@ import $ from 'jquery'
 import splitAssetString from 'compiled/str/splitAssetString'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 
-  // -------------------
-  //       About
-  // -------------------
+// -------------------
+//       About
+// -------------------
 
-  // the student groups store is in charge of fetching groups
-  // in a course - currently used on the assignment & discussion
-  // edit pages when selection an assignemnt override's set in
-  // the due date picker
+// the student groups store is in charge of fetching groups
+// in a course - currently used on the assignment & discussion
+// edit pages when selection an assignemnt override's set in
+// the due date picker
 
-  // -------------------
-  //     Initialize
-  // -------------------
+// -------------------
+//     Initialize
+// -------------------
 
-  const initialStoreState = {
-    groups: {},
-    fetchComplete: false,
-    selectedGroupSetId: null
+const initialStoreState = {
+  groups: {},
+  fetchComplete: false,
+  selectedGroupSetId: null
+}
+
+const StudentGroupStore = createStore($.extend(true, {}, initialStoreState))
+
+// -------------------
+//      Fetching
+// -------------------
+
+StudentGroupStore.fetchGroupsForCourse = function(url) {
+  const courseId = splitAssetString(window.ENV.context_asset_string)[1]
+  const getGroupsPath = url || '/api/v1/courses/' + courseId + '/groups'
+
+  $.getJSON(getGroupsPath, {}, this.fetchGroupsCallback.bind(this))
+}
+
+StudentGroupStore.fetchGroupsCallback = function(data, status, xhr) {
+  const links = parseLinkHeader(xhr)
+  const newGroups = data
+  this.addGroups(newGroups)
+
+  if (links.next) {
+    this.fetchGroupsForCourse(links.next)
+  } else {
+    this.markFetchComplete()
   }
+}
 
-  let StudentGroupStore = createStore($.extend(true, {}, initialStoreState))
+// -------------------
+//   Set & Get State
+// -------------------
 
-  // -------------------
-  //      Fetching
-  // -------------------
+StudentGroupStore.getGroups = function() {
+  return StudentGroupStore.getState().groups
+}
 
-  StudentGroupStore.fetchGroupsForCourse = function(url){
-    const courseId = splitAssetString(window.ENV.context_asset_string)[1]
-    const getGroupsPath = url || "/api/v1/courses/"+courseId+"/groups"
+StudentGroupStore.getSelectedGroupSetId = function() {
+  return StudentGroupStore.getState().selectedGroupSetId
+}
 
-    $.getJSON(getGroupsPath, {},
-      this.fetchGroupsCallback.bind(this)
-    )
+StudentGroupStore.addGroups = function(newlyFetchedGroups) {
+  const newGroupsHash = _.keyBy(newlyFetchedGroups, 'id')
+  const newGroupsState = _.extend(newGroupsHash, this.getState().groups)
+  this.setState({
+    groups: newGroupsState
+  })
+}
+
+StudentGroupStore.setSelectedGroupSet = function(setId) {
+  this.setState({
+    selectedGroupSetId: setId
+  })
+}
+
+StudentGroupStore.setGroupSetIfNone = function(setId) {
+  if (!this.getSelectedGroupSetId()) {
+    this.setSelectedGroupSet(setId)
   }
+}
 
-  StudentGroupStore.fetchGroupsCallback = function(data, status, xhr){
-    const links = parseLinkHeader(xhr)
-    const newGroups = data
-    this.addGroups(newGroups)
+StudentGroupStore.markFetchComplete = function() {
+  this.setState({
+    fetchComplete: true
+  })
+}
 
-    if (links.next) {
-      this.fetchGroupsForCourse(links.next)
-    } else {
-      this.markFetchComplete()
-    }
-  }
+StudentGroupStore.fetchComplete = function() {
+  return this.getState().fetchComplete
+}
 
-  // -------------------
-  //   Set & Get State
-  // -------------------
+// -------------------
+//       Helpers
+// -------------------
 
-  StudentGroupStore.getGroups = function(){
-    return StudentGroupStore.getState().groups
-  }
+// test helper
+StudentGroupStore.reset = function() {
+  this.setState($.extend(true, {}, initialStoreState))
+}
 
-  StudentGroupStore.getSelectedGroupSetId = function(){
-    return StudentGroupStore.getState().selectedGroupSetId
-  }
+StudentGroupStore.groupsFilteredForSelectedSet = function() {
+  const groups = this.getState().groups
+  const setId = this.getState().selectedGroupSetId
+  return _.filter(groups, (value, key) => value.group_category_id === setId)
+}
 
-  StudentGroupStore.addGroups = function(newlyFetchedGroups){
-    const newGroupsHash = _.keyBy(newlyFetchedGroups, "id")
-    const newGroupsState = _.extend(newGroupsHash, this.getState().groups)
-    this.setState({
-      groups: newGroupsState
-    })
-  }
-
-  StudentGroupStore.setSelectedGroupSet = function(setId){
-    this.setState({
-      selectedGroupSetId: setId
-    })
-  }
-
-  StudentGroupStore.setGroupSetIfNone = function(setId){
-    if (!this.getSelectedGroupSetId()){
-      this.setSelectedGroupSet(setId)
-    }
-  }
-
-  StudentGroupStore.markFetchComplete = function(){
-    this.setState({
-      fetchComplete: true
-    })
-  }
-
-  StudentGroupStore.fetchComplete = function(){
-    return this.getState().fetchComplete
-  }
-
-  // -------------------
-  //       Helpers
-  // -------------------
-
-  // test helper
-  StudentGroupStore.reset = function(){
-    this.setState($.extend(true, {}, initialStoreState))
-  }
-
-  StudentGroupStore.groupsFilteredForSelectedSet = function(){
-    const groups = this.getState().groups
-    const setId = this.getState().selectedGroupSetId
-    return _.filter( groups, (value, key) => value.group_category_id === setId);
-  }
-
-  // -------------------
+// -------------------
 
 export default StudentGroupStore

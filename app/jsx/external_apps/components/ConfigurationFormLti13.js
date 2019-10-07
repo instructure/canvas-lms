@@ -69,11 +69,14 @@ class ConfigurationFormLti13 extends React.Component {
           icon={() => <IconLtiLine />}
           ref={this.clientIdInput}
           onChange={this.setClientId}
-          messages={
-            [
-              { text: I18n.t('To obtain a client ID, an account admin will need to generate an LTI developer key.'), type: 'hint' }
-            ].concat(this.state.messages)
-          }
+          messages={[
+            {
+              text: I18n.t(
+                'To obtain a client ID, an account admin will need to generate an LTI developer key.'
+              ),
+              type: 'hint'
+            }
+          ].concat(this.state.messages)}
           required
         />
       </View>

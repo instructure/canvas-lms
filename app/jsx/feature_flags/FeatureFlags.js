@@ -30,7 +30,6 @@ import {Table} from '@instructure/ui-table'
 const {Head, Body, ColHeader, Row, Cell} = Table
 
 export default class FeatureFlags extends React.Component {
-
   constructor(props) {
     super(props)
     this.state = {
@@ -39,46 +38,42 @@ export default class FeatureFlags extends React.Component {
     }
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.retrieveFlagsConfig()
   }
 
   retrieveFlagsConfig() {
     this.setState({isLoading: true})
-    const url = `/api/v1/accounts/${ window.ENV.ACCOUNT.id}/features`
-    axios.get(url)
-      .then((response) => this.loadData(response.data))
+    const url = `/api/v1/accounts/${window.ENV.ACCOUNT.id}/features`
+    axios.get(url).then(response => this.loadData(response.data))
   }
 
-  loadData (features) {
+  loadData(features) {
     this.setState({features, isLoading: false})
   }
 
   revert = () => {
-    const url = `/api/v1/accounts/${ window.ENV.ACCOUNT.id}/features/flags/new_features_ui`
-    return axios.put(url, {state: 'off'})
-      .then(() => { window.location.reload(true) });
+    const url = `/api/v1/accounts/${window.ENV.ACCOUNT.id}/features/flags/new_features_ui`
+    return axios.put(url, {state: 'off'}).then(() => {
+      window.location.reload(true)
+    })
   }
 
   renderFeatureRows() {
-    return this.state.features.map( feature => {
+    return this.state.features.map(feature => {
       return (
         <Row key={feature.feature}>
           <Cell>{feature.display_name}</Cell>
           <Cell>
-            <Tooltip
-              tip={feature.description}
-              on={['click', 'hover', 'focus']}
-              variant="inverse"
-            >
+            <Tooltip tip={feature.description} on={['click', 'hover', 'focus']} variant="inverse">
               <Button variant="icon" icon={IconInfoLine}>
                 <ScreenReaderContent>{I18n.t('toggle tooltip')}</ScreenReaderContent>
               </Button>
             </Tooltip>
           </Cell>
-          <Cell></Cell>
-          <Cell></Cell>
-          <Cell></Cell>
+          <Cell />
+          <Cell />
+          <Cell />
         </Row>
       )
     })
@@ -88,21 +83,21 @@ export default class FeatureFlags extends React.Component {
     return (
       <View as="div">
         <View as="div">
-          <Text>{I18n.t(
-            'This is the new Feature Preview UI. It is currently read-only. To revert to old UI, click the ' +
-            'button. This will disable the "New Feature Flags" feature and refresh the page.'
+          <Text>
+            {I18n.t(
+              'This is the new Feature Preview UI. It is currently read-only. To revert to old UI, click the ' +
+                'button. This will disable the "New Feature Flags" feature and refresh the page.'
             )}
           </Text>
         </View>
-        <Button
-          onClick={this.revert}
-          margin="small 0"
-        >
+        <Button onClick={this.revert} margin="small 0">
           {I18n.t('Revert to old UI')}
         </Button>
 
         <View as="div" width="80%">
-          {this.state.isLoading ? <Spinner renderTitle={I18n.t("Loading features")} /> : (
+          {this.state.isLoading ? (
+            <Spinner renderTitle={I18n.t('Loading features')} />
+          ) : (
             <Table caption={I18n.t('Feature Preview')} margin="medium 0 0">
               <Head>
                 <Row>
@@ -113,9 +108,7 @@ export default class FeatureFlags extends React.Component {
                   <ColHeader id="state">{I18n.t('State')}</ColHeader>
                 </Row>
               </Head>
-              <Body>
-                {this.renderFeatureRows()}
-              </Body>
+              <Body>{this.renderFeatureRows()}</Body>
             </Table>
           )}
         </View>

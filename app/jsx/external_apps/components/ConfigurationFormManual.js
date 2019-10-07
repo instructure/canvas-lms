@@ -21,10 +21,10 @@ import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextInput from '../../external_apps/components/TextInput'
-import TextAreaInput from '../../external_apps/components/TextAreaInput'
-import SelectInput from '../../external_apps/components/SelectInput'
-import CheckboxInput from '../../external_apps/components/CheckboxInput'
+import TextInput from './TextInput'
+import TextAreaInput from './TextAreaInput'
+import SelectInput from './SelectInput'
+import CheckboxInput from './CheckboxInput'
 import 'compiled/jquery.rails_flash_notifications'
 
 const PRIVACY_OPTIONS = {
@@ -53,7 +53,7 @@ export default class ConfigurationFormManual extends React.Component {
   }
 
   isValid = () => {
-    let errors = {},
+    const errors = {},
       formErrors = [],
       name = this.refs.name.state.value || '',
       url = this.refs.url.state.value || '',

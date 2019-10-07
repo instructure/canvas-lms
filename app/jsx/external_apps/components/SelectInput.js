@@ -20,7 +20,7 @@ import _ from 'underscore'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
-import InputMixin from '../../external_apps/mixins/InputMixin'
+import InputMixin from '../mixins/InputMixin'
 
 export default createReactClass({
   displayName: 'SelectInput',
@@ -39,10 +39,11 @@ export default createReactClass({
   },
 
   renderSelectOptions() {
-    const options = _.map(
-      this.props.values,
-      (v, k) => <option key={k} value={k}>{v}</option>
-    )
+    const options = _.map(this.props.values, (v, k) => (
+      <option key={k} value={k}>
+        {v}
+      </option>
+    ))
     if (this.props.allowBlank) {
       options.unshift(<option key="NO_VALUE" value={null} />)
     }

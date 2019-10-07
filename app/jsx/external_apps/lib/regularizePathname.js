@@ -21,9 +21,9 @@
  * slash.
  */
 const regularizePathname = (ctx, next) => {
-  ctx.originalPathname = ctx.pathname;
-  ctx.pathname = ctx.pathname.replace('#' + ctx.hash, '').replace(/\/$/, '');
-  next();
-};
+  ctx.originalPathname = ctx.pathname
+  ctx.pathname = ctx.pathname.replace('#' + ctx.hash, '').replace(/\/$/, '')
+  next()
+}
 
 export default regularizePathname

@@ -19,82 +19,82 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import page from 'page'
-import Root from '../external_apps/components/Root'
-import AppList from '../external_apps/components/AppList'
-import AppDetails from '../external_apps/components/AppDetails'
-import Configurations from '../external_apps/components/Configurations'
-import AppCenterStore from '../external_apps/lib/AppCenterStore'
-import regularizePathname from '../external_apps/lib/regularizePathname'
+import Root from './components/Root'
+import AppList from './components/AppList'
+import AppDetails from './components/AppDetails'
+import Configurations from './components/Configurations'
+import AppCenterStore from './lib/AppCenterStore'
+import regularizePathname from './lib/regularizePathname'
 
-  const currentPath = window.location.pathname;
-  const re = /(.*\/settings|.*\/details)/;
-  const matches = re.exec(currentPath);
-  const baseUrl = matches[0];
+const currentPath = window.location.pathname
+const re = /(.*\/settings|.*\/details)/
+const matches = re.exec(currentPath)
+const baseUrl = matches[0]
 
-  let targetNodeToRenderIn = null;
-  let alreadyRendered = false
+let targetNodeToRenderIn = null
+let alreadyRendered = false
 
-
-  /**
-   * Route Handlers
-   */
-  const renderAppList = (ctx) => {
-    if (!window.ENV.APP_CENTER.enabled) {
-      page.redirect('/configurations');
-    } else {
-      ReactDOM.render(
-        <Root>
-          <AppList pathname={ctx.pathname} alreadyRendered={alreadyRendered}/>
-        </Root>
-      , targetNodeToRenderIn);
-      alreadyRendered = true
-    }
-  };
-
-  const renderAppDetails = (ctx) => {
+/**
+ * Route Handlers
+ */
+const renderAppList = ctx => {
+  if (!window.ENV.APP_CENTER.enabled) {
+    page.redirect('/configurations')
+  } else {
     ReactDOM.render(
       <Root>
-        <AppDetails
-          shortName={ctx.params.shortName}
-          pathname={ctx.pathname}
-          baseUrl={baseUrl}
-          store={AppCenterStore}
-        />
-      </Root>
-    , targetNodeToRenderIn);
-  };
-
-  const renderConfigurations = (ctx) => {
-    // router.start is only called when loading the Apps tab
-    // so we don't want to try anything here that hasn't happened.
-    if (targetNodeToRenderIn) {
-      ReactDOM.render(
-        <Root>
-          <Configurations
-            pathname={ctx.pathname}
-            env={window.ENV} />
-        </Root>
-      , targetNodeToRenderIn);
-    }
+        <AppList pathname={ctx.pathname} alreadyRendered={alreadyRendered} />
+      </Root>,
+      targetNodeToRenderIn
+    )
+    alreadyRendered = true
   }
+}
 
-  /**
-   * Route Configuration
-   */
-  page.base(baseUrl);
-  page('*', regularizePathname);
-  page('/', renderAppList);
-  page('/app/:shortName', renderAppDetails);
-  page('/configurations', renderConfigurations);
+const renderAppDetails = ctx => {
+  ReactDOM.render(
+    <Root>
+      <AppDetails
+        shortName={ctx.params.shortName}
+        pathname={ctx.pathname}
+        baseUrl={baseUrl}
+        store={AppCenterStore}
+      />
+    </Root>,
+    targetNodeToRenderIn
+  )
+}
+
+const renderConfigurations = ctx => {
+  // router.start is only called when loading the Apps tab
+  // so we don't want to try anything here that hasn't happened.
+  if (targetNodeToRenderIn) {
+    ReactDOM.render(
+      <Root>
+        <Configurations pathname={ctx.pathname} env={window.ENV} />
+      </Root>,
+      targetNodeToRenderIn
+    )
+  }
+}
+
+/**
+ * Route Configuration
+ */
+page.base(baseUrl)
+page('*', regularizePathname)
+page('/', renderAppList)
+page('/app/:shortName', renderAppDetails)
+page('/configurations', renderConfigurations)
 
 export default {
-    start (targetNode) {
-      targetNodeToRenderIn = targetNode;
-      page.start();
-    },
-    stop () {
-      // we may not be the only thing using page on this page.
-      page.stop();
-    },
-    regularizePathname
-  };
+  start(targetNode) {
+    targetNodeToRenderIn = targetNode
+    page.start()
+  },
+  stop() {
+    // we may not be the only thing using page on this page.
+    page.stop()
+  },
+  regularizePathname
+}

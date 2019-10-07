@@ -22,188 +22,220 @@ import $ from 'jquery'
 import DefaultUrlMixin from 'compiled/backbone-ext/DefaultUrlMixin'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 
-  // -------------------
-  //     Initialize
-  // -------------------
+// -------------------
+//     Initialize
+// -------------------
 
-  var initialStoreState = {
-    students: {},
-    searchedNames: {},
-    currentlySearching: false,
-    allStudentsFetched: false,
-    requestedStudentsForCourse: false
+const initialStoreState = {
+  students: {},
+  searchedNames: {},
+  currentlySearching: false,
+  allStudentsFetched: false,
+  requestedStudentsForCourse: false
+}
+
+const OverrideStudentStore = createStore($.extend(true, {}, initialStoreState))
+
+// -------------------
+//   Private Methods
+// -------------------
+
+function studentEnrollments(student) {
+  return _.filter(
+    student.enrollments,
+    enrollment =>
+      enrollment.type === 'StudentEnrollment' || enrollment.type === 'StudentViewEnrollment'
+  )
+}
+
+function sectionIDs(enrollments) {
+  return _.map(enrollments, enrollment => enrollment.course_section_id)
+}
+
+// -------------------
+//      Fetching
+// -------------------
+
+// ---- by ID ----
+
+OverrideStudentStore.fetchStudentsByID = function(givenIds) {
+  if (typeof givenIds === 'undefined' || givenIds.length === 0) {
+    return null
   }
 
-  var OverrideStudentStore = createStore($.extend(true, {}, initialStoreState))
+  const getUsersPath = this.getContextPath() + '/users'
+  $.getJSON(
+    getUsersPath,
+    {
+      user_ids: givenIds.join(','),
+      enrollment_type: 'student',
+      include: ['enrollments', 'group_ids']
+    },
+    this._fetchStudentsByIDSuccessHandler.bind(this, {})
+  )
+}
 
-  // -------------------
-  //   Private Methods
-  // -------------------
+OverrideStudentStore._fetchStudentsByIDSuccessHandler = function(opts, items, status, xhr) {
+  this.addStudents(items)
 
-  function studentEnrollments(student) {
-    return _.filter(student.enrollments, enrollment => enrollment.type === "StudentEnrollment" || enrollment.type === "StudentViewEnrollment");
+  const links = parseLinkHeader(xhr)
+  if (links.next) {
+    $.getJSON(links.next, {}, this._fetchStudentsByIDSuccessHandler.bind(this, {}))
+  }
+}
+
+// ---- by name ----
+
+OverrideStudentStore.fetchStudentsByName = function(nameString) {
+  if (
+    $.trim(nameString) === '' ||
+    this.allStudentsFetched() ||
+    this.alreadySearchedForName(nameString)
+  ) {
+    return true
   }
 
-  function sectionIDs(enrollments) {
-    return _.map(enrollments, enrollment => enrollment.course_section_id);
+  const searchUsersPath = this.getContextPath() + '/search_users'
+
+  this.setState({
+    currentlySearching: true
+  })
+
+  $.getJSON(
+    searchUsersPath,
+    {
+      search_term: nameString,
+      enrollment_type: 'student',
+      include_inactive: false,
+      include: ['enrollments', 'group_ids']
+    },
+    this._fetchStudentsByNameSuccessHandler.bind(this, {nameString}),
+    this._fetchStudentsByNameErrorHandler.bind(this, {nameString})
+  )
+}
+
+OverrideStudentStore.allStudentsFetched = function() {
+  return this.getState().allStudentsFetched
+}
+
+OverrideStudentStore._fetchStudentsByNameSuccessHandler = function(opts, items, status, xhr) {
+  this.doneSearching()
+  this.markNameSearched(opts.nameString)
+  this.addStudents(items)
+}
+
+OverrideStudentStore._fetchStudentsByNameErrorHandler = function(opts) {
+  this.doneSearching()
+}
+
+// ---- by course ----
+
+const PAGES_OF_STUDENTS_TO_FETCH = 4
+const STUDENTS_FETCHED_PER_PAGE = 50
+
+OverrideStudentStore.fetchStudentsForCourse = function() {
+  if (this.getState().requestedStudentsForCourse) {
+    return
   }
+  this.setState({requestedStudentsForCourse: true})
 
-  // -------------------
-  //      Fetching
-  // -------------------
+  const path = this.getContextPath() + '/users'
 
-  // ---- by ID ----
+  $.getJSON(
+    path,
+    {
+      per_page: STUDENTS_FETCHED_PER_PAGE,
+      enrollment_type: 'student',
+      include_inactive: false,
+      include: ['enrollments', 'group_ids']
+    },
+    this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: 1})
+  )
+}
 
-  OverrideStudentStore.fetchStudentsByID = function(givenIds) {
-    if (typeof givenIds === 'undefined' || givenIds.length === 0) {
-      return null
+OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function(
+  {pageNumber},
+  items,
+  status,
+  xhr
+) {
+  this.addStudents(items)
+
+  const links = parseLinkHeader(xhr)
+  if (links.next) {
+    if (pageNumber < PAGES_OF_STUDENTS_TO_FETCH) {
+      $.getJSON(
+        links.next,
+        {},
+        this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: pageNumber + 1})
+      )
     }
-
-    var getUsersPath = this.getContextPath() + "/users"
-    $.getJSON(getUsersPath,
-      {user_ids: givenIds.join(","), enrollment_type: "student", include: ["enrollments", "group_ids"]},
-      this._fetchStudentsByIDSuccessHandler.bind(this, {})
-    )
+  } else {
+    this.setState({allStudentsFetched: true})
   }
+}
 
-  OverrideStudentStore._fetchStudentsByIDSuccessHandler = function(opts, items, status, xhr){
-    this.addStudents(items)
+// -------------------
+//   Set & Get State
+// -------------------
 
-    const links = parseLinkHeader(xhr)
-    if (links.next) {
-      $.getJSON(links.next, {}, this._fetchStudentsByIDSuccessHandler.bind(this, {}))
-    }
-  }
+OverrideStudentStore.getStudents = function() {
+  return OverrideStudentStore.getState().students
+}
 
-  // ---- by name ----
+OverrideStudentStore.addStudents = function(newlyFetchedStudents) {
+  _.each(newlyFetchedStudents, student => {
+    student.enrollments = studentEnrollments(student)
+    student.sections = sectionIDs(student.enrollments)
+  })
+  const newStudentsHash = _.keyBy(newlyFetchedStudents, student => student.id)
+  const newStudentState = _.extend(newStudentsHash, this.getState().students)
+  this.setState({
+    students: newStudentState
+  })
+}
 
-  OverrideStudentStore.fetchStudentsByName = function(nameString) {
-    if( $.trim(nameString) === "" ||
-        this.allStudentsFetched() ||
-        this.alreadySearchedForName(nameString)){
-      return true
-    }
+OverrideStudentStore.doneSearching = function() {
+  this.setState({
+    currentlySearching: false
+  })
+}
 
-    var searchUsersPath = this.getContextPath() + "/search_users"
+OverrideStudentStore.currentlySearching = function() {
+  return this.getState().currentlySearching
+}
 
-    this.setState({
-      currentlySearching: true
-    })
+// -------------------
+//       Helpers
+// -------------------
 
-    $.getJSON(searchUsersPath,
-      {search_term: nameString, enrollment_type: "student", include_inactive: false, include: ["enrollments", "group_ids"]},
-      this._fetchStudentsByNameSuccessHandler.bind(this, {nameString: nameString}),
-      this._fetchStudentsByNameErrorHandler.bind(this, {nameString: nameString})
-    )
-  }
+OverrideStudentStore.getContextPath = function() {
+  return '/api/v1/' + DefaultUrlMixin._contextPath()
+}
 
-  OverrideStudentStore.allStudentsFetched = function(){
-    return this.getState().allStudentsFetched
-  }
+// test helper
+OverrideStudentStore.reset = function() {
+  this.setState($.extend(true, {}, initialStoreState))
+}
 
-  OverrideStudentStore._fetchStudentsByNameSuccessHandler = function(opts, items, status, xhr){
-    this.doneSearching()
-    this.markNameSearched(opts["nameString"])
-    this.addStudents(items)
-  }
+// ----------------------
+// Marking Name Searched
+// ----------------------
 
-  OverrideStudentStore._fetchStudentsByNameErrorHandler = function(opts){
-    this.doneSearching()
-  }
+OverrideStudentStore.alreadySearchedForName = function(name) {
+  return !!this.getState().searchedNames[name]
+}
 
-  // ---- by course ----
+OverrideStudentStore.alreadySearchingForName = function(name) {
+  return _.includes(this.getState().activeNameSearches, name)
+}
 
-  var PAGES_OF_STUDENTS_TO_FETCH = 4
-  var STUDENTS_FETCHED_PER_PAGE = 50
-
-  OverrideStudentStore.fetchStudentsForCourse = function(){
-    if (this.getState().requestedStudentsForCourse) {
-      return
-    }
-    this.setState({requestedStudentsForCourse: true})
-
-    var path = this.getContextPath() + "/users"
-
-    $.getJSON(path,
-      {per_page: STUDENTS_FETCHED_PER_PAGE, enrollment_type: "student", include_inactive: false, include: ["enrollments", "group_ids"]},
-      this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: 1})
-    )
-  }
-
-  OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function({pageNumber}, items, status, xhr){
-    this.addStudents(items)
-
-    const links = parseLinkHeader(xhr)
-    if (links.next) {
-      if (pageNumber < PAGES_OF_STUDENTS_TO_FETCH) {
-        $.getJSON(links.next, {}, this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: pageNumber + 1}))
-      }
-    } else {
-      this.setState({allStudentsFetched: true})
-    }
-  }
-
-  // -------------------
-  //   Set & Get State
-  // -------------------
-
-  OverrideStudentStore.getStudents = function(){
-    return OverrideStudentStore.getState().students
-  }
-
-  OverrideStudentStore.addStudents = function(newlyFetchedStudents){
-    _.each(newlyFetchedStudents, (student) => {
-      student.enrollments = studentEnrollments(student);
-      student.sections = sectionIDs(student.enrollments);
-    });
-    let newStudentsHash = _.keyBy(newlyFetchedStudents, (student) => student.id)
-    let newStudentState = _.extend(newStudentsHash, this.getState().students)
-    this.setState({
-      students: newStudentState
-    })
-  }
-
-  OverrideStudentStore.doneSearching = function(){
-    this.setState({
-      currentlySearching: false
-    })
-  }
-
-  OverrideStudentStore.currentlySearching = function(){
-    return this.getState().currentlySearching
-  }
-
-  // -------------------
-  //       Helpers
-  // -------------------
-
-  OverrideStudentStore.getContextPath = function(){
-    return "/api/v1/" + DefaultUrlMixin._contextPath()
-  }
-
-  // test helper
-  OverrideStudentStore.reset = function(){
-    this.setState($.extend(true, {}, initialStoreState))
-  }
-
-  // ----------------------
-  // Marking Name Searched
-  // ----------------------
-
-  OverrideStudentStore.alreadySearchedForName = function(name){
-    return !!this.getState().searchedNames[name]
-  }
-
-  OverrideStudentStore.alreadySearchingForName = function(name){
-    return _.includes(this.getState().activeNameSearches, name)
-  }
-
-  OverrideStudentStore.markNameSearched = function(name){
-    var searchedNames = this.getState().searchedNames
-    searchedNames[name] = true
-    this.setState({
-      searchedNames: searchedNames
-    })
-  }
+OverrideStudentStore.markNameSearched = function(name) {
+  const searchedNames = this.getState().searchedNames
+  searchedNames[name] = true
+  this.setState({
+    searchedNames
+  })
+}
 
 export default OverrideStudentStore

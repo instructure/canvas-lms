@@ -54,7 +54,10 @@ export default class InfiniteScroll extends React.Component {
       window.pageYOffset !== undefined
         ? window.pageYOffset
         : (document.documentElement || document.body.parentNode || document.body).scrollTop
-    if (topPosition(this.node) + this.node.offsetHeight - scrollTop - window.innerHeight < Number(this.props.threshold)) {
+    if (
+      topPosition(this.node) + this.node.offsetHeight - scrollTop - window.innerHeight <
+      Number(this.props.threshold)
+    ) {
       this.detachScrollListener()
       // call loadMore after detachScrollListener to allow
       // for non-async loadMore functions

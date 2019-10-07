@@ -17,8 +17,8 @@
  */
 
 const iframeAllowances = () => {
-    const allowances = ENV.LTI_LAUNCH_FRAME_ALLOWANCES || []
-    return allowances.join('; ')
+  const allowances = ENV.LTI_LAUNCH_FRAME_ALLOWANCES || []
+  return allowances.join('; ')
 }
 
 export default iframeAllowances

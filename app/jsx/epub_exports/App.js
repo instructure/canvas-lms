@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import CourseStore from '../epub_exports/CourseStore'
-import CourseList from '../epub_exports/CourseList'
+import CourseStore from './CourseStore'
+import CourseList from './CourseList'
 
 class EpubExportApp extends React.Component {
   static displayName = 'EpubExportApp'

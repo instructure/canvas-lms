@@ -19,7 +19,7 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextInput from '../../external_apps/components/TextInput'
+import TextInput from './TextInput'
 
 export default class ConfigurationFormLti2 extends React.Component {
   static propTypes = {

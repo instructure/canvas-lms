@@ -29,7 +29,7 @@ export default class ConfigureExternalToolButton extends React.Component {
     returnFocus: func.isRequired
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       modalIsOpen: props.modalIsOpen,
@@ -85,12 +85,8 @@ export default class ConfigureExternalToolButton extends React.Component {
   }
 
   renderIframe = () => {
-    const beforeAlertStyles = `before_external_content_info_alert ${
-      this.state.beforeExternalContentAlertClass
-    }`
-    const afterAlertStyles = `after_external_content_info_alert ${
-      this.state.afterExternalContentAlertClass
-    }`
+    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
 
     return (
       <div>

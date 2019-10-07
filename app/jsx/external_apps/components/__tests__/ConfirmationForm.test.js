@@ -34,11 +34,7 @@ function newProps(overrides) {
 }
 
 function mountSubject(props = newProps()) {
-  wrapper = mount(
-    <ConfirmationForm
-      {...props}
-    />
-  )
+  wrapper = mount(<ConfirmationForm {...props} />)
 }
 
 afterEach(() => {
@@ -47,31 +43,51 @@ afterEach(() => {
 
 it('uses the specified confirmLabel', () => {
   mountSubject()
-  expect(wrapper.find('Button').first().html()).toContain('Nope!')
+  expect(
+    wrapper
+      .find('Button')
+      .first()
+      .html()
+  ).toContain('Nope!')
 })
 
 it('uses the specified cancelLabel', () => {
   mountSubject()
-  expect(wrapper.find('Button').at(1).html()).toContain('Yes, please')
+  expect(
+    wrapper
+      .find('Button')
+      .at(1)
+      .html()
+  ).toContain('Yes, please')
 })
 
 it('uses the specified message', () => {
   const props = newProps()
   mountSubject(props)
-  expect(wrapper.find('Text').first().html()).toContain(props.message)
+  expect(
+    wrapper
+      .find('Text')
+      .first()
+      .html()
+  ).toContain(props.message)
 })
 
 it('calls "onCancel" when cancel button is clicked', () => {
   const props = newProps()
   mountSubject(props)
-  wrapper.find('Button').first().simulate('click')
+  wrapper
+    .find('Button')
+    .first()
+    .simulate('click')
   expect(props.onCancel).toHaveBeenCalled()
 })
 
 it('calls "onConfirm" when confirm button is clicked', () => {
   const props = newProps()
   mountSubject(props)
-  wrapper.find('Button').at(1).simulate('click')
+  wrapper
+    .find('Button')
+    .at(1)
+    .simulate('click')
   expect(props.onConfirm).toHaveBeenCalled()
 })
-

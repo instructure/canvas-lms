@@ -84,18 +84,18 @@ export default class DeleteExternalToolButton extends React.Component {
             onDismiss={this.closeModal}
             label={I18n.t('Delete %{tool} App?', {tool: this.props.tool.name})}
           >
-            <Modal.Body>
-              {I18n.t('Are you sure you want to remove this tool?')}
-            </Modal.Body>
+            <Modal.Body>{I18n.t('Are you sure you want to remove this tool?')}</Modal.Body>
             <Modal.Footer>
               <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
               &nbsp;
-              <Button onClick={this.deleteTool} variant="danger">{I18n.t('Delete')}</Button>
+              <Button onClick={this.deleteTool} variant="danger">
+                {I18n.t('Delete')}
+              </Button>
             </Modal.Footer>
           </Modal>
         </li>
       )
     }
-    return false;
+    return false
   }
 }

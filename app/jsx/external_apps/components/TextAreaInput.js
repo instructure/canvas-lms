@@ -19,7 +19,7 @@
 import React from 'react'
 import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
-import InputMixin from '../../external_apps/mixins/InputMixin'
+import InputMixin from '../mixins/InputMixin'
 
 export default createReactClass({
   displayName: 'TextAreaInput',
