@@ -48,9 +48,7 @@ export default class SaveThemeButton extends Component {
 
     let url, method
     if (shouldUpdate) {
-      url = `/api/v1/accounts/${this.props.accountID}/shared_brand_configs/${
-        this.props.sharedBrandConfigBeingEdited.id
-      }`
+      url = `/api/v1/accounts/${this.props.accountID}/shared_brand_configs/${this.props.sharedBrandConfigBeingEdited.id}`
       method = 'PUT'
     } else {
       if (!this.state.newThemeName) {

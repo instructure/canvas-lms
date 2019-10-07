@@ -17,33 +17,36 @@
  */
 
 import React from 'react'
-import { mount, shallow } from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import ProficiencyRating from '../ProficiencyRating'
 
-const defaultProps = (props = {}) => (
-  Object.assign({
-    color: '00ff00',
-    description: 'Stellar',
-    disableDelete: false,
-    mastery: false,
-    onColorChange: () => {},
-    onDelete: () => {},
-    onDescriptionChange: () => {},
-    onMasteryChange: () => {},
-    onPointsChange: () => {},
-    points: "10.0"
-  }, props)
-)
+const defaultProps = (props = {}) => ({
+  color: '00ff00',
+  description: 'Stellar',
+  disableDelete: false,
+  mastery: false,
+  onColorChange: () => {},
+  onDelete: () => {},
+  onDescriptionChange: () => {},
+  onMasteryChange: () => {},
+  onPointsChange: () => {},
+  points: '10.0',
+  ...props
+})
 
 it('renders the ProficiencyRating component', () => {
-  const wrapper = shallow(<ProficiencyRating {...defaultProps()}/>)
+  const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
   expect(wrapper).toMatchSnapshot()
 })
 
 it('mastery checkbox is checked if mastery', () => {
-  const wrapper = shallow(<ProficiencyRating {...defaultProps({
-    mastery: true
-  })}/>)
+  const wrapper = shallow(
+    <ProficiencyRating
+      {...defaultProps({
+        mastery: true
+      })}
+    />
+  )
   const radio = wrapper.find('RadioInput')
   expect(radio.props().checked).toBe(true)
 })
@@ -52,10 +55,16 @@ it('mastery checkbox receives focus', () => {
   const wrapper = mount(
     <table>
       <tbody>
-        <ProficiencyRating {...defaultProps({focusField: 'mastery'})}/>
+        <ProficiencyRating {...defaultProps({focusField: 'mastery'})} />
       </tbody>
-    </table>)
-  expect(wrapper.find('RadioInput').find('input').instance()).toBe(document.activeElement)
+    </table>
+  )
+  expect(
+    wrapper
+      .find('RadioInput')
+      .find('input')
+      .instance()
+  ).toBe(document.activeElement)
 })
 
 it('clicking mastery checkbox triggers change', () => {
@@ -63,15 +72,19 @@ it('clicking mastery checkbox triggers change', () => {
   const wrapper = mount(
     <table>
       <tbody>
-        <ProficiencyRating {...defaultProps({onMasteryChange})}/>
+        <ProficiencyRating {...defaultProps({onMasteryChange})} />
       </tbody>
-    </table>)
-  wrapper.find('RadioInput').find('input').simulate('change')
+    </table>
+  )
+  wrapper
+    .find('RadioInput')
+    .find('input')
+    .simulate('change')
   expect(onMasteryChange).toHaveBeenCalledTimes(1)
 })
 
 it('includes the rating description', () => {
-  const wrapper = shallow(<ProficiencyRating {...defaultProps()}/>)
+  const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
   const input = wrapper.find('TextInput').at(0)
   expect(input.prop('defaultValue')).toBe('Stellar')
 })
@@ -81,15 +94,20 @@ it('changing description triggers change', () => {
   const wrapper = mount(
     <table>
       <tbody>
-        <ProficiencyRating {...defaultProps({onDescriptionChange})}/>
+        <ProficiencyRating {...defaultProps({onDescriptionChange})} />
       </tbody>
-    </table>)
-  wrapper.find('TextInput').at(0).find('input').simulate('change')
+    </table>
+  )
+  wrapper
+    .find('TextInput')
+    .at(0)
+    .find('input')
+    .simulate('change')
   expect(onDescriptionChange).toHaveBeenCalledTimes(1)
 })
 
 it('includes the points', () => {
-  const wrapper = shallow(<ProficiencyRating {...defaultProps()}/>)
+  const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
   const input = wrapper.find('TextInput').at(1)
   expect(input.prop('defaultValue')).toBe('10')
 })
@@ -99,10 +117,15 @@ it('changing points triggers change', () => {
   const wrapper = mount(
     <table>
       <tbody>
-        <ProficiencyRating {...defaultProps({onPointsChange})}/>
+        <ProficiencyRating {...defaultProps({onPointsChange})} />
       </tbody>
-    </table>)
-  wrapper.find('TextInput').at(1).find('input').simulate('change')
+    </table>
+  )
+  wrapper
+    .find('TextInput')
+    .at(1)
+    .find('input')
+    .simulate('change')
   expect(onPointsChange).toHaveBeenCalledTimes(1)
 })
 
@@ -111,10 +134,14 @@ it('clicking delete button triggers delete', () => {
   const wrapper = mount(
     <table>
       <tbody>
-        <ProficiencyRating {...defaultProps({onDelete})}/>
+        <ProficiencyRating {...defaultProps({onDelete})} />
       </tbody>
-    </table>)
-  wrapper.find('Button').at(1).simulate('click')
+    </table>
+  )
+  wrapper
+    .find('Button')
+    .at(1)
+    .simulate('click')
   expect(onDelete).toHaveBeenCalledTimes(1)
 })
 
@@ -123,12 +150,18 @@ it('clicking disabled delete button does not triggers delete', () => {
   const wrapper = mount(
     <table>
       <tbody>
-        <ProficiencyRating {...defaultProps({
-          onDelete,
-          disableDelete: true
-        })}/>
+        <ProficiencyRating
+          {...defaultProps({
+            onDelete,
+            disableDelete: true
+          })}
+        />
       </tbody>
-    </table>)
-  wrapper.find('Button').at(1).simulate('click')
+    </table>
+  )
+  wrapper
+    .find('Button')
+    .at(1)
+    .simulate('click')
   expect(onDelete).toHaveBeenCalledTimes(0)
 })

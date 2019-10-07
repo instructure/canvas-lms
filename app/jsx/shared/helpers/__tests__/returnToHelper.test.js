@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { isValid } from '../returnToHelper'
+import {isValid} from '../returnToHelper'
 
 describe('returnToHelper', () => {
   describe('isValid', () => {
@@ -35,9 +35,15 @@ describe('returnToHelper', () => {
     })
 
     test('returns false for data: protocol', () => {
-      expect(isValid('data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(false)
-      expect(isValid('  data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(false)
-      expect(isValid('DaTa:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(false)
+      expect(isValid('data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(
+        false
+      )
+      expect(isValid('  data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(
+        false
+      )
+      expect(isValid('DaTa:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(
+        false
+      )
     })
 
     test('returns true for other urls', () => {

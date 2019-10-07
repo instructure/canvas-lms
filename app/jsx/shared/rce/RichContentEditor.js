@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import serviceRCELoader from '../rce/serviceRCELoader'
-import {RCELOADED_EVENT_NAME, send, destroy, focus} from '../rce/RceCommandShim'
-const Sidebar = !ENV.use_rce_enhancements && require('../rce/Sidebar').default
+import serviceRCELoader from './serviceRCELoader'
+import {RCELOADED_EVENT_NAME, send, destroy, focus} from './RceCommandShim'
 import deprecated from '../helpers/deprecated'
 import $ from 'jquery'
+
+const Sidebar = !ENV.use_rce_enhancements && require('../rce/Sidebar').default
 
 function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   target.css('display', 'none')
@@ -105,7 +106,8 @@ function freshNode(target) {
   return newTarget
 }
 
-const deprecationMsg = "with the new RCE you don't need to call this method, it is a no op since there is no sidebar"
+const deprecationMsg =
+  "with the new RCE you don't need to call this method, it is a no op since there is no sidebar"
 
 const RichContentEditor = {
   /**
@@ -177,7 +179,7 @@ const RichContentEditor = {
     // avoid modifying the original options object provided
     tinyMCEInitOptions = $.extend({}, tinyMCEInitOptions)
 
-    const callback = (rce) => {
+    const callback = rce => {
       if (tinyMCEInitOptions.focus) {
         // call activateRCE once loaded
         this.activateRCE($target)
@@ -195,7 +197,6 @@ const RichContentEditor = {
     }
 
     loadServiceRCE($target, tinyMCEInitOptions, callback)
-
 
     hideResizeHandleForScreenReaders()
   },

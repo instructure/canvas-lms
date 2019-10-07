@@ -29,21 +29,23 @@ export default class RubricManagement extends React.Component {
     accountId: PropTypes.string.isRequired
   }
 
-  focusTab = _.memoize((ix) => () => {
+  focusTab = _.memoize(ix => () => {
     ReactDOM.findDOMNode(this.tabList._tabs[ix]).focus()
   })
 
   render() {
     return (
-      <TabList ref={tabList => { this.tabList = tabList }} defaultSelectedIndex={0}>
+      <TabList
+        ref={tabList => {
+          this.tabList = tabList
+        }}
+        defaultSelectedIndex={0}
+      >
         <TabList.Panel title={I18n.t('Account Rubrics')}>
           <RubricPanel />
         </TabList.Panel>
         <TabList.Panel title={I18n.t('Learning Mastery')}>
-          <ProficiencyTable
-            focusTab={this.focusTab(1)}
-            accountId={this.props.accountId}
-          />
+          <ProficiencyTable focusTab={this.focusTab(1)} accountId={this.props.accountId} />
         </TabList.Panel>
       </TabList>
     )

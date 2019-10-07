@@ -17,13 +17,13 @@
  */
 import _ from 'lodash'
 
-export const defaultCriteria = (id) => ({
+export const defaultCriteria = id => ({
   criterion_id: id,
-  points: { text: '', valid: true }
+  points: {text: '', valid: true}
 })
 
-const fillCriteria = (criterion) => {
-  const { comments, points } = criterion
+const fillCriteria = criterion => {
+  const {comments, points} = criterion
   const hasPoints = !_.isNil(points)
   const hasComments = !_.isNil(comments) && comments.length > 0
   return {
@@ -38,26 +38,26 @@ const fillCriteria = (criterion) => {
 }
 
 export const fillAssessment = (rubric, partialAssessment, assessmentDefaults) => {
-  const prior = _.keyBy(_.cloneDeep(partialAssessment.data), (c) => c.criterion_id)
+  const prior = _.keyBy(_.cloneDeep(partialAssessment.data), c => c.criterion_id)
 
   return {
     score: 0,
     ...assessmentDefaults,
     ...partialAssessment,
-    data: rubric.criteria.map((c) =>
+    data: rubric.criteria.map(c =>
       _.has(prior, c.id) ? fillCriteria(prior[c.id]) : defaultCriteria(c.id)
     )
   }
 }
 
-const savedCommentPath = (id) => ['summary_data', 'saved_comments', id]
+const savedCommentPath = id => ['summary_data', 'saved_comments', id]
 export const getSavedComments = (association, id) =>
   _.get(association, savedCommentPath(id), undefined)
 
 export const updateAssociationData = (association, assessment) => {
   assessment.data
-    .filter(({ saveCommentsForLater }) => saveCommentsForLater)
-    .forEach(({ criterion_id: id, comments }) => {
+    .filter(({saveCommentsForLater}) => saveCommentsForLater)
+    .forEach(({criterion_id: id, comments}) => {
       const prior = getSavedComments(association, id) || []
       _.set(association, savedCommentPath(id), _.uniq([...prior, comments]))
     })

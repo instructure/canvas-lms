@@ -60,7 +60,9 @@ describe('CanvasMediaPlayer', () => {
   })
 
   it('makes ajax call if no mediaSources are provided on load', async () => {
-    fetch.mockResponseOnce(JSON.stringify({media_sources: [defaultMediaObject(), defaultMediaObject()]}))
+    fetch.mockResponseOnce(
+      JSON.stringify({media_sources: [defaultMediaObject(), defaultMediaObject()]})
+    )
 
     let component
     act(() => {
@@ -124,7 +126,7 @@ describe('CanvasMediaPlayer', () => {
       const {width, height} = sizeMediaPlayer(player, 'video', playerContainer)
 
       expect(width).toBe('500px')
-      expect(height).toBe(`${Math.round(.6 * 500)}px`)
+      expect(height).toBe(`${Math.round(0.6 * 500)}px`)
     })
   })
 
@@ -164,10 +166,7 @@ describe('CanvasMediaPlayer', () => {
     it('skips source chooser button when there is only 1 source', () => {
       document.fullscreenEnabled = true
       const {queryByText, queryByLabelText} = render(
-        <CanvasMediaPlayer
-          media_id="dummy_media_id"
-          media_sources={[defaultMediaObject()]}
-        />
+        <CanvasMediaPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />
       )
       expect(queryByText('Play')).toBeInTheDocument()
       expect(queryByLabelText('Timebar')).toBeInTheDocument()

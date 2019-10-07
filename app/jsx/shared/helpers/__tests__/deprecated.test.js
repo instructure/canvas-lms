@@ -23,7 +23,6 @@
 import deprecated from '../deprecated'
 
 describe('deprecated', () => {
-
   let originalFn
   beforeEach(() => {
     originalFn = jest.fn()
@@ -31,24 +30,26 @@ describe('deprecated', () => {
   })
 
   it('only logs deprecation message once', () => {
-    const foo = deprecated("some message", originalFn)
+    const foo = deprecated('some message', originalFn)
 
     foo()
     expect(console.warn).toHaveBeenCalledTimes(1)
     expect(originalFn).toHaveBeenCalledTimes(1)
 
-    foo(); foo("some arg"); foo()
+    foo()
+    foo('some arg')
+    foo()
     expect(console.warn).toHaveBeenCalledTimes(1)
     expect(originalFn).toHaveBeenCalledTimes(4)
   })
 
   it('passes on args', () => {
     const hostObj = {}
-    deprecated("some message", hostObj, 'deprecatedMethod', originalFn)
+    deprecated('some message', hostObj, 'deprecatedMethod', originalFn)
 
-    hostObj.deprecatedMethod("some arg")
+    hostObj.deprecatedMethod('some arg')
     expect(console.warn).toHaveBeenCalledTimes(1)
-    expect(originalFn).toHaveBeenLastCalledWith("some arg")
+    expect(originalFn).toHaveBeenLastCalledWith('some arg')
 
     hostObj.deprecatedMethod(hostObj)
     expect(console.warn).toHaveBeenCalledTimes(1)
@@ -57,10 +58,10 @@ describe('deprecated', () => {
 
   it('works the same with other signature', () => {
     const hostObj = {deprecatedMethod: originalFn}
-    deprecated("some message", hostObj, 'deprecatedMethod')
+    deprecated('some message', hostObj, 'deprecatedMethod')
 
-    hostObj.deprecatedMethod("some arg")
+    hostObj.deprecatedMethod('some arg')
     expect(console.warn).toHaveBeenCalledTimes(1)
-    expect(originalFn).toHaveBeenLastCalledWith("some arg")
+    expect(originalFn).toHaveBeenLastCalledWith('some arg')
   })
 })

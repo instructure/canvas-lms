@@ -22,20 +22,15 @@ import {IconFeedbackLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import I18n from 'i18n!edit_rubricCommentButton'
 
-const CommentButton = ({ onClick }) => (
+const CommentButton = ({onClick}) => (
   <div>
-    <Button
-      variant="icon"
-      icon={<IconFeedbackLine />}
-      margin="0 x-small 0 0"
-      onClick={onClick}
-    >
+    <Button variant="icon" icon={<IconFeedbackLine />} margin="0 x-small 0 0" onClick={onClick}>
       <ScreenReaderContent>{I18n.t('Add Additional Comments')}</ScreenReaderContent>
     </Button>
   </div>
 )
 CommentButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired
 }
 
 export default CommentButton

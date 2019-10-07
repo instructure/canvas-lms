@@ -16,18 +16,18 @@
 
 import moxios from 'moxios'
 import sinon from 'sinon'
-import { shallow, mount } from 'enzyme'
+import {shallow, mount} from 'enzyme'
 import React from 'react'
 import FileBrowser from '../FileBrowser'
 
-const getProps = (overrides) => ({
+const getProps = overrides => ({
   selectFile: () => {},
   contentTypes: ['image/*'],
   useContextAssets: true,
   ...overrides
 })
 
-const courseFolder = (overrides) => ({
+const courseFolder = overrides => ({
   id: 1,
   name: 'course files',
   context_id: 1,
@@ -38,7 +38,7 @@ const courseFolder = (overrides) => ({
   ...overrides
 })
 
-const userFolder = (overrides) => ({
+const userFolder = overrides => ({
   id: 3,
   name: 'my files',
   context_id: 2,
@@ -48,7 +48,7 @@ const userFolder = (overrides) => ({
   ...overrides
 })
 
-const testFile = (overrides) => ({
+const testFile = overrides => ({
   id: 1,
   display_name: 'file 1',
   folder_id: 1,
@@ -67,89 +67,105 @@ describe('FileBrowser', () => {
   })
 
   it('renders', () => {
-    const wrapper = shallow(<FileBrowser { ...getProps() } />)
+    const wrapper = shallow(<FileBrowser {...getProps()} />)
     expect(wrapper).toMatchSnapshot()
   })
 
-  it('only shows images in the tree', (done) => {
+  it('only shows images in the tree', done => {
     const files = [
       testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'}),
-      testFile({id: 2, display_name: 'file 2', folder_id: 4, thumbnail_url: 'thumbnail.jpg', 'content-type': 'text/html'})
+      testFile({
+        id: 2,
+        display_name: 'file 2',
+        folder_id: 4,
+        thumbnail_url: 'thumbnail.jpg',
+        'content-type': 'text/html'
+      })
     ]
     moxios.stubRequest('/api/v1/folders/4/files', {
       status: 200,
       responseText: files,
-      headers: {link: 'url; rel="current"'},
+      headers: {link: 'url; rel="current"'}
     })
 
-    const wrapper = mount(<FileBrowser { ...getProps() } />)
+    const wrapper = mount(<FileBrowser {...getProps()} />)
     const collections = {
       0: {collections: [1]},
       1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
-      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'},
+      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'}
     }
     wrapper.instance().setState({collections})
     wrapper.update()
-    wrapper.find('TreeButton').first().simulate('click')
+    wrapper
+      .find('TreeButton')
+      .first()
+      .simulate('click')
     moxios.wait(() => {
-      wrapper.find('TreeButton').at(1).simulate('click')
+      wrapper
+        .find('TreeButton')
+        .at(1)
+        .simulate('click')
       expect(wrapper.find('TreeButton')).toHaveLength(3)
       expect(wrapper.find('Img')).toHaveLength(1)
       done()
     })
   })
 
-  it('shows thumbnails if provided', (done) => {
-    const files = [
-      testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'}),
-    ]
+  it('shows thumbnails if provided', done => {
+    const files = [testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'})]
     moxios.stubRequest('/api/v1/folders/4/files', {
       status: 200,
       responseText: files,
-      headers: {link: 'url; rel="current"'},
+      headers: {link: 'url; rel="current"'}
     })
 
-    const wrapper = mount(<FileBrowser { ...getProps() } />)
+    const wrapper = mount(<FileBrowser {...getProps()} />)
     const collections = {
       0: {collections: [1]},
       1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
-      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'},
+      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'}
     }
     wrapper.instance().setState({collections})
     wrapper.update()
-    wrapper.find('TreeButton').first().simulate('click')
+    wrapper
+      .find('TreeButton')
+      .first()
+      .simulate('click')
     moxios.wait(() => {
-      wrapper.find('TreeButton').at(1).simulate('click')
+      wrapper
+        .find('TreeButton')
+        .at(1)
+        .simulate('click')
       expect(wrapper.find('Img')).toHaveLength(1)
       done()
     })
   })
 
-  it('gets root folder data on mount', (done) => {
+  it('gets root folder data on mount', done => {
     moxios.stubRequest('/api/v1/courses/1/folders/root', {
       status: 200,
       responseText: courseFolder(),
-      headers: {link: 'url; rel="current"'},
+      headers: {link: 'url; rel="current"'}
     })
     moxios.stubRequest('/api/v1/users/self/folders/root', {
       status: 200,
       responseText: userFolder(),
-      headers: {link: 'url; rel="current"'},
+      headers: {link: 'url; rel="current"'}
     })
     const subFolders = [userFolder({id: 2, name: 'sub folder 1', parent_folder_id: 1})]
     const files = [testFile()]
     moxios.stubRequest('/api/v1/folders/1/folders', {
       status: 200,
       responseText: subFolders,
-      headers: {link: 'url; rel="current"'},
+      headers: {link: 'url; rel="current"'}
     })
     moxios.stubRequest('/api/v1/folders/1/files', {
       status: 200,
       responseText: files,
-      headers: {link: 'url; rel="current"'},
+      headers: {link: 'url; rel="current"'}
     })
 
-    const wrapper = shallow(<FileBrowser { ...getProps() } />)
+    const wrapper = shallow(<FileBrowser {...getProps()} />)
     wrapper.instance().componentDidMount()
     moxios.wait(() => {
       const node = wrapper.find('TreeBrowser')
@@ -171,19 +187,24 @@ describe('FileBrowser', () => {
       const node = wrapper.find('TreeBrowser')
       expect(node.props().collections[1].collections).toEqual([2])
       expect(node.props().collections[1].items).toEqual([1])
-      expect(node.props().items[1]).toEqual({id: 1, name: 'file 1', src: '/courses/1/files/1/preview', alt: 'file 1'})
+      expect(node.props().items[1]).toEqual({
+        id: 1,
+        name: 'file 1',
+        src: '/courses/1/files/1/preview',
+        alt: 'file 1'
+      })
       done()
     })
   })
 
   it('should not error when there is no context asset string', () => {
     delete window.ENV.context_asset_string
-    const wrapper = shallow(<FileBrowser { ...getProps() } />)
+    const wrapper = shallow(<FileBrowser {...getProps()} />)
     expect(wrapper.find('TreeBrowser').exists()).toBeTruthy()
   })
 
   describe('on folder click', () => {
-    it("gets sub-folders and files for folder's sub-folders on folder expand", (done) => {
+    it("gets sub-folders and files for folder's sub-folders on folder expand", done => {
       const subFolders1 = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
       const subFolders2 = [courseFolder({id: 7, name: 'sub folder 2', parent_folder_id: 5})]
       const files1 = [testFile({folder_id: 4})]
@@ -191,25 +212,25 @@ describe('FileBrowser', () => {
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 200,
         responseText: subFolders1,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/5/folders', {
         status: 200,
         responseText: subFolders2,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/4/files', {
         status: 200,
         responseText: files1,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/5/files', {
         status: 200,
         responseText: files2,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
 
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1, 3]},
         1: {id: 1, collections: [4, 5], context: '/courses/1'},
@@ -220,7 +241,10 @@ describe('FileBrowser', () => {
       wrapper.instance().setState({collections})
       wrapper.update()
       const spy = sinon.spy(wrapper.instance(), 'getFolderData')
-      wrapper.find('TreeButton').first().simulate('click')
+      wrapper
+        .find('TreeButton')
+        .first()
+        .simulate('click')
       expect(spy.called).toBeTruthy()
       moxios.wait(() => {
         const node = wrapper.find('TreeBrowser')
@@ -233,7 +257,7 @@ describe('FileBrowser', () => {
     })
 
     it('does not get new folder/file data on folder collapse', () => {
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1, 3]},
         1: {id: 1, collections: [4, 5], context: '/courses/1'},
@@ -244,33 +268,36 @@ describe('FileBrowser', () => {
       wrapper.instance().setState({collections, openFolders: [1]})
       wrapper.update()
       const spy = sinon.spy(wrapper.instance(), 'getFolderData')
-      wrapper.find('TreeButton').first().simulate('click')
+      wrapper
+        .find('TreeButton')
+        .first()
+        .simulate('click')
       expect(spy.notCalled).toBeTruthy()
     })
 
-    it('populates data for items that were not loaded yet when the parent folder was clicked', (done) => {
+    it('populates data for items that were not loaded yet when the parent folder was clicked', done => {
       const subFolders = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
       const files = [testFile({folder_id: 6})]
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 200,
         responseText: subFolders,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/6/folders', {
         status: 200,
         responseText: [],
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/6/files', {
         status: 200,
         responseText: files,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
-        4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'},
+        4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'}
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -288,7 +315,7 @@ describe('FileBrowser', () => {
       })
     })
 
-    it('gets additional pages of data', (done) => {
+    it('gets additional pages of data', done => {
       const subFolders1 = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
       const subFolders2 = [courseFolder({id: 7, name: 'sub folder 2', parent_folder_id: 4})]
       const files1 = [testFile({folder_id: 4})]
@@ -296,32 +323,35 @@ describe('FileBrowser', () => {
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 200,
         responseText: subFolders1,
-        headers: {link: '</api/v1/folders/4/folders?page=2>; rel="next"'},
+        headers: {link: '</api/v1/folders/4/folders?page=2>; rel="next"'}
       })
       moxios.stubRequest('/api/v1/folders/4/folders?page=2', {
         status: 200,
         responseText: subFolders2,
-        headers: {link: '<url>; rel="current"'},
+        headers: {link: '<url>; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/4/files', {
         status: 200,
         responseText: files1,
-        headers: {link: '</api/v1/folders/4/files?page=2>; rel="next"'},
+        headers: {link: '</api/v1/folders/4/files?page=2>; rel="next"'}
       })
       moxios.stubRequest('/api/v1/folders/4/files?page=2', {
         status: 200,
         responseText: files2,
-        headers: {link: '<url>; rel="current"'},
+        headers: {link: '<url>; rel="current"'}
       })
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1, 3]},
         1: {id: 1, collections: [4], context: 'courses/1'},
-        4: {id: 4, collections: [], items: [], context: 'users/1'},
+        4: {id: 4, collections: [], items: [], context: 'users/1'}
       }
       wrapper.instance().setState({collections})
       wrapper.update()
-      wrapper.find('TreeButton').first().simulate('click')
+      wrapper
+        .find('TreeButton')
+        .first()
+        .simulate('click')
       moxios.wait(() => {
         moxios.wait(() => {
           moxios.wait(() => {
@@ -336,30 +366,46 @@ describe('FileBrowser', () => {
       })
     })
 
-    it('does not get data for locked sub-folders', (done) => {
+    it('does not get data for locked sub-folders', done => {
       const subFolders = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
       const files = [testFile({folder_id: 4})]
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 401,
         responseText: subFolders,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/4/files', {
         status: 401,
         responseText: files,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
 
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
-        4: {id: 4, name: 'folder 4', collections: [], items: [], descriptor: 'Locked', locked: true, context: '/users/1'},
+        4: {
+          id: 4,
+          name: 'folder 4',
+          collections: [],
+          items: [],
+          descriptor: 'Locked',
+          locked: true,
+          context: '/users/1'
+        }
       }
       wrapper.instance().setState({collections})
       wrapper.update()
-      wrapper.find('TreeButton').first().simulate('click')
-      expect(wrapper.find('TreeButton span span span').last().text()).toEqual('Locked')
+      wrapper
+        .find('TreeButton')
+        .first()
+        .simulate('click')
+      expect(
+        wrapper
+          .find('TreeButton span span span')
+          .last()
+          .text()
+      ).toEqual('Locked')
       moxios.wait(() => {
         const node = wrapper.find('TreeBrowser')
         expect(node.instance().props.collections[4].collections).toEqual([])
@@ -368,7 +414,7 @@ describe('FileBrowser', () => {
       })
     })
 
-    it('replaces folder and file data if the folder has previously been loaded', (done) => {
+    it('replaces folder and file data if the folder has previously been loaded', done => {
       const subFolders = [courseFolder({id: 5, name: 'sub folder 1', parent_folder_id: 4})]
       const files = [
         testFile({folder_id: 4}),
@@ -377,15 +423,15 @@ describe('FileBrowser', () => {
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 200,
         responseText: subFolders,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/4/files', {
         status: 200,
         responseText: files,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
 
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
@@ -395,7 +441,10 @@ describe('FileBrowser', () => {
       const items = {1: {id: 1, name: 'old name 1'}}
       wrapper.instance().setState({collections, items})
       wrapper.update()
-      wrapper.find('TreeButton').first().simulate('click')
+      wrapper
+        .find('TreeButton')
+        .first()
+        .simulate('click')
       moxios.wait(() => {
         const node = wrapper.find('TreeBrowser')
         expect(node.instance().props.collections[5].name).toEqual('sub folder 1')
@@ -409,7 +458,7 @@ describe('FileBrowser', () => {
   describe('on file click', () => {
     it('sets a selected file on file click', () => {
       const spy = sinon.spy()
-      const wrapper = mount(<FileBrowser { ...getProps({selectFile: spy}) } />)
+      const wrapper = mount(<FileBrowser {...getProps({selectFile: spy})} />)
       const collections = {
         0: {collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [], items: [1, 2]}
@@ -421,15 +470,21 @@ describe('FileBrowser', () => {
       wrapper.instance().setState({collections, items})
       wrapper.update()
       wrapper.find('TreeButton').simulate('click')
-      wrapper.find('TreeButton').at(1).simulate('click')
+      wrapper
+        .find('TreeButton')
+        .at(1)
+        .simulate('click')
       expect(spy.getCall(0).args[0]).toEqual(items[1])
-      wrapper.find('TreeButton').at(2).simulate('click')
+      wrapper
+        .find('TreeButton')
+        .at(2)
+        .simulate('click')
       expect(spy.getCall(1).args[0]).toEqual(items[2])
     })
   })
 
   describe('ordering', () => {
-    it('orders collections naturally by folder name', (done) => {
+    it('orders collections naturally by folder name', done => {
       const subFolders = [
         courseFolder({id: 5, name: 'sub folder 1', parent_folder_id: 1}),
         courseFolder({id: 6, name: 'sub folder 10', parent_folder_id: 1}),
@@ -438,18 +493,18 @@ describe('FileBrowser', () => {
       moxios.stubRequest('/api/v1/folders/1/folders', {
         status: 200,
         responseText: subFolders,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         responseText: [],
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
 
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'},
+        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'}
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -457,32 +512,32 @@ describe('FileBrowser', () => {
       wrapper.update()
       moxios.wait(() => {
         const node = wrapper.find('TreeBrowser')
-        expect(node.instance().props.collections[1].collections).toEqual([5,7,6])
+        expect(node.instance().props.collections[1].collections).toEqual([5, 7, 6])
         done()
       })
     })
 
-    it('orders items naturally by file name', (done) => {
+    it('orders items naturally by file name', done => {
       const files = [
         testFile({id: 1, display_name: 'file 1', folder_id: 1}),
         testFile({id: 2, display_name: 'file 10', folder_id: 1}),
-        testFile({id: 3, display_name: 'file 2', folder_id: 1}),
+        testFile({id: 3, display_name: 'file 2', folder_id: 1})
       ]
       moxios.stubRequest('/api/v1/folders/1/folders', {
         status: 200,
         responseText: [],
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         responseText: files,
-        headers: {link: 'url; rel="current"'},
+        headers: {link: 'url; rel="current"'}
       })
 
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'},
+        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'}
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -490,7 +545,7 @@ describe('FileBrowser', () => {
       wrapper.update()
       moxios.wait(() => {
         const node = wrapper.find('TreeBrowser')
-        expect(node.instance().props.collections[1].items).toEqual([1,3,2])
+        expect(node.instance().props.collections[1].items).toEqual([1, 3, 2])
         done()
       })
     })
@@ -498,74 +553,133 @@ describe('FileBrowser', () => {
 
   describe('upload dialog', () => {
     it('does not show upload button if disallowed', () => {
-      const wrapper = shallow(<FileBrowser { ...getProps({allowUpload: false}) } />)
+      const wrapper = shallow(<FileBrowser {...getProps({allowUpload: false})} />)
       expect(wrapper.instance().renderUploadDialog()).toBe(null)
     })
 
     it('activates upload button for folders user can upload to', () => {
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [4,5], items: [], canUpload: true, locked: false, context: '/courses/1'},
-        4: {id: 4, name: 'folder 4', collections: [], items: [], canUpload: false, locked: false, context: '/courses/1'},
-        5: {id: 5, name: 'folder 5', collections: [], items: [], canUpload: true, locked: true, context: '/users/1'}
+        1: {
+          id: 1,
+          name: 'folder 1',
+          collections: [4, 5],
+          items: [],
+          canUpload: true,
+          locked: false,
+          context: '/courses/1'
+        },
+        4: {
+          id: 4,
+          name: 'folder 4',
+          collections: [],
+          items: [],
+          canUpload: false,
+          locked: false,
+          context: '/courses/1'
+        },
+        5: {
+          id: 5,
+          name: 'folder 5',
+          collections: [],
+          items: [],
+          canUpload: true,
+          locked: true,
+          context: '/users/1'
+        }
       }
       wrapper.instance().setState({collections})
       wrapper.update()
       expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBe(true)
-      wrapper.find('TreeButton').at(0).simulate('click')
+      wrapper
+        .find('TreeButton')
+        .at(0)
+        .simulate('click')
       expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBeUndefined()
-      wrapper.find('TreeButton').at(1).simulate('click')
+      wrapper
+        .find('TreeButton')
+        .at(1)
+        .simulate('click')
       expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBe(true)
-      wrapper.find('TreeButton').at(2).simulate('click')
+      wrapper
+        .find('TreeButton')
+        .at(2)
+        .simulate('click')
       expect(wrapper.find('#image-upload__upload button').prop('disabled')).toBe(true)
     })
 
     it('uploads a file', () => {
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false, context: '/courses/1'}
+        1: {
+          id: 1,
+          name: 'folder 1',
+          collections: [],
+          items: [],
+          canUpload: true,
+          locked: false,
+          context: '/courses/1'
+        }
       }
       const spy = sinon.spy(wrapper.instance(), 'submitFile')
       wrapper.instance().setState({collections})
       wrapper.update()
-      wrapper.find('TreeButton').at(0).simulate('click')
+      wrapper
+        .find('TreeButton')
+        .at(0)
+        .simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
-          files: [
-            'dummyValue.png'
-          ]
+          files: ['dummyValue.png']
         }
       })
       expect(spy.called).toBeTruthy()
     })
 
     it('renders a spinner while uploading files', () => {
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false, context: '/courses/1'}
+        1: {
+          id: 1,
+          name: 'folder 1',
+          collections: [],
+          items: [],
+          canUpload: true,
+          locked: false,
+          context: '/courses/1'
+        }
       }
       wrapper.instance().setState({collections})
       wrapper.update()
-      wrapper.find('TreeButton').at(0).simulate('click')
+      wrapper
+        .find('TreeButton')
+        .at(0)
+        .simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
-          files: [
-            'dummyValue.png'
-          ]
+          files: ['dummyValue.png']
         }
       })
       expect(wrapper.find('Mask').exists()).toBeTruthy()
       expect(wrapper.find('Spinner').exists()).toBeTruthy()
     })
 
-    it('shows an alert on file upload', (done) => {
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+    it('shows an alert on file upload', done => {
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false, context: '/courses/1'}
+        1: {
+          id: 1,
+          name: 'folder 1',
+          collections: [],
+          items: [],
+          canUpload: true,
+          locked: false,
+          context: '/courses/1'
+        }
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -573,25 +687,23 @@ describe('FileBrowser', () => {
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         response: {
-          upload_url: "http://new_url",
+          upload_url: 'http://new_url',
           upload_params: {
-            Filename: "file",
-            key: "folder/filename",
-            "content-type": "image/png"
+            Filename: 'file',
+            key: 'folder/filename',
+            'content-type': 'image/png'
           },
-          file_param: "attachment[uploaded_data]"
+          file_param: 'attachment[uploaded_data]'
         }
       })
       moxios.stubRequest('http://new_url', {
         status: 200,
-        response: {id: 1, display_name: 'file 1', "content-type": "image/png", folder_id: 1}
+        response: {id: 1, display_name: 'file 1', 'content-type': 'image/png', folder_id: 1}
       })
       wrapper.find('TreeButton').simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
-          files: [
-            {name: 'file 1', size: 0}
-          ]
+          files: [{name: 'file 1', size: 0}]
         }
       })
       moxios.wait(() => {
@@ -606,23 +718,31 @@ describe('FileBrowser', () => {
       })
     })
 
-    it('shows an alert on file upload fail', (done) => {
-      const wrapper = mount(<FileBrowser { ...getProps() } />)
+    it('shows an alert on file upload fail', done => {
+      const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false, context: '/courses/1'}
+        1: {
+          id: 1,
+          name: 'folder 1',
+          collections: [],
+          items: [],
+          canUpload: true,
+          locked: false,
+          context: '/courses/1'
+        }
       }
       const spy = sinon.spy(wrapper.instance(), 'setFailureMessage')
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 500,
         response: {
-          upload_url: "http://new_url",
+          upload_url: 'http://new_url',
           upload_params: {
-            Filename: "file",
-            key: "folder/filename",
-            "content-type": "image/png"
+            Filename: 'file',
+            key: 'folder/filename',
+            'content-type': 'image/png'
           },
-          file_param: "attachment[uploaded_data]"
+          file_param: 'attachment[uploaded_data]'
         }
       })
       wrapper.instance().setState({collections})
@@ -630,9 +750,7 @@ describe('FileBrowser', () => {
       wrapper.find('TreeButton').simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
-          files: [
-            {name: 'file 1', size: 0}
-          ]
+          files: [{name: 'file 1', size: 0}]
         }
       })
       moxios.wait(() => {
@@ -644,23 +762,23 @@ describe('FileBrowser', () => {
   })
 
   describe('FileBrowser content type filtering', () => {
-    it ('allows all content types by default', () => {
+    it('allows all content types by default', () => {
       const no_type_param = {selectFile: () => {}}
-      const wrapper = shallow(<FileBrowser { ...no_type_param } />)
+      const wrapper = shallow(<FileBrowser {...no_type_param} />)
       expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
       expect(wrapper.instance().contentTypeIsAllowed('some/not-real-thing')).toBeTruthy()
     })
 
-    it ('can restrict to one content type pattern', () => {
-      const wrapper = shallow(<FileBrowser { ...getProps({contentTypes: ['image/*']}) } />)
+    it('can restrict to one content type pattern', () => {
+      const wrapper = shallow(<FileBrowser {...getProps({contentTypes: ['image/*']})} />)
       expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
       expect(wrapper.instance().contentTypeIsAllowed('image/jpeg')).toBeTruthy()
       expect(wrapper.instance().contentTypeIsAllowed('video/mp4')).toBeFalsy()
       expect(wrapper.instance().contentTypeIsAllowed('not/allowed')).toBeFalsy()
     })
 
-    it ('can restrict to multiple content type patterns', () => {
-      const wrapper = shallow(<FileBrowser { ...getProps({contentTypes: ['image/*', 'video/*']}) } />)
+    it('can restrict to multiple content type patterns', () => {
+      const wrapper = shallow(<FileBrowser {...getProps({contentTypes: ['image/*', 'video/*']})} />)
       expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
       expect(wrapper.instance().contentTypeIsAllowed('image/jpeg')).toBeTruthy()
       expect(wrapper.instance().contentTypeIsAllowed('video/mp4')).toBeTruthy()

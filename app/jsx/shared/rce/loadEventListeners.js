@@ -19,7 +19,7 @@ import initializeExternalTools from 'tinymce_plugins/instructure_external_tools/
 import INST from 'INST'
 import Links from 'tinymce_plugins/instructure_links/links'
 
-export default function loadEventListeners (callbacks = {}) {
+export default function loadEventListeners(callbacks = {}) {
   const validCallbacks = [
     'equationCB',
     'linksCB',
@@ -29,13 +29,15 @@ export default function loadEventListeners (callbacks = {}) {
     'recordCB'
   ]
 
-  validCallbacks.forEach((cbName) => {
+  validCallbacks.forEach(cbName => {
     if (callbacks[cbName] === undefined) {
-      callbacks[cbName] = function () { /* no-op*/ }
+      callbacks[cbName] = function() {
+        /* no-op */
+      }
     }
   })
 
-  document.addEventListener('tinyRCE/initEquation', ({ detail }) => {
+  document.addEventListener('tinyRCE/initEquation', ({detail}) => {
     import('compiled/views/tinymce/EquationEditorView').then(({default: EquationEditorView}) => {
       const view = new EquationEditorView(detail.ed)
       callbacks.equationCB(view)
@@ -48,29 +50,31 @@ export default function loadEventListeners (callbacks = {}) {
   })
 
   document.addEventListener('tinyRCE/initImagePicker', e => {
-    import('compiled/views/tinymce/InsertUpdateImageView').then(({default: InsertUpdateImageView}) => {
-      const view = new InsertUpdateImageView(e.detail.ed, e.detail.selectedNode)
-      callbacks.imagePickerCB(view)
-    })
+    import('compiled/views/tinymce/InsertUpdateImageView').then(
+      ({default: InsertUpdateImageView}) => {
+        const view = new InsertUpdateImageView(e.detail.ed, e.detail.selectedNode)
+        callbacks.imagePickerCB(view)
+      }
+    )
   })
 
   document.addEventListener('tinyRCE/initEquella', e => {
     import('tinymce_plugins/instructure_equella/initializeEquella').then(
-      ({ default: initializeEquella }) => {
+      ({default: initializeEquella}) => {
         initializeEquella(e.detail.ed)
         callbacks.equellaCB()
       }
     )
   })
 
-  document.addEventListener('tinyRCE/initExternalTools', (e) => {
+  document.addEventListener('tinyRCE/initExternalTools', e => {
     initializeExternalTools.init(e.detail.ed, e.detail.url, INST)
     callbacks.externalToolCB()
   })
 
   document.addEventListener('tinyRCE/initRecord', e => {
     import('tinymce_plugins/instructure_record/mediaEditorLoader').then(
-      ({ default: mediaEditorLoader }) => {
+      ({default: mediaEditorLoader}) => {
         mediaEditorLoader.insertEditor(e.detail.ed)
         callbacks.recordCB()
       }

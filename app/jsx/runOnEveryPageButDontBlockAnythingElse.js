@@ -47,7 +47,7 @@ if (ENV.page_view_update_url) import('page_views')
 // this will make nested apps that use the hash happy
 $('#skip_navigation_link').on(
   'click',
-  preventDefault(function () {
+  preventDefault(function() {
     $($(this).attr('href'))
       .attr('tabindex', -1)
       .focus()

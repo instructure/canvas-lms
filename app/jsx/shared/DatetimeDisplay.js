@@ -19,27 +19,22 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import tz from 'timezone'
-  class DatetimeDisplay extends React.Component {
-    render () {
-      let datetime = this.props.datetime instanceof Date ? this.props.datetime.toString() : this.props.datetime
-      return (
-        <span className='DatetimeDisplay'>
-          {tz.format(datetime, this.props.format)}
-        </span>
-      );
-    }
-  };
 
-  DatetimeDisplay.propTypes = {
-    datetime: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.instanceOf(Date)
-    ]),
-    format: PropTypes.string
-  };
+class DatetimeDisplay extends React.Component {
+  render() {
+    const datetime =
+      this.props.datetime instanceof Date ? this.props.datetime.toString() : this.props.datetime
+    return <span className="DatetimeDisplay">{tz.format(datetime, this.props.format)}</span>
+  }
+}
 
-  DatetimeDisplay.defaultProps = {
-    format: '%c'
-  };
+DatetimeDisplay.propTypes = {
+  datetime: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+  format: PropTypes.string
+}
+
+DatetimeDisplay.defaultProps = {
+  format: '%c'
+}
 
 export default DatetimeDisplay

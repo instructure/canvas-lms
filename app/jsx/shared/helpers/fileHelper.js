@@ -34,9 +34,9 @@ export const formatFileSize = (bytes, decimals = 2) => {
 export const getFileThumbnail = (file, iconSize = 'medium') => {
   const iconSizes = {
     'x-small': '1.125rem',
-    'small': '2rem',
-    'medium': '3rem',
-    'large': '5rem',
+    small: '2rem',
+    medium: '3rem',
+    large: '5rem',
     'x-large': '10rem'
   }
   standardizeToFilesAPI(file)

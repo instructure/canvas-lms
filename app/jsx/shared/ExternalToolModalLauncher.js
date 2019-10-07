@@ -158,12 +158,8 @@ export default class ExternalToolModalLauncher extends React.Component {
   }
 
   render() {
-    const beforeAlertStyles = `before_external_content_info_alert ${
-      this.state.beforeExternalContentAlertClass
-    }`
-    const afterAlertStyles = `after_external_content_info_alert ${
-      this.state.afterExternalContentAlertClass
-    }`
+    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
     const styles = this.getDimensions()
 
     styles.modalLaunchStyle = {...styles.modalLaunchStyle, ...this.state.modalLaunchStyle}

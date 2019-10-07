@@ -69,11 +69,36 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      expect(wrapper.find('ProficiencyRating').at(0).prop('focusField')).toBe('mastery')
-      expect(wrapper.find('ProficiencyRating').at(1).prop('focusField')).toBeNull()
-      expect(wrapper.find('ProficiencyRating').at(2).prop('focusField')).toBeNull()
-      expect(wrapper.find('ProficiencyRating').at(3).prop('focusField')).toBeNull()
-      expect(wrapper.find('ProficiencyRating').at(4).prop('focusField')).toBeNull()
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .at(0)
+          .prop('focusField')
+      ).toBe('mastery')
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .at(1)
+          .prop('focusField')
+      ).toBeNull()
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .at(2)
+          .prop('focusField')
+      ).toBeNull()
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .at(3)
+          .prop('focusField')
+      ).toBeNull()
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .at(4)
+          .prop('focusField')
+      ).toBeNull()
       done()
     }, 1)
   })
@@ -117,9 +142,17 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper.instance().handleDescriptionChange(0)("")
-      wrapper.find('Button').last().simulate('click')
-      expect(wrapper.find('ProficiencyRating').first().prop('descriptionError')).toBe('Missing required description')
+      wrapper.instance().handleDescriptionChange(0)('')
+      wrapper
+        .find('Button')
+        .last()
+        .simulate('click')
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .first()
+          .prop('descriptionError')
+      ).toBe('Missing required description')
       done()
     }, 1)
   })
@@ -128,9 +161,17 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper.instance().handlePointsChange(0)("")
-      wrapper.find('Button').last().simulate('click')
-      expect(wrapper.find('ProficiencyRating').first().prop('pointsError')).toBe('Invalid points')
+      wrapper.instance().handlePointsChange(0)('')
+      wrapper
+        .find('Button')
+        .last()
+        .simulate('click')
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .first()
+          .prop('pointsError')
+      ).toBe('Invalid points')
       done()
     }, 1)
   })
@@ -139,9 +180,17 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper.instance().handlePointsChange(0)("1.1.1")
-      wrapper.find('Button').last().simulate('click')
-      expect(wrapper.find('ProficiencyRating').first().prop('pointsError')).toBe('Invalid points')
+      wrapper.instance().handlePointsChange(0)('1.1.1')
+      wrapper
+        .find('Button')
+        .last()
+        .simulate('click')
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .first()
+          .prop('pointsError')
+      ).toBe('Invalid points')
       done()
     }, 1)
   })
@@ -150,9 +199,17 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper.instance().handlePointsChange(0)("-1")
-      wrapper.find('Button').last().simulate('click')
-      expect(wrapper.find('ProficiencyRating').first().prop('pointsError')).toBe('Negative points')
+      wrapper.instance().handlePointsChange(0)('-1')
+      wrapper
+        .find('Button')
+        .last()
+        .simulate('click')
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .first()
+          .prop('pointsError')
+      ).toBe('Negative points')
       done()
     }, 1)
   })
@@ -164,7 +221,10 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      wrapper.find('Button').last().simulate('click')
+      wrapper
+        .find('Button')
+        .last()
+        .simulate('click')
       expect(axios.post).toHaveBeenCalledTimes(1)
       postSpy.mockRestore()
       done()
@@ -200,7 +260,6 @@ describe('default proficiency', () => {
     wrapper.instance().handlePointsChange(0)('-1')
     expect(wrapper.instance().isStateValid()).toBe(false)
   })
-
 })
 
 describe('custom proficiency', () => {
@@ -227,12 +286,21 @@ describe('custom proficiency', () => {
     const spy = jest.spyOn(axios, 'get').mockImplementation(() => promise)
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     return promise.then(() => {
-        spy.mockRestore()
-        expect(wrapper.find('ProficiencyRating')).toHaveLength(2)
-        expect(wrapper.find('ProficiencyRating').first().prop('disableDelete')).toBeFalsy()
-        expect(wrapper.find('ProficiencyRating').last().prop('disableDelete')).toBeFalsy()
-      }
-    )
+      spy.mockRestore()
+      expect(wrapper.find('ProficiencyRating')).toHaveLength(2)
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .first()
+          .prop('disableDelete')
+      ).toBeFalsy()
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .last()
+          .prop('disableDelete')
+      ).toBeFalsy()
+    })
   })
 
   it('renders one rating that is not deletable', () => {
@@ -252,10 +320,14 @@ describe('custom proficiency', () => {
     const spy = jest.spyOn(axios, 'get').mockImplementation(() => promise)
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     return promise.then(() => {
-        spy.mockRestore()
-        expect(wrapper.find('ProficiencyRating')).toHaveLength(1)
-        expect(wrapper.find('ProficiencyRating').first().prop('disableDelete')).toBeTruthy()
-      }
-    )
+      spy.mockRestore()
+      expect(wrapper.find('ProficiencyRating')).toHaveLength(1)
+      expect(
+        wrapper
+          .find('ProficiencyRating')
+          .first()
+          .prop('disableDelete')
+      ).toBeTruthy()
+    })
   })
 })

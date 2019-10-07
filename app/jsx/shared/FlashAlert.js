@@ -17,29 +17,29 @@
  */
 
 /**
-* Flash alerts, especially for ajax error messages
-* Typical usage:
-* import {showFlashError} from './FlashAlert'
-* ...
-* axios.put(url, data).then((response) => {
-*     // do something with response
-*   }).catch(showFlashError(your_error_message))
-*
-* showFlashError() with no argument shows a generic message
-*
-* On error, will display an inst-ui Alert at the top of the page
-* with an error message and "Details" button. When the user clicks
-* the button, it shows error details extracted from the axios Error
-*
-* You could also import the lower level showFlashAlert function or
-* the FlashAlert component if you need more control
-*
-* showFlashAlert({ err, message, type }, onCloseCallback)
-*  err: error object
-*  message: user-facing message
-*  type: one of ['info', 'success', 'warning', 'error']
-*        default is 'info' unless an error object is passed in, else is 'error'
-*/
+ * Flash alerts, especially for ajax error messages
+ * Typical usage:
+ * import {showFlashError} from './FlashAlert'
+ * ...
+ * axios.put(url, data).then((response) => {
+ *     // do something with response
+ *   }).catch(showFlashError(your_error_message))
+ *
+ * showFlashError() with no argument shows a generic message
+ *
+ * On error, will display an inst-ui Alert at the top of the page
+ * with an error message and "Details" button. When the user clicks
+ * the button, it shows error details extracted from the axios Error
+ *
+ * You could also import the lower level showFlashAlert function or
+ * the FlashAlert component if you need more control
+ *
+ * showFlashAlert({ err, message, type }, onCloseCallback)
+ *  err: error object
+ *  message: user-facing message
+ *  type: one of ['info', 'success', 'warning', 'error']
+ *        default is 'info' unless an error object is passed in, else is 'error'
+ */
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -65,7 +65,7 @@ export default class FlashAlert extends React.Component {
     error: PropTypes.instanceOf(Error),
     variant: PropTypes.oneOf(['info', 'success', 'warning', 'error']),
     timeout: PropTypes.number,
-    screenReaderOnly: PropTypes.bool,
+    screenReaderOnly: PropTypes.bool
   }
 
   static defaultProps = {
@@ -75,17 +75,17 @@ export default class FlashAlert extends React.Component {
     screenReaderOnly: false
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
       showDetails: false,
-      isOpen: true,
+      isOpen: true
     }
-    this.timerId = 0;
+    this.timerId = 0
   }
 
-  getLiveRegion () {
+  getLiveRegion() {
     // return element where flash screenreader messages go.
     // create if necessary
     let liveRegion = document.getElementById(screenreaderMessageHolderId)
@@ -99,13 +99,13 @@ export default class FlashAlert extends React.Component {
   }
 
   showDetails = () => {
-    this.setState({ showDetails: true })
+    this.setState({showDetails: true})
     clearTimeout(this.timerId)
     this.timerId = setTimeout(() => this.closeAlert(), this.props.timeout)
   }
 
   closeAlert = () => {
-    this.setState({ isOpen: false }, () => {
+    this.setState({isOpen: false}, () => {
       setTimeout(() => {
         clearTimeout(this.timerId)
         this.props.onClose()
@@ -113,7 +113,7 @@ export default class FlashAlert extends React.Component {
     })
   }
 
-  findDetailMessage () {
+  findDetailMessage() {
     const err = this.props.error
     let a = err.message
     let b
@@ -137,7 +137,7 @@ export default class FlashAlert extends React.Component {
     return {a, b}
   }
 
-  renderDetailMessage () {
+  renderDetailMessage() {
     const {a, b} = this.findDetailMessage()
     return (
       <Text as="p" fontStyle="italic">
@@ -148,7 +148,7 @@ export default class FlashAlert extends React.Component {
     )
   }
 
-  render () {
+  render() {
     let details = null
     if (this.props.error) {
       if (this.state.showDetails) {
@@ -157,7 +157,9 @@ export default class FlashAlert extends React.Component {
         details = (
           <span>
             <PresentationContent>
-              <Button variant="link" onClick={this.showDetails}>{I18n.t('Details')}</Button>
+              <Button variant="link" onClick={this.showDetails}>
+                {I18n.t('Details')}
+              </Button>
             </PresentationContent>
             <ScreenReaderContent>{this.renderDetailMessage()}</ScreenReaderContent>
           </span>
@@ -166,7 +168,7 @@ export default class FlashAlert extends React.Component {
     }
 
     return (
-      <Transition transitionOnMount in={this.state.isOpen} type='fade'>
+      <Transition transitionOnMount in={this.state.isOpen} type="fade">
         <Alert
           variant={this.props.variant}
           renderCloseButtonLabel={I18n.t('Close')}
@@ -178,36 +180,37 @@ export default class FlashAlert extends React.Component {
           screenReaderOnly={this.props.screenReaderOnly}
         >
           <div>
-            <p style={{margin: '0 -5px'}}>
-              {this.props.message}
-            </p>
+            <p style={{margin: '0 -5px'}}>{this.props.message}</p>
             {details}
           </div>
         </Alert>
       </Transition>
-    );
+    )
   }
 }
 
-export function showFlashAlert ({ message, err, type = err ? 'error' : 'info', srOnly=false }) {
-  function closeAlert (atNode) {
+export function showFlashAlert({message, err, type = err ? 'error' : 'info', srOnly = false}) {
+  function closeAlert(atNode) {
     ReactDOM.unmountComponentAtNode(atNode)
     atNode.remove()
   }
 
-  function getAlertContainer () {
+  function getAlertContainer() {
     let alertContainer = document.getElementById(messageHolderId)
     if (!alertContainer) {
       alertContainer = document.createElement('div')
       alertContainer.classList.add('clickthrough-container')
       alertContainer.id = messageHolderId
-      alertContainer.setAttribute('style', 'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;')
+      alertContainer.setAttribute(
+        'style',
+        'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;'
+      )
       document.body.appendChild(alertContainer)
     }
     return alertContainer
   }
 
-  function renderAlert (parent) {
+  function renderAlert(parent) {
     ReactDOM.render(
       <FlashAlert
         message={message}
@@ -216,7 +219,8 @@ export function showFlashAlert ({ message, err, type = err ? 'error' : 'info', s
         variant={type}
         onClose={closeAlert.bind(null, parent)} // eslint-disable-line react/jsx-no-bind
         screenReaderOnly={srOnly}
-      />, parent
+      />,
+      parent
     )
   }
 
@@ -228,17 +232,17 @@ export function showFlashAlert ({ message, err, type = err ? 'error' : 'info', s
   renderAlert(div)
 }
 
-export function destroyContainer () {
+export function destroyContainer() {
   const container = document.getElementById(messageHolderId)
   const liveRegion = document.getElementById(screenreaderMessageHolderId)
   if (container) container.remove()
   if (liveRegion) liveRegion.remove()
 }
 
-export function showFlashError (message = I18n.t('An error occurred making a network request')) {
-  return err => showFlashAlert({ message, err, type: 'error' })
+export function showFlashError(message = I18n.t('An error occurred making a network request')) {
+  return err => showFlashAlert({message, err, type: 'error'})
 }
 
-export function showFlashSuccess (message) {
-  return () => showFlashAlert({ message, type: 'success' })
+export function showFlashSuccess(message) {
+  return () => showFlashAlert({message, type: 'success'})
 }

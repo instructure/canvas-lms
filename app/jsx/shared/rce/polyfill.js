@@ -16,45 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  const editorExtensions = {
-    call(methodName, ...args) {
-      // since exists? has a ? and cant be a regular function (yet we want
-      // the same signature as editorbox) just return true rather than
-      // calling as a fn on the editor
-      if (methodName === "exists?") { return true }
-      return this[methodName](...args)
-    },
+const editorExtensions = {
+  call(methodName, ...args) {
+    // since exists? has a ? and cant be a regular function (yet we want
+    // the same signature as editorbox) just return true rather than
+    // calling as a fn on the editor
+    if (methodName === 'exists?') {
+      return true
+    }
+    return this[methodName](...args)
+  },
 
-    focus() {
-      if (tinymce !== undefined) {
-        let editor = tinymce.get(this._textareaEl.id)
-        editor && editor.focus(true)
-      }
+  focus() {
+    if (tinymce !== undefined) {
+      const editor = tinymce.get(this._textareaEl.id)
+      editor && editor.focus(true)
     }
   }
+}
 
-  const sidebarExtensions = {
-    show() {
-      // TODO generalize/adapt this once in service
-      $("#editor_tabs").show()
-    },
+const sidebarExtensions = {
+  show() {
+    // TODO generalize/adapt this once in service
+    $('#editor_tabs').show()
+  },
 
-    hide() {
-      // TODO generalize/adapt this once in service
-      $("#editor_tabs").hide()
-    }
+  hide() {
+    // TODO generalize/adapt this once in service
+    $('#editor_tabs').hide()
   }
+}
 
-  const polyfill = {
-    wrapEditor(editor) {
-      let extensions = {...editorExtensions, ...editor}
-      return Object.assign(editor, extensions)
-    },
+const polyfill = {
+  wrapEditor(editor) {
+    const extensions = {...editorExtensions, ...editor}
+    return Object.assign(editor, extensions)
+  },
 
-    wrapSidebar(sidebar) {
-      let extensions = {...sidebarExtensions, ...sidebar}
-      return Object.assign(sidebar, extensions)
-    }
+  wrapSidebar(sidebar) {
+    const extensions = {...sidebarExtensions, ...sidebar}
+    return Object.assign(sidebar, extensions)
   }
+}
 
 export default polyfill

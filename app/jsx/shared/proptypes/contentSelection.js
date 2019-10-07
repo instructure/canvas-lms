@@ -34,9 +34,11 @@ const CONTENT_SELECTION_TYPES = [
 ]
 
 // build the shape {folders: arrayOf(...), files: arrayOf(...), ...}
-const contentSelectionShape = exact(CONTENT_SELECTION_TYPES.reduce((selections, type) => {
-  selections[type] = arrayOf(oneOfType([string, number]))
-  return selections
-}, {}))
+const contentSelectionShape = exact(
+  CONTENT_SELECTION_TYPES.reduce((selections, type) => {
+    selections[type] = arrayOf(oneOfType([string, number]))
+    return selections
+  }, {})
+)
 
 export default contentSelectionShape

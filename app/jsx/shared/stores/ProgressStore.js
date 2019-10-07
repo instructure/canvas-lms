@@ -18,16 +18,17 @@
 
 import createStore from '../helpers/createStore'
 import $ from 'jquery'
-  var ProgressStore = createStore({}),
-    _progresses = {};
 
-  ProgressStore.get = function(progress_id) {
-    var url = "/api/v1/progress/" + progress_id;
+const ProgressStore = createStore({}),
+  _progresses = {}
 
-    $.getJSON(url, data => {
-      _progresses[data.id] = data;
-      ProgressStore.setState(_progresses);
-    });
-  };
+ProgressStore.get = function(progress_id) {
+  const url = '/api/v1/progress/' + progress_id
+
+  $.getJSON(url, data => {
+    _progresses[data.id] = data
+    ProgressStore.setState(_progresses)
+  })
+}
 
 export default ProgressStore

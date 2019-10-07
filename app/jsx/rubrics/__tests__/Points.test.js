@@ -16,84 +16,108 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import Points from '../Points'
 
 describe('The Points component', () => {
-  const component = (props) => shallow(<Points {...props} />)
-  const id = { criterion_id: '_7506' }
+  const component = props => shallow(<Points {...props} />)
+  const id = {criterion_id: '_7506'}
 
-  const validPoints = (text) => ({ text, valid: true, value: parseFloat(text) })
+  const validPoints = text => ({text, valid: true, value: parseFloat(text)})
 
   it('renders the root component as expected', () => {
-    expect(component({
-      assessment: { ...id, points: validPoints('1') },
-      pointsPossible: 2
-    })).toMatchSnapshot()
+    expect(
+      component({
+        assessment: {...id, points: validPoints('1')},
+        pointsPossible: 2
+      })
+    ).toMatchSnapshot()
   })
 
   it('renders the component when assessing with the expected layout', () => {
-    expect(component({
-      assessment: { ...id, points: validPoints('1') },
-      assessing: true,
-      pointsPossible: 2
-    })).toMatchSnapshot()
+    expect(
+      component({
+        assessment: {...id, points: validPoints('1')},
+        assessing: true,
+        pointsPossible: 2
+      })
+    ).toMatchSnapshot()
   })
 
   it('renders the right text for fractional points', () => {
-    expect(component({
-      assessment: { ...id, points: validPoints('1.1') },
-      pointsPossible: 2
-    }).find('div').text()).toEqual('1.1 / 2 pts')
+    expect(
+      component({
+        assessment: {...id, points: validPoints('1.1')},
+        pointsPossible: 2
+      })
+        .find('div')
+        .text()
+    ).toEqual('1.1 / 2 pts')
   })
 
   it('renders the provided value on page load with no point text', () => {
-    expect(component({
-      assessment: { ...id, points: { text: null, valid: true, value: 1.255 } },
-      pointsPossible: 2
-    }).find('div').text()).toEqual('1.26 / 2 pts')
+    expect(
+      component({
+        assessment: {...id, points: {text: null, valid: true, value: 1.255}},
+        pointsPossible: 2
+      })
+        .find('div')
+        .text()
+    ).toEqual('1.26 / 2 pts')
   })
 
   it('renders no errors with point text verbatim when valid', () => {
-    expect(component({
-      assessing: true,
-      assessment: { ...id, points: {text: '', valid: true, value: undefined } },
-      pointsPossible: 2
-    }).find('TextInput').prop('messages')).toHaveLength(0)
+    expect(
+      component({
+        assessing: true,
+        assessment: {...id, points: {text: '', valid: true, value: undefined}},
+        pointsPossible: 2
+      })
+        .find('TextInput')
+        .prop('messages')
+    ).toHaveLength(0)
   })
 
   it('renders points possible with no assessment', () => {
-    expect(component({
-      assessing: false,
-      assessment: null,
-      pointsPossible: 2
-    }).find('div').text()).toEqual('2 pts')
+    expect(
+      component({
+        assessing: false,
+        assessment: null,
+        pointsPossible: 2
+      })
+        .find('div')
+        .text()
+    ).toEqual('2 pts')
   })
 
-  const withPoints = (points) => component({
-    allowExtraCredit: false,
-    assessing: true,
-    assessment: {
-      ...id,
-      points
-    },
-    pointsPossible: 5
-  })
+  const withPoints = points =>
+    component({
+      allowExtraCredit: false,
+      assessing: true,
+      assessment: {
+        ...id,
+        points
+      },
+      pointsPossible: 5
+    })
 
   it('renders an error when valid is false', () => {
-    const el = withPoints({ text: 'stringy', valid: false, value: null })
+    const el = withPoints({text: 'stringy', valid: false, value: null})
     expect(el.find('TextInput').prop('messages')).toHaveLength(1)
   })
 
   it('renders an error when extra credit cannot be given', () => {
-    const el = withPoints({ text: '30', valid: true, value: 30 })
+    const el = withPoints({text: '30', valid: true, value: 30})
     expect(el.find('TextInput').prop('messages')).toHaveLength(1)
   })
 
   it('renders no error when valid is true', () => {
     const expectNoErrorsWith = (text, value) =>
-      expect(withPoints({ text, valid: true, value })
-        .find('TextInput').prop('messages')).toHaveLength(0)
+      expect(
+        withPoints({text, valid: true, value})
+          .find('TextInput')
+          .prop('messages')
+      ).toHaveLength(0)
 
     expectNoErrorsWith('')
     expectNoErrorsWith(null)

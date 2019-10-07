@@ -66,7 +66,13 @@ function consumePagesInOrder(callback, data) {
  * @param pageCallback - called for each page of data
  * @returns a jQuery Deferred that will be resolved when all pages have been fetched
  */
-function cheaterDepaginate(url, params, pageCallback, pagesEnqueuedCallback = () => {}, dispatch = null) {
+function cheaterDepaginate(
+  url,
+  params,
+  pageCallback,
+  pagesEnqueuedCallback = () => {},
+  dispatch = null
+) {
   const gotAllPagesDfd = $.Deferred()
   const data = []
   const errHandler = () => {
@@ -110,7 +116,8 @@ function cheaterDepaginate(url, params, pageCallback, pagesEnqueuedCallback = ()
       const dfds = []
 
       if (dispatch == null) {
-        const fetchPage = page => $.ajaxJSON(url, 'GET', paramsForPage(page), bindPageCallback(page))
+        const fetchPage = page =>
+          $.ajaxJSON(url, 'GET', paramsForPage(page), bindPageCallback(page))
 
         for (let page = 2; page <= lastPage; page++) {
           dfds.push(fetchPage(page))

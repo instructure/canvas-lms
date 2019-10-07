@@ -18,10 +18,8 @@
 
 import axios from 'axios'
 
-export const fetchProficiency = (accountId) => (
+export const fetchProficiency = accountId =>
   axios.get(`/api/v1/accounts/${accountId}/outcome_proficiency`)
-)
 
-export const saveProficiency = (accountId, config) => (
+export const saveProficiency = (accountId, config) =>
   axios.post(`/api/v1/accounts/${accountId}/outcome_proficiency`, config)
-)

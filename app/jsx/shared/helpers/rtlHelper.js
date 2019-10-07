@@ -48,8 +48,9 @@ const flipped = {
  * @param {ElementToCheck}, will use the <html> element by default
  * @returns {String} 'ltr' or 'rtl' (or `undefined` if no DOM is present)
  */
-export function direction(leftOrRight, element){
-  if (leftOrRight !== 'left' && leftOrRight !== 'right') throw new Error('expected either left or right')
+export function direction(leftOrRight, element) {
+  if (leftOrRight !== 'left' && leftOrRight !== 'right')
+    throw new Error('expected either left or right')
   return isRTL(element) ? flipped[leftOrRight] : leftOrRight
 }
 
@@ -58,7 +59,7 @@ export function direction(leftOrRight, element){
  * @param {Element} element, will use the <html> element by default
  * @returns {String} 'ltr' or 'rtl' (or `undefined` if no DOM is present)
  */
-export function getDirection(element){
-  if (typeof element === 'undefined' || (element === htmlEl)) return getDefaultDir()
+export function getDirection(element) {
+  if (typeof element === 'undefined' || element === htmlEl) return getDefaultDir()
   return element.getAttribute('dir') || getComputedStyle(element, null).direction
 }

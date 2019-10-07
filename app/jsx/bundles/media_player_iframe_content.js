@@ -45,7 +45,11 @@ ready(() => {
 
   const div = document.body.firstElementChild
   ReactDOM.render(
-    <CanvasMediaPlayer media_id={media_id} media_sources={href_source || ENV.media_sources} type={type} />,
+    <CanvasMediaPlayer
+      media_id={media_id}
+      media_sources={href_source || ENV.media_sources}
+      type={type}
+    />,
     document.body.appendChild(div)
   )
 })

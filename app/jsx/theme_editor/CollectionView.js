@@ -225,7 +225,7 @@ export default class CollectionView extends React.Component {
                 <button
                   type="button"
                   className="Button Button--icon-action"
-                  data-tooltip="{&quot;tooltipClass&quot;:&quot;popover popover-padded&quot;, &quot;position&quot;:&quot;left&quot;}"
+                  data-tooltip='{"tooltipClass":"popover popover-padded", "position":"left"}'
                   title={I18n.t(
                     'Default templates are used as starting points for new themes and cannot be deleted.'
                   )}

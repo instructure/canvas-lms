@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sanitizeUrl from "../sanitizeUrl";
+import sanitizeUrl from '../sanitizeUrl'
 
 it('removes replaces javascript: scheme urls with about:blank', () => {
   // eslint-disable-next-line no-script-url
-  expect(sanitizeUrl('javascript:prompt(document.cookie);prompt(document.domain);')).toBe('about:blank')
+  expect(sanitizeUrl('javascript:prompt(document.cookie);prompt(document.domain);')).toBe(
+    'about:blank'
+  )
 })
 
 it('leaves normal non-javascript: urls alone', () => {
   expect(sanitizeUrl('http://instructure.com')).toBe('http://instructure.com')
 })
-

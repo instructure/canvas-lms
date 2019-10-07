@@ -21,12 +21,9 @@ export function replaceOneTag(text, name, value) {
     return text
   }
   const strName = (name || '').toString()
-  const strValue = (value || '').toString().replace(/\s/g, "+")
-  const itemExpression = new RegExp(
-    `(%7B|{){2}[\\s|%20|\+]*${strName}[\\s|%20|\+]*(%7D|}){2}`,
-    'g'
-  )
-  return text.replace(itemExpression, strValue);
+  const strValue = (value || '').toString().replace(/\s/g, '+')
+  const itemExpression = new RegExp(`(%7B|{){2}[\\s|%20|\+]*${strName}[\\s|%20|\+]*(%7D|}){2}`, 'g')
+  return text.replace(itemExpression, strValue)
 }
 
 export function replaceTags(text, mappingOrName, maybeValue) {

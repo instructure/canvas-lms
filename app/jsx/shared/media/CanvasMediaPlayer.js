@@ -33,7 +33,7 @@ export default function CanvasMediaPlayer(props) {
     myIframeRef.current = [...window.parent.document.getElementsByTagName('iframe')].find(
       el => el.contentWindow === window
     )
-    }, [])
+  }, [])
 
   useEffect(() => {
     if (!props.media_sources.length) {
@@ -47,7 +47,7 @@ export default function CanvasMediaPlayer(props) {
 
   useEffect(() => {
     const player = containerRef.current.querySelector('video')
-    if(player) {
+    if (player) {
       if (player.loadedmetadata || player.readyState >= 1) {
         setMediaPlayerSize(player)
       } else {
@@ -77,7 +77,7 @@ export default function CanvasMediaPlayer(props) {
 
   function setMediaPlayerSize(player) {
     const playerContainer = myIframeRef.current
-    if(playerContainer) {
+    if (playerContainer) {
       const {width, height} = sizeMediaPlayer(player, props.type, playerContainer)
       playerContainer.style.width = width
       playerContainer.style.height = height
@@ -86,9 +86,11 @@ export default function CanvasMediaPlayer(props) {
       }
 
       const playerContainerContainer = playerContainer.parentElement // tinymce adds this
-      if (playerContainerContainer &&
-          playerContainerContainer.classList.contains('mce-preview-object') &&
-          playerContainerContainer.classList.contains('mce-object-iframe')) {
+      if (
+        playerContainerContainer &&
+        playerContainerContainer.classList.contains('mce-preview-object') &&
+        playerContainerContainer.classList.contains('mce-object-iframe')
+      ) {
         // we're in the RCE
         playerContainerContainer.style.width = width
         playerContainerContainer.style.height = height
@@ -135,18 +137,20 @@ export default function CanvasMediaPlayer(props) {
 
   return (
     <div ref={containerRef}>
-      {media_sources.length ?
-        <VideoPlayer
-          sources={media_sources}
-          controls={renderControls}
-        /> :
-        <LoadingIndicator translatedTitle={I18n.t('Loading')} size={props.type === 'audio' ? 'x-small' : 'large'} />}
+      {media_sources.length ? (
+        <VideoPlayer sources={media_sources} controls={renderControls} />
+      ) : (
+        <LoadingIndicator
+          translatedTitle={I18n.t('Loading')}
+          size={props.type === 'audio' ? 'x-small' : 'large'}
+        />
+      )}
     </div>
   )
 }
 
 export function sizeMediaPlayer(player, type, playerContainer) {
-  if(type === 'audio') {
+  if (type === 'audio') {
     return {width: '300px', height: '3rem'}
   }
 
@@ -158,7 +162,7 @@ export function sizeMediaPlayer(player, type, playerContainer) {
     const minSideLength = playerContainer.clientWidth
     const w = Math.min(width, minSideLength)
 
-    return {width: `${w}px`, height: `${Math.round(w/width * height)}px`}
+    return {width: `${w}px`, height: `${Math.round((w / width) * height)}px`}
   }
   return {}
 }

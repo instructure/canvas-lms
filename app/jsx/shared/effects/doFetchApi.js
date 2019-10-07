@@ -35,7 +35,7 @@ export default async function doFetchApi({
 }) {
   const fetchHeaders = {
     Accept: 'application/json+canvas-string-ids, application/json',
-    'X-CSRF-Token': $.cookie('_csrf_token'),
+    'X-CSRF-Token': $.cookie('_csrf_token')
   }
   if (body && typeof body !== 'string') {
     body = JSON.stringify(body)

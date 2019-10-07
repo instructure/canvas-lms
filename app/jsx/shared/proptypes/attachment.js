@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, string } from 'prop-types'
+import {shape, string} from 'prop-types'
 
 const attachmentShape = shape({
   id: string,

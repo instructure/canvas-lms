@@ -17,8 +17,8 @@
  */
 
 export default function sanitizeHtml(html) {
-  // Note: it is expected that tinymce be loaded and available globally at `window.tinymce` by the 
-  // time this function runs. To do that you can just make sure to call 
+  // Note: it is expected that tinymce be loaded and available globally at `window.tinymce` by the
+  // time this function runs. To do that you can just make sure to call
   // RichContentEditor.preloadRemoteModule first
-  return new tinymce.html.Serializer().serialize(new tinymce.html.DomParser().parse(html));
+  return new tinymce.html.Serializer().serialize(new tinymce.html.DomParser().parse(html))
 }

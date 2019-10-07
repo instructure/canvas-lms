@@ -121,9 +121,8 @@ export default class ThemeEditor extends React.Component {
   }
 
   onSubAccountProgress = data => {
-    const newSubAccountProgs = _.map(
-      this.state.activeSubAccountProgresses,
-      progress => (progress.tag == data.tag ? data : progress)
+    const newSubAccountProgs = _.map(this.state.activeSubAccountProgresses, progress =>
+      progress.tag == data.tag ? data : progress
     )
 
     this.filterAndSetActive(newSubAccountProgs)

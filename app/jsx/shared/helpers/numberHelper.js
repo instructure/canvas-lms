@@ -19,43 +19,43 @@
 import parseNumber from 'parse-decimal-number'
 import I18n from 'i18nObj'
 
-  const helper = {
-    _parseNumber: parseNumber,
+const helper = {
+  _parseNumber: parseNumber,
 
-    parse (input) {
-      if (input == null) {
-        return NaN
-      } else if (typeof input === 'number') {
-        return input
-      }
-
-      let num = helper._parseNumber(input.toString(), {
-        thousands: I18n.lookup('number.format.delimiter'),
-        decimal: I18n.lookup('number.format.separator')
-      })
-
-      // fallback to default delimiters if invalid with locale specific ones
-      if (isNaN(num)) {
-        num = helper._parseNumber(input)
-      }
-
-      // final fallback to old parseFloat - this allows us to still support scientific 'e' notation
-      if (input.toString().indexOf('e') > -1 && isNaN(num)) {
-        num = parseFloat(input)
-
-        // Over 'e20' these don't produce usable numbers,
-        // so we just have to cap it for simplicity's sake...
-        if(num.toString().indexOf('e') > -1) {
-          return NaN
-        }
-      }
-
-      return num
-    },
-
-    validate (input) {
-      return !isNaN(helper.parse(input))
+  parse(input) {
+    if (input == null) {
+      return NaN
+    } else if (typeof input === 'number') {
+      return input
     }
+
+    let num = helper._parseNumber(input.toString(), {
+      thousands: I18n.lookup('number.format.delimiter'),
+      decimal: I18n.lookup('number.format.separator')
+    })
+
+    // fallback to default delimiters if invalid with locale specific ones
+    if (isNaN(num)) {
+      num = helper._parseNumber(input)
+    }
+
+    // final fallback to old parseFloat - this allows us to still support scientific 'e' notation
+    if (input.toString().indexOf('e') > -1 && isNaN(num)) {
+      num = parseFloat(input)
+
+      // Over 'e20' these don't produce usable numbers,
+      // so we just have to cap it for simplicity's sake...
+      if (num.toString().indexOf('e') > -1) {
+        return NaN
+      }
+    }
+
+    return num
+  },
+
+  validate(input) {
+    return !isNaN(helper.parse(input))
   }
+}
 
 export default helper

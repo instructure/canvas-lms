@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { replaceOneTag, replaceTags } from '../tags'
+import {replaceOneTag, replaceTags} from '../tags'
 
 test('replaceOneTag replaces one tag', () => {
   expect(replaceOneTag('Hello {{name}}!', 'name', 'test')).toBe('Hello test!')

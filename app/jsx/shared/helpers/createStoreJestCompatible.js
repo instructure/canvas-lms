@@ -16,67 +16,67 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  /**
-   * Creates a data store with some initial state.
-   *
-   * ```js
-   * var UserStore = createStore({loaded: false, users: []});
-   *
-   * UserStore.load = function() {
-   *   $.getJSON('/users', function(users) {
-   *     UserStore.setState({loaded: true, users});
-   *   });
-   * };
-   * ```
-   *
-   * Then in a component:
-   *
-   * ```js
-   * var UsersView = React.createClass({
-   *   getInitialState () {
-   *     return UserStore.getState();
-   *   },
-   *
-   *   componentDidMount () {
-   *     UserStore.addChangeListener(this.handleStoreChange);
-   *     UserStore.load();
-   *   },
-   *
-   *   handleStoreChange () {
-   *     this.setState(UserStore.getState());
-   *   }
-   * });
-   * ```
-   */
+/**
+ * Creates a data store with some initial state.
+ *
+ * ```js
+ * var UserStore = createStore({loaded: false, users: []});
+ *
+ * UserStore.load = function() {
+ *   $.getJSON('/users', function(users) {
+ *     UserStore.setState({loaded: true, users});
+ *   });
+ * };
+ * ```
+ *
+ * Then in a component:
+ *
+ * ```js
+ * var UsersView = React.createClass({
+ *   getInitialState () {
+ *     return UserStore.getState();
+ *   },
+ *
+ *   componentDidMount () {
+ *     UserStore.addChangeListener(this.handleStoreChange);
+ *     UserStore.load();
+ *   },
+ *
+ *   handleStoreChange () {
+ *     this.setState(UserStore.getState());
+ *   }
+ * });
+ * ```
+ */
 
 function createStore(initialState = {}) {
   let state = initialState
   const listeners = {}
 
   return {
-    setState (newState) {
-      state = Object.assign({}, state, newState)
+    setState(newState) {
+      state = {...state, ...newState}
       this.emitChange()
     },
 
-    getState () {
+    getState() {
       return state
     },
 
-    clearState () {
+    clearState() {
       state = {}
       this.emitChange()
     },
 
-    addChangeListener (listener) {
+    addChangeListener(listener) {
       listeners[listener] = listener
     },
 
-    removeChangeListener (listener) {
+    removeChangeListener(listener) {
       delete listeners[listener]
     },
 
-    emitChange () {
+    emitChange() {
       Object.values(listeners).forEach(listener => listener())
     }
   }

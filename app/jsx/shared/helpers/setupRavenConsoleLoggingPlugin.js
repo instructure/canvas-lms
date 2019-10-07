@@ -23,26 +23,26 @@
  * @param {string} options.loggerName Name for the logger
  */
 export default function setupRavenConsoleLoggingPlugin(client, options) {
-  const CONSOLE_LEVELS = ['debug', 'info', 'warn', 'error'];
+  const CONSOLE_LEVELS = ['debug', 'info', 'warn', 'error']
   CONSOLE_LEVELS.forEach(level => {
     window.console[level] = (...args) => {
-      const msg = args.join(' ');
+      const msg = args.join(' ')
       if (msg.includes('deprecated')) {
         const data = {
           level: level === 'warn' ? 'warning' : level,
           logger: options.loggerName || 'console',
           stacktrace: true,
           extra: {
-            arguments: args,
+            arguments: args
           }
-        };
+        }
 
         // make raven think window.fetch is unavailable so it doesn't use the mocked one
         const fetch = window.fetch
         delete window.fetch
-        client.captureMessage(msg, data);
+        client.captureMessage(msg, data)
         window.fetch = fetch
       }
     }
-  });
-};
+  })
+}

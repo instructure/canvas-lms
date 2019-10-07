@@ -45,37 +45,47 @@ window.bundles.push = loadBundle
 window.bundles.forEach(loadBundle)
 
 import('./runOnEveryPageButDontBlockAnythingElse')
-if (ENV.csp) import('./account_settings/alert_enforcement').then(({default: setupCSP}) => setupCSP(window.document))
+if (ENV.csp)
+  import('./account_settings/alert_enforcement').then(({default: setupCSP}) =>
+    setupCSP(window.document)
+  )
 if (ENV.INCOMPLETE_REGISTRATION) import('compiled/registration/incompleteRegistrationWarning')
 if (ENV.badge_counts) import('compiled/badge_counts')
 
 $('html').removeClass('scripts-not-loaded')
 
-$('.help_dialog_trigger').click((event) => {
+$('.help_dialog_trigger').click(event => {
   event.preventDefault()
   import('compiled/helpDialog').then(({default: helpDialog}) => helpDialog.open())
 })
 
-
 // Backbone routes
-$('body').on('click', '[data-pushstate]', preventDefault(function() {
-  Backbone.history.navigate($(this).attr('href'), true)
-}))
+$('body').on(
+  'click',
+  '[data-pushstate]',
+  preventDefault(function() {
+    Backbone.history.navigate($(this).attr('href'), true)
+  })
+)
 
 if (
   window.ENV.NEW_USER_TUTORIALS &&
   window.ENV.NEW_USER_TUTORIALS.is_enabled &&
-  (window.ENV.context_asset_string && (splitAssetString(window.ENV.context_asset_string)[0] === 'courses'))
+  (window.ENV.context_asset_string &&
+    splitAssetString(window.ENV.context_asset_string)[0] === 'courses')
 ) {
-  import('./new_user_tutorial/initializeNewUserTutorials').then(({default: initializeNewUserTutorials}) => {
-    initializeNewUserTutorials()
-  })
+  import('./new_user_tutorial/initializeNewUserTutorials').then(
+    ({default: initializeNewUserTutorials}) => {
+      initializeNewUserTutorials()
+    }
+  )
 }
 
 // edge < 15 does not support css vars
 // edge >= 15 claims to, but is currently broken
-const edge = window.navigator.userAgent.indexOf("Edge") > -1
-const supportsCSSVars = !edge && window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
+const edge = window.navigator.userAgent.indexOf('Edge') > -1
+const supportsCSSVars =
+  !edge && window.CSS && window.CSS.supports && window.CSS.supports('(--foo: red)')
 if (!supportsCSSVars) {
   import('./canvasCssVariablesPolyfill').then(({default: canvasCssVariablesPolyfill}) => {
     window.canvasCssVariablesPolyfill = canvasCssVariablesPolyfill

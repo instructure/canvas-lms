@@ -18,32 +18,27 @@
 
 import React from 'react'
 
-  class FlickrImage extends React.Component {
-    handleClick = event => {
-      this.props.selectImage(this.props.url);
-    };
-
-    render () {
-
-      const imageStyle = {
-        backgroundImage: `url(${this.props.url})`
-      };
-
-      return (
-        <a className="FlickrImage"
-           onClick={this.handleClick}
-           href="javascript:;"
-           ref="flickrImage">
-          <img className="FlickrImage__screenreader"
-               alt={this.props.searchTerm}
-               src={this.props.url}>
-          </img>
-          <div className="FlickrImage__display"
-               style={imageStyle}>
-          </div>
-        </a>
-      );
-    }
+class FlickrImage extends React.Component {
+  handleClick = event => {
+    this.props.selectImage(this.props.url)
   }
+
+  render() {
+    const imageStyle = {
+      backgroundImage: `url(${this.props.url})`
+    }
+
+    return (
+      <a className="FlickrImage" onClick={this.handleClick} href="javascript:;" ref="flickrImage">
+        <img
+          className="FlickrImage__screenreader"
+          alt={this.props.searchTerm}
+          src={this.props.url}
+        />
+        <div className="FlickrImage__display" style={imageStyle} />
+      </a>
+    )
+  }
+}
 
 export default FlickrImage
