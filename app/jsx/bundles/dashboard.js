@@ -22,9 +22,7 @@ import 'jquery.disableWhileLoading'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import DashboardHeader from '../dashboard/DashboardHeader'
-import ready from '@instructure/ready'
 
-ready(() => {
 const dashboardHeaderContainer = document.getElementById('dashboard_header_container');
 if (dashboardHeaderContainer) {
   const dashboard_view = ENV.PREFERENCES.dashboard_view;
@@ -47,4 +45,3 @@ if (dashboardHeaderContainer) {
   // we can initialize the backbone view immediately
   import('../views/DashboardView').then(({default: DashboardView}) => new DashboardView())
 }
-})

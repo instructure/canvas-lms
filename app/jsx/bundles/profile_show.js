@@ -17,8 +17,5 @@
  */
 
 import ProfileShow from 'compiled/views/profiles/ProfileShow'
-import ready from '@instructure/ready'
 
-ready(() => {
 new ProfileShow(ENV.PROFILE)
-})

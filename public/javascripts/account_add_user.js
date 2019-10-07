@@ -18,7 +18,6 @@
 
 import I18n from 'i18n!accounts'
 import $ from 'jquery'
-import ready from '@instructure/ready'
 import addPrivacyLinkToDialog from 'compiled/util/addPrivacyLinkToDialog'
 import _ from 'underscore'
 import 'user_sortable_name'
@@ -27,7 +26,6 @@ import 'jqueryui/dialog'
 import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery.rails_flash_notifications'
 
-ready(() => {
   $(".add_user_link").click(event => {
     event.preventDefault();
     $("#add_user_form :text").val("");
@@ -101,4 +99,3 @@ ready(() => {
   $("#add_user_dialog .cancel_button").click(() => {
     $("#add_user_dialog").dialog('close');
   });
-})

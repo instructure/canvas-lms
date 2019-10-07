@@ -19,9 +19,8 @@
 import $ from 'jquery'
 import NotificationPreferences from 'compiled/notifications/NotificationPreferences'
 import initPrivacyNotice from 'compiled/notifications/privacyNotice'
-import ready from '@instructure/ready'
 import 'compiled/profile/confirmEmail'
 
-ready(() => new NotificationPreferences(ENV.NOTIFICATION_PREFERENCES_OPTIONS))
+new NotificationPreferences(ENV.NOTIFICATION_PREFERENCES_OPTIONS)
 
 $(() => initPrivacyNotice())

@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import 'jquery.doc_previews'
 import 'jquery.instructure_misc_plugins'
-import ready from '@instructure/ready'
 
 const previewDefaults = {
   height: '100%',
@@ -28,8 +27,6 @@ const previewDefaults = {
   }
 }
 
-ready(() => {
 const previewDiv = $('#doc_preview')
 previewDiv.fillWindowWithMe()
 previewDiv.loadDocPreview($.merge(previewDefaults, previewDiv.data()))
-})

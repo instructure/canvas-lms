@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import ReactDOM from 'react-dom'
 import router from '../external_apps/router'
-import ready from '@instructure/ready'
 
 let alreadyRendered = false
 
@@ -35,7 +34,6 @@ function renderReactApps (tabId) {
   }
 }
 
-ready(() => {
 const activeTabId = $('li.ui-state-active > a').prop('id')
 if (activeTabId) { renderReactApps(activeTabId) }
 
@@ -43,5 +41,4 @@ $('#account_settings_tabs, #course_details_tabs').on('tabscreate tabsactivate', 
   const selectedTab = ui.tab || ui.newTab
   const tabId = $(selectedTab).find('a').attr('id')
   renderReactApps(tabId)
-})
 })

@@ -17,9 +17,8 @@
  */
 
 import $ from 'jquery'
-import ready from '@instructure/ready'
 
-ready(() => {
+$(() => {
   const $select = $('select.locale')
 
   const $warningLink = $('i.locale-warning')
