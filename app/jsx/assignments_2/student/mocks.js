@@ -15,33 +15,61 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {addMockFunctionsToSchema, makeExecutableSchema} from 'graphql-tools'
 import {addTypenameToDocument} from 'apollo-utilities'
+import glob from 'glob'
 import gql from 'graphql-tag'
 import {graphql} from 'graphql'
-import {makeExecutableSchema, addMockFunctionsToSchema} from 'graphql-tools'
 import {print} from 'graphql/language/printer'
 import schemaString from '../../../../schema.graphql'
 
 import {Assignment} from './graphqlData/Assignment'
 import {Submission} from './graphqlData/Submission'
 
-import glob from 'glob'
+let _dynamicDefaultMockImports = null
+async function loadDefaultMocks() {
+  if (_dynamicDefaultMockImports !== null) {
+    return _dynamicDefaultMockImports
+  }
 
-const filesToImport = glob.sync('./graphqlData/**.js', {cwd: './app/jsx/assignments_2/student'})
-const importPromises = filesToImport.map(async file => {
-  const fileImport = await import(file)
-  return fileImport.DefaultMocks || {}
-})
+  const filesToImport = glob.sync('./graphqlData/**.js', {cwd: './app/jsx/assignments_2/student'})
+  const defaultMocks = await Promise.all(
+    filesToImport.map(async file => {
+      const fileImport = await import(file)
+      return fileImport.DefaultMocks || {}
+    })
+  )
+  _dynamicDefaultMockImports = defaultMocks.filter(m => m !== undefined)
+  return _dynamicDefaultMockImports
+}
+
+let _typeIntrospectionSet = null
+async function getValidTypes() {
+  if (_typeIntrospectionSet !== null) {
+    return _typeIntrospectionSet
+  }
+
+  const typeIntrospectionQuery = '{ __schema { types { name } } }'
+  const schema = makeExecutableSchema({
+    typeDefs: schemaString,
+    resolverValidationOptions: {
+      requireResolversForResolveType: false
+    }
+  })
+  const result = await graphql(schema, typeIntrospectionQuery)
+  _typeIntrospectionSet = new Set(result.data.__schema.types.map(type => type.name))
+  return _typeIntrospectionSet
+}
 
 async function makeDefaultMocks() {
-  const defaultMockImports = await Promise.all(importPromises)
+  const defaultMocks = await loadDefaultMocks()
   return [
     // Custom scalar types defined in our graphql schema
     {URL: () => 'http://graphql-mocked-url.com'},
     {DateTime: () => null},
 
     // DefaultMocks as defined in the ./graphqlData javascript files
-    ...defaultMockImports
+    ...defaultMocks
   ]
 }
 
@@ -51,13 +79,25 @@ async function createMocks(overrides = []) {
     overrides = [overrides]
   }
 
+  const validTypes = await getValidTypes()
   const defaultMocks = await makeDefaultMocks()
   const allOverrides = [...defaultMocks, ...overrides]
+
   allOverrides.forEach(overrideObj => {
     if (typeof overrideObj !== 'object') {
       throw new Error(`overrides must be an object, not ${typeof overrideObj}`)
     }
     Object.keys(overrideObj).forEach(key => {
+      // Sanity check. If someone tries to add an override that doesn't exist in
+      // the schema, we are going to fail hard here instead of having unexpected
+      // results returned from this function
+      if (!validTypes.has(key)) {
+        const err =
+          `The override "${key}" is not a valid graphql type. ` +
+          'Did you typo it or forget to update your graphql schema?'
+        throw new Error(err)
+      }
+
       const defaultFunction = mocks[key] || (() => undefined)
       const defaultValues = defaultFunction()
       const overrideFunction = overrideObj[key]
