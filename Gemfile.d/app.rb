@@ -45,13 +45,13 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 
 gem 'addressable', '2.7.0', require: false
 gem "after_transaction_commit", '2.0.0'
-gem "aws-sdk-dynamodb", "1.34.0"
-gem "aws-sdk-kinesis", '1.18.0', require: false
-gem "aws-sdk-s3", '1.45.0', require: false
-gem "aws-sdk-sns", '1.18.0', require: false
-gem "aws-sdk-sqs", '1.18.0', require: false
-gem "aws-sdk-core", "3.61.1", require: false
-gem "aws-sdk-kms", "1.23.0", require: false
+gem "aws-sdk-dynamodb", "1.36.0"
+gem "aws-sdk-kinesis", '1.19.0', require: false
+gem "aws-sdk-s3", '1.48.0', require: false
+gem "aws-sdk-sns", '1.19.0', require: false
+gem "aws-sdk-sqs", '1.22.0', require: false
+gem "aws-sdk-core", "3.68.1", require: false
+gem "aws-sdk-kms", "1.24.0", require: false
 gem "aws-sigv4", "1.1.0", require: false
 
 gem 'barby', '0.6.8', require: false
@@ -67,7 +67,7 @@ gem 'inst-jobs', '0.15.13'
     gem 'et-orbi', '1.0.8', require: false
 gem 'switchman-inst-jobs', '1.3.5'
 gem 'inst-jobs-autoscaling', '1.0.5'
-  gem 'aws-sdk-autoscaling', '1.25.0', require: false
+  gem 'aws-sdk-autoscaling', '1.28.0', require: false
 # ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
 # check https://github.com/ffi/ffi/issues/621 for resolution prior to bumping version
 gem 'ffi', '1.9.18', require: false
