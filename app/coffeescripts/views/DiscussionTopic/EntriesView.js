@@ -24,7 +24,6 @@ import '../../jquery/scrollIntoView'
 import 'underscore.flattenObjects'
 
 export default class EntriesView extends Backbone.View {
-
   static initClass() {
     this.prototype.defaults = {
       initialPage: 0,

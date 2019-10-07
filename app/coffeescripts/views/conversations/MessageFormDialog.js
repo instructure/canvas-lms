@@ -35,7 +35,6 @@ import 'jquery.elastic'
 // #
 // reusable message composition dialog
 export default class MessageFormDialog extends DialogBaseView {
-
   static initClass() {
     this.prototype.template = template
 
@@ -173,9 +172,7 @@ export default class MessageFormDialog extends DialogBaseView {
     this.$fullDialog.addClass('compose-message-dialog')
 
     // add attachment and media buttons to bottom bar
-    this.$fullDialog
-      .find('.ui-dialog-buttonpane')
-      .prepend(composeButtonBarTemplate({}))
+    this.$fullDialog.find('.ui-dialog-buttonpane').prepend(composeButtonBarTemplate({}))
 
     return (this.$addMediaComment = this.$fullDialog.find('.attach-media'))
   }
@@ -313,7 +310,7 @@ export default class MessageFormDialog extends DialogBaseView {
       contextView.render()
     }
 
-    this.$fullDialog.on('click', '.message-body', (e) => this.handleBodyClick(e))
+    this.$fullDialog.on('click', '.message-body', e => this.handleBodyClick(e))
     this.$fullDialog.on('click', '.attach-file', () => this.addAttachment())
     this.$fullDialog.on(
       'click',

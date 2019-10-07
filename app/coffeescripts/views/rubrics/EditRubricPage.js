@@ -59,7 +59,7 @@ export default class EditRubricPage {
     }
     this.$els.dialog.show()
     return this.$els.dialog.$el.find('.alert').focus()
-  };
+  }
 
   onOutcomeImport(model) {
     return rubricEditing.onFindOutcome(model)

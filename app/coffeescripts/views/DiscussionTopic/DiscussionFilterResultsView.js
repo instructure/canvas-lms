@@ -24,7 +24,6 @@ import EntryCollection from '../../collections/EntryCollection'
 import rEscape from '../../regexp/rEscape'
 
 export default class DiscussionFilterResultsView extends EntryCollectionView {
-
   static initClass() {
     this.prototype.defaults = {
       ...EntryCollectionView.prototype.defaults,

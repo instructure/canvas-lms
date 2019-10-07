@@ -78,7 +78,7 @@ export default class UnassignedUsersView extends GroupUsersView {
     this.collection.load('first')
     this.$el
       .parent()
-      .droppable(Object.assign({}, this.dropOptions))
+      .droppable({...this.dropOptions})
       .unbind('drop')
       .on('drop', this._onDrop.bind(this))
     this.scrollContainer = this.heightContainer = this.$el

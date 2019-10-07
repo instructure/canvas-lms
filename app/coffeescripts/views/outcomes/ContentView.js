@@ -34,7 +34,6 @@ import {subscribe} from 'vendor/jquery.ba-tinypubsub'
 // It uses OutcomeView and OutcomeGroupView to render
 
 export default class ContentView extends Backbone.View {
-
   initialize({readOnly, setQuizMastery, useForScoring, instructionsTemplate, renderInstructions}) {
     this.readOnly = readOnly
     this.setQuizMastery = setQuizMastery
@@ -147,7 +146,7 @@ export default class ContentView extends Backbone.View {
       focusStyleClass: 'MoveDialog__folderItem--focused',
       selectedStyleClass: 'MoveDialog__folderItem--selected',
       onlyShowSubtrees: true,
-      onClick: function() {
+      onClick() {
         TreeBrowserView.prototype.setActiveTree(this, treeBrowser)
       }
     }).render()

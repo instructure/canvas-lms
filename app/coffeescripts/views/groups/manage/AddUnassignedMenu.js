@@ -23,7 +23,6 @@ import $ from 'jquery'
 import '../../../jquery/outerclick'
 
 export default class AddUnassignedMenu extends PopoverMenuView {
-
   static initClass() {
     this.child('usersView', '[data-view=users]')
     this.child('inputFilterView', '[data-view=inputFilter]')

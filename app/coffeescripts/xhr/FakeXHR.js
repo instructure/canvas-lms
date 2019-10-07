@@ -24,7 +24,7 @@ import $ from 'jquery'
 // We don't actually care about some of this stuff, but we stub out all XHR so
 // that things that try to use it don't blow up.
 export default class FakeXHR {
-  constructor () {
+  constructor() {
     this.readyState = 0
     this.timeout = 0
     this.withCredentials = false
@@ -32,7 +32,7 @@ export default class FakeXHR {
 
   // #
   // we assume all responses are json
-  setResponse (body) {
+  setResponse(body) {
     this.readyState = 4
     this.responseText = body
 
@@ -54,17 +54,23 @@ export default class FakeXHR {
     return (this.responseType = 'json')
   }
 
-  abort () {}
-  getAllResponseHeaders () {
+  abort() {}
+
+  getAllResponseHeaders() {
     if (this.responseText) {
       return ''
     } else {
       return null
     }
   }
-  getResponseHeader () {}
-  open () {}
-  overrideMimeType () {}
-  send () {}
-  setRequestHeader () {}
+
+  getResponseHeader() {}
+
+  open() {}
+
+  overrideMimeType() {}
+
+  send() {}
+
+  setRequestHeader() {}
 }

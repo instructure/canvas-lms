@@ -26,7 +26,6 @@ import 'vendor/bootstrap/bootstrap-dropdown'
 import 'vendor/bootstrap-select/bootstrap-select'
 
 export default class InboxHeaderView extends View {
-
   static initClass() {
     this.prototype.els = {
       '#compose-btn': '$composeBtn',

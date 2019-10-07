@@ -46,7 +46,9 @@ export default class ProfileShow extends Backbone.View {
     if (!confirm(I18n.t('Are you sure you want to report this profile picture?'))) return
     const link = $(e.currentTarget)
     $('.avatar').hide()
-    return $.ajaxJSON(link.attr('href'), 'POST', {}, data => $.flashMessage(I18n.t('The profile picture has been reported')))
+    return $.ajaxJSON(link.attr('href'), 'POST', {}, data =>
+      $.flashMessage(I18n.t('The profile picture has been reported'))
+    )
   }
 
   handleDeclarativeClick(event) {

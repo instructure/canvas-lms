@@ -57,7 +57,9 @@ export default class OutcomeDetailView extends DialogBaseView {
       outcome: this.model
     })
 
-    this.allAlignments.on('fetched:last', () => this.alignmentsForView.reset(this.allAlignments.toArray()));
+    this.allAlignments.on('fetched:last', () =>
+      this.alignmentsForView.reset(this.allAlignments.toArray())
+    )
 
     return this.allAlignments.fetch()
   }

@@ -127,8 +127,7 @@ export default class ToggleShowByView extends Backbone.View {
       >
         <RadioInput id="show_by_date" label={I18n.t('Show by Date')} value="date" context="off" />
         <RadioInput id="show_by_type" label={I18n.t('Show by Type')} value="type" context="off" />
-      </RadioInputGroup>
-      ,
+      </RadioInputGroup>,
       this.el
     )
   }
@@ -137,15 +136,16 @@ export default class ToggleShowByView extends Backbone.View {
     let groups = this.showByDate() ? this.groupedByDate : this.groupedByAG
     this.setAssignmentGroupAssociations(groups)
     groups = _.filter(groups, group => {
-      const hasWeight = this.course.get('apply_assignment_group_weights') && group.get('group_weight') > 0
+      const hasWeight =
+        this.course.get('apply_assignment_group_weights') && group.get('group_weight') > 0
       return group.get('assignments').length > 0 || hasWeight
     })
     return this.assignmentGroups.reset(groups)
   }
 
   setAssignmentGroupAssociations(groups) {
-    (groups || []).forEach(assignment_group => {
-      (assignment_group.get('assignments').models || []).forEach(assignment => {
+    ;(groups || []).forEach(assignment_group => {
+      ;(assignment_group.get('assignments').models || []).forEach(assignment => {
         // we are keeping this change on the frontend only (for keyboard nav), will not persist in the db
         assignment.collection = assignment_group
         assignment.set('assignment_group_id', assignment_group.id)
@@ -159,7 +159,13 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   cacheKey() {
-    return ['course', this.course.get('id'), 'user', ENV.current_user_id, 'assignments_show_by_date']
+    return [
+      'course',
+      this.course.get('id'),
+      'user',
+      ENV.current_user_id,
+      'assignments_show_by_date'
+    ]
   }
 
   toggleShowBy(sort) {

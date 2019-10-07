@@ -63,7 +63,7 @@ export default class FeatureFlagAdminView extends Backbone.View {
   }
 
   shouldShowTitles(features) {
-    const counts = _.map(this.featureGroups, key => features[key] ? features[key].length : 0)
+    const counts = _.map(this.featureGroups, key => (features[key] ? features[key].length : 0))
     return _.reject(counts, count => count === 0).length > 1
   }
 

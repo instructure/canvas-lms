@@ -27,7 +27,6 @@ import Group from '../../../models/Group'
 import template from 'jst/groups/manage/groupCategoryDetail'
 
 export default class GroupCategoryDetailView extends View {
-
   static initClass() {
     this.prototype.template = template
 

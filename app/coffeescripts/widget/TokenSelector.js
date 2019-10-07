@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import TokenSelectorList from '../widget/TokenSelectorList'
+import TokenSelectorList from './TokenSelectorList'
 import RecipientCollection from '../collections/RecipientCollection'
 import 'jquery.instructure_misc_helpers'
 import '../jquery/scrollIntoView'
@@ -106,16 +106,14 @@ export default class TokenSelector {
         }
       } else if (this.selectionToggleable() && $(e.target).closest('a.toggle').length) {
         this.toggleSelection()
+      } else if (this.selectionExpanded()) {
+        this.collapse()
+      } else if (this.selectionExpandable()) {
+        this.expandSelection()
       } else {
-        if (this.selectionExpanded()) {
-          this.collapse()
-        } else if (this.selectionExpandable()) {
-          this.expandSelection()
-        } else {
-          this.toggleSelection(true)
-          this.clear()
-          this.close()
-        }
+        this.toggleSelection(true)
+        this.clear()
+        this.close()
       }
     }
     return this.input.focus()
@@ -452,15 +450,15 @@ export default class TokenSelector {
         ? this.selection.next().length
           ? this.selection.next()
           : this.selection.parent('ul').next().length
-            ? this.selection
-                .parent('ul')
-                .next()
-                .find('li')
-                .first()
-            : null
+          ? this.selection
+              .parent('ul')
+              .next()
+              .find('li')
+              .first()
+          : null
         : this.list != null
-          ? this.list.first()
-          : undefined,
+        ? this.list.first()
+        : undefined,
       preserveMode
     )
     if (this.selection != null ? this.selection.hasClass('message') : undefined) {
@@ -476,15 +474,15 @@ export default class TokenSelector {
           : undefined)
           ? this.selection.prev()
           : this.selection.parent('ul').prev().length
-            ? this.selection
-                .parent('ul')
-                .prev()
-                .find('li')
-                .last()
-            : null
+          ? this.selection
+              .parent('ul')
+              .prev()
+              .find('li')
+              .last()
+          : null
         : this.list != null
-          ? this.list.last()
-          : undefined
+        ? this.list.last()
+        : undefined
     )
     if (this.selection != null ? this.selection.hasClass('message') : undefined) {
       return this.selectPrev()
@@ -543,6 +541,7 @@ export default class TokenSelector {
     }
     return postData
   }
+
   collectionForQuery(query) {
     if (this.lastFetch != null) {
       this.lastFetch.abort()

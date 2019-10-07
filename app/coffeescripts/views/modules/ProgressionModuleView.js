@@ -15,57 +15,56 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from "i18n!context_modules";
+import I18n from 'i18n!context_modules'
 
-import Backbone from "Backbone";
-import template from "jst/modules/ProgressionModuleView";
+import Backbone from 'Backbone'
+import template from 'jst/modules/ProgressionModuleView'
 
-let ProgressionModuleView;
+let ProgressionModuleView
 
 export default ProgressionModuleView = (function() {
   ProgressionModuleView = class ProgressionModuleView extends Backbone.View {
     static initClass() {
-
-      this.prototype.tagName = 'li';
-      this.prototype.className = 'progressionModule';
-      this.prototype.template = template;
+      this.prototype.tagName = 'li'
+      this.prototype.className = 'progressionModule'
+      this.prototype.template = template
 
       this.prototype.statuses = {
-        "started"   : I18n.t("module_started", "In Progress"),
-        "completed" : I18n.t("module_complete", "Complete"),
-        "unlocked"  : I18n.t("module_unlocked", "Unlocked"),
-        "locked"    : I18n.t("module_locked", "Locked")
-      };
+        started: I18n.t('module_started', 'In Progress'),
+        completed: I18n.t('module_complete', 'Complete'),
+        unlocked: I18n.t('module_unlocked', 'Unlocked'),
+        locked: I18n.t('module_locked', 'Locked')
+      }
 
       this.prototype.iconClasses = {
-        'ModuleItem'          : "icon-module",
-        'File'                : "icon-paperclip",
-        'Page'                : "icon-document",
-        'Discussion'          : "icon-discussion",
-        'Assignment'          : "icon-assignment",
-        'Quiz'                : "icon-quiz",
-        'ExternalTool'        : "icon-link",
-        'Lti::MessageHandler' : "icon-link"
-      };
+        ModuleItem: 'icon-module',
+        File: 'icon-paperclip',
+        Page: 'icon-document',
+        Discussion: 'icon-discussion',
+        Assignment: 'icon-assignment',
+        Quiz: 'icon-quiz',
+        ExternalTool: 'icon-link',
+        'Lti::MessageHandler': 'icon-link'
+      }
     }
 
     toJSON() {
-      const json = super.toJSON(...arguments);
-      json.student_id = this.model.collection.student_id;
-      json.status_text = this.statuses[json.state];
-      json[json.state] = true;
+      const json = super.toJSON(...arguments)
+      json.student_id = this.model.collection.student_id
+      json.status_text = this.statuses[json.state]
+      json[json.state] = true
 
-      for (let item of json.items) {
-        item.icon_class = this.iconClasses[item.type] || this.iconClasses['ModuleItem'];
+      for (const item of json.items) {
+        item.icon_class = this.iconClasses[item.type] || this.iconClasses.ModuleItem
       }
-      return json;
+      return json
     }
 
     afterRender() {
-      super.afterRender(...arguments);
-      return this.model.collection.syncHeight();
+      super.afterRender(...arguments)
+      return this.model.collection.syncHeight()
     }
-  };
-  ProgressionModuleView.initClass();
-  return ProgressionModuleView;
-})();
+  }
+  ProgressionModuleView.initClass()
+  return ProgressionModuleView
+})()

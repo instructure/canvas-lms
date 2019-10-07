@@ -28,7 +28,6 @@ import 'jqueryui/dialog'
 import 'mathquill'
 
 export default class EquationEditorView extends Backbone.View {
-
   static initClass() {
     this.prototype.template = template
 
@@ -44,7 +43,7 @@ export default class EquationEditorView extends Backbone.View {
     }
   }
 
-  //#
+  // #
   // class method
   //
   // like $.text() / Sizzle.getText(elems), except it also gets alt
@@ -59,7 +58,7 @@ export default class EquationEditorView extends Backbone.View {
       // Get the text from text nodes and CDATA nodes
       if ([3, 4].includes(elem.nodeType)) {
         if (elem.nodeValue.match(/^<img/)) {
-          //if the "text" is really just an unparsed "img" node
+          // if the "text" is really just an unparsed "img" node
           // then we really want the alt element
           return self.getEquationText($(elem.nodeValue))
         } else {
@@ -78,7 +77,7 @@ export default class EquationEditorView extends Backbone.View {
       } else if (elem.nodeType !== 8) {
         return self.getEquationText(elem.childNodes)
       }
-    }).join('');
+    }).join('')
   }
 
   getEquationText(elems) {
@@ -113,7 +112,7 @@ export default class EquationEditorView extends Backbone.View {
         {
           class: 'btn-primary',
           text: I18n.t('button.insert_equation', 'Insert Equation'),
-          click: (e) => this.onSubmit(e)
+          click: e => this.onSubmit(e)
         }
       ]
     })

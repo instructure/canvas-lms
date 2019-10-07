@@ -30,7 +30,6 @@ import template from 'jst/quizzes/QuizItemView'
 import 'jquery.disableWhileLoading'
 
 export default class ItemView extends Backbone.View {
-
   static initClass() {
     this.prototype.template = template
 
@@ -48,7 +47,7 @@ export default class ItemView extends Backbone.View {
       'click .delete-item': 'onDelete',
       'click .migrate': 'migrateQuiz',
       'click .quiz-copy-to': 'copyQuizTo',
-      'click .quiz-send-to': 'sendQuizTo',
+      'click .quiz-send-to': 'sendQuizTo'
     }
 
     this.prototype.messages = {

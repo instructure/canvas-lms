@@ -90,10 +90,12 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
     // wait for. This adds a 'setTimeout' which calls reset that fixes display
     // issues and hooks up the click handlers to the sidebar.
     return this.$el.disableWhileLoading(
-      $.when(...Array.from(dfds || [])).done(() => setTimeout(() => {
-        this.reset();
-        return this.$el.find('[tabindex=0]:first').focus();
-      }))
+      $.when(...Array.from(dfds || [])).done(() =>
+        setTimeout(() => {
+          this.reset()
+          return this.$el.find('[tabindex=0]:first').focus()
+        })
+      )
     )
   }
 

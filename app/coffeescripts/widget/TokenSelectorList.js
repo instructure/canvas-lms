@@ -21,7 +21,6 @@ import PaginatedView from '../views/PaginatedView'
 import 'jquery.disableWhileLoading'
 
 export default class TokenSelectorList extends PaginatedView {
-
   static initClass() {
     this.prototype.tagName = 'div'
     this.prototype.className = 'list'

@@ -37,13 +37,14 @@ export default class WikiPageIndexEditDialog extends DialogFormView {
 
     this.prototype.wrapperTemplate = wrapperTemplate
   }
+
   template() {
     return ''
   }
 
   initialize(options = {}) {
     this.returnFocusTo = options.returnFocusTo
-    return super.initialize({...dialogDefaults, ...options});
+    return super.initialize({...dialogDefaults, ...options})
   }
 
   setupDialog() {

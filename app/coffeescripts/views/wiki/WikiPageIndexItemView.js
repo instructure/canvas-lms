@@ -231,7 +231,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
           .find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
-    });
+    })
   }
 
   useAsFrontPage(ev) {
@@ -257,7 +257,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
         const cogs = $('.collectionViewItems').find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
-    });
+    })
   }
 
   sendWikiPageTo(ev) {

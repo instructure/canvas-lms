@@ -42,7 +42,7 @@ export default class IndexView extends Backbone.View {
       this.filterResults()
       return this.announceCount()
     }, 200)
-    //ie10 x-close workaround
+    // ie10 x-close workaround
   }
 
   initialize() {

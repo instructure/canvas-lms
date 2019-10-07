@@ -24,7 +24,7 @@ import $ from 'jquery'
 export default class UploadMediaTrackForm {
   // video url needs to be the url to mp4 version of the video.
   // it will be passed along to amara.org
-  constructor (mediaCommentId, video_url) {
+  constructor(mediaCommentId, video_url) {
     this.mediaCommentId = mediaCommentId
     this.video_url = video_url
     const templateVars = {
@@ -32,20 +32,25 @@ export default class UploadMediaTrackForm {
       video_url: this.video_url,
       is_amazon_url: this.video_url.search(/.mp4/) !== -1
     }
-    this.$dialog = $(template(templateVars)).appendTo('body').dialog({
-      width: 650,
-      resizable: false,
-      buttons: [{
-        'data-text-while-loading': I18n.t('cancel', 'Cancel'),
-        text: I18n.t('cancel', 'Cancel'),
-        click: () => this.$dialog.remove()
-      }, {
-        class: 'btn-primary',
-        'data-text-while-loading': I18n.t('uploading', 'Uploading...'),
-        text: I18n.t('upload', 'Upload'),
-        click: this.onSubmit
-      }]
-    })
+    this.$dialog = $(template(templateVars))
+      .appendTo('body')
+      .dialog({
+        width: 650,
+        resizable: false,
+        buttons: [
+          {
+            'data-text-while-loading': I18n.t('cancel', 'Cancel'),
+            text: I18n.t('cancel', 'Cancel'),
+            click: () => this.$dialog.remove()
+          },
+          {
+            class: 'btn-primary',
+            'data-text-while-loading': I18n.t('uploading', 'Uploading...'),
+            text: I18n.t('upload', 'Upload'),
+            click: this.onSubmit
+          }
+        ]
+      })
   }
 
   onSubmit = () => {
@@ -53,31 +58,43 @@ export default class UploadMediaTrackForm {
     submitDfd.fail(() => this.$dialog.find('.invalidInputMsg').show())
 
     this.$dialog.disableWhileLoading(submitDfd)
-    this.getFileContent().fail(() => submitDfd.reject()).done((content) => {
-      const params = {
-        content,
-        locale: this.$dialog.find('[name="locale"]').val(),
-      }
+    this.getFileContent()
+      .fail(() => submitDfd.reject())
+      .done(content => {
+        const params = {
+          content,
+          locale: this.$dialog.find('[name="locale"]').val()
+        }
 
-      if (!params.content || !params.locale) return submitDfd.reject()
+        if (!params.content || !params.locale) return submitDfd.reject()
 
-
-      return $.ajaxJSON(`/media_objects/${this.mediaCommentId}/media_tracks`, 'POST', params, () => {
-        submitDfd.resolve()
-        this.$dialog.dialog('close')
-        $.flashMessage(I18n.t('track_uploaded_successfully', 'Track uploaded successfully; please refresh your browser.'))
-      }, () => {
-        submitDfd.reject()
+        return $.ajaxJSON(
+          `/media_objects/${this.mediaCommentId}/media_tracks`,
+          'POST',
+          params,
+          () => {
+            submitDfd.resolve()
+            this.$dialog.dialog('close')
+            $.flashMessage(
+              I18n.t(
+                'track_uploaded_successfully',
+                'Track uploaded successfully; please refresh your browser.'
+              )
+            )
+          },
+          () => {
+            submitDfd.reject()
+          }
+        )
       })
-    })
   }
 
-  getFileContent () {
+  getFileContent() {
     const dfd = new $.Deferred()
     const file = this.$dialog.find('input[name="content"]')[0].files[0]
     if (file) {
       const reader = new FileReader()
-      reader.onload = function (e) {
+      reader.onload = function(e) {
         const content = e.target.result
         return dfd.resolve(content)
       }

@@ -23,7 +23,6 @@ import 'jquery.instructure_forms'
 import 'jquery.disableWhileLoading'
 
 export default class FileUploadQuestion extends View {
-
   static initClass() {
     // TODO: Handle quota errors?
     // TODO: Handle upload errors?

@@ -23,7 +23,6 @@ import OutcomeGroup from '../../models/OutcomeGroup'
 
 // Manage the toolbar buttons.
 export default class ToolbarView extends Backbone.View {
-
   static initClass() {
     this.prototype.events = {
       'click .go_back': 'goBack',

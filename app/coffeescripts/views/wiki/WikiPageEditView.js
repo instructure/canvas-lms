@@ -31,7 +31,6 @@ import 'jquery.instructure_date_and_time'
 RichContentEditor.preloadRemoteModule()
 
 export default class WikiPageEditView extends ValidatedFormView {
-
   static initClass() {
     this.mixin({
       els: {
@@ -137,7 +136,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     return this.$studentTodoAtContainer.toggle()
   }
 
-  handleStudentTodoUpdate = (newDate) => {
+  handleStudentTodoUpdate = newDate => {
     this.studentTodoAtDateValue = newDate
     return this.renderStudentTodoAtDate()
   }

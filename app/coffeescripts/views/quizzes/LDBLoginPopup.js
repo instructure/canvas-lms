@@ -65,17 +65,18 @@ export default class LDBLoginPopup extends Backbone.View {
       }
     }
   }
+
   initialize(options) {
     // @property {window} whnd The popup window handle.
     // @private
-    let whnd = undefined
+    let whnd
 
     // @property {CSSStyleSheet[]} styleSheets
     // @private
     //
     // The set of stylesheets to inject into the dialog, parsed from the current
     // page's available stylesheets.
-    let styleSheets = undefined
+    let styleSheets
 
     // @property {jQuery} $delegate
     // @private
@@ -92,7 +93,7 @@ export default class LDBLoginPopup extends Backbone.View {
     // instead of binding to 'click', 'mousedown', or 'keydown' handlers on all
     // of window, document, and document.body to ensure that everything gets
     // captured.
-    let $inputSink = undefined
+    let $inputSink
 
     _.extend(this.options, options)
 
@@ -258,7 +259,7 @@ export default class LDBLoginPopup extends Backbone.View {
       })
 
     if (this.options.sticky) {
-      let relaunch = undefined
+      let relaunch
 
       this.on('login_failure.sticky', () => (relaunch = true))
 

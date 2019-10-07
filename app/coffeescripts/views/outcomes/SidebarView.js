@@ -28,7 +28,6 @@ import FindDirectoryView from './FindDirectoryView'
 let findDialog
 
 export default class SidebarView extends Backbone.View {
-
   static initClass() {
     this.prototype.directoryWidth = 200
     this.prototype.entryHeight = 30
@@ -130,7 +129,7 @@ export default class SidebarView extends Backbone.View {
   // Select the directory view and optionally select an Outcome or Group.
   selectDir(dir, selectedModel) {
     // If root selection is an outcome, don't have a dir. Get root most dir to clear selection.
-    const useDir = dir ? dir : this.directories[0]
+    const useDir = dir || this.directories[0]
     if (useDir && !selectedModel) useDir.clearSelection()
 
     // remove all directories after the selected dir from @directories and the view
@@ -172,11 +171,11 @@ export default class SidebarView extends Backbone.View {
 
   selectedGroup() {
     let g = null
-    this._findLastDir((d) => {
-        if (d.selectedModel instanceof OutcomeGroup) {
-          return g = d.selectedModel;
-        }
-      });
+    this._findLastDir(d => {
+      if (d.selectedModel instanceof OutcomeGroup) {
+        return (g = d.selectedModel)
+      }
+    })
     return g || this.rootOutcomeGroup
   }
 

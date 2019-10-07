@@ -24,7 +24,6 @@ import wrapper from 'jst/EmptyDialogFormWrapper'
 import groupHasSubmissions from '../../../util/groupHasSubmissions'
 
 export default class RandomlyAssignMembersView extends DialogFormView {
-
   static initClass() {
     this.prototype.defaults = {
       title: I18n.t('randomly_assigning_members', 'Randomly Assigning Students'),

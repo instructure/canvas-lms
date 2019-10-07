@@ -29,7 +29,6 @@ import htmlEscape from 'str/htmlEscape'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 
 export default class TopicView extends Backbone.View {
-
   static initClass() {
     this.prototype.events = {
       // #
@@ -192,13 +191,11 @@ export default class TopicView extends Backbone.View {
     }
     if (this.reply == null) {
       this.reply = new Reply(this, {topLevel: true, focus: true})
-      this.reply.on(
-        'edit',
-        () => (this.$addRootReply != null ? this.$addRootReply.hide() : undefined)
+      this.reply.on('edit', () =>
+        this.$addRootReply != null ? this.$addRootReply.hide() : undefined
       )
-      this.reply.on(
-        'hide',
-        () => (this.$addRootReply != null ? this.$addRootReply.show() : undefined)
+      this.reply.on('hide', () =>
+        this.$addRootReply != null ? this.$addRootReply.show() : undefined
       )
       this.reply.on('save', entry => {
         ENV.DISCUSSION.CAN_SUBSCRIBE = true

@@ -22,7 +22,6 @@ import _ from 'underscore'
 import {View} from 'Backbone'
 
 export default class SearchableSubmenuView extends View {
-
   initialize() {
     super.initialize(...arguments)
     const content_type = this.$el.children('[data-content-type]').data('content-type')

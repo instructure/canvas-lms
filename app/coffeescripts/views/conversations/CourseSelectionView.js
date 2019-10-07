@@ -26,7 +26,6 @@ import 'vendor/bootstrap/bootstrap-dropdown'
 import 'vendor/bootstrap-select/bootstrap-select'
 
 export default class CourseSelectionView extends View {
-
   static initClass() {
     this.prototype.events = {change: 'onChange'}
 
