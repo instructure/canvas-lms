@@ -21,18 +21,16 @@ import {mount} from 'enzyme'
 import ToolConfigurationForm from '../ToolConfigurationForm'
 
 function newProps(overrides = {}) {
-  return Object.assign({},
-    {
-      toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
-      toolConfigurationUrl: 'https://www.test.com/config.json',
-      validScopes: {},
-      validPlacements: [],
-      dispatch: jest.fn(),
-      setLtiConfigurationMethod: jest.fn(),
-      configurationMethod: 'json'
-    },
-    overrides
-  )
+  return {
+    toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
+    toolConfigurationUrl: 'https://www.test.com/config.json',
+    validScopes: {},
+    validPlacements: [],
+    dispatch: jest.fn(),
+    setLtiConfigurationMethod: jest.fn(),
+    configurationMethod: 'json',
+    ...overrides
+  }
 }
 
 let wrapper = 'empty wrapper'

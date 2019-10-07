@@ -75,7 +75,7 @@ const types = [
 const actions = Object.assign(createActions(...types), discussionActions.actionCreators)
 
 function copyAndUpdateDiscussion(discussion, updatedFields, focusOn) {
-  const discussionCopy = Object.assign({}, discussion)
+  const discussionCopy = {...discussion}
   Object.keys(updatedFields).forEach(key => {
     if (!Object.prototype.hasOwnProperty.call(discussion, key)) {
       throw new Error(`field ${key} does not exist in the discussion`)

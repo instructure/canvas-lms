@@ -190,7 +190,8 @@ export default class DiscussionSettings extends Component {
           <Modal.Footer>
             <Button disabled={this.props.isSavingSettings} onClick={this.props.toggleModalOpen}>
               {I18n.t('Cancel')}
-            </Button>&nbsp;
+            </Button>
+            &nbsp;
             <Button
               id="submit_discussion_settings"
               disabled={this.props.isSavingSettings}

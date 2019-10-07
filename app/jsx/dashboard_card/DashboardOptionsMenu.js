@@ -93,7 +93,9 @@ export default class DashboardOptionsMenu extends React.Component {
           selected={[this.props.view]}
         >
           <Menu.Item value="cards">{I18n.t('Card View')}</Menu.Item>
-          {this.props.planner_enabled && <Menu.Item value="planner">{I18n.t('List View')}</Menu.Item>}
+          {this.props.planner_enabled && (
+            <Menu.Item value="planner">{I18n.t('List View')}</Menu.Item>
+          )}
           <Menu.Item value="activity">{I18n.t('Recent Activity')}</Menu.Item>
         </Menu.Group>
         {cardView && <Menu.Separator />}

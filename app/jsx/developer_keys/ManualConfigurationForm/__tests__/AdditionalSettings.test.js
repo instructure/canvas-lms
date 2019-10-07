@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import get from 'lodash/get'
 
 import AdditionalSettings from '../AdditionalSettings'
@@ -44,25 +44,21 @@ const props = (overrides = {}, additionalSettingsOverrides = {}, settingsOverrid
 it('generates the toolConfiguration', () => {
   const wrapper = mount(<AdditionalSettings {...props()} />)
   const toolConfig = wrapper.instance().generateToolConfigurationPart()
-  expect(toolConfig.extensions.length).toEqual(1);
+  expect(toolConfig.extensions.length).toEqual(1)
   const ext = toolConfig.extensions[0]
-  expect(ext.domain).toEqual('www.example.com');
+  expect(ext.domain).toEqual('www.example.com')
   expect(Object.keys(ext.settings).length).toEqual(4)
 })
 
 const checkToolConfigPart = (toolConfig, path, value) => {
-  expect(get(toolConfig, path)).toEqual(value);
+  expect(get(toolConfig, path)).toEqual(value)
 }
 
 const checkChange = (path, funcName, value) => {
   const wrapper = mount(<AdditionalSettings {...props()} />)
 
-  wrapper.instance()[funcName]({target: { value }})
-  checkToolConfigPart(
-    wrapper.instance().generateToolConfigurationPart(),
-    path,
-    value
-  )
+  wrapper.instance()[funcName]({target: {value}})
+  checkToolConfigPart(wrapper.instance().generateToolConfigurationPart(), path, value)
 }
 
 it('changes the output when domain changes', () => {
@@ -74,7 +70,11 @@ it('changes the output when tool_id changes', () => {
 })
 
 it('changes the output when icon_url changes', () => {
-  checkChange(['extensions', '0', 'settings', 'icon_url'], 'handleIconUrlChange', 'http://example.com/new_icon')
+  checkChange(
+    ['extensions', '0', 'settings', 'icon_url'],
+    'handleIconUrlChange',
+    'http://example.com/new_icon'
+  )
 })
 
 it('changes the output when text changes', () => {
@@ -82,7 +82,11 @@ it('changes the output when text changes', () => {
 })
 
 it('changes the output when selection_height changes', () => {
-  checkChange(['extensions', '0', 'settings', 'selection_height'], 'handleSelectionHeightChange', 250)
+  checkChange(
+    ['extensions', '0', 'settings', 'selection_height'],
+    'handleSelectionHeightChange',
+    250
+  )
 })
 
 it('changes the output when selection_width changes', () => {

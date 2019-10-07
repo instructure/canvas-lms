@@ -47,10 +47,10 @@ const developerKeysHandlers = {
     listDeveloperKeyScopesError: true
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEY_SCOPES_SET]: (state, action) => {
-      return {
-        ...state,
-        selectedScopes: action.payload
-      }
+    return {
+      ...state,
+      selectedScopes: action.payload
+    }
   }
 }
 

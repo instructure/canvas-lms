@@ -17,48 +17,48 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import sinon from 'sinon'
 import Scopes from '../Scopes'
 
 function props(pending = false, requireScopes = true, onRequireScopesChange = () => {}) {
-  return({
-      developerKey: {},
-      availableScopes: {
-        "oauth":[
-           {
-              "resource":"oauth",
-              "verb":"GET",
-              "scope":"/auth/userinfo"
-           }
-        ],
-        "account_domain_lookups":[
-           {
-              "resource":"account_domain_lookups",
-              "verb":"GET",
-              "path":"/api/v1/accounts/search",
-              "scope":"url:GET|/api/v1/accounts/search"
-           },
-           {
-              "resource":"account_domain_lookups",
-              "verb":"POST",
-              "path":"/api/v1/account_domain_lookups",
-              "scope":"url:POST|/api/v1/account_domain_lookups"
-           }
-        ]
-      },
-      availableScopesPending: pending,
-      dispatch: () => {},
-      listScopesSet: () => {},
-      requireScopes,
-      onRequireScopesChange
-    })
+  return {
+    developerKey: {},
+    availableScopes: {
+      oauth: [
+        {
+          resource: 'oauth',
+          verb: 'GET',
+          scope: '/auth/userinfo'
+        }
+      ],
+      account_domain_lookups: [
+        {
+          resource: 'account_domain_lookups',
+          verb: 'GET',
+          path: '/api/v1/accounts/search',
+          scope: 'url:GET|/api/v1/accounts/search'
+        },
+        {
+          resource: 'account_domain_lookups',
+          verb: 'POST',
+          path: '/api/v1/account_domain_lookups',
+          scope: 'url:POST|/api/v1/account_domain_lookups'
+        }
+      ]
+    },
+    availableScopesPending: pending,
+    dispatch: () => {},
+    listScopesSet: () => {},
+    requireScopes,
+    onRequireScopesChange
+  }
 }
 
 it('renders a spinner if scope state is "pending"', () => {
   const wrapper = mount(<Scopes {...props(true)} />)
   const spinner = wrapper.find('#scopes-loading-spinner')
-  expect(spinner.text()).toBe("Loading Available Scopes")
+  expect(spinner.text()).toBe('Loading Available Scopes')
 })
 
 it('renders scopes if scope state is not "pending"', () => {
@@ -74,7 +74,7 @@ it('defaults the filter state to an empty string', () => {
 
 it('handles filter input change by setting the filter state', () => {
   const wrapper = mount(<Scopes {...props()} />)
-  const eventDup = { currentTarget: { value: 'banana' } }
+  const eventDup = {currentTarget: {value: 'banana'}}
   wrapper.instance().handleFilterChange(eventDup)
   expect(wrapper.state().filter).toBe('banana')
 })
@@ -99,7 +99,6 @@ it('renders ScopesList if requireScopes is true', () => {
   expect(wrapper.find('ScopesList')).toHaveLength(1)
 })
 
-
 it('does render search box if requireScopes is true', () => {
   const wrapper = mount(<Scopes {...props()} />)
   expect(wrapper.find('TextInput')).toHaveLength(1)
@@ -108,6 +107,10 @@ it('does render search box if requireScopes is true', () => {
 it('controls requireScopes change when clicking requireScopes button', () => {
   const requireScopesStub = sinon.stub()
   const wrapper = mount(<Scopes {...props(undefined, true, requireScopesStub)} />)
-  wrapper.find('Checkbox').filterWhere(n => n.prop('variant') === 'toggle').props().onChange()
+  wrapper
+    .find('Checkbox')
+    .filterWhere(n => n.prop('variant') === 'toggle')
+    .props()
+    .onChange()
   expect(requireScopesStub.called).toBe(true)
 })

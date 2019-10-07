@@ -26,115 +26,118 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconEditLine, IconEyeLine, IconOffLine, IconTrashLine} from '@instructure/ui-icons'
 
 class DeveloperKeyActionButtons extends React.Component {
-  makeVisibleLinkHandler = (event) => {
-    const { dispatch, makeVisibleDeveloperKey, developerKey } = this.props
+  makeVisibleLinkHandler = event => {
+    const {dispatch, makeVisibleDeveloperKey, developerKey} = this.props
     event.preventDefault()
     dispatch(makeVisibleDeveloperKey(developerKey))
   }
 
-  makeInvisibleLinkHandler = (event) => {
-    const { dispatch, makeInvisibleDeveloperKey, developerKey } = this.props
+  makeInvisibleLinkHandler = event => {
+    const {dispatch, makeInvisibleDeveloperKey, developerKey} = this.props
     event.preventDefault()
     dispatch(makeInvisibleDeveloperKey(developerKey))
   }
 
-  deleteLinkHandler = (event) => {
-    const { dispatch, deleteDeveloperKey, developerKey, onDelete } = this.props
+  deleteLinkHandler = event => {
+    const {dispatch, deleteDeveloperKey, developerKey, onDelete} = this.props
     event.preventDefault()
     const confirmResult = confirm(this.confirmationMessage(developerKey))
     if (confirmResult) {
       const callBack = onDelete()
-      deleteDeveloperKey(developerKey)(dispatch)
-        .then(() => { callBack() })
+      deleteDeveloperKey(developerKey)(dispatch).then(() => {
+        callBack()
+      })
     }
   }
 
-  editLinkHandler = (event) => {
-    const { dispatch, editDeveloperKey, developerKeysModalOpen, developerKey, ltiKeysSetLtiKey, developerKey: {is_lti_key} } = this.props
+  editLinkHandler = event => {
+    const {
+      dispatch,
+      editDeveloperKey,
+      developerKeysModalOpen,
+      developerKey,
+      ltiKeysSetLtiKey,
+      developerKey: {is_lti_key}
+    } = this.props
 
     event.preventDefault()
-    if (is_lti_key) { dispatch(ltiKeysSetLtiKey(true)) }
+    if (is_lti_key) {
+      dispatch(ltiKeysSetLtiKey(true))
+    }
     dispatch(editDeveloperKey(developerKey))
     dispatch(developerKeysModalOpen(is_lti_key ? 'lti' : 'api'))
   }
 
-  focusDeleteLink = () => { this.deleteLink.focus() }
+  focusDeleteLink = () => {
+    this.deleteLink.focus()
+  }
 
-  refDeleteLink = (link) => { this.deleteLink = link; }
+  refDeleteLink = link => {
+    this.deleteLink = link
+  }
 
   confirmationMessage(developerKey) {
     if (developerKey.is_lti_key) {
       return I18n.t(
-        "Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context."
+        'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
       )
     }
     return I18n.t('Are you sure you want to delete this developer key?')
   }
 
-  renderVisibilityIcon () {
-    const { developerName, visible, showVisibilityToggle } = this.props
-    if (!showVisibilityToggle) { return null }
+  renderVisibilityIcon() {
+    const {developerName, visible, showVisibilityToggle} = this.props
+    if (!showVisibilityToggle) {
+      return null
+    }
     if (visible) {
-      return <Tooltip
-        tip={I18n.t("Make key invisible")}
-      >
-        <Button
-          variant="icon"
-          margin="0"
-          size="small"
-          onClick={this.makeInvisibleLinkHandler}
-        >
-          <ScreenReaderContent>{I18n.t('Make key %{developerName} invisible', {developerName})}</ScreenReaderContent>
-          <IconEyeLine />
-        </Button>
-      </Tooltip>
+      return (
+        <Tooltip tip={I18n.t('Make key invisible')}>
+          <Button variant="icon" margin="0" size="small" onClick={this.makeInvisibleLinkHandler}>
+            <ScreenReaderContent>
+              {I18n.t('Make key %{developerName} invisible', {developerName})}
+            </ScreenReaderContent>
+            <IconEyeLine />
+          </Button>
+        </Tooltip>
+      )
     }
 
-    return <Tooltip
-      tip={I18n.t("Make key visible")}
-    >
-      <Button
-        variant="icon"
-        margin="0"
-        size="small"
-        onClick={this.makeVisibleLinkHandler}
-      >
-        <ScreenReaderContent>{I18n.t('Make key %{developerName} visible', {developerName})}</ScreenReaderContent>
-        <IconOffLine />
-      </Button>
-    </Tooltip>
+    return (
+      <Tooltip tip={I18n.t('Make key visible')}>
+        <Button variant="icon" margin="0" size="small" onClick={this.makeVisibleLinkHandler}>
+          <ScreenReaderContent>
+            {I18n.t('Make key %{developerName} visible', {developerName})}
+          </ScreenReaderContent>
+          <IconOffLine />
+        </Button>
+      </Tooltip>
+    )
   }
 
-  renderEditButton () {
-    const { developerName } = this.props;
+  renderEditButton() {
+    const {developerName} = this.props
 
     return (
-      <Tooltip
-          tip={I18n.t("Edit this key")}
-        >
-        <Button
-          variant="icon"
-          margin="0"
-          size="small"
-          onClick={this.editLinkHandler}
-        >
-          <ScreenReaderContent>{I18n.t("Edit key %{developerName}", {developerName})}</ScreenReaderContent>
+      <Tooltip tip={I18n.t('Edit this key')}>
+        <Button variant="icon" margin="0" size="small" onClick={this.editLinkHandler}>
+          <ScreenReaderContent>
+            {I18n.t('Edit key %{developerName}', {developerName})}
+          </ScreenReaderContent>
           <IconEditLine />
         </Button>
       </Tooltip>
     )
   }
 
-  render () {
-    const { developerName } = this.props;
+  render() {
+    const {developerName} = this.props
 
     return (
       <div>
         {this.renderEditButton()}
         {this.renderVisibilityIcon()}
-        <Tooltip
-          tip={I18n.t("Delete this key")}
-        >
+        <Tooltip tip={I18n.t('Delete this key')}>
           <Button
             variant="icon"
             margin="0"
@@ -142,13 +145,15 @@ class DeveloperKeyActionButtons extends React.Component {
             onClick={this.deleteLinkHandler}
             buttonRef={this.refDeleteLink}
           >
-            <ScreenReaderContent>{I18n.t("Delete key %{developerName}", {developerName})}</ScreenReaderContent>
+            <ScreenReaderContent>
+              {I18n.t('Delete key %{developerName}', {developerName})}
+            </ScreenReaderContent>
             <IconTrashLine />
           </Button>
         </Tooltip>
       </div>
-    );
-  };
+    )
+  }
 }
 
 DeveloperKeyActionButtons.propTypes = {
@@ -169,7 +174,7 @@ DeveloperKeyActionButtons.propTypes = {
   developerName: PropTypes.string.isRequired,
   onDelete: PropTypes.func.isRequired,
   showVisibilityToggle: PropTypes.bool
-};
+}
 
 DeveloperKeyActionButtons.defaultProps = {
   showVisibilityToggle: true

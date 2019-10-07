@@ -27,7 +27,7 @@ import PropTypes from 'prop-types'
 import DeveloperKeysTable from './AdminTable'
 import DeveloperKey from './DeveloperKey'
 import NewKeyModal from './NewKeyModal'
-import DeveloperKeyModalTrigger from "./NewKeyTrigger"
+import DeveloperKeyModalTrigger from './NewKeyTrigger'
 
 class DeveloperKeysApp extends React.Component {
   state = {
@@ -35,20 +35,38 @@ class DeveloperKeysApp extends React.Component {
   }
 
   get isSiteAdmin() {
-    return this.props.ctx.params.contextId === "site_admin"
+    return this.props.ctx.params.contextId === 'site_admin'
   }
 
-  setMainTableRef = (node) => { this.mainTableRef = node }
-  setInheritedTableRef = (node) => { this.inheritedTableRef = node }
-  setAddKeyButtonRef = (node) => { this.addDevKeyButton = node }
-  setInheritedTabRef = (node) => { this.inheritedTab = node }
+  setMainTableRef = node => {
+    this.mainTableRef = node
+  }
 
-  focusDevKeyButton = () => { this.addDevKeyButton.focus() }
-  focusInheritedTab = () => { this.setState({focusTab: true}) }
+  setInheritedTableRef = node => {
+    this.inheritedTableRef = node
+  }
+
+  setAddKeyButtonRef = node => {
+    this.addDevKeyButton = node
+  }
+
+  setInheritedTabRef = node => {
+    this.inheritedTab = node
+  }
+
+  focusDevKeyButton = () => {
+    this.addDevKeyButton.focus()
+  }
+
+  focusInheritedTab = () => {
+    this.setState({focusTab: true})
+  }
 
   showMoreButtonHandler = _event => {
     const {
-      applicationState: {listDeveloperKeys: {nextPage}},
+      applicationState: {
+        listDeveloperKeys: {nextPage}
+      },
       store: {dispatch},
       actions: {getRemainingDeveloperKeys}
     } = this.props
@@ -57,39 +75,48 @@ class DeveloperKeysApp extends React.Component {
   }
 
   showMoreButton() {
-    const {applicationState: {listDeveloperKeys: {listDeveloperKeysPending, nextPage}}} = this.props
+    const {
+      applicationState: {
+        listDeveloperKeys: {listDeveloperKeysPending, nextPage}
+      }
+    } = this.props
 
     if (nextPage && !listDeveloperKeysPending) {
-      return (
-        <Button onClick={this.showMoreButtonHandler}>
-          {I18n.t("Show All Keys")}
-        </Button>)
+      return <Button onClick={this.showMoreButtonHandler}>{I18n.t('Show All Keys')}</Button>
     }
     return null
   }
 
   showMoreInheritedButtonHandler = _event => {
     const {
-      applicationState: {listDeveloperKeys: {inheritedNextPage}},
+      applicationState: {
+        listDeveloperKeys: {inheritedNextPage}
+      },
       store: {dispatch},
       actions: {getRemainingInheritedDeveloperKeys}
     } = this.props
 
     const callBack = this.inheritedTableRef.createSetFocusCallback()
-    getRemainingInheritedDeveloperKeys(inheritedNextPage, [], callBack)(dispatch)
-      .then((foundActiveKey) => {if (!foundActiveKey) {this.focusInheritedTab()}})
+    getRemainingInheritedDeveloperKeys(inheritedNextPage, [], callBack)(dispatch).then(
+      foundActiveKey => {
+        if (!foundActiveKey) {
+          this.focusInheritedTab()
+        }
+      }
+    )
   }
 
   showMoreInheritedButton() {
     const {
-      applicationState: {listDeveloperKeys: {listInheritedDeveloperKeysPending, inheritedNextPage}}
+      applicationState: {
+        listDeveloperKeys: {listInheritedDeveloperKeysPending, inheritedNextPage}
+      }
     } = this.props
 
     if (inheritedNextPage && !listInheritedDeveloperKeysPending) {
       return (
-        <Button onClick={this.showMoreInheritedButtonHandler}>
-          {I18n.t("Show All Keys")}
-        </Button>)
+        <Button onClick={this.showMoreInheritedButtonHandler}>{I18n.t('Show All Keys')}</Button>
+      )
     }
     return null
   }
@@ -113,11 +140,7 @@ class DeveloperKeysApp extends React.Component {
     } = this.props
     return (
       <div>
-        <View
-          as="div"
-          margin="0 0 small 0"
-          padding="none"
-        >
+        <View as="div" margin="0 0 small 0" padding="none">
           <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
         </View>
         <TabList variant="minimal" focus={this.state.focusTab}>
@@ -145,43 +168,30 @@ class DeveloperKeysApp extends React.Component {
               ctx={ctx}
               setFocus={this.focusDevKeyButton}
             />
-            <View
-              as="div"
-              margin="small"
-              padding="large"
-              textAlign="center"
-            >
+            <View as="div" margin="small" padding="large" textAlign="center">
               {listDeveloperKeysPending ? <Spinner renderTitle={I18n.t('Loading')} /> : null}
               {this.showMoreButton()}
             </View>
           </TabList.Panel>
-          {
-            this.isSiteAdmin
-              ? null
-              : <TabList.Panel
-                title={I18n.t('Inherited')}
-                tabRef={this.setInheritedTabRef}
-              >
-                <DeveloperKeysTable
-                  ref={this.setInheritedTableRef}
-                  store={store}
-                  actions={actions}
-                  developerKeysList={inheritedList}
-                  ctx={ctx}
-                  inherited
-                  setFocus={this.focusInheritedTab}
-                />
-                <View
-                  as="div"
-                  margin="small"
-                  padding="large"
-                  textAlign="center"
-                >
-                  {listInheritedDeveloperKeysPending ? <Spinner renderTitle={I18n.t('Loading')} /> : null}
-                  {this.showMoreInheritedButton()}
-                </View>
-              </TabList.Panel>
-          }
+          {this.isSiteAdmin ? null : (
+            <TabList.Panel title={I18n.t('Inherited')} tabRef={this.setInheritedTabRef}>
+              <DeveloperKeysTable
+                ref={this.setInheritedTableRef}
+                store={store}
+                actions={actions}
+                developerKeysList={inheritedList}
+                ctx={ctx}
+                inherited
+                setFocus={this.focusInheritedTab}
+              />
+              <View as="div" margin="small" padding="large" textAlign="center">
+                {listInheritedDeveloperKeysPending ? (
+                  <Spinner renderTitle={I18n.t('Loading')} />
+                ) : null}
+                {this.showMoreInheritedButton()}
+              </View>
+            </TabList.Panel>
+          )}
         </TabList>
       </div>
     )
@@ -218,7 +228,7 @@ DeveloperKeysApp.propTypes = {
     params: PropTypes.shape({
       contextId: PropTypes.string.isRequired
     })
-  }).isRequired,
+  }).isRequired
 }
 
 export default DeveloperKeysApp

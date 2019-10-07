@@ -27,7 +27,7 @@ import ScopesMethod from './ScopesMethod'
 import DeveloperKeyScope from './Scope'
 
 export default class ScopesGroup extends React.Component {
-  state = { groupChecked: this.allScopesAreSelected(this.props) }
+  state = {groupChecked: this.allScopesAreSelected(this.props)}
 
   componentWillReceiveProps(nextProps) {
     this.setState({
@@ -82,9 +82,7 @@ export default class ScopesGroup extends React.Component {
         <Flex.Item padding="0 x-small 0 0">
           <Text size="medium">{this.props.name}</Text>
         </Flex.Item>
-        <Flex.Item>
-          {this.selectedMethods()}
-        </Flex.Item>
+        <Flex.Item>{this.selectedMethods()}</Flex.Item>
       </Flex>
     )
   }
@@ -127,13 +125,9 @@ export default class ScopesGroup extends React.Component {
 
   render() {
     return (
-      <View
-        as="div"
-        borderWidth="none none small none"
-        data-automation="scopes-group"
-      >
+      <View as="div" borderWidth="none none small none" data-automation="scopes-group">
         <Flex alignItems="start" padding="small none small small">
-        <Flex.Item padding="none small none none">
+          <Flex.Item padding="none small none none">
             <Checkbox
               label={
                 <ScreenReaderContent>

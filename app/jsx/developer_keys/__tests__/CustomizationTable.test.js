@@ -21,13 +21,14 @@ import {mount} from 'enzyme'
 import CustomizationTable from '../CustomizationTable'
 
 function newProps(overrides = {}) {
-  return Object.assign({
+  return {
     name: 'Scopes',
     type: 'scope',
     options: ['Manage Line Items', 'Create Line Items'],
     onOptionToggle: () => {},
-    selectedOptions: []
-  }, overrides)
+    selectedOptions: [],
+    ...overrides
+  }
 }
 
 let wrapper = 'empty wrapper'

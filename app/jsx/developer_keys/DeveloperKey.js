@@ -33,66 +33,52 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 import DeveloperKeyActionButtons from './ActionButtons'
 import DeveloperKeyStateControl from './InheritanceStateControl'
 
-
 class DeveloperKey extends React.Component {
-  state = { showKey: false }
+  state = {showKey: false}
 
   get isSiteAdmin() {
-    return this.props.ctx.params.contextId === "site_admin"
+    return this.props.ctx.params.contextId === 'site_admin'
   }
 
-  activateLinkHandler = (event) => {
+  activateLinkHandler = event => {
     event.preventDefault()
-    this.props.store.dispatch(
-      this.props.actions.activateDeveloperKey(
-        this.props.developerKey
-      )
-    )
+    this.props.store.dispatch(this.props.actions.activateDeveloperKey(this.props.developerKey))
   }
 
-  deactivateLinkHandler = (event) => {
+  deactivateLinkHandler = event => {
     event.preventDefault()
-    this.props.store.dispatch(
-      this.props.actions.deactivateDeveloperKey(
-        this.props.developerKey
-      )
-    )
+    this.props.store.dispatch(this.props.actions.deactivateDeveloperKey(this.props.developerKey))
   }
 
-  getToolName () {
+  getToolName() {
     return this.props.developerKey.name || I18n.t('Unnamed Tool')
   }
 
-  ownerEmail (developerKey) {
-    if(developerKey.email) {
+  ownerEmail(developerKey) {
+    if (developerKey.email) {
       return developerKey.email
     }
     return I18n.t('No Email')
   }
 
-  isActive (developerKey) {
-    return developerKey.workflow_state !== "inactive"
+  isActive(developerKey) {
+    return developerKey.workflow_state !== 'inactive'
   }
 
   focusDeleteLink = () => {
-    this.actionButtons.focusDeleteLink();
+    this.actionButtons.focusDeleteLink()
   }
 
   focusToggleGroup = () => {
-    this.toggleGroup.focusToggleGroup();
+    this.toggleGroup.focusToggleGroup()
   }
 
-  isDisabled = () => ( this.toggleGroup.isDisabled() )
+  isDisabled = () => this.toggleGroup.isDisabled()
 
-  makeImage (developerKey) {
+  makeImage(developerKey) {
     if (developerKey.icon_url) {
       return (
-        <View as="div"
-              width="4rem"
-              height="4rem"
-              textAlign="center"
-              margin="0 small 0 0"
-        >
+        <View as="div" width="4rem" height="4rem" textAlign="center" margin="0 small 0 0">
           <Img
             src={developerKey.icon_url}
             constrain="contain"
@@ -104,64 +90,64 @@ class DeveloperKey extends React.Component {
     return <View as="div" height="4rem" width="4rem" margin="0 small 0 0" />
   }
 
-  makeUserLink (developerKey) {
+  makeUserLink(developerKey) {
     const email = this.ownerEmail(developerKey)
-    if (!developerKey.user_id) { return email }
-    return (<Link href={`/users/${developerKey.user_id}`}>{email}</Link> );
+    if (!developerKey.user_id) {
+      return email
+    }
+    return <Link href={`/users/${developerKey.user_id}`}>{email}</Link>
   }
 
-  redirectURI (developerKey) {
-    if (!developerKey.redirect_uri) { return null }
-    const uri = I18n.t("URI: %{redirect_uri}", {redirect_uri: developerKey.redirect_uri})
-    return (<div>{uri}</div>)
+  redirectURI(developerKey) {
+    if (!developerKey.redirect_uri) {
+      return null
+    }
+    const uri = I18n.t('URI: %{redirect_uri}', {redirect_uri: developerKey.redirect_uri})
+    return <div>{uri}</div>
   }
 
-  lastUsed (developerKey) {
-    const lastUsed = I18n.t("Last Used:")
-    const lastUsedDate = developerKey.last_used_at ? developerKey.last_used_at : I18n.t("Never")
+  lastUsed(developerKey) {
+    const lastUsed = I18n.t('Last Used:')
+    const lastUsedDate = developerKey.last_used_at ? developerKey.last_used_at : I18n.t('Never')
     return `${lastUsed} ${lastUsedDate}`
   }
 
-  handleDelete = () => (
-    this.props.onDelete(this.props.developerKey.id)
-  )
+  handleDelete = () => this.props.onDelete(this.props.developerKey.id)
 
   handleShowKey = () => {
     this.setState({showKey: !this.state.showKey})
   }
 
-  refActionButtons = (link) => { this.actionButtons = link; }
-  refToggleGroup = (link) => { this.toggleGroup = link }
+  refActionButtons = link => {
+    this.actionButtons = link
+  }
 
-  render () {
-    const { developerKey, inherited } = this.props;
+  refToggleGroup = link => {
+    this.toggleGroup = link
+  }
+
+  render() {
+    const {developerKey, inherited} = this.props
 
     return (
       <tr>
         <td>
           <Flex>
             {this.makeImage(developerKey)}
-            <Flex.Item shrink>
-            {this.getToolName(developerKey)}
-            </Flex.Item>
+            <Flex.Item shrink>{this.getToolName(developerKey)}</Flex.Item>
           </Flex>
         </td>
 
-        {!inherited &&
-          <td style={{wordBreak: "break-all"}} width="200px">
-              {this.makeUserLink(developerKey)}
+        {!inherited && (
+          <td style={{wordBreak: 'break-all'}} width="200px">
+            {this.makeUserLink(developerKey)}
           </td>
-        }
+        )}
 
         <td>
-          <View
-            maxWidth="200px"
-            as="div"
-          >
-            <div>
-              {developerKey.id}
-            </div>
-            {!inherited &&
+          <View maxWidth="200px" as="div">
+            <div>{developerKey.id}</div>
+            {!inherited && (
               <div>
                 <Popover
                   placement="top"
@@ -172,18 +158,12 @@ class DeveloperKey extends React.Component {
                   shouldReturnFocus
                   shouldCloseOnDocumentClick
                   onDismiss={this.handleShowKey}
-                  label={I18n.t("Key")}
+                  label={I18n.t('Key')}
                 >
                   <Popover.Trigger>
                     <Button onClick={this.handleShowKey} size="small">
-                      {
-                        this.state.showKey ?
-                          I18n.t('Hide Key') :
-                          I18n.t('Show Key')
-                      }
-                      <ScreenReaderContent>
-                        {this.getToolName()}
-                      </ScreenReaderContent>
+                      {this.state.showKey ? I18n.t('Hide Key') : I18n.t('Show Key')}
+                      <ScreenReaderContent>{this.getToolName()}</ScreenReaderContent>
                     </Button>
                   </Popover.Trigger>
                   <Popover.Content>
@@ -196,44 +176,44 @@ class DeveloperKey extends React.Component {
                       {I18n.t('Close')}
                     </CloseButton>
                     <View padding="large small small small" display="block">
-                      { developerKey.api_key }
+                      {developerKey.api_key}
                     </View>
                   </Popover.Content>
                 </Popover>
               </div>
-            }
-            {!inherited &&
-              <div style={{wordBreak: "break-all"}}>
-                {this.redirectURI(developerKey)}
-              </div>
-            }
+            )}
+            {!inherited && (
+              <div style={{wordBreak: 'break-all'}}>{this.redirectURI(developerKey)}</div>
+            )}
           </View>
         </td>
 
-        {!inherited &&
+        {!inherited && (
           <td>
             <div>
-              {I18n.t("Access Token Count: %{access_token_count}", {access_token_count: developerKey.access_token_count})}
+              {I18n.t('Access Token Count: %{access_token_count}', {
+                access_token_count: developerKey.access_token_count
+              })}
             </div>
             <div>
-              {I18n.t("Created: %{created_at}", {created_at: $.datetimeString(developerKey.created_at)})}
+              {I18n.t('Created: %{created_at}', {
+                created_at: $.datetimeString(developerKey.created_at)
+              })}
             </div>
-            <div>
-              {this.lastUsed(developerKey)}
-            </div>
+            <div>{this.lastUsed(developerKey)}</div>
           </td>
-        }
+        )}
         <td>
-          {developerKey.is_lti_key
-            ?  <Tooltip
-                tip={I18n.t("Developer key is an external tool.")}
-                on={['click', 'hover', 'focus']}
-              >
-                <Button variant="icon" icon={IconLtiLine}>
-                  <ScreenReaderContent>{I18n.t("Toggle ToolTip")}</ScreenReaderContent>
-                </Button>
-              </Tooltip>
-            : null}
+          {developerKey.is_lti_key ? (
+            <Tooltip
+              tip={I18n.t('Developer key is an external tool.')}
+              on={['click', 'hover', 'focus']}
+            >
+              <Button variant="icon" icon={IconLtiLine}>
+                <ScreenReaderContent>{I18n.t('Toggle ToolTip')}</ScreenReaderContent>
+              </Button>
+            </Tooltip>
+          ) : null}
         </td>
         <td>
           <DeveloperKeyStateControl
@@ -244,7 +224,7 @@ class DeveloperKey extends React.Component {
             ctx={this.props.ctx}
           />
         </td>
-        {!inherited &&
+        {!inherited && (
           <td>
             <DeveloperKeyActionButtons
               ref={this.refActionButtons}
@@ -257,15 +237,15 @@ class DeveloperKey extends React.Component {
               showVisibilityToggle={this.isSiteAdmin}
             />
           </td>
-        }
+        )}
       </tr>
-    );
-  };
+    )
+  }
 }
 
 DeveloperKey.propTypes = {
   store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired,
+    dispatch: PropTypes.func.isRequired
   }).isRequired,
   actions: PropTypes.shape({
     makeVisibleDeveloperKey: PropTypes.func.isRequired,
@@ -293,8 +273,8 @@ DeveloperKey.propTypes = {
   }).isRequired,
   inherited: PropTypes.bool,
   onDelete: PropTypes.func.isRequired
-};
+}
 
-DeveloperKey.defaultProps = { inherited: false }
+DeveloperKey.defaultProps = {inherited: false}
 
 export default DeveloperKey

@@ -157,7 +157,7 @@ export class DiscussionsContainer extends Component {
       }
     })
     this.setState({discussions: newDiscussions.discussions})
-  };
+  }
 
   renderDiscussions() {
     return this.state.discussions.map(discussion =>
@@ -234,7 +234,7 @@ export const mapState = (state, ownProps) => {
     discussions: filteredDiscussions,
     permissions: state.permissions
   }
-  return Object.assign({}, ownProps, propsFromState)
+  return {...ownProps, ...propsFromState}
 }
 
 const mapDispatch = dispatch => {

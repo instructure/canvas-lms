@@ -23,7 +23,7 @@ import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 
 export default class LtiKeyFooter extends React.Component {
-  get buttonText () {
+  get buttonText() {
     if (this.props.saveOnly) {
       return I18n.t('Save')
     }
@@ -35,9 +35,12 @@ export default class LtiKeyFooter extends React.Component {
   }
 
   onSave = e => {
-    return this.props.onSaveClick(e).then(() => {
-      this.props.dispatch(this.props.ltiKeysSetCustomizing(false))
-    }).catch((err) => err) // validation error most likely
+    return this.props
+      .onSaveClick(e)
+      .then(() => {
+        this.props.dispatch(this.props.ltiKeysSetCustomizing(false))
+      })
+      .catch(err => err) // validation error most likely
   }
 
   onCancel = e => {
@@ -59,7 +62,9 @@ export default class LtiKeyFooter extends React.Component {
   render() {
     return (
       <>
-        <Button onClick={this.onCancel} margin="0 small 0 0">{I18n.t('Cancel')}</Button>
+        <Button onClick={this.onCancel} margin="0 small 0 0">
+          {I18n.t('Cancel')}
+        </Button>
         {this.nextOrSaveButton()}
       </>
     )

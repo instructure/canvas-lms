@@ -47,21 +47,23 @@ describe('saveLtiToolConfiguration', () => {
 
   it('sets the developer key with provided fields', () => {
     save()
-    expect(dispatch).toBeCalledWith(developerKeysActions.setEditingDeveloperKey({name: 'test'}))
+    expect(dispatch).toHaveBeenCalledWith(
+      developerKeysActions.setEditingDeveloperKey({name: 'test'})
+    )
   })
 
   it('sets the tool configuration url if provided', () => {
     save(true)
-    expect(dispatch).toBeCalledWith(actions.setLtiToolConfigurationUrl('test.url'))
+    expect(dispatch).toHaveBeenCalledWith(actions.setLtiToolConfigurationUrl('test.url'))
   })
 
   describe('on successful response', () => {
     it('sets the tool configuration', () => {
-      expect(dispatch).toBeCalledWith(actions.setLtiToolConfiguration({test: 'config'}))
+      expect(dispatch).toHaveBeenCalledWith(actions.setLtiToolConfiguration({test: 'config'}))
     })
 
     it('prepends the developer key to the list', () => {
-      expect(dispatch).toBeCalledWith(
+      expect(dispatch).toHaveBeenCalledWith(
         developerKeysActions.listDeveloperKeysPrepend({
           id: 100000000087,
           name: 'test key',

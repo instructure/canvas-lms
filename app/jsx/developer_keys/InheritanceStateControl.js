@@ -42,7 +42,9 @@ export default class DeveloperKeyStateControl extends React.Component {
 
   isDisabled = () => {
     const devKeyBinding = this.props.developerKey.developer_key_account_binding
-    if (!devKeyBinding || devKeyBinding.workflow_state === 'allow') { return false }
+    if (!devKeyBinding || devKeyBinding.workflow_state === 'allow') {
+      return false
+    }
     return !devKeyBinding.account_owns_binding
   }
 
@@ -55,19 +57,26 @@ export default class DeveloperKeyStateControl extends React.Component {
   }
 
   isSiteAdmin() {
-    return this.props.ctx.params.contextId === "site_admin"
+    return this.props.ctx.params.contextId === 'site_admin'
   }
 
   getDefaultValue() {
-    return this.radioGroupValue() === 'allow' && !this.isSiteAdmin() ? 'off' : this.radioGroupValue()
+    return this.radioGroupValue() === 'allow' && !this.isSiteAdmin()
+      ? 'off'
+      : this.radioGroupValue()
   }
 
   focusToggleGroup = () => {
     this[`${this.getDefaultValue()}Toggle`].focus()
   }
 
-  refOnToggle = (node) => { this.onToggle = node }
-  refOffToggle = (node) => { this.offToggle = node }
+  refOnToggle = node => {
+    this.onToggle = node
+  }
+
+  refOffToggle = node => {
+    this.offToggle = node
+  }
 
   render() {
     return (
@@ -83,7 +92,16 @@ export default class DeveloperKeyStateControl extends React.Component {
         name={this.props.developerKey.id}
       >
         <RadioInput ref={this.refOnToggle} label={I18n.t('On')} value="on" context="success" />
-        {this.isSiteAdmin() && <RadioInput ref={(node) => {this.allowToggle = node}} label={I18n.t('Allow')} value="allow" context="off"/>}
+        {this.isSiteAdmin() && (
+          <RadioInput
+            ref={node => {
+              this.allowToggle = node
+            }}
+            label={I18n.t('Allow')}
+            value="allow"
+            context="off"
+          />
+        )}
         <RadioInput ref={this.refOffToggle} label={I18n.t('Off')} value="off" context="danger" />
       </RadioInputGroup>
     )
@@ -103,7 +121,7 @@ DeveloperKeyStateControl.propTypes = {
     developer_key_account_binding: PropTypes.shape({
       workflow_state: PropTypes.string.isRequired,
       account_owns_binding: PropTypes.bool
-    }),
+    })
   }),
   ctx: PropTypes.shape({
     params: PropTypes.shape({

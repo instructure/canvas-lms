@@ -60,7 +60,7 @@ const reducerMap = {
   },
   [actionTypes.UPDATE_DISCUSSION_SUCCESS]: (state, action) => {
     const updatedDiscussion = action.payload.discussion
-    const newState = Object.assign({}, state)
+    const newState = {...state}
     newState[updatedDiscussion.id] = updatedDiscussion
     return newState
   },
@@ -73,19 +73,19 @@ const reducerMap = {
     }, {}),
   [actionTypes.DRAG_AND_DROP_START]: (state, action) => {
     const updatedDiscussion = action.payload.discussion
-    const newState = Object.assign({}, state)
+    const newState = {...state}
     newState[updatedDiscussion.id] = updatedDiscussion
     return newState
   },
   [actionTypes.DRAG_AND_DROP_FAIL]: (state, action) => {
     const updatedDiscussion = action.payload.discussion
-    const newState = Object.assign({}, state)
+    const newState = {...state}
     newState[updatedDiscussion.id] = updatedDiscussion
     return newState
   },
   [actionTypes.DELETE_DISCUSSION_SUCCESS]: (state, action) => {
     const {focusId, focusOn} = action.payload.nextFocusDiscussion
-    const newState = Object.assign({}, state)
+    const newState = {...state}
     delete newState[action.payload.discussion.id]
     if (focusId) {
       newState[focusId] = {...newState[focusId], focusOn}
@@ -94,7 +94,7 @@ const reducerMap = {
   },
   [actionTypes.DUPLICATE_DISCUSSION_SUCCESS]: (state, action) => {
     const {newDiscussion} = action.payload
-    const newState = Object.assign({}, state)
+    const newState = {...state}
 
     // Add our new discussion to the store
     newState[newDiscussion.id] = newDiscussion

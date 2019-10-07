@@ -22,10 +22,11 @@ import ContentItemProcessor from '../ContentItemProcessor'
 import I18n from 'i18n!external_content.success'
 
 export default function processEditorContentItems(event, editor, dialog) {
-
   const processor = ContentItemProcessor.fromEvent(event, processHandler)
 
-  if (!processor) { return }
+  if (!processor) {
+    return
+  }
 
   processor
     .process(editor)
@@ -33,7 +34,7 @@ export default function processEditorContentItems(event, editor, dialog) {
       // Remove "unsaved changes" warnings and close modal
       dialog.close()
     })
-    .catch((e) => {
+    .catch(e => {
       console.error(e)
       $.flashError(I18n.t('Error retrieving content'))
     })

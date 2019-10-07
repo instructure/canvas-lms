@@ -54,7 +54,12 @@ function renderShowDeveloperKeys(ctx) {
     const view = () => {
       const currentState = store.getState()
       ReactDOM.render(
-        <DeveloperKeysApp applicationState={currentState} actions={actions} store={store} ctx={ctx} />,
+        <DeveloperKeysApp
+          applicationState={currentState}
+          actions={actions}
+          store={store}
+          ctx={ctx}
+        />,
         document.getElementById('reactContent')
       )
     }

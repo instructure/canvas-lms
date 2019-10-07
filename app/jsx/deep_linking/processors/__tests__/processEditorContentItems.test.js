@@ -17,7 +17,7 @@
  */
 
 import ContentItemProcessor from '../../ContentItemProcessor'
-import processEditorContentItems, { processHandler } from '../processEditorContentItems'
+import processEditorContentItems, {processHandler} from '../processEditorContentItems'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 
 jest.mock('jsx/shared/rce/RceCommandShim', () => ({
@@ -105,9 +105,7 @@ describe('processEditorContentItems', () => {
     })
 
     it('creates content for an HTML fragment content item', () => {
-      expect(send.mock.calls[3][2]).toEqual(
-        '<a href=\"www.html.com\">test</a>'
-      )
+      expect(send.mock.calls[3][2]).toEqual('<a href="www.html.com">test</a>')
     })
   })
 

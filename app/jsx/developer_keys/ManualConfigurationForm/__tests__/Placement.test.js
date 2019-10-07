@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import get from 'lodash/get'
 
 import Placement from '../Placement'
@@ -47,21 +47,17 @@ it('generates the toolConfiguration', () => {
 })
 
 const checkToolConfigPart = (toolConfig, path, value) => {
-  expect(get(toolConfig, path)).toEqual(value);
+  expect(get(toolConfig, path)).toEqual(value)
 }
 
 const checkChange = (path, funcName, value, event = null) => {
   const wrapper = mount(<Placement {...props()} />)
 
-  event = event || {target: { value }}
+  event = event || {target: {value}}
   event = Array.isArray(event) ? event : [event]
 
   wrapper.instance()[funcName](...event)
-  checkToolConfigPart(
-    wrapper.instance().generateToolConfigurationPart(),
-    path,
-    value
-  )
+  checkToolConfigPart(wrapper.instance().generateToolConfigurationPart(), path, value)
 }
 
 it('changes the output when target_link_uri changes', () => {
@@ -85,7 +81,10 @@ it('changes the output when selection_width changes', () => {
 })
 
 it('changes the output when message_type changes', () => {
-  checkChange(['message_type'], 'handleMessageTypeChange', 'LtiDeepLinkingRequest', [null, 'LtiDeepLinkingRequest'])
+  checkChange(['message_type'], 'handleMessageTypeChange', 'LtiDeepLinkingRequest', [
+    null,
+    'LtiDeepLinkingRequest'
+  ])
 })
 
 it('cleans up invalid inputs', () => {
@@ -98,9 +97,9 @@ it('is valid when valid', () => {
   expect(wrapper.instance().valid()).toEqual(true)
 })
 
-const placements = ["editor_button", "migration_selection", "homework_submission"]
+const placements = ['editor_button', 'migration_selection', 'homework_submission']
 
-placements.forEach((placementName) => {
+placements.forEach(placementName => {
   it('displays alert when placement only supports deep linking', () => {
     const wrapper = mount(<Placement {...props({placementName})} />)
     wrapper.find('button').simulate('click')
@@ -108,11 +107,13 @@ placements.forEach((placementName) => {
   })
 })
 
-const couldBeEither = ["assignment_selection", "link_selection"]
+const couldBeEither = ['assignment_selection', 'link_selection']
 
-couldBeEither.forEach((placementName) => {
+couldBeEither.forEach(placementName => {
   it('displays alert when placement supports deep linking and resource link and deep linking chosen', () => {
-    const wrapper = mount(<Placement {...props({placementName}, {message_type: 'LtiDeepLinkingRequest'})} />)
+    const wrapper = mount(
+      <Placement {...props({placementName}, {message_type: 'LtiDeepLinkingRequest'})} />
+    )
     wrapper.find('button').simulate('click')
     expect(wrapper.exists('Alert')).toBeTruthy()
   })
