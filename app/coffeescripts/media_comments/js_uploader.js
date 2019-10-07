@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import DialogManager from '../media_comments/dialog_manager'
-import CommentUiLoader from '../media_comments/comment_ui_loader'
+import DialogManager from './dialog_manager'
+import CommentUiLoader from './comment_ui_loader'
 import K5Uploader from '@instructure/k5uploader'
-import UploadViewManager from '../media_comments/upload_view_manager'
-import KalturaSessionLoader from '../media_comments/kaltura_session_loader'
-import FileInputManager from '../media_comments/file_input_manager'
+import UploadViewManager from './upload_view_manager'
+import KalturaSessionLoader from './kaltura_session_loader'
+import FileInputManager from './file_input_manager'
 
 /*
-   * Creates and Mediates between various upload ui and actors
-   */
+ * Creates and Mediates between various upload ui and actors
+ */
 export default class JsUploader {
   constructor() {
     this.dialogManager = new DialogManager()
@@ -57,7 +57,7 @@ export default class JsUploader {
       this.createNeededFields()
       return this.bindEvents()
     })
-  };
+  }
 
   getKs() {
     return this.kSession.kalturaSession.ks
@@ -91,41 +91,47 @@ export default class JsUploader {
       this.fileInputManager.allowedMedia,
       this.file
     )
-  };
+  }
 
   doUploadByFile = inputFile => {
     this.file = inputFile
     if (this.uploader) {
       this.resetUploader()
     }
-    const session = this.kSession.generateUploadOptions(['video', 'audio', 'webm', 'video/webm', 'audio/webm'])
+    const session = this.kSession.generateUploadOptions([
+      'video',
+      'audio',
+      'webm',
+      'video/webm',
+      'audio/webm'
+    ])
     this.uploader = new K5Uploader(session)
     this.uploader.addEventListener('K5.fileError', this.onFileError)
     this.uploader.addEventListener('K5.complete', this.onUploadComplete)
     return this.uploader.addEventListener('K5.ready', this.onUploaderReady)
-  };
+  }
 
   onFileError = () => {
     return this.createNeededFields()
-  };
+  }
 
   onUploadComplete = e => {
     this.resetUploader()
     if (!((e.title != null ? e.title.length : undefined) > 0)) {
       e.title = this.file.name
     }
-    this.addEntry(e, this.file.type.includes("audio"))
+    this.addEntry(e, this.file.type.includes('audio'))
     return this.dialogManager.hide()
-  };
+  }
 
   onUploaderReady = () => {
     return this.uploader.uploadFile(this.file)
-  };
+  }
 
   resetUploader = () => {
     this.uploader.removeEventListener('K5.fileError', this.onFileError)
     this.uploader.removeEventListener('K5.complete', this.onUploadComplete)
     this.uploader.removeEventListener('K5.ready', this.onUploaderReady)
     return this.uploader.destroy()
-  };
+  }
 }

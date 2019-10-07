@@ -147,6 +147,7 @@ class __Folder extends FilesystemObject {
       (this.folders.loadedAll && this.folders.length === 0)
     )
   }
+
   urlPath() {
     let relativePath = (this.get('full_name') || '').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
     relativePath = urlHelper.encodeSpecialChars(relativePath)

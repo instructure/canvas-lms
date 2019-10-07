@@ -21,7 +21,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import homeworkSubmissionTool from 'jst/assignments/homework_submission_tool'
 import ExternalContentReturnView from '../views/ExternalTools/ExternalContentReturnView'
-import ExternalToolCollection from '../external_tools/ExternalToolCollection'
+import ExternalToolCollection from './ExternalToolCollection'
 import ExternalContentFileSubmissionView from '../views/assignments/ExternalContentFileSubmissionView'
 import ExternalContentUrlSubmissionView from '../views/assignments/ExternalContentUrlSubmissionView'
 import ExternalContentLtiLinkSubmissionView from '../views/assignments/ExternalContentLtiLinkSubmissionView'
@@ -126,7 +126,7 @@ export default class HomeworkSubmissionLtiContainer {
       'ready',
       (function(_this) {
         return function(data) {
-          var homeworkSubmissionView
+          let homeworkSubmissionView
           tool = this.model // this will return the model from returnView
           homeworkSubmissionView = _this.createHomeworkSubmissionView(tool, data)
           homeworkSubmissionView.parentView = _this
@@ -135,8 +135,10 @@ export default class HomeworkSubmissionLtiContainer {
           _this.cleanupViewsForTool(tool)
           _this.renderedViews[tool.get('id')].push(homeworkSubmissionView)
           homeworkSubmissionView.render()
-          return $('input.turnitin_pledge').click(e => recordEulaAgreement('#eula_agreement_timestamp', e.target.checked));
-        };
+          return $('input.turnitin_pledge').click(e =>
+            recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
+          )
+        }
       })(this)
     )
 

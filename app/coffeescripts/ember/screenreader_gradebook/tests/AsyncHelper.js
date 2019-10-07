@@ -28,7 +28,7 @@ export default class AsyncHelper {
     Ember.RSVP.on('created', this.incrementRequest)
     Ember.RSVP.on('fulfilled', this.decrementRequest)
     return Ember.RSVP.on('rejected', this.decrementRequest)
-  };
+  }
 
   stop = () => {
     Ember.RSVP.off('created', this.incrementRequest)
@@ -36,15 +36,15 @@ export default class AsyncHelper {
     Ember.RSVP.off('rejected', this.decrementRequest)
     Ember.RSVP.configure('instrument', false)
     return (this.pendingRequests = 0)
-  };
+  }
 
   incrementRequest = () => {
     return this.pendingRequests++
-  };
+  }
 
   decrementRequest = () => {
     return this.pendingRequests--
-  };
+  }
 
   waitForRequests = () => {
     return new Promise(resolve => {
@@ -59,5 +59,5 @@ export default class AsyncHelper {
 
       return defer()
     })
-  };
+  }
 }

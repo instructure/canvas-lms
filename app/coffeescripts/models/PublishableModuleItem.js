@@ -101,9 +101,11 @@ export default class PublishableModuleItem extends Model {
   url() {
     return this.branch('urls')
   }
+
   toJSON() {
     return this.branch('toJSONs')
   }
+
   disabledMessage() {
     return this.branch('disabledMessages')
   }

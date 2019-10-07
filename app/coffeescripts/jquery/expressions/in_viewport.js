@@ -35,7 +35,7 @@ const $window = $(window)
 //     // iterate over all questions that are currently visible to the student:
 //     $('.question').filter(':in_viewport').each(function() {
 //     });
-export default function in_viewport (el) {
+export default function in_viewport(el) {
   const $el = $(el)
 
   const vpTop = $window.scrollTop()

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { matchingToolUrls } from '../LtiAssignmentHelpers'
+import {matchingToolUrls} from '../LtiAssignmentHelpers'
 
 describe('#matchingToolUrls', () => {
   let firstUrl
@@ -90,4 +90,3 @@ describe('#matchingToolUrls', () => {
     })
   })
 })
-

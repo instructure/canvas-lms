@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
-import EditorToggle from '../editor/EditorToggle'
+import EditorToggle from './EditorToggle'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 

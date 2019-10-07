@@ -19,8 +19,8 @@
 // $(element).click preventDefault (event) ->
 //   #do stuff with the event
 
-export default function preventDefault (fn) {
-  return function (event) {
+export default function preventDefault(fn) {
+  return function(event) {
     if (event) event.preventDefault()
     return fn.apply(this, arguments)
   }

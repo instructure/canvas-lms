@@ -17,17 +17,25 @@
 
 import $ from 'jquery'
 
-    // depends on the scrollable ancestor being the first positioned
-    // ancestor. if it's not, it won't work
-export default $.fn.scrollIntoView = function (options = {}) {
+// depends on the scrollable ancestor being the first positioned
+// ancestor. if it's not, it won't work
+export default $.fn.scrollIntoView = function(options = {}) {
   const $container = options.container || this.offsetParent()
   const containerTop = $container.scrollTop()
   const containerBottom = containerTop + $container.height()
   let elemTop = this[0].offsetTop
   let elemBottom = elemTop + $(this[0]).outerHeight()
   if (options.ignore && options.ignore.border) {
-    elemTop += parseInt($(this[0]).css('border-top-width').replace('px', ''))
-    elemBottom -= parseInt($(this[0]).css('border-bottom-width').replace('px', ''))
+    elemTop += parseInt(
+      $(this[0])
+        .css('border-top-width')
+        .replace('px', '')
+    )
+    elemBottom -= parseInt(
+      $(this[0])
+        .css('border-bottom-width')
+        .replace('px', '')
+    )
   }
   if (elemTop < containerTop || options.toTop) {
     return $container.scrollTop(elemTop)
@@ -35,4 +43,3 @@ export default $.fn.scrollIntoView = function (options = {}) {
     return $container.scrollTop(elemBottom - $container.height())
   }
 }
-

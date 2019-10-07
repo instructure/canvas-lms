@@ -35,8 +35,15 @@ class Reply {
   // Creates a new reply to an Entry
   //
   // @param {view} an EntryView instance
-  constructor (view, options = {}) {
-    ['attachKeyboardShortcuts', 'hide', 'hideNotification', 'submit', 'onPostReplySuccess', 'onPostReplyError'].forEach(m => this[m] = this[m].bind(this))
+  constructor(view, options = {}) {
+    ;[
+      'attachKeyboardShortcuts',
+      'hide',
+      'hideNotification',
+      'submit',
+      'onPostReplySuccess',
+      'onPostReplyError'
+    ].forEach(m => (this[m] = this[m].bind(this)))
     this.view = view
     this.options = options
     this.el = this.view.$('.discussion-reply-action:first')
@@ -46,15 +53,20 @@ class Reply {
     if (this.discussionEntry.length === 0) {
       this.discussionEntry = this.el.closest('.entry')
     }
-    this.form = this.discussionEntry.find('form.discussion-reply-form:first').submit(preventDefault(this.submit))
+    this.form = this.discussionEntry
+      .find('form.discussion-reply-form:first')
+      .submit(preventDefault(this.submit))
     this.textArea = this.getEditingElement()
     this.form.find('.cancel_button').click(this.hide)
-    this.form.on('click', '.toggle-wrapper a', (e) => {
+    this.form.on('click', '.toggle-wrapper a', e => {
       e.preventDefault()
       RichContentEditor.callOnRCE(this.textArea, 'toggle')
       // hide the clicked link, and show the other toggle link.
       // todo: replace .andSelf with .addBack when JQuery is upgraded.
-      return $(e.currentTarget).siblings('a').andSelf().toggle()
+      return $(e.currentTarget)
+        .siblings('a')
+        .andSelf()
+        .toggle()
     })
     this.form.delegate('.alert .close', 'click', preventDefault(this.hideNotification))
     this.editing = false
@@ -62,9 +74,12 @@ class Reply {
     _.defer(this.attachKeyboardShortcuts)
   }
 
-  attachKeyboardShortcuts () {
+  attachKeyboardShortcuts() {
     if (!ENV.use_rce_enhancements) {
-      return this.view.$('.toggle-wrapper').first().before(new KeyboardShortcuts().render().$el)
+      return this.view
+        .$('.toggle-wrapper')
+        .first()
+        .before(new KeyboardShortcuts().render().$el)
     }
   }
 
@@ -72,7 +87,7 @@ class Reply {
   // Shows or hides the TinyMCE editor for a reply
   //
   // @api public
-  toggle () {
+  toggle() {
     if (!this.editing) {
       return this.edit()
     } else {
@@ -84,7 +99,7 @@ class Reply {
   // Shows the TinyMCE editor for a reply
   //
   // @api public
-  edit () {
+  edit() {
     this.form.addClass('replying')
     this.discussionEntry.addClass('replying')
     RichContentEditor.initSidebar()
@@ -100,12 +115,10 @@ class Reply {
   }
 
   createTextArea(id) {
-    return (
-      $('<textarea/>')
-        .addClass('reply-textarea')
-        .attr('id', id)
-        .attr('aria-hidden', 'true')
-    )
+    return $('<textarea/>')
+      .addClass('reply-textarea')
+      .attr('id', id)
+      .attr('aria-hidden', 'true')
   }
 
   replaceTextArea(textAreaId) {
@@ -119,7 +132,7 @@ class Reply {
   // Hides the TinyMCE editor
   //
   // @api public
-  hide () {
+  hide() {
     const textAreaId = this.textArea.attr('id')
     this.content = RichContentEditor.callOnRCE(this.textArea, 'get_code')
     this.form.removeClass('replying')
@@ -130,7 +143,7 @@ class Reply {
     return this.discussionEntry.find('.discussion-reply-action').focus()
   }
 
-  hideNotification () {
+  hideNotification() {
     return this.view.model.set('notification', '')
   }
 
@@ -139,15 +152,18 @@ class Reply {
   // to the server.
   //
   // @api private
-  submit () {
+  submit() {
     this.hide()
-    this.view.model.set('notification', `<div class='alert alert-info'>${htmlEscape(I18n.t('saving_reply', 'Saving reply...'))}</div>`)
+    this.view.model.set(
+      'notification',
+      `<div class='alert alert-info'>${htmlEscape(I18n.t('saving_reply', 'Saving reply...'))}</div>`
+    )
     const entry = new Entry(this.getModelAttributes())
     entry.save(null, {
       success: this.onPostReplySuccess,
       error: this.onPostReplyError,
       multipart: entry.get('attachment'),
-      proxyAttachment: true,
+      proxyAttachment: true
     })
     return this.removeAttachments()
   }
@@ -156,7 +172,7 @@ class Reply {
   // Get the jQueryEl element on the discussion entry to edit.
   //
   // @api private
-  getEditingElement () {
+  getEditingElement() {
     return this.view.$('.reply-textarea:first')
   }
 
@@ -164,7 +180,7 @@ class Reply {
   // Computes the model's attributes before saving it to the server
   //
   // @api private
-  getModelAttributes () {
+  getModelAttributes() {
     const now = new Date().getTime()
     // TODO: remove this summary, server should send it in create response and no further
     // work is required
@@ -176,7 +192,7 @@ class Reply {
       created_at: now,
       updated_at: now,
       attachment: this.form.find('input[type=file]')[0],
-      new: true,
+      new: true
     }
   }
 
@@ -184,7 +200,7 @@ class Reply {
   // Callback when the model is succesfully saved
   //
   // @api private
-  onPostReplySuccess (entry, response) {
+  onPostReplySuccess(entry, response) {
     if (response.errors) {
       this.hideNotification()
       this.textArea.val(entry.get('message'))
@@ -201,12 +217,15 @@ class Reply {
   // Callback when the model fails to save
   //
   // @api private
-  onPostReplyError (entry) {
+  onPostReplyError(entry) {
     this.view.model.set(
       'notification',
-      `<div class='alert alert-info'>${I18n.t('*An error occurred*, please post your reply again later', {
-        wrapper: '<strong>$1</strong>',
-      })}</div>`
+      `<div class='alert alert-info'>${I18n.t(
+        '*An error occurred*, please post your reply again later',
+        {
+          wrapper: '<strong>$1</strong>'
+        }
+      )}</div>`
     )
     this.textArea.val(entry.get('message'))
     return this.edit()
@@ -214,7 +233,7 @@ class Reply {
 
   // #
   // Adds an attachment
-  addAttachment ($el) {
+  addAttachment($el) {
     this.form.find('ul.discussion-reply-attachments').append(replyAttachmentTemplate())
     this.form.find('ul.discussion-reply-attachments input').focus()
     return this.form.find('a.discussion-reply-add-attachment').hide() // TODO: when the data model allows it, tweak this to support multiple in the UI
@@ -222,16 +241,22 @@ class Reply {
 
   // #
   // Removes an attachment
-  removeAttachment ($el) {
+  removeAttachment($el) {
     $el.closest('ul.discussion-reply-attachments li').remove()
-    return this.form.find('a.discussion-reply-add-attachment').show().focus()
+    return this.form
+      .find('a.discussion-reply-add-attachment')
+      .show()
+      .focus()
   }
 
   // #
   // Removes all attachments
-  removeAttachments () {
+  removeAttachments() {
     this.form.find('ul.discussion-reply-attachments').empty()
-    return this.form.find('a.discussion-reply-add-attachment').show().focus()
+    return this.form
+      .find('a.discussion-reply-add-attachment')
+      .show()
+      .focus()
   }
 }
 

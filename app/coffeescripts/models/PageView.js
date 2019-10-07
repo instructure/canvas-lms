@@ -51,7 +51,10 @@ function parseUserAgentString(userAgent) {
   if (!browser) {
     browser = I18n.t('browsers.unrecognized', 'Unrecognized Browser')
   } else if (data.version) {
-    data.version = data.version.split(/\./).slice(0, 2).join('.')
+    data.version = data.version
+      .split(/\./)
+      .slice(0, 2)
+      .join('.')
     browser = `${browser} ${data.version}`
   }
   return browser

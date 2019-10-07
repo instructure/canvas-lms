@@ -28,12 +28,12 @@ export default class Publishable extends Backbone.Model {
   publish = () => {
     this.set('published', true)
     return this.save()
-  };
+  }
 
   unpublish = () => {
     this.set('published', false)
     return this.save()
-  };
+  }
 
   disabledMessage() {
     return I18n.t('cant_unpublish', "Can't unpublish")
