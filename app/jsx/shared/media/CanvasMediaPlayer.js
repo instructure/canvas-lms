@@ -23,8 +23,13 @@ import {VideoPlayer} from '@instructure/ui-media-player'
 import {View} from '@instructure/ui-layout'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
+const byBitrate = (a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
+
 export default function CanvasMediaPlayer(props) {
-  const [media_sources, setMedia_sources] = useState(props.media_sources)
+  const sorted_sources = Array.isArray(props.media_sources)
+    ? props.media_sources.sort(byBitrate)
+    : null
+  const [media_sources, setMedia_sources] = useState(sorted_sources)
   const [retryTimerId, setRetryTimerId] = useState(0)
   const containerRef = useRef(null)
   const myIframeRef = useRef(null)
@@ -71,7 +76,7 @@ export default function CanvasMediaPlayer(props) {
       // if there is a network error, just ignore and retry
     }
     if (resp && resp.media_sources && resp.media_sources.length) {
-      setMedia_sources(resp.media_sources)
+      setMedia_sources(resp.media_sources.sort(byBitrate))
     } else {
       // if they're not present yet, try again in a little bit
       await new Promise(resolve => {
