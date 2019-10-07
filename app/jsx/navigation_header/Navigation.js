@@ -180,11 +180,14 @@ export default class Navigation extends React.Component {
       }
 
       // finished
-      this.setState({
-        [type]: newData,
-        [`${type}Loading`]: false,
-        [`${type}AreLoaded`]: true
-      }, this.props.onDataRecieved)
+      this.setState(
+        {
+          [type]: newData,
+          [`${type}Loading`]: false,
+          [`${type}AreLoaded`]: true
+        },
+        this.props.onDataRecieved
+      )
     })
   }
 
@@ -220,7 +223,10 @@ export default class Navigation extends React.Component {
     } catch (error) {
       console.warn('something went wrong updating unread count', error)
     }
-    setTimeout(() => this.pollUnreadCount(), this.unread_count_attempts * UNREAD_COUNT_POLL_INTERVAL)
+    setTimeout(
+      () => this.pollUnreadCount(),
+      this.unread_count_attempts * UNREAD_COUNT_POLL_INTERVAL
+    )
   }
 
   unreadCountElement() {
@@ -248,7 +254,10 @@ export default class Navigation extends React.Component {
       </>,
       this.unreadCountElement()
     )
-    const badgeElements = [this.unreadCountElement(), document.getElementById('mobileHeaderInboxUnreadBadge')]
+    const badgeElements = [
+      this.unreadCountElement(),
+      document.getElementById('mobileHeaderInboxUnreadBadge')
+    ]
     badgeElements.forEach(el => {
       if (el) el.style.display = count > 0 ? '' : 'none'
     })

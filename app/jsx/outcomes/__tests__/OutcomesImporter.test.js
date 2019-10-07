@@ -19,55 +19,59 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import sinon from 'sinon'
-import { render, shallow } from 'enzyme'
-import { merge } from 'lodash'
-import OutcomesImporter, { showOutcomesImporterIfInProgress } from '../OutcomesImporter'
+import {render, shallow} from 'enzyme'
+import {merge} from 'lodash'
+import OutcomesImporter, {showOutcomesImporterIfInProgress} from '../OutcomesImporter'
 
-import { showFlashAlert } from '../../shared/FlashAlert'
+import {showFlashAlert} from '../../shared/FlashAlert'
 import * as apiClient from '../apiClient'
 
-jest.mock('../../shared/FlashAlert');
-jest.mock('../apiClient');
+jest.mock('../../shared/FlashAlert')
+jest.mock('../apiClient')
 
 jest.useFakeTimers()
 
 const file = sinon.createStubInstance(File)
-const defaultProps = (props = {}) => (
-  merge({
-    hide: () => {},
-    disableOutcomeViews: () => {},
-    resetOutcomeViews: () => {},
-    file,
-    contextUrlRoot: '/accounts/1',
-    invokedImport: true
-  }, props)
-)
+const defaultProps = (props = {}) =>
+  merge(
+    {
+      hide: () => {},
+      disableOutcomeViews: () => {},
+      resetOutcomeViews: () => {},
+      file,
+      contextUrlRoot: '/accounts/1',
+      invokedImport: true
+    },
+    props
+  )
 
 it('renders the OutcomesImporter component', () => {
-  const modal = shallow(<OutcomesImporter {...defaultProps()}/>, {disableLifecycleMethods: true})
+  const modal = shallow(<OutcomesImporter {...defaultProps()} />, {disableLifecycleMethods: true})
   expect(modal.exists()).toBe(true)
 })
 
 it('disables the Outcome Views when upload starts', () => {
   const disableOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ disableOutcomeViews })}/>, {disableLifecycleMethods: true})
+  const modal = shallow(<OutcomesImporter {...defaultProps({disableOutcomeViews})} />, {
+    disableLifecycleMethods: true
+  })
   apiClient.createImport.mockReturnValue(Promise.resolve({data: {id: 3}}))
   modal.instance().beginUpload()
-  expect(disableOutcomeViews).toBeCalled()
+  expect(disableOutcomeViews).toHaveBeenCalled()
 })
 
 it('resets the Outcome Views when upload is complete', () => {
   const resetOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ resetOutcomeViews })}/>)
+  const modal = shallow(<OutcomesImporter {...defaultProps({resetOutcomeViews})} />)
   modal.instance().completeUpload(10, true)
-  expect(resetOutcomeViews).toBeCalled()
+  expect(resetOutcomeViews).toHaveBeenCalled()
 })
 
 it('shows a flash alert when upload successfully completes', () => {
   const resetOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ resetOutcomeViews })}/>)
+  const modal = shallow(<OutcomesImporter {...defaultProps({resetOutcomeViews})} />)
   modal.instance().completeUpload(0, true)
-  expect(showFlashAlert).toBeCalledWith({
+  expect(showFlashAlert).toHaveBeenCalledWith({
     type: 'success',
     message: 'Your outcomes were successfully imported.'
   })
@@ -75,94 +79,106 @@ it('shows a flash alert when upload successfully completes', () => {
 
 it('shows a flash alert when upload fails', () => {
   const resetOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ resetOutcomeViews })}/>)
+  const modal = shallow(<OutcomesImporter {...defaultProps({resetOutcomeViews})} />)
   modal.instance().completeUpload(1, false)
-  expect(showFlashAlert).toBeCalledWith({
+  expect(showFlashAlert).toHaveBeenCalledWith({
     type: 'error',
-    message: 'There was an error with your import, please examine your file and attempt the upload again.' +
-             ' Check your email for more details.'
+    message:
+      'There was an error with your import, please examine your file and attempt the upload again.' +
+      ' Check your email for more details.'
   })
-  expect(resetOutcomeViews).toBeCalled()
+  expect(resetOutcomeViews).toHaveBeenCalled()
 })
 
 it('shows a flash alert when upload successfully completes but with warnings', () => {
   const resetOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ resetOutcomeViews })}/>)
+  const modal = shallow(<OutcomesImporter {...defaultProps({resetOutcomeViews})} />)
   modal.instance().completeUpload(10, true)
-  expect(showFlashAlert).toBeCalledWith({
+  expect(showFlashAlert).toHaveBeenCalledWith({
     type: 'warning',
-    message: 'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
+    message:
+      'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
   })
-  expect(resetOutcomeViews).toBeCalled()
+  expect(resetOutcomeViews).toHaveBeenCalled()
 })
 
 it('uploads file when the upload begins', () => {
   const disableOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ disableOutcomeViews })}/>)
+  const modal = shallow(<OutcomesImporter {...defaultProps({disableOutcomeViews})} />)
   apiClient.createImport.mockReturnValue(Promise.resolve({data: {id: 3}}))
   modal.instance().beginUpload()
-  expect(apiClient.createImport).toBeCalledWith('/accounts/1', file)
+  expect(apiClient.createImport).toHaveBeenCalledWith('/accounts/1', file)
 })
 
 it('starts polling for import status after the upload begins', () => {
   const disableOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ disableOutcomeViews })}/>)
+  const modal = shallow(<OutcomesImporter {...defaultProps({disableOutcomeViews})} />)
   apiClient.createImport.mockReturnValue(Promise.resolve({data: {id: 3}}))
-  apiClient.queryImportStatus.mockReturnValue(Promise.resolve({data: {workflow_state: 'succeeded', processing_errors: []}}))
+  apiClient.queryImportStatus.mockReturnValue(
+    Promise.resolve({data: {workflow_state: 'succeeded', processing_errors: []}})
+  )
   modal.instance().beginUpload()
   expect(setInterval).toHaveBeenLastCalledWith(expect.any(Function), 1000)
-  jest.advanceTimersByTime(2000);
+  jest.advanceTimersByTime(2000)
   expect(apiClient.queryImportStatus).toHaveBeenLastCalledWith('/accounts/1', 3)
 })
 
 it('completes upload when status returns succeeded or failed', async () => {
   const resetOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ resetOutcomeViews })}/>)
-  apiClient.queryImportStatus.mockReturnValue(Promise.resolve({data: {workflow_state: 'succeeded', processing_errors: []}}))
+  const modal = shallow(<OutcomesImporter {...defaultProps({resetOutcomeViews})} />)
+  apiClient.queryImportStatus.mockReturnValue(
+    Promise.resolve({data: {workflow_state: 'succeeded', processing_errors: []}})
+  )
   modal.instance().pollImportStatus(0)
-  await jest.advanceTimersByTime(2000);
-  expect(resetOutcomeViews).toBeCalled()
+  await jest.advanceTimersByTime(2000)
+  expect(resetOutcomeViews).toHaveBeenCalled()
 })
 
 it('renders importer if in progress', async () => {
   const disableOutcomeViews = jest.fn()
-  const props = defaultProps({ disableOutcomeViews, file: null, importId: '9' })
-  apiClient.queryImportStatus.mockReturnValue(Promise.resolve({status: 200, data: {workflow_state: 'importing', user: {id: '1'}}}))
+  const props = defaultProps({disableOutcomeViews, file: null, importId: '9'})
+  apiClient.queryImportStatus.mockReturnValue(
+    Promise.resolve({status: 200, data: {workflow_state: 'importing', user: {id: '1'}}})
+  )
   ReactDOM.render = jest.fn()
   await showOutcomesImporterIfInProgress(props, '1')
-  expect(ReactDOM.render).toBeCalled()
+  expect(ReactDOM.render).toHaveBeenCalled()
 })
 
 it('does not render importer if no latest import', async () => {
   const disableOutcomeViews = jest.fn()
-  const props = defaultProps({ disableOutcomeViews, file: null, importId: '9' })
+  const props = defaultProps({disableOutcomeViews, file: null, importId: '9'})
   apiClient.queryImportStatus.mockReturnValue(Promise.resolve({status: 404}))
   ReactDOM.render = jest.fn()
   await showOutcomesImporterIfInProgress(props)
-  expect(ReactDOM.render).not.toBeCalled()
+  expect(ReactDOM.render).not.toHaveBeenCalled()
 })
 
 it('starts polling for import status when an import is in progress', () => {
   const disableOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ disableOutcomeViews, file: null, importId: '9' })}/>)
-  apiClient.queryImportStatus.mockReturnValue(Promise.resolve({data: {workflow_state: 'succeeded', processing_errors: []}}))
+  const modal = shallow(
+    <OutcomesImporter {...defaultProps({disableOutcomeViews, file: null, importId: '9'})} />
+  )
+  apiClient.queryImportStatus.mockReturnValue(
+    Promise.resolve({data: {workflow_state: 'succeeded', processing_errors: []}})
+  )
   modal.instance().beginUpload()
   expect(setInterval).toHaveBeenLastCalledWith(expect.any(Function), 1000)
-  jest.advanceTimersByTime(2000);
+  jest.advanceTimersByTime(2000)
   expect(apiClient.queryImportStatus).toHaveBeenLastCalledWith('/accounts/1', '9')
 })
 
 it('display "please wait" text for user that invoked upload', () => {
-  const wrapper = render(<OutcomesImporter {...defaultProps()}/>)
+  const wrapper = render(<OutcomesImporter {...defaultProps()} />)
   expect(wrapper.text()).toContain('Please wait')
 })
 
 it('display "ok to leave" text for user that invoked upload', () => {
-  const wrapper = render(<OutcomesImporter {...defaultProps()}/>)
+  const wrapper = render(<OutcomesImporter {...defaultProps()} />)
   expect(wrapper.text()).toContain('ok to leave')
 })
 
 it('display "currently in progress" text for user that did not invoke the upload', () => {
-  const wrapper = render(<OutcomesImporter {...defaultProps({invokedImport: false})}/>)
+  const wrapper = render(<OutcomesImporter {...defaultProps({invokedImport: false})} />)
   expect(wrapper.text()).toContain('currently in progress')
 })

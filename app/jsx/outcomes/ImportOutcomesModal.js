@@ -28,16 +28,19 @@ import {View} from '@instructure/ui-layout'
 import {PresentationContent} from '@instructure/ui-a11y'
 import SVGWrapper from '../shared/SVGWrapper'
 
-export function showImportOutcomesModal (props) {
+export function showImportOutcomesModal(props) {
   const parent = document.createElement('div')
   parent.setAttribute('class', 'import-outcomes-modal-container')
   document.body.appendChild(parent)
 
-  function showImportOutcomesRef (modal) {
+  function showImportOutcomesRef(modal) {
     if (modal) modal.show()
   }
 
-  ReactDOM.render(<ImportOutcomesModal {...props} parent={parent} ref={showImportOutcomesRef} />, parent)
+  ReactDOM.render(
+    <ImportOutcomesModal {...props} parent={parent} ref={showImportOutcomesRef} />,
+    parent
+  )
 }
 
 export default class ImportOutcomesModal extends Component {
@@ -59,27 +62,26 @@ export default class ImportOutcomesModal extends Component {
     this.hide()
   }
 
-  onSelection (accepted, rejected) {
+  onSelection(accepted, rejected) {
     if (accepted.length > 0) {
       this.hide()
       this.props.toolbar.trigger('start_sync', accepted[0])
     } else if (rejected.length > 0) {
-      this.setState({ messages: [{ text: I18n.t('Invalid file type'), type: 'error'}] })
+      this.setState({messages: [{text: I18n.t('Invalid file type'), type: 'error'}]})
     }
   }
 
-  show () {
-    this.setState({ show: true })
+  show() {
+    this.setState({show: true})
   }
 
-  hide () {
-    this.setState({ show: false },
-      () => {
-        if (this.props.parent) ReactDOM.unmountComponentAtNode(this.props.parent)
-      })
+  hide() {
+    this.setState({show: false}, () => {
+      if (this.props.parent) ReactDOM.unmountComponentAtNode(this.props.parent)
+    })
   }
 
-  render () {
+  render() {
     const styles = {
       width: '10rem',
       margin: '0 auto'
@@ -94,24 +96,28 @@ export default class ImportOutcomesModal extends Component {
         <Modal.Body>
           <FileDrop
             accept=".csv, .json"
-            onDrop={(acceptedFile, rejectedFile) =>
-              this.onSelection(acceptedFile, rejectedFile)
-            }
+            onDrop={(acceptedFile, rejectedFile) => this.onSelection(acceptedFile, rejectedFile)}
             messages={this.state.messages}
             label={
               <div>
                 <Billboard
                   size="medium"
                   heading={I18n.t('Upload your Outcomes!')}
-                  headingLevel='h2'
+                  headingLevel="h2"
                   message={I18n.t('Drag and drop or click to browse your computer')}
-                  hero={<div style={styles}><PresentationContent><SVGWrapper url="/images/upload_rocket.svg"/></PresentationContent></div>}
+                  hero={
+                    <div style={styles}>
+                      <PresentationContent>
+                        <SVGWrapper url="/images/upload_rocket.svg" />
+                      </PresentationContent>
+                    </div>
+                  }
                 />
                 <Text fontStyle="italic">{I18n.t('CSV or JSON formats only')}</Text>
               </div>
             }
           />
-          <View as="div" margin="large auto" textAlign='center'>
+          <View as="div" margin="large auto" textAlign="center">
             <Link href="/doc/api/file.outcomes_csv.html">{I18n.t('Outcomes CSV Format')}</Link>
           </View>
         </Modal.Body>

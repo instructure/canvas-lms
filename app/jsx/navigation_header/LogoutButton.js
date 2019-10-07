@@ -42,4 +42,3 @@ LogoutButton.propTypes = (() => {
   const {children, ...buttonpropTypes} = Button.propTypes
   return buttonpropTypes
 })()
-

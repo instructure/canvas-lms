@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
@@ -27,20 +26,38 @@ import {Button} from '@instructure/ui-buttons'
 export default function GroupsTray({groups, hasLoaded}) {
   return (
     <View as="div" padding="medium">
-      <Heading level="h3" as="h2">{I18n.t('Groups')}</Heading>
-      <hr role="presentation"/>
-      <List variant="unstyled"  margin="small 0" itemSpacing="small">
+      <Heading level="h3" as="h2">
+        {I18n.t('Groups')}
+      </Heading>
+      <hr role="presentation" />
+      <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
-          groups.map(group =>
-            <List.Item key={group.id}>
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/groups/${group.id}`}>{group.name}</Button>
-            </List.Item>
-          ).concat([
-            <List.Item key="hr"><hr role="presentation"/></List.Item>,
-            <List.Item key="all">
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/groups">{I18n.t('All Groups')}</Button>
-            </List.Item>
-          ])
+          groups
+            .map(group => (
+              <List.Item key={group.id}>
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href={`/groups/${group.id}`}
+                >
+                  {group.name}
+                </Button>
+              </List.Item>
+            ))
+            .concat([
+              <List.Item key="hr">
+                <hr role="presentation" />
+              </List.Item>,
+              <List.Item key="all">
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href="/groups"
+                >
+                  {I18n.t('All Groups')}
+                </Button>
+              </List.Item>
+            ])
         ) : (
           <List.Item>
             <Spinner size="small" renderTitle={I18n.t('Loading')} />
@@ -52,10 +69,12 @@ export default function GroupsTray({groups, hasLoaded}) {
 }
 
 GroupsTray.propTypes = {
-  groups: arrayOf(shape({
-    id: string.isRequired,
-    name: string.isRequired
-  })).isRequired,
+  groups: arrayOf(
+    shape({
+      id: string.isRequired,
+      name: string.isRequired
+    })
+  ).isRequired,
   hasLoaded: bool.isRequired
 }
 

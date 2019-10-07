@@ -19,14 +19,14 @@
 import I18n from 'i18n!move_item_tray'
 import axios from 'axios'
 import React from 'react'
-import { string, func, arrayOf } from 'prop-types'
+import {string, func, arrayOf} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {Heading} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import {CloseButton} from '@instructure/ui-buttons'
 
-import { showFlashError } from '../shared/FlashAlert'
-import { itemShape, moveOptionsType } from './propTypes'
+import {showFlashError} from '../shared/FlashAlert'
+import {itemShape, moveOptionsType} from './propTypes'
 import MoveSelect from './MoveSelect'
 
 export default class MoveItemTray extends React.Component {
@@ -38,20 +38,20 @@ export default class MoveItemTray extends React.Component {
     formatSaveUrl: func,
     formatSaveData: func,
     onMoveSuccess: func,
-    onExited: func,
+    onExited: func
   }
 
   static defaultProps = {
     title: I18n.t('Move To'),
     focusOnExit: () => null,
     formatSaveUrl: () => null,
-    formatSaveData: (order) => ({ order: order.join(',') }),
+    formatSaveData: order => ({order: order.join(',')}),
     onExited: () => {},
-    onMoveSuccess: () => {},
+    onMoveSuccess: () => {}
   }
 
   state = {
-    open: true,
+    open: true
   }
 
   onExited = () => {
@@ -62,27 +62,28 @@ export default class MoveItemTray extends React.Component {
     if (this.props.onExited) this.props.onExited()
   }
 
-  onMoveSelect = ({ order, itemId, groupId, itemIds }) => {
-    const saveUrl = this.props.formatSaveUrl({ itemId, groupId })
+  onMoveSelect = ({order, itemId, groupId, itemIds}) => {
+    const saveUrl = this.props.formatSaveUrl({itemId, groupId})
     const promise = saveUrl
-                  ? axios.post(saveUrl, this.props.formatSaveData(order))
-                  : Promise.resolve({ data: order })
-    promise.then(res => {
-      this.props.onMoveSuccess({ data: res.data, groupId, itemId, itemIds })
-      this.close()
-    })
-    .catch(showFlashError(I18n.t('Move Item Failed')))
+      ? axios.post(saveUrl, this.props.formatSaveData(order))
+      : Promise.resolve({data: order})
+    promise
+      .then(res => {
+        this.props.onMoveSuccess({data: res.data, groupId, itemId, itemIds})
+        this.close()
+      })
+      .catch(showFlashError(I18n.t('Move Item Failed')))
   }
 
   open = () => {
-    this.setState({ open: true })
+    this.setState({open: true})
   }
 
   close = () => {
-    this.setState({ open: false })
+    this.setState({open: false})
   }
 
-  render () {
+  render() {
     return (
       <Tray
         label={this.props.title}

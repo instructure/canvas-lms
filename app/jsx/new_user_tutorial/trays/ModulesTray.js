@@ -29,13 +29,11 @@ const ModulesTray = () => (
     image="/images/tutorial-tray-images/module_tutorial.svg"
   >
     <Text as="p">
-      {
-          I18n.t(`Organize and segment your course by topic, unit, chapter,
+      {I18n.t(`Organize and segment your course by topic, unit, chapter,
                   or week. Sequence select modules by defining criteria and
-                  prerequisites.`)
-        }
+                  prerequisites.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default ModulesTray

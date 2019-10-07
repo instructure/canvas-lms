@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!move_positions'
 
-export function removeFromOrder (set, item) {
+export function removeFromOrder(set, item) {
   const order = set.slice()
   const index = order.indexOf(item)
   if (index !== -1) {
@@ -27,47 +27,43 @@ export function removeFromOrder (set, item) {
   return order
 }
 
-export function removeAllFromOrder (set, items) {
+export function removeAllFromOrder(set, items) {
   let order = set.slice()
-  items.forEach((item) => {
+  items.forEach(item => {
     order = removeFromOrder(order, item)
   })
-  return order;
+  return order
 }
 
 export const positions = {
   first: {
     type: 'absolute',
     label: I18n.t('At the Top'),
-    apply: ({ items, order }) => [...items, ...removeAllFromOrder(order, items)],
+    apply: ({items, order}) => [...items, ...removeAllFromOrder(order, items)]
   },
   before: {
     type: 'relative',
     label: I18n.t('Before..'),
-    apply: ({ order, items, relativeTo }) => {
+    apply: ({order, items, relativeTo}) => {
       const cleanedOrder = removeAllFromOrder(order, items)
-      return [
-        ...cleanedOrder.slice(0, relativeTo),
-        ...items,
-        ...cleanedOrder.slice(relativeTo),
-      ]
-    },
+      return [...cleanedOrder.slice(0, relativeTo), ...items, ...cleanedOrder.slice(relativeTo)]
+    }
   },
   after: {
     type: 'relative',
     label: I18n.t('After..'),
-    apply: ({ order, items, relativeTo }) => {
+    apply: ({order, items, relativeTo}) => {
       const cleanedOrder = removeAllFromOrder(order, items)
       return [
         ...cleanedOrder.slice(0, relativeTo + 1),
         ...items,
-        ...cleanedOrder.slice(relativeTo + 1),
+        ...cleanedOrder.slice(relativeTo + 1)
       ]
-    },
+    }
   },
   last: {
     type: 'absolute',
     label: I18n.t('At the Bottom'),
-    apply: ({ order, items }) => [...removeAllFromOrder(order, items), ...items]
+    apply: ({order, items}) => [...removeAllFromOrder(order, items), ...items]
   }
 }

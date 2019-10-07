@@ -42,59 +42,62 @@ export default class MoveSelect extends React.Component {
     this.state = {
       selectedGroup: this.props.moveOptions.groups && this.getFilteredGroups()[0],
       selectedPosition: positions.first,
-      selectedSibling: 0,
+      selectedSibling: 0
     }
   }
 
-  selectGroup = (e) => {
-    this.setState({ selectedGroup: this.props.moveOptions.groups.find(group => group.id === e.target.value) || null })
+  selectGroup = e => {
+    this.setState({
+      selectedGroup:
+        this.props.moveOptions.groups.find(group => group.id === e.target.value) || null
+    })
   }
 
-  selectPosition = (e) => {
-    this.setState({ selectedPosition: positions[e.target.value] || null })
+  selectPosition = e => {
+    this.setState({selectedPosition: positions[e.target.value] || null})
   }
 
-  selectSibling = (e) => {
-    this.setState({ selectedSibling: e.target.value === '' ? 0 : Number(e.target.value) })
+  selectSibling = e => {
+    this.setState({selectedSibling: e.target.value === '' ? 0 : Number(e.target.value)})
   }
 
   submitSelection = () => {
-    const { items, moveOptions } = this.props
-    const { selectedGroup, selectedPosition, selectedSibling } = this.state
-    let order = items.map(({ id }) => id)
+    const {items, moveOptions} = this.props
+    const {selectedGroup, selectedPosition, selectedSibling} = this.state
+    let order = items.map(({id}) => id)
     if (selectedPosition) {
       const itemsInGroup = selectedGroup ? selectedGroup.items : moveOptions.siblings
       order = selectedPosition.apply({
-        items: items.map(({ id }) => id),
-        order: itemsInGroup.map(({ id }) => id),
-        relativeTo: selectedSibling,
+        items: items.map(({id}) => id),
+        order: itemsInGroup.map(({id}) => id),
+        relativeTo: selectedSibling
       })
     }
 
     this.props.onSelect({
       groupId: moveOptions.groups ? selectedGroup.id : null,
-      itemIds: items.map(({ id }) => id),
-      order,
+      itemIds: items.map(({id}) => id),
+      order
     })
   }
 
-  hasSelectedPosition () {
-    const { selectedSibling, selectedPosition } = this.state
+  hasSelectedPosition() {
+    const {selectedSibling, selectedPosition} = this.state
     const isAbsolute = selectedPosition && selectedPosition.type === 'absolute'
     return !!selectedPosition && (isAbsolute || selectedSibling !== null)
   }
 
   getFilteredGroups() {
-    const { moveOptions, items } = this.props
-    let { groups } = moveOptions
+    const {moveOptions, items} = this.props
+    let {groups} = moveOptions
     if (moveOptions.excludeCurrent && items[0].groupId) {
       groups = groups.filter(group => group.id !== items[0].groupId)
     }
     return groups
   }
 
-  isDoneSelecting () {
-    const { selectedGroup } = this.state
+  isDoneSelecting() {
+    const {selectedGroup} = this.state
     if (this.props.moveOptions.groups) {
       if (selectedGroup && selectedGroup.items && selectedGroup.items.length) {
         return this.hasSelectedPosition()
@@ -106,13 +109,10 @@ export default class MoveSelect extends React.Component {
     }
   }
 
-  renderSelect ({ label, onChange, options, className,  selectOneDefault}) {
+  renderSelect({label, onChange, options, className, selectOneDefault}) {
     return (
       <View margin="medium 0" display="block" className={className}>
-        <FormField
-          id="move-select-form"
-          label={<ScreenReaderContent>{label}</ScreenReaderContent>}
-        >
+        <FormField id="move-select-form" label={<ScreenReaderContent>{label}</ScreenReaderContent>}>
           <select
             onChange={onChange}
             style={{
@@ -120,7 +120,7 @@ export default class MoveSelect extends React.Component {
               width: '100%'
             }}
           >
-            {selectOneDefault && (<option>{I18n.t('Select one')}</option>)}
+            {selectOneDefault && <option>{I18n.t('Select one')}</option>}
             {options}
           </select>
         </FormField>
@@ -128,8 +128,8 @@ export default class MoveSelect extends React.Component {
     )
   }
 
-  renderSelectGroup () {
-    const { selectedGroup } = this.state
+  renderSelectGroup() {
+    const {selectedGroup} = this.state
     const selectPosition = !!(selectedGroup && selectedGroup.items && selectedGroup.items.length)
     const groups = this.getFilteredGroups(this.props)
     return (
@@ -138,8 +138,11 @@ export default class MoveSelect extends React.Component {
           label: I18n.t('Group Select'),
           className: 'move-select__group',
           onChange: this.selectGroup,
-          options: groups.map(group =>
-            <option key={group.id} value={group.id}>{group.title}</option>),
+          options: groups.map(group => (
+            <option key={group.id} value={group.id}>
+              {group.title}
+            </option>
+          )),
           selectOneDefault: false
         })}
         {selectPosition ? this.renderSelectPosition(selectedGroup.items) : null}
@@ -147,8 +150,8 @@ export default class MoveSelect extends React.Component {
     )
   }
 
-  renderSelectPosition (items) {
-    const { selectedPosition } = this.state
+  renderSelectPosition(items) {
+    const {selectedPosition} = this.state
     const selectSibling = !!(selectedPosition && selectedPosition.type === 'relative')
     return (
       <div>
@@ -157,61 +160,78 @@ export default class MoveSelect extends React.Component {
           label: I18n.t('Position Select'),
           className: 'move-select__position',
           onChange: this.selectPosition,
-          options: Object.keys(positions).map((pos) =>
-            <option key={pos} value={pos}>{positions[pos].label}</option>),
+          options: Object.keys(positions).map(pos => (
+            <option key={pos} value={pos}>
+              {positions[pos].label}
+            </option>
+          )),
           selectOneDefault: false
         })}
         {selectSibling ? (
           <div>
-            <ConnectorIcon aria-hidden style={{ position: 'absolute', transform: 'translate(-15px, -35px)' }} />
+            <ConnectorIcon
+              aria-hidden
+              style={{position: 'absolute', transform: 'translate(-15px, -35px)'}}
+            />
             {this.renderSelectSibling(items)}
-          </div>) : null}
+          </div>
+        ) : null}
       </div>
     )
   }
 
-  renderSelectSibling (items) {
+  renderSelectSibling(items) {
     const filteredItems = items.filter(item => item.id !== this.props.items[0].id)
     return this.renderSelect({
       label: I18n.t('Item Select'),
       className: 'move-select__sibling',
       onChange: this.selectSibling,
-      options: filteredItems.map((item, index) =>
-        <option key={item.id} value={index}>{item.title}</option>),
+      options: filteredItems.map((item, index) => (
+        <option key={item.id} value={index}>
+          {item.title}
+        </option>
+      )),
       selectOneDefault: false
     })
   }
 
   renderPlaceTitle() {
-    const title = (this.props.moveOptions.groups) ?
-      I18n.t('Place') :
-      I18n.t('Place "%{title}"', { title: this.props.items[0].title })
-    return (
-      <Text weight='bold'>{title}</Text>
-    )
+    const title = this.props.moveOptions.groups
+      ? I18n.t('Place')
+      : I18n.t('Place "%{title}"', {title: this.props.items[0].title})
+    return <Text weight="bold">{title}</Text>
   }
 
-  render () {
-    const { siblings, groups } = this.props.moveOptions
+  render() {
+    const {siblings, groups} = this.props.moveOptions
     return (
       <div className="move-select">
-        {this.props.moveOptions.groupsLabel &&
-          <Text weight='bold'>{this.props.moveOptions.groupsLabel}</Text>}
-        {groups
-          ? this.renderSelectGroup()
-          : this.renderSelectPosition(siblings)}
-        {(
+        {this.props.moveOptions.groupsLabel && (
+          <Text weight="bold">{this.props.moveOptions.groupsLabel}</Text>
+        )}
+        {groups ? this.renderSelectGroup() : this.renderSelectPosition(siblings)}
+        {
           <View textAlign="end" display="block">
-            <hr aria-hidden="true"/>
-            <Button id="move-item-tray-cancel-button" onClick={this.props.onClose} margin="0 x-small 0 0">{I18n.t('Cancel')}</Button>
+            <hr aria-hidden="true" />
+            <Button
+              id="move-item-tray-cancel-button"
+              onClick={this.props.onClose}
+              margin="0 x-small 0 0"
+            >
+              {I18n.t('Cancel')}
+            </Button>
             <Button
               id="move-item-tray-submit-button"
               disabled={!this.isDoneSelecting()}
-              type="submit" variant="primary"
+              type="submit"
+              variant="primary"
               onClick={this.submitSelection}
-              margin="0 x-small 0 0">{I18n.t('Move')}</Button>
+              margin="0 x-small 0 0"
+            >
+              {I18n.t('Move')}
+            </Button>
           </View>
-        )}
+        }
       </div>
     )
   }

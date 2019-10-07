@@ -28,12 +28,10 @@ const ImportTray = () => (
     image="/images/tutorial-tray-images/import.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Bring existing content from another course or course
-          management system into your Canvas course.`)
-      }
+      {I18n.t(`Bring existing content from another course or course
+          management system into your Canvas course.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
-export default ImportTray;
+export default ImportTray

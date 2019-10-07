@@ -23,20 +23,20 @@ import SVGWrapper from '../../shared/SVGWrapper'
 
 const TutorialTrayContent = props => (
   <div className={props.name}>
-    <Heading level="h2" as="h2" ellipsis>{props.heading}</Heading>
+    <Heading level="h2" as="h2" ellipsis>
+      {props.heading}
+    </Heading>
     <div className="NewUserTutorialTray__Subheading">
-      <Heading level="h3" as="h3">{props.subheading}</Heading>
+      <Heading level="h3" as="h3">
+        {props.subheading}
+      </Heading>
     </div>
     {props.children}
-    {
-      props.image
-      ? <div className="NewUserTutorialTray__ImageContainer" aria-hidden="true">
-        {/\.svg$/.test(props.image)
-        ? <SVGWrapper url={props.image} />
-        : <Img src={props.image} />}
+    {props.image ? (
+      <div className="NewUserTutorialTray__ImageContainer" aria-hidden="true">
+        {/\.svg$/.test(props.image) ? <SVGWrapper url={props.image} /> : <Img src={props.image} />}
       </div>
-      : null
-    }
+    ) : null}
   </div>
 )
 
@@ -44,12 +44,9 @@ TutorialTrayContent.propTypes = {
   name: PropTypes.string.isRequired,
   heading: PropTypes.string.isRequired,
   subheading: PropTypes.string.isRequired,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
-  ]),
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   image: PropTypes.string
-};
+}
 TutorialTrayContent.defaultProps = {
   children: [],
   image: null,

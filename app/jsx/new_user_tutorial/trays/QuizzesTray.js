@@ -28,11 +28,9 @@ const QuizzesTray = () => (
     image="/images/tutorial-tray-images/quiz.svg"
   >
     <Text as="p">
-      {
-        I18n.t('Create and administer online quizzes and surveys, both graded and ungraded.')
-      }
+      {I18n.t('Create and administer online quizzes and surveys, both graded and ungraded.')}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default QuizzesTray
