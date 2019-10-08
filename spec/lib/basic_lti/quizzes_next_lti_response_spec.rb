@@ -95,7 +95,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
     }
   end
 
-  describe "#handle_replaceResult" do
+  describe "#handle_replace_result" do
     it "accepts a grade" do
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 

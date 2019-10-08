@@ -39,7 +39,7 @@ module BasicLTI
       tool.shard.activate do
         sourcedid = BasicLTI::Sourcedid.load!(sourceid)
         raise BasicLTI::Errors::InvalidSourceId, 'Tool is invalid' unless tool == sourcedid.tool
-        return sourcedid.course, sourcedid.assignment, sourcedid.user
+        return sourcedid.assignment, sourcedid.user
       end
     end
 
@@ -91,36 +91,33 @@ module BasicLTI
       end
 
       def result_score
-        @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
+        @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultScore > textString').try(:content)
       end
 
       def submission_submitted_at
-        @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > submissionDetails > submittedAt').try(:content)
+        @lti_request&.at_css('imsx_POXBody > replaceResultRequest > submissionDetails > submittedAt').try(:content)
       end
 
       def result_total_score
-        @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultTotalScore > textString').try(:content)
+        @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultTotalScore > textString').try(:content)
       end
 
       def result_data_text
-        @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > text').try(:content)
+        @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > text').try(:content)
       end
 
       def result_data_url
-        @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > url').try(:content)
+        @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > url').try(:content)
       end
 
       def result_data_download_url
-        url = @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > downloadUrl').try(:content)
-        name = @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > documentName').try(:content)
-        return {
-          url: url,
-          name: name
-        } if url && name
+        url = @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > downloadUrl').try(:content)
+        name = @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > documentName').try(:content)
+        return { url: url, name: name } if url && name
       end
 
       def result_data_launch_url
-        @lti_request && @lti_request.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > ltiLaunchUrl').try(:content)
+        @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > ltiLaunchUrl').try(:content)
       end
 
       def to_xml
@@ -160,15 +157,15 @@ module BasicLTI
       end
 
       def handle_request(tool)
-        #check if we recognize the xml structure
+        # check if we recognize the xml structure
         return false unless operation_ref_identifier
         # verify the lis_result_sourcedid param, which will be a canvas-signed
-        # tuple of (course, assignment, user) to ensure that only this launch of
+        # tuple of (assignment, user) to ensure that only this launch of
         # the tool is attempting to modify this data.
         source_id = self.sourcedid
 
         begin
-          course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
+          assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
         rescue Errors::InvalidSourceId => e
           self.code_major = 'failure'
           self.description = e.to_s
@@ -176,9 +173,9 @@ module BasicLTI
           return true
         end
 
-        op = self.operation_ref_identifier
+        op = self.operation_ref_identifier.underscore
         if self.respond_to?("handle_#{op}", true)
-          return self.send("handle_#{op}", tool, course, assignment, user)
+          return self.send("handle_#{op}", tool, assignment, user)
         end
 
         false
@@ -186,11 +183,27 @@ module BasicLTI
 
       protected
 
-      def handle_replaceResult(_tool, _course, assignment, user)
+      # rubocop:disable Metrics/PerceivedComplexity, Metrics/MethodLength
+      def handle_replace_result(tool, assignment, user)
         text_value = self.result_score
-        new_score = Float(text_value) rescue false
-        raw_score = Float(self.result_total_score) rescue false
+        score_value = self.result_total_score
         error_message = nil
+        begin
+          new_score = Float(text_value)
+        rescue
+          new_score = false
+          error_message = text_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result', <<~NO_POINTS, :grade => text_value)
+            Unable to parse resultScore: %{grade}
+          NO_POINTS
+        end
+        begin
+          raw_score = Float(score_value)
+        rescue
+          raw_score = false
+          error_message ||= score_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result_total', <<~NO_POINTS, :grade => score_value)
+            Unable to parse resultTotalScore: %{grade}
+          NO_POINTS
+        end
         submission_hash = {}
         existing_submission = assignment.submissions.where(user_id: user.id).first
         if (text = result_data_text)
@@ -222,15 +235,15 @@ module BasicLTI
 
         if raw_score
           submission_hash[:grade] = raw_score
-          submission_hash[:grader_id] = -_tool.id
+          submission_hash[:grader_id] = -tool.id
         elsif new_score
-          if (0.0 .. 1.0).include?(new_score)
+          if (0.0..1.0).cover?(new_score)
             submission_hash[:grade] = "#{round_if_whole(new_score * 100)}%"
-            submission_hash[:grader_id] = -_tool.id
+            submission_hash[:grader_id] = -tool.id
           else
             error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
           end
-        elsif !text && !url && !launch_url
+        elsif !error_message && !text && !url && !launch_url
           error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
 
@@ -265,9 +278,20 @@ to because the assignment has no points possible.
               :n_strand => Attachment.clone_url_strand(url)
             }
 
-            send_later_enqueue_args(:fetch_attachment_and_save_submission, job_options, url, attachment, _tool, submission_hash, assignment, user, new_score, raw_score)
+            send_later_enqueue_args(
+              :fetch_attachment_and_save_submission,
+              job_options,
+              url,
+              attachment,
+              tool,
+              submission_hash,
+              assignment,
+              user,
+              new_score,
+              raw_score
+            )
           else
-            create_homework_submission _tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date
+            create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date
           end
         end
 
@@ -275,15 +299,17 @@ to because the assignment has no points possible.
 
         true
       end
+      # rubocop:enable Metrics/PerceivedComplexity, Metrics/MethodLength
 
-      def create_homework_submission(_tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date=nil)
+      # rubocop:disable Metrics/ParameterLists
+      def create_homework_submission(tool, submission_hash, assignment, user, new_score, raw_score, submitted_at_date=nil)
         if submission_hash[:submission_type].present? && submission_hash[:submission_type] != 'external_tool'
           @submission = assignment.submit_homework(user, submission_hash.clone)
         end
 
         if new_score || raw_score
           submission_hash[:grade] = (new_score >= 1 ? "pass" : "fail") if assignment.grading_type == "pass_fail"
-          submission_hash[:grader_id] = -_tool.id
+          submission_hash[:grader_id] = -tool.id
           @submission = assignment.grade_student(user, submission_hash).first
           if submission_hash[:submission_type] == 'external_tool' && submitted_at_date.nil?
             @submission.submitted_at = Time.zone.now
@@ -302,14 +328,15 @@ to because the assignment has no points possible.
           self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
         end
       end
+      # rubocop:enable Metrics/ParameterLists
 
-      def handle_deleteResult(tool, _course, assignment, user)
+      def handle_delete_result(tool, assignment, user)
         assignment.grade_student(user, :grade => nil, grader_id: -tool.id)
         self.body = "<deleteResultResponse />"
         true
       end
 
-      def handle_readResult(tool, course, assignment, user)
+      def handle_read_result(_, assignment, user)
         @submission = assignment.submission_for_student(user)
         self.body = %{
         <readResultResponse>
@@ -324,10 +351,12 @@ to because the assignment has no points possible.
         true
       end
 
-      def fetch_attachment_and_save_submission(url, attachment, _tool, submission_hash, assignment, user, new_score, raw_score)
+      # rubocop:disable Metrics/ParameterLists
+      def fetch_attachment_and_save_submission(url, attachment, tool, submission_hash, assignment, user, new_score, raw_score)
         attachment.clone_url(url, 'rename', true)
-        create_homework_submission _tool, submission_hash, assignment, user, new_score, raw_score
+        create_homework_submission tool, submission_hash, assignment, user, new_score, raw_score
       end
+      # rubocop:enable Metrics/ParameterLists
 
       def submission_score
         if @submission.try(:graded?)
