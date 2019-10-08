@@ -1051,8 +1051,7 @@ class ApplicationController < ActionController::Base
       @context = @membership.group unless @problem
       @current_user = @membership.user unless @problem
     elsif pieces[0] == 'user'
-      @current_user = UserPastLtiId.where(user_uuid: pieces[1]).take&.user
-      @current_user ||= User.where(uuid: pieces[1]).first
+      find_user_from_uuid(pieces[1])
       @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid." unless @current_user
       @context = @current_user
     else
@@ -1082,6 +1081,11 @@ class ApplicationController < ActionController::Base
       return false
     end
     @context
+  end
+
+  def find_user_from_uuid(uuid)
+    @current_user = UserPastLtiId.where(user_uuid: uuid).take&.user
+    @current_user ||= User.where(uuid: uuid).first
   end
 
   def discard_flash_if_xhr
