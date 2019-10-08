@@ -118,6 +118,20 @@ async function createMocks(overrides = []) {
   return mocks
 }
 
+function nodeInterfaceProperlyMocked(queryAST, mocks) {
+  // flatMap
+  const selections = queryAST.definitions.reduce(
+    (acc, d) => acc.concat(d.selectionSet.selections),
+    []
+  )
+  const selectionNames = new Set(selections.map(s => s.name.value))
+  if (selectionNames.has('node') || selectionNames.has('legacyNode')) {
+    return !!mocks.Node?.()?.__typename
+  } else {
+    return true
+  }
+}
+
 /*
  * Mock the result of a graphql query based on the graphql schema for canvas
  * and some default values set specifically for assignments 2. For specifics,
@@ -133,19 +147,27 @@ async function createMocks(overrides = []) {
  *       }
  *       ```
  */
-export async function mockQuery(query, overrides = [], variables = {}) {
-  // Turn the processed / normalized graphql-tag (gql) query back into a
-  // string that can be used to make a query using graphql.js. Using gql is
-  // super helpful for things like removing duplicate fragments, so we still
-  // want to use that when we are defining our queries.
-  const queryStr = print(addTypenameToDocument(query))
+export async function mockQuery(queryAST, overrides = [], variables = {}) {
+  const mocks = await createMocks(overrides)
+
+  // Catch common mistake of forgetting to override the __typename for node interface
+  if (!nodeInterfaceProperlyMocked(queryAST, mocks)) {
+    const err =
+      'You must add a __typename override to tell the node interface what type ' +
+      'you are expecting. For example: `{Node: {__typename: "Course"}}`'
+    throw new Error(err)
+  }
+
+  // Turn the AST query into a string that can be used to make a query against graphql.js
+  const queryStr = print(addTypenameToDocument(queryAST))
   const schema = makeExecutableSchema({
     typeDefs: schemaString,
     resolverValidationOptions: {
       requireResolversForResolveType: false
     }
   })
-  const mocks = await createMocks(overrides)
+
+  // Run our query againsted the mocked server
   addMockFunctionsToSchema({schema, mocks})
   const result = await graphql(schema, queryStr, null, null, variables)
   if (result.errors) {
