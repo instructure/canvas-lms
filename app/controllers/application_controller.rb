@@ -119,15 +119,6 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {}, overwrite = false)
-    if hash.present? && @js_env_has_been_rendered
-      begin
-        raise "you tried to add something to js_env after js_env has been rendered. if you are streaming templates, you must js_env from the controller not the view"
-      rescue => e
-        ErrorReport.log_exception('js_env_with_streaming', e)
-        raise e unless Rails.env.production?
-      end
-    end
-
     return {} unless request.format.html? || request.format == "*/*" || @include_js_env
     # set some defaults
     unless @js_env
@@ -195,13 +186,6 @@ class ApplicationController < ActionController::Base
     @js_env
   end
   helper_method :js_env
-
-  def render_js_env
-    res = StringifyIds.recursively_stringify_ids(js_env.clone).to_json
-    @js_env_has_been_rendered = true
-    res
-  end
-  helper_method :render_js_env
 
   # add keys to JS environment necessary for the RCE at the given risk level
   def rce_js_env(domain: request.env['HTTP_HOST'])

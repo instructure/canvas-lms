@@ -20,8 +20,5 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import FileNotFound from '../shared/FileNotFound'
-import ready from '@instructure/ready'
 
-ready(() => {
 ReactDOM.render(<FileNotFound contextCode={window.ENV.context_asset_string} />, $('#sendMessageForm')[0])
-})

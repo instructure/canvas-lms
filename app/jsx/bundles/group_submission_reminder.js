@@ -22,7 +22,6 @@ import {string} from 'prop-types'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
-import ready from '@instructure/ready'
 
 
 export default function GroupSubmissionAlert ({groupType}) {
@@ -37,11 +36,9 @@ GroupSubmissionAlert.propTypes = {
   groupType: string.isRequired
 }
 
-ready(() => {
 $('.group_submission_alert').each((idx, alertContainer) => {
   ReactDOM.render(
     <GroupSubmissionAlert groupType={alertContainer.getAttribute('data-group-type')} />,
     alertContainer
   )
-})
 })

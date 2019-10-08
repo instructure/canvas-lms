@@ -19,9 +19,7 @@
 import createPermissionsIndex from 'jsx/permissions'
 import {COURSE, ACCOUNT, ALL_ROLES_VALUE, ALL_ROLES_LABEL} from '../permissions/propTypes'
 import {getSortedRoles} from '../permissions/helper/utils'
-import ready from '@instructure/ready'
 
-ready(() => {
 const root = document.querySelector('#content')
 
 // We only want a 1-level flatten
@@ -73,4 +71,3 @@ const initialState = {
 const app = createPermissionsIndex(root, initialState)
 
 app.render()
-})

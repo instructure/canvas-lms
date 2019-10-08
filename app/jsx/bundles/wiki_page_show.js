@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import ready from '@instructure/ready'
 import 'context_modules'
 import WikiPage from 'compiled/models/WikiPage'
 import WikiPageView from 'compiled/views/wiki/WikiPageView'
@@ -42,7 +41,6 @@ const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
   contextAssetString: ENV.context_asset_string
 })
 
-ready(() => {
 const wikiPageView = new WikiPageView({
   el: '#wiki_page_show',
   model: wikiPage,
@@ -59,6 +57,5 @@ const wikiPageView = new WikiPageView({
 })
 
 wikiPageView.render()
-})
 
 monitorLtiMessages()

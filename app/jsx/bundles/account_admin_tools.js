@@ -32,7 +32,6 @@ import UserDateRangeSearchFormView from 'compiled/views/accounts/admin_tools/Use
 import CommMessageItemView from 'compiled/views/accounts/admin_tools/CommMessageItemView'
 import messagesSearchResultsTemplate from 'jst/accounts/admin_tools/commMessagesSearchResults'
 import usersTemplate from 'jst/accounts/usersList'
-import ready from '@instructure/ready'
 
   // This is used by admin tools to display search results
 const restoreModel = new CourseRestoreModel({account_id: ENV.ACCOUNT_ID})
@@ -40,8 +39,6 @@ const restoreModel = new CourseRestoreModel({account_id: ENV.ACCOUNT_ID})
 const messages = new CommMessageCollection(null, {params: {perPage: 10}})
 const messagesUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
 const loggingUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
-
-ready(() => {
 const messagesContentView = new CommMessagesContentPaneView({
   searchForm: new UserDateRangeSearchFormView({
     formName: 'messages',
@@ -83,4 +80,3 @@ const app = new AdminToolsView({
 })
 
 app.render()
-})

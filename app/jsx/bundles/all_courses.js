@@ -18,7 +18,6 @@
 
 import I18n from 'i18n!catalog'
 import $ from 'jquery'
-import ready from '@instructure/ready'
 import 'jqueryui/dialog'
 
 function fetchCourses () {
@@ -62,10 +61,8 @@ function handleCourseClick (e) {
   e.preventDefault()
 }
 
-ready(() => {
 $('#course_filter').submit(handleNav)
 $('#catalog_content').on('click', '#previous-link', handleNav)
 $('#catalog_content').on('click', '#next-link', handleNav)
 $('#catalog_content').on('click', '#course_summaries', handleCourseClick)
 window.addEventListener('popstate', fetchCourses)
-})

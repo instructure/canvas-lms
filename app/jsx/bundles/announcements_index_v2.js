@@ -17,9 +17,7 @@
  */
 
 import createAnnouncementsIndex from '../announcements'
-import ready from '@instructure/ready'
 
-ready(() => {
 const root = document.querySelector('#content')
 const [contextType, contextId] = ENV.context_asset_string.split('_')
 const app = createAnnouncementsIndex(root, {
@@ -31,4 +29,3 @@ const app = createAnnouncementsIndex(root, {
 })
 
 app.render()
-})

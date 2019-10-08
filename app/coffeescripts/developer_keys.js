@@ -20,7 +20,6 @@ import $ from 'jquery'
 import developer_key from 'jst/developer_key'
 import developerKeyFormTemplate from 'jst/developer_key_form'
 import preventDefault from './fn/preventDefault'
-import ready from '@instructure/ready'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_date_and_time'
 import 'jqueryui/dialog'
@@ -101,7 +100,6 @@ function nextPage () {
   }))
 }
 
-ready(() => {
 nextPage()
 $('#keys')
   .on('click', '.delete_link', preventDefault(function () {
@@ -145,4 +143,3 @@ $('#edit_dialog')
   .on('click', '.cancel', () => $('#edit_dialog').dialog('close'))
 
 $('.show_all').click(event => nextPage())
-})

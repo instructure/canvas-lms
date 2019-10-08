@@ -22,7 +22,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Navigation from '../navigation_header/Navigation'
 import MobileNavigation from '../navigation_header/MobileNavigation'
-import ready from '@instructure/ready'
 
 // #
 // Handle user toggling of nav width
@@ -52,7 +51,6 @@ $('body').on('click', '#primaryNavToggle', function () {
   }
 })
 
-ready(() => {
 const globalNavTrayContainer = document.getElementById('global_nav_tray_container')
 if (globalNavTrayContainer) {
   let mobileNavigationComponent
@@ -73,4 +71,4 @@ if (globalNavTrayContainer) {
     )
   }
 }
-})
+

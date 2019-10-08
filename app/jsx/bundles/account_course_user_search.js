@@ -23,7 +23,6 @@ import App from '../account_course_user_search/index'
 import router from '../account_course_user_search/router'
 import configureStore from '../account_course_user_search/store/configureStore'
 import initialState from '../account_course_user_search/store/initialState'
-import ready from '@instructure/ready'
 
 // eg: '/accounts/xxx' for anything like '/accounts/xxx/whatever`
 initialState.tabList.basePath = window.location.pathname.match(/.*accounts\/[^/]*/)[0]
@@ -59,7 +58,7 @@ function updateDocumentTitleBreadcrumbAndActiveTab(activeTab) {
   // toggle the breadcrumb between "Corses" and "People"
   $('#breadcrumbs a:last span').text(activeTab.title)
 }
-ready(() => {
+
 const content = document.getElementById('content')
 store.subscribe(() => {
   const tabState = store.getState().tabList
@@ -70,4 +69,3 @@ store.subscribe(() => {
 })
 
 router.start(store)
-})

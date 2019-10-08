@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ready from '@instructure/ready'
 import $ from 'jquery'
 import QuizArrowApplicator from 'quiz_arrows'
 import 'quizzes'
@@ -24,7 +23,6 @@ import 'supercalc'
 import 'quiz_rubric'
 import 'compiled/quizzes/access_code'
 
-ready(() => {
 $('#show_question_details').on('click', function () {
     // Create the quiz arrows
   if ($(this).is(':checked')) {
@@ -44,5 +42,4 @@ $('body').on('saved', '.question', () => {
     const arrowApplicator = new QuizArrowApplicator()
     arrowApplicator.applyArrows()
   }
-})
 })

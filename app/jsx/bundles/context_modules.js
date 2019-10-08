@@ -21,10 +21,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ModulesHomePage from '../courses/ModulesHomePage'
 import modules from 'context_modules'
-import ready from '@instructure/ready'
 
 
-ready(() => {
 const container = document.getElementById('modules_homepage_user_create')
 if (container) {
   ReactDOM.render(<ModulesHomePage onCreateButtonClick={modules.addModule} />, container)
@@ -33,4 +31,3 @@ if (container) {
 if (ENV.NO_MODULE_PROGRESSIONS) {
   $('.module_progressions_link').remove()
 }
-})

@@ -18,14 +18,12 @@
 
 import I18n from 'i18n!user_notes'
 import $ from 'jquery'
-import ready from '@instructure/ready'
 import './jquery.instructure_forms'
 import './jquery.loadingImg'
 import './jquery.instructure_date_and_time'
 import './jquery.instructure_misc_plugins'
 import './vendor/jquery.pageless'
 
-ready(function() {
   if (ENV.user_note_list_pageless_options) {
     $('#user_note_list').pageless(ENV.user_note_list_pageless_options);
   }
@@ -100,4 +98,3 @@ ready(function() {
       }
     });
   });
-})

@@ -18,11 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ready from '@instructure/ready'
 
 import GradeSummary from '../assignments/GradeSummary'
 
-ready(() => {
 const $container = document.getElementById('content')
 ReactDOM.render(<GradeSummary />, $container)
-})

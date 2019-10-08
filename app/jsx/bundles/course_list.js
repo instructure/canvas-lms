@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!course_list'
-import ready from '@instructure/ready'
 
 function success (target) {
   const favorited_tooltip = I18n.t('favorited_tooltip', 'Click to remove from the courses menu.')
@@ -51,7 +50,6 @@ function success (target) {
   }
 }
 
-ready(() => {
 $('[data-favorite-url]').on('click keyclick', function (event) {
   event.preventDefault()
   const url = $(this).data('favoriteUrl')
@@ -62,4 +60,4 @@ $('[data-favorite-url]').on('click keyclick', function (event) {
     $.ajaxJSON(url, 'POST', {}, success(target), null)
   }
 })
-})
+

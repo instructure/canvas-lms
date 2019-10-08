@@ -19,9 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AccountTabContainer from '../grading/AccountTabContainer'
-import ready from '@instructure/ready'
 
-ready(() => {
 ReactDOM.render(
   <AccountTabContainer
     {...{
@@ -36,4 +34,3 @@ ReactDOM.render(
   />,
   document.getElementById('react_grading_tabs')
 )
-})

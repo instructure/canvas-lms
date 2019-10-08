@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import ready from '@instructure/ready'
 import WikiPage from 'compiled/models/WikiPage'
 import WikiPageRevisionsCollection from 'compiled/collections/WikiPageRevisionsCollection'
 import WikiPageContentView from 'compiled/views/wiki/WikiPageContentView'
@@ -28,7 +27,6 @@ $('body').addClass('show revisions')
 const wikiPage = new WikiPage(ENV.WIKI_PAGE, {revision: ENV.WIKI_PAGE_REVISION, contextAssetString: ENV.context_asset_string})
 const revisions = new WikiPageRevisionsCollection([], {parentModel: wikiPage})
 
-ready(() => {
 const revisionsView = new WikiPageRevisionsView({
   collection: revisions,
   pages_path: ENV.WIKI_PAGES_PATH
@@ -50,4 +48,3 @@ revisionsView.render()
 
 revisionsView.collection.setParams({per_page: 10})
 revisionsView.collection.fetch()
-})
