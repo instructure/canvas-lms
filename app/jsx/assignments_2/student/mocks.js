@@ -15,17 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {addMockFunctionsToSchema, makeExecutableSchema} from 'graphql-tools'
-import {addTypenameToDocument} from 'apollo-utilities'
 import glob from 'glob'
 import gql from 'graphql-tag'
-import {graphql} from 'graphql'
-import {print} from 'graphql/language/printer'
-import schemaString from '../../../../schema.graphql'
 
 import {Assignment} from './graphqlData/Assignment'
 import {Submission} from './graphqlData/Submission'
 
+import mockGraphqlQuery from '../../shared/graphql_query_mock'
+
+// Dynamically load and cache all of the `DefaultMocks` defined in `./graphqlData/*.js`
 let _dynamicDefaultMockImports = null
 async function loadDefaultMocks() {
   if (_dynamicDefaultMockImports !== null) {
@@ -43,138 +41,14 @@ async function loadDefaultMocks() {
   return _dynamicDefaultMockImports
 }
 
-let _typeIntrospectionSet = null
-async function getValidTypes() {
-  if (_typeIntrospectionSet !== null) {
-    return _typeIntrospectionSet
-  }
-
-  const typeIntrospectionQuery = '{ __schema { types { name } } }'
-  const schema = makeExecutableSchema({
-    typeDefs: schemaString,
-    resolverValidationOptions: {
-      requireResolversForResolveType: false
-    }
-  })
-  const result = await graphql(schema, typeIntrospectionQuery)
-  _typeIntrospectionSet = new Set(result.data.__schema.types.map(type => type.name))
-  return _typeIntrospectionSet
-}
-
-async function makeDefaultMocks() {
-  const defaultMocks = await loadDefaultMocks()
-  return [
-    // Custom scalar types defined in our graphql schema
-    {URL: () => 'http://graphql-mocked-url.com'},
-    {DateTime: () => null},
-
-    // DefaultMocks as defined in the ./graphqlData javascript files
-    ...defaultMocks
-  ]
-}
-
-async function createMocks(overrides = []) {
-  const mocks = {}
+// Small wrapper around mockGraphqlQuery which includes our default overrides
+export async function mockQuery(queryAST, overrides = [], variables = {}) {
   if (!Array.isArray(overrides)) {
     overrides = [overrides]
   }
-
-  const validTypes = await getValidTypes()
-  const defaultMocks = await makeDefaultMocks()
-  const allOverrides = [...defaultMocks, ...overrides]
-
-  allOverrides.forEach(overrideObj => {
-    if (typeof overrideObj !== 'object') {
-      throw new Error(`overrides must be an object, not ${typeof overrideObj}`)
-    }
-
-    Object.keys(overrideObj).forEach(key => {
-      // Sanity check. If someone tries to add an override that doesn't exist in
-      // the schema, we are going to fail hard here instead of having unexpected
-      // results returned from this function
-      if (!validTypes.has(key)) {
-        const err =
-          `The override "${key}" is not a valid graphql type. ` +
-          'Did you typo it or forget to update your graphql schema?'
-        throw new Error(err)
-      }
-
-      const defaultFunction = mocks[key] || (() => undefined)
-      const defaultValues = defaultFunction()
-      const overrideFunction =
-        typeof overrideObj[key] === 'function' ? overrideObj[key] : () => overrideObj[key]
-      const overrideValues = overrideFunction()
-
-      // This if statement handles scalar types. For example, saying that all URL
-      // types resolve to a dummy url, regardless of where they show up in the query
-      if (typeof overrideValues !== 'object' || overrideValues === null) {
-        mocks[key] = () => overrideValues
-      } else {
-        mocks[key] = () => ({...defaultValues, ...overrideValues})
-      }
-    })
-  })
-
-  return mocks
-}
-
-function nodeInterfaceProperlyMocked(queryAST, mocks) {
-  // flatMap
-  const selections = queryAST.definitions.reduce(
-    (acc, d) => acc.concat(d.selectionSet.selections),
-    []
-  )
-  const selectionNames = new Set(selections.map(s => s.name.value))
-  if (selectionNames.has('node') || selectionNames.has('legacyNode')) {
-    return !!mocks.Node?.()?.__typename
-  } else {
-    return true
-  }
-}
-
-/*
- * Mock the result of a graphql query based on the graphql schema for canvas
- * and some default values set specifically for assignments 2. For specifics,
- * see: https://www.apollographql.com/docs/graphql-tools/mocking/
- *
- * NOTE: You can mock an interface by passing in desired concrete __typename as
- *       an override. For example, if you are using the `Node` interface to
- *       query for a course, your override would look like this:
- *
- *       ```
- *       {
- *         Node: () => ({ __typename: 'Course'})
- *       }
- *       ```
- */
-export async function mockQuery(queryAST, overrides = [], variables = {}) {
-  const mocks = await createMocks(overrides)
-
-  // Catch common mistake of forgetting to override the __typename for node interface
-  if (!nodeInterfaceProperlyMocked(queryAST, mocks)) {
-    const err =
-      'You must add a __typename override to tell the node interface what type ' +
-      'you are expecting. For example: `{Node: {__typename: "Course"}}`'
-    throw new Error(err)
-  }
-
-  // Turn the AST query into a string that can be used to make a query against graphql.js
-  const queryStr = print(addTypenameToDocument(queryAST))
-  const schema = makeExecutableSchema({
-    typeDefs: schemaString,
-    resolverValidationOptions: {
-      requireResolversForResolveType: false
-    }
-  })
-
-  // Run our query againsted the mocked server
-  addMockFunctionsToSchema({schema, mocks})
-  const result = await graphql(schema, queryStr, null, null, variables)
-  if (result.errors) {
-    const errors = result.errors.map(e => e.message)
-    throw new Error('The graphql query contained errors:\n  - ' + errors.join('\n  - '))
-  }
-  return result
+  const defaultOverrides = await loadDefaultMocks()
+  const allOverrides = [...defaultOverrides, ...overrides]
+  return mockGraphqlQuery(queryAST, allOverrides, variables)
 }
 
 export async function mockAssignment(overrides = []) {
@@ -214,10 +88,7 @@ export async function mockSubmission(overrides = []) {
   if (!Array.isArray(overrides)) {
     overrides = [overrides]
   }
-  overrides.push({
-    Node: () => ({__typename: 'Submission'})
-  })
-
+  overrides.push({Node: () => ({__typename: 'Submission'})})
   const result = await mockQuery(query, overrides, {submissionID: '1'})
   return result.data.node
 }
