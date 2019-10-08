@@ -170,6 +170,19 @@ module ApplicationHelper
     (use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev').freeze
   end
 
+  def load_scripts_async_in_order(script_urls)
+    # this is how you execute scripts in order, in a way that doesn’t block rendering,
+    # and without having to use 'defer' to wait until the whole DOM is loaded.
+    # see: https://www.html5rocks.com/en/tutorials/speed/script-loading/
+    javascript_tag "
+      ;#{script_urls.map{ |url| javascript_path(url)}}.forEach(function(src) {
+        var s = document.createElement('script')
+        s.src = src
+        s.async = false
+        document.head.appendChild(s)
+      });"
+  end
+
   # puts the "main" webpack entry and the moment & timezone files in the <head> of the document
   def include_head_js
     paths = []
@@ -197,17 +210,8 @@ module ApplicationHelper
       paths.each { |url| concat preload_link_tag(javascript_path(url)) }
       chunk_urls.each { |url| concat preload_link_tag(url) }
 
-      # this is how you execute scripts in order, in a way that doesn’t block rendering,
-      # and without having to use 'defer' to wait until the whole DOM is loaded.
-      # see: https://www.html5rocks.com/en/tutorials/speed/script-loading/
-      concat javascript_tag "
-        ;#{(paths + chunk_urls).map{ |url| javascript_path(url)}}.forEach(function(src) {
-          var s = document.createElement('script')
-          s.src = src
-          s.async = false
-          document.head.appendChild(s)
-        });
-      "
+
+      concat load_scripts_async_in_order(paths + chunk_urls)
       concat include_js_bundles
     end
   end
@@ -727,7 +731,9 @@ module ApplicationHelper
     end
 
     if includes.present?
-      javascript_include_tag(*includes, defer: true)
+      # Loading them like this puts them in the same queue as our script tags we load in
+      # include_head_js. We need that because we need them to load _after_ our jquery loads.
+      load_scripts_async_in_order(includes)
     end
   end
 
