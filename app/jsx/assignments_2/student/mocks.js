@@ -147,7 +147,12 @@ export async function mockQuery(query, overrides = [], variables = {}) {
   })
   const mocks = await createMocks(overrides)
   addMockFunctionsToSchema({schema, mocks})
-  return graphql(schema, queryStr, null, null, variables) // Returns a promise
+  const result = await graphql(schema, queryStr, null, null, variables)
+  if (result.errors) {
+    const errors = result.errors.map(e => e.message)
+    throw new Error('The graphql query contained errors:\n  - ' + errors.join('\n  - '))
+  }
+  return result
 }
 
 export async function mockAssignment(overrides = []) {
