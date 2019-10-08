@@ -43,6 +43,9 @@ export default function CanvasMediaPlayer(props) {
     return () => {
       clearTimeout(retryTimerId)
     }
+    // The way this function is setup seems to break things when more exhaustive
+    // deps are put in here.  We should investigate more in the future.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [retryTimerId])
 
   useEffect(() => {
@@ -54,6 +57,9 @@ export default function CanvasMediaPlayer(props) {
         player.addEventListener('loadedmetadata', () => setMediaPlayerSize(player))
       }
     }
+    // The way this function is setup seems to break things when more exhaustive
+    // deps are put in here.  We should investigate more in the future.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [media_sources.length])
 
   async function fetchSources() {
