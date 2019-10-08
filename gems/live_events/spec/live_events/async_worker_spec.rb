@@ -20,7 +20,7 @@ require 'spec_helper'
 
 describe LiveEvents::AsyncWorker do
   let(:put_records_return) { [] }
-  let(:stream_client) { double(stream_name: stream_name) }
+  let(:stream_client) { double(stream_name: stream_name, put_records: OpenStruct.new(records: [], error_code: nil, error_message: nil)) }
   let(:stream_name) { 'stream_name_x' }
   let(:event_name) { 'event_name' }
   let(:event) do
@@ -139,6 +139,7 @@ describe LiveEvents::AsyncWorker do
     it "should drain the queue" do
       @worker.push(event, partition_key)
       expect(@worker).to receive(:at_exit).and_yield
+      expect(LiveEvents.logger).not_to receive(:error)
       @worker.start!
       @worker.send(:at_exit)
     end

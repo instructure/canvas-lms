@@ -95,7 +95,7 @@ module LiveEvents
         begin
           # r will be nil on first pass
           records = [r].compact
-          total_bytes = r&.fetch(:total_bytes) || 0
+          total_bytes = (r.is_a?(Hash) && r[:total_bytes]) || 0
           while @queue.size > 0 && total_bytes < MAX_BYTE_THRESHOLD
             r = @queue.pop
             break if r == :stop
