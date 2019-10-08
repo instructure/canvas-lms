@@ -27,7 +27,7 @@ export function closeDialog() {
 
 export function useOldDebounce() {
   // this version of debounce works with sinon's useFakeTimers
-  return _.debounce = (func, wait, immediate) =>
+  return (_.debounce = (func, wait, immediate) =>
     function() {
       let result
       const context = this
@@ -54,9 +54,9 @@ export function useOldDebounce() {
         result = func.apply(context, args)
       }
       return result
-    }
+    })
 }
 
 export function useNormalDebounce() {
-  return _.debounce = debounce
+  return (_.debounce = debounce)
 }

@@ -22,9 +22,30 @@ import 'helpers/jquery.simulate'
 
 const searchTerm = 'bunnies'
 const photoData = [
-  {id: 'noooooo', secret: 'whyyyyy', farm: 'moooo', owner: 'notyou', server: 'maneframe', needs_interstitial: 0},
-  {id: 'nooope', secret: 'sobbbbb', farm: 'sadface', owner: 'meeee', server: 'mwhahahah', needs_interstitial: 0},
-  {id: 'nsfwid', secret: 'nsfwsecret', farm: 'nsfwfarm', owner: 'nsfwowner', server: 'nsfwserver', needs_interstitial: 1}
+  {
+    id: 'noooooo',
+    secret: 'whyyyyy',
+    farm: 'moooo',
+    owner: 'notyou',
+    server: 'maneframe',
+    needs_interstitial: 0
+  },
+  {
+    id: 'nooope',
+    secret: 'sobbbbb',
+    farm: 'sadface',
+    owner: 'meeee',
+    server: 'mwhahahah',
+    needs_interstitial: 0
+  },
+  {
+    id: 'nsfwid',
+    secret: 'nsfwsecret',
+    farm: 'nsfwfarm',
+    owner: 'nsfwowner',
+    server: 'nsfwserver',
+    needs_interstitial: 1
+  }
 ]
 
 function setupServerResponses() {
@@ -76,11 +97,47 @@ test('search', function() {
   equal(results.length, 2, 'non-nsfw images are added to the results')
 
   for (let idx = 0; idx <= 1; idx++) {
-    ok(results.eq(idx).attr('data-fullsize').includes(photoData[idx].id), 'flickr - img src has id')
-    ok(results.eq(idx).attr('data-fullsize').includes(photoData[idx].secret), 'flickr - img src has secret')
-    ok(results.eq(idx).attr('data-fullsize').includes(photoData[idx].farm), 'flickr - img src has farm')
-    ok(results.eq(idx).attr('data-fullsize').includes(photoData[idx].server), 'flickr - img src has server')
-    ok(results.eq(idx).attr('data-linkto').includes(photoData[idx].id), 'flickr - link has id')
-    ok(results.eq(idx).attr('data-linkto').includes(photoData[idx].owner), 'flickr - link has owner')
+    ok(
+      results
+        .eq(idx)
+        .attr('data-fullsize')
+        .includes(photoData[idx].id),
+      'flickr - img src has id'
+    )
+    ok(
+      results
+        .eq(idx)
+        .attr('data-fullsize')
+        .includes(photoData[idx].secret),
+      'flickr - img src has secret'
+    )
+    ok(
+      results
+        .eq(idx)
+        .attr('data-fullsize')
+        .includes(photoData[idx].farm),
+      'flickr - img src has farm'
+    )
+    ok(
+      results
+        .eq(idx)
+        .attr('data-fullsize')
+        .includes(photoData[idx].server),
+      'flickr - img src has server'
+    )
+    ok(
+      results
+        .eq(idx)
+        .attr('data-linkto')
+        .includes(photoData[idx].id),
+      'flickr - link has id'
+    )
+    ok(
+      results
+        .eq(idx)
+        .attr('data-linkto')
+        .includes(photoData[idx].owner),
+      'flickr - link has owner'
+    )
   }
 })

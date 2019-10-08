@@ -87,7 +87,6 @@ test('move, edit, and delete buttons do not appear when read only', function() {
   view.remove()
 })
 
-
 QUnit.module('OutcomeGroupView as a student', {
   setup() {
     fixtures.setup()

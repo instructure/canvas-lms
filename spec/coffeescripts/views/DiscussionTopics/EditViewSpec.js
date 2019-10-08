@@ -581,13 +581,13 @@ QUnit.module('EditView: Assignment External Tools', {
 })
 
 test('it attaches assignment external tools component in course context', function() {
-  ENV.context_asset_string = "course_1"
+  ENV.context_asset_string = 'course_1'
   const view = this.editView()
   equal(view.$AssignmentExternalTools.children().size(), 1)
 })
 
 test('it does not attach assignment external tools component in group context', function() {
-  ENV.context_asset_string = "group_1"
+  ENV.context_asset_string = 'group_1'
   const view = this.editView()
   equal(view.$AssignmentExternalTools.children().size(), 0)
 })

@@ -22,7 +22,8 @@ import inlineMediaComment from 'compiled/behaviors/instructure_inline_media_comm
 QUnit.module('inlineMediaComment', {
   setup() {
     this.fixtures = document.getElementById('fixtures')
-    this.fixtures.innerHTML = "<a data-media_comment_id=42 class='instructure_inline_media_comment' href='42' tabindex=0></a>"
+    this.fixtures.innerHTML =
+      "<a data-media_comment_id=42 class='instructure_inline_media_comment' href='42' tabindex=0></a>"
     window.INST.kalturaSettings = 'settings set'
   },
   teardown() {

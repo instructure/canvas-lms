@@ -66,7 +66,7 @@ test('should handle intialization of locked / unlocked rows', function() {
 
 test('should remove rows correctly', function() {
   for (const row of this.me.rows) {
-  // get rid of every row
+    // get rid of every row
     row.remove()
     ok(!this.me.rows.includes(row))
   }

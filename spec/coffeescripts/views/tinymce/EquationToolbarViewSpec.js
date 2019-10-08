@@ -26,7 +26,8 @@ QUnit.module('EquationToolbarView MathJax', {
 
 test('mathjax is loaded properly', () => {
   const equationToolbarView = new EquationToolbarView()
-  sandbox.mock(mathml)
+  sandbox
+    .mock(mathml)
     .expects('loadMathJax')
     .withArgs('TeX-AMS_HTML.js')
   equationToolbarView.render()

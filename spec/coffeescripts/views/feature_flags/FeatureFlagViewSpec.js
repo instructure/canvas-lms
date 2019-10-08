@@ -314,7 +314,11 @@ QUnit.module('FeatureFlagView (read-only)', {
     this.container = $('<div />', {id: 'feature-flags'}).appendTo('#fixtures')
     this.snapshot = tz.snapshot()
     I18nStubber.pushFrame()
-    fakeENV.setup({context_asset_string: 'account_1', ACCOUNT: {id: 1, site_admin: true}, PERMISSIONS: {manage_feature_flags: false}})
+    fakeENV.setup({
+      context_asset_string: 'account_1',
+      ACCOUNT: {id: 1, site_admin: true},
+      PERMISSIONS: {manage_feature_flags: false}
+    })
     this.server = sinon.fakeServer.create()
   },
   teardown() {

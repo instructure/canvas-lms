@@ -26,6 +26,7 @@ class AssignmentStub extends Backbone.Model {
   name() {
     return this.get('name')
   }
+
   toView() {
     return {
       name: this.get('name'),

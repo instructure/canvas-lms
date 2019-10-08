@@ -71,9 +71,9 @@ QUnit.module('loadOnTarget', {
     this.$div = fixtures.create('<div><textarea id="theTarget" name="elementName" /></div>')
     this.$textarea = fixtures.find('#theTarget')
     this.editor = {
-      mceInstance () {
+      mceInstance() {
         return {
-          on (eventType, callback) {
+          on(eventType, callback) {
             callback()
           }
         }

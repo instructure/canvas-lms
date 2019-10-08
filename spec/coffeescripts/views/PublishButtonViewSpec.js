@@ -38,12 +38,14 @@ QUnit.module('PublishButtonView', {
         dfrd.resolve()
         return dfrd
       }
+
       unpublish() {
         this.set('published', false)
         const dfrd = $.Deferred()
         dfrd.resolve()
         return dfrd
       }
+
       disabledMessage() {
         return "can't unpublish"
       }

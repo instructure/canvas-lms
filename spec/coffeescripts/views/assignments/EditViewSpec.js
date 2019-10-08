@@ -315,7 +315,7 @@ test('does not allow point value of "" if grading type is letter', function() {
     'Points possible must be 0 or more for selected grading type'
   )
 
-  //removes student group
+  // removes student group
   view.$('#has_group_category').click()
   equal(view.getFormData().groupCategoryId, null)
 })
@@ -334,10 +334,7 @@ test('does not allow blank default external tool url', function() {
   const view = this.editView()
   const data = {submission_type: 'external_tool'}
   const errors = view._validateExternalTool(data, [])
-  equal(
-    errors['default-tool-launch-button'][0].message,
-    'External Tool URL cannot be left blank'
-  )
+  equal(errors['default-tool-launch-button'][0].message, 'External Tool URL cannot be left blank')
 })
 
 test('does not validate allowed extensions if file uploads is not a submission type', function() {
@@ -504,14 +501,18 @@ test('rounds points_possible', function() {
 })
 
 test('sets seconds of due_at to 59 if the new minute value is 59', function() {
-  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))})
+  const view = this.editView({
+    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().due_at, '2000-08-28T11:59:59.000Z')
 })
 
 test('sets seconds of due_at to 00 if the new minute value is not 59', function() {
-  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const view = this.editView({
+    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().due_at, '2000-09-28T11:58:00.000Z')
@@ -521,28 +522,36 @@ test('sets seconds of due_at to 00 if the new minute value is not 59', function(
 // the seconds value was set to something different prior to the update, keep
 // that value.
 test('keeps original due_at seconds if only the seconds value has changed', function() {
-  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))})
+  const view = this.editView({
+    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
   strictEqual(view.getFormData().due_at, '2000-08-29T11:59:23.000Z')
 })
 
 test('keeps original due_at seconds if the date has not changed', function() {
-  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const view = this.editView({
+    due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().due_at, '2000-08-28T11:59:23.000Z')
 })
 
 test('sets seconds of unlock_at to 59 if the new minute value is 59', function() {
-  const view = this.editView({unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))})
+  const view = this.editView({
+    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().unlock_at, '2000-08-28T11:59:59.000Z')
 })
 
 test('sets seconds of unlock_at to 00 if the new minute value is not 59', function() {
-  const view = this.editView({unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const view = this.editView({
+    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().unlock_at, '2000-09-28T11:58:00.000Z')
@@ -552,28 +561,36 @@ test('sets seconds of unlock_at to 00 if the new minute value is not 59', functi
 // the seconds value was set to something different prior to the update, keep
 // that value.
 test('keeps original unlock_at seconds if only the seconds value has changed', function() {
-  const view = this.editView({unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))})
+  const view = this.editView({
+    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
   strictEqual(view.getFormData().unlock_at, '2000-08-29T11:59:23.000Z')
 })
 
 test('keeps original unlock_at seconds if the date has not changed', function() {
-  const view = this.editView({unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const view = this.editView({
+    unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().unlock_at, '2000-08-28T11:59:23.000Z')
 })
 
 test('sets seconds of lock_at to 59 if the new minute value is 59', function() {
-  const view = this.editView({lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))})
+  const view = this.editView({
+    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().lock_at, '2000-08-28T11:59:59.000Z')
 })
 
 test('sets seconds of lock_at to 00 if the new minute value is not 59', function() {
-  const view = this.editView({lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const view = this.editView({
+    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
   strictEqual(view.getFormData().lock_at, '2000-09-28T11:58:00.000Z')
@@ -583,14 +600,18 @@ test('sets seconds of lock_at to 00 if the new minute value is not 59', function
 // the seconds value was set to something different prior to the update, keep
 // that value.
 test('keeps original lock_at seconds if only the seconds value has changed', function() {
-  const view = this.editView({lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))})
+  const view = this.editView({
+    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
   strictEqual(view.getFormData().lock_at, '2000-08-29T11:59:23.000Z')
 })
 
 test('keeps original lock_at seconds if the date has not changed', function() {
-  const view = this.editView({lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const view = this.editView({
+    lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  })
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().lock_at, '2000-08-28T11:59:23.000Z')
@@ -660,7 +681,7 @@ test('calls togglePeerReviewsAndGroupCategoryEnabled', function() {
   view.togglePeerReviewsAndGroupCategoryEnabled.restore()
 })
 
-QUnit.module('#handleAnonymousGradingChange', (hooks) => {
+QUnit.module('#handleAnonymousGradingChange', hooks => {
   let server
   let view
 
@@ -738,7 +759,7 @@ QUnit.module('#handleAnonymousGradingChange', (hooks) => {
   })
 })
 
-QUnit.module('#togglePeerReviewsAndGroupCategoryEnabled', (hooks) => {
+QUnit.module('#togglePeerReviewsAndGroupCategoryEnabled', hooks => {
   let server
   let view
 
@@ -876,9 +897,9 @@ QUnit.module('EditView: enableCheckbox', {
 
 test('enables checkbox', function() {
   const view = this.editView()
-  sandbox.stub(view.$('#assignment_peer_reviews'), 'parent').returns(
-    view.$('#assignment_peer_reviews')
-  )
+  sandbox
+    .stub(view.$('#assignment_peer_reviews'), 'parent')
+    .returns(view.$('#assignment_peer_reviews'))
 
   view.$('#assignment_peer_reviews').prop('disabled', true)
   view.enableCheckbox(view.$('#assignment_peer_reviews'))
@@ -1328,8 +1349,8 @@ test('does not show the load in new tab checkbox', function() {
   equal(this.view.$externalToolsNewTab.length, 0)
 })
 
-QUnit.module('EditView: anonymous grading', (hooks) => {
-  let server;
+QUnit.module('EditView: anonymous grading', hooks => {
+  let server
   hooks.beforeEach(() => {
     fixtures.innerHTML = '<span data-component="ModeratedGradingFormFieldGroup"></span>'
     fakeENV.setup({
@@ -1344,13 +1365,13 @@ QUnit.module('EditView: anonymous grading', (hooks) => {
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
-  });
+  })
 
   hooks.afterEach(() => {
     server.restore()
     fakeENV.teardown()
     fixtures.innerHTML = ''
-  });
+  })
 
   test('does not show the checkbox when environment is not set', () => {
     const view = editView()
@@ -1374,9 +1395,7 @@ QUnit.module('EditView: anonymous grading', (hooks) => {
 
   test('is disabled when group assignment is enabled', () => {
     ENV.ANONYMOUS_GRADING_ENABLED = true
-    ENV.GROUP_CATEGORIES = [
-      {id: '1', name: 'Group Category #1'}
-    ]
+    ENV.GROUP_CATEGORIES = [{id: '1', name: 'Group Category #1'}]
     const view = editView({group_category_id: '1'})
     view.$el.appendTo($('#fixtures'))
     view.afterRender() // call this because it's called before everything is rendered in the specs
@@ -1386,7 +1405,7 @@ QUnit.module('EditView: anonymous grading', (hooks) => {
   })
 })
 
-QUnit.module('EditView: Anonymous Instructor Annotations', (hooks) => {
+QUnit.module('EditView: Anonymous Instructor Annotations', hooks => {
   let server
 
   function setupFakeEnv(envOptions = {}) {
@@ -1431,7 +1450,7 @@ QUnit.module('EditView: Anonymous Instructor Annotations', (hooks) => {
   })
 })
 
-QUnit.module('EditView: Anonymous Moderated Marking', (hooks) => {
+QUnit.module('EditView: Anonymous Moderated Marking', hooks => {
   let server
 
   hooks.beforeEach(() => {
@@ -1466,7 +1485,7 @@ QUnit.module('EditView: Anonymous Moderated Marking', (hooks) => {
   })
 })
 
-QUnit.module('EditView#validateFinalGrader', (hooks) => {
+QUnit.module('EditView#validateFinalGrader', hooks => {
   let server
   let view
 
@@ -1497,22 +1516,22 @@ QUnit.module('EditView#validateFinalGrader', (hooks) => {
   })
 
   test('returns no errors if moderated grading is turned off', () => {
-    const errors = view.validateFinalGrader({ moderated_grading: 'off' })
+    const errors = view.validateFinalGrader({moderated_grading: 'off'})
     strictEqual(Object.keys(errors).length, 0)
   })
 
   test('returns no errors if moderated grading is turned on and there is a final grader', () => {
-    const errors = view.validateFinalGrader({ moderated_grading: 'on', final_grader_id: '89' })
+    const errors = view.validateFinalGrader({moderated_grading: 'on', final_grader_id: '89'})
     strictEqual(Object.keys(errors).length, 0)
   })
 
   test('returns an error if moderated grading is turned on and there is no final grader', () => {
-    const errors = view.validateFinalGrader({ moderated_grading: 'on', final_grader_id: '' })
+    const errors = view.validateFinalGrader({moderated_grading: 'on', final_grader_id: ''})
     deepEqual(Object.keys(errors), ['final_grader_id'])
   })
 })
 
-QUnit.module('EditView#validateGraderCount', (hooks) => {
+QUnit.module('EditView#validateGraderCount', hooks => {
   let server
   let view
 
@@ -1543,35 +1562,35 @@ QUnit.module('EditView#validateGraderCount', (hooks) => {
   })
 
   test('returns no errors if moderated grading is turned off', () => {
-    const errors = view.validateGraderCount({ moderated_grading: 'off' })
+    const errors = view.validateGraderCount({moderated_grading: 'off'})
     strictEqual(Object.keys(errors).length, 0)
   })
 
   test('returns no errors if moderated grading is turned on and grader count is in an acceptable range', () => {
-    const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '6' })
+    const errors = view.validateGraderCount({moderated_grading: 'on', grader_count: '6'})
     strictEqual(Object.keys(errors).length, 0)
   })
 
   test('returns no errors if moderated grading is turned on and grader count is greater than available grader count', () => {
-    const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '8' })
+    const errors = view.validateGraderCount({moderated_grading: 'on', grader_count: '8'})
     strictEqual(Object.keys(errors).length, 0)
   })
 
   test('returns an error if moderated grading is turned on and grader count is empty', () => {
-    const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '' })
+    const errors = view.validateGraderCount({moderated_grading: 'on', grader_count: ''})
     deepEqual(Object.keys(errors), ['grader_count'])
   })
 
   test('returns an error if moderated grading is turned on and grader count is 0', () => {
-    const errors = view.validateGraderCount({ moderated_grading: 'on', grader_count: '0' })
+    const errors = view.validateGraderCount({moderated_grading: 'on', grader_count: '0'})
     deepEqual(Object.keys(errors), ['grader_count'])
   })
 })
 
-QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
+QUnit.module('EditView#renderModeratedGradingFormFieldGroup', suiteHooks => {
   let view
   let server
-  const availableModerators = [{ name: 'John Doe', id: '21' }, { name: 'Jane Doe', id: '89' }]
+  const availableModerators = [{name: 'John Doe', id: '21'}, {name: 'Jane Doe', id: '89'}]
 
   suiteHooks.beforeEach(() => {
     fixtures.innerHTML = `
@@ -1612,7 +1631,7 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
     strictEqual(document.getElementsByClassName('ModeratedGrading__Container').length, 0)
   })
 
-  QUnit.module('props passed to the component', (hooks) => {
+  QUnit.module('props passed to the component', hooks => {
     hooks.beforeEach(() => {
       ENV.MODERATED_GRADING_ENABLED = true
       sinon.spy(React, 'createElement')
@@ -1691,7 +1710,10 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
 
     test('passes handleGraderCommentsVisibleToGradersChanged as a prop to the component', () => {
       view.renderModeratedGradingFormFieldGroup()
-      strictEqual(props().onGraderCommentsVisibleToGradersChange, view.handleGraderCommentsVisibleToGradersChanged)
+      strictEqual(
+        props().onGraderCommentsVisibleToGradersChange,
+        view.handleGraderCommentsVisibleToGradersChanged
+      )
     })
 
     test('passes handleModeratedGradingChanged as a prop to the component', () => {
@@ -1701,7 +1723,7 @@ QUnit.module('EditView#renderModeratedGradingFormFieldGroup', (suiteHooks) => {
   })
 })
 
-QUnit.module('EditView#handleModeratedGradingChanged', (hooks) => {
+QUnit.module('EditView#handleModeratedGradingChanged', hooks => {
   let server
   let view
 
@@ -1746,22 +1768,28 @@ QUnit.module('EditView#handleModeratedGradingChanged', (hooks) => {
     view.togglePeerReviewsAndGroupCategoryEnabled.restore()
   })
 
-  test('reveals the "Graders Anonymous to Graders" option when passed true and ' +
-  'grader comments are visible to graders', () => {
-    view.assignment.graderCommentsVisibleToGraders(true)
-    view.handleModeratedGradingChanged(true)
-    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
-    const isHidden = getComputedStyle(label).getPropertyValue('display') === 'none'
-    strictEqual(isHidden, false)
-  })
+  test(
+    'reveals the "Graders Anonymous to Graders" option when passed true and ' +
+      'grader comments are visible to graders',
+    () => {
+      view.assignment.graderCommentsVisibleToGraders(true)
+      view.handleModeratedGradingChanged(true)
+      const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
+      const isHidden = getComputedStyle(label).getPropertyValue('display') === 'none'
+      strictEqual(isHidden, false)
+    }
+  )
 
-  test('does not reveal the "Graders Anonymous to Graders" option when passed true and ' +
-  'grader comments are not visible to graders', () => {
-    view.handleModeratedGradingChanged(true)
-    const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
-    const isHidden = getComputedStyle(label).getPropertyValue('display') === 'none'
-    strictEqual(isHidden, true)
-  })
+  test(
+    'does not reveal the "Graders Anonymous to Graders" option when passed true and ' +
+      'grader comments are not visible to graders',
+    () => {
+      view.handleModeratedGradingChanged(true)
+      const label = document.querySelector('label[for="assignment_graders_anonymous_to_graders"]')
+      const isHidden = getComputedStyle(label).getPropertyValue('display') === 'none'
+      strictEqual(isHidden, true)
+    }
+  )
 
   test('calls uncheckAndHideGraderAnonymousToGraders when passed false', () => {
     sinon.stub(view, 'uncheckAndHideGraderAnonymousToGraders')
@@ -1771,7 +1799,7 @@ QUnit.module('EditView#handleModeratedGradingChanged', (hooks) => {
   })
 })
 
-QUnit.module('EditView#handleGraderCommentsVisibleToGradersChanged', (hooks) => {
+QUnit.module('EditView#handleGraderCommentsVisibleToGradersChanged', hooks => {
   let server
   let view
 
@@ -1824,7 +1852,7 @@ QUnit.module('EditView#handleGraderCommentsVisibleToGradersChanged', (hooks) => 
   })
 })
 
-QUnit.module('EditView#uncheckAndHideGraderAnonymousToGraders', (hooks) => {
+QUnit.module('EditView#uncheckAndHideGraderAnonymousToGraders', hooks => {
   let server
   let view
 

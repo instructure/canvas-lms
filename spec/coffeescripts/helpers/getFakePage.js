@@ -40,9 +40,6 @@ export default function getFakePage(thisPage = 1) {
   return {
     urls,
     header: links.join(','),
-    data: [
-      {id: lastID - 1, foo: 'bar', baz: 'qux'},
-      {id: lastID, foo: 'bar', baz: 'qux'}
-    ]
+    data: [{id: lastID - 1, foo: 'bar', baz: 'qux'}, {id: lastID, foo: 'bar', baz: 'qux'}]
   }
 }

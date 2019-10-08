@@ -89,10 +89,7 @@ test('uses the score when the score is 0', () => {
     '/courses/2'
   )
 
-  equal(
-    tii_data.score,
-    '0%'
-  )
+  equal(tii_data.score, '0%')
 })
 
 test('correctly finds text entry plagiarism data', () => {

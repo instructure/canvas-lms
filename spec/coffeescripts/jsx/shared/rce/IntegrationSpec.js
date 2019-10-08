@@ -37,9 +37,9 @@ QUnit.module('Rce Abstraction - integration', {
       renderIntoDiv: (renderingTarget, propsForRCE, renderCallback) => {
         $(renderingTarget).append(`<div id='fake-editor'>${propsForRCE.toString()}</div>`)
         const fakeEditor = {
-          mceInstance () {
+          mceInstance() {
             return {
-              on () { }
+              on() {}
             }
           }
         }
