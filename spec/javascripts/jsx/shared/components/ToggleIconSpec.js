@@ -17,20 +17,24 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import merge from 'lodash/merge'
 import ToggleIcon from 'jsx/shared/components/ToggleIcon'
 
 QUnit.module('ToggleIcon component')
 
-const makeProps = (props = {}) => merge({
-  toggled: true,
-  OnIcon: <span className="onIcon" />,
-  OffIcon: <span className="offIcon" />,
-  onToggleOn: () => {},
-  onToggleOff: () => {},
-  disabled: false,
-}, props)
+const makeProps = (props = {}) =>
+  merge(
+    {
+      toggled: true,
+      OnIcon: <span className="onIcon" />,
+      OffIcon: <span className="offIcon" />,
+      onToggleOn: () => {},
+      onToggleOff: () => {},
+      disabled: false
+    },
+    props
+  )
 
 test('renders the ToggleIcon component', () => {
   const tree = mount(<ToggleIcon {...makeProps()} />)
@@ -44,7 +48,7 @@ test('renders the on icon when toggled', () => {
 })
 
 test('renders the off icon when untoggled', () => {
-  const tree = mount(<ToggleIcon {...makeProps({ toggled: false })} />)
+  const tree = mount(<ToggleIcon {...makeProps({toggled: false})} />)
   ok(!tree.find('.onIcon').exists())
   ok(tree.find('.offIcon').exists())
 })
@@ -52,7 +56,7 @@ test('renders the off icon when untoggled', () => {
 test('calls onToggleOff when clicked while toggled', () => {
   const onToggleOn = sinon.spy()
   const onToggleOff = sinon.spy()
-  const tree = mount(<ToggleIcon {...makeProps({ onToggleOn, onToggleOff })} />)
+  const tree = mount(<ToggleIcon {...makeProps({onToggleOn, onToggleOff})} />)
 
   tree.find('.onIcon').simulate('click')
   strictEqual(onToggleOff.callCount, 1)
@@ -62,7 +66,7 @@ test('calls onToggleOff when clicked while toggled', () => {
 test('calls onToggleOn when clicked while untoggled', () => {
   const onToggleOn = sinon.spy()
   const onToggleOff = sinon.spy()
-  const tree = mount(<ToggleIcon {...makeProps({ onToggleOn, onToggleOff, toggled: false })} />)
+  const tree = mount(<ToggleIcon {...makeProps({onToggleOn, onToggleOff, toggled: false})} />)
 
   tree.find('.offIcon').simulate('click')
   strictEqual(onToggleOff.callCount, 0)
@@ -72,7 +76,7 @@ test('calls onToggleOn when clicked while untoggled', () => {
 test('cannot be clicked if disabled', () => {
   const onToggleOn = sinon.spy()
   const onToggleOff = sinon.spy()
-  const tree = mount(<ToggleIcon {...makeProps({ onToggleOn, onToggleOff, disabled: true })} />)
+  const tree = mount(<ToggleIcon {...makeProps({onToggleOn, onToggleOff, disabled: true})} />)
 
   tree.find('.onIcon').simulate('click')
   strictEqual(onToggleOff.callCount, 0)

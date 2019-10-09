@@ -20,19 +20,19 @@ import Backbone from 'Backbone'
 import ExternalContentHomeworkSubmissionView from 'compiled/views/assignments/ExternalContentHomeworkSubmissionView'
 
 function newView() {
-  const view = new ExternalContentHomeworkSubmissionView
+  const view = new ExternalContentHomeworkSubmissionView()
   view.externalTool = {}
   view.model = new Backbone.Model({})
   return view
 }
 
 QUnit.module('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', {
-  teardown () {
-    document.getElementById('fixtures').innerHTML = ""
+  teardown() {
+    document.getElementById('fixtures').innerHTML = ''
   }
 })
 
-test("Does submit the assignment if the EULA checkbox is not checked", () => {
+test('Does submit the assignment if the EULA checkbox is not checked', () => {
   const view = newView()
   const submitSpy = sinon.spy()
 
@@ -41,7 +41,6 @@ test("Does submit the assignment if the EULA checkbox is not checked", () => {
   input.className = 'turnitin_pledge external-tool'
   input.checked = false
 
-
   document.getElementById('fixtures').appendChild(input)
   view.submitHomework = submitSpy
   view._triggerSubmit({preventDefault: () => {}, stopPropagation: () => {}})
@@ -49,7 +48,7 @@ test("Does submit the assignment if the EULA checkbox is not checked", () => {
   notOk(submitSpy.called)
 })
 
-test("Does submit the assignment if the EULA checkbox is checked", () => {
+test('Does submit the assignment if the EULA checkbox is checked', () => {
   const view = newView()
   const submitSpy = sinon.spy()
 
@@ -58,7 +57,6 @@ test("Does submit the assignment if the EULA checkbox is checked", () => {
   input.className = 'turnitin_pledge external-tool'
   input.checked = true
 
-
   document.getElementById('fixtures').appendChild(input)
   view.submitHomework = submitSpy
   view._triggerSubmit({preventDefault: () => {}, stopPropagation: () => {}})
@@ -66,7 +64,7 @@ test("Does submit the assignment if the EULA checkbox is checked", () => {
   ok(submitSpy.called)
 })
 
-test("Does submit the assignment if the EULA checkbox does not exist", () => {
+test('Does submit the assignment if the EULA checkbox does not exist', () => {
   const view = newView()
   const submitSpy = sinon.spy()
 

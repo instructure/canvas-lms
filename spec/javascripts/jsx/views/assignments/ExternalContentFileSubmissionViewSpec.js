@@ -35,7 +35,7 @@ let model
 let view
 
 QUnit.module('ExternalContentFileSubmissionView#uploadFileFromUrl', {
-  setup () {
+  setup() {
     sandbox = sinon.createSandbox()
     fakeENV.setup()
     window.ENV.COURSE_ID = 42
@@ -44,25 +44,26 @@ QUnit.module('ExternalContentFileSubmissionView#uploadFileFromUrl', {
       ID: 24
     }
     model = new Backbone.Model(contentItem)
-    view = new ExternalContentFileSubmissionView
-      externalTool: {}
-      model: model
+    view = new ExternalContentFileSubmissionView()
+    {
+    }
+    model
   },
 
-  teardown () {
+  teardown() {
     fakeENV.teardown()
     $('#fixtures').empty()
     sandbox.restore()
   }
 })
 
-test("hits the course url", () => {
+test('hits the course url', () => {
   const spy = sandbox.spy(axios, 'post')
   view.uploadFileFromUrl({}, model)
   ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
 })
 
-test("hits the group url", () => {
+test('hits the group url', () => {
   window.ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER = 2
 
   const spy = sandbox.spy(axios, 'post')
@@ -70,7 +71,7 @@ test("hits the group url", () => {
   ok(spy.calledWith('/api/v1/groups/2/files?assignment_id=24'))
 })
 
-test("sends the eula agreement timestamp to the submission endpoint", () => {
+test('sends the eula agreement timestamp to the submission endpoint', () => {
   const spy = sandbox.spy(axios, 'post')
   view.uploadFileFromUrl({}, model)
   equal(spy.args[0][1].eula_agreement_timestamp, model.get('eula_agreement_timestamp'))

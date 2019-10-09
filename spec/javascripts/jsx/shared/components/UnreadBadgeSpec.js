@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount, shallow } from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import UnreadBadge from 'jsx/shared/components/UnreadBadge'
 
 QUnit.module('UnreadBadge component')
@@ -26,7 +26,7 @@ const defaultProps = () => ({
   unreadCount: 2,
   totalCount: 5,
   unreadLabel: '2 unread replies',
-  totalLabel: '5 total replies',
+  totalLabel: '5 total replies'
 })
 
 test('renders the UnreadBadge component', () => {
