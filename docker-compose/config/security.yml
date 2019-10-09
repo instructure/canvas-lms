@@ -1,5 +1,15 @@
+common: &default_settings
+  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>
+
 development:
-  encryption_key: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+  <<: *default_settings
 
 test:
-  encryption_key: facdd3a131ddd8988b14f6e4e01039c93cfa0160
+  <<: *default_settings
+  domain: localhost
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings

@@ -39,7 +39,11 @@ module Canvas::Security
   end
 
   def self.config
-    @config ||= (YAML.load_file(Rails.root+"config/security.yml")[Rails.env] rescue nil)
+    @config ||= begin
+      path = Rails.root + 'config/security.yml'
+      raise('config/security.yml missing, see security.yml.example') unless File.exist?(path)
+      YAML.safe_load(ERB.new(File.read(path)).result)[Rails.env]
+    end
   end
 
   def self.encrypt_password(secret, key)
