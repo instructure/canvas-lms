@@ -28,13 +28,13 @@ group :test do
   gem 'simplecov-rcov', '0.2.3', require: false
   gem 'puma', '4.2.1'
 
-  gem 'rspec', '3.8.0'
+  gem 'rspec', '3.9.0'
   gem 'rspec_around_all', '0.2.0'
-  gem 'rspec-rails', '3.8.2'
+  gem 'rspec-rails', '3.9.0'
   gem 'rspec-collection_matchers', '1.2.0'
-  gem 'rspec-support', '3.8.3'
-  gem 'rspec-expectations', '3.8.6'
-  gem 'rspec-mocks', '3.8.2'
+  gem 'rspec-support', '3.9.0'
+  gem 'rspec-expectations', '3.9.0'
+  gem 'rspec-mocks', '3.9.0'
   gem 'shoulda-matchers', '4.1.2'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
