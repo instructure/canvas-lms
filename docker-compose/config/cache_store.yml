@@ -1,4 +1,15 @@
-test:
-  cache_store: redis_store
+common: &default_settings
+  cache_store: <%= ENV['CACHE_STORE'] %>
+
 development:
+  <<: *default_settings
+
+test:
+  <<: *default_settings
   cache_store: redis_store
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings

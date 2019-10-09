@@ -1,12 +1,20 @@
+common: &default_settings
+  servers: 
+    - <%= ENV['REDIS_HOST_1'] %>
+    # Note: you can add more servers here. If we do that, create more ENV vars for them.
+
 development:
-  servers:
-    - redis://canvasredis
+  <<: *default_settings
 
 test:
-  # only tests that are exercising the integration with redis require redis to run.
-  servers:
-    - redis://canvasredis
+  <<: *default_settings
   # warning: the redis database will get cleared before each test, so if you
   # use this server for anything else, make sure to set aside a database id for
   # these tests to use.
   database: 1
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings

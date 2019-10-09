@@ -1,11 +1,18 @@
-## amazon storage example. requires valid amazon_s3.yml
+common: &default_settings
+  ## storage: s3 - would require valid amazon_s3.yml
+  storage: <%= ENV['FILE_STORE'] %>
+  path_prefix: <%= ENV['FILE_STORE_PATH_PREFIX'] %>
+
 development:
-  storage: s3
+  <<: *default_settings
 
 test:
+  <<: *default_settings
   storage: local
   path_prefix: tmp/files
 
+staging:
+  <<: *default_settings
+
 production:
-  storage: local
-  path_prefix: tmp/files
+  <<: *default_settings
