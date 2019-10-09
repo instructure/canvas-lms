@@ -17,7 +17,8 @@
 
 if CANVAS_RAILS5_2
   gem 'rails', '5.2.3'
-    gem 'loofah', '2.2.3'
+    gem 'loofah', '2.3.0'
+    gem 'sprockets', '3.7.2' # 4.0 requires ruby 2.5
 else
   gem 'rails', '6.0.0'
 end
@@ -127,7 +128,6 @@ gem 'inst-jobs-statsd', '1.2.3'
 gem 'gepub', '1.0.4'
 gem 'imperium', '0.5.1', require: false
 gem 'academic_benchmarks', '0.0.11', require: false
-  gem 'sprockets', '3.7.2'
 
 gem 'graphql', '1.9.11'
 gem 'graphql-batch', '0.4.1'
