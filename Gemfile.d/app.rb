@@ -56,7 +56,7 @@ gem "aws-sdk-kms", "1.24.0", require: false
 gem "aws-sigv4", "1.1.0", require: false
 
 gem 'barby', '0.6.8', require: false
-  gem 'rqrcode', '0.10.1', require: false
+  gem 'rqrcode', '1.1.1', require: false
   gem 'chunky_png', '1.3.11', require: false
 gem 'bcrypt', '3.1.13'
 gem 'brotli', '0.2.3', require: false
@@ -105,7 +105,7 @@ gem 'ratom-nokogiri', '0.10.8', require: false
 gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
 
-gem 'rotp', '3.3.1', require: false
+gem 'rotp', '5.1.0', require: false
 gem 'net-ldap', '0.16.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'saml2', '3.0.8'
