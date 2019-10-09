@@ -30,6 +30,8 @@
     'edit' => "<i class='icon-edit'></i>".html_safe,
     'delete' => "<i class='icon-end'></i>".html_safe,
     'duplicate' => "<i class='icon-copy-course'></i>".html_safe,
+    'copy_to' => "<i class='icon-duplicate'></i>".html_safe,
+    'send_to' => "<i class='icon-user'></i>".html_safe,
   }
 
   menu_type_to_class = {
@@ -94,6 +96,7 @@
       <div class="module-item-title">
         <span class="item_name">
           <% if module_item && module_item.content_type == 'ExternalUrl' && module_item.new_tab %>
+            <% # FYI, this link gets opened via context_modules_helper.externalUrlLinkClick %>
             <a
               title="<%= module_item && module_item.title %>"
               class="title external_url_link"
@@ -101,7 +104,7 @@
               href="<%= module_item.url %>"
               data-item-href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item.id %>"
             >
-               <%= module_item.title %>
+              <%= module_item.title %>
             </a>
           <% else %>
             <a
@@ -243,21 +246,41 @@
             <li class="dupe-option" role="presentation"><a href="/api/v1<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/duplicate" class="duplicate_item_link" title="<%= t('Duplicate Item') %>"><%= @module_item_image_tags['duplicate'] %> <%= t('Duplicate') %></a></li>
             <li role="presentation">
               <a href="#<%= module_item ? module_item.id : "{{ id }}" %>"
-                 aria-label="<%= t('Move this item') %>"
-                 class="move_module_item_link icon-updown"
-                 title="<%= t('Move this item') %>"
+                aria-label="<%= t('Move this item') %>"
+                class="move_module_item_link icon-updown"
+                title="<%= t('Move this item') %>"
               ><%= t("Move to...") %></a>
             </li>
             <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
+            <% if @domain_root_account&.feature_enabled?(:direct_share) %>
+              <li role="presentation">
+                <a
+                  href="#"
+                  class="module_item_send_to"
+                  title="<%= t("Send this module item to another user...") %>"
+                  aria-label="<%= t("Send this module item to another user...") %>"
+                  ><%= @module_item_image_tags['send_to'] %> <%= t('Send To...') %>
+                </a>
+              </li>
+              <li role="presentation">
+                <a
+                  href="#"
+                  class="module_item_copy_to"
+                  title="<%= t('Copy this module item to a course...') %>"
+                  aria-label="<%= t('Copy this module item to a course...') %>"
+                  ><%= @module_item_image_tags['copy_to'] %> <%= t('Copy To...') %>
+                </a>
+              </li>
+            <% end %>
             <% menu_type_to_class.each do |menu_type, content_class| %>
               <% if !module_item || module_item.content.is_a?(content_class) %>
                 <%
-                   launch_options = {}
-                   if menu_type == :file_menu
-                     launch_options[:files] = [module_item ? module_item.content_id : "{{ content_id }}"]
-                   else
-                     launch_options[:module_items] = [module_item ? module_item.id : "{{ id }}"]
-                   end
+                  launch_options = {}
+                  if menu_type == :file_menu
+                    launch_options[:files] = [module_item ? module_item.content_id : "{{ content_id }}"]
+                  else
+                    launch_options[:module_items] = [module_item ? module_item.id : "{{ id }}"]
+                  end
                 %>
                 <%= external_tools_menu_items(@menu_tools[menu_type], {link_class: "menu_tool_link", settings_key: menu_type, in_list: true, url_params: launch_options}) %>
               <% end %>

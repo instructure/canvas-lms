@@ -34,12 +34,16 @@
 %>
   <h1 class="screenreader-only"><%= @tag.title %></h1>
   <% if @tag.try(:new_tab) %>
-    <%= t :new_tab, "This site needs to be opened in a new browser window." %>
+    <%= t :new_tab, "This site was opened in a new browser window." %>
     <div>
-      <a id="open_url_button" target="_blank" class="btn external"
-         href="<%= @tag.url %>"
-         title="<%= t("Open %{title} in a new window", :title => @tag.title) %>"
-         aria-label="<%= t("Open %{title} in a new window", :title => @tag.title) %>">
+      <a id="open_url_button"
+        target="_blank"
+        class="btn external"
+        href="<%= @tag.url %>"
+        title="<%= t("Open %{title} in a new window", :title => @tag.title) %>"
+        aria-label="<%= t("Open %{title} in a new window", :title => @tag.title) %>"
+        rel="noopener noreferrer"
+      >
         <%= t("Open %{title} in a new window", :title => @tag.title) %>
       </a>
     </div>
@@ -69,3 +73,9 @@
   <% end %>
 
 <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>
+<% if @tag.try(:new_tab) %>
+<script>
+  document.getElementById('open_url_button').click()
+</script>
+<% end %>
+
