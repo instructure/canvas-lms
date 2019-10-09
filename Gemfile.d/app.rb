@@ -90,7 +90,7 @@ gem 'twilio-ruby', '5.7.2', require: false
 
 gem 'mail', '2.7.1', require: false
   gem 'mini_mime', '1.0.0', require: false
-gem 'marginalia', '1.5.0', require: false
+gem 'marginalia', '1.8.0', require: false
 gem 'mime-types', '3.2.2'
 gem 'mini_magick', '4.8.0'
 gem 'multi_json', '1.13.1'
