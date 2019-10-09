@@ -385,4 +385,60 @@ describe Types::SubmissionType do
       expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to eq false
     end
   end
+
+  describe 'rubric_Assessments_connection' do
+    before(:once) do
+      rubric_for_course
+      rubric_association_model(
+        context: @course,
+        rubric: @rubric,
+        association_object: @assignment,
+        purpose: 'grading'
+      )
+
+      @assignment.submit_homework(@student, body: 'foo', submitted_at: 2.hour.ago)
+
+      rubric_assessment_model(
+        user: @student,
+        assessor: @teacher,
+        rubric_association: @rubric_association,
+        assessment_type: 'grading'
+      )
+    end
+
+    it 'works' do
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }')
+      ).to eq [@rubric_assessment.id.to_s]
+    end
+
+    it 'requires permission' do
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }', current_user: @student)
+      ).to eq [@rubric_assessment.id.to_s]
+    end
+
+    it 'grabs the assessment for the current submission attempt by default' do
+      @submission2 = @assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }')
+      ).to eq []
+    end
+
+    it 'grabs the assessment for the given submission attempt when using the for_attempt filter' do
+      @assignment.submit_homework(@student, body: 'bar', submitted_at: 1.hour.since)
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection(filter: {forAttempt: 2}) { nodes { _id } }')
+      ).to eq [@rubric_assessment.id.to_s]
+    end
+
+    it 'works with submission histories' do
+      @assignment.submit_homework(@student, body: 'bar', submitted_at: 1.hour.since)
+      expect(
+        submission_type.resolve(
+          'submissionHistoriesConnection { nodes { rubricAssessmentsConnection { nodes { _id } } } }'
+        )
+      ).to eq [[], [@rubric_assessment.id.to_s], []]
+    end
+  end
 end

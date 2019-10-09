@@ -103,6 +103,8 @@ export function ltiMessageHandler(e) {
               message.height = window.innerHeight;
               message.width = window.innerWidth;
               message.offset = $('.tool_content_wrapper').offset();
+              message.footer = $('#fixed_bottom').height() || 0;
+              message.scrollY = window.scrollY;
               const strMessage = JSON.stringify(message);
 
               iframe.contentWindow.postMessage(strMessage, '*');
@@ -133,6 +135,27 @@ export function ltiMessageHandler(e) {
       case 'lti.screenReaderAlert':
         $.screenReaderFlashMessageExclusive(message.body.html || message.body)
         break;
+      case 'lti.enableScrollEvents': {
+        const iframe = findDomForWindow(e.source);
+        if (iframe) {
+          let timeout;
+          window.addEventListener('scroll', () => {
+            // requesting animation frames effectively debounces the scroll messages being sent
+            if (timeout) {
+              window.cancelAnimationFrame(timeout);
+            }
+
+            timeout = window.requestAnimationFrame(() => {
+              const msg = JSON.stringify({
+                subject: 'lti.scroll',
+                scrollY: window.scrollY
+              });
+              iframe.contentWindow.postMessage(msg, '*');
+            });
+          }, false);
+        }
+        break;
+      }
     }
   } catch(err) {
     (console.error || console.log).call(console, 'invalid message received from');

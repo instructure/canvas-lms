@@ -18,7 +18,7 @@
 
 import React, {PureComponent} from 'react'
 import {Badge, TruncateText, Text} from '@instructure/ui-elements'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Focusable, FocusableView} from '@instructure/ui-focusable'
 
 import {Tooltip} from '@instructure/ui-overlays'
@@ -90,11 +90,11 @@ export default class AuditEvent extends PureComponent {
 
     return (
       <Flex alignItems="start" as="div" direction="row">
-        <FlexItem as="div" margin="none">
+        <Flex.Item as="div" margin="none">
           {iconView}
-        </FlexItem>
+        </Flex.Item>
 
-        <FlexItem as="div" grow margin="none none none x-small" shrink>
+        <Flex.Item as="div" grow margin="none none none x-small" shrink>
           <Text as="div" weight="bold">
             <TruncateText maxLines={2}>{label}</TruncateText>
           </Text>
@@ -106,7 +106,7 @@ export default class AuditEvent extends PureComponent {
               </Text>
             </View>
           )}
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }

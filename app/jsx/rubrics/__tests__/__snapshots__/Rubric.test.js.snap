@@ -31,6 +31,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
       >
         <th
           className="rubric-criteria"
+          key="TableHeadingCriteria"
           scope="col"
         >
           Criteria
@@ -38,12 +39,14 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         <th
           className="ratings"
           colSpan={null}
+          key="TableHeadingRatings"
           scope="col"
         >
           Ratings
         </th>
         <th
           className="rubric-points"
+          key="TableHeadingPoints"
           scope="col"
         >
           Pts
@@ -61,6 +64,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
       <tr>
         <th
           className="rubric-criteria"
+          key="TableHeadingCriteria"
           scope="col"
         >
           Criteria
@@ -68,12 +72,14 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         <th
           className="ratings"
           colSpan={null}
+          key="TableHeadingRatings"
           scope="col"
         >
           Ratings
         </th>
         <th
           className="rubric-points"
+          key="TableHeadingPoints"
           scope="col"
         >
           Pts
@@ -243,6 +249,7 @@ exports[`the Rubric component renders as expected 1`] = `
       >
         <th
           className="rubric-criteria"
+          key="TableHeadingCriteria"
           scope="col"
         >
           Criteria
@@ -250,12 +257,14 @@ exports[`the Rubric component renders as expected 1`] = `
         <th
           className="ratings"
           colSpan={null}
+          key="TableHeadingRatings"
           scope="col"
         >
           Ratings
         </th>
         <th
           className="rubric-points"
+          key="TableHeadingPoints"
           scope="col"
         >
           Pts
@@ -273,6 +282,7 @@ exports[`the Rubric component renders as expected 1`] = `
       <tr>
         <th
           className="rubric-criteria"
+          key="TableHeadingCriteria"
           scope="col"
         >
           Criteria
@@ -280,12 +290,14 @@ exports[`the Rubric component renders as expected 1`] = `
         <th
           className="ratings"
           colSpan={null}
+          key="TableHeadingRatings"
           scope="col"
         >
           Ratings
         </th>
         <th
           className="rubric-points"
+          key="TableHeadingPoints"
           scope="col"
         >
           Pts
@@ -480,6 +492,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
       >
         <th
           className="rubric-criteria"
+          key="TableHeadingCriteria"
           scope="col"
         >
           Criteria
@@ -487,12 +500,14 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <th
           className="ratings"
           colSpan={null}
+          key="TableHeadingRatings"
           scope="col"
         >
           Ratings
         </th>
         <th
           className="rubric-points"
+          key="TableHeadingPoints"
           scope="col"
         >
           Pts
@@ -510,6 +525,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
       <tr>
         <th
           className="rubric-criteria"
+          key="TableHeadingCriteria"
           scope="col"
         >
           Criteria
@@ -517,12 +533,14 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         <th
           className="ratings"
           colSpan={null}
+          key="TableHeadingRatings"
           scope="col"
         >
           Ratings
         </th>
         <th
           className="rubric-points"
+          key="TableHeadingPoints"
           scope="col"
         >
           Pts
@@ -686,6 +704,7 @@ exports[`the Rubric component updates the total score when an individual criteri
       >
         <th
           className="rubric-criteria"
+          key="TableHeadingCriteria"
           scope="col"
         >
           Criteria
@@ -693,12 +712,14 @@ exports[`the Rubric component updates the total score when an individual criteri
         <th
           className="ratings"
           colSpan={null}
+          key="TableHeadingRatings"
           scope="col"
         >
           Ratings
         </th>
         <th
           className="rubric-points"
+          key="TableHeadingPoints"
           scope="col"
         >
           Pts
@@ -716,6 +737,7 @@ exports[`the Rubric component updates the total score when an individual criteri
       <tr>
         <th
           className="rubric-criteria"
+          key="TableHeadingCriteria"
           scope="col"
         >
           Criteria
@@ -723,12 +745,14 @@ exports[`the Rubric component updates the total score when an individual criteri
         <th
           className="ratings"
           colSpan={null}
+          key="TableHeadingRatings"
           scope="col"
         >
           Ratings
         </th>
         <th
           className="rubric-points"
+          key="TableHeadingPoints"
           scope="col"
         >
           Pts

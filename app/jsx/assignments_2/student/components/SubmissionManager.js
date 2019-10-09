@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
 import {Button} from '@instructure/ui-buttons'
@@ -155,12 +156,22 @@ export default class SubmissionManager extends Component {
     )
   }
 
-  renderAttemptTab() {
+  handleDraftComplete = success => {
+    this.updateUploadingFiles(false)
+
+    if (success) {
+      this.context.setOnSuccess(I18n.t('Submission draft updated'))
+    } else {
+      this.context.setOnFailure(I18n.t('Error updating submission draft'))
+    }
+  }
+
+  renderAttemptTab = () => {
     return (
       <Mutation
         mutation={CREATE_SUBMISSION_DRAFT}
-        onCompleted={() => this.updateUploadingFiles(false)}
-        onError={() => this.updateUploadingFiles(false)}
+        onCompleted={() => this.handleDraftComplete(true)}
+        onError={() => this.handleDraftComplete(false)}
         update={this.updateSubmissionDraftCache}
       >
         {createSubmissionDraft => (
@@ -178,7 +189,7 @@ export default class SubmissionManager extends Component {
     )
   }
 
-  renderSubmitButton = submitMutation => {
+  renderSubmitButton = () => {
     const outerFooterStyle = {
       position: 'fixed',
       bottom: '0',
@@ -213,16 +224,25 @@ export default class SubmissionManager extends Component {
     return (
       <div style={outerFooterStyle}>
         <div style={innerFooterStyle}>
-          <Button
-            id="submit-button"
-            data-testid="submit-button"
-            disabled={this.state.submittingAssignment}
-            variant="primary"
-            margin="xx-small 0"
-            onClick={() => this.submitAssignment(submitMutation)}
+          <Mutation
+            mutation={CREATE_SUBMISSION}
+            onCompleted={() => this.context.setOnSuccess(I18n.t('Submission sent'))}
+            onError={() => this.context.setOnFailure(I18n.t('Error sending submission'))}
+            update={this.clearSubmissionHistoriesCache}
           >
-            {I18n.t('Submit')}
-          </Button>
+            {submitMutation => (
+              <Button
+                id="submit-button"
+                data-testid="submit-button"
+                disabled={this.state.submittingAssignment}
+                variant="primary"
+                margin="xx-small 0"
+                onClick={() => this.submitAssignment(submitMutation)}
+              >
+                {I18n.t('Submit')}
+              </Button>
+            )}
+          </Mutation>
         </div>
       </div>
     )
@@ -230,14 +250,12 @@ export default class SubmissionManager extends Component {
 
   render() {
     return (
-      <Mutation mutation={CREATE_SUBMISSION} update={this.clearSubmissionHistoriesCache}>
-        {createSubmission => (
-          <>
-            {this.state.submittingAssignment ? <LoadingIndicator /> : this.renderAttemptTab()}
-            {this.shouldRenderSubmit() && this.renderSubmitButton(createSubmission)}
-          </>
-        )}
-      </Mutation>
+      <>
+        {this.state.submittingAssignment ? <LoadingIndicator /> : this.renderAttemptTab()}
+        {this.shouldRenderSubmit() && this.renderSubmitButton()}
+      </>
     )
   }
 }
+
+SubmissionManager.contextType = AlertManagerContext

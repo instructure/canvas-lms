@@ -66,6 +66,7 @@ const FileSelectTable = props => {
           columnWidths={tableColumnWidths}
           files={props.files}
           folders={props.folders}
+          handleCanvasFileSelect={props.handleCanvasFileSelect}
           selectedFolderID={props.selectedFolderID}
         />
       )}
@@ -74,12 +75,11 @@ const FileSelectTable = props => {
 }
 
 FileSelectTable.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
   folders: object,
-  // eslint-disable-next-line react/forbid-prop-types
   files: object,
-  selectedFolderID: string,
-  handleFolderSelect: func
+  handleCanvasFileSelect: func,
+  handleFolderSelect: func,
+  selectedFolderID: string
 }
 
 export default FileSelectTable

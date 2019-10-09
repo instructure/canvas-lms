@@ -16,12 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {bool, shape, string} from 'prop-types'
+import gql from 'graphql-tag'
 
-/**
- * TEMPORARY
- */
+export const RubricAssociation = {
+  fragment: gql`
+    fragment RubricAssociation on RubricAssociation {
+      _id
+      hide_points: hidePoints
+      hide_score_total: hideScoreTotal
+      use_for_grading: useForGrading
+    }
+  `,
 
-export default function FakeComponent() {
-  return <div>This is fake and is only for demo now</div>
+  shape: shape({
+    _id: string.isRequired,
+    hide_points: bool,
+    hide_score_total: bool.isRequired,
+    use_for_grading: bool.isRequired
+  })
+}
+
+export const RubricAssociationDefaultMocks = {
+  RubricAssociation: () => ({
+    _id: '1',
+    hidePoints: false,
+    hideScoreTotal: false,
+    useForGrading: false
+  })
 }

@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_trayMetricsList'
-import {MetricsList as InstUIMetricsList,  MetricsListItem } from '@instructure/ui-elements'
+import {MetricsList as InstUIMetricsList } from '@instructure/ui-elements'
 
   class MetricsList extends React.Component {
     static propTypes = {
@@ -79,9 +79,9 @@ import {MetricsList as InstUIMetricsList,  MetricsListItem } from '@instructure/
           <section
             className="StudentContextTray__Section StudentContextTray-MetricsList">
             <InstUIMetricsList>
-              <MetricsListItem label={I18n.t('Grade')} value={this.grade} />
-              <MetricsListItem label={I18n.t('Missing')} value={this.missingCount} />
-              <MetricsListItem label={I18n.t('Late')} value={this.lateCount} />
+              <InstUIMetricsList.Item label={I18n.t('Grade')} value={this.grade} />
+              <InstUIMetricsList.Item label={I18n.t('Missing')} value={this.missingCount} />
+              <InstUIMetricsList.Item label={I18n.t('Late')} value={this.lateCount} />
             </InstUIMetricsList>
           </section>
         )

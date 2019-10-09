@@ -19,14 +19,12 @@
 import I18n from 'i18n!managed_course_selector'
 import React, {useState} from 'react'
 import {func} from 'prop-types'
-import {useDebouncedCallback} from 'use-debounce'
-import _ from 'lodash'
 
 import CanvasAsyncSelect from './CanvasAsyncSelect'
 import useManagedCourseSearchApi from '../effects/useManagedCourseSearchApi'
+import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
 
 const MINIMUM_SEARCH_LENGTH = 3
-const TYPING_DEBOUNCE_TIMEOUT = 750
 
 ManagedCourseSelector.propTypes = {
   onCourseSelected: func // (course) => {} (see proptypes/course.js)
@@ -36,32 +34,27 @@ ManagedCourseSelector.defaultProps = {
   onCourseSelected: () => {}
 }
 
+function isSearchableTerm(value) {
+  return value.length === 0 || value.length >= MINIMUM_SEARCH_LENGTH
+}
+
 export default function ManagedCourseSelector({onCourseSelected}) {
   const [courses, setCourses] = useState(null)
   const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [selectedCourse, setSelectedCourse] = useState(null)
-  const [searchParams, rawSetSearchParams] = useState({})
+  const {searchTerm, setSearchTerm, searchTermIsPending} = useDebouncedSearchTerm('', {
+    isSearchableTerm
+  })
 
-  // We don't want to search immediately after each keystroke, so debounce
-  // setting the search parameters.
-  const [setSearchParams] = useDebouncedCallback(newSearchParams => {
-    // New searches only happen if searchParams actually changes. We only want
-    // to clear courses if a new search is actually going to happen to
-    // repopulate them.
-    if (!_.isEqual(searchParams, newSearchParams)) {
-      setCourses(null)
-      rawSetSearchParams(newSearchParams)
-    }
-  }, TYPING_DEBOUNCE_TIMEOUT)
-
+  const searchParams = searchTerm.length === 0 ? {} : {term: searchTerm}
   useManagedCourseSearchApi({
     success: setCourses,
     error: setError,
+    loading: setIsLoading,
     params: searchParams
   })
-  const searchableInputValue = value => value.length === 0 || value.length >= MINIMUM_SEARCH_LENGTH
-  const searchableInput = searchableInputValue(inputValue)
 
   const handleCourseSelected = (ev, id) => {
     if (courses === null) return
@@ -74,20 +67,19 @@ export default function ManagedCourseSelector({onCourseSelected}) {
   }
 
   const handleInputChanged = ev => {
+    setInputValue(ev.target.value)
+    setSearchTerm(ev.target.value)
     if (selectedCourse !== null) onCourseSelected(null)
     setSelectedCourse(null)
-    setInputValue(ev.target.value)
-    const newSearchParams = ev.target.value.length ? {term: ev.target.value} : {}
-    setSearchParams(newSearchParams)
   }
 
   // If there's an error, throw it to an ErrorBoundary
   if (error !== null) throw error
 
-  const isLoading = searchableInput && courses === null
+  const searchableInput = isSearchableTerm(inputValue)
   const noOptionsLabel = searchableInput
     ? I18n.t('No Results')
-    : I18n.t('Type at least 3 characters to search.')
+    : I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH})
   const courseOptions =
     courses === null || !searchableInput
       ? null
@@ -99,9 +91,10 @@ export default function ManagedCourseSelector({onCourseSelected}) {
 
   const selectProps = {
     options: courseOptions,
-    isLoading,
+    isLoading: isLoading || searchTermIsPending,
     inputValue,
-    assistiveText: I18n.t('Type at least 3 characters to search.'),
+    selectedOptionId: selectedCourse ? selectedCourse.id : null,
+    assistiveText: I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH}),
     renderLabel: I18n.t('Select a Course'),
     placeholder: I18n.t('Begin typing to search'),
     noOptionsLabel,

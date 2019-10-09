@@ -161,7 +161,7 @@ import './vendor/jquery.scrollTo'
     onContinue();
   };
   $.fn.confirmDelete.defaults = {
-    message: I18n.t('confirms.default_delete_thing', "Are you sure you want to delete this?")
+    get message(){ return I18n.t('confirms.default_delete_thing', "Are you sure you want to delete this?")}
   };
 
   // Watches the given element's location.href for any changes

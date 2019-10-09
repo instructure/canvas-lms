@@ -97,7 +97,7 @@ export default class UploadMedia extends React.Component {
       // handle error
     } else {
       try {
-        if (this.subtitles.lenth > 0) {
+        if (this.subtitles.length > 0) {
           await saveClosedCaptions(data.media_object.media_id, this.subtitles)
         }
         this.props.onDismiss(null, data)
@@ -184,6 +184,16 @@ export default class UploadMedia extends React.Component {
     )
   }
 
+  onModalClose = () => {
+    this.setState({
+      embedCode: '',
+      hasUploadedFile: false,
+      selectedPanel: 0,
+      theFile: null
+    })
+    this.props.onDismiss()
+  }
+
   renderModalFooter = () => {
     if (this.state.selectedPanel === PANELS.RECORD) {
       return null
@@ -192,7 +202,7 @@ export default class UploadMedia extends React.Component {
     const {CLOSE_TEXT, SUBMIT_TEXT} = this.props.uploadMediaTranslations.UploadMediaStrings
     return (
       <Modal.Footer>
-        <Button onClick={this.props.onDismiss}> {CLOSE_TEXT} </Button>
+        <Button onClick={this.onModalClose}> {CLOSE_TEXT} </Button>
         &nbsp;
         <Button
           onClick={e => {
@@ -215,12 +225,12 @@ export default class UploadMedia extends React.Component {
       <Modal
         label={UPLOAD_MEDIA_LABEL}
         size="medium"
-        onDismiss={this.props.onDismiss}
+        onDismiss={this.onModalClose}
         open={this.props.open}
         shouldCloseOnDocumentClick={false}
       >
         <Modal.Header>
-          <CloseButton onClick={this.props.onDismiss} offset="medium" placement="end">
+          <CloseButton onClick={this.onModalClose} offset="medium" placement="end">
             {CLOSE_TEXT}
           </CloseButton>
           <Heading>{UPLOAD_MEDIA_LABEL}</Heading>

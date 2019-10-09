@@ -1497,6 +1497,30 @@ describe Submission do
         expect(@submission.messages_sent.keys).to eq ['Assignment Submitted']
       end
 
+      it "should not send a message to a TA without grading rights" do
+        limited_role = custom_ta_role("limitedta", :account => @course.account)
+        [:view_all_grades, :manage_grades].each do |permission|
+          @course.account.role_overrides.create!(:permission => permission, :enabled => false, :role => limited_role)
+        end
+
+        limited_ta = user_factory(:active_all => true, :active_cc => true)
+        @course.enroll_user(limited_ta, "TaEnrollment", :role => limited_role, :enrollment_state => "active")
+        normal_ta = user_factory(:active_all => true, :active_cc => true)
+        @course.enroll_user(normal_ta, "TaEnrollment", :enrollment_state => "active")
+
+        n = Notification.where(:name => 'Assignment Submitted').first
+        n.update_attributes(:category => "TestImmediately")
+        [limited_ta, normal_ta].each do |ta|
+          NotificationPolicy.create(:notification => n, :communication_channel => ta.communication_channel, :frequency => "immediately")
+        end
+        @assignment.workflow_state = "published"
+        @assignment.update_attributes(:due_at => Time.now + 1000)
+
+        submission_spec_model(user: @student, submit_homework: true)
+        expect(@submission.messages_sent['Assignment Submitted'].map(&:user)).to eq [normal_ta]
+      end
+
+
       it "should send the correct message when an assignment is turned in late" do
         @assignment.workflow_state = "published"
         @assignment.update_attributes(:due_at => Time.now - 1000)
@@ -4822,6 +4846,24 @@ describe Submission do
       })
 
       expect(subject).to eq([other_assessment])
+    end
+
+    context "attempt argument" do
+      before(:once) do
+        @submission2 = @assignment.submit_homework(@student, body: 'bar', submitted_at: 1.hour.since)
+      end
+
+      it 'returns an empty list if no rubric assessments exist for the desired attempt' do
+        expect(
+          @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission2.attempt)
+        ).to be_empty
+      end
+
+      it 'can find historic rubric assessments of older attempts' do
+        expect(
+          @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission.attempt)
+        ).to contain_exactly(@teacher_assessment, @student_assessment)
+      end
     end
   end
 

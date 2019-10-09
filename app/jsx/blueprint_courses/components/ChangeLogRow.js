@@ -22,7 +22,7 @@ import {string, bool, node} from 'prop-types'
 import cx from 'classnames'
 import shortId from '../../shared/shortid'
 
-import {Grid,  GridRow, GridCol } from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 import { IconLock, IconUnlock } from './BlueprintLocks'
 
@@ -53,12 +53,12 @@ export default class ChangeLogRow extends Component {
     const cellRole = isHeading ? 'columnheader' : 'gridcell'
     return (
       <Grid colSpacing="none">
-        <GridRow>
-          <GridCol width={6}><span id={this.colIds[0]} role={cellRole}>{this.renderText(col1)}</span></GridCol>
-          <GridCol width={2}><span id={this.colIds[1]} role={cellRole}>{this.renderText(col2)}</span></GridCol>
-          <GridCol width={3}><span id={this.colIds[2]} role={cellRole}>{this.renderText(col3)}</span></GridCol>
-          <GridCol width={1}><span id={this.colIds[3]} role={cellRole}>{this.renderText(col4)}</span></GridCol>
-        </GridRow>
+        <Grid.Row>
+          <Grid.Col width={6}><span id={this.colIds[0]} role={cellRole}>{this.renderText(col1)}</span></Grid.Col>
+          <Grid.Col width={2}><span id={this.colIds[1]} role={cellRole}>{this.renderText(col2)}</span></Grid.Col>
+          <Grid.Col width={3}><span id={this.colIds[2]} role={cellRole}>{this.renderText(col3)}</span></Grid.Col>
+          <Grid.Col width={1}><span id={this.colIds[3]} role={cellRole}>{this.renderText(col4)}</span></Grid.Col>
+        </Grid.Row>
       </Grid>
     )
   }

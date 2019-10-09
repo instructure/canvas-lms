@@ -28,7 +28,7 @@ import {Spinner, Text} from '@instructure/ui-elements'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
 import {IconSearchLine, IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
-import {View, Flex, FlexItem} from '@instructure/ui-layout'
+import {View, Flex} from '@instructure/ui-layout'
 import {Alert} from '@instructure/ui-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
@@ -150,7 +150,7 @@ export default class ImageSearch extends React.Component {
 
     return (
       <Flex as="div" width="100%" justifyItems="space-between" margin="small 0 small">
-        <FlexItem>
+        <Flex.Item>
           { this.state.prevUrl && <Button variant="link"
             buttonRef={(e) => this._imageSearchControlPrev = e}
             onClick={this.loadPreviousPage}
@@ -158,8 +158,8 @@ export default class ImageSearch extends React.Component {
           >
             {I18n.t('Previous Page')}
           </Button> }
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           { this.state.nextUrl && <Button variant="link"
             buttonRef={(e) => this._imageSearchControlNext = e}
             onClick={this.loadNextPage}
@@ -167,7 +167,7 @@ export default class ImageSearch extends React.Component {
           >
             {I18n.t('Next Page')}<View padding="0 0 0 x-small"><IconArrowOpenEndLine /></View>
           </Button> }
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }

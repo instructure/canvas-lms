@@ -16,22 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentAlert from '../AssignmentAlert'
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
 import I18n from 'i18n!assignments_2'
+import {MARK_SUBMISSION_COMMENT_READ} from '../../graphqlData/Mutations'
 import noComments from '../../SVG/NoComments.svg'
-import React, {useEffect} from 'react'
-import {SubmissionComment} from '../../graphqlData/SubmissionComment'
+import React, {useContext, useEffect} from 'react'
 import {Submission} from '../../graphqlData/Submission'
-import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
-import {MARK_SUBMISISON_COMMENT_READ} from '../../graphqlData/Mutations'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
+import {SubmissionComment} from '../../graphqlData/SubmissionComment'
+import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
 import {useMutation} from 'react-apollo'
 
 function CommentContent(props) {
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+
   const [markCommentsRead, {called: mutationCalled, error: mutationError}] = useMutation(
-    MARK_SUBMISISON_COMMENT_READ,
+    MARK_SUBMISSION_COMMENT_READ,
     {
       update(cache) {
         const submissionQueryVariables = {
@@ -81,18 +83,16 @@ function CommentContent(props) {
     }
   }, [markCommentsRead, props.comments, props.submission])
 
+  useEffect(() => {
+    if (mutationCalled && !mutationError) {
+      setOnSuccess(I18n.t('All submission comments have been marked as read'))
+    } else if (mutationError) {
+      setOnFailure(I18n.t('There was a problem marking submission comments as read'))
+    }
+  }, [mutationCalled, mutationError, setOnFailure, setOnSuccess])
+
   return (
     <>
-      {mutationCalled && !mutationError && (
-        <AssignmentAlert
-          successMessage={I18n.t('All submission comments have been marked as read.')}
-        />
-      )}
-      {mutationError && (
-        <AssignmentAlert
-          errorMessage={I18n.t('There was a problem marking submission comments as read.')}
-        />
-      )}
       {!props.comments.length && (
         <SVGWithTextPlaceholder
           text={I18n.t('Send a comment to your instructor about this assignment.')}

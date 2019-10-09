@@ -92,7 +92,7 @@ class CourseHomeDialog extends React.Component {
     const inputs = [
       {
         value: 'feed',
-        label: I18n.t('Course Activity Stream'),
+        get label() {return I18n.t('Course Activity Stream')},
         checked: selectedDefaultView === 'feed'
       },
       {
@@ -103,17 +103,17 @@ class CourseHomeDialog extends React.Component {
       },
       {
         value: 'modules',
-        label: I18n.t('Course Modules'),
+        get label() {return I18n.t('Course Modules')},
         checked: selectedDefaultView === 'modules'
       },
       {
         value: 'assignments',
-        label: I18n.t('Assignments List'),
+        get label() {return I18n.t('Assignments List')},
         checked: selectedDefaultView === 'assignments'
       },
       {
         value: 'syllabus',
-        label: I18n.t('Syllabus'),
+        get label() {return I18n.t('Syllabus')},
         checked: selectedDefaultView === 'syllabus'
       }
     ]

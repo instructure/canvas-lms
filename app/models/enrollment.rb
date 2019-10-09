@@ -1133,7 +1133,6 @@ class Enrollment < ActiveRecord::Base
       if association(:course).loaded?
         assn = result.association(:course)
         assn.target = course
-        Bullet::Detector::Association.add_object_associations(result, :course) if defined?(Bullet) && Bullet.start?
       end
     end
     result

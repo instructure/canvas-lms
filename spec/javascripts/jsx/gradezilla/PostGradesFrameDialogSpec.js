@@ -82,6 +82,10 @@ QUnit.module('Gradezilla > PostGradesFrameDialog', suiteHooks => {
     test("sets the proper values for the iframe 'allow' attribute", () => {
       equal(iframe.attr('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
     })
+
+    test("sets the 'data-lti-launch' attribute on the iframe", () => {
+      equal(iframe.attr('data-lti-launch'), 'true')
+    })
   })
 
   QUnit.module('content resizing', () => {

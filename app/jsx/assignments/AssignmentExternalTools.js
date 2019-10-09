@@ -133,6 +133,7 @@ class AssignmentExternalTools extends React.Component {
         key={tool.definition_id}
         title={I18n.t('External Tool %{tool_id}', {tool_id: tool.definition_id})}
         ref={(e) => { this[`tool_iframe_${tool.definition_id}`] = e; }}
+        data-lti-launch="true"
       />
     )
   }

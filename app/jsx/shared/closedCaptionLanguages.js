@@ -18,61 +18,167 @@
 import I18n from 'i18n!closedCaptionLanguages'
 
 const closedCaptionLanguages = {
-  af: I18n.t('Afrikaans'),
-  sq: I18n.t('Albanian'),
-  ar: I18n.t('Arabic'),
-  be: I18n.t('Belarusian'),
-  bg: I18n.t('Bulgarian'),
-  ca: I18n.t('Catalan'),
-  zh: I18n.t('Chinese'),
+  get af() {
+    return I18n.t('Afrikaans')
+  },
+  get sq() {
+    return I18n.t('Albanian')
+  },
+  get ar() {
+    return I18n.t('Arabic')
+  },
+  get be() {
+    return I18n.t('Belarusian')
+  },
+  get bg() {
+    return I18n.t('Bulgarian')
+  },
+  get ca() {
+    return I18n.t('Catalan')
+  },
+  get zh() {
+    return I18n.t('Chinese')
+  },
   'zh-cn': I18n.t('Chinese Simplified'),
   'zh-tw': I18n.t('Chinese Traditional'),
-  hr: I18n.t('Croatian'),
-  cs: I18n.t('Czech'),
-  da: I18n.t('Danish'),
-  nl: I18n.t('Dutch'),
-  en: I18n.t('English'),
-  et: I18n.t('Estonian'),
-  fl: I18n.t('Filipino'),
-  fi: I18n.t('Finnish'),
-  fr: I18n.t('French'),
-  gl: I18n.t('Galician'),
-  de: I18n.t('German'),
-  el: I18n.t('Greek'),
-  ht: I18n.t('Haitian Creole'),
-  iw: I18n.t('Hebrew'),
-  hi: I18n.t('Hindi'),
-  hu: I18n.t('Hungarian'),
-  is: I18n.t('Icelandic'),
-  id: I18n.t('Indonesian'),
-  ga: I18n.t('Irish'),
-  it: I18n.t('Italian'),
-  ja: I18n.t('Japanese'),
-  ko: I18n.t('Korean'),
-  lv: I18n.t('Latvian'),
-  lt: I18n.t('Lithuanian'),
-  mk: I18n.t('Macedonian'),
-  ms: I18n.t('Malay'),
-  mt: I18n.t('Maltese'),
-  no: I18n.t('Norwegian'),
-  fa: I18n.t('Persian'),
-  pl: I18n.t('Polish'),
-  pt: I18n.t('Portuguese'),
-  ro: I18n.t('Romanian'),
-  ru: I18n.t('Russian'),
-  sr: I18n.t('Serbian'),
-  sk: I18n.t('Slovak'),
-  sl: I18n.t('Slovenian'),
-  es: I18n.t('Spanish'),
-  sw: I18n.t('Swahili'),
-  sv: I18n.t('Swedish'),
-  tl: I18n.t('Tagalog'),
-  th: I18n.t('Thai'),
-  tr: I18n.t('Turkish'),
-  uk: I18n.t('Ukrainian'),
-  vi: I18n.t('Vietnamese'),
-  cy: I18n.t('Welsh'),
-  yi: I18n.t('Yiddish')
+  get hr() {
+    return I18n.t('Croatian')
+  },
+  get cs() {
+    return I18n.t('Czech')
+  },
+  get da() {
+    return I18n.t('Danish')
+  },
+  get nl() {
+    return I18n.t('Dutch')
+  },
+  get en() {
+    return I18n.t('English')
+  },
+  get et() {
+    return I18n.t('Estonian')
+  },
+  get fl() {
+    return I18n.t('Filipino')
+  },
+  get fi() {
+    return I18n.t('Finnish')
+  },
+  get fr() {
+    return I18n.t('French')
+  },
+  get gl() {
+    return I18n.t('Galician')
+  },
+  get de() {
+    return I18n.t('German')
+  },
+  get el() {
+    return I18n.t('Greek')
+  },
+  get ht() {
+    return I18n.t('Haitian Creole')
+  },
+  get iw() {
+    return I18n.t('Hebrew')
+  },
+  get hi() {
+    return I18n.t('Hindi')
+  },
+  get hu() {
+    return I18n.t('Hungarian')
+  },
+  get is() {
+    return I18n.t('Icelandic')
+  },
+  get id() {
+    return I18n.t('Indonesian')
+  },
+  get ga() {
+    return I18n.t('Irish')
+  },
+  get it() {
+    return I18n.t('Italian')
+  },
+  get ja() {
+    return I18n.t('Japanese')
+  },
+  get ko() {
+    return I18n.t('Korean')
+  },
+  get lv() {
+    return I18n.t('Latvian')
+  },
+  get lt() {
+    return I18n.t('Lithuanian')
+  },
+  get mk() {
+    return I18n.t('Macedonian')
+  },
+  get ms() {
+    return I18n.t('Malay')
+  },
+  get mt() {
+    return I18n.t('Maltese')
+  },
+  get no() {
+    return I18n.t('Norwegian')
+  },
+  get fa() {
+    return I18n.t('Persian')
+  },
+  get pl() {
+    return I18n.t('Polish')
+  },
+  get pt() {
+    return I18n.t('Portuguese')
+  },
+  get ro() {
+    return I18n.t('Romanian')
+  },
+  get ru() {
+    return I18n.t('Russian')
+  },
+  get sr() {
+    return I18n.t('Serbian')
+  },
+  get sk() {
+    return I18n.t('Slovak')
+  },
+  get sl() {
+    return I18n.t('Slovenian')
+  },
+  get es() {
+    return I18n.t('Spanish')
+  },
+  get sw() {
+    return I18n.t('Swahili')
+  },
+  get sv() {
+    return I18n.t('Swedish')
+  },
+  get tl() {
+    return I18n.t('Tagalog')
+  },
+  get th() {
+    return I18n.t('Thai')
+  },
+  get tr() {
+    return I18n.t('Turkish')
+  },
+  get uk() {
+    return I18n.t('Ukrainian')
+  },
+  get vi() {
+    return I18n.t('Vietnamese')
+  },
+  get cy() {
+    return I18n.t('Welsh')
+  },
+  get yi() {
+    return I18n.t('Yiddish')
+  }
 }
 
 export default closedCaptionLanguages

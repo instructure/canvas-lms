@@ -146,7 +146,7 @@ class SearchResultsComponent extends Component {
     if (this.props.requestingResults) {
       $.screenReaderFlashMessage(I18n.t('Loading more gradebook history results.'))
 
-      return <Spinner size="small" title={I18n.t('Loading Results')} />
+      return <Spinner size="small" renderTitle={I18n.t('Loading Results')} />
     }
 
     if (this.noResultsFound()) {

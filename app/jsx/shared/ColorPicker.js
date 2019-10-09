@@ -32,21 +32,21 @@ import {isRTL} from './helpers/rtlHelper'
 import 'compiled/jquery.rails_flash_notifications'
 
   export const PREDEFINED_COLORS = [
-    {hexcode: '#BD3C14', name: I18n.t('Brick')},
-    {hexcode: '#FF2717', name: I18n.t('Red')},
-    {hexcode: '#E71F63', name: I18n.t('Magenta')},
-    {hexcode: '#8F3E97', name: I18n.t('Purple')},
-    {hexcode: '#65499D', name: I18n.t('Deep Purple')},
-    {hexcode: '#4554A4', name: I18n.t('Indigo')},
-    {hexcode: '#1770AB', name: I18n.t('Blue')},
-    {hexcode: '#0B9BE3', name: I18n.t('Light Blue')},
-    {hexcode: '#06A3B7', name: I18n.t('Cyan')},
-    {hexcode: '#009688', name: I18n.t('Teal')},
-    {hexcode: '#009606', name: I18n.t('Green')},
-    {hexcode: '#8D9900', name: I18n.t('Olive')},
-    {hexcode: '#D97900', name: I18n.t('Pumpkin')},
-    {hexcode: '#FD5D10', name: I18n.t('Orange')},
-    {hexcode: '#F06291', name: I18n.t('Pink')}
+    {hexcode: '#BD3C14', get name(){return I18n.t('Brick')}},
+    {hexcode: '#FF2717', get name(){return I18n.t('Red')}},
+    {hexcode: '#E71F63', get name(){return I18n.t('Magenta')}},
+    {hexcode: '#8F3E97', get name(){return I18n.t('Purple')}},
+    {hexcode: '#65499D', get name(){return I18n.t('Deep Purple')}},
+    {hexcode: '#4554A4', get name(){return I18n.t('Indigo')}},
+    {hexcode: '#1770AB', get name(){return I18n.t('Blue')}},
+    {hexcode: '#0B9BE3', get name(){return I18n.t('Light Blue')}},
+    {hexcode: '#06A3B7', get name(){return I18n.t('Cyan')}},
+    {hexcode: '#009688', get name(){return I18n.t('Teal')}},
+    {hexcode: '#009606', get name(){return I18n.t('Green')}},
+    {hexcode: '#8D9900', get name(){return I18n.t('Olive')}},
+    {hexcode: '#D97900', get name(){return I18n.t('Pumpkin')}},
+    {hexcode: '#FD5D10', get name(){return I18n.t('Orange')}},
+    {hexcode: '#F06291', get name(){return I18n.t('Pink')}}
   ];
 
   function shouldApplySwatchBorderColor (color) {

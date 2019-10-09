@@ -115,7 +115,7 @@ export default class GeneratePairingCode extends Component {
             <div className='pairing-code'>
               {this.state.gettingPairingCode
                 ? <div>
-                    <Spinner margin='0 small 0 0' size='x-small' title={I18n.t('Generating pairing code')} />
+                    <Spinner margin='0 small 0 0' size='x-small' renderTitle={I18n.t('Generating pairing code')} />
                     <PresentationContent>
                       {I18n.t('Generating pairing code...')}
                     </PresentationContent>

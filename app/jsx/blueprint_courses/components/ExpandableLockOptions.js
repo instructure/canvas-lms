@@ -25,7 +25,7 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-elements'
-import {Grid, GridRow, GridCol} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 
 import { IconLock, IconUnlock } from './BlueprintLocks'
 import LockCheckList from './LockCheckList'
@@ -111,18 +111,18 @@ export default class ExpandableLockOptions extends React.Component {
   renderTitle () {
     return (
       <Grid>
-        <GridRow>
-          <GridCol width={4}>
+        <Grid.Row>
+          <Grid.Col width={4}>
             {this.renderIndicatorIcon()}
-          </GridCol>
-          <GridCol width={8}>
+          </Grid.Col>
+          <Grid.Col width={8}>
             <PresentationContent>
               <div className="bcs_tab-text" >
                 <Text size="small" weight="normal">{itemTypeLabelPlurals[this.props.objectType]}</Text>
               </div>
             </PresentationContent>
-          </GridCol>
-        </GridRow>
+          </Grid.Col>
+        </Grid.Row>
       </Grid>
     )
   }
@@ -161,23 +161,23 @@ export default class ExpandableLockOptions extends React.Component {
       <div className="bcs__object-tab">
         <div onClick={this.toggle}>
           <Grid>
-            <GridRow>
-              <GridCol width={4}>
+            <Grid.Row>
+              <Grid.Col width={4}>
                 {this.renderTitle()}
-              </GridCol>
-              <GridCol width={1}>
+              </Grid.Col>
+              <Grid.Col width={1}>
                 <PresentationContent>
                   {this.renderLockIcon()}
                 </PresentationContent>
-              </GridCol>
-              <GridCol width={7}>
+              </Grid.Col>
+              <Grid.Col width={7}>
                 <PresentationContent>
                   <div className="bcs_tab-text" >
                     <Text size="small" weight="normal" >{formatLockObject(this.state.locks)}</Text>
                   </div>
                 </PresentationContent>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </div>
         {this.renderSubList()}

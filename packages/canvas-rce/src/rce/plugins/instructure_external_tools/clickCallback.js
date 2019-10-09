@@ -16,32 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
-import {number, shape, string} from 'prop-types'
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-export const Rating = {
-  fragment: gql`
-    fragment Rating on Rating {
-      id
-      description
-      long_description: longDescription
-      points
+export default function clickCallback(ed, ltiButtons) {
+
+  return import('./components/LtiToolsModal').then(({LtiToolsModal}) => {
+    let container = document.querySelector('.canvas-rce-upload-container')
+    if (!container) {
+      container = document.createElement('div')
+      container.className = 'canvas-rce-upload-container'
+      document.body.appendChild(container)
     }
-  `,
 
-  shape: shape({
-    id: string.isRequired,
-    description: string.isRequired,
-    long_description: string,
-    points: number
-  })
-}
+    const handleDismiss = () => {
+      ReactDOM.unmountComponentAtNode(container)
+      ed.focus()
+    }
 
-export const RatingDefaultMocks = {
-  Rating: () => ({
-    id: '1',
-    description: 'Full Marks',
-    longDescription: 'You earned full marks',
-    points: 5
+    ReactDOM.render(
+      <LtiToolsModal
+        editor={ed}
+        onDismiss={handleDismiss}
+        ltiButtons={ltiButtons}
+      />, container
+    )
   })
 }

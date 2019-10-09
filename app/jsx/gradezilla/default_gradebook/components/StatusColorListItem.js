@@ -24,7 +24,7 @@ import {Popover} from '@instructure/ui-overlays'
 import {Text} from '@instructure/ui-elements'
 import {IconMoreSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Grid, GridRow, GridCol} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import ColorPicker from '../../../shared/ColorPicker'
 import {statusesTitleMap} from '../constants/statuses'
 import {defaultColors} from '../constants/colors'
@@ -83,11 +83,11 @@ class StatusColorListItem extends React.Component {
         style={{backgroundColor: this.state.color}}
       >
         <Grid vAlign="middle">
-          <GridRow>
-            <GridCol>
+          <Grid.Row>
+            <Grid.Col>
               <Text>{statusesTitleMap[status]}</Text>
-            </GridCol>
-            <GridCol width="auto">
+            </Grid.Col>
+            <Grid.Col width="auto">
               <Popover
                 on="click"
                 show={isColorPickerShown}
@@ -125,8 +125,8 @@ class StatusColorListItem extends React.Component {
                   />
                 </Popover.Content>
               </Popover>
-            </GridCol>
-          </GridRow>
+            </Grid.Col>
+          </Grid.Row>
         </Grid>
       </li>
     )

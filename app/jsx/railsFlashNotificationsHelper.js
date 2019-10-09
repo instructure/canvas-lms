@@ -19,7 +19,6 @@
 import I18n from 'i18n!shared.flash_notices'
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
-import 'jqueryui/effects/drop'
 import 'jquery.cookie'
 
 function updateAriaLive({polite} = {polite: false}) {

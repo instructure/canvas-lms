@@ -24,7 +24,7 @@ import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {roleIsCourseBaseRole} from '../helper/utils'
 import {Button} from '@instructure/ui-buttons'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {FormField} from '@instructure/ui-form-field'
 import {Heading, Spinner, Text} from '@instructure/ui-elements'
 import {IconXSolid} from '@instructure/ui-icons'
@@ -103,7 +103,7 @@ export default class AddTray extends Component {
 
   renderTrayHeader = () => (
     <Flex alignItems="center" margin="small">
-      <FlexItem>
+      <Flex.Item>
         <Button
           id="close-add-role-tray-button"
           variant="icon"
@@ -113,14 +113,14 @@ export default class AddTray extends Component {
         >
           <IconXSolid title={I18n.t('Close')} />
         </Button>
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <View as="div" margin="0 0 0 small">
           <Heading level="h3" as="h2">
             {this.props.tab === COURSE ? I18n.t('New Course Role') : I18n.t('New Account Role')}
           </Heading>
         </View>
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 
@@ -187,7 +187,7 @@ export default class AddTray extends Component {
   renderLoadingIndicator() {
     return (
       <View display="block" margin="auto">
-        <Spinner size="large" title={I18n.t('Saving New Role')} />
+        <Spinner size="large" renderTitle={I18n.t('Saving New Role')} />
       </View>
     )
   }

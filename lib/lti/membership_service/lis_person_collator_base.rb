@@ -37,7 +37,7 @@ module Lti
       private
 
       def membership_type
-        User.preload(:communication_channels, :not_ended_enrollments)
+        User.preload(:communication_channels, :not_ended_enrollments, :pseudonym)
       end
 
       def users
@@ -53,7 +53,8 @@ module Lti
           img: user.avatar_image_url,
           email: user.email,
           result_sourced_id: nil,
-          user_id: user_id
+          user_id: user_id,
+          sourced_id: user&.pseudonym&.sis_user_id
         )
       end
 

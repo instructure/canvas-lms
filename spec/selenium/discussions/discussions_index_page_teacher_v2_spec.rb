@@ -74,7 +74,8 @@ describe "discussions index" do
       # Attempt to make this test less brittle. It's doing client side filtering
       # with a debounce function, so we need to give it time to perform the filtering
       expect(DiscussionsIndex.discussion(discussion1_title)).to be_displayed
-      expect(f('#content')).not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
+      expect(DiscussionsIndex.discussion_group("Closed for Comments")).
+        not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
     end
 
     it "search by title works correctly", test_id:3481190, priority: "1" do
@@ -84,7 +85,8 @@ describe "discussions index" do
       # Attempt to make this test less brittle. It's doing client side filtering
       # with a debounce function, so we need to give it time to perform the filtering
       expect(DiscussionsIndex.discussion(discussion1_title)).to be_displayed
-      expect(f('#content')).not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
+      expect(DiscussionsIndex.discussion_group("Closed for Comments")).
+        not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
     end
 
     it 'clicking the Add Discussion button redirects to new discussion page', test_id:3481193, priority: "1" do

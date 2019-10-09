@@ -100,7 +100,7 @@ export default class CalendarEvent extends Backbone.Model {
   showSpinner() {
     ReactDOM.render(
       <div>
-        <Spinner title={I18n.t('Loading')} size="medium" />
+        <Spinner renderTitle={I18n.t('Loading')} size="medium" />
       </div>
     ,
       this.view.el

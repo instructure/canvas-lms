@@ -1133,6 +1133,7 @@ hu:
         domain: "Tartomány:"
         edit_institution_email: "A felhasználók törölhetik az intézmény által hozzárendelt e-mail címűket"
         enable_alerts: "Figyelmeztetések (béta verzió)"
+        enable_course_catalog: "A kurzusok kereshető listájának mutatása a root fiókban a \"Legyen a kurzus része a publikus kurzuslistának\" opció beállításával"
         enable_eportfolios: e-portfóliók
         enable_profiles: "Profilok engedélyezése"
         enable_turnitin: Turnitin
@@ -1562,6 +1563,7 @@ hu:
   add_new_term_d2217c0d: "Új félév hozzáadása"
   add_people_7ee4b2ec: "Résztvevők hozzáadása"
   add_people_to_coursename_5ea234e1: "Felhasználók hozzáadása a következő modulhoz:%{courseName}"
+  add_quiz_cebfa28b: "Kvíz hozzáadása"
   add_quiz_ip_filter_c7b37dc5: "Kvíz IP szűrő hozzáadása"
   add_rating_89d7fbde: "Értékelés hozzáadása"
   add_recipient_ff135ed7: "Címzett hozzáadása"
@@ -8334,6 +8336,7 @@ hu:
   manage_update_for_toolname_f8e3b2fb: "Frissítés kezelése ehhez: %{toolName}"
   manage_usage_rights_c5a8c216: "Felhasználói jogosultságok kezelése"
   manage_your_course_details_664c335f: "Kurzusrészletek  kezelése"
+  manual_8c2665de: Kézi
   manual_entry_e4a4f99a: "Kézi bejegyzés"
   manually_mark_posts_as_read_afa5d035: "Bejegyzések manuális megjelölése olvasottként"
   mark_as_done_6fa48d2f: "Megjelölés befejezettként"
@@ -14938,6 +14941,7 @@ hu:
   syllabus: "Kurzus tematikája"
   syllabus_f191f65b: Tematika
   system_default_language_28a1052d: "Rendszer alapértelmezett (%{language})"
+  ta_8d966626: Segédoktató
   tab_1_3d6b3fb: "Lap 1"
   tab_1_content_8944c219: "Lap 1 tartalma"
   tab_2_9adfe241: "Lap 2"

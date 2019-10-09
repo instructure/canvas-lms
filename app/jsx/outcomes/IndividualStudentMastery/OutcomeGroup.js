@@ -20,17 +20,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ImmutablePropTypes from 'react-immutable-proptypes'
 import I18n from 'i18n!IndividualStudentMasteryOutcomeGroup'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {List, ListItem, Pill, Text} from '@instructure/ui-elements'
+import {List, Pill, Text} from '@instructure/ui-elements'
 import natcompare from 'compiled/util/natcompare'
 import Outcome from './Outcome'
 import * as shapes from './shapes'
 
 const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup) => (
   <Flex justifyItems="space-between">
-    <FlexItem padding="0 x-small 0 0"><Text size="large" weight="bold">{ outcomeGroup.title }</Text></FlexItem>
-    <FlexItem><Pill text={I18n.t('%{numMastered} of %{numGroup} Mastered', { numMastered, numGroup })} /></FlexItem>
+    <Flex.Item padding="0 x-small 0 0"><Text size="large" weight="bold">{ outcomeGroup.title }</Text></Flex.Item>
+    <Flex.Item><Pill text={I18n.t('%{numMastered} of %{numGroup} Mastered', { numMastered, numGroup })} /></Flex.Item>
   </Flex>
 )
 
@@ -68,13 +68,13 @@ export default class OutcomeGroup extends React.Component {
           <List variant="unstyled" delimiter="solid">
             {
               outcomes.sort(natcompare.byKey('title')).map((outcome) => (
-                <ListItem key={outcome.id} margin="0">
+                <List.Item key={outcome.id} margin="0">
                   <Outcome
                     outcome={outcome}
                     expanded={expandedOutcomes.has(outcome.expansionId)}
                     onExpansionChange={onExpansionChange}
                     outcomeProficiency={outcomeProficiency} />
-                </ListItem>
+                </List.Item>
               ))
             }
           </List>

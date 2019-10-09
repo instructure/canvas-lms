@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {func, number} from 'prop-types'
-import {Pagination, PaginationButton} from '@instructure/ui-pagination'
+import {Pagination} from '@instructure/ui-pagination'
 import I18n from 'i18n!assignment_grade_summary'
 
 export default class PageNavigation extends Component {
@@ -37,7 +37,7 @@ export default class PageNavigation extends Component {
 
     for (let i = 1; i <= this.props.pageCount; i++) {
       pageButtons.push(
-        <PaginationButton
+        <Pagination.Page
           current={i === this.props.currentPage}
           key={i}
           onClick={() => {
@@ -45,7 +45,7 @@ export default class PageNavigation extends Component {
           }}
         >
           {I18n.n(i)}
-        </PaginationButton>
+        </Pagination.Page>
       )
     }
 

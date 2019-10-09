@@ -48,7 +48,7 @@ const makeProps = (props = {}) => merge({
   },
   canPublish: false,
   masterCourseData: {},
-  setCopyToOpen: () => {},
+  setCopyTo: () => {},
   setSendToOpen: () => {},
   DIRECT_SHARE_ENABLED: false
 }, props)
@@ -390,7 +390,7 @@ test('opens the copyTo tray when menu item is selected', () => {
   const props = makeProps({
     displayManageMenu: true,
     DIRECT_SHARE_ENABLED: true,
-    setCopyToOpen: copySpy,
+    setCopyTo: copySpy
   })
   const tree = mount(<DiscussionRow {...props} />)
   tree
@@ -398,7 +398,10 @@ test('opens the copyTo tray when menu item is selected', () => {
     .find('button')
     .simulate('click')
   document.querySelector('#copyTo-discussion-menu-option').click()
-  ok(copySpy.calledOnce)
+  deepEqual(copySpy.firstCall.args[0], {
+    open: true,
+    selection: {discussion_topics: [props.discussion.id]}
+  })
   tree.unmount()
 })
 
@@ -407,7 +410,7 @@ test('opens the sendTo tray when menu item is selected', () => {
   const props = makeProps({
     displayManageMenu: true,
     DIRECT_SHARE_ENABLED: true,
-    setSendToOpen: sendSpy
+    setSendTo: sendSpy
   })
   const tree = mount(<DiscussionRow {...props} />)
   tree
@@ -415,7 +418,13 @@ test('opens the sendTo tray when menu item is selected', () => {
     .find('button')
     .simulate('click')
   document.querySelector('#sendTo-discussion-menu-option').click()
-  ok(sendSpy.calledOnce)
+  deepEqual(sendSpy.firstCall.args[0], {
+    open: true,
+    selection: {
+      content_type: 'discussion_topic',
+      content_id: props.discussion.id
+    }
+  })
   tree.unmount()
 })
 

@@ -385,6 +385,9 @@ describe "speed grader submissions" do
         student_submission
         @submission.originality_reports.create!(workflow_state: 'error')
 
+        @submission.assignment.turnitin_enabled = true
+        @submission.assignment.save!
+
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         wait_for_ajaximations
 

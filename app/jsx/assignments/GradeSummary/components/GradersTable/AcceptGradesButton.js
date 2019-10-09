@@ -47,7 +47,8 @@ function startedButton(props) {
 
   return (
     <Button {...buttonProps(props)} variant="light">
-      <Spinner size="x-small" title={title} /> <PresentationContent>{title}</PresentationContent>
+      <Spinner size="x-small" renderTitle={title} />{' '}
+      <PresentationContent>{title}</PresentationContent>
     </Button>
   )
 }

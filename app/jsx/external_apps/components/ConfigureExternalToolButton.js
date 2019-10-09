@@ -115,6 +115,7 @@ export default class ConfigureExternalToolButton extends React.Component {
           ref={e => {
             this.iframe = e
           }}
+          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}

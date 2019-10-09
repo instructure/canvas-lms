@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
-import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
 import {
   IconMoveUpTopSolid,
@@ -58,44 +58,44 @@ class DashboardCardMovementMenu extends React.Component {
     return (
       <Menu onSelect={this.props.onMenuSelect}>
         {!!canMoveToBeginning && (
-          <MenuItem onSelect={this.handleMoveCard(0)}>
+          <Menu.Item onSelect={this.handleMoveCard(0)}>
             <span className="DashboardCardMenu__MovementItem">
               <IconMoveUpTopSolid className="DashboardCardMenu__MovementIcon" />
               <Text weight="bold" size="small">
                 {I18n.t('Top')}
               </Text>
             </span>
-          </MenuItem>
+          </Menu.Item>
         )}
         {!!canMoveLeft && (
-          <MenuItem onSelect={this.handleMoveCard(this.props.currentPosition - 1)}>
+          <Menu.Item onSelect={this.handleMoveCard(this.props.currentPosition - 1)}>
             <span className="DashboardCardMenu__MovementItem">
               <IconMoveUpSolid className="DashboardCardMenu__MovementIcon" />
               <Text weight="bold" size="small">
                 {I18n.t('Ahead')}
               </Text>
             </span>
-          </MenuItem>
+          </Menu.Item>
         )}
         {!!canMoveRight && (
-          <MenuItem onSelect={this.handleMoveCard(this.props.currentPosition + 1)}>
+          <Menu.Item onSelect={this.handleMoveCard(this.props.currentPosition + 1)}>
             <span className="DashboardCardMenu__MovementItem">
               <IconMoveDownSolid className="DashboardCardMenu__MovementIcon" />
               <Text weight="bold" size="small">
                 {I18n.t('Behind')}
               </Text>
             </span>
-          </MenuItem>
+          </Menu.Item>
         )}
         {!!canMoveToEnd && (
-          <MenuItem onSelect={this.handleMoveCard(this.props.lastPosition)}>
+          <Menu.Item onSelect={this.handleMoveCard(this.props.lastPosition)}>
             <span className="DashboardCardMenu__MovementItem">
               <IconMoveDownBottomSolid className="DashboardCardMenu__MovementIcon" />
               <Text weight="bold" size="small">
                 {I18n.t('Bottom')}
               </Text>
             </span>
-          </MenuItem>
+          </Menu.Item>
         )}
       </Menu>
     )

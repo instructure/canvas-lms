@@ -89,7 +89,7 @@ class Layout extends Component {
               students={this.props.students}
             />
           ) : (
-            <Spinner title={I18n.t('Students are loading')} />
+            <Spinner renderTitle={I18n.t('Students are loading')} />
           )}
         </View>
       </div>

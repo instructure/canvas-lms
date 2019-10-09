@@ -70,15 +70,9 @@ describe Types::AssignmentType do
   end
 
   it "works with rubric" do
-    rubric = Rubric.create!(title: 'hi', context: course)
-    assignment.build_rubric_association(:rubric => rubric,
-                                         :purpose => 'grading',
-                                         :use_for_grading => true,
-                                         :context => course)
-    assignment.rubric_association.save!
-    expect(assignment_type.resolve("rubric { _id }")).to eq rubric.id.to_s
-    expect(assignment_type.resolve("rubric { freeFormCriterionComments }")).to eq assignment.rubric.free_form_criterion_comments
-    expect(assignment_type.resolve("rubric { freeFormCriterionComments }")).to eq rubric.free_form_criterion_comments
+    rubric_for_course
+    rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: 'grading')
+    expect(assignment_type.resolve("rubric { _id }")).to eq @rubric.id.to_s
   end
 
   it "works with moderated grading" do

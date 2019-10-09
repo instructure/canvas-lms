@@ -76,6 +76,11 @@
 #           "description": "Whether the recipient has viewed the content share.",
 #           "example": "read",
 #           "type": "string"
+#         },
+#         "content_export": {
+#           "description": "The content export record associated with this content share",
+#           "example": {"id": 42},
+#           "$ref": "ContentExport"
 #         }
 #       }
 #     }

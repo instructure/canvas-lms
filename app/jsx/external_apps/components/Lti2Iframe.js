@@ -125,6 +125,7 @@ export default class Lti2Iframe extends React.Component {
             ref={e => {
               this.iframe = e
             }}
+            data-lti-launch="true"
           />
           <div
             onFocus={this.handleAlertFocus}

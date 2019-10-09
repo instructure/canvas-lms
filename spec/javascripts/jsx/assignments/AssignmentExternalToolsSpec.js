@@ -238,4 +238,17 @@ QUnit.module('AssignmentExternalTools', hooks => {
     equal(computedUrl, correctUrl);
   })
 
+  test('it sets the "data-lti-launch" attribute on each iframe', () => {
+    wrapper = mount(
+      <AssignmentExternalTools.configTools
+        placement="assignment_view"
+        courseId={1}
+        assignmentId={1}
+      />
+    )
+    wrapper.setState({tools: toolDefinitions})
+    wrapper.find('.tool_launch').forEach(iframe => {
+      equal(iframe.instance().getAttribute('data-lti-launch'), 'true')
+    })
+  })
 })

@@ -23,7 +23,7 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 
 import {Button} from '@instructure/ui-buttons'
-import {View, Grid, GridRow, GridCol} from '@instructure/ui-layout'
+import {View, Grid} from '@instructure/ui-layout'
 import {Spinner, Text} from '@instructure/ui-elements'
 import {IconXLine} from '@instructure/ui-icons'
 
@@ -87,8 +87,8 @@ export default class RSSFeedList extends React.Component {
             hAlign="space-around"
             rowSpacing="small"
           >
-            <GridRow>
-              <GridCol>
+            <Grid.Row>
+              <Grid.Col>
                 <Button
                   variant="link"
                   margin="0 small"
@@ -101,8 +101,8 @@ export default class RSSFeedList extends React.Component {
                 <Text size="small" margin="0 small" color="secondary">
                   {this.renderPostAddedText(external_feed_entries_count)}
                 </Text>
-              </GridCol>
-              <GridCol width="auto">
+              </Grid.Col>
+              <Grid.Col width="auto">
                 <Button
                   id={`feed-row-${index}`}
                   className="external-rss-feed__delete-button"
@@ -114,8 +114,8 @@ export default class RSSFeedList extends React.Component {
                 >
                   <IconXLine title={I18n.t('Delete %{feedName}', {feedName: display_name})} />
                 </Button>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </View>
       </div>
@@ -126,7 +126,7 @@ export default class RSSFeedList extends React.Component {
     if (!this.props.hasLoadedFeed) {
       return (
         <div style={{textAlign: 'center'}}>
-          <Spinner size="small" title={I18n.t('Adding RSS Feed')} />
+          <Spinner size="small" renderTitle={I18n.t('Adding RSS Feed')} />
         </div>
       )
     } else {

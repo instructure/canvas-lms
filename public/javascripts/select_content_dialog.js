@@ -147,7 +147,8 @@ import './jquery.templateData'
             src: '/images/ajax-loader-medium-444.gif',
             borderstyle: '0',
             tabindex: '0',
-            allow: iframeAllowances()
+            allow: iframeAllowances(),
+            'data-lti-launch': 'true'
           }));
           $dialog.append(`<div class="after_external_content_info_alert screenreader-only" tabindex="0">
             <div class="ic-flash-info">

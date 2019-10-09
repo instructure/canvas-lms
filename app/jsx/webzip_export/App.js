@@ -106,7 +106,7 @@ import Errors from '../webzip_export/components/Errors'
       const webzipInProgress = this.getExportsInProgress()
       const finishedExports = this.getFinishedExports()
       if (!this.state.loaded) {
-        app = <Spinner size="small" title={I18n.t('Loading')} />
+        app = <Spinner size="small" renderTitle={I18n.t('Loading')} />
       } else if (this.state.errors.length > 0) {
         app = <Errors errors={this.state.errors} />
       } else if (finishedExports.length > 0 || !webzipInProgress) {

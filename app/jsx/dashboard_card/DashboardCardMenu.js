@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 import {Popover} from '@instructure/ui-overlays'
-import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {TabList} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
 
 import ColorPicker from '../shared/ColorPicker'
@@ -167,16 +167,16 @@ export default class DashboardCardMenu extends React.Component {
                   variant="minimal"
                   size="small"
                 >
-                  <TabPanel
+                  <TabList.Panel
                     padding="none"
                     title={I18n.t('Color')}
                     tabRef={c => (this._colorTab = c)}
                   >
                     {colorPicker}
-                  </TabPanel>
-                  <TabPanel padding="none" title={I18n.t('Move')}>
+                  </TabList.Panel>
+                  <TabList.Panel padding="none" title={I18n.t('Move')}>
                     {movementMenu}
-                  </TabPanel>
+                  </TabList.Panel>
                 </TabList>
               </div>
             }

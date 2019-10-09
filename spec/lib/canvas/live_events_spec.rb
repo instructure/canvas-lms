@@ -1163,4 +1163,48 @@ describe Canvas::LiveEvents do
       end
     end
   end
+
+  describe 'user' do
+    context 'created' do
+      it 'should trigger a user_created live event' do
+        user_with_pseudonym
+
+        expect_event('user_created', {
+          user_id: @user.global_id.to_s,
+          uuid: @user.uuid,
+          name: @user.name,
+          short_name: @user.short_name,
+          workflow_state: @user.workflow_state,
+          created_at: @user.created_at,
+          updated_at: @user.updated_at,
+          user_login: @pseudonym&.unique_id,
+          user_sis_id: @pseudonym&.sis_user_id
+        }.compact!).once
+
+        Canvas::LiveEvents.user_created(@user)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger a user_updated live event' do
+        user_with_pseudonym
+
+        @user.update!(name: "Test Name")
+
+        expect_event('user_updated', {
+          user_id: @user.global_id.to_s,
+          uuid: @user.uuid,
+          name: @user.name,
+          short_name: @user.short_name,
+          workflow_state: @user.workflow_state,
+          created_at: @user.created_at,
+          updated_at: @user.updated_at,
+          user_login: @pseudonym&.unique_id,
+          user_sis_id: @pseudonym&.sis_user_id
+        }.compact!).once
+
+        Canvas::LiveEvents.user_updated(@user)
+      end
+    end
+  end
 end

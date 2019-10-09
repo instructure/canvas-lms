@@ -383,6 +383,7 @@ el:
     report_header_long_name: "πλήρες όνομα"
     report_header_name: όνομα
     report_header_outcome_score: "βαθμολογία αποτελέσματος"
+    report_header_role: ρόλος
     report_header_section: τμήμα
     report_header_section_id: "id τμήματος"
     report_header_section_name: "όνομα τμήματος"
@@ -1015,6 +1016,7 @@ el:
         domain: "Domain:"
         edit_institution_email: "Οι χρήστες μπορούν να διαγράψουν την επίσημη ηλεκτρονική διεύθυνση που τους έχει δώσει το πανεπιστήμιο"
         enable_alerts: "Συναργερμοί (beta)"
+        enable_course_catalog: "Εμφάνισης λίστας με δυνατότητα αναζήτησης μαθημάτων σε αυτόν τον λογαριασμό ρίζας με ενεργοποιημένη την ένδειξη «Συμπεριλάβετε αυτό το μάθημα στο ευρετήριο κοινοποιημένων μαθημάτων»."
         enable_eportfolios: ePortofolios
         enable_profiles: "Ενεργοποίηση Προφίλ Χρηστών"
         enable_turnitin: "Υπηρεσία Turnitin"
@@ -1377,6 +1379,8 @@ el:
     errors: 
       messages: 
         record_invalid: "Η επικύρωση απέτυχε: %{errors}"
+        restrict_dependent_destroy: 
+          has_one: "Δεν είναι δυνατή η διαγραφή της καταχώρισης επειδή υπάρχει εξαρτώμενη καταγραφή %{record}"
   activity_by_category_9c2033d1: "Δραστηριότητα ανά Κατηγορία"
   activity_by_date_878c5b49: "Δραστηριότητα ανά ημερομηνία"
   add_2nd_review_ea988088: "Προσθήκη 2ης Κριτικής"
@@ -1427,6 +1431,7 @@ el:
   add_new_set_of_due_dates_e8e240f: "Προσθέστε νέο σύνολο απο καταληκτικές ημερομηνίες"
   add_new_term_d2217c0d: "Προσθήκη Νέου Εξαμήνου"
   add_people_7ee4b2ec: "Προσθήκη Ατόμων"
+  add_quiz_cebfa28b: "Προσθήκη Κουίζ"
   add_quiz_ip_filter_c7b37dc5: "Πρόσθεση φίλτου IP Διεύθυνσης για Κουίζ"
   add_recipient_ff135ed7: "Προσθήκη Παραλήπτη"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Προσθήκη, αφαίρεση η ανακατάταξη των ενοτήτων για αυτό το portfolio"
@@ -2229,7 +2234,7 @@ el:
         google_drives_auth_required: "Πριν μπορέσετε να υποβάλετε εργασίες απευθείας από το Google Drive, θα πρέπει να εξουσιοδοτήσετε το Canvas να έχει πρόσβαση στον λογαριασμό σας στο Google Drive:"
         media_recording_ready: "Όλα Έτοιμα για Υποβολή! Κάντε κλικ στο κουμπί «Υποβολή Εργασίας» για ολοκλήρωση."
         media_recordings_disabled: "Οι ηχογραφήσεις αρχείων πολυμέσων δεν είναι ενεργοποιημένες σε αυτή την ιστοσελίδα του Canvas και δεν θα μπορέσετε να υποβάλετε εργασίες αυτού του τύπου. Παρακαλώ επικοινωνήστε με τον εκπαιδευτή σας για να αλλάξετε τις ρυθμίσεις αυτής της εργασίας ή με τον διαχειριστή των υπολογιστικών συστημάτων σας για την ενεργοποίηση των ηχογραφήσεων αρχείων πολυμέσων."
-        submitting: Υποβάλεται...
+        submitting: "Υποβολή σε εξέλιξη..."
         uploading: "Γίνεται ανάκτηση αντιγράφου του Google Doc σας για υποβολή για αυτή την εργασία. Αυτό μπορεί να πάρει λίγη ώρα, ανάλογα με το μέγεθος του αρχείου..."
       no_submission: "Δεν έχει Επιλεγεί Υποβολή"
       submission_url: "Υποβολή:"
@@ -2495,6 +2500,7 @@ el:
   body_shadow_d36e8c2e: "Σκίαση Κυρίου Μέρους"
   bookmark_service: 
     default_title: "Δεν υπάρχει Τίτλος"
+  bookmarks_5b5b81c9: Σελιδοδείκτες
   bounce_count_reset_c4c2218f: "Επαναφορά αριθμού επιστροφών!"
   bounce_reason_689ed4c6: "Λόγος επιστροφής"
   breadcrumb_1_cb3c504: "Ιχνηλάτηση 1"
@@ -2995,9 +3001,11 @@ el:
   canvas_cloud_information_fdd404f2: "Πληροφορίες Canvas Cloud"
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Οι σύνδεσμοι των εργαλειοθηκών του Canvas θα σας βοηθήσουν να πλοηγηθείτε στην εργαλειοθήκη του Καταλόγου"
+  canvas_demo_7a005cf3: "Δοκιμή Canvas"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Το Canvas δεν αναγνώρισε τον πάροχο επαλήθευσής σας"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "<mrk mid=\"3557\" mtype=\"seg\">Στο Canvas δεν υπάρχει λογαριασμός για τον χρήστη:</mrk> <mrk mid=\"3558\" mtype=\"seg\">%{user}</mrk>"
   canvas_error_report_ff678539: "Αναφορά Σφάλματος Canvas"
+  canvas_id_f42f6ad: "Canvas ID"
   canvas_introduction_video_2d81f3ad: "Εισαγωγικό Βίντεο στο Canvas"
   canvas_login_failure_message_4c922f2f: "Μήνυμα απο το Canvas σχετικά με την αποτυχία σύνδεσης"
   canvas_revision_unknown: Άγνωστο
@@ -4659,6 +4667,7 @@ el:
   create_users_view: 
     required: "Παρακαλώ, καταχωρίστε μερικές διευθύνσεις ηλεκτρονικού ταχυδρομείου."
   created_by_b39b9c8b: "Δημιουργήθηκε απο τον/την"
+  created_by_sis_b590894c: "Δημιουργήθηκε από το SIS _Student Information System_"
   created_group_group_name_2097306b: "Δημιουργήθηκε η ομάδα %{group_name}"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "<mrk mid=\"3565\" mtype=\"seg\">Η δημιουργία Εξαγωγής Υποβολών θα σας επιτρέψει να κάνετε λήψη ενός αρχείου zip με όλες τις υποβολές εργασιών για όλα τα τρέχοντα και προηγούμενα μαθήματα.</mrk> <mrk mid=\"3566\" mtype=\"seg\">Αυτό το αρχείο μπορεί να είναι μεγάλο, οπότε η διαδικασία μπορεί να πάρει λίγη ώρα.</mrk> <mrk mid=\"3567\" mtype=\"seg\">Μπορείτε να απομακρυνθείτε από αυτή τη σελίδα και να επιστρέψετε αργότερα.</mrk>"
   creative_commons_714a065f: "Creative Commons"
@@ -4810,9 +4819,16 @@ el:
   dashboard_7f1dbf71: "Ταμπλό Επιλογών"
   data_exports: "εξαγωγές δεδομένων"
   data_set_identifier_data_set_id_c228b5df: "<mrk mid=\"5882\" mtype=\"seg\">Αναγνωριστικό Συνόλου Δεδομένων:</mrk> <mrk mid=\"5883\" mtype=\"seg\">%{data_set_id}</mrk>"
+  database_error_err_6393d244: "Σφάλμα βάσης δεδομένων (%{err})"
   date: 
     abbr_day_names: 
-      - ""
+      - Κυρ
+      - Δευ
+      - Τρι
+      - Τετ
+      - Πέμ
+      - Παρ
+      - Σαβ
     abbr_month_names: 
       - ~
       - Ιαν
@@ -5841,7 +5857,7 @@ el:
     messages: 
       accepted: "πρέπει να το αποδεχτείτε"
       blank: "δεν πρέπει να παραμείνει κενό"
-      confirmation: "δεν ταιριάζει %{attribute}"
+      confirmation: "δεν ταιριάζει με την επιβεβαίωση %{attribute}"
       empty: "δεν πρέπει να παραμείνει κενό"
       equal_to: "πρέπει να είναι ίσο με %{count}"
       even: "πρέπει να είναι άρτιος"
@@ -5973,6 +5989,7 @@ el:
   fair_score_554e2558: "Μέτρια Βαθμολογία"
   fair_use_bee47d77: "Θεμιτή Χρήση"
   favicon_6e658914: Favicon
+  favorites_c7e0207c: Αγαπημένα
   feature_flags: 
     feature_flag: 
       allow: "Να επιτρέπεται"
@@ -5999,13 +6016,16 @@ el:
     quiz_log_auditing: "Έλεγχος Καταγραφής Κουίζ"
     student_outcome_gradebook: "Βαθμολόγιο Μαθησιακής Επιδεξιότητας Φοιτητή/τριας"
   field_name_31fff38e: "Όνομα Πεδίου"
+  file_already_exists_bdc61895: "το αρχείο ήδη υπάρχει"
   file_c851020d: Αρχείο
   file_content_a99b5c6b: "Περιεχόμενο Αρχείου"
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "Το αρχείο %{filename} δεν μπορούσε να περιληφθεί στο αρχείο ePub. Βλ. το ξεχωριστό αρχείο zip για πρόσβαση."
+  file_has_no_data_213a4540: "Το αρχείο δεν περιέχει δεδομένα"
   file_list_350d08df: "Λίστα Αρχείων"
   file_list_updated_38e2a5ad: "Ενημερώθηκε η λίστα αρχείων"
   file_menu_cc0ca54: "Μενού Αρχείων"
   file_name_2fe68ec1: "Όνομα Αρχείου"
+  file_name_too_long_ea535796: "το όνομα του αρχείου είναι πολύ μεγάλο"
   file_not_found_9eec054c: "Το αρχείο δεν βρέθηκε"
   file_preview_eedb43f2: "Προβολή Αρχείου"
   file_previews: 
@@ -7082,6 +7102,7 @@ el:
   international_text_messaging_rates_may_apply_d4b4a97a: "Ενδέχεται να εφαρμόζεται χρέωση διεθνών μηνυμάτων κειμένου."
   invalid_authenticity_token_b753558c: "Μη Έγκυρο Token Επαλήθευσης"
   invalid_content_type_utf_8_required_bd458b78: "Μη έγκυρος τύπος περιεχομένου, απαιτείται UTF-8"
+  invalid_csv_file_2c076da5: "Μη έγκυρο CVS αρχείο "
   invalid_domain_e810c1d: "Μη έγκυρο domain"
   invalid_file_type_881cc9b2: "Μη έγκυρος τύπος αρχείου"
   invalid_points_possible: "Η τιμή των πιθανών μορίων για αυτή την εργασία πρέπει να είναι μηδέν ή μεγαλύτερη."
@@ -7182,6 +7203,7 @@ el:
     titles: 
       play_comment: "Αναπαραγωγή Πολυμεσικού Σχολίου"
   just_in_time_provisioning_382a0354: "Παροχή τη στιγμή που απαιτείται (JIT)"
+  jwts_4f397c85: JWTs
   k12_description: |-
       <mrk mid="1613" mtype="seg">Λειτουργίες, ρυθμίσεις και εμφανίσεις που ταιριάζουν περισσότερο, ιδίως στο περιβάλλον του K-12.</mrk> <mrk mid="1614" mtype="seg">Προς το παρόν, μόνο αυτό
       πραγματοποιεί κάποιες αλλαγές στην εμφάνιση, αλλά διάφορα πράγματα που αφορούν το Κ-12 θα προστεθούν στο μέλλον.</mrk>
@@ -7256,6 +7278,8 @@ el:
     auth: 
       api: 
         bad_request_status: κακό_αίτημα
+        not_found_message: not_found
+        not_found_status: not_found
       authentication_required: "απαιτείται εξουσιοδότηση χρήστη"
       errors: 
         not_authenticated: "Θα πρέπει να έχετε συνδεθεί για να έχετε πρόσβαση σε αυτή τη σελίδα"
@@ -7507,6 +7531,7 @@ el:
   manage_update_for_toolname_f8e3b2fb: "Διαχείριση ενημέρωσης για το εργαλείο %{toolName}"
   manage_usage_rights_c5a8c216: "Διαχείριση Δικαιωμάτων Χρήσης"
   manage_your_course_details_664c335f: "Διαχειριστείτε τις λεπτομέρειες του μαθήματός σας"
+  manual_8c2665de: Εγχειρίδιο
   manual_entry_e4a4f99a: "Χειροκίνητη Καταχώριση"
   manually_mark_posts_as_read_afa5d035: "Χειροκίνητη επισήμανση των δημοσιεύσεων ως αναγνωσμένων"
   mark_as_done_6fa48d2f: "Επισήμανση ως ολοκληρωμένο"
@@ -8139,6 +8164,10 @@ el:
       summary: 
         subject: "<mrk mid=\"4585\" mtype=\"seg\">Βαθμοί και σχόλια εκδόθηκαν για:</mrk> <mrk mid=\"4586\" mtype=\"seg\">%{title}, %{course}</mrk>"
     assignment_unpublished_module: "Αυτή η εργασία είναι μέρος μιας μη δημοσιευμένης ενότητας και δεν είναι ακόμη διαθέσιμη."
+    blueprint_sync_complete: 
+      email: 
+        html: 
+          details_link: "Περισσότερες πληροφορίες..."
     collaboration_invitation: 
       email: 
         body: |-
@@ -8232,6 +8261,7 @@ el:
           attached_files: "Επισυναπτόμενα Αρχεία:"
           audio_comment: "Αυτό το μήνυμα περιέχει πολυμεσικά σχόλια. Για να ακούσετε ή να απαντήσετε, κάντε κλικ σε αυτόν τον σύνδεσμο:"
           download: λήψη
+          pre_you_can: Μπορείτε
           subject: "%{user_name}, μόλις στείλατε μήνυμα στο Canvas."
           unknown_user: "Άγνωστος Χρήστης"
           view_message: "Προβολή αυτού του μηνύματος στις Συνομιλίες"
@@ -8254,6 +8284,7 @@ el:
           attached_files: "Επισυναπτόμενα Αρχεία:"
           audio_comment: "Αυτό το μήνυμα περιέχει πολυμεσικά σχόλια. Για να ακούσετε ή να απαντήσετε, κάντε κλικ σε αυτόν τον σύνδεσμο:"
           download: λήψη
+          pre_you_can: Μπορείτε
           subject: "Ο χρήστης %{user_name} μόλις σας έστειλε μήνυμα στο Canvas."
           unknown_user: "Άγνωστος Χρήστης"
           view_message: "Προβολή αυτού του μηνύματος στις Συνομιλίες"
@@ -8377,6 +8408,7 @@ el:
         html: 
           complete_registration_link: "Κάντε κλικ εδώ για να ολοκληρώσετε την εγγραφή"
           email: "Ηλεκτρονική Διεύθυνση"
+          link: "Κάντε κλίκ εδώ για να εμφανίσετε την σελίδα του μαθήματος"
           name: Όνομα
           none: κανένα
           subject: "Εγγραφή στο Μάθημα"
@@ -9038,11 +9070,11 @@ el:
         tweet: "<mrk mid=\"2146\" mtype=\"seg\">Ειδοποίηση Canvas - Αλλαγή Βαθμού:</mrk> <mrk mid=\"2147\" mtype=\"seg\">%{date}</mrk>"
     submission_graded: 
       email: 
-        body: "Η εργασία, %{assignment}, έχει βαθμολογηθεί."
+        body: "Η εργασία σας %{assignment} έχει βαθμολογηθεί."
         excused: "Αυτή η εργασία έχει παραλειφθεί."
         graded_date: "βαθμολογήθηκε/αν: %{date}"
         html: 
-          body: "Η εργασία, %{assignment}, έχει βαθμολογηθεί."
+          body: "Η εργασία σας %{assignment} έχει βαθμολογηθεί."
           excused: "Αυτή η εργασία έχει παραλειφθεί."
           graded_date: "ανα-βαθμολογήθηκε/αν: %{date}"
           link_message: "Μπορείτε να δείτε την εργασία εδώ"
@@ -9064,7 +9096,7 @@ el:
         not_applicable: "Δεν εφαρμόζεται"
         score: "<mrk mid=\"2157\" mtype=\"seg\">βαθμολογία:</mrk>  <mrk mid=\"2158\" mtype=\"seg\">%{score} από %{total}</mrk>"
         score_pending_review: "εκκρεμεί αναθεώρηση της βαθμολογίας από τον καθηγητή"
-        sms_body: "%{assignment}, %{context} έχει αλλάξει."
+        sms_body: "Η %{assignment} έχει βαθμολογηθεί."
       summary: 
         graded_date: "ανα-βαθμολογήθηκε/αν: %{date}"
         no_date_set: "Δεν έχει καθοριστεί ημερομηνία"
@@ -9133,13 +9165,13 @@ el:
         html: 
           body: "Μια σελίδα ενημερώθηκε στο wiki για %{title} που ίσως σας διευκολύνει."
           link_message: "Κάντε κλικ εδώ για αναθεώρηση"
-          subject: "<mrk mid=\"774\" mtype=\"seg\">Ενημερωμένη Σελίδα Wiki:</mrk> <mrk mid=\"775\" mtype=\"seg\">%{title}, %{user}</mrk>"
+          subject: "Η σελίδα ενημερώθηκε: %{title},%{user}"
         link_message: "<mrk mid=\"2182\" mtype=\"seg\">Μπορείτε να το δείτε εδώ:</mrk> <mrk mid=\"2183\" mtype=\"seg\">%{link}</mrk>"
-        subject: "<mrk mid=\"2184\" mtype=\"seg\">Ενημερωμένη Σελίδα Wiki:</mrk> <mrk mid=\"2185\" mtype=\"seg\">%{title}, %{user}</mrk>"
+        subject: "Η σελίδα ενημερώθηκε: %{title},%{user}"
       sms: 
         more_info: "Περισσότερες πληροφορίες στη διεύθυνση %{url}"
       summary: 
-        subject: "<mrk mid=\"2187\" mtype=\"seg\">Ενημερωμένη Σελίδα Wiki:</mrk> <mrk mid=\"2188\" mtype=\"seg\">%{title}, %{user}</mrk>"
+        subject: "Η σελίδα ενημερώθηκε: %{title},%{user}"
       twitter: 
         tweet: "<mrk mid=\"2189\" mtype=\"seg\">Ειδοποίηση Canvas - Η Σελίδα Ενημερώθηκε:</mrk> <mrk mid=\"2190\" mtype=\"seg\">%{title}, %{user}.</mrk>"
     web_conference_invitation: 
@@ -9406,6 +9438,7 @@ el:
   not_graded_e027c866: "Δεν έχει βαθμολογηθεί"
   not_installed_37a21a76: "Δεν εγκαταστάθηκε"
   not_published_73f7079: "Μη δημοσιευμένο"
+  not_synced_529cbf29: "Δεν έχει συγχρονιστεί"
   not_yet_completed_345a0bca: "Δεν έχει ολοκληρωθεί ακόμη"
   note_8b73ce09: Σημείωση
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "<mrk mid=\"6194\" mtype=\"seg\">Σημείωση:</mrk> <mrk mid=\"6195\" mtype=\"seg\">Μπορεί να χρειαστεί έως και μία εβδομάδα για την παροχή του Beta URL, ανάλογα με τον κύκλο ανανέωσης Beta.</mrk>"
@@ -9680,6 +9713,7 @@ el:
         allow_application: "Η εφαρμογή %{app_name} ζητά πρόσβαση στον λογαριασμό σας."
       page_title: "Σύνδεση στην Εφαρμογή"
       remember_auth: "Απομνημόνευση της εξουσιοδότησής μου για αυτή την υπηρεσία"
+  oauth_2_eb9d97: "Πρωτόκολλο OAuth2"
   observees: 
     being_observed: "Σπουδαστές υπό Παρατήρηση"
     new_observee_password: "Κωδικός πρόσβασης"
@@ -9982,6 +10016,7 @@ el:
       delete_reminder_failed: "Η διαγραφή απέτυχε"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Δεν είναι δυνατή η αξιολόγηση ομοτίμων για εργασίες με βαθμολόγηση από περισσότερους"
   peer_reviews_e3a55964: "Αξιολογήσεις Ομότιμων"
+  pending_3e506a5b: Εκκρεμεί
   people_b4ebb13c: Κοινό
   people_options_cfb419a6: "Επιλογές Ατόμων"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Το κοινό θα δει αυτό το όνομα σε συζητήσεις, μηνύματα και σχόλια"
@@ -10382,6 +10417,7 @@ el:
       validations: 
         poll_choice_belongs_to_poll: "Αυτή η επιλογή ερώτησης γκάλοπ δεν ανήκει στο υπάρχον γκάλοπ."
         poll_is_published: "Αυτή η συνεδρία γκάλοπ δεν δέχεται υποβολές."
+  polls_d8096fb7: Δημοσκοπήσεις
   poor_score_715306e2: "Χαμηλή βαθμολογία"
   port_75f69d1: Θύρα
   position_f9c9b93c: Θέση
@@ -10697,6 +10733,7 @@ el:
     upload_file_view: 
       choose_a_picture: "επιλέξτε μια φωτογραφία"
       crop_instructions: "Για να κόψετε την εικόνα, σύρετε την επιλογή και μετά κάντε κλικ στο κουμπί «Αποθήκευση» παρακάτω."
+  progress_9de4af8f: Πρόοδος
   progress_for_account_name_ef203250: "Πρόοδος για τον λογαριασμό %{account_name}"
   progress_loading_bar_a26b8861: "Μπάρα προόδου/φόρτωσης"
   project_groups_1fa0320b: "Ομάδες Πρότζεκτ"
@@ -11525,7 +11562,7 @@ el:
         place: "Τοποθέτηση:"
         question_group: "Σε ομάδα ερωτήσεων:"
         save: Αποθήκευση
-        saving: Αποθήκευση...
+        saving: "Αποθήκευση σε εξέλιξη..."
         where_to_move: "Πού θα θέλατε να μετακινήσετε το %{quiz_item};"
       multi_answer: 
         choose_answer: Επιλογή
@@ -12176,6 +12213,7 @@ el:
   role: 
     duplicate_role: "Υπάρχει ήδη ρόλος με αυτό το όνομα"
   role_7c0b7eaa: "Ρόλος:"
+  role_b3951149: ρόλος
   role_name_18a5943b: "Όνομα Ρόλου"
   role_override: 
     permission: 
@@ -12298,6 +12336,7 @@ el:
       account_roles: "Ρόλοι Λογαριασμού"
       course_roles: "Ρόλοι Μαθήματος"
       page_header_title: "Άδειες Λογαριασμού"
+  roles_730b879e: Ρόλοι
   rootFoldersFinder: 
     course_files: "Αρχεία μαθήματος"
     group_files: "Αρχεία ομάδας"
@@ -12587,6 +12626,7 @@ el:
         crosslist_this_section: "Αφαίρεση αυτού του Τομέα από τη λίστα"
         current_enrollments: "Τρέχουσες εγγραφές"
         decrosslist_section: "Επαναφορά αυτού του Τομέα στη Λίστα"
+  sections_94731e51: Τμήματα
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Δείτε μερικά εργαλεία LTI* που λειτουργούν τέλεια με το Canvas."
   select_a_grading_period_5ea50f1: "Επιλογή Περιόδου Βαθμολόγησης..."
   select_a_grading_period_aab25483: "Επιλογή Περιόδου Βαθμολόγησης"
@@ -12676,6 +12716,7 @@ el:
   service_cloud_ticketing_connector_889e1b7b: "Συνδέτης (Connector) του Συστήματος Υποβολής Ticket του Service Cloud"
   services_api: 
     must_be_logged_in: "Πρέπει να είσαστε συνδεδεμένοι για να χρησιμοποιήσετε το Kaltura"
+  services_ccd7bca0: Υπηρεσίες
   set_default_email_address_400f70dc: "Ορισμός προεπιλεγμένης ηλεκτρονικής διεύθυνσης"
   set_default_grade_dialog: 
     dialog_title: "Προεπιλεγμένος βαθμός για το μάθημα %{assignment.name}"
@@ -13390,6 +13431,7 @@ el:
     no_answer: "Δεν έχει υπάρξει απάντηση"
   statistics_4573b730: "Στατιστικά Στοιχεία"
   stats_9272cef3: Στατιστικές
+  status_e051bb30: κατάσταση
   status_e7fdbe06: Κατάσταση
   step: Βήμα
   stream_items_api: 
@@ -13646,7 +13688,10 @@ el:
   switch_to_group_group_name_786b913b: "Αλλαγή στην ομάδα %{group_name}"
   syllabus: "Αναλυτικό Πρόγραμμα Μαθήματος"
   syllabus_f191f65b: "Αναλυτικό Πρόγραμμα"
+  synced_97764882: "Έγινε συγχρονισμός"
+  syncing_e67b8a9f: "Συγχρονισμός σε εξέλιξη..."
   system_default_language_28a1052d: "Προεπιλεγμένη (%{language}) Συστήματος"
+  ta_8d966626: "Εγγεγραμμένος ως βοηθός διδασκαλίας"
   tab_1_3d6b3fb: "Καρτέλα 1"
   tab_1_content_8944c219: "Περιεχόμενο καρτέλας 1"
   tab_2_9adfe241: "Καρτέλα 2"
@@ -13751,6 +13796,7 @@ el:
   the_app_was_added_successfully_3f785a23: "Η εφαρμογή προστέθηκε επιτυχώς"
   the_app_was_deactivated_573520ab: "Η εφαρμογή απενεργοποιήθηκε"
   the_app_was_updated_successfully_3d71cd1b: "Η εφαρμογή ενημερώθηκε επιτυχώς"
+  the_end_date_for_submissions_66168efa: "Η καταληκτική ημερομηνία για υποβολές"
   the_error_stack_trace_if_there_is_one_b7e008a1: "Τα ίχνη στοίβας για το σφάλμα, αν υπάρχουν"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "<mrk mid=\"1159\" mtype=\"seg\">Η ετικέτα Αρχεία είναι ο χώρος όπου μπορείτε να μοιραστείτε διαφάνειες από παραδόσεις, πρότυπα έγγραφα, βοηθήματα μελέτης, οτιδήποτε θα θέλουν να κατεβάσουν οι σπουδαστές.</mrk>  <mrk mid=\"1160\" mtype=\"seg\">Η μεταφόρτωση και η οργάνωση των αρχείων σας είναι εύκολη με το Canvas.</mrk>  <mrk mid=\"1161\" mtype=\"seg\">Θα σας δείξουμε πώς γίνεται.</mrk>"
   the_following_fields_are_invalid_fields_b3565800: "<mrk mid=\"6483\" mtype=\"seg\">Τα ακόλουθα πεδία δεν είναι έγκυρα:</mrk> <mrk mid=\"6484\" mtype=\"seg\">%{fields}</mrk>"
@@ -13844,6 +13890,7 @@ el:
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Αυτή η σελίδα-δείγμα περιλαμβάνει συνήθη στοιχεία του UI του Canvas για να σας βοηθήσει να δημιουργήσετε τη δική σας προσαρμοσμένη σήμανση. Μόλις αρχίσετε να κάνετε αλλαγές στα χρώματα και τις εικόνες στην αριστερή πλευρική μπάρα, θα δείτε ένα κουμπί *Προεπισκόπηση των Αλλαγών Σας*. Κάντε κλικ για να ανανεώσετε τη σελίδα και να δείτε πώς φαίνονται οι αλλαγές σας."
   this_student_wrote_f1a3f22d: "Ο σπουδαστής έγραψε:"
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Αυτή η υποβολή έχει ήδη βαθμολογηθεί και είναι έτοιμη για επανέλεγχο."
+  this_topic_is_closed_for_comments_3dd10c00: "Αυτό το θέμα είναι κλειστό για σχόλια."
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "<mrk mid=\"1506\" mtype=\"seg\">Αυτός ο χρήστης έχει πολλαπλούς ρόλους σε αυτό το μάθημα.</mrk> <mrk mid=\"1507\" mtype=\"seg\">Αν αλλάξετε τον ρόλο του εδώ θα αντικατασταθούν όλες οι τρέχουσες εγγραφές του.</mrk>"
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Αυτός ο χρήστης δεν έχει, προς το παρόν, πρόσβαση στο μάθημα "
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Αυτό θα σας επιτρέψει να επαληθεύσετε το Canvas για τη δημοσίευση βαθμών στο SIS"
@@ -14330,6 +14377,7 @@ el:
       profile: Προφιλ
       settings: Ρυθμίσεις
   user_s_settings_d65644b4: "Ρυθμίσεις του/της %{user}"
+  user_search_results_f5445b8b: "Αποτελέσματα Αναζήτησης Χρήστη"
   user_selected_answer: Επιλέξατε
   user_selected_wrong: "Η σωστή απάντηση ήταν %{correct_answer_text}."
   user_service: 
@@ -14772,11 +14820,11 @@ el:
       multi_page_html: "Προβολή %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> από <b>%{count}</b> συνολικά"
       single_page: 
         one: "Προβολή 1 %{model}"
-        other: "Προβολή και των %{count} %{model}"
+        other: "Προβολή όλων %{count} %{model}"
         zero: "Δεν βρέθηκε %{model}"
       single_page_html: 
         one: "Προβολή <b>1</b> %{model}"
-        other: "Προβολή <b>all&nbsp;%{count}</b> %{model}"
+        other: "Προβολή <b>όλων&nbsp;%{count}</b> %{model}"
         zero: "Δεν βρέθηκε %{model}"
     page_gap: "&hellip;"
     previous_label: "&#8592; Προηγούμενο"

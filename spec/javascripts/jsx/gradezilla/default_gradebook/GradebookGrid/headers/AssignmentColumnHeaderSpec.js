@@ -133,6 +133,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         {
           id: '1001',
           isInactive: false,
+          isTestStudent: false,
           name: 'Adam Jones',
           sortableName: 'Jones, Adam',
           submission: {
@@ -147,6 +148,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         {
           id: '1002',
           isInactive: false,
+          isTestStudent: false,
           name: 'Betty Ford',
           sortableName: 'Ford, Betty',
           submission: {
@@ -161,6 +163,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         {
           id: '1003',
           isInactive: false,
+          isTestStudent: false,
           name: 'Charlie Xi',
           sortableName: 'Xi, Charlie',
           submission: {
@@ -261,15 +264,34 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
           props.assignment.postManually = true
         })
 
-        test('displays an "off" icon when no submissions are graded but unposted', () => {
-          props.students.forEach(student => {
-            if (student.submission.workflowState === 'graded') {
-              student.submission.postedAt = new Date()
-            }
+        QUnit.module('when new icons are enabled', newIconsEnabledHooks => {
+          newIconsEnabledHooks.beforeEach(() => {
+            props.postGradesAction.newIconsEnabled = true
           })
 
-          mountComponent()
-          ok(getColumnHeaderIcon('IconOff'))
+          test('does not display an "off" icon when no submissions are graded but unposted', () => {
+            props.students.forEach(student => {
+              if (student.submission.workflowState === 'graded') {
+                student.submission.postedAt = new Date()
+              }
+            })
+
+            mountComponent()
+            notOk(getColumnHeaderIcon('IconOff'))
+          })
+        })
+
+        QUnit.module('when new icons are not enabled', () => {
+          test('displays an "off" icon when no submissions are graded but unposted', () => {
+            props.students.forEach(student => {
+              if (student.submission.workflowState === 'graded') {
+                student.submission.postedAt = new Date()
+              }
+            })
+
+            mountComponent()
+            ok(getColumnHeaderIcon('IconOff'))
+          })
         })
 
         test('displays an "off" icon when at least one submission is graded but unposted', () => {
@@ -356,6 +378,42 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         props.assignment.anonymizeStudents = true
         mountComponent()
         equal(getSecondaryDetailText(), 'Unpublished')
+      })
+    })
+
+    QUnit.module('when post policies are enabled', postPoliciesEnabledHooks => {
+      postPoliciesEnabledHooks.beforeEach(() => {
+        props.postGradesAction.featureEnabled = true
+      })
+
+      QUnit.module('when the assignment is manually posted', manualPostHooks => {
+        manualPostHooks.beforeEach(() => {
+          props.assignment.postManually = true
+        })
+
+        test('displays "Manual" text when new post policy icons are enabled', () => {
+          props.postGradesAction.newIconsEnabled = true
+          mountComponent()
+          ok(getSecondaryDetailText().includes('Manual'))
+        })
+
+        test('prioritizes "Anonymous" text when new post policy icons are enabled and the assignment is anonymized', () => {
+          props.postGradesAction.newIconsEnabled = true
+          props.assignment.anonymizeStudents = true
+          mountComponent()
+          equal(getSecondaryDetailText(), 'Anonymous')
+        })
+
+        test('does not display "Manual" text when the new post policy icons are not enabled', () => {
+          mountComponent()
+          notOk(getSecondaryDetailText().includes('Manual'))
+        })
+      })
+
+      test('does not display "Manual" text when icons are enabled but the assignment is auto-posted', () => {
+        props.postGradesAction.newIconsEnabled = true
+        mountComponent()
+        notOk(getSecondaryDetailText().includes('Manual'))
       })
     })
   })
@@ -800,6 +858,22 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         const [settings] = window.messageStudents.lastCall.args
         settings.onClose()
         strictEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+
+      test('includes non-test students in the "settings" hash', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        const [settings] = window.messageStudents.lastCall.args
+        strictEqual(settings.students.length, 3)
+      })
+
+      test('excludes test students from the "settings" hash', () => {
+        props.students[0].isTestStudent = true
+
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        const [settings] = window.messageStudents.lastCall.args
+        deepEqual(settings.students.map(student => student.name), ['Betty Ford', 'Charlie Xi'])
       })
     })
   })

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {CREATE_SUBMISSION} from '../../graphqlData/Mutations'
 import {fireEvent, render} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
@@ -80,9 +81,11 @@ describe('SubmissionManager', () => {
     ]
 
     const {getByText} = render(
-      <MockedProvider mocks={mocks}>
-        <SubmissionManager {...props} />
-      </MockedProvider>
+      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <MockedProvider mocks={mocks}>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      </AlertManagerContext.Provider>
     )
 
     const submitButton = getByText('Submit')

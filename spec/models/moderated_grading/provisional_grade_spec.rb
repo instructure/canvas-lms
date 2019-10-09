@@ -270,63 +270,66 @@ describe ModeratedGrading::ProvisionalGrade do
 
   describe "grade_matches_current_submission" do
     it "returns true if the grade is newer than the submission" do
-      sub = nil
+      submission = nil
       Timecop.freeze(10.minutes.ago) do
-        sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
+        submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
       end
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
-      expect(pg.reload.grade_matches_current_submission).to eq true
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
+      expect(provisional_grade.reload.grade_matches_current_submission).to eq true
     end
 
     it "returns false if the submission is newer than the grade" do
-      sub = nil
-      pg = nil
+      submission = nil
+      provisional_grade = nil
       Timecop.freeze(10.minutes.ago) do
-        sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-        pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+        submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+        provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
       end
-      assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'resubmit')
-      expect(pg.reload.grade_matches_current_submission).to eq false
+      assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'resubmit')
+      expect(provisional_grade.reload.grade_matches_current_submission).to eq false
     end
   end
 
   describe 'unique constraint' do
     it "disallows multiple provisional grades from the same user" do
-      pg1 = submission.provisional_grades.build(score: 75)
-      pg1.scorer = scorer
-      pg1.save!
-      pg2 = submission.provisional_grades.build(score: 80)
-      pg2.scorer = scorer
-      expect { pg2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+      first_provisional_grade = submission.provisional_grades.build(score: 75)
+      first_provisional_grade.scorer = scorer
+      first_provisional_grade.save!
+      second_provisional_grade = submission.provisional_grades.build(score: 80)
+      second_provisional_grade.scorer = scorer
+      expect { second_provisional_grade.save! }.to raise_error(ActiveRecord::RecordNotUnique)
     end
 
     it "disallows multiple final provisional grades" do
-      pg1 = submission.provisional_grades.build(score: 75, final: false)
-      pg1.scorer = scorer
-      pg1.save!
-      pg2 = submission.provisional_grades.build(score: 75, final: true)
-      pg2.scorer = scorer
-      pg2.save!
-      pg3 = submission.provisional_grades.build(score: 80, final: true)
-      pg3.scorer = User.create!
-      expect { pg3.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+      first_provisional_grade = submission.provisional_grades.build(score: 75, final: false)
+      first_provisional_grade.scorer = scorer
+      first_provisional_grade.save!
+      second_provisional_grade = submission.provisional_grades.build(score: 75, final: true)
+      second_provisional_grade.scorer = scorer
+      second_provisional_grade.save!
+      third_provisional_grade = submission.provisional_grades.build(score: 80, final: true)
+      third_provisional_grade.scorer = User.create!
+      expect { third_provisional_grade.save! }.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
 
   describe '#graded_at when a grade changes' do
     it { expect(provisional_grade.graded_at).to be_nil }
+
     it 'updates the graded_at timestamp when changing grade' do
       Timecop.freeze(@now) do
         provisional_grade.update_attributes(grade: 'B')
         expect(provisional_grade.graded_at).to eql @now
       end
     end
+
     it 'updates the graded_at timestamp when changing score' do
       Timecop.freeze(@now) do
         provisional_grade.update_attributes(score: 80)
         expect(provisional_grade.graded_at).to eql @now
       end
     end
+
     it 'updated graded_at when force_save is set, regardless of whether the grade actually changed' do
       Timecop.freeze(@now) do
         provisional_grade.force_save = true
@@ -338,102 +341,133 @@ describe ModeratedGrading::ProvisionalGrade do
 
   describe 'infer_grade' do
     it 'infers a grade if only score is given' do
-      pg = submission.find_or_create_provisional_grade!(scorer, score: 0)
-      expect(pg.grade).not_to be_nil
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 0)
+      expect(provisional_grade.grade).not_to be_nil
     end
 
     it 'leaves grade nil if score is nil' do
-      pg = submission.find_or_create_provisional_grade! scorer
-      expect(pg.grade).to be_nil
+      provisional_grade = submission.find_or_create_provisional_grade! scorer
+      expect(provisional_grade.grade).to be_nil
     end
   end
 
   describe "publish_rubric_assessments!" do
     it "publishes rubric assessments to the submission" do
-      @course = course
-      outcome_with_rubric
-      association = @rubric.associate_with(assignment, course, :purpose => 'grading', :use_for_grading => true)
+      outcome_with_rubric(course: course)
+      association = @rubric.associate_with(assignment, course, purpose: 'grading', use_for_grading: true)
 
-      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
 
-      prov_assmt = association.assess(:user => student, :assessor => scorer, :artifact => pg,
-        :assessment => { :assessment_type => 'grading',
-          :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "good 4 u" } })
+      provisional_assessment = association.assess(
+        user: student,
+        assessor: scorer,
+        artifact: provisional_grade,
+        assessment: {
+          assessment_type: 'grading',
+          :"criterion_#{@rubric.criteria_object.first.id}" => {
+            points: 3,
+            comments: "good 4 u"
+          }
+        }
+      )
 
+      expect(provisional_assessment.score).to eq 3
 
-      expect(prov_assmt.score).to eq 3
-
-      pg.publish!
-
-      real_assmt = sub.rubric_assessments.first
-      expect(real_assmt.score).to eq 3
-      expect(real_assmt.assessor).to eq scorer
-      expect(real_assmt.rubric_association).to eq association
-      expect(real_assmt.data).to eq prov_assmt.data
+      provisional_grade.publish!
+      real_assessment = submission.rubric_assessments.first
+      expect(real_assessment.score).to eq 3
+      expect(real_assessment.assessor).to eq scorer
+      expect(real_assessment.rubric_association).to eq association
+      expect(real_assessment.data).to eq provisional_assessment.data
     end
 
     it "posts learning outcome results" do
-      @course = course
-      outcome_with_rubric
-      association = @rubric.associate_with(assignment, course, :purpose => 'grading', :use_for_grading => true)
+      outcome_with_rubric(course: course)
+      association = @rubric.associate_with(assignment, course, purpose: 'grading', use_for_grading: true)
 
-      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
 
       expect do
-        association.assess(:user => student, :assessor => scorer, :artifact => pg,
-          :assessment => { :assessment_type => 'grading',
-            :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "good 4 u" } })
+        association.assess(
+          user: student,
+          assessor: scorer,
+          artifact: provisional_grade,
+          assessment: {
+            assessment_type: 'grading',
+            :"criterion_#{@rubric.criteria_object.first.id}" => {
+              points: 3,
+              comments: "good 4 u"
+            }
+          }
+        )
       end.to change { LearningOutcomeResult.count }.by(0)
 
+      expect { provisional_grade.publish!}.to change { LearningOutcomeResult.count }.by(1)
+    end
 
-      expect do
-        pg.publish!
-      end.to change { LearningOutcomeResult.count }.by(1)
+    it "sets grade_posting_in_progress on the rubric_assessment's submission" do
+      outcome_with_rubric(course: course)
+      association = @rubric.associate_with(assignment, course, purpose: 'grading', use_for_grading: true)
+      submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
+      provisional_grade.submission.grade_posting_in_progress = true
+
+      association.assess(
+        user: student,
+        assessor: scorer,
+        artifact: provisional_grade,
+        assessment: {
+          assessment_type: :grading,
+          :"criterion_#{@rubric.criteria_object.first.id}" => {
+            points: 3,
+            comments: "good 4 u"
+          }
+        }
+      )
+      provisional_grade.publish!
+      expect(submission.reload.score).to eq 3
     end
   end
 
   describe "publish!" do
     it "sets the submission as 'graded'" do
       assignment.update!(moderated_grading: true, grader_count: 2)
-      sub = submission_model(assignment: assignment, user: student)
-      provisional_grade = sub.find_or_create_provisional_grade!(scorer, score: 80, graded_anonymously: true)
-
+      submission = submission_model(assignment: assignment, user: student)
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 80, graded_anonymously: true)
       provisional_grade.publish!
-      sub.reload
+      submission.reload
 
-      expect(sub.workflow_state).to eq 'graded'
+      expect(submission.workflow_state).to eq 'graded'
     end
 
     it "updates the submission with provisional grade attributes" do
-      @course = course
-      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 80, graded_anonymously: true)
-      sub.reload
+      submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 80, graded_anonymously: true)
+      submission.reload
 
-      expect(pg).to receive(:publish_rubric_assessments!).once
-      pg.publish!
-      sub.reload
+      expect(provisional_grade).to receive(:publish_rubric_assessments!).once
+      provisional_grade.publish!
+      submission.reload
 
-      expect(sub.grade_matches_current_submission).to eq true
-      expect(sub.graded_at).not_to be_nil
-      expect(sub.grader_id).to eq scorer.id
-      expect(sub.score).to eq 80
-      expect(sub.grade).not_to be_nil
-      expect(sub.graded_anonymously).to eq true
+      expect(submission.grade_matches_current_submission).to eq true
+      expect(submission.graded_at).not_to be_nil
+      expect(submission.grader_id).to eq scorer.id
+      expect(submission.score).to eq 80
+      expect(submission.grade).not_to be_nil
+      expect(submission.graded_anonymously).to eq true
     end
 
     it "duplicates submission comments from the provisional grade to the submission" do
-      @course = course
-      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
-      provisional_comment = sub.add_comment(commenter: scorer, comment: 'blah', provisional: true)
+      submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
+      provisional_comment = submission.add_comment(commenter: scorer, comment: 'blah', provisional: true)
 
-      pg.publish!
-      sub.reload
+      provisional_grade.publish!
+      submission.reload
 
-      real_comment = sub.submission_comments.first
+      real_comment = submission.submission_comments.first
       expect(real_comment.provisional_grade_id).to be_nil
       expect(real_comment.author).to eq scorer
       expect(real_comment.comment).to eq provisional_comment.comment
@@ -441,44 +475,42 @@ describe ModeratedGrading::ProvisionalGrade do
     end
 
     it "shares attachments between duplicated submission comments" do
-      @course = course
-      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
       file = assignment.attachments.create! uploaded_data: default_uploaded_data
-      provisional_comment = sub.add_comment(commenter: scorer, comment: 'blah', provisional: true, attachments: [file])
+      provisional_comment = submission.add_comment(commenter: scorer, comment: 'blah', provisional: true, attachments: [file])
 
-      pg.publish!
-      sub.reload
+      provisional_grade.publish!
+      submission.reload
 
-      real_comment = sub.submission_comments.first
+      real_comment = submission.submission_comments.first
       expect(real_comment.attachments).to eq provisional_comment.attachments
     end
 
     it "does not duplicate submission comments not associated with the provisional grade" do
-      @course = course
-      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
-      sub.add_comment(commenter: scorer, comment: 'provisional', provisional: true)
-      sub.add_comment(commenter: scorer, comment: 'normal', provisional: false)
+      submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
+      submission.add_comment(commenter: scorer, comment: 'provisional', provisional: true)
+      submission.add_comment(commenter: scorer, comment: 'normal', provisional: false)
 
-      pg.publish!
-      sub.reload
+      provisional_grade.publish!
+      submission.reload
 
-      expect(sub.submission_comments.map(&:comment)).to match_array(['provisional', 'normal'])
+      expect(submission.submission_comments.map(&:comment)).to match_array(['provisional', 'normal'])
     end
 
     it "triggers GradeCalculator#recompute_final_score by default" do
-      sub = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hello")
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hello")
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
       expect(GradeCalculator).to receive(:recompute_final_score).once
-      pg.publish!
+      provisional_grade.publish!
     end
 
     it "does not triggers GradeCalculator#recompute_final_score if passed skip_grade_calc true" do
-      sub = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hello")
-      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+      submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hello")
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
       expect(GradeCalculator).not_to receive(:recompute_final_score)
-      pg.publish!(skip_grade_calc: true)
+      provisional_grade.publish!(skip_grade_calc: true)
     end
 
     it 'does not create a duplicate submission comment created event when a provisional grade is published' do

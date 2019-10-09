@@ -102,6 +102,7 @@ class CollaborationsToolLaunch extends React.Component {
           src={this.props.launchUrl}
           style={this.state.iframeStyle}
           ref={(e) => { this.iframe = e; }}
+          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}

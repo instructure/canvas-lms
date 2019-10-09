@@ -35,7 +35,7 @@
           <%= render :partial => 'login/shared/header_logo' %>
           <div class="ic-Login-header__links">
             <%= render "login/canvas/login_banner" %>
-            <% if @domain_root_account.feature_enabled?(:course_catalog) %>
+            <% if @domain_root_account.enable_course_catalog? %>
               <a href="/search/all_courses" class="ic-Login__link">
                 <%= t('browse_courses', 'Browse courses') %>
               </a>

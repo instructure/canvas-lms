@@ -85,11 +85,12 @@ describe('doFetchApi', () => {
     })
   })
 
-  it('converts body object to string body', () => {
+  it('converts body object to string body and sets content-type', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 200)
     doFetchApi({path, body: {the: 'body'}})
     const [, fetchOptions] = fetchMock.lastCall()
     expect(JSON.parse(fetchOptions.body)).toEqual({the: 'body'})
+    expect(fetchOptions.headers['Content-Type']).toBe('application/json')
   })
 })

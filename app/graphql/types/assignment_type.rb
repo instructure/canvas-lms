@@ -210,6 +210,9 @@ module Types
     field :can_unpublish, Boolean, method: :can_unpublish?, null: true
 
     field :rubric, RubricType, null: true
+    def rubric
+      load_association(:rubric)
+    end
 
     def lock_info
       load_locked_for { |lock_info| lock_info || {} }

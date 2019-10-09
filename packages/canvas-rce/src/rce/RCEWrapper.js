@@ -755,13 +755,15 @@ class RCEWrapper extends React.Component {
     const el = this.getTextarea();
     if (this._textareaEl !== el) {
       this.unhandleTextareaChange();
-      el.addEventListener("change", this.handleTextareaChange);
-      if (this.props.textareaClassName) {
-        // split the string on whitespace because classList doesn't let you add multiple
-        // space seperated classes at a time but does let you add an array of them
-        el.classList.add(...this.props.textareaClassName.split(/\s+/))
+      if (el) {
+        el.addEventListener("change", this.handleTextareaChange);
+        if (this.props.textareaClassName) {
+          // split the string on whitespace because classList doesn't let you add multiple
+          // space seperated classes at a time but does let you add an array of them
+          el.classList.add(...this.props.textareaClassName.split(/\s+/))
+        }
+        this._textareaEl = el;
       }
-      this._textareaEl = el;
     }
   }
 

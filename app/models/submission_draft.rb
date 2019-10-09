@@ -17,6 +17,8 @@
 #
 
 class SubmissionDraft < ActiveRecord::Base
+  include CustomValidations
+
   belongs_to :submission, inverse_of: :submission_drafts
   has_many :submission_draft_attachments, inverse_of: :submission_draft, dependent: :delete_all
   has_many :attachments, through: :submission_draft_attachments
@@ -26,6 +28,7 @@ class SubmissionDraft < ActiveRecord::Base
   validates :submission, uniqueness: { scope: :submission_attempt }
   validates :body, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
   validate :submission_attempt_matches_submission
+  validates_as_url :url
 
   def submission_attempt_matches_submission
     current_submission_attempt = self.submission&.attempt || 0
@@ -46,6 +49,8 @@ class SubmissionDraft < ActiveRecord::Base
         return true if self.body.present?
       when 'online_upload'
         return true if self.attachments.present?
+      when 'online_url'
+        return true if self.url.present?
       end
     end
 

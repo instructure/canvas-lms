@@ -24,7 +24,7 @@ import React, {Component} from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
-import {View, Flex, FlexItem} from '@instructure/ui-layout'
+import {View, Flex} from '@instructure/ui-layout'
 import {Dialog, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Heading, Text} from '@instructure/ui-elements'
 import {IconArrowStartSolid, IconEditLine, IconTrashLine, IconXSolid} from '@instructure/ui-icons'
@@ -367,7 +367,7 @@ export default class RoleTray extends Component {
   renderTrayHeader = () => (
     <div>
       <Flex alignItems="start" justifyItems="space-between">
-        <FlexItem>
+        <Flex.Item>
           <View as="div">
             <div style={{maxWidth: '225px'}}>
               <Heading id="general_tray_header" level="h3" as="h2">
@@ -380,16 +380,16 @@ export default class RoleTray extends Component {
               </Text>
             )}
           </View>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           {this.props.editable && this.renderEditButton()}
           {this.props.deletable && this.renderDeleteButton()}
-        </FlexItem>
+        </Flex.Item>
       </Flex>
 
       <View as="div" margin="small 0 medium 0">
         <Flex direction="column">
-          <FlexItem>
+          <Flex.Item>
             <Text className="role-tray-last-changed">
               <span>
                 <FriendlyDatetime
@@ -398,7 +398,7 @@ export default class RoleTray extends Component {
                 />
               </span>
             </Text>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </View>
     </div>

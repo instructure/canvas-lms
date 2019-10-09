@@ -23,14 +23,19 @@ module AccountReports
   class GradeReports
     include ReportHelper
 
-    def initialize(account_report)
+    def initialize(account_report, runner=nil)
       @account_report = account_report
-      extra_text_term(@account_report)
-      include_deleted_objects
+      @include_deleted = value_to_boolean(account_report.parameters&.dig('include_deleted'))
 
-      if @account_report.value_for_param("limiting_period")
-        add_extra_text(I18n.t('account_reports.grades.limited',
-                              'deleted objects limited by days specified;'))
+      # we do not want to add extra_text more than one time.
+      unless runner
+        extra_text_term(@account_report)
+        include_deleted_objects
+
+        if @account_report.value_for_param("limiting_period")
+          add_extra_text(I18n.t('account_reports.grades.limited',
+                                'deleted objects limited by days specified;'))
+        end
       end
     end
 
@@ -53,11 +58,7 @@ module AccountReports
     # - student current score
     # - student final score
     # - enrollment status
-
     def grade_export
-      students = student_grade_scope
-      students = add_term_scope(students, 'c')
-
       headers = []
       headers << I18n.t('student name')
       headers << I18n.t('student id')
@@ -81,44 +82,49 @@ module AccountReports
 
       courses = root_account.all_courses
       courses = courses.where(:enrollment_term_id => term) if term
+      courses = add_course_sub_account_scope(courses)
+      courses = courses.active unless @include_deleted
+      total = courses.count
+      courses.find_ids_in_batches(batch_size: 10_000) {|batch| create_report_runners(batch, total)} unless total == 0
 
-      write_report headers do |csv|
-        course_ids = courses.order(:enrollment_term_id, :id).pluck(:id)
-        course_ids.each_slice(1000) do |batched_course_ids|
-          students.where(:course_id => batched_course_ids).preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-            users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
-            users.uniq!
-            users_by_id = users.index_by(&:id)
-            pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
-            student_chunk.each do |student|
-              p = loaded_pseudonym(pseudonyms,
-                                   users_by_id[student.user_id],
-                                   include_deleted: @include_deleted,
-                                   enrollment: student)
-              next unless p
-              arr = []
-              arr << student["user_name"]
-              arr << student["user_id"]
-              arr << p.sis_user_id
-              arr << p.integration_id if include_integration_id?
-              arr << student["course_name"]
-              arr << student["course_id"]
-              arr << student["course_sis_id"]
-              arr << student["section_name"]
-              arr << student["course_section_id"]
-              arr << student["section_sis_id"]
-              arr << student["term_name"]
-              arr << student["term_id"]
-              arr << student["term_sis_id"]
-              arr << student["current_score"]
-              arr << student["final_score"]
-              arr << student["enroll_state"]
-              arr << student["unposted_current_score"]
-              arr << student["unposted_final_score"]
-              arr << student["override_score"] if include_override_score?
-              csv << arr
-            end
-          end
+      write_report_in_batches(headers)
+    end
+
+    def grade_export_runner(runner)
+      students = student_grade_scope.where(course_id: runner.batch_items)
+
+      students.preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
+        users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
+        users.uniq!
+        users_by_id = users.index_by(&:id)
+        pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
+        student_chunk.each_with_index do |student, i|
+          p = loaded_pseudonym(pseudonyms,
+                               users_by_id[student.user_id],
+                               include_deleted: @include_deleted,
+                               enrollment: student)
+          next unless p
+          arr = []
+          arr << student["user_name"]
+          arr << student["user_id"]
+          arr << p.sis_user_id
+          arr << p.integration_id if include_integration_id?
+          arr << student["course_name"]
+          arr << student["course_id"]
+          arr << student["course_sis_id"]
+          arr << student["section_name"]
+          arr << student["course_section_id"]
+          arr << student["section_sis_id"]
+          arr << student["term_name"]
+          arr << student["term_id"]
+          arr << student["term_sis_id"]
+          arr << student["current_score"]
+          arr << student["final_score"]
+          arr << student["enroll_state"]
+          arr << student["unposted_current_score"]
+          arr << student["unposted_final_score"]
+          arr << student["override_score"] if include_override_score?
+          add_report_row(row: arr, row_number: i, report_runner: runner)
         end
       end
     end
@@ -305,6 +311,7 @@ module AccountReports
            AND sc.workflow_state <> 'deleted'")
       end
 
+      # this can be removed when both reports are using parallel
       students = add_course_sub_account_scope(students, 'c')
     end
 

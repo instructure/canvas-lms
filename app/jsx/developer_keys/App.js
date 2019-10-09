@@ -18,7 +18,7 @@
 
 import {Button} from '@instructure/ui-buttons'
 import {Heading, Spinner} from '@instructure/ui-elements'
-import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {TabList} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-layout'
 
 import I18n from 'i18n!react_developer_keys'
@@ -121,7 +121,7 @@ class DeveloperKeysApp extends React.Component {
           <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
         </View>
         <TabList variant="minimal" focus={this.state.focusTab}>
-          <TabPanel title={I18n.t('Account')}>
+          <TabList.Panel title={I18n.t('Account')}>
             <DeveloperKeyModalTrigger
               store={store}
               actions={actions}
@@ -151,14 +151,14 @@ class DeveloperKeysApp extends React.Component {
               padding="large"
               textAlign="center"
             >
-              {listDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
+              {listDeveloperKeysPending ? <Spinner renderTitle={I18n.t('Loading')} /> : null}
               {this.showMoreButton()}
             </View>
-          </TabPanel>
+          </TabList.Panel>
           {
             this.isSiteAdmin
               ? null
-              : <TabPanel
+              : <TabList.Panel
                 title={I18n.t('Inherited')}
                 tabRef={this.setInheritedTabRef}
               >
@@ -177,10 +177,10 @@ class DeveloperKeysApp extends React.Component {
                   padding="large"
                   textAlign="center"
                 >
-                  {listInheritedDeveloperKeysPending ? <Spinner title={I18n.t('Loading')} /> : null}
+                  {listInheritedDeveloperKeysPending ? <Spinner renderTitle={I18n.t('Loading')} /> : null}
                   {this.showMoreInheritedButton()}
                 </View>
-              </TabPanel>
+              </TabList.Panel>
           }
         </TabList>
       </div>

@@ -26,7 +26,7 @@ import AnnouncementRow from '../shared/components/AnnouncementRow'
 
 if (ENV.SHOW_ANNOUNCEMENTS) {
   const container = document.querySelector('#announcements_on_home_page')
-  ReactDOM.render(<Spinner title={I18n.t('Loading Announcements')} size="small" />, container)
+  ReactDOM.render(<Spinner renderTitle={I18n.t('Loading Announcements')} size="small" />, container)
 
   const url = '/api/v1/announcements'
 

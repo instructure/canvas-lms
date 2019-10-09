@@ -20,9 +20,9 @@ import React from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import {IconMoreSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import {View, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {View, Grid} from '@instructure/ui-layout'
 
-import {Menu, MenuItem, MenuItemGroup, MenuItemSeparator} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!gradezilla'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -102,20 +102,20 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
       >
         <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
-            <GridRow>
-              <GridCol textAlign="center" width="auto">
+            <Grid.Row>
+              <Grid.Col textAlign="center" width="auto">
                 <div className="Gradebook__ColumnHeaderIndicators" />
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center">
+              <Grid.Col textAlign="center">
                 <View className="Gradebook__ColumnHeaderDetail">
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {I18n.t('Total')}
                   </Text>
                 </View>
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center" width="auto">
+              <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>
                   <Menu
                     contentRef={this.bindOptionsMenuContent}
@@ -126,10 +126,10 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                     trigger={renderTrigger(ref => (this.optionsMenuTrigger = ref))}
                   >
                     <Menu contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
-                      <MenuItemGroup
+                      <Menu.Group
                         label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
                       >
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'ascending'
@@ -138,9 +138,9 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                           onSelect={sortBySetting.onSortByGradeAscending}
                         >
                           <span>{I18n.t('Grade - Low to High')}</span>
-                        </MenuItem>
+                        </Menu.Item>
 
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'descending'
@@ -149,13 +149,13 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                           onSelect={sortBySetting.onSortByGradeDescending}
                         >
                           <span>{I18n.t('Grade - High to Low')}</span>
-                        </MenuItem>
-                      </MenuItemGroup>
+                        </Menu.Item>
+                      </Menu.Group>
                     </Menu>
 
-                    {showSeparator && <MenuItemSeparator />}
+                    {showSeparator && <Menu.Separator />}
                     {!gradeDisplay.hidden && (
-                      <MenuItem
+                      <Menu.Item
                         disabled={this.props.gradeDisplay.disabled}
                         onSelect={this.switchGradeDisplay}
                       >
@@ -164,28 +164,28 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                             ? I18n.t('Display as Percentage')
                             : I18n.t('Display as Points')}
                         </span>
-                      </MenuItem>
+                      </Menu.Item>
                     )}
 
                     {!position.isInFront && (
-                      <MenuItem onSelect={position.onMoveToFront}>
+                      <Menu.Item onSelect={position.onMoveToFront}>
                         <span data-menu-item-id="total-grade-move-to-front">
                           {I18n.t('Move to Front')}
                         </span>
-                      </MenuItem>
+                      </Menu.Item>
                     )}
 
                     {!position.isInBack && (
-                      <MenuItem onSelect={position.onMoveToBack}>
+                      <Menu.Item onSelect={position.onMoveToBack}>
                         <span data-menu-item-id="total-grade-move-to-back">
                           {I18n.t('Move to End')}
                         </span>
-                      </MenuItem>
+                      </Menu.Item>
                     )}
                   </Menu>
                 </div>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </div>
       </div>

@@ -107,6 +107,33 @@ QUnit.module('StudentContextTray', (hooks) => {
       ok(children[0].props.children.props.href.match(/analytics/))
     })
 
+    test('it renders analytics 2 button (only) if the tool is installed', () => {
+      const userWithAnalytics = {...user, analytics}
+
+      tray = TestUtils.renderIntoDocument(
+        <StudentContextTray
+          courseId={courseId}
+          studentId={studentId}
+          returnFocusTo={() => {}}
+          data={{
+            loading: false,
+            user: userWithAnalytics,
+            course
+          }}
+          externalTools={[{title: "Analytics Beta",
+            base_url: "http://example.com/courses/1/external_tools/29?launch_type=student_context_card",
+            tool_id: "fd75124a-140e-470f-944c-114d2d93bb40",
+            icon_url: null,
+            canvas_icon_class: "icon-analytics"}]}
+        />,
+        document.getElementById('fixtures'))
+      const quickLinks = tray.renderQuickLinks(userWithAnalytics, course)
+      const children = quickLinks.props.children.filter(quickLink => quickLink !== null)
+
+      equal(children.length, 1)
+      equal(children[0][0].props.children.props.href, 'http://example.com/courses/1/external_tools/29?launch_type=student_context_card&student_id=1')
+    })
+
     test('it does not render without analytics data', () => {
       tray = TestUtils.renderIntoDocument(
         <StudentContextTray

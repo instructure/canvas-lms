@@ -57,5 +57,7 @@ module Types
     end
 
     field :submission_attempt, Integer, null: false
+
+    field :url, Types::UrlType, null: true
   end
 end

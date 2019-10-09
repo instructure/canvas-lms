@@ -16,15 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
-  class CriterionType < ApplicationObjectType
-    graphql_name 'Criterion'
+class MigrateUsageRightsAndCourseCatalog < ActiveRecord::Migration[5.2]
+  tag :predeploy
+  disable_ddl_transaction!
 
-    field :id, ID, null:false
-    field :criterion_use_range, Boolean, null: false
-    field :description, String, null: false
-    field :long_description, String, null: true
-    field :points, Int, null: false
-    field :ratings, [RatingType], null: false
+  def change
+    DataFixup::MoveFeatureFlagsToSettings.run(:course_catalog, "RootAccount", :enable_course_catalog)
+    DataFixup::MoveFeatureFlagsToSettings.run(:usage_rights_required, "AccountAndCourseInherited", :usage_rights_required)
   end
 end

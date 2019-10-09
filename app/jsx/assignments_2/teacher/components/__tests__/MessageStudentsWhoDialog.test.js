@@ -641,20 +641,21 @@ describe('MessageStudentsWhoDialog', () => {
     })
 
     it('handles success', async () => {
-      const {getByTestId, getAllByText, getByText} = renderMessageStudentsWhoDialog(
-        partialSubAssignment()
-      )
+      const {getByTestId, getByText} = renderMessageStudentsWhoDialog(partialSubAssignment())
       const bodyInput = getByTestId('body-input')
       fireEvent.change(bodyInput, {target: {value: 'Typing some body text here'}})
       const sendButton = getByText('Send').closest('button')
       axios.post.mockResolvedValue(() => Promise.resolve({status: 202, data: []}))
       fireEvent.click(sendButton)
 
-      expect(await waitForElement(() => getAllByText('Messages sent')[0])).toBeInTheDocument()
+      // filter out the screenreader alerts and assert that
+      // the main div with 'id=flashalert_message_holder' has the success message
+      const msgsContainer = await document.querySelector('#flashalert_message_holder')
+      expect(msgsContainer).toHaveTextContent(/Messages sent/i)
     })
 
     it('handles error', async () => {
-      const {getByTestId, getAllByText, getByText} = renderMessageStudentsWhoDialog(
+      const {getByTestId, findAllByText, getByText} = renderMessageStudentsWhoDialog(
         partialSubAssignment()
       )
       const bodyInput = getByTestId('body-input')
@@ -663,9 +664,10 @@ describe('MessageStudentsWhoDialog', () => {
       axios.post.mockRejectedValue(() => Promise.reject(new Error('something bad happened')))
       fireEvent.click(sendButton)
 
-      expect(
-        await waitForElement(() => getAllByText('Error sending messages')[0])
-      ).toBeInTheDocument()
+      // filter out the screenreader alerts and assert that
+      // the main div with 'id=flashalert_message_holder' has the error message
+      const msgsContainer = await findAllByText('Error sending messages')
+      expect(msgsContainer[0].closest('div#flashalert_message_holder')).not.toBeNull()
     })
   })
 })

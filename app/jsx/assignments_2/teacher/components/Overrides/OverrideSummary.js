@@ -26,7 +26,7 @@ import TeacherViewContext from '../TeacherViewContext'
 import AvailabilityDates from '../../../shared/AvailabilityDates'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 
-import {Flex, FlexItem, View, Responsive} from '@instructure/ui-layout'
+import {Flex, View, Responsive} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 
 export default class OverrideSummary extends React.Component {
@@ -130,10 +130,10 @@ export default class OverrideSummary extends React.Component {
               <View as="div" data-testid="OverrideSummary">
                 {largerScreen ? (
                   <Flex justifyItems="space-between">
-                    <FlexItem grow shrink>
+                    <Flex.Item grow shrink>
                       {leftColumn}
-                    </FlexItem>
-                    <FlexItem textAlign="end">{rightColumn}</FlexItem>
+                    </Flex.Item>
+                    <Flex.Item textAlign="end">{rightColumn}</Flex.Item>
                   </Flex>
                 ) : (
                   <View display="block">

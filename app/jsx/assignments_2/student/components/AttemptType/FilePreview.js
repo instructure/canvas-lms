@@ -25,7 +25,7 @@ import React, {Component} from 'react'
 import {SubmissionFile} from '../../graphqlData/File'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {IconDownloadLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
@@ -195,11 +195,11 @@ export default class FilePreview extends Component {
         <div style={{margin: '-0.75rem'}}>
           <Flex>
             {this.props.files.length > 1 && (
-              <FlexItem align="start">{this.renderFileIcons()}</FlexItem>
+              <Flex.Item align="start">{this.renderFileIcons()}</Flex.Item>
             )}
-            <FlexItem shrink grow align="start">
+            <Flex.Item shrink grow align="start">
               {this.renderFilePreview()}
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         </div>
       )

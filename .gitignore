@@ -28,6 +28,7 @@
 /exports/
 Gemfile.lock
 Gemfile.lock.next
+knapsack_rspec_report.json
 /log/
 mkmf.log
 /node_modules

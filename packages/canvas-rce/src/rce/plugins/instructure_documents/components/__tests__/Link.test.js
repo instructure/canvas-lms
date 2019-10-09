@@ -101,6 +101,16 @@ describe('RCE "Documents" Plugin > Document', () => {
       expect(queryIconByName(container, 'IconPdf')).toBeInTheDocument()
     })
 
+    it('the video icon', () => {
+      const {container} = renderComponent({content_type: 'video/mp4'})
+      expect(queryIconByName(container, 'IconVideo')).toBeInTheDocument()
+    })
+
+    it('the audio icon', () => {
+      const {container} = renderComponent({content_type: 'audio/mp3'})
+      expect(queryIconByName(container, 'IconAudio')).toBeInTheDocument()
+    })
+
     it('the drag handle only on hover', () => {
       const {container, getByTestId} = renderComponent()
 

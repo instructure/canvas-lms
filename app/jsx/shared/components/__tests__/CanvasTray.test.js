@@ -18,18 +18,22 @@
 
 import React from 'react'
 import CanvasTray from '../CanvasTray'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 
 describe('CanvasTray', () => {
   it('renders header, close button, children', () => {
+    const handleDismiss = jest.fn()
     const {getByText} = render(
-      <CanvasTray open label="Do the thing">
+      <CanvasTray open label="Do the thing" onDismiss={handleDismiss}>
         Tray Content
       </CanvasTray>
     )
     expect(getByText('Do the thing').tagName).toBe('H2')
-    expect(getByText('Close').closest('button')).toBeInTheDocument()
     expect(getByText('Tray Content')).toBeInTheDocument()
+    const closeButton = getByText('Close').closest('button')
+    expect(closeButton).toBeInTheDocument()
+    fireEvent.click(closeButton)
+    expect(handleDismiss).toHaveBeenCalled()
   })
 
   describe('Errors', () => {

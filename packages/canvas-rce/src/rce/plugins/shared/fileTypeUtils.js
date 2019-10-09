@@ -21,10 +21,17 @@ import {
   IconMsExcelLine,
   IconMsPptLine,
   IconMsWordLine,
-  IconPdfLine
+  IconPdfLine,
+  IconVideoLine,
+  IconAudioLine
 } from '@instructure/ui-icons'
 
 export function getIconFromType(type) {
+  if (isVideo(type)) {
+    return IconVideoLine
+  } else if (isAudio(type)) {
+    return IconAudioLine
+  }
   switch(type) {
     case 'application/msword':
     case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':

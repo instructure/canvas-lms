@@ -68,7 +68,8 @@ function fakeEditor() {
     selection: {
       getContent: jest.fn()
     },
-    getContent: jest.fn()
+    getContent: jest.fn(),
+    focus: () => {}
   }
 }
 
@@ -198,6 +199,12 @@ describe('open', () => {
     instance.open({name: 'foo', id: 2})
     expect(win.$).toHaveBeenCalledWith(instance.props.win)
     expect(bind).toHaveBeenCalledWith('externalContentReady', instance.handleExternalContentReady)
+  })
+
+  it('sets "data-lti-launch" attribute on iframe', async () => {
+    const instance = await getInstance(container)
+    instance.open({name: 'foo', id: 2})
+    expect(document.querySelector('iframe').getAttribute('data-lti-launch')).toBe('true')
   })
 
   describe('tray', () => {

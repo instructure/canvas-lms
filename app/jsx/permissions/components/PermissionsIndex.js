@@ -26,9 +26,9 @@ import 'compiled/jquery.rails_flash_notifications'
 
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
-import {View, Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {View, Grid} from '@instructure/ui-layout'
 import {IconSearchLine} from '@instructure/ui-icons'
-import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {TabList} from '@instructure/ui-tabs'
 import {TextInput, Select} from '@instructure/ui-forms'
 import {Heading} from '@instructure/ui-elements'
 
@@ -121,8 +121,8 @@ export default class PermissionsIndex extends Component {
       <div className="permissions-v2__header_contianer">
         <View display="block">
           <Grid>
-            <GridRow vAlign="middle">
-              <GridCol width={3}>
+            <Grid.Row vAlign="middle">
+              <Grid.Col width={3}>
                 <TextInput
                   label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search Permissions')}
@@ -134,8 +134,8 @@ export default class PermissionsIndex extends Component {
                   onChange={this.onSearchStringChange}
                   name="permission_search"
                 />
-              </GridCol>
-              <GridCol width={8}>
+              </Grid.Col>
+              <Grid.Col width={8}>
                 <Select
                   id="permissions-role-filter"
                   label={<ScreenReaderContent>{I18n.t('Filter Roles')}</ScreenReaderContent>}
@@ -163,8 +163,8 @@ export default class PermissionsIndex extends Component {
                       </option>
                     ))}
                 </Select>
-              </GridCol>
-              <GridCol width={2}>
+              </Grid.Col>
+              <Grid.Col width={2}>
                 <Button
                   id="add_role"
                   variant="primary"
@@ -173,8 +173,8 @@ export default class PermissionsIndex extends Component {
                 >
                   {I18n.t('Add Role')}
                 </Button>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </View>
       </div>
@@ -197,14 +197,14 @@ export default class PermissionsIndex extends Component {
           }
         />
         <TabList onChange={this.onTabChanged}>
-          <TabPanel title={I18n.t('Course Roles')}>
+          <TabList.Panel title={I18n.t('Course Roles')}>
             {this.renderHeader()}
             <ConnectedPermissionsTable />
-          </TabPanel>
-          <TabPanel title={I18n.t('Account Roles')}>
+          </TabList.Panel>
+          <TabList.Panel title={I18n.t('Account Roles')}>
             {this.renderHeader()}
             <ConnectedPermissionsTable />
-          </TabPanel>
+          </TabList.Panel>
         </TabList>
       </div>
     )

@@ -22,7 +22,7 @@ import React from 'react'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Checkbox, TextInput} from '@instructure/ui-forms'
-import {Grid, GridCol, GridRow, View} from '@instructure/ui-layout'
+import {Grid, View} from '@instructure/ui-layout'
 import {IconWarningLine, IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Spinner, Text} from '@instructure/ui-elements'
@@ -48,19 +48,19 @@ export default class Scopes extends React.Component {
     const { developerKey } = this.props
     if (this.props.availableScopesPending) {
       return (
-        <GridRow hAlign="space-around">
-          <GridCol width={2}>
+        <Grid.Row hAlign="space-around">
+          <Grid.Col width={2}>
             <span id="scopes-loading-spinner">
-              <Spinner title={I18n.t('Loading Available Scopes')} />
+              <Spinner renderTitle={I18n.t('Loading Available Scopes')} />
             </span>
-          </GridCol>
-        </GridRow>
+          </Grid.Col>
+        </Grid.Row>
       )
     }
 
     return (
-      <GridRow>
-        <GridCol>
+      <Grid.Row>
+        <Grid.Col>
           <View>
               {this.props.requireScopes
                 ? <ScopesList
@@ -82,8 +82,8 @@ export default class Scopes extends React.Component {
 
               }
           </View>
-        </GridCol>
-      </GridRow>
+        </Grid.Col>
+      </Grid.Row>
     )
   }
 
@@ -91,8 +91,8 @@ export default class Scopes extends React.Component {
     const searchEndpoints = I18n.t('Search endpoints')
     return (
       <Grid>
-        <GridRow rowSpacing="small">
-          <GridCol
+        <Grid.Row rowSpacing="small">
+          <Grid.Col
             data-automation="enforce_scopes"
           >
             <Checkbox
@@ -106,11 +106,11 @@ export default class Scopes extends React.Component {
               checked={this.props.requireScopes}
               onChange={this.props.onRequireScopesChange}
             />
-          </GridCol>
+          </Grid.Col>
           {
             this.props.requireScopes
             ? (
-              <GridCol width="auto">
+              <Grid.Col width="auto">
                 <TextInput
                   label={<ScreenReaderContent>{searchEndpoints}</ScreenReaderContent>}
                   placeholder={searchEndpoints}
@@ -118,11 +118,11 @@ export default class Scopes extends React.Component {
                   icon={() => <IconSearchLine />}
                   onChange={this.handleFilterChange}
                 />
-              </GridCol>
+              </Grid.Col>
             )
             : null
           }
-        </GridRow>
+        </Grid.Row>
         {this.body()}
       </Grid>
     )

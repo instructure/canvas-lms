@@ -1521,7 +1521,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     })
   })
 
-  QUnit.module('hideComments', hooks => {
+  QUnit.module('anonymizeStudents', hooks => {
     hooks.beforeEach(() => {
       initializeApp()
       return asyncHelper.waitForRequests()
@@ -1533,7 +1533,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
 
       return Ember.run(() => {
         srgb.set('selectedAssignment', assignment)
-        equal(srgb.get('hideComments'), false)
+        equal(srgb.get('anonymizeStudents'), false)
       })
     })
 
@@ -1543,7 +1543,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
 
       return Ember.run(() => {
         srgb.set('selectedAssignment', assignment)
-        equal(srgb.get('hideComments'), true)
+        equal(srgb.get('anonymizeStudents'), true)
       })
     })
   })

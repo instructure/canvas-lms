@@ -25,7 +25,7 @@ import 'jquery.instructure_date_and_time'
 import {View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {IconReplyLine, IconLockLine, IconUnlockLine, IconTrashLine} from '@instructure/ui-icons'
 
 import AnnouncementModel from 'compiled/models/Announcement'
@@ -71,7 +71,7 @@ export default function AnnouncementRow({
 
   const renderMenuList = () => {
     const menuList = [
-      <MenuItem
+      <Menu.Item
         key="delete"
         value={{action: 'delete', id: announcement.id}}
         id="delete-announcement-menu-option"
@@ -83,11 +83,11 @@ export default function AnnouncementRow({
         <ScreenReaderContent>
           {I18n.t('Delete announcement %{title}', {title: announcement.title})}
         </ScreenReaderContent>
-      </MenuItem>
+      </Menu.Item>
     ]
     if (!announcementsLocked) {
       menuList.push(
-        <MenuItem
+        <Menu.Item
           key="lock"
           value={{action: 'lock', id: announcement.id, lock: !announcement.locked}}
           id="lock-announcement-menu-option"
@@ -108,7 +108,7 @@ export default function AnnouncementRow({
               ? I18n.t('Allow comments for %{title}', {title: announcement.title})
               : I18n.t('Disallow comments for %{title}', {title: announcement.title})}
           </ScreenReaderContent>
-        </MenuItem>
+        </Menu.Item>
       )
     }
     return menuList

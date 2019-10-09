@@ -21,7 +21,7 @@ import {bool, func} from 'prop-types'
 
 import I18n from 'i18n!assignments_2'
 
-import {Grid, GridRow, GridCol, View} from '@instructure/ui-layout'
+import {Grid, View} from '@instructure/ui-layout'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 import TeacherViewContext from './TeacherViewContext'
@@ -173,8 +173,8 @@ export default class Header extends React.Component {
     const assignment = this.props.assignment
     return (
       <Grid startAt="large" colSpacing="large">
-        <GridRow>
-          <GridCol>
+        <Grid.Row>
+          <Grid.Col>
             <View display="block" padding="small 0 medium xx-small">
               <AssignmentType
                 mode={this.state.assignmentTypeMode}
@@ -217,11 +217,11 @@ export default class Header extends React.Component {
                 readOnly={this.props.readOnly}
               />
             </View>
-          </GridCol>
-          <GridCol width="auto" textAlign="end">
+          </Grid.Col>
+          <Grid.Col width="auto" textAlign="end">
             <Toolbox {...this.props} />
-          </GridCol>
-        </GridRow>
+          </Grid.Col>
+        </Grid.Row>
       </Grid>
     )
   }

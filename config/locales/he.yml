@@ -1261,6 +1261,7 @@ he:
         domain: דומיין
         edit_institution_email: "המשתמשים יכולים לבטל את כתובת הדוא\"ל  שהוקצתה להם ע\"י הארגון"
         enable_alerts: "התראות (בטא)"
+        enable_course_catalog: "הצגת רשימה ניתנת לחיפוש של קורסים מחשבון בסיס זה המאפשרים \"הכללת קורס זה באינדקס הקורסים הפתוחים לכל\" "
         enable_eportfolios: ePortfolios
         enable_profiles: "אפשור פרופילי משתמש"
         enable_turnitin: Turnitin
@@ -1743,6 +1744,7 @@ he:
   add_people_7ee4b2ec: "הוספת אנשים"
   add_people_to_coursename_5ea234e1: "הוספת אנשים אל: %{courseName}"
   add_proficiency_rating_d819f6b8: "הוספת דירוג מומחיות"
+  add_quiz_cebfa28b: "הוספת בוחן"
   add_quiz_ip_filter_c7b37dc5: "הוספת כתובת IP למסנן בוחן"
   add_rating_89d7fbde: "הוספת דירוג"
   add_recipient_ff135ed7: "הוספת נמען"
@@ -10432,6 +10434,7 @@ he:
   manage_update_for_toolname_f8e3b2fb: "ניהול עדכונים עבור %{toolName}"
   manage_usage_rights_c5a8c216: "ניהול זכויות שימוש"
   manage_your_course_details_664c335f: "ניהול פרטי הקורס שלך"
+  manual_8c2665de: ידני
   manual_entry_e4a4f99a: "מופע ידני"
   manually_mark_posts_as_read_afa5d035: "סימון ידני של פרסומים כנקראו"
   mark_as_done_6fa48d2f: "סימון כבוצע"
@@ -18028,6 +18031,7 @@ he:
   sync_to_posttosisname_9837a8bf: "התאמה עם %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "התאמה עם %{postToSISName}"
   system_default_language_28a1052d: "שפת ברירת מחדל של המערכת (%{language})"
+  ta_8d966626: "עוזר הוראה"
   tab_1_3d6b3fb: "לשונית 1"
   tab_1_content_8944c219: "תוכן לשונית 1"
   tab_2_9adfe241: "לשונית 2"

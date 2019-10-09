@@ -90,6 +90,11 @@ module Types
       super(filter: filter, course: course)
     end
 
+    field :account, AccountType, null: true
+    def account
+      load_association(:account)
+    end
+
     field :sections_connection, SectionType.connection_type, null: true
     def sections_connection
       course.active_course_sections.

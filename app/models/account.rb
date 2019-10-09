@@ -248,6 +248,10 @@ class Account < ActiveRecord::Base
 
   add_setting :require_confirmed_email, :boolean => true, :root_only => true, :default => false
 
+  add_setting :enable_course_catalog, :boolean => true, :root_only => true, :default => false
+  add_setting :usage_rights_required, :boolean => true, :default => false, :inheritable => true
+
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -285,6 +289,10 @@ class Account < ActiveRecord::Base
 
   def product_name
     settings[:product_name] || t("#product_name", "Canvas")
+  end
+
+  def usage_rights_required?
+    usage_rights_required[:value]
   end
 
   def allow_global_includes?
@@ -1089,6 +1097,10 @@ class Account < ActiveRecord::Base
       result
     }
     can :create_courses
+
+    # allow teachers to view term dates
+    given { |user| self.root_account? && !self.site_admin? && self.enrollments.active.of_instructor_type.where(:user_id => user).exists? }
+    can :read_terms
 
     # any logged in user can read global outcomes, but must be checked against the site admin
     given{ |user| self.site_admin? && user }

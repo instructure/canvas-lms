@@ -26,6 +26,18 @@ describe('useFetchApi', () => {
     fetchMock.restore()
   })
 
+  it('reports loading status', async () => {
+    const path = '/api/v1/blah'
+    const response = {key: 'value'}
+    fetchMock.mock(`path:${path}`, response)
+    const loading = jest.fn()
+    renderHook(() => useFetchApi({loading, path}))
+    expect(loading).toHaveBeenCalledTimes(1)
+    expect(loading).toHaveBeenCalledWith(true)
+    await fetchMock.flush(true)
+    expect(loading).toHaveBeenCalledWith(false)
+  })
+
   it('fetches and reports success with results', async () => {
     const path = '/api/v1/blah'
     const response = {key: 'value'}
@@ -44,11 +56,13 @@ describe('useFetchApi', () => {
     fetchMock.mock(`path:${path}`, 401)
     const success = jest.fn()
     const error = jest.fn()
-    renderHook(() => useFetchApi({success, error, path}))
+    const loading = jest.fn()
+    renderHook(() => useFetchApi({success, error, loading, path}))
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)
     expect(success).not.toHaveBeenCalled()
     expect(error.mock.calls[0][0].response.status).toEqual(401)
+    expect(loading).toHaveBeenCalledWith(false)
   })
 
   it('fails when there is a network error', async () => {
@@ -56,11 +70,13 @@ describe('useFetchApi', () => {
     fetchMock.mock(`path:${path}`, {throws: new Error('network failure')})
     const success = jest.fn()
     const error = jest.fn()
-    renderHook(() => useFetchApi({success, error, path}))
+    const loading = jest.fn()
+    renderHook(() => useFetchApi({success, error, loading, path}))
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)
     expect(success).not.toHaveBeenCalled()
     expect(error.mock.calls[0][0].toString()).toMatch('network failure')
+    expect(loading).toHaveBeenCalledWith(false)
   })
 
   it('passes params via url', () => {

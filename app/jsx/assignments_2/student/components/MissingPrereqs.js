@@ -19,7 +19,7 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {string} from 'prop-types'
 
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {Heading, Text} from '@instructure/ui-elements'
 
 import {Button} from '@instructure/ui-buttons'
@@ -29,26 +29,26 @@ import locked1SVG from '../SVG/Locked1.svg'
 function MissingPrereqs(props) {
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
-      <FlexItem>
+      <Flex.Item>
         <img alt={I18n.t('Assignment Locked with Prerequisite')} src={locked1SVG} />
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <Flex margin="small" direction="column" alignItems="center" justifyContent="center">
-          <FlexItem>
+          <Flex.Item>
             <Heading size="large" data-test-id="assignments-2-pre-req-title" margin="small">
               {I18n.t('Prerequisite Completion Period')}
             </Heading>
-          </FlexItem>
-          <FlexItem>
+          </Flex.Item>
+          <Flex.Item>
             <Text size="medium">{props.preReqTitle}</Text>
-          </FlexItem>
-          <FlexItem>
+          </Flex.Item>
+          <Flex.Item>
             <Button variant="primary" margin="small" href={props.preReqLink}>
               {I18n.t('Go to Prerequisite')}
             </Button>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }

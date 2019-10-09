@@ -23,7 +23,7 @@ import $ from 'jquery'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput, Select, TextArea} from '@instructure/ui-forms'
 import {PresentationContent} from '@instructure/ui-a11y'
-import {Grid, GridRow, GridCol} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 
 const validationMessage = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
 
@@ -153,8 +153,8 @@ export default class RequiredValues extends React.Component {
           <hr />
         </PresentationContent>
         <Grid>
-          <GridRow>
-            <GridCol>
+          <Grid.Row>
+            <Grid.Col>
               <TextInput
                 name="title"
                 value={toolConfiguration.title}
@@ -162,8 +162,8 @@ export default class RequiredValues extends React.Component {
                 onChange={this.handleTitleChange}
                 messages={showMessages && !toolConfiguration.title ? validationMessage : []}
               />
-            </GridCol>
-            <GridCol>
+            </Grid.Col>
+            <Grid.Col>
               <TextArea
                 name="description"
                 value={toolConfiguration.description}
@@ -172,10 +172,10 @@ export default class RequiredValues extends React.Component {
                 onChange={this.handleDescriptionChange}
                 messages={showMessages && !toolConfiguration.description ? validationMessage : []}
               />
-            </GridCol>
-          </GridRow>
-          <GridRow>
-            <GridCol>
+            </Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col>
               <TextInput
                 name="target_link_uri"
                 value={toolConfiguration.target_link_uri}
@@ -183,8 +183,8 @@ export default class RequiredValues extends React.Component {
                 onChange={this.handleTargetLinkUriChange}
                 messages={showMessages && !toolConfiguration.target_link_uri ? validationMessage : []}
               />
-            </GridCol>
-            <GridCol>
+            </Grid.Col>
+            <Grid.Col>
               <TextInput
                 name="oidc_initiation_url"
                 value={toolConfiguration.oidc_initiation_url}
@@ -192,8 +192,8 @@ export default class RequiredValues extends React.Component {
                 onChange={this.handleOidcInitiationUrlChange}
                 messages={showMessages && !toolConfiguration.oidc_initiation_url ? validationMessage : []}
               />
-            </GridCol>
-          </GridRow>
+            </Grid.Col>
+          </Grid.Row>
         </Grid>
         <Select
           label={I18n.t("* JWK Method")}

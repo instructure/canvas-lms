@@ -1575,6 +1575,32 @@ describe ContextExternalTool do
 
     end
 
+    describe '#feature_flag_enabled?' do
+      let(:tool) do
+        analytics_2_tool_factory
+      end
+
+      it 'should return true if the feature is enabled' do
+        @course.root_account.enable_feature!(:analytics_2)
+        expect(tool.feature_flag_enabled?).to be true
+      end
+
+      it 'should return false if the feature is disabled' do
+        expect(tool.feature_flag_enabled?).to be false
+      end
+
+      it "should return true if called on tools that aren't mapped to feature flags" do
+        other_tool = @course.context_external_tools.create!(
+          name: 'other_feature',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          url: 'http://example.com/launch',
+          tool_id: 'yo'
+        )
+        expect(other_tool.feature_flag_enabled?).to be true
+      end
+    end
+
     describe 'set_policy' do
       let(:tool) do
         @course.context_external_tools.create(
@@ -1623,6 +1649,22 @@ describe ContextExternalTool do
       tool.editor_button = { use_tray: "true" }
       json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
       expect(json[0][:use_tray]).to eq true
+    end
+
+    describe 'includes the description' do
+      it 'parsed into HTML' do
+        tool.editor_button = {}
+        tool.description = "the first paragraph.\n\nthe second paragraph."
+        json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+        expect(json[0][:description]).to eq "<p>the first paragraph.</p>\n\n<p>the second paragraph.</p>\n"
+      end
+
+      it 'with target="_blank" on links' do
+        tool.editor_button = {}
+        tool.description = "[link text](http://the.url)"
+        json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+        expect(json[0][:description]).to eq "<p><a href=\"http://the.url\" target=\"_blank\">link text</a></p>\n"
+      end
     end
   end
 end

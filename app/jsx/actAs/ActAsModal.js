@@ -170,7 +170,7 @@ export default class ActAsModal extends React.Component {
           <Modal.Body>
             {this.state.isLoading ?
               <div className="ActAs__loading">
-                <Spinner title={I18n.t('Loading')} />
+                <Spinner renderTitle={I18n.t('Loading')} />
               </div>
             :
               <div className="ActAs__body">

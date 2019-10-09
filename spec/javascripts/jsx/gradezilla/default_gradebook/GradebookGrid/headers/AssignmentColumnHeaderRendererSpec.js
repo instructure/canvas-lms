@@ -392,6 +392,17 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
           strictEqual(component.props.postGradesAction.hasGradesToPost, false)
         })
 
+        test('sets newIconsEnabled to true if Gradebook has new_post_policy_icons_enabled set to true', () => {
+          gradebook.options.new_post_policy_icons_enabled = true
+          render()
+          strictEqual(component.props.postGradesAction.newIconsEnabled, true)
+        })
+
+        test('sets newIconsEnabled to false if Gradebook does not have new_post_policy_icons_enabled set to true', () => {
+          render()
+          strictEqual(component.props.postGradesAction.newIconsEnabled, false)
+        })
+
         test('includes a callback to show the "Post Assignment Grades" tray', () => {
           gradebook.gotChunkOfStudents([student])
           render()
@@ -614,6 +625,24 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       render()
       const studentProp = component.props.students.find(s => s.id === student.id)
       strictEqual(studentProp.submission.postedAt, null)
+    })
+
+    test('"isTestStudent" is true if the student is enrolled via a StudentViewEnrollment', () => {
+      buildGradebook()
+      student.enrollments = [{type: 'StudentViewEnrollment'}]
+      gradebook.gotChunkOfStudents([student])
+      render()
+      const studentProp = component.props.students.find(s => s.id === student.id)
+      strictEqual(studentProp.isTestStudent, true)
+    })
+
+    test('"isTestStudent" is false if the student is not enrolled via a StudentViewEnrollment', () => {
+      buildGradebook()
+      student.enrollments = [{type: 'StudentEnrollment'}]
+      gradebook.gotChunkOfStudents([student])
+      render()
+      const studentProp = component.props.students.find(s => s.id === student.id)
+      strictEqual(studentProp.isTestStudent, false)
     })
 
     test('includes a callback for keyDown events', () => {

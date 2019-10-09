@@ -27,7 +27,7 @@ import I18n from 'i18n!mimeClass'
 // (and app/stylesheets/components/deprecated/_fancy_links.scss if it is still being used)
 const mimeClasses = {
   audio: {
-    displayName: I18n.t('Audio'),
+    get displayName(){return I18n.t('Audio')},
     mimeTypes: [
       'audio/x-mpegurl',
       'audio/x-pn-realaudio',
@@ -40,7 +40,7 @@ const mimeClasses = {
     ]
   },
   code: {
-    displayName: I18n.t('Source code'),
+    get displayName(){return I18n.t('Source code')},
     mimeTypes: [
       'text/xml',
       'text/css',
@@ -51,7 +51,7 @@ const mimeClasses = {
     ]
   },
   doc: {
-    displayName: I18n.t('Text document'),
+    get displayName(){return I18n.t('Text document')},
     mimeTypes: [
       'application/x-docx',
       'text/rtf',
@@ -62,20 +62,20 @@ const mimeClasses = {
     ]
   },
   flash: {
-    displayName: I18n.t('Flash'),
+    get displayName(){return I18n.t('Flash')},
     mimeTypes: [
       'application/x-shockwave-flash'
     ]
   },
   html: {
-    displayName: I18n.t('Web page'),
+    get displayName(){return I18n.t('Web page')},
     mimeTypes: [
       'text/html',
       'application/xhtml+xml'
     ]
   },
   image: {
-    displayName: I18n.t('Image'),
+    get displayName(){return I18n.t('Image')},
     mimeTypes: [
       'image/png',
       'image/x-psd',
@@ -85,27 +85,27 @@ const mimeClasses = {
     ]
   },
   ppt: {
-    displayName: I18n.t('Presentation'),
+    get displayName(){return I18n.t('Presentation')},
     mimeTypes: [
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       'application/vnd.ms-powerpoint'
     ]
   },
   pdf: {
-    displayName: I18n.t('PDF'),
+    get displayName(){return I18n.t('PDF')},
     mimeTypes: [
       'application/pdf'
     ]
   },
   text: {
-    displayName: I18n.t('Plain text'),
+    get displayName(){return I18n.t('Plain text')},
     mimeTypes: [
       'text',
       'text/plain'
     ]
   },
   video: {
-    displayName: I18n.t('Video'),
+    get displayName(){return I18n.t('Video')},
     mimeTypes: [
       'video/mp4',
       'video/x-ms-asf',
@@ -118,7 +118,7 @@ const mimeClasses = {
     ]
   },
   xls: {
-    displayName: I18n.t('Spreadsheet'),
+    get displayName(){return I18n.t('Spreadsheet')},
     mimeTypes: [
       'application/vnd.oasis.opendocument.spreadsheet',
       'text/csv',
@@ -127,7 +127,7 @@ const mimeClasses = {
     ]
   },
   zip: {
-    displayName: I18n.t('Archive'),
+    get displayName(){return I18n.t('Archive')},
     mimeTypes: [
       'application/x-rar-compressed',
       'application/x-zip-compressed',

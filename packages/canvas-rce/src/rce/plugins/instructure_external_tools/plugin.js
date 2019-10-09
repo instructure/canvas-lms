@@ -18,10 +18,14 @@
 
 import dispatchInitEvent from "./dispatchInitEvent";
 import {IconLtiLine} from '@instructure/ui-icons/es/svg'
+import clickCallback from './clickCallback'
 
 
 tinymce.create("tinymce.plugins.InstructureExternalTools", {
   init(ed, url) {
+    document.addEventListener('tinyRCE/onExternalTools', (event) => {
+      clickCallback(ed, event.detail.ltiButtons)
+    })
     ed.ui.registry.addIcon('lti', IconLtiLine.src)
     dispatchInitEvent(ed, document, url);
   },

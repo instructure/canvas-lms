@@ -21,7 +21,7 @@ import {bool, func, instanceOf, shape, string} from 'prop-types'
 import _ from 'underscore'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-overlays'
-import {TabList, TabPanel} from '@instructure/ui-tabs'
+import {TabList} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-layout'
 import I18n from 'i18n!gradezilla'
 
@@ -257,32 +257,32 @@ export default class GradebookSettingsModal extends React.Component {
         <Modal.Body>
           <View as="div" height={MODAL_CONTENTS_HEIGHT}>
             <TabList defaultSelectedIndex={0}>
-              <TabPanel title={I18n.t('Late Policies')}>
+              <TabList.Panel title={I18n.t('Late Policies')}>
                 <LatePoliciesTabPanel
                   latePolicy={this.state.latePolicy}
                   changeLatePolicy={this.changeLatePolicy}
                   locale={this.props.locale}
                   showAlert={this.props.gradedLateSubmissionsExist}
                 />
-              </TabPanel>
+              </TabList.Panel>
 
               {this.props.postPolicies != null && (
-                <TabPanel title={I18n.t('Grade Posting Policy')}>
+                <TabList.Panel title={I18n.t('Grade Posting Policy')}>
                   <GradePostingPolicyTabPanel
                     anonymousAssignmentsPresent={this.props.anonymousAssignmentsPresent}
                     onChange={this.changePostPolicy}
                     settings={this.state.coursePostPolicy}
                   />
-                </TabPanel>
+                </TabList.Panel>
               )}
 
               {includeAdvancedTab && (
-                <TabPanel title={I18n.t('Advanced')}>
+                <TabList.Panel title={I18n.t('Advanced')}>
                   <AdvancedTabPanel
                     courseSettings={this.state.courseSettings}
                     onCourseSettingsChange={this.handleCourseSettingsChange}
                   />
-                </TabPanel>
+                </TabList.Panel>
               )}
             </TabList>
           </View>

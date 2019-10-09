@@ -60,7 +60,10 @@ export default function Images(props) {
   }, [contextType, files.length, hasMore, isLoading, fetchInitialImages])
 
   return (
-    <>
+    <View
+      as="div"
+      data-testid="instructure_links-ImagesPanel"
+    >
       <Flex alignItems="center" direction="column" justifyItems="space-between" height="100%">
         <Flex.Item overflowY="visible" width="100%">
           <ImageList images={files} lastItemRef={lastItemRef} onImageClick={props.onImageEmbed} />
@@ -86,7 +89,7 @@ export default function Images(props) {
           <Text color="error">{formatMessage("Loading failed.")}</Text>
         </View>
       )}
-    </>
+    </View>
   )
 }
 

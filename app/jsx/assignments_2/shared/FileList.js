@@ -23,9 +23,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {List, ListItem, Text} from '@instructure/ui-elements'
+import {Link, List, Text} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 const getIcon = file => {
@@ -44,37 +44,37 @@ const getIcon = file => {
 }
 
 const FileList = props => {
-  const {canRemove, files, previewHandler, removeFileHandler} = props
+  const {canRemove, files, removeFileHandler} = props
   const refsMap = {}
 
   return (
     <List variant="unstyled" delimiter="solid">
-      <ListItem>
+      <List.Item>
         <Text size="x-small" weight="bold">
           {I18n.t('Attached')}
         </Text>
-      </ListItem>
+      </List.Item>
       {files.map(file => (
-        <ListItem key={file.id}>
+        <List.Item key={file.id}>
           <Flex>
-            <FlexItem size="40px" padding="x-small small">
+            <Flex.Item size="40px" padding="x-small small">
               {getIcon(file)}
-            </FlexItem>
-            <FlexItem grow shrink>
+            </Flex.Item>
+            <Flex.Item grow shrink>
               <Text size="x-small">{file.name}</Text>
-            </FlexItem>
-            <FlexItem>
-              <Button variant="link" size="small" onClick={previewHandler}>
+            </Flex.Item>
+            <Flex.Item>
+              <Link href={file.embedded_iframe_url} target="_blank">
                 <span aria-hidden title={I18n.t('Preview')}>
                   {I18n.t('Preview')}
                 </span>
                 <ScreenReaderContent>
                   {I18n.t('Preview %{filename}', {filename: file.name})}
                 </ScreenReaderContent>
-              </Button>
-            </FlexItem>
+              </Link>
+            </Flex.Item>
             {canRemove && (
-              <FlexItem padding="0 small 0 x-small">
+              <Flex.Item padding="0 small 0 x-small">
                 <Button
                   icon={IconTrashLine}
                   id={file.id}
@@ -89,10 +89,10 @@ const FileList = props => {
                     {I18n.t('Remove %{filename}', {filename: file.name})}
                   </ScreenReaderContent>
                 </Button>
-              </FlexItem>
+              </Flex.Item>
             )}
           </Flex>
-        </ListItem>
+        </List.Item>
       ))}
     </List>
   )
@@ -107,7 +107,6 @@ FileList.propTypes = {
       type: PropTypes.string.isRequired
     })
   ).isRequired,
-  previewHandler: PropTypes.func,
   removeFileHandler: PropTypes.func
 }
 

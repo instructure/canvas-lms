@@ -18,7 +18,7 @@
 
 import React, {PureComponent} from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Heading, TruncateText} from '@instructure/ui-elements'
 import {Tray} from '@instructure/ui-overlays'
 import I18n from 'i18n!post_grades_tray'
@@ -105,17 +105,17 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
       >
         <View as="div" padding="small">
           <Flex as="div" alignItems="start" margin="0 0 medium 0">
-            <FlexItem>
+            <Flex.Item>
               <CloseButton onClick={this.handleDismiss}>{I18n.t('Close')}</CloseButton>
-            </FlexItem>
+            </Flex.Item>
 
-            <FlexItem margin="0 0 0 small" shrink>
+            <Flex.Item margin="0 0 0 small" shrink>
               <Heading as="h2" level="h3">
                 <TruncateText maxLines={3}>
                   {I18n.t('Grade Posting Policy: %{name}', {name: assignment.name})}
                 </TruncateText>
               </Heading>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         </View>
 

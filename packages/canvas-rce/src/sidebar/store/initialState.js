@@ -50,6 +50,7 @@ export default function(props = {}) {
     upload,
     images,
     documents,
+    media,
     flickr,
     newPageLinkExpanded
   } = props;
@@ -95,6 +96,10 @@ export default function(props = {}) {
     documents = source.initializeDocuments(props);
   }
 
+  if (media === undefined) {
+    media = source.initializeMedia(props);
+  }
+
   if (newPageLinkExpanded === undefined) {
     newPageLinkExpanded = false;
   }
@@ -111,6 +116,7 @@ export default function(props = {}) {
     upload,
     images,
     documents,
+    media,
     flickr,
     newPageLinkExpanded
   };

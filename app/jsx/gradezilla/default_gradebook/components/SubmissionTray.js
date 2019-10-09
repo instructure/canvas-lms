@@ -29,10 +29,12 @@ import Carousel from './Carousel'
 import GradeInput from './GradeInput'
 import LatePolicyGrade from './LatePolicyGrade'
 import CommentPropTypes from '../propTypes/CommentPropTypes'
+import SimilarityScore from './SimilarityScore'
 import SubmissionCommentListItem from './SubmissionCommentListItem'
 import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
 import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
+import {extractSimilarityInfo} from '../../../grading/helpers/SubmissionHelper'
 
 function renderAvatar(name, avatarUrl) {
   return (
@@ -138,7 +140,8 @@ export default class SubmissionTray extends React.Component {
     isInClosedGradingPeriod: bool.isRequired,
     isInNoGradingPeriod: bool.isRequired,
     isNotCountedForScore: bool.isRequired,
-    onAnonymousSpeedGraderClick: func.isRequired
+    onAnonymousSpeedGraderClick: func.isRequired,
+    showSimilarityScore: bool.isRequired
   }
 
   cancelCommenting = () => {
@@ -198,7 +201,7 @@ export default class SubmissionTray extends React.Component {
 
     return (
       <div style={{textAlign: 'center'}}>
-        <Spinner title={I18n.t('Loading comments')} size="large" />
+        <Spinner renderTitle={I18n.t('Loading comments')} size="large" />
       </div>
     )
   }
@@ -239,6 +242,31 @@ export default class SubmissionTray extends React.Component {
           </Button>
         </View>
       </View>
+    )
+  }
+
+  renderSimilarityScore() {
+    const {assignment, submission} = this.props
+    const similarityInfo = extractSimilarityInfo(submission)
+    if (assignment.anonymizeStudents || similarityInfo == null) {
+      return
+    }
+
+    const {
+      id: entryId,
+      data: {similarity_score, status}
+    } = similarityInfo.entries[0]
+    const reportType = similarityInfo.type
+    const assignmentPath = `/courses/${assignment.courseId}/assignments/${assignment.id}`
+    const reportUrl = `${assignmentPath}/submissions/${submission.userId}/${reportType}/${entryId}`
+
+    return (
+      <SimilarityScore
+        hasAdditionalData={similarityInfo.entries.length > 1}
+        reportUrl={reportUrl}
+        similarityScore={similarity_score}
+        status={status}
+      />
     )
   }
 
@@ -345,6 +373,8 @@ export default class SubmissionTray extends React.Component {
             </View>
 
             <View as="div" style={{overflowY: 'auto', flex: '1 1 auto'}}>
+              {this.props.showSimilarityScore && this.renderSimilarityScore()}
+
               <SubmissionStatus
                 assignment={this.props.assignment}
                 isConcluded={this.props.student.isConcluded}

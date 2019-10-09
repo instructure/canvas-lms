@@ -31,6 +31,7 @@ CanvasAsyncSelect.propTypes = {
   ...Select.propTypes,
   inputValue: string,
   isLoading: bool,
+  selectedOptionId: string,
   noOptionsLabel: string,
   onOptionSelected: func, // (event, optionId | null) => {}
   onInputChange: func // (event, value) => {}
@@ -46,8 +47,9 @@ CanvasAsyncSelect.defaultProps = {
 
 export default function CanvasAsyncSelect({
   options,
-  isLoading,
   inputValue,
+  isLoading,
+  selectedOptionId,
   noOptionsLabel,
   onOptionSelected,
   onInputChange,
@@ -58,7 +60,6 @@ export default function CanvasAsyncSelect({
   const previousLoading = previousLoadingRef.current
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [highlightedOptionId, setHighlightedOptionId] = useState(null)
-  const [selectedOptionId, setSelectedOptionId] = useState(null)
   const [announcement, setAnnouncement] = useState('')
   const [hasFocus, setHasFocus] = useState(false)
 
@@ -100,10 +101,6 @@ export default function CanvasAsyncSelect({
   function handleInputChange(ev) {
     // user typing in the input negates the selection
     const newValue = ev.target.value
-    if (selectedOptionId !== null) {
-      setSelectedOptionId(null)
-      onOptionSelected(ev, null)
-    }
     setIsShowingOptions(true)
     onInputChange(ev, newValue)
   }
@@ -128,7 +125,6 @@ export default function CanvasAsyncSelect({
   function handleSelectOption(ev, {id}) {
     const selectedOption = findOptionById(id)
     if (!selectedOption) return
-    setSelectedOptionId(id)
     setIsShowingOptions(false)
     setAnnouncement(
       <>

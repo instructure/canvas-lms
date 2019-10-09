@@ -129,11 +129,14 @@ gem 'inst-jobs-statsd', '1.2.3'
 gem 'gepub', '1.0.1'
 gem 'imperium', '0.5.0', require: false
 gem 'academic_benchmarks', '0.0.11', require: false
+  gem 'sprockets', '3.7.2'
 
 gem 'graphql', '1.9.11'
 gem 'graphql-batch', '0.4.1'
 
 gem 'prawn-rails', '1.3.0'
+
+gem 'redcarpet', '3.4.0', require: false
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'

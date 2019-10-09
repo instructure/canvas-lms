@@ -448,6 +448,7 @@ describe ContentMigration do
       @copy_from.public_syllabus = true
       @copy_from.public_syllabus_to_auth = true
       @copy_from.lock_all_announcements = true
+      @copy_from.usage_rights_required = true
       @copy_from.allow_student_discussion_editing = false
       @copy_from.restrict_student_future_view = true
       @copy_from.restrict_student_past_view = true

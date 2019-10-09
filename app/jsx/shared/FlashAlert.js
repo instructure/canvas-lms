@@ -169,7 +169,7 @@ export default class FlashAlert extends React.Component {
       <Transition transitionOnMount in={this.state.isOpen} type='fade'>
         <Alert
           variant={this.props.variant}
-          closeButtonLabel={I18n.t('Close')}
+          renderCloseButtonLabel={I18n.t('Close')}
           onDismiss={this.closeAlert}
           margin="small auto"
           timeout={this.props.timeout}

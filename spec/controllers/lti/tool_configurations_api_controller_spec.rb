@@ -261,7 +261,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
-  shared_examples_for 'an endpoint that validates public_jwk' do
+  shared_examples_for 'an endpoint that validates public_jwk and public_jwk_url' do
     let(:make_request) { raise 'set in examples' }
     let(:tool_config_public_jwk) do
       {
@@ -273,14 +273,41 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         "use" => "sig"
       }
     end
+    let(:settings) do
+      s = super()
+      s['public_jwk_url'] = "https://test.com"
+      s
+    end
 
     subject do
       make_request
+      return nil if json_parse['errors'].blank?
       json_parse['errors'].first['message']
     end
 
     context 'when the public jwk is missing' do
       let(:public_jwk) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when the public jwk url is missing' do
+      let(:settings) do
+        s = super()
+        s.delete('public_jwk_url')
+        s
+      end
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when both the public jwk and public jwk url are missing' do
+      let(:public_jwk) { nil }
+      let(:settings) do
+        s = super()
+        s.delete('public_jwk_url')
+        s
+      end
 
       it { is_expected.to be_present }
     end
@@ -350,7 +377,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       let(:make_request) { post :create, params: params }
     end
 
-    it_behaves_like 'an endpoint that validates public_jwk' do
+    it_behaves_like 'an endpoint that validates public_jwk and public_jwk_url' do
       let(:make_request) { post :create, params: params }
     end
 
@@ -427,7 +454,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       end
     end
 
-    it_behaves_like 'an endpoint that validates public_jwk' do
+    it_behaves_like 'an endpoint that validates public_jwk and public_jwk_url' do
       let(:make_request) { put :update, params: params }
     end
 

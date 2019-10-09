@@ -251,6 +251,8 @@ class CourseSection < ActiveRecord::Base
     Assignment.suspend_due_date_caching do
       Assignment.where(context: [old_course, self.course]).touch_all
     end
+
+    User.clear_cache_keys(user_ids, :enrollments)
     EnrollmentState.send_later_if_production_enqueue_args(:invalidate_states_for_course_or_section,
       {:n_strand => ["invalidate_enrollment_states", self.global_root_account_id]}, self, invalidate_access: true)
     User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?

@@ -138,6 +138,63 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
+    it "js_env quiz_lti_enabled is true when quizzes_next/newquizzes_on_quiz_page is enabled" do
+      user_session(@teacher)
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.settings[:provision] = {'lti' => 'lti url'}
+      @course.root_account.save!
+      @course.root_account.enable_feature! :quizzes_next
+      @course.root_account.enable_feature! :newquizzes_on_quiz_page
+      @course.enable_feature! :quizzes_next
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:FLAGS][:quiz_lti_enabled]).to be true
+    end
+
+    it "js_env quiz_lti_enabled is false when newquizzes_on_quiz_page is disabled" do
+      user_session(@teacher)
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.settings[:provision] = {'lti' => 'lti url'}
+      @course.root_account.save!
+      @course.root_account.enable_feature! :quizzes_next
+      @course.enable_feature! :quizzes_next
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:FLAGS][:quiz_lti_enabled]).to be false
+    end
+
+    it "js_env quiz_lti_enabled is false when quizzes_next is disabled" do
+      user_session(@teacher)
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.settings[:provision] = {'lti' => 'lti url'}
+      @course.root_account.save!
+      @course.root_account.enable_feature! :newquizzes_on_quiz_page
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:FLAGS][:quiz_lti_enabled]).to be false
+    end
+
+    it "js_env quiz_lti_enabled is false when new quizzes is not available" do
+      user_session @teacher
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:FLAGS][:quiz_lti_enabled]).to be false
+    end
+
     it "js_env migrate_quiz_enabled is false when only quizzes_next is enabled" do
       user_session(@teacher)
       @course.root_account.settings[:provision] = {'lti' => 'lti url'}

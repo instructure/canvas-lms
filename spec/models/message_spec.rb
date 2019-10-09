@@ -70,6 +70,35 @@ describe Message do
       expect(msg.html_body.index('<!DOCTYPE')).to eq 0
     end
 
+    it "should use slack template if present" do
+      @au = AccountUser.create(:account => account_model)
+      course_with_student
+      alert = @course.alerts.create!(recipients: [:student],
+        criteria: [
+          criterion_type: 'Interaction',
+          threshold: 7
+        ])
+      mock_template = "slack template"
+      expect_any_instance_of(Message).to receive(:get_template).with('alert.slack.erb').and_return(mock_template)
+      msg = generate_message(:alert, :slack, alert)
+      expect(msg.body).to eq mock_template
+    end
+
+    it "should sms template if no slack template present" do
+      @au = AccountUser.create(:account => account_model)
+      course_with_student
+      alert = @course.alerts.create!(recipients: [:student],
+                                      criteria: [
+                                        criterion_type: 'Interaction',
+                                        threshold: 7
+                                      ])
+      mock_template = "sms template"
+      expect_any_instance_of(Message).to receive(:get_template).with('alert.slack.erb').and_return(nil)
+      expect_any_instance_of(Message).to receive(:get_template).with('alert.sms.erb').and_return(mock_template)
+      msg = generate_message(:alert, :slack, alert)
+      expect(msg.body).to eq mock_template
+    end
+
     it "should not html escape the subject" do
       assignment_model(:title => "hey i have weird&<stuff> in my name but that's okay")
       msg = generate_message(:assignment_created, :email, @assignment)

@@ -139,14 +139,6 @@ allow_opt_out_of_inbox:
       on the Inbox, and hide the Conversation's notification preferences.
   applies_to: RootAccount
   root_opt_in: true
-course_catalog:
-  state: allowed
-  display_name: Public Course Index
-  description:
-    display_course_catalog: Show a searchable list of courses in this root account
-      with the "Include this course in the public course index" flag enabled.
-  applies_to: RootAccount
-  root_opt_in: true
 gradebook_list_students_by_sortable_name:
   state: allowed
   display_name:
@@ -157,13 +149,6 @@ gradebook_list_students_by_sortable_name:
       names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and
       can be changed in settings.
   applies_to: Course
-usage_rights_required:
-  state: hidden
-  display_name: Require Usage Rights for Uploaded Files
-  description: If enabled, copyright and license information must be provided for
-    files before they are published.
-  applies_to: Course
-  root_opt_in: true
 lti2_rereg:
   state: hidden
   display_name: LTI 2 Reregistration
@@ -362,6 +347,12 @@ import_to_quizzes_next:
   description: Allow importing of QTI and Common Cartridge into New Quizzes.
   applies_to: RootAccount
   root_opt_in: true
+newquizzes_on_quiz_page:
+  state: hidden
+  display_name: New Quizzes on the Quizzes page
+  description: Show New Quizzes on the Quizzes page
+  applies_to: Account
+  root_opt_in: true
 common_cartridge_page_conversion:
   state: hidden
   display_name: Common Cartridge HTML File to Page Conversion
@@ -456,3 +447,17 @@ compact_live_event_payloads:
   display_name: Remove null values from live event payloads
   description: Canvas will remove keys with null values from
     live event payloads if this feature is enabled.
+analytics_2:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Course and User Analytics
+  description: Show new analytics for course and user data
+new_gradebook_plagiarism_indicator:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Gradebook Plagiarism Indicator
+  description: Enables display of plagiarism reports and similarity scores in
+    the New Gradebook submission tray.
+  environments:
+    production:
+      state: disabled

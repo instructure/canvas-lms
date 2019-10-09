@@ -41,7 +41,7 @@ HelpTray.propTypes = {
 }
 
 HelpTray.defaultProps = {
-  trayTitle: I18n.t('Help'),
+  get trayTitle(){return I18n.t('Help')},
   hasLoaded: false,
   links: []
 }

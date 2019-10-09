@@ -19,18 +19,18 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import {string, bool, arrayOf, shape} from 'prop-types'
-import {Avatar, Heading, List, ListItem, Spinner} from '@instructure/ui-elements'
+import {Avatar, Heading, List, Spinner} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-layout'
 import LogoutButton from '../LogoutButton'
 
 function ProfileTab({id, html_url, label}) {
   return (
-    <ListItem key={id}>
+    <List.Item key={id}>
       <Button variant="link" margin="none" href={html_url}>
         {label}
       </Button>
-    </ListItem>
+    </List.Item>
   )
 }
 
@@ -62,11 +62,11 @@ export default function ProfileTray({userDisplayName, userAvatarURL, loaded, tab
         {loaded ? (
           tabs.map(tab => <ProfileTab key={tab.id} {...tab} />)
         ) : (
-          <ListItem key="loading">
+          <List.Item key="loading">
             <div style={{textAlign: 'center'}}>
               <Spinner margin="medium" renderTitle="Loading" />
             </div>
-          </ListItem>
+          </List.Item>
         )}
       </List>
     </View>

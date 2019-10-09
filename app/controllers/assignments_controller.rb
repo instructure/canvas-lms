@@ -87,19 +87,21 @@ class AssignmentsController < ApplicationController
   def show
     Shackles.activate(:slave) do
       @assignment ||= @context.assignments.find(params[:id])
-      a2_enabled = @context.feature_enabled?(:assignments_2) &&
-                   (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
 
-      # We will need to do some additional work here about figuring out when we
-      # can short-circuit to A2 vs when we need to go through the rest of the
-      # method here.
-      if a2_enabled && @assignment.submission_types != 'external_tool'
+      # TODO: Make sure we aren't stripping out any needed functionality that is
+      #       happening when this controller is hit without A2 enabled. Specifically
+      #       `ensure_assignment_group`, `context_module_action`, and `log_asset_access`.
+      if @assignment.a2_enabled? && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
         unless can_do(@context, @current_user, :read_as_admin)
-          assignment_prereqs = context_module_sequence_items_by_asset_id(params[:id], "Assignment")
+          # TODO: Look at how the `@locked` stuff is used bellow, in A1 the pre-reqs are only being
+          #       calculated if needed, but we are doing it every time here.
+          assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+
           js_env({
             ASSIGNMENT_ID: params[:id],
             COURSE_ID: @context.id,
-            PREREQS: assignment_prereqs
+            PREREQS: assignment_prereqs,
+            SUBMISSION_ID: @assignment.submissions.where(user: @current_user).pluck(:id).first
           })
           css_bundle :assignments_2_student
           js_bundle :assignments_2_show_student
@@ -204,9 +206,9 @@ class AssignmentsController < ApplicationController
           if can_do(@context, @current_user, :read_as_admin)
             css_bundle :assignments_2_teacher
             js_bundle :assignments_2_show_teacher
+            render html: '', layout: true
+            return
           end
-          render html: '', layout: true
-          return
         end
 
         # everything else here is only for the old assignment page and can be
@@ -600,7 +602,7 @@ class AssignmentsController < ApplicationController
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
-      hash[:CANCEL_TO] = @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
+      hash[:CANCEL_TO] = set_cancel_to_url
       hash[:CONTEXT_ID] = @context.id
       hash[:CONTEXT_ACTION_SOURCE] = :assignments
       hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
@@ -632,6 +634,13 @@ class AssignmentsController < ApplicationController
       set_master_course_js_env_data(@assignment, @context)
       render :edit
     end
+  end
+
+  def set_cancel_to_url
+    if @assignment.quiz_lti? && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+      return polymorphic_url([@context, :quizzes])
+    end
+    @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
   end
 
   # @API Delete an assignment
@@ -760,7 +769,8 @@ class AssignmentsController < ApplicationController
     # the tool should be enabled, this URL was chosen because we sometimes
     # want the tool enabled in beta or test. NOTE: This is a stop-gap until
     # Quizzes.Next has a beta env.
-    @context.feature_enabled?(:quizzes_next) &&
+    !@context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
+      @context.feature_enabled?(:quizzes_next) &&
       quiz_lti_tool.present? &&
       quiz_lti_tool.url != 'http://void.url.inseng.net'
   end

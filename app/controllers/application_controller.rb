@@ -145,7 +145,6 @@ class ApplicationController < ActionController::Base
         k12: k12?,
         use_responsive_layout: use_responsive_layout?,
         use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
-        use_unsplash_image_search: PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -229,21 +228,24 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def external_tools_display_hashes(type, context=@context, custom_settings=[])
+  def external_tools_display_hashes(type, context=@context, custom_settings=[], tool_ids: nil)
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
     tools = ContextExternalTool.all_tools_for(context, {:placements => type,
-      :root_account => @domain_root_account, :current_user => @current_user}).to_a
+      :root_account => @domain_root_account, :current_user => @current_user,
+      :tool_ids => tool_ids}).to_a
 
-    tools.select!{|tool|
-      tool.visible_with_permission_check?(type, @current_user, context, session)
-    }
+    tools.select! do |tool|
+      tool.visible_with_permission_check?(type, @current_user, context, session) &&
+        tool.feature_flag_enabled?
+    end
 
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
     end
   end
+  helper_method :external_tools_display_hashes
 
   def external_tool_display_hash(tool, type, url_params={}, context=@context, custom_settings=[])
     url_params = {
@@ -255,6 +257,7 @@ class ApplicationController < ActionController::Base
       :title => tool.label_for(type, I18n.locale),
       :base_url =>  polymorphic_url([context, :external_tool], url_params)
     }
+    hash.merge!(:tool_id => tool.tool_id) if tool.tool_id.present?
 
     extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
     extension_settings.each do |setting|
@@ -1048,8 +1051,7 @@ class ApplicationController < ActionController::Base
       @context = @membership.group unless @problem
       @current_user = @membership.user unless @problem
     elsif pieces[0] == 'user'
-      @current_user = UserPastLtiId.where(user_uuid: pieces[1]).take&.user
-      @current_user ||= User.where(uuid: pieces[1]).first
+      find_user_from_uuid(pieces[1])
       @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid." unless @current_user
       @context = @current_user
     else
@@ -1079,6 +1081,11 @@ class ApplicationController < ActionController::Base
       return false
     end
     @context
+  end
+
+  def find_user_from_uuid(uuid)
+    @current_user = UserPastLtiId.where(user_uuid: uuid).take&.user
+    @current_user ||= User.where(uuid: uuid).first
   end
 
   def discard_flash_if_xhr
@@ -2446,7 +2453,7 @@ class ApplicationController < ActionController::Base
     ctx[:context_type] = @context.class.to_s if @context
     ctx[:context_id] = @context.global_id if @context
     ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
-    ctx[:context_account_id] = Context.get_account_or_parent_account(@context)&.global_id if @context
+    ctx[:context_account_id] = Context.get_account_or_parent_account_global_id(@context) if @context
 
     if @context_membership
       ctx[:context_role] =
@@ -2547,7 +2554,7 @@ class ApplicationController < ActionController::Base
       @streaming_template = true
       false
     else
-      Setting.get("disable_template_streaming_all", "false") != "true" &&
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_template_streaming"] &&
         Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
     end
   end

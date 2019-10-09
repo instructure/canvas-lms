@@ -89,7 +89,7 @@ export default class ConfirmDialog extends React.Component {
 
   renderBusyMaskBody() {
     if (this.props.busyMaskBody) return this.props.busyMaskBody()
-    return <Spinner size="small" title={this.props.spinnerLabel} />
+    return <Spinner size="small" renderTitle={this.props.spinnerLabel} />
   }
 
   renderButton = (buttonProps, index) => {

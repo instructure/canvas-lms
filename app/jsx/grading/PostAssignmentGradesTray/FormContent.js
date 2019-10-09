@@ -22,7 +22,7 @@ import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {AccessibleContent} from '@instructure/ui-a11y'
 import {Badge, Spinner, Text} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 
 import I18n from 'i18n!post_assignment_grades_tray'
 
@@ -46,7 +46,7 @@ export default function FormContent({
   if (postingGrades) {
     return (
       <View as="div" textAlign="center" padding="large">
-        <Spinner title={I18n.t('Posting grades')} size="large" />
+        <Spinner renderTitle={I18n.t('Posting grades')} size="large" />
       </View>
     )
   }
@@ -102,17 +102,17 @@ export default function FormContent({
 
       <View as="div" margin="medium 0 0" padding="0 medium">
         <Flex justifyItems="end">
-          <FlexItem margin="0 small 0 0">
+          <Flex.Item margin="0 small 0 0">
             <Button disabled={!gradesPublished} onClick={dismiss}>
               {I18n.t('Close')}
             </Button>
-          </FlexItem>
+          </Flex.Item>
 
-          <FlexItem>
+          <Flex.Item>
             <Button disabled={!gradesPublished} onClick={onPostClick} variant="primary">
               {I18n.t('Post')}
             </Button>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </View>
     </>

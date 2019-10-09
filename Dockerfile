@@ -32,6 +32,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
        libicu-dev \
        postgresql-client-9.5 \
        unzip \
+       pbzip2 \
        fontforge \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \

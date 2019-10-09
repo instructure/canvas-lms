@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import errorShipUrl from '../SVG/ErrorShip.svg'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import GenericErrorPage from '../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2_initial_query'
 import LoadingIndicator from '../../shared/LoadingIndicator'

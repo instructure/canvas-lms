@@ -495,6 +495,53 @@ describe RubricAssessment do
     end
 
     describe '#update_artifact' do
+      describe 'grade_posting_in_progress' do
+        subject_once(:ra) do
+          RubricAssessment.new(
+            score: 2.0,
+            assessment_type: :grading,
+            rubric: rubric,
+            artifact: submission,
+            assessor: @teacher
+          )
+        end
+
+        let_once(:rubric) { rubric_model }
+        let_once(:submission) { @assignment.submissions.find_by!(user: @student) }
+
+        before do
+          submission.score = 1
+          ra.build_rubric_association(
+            use_for_grading: true,
+            association_object: @assignment
+          )
+        end
+
+        it 'is nil by default' do
+          expect(@assignment).to receive(:grade_student).with(
+            ra.submission.student,
+            score: ra.score,
+            grader: ra.assessor,
+            graded_anonymously: nil,
+            grade_posting_in_progress: nil
+          )
+          ra.save!
+        end
+
+        it 'passes grade_posting_in_progress from submission' do
+          submission.grade_posting_in_progress = true
+
+          expect(@assignment).to receive(:grade_student).with(
+            ra.submission.student,
+            score: ra.score,
+            grader: ra.assessor,
+            graded_anonymously: nil,
+            grade_posting_in_progress: submission.grade_posting_in_progress
+          )
+          ra.save!
+        end
+      end
+
       it 'should set group on submission' do
         group_category = @course.group_categories.create!(name: "Test Group Set")
         group = @course.groups.create!(name: "Group A", group_category: group_category)

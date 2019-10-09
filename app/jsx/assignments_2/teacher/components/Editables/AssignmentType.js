@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func, oneOf, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 
 import {
@@ -77,12 +77,12 @@ export default class AssignmentType extends React.Component {
 
     return (
       <Flex>
-        <FlexItem>
+        <Flex.Item>
           <selectedType.icon />
-        </FlexItem>
-        <FlexItem margin="0 0 0 small">
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
           <Text>{selectedType.label}</Text>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }

@@ -342,8 +342,8 @@ module ApplicationHelper
       !@body_class_no_headers &&
       @current_user &&
       @context.is_a?(Course) &&
-      embedded_chat_enabled &&
-      external_tool_tab_visible('chat')
+      external_tool_tab_visible('chat') &&
+      embedded_chat_enabled
   end
 
   def active_external_tool_by_id(tool_id)
@@ -369,9 +369,10 @@ module ApplicationHelper
   end
 
   def external_tool_tab_visible(tool_id)
+    return false unless available_section_tabs.any?{|tc| tc[:external]} # if the course has no external tool tabs, we know it won't have a chat one so we can bail early before querying the db/redis for it
     tool = active_external_tool_by_id(tool_id)
     return false unless tool
-    @context.tabs_available(@current_user).find {|tc| tc[:id] == tool.asset_string}.present?
+    available_section_tabs.find {|tc| tc[:id] == tool.asset_string}.present?
   end
 
   def license_help_link
@@ -440,13 +441,23 @@ module ApplicationHelper
 
   def inst_env
     global_inst_object = { :environment =>  Rails.env }
+
+    # TODO: get these kaltura settings out of the global INST object completely.
+    # Only load them when trying to record a video
+    if @context.try_rescue(:allow_media_comments?) || controller_name == 'conversations'
+      kalturaConfig = CanvasKaltura::ClientV3.config
+      if kalturaConfig
+        global_inst_object[:allowMediaComments] = true
+        global_inst_object[:kalturaSettings] = kalturaConfig.try(:slice,
+          'domain', 'resource_domain', 'rtmp_domain',
+          'partner_id', 'subpartner_id', 'player_ui_conf',
+          'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
+          'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'
+        )
+      end
+    end
+
     {
-      :allowMediaComments       => CanvasKaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => CanvasKaltura::ClientV3.config.try(:slice,
-                                    'domain', 'resource_domain', 'rtmp_domain',
-                                    'partner_id', 'subpartner_id', 'player_ui_conf',
-                                    'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
-                                    'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'),
       :equellaEnabled           => !!equella_enabled?,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),

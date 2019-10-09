@@ -3569,7 +3569,7 @@ describe 'Submissions API', type: :request do
     @submission = Submission.first
     expect(json['submission_comments'].size).to eq 1
     comment = json['submission_comments'].first
-    expect(comment['comment']).to eq 'This is a media comment.'
+    expect(comment['comment']).to eq ''
     expect(comment['media_comment']['url']).to eq "http://www.example.com/users/#{@user.id}/media_download?entryId=1234&redirect=1&type=mp4"
     expect(comment['media_comment']["content-type"]).to eq "audio/mp4"
   end

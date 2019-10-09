@@ -987,6 +987,7 @@ import 'compiled/jquery/fixDialogButtons'
           rubric.permissions.delete_association = data.rubric_association.permissions['delete'];
         }
         rubricEditing.updateRubric($rubric, rubric);
+        rubricEditing.updateRubricPoints($rubric);
         rubricEditing.hideEditRubric($rubric, false);
         $rubric_dialog.dialog('close');
       }, () => {

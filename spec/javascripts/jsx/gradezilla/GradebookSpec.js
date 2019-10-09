@@ -4416,6 +4416,19 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       students = gradebook.studentsThatCanSeeAssignment('2302') // re-cache
       deepEqual(Object.keys(students), ['1102'])
     })
+
+    test('includes test students', function() {
+      gradebook.gotChunkOfStudents(allStudents)
+
+      const testStudent = {
+        id: '9901',
+        name: 'Test Student',
+        enrollments: [{type: 'StudentViewEnrollment', grades: {html_url: 'http://example.ur/'}}]
+      }
+      gradebook.gotChunkOfStudents([testStudent])
+      const students = gradebook.studentsThatCanSeeAssignment('2301')
+      deepEqual(Object.keys(students), ['1101', '1102', '9901'])
+    })
   })
 })
 

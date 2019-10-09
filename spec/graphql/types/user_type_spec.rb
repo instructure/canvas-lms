@@ -136,4 +136,24 @@ describe Types::UserType do
       expect(user_type.resolve("email", current_user: @random_person)).to be_nil
     end
   end
+
+  context "groups" do
+    before(:once) do
+      @user_group_ids = (1..5).map {
+        group_with_user({user: @student, active_all: true}).group_id.to_s
+      }
+      @deleted_user_group_ids = (1..3).map {
+        group = group_with_user({user: @student, active_all: true})
+        group.destroy
+        group.group_id.to_s
+      }
+    end
+
+    it "fetches the groups associated with a user" do
+      user_type.resolve('groups { _id }', current_user: @student).all? do |id|
+        expect(@user_group_ids.include?(id)).to be true
+        expect(@deleted_user_group_ids.include?(id)).to be false
+      end
+    end
+  end
 end

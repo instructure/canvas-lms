@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
-import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Flex, View} from '@instructure/ui-layout'
+import {Menu} from '@instructure/ui-menu'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconPlusLine} from '@instructure/ui-icons'
@@ -38,17 +38,17 @@ export default class DeveloperKeyModalTrigger extends React.Component {
 
   developerKeyMenuItem(title, onClick) {
     return (
-      <MenuItem onClick={onClick} type="button">
+      <Menu.Item onClick={onClick} type="button">
         <Flex>
-          <FlexItem padding="0 x-small 0 0" margin="0 0 xxx-small 0">
+          <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
             <IconPlusLine />
-          </FlexItem>
-          <FlexItem>
+          </Flex.Item>
+          <Flex.Item>
             <ScreenReaderContent>{I18n.t('Create an')}</ScreenReaderContent>
             {title}
-          </FlexItem>
+          </Flex.Item>
         </Flex>
-      </MenuItem>
+      </Menu.Item>
     )
   }
 

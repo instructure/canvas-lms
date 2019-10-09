@@ -19,7 +19,7 @@
 import {Assignment} from '../graphqlData/Assignment'
 import {Badge, Text} from '@instructure/ui-elements'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './Attempt'
 import GradeDisplay from './GradeDisplay'
@@ -33,7 +33,7 @@ import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 import {Tabs} from '@instructure/ui-tabs'
 
 const CommentsTab = lazy(() => import('./CommentsTab'))
-const RubricTab = lazy(() => import('./RubricTab'))
+const RubricsQuery = lazy(() => import('./RubricsQuery'))
 
 ContentTabs.propTypes = {
   assignment: Assignment.shape,
@@ -48,6 +48,8 @@ function currentSubmissionGrade(assignment, submission) {
     right: '50px'
   }
 
+  const currentGrade = submission.state === 'graded' ? submission.grade : null
+
   return (
     <div style={tabBarAlign}>
       <Text weight="bold">
@@ -55,19 +57,19 @@ function currentSubmissionGrade(assignment, submission) {
           displaySize="medium"
           gradingType={assignment.gradingType}
           pointsPossible={assignment.pointsPossible}
-          receivedGrade={submission.grade}
+          receivedGrade={currentGrade}
         />
       </Text>
       <Text size="small">
         {submission.submittedAt ? (
           <Flex justifyItems="end">
-            <FlexItem padding="0 xx-small 0 0">{I18n.t('Submitted')}</FlexItem>
-            <FlexItem>
+            <Flex.Item padding="0 xx-small 0 0">{I18n.t('Submitted')}</Flex.Item>
+            <Flex.Item>
               <FriendlyDatetime
                 dateTime={submission.submittedAt}
                 format={I18n.t('#date.formats.full')}
               />
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         ) : (
           I18n.t('Not submitted')
@@ -127,12 +129,14 @@ function ContentTabs(props) {
         : null}
       <Tabs onRequestTabChange={handleTabChange} variant="default">
         <Tabs.Panel
+          key="attempt-tab"
           renderTitle={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
           selected={selectedTabIndex === 0}
         >
           <SubmissionManager assignment={props.assignment} submission={props.submission} />
         </Tabs.Panel>
         <Tabs.Panel
+          key="comments-tab"
           selected={selectedTabIndex === 1}
           renderTitle={
             <span>
@@ -150,9 +154,13 @@ function ContentTabs(props) {
           {renderCommentsTab(props)}
         </Tabs.Panel>
         {props.assignment.rubric && (
-          <Tabs.Panel renderTitle={I18n.t('Rubric')} selected={selectedTabIndex === 2}>
+          <Tabs.Panel
+            key="rubrics-tab"
+            renderTitle={I18n.t('Rubric')}
+            selected={selectedTabIndex === 2}
+          >
             <Suspense fallback={<LoadingIndicator />}>
-              <RubricTab assignment={props.assignment} />
+              <RubricsQuery assignment={props.assignment} submission={props.submission} />
             </Suspense>
           </Tabs.Panel>
         )}

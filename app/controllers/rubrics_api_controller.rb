@@ -227,6 +227,7 @@
 #           "type": "string"
 #         },
 #         "use_for_grading": {
+#           "description": "Whether or not the associated rubric is used for grade calculation",
 #           "example": "true",
 #           "type": "boolean"
 #         },
@@ -235,10 +236,12 @@
 #           "type": "string"
 #         },
 #         "purpose": {
+#           "description": "Whether or not the association is for grading (and thus linked to an assignment) or if it's to indicate the rubric should appear in its context. Values will be grading or bookmark.",
 #           "example": "grading",
 #           "type": "string"
 #         },
 #         "hide_score_total": {
+#           "description": "Whether or not the score total is displayed within the rubric. This option is only available if the rubric is not used for grading.",
 #           "example": "true",
 #           "type": "boolean"
 #         },

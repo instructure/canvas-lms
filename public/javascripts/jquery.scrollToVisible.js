@@ -21,7 +21,6 @@
 
 import $ from 'jquery'
 import './vendor/jquery.scrollTo'
-import './jquery.instructure_jquery_patches'
 
 $.fn.scrollToVisible = function(obj) {
   var options = {};

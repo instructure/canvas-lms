@@ -405,6 +405,24 @@ describe DiscussionEntry do
       expect(DiscussionEntry).to receive(:unique_constraint_retry).once
       @entry.change_read_state("read", @student)
     end
+
+    it "should not increment unread count for students in group topics when posting to the root" do
+      course_with_student(:active_all => true)
+      teacher1 = @teacher
+      teacher2 = teacher_in_course(:course => @course, :active_all => true).user
+
+      group_category = @course.group_categories.create(:name => "new category")
+      @group = @course.groups.create(:name => "group", :group_category => group_category)
+      @group.add_user(@student)
+
+      root_topic = @course.discussion_topics.create!(:title => "parent topic", :message => "msg", :group_category => group_category)
+      student_participant = root_topic.discussion_topic_participants.create!(user: @student)
+      teacher_participant = root_topic.discussion_topic_participants.create!(user: teacher2)
+      root_topic.discussion_entries.create!(message: "message", user: teacher1)
+
+      expect(student_participant.reload.unread_entry_count).to eq 0
+      expect(teacher_participant.reload.unread_entry_count).to eq 1 # still count as unread for the user that can read it
+    end
   end
 
   context "rating" do

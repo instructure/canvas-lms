@@ -844,6 +844,7 @@ CanvasRails::Application.routes.draw do
       get :communication
       put :communication_update
       get :settings
+      get :content_shares
       get :observees
     end
   end
@@ -1622,6 +1623,10 @@ CanvasRails::Application.routes.draw do
       post 'image_selection/:id', action: :image_selection
     end
 
+    scope(controller: :immersive_reader) do
+      get 'immersive_reader/authenticate', action: :authenticate
+    end
+
     scope(controller: :search) do
       get 'search/rubrics', action: 'rubrics', as: 'search_rubrics'
       get 'search/recipients', action: 'recipients', as: 'search_recipients'
@@ -2167,6 +2172,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :planner) do
       get 'planner/items', action: :index, as: :planner_items
+      get 'users/:user_id/planner/items', action: :index, as: :user_planner_items
     end
 
     scope(controller: :planner_overrides) do

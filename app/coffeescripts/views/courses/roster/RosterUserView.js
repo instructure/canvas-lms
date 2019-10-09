@@ -97,8 +97,7 @@ export default class RosterUserView extends Backbone.View {
 
     json.canEditSections = !json.isInactive && !_.isEmpty(this.model.sectionEditableEnrollments())
     json.canLinkStudents = json.isObserver && !ENV.course.concluded
-    json.canViewLoginIdColumn =
-      ENV.permissions.manage_admin_users || ENV.permissions.manage_students
+    json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
     json.canManage = _.some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
       this.model.hasEnrollmentType(et)

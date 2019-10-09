@@ -19,7 +19,6 @@ class StubbedClient
   def self.put_records(records:, stream_name:)
     events = records.map { |e| JSON.parse(e[:data]).dig('attributes', 'event_name') }.join(' | ')
     puts "Events #{events} put to stream #{stream_name}: #{records}"
-    records.map { |r| OpenStruct.new(error_code: nil, error_message: nil ) }
   end
 
   def self.stream_name
@@ -31,7 +30,6 @@ Rails.configuration.to_prepare do
   LiveEvents.logger = Rails.logger
   LiveEvents.cache = Rails.cache
   LiveEvents.statsd = InstStatsd::Statsd
-  LiveEvents.error_reporter = Canvas::Errors
   LiveEvents.max_queue_size = -> { Setting.get('live_events_max_queue_size', 5000).to_i }
   LiveEvents.settings = -> {
     plugin_settings = Canvas::Plugin.find(:live_events)&.settings

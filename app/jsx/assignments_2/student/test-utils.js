@@ -177,7 +177,8 @@ export function commentGraphqlMock(comments) {
           submissionAttempt: legacyMockSubmission().attempt,
           id: legacyMockSubmission().id,
           comment: 'lion',
-          fileIds: []
+          fileIds: [],
+          mediaObjectId: null
         }
       },
       result: {

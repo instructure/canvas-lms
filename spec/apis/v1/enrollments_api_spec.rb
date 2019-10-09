@@ -1577,6 +1577,7 @@ describe EnrollmentsApiController, type: :request do
               'sortable_name' => e.user.sortable_name,
               'short_name' => e.user.short_name,
               'id' => e.user.id,
+              'login_id' => @user.pseudonym.unique_id,
               'created_at' => e.user.created_at.iso8601
             },
             'html_url' => course_user_url(e.course_id, e.user_id),

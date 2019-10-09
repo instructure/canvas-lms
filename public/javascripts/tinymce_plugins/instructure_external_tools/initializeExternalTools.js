@@ -26,7 +26,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 const TRANSLATIONS = {
-  more_external_tools: htmlEscape(I18n.t('more_external_tools', 'More External Tools'))
+  get more_external_tools() {
+    return htmlEscape(I18n.t('more_external_tools', 'More External Tools'))
+  }
 }
 
 const ExternalToolsPlugin = {
@@ -82,9 +84,10 @@ const ExternalToolsPlugin = {
       }
     }
     if (ltiButtons.length && ENV.use_rce_enhancements) {
-      ed.ui.registry.addMenuButton('lti_tool_dropdown', {
-        fetch(callback) {
-          callback(ltiButtons)
+      ed.ui.registry.addButton('lti_tool_dropdown', {
+        onAction: () => {
+          const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
+          document.dispatchEvent(ev)
         },
         icon: 'lti',
         tooltip: 'LTI Tools'

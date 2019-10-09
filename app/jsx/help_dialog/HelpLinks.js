@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, arrayOf, shape, string, func} from 'prop-types'
 import I18n from 'i18n!help_dialog'
 import {Button} from '@instructure/ui-buttons'
-import {List, ListItem, Spinner, Text} from '@instructure/ui-elements'
+import {List, Spinner, Text} from '@instructure/ui-elements'
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
   return (
@@ -28,7 +28,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
       {hasLoaded ? (
         links
           .map((link, index) => (
-            <ListItem key={`link-${index}`}>
+            <List.Item key={`link-${index}`}>
               <Button
                 variant="link"
                 href={link.url}
@@ -49,17 +49,17 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                   {link.subtext}
                 </Text>
               )}
-            </ListItem>
+            </List.Item>
           ))
           .concat(
             // if the current user is an admin, show the settings link to
             // customize this menu
             window.ENV.current_user_roles &&
               window.ENV.current_user_roles.includes('root_admin') && [
-                <ListItem key="hr">
+                <List.Item key="hr">
                   <hr role="presentation" />
-                </ListItem>,
-                <ListItem key="customize">
+                </List.Item>,
+                <List.Item key="customize">
                   <Button
                     variant="link"
                     theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
@@ -67,14 +67,14 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                   >
                     {I18n.t('Customize this menu')}
                   </Button>
-                </ListItem>
+                </List.Item>
               ]
           )
           .filter(Boolean)
       ) : (
-        <ListItem>
-          <Spinner size="small" title={I18n.t('Loading')} />
-        </ListItem>
+        <List.Item>
+          <Spinner size="small" renderTitle={I18n.t('Loading')} />
+        </List.Item>
       )}
     </List>
   )

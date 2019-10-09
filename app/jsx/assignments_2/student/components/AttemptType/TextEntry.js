@@ -58,11 +58,21 @@ export default class TextEntry extends React.Component {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (this.getDraftBody() !== null && this.props.editingDraft && !this.state.editorLoaded) {
       this.loadRCE()
     } else if (!this.props.editingDraft && this.state.editorLoaded) {
       this.unloadRCE()
+    }
+
+    if (!this.props.editingDraft) {
+      if (['submitted', 'graded'].includes(this.props.submission.state)) {
+        this.viewTextSubmission.focus()
+      } else if (prevProps.editingDraft) {
+        this.editTextEntryButton.focus()
+      } else if (this.getDraftBody() === null) {
+        this.startTextEntryButton.focus()
+      }
     }
   }
 
@@ -175,7 +185,7 @@ export default class TextEntry extends React.Component {
     }
   }
 
-  handleCancelButton = () => {
+  handleDeleteButton = () => {
     if (this._isMounted) {
       this.updateSubmissionDraft(null)
       this.props.updateEditingDraft(false)
@@ -220,7 +230,15 @@ export default class TextEntry extends React.Component {
 
   renderSubmission() {
     return (
-      <View as="div" borderWidth="small" padding="xx-small" data-testid="text-submission">
+      <View
+        as="div"
+        borderWidth="small"
+        padding="xx-small"
+        data-testid="text-submission"
+        ref={el => {
+          this.viewTextSubmission = el
+        }}
+      >
         <div dangerouslySetInnerHTML={{__html: this.props.submission.body}} />
       </View>
     )
@@ -235,6 +253,9 @@ export default class TextEntry extends React.Component {
           <div>
             <Button
               data-testid="edit-text-draft"
+              ref={el => {
+                this.editTextEntryButton = el
+              }}
               margin="0 x-small 0 0"
               onClick={() => {
                 this.props.updateEditingDraft(true)
@@ -245,7 +266,7 @@ export default class TextEntry extends React.Component {
             <Button
               data-testid="delete-text-draft"
               icon={IconTrashLine}
-              onClick={this.handleCancelButton}
+              onClick={this.handleDeleteButton}
             >
               <ScreenReaderContent>{I18n.t('Remove submission draft')}</ScreenReaderContent>
             </Button>
@@ -262,7 +283,14 @@ export default class TextEntry extends React.Component {
           heading={I18n.t('Text Entry')}
           hero={<IconTextLine color="brand" />}
           message={
-            <Button data-testid="start-text-entry" onClick={this.handleStartButton}>
+            <Button
+              data-testid="start-text-entry"
+              id="start-text-entry"
+              onClick={this.handleStartButton}
+              ref={el => {
+                this.startTextEntryButton = el
+              }}
+            >
               {I18n.t('Start Entry')}
             </Button>
           }

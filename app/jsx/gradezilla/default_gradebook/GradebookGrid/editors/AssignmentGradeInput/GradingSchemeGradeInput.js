@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {arrayOf, bool, element, func, instanceOf, number, shape, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {TextInput} from '@instructure/ui-forms'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import I18n from 'i18n!gradezilla'
@@ -235,14 +235,14 @@ export default class GradingSchemeInput extends Component {
             }
           >
             {this.props.gradingScheme.map(([key]) => (
-              <MenuItem key={key} value={key}>
+              <Menu.Item key={key} value={key}>
                 {key}
-              </MenuItem>
+              </Menu.Item>
             ))}
 
-            <MenuItem key="EX" value="EX">
+            <Menu.Item key="EX" value="EX">
               {GradeFormatHelper.excused()}
-            </MenuItem>
+            </Menu.Item>
           </Menu>
         </div>
       </div>

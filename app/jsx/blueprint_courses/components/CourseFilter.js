@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import {TextInput} from '@instructure/ui-forms'
 import Select from '@instructure/ui-core/lib/components/Select'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Grid, GridCol, GridRow} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import propTypes from '../propTypes'
 
 const { func } = PropTypes
@@ -104,8 +104,8 @@ export default class CourseFilter extends React.Component {
     return (
       <div className="bca-course-filter" ref={(c) => { this.wrapper = c }}>
         <Grid colSpacing="none">
-          <GridRow>
-            <GridCol width={7}>
+          <Grid.Row>
+            <Grid.Col width={7}>
               <TextInput
                 ref={(c) => { this.searchInput = c }}
                 type="search"
@@ -117,8 +117,8 @@ export default class CourseFilter extends React.Component {
                   <ScreenReaderContent>{I18n.t('Search Courses')}</ScreenReaderContent>
                 }
               />
-            </GridCol>
-            <GridCol width={2}>
+            </Grid.Col>
+            <Grid.Col width={2}>
               <Select
                 selectRef={(c) => { this.termInput = c }}
                 key="terms"
@@ -134,8 +134,8 @@ export default class CourseFilter extends React.Component {
                   <option key={term.id} value={term.id}>{term.name}</option>
                 ))}
               </Select>
-            </GridCol>
-            <GridCol width={3}>
+            </Grid.Col>
+            <Grid.Col width={3}>
               <Select
                 selectRef={(c) => { this.subAccountInput = c }}
                 key="subAccounts"
@@ -151,8 +151,8 @@ export default class CourseFilter extends React.Component {
                   <option key={account.id} value={account.id}>{account.name}</option>
                 ))}
               </Select>
-            </GridCol>
-          </GridRow>
+            </Grid.Col>
+          </Grid.Row>
         </Grid>
       </div>
     )

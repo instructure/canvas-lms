@@ -523,12 +523,13 @@ describe PlannerController do
           get :index, params: {:per_page => 2}
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id]
 
-          next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
-          get :index, params: {:per_page => 2, :page => next_page}
+          link = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}
+          expect(link[:uri].path).to include '/api/v1/planner/items'
+          get :index, params: {:per_page => 2, :page => link['page']}
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment5.id, @assignment.id]
 
-          next_page = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}['page']
-          get :index, params: {:per_page => 2, :page => next_page}
+          link = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}
+          get :index, params: {:per_page => 2, :page => link['page']}
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
         end
 
@@ -704,6 +705,32 @@ describe PlannerController do
             expect(response_json.length).to eq 4
             expect(response_json.map { |i| i["plannable_id"] }).to eq([page1.id, @planner_note1.id, @page.id, @planner_note2.id])
           end
+        end
+      end
+
+      context "with user id" do
+        it "allows a student to query her own planner items" do
+          get :index, params: {user_id: 'self', per_page: 1}
+          expect(response).to be_success
+          link = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}
+          expect(link[:uri].path).to include "/api/v1/users/self/planner/items"
+        end
+
+        it "allows a linked observer to query a student's planner items" do
+          observer = user_with_pseudonym
+          user_session(observer)
+          UserObservationLink.create_or_restore(observer: observer, student: @student, root_account: Account.default)
+          get :index, params: {user_id: @student.to_param, per_page: 1}
+          expect(response).to be_success
+          link = Api.parse_pagination_links(response.headers['Link']).detect{|p| p[:rel] == "next"}
+          expect(link[:uri].path).to include "/api/v1/users/#{@student.to_param}/planner/items"
+        end
+
+        it "does not allow a user without :read_as_parent to query another user's planner items" do
+          rando = user_with_pseudonym
+          user_session(rando)
+          get :index, params: {user_id: @student.to_param, per_page: 1}
+          expect(response).to be_unauthorized
         end
       end
 

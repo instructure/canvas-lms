@@ -35,6 +35,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "Page"
   value "PostPolicy"
   value "Progress"
+  value "Rubric"
   value "Section"
   value "Submission"
   value "Term"

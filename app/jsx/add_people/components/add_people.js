@@ -242,7 +242,7 @@ export default class AddPeople extends React.Component {
 
     switch (currentPage) {
       case RESULTPENDING:
-        currentPanel = <Spinner size="medium" title={I18n.t('Loading')} />
+        currentPanel = <Spinner size="medium" renderTitle={I18n.t('Loading')} />
         panelLabel = I18n.t('loading')
         break
       case APIERROR:

@@ -286,7 +286,8 @@ describe "context modules" do
 
     before(:once) do
       course_factory(active_course: true)
-      Account.default.enable_feature!(:usage_rights_required)
+      @course.usage_rights_required = true
+      @course.save!
       #adding file to course
       @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
       @file.context = @course

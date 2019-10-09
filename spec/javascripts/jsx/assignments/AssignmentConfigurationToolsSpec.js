@@ -349,3 +349,22 @@ test('sets the iframe allowances', () => {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
   )
 })
+
+test('sets the iframe "data-lti-launch" attribute', () => {
+  const wrapper = mount(
+    <AssignmentConfigurationTools.configTools
+      courseId={1}
+      secureParams={secureParams}
+      selectedTool={5}
+      selectedToolType="ContextExternalTool"
+    />
+  )
+
+  equal(
+    wrapper
+      .find('.tool_launch')
+      .instance()
+      .getAttribute('data-lti-launch'),
+    'true'
+  )
+})

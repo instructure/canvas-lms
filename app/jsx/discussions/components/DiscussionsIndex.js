@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, {Component} from 'react'
-import {func, bool, string} from 'prop-types'
+import {func, bool, string, shape, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
@@ -28,8 +28,8 @@ import {View} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Spinner, Heading, Text} from '@instructure/ui-elements'
 
-import CanvasTray from 'jsx/shared/components/CanvasTray'
 import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
 
 import {
   ConnectedDiscussionsContainer,
@@ -50,6 +50,7 @@ import {discussionList} from '../../shared/proptypes/discussion'
 import propTypes from '../propTypes'
 import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
+import contentShareShape from 'jsx/shared/proptypes/contentShare'
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
@@ -67,8 +68,11 @@ export default class DiscussionsIndex extends Component {
     pinnedDiscussions: discussionList.isRequired,
     unpinnedDiscussions: discussionList.isRequired,
     copyToOpen: bool.isRequired,
+    copyToSelection: shape({discussion_topics: arrayOf(string)}),
     sendToOpen: bool.isRequired,
-    DIRECT_SHARE_ENABLED: bool.isRequired
+    sendToSelection: contentShareShape,
+    DIRECT_SHARE_ENABLED: bool.isRequired,
+    COURSE_ID: string
   }
 
   state = {
@@ -105,7 +109,7 @@ export default class DiscussionsIndex extends Component {
   renderSpinner(title) {
     return (
       <div className="discussions-v2__spinnerWrapper">
-        <Spinner size="large" title={title} />
+        <Spinner size="large" renderTitle={title} />
         <Text size="small" as="p">
           {title}
         </Text>
@@ -246,18 +250,19 @@ export default class DiscussionsIndex extends Component {
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
           <DirectShareCourseTray
+            sourceCourseId={this.props.COURSE_ID}
+            contentSelection={this.props.copyToSelection}
             open={this.props.copyToOpen}
             onDismiss={() => this.props.setCopyToOpen(false)}
           />
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
-          <CanvasTray
+          <DirectShareUserModal
+            courseId={this.props.COURSE_ID}
             open={this.props.sendToOpen}
-            label={I18n.t('Send To...')}
+            contentShare={this.props.sendToSelection}
             onDismiss={() => this.props.setSendToOpen(false)}
-          >
-            TODO: Implement
-          </CanvasTray>
+          />
         )}{' '}
       </View>
     )
@@ -296,11 +301,14 @@ const connectState = (state, ownProps) => {
     permissions: state.permissions,
     pinnedDiscussions: pinnedDiscussionIds.map(id => allDiscussions[id]),
     unpinnedDiscussions: unpinnedDiscussionIds.map(id => allDiscussions[id]),
-    copyToOpen: state.copyToOpen,
-    sendToOpen: state.sendToOpen,
-    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED
+    copyToOpen: state.copyTo.open,
+    copyToSelection: state.copyTo.selection,
+    sendToOpen: state.sendTo.open,
+    sendToSelection: state.sendTo.selection,
+    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,
+    COURSE_ID: state.COURSE_ID
   }
-  return Object.assign({}, ownProps, fromPagination, fromState)
+  return {...ownProps, ...fromPagination, ...fromState}
 }
 const connectActions = dispatch =>
   bindActionCreators(

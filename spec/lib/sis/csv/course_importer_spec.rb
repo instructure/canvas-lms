@@ -763,14 +763,16 @@ describe SIS::CSV::CourseImporter do
     end
 
     it 'sets and updates grade_passback_setting' do
+      Setting.set('valid_grade_passback_settings', 'disabled,nightly_sync,other')
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,grade_passback_setting",
-        "test_1,TC 101,Test Course 101,,,active,nightly_sync",
-        "test_2,TC 102,Test Course 102,,,active,nightly_sync",
+        "test_1,TC 101,Test Course 101,,,active,disabled",
+        "test_2,TC 102,Test Course 102,,,active,other",
         "test_3,TC 103,Test Course 103,,,active,nightly_sync"
       )
-      expect(Course.find_by_sis_source_id('test_1').grade_passback_setting).to eq 'nightly_sync'
-      expect(Course.find_by_sis_source_id('test_2').grade_passback_setting).to eq 'nightly_sync'
+      expect(Course.where(sis_source_id: 'test_1').take.grade_passback_setting).to eq 'disabled'
+      expect(Course.where(sis_source_id: 'test_2').take.grade_passback_setting).to eq 'other'
+      expect(Course.where(sis_source_id: 'test_3').take.grade_passback_setting).to eq 'nightly_sync'
 
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,grade_passback_setting",
@@ -778,15 +780,15 @@ describe SIS::CSV::CourseImporter do
         "test_2,TC 102,Test Course 102,,,active,\"\"",
         "test_3,TC 103,Test Course 103,,,active,nightly_sync"
       )
-      expect(Course.find_by_sis_source_id('test_1').grade_passback_setting).to be_nil
-      expect(Course.find_by_sis_source_id('test_2').grade_passback_setting).to be_nil
-      expect(Course.find_by_sis_source_id('test_3').grade_passback_setting).to eq 'nightly_sync'
+      expect(Course.where(sis_source_id: 'test_1').take.grade_passback_setting).to be_nil
+      expect(Course.where(sis_source_id: 'test_2').take.grade_passback_setting).to be_nil
+      expect(Course.where(sis_source_id: 'test_3').take.grade_passback_setting).to eq 'nightly_sync'
 
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_3,TC 103,Test Course 103,,,active"
       )
-      expect(Course.find_by_sis_source_id('test_3').grade_passback_setting).to eq 'nightly_sync'
+      expect(Course.where(sis_source_id: 'test_3').take.grade_passback_setting).to eq 'nightly_sync'
     end
 
     it 'respects stuck grade_passback setting' do
@@ -794,7 +796,7 @@ describe SIS::CSV::CourseImporter do
         "course_id,short_name,long_name,account_id,term_id,status,grade_passback_setting",
         "test_1,TC 101,Test Course 101,,,active,nightly_sync"
       )
-      expect((course = Course.find_by_sis_source_id('test_1')).grade_passback_setting).to eq 'nightly_sync'
+      expect((course = Course.where(sis_source_id: 'test_1').take).grade_passback_setting).to eq 'nightly_sync'
       course.grade_passback_setting=nil
       course.save!
 
@@ -802,7 +804,7 @@ describe SIS::CSV::CourseImporter do
         "course_id,short_name,long_name,account_id,term_id,status,grade_passback_setting",
         "test_1,TC 101,Test Course 101,,,active,nightly_sync"
       )
-      expect(Course.find_by_sis_source_id('test_1').grade_passback_setting).to be_nil
+      expect(Course.where(sis_source_id: 'test_1').take.grade_passback_setting).to be_nil
     end
   end
 end

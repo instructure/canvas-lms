@@ -143,7 +143,7 @@ export default class DiscussionSettings extends Component {
         className="discussion-settings-v2-spinner-container"
         tabIndex="-1"
       >
-        <Spinner title={I18n.t('Saving')} size="small" />
+        <Spinner renderTitle={I18n.t('Saving')} size="small" />
       </div>
     )
   }

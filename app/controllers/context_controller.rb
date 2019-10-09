@@ -143,7 +143,8 @@ class ContextController < ApplicationController
         :resend_invitations_url => course_re_send_invitations_url(@context),
         :permissions => {
           :read_sis => @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
-          :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
+          :view_user_logins => @context.grants_right?(@current_user, session, :view_user_logins),
+          :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)),
           :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
           :add_users => manage_students || manage_admins,
           :read_reports => @context.grants_right?(@current_user, session, :read_reports)

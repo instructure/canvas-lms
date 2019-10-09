@@ -16,13 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
-  class RatingType < ApplicationObjectType
-    graphql_name 'Rating'
+class AddUrlToSubmissionDraft < ActiveRecord::Migration[5.2]
+  tag :predeploy
 
-    field :id, ID, null: false
-    field :description, String, null: false
-    field :long_description, String, null: true
-    field :points, Int, null: false
+  def change
+    add_column :submission_drafts, :url, :text
   end
 end

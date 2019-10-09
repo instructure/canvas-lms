@@ -18,39 +18,50 @@
 
 import {arrayOf, bool, number, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
-import {Rating} from './Rating'
+import {RubricRating} from './RubricRating'
 
-export const Criterion = {
+export const RubricCriterion = {
   fragment: gql`
-    fragment Criterion on Criterion {
-      id
+    fragment RubricCriterion on RubricCriterion {
+      id: _id
       criterion_use_range: criterionUseRange
       description
+      ignore_for_scoring: ignoreForScoring
       long_description: longDescription
+      mastery_points: masteryPoints
+      outcome {
+        _id
+      }
       points
       ratings {
-        ...Rating
+        ...RubricRating
       }
     }
-    ${Rating.fragment}
+    ${RubricRating.fragment}
   `,
 
   shape: shape({
     id: string.isRequired,
     criterion_use_range: bool.isRequired,
     description: string.isRequired,
+    ignore_for_scoring: bool,
     long_description: string,
+    mastery_points: number,
+    outcome: shape({
+      _id: string.isRequired
+    }),
     points: number,
-    ratings: arrayOf(Rating.shape)
+    ratings: arrayOf(RubricRating.shape)
   })
 }
 
-export const CriterionDefaultMocks = {
-  Criterion: () => ({
-    id: '1',
+export const RubricCriterionDefaultMocks = {
+  RubricCriterion: () => ({
+    _id: '1',
     criterionUseRange: false,
-    description: 'First Criterion',
-    longDescription: '',
+    ignoreForScoring: false,
+    masteryPoints: null,
+    outcome: null,
     points: 6,
     ratings: [{}]
   })

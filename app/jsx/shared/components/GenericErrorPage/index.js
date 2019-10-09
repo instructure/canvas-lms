@@ -132,7 +132,9 @@ class GenericErrorPage extends React.Component {
               handleSubmitErrorReport={this.handleSubmitErrorReport}
             />
           )}
-          {this.state.submitLoading && <Spinner title={I18n.t('Loading')} margin="0 0 0 medium" />}
+          {this.state.submitLoading && (
+            <Spinner renderTitle={I18n.t('Loading')} margin="0 0 0 medium" />
+          )}
           {this.state.commentPosted && this.state.commentPostError && (
             <View display="block" data-test-id="generic-error-comments-submitted">
               <Text color="error" margin="x-small">

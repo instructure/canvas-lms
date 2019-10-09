@@ -21,15 +21,29 @@ import tz from 'timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-  var STRINGS = {
-    timeLabel: I18n.beforeLabel(I18n.t('Time')),
-    hourTitle: I18n.t('datepicker.titles.hour', 'hr'),
-    minuteTitle: I18n.t('datepicker.titles.minute', 'min'),
-    selectTitle: I18n.t('datepicker.titles.am_pm', 'am/pm'),
-    AM: I18n.t('#time.am'),
-    PM: I18n.t('#time.pm'),
-    doneButton: I18n.t('#buttons.done', 'Done')
-  };
+const STRINGS = {
+  get timeLabel() {
+    return I18n.beforeLabel(I18n.t('Time'))
+  },
+  get hourTitle() {
+    return I18n.t('datepicker.titles.hour', 'hr')
+  },
+  get minuteTitle() {
+    return I18n.t('datepicker.titles.minute', 'min')
+  },
+  get selectTitle() {
+    return I18n.t('datepicker.titles.am_pm', 'am/pm')
+  },
+  get AM() {
+    return I18n.t('#time.am')
+  },
+  get PM() {
+    return I18n.t('#time.pm')
+  },
+  get doneButton() {
+    return I18n.t('#buttons.done', 'Done')
+  }
+}
 
   function renderDatepickerTime($input) {
     var data = {

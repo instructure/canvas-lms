@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, func, shape, string} from 'prop-types'
 import axios from 'axios'
 import BreadcrumbLinkWithTip from './BreadcrumbLinkWithTip'
-import errorShipUrl from '../../../../SVG/ErrorShip.svg'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import FileSelectTable from './FileSelectTable'
 import GenericErrorPage from '../../../../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2'
@@ -50,6 +50,10 @@ class CanvasFiles extends React.Component {
   componentDidMount() {
     this._isMounted = true
     this.loadUserRootFolders()
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   folderContentApiUrl = (folderID, type) => {
@@ -259,6 +263,7 @@ class CanvasFiles extends React.Component {
             folders={this.state.loadedFolders}
             files={this.state.loadedFiles}
             selectedFolderID={this.state.selectedFolderID}
+            handleCanvasFileSelect={this.props.handleCanvasFileSelect}
             handleFolderSelect={this.handleUpdateSelectedFolder}
           />
         </Flex.Item>
@@ -274,6 +279,7 @@ class CanvasFiles extends React.Component {
 
 CanvasFiles.propTypes = {
   courseID: string.isRequired,
+  handleCanvasFileSelect: func.isRequired,
   userGroups: arrayOf(
     shape({
       _id: string,

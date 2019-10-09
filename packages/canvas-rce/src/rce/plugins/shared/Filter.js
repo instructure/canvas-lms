@@ -123,11 +123,9 @@ export default function Filter(props) {
                 {formatMessage('Documents')}
               </option>
 
-              {/*
               <option value="media" icon={IconAttachMediaLine}>
                 {formatMessage('Media')}
               </option>
-              */}
 
               <option value="all">{formatMessage('All')}</option>
             </Select>

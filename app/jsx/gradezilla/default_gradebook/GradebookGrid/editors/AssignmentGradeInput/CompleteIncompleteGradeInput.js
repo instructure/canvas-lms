@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
 import {IconArrowOpenDownLine, IconCheckSolid, IconEndSolid} from '@instructure/ui-icons'
@@ -165,9 +165,9 @@ export default class CompleteIncompleteGradeInput extends Component {
             }
           >
             {menuItems.map(menuItem => (
-              <MenuItem key={menuItem.status} value={menuItem.value}>
+              <Menu.Item key={menuItem.status} value={menuItem.value}>
                 {componentForGrade(menuItem.status, {forMenu: true})}
-              </MenuItem>
+              </Menu.Item>
             ))}
           </Menu>
         </div>

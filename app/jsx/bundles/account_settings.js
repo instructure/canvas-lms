@@ -56,7 +56,7 @@ if (document.getElementById('tab-security')) {
       padding="large"
       textAlign="center"
     >
-    <Spinner size="large" title={I18n.t('Loading')} />
+    <Spinner size="large" renderTitle={I18n.t('Loading')} />
   </View>, document.getElementById('tab-security'))
 }
 

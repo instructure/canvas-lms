@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {bool, func, shape} from 'prop-types'
 import {View} from '@instructure/ui-layout'
-import {List, ListItem, Text} from '@instructure/ui-elements'
+import {List, Text} from '@instructure/ui-elements'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
@@ -95,11 +95,11 @@ export default class GradePostingPolicyTabPanel extends Component {
             </Text>
 
             <List margin="0 0 0 small" size="small" itemSpacing="small">
-              <ListItem>{I18n.t('Their grade for the assignment')}</ListItem>
-              <ListItem>{I18n.t('Grade change notifications')}</ListItem>
-              <ListItem>{I18n.t('Submission comments')}</ListItem>
-              <ListItem>{I18n.t('Curving assignments')}</ListItem>
-              <ListItem>{I18n.t('Score change notifications')}</ListItem>
+              <List.Item>{I18n.t('Their grade for the assignment')}</List.Item>
+              <List.Item>{I18n.t('Grade change notifications')}</List.Item>
+              <List.Item>{I18n.t('Submission comments')}</List.Item>
+              <List.Item>{I18n.t('Curving assignments')}</List.Item>
+              <List.Item>{I18n.t('Score change notifications')}</List.Item>
             </List>
 
             <Text size="small" as="p">

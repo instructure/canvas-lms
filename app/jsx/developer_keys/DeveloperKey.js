@@ -24,7 +24,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {IconLtiLine} from '@instructure/ui-icons'
 import {Popover, Tooltip} from '@instructure/ui-overlays'
 import {Img, Link} from '@instructure/ui-elements'
@@ -141,9 +141,9 @@ class DeveloperKey extends React.Component {
         <td>
           <Flex>
             {this.makeImage(developerKey)}
-            <FlexItem shrink>
+            <Flex.Item shrink>
             {this.getToolName(developerKey)}
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         </td>
 

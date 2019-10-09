@@ -77,6 +77,14 @@ class StudentAssignmentPageV2
       f('textarea')
     end
 
+    def record_upload_button
+      f("button[data-testid='media-modal-launch-button']")
+    end
+
+    def media_modal
+      f("span[aria-label='Upload Media']")
+    end
+
     def leave_a_comment(comment)
       replace_content(comment_text_area, comment)
       send_comment_button.click

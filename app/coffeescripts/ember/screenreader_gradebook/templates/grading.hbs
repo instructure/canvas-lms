@@ -48,14 +48,14 @@
             </p>
           {{/unless}}
           </div>
-          {{#unless hideComments}}
-          <button
-            id="submission_details"
-            class="btn"
-            {{action 'openDialog' 'submission' target=view}}
-          >
-            {{#t 'submission_details'}}Submission Details{{/t}}
-          </button>
+          {{#unless anonymizeStudents}}
+            <button
+              id="submission_details"
+              class="btn"
+              {{action 'openDialog' 'submission' target=view}}
+            >
+              {{#t 'submission_details'}}Submission Details{{/t}}
+            </button>
           {{/unless}}
         {{/if}}
       {{else}}

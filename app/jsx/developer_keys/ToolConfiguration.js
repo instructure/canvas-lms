@@ -18,7 +18,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {GridCol, GridRow} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-layout'
 import CustomizationForm from './CustomizationForm'
 import ToolConfigurationForm from './ToolConfigurationForm'
 
@@ -75,9 +75,9 @@ export default class ToolConfiguration extends React.Component {
 
   render() {
     return (
-      <GridRow>
-        <GridCol>{this.body()}</GridCol>
-      </GridRow>
+      <Grid.Row>
+        <Grid.Col>{this.body()}</Grid.Col>
+      </Grid.Row>
     )
   }
 }

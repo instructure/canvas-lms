@@ -357,7 +357,7 @@ class FileBrowser extends React.Component {
 
   renderMask () {
     if (this.state.uploading) {
-      return <Mask><Spinner className="file-browser__uploading" title={I18n.t('File uploading')} /></Mask>
+      return <Mask><Spinner className="file-browser__uploading" renderTitle={I18n.t('File uploading')} /></Mask>
     } else {
       return null
     }
@@ -365,7 +365,7 @@ class FileBrowser extends React.Component {
 
   renderLoading () {
     if (this.state.loadingCount > 0) {
-      return <Spinner className="file-browser__loading" title={I18n.t('Loading folders')} size="small" />
+      return <Spinner className="file-browser__loading" renderTitle={I18n.t('Loading folders')} size="small" />
     } else {
       return null
     }

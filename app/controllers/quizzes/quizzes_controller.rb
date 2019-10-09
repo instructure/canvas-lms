@@ -119,6 +119,7 @@ class Quizzes::QuizzesController < ApplicationController
           options: quiz_options
         },
         :URLS => {
+          new_assignment_url: new_polymorphic_url([@context, :assignment]),
           new_quiz_url: context_url(@context, :context_quizzes_new_url, :fresh => 1),
           question_banks_url: context_url(@context, :context_question_banks_url),
           assignment_overrides: api_v1_course_quiz_assignment_overrides_url(@context)
@@ -131,6 +132,7 @@ class Quizzes::QuizzesController < ApplicationController
         :FLAGS => {
           question_banks: feature_enabled?(:question_banks),
           post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
+          quiz_lti_enabled: quiz_lti_enabled?,
           migrate_quiz_enabled:
             @context.feature_enabled?(:quizzes_next) &&
               @context.quiz_lti_tool.present?,
@@ -1029,6 +1031,14 @@ class Quizzes::QuizzesController < ApplicationController
         format.json { render json: @quiz.errors, status: :forbidden }
       end
     end
+  end
+
+  def quiz_lti_enabled?
+    quiz_lti_tool = @context.quiz_lti_tool
+    @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
+      @context.feature_enabled?(:quizzes_next) &&
+      quiz_lti_tool.present? &&
+      quiz_lti_tool.url != 'http://void.url.inseng.net'
   end
 
   protected

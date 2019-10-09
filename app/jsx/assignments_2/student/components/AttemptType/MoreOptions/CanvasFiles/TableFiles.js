@@ -18,11 +18,12 @@
 
 import {formatFileSize, getFileThumbnail} from '../../../../../../shared/helpers/fileHelper'
 import FriendlyDatetime from '../../../../../../shared/FriendlyDatetime'
+import {func, object, shape, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import {object, shape, string} from 'prop-types'
 import React from 'react'
+import tz from 'timezone'
 
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {
   IconCheckMarkIndeterminateLine,
   IconPublishSolid,
@@ -32,104 +33,142 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text, TruncateText} from '@instructure/ui-elements'
 import {Tooltip} from '@instructure/ui-overlays'
 
-const renderFileName = fileName => (
-  <Tooltip tip={fileName} as="div" variant="inverse">
-    <Text size="small" tabIndex="0">
-      <ScreenReaderContent>{I18n.t(', name: ')}</ScreenReaderContent>
-      <TruncateText>{fileName}</TruncateText>
-    </Text>
-  </Tooltip>
-)
-
-const renderDateCreated = createdAt => (
-  <Text size="small">
-    <ScreenReaderContent>{I18n.t(', date created: ')}</ScreenReaderContent>
-    <FriendlyDatetime dateTime={createdAt} format={I18n.t('#date.formats.medium')} />
-  </Text>
-)
-
-const renderDateModified = modifiedAt => (
-  <Text size="small">
-    <ScreenReaderContent>{I18n.t(', date modified: ')}</ScreenReaderContent>
-    {modifiedAt ? (
-      <FriendlyDatetime dateTime={modifiedAt} format={I18n.t('#date.formats.medium')} />
-    ) : (
-      renderNotApplicableCell()
-    )}
-  </Text>
-)
-
-const renderModifiedBy = user => (
-  <Text size="small">
-    <ScreenReaderContent>{I18n.t(', modified by: ')}</ScreenReaderContent>
-    {user ? user.display_name : renderNotApplicableCell()}
-  </Text>
-)
-
-const renderFileSize = size => (
-  <Text size="small">
-    <ScreenReaderContent>{I18n.t(', size: ')}</ScreenReaderContent>
-    {size ? formatFileSize(size) : renderNotApplicableCell()}
-  </Text>
-)
-
-const renderPublishedState = locked => {
-  return locked ? (
-    <>
-      <ScreenReaderContent>{I18n.t(', state: unpublished')}</ScreenReaderContent>
-      <IconUnpublishedLine />
-    </>
-  ) : (
-    <>
-      <ScreenReaderContent>{I18n.t(', state: published')}</ScreenReaderContent>
-      <IconPublishSolid color="success" />
-    </>
+const FileButton = props => {
+  return (
+    <Tooltip tip={props.tip} as="div" variant="inverse">
+      <div
+        className={`file-select-item ${props.selected ? 'file-select-item-selected' : ''}`}
+        onClick={props.onClick}
+        onKeyUp={e => {
+          // Keycode 13 is the Return or Enter key
+          if (e.keyCode === 13) {
+            props.onClick()
+          }
+        }}
+        tabIndex="0"
+        role="button"
+      >
+        {props.children}
+      </div>
+    </Tooltip>
   )
 }
 
-const renderNotApplicableCell = () => (
-  <>
-    <ScreenReaderContent>{I18n.t('not applicable')}</ScreenReaderContent>
-    <IconCheckMarkIndeterminateLine />
-  </>
-)
+class TableFiles extends React.Component {
+  state = {
+    selectedFileID: null
+  }
 
-const TableFiles = props => {
-  return (
-    <>
-      {props.folders[props.selectedFolderID].subFileIDs.map(id => {
-        const file = props.files[id]
-        return (
-          <div key={file.id}>
-            <ScreenReaderContent>{I18n.t('type: file')}</ScreenReaderContent>
-            <Flex>
-              <FlexItem padding="xx-small" size={props.columnWidths.thumbnailWidth}>
-                {getFileThumbnail(file, 'small')}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.nameWidth} grow>
-                {renderFileName(file.display_name)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.dateCreatedWidth}>
-                {renderDateCreated(file.created_at)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.dateModifiedWidth}>
-                {renderDateModified(file.updated_at)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.modifiedByWidth}>
-                {renderModifiedBy(file.user)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.fileSizeWidth}>
-                {renderFileSize(file.size)}
-              </FlexItem>
-              <FlexItem padding="xx-small" size={props.columnWidths.publishedWidth}>
-                {renderPublishedState(file.locked)}
-              </FlexItem>
-            </Flex>
-          </div>
-        )
-      })}
-    </>
+  formattedDateTime = dateTime => {
+    return tz.format(tz.parse(dateTime), I18n.t('#date.formats.medium'))
+  }
+
+  renderSRContents = file => {
+    const description = []
+    description.push(I18n.t('type: file'))
+    description.push(I18n.t('name: %{name}', {name: file.display_name}))
+    description.push(
+      I18n.t('date created: %{createdAt}', {createdAt: this.formattedDateTime(file.created_at)})
+    )
+    if (file.hasOwnProperty('updated_at')) {
+      description.push(
+        I18n.t('date modified: %{modifiedAt}', {
+          modifiedAt: this.formattedDateTime(file.updated_at)
+        })
+      )
+    }
+    if (file.hasOwnProperty('user')) {
+      description.push(I18n.t('modified by: %{user}', {user: file.user.display_name}))
+    }
+    if (file.hasOwnProperty('size')) {
+      description.push(I18n.t('size: %{size}', {size: formatFileSize(file.size)}))
+    }
+    description.push(file.locked ? I18n.t('state: unpublished') : I18n.t('state: published'))
+
+    return <ScreenReaderContent>{description.join(', ')}</ScreenReaderContent>
+  }
+
+  renderFileName = fileName => (
+    <Text size="small">
+      <TruncateText>{fileName}</TruncateText>
+    </Text>
   )
+
+  renderDateCreated = createdAt => (
+    <Text size="small">
+      <FriendlyDatetime dateTime={createdAt} format={I18n.t('#date.formats.medium')} />
+    </Text>
+  )
+
+  renderDateModified = modifiedAt => (
+    <Text size="small">
+      {modifiedAt ? (
+        <FriendlyDatetime dateTime={modifiedAt} format={I18n.t('#date.formats.medium')} />
+      ) : (
+        <IconCheckMarkIndeterminateLine />
+      )}
+    </Text>
+  )
+
+  renderModifiedBy = user => (
+    <Text size="small">
+      {user ? <TruncateText>{user.display_name}</TruncateText> : <IconCheckMarkIndeterminateLine />}
+    </Text>
+  )
+
+  renderFileSize = size => (
+    <Text size="small">{size ? formatFileSize(size) : <IconCheckMarkIndeterminateLine />}</Text>
+  )
+
+  renderPublishedState = locked => {
+    return locked ? <IconUnpublishedLine /> : <IconPublishSolid color="success" />
+  }
+
+  render() {
+    return (
+      <>
+        {this.props.folders[this.props.selectedFolderID].subFileIDs.map(id => {
+          const file = this.props.files[id]
+          return (
+            <FileButton
+              key={id}
+              selected={this.state.selectedFileID === id}
+              onClick={() => {
+                this.setState({selectedFileID: id})
+                this.props.handleCanvasFileSelect(id)
+              }}
+              tip={file.display_name}
+            >
+              {this.renderSRContents(file)}
+              <Flex aria-hidden>
+                <Flex.Item padding="xx-small" size={this.props.columnWidths.thumbnailWidth}>
+                  {getFileThumbnail(file, 'small')}
+                </Flex.Item>
+                <Flex.Item padding="xx-small" size={this.props.columnWidths.nameWidth} grow>
+                  {this.renderFileName(file.display_name)}
+                </Flex.Item>
+                <Flex.Item padding="xx-small" size={this.props.columnWidths.dateCreatedWidth}>
+                  {this.renderDateCreated(file.created_at)}
+                </Flex.Item>
+                <Flex.Item padding="xx-small" size={this.props.columnWidths.dateModifiedWidth}>
+                  {this.renderDateModified(file.updated_at)}
+                </Flex.Item>
+                <Flex.Item padding="xx-small" size={this.props.columnWidths.modifiedByWidth}>
+                  {this.renderModifiedBy(file.user)}
+                </Flex.Item>
+                <Flex.Item padding="xx-small" size={this.props.columnWidths.fileSizeWidth}>
+                  {this.renderFileSize(file.size)}
+                </Flex.Item>
+                <Flex.Item padding="xx-small" size={this.props.columnWidths.publishedWidth}>
+                  {this.renderPublishedState(file.locked)}
+                </Flex.Item>
+              </Flex>
+            </FileButton>
+          )
+        })}
+      </>
+    )
+  }
 }
 
 TableFiles.propTypes = {
@@ -143,10 +182,9 @@ TableFiles.propTypes = {
     fileSizeWidth: string,
     publishedWidth: string
   }),
-  // eslint-disable-next-line react/forbid-prop-types
   files: object,
-  // eslint-disable-next-line react/forbid-prop-types
   folders: object,
+  handleCanvasFileSelect: func,
   selectedFolderID: string
 }
 

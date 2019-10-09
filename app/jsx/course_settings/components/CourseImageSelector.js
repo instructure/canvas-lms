@@ -19,7 +19,7 @@
 import React from 'react'
 import {IconMoreLine, IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import {Menu, MenuItem} from '@instructure/ui-menu'
+import {Menu} from '@instructure/ui-menu'
 import {Spinner} from '@instructure/ui-elements'
 import Modal from '../../shared/components/InstuiModal'
 import I18n from 'i18n!course_images'
@@ -80,12 +80,12 @@ export default class CourseImageSelector extends React.Component {
                 </div>
               }
             >
-              <MenuItem onClick={this.changeImage}>
+              <Menu.Item onClick={this.changeImage}>
                 <IconEditLine /> {I18n.t('Choose image')}
-              </MenuItem>
-              <MenuItem onClick={this.removeImage}>
+              </Menu.Item>
+              <Menu.Item onClick={this.removeImage}>
                 <IconTrashLine /> {I18n.t('Remove image')}
-              </MenuItem>
+              </Menu.Item>
             </Menu>
           ) : (
             <Button onClick={this.changeImage}>{I18n.t('Choose Image')}</Button>

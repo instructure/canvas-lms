@@ -343,21 +343,9 @@ import 'jqueryui/tabs'
       $(this).text(optionText);
       const csp = document.getElementById('csp_options')
       if (csp)  {
-        Promise.all([
-          import('axios'),
-          import('react-dom'),
-          import('react'),
-          import('jsx/course_settings/components/CSPSelectionBox')
-        ])
-        .then(([{default: axios}, ReactDOM, React, {default: CSPSelectionBox}]) => {
-          ReactDOM.render(
-            <CSPSelectionBox
-              courseId={ENV.COURSE_ID}
-              canManage={ENV.PERMISSIONS.manage_account_settings}
-              apiLibrary={axios}
-            />, csp
-          )
-        }).catch(()=> {
+        import('jsx/course_settings/renderCSPSelectionBox')
+        .then(({renderCSPSelectionBox}) => renderCSPSelectionBox(csp))
+        .catch(()=> {
           // We shouldn't get here, but if we do... do something.
           const $message = $('<div />').text(I18n.t('Setting failed to load, try refreshing.'))
           $(csp).append($message)

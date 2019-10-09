@@ -28,6 +28,7 @@ export const SubmissionDraft = {
       }
       body
       meetsAssignmentCriteria
+      url
     }
     ${SubmissionDraftFile.fragment}
   `,
@@ -36,7 +37,8 @@ export const SubmissionDraft = {
     _id: string,
     attachments: arrayOf(SubmissionDraftFile.shape),
     body: string,
-    meetsAssignmentCriteria: bool
+    meetsAssignmentCriteria: bool,
+    url: string
   })
 }
 
@@ -44,6 +46,7 @@ export const SubmissionDraftDefaultMocks = {
   SubmissionDraft: () => ({
     attachments: () => [],
     body: null,
-    meetsAssignmentCriteria: false
+    meetsAssignmentCriteria: false,
+    url: null
   })
 }

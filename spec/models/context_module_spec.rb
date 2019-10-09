@@ -48,7 +48,8 @@ describe ContextModule do
 
     context "with file usage rights required" do
       before :once do
-        @course.enable_feature! :usage_rights_required
+        @course.usage_rights_required = true
+        @course.save!
       end
 
       it "should not publish Attachment module items if usage rights are missing" do

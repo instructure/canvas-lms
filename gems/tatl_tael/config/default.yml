@@ -157,12 +157,13 @@ Simple/CoffeeLinter:
   Severity: "warn"
   Precondition:
     Include:
-    - "**/**.coffee"
-  Message: Your commit modifies CoffeeScript files. Don't do that.
+    - "**/*[^Gradebook,Assignment].coffee"
+  Message: Your commit modifies CoffeeScript. You should probably decaffeinate 
+    (https://decaffeinate-project.org/repl/) it then make your changes in the JS file instead.
     CoffeeScript is deprecated in canvas and we eventually want to get rid of all of it.
-    If you are going to modify any code that is currently CoffeScript,
-    first decaffeinate (https://decaffeinate-project.org/repl/) it to .js in one commit,
-    and then make the changes in that .js file in a second commit.
+    If you've given that honest thought and your team still feels it makes sense leave this file
+    as CoffeeScript for now and you don't want to see this message
+    about it anymore, you can add it to the pattern in gems/tatl_tael/config/default.yml
 
 Simple/CoffeeSpecsLinter:
   Severity: "warn"
@@ -228,7 +229,7 @@ Simple/NewErbLinter:
         render :html => "".html_safe, :layout => true
 
 Simple/NewQunitLinter:
-  Severity: "error"
+  Severity: "warn"
   Precondition:
     Include:
     - "spec/coffeescripts/**"
@@ -236,4 +237,4 @@ Simple/NewQunitLinter:
     Statuses:
     - added
   Message: |-
-    Your commit includes new qUnit/karma files. Don't do that. All new tests should be in Jest.
+    Your commit adds new qUnit files but all new tests should be in Jest.

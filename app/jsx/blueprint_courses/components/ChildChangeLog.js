@@ -47,7 +47,7 @@ export default class ChildChangeLog extends Component {
       const title = I18n.t('Loading Change Log')
       return (
         <div className="bcc__change-log__loading" style={{textAlign: 'center'}}>
-          <Spinner title={title} />
+          <Spinner renderTitle={title} />
           <PresentationContent>
             <Text as="p">{title}</Text>
           </PresentationContent>

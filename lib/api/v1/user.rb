@@ -218,7 +218,7 @@ module Api::V1::User
         permissions_account = context.is_a?(Account) ? context : context.account
       end
       !!(
-        permissions_context.grants_any_right?(current_user, :manage_students, :read_sis) ||
+        permissions_context.grants_any_right?(current_user, :manage_students, :read_sis, :view_user_logins) ||
         permissions_account.membership_for_user(current_user) ||
         permissions_account.root_account.grants_right?(current_user, :manage_sis)
       )

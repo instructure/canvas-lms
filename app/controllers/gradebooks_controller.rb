@@ -21,6 +21,7 @@ class GradebooksController < ApplicationController
   include GradebooksHelper
   include KalturaHelper
   include Api::V1::AssignmentGroup
+  include Api::V1::Group
   include Api::V1::GroupCategory
   include Api::V1::Submission
   include Api::V1::CustomGradebookColumn
@@ -657,6 +658,7 @@ class GradebooksController < ApplicationController
 
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
     @disable_unmute_assignment = @assignment.muted && !@assignment.grades_published?
+
     respond_to do |format|
 
       format.html do
@@ -702,7 +704,6 @@ class GradebooksController < ApplicationController
         if new_gradebook_enabled?
           env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
           env[:post_policies_enabled] = true if @context.post_policies_enabled?
-          env[:selected_student_group_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'student_group_id')
         end
 
         if @assignment.quiz
@@ -710,6 +711,37 @@ class GradebooksController < ApplicationController
                                                             @assignment.quiz.id,
                                                             :user_id => "{{user_id}}"
         end
+
+        if @context.filter_speed_grader_by_student_group?
+          env[:filter_speed_grader_by_student_group] = true
+
+          requested_student_id = if @assignment.anonymize_students? && params[:anonymous_id].present?
+            @assignment.submissions.find_by(anonymous_id: params[:anonymous_id])&.user_id
+          elsif !@assignment.anonymize_students?
+            params[:student_id]
+          end
+
+          group_selection = SpeedGrader::StudentGroupSelection.new(current_user: @current_user, course: @context)
+          updated_group_info = group_selection.select_group(student_id: requested_student_id)
+
+          if updated_group_info.group != group_selection.initial_group
+            new_group_id = updated_group_info.group.present? ? updated_group_info.group.id.to_s : nil
+            gradebook_settings(create_if_missing: true).deep_merge!({
+              context.id => {
+                'filter_rows_by' => {
+                  'student_group_id' => new_group_id
+                }
+              }
+            })
+            @current_user.save!
+          end
+
+          if updated_group_info.group.present?
+            env[:selected_student_group] = group_json(updated_group_info.group, @current_user, session)
+          end
+          env[:student_group_reason_for_change] = updated_group_info.reason_for_change if updated_group_info.reason_for_change.present?
+        end
+
         append_sis_data(env)
         js_env(env)
 
@@ -877,9 +909,14 @@ class GradebooksController < ApplicationController
       late_policy: @context.late_policy.as_json(include_root: false),
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       post_policies_enabled: @context.post_policies_enabled?,
-      sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true)
+      sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
+      show_similarity_score: @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
     }
-    new_gradebook_options[:post_manually] = @context.post_manually? if @context.post_policies_enabled?
+
+    if @context.post_policies_enabled?
+      new_gradebook_options[:post_manually] = @context.post_manually?
+      new_gradebook_options[:new_post_policy_icons_enabled] = @context.root_account.feature_enabled?(:new_post_policy_icons)
+    end
 
     {GRADEBOOK_OPTIONS: new_gradebook_options}
   end

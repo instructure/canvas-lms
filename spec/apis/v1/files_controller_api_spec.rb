@@ -369,7 +369,8 @@ describe "Files API", type: :request do
     end
 
     it "creates file locked when usage rights required" do
-      @course.enable_feature!(:usage_rights_required)
+      @course.usage_rights_required = true
+      @course.save!
       api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       attachment = Attachment.where(instfs_uuid: instfs_uuid).first
@@ -377,7 +378,8 @@ describe "Files API", type: :request do
     end
 
     it "creates file unlocked when usage rights not required" do
-      @course.disable_feature!(:usage_rights_required)
+      @course.usage_rights_required = false
+      @course.save!
       api_call(:post, "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       attachment = Attachment.where(instfs_uuid: instfs_uuid).first
@@ -1230,7 +1232,8 @@ describe "Files API", type: :request do
 
     context "with usage_rights_required" do
       before do
-        @course.enable_feature! :usage_rights_required
+        @course.usage_rights_required = true
+        @course.save!
         user_session(@teacher)
         @att.update_attribute(:locked, true)
       end

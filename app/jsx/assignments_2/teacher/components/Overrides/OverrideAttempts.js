@@ -19,7 +19,7 @@ import React from 'react'
 import {bool, oneOf, number} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import {requiredIfDetail} from '../../assignmentData'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {NumberInput} from '@instructure/ui-number-input'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Select} from '@instructure/ui-forms'
@@ -75,7 +75,7 @@ export default class OverrideAttempts extends React.Component {
   renderLimit() {
     const attempts = this.props.allowedAttempts === null ? 'unlimited' : 'limited'
     return (
-      <FlexItem data-testid="OverrideAttempts-Limit" margin="0 small 0 0">
+      <Flex.Item data-testid="OverrideAttempts-Limit" margin="0 small 0 0">
         <Select
           readOnly={this.props.readOnly}
           label={I18n.t('Attempts Allowed')}
@@ -86,7 +86,7 @@ export default class OverrideAttempts extends React.Component {
           <option value="limited">{I18n.t('Limited')}</option>
           <option value="unlimited">{I18n.t('Unlimited')}</option>
         </Select>
-      </FlexItem>
+      </Flex.Item>
     )
   }
 
@@ -96,7 +96,7 @@ export default class OverrideAttempts extends React.Component {
       const label = I18n.t({one: 'Attempt', other: 'Attempts'}, {count: limit})
 
       return (
-        <FlexItem margin="small 0 0" data-testid="OverrideAttempts-Attempts">
+        <Flex.Item margin="small 0 0" data-testid="OverrideAttempts-Attempts">
           <NumberInput
             readOnly={this.props.readOnly}
             inline
@@ -113,7 +113,7 @@ export default class OverrideAttempts extends React.Component {
               <Text>{label}</Text>
             </View>
           </PresentationContent>
-        </FlexItem>
+        </Flex.Item>
       )
     }
     return null

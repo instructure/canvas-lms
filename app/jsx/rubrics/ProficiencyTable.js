@@ -264,7 +264,7 @@ export default class ProficiencyTable extends React.Component {
   renderSpinner() {
     return (
       <div style={{textAlign: 'center'}}>
-        <Spinner title={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
+        <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
       </div>
     )
   }

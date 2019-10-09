@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {Tooltip} from '@instructure/ui-overlays'
 import {Button} from '@instructure/ui-buttons'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 import LatePolicyToolTipContent from './LatePolicyToolTipContent'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -32,10 +32,10 @@ function LatePolicyStatusDisplay(props) {
   return (
     <div data-testid="late-policy-container">
       <Flex justifyItems="end">
-        <FlexItem padding="none xxx-small none none">
+        <Flex.Item padding="none xxx-small none none">
           <Text size="medium">{I18n.t('Late Policy:')}</Text>
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <Tooltip
             tip={
               <LatePolicyToolTipContent
@@ -65,7 +65,7 @@ function LatePolicyStatusDisplay(props) {
               </Text>
             </Button>
           </Tooltip>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </div>
   )

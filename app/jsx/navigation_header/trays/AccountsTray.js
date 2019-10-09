@@ -20,7 +20,7 @@ import I18n from 'i18n!new_nav'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-layout'
-import {Heading, List, ListItem, Spinner} from '@instructure/ui-elements'
+import {Heading, List, Spinner} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 
 export default function AccountsTray({accounts, hasLoaded}) {
@@ -31,19 +31,19 @@ export default function AccountsTray({accounts, hasLoaded}) {
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           accounts.map(account =>
-            <ListItem key={account.id}>
+            <List.Item key={account.id}>
               <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/accounts/${account.id}`}>{account.name}</Button>
-            </ListItem>
+            </List.Item>
           ).concat([
-            <ListItem key="hr"><hr role="presentation"/></ListItem>,
-            <ListItem key="all">
+            <List.Item key="hr"><hr role="presentation"/></List.Item>,
+            <List.Item key="all">
               <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/accounts">{I18n.t('All Accounts')}</Button>
-            </ListItem>
+            </List.Item>
           ])
         ) : (
-          <ListItem>
+          <List.Item>
             <Spinner size="small" title={I18n.t('Loading')} />
-          </ListItem>
+          </List.Item>
         )}
       </List>
     </View>

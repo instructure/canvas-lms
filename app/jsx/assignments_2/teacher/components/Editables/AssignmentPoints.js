@@ -22,7 +22,7 @@ import I18n from 'i18n!assignments_2'
 
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 
 import EditableNumber from './EditableNumber'
@@ -100,7 +100,7 @@ export default class AssignmentPoints extends React.Component {
     return (
       <div style={sty} data-testid="AssignmentPoints">
         <Flex alignItems="center" justifyItems="end">
-          <FlexItem margin="0 x-small 0 0">
+          <Flex.Item margin="0 x-small 0 0">
             <EditableNumber
               mode={this.props.mode}
               inline
@@ -114,10 +114,10 @@ export default class AssignmentPoints extends React.Component {
               required
               readOnly={this.props.readOnly}
             />
-          </FlexItem>
-          <FlexItem>
+          </Flex.Item>
+          <Flex.Item>
             <Text size="large">{label}</Text>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
         {msg}
       </div>

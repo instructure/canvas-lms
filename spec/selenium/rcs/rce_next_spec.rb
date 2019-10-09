@@ -483,6 +483,7 @@ describe "RCE next tests" do
     end
 
     it "should open upload media modal when clicking upload option" do
+      skip('Unskip after adding upload option back COREFE-268')
       visit_front_page_edit(@course)
 
       click_more_toolbar_button
@@ -573,31 +574,45 @@ describe "RCE next tests" do
         driver.switch_to.default_content
         expect(f('.tox-pop__dialog button[title="Show link options"]')).to eq(driver.switch_to.active_element)
       end
+    end
 
-      it "should display lti icon with a tool enabled for the course" do
+    describe 'lti tool integration' do
+      before(:each) do
         # set up the lti tool
         @tool = Account.default.context_external_tools.new({
-           :name => "Commons",
-           :domain => "canvaslms.com",
-           :consumer_key => '12345',
-           :shared_secret => 'secret'
+          :name => "Commons",
+          :domain => "canvaslms.com",
+          :consumer_key => '12345',
+          :shared_secret => 'secret'
         })
         @tool.set_extension_setting(:editor_button, {
-           :message_type => "ContentItemSelectionRequest",
-           :url => "http://www.example.com",
-           :icon_url => "https://lor.instructure.com/img/icon_commons.png",
-           :text => "Commons Favorites",
-           :enabled => "true",
-           :use_tray => "true"
+          :message_type => "ContentItemSelectionRequest",
+          :url => "http://www.example.com",
+          :icon_url => "https://lor.instructure.com/img/icon_commons.png",
+          :text => "Commons Favorites",
+          :enabled => "true",
+          :use_tray => "true"
         })
         @tool.save!
+      end
 
+      it "should display lti icon with a tool enabled for the course" do
         page_title = "Page1"
         create_wiki_page_with_embedded_image(page_title)
 
         visit_existing_wiki_edit(@course, page_title)
 
         expect(lti_tools_button).to be_displayed
+      end
+
+      it "should display the lti tool modal" do
+        page_title = "Page1"
+        create_wiki_page_with_embedded_image(page_title)
+
+        visit_existing_wiki_edit(@course, page_title)
+        lti_tools_button.click
+
+        expect(lti_tools_modal).to be_displayed
       end
     end
   end

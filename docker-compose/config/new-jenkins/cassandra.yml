@@ -1,0 +1,25 @@
+test:
+   page_views:
+     servers:
+       - cassandra:9160
+     keyspace: page_views
+     retries: 10
+     connect_timeout: 15
+     timeout: 15
+
+   auditors:
+     servers:
+       - cassandra:9160
+     keyspace: auditors
+     retries: 10
+     connect_timeout: 15
+     timeout: 15
+
+   global_lookups:
+     servers:
+       - cassandra:9160
+     keyspace: global_lookups
+     retries: 10
+     connect_timeout: 15
+     auto_snapshot: false
+     timeout: 15
