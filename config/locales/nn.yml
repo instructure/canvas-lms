@@ -2593,6 +2593,7 @@ nn:
   assessment_question_id_4eacadb3: "ID for vurderingsspørsmål"
   assessment_title_7ab69b66: vurderingstittel
   assessment_type_81a73b9c: vurderingstype
+  asset_string_ddeaf719: Streng
   assign_eedf72bb: Tilordne
   assign_reviews_on_date_7e48ec50: "Tilordne gjennomgangar etter dato"
   assign_to_6b806cd9: "Tilordne til: "
@@ -2684,6 +2685,10 @@ nn:
       Oppgåveresultat er synlege for studentar med ein gong dei er lagde inn.\n\
       Vurderingsresultat som allereie er skjulte er framleis skjulte. "
   assignment_grades_will_be_visible_to_students_as_s_8c19fa1: "Oppgåvevurderingar er synlege for studentar med ein gong dei er lagde inn."
+  assignment_grades_will_be_visible_to_students_as_s_bfbea571: |-
+      
+      Oppgåveresultat er synlege for studentar med ein gong dei er lagde inn.
+      Vurderingsresultat som allereie er skjulte er framleis skjulte.
   assignment_group: 
     default_name: Oppgåver
     default_title: Oppgåver
@@ -3557,6 +3562,7 @@ nn:
   before_publishing_your_course_you_must_either_publ_cdfdc78c: "Innan du publiserar emnet ditt må du enten publisere ein modul eller velje ein annan heimeside. "
   before_publishing_your_course_you_must_either_publ_cf84cad9: "Før du publiserer emnet ditt må du enten publisere ein modul frå modulsida, eller velje ein annan heimeside."
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Før du kan redigere profilen, må du stadfeste e-postadressa di (%{email}) ved å klikke på lenka i e-posten vi har sendt deg. Dersom du ikkje har motteke e-posten, kan du *klikke for å sende e-post på nytt*, men du må også sjå etter i søppelpost."
+  begin_typing_to_search_7daa7b1: "Skriv for å søke"
   beginning_date_2d2a29ac: Startdato
   behind_31e4e0fe: Etter
   belarusian_b2f19c76: Kviterussisk
@@ -10488,6 +10494,7 @@ nn:
   importing_course_content_into_the_same_course_will_b09c69e: "Import av emneinnhald til det same emnet vil duplisere innhaldet du først importerte og overskrive duplikata hvis du gjentek handlinga. "
   importing_name_8f2b131d: "Importerer \"%{name}\""
   importing_outcomes_e62a0375: "Importerer læringsmål"
+  improve_accessibility_of_left_hand_menu_through_be_908fb002: "Auk tilgjengelegheita til venstremenyen gjennom betre bruk av fargar, i tillegg til visuelle indikatorar og skjermlesarindikatorar for inaktive menyelement. "
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "i %{asset_link} klikkar studentane på %{bad_link}, som går til ei side i emnet ditt som ikkje eksisterar. "
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "I %{asset_link} klikkar studentane på %{bad_link} for å komme til innhald i eit anna emne."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "I %{asset_link} klikkar studentane på %{bad_link} for å komme til innhald dei ikkje har tilgang til."
@@ -13648,6 +13655,7 @@ nn:
   no_due_date_6e6a23c1: "(ingen innleveringsfrist)"
   no_e16d9132: Nei
   no_email_8585ad7e: "Ingen e-post"
+  no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Kunne ikkje finne eksisterande brukar for innlogging med SIS-ID %{user_id}"
   no_exports_to_display_7f1b630b: "Ingen eksportar å vise"
   no_file_submitted_a879fa53: "Inga fil er levert"
   no_final_grade_selected_3595c9c: "Ingen sluttkarakter er vald"
@@ -13670,6 +13678,7 @@ nn:
   no_matching_users_found_83889c10: "Finn ikkje samsvarande brukarar."
   no_migration_file: "Fil er nødvendig for overføring av innhald."
   no_module_assigned_ca183bd7: "Ingen modul er tilordna"
+  no_more_results_17c4f108: "Ingen fleire resultat"
   no_more_results_to_load_6774fb1c: "Ikkje fleire resultat å laste."
   no_outcome_file_or_authority_given_c90f9c5f: "Resultatfil eller autoritet er ikkje gitt"
   no_password_was_given_472222e5: "Passord er ikkje oppgitt"
@@ -17781,6 +17790,7 @@ nn:
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Sjå LTI-verktøy som fungerer bra med Canvas."
   see_turnitin_results_cd9d4a6c: "Sjå Turnitin-resultat"
   select_1e849959: "[ Vel ]"
+  select_a_course_4710371f: "Vel eit emne"
   select_a_grading_period_5ea50f1: "Vel ei karaktersetjingsperiode..."
   select_a_grading_period_aab25483: "Vel ei karaktersetjingsperiode"
   select_a_log_type_to_search_247fc6b4: "Vel ein loggtype å søke etter."
@@ -17926,6 +17936,7 @@ nn:
   send_this_module_to_another_user_50cb27c8: "Send modul til ein annan brukar..."
   send_title_to_user_526320bb: "Send {%title} til brukar"
   send_to_7881bf0e: "Send til..."
+  send_to_a879095e: "Send til:"
   send_to_b940900a: "Send til..."
   send_to_ce05b460: "Send til"
   sending_bf324366: Sender...
@@ -19498,6 +19509,7 @@ nn:
     tab_location_error: "Faneplasseringa er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikkje behandlast"
   tabs_5605547e: Faner
+  tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
   take_a_picture_d582acf1: "Ta eit bilde"
   take_a_snapshot_now_5b622d85: "Ta eit augneblinksbilde no"
@@ -20311,6 +20323,10 @@ nn:
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_bd8aada1: |-
       For å moderere ein quiz, må 'Oppgåver og Quizar - legg til / endre / slett' òg vere slått på..
       For å sjå kolonna for brukar-SIS-ID i CSV-fila til quizelementanalyse, må 'SIS-data - les' òg vere slått på.
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_ca1e4e6a: |-
+      For å moderere ein quiz, må 'Oppgåver og quizar - legg til / endre / slett òg vere slått på.
+      For å sjå kolonna for brukar-SIS-ID i CSV-fila for analyse av quizelement, må 'SIS-data - les' òg vere slått på.
+      For å sjå innleveringsloggen, må 'Quizar - vis innleveringslogg' òg vere slått på.
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "For å moderere ein quiz må 'Vurderingar - endre' òg vere slått på."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "For å moderere vurderingar må 'Vurderingar - vel moderering av sluttvurdering' òg  vere slått på."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "For å få ein klient-ID, må kontoadministrator generere ein LTI-utviklarnøkkel."
@@ -20494,6 +20510,7 @@ nn:
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' er ikkje ein gyldig bildetype (prøv JPG, PNG eller GIF)"
   type_of_change_1cb24a0e: "Type endring"
   type_of_item_8a37f69d: "Type element"
+  type_to_search_de63ad38: "Skriv for å søke"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Uff. Kontakt ein Catalog-utviklar. Feilmelding: %{message}"
   ukrainian_945b00b7: Ukrainsk
   unable_to_accept_update_fd53a7e2: "Kan ikkje oppdatere"
