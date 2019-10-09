@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :redis do
-  gem 'redis', '4.0.1'
+  gem 'redis', '4.1.3'
   gem 'redis-scripting', '1.0.1'
 
   gem 'digest-murmurhash', '1.1.1'
