@@ -1,4 +1,27 @@
-development:
+common: &default_settings
   logger: rails
+  
+  # Log Level seems like the only setting here we would want to change without a code release.
+  log_level: <%= ENV['LOG_LEVEL'] %> 
+
+development:
+  <<: *default_settings
   log_context: false
-  log_level: debug
+
+test:
+  <<: *default_settings
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings
+
+# Another option we could setup.
+#  logger: syslog
+#  app_ident: canvas-lms
+#  daemon_ident: canvas-lms-daemon
+#  include_pid: false
+#  facilities:
+#  - user
+#  - local3
