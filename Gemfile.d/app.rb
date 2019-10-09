@@ -97,8 +97,8 @@ gem 'multi_json', '1.13.1'
 gem 'netaddr', '1.5.1', require: false
 gem 'nokogiri', '1.10.4', require: false
 gem 'oauth', '0.5.4', require: false
-gem 'parallel', '1.12.1', require: false
-  gem 'ruby-progressbar', '1.9.0', require: false # used to show progress of S3Uploader
+gem 'parallel', '1.18.0', require: false
+  gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'retriable', '1.4.1'
 gem 'rake', '12.3.1'
 gem 'ratom-nokogiri', '0.10.8', require: false
