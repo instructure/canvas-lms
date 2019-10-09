@@ -462,7 +462,7 @@ module ApplicationHelper
 
     # TODO: get these kaltura settings out of the global INST object completely.
     # Only load them when trying to record a video
-    if @context.try_rescue(:allow_media_comments?)
+    if @context.try_rescue(:allow_media_comments?) || controller_name == 'conversations'
       kalturaConfig = CanvasKaltura::ClientV3.config
       if kalturaConfig
         global_inst_object[:allowMediaComments] = true
