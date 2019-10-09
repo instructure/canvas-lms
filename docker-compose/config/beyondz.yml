@@ -1,29 +1,28 @@
+common: &default_settings
+  base_url: <%= ENV['BZ_BASE_URL'] %>
+  change_password_path: <%= ENV['BZ_CHANGE_PASSWORD_PATH'] %>
+  nonexistent_user_path: <%= ENV['BZ_NONEXISTENT_USER_PATH'] %>
+  bitly_access_token: <%= ENV['BZ_BITLY_ACCESS_TOKEN'] %>
+  help_url: <%= ENV['BZ_HELP_URL'] %>
+  docusign_api_key: <%= ENV['BZ_DOCUSIGN_API_KEY'] %>
+  docusign_api_secret: <%= ENV['BZ_DOCUSIGN_API_SECRET'] %>
+  docusign_host: <%= ENV['BZ_DOCUSIGN_HOST'] %>
+  docusign_return_url: <%= ENV['BZ_DOCUSIGN_RETURN_URL'] %>
+  qualtrics_library_id: <%= ENV['BZ_QUALTRICS_LIBRARY_ID'] %>
+  qualtrics_api_token: <%= ENV['BZ_QUALTRICS_API_TOKEN'] %>
+  qualtrics_host: <%= ENV['BZ_QUALTRICS_HOST'] %>
+
 development:
-  base_url: http://canvasweb
-  change_password_path: /users/edit
-  nonexistent_user_path: /users/not_on_lms
-  bitly_access_token: 12345689assdfe
-  help_url: http://helpweb
-  docusign_api_key: TODO
-  docusign_api_secret: TODO
-  docusign_host: TODO
-  docusign_return_url: TODO
-  qualtrics_library_id: TODO
-  qualtrics_api_token: TODO
-  qualtrics_host: TODO
+  <<: *default_settings
   dev_tools_enabled: true
 
 test:
-  base_url: https://test.bebraven.org/
-  change_password_path: /users/edit
-  nonexistent_user_path: /users/not_on_lms
-  bitly_access_token: 12345689assdfe
-  help_url: http://helpweb
-  docusign_api_key: TODO
-  docusign_api_secret: TODO
-  docusign_host: TODO
-  docusign_return_url: TODO
-  qualtrics_library_id: TODO
-  qualtrics_api_token: TODO
-  qualtrics_host: TODO
+  <<: *default_settings
   dev_tools_enabled: true
+
+staging:
+  <<: *default_settings
+  dev_tools_enabled: true
+
+production:
+  <<: *default_settings
