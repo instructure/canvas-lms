@@ -23,6 +23,7 @@ else
 fi
 
 cp -a /app/docker-compose/config/* /app/config/
+cp -a /app/docker-compose/.env /app/.env
 
 echo "Checking if the AWS ENV vars are setup"
 if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then

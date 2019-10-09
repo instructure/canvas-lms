@@ -17,6 +17,10 @@ else
   gem 'activesupport-json_encoder', '1.1.0'
 end
 
+# Support for configurign our environment variables using a .env file.
+# See https://github.com/bkeepers/dotenv#can-i-use-dotenv-in-production
+gem 'dotenv-rails'
+
 gem 'ruby-openid'
 
 gem 'encrypted_cookie_store-instructure', '1.1.12', require: 'encrypted_cookie_store'

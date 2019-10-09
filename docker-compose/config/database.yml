@@ -1,20 +1,27 @@
-common: &common
+common: &default_settings
   adapter: postgresql
-  host: canvasdb
+  host: <%= ENV['PGHOST'] %> 
   encoding: utf8
-  username: canvas
+  database: <%= ENV['PGDATABASE'] %>
+  username: <%= ENV['PGUSER'] %>
   timeout: 5000
-  prepared_statements: false
 
 development:
-  <<: *common
-  database: canvas
+  <<: *default_settings
   open: true
 
 test:
-  <<: *common
+  <<: *default_settings
   database: canvas_test_rails3_<%= ENV['TEST_ENV_NUMBER'] %>
   shard1: canvas_test_rails3_shard1
   shard2: canvas_test_rails3_shard2
   test_shard_1: canvas_test_rails3_shard1
   test_shard_2: canvas_test_rails3_shard2
+
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings
+

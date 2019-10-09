@@ -10,6 +10,11 @@
 #
 # That's what .git/info/exclude and core.excludesfile are for :)
 
+# See https://github.com/bkeepers/dotenv#can-i-use-dotenv-in-production
+# for more info about why these are the only .env files we .gitignore
+/.env
+.env.*.local
+
 .bundle/
 .byebug_history
 /.yardoc/
@@ -87,8 +92,6 @@ docker-compose.override.yml
 
 # Local Development only files
 *.dev
-.env
-
 
 # ignore JetBrains IDEs files
 .idea/*
