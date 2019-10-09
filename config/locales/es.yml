@@ -19864,8 +19864,8 @@ es:
           
           Los alumnos podrán ver que esta tarea está silenciada.
           
-          ¿Está seguro que deseas silenciar esta tarea? Si decides hacerlo,
-          podrás activarla de nuevo seleccionando la opción "Activar tarea".
+          Si decides hacerlo, podrás activarla de
+          nuevo seleccionando la opción "Activar tarea".
     new_course_form: 
       cancel: Cancelar
       course_cose_explanation: "Esto se mostrará en lugares con poco espacio"
