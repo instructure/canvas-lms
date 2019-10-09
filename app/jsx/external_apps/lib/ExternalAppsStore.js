@@ -54,6 +54,9 @@ store.reset = function() {
 }
 
 store.fetch = function() {
+  if (this.getState().isLoading) {
+    return
+  }
   const url =
     this.getState().links.next ||
     '/api/v1' + ENV.CONTEXT_BASE_URL + '/lti_apps?per_page=' + PER_PAGE
@@ -88,7 +91,7 @@ store.save = function(configurationType, data, success, error) {
   const params = this._generateParams(configurationType, data)
 
   // Don't send shared secret if it hasn't changed //
-  if (params.shared_secret == 'N/A') {
+  if (params.shared_secret === 'N/A') {
     delete params.shared_secret
   }
 
@@ -191,7 +194,6 @@ store.activate = function(tool, success, error) {
 }
 
 store.deactivate = function(tool, success, error) {
-  const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id
   const tools = _.map(this.getState().externalTools, t => {
     if (t.app_id === tool.app_id) {
       t.enabled = false

@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import I18n from 'i18n!external_tools'
 import _ from 'underscore'
 import createStore from '../../shared/helpers/createStoreJestCompatible'
 import ExternalAppsStore from './ExternalAppsStore'
@@ -108,6 +107,7 @@ store.flagAppAsInstalled = function(shortName) {
 
 store._fetchSuccessHandler = function(apps, status, xhr) {
   const links = parseLinkHeader(xhr)
+  let tools = apps
   if (links.current !== links.first) {
     tools = this.getState().apps.concat(apps)
   }
@@ -116,13 +116,14 @@ store._fetchSuccessHandler = function(apps, status, xhr) {
     links,
     isLoading: false,
     isLoaded: true,
-    apps: sort(apps),
+    apps: sort(tools),
     hasMore: !!links.next
   })
 
   // Update the installed app list in case this is a reload from
   // installing a tool from the app center
   ExternalAppsStore.reset()
+  ExternalAppsStore.fetch()
 }
 
 store._fetchErrorHandler = function() {
