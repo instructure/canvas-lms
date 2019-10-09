@@ -9,6 +9,18 @@
     </div>
   </div>
 {{/if}}
+
+{{#if ENV.NO_AUTO_DATES_NAG}}
+  <div class="course-dates-nag">
+    <i class="icon-warning"></i>
+    <div>
+      <span>Auto-due-dates are disabled for future imports.</span>
+      Please be aware that when adding content a previously imported/copied course,
+      due dates will not be added and content will need to be manually sequenced.
+    </div>
+  </div>
+{{/if}}
+
 <div class="control-group">
   <label class="control-label" for="chooseMigrationConverter"><strong>{{#t "import_from_label"}}Content Type{{/t}}</strong></label>
   <div class="controls">
