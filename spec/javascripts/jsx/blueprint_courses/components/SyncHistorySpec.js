@@ -30,7 +30,7 @@ const defaultProps = () => ({
   loadAssociations: () => {},
   isLoadingAssociations: false,
   hasLoadedAssociations: false,
-  migrations: getSampleData().history,
+  migrations: getSampleData().history
 })
 
 test('renders the SyncHistory component', () => {

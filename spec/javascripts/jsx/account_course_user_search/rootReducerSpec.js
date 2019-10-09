@@ -147,7 +147,8 @@ test('GOT_USERS action reducer', () => {
         }
       ],
       xhr: {
-        getResponseHeader: sandbox.mock()
+        getResponseHeader: sandbox
+          .mock()
           .withArgs('Link')
           .returns(LinkHeader)
       }

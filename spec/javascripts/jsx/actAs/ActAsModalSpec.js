@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import ActAsModal from 'jsx/actAs/ActAsModal'
 import ActAsMask from 'jsx/actAs/ActAsMask'
 import ActAsPanda from 'jsx/actAs/ActAsPanda'
@@ -25,7 +25,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Avatar, Table, Text, Spinner} from '@instructure/ui-elements'
 
 QUnit.module('ActAsModal', {
-  setup () {
+  setup() {
     this.props = {
       user: {
         name: 'test user',
@@ -34,21 +34,24 @@ QUnit.module('ActAsModal', {
         avatar_image_url: 'testImageUrl',
         sortable_name: 'bar, baz',
         email: 'testUser@test.com',
-        pseudonyms: [{
-          login_id: 'qux',
-          sis_id: 555,
-          integration_id: 222
-        }, {
-          login_id: 'tic',
-          sis_id: 777,
-          integration_id: 888
-        }]
+        pseudonyms: [
+          {
+            login_id: 'qux',
+            sis_id: 555,
+            integration_id: 222
+          },
+          {
+            login_id: 'tic',
+            sis_id: 777,
+            integration_id: 888
+          }
+        ]
       }
     }
   }
 })
 
-test('it renders with panda svgs, user avatar, table, and proceed button present', function () {
+test('it renders with panda svgs, user avatar, table, and proceed button present', function() {
   const wrapper = shallow(<ActAsModal {...this.props} />)
   const mask = wrapper.find(ActAsMask)
   const panda = wrapper.find(ActAsPanda)
@@ -59,7 +62,7 @@ test('it renders with panda svgs, user avatar, table, and proceed button present
   ok(button.exists())
 })
 
-test('it renders avatar with user image url', function () {
+test('it renders avatar with user image url', function() {
   const wrapper = shallow(<ActAsModal {...this.props} />)
   const avatar = wrapper.find(Avatar)
 
@@ -67,15 +70,15 @@ test('it renders avatar with user image url', function () {
   equal(avatar.props().src, 'testImageUrl')
 })
 
-test('it renders the table with correct user information', function () {
+test('it renders the table with correct user information', function() {
   const wrapper = shallow(<ActAsModal {...this.props} />)
   const tables = wrapper.find(Table)
 
   ok(tables.length === 3)
 
   const textContent = []
-  tables.find('tr').forEach((row) => {
-    row.find(Text).forEach((rowContent) => {
+  tables.find('tr').forEach(row => {
+    row.find(Text).forEach(rowContent => {
       textContent.push(rowContent.props().children)
     })
   })
@@ -86,14 +89,14 @@ test('it renders the table with correct user information', function () {
   ok(tableText.indexOf(user.short_name) > -1)
   ok(tableText.indexOf(user.sortable_name) > -1)
   ok(tableText.indexOf(user.email) > -1)
-  user.pseudonyms.forEach((pseudonym) => {
+  user.pseudonyms.forEach(pseudonym => {
     ok(tableText.indexOf(pseudonym.login_id) > -1)
     ok(tableText.indexOf(pseudonym.sis_id) > -1)
     ok(tableText.indexOf(pseudonym.integration_id) > -1)
   })
 })
 
-test('it should only display loading spinner if state is loading', function (assert) {
+test('it should only display loading spinner if state is loading', function(assert) {
   const done = assert.async()
   const wrapper = shallow(<ActAsModal {...this.props} />)
   notOk(wrapper.find(Spinner).exists())

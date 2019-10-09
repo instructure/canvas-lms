@@ -33,11 +33,8 @@ QUnit.module('ChildCourse class', {
   }
 })
 
-const defaultData = () => select(getSampleData(), [
-  'terms',
-  'masterCourse',
-  ['childCourse', 'course'],
-])
+const defaultData = () =>
+  select(getSampleData(), ['terms', 'masterCourse', ['childCourse', 'course']])
 
 test('mounts ChildContent to container component', () => {
   child = new ChildCourse(container, defaultData())
@@ -56,9 +53,16 @@ test('change log route onEnter calls app showChangeLog with params from URL', ()
   child = new ChildCourse(container, defaultData())
   child.render()
   child.app.showChangeLog = sinon.spy()
-  child.routes[0].onEnter({ params: { blueprintType: 'template', templateId: '2', changeId: '3' } }, () => {})
+  child.routes[0].onEnter(
+    {params: {blueprintType: 'template', templateId: '2', changeId: '3'}},
+    () => {}
+  )
   equal(child.app.showChangeLog.callCount, 1)
-  deepEqual(child.app.showChangeLog.getCall(0).args[0], { blueprintType: 'template', templateId: '2', changeId: '3' })
+  deepEqual(child.app.showChangeLog.getCall(0).args[0], {
+    blueprintType: 'template',
+    templateId: '2',
+    changeId: '3'
+  })
 
   child.app.hideChangeLog = sinon.spy()
   child.routes[0].onExit({}, () => {})
