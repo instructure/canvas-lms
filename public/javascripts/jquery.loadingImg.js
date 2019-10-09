@@ -18,108 +18,110 @@
 
 import $ from 'jquery'
 
-  // Shows an ajax-loading image on the given object.
-  $.fn.loadingImg = function(options) {
-    if(!this || this.length === 0) {
-      return this;
-    }
-    var $obj = this.filter(":first");
-    var list;
-    if(options === "hide" || options === "remove") {
-      $obj.children(".loading_image").remove();
-      list = $obj.data('loading_images') || [];
-      list.forEach(item => {
-        if(item) {
-          item.remove();
-        }
-      });
-      $obj.data('loading_images', null);
-      return this;
-    } else if(options === "remove_once") {
-      $obj.children(".loading_image").remove();
-      list = $obj.data('loading_images') || [];
-      var img = list.pop();
-      if(img) { img.remove(); }
-      $obj.data('loading_images', list);
-      return this;
-    } else if (options == "register_image" && arguments.length == 3) {
-      $.fn.loadingImg.image_files[arguments[1]] = arguments[2];
-    }
-    options = $.extend({}, $.fn.loadingImg.defaults, options);
-    var image = $.fn.loadingImg.image_files['normal'];
-    if(options.image_size && $.fn.loadingImg.image_files[options.image_size]) {
-      image = $.fn.loadingImg.image_files[options.image_size];
-    }
-    if(options.paddingTop) {
-      options.vertical = options.paddingTop;
-    }
-    var paddingTop = 0;
-    if(options.vertical) {
-      if(options.vertical == "top") {
-      } else if(options.vertical == "bottom") {
-        paddingTop = $obj.outerHeight();
-      } else if(options.vertical == "middle")  {
-        paddingTop = ($obj.outerHeight() / 2) - (image.height / 2);
-      } else {
-        paddingTop = parseInt(options.vertical, 10);
-        if(isNaN(paddingTop)) {
-          paddingTop = 0;
-        }
+// Shows an ajax-loading image on the given object.
+$.fn.loadingImg = function(options) {
+  if (!this || this.length === 0) {
+    return this
+  }
+  const $obj = this.filter(':first')
+  let list
+  if (options === 'hide' || options === 'remove') {
+    $obj.children('.loading_image').remove()
+    list = $obj.data('loading_images') || []
+    list.forEach(item => {
+      if (item) {
+        item.remove()
       }
+    })
+    $obj.data('loading_images', null)
+    return this
+  } else if (options === 'remove_once') {
+    $obj.children('.loading_image').remove()
+    list = $obj.data('loading_images') || []
+    const img = list.pop()
+    if (img) {
+      img.remove()
     }
-    var paddingLeft = 0;
-    if(options.horizontal) {
-      if(options.horizontal == "left") {
-      } else if(options.horizontal == "right") {
-        paddingLeft = $obj.outerWidth() - image.width;
-      } else if(options.horizontal == "middle")  {
-        paddingLeft = ($obj.outerWidth() / 2) - (image.width / 2);
-      } else {
-        paddingLeft = parseInt(options.horizontal, 10);
-        if(isNaN(paddingLeft)) {
-          paddingLeft = 0;
-        }
-      }
-    }
-    var zIndex = $obj.zIndex() + 1;
-    var $imageHolder = $(document.createElement('div')).addClass('loading_image_holder');
-    var $image = $(document.createElement('img')).attr('src', image.url);
-    $imageHolder.append($image);
-    list = $obj.data('loading_images') || [];
-    list.push($imageHolder);
-    $obj.data('loading_images', list);
-
-    if(!$obj.css('position') || $obj.css('position') == "static") {
-      var offset = $obj.offset();
-      var top = offset.top, left = offset.left;
-      if(options.vertical) {
-        top += paddingTop;
-      }
-      if(options.horizontal) {
-        left += paddingLeft;
-      }
-      $imageHolder.css({
-        zIndex: zIndex,
-        position: "absolute",
-        top: top,
-        left: left
-      });
-      $("body").append($imageHolder);
+    $obj.data('loading_images', list)
+    return this
+  } else if (options == 'register_image' && arguments.length == 3) {
+    $.fn.loadingImg.image_files[arguments[1]] = arguments[2]
+  }
+  options = $.extend({}, $.fn.loadingImg.defaults, options)
+  let image = $.fn.loadingImg.image_files.normal
+  if (options.image_size && $.fn.loadingImg.image_files[options.image_size]) {
+    image = $.fn.loadingImg.image_files[options.image_size]
+  }
+  if (options.paddingTop) {
+    options.vertical = options.paddingTop
+  }
+  let paddingTop = 0
+  if (options.vertical) {
+    if (options.vertical == 'top') {
+    } else if (options.vertical == 'bottom') {
+      paddingTop = $obj.outerHeight()
+    } else if (options.vertical == 'middle') {
+      paddingTop = $obj.outerHeight() / 2 - image.height / 2
     } else {
-      $imageHolder.css({
-        zIndex: zIndex,
-        position: "absolute",
-        top: paddingTop,
-        left: paddingLeft
-      });
-      $obj.append($imageHolder);
+      paddingTop = parseInt(options.vertical, 10)
+      if (isNaN(paddingTop)) {
+        paddingTop = 0
+      }
     }
-    return $(this);
-  };
-  $.fn.loadingImg.defaults = {paddingTop: 0, image_size: 'normal', vertical: 0, horizontal: 0};
-  $.fn.loadingImg.image_files = {
-    normal: {url: '/images/ajax-loader.gif', width: 32, height: 32},
-    small: {url: '/images/ajax-loader-small.gif', width: 16, height: 16}
-  };
-  $.fn.loadingImage = $.fn.loadingImg;
-  
+  }
+  let paddingLeft = 0
+  if (options.horizontal) {
+    if (options.horizontal == 'left') {
+    } else if (options.horizontal == 'right') {
+      paddingLeft = $obj.outerWidth() - image.width
+    } else if (options.horizontal == 'middle') {
+      paddingLeft = $obj.outerWidth() / 2 - image.width / 2
+    } else {
+      paddingLeft = parseInt(options.horizontal, 10)
+      if (isNaN(paddingLeft)) {
+        paddingLeft = 0
+      }
+    }
+  }
+  const zIndex = $obj.zIndex() + 1
+  const $imageHolder = $(document.createElement('div')).addClass('loading_image_holder')
+  const $image = $(document.createElement('img')).attr('src', image.url)
+  $imageHolder.append($image)
+  list = $obj.data('loading_images') || []
+  list.push($imageHolder)
+  $obj.data('loading_images', list)
+
+  if (!$obj.css('position') || $obj.css('position') == 'static') {
+    const offset = $obj.offset()
+    let top = offset.top,
+      left = offset.left
+    if (options.vertical) {
+      top += paddingTop
+    }
+    if (options.horizontal) {
+      left += paddingLeft
+    }
+    $imageHolder.css({
+      zIndex,
+      position: 'absolute',
+      top,
+      left
+    })
+    $('body').append($imageHolder)
+  } else {
+    $imageHolder.css({
+      zIndex,
+      position: 'absolute',
+      top: paddingTop,
+      left: paddingLeft
+    })
+    $obj.append($imageHolder)
+  }
+  return $(this)
+}
+$.fn.loadingImg.defaults = {paddingTop: 0, image_size: 'normal', vertical: 0, horizontal: 0}
+$.fn.loadingImg.image_files = {
+  normal: {url: '/images/ajax-loader.gif', width: 32, height: 32},
+  small: {url: '/images/ajax-loader-small.gif', width: 16, height: 16}
+}
+$.fn.loadingImage = $.fn.loadingImg

@@ -30,20 +30,20 @@ $.getJSON = function(url, data, _callback) {
 }
 // Wrapper for default $.ajax behavior.  On error will call
 // the default error method if no error method is provided.
-$.ajaxJSON = function(url, submit_type, data={}, success, error, options) {
-  if(!url && error) {
-    error(null, null, "URL required for requests", null)
+$.ajaxJSON = function(url, submit_type, data = {}, success, error, options) {
+  if (!url && error) {
+    error(null, null, 'URL required for requests', null)
     return
   }
-  url = url || "."
-  if(
-    submit_type !== "GET" &&
+  url = url || '.'
+  if (
+    submit_type !== 'GET' &&
     // if it's a json request and has already been JSON.stringify'ed,
     //  then we can't attach properties to `data` since it's already a string
     typeof data !== 'string'
   ) {
     data._method = submit_type
-    submit_type = "POST"
+    submit_type = 'POST'
     data.authenticity_token = authenticity_token()
   }
   const ajaxError = function(xhr, textStatus, errorThrown) {
@@ -51,17 +51,17 @@ $.ajaxJSON = function(url, submit_type, data={}, success, error, options) {
       return // request aborted, do nothing
     }
     let data = xhr
-    if(xhr.responseText) {
-      const text = xhr.responseText.replace(/(<([^>]+)>)/ig,"")
-      data = { message: text }
+    if (xhr.responseText) {
+      const text = xhr.responseText.replace(/(<([^>]+)>)/gi, '')
+      data = {message: text}
       try {
         data = $.parseJSON(xhr.responseText)
-      } catch(e) { }
+      } catch (e) {}
     }
-    if(options && options.skipDefaultError) {
+    if (options && options.skipDefaultError) {
       $.ajaxJSON.ignoredXHRs.push(xhr)
     }
-    if(error && $.isFunction(error)) {
+    if (error && $.isFunction(error)) {
       error(data, xhr, textStatus, errorThrown)
     } else {
       $.ajaxJSON.unhandledXHRs.push(xhr)
@@ -69,24 +69,34 @@ $.ajaxJSON = function(url, submit_type, data={}, success, error, options) {
   }
   const params = {
     url,
-    dataType: "json",
+    dataType: 'json',
     type: submit_type,
     success(data, textStatus, xhr) {
       data = data || {}
       let page_view_update_url = null
-      if(xhr && xhr.getResponseHeader && (page_view_update_url = xhr.getResponseHeader("X-Canvas-Page-View-Update-Url"))) {
+      if (
+        xhr &&
+        xhr.getResponseHeader &&
+        (page_view_update_url = xhr.getResponseHeader('X-Canvas-Page-View-Update-Url'))
+      ) {
         setTimeout(() => {
           $(document).triggerHandler('page_view_update_url_received', page_view_update_url)
         }, 50)
       }
-      if(!data.length && data.errors) {
-        ajaxError(data.errors, null, "")
-        if(!options || !options.skipDefaultError) {
-          $.fn.defaultAjaxError.func.call($.fn.defaultAjaxError.object, null, data, "0", data.errors)
+      if (!data.length && data.errors) {
+        ajaxError(data.errors, null, '')
+        if (!options || !options.skipDefaultError) {
+          $.fn.defaultAjaxError.func.call(
+            $.fn.defaultAjaxError.object,
+            null,
+            data,
+            '0',
+            data.errors
+          )
         } else {
           $.ajaxJSON.ignoredXHRs.push(xhr)
         }
-      } else if(success && $.isFunction(success)) {
+      } else if (success && $.isFunction(success)) {
         success(data, xhr)
       }
     },
@@ -96,10 +106,10 @@ $.ajaxJSON = function(url, submit_type, data={}, success, error, options) {
     complete(_xhr) {},
     data
   }
-  if(options && options.timeout) {
+  if (options && options.timeout) {
     params.timeout = options.timeout
   }
-  if(options && options.contentType) {
+  if (options && options.contentType) {
     params.contentType = options.contentType
   }
 
@@ -130,7 +140,7 @@ $.ajaxJSON.isUnauthenticated = function(xhr) {
   let json_data
   try {
     json_data = $.parseJSON(xhr.responseText)
-  } catch(e) {}
+  } catch (e) {}
 
   return !!json_data && json_data.status === 'unauthenticated'
 }
@@ -141,12 +151,14 @@ $.ajaxJSON.isUnauthenticated = function(xhr) {
 $.fn.defaultAjaxError = function(func) {
   $.fn.defaultAjaxError.object = this
   $.fn.defaultAjaxError.func = function(event, request, settings, error) {
-    const inProduction = (INST.environment === "production")
-    const unhandled = ($.inArray(request, $.ajaxJSON.unhandledXHRs) !== -1)
-    const ignore = ($.inArray(request, $.ajaxJSON.ignoredXHRs) !== -1)
-    if((!inProduction || unhandled || $.ajaxJSON.isUnauthenticated(request)) && !ignore) {
+    const inProduction = INST.environment === 'production'
+    const unhandled = $.inArray(request, $.ajaxJSON.unhandledXHRs) !== -1
+    const ignore = $.inArray(request, $.ajaxJSON.ignoredXHRs) !== -1
+    if ((!inProduction || unhandled || $.ajaxJSON.isUnauthenticated(request)) && !ignore) {
       // $.grep will throw an error if it somehow gets something without length like undefined
-      $.ajaxJSON.unhandledXHRs = ($.ajaxJSON.unhandledXHRs) ? $.grep($.ajaxJSON.unhandledXHRs, (xhr) => xhr !== request) : $.ajaxJSON.unhandledXHRs
+      $.ajaxJSON.unhandledXHRs = $.ajaxJSON.unhandledXHRs
+        ? $.grep($.ajaxJSON.unhandledXHRs, xhr => xhr !== request)
+        : $.ajaxJSON.unhandledXHRs
       const debugOnly = !!unhandled
       func.call(this, event, request, settings, error, debugOnly)
     }

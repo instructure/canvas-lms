@@ -24,10 +24,12 @@ function eventTimes(dateFormats, timeFormats) {
   const formats = []
   dateFormats.forEach(df => {
     timeFormats.forEach(tf => {
-      formats.push(() => I18n.t('#time.event', {
-        date: I18n.lookup(`date.formats.${df}`),
-        time: I18n.lookup(`time.formats.${tf}`)
-      }))
+      formats.push(() =>
+        I18n.t('#time.event', {
+          date: I18n.lookup(`date.formats.${df}`),
+          time: I18n.lookup(`time.formats.${tf}`)
+        })
+      )
     })
   })
   return formats
@@ -46,7 +48,6 @@ function joinFormats(separator, ...formats) {
 }
 
 const moment_formats = {
-
   i18nToMomentHash: {
     '%A': 'dddd',
     '%B': 'MMMM',
@@ -75,21 +76,30 @@ const moment_formats = {
   basicMomentFormats: [
     moment.ISO_8601,
     'YYYY',
-    'LT', 'LTS', 'L', 'l', 'LL', 'll', 'LLL', 'lll', 'LLLL', 'llll',
+    'LT',
+    'LTS',
+    'L',
+    'l',
+    'LL',
+    'll',
+    'LLL',
+    'lll',
+    'LLLL',
+    'llll',
     'D MMM YYYY',
     'H:mm'
   ],
 
-  getFormats () {
+  getFormats() {
     let formatsToTransform = moment_formats.formatsForLocale()
     formatsToTransform = moment_formats.formatsIncludingImplicitMinutes(formatsToTransform)
     return this.transformFormats(formatsToTransform)
   },
 
-  formatsIncludingImplicitMinutes (formats) {
-    const arrayOfArrays = _.map(formats, format => format.match(/:%-?M/) ?
-          [format, format.replace(/:%-?M/, '')] :
-          [format])
+  formatsIncludingImplicitMinutes(formats) {
+    const arrayOfArrays = _.map(formats, format =>
+      format.match(/:%-?M/) ? [format, format.replace(/:%-?M/, '')] : [format]
+    )
     return _.flatten(arrayOfArrays)
   },
 
@@ -98,56 +108,60 @@ const moment_formats = {
     return _.union(moment_formats.basicMomentFormats, localeSpecificFormats)
   }),
 
-    // examples are from en_US. order is significant since if an input matches
-    // multiple formats, the format earlier in the list will be preferred
+  // examples are from en_US. order is significant since if an input matches
+  // multiple formats, the format earlier in the list will be preferred
   orderedFormats: [
-    timeFormat('default'),             // %a, %d %b %Y %H:%M:%S %z
-    dateFormat('full_with_weekday'),   // %a %b %-d, %Y %-l:%M%P
-    dateFormat('full'),                // %b %-d, %Y %-l:%M%P
-    dateFormat('date_at_time'),        // %b %-d at %l:%M%P
-    dateFormat('long_with_weekday'),   // %A, %B %-d
+    timeFormat('default'), // %a, %d %b %Y %H:%M:%S %z
+    dateFormat('full_with_weekday'), // %a %b %-d, %Y %-l:%M%P
+    dateFormat('full'), // %b %-d, %Y %-l:%M%P
+    dateFormat('date_at_time'), // %b %-d at %l:%M%P
+    dateFormat('long_with_weekday'), // %A, %B %-d
     dateFormat('medium_with_weekday'), // %a %b %-d, %Y
-    dateFormat('short_with_weekday'),  // %a, %b %-d
-    timeFormat('long'),                // %B %d, %Y %H:%M
-    dateFormat('long'),                // %B %-d, %Y
+    dateFormat('short_with_weekday'), // %a, %b %-d
+    timeFormat('long'), // %B %d, %Y %H:%M
+    dateFormat('long'), // %B %-d, %Y
     ...eventTimes(['medium', 'short'], ['tiny', 'tiny_on_the_hour']),
     joinFormats(' ', 'date.formats.medium', 'time.formats.tiny'),
     joinFormats(' ', 'date.formats.medium', 'time.formats.tiny_on_the_hour'),
-    dateFormat('medium'),              // %b %-d, %Y
-    timeFormat('short'),               // %d %b %H:%M
+    dateFormat('medium'), // %b %-d, %Y
+    timeFormat('short'), // %d %b %H:%M
     joinFormats(' ', 'date.formats.short', 'time.formats.tiny'),
     joinFormats(' ', 'date.formats.short', 'time.formats.tiny_on_the_hour'),
-    dateFormat('short'),               // %b %-d
-    dateFormat('default'),             // %Y-%m-%d
-    timeFormat('tiny'),                // %l:%M%P
-    timeFormat('tiny_on_the_hour'),    // %l%P
-    dateFormat('weekday'),             // %A
-    dateFormat('short_weekday')        // %a
+    dateFormat('short'), // %b %-d
+    dateFormat('default'), // %Y-%m-%d
+    timeFormat('tiny'), // %l:%M%P
+    timeFormat('tiny_on_the_hour'), // %l%P
+    dateFormat('weekday'), // %A
+    dateFormat('short_weekday') // %a
   ],
 
-  formatsForLocale () {
+  formatsForLocale() {
     return _.compact(moment_formats.orderedFormats.map(fn => fn()))
   },
 
-  i18nToMomentFormat (fullString) {
+  i18nToMomentFormat(fullString) {
     const withEscapes = moment_formats.escapeSubStrings(fullString)
     return moment_formats.replaceDateKeys(withEscapes)
   },
 
-  escapeSubStrings (formatString) {
+  escapeSubStrings(formatString) {
     const substrings = formatString.split(' ')
     const escapedSubs = _.map(substrings, moment_formats.escapedUnlessi18nKey)
     return escapedSubs.join(' ')
   },
 
-  escapedUnlessi18nKey (string) {
+  escapedUnlessi18nKey(string) {
     const isKey = _.find(_.keys(moment_formats.i18nToMomentHash), k => string.indexOf(k) > -1)
 
     return isKey ? string : `[${string}]`
   },
 
-  replaceDateKeys (formatString) {
-    return _.reduce(moment_formats.i18nToMomentHash, (string, forMoment, forBase) => string.replace(forBase, forMoment), formatString)
+  replaceDateKeys(formatString) {
+    return _.reduce(
+      moment_formats.i18nToMomentHash,
+      (string, forMoment, forBase) => string.replace(forBase, forMoment),
+      formatString
+    )
   }
 }
 

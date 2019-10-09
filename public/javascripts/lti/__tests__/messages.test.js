@@ -16,41 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ltiMessageHandler } from '../messages';
+import {ltiMessageHandler} from '../messages'
 
 const requestFullWindowLaunchMessage = {
   messageType: 'requestFullWindowLaunch',
   content: 'http://localhost/test'
-};
+}
 
 function postMessageEvent(data, origin, source) {
   return {
     data,
     origin,
     source
-  };
+  }
 }
 
 describe('ltiMessageHandler', () => {
-  const origin = "http://localhost";
-  const { assign } = window.location;
+  const origin = 'http://localhost'
+  const {assign} = window.location
 
   global.URL = jest.fn().mockImplementation(() => ({
-    searchParams: { append: jest.fn()}
-  }));
+    searchParams: {append: jest.fn()}
+  }))
 
   beforeAll(() => {
-    delete window.location;
-    window.location = { assign: jest.fn() };
-  });
+    delete window.location
+    window.location = {assign: jest.fn()}
+  })
 
   afterAll(() => {
-    window.location.assign = assign;
-  });
+    window.location.assign = assign
+  })
 
-  it("opens new window on requestFullWindowLaunch", () => {
-    ENV.context_asset_string = "account_1";
-    ltiMessageHandler(postMessageEvent(requestFullWindowLaunchMessage, origin));
-    expect(window.location.assign).toHaveBeenCalled();
-  });
-});
+  it('opens new window on requestFullWindowLaunch', () => {
+    ENV.context_asset_string = 'account_1'
+    ltiMessageHandler(postMessageEvent(requestFullWindowLaunchMessage, origin))
+    expect(window.location.assign).toHaveBeenCalled()
+  })
+})

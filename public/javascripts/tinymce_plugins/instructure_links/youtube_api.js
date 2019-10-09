@@ -19,26 +19,25 @@
 import $ from 'jquery'
 
 export default class YouTubeApi {
-
-  fetchYouTubeTitle (id, cb) {
+  fetchYouTubeTitle(id, cb) {
     const jwt = ENV.JWT
     const appHost = ENV.RICH_CONTENT_APP_HOST
     const url = `//${appHost}/api/youtube_title?vid_id=${id}`
     $.ajax({
-        headers: {Authorization: `Bearer ${jwt}`},
-        url: url
-      })
-      .success((data) => {
+      headers: {Authorization: `Bearer ${jwt}`},
+      url
+    })
+      .success(data => {
         if (data.id === id) {
           cb(data.title)
         }
       })
-      .error((err) => {
+      .error(err => {
         cb(null, err)
       })
   }
 
-  titleYouTubeText ($link) {
+  titleYouTubeText($link) {
     const id = $.youTubeID($link.attr('href'))
     this.fetchYouTubeTitle(id, (vidTitle, err) => {
       if (err) {

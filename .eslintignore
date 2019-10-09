@@ -1,10 +1,11 @@
-/gems/canvas_i18nliner
-/doc/
-/public/javascripts/translations/_core_en.js
-/public/javascripts/vendor
-/public/javascripts/bower
+/gems/canvas_i18nliner/*
+/doc/*
+/public/javascripts/translations/*
+/public/javascripts/vendor/*
+/public/javascripts/bower/*
 public/javascripts/react-dnd-test-backend.js
 public/javascripts/mathquill.js
+public/javascripts/symlink_to_node_modules/*
 
 spec/selenium/helpers/jquery.simulate.js
 spec/javascripts/support/jquery.mockjax.js

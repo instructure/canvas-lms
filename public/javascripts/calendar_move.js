@@ -23,7 +23,7 @@ import 'jqueryui/datepicker'
 
 const monthNames = I18n.lookup('date.month_names')
 
-function makeDate (date) {
+function makeDate(date) {
   return {
     day: date.getDate(),
     month: date.getMonth(),
@@ -31,11 +31,11 @@ function makeDate (date) {
   }
 }
 
-export function changeMonth ($month, change) {
+export function changeMonth($month, change) {
   const monthData = $month.data('calendar_objects')
   var data = {}
   var current = null
-  if (typeof (change) === 'string') {
+  if (typeof change === 'string') {
     var current = $.datepicker.oldParseDate('mm/dd/yy', change)
     if (current) {
       current.setDate(1)
@@ -109,19 +109,27 @@ export function changeMonth ($month, change) {
       }
       $day.attr('class', class_names.join(' '))
     }
-    $day.show().addClass('visible').parents('tr').show().addClass('visible')
+    $day
+      .show()
+      .addClass('visible')
+      .parents('tr')
+      .show()
+      .addClass('visible')
     var data = {
       day_number: day
     }
-    const month_number = month < 9 ? `0${month + 1}` : (month + 1)
+    const month_number = month < 9 ? `0${month + 1}` : month + 1
     const day_number = day < 10 ? `0${day}` : day
     let id = `day_${year}_${month_number}_${day_number}`
     if ($month.hasClass('mini_month')) {
       id = `mini_${id}`
     }
-    $day.attr('id', id)
+    $day
+      .attr('id', id)
       .addClass(`date_${month_number}_${day_number}_${year}`)
-      .find('.day_number').text(day).attr('title', `${month_number}/${day_number}/${year}`)
+      .find('.day_number')
+      .text(day)
+      .attr('title', `${month_number}/${day_number}/${year}`)
       .addClass(`date_${month_number}_${day_number}_${year}`) // left here because I don't know what it'll break...
     let $div = $day.children('div')
     if ($month.hasClass('mini_month')) {
@@ -143,8 +151,12 @@ export function changeMonth ($month, change) {
     }
     day++
     idx++
-    if ((lastDayOfPreviousMonth && day > lastDayOfPreviousMonth.day && month == lastDayOfPreviousMonth.month)
-          || (day > lastDayOfMonth.day && month == lastDayOfMonth.month)) {
+    if (
+      (lastDayOfPreviousMonth &&
+        day > lastDayOfPreviousMonth.day &&
+        month == lastDayOfPreviousMonth.month) ||
+      (day > lastDayOfMonth.day && month == lastDayOfMonth.month)
+    ) {
       month += 1
       if (month >= 12) {
         month -= 12
@@ -155,7 +167,10 @@ export function changeMonth ($month, change) {
   }
   while (idx < $days.length) {
     var $day = $days.eq(idx)
-    $day.parents('tr').hide().removeClass('visible')
+    $day
+      .parents('tr')
+      .hide()
+      .removeClass('visible')
     $day.hide().removeClass('visible')
     idx++
   }

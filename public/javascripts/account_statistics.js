@@ -22,7 +22,7 @@ import './jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import './jquery.instructure_misc_helpers' // replaceTags
 
-function populateDialog (data_points, axis, $link) {
+function populateDialog(data_points, axis, $link) {
   $('#over_time_dialog').dialog({
     width: 630,
     height: 330,
@@ -34,11 +34,11 @@ function populateDialog (data_points, axis, $link) {
 
   // google dependencies declared in views/acccounts/statistics since google.load uses document.write :(
   /* global google */
-  const data = new google.visualization.DataTable();
+  const data = new google.visualization.DataTable()
   data.addColumn('date', I18n.t('Date'))
   data.addColumn('number', axis || I18n.t('Value'))
-  data.addColumn('string', 'title1');
-  data.addColumn('string', 'text1');
+  data.addColumn('string', 'title1')
+  data.addColumn('string', 'text1')
 
   const rows = []
   $.each(data_points, function() {
@@ -57,18 +57,24 @@ function populateDialog (data_points, axis, $link) {
 }
 
 $(document).ready(() => {
-  $('.over_time_link').live('click', function (event) {
+  $('.over_time_link').live('click', function(event) {
     event.preventDefault()
     const $link = $(this)
     const name = $link.attr('data-name')
     const url = $.replaceTags($('.over_time_url').attr('href'), 'attribute', $link.attr('data-key'))
     $link.text(I18n.t('loading...'))
-    $.ajaxJSON(url, 'GET', {}, (data) => {
-      $link.text(I18n.t('over time'))
-      $('#over_time_dialog .csv_url').attr('href', `${url}.csv`)
-      populateDialog(data, name, $link)
-    }, () => {
-      $link.text(I18n.t('error'))
-    })
+    $.ajaxJSON(
+      url,
+      'GET',
+      {},
+      data => {
+        $link.text(I18n.t('over time'))
+        $('#over_time_dialog .csv_url').attr('href', `${url}.csv`)
+        populateDialog(data, name, $link)
+      },
+      () => {
+        $link.text(I18n.t('error'))
+      }
+    )
   })
 })

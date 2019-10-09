@@ -21,25 +21,28 @@ import $ from 'jquery'
 // configure MathJax to use 'color' extension fo LaTeX coding
 const localConfig = {
   TeX: {
-    extensions: ["color.js"]
-  }
-};
-
-export function loadMathJax (configFile, cb = null) {
-  if (!isMathJaxLoaded()) {
-    // signal local config to mathjax as it loads
-    window.MathJax = localConfig;
-    $.getScript(`//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=${configFile}`, cb);
-  } else if (typeof cb === 'function') {
-      // Make sure we always call the callback if it is loaded already and make sure we
-      // also reprocess the page since chances are if we are requesting MathJax again,
-      // something has changed on the page and needs to get pulled into the MathJax ecosystem
-      window.MathJax.Hub.Reprocess();
-      cb();
+    extensions: ['color.js']
   }
 }
 
-export function isMathMLOnPage () {
+export function loadMathJax(configFile, cb = null) {
+  if (!isMathJaxLoaded()) {
+    // signal local config to mathjax as it loads
+    window.MathJax = localConfig
+    $.getScript(
+      `//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=${configFile}`,
+      cb
+    )
+  } else if (typeof cb === 'function') {
+    // Make sure we always call the callback if it is loaded already and make sure we
+    // also reprocess the page since chances are if we are requesting MathJax again,
+    // something has changed on the page and needs to get pulled into the MathJax ecosystem
+    window.MathJax.Hub.Reprocess()
+    cb()
+  }
+}
+
+export function isMathMLOnPage() {
   const mathElements = document.getElementsByTagName('math')
   for (let i = 0; i < mathElements.length; i++) {
     const $el = $(mathElements[i])
@@ -47,7 +50,7 @@ export function isMathMLOnPage () {
   }
 }
 
-export function isMathJaxLoaded () {
+export function isMathJaxLoaded() {
   return !(typeof MathJax === 'undefined')
 }
 

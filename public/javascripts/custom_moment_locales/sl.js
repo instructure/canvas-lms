@@ -21,27 +21,18 @@ const moment = require('moment')
 const data = moment.localeData('sl')
 
 data._monthsShort = [
-  "jan",
-  "feb",
-  "mar",
-  "apr",
-  "maj",
-  "jun",
-  "jul",
-  "avg",
-  "sep",
-  "okt",
-  "nov",
-  "dec"
+  'jan',
+  'feb',
+  'mar',
+  'apr',
+  'maj',
+  'jun',
+  'jul',
+  'avg',
+  'sep',
+  'okt',
+  'nov',
+  'dec'
 ]
 
-data._weekdaysShort = [
-  "ned",
-  "pon",
-  "tor",
-  "sre",
-  "čet",
-  "pet",
-  "sob"
-]
-
+data._weekdaysShort = ['ned', 'pon', 'tor', 'sre', 'čet', 'pet', 'sob']

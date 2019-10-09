@@ -20,11 +20,11 @@ import $ from 'jquery'
 import i18nLolcalize from 'compiled/str/i18nLolcalize'
 import I18n from 'i18n-js'
 import extend from 'i18nliner/dist/lib/extensions/i18n_js'
-// add i18nliner's runtime extensions to the global I18n object
-extend(I18n)
 
 import htmlEscape from './str/htmlEscape'
 import './vendor/date'
+// add i18nliner's runtime extensions to the global I18n object
+extend(I18n)
 
 /*
  * Overridden interpolator that localizes any interpolated numbers.
@@ -49,7 +49,7 @@ I18n.interpolate = function(message, origOptions) {
 
 I18n.locale = document.documentElement.getAttribute('lang')
 
-I18n.lookup = function(scope, options={}) {
+I18n.lookup = function(scope, options = {}) {
   const translations = I18n.translations
   const locales = I18n.getLocaleAndFallbacks(I18n.currentLocale())
   if (typeof scope === 'object') {
@@ -63,9 +63,9 @@ I18n.lookup = function(scope, options={}) {
   const scopes = scope.split(this.defaultSeparator)
 
   let messages
-  for (let i = 0; !messages && (i < locales.length); i++) {
+  for (let i = 0; !messages && i < locales.length; i++) {
     messages = translations[locales[i]]
-    for (let j = 0; messages && (j < scopes.length); j++) {
+    for (let j = 0; messages && j < scopes.length; j++) {
       const currentScope = scopes[j]
       messages = messages[currentScope]
     }
@@ -82,7 +82,7 @@ I18n.getLocaleAndFallbacks = function(locale) {
   if (!I18n.fallbacksMap) {
     I18n.fallbacksMap = I18n.computeFallbacks()
   }
-  return (I18n.fallbacksMap[locale] || [I18n.defaultLocale])
+  return I18n.fallbacksMap[locale] || [I18n.defaultLocale]
 }
 
 I18n.computeFallbacks = function() {
@@ -124,7 +124,7 @@ I18n.n = I18n.localizeNumber = (value, options = {}) => {
   return I18n[method](value, format)
 }
 
-const padding = (n, pad='00', len=2) => {
+const padding = (n, pad = '00', len = 2) => {
   const s = pad + n.toString()
   return s.substr(s.length - len)
 }
@@ -139,7 +139,8 @@ I18n.strftime = function(date, format) {
   const day = date.getDate()
   const year = date.getFullYear()
   const month = date.getMonth() + 1
-  const dayOfYear = 1 + Math.round((new Date(year, month - 1, day) - new Date(year, 0, 1)) / 86400000)
+  const dayOfYear =
+    1 + Math.round((new Date(year, month - 1, day) - new Date(year, 0, 1)) / 86400000)
   const hour = date.getHours()
   let hour12 = hour
   const meridian = hour > 11 ? 1 : 0
@@ -150,13 +151,9 @@ I18n.strftime = function(date, format) {
   const epochOffset = Math.floor(date.getTime() / 1000)
   const absOffsetHours = Math.floor(Math.abs(offset / 60))
   const absOffsetMinutes = Math.abs(offset) - absOffsetHours * 60
-  const timezoneoffset = `${
-      offset > 0 ? '-' : '+'
-    }${
-      absOffsetHours.toString().length < 2 ? `0${absOffsetHours}` : absOffsetHours
-    }${
-      absOffsetMinutes.toString().length < 2 ? `0${absOffsetMinutes}` : absOffsetMinutes
-    }`
+  const timezoneoffset = `${offset > 0 ? '-' : '+'}${
+    absOffsetHours.toString().length < 2 ? `0${absOffsetHours}` : absOffsetHours
+  }${absOffsetMinutes.toString().length < 2 ? `0${absOffsetMinutes}` : absOffsetMinutes}`
 
   if (hour12 > 12) {
     hour12 -= 12
@@ -176,14 +173,17 @@ I18n.strftime = function(date, format) {
   */
   let optionsNeeded = false
   const f = format
-    .replace(/%([DFrRTv])/g, (str, p1) => ({
-        D: '%m/%d/%y',
-        F: '%Y-%m-%d',
-        r: '%I:%M:%S %p',
-        R: '%H:%M',
-        T: '%H:%M:%S',
-        v: '%e-%b-%Y'
-      }[p1])
+    .replace(
+      /%([DFrRTv])/g,
+      (str, p1) =>
+        ({
+          D: '%m/%d/%y',
+          F: '%Y-%m-%d',
+          r: '%I:%M:%S %p',
+          R: '%H:%M',
+          T: '%H:%M:%S',
+          v: '%e-%b-%Y'
+        }[p1])
     )
     .replace(/%(%|\-?[a-zA-Z]|3N)/g, (str, p1) => {
       // check to see if we need an options object
@@ -202,42 +202,78 @@ I18n.strftime = function(date, format) {
       }
 
       switch (p1) {
-        case 'a':  return options.abbr_day_names[weekDay]
-        case 'A':  return options.day_names[weekDay]
-        case 'b':  return options.abbr_month_names[month]
-        case 'B':  return options.month_names[month]
-        case 'd':  return padding(day)
-        case '-d': return day
-        case 'e':  return padding(day, ' ')
-        case 'h':  return options.abbr_month_names[month]
-        case 'H':  return padding(hour)
-        case '-H': return hour
-        case 'I':  return padding(hour12)
-        case '-I': return hour12
-        case 'j':  return padding(dayOfYear, '00', 3)
-        case 'k':  return padding(hour, ' ')
-        case 'l':  return padding(hour12, ' ')
-        case 'L':  return padding(mils, '00', 3)
-        case 'm':  return padding(month)
-        case '-m': return month
-        case 'M':  return padding(mins)
-        case '-M': return mins
-        case 'n':  return '\n'
-        case '3N': return padding(mils, '00', 3)
-        case 'p':  return options.meridian[meridian]
-        case 'P':  return options.meridian[meridian].toLowerCase()
-        case 's':  return epochOffset
-        case 'S':  return padding(secs)
-        case '-S': return secs
-        case 't':  return '\t'
-        case 'u':  return weekDay || weekDay + 7
-        case 'w':  return weekDay
-        case 'y':  return padding(year)
-        case '-y': return padding(year).replace(/^0+/, '')
-        case 'Y':  return year
-        case 'z':  return timezoneoffset
-        case '%':  return '%'
-        default:   return str
+        case 'a':
+          return options.abbr_day_names[weekDay]
+        case 'A':
+          return options.day_names[weekDay]
+        case 'b':
+          return options.abbr_month_names[month]
+        case 'B':
+          return options.month_names[month]
+        case 'd':
+          return padding(day)
+        case '-d':
+          return day
+        case 'e':
+          return padding(day, ' ')
+        case 'h':
+          return options.abbr_month_names[month]
+        case 'H':
+          return padding(hour)
+        case '-H':
+          return hour
+        case 'I':
+          return padding(hour12)
+        case '-I':
+          return hour12
+        case 'j':
+          return padding(dayOfYear, '00', 3)
+        case 'k':
+          return padding(hour, ' ')
+        case 'l':
+          return padding(hour12, ' ')
+        case 'L':
+          return padding(mils, '00', 3)
+        case 'm':
+          return padding(month)
+        case '-m':
+          return month
+        case 'M':
+          return padding(mins)
+        case '-M':
+          return mins
+        case 'n':
+          return '\n'
+        case '3N':
+          return padding(mils, '00', 3)
+        case 'p':
+          return options.meridian[meridian]
+        case 'P':
+          return options.meridian[meridian].toLowerCase()
+        case 's':
+          return epochOffset
+        case 'S':
+          return padding(secs)
+        case '-S':
+          return secs
+        case 't':
+          return '\t'
+        case 'u':
+          return weekDay || weekDay + 7
+        case 'w':
+          return weekDay
+        case 'y':
+          return padding(year)
+        case '-y':
+          return padding(year).replace(/^0+/, '')
+        case 'Y':
+          return year
+        case 'z':
+          return timezoneoffset
+        case '%':
+          return '%'
+        default:
+          return str
       }
     })
 
@@ -265,23 +301,21 @@ I18n.pluralize = function(count, scope, options) {
   let message
   switch (Math.abs(count)) {
     case 0:
-      message = (translation.zero != null)
-        ? translation.zero
-        : (translation.none != null)
+      message =
+        translation.zero != null
+          ? translation.zero
+          : translation.none != null
           ? translation.none
-          : (translation.other != null)
-            ? translation.other
-            : this.missingTranslation(scope, 'zero')
+          : translation.other != null
+          ? translation.other
+          : this.missingTranslation(scope, 'zero')
       break
     case 1:
-      message = (translation.one != null)
-        ? translation.one
-        : this.missingTranslation(scope, 'one')
+      message = translation.one != null ? translation.one : this.missingTranslation(scope, 'one')
       break
     default:
-      message = (translation.other != null)
-        ? translation.other
-        : this.missingTranslation(scope, 'other')
+      message =
+        translation.other != null ? translation.other : this.missingTranslation(scope, 'other')
   }
 
   return this.interpolate(message, options)
@@ -295,7 +329,8 @@ I18n.CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
 // TODO: make i18nliner-js set i18n_inferred_key, which will DRY things up
 // slightly
 const inferKey = I18n.CallHelpers.inferKey.bind(I18n.CallHelpers)
-I18n.CallHelpers.inferKey = (defaultValue, translateOptions) => `#${inferKey(defaultValue, translateOptions)}`
+I18n.CallHelpers.inferKey = (defaultValue, translateOptions) =>
+  `#${inferKey(defaultValue, translateOptions)}`
 
 I18n.CallHelpers.normalizeKey = (key, options) => {
   if (key[0] === '#') {
@@ -336,8 +371,7 @@ class Scope {
         this.cache.set(cacheKey, valToCache)
         return valToCache
       }
-    }
-    else {
+    } else {
       return this.translateWithoutCache(...args)
     }
   }

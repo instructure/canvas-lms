@@ -21,7 +21,9 @@
 import moment from 'moment'
 
 export default moment.defineLocale('mi-nz', {
-  months: 'Kohi-tāte_Hui-tanguru_Poutū-te-rangi_Paenga-whāwhā_Haratua_Pipiri_Hōngoingoi_Here-turi-kōkā_Mahuru_Whiringa-ā-nuku_Whiringa-ā-rangi_Hakihea'.split('_'),
+  months: 'Kohi-tāte_Hui-tanguru_Poutū-te-rangi_Paenga-whāwhā_Haratua_Pipiri_Hōngoingoi_Here-turi-kōkā_Mahuru_Whiringa-ā-nuku_Whiringa-ā-rangi_Hakihea'.split(
+    '_'
+  ),
   monthsShort: ['Hān', 'Pēp', 'Māe', 'Āpe', 'Mei', 'Hun', 'Hūr', 'Āku', 'Hep', 'Oke', 'Noe', 'Tīh'],
   // regexes taken from moment 2.22.2's moment/locale/mi.js
   // and modified to include unicode characters from our customized monthsShort
@@ -65,4 +67,4 @@ export default moment.defineLocale('mi-nz', {
   },
   ordinalParse: /\d{1,2}º/,
   ordinal: '%dº'
-});
+})
