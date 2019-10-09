@@ -89,7 +89,7 @@ gem 'json-jwt', '1.9.4', require: false
 gem 'twilio-ruby', '5.7.2', require: false
 
 gem 'mail', '2.7.1', require: false
-  gem 'mini_mime', '1.0.0', require: false
+  gem 'mini_mime', '1.0.2', require: false
 gem 'marginalia', '1.8.0', require: false
 gem 'mime-types', '3.3.0'
 gem 'mini_magick', '4.9.5'
