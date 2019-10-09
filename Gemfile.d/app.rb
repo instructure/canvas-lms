@@ -25,7 +25,7 @@ end
 
 gem 'rack', '2.0.7'
 
-gem 'oauth2', '1.4.1', require: false
+gem 'oauth2', '1.4.2', require: false
 
 gem 'rails-observers', '0.1.5'
 
