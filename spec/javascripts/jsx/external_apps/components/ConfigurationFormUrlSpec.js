@@ -21,30 +21,29 @@ import TestUtils from 'react-dom/test-utils'
 import ConfigurationFormUrl from 'jsx/external_apps/components/ConfigurationFormUrl'
 
 const fakeStore = {
-  findAppByShortName () {
+  findAppByShortName() {
     return {
       short_name: 'someApp',
       config_options: []
-    };
+    }
   }
-};
+}
 
-const component = TestUtils.renderIntoDocument (
+const component = TestUtils.renderIntoDocument(
   <ConfigurationFormUrl
-    name='Test tool'
-    consumerKey='key'
-    sharedSecret='secret'
-    configUrl='http://example.com'
-    allowMembershipServiceAccess={true}
-    membershipServiceFeatureFlagEnabled={true}
+    name="Test tool"
+    consumerKey="key"
+    sharedSecret="secret"
+    configUrl="http://example.com"
+    allowMembershipServiceAccess
+    membershipServiceFeatureFlagEnabled
   />
-);
+)
 
-QUnit.module('ConfigurationFormUrl#getFormData()');
+QUnit.module('ConfigurationFormUrl#getFormData()')
 
 test('returns expected output with membership service feature flag enabled', () => {
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormUrl);
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormUrl)
   app.refs.allow_membership_service_access.setState({value: true})
-  equal(app.getFormData().allow_membership_service_access, true);
-});
-
+  equal(app.getFormData().allow_membership_service_access, true)
+})

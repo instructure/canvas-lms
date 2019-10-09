@@ -23,9 +23,7 @@ import GradebookExportManager from 'jsx/gradezilla/shared/GradebookExportManager
 const currentUserId = 42
 const exportingUrl = 'http://exportingUrl'
 const monitoringBase = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
-const attachmentBase = `${
-  GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL
-}/${currentUserId}/files`
+const attachmentBase = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
 const workingExport = {
   progressId: 'progressId',
   attachmentId: 'attachmentId'

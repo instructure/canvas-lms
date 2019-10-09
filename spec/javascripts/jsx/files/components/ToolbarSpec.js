@@ -60,13 +60,7 @@ QUnit.module('Toolbar', {
 
 test('renders multi select action items when there is more than one item selected', () => {
   const toolbar = mount(
-    <Toolbar
-      params="foo"
-      query=""
-      selectedItems={[file]}
-      contextId="1"
-      contextType="courses"
-    />
+    <Toolbar params="foo" query="" selectedItems={[file]} contextId="1" contextType="courses" />
   )
   ok(toolbar.find('.ui-buttonset .ui-button').exists(), 'shows multiple select action items')
 })

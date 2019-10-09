@@ -352,7 +352,7 @@ test('sets "formattedValue" to formatted grade', function() {
   equal(score.formattedValue, 'C+ (78.5)')
 })
 
-QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
+QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
   suiteHooks.beforeEach(() => {
     commonSetup()
     ENV.assignment_groups = createAssignmentGroups()
@@ -384,11 +384,11 @@ QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
     ok($teaser.text().includes('1,234'), 'includes internationalized score')
   })
 
-  QUnit.module('final grade override', (contextHooks) => {
+  QUnit.module('final grade override', contextHooks => {
     contextHooks.beforeEach(() => {
       exampleGrades = createExampleGrades()
       exampleGrades.current = {score: 23, possible: 100}
-      ENV.grading_scheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['F', 0]]
+      ENV.grading_scheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0]]
     })
 
     test('sets the letter grade to the effective grade', () => {
@@ -457,7 +457,6 @@ QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
     })
   })
 })
-
 
 QUnit.module('GradeSummary.calculateSubtotalsByGradingPeriod', {
   setup() {

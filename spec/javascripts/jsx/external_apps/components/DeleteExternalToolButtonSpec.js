@@ -28,7 +28,11 @@ const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
 const createElement = data => (
-  <DeleteExternalToolButton tool={data.tool} canAddEdit={data.canAddEdit} returnFocus={data.returnFocus} />
+  <DeleteExternalToolButton
+    tool={data.tool}
+    canAddEdit={data.canAddEdit}
+    returnFocus={data.returnFocus}
+  />
 )
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 const getDOMNodes = function(data) {
@@ -85,7 +89,9 @@ test('open and close modal', function() {
 
 test('deletes a tool', function() {
   sinon.spy(store, 'delete')
-  const wrapper = mount(<DeleteExternalToolButton tool={this.tools[0]} canAddEdit returnFocus={() => {}}/>)
+  const wrapper = mount(
+    <DeleteExternalToolButton tool={this.tools[0]} canAddEdit returnFocus={() => {}} />
+  )
   wrapper.instance().deleteTool({preventDefault: () => {}})
   ok(store.delete.called)
   store.delete.restore()
