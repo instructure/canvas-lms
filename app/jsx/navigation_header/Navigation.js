@@ -141,14 +141,19 @@ export default class Navigation extends React.Component {
       }
       setTimeout(() => this.pollUnreadCount(), msUntilIShouldStartPolling)
     }
+
+    $(`.${ACTIVE_CLASS}`).attr('aria-current', 'page')
   }
 
   componentWillUpdate(newProps, newState) {
     if (newState.activeItem !== this.state.activeItem) {
-      $(`.${ACTIVE_CLASS}`).removeClass(ACTIVE_CLASS)
+      $(`.${ACTIVE_CLASS}`)
+        .removeClass(ACTIVE_CLASS)
+        .removeAttr('aria-current')
       $(`#global_nav_${newState.activeItem}_link`)
         .closest('li')
         .addClass(ACTIVE_CLASS)
+        .attr('aria-current', 'page')
     }
   }
 
