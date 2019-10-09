@@ -119,7 +119,7 @@ gem 'shackles', '1.4.2'
 gem 'browser', '2.6.1', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
-gem 'sentry-raven', '2.7.2', require: false
+gem 'sentry-raven', '2.11.3', require: false
 gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
