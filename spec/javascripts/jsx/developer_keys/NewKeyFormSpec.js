@@ -20,7 +20,7 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import DeveloperKeyFormFields from 'jsx/developer_keys/NewKeyForm'
 import fakeENV from 'helpers/fakeENV'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 
 QUnit.module('NewKeyForm')
 
@@ -50,13 +50,14 @@ function formFieldOfTypeAndName(devKey, fieldType, name, isLtiKey, customizing) 
       availableScopes={{}}
       availableScopesPending={false}
       developerKey={devKey}
-      dispatch={ () => {} }
-      listDeveloperKeyScopesSet={ () => {} }
-      createLtiKeyState={ {customizing, isLtiKey} }
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      createLtiKeyState={{customizing, isLtiKey}}
     />
   )
-  return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).
-    find((elem) => elem.name == `developer_key[${name}]`);
+  return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).find(
+    elem => elem.name == `developer_key[${name}]`
+  )
 }
 
 test('populates the key name', () => {
@@ -100,7 +101,7 @@ test('does not populates the key test_cluster_only without ENV set', () => {
 })
 
 test('populates the key test_cluster_only', () => {
-  fakeENV.setup({ enableTestClusterChecks: true })
+  fakeENV.setup({enableTestClusterChecks: true})
   const input = formFieldOfTypeAndName(developerKey, 'input', 'test_cluster_only')
   equal(input.checked, developerKey.test_cluster_only)
   fakeENV.teardown()
@@ -143,9 +144,9 @@ test('renders the tool configuration form if isLtiKey is true', () => {
       availableScopes={{}}
       availableScopesPending={false}
       developerKey={developerKey}
-      dispatch={ () => {} }
-      listDeveloperKeyScopesSet={ () => {} }
-      createLtiKeyState={ {customizing: false, isLtiKey: true} }
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      createLtiKeyState={{customizing: false, isLtiKey: true}}
     />
   )
   ok(wrapper.find('ToolConfiguration').exists())
@@ -157,9 +158,9 @@ test('renders the developer key scopes form if isLtiKey is false', () => {
       availableScopes={{}}
       availableScopesPending={false}
       developerKey={developerKey}
-      dispatch={ () => {} }
-      listDeveloperKeyScopesSet={ () => {} }
-      createLtiKeyState={ {customizing: false, isLtiKey: false} }
+      dispatch={() => {}}
+      listDeveloperKeyScopesSet={() => {}}
+      createLtiKeyState={{customizing: false, isLtiKey: false}}
     />
   )
   ok(wrapper.find('Scopes').exists())

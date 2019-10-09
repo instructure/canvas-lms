@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import { Provider } from 'react-redux'
-import { mount, shallow } from 'enzyme'
+import {Provider} from 'react-redux'
+import {mount, shallow} from 'enzyme'
 
 import DiscussionsIndex from 'jsx/discussions/components/DiscussionsIndex'
 
@@ -34,10 +34,10 @@ const defaultProps = () => ({
   permissions: {create: false, manage_content: false, moderate: false},
   pinnedDiscussions: [],
   pinnedDiscussionIds: [],
-  roles: ["student", "user"],
+  roles: ['student', 'user'],
   togglePin: () => {},
   unpinnedDiscussions: [],
-  unpinnedDiscussionIds: [],
+  unpinnedDiscussionIds: []
 })
 
 // necessary to mock this because we have a child Container/"Smart" component
@@ -56,7 +56,7 @@ const store = {
     permissions: {
       create: true,
       manage_content: true,
-      moderate: true,
+      moderate: true
     },
     pinnedDiscussionIds: [],
     roles: ['user', 'teacher'],
@@ -69,7 +69,7 @@ const store = {
   // we only need to define these functions so that we match the react-redux contextTypes
   // shape for a store otherwise react-redux thinks our store is invalid
   dispatch() {},
-  subscribe() {},
+  subscribe() {}
 }
 
 QUnit.module('DiscussionsIndex component')
