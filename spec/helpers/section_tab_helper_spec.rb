@@ -177,6 +177,16 @@ describe SectionTabHelper do
         expect(tag.a_attributes[:target]).to eq '_blank'
       end
 
+      it 'does not include aria-current if tab is not active' do
+        tag = SectionTabHelperSpec::SectionTabTag.new(new_window_tab, course)
+        expect(tag.a_attributes[:'aria-current']).to eq nil
+      end
+
+      it 'includes aria-current if tab is active' do
+        tag = SectionTabHelperSpec::SectionTabTag.new(new_window_tab, course, new_window_tab[:css_class])
+        expect(tag.a_attributes[:'aria-current']).to eq 'page'
+      end
+
     end
 
     describe '#a_tag' do
@@ -310,6 +320,15 @@ describe SectionTabHelper do
         expect(tag.a_attributes[:target]).to eq '_blank'
       end
 
+      it 'does not include aria-current if tab is not active' do
+        tag = SectionTabHelperSpec::SectionTabTagNew.new(new_window_tab, course)
+        expect(tag.a_attributes[:'aria-current']).to eq nil
+      end
+
+      it 'includes aria-current if tab is active' do
+        tag = SectionTabHelperSpec::SectionTabTagNew.new(new_window_tab, course, new_window_tab[:css_class])
+        expect(tag.a_attributes[:'aria-current']).to eq 'page'
+      end
     end
 
     describe '#a_tag' do
