@@ -19,6 +19,7 @@ import {addMockFunctionsToSchema, makeExecutableSchema} from 'graphql-tools'
 import {addTypenameToDocument} from 'apollo-utilities'
 import {graphql} from 'graphql'
 import gql from 'graphql-tag'
+import {merge} from 'lodash'
 import {print} from 'graphql/language/printer'
 import schemaString from '../../../../schema.graphql'
 
@@ -80,7 +81,7 @@ async function createMocks(overrides = []) {
       if (typeof overrideValues !== 'object' || overrideValues === null) {
         mocks[key] = () => overrideValues
       } else {
-        mocks[key] = () => ({...defaultValues, ...overrideValues})
+        mocks[key] = () => merge(defaultValues, overrideValues)
       }
     })
   })

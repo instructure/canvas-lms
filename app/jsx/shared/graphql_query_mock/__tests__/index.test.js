@@ -112,6 +112,26 @@ describe('graphqlMockQuery', () => {
       expect(result.data.assignment._id).toEqual('1')
       expect(result.data.assignment.name).toEqual('foobarbaz')
     })
+
+    it('deep merges multiple different overrides', async () => {
+      const query = `
+        query TestQuery {
+          assignment(id: "1") {
+            rubric {
+              _id
+              title
+            }
+          }
+        }
+      `
+      const overrides = [
+        {Assignment: {rubric: {_id: '1'}}},
+        {Assignment: {rubric: {title: 'foobarbaz'}}}
+      ]
+      const result = await mockGraphqlQuery(query, overrides)
+      expect(result.data.assignment.rubric._id).toEqual('1')
+      expect(result.data.assignment.rubric.title).toEqual('foobarbaz')
+    })
   })
 
   describe('catches common mistakes by', () => {
