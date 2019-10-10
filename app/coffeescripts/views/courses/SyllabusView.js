@@ -113,30 +113,28 @@ export default class SyllabusView extends Backbone.View {
     let lastEvent = null
     const dateCollator = function(memo, json) {
       let due_at, end_at, html_url, start_at, todo_at
-      let related_id = json['related_id']
+      let related_id = json.related_id
       if (related_id == null) {
-        related_id = json['id']
+        related_id = json.id
       }
-      if (json['type'] === 'assignment') {
+      if (json.type === 'assignment') {
         if (html_url_for_assignment) {
-          html_url = json['html_url']
+          html_url = json.html_url
         }
-      } else {
-        if (html_url_for_event) {
-          html_url = json['html_url']
-        }
+      } else if (html_url_for_event) {
+        html_url = json.html_url
       }
-      const title = json['title']
-      if (json['start_at']) {
-        start_at = $.fudgeDateForProfileTimezone(Date.parse(json['start_at']))
+      const title = json.title
+      if (json.start_at) {
+        start_at = $.fudgeDateForProfileTimezone(Date.parse(json.start_at))
       }
-      if (json['end_at']) {
-        end_at = $.fudgeDateForProfileTimezone(Date.parse(json['end_at']))
+      if (json.end_at) {
+        end_at = $.fudgeDateForProfileTimezone(Date.parse(json.end_at))
       }
-      if (json['type'] === 'assignment') {
+      if (json.type === 'assignment') {
         due_at = start_at
-      } else if (json['type'] === 'wiki_page' || json['type'] === 'discussion_topic') {
-        todo_at = $.fudgeDateForProfileTimezone(Date.parse(json['todo_at']))
+      } else if (json.type === 'wiki_page' || json.type === 'discussion_topic') {
+        todo_at = $.fudgeDateForProfileTimezone(Date.parse(json.todo_at))
       }
 
       let override = null
@@ -151,7 +149,7 @@ export default class SyllabusView extends Backbone.View {
       let orig_start_date = null
       if (start_at) {
         start_date = new Date(start_at.getFullYear(), start_at.getMonth(), start_at.getDate())
-        orig_start_date = Date.parse(json['start_at'])
+        orig_start_date = Date.parse(json.start_at)
       }
 
       let end_date = null
@@ -161,7 +159,7 @@ export default class SyllabusView extends Backbone.View {
 
       if (
         !lastDate ||
-        (lastDate['date'] != null ? lastDate['date'].getTime() : undefined) !==
+        (lastDate.date != null ? lastDate.date.getTime() : undefined) !==
           (start_date != null ? start_date.getTime() : undefined)
       ) {
         lastDate = {
@@ -173,21 +171,19 @@ export default class SyllabusView extends Backbone.View {
 
         memo.push(lastDate)
         lastEvent = null
-      } else {
-        if (lastEvent) {
-          lastEvent['last'] = false
-        }
+      } else if (lastEvent) {
+        lastEvent.last = false
       }
 
       lastEvent = {
-        related_id: related_id,
-        type: json['type'],
-        title: title,
-        html_url: html_url,
-        start_at: start_at,
-        end_at: end_at,
-        due_at: due_at,
-        todo_at: todo_at,
+        related_id,
+        type: json.type,
+        title,
+        html_url,
+        start_at,
+        end_at,
+        due_at,
+        todo_at,
         same_day:
           (start_date != null ? start_date.getTime() : undefined) ===
           (end_date != null ? end_date.getTime() : undefined),
@@ -195,12 +191,12 @@ export default class SyllabusView extends Backbone.View {
           (start_at != null ? start_at.getTime() : undefined) ===
           (end_at != null ? end_at.getTime() : undefined),
         last: true,
-        override: override,
-        json: json,
-        workflow_state: json['workflow_state']
+        override,
+        json,
+        workflow_state: json.workflow_state
       }
 
-      lastDate['events'].push(lastEvent)
+      lastDate.events.push(lastEvent)
 
       if (!(related_id in relatedEvents)) {
         relatedEvents[related_id] = []
@@ -215,13 +211,13 @@ export default class SyllabusView extends Backbone.View {
 
     // Remove extraneous override information for single events
     let overrides_present = false
-    for (let id in relatedEvents) {
+    for (const id in relatedEvents) {
       const events = relatedEvents[id]
       if (events.length === 1) {
-        events[0]['override'] = null
+        events[0].override = null
       } else {
-        for (let event of Array.from(events)) {
-          overrides_present |= event['override'] !== null
+        for (const event of Array.from(events)) {
+          overrides_present |= event.override !== null
         }
       }
     }

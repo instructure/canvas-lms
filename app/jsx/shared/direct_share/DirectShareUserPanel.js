@@ -30,7 +30,12 @@ DirectShareUserPanel.propTypes = {
   onUserRemoved: func // basicUser => {}
 }
 
-export default function DirectShareUserPanel({selectedUsers, onUserSelected, onUserRemoved, courseId}) {
+export default function DirectShareUserPanel({
+  selectedUsers,
+  onUserSelected,
+  onUserRemoved,
+  courseId
+}) {
   function renderSelectedUserTags() {
     return selectedUsers.map(user => (
       <Tag
@@ -43,9 +48,11 @@ export default function DirectShareUserPanel({selectedUsers, onUserSelected, onU
     ))
   }
 
-  return <ContentShareUserSearchSelector
-    courseId={courseId || ENV.COURSE_ID}
-    onUserSelected={onUserSelected}
-    renderBeforeInput={renderSelectedUserTags}
-  />
+  return (
+    <ContentShareUserSearchSelector
+      courseId={courseId || ENV.COURSE_ID}
+      onUserSelected={onUserSelected}
+      renderBeforeInput={renderSelectedUserTags}
+    />
+  )
 }

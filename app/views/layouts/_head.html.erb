@@ -51,7 +51,7 @@
       ))
     end
   %>
-  <script>window.fetchIgnoredByNewRelic = window.fetch</script><%= browser_performance_monitor_embed %>
+  <%= browser_performance_monitor_embed %>
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
@@ -59,7 +59,7 @@
   <%= include_custom_meta_tags %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
-  <%= include_css_bundles %>
+  <%= benchmark("include_css_bundles") { include_css_bundles } %>
   <%= include_account_css %>
   <script>
     <%#
@@ -83,7 +83,14 @@
   <%= javascript_include_tag(active_brand_config_url('js'), defer: true) %>
 
   <% js_bundle :navigation_header unless @headers == false %>
-  <%= include_head_js %>
+
+  <% js_env(active_context_tab: get_active_tab) %>
+  <script>
+    INST = <%= benchmark("rendering INST") { raw(inst_env.to_json) } %>;
+    ENV = <%= benchmark("rendering ENV") { raw(render_js_env) } %>;
+  </script>
+
+  <%= benchmark("include_head_js") { include_head_js } %>
   <% @xhrs_to_prefetch_from_controller&.each do |args| %>
     <%= prefetch_xhr(*args) %>
   <% end %>

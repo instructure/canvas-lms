@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!load_bank'
 import $ from 'jquery'
-import addBank from '../../quizzes/question_bank/addBank'
+import addBank from './addBank'
 import 'jquery.ajaxJSON' /* ajaxJSON */
 import 'jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'
@@ -28,18 +28,24 @@ import 'jquery.keycodes' /* keycodes */
 import 'jquery.loadingImg' /* loadingImage */
 import 'jquery.templateData' /* fillTemplateData, getTemplateData */
 
-export default function loadBanks () {
-    var url = $("#bank_urls .managed_banks_url").attr('href');
-    var $dialog = $("#move_question_dialog");
-    $dialog.find("li.message").text(I18n.t('loading_banks', "Loading banks..."));
-    $.ajaxJSON(url, 'GET', {}, data => {
-      for(var idx = 0; idx < data.length; idx++) {
-        addBank(data[idx].assessment_question_bank);
+export default function loadBanks() {
+  const url = $('#bank_urls .managed_banks_url').attr('href')
+  const $dialog = $('#move_question_dialog')
+  $dialog.find('li.message').text(I18n.t('loading_banks', 'Loading banks...'))
+  $.ajaxJSON(
+    url,
+    'GET',
+    {},
+    data => {
+      for (let idx = 0; idx < data.length; idx++) {
+        addBank(data[idx].assessment_question_bank)
       }
-      $dialog.addClass('loaded');
-      $dialog.find("li.bank.blank").show();
-      $dialog.find("li.message").hide();
-    }, data => {
-      $dialog.find("li.message").text(I18n.t("error_loading_banks", "Error loading banks"));
-    });
+      $dialog.addClass('loaded')
+      $dialog.find('li.bank.blank').show()
+      $dialog.find('li.message').hide()
+    },
+    data => {
+      $dialog.find('li.message').text(I18n.t('error_loading_banks', 'Error loading banks'))
+    }
+  )
 }

@@ -29,8 +29,14 @@ import * as shapes from './shapes'
 
 const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup) => (
   <Flex justifyItems="space-between">
-    <Flex.Item padding="0 x-small 0 0"><Text size="large" weight="bold">{ outcomeGroup.title }</Text></Flex.Item>
-    <Flex.Item><Pill text={I18n.t('%{numMastered} of %{numGroup} Mastered', { numMastered, numGroup })} /></Flex.Item>
+    <Flex.Item padding="0 x-small 0 0">
+      <Text size="large" weight="bold">
+        {outcomeGroup.title}
+      </Text>
+    </Flex.Item>
+    <Flex.Item>
+      <Pill text={I18n.t('%{numMastered} of %{numGroup} Mastered', {numMastered, numGroup})} />
+    </Flex.Item>
   </Flex>
 )
 
@@ -52,31 +58,37 @@ export default class OutcomeGroup extends React.Component {
     this.props.onExpansionChange('group', this.props.outcomeGroup.id, expanded)
   }
 
-  render () {
-    const { outcomeGroup, outcomes, expanded, expandedOutcomes, onExpansionChange, outcomeProficiency } = this.props
-    const numMastered = outcomes.filter((o) => o.mastered).length
+  render() {
+    const {
+      outcomeGroup,
+      outcomes,
+      expanded,
+      expandedOutcomes,
+      onExpansionChange,
+      outcomeProficiency
+    } = this.props
+    const numMastered = outcomes.filter(o => o.mastered).length
     const numGroup = outcomes.length
 
     return (
       <View as="div" className="outcomeGroup">
         <ToggleGroup
           summary={outcomeGroupHeader(outcomeGroup, numMastered, numGroup)}
-          toggleLabel={I18n.t('Toggle outcomes for %{title}', { title: outcomeGroup.title })}
+          toggleLabel={I18n.t('Toggle outcomes for %{title}', {title: outcomeGroup.title})}
           expanded={expanded}
           onToggle={this.handleToggle}
         >
           <List variant="unstyled" delimiter="solid">
-            {
-              outcomes.sort(natcompare.byKey('title')).map((outcome) => (
-                <List.Item key={outcome.id} margin="0">
-                  <Outcome
-                    outcome={outcome}
-                    expanded={expandedOutcomes.has(outcome.expansionId)}
-                    onExpansionChange={onExpansionChange}
-                    outcomeProficiency={outcomeProficiency} />
-                </List.Item>
-              ))
-            }
+            {outcomes.sort(natcompare.byKey('title')).map(outcome => (
+              <List.Item key={outcome.id} margin="0">
+                <Outcome
+                  outcome={outcome}
+                  expanded={expandedOutcomes.has(outcome.expansionId)}
+                  onExpansionChange={onExpansionChange}
+                  outcomeProficiency={outcomeProficiency}
+                />
+              </List.Item>
+            ))}
           </List>
         </ToggleGroup>
       </View>

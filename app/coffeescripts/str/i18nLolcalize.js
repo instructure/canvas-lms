@@ -21,11 +21,11 @@ const formatter = {
 }
 
 // see also lib/i18n/lolcalize.rb
-function letThereBeLols (str) {
+function letThereBeLols(str) {
   // don't want to mangle placeholders, wrappers, etc.
   const pattern = /(\s*%h?\{[^\}]+\}\s*|\s*[\n\\`\*_\{\}\[\]\(\)\#\+\-!]+\s*|^\s+)/
 
-  const result = str.split(pattern).map((token) => {
+  const result = str.split(pattern).map(token => {
     if (token.match(pattern)) return token
     let s = ''
     // same as for i in [0...token.length] in coffeescript
@@ -40,7 +40,7 @@ function letThereBeLols (str) {
   return result.join('')
 }
 
-export default function i18nLolcalize (strOrObj) {
+export default function i18nLolcalize(strOrObj) {
   if (typeof strOrObj === 'string') return letThereBeLols(strOrObj)
 
   const result = {}

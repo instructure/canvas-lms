@@ -17,17 +17,11 @@
  */
 
 import React from 'react'
-import createReactClass from 'create-react-class';
+import createReactClass from 'create-react-class'
 import FolderTree from 'compiled/react_files/components/FolderTree'
 
-  FolderTree.render =  function () {
-    return (
-      <div
-        className='ef-folder-list'
-        ref='FolderTreeHolder'
-      >
-      </div>
-    );
-  };
+FolderTree.render = function() {
+  return <div className="ef-folder-list" ref="FolderTreeHolder" />
+}
 
-export default createReactClass(FolderTree);
+export default createReactClass(FolderTree)

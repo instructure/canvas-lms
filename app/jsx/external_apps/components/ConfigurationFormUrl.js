@@ -20,8 +20,8 @@ import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextInput from '../../external_apps/components/TextInput'
-import CheckboxInput from '../../external_apps/components/CheckboxInput'
+import TextInput from './TextInput'
+import CheckboxInput from './CheckboxInput'
 import 'compiled/jquery.rails_flash_notifications'
 
 export default class ConfigurationFormUrl extends React.Component {
@@ -39,7 +39,7 @@ export default class ConfigurationFormUrl extends React.Component {
   }
 
   isValid = () => {
-    let fields = ['name', 'configUrl'],
+    const fields = ['name', 'configUrl'],
       errors = {},
       formErrors = []
 

@@ -371,6 +371,16 @@ class GradebookImporter
     @student_columns += @parsed_custom_column_data.length
   end
 
+  GRADEBOOK_IMPORTER_RESERVED_NAMES = [
+    "Student",
+    "ID",
+    "SIS User ID",
+    "SIS Login ID",
+    "Section",
+    "Integration ID",
+    "Root Account"
+  ].freeze
+
   NON_ASSIGNMENT_COLUMN_HEADERS = [
     "Current Score",
     "Current Points",

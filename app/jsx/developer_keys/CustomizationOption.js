@@ -31,7 +31,7 @@ export default class CustomizationOption extends React.Component {
       return null
     }
 
-    return(
+    return (
       <Tooltip
         tip={I18n.t('Tool supports Deep Linking at this placement')}
         on={['click', 'hover', 'focus']}

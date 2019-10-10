@@ -2213,4 +2213,43 @@ describe Attachment do
       expect(dup.display_name).not_to eq 'test.txt'
     end
   end
+
+  describe "copy_attachments_to_submissions_folder" do
+    before(:once) do
+      course_with_student
+      @course.account.enable_service(:avatars)
+      attachment_model(context: @student)
+    end
+
+    it "copies a user attachment into the user's submissions folder" do
+      atts = Attachment.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts.length).to eq 1
+      expect(atts[0]).not_to eq @attachment
+      expect(atts[0].folder).to eq @student.submissions_folder(@course)
+    end
+
+    it "copies files already in submissions folders" do
+      @attachment.folder = @student.submissions_folder(@course)
+      @attachment.save!
+      atts = Attachment.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts).not_to include @attachment
+      expect(atts[0].root_attachment).to eq @attachment
+    end
+
+    it "copies a group attachment into the group submission folder" do
+      group_model(context: @course)
+      attachment_model(context: @group)
+      atts = Attachment.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts.length).to eq 1
+      expect(atts[0]).not_to eq @attachment
+      expect(atts[0].folder).to eq @group.submissions_folder
+    end
+
+    it "leaves files in non user/group context alone" do
+      assignment_model(context: @course)
+      weird_file = @assignment.attachments.create! display_name: 'blah', uploaded_data: default_uploaded_data
+      atts = Attachment.copy_attachments_to_submissions_folder(@course, [weird_file])
+      expect(atts).to eq [weird_file]
+    end
+  end
 end

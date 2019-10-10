@@ -27,7 +27,6 @@ import {completeUpload} from 'jsx/shared/upload_file'
 import template from 'jst/profiles/avatarDialog'
 
 export default class AvatarDialogView extends DialogBaseView {
-
   static initClass() {
     this.prototype.template = template
 
@@ -151,10 +150,10 @@ export default class AvatarDialogView extends DialogBaseView {
         const message = _.isString(errors.base)
           ? errors.base
           : _.isArray(errors.base)
-            ? errors.base.reduce(errorReducer, '')
-            : I18n.t(
-                'Your profile photo could not be uploaded. You may have exceeded your upload limit.'
-              )
+          ? errors.base.reduce(errorReducer, '')
+          : I18n.t(
+              'Your profile photo could not be uploaded. You may have exceeded your upload limit.'
+            )
 
         $.flashError(message)
         return this.enableSelectButton()
@@ -217,7 +216,7 @@ export default class AvatarDialogView extends DialogBaseView {
     }).then(_.partial(this.updateDomAvatar, url))
   }
 
-  updateDomAvatar = (url) => {
+  updateDomAvatar = url => {
     $('.profile_pic_link, .profile-link').css('background-image', `url('${url}')`)
     return this.close()
   }

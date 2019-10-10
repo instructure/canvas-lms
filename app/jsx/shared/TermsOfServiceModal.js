@@ -102,7 +102,9 @@ export default class TermsOfServiceModal extends React.Component {
           >
             <Modal.Body>
               {this.props.preview ? (
-                <div dangerouslySetInnerHTML={{__html: this.state.TERMS_OF_SERVICE_CUSTOM_CONTENT}} />
+                <div
+                  dangerouslySetInnerHTML={{__html: this.state.TERMS_OF_SERVICE_CUSTOM_CONTENT}}
+                />
               ) : (
                 <TermsOfServiceCustomContents />
               )}

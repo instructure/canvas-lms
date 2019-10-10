@@ -24,10 +24,11 @@ import {Spinner, Heading, Text} from '@instructure/ui-elements'
 import {showFlashAlert} from '../shared/FlashAlert'
 import * as apiClient from './apiClient'
 
-const unmount = (mount) => () => ReactDOM.unmountComponentAtNode(mount)
-export function showOutcomesImporterIfInProgress ({ mount, ...props }, userId) {
-  return apiClient.queryImportStatus(props.contextUrlRoot, 'latest').
-    then((response) => {
+const unmount = mount => () => ReactDOM.unmountComponentAtNode(mount)
+export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
+  return apiClient
+    .queryImportStatus(props.contextUrlRoot, 'latest')
+    .then(response => {
       if (response.status === 200 && response.data.workflow_state === 'importing') {
         const importId = response.data.id
         const invokedImport = userId === response.data.user.id
@@ -41,20 +42,12 @@ export function showOutcomesImporterIfInProgress ({ mount, ...props }, userId) {
           mount
         )
       }
-    }).
-    catch(() => {
     })
+    .catch(() => {})
 }
 
-export function showOutcomesImporter ({ mount, ...props }) {
-  ReactDOM.render(
-    <OutcomesImporter
-      {...props}
-      hide={unmount(mount)}
-      invokedImport
-    />,
-    mount
-  )
+export function showOutcomesImporter({mount, ...props}) {
+  ReactDOM.render(<OutcomesImporter {...props} hide={unmount(mount)} invokedImport />, mount)
 }
 
 export default class OutcomesImporter extends Component {
@@ -73,31 +66,34 @@ export default class OutcomesImporter extends Component {
     importId: null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.beginUpload()
   }
 
-  pollImportStatus (importId) {
+  pollImportStatus(importId) {
     const pollStatus = setInterval(() => {
-      apiClient.queryImportStatus(this.props.contextUrlRoot, importId).
-        then((response) => {
-          const workflowState = response.data.workflow_state
-          if (workflowState === 'succeeded' || workflowState === 'failed') {
-            this.completeUpload(response.data.processing_errors.length, workflowState === 'succeeded')
-            clearInterval(pollStatus)
-          }
-        })
+      apiClient.queryImportStatus(this.props.contextUrlRoot, importId).then(response => {
+        const workflowState = response.data.workflow_state
+        if (workflowState === 'succeeded' || workflowState === 'failed') {
+          this.completeUpload(response.data.processing_errors.length, workflowState === 'succeeded')
+          clearInterval(pollStatus)
+        }
+      })
     }, 1000)
   }
 
-  beginUpload () {
+  beginUpload() {
     const {disableOutcomeViews, resetOutcomeViews, contextUrlRoot, file, importId} = this.props
     disableOutcomeViews()
     if (file !== null) {
-      apiClient.createImport(contextUrlRoot, file).
-        then((resp) => this.pollImportStatus(resp.data.id)).
-        catch(() => {
-          showFlashAlert({type: 'error', message: I18n.t('There was an error uploading your file. Please try again.')})
+      apiClient
+        .createImport(contextUrlRoot, file)
+        .then(resp => this.pollImportStatus(resp.data.id))
+        .catch(() => {
+          showFlashAlert({
+            type: 'error',
+            message: I18n.t('There was an error uploading your file. Please try again.')
+          })
           resetOutcomeViews()
         })
     } else if (importId !== null) {
@@ -105,7 +101,7 @@ export default class OutcomesImporter extends Component {
     }
   }
 
-  completeUpload (count, succeeded) {
+  completeUpload(count, succeeded) {
     const {hide, resetOutcomeViews, invokedImport} = this.props
     if (hide) hide()
     resetOutcomeViews()
@@ -122,31 +118,34 @@ export default class OutcomesImporter extends Component {
     } else if (count > 0) {
       showFlashAlert({
         type: 'warning',
-        message: I18n.t('There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.')
+        message: I18n.t(
+          'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
+        )
       })
     } else {
-      showFlashAlert({ type: 'success', message: I18n.t('Your outcomes were successfully imported.') })
+      showFlashAlert({
+        type: 'success',
+        message: I18n.t('Your outcomes were successfully imported.')
+      })
     }
   }
 
-  render () {
+  render() {
     const {invokedImport} = this.props
     const styles = {
-      'textAlign': 'center',
-      'marginTop': '3rem'
+      textAlign: 'center',
+      marginTop: '3rem'
     }
     return (
       <div style={styles}>
-        <Spinner
-          title = {I18n.t('importing outcomes')}
-          size = 'large'
-        />
-        <Heading level='h4'>
-          {invokedImport && I18n.t("Please wait as we upload and process your file.")}
-          {!invokedImport && I18n.t("An outcome import is currently in progress.")}
+        <Spinner title={I18n.t('importing outcomes')} size="large" />
+        <Heading level="h4">
+          {invokedImport && I18n.t('Please wait as we upload and process your file.')}
+          {!invokedImport && I18n.t('An outcome import is currently in progress.')}
         </Heading>
-        <Text fontStyle='italic'>
-          {invokedImport && I18n.t("It's ok to leave this page, we'll email you when the import is done.")}
+        <Text fontStyle="italic">
+          {invokedImport &&
+            I18n.t("It's ok to leave this page, we'll email you when the import is done.")}
         </Text>
       </div>
     )

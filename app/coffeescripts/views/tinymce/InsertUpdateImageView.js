@@ -24,7 +24,7 @@ import htmlEscape from 'str/htmlEscape'
 import FileBrowser from 'jsx/shared/rce/FileBrowser'
 import DialogBaseView from '../DialogBaseView'
 import template from 'jst/tinymce/InsertUpdateImageView'
-import { send } from 'jsx/shared/rce/RceCommandShim'
+import {send} from 'jsx/shared/rce/RceCommandShim'
 import FindFlickrImageView from '../FindFlickrImageView'
 
 export default class InsertUpdateImageView extends DialogBaseView {
@@ -75,21 +75,23 @@ export default class InsertUpdateImageView extends DialogBaseView {
       case 'tabUploaded':
         loadTab(done => {
           ReactDOM.render(
-            <FileBrowser allowUpload={true}
-                         contentTypes={["image/*"]}
-                         selectFile={this.setSelectedImage}
-                         useContextAssets={true} />,
+            <FileBrowser
+              allowUpload
+              contentTypes={['image/*']}
+              selectFile={this.setSelectedImage}
+              useContextAssets
+            />,
             this.$el[0].querySelector('#tabUploaded'),
             done
           )
         })
-        break;
+        break
       case 'tabFlickr':
         loadTab(done => {
           new FindFlickrImageView().render().$el.appendTo(ui.panel)
           done()
         })
-        break;
+        break
     }
   }
 
@@ -170,7 +172,7 @@ export default class InsertUpdateImageView extends DialogBaseView {
       if (val) res[key] = val
     }
     if (this.$("[name='image[data-decorative]']").is(':checked')) {
-      res['alt'] = ''
+      res.alt = ''
       res['data-decorative'] = true
     }
     res['data-mce-src'] = res.src

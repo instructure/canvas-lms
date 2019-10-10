@@ -33,7 +33,6 @@ import '../../jquery.rails_flash_notifications'
 
 // The outcome group "directory" browser.
 export default class OutcomesDirectoryView extends PaginatedView {
-
   static initClass() {
     this.prototype.tagName = 'ul'
     this.prototype.className = 'outcome-level'

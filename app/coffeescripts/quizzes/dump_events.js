@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import eventManager from '../quizzes/log_auditing'
+import eventManager from './log_auditing'
 
 export default function(unregister) {
   if (unregister) {

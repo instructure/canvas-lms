@@ -25,14 +25,15 @@ import ScopesMethod from './ScopesMethod'
 
 const DeveloperKeyScope = props => {
   return (
-    <View
-      as="div"
-      data-automation="developer-key-scope"
-    >
+    <View as="div" data-automation="developer-key-scope">
       <Flex alignItems="start" padding="small medium small none">
         <Flex.Item padding="none">
           <Checkbox
-            label={<ScreenReaderContent>{props.checked ? I18n.t('Disable scope') : I18n.t('Enable scope')}</ScreenReaderContent>}
+            label={
+              <ScreenReaderContent>
+                {props.checked ? I18n.t('Disable scope') : I18n.t('Enable scope')}
+              </ScreenReaderContent>
+            }
             value={props.scope.scope}
             onChange={props.onChange}
             checked={props.checked}

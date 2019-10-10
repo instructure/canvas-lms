@@ -404,7 +404,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
         </Menu>
 
         <Menu.Item
-          disabled={!this.props.submissionsLoaded}
+          disabled={!this.props.submissionsLoaded || this.props.assignment.anonymizeStudents}
           onSelect={this.showMessageStudentsWhoDialog}
         >
           <span data-menu-item-id="message-students-who">{I18n.t('Message Students Who')}</span>

@@ -692,8 +692,6 @@ en:
   if_enabled_common_cartridge_importers_will_convert_9bffff09: If enabled, Common Cartridge importers will convert HTML files into Pages
   non_scoring_rubrics_9f2033ad: Non-scoring Rubrics
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: If enabled, the option will be presented to have non-scoring rubrics.
-  assignments_2_e88d7a26: Assignments 2
-  use_the_new_assignments_page_dd292b9d: Use the new assignments page
   slack_notifications_3a0288e6: Slack Notifications
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: The ability for users to receive notifications from slack
   content_security_policy_3bb8d922: Content Security Policy
@@ -714,6 +712,8 @@ en:
   show_new_analytics_for_course_and_user_data_18e92636: Show new analytics for course and user data
   new_gradebook_plagiarism_indicator_8dd22971: New Gradebook Plagiarism Indicator
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray.
+  course_favorites_from_dashboard_27a3515a: Course Favorites From Dashboard
+  this_allows_the_user_to_unfavorite_a_course_direct_828d0587: This allows the user to unfavorite a course directly from its dashboard card.
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
           to view a log of those events once a submission is made.
@@ -727,6 +727,12 @@ en:
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
     Allows admins to view a log containing information about all recently run
     GraphQL mutations
+  microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: Microsoft Immersive Reader - Free Trial (Wiki Pages)
+  makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: Makes a Microsoft Immersive Reader link option show up on wiki pages.
+  new_post_policy_icons_da13a62c: New Post Policy Icons
+  updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: Updates the display of Post Policy icons in the New Gradebook assignment column header.
+  gradebook_import_reserved_names_bugfix_apg_122_32a77a18: Gradebook Import Reserved Names Bugfix (APG-122)
+  behaviour_change_related_to_the_bugfix_in_apg_122__370fb242: Behaviour change related to the bugfix in APG-122. Don't allow custom columns to be created that are titled the same as gradebook importer reserved names
   accessible_sidebar_menu_b30baf97: Accessible Sidebar Menu
   improve_accessibility_of_left_hand_menu_through_be_908fb002: Improve accessibility of left-hand menu through better use of color plus visual and screenreader indicators of inactive menu items.
   check_submission_file_type_b3dbf3fd: Check Submission File Type
@@ -735,8 +741,12 @@ en:
     the allowed extensions of the associated assignment.
   this_is_a_siteadmin_test_feature_flag_3ab5184: This is a SiteAdmin test Feature Flag
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: This flag will not cause any change in behavior.
+  assignments_2_teacher_view_3cd3aeda: Assignments 2 Teacher View
+  use_the_new_assignments_teacher_page_8add7e46: Use the new assignments teacher page
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
+  assignments_2_student_view_224cb233: Assignments 2 Student View
+  use_the_new_assignments_student_page_944262af: Use the new assignments student page
   announcement_successfully_created_731a707f: Announcement successfully created
   announcement_creation_failed_f7d227f5: Announcement creation failed
   announcement_successfully_updated_7bc5130: Announcement successfully updated
@@ -1784,6 +1794,7 @@ en:
     site_admin: Site Admin
     assignments: Assignments
     syllabus: Syllabus
+    quizzes: Quizzes
     calendar_events: Calendar Events
     collaborations: Collaborations
     conferences: Conferences
@@ -1802,7 +1813,6 @@ en:
     jobs: Jobs
     outcomes: Outcomes
     question_banks: Question Banks
-    quizzes: Quizzes
     wiki_pages: Pages
     revisions: Revisions
     eportfolio_welcome: Welcome to Your ePortfolio
@@ -4352,6 +4362,7 @@ en:
   lti2:
     register_tool: Register Tool
   resource_url_must_match_the_resource_handler_s_dom_b768cf: resource url must match the resource handler's domain
+  loading_25990131: Loading...
   migration_issues:
     errors:
       valid_workflow_state: Must send a valid workflow state
@@ -9589,7 +9600,7 @@ en:
         body: |-
           Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
 
-          Your can view it here:
+          You can view it here:
           %{url}
         html:
           subject: 'Assignment Unmuted: %{title}, %{course}'
@@ -10459,6 +10470,10 @@ en:
         html:
           link: You can view it here
           body: Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
+    submissions_posted:
+      email:
+        html:
+          link: You can view the assignment here
     summaries:
       email:
         subject: Recent Canvas Notifications
@@ -10829,6 +10844,7 @@ en:
   can_list_subscriptions_to_data_service_data_b52d5e37: Can list subscriptions to data service data.
   can_destroy_subscription_to_data_service_data_b8dfca27: Can destroy subscription to data service data.
   can_list_categorized_event_types_52596f7: Can list categorized event types.
+  can_view_feature_flags_c92e0aa9: Can view feature flags
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: An error occurred while attempting to contact Turnitin.
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.
   update_your_notification_settings_ed9564f3: Update your notification settings
@@ -10936,6 +10952,20 @@ en:
 
     More info at %{url}
   grade_changes_and_new_comments_released_for_title__f1350f92: 'Grade changes and new comments released for: %{title}, %{course}'
+  submissions_posted_title_course_43677dba: 'Submissions Posted: %{title}, %{course}'
+  grade_changes_and_comments_have_been_released_for__624411ff: 'Grade changes and comments have been released for everyone graded in sections: %{section_names}.'
+  grade_changes_and_comments_have_been_released_for__79d3473e: Grade changes and comments have been released for everyone graded.
+  grade_changes_and_comments_have_been_released_for__5d6a01a0: 'Grade changes and comments have been released for everyone in sections: %{section_names}.'
+  grade_changes_and_comments_have_been_released_for__3978b741: Grade changes and comments have been released for everyone.
+  body_text_you_can_view_the_assignment_here_url_a4d5092c: |-
+    %{body_text}
+
+    You can view the assignment here:
+    %{url}
+  body_text_more_info_at_url_754b1a5a: |-
+    %{body_text}
+
+    More info at %{url}
   wiki_page_content_is_locked_or_not_yet_available_6fdad388: Wiki page content is locked or not yet available
   user_just_updated_title_88074ab2: "%{user} just updated %{title}"
   remove_name_as_an_admin_c296cf49: Remove %{name} as an admin
@@ -11057,7 +11087,6 @@ en:
   new_announcement_23af4598: New Announcement
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: Site Admin Only. Send to 1 / %{denominator} users in enabled accounts each month.
   publish_announcement_fec6d7e2: Publish announcement
-  loading_25990131: Loading...
   term_42976f1c: 'Term:'
   data_set_identifier_data_set_id_c228b5df: 'Data Set Identifier: %{data_set_id}'
   incremental_update_successfully_generated_against__db3f3f06: Incremental update successfully generated against a previous SIS Import.
@@ -11683,6 +11712,7 @@ en:
   resubmit_to_tool_name_1cf02a31: Resubmit to %{tool_name}
   grading_aa6de9: Grading
   select_rubric_2aa2ffa2: Select Rubric
+  comments_for_this_attempt_a5fae61f: Comments for this Attempt
   assignment_comments_e43ed898: Assignment Comments
   draft_comment_b2376ea4: Draft comment
   submit_a3cc6859: Submit
@@ -13221,6 +13251,8 @@ en:
       delete_quiz: Are you sure you want to delete this quiz?
     default_quiz_title: Quiz
     loading_question_banks: Loading Question Banks...
+    question:
+      positive_points: Must be zero or greater
     loading_questions: Loading Questions...
     loading_more_questions: loading more questions...
     more_questions: more questions
@@ -13229,8 +13261,6 @@ en:
     default_response_to_file_upload: Response to show student after they submit an answer
     default_comments_on_wrong_match: Response if the user misses this match
     default_answer_comments_on_match: Response if the student matches this answer
-    question:
-      positive_points: Must be zero or greater
     loading_question: Loading Question...
     top_level: "-- Top level --"
     before_quiz_item: before %{name}
@@ -15097,6 +15127,13 @@ en:
   more_modules_d9a9f003: More Modules
   attempt_current_attempt_ef626179: Attempt %{current_attempt}
   attempt_current_attempt_of_max_attempts_427ed508: Attempt %{current_attempt} of %{max_attempts}
+  media_af190855: Media
+  text_entry_e1808b2f: Text Entry
+  file_c851020d: File
+  url_22a5f3b8: URL
+  choose_one_submission_type_cf4eda5b: Choose One Submission Type
+  submission_type_a925fc5f: Submission Type
+  choose_one_2c4277df: Choose One
   preview_unavailable_aacd459a: Preview Unavailable
   download_c7ffdfb9: Download
   no_submission_fb131a40: No Submission
@@ -15130,7 +15167,6 @@ en:
   user_groups_query_error_bba6a6b7: User groups query error
   more_options_272b4953: More Options
   upload_8b403d05: Upload
-  text_entry_e1808b2f: Text Entry
   remove_submission_draft_f5c7f58b: Remove submission draft
   start_entry_4b491f60: Start Entry
   please_enter_a_url_d2c868b5: Please enter a url
@@ -15159,6 +15195,8 @@ en:
   ungraded_pointspossible_e2f86bd9: ungraded/%{pointsPossible}
   ungraded_147a0dce: ungraded
   formattedgrade_points_90505a61: "%{formattedGrade} Points"
+  calculated_by_baa3c8f3: 'Calculated by:'
+  most_recent_b2797d2: Most Recent
   attempt_attempt_grade_c01f45df: 'Attempt %{attempt}: %{grade}'
   late_penalty_minus_count_points_810572fe:
     one: 'Late Penalty: minus 1 Point'
@@ -15190,8 +15228,8 @@ en:
   new_attempt_57eae3d9: New Attempt
   failed_to_load_more_submissions_148ff11f: Failed to load more submissions
   submission_draft_updated_e953166a: Submission draft updated
-  submission_sent_3f0d2ee1: Submission sent
   error_sending_submission_d32dc075: Error sending submission
+  submission_sent_3f0d2ee1: Submission sent
   points_is_required_9a9d05b2: Points is required
   points_must_be_a_number_0_daa4f7dc: Points must be a number >= 0
   points_must_0_3bff353: Points must >= 0
@@ -15290,12 +15328,8 @@ en:
   arc_a935e585: ARC
   in_class_23eeca38: In Class
   app_b157c2b3: App
-  file_c851020d: File
-  media_af190855: Media
   non_canvas_11f36d4a: Non Canvas
-  url_22a5f3b8: URL
   add_submission_type_8690db4b: Add submission type
-  submission_type_a925fc5f: Submission Type
   or_9b70ccaa: Or
   and_7fcc2911: And
   coming_soon_79d46687: COMING SOON
@@ -15414,11 +15448,11 @@ en:
   change_applied_89d1aa5a: Change Applied
   applied_cc7be774: Applied
   blueprint_course_information_term_course_10d5cf30: 'Blueprint Course Information: %{term} - %{course}'
+  any_term_d49af19f: Any Term
+  any_sub_account_ec7069f2: Any Sub-Account
   search_by_title_short_name_or_sis_id_fe84aa12: Search by title, short name, or SIS ID
   select_term_f8083fb0: Select Term
-  any_term_d49af19f: Any Term
   select_sub_account_6704196a: Select Sub-Account
-  any_sub_account_ec7069f2: Any Sub-Account
   loading_courses_started_6e6d742c: Loading courses started
   loading_courses_complete_count_courses_found_6768d9e1:
     one: 'Loading courses complete: one course found'
@@ -15435,7 +15469,7 @@ en:
     one: Select (%{count}) Course
     other: Select All (%{count}) Courses
   associations_3fd4abe8: Associations
-  loading_assotiations_ac5f6dbf: Loading assotiations...
+  loading_associations_2b92bcf7: Loading associations...
   sync_history_3d46eb19: Sync History
   loading_sync_history_3eb11baf: Loading sync history...
   unsynced_changes_4ddaec76: Unsynced Changes
@@ -15598,10 +15632,13 @@ en:
   view_submission_ff3da5d: View Submission
   select_student_name_caaff244: Select student %{name}
   content_share_preview_166f6562: Content Share Preview
+  no_content_has_been_shared_with_you_667fde6c: No content has been shared with you.
   retrieval_of_received_shares_failed_6c5583e3: Retrieval of Received Shares failed
   received_content_53049822: Received Content
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: The list below is content that has been shared with you. You can preview the content, import it into your course, or remove it from the list.
   manage_options_for_name_83278ad0: Manage options for %{name}
+  unread_ee6db4aa: unread
+  read_7cabda44: read
   content_shared_by_others_to_you_5a40bb2c: Content shared by others to you
   received_7689640e: Received
   last_login_b7bc0479: 'Last login:'
@@ -15736,15 +15773,26 @@ en:
   help_menu_links_51184b65: Help menu links
   failed_to_load_recent_activity_d3e5adeb: Failed to load recent activity
   failed_to_save_dashboard_selection_32e71c72: Failed to save dashboard selection
+  no_courses_favorited_4e69fd63: No courses favorited
+  you_have_no_courses_favorited_reloading_this_page__a2bae9de: "You have no courses favorited. Reloading this page will show all\n      your active courses. To add favorites, go to "
+  all_courses_80701c6f: All Courses.
+  confirm_unfavorite_course_fa01966d: Confirm unfavorite course
+  unfavorite_coursename_32f77231: Unfavorite %{courseName}
+  you_are_about_to_remove_this_course_from_your_dash_7e806db6: |-
+    You are about to remove this course from your dashboard. It will still be available
+                  by navigating to Courses > All Courses from the main menu.
+  we_were_unable_to_remove_this_course_from_your_fav_70fa598d: We were unable to remove this course from your favorites.
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: Choose a color or course nickname or move course card for %{course}
   course_image_for_course_cfbb08df: Course image for %{course}
   course_card_color_region_for_course_c356a69c: Course card color region for %{course}
   actions_for_course_312ff446: Actions for %{course}
   color_a363e1b0: Color
-  top_66e0adb6: Top
-  ahead_21f22939: Ahead
-  behind_31e4e0fe: Behind
-  bottom_15a2a9be: Bottom
+  dashboard_card_movement_menu_b65b98f5: Dashboard Card Movement Menu
+  move_to_top_e0d7d66e: Move to top
+  move_up_2440f707: Move up
+  move_down_4a9c9b18: Move down
+  move_to_bottom_d0f71bf0: Move to bottom
+  unfavorite_cd0c113e: Unfavorite
   dashboard_options_b240ed5a: Dashboard Options
   dashboard_view_d7d85969: Dashboard View
   toggle_course_card_color_overlays_b5b8137a: Toggle course card color overlays
@@ -16847,7 +16895,6 @@ en:
   course_roles_d2d5d666: Course Roles
   account_roles_10fea071: Account Roles
   create_14873ed7: create
-  read_7cabda44: read
   update_374eb54: update
   delete_a143a2ab: delete
   4_rows_added_44e0db4d: 4 rows added
@@ -17750,9 +17797,9 @@ en:
   gpa_scale_6710e2ee: GPA scale
   other_ddacb37d: other
   score_pts_adcb1af3: "%{score} pts"
-  there_was_a_problem_starting_the_copy_operation_dd599cdd: There was a problem starting the copy operation
-  copy_operation_started_successfully_b2f236a1: Copy operation started successfully
   starting_copy_operation_cc46d911: Starting copy operation
+  copy_operation_started_successfully_b2f236a1: Copy operation started successfully
+  there_was_a_problem_starting_the_copy_operation_dd599cdd: There was a problem starting the copy operation
   starting_content_share_2d8c2999: Starting content share
   content_share_started_successfully_2c37fb79: Content share started successfully
   error_starting_content_share_18fb1532: Error starting content share

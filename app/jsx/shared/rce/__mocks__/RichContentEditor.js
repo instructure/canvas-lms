@@ -21,8 +21,7 @@ const RichContentEditor = {
   loadNewEditor() {},
   destroyRCE() {},
   callOnRCE(textarea, opName) {
-    if (opName === 'get_code')
-    return textarea.innerHTML
+    if (opName === 'get_code') return textarea.innerHTML
   }
 }
 export default RichContentEditor

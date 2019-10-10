@@ -22,7 +22,6 @@ import GroupCategoryCloneView from './GroupCategoryCloneView'
 import groupHasSubmissions from '../../../util/groupHasSubmissions'
 
 export default class GroupView extends View {
-
   static initClass() {
     this.prototype.tagName = 'li'
 
@@ -79,7 +78,7 @@ export default class GroupView extends View {
     } else {
       // enable droppable on the child GroupView (view)
       if (!this.$el.data('droppable')) {
-        this.$el.droppable(Object.assign({}, this.dropOptions)).on('drop', this._onDrop.bind(this))
+        this.$el.droppable({...this.dropOptions}).on('drop', this._onDrop.bind(this))
       }
       return this.$el.removeClass('slots-full')
     }

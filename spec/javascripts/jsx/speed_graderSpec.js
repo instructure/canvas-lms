@@ -782,7 +782,8 @@ QUnit.module('SpeedGrader#handleGradeSubmit', hooks => {
       course_id: '29',
       grading_role: 'moderator',
       help_url: 'example.com/support',
-      show_help_menu_item: false
+      show_help_menu_item: false,
+      RUBRIC_ASSESSMENT: {}
     }
     fakeENV.setup(env)
     sandbox.spy($.fn, 'append')
@@ -2948,7 +2949,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
       ...alphaIdPair,
       created_at: new Date().toISOString(),
       publishable: false,
-      comment: 'a comment'
+      comment: 'a comment',
+      author_name: 'an author'
     }
     const alphaAnonymousSubmissionComment = {
       ...alphaAnonymousIdPair,
@@ -4148,7 +4150,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) { /* eslint-disable-line qunit/
           course_id: '29',
           grading_role: 'moderator',
           help_url: 'example.com/support',
-          show_help_menu_item: false
+          show_help_menu_item: false,
+          RUBRIC_ASSESSMENT: {}
         })
         courses = `/courses/${ENV.course_id}`
         assignments = `/assignments/${ENV.assignment_id}`

@@ -192,14 +192,11 @@ export default class AnnouncementsIndex extends Component {
   }
 }
 
-const connectState = state =>
-  Object.assign(
-    {
-      isCourseContext: state.contextType === 'course'
-    },
-    selectPaginationState(state, 'announcements'),
-    select(state, ['permissions', 'masterCourseData', 'announcementsLocked'])
-  )
+const connectState = state => ({
+  isCourseContext: state.contextType === 'course',
+  ...selectPaginationState(state, 'announcements'),
+  ...select(state, ['permissions', 'masterCourseData', 'announcementsLocked'])
+})
 const connectActions = dispatch =>
   bindActionCreators(
     select(actions, [

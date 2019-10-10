@@ -18,7 +18,7 @@
 
 import ResourceLinkContentItem from '../ResourceLinkContentItem'
 
-const url ='https://www.test.com/launch'
+const url = 'https://www.test.com/launch'
 const endpoint = 'http://test.canvas.com/accounts/1/external_tools/retrieve'
 const title = 'Tool Title'
 const json = {
@@ -28,10 +28,7 @@ const json = {
 
 const resourceLinkContentItem = (overrides, launchEndpoint) => {
   const mergedJson = {...json, ...overrides}
-  return new ResourceLinkContentItem(
-    mergedJson,
-    launchEndpoint
-  )
+  return new ResourceLinkContentItem(mergedJson, launchEndpoint)
 }
 
 describe('constructor', () => {

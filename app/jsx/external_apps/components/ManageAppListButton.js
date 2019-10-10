@@ -20,7 +20,7 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '../../shared/components/InstuiModal'
-import ConfigOptionField from '../../external_apps/components/ConfigOptionField'
+import ConfigOptionField from './ConfigOptionField'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-layout'
 

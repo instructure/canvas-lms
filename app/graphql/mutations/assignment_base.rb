@@ -108,7 +108,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
   argument :allowed_attempts, Int, required: false
   argument :muted, Boolean, required: false
   argument :only_visible_to_overrides, Boolean, required: false
-  argument :submission_types, [Types::AssignmentType::AssignmentSubmissionType], required: false
+  argument :submission_types, [Types::AssignmentSubmissionType], required: false
   argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false
   argument :moderated_grading, Mutations::AssignmentModeratedGradingUpdate, required: false
   argument :grade_group_students_individually, Boolean, required: false

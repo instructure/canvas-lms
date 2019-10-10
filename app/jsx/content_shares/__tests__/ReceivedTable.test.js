@@ -19,7 +19,11 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import ReceivedTable from 'jsx/content_shares/ReceivedTable'
-import {assignmentShare, discussionShare} from 'jsx/content_shares/__tests__/test-utils'
+import {
+  assignmentShare,
+  readDiscussionShare,
+  unreadDiscussionShare
+} from 'jsx/content_shares/__tests__/test-utils'
 
 describe('content shares table', () => {
   it('renders only table header and no body rows when there are no shares', () => {
@@ -42,12 +46,22 @@ describe('content shares table', () => {
   })
 
   it('renders multiple rows of share data', () => {
-    const {getByText} = render(<ReceivedTable shares={[assignmentShare, discussionShare]} />)
+    const {getByText} = render(<ReceivedTable shares={[assignmentShare, readDiscussionShare]} />)
     expect(getByText(assignmentShare.name)).toBeInTheDocument()
     expect(getByText(assignmentShare.content_type)).toBeInTheDocument()
 
-    expect(getByText(discussionShare.name)).toBeInTheDocument()
-    expect(getByText(discussionShare.content_type)).toBeInTheDocument()
+    expect(getByText(readDiscussionShare.name)).toBeInTheDocument()
+    expect(getByText(readDiscussionShare.content_type)).toBeInTheDocument()
+  })
+
+  it('renders no unread dot for read items', () => {
+    const {queryByTestId} = render(<ReceivedTable shares={[readDiscussionShare]} />)
+    expect(queryByTestId('received-table-row-unread')).toBeNull()
+  })
+
+  it('renders an unread dot for unread items', () => {
+    const {queryByTestId} = render(<ReceivedTable shares={[unreadDiscussionShare]} />)
+    expect(queryByTestId('received-table-row-unread')).toBeInTheDocument()
   })
 
   it('triggers handler for preview menu action', () => {
@@ -61,7 +75,7 @@ describe('content shares table', () => {
     const previewOption = getByTestId('preview-menu-action')
     fireEvent.click(previewOption)
     expect(onPreview).toHaveBeenCalledTimes(1)
-    expect(onPreview).toHaveBeenCalledWith(assignmentShare.id)
+    expect(onPreview).toHaveBeenCalledWith(assignmentShare)
     expect(onImport).toHaveBeenCalledTimes(0)
   })
 

@@ -28,13 +28,11 @@ const PagesTray = () => (
     image="/images/tutorial-tray-images/page.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Build Pages containing content and educational resources that
+      {I18n.t(`Build Pages containing content and educational resources that
                 help students learn but aren't assignments. Include text,
-                multimedia, and links to files and external resources.`)
-      }
+                multimedia, and links to files and external resources.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default PagesTray

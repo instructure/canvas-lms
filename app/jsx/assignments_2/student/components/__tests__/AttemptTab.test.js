@@ -19,9 +19,9 @@
 import $ from 'jquery'
 import * as uploadFileModule from '../../../../shared/upload_file'
 import AttemptTab from '../AttemptTab'
+import {fireEvent, render, waitForElement} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '../../mocks'
 import React from 'react'
-import {render, waitForElement} from '@testing-library/react'
 import {SubmissionMocks} from '../../graphqlData/Submission'
 
 describe('ContentTabs', () => {
@@ -86,6 +86,68 @@ describe('ContentTabs', () => {
         const {findByTestId} = render(<AttemptTab {...props} />)
         expect(await findByTestId('text-entry')).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('there are multiple submission types', () => {
+    it('renders the attempt selection page', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: () => ({submissionTypes: ['online_text_entry', 'online_upload']})
+      })
+      const {getByText} = render(<AttemptTab {...props} />)
+
+      expect(getByText('Choose One Submission Type')).toBeInTheDocument()
+    })
+
+    it('shows the correct submission types in the selector', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: () => ({submissionTypes: ['online_text_entry', 'online_upload']})
+      })
+      const {container, getByText} = render(<AttemptTab {...props} />)
+
+      const selector = container.querySelector('select')
+      expect(selector).toContainElement(getByText('Choose One'))
+      expect(selector).toContainElement(getByText('Text Entry'))
+      expect(selector).toContainElement(getByText('File'))
+    })
+
+    it('allows you to select the submission type to render', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: () => ({submissionTypes: ['online_text_entry', 'online_upload']})
+      })
+      const {container, getByTestId} = render(<AttemptTab {...props} />)
+
+      const selector = container.querySelector('select')
+      fireEvent.change(selector, {target: {value: 'online_text_entry'}})
+
+      expect(await getByTestId('text-entry')).toBeInTheDocument()
+    })
+
+    it('continues rendering the type selector after selecting a type', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: () => ({submissionTypes: ['online_text_entry', 'online_upload']})
+      })
+      const {container, getByTestId, getByText} = render(<AttemptTab {...props} />)
+
+      const selector = container.querySelector('select')
+      fireEvent.change(selector, {target: {value: 'online_text_entry'}})
+
+      await getByTestId('text-entry')
+      expect(getByText('Choose One')).toBeInTheDocument()
+    })
+
+    it('renders the active submission type if available', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: () => ({submissionTypes: ['online_text_entry', 'online_upload']}),
+        Submission: () => ({
+          submissionDraft: {
+            activeSubmissionType: 'online_text_entry'
+          }
+        })
+      })
+      const {getByTestId} = render(<AttemptTab {...props} />)
+
+      expect(await getByTestId('text-entry')).toBeInTheDocument()
     })
   })
 })

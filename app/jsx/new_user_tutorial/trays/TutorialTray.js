@@ -26,7 +26,6 @@ import NewUserTutorialToggleButton from '../NewUserTutorialToggleButton'
 import ConfirmEndTutorialDialog from '../ConfirmEndTutorialDialog'
 
 class TutorialTray extends React.Component {
-
   static propTypes = {
     // Used as a label for the content (screenreader-only)
     label: PropTypes.string.isRequired,
@@ -38,44 +37,44 @@ class TutorialTray extends React.Component {
     returnFocusToFunc: PropTypes.func.isRequired
   }
 
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
     this.state = {
       ...props.store.getState(),
       endUserTutorialShown: false
-    };
+    }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.store.addChangeListener(this.handleStoreChange)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.store.removeChangeListener(this.handleStoreChange)
   }
 
   handleStoreChange = () => {
-    this.setState(this.props.store.getState());
+    this.setState(this.props.store.getState())
   }
 
   handleToggleClick = () => {
     this.props.store.setState({
       isCollapsed: !this.state.isCollapsed
-    });
+    })
   }
 
   handleEndTutorialClick = () => {
     this.setState({
       endUserTutorialShown: true
-    });
+    })
   }
 
   closeEndTutorialDialog = () => {
     this.setState({
       endUserTutorialShown: false
-    });
+    })
     if (this.endTutorialButton) {
-      this.endTutorialButton.focus();
+      this.endTutorialButton.focus()
     }
   }
 
@@ -84,10 +83,10 @@ class TutorialTray extends React.Component {
   }
 
   handleExiting = () => {
-    this.props.returnFocusToFunc().focus();
+    this.props.returnFocusToFunc().focus()
   }
 
-  render () {
+  render() {
     return (
       <Tray
         label={this.props.label}
@@ -101,7 +100,9 @@ class TutorialTray extends React.Component {
         <div className="NewUserTutorialTray">
           <div className="NewUserTutorialTray__ButtonContainer">
             <NewUserTutorialToggleButton
-              ref={(c) => { this.toggleButton = c; }}
+              ref={c => {
+                this.toggleButton = c
+              }}
               onClick={this.handleToggleClick}
               store={this.props.store}
             />
@@ -110,7 +111,9 @@ class TutorialTray extends React.Component {
           <div className="NewUserTutorialTray__EndTutorialContainer">
             <Button
               onClick={this.handleEndTutorialClick}
-              ref={(c) => { this.endTutorialButton = c; }}
+              ref={c => {
+                this.endTutorialButton = c
+              }}
             >
               {I18n.t('End Tutorial')}
             </Button>
@@ -121,7 +124,7 @@ class TutorialTray extends React.Component {
           />
         </div>
       </Tray>
-    );
+    )
   }
 }
 

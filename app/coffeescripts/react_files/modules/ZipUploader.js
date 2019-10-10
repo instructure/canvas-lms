@@ -54,11 +54,11 @@ export default class ZipUploader extends BaseUploader {
     this.uploadData = data.pre_attachment
     this.contentMigrationId = data.id
     return this._actualUpload()
-  };
+  }
 
   onUploadPosted = () => {
     return this.getContentMigration()
-  };
+  }
 
   // get the content migration when ready and use progress api to pull migration progress
   getContentMigration = () => {
@@ -71,7 +71,7 @@ export default class ZipUploader extends BaseUploader {
         return this.pullMigrationProgress(results.progress_url)
       }
     })
-  };
+  }
 
   pullMigrationProgress = url => {
     return $.getJSON(url).then(results => {
@@ -86,7 +86,7 @@ export default class ZipUploader extends BaseUploader {
         return this.onMigrationComplete()
       }
     })
-  };
+  }
 
   onMigrationComplete() {
     // reload to get new files to appear
@@ -98,7 +98,7 @@ export default class ZipUploader extends BaseUploader {
   trackProgress = e => {
     this.progress = e.loaded / e.total
     return this.onProgress(this.progress, this.file)
-  };
+  }
 
   // migration progress is [0..100]
   trackMigrationProgress(value) {

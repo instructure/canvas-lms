@@ -192,8 +192,8 @@ describe "manage groups" do
       expect(fj(".group-summary:visible:last").text).to eq "0 students"
 
       # Move the user from one group into the other
+      make_full_screen
       f(".groups .group .group-user .group-user-actions").click
-      scroll_into_view('.edit-group-assignment:first')
       fj(".edit-group-assignment:first").click
       f("div[aria-label='Move Student']") # wait for element
       f(".move-select .move-select__group option:last-child").click

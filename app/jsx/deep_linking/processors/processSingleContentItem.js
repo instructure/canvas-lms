@@ -21,7 +21,9 @@ import ContentItemProcessor from '../ContentItemProcessor'
 export default function processSingleContentItem(event) {
   const processor = ContentItemProcessor.fromEvent(event, processHandler)
 
-  if (processor) { return processor.process() }
+  if (processor) {
+    return processor.process()
+  }
 }
 
 async function processHandler() {

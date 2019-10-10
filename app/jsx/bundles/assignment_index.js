@@ -54,7 +54,8 @@ let assignmentSettingsView = false
 let assignmentSyncSettingsView = false
 let createGroupView = false
 let showByView = false
-const indexEl = window.location.href.indexOf('assignments') === -1 ? '#course_home_content' : '#content'
+const indexEl =
+  window.location.href.indexOf('assignments') === -1 ? '#course_home_content' : '#content'
 
 if (ENV.PERMISSIONS.manage_assignments) {
   assignmentSettingsView = new AssignmentSettingsView({
@@ -96,24 +97,28 @@ app.render()
 
 // kick it all off
 course.trigger('change')
-getPrefetchedXHR('assignment_groups_url').then(res =>
-  res.json().then(data => {
-    // we have to do things a little different than a normal paginatedCollection
-    // because we used prefetch_xhr to prefetch the first page of assignment_groups
-    // but we still want the rest of the pages (if any) to be fetched like any
-    // other paginatedCollection would.
-    assignmentGroups.reset(data)
-    const mockJqXHR = {getResponseHeader: h => res.headers.get(h)}
-    assignmentGroups._setStateAfterFetch(mockJqXHR, {})
-    if (!assignmentGroups.loadedAll) {
-      return assignmentGroups.fetch({page: 'next'})
+getPrefetchedXHR('assignment_groups_url')
+  .then(res =>
+    res.json().then(data => {
+      // we have to do things a little different than a normal paginatedCollection
+      // because we used prefetch_xhr to prefetch the first page of assignment_groups
+      // but we still want the rest of the pages (if any) to be fetched like any
+      // other paginatedCollection would.
+      assignmentGroups.reset(data)
+      const mockJqXHR = {getResponseHeader: h => res.headers.get(h)}
+      assignmentGroups._setStateAfterFetch(mockJqXHR, {})
+      if (!assignmentGroups.loadedAll) {
+        return assignmentGroups.fetch({page: 'next'})
+      }
+    })
+  )
+  .then(() => {
+    if (ENV.HAS_GRADING_PERIODS) {
+      app.filterResults()
+    }
+    if (ENV.PERMISSIONS.manage) {
+      assignmentGroups.loadModuleNames()
+    } else {
+      assignmentGroups.getGrades()
     }
   })
-).then(() => {
-  if (ENV.HAS_GRADING_PERIODS) { app.filterResults() }
-  if (ENV.PERMISSIONS.manage) {
-    assignmentGroups.loadModuleNames()
-  } else {
-    assignmentGroups.getGrades()
-  }
-})

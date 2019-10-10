@@ -27,7 +27,7 @@ import propTypes from '../propTypes'
 import CourseFilter from './CourseFilter'
 import CoursePickerTable from './CoursePickerTable'
 
-const { func, bool, arrayOf, string } = PropTypes
+const {func, bool, arrayOf, string} = PropTypes
 
 export default class CoursePicker extends React.Component {
   static propTypes = {
@@ -39,69 +39,74 @@ export default class CoursePicker extends React.Component {
     isLoadingCourses: bool.isRequired,
     onSelectedChanged: func,
     detailsRef: func,
-    isExpanded: bool,
+    isExpanded: bool
   }
 
   static defaultProps = {
     detailsRef: () => {},
     onSelectedChanged: () => {},
-    isExpanded: true,
+    isExpanded: true
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       isExpanded: props.isExpanded,
-      announceChanges: false,
+      announceChanges: false
     }
-    this._homeRef = null;
+    this._homeRef = null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fixIcons()
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (this.state.announceChanges && !this.props.isLoadingCourses && nextProps.isLoadingCourses) {
       $.screenReaderFlashMessage(I18n.t('Loading courses started'))
     }
 
     if (this.state.announceChanges && this.props.isLoadingCourses && !nextProps.isLoadingCourses) {
-      this.setState({ announceChanges: false })
-      $.screenReaderFlashMessage(I18n.t({
-        one: 'Loading courses complete: one course found',
-        other: 'Loading courses complete: %{count} courses found'
-      }, { count: nextProps.courses.length }))
+      this.setState({announceChanges: false})
+      $.screenReaderFlashMessage(
+        I18n.t(
+          {
+            one: 'Loading courses complete: one course found',
+            other: 'Loading courses complete: %{count} courses found'
+          },
+          {count: nextProps.courses.length}
+        )
+      )
     }
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     this.fixIcons()
   }
 
   onFilterActivate = () => {
     this.setState({
-      isExpanded: true,
+      isExpanded: true
     })
   }
 
-  onSelectedChanged = (selected) => {
+  onSelectedChanged = selected => {
     this.props.onSelectedChanged(selected)
-    this.setState({ isExpanded: true })
+    this.setState({isExpanded: true})
   }
 
   // when the filter updates, load new courses
-  onFilterChange = (filters) => {
+  onFilterChange = filters => {
     this.props.loadCourses(filters)
 
     this.setState({
       filters,
       isExpanded: true,
-      announceChanges: true,
+      announceChanges: true
     })
   }
 
-  // when user clicks "Courses" button to toggle visibliity
+  // when user clicks "Courses" button to toggle visibility
   onToggleCoursePicker = (event, isExpanded) => {
     this.setState({isExpanded})
   }
@@ -109,24 +114,30 @@ export default class CoursePicker extends React.Component {
   // in IE, instui icons are in the tab order and get focus, even if hidden
   // this fixes them up so that doesn't happen.
   // Eventually this should get folded into instui via INSTUI-572
-  fixIcons () {
+  fixIcons() {
     if (this._homeRef) {
-      Array.prototype.forEach.call(
-        this._homeRef.querySelectorAll('svg[aria-hidden]'),
-        (el) => { el.setAttribute('focusable', 'false') }
-      )
+      Array.prototype.forEach.call(this._homeRef.querySelectorAll('svg[aria-hidden]'), el => {
+        el.setAttribute('focusable', 'false')
+      })
     }
   }
 
-  reloadCourses () {
+  reloadCourses() {
     this.props.loadCourses(this.state.filters)
   }
 
-  render () {
+  render() {
     return (
-      <div className="bca-course-picker" ref={(el) => { this._homeRef = el }}>
+      <div
+        className="bca-course-picker"
+        ref={el => {
+          this._homeRef = el
+        }}
+      >
         <CourseFilter
-          ref={(c) => { this.filter = c }}
+          ref={c => {
+            this.filter = c
+          }}
           terms={this.props.terms}
           subAccounts={this.props.subAccounts}
           onChange={this.onFilterChange}
@@ -134,20 +145,26 @@ export default class CoursePicker extends React.Component {
         />
         <div className="bca-course-details__wrapper">
           <ToggleDetails
-            ref={(c) => { this.coursesToggle = c }}
+            ref={c => {
+              this.coursesToggle = c
+            }}
             expanded={this.state.isExpanded}
             summary={
-              <span ref={(c) => {
-                if (c) this.props.detailsRef(c.parentElement.parentElement)
-              }}>
+              <span
+                ref={c => {
+                  if (c) this.props.detailsRef(c.parentElement.parentElement)
+                }}
+              >
                 <Text>{I18n.t('Courses')}</Text>
               </span>
             }
             onToggle={this.onToggleCoursePicker}
           >
-            {this.props.isLoadingCourses && (<div className="bca-course-picker__loading">
-              <Spinner renderTitle={I18n.t('Loading Courses')} />
-            </div>)}
+            {this.props.isLoadingCourses && (
+              <div className="bca-course-picker__loading">
+                <Spinner renderTitle={I18n.t('Loading Courses')} />
+              </div>
+            )}
             <CoursePickerTable
               courses={this.props.courses}
               selectedCourses={this.props.selectedCourses}

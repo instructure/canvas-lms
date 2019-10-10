@@ -32,7 +32,7 @@ export default class DialogManager {
 
   hide = () => {
     $('#media_comment_dialog').dialog('close')
-  };
+  }
 
   createLoadingWindow() {
     if (this.dialog.length === 0) {
@@ -82,7 +82,7 @@ export default class DialogManager {
         return opts.close.call(this.$dialog)
       }
     })
-  };
+  }
 
   setupTypes(mediaType) {
     if (mediaType === 'video') {

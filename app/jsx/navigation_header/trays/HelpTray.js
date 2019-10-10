@@ -26,9 +26,11 @@ import HelpDialog from '../../help_dialog/HelpDialog'
 export default function HelpTray({trayTitle, closeTray, links, hasLoaded}) {
   return (
     <View as="div" padding="medium" id="help_tray">
-      <Heading level="h3" as="h2">{trayTitle}</Heading>
-      <hr role="presentation"/>
-      <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray}/>
+      <Heading level="h3" as="h2">
+        {trayTitle}
+      </Heading>
+      <hr role="presentation" />
+      <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray} />
     </View>
   )
 }
@@ -41,7 +43,9 @@ HelpTray.propTypes = {
 }
 
 HelpTray.defaultProps = {
-  get trayTitle(){return I18n.t('Help')},
+  get trayTitle() {
+    return I18n.t('Help')
+  },
   hasLoaded: false,
   links: []
 }

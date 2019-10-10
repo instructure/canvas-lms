@@ -286,9 +286,13 @@ class FeatureFlagsController < ApplicationController
   def delete
     if authorized_action(@context, @current_user, :manage_feature_flags)
       return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
-      flag = @context.feature_flags.where(feature: params[:feature]).first!
+      flag = @context.feature_flags.find_by!(feature: params[:feature])
+      prior_state = flag.state
       return render json: { message: "flag is locked" }, status: :forbidden if flag.locked?(@context)
-      flag.destroy
+      if flag.destroy
+        feature_def = Feature.definitions[params[:feature]]
+        feature_def.after_state_change_proc&.call(@current_user, @context, prior_state, feature_def.state)
+      end
       render json: feature_flag_json(flag, @context, @current_user, session)
     end
   end

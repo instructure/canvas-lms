@@ -24,9 +24,9 @@ import {IconXSolid} from '@instructure/ui-icons'
 import I18n from 'i18n!cyoe_assignment_sidebar_breakdown_details'
 import StudentRangesView from './student-ranges-view'
 import StudentDetailsView from './student-details-view'
-import { assignmentShape, selectedPathShape } from '../shapes/index'
+import {assignmentShape, selectedPathShape} from '../shapes/index'
 
-const { array, object, func, bool } = PropTypes
+const {array, object, func, bool} = PropTypes
 
 export default class BreakdownDetails extends React.Component {
   static propTypes = {
@@ -44,7 +44,7 @@ export default class BreakdownDetails extends React.Component {
 
   unselectStudent = () => {
     this.props.selectStudent(null)
-  };
+  }
 
   selectPrevStudent = () => {
     let studentIndex = this.props.selectedPath.student
@@ -57,25 +57,29 @@ export default class BreakdownDetails extends React.Component {
     }
 
     this.props.selectStudent(studentIndex)
-  };
+  }
 
   selectNextStudent = () => {
     let studentIndex = this.props.selectedPath.student
     const range = this.props.ranges[this.props.selectedPath.range]
 
-    if (studentIndex < (range.size - 1)) {
+    if (studentIndex < range.size - 1) {
       studentIndex += 1
     } else {
       studentIndex = 0
     }
 
     this.props.selectStudent(studentIndex)
-  };
+  }
 
-  render () {
-    const { selectedPath, ranges, students } = this.props
-    const selectedStudent = selectedPath.student !== null ? ranges[selectedPath.range].students[selectedPath.student].user : null
-    const studentDetails = selectedPath.student !== null && selectedStudent ? students[selectedStudent.id] : null
+  render() {
+    const {selectedPath, ranges, students} = this.props
+    const selectedStudent =
+      selectedPath.student !== null
+        ? ranges[selectedPath.range].students[selectedPath.student].user
+        : null
+    const studentDetails =
+      selectedPath.student !== null && selectedStudent ? students[selectedStudent.id] : null
 
     return (
       <Tray
@@ -89,7 +93,9 @@ export default class BreakdownDetails extends React.Component {
             <span className="crs-breakdown-details__closeButton">
               <Button
                 variant="icon"
-                ref={(e) => { this.closeButton = e }}
+                ref={e => {
+                  this.closeButton = e
+                }}
                 onClick={this.props.closeSidebar}
               >
                 <span className="crs-breakdown-details__closeButtonIcon">
@@ -116,6 +122,6 @@ export default class BreakdownDetails extends React.Component {
           </div>
         </div>
       </Tray>
-    );
+    )
   }
 }

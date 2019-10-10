@@ -47,9 +47,7 @@ class GradebookExportManager {
 
     this.exportingUrl = exportingUrl
     this.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
-    this.attachmentBaseUrl = `${
-      GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL
-    }/${currentUserId}/files`
+    this.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
     this.currentUserId = currentUserId
 
     if (existingExport) {

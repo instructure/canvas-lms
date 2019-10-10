@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import ReceivedContentView from 'jsx/content_shares/ReceivedContentView'
 import {assignmentShare} from 'jsx/content_shares/__tests__/test-utils'
@@ -47,6 +47,16 @@ describe('view of received content', () => {
     expect(getByText(shares[0].name)).toBeInTheDocument()
   })
 
+  it('displays a message instead of a table on an empty return', () => {
+    useFetchApi.mockImplementationOnce(({loading, success}) => {
+      loading(false)
+      success([])
+    })
+    const {queryByText, getByText} = render(<ReceivedContentView />)
+    expect(queryByText('Content shared by others to you')).toBeNull()
+    expect(getByText(/no content has been shared with you/i)).toBeInTheDocument()
+  })
+
   it('raises an error on unsuccessful retrieval', () => {
     useFetchApi.mockImplementationOnce(({loading, error}) => {
       loading(false)
@@ -55,5 +65,17 @@ describe('view of received content', () => {
     expect(() => {
       render(<ReceivedContentView />)
     }).toThrow('Retrieval of Received Shares failed')
+  })
+
+  it('displays a preview modal when requested', () => {
+    const shares = [assignmentShare]
+    useFetchApi.mockImplementationOnce(({loading, success}) => {
+      loading(false)
+      success(shares)
+    })
+    const {getByText} = render(<ReceivedContentView />)
+    fireEvent.click(getByText(/manage options/i))
+    fireEvent.click(getByText('Preview'))
+    expect(document.querySelector('iframe')).toBeInTheDocument()
   })
 })

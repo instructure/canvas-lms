@@ -66,7 +66,7 @@ export default class DiscussionToolbarView extends View {
     this.$unread.prop('checked', false)
     this.$unread.button('refresh')
     return this.maybeDisableFields()
-  };
+  }
 
   toggleUnread() {
     // setTimeout so the ui can update the button before the rest

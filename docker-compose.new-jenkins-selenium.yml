@@ -13,7 +13,7 @@ services:
       SASS_STYLE: 'compressed'
 
   selenium-chrome:
-    build: ./docker-compose/selenium-chrome
+    image: starlord.inscloudgate.net/jenkins/selenium-chrome:3.141.59-selenium
 
   canvasrceapi:
     image: starlord.inscloudgate.net/jeremyp/canvas-rce-api_web

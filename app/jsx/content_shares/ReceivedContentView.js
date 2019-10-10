@@ -21,14 +21,16 @@ import I18n from 'i18n!content_share'
 import ContentHeading from './ContentHeading'
 import ReceivedTable from './ReceivedTable'
 import PreviewModal from './PreviewModal'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner, Text} from '@instructure/ui-elements'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
+
+const NoContent = () => <Text size="large">{I18n.t('No content has been shared with you.')}</Text>
 
 export default function ReceivedContentView() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [shares, setShares] = useState([])
-  const [previewOpen, setPreviewOpen] = useState(false)
+  const [currentPreviewShare, setCurrentPreviewShare] = useState(null)
 
   const getSharesUrl = '/api/v1/users/self/content_shares/received'
 
@@ -39,12 +41,21 @@ export default function ReceivedContentView() {
     path: getSharesUrl
   })
 
-  function onPreview(shareId) {
-    setPreviewOpen(true)
+  function onPreview(share) {
+    setCurrentPreviewShare(share)
   }
 
   function onImport(shareId) {
     console.log(`onImport action for ${shareId}`)
+  }
+
+  function renderBody() {
+    const someContent = Array.isArray(shares) && shares.length > 0
+
+    if (isLoading) return <Spinner renderTitle={I18n.t('Loading')} />
+    if (someContent)
+      return <ReceivedTable shares={shares} onPreview={onPreview} onImport={onImport} />
+    return <NoContent />
   }
 
   if (error) throw new Error(I18n.t('Retrieval of Received Shares failed'))
@@ -59,9 +70,12 @@ export default function ReceivedContentView() {
             'content, import it into your course, or remove it from the list.'
         )}
       />
-      <ReceivedTable shares={shares} onPreview={onPreview} onImport={onImport} />
-      {isLoading && <Spinner renderTitle={I18n.t('Loading')} />}
-      <PreviewModal open={previewOpen} onDismiss={() => setPreviewOpen(false)} />
+      {renderBody()}
+      <PreviewModal
+        open={currentPreviewShare !== null}
+        share={currentPreviewShare}
+        onDismiss={() => setCurrentPreviewShare(null)}
+      />
     </>
   )
 }

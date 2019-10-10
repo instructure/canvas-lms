@@ -18,9 +18,14 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import formatMessage from '../../../format-message'
+import Bridge from '../../../bridge'
+import {StoreProvider} from '../shared/StoreContext'
 
 export default function(ed, document) {
-  return import('./UploadMedia').then(({UploadMedia}) => {
+  return import('@instructure/canvas-media').then((CanvasMedia) => {
+    const UploadMedia = CanvasMedia.default
+  // return import('./UploadMedia').then(({UploadMedia}) => {
     let container = document.querySelector('.canvas-rce-media-upload')
     if (!container) {
       container = document.createElement('div')
@@ -33,6 +38,57 @@ export default function(ed, document) {
       ed.focus(false)
     }
 
-    ReactDOM.render(<UploadMedia onDismiss={handleDismiss} editor={ed} />, container)
+    // redux's activateMediaUpload action does the image placeholder,
+    // but it also does the upload. We need to separate them if we
+    // want to stay within the redux approach
+    const handleStartUpload = fileProps => {
+      Bridge.insertImagePlaceholder(fileProps)
+      handleDismiss()
+    }
+
+    const handleUpload = (error, uploadData, onUploadComplete) => {
+      onUploadComplete(error, uploadData)
+    }
+
+    const trayProps = Bridge.trayProps.get(ed)
+
+    ReactDOM.render(
+      <StoreProvider {...trayProps}>
+        {contentProps => (
+          <UploadMedia
+            contextType={ed.settings.canvas_rce_user_context.type}
+            contextId={ed.settings.canvas_rce_user_context.id}
+            open
+            languages={[{id: 'en', label: 'English'}]}
+            liveRegion={() => document.getElementById('flash_screenreader_holder')}
+            onStartUpload={fileProps => handleStartUpload(fileProps)}
+            onComplete={(err, data) => handleUpload(err, data, contentProps.mediaUploadComplete)}
+            onDismiss={handleDismiss}
+            tabs={{embed: false, record: true, upload: true}}
+            uploadMediaTranslations={
+              {UploadMediaStrings: {
+                ADD_CLOSED_CAPTIONS_OR_SUBTITLES: formatMessage('Add CC/Subtitles'),
+                CLEAR_FILE_TEXT: formatMessage('Clear selected file'),
+                CLOSE_TEXT: formatMessage('Close'),
+                CLOSED_CAPTIONS_CHOOSE_FILE: formatMessage('Choose caption file'),
+                CLOSED_CAPTIONS_SELECT_LANGUAGE: formatMessage('Select Language'),
+                COMPUTER_PANEL_TITLE: formatMessage('Computer'),
+                DRAG_DROP_CLICK_TO_BROWSE: formatMessage('Drop and drop, or click to browse your computer'),
+                DRAG_FILE_TEXT: formatMessage('Drag a file here'),
+                EMBED_PANEL_TITLE: formatMessage('Embed'),
+                EMBED_VIDEO_CODE_TEXT: formatMessage('Embed Code'),
+                INVALID_FILE_TEXT: formatMessage('Invalid File'),
+                LOADING_MEDIA: formatMessage('Loading...'),
+                RECORD_PANEL_TITLE: formatMessage('Record'),
+                SUBMIT_TEXT: formatMessage('Submit'),
+                UPLOADING_ERROR: formatMessage('Upload Error'),
+                UPLOAD_MEDIA_LABEL: formatMessage('Upload Media'),
+                MEDIA_RECORD_NOT_AVAILABLE: formatMessage('Audio and Video recording is not available.')
+              }
+            }}
+          />
+        )}
+      </StoreProvider>, container
+    )
   })
 }

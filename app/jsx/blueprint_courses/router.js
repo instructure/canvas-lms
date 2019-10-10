@@ -20,32 +20,32 @@ import page from 'page'
 
 export default class BlueprintRouter {
   static PATHS = {
-    singleMigration: '/blueprint/:blueprintType/:templateId/:changeId',
+    singleMigration: '/blueprint/:blueprintType/:templateId/:changeId'
   }
 
-  static handleEnter (route) {
+  static handleEnter(route) {
     return (ctx, next) => {
       route.onEnter(ctx)
       next()
     }
   }
 
-  static handleExit (route) {
+  static handleExit(route) {
     return (ctx, next) => {
       route.onExit(ctx)
       next()
     }
   }
 
-  constructor (pageInstance = page) {
+  constructor(pageInstance = page) {
     this.page = pageInstance
   }
 
-  registerRoutes (routes) {
+  registerRoutes(routes) {
     routes.forEach(this.registerRoute)
   }
 
-  registerRoute = (route) => {
+  registerRoute = route => {
     if (route.onEnter) {
       this.page(route.path, BlueprintRouter.handleEnter(route))
     }
@@ -55,12 +55,12 @@ export default class BlueprintRouter {
     }
   }
 
-  start () {
+  start() {
     this.page.base(location.pathname)
-    this.page({ hashbang: true })
+    this.page({hashbang: true})
   }
 
-  stop () {
+  stop() {
     // it's possible that we're not the only thing using page
     // page.stop()
   }

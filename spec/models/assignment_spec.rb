@@ -3428,6 +3428,38 @@ describe Assignment do
     end
   end
 
+  describe "#peer_reviews_assigned" do
+    before :once do
+      @assignment = assignment_model(course: @course)
+      @assignment.peer_reviews = true
+      @assignment.automatic_peer_reviews = true
+      @assignment.due_at = 1.day.ago
+      @assignment.peer_reviews_assigned = true
+      @assignment.save!
+    end
+
+    it "is set to `true` when all peer reviews have been assigned" do
+      @assignment.assign_peer_reviews
+      expect(@assignment.peer_reviews_assigned).to be true
+    end
+
+    it "is set to `false` when the #assign_at time changes" do
+      @assignment.assign_peer_reviews
+      @assignment.peer_reviews_assign_at = 1.day.from_now
+      @assignment.save!
+      expect(@assignment.peer_reviews_assigned).to be false
+    end
+  end
+
+  describe "#peer_reviews_assign_at" do
+    it "is writeable" do
+      assignment_model(course: @course)
+      now = Time.zone.now
+      @assignment.peer_reviews_assign_at = now
+      expect(@assignment.peer_reviews_assign_at).to eq now
+    end
+  end
+
   context "peer reviews" do
     before :once do
       assignment_model(course: @course)
@@ -3477,61 +3509,43 @@ describe Assignment do
       end
     end
 
-    it "should schedule auto_assign when variables are right" do
-      @a.peer_reviews = true
-      @a.automatic_peer_reviews = true
-      @a.due_at = Time.zone.now
+    describe '"auto-assign" scheduling' do
+      before :each do
+        @a.peer_reviews = true
+        @a.automatic_peer_reviews = true
+        @a.due_at = Time.zone.now
+      end
 
-      expects_job_with_tag('Assignment#do_auto_peer_review') {
+      it "schedules a 'do_auto_peer_review' job when saved" do
+        expects_job_with_tag('Assignment#do_auto_peer_review', 1) {
+          @a.save!
+        }
+      end
+
+      it "schedules review assignment using the assignment due date" do
+        @a.peer_reviews_due_at = 1.day.from_now
         @a.save!
-      }
-    end
+        job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+        expect(job.run_at).to eq @a.peer_reviews_due_at
+      end
 
-    it "should re-schedule auto_assign date is pushed out" do
-      @a.peer_reviews = true
-      @a.automatic_peer_reviews = true
-      @a.peer_reviews_due_at = 1.day.from_now
-      @a.save!
-      job = Delayed::Job.where(:tag => "Assignment#do_auto_peer_review").last
-      expect(job.run_at.to_i).to eq @a.peer_reviews_due_at.to_i
-
-      @a.peer_reviews_due_at = 2.days.from_now
-      @a.save!
-      job.reload
-      expect(job.run_at.to_i).to eq @a.peer_reviews_due_at.to_i
-    end
-
-    it "should not schedule auto_assign when skip_schedule_peer_reviews is set" do
-      @a.peer_reviews = true
-      @a.automatic_peer_reviews = true
-      @a.due_at = Time.zone.now
-      @a.skip_schedule_peer_reviews = true
-
-      expects_job_with_tag('Assignment#do_auto_peer_review', 0) {
+      it "re-schedules the existing job when the assignment due date changes" do
+        @a.peer_reviews_due_at = 1.day.from_now
         @a.save!
-      }
-    end
+        job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+        @a.peer_reviews_due_at = 2.days.from_now
+        @a.save!
+        job.reload
+        expect(job.run_at).to eq @a.peer_reviews_due_at
+      end
 
-    it "should reset peer_reviews_assigned when the assign_at time changes" do
-      @a.peer_reviews = true
-      @a.automatic_peer_reviews = true
-      @a.due_at = 1.day.ago
-      @a.peer_reviews_assigned = true
-      @a.save!
+      it "does not schedule a job when #skip_schedule_peer_reviews is set" do
+        @a.skip_schedule_peer_reviews = true
 
-      @a.assign_peer_reviews
-      expect(@a.peer_reviews_assigned).to be_truthy
-
-      @a.peer_reviews_assign_at = 1.day.from_now
-      @a.save!
-
-      expect(@a.peer_reviews_assigned).to be_falsey
-    end
-
-    it "should allow setting peer_reviews_assign_at" do
-      now = Time.now
-      @assignment.peer_reviews_assign_at = now
-      expect(@assignment.peer_reviews_assign_at).to eq now
+        expects_job_with_tag('Assignment#do_auto_peer_review', 0) {
+          @a.save!
+        }
+      end
     end
 
     it "should assign multiple peer reviews" do
@@ -3655,34 +3669,315 @@ describe Assignment do
       end
     end
 
-    context "differentiated_assignments" do
+    context "when using assignment overrides and manual peer review assignment" do
       before :once do
-        setup_differentiated_assignments
-        @assignment.submit_homework(@student1, submission_type: 'online_url', url: 'http://www.google.com')
-        @submissions = @assignment.submissions
+        @assignment = assignment_model(
+          automatic_peer_reviews: false,
+          course: @course,
+          due_at: 1.day.from_now,
+          only_visible_to_overrides: false,
+          peer_review_count: 1,
+          peer_reviews: true,
+          submission_types: "online_url",
+          workflow_state: "published"
+        )
+
+        @section1 = @course.course_sections.create!(name: 'Section One')
+        @section2 = @course.course_sections.create!(name: 'Section Two')
+
+        @override_s1 = @assignment.assignment_overrides.build
+        @override_s1.set = @section1
+        @override_s1.due_at = 2.days.from_now
+        @override_s1.save!
       end
-      context "feature on" do
-        it "should assign peer reviews only to students with visibility" do
-          @assignment.peer_review_count = 1
-          res = @assignment.assign_peer_reviews
-          expect(res.length).to be 0
-          @submissions.reload.each do |s|
-            expect(res.map(&:asset)).not_to include(s)
-            expect(res.map(&:assessor_asset)).not_to include(s)
+
+      context "when the assignment is assigned to everyone" do
+        before :once do
+          @student1, @student2, @student3, @student4 = create_users(4, return_type: :record)
+          student_in_section(@section1, user: @student1)
+          student_in_section(@section2, user: @student2)
+          student_in_section(@section1, user: @student3)
+          student_in_section(@section2, user: @student4)
+
+          # Submit homework for review. Only submitted homework is considered for review.
+          @assignment.submit_homework(@student1, submission_type: 'online_url', url: 'http://www.google.com')
+          @assignment.submit_homework(@student2, submission_type: 'online_url', url: 'http://www.google.com')
+          @assignment.submit_homework(@student3, submission_type: 'online_url', url: 'http://www.google.com')
+          @assignment.submit_homework(@student4, submission_type: 'online_url', url: 'http://www.google.com')
+        end
+
+        it "assigns every student a peer for review" do
+          assessment_requests = @assignment.assign_peer_reviews
+          expect(assessment_requests.map(&:assessor_id)).to contain_exactly(
+            @student1.id,
+            @student2.id,
+            @student3.id,
+            @student4.id
+          )
+        end
+
+        it "assigns every student as a peer to review" do
+          assessment_requests = @assignment.assign_peer_reviews
+          expect(assessment_requests.map(&:user_id)).to contain_exactly(
+            @student1.id,
+            @student2.id,
+            @student3.id,
+            @student4.id
+          )
+        end
+      end
+
+      context "when the assignment is assigned only to some students" do
+        before :once do
+          @assignment.only_visible_to_overrides = true
+          @assignment.save!
+
+          @student1, @student2, @student3, @student4 = create_users(4, return_type: :record)
+          student_in_section(@section1, user: @student1)
+          student_in_section(@section2, user: @student2)
+          student_in_section(@section1, user: @student3)
+          student_in_section(@section2, user: @student4)
+
+          # Submit homework for review. Only submitted homework is considered for review.
+          @assignment.submit_homework(@student1, submission_type: 'online_url', url: 'http://www.google.com')
+          @assignment.submit_homework(@student3, submission_type: 'online_url', url: 'http://www.google.com')
+        end
+
+        it "assigns only assigned students a peer for review" do
+          assessment_requests = @assignment.assign_peer_reviews
+          expect(assessment_requests.map(&:assessor_id)).to contain_exactly(
+            @student1.id,
+            @student3.id
+          )
+        end
+
+        it "assigns only assigned students as a peer to review" do
+          assessment_requests = @assignment.assign_peer_reviews
+          expect(assessment_requests.map(&:user_id)).to contain_exactly(
+            @student1.id,
+            @student3.id
+          )
+        end
+      end
+
+      it "does not assign peer reviews when not enough students have submitted" do
+        @student1, @student2 = create_users(2, return_type: :record)
+        student_in_section(@section1, user: @student1)
+        student_in_section(@section2, user: @student2)
+
+        # Submit homework for review. Only submitted homework is considered for review.
+        @assignment.submit_homework(@student1, submission_type: 'online_url', url: 'http://www.google.com')
+
+        assessment_requests = @assignment.assign_peer_reviews
+        expect(assessment_requests).to be_empty
+      end
+    end
+
+    describe '"auto-assign" scheduling with assignment overrides' do
+      before :once do
+        @assignment = assignment_model(
+          automatic_peer_reviews: false,
+          course: @course,
+          only_visible_to_overrides: false,
+          peer_review_count: 1,
+          peer_reviews: true,
+          submission_types: "online_url",
+          workflow_state: "published"
+        )
+
+        @assignment.automatic_peer_reviews = true
+
+        @section1 = @course.course_sections.create!(name: 'Section One')
+        @section2 = @course.course_sections.create!(name: 'Section Two')
+
+        @override_s1 = @assignment.assignment_overrides.create!(
+          due_at: 2.days.from_now,
+          due_at_overridden: true,
+          set: @section1
+        )
+
+        @student1, @student2, @student3, @student4 = create_users(4, return_type: :record)
+        student_in_section(@section1, user: @student1)
+        student_in_section(@section2, user: @student2)
+        student_in_section(@section1, user: @student3)
+        student_in_section(@section2, user: @student4)
+
+        # Submit homework for review. Only submitted homework is considered for review.
+        @sub1 = @assignment.submit_homework(@student1, submission_type: 'online_url', url: 'http://www.google.com')
+        @sub2 = @assignment.submit_homework(@student2, submission_type: 'online_url', url: 'http://www.google.com')
+        @sub3 = @assignment.submit_homework(@student3, submission_type: 'online_url', url: 'http://www.google.com')
+        @sub4 = @assignment.submit_homework(@student4, submission_type: 'online_url', url: 'http://www.google.com')
+      end
+
+      context "when reviews are automatically assigned using the 'assign_at' date" do
+        before :each do
+          @assignment.due_at = 1.day.from_now
+          @assignment.peer_reviews_assign_at = 1.day.from_now
+        end
+
+        it "schedules a 'do_auto_peer_review' job when saved" do
+          expects_job_with_tag('Assignment#do_auto_peer_review', 1) {
+            @assignment.save!
+          }
+        end
+
+        it "schedules the job using the 'assign_at' date" do
+          @assignment.save!
+          job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+          expect(job.run_at).to eq @assignment.peer_reviews_assign_at
+        end
+
+        context "when the job runs" do
+          it "assigns peer reviews to all students" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            Timecop.freeze(1.day.from_now) do
+              job.invoke_job
+              # assessment_requests = @assignment.assign_peer_reviews
+              expect(AssessmentRequest.count).to be(4)
+            end
           end
 
-          # let's add this student to the section the assignment is assigned to
-          student_in_section(@section1, user: @student2)
-          @assignment.submit_homework(@student2, submission_type: 'online_url', url: 'http://www.google.com')
+          it "does not schedule another job" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            expect do
+              Timecop.freeze(1.day.from_now) do
+                job.invoke_job
+              end
+            end.not_to change { Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last.run_at }
+          end
 
-          res = @assignment.assign_peer_reviews
-          expect(res.length).to be 2
-          @submissions.reload.each do |s|
-            expect(res.map(&:asset)).to include(s)
-            expect(res.map(&:assessor_asset)).to include(s)
+          it "sets #peer_reviews_assigned to `true`" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            Timecop.freeze(1.day.from_now) do
+              job.invoke_job
+              expect(@assignment.reload.peer_reviews_assigned).to be(true)
+            end
+          end
+        end
+      end
+
+      context "when reviews are assigned using due dates" do
+        before :each do
+          @assignment.due_at = 1.day.from_now
+          @assignment.peer_reviews_assign_at = nil
+        end
+
+        # schedules a 'do_auto_peer_review' job for the earliest
+        # assigns all reviews when the 'assign_at' date has passed
+        # does not schedule additional jobs
+        # sets #peer_reviews_assigned to `true`
+
+        it "schedules a 'do_auto_peer_review' job when saved" do
+          expects_job_with_tag('Assignment#do_auto_peer_review', 1) {
+            @assignment.save!
+          }
+        end
+
+        context "when the 'due_at' date of the assignment is the earliest due date" do
+          it "schedules the job using the 'due_at' date of the assignment" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            expect(job.run_at).to eq @assignment.due_at
+          end
+
+          it "assigns peer reviews to all students assigned directly to the assignment" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            Timecop.freeze(1.day.from_now) do
+              job.invoke_job
+              assessment_requests = AssessmentRequest.all.to_a
+              expect(assessment_requests.map(&:assessor_id)).to contain_exactly(
+                @student2.id,
+                @student4.id
+              )
+            end
+          end
+
+          it "schedules another job" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            expect do
+              Timecop.freeze(1.day.from_now) do
+                job.invoke_job
+              end
+            end.to change { Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last.run_at }
+          end
+
+          it "uses the next due date when scheduling the next job" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            Timecop.freeze(1.day.from_now) do
+              job.invoke_job
+            end
+            expect(job.reload.run_at).to eq @override_s1.due_at
+          end
+
+          it "sets #peer_reviews_assigned to `false`" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            Timecop.freeze(1.day.from_now) do
+              job.invoke_job
+            end
+            expect(@assignment.reload.peer_reviews_assigned).to be(false)
           end
         end
 
+        context "when the 'due_at' date of an override is the earliest due date" do
+          before :each do
+            @assignment.due_at = 3.days.from_now
+          end
+
+          it "schedules the job using the 'due_at' date of the override" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            expect(job.run_at).to eq @override_s1.due_at
+          end
+
+          it "assigns peer reviews to all students assigned with the override" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            Timecop.freeze(2.days.from_now) do
+              job.invoke_job
+              assessment_requests = AssessmentRequest.all.to_a
+              expect(assessment_requests.map(&:assessor_id)).to contain_exactly(
+                @student1.id,
+                @student3.id
+              )
+            end
+          end
+
+          it "schedules another job" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            expect do
+              Timecop.freeze(2.days.from_now) do
+                job.invoke_job
+              end
+            end.to change { Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last.run_at }
+          end
+
+          it "uses the next due date when scheduling the next job" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            Timecop.freeze(2.days.from_now) do
+              job.invoke_job
+            end
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            expect(job.run_at).to eq @assignment.due_at
+          end
+
+          it "sets #peer_reviews_assigned to `false`" do
+            @assignment.save!
+            job = Delayed::Job.where(tag: "Assignment#do_auto_peer_review").last
+            Timecop.freeze(2.days.from_now) do
+              job.invoke_job
+            end
+            expect(@assignment.reload.peer_reviews_assigned).to be(false)
+          end
+        end
       end
     end
   end
@@ -4484,12 +4779,16 @@ describe Assignment do
     end
 
     it 'excludes students with completed enrollments by date when not differentiated' do
-      @course.start_at = 2.days.ago
-      @course.conclude_at = 1.day.ago
-      @course.restrict_enrollments_to_course_dates = true
-      @course.save!
-      @assignment.update_attribute(:only_visible_to_overrides, false)
-      expect(@assignment.participants(by_date: true).include?(@student1)).to be_falsey
+      @course.update!(
+        conclude_at: 1.day.ago,
+        restrict_enrollments_to_course_dates: true,
+        start_at: 2.days.ago
+      )
+      # reload the course to clear any cached results of the participating_students_by_date scope
+      @course.reload
+
+      @assignment.update!(only_visible_to_overrides: false)
+      expect(@assignment.participants(by_date: true)).not_to include(@student1)
     end
 
     it 'excludes students without visibility' do
@@ -7514,6 +7813,56 @@ describe Assignment do
             expect(Canvas::LiveEvents).to receive(:grade_changed).twice
             assignment.grade_student(student1, grade: 10, grader: teacher)
           end
+        end
+      end
+
+      describe "Submissions Posted notification" do
+        let_once(:notification) { Notification.find_or_create_by!(category: "Grading", name: "Submissions Posted") }
+        let(:context) { { current_user: teacher } }
+        let(:teacher_enrollment) { @course.teacher_enrollments.find_by!(user: teacher) }
+        let(:section1) { @course.course_sections.create! }
+        let(:submissions_posted_messages) do
+          Message.where(
+            communication_channel: teacher.email_channel,
+            notification: notification
+          )
+        end
+
+        before(:each) do
+          section1.enroll_user(student1, "StudentEnrollment", "active")
+          teacher.update!(email: "fakeemail@example.com", workflow_state: :registered)
+          teacher.email_channel.update!(workflow_state: :active)
+          teacher_enrollment.update!(workflow_state: :active)
+        end
+
+        it "does not broadcast a notification when not including posting_params" do
+          expect { assignment.post_submissions }.not_to change { submissions_posted_messages.count }
+        end
+
+        it "broadcasts a notification when posting to everyone" do
+          assignment.post_submissions(posting_params: { graded_only: false })
+          body_text = "Grade changes and comments have been released for everyone."
+          expect(submissions_posted_messages.order(:id).last.body).to include body_text
+        end
+
+        it "broadcasts a notification when posting to everyone graded" do
+          assignment.grade_student(student1, grader: teacher, score: 1)
+          assignment.post_submissions(posting_params: { graded_only: true })
+          body_text = "Grade changes and comments have been released for everyone graded."
+          expect(submissions_posted_messages.order(:id).last.body).to include body_text
+        end
+
+        it "broadcasts a notification when posting to everyone in sections" do
+          assignment.post_submissions(posting_params: { graded_only: false, section_names: ["section 1"] })
+          body_text = "Grade changes and comments have been released for everyone in sections: section 1."
+          expect(submissions_posted_messages.order(:id).last.body).to include body_text
+        end
+
+        it "broadcasts a notification when posting to everyone graded in sections" do
+          assignment.grade_student(student1, grader: teacher, score: 1)
+          assignment.post_submissions(posting_params: { graded_only: true, section_names: ["section 1"] })
+          body_text = "Grade changes and comments have been released for everyone graded in sections: section 1."
+          expect(submissions_posted_messages.order(:id).last.body).to include body_text
         end
       end
 

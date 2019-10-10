@@ -34,7 +34,7 @@ class MarkAsReadWatcher {
 
   // #
   // @param {EntryView} view
-  constructor (view) {
+  constructor(view) {
     this.view = view
     MarkAsReadWatcher.unread.push(this)
     this.view.model.bind('change:collapsedView', (model, collapsedView) => {
@@ -45,11 +45,11 @@ class MarkAsReadWatcher {
     })
   }
 
-  createTimer () {
+  createTimer() {
     return this.timer || (this.timer = setTimeout(this.markAsRead, MS_UNTIL_READ))
   }
 
-  clearTimer () {
+  clearTimer() {
     clearTimeout(this.timer)
     return delete this.timer
   }
@@ -58,9 +58,9 @@ class MarkAsReadWatcher {
     this.view.model.markAsRead()
     MarkAsReadWatcher.unread = _(MarkAsReadWatcher.unread).without(this)
     return MarkAsReadWatcher.trigger('markAsRead', this.view.model)
-  };
+  }
 
-  static init () {
+  static init() {
     $window.bind('scroll resize', this.checkForVisibleEntries)
     return this.checkForVisibleEntries()
   }
@@ -68,10 +68,11 @@ class MarkAsReadWatcher {
   static checkForVisibleEntries = _.throttle(() => {
     const topOfViewport = $window.scrollTop()
     const bottomOfViewport = topOfViewport + $window.height()
-    MarkAsReadWatcher.unread.forEach((entry) => {
+    MarkAsReadWatcher.unread.forEach(entry => {
       if (entry.ignore || entry.view.model.get('forced_read_state')) return
       const topOfElement = entry.view.$el.offset().top
-      const inView = topOfElement < bottomOfViewport && topOfElement + entry.view.$el.height() > topOfViewport
+      const inView =
+        topOfElement < bottomOfViewport && topOfElement + entry.view.$el.height() > topOfViewport
       entry[inView ? 'createTimer' : 'clearTimer']()
     })
   }, CHECK_THROTTLE)

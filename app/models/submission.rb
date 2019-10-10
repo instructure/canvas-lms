@@ -213,6 +213,7 @@ class Submission < ActiveRecord::Base
   IdBookmarker = BookmarkedCollection::SimpleBookmarker.new(Submission, :id)
 
   scope :anonymized, -> { where.not(anonymous_id: nil) }
+  scope :due_in_past, -> { where('cached_due_date <= ?', Time.now.utc) }
 
   scope :posted, -> { where.not(posted_at: nil) }
   scope :unposted, -> { where(posted_at: nil) }
@@ -2714,8 +2715,9 @@ class Submission < ActiveRecord::Base
   def comment_causes_posting?(author:, draft:, provisional:)
     return false if posted? || assignment.post_manually?
     return false if draft || provisional
+    return false if author.blank?
 
-    author.present? && assignment.context.instructor_ids.include?(author.id)
+    assignment.context.instructor_ids.include?(author.id) || assignment.context.account_membership_allows(author)
   end
 
   def handle_posted_at_changed

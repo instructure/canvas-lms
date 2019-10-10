@@ -25,11 +25,7 @@ function renderLink(anchorProps) {
   // This uses a plain <a /> rather than Instructure-UI's <Link /> because
   // <Tooltip /> and disabled <Link /> currently do not work together.
   return (
-    <a
-      rel="noopener noreferrer"
-      target="_blank"
-      {...anchorProps}
-    >
+    <a rel="noopener noreferrer" target="_blank" {...anchorProps}>
       {I18n.t('SpeedGrader™')}
     </a>
   )
@@ -47,7 +43,9 @@ function SpeedGraderLink(props) {
       ...anchorProps,
       'aria-disabled': 'true',
       'aria-describedby': props.disabledTip,
-      onClick: (event) => {event.preventDefault()},
+      onClick: event => {
+        event.preventDefault()
+      },
       role: 'button',
       style: {opacity: 0.5}
     }
@@ -57,7 +55,9 @@ function SpeedGraderLink(props) {
     <Tooltip placement="bottom" tip={props.disabledTip} variant="inverse">
       {renderLink(anchorProps)}
     </Tooltip>
-  ) : renderLink(anchorProps)
+  ) : (
+    renderLink(anchorProps)
+  )
 }
 
 SpeedGraderLink.propTypes = {

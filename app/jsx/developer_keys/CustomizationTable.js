@@ -85,5 +85,5 @@ CustomizationTable.propTypes = {
 }
 
 CustomizationTable.defaultProps = {
-  messageTypeFor: () => ('')
+  messageTypeFor: () => ''
 }

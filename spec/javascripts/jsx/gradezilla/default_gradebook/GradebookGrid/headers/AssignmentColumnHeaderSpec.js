@@ -826,6 +826,13 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       ok(getMenuItem($menuContent, 'Message Students Who'))
     })
 
+    test('is disabled when anonymizing students', () => {
+      props.assignment.anonymizeStudents = true
+      mountAndOpenOptionsMenu()
+      const $menuItem = getMenuItem($menuContent, 'Message Students Who')
+      strictEqual($menuItem.getAttribute('aria-disabled'), 'true')
+    })
+
     test('is disabled when submissions are not loaded', () => {
       props.submissionsLoaded = false
       mountAndOpenOptionsMenu()

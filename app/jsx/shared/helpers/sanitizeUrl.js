@@ -20,7 +20,7 @@
  * Replaces bad urls with harmless urls in cases where bad urls might cause harm
  * @param {string} url
  */
-export default function sanitizeUrl (url) {
+export default function sanitizeUrl(url) {
   const badSchemeRegex = /javascript:/
   if (url.match(badSchemeRegex)) {
     return 'about:blank'

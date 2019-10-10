@@ -19,8 +19,8 @@
 import _ from 'underscore'
 import I18n from 'i18n!modules'
 import React from 'react'
-import assignmentUtils from '../../gradezilla/SISGradePassback/assignmentUtils'
-import AssignmentCorrectionRow from '../../gradezilla/SISGradePassback/AssignmentCorrectionRow'
+import assignmentUtils from './assignmentUtils'
+import AssignmentCorrectionRow from './AssignmentCorrectionRow'
 
 class PostGradesDialogCorrectionsPage extends React.Component {
   componentDidMount() {

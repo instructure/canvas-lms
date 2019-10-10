@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import moxios from 'moxios'
 import GeneratePairingCode from 'jsx/profiles/GeneratePairingCode'
 
@@ -78,7 +78,7 @@ it('Show an error in the modal if the pairing code fails to generate', () => {
   })
 
   const tree = shallow(<GeneratePairingCode />)
-  tree.setState({ showModal: true })
+  tree.setState({showModal: true})
 
   moxios.wait(() => {
     const errorMessage = tree.find('Text[color="error"]')
@@ -88,7 +88,7 @@ it('Show an error in the modal if the pairing code fails to generate', () => {
 
 it('Shows the loading spinner while the pairing code is being generated', () => {
   const tree = shallow(<GeneratePairingCode {...defaultProps} />)
-  tree.setState({ gettingPairingCode: true })
+  tree.setState({gettingPairingCode: true})
 
   const spinner = tree.find('Spinner')
   expect(spinner.exists()).toEqual(true)
@@ -96,7 +96,7 @@ it('Shows the loading spinner while the pairing code is being generated', () => 
 
 it('clicking the close button will close the modal', () => {
   const tree = shallow(<GeneratePairingCode />)
-  tree.setState({ showModal: true })
+  tree.setState({showModal: true})
 
   const closeButton = tree.find('CloseButton')
   closeButton.simulate('click')
@@ -105,7 +105,7 @@ it('clicking the close button will close the modal', () => {
 
 it('clicking the ok button will close the modal', () => {
   const tree = shallow(<GeneratePairingCode />)
-  tree.setState({ showModal: true })
+  tree.setState({showModal: true})
 
   const okButton = tree.find('ModalFooter Button')
   okButton.simulate('click')
@@ -113,8 +113,8 @@ it('clicking the ok button will close the modal', () => {
 })
 
 it('should use the name in the text when it is provided', () => {
-  const tree = shallow(<GeneratePairingCode {...defaultProps} name='George' />)
-  tree.setState({ showModal: true })
+  const tree = shallow(<GeneratePairingCode {...defaultProps} name="George" />)
+  tree.setState({showModal: true})
 
   const text = tree.find('ModalBody > Text').props().children
   expect(text.includes('George')).toEqual(true)

@@ -98,5 +98,5 @@ export default function downloadStuffAsAZip(filesAndFolders, {contextType, conte
     .always(() => {
       $(window).off('beforeunload', promptBeforeLeaving)
       $progressIndicator.remove()
-    });
+    })
 }

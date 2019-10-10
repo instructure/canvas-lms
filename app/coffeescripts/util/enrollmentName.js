@@ -35,6 +35,6 @@ const types = {
   }
 }
 
-export default function enrollmentName (type) {
+export default function enrollmentName(type) {
   return types[type] || type
 }

@@ -34,8 +34,8 @@ const reduceItems = handleActions(
   {
     [actionTypes.LOCK_ANNOUNCEMENTS_SUCCESS]: (state, action) => {
       const successIds = action.payload.res.successes.map(success => success.data)
-      return state.map(
-        item => (successIds.includes(item.id) ? {...item, locked: action.payload.locked} : item)
+      return state.map(item =>
+        successIds.includes(item.id) ? {...item, locked: action.payload.locked} : item
       )
     }
   },

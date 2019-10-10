@@ -60,9 +60,7 @@ export default class DeploymentIdButton extends React.Component {
           onDismiss={this.closeModal}
           label={I18n.t('Deployment Id for %{tool} App', {tool: this.props.tool.name})}
         >
-          <Modal.Body>
-            {this.props.tool.deployment_id}
-          </Modal.Body>
+          <Modal.Body>{this.props.tool.deployment_id}</Modal.Body>
           <Modal.Footer>
             <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
           </Modal.Footer>

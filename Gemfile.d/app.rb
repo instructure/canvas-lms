@@ -22,7 +22,7 @@ else
   gem 'rails', '6.0.0'
 end
 
-gem 'rack', '2.0.6'
+gem 'rack', '2.0.7'
 
 gem 'oauth2', '1.4.1', require: false
 
@@ -34,7 +34,7 @@ gem 'tzinfo', '1.2.5'
 gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
-gem 'authlogic', '5.0.2'
+gem 'authlogic', '5.0.4'
   gem 'scrypt', '3.0.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'switchman', '1.14.7'
@@ -43,15 +43,15 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.1.7', require: false
 
-gem 'addressable', '2.5.2', require: false
+gem 'addressable', '2.7.0', require: false
 gem "after_transaction_commit", '2.0.0'
-gem "aws-sdk-dynamodb", "1.34.0"
-gem "aws-sdk-kinesis", '1.18.0', require: false
-gem "aws-sdk-s3", '1.45.0', require: false
-gem "aws-sdk-sns", '1.18.0', require: false
-gem "aws-sdk-sqs", '1.18.0', require: false
-gem "aws-sdk-core", "3.61.1", require: false
-gem "aws-sdk-kms", "1.23.0", require: false
+gem "aws-sdk-dynamodb", "1.36.0"
+gem "aws-sdk-kinesis", '1.19.0', require: false
+gem "aws-sdk-s3", '1.48.0', require: false
+gem "aws-sdk-sns", '1.19.0', require: false
+gem "aws-sdk-sqs", '1.22.0', require: false
+gem "aws-sdk-core", "3.68.1", require: false
+gem "aws-sdk-kms", "1.24.0", require: false
 gem "aws-sigv4", "1.1.0", require: false
 
 gem 'barby', '0.6.8', require: false
@@ -67,19 +67,17 @@ gem 'inst-jobs', '0.15.13'
     gem 'et-orbi', '1.0.8', require: false
 gem 'switchman-inst-jobs', '1.3.5'
 gem 'inst-jobs-autoscaling', '1.0.5'
-  gem 'aws-sdk-autoscaling', '1.25.0', require: false
-# ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults
-# check https://github.com/ffi/ffi/issues/621 for resolution prior to bumping version
-gem 'ffi', '1.9.18', require: false
+  gem 'aws-sdk-autoscaling', '1.28.0', require: false
+gem 'ffi', '1.11.1', require: false
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '1.7.10', require: false
-gem 'httparty', '0.16.1'
+gem 'httparty', '0.17.1'
 gem 'i18n', '1.0.0'
 gem 'i18nliner', '0.1.0'
   gem 'ruby2ruby', '2.4.1', require: false
   gem 'ruby_parser', '3.11.0', require: false
-gem 'icalendar', '2.5.1', require: false
-gem 'ims-lti', '2.2.3', require: 'ims'
+gem 'icalendar', '2.5.3', require: false
+gem 'ims-lti', '2.3.0', require: 'ims'
 gem 'json_schemer', '0.1.7'
 gem 'simple_oauth', '0.3.1', require: false
 gem 'json', '2.2.0'
@@ -117,18 +115,19 @@ gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.1.1', require: false
 gem 'shackles', '1.4.2'
 
-gem 'browser', '2.5.3', require: false
+gem 'browser', '2.6.1', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'sentry-raven', '2.7.2', require: false
 gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
-  gem 'dogstatsd-ruby', '4.3.0'
+  gem 'dogstatsd-ruby', '4.5.0'
 gem 'inst-jobs-statsd', '1.2.3'
-gem 'gepub', '1.0.1'
-gem 'imperium', '0.5.0', require: false
+gem 'gepub', '1.0.4'
+gem 'imperium', '0.5.1', require: false
 gem 'academic_benchmarks', '0.0.11', require: false
+  gem 'sprockets', '3.7.2'
 
 gem 'graphql', '1.9.11'
 gem 'graphql-batch', '0.4.1'

@@ -39,6 +39,6 @@ describe('start', () => {
         contextId: '1',
         api: fakeAxios
       })
-    }).not.toThrowError()
+    }).not.toThrow()
   })
 })

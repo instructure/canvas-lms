@@ -551,25 +551,42 @@ describe TabsController, type: :request do
     describe "user profile" do
       before(:each) { user_model }
 
-      it 'should include external tools' do
-        @tool = Account.default.context_external_tools.new({
+      let(:tool) {
+        Account.default.context_external_tools.new({
           :name => 'Example',
           :url => 'http://www.example.com',
           :consumer_key => 'key',
           :shared_secret => 'secret',
         })
-        @tool.settings.merge!({
-          :user_navigation => {
-            :enabled => 'true',
-            :url => 'http://www.example.com',
-          },
-        })
-        @tool.save!
+      }
+
+      it 'should include external tools' do
+        tool.settings[:user_navigation] = {
+          :enabled => 'true',
+          :url => 'http://www.example.com',
+        }
+        tool.save!
 
         json = api_call(:get, "/api/v1/users/#{@user.id}/tabs",
                         { :controller => 'tabs', :action => 'index', :user_id => @user.to_param, :format => 'json'})
 
         expect(json).to include(include('type' => 'external', 'label' => 'Example'))
+      end
+
+      it "handles external tools with windowTarget: _blank" do
+        tool.settings[:user_navigation] = {
+          enable: true,
+          url: 'http://www.example.com/foo',
+          windowTarget: '_blank'
+        }
+        tool.save!
+
+        json = api_call(:get, "/api/v1/users/#{@user.id}/tabs",
+                        { :controller => 'tabs', :action => 'index', :user_id => @user.to_param, :format => 'json'})
+
+        tab = json.find{|j| j['type'] == 'external'}
+        expect(tab['html_url']).to match(%r{^/users/[0-9]+/external_tools/[0-9]+\?display=borderless$})
+        expect(tab['full_url']).to match(%r{^http.*users/[0-9]+/external_tools/[0-9]+\?display=borderless$})
       end
     end
 

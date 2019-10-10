@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import I18n from 'i18n!generate_pairing_code'
 import React, {Component} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -28,7 +27,6 @@ import axios from 'axios'
 import {string} from 'prop-types'
 
 export default class GeneratePairingCode extends Component {
-
   state = {
     pairingCode: '',
     showModal: false,
@@ -37,18 +35,19 @@ export default class GeneratePairingCode extends Component {
   }
 
   openModal = () => {
-    this.setState({ showModal: true })
+    this.setState({showModal: true})
     this.generatePairingCode()
   }
 
   closeModal = () => {
-    this.setState({ showModal: false })
+    this.setState({showModal: false})
   }
 
   generatePairingCode = () => {
-    this.setState({ gettingPairingCode: true, pairingCodeError: false })
-    axios.post(`/api/v1/users/${this.props.userId}/observer_pairing_codes`)
-      .then(({ data }) => {
+    this.setState({gettingPairingCode: true, pairingCodeError: false})
+    axios
+      .post(`/api/v1/users/${this.props.userId}/observer_pairing_codes`)
+      .then(({data}) => {
         this.setState({
           gettingPairingCode: false,
           pairingCode: data.code
@@ -63,28 +62,26 @@ export default class GeneratePairingCode extends Component {
   }
 
   renderCloseButton = () => (
-    <CloseButton
-      placement='end'
-      offset='medium'
-      variant='icon'
-      onClick={this.closeModal}
-    >
+    <CloseButton placement="end" offset="medium" variant="icon" onClick={this.closeModal}>
       Close
     </CloseButton>
   )
 
   renderPairingCode = () => {
     if (this.state.pairingCodeError) {
-      return <Text color='error'>{I18n.t('There was an error generating the pairing code')}</Text>
+      return <Text color="error">{I18n.t('There was an error generating the pairing code')}</Text>
     } else {
       return <Text>{this.state.pairingCode}</Text>
     }
   }
 
-  render () {
-    const messageWithName = I18n.t(`Share the following pairing code with an observer to allow
+  render() {
+    const messageWithName = I18n.t(
+      `Share the following pairing code with an observer to allow
     them to connect with %{name}. This code will expire in seven days,
-    or after one use.`, { name: this.props.name })
+    or after one use.`,
+      {name: this.props.name}
+    )
     const messageWithoutName = I18n.t(`Share the following pairing code with an observer to allow
     them to connect with you. This code will expire in seven days,
     or after one use.`)
@@ -99,33 +96,33 @@ export default class GeneratePairingCode extends Component {
           onDismiss={this.closeModal}
           shouldCloseOnDocumentClick
           label={I18n.t('Pair with Observer')}
-          size='small'
+          size="small"
         >
           <Modal.Header>
             {this.renderCloseButton()}
             <Heading>{I18n.t('Pair with Observer')}</Heading>
           </Modal.Header>
           <Modal.Body>
-            <Text>
-              {this.props.name
-                ? messageWithName
-                : messageWithoutName
-              }
-            </Text>
-            <div className='pairing-code'>
-              {this.state.gettingPairingCode
-                ? <div>
-                    <Spinner margin='0 small 0 0' size='x-small' renderTitle={I18n.t('Generating pairing code')} />
-                    <PresentationContent>
-                      {I18n.t('Generating pairing code...')}
-                    </PresentationContent>
-                  </div>
-                : this.renderPairingCode()
-              }
+            <Text>{this.props.name ? messageWithName : messageWithoutName}</Text>
+            <div className="pairing-code">
+              {this.state.gettingPairingCode ? (
+                <div>
+                  <Spinner
+                    margin="0 small 0 0"
+                    size="x-small"
+                    renderTitle={I18n.t('Generating pairing code')}
+                  />
+                  <PresentationContent>{I18n.t('Generating pairing code...')}</PresentationContent>
+                </div>
+              ) : (
+                this.renderPairingCode()
+              )}
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={this.closeModal} variant="primary" className='pairing-code-ok'>{I18n.t('OK')}</Button>
+            <Button onClick={this.closeModal} variant="primary" className="pairing-code-ok">
+              {I18n.t('OK')}
+            </Button>
           </Modal.Footer>
         </Modal>
       </div>

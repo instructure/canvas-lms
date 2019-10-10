@@ -22,6 +22,6 @@ import MutationAuditLog from 'jsx/audit_logs/MutationAuditLog'
 
 export default class GraphQLMutationContentView extends Backbone.View {
   render() {
-    ReactDOM.render(<MutationAuditLog/>, this.el);
+    ReactDOM.render(<MutationAuditLog />, this.el)
   }
 }

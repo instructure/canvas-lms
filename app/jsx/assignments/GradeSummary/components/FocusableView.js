@@ -103,7 +103,7 @@ export default class FocusableView extends Component {
     if (handler) {
       handler(event)
     }
-  };
+  }
 
   render() {
     return (

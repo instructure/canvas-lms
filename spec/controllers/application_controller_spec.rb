@@ -30,7 +30,8 @@ RSpec.describe ApplicationController do
       format: double(:html? => true),
       user_agent: nil,
       remote_ip: '0.0.0.0',
-      base_url: 'https://canvas.test'
+      base_url: 'https://canvas.test',
+      referer: nil
     )
     allow(controller).to receive(:request).and_return(request_double)
   end
@@ -722,9 +723,54 @@ RSpec.describe ApplicationController do
         end
       end
 
+      context 'return_url' do
+        before do
+          controller.instance_variable_set(:"@context", course)
+          content_tag.update_attributes!(context: assignment_model)
+          allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
+          allow(controller).to receive(:render)
+          allow(controller).to receive(:lti_launch_params)
+          allow(controller).to receive(:require_user).and_return(true)
+          allow(controller).to receive(:named_context_url).and_return('named_context_url')
+          allow(controller).to receive(:polymorphic_url).and_return('host/quizzes')
+        end
+
+        it 'is set to quizzes page when launched from quizzes page' do
+          allow(controller.request).to receive(:referer).and_return('quizzes')
+          controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'host/quizzes'
+        end
+
+        it 'is set to quizzes page when launched from assignments/new' do
+          allow(controller.request).to receive(:referer).and_return('assignments/new')
+          controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'host/quizzes'
+        end
+
+        it 'is not set to quizzes page when flag is disabled' do
+          allow(controller.request).to receive(:referer).and_return('assignments/new')
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'named_context_url'
+        end
+
+        it 'is set using named_context_url when not launched from quizzes page' do
+          allow(controller.request).to receive(:referer).and_return('assignments')
+          controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'named_context_url'
+        end
+      end
+
       it 'returns the full path for the redirect url' do
         expect(controller).to receive(:named_context_url).with(course, :context_url, {:include_host => true})
-        expect(controller).to receive(:named_context_url).with(course, :context_external_content_success_url, 'external_tool_redirect', {:include_host => true}).and_return('wrong_url')
+        expect(controller).to receive(:named_context_url).with(
+          course,
+          :context_external_content_success_url,
+          'external_tool_redirect',
+          {:include_host => true}
+        ).and_return('wrong_url')
         allow(controller).to receive(:render)
         allow(controller).to receive_messages(js_env:[])
         controller.instance_variable_set(:"@context", course)
@@ -1113,7 +1159,8 @@ describe ApplicationController do
         client_ip: '0.0.0.0',
         producer: 'canvas',
         url: 'http://test.host',
-        http_method: 'GET'
+        http_method: 'GET',
+        referrer: nil
       }
     end
 
@@ -1134,6 +1181,15 @@ describe ApplicationController do
       controller.instance_variable_set(:@context, course_model(sis_source_id: 'banana'))
       controller.send(:setup_live_events_context)
       expect(LiveEvents.get_context[:context_sis_source_id]).to eq 'banana'
+    end
+
+    context "when there is a HTTP referrer" do
+      it "includes the referer in 'referrer' (two 'r's)" do
+        url = 'http://example.com/some-referer-url'
+        controller.request.headers['HTTP_REFERER'] = url
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(non_conditional_values.merge(referrer: url))
+      end
     end
 
     context 'when a domain_root_account exists' do

@@ -22,7 +22,7 @@ import $ from 'jquery'
 import AvatarDialogView from '../views/profiles/AvatarDialogView'
 
 export default class AvatarWidget {
-  constructor (el) {
+  constructor(el) {
     this.$el = $(el)
     this._attachEvents()
   }
@@ -30,7 +30,7 @@ export default class AvatarWidget {
   // Internal: Add click event to @$el to open widget.
   //
   // Returns nothing.
-  _attachEvents () {
+  _attachEvents() {
     return this.$el.on('click', this._openAvatarDialog)
   }
 
@@ -47,5 +47,5 @@ export default class AvatarWidget {
       this.avatarDialog = new AvatarDialogView()
     }
     return this.avatarDialog.show()
-  };
+  }
 }

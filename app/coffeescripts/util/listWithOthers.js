@@ -20,14 +20,15 @@ import $ from 'jquery'
 import h from 'str/htmlEscape'
 import 'jquery.instructure_misc_helpers'
 
-export default function listWithOthers (strings, cutoff = 2) {
+export default function listWithOthers(strings, cutoff = 2) {
   if (strings.length > cutoff) {
     strings = strings.slice(0, cutoff).concat([strings.slice(cutoff, strings.length)])
   }
-  return $.toSentence(strings.map(strOrArray =>
-    typeof strOrArray === 'string' || strOrArray instanceof h.SafeString
-      ? `<span>${h(strOrArray)}</span>`
-      : `
+  return $.toSentence(
+    strings.map(strOrArray =>
+      typeof strOrArray === 'string' || strOrArray instanceof h.SafeString
+        ? `<span>${h(strOrArray)}</span>`
+        : `
         <span class='others'>
           ${h(I18n.t('other', 'other', {count: strOrArray.length}))}
           <span>
@@ -39,4 +40,3 @@ export default function listWithOthers (strings, cutoff = 2) {
     )
   )
 }
-

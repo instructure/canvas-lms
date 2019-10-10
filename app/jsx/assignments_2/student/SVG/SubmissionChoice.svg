@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="422px" height="150px" viewBox="0 0 422 150" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>Group 6</title>
+    <desc>Created with Sketch.</desc>
+    <g id="OR-Assignment" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="OR-1-Copy-7" transform="translate(-642.000000, -965.000000)">
+            <g id="Group-6" transform="translate(644.000000, 966.000000)">
+                <g id="Group-4" transform="translate(52.000000, 96.500000) rotate(-15.000000) translate(-52.000000, -96.500000) translate(8.000000, 60.000000)">
+                    <rect id="Rectangle" stroke="#2D3B45" stroke-width="2" fill="#FFFFFF" x="0" y="0" width="88" height="73"></rect>
+                    <polygon id="Path-2" fill="#ABC885" points="8 63 26.3825725 34.1808587 40.8930479 48.5904294 56.2300436 23 80 63"></polygon>
+                    <circle id="Oval" stroke="#FBB03B" fill="#FDD089" cx="27.5" cy="21.5" r="6.5"></circle>
+                </g>
+                <path d="M263,100.398539 C279.706524,71.5062956 304.706524,53.7067826 338,47" id="Path-5" stroke="#8B969E" stroke-width="2" stroke-dasharray="2,4" transform="translate(300.500000, 73.699270) scale(1, -1) rotate(20.000000) translate(-300.500000, -73.699270) "></path>
+                <g id="Group-5" transform="translate(366.000000, 88.500000) rotate(15.000000) translate(-366.000000, -88.500000) translate(320.000000, 40.000000)">
+                    <rect id="Rectangle" stroke="#2D3B45" stroke-width="2" fill="#FFFFFF" x="3.79049653" y="35" width="88" height="62"></rect>
+                    <g id="Group" transform="translate(45.500000, 17.500000) rotate(-2.000000) translate(-45.500000, -17.500000) translate(1.000000, 2.000000)">
+                        <polygon id="Rectangle" stroke="#2D3B45" stroke-width="2" points="0 16.8474822 86.761218 1 89 14.1525178 2.23878199 30"></polygon>
+                        <polygon id="Rectangle" fill="#2D3B45" transform="translate(8.000000, 22.500000) rotate(-5.000000) translate(-8.000000, -22.500000) " points="8.72603173 15 13 15.7629606 7.27396827 30 3 29.2370394"></polygon>
+                        <polygon id="Rectangle" fill="#2D3B45" transform="translate(20.000000, 19.500000) rotate(-5.000000) translate(-20.000000, -19.500000) " points="20.7260317 12 25 12.7629606 19.2739683 27 15 26.2370394"></polygon>
+                        <polygon id="Rectangle" fill="#2D3B45" transform="translate(33.000000, 17.500000) rotate(-5.000000) translate(-33.000000, -17.500000) " points="33.7260317 10 38 10.7629606 32.2739683 25 28 24.2370394"></polygon>
+                        <polygon id="Rectangle" fill="#2D3B45" transform="translate(45.000000, 15.500000) rotate(-5.000000) translate(-45.000000, -15.500000) " points="45.7260317 8 50 8.76296064 44.2739683 23 40 22.2370394"></polygon>
+                        <polygon id="Rectangle" fill="#2D3B45" transform="translate(57.000000, 13.500000) rotate(-5.000000) translate(-57.000000, -13.500000) " points="57.7260317 6 62 6.76296064 56.2739683 21 52 20.2370394"></polygon>
+                        <polygon id="Rectangle" fill="#2D3B45" transform="translate(70.000000, 10.500000) rotate(-5.000000) translate(-70.000000, -10.500000) " points="70.7260317 3 75 3.76296064 69.2739683 18 65 17.2370394"></polygon>
+                        <polygon id="Rectangle" fill="#2D3B45" transform="translate(82.000000, 8.500000) rotate(-5.000000) translate(-82.000000, -8.500000) " points="82.7260317 1 87 1.76296064 81.2739683 16 77 15.2370394"></polygon>
+                    </g>
+                    <path d="M67.707228,67.0110386 C67.4847006,66.3342979 66.8538241,65.8785803 66.1357719,65.8785803 L53.7040629,65.8785803 L49.8637453,54.1347369 L49.8637453,54.1324583 C49.6389239,53.4557176 49.0080473,53 48.2899951,53 C47.574237,53 46.9410664,53.4557176 46.718539,54.1347369 L42.8759274,65.8785803 L30.4442184,65.8785803 C29.7261662,65.8785803 29.0952897,66.3342979 28.8727623,67.0110386 C28.6502349,67.6877793 28.888821,68.4260419 29.4715215,68.8475807 L39.5311347,76.1071626 L35.688523,87.8532845 C35.4659957,88.5323038 35.711464,89.2705664 36.2941645,89.687548 C36.5832206,89.8948995 36.9227469,90 37.2622732,90 C37.6017995,90 37.9413258,89.8948995 38.232676,89.6852694 L48.2899951,82.4279661 L58.3450201,89.6852694 C58.9254265,90.1045296 59.7077134,90.1045296 60.2881199,89.687548 C60.8708204,89.2705664 61.1139946,88.5323038 60.8914672,87.851006 L57.0488556,76.1071626 L67.1107629,68.8475807 C67.6911693,68.4260419 67.9320494,67.6877793 67.707228,67.0110386" id="Mask" stroke="#FBB03B" stroke-width="2" fill="#FDD089"></path>
+                    <rect id="Rectangle" stroke="#2D3B45" stroke-width="2" fill="#C7CDD1" x="4" y="35" width="88" height="11"></rect>
+                </g>
+                <path d="M44,50 C46.7182882,32.0313032 60.4069526,20.9848122 85.0659934,16.8605268 C109.725034,12.7362415 143.900815,23.4369409 187.593336,48.9626252" id="Path-4" stroke="#8B969E" stroke-width="2" stroke-dasharray="2,4" transform="translate(115.796668, 33.000000) rotate(-5.000000) translate(-115.796668, -33.000000) "></path>
+                <g id="Group-2" transform="translate(150.947632, 0.000000)">
+                    <polygon id="Stroke-5" stroke="#384A58" stroke-width="2" fill="#FFFFFF" points="0.052368497 148 113.052368 148 113.052368 25.8880499 101.94488 14.8826816 86.9402265 0 0.052368497 0"></polygon>
+                    <polygon id="Fill-6" fill="#D2E9F6" points="18.0523685 81 100.052368 81 100.052368 70 18.0523685 70"></polygon>
+                    <polygon id="Fill-6" fill="#C7CDD1" points="19.0523685 96 92.0523685 96 92.0523685 89 19.0523685 89"></polygon>
+                    <polygon id="Fill-6" fill="#C7CDD1" points="19.0523685 112 68.0523685 112 68.0523685 105 19.0523685 105"></polygon>
+                    <polygon id="Fill-6" fill="#C7CDD1" points="18.0523685 128 59.0523685 128 59.0523685 121 18.0523685 121"></polygon>
+                    <g id="Icons/Lined/Text" transform="translate(14.052368, 25.000000)" fill="#2D3B45">
+                        <polygon id="Mask" points="3.55555556 0 27.3269841 0 27.3269841 8.62714286 23.944127 8.62714286 23.944127 3.48857143 17.3155556 3.48857143 17.3155556 29.5114286 22.344127 29.5114286 22.344127 33 8.49269841 33 8.49269841 29.5114286 13.5212698 29.5114286 13.5212698 3.48857143 6.9384127 3.48857143 6.9384127 8.62714286 3.55555556 8.62714286"></polygon>
+                    </g>
+                    <polyline id="Path-3" stroke="#2D3B45" stroke-width="2" points="87.0523685 0 87.0523685 25.4745181 113.052368 26"></polyline>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

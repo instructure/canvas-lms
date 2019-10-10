@@ -28,27 +28,27 @@ const initialState = {
 }
 
 const developerKeysHandlers = {
-  [ACTION_NAMES.DEVELOPER_KEYS_MODAL_OPEN]: (state) => ({
+  [ACTION_NAMES.DEVELOPER_KEYS_MODAL_OPEN]: state => ({
     ...state,
     developerKeyModalOpen: true
   }),
-  [ACTION_NAMES.DEVELOPER_KEYS_MODAL_CLOSE]: (state) => ({
+  [ACTION_NAMES.DEVELOPER_KEYS_MODAL_CLOSE]: state => ({
     ...state,
     developerKeyModalOpen: false
   }),
-  [ACTION_NAMES.CREATE_OR_EDIT_DEVELOPER_KEY_START]: (state) => ({
+  [ACTION_NAMES.CREATE_OR_EDIT_DEVELOPER_KEY_START]: state => ({
     ...state,
     developerKeyCreateOrEditSuccessful: false,
     developerKeyCreateOrEditFailed: false,
     developerKeyCreateOrEditPending: true
   }),
-  [ACTION_NAMES.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL]: (state) => ({
+  [ACTION_NAMES.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL]: state => ({
     ...state,
     developerKeyCreateOrEditSuccessful: true,
     developerKeyCreateOrEditFailed: false,
     developerKeyCreateOrEditPending: false
   }),
-  [ACTION_NAMES.CREATE_OR_EDIT_DEVELOPER_KEY_FAILED]: (state) => ({
+  [ACTION_NAMES.CREATE_OR_EDIT_DEVELOPER_KEY_FAILED]: state => ({
     ...state,
     developerKeyCreateOrEditSuccessful: false,
     developerKeyCreateOrEditFailed: true,
@@ -59,7 +59,7 @@ const developerKeysHandlers = {
     developerKey: action.payload,
     editing: !!action.payload
   })
-};
+}
 
 export default (state = initialState, action) => {
   if (developerKeysHandlers[action.type]) {

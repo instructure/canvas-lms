@@ -103,7 +103,8 @@ describe('Assignment Student Content View', () => {
     expect(getByText('Availability Dates')).toBeInTheDocument()
   })
 
-  it.skip('renders Comments', async () => { // TODO: get this to work in react 16.9
+  it.skip('renders Comments', async () => {
+    // TODO: get this to work in react 16.9
     const {getAllByText, getByText} = render(
       <MockedProvider mocks={mocks} addTypename>
         <StudentContent {...makeProps()} />

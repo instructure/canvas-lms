@@ -16,13 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import {oneOf, string} from 'prop-types'
 import {Spinner} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 
-export default function LoadingIndicator(translatedTitle) {
+export default function LoadingIndicator({translatedTitle, size}) {
   return (
     <View as="div" height="100%" width="100%" textAlign="center">
-      <Spinner renderTitle={() => translatedTitle} size="large" margin="0 0 0 medium" />
+      <Spinner renderTitle={() => translatedTitle} size={size} margin="0 0 0 medium" />
     </View>
   )
+}
+
+LoadingIndicator.propTypes = {
+  translatedTitle: string.isRequired,
+  size: oneOf(['x-small', 'small', 'medium', 'large'])
+}
+LoadingIndicator.defaultProps = {
+  size: 'large'
 }

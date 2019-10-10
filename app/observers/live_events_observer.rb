@@ -39,7 +39,9 @@ class LiveEventsObserver < ActiveRecord::Observer
           :context_module,
           :context_module_progression,
           :content_tag,
-          :learning_outcome_result
+          :learning_outcome_result,
+          :learning_outcome,
+          :learning_outcome_group
 
   NOP_UPDATE_FIELDS = [ "updated_at", "sis_batch_id" ].freeze
   def after_update(obj)

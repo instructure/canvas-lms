@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { handleActions } from 'redux-actions'
+import {handleActions} from 'redux-actions'
 import SchedulerActions from './actions'
 import initialState from './store/initialState'
 
-  const reducer = handleActions({
+const reducer = handleActions(
+  {
     [SchedulerActions.keys.SET_FIND_APPOINTMENT_MODE]: (state = initialState, action) => {
       return {
         ...state,
@@ -33,6 +34,8 @@ import initialState from './store/initialState'
         selectedCourse: action.payload
       }
     }
-  }, initialState);
+  },
+  initialState
+)
 
 export default reducer

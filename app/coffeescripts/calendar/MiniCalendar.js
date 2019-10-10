@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import I18n from 'i18n!calendar'
 import _ from 'underscore'
-import calendarDefaults from '../calendar/CalendarDefaults'
+import calendarDefaults from './CalendarDefaults'
 import 'vendor/jquery.ba-tinypubsub'
 
 export default class MiniCalendar {

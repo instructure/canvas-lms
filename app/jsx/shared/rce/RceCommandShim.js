@@ -31,13 +31,15 @@
 export const RCELOADED_EVENT_NAME = 'RceLoaded'
 export let tmce
 
-function delaySend ($target, methodName, ...args) {
-  $target.one(RCELOADED_EVENT_NAME, {
+function delaySend($target, methodName, ...args) {
+  $target.one(
+    RCELOADED_EVENT_NAME,
+    {
       method_name: methodName,
-      args: args
+      args
     },
     (e, remoteEditor) => {
-      remoteEditor.call(e.data.method_name, ...(e.data.args))
+      remoteEditor.call(e.data.method_name, ...e.data.args)
     }
   )
 }
@@ -50,7 +52,7 @@ export function getTinymce() {
   return tmce || tinymce
 }
 
-export function send ($target, methodName, ...args) {
+export function send($target, methodName, ...args) {
   const remoteEditor = $target.data('remoteEditor')
   if (remoteEditor) {
     let ret
@@ -83,13 +85,15 @@ export function send ($target, methodName, ...args) {
     } else if (methodName === 'get_code') {
       return $target.val()
     } else {
-      console.warn(`called send('${methodName}') on an RCE instance that hasn't fully loaded, delaying send`)
+      console.warn(
+        `called send('${methodName}') on an RCE instance that hasn't fully loaded, delaying send`
+      )
       delaySend($target, methodName, ...args)
     }
   }
 }
 
-export function focus ($target) {
+export function focus($target) {
   const remoteEditor = $target.data('remoteEditor')
   if (remoteEditor) {
     remoteEditor.focus()
@@ -98,7 +102,7 @@ export function focus ($target) {
   }
 }
 
-export function destroy ($target) {
+export function destroy($target) {
   const remoteEditor = $target.data('remoteEditor')
   if (remoteEditor) {
     // detach the remote editor reference after destroying it

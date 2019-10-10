@@ -27,15 +27,18 @@ export class RetrievingContent extends React.Component {
 
   componentDidMount() {
     const parentWindow = this.parentWindow()
-    parentWindow.postMessage({
-      messageType: RetrievingContent.messageType,
-      content_items: ENV.content_items,
-      msg: ENV.message,
-      log: ENV.log,
-      errormsg: ENV.error_message,
-      errorlog: ENV.error_log,
-      ltiEndpoint: ENV.lti_endpoint
-    }, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+    parentWindow.postMessage(
+      {
+        messageType: RetrievingContent.messageType,
+        content_items: ENV.content_items,
+        msg: ENV.message,
+        log: ENV.log,
+        errormsg: ENV.error_message,
+        errorlog: ENV.error_log,
+        ltiEndpoint: ENV.lti_endpoint
+      },
+      ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+    )
   }
 
   render() {

@@ -45,7 +45,15 @@ module LiveEvents
     require 'live_events/async_worker'
 
     def get_context
-      Thread.current[:live_events_ctx].try(:clone)
+      ctx = Thread.current[:live_events_ctx]
+      return ctx&.clone if ctx
+
+      lazy_proc = Thread.current[:live_events_lazy_context]
+      if lazy_proc
+        Thread.current[:live_events_lazy_context] = nil
+        set_context(lazy_proc.call)
+        get_context
+      end
     end
 
     # Set (on the current thread) the context to be used for future calls to post_event.
@@ -53,14 +61,29 @@ module LiveEvents
       Thread.current[:live_events_ctx] = ctx
     end
 
+    def provide_lazy_context(lazy_proc)
+      # in tests, if we allow this to be lazy evaluated, we get a ton of:
+      # RSpec::Mocks::ExpiredTestDoubleError: #<Double "Pseudonym"> was originally
+      # created in one example but has leaked into another example and can no longer
+      # be used. rspec-mocks' doubles are designed to only last for one example,
+      # and you need to create a new one in each example you wish to use it for.
+      if Rails.env.test?
+        set_context(lazy_proc.call)
+      else
+        Thread.current[:live_events_lazy_context] = lazy_proc
+      end
+    end
+
+
     def clear_context!
+      Thread.current[:live_events_lazy_context] = nil
       Thread.current[:live_events_ctx] = nil
     end
 
     # Post an event for the current account.
     def post_event(event_name:, payload:, time: Time.now, context: nil, partition_key: nil) # rubocop:disable Rails/SmartTimeZone
       if (LiveEvents::Client.config)
-        context ||= Thread.current[:live_events_ctx]
+        context ||= get_context
         client.post_event(event_name, payload, time, context, partition_key)
       end
     end

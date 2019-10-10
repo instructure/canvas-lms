@@ -27,117 +27,105 @@ it('there are defaults', () => {
   expect(defaults.listDeveloperKeysPending).toBe(false)
   expect(defaults.listDeveloperKeysSuccessful).toBe(false)
   expect(defaults.listDeveloperKeysError).toBeNull()
-});
+})
 
 it('responds to listDeveloperKeysStart', () => {
   const state = {
     listDeveloperKeysPending: false,
     listDeveloperKeysSuccessful: true,
     listDeveloperKeysError: {}
-  };
+  }
 
-  const action = actions.listDeveloperKeysStart();
-  const newState = reducer(state, action);
+  const action = actions.listDeveloperKeysStart()
+  const newState = reducer(state, action)
   expect(newState.listDeveloperKeysPending).toBe(true)
   expect(newState.listDeveloperKeysSuccessful).toBe(false)
   expect(newState.listDeveloperKeysError).toBeNull()
-});
+})
 
 it('responds to listInheritedDeveloperKeysStart', () => {
   const state = {
     listInheritedDeveloperKeysPending: false,
     listInheritedDeveloperKeysSuccessful: true,
     listInheritedDeveloperKeysError: {}
-  };
+  }
 
-  const action = actions.listInheritedDeveloperKeysStart();
-  const newState = reducer(state, action);
+  const action = actions.listInheritedDeveloperKeysStart()
+  const newState = reducer(state, action)
   expect(newState.listInheritedDeveloperKeysPending).toBe(true)
   expect(newState.listInheritedDeveloperKeysSuccessful).toBe(false)
   expect(newState.listInheritedDeveloperKeysError).toBeNull()
-});
+})
 
 it('responds to listDeveloperKeysSuccessful', () => {
   const state = {
     listDeveloperKeysPending: true,
     listDeveloperKeysSuccessful: false,
     list: []
-  };
-  const payload = {developerKeys: []};
-  const action = actions.listDeveloperKeysSuccessful(payload);
-  const newState = reducer(state, action);
+  }
+  const payload = {developerKeys: []}
+  const action = actions.listDeveloperKeysSuccessful(payload)
+  const newState = reducer(state, action)
   expect(newState.listDeveloperKeysPending).toBe(false)
   expect(newState.listDeveloperKeysSuccessful).toBe(true)
   expect(newState.list).toHaveLength(payload.developerKeys.length)
-});
+})
 
 it('responds to listInheritedDeveloperKeysSuccessful', () => {
   const state = {
     listInheritedDeveloperKeysPending: true,
     listInheritedDeveloperKeysSuccessful: false,
     inheritedList: []
-  };
-  const payload = {developerKeys: [{id: 1}]};
-  const action = actions.listInheritedDeveloperKeysSuccessful(payload);
-  const newState = reducer(state, action);
+  }
+  const payload = {developerKeys: [{id: 1}]}
+  const action = actions.listInheritedDeveloperKeysSuccessful(payload)
+  const newState = reducer(state, action)
   expect(newState.listInheritedDeveloperKeysPending).toBe(false)
   expect(newState.listInheritedDeveloperKeysSuccessful).toBe(true)
   expect(newState.inheritedList).toHaveLength(payload.developerKeys.length)
-});
+})
 
 it('responds to listDeveloperKeysFailed', () => {
   const state = {
     listDeveloperKeysPending: true,
     listDeveloperKeysError: null
-  };
-  const error = {};
+  }
+  const error = {}
 
-  const action = actions.listDeveloperKeysFailed(error);
-  const newState = reducer(state, action);
+  const action = actions.listDeveloperKeysFailed(error)
+  const newState = reducer(state, action)
   expect(newState.listDeveloperKeysPending).toBe(false)
   expect(newState.listDeveloperKeysError).toBe(error)
-});
+})
 
 it('responds to listInheritedDeveloperKeysFailed', () => {
   const state = {
     listInheritedDeveloperKeysPending: true,
     listInheritedDeveloperKeysError: null
-  };
-  const error = {};
+  }
+  const error = {}
 
-  const action = actions.listInheritedDeveloperKeysFailed(error);
-  const newState = reducer(state, action);
+  const action = actions.listInheritedDeveloperKeysFailed(error)
+  const newState = reducer(state, action)
   expect(newState.listInheritedDeveloperKeysPending).toBe(false)
   expect(newState.listInheritedDeveloperKeysError).toBe(error)
-});
+})
 
 it('responds to listDeveloperKeysReplace', () => {
   const state = {
-    list: [
-      {id: 11, name: 'a'},
-      {id: 22, name: 'b'},
-      {id: 33, name: 'c'},
-    ]
-  };
+    list: [{id: 11, name: 'a'}, {id: 22, name: 'b'}, {id: 33, name: 'c'}]
+  }
 
-  const payload = {id: 22, name: 'zz'};
-  const action = actions.listDeveloperKeysReplace(payload);
-  const newState = reducer(state, action);
+  const payload = {id: 22, name: 'zz'}
+  const action = actions.listDeveloperKeysReplace(payload)
+  const newState = reducer(state, action)
 
-  expect(newState.list).toEqual(
-    [
-      {id: 11, name: 'a'},
-      {id: 22, name: 'zz'},
-      {id: 33, name: 'c'}
-    ]
-  )
-});
+  expect(newState.list).toEqual([{id: 11, name: 'a'}, {id: 22, name: 'zz'}, {id: 33, name: 'c'}])
+})
 
 it('istDeveloperKeysReplaceBindingState replaces state in list', () => {
   const state = {
-    list: [
-      {id: '11', name: 'a'},
-    ],
+    list: [{id: '11', name: 'a'}],
     inheritedList: []
   }
 
@@ -147,18 +135,16 @@ it('istDeveloperKeysReplaceBindingState replaces state in list', () => {
     account_id: 1
   }
 
-  const action = actions.listDeveloperKeysReplaceBindingState(payload);
-  const newState = reducer(state, action);
+  const action = actions.listDeveloperKeysReplaceBindingState(payload)
+  const newState = reducer(state, action)
 
   expect(newState.list[0].developer_key_account_binding.workflow_state).toBe('active')
-});
+})
 
 it('listDeveloperKeysReplaceBindingState in inherited list', () => {
   const state = {
     list: [],
-    inheritedList: [
-      {id: '11', name: 'a'},
-    ]
+    inheritedList: [{id: '11', name: 'a'}]
   }
 
   const payload = {
@@ -167,51 +153,32 @@ it('listDeveloperKeysReplaceBindingState in inherited list', () => {
     account_id: 1
   }
 
-  const action = actions.listDeveloperKeysReplaceBindingState(payload);
-  const newState = reducer(state, action);
+  const action = actions.listDeveloperKeysReplaceBindingState(payload)
+  const newState = reducer(state, action)
 
   expect(newState.inheritedList[0].developer_key_account_binding.workflow_state).toBe('active')
-});
+})
 
 it('responds to listDeveloperKeysDelete', () => {
   const state = {
-    list: [
-      {id: '44', name: 'dd'},
-      {id: '55', name: 'ee'},
-      {id: '66', name: 'ff'},
-    ]
-  };
+    list: [{id: '44', name: 'dd'}, {id: '55', name: 'ee'}, {id: '66', name: 'ff'}]
+  }
 
-  const payload = {id: 55};
-  const action = actions.listDeveloperKeysDelete(payload);
-  const newState = reducer(state, action);
+  const payload = {id: 55}
+  const action = actions.listDeveloperKeysDelete(payload)
+  const newState = reducer(state, action)
 
-  expect(newState.list).toEqual(
-    [
-      {id: '44', name: 'dd'},
-      {id: '66', name: 'ff'}
-    ]
-  )
-});
+  expect(newState.list).toEqual([{id: '44', name: 'dd'}, {id: '66', name: 'ff'}])
+})
 
 it('responds to listDeveloperKeysPrepend', () => {
   const state = {
-    list: [
-      {id: 77, name: 'AA'},
-      {id: 88, name: 'BB'},
-    ]
-  };
+    list: [{id: 77, name: 'AA'}, {id: 88, name: 'BB'}]
+  }
 
-  const payload = {id: 99, name: 'OO'};
-  const action = actions.listDeveloperKeysPrepend(payload);
-  const newState = reducer(state, action);
+  const payload = {id: 99, name: 'OO'}
+  const action = actions.listDeveloperKeysPrepend(payload)
+  const newState = reducer(state, action)
 
-  expect(newState.list).toEqual(
-    [
-      {id: 99, name: 'OO'},
-      {id: 77, name: 'AA'},
-      {id: 88, name: 'BB'}
-    ]
-  )
-});
-
+  expect(newState.list).toEqual([{id: 99, name: 'OO'}, {id: 77, name: 'AA'}, {id: 88, name: 'BB'}])
+})

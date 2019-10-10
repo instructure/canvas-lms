@@ -117,28 +117,26 @@ export default class FlickrSearch extends React.Component {
 
         {photos && (
           <span className="FlickrSearch__pageNavigation">
-            {this.state.page > 1 &&
-              !this.state.searching && (
-                <a
-                  className="FlickrSearch__control"
-                  ref="flickrSearchControlPrev"
-                  href="#"
-                  onClick={this.decrementPageCount}
-                >
-                  <i className="icon-arrow-open-left" /> {I18n.t('Previous')}
-                </a>
-              )}
-            {this.state.page < photos.pages &&
-              !this.state.searching && (
-                <a
-                  className="FlickrSearch__control"
-                  ref="flickrSearchControlNext"
-                  href="#"
-                  onClick={this.incrementPageCount}
-                >
-                  {I18n.t('Next')} <i className="icon-arrow-open-right" />
-                </a>
-              )}
+            {this.state.page > 1 && !this.state.searching && (
+              <a
+                className="FlickrSearch__control"
+                ref="flickrSearchControlPrev"
+                href="#"
+                onClick={this.decrementPageCount}
+              >
+                <i className="icon-arrow-open-left" /> {I18n.t('Previous')}
+              </a>
+            )}
+            {this.state.page < photos.pages && !this.state.searching && (
+              <a
+                className="FlickrSearch__control"
+                ref="flickrSearchControlNext"
+                href="#"
+                onClick={this.incrementPageCount}
+              >
+                {I18n.t('Next')} <i className="icon-arrow-open-right" />
+              </a>
+            )}
           </span>
         )}
       </div>

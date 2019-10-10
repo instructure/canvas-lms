@@ -19,13 +19,15 @@
 import fcUtil from '../util/fcUtil'
 
 export default class TimeBlockListManager {
-
   // takes an optional array of Date pairs
   constructor(blocks) {
     this.blocks = []
     if (blocks) {
       for (let i = 0, len = blocks.length; i < len; i++) {
-        let ref = blocks[i], start = ref[0], end = ref[1], locked = ref[2]
+        const ref = blocks[i],
+          start = ref[0],
+          end = ref[1],
+          locked = ref[2]
         this.add(start, end, locked)
       }
     }
@@ -58,7 +60,7 @@ export default class TimeBlockListManager {
       }
     })
 
-    return this.blocks = consolidatedBlocks
+    return (this.blocks = consolidatedBlocks)
   }
 
   // split each block into multiple blocks of the given length
@@ -95,6 +97,6 @@ export default class TimeBlockListManager {
   }
 
   reset() {
-    return this.blocks = []
+    return (this.blocks = [])
   }
 }

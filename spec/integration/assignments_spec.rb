@@ -338,13 +338,12 @@ describe "assignments_2 feature flag and parameter" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
         html = Nokogiri::HTML(response.body)
         expect(html.at_css('div#assignment_show')).to be
-        expect(html.at_css("a#toggle_assignments_2")).not_to be
       end
     end
 
     describe "with feature enabled" do
       before :once do
-        Account.default.enable_feature! :assignments_2
+        Account.default.enable_feature! :assignments_2_teacher
       end
 
       it "it shows new assignments" do
@@ -357,7 +356,6 @@ describe "assignments_2 feature flag and parameter" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
         html = Nokogiri::HTML(response.body)
         expect(html.at_css('div#assignment_show')).to be
-        expect(html.at_css("a#toggle_assignments_2")).to be
       end
     end
   end
@@ -377,13 +375,12 @@ describe "assignments_2 feature flag and parameter" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
         html = Nokogiri::HTML(response.body)
         expect(html.at_css('div#assignment_show')).to be
-        expect(html.at_css("a#toggle_assignments_2")).not_to be
       end
     end
 
     describe "with feature enabled" do
       before :once do
-        Account.default.enable_feature! :assignments_2
+        Account.default.enable_feature! :assignments_2_student
       end
 
       it "shows new assignments by default" do
@@ -396,7 +393,6 @@ describe "assignments_2 feature flag and parameter" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
         html = Nokogiri::HTML(response.body)
         expect(html.at_css('div#assignment_show')).to be
-        expect(html.at_css("a#toggle_assignments_2")).to be
       end
     end
   end

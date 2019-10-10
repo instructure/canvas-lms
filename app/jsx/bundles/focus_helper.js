@@ -24,7 +24,9 @@ $(document).ready(() => {
   if (params.focus) {
     const el = $(`#${params.focus}`)
     if (el) {
-      if (el.attr('type') === 'text') { el.select() }
+      if (el.attr('type') === 'text') {
+        el.select()
+      }
       el.focus()
     }
   }

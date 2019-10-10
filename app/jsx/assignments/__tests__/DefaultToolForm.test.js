@@ -19,7 +19,7 @@
 import axios from 'axios'
 import React from 'react'
 import {mount} from 'enzyme'
-import DefaultToolForm, { toolSubmissionType } from '../DefaultToolForm'
+import DefaultToolForm, {toolSubmissionType} from '../DefaultToolForm'
 import SelectContentDialog from '../../../../public/javascripts/select_content_dialog.js'
 
 const newProps = (overrides = {}) => ({
@@ -51,7 +51,10 @@ describe('DefaultToolForm', () => {
   it('launches the tool when the button is clicked', () => {
     SelectContentDialog.Events.onContextExternalToolSelect = jest.fn()
     wrapper = mount(<DefaultToolForm {...newProps()} />)
-    wrapper.find('#default-tool-launch-button').first().simulate('click')
+    wrapper
+      .find('#default-tool-launch-button')
+      .first()
+      .simulate('click')
     expect(SelectContentDialog.Events.onContextExternalToolSelect).toHaveBeenCalled()
     SelectContentDialog.Events.onContextExternalToolSelect.mockRestore()
   })
@@ -74,11 +77,15 @@ describe('DefaultToolForm', () => {
   describe('when the configured tool is not installed', () => {
     beforeAll(() => {
       axios.get.mockResolvedValue({
-        data: [{
-          placements: [{
-            url: 'foo'
-          }]
-        }]
+        data: [
+          {
+            placements: [
+              {
+                url: 'foo'
+              }
+            ]
+          }
+        ]
       })
     })
 

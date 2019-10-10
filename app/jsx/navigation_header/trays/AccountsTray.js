@@ -26,20 +26,38 @@ import {Button} from '@instructure/ui-buttons'
 export default function AccountsTray({accounts, hasLoaded}) {
   return (
     <View as="div" padding="medium">
-      <Heading level="h3" as="h2">{I18n.t('Admin')}</Heading>
-      <hr role="presentation"/>
+      <Heading level="h3" as="h2">
+        {I18n.t('Admin')}
+      </Heading>
+      <hr role="presentation" />
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
-          accounts.map(account =>
-            <List.Item key={account.id}>
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/accounts/${account.id}`}>{account.name}</Button>
-            </List.Item>
-          ).concat([
-            <List.Item key="hr"><hr role="presentation"/></List.Item>,
-            <List.Item key="all">
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/accounts">{I18n.t('All Accounts')}</Button>
-            </List.Item>
-          ])
+          accounts
+            .map(account => (
+              <List.Item key={account.id}>
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href={`/accounts/${account.id}`}
+                >
+                  {account.name}
+                </Button>
+              </List.Item>
+            ))
+            .concat([
+              <List.Item key="hr">
+                <hr role="presentation" />
+              </List.Item>,
+              <List.Item key="all">
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href="/accounts"
+                >
+                  {I18n.t('All Accounts')}
+                </Button>
+              </List.Item>
+            ])
         ) : (
           <List.Item>
             <Spinner size="small" title={I18n.t('Loading')} />
@@ -51,10 +69,12 @@ export default function AccountsTray({accounts, hasLoaded}) {
 }
 
 AccountsTray.propTypes = {
-  accounts: arrayOf(shape({
-    id: string.isRequired,
-    name: string.isRequired
-  })).isRequired,
+  accounts: arrayOf(
+    shape({
+      id: string.isRequired,
+      name: string.isRequired
+    })
+  ).isRequired,
   hasLoaded: bool.isRequired
 }
 

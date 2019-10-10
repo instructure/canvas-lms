@@ -21,18 +21,20 @@ import $ from 'jquery'
 
 export default class RubricPanel extends React.Component {
   componentDidMount() {
-    $("#right-side-wrapper").show()
-    $("#rubrics").detach().appendTo('#new_rubrics')
+    $('#right-side-wrapper').show()
+    $('#rubrics')
+      .detach()
+      .appendTo('#new_rubrics')
   }
 
   componentWillUnmount() {
-    $("#right-side-wrapper").hide()
-    $("#rubrics").detach().appendTo('#rubric_attic')
+    $('#right-side-wrapper').hide()
+    $('#rubrics')
+      .detach()
+      .appendTo('#rubric_attic')
   }
 
   render() {
-    return (
-      <div id="new_rubrics" />
-    )
+    return <div id="new_rubrics" />
   }
 }

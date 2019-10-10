@@ -20,9 +20,9 @@ import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextInput from '../../external_apps/components/TextInput'
-import TextAreaInput from '../../external_apps/components/TextAreaInput'
-import CheckboxInput from '../../external_apps/components/CheckboxInput'
+import TextInput from './TextInput'
+import TextAreaInput from './TextAreaInput'
+import CheckboxInput from './CheckboxInput'
 import 'compiled/jquery.rails_flash_notifications'
 
 export default class ConfigurationFormXml extends React.Component {

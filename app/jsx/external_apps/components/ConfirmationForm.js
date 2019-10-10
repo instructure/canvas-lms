@@ -29,11 +29,17 @@ const ConfirmationForm = props => {
   return (
     <View display="block">
       <View display="block">
-        <Text className="confirmation-message" size="large">{message}</Text>
+        <Text className="confirmation-message" size="large">
+          {message}
+        </Text>
       </View>
       <View display="block" margin="small 0 0 0">
-        <Button onClick={onCancel} margin="0 x-small 0 0">{cancelLabel}</Button>
-        <Button onClick={onConfirm} variant="primary">{confirmLabel}</Button>
+        <Button onClick={onCancel} margin="0 x-small 0 0">
+          {cancelLabel}
+        </Button>
+        <Button onClick={onConfirm} variant="primary">
+          {confirmLabel}
+        </Button>
       </View>
     </View>
   )

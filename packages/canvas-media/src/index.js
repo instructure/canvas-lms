@@ -50,6 +50,8 @@ export default class UploadMedia extends React.Component {
     liveRegion: func,
     contextId: string,
     contextType: string,
+    onStartUpload: func,
+    onComplete: func,
     onDismiss: func,
     open: bool,
     tabs: shape({
@@ -74,7 +76,9 @@ export default class UploadMedia extends React.Component {
 
   handleSubmit = () => {
     switch (this.state.selectedPanel) {
-      case PANELS.COMPUTER: {
+      case PANELS.COMPUTER:
+      case PANELS.RECORD: {
+        this.props.onStartUpload && this.props.onStartUpload(this.state.theFile)
         saveMediaRecording(
           this.state.theFile,
           this.props.contextId,
@@ -100,9 +104,11 @@ export default class UploadMedia extends React.Component {
         if (this.subtitles.length > 0) {
           await saveClosedCaptions(data.media_object.media_id, this.subtitles)
         }
-        this.props.onDismiss(null, data)
-      } catch (_) {
+        this.props.onDismiss && this.props.onDismiss()
+        this.props.onComplete && this.props.onComplete(null, data)
+      } catch (ex) {
         // Handle error
+        console.error(ex) // eslint-disable-line no-console
       }
     }
   }
@@ -115,7 +121,7 @@ export default class UploadMedia extends React.Component {
       EMBED_VIDEO_CODE_TEXT,
       LOADING_MEDIA,
       RECORD_PANEL_TITLE,
-      UPLOADING_ERROR
+      MEDIA_RECORD_NOT_AVAILABLE
     } = this.props.uploadMediaTranslations.UploadMediaStrings
 
     return (
@@ -158,10 +164,8 @@ export default class UploadMedia extends React.Component {
             <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
               <MediaRecorder
                 MediaCaptureStrings={this.props.uploadMediaTranslations.MediaCaptureStrings}
-                contextType={this.props.contextType}
-                contextId={this.props.contextId}
-                errorMessage={UPLOADING_ERROR}
-                dismiss={this.props.onDismiss}
+                errorMessage={MEDIA_RECORD_NOT_AVAILABLE}
+                onSave={file => this.setState({theFile: file}, this.handleSubmit)}
               />
             </Suspense>
           </Tabs.Panel>
@@ -224,7 +228,7 @@ export default class UploadMedia extends React.Component {
     return (
       <Modal
         label={UPLOAD_MEDIA_LABEL}
-        size="medium"
+        size="large"
         onDismiss={this.onModalClose}
         open={this.props.open}
         shouldCloseOnDocumentClick={false}

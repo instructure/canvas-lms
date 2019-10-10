@@ -38,11 +38,11 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
       icon: "video",
       fetch(callback) {
         const items = [
-          // {
-          //   type: 'menuitem',
-          //   text: formatMessage('Upload/Record Media'),
-          //   onAction: () => ed.execCommand("instructureRecord"),
-          // },
+          {
+            type: 'menuitem',
+            text: formatMessage('Upload/Record Media'),
+            onAction: () => ed.execCommand("instructureRecord"),
+          },
 
           {
             type: 'menuitem',

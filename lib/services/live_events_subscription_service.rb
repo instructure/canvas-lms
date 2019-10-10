@@ -81,8 +81,8 @@ module Services
         request(:delete, "/api/subscriptions/#{subscription_id}", options)
       end
 
-      def index(jwt_body, opts = {})
-        options = { headers: headers(jwt_body, opts) }
+      def index(jwt_body, opts = {}, query: {})
+        options = { headers: headers(jwt_body, opts), query: query }
         request(:get, '/api/root_account_subscriptions', options)
       end
 

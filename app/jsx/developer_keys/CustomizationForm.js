@@ -25,22 +25,24 @@ import {View} from '@instructure/ui-layout'
 import CustomizationTable from './CustomizationTable'
 import OtherOptions from './OtherOptions'
 
-export const customFieldsStringToObject = (data) => {
+export const customFieldsStringToObject = data => {
   const output = {}
   data.split('\n').forEach(field => {
     const value = field.split('=')
-    if(value.length > 1) {
+    if (value.length > 1) {
       output[value[0]] = value[1]
     }
   })
   return output
 }
 
-export const objectToCustomVariablesString = (custom_fields) => {
-  if(!custom_fields || Object.keys(custom_fields).length === 0) { return '' }
-  return Object.keys(custom_fields).map(
-    k => `${k}=${custom_fields[k]}`
-  ).join('\n')
+export const objectToCustomVariablesString = custom_fields => {
+  if (!custom_fields || Object.keys(custom_fields).length === 0) {
+    return ''
+  }
+  return Object.keys(custom_fields)
+    .map(k => `${k}=${custom_fields[k]}`)
+    .join('\n')
 }
 
 const validationMessage = [{text: I18n.t('Invalid custom fields.'), type: 'error'}]
@@ -114,7 +116,9 @@ export default class CustomizationForm extends React.Component {
     }
 
     // Intersection of requested placements and valid placements
-    return extension.settings.placements.filter(placement => validPlacements.includes(placement.placement))
+    return extension.settings.placements.filter(placement =>
+      validPlacements.includes(placement.placement)
+    )
   }
 
   componentDidMount() {
@@ -165,14 +169,11 @@ export default class CustomizationForm extends React.Component {
     return array
   }
 
-  updateCustomFields = (e) => {
+  updateCustomFields = e => {
     const customFieldsObject = customFieldsStringToObject(e.target.value)
     const toUpdate = Object.keys(customFieldsObject).length > 0 ? customFieldsObject : null
     this.setState({custom_fields: e.target.value, valid: !!toUpdate})
-    this.props.updateToolConfiguration(
-      toUpdate,
-      'custom_fields'
-    )
+    this.props.updateToolConfiguration(toUpdate, 'custom_fields')
   }
 
   scopeTable() {

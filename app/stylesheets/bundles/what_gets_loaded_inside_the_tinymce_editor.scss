@@ -79,4 +79,13 @@ body#tinyrce {
   text-decoration: underline;
 }
 
+/* the span tinymce puts around the media player's iframe */
+.mce-content-body .mce-preview-object {
+  border-style: none;
+}
+
+iframe {
+  background-color: #eee;
+}
+
 @import 'our_custom_tiny_mce_stuff/_tinymce.editor_box.scss';

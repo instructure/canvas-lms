@@ -867,7 +867,7 @@ const mapState = (state, ownProps) => {
     isMasterCourse: masterCourse,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED
   }
-  return Object.assign({}, ownProps, propsFromState)
+  return {...ownProps, ...propsFromState}
 }
 
 export const DraggableDiscussionRow = compose(

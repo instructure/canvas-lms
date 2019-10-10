@@ -1160,11 +1160,12 @@ acknowledge that you have read and agreed to the
       <% end %>
     <% end %>
   </div>
-
-  <div id="tab-reports">
-    <p><%= t("Loading...") %></p>
-    <!-- this will be populated by an xhr request to AccountsController::reports_tab -->
-  </div>
+  <% if can_do(@context, @current_user, :read_reports) %>
+    <div id="tab-reports">
+      <p><%= t("Loading...") %></p>
+      <!-- this will be populated by an xhr request to AccountsController::reports_tab -->
+    </div>
+  <% end %>
   <% if can_do(@context, @current_user, :read_as_admin) %>
       <div id="tab-tools">
         <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>

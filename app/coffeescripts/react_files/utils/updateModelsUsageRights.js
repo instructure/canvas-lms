@@ -22,11 +22,11 @@ import File from '../../models/File'
 import ModuleFile from '../../models/ModuleFile'
 
 /*
-  * Sets usage rights on the models in memory based on the response from the
-  * API.
-  *    apiData - the response from the API
-  *    models - an array containing the files/folders to update
-  */
+ * Sets usage rights on the models in memory based on the response from the
+ * API.
+ *    apiData - the response from the API
+ *    models - an array containing the files/folders to update
+ */
 // Grab the ids affected from the apiData
 export default function updateModelsUsageRights(apiData, models) {
   const affectedIds = apiData && apiData.file_ids

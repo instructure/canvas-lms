@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import Backbone from 'Backbone'
-import FeatureFlagDialog from '../feature_flags/FeatureFlagDialog'
+import FeatureFlagDialog from './FeatureFlagDialog'
 import template from 'jst/feature_flags/featureFlag'
 import I18n from 'i18n!feature_flags'
 
@@ -90,11 +90,11 @@ export default class FeatureFlagView extends Backbone.View {
   checkSiteAdmin() {
     const deferred = $.Deferred()
     if (!this.model.isSiteAdmin()) {
-      return deferred.resolve();
+      return deferred.resolve()
     }
     const view = new FeatureFlagDialog({
       deferred,
-      message: I18n.t("This will affect every customer. Are you sure?"),
+      message: I18n.t('This will affect every customer. Are you sure?'),
       title: this.model.get('display_name'),
       hasCancelButton: true
     })

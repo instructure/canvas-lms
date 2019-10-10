@@ -1,0 +1,13 @@
+# it is intended that this be used exclusive of all other docker-compose.*yml files in CI
+version: "2.3"
+services:
+  web:
+    environment:
+      CI_NODE_TOTAL: $CI_NODE_TOTAL
+      CI_NODE_INDEX: $CI_NODE_INDEX
+      KNAPSACK_ENABLED: $KNAPSACK_ENABLED
+      KNAPSACK_TEST_FILE_PATTERN: $KNAPSACK_TEST_FILE_PATTERN
+      KNAPSACK_EXCLUDE_REGEX: $KNAPSACK_EXCLUDE_REGEX
+      KNAPSACK_TEST_DIR: $KNAPSACK_TEST_DIR
+      KNAPSACK_GENERATE_REPORT: $KNAPSACK_GENERATE_REPORT
+

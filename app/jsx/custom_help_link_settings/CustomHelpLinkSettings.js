@@ -57,7 +57,7 @@ export default class CustomHelpLinkSettings extends React.Component {
     this.state = {
       links,
       editing: null, // id of link that is being edited
-      isNameValid: true,  // so the first blur will trigger the alert even if name is empty now.
+      isNameValid: true // so the first blur will trigger the alert even if name is empty now.
     }
   }
 
@@ -70,8 +70,8 @@ export default class CustomHelpLinkSettings extends React.Component {
     }))
   }
 
-  nextLinkIndex = (links) => {
-    let max = 0;
+  nextLinkIndex = links => {
+    let max = 0
     links.forEach(link => {
       const match = link.id && link.id.match(/^link(\d+)$/)
       const index = match && parseInt(match[1], 10)
@@ -267,12 +267,12 @@ export default class CustomHelpLinkSettings extends React.Component {
   }
 
   validateName = event => {
-    const isValid = !!event.target.value  // covers undefined and empty string
+    const isValid = !!event.target.value // covers undefined and empty string
     if (this.state.isNameValid && !isValid) {
       // we just transitioned from valid to invalid
-      $.screenReaderFlashMessage(I18n.t('You left the required name field empty.'));
+      $.screenReaderFlashMessage(I18n.t('You left the required name field empty.'))
     }
-    this.setState({isNameValid: isValid});
+    this.setState({isNameValid: isValid})
   }
 
   renderForm = link => (

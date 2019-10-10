@@ -357,6 +357,18 @@
       },
       {
         "kind": "UNION",
+        "name": "TurnitinContext",
+        "possibleTypes": [
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "File"
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
         "name": "ProgressContext",
         "possibleTypes": [
           {

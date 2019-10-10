@@ -160,19 +160,17 @@ export default class IndexHeader extends Component {
   }
 }
 
-const connectState = state =>
-  Object.assign(
-    {},
-    select(state, [
-      'contextType',
-      'contextId',
-      'permissions',
-      'userSettings',
-      'courseSettings',
-      'isSavingSettings',
-      'isSettingsModalOpen'
-    ])
-  )
+const connectState = state => ({
+  ...select(state, [
+    'contextType',
+    'contextId',
+    'permissions',
+    'userSettings',
+    'courseSettings',
+    'isSavingSettings',
+    'isSettingsModalOpen'
+  ])
+})
 const selectedActions = [
   'fetchUserSettings',
   'searchDiscussions',

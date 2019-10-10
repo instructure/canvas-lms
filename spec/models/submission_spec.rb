@@ -3274,6 +3274,30 @@ describe Submission do
     end
   end
 
+  describe "scope: due_in_past" do
+    subject(:submissions) { student.submissions.due_in_past }
+
+    let(:future_assignment) { @course.assignments.create!(due_at: 2.days.from_now) }
+    let(:past_assignment) { @course.assignments.create!(due_at: 2.days.ago) }
+    let(:whenever_assignment) { @course.assignments.create!(due_at: nil) }
+    let(:student) { @student }
+    let(:future_submission) { future_assignment.submission_for_student(student) }
+    let(:past_submission) { past_assignment.submission_for_student(student) }
+    let(:whenever_submission) { whenever_assignment.submission_for_student(student) }
+
+    it "includes submissions with a due date in the past" do
+      is_expected.to include(past_submission)
+    end
+
+    it "excludes submissions with a due date in the future" do
+      is_expected.not_to include(future_submission)
+    end
+
+    it "excludes submissions without a due date" do
+      is_expected.not_to include(whenever_submission)
+    end
+  end
+
   describe "scope: missing" do
     context "not submitted" do
       before :once do
@@ -5096,7 +5120,14 @@ describe Submission do
           expect(submission).to be_posted
         end
 
-        it "does not post the submission if the comment is not from an instructor" do
+        it "posts the submission if the comment is from an admin" do
+          admin = User.create!
+          course.root_account.account_users.create!(user: admin)
+          submission.add_comment(comment_params.merge({author: admin}))
+          expect(submission).to be_posted
+        end
+
+        it "does not post the submission if the comment is not from an instructor or admin" do
           submission.add_comment(comment_params.merge({author: student}))
           expect(submission).not_to be_posted
         end

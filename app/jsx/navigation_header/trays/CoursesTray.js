@@ -26,23 +26,43 @@ import {Button} from '@instructure/ui-buttons'
 export default function CoursesTray({courses, hasLoaded}) {
   return (
     <View as="div" padding="medium">
-      <Heading level="h3" as="h2">{I18n.t('Courses')}</Heading>
-      <hr role="presentation"/>
+      <Heading level="h3" as="h2">
+        {I18n.t('Courses')}
+      </Heading>
+      <hr role="presentation" />
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
-          courses.map(course =>
-            <List.Item key={course.id}>
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/courses/${course.id}`}>{course.name}</Button>
-              {course.enrollment_term_id > 1 &&
-                <Text as="div" size="x-small" weight="light">{course.term.name}</Text>
-              }
-            </List.Item>
-          ).concat([
-            <List.Item key="hr"><hr role="presentation"/></List.Item>,
-            <List.Item key="all">
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/courses">{I18n.t('All Courses')}</Button>
-            </List.Item>
-          ])
+          courses
+            .map(course => (
+              <List.Item key={course.id}>
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href={`/courses/${course.id}`}
+                >
+                  {course.name}
+                </Button>
+                {course.enrollment_term_id > 1 && (
+                  <Text as="div" size="x-small" weight="light">
+                    {course.term.name}
+                  </Text>
+                )}
+              </List.Item>
+            ))
+            .concat([
+              <List.Item key="hr">
+                <hr role="presentation" />
+              </List.Item>,
+              <List.Item key="all">
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href="/courses"
+                >
+                  {I18n.t('All Courses')}
+                </Button>
+              </List.Item>
+            ])
         ) : (
           <List.Item>
             <Spinner size="small" renderTitle={I18n.t('Loading')} />
@@ -50,20 +70,22 @@ export default function CoursesTray({courses, hasLoaded}) {
         )}
       </List>
       <br />
-        <Text as="div">
-          {I18n.t(
-            'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
-          )}
-        </Text>
+      <Text as="div">
+        {I18n.t(
+          'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
+        )}
+      </Text>
     </View>
   )
 }
 
 CoursesTray.propTypes = {
-  courses: arrayOf(shape({
-    id: string.isRequired,
-    name: string.isRequired
-  })).isRequired,
+  courses: arrayOf(
+    shape({
+      id: string.isRequired,
+      name: string.isRequired
+    })
+  ).isRequired,
   hasLoaded: bool.isRequired
 }
 

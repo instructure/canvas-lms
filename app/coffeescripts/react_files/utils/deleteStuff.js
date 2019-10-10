@@ -90,5 +90,5 @@ export default function deleteStuff(filesAndFolders, args) {
     if (args && args.returnFocusTo) {
       $(args.returnFocusTo).focus()
     }
-  });
+  })
 }

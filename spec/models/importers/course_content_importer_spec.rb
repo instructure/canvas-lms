@@ -486,6 +486,38 @@ describe Course do
     end
   end
 
+  describe "insert into module" do
+    before :once do
+      course_factory
+      @module = @course.context_modules.create! name: 'test'
+      @module.add_item(type: 'context_module_sub_header', title: 'blah')
+      @params = {"copy" => {"quizzes" => {"i7ed12d5eade40d9ee8ecb5300b8e02b2" => true}}}
+      json = File.open(File.join(IMPORT_JSON_DIR, 'assessments.json')).read
+      @data = JSON.parse(json).with_indifferent_access
+    end
+
+    it "appends imported items to a module" do
+      migration = @course.content_migrations.build
+      migration.migration_settings[:migration_ids_to_import] = @params
+      migration.migration_settings[:insert_into_module_id] = @module.id
+      migration.save!
+
+      Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(ContextModuleSubHeader Quizzes::Quiz))
+    end
+
+    it "inserts imported items into a module" do
+      migration = @course.content_migrations.build
+      migration.migration_settings[:migration_ids_to_import] = @params
+      migration.migration_settings[:insert_into_module_id] = @module.id
+      migration.migration_settings[:insert_into_module_position] = 1
+      migration.save!
+
+      Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(Quizzes::Quiz ContextModuleSubHeader))
+    end
+  end
+
   it 'should be able to i18n without keys' do
     expect { Importers::CourseContentImporter.translate('stuff') }.not_to raise_error
   end

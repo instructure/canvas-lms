@@ -24,7 +24,6 @@ import _ from 'underscore'
 import tz from 'timezone'
 import htmlEscape from './str/htmlEscape'
 import preventDefault from 'compiled/fn/preventDefault'
-import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import './instructure_helper'
 import 'jqueryui/draggable'
 import './jquery.ajaxJSON'
@@ -456,16 +455,22 @@ function handleYoutubeLink () {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      RichContentEditor.initSidebar({
-        show: function() { $('#sidebar_content').hide() },
-        hide: function() { $('#sidebar_content').show() }
+      import('jsx/shared/rce/RichContentEditor').then(({default: RichContentEditor}) => {
+        if (!ENV.use_rce_enhancements) {
+          RichContentEditor.initSidebar({
+            show: function() { $('#sidebar_content').hide() },
+            hide: function() { $('#sidebar_content').show() }
+          })
+        }
+        RichContentEditor.loadNewEditor($editor, { focus: true })
       })
-      RichContentEditor.loadNewEditor($editor, { focus: true })
     }).bind('richTextEnd', (event, $editor) => {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      RichContentEditor.destroyRCE($editor);
+      import('jsx/shared/rce/RichContentEditor').then(({default: RichContentEditor}) => {
+        RichContentEditor.destroyRCE($editor);
+      })
     });
 
     $(".communication_message .content .links .show_users_link,.communication_message .header .show_users_link").click(function(event) {
@@ -701,7 +706,7 @@ function handleYoutubeLink () {
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     var timeAgoEvents  = [];
     function timeAgoRefresh() {
-      timeAgoEvents = $(".time_ago_date:visible").toArray();
+      timeAgoEvents = [...document.querySelectorAll('.time_ago_date')].filter($.expr.filters.visible)
       processNextTimeAgoEvent();
     }
     function processNextTimeAgoEvent() {
@@ -842,27 +847,32 @@ function handleYoutubeLink () {
     });
 
 
-    // in 2 seconds (to give time for everything else to load), find all the external links and add give them
+    // in 100ms (to give time for everything else to load), find all the external links and add give them
     // the external link look and behavior (force them to open in a new tab)
     setTimeout(function() {
-      $("#content a:external,#content a.explicit_external_link")
-      // don't mess with the ones that were already processed in enhanceUserContent
-      .not(".external")
-      .each(function(){
+      const content = document.getElementById('content')
+      if (!content) return
+      const links = content.querySelectorAll(`a[href*="//"]:not([href*="${window.location.hostname}"])`) // technique for finding "external" links copied from https://davidwalsh.name/external-links-css
+      for (let i = 0; i < links.length; i++) {
+        const $link = $(links[i])
+        
+        // don't mess with the ones that were already processed in enhanceUserContent
+        if ($link.hasClass('external')) continue
+        
         var indicatorText = I18n.t('titles.external_link', 'Links to an external site.');
         var $linkIndicator = $('<span class="ui-icon ui-icon-extlink ui-icon-inline"/>').attr('title', indicatorText);
         $linkIndicator.append($('<span class="screenreader-only"/>').text(indicatorText));
-        $(this)
+        $link
           .not(".open_in_a_new_tab")
           .not(":has(img)")
           .not(".not_external")
           .not(".exclude_external_icon")
           .addClass('external')
           .children("span.ui-icon-extlink").remove().end()
-          .html('<span>' + $(this).html() + '</span>')
+          .html('<span>' + $link.html() + '</span>')
           .attr('target', '_blank')
           .attr('rel', 'noreferrer noopener')
           .append($linkIndicator);
-      });
-    }, 2000);
+      }
+    }, 100);
   });

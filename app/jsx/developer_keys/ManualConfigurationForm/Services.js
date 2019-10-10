@@ -26,8 +26,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 export default class Services extends React.Component {
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
     this.state = {
       scopes: this.props.scopes
     }
@@ -44,43 +44,31 @@ export default class Services extends React.Component {
   }
 
   render() {
-    const { scopes } = this.state;
-    const { validScopes } = this.props;
+    const {scopes} = this.state
+    const {validScopes} = this.props
 
     return (
-        <ToggleDetails
-          summary={I18n.t("LTI Advantage Services")}
-          fluidWidth
-        >
-          <View
-            as="div"
-            margin="small"
+      <ToggleDetails summary={I18n.t('LTI Advantage Services')} fluidWidth>
+        <View as="div" margin="small">
+          <Alert variant="warning" margin="small">
+            {I18n.t(
+              'Services must be supported by the tool in order to work. Check with your Tool Vendor to ensure service capabilities.'
+            )}
+          </Alert>
+          <CheckboxGroup
+            name="services"
+            onChange={this.handleScopesSelectionChange}
+            value={scopes}
+            description={
+              <ScreenReaderContent>{I18n.t('Check Services to enable')}</ScreenReaderContent>
+            }
           >
-            <Alert
-              variant="warning"
-              margin="small"
-            >
-              {I18n.t("Services must be supported by the tool in order to work. Check with your Tool Vendor to ensure service capabilities.")}
-            </Alert>
-            <CheckboxGroup
-              name="services"
-              onChange={this.handleScopesSelectionChange}
-              value={scopes}
-              description={<ScreenReaderContent>{I18n.t("Check Services to enable")}</ScreenReaderContent>}
-            >
-              {
-                Object.keys(validScopes).map(key => {
-                  return <Checkbox
-                    key={key}
-                    label={validScopes[key]}
-                    value={key}
-                    variant="toggle"
-                  />
-                })
-              }
-            </CheckboxGroup>
-          </View>
-        </ToggleDetails>
+            {Object.keys(validScopes).map(key => {
+              return <Checkbox key={key} label={validScopes[key]} value={key} variant="toggle" />
+            })}
+          </CheckboxGroup>
+        </View>
+      </ToggleDetails>
     )
   }
 }

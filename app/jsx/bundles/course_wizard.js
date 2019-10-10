@@ -22,9 +22,9 @@ import ReactDOM from 'react-dom'
 import CourseWizard from '../course_wizard/CourseWizard'
 
 /*
-  * This essentially handles binding the button events and calling out to the
-  * CourseWizard React component that is the actual wizard.
-  */
+ * This essentially handles binding the button events and calling out to the
+ * CourseWizard React component that is the actual wizard.
+ */
 
 const $wizard_box = $('#wizard_box')
 

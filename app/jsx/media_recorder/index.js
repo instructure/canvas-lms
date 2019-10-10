@@ -18,8 +18,8 @@
 
 import React from 'react'
 import I18n from 'i18n!media_recorder'
-import { MediaCapture, canUseMediaCapture } from '@instructure/media-capture'
-import { func } from 'prop-types'
+import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
+import {func} from 'prop-types'
 
 const translations = {
   ARIA_VIDEO_LABEL: I18n.t('Video Player'),
@@ -59,10 +59,7 @@ export default class CanvasMediaRecorder extends React.Component {
     return (
       <div>
         {canUseMediaCapture() && (
-          <MediaCapture
-            translations={translations}
-            onCompleted={this.saveFile}
-          />
+          <MediaCapture translations={translations} onCompleted={this.saveFile} />
         )}
       </div>
     )

@@ -65,7 +65,7 @@ export default class Grid extends Component {
       <div className="GradesGrid" ref={this.props.horizontalScrollRef}>
         <table role="table">
           <caption>
-            {<ScreenReaderContent>{I18n.t('Grade Selection Table')}</ScreenReaderContent>}
+            <ScreenReaderContent>{I18n.t('Grade Selection Table')}</ScreenReaderContent>
           </caption>
 
           <thead>

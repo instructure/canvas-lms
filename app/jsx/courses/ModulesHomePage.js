@@ -30,7 +30,7 @@ export default class ModulesHomePage extends React.Component {
     onCreateButtonClick: () => {}
   }
 
-  render () {
+  render() {
     const importURL = window.ENV.CONTEXT_URL_ROOT + '/content_migrations'
     return (
       <ul className="ic-EmptyStateList">
@@ -42,9 +42,7 @@ export default class ModulesHomePage extends React.Component {
               onClick={this.props.onCreateButtonClick}
             >
               <IconModuleSolid className="ic-EmptyStateButton__SVG" />
-              <span className="ic-EmptyStateButton__Text">
-                {I18n.t('Create a new Module')}
-              </span>
+              <span className="ic-EmptyStateButton__Text">{I18n.t('Create a new Module')}</span>
             </button>
           </div>
         </li>
@@ -52,9 +50,7 @@ export default class ModulesHomePage extends React.Component {
           <div className="ic-EmptyStateList__BillboardWrapper">
             <a href={importURL} className="ic-EmptyStateButton">
               <IconUploadLine className="ic-EmptyStateButton__SVG" />
-              <span className="ic-EmptyStateButton__Text">
-                {I18n.t('Add existing content')}
-              </span>
+              <span className="ic-EmptyStateButton__Text">{I18n.t('Add existing content')}</span>
             </a>
           </div>
         </li>

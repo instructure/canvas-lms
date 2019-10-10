@@ -19,9 +19,9 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import Modal from '../../shared/components/InstuiModal'
-import Lti2Iframe from '../../external_apps/components/Lti2Iframe'
-import Lti2ReregistrationUpdateModal from '../../external_apps/components/Lti2ReregistrationUpdateModal'
-import store from '../../external_apps/lib/ExternalAppsStore'
+import Lti2Iframe from './Lti2Iframe'
+import Lti2ReregistrationUpdateModal from './Lti2ReregistrationUpdateModal'
+import store from '../lib/ExternalAppsStore'
 import 'compiled/jquery.rails_flash_notifications'
 
 export default class ReregisterExternalToolButton extends React.Component {

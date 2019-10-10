@@ -400,4 +400,60 @@ describe LiveEventsObserver do
       end
     end
   end
+
+  describe "learning_outcomes" do
+    before do
+      @context = course_model
+    end
+
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:learning_outcome_created).with(anything)
+      outcome_model
+    end
+
+    it "posts update events" do
+      outcome = outcome_model
+      expect(Canvas::LiveEvents).to receive(:learning_outcome_updated).with(outcome)
+      outcome.update_attribute(:short_description, 'this is new')
+    end
+  end
+
+  describe "learning_outcome_groups" do
+    before do
+      @context = course_model
+      @context.root_outcome_group
+    end
+
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:learning_outcome_group_created).with(anything)
+      outcome_group_model
+    end
+
+    it "posts update events" do
+      group = outcome_group_model
+      expect(Canvas::LiveEvents).to receive(:learning_outcome_group_updated).with(group)
+      group.update_attribute(:description, 'this is new')
+    end
+  end
+
+  describe "learning_outcome_links" do
+    before do
+      @context = course_model
+    end
+
+    it "posts create events" do
+      outcome = outcome_model
+      group = outcome_group_model
+      expect(Canvas::LiveEvents).to receive(:learning_outcome_link_created).with(anything)
+      group.add_outcome(outcome)
+    end
+
+    it "posts updated events" do
+      outcome = outcome_model
+      group = outcome_group_model
+      link = group.add_outcome(outcome)
+      expect(Canvas::LiveEvents).to receive(:learning_outcome_link_updated).with(link)
+      link.destroy!
+    end
+  end
 end

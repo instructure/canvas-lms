@@ -32,25 +32,22 @@ class ImageSearchItem extends React.Component {
   }
 
   handleClick = () => {
-    this.props.selectImage(this.props.src, this.props.confirmationId);
+    this.props.selectImage(this.props.src, this.props.confirmationId)
   }
 
-  render () {
+  render() {
     return (
       <div className="ImageSearch__wrapper">
-        <button className="ImageSearch__item"
-                type="button"
-                onClick={this.handleClick}
-        >
-          <img className="ImageSearch__img"
-               alt={this.props.description}
-               src={this.props.src}
-          />
+        <button className="ImageSearch__item" type="button" onClick={this.handleClick}>
+          <img className="ImageSearch__img" alt={this.props.description} src={this.props.src} />
         </button>
         <div className="ImageSearch__attribution">
           <a href={this.props.userUrl} target="_blank" rel="noopener noreferrer">
             <ScreenReaderContent>
-              {I18n.t("Artist info for %{userName} for %{description}", {userName: this.props.userName, description: this.props.description})}
+              {I18n.t('Artist info for %{userName} for %{description}', {
+                userName: this.props.userName,
+                description: this.props.description
+              })}
             </ScreenReaderContent>
             <PresentationContent>{this.props.userName}</PresentationContent>
           </a>

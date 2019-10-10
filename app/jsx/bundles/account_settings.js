@@ -25,38 +25,37 @@ import {Spinner} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import 'account_settings'
 import 'compiled/modules/account_quota_settings'
-import FeatureFlags from "../feature_flags/FeatureFlags"
+import FeatureFlags from '../feature_flags/FeatureFlags'
+import ready from '@instructure/ready'
 
-if (window.ENV.NEW_FEATURES_UI) {
-  ReactDOM.render(<FeatureFlags/>, document.getElementById('tab-features'))
-} else {
-  const featureFlags = new FeatureFlagAdminView({el: '#tab-features'})
-  featureFlags.collection.fetchAll()
-}
+ready(() => {
+  if (window.ENV.NEW_FEATURES_UI) {
+    ReactDOM.render(<FeatureFlags />, document.getElementById('tab-features'))
+  } else {
+    const featureFlags = new FeatureFlagAdminView({el: '#tab-features'})
+    featureFlags.collection.fetchAll()
+  }
 
-if (document.getElementById('custom_help_link_settings')) {
-  ReactDOM.render(
-    <CustomHelpLinkSettings
-      {...{
-        name: window.ENV.help_link_name,
-        icon: window.ENV.help_link_icon,
-        links: window.ENV.CUSTOM_HELP_LINKS,
-        defaultLinks: window.ENV.DEFAULT_HELP_LINKS
-      }}
-    />,
-    document.getElementById('custom_help_link_settings')
-  )
-}
+  if (document.getElementById('custom_help_link_settings')) {
+    ReactDOM.render(
+      <CustomHelpLinkSettings
+        {...{
+          name: window.ENV.help_link_name,
+          icon: window.ENV.help_link_icon,
+          links: window.ENV.CUSTOM_HELP_LINKS,
+          defaultLinks: window.ENV.DEFAULT_HELP_LINKS
+        }}
+      />,
+      document.getElementById('custom_help_link_settings')
+    )
+  }
 
-if (document.getElementById('tab-security')) {
-  ReactDOM.render(
-    <View
-      as="div"
-      margin="large"
-      padding="large"
-      textAlign="center"
-    >
-    <Spinner size="large" renderTitle={I18n.t('Loading')} />
-  </View>, document.getElementById('tab-security'))
-}
-
+  if (document.getElementById('tab-security')) {
+    ReactDOM.render(
+      <View as="div" margin="large" padding="large" textAlign="center">
+        <Spinner size="large" renderTitle={I18n.t('Loading')} />
+      </View>,
+      document.getElementById('tab-security')
+    )
+  }
+})

@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 import {Popover} from '@instructure/ui-overlays'
-import {TabList} from '@instructure/ui-tabs'
+import {Tabs} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
 
 import ColorPicker from '../shared/ColorPicker'
@@ -41,8 +41,10 @@ export default class DashboardCardMenu extends React.Component {
     popoverContentRef: PropTypes.func,
     handleShow: PropTypes.func,
     handleMove: PropTypes.func,
+    isFavorited: PropTypes.bool,
     currentPosition: PropTypes.number,
     lastPosition: PropTypes.number,
+    onUnfavorite: PropTypes.func,
     menuOptions: PropTypes.shape({
       canMoveLeft: PropTypes.bool,
       canMoveRight: PropTypes.bool,
@@ -60,8 +62,13 @@ export default class DashboardCardMenu extends React.Component {
     menuOptions: null
   }
 
-  state = {
-    show: false
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      show: false,
+      selectedIndex: 0
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -80,6 +87,12 @@ export default class DashboardCardMenu extends React.Component {
 
   handleMovementMenuSelect = () => {
     this.setState({show: false})
+  }
+
+  handleTabChange = (event, {index}) => {
+    this.setState({
+      selectedIndex: index
+    })
   }
 
   render() {
@@ -128,7 +141,9 @@ export default class DashboardCardMenu extends React.Component {
         assetString={assetString}
         menuOptions={menuOptions}
         handleMove={handleMove}
+        isFavorited={this.props.isFavorited}
         onMenuSelect={this.handleMovementMenuSelect}
+        onUnfavorite={this.props.onUnfavorite}
       />
     )
 
@@ -137,6 +152,8 @@ export default class DashboardCardMenu extends React.Component {
       height: 310,
       paddingTop: 0
     }
+
+    const selectedIndex = this.state.selectedIndex
 
     return (
       <Popover
@@ -159,27 +176,30 @@ export default class DashboardCardMenu extends React.Component {
             {I18n.t('Close')}
           </CloseButton>
           <div style={menuStyles}>
-            {
-              <div>
-                <TabList
-                  ref={c => (this._tabList = c)}
+            <div>
+              <Tabs
+                ref={c => (this._tabList = c)}
+                padding="none"
+                variant="secondary"
+                onRequestTabChange={this.handleTabChange}
+              >
+                <Tabs.Panel
                   padding="none"
-                  variant="minimal"
-                  size="small"
+                  renderTitle={I18n.t('Color')}
+                  isSelected={selectedIndex === 0}
+                  tabRef={c => (this._colorTab = c)}
                 >
-                  <TabList.Panel
-                    padding="none"
-                    title={I18n.t('Color')}
-                    tabRef={c => (this._colorTab = c)}
-                  >
-                    {colorPicker}
-                  </TabList.Panel>
-                  <TabList.Panel padding="none" title={I18n.t('Move')}>
-                    {movementMenu}
-                  </TabList.Panel>
-                </TabList>
-              </div>
-            }
+                  {colorPicker}
+                </Tabs.Panel>
+                <Tabs.Panel
+                  padding="none"
+                  renderTitle={I18n.t('Move')}
+                  isSelected={selectedIndex === 1}
+                >
+                  {movementMenu}
+                </Tabs.Panel>
+              </Tabs>
+            </div>
           </div>
         </Popover.Content>
       </Popover>

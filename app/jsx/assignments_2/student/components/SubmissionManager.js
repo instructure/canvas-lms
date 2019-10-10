@@ -49,7 +49,11 @@ export default class SubmissionManager extends Component {
     this.setState({uploadingFiles})
   }
 
-  updateSubmissionDraftCache = (cache, mutationResult) => {
+  updateSubmissionDraftCache = (cache, result) => {
+    if (result.data.createSubmissionDraft.errors) {
+      return
+    }
+
     const {assignment} = JSON.parse(
       JSON.stringify(
         cache.readQuery({
@@ -62,7 +66,7 @@ export default class SubmissionManager extends Component {
       )
     )
 
-    const newDraft = mutationResult.data.createSubmissionDraft.submissionDraft
+    const newDraft = result.data.createSubmissionDraft.submissionDraft
     assignment.submissionsConnection.nodes[0].submissionDraft = newDraft
 
     cache.writeQuery({
@@ -72,7 +76,11 @@ export default class SubmissionManager extends Component {
     })
   }
 
-  clearSubmissionHistoriesCache = cache => {
+  clearSubmissionHistoriesCache = (cache, result) => {
+    if (result.data.createSubmission.errors) {
+      return
+    }
+
     // Clear the submission histories cache so that we don't lose the currently
     // displayed submission when a new submission is created and the current
     // submission gets transitioned over to a submission history.
@@ -170,7 +178,7 @@ export default class SubmissionManager extends Component {
     return (
       <Mutation
         mutation={CREATE_SUBMISSION_DRAFT}
-        onCompleted={() => this.handleDraftComplete(true)}
+        onCompleted={data => this.handleDraftComplete(!data.createSubmissionDraft.errors)}
         onError={() => this.handleDraftComplete(false)}
         update={this.updateSubmissionDraftCache}
       >
@@ -226,7 +234,11 @@ export default class SubmissionManager extends Component {
         <div style={innerFooterStyle}>
           <Mutation
             mutation={CREATE_SUBMISSION}
-            onCompleted={() => this.context.setOnSuccess(I18n.t('Submission sent'))}
+            onCompleted={data =>
+              data.createSubmission.errors
+                ? this.context.setOnFailure(I18n.t('Error sending submission'))
+                : this.context.setOnSuccess(I18n.t('Submission sent'))
+            }
             onError={() => this.context.setOnFailure(I18n.t('Error sending submission'))}
             update={this.clearSubmissionHistoriesCache}
           >

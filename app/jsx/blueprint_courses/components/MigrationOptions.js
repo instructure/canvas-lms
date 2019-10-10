@@ -19,8 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!blueprint_settingsMigrationOptions'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
@@ -46,44 +46,50 @@ export default class MigrationOptions extends React.Component {
     enableSendNotification: PropTypes.func.isRequired,
     includeCustomNotificationMessage: PropTypes.func.isRequired,
     includeCourseSettings: PropTypes.func.isRequired,
-    setNotificationMessage: PropTypes.func.isRequired,
+    setNotificationMessage: PropTypes.func.isRequired
   }
 
-  componentWillReceiveProps (newProps) {
-    if (newProps.notificationMessage !== this.props.notificationMessage
-      && newProps.notificationMessage.length > WARNING_MESSAGE_LENGTH) {
-      $.screenReaderFlashMessage(I18n.t('%{count} of %{max} maximum characters', {
-        count: newProps.notificationMessage.length,
-        max: MAX_NOTIFICATION_MESSAGE_LENGTH
-      }));
+  componentWillReceiveProps(newProps) {
+    if (
+      newProps.notificationMessage !== this.props.notificationMessage &&
+      newProps.notificationMessage.length > WARNING_MESSAGE_LENGTH
+    ) {
+      $.screenReaderFlashMessage(
+        I18n.t('%{count} of %{max} maximum characters', {
+          count: newProps.notificationMessage.length,
+          max: MAX_NOTIFICATION_MESSAGE_LENGTH
+        })
+      )
     }
   }
 
-  handleSendNotificationChange = (event) => {
+  handleSendNotificationChange = event => {
     this.props.enableSendNotification(event.target.checked)
   }
 
-  handleIncludeCourseSettingsChange = (event) => {
+  handleIncludeCourseSettingsChange = event => {
     this.props.includeCourseSettings(event.target.checked)
   }
 
-  handleAddAMessageChange = (event) => {
+  handleAddAMessageChange = event => {
     this.props.includeCustomNotificationMessage(event.target.checked)
   }
 
-  handleChangeMessage = (event) => {
+  handleChangeMessage = event => {
     if (event.target.value.length > MAX_NOTIFICATION_MESSAGE_LENGTH) {
       setTimeout(() => {
         $.screenReaderFlashMessage(
-          I18n.t('You have reached the limit of %{len} characters in the notification message', {len: MAX_NOTIFICATION_MESSAGE_LENGTH})
+          I18n.t('You have reached the limit of %{len} characters in the notification message', {
+            len: MAX_NOTIFICATION_MESSAGE_LENGTH
+          })
         )
-      }, 600);
+      }, 600)
     }
-    const msg = event.target.value.slice(0, MAX_NOTIFICATION_MESSAGE_LENGTH);
+    const msg = event.target.value.slice(0, MAX_NOTIFICATION_MESSAGE_LENGTH)
     this.props.setNotificationMessage(msg)
   }
 
-  render () {
+  render() {
     const isDisabled = MigrationStates.isLoadingState(this.props.migrationStatus)
 
     return (
@@ -104,7 +110,7 @@ export default class MigrationOptions extends React.Component {
             disabled={isDisabled}
           />
         </div>
-        {this.props.willSendNotification ?
+        {this.props.willSendNotification ? (
           <div className="bcs__history-notification__add-message">
             <Checkbox
               label={I18n.t('Add a Message')}
@@ -115,27 +121,28 @@ export default class MigrationOptions extends React.Component {
               disabled={isDisabled}
             />
             <Text
-              aria-label={
-                I18n.t('%{chars} written, max character length %{len}',
-                  {
-                    chars: this.props.notificationMessage.length,
-                    len: MAX_NOTIFICATION_MESSAGE_LENGTH
-                  })
-              }
-              as="span" color="secondary" size="small" role="presentation"
+              aria-label={I18n.t('%{chars} written, max character length %{len}', {
+                chars: this.props.notificationMessage.length,
+                len: MAX_NOTIFICATION_MESSAGE_LENGTH
+              })}
+              as="span"
+              color="secondary"
+              size="small"
+              role="presentation"
             >
-              ({I18n.t('%{len}/%{maxLen}', {len: this.props.notificationMessage.length, maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH})})
+              (
+              {I18n.t('%{len}/%{maxLen}', {
+                len: this.props.notificationMessage.length,
+                maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH
+              })}
+              )
             </Text>
-          </div> : null
-        }
-        {this.props.willSendNotification && this.props.willIncludeCustomNotificationMessage ?
+          </div>
+        ) : null}
+        {this.props.willSendNotification && this.props.willIncludeCustomNotificationMessage ? (
           <div className="bcs__history-notification__message">
             <TextArea
-              label={
-                <ScreenReaderContent>
-                  {I18n.t('Message text')}
-                </ScreenReaderContent>
-              }
+              label={<ScreenReaderContent>{I18n.t('Message text')}</ScreenReaderContent>}
               autoGrow={false}
               resize="vertical"
               inline
@@ -143,8 +150,8 @@ export default class MigrationOptions extends React.Component {
               onChange={this.handleChangeMessage}
               disabled={isDisabled}
             />
-          </div> : null
-        }
+          </div>
+        ) : null}
       </div>
     )
   }
@@ -159,4 +166,7 @@ const connectState = state =>
     'willIncludeCourseSettings'
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedMigrationOptions = connect(connectState, connectActions)(MigrationOptions)
+export const ConnectedMigrationOptions = connect(
+  connectState,
+  connectActions
+)(MigrationOptions)

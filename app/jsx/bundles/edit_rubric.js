@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'rubricEditBinding'
 
-const initEditRubricPage = function () {
+const initEditRubricPage = function() {
   const event = document.createEvent('Event')
   event.initEvent('rubricEditDataReady', true, true)
   document.dispatchEvent(event)

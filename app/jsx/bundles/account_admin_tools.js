@@ -32,51 +32,56 @@ import UserDateRangeSearchFormView from 'compiled/views/accounts/admin_tools/Use
 import CommMessageItemView from 'compiled/views/accounts/admin_tools/CommMessageItemView'
 import messagesSearchResultsTemplate from 'jst/accounts/admin_tools/commMessagesSearchResults'
 import usersTemplate from 'jst/accounts/usersList'
+import ready from '@instructure/ready'
 
-  // This is used by admin tools to display search results
+// This is used by admin tools to display search results
 const restoreModel = new CourseRestoreModel({account_id: ENV.ACCOUNT_ID})
 
 const messages = new CommMessageCollection(null, {params: {perPage: 10}})
 const messagesUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
 const loggingUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
-const messagesContentView = new CommMessagesContentPaneView({
-  searchForm: new UserDateRangeSearchFormView({
-    formName: 'messages',
-    inputFilterView: new InputFilterView({
-      collection: messagesUsers}),
-    usersView: new PaginatedCollectionView({
-      collection: messagesUsers,
-      itemView: UserView,
-      buffer: 1000,
-      template: usersTemplate
+
+ready(() => {
+  const messagesContentView = new CommMessagesContentPaneView({
+    searchForm: new UserDateRangeSearchFormView({
+      formName: 'messages',
+      inputFilterView: new InputFilterView({
+        collection: messagesUsers
+      }),
+      usersView: new PaginatedCollectionView({
+        collection: messagesUsers,
+        itemView: UserView,
+        buffer: 1000,
+        template: usersTemplate
+      }),
+      collection: messages
+    }),
+    resultsView: new PaginatedCollectionView({
+      template: messagesSearchResultsTemplate,
+      itemView: CommMessageItemView,
+      collection: messages
     }),
     collection: messages
-  }),
-  resultsView: new PaginatedCollectionView({
-    template: messagesSearchResultsTemplate,
-    itemView: CommMessageItemView,
-    collection: messages
-  }),
-  collection: messages
-})
-
-    // Render tabs
-const app = new AdminToolsView({
-  el: '#admin-tools-app',
-  tabs: {
-    courseRestore: ENV.PERMISSIONS.restore_course,
-    viewMessages: ENV.PERMISSIONS.view_messages,
-    logging: !!ENV.PERMISSIONS.logging
-  },
-  restoreContentPaneView: new RestoreContentPaneView({
-    courseSearchFormView: new CourseSearchFormView({model: restoreModel}),
-    courseSearchResultsView: new CourseSearchResultsView({model: restoreModel})
-  }),
-  messageContentPaneView: messagesContentView,
-  loggingContentPaneView: new LoggingContentPaneView({
-    permissions: ENV.PERMISSIONS.logging,
-    users: loggingUsers
   })
-})
 
-app.render()
+  // Render tabs
+  const app = new AdminToolsView({
+    el: '#admin-tools-app',
+    tabs: {
+      courseRestore: ENV.PERMISSIONS.restore_course,
+      viewMessages: ENV.PERMISSIONS.view_messages,
+      logging: !!ENV.PERMISSIONS.logging
+    },
+    restoreContentPaneView: new RestoreContentPaneView({
+      courseSearchFormView: new CourseSearchFormView({model: restoreModel}),
+      courseSearchResultsView: new CourseSearchResultsView({model: restoreModel})
+    }),
+    messageContentPaneView: messagesContentView,
+    loggingContentPaneView: new LoggingContentPaneView({
+      permissions: ENV.PERMISSIONS.logging,
+      users: loggingUsers
+    })
+  })
+
+  app.render()
+})

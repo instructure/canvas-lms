@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'formdata-polyfill'; // Need to support FormData.has for IE
+import 'formdata-polyfill' // Need to support FormData.has for IE
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ThemeEditor from '../theme_editor/ThemeEditor'

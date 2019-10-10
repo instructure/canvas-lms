@@ -254,7 +254,13 @@
         </div>
 
         <div class="content_box">
-          <h2><%= t("Assignment Comments") %></h2>
+          <h2>
+            <% if @assignment.a2_enabled? %>
+              <%= t('Comments for this Attempt') %>
+            <% else %>
+              <%= t("Assignment Comments") %>
+            <% end %>
+          </h2>
           <div id="discussion">
             <div id="comments">
               <div class="comment" id="comment_blank" style="display: none;">

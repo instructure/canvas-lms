@@ -23,7 +23,7 @@ import PropTypes from 'prop-types'
 import BBTreeBrowserView from '../modules/BBTreeBrowserView'
 import RootFoldersFinder from '../../views/RootFoldersFinder'
 import customPropTypes from '../modules/customPropTypes'
-import filesEnv from '../../react_files/modules/filesEnv'
+import filesEnv from '../modules/filesEnv'
 import page from 'page'
 import '../../jquery.rails_flash_notifications'
 

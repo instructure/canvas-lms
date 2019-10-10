@@ -53,9 +53,7 @@ export default class FilePreview extends React.PureComponent {
 
   componentWillMount() {
     if (this.props.isOpen) {
-      this.getItemsToView(this.props, items =>
-        this.setState(this.stateProperties(items))
-      )
+      this.getItemsToView(this.props, items => this.setState(this.stateProperties(items)))
     }
   }
 
@@ -106,7 +104,10 @@ export default class FilePreview extends React.PureComponent {
   }
 
   getItemsToView = (props, cb) => {
-    if (typeof cb !== 'function') throw new Error("getItemsToView(props: obj, callback: fn) requires `callback` to be a function")
+    if (typeof cb !== 'function')
+      throw new Error(
+        'getItemsToView(props: obj, callback: fn) requires `callback` to be a function'
+      )
     // Sets up our collection that we will be using.
     let initialItem = null
     const onlyIdsToPreview = props.query.only_preview && props.query.only_preview.split(',')
@@ -182,10 +183,10 @@ export default class FilePreview extends React.PureComponent {
     )
   }
 
-  stateProperties = (items) => ({
+  stateProperties = items => ({
     initialItem: items.initialItem,
     displayedItem: items.initialItem,
-    otherItems: items.otherItems,
+    otherItems: items.otherItems
   })
 
   renderArrowLink = direction => {
@@ -269,21 +270,20 @@ export default class FilePreview extends React.PureComponent {
                 {this.state.initialItem ? this.state.initialItem.displayName() : ''}
               </h1>
               <div className="ef-file-preview-header-buttons">
-                {this.state.displayedItem &&
-                  !this.state.displayedItem.get('locked_for_user') && (
-                    <a
-                      href={this.state.displayedItem.get('url')}
-                      download
-                      className="ef-file-preview-header-download ef-file-preview-button"
-                    >
-                      <i className="icon-download" />
-                      <span className="hidden-phone">{` ${I18n.t('Download')}`}</span>
-                    </a>
-                  )}
+                {this.state.displayedItem && !this.state.displayedItem.get('locked_for_user') && (
+                  <a
+                    href={this.state.displayedItem.get('url')}
+                    download
+                    className="ef-file-preview-header-download ef-file-preview-button"
+                  >
+                    <i className="icon-download" />
+                    <span className="hidden-phone">{` ${I18n.t('Download')}`}</span>
+                  </a>
+                )}
                 <button
                   type="button"
                   className={showInfoPanelClasses}
-                  ref={e => this.infoButton = e}
+                  ref={e => (this.infoButton = e)}
                   onClick={this.toggle('showInfoPanel')}
                 >
                   {/* Wrap content in a div because firefox doesn't support display: flex on buttons */}
@@ -295,7 +295,7 @@ export default class FilePreview extends React.PureComponent {
                 <button
                   type="button"
                   onClick={preventDefault(this.closeModal)}
-                  ref={e => this.closeButton = e}
+                  ref={e => (this.closeButton = e)}
                   className="ef-file-preview-header-close ef-file-preview-button"
                 >
                   <i className="icon-end" />

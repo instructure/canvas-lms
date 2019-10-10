@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {exact, number, oneOf, oneOfType, string} from 'prop-types'
+import {oneOf, shape, string} from 'prop-types'
+import basicUser from 'jsx/shared/proptypes/user'
+import contentExport from 'jsx/shared/proptypes/contentExport'
 
 const CONTENT_SHARE_TYPES = [
   'assignment',
@@ -27,9 +29,15 @@ const CONTENT_SHARE_TYPES = [
   'module_item'
 ]
 
-const contentShareShape = exact({
-  content_type: oneOf(CONTENT_SHARE_TYPES),
-  content_id: oneOfType([string, number])
+const contentShareShape = shape({
+  id: string.isRequired,
+  name: string.isRequired,
+  content_type: oneOf(CONTENT_SHARE_TYPES).isRequired,
+  created_at: string.isRequired,
+  updated_at: string.isRequired,
+  read_state: string.isRequired,
+  sender: basicUser.isRequired,
+  content_export: contentExport
 })
 
 export default contentShareShape

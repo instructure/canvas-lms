@@ -37,11 +37,11 @@ export default class ExternalToolsTableRow extends React.Component {
     setFocusAbove: PropTypes.func.isRequired,
     store: PropTypes.shape({
       getState: PropTypes.func,
-      filteredApps: PropTypes.func,
+      filteredApps: PropTypes.func
     }).isRequired
   }
 
-  get is13Tool () {
+  get is13Tool() {
     return this.props.tool.lti_version === '1.3'
   }
 
@@ -108,19 +108,23 @@ export default class ExternalToolsTableRow extends React.Component {
     }
   }
 
-  focus () {
+  focus() {
     this.button.focus()
   }
 
   renderButtons = () => {
-    const { tool } = this.props
+    const {tool} = this.props
     if (tool.installed_locally && !tool.restricted_by_master_course) {
-      let configureButton= null
+      let configureButton = null
       let updateBadge = null
 
       if (tool.tool_configuration) {
         configureButton = (
-          <ConfigureExternalToolButton ref="configureExternalToolButton" tool={tool} returnFocus={this.returnFocus} />
+          <ConfigureExternalToolButton
+            ref="configureExternalToolButton"
+            tool={tool}
+            returnFocus={this.returnFocus}
+          />
         )
       }
 
@@ -145,9 +149,7 @@ export default class ExternalToolsTableRow extends React.Component {
             >
               <i className="icon-settings" />
               <i className="icon-mini-arrow-down" />
-              <span className="screenreader-only">{`${tool.name} ${I18n.t(
-                'Settings'
-              )}`}</span>
+              <span className="screenreader-only">{`${tool.name} ${I18n.t('Settings')}`}</span>
             </a>
             <ul
               className="al-options"
@@ -157,10 +159,7 @@ export default class ExternalToolsTableRow extends React.Component {
               aria-expanded="false"
             >
               {configureButton}
-              <ManageUpdateExternalToolButton
-                tool={tool}
-                returnFocus={this.returnFocus}
-              />
+              <ManageUpdateExternalToolButton tool={tool} returnFocus={this.returnFocus} />
               <EditExternalToolButton
                 ref="editExternalToolButton"
                 tool={tool}
@@ -179,14 +178,9 @@ export default class ExternalToolsTableRow extends React.Component {
                 canAddEdit={this.props.canAddEdit}
                 returnFocus={this.returnFocus}
               />
-              {
-                this.is13Tool
-                ? <DeploymentIdButton
-                    tool={tool}
-                    returnFocus={this.returnFocus}
-                  />
-                : null
-              }
+              {this.is13Tool ? (
+                <DeploymentIdButton tool={tool} returnFocus={this.returnFocus} />
+              ) : null}
               <DeleteExternalToolButton
                 ref="deleteExternalToolButton"
                 tool={tool}

@@ -17,7 +17,7 @@
  */
 
 import classnames from "classnames";
-import { renderLink, renderImage, renderLinkedImage } from "./contentRendering";
+import { renderLink, renderImage, renderLinkedImage, renderVideo, renderAudio, mediaIframeSrcFromFile } from "./contentRendering";
 import scroll from "../common/scroll";
 import {defaultImageSize} from './plugins/instructure_image/ImageEmbedOptions'
 
@@ -217,3 +217,24 @@ function linkImageFigure(editor, fig, attrs) {
     a.appendChild(img);
   }
 };
+
+/* ** video insertion ** */
+
+export function insertVideo(editor, video) {
+  let result = insertContent(editor, renderVideo(video))
+  // for some reason, editor.selection.getEnd() returned from
+  // insertContent is parent paragraph when inserting the
+  // video iframe. Look for the iframe with the right
+  // src attribute. (Aside: tinymce strips the id or data-*
+  // attributes from the iframe, that's why we can't look for those)
+  const src = mediaIframeSrcFromFile(video)
+  result = result.querySelector(`iframe[src="${src}"]`)
+  return result
+}
+
+export function insertAudio(editor, audio) {
+  let result = insertContent(editor, renderAudio(audio))
+  const src = mediaIframeSrcFromFile(audio)
+  result = result.querySelector(`iframe[src="${src}"]`)
+  return result
+}

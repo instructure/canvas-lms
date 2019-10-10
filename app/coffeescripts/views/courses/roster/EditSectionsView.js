@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 import I18n from 'i18n!course_settings'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -29,7 +28,6 @@ import '../../../jquery.rails_flash_notifications'
 import 'jquery.disableWhileLoading'
 
 export default class EditSectionsView extends DialogBaseView {
-
   static initClass() {
     this.mixin(RosterDialogMixin)
 
@@ -88,9 +86,9 @@ export default class EditSectionsView extends DialogBaseView {
     const $sections = this.$('#user_sections')
     return (() => {
       const result = []
-      for (let e of Array.from(this.model.sectionEditableEnrollments())) {
+      for (const e of Array.from(this.model.sectionEditableEnrollments())) {
         var section
-        if ((section = ENV.CONTEXTS['sections'][e.course_section_id])) {
+        if ((section = ENV.CONTEXTS.sections[e.course_section_id])) {
           result.push(
             $sections.append(
               sectionTemplate({
@@ -145,7 +143,7 @@ export default class EditSectionsView extends DialogBaseView {
     const newEnrollments = []
     const deferreds = []
     // create new enrollments
-    for (let id of Array.from(newSections)) {
+    for (const id of Array.from(newSections)) {
       url = `/api/v1/sections/${id}/enrollments`
       const data = {
         enrollment: {
@@ -173,7 +171,7 @@ export default class EditSectionsView extends DialogBaseView {
     const enrollmentsToRemove = _.filter(this.model.sectionEditableEnrollments(), en =>
       _.includes(sectionsToRemove, en.course_section_id)
     )
-    for (let en of Array.from(enrollmentsToRemove)) {
+    for (const en of Array.from(enrollmentsToRemove)) {
       url = `${ENV.COURSE_ROOT_URL}/unenroll/${en.id}`
       deferreds.push($.ajaxJSON(url, 'DELETE'))
     }

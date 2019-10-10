@@ -57,7 +57,7 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
   function startSendOperation() {
     return doFetchApi({
       method: 'POST',
-      path:'/api/v1/users/self/content_shares',
+      path: '/api/v1/users/self/content_shares',
       body: {
         ...contentShare,
         receiver_ids: selectedUsers.map(user => user.id)
@@ -68,12 +68,12 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
   function handleSend() {
     setPostStatus('info')
     startSendOperation()
-    .then(() => setPostStatus('success'))
-    .catch(err => {
-      console.error(err) // eslint-disable-line no-console
-      if (err.response) console.error(err.response) // eslint-disable-line no-console
-      setPostStatus('error')
-    })
+      .then(() => setPostStatus('success'))
+      .catch(err => {
+        console.error(err) // eslint-disable-line no-console
+        if (err.response) console.error(err.response) // eslint-disable-line no-console
+        setPostStatus('error')
+      })
   }
 
   function Footer() {
@@ -110,14 +110,14 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
   else if (postStatus === 'success') alertMessage = I18n.t('Content share started successfully')
   else if (postStatus === 'error') alertMessage = I18n.t('Error starting content share')
 
-  const alert = alertMessage
-  ? (
+  const alert = alertMessage ? (
     <Alert variant={postStatus}>
-      <div role="alert" aria-live="assertive" aria-atomic>{alertMessage}</div>
+      <div role="alert" aria-live="assertive" aria-atomic>
+        {alertMessage}
+      </div>
       {postStatus === 'info' ? <Spinner renderTitle="" size="x-small" /> : null}
     </Alert>
-  )
-  : null
+  ) : null
 
   // TODO: should show the title of item being shared
   return (

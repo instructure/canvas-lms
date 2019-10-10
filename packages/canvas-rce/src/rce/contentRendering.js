@@ -20,6 +20,9 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import {cleanUrl} from './contentInsertionUtils';
 import formatMessage from "../format-message";
+import {VIDEO_SIZE_DEFAULT, AUDIO_PLAYER_SIZE} from './plugins/instructure_record/VideoOptionsTray/TrayController'
+import {isAudio} from './plugins/shared/fileTypeUtils'
+
 
 export function renderLink(data, contents) {
   const linkAttrs = {...data}
@@ -95,4 +98,54 @@ export function constructJSXImageElement(image, opts = {}) {
 
 export function renderImage(image, opts) {
   return renderToStaticMarkup(constructJSXImageElement(image, opts));
+}
+
+export function mediaIframeSrcFromFile(fileProps) {
+  const type = isAudio(fileProps.content_type || fileProps.type) ? 'audio' : 'video'
+  if (fileProps.embedded_iframe_url) {
+    return `${fileProps.embedded_iframe_url}?type=${type}`
+  }
+  return `/media_objects_iframe?mediahref=${encodeURIComponent(fileProps.href)}&type=${type}`
+}
+
+function constructJSXVideoEmbedding(video) {
+  const src = mediaIframeSrcFromFile(video)
+  return (
+    <iframe
+      allow="fullscreen"
+      allowFullScreen
+      data-media-id={`${video.media_id || video.id}`}
+      src={src}
+      style={{
+        width: VIDEO_SIZE_DEFAULT.width,
+        height: VIDEO_SIZE_DEFAULT.height,
+        display: 'inline-block'
+      }}
+      title={video.name}
+    />
+  )
+}
+
+export function renderVideo(video) {
+  return renderToStaticMarkup(constructJSXVideoEmbedding(video))
+}
+
+function constructJSXAudioEmbedding(audio) {
+  const src = mediaIframeSrcFromFile(audio)
+  return (
+    <iframe
+      data-media-id={`${audio.media_id || audio.id}`}
+      src={src}
+      style={{
+        width: AUDIO_PLAYER_SIZE.width,
+        height: AUDIO_PLAYER_SIZE.height,
+        display: 'inline-block'
+      }}
+      title={audio.name}
+    />
+  )
+}
+
+export function renderAudio(audio) {
+  return renderToStaticMarkup(constructJSXAudioEmbedding(audio))
 }

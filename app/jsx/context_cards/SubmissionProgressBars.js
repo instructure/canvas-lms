@@ -25,126 +25,126 @@ import {Tooltip} from '@instructure/ui-overlays'
 
 function scoreInPoints(score, pointsPossible) {
   const formattedScore = I18n.n(score, {precision: 2, strip_insignificant_zeros: true})
-  const formattedPointsPossible = I18n.n(pointsPossible, {precision: 2, strip_insignificant_zeros: true})
-  return `${formattedScore  }/${  formattedPointsPossible}`
+  const formattedPointsPossible = I18n.n(pointsPossible, {
+    precision: 2,
+    strip_insignificant_zeros: true
+  })
+  return `${formattedScore}/${formattedPointsPossible}`
 }
 
+class SubmissionProgressBars extends React.Component {
+  static propTypes = {
+    submissions: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        score: PropTypes.number,
+        user: PropTypes.shape({
+          _id: PropTypes.string.isRequired
+        }).isRequired,
+        assignment: PropTypes.shape({
+          html_url: PropTypes.string.isRequired,
+          points_possible: PropTypes.number
+        })
+      }).isRequired
+    ).isRequired
+  }
 
-  class SubmissionProgressBars extends React.Component {
-    static propTypes = {
-      submissions: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string.isRequired,
-          score: PropTypes.number,
-          user: PropTypes.shape({
-            _id: PropTypes.string.isRequired
-          }).isRequired,
-          assignment: PropTypes.shape({
-            html_url: PropTypes.string.isRequired,
-            points_possible: PropTypes.number,
-          })
-        }).isRequired
-      ).isRequired,
+  static displayGrade(submission) {
+    const {score, grade, excused} = submission
+    const pointsPossible = submission.assignment.points_possible
+    let display
+
+    if (excused) {
+      display = 'EX'
+    } else if (grade.match(/%/)) {
+      // Grade is a percentage, just show it
+      display = grade
+    } else if (grade.match(/complete/)) {
+      // Grade is complete/incomplete, show icon
+      display = SubmissionProgressBars.renderIcon(grade)
+    } else {
+      // Default to show score out of points possible
+      display = scoreInPoints(score, pointsPossible)
     }
 
-    static displayGrade (submission) {
-      const {score, grade, excused} = submission
-      const pointsPossible = submission.assignment.points_possible
-      let display
+    return display
+  }
 
-      if (excused) {
-        display = 'EX'
-      } else if (grade.match(/%/)) {
-        // Grade is a percentage, just show it
-        display = grade
-      } else if (grade.match(/complete/)) {
-        // Grade is complete/incomplete, show icon
-        display = SubmissionProgressBars.renderIcon(grade)
-      } else {
-        // Default to show score out of points possible
-        display = scoreInPoints(score, pointsPossible)
-      }
+  static displayScreenreaderGrade(submission) {
+    const {score, grade, excused} = submission
+    const pointsPossible = submission.assignment.points_possible
+    let display
 
-      return display
+    if (excused) {
+      display = I18n.t('excused')
+    } else if (grade.match(/%/) || grade.match(/complete/)) {
+      // Grade is a percentage or in/complete, just show it
+      display = grade
+    } else {
+      // Default to show score out of points possible
+      display = scoreInPoints(score, pointsPossible)
     }
 
-    static displayScreenreaderGrade (submission) {
-      const {score, grade, excused} = submission
-      const pointsPossible = submission.assignment.points_possible
-      let display
+    return display
+  }
 
-      if (excused) {
-        display = I18n.t('excused')
-      } else if (grade.match(/%/) || grade.match(/complete/)) {
-        // Grade is a percentage or in/complete, just show it
-        display = grade
-      } else {
-        // Default to show score out of points possible
-        display = scoreInPoints(score, pointsPossible)
-      }
+  static renderIcon(grade) {
+    const iconClass = classnames({
+      'icon-check': grade === 'complete',
+      'icon-x': grade === 'incomplete'
+    })
 
-      return display
-    }
+    return (
+      <div>
+        <span className="screenreader-only">{I18n.t('%{grade}', {grade})}</span>
+        <i className={iconClass} />
+      </div>
+    )
+  }
 
-    static renderIcon (grade) {
-      const iconClass = classnames({
-        'icon-check': grade === 'complete',
-        'icon-x': grade === 'incomplete'
-      })
-
+  render() {
+    const submissions = this.props.submissions.filter(s => s.grade != null)
+    if (submissions.length > 0) {
       return (
-        <div>
-          <span className='screenreader-only'>
-            {I18n.t("%{grade}", {grade})}
-          </span>
-          <i className={iconClass}></i>
-        </div>
-      )
-    }
-
-    render () {
-      const submissions = this.props.submissions.filter(s => s.grade != null);
-      if (submissions.length > 0) {
-        return (
-          <section
-            className="StudentContextTray__Section StudentContextTray-Progress">
-            <Heading level="h4" as="h3" border="bottom">
-              {I18n.t("Last %{length} Graded Items", {length: submissions.length})}
-            </Heading>
-            {submissions.map((submission) => {
-              return (
-                <div key={submission.id} className="StudentContextTray-Progress__Bar">
-                  <Tooltip
-                    tip={submission.assignment.name}
-                    placement="top"
+        <section className="StudentContextTray__Section StudentContextTray-Progress">
+          <Heading level="h4" as="h3" border="bottom">
+            {I18n.t('Last %{length} Graded Items', {length: submissions.length})}
+          </Heading>
+          {submissions.map(submission => {
+            return (
+              <div key={submission.id} className="StudentContextTray-Progress__Bar">
+                <Tooltip tip={submission.assignment.name} placement="top">
+                  <Link
+                    href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
+                    theme={{textDecoration: 'none'}}
+                    display="block"
                   >
-                    <Link
-                      href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
-                      theme={{textDecoration: 'none'}}
-                      display="block"
-                    >
-                      <Progress
-                        size="small"
-                        successColor={false}
-                        label={I18n.t('Grade')}
-                        valueMax={submission.assignment.points_possible}
-                        valueNow={submission.score || 0}
-                        formatValueText={() => SubmissionProgressBars.displayScreenreaderGrade(submission)}
-                        formatDisplayedValue={() => (
-                          <Text size="x-small" color="secondary">
-                            {SubmissionProgressBars.displayGrade(submission)}
-                          </Text>
-                        )}
-                      />
-                    </Link>
-                  </Tooltip>
-                </div>
-              )
-            })}
-          </section>
-        )
-      } else { return null }
+                    <Progress
+                      size="small"
+                      successColor={false}
+                      label={I18n.t('Grade')}
+                      valueMax={submission.assignment.points_possible}
+                      valueNow={submission.score || 0}
+                      formatValueText={() =>
+                        SubmissionProgressBars.displayScreenreaderGrade(submission)
+                      }
+                      formatDisplayedValue={() => (
+                        <Text size="x-small" color="secondary">
+                          {SubmissionProgressBars.displayGrade(submission)}
+                        </Text>
+                      )}
+                    />
+                  </Link>
+                </Tooltip>
+              </div>
+            )
+          })}
+        </section>
+      )
+    } else {
+      return null
     }
   }
+}
 
 export default SubmissionProgressBars

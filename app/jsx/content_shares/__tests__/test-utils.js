@@ -29,15 +29,24 @@ export function mockShare(overrides = {}) {
     created_at: '2019-07-04T12:00:00Z',
     updated_at: '2019-07-24T12:00:00Z',
     read_state: 'read',
+    content_export: {
+      id: '3',
+      attachment: {
+        id: '4',
+        url: 'https://attachment.url'
+      }
+    },
     ...overrides
   }
 }
 
 export const assignmentShare = mockShare()
-export const discussionShare = mockShare({
-  id: 2,
+export const readDiscussionShare = mockShare({
+  id: '2',
   name: 'A Course Discussion',
-  content_type: 'discussion',
+  read_state: 'read',
+  content_type: 'discussion_topic',
   created_at: '2019-07-05T12:00:00Z',
   updated_at: '2019-07-25T12:00:00Z'
 })
+export const unreadDiscussionShare = {...readDiscussionShare, read_state: 'unread'}

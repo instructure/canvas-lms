@@ -40,11 +40,9 @@ const general = 'false'
 const keys = [
   {objectType: 'assignment'},
   {objectType: 'discussion_topic'},
-  {objectType: 'wiki_page',
-    lockableAttributes: ['content']},
-  {objectType: 'attachment',
-    lockableAttributes: ['content']},
-  {objectType: 'quiz'},
+  {objectType: 'wiki_page', lockableAttributes: ['content']},
+  {objectType: 'attachment', lockableAttributes: ['content']},
+  {objectType: 'quiz'}
 ]
 
 export default class BlueprintLockOptions extends React.Component {
@@ -54,43 +52,45 @@ export default class BlueprintLockOptions extends React.Component {
     useRestrictionsbyType: PropTypes.bool.isRequired,
     generalRestrictions: propTypes.itemLocks.isRequired,
     restrictionsByType: propTypes.itemLocksByObject.isRequired,
-    lockableAttributes: propTypes.lockableAttributeList,
+    lockableAttributes: propTypes.lockableAttributeList
   }
 
   static defaultProps = {
     disabledMessage: '',
-    lockableAttributes: ['content', 'points', 'due_dates', 'availability_dates'],
+    lockableAttributes: ['content', 'points', 'due_dates', 'availability_dates']
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       lockType: props.useRestrictionsbyType ? granular : general,
       courseEnabled: props.isMasterCourse,
       generalRestrictions: props.generalRestrictions,
-      objectRestrictions: props.restrictionsByType,
+      objectRestrictions: props.restrictionsByType
     }
   }
 
-  onChange = (e) => {
+  onChange = e => {
     this.setState({
       lockType: e.target.value
     })
   }
 
   enableCourse = () => {
-    this.setState({ courseEnabled: !this.state.courseEnabled })
+    this.setState({courseEnabled: !this.state.courseEnabled})
   }
 
-  renderGeneralMenu (lock) {
+  renderGeneralMenu(lock) {
     const viewableClasses = cx({
       'bcs_sub-menu': true,
-      'bcs_sub-menu-viewable': lock === general,
+      'bcs_sub-menu-viewable': lock === general
     })
     return (
       <div className={viewableClasses}>
         <div className="bcs_sub-menu-item">
-          <Text size="x-small" lineHeight="condensed">{generalDescription + standardDescription}</Text>
+          <Text size="x-small" lineHeight="condensed">
+            {generalDescription + standardDescription}
+          </Text>
         </div>
         <LockCheckList
           formName="[blueprint_restrictions]"
@@ -101,31 +101,32 @@ export default class BlueprintLockOptions extends React.Component {
     )
   }
 
-  renderGranularMenu (lock) {
+  renderGranularMenu(lock) {
     const viewableClasses = cx({
       'bcs_sub-menu': true,
-      'bcs_sub-menu-viewable': lock === granular,
+      'bcs_sub-menu-viewable': lock === granular
     })
     return (
       <div className={viewableClasses}>
         <div className="bcs_sub-menu-item">
           <Text size="x-small">{granularDescription + standardDescription}</Text>
-          {keys.map(item =>
+          {keys.map(item => (
             <ExpandableLockOptions
               key={item.objectType}
               objectType={item.objectType}
               locks={this.state.objectRestrictions[item.objectType]}
               lockableAttributes={item.lockableAttributes || this.props.lockableAttributes}
-            />)}
+            />
+          ))}
         </div>
       </div>
     )
   }
 
-  renderOptionMenu () {
+  renderOptionMenu() {
     const viewableClasses = cx({
       'bcs_sub-menu': true,
-      'bcs_sub-menu-viewable': this.state.courseEnabled,
+      'bcs_sub-menu-viewable': this.state.courseEnabled
     })
     return (
       <div className={viewableClasses}>
@@ -142,7 +143,9 @@ export default class BlueprintLockOptions extends React.Component {
           </div>
           <div className="bcs_radio_input-group">
             <RadioInput
-              ref={(c) => { this.granularRadioInput = c }}
+              ref={c => {
+                this.granularRadioInput = c
+              }}
               name="course[use_blueprint_restrictions_by_object_type]"
               label={granularLocking}
               value={granular}
@@ -156,31 +159,30 @@ export default class BlueprintLockOptions extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const disabled = !!this.props.disabledMessage
-    let checkBox = (<div>
-      <input type="hidden" name="course[blueprint]" value={false} />
-      <Checkbox
-        name="course[blueprint]"
-        checked={this.state.courseEnabled}
-        disabled={disabled}
-        label={blueprintDescription}
-        onChange={this.enableCourse}
-        aria-label={this.props.disabledMessage}
-        value="on"
-      />
-    </div>)
+    let checkBox = (
+      <div>
+        <input type="hidden" name="course[blueprint]" value={false} />
+        <Checkbox
+          name="course[blueprint]"
+          checked={this.state.courseEnabled}
+          disabled={disabled}
+          label={blueprintDescription}
+          onChange={this.enableCourse}
+          aria-label={this.props.disabledMessage}
+          value="on"
+        />
+      </div>
+    )
     if (disabled) {
-      checkBox =
-      (<div className="disabled_message">
-        <Tooltip
-          tip={this.props.disabledMessage}
-          placement="top start"
-          variant="inverse"
-        >
-          <div>{checkBox}</div>
-        </Tooltip>
-      </div>)
+      checkBox = (
+        <div className="disabled_message">
+          <Tooltip tip={this.props.disabledMessage} placement="top start" variant="inverse">
+            <div>{checkBox}</div>
+          </Tooltip>
+        </div>
+      )
     }
     return (
       <div>

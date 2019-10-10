@@ -36,7 +36,7 @@ module SpeedGrader
       submission_json_fields = %i(id submitted_at workflow_state grade
                                   grade_matches_current_submission graded_at turnitin_data
                                   submission_type score points_deducted assignment_id submission_comments
-                                  grading_period_id excused updated_at)
+                                  grading_period_id excused updated_at attempt)
 
       submission_json_fields << (anonymous_students?(current_user: current_user, assignment: assignment) ? :anonymous_id : :user_id)
       submission_json_fields << :posted_at if course.post_policies_enabled?

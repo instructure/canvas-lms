@@ -342,7 +342,7 @@ describe ExternalToolsController, type: :request do
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools/#{et.id}.json",
                     {:controller => 'external_tools', :action => 'show', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s})
-    expect(HashDiff.diff(json, example_json(et))).to eq []
+    expect(json).to eq example_json(et)
   end
 
   def not_found_call(context, type="course")
@@ -360,7 +360,7 @@ describe ExternalToolsController, type: :request do
                      :group_id => group.id.to_s, :include_parents => true})
 
     expect(json.size).to eq 1
-    expect(HashDiff.diff(json.first, example_json(et))).to eq []
+    expect(json.first).to eq example_json(et)
   end
 
   def group_index_paginate_call(group)
@@ -398,7 +398,7 @@ describe ExternalToolsController, type: :request do
                      :"#{type}_id" => context.id.to_s})
 
     expect(json.size).to eq 1
-    expect(HashDiff.diff(json.first, example_json(et))).to eq []
+    expect(json.first).to eq example_json(et)
   end
 
   def index_call_with_placment(context, placement, type="course")
@@ -410,7 +410,7 @@ describe ExternalToolsController, type: :request do
                      :"#{type}_id" => context.id.to_s})
 
     expect(json.size).to eq 1
-    expect(HashDiff.diff(json.first, example_json(et_with_placement))).to eq []
+    expect(json.first).to eq example_json(et_with_placement)
   end
 
   def search_call(context, type="course")
@@ -445,7 +445,7 @@ describe ExternalToolsController, type: :request do
     expect(context.context_external_tools.count).to eq 1
 
     et = context.context_external_tools.last
-    expect(HashDiff.diff(json, example_json(et))).to eq []
+    expect(json).to eq example_json(et)
   end
 
   def update_call(context, type="course")
@@ -455,7 +455,7 @@ describe ExternalToolsController, type: :request do
                     {:controller => 'external_tools', :action => 'update', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s}, post_hash)
     et.reload
-    expect(HashDiff.diff(json, example_json(et))).to eq []
+    expect(json).to eq example_json(et)
   end
 
   def destroy_call(context, type="course")

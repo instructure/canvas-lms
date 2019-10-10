@@ -19,13 +19,13 @@
 import _ from 'underscore'
 import $ from 'jquery'
 import 'jquery.ajaxJSON'
-import 'jquery.instructure_misc_helpers'  /* replaceTags */
+import 'jquery.instructure_misc_helpers' /* replaceTags */
 import 'jquery.instructure_misc_plugins' /* showIf */
 import 'jquery.templateData'
 import 'compiled/jquery/mediaCommentThumbnail'
 import 'media_comments' /* mediaComment */
 import axios from 'axios'
-import { camelize } from 'convert_case'
+import {camelize} from 'convert_case'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import gradingPeriodSetsApi from 'compiled/api/gradingPeriodSetsApi'
@@ -37,37 +37,39 @@ import CourseGradeCalculator from '../gradebook/CourseGradeCalculator'
 import {scopeToUser} from '../gradebook/EffectiveDueDates'
 import {scoreToGrade} from '../gradebook/GradingSchemeHelper'
 import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper'
-import StatusPill from '../grading/StatusPill'
+import StatusPill from './StatusPill'
 import SelectMenuGroup from '../grade_summary/SelectMenuGroup'
 import {scoreToPercentage} from '../gradebook/shared/helpers/GradeCalculationHelper'
 
 const GradeSummary = {
-  getSelectedGradingPeriodId () {
+  getSelectedGradingPeriodId() {
     const currentGradingPeriodId = ENV.current_grading_period_id
 
     if (!currentGradingPeriodId || currentGradingPeriodId === '0') {
-      return null;
+      return null
     }
 
     return currentGradingPeriodId
   },
 
-  getAssignmentId ($assignment) {
-    return $assignment.getTemplateData({ textValues: ['assignment_id'] }).assignment_id
+  getAssignmentId($assignment) {
+    return $assignment.getTemplateData({textValues: ['assignment_id']}).assignment_id
   },
 
-  parseScoreText (text, numericalDefault, formattedDefault) {
-    const defaultNumericalValue = (typeof numericalDefault === 'number') ? numericalDefault : null
-    const defaultFormattedValue = (typeof formattedDefault === 'string') ? formattedDefault : '-'
+  parseScoreText(text, numericalDefault, formattedDefault) {
+    const defaultNumericalValue = typeof numericalDefault === 'number' ? numericalDefault : null
+    const defaultFormattedValue = typeof formattedDefault === 'string' ? formattedDefault : '-'
     let numericalValue = numberHelper.parse(text)
     numericalValue = isNaN(numericalValue) ? defaultNumericalValue : numericalValue
     return {
       numericalValue,
-      formattedValue: GradeFormatHelper.formatGrade(numericalValue, { defaultValue: defaultFormattedValue })
+      formattedValue: GradeFormatHelper.formatGrade(numericalValue, {
+        defaultValue: defaultFormattedValue
+      })
     }
   },
 
-  getOriginalScore ($assignment) {
+  getOriginalScore($assignment) {
     let numericalValue = parseFloat($assignment.find('.original_points').text())
     numericalValue = isNaN(numericalValue) ? null : numericalValue
     return {
@@ -76,50 +78,57 @@ const GradeSummary = {
     }
   },
 
-  onEditWhatIfScore ($assignmentScore, $ariaAnnouncer) {
-      // Store the original score so that it can be restored when the "What-If" score is reverted.
+  onEditWhatIfScore($assignmentScore, $ariaAnnouncer) {
+    // Store the original score so that it can be restored when the "What-If" score is reverted.
     if (!$assignmentScore.find('.grade').data('originalValue')) {
       $assignmentScore.find('.grade').data('originalValue', $assignmentScore.find('.grade').html())
     }
 
     const $screenreaderLinkClone = $assignmentScore.find('.screenreader-only').clone(true)
     $assignmentScore.find('.grade').data('screenreader_link', $screenreaderLinkClone)
-    $assignmentScore.find('.grade').empty().append($('#grade_entry'))
+    $assignmentScore
+      .find('.grade')
+      .empty()
+      .append($('#grade_entry'))
     $assignmentScore.find('.score_value').hide()
     $ariaAnnouncer.text(I18n.t('Enter a What-If score.'))
 
-      // Get the current shown score (possibly a "What-If" score)
-      // and use it as the default value in the text entry field
-    const whatIfScoreText = $assignmentScore.parents('.student_assignment').find('.what_if_score').text()
+    // Get the current shown score (possibly a "What-If" score)
+    // and use it as the default value in the text entry field
+    const whatIfScoreText = $assignmentScore
+      .parents('.student_assignment')
+      .find('.what_if_score')
+      .text()
     const score = GradeSummary.parseScoreText(whatIfScoreText, 0, '0')
-    $('#grade_entry').val(score.formattedValue)
-        .show()
-        .focus()
-        .select()
+    $('#grade_entry')
+      .val(score.formattedValue)
+      .show()
+      .focus()
+      .select()
   },
 
-  onScoreChange ($assignment, options) {
+  onScoreChange($assignment, options) {
     const originalScore = GradeSummary.getOriginalScore($assignment)
 
-      // parse the score entered by the user
+    // parse the score entered by the user
     const enteredScoreText = $assignment.find('#grade_entry').val()
     let score = GradeSummary.parseScoreText(enteredScoreText)
 
-      // if the user cleared the score, use the previous What-If score
+    // if the user cleared the score, use the previous What-If score
     if (score.numericalValue == null) {
       const previousWhatIfScore = $assignment.find('.what_if_score').text()
       score = GradeSummary.parseScoreText(previousWhatIfScore)
     }
 
-      // if there is no What-If score, use the original score
+    // if there is no What-If score, use the original score
     if (score.numericalValue == null) {
       score = originalScore
     }
 
-      // set 'isChanged' to true if the user entered the score already on the submission
+    // set 'isChanged' to true if the user entered the score already on the submission
     const isChanged = score.numericalValue != originalScore.numericalValue // eslint-disable-line eqeqeq
 
-      // update '.what_if_score' with the parsed value from '#grade_entry'
+    // update '.what_if_score' with the parsed value from '#grade_entry'
     $assignment.find('.what_if_score').text(score.formattedValue)
 
     let shouldUpdate = options.update
@@ -131,19 +140,28 @@ const GradeSummary = {
     const assignmentId = GradeSummary.getAssignmentId($assignment)
 
     if (shouldUpdate) {
-      const url = $.replaceTags($('.update_submission_url').attr('href'), 'assignment_id', assignmentId)
-        // if the original score was entered, remove the student entered score
+      const url = $.replaceTags(
+        $('.update_submission_url').attr('href'),
+        'assignment_id',
+        assignmentId
+      )
+      // if the original score was entered, remove the student entered score
       const scoreForUpdate = isChanged ? score.numericalValue : null
-      $.ajaxJSON(url, 'PUT', { 'submission[student_entered_score]': scoreForUpdate },
-          (data) => {
-            const updatedData = {student_entered_score: data.submission.student_entered_score}
-            $assignment.fillTemplateData({ data: updatedData })
-          },
-          $.noop
-        )
+      $.ajaxJSON(
+        url,
+        'PUT',
+        {'submission[student_entered_score]': scoreForUpdate},
+        data => {
+          const updatedData = {student_entered_score: data.submission.student_entered_score}
+          $assignment.fillTemplateData({data: updatedData})
+        },
+        $.noop
+      )
     }
 
-    $('#grade_entry').hide().appendTo($('body'))
+    $('#grade_entry')
+      .hide()
+      .appendTo($('body'))
 
     const $grade = $assignment.find('.grade')
 
@@ -160,14 +178,19 @@ const GradeSummary = {
     if (isChanged) {
       $assignmentScore.attr('title', '')
       $scoreTeaser.text(I18n.t('This is a What-If score'))
-      const $revertScore = $('#revert_score_template').clone(true).attr('id', '').show()
+      const $revertScore = $('#revert_score_template')
+        .clone(true)
+        .attr('id', '')
+        .show()
       $assignmentScore.find('.score_holder').append($revertScore)
       $grade.addClass('changed')
 
-        // this is to distinguish between the revert_all_scores_link in the right nav and
-        // the revert arrows within the grade_summary page grid
+      // this is to distinguish between the revert_all_scores_link in the right nav and
+      // the revert arrows within the grade_summary page grid
       if (options.refocus) {
-        setTimeout(() => { $assignment.find('.revert_score_link').focus() }, 0)
+        setTimeout(() => {
+          $assignment.find('.revert_score_link').focus()
+        }, 0)
       }
     } else {
       setTooltipForScore($assignment)
@@ -176,7 +199,9 @@ const GradeSummary = {
       $assignment.find('.revert_score_link').remove()
 
       if (options.refocus) {
-        setTimeout(() => { $assignment.find('.grade').focus() }, 0)
+        setTimeout(() => {
+          $assignment.find('.grade').focus()
+        }, 0)
       }
     }
 
@@ -189,10 +214,10 @@ const GradeSummary = {
     GradeSummary.updateStudentGrades()
   },
 
-  onScoreRevert ($assignment, options) {
+  onScoreRevert($assignment, options) {
     const $assignmentScore = $assignment.find('.assignment_score')
     const $grade = $assignmentScore.find('.grade')
-    const opts = { refocus: true, skipEval: false, ...options }
+    const opts = {refocus: true, skipEval: false, ...options}
     const score = GradeSummary.getOriginalScore($assignment)
     let title
 
@@ -228,7 +253,9 @@ const GradeSummary = {
     $grade.prepend($screenreaderLinkClone)
 
     if (opts.refocus) {
-      setTimeout(() => { $assignment.find('.grade').focus() }, 0)
+      setTimeout(() => {
+        $assignment.find('.grade').focus()
+      }, 0)
     }
   }
 }
@@ -267,30 +294,30 @@ function setTooltipForScore($assignment) {
   $tooltipScoreTeaser.text(tooltipText)
 }
 
-function getGradingPeriodSet () {
+function getGradingPeriodSet() {
   if (ENV.grading_period_set) {
     return gradingPeriodSetsApi.deserializeSet(ENV.grading_period_set)
   }
   return null
 }
 
-function calculateGrades () {
+function calculateGrades() {
   let grades
 
   if (ENV.effective_due_dates && ENV.grading_period_set) {
     grades = CourseGradeCalculator.calculate(
-        ENV.submissions,
-        ENV.assignment_groups,
-        ENV.group_weighting_scheme,
-        getGradingPeriodSet(),
-        scopeToUser(ENV.effective_due_dates, ENV.student_id)
-      )
+      ENV.submissions,
+      ENV.assignment_groups,
+      ENV.group_weighting_scheme,
+      getGradingPeriodSet(),
+      scopeToUser(ENV.effective_due_dates, ENV.student_id)
+    )
   } else {
     grades = CourseGradeCalculator.calculate(
-        ENV.submissions,
-        ENV.assignment_groups,
-        ENV.group_weighting_scheme
-      )
+      ENV.submissions,
+      ENV.assignment_groups,
+      ENV.group_weighting_scheme
+    )
   }
 
   const selectedGradingPeriodId = GradeSummary.getSelectedGradingPeriodId()
@@ -301,20 +328,20 @@ function calculateGrades () {
   return grades
 }
 
-function canBeConvertedToGrade (score, possible) {
+function canBeConvertedToGrade(score, possible) {
   return possible > 0 && !isNaN(score)
 }
 
-function calculatePercentGrade (score, possible) {
+function calculatePercentGrade(score, possible) {
   const percentGrade = scoreToPercentage(score, possible)
   return round(percentGrade, round.DEFAULT)
 }
 
-function formatPercentGrade (percentGrade) {
+function formatPercentGrade(percentGrade) {
   return I18n.n(percentGrade, {percentage: true})
 }
 
-function calculateGrade (score, possible) {
+function calculateGrade(score, possible) {
   if (canBeConvertedToGrade(score, possible)) {
     return formatPercentGrade(calculatePercentGrade(score, possible))
   }
@@ -322,13 +349,13 @@ function calculateGrade (score, possible) {
   return I18n.t('N/A')
 }
 
-function subtotalByGradingPeriod () {
+function subtotalByGradingPeriod() {
   const gpset = ENV.grading_period_set
   const gpselected = GradeSummary.getSelectedGradingPeriodId()
-  return ((!gpselected || gpselected === 0) && gpset && gpset.weighted)
+  return (!gpselected || gpselected === 0) && gpset && gpset.weighted
 }
 
-function calculateSubtotals (byGradingPeriod, calculatedGrades, currentOrFinal) {
+function calculateSubtotals(byGradingPeriod, calculatedGrades, currentOrFinal) {
   const subtotals = []
   let params
   if (byGradingPeriod) {
@@ -366,21 +393,21 @@ function calculateSubtotals (byGradingPeriod, calculatedGrades, currentOrFinal) 
   return subtotals
 }
 
-function finalGradePointsPossibleText (groupWeightingScheme, scoreWithPointsPossible) {
-  if (groupWeightingScheme === "percent") {
-    return "";
+function finalGradePointsPossibleText(groupWeightingScheme, scoreWithPointsPossible) {
+  if (groupWeightingScheme === 'percent') {
+    return ''
   }
 
-  const gradingPeriodId = GradeSummary.getSelectedGradingPeriodId();
-  const gradingPeriodSet = getGradingPeriodSet();
+  const gradingPeriodId = GradeSummary.getSelectedGradingPeriodId()
+  const gradingPeriodSet = getGradingPeriodSet()
   if (gradingPeriodId == null && gradingPeriodSet && gradingPeriodSet.weighted) {
-    return "";
+    return ''
   }
 
-  return scoreWithPointsPossible;
+  return scoreWithPointsPossible
 }
 
-function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme) {
+function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme) {
   const gradeChanged = $('.grade.changed').length > 0
   const showTotalGradeAsPoints = ENV.show_total_grade_as_points
 
@@ -394,16 +421,19 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
 
   const finalScore = calculatedGrades[currentOrFinal].score
   const finalPossible = calculatedGrades[currentOrFinal].possible
-  const scoreAsPoints = `${I18n.n(finalScore, {precision: round.DEFAULT})} / ${I18n.n(finalPossible, {precision: round.DEFAULT})}`
+  const scoreAsPoints = `${I18n.n(finalScore, {precision: round.DEFAULT})} / ${I18n.n(
+    finalPossible,
+    {precision: round.DEFAULT}
+  )}`
   const scoreAsPercent = calculateGrade(finalScore, finalPossible)
 
   let finalGrade
   let teaserText
 
   if (gradingSchemeEnabled()) {
-    const scoreToUse = overrideScorePresent() ?
-      ENV.effective_final_score :
-      calculatePercentGrade(finalScore, finalPossible)
+    const scoreToUse = overrideScorePresent()
+      ? ENV.effective_final_score
+      : calculatePercentGrade(finalScore, finalPossible)
 
     const letterGrade = scoreToGrade(scoreToUse, ENV.grading_scheme)
     $('.final_grade .letter_grade').text(letterGrade)
@@ -424,16 +454,18 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
   $finalGradeRow.find('.grade').text(finalGrade)
   $finalGradeRow.find('.score_teaser').text(teaserText)
 
-  const pointsPossibleText = finalGradePointsPossibleText(groupWeightingScheme, scoreAsPoints);
-  $finalGradeRow.find('.points_possible').text(pointsPossibleText);
+  const pointsPossibleText = finalGradePointsPossibleText(groupWeightingScheme, scoreAsPoints)
+  $finalGradeRow.find('.points_possible').text(pointsPossibleText)
 
   if (groupWeightingScheme === 'percent') {
     $finalGradeRow.find('.score_teaser').hide()
   }
 
   if (gradeChanged) {
-      // User changed their points for an assignment => let's let them know their updated points
-    const msg = I18n.t('Based on What-If scores, the new total is now %{grade}', {grade: finalGrade})
+    // User changed their points for an assignment => let's let them know their updated points
+    const msg = I18n.t('Based on What-If scores, the new total is now %{grade}', {
+      grade: finalGrade
+    })
     $.screenReaderFlashMessageExclusive(msg)
   }
 
@@ -452,8 +484,10 @@ function overrideScorePresent() {
   return ENV.effective_final_score != null
 }
 
-function updateStudentGrades () {
-  const droppedMessage = I18n.t('This assignment is dropped and will not be considered in the total calculation')
+function updateStudentGrades() {
+  const droppedMessage = I18n.t(
+    'This assignment is dropped and will not be considered in the total calculation'
+  )
   const ignoreUngradedSubmissions = $('#only_consider_graded_assignments').attr('checked')
   const currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final'
   const groupWeightingScheme = ENV.group_weighting_scheme
@@ -464,12 +498,17 @@ function updateStudentGrades () {
   $('.dropped').attr('aria-label', '')
   $('.dropped').attr('title', '')
 
-    // mark dropped assignments
-  $('.student_assignment').find('.points_possible').attr('aria-label', '')
+  // mark dropped assignments
+  $('.student_assignment')
+    .find('.points_possible')
+    .attr('aria-label', '')
 
-  _.forEach(calculatedGrades.assignmentGroups, (grades) => {
-    _.forEach(grades[currentOrFinal].submissions, (submission) => {
-      $(`#submission_${submission.submission.assignment_id}`).toggleClass('dropped', !!submission.drop)
+  _.forEach(calculatedGrades.assignmentGroups, grades => {
+    _.forEach(grades[currentOrFinal].submissions, submission => {
+      $(`#submission_${submission.submission.assignment_id}`).toggleClass(
+        'dropped',
+        !!submission.drop
+      )
     })
   })
 
@@ -481,8 +520,8 @@ function updateStudentGrades () {
   }
 }
 
-function updateScoreForAssignment (assignmentId, score) {
-  const submission = _.find(ENV.submissions, s => (`${s.assignment_id}`) === (`${assignmentId}`))
+function updateScoreForAssignment(assignmentId, score) {
+  const submission = _.find(ENV.submissions, s => `${s.assignment_id}` === `${assignmentId}`)
 
   if (submission) {
     submission.score = score
@@ -491,15 +530,15 @@ function updateScoreForAssignment (assignmentId, score) {
   }
 }
 
-function bindShowAllDetailsButton ($ariaAnnouncer) {
-  $('#show_all_details_button').click((event) => {
+function bindShowAllDetailsButton($ariaAnnouncer) {
+  $('#show_all_details_button').click(event => {
     event.preventDefault()
     const $button = $('#show_all_details_button')
     $button.toggleClass('showAll')
 
     if ($button.hasClass('showAll')) {
       $button.text(I18n.t('Hide All Details'))
-      $('tr.student_assignment.editable').each(function () {
+      $('tr.student_assignment.editable').each(function() {
         const assignmentId = $(this).getTemplateValue('assignment_id')
         const muted = $(this).data('muted')
         if (!muted) {
@@ -529,11 +568,11 @@ function goToURL(url) {
 }
 
 function saveAssignmentOrder(order) {
-  return axios.post(ENV.save_assignment_order_url, { assignment_order: order })
+  return axios.post(ENV.save_assignment_order_url, {assignment_order: order})
 }
 
 function coursesWithGrades() {
-  return ENV.courses_with_grades.map((course) => camelize(course))
+  return ENV.courses_with_grades.map(course => camelize(course))
 }
 
 function getSelectMenuGroupProps() {
@@ -560,17 +599,17 @@ function renderSelectMenuGroup() {
   )
 }
 
-function setup () {
-  $(document).ready(function () {
+function setup() {
+  $(document).ready(function() {
     GradeSummary.updateStudentGrades()
     const showAllWhatIfButton = $(this).find('#student-grades-whatif button')
     const revertButton = $(this).find('#revert-all-to-actual-score')
     const $ariaAnnouncer = $(this).find('#aria-announcer')
 
-    $('.revert_all_scores_link').click((event) => {
+    $('.revert_all_scores_link').click(event => {
       event.preventDefault()
-        // we pass in refocus: false here so the focus won't go to the revert arrows within the grid
-      $('#grades_summary .revert_score_link').each(function () {
+      // we pass in refocus: false here so the focus won't go to the revert arrows within the grid
+      $('#grades_summary .revert_score_link').each(function() {
         $(this).trigger('click', {skipEval: true, refocus: false})
       })
       $('#.show_guess_grades.exists').show()
@@ -579,36 +618,42 @@ function setup () {
       $.screenReaderFlashMessageExclusive(I18n.t('Grades are now reverted to original scores'))
     })
 
-      // manages toggling and screenreader focus for comments, scoring, and rubric details
-    $('.toggle_comments_link, .toggle_score_details_link, ' +
-        '.toggle_rubric_assessments_link, .toggle_final_grade_info').click(function (event) {
-          event.preventDefault()
-          const $row = $(`#${$(this).attr('aria-controls')}`)
-          const originEl = this
+    // manages toggling and screenreader focus for comments, scoring, and rubric details
+    $(
+      '.toggle_comments_link, .toggle_score_details_link, ' +
+        '.toggle_rubric_assessments_link, .toggle_final_grade_info'
+    ).click(function(event) {
+      event.preventDefault()
+      const $row = $(`#${$(this).attr('aria-controls')}`)
+      const originEl = this
 
-          $(originEl).attr('aria-expanded', $row.css('display') === 'none')
-          $row.toggle()
+      $(originEl).attr('aria-expanded', $row.css('display') === 'none')
+      $row.toggle()
 
-          if ($row.css('display') !== 'none') {
-            $row.find('.screenreader-toggle').focus()
-          }
-        })
+      if ($row.css('display') !== 'none') {
+        $row.find('.screenreader-toggle').focus()
+      }
+    })
 
-    $('.screenreader-toggle').click(function (event) {
+    $('.screenreader-toggle').click(function(event) {
       event.preventDefault()
       const ariaControl = $(this).data('aria')
       const originEl = $(`a[aria-controls='${ariaControl}']`)
 
       $(originEl).attr('aria-expanded', false)
       $(originEl).focus()
-      $(this).closest('.rubric_assessments, .comments').hide()
+      $(this)
+        .closest('.rubric_assessments, .comments')
+        .hide()
     })
 
-    function editWhatIfScore (event) {
+    function editWhatIfScore(event) {
       if (event.type === 'click' || event.keyCode === 13) {
-        if ($('#grades_summary.editable').length === 0 ||
-              $(this).find('#grade_entry').length > 0 ||
-              $(event.target).closest('.revert_score_link').length > 0) {
+        if (
+          $('#grades_summary.editable').length === 0 ||
+          $(this).find('#grade_entry').length > 0 ||
+          $(event.target).closest('.revert_score_link').length > 0
+        ) {
           return
         }
 
@@ -618,32 +663,35 @@ function setup () {
 
     $('.student_assignment.editable .assignment_score').on('click keypress', editWhatIfScore)
 
-    $('#grade_entry').keydown(function (event) {
+    $('#grade_entry').keydown(function(event) {
       if (event.keyCode === 13) {
-          // Enter Key: Finish Changes
+        // Enter Key: Finish Changes
         $ariaAnnouncer.text('')
         $(this)[0].blur()
       } else if (event.keyCode === 27) {
-          // Escape Key: Clear the Text Field
+        // Escape Key: Clear the Text Field
         $ariaAnnouncer.text('')
-        const val = $(this).parents('.student_assignment')
-            .addClass('dont_update')
-            .find('.original_score')
-            .text()
-        $(this).val(val || '')[0].blur()
+        const val = $(this)
+          .parents('.student_assignment')
+          .addClass('dont_update')
+          .find('.original_score')
+          .text()
+        $(this)
+          .val(val || '')[0]
+          .blur()
       }
     })
 
-    $('#grades_summary .student_assignment').bind('score_change', function (_event, options) {
+    $('#grades_summary .student_assignment').bind('score_change', function(_event, options) {
       GradeSummary.onScoreChange($(this), options)
     })
 
-    $('#grade_entry').blur(function () {
+    $('#grade_entry').blur(function() {
       const $assignment = $(this).parents('.student_assignment')
-      $assignment.triggerHandler('score_change', { update: true, refocus: true })
+      $assignment.triggerHandler('score_change', {update: true, refocus: true})
     })
 
-    $('#grades_summary').delegate('.revert_score_link', 'click', function (event, options) {
+    $('#grades_summary').delegate('.revert_score_link', 'click', function(event, options) {
       event.preventDefault()
       event.stopPropagation()
 
@@ -652,20 +700,27 @@ function setup () {
 
     $('#grades_summary:not(.editable) .assignment_score').css('cursor', 'default')
 
-    $('#grades_summary tr').hover(function () {
-      $(this).find('th.title .context').addClass('context_hover')
-    }, function () {
-      $(this).find('th.title .context').removeClass('context_hover')
-    })
+    $('#grades_summary tr').hover(
+      function() {
+        $(this)
+          .find('th.title .context')
+          .addClass('context_hover')
+      },
+      function() {
+        $(this)
+          .find('th.title .context')
+          .removeClass('context_hover')
+      }
+    )
 
     $('.show_guess_grades_link').click(() => {
-      $('#grades_summary .student_entered_score').each(function () {
+      $('#grades_summary .student_entered_score').each(function() {
         const score = GradeSummary.parseScoreText($(this).text())
         if (score.numericalValue != null) {
           const $assignment = $(this).parents('.student_assignment')
           $assignment.find('.what_if_score').text(score.formattedValue)
           $assignment.find('.score_value').hide()
-          $assignment.triggerHandler('score_change', { update: false, refocus: false })
+          $assignment.triggerHandler('score_change', {update: false, refocus: false})
         }
       })
       $('.show_guess_grades').hide()
@@ -673,16 +728,18 @@ function setup () {
       $.screenReaderFlashMessageExclusive(I18n.t('Grades are now showing what-if scores'))
     })
 
-    $('#grades_summary .student_entered_score').each(function () {
+    $('#grades_summary .student_entered_score').each(function() {
       const score = GradeSummary.parseScoreText($(this).text())
       if (score.numericalValue != null) {
-        $('.show_guess_grades').show().addClass('exists')
+        $('.show_guess_grades')
+          .show()
+          .addClass('exists')
       }
     })
 
     $('.comments .play_comment_link').mediaCommentThumbnail('normal')
 
-    $('.play_comment_link').live('click', function (event) {
+    $('.play_comment_link').live('click', function(event) {
       event.preventDefault()
       const $parent = $(this).parents('.comment_media')
       const commentId = $parent.getTemplateData({textValues: ['media_comment_id']}).media_comment_id
@@ -698,9 +755,11 @@ function setup () {
       }
     })
 
-    $('#only_consider_graded_assignments').change(() => {
-      GradeSummary.updateStudentGrades()
-    }).triggerHandler('change')
+    $('#only_consider_graded_assignments')
+      .change(() => {
+        GradeSummary.updateStudentGrades()
+      })
+      .triggerHandler('change')
 
     bindShowAllDetailsButton($ariaAnnouncer)
     StatusPill.renderPills()

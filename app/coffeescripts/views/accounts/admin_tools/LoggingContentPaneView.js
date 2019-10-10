@@ -88,9 +88,7 @@ export default class LoggingContentPaneView extends Backbone.View {
   }
 
   initMutationLog() {
-    return this.permissions.mutation ?
-      new GraphQLMutationContentView() :
-      new Backbone.View()
+    return this.permissions.mutation ? new GraphQLMutationContentView() : new Backbone.View()
   }
 }
 LoggingContentPaneView.initClass()

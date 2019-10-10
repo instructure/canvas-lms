@@ -28,9 +28,15 @@ if (container && ENV.CONTENT_NOTICES.length > 0) {
     if (notice.link_text && notice.link_target) {
       link = <Link href={notice.link_target}>{notice.link_text}</Link>
     }
-    return <Alert key={notice.tag} variant={notice.variant} liveRegion={() => document.getElementById('flash_screenreader_holder')}>
+    return (
+      <Alert
+        key={notice.tag}
+        variant={notice.variant}
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+      >
         <Text>{notice.text}</Text>&emsp;{link}
       </Alert>
+    )
   })
   ReactDOM.render(alerts, container)
 }
