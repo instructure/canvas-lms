@@ -118,7 +118,10 @@ namespace :deploy do
       # and this process runs as the deploy user who is in the canvasadmin group whereas the apache
       # application runs as canvasuser so when logs get rotated they are put in the canvasuser group
       execute :sudo, 'chown -R canvasuser:canvasadmin', release_path.join('log/') 
-      execute :sudo, 'chmod -R g+sw', release_path.join('log')
+      execute :sudo, 'chmod -R g+w', release_path.join('log')
+      # Set the setgid bit on the log dir so that files created in that dir are owned by the log dir's group by default
+      # This is so that when the Rails.logger rotates the files, they maintain the same permissions.
+      execute :sudo, 'chmod g+sw', release_path.join('log') 
     end
   end
 
