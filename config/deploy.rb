@@ -118,7 +118,7 @@ namespace :deploy do
       # and this process runs as the deploy user who is in the canvasadmin group whereas the apache
       # application runs as canvasuser so when logs get rotated they are put in the canvasuser group
       execute :sudo, 'chown -R canvasuser:canvasadmin', release_path.join('log/') 
-      execute :sudo, 'chmod -R g+w', release_path.join('log')
+      execute :sudo, 'chmod -R g+sw', release_path.join('log')
     end
   end
 
