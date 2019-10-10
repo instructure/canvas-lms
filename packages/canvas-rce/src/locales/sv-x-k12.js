@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/sv-x-k12.json"
-import "../rce/languages/sv_SE";
+import formatMessage from '../format-message'
+import locale from '../../locales/sv-x-k12.json'
+import '../rce/languages/sv_SE'
 
-formatMessage.addLocale({ "sv-x-k12": locale });
+formatMessage.addLocale({'sv-x-k12': locale})

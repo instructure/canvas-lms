@@ -19,9 +19,9 @@
 import React, {useState} from 'react'
 import {func, oneOf, string} from 'prop-types'
 import {linkShape} from './propTypes'
-import formatMessage from '../../../../format-message';
-import {renderLink as renderLinkHtml} from "../../../contentRendering";
-import dragHtml from "../../../../sidebar/dragHtml";
+import formatMessage from '../../../../format-message'
+import {renderLink as renderLinkHtml} from '../../../contentRendering'
+import dragHtml from '../../../../sidebar/dragHtml'
 import {AccessibleContent} from '@instructure/ui-a11y'
 import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
@@ -48,7 +48,7 @@ function IconBlank() {
 }
 
 function getIcon(type) {
-  switch(type) {
+  switch (type) {
     case 'assignments':
       return IconAssignmentLine
     case 'discussions':
@@ -75,23 +75,23 @@ export default function Link(props) {
   const color = published ? 'success' : 'primary'
   let dateString = null
   if (date) {
-    if (date === 'multiple' ) {
+    if (date === 'multiple') {
       dateString = formatMessage('Due: Multiple Dates')
     } else {
       const when = formatMessage.date(Date.parse(date), 'long')
-      switch(date_type) {
+      switch (date_type) {
         case 'todo':
           dateString = formatMessage('To Do: {when}', {when})
           break
         case 'published':
           dateString = formatMessage('Published: {when}', {when})
-          break;
+          break
         case 'posted':
           dateString = formatMessage('Posted: {when}', {when})
-          break;
+          break
         case 'delayed_post':
           dateString = formatMessage('To Be Posted: {when}', {when})
-          break;
+          break
         case 'due':
         default:
           dateString = formatMessage('Due: {when}', {when})
@@ -99,11 +99,13 @@ export default function Link(props) {
       }
     }
   }
-  const publishedMsg = props.link.published ? formatMessage('published') : formatMessage('unpublished')
+  const publishedMsg = props.link.published
+    ? formatMessage('published')
+    : formatMessage('unpublished')
 
   function handleLinkClick(e) {
-    e.preventDefault();
-    props.onClick(props.link);
+    e.preventDefault()
+    props.onClick(props.link)
   }
 
   function handleLinkKey(e) {
@@ -114,7 +116,7 @@ export default function Link(props) {
   }
 
   function handleDragStart(e) {
-    dragHtml(e, renderLinkHtml(props.link, props.link.title));
+    dragHtml(e, renderLinkHtml(props.link, props.link.title))
   }
 
   function handleDragEnd(e) {
@@ -167,14 +169,20 @@ export default function Link(props) {
                       </Text>
                     </Flex.Item>
                     <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
-                      <View as="div" margin="0">{title}</View>
-                      {dateString ? (<View as="div">{dateString}</View>) : null}
+                      <View as="div" margin="0">
+                        {title}
+                      </View>
+                      {dateString ? <View as="div">{dateString}</View> : null}
                     </Flex.Item>
                     {'published' in props.link && (
                       <Flex.Item>
                         <AccessibleContent alt={publishedMsg}>
                           <Text color={color}>
-                            {published ? <IconPublishSolid inline={false}/> : <IconUnpublishedSolid inline={false} />}
+                            {published ? (
+                              <IconPublishSolid inline={false} />
+                            ) : (
+                              <IconUnpublishedSolid inline={false} />
+                            )}
                           </Text>
                         </AccessibleContent>
                       </Flex.Item>
@@ -193,8 +201,13 @@ export default function Link(props) {
 Link.propTypes = {
   link: linkShape.isRequired,
   type: oneOf([
-    'assignments', 'discussions', 'modules', 'quizzes',
-    'announcements', 'wikiPages', 'navigation'
+    'assignments',
+    'discussions',
+    'modules',
+    'quizzes',
+    'announcements',
+    'wikiPages',
+    'navigation'
   ]).isRequired,
   onClick: func.isRequired,
   describedByID: string.isRequired,

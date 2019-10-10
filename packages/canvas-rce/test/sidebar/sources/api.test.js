@@ -66,7 +66,7 @@ describe('sources/api', () => {
     })
 
     it('bookmark omits host if not in props', () => {
-      const noHostProps = { ...props, host: undefined}
+      const noHostProps = {...props, host: undefined}
       collection = apiSource.initializeCollection(endpoint, noHostProps)
       assert.equal(collection.bookmark, '/api/wikiPages?contextType=group&contextId=123')
     })
@@ -222,7 +222,7 @@ describe('sources/api', () => {
   })
 
   describe('fetchMediaFolder', () => {
-    let files;
+    let files
     beforeEach(() => {
       files = [{id: 24}]
       const body = {files}
@@ -233,11 +233,17 @@ describe('sources/api', () => {
       apiSource.fetchPage.restore()
     })
     it('calls fetchPage with the proper params', () => {
-      return apiSource.fetchMediaFolder({
-        contextType: 'course', contextId: '22'
-      }).then(() => {
-        sinon.assert.calledWith(apiSource.fetchPage, '/api/folders/media?contextType=course&contextId=22')
-      })
+      return apiSource
+        .fetchMediaFolder({
+          contextType: 'course',
+          contextId: '22'
+        })
+        .then(() => {
+          sinon.assert.calledWith(
+            apiSource.fetchPage,
+            '/api/folders/media?contextType=course&contextId=22'
+          )
+        })
     })
   })
 
@@ -284,14 +290,17 @@ describe('sources/api', () => {
 
     it('calls alertFunc when an error occurs', () => {
       fetchMock.mock(uri, 500)
-      return apiSource.preflightUpload(fileProps, apiProps).then(() => {
-        sinon.assert.calledWith(alertFuncSpy, {
-          text: 'Something went wrong uploading, check your connection and try again.',
-          variant: 'error'
+      return apiSource
+        .preflightUpload(fileProps, apiProps)
+        .then(() => {
+          sinon.assert.calledWith(alertFuncSpy, {
+            text: 'Something went wrong uploading, check your connection and try again.',
+            variant: 'error'
+          })
         })
-      }).catch(() => {
-        // This will re-throw so we just catch it here.
-      })
+        .catch(() => {
+          // This will re-throw so we just catch it here.
+        })
     })
 
     it('throws an exception when an error occurs', () => {
@@ -319,7 +328,7 @@ describe('sources/api', () => {
     })
 
     it('calls alertFunc if there is a problem', () => {
-      fetchMock.once(uploadUrl, 500, { overwriteRoutes: true})
+      fetchMock.once(uploadUrl, 500, {overwriteRoutes: true})
       return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
         sinon.assert.calledWith(alertFuncSpy, {
           text: 'Something went wrong uploading, check your connection and try again.',
@@ -526,11 +535,11 @@ describe('sources/api', () => {
       })
     })
 
-    it("defaults display_name to name", () => {
-      const url = "/file/url?download_frd=1"
-      const name = "filename"
-      fetchMock.mock("*", {url, name})
-      sinon.stub(fileUrl, "downloadToWrap")
+    it('defaults display_name to name', () => {
+      const url = '/file/url?download_frd=1'
+      const name = 'filename'
+      fetchMock.mock('*', {url, name})
+      sinon.stub(fileUrl, 'downloadToWrap')
       return apiSource.getFile(id).then(file => {
         assert.equal(file.display_name, name)
         fileUrl.downloadToWrap.restore()
@@ -541,12 +550,12 @@ describe('sources/api', () => {
 
   describe('pingbackUnsplash', () => {
     it('sends the given id to the proper route', () => {
-      const expectedUrl = "/api/unsplash/pingback?id=123"
+      const expectedUrl = '/api/unsplash/pingback?id=123'
       fetchMock.mock(expectedUrl, 200)
       return apiSource.pingbackUnsplash(123).then(() => {
         assert.ok(fetchMock.done())
         assert.ok(fetchMock.lastUrl() === expectedUrl)
-        fetchMock.restore();
+        fetchMock.restore()
       })
     })
   })

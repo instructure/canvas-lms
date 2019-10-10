@@ -15,33 +15,34 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react';
-import LoadingPastIndicator from '../index';
-import {shallow} from 'enzyme';
-jest.mock( '../../../utilities/scrollUtils');
-import {animateSlideDown} from '../../../utilities/scrollUtils'; // eslint-disable-line import/first
+import React from 'react'
+import {shallow} from 'enzyme'
+import LoadingPastIndicator from '../index'
+
+jest.mock('../../../utilities/scrollUtils')
+import {animateSlideDown} from '../../../utilities/scrollUtils' // eslint-disable-line import/first
 
 it('renders very little', () => {
-  const wrapper = shallow(<LoadingPastIndicator />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<LoadingPastIndicator />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders spinner while loading', () => {
-  const wrapper = shallow(<LoadingPastIndicator loadingPast={true} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<LoadingPastIndicator loadingPast />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('prioritizes loading complete over currently loading', () => {
-  const wrapper = shallow(<LoadingPastIndicator loadingPast={true} allPastItemsLoaded={true} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<LoadingPastIndicator loadingPast allPastItemsLoaded />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders TV when all past items loaded', () => {
-  const wrapper = shallow(<LoadingPastIndicator allPastItemsLoaded={true} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<LoadingPastIndicator allPastItemsLoaded />)
+  expect(wrapper).toMatchSnapshot()
+})
 
-it('shows an Alert when there\'s a query error', () => {
-  const wrapper = shallow(<LoadingPastIndicator loadingError={'uh oh'}/>);
-  expect(wrapper).toMatchSnapshot();
-});
+it("shows an Alert when there's a query error", () => {
+  const wrapper = shallow(<LoadingPastIndicator loadingError="uh oh" />)
+  expect(wrapper).toMatchSnapshot()
+})

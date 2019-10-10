@@ -20,11 +20,11 @@ import React, {useRef, useState} from 'react'
 import {arrayOf, bool, func, number, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 import keycode from 'keycode'
-import { Button } from '@instructure/ui-buttons'
-import { Flex, View } from '@instructure/ui-layout'
-import {findFocusable, ScreenReaderContent } from '@instructure/ui-a11y'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, View} from '@instructure/ui-layout'
+import {findFocusable, ScreenReaderContent} from '@instructure/ui-a11y'
 
-import { Text } from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {IconA11yLine, IconKeyboardShortcutsLine, IconMiniArrowEndLine} from '@instructure/ui-icons'
 import formatMessage from '../format-message'
@@ -70,7 +70,7 @@ export default function StatusBar(props) {
     const buttons = findFocusable(statusBarRef.current)
     if (event.keyCode === keycode.codes.right) {
       buttons[(focusedIndex + 1) % buttons.length].focus()
-    } else if(event.keyCode === keycode.codes.left) {
+    } else if (event.keyCode === keycode.codes.left) {
       buttons[(focusedIndex + buttons.length - 1) % buttons.length].focus()
     }
   }
@@ -86,14 +86,12 @@ export default function StatusBar(props) {
   }
 
   const [focusedIndex, setFocusedIndex] = useState(0)
-  const statusBarRef = useRef(null);
+  const statusBarRef = useRef(null)
 
   /* eslint-disable react/prop-types */
   function renderPath() {
     if (props.isHtmlView) return null
-    return (
-      <View data-testid="whole-status-bar-path">{renderPathString(props)}</View>
-    )
+    return <View data-testid="whole-status-bar-path">{renderPathString(props)}</View>
   }
 
   function renderIconButtons() {
@@ -135,11 +133,7 @@ export default function StatusBar(props) {
       {count: props.wordCount}
     )
     return (
-      <View
-        display="inline-block"
-        padding="0 small"
-        data-testid="status-bar-word-count"
-      >
+      <View display="inline-block" padding="0 small" data-testid="status-bar-word-count">
         <Text>{wordCount}</Text>
       </View>
     )
@@ -165,9 +159,7 @@ export default function StatusBar(props) {
   }
 
   function renderResizeHandle() {
-    return (
-      <ResizeHandle onDrag={props.onResize} tabIndex={tabIndexForPosition(3)} />
-    )
+    return <ResizeHandle onDrag={props.onResize} tabIndex={tabIndexForPosition(3)} />
   }
   /* eslint-enable react/prop-types */
 
@@ -178,13 +170,11 @@ export default function StatusBar(props) {
       data-testid="RCEStatusBar"
       justifyItems={flexJustify}
       ref={statusBarRef}
-        onKeyDown={handleKey}
-        onFocus={handleFocus}
-        role="status"
+      onKeyDown={handleKey}
+      onFocus={handleFocus}
+      role="status"
     >
-      <Flex.Item grow>
-        {renderPath()}
-      </Flex.Item>
+      <Flex.Item grow>{renderPath()}</Flex.Item>
 
       <Flex.Item role="toolbar" title={formatMessage('Editor Statusbar')}>
         {renderIconButtons()}

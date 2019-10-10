@@ -38,12 +38,7 @@ export default function KeyboardShortcutModal(props) {
       onDismiss={props.onDismiss}
     >
       <Modal.Header>
-        <CloseButton
-          placement="end"
-          offset="medium"
-          variant="icon"
-          onClick={props.onDismiss}
-        >
+        <CloseButton placement="end" offset="medium" variant="icon" onClick={props.onDismiss}>
           {formatMessage('Close')}
         </CloseButton>
         <Heading>{formatMessage('Keyboard Shortcuts')}</Heading>
@@ -51,18 +46,36 @@ export default function KeyboardShortcutModal(props) {
       <Modal.Body>
         <View as="div" margin="small">
           <List variant="unstyled">
-            <List.Item><Text weight="bold">ALT+F8/ALT+0</Text> {formatMessage('Open this keyboard shortcuts dialog')}</List.Item>
-            <List.Item><Text weight="bold">CTRL+F9</Text> {formatMessage('Focus the popup context toolbar')}</List.Item>
-            <List.Item><Text weight="bold">ALT+F9</Text> {formatMessage('Go to the editor\'s menubar')}</List.Item>
-            <List.Item><Text weight="bold">ALT+F10</Text> {formatMessage('Go to the editor\'s toolbar')}</List.Item>
-            <List.Item><Text weight="bold">ESC</Text> {formatMessage('Close a menu or dialog. Also returns you to the editor area')}</List.Item>
-            <List.Item><Text weight="bold">{formatMessage('TAB/Arrows')}</Text> {formatMessage('Navigate through the menu or toolbar')}</List.Item>
+            <List.Item>
+              <Text weight="bold">ALT+F8/ALT+0</Text>{' '}
+              {formatMessage('Open this keyboard shortcuts dialog')}
+            </List.Item>
+            <List.Item>
+              <Text weight="bold">CTRL+F9</Text> {formatMessage('Focus the popup context toolbar')}
+            </List.Item>
+            <List.Item>
+              <Text weight="bold">ALT+F9</Text> {formatMessage("Go to the editor's menubar")}
+            </List.Item>
+            <List.Item>
+              <Text weight="bold">ALT+F10</Text> {formatMessage("Go to the editor's toolbar")}
+            </List.Item>
+            <List.Item>
+              <Text weight="bold">ESC</Text>{' '}
+              {formatMessage('Close a menu or dialog. Also returns you to the editor area')}
+            </List.Item>
+            <List.Item>
+              <Text weight="bold">{formatMessage('TAB/Arrows')}</Text>{' '}
+              {formatMessage('Navigate through the menu or toolbar')}
+            </List.Item>
           </List>
           <View as="p">
-            {formatMessage('Other editor shortcuts may be found at')} <a
+            {formatMessage('Other editor shortcuts may be found at')}{' '}
+            <a
               href="https://www.tiny.cloud/docs/advanced/keyboard-shortcuts/"
               target="rcekbshortcut"
-            >https://www.tiny.cloud/docs/advanced/keyboard-shortcuts/</a>
+            >
+              https://www.tiny.cloud/docs/advanced/keyboard-shortcuts/
+            </a>
           </View>
         </View>
       </Modal.Body>

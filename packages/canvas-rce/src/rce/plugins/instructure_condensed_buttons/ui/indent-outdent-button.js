@@ -31,16 +31,24 @@ export default function register(editor) {
     presets: 'listpreview',
     columns: 3,
     fetch: callback => {
-      callback([{
-        type: 'choiceitem',
-        icon: 'outdent',
-        text: formatMessage('Decrease indent')
-      }])
+      callback([
+        {
+          type: 'choiceitem',
+          icon: 'outdent',
+          text: formatMessage('Decrease indent')
+        }
+      ])
     },
     onItemAction: () => editor.execCommand('outdent'),
     onSetup: () => {
-      const $basicButton = editor.$(editor.editorContainer.querySelector(`.tox-tbtn[aria-label="${baseIndentButton.tooltip}"]`))
-      const $splitButton = editor.$(editor.editorContainer.querySelector(`.tox-split-button[aria-label="${baseIndentButton.tooltip}"]`))
+      const $basicButton = editor.$(
+        editor.editorContainer.querySelector(`.tox-tbtn[aria-label="${baseIndentButton.tooltip}"]`)
+      )
+      const $splitButton = editor.$(
+        editor.editorContainer.querySelector(
+          `.tox-split-button[aria-label="${baseIndentButton.tooltip}"]`
+        )
+      )
       function showHideButtons(canOutdent) {
         $basicButton[canOutdent ? 'hide' : 'show']()
         $splitButton[canOutdent ? 'show' : 'hide']()
@@ -51,7 +59,7 @@ export default function register(editor) {
       }
       setTimeout(() => showHideButtons(false)) // hide the spitbutton by default on first render
 
-      editor.on('NodeChange', onNodeChange);
+      editor.on('NodeChange', onNodeChange)
       return () => editor.off('NodeChange', onNodeChange)
     }
   })

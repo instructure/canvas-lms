@@ -16,37 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 
 export const userShape = {
   id: PropTypes.string,
   displayName: PropTypes.string,
   avatarUrl: PropTypes.string,
   color: PropTypes.string
-};
+}
 
 export const badgeShape = {
   text: PropTypes.string,
   variant: PropTypes.string
-};
+}
 
 export const courseShape = {
   id: PropTypes.string,
   longName: PropTypes.string,
   enrollmentType: PropTypes.string
-};
+}
 
 export const itemShape = {
   context: PropTypes.shape({})
-};
+}
 
 export const opportunityShape = {
   items: PropTypes.arrayOf(PropTypes.object),
-  nextUrl: PropTypes.string,
-};
+  nextUrl: PropTypes.string
+}
 
-export const sizeShape = PropTypes.oneOf(['small', 'medium', 'large']);
+export const sizeShape = PropTypes.oneOf(['small', 'medium', 'large'])
 
 export const statusShape = PropTypes.oneOfType([
   PropTypes.bool,
@@ -57,16 +56,16 @@ export const statusShape = PropTypes.oneOfType([
     late: PropTypes.bool,
     missing: PropTypes.bool,
     needs_grading: PropTypes.bool,
-    submitted: PropTypes.bool,
+    submitted: PropTypes.bool
   })
-]);
+])
 
 export const feedbackShape = {
   author_avatar_url: PropTypes.string,
   author_name: PropTypes.string,
   comment: PropTypes.string,
-  is_media: PropTypes.bool,
-};
+  is_media: PropTypes.bool
+}
 
 export default {
   badgeShape,
@@ -76,5 +75,5 @@ export default {
   opportunityShape,
   sizeShape,
   statusShape,
-  feedbackShape,
-};
+  feedbackShape
+}

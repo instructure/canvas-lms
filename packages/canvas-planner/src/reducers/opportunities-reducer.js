@@ -15,36 +15,41 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { handleActions } from 'redux-actions';
-import { cloneDeep } from 'lodash';
+import {handleActions} from 'redux-actions'
+import {cloneDeep} from 'lodash'
 
 function setOpportunityState(state, action) {
   // merge payload into state, ignoring duplicates
   // this approach favors the existing item over the new
-  const opportunities = [...state.items].concat(action.payload.items.filter(
-    payitem => state.items.findIndex(stateitem => stateitem.id === payitem.id) < 0)
-  );
+  const opportunities = [...state.items].concat(
+    action.payload.items.filter(
+      payitem => state.items.findIndex(stateitem => stateitem.id === payitem.id) < 0
+    )
+  )
   return {
     items: opportunities,
     nextUrl: action.payload.nextUrl
-  };
+  }
 }
 
-export default handleActions({
-  ADD_OPPORTUNITIES: setOpportunityState,
-  DISMISSED_OPPORTUNITY: (state, action) => {
-    let stateCopy = cloneDeep(state);
-    let dismissedOpportunity = stateCopy.items.find(
-      opportunity => opportunity.id === action.payload.assignment_id
-    );
-    if (dismissedOpportunity.planner_override) {
-      dismissedOpportunity.planner_override.dismissed = action.payload.dismissed;
-    } else {
-      dismissedOpportunity.planner_override = action.payload;
+export default handleActions(
+  {
+    ADD_OPPORTUNITIES: setOpportunityState,
+    DISMISSED_OPPORTUNITY: (state, action) => {
+      const stateCopy = cloneDeep(state)
+      const dismissedOpportunity = stateCopy.items.find(
+        opportunity => opportunity.id === action.payload.assignment_id
+      )
+      if (dismissedOpportunity.planner_override) {
+        dismissedOpportunity.planner_override.dismissed = action.payload.dismissed
+      } else {
+        dismissedOpportunity.planner_override = action.payload
+      }
+      return stateCopy
     }
-    return stateCopy;
+  },
+  {
+    items: [],
+    nextUrl: null
   }
-}, {
-  items: [],
-  nextUrl: null
-});
+)

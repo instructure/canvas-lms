@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/vi.json";
-import "../rce/languages/vi_VN";
+import formatMessage from '../format-message'
+import locale from '../../locales/vi.json'
+import '../rce/languages/vi_VN'
 
-formatMessage.addLocale({ vi: locale });
+formatMessage.addLocale({vi: locale})

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- // Several components use aphrodite, which tries to manipulate the dom
- // on a timer which expires after the test completes and the document no longer exists
+// Several components use aphrodite, which tries to manipulate the dom
+// on a timer which expires after the test completes and the document no longer exists
 import {StyleSheetTestUtils} from 'aphrodite'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
 
@@ -37,7 +37,7 @@ if (!('MutationObserver' in window)) {
 }
 
 if (typeof window.URL.createObjectURL === 'undefined') {
-  Object.defineProperty(window.URL, 'createObjectURL', { value: ()=> {}})
+  Object.defineProperty(window.URL, 'createObjectURL', {value: () => {}})
 }
 
 window.scroll = () => {}

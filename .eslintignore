@@ -9,3 +9,5 @@ public/javascripts/symlink_to_node_modules/*
 
 spec/selenium/helpers/jquery.simulate.js
 spec/javascripts/support/jquery.mockjax.js
+
+packages/**/node_modules/**

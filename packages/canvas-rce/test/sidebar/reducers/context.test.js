@@ -15,37 +15,37 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import assert from "assert";
-import {changeContextType, changeContextId} from "../../../src/sidebar/reducers/context";
-import * as actions from "../../../src/sidebar/actions/context";
+import assert from 'assert'
+import {changeContextType, changeContextId} from '../../../src/sidebar/reducers/context'
+import * as actions from '../../../src/sidebar/actions/context'
 
-describe("Context reducer", () => {
-  let state;
+describe('Context reducer', () => {
+  let state
   beforeEach(() => {
     state = {
       contextType: 'course',
       contextId: '17'
     }
-  });
-  describe("changeContextType", () => {
-    it("does not modify the state if for unknown actions", () => {
-      assert(changeContextType(state, { type: "unknown.action" }) === state);
-    });
+  })
+  describe('changeContextType', () => {
+    it('does not modify the state if for unknown actions', () => {
+      assert(changeContextType(state, {type: 'unknown.action'}) === state)
+    })
 
-    it("returns the new context type", () => {
-      assert(changeContextType(state, {type: actions.CHANGE_CONTEXT_TYPE, payload: 'user'}) === 'user')
+    it('returns the new context type', () => {
+      assert(
+        changeContextType(state, {type: actions.CHANGE_CONTEXT_TYPE, payload: 'user'}) === 'user'
+      )
     })
   })
 
-  describe("changeContextId", () => {
-    it("does not modify the state if for unknown actions", () => {
-      assert(changeContextId(state, { type: "unknown.action" }) === state);
-    });
+  describe('changeContextId', () => {
+    it('does not modify the state if for unknown actions', () => {
+      assert(changeContextId(state, {type: 'unknown.action'}) === state)
+    })
 
-    it("returns the new context it", () => {
+    it('returns the new context it', () => {
       assert(changeContextId(state, {type: actions.CHANGE_CONTEXT_ID, payload: '19'}) === '19')
     })
   })
-
-
-});
+})

@@ -16,25 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { deepEqual, equal } from "assert";
-import reducer from "../../../src/sidebar/reducers/session";
-import { RECEIVE_SESSION } from "../../../src/sidebar/actions/session";
+import {deepEqual, equal} from 'assert'
+import reducer from '../../../src/sidebar/reducers/session'
+import {RECEIVE_SESSION} from '../../../src/sidebar/actions/session'
 
-describe("Session reducer", () => {
-  describe("RECEIVE_SESSION action", () => {
-    it("merges action data with existing state", () => {
-      const state = { a: 1, b: 2 };
+describe('Session reducer', () => {
+  describe('RECEIVE_SESSION action', () => {
+    it('merges action data with existing state', () => {
+      const state = {a: 1, b: 2}
       const ret = reducer(state, {
         type: RECEIVE_SESSION,
-        data: { b: 3, c: 4 }
-      });
-      deepEqual(ret, { a: 1, b: 3, c: 4 });
-    });
-  });
+        data: {b: 3, c: 4}
+      })
+      deepEqual(ret, {a: 1, b: 3, c: 4})
+    })
+  })
 
-  it("returns the original state if called with other action", () => {
-    const state = {};
-    const ret = reducer(state, { type: "SOME_OTHER_ACTION" });
-    equal(state, ret);
-  });
-});
+  it('returns the original state if called with other action', () => {
+    const state = {}
+    const ret = reducer(state, {type: 'SOME_OTHER_ACTION'})
+    equal(state, ret)
+  })
+})

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import formatMessage from '../../../../../format-message';
+import formatMessage from '../../../../../format-message'
 import Link from '../Link'
 
 function renderComponent(props) {
@@ -46,7 +46,7 @@ describe('RCE "Links" Plugin > Link', () => {
       {type: 'quizzes', icon: 'IconQuiz'},
       {type: 'announcements', icon: 'IconAnnouncement'},
       {type: 'wikiPages', icon: 'IconDocument'},
-      {type: 'navigation', icon: 'IconBlank'},
+      {type: 'navigation', icon: 'IconBlank'}
     ]
 
     linkTypes.forEach(lt => {

@@ -16,11 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Animation from '../animation';
+import Animation from '../animation'
 
 export class MaintainScrollPositionWhenScrollingIntoThePast extends Animation {
-  fixedElement () { return this.app().fixedElementForItemScrolling(); }
-  uiDidUpdate () {
-    this.maintainViewportPositionOfFixedElement();
+  fixedElement() {
+    return this.app().fixedElementForItemScrolling()
+  }
+
+  uiDidUpdate() {
+    this.maintainViewportPositionOfFixedElement()
   }
 }

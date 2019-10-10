@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import offset from "bloody-offset";
+import offset from 'bloody-offset'
 
 // the editor's iframe
 function editorIframe(editor) {
-  return editor.getContainer().querySelector("iframe");
+  return editor.getContainer().querySelector('iframe')
 }
 
 function box(el) {
-  const b = el.getBoundingClientRect();
+  const b = el.getBoundingClientRect()
   return {
     top: b.top,
     left: b.left,
     width: b.right - b.left,
     height: b.bottom - b.top
-  };
+  }
 }
 
 //
@@ -38,13 +38,13 @@ function box(el) {
 // subtract out the iframe's scroll since the target's position is relative to
 // the iframe's _document_, not its visible window.
 export default function indicatorRegion(editor, target, offsetFn = offset) {
-  const iframe = editorIframe(editor);
-  const outerShape = offsetFn(iframe);
-  const innerShape = box(target);
+  const iframe = editorIframe(editor)
+  const outerShape = offsetFn(iframe)
+  const innerShape = box(target)
   return {
     width: innerShape.width,
     height: innerShape.height,
     left: outerShape.left + innerShape.left,
     top: outerShape.top + innerShape.top
-  };
+  }
 }

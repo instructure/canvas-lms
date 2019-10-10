@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const RECEIVE_SESSION = "action.session.receive_session";
+export const RECEIVE_SESSION = 'action.session.receive_session'
 
 function receiveSession(data) {
   return {
     type: RECEIVE_SESSION,
     data
-  };
+  }
 }
 
 export function get(dispatch, getState) {
-  const { source } = getState();
-  return source.getSession().then(data => dispatch(receiveSession(data)));
+  const {source} = getState()
+  return source.getSession().then(data => dispatch(receiveSession(data)))
 }

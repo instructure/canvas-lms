@@ -24,7 +24,7 @@ import {object, func} from 'prop-types'
 import React from 'react'
 
 export default class MediaRecorder extends React.Component {
-  saveFile = (file) => {
+  saveFile = file => {
     this.props.contentProps.saveMediaRecording(file, this.props.editor, this.props.dismiss)
   }
 
@@ -32,18 +32,12 @@ export default class MediaRecorder extends React.Component {
     return (
       <div>
         {canUseMediaCapture() ? (
-          <MediaCapture
-            translations={MediaCaptureStrings}
-            onCompleted={this.saveFile}
-          />
-        ) :
-        (<Alert
-          variant="error"
-          margin="small"
-        >
-          {formatMessage('Error uploading video/audio recording')}
-        </Alert>)
-      }
+          <MediaCapture translations={MediaCaptureStrings} onCompleted={this.saveFile} />
+        ) : (
+          <Alert variant="error" margin="small">
+            {formatMessage('Error uploading video/audio recording')}
+          </Alert>
+        )}
       </div>
     )
   }

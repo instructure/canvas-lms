@@ -16,51 +16,43 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import sinon from "sinon";
-import normalizeProps from "../../src/rce/normalizeProps";
+import assert from 'assert'
+import sinon from 'sinon'
+import normalizeProps from '../../src/rce/normalizeProps'
 
 class MockMutationObserver {
   observer() {}
 }
 
-describe("Rce normalizeProps", () => {
+describe('Rce normalizeProps', () => {
   let props,
-    tinymce = {};
+    tinymce = {}
   beforeEach(() => {
-    props = { editorOptions: sinon.stub().returns({}) };
-  });
+    props = {editorOptions: sinon.stub().returns({})}
+  })
 
-  it("calls editorOptions with provided tinymce", () => {
-    normalizeProps(props, tinymce, MockMutationObserver);
-    assert.ok(props.editorOptions.calledWith(tinymce));
-  });
+  it('calls editorOptions with provided tinymce', () => {
+    normalizeProps(props, tinymce, MockMutationObserver)
+    assert.ok(props.editorOptions.calledWith(tinymce))
+  })
 
-  it("sets tinymce as provided, even over prop", () => {
-    const otherMCE = {};
+  it('sets tinymce as provided, even over prop', () => {
+    const otherMCE = {}
+    const normalized = normalizeProps({...props, tinymce: otherMCE}, tinymce, MockMutationObserver)
+    assert.equal(normalized.tinymce, tinymce)
+  })
+
+  it('normalizes the language', () => {
+    const normalized = normalizeProps({...props, language: 'mi-NZ'}, tinymce, MockMutationObserver)
+    assert.equal(normalized.language, 'mi')
+  })
+
+  it('retains other props', () => {
     const normalized = normalizeProps(
-      { ...props, tinymce: otherMCE },
+      {...props, textareaId: 'textareaId'},
       tinymce,
       MockMutationObserver
-    );
-    assert.equal(normalized.tinymce, tinymce);
-  });
-
-  it("normalizes the language", () => {
-    const normalized = normalizeProps(
-      { ...props, language: "mi-NZ" },
-      tinymce,
-      MockMutationObserver
-    );
-    assert.equal(normalized.language, "mi");
-  });
-
-  it("retains other props", () => {
-    const normalized = normalizeProps(
-      { ...props, textareaId: "textareaId" },
-      tinymce,
-      MockMutationObserver
-    );
-    assert.equal(normalized.textareaId, "textareaId");
-  });
-});
+    )
+    assert.equal(normalized.textareaId, 'textareaId')
+  })
+})

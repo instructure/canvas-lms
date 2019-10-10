@@ -32,7 +32,7 @@ export function getIconFromType(type) {
   } else if (isAudio(type)) {
     return IconAudioLine
   }
-  switch(type) {
+  switch (type) {
     case 'application/msword':
     case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
       return IconMsWordLine

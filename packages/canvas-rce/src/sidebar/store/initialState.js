@@ -16,23 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import RceApiSource from "../sources/api";
+import RceApiSource from '../sources/api'
 
 // normalize contextType. e.g. accept either of 'course' or 'courses', but
 // only store 'course'
 function normalizeContextType(contextType) {
   switch (contextType) {
-    case "course":
-    case "courses":
-      return "course";
-    case "group":
-    case "groups":
-      return "group";
-    case "user":
-    case "users":
-      return "user";
+    case 'course':
+    case 'courses':
+      return 'course'
+    case 'group':
+    case 'groups':
+      return 'group'
+    case 'user':
+    case 'users':
+      return 'user'
     default:
-      return undefined;
+      return undefined
   }
 }
 
@@ -53,11 +53,11 @@ export default function(props = {}) {
     media,
     flickr,
     newPageLinkExpanded
-  } = props;
+  } = props
 
   // normalize contextType (including in props)
-  contextType = normalizeContextType(contextType);
-  props = { ...props, contextType };
+  contextType = normalizeContextType(contextType)
+  props = {...props, contextType}
 
   // default to API source
   if (source == null) {
@@ -65,43 +65,43 @@ export default function(props = {}) {
       jwt,
       refreshToken,
       host
-    });
+    })
   }
 
   // create collections in default state if none provided
   if (collections === undefined) {
     collections = {
-      announcements: source.initializeCollection("announcements", props),
-      assignments: source.initializeCollection("assignments", props),
-      discussions: source.initializeCollection("discussions", props),
-      modules: source.initializeCollection("modules", props),
-      quizzes: source.initializeCollection("quizzes", props),
-      wikiPages: source.initializeCollection("wikiPages", props)
-    };
+      announcements: source.initializeCollection('announcements', props),
+      assignments: source.initializeCollection('assignments', props),
+      discussions: source.initializeCollection('discussions', props),
+      modules: source.initializeCollection('modules', props),
+      quizzes: source.initializeCollection('quizzes', props),
+      wikiPages: source.initializeCollection('wikiPages', props)
+    }
   }
 
   if (upload === undefined) {
-    upload = source.initializeUpload(props);
+    upload = source.initializeUpload(props)
   }
 
   if (flickr === undefined) {
-    flickr = source.initializeFlickr(props);
+    flickr = source.initializeFlickr(props)
   }
 
   if (images === undefined) {
-    images = source.initializeImages(props);
+    images = source.initializeImages(props)
   }
 
   if (documents === undefined) {
-    documents = source.initializeDocuments(props);
+    documents = source.initializeDocuments(props)
   }
 
   if (media === undefined) {
-    media = source.initializeMedia(props);
+    media = source.initializeMedia(props)
   }
 
   if (newPageLinkExpanded === undefined) {
-    newPageLinkExpanded = false;
+    newPageLinkExpanded = false
   }
 
   return {
@@ -119,5 +119,5 @@ export default function(props = {}) {
     media,
     flickr,
     newPageLinkExpanded
-  };
+  }
 }

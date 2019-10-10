@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export default function generator ({ colors, typography, spacing}) {
+export default function generator({colors, typography, spacing}) {
   return {
     fontSize: typography.fontSizeMedium,
     fontFamily: typography.fontFamily,
@@ -30,5 +30,5 @@ export default function generator ({ colors, typography, spacing}) {
     smallSpacing: spacing.small,
     largeSpacing: spacing.large,
     xxLargeSpacing: spacing.xxLarge
-  };
+  }
 }

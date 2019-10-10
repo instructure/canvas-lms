@@ -18,7 +18,7 @@
 
 const aphrodite = require('aphrodite')
 
-function pseudochild (selector, baseSelector, generateSubtreeStyles) {
+function pseudochild(selector, baseSelector, generateSubtreeStyles) {
   const regex = /^#:(?:\w|-)+\s{1}\w+$/im
   if (!selector.match(regex)) {
     return null

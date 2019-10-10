@@ -30,7 +30,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   beforeEach(() => {
     $videos = []
     editors = [new FakeEditor(), new FakeEditor()]
-    editors.forEach((editor) => {
+    editors.forEach(editor => {
       editor.initialize()
       const $video = createVideo(320, 320)
       $videos.push($video)
@@ -49,9 +49,9 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     }
   })
 
-  function createVideo(height = 200, width = 200, id = "12345bseds") {
+  function createVideo(height = 200, width = 200, id = '12345bseds') {
     const $el = document.createElement('div')
-    $el.setAttribute("style",`height: ${height}; width:${width}`);
+    $el.setAttribute('style', `height: ${height}; width:${width}`)
     $el.id = id
     return $el
   }

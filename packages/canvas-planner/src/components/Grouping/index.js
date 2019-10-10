@@ -15,22 +15,26 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, { Component } from 'react';
+import React, {Component} from 'react'
 import {themeable} from '@instructure/ui-themeable'
-import classnames from 'classnames';
-import { partition } from 'lodash';
-import { arrayOf, string, number, shape, func } from 'prop-types';
-import { userShape, itemShape, sizeShape } from '../plannerPropTypes';
-import styles from './styles.css';
-import theme from './theme.js';
-import PlannerItem from '../PlannerItem';
-import CompletedItemsFacade from '../CompletedItemsFacade';
-import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
-import moment from 'moment-timezone';
-import formatMessage from '../../format-message';
-import { getBadgesForItem, getBadgesForItems, showPillForOverdueStatus } from '../../utilities/statusUtils';
-import { animatable } from '../../dynamic-ui';
-import responsiviser from '../responsiviser';
+import classnames from 'classnames'
+import {partition} from 'lodash'
+import {arrayOf, string, number, shape, func} from 'prop-types'
+import moment from 'moment-timezone'
+import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
+import styles from './styles.css'
+import theme from './theme.js'
+import PlannerItem from '../PlannerItem'
+import CompletedItemsFacade from '../CompletedItemsFacade'
+import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
+import formatMessage from '../../format-message'
+import {
+  getBadgesForItem,
+  getBadgesForItems,
+  showPillForOverdueStatus
+} from '../../utilities/statusUtils'
+import {animatable} from '../../dynamic-ui'
+import responsiviser from '../responsiviser'
 
 export class Grouping extends Component {
   static propTypes = {
@@ -46,87 +50,103 @@ export class Grouping extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     currentUser: shape(userShape),
-    responsiveSize: sizeShape,
-  };
+    responsiveSize: sizeShape
+  }
+
   static defaultProps = {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
-    responsiveSize: 'large',
-  };
+    responsiveSize: 'large'
+  }
 
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
 
     this.state = {
       showCompletedItems: false,
-      badgeMap: this.setupItemBadgeMap(props.items),
-    };
-
+      badgeMap: this.setupItemBadgeMap(props.items)
+    }
   }
 
-  componentDidMount () {
-    this.props.registerAnimatable('group', this, this.props.animatableIndex, this.itemUniqueIds());
+  componentDidMount() {
+    this.props.registerAnimatable('group', this, this.props.animatableIndex, this.itemUniqueIds())
   }
 
-  componentWillReceiveProps (newProps) {
-    this.props.deregisterAnimatable('group', this, this.itemUniqueIds());
-    this.props.registerAnimatable('group', this, newProps.animatableIndex, this.itemUniqueIds(newProps));
+  componentWillReceiveProps(newProps) {
+    this.props.deregisterAnimatable('group', this, this.itemUniqueIds())
+    this.props.registerAnimatable(
+      'group',
+      this,
+      newProps.animatableIndex,
+      this.itemUniqueIds(newProps)
+    )
   }
 
-  componentWillUnmount () {
-    this.props.deregisterAnimatable('group', this, this.itemUniqueIds());
+  componentWillUnmount() {
+    this.props.deregisterAnimatable('group', this, this.itemUniqueIds())
   }
 
-  itemUniqueIds (props = this.props) { return props.items.map(item => item.uniqueId); }
-
-  setupItemBadgeMap (items) {
-    const mapping = {};
-    items.forEach((item) => {
-      const badges = getBadgesForItem(item);
-      if (badges.length) mapping[item.id] = badges;
-    });
-    return mapping;
+  itemUniqueIds(props = this.props) {
+    return props.items.map(item => item.uniqueId)
   }
 
-  groupingLinkRef = (link) => {
-    this.groupingLink = link;
+  setupItemBadgeMap(items) {
+    const mapping = {}
+    items.forEach(item => {
+      const badges = getBadgesForItem(item)
+      if (badges.length) mapping[item.id] = badges
+    })
+    return mapping
   }
 
-  getFocusable = () => { return this.groupingLink; }
-  getScrollable () { return this.groupingLink || this.plannerNoteHero; }
+  groupingLinkRef = link => {
+    this.groupingLink = link
+  }
 
-  handleFacadeClick = (e) => {
-    if (e) { e.preventDefault(); }
-    this.setState(() => ({
-      showCompletedItems: true
-    }), () => {
-      if (this.groupingLink) this.groupingLink.focus();
-    });
+  getFocusable = () => {
+    return this.groupingLink
+  }
+
+  getScrollable() {
+    return this.groupingLink || this.plannerNoteHero
+  }
+
+  handleFacadeClick = e => {
+    if (e) {
+      e.preventDefault()
+    }
+    this.setState(
+      () => ({
+        showCompletedItems: true
+      }),
+      () => {
+        if (this.groupingLink) this.groupingLink.focus()
+      }
+    )
   }
 
   getLayout() {
-    return this.props.responsiveSize;
+    return this.props.responsiveSize
   }
 
-  renderItemsAndFacade (items) {
-    const [completedItems, otherItems ] = partition(items, item => (item.completed && !item.show));
-    let itemsToRender = otherItems;
+  renderItemsAndFacade(items) {
+    const [completedItems, otherItems] = partition(items, item => item.completed && !item.show)
+    let itemsToRender = otherItems
     if (this.state.showCompletedItems) {
-      itemsToRender = items;
+      itemsToRender = items
     }
 
-    const componentsToRender = this.renderItems(itemsToRender);
-    componentsToRender.push(this.renderFacade(completedItems, this.props.animatableIndex * 100 + itemsToRender.length + 1));
-    return componentsToRender;
+    const componentsToRender = this.renderItems(itemsToRender)
+    componentsToRender.push(
+      this.renderFacade(completedItems, this.props.animatableIndex * 100 + itemsToRender.length + 1)
+    )
+    return componentsToRender
   }
 
-  renderItems (items) {
-    const showNotificationBadgeOnItem = this.getLayout() !== 'large';
+  renderItems(items) {
+    const showNotificationBadgeOnItem = this.getLayout() !== 'large'
     return items.map((item, itemIndex) => (
-      <li
-        className={styles.item}
-        key={item.uniqueId}
-      >
+      <li className={styles.item} key={item.uniqueId}>
         <PlannerItem
           theme={{
             iconColor: this.props.color
@@ -162,35 +182,32 @@ export class Grouping extends Component {
           timeZone={this.props.timeZone}
         />
       </li>
-    ));
+    ))
   }
 
-  renderFacade (completedItems, animatableIndex) {
-    const showNotificationBadgeOnItem = this.getLayout() !== 'large';
+  renderFacade(completedItems, animatableIndex) {
+    const showNotificationBadgeOnItem = this.getLayout() !== 'large'
     if (!this.state.showCompletedItems && completedItems.length > 0) {
-      const theDay = completedItems[0].date.clone();
-      theDay.startOf('day');
-      let missing = false;
-      let newActivity = false;
+      const theDay = completedItems[0].date.clone()
+      theDay.startOf('day')
+      let missing = false
+      let newActivity = false
       const completedItemIds = completedItems.map(item => {
-        if (showPillForOverdueStatus('missing', item)) missing = true;
-        if (item.newActivity) newActivity = true;
-        return item.uniqueId;
-      });
-      let notificationBadge = 'none';
+        if (showPillForOverdueStatus('missing', item)) missing = true
+        if (item.newActivity) newActivity = true
+        return item.uniqueId
+      })
+      let notificationBadge = 'none'
       if (showNotificationBadgeOnItem) {
         if (newActivity) {
-          notificationBadge = 'newActivity';
+          notificationBadge = 'newActivity'
         } else if (missing) {
-          notificationBadge = 'missing';
+          notificationBadge = 'missing'
         }
       }
 
       return (
-        <li
-          className={styles.item}
-          key='completed'
-        >
+        <li className={styles.item} key="completed">
           <CompletedItemsFacade
             onClick={this.handleFacadeClick}
             itemCount={completedItems.length}
@@ -205,40 +222,41 @@ export class Grouping extends Component {
             responsiveSize={this.props.responsiveSize}
           />
         </li>
-      );
+      )
     }
-    return null;
+    return null
   }
 
-  renderToDoText () {
-    return formatMessage('To Do');
+  renderToDoText() {
+    return formatMessage('To Do')
   }
 
-  renderNotificationBadge () {
+  renderNotificationBadge() {
     // narrower layout puts the indicator next to the actual items
     if (this.getLayout() !== 'large') {
-      return null;
+      return null
     }
 
-    let missing = false;
+    let missing = false
     const newItem = this.props.items.find(item => {
-      if (showPillForOverdueStatus('missing', item)) missing = true;
-      return item.newActivity;
-    });
+      if (showPillForOverdueStatus('missing', item)) missing = true
+      return item.newActivity
+    })
     if (newItem || missing) {
-      const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator;
-      const badgeMessage = this.props.title ? this.props.title : this.renderToDoText();
+      const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator
+      const badgeMessage = this.props.title ? this.props.title : this.renderToDoText()
       return (
         <NotificationBadge>
           <IndicatorComponent
-          title={badgeMessage}
-          itemIds={this.itemUniqueIds()}
-          animatableIndex={this.props.animatableIndex}
-          getFocusable={this.getFocusable} />
+            title={badgeMessage}
+            itemIds={this.itemUniqueIds()}
+            animatableIndex={this.props.animatableIndex}
+            getFocusable={this.getFocusable}
+          />
         </NotificationBadge>
-      );
+      )
     } else {
-      return <NotificationBadge/>;
+      return <NotificationBadge />
     }
   }
 
@@ -247,49 +265,52 @@ export class Grouping extends Component {
     const clazz = classnames({
       [styles.overlay]: true,
       [styles.withImage]: this.props.image_url
-    });
-    const style = this.getLayout() === 'large' ? { backgroundColor: this.props.color } : null;
-    return <span className={clazz} style={style} />;
+    })
+    const style = this.getLayout() === 'large' ? {backgroundColor: this.props.color} : null
+    return <span className={clazz} style={style} />
   }
 
   renderGroupLinkTitle() {
-    return <span className={styles.title}>
-        {this.props.title || this.renderToDoText()}
-      </span>;
+    return <span className={styles.title}>{this.props.title || this.renderToDoText()}</span>
   }
 
-  renderGroupLink () {
+  renderGroupLink() {
     if (!this.props.title) {
-      return <span className={styles.hero} ref={elt => this.plannerNoteHero = elt}>
+      return (
+        <span className={styles.hero} ref={elt => (this.plannerNoteHero = elt)}>
+          {this.renderGroupLinkBackground()}
+          {this.renderGroupLinkTitle()}
+        </span>
+      )
+    }
+    const style =
+      this.getLayout() === 'large' ? {backgroundImage: `url(${this.props.image_url || ''})`} : null
+    return (
+      <a
+        href={this.props.url || '#'}
+        ref={this.groupingLinkRef}
+        className={`${styles.hero} ${styles.heroHover}`}
+        style={style}
+      >
         {this.renderGroupLinkBackground()}
         {this.renderGroupLinkTitle()}
-      </span>;
-    }
-    const style = this.getLayout() === 'large' ? {backgroundImage: `url(${this.props.image_url || ''})`} : null;
-    return <a
-      href={this.props.url || "#"}
-      ref={this.groupingLinkRef}
-      className={`${styles.hero} ${styles.heroHover}`}
-      style={style}
-    >
-      {this.renderGroupLinkBackground()}
-      {this.renderGroupLinkTitle()}
-    </a>;
+      </a>
+    )
   }
 
-  render () {
+  render() {
     return (
-      <div className={classnames(styles.root, styles[this.getLayout()], 'planner-grouping')} >
+      <div className={classnames(styles.root, styles[this.getLayout()], 'planner-grouping')}>
         {this.renderNotificationBadge()}
         {this.renderGroupLink()}
-        <ol className={styles.items} style={{ borderColor: this.props.color }}>
-          { this.renderItemsAndFacade(this.props.items)}
+        <ol className={styles.items} style={{borderColor: this.props.color}}>
+          {this.renderItemsAndFacade(this.props.items)}
         </ol>
       </div>
-    );
+    )
   }
 }
 
-const ResponsiveGrouping = responsiviser()(Grouping);
+const ResponsiveGrouping = responsiviser()(Grouping)
 
-export default animatable(themeable(theme, styles)(ResponsiveGrouping));
+export default animatable(themeable(theme, styles)(ResponsiveGrouping))

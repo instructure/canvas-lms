@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import React from "react";
-import Loading from "../../../src/common/components/Loading";
-import sd from "skin-deep";
+import assert from 'assert'
+import React from 'react'
+import Loading from '../../../src/common/components/Loading'
+import sd from 'skin-deep'
 
-describe("Loading", () => {
-  it("includes a screenreader-only message", () => {
-    const tree = sd.shallowRender(<Loading />);
-    const message = tree.subTree("ScreenReaderContent");
-    assert.equal([].join.call(message.props.children, ""), "Loading...");
-  });
-});
+describe('Loading', () => {
+  it('includes a screenreader-only message', () => {
+    const tree = sd.shallowRender(<Loading />)
+    const message = tree.subTree('ScreenReaderContent')
+    assert.equal([].join.call(message.props.children, ''), 'Loading...')
+  })
+})

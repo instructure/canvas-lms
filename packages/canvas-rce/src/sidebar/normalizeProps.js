@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Bridge from "../bridge";
+import Bridge from '../bridge'
 
 export default function(props) {
   return {
@@ -27,5 +27,5 @@ export default function(props) {
 
     // other props, including overrides
     ...props
-  };
+  }
 }

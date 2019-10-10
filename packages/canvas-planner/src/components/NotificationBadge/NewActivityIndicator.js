@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react';
-import { arrayOf, string, number, func } from 'prop-types';
-import formatMessage from '../../format-message';
+import React, {Component} from 'react'
+import {arrayOf, string, number, func} from 'prop-types'
+import formatMessage from '../../format-message'
 
-import { animatable } from '../../dynamic-ui';
+import {animatable} from '../../dynamic-ui'
 
-import Indicator from './Indicator';
+import Indicator from './Indicator'
 
 export class NewActivityIndicator extends Component {
   static propTypes = {
@@ -31,42 +31,55 @@ export class NewActivityIndicator extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     animatableIndex: number,
-    getFocusable: func,
+    getFocusable: func
   }
 
   static defaultProps = {
     registerAnimatable: () => {},
-    deregisterAnimatable: () => {},
+    deregisterAnimatable: () => {}
   }
 
-  componentWillMount () {
-    this.props.registerAnimatable('new-activity-indicator', this, this.props.animatableIndex, this.props.itemIds);
+  componentWillMount() {
+    this.props.registerAnimatable(
+      'new-activity-indicator',
+      this,
+      this.props.animatableIndex,
+      this.props.itemIds
+    )
   }
 
-  componentWillReceiveProps (newProps) {
-    this.props.deregisterAnimatable('new-activity-indicator', this, this.props.itemIds);
-    this.props.registerAnimatable('new-activity-indicator', this, newProps.animatableIndex, newProps.itemIds);
+  componentWillReceiveProps(newProps) {
+    this.props.deregisterAnimatable('new-activity-indicator', this, this.props.itemIds)
+    this.props.registerAnimatable(
+      'new-activity-indicator',
+      this,
+      newProps.animatableIndex,
+      newProps.itemIds
+    )
   }
 
-  componentWillUnmount () {
-    this.props.deregisterAnimatable('new-activity-indicator', this, this.props.itemIds);
+  componentWillUnmount() {
+    this.props.deregisterAnimatable('new-activity-indicator', this, this.props.itemIds)
   }
 
-  getFocusable () {
-    return this.props.getFocusable ? this.props.getFocusable() : undefined;
-  }
-  getScrollable () {
-    return this.indicatorElt;
+  getFocusable() {
+    return this.props.getFocusable ? this.props.getFocusable() : undefined
   }
 
-  render () {
-    const badgeMessage = formatMessage('New activity for {title}', {title: this.props.title});
-    return <Indicator
-      indicatorRef={ref => this.indicatorElt = ref}
-      title={badgeMessage}
-      variant="primary"
-    />;
+  getScrollable() {
+    return this.indicatorElt
+  }
+
+  render() {
+    const badgeMessage = formatMessage('New activity for {title}', {title: this.props.title})
+    return (
+      <Indicator
+        indicatorRef={ref => (this.indicatorElt = ref)}
+        title={badgeMessage}
+        variant="primary"
+      />
+    )
   }
 }
 
-export default animatable(NewActivityIndicator);
+export default animatable(NewActivityIndicator)

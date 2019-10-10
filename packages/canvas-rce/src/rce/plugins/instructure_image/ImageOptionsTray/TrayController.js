@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { camelize } from '@instructure/ui-utils'
+import {camelize} from '@instructure/ui-utils'
 
 import bridge from '../../../../bridge'
 import {asImageEmbed} from '../../shared/ContentSelection'
@@ -92,7 +92,6 @@ export default class TrayController {
         width: imageOptions.appliedWidth,
         height: imageOptions.appliedHeight
       })
-
     } else {
       const link = `<a href="${$img.src}" target="_blank">${$img.src}</a>`
       editor.selection.setContent(link)

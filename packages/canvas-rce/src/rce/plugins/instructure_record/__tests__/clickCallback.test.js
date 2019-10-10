@@ -28,18 +28,18 @@ const fauxEditor = {
   }
 }
 describe('Instructure Media Plugin: clickCallback', () => {
-  let trayProps;
+  let trayProps
   beforeEach(() => {
-      trayProps = {
-        source: {
-          initializeCollection () {},
-          initializeUpload () {},
-          initializeFlickr () {},
-          initializeImages() {},
-          initializeDocuments() {},
-          initializeMedia() {}
-        }
+    trayProps = {
+      source: {
+        initializeCollection() {},
+        initializeUpload() {},
+        initializeFlickr() {},
+        initializeImages() {},
+        initializeDocuments() {},
+        initializeMedia() {}
       }
+    }
   })
   afterEach(() => {
     document.querySelector('.canvas-rce-media-upload').remove()

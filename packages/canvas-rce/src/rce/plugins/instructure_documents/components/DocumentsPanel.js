@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react';
-import {arrayOf, bool, func, shape, string, objectOf} from 'prop-types';
+import React, {useEffect, useRef} from 'react'
+import {arrayOf, bool, func, shape, string, objectOf} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
-import formatMessage from '../../../../format-message';
+import formatMessage from '../../../../format-message'
 
 import {Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
@@ -36,36 +36,25 @@ function hasFiles(documents) {
 }
 
 function isEmpty(documents) {
-  return (
-    !hasFiles(documents) &&
-    !documents.hasMore &&
-    !documents.isLoading
-  );
+  return !hasFiles(documents) && !documents.hasMore && !documents.isLoading
 }
 
 function renderLinks(files, handleClick, lastItemRef) {
   return files.map((f, index) => {
     let focusRef = null
-    if (index === files.length -1) {
+    if (index === files.length - 1) {
       focusRef = lastItemRef
     }
-    return (
-      <Link
-        key={f.id}
-        {...f}
-        onClick={handleClick}
-        focusRef={focusRef}
-      />
-    )
+    return <Link key={f.id} {...f} onClick={handleClick} focusRef={focusRef} />
   })
 }
 
 function renderLoadingError(_error) {
   return (
     <View as="div" role="alert" margin="medium">
-      <Text color="error">{formatMessage("Loading failed.")}</Text>
+      <Text color="error">{formatMessage('Loading failed.')}</Text>
     </View>
-  );
+  )
 }
 
 export default function DocumentsPanel(props) {
@@ -101,11 +90,7 @@ export default function DocumentsPanel(props) {
   }
 
   return (
-    <View
-      as="div"
-      data-testid="instructure_links-DocumentsPanel"
-    >
-
+    <View as="div" data-testid="instructure_links-DocumentsPanel">
       {renderLinks(files, handleDocClick, lastItemRef)}
 
       {loader.isLoading && <LoadingIndicator loader={loader} />}
@@ -118,12 +103,11 @@ export default function DocumentsPanel(props) {
 
       {isEmpty(documents) && (
         <View as="div" padding="medium">
-          {formatMessage("No results.")}
+          {formatMessage('No results.')}
         </View>
       )}
-
     </View>
-  );
+  )
 }
 
 DocumentsPanel.propTypes = {
@@ -131,11 +115,13 @@ DocumentsPanel.propTypes = {
   fetchInitialDocs: func.isRequired,
   fetchNextDocs: func.isRequired,
   onLinkClick: func.isRequired,
-  documents: objectOf(shape({
-    files: arrayOf(shape(fileShape)).isRequired,
-    bookmark: string,
-    hasMore: bool,
-    isLoading: bool,
-    error: string
-  })).isRequired
+  documents: objectOf(
+    shape({
+      files: arrayOf(shape(fileShape)).isRequired,
+      bookmark: string,
+      hasMore: bool,
+      isLoading: bool,
+      error: string
+    })
+  ).isRequired
 }

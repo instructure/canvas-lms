@@ -16,36 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Animation from '../animation';
-import { specialFallbackFocusId } from '../util';
+import Animation from '../animation'
+import {specialFallbackFocusId} from '../util'
 
 export class FocusPriorItemOnDelete extends Animation {
   setItemFocusUniqueId = null
 
-  uiWillUpdate () {
-    const action = this.acceptedAction('DELETED_PLANNER_ITEM');
-    const doomedItemComponentId = action.payload.uniqueId;
-    const sortedItemComponents = this.registry().getAllItemsSorted();
+  uiWillUpdate() {
+    const action = this.acceptedAction('DELETED_PLANNER_ITEM')
+    const doomedItemComponentId = action.payload.uniqueId
+    const sortedItemComponents = this.registry().getAllItemsSorted()
     const doomedItemComponentIndex = sortedItemComponents.findIndex(
       c => c.componentIds[0] === doomedItemComponentId
-    );
-    const priorComponentIndex = doomedItemComponentIndex - 1;
-    this.setItemFocusUniqueId = priorComponentIndex >= 0 ?
-      sortedItemComponents[priorComponentIndex].componentIds[0] :
-      specialFallbackFocusId('item');
+    )
+    const priorComponentIndex = doomedItemComponentIndex - 1
+    this.setItemFocusUniqueId =
+      priorComponentIndex >= 0
+        ? sortedItemComponents[priorComponentIndex].componentIds[0]
+        : specialFallbackFocusId('item')
   }
 
-  uiDidUpdate () {
-    const setItemFocusUniqueId = this.setItemFocusUniqueId;
-    this.setItemFocusUniqueId = null;
+  uiDidUpdate() {
+    const setItemFocusUniqueId = this.setItemFocusUniqueId
+    this.setItemFocusUniqueId = null
 
-    const itemComponentToFocus = this.registry().getComponent('item', setItemFocusUniqueId);
-    if (itemComponentToFocus == null) return;
+    const itemComponentToFocus = this.registry().getComponent('item', setItemFocusUniqueId)
+    if (itemComponentToFocus == null) return
     // Use a non-zero timeout to work around bug INSTUI-1141 where the Tray
     // will steal focus back after a delete confirmation dialog.
     this.window().setTimeout(() => {
-      this.animator().focusElement(itemComponentToFocus.component.getFocusable('delete'));
-      this.animator().scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset());
-    }, 250);
+      this.animator().focusElement(itemComponentToFocus.component.getFocusable('delete'))
+      this.animator().scrollTo(itemComponentToFocus.component.getScrollable(), this.stickyOffset())
+    }, 250)
   }
 }

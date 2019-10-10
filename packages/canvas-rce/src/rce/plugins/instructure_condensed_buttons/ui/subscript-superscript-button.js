@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import formatMessage from '../../../../format-message'
 
-export default function register (editor){
+export default function register(editor) {
   const superAndSub = {
-    'superscript': formatMessage('Superscript'),
-    'subscript': formatMessage('Subscript'),
+    superscript: formatMessage('Superscript'),
+    subscript: formatMessage('Subscript')
   }
 
   Object.keys(superAndSub).forEach(key => {
@@ -33,20 +32,27 @@ export default function register (editor){
       tooltip: superAndSub[key],
       icon: key,
       fetch: cb => {
-        cb([{
-          type: 'choiceitem',
-          icon: oppositeKey,
-          text: superAndSub[oppositeKey]
-        }])
+        cb([
+          {
+            type: 'choiceitem',
+            icon: oppositeKey,
+            text: superAndSub[oppositeKey]
+          }
+        ])
       },
 
       onAction: () => editor.execCommand('mceToggleFormat', false, key),
       onItemAction: () => editor.execCommand('mceToggleFormat', false, oppositeKey),
-      onSetup (api) {
-        const $button = editor.$(editor.editorContainer.querySelector(`.tox-split-button[aria-label="${superAndSub[key]}"]`))
+      onSetup(api) {
+        const $button = editor.$(
+          editor.editorContainer.querySelector(
+            `.tox-split-button[aria-label="${superAndSub[key]}"]`
+          )
+        )
         function onNodeChange() {
           const iMatch = editor.formatter.match(key)
-          const showButton = iMatch || (key ==='superscript' && !editor.formatter.match(oppositeKey))
+          const showButton =
+            iMatch || (key === 'superscript' && !editor.formatter.match(oppositeKey))
           $button[showButton ? 'show' : 'hide']()
           api.setActive(iMatch)
         }
@@ -57,4 +63,3 @@ export default function register (editor){
     })
   })
 }
-

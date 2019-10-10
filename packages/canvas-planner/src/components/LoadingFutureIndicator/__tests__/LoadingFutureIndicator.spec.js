@@ -15,33 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react';
-import {shallow} from 'enzyme';
-import LoadingFutureIndicator from '../index';
+import React from 'react'
+import {shallow} from 'enzyme'
+import LoadingFutureIndicator from '../index'
 
 it('renders load more by default', () => {
-  const wrapper = shallow(<LoadingFutureIndicator />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<LoadingFutureIndicator />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders loading when indicated', () => {
-  const wrapper = shallow(<LoadingFutureIndicator loadingFuture />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<LoadingFutureIndicator loadingFuture />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders all future items loaded regardless of other props', () => {
-  const wrapper = shallow(<LoadingFutureIndicator loadingFuture allFutureItemsLoaded />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<LoadingFutureIndicator loadingFuture allFutureItemsLoaded />)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('invokes the callback when the load more button is clicked', () => {
-  const mockLoad = jest.fn();
-  const wrapper = shallow(<LoadingFutureIndicator onLoadMore={mockLoad} />);
-  wrapper.find('Button').simulate('click');
-  expect(mockLoad).toHaveBeenCalledWith({loadMoreButtonClicked: true});
-});
+  const mockLoad = jest.fn()
+  const wrapper = shallow(<LoadingFutureIndicator onLoadMore={mockLoad} />)
+  wrapper.find('Button').simulate('click')
+  expect(mockLoad).toHaveBeenCalledWith({loadMoreButtonClicked: true})
+})
 
-it('shows an Alert when there\'s a query error', () => {
-  const wrapper = shallow(<LoadingFutureIndicator loadingError={"uh oh"}/>);
-  expect(wrapper).toMatchSnapshot();
-});
+it("shows an Alert when there's a query error", () => {
+  const wrapper = shallow(<LoadingFutureIndicator loadingError="uh oh" />)
+  expect(wrapper).toMatchSnapshot()
+})

@@ -39,7 +39,7 @@ import {
   IconTextEndLine,
   IconTextStartLine,
   IconTextSubscriptLine,
-  IconTextSuperscriptLine,
+  IconTextSuperscriptLine
 } from '@instructure/ui-icons/es/svg'
 
 tinymce.PluginManager.add('instructure-ui-icons', function(editor) {

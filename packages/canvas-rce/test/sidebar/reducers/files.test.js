@@ -16,62 +16,62 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import files from "../../../src/sidebar/reducers/files";
-import * as actions from "../../../src/sidebar/actions/files";
+import assert from 'assert'
+import files from '../../../src/sidebar/reducers/files'
+import * as actions from '../../../src/sidebar/actions/files'
 
-describe("Files reducer", () => {
-  let state;
+describe('Files reducer', () => {
+  let state
 
   beforeEach(() => {
-    state = {};
-  });
+    state = {}
+  })
 
-  it("does not modify the state if for unknown actions", () => {
-    assert(files(state, { type: "unknown.action" }) === state);
-  });
+  it('does not modify the state if for unknown actions', () => {
+    assert(files(state, {type: 'unknown.action'}) === state)
+  })
 
-  describe("ADD_FILE", () => {
-    let action;
+  describe('ADD_FILE', () => {
+    let action
 
     beforeEach(() => {
       action = {
         type: actions.ADD_FILE,
         id: 1,
-        name: "Foo",
-        fileType: "text/plain",
-        url: "/files/1",
-        embed: { type: "scribd" }
-      };
-    });
+        name: 'Foo',
+        fileType: 'text/plain',
+        url: '/files/1',
+        embed: {type: 'scribd'}
+      }
+    })
 
-    it("adds a new property to files keyed by id from action", () => {
-      assert(files(state, action)[action.id]);
-    });
+    it('adds a new property to files keyed by id from action', () => {
+      assert(files(state, action)[action.id])
+    })
 
-    it("sets id from action", () => {
-      assert(files(state, action)[action.id].id === action.id);
-    });
+    it('sets id from action', () => {
+      assert(files(state, action)[action.id].id === action.id)
+    })
 
-    it("sets name from action", () => {
-      assert(files(state, action)[action.id].name === action.name);
-    });
+    it('sets name from action', () => {
+      assert(files(state, action)[action.id].name === action.name)
+    })
 
-    it("sets type from action fileType", () => {
-      assert(files(state, action)[action.id].type === action.fileType);
-    });
+    it('sets type from action fileType', () => {
+      assert(files(state, action)[action.id].type === action.fileType)
+    })
 
-    it("sets url from action", () => {
-      assert(files(state, action)[action.id].url === action.url);
-    });
+    it('sets url from action', () => {
+      assert(files(state, action)[action.id].url === action.url)
+    })
 
-    it("sets embed from action", () => {
-      assert(files(state, action)[action.id].embed === action.embed);
-    });
+    it('sets embed from action', () => {
+      assert(files(state, action)[action.id].embed === action.embed)
+    })
 
-    it("keeps existing properties", () => {
-      state.foo = "bar";
-      assert(files(state, action).foo === state.foo);
-    });
-  });
-});
+    it('keeps existing properties', () => {
+      state.foo = 'bar'
+      assert(files(state, action).foo === state.foo)
+    })
+  })
+})

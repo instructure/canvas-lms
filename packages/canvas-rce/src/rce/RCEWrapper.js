@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from "prop-types";
-import React from "react";
-import {Editor} from "@tinymce/tinymce-react";
+import PropTypes from 'prop-types'
+import React from 'react'
+import {Editor} from '@tinymce/tinymce-react'
 import uniqBy from 'lodash/uniqBy'
 
 import themeable from '@instructure/ui-themeable'
@@ -26,13 +26,13 @@ import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Alert} from '@instructure/ui-alerts'
 
-import formatMessage from "../format-message";
-import * as contentInsertion from "./contentInsertion";
-import indicatorRegion from "./indicatorRegion";
-import indicate from "../common/indicate";
-import Bridge from "../bridge";
+import formatMessage from '../format-message'
+import * as contentInsertion from './contentInsertion'
+import indicatorRegion from './indicatorRegion'
+import indicate from '../common/indicate'
+import Bridge from '../bridge'
 import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
-import StatusBar from './StatusBar';
+import StatusBar from './StatusBar'
 import ShowOnFocusButton from './ShowOnFocusButton'
 import theme from '../skins/theme'
 import {isAudio, isImage, isVideo} from './plugins/shared/fileTypeUtils'
@@ -41,23 +41,33 @@ import AlertMessageArea from './AlertMessageArea'
 import alertHandler from './alertHandler'
 import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
 import {defaultImageSize} from './plugins/instructure_image/ImageEmbedOptions'
-import {VIDEO_SIZE_DEFAULT, AUDIO_PLAYER_SIZE} from './plugins/instructure_record/VideoOptionsTray/TrayController'
+import {
+  VIDEO_SIZE_DEFAULT,
+  AUDIO_PLAYER_SIZE
+} from './plugins/instructure_record/VideoOptionsTray/TrayController'
 
 const ASYNC_FOCUS_TIMEOUT = 250
 
 // we  `require` instead of `import` these 2 css files because the ui-themeable babel require hook only works with `require`
 const styles = require('../skins/skin-delta.css')
-const skinCSS = require('../../node_modules/tinymce/skins/ui/oxide/skin.min.css').template().replace(/tinymce__oxide--/g, "")
-const contentCSS = require('../../node_modules/tinymce/skins/ui/oxide/content.css').template().replace(/tinymce__oxide--/g, "")
+const skinCSS = require('../../node_modules/tinymce/skins/ui/oxide/skin.min.css')
+  .template()
+  .replace(/tinymce__oxide--/g, '')
+const contentCSS = require('../../node_modules/tinymce/skins/ui/oxide/content.css')
+  .template()
+  .replace(/tinymce__oxide--/g, '')
 
 // If we ever get our jest tests configured so they can handle importing real esModules,
 // we can move this to plugins/instructure-ui-icons/plugin.js like the rest.
 function addKebabIcon(editor) {
-  editor.ui.registry.addIcon('more-drawer', `
+  editor.ui.registry.addIcon(
+    'more-drawer',
+    `
     <svg viewBox="0 0 1920 1920">
       <path d="M1129.412 1637.647c0 93.448-75.964 169.412-169.412 169.412-93.448 0-169.412-75.964-169.412-169.412 0-93.447 75.964-169.412 169.412-169.412 93.448 0 169.412 75.965 169.412 169.412zm0-677.647c0 93.448-75.964 169.412-169.412 169.412-93.448 0-169.412-75.964-169.412-169.412 0-93.448 75.964-169.412 169.412-169.412 93.448 0 169.412 75.964 169.412 169.412zm0-677.647c0 93.447-75.964 169.412-169.412 169.412-93.448 0-169.412-75.965-169.412-169.412 0-93.448 75.964-169.412 169.412-169.412 93.448 0 169.412 75.964 169.412 169.412z" stroke="none" stroke-width="1" fill-rule="evenodd"/>
     </svg>
-  `)
+  `
+  )
 }
 
 // Get oxide the default skin injected into the DOM before the overrides loaded by themeable
@@ -65,20 +75,20 @@ let inserted = false
 function injectTinySkin() {
   if (inserted) return
   inserted = true
-  const style = document.createElement("style");
+  const style = document.createElement('style')
   style.setAttribute('data-skin', 'tiny oxide skin')
   style.appendChild(
     // the .replace here is because the ui-themeable babel hook adds that prefix to all the class names
     document.createTextNode(skinCSS)
-  );
+  )
   const beforeMe =
     document.head.querySelector('style[data-glamor]') || // find instui's themeable stylesheet
     document.head.querySelector('style') || // find any stylesheet
     document.head.firstElementChild
-  document.head.insertBefore(style, beforeMe);
+  document.head.insertBefore(style, beforeMe)
 }
 
-const editorWrappers = new WeakMap();
+const editorWrappers = new WeakMap()
 
 function showMenubar(el, show) {
   const $menubar = el.querySelector('.tox-menubar')
@@ -90,7 +100,7 @@ function showMenubar(el, show) {
 
 function focusToolbar(el) {
   const $firstToolbarButton = el.querySelector('.tox-tbtn')
-  $firstToolbarButton  && $firstToolbarButton.focus()
+  $firstToolbarButton && $firstToolbarButton.focus()
 }
 
 function focusFirstMenuButton(el) {
@@ -107,7 +117,7 @@ function focusContextToolbar() {
 
 function isElementWithinTable(node) {
   let elem = node
-  while(elem) {
+  while (elem) {
     if (elem.tagName === 'TABLE' || elem.tagName === 'TD' || elem.tagName === 'TH') {
       return true
     }
@@ -116,12 +126,12 @@ function isElementWithinTable(node) {
   return false
 }
 
-let alertIdValue = 0;
+let alertIdValue = 0
 
 @themeable(theme, styles)
 class RCEWrapper extends React.Component {
   static getByEditor(editor) {
-    return editorWrappers.get(editor);
+    return editorWrappers.get(editor)
   }
 
   static propTypes = {
@@ -137,7 +147,7 @@ class RCEWrapper extends React.Component {
     textareaId: PropTypes.string,
     tinymce: PropTypes.object, // eslint-disable-line react/forbid-prop-types
     trayProps
-  };
+  }
 
   static defaultProps = {
     trayProps: null
@@ -146,18 +156,18 @@ class RCEWrapper extends React.Component {
   static skinCssInjected = false
 
   constructor(props) {
-    super(props);
+    super(props)
 
     // interface consistent with editorBox
-    this.get_code = this.getCode;
-    this.set_code = this.setCode;
-    this.insert_code = this.insertCode;
+    this.get_code = this.getCode
+    this.set_code = this.setCode
+    this.insert_code = this.insertCode
 
     // test override points
-    this.indicator = false;
+    this.indicator = false
 
-    this._elementRef = null;
-    this._showOnFocusButton = null;
+    this._elementRef = null
+    this._showOnFocusButton = null
 
     injectTinySkin()
 
@@ -171,29 +181,31 @@ class RCEWrapper extends React.Component {
       announcement: null
     }
 
-    alertHandler.alertFunc = this.addAlert;
+    alertHandler.alertFunc = this.addAlert
   }
 
   // getCode and setCode naming comes from tinyMCE
   // kind of strange but want to be consistent
   getCode() {
-    return this.isHidden()
-      ? this.textareaValue()
-      : this.mceInstance().getContent();
+    return this.isHidden() ? this.textareaValue() : this.mceInstance().getContent()
   }
 
   checkReadyToGetCode(promptFunc) {
-    let status = true;
+    let status = true
     // Check for remaining placeholders
     if (this.mceInstance().dom.doc.querySelector(`[data-placeholder-for]`)) {
-      status = promptFunc(formatMessage('Content is still being uploaded, if you continue it will not be embedded properly.'))
+      status = promptFunc(
+        formatMessage(
+          'Content is still being uploaded, if you continue it will not be embedded properly.'
+        )
+      )
     }
 
-    return status;
+    return status
   }
 
   setCode(newContent) {
-    this.mceInstance().setContent(newContent);
+    this.mceInstance().setContent(newContent)
   }
 
   indicateEditor(element) {
@@ -205,17 +217,17 @@ class RCEWrapper extends React.Component {
       }, 100)
       return
     }
-    const editor = this.mceInstance();
+    const editor = this.mceInstance()
     if (this.indicator) {
-      this.indicator(editor, element);
+      this.indicator(editor, element)
     } else if (!this.isHidden()) {
-      indicate(indicatorRegion(editor, element));
+      indicate(indicatorRegion(editor, element))
     }
   }
 
   contentInserted(element) {
-    this.indicateEditor(element);
-    this.checkImageLoadError(element);
+    this.indicateEditor(element)
+    this.checkImageLoadError(element)
     this.sizeEditorForContent(element)
   }
 
@@ -231,68 +243,71 @@ class RCEWrapper extends React.Component {
     if (height) {
       const ifr = this.iframe
       if (ifr) {
-        const editor_body_style = ifr.contentWindow.getComputedStyle(this.iframe.contentDocument.body)
-        const editor_ht = ifr.contentDocument.body.clientHeight -
-                          parseInt(editor_body_style['padding-top'], 10) -
-                          parseInt(editor_body_style['padding-bottom'], 10)
+        const editor_body_style = ifr.contentWindow.getComputedStyle(
+          this.iframe.contentDocument.body
+        )
+        const editor_ht =
+          ifr.contentDocument.body.clientHeight -
+          parseInt(editor_body_style['padding-top'], 10) -
+          parseInt(editor_body_style['padding-bottom'], 10)
 
         const para_margin_ht = 24
         const reserve_ht = Math.ceil(height + para_margin_ht)
         if (reserve_ht > editor_ht) {
-          this.onResize(null,  {deltaY: reserve_ht - editor_ht})
+          this.onResize(null, {deltaY: reserve_ht - editor_ht})
         }
       }
     }
   }
 
   checkImageLoadError(element) {
-    if (!element || element.tagName !== "IMG") {
-      return;
+    if (!element || element.tagName !== 'IMG') {
+      return
     }
     if (!element.complete) {
-      element.onload = () => this.checkImageLoadError(element);
-      return;
+      element.onload = () => this.checkImageLoadError(element)
+      return
     }
     // checking naturalWidth in a future event loop run prevents a race
     // condition between the onload callback and naturalWidth being set.
     setTimeout(() => {
       if (element.naturalWidth === 0) {
-        element.style.border = "1px solid #000";
-        element.style.padding = "2px";
+        element.style.border = '1px solid #000'
+        element.style.padding = '2px'
       }
-    }, 0);
+    }, 0)
   }
 
   insertCode(code) {
-    const editor = this.mceInstance();
-    const element = contentInsertion.insertContent(editor, code);
-    this.contentInserted(element);
+    const editor = this.mceInstance()
+    const element = contentInsertion.insertContent(editor, code)
+    this.contentInserted(element)
   }
 
   insertImage(image) {
-    const editor = this.mceInstance();
-    const element = contentInsertion.insertImage(editor, image);
+    const editor = this.mceInstance()
+    const element = contentInsertion.insertImage(editor, image)
     if (element && element.complete) {
-      this.contentInserted(element);
+      this.contentInserted(element)
     } else if (element) {
-      element.onload = () => this.contentInserted(element);
-      element.onerror = () => this.checkImageLoadError(element);
+      element.onload = () => this.contentInserted(element)
+      element.onerror = () => this.checkImageLoadError(element)
     }
   }
 
   insertImagePlaceholder(fileMetaProps) {
-    let width, height;
+    let width, height
     if (isImage(fileMetaProps.contentType)) {
-      const image = new Image();
+      const image = new Image()
       image.src = fileMetaProps.domObject.preview
       width = image.width
       height = image.height
       if (width > defaultImageSize && image.width > image.height) {
         width = defaultImageSize
-        height = image.height * width / image.width
+        height = (image.height * width) / image.width
       } else if (height > defaultImageSize && image.height > image.width) {
         height = defaultImageSize
-        width = image.width * height / image.height
+        width = (image.width * height) / image.height
       }
       width = `${width}px`
       height = `${height}px`
@@ -312,15 +327,15 @@ class RCEWrapper extends React.Component {
       src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="${fileMetaProps.name}"
       style="width: ${width}; height: ${height}; border: solid 1px #8B969E;"
-    />`;
+    />`
 
-    this.insertCode(markup);
+    this.insertCode(markup)
   }
 
   insertVideo(video) {
-    const editor = this.mceInstance();
-    const element = contentInsertion.insertVideo(editor, video);
-    this.contentInserted(element);
+    const editor = this.mceInstance()
+    const element = contentInsertion.insertVideo(editor, video)
+    this.contentInserted(element)
   }
 
   insertAudio(audio) {
@@ -332,59 +347,59 @@ class RCEWrapper extends React.Component {
   removePlaceholders(name) {
     const placeholder = this.mceInstance().dom.doc.querySelector(`[data-placeholder-for="${name}"]`)
     if (placeholder) {
-      placeholder.remove();
+      placeholder.remove()
     }
   }
 
   insertLink(link) {
-    const editor = this.mceInstance();
-    const element = contentInsertion.insertLink(editor, link);
-    this.contentInserted(element);
+    const editor = this.mceInstance()
+    const element = contentInsertion.insertLink(editor, link)
+    this.contentInserted(element)
   }
 
   existingContentToLink() {
-    const editor = this.mceInstance();
-    return contentInsertion.existingContentToLink(editor);
+    const editor = this.mceInstance()
+    return contentInsertion.existingContentToLink(editor)
   }
 
   existingContentToLinkIsImg() {
-    const editor = this.mceInstance();
-    return contentInsertion.existingContentToLinkIsImg(editor);
+    const editor = this.mceInstance()
+    return contentInsertion.existingContentToLinkIsImg(editor)
   }
 
   mceInstance() {
-    const editors = this.props.tinymce.editors || [];
-    return editors.filter(ed => ed.id === this.props.textareaId)[0];
+    const editors = this.props.tinymce.editors || []
+    return editors.filter(ed => ed.id === this.props.textareaId)[0]
   }
 
   onTinyMCEInstance(command, args) {
-    const editor = this.mceInstance();
+    const editor = this.mceInstance()
     if (editor) {
-      if (command === "mceRemoveEditor") {
-        editor.execCommand("mceNewDocument");
+      if (command === 'mceRemoveEditor') {
+        editor.execCommand('mceNewDocument')
       } // makes sure content can't persist past removal
-      editor.execCommand(command, false, this.props.textareaId, args);
+      editor.execCommand(command, false, this.props.textareaId, args)
     }
   }
 
   destroy() {
-    this._destroyCalled = true;
-    this.onTinyMCEInstance("mceRemoveEditor");
-    this.unhandleTextareaChange();
-    this.props.handleUnmount && this.props.handleUnmount();
+    this._destroyCalled = true
+    this.onTinyMCEInstance('mceRemoveEditor')
+    this.unhandleTextareaChange()
+    this.props.handleUnmount && this.props.handleUnmount()
   }
 
   onRemove() {
-    Bridge.detachEditor(this);
-    this.props.onRemove && this.props.onRemove(this);
+    Bridge.detachEditor(this)
+    this.props.onRemove && this.props.onRemove(this)
   }
 
   getTextarea() {
-    return document.getElementById(this.props.textareaId);
+    return document.getElementById(this.props.textareaId)
   }
 
   textareaValue() {
-    return this.getTextarea().value;
+    return this.getTextarea().value
   }
 
   toggle = () => {
@@ -396,28 +411,26 @@ class RCEWrapper extends React.Component {
   }
 
   focus() {
-    this.onTinyMCEInstance("mceFocus");
+    this.onTinyMCEInstance('mceFocus')
   }
 
   is_dirty() {
-    const content = this.isHidden()
-      ? this.textareaValue()
-      : this.mceInstance().getContent();
-    return content !== this.cleanInitialContent();
+    const content = this.isHidden() ? this.textareaValue() : this.mceInstance().getContent()
+    return content !== this.cleanInitialContent()
   }
 
   cleanInitialContent() {
     if (!this._cleanInitialContent) {
-      const el = window.document.createElement("div");
-      el.innerHTML = this.props.defaultContent;
-      const serializer = this.mceInstance().serializer;
-      this._cleanInitialContent = serializer.serialize(el, { getInner: true });
+      const el = window.document.createElement('div')
+      el.innerHTML = this.props.defaultContent
+      const serializer = this.mceInstance().serializer
+      this._cleanInitialContent = serializer.serialize(el, {getInner: true})
     }
-    return this._cleanInitialContent;
+    return this._cleanInitialContent
   }
 
   isHidden() {
-    return this.mceInstance().isHidden();
+    return this.mceInstance().isHidden()
   }
 
   get iframe() {
@@ -433,8 +446,8 @@ class RCEWrapper extends React.Component {
   handleFocus() {
     if (!this.state.focused) {
       this.setState({focused: true})
-      Bridge.focusEditor(this);
-      this.props.onFocus && this.props.onFocus(this);
+      Bridge.focusEditor(this)
+      this.props.onFocus && this.props.onFocus(this)
     }
   }
 
@@ -475,7 +488,11 @@ class RCEWrapper extends React.Component {
           return
         }
 
-        if (event && event.relatedTarget && event.relatedTarget.getAttribute('class').includes('tox-')) {
+        if (
+          event &&
+          event.relatedTarget &&
+          event.relatedTarget.getAttribute('class').includes('tox-')
+        ) {
           // a tinymce popup has focus
           return
         }
@@ -527,10 +544,10 @@ class RCEWrapper extends React.Component {
   call(methodName, ...args) {
     // since exists? has a ? and cant be a regular function just return true
     // rather than calling as a fn on the editor
-    if (methodName === "exists?") {
-      return true;
+    if (methodName === 'exists?') {
+      return true
     }
-    return this[methodName](...args);
+    return this[methodName](...args)
   }
 
   initKeyboardShortcuts(el, editor) {
@@ -563,16 +580,16 @@ class RCEWrapper extends React.Component {
   }
 
   onInit(_e, editor) {
-    editor.rceWrapper = this;
+    editor.rceWrapper = this
     this.initKeyboardShortcuts(this._elementRef, editor)
-    if(document.body.classList.contains('Underline-All-Links__enabled')) {
+    if (document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
     }
     editor.on('wordCountUpdate', this.onWordCountUpdate)
     // and an aria-label to the application div that wraps RCE
     const tinyapp = document.querySelector('.tox-tinymce[role="application"]')
     if (tinyapp) {
-      tinyapp.setAttribute('aria-label', formatMessage("Rich Content Editor"))
+      tinyapp.setAttribute('aria-label', formatMessage('Rich Content Editor'))
     }
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
@@ -589,21 +606,27 @@ class RCEWrapper extends React.Component {
       if (isImageEmbed(node)) {
         if (this.announcing !== 1) {
           this.setState({
-            announcement: formatMessage('type Control F9 to access image options. {text}', {text: node.getAttribute('alt')})
+            announcement: formatMessage('type Control F9 to access image options. {text}', {
+              text: node.getAttribute('alt')
+            })
           })
           this.announcing = 1
         }
-      } else if(isFileLink(node)) {
+      } else if (isFileLink(node)) {
         if (this.announcing !== 2) {
           this.setState({
-            announcement: formatMessage('type Control F9 to access link options. {text}', {text: node.textContent})
+            announcement: formatMessage('type Control F9 to access link options. {text}', {
+              text: node.textContent
+            })
           })
           this.announcing = 2
         }
-      } else if(isElementWithinTable(node)) {
+      } else if (isElementWithinTable(node)) {
         if (this.announcing !== 3) {
           this.setState({
-            announcement: formatMessage('type Control F9 to access table options. {text}', {text: node.textContent})
+            announcement: formatMessage('type Control F9 to access table options. {text}', {
+              text: node.textContent
+            })
           })
           this.announcing = 3
         }
@@ -616,7 +639,7 @@ class RCEWrapper extends React.Component {
     })
   }
 
-  doAutoResize = (e) => {
+  doAutoResize = e => {
     const ifr = this.iframe
     if (ifr) {
       const contentElm = ifr.contentDocument.documentElement
@@ -668,7 +691,7 @@ class RCEWrapper extends React.Component {
     this.onTinyMCEInstance('openAccessibilityChecker', {skip_focus: true})
   }
 
-  handleShortcutKeyShortcut = (event) => {
+  handleShortcutKeyShortcut = event => {
     if (event.altKey && (event.keyCode === 48 || event.keyCode === 119)) {
       event.preventDefault()
       event.stopPropagation()
@@ -695,17 +718,17 @@ class RCEWrapper extends React.Component {
   componentWillUnmount() {
     window.clearTimeout(this.blurTimer)
     if (!this._destroyCalled) {
-      this.destroy();
+      this.destroy()
     }
     this._elementRef.removeEventListener('keyup', this.handleShortcutKeyShortcut, true)
   }
 
   wrapOptions(options = {}) {
-    const setupCallback = options.setup;
+    const setupCallback = options.setup
     options.toolbar = options.toolbar || []
-    const lti_tool_dropdown = options.toolbar.some(str => str.includes('lti_tool_dropdown')) ?
-      'lti_tool_dropdown' :
-      ''
+    const lti_tool_dropdown = options.toolbar.some(str => str.includes('lti_tool_dropdown'))
+      ? 'lti_tool_dropdown'
+      : ''
     return {
       ...options,
 
@@ -719,11 +742,14 @@ class RCEWrapper extends React.Component {
 
       setup: editor => {
         addKebabIcon(editor)
-        editorWrappers.set(editor, this);
-        const trayPropsWithColor = {brandColor: this.theme.canvasBrandColor, ...this.props.trayProps}
+        editorWrappers.set(editor, this)
+        const trayPropsWithColor = {
+          brandColor: this.theme.canvasBrandColor,
+          ...this.props.trayProps
+        }
         Bridge.trayProps.set(editor, trayPropsWithColor)
-        if (typeof setupCallback === "function") {
-          setupCallback(editor);
+        if (typeof setupCallback === 'function') {
+          setupCallback(editor)
         }
       },
 
@@ -733,61 +759,87 @@ class RCEWrapper extends React.Component {
       // things like table resizing and stuff.
       content_style: contentCSS,
 
-      toolbar: [{
-          name: formatMessage('Styles'), items: ['fontsizeselect', 'formatselect']
-        }, {
-          name: formatMessage('Formatting'), items: ['bold', 'italic', 'underline', 'forecolor', 'backcolor', 'superscript', 'subscript']
-        }, {
-          name: formatMessage('Alignment and Indentation'), items: ['align', 'bullist', 'outdent', 'indent', 'directionality']
-        }, {
-          name: formatMessage('Canvas Plugins'), items: ['instructure_links', 'instructure_image', 'instructure_record', 'instructure_documents']
-        }, {
-          name: formatMessage('Miscellaneous and LTI'), items: ['removeformat', 'table', 'instructure_equation', `${lti_tool_dropdown}`]
+      toolbar: [
+        {
+          name: formatMessage('Styles'),
+          items: ['fontsizeselect', 'formatselect']
+        },
+        {
+          name: formatMessage('Formatting'),
+          items: [
+            'bold',
+            'italic',
+            'underline',
+            'forecolor',
+            'backcolor',
+            'superscript',
+            'subscript'
+          ]
+        },
+        {
+          name: formatMessage('Alignment and Indentation'),
+          items: ['align', 'bullist', 'outdent', 'indent', 'directionality']
+        },
+        {
+          name: formatMessage('Canvas Plugins'),
+          items: [
+            'instructure_links',
+            'instructure_image',
+            'instructure_record',
+            'instructure_documents'
+          ]
+        },
+        {
+          name: formatMessage('Miscellaneous and LTI'),
+          items: ['removeformat', 'table', 'instructure_equation', `${lti_tool_dropdown}`]
         }
       ],
-      contextmenu: '',  // show the browser's native context menu
+      contextmenu: '', // show the browser's native context menu
 
       toolbar_drawer: 'floating',
 
       // tiny's external link create/edit dialog config
-      target_list: false,  // don't show the target list when creating/editing links
-      link_title: false,   // don't show the title input when creating/editing links
+      target_list: false, // don't show the target list when creating/editing links
+      link_title: false, // don't show the title input when creating/editing links
       default_link_target: '_blank',
 
-      canvas_rce_user_context: {type: this.props.trayProps.contextType, id: this.props.trayProps.contextId}
+      canvas_rce_user_context: {
+        type: this.props.trayProps.contextType,
+        id: this.props.trayProps.contextId
+      }
     }
   }
 
   handleTextareaChange = () => {
     if (this.isHidden()) {
-      this.setCode(this.textareaValue());
+      this.setCode(this.textareaValue())
     }
-  };
+  }
 
   unhandleTextareaChange() {
     if (this._textareaEl) {
-      this._textareaEl.removeEventListener("change", this.handleTextareaChange);
+      this._textareaEl.removeEventListener('change', this.handleTextareaChange)
     }
   }
 
   registerTextareaChange() {
-    const el = this.getTextarea();
+    const el = this.getTextarea()
     if (this._textareaEl !== el) {
-      this.unhandleTextareaChange();
+      this.unhandleTextareaChange()
       if (el) {
-        el.addEventListener("change", this.handleTextareaChange);
+        el.addEventListener('change', this.handleTextareaChange)
         if (this.props.textareaClassName) {
           // split the string on whitespace because classList doesn't let you add multiple
           // space seperated classes at a time but does let you add an array of them
           el.classList.add(...this.props.textareaClassName.split(/\s+/))
         }
-        this._textareaEl = el;
+        this._textareaEl = el
       }
     }
   }
 
   componentDidMount() {
-    this.registerTextareaChange();
+    this.registerTextareaChange()
     this._elementRef.addEventListener('keyup', this.handleShortcutKeyShortcut, true)
     // give the textarea its initial size
     this.onResize(null, {deltaY: 0})
@@ -795,15 +847,15 @@ class RCEWrapper extends React.Component {
 
   componentDidUpdate(_prevProps, prevState) {
     const {...mceProps} = this.props
-    this.registerTextareaChange();
-    if(prevState.isHtmlView !== this.state.isHtmlView) {
+    this.registerTextareaChange()
+    if (prevState.isHtmlView !== this.state.isHtmlView) {
       if (this.state.isHtmlView) {
-        this.getTextarea().removeAttribute('aria-hidden');
+        this.getTextarea().removeAttribute('aria-hidden')
         this.mceInstance().hide()
         document.getElementById(mceProps.textareaId).focus()
       } else {
-        this.setCode(this.textareaValue());
-        this.getTextarea().setAttribute('aria-hidden', true);
+        this.setCode(this.textareaValue())
+        this.getTextarea().setAttribute('aria-hidden', true)
         this.mceInstance().show()
         this.mceInstance().focus()
         this.doAutoResize()
@@ -812,19 +864,18 @@ class RCEWrapper extends React.Component {
   }
 
   addAlert = alert => {
-    alert.id = alertIdValue++;
+    alert.id = alertIdValue++
     this.setState(state => {
-      let messages = state.messages.concat(alert);
-      messages = uniqBy(messages, 'text'); // Don't show the same message twice
-      return { messages };
-    });
-  };
+      let messages = state.messages.concat(alert)
+      messages = uniqBy(messages, 'text') // Don't show the same message twice
+      return {messages}
+    })
+  }
 
-
-  removeAlert = (messageId) => {
+  removeAlert = messageId => {
     this.setState(state => {
-      const messages = state.messages.filter(message => message.id !== messageId);
-      return { messages };
+      const messages = state.messages.filter(message => message.id !== messageId)
+      return {messages}
     })
   }
 
@@ -835,7 +886,7 @@ class RCEWrapper extends React.Component {
     if (this.state.messages.length > 0) {
       throw new Error('There are messages currently, you cannot reset when they are non-zero')
     }
-    alertIdValue = 0;
+    alertIdValue = 0
   }
 
   render() {
@@ -845,7 +896,7 @@ class RCEWrapper extends React.Component {
     return (
       <div
         className={`${styles.root} rce-wrapper`}
-        ref={el => this._elementRef = el}
+        ref={el => (this._elementRef = el)}
         onFocus={this.handleFocusRCE}
         onBlur={this.handleBlurRCE}
       >
@@ -856,11 +907,15 @@ class RCEWrapper extends React.Component {
             icon: IconKeyboardShortcutsLine,
             margin: 'xx-small'
           }}
-          ref={el => this._showOnFocusButton = el}
+          ref={el => (this._showOnFocusButton = el)}
         >
-          {<ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>}
+          <ScreenReaderContent>{formatMessage('View keyboard shortcuts')}</ScreenReaderContent>
         </ShowOnFocusButton>
-        <AlertMessageArea messages={this.state.messages} liveRegion={trayProps.liveRegion} afterDismiss={this.removeAlert} />
+        <AlertMessageArea
+          messages={this.state.messages}
+          liveRegion={trayProps.liveRegion}
+          afterDismiss={this.removeAlert}
+        />
         <Editor
           id={mceProps.textareaId}
           textareaName={mceProps.name}
@@ -884,7 +939,11 @@ class RCEWrapper extends React.Component {
           onKBShortcutModalOpen={this.openKBShortcutModal}
           onA11yChecker={this.onA11yChecker}
         />
-        <CanvasContentTray bridge={Bridge} onTrayClosing={this.handleContentTrayClosing} {...trayProps} />
+        <CanvasContentTray
+          bridge={Bridge}
+          onTrayClosing={this.handleContentTrayClosing}
+          {...trayProps}
+        />
         <KeyboardShortcutModal
           onClose={this.KBShortcutModalClosed}
           onDismiss={this.closeKBShortcutModal}
@@ -893,13 +952,12 @@ class RCEWrapper extends React.Component {
         <Alert
           screenReaderOnly
           liveRegion={() => document.getElementById('flash_screenreader_holder')}
-          >
+        >
           {this.state.announcement}
         </Alert>
       </div>
-    );
+    )
   }
 }
 
 export default RCEWrapper
-

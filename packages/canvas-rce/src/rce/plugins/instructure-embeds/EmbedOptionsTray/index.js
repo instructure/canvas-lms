@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {bool, func, shape, string} from 'prop-types'
-import {Button,CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {Heading} from '@instructure/ui-elements'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'

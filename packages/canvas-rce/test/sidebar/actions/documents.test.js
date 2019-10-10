@@ -15,15 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import assert from "assert";
-import sinon from "sinon";
-import * as actions from "../../../src/sidebar/actions/documents";
+import assert from 'assert'
+import sinon from 'sinon'
+import * as actions from '../../../src/sidebar/actions/documents'
 
-describe("Documents actions", () => {
-  describe("fetchDocuments", () => {
-
-    it("fetches initial page if necessary, part 1", () => {
-      const dispatchSpy = sinon.spy();
+describe('Documents actions', () => {
+  describe('fetchDocuments', () => {
+    it('fetches initial page if necessary, part 1', () => {
+      const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           documents: {
@@ -35,13 +34,13 @@ describe("Documents actions", () => {
             }
           },
           contextType: 'user'
-        };
-      };
+        }
+      }
       actions.fetchInitialDocs()(dispatchSpy, getState)
-      assert(dispatchSpy.called);
-    });
-    it("fetches initial page if necessary, part 2", () => {
-      const dispatchSpy = sinon.spy();
+      assert(dispatchSpy.called)
+    })
+    it('fetches initial page if necessary, part 2', () => {
+      const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           documents: {
@@ -53,65 +52,65 @@ describe("Documents actions", () => {
             }
           },
           contextType: 'user'
-        };
-      };
+        }
+      }
       actions.fetchNextDocs()(dispatchSpy, getState)
-      assert(dispatchSpy.called);
-    });
-    it("skips the fetch if subsequent renders", () => {
-      const dispatchSpy = sinon.spy();
+      assert(dispatchSpy.called)
+    })
+    it('skips the fetch if subsequent renders', () => {
+      const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           documents: {
             user: {
-              files: [{ one: "1" }, { two: "2" }, { three: "3" }],
+              files: [{one: '1'}, {two: '2'}, {three: '3'}],
               hasMore: true,
               isLoading: false,
               requested: true
             }
           },
           contextType: 'user'
-        };
-      };
+        }
+      }
       actions.fetchInitialDocs()(dispatchSpy, getState)
-      assert(!dispatchSpy.called);
-    });
-    it("fetches if requested and there are more to load", () => {
-      const dispatchSpy = sinon.spy();
+      assert(!dispatchSpy.called)
+    })
+    it('fetches if requested and there are more to load', () => {
+      const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           documents: {
             user: {
-              files: [{ one: "1" }, { two: "2" }, { three: "3" }],
+              files: [{one: '1'}, {two: '2'}, {three: '3'}],
               hasMore: true,
-              bookmark: "someurl",
+              bookmark: 'someurl',
               isLoading: false
             }
           },
           contextType: 'user'
-        };
-      };
+        }
+      }
       actions.fetchNextDocs()(dispatchSpy, getState)
-      assert(dispatchSpy.called);
-    });
-    it("does not fetch if requested but no more to load", () => {
-      const dispatchSpy = sinon.spy();
+      assert(dispatchSpy.called)
+    })
+    it('does not fetch if requested but no more to load', () => {
+      const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           documents: {
             user: {
-              files: [{ one: "1" }, { two: "2" }, { three: "3" }],
+              files: [{one: '1'}, {two: '2'}, {three: '3'}],
               hasMore: false,
-              bookmark: "someurl",
+              bookmark: 'someurl',
               isLoading: false,
               requested: true
             }
           },
           contextType: 'user'
-        };
-      };
+        }
+      }
       actions.fetchNextDocs()(dispatchSpy, getState)
-      assert(!dispatchSpy.called);
-    });
-  });
-});
+      assert(!dispatchSpy.called)
+    })
+  })
+})

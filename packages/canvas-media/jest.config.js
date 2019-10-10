@@ -17,28 +17,11 @@
  */
 
 module.exports = {
-  modulePathIgnorePatterns: [
-    "<rootDir>/lib",
-    "<rootDir>/es"
-  ],
-  reporters: [
-    "default",
-    ["jest-junit", {outputDirectory: './coverage'}]
-  ],
-  setupFiles: [
-    'jest-canvas-mock',
-    '<rootDir>/jest/jest-setup.js'
-  ],
-  setupFilesAfterEnv: [
-    '@testing-library/jest-dom/extend-expect'
-  ],
+  modulePathIgnorePatterns: ['<rootDir>/lib', '<rootDir>/es'],
+  reporters: ['default', ['jest-junit', {outputDirectory: './coverage'}]],
+  setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
   testEnvironment: 'jest-environment-jsdom-fourteen',
-  testMatch: [
-    '**/__tests__/**/?(*.)(spec|test).js'
-  ],
-  testPathIgnorePatterns: [
-    "<rootDir>/node_modules",
-    "<rootDir>/lib",
-    "<rootDir>/es"
-  ]
+  testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
+  testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/es']
 }

@@ -19,12 +19,14 @@
 import React from 'react'
 import {View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
-import formatMessage from "../../../format-message";
+import formatMessage from '../../../format-message'
 
 export default function UnknownFileTypePanel() {
   return (
     <View as="div" margin="medium">
-      <Text color="error">{formatMessage("Something went wrong and I don't know what to show you.")}</Text>
+      <Text color="error">
+        {formatMessage("Something went wrong and I don't know what to show you.")}
+      </Text>
     </View>
   )
 }

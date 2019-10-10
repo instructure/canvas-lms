@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/pt_BR.json";
-import "../rce/languages/pt_BR";
+import formatMessage from '../format-message'
+import locale from '../../locales/pt_BR.json'
+import '../rce/languages/pt_BR'
 
-formatMessage.addLocale({ "pt-BR": locale });
+formatMessage.addLocale({'pt-BR': locale})

@@ -16,32 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import clickCallback from "./clickCallback";
+import clickCallback from './clickCallback'
 import bridge from '../../../bridge'
-import formatMessage from "../../../format-message";
+import formatMessage from '../../../format-message'
 import TrayController from './VideoOptionsTray/TrayController'
 // import {isVideoElement} from '../shared/ContentSelection'
 
 const trayController = new TrayController()
 
 const COURSE_PLUGIN_KEY = 'course_media'
-const USER_PLUGIN_KEY  = 'user_media'
+const USER_PLUGIN_KEY = 'user_media'
 
-
-tinymce.create("tinymce.plugins.InstructureRecord", {
+tinymce.create('tinymce.plugins.InstructureRecord', {
   init(ed) {
     const contextType = ed.settings.canvas_rce_user_context.type
 
-    ed.addCommand("instructureRecord", clickCallback.bind(this, ed, document));
-    ed.ui.registry.addMenuButton("instructure_record", {
+    ed.addCommand('instructureRecord', clickCallback.bind(this, ed, document))
+    ed.ui.registry.addMenuButton('instructure_record', {
       tooltip: formatMessage('Record/Upload Media'),
-      icon: "video",
+      icon: 'video',
       fetch(callback) {
         const items = [
           {
             type: 'menuitem',
             text: formatMessage('Upload/Record Media'),
-            onAction: () => ed.execCommand("instructureRecord"),
+            onAction: () => ed.execCommand('instructureRecord')
           },
 
           {
@@ -65,9 +64,9 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
           })
         }
 
-        callback(items);
+        callback(items)
       }
-    });
+    })
 
     /*
      * Register the Video "Options" button that will open the Video Options
@@ -82,7 +81,7 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
 
       text: formatMessage('Options'),
       tooltip: buttonAriaLabel
-    });
+    })
 
     ed.ui.registry.addContextToolbar('instructure-video-toolbar', {
       items: 'instructure-video-options',
@@ -94,10 +93,7 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
   remove(editor) {
     trayController.hideTrayForEditor(editor)
   }
-});
+})
 
 // Register plugin
-tinymce.PluginManager.add(
-  "instructure_record",
-  tinymce.plugins.InstructureRecord
-);
+tinymce.PluginManager.add('instructure_record', tinymce.plugins.InstructureRecord)

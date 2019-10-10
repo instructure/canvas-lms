@@ -22,77 +22,82 @@
  * which is necessary until we have a package for sharing components
  * among canvas' sub-packages.
  */
-import React, { Component } from 'react';
-import { node, object } from 'prop-types';
+import React, {Component} from 'react'
+import {node, object} from 'prop-types'
 
-import {Button} from '@instructure/ui-buttons';
-import {ScreenReaderContent} from '@instructure/ui-a11y';
+import {Button} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 export default class ShowOnFocusButton extends Component {
   static propTypes = {
     buttonProps: object,
     srProps: object,
     children: node.isRequired
-  };
+  }
 
   static defaultProps = {
-    buttonRef: () =>{}
-  };
+    buttonRef: () => {}
+  }
 
   state = {
     visible: false
   }
 
   handleFocus = () => {
-    this.setState({
-      visible: true
-    }, () => {
-      if(!this.btnRef.focused) {
-        this.btnRef.focus()
+    this.setState(
+      {
+        visible: true
+      },
+      () => {
+        if (!this.btnRef.focused) {
+          this.btnRef.focus()
+        }
       }
-    });
+    )
   }
 
   handleBlur = () => {
     this.setState({
       visible: false
-    });
+    })
   }
 
   focus() {
     this.btnRef.focus()
   }
 
-  renderButton () {
-    const { buttonProps, children } = this.props;
+  renderButton() {
+    const {buttonProps, children} = this.props
     return (
       <Button
         data-testid="ShowOnFocusButton__button"
         variant="link"
-        ref={(btn) => { this.btnRef = btn}}
+        ref={btn => {
+          this.btnRef = btn
+        }}
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
         {...buttonProps}
       >
         {children}
       </Button>
-    );
+    )
   }
 
-  renderInvisibleButton () {
-    const { srProps } = this.props;
+  renderInvisibleButton() {
+    const {srProps} = this.props
     return (
       <ScreenReaderContent {...srProps} data-testid="ShowOnFocusButton__sronly">
         {this.renderButton()}
       </ScreenReaderContent>
-    );
+    )
   }
 
-  render () {
+  render() {
     if (this.state.visible) {
-      return this.renderButton();
+      return this.renderButton()
     } else {
-      return this.renderInvisibleButton();
+      return this.renderInvisibleButton()
     }
   }
 }

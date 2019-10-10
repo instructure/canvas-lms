@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { REQUEST_PAGE, RECEIVE_PAGE, FAIL_PAGE } from "../actions/data";
-import collectionReducer from "./collection";
-import { combineReducers } from "redux";
+import {REQUEST_PAGE, RECEIVE_PAGE, FAIL_PAGE} from '../actions/data'
+import collectionReducer from './collection'
+import {combineReducers} from 'redux'
 
 // binds a collection reducer to listen only to actions directed at it
 function boundCollectionReducer(key) {
@@ -28,23 +28,23 @@ function boundCollectionReducer(key) {
       case RECEIVE_PAGE:
       case FAIL_PAGE:
         if (action.key === key) {
-          return collectionReducer(state, action);
+          return collectionReducer(state, action)
         } else {
-          return state;
+          return state
         }
 
       default:
-        return state;
+        return state
     }
-  };
+  }
 }
 
 // combine a collection reducer for each collection we care about
 export default combineReducers({
-  announcements: boundCollectionReducer("announcements"),
-  assignments: boundCollectionReducer("assignments"),
-  discussions: boundCollectionReducer("discussions"),
-  modules: boundCollectionReducer("modules"),
-  quizzes: boundCollectionReducer("quizzes"),
-  wikiPages: boundCollectionReducer("wikiPages")
-});
+  announcements: boundCollectionReducer('announcements'),
+  assignments: boundCollectionReducer('assignments'),
+  discussions: boundCollectionReducer('discussions'),
+  modules: boundCollectionReducer('modules'),
+  quizzes: boundCollectionReducer('quizzes'),
+  wikiPages: boundCollectionReducer('wikiPages')
+})
