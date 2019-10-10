@@ -14,7 +14,7 @@ const PRETTIER_WHITELIST = (module.exports = [
   './*.js',
   'app/jsx/**/*.js',
   'app/coffeescripts/**/*.js',
-  'spec/coffeescripts/**/*.js',
+  'spec/**/*.js',
   'frontend_build/**/*.js',
   'packages/canvas-media/src/**/*.js',
   'script/**/*.js',

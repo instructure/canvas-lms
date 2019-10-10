@@ -17,37 +17,39 @@
  */
 
 function serialize(value) {
-  if(typeof value === 'boolean' || value === null) { value = JSON.stringify(value); }
-  if(value instanceof HTMLElement) {
-    value = value.toString();
+  if (typeof value === 'boolean' || value === null) {
+    value = JSON.stringify(value)
+  }
+  if (value instanceof HTMLElement) {
+    value = value.toString()
   }
 
-  if(typeof value !== 'undefined' && typeof value !== 'string' && value.toString) {
-    value = value.toString();
+  if (typeof value !== 'undefined' && typeof value !== 'string' && value.toString) {
+    value = value.toString()
   } else {
     // Otherwise testem croaks
-    console.log(typeof value) 
-    value = 'n/a';
+    console.log(typeof value)
+    value = 'n/a'
   }
 
-  return value;
+  return value
 }
 
-QUnit.config['log'].unshift(details => {
+QUnit.config.log.unshift(details => {
   try {
-    details.actual = serialize(details.actual);
-    details.expected = serialize(details.expected);
+    details.actual = serialize(details.actual)
+    details.expected = serialize(details.expected)
 
-    if(details.actual instanceof Array) {
+    if (details.actual instanceof Array) {
       for (var i = 0; i < details.actual.length; i++) {
-        details.actual[i] = serialize(details.actual[i]);
+        details.actual[i] = serialize(details.actual[i])
       }
     }
 
-    if(details.expected instanceof Array) {
+    if (details.expected instanceof Array) {
       for (var i = 0; i < details.expected.length; i++) {
-        details.expected[i] = serialize(details.expected[i]);
+        details.expected[i] = serialize(details.expected[i])
       }
-    }    
-  } catch(e) {}
-});
+    }
+  } catch (e) {}
+})
