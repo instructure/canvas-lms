@@ -94,7 +94,6 @@ gem 'marginalia', '1.8.0', require: false
 gem 'mime-types', '3.3.0'
 gem 'mini_magick', '4.9.5'
 gem 'multi_json', '1.13.1'
-gem 'netaddr', '1.5.1', require: false
 gem 'nokogiri', '1.10.4', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'parallel', '1.18.0', require: false
