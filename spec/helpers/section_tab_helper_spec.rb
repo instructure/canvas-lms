@@ -403,6 +403,14 @@ describe SectionTabHelper do
         expect(tag.li_classes).to be_a Array
         expect(tag.li_classes).to include('section')
       end
+
+      it 'should include `section-hidden` if tab is hidden' do
+        tag = SectionTabHelperSpec::SectionTabTag.new(
+            tab_assignments.merge(hidden: true), course
+        )
+
+        expect(tag.li_classes).to include('section-tab-hidden')
+      end
     end
 
     describe '#to_html' do
