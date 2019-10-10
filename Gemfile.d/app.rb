@@ -79,7 +79,7 @@ gem 'i18nliner', '0.1.1'
   gem 'ruby_parser', '3.14.0', require: false
 gem 'icalendar', '2.5.3', require: false
 gem 'ims-lti', '2.3.0', require: 'ims'
-gem 'json_schemer', '0.1.7'
+gem 'json_schemer', '0.2.7'
 gem 'simple_oauth', '0.3.1', require: false
 gem 'json', '2.2.0'
 gem 'link_header', '0.0.8'
