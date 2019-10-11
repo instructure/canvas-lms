@@ -78,7 +78,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
       upload_errors = validate_online_upload(assignment, attachments)
       return upload_errors if upload_errors
 
-      submission_params[:attachments] = Attachment.copy_attachments_to_submissions_folder(context, attachments)
+      submission_params[:attachments] = copy_attachments_to_submissions_folder(context, attachments)
     when 'online_url'
       submission_params[:url] = input[:url]
     end
@@ -121,5 +121,17 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     end
 
     true
+  end
+
+  def copy_attachments_to_submissions_folder(assignment_context, attachments)
+    attachments.map do |attachment|
+      if attachment&.folder&.for_submissions?
+        attachment # already in a submissions folder
+      elsif attachment.context.respond_to?(:submissions_folder)
+        attachment.copy_to_folder!(attachment.context.submissions_folder(assignment_context))
+      else
+        attachment # in a weird context; leave it alone
+      end
+    end
   end
 end
