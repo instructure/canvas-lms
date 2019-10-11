@@ -63,9 +63,9 @@ gem 'brotli', '0.2.3', require: false
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.15.13'
-  gem 'rufus-scheduler', '3.4.2', require: false
-    gem 'et-orbi', '1.0.8', require: false
+gem 'inst-jobs', '0.15.14'
+  gem 'fugit', '1.3.3', require: false
+    gem 'et-orbi', '1.2.2', require: false
 gem 'switchman-inst-jobs', '1.3.5'
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.28.0', require: false
