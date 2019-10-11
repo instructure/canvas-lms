@@ -15189,9 +15189,10 @@ package-hash@^3.0.0:
   resolved "https://registry.yarnpkg.com/package/-/package-1.0.1.tgz#d25a1f99e2506dcb27d6704b83dca8a312e4edcc"
   integrity sha1-0lofmeJQbcsn1nBLg9yooxLk7cw=
 
-page@visionmedia/page.js#1.6.4:
-  version "1.6.4"
-  resolved "https://codeload.github.com/visionmedia/page.js/tar.gz/d11509f1f0fed0309391d995919c25dce84b8abd"
+page@^1.11:
+  version "1.11.5"
+  resolved "https://registry.yarnpkg.com/page/-/page-1.11.5.tgz#0cfc8608be337f26f4377f31df0787aef0ca1af7"
+  integrity sha512-0JXUHc7Y8p1cPJQbhZSwaKO3p+bU3Rgny+OM5gJMKHWHvJKan/fsE5RUzEjRQolv9DzPOSVWfSOHz0lLxK19eA==
   dependencies:
     path-to-regexp "~1.2.1"
 

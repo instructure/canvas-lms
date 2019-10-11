@@ -100,7 +100,7 @@ page('/folder/*', getFolderSplat, renderShowFolder)
 
 export default {
   start() {
-    page.start()
+    page.start({click: false})
   },
   getFolderSplat // Export getSplat for testing
 }

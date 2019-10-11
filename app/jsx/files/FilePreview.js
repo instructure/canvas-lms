@@ -207,6 +207,7 @@ export default class FilePreview extends React.PureComponent {
             this.getNavigationParams({id: nextItem.id})
           )}`}
           className="ef-file-preview-container-arrow-link"
+          onClick={e => page.clickHandler(e.nativeEvent)}
         >
           <div className="ef-file-preview-arrow-link">
             <span className="screenreader-only">{linkText}</span>
