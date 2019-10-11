@@ -122,6 +122,48 @@ describe WikiPagesController do
       end
     end
 
+    describe "immersive reader" do
+      context "as a teacher" do
+        before do
+          course_with_teacher(active_all: true)
+          @page = @course.wiki_pages.create!(title: "immersive reader", body: "")
+          user_session @teacher
+        end
+
+        context "feature enabled" do
+          before do
+            @course.root_account.enable_feature! :immersive_reader_wiki_pages
+          end
+
+          it "should render with the proper JS_ENV set" do
+            get 'show', params: {course_id: @course.id, id: @page.url}
+            expect(response).to be_successful
+            expect(controller.js_env[:IMMERSIVE_READER_ENABLED]).to be_truthy
+          end
+        end
+      end
+
+      context "as a student" do
+        before do
+          course_with_student(active_all: true)
+          @page = @course.wiki_pages.create!(title: "immersive reader", body: "")
+          user_session @student
+        end
+
+        context "feature enabled" do
+          before do
+            @course.root_account.enable_feature! :immersive_reader_wiki_pages
+          end
+
+          it "should render with the proper JS_ENV set" do
+            get 'show', params: {course_id: @course.id, id: @page.url}
+            expect(response).to be_successful
+            expect(controller.js_env[:IMMERSIVE_READER_ENABLED]).to be_truthy
+          end
+        end
+      end
+    end
+
     context "differentiated assignments" do
       before do
         assignment = @course.assignments.create!(

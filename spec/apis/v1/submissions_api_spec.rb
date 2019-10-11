@@ -3927,15 +3927,17 @@ describe 'Submissions API', type: :request do
         })
       end
 
-      it "always copies files to the submissions folder even if already there" do
+      it "copys files to the submissions folder if they're not there already" do
         @assignment.update_attributes(:submission_types => 'online_upload')
         a1 = attachment_model(:context => @user, :folder => @user.submissions_folder)
         a2 = attachment_model(:context => @user)
         json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
         submission_attachment_ids = json['attachments'].map { |a| a['id'] }
-        checks = Attachment.find(submission_attachment_ids)
-        expect(checks.map{ |attachment| attachment.root_attachment.id }).to contain_exactly(a1.id, a2.id)
-        checks.each { |attachment| expect(attachment.folder).to eq @user.submissions_folder(@course) }
+        expect(submission_attachment_ids.size).to eq 2
+        expect(submission_attachment_ids.delete(a1.id)).not_to be_nil
+        copy = Attachment.find(submission_attachment_ids.last)
+        expect(copy.folder).to eq @user.submissions_folder(@course)
+        expect(copy.root_attachment).to eq a2
       end
     end
 
