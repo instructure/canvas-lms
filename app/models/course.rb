@@ -2925,6 +2925,10 @@ class Course < ActiveRecord::Base
   def self.add_setting(setting, opts = {})
     setting = setting.to_sym
     settings_options[setting] = opts
+    valid_keys = [:boolean, :default, :inherited, :alias, :arbitrary]
+    invalid_keys = opts.except(*valid_keys).keys
+    raise "invalid options - #{invalid_keys.inspect} (must be in #{valid_keys.inspect})" if invalid_keys.any?
+
     cast_expression = "val.to_s"
     cast_expression = "val" if opts[:arbitrary]
     if opts[:boolean]
@@ -2998,7 +3002,7 @@ class Course < ActiveRecord::Base
   add_setting :syllabus_master_template_id
   add_setting :syllabus_updated_at
 
-  add_setting :usage_rights_required, :boolean => true, :default => false, :inheritable => true
+  add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
