@@ -22,7 +22,9 @@ module Canvas
   describe JWTWorkflow do
     before(:each) do
       @c = Course.new
-      @c.root_account = Account.new
+      @a = Account.new
+      @c.account = @a
+      @c.root_account = @a
       @u = User.new
     end
 
