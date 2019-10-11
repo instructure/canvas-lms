@@ -115,7 +115,7 @@ The title of the context.
 **Launch Parameter**: *context_title*  
 
 ```
-Example Course
+"Example Course"
 ```
 ## com.instructure.Editor.contents
 The contents of the text editor associated with the content item launch.
@@ -144,7 +144,7 @@ and Canvas via the Window.postMessage API.
 **Launch Parameter**: *com_instructure_post_message_token*  
 
 ```
-9ae4170c-6b64-444d-9246-0b7dedd5f560
+"9ae4170c-6b64-444d-9246-0b7dedd5f560"
 ```
 ## com.instructure.Assignment.lti.id
 The LTI assignment id of an assignment. This value corresponds with
@@ -154,7 +154,7 @@ the `ext_lti_assignment_id` send in various launches and webhooks.
 **Launch Parameter**: *com_instructure_assignment_lti_id*  
 
 ```
-9ae4170c-6b64-444d-9246-0b7dedd5f560
+"9ae4170c-6b64-444d-9246-0b7dedd5f560"
 ```
 ## com.instructure.OriginalityReport.id
 The Canvas id of the Originality Report associated
@@ -202,7 +202,7 @@ an opaque identifier that uniquely identifies the context of the tool launch.
 **Launch Parameter**: *context_id*  
 
 ```
-cdca1fe2c392a208bd8a657f8865ddb9ca359534
+"cdca1fe2c392a208bd8a657f8865ddb9ca359534"
 ```
 ## Context.sourcedId
 The sourced Id of the context.
@@ -220,7 +220,7 @@ communicates the kind of browser window/frame where the Canvas has launched a to
 **Launch Parameter**: *launch_presentation_document_target*  
 
 ```
-iframe
+"iframe"
 ```
 ## Message.locale
 returns the current locale.
@@ -229,7 +229,7 @@ returns the current locale.
 **Launch Parameter**: *launch_presentation_locale*  
 
 ```
-de
+"de"
 ```
 ## ToolConsumerInstance.guid
 returns a unique identifier for the Tool Consumer (Canvas).
@@ -238,7 +238,7 @@ returns a unique identifier for the Tool Consumer (Canvas).
 **Launch Parameter**: *tool_consumer_instance_guid*  
 
 ```
-0dWtgJjjFWRNT41WdQMvrleejGgv7AynCVm3lmZ2:canvas-lms
+"0dWtgJjjFWRNT41WdQMvrleejGgv7AynCVm3lmZ2:canvas-lms"
 ```
 ## Canvas.api.domain
 returns the canvas domain for the current context.
@@ -247,7 +247,7 @@ returns the canvas domain for the current context.
 
 
 ```
-canvas.instructure.com
+"canvas.instructure.com"
 ```
 ## Canvas.api.collaborationMembers.url
 returns the api url for the members of the collaboration.
@@ -256,7 +256,7 @@ returns the api url for the members of the collaboration.
 
 
 ```
-https://canvas.instructure.com/api/v1/collaborations/1/members
+"https://canvas.instructure.com/api/v1/collaborations/1/members"
 ```
 ## Canvas.api.baseUrl
 returns the base URL for the current context.
@@ -265,7 +265,7 @@ returns the base URL for the current context.
 
 
 ```
-https://canvas.instructure.com
+"https://canvas.instructure.com"
 ```
 ## ToolProxyBinding.memberships.url
 returns the URL for the membership service associated with the current context.
@@ -276,7 +276,7 @@ This variable is for future use only. Complete support for the IMS Membership Se
 
 
 ```
-https://canvas.instructure.com/api/lti/courses/1/membership_service
+"https://canvas.instructure.com/api/lti/courses/1/membership_service"
 ```
 ## Canvas.account.id
 returns the account id for the current context.
@@ -294,7 +294,7 @@ returns the account name for the current context.
 
 
 ```
-School Name
+"School Name"
 ```
 ## Canvas.account.sisSourceId
 returns the account's sis source id for the current context.
@@ -303,7 +303,7 @@ returns the account's sis source id for the current context.
 
 
 ```
-sis_account_id_1234
+"sis_account_id_1234"
 ```
 ## Canvas.rootAccount.id
 returns the Root Account ID for the current context.
@@ -321,7 +321,7 @@ returns the root account's sis source id for the current context.
 
 
 ```
-sis_account_id_1234
+"sis_account_id_1234"
 ```
 ## Canvas.externalTool.url
 returns the URL for the external tool that was launched. Only available for LTI 1.
@@ -330,7 +330,7 @@ returns the URL for the external tool that was launched. Only available for LTI 
 
 
 ```
-http://example.url/path
+"http://example.url/path"
 ```
 ## com.instructure.brandConfigJSON.url
 returns the URL to retrieve the brand config JSON for the launching context.
@@ -339,7 +339,7 @@ returns the URL to retrieve the brand config JSON for the launching context.
 
 
 ```
-http://example.url/path.json
+"http://example.url/path.json"
 ```
 ## com.instructure.brandConfigJSON
 returns the brand config JSON itself for the launching context.
@@ -360,7 +360,7 @@ More information on on how to use instructure ui react components can be found [
 
 
 ```
-http://example.url/path.js
+"http://example.url/path.js"
 ```
 ## Canvas.css.common
 returns the URL for the common css file.
@@ -369,7 +369,7 @@ returns the URL for the common css file.
 
 
 ```
-http://example.url/path.css
+"http://example.url/path.css"
 ```
 ## Canvas.shard.id
 returns the shard id for the current context.
@@ -405,7 +405,7 @@ returns the account uuid for the current context.
 **Launch Parameter**: *vnd_canvas_root_account_uuid*  
 
 ```
-Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo
+"Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo"
 ```
 ## Canvas.root_account.sisSourceId *[deprecated]*
 returns the root account sis source id for the current context.
@@ -432,7 +432,7 @@ returns the current course uuid.
 
 
 ```
-S3vhRY2pBzG8iPdZ3OBPsPrEnqn5sdRoJOLXGbwc
+"S3vhRY2pBzG8iPdZ3OBPsPrEnqn5sdRoJOLXGbwc"
 ```
 ## Canvas.course.name
 returns the current course name.
@@ -441,7 +441,7 @@ returns the current course name.
 
 
 ```
-Course Name
+"Course Name"
 ```
 ## Canvas.course.sisSourceId
 returns the current course sis source id.
@@ -459,7 +459,7 @@ returns the current course start date.
 
 
 ```
-YYY-MM-DD HH:MM:SS -0700
+2018-01-15 00:00:00 -0700
 ```
 ## Canvas.course.workflowState
 returns the current course workflow state. Workflow states of "claimed" or "created"
@@ -469,7 +469,7 @@ indicate an unpublished course.
 
 
 ```
-active
+"active"
 ```
 ## Canvas.term.startAt
 returns the current course's term start date.
@@ -478,7 +478,7 @@ returns the current course's term start date.
 
 
 ```
-YYY-MM-DD HH:MM:SS -0700
+2018-01-12 00:00:00 -0700
 ```
 ## Canvas.term.name
 returns the current course's term name.
@@ -487,7 +487,7 @@ returns the current course's term name.
 **Launch Parameter**: *canvas_term_name*  
 
 ```
-W1 2017
+"W1 2017"
 ```
 ## CourseSection.sourcedId
 returns the current course sis source id
@@ -506,7 +506,7 @@ returns the current course enrollment state.
 
 
 ```
-active
+"active"
 ```
 ## com.instructure.Assignment.anonymous_grading
 returns true if the assignment has anonymous grading
@@ -526,7 +526,7 @@ using the LIS v2 vocabulary.
 **Launch Parameter**: *com_instructure_membership_roles*  
 
 ```
-http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student
+"http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
 ```
 ## Canvas.membership.roles
 returns the current course membership roles.
@@ -535,7 +535,7 @@ returns the current course membership roles.
 **Launch Parameter**: *canvas_membership_roles*  
 
 ```
-StudentEnrollment
+"StudentEnrollment"
 ```
 ## Canvas.membership.concludedRoles
 This is a list of IMS LIS roles should have a different key.
@@ -544,7 +544,7 @@ This is a list of IMS LIS roles should have a different key.
 
 
 ```
-urn:lti:sysrole:ims/lis/None
+"urn:lti:sysrole:ims/lis/None"
 ```
 ## Canvas.course.previousContextIds
 With respect to the current course, returns the context ids of the courses from which content has been copied (excludes cartridge imports).
@@ -553,7 +553,7 @@ With respect to the current course, returns the context ids of the courses from 
 
 
 ```
-1234,4567
+"1234,4567"
 ```
 ## Canvas.course.previousContextIds.recursive
 With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
@@ -562,7 +562,7 @@ With respect to the current course, recursively returns the context ids of the c
 
 
 ```
-1234,4567
+"1234,4567"
 ```
 ## Canvas.course.previousCourseIds
 With respect to the current course, returns the course ids of the courses from which content has been copied (excludes cartridge imports).
@@ -580,7 +580,7 @@ Returns the full name of the launching user.
 **Launch Parameter**: *lis_person_name_full*  
 
 ```
-John Doe
+"John Doe"
 ```
 ## Person.name.display
 Returns the display name of the launching user.
@@ -589,7 +589,7 @@ Returns the display name of the launching user.
 **Launch Parameter**: *person_name_display*  
 
 ```
-John Doe
+"John Doe"
 ```
 ## Person.name.family
 Returns the last name of the launching user.
@@ -598,7 +598,7 @@ Returns the last name of the launching user.
 **Launch Parameter**: *lis_person_name_family*  
 
 ```
-Doe
+"Doe"
 ```
 ## Person.name.given
 Returns the first name of the launching user.
@@ -607,7 +607,7 @@ Returns the first name of the launching user.
 **Launch Parameter**: *lis_person_name_given*  
 
 ```
-John
+"John"
 ```
 ## com.instructure.Person.name_sortable
 Returns the sortable name of the launching user.
@@ -616,7 +616,7 @@ Returns the sortable name of the launching user.
 **Launch Parameter**: *com_instructure_person_name_sortable*  
 
 ```
-Doe, John
+"Doe, John"
 ```
 ## Person.email.primary
 Returns the primary email of the launching user.
@@ -625,7 +625,7 @@ Returns the primary email of the launching user.
 **Launch Parameter**: *lis_person_contact_email_primary*  
 
 ```
-john.doe@example.com
+"john.doe@example.com"
 ```
 ## vnd.Canvas.Person.email.sis
 Returns the institution assigned email of the launching user.
@@ -634,7 +634,7 @@ Returns the institution assigned email of the launching user.
 
 
 ```
-john.doe@example.com
+"john.doe@example.com"
 ```
 ## Person.address.timezone
 Returns the name of the timezone of the launching user.
@@ -643,7 +643,7 @@ Returns the name of the timezone of the launching user.
 
 
 ```
-America/Denver
+"America/Denver"
 ```
 ## User.image
 Returns the profile picture URL of the launching user.
@@ -652,7 +652,7 @@ Returns the profile picture URL of the launching user.
 **Launch Parameter**: *user_image*  
 
 ```
-https://example.com/picture.jpg
+"https://example.com/picture.jpg"
 ```
 ## User.id [duplicates Canvas.user.id]
 Returns the Canvas user_id of the launching user.
@@ -679,7 +679,7 @@ Returns the Canvas user_uuid of the launching user for the context.
 
 
 ```
-N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3
+"N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3"
 ```
 ## vnd.instructure.User.current_uuid [duplicates User.uuid]
 Returns the current Canvas user_uuid of the launching user.
@@ -688,7 +688,7 @@ Returns the current Canvas user_uuid of the launching user.
 
 
 ```
-N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3
+"N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3"
 ```
 ## Canvas.user.prefersHighContrast
 Returns the users preference for high contrast colors (an accessibility feature).
@@ -706,7 +706,7 @@ returns the Canvas ids of all active groups in the current course.
 **Launch Parameter**: *com_instructure_course_groupids*  
 
 ```
-23,24,...
+"23,24,..."
 ```
 ## Canvas.group.contextIds
 returns the context ids for the groups the user belongs to in the course.
@@ -715,7 +715,7 @@ returns the context ids for the groups the user belongs to in the course.
 
 
 ```
-1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,...
+"1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,..."
 ```
 ## Membership.role
 Returns the [IMS LTI membership service](https://www.imsglobal.org/specs/ltimemv1p0/specification-3) roles for filtering via query parameters.
@@ -725,7 +725,7 @@ Or, for LTI 1.3 tools, returns the [IMS LTI Names and Role Provisioning Service]
 **Launch Parameter**: *roles*  
 
 ```
-http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
+"http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
 ```
 ## Canvas.xuser.allRoles [duplicates ext_roles which is sent by default]
 Returns list of [LIS role full URNs](https://www.imsglobal.org/specs/ltiv1p0/implementation-guide#toc-16).
@@ -741,7 +741,7 @@ System role urns start with "urn:lti:sysrole" and include roles for the entire s
 
 
 ```
-urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:sysrole:ims/lis/SysAdmin,urn:lti:sysrole:ims/lis/User
+"urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:sysrole:ims/lis/SysAdmin,urn:lti:sysrole:ims/lis/User"
 ```
 ## com.instructure.User.allRoles
 Same as "Canvas.xuser.allRoles", but uses roles formatted for LTI Advantage.
@@ -780,7 +780,7 @@ This may not be the pseudonym the user is actually logged in with.
 
 
 ```
-jdoe
+"jdoe"
 ```
 ## Canvas.user.loginId [duplicates User.username]
 Username/Login ID for the primary pseudonym for the user for the account.
@@ -790,7 +790,7 @@ This may not be the pseudonym the user is actually logged in with.
 
 
 ```
-jdoe
+"jdoe"
 ```
 ## Canvas.user.sisSourceId [duplicates Person.sourcedId]
 Returns the sis source id for the primary pseudonym for the user for the account
@@ -800,7 +800,7 @@ This may not be the pseudonym the user is actually logged in with.
 
 
 ```
-sis_user_42
+"sis_user_42"
 ```
 ## Canvas.user.sisIntegrationId
 Returns the integration id for the primary pseudonym for the user for the account
@@ -810,7 +810,7 @@ This may not be the pseudonym the user is actually logged in with.
 
 
 ```
-integration_user_42
+"integration_user_42"
 ```
 ## Person.sourcedId [duplicates Canvas.user.sisSourceId]
 Returns the sis source id for the primary pseudonym for the user for the account
@@ -820,7 +820,7 @@ This may not be the pseudonym the user is actually logged in with.
 **Launch Parameter**: *lis_person_sourcedid*  
 
 ```
-sis_user_42
+"sis_user_42"
 ```
 ## Canvas.logoutService.url
 Returns the logout service url for the user.
@@ -831,7 +831,7 @@ It may not hold all the sis info needed in other launch substitutions.
 
 
 ```
-https://<domain>.instructure.com/api/lti/v1/logout_service/<external_tool_id>-<user_id>-<current_unix_timestamp>-<opaque_string>
+"https://<domain>.instructure.com/api/lti/v1/logout_service/<external_tool_id>-<user_id>-<current_unix_timestamp>-<opaque_string>"
 ```
 ## Canvas.masqueradingUser.id
 Returns the Canvas user_id for the masquerading user.
@@ -853,7 +853,7 @@ It may not hold all the sis info needed in other launch substitutions.
 
 
 ```
-da12345678cb37ba1e522fc7c5ef086b7704eff9
+"da12345678cb37ba1e522fc7c5ef086b7704eff9"
 ```
 ## Canvas.xapi.url
 Returns the xapi url for the user.
@@ -862,7 +862,7 @@ Returns the xapi url for the user.
 
 
 ```
-https://<domain>.instructure.com/api/lti/v1/xapi/<external_tool_id>-<user_id>-<course_id>-<current_unix_timestamp>-<opaque_id>
+"https://<domain>.instructure.com/api/lti/v1/xapi/<external_tool_id>-<user_id>-<course_id>-<current_unix_timestamp>-<opaque_id>"
 ```
 ## Caliper.url
 Returns the caliper url for the user.
@@ -871,7 +871,7 @@ Returns the caliper url for the user.
 
 
 ```
-https://<domain>.instructure.com/api/lti/v1/caliper/<external_tool_id>-<user_id>-<course_id>-<current_unix_timestamp>-<opaque_id>
+"https://<domain>.instructure.com/api/lti/v1/caliper/<external_tool_id>-<user_id>-<course_id>-<current_unix_timestamp>-<opaque_id>"
 ```
 ## Canvas.course.sectionIds
 Returns a comma separated list of section_id's that the user is enrolled in.
@@ -880,7 +880,7 @@ Returns a comma separated list of section_id's that the user is enrolled in.
 
 
 ```
-42, 43
+"42, 43"
 ```
 ## Canvas.course.sectionRestricted
 Returns true if the user can only view and interact with users in their own sections.
@@ -898,7 +898,7 @@ Returns a comma separated list of section sis_id's that the user is enrolled in.
 
 
 ```
-section_sis_id_1, section_sis_id_2
+"section_sis_id_1, section_sis_id_2"
 ```
 ## com.instructure.contextLabel
 Returns the course code.
@@ -907,7 +907,7 @@ Returns the course code.
 **Launch Parameter**: *context_label*  
 
 ```
-CS 124
+"CS 124"
 ```
 ## Canvas.module.id
 Returns the module_id that the module item was launched from.
@@ -954,7 +954,7 @@ from a group assignment.
 **Launch Parameter**: *vnd_canvas_group_name*  
 
 ```
-Group One
+"Group One"
 ```
 ## Canvas.assignment.title
 Returns the title of the assignment that was launched.
@@ -963,7 +963,7 @@ Returns the title of the assignment that was launched.
 
 
 ```
-Deep thought experiment
+"Deep thought experiment"
 ```
 ## Canvas.assignment.pointsPossible
 Returns the points possible of the assignment that was launched.
@@ -1003,7 +1003,7 @@ Only available when launched as an assignment with an `unlock_at` set.
 
 
 ```
-YYYY-MM-DDT07:00:00Z
+2018-02-18T00:00:00Z
 ```
 ## Canvas.assignment.lockAt.iso8601
 Returns the `lock_at` date of the assignment that was launched.
@@ -1013,7 +1013,7 @@ Only available when launched as an assignment with a `lock_at` set.
 
 
 ```
-YYYY-MM-DDT07:00:00Z
+2018-02-20:00:00Z
 ```
 ## Canvas.assignment.dueAt.iso8601
 Returns the `due_at` date of the assignment that was launched.
@@ -1023,7 +1023,7 @@ Only available when launched as an assignment with a `due_at` set.
 
 
 ```
-YYYY-MM-DDT07:00:00Z
+2018-02-19:00:00Z
 ```
 ## Canvas.assignment.published
 Returns true if the assignment that was launched is published.
@@ -1043,7 +1043,7 @@ Only available for LTI 2.0.
 
 
 ```
-https://<domain>.instructure.com/api/lti/tool_settings/<link_id>
+"https://<domain>.instructure.com/api/lti/tool_settings/<link_id>"
 ```
 ## ToolProxyBinding.custom.url
 Returns the endpoint url for accessing context-level tool settings
@@ -1053,7 +1053,7 @@ Only available for LTI 2.0.
 
 
 ```
-https://<domain>.instructure.com/api/lti/tool_settings/<binding_id>
+"https://<domain>.instructure.com/api/lti/tool_settings/<binding_id>"
 ```
 ## ToolProxy.custom.url
 Returns the endpoint url for accessing system-wide tool settings
@@ -1063,7 +1063,7 @@ Only available for LTI 2.0.
 
 
 ```
-https://<domain>.instructure.com/api/lti/tool_settings/<proxy_id>
+"https://<domain>.instructure.com/api/lti/tool_settings/<proxy_id>"
 ```
 ## ToolConsumerProfile.url
 Returns the [Tool Consumer Profile](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-46) url for the tool.
@@ -1073,8 +1073,8 @@ Only available for LTI 2.0.
 
 
 ```
-https://<domain>.instructure.com/api/lti/courses/<course_id>/tool_consumer_profile/<opaque_id>
-https://<domain>.instructure.com/api/lti/accounts/<account_id>/tool_consumer_profile/<opaque_id>
+"https://<domain>.instructure.com/api/lti/courses/<course_id>/tool_consumer_profile/<opaque_id>"
+"https://<domain>.instructure.com/api/lti/accounts/<account_id>/tool_consumer_profile/<opaque_id>"
 ```
 ## vnd.Canvas.OriginalityReport.url
 The originality report LTI2 service endpoint.
@@ -1083,7 +1083,7 @@ The originality report LTI2 service endpoint.
 **Launch Parameter**: *vnd_canvas_originality_report_url*  
 
 ```
-api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report
+"api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report"
 ```
 ## vnd.Canvas.submission.url
 The submission LTI2 service endpoint.
@@ -1092,7 +1092,7 @@ The submission LTI2 service endpoint.
 **Launch Parameter**: *vnd_canvas_submission_url*  
 
 ```
-api/lti/assignments/{assignment_id}/submissions/{submission_id}
+"api/lti/assignments/{assignment_id}/submissions/{submission_id}"
 ```
 ## vnd.Canvas.submission.history.url
 The submission history LTI2 service endpoint.
@@ -1101,7 +1101,7 @@ The submission history LTI2 service endpoint.
 **Launch Parameter**: *vnd_canvas_submission_history_url*  
 
 ```
-api/lti/assignments/{assignment_id}/submissions/{submission_id}/history
+"api/lti/assignments/{assignment_id}/submissions/{submission_id}/history"
 ```
 ## Canvas.file.media.id
 

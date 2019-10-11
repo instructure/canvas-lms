@@ -22,6 +22,6 @@ group :development, :test do
     gem 'mustache', '1.1.0', require: false
     gem 'pygments.rb', '1.2.1', require: false
   gem 'bluecloth', '2.2.0' # for generating api docs
-  gem 'yard', '0.9.5'
+  gem 'yard', '0.9.20'
   gem 'yard-appendix', '0.1.8'
 end
