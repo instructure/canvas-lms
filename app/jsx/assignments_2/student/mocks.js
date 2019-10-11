@@ -41,6 +41,24 @@ async function loadDefaultMocks() {
   return _dynamicDefaultMockImports
 }
 
+const SUBMISSION_QUERY = gql`
+  query SubmissionQuery($submissionID: ID!) {
+    submission(id: "1") {
+      ...Submission
+    }
+  }
+  ${Submission.fragment}
+`
+
+const ASSIGNMENT_QUERY = gql`
+  query AssignmentQuery {
+    assignment(id: "1") {
+      ...Assignment
+    }
+  }
+  ${Assignment.fragment}
+`
+
 // Small wrapper around mockGraphqlQuery which includes our default overrides
 export async function mockQuery(queryAST, overrides = [], variables = {}) {
   if (!Array.isArray(overrides)) {
@@ -52,15 +70,7 @@ export async function mockQuery(queryAST, overrides = [], variables = {}) {
 }
 
 export async function mockAssignment(overrides = []) {
-  const query = gql`
-    query AssignmentQuery {
-      assignment(id: "1") {
-        ...Assignment
-      }
-    }
-    ${Assignment.fragment}
-  `
-  const result = await mockQuery(query, overrides)
+  const result = await mockQuery(ASSIGNMENT_QUERY, overrides)
   const assignment = result.data.assignment
 
   // TODO: Move env out of assignment and into react context.
@@ -75,22 +85,8 @@ export async function mockAssignment(overrides = []) {
 }
 
 export async function mockSubmission(overrides = []) {
-  const query = gql`
-    query SubmissionQuery($submissionID: ID!) {
-      node(id: "1") {
-        ... on Submission {
-          ...Submission
-        }
-      }
-    }
-    ${Submission.fragment}
-  `
-  if (!Array.isArray(overrides)) {
-    overrides = [overrides]
-  }
-  overrides.push({Node: () => ({__typename: 'Submission'})})
-  const result = await mockQuery(query, overrides, {submissionID: '1'})
-  return result.data.node
+  const result = await mockQuery(SUBMISSION_QUERY, overrides, {submissionID: '1'})
+  return result.data.submission
 }
 
 export async function mockAssignmentAndSubmission(overrides = []) {
