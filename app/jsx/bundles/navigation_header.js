@@ -61,7 +61,7 @@ ready(() => {
     }
 
     const DesktopNavComponent = ReactDOM.render(
-      <Navigation onDataRecieved={renderMobileNav} />,
+      <Navigation onDataReceived={renderMobileNav} />,
       globalNavTrayContainer
     )
 
