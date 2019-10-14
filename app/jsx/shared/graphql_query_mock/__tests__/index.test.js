@@ -97,7 +97,9 @@ describe('graphqlMockQuery', () => {
       const promise = mockGraphqlQuery(query, {Assignment: {_id: null}})
       await expect(promise).rejects.toThrow(/The graphql query contained errors/)
     })
+  })
 
+  describe('deep merging', () => {
     it('merges multiple different overrides', async () => {
       const query = `
         query TestQuery {
@@ -131,6 +133,68 @@ describe('graphqlMockQuery', () => {
       const result = await mockGraphqlQuery(query, overrides)
       expect(result.data.assignment.rubric._id).toEqual('1')
       expect(result.data.assignment.rubric.title).toEqual('foobarbaz')
+    })
+
+    it('lets you override an already overridden list with an empty list', async () => {
+      const query = gql`
+        query TestQuery {
+          assignment(id: "1") {
+            submissionsConnection {
+              nodes {
+                _id
+              }
+            }
+          }
+        }
+      `
+      const overrides = [
+        {SubmissionConnection: {nodes: [{_id: '1'}]}},
+        {SubmissionConnection: {nodes: []}}
+      ]
+      const result = await mockGraphqlQuery(query, overrides)
+      expect(result.data.assignment.submissionsConnection.nodes).toEqual([])
+    })
+
+    it('handles deep merging of null', async () => {
+      const query = gql`
+        query TestQuery {
+          assignment(id: "1") {
+            submissionsConnection {
+              nodes {
+                url
+              }
+            }
+          }
+        }
+      `
+      const overrides = [
+        {SubmissionConnection: {nodes: [{url: 'http://foobarbaz.com'}]}},
+        {SubmissionConnection: {nodes: [{url: null}]}}
+      ]
+      const result = await mockGraphqlQuery(query, overrides)
+      const urls = result.data.assignment.submissionsConnection.nodes.map(s => s.url)
+      expect(urls).toEqual([null])
+    })
+
+    it('handles deep merging of undefined', async () => {
+      const query = gql`
+        query TestQuery {
+          assignment(id: "1") {
+            submissionsConnection {
+              nodes {
+                url
+              }
+            }
+          }
+        }
+      `
+      const overrides = [
+        {SubmissionConnection: {nodes: [{url: 'http://foobarbaz.com'}]}},
+        {SubmissionConnection: {nodes: [{url: undefined}]}}
+      ]
+      const result = await mockGraphqlQuery(query, overrides)
+      const urls = result.data.assignment.submissionsConnection.nodes.map(s => s.url)
+      expect(urls).toEqual(['http://graphql-mocked-url.com']) // Goes back to the default scalar mock
     })
   })
 

@@ -19,12 +19,21 @@ import {addMockFunctionsToSchema, makeExecutableSchema} from 'graphql-tools'
 import {addTypenameToDocument} from 'apollo-utilities'
 import {graphql} from 'graphql'
 import gql from 'graphql-tag'
-import {merge} from 'lodash'
+import {mergeWith} from 'lodash'
 import {print} from 'graphql/language/printer'
 import schemaString from '../../../../schema.graphql'
 
 // Mock our custom scalar values in the canvas graphql schema
 const DEFAULT_MOCKS = [{URL: 'http://graphql-mocked-url.com'}, {DateTime: null}]
+
+// Allow you to merge and replace an existing array with an empty array.
+// https://github.com/lodash/lodash/issues/1313
+function emptyArrayReplaceCustomizer(obj, src) {
+  if (Array.isArray(src)) {
+    return src
+  }
+  return undefined
+}
 
 // Get and cache the valid types that can be mocked
 let _typeIntrospectionSet = null
@@ -81,7 +90,7 @@ async function createMocks(overrides = []) {
       if (typeof overrideValues !== 'object' || overrideValues === null) {
         mocks[key] = () => overrideValues
       } else {
-        mocks[key] = () => merge(defaultValues, overrideValues)
+        mocks[key] = () => mergeWith(defaultValues, overrideValues, emptyArrayReplaceCustomizer)
       }
     })
   })
