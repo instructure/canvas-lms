@@ -269,10 +269,8 @@ $(function() {
   if ($breadcrumbs.length) {
     let $breadcrumbEllipsis
     let addedEllipsisClass = false
-    // we want to make sure that the breadcrumb doesnt wrap multiple lines, the way we are going to check if it is one line
-    // is by grabbing the first (which should be the home crumb) and checking to see how high it is, the * 1.5 part is
-    // just in case to ever handle any padding or margin.
-    const hightOfOneBreadcrumb = $breadcrumbs.find('li:visible:first').height() * 1.5
+    // if we ever change the styling of the breadcrumbs so their height changes, change this too. the * 1.5 part is just in case to ever handle any padding or margin.
+    const hightOfOneBreadcrumb = 27 * 1.5
 
     const resizeBreadcrumb = () => {
       let maxWidth = 500
