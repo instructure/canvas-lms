@@ -29,6 +29,14 @@ import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import {Avatar, Badge, Text} from '@instructure/ui-elements'
 import contentShareShape from 'jsx/shared/proptypes/contentShare'
 
+const friendlyShareNames = {
+  assignment: I18n.t('Assignment'),
+  discussion_topic: I18n.t('Discussion Topic'),
+  module: I18n.t('Module'),
+  page: I18n.t('Page'),
+  quiz: I18n.t('Quiz')
+}
+
 ReceivedTable.propTypes = {
   shares: arrayOf(contentShareShape),
   onPreview: func,
@@ -79,7 +87,7 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove}) {
         <Table.Cell textAlign="end">{renderUnreadBadge(share.read_state)}</Table.Cell>
         <Table.Cell>{share.name}</Table.Cell>
         <Table.Cell>
-          <Text transform="capitalize">{share.content_type}</Text>
+          <Text>{friendlyShareNames[share.content_type]}</Text>
         </Table.Cell>
         <Table.Cell>
           <Avatar
