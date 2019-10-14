@@ -182,7 +182,9 @@ class StepItem extends Component {
             <ButtonContext.Consumer>{context => this.renderIcon(context)}</ButtonContext.Consumer>
           </span>
         </span>
-        <span className="step-item-label">{this.renderLabel()}</span>
+        <span className="step-item-label" aria-hidden={this.props.status === 'button'}>
+          {this.renderLabel()}
+        </span>
       </span>
     )
   }
