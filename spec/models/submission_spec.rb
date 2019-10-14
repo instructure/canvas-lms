@@ -5096,7 +5096,14 @@ describe Submission do
           expect(submission).to be_posted
         end
 
-        it "does not post the submission if the comment is not from an instructor" do
+        it "posts the submission if the comment is from an admin" do
+          admin = User.create!
+          course.root_account.account_users.create!(user: admin)
+          submission.add_comment(comment_params.merge({author: admin}))
+          expect(submission).to be_posted
+        end
+
+        it "does not post the submission if the comment is not from an instructor or admin" do
           submission.add_comment(comment_params.merge({author: student}))
           expect(submission).not_to be_posted
         end
