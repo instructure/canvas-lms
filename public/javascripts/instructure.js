@@ -271,20 +271,24 @@ $(function() {
     let addedEllipsisClass = false
     // if we ever change the styling of the breadcrumbs so their height changes, change this too. the * 1.5 part is just in case to ever handle any padding or margin.
     const hightOfOneBreadcrumb = 27 * 1.5
+    let taskID
 
     const resizeBreadcrumb = () => {
-      let maxWidth = 500
-      $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible')
-      $breadcrumbEllipsis.ifExists(() => {
-        $breadcrumbEllipsis.css('maxWidth', '')
-        for (let i = 0; $breadcrumbs.height() > hightOfOneBreadcrumb && i < 20; i++) {
-          // the i here is just to make sure we don't get into an ifinite loop somehow
-          if (!addedEllipsisClass) {
-            addedEllipsisClass = true
-            $breadcrumbEllipsis.addClass('ellipsis')
+      if (taskID) (cancelIdleCallback || cancelAnimationFrame)(taskID)
+      taskID = (requestIdleCallback || requestAnimationFrame)(() => {
+        let maxWidth = 500
+        $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible')
+        $breadcrumbEllipsis.ifExists(() => {
+          $breadcrumbEllipsis.css('maxWidth', '')
+          for (let i = 0; $breadcrumbs.height() > hightOfOneBreadcrumb && i < 20; i++) {
+            // the i here is just to make sure we don't get into an ifinite loop somehow
+            if (!addedEllipsisClass) {
+              addedEllipsisClass = true
+              $breadcrumbEllipsis.addClass('ellipsis')
+            }
+            $breadcrumbEllipsis.css('maxWidth', (maxWidth -= 20))
           }
-          $breadcrumbEllipsis.css('maxWidth', (maxWidth -= 20))
-        }
+        })
       })
     }
     resizeBreadcrumb() // force it to run once right now
