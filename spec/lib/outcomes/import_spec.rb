@@ -353,6 +353,12 @@ RSpec.describe Outcomes::Import do
       expect(existing_outcome.reload).to have_attributes outcome_attributes
     end
 
+    it 'restores deleted outcome' do
+      existing_outcome.update!(workflow_state: 'deleted')
+      importer.import_outcome(**outcome_attributes.merge(workflow_state: ''))
+      expect(existing_outcome.reload.workflow_state).to eq 'active'
+    end
+
     it 'fails if outcome has already appeared in import' do
       importer.import_outcome(outcome_attributes)
       expect do
