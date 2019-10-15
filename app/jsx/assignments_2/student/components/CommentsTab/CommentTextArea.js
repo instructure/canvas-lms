@@ -69,6 +69,7 @@ export default class CommentTextArea extends Component {
   optimisticResponse() {
     return {
       createSubmissionComment: {
+        errors: null,
         submissionComment: {
           _id: 'pending',
           attachments: [],

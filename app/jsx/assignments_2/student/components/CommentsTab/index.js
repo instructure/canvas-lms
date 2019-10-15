@@ -27,7 +27,7 @@ import React from 'react'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 import {Submission} from '../../graphqlData/Submission'
 
-function CommentsTab(props) {
+export default function CommentsTab(props) {
   const queryVariables = {
     submissionId: props.submission.id,
     submissionAttempt: props.submission.attempt
@@ -71,5 +71,3 @@ CommentsTab.propTypes = {
   assignment: Assignment.shape,
   submission: Submission.shape
 }
-
-export default React.memo(CommentsTab)
