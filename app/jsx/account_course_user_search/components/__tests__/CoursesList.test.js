@@ -168,7 +168,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
             total_students: 'Click to sort by number of students descending'
           }[columnID] || `Click to sort by ${label} descending`
 
-        expect(header.find('Tooltip').prop('tip')).toMatch(RegExp(expectedTip, 'i'))
+        expect(
+          header
+            .find('Tooltip')
+            .first()
+            .prop('tip')
+        ).toMatch(RegExp(expectedTip, 'i'))
         expect(header.text()).toMatch(label)
       })
 
@@ -194,7 +199,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
             total_students: 'Click to sort by number of students ascending'
           }[columnID] || `Click to sort by ${label} ascending`
 
-        expect(header.find('Tooltip').prop('tip')).toMatch(RegExp(expectedTip, 'i'))
+        expect(
+          header
+            .find('Tooltip')
+            .first()
+            .prop('tip')
+        ).toMatch(RegExp(expectedTip, 'i'))
         expect(header.text()).toMatch(label)
       })
 

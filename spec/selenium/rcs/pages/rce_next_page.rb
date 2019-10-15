@@ -339,7 +339,7 @@ module RCENextPage
   end
 
   def decorative_options_checkbox
-    f('[data-cid="Checkbox"]')
+    fxpath('//div/input[@type="checkbox"]/..')
   end
 
   # ---------------------- Actions ----------------------

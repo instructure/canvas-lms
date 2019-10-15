@@ -29,7 +29,7 @@ module PostGradesTray
   end
 
   def self.unposted_count_indicator
-    fxpath("//span[@data-cid='Badge']/span")
+    f('#PostAssignmentGradesTray__Layout__UnpostedSummary span[id]')
   end
 
   def self.unposted_count
