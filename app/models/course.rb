@@ -450,7 +450,7 @@ class Course < ActiveRecord::Base
   def image
     @image ||= if self.image_id.present?
       self.shard.activate do
-        self.attachments.active.where(id: self.image_id).take&.public_download_url
+        self.attachments.active.where(id: self.image_id).take&.public_download_url(1.year)
       end
     elsif self.image_url
       self.image_url
