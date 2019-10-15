@@ -23,7 +23,7 @@ import {Table} from '@instructure/ui-table'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
-import {IconMoreLine, IconEyeLine, IconImportLine} from '@instructure/ui-icons'
+import {IconMoreLine, IconEyeLine, IconImportLine, IconTrashLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-layout'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import {Avatar, Badge, Text} from '@instructure/ui-elements'
@@ -32,10 +32,11 @@ import contentShareShape from 'jsx/shared/proptypes/contentShare'
 ReceivedTable.propTypes = {
   shares: arrayOf(contentShareShape),
   onPreview: func,
-  onImport: func
+  onImport: func,
+  onRemove: func
 }
 
-export default function ReceivedTable({shares, onPreview, onImport}) {
+export default function ReceivedTable({shares, onPreview, onImport, onRemove}) {
   function renderActionMenu(share) {
     return (
       <Menu
@@ -53,6 +54,9 @@ export default function ReceivedTable({shares, onPreview, onImport}) {
         </Menu.Item>
         <Menu.Item data-testid="import-menu-action" onSelect={() => onImport(share)}>
           <IconImportLine /> <View margin="0 0 0 x-small">{I18n.t('Import')}</View>
+        </Menu.Item>
+        <Menu.Item data-testid="remove-menu-action" onSelect={() => onRemove(share)}>
+          <IconTrashLine /> <View margin="0 0 0 x-small">{I18n.t('Remove')}</View>
         </Menu.Item>
       </Menu>
     )

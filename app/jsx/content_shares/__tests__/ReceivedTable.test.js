@@ -93,4 +93,12 @@ describe('content shares table', () => {
     expect(onImport).toHaveBeenCalledWith(assignmentShare)
     expect(onPreview).toHaveBeenCalledTimes(0)
   })
+
+  it('triggers handler for remove menu action', () => {
+    const onRemove = jest.fn()
+    const {getByText} = render(<ReceivedTable shares={[assignmentShare]} onRemove={onRemove} />)
+    fireEvent.click(getByText(/manage options/i))
+    fireEvent.click(getByText('Remove'))
+    expect(onRemove).toHaveBeenCalledWith(assignmentShare)
+  })
 })

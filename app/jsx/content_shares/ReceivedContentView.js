@@ -24,6 +24,8 @@ import ReceivedTable from './ReceivedTable'
 import PreviewModal from './PreviewModal'
 import {Spinner, Text} from '@instructure/ui-elements'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
+import doFetchApi from 'jsx/shared/effects/doFetchApi'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
 const CourseImportPanel = lazy(() => import('./CourseImportPanel'))
 const NoContent = () => <Text size="large">{I18n.t('No content has been shared with you.')}</Text>
@@ -44,6 +46,10 @@ export default function ReceivedContentView() {
     path: getSharesUrl
   })
 
+  function removeShareFromList(doomedShare) {
+    setShares(shares.filter(share => share.id !== doomedShare.id))
+  }
+
   function onPreview(share) {
     setCurrentContentShare(share)
     setWhichModalOpen('preview')
@@ -52,6 +58,18 @@ export default function ReceivedContentView() {
   function onImport(share) {
     setCurrentContentShare(share)
     setWhichModalOpen('import')
+  }
+
+  function onRemove(share) {
+    // eslint-disable-next-line no-alert
+    const shouldRemove = window.confirm(I18n.t('Are you sure you wan to remove this item?'))
+    if (shouldRemove) {
+      doFetchApi({path: `/api/v1/users/self/content_shares/${share.id}`, method: 'DELETE'})
+        .then(() => removeShareFromList(share))
+        .catch(err =>
+          showFlashAlert({message: I18n.t('There was an error removing the item'), err})
+        )
+    }
   }
 
   function closeModal() {
@@ -63,7 +81,14 @@ export default function ReceivedContentView() {
 
     if (isLoading) return <Spinner renderTitle={I18n.t('Loading')} />
     if (someContent)
-      return <ReceivedTable shares={shares} onPreview={onPreview} onImport={onImport} />
+      return (
+        <ReceivedTable
+          shares={shares}
+          onPreview={onPreview}
+          onImport={onImport}
+          onRemove={onRemove}
+        />
+      )
     return <NoContent />
   }
 

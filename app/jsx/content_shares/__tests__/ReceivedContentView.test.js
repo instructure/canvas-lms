@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import ReceivedContentView from 'jsx/content_shares/ReceivedContentView'
 import {assignmentShare} from 'jsx/content_shares/__tests__/test-utils'
+import fetchMock from 'fetch-mock'
 
 jest.mock('jsx/shared/effects/useFetchApi')
 
@@ -102,5 +103,67 @@ describe('view of received content', () => {
     fireEvent.click(getByText(/manage options/i))
     fireEvent.click(getByText('Import'))
     expect(await findByText(/select a course/i)).toBeInTheDocument()
+  })
+
+  describe('remove', () => {
+    const oldWindowConfirm = window.confirm
+
+    beforeEach(() => {
+      window.confirm = jest.fn()
+    })
+
+    afterEach(() => {
+      window.confirm = oldWindowConfirm
+      fetchMock.restore()
+    })
+
+    it('removes a content share when requested', async () => {
+      const shares = [assignmentShare]
+      useFetchApi.mockImplementationOnce(({loading, success}) => {
+        loading(false)
+        success(shares)
+      })
+      fetchMock.mock(`path:/api/v1/users/self/content_shares/${assignmentShare.id}`, 200, {
+        method: 'DELETE'
+      })
+      window.confirm.mockImplementation(() => true)
+      const {getByText, queryByText} = render(<ReceivedContentView />)
+      fireEvent.click(getByText(/manage options/i))
+      fireEvent.click(getByText('Remove'))
+      await act(() => fetchMock.flush(true))
+      expect(queryByText(assignmentShare.name)).toBeNull()
+    })
+
+    it('does nothing when user declines to remove', async () => {
+      const shares = [assignmentShare]
+      useFetchApi.mockImplementationOnce(({loading, success}) => {
+        loading(false)
+        success(shares)
+      })
+      window.confirm.mockImplementation(() => false)
+      jest.spyOn(window, 'fetch')
+      const {getByText} = render(<ReceivedContentView />)
+      fireEvent.click(getByText(/manage options/i))
+      fireEvent.click(getByText('Remove'))
+      expect(window.fetch).not.toHaveBeenCalled()
+      expect(getByText(assignmentShare.name)).toBeInTheDocument()
+    })
+
+    it('displays an error when the fetch fails', async () => {
+      const shares = [assignmentShare]
+      useFetchApi.mockImplementationOnce(({loading, success}) => {
+        loading(false)
+        success(shares)
+      })
+      fetchMock.mock(`path:/api/v1/users/self/content_shares/${assignmentShare.id}`, 401, {
+        method: 'DELETE'
+      })
+      window.confirm.mockImplementation(() => true)
+      const {getByText, getAllByText} = render(<ReceivedContentView />)
+      fireEvent.click(getByText(/manage options/i))
+      fireEvent.click(getByText('Remove'))
+      await act(() => fetchMock.flush(true))
+      expect(getAllByText(/401/)[0]).toBeInTheDocument()
+    })
   })
 })
