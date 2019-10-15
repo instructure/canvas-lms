@@ -121,7 +121,11 @@ I18n.n = I18n.localizeNumber = (value, options = {}) => {
     precision: options.precision != null ? options.precision : 5
   }
   const method = options.percentage ? 'toPercentage' : 'toNumber'
-  return I18n[method](value, format)
+  if (value && value.toString().match(/e/)) {
+    return value.toString()
+  } else {
+    return I18n[method](value, format)
+  }
 }
 
 const padding = (n, pad = '00', len = 2) => {
