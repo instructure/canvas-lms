@@ -102,6 +102,9 @@ pipeline {
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
     CACHE_TAG = "canvas-lms:previous-image"
+    POSTGRES_CACHE_TAG = "canvas-lms:previous-postgres-image"
+    CASSANDRA_CACHE_TAG = "canvas-lms:previous-cassandra-image"
+    DYNAMODB_CACHE_TAG = "canvas-lms:previous-dynamodb-image"
   }
 
   stages {
@@ -216,11 +219,16 @@ pipeline {
           steps {
             skipIfPreviouslySuccessful("smoke-test") {
               timeout(time: 10) {
-                sh 'build/new-jenkins/docker-compose-pull.sh'
-                sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
-                sh 'build/new-jenkins/docker-compose-build-up.sh'
-                sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-                sh 'build/new-jenkins/smoke-test.sh'
+                script {
+                  sh 'build/new-jenkins/docker-compose-pull.sh'
+                  sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+                  def dbCommon = load 'build/new-jenkins/groovy/cache-migrations.groovy'
+                  dbCommon.createMigrateBuildUpCached()
+                  sh 'build/new-jenkins/smoke-test.sh'
+                  if (env.GERRIT_EVENT_TYPE == 'change-merged') {
+                    dbCommon.storeMigratedImages()
+                  }
+                }
               }
             }
           }
@@ -355,3 +363,4 @@ pipeline {
     }
   }
 }
+
