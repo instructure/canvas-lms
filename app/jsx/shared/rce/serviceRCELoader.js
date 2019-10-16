@@ -59,7 +59,8 @@ let loadingPromise
 
 const RCELoader = {
   preload(cb) {
-    this.loadRCE(cb)
+    // since we are just preloading, let other stuff waiting to run go first so we don't slow pageload
+    ;(window.requestIdleCallback || window.setTimeout)(() => this.loadRCE(cb))
   },
 
   loadOnTarget(target, tinyMCEInitOptions, callback) {
