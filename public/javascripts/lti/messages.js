@@ -22,6 +22,7 @@ import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 import htmlEscape from 'str/htmlEscape'
 import ToolLaunchResizer from './tool_launch_resizer'
+import handleLtiPostMessage from './post_message/handleLtiPostMessage'
 
 let beforeUnloadHandler
 function setUnloadMessage(msg) {
@@ -51,31 +52,12 @@ function findDomForWindow(sourceWindow) {
 }
 
 export function ltiMessageHandler(e) {
-  const {messageType, data} = e.data
-  if (messageType) {
-    if (messageType === 'requestFullWindowLaunch') {
-      let context = ENV.context_asset_string.replace('_', 's/')
-      if (!(context.startsWith('account') || context.startsWith('course'))) {
-        context = 'accounts/' + ENV.DOMAIN_ROOT_ACCOUNT_ID
-      }
-
-      const tool_launch_url = new URL(data)
-      tool_launch_url.searchParams.append('full_win_launch_requested', '1')
-      // xsslint safeString.property window.location
-      tool_launch_url.searchParams.append('platform_redirect_url', window.location)
-
-      const launch_url = `${
-        window.location.origin
-      }/${context}/external_tools/retrieve?display=borderless&url=${encodeURIComponent(
-        tool_launch_url.toString()
-      )}`
-      window.location.assign(launch_url)
-    } else {
-      console.error(`invalid messageType: ${e.data.messageType}`)
-    }
+  if (e.data.messageType) {
+    handleLtiPostMessage(e)
     return
   }
 
+  // Legacy post message handlers
   try {
     const message = JSON.parse(e.data)
     switch (message.subject) {
