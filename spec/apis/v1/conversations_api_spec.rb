@@ -987,7 +987,6 @@ describe ConversationsController, type: :request do
                   "id" => forwarded_message.id, "created_at" => forwarded_message.created_at.to_json[1, 20], "body" => "test", "author_id" => @bob.id, "generated" => false, "media_comment" => nil, "forwarded_messages" => [],
                   "attachments" => [{
                     'filename' => attachment.filename,
-                    'workflow_state' => 'processed',
                     'url' => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                     'content-type' => 'image/png',
                     'display_name' => 'test my file? hai!&.png',
@@ -1250,7 +1249,6 @@ describe ConversationsController, type: :request do
             "attachments" => [
               {
                 "filename" => "test.txt",
-                "workflow_state" => "processed",
                 "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
                 "content-type" => "unknown/unknown",
                 "display_name" => "test.txt",
