@@ -1809,6 +1809,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  def participating_current_and_concluded_course_ids
+    cached_course_ids('current_and_concluded') do |enrollments|
+      enrollments.current_and_concluded.not_inactive_by_date_ignoring_access
+    end
+  end
+
   def participating_student_current_and_concluded_course_ids
     cached_course_ids('student_current_and_concluded') do |enrollments|
       enrollments.current_and_concluded.not_inactive_by_date_ignoring_access.where(type: %w{StudentEnrollment StudentViewEnrollment})
