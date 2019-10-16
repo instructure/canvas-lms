@@ -41,13 +41,20 @@ export default class CoursesListRow extends React.Component {
     name: string.isRequired,
     workflow_state: string.isRequired,
     total_students: number.isRequired,
-    teachers: arrayOf(shape(UserLink.propTypes)),
+    teachers: arrayOf(
+      shape({
+        size: UserLink.propTypes.size,
+        href: UserLink.propTypes.href,
+        display_name: UserLink.propTypes.name,
+        avatar_url: UserLink.propTypes.src
+      })
+    ),
     teacher_count: number,
     sis_course_id: string,
     subaccount_name: string.isRequired,
     term: shape({name: string.isRequired}).isRequired,
     roles: arrayOf(shape({id: string.isRequired})),
-    showSISIds: bool.isRequired,
+    showSISIds: bool,
     can_create_enrollments: bool,
     blueprint: bool,
     concluded: bool
