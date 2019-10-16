@@ -132,26 +132,31 @@ module AccountReports
         root_account.enrollment_terms.active :
         root_account.enrollment_terms.where(id: @account_report.parameters[:enrollment_term_id])
 
-      term_reports = terms.reduce({}) do |reports, term|
-        reports[term.name] = mgp_term_csv(term)
-        reports
-      end
+      courses = root_account.all_courses.order(:id)
+      courses = courses.where(enrollment_term_id: terms)
+      courses = add_course_sub_account_scope(courses)
+      courses = courses.active unless @include_deleted
+      total = courses.count
 
-      send_report(term_reports)
+      term_reports = terms.each_with_object({}) do |term, reports|
+        header = mgp_term_header(term)
+        if header
+          reports[term.name] = header
+          courses.where(enrollment_term_id: term).find_ids_in_batches(batch_size: 10_000) { |batch| create_report_runners(batch, total) } unless total == 0
+        else
+          # for parallel reports we need to have at least runner to be able to finish the report
+          @runner ||= @account_report.account_report_runners.create!
+          reports[term.name] = [I18n.t("no grading periods configured for this term")]
+        end
+      end
+      # if we made a runner for an empty term, we can mark it as completed.
+      @runner&.complete
+      write_report_in_batches([], files: term_reports)
     end
 
-    def mgp_term_csv(term)
-      students = student_grade_scope
-      students = students.where(c: {enrollment_term_id: term})
-
+    def mgp_term_header(term)
       gp_set = term.grading_period_group
-      unless gp_set
-        not_found = Tempfile.open(%w[not-found csv])
-        not_found.puts I18n.t("no grading periods configured for this term")
-        not_found.close
-        return not_found
-      end
-      grading_periods = gp_set.grading_periods.active.order(:start_date)
+      return false unless gp_set
 
       headers = []
       headers << I18n.t('student name')
@@ -169,7 +174,7 @@ module AccountReports
       headers << I18n.t('term sis')
       headers << I18n.t('grading period set')
       headers << I18n.t('grading period set id')
-      grading_periods.each do |gp|
+      gp_set.grading_periods.active.order(:start_date).each do |gp|
         headers << I18n.t('%{name} grading period id', name: gp.title)
         headers << I18n.t('%{name} current score', name: gp.title)
         headers << I18n.t('%{name} final score', name: gp.title)
@@ -185,54 +190,57 @@ module AccountReports
         headers << I18n.t('%{name} override grade', name: gp.title) if include_override_score?
       end
       headers.concat(grading_field_headers)
+    end
 
-      generate_and_run_report headers do |csv|
-        course_ids = root_account.all_courses.where(:enrollment_term_id => term).order(:id).pluck(:id)
-        course_ids.each_slice(1000) do |batched_course_ids|
-          courses_by_id = Course.where(id: course_ids).preload(:grading_standard).index_by(&:id)
-          students.where(:course_id => batched_course_ids).preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-            users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
-            users.uniq!
-            users_by_id = users.index_by(&:id)
-            pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
-            students_by_course = student_chunk.group_by { |x| x.course_id }
-            students_by_course.each do |course_id, course_students|
-              scores = indexed_scores(course_students, grading_periods)
-              course_students.each do |student|
-                p = loaded_pseudonym(pseudonyms,
-                                     users_by_id[student.user_id],
-                                     include_deleted: @include_deleted,
-                                     enrollment: student)
-                next unless p
-                course = courses_by_id[student["course_id"]]
-                arr = []
-                arr << student["user_name"]
-                arr << student["user_id"]
-                arr << p.sis_user_id
-                arr << p.integration_id if include_integration_id?
-                arr << student["course_name"]
-                arr << student["course_id"]
-                arr << student["course_sis_id"]
-                arr << student["section_name"]
-                arr << student["course_section_id"]
-                arr << student["section_sis_id"]
-                arr << student["term_name"]
-                arr << student["term_id"]
-                arr << student["term_sis_id"]
-                arr << gp_set.title
-                arr << gp_set.id
+    def mgp_grade_export_runner(runner)
+      term = root_account.enrollment_terms.where(id: root_account.all_courses.where(id: runner.batch_items.first).select(:enrollment_term_id)).take
+      gp_set = term.grading_period_group
+      grading_periods = gp_set.grading_periods.active.order(:start_date)
+      return unless grading_periods
 
-                grading_periods.each do |gp|
-                  scores_for_student = grading_period_scores_for_student(student, gp, scores)
+      students = student_grade_scope.where(course_id: runner.batch_items)
+      courses_by_id = Course.where(id: runner.batch_items).preload(:grading_standard).index_by(&:id)
+      students.where(course_id: runner.batch_items).preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
+        users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
+        users.uniq!
+        users_by_id = users.index_by(&:id)
+        pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
+        students_by_course = student_chunk.group_by { |x| x.course_id }
+        students_by_course.each do |_course_id, course_students|
+          scores = indexed_scores(course_students, grading_periods)
+          course_students.each_with_index do |student, i|
+            p = loaded_pseudonym(pseudonyms,
+                                 users_by_id[student.user_id],
+                                 include_deleted: @include_deleted,
+                                 enrollment: student)
+            next unless p
+            course = courses_by_id[student["course_id"]]
+            arr = []
+            arr << student["user_name"]
+            arr << student["user_id"]
+            arr << p.sis_user_id
+            arr << p.integration_id if include_integration_id?
+            arr << student["course_name"]
+            arr << student["course_id"]
+            arr << student["course_sis_id"]
+            arr << student["section_name"]
+            arr << student["course_section_id"]
+            arr << student["section_sis_id"]
+            arr << student["term_name"]
+            arr << student["term_id"]
+            arr << student["term_sis_id"]
+            arr << gp_set.title
+            arr << gp_set.id
 
-                  arr << gp.id
-                  arr.concat(grading_period_grading_field_values(scores_for_student: scores_for_student))
-                end
+            grading_periods.each do |gp|
+              scores_for_student = grading_period_scores_for_student(student, gp, scores)
 
-                arr.concat(grading_field_values(student: student, course: course))
-                csv << arr
-              end
+              arr << gp.id
+              arr.concat(grading_period_grading_field_values(scores_for_student: scores_for_student))
             end
+
+            arr.concat(grading_field_values(student: student, course: course))
+            add_report_row(row: arr, row_number: i, report_runner: runner, file: term.name)
           end
         end
       end
@@ -302,9 +310,7 @@ module AccountReports
            AND enrollments.workflow_state IN ('active', 'completed')
            AND sc.workflow_state <> 'deleted'")
       end
-
-      # this can be removed when both reports are using parallel
-      students = add_course_sub_account_scope(students, 'c')
+      students
     end
 
     def include_override_score?
