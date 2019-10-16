@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import getCookie from './shared/helpers/getCookie'
 import gql from 'graphql-tag'
 import {ApolloClient} from 'apollo-client'
 import {InMemoryCache, IntrospectionFragmentMatcher} from 'apollo-cache-inmemory'
@@ -43,7 +43,7 @@ function setHeadersLink() {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'GraphQL-Metrics': true,
-        'X-CSRF-Token': $.cookie('_csrf_token')
+        'X-CSRF-Token': getCookie('_csrf_token')
       }
     })
     return forward(operation)

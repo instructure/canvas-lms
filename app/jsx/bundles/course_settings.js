@@ -25,7 +25,6 @@ import CourseImageSelector from '../course_settings/components/CourseImageSelect
 import BlueprintLockOptions from '../blueprint_courses/components/BlueprintLockOptions'
 import configureStore from '../course_settings/store/configureStore'
 import initialState from '../course_settings/store/initialState'
-import 'jquery.cookie'
 import 'course_settings'
 import 'grading_standards'
 

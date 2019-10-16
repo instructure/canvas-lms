@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
+import 'jquery.cookie'
 
 export default function submitHtmlForm(action, method, md5) {
   $(`

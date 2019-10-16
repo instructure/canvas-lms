@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'jquery.cookie'
+import getCookie from '../../app/jsx/shared/helpers/getCookie'
 
 // monkey patch jquery's JSON parsing so we can have all of our ajax responses return with
 // 'while(1);' prepended to them to protect against a CSRF attack vector.
@@ -86,7 +86,7 @@ $.ajaxPrefilter('json', (options, originalOptions, jqXHR) => {
 
 // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
 const CSRFProtection = function(xhr) {
-  const csrfToken = $.cookie('_csrf_token')
+  const csrfToken = getCookie('_csrf_token')
   if (csrfToken) xhr.setRequestHeader('X-CSRF-Token', csrfToken)
 }
 
