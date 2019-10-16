@@ -1544,7 +1544,14 @@ class Assignment < ActiveRecord::Base
       visible_to_user?(user) &&
       !excused_for?(user)
     }
-    can :submit and can :attach_submission_comment_files
+    can :submit
+
+    given do |user, session|
+      (submittable_type? || submission_types == "discussion_topic") &&
+      context.grants_right?(user, session, :participate_as_student) &&
+      visible_to_user?(user)
+    end
+    can :attach_submission_comment_files
 
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
     can :read

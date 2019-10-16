@@ -4086,6 +4086,15 @@ describe Assignment do
       })
     end
 
+    context "to attach submission comment files" do
+      it 'is true when a student can read an assignment but the assignment is locked' do
+        @assignment.lock_at = 1.week.ago
+        @assignment.submission_types = 'online_upload'
+        @assignment.save!
+        expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be true
+      end
+    end
+
     context "to delete" do
       context "when there are no grading periods" do
         it "is true for admins" do
