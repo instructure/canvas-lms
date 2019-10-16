@@ -5580,8 +5580,8 @@ QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
       }
     })
     this.gradebook.setAssignmentGroups({
-      '1': {id: '1'},
-      '2': {id: '2'}
+      '1': {id: '1', name: 'First'},
+      '2': {id: '2', name: 'Second'}
     })
     sinon.spy(this.gradebook, 'setFilterColumnsBySetting')
     sandbox.spy($, 'ajaxJSON')
