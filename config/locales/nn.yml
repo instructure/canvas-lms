@@ -4211,9 +4211,13 @@ nn:
   can_create_and_update_submission_results_for_assig_51e7033d: "Kan opprette og oppdatere innleveringsresultata for oppgåver tilknytta verktøyet."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "Kan opprette og sjå oppgåvedata som er tilknytta verktøyet i vurderingsoversikta."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "kan opprette, endre namn på og redigere sider som standard"
+  can_create_subscription_to_data_service_data_bb2874f2: "Kan opprette abonnement til datateneste-data."
+  can_destroy_subscription_to_data_service_data_b8dfca27: "Kan fjerne abonnement til datateneste-data."
   can_edit_this_page_role_selection_6ccec3c7: "Kan redigere denne sida"
   can_interact_with_users_in_their_section_only_48cb8c43: "Kan berre sjå brukarar frå eigen seksjon"
+  can_list_categorized_event_types_52596f7: "Kan liste kategoriserte hendingstypar."
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "Kan hente brukardata knytta til konteksten verktøyet er installert i."
+  can_show_subscription_to_data_service_data_688ce3: "Kan vise abonnement til datateneste-data."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikkje rekne ut poengsum før ei oppgåve har moglege poeng"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: |-
       
@@ -4226,6 +4230,7 @@ nn:
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Kan ikkje fjerne publisering av %{item_name} dersom det finst studentinnleveringar"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Kan ikkje fjerne publisering av %{name} dersom det finst studentinnleveringar"
   can_update_public_jwk_for_lti_services_26037129: "Kan oppdatere offentleg jwk for LTI-tenester."
+  can_update_subscription_to_data_service_data_374a0c89: "Kan oppdatere abonnement datateneste-data."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Kan sjå oppgåvedata som er tilknytta verktøyet i vurderingsoversikta."
   can_view_submission_data_for_assignments_associate_dd06f583: "Kan sjå innleveringsdata for oppgåver som er tilknytta verktøyet."
   canada_1_921df67a: "Canada (+1)"
@@ -4341,6 +4346,7 @@ nn:
   canvas_ticketing_email_connector_27e253ae: "Koplingspunkt for Canvas Ticketing e-post"
   canvas_ticketing_web_post_connector_11158897: "Koplingspunkt for Canvas Ticketing weboppføring"
   canvas_user_id_4c18b78a: canvas_user_id
+  canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas vil fjerne nøklar med null-verdiar frå live event payloads dersom funksjonen er slått på. "
   captions_subtitles_af2c47e: Undertekstar
   card_movement_menu_for_title_b94c09af: "Kortflyttingsmeny for %{title}"
   card_view_eaf73185: Kortvising
@@ -4364,6 +4370,7 @@ nn:
     by_sa: "CC Namngjeving - Del på same vilkår BY-SA"
     private: "Privat (med opphavsrett)"
     public_domain: "Offentleg domene"
+  cc_subtitles_a0d16ff6: Undertekstar
   cell_number_69a7c309: Mobiltelefonnummer
   cell_number_is_invalid_bd6faee0: "Mobiltelefonnummeret er ugyldig."
   cell_number_is_required_2edcee60: "Mobiltelefonnummer er obligatorisk."
@@ -4448,6 +4455,7 @@ nn:
   click_here_to_view_the_submission_24777a69: "Klikk her for å sjå innleveringa"
   click_ok_to_continue_deleting_this_role_baa9d9e2: "Klikk \"ok\" for å fortsette med å slette rolla"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klikk på eit snapshot for å gå tilbake til forsøket ditt slik det var når snapshotet blei tatt. Merk! Du vil mista alt arbeidet du har gjort i tida etter at snapshotet blei tatt og det kan ikkje gjerast om! "
+  click_the_button_above_to_add_content_4c7024a: "Klikk på knappen over for å leggje til innhald"
   click_to_add_a_name_6cf551b0: "Klikk for å legge til eit namn"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Klikk for å endre profilbilde for %{display_name}"
   click_to_close_outcome_details_popover_d469d47d: "Klikk for å lukke popup-en med læringsmåldetaljar"
@@ -7228,6 +7236,7 @@ nn:
     saving: Lagrar...
   different_course_b875770e: "anna emne"
   diigo_993c4646: Diigo
+  direct_share_80afd4a7: "Direct Share"
   disableWhileLoading: 
     loading: Lastar...
   disable_a5c05db3: Deaktiver
@@ -7719,6 +7728,10 @@ nn:
   due_no_due_date_3c1d1651: "innleveringsfrist: Ingen frist"
   due_on_date_5ffb2182: Innleveringsfrist
   due_time_9acd6b69: "Frist %{time}"
+  due_to_the_size_of_your_course_you_must_select_a_s_f834ba66: |-
+      
+      Storleiken på emnet gjer at du må velje ei studentgruppe før du opnar
+      SpeedGrader.
   duplicate_31cec192: Dupliser
   duplicate_assignment_name_3ca7d753: "Dupliser oppgåve %{name}"
   duplicate_discussion_title_43b39959: "Dupliser diskusjon %{title}"
@@ -8629,6 +8642,7 @@ nn:
   file_tree_collapsed_d4b0ae96: "Filstruktur er skjult"
   file_tree_expanded_a1d20c4a: "Filstruktur utvida"
   file_upload_failed_af22dd91: "Filopplasting mislukkast"
+  file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "FIlopplasting, fil-URL eller innhaldseksport-ID er obligatorisk"
   file_upload_submission_740711f: "Innsending av filopplasting"
   file_uploading_56c9c0c8: Filopplasting
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} er publisert med følgande bruksrett: %{usage_right}"
@@ -9526,6 +9540,7 @@ nn:
   grades_posted_c5d8dcce: "Vurderingar er posta"
   grades_posted_to_students_56b8cb2d: "Vurderingsresultat er posta til studentar"
   grades_posting_bc7cfc1a: "Postar vurderingar"
+  grades_released_488c2808: "Vurderingsresultata er frigjevne."
   grades_saved_5954b0bb: "Vurderingar er lagra."
   grades_select_final_grade_for_moderation_ae8585d1: "Vurdringar - vel å moderere sluttvurdering"
   grades_view_all_grades_8bf9f8d3: "Vurderingar - sjå alle vurderingar"
@@ -9534,6 +9549,10 @@ nn:
   grades_visible_to_students_1584fa83: "Vurderingar er synlege for studentar"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Vurderingane vart publiserte til vurderingsoversikta"
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Vurderingsresultata er sende til vurderingsoversikta."
+  grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: |-
+      
+      Vurderingar er skjulte som standard. Alle vurderingar som allereie er posta vil halde fram med å vere synlege. 
+      Vel kva tid vurderingar skal postast for denne oppgåva i vurderingsoversikta.
   grades_will_be_hidden_by_default_any_grades_that_h_b6fac5e5: "\n\
       Vurderingar er skjulte som standard. Alle vurderingar som allereie er posta vil halde fram med å vere synlege.\n\
       Vel kva tid vurderingar skal postast per oppgåve i den respektive kolonna i vurderingsoversikta.\n\
@@ -10287,6 +10306,7 @@ nn:
   hide_navigation_menu_f0b3e90: "Skjul navigeringsmeny"
   hide_notes_column_7749f408: "Skjul kolonne for merknader"
   hide_outcomes_with_no_results_7e4ce06f: "Skjuler læringsmål utan resultat"
+  hide_params_eadf0961: "Skjul params"
   hide_score_total_for_assessment_results_d0ef117f: "Skjul endeleg resultat for vurderingsresultat"
   hide_sidebar_2b5b3776: "Skjul sidestolpe"
   hide_student_names_3e59e862: "Skjul studentnamn"
@@ -11195,6 +11215,7 @@ nn:
   loading_more_results_def6df65: "Lastar fleire resultat..."
   loading_more_sub_accounts_d0a30903: "Lastar fleire underkontoar..."
   loading_more_terms_4053e31f: "Laster fleire semester"
+  loading_options_c823e98b: "Lastar alternativ..."
   loading_outcome_results_96e21ce4: "Lastar læringsmålresultat"
   loading_results_769c8819: "Lastar resultat"
   loading_students_30b71301: "Lastar studentar"
@@ -14216,6 +14237,7 @@ nn:
   option_4_aec96b1f: "Alternativ 4"
   option_index_6308524d: "Alternativ %{index}"
   option_name_ba758e08: "%{option_name}"
+  option_selected_737b6f72: "Alternativ valt:"
   option_selected_list_collapsed_70a356b4: "%{option} er valt. Liste er skjult."
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Vel å inkludere byte-order mark i kompatible reknearkeksportar sånn at dei kan importerast til Excel for språkvariantane som krev ein sånn koding.  "
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Vel å inkludere byte-order mark i vurderingseksportfiler sånn at dei kan importerast til Excel for språkvariantane som krev ein sånn koding.  "
@@ -16173,6 +16195,7 @@ nn:
       display_question: 
         default_question_answer: "[ Vel ]"
         flag_this_question: "Merk dette spørsmålet"
+        group_of_answer_choices: "Gruppe med svaralternativ"
         headers: 
           formulas: Formlar
           possible_solutions: "Moglege løysingar"
@@ -17135,6 +17158,7 @@ nn:
   remove_row_row_167c424a: "Fjern rad %{row}"
   remove_student_from_recipients_4b206e35: "Fjern %{student} frå mottakarar"
   remove_studentname_16ba8c3a: "Fjern %{studentName}"
+  remove_submission_draft_f5c7f58b: "Fjern innleveringsutkast."
   remove_text_8e485c41: "Fjern %{text}"
   remove_these_dates_48453a81: "Fjern desse datoane"
   remove_this_item_from_the_module_4b2ceab7: "Fjern elementet frå modulen"
@@ -18738,6 +18762,7 @@ nn:
   show_one_question_at_a_time_271e346d: "Vis eitt spørsmål om gongen"
   show_only_blueprint_courses_9fb37b41: "Vis kun Blueprint-emne"
   show_originality_report_to_students_be22f5ee: "Vis originalitetsrapport til studentar"
+  show_params_3401895b: "Vis params"
   show_question_details_b059df00: "Vis spørsmålsdetaljar"
   show_recent_activity_stream_2be4abc1: "Sjå nyleg aktivitetsstraum"
   show_report_to_students_a07888a6: "Vis rapport til studentar"
@@ -19157,6 +19182,7 @@ nn:
     other: "Studentar som ikkje har teke undersøkinga (%{count})"
     zero: "Studentar som ikkje har teke undersøkinga"
   students_will_automatically_receive_full_credit_on_cc61df39: "studentar får automatisk fullt utbytte når dei gjennomfører undersøkinga"
+  students_will_be_able_to_see_that_the_grades_for_t_5421a866: "Studentar vil sjå at vurderingsresultata for oppgåva er skjulte."
   students_will_be_able_to_see_that_the_grades_for_t_e98d7726: |-
       
       Studentar vil sjå at vurderingane for oppgåva 
@@ -19248,6 +19274,7 @@ nn:
   submission_items_b2db1b8d: Innleveringselement
   submission_locked_a6074f8b: "Innlevering låst"
   submission_locked_image_93aced38: "Innlevering låst-bilde"
+  submission_posted_title_course_138bd744: "Innlevering er posta: %{title}, %{course}"
   submission_preview_383473ec: "Førehandsvising av innlevering"
   submission_requirement_8ba1ee08: "Krav til innlevering"
   submission_score_b7a291e8: "resultat innlevering"
@@ -19755,6 +19782,7 @@ nn:
   there_are_count_unsynced_changes_25ed3bed: 
     one: "Det er ein - 1 - usynkronisert endring"
     other: "Det er %{count} usynkroniserte endringar"
+  there_are_currently_availablegraderscount_availabl_58f85403: "Det finst %{availableGradersCount}tilgjengelege vurderarar"
   there_are_currently_maxgradercount_available_grade_9ab81123: "Det finst %{maxGraderCount} tilgjengelege vurderarar"
   there_are_currently_no_associated_courses_fba1754f: "Det er ingen tilknytta emne akkurat no. "
   there_are_no_announcements_for_this_course_5ee649c3: "Finn ikkje kunngjeringar for dette emnet."
@@ -19859,16 +19887,19 @@ nn:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette mogleggjer ein oppdatert navigasjon, nytt dashbord og eit enklare, meir moderne uttrykk."
   this_enables_users_to_generate_and_download_course_4c69c531: "Dette gjer at brukarane kan generere og laste ned EPUB for emne."
   this_environment_is_currently_being_updated_with_a_235f1875: "Systemet oppdaterast akkurat no med ein kopi av dei siste produksjonsdata. Kom tilbake seinare."
+  this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Funksjonen gir faglærarar løyve til å kopiere enkeltelement frå eitt emne til eit anna, og dele eit innhaldselement med andre brukarar sånn at dei kan importere elementa inn i eigne emne."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Denne funksjonen kan ikkje slåast av fordi det er minst ein underkonto eller eit emne som har aktivert funksjonen."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Denne funksjonen kan ikkje vere slått på samstundes som autogjenkjenning av feltskilje er slått på"
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: "Denne funksjonen kan ikkje vere slått på samstundes som semikolon er i bruk som feltskilje"
   this_feature_cannot_be_disabled_once_it_has_been_t_db7cc39e: "Funksjonen kan ikkje slåast av når den først er aktivert."
+  this_feature_creates_a_siteadmin_release_flag_tab__15215be9: "Funksjonen opprettar ein eigen release-merknadsfane sånn at SiteAdmin kan lansere funksjonar til brukarane via brukargrensesnittet. Brukargrensesnittet er samstundes endra for den gamle funksjonsval-fana. "
   this_field_is_required_fa58c4a: "Dette feltet er obligatorisk"
   this_field_name_is_required_988caebc: "Feltet \"%{name}\" er obligatorisk."
   this_field_name_is_required_b9196401: "Feltet \"name\" er obligatorisk."
   this_file_16b24f02: "denne fila"
   this_file_9443cda1: "Denne fila"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Denne fila må ha usage_rights klarert før ho kan publiserast."
+  this_flag_will_not_cause_any_change_in_behavior_24c0308b: "Merknadsflagget skal ikkje føre til endringar i oppførsel."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Denne mappa er låst og kan ikkje visast."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Denne vurderinga er ulik vurderinga som er synleg for studentane fordi nokre oppgåver er skjulte"
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: "Denne vurderinga er ulik vurderinga som er synleg for studentane fordi nokre vurderingsresultat ikkje er posta enno"
@@ -19884,12 +19915,17 @@ nn:
   this_is_a_message_for_name_7abf1e39: "Dette er ei melding til *%{name}*"
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: "Dette er ei førehandsvising av utkastet til quizen"
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "Dette er ei førehandsvising av den publiserte versjonen av quizen"
+  this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
+      Rapporten er over alle studentar som er registrerte på eit emne i ein gitt semester og som
+      har levert ein oppgåve. Rapporten inneheld ein rad per
+      studentinnlevering.
   this_is_a_what_if_score_cbdc04f9: "Dette er kva-skjer-dersom-resultat"
   this_is_an_account_setting_that_must_be_turned_on__4c939dea: "Dette er ein kontoinnstilling som institusjonen sin Canvas-kontakt må aktivere."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Dette er ein utviklarfunksjon som førehandsviser korleis sider vil sjå ut i eit høgre-til-venstre-miljø, utan å faktisk endre til eit språk som normalt brukar høgre-til-venstre-prinsippar."
   this_is_not_a_valid_grade_9cc2cb8: "Dette er ikkje ei gyldig vurdering"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Denne karakteren er valt for denne studenten akkurat no."
   this_is_the_default_email_address_f3c421fb: "Dette er standard e-postadresse"
+  this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "Dette er det nye brukargrensesnittet for førehandsvising av funksjonsval. Førebels er det kun lesbart. For å få tilbake det gamle brukargrensesnittet må du klikke på knappen. Då deaktiverast \"nytt funksjonsval-merknad\"-funksjonen og sida lastast på nytt. "
   this_is_your_course_landing_page_33d445ec: "Dette er forsida til emnet ditt"
   this_is_your_current_theme_4331709b: "Dette er gjeldande tema"
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Dette elementet viser på ny når det kjem ei ny innlevering."
@@ -20726,6 +20762,7 @@ nn:
   use_remote_version_of_rich_content_editor_52f7fc4b: "Bruk eksternt redigeringsprogram for rikt innhald"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Bruk eksternt redigeringsprogram for rikt innhald OG sidestolpe"
   use_remote_version_of_rich_content_editor_and_side_ebaaa986: "Bruk eksternt redigeringsprogram for rikt innhald OG sidestolpe i risikoaktivitetar som quizar"
+  use_semicolons_instead_of_commas_to_separate_field_62d24565: "Nokre språkvariantar krev av importfunksjonen i Excel at ein brukar semikolon istadenfor komma for å skilje mellom felt i reknearkeksportar.  "
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: "Nokre språkvariantar krev av importfunksjonen i Excel at ein brukar semikolon istadenfor komma for å skilje mellom felt ved eksport av vurderingsoversikta.  "
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Bruk semikolon for å skilje felt i kompatible reknearkeksportar"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Bruk semikolon for å skilje felt ved eksport av vurderingsoversikt"
@@ -21359,6 +21396,7 @@ nn:
   what_should_the_csv_file_look_like_985a59ac: "Korleis vil du at CSV-fila skal sjå ut?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Når du skal leggje til fleire brukarar på ein gong, bruk komma eller linjeskift for å skilja brukarane."
   when_disabled_students_can_still_send_individual_m_567a911c: "Sjølv om den er slått av, kan studentar framleis sende individuelle meldingar til faglærarar på emna, undervisingsassistentar og andre studentar som tilhøyrer grupper på same kontonivå."
+  when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Når vurderingsresultat vert skjult for anonyme oppgåver, vil resultata bli skjult for alle i emnet. Anonymitet innførast på nytt."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Dette er sida folk ser når dei besøker emnet. Du kan la sida vise aktivitetsstraum, liste over emnemodular, emneoversikt eller ei tilpassa side du lagar sjølv. Standard er aktivitetsstraumen på emnet."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Når brukarar går til emnet ditt er dette den første sida dei får sjå.
@@ -21377,6 +21415,7 @@ nn:
       Dersom vurderingar for oppgåva er skjulte, vil ikkje studentane 
       få varsel om eller sjå:
   while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: "Dersom vurderingane for oppgåva er skjulte, vil studentane ikkje lenger få varsel om eller sjå:"
+  while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: "Dersom vurderingar for denne oppgåva er sett til manuell, vil studentane ikkje få varsel om eller sjå:"
   whitelist_count_max_26a270f: "Kviteliste (%{count}/%{max})"
   whitelist_e88fd8ed: Kviteliste
   whitelist_editing_is_disabled_when_security_settin_ab40cc90: "Endring av kviteliste er slått av når tryggleiksinnstillingar arvast frå eit overordna nivå."

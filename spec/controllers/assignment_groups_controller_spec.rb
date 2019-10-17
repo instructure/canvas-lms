@@ -279,6 +279,25 @@ describe AssignmentGroupsController do
           @course.enrollment_term.update!(grading_period_group: @gp_group)
         end
 
+        it "any_assignment_in_closed_grading_period is false if no assignments exist, but a closed grading period does" do
+          @gp_group.grading_periods.create!(
+            start_date: 4.days.ago,
+            end_date: 2.days.ago,
+            close_date: 1.day.ago,
+            title: "closed gp"
+          )
+          @course.assignments.destroy_all
+          json = api_call_as_user(@student, :get,
+            "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=submission", {
+            controller: 'assignment_groups',
+            action: 'index',
+            format: 'json',
+            course_id: @course.id,
+            include: ['assignments', 'submission']
+          })
+          expect(json.first.fetch("any_assignment_in_closed_grading_period")).to be false
+        end
+
         it "returns in_closed_grading_period when 'assignments' are included in params" do
           @course.assignments.create!
           json = api_call_as_user(@teacher, :get,
