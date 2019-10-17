@@ -394,7 +394,7 @@ rce_enhancements:
   root_opt_in: true
   environments:
     production:
-      state: disabled
+      state: hidden
 new_features_ui:
   state: hidden
   applies_to: RootAccount
