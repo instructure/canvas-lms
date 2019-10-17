@@ -25,17 +25,48 @@ describe('doFetchApi', () => {
     fetchMock.restore()
   })
 
-  it('fetches and resolves with results', () => {
+  it('fetches and resolves with json results', () => {
     const path = '/api/v1/blah'
     const response = {key: 'value'}
     fetchMock.mock(`path:${path}`, response)
-    return expect(doFetchApi({path})).resolves.toEqual({key: 'value'})
+    return expect(doFetchApi({path})).resolves.toMatchObject({json: {key: 'value'}})
   })
 
-  it('resolves to undefined when response is empty', () => {
+  it('resolves json to null when response is empty', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 200)
-    return expect(doFetchApi({path})).resolves.toBeUndefined()
+    return expect(doFetchApi({path})).resolves.toMatchObject({json: null})
+  })
+
+  it('resolve includes response', () => {
+    const path = '/api/v1/blah'
+    fetchMock.mock(`path:${path}`, 200)
+    return expect(doFetchApi({path})).resolves.toMatchObject({response: {status: 200}})
+  })
+
+  it('resolve includes the parsed link header', () => {
+    const path = '/api/v1/blah'
+    fetchMock.mock(`path:${path}`, {
+      headers: {
+        Link:
+          '<http://api?page=3>; rel="current",<http://api?page=1>; rel="first",<http://api?page=5>; rel="last", <http://api?page=4>; rel="next", <http://api?page=2>; rel="prev"'
+      }
+    })
+    return expect(doFetchApi({path})).resolves.toMatchObject({
+      link: {
+        first: {page: '1'},
+        prev: {page: '2'},
+        current: {page: '3'},
+        next: {page: '4'},
+        last: {page: '5'}
+      }
+    })
+  })
+
+  it('link is null when there is no link header', () => {
+    const path = '/api/v1/blah'
+    fetchMock.mock(`path:${path}`, 200)
+    return expect(doFetchApi({path})).resolves.toMatchObject({link: null})
   })
 
   it('rejects on network error', () => {
@@ -62,7 +93,7 @@ describe('doFetchApi', () => {
     // Mock both orders so the test doesn't depend on object insertion order
     fetchMock.mock(`end:?foo=bar&baz=bing`, {key: 'value'})
     fetchMock.mock(`end:?baz=bing&foo=bar`, {key: 'value'})
-    return expect(doFetchApi({path, params})).resolves.toEqual({key: 'value'})
+    return expect(doFetchApi({path, params})).resolves.toMatchObject({json: {key: 'value'}})
   })
 
   it('passes default headers, headers, body, and fetch options', () => {

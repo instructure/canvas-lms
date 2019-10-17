@@ -81,6 +81,37 @@ describe('view of received content', () => {
     }).toThrow('Retrieval of Received Shares failed')
   })
 
+  it('shows pagination when the link header indicates there are multiple pages', () => {
+    useFetchApi.mockImplementationOnce(({success, meta}) => {
+      const link = {
+        last: {page: '5', url: 'last'}
+      }
+      meta({link})
+      success([assignmentShare])
+    })
+    const {getByText} = render(<ReceivedContentView />)
+
+    // other numbers can be left out due to compact representation
+    const expectedNums = ['1', '2', '3', '4', '5']
+    expectedNums.forEach(n => {
+      expect(getByText(n)).toBeInTheDocument()
+    })
+  })
+
+  it('updates the current page when a page number is clicked', () => {
+    useFetchApi.mockImplementationOnce(({success, meta}) => {
+      const link = {
+        last: {page: '5', url: 'last'}
+      }
+      meta({link})
+      success([assignmentShare])
+    })
+    const {getByText} = render(<ReceivedContentView />)
+    fireEvent.click(getByText('3'))
+    const lastFetchCall = useFetchApi.mock.calls.pop()
+    expect(lastFetchCall[0]).toMatchObject({params: {page: 3}})
+  })
+
   it('displays a preview modal when requested', () => {
     const shares = [assignmentShare]
     useFetchApi.mockImplementationOnce(({loading, success}) => {

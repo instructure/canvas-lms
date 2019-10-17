@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import getCookie from '../helpers/getCookie'
+import parseLinkHeader from 'parse-link-header'
 
 function constructRelativeUrl({path, params}) {
   const queryString = $.param(params)
@@ -52,7 +53,8 @@ export default async function doFetchApi({
     err.response = response // in case anyone wants to check it for something
     throw err
   }
+  const link = parseLinkHeader(response.headers.get('Link'))
   const text = await response.text()
-  const json = text.length > 0 ? JSON.parse(text) : undefined
-  return json
+  const json = text.length > 0 ? JSON.parse(text) : null
+  return {json, response, link}
 }

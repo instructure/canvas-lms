@@ -25,6 +25,7 @@ import PreviewModal from './PreviewModal'
 import {Spinner, Text} from '@instructure/ui-elements'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
+import Paginator from 'jsx/shared/components/Paginator'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
 const CourseImportPanel = lazy(() => import('./CourseImportPanel'))
@@ -34,6 +35,8 @@ export default function ReceivedContentView() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [shares, setShares] = useState([])
+  const [responseMeta, setResponseMeta] = useState({})
+  const [currentPage, setCurrentPage] = useState(1)
   const [currentContentShare, setCurrentContentShare] = useState(null)
   const [whichModalOpen, setWhichModalOpen] = useState(null)
 
@@ -41,9 +44,11 @@ export default function ReceivedContentView() {
 
   useFetchApi({
     success: setShares,
+    meta: setResponseMeta,
     error: setError,
     loading: setIsLoading,
-    path: getSharesUrl
+    path: getSharesUrl,
+    params: {page: currentPage}
   })
 
   function removeShareFromList(doomedShare) {
@@ -92,6 +97,22 @@ export default function ReceivedContentView() {
     return <NoContent />
   }
 
+  function renderPagination() {
+    if (responseMeta.link) {
+      const last = parseInt(responseMeta.link.last.page, 10)
+      if (!Number.isNaN(last)) {
+        return (
+          <Paginator
+            loadPage={setCurrentPage}
+            page={currentPage}
+            pageCount={last}
+            margin="small 0 0 0"
+          />
+        )
+      }
+    }
+  }
+
   if (error) throw new Error(I18n.t('Retrieval of Received Shares failed'))
 
   return (
@@ -105,6 +126,7 @@ export default function ReceivedContentView() {
         )}
       />
       {renderBody()}
+      {renderPagination()}
       <PreviewModal
         open={whichModalOpen === 'preview'}
         share={currentContentShare}

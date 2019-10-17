@@ -18,16 +18,23 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import I18n from 'i18n!paginator'
 import {Pagination} from '@instructure/ui-pagination'
 
-const Paginator = ({loadPage, page, pageCount}) => {
+const Paginator = ({loadPage, page, pageCount, ...paginationProps}) => {
   if (pageCount <= 1) {
     return <span />
   }
 
   return (
-    <Pagination variant="compact">
+    <Pagination
+      variant="compact"
+      labelNext={I18n.t('Next Page')}
+      labelPrev={I18n.t('Previous Page')}
+      {...paginationProps}
+    >
       {Array.from(Array(pageCount)).map((v, i) => (
+        // eslint-disable-next-line react/no-array-index-key
         <Pagination.Page onClick={() => loadPage(i + 1)} key={i + 1} current={page === i + 1}>
           {i + 1}
         </Pagination.Page>
