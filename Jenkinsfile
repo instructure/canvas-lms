@@ -182,82 +182,85 @@ pipeline {
             }
           }
         }
-
-        stage('Selenium Chrome') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'selenium-chrome',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Vendored Gems') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'vendored-gems',
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Rspec') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'rspec',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Selenium Performance Chrome') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'selenium-performance-chrome',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Contract Tests') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'contract-tests',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Frontend') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'frontend',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Xbrowser') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'xbrowser',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
+/*
+ *  Don't run these on all patch sets until we have them ready to report results.
+ *  Uncomment stage to run when developing.
+ *       stage('Selenium Chrome') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'selenium-chrome',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Vendored Gems') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'vendored-gems',
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Rspec') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'rspec',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Selenium Performance Chrome') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'selenium-performance-chrome',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Contract Tests') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'contract-tests',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Frontend') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'frontend',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Xbrowser') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'xbrowser',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *        }
+ */
       }
     }
 
