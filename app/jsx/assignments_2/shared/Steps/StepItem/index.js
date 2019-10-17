@@ -37,7 +37,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 class StepItem extends Component {
   static propTypes = {
-    status: oneOf(['button', 'complete', 'in-progress', 'unavailable']),
+    status: oneOf(['button', 'complete', 'incomplete', 'in-progress', 'unavailable']),
     label: oneOfType([func, string, element]).isRequired,
     icon: element,
     pinSize: string,
@@ -184,6 +184,7 @@ class StepItem extends Component {
         </span>
         <span className="step-item-label" aria-hidden={this.props.status === 'button'}>
           {this.renderLabel()}
+          <ScreenReaderContent>{status}</ScreenReaderContent>
         </span>
       </span>
     )
