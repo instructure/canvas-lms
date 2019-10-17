@@ -108,9 +108,8 @@ export default class PublishButton extends Backbone.View
       @render()
       @setFocusToElement()
     .fail (error) =>
-      errors = JSON.parse(error.responseText)['errors']
-      $.flashError errors.published[0].message
-      @model.set 'unpublishable', true
+      if error.status == 403
+        $.flashError @model.disabledMessage()
       @disable()
       @renderPublished()
       @setFocusToElement()

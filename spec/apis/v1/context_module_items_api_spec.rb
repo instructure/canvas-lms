@@ -672,25 +672,24 @@ describe "Module Items API", type: :request do
       end
 
       it "should unpublish module items" do
-        course_with_student(:course => @course, :active_all => true)
-        @user = @teacher
-
-        @assignment.submit_homework(@student, :body => "done!")
-
-        expect(@module1.evaluate_for(@student).workflow_state).to eq 'started'
-
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                         {:controller => "context_module_items_api", :action => "update", :format => "json",
                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
-                        {:module_item => {:published => '0'}}
-        )
+                        {:module_item => {:published => '0'}}, {}, {:expected_status => 200})
         expect(json['published']).to eq false
+        expect(@assignment_tag.reload).to be_unpublished
+        expect(@assignment.reload).to be_unpublished
+      end
 
-        @assignment_tag.reload
-        expect(@assignment_tag.workflow_state).to eq 'unpublished'
-
-        @module1.reload
-        expect(@module1.evaluate_for(@student).workflow_state).to eq 'unlocked'
+      it "should not unpublish module items linked to assignments with submissions" do
+        student_in_course(:course => @course, :active_all => true)
+        @assignment.submit_homework(@student, :body => "done!")
+        api_call_as_user(@teacher, :put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+                        {:controller => "context_module_items_api", :action => "update", :format => "json",
+                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :id => "#{@assignment_tag.id}"},
+                        {:module_item => {:published => '0'}}, {}, {:expected_status => 403})
+        expect(@assignment_tag.reload).to be_published
+        expect(@assignment.reload).to be_published
       end
 
       describe "moving items between modules" do
