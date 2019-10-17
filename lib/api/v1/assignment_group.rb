@@ -105,6 +105,7 @@ module Api::V1::AssignmentGroup
   end
 
   def in_closed_grading_period_hash(context, assignments)
+    return {} if assignments.empty?
     grading_periods = GradingPeriodGroup.for_course(context)&.grading_periods
     closed_grading_periods = grading_periods&.closed
 
