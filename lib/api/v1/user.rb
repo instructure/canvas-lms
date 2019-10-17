@@ -66,6 +66,10 @@ module Api::V1::User
                       :integration_id => pseudonym&.integration_id
         end
 
+        if user.account_pronoun && @domain_root_account && Account.site_admin.feature_enabled?(:account_pronouns) && @domain_root_account.settings[:can_add_pronouns]
+          json[:pronoun] = user.account_pronoun.display_pronoun
+        end
+
         if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
           json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
           json[:root_account] = HostUrl.context_host(pseudonym&.account) if include_root_account
