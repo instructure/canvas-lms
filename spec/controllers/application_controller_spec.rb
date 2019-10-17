@@ -755,6 +755,12 @@ RSpec.describe ApplicationController do
           expect(assigns[:return_url]).to eq 'named_context_url'
         end
 
+        it 'is not set to quizzes page when there is no referer' do
+          allow(controller.request).to receive(:referer).and_return(nil)
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'named_context_url'
+        end
+
         it 'is set using named_context_url when not launched from quizzes page' do
           allow(controller.request).to receive(:referer).and_return('assignments')
           controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
