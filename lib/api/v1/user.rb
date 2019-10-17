@@ -198,6 +198,10 @@ module Api::V1::User
       avatar_image_url: avatar_url_for_user(user),
       html_url: participant_url
     }
+    if user.account_pronoun && @domain_root_account
+      hash[:pronoun] = user.account_pronoun.display_pronoun if @domain_root_account.settings[:can_add_pronouns] != false &&
+        Account.site_admin.feature_enabled?(:account_pronouns)
+    end
     hash[:avatar_is_fallback] = user.avatar_image_url.nil? if includes.include?(:avatar_is_fallback) && avatars_enabled_for_user?(user)
     hash[:fake_student] = true if user.fake_student?
     hash
