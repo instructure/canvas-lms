@@ -42,6 +42,7 @@ module Api::V1::User
     if opts[:group_memberships]
       ActiveRecord::Associations::Preloader.new.preload(users, :group_memberships)
     end
+    ActiveRecord::Associations::Preloader.new.preload(users, :account_pronoun)
   end
 
   def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment=nil, tool_includes: [])

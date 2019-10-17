@@ -48,7 +48,7 @@
         <li class="user-list__item" id="user_<%= student.id %>">
           <%= avatar(student, context_code: @context.asset_string, size: 30) %>
           <div class="user-list__item-details">
-            <a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= is_teacher ? student.name : student.short_name %></a>
+            <a href="<%= context_url(@context, :context_user_url, student.id) %>" class="user_name"><%= is_teacher ? student.name : student.short_name %> <i><% if student.account_pronoun && @domain_root_account.settings[:can_add_pronouns] && Account.site_admin.feature_enabled?(:account_pronouns) %> (<%= student.account_pronoun&.display_pronoun %>)<% end %></i></a>
             <% if is_teacher %>
               <div class="short_name"><%= student.short_name %></div>
               <div class="email"><%= student.email %></div>
@@ -71,7 +71,7 @@
         <li class="user-list__item" id="user_<%= teacher.id %>">
           <%= avatar(teacher, context_code: @context.context.asset_string, size: 30) %>
           <div class="user-list__item-details">
-            <a href="<%= context_url(@context.context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %></a>
+            <a href="<%= context_url(@context.context, :context_user_url, teacher.id) %>" class="user_name"><%= teacher.name %> <i><% if teacher.account_pronoun && @domain_root_account.settings[:can_add_pronouns] && Account.site_admin.feature_enabled?(:account_pronouns) %> (<%= teacher.account_pronoun&.display_pronoun %>)<% end %></i></a>
             <% if is_teacher %>
               <div class="short_name"><%= teacher.short_name %></div>
               <div class="email"><%= teacher.email %></div>
