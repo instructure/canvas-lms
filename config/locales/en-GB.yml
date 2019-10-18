@@ -1925,6 +1925,7 @@ en-GB:
   all_comments_are_sent_to_the_whole_group_284591e7: "All comments are sent to the whole group"
   all_comments_are_sent_to_the_whole_group_778126f3: "All comments are sent to the whole group."
   all_configured_apps_a14eef0a: "All configured apps"
+  all_courses_80701c6f: "All Courses."
   all_courses_a7dbb853: "All courses"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "All dates fields must be present and formatted correctly"
   all_day_fb42c4fc: "All Day"
@@ -3487,6 +3488,8 @@ en-GB:
   assignments_2_student_error_page_3ca3e0df: "Assignments 2 Student Error Page"
   assignments_2_student_initial_query_error_52aa5ebd: "Assignments 2 Student initial query error"
   assignments_2_student_submission_preview_query_err_877af754: "Assignments 2 Student submission preview query error"
+  assignments_2_student_view_224cb233: "Assignments 2 Student View"
+  assignments_2_teacher_view_3cd3aeda: "Assignments 2 Teacher View"
   assignments_2_teacher_view_error_page_8e45dedc: "Assignments 2 Teacher View Error Page"
   assignments_and_gradebook_37e43d4f: "Assignments and Gradebook"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Assignments and quizzes - add / edit / delete"
@@ -3855,6 +3858,15 @@ en-GB:
   body_9f663faf: Body
   body_f48fe5cd: "Body:"
   body_shadow_d36e8c2e: "Body shadow"
+  body_text_more_info_at_url_754b1a5a: |-
+      %{body_text}
+      
+      More info at %{url}
+  body_text_you_can_view_the_assignment_here_url_a4d5092c: |-
+      %{body_text}
+      
+      You can view the assignment here: 
+      %{url}
   bolivia_567898d8: Bolivia
   bolivia_591_9b8a7a5c: "Bolivia (+591)"
   bookmark_bank_46d729be: "Bookmark %{bank}"
@@ -4467,6 +4479,7 @@ en-GB:
   can_update_public_jwk_for_lti_services_26037129: "Can update public jwk for LTI services."
   can_update_subscription_to_data_service_data_374a0c89: "Can update subscription to data service data."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Can view assignment data in the gradebook associated with the tool."
+  can_view_feature_flags_c92e0aa9: "Can view feature flags"
   can_view_submission_data_for_assignments_associate_dd06f583: "Can view submission data for assignments associated with the tool."
   canada_1_921df67a: "Canada (+1)"
   canada_aec587fa: Canada
@@ -4681,6 +4694,8 @@ en-GB:
   choose_home_page_80cef4ee: "Choose home page"
   choose_image_242f727e: "Choose image"
   choose_image_e5ee5d7a: "Choose image"
+  choose_one_2c4277df: "Choose one"
+  choose_one_submission_type_cf4eda5b: "Choose One Submission Type"
   choose_student_1513fcd1: "-- Choose student --"
   choose_the_next_mastery_path_b035b727: "Choose the next mastery path"
   choose_usage_rights_33683854: "Choose usage rights..."
@@ -4936,6 +4951,7 @@ en-GB:
   comment_input_box_b8c7e58b: "Comment input box"
   comment_submitted_d9934b: "Comment submitted!"
   comments_e07bcbe3: Comments
+  comments_for_this_attempt_a5fae61f: "Comments for this Attempt"
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "This enables converting a Common Cartridge packages in the intermediary json format to be imported"
   common_cartridge_display: "Common Cartridge"
@@ -5140,6 +5156,7 @@ en-GB:
   confirm_edit_outcome_a9746c99: "Confirm edit outcome"
   confirm_removal_a9bb889: "Confirm removal"
   confirm_reservation_removal_e6350e7c: "Confirm reservation removal"
+  confirm_unfavorite_course_fa01966d: "Confirm unfavourite course"
   confirmation_code_required_22984955: "Confirmation code (required)"
   confirmation_failed_please_try_again_ae566d37: "Confirmation failed. Please try again."
   consumer_key_57d9fcf1: "Consumer key"
@@ -6307,6 +6324,7 @@ en-GB:
       topic: "Unknown topic"
       wiki_page: "Unknown wiki page"
   course_external_tools_query_error_d5110efe: "Course external tools query error"
+  course_favorites_from_dashboard_27a3515a: "Course Favourites From Dashboard"
   course_files_62deb8f8: "Course Files"
   course_files_a31f97fc: "Course files"
   course_files_add_edit_delete_24678a2f: "Course files - add / edit / delete"
@@ -7154,7 +7172,7 @@ en-GB:
     plugins: Plugins
     prior_users: "Prior users"
     question_banks: "Question banks"
-    quizzes: ~
+    quizzes: Quizzes
     registered_services: "Registered services"
     revisions: Revisions
     rubrics: Rubrics
@@ -7310,6 +7328,7 @@ en-GB:
       show_less: "Show less"
       show_more: "Show more"
   dashboard_7f1dbf71: Dashboard
+  dashboard_card_movement_menu_b65b98f5: "Dashboard Card Movement Menu"
   dashboard_options_b240ed5a: "Dashboard options"
   dashboard_view_d7d85969: "Dashboard view"
   data_exports: "data exports"
@@ -9630,6 +9649,10 @@ en-GB:
   grade_change_activity_75fb525: "Grade change activity"
   grade_change_log_231f90e4: "Grade change log"
   grade_change_notifications_98461261: "Grade change notifications"
+  grade_changes_and_comments_have_been_released_for__3978b741: "Grade changes and comments have been released for everyone."
+  grade_changes_and_comments_have_been_released_for__5d6a01a0: "Grade changes and comments have been released for everyone in sections: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__624411ff: "Grade changes and comments have been released for everyone graded in sections: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__79d3473e: "Grade changes and comments have been released for everyone graded."
   grade_changes_and_new_comments_released_for_title__f1350f92: "Grade changes and new comments released for: %{title}, %{course}"
   grade_changes_cb5a57a8: "Grade Changes"
   grade_display_warning_dialog: 
@@ -12064,6 +12087,7 @@ en-GB:
   loading_announcements_b927a86c: "Loading announcements"
   loading_assessment_audit_trail_5cf4c10: "Loading assessment audit trail"
   loading_assignments_352ec769: "Loading Assignments"
+  loading_associations_2b92bcf7: "Loading associations..."
   loading_associations_9da66c4e: "Loading associations"
   loading_associations_complete_b93a9c6e: "Loading associations complete"
   loading_associations_started_1f65d8d: "Loading associations started"
@@ -12309,6 +12333,7 @@ en-GB:
   make_new_settings_for_sis_integrations_visible_and_875039ca: "Make new settings for SIS integrations visible and active"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Make sure you choose the most appropiate option as students' scores MAY be affected."
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Make this course publicly visible (student data will remain private)"
+  makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Makes a Microsoft Immersive Reader link option show up on wiki pages."
   making_a_copy_of_originalassignmentname_b7268992: "Making a copy of \"%{originalAssignmentName}\""
   malay_f5dddce4: Malay
   malaysia_60_7d357b28: "Malaysia (+60)"
@@ -13051,15 +13076,15 @@ en-GB:
     assignment_unmuted: 
       email: 
         body: |-
-            Your instructor has released grade changes and new comments for %{title}. These changes can now be viewed.
+            Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
             
-            Your can view it here: 
+            You can view it here: 
             %{url}
         html: 
           body: "Your instructor has released grade changes and new comments for %{title}. These changes can now be viewed."
-          link: "You can view it here"
+          link: "You can view the assignment here"
           subject: "Assignment unmuted: %{title}, %{course}"
-        subject: "Assignment unmuted: %{title}, %{course}"
+        subject: "Assignment Unmuted: %{title}, %{course}"
       sms: 
         body: |-
             Your instructor has released grades and comments for %{title}, %{course}.
@@ -14209,6 +14234,10 @@ en-GB:
         html: 
           body: "Your instructor has released grade changes and new comments for %{title}. These changes are now viewable."
           link: "You can view it here"
+    submissions_posted: 
+      email: 
+        html: 
+          link: "You can view the assignment here"
     summaries: 
       email: 
         daily_body: "You're signed up to receive a daily report of some notifications from your Canvas account.  Below is the report for %{date}:"
@@ -14292,6 +14321,7 @@ en-GB:
   mexico_b2d7a271: Mexico
   mgp_grade_export_d29b471f: "MGP grade export"
   mic_a7f3d311: Mic
+  microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - Free Trial (Wiki Pages)"
   migrate_67c9f753: Migrate
   migrate_quiz_5d0f777: "Migrate quiz"
   migration: 
@@ -14606,6 +14636,7 @@ en-GB:
     move_to_end: "-- At the bottom --"
   move_discussion_9ff5b2d1: "Move Discussion"
   move_discussion_title_93ea7be1: "Move discussion %{title}"
+  move_down_4a9c9b18: "Move down"
   move_group_3dd7f76e: "Move group"
   move_group_77ae285d: "Move group…"
   move_item_e94a8103: "Move item"
@@ -14635,6 +14666,7 @@ en-GB:
   move_this_section_890bee38: "Move this section"
   move_to_25d7ef11: "Move to"
   move_to_9b91c6e0: "Move to…"
+  move_to_bottom_d0f71bf0: "Move to bottom"
   move_to_dde1a5e1: "Move to..."
   move_to_end_c6bfbcf5: "Move to end"
   move_to_end_fef2fa15: "Move to end"
@@ -14642,7 +14674,9 @@ en-GB:
   move_to_front_bf6f0194: "Move to Front"
   move_to_the_beginning_636b342c: "Move to the beginning"
   move_to_the_end_bc05abf6: "Move to the end"
+  move_to_top_e0d7d66e: "Move to top"
   move_to_using_instui_for_several_components_and_im_21898396: "Move to using InstUI for several components and implementing a store system"
+  move_up_2440f707: "Move up"
   moving_a4d552df: moving...
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
@@ -14815,6 +14849,7 @@ en-GB:
   new_module_4e9287e4: "New module"
   new_outcome_7fba8c7d: "New outcome"
   new_outcome_group_af59f145: "New outcome group"
+  new_post_policy_icons_da13a62c: "New Post Policy Icons"
   new_question_9107c469: "New question"
   new_question_group_d9306280: "New question group"
   new_quiz_34aacba6: "New quiz"
@@ -14872,7 +14907,9 @@ en-GB:
   no_collaboration_apps_3bbd30ce: "No collaboration apps"
   no_content_5dbc9acf: "No Content"
   no_content_has_been_added_f36bab43: "* No content has been added"
+  no_content_has_been_shared_with_you_667fde6c: "No content has been shared with you."
   no_content_not_visible_to_students_b59f4867: "No content. Not visible to students"
+  no_courses_favorited_4e69fd63: "No courses favourited"
   no_courses_found_12d68a74: "No courses found"
   no_date_bfeb2df7: "No date"
   no_description_c2554c25: "No description"
@@ -21108,6 +21145,7 @@ en-GB:
     errors_update_failed: "Update Failed"
   submissions_folder_9db8dadf: "Submissions folder"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "submissions folders must be created in User or Group context"
+  submissions_posted_title_course_43677dba: "Submissions Posted: %{title}, %{course}"
   submissions_view_and_make_comments_cafaf361: "Submissions - view and make comments"
   submit_a3cc6859: Submit
   submit_a_comment_7edbf648: "Submit a Comment"
@@ -21604,6 +21642,7 @@ en-GB:
                     If you wish to remove them, you should remove the associated tool.
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "These marking periods were created for you by an administrator."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "This action has been disabled by your admin."
+  this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "This allows the user to unfavourite a course directly from its dashboard card."
   this_allows_you_to_restrict_custom_javascript_that_d8495e02: |-
       This allows you to restrict custom JavaScript that runs in your instance of Canvas.
                      This will be enabled by an updated Content Security Policy (CSP).
@@ -22394,6 +22433,8 @@ en-GB:
   undo_remove_course_association_name_68eb4037: "Undo remove course association %{name}"
   unenrolled_bc89d5e3: Unenrolled
   unenrolled_users_e7632d24: "Unenrolled users"
+  unfavorite_cd0c113e: Unfavourite
+  unfavorite_coursename_32f77231: "Unfavourite %{courseName}"
   ungraded_147a0dce: ungraded
   ungraded_answers_31ef2df7: "Ungraded answers"
   ungraded_ed0c6f98: Ungraded
@@ -22474,6 +22515,7 @@ en-GB:
   unpublishing_1fa99dc6: Unpublishing…
   unread_c14cb06f: "unread,"
   unread_e9c1b19c: Unread
+  unread_ee6db4aa: unread
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"
   unregister_service_985238e9: "Unregister service"
   unreserved_e86b7425: Unreserved
@@ -22527,6 +22569,7 @@ en-GB:
   updated_permissions_page_f2e91060: "Updated Permissions Page"
   updated_terms_of_service_82f34148: "Updated Terms of Service"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Updated UI for searching and displaying users and courses within an account."
+  updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Updates the display of Post Policy icons in the New Gradebook assignment column header."
   updating_6edbab78: Updating
   updating_discussion_failed_aadb2d35: "Updating discussion failed"
   upload_8b403d05: Upload
@@ -22600,6 +22643,8 @@ en-GB:
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Use semicolons to separate fields in compatible spreadsheet exports"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Use semicolons to separate fields in Gradebook Exports"
   use_the_new_assignments_page_dd292b9d: "Use the new assignments page"
+  use_the_new_assignments_student_page_944262af: "Use the new assignments student page"
+  use_the_new_assignments_teacher_page_8add7e46: "Use the new assignments teacher page"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Use the new Collaborations external tool to enable more options for tools to use to collaborate"
   use_the_new_document_annotation_tool_2cbc98d0: "Use the new document annotation tool"
   use_the_new_interface_for_managing_permissions_907e8e8f: "Use the new interface for managing permissions"
@@ -23219,6 +23264,7 @@ en-GB:
   we_were_unable_to_find_matches_below_f1c6d1ed: "We were unable to find matches below."
   we_were_unable_to_find_matches_below_select_any_yo_87035b30: "We were unable to find matches below. Select any you would like to create as new users. Unselected will be skipped at this time."
   we_were_unable_to_find_matches_for_the_logins_belo_d5f79db2: "We were unable to find matches for the logins below. Select which you would like to be created as new users."
+  we_were_unable_to_remove_this_course_from_your_fav_70fa598d: "We were unable to remove this course from your favourites."
   we_were_unable_to_update_the_app_659f5bc6: "We were unable to update the app."
   web_conference: 
     default_name_for_courses: "Course web conference"
@@ -23495,6 +23541,9 @@ en-GB:
       You are about to lose any unsaved changes.
       
       Would you still like to proceed?
+  you_are_about_to_remove_this_course_from_your_dash_7e806db6: |-
+      You are about to remove this course from your dashboard. It will still be available
+                    by navigating to Courses > All Courses from the main menu.
   you_are_currently_acting_as_user_name_8d2be0ee: "You are currently acting as %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "You are currently logged into Student view"
   you_are_currently_masquerading_as_user_name_f4a00ade: "You are currently masquerading as %{user_name}"
@@ -23585,6 +23634,8 @@ en-GB:
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "You have entered an invalid grade for this student. Check the value and the grading type and try again."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*You have made changes to the questions in this quiz.* These changes will not appear for students until you save the quiz."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "You have no collaboration apps configured. Talk to your teacher to get some set up."
+  you_have_no_courses_favorited_reloading_this_page__a2bae9de: "You have no courses favourited. Reloading this page will show all\n\
+      \x20     your active courses. To add favourites, go to "
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: "You have no LTIs configured to create collaborations with. Talk to your teacher to get some set up."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "You have no outcomes. *Click here* to create one."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "You have no outcomes. Click here to go to the outcomes page."
