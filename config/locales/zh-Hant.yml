@@ -1922,6 +1922,7 @@ zh-Hant:
   all_comments_are_sent_to_the_whole_group_284591e7: 所有評論都發送給全體群組
   all_comments_are_sent_to_the_whole_group_778126f3: 所有評論都發送給全體群組。
   all_configured_apps_a14eef0a: 所有已配置的應用程式
+  all_courses_80701c6f: 所有課程。
   all_courses_a7dbb853: 所有課程
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: 所有日期字段必須存在並且格式正確
   all_day_fb42c4fc: 全日
@@ -3476,6 +3477,8 @@ zh-Hant:
   assignments_2_e88d7a26: "作業列表 2"
   assignments_2_student_error_page_3ca3e0df: "作業列表 2 學生錯誤頁面"
   assignments_2_student_initial_query_error_52aa5ebd: "作業列表 2 學生初始查詢錯誤"
+  assignments_2_student_view_224cb233: "作業 2 學生視圖"
+  assignments_2_teacher_view_3cd3aeda: "作業 2 教師視圖"
   assignments_2_teacher_view_error_page_8e45dedc: "作業 2 教師檢視錯誤頁"
   assignments_and_gradebook_37e43d4f: 作業及成績單
   assignments_and_quizzes_add_edit_delete_5bac17ed: "作業和測驗 - 添加 / 編輯 / 刪除"
@@ -3844,6 +3847,15 @@ zh-Hant:
   body_9f663faf: 主體
   body_f48fe5cd: 主體：
   body_shadow_d36e8c2e: 主體陰影
+  body_text_more_info_at_url_754b1a5a: |-
+      %{body_text}
+      
+      更多資訊，請造訪：%{url}
+  body_text_you_can_view_the_assignment_here_url_a4d5092c: |-
+      %{body_text}
+      
+      您可在此檢視該作業：
+      %{url}
   bolivia_567898d8: 玻利維亞
   bolivia_591_9b8a7a5c: "玻利維亞 (+591)"
   bookmark_bank_46d729be: "書籤%{bank}"
@@ -4456,6 +4468,7 @@ zh-Hant:
   can_update_public_jwk_for_lti_services_26037129: "可以更新 LTI 服務的公開 jwk。"
   can_update_subscription_to_data_service_data_374a0c89: 可以更新數據服務數據的訂閱。
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: 可以在與工具關聯的成績單中檢視作業資料。
+  can_view_feature_flags_c92e0aa9: 可檢視功能標記
   can_view_submission_data_for_assignments_associate_dd06f583: 可以檢視與工具關聯的作業的提交項目資料。
   canada_1_921df67a: "加拿大 (+1)"
   canada_aec587fa: 加拿大
@@ -4670,6 +4683,8 @@ zh-Hant:
   choose_home_page_80cef4ee: 選擇首頁
   choose_image_242f727e: 選擇圖像
   choose_image_e5ee5d7a: 選擇影像
+  choose_one_2c4277df: 選擇一個
+  choose_one_submission_type_cf4eda5b: 選擇一個提交類型
   choose_student_1513fcd1: "-- 選擇學生 --"
   choose_the_next_mastery_path_b035b727: 選擇下一個掌握歷程
   choose_usage_rights_33683854: 選擇使用權此…
@@ -4924,6 +4939,7 @@ zh-Hant:
   comment_input_box_b8c7e58b: 評論輸入框
   comment_submitted_d9934b: 已提交評論！
   comments_e07bcbe3: 評論
+  comments_for_this_attempt_a5fae61f: 此嘗試的評論
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "這可在媒介 json 格式下轉換要導入的通用墨水匣"
   common_cartridge_display: 通用墨水匣
@@ -5128,6 +5144,7 @@ zh-Hant:
   confirm_edit_outcome_a9746c99: 確認編輯成果
   confirm_removal_a9bb889: 確認移除
   confirm_reservation_removal_e6350e7c: 確認預約移除
+  confirm_unfavorite_course_fa01966d: 確認取消收藏課程
   confirmation_code_required_22984955: 確認代碼（必填）
   confirmation_failed_please_try_again_ae566d37: 確認失敗。請再試一次。
   consumer_key_57d9fcf1: 消費者密鑰
@@ -6294,6 +6311,7 @@ zh-Hant:
       topic: 未知主題
       wiki_page: "未知 Wiki 頁面"
   course_external_tools_query_error_d5110efe: 課程外部工具查詢錯誤
+  course_favorites_from_dashboard_27a3515a: 儀錶板課程收藏夾
   course_files_62deb8f8: 課程文檔
   course_files_a31f97fc: 課程檔案
   course_files_add_edit_delete_24678a2f: "課程檔案 - 添加 / 編輯 / 刪除"
@@ -7140,7 +7158,7 @@ zh-Hant:
     plugins: 外掛程式
     prior_users: 之前的使用者
     question_banks: 題庫
-    quizzes: ~
+    quizzes: 測驗
     registered_services: 所登記的服務
     revisions: 修訂
     rubrics: 評估量表
@@ -7296,6 +7314,7 @@ zh-Hant:
       show_less: 顯示更少
       show_more: 顯示更多
   dashboard_7f1dbf71: 儀表板
+  dashboard_card_movement_menu_b65b98f5: 儀錶板卡活動選單
   dashboard_options_b240ed5a: 儀表板選項
   dashboard_view_d7d85969: 儀錶板檢視
   data_exports: 資料導出
@@ -9269,7 +9288,7 @@ zh-Hant:
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: 提交票證，以獲取支援團隊親自回覆。
   file_already_exists_bdc61895: 檔案已經存在
   file_attachment_8e7dbfd1: 文檔附件
-  file_c851020d: 文檔
+  file_c851020d: 檔案
   file_content_a99b5c6b: 文檔內容
   file_export_from_date_cf867c8d: "*檔案從...匯出%{date}*"
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "文檔 %{filename} 無法被加 入ePub 文件。請參考單個 zip 文檔。"
@@ -9610,6 +9629,10 @@ zh-Hant:
   grade_change_activity_75fb525: 評分變更活動
   grade_change_log_231f90e4: 評分變更日誌
   grade_change_notifications_98461261: 評分變更通知
+  grade_changes_and_comments_have_been_released_for__3978b741: 各人的評分等級更改和評論已發佈。
+  grade_changes_and_comments_have_been_released_for__5d6a01a0: "各人的評分等級更改和評論已發佈，如下：%{section_names}。"
+  grade_changes_and_comments_have_been_released_for__624411ff: "先前已評分的各人評分等級更改和評論已發佈，如下：%{section_names}。"
+  grade_changes_and_comments_have_been_released_for__79d3473e: 先前已評分的各人評分等級更改和評論已發佈。
   grade_changes_and_new_comments_released_for_title__f1350f92: "已發佈成績更改和新評論的科目：%{title}，%{course}"
   grade_changes_cb5a57a8: 成績更改
   grade_display_warning_dialog: 
@@ -12013,6 +12036,7 @@ zh-Hant:
   loading_announcements_b927a86c: 通告載入中
   loading_assessment_audit_trail_5cf4c10: 正在載入評估稽核跟蹤
   loading_assignments_352ec769: 作業載入中
+  loading_associations_2b92bcf7: 正在加載社團…
   loading_associations_9da66c4e: 正在載入關聯
   loading_associations_complete_b93a9c6e: 完成載入關聯
   loading_associations_started_1f65d8d: 開始載入關聯
@@ -12258,6 +12282,7 @@ zh-Hant:
   make_new_settings_for_sis_integrations_visible_and_875039ca: "顯示并激活 SIS 集成的新設定"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: 請確保您選擇最合適的選項，因為學生的成績可能會受到影響。
   make_this_course_publicly_visible_student_data_wil_3954d6c8: 使此課程公開可見（學生數據仍保持私密）
+  makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "將 Microsoft Immersive Reader 連結選項顯示在維基百科頁面上。"
   making_a_copy_of_originalassignmentname_b7268992: "複製 \"%{originalAssignmentName}\""
   malay_f5dddce4: 馬來語
   malaysia_60_7d357b28: "馬來西亞 (+60)"
@@ -12999,15 +13024,15 @@ zh-Hant:
     assignment_unmuted: 
       email: 
         body: |-
-            您的導師已發佈了評分更改和關於 %{title} 的新評論。這些更改現在已可以檢視。
+            您的導師已發佈了評分更改和關於 %{title} 的新評論。這些更改現在已可檢視。
             
-            您可以在此處檢視：
+            您可以在此檢視：
             %{url}
         html: 
           body: "您的導師已發佈了評分更改和關於 %{title} 的新評論。這些更改現在已可以檢視。"
-          link: 您可以在此處對其進行檢視。
+          link: 您可以在此檢視該作業
           subject: "已取消靜音的作業：%{title}, %{course}"
-        subject: "已取消靜音的作業：%{title}, %{course}"
+        subject: "取消任務靜音：%{title}，%{course}"
       sms: 
         body: |-
             您的導師已發佈了關於 %{title}，%{course} 的分數和評論。
@@ -14155,6 +14180,10 @@ zh-Hant:
         html: 
           body: "您的導師已發佈了評分更改和關於 %{title} 的新評論。這些更改現在已可以檢視。"
           link: 您可以在此處對其進行檢視。
+    submissions_posted: 
+      email: 
+        html: 
+          link: 您可以在此檢視該作業
     summaries: 
       email: 
         daily_body: "您已註冊，以查收您 Canvas 帳戶某些通知的每日報告。以下是 %{date} 的報告："
@@ -14238,6 +14267,7 @@ zh-Hant:
   mexico_b2d7a271: 墨西哥
   mgp_grade_export_d29b471f: "MGP 成績導出"
   mic_a7f3d311: 麥克風
+  microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - 免費試用（維基百科頁面）"
   migrate_67c9f753: 遷移
   migrate_quiz_5d0f777: 遷移測驗
   migration: 
@@ -14552,6 +14582,7 @@ zh-Hant:
     move_to_end: "-- 在底部 --"
   move_discussion_9ff5b2d1: 移動討論區
   move_discussion_title_93ea7be1: "移動討論區%{title}"
+  move_down_4a9c9b18: 向下移動
   move_group_3dd7f76e: 移動群組
   move_group_77ae285d: 移動群組...
   move_item_e94a8103: 移動項目
@@ -14581,6 +14612,7 @@ zh-Hant:
   move_this_section_890bee38: 移動此班別
   move_to_25d7ef11: 移至
   move_to_9b91c6e0: 移至...
+  move_to_bottom_d0f71bf0: 移動至底部
   move_to_dde1a5e1: 移動到...
   move_to_end_c6bfbcf5: 移到最後
   move_to_end_fef2fa15: 移至結尾
@@ -14588,7 +14620,9 @@ zh-Hant:
   move_to_front_bf6f0194: 移至前面
   move_to_the_beginning_636b342c: 移至開始
   move_to_the_end_bc05abf6: 移至結束
+  move_to_top_e0d7d66e: 移動至頂部
   move_to_using_instui_for_several_components_and_im_21898396: "轉移到使用 InstUI 的幾個組件並實施商店系統"
+  move_up_2440f707: 向上移動
   moving_a4d552df: 正在移動…
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
@@ -14761,6 +14795,7 @@ zh-Hant:
   new_module_4e9287e4: 新單元
   new_outcome_7fba8c7d: 新成果
   new_outcome_group_af59f145: 新成果群組
+  new_post_policy_icons_da13a62c: 新發帖政策圖標
   new_question_9107c469: 新問題
   new_question_group_d9306280: 新問題群組
   new_quiz_34aacba6: 新測驗
@@ -14818,7 +14853,9 @@ zh-Hant:
   no_collaboration_apps_3bbd30ce: 沒有協作應用程式
   no_content_5dbc9acf: 無內容
   no_content_has_been_added_f36bab43: "* 未添加任何內容"
+  no_content_has_been_shared_with_you_667fde6c: 沒有與您共用的內容。
   no_content_not_visible_to_students_b59f4867: 沒有內容。看不到學生
+  no_courses_favorited_4e69fd63: 無收藏的課程
   no_courses_found_12d68a74: 找不到課程
   no_date_bfeb2df7: 無日期
   no_description_c2554c25: 沒有說明
@@ -21019,6 +21056,7 @@ zh-Hant:
     errors_update_failed: 更新失敗
   submissions_folder_9db8dadf: 提交文件夾
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: 提交文件夾必須透過使用者或群組環境來創建
+  submissions_posted_title_course_43677dba: "已發佈的提交項目：%{title}，%{course}"
   submissions_view_and_make_comments_cafaf361: "提交項目 - 查看和評論"
   submit_a3cc6859: 提交
   submit_a_comment_7edbf648: 提交評論
@@ -21516,6 +21554,7 @@ zh-Hant:
                     如果您希望移除它們，請移除其關聯工具。
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: 由一位管理員為您創建這些評分時段。
   this_action_has_been_disabled_by_your_admin_5e34bfa0: 您的管理員停用了此操作。
+  this_allows_the_user_to_unfavorite_a_course_direct_828d0587: 此功能可允許使用者從儀錶板卡上直接取消課程收藏。
   this_allows_you_to_restrict_custom_javascript_that_d8495e02: |-
       這允許您限制在您的 Canvas 實例內執行的自訂 JavaScript。
                      這將會由更新後的內容安全政策 (CSP) 啟用。
@@ -22306,6 +22345,8 @@ zh-Hant:
   undo_remove_course_association_name_68eb4037: "取消移除課程藍圖%{name}"
   unenrolled_bc89d5e3: 已取消註冊
   unenrolled_users_e7632d24: 未註冊的使用者
+  unfavorite_cd0c113e: 取消收藏
+  unfavorite_coursename_32f77231: "取消收藏 %{courseName}"
   ungraded_147a0dce: 未評分
   ungraded_answers_31ef2df7: 未評分的答案
   ungraded_ed0c6f98: 未評分
@@ -22386,6 +22427,7 @@ zh-Hant:
   unpublishing_1fa99dc6: 正在取消發佈...
   unread_c14cb06f: 未讀，
   unread_e9c1b19c: 未讀
+  unread_ee6db4aa: 未讀
   unreadcount_unread_replies_509e167f: "%{unreadCount} 未讀回覆"
   unregister_service_985238e9: 取消註冊服務
   unreserved_e86b7425: 未被預訂
@@ -22438,6 +22480,7 @@ zh-Hant:
   updated_permissions_page_f2e91060: 已更新的權限頁面
   updated_terms_of_service_82f34148: 已更新的服務條款
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "升級 UI，以便在同一帳戶內搜尋和顯示多個使用者和課程。"
+  updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "在 New Gradebook 作業欄目標題更新《發帖政策》圖標。"
   updating_6edbab78: 正在更新
   updating_discussion_failed_aadb2d35: 更新討論區失敗
   upload_8b403d05: 上傳
@@ -22511,6 +22554,8 @@ zh-Hant:
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: 在成績單匯出中使用分號分隔欄位
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: 在成績單匯出中使用分號以分隔欄位
   use_the_new_assignments_page_dd292b9d: 使用新的作業列表頁面
+  use_the_new_assignments_student_page_944262af: 使用新的作業學生頁面
+  use_the_new_assignments_teacher_page_8add7e46: 使用新的作業教師頁面
   use_the_new_collaborations_external_tool_enabling__5f0ed73: 使用新協作外部工具，啟用更多工具選項用於協作
   use_the_new_document_annotation_tool_2cbc98d0: 使用新的文檔評註工具
   use_the_new_interface_for_managing_permissions_907e8e8f: 使用新的界面來管理權限
@@ -23123,6 +23168,7 @@ zh-Hant:
   we_were_unable_to_find_matches_below_f1c6d1ed: 查無以下配對。
   we_were_unable_to_find_matches_below_select_any_yo_87035b30: 查無以下配對。任意挑選，創建新使用者。未被選取的使用者將被跳過。
   we_were_unable_to_find_matches_for_the_logins_belo_d5f79db2: 我們無法找到以下登入的吻合。選擇那些您要創建為新使用者的。
+  we_were_unable_to_remove_this_course_from_your_fav_70fa598d: 我們無法從您的收藏夾中刪除此課程。
   we_were_unable_to_update_the_app_659f5bc6: 我們無法更新該應用程式。
   web_conference: 
     default_name_for_courses: "課程 Web 會議"
@@ -23395,6 +23441,9 @@ zh-Hant:
       您會失去所有未保存的改動。
       
       您確定要繼續嗎？
+  you_are_about_to_remove_this_course_from_your_dash_7e806db6: |-
+      您將從您的儀錶板中刪除此課程。該課程依然可用，
+                    可在主選單中導航至「課程 > 所有課程」。
   you_are_currently_acting_as_user_name_8d2be0ee: "您目前正在作為%{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: 您目前已登入學生視圖
   you_are_currently_masquerading_as_user_name_f4a00ade: "您目前正在偽裝成 %{user_name}"
@@ -23479,6 +23528,8 @@ zh-Hant:
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: 您為此學生輸入了無效的評分。檢查值和等級評分類型後重試。
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*您已對此測驗中的問題進行了更改。*在保存此測驗之前，學生將不會看到這些更改。"
   you_have_no_collaboration_apps_configured_talk_to__6733123a: 您沒有已配置的協作應用程式。請聯繫您的教師以進行相應設置。
+  you_have_no_courses_favorited_reloading_this_page__a2bae9de: "您沒有收藏的課程。重新加載此頁面將會顯示\n\
+      \x20     您的所有活動課程。如需添加收藏，請轉至 "
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: 您沒有已配置的LTI可用於創建協作。請資訊您的教師以獲取部分配置。
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "您沒有成果。*按一下此處* 創建一個成果。"
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: 您沒有成果。按一下此處轉到成果頁面。
