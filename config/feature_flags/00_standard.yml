@@ -409,7 +409,7 @@ rce_enhancements:
   beta: true
   environments:
     production:
-      state: disabled
+      state: hidden
 new_features_ui:
   state: hidden
   applies_to: RootAccount
