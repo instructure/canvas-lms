@@ -281,6 +281,10 @@ class ContentMigrationsController < ApplicationController
   #   (if +insert_into_module_id+ is supplied). If this parameter
   #   is omitted, items will be added to the end of the module.
   #
+  # @argument settings[move_to_assignment_group_id] [Integer]
+  #   The id of an assignment group in the target course. If provided, all
+  #   imported assignments will be moved to the given assignment group.
+  #
   # @argument date_shift_options[shift_dates] [Boolean]
   #   Whether to shift dates in the copied course
   #
