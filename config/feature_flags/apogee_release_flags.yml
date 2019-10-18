@@ -17,3 +17,10 @@ add_grading_scheme_to_admin_grade_reports:
   display_name: Add Grading Scheme to Admin Grade Reports
   description: Includes grade values in the admin grade reports.
   applies_to: RootAccount
+allow_postable_submission_comments:
+  state: hidden
+  display_name: Allow Postable Submission Comments
+  description: For manually posted assignments, the presence of a submission comment not by the submission's own
+    user will allow posting the assignment. Previously, this would have required a grade before posting could
+    occur.
+  applies_to: RootAccount

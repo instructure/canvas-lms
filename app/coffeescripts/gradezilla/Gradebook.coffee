@@ -75,7 +75,7 @@ import assignmentHelper from 'jsx/gradezilla/shared/helpers/assignmentHelper'
 import TextMeasure from 'jsx/gradezilla/shared/helpers/TextMeasure'
 import * as GradeInputHelper from 'jsx/grading/helpers/GradeInputHelper'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
-import {isHidden} from 'jsx/grading/helpers/SubmissionHelper'
+import {isPostable} from 'jsx/grading/helpers/SubmissionHelper'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
 import {Button} from '@instructure/ui-buttons'
 import {IconSettingsSolid} from '@instructure/ui-icons'
@@ -2088,7 +2088,7 @@ export default do ->
           # Ignore anonymous assignments when deciding whether to show the
           # "hidden" icon, as including them could reveal which students have
           # and have not been graded
-          submission? && isHidden(submission) && !assignment.anonymize_students
+          submission? && isPostable(submission) && !assignment.anonymize_students
         )
       else
         @filteredContentInfo.mutedAssignments

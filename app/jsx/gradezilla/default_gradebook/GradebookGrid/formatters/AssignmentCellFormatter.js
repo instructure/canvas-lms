@@ -22,7 +22,7 @@ import I18n from 'i18n!gradezilla'
 import htmlEscape from 'str/htmlEscape'
 import {extractDataTurnitin} from 'compiled/gradezilla/Turnitin'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
-import {extractSimilarityInfo, isHidden} from '../../../../grading/helpers/SubmissionHelper'
+import {extractSimilarityInfo, isPostable} from '../../../../grading/helpers/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
 
 function getTurnitinState(submission) {
@@ -214,7 +214,7 @@ export default class AssignmentCellFormatter {
     }
 
     const showUnpostedIndicator =
-      columnDef.postAssignmentGradesTrayOpenForAssignmentId && isHidden(submission)
+      columnDef.postAssignmentGradesTrayOpenForAssignmentId && isPostable(submission)
 
     const options = {
       classNames: classNamesForAssignmentCell(assignmentData, submissionData),

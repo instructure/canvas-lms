@@ -40,6 +40,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
       submission: {
         assignmentId: '1',
         excused: false,
+        hasPostableComments: false,
         late: false,
         missing: false,
         postedAt: null,
@@ -176,6 +177,13 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
       strictEqual(hiddenPills.length, 1)
     })
 
+    test('shows the "Hidden" pill when the submission has comments and not posted', () => {
+      props.submission.hasPostableComments = true
+      wrapper = mountComponent()
+      const hiddenPills = getHiddenPills()
+      strictEqual(hiddenPills.length, 1)
+    })
+
     test('does not show the "Hidden" pill when the submission is not graded', () => {
       props.submission.workflowState = 'unsubmitted'
       wrapper = mountComponent()
@@ -218,6 +226,7 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
       postPoliciesEnabled: false,
       submission: {
         excused: false,
+        hasPostableComments: false,
         late: false,
         missing: false,
         secondsLate: 0,
@@ -278,6 +287,7 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
       postPoliciesEnabled: false,
       submission: {
         excused: false,
+        hasPostableComments: false,
         late: false,
         missing: false,
         secondsLate: 0,
@@ -338,6 +348,7 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
       postPoliciesEnabled: false,
       submission: {
         excused: false,
+        hasPostableComments: false,
         late: false,
         missing: false,
         secondsLate: 0,
@@ -398,6 +409,7 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', hooks => {
       postPoliciesEnabled: false,
       submission: {
         excused: false,
+        hasPostableComments: false,
         late: false,
         missing: false,
         secondsLate: 0,
@@ -458,6 +470,7 @@ QUnit.module('SubmissionStatus - Not calculated in final grade', hooks => {
       postPoliciesEnabled: false,
       submission: {
         excused: false,
+        hasPostableComments: false,
         late: false,
         missing: false,
         secondsLate: 0,

@@ -111,7 +111,8 @@ export default class SubmissionTray extends React.Component {
       pointsDeducted: number,
       postedAt: string.isRequired,
       secondsLate: number.isRequired,
-      assignmentId: string.isRequired
+      assignmentId: string.isRequired,
+      hasPostableComments: bool.isRequired
     }),
     isFirstAssignment: bool.isRequired,
     isLastAssignment: bool.isRequired,

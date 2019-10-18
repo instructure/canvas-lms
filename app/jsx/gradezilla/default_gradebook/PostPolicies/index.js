@@ -26,12 +26,14 @@ import PostAssignmentGradesTray from '../../../grading/PostAssignmentGradesTray'
 
 function getSubmission(student, assignmentId) {
   const submission = student[`assignment_${assignmentId}`] || {
+    has_postable_comments: false,
     posted_at: null,
     score: null,
     workflow_state: null
   }
 
   return {
+    hasPostableComments: !!submission.has_postable_comments,
     postedAt: submission.posted_at,
     score: submission.score,
     workflowState: submission.workflow_state

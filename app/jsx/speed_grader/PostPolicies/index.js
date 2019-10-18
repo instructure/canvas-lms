@@ -114,6 +114,7 @@ export default class PostPolicies {
       onPosted,
       sections: this._sections,
       submissions: submissions.map(submission => ({
+        hasPostableComments: !!submission.has_postable_comments,
         postedAt: submission.posted_at,
         score: submission.score,
         workflowState: submission.workflow_state

@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-elements'
 import 'message_students'
 import I18n from 'i18n!gradezilla'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {isHidden} from '../../../../grading/helpers/SubmissionHelper'
+import {isPostable} from '../../../../grading/helpers/SubmissionHelper'
 import MessageStudentsWhoHelper from '../../../shared/helpers/messageStudentsWhoHelper'
 import ColumnHeader from './ColumnHeader'
 
@@ -89,23 +89,23 @@ SecondaryDetailLine.propTypes = {
 }
 
 function labelForPostGradesAction(postGradesAction) {
-  if (!postGradesAction.hasGrades) {
-    return I18n.t('No grades to post')
-  } else if (postGradesAction.hasGradesToPost) {
+  if (postGradesAction.hasGradesOrCommentsToPost) {
     return I18n.t('Post grades')
+  } else if (postGradesAction.hasGradesOrPostableComments) {
+    return I18n.t('All grades posted')
   }
 
-  return I18n.t('All grades posted')
+  return I18n.t('No grades to post')
 }
 
 function labelForHideGradesAction(hideGradesAction) {
-  if (!hideGradesAction.hasGrades) {
-    return I18n.t('No grades to hide')
-  } else if (hideGradesAction.hasGradesToHide) {
+  if (hideGradesAction.hasGradesOrCommentsToHide) {
     return I18n.t('Hide grades')
+  } else if (hideGradesAction.hasGradesOrPostableComments) {
+    return I18n.t('All grades hidden')
   }
 
-  return I18n.t('All grades hidden')
+  return I18n.t('No grades to hide')
 }
 
 export default class AssignmentColumnHeader extends ColumnHeader {
@@ -131,13 +131,14 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     }).isRequired,
 
     hideGradesAction: shape({
-      hasGradesToHide: bool.isRequired,
+      hasGradesOrCommentsToHide: bool.isRequired,
       onSelect: func.isRequired
     }).isRequired,
 
     postGradesAction: shape({
       featureEnabled: bool.isRequired,
-      hasGradesToPost: bool.isRequired,
+      hasGradesOrPostableComments: bool.isRequired,
+      hasGradesOrCommentsToPost: bool.isRequired,
       newIconsEnabled: bool.isRequired,
       onSelect: func.isRequired
     }).isRequired,
@@ -423,9 +424,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
         {this.props.postGradesAction.featureEnabled ? (
           <Menu.Item
-            disabled={
-              !this.props.postGradesAction.hasGradesToPost || !this.props.postGradesAction.hasGrades
-            }
+            disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
             onSelect={this.postGrades}
           >
             {labelForPostGradesAction(this.props.postGradesAction)}
@@ -445,9 +444,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
         {this.props.postGradesAction.featureEnabled && (
           <Menu.Item
-            disabled={
-              !this.props.hideGradesAction.hasGradesToHide || !this.props.hideGradesAction.hasGrades
-            }
+            disabled={!this.props.hideGradesAction.hasGradesOrCommentsToHide}
             onSelect={this.hideGrades}
           >
             {labelForHideGradesAction(this.props.hideGradesAction)}
@@ -507,7 +504,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     }
 
     const submissions = this.props.students.map(student => student.submission)
-    const postableSubmissionsPresent = submissions.some(isHidden)
+    const postableSubmissionsPresent = submissions.some(isPostable)
 
     if (newIconsEnabled) {
       // Assignment has at least one hidden submission that can be posted

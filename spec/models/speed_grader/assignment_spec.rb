@@ -280,6 +280,52 @@ describe SpeedGrader::Assignment do
       allow(Canvadoc).to receive(:mime_types).and_return("image/png")
     end
 
+    describe "has_postable_comments" do
+      before(:each) do
+        PostPolicy.enable_feature!
+        @course.root_account.enable_feature!(:allow_postable_submission_comments)
+        @course.enable_feature!(:new_gradebook)
+        @assignment.ensure_post_policy(post_manually: true)
+      end
+
+      it "is not included when allow_postable_submission_comments feature is not enabled" do
+        @course.root_account.disable_feature!(:allow_postable_submission_comments)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        expect(json[:submissions].first).not_to have_key "has_postable_comments"
+      end
+
+      it "is not included when Post Policies are not enabled" do
+        @course.disable_feature!(:new_gradebook)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        expect(json[:submissions].first).not_to have_key "has_postable_comments"
+      end
+
+      it "is true when unposted, hidden comments exist, and postable comments feature is enabled" do
+        student1_sub = @assignment.submissions.find_by!(user: @student_1)
+        student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
+        expect(submission_json["has_postable_comments"]).to be true
+      end
+
+      it "is not present when unposted, hidden comments exist, and postable comments feature is not enabled" do
+        @course.root_account.disable_feature!(:allow_postable_submission_comments)
+        student1_sub = @assignment.submissions.find_by!(user: @student_1)
+        student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
+        expect(submission_json).not_to have_key "has_postable_comments"
+      end
+
+      it "is false when unposted and only non-hidden comments exist" do
+        student1_sub = @assignment.submissions.find_by!(user: @student_1)
+        student1_sub.add_comment(author: @student1, comment: "good job!", hidden: false)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
+        expect(submission_json["has_postable_comments"]).to be false
+      end
+    end
+
     it "returns submission lateness" do
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
       json[:submissions].each do |submission|

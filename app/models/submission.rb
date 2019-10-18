@@ -143,6 +143,11 @@ class Submission < ActiveRecord::Base
 
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
+  scope :postable, -> { graded.union(with_hidden_comments) }
+  scope :with_hidden_comments, -> {
+    where("EXISTS (?)", SubmissionComment.where("submission_id = submissions.id AND hidden = true"))
+  }
+
   # This should only be used in the course drop down to show assignments recently graded.
   scope :recently_graded_assignments, lambda { |user_id, date, limit|
     select("assignments.id, assignments.title, assignments.points_possible, assignments.due_at,
