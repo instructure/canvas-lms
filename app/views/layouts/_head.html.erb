@@ -80,7 +80,7 @@
     }
     document.addEventListener('click', _earlyClick)
   </script>
-  <%= javascript_include_tag(active_brand_config_url('js'), defer: true) %>
+  <%= load_scripts_async_in_order([active_brand_config_url('js')]) %>
 
   <% js_bundle :navigation_header unless @headers == false %>
 
