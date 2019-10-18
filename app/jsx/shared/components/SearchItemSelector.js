@@ -18,59 +18,69 @@
 
 import I18n from 'i18n!managed_course_selector'
 import React, {useState} from 'react'
-import {func} from 'prop-types'
+import {func, string} from 'prop-types'
 
 import CanvasAsyncSelect from './CanvasAsyncSelect'
-import useManagedCourseSearchApi from '../effects/useManagedCourseSearchApi'
 import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
 
 const MINIMUM_SEARCH_LENGTH = 3
 
-ManagedCourseSelector.propTypes = {
-  onCourseSelected: func // (course) => {} (see proptypes/course.js)
+SearchItemSelector.propTypes = {
+  onItemSelected: func, // expects each item to have the 'name' property
+  itemSearchFunction: func,
+  renderLabel: string,
+  contextId: string
 }
 
-ManagedCourseSelector.defaultProps = {
-  onCourseSelected: () => {}
+SearchItemSelector.defaultProps = {
+  onItemSelected: () => {},
+  itemSearchFunction: () => {},
+  renderLabel: ''
 }
 
 function isSearchableTerm(value) {
   return value.length === 0 || value.length >= MINIMUM_SEARCH_LENGTH
 }
 
-export default function ManagedCourseSelector({onCourseSelected}) {
-  const [courses, setCourses] = useState(null)
+export default function SearchItemSelector({
+  onItemSelected,
+  renderLabel,
+  itemSearchFunction,
+  contextId = ''
+}) {
+  const [items, setItems] = useState(null)
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [inputValue, setInputValue] = useState('')
-  const [selectedCourse, setSelectedCourse] = useState(null)
+  const [selectedItem, setSelectedItem] = useState(null)
   const {searchTerm, setSearchTerm, searchTermIsPending} = useDebouncedSearchTerm('', {
     isSearchableTerm
   })
 
-  const searchParams = searchTerm.length === 0 ? {} : {term: searchTerm}
-  useManagedCourseSearchApi({
-    success: setCourses,
+  const searchParams = searchTerm.length === 0 ? {} : {term: searchTerm, search_term: searchTerm}
+  if (contextId) searchParams.contextId = contextId
+  itemSearchFunction({
+    success: setItems,
     error: setError,
     loading: setIsLoading,
     params: searchParams
   })
 
-  const handleCourseSelected = (ev, id) => {
-    if (courses === null) return
-    const course = courses.find(c => c.id === id)
-    if (!course) return
+  const handleItemSelected = (ev, id) => {
+    if (items === null) return
+    const item = items.find(i => i.id === id)
+    if (!item) return
 
-    setInputValue(course.name)
-    setSelectedCourse(course)
-    onCourseSelected(course)
+    setInputValue(item.name)
+    setSelectedItem(item)
+    onItemSelected(item)
   }
 
   const handleInputChanged = ev => {
     setInputValue(ev.target.value)
     setSearchTerm(ev.target.value)
-    if (selectedCourse !== null) onCourseSelected(null)
-    setSelectedCourse(null)
+    if (selectedItem !== null) onItemSelected(null)
+    setSelectedItem(null)
   }
 
   // If there's an error, throw it to an ErrorBoundary
@@ -80,26 +90,26 @@ export default function ManagedCourseSelector({onCourseSelected}) {
   const noOptionsLabel = searchableInput
     ? I18n.t('No Results')
     : I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH})
-  const courseOptions =
-    courses === null || !searchableInput
+  const itemOptions =
+    items === null || !searchableInput
       ? null
-      : courses.map(course => (
-          <CanvasAsyncSelect.Option key={course.id} id={course.id}>
-            {course.name}
+      : items.map(item => (
+          <CanvasAsyncSelect.Option key={item.id} id={item.id}>
+            {item.name}
           </CanvasAsyncSelect.Option>
         ))
 
   const selectProps = {
-    options: courseOptions,
+    options: itemOptions,
     isLoading: isLoading || searchTermIsPending,
     inputValue,
-    selectedOptionId: selectedCourse ? selectedCourse.id : null,
+    selectedOptionId: selectedItem ? selectedItem.id : null,
     assistiveText: I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH}),
-    renderLabel: I18n.t('Select a Course'),
+    renderLabel,
     placeholder: I18n.t('Begin typing to search'),
     noOptionsLabel,
     onInputChange: handleInputChanged,
-    onOptionSelected: handleCourseSelected
+    onOptionSelected: handleItemSelected
   }
-  return <CanvasAsyncSelect {...selectProps}>{courseOptions}</CanvasAsyncSelect>
+  return <CanvasAsyncSelect {...selectProps}>{itemOptions}</CanvasAsyncSelect>
 }
