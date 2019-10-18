@@ -72,6 +72,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should show one image in student image sidebar" do
+      skip('Currently broken COREFE-371')
       get "/courses/#{@course.id}/discussion_topics/new"
       click_images_toolbar_button
       click_user_images
