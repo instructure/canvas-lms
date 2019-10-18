@@ -16,8 +16,8 @@ services:
       RAILS_DB_PASSWORD: ''
       DATABASE_URL: "postgres://postgres@postgres:5432/canvas_test"
       RANDOMIZE_SEQUENCES: 1
-      RERUNS_RETRY: $RERUNS_RETRY
-      MAX_FAIL: $MAX_FAIL
+      RERUNS_RETRY:
+      MAX_FAIL:
 
   redis:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
