@@ -19,6 +19,16 @@ services:
       RERUNS_RETRY:
       MAX_FAIL:
 
+      # knapsack
+      CI_NODE_TOTAL:
+      CI_NODE_INDEX:
+      KNAPSACK_ENABLED:
+      KNAPSACK_TEST_FILE_PATTERN:
+      KNAPSACK_EXCLUDE_REGEX:
+      KNAPSACK_TEST_DIR:
+      KNAPSACK_GENERATE_REPORT:
+
+
   redis:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
 
