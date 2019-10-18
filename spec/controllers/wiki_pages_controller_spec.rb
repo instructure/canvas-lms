@@ -40,21 +40,6 @@ describe WikiPagesController do
     end
   end
 
-  describe "GET 'index'" do
-    it "sets DIRECT_SHARE_ENABLED when enabled" do
-      @course.account.enable_feature!(:direct_share)
-      get 'index', params: {course_id: @course.id}
-      expect(response).to be_successful
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(true)
-    end
-
-    it "does not set DIRECT_SHARE_ENABLED when disabled" do
-      get 'index', params: {course_id: @course.id}
-      expect(response).to be_successful
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
-    end
-  end
-
   context "with page" do
     before do
       @page = @course.wiki_pages.create!(title: "ponies5ever", body: "")

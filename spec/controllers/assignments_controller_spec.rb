@@ -232,19 +232,6 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
-    it "js_env DIRECT_SHARE_ENABLED when direct_share feature is enabled" do
-      @course.root_account.enable_feature!(:direct_share)
-      user_session(@teacher)
-      get 'index', params: {:course_id => @course.id}
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to eq true
-    end
-
-    it "js_env DIRECT_SHARE_ENABLED when direct_share feature is disabled" do
-      user_session(@teacher)
-      get 'index', params: {:course_id => @course.id}
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to eq false
-    end
-
     context "draft state" do
       it "should create a default group if none exist" do
         user_session(@student)

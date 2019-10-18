@@ -126,6 +126,25 @@ RSpec.describe ApplicationController do
       expect(@controller.js_env[:TIMEZONE]).to eq 'America/Juneau'
     end
 
+    describe "DIRECT_SHARE_ENABLED feature flag" do
+      it "sets the env var to true when FF is enabled" do
+        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        allow(root_account).to receive(:feature_enabled?).and_return(false)
+        allow(root_account).to receive(:feature_enabled?).with(:direct_share).and_return(true)
+        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
+        controller.instance_variable_set(:@domain_root_account, root_account)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
+      end
+
+      it "sets the env var to false when FF is disabled" do
+        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        allow(root_account).to receive(:feature_enabled?).and_return(false)
+        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
+        controller.instance_variable_set(:@domain_root_account, root_account)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+      end
+    end
+
     it "sets the contextual timezone from the context" do
       Time.zone = "Mountain Time (US & Canada)"
       controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))

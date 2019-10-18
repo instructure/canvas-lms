@@ -1895,7 +1895,6 @@ class CoursesController < ApplicationController
         js_env({
                  # don't check for student enrollments because we want to show course items on the teacher's  syllabus
                  STUDENT_PLANNER_ENABLED: @domain_root_account&.feature_enabled?(:student_planner),
-                 DIRECT_SHARE_ENABLED: @domain_root_account&.feature_enabled?(:direct_share),
                  COURSE: {
                    id: @context.id.to_s,
                    pages_url: polymorphic_url([@context, :wiki_pages]),

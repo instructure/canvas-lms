@@ -122,7 +122,10 @@ class Quizzes::QuizzesController < ApplicationController
           migrate_quiz_enabled:
             @context.feature_enabled?(:quizzes_next) &&
               @context.quiz_lti_tool.present?,
-          DIRECT_SHARE_ENABLED: can_manage && @domain_root_account&.feature_enabled?(:direct_share)
+          # TODO: remove this since it's set in application controller
+          # Will need to update consumers of this in the UI to bring down
+          # this permissions check as well
+          DIRECT_SHARE_ENABLED: can_manage && @domain_root_account.try(:feature_enabled?, :direct_share),
         },
         :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
         :SIS_NAME => sis_name,
