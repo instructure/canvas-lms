@@ -124,6 +124,9 @@ export const MARK_SUBMISSION_COMMENT_READ = gql`
     markSubmissionCommentsRead(
       input: {submissionCommentIds: $commentIds, submissionId: $submissionId}
     ) {
+      submissionComments {
+        _id
+      }
       errors {
         ...Error
       }

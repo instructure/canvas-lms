@@ -80,10 +80,14 @@ export const STUDENT_VIEW_QUERY = gql`
 `
 
 export const SUBMISSION_COMMENT_QUERY = gql`
-  query GetSubmissionComments($submissionId: ID!, $submissionAttempt: Int!) {
+  query GetSubmissionComments($submissionId: ID!, $submissionAttempt: Int!, $cursor: String) {
     submissionComments: node(id: $submissionId) {
       ... on Submission {
-        commentsConnection(filter: {forAttempt: $submissionAttempt}) {
+        commentsConnection(last: 20, before: $cursor, filter: {forAttempt: $submissionAttempt}) {
+          pageInfo {
+            startCursor
+            hasPreviousPage
+          }
           nodes {
             ...SubmissionComment
           }

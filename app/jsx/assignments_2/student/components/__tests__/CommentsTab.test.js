@@ -28,8 +28,8 @@ import {render, waitForElement, fireEvent, wait, act} from '@testing-library/rea
 import React from 'react'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 
-async function mockSubmissionCommentQuery(overrides = {}) {
-  const variables = {submissionAttempt: 0, submissionId: '1'}
+async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}) {
+  const variables = {submissionAttempt: 0, submissionId: '1', ...variableOverrides}
   const allOverrides = [
     {DateTime: '2010-10-16T23:59:59-06:00'},
     {Node: {__typename: 'Submission'}},
@@ -130,6 +130,77 @@ describe('CommentsTab', () => {
       </MockedProvider>
     )
     expect(await waitForElement(() => getByTestId('comments-container'))).toBeInTheDocument()
+  })
+
+  it('renders Load More Comments button when pages remain', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        pageInfo: {
+          hasPreviousPage: true
+        }
+      }
+    }
+
+    const mocks = [await mockSubmissionCommentQuery(overrides)]
+    const props = await mockAssignmentAndSubmission()
+
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <CommentsTab {...props} />
+      </MockedProvider>
+    )
+
+    expect(await waitForElement(() => getByText('Load More Comments'))).toBeInTheDocument()
+  })
+
+  it('does not render Load More Comments button when no pages remain', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        pageInfo: {
+          hasPreviousPage: false
+        }
+      }
+    }
+
+    const mocks = [await mockSubmissionCommentQuery(overrides)]
+    const props = await mockAssignmentAndSubmission()
+
+    const {queryByText} = render(
+      <MockedProvider mocks={mocks}>
+        <CommentsTab {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByText('Load More Comments')).not.toBeInTheDocument()
+  })
+
+  it('loads more comments when button is clicked', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        pageInfo: {
+          hasPreviousPage: true
+        }
+      }
+    }
+
+    const mocks = [
+      await mockSubmissionCommentQuery(overrides),
+      await mockSubmissionCommentQuery(overrides, {cursor: 'Hello World'})
+    ]
+    const props = await mockAssignmentAndSubmission()
+
+    const querySpy = jest.spyOn(apollo, 'useQuery')
+
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <CommentsTab {...props} />
+      </MockedProvider>
+    )
+
+    const loadMoreButton = await waitForElement(() => getByText('Load More Comments'))
+    fireEvent.click(loadMoreButton)
+
+    expect(querySpy).toHaveBeenCalledTimes(3)
   })
 
   it('renders CommentTextArea', async () => {
