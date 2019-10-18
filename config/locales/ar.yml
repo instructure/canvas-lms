@@ -1974,6 +1974,7 @@ ar:
   all_comments_are_sent_to_the_whole_group_284591e7: "يتم إرسال جميع الرسائل إلى المجموعة بأكملها"
   all_comments_are_sent_to_the_whole_group_778126f3: "يتم إرسال جميع الرسائل إلى المجموعة بأكملها."
   all_configured_apps_a14eef0a: "جميع التطبيقات المكوّنة"
+  all_courses_80701c6f: "جميع المساقات."
   all_courses_a7dbb853: "جميع المساقات"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "يجب تقديم وتنسيق كافة حقول التواريخ بشكل صحيح"
   all_day_fb42c4fc: "طوال اليوم"
@@ -3584,6 +3585,8 @@ ar:
   assignments_2_e88d7a26: "المهمة 2"
   assignments_2_student_error_page_3ca3e0df: "صفحة خطأ مهام 2 للطالب"
   assignments_2_student_initial_query_error_52aa5ebd: "خطأ في الاستعلام الأولي لإرسال مهام 2 للطالب"
+  assignments_2_student_view_224cb233: "طريقتا عرض المهام للطالب"
+  assignments_2_teacher_view_3cd3aeda: "طريقتا عرض المهام للمعلم"
   assignments_2_teacher_view_error_page_8e45dedc: "معلمان للمهمة يعرضان صفحة خطأ"
   assignments_and_gradebook_37e43d4f: "المهام ودفتر الدرجات"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "المهام والاختبارات الموجزة - إضافة / تحرير / حذف"
@@ -3956,6 +3959,15 @@ ar:
   body_9f663faf: الجسم
   body_f48fe5cd: "النص:"
   body_shadow_d36e8c2e: "ظل النص"
+  body_text_more_info_at_url_754b1a5a: |-
+      %{body_text}
+      
+      المزيد من المعلومات على %{url}
+  body_text_you_can_view_the_assignment_here_url_a4d5092c: |-
+      %{body_text}
+      
+      يمكنك عرض المهمة هنا: 
+      %{url}
   bolivia_567898d8: بوليفيا
   bolivia_591_9b8a7a5c: "بوليفيا (+591)"
   bookmark_bank_46d729be: "الإشارة المرجعية %{bank}"
@@ -4570,6 +4582,7 @@ ar:
   can_update_public_jwk_for_lti_services_26037129: "يمكن تحديث jwk العام لخدمات LTI."
   can_update_subscription_to_data_service_data_374a0c89: "يمكن تحديث اشتراك بيانات خدمة البيانات."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "يمكن عرض بيانات المهمة في دفتر الدرجات المقترن بالأداة."
+  can_view_feature_flags_c92e0aa9: "يمكنك عرض إشارات الميزات"
   can_view_submission_data_for_assignments_associate_dd06f583: "يمكن عرض بيانات الإرسال للمهام المقترنة بالأداة."
   canada_1_921df67a: "كندا (+1)"
   canada_aec587fa: كندا
@@ -4784,6 +4797,8 @@ ar:
   choose_home_page_80cef4ee: "اختيار الصفحة الرئيسية"
   choose_image_242f727e: "اختيار صورة"
   choose_image_e5ee5d7a: "اختيار الصورة"
+  choose_one_2c4277df: "اختر نوعًا واحدًا"
+  choose_one_submission_type_cf4eda5b: "اختر نوع إرسال واحد"
   choose_student_1513fcd1: "-- اختيار طالب --"
   choose_the_next_mastery_path_b035b727: "اختر مسار الإتقان التالي"
   choose_usage_rights_33683854: "اختيار حقوق الاستخدام..."
@@ -5042,6 +5057,7 @@ ar:
   comment_input_box_b8c7e58b: "مربع إدخال التعليق"
   comment_submitted_d9934b: "تم إرسال التعليق!"
   comments_e07bcbe3: التعليقات
+  comments_for_this_attempt_a5fae61f: "التعليقات على هذه المحاولة"
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "يقوم هذا الإجراء بتمكين تحويل حِزم الكارتريدج المشتركة الموجودة بتنسيق json الوسيط ليتم استيرادها"
   common_cartridge_display: "الكارتريدج المشتركة"
@@ -5239,6 +5255,7 @@ ar:
   confirm_edit_outcome_a9746c99: "تأكيد ناتج التحرير"
   confirm_removal_a9bb889: "تأكيد الإزالة"
   confirm_reservation_removal_e6350e7c: "تأكيد إزالة الحجز"
+  confirm_unfavorite_course_fa01966d: "تأكيد إلغاء المساق من المفضلة"
   confirmation_code_required_22984955: "رمز التأكيد (مطلوب)"
   confirmation_failed_please_try_again_ae566d37: "فشل التأكيد. يرجى إعادة المحاولة."
   consumer_key_57d9fcf1: "مفتاح العميل"
@@ -6534,6 +6551,7 @@ ar:
       topic: "موضوع غير معروف"
       wiki_page: "صفحة wiki غير معروفة"
   course_external_tools_query_error_d5110efe: "خطأ استعلام الأدوات الخارجية للمساق"
+  course_favorites_from_dashboard_27a3515a: "تفضيلات المساق من لوحة المعلومات"
   course_files_62deb8f8: "ملفات المساق"
   course_files_a31f97fc: "ملفات المساق"
   course_files_add_edit_delete_24678a2f: "ملفات المساق - إضافة / تحرير / حذف"
@@ -7390,7 +7408,7 @@ ar:
     plugins: "مكونات إضافية"
     prior_users: "مستخدمون سابقون"
     question_banks: "بنوك الأسئلة"
-    quizzes: ~
+    quizzes: "الاختبارات الموجزة"
     registered_services: "الخدمات المسجّلة"
     revisions: المراجعات
     rubrics: العناوين
@@ -7578,6 +7596,7 @@ ar:
       show_less: "عرض القليل"
       show_more: "عرض المزيد"
   dashboard_7f1dbf71: "لوحة المعلومات"
+  dashboard_card_movement_menu_b65b98f5: "قائمة حركة بطاقة لوحة المعلومات"
   dashboard_options_b240ed5a: "خيارات لوحة المعلومات"
   dashboard_view_d7d85969: "عرض لوحة المعلومات"
   data_exports: "عمليات تصدير البيانات"
@@ -10010,6 +10029,10 @@ ar:
   grade_change_activity_75fb525: "نشاط تغيير الدرجة"
   grade_change_log_231f90e4: "سجل تغيير الدرجة"
   grade_change_notifications_98461261: "إعلامات تغيير الدرجات"
+  grade_changes_and_comments_have_been_released_for__3978b741: "تم إصدار تغييرات وتعليقات التقديرات للجميع."
+  grade_changes_and_comments_have_been_released_for__5d6a01a0: "تم إصدار تغييرات وتعليقات التقديرات لجميع من في الأقسام: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__624411ff: "تم إصدار تغييرات وتعليقات التقديرات لجميع من تم تقييمه في الأقسام: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__79d3473e: "تم إصدار تغييرات وتعليقات التقديرات لجميع من تم تقييمه."
   grade_changes_and_new_comments_released_for_title__f1350f92: "تم إصدار تغييرات التقدير والتعليقات الجديدة لـ: %{title}، %{course}"
   grade_changes_cb5a57a8: "التغييرات في الدرجات"
   grade_display_warning_dialog: 
@@ -12515,6 +12538,7 @@ ar:
   loading_announcements_b927a86c: "جارٍ تحميل الإعلانات"
   loading_assessment_audit_trail_5cf4c10: "جارٍ تحميل مسار تدقيق التقييم"
   loading_assignments_352ec769: "جارٍ تحميل المهام"
+  loading_associations_2b92bcf7: "جارٍ تحميل الاقترانات..."
   loading_associations_9da66c4e: "تحميل الاقترانات"
   loading_associations_complete_b93a9c6e: "اكتمل تحميل الاقترانات"
   loading_associations_started_1f65d8d: "بدأ تحميل الاقترانات"
@@ -12764,6 +12788,7 @@ ar:
   make_new_settings_for_sis_integrations_visible_and_875039ca: "إجراء إعدادات جديدة لتكاملات نظام معلومات الطلاب مرئي ونشط"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "تأكد من اختيار أنسب خيار حيث قد تتأثر نقاط الطلاب."
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "جعل هذا المساق مرئيًا بصورة عامة (ستظل بيانات الطلاب خاصة)"
+  makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "يجعب خيار ارتباط Microsoft Immersive Reader يظهر على صفحات ويكي."
   making_a_copy_of_originalassignmentname_b7268992: "جار إنشاء نسخة من \"%{originalAssignmentName}\""
   malay_f5dddce4: الماليزية
   malaysia_60_7d357b28: "ماليزيا (+60)"
@@ -13545,15 +13570,15 @@ ar:
     assignment_unmuted: 
       email: 
         body: |-
-            قام المعلم بإصدار تغييرات في الدرجات وتعليقات جديدة لـ %{title}. تعد هذه التغييرات قابلة للعرض الآن.
+            أصدر معلمك تغييرات على التقدير وتعليقات جديدة لـ %{title}. هذه التغييرات قابلة للعرض الآن.
             
             يمكنك عرضها هنا: 
             %{url}
         html: 
           body: "قام المعلم بإصدار تغييرات الدرجات وتعليقات جديدة لـ %{title}. ويمكن عرض هذه التغييرات الآن."
-          link: "يمكنك عرضها هنا"
+          link: "يمكنك عرض المهمة هنا"
           subject: "المهمة التي تم إلغاء حجبها: %{title}، %{course}"
-        subject: "المهمة التي تم إلغاء حجبها: %{title}, %{course}"
+        subject: "تم إلغاء كتم المهمة: %{title}، %{course}"
       sms: 
         body: |-
             قام المعلم بإصدار درجات وتعليقات لـ %{title}، %{course}.
@@ -14703,6 +14728,10 @@ ar:
         html: 
           body: "أصدر معلمك تغييرات على التقدير وتعليقات جديدة لـ %{title}. هذه التغييرات قابلة للعرض الآن."
           link: "يمكنك عرضها هنا"
+    submissions_posted: 
+      email: 
+        html: 
+          link: "يمكنك عرض المهمة هنا"
     summaries: 
       email: 
         daily_body: "تم تسجيلك لاستلام تقرير يومي خاص ببعض الإعلامات الواردة من حساب Canvas.  فيما يلي التقرير بتاريخ %{date}:"
@@ -14790,6 +14819,7 @@ ar:
   mexico_b2d7a271: المكسيك
   mgp_grade_export_d29b471f: "تصدير درجة MGP"
   mic_a7f3d311: الميكروفون
+  microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - إصدار تجريبي مجاني (صفحات ويكي)"
   migrate_67c9f753: ترحيل
   migrate_quiz_5d0f777: "ترحيل اختبار موجز"
   migration: 
@@ -15120,6 +15150,7 @@ ar:
     move_to_end: "-- في الأسفل --"
   move_discussion_9ff5b2d1: "نقل المناقشة"
   move_discussion_title_93ea7be1: "نقل المناقشة %{title}"
+  move_down_4a9c9b18: "تحريك لأسفل"
   move_group_3dd7f76e: "نقل المجموعة"
   move_group_77ae285d: "نقل المجموعة..."
   move_item_e94a8103: "نقل العنصر"
@@ -15149,6 +15180,7 @@ ar:
   move_this_section_890bee38: "تحريك هذا القسم"
   move_to_25d7ef11: "نقل إلى"
   move_to_9b91c6e0: "نقل إلى..."
+  move_to_bottom_d0f71bf0: "تحريك إلى المؤخرة"
   move_to_dde1a5e1: "نقل إلى..."
   move_to_end_c6bfbcf5: "انتقال إلى النهاية"
   move_to_end_fef2fa15: "التحرك إلى النهاية"
@@ -15156,7 +15188,9 @@ ar:
   move_to_front_bf6f0194: "التحرك إلى البداية"
   move_to_the_beginning_636b342c: "تحريك إلى البداية"
   move_to_the_end_bc05abf6: "تحريك إلى النهاية"
+  move_to_top_e0d7d66e: "تحريك إلى القمة"
   move_to_using_instui_for_several_components_and_im_21898396: "انتقل إلى استخدام InstUI لعدة مكونات وتطبيق نظام للمتجر"
+  move_up_2440f707: "تحريك لأعلى"
   moving_a4d552df: "يتم الآن النقل..."
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
@@ -15333,6 +15367,7 @@ ar:
   new_module_4e9287e4: "وحدة جديدة"
   new_outcome_7fba8c7d: "نتيجة جديدة"
   new_outcome_group_af59f145: "مجموعة نتائج جديدة"
+  new_post_policy_icons_da13a62c: "أيقونات سياسة النشر الجديدة"
   new_question_9107c469: "سؤال جديد"
   new_question_group_d9306280: "مجموعة أسئلة جديدة"
   new_quiz_34aacba6: "اختبار جديد"
@@ -15390,7 +15425,9 @@ ar:
   no_collaboration_apps_3bbd30ce: "لا توجد تطبيقات تعاون"
   no_content_5dbc9acf: "لا يوجد محتوى"
   no_content_has_been_added_f36bab43: "* لم تتم إضافة أي محتوى"
+  no_content_has_been_shared_with_you_667fde6c: "لم تتم مشاركة أي محتوى معك."
   no_content_not_visible_to_students_b59f4867: "لا يوجد محتوى. ليس مرئيًا للطلاب"
+  no_courses_favorited_4e69fd63: "لا توجد مساقات مفضلة"
   no_courses_found_12d68a74: "لم يتم العثور على مساقات"
   no_date_bfeb2df7: "دون تاريخ"
   no_description_c2554c25: "بلا وصف"
@@ -19274,7 +19311,7 @@ ar:
     updated_at_short: "تم التعديل"
     view: عرض
   react_ui_rewrite_developer_key_management_aa1df236: "تفاعل إدارة مفتاح مطور إعادة كتابة واجهة المستخدم"
-  read_7cabda44: قراءة
+  read_7cabda44: مقروء
   read_comments_3fcc7590: "قراءة التعليقات"
   read_context_membership_8068f3dd: "قراءة عضوية السياق"
   read_line_item_results_6472a120: "قراءة نتائج عناصر البنود"
@@ -21896,6 +21933,7 @@ ar:
     errors_update_failed: "فشل التحديث"
   submissions_folder_9db8dadf: "مجلد الإرسالات"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "يجب إنشاء مجلدات الإرسالات في سياق المستخدم أو المجموعة"
+  submissions_posted_title_course_43677dba: "الإرسالات المنشورة: %{title}، %{course}"
   submissions_view_and_make_comments_cafaf361: "الإرسالات - عرض وإنشاء التعليقات"
   submit_a3cc6859: إرسال
   submit_a_comment_7edbf648: "إرسال تعليق"
@@ -22413,6 +22451,7 @@ ar:
                    إذا كنت ترغب في إزالتها، فيجب أن تقوم بإزالة الأداة المقترنة.
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "قام مسؤول بإنشاء فترات تقييم الدرجات هذه من أجلك."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "تم تعطيل هذا الإجراء بواسطة مسؤولك."
+  this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "هذا يسمح للمستخدم بإلغاء تفضيل المساقات مباشرة من بطاقة لوحة المعلومات الخاصة بها."
   this_allows_you_to_restrict_custom_javascript_that_d8495e02: |-
       يسمح لك هذا بتقييد تخصيص JavaScript الذي يعمل في حالتك من Canvas.
                      سيتم تمكين هذا من قبل سياسة أمان المحتوى (CSP) المحدثة.
@@ -23211,6 +23250,8 @@ ar:
   undo_remove_course_association_name_68eb4037: "التراجع عن إزالة اقتران المساق %{name}"
   unenrolled_bc89d5e3: "إلغاء التسجيل"
   unenrolled_users_e7632d24: "مستخدمين غير مسجلين"
+  unfavorite_cd0c113e: "إلغاء من المفضلة"
+  unfavorite_coursename_32f77231: "إلغاء %{courseName} من المفضلة"
   ungraded_147a0dce: "لم يتم تقييم الدرجة"
   ungraded_answers_31ef2df7: "أجوبة لم يتم تقييمها"
   ungraded_ed0c6f98: "لم يتم تقييم الدرجة"
@@ -23291,6 +23332,7 @@ ar:
   unpublishing_1fa99dc6: "جارٍ إلغاء النشر..."
   unread_c14cb06f: "غير مقروء،"
   unread_e9c1b19c: "غير مقروء"
+  unread_ee6db4aa: "غير مقروء"
   unreadcount_unread_replies_509e167f: "%{unreadCount} ردود غير مقروءة"
   unregister_service_985238e9: "إلغاء تسجيل الخدمة"
   unreserved_e86b7425: "غير محجوز"
@@ -23344,6 +23386,7 @@ ar:
   updated_permissions_page_f2e91060: "صفحة أذونات محدثة"
   updated_terms_of_service_82f34148: "تحديث شروط الخدمة"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "واجهة مستخدم محدّثة للبحث عن المستخدمين والمساقات في الحساب وعرضها."
+  updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "لتحديث عرض أيقونات سياسة النشر في عنوان عمود مهمة دفتر الدرجات الجديد."
   updating_6edbab78: تحديث
   updating_discussion_failed_aadb2d35: "فشل تحديث المناقشة"
   upload_8b403d05: تحميل
@@ -23417,6 +23460,8 @@ ar:
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "استخدام الفواصل المنقوطة لفصل الحقول في عمليات تصدير جداول بيانات متوافقة"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "استخدام الفواصل المنقوطة لفصل الحقول في عمليات تصدير دفتر الدرجات"
   use_the_new_assignments_page_dd292b9d: "استخدم صفحة المهام الجديدة"
+  use_the_new_assignments_student_page_944262af: "استخدم صفحة المهام الجديدة للطالب"
+  use_the_new_assignments_teacher_page_8add7e46: "استخدم صفحة المهام الجديدة للمعلم"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "استخدم الأداة الخارجية الجديدة للتعاونات التي توفر مزيد من الخيارات للأدوات التي تستخدم في التعاون"
   use_the_new_document_annotation_tool_2cbc98d0: "استخدم أداة التعليقات التوضيحية الجديدة للمستند"
   use_the_new_interface_for_managing_permissions_907e8e8f: "استخدام واجهة جديدة لإدارة الأذونات"
@@ -24071,6 +24116,7 @@ ar:
   we_were_unable_to_find_matches_below_f1c6d1ed: "تعذر علينا العثور على تطابقات أدناه."
   we_were_unable_to_find_matches_below_select_any_yo_87035b30: "تعذر علينا العثور على تطابقات أدناه. قم بتحديد أي منها تود إنشاؤه كمستخدمين جدد. سيتم تجاوز غير المحددين في الوقت الحالي."
   we_were_unable_to_find_matches_for_the_logins_belo_d5f79db2: "تعذر علينا العثور على تطابقات لعمليات تسجيل الدخول أدناه. قم بتحديد العناصر التي ترغب في إنشائها كمستخدمين جدد."
+  we_were_unable_to_remove_this_course_from_your_fav_70fa598d: "تعذر لدينا إزالة هذا المساق من المفضلة لديك."
   we_were_unable_to_update_the_app_659f5bc6: "لم نتمكن من تحديث التطبيق."
   web_conference: 
     default_name_for_courses: "مؤتمر ويب للمساق"
@@ -24355,6 +24401,9 @@ ar:
       أنت على وشك فقدان أي تغييرات لم يتم حفظها.
       
       هل مازلت تريد المتابعة؟
+  you_are_about_to_remove_this_course_from_your_dash_7e806db6: |-
+      أنت على وشك إزالة هذا المساق من لوحة المعلومات. ستبقى متاحة
+                    من خلال التنقل إلى المساقات > جميع المساقات من القائمة الرئيسية.
   you_are_currently_acting_as_user_name_8d2be0ee: "أنت الآن تتصرف كـ %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "لقد قمت بتسجيل الدخول إلى عرض الطالب حاليًا"
   you_are_currently_masquerading_as_user_name_f4a00ade: "إنك تتخفى حاليًا وكأنك %{user_name}"
@@ -24443,6 +24492,8 @@ ar:
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "لقد أدخلت درجة غير صالحة لهذا الطالب. تحقق من القيمة ونوع التقييم وحاول مرة أخرى."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*لقد أجريت تغييرات على الأسئلة في هذا الاختبار.* لن تظهر هذه التغييرات للطلاب حتى تحفظ الاختبار."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "ليس لديك أي تطبيقات تعاون مكونة. تحدث مع معلمك لإعداد البعض."
+  you_have_no_courses_favorited_reloading_this_page__a2bae9de: "لا توجد لديك مساقات مفضلة. إعادة تحميل هذه الصفحة ستؤدي إلى إظهار كل\n\
+      \x20     مساقاتك النشطة. إضافة مفضلات، انتقل إلى  "
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: "ليس لديك أي LTI مكون ليتفاعل مع التعاونات. تحدث مع معلمك لإعداد البعض."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "لا توجد نتائج. *انقر هنا* لإنشاء واحدة."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "لا توجد نتائج. انقر هنا للانتقال إلى صفحة النتائج."
