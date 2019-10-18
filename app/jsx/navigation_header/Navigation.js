@@ -63,13 +63,14 @@ export default class Navigation extends React.Component {
     super(props)
     this.closeTray = this.closeTray.bind(this)
     this.onInboxUnreadUpdate = this.onInboxUnreadUpdate.bind(this)
+    this.onSharesUnreadUpdate = this.onSharesUnreadUpdate.bind(this)
     this.state = {
       groups: [],
       accounts: [],
       courses: [],
       help: [],
       profile: [],
-      unread_count: 0,
+      unreadSharesCount: 0,
       isTrayOpen: false,
       type: null,
       coursesLoading: false,
@@ -84,6 +85,7 @@ export default class Navigation extends React.Component {
       profileAreLoaded: false
     }
     this.unreadInboxCountElement = null
+    this.unreadSharesCountElement = null
   }
 
   UNSAFE_componentWillMount() {
@@ -223,6 +225,8 @@ export default class Navigation extends React.Component {
   }
 
   renderTrayContent() {
+    const counts = {unreadShares: this.state.unreadSharesCount}
+
     switch (this.state.type) {
       case 'courses':
         return (
@@ -260,6 +264,7 @@ export default class Navigation extends React.Component {
             }
             loaded={this.state.profileAreLoaded}
             tabs={this.state.profile}
+            counts={counts}
           />
         )
       case 'help':
@@ -300,12 +305,41 @@ export default class Navigation extends React.Component {
     if (typeof this.props.onDataReceived === 'function') this.props.onDataReceived()
   }
 
+  onSharesUnreadUpdate(unreadCount) {
+    if (this.state.unreadSharesCount !== unreadCount)
+      this.setState({unreadSharesCount: unreadCount})
+  }
+
+  inboxUnreadSRText(count) {
+    return I18n.t(
+      {
+        one: 'One unread message.',
+        other: '%{count} unread messages.'
+      },
+      {count}
+    )
+  }
+
+  sharesUnreadSRText(count) {
+    return I18n.t(
+      {
+        one: 'One unread share.',
+        other: '%{count} unread shares.'
+      },
+      {count}
+    )
+  }
+
   render() {
     const UnreadComponent = this.props.unreadComponent
 
     if (this.unreadInboxCountElement === null)
       this.unreadInboxCountElement = document.querySelector(
         '#global_nav_conversations_link .menu-item__badge'
+      )
+    if (this.unreadSharesCountElement === null)
+      this.unreadSharesCountElement = document.querySelector(
+        '#global_nav_profile_link .menu-item__badge'
       )
 
     return (
@@ -324,11 +358,20 @@ export default class Navigation extends React.Component {
           </CloseButton>
           <div className="tray-with-space-for-global-nav">{this.renderTrayContent()}</div>
         </Tray>
+        {ENV.DIRECT_SHARE_ENABLED && (
+          <UnreadComponent
+            targetEl={this.unreadSharesCountElement}
+            dataUrl="/api/v1/users/self/content_shares/unread_count"
+            onUpdate={this.onSharesUnreadUpdate}
+            srText={this.sharesUnreadSRText}
+          />
+        )}
         {!ENV.current_user_disabled_inbox && (
           <UnreadComponent
             targetEl={this.unreadInboxCountElement}
             dataUrl="/api/v1/conversations/unread_count"
             onUpdate={this.onInboxUnreadUpdate}
+            srText={this.inboxUnreadSRText}
           />
         )}
       </>

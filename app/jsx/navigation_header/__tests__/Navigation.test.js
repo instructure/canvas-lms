@@ -24,14 +24,28 @@ describe('GlobalNavigation', () => {
     unreadComponent.mockClear()
     window.ENV.current_user_id = 10
     window.ENV.current_user_disabled_inbox = false
+    window.ENV.DIRECT_SHARE_ENABLED = true
   })
 
   it('renders', () => {
     expect(() => render(<Navigation unreadComponent={unreadComponent} />)).not.toThrow()
   })
 
-  describe('inbox unread badge', () => {
-    it('renders the inbox unread component', () => {
+  describe('unread badges', () => {
+    it('renders both the shares unread and the inbox unread component', () => {
+      render(<Navigation unreadComponent={unreadComponent} />)
+      expect(unreadComponent).toHaveBeenCalledTimes(2)
+      const urls = unreadComponent.mock.calls.map(parms => parms[0].dataUrl)
+      expect(urls).toEqual(
+        expect.arrayContaining([
+          '/api/v1/users/self/content_shares/unread_count',
+          '/api/v1/conversations/unread_count'
+        ])
+      )
+    })
+
+    it('does not render the shares unread component when the FF is off', () => {
+      ENV.DIRECT_SHARE_ENABLED = false
       render(<Navigation unreadComponent={unreadComponent} />)
       expect(unreadComponent).toHaveBeenCalledTimes(1)
       expect(unreadComponent.mock.calls[0][0].dataUrl).toBe('/api/v1/conversations/unread_count')
@@ -40,7 +54,10 @@ describe('GlobalNavigation', () => {
     it('does not render the inbox unread component when user has opted out of notifications', () => {
       ENV.current_user_disabled_inbox = true
       render(<Navigation unreadComponent={unreadComponent} />)
-      expect(unreadComponent).not.toHaveBeenCalled()
+      expect(unreadComponent).toHaveBeenCalledTimes(1)
+      expect(unreadComponent.mock.calls[0][0].dataUrl).toBe(
+        '/api/v1/users/self/content_shares/unread_count'
+      )
     })
   })
 })

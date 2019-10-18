@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, cleanup} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import {getByText as domGetByText} from '@testing-library/dom'
 import ProfileTray from '../ProfileTray'
 
 const imageUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
@@ -29,6 +30,7 @@ describe('ProfileTray', () => {
     props = {
       userDisplayName: 'Sample Student',
       userAvatarURL: imageUrl,
+      counts: {unreadShares: 12},
       tabs: [
         {
           id: 'foo',
@@ -39,13 +41,16 @@ describe('ProfileTray', () => {
           id: 'bar',
           label: 'Bar',
           html_url: '/bar'
+        },
+        {
+          id: 'shared',
+          label: 'Shared Content',
+          html_url: '/shared'
         }
       ],
       loaded: true
     }
   })
-
-  afterEach(cleanup)
 
   it('renders the component', () => {
     const {getByText} = render(<ProfileTray {...props} />)
@@ -68,5 +73,11 @@ describe('ProfileTray', () => {
     const {getByText} = render(<ProfileTray {...props} />)
     getByText('Foo')
     getByText('Bar')
+  })
+
+  it('renders the unread count badge on Shared Content', () => {
+    const {container} = render(<ProfileTray {...props} />)
+    const elt = container.firstChild.querySelector('a[href="/shared"]')
+    domGetByText(elt, '12 unread.')
   })
 })
