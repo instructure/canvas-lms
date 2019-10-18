@@ -53,27 +53,38 @@ class SubmissionDraft < ActiveRecord::Base
   end
   private :submission_attempt_matches_submission
 
+  def meets_text_entry_criteria?
+    self.body.present?
+  end
+
+  def meets_upload_criteria?
+    self.attachments.present?
+  end
+
+  def meets_url_criteria?
+    return false if self.url.blank?
+    begin
+      CanvasHttp.validate_url(self.url)
+      true
+    rescue URI::Error, ArgumentError
+      false
+    end
+  end
+
+  # this checks if any type on the assignment is drafted
   def meets_assignment_criteria?
-    # we just need to meet draft criteria for a single type to be valid
     submission_types = self.submission.assignment.submission_types.split(',')
     submission_types.each do |type|
       case type
       when 'online_text_entry'
-        return true if self.body.present?
+        return true if meets_text_entry_criteria?
       when 'online_upload'
-        return true if self.attachments.present?
+        return true if meets_upload_criteria?
       when 'online_url'
-        return false if self.url.blank?
-        begin
-          CanvasHttp.validate_url(self.url)
-          return true
-        rescue URI::Error, ArgumentError
-          return false
-        end
+        return true if meets_url_criteria?
       end
     end
 
-    # return false if we did not meet our draft requirements for any of the types
     false
   end
 end

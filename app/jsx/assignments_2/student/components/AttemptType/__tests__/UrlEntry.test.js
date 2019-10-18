@@ -40,7 +40,7 @@ describe('UrlEntry', () => {
             activeSubmissionType: 'online_url',
             attachments: () => [],
             body: null,
-            meetsAssignmentCriteria: false,
+            meetsUrlCriteria: false,
             url: null
           }
         }
@@ -57,7 +57,7 @@ describe('UrlEntry', () => {
             activeSubmissionType: 'online_url',
             attachments: () => [],
             body: null,
-            meetsAssignmentCriteria: false,
+            meetsUrlCriteria: false,
             url: 'not a valid url'
           }
         }
@@ -74,7 +74,7 @@ describe('UrlEntry', () => {
             activeSubmissionType: 'online_url',
             attachments: () => [],
             body: null,
-            meetsAssignmentCriteria: true,
+            meetsUrlCriteria: true,
             url: 'http://www.valid.com'
           }
         }
@@ -91,7 +91,7 @@ describe('UrlEntry', () => {
             activeSubmissionType: 'online_url',
             attachments: () => [],
             body: null,
-            meetsAssignmentCriteria: true,
+            meetsUrlCriteria: true,
             url: 'http://www.reddit.com'
           }
         }

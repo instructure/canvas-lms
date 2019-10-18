@@ -48,7 +48,7 @@ describe('SubmissionManager', () => {
     expect(queryByText('Submit')).not.toBeInTheDocument()
   })
 
-  it('renders a submit button when the draft criteria is met', async () => {
+  it('renders a submit button when the draft criteria is met for the active type', async () => {
     const props = await mockAssignmentAndSubmission({
       Submission: SubmissionMocks.onlineUploadReadyToSubmit
     })
@@ -59,6 +59,24 @@ describe('SubmissionManager', () => {
     )
 
     expect(getByText('Submit')).toBeInTheDocument()
+  })
+
+  it('does not render the submit button if the draft criteria is not met for the active type', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        submissionDraft: {
+          activeSubmissionType: 'online_upload',
+          body: 'some text here'
+        }
+      }
+    })
+    const {queryByText} = render(
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByText('Submit')).not.toBeInTheDocument()
   })
 
   it('disables the submit button after it is pressed', async () => {

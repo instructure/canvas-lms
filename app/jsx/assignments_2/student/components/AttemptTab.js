@@ -17,7 +17,7 @@
  */
 
 import {Assignment} from '../graphqlData/Assignment'
-import {bool, func} from 'prop-types'
+import {bool, func, string} from 'prop-types'
 import {FormField} from '@instructure/ui-form-field'
 import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '../../shared/LoadingIndicator'
@@ -35,17 +35,15 @@ const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
 
 export default class AttemptTab extends Component {
   static propTypes = {
+    activeSubmissionType: string,
     assignment: Assignment.shape,
     createSubmissionDraft: func,
     editingDraft: bool,
     submission: Submission.shape,
+    updateActiveSubmissionType: func,
     updateEditingDraft: func,
     updateUploadingFiles: func,
     uploadingFiles: bool
-  }
-
-  state = {
-    activeSubmissionType: this.props.submission?.submissionDraft?.activeSubmissionType || null
   }
 
   friendlyTypeName = type => {
@@ -60,6 +58,16 @@ export default class AttemptTab extends Component {
         return I18n.t('URL')
       default:
         throw new Error('submission type not yet supported in A2')
+    }
+  }
+
+  getCurrentSubmissionType = () => {
+    if (this.props.submission.url !== null) {
+      return 'online_url'
+    } else if (this.props.submission.body !== null && this.props.submission.body !== '') {
+      return 'online_text_entry'
+    } else if (this.props.submission.attachments.length !== 0) {
+      return 'online_upload'
     }
   }
 
@@ -149,18 +157,24 @@ export default class AttemptTab extends Component {
   }
 
   renderSubmissionTypeSelector() {
+    // because we are currently allowing only a single submission type
+    // you should never need to change types after submitting
+    if (this.props.submission.state === 'graded' || this.props.submission.state === 'submitted') {
+      return null
+    }
+
     return (
       <FormField
         id="select-submission-type"
         label={<Text weight="bold">{I18n.t('Submission Type')}</Text>}
       >
         <select
-          onChange={event => this.setState({activeSubmissionType: event.target.value})}
+          onChange={event => this.props.updateActiveSubmissionType(event.target.value)}
           style={{
             margin: '0 0 10px 0',
             width: '225px'
           }}
-          value={this.state.activeSubmissionType || 'default'}
+          value={this.props.activeSubmissionType || 'default'}
         >
           <option hidden key="default" value="default">
             {I18n.t('Choose One')}
@@ -177,12 +191,15 @@ export default class AttemptTab extends Component {
 
   render() {
     if (this.props.assignment.submissionTypes.length > 1) {
+      const submissionType = ['submitted', 'graded'].includes(this.props.submission.state)
+        ? this.getCurrentSubmissionType()
+        : this.props.activeSubmissionType
       return (
         <div data-testid="attempt-tab">
           {this.renderSubmissionTypeSelector()}
-          {this.state.activeSubmissionType !== null &&
-          this.props.assignment.submissionTypes.includes(this.state.activeSubmissionType)
-            ? this.renderByType(this.state.activeSubmissionType)
+          {this.submissionType !== null &&
+          this.props.assignment.submissionTypes.includes(submissionType)
+            ? this.renderByType(submissionType)
             : this.renderUnselectedType()}
         </div>
       )

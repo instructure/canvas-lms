@@ -50,8 +50,10 @@ export const DefaultMocks = {
 export const SubmissionMocks = {
   onlineUploadReadyToSubmit: {
     submissionDraft: {
+      activeSubmissionType: 'online_upload',
       attachments: [{_id: '1'}],
-      meetsAssignmentCriteria: true
+      meetsAssignmentCriteria: true,
+      meetsUploadCriteria: true
     }
   },
 

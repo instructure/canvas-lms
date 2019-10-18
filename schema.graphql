@@ -2869,6 +2869,9 @@ type SubmissionDraft implements LegacyIDInterface {
   attachments: [File!]
   body: String
   meetsAssignmentCriteria: Boolean!
+  meetsTextEntryCriteria: Boolean!
+  meetsUploadCriteria: Boolean!
+  meetsUrlCriteria: Boolean!
   submissionAttempt: Int!
   url: URL
 }

@@ -90,7 +90,7 @@ describe('ContentTabs', () => {
   })
 
   describe('there are multiple submission types', () => {
-    it('renders the attempt selection page', async () => {
+    it('renders the attempt selection page if there is no active submission type', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
       })
@@ -111,43 +111,54 @@ describe('ContentTabs', () => {
       expect(selector).toContainElement(getByText('File'))
     })
 
-    it('allows you to select the submission type to render', async () => {
+    it('updates the active type after selecting a type', async () => {
+      const mockedUpdateActiveSubmissionType = jest.fn()
       const props = await mockAssignmentAndSubmission({
         Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
       })
-      const {container, getByTestId} = render(<AttemptTab {...props} />)
+      const {container} = render(
+        <AttemptTab {...props} updateActiveSubmissionType={mockedUpdateActiveSubmissionType} />
+      )
 
       const selector = container.querySelector('select')
       fireEvent.change(selector, {target: {value: 'online_text_entry'}})
 
-      expect(await getByTestId('text-entry')).toBeInTheDocument()
-    })
-
-    it('continues rendering the type selector after selecting a type', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
-      })
-      const {container, getByTestId, getByText} = render(<AttemptTab {...props} />)
-
-      const selector = container.querySelector('select')
-      fireEvent.change(selector, {target: {value: 'online_text_entry'}})
-
-      await getByTestId('text-entry')
-      expect(getByText('Choose One')).toBeInTheDocument()
+      expect(mockedUpdateActiveSubmissionType).toHaveBeenCalledWith('online_text_entry')
     })
 
     it('renders the active submission type if available', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
-        Submission: {
-          submissionDraft: {
-            activeSubmissionType: 'online_text_entry'
-          }
-        }
+        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
       })
-      const {getByTestId} = render(<AttemptTab {...props} />)
+      const {getByTestId} = render(
+        <AttemptTab {...props} activeSubmissionType="online_text_entry" />
+      )
 
       expect(await getByTestId('text-entry')).toBeInTheDocument()
+    })
+
+    it('does not render the selector if the submission state is submitted', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
+        Submission: {
+          state: 'submitted'
+        }
+      })
+      const {container} = render(<AttemptTab {...props} />)
+
+      expect(container.querySelector('select')).not.toBeInTheDocument()
+    })
+
+    it('does not render the selector if the submission state is graded', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
+        Submission: {
+          state: 'graded'
+        }
+      })
+      const {container} = render(<AttemptTab {...props} />)
+
+      expect(container.querySelector('select')).not.toBeInTheDocument()
     })
   })
 })

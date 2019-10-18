@@ -59,7 +59,7 @@ class UrlEntry extends React.Component {
 
   updateInputState = () => {
     const url = this.props.submission.submissionDraft.url
-    const valid = this.props.submission.submissionDraft.meetsAssignmentCriteria
+    const valid = this.props.submission.submissionDraft.meetsUrlCriteria
     this.setState({
       messages: valid ? [] : ERROR_MESSAGE,
       url,
