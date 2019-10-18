@@ -1159,3 +1159,51 @@ The submission history LTI2 service endpoint.
 
 
 
+## com.instructure.Course.accept_canvas_resource_types
+Returns the types of resources that can be imported to the current page, forwarded from the request.
+Value is an array of one or more values of: ["assignment", "assignment_group", "audio",
+"discussion_topic", "document", "image", "module", "quiz", "page", "video"].
+
+**Availability**: *always*
+**Launch Parameter**: *com_instructure_course_accept_canvas_resource_types*
+
+```
+["page"]
+["module"]
+["assignment", "discussion_topic", "page", "quiz", "module"]
+```
+## com.instructure.Course.canvas_resource_type
+Returns the target resource type for the current page, forwarded from the request.
+Value is the largest logical unit of the page. Possible values are: ["assignment", "assignment_group",
+"audio", "discussion_topic", "document", "image", "module", "quiz", "page", "video"]
+  on Pages Index -> 'page'
+  on Modules -> 'module'
+  and so on.
+
+**Availability**: *always*
+**Launch Parameter**: *com_instructure_course_canvas_resource_type*
+
+```
+page
+```
+## com.instructure.Course.allow_canvas_resource_selection
+Returns whether a content can be imported into a specific group on the page, forwarded from the request.
+True for Modules page and Assignment Groups page. False for other content index pages.
+
+**Availability**: *always*
+**Launch Parameter**: *com_instructure_course_allow_canvas_resource_selection*
+
+```
+true
+```
+## com.instructure.Course.available_canvas_resources
+Returns a list of content groups which can be selected, providing ID and name of each group,
+forwarded from the request.
+Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
+
+**Availability**: *always*
+**Launch Parameter**: *com_instructure_course_available_canvas_resources*
+
+```
+[{"id": "3", name: "First Module"}, {"id": "5", name: "Second Module"]
+```

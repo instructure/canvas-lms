@@ -203,7 +203,15 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     const tool = this.wikiIndexPlacements.find(t => t.id === ev.target.dataset.toolId)
     const mountPoint = $('#externalToolMountPoint')[0]
     ReactDOM.render(
-      <ContentTypeExternalToolTray tool={tool} onDismiss={this.closeExternalTool} />,
+      <ContentTypeExternalToolTray
+        tool={tool}
+        placement="wiki_index_menu"
+        acceptedResourceTypes={['page']}
+        targetResourceType="page"
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={this.closeExternalTool}
+      />,
       mountPoint
     )
   }
