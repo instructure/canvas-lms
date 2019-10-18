@@ -274,8 +274,8 @@ $(function() {
     let taskID
 
     const resizeBreadcrumb = () => {
-      if (taskID) (cancelIdleCallback || cancelAnimationFrame)(taskID)
-      taskID = (requestIdleCallback || requestAnimationFrame)(() => {
+      if (taskID) (window.cancelIdleCallback || window.cancelAnimationFrame)(taskID)
+      taskID = (window.requestIdleCallback || window.requestAnimationFrame)(() => {
         let maxWidth = 500
         $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible')
         $breadcrumbEllipsis.ifExists(() => {
