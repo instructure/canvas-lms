@@ -315,7 +315,7 @@ module RCENextPage
   end
 
   def tray_container
-    f('[data-cid="Tray"]')
+    f('[data-testid="CanvasContentTray"]')
   end
 
   def display_text_link_option
