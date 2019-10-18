@@ -81,6 +81,13 @@ module Types
       end
     end
 
+    field :pronoun, String, null: true
+    def pronoun
+      if @context[:domain_root_account].settings[:can_add_pronouns]
+        load_association(:account_pronoun).then { |p| p&.display_pronoun }
+      end
+    end
+
     field :groups, [GroupType], null: true
     def groups
       load_association(:current_groups)

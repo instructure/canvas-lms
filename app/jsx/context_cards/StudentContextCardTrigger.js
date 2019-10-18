@@ -22,8 +22,8 @@ import ReactDOM from 'react-dom'
 import StudentContextTray from './GraphQLStudentContextTray'
 
 const handleClickEvent = event => {
-  const studentId = $(event.target).attr('data-student_id')
-  const courseId = $(event.target).attr('data-course_id')
+  const studentId = $(event.currentTarget).attr('data-student_id')
+  const courseId = $(event.currentTarget).attr('data-course_id')
   if (ENV.STUDENT_CONTEXT_CARDS_ENABLED && studentId && courseId) {
     event.preventDefault()
     const container = document.getElementById('StudentTray__Container')

@@ -3371,6 +3371,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
   groups: [Group!]
   id: ID!
   name: String
+  pronoun: String
 
   """
   A short name the user has selected, for use in conversations or other less formal places through the site.
