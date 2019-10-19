@@ -15,6 +15,8 @@ CanvasRails::Application.routes.draw do
   get 'bz/load_wiki_pages' => 'bz#load_wiki_pages'
   get 'bz/user_retained_data' => 'bz#user_retained_data'
   post 'bz/user_retained_data' => 'bz#set_user_retained_data'
+  get 'bz/reset_retained_data' => 'bz#reset_user_retained_data'
+  post 'bz/reset_retained_data' => 'bz#reset_user_retained_data'
 
   get 'bz/cohort_info_upload' => 'bz#cohort_info_upload', as: :cohort_info_upload
   get 'bz/cohort_info_download' => 'bz#cohort_info_download', as: :cohort_info_download

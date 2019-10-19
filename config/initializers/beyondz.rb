@@ -17,6 +17,12 @@ class BeyondZConfiguration
   def self.bitly_access_token
     @config[:bitly_access_token]
   end
+  
+  # True if it's safe to show UI tools that are dangerous and only
+  # safe to be exposed in a dev or testing environment.
+  def self.dev_tools_enabled
+    @config[:dev_tools_enabled]
+  end
 
   def self.docusign_host
     @config[:docusign_host]

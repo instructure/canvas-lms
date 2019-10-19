@@ -21,7 +21,27 @@
           <i class="icon-download" aria-hidden='true'></i> <%= t("Download Course Content") %>
         <% end %>
     <% end %>
-    <% if show_request_delete_account %>
+    <% if show_dev_tools %>
+        <a href="#" class="btn button-sidebar-wide reset_retained_data_button">
+          <i class="icon-reset" aria-hidden='true'></i> <%= t("Reset Magic Fields") %>
+        </a>
+        <div <%= hidden(true) %> id="reset_retained_data_dialog">
+          <p><%= mt('Reset Magic Fields', 'Resetting these fields will permanently delete all data stored in magic fields for the user you\'re currently logged in as. This includes all their answers and interactions with the modules and assignments. This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?') %></p>
+
+          <%= form_for @current_user, :url => "/bz/reset_retained_data?user_id=#{@current_user.id}", :html => { :method => :post } do %>
+            <div class="button-container">
+              <button type="button" class="btn cancel_button">
+                <%= t('#buttons.cancel', 'Cancel') %>
+              </button>
+              <button type="submit" class="btn btn-danger submit_button">
+                <%= t('buttons.reset', 'Reset Magic Field Data') %>
+              </button>
+            </div>
+          <% end %>
+        </div>
+
+    <% end %>
+     <% if show_request_delete_account %>
        <a href="<%= request_delete_account_link %>" class="btn button-sidebar-wide"> <%= t('Delete My Account') %></a>
     <% end %>
   </div>

@@ -1,6 +1,12 @@
 development:
   base_url: https://localhost
   change_password_path: /users/edit
+
+  # This controls certain UI tools available in the UI that are
+  # dangerous to have exposed on a production machine and should
+  # only be visible on dev, test, or staging environments.
+  dev_tools_enabled: true
+
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
   help_url: http://localhost
@@ -12,6 +18,7 @@ development:
 test:
   base_url: https://test.bebraven.org/
   change_password_path: /users/edit
+  dev_tools_enabled: true
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
   docusign_host: account-d.docusign.com
@@ -22,6 +29,7 @@ test:
 staging:
   base_url: https://stagingjoin.bebraven.org/
   change_password_path: /users/edit
+  dev_tools_enabled: true
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
   docusign_host: account-d.docusign.com
@@ -33,6 +41,7 @@ production:
   google_analytics_account: UA-XXXXXXXX-1
   base_url: https://join.bebraven.org/
   change_password_path: /users/edit
+  dev_tools_enabled: false
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
   help_url: https://help.bebraven.org
@@ -40,6 +49,10 @@ production:
   docusign_api_key: xxx-xxx-xxxx-xxxx
   docusign_api_secret: xxx-xxx-xxxx-xxxx
   docusign_return_url: https://portal.bebraven.org/bz/docusign_user_redirect
+
+  # Note that qualtrics doesn't have a "dev" or "testing" account option.
+  # We use the prod account for testing. Make sure you know what you're 
+  # doing if you enable it in another env.
   qualtrics_library_id: from_qualtrics_ids_section_of_account_settings
   qualtrics_api_token: from_qualtrics_ids_section_of_account_settings
   qualtrics_host: az1.qualtrics.com # the url from when you log into
