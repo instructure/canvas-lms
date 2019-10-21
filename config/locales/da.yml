@@ -1921,6 +1921,7 @@ da:
   all_comments_are_sent_to_the_whole_group_284591e7: "Alle kommentarer sendes til hele gruppen"
   all_comments_are_sent_to_the_whole_group_778126f3: "Alle kommentarer sendes til hele gruppen."
   all_configured_apps_a14eef0a: "Alle konfigurerede app'er"
+  all_courses_80701c6f: "Alle fag."
   all_courses_a7dbb853: "Alle fag"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datafelter skal være til stede og korrekt formateret"
   all_day_fb42c4fc: "Hele dagen"
@@ -3476,6 +3477,8 @@ da:
   assignments_2_e88d7a26: "Opgaver 2"
   assignments_2_student_error_page_3ca3e0df: "Opgaver 2 Fejlside for studerende"
   assignments_2_student_initial_query_error_52aa5ebd: "Opgaver 2 Fejl ved studerendes indledende forespørgsel"
+  assignments_2_student_view_224cb233: "Opgaver 2 Visning for studerende"
+  assignments_2_teacher_view_3cd3aeda: "Opgaver 2 Lærervisning"
   assignments_2_teacher_view_error_page_8e45dedc: "Opgaver 2 Lærervisning Fejlside"
   assignments_and_gradebook_37e43d4f: "Opgaver og karakteroversigt"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Opgaver og test - tilføj / rediger / slet"
@@ -3843,6 +3846,15 @@ da:
   body_9f663faf: Brødtekst
   body_f48fe5cd: "Brødtekst:"
   body_shadow_d36e8c2e: Skyggetekst
+  body_text_more_info_at_url_754b1a5a: |-
+      %{body_text}
+      
+      Mere info på %{url}
+  body_text_you_can_view_the_assignment_here_url_a4d5092c: |-
+      %{body_text}
+      
+      Du kan se opgaven her: 
+      %{url}
   bolivia_567898d8: Bolivia
   bolivia_591_9b8a7a5c: "Bolivia (+591)"
   bookmark_bank_46d729be: "Bogmærke %{bank}"
@@ -4454,6 +4466,7 @@ da:
   can_update_public_jwk_for_lti_services_26037129: "Kan opdatere offentlig jwk for LTI-tjenester."
   can_update_subscription_to_data_service_data_374a0c89: "Kan opdatere abonnement på datatjenestedata."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Kan se opgavedata i den karakteroversigt, der er knyttet til værktøjet."
+  can_view_feature_flags_c92e0aa9: "Kan se funktionsflag"
   can_view_submission_data_for_assignments_associate_dd06f583: "Kan se afleveringsdata for opgaver, der er knyttet til værktøjet."
   canada_1_921df67a: "Canada (+1)"
   canada_aec587fa: Canada
@@ -4668,6 +4681,8 @@ da:
   choose_home_page_80cef4ee: "Vælg startside"
   choose_image_242f727e: "Vælg billede"
   choose_image_e5ee5d7a: "Vælg billede"
+  choose_one_2c4277df: "Vælg en"
+  choose_one_submission_type_cf4eda5b: "Vælg én afleveringsform"
   choose_student_1513fcd1: "-- Vælg studerende --"
   choose_the_next_mastery_path_b035b727: "Vælg den næste læringssti"
   choose_usage_rights_33683854: "Vælg brugsrettigheder ..."
@@ -4923,6 +4938,7 @@ da:
   comment_input_box_b8c7e58b: Kommentarfelt
   comment_submitted_d9934b: "Kommentar sendt!"
   comments_e07bcbe3: Kommentarer
+  comments_for_this_attempt_a5fae61f: "Kommentarer til dette forsøg"
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "Dette aktiverer konvertering af en Common Cartridge-pakke i det mellemliggende json-format, som skal importeres"
   common_cartridge_display: "Common Cartridge"
@@ -5122,6 +5138,7 @@ da:
   confirm_edit_outcome_a9746c99: "Bekræft Rediger læringsudbytte"
   confirm_removal_a9bb889: "Bekræft fjernelse"
   confirm_reservation_removal_e6350e7c: "Bekræft fjernelse af reservation"
+  confirm_unfavorite_course_fa01966d: "Bekræft, at faget fjernes fra favoritter"
   confirmation_code_required_22984955: "Bekræftelseskode (påkrævet)"
   confirmation_failed_please_try_again_ae566d37: "Bekræftelse mislykkedes. Prøv igen."
   consumer_key_57d9fcf1: Forbrugernøgle
@@ -6289,6 +6306,7 @@ da:
       topic: "Ukendt emne"
       wiki_page: "Ukendt wikiside"
   course_external_tools_query_error_d5110efe: "Fagets eksterne værktøjer - forespørgselsfejl"
+  course_favorites_from_dashboard_27a3515a: "Fag-favoritter fra oversigten"
   course_files_62deb8f8: "Fagets filer"
   course_files_a31f97fc: "Fagets filer"
   course_files_add_edit_delete_24678a2f: "Fagfiler - tilføj / rediger / slet"
@@ -7132,7 +7150,7 @@ da:
     plugins: Plugins
     prior_users: "Forrige brugere"
     question_banks: Spørgsmålsbanker
-    quizzes: ~
+    quizzes: Test
     registered_services: "Registrerede tjenester"
     revisions: Revisioner
     rubrics: Rubrikker
@@ -7288,6 +7306,7 @@ da:
       show_less: "Vis mindre"
       show_more: "Vis mere"
   dashboard_7f1dbf71: Oversigt
+  dashboard_card_movement_menu_b65b98f5: "Oversigt-kortets bevægelsesmenu"
   dashboard_options_b240ed5a: Forsideindstillinger
   dashboard_view_d7d85969: "Oversigt visning"
   data_exports: dataeksporter
@@ -9609,6 +9628,10 @@ da:
   grade_change_activity_75fb525: Karakterændringer
   grade_change_log_231f90e4: "Ændringslog for karakter"
   grade_change_notifications_98461261: "Meddelelser om karakterændring"
+  grade_changes_and_comments_have_been_released_for__3978b741: "Karakterændringer og kommentarer er blevet frigivet for alle."
+  grade_changes_and_comments_have_been_released_for__5d6a01a0: "Karakterændringer og kommentarer er blevet frigivet for alle i sektionerne: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__624411ff: "Karakterændringer og kommentarer er blevet frigivet for alle, der er blevet vurderet i sektionerne: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__79d3473e: "Karakterændringer og kommentarer er blevet frigivet for alle, der er er blevet vurderet."
   grade_changes_and_new_comments_released_for_title__f1350f92: "Karakterændringer og nye kommentarer offentliggjort for: %{title}, %{course}"
   grade_changes_cb5a57a8: Karakterændringer
   grade_display_warning_dialog: 
@@ -12024,6 +12047,7 @@ da:
   loading_announcements_b927a86c: "Henter beskeder"
   loading_assessment_audit_trail_5cf4c10: "Indlæser vurdering af revisionssporet"
   loading_assignments_352ec769: "Opgaver indlæses"
+  loading_associations_2b92bcf7: "Indlæser associationer ..."
   loading_associations_9da66c4e: "Indlæser associationer"
   loading_associations_complete_b93a9c6e: "Indlæsning af associationer afsluttet"
   loading_associations_started_1f65d8d: "Indlæsning af associationer påbegyndt"
@@ -12269,6 +12293,7 @@ da:
   make_new_settings_for_sis_integrations_visible_and_875039ca: "Gør nye indstillinger for SIS-integrationer synlige og aktive"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Sørg for at du vælger den mest passende mulighed, eftersom studerendes scores KAN blive påvirket."
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Gør dette kursus synligt for offentligheden (studerendes data forbliver private)"
+  makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Viser en Microsoft Immersive Reader-linkindstilling på Wiki-sider."
   making_a_copy_of_originalassignmentname_b7268992: "Laver en kopi af \"%{originalAssignmentName}\""
   malay_f5dddce4: Malaj
   malaysia_60_7d357b28: "Malaysia (+60)"
@@ -13010,15 +13035,15 @@ da:
     assignment_unmuted: 
       email: 
         body: |-
-            Din instruktør har offentliggjort karakterændringer og nye kommentarer for %{title}. Disse ændringer kan nu vises.
+            Din instruktør har slået karakterændringer og nye kommentarer op for %{title}. Disse ændringer kan nu ses.
             
-            Du kan se dem her: 
+            Du kan dem her: 
             %{url}
         html: 
           body: "Din instruktør har offentliggjort karakterændringer og nye kommentarer til %{title}. De pågældende ændringer er nu synlige."
-          link: "Du kan se den her"
+          link: "Du kan se opgaven her"
           subject: "Opgave offentliggjort: %{title}, %{course}"
-        subject: "Opgave offentliggjort: %{title}, %{course}"
+        subject: "Opgaver med offentliggjort feedback: %{title}, %{course}"
       sms: 
         body: |-
             Din instruktør har offentliggjort karakterer og kommentarer for %{title}, %{course}.
@@ -14168,6 +14193,10 @@ da:
         html: 
           body: "Din instruktør har slået karakterændringer og nye kommentarer op for %{title}. Disse ændringer kan nu ses."
           link: "Du kan se den her"
+    submissions_posted: 
+      email: 
+        html: 
+          link: "Du kan se opgaven her"
     summaries: 
       email: 
         daily_body: "Du er tilmeldt at modtage en daglig rapport med meddelelser fra din Canvas-konto. Nedenfor findes rapporten for %{date}:"
@@ -14251,6 +14280,7 @@ da:
   mexico_b2d7a271: Mexico
   mgp_grade_export_d29b471f: "MGP karakter-eksport"
   mic_a7f3d311: Mikrofon
+  microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - Gratis prøveversion (Wiki-sider)"
   migrate_67c9f753: Overfør
   migrate_quiz_5d0f777: "Overførsel af test"
   migration: 
@@ -14565,6 +14595,7 @@ da:
     move_to_end: "-- På bunden --"
   move_discussion_9ff5b2d1: "Flyt diskussion"
   move_discussion_title_93ea7be1: "Flyt diskussion %{title}"
+  move_down_4a9c9b18: "Flyt ned"
   move_group_3dd7f76e: "Flyt gruppe"
   move_group_77ae285d: "Flyt gruppe ..."
   move_item_e94a8103: "Flyt element"
@@ -14594,6 +14625,7 @@ da:
   move_this_section_890bee38: "Flyt denne sektion"
   move_to_25d7ef11: "Flyt til"
   move_to_9b91c6e0: "Flyt til ..."
+  move_to_bottom_d0f71bf0: "Flyt til bunden"
   move_to_dde1a5e1: "Flyt til ..."
   move_to_end_c6bfbcf5: "Flyt til slutningen"
   move_to_end_fef2fa15: "Flyt til afslutning"
@@ -14601,7 +14633,9 @@ da:
   move_to_front_bf6f0194: "Flyt foran"
   move_to_the_beginning_636b342c: "Flyt til begyndelsen"
   move_to_the_end_bc05abf6: "Flyt til slutningen"
+  move_to_top_e0d7d66e: "Flyt til toppen"
   move_to_using_instui_for_several_components_and_im_21898396: "Skift til at bruge InstUI for flere komponenter og implementering af et lagringssystem"
+  move_up_2440f707: "Flyt op"
   moving_a4d552df: "Flytter ..."
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
@@ -14774,6 +14808,7 @@ da:
   new_module_4e9287e4: "Nyt modul"
   new_outcome_7fba8c7d: "Nyt læringsudbytte"
   new_outcome_group_af59f145: "Ny læringsudbytte-gruppe"
+  new_post_policy_icons_da13a62c: "Nye ikoner for opslagspolitikker"
   new_question_9107c469: "Nyt spørgsmål"
   new_question_group_d9306280: "Ny spørgsmålsgruppe"
   new_quiz_34aacba6: "Ny test"
@@ -14831,7 +14866,9 @@ da:
   no_collaboration_apps_3bbd30ce: "Ingen samarbejds-apps"
   no_content_5dbc9acf: "Intet indhold"
   no_content_has_been_added_f36bab43: "* Der er ikke blevet tilføjet indhold"
+  no_content_has_been_shared_with_you_667fde6c: "Intet indhold er blevet delt med dig."
   no_content_not_visible_to_students_b59f4867: "Intet indhold. Ikke synlig for studerende"
+  no_courses_favorited_4e69fd63: "Ingen fag som favorit"
   no_courses_found_12d68a74: "Der er ikke fundet fag"
   no_date_bfeb2df7: "Ingen dato"
   no_description_c2554c25: "ingen beskrivelse"
@@ -21045,6 +21082,7 @@ da:
     errors_update_failed: "Opdatering mislykkedes"
   submissions_folder_9db8dadf: Afleveringsmappe
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "afleveringsmapper skal være oprettet i Bruger eller Gruppesammenhæng"
+  submissions_posted_title_course_43677dba: "Afleveringer indsendt: %{title}, %{course}"
   submissions_view_and_make_comments_cafaf361: "Afleveringer - vis og kommenter"
   submit_a3cc6859: Aflever
   submit_a_comment_7edbf648: "Indsend en kommentar"
@@ -21542,6 +21580,7 @@ da:
                     Hvis du ønsker at fjerne dem, skal du fjerne det tilknyttede værktøj.
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Disse bedømmelsesperioder blev oprettet for dig af en administrator."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Denne handling er blevet deaktiveret af din administrator."
+  this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "Dette gør det muligt for brugeren at fjerne et fag fra favoritter direkte fra oversigts-kortet."
   this_allows_you_to_restrict_custom_javascript_that_d8495e02: |-
       Dette giver dig mulighed for at begrænse brugerdefineret JavaScript, der kører i din instans af Canvas.
                      Dette vil blive aktiveret af en opdateret indholdssikkerhedspolitik (CSP).
@@ -22332,6 +22371,8 @@ da:
   undo_remove_course_association_name_68eb4037: "Fortryd fjern fagassociation %{name}"
   unenrolled_bc89d5e3: Frameldt
   unenrolled_users_e7632d24: "Ikke tilmeldte brugere"
+  unfavorite_cd0c113e: "Fjern fra favoritter"
+  unfavorite_coursename_32f77231: "Fjern fra %{courseName}"
   ungraded_147a0dce: "ikke bedømt"
   ungraded_answers_31ef2df7: "Ikke bedømte svar"
   ungraded_ed0c6f98: "Ikke bedømt"
@@ -22412,6 +22453,7 @@ da:
   unpublishing_1fa99dc6: "Fjerner offentliggørelse ..."
   unread_c14cb06f: "ulæst,"
   unread_e9c1b19c: Ulæst
+  unread_ee6db4aa: ulæst
   unreadcount_unread_replies_509e167f: "%{unreadCount} ulæste svar"
   unregister_service_985238e9: "Annuller tjenestens registrering"
   unreserved_e86b7425: "Ikke reserveret"
@@ -22462,6 +22504,7 @@ da:
   updated_permissions_page_f2e91060: "Side for opdaterede tilladelser"
   updated_terms_of_service_82f34148: "Opdaterede Vilkår for service"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Opdateret UI til at søge efter og vise brugere og fag i en konto."
+  updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Opdaterer visningen af ikoner for opslagspolitikker i kolonneoverskriften Ny karakteroversigt-opgave."
   updating_6edbab78: Opdaterer
   updating_discussion_failed_aadb2d35: "Opdatering af diskussion mislykkedes"
   upload_8b403d05: Upload
@@ -22535,6 +22578,8 @@ da:
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Brug semikoloner til at adskille felter i kompatible regnearkseksporter"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Brug semikolon til at adskille felter i karakteroversigt-eksporter"
   use_the_new_assignments_page_dd292b9d: "Brug den nye opgaveside"
+  use_the_new_assignments_student_page_944262af: "Brug den nye opgaveside for studerende"
+  use_the_new_assignments_teacher_page_8add7e46: "Brug den nye opgaveside for lærer"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Benyttelse af det nye eksterne samarbejdsværktøj aktiverer flere muligheder for værktøjer til brug for samarbejder"
   use_the_new_document_annotation_tool_2cbc98d0: "Benyt det nye dokument kommenteringsværktøj"
   use_the_new_interface_for_managing_permissions_907e8e8f: "Brug den nye grænseflade til at administrere tilladelser"
@@ -23154,6 +23199,7 @@ da:
   we_were_unable_to_find_matches_below_f1c6d1ed: "Vi kunne ikke finde nogen match nedenfor."
   we_were_unable_to_find_matches_below_select_any_yo_87035b30: "Vi kunne ikke finde nogen match nedenfor. Vælg dem, du gerne vil oprette som nye brugere. Umarkerede springes over på dette tidspunkt."
   we_were_unable_to_find_matches_for_the_logins_belo_d5f79db2: "Vi kunne ikke finde match for loginsene nedenfor. Vælg dem, du gerne vil oprette som nye brugere."
+  we_were_unable_to_remove_this_course_from_your_fav_70fa598d: "Vi kunne ikke fjerne dette fag fra dine favoritter."
   we_were_unable_to_update_the_app_659f5bc6: "Vi kunne ikke opdatere app'en."
   web_conference: 
     default_name_for_courses: "Fag webkonference"
@@ -23426,6 +23472,9 @@ da:
       Du er ved at miste ændringer, der ikke er gemt.
       
       Ønsker du stadig at fortsætte?
+  you_are_about_to_remove_this_course_from_your_dash_7e806db6: |-
+      Du er ved at fjerne dette fag fra din oversigt. Det vil stadig være tilgængeligt 
+                    ved at navigere til Fag > Alle fag fra hovedmenuen.
   you_are_currently_acting_as_user_name_8d2be0ee: "Du fungerer aktuelt som %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Du er aktuelt logget i visning som studerende"
   you_are_currently_masquerading_as_user_name_f4a00ade: "Du maskerer dig aktuelt som %{user_name}"
@@ -23508,6 +23557,8 @@ da:
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "Du har indtastet en ugyldig karakter for denne studerende. Kontroller værdien og karaktertypen, og prøv igen."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har foretaget ændringer til spørgsmålene i denne test.* Disse ændringer vises ikke for de studerende, før du gemmer testen."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "Du har ikke konfigureret nogen samarbejds-apps. Spørg din lærer om at sætte dem op."
+  you_have_no_courses_favorited_reloading_this_page__a2bae9de: "Du har ingen fag som favorit. Genindlæsning af denne side viser alle\n\
+      \x20     dine aktive fag. For at tilføje favoritter skal du gå til "
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: "Du har ingen LTI'er konfigureret til at oprette samarbejder. Tal til din lærer om opsætning af dem."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen læringsudbytter. *Klik her* for at oprette et."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ikke nogen læringsudbytter. Klik her for at gå til læringsudbyttesiden."

@@ -1775,6 +1775,7 @@ it:
   all_comments_are_sent_to_the_whole_group_284591e7: "Tutti i commenti vengono inviati all'intero gruppo"
   all_comments_are_sent_to_the_whole_group_778126f3: "Tutti i commenti vengono inviati all'intero gruppo."
   all_configured_apps_a14eef0a: "Tutte le app configurate"
+  all_courses_80701c6f: "Tutti i corsi."
   all_courses_a7dbb853: "Tutti i corsi"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Tutti i campi delle date devono essere presenti e formattati correttamente"
   all_day_fb42c4fc: "Tutto il giorno"
@@ -3175,6 +3176,8 @@ it:
   assignments_2_e88d7a26: "Compiti 2"
   assignments_2_student_error_page_3ca3e0df: "Pagina di errore studente Compiti 2"
   assignments_2_student_initial_query_error_52aa5ebd: "Errore di query iniziale studente Compiti 2"
+  assignments_2_student_view_224cb233: "Compiti 2 Vista studente"
+  assignments_2_teacher_view_3cd3aeda: "Compiti 2 Vista Insegnante"
   assignments_2_teacher_view_error_page_8e45dedc: "Pagina di errore visualizzazione insegnante compiti 2"
   assignments_and_gradebook_37e43d4f: "Compiti e registro dei voti"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Compiti e quiz - aggiungi/modifica/elimina"
@@ -3513,6 +3516,15 @@ it:
   body_9f663faf: Corpo
   body_f48fe5cd: "Corpo:"
   body_shadow_d36e8c2e: "Ombreggiatura corpo"
+  body_text_more_info_at_url_754b1a5a: |-
+      %{body_text}
+      
+      Ulteriori informazioni su %{url}
+  body_text_you_can_view_the_assignment_here_url_a4d5092c: |-
+      %{body_text}
+      
+      Puoi visualizzare il compito qui: 
+      %{url}
   bolivia_591_9b8a7a5c: "Bolivia (+591)"
   bookmark_bank_46d729be: "Preferiti %{bank}"
   bookmark_service: 
@@ -4076,6 +4088,7 @@ it:
   can_update_public_jwk_for_lti_services_26037129: "È possibile aggiornare jwk pubblico per i servizi LTI."
   can_update_subscription_to_data_service_data_374a0c89: "Può aggiornare l'abbonamento ai dati del servizio dati."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "Può visualizzare i dati dei compiti nel registro dei voti associato allo strumento."
+  can_view_feature_flags_c92e0aa9: "Puoi visualizzare i flag di funzionalità"
   can_view_submission_data_for_assignments_associate_dd06f583: "Può visualizzare i dati della consegna per i compiti associati allo strumento."
   canada_1_921df67a: "Canada (+1)"
   cancel_caeb1e68: Annulla
@@ -4282,6 +4295,8 @@ it:
   choose_home_page_80cef4ee: "Scegli home page"
   choose_image_242f727e: "Scegli immagine"
   choose_image_e5ee5d7a: "Scegli immagine"
+  choose_one_2c4277df: "Seleziona un'opzione"
+  choose_one_submission_type_cf4eda5b: "Scegli un tipo di invio"
   choose_student_1513fcd1: "- Scegli studente -"
   choose_the_next_mastery_path_b035b727: "Scegli il successivo percorso di acquisizione della padronanza"
   choose_usage_rights_33683854: "Scegli diritti di utilizzo..."
@@ -4507,6 +4522,7 @@ it:
   comment_input_box_b8c7e58b: "Casella inserimento commento"
   comment_submitted_d9934b: "Commento inviato!"
   comments_e07bcbe3: Commenti
+  comments_for_this_attempt_a5fae61f: "Commenti per questo Tentativo"
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "Questo consente di convertire pacchetti Common Cartridge nel formato JSON intermediario da importare"
   common_cartridge_display: "Common Cartridge"
@@ -4689,6 +4705,7 @@ it:
   confirm_edit_outcome_a9746c99: "Conferma modifica esito"
   confirm_removal_a9bb889: "Conferma rimozione"
   confirm_reservation_removal_e6350e7c: "Conferma rimozione prenotazione"
+  confirm_unfavorite_course_fa01966d: "Conferma la rimozione del corso dai preferiti"
   confirmation_code_required_22984955: "Codice di conferma (obbligatorio)"
   confirmation_failed_please_try_again_ae566d37: "Conferma non riuscita.  Riprova."
   consumer_key_6f94ba11: "Chiave consumer"
@@ -5721,6 +5738,7 @@ it:
       topic: "Argomento sconosciuto"
       wiki_page: "Pagina wiki sconosciuta"
   course_external_tools_query_error_d5110efe: "Errore di query degli strumenti esterni"
+  course_favorites_from_dashboard_27a3515a: "Preferiti del corso dal Dashboard"
   course_files_62deb8f8: "File del corso"
   course_files_a31f97fc: "File corso"
   course_files_add_edit_delete_24678a2f: "File corso - aggiungi/modifica/elimina"
@@ -6413,7 +6431,7 @@ it:
     plugins: Plug-in
     prior_users: "Utenti precedenti"
     question_banks: "Banche di domande"
-    quizzes: ~
+    quizzes: Quiz
     registered_services: "Servizi registrati"
     revisions: Revisioni
     rubrics: Rubriche
@@ -6552,6 +6570,7 @@ it:
       show_less: "Mostra meno"
       show_more: "Mostra di più"
   dashboard_7f1dbf71: Dashboard
+  dashboard_card_movement_menu_b65b98f5: "Menù di movimento della scheda del dashboard"
   dashboard_options_b240ed5a: "Opzioni dashboard"
   dashboard_view_d7d85969: "Visualizzazione dashboard"
   data_exports: "esportazioni dati"
@@ -8252,7 +8271,7 @@ it:
       ? "on"
       : "On"
       release_notes: "note di rilascio"
-      toggle_feature_details_screenreader_info: "Abilita/disabilita dettagli funzioni per %{title}"
+      toggle_feature_details_screenreader_info: "Attiva/disattiva dettagli funzione di %{title}"
       ? "true"
       : "On"
     feature_flag_admin_view: 
@@ -8571,6 +8590,10 @@ it:
   grade_change_activity_75fb525: "Attività di modifica voto"
   grade_change_log_231f90e4: "Log modifiche voti"
   grade_change_notifications_98461261: "Notifiche modifica voto"
+  grade_changes_and_comments_have_been_released_for__3978b741: "I cambiamenti di valutazione e i commenti sono stati pubblicati per tutti."
+  grade_changes_and_comments_have_been_released_for__5d6a01a0: "I cambiamenti di valutazione e i commenti sono stati pubblicati per tutti nelle sezioni: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__624411ff: "I cambiamenti di valutazione e i commenti sono stati rilasciati per tutti coloro che sono stati valutati nelle sezioni: %{section_names}."
+  grade_changes_and_comments_have_been_released_for__79d3473e: "I cambiamenti di valutazione e i commenti sono stati pubblicati per tutti gli studenti valutati."
   grade_changes_and_new_comments_released_for_title__f1350f92: "Modifiche dei voti e nuovi commenti rilasciati per: %{title}, %{course}"
   grade_changes_cb5a57a8: "Modifiche ai voti"
   grade_display_warning_dialog: 
@@ -10418,6 +10441,7 @@ it:
   loading_announcements_b927a86c: "Caricamento annunci"
   loading_assessment_audit_trail_5cf4c10: "Caricamento audit trail valutazione"
   loading_assignments_352ec769: "Caricamento dei compiti"
+  loading_associations_2b92bcf7: "Caricamento associazioni....."
   loading_associations_9da66c4e: "Caricamento associazioni"
   loading_associations_complete_b93a9c6e: "Caricamento associazioni completato"
   loading_associations_started_1f65d8d: "Caricamento associazioni avviato"
@@ -10629,6 +10653,7 @@ it:
   make_key_developername_visible_97c404bf: "Rendi chiave %{developerName} visibile"
   make_key_invisible_e66af89: "Rendi chiave invisibile"
   make_key_visible_5c03fa34: "Rendi chiave visibile"
+  makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Fa apparire un'opzione di collegamento Microsoft Immersive Reader sulle pagine wiki."
   making_a_copy_of_originalassignmentname_b7268992: "Creazione di una copia di \"%{originalAssignmentName}\""
   malay_f5dddce4: Malese
   malaysia_60_7d357b28: "Malesia (+60)"
@@ -11313,13 +11338,13 @@ it:
     assignment_unmuted: 
       email: 
         body: |-
-            Il tuo istruttore ha rilasciato modifiche ai voti e nuovi commenti per %{title}. Queste modifiche sono ora visualizzabili.
+            L’istruttore ha emesso delle modifiche dei voti e nuovi commenti per %{title}. Queste modifiche sono ora visualizzabili.
             
-            Puoi visualizzarlo qui: 
+            Le puoi visualizzare qui: 
             %{url}
         html: 
           body: "Il tuo istruttore ha rilasciato modifiche ai voti e nuovi commenti per %{title}. Queste modifiche sono ora visualizzabili."
-          link: "Puoi visualizzarlo qui"
+          link: "Puoi visualizzare il compito qui"
           subject: "Compito riattivato: %{title}, %{course}"
         subject: "Compito riattivato: %{title}, %{course}"
       sms: 
@@ -12354,6 +12379,10 @@ it:
         html: 
           body: "Il tuo istruttore ha rilasciato modifiche ai voti e nuovi commenti per %{title}. Queste modifiche sono ora visualizzabili."
           link: "Puoi visualizzarlo qui"
+    submissions_posted: 
+      email: 
+        html: 
+          link: "Puoi visualizzare il compito qui"
     summaries: 
       email: 
         daily_body: "Ti sei registrato per ricevere un report giornaliero di alcune notifiche dal tuo account Canvas.  Di seguito è riportato il report per %{date}:"
@@ -12434,6 +12463,7 @@ it:
   mexico_52_60d635c7: "Messico (+52)"
   mgp_grade_export_d29b471f: "Esporta voti MGP"
   mic_a7f3d311: Microfono
+  microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - Prova Gratuita (pagine Wiki)"
   migrate_67c9f753: "Esegui migrazione"
   migrate_quiz_5d0f777: "Esegui migrazione quiz"
   migration: 
@@ -12617,6 +12647,7 @@ it:
     move_to_end: "- In fondo -"
   move_discussion_9ff5b2d1: "Sposta discussione"
   move_discussion_title_93ea7be1: "Sposta discussione %{title}"
+  move_down_4a9c9b18: "Sposta giù"
   move_group_3dd7f76e: "Sposta gruppo"
   move_group_77ae285d: "Sposta gruppo…"
   move_item_e94a8103: "Sposta elemento"
@@ -12644,10 +12675,13 @@ it:
   move_this_section_890bee38: "Sposta questa sezione"
   move_to_25d7ef11: "Passa a"
   move_to_9b91c6e0: "Sposta in…"
+  move_to_bottom_d0f71bf0: "Sposta in basso"
   move_to_dde1a5e1: "Sposta in..."
   move_to_end_c6bfbcf5: "Sposta alla fine"
   move_to_front_bf6f0194: "Sposta in primo piano"
+  move_to_top_e0d7d66e: "Sposta in alto"
   move_to_using_instui_for_several_components_and_im_21898396: "Utilizza InstUI per diversi componenti e implementa un sistema di archivio"
+  move_up_2440f707: "Sposta su"
   moving_a4d552df: "Spostamento in corso..."
   mp3_c21c0f5f: MP3
   mp4_5c789afc: MP4
@@ -12808,6 +12842,7 @@ it:
   new_module_4e9287e4: "Nuovo modulo"
   new_outcome_7fba8c7d: "Nuovo esito"
   new_outcome_group_af59f145: "Nuovo gruppo di esiti"
+  new_post_policy_icons_da13a62c: "Nuove icone dopo l’applicazione dei criteri"
   new_question_9107c469: "Nuova domanda"
   new_question_group_d9306280: "Nuovo gruppo di domande"
   new_quiz_34aacba6: "Nuovo quiz"
@@ -12861,7 +12896,9 @@ it:
   no_collaboration_apps_3bbd30ce: "Nessuna app di collaborazione"
   no_content_5dbc9acf: "Nessun contenuto"
   no_content_has_been_added_f36bab43: "* Nessun contenuto aggiunto"
+  no_content_has_been_shared_with_you_667fde6c: "Non è stato condiviso nessun contenuto con te."
   no_content_not_visible_to_students_b59f4867: "Nessun contenuto. Non visibile agli studenti"
+  no_courses_favorited_4e69fd63: "Non ci sono corsi preferiti"
   no_courses_found_12d68a74: "Nessun corso trovato"
   no_date_bfeb2df7: "Nessuna data"
   no_description_c2554c25: "Nessuna descrizione"
@@ -18363,6 +18400,7 @@ it:
       no_report: "Impossibile trovare un report per l'elemento della consegna"
     errors_update_failed: "Aggiornamento non riuscito"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "le cartelle delle consegne devono essere create nel contesto Utente o Gruppo"
+  submissions_posted_title_course_43677dba: "Invii pubblicati: %{title}, %{course}"
   submissions_view_and_make_comments_cafaf361: "Compiti - visualizza e crea commenti"
   submit_a3cc6859: Invia
   submit_a_comment_7edbf648: "Invia un commento"
@@ -18824,6 +18862,7 @@ it:
   these_domains_have_automatically_been_added_to_you_cef51600: |-
       Questi domini sono stati automaticamente aggiunti al tuo elenco di elementi consentiti.
                     Se desideri rimuoverli, devi rimuovere lo strumento associato.
+  this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "Questo permette all'utente di rimuovere un corso dai preferiti direttamente dalla scheda dashboard."
   this_allows_you_to_restrict_custom_javascript_that_d8495e02: |-
       Ciò consente di limitare JavaScript personalizzati che sono eseguiti nella propria istanza di Canvas.
                      Sarà consentito da una Politica sulla sicurezza dei contenuti (CSP) aggiornata.
@@ -19594,6 +19633,8 @@ it:
   undo_remove_course_association_name_68eb4037: "Annulla rimozione associazione corso %{name}"
   unenrolled_bc89d5e3: "Iscrizione annullata"
   unenrolled_users_e7632d24: "Utenti non iscritti"
+  unfavorite_cd0c113e: "Rimuovi dai preferiti"
+  unfavorite_coursename_32f77231: "Rimuovi dai preferiti %{courseName}"
   ungraded_147a0dce: "non valutato"
   ungraded_answers_31ef2df7: "Risposte senza voto"
   ungraded_ed0c6f98: "Non valutato"
@@ -19665,6 +19706,7 @@ it:
   unpublished_dfd8801: "non pubblicato"
   unread_c14cb06f: "non letto,"
   unread_e9c1b19c: "Non letto"
+  unread_ee6db4aa: "non letto"
   unreadcount_unread_replies_509e167f: "%{unreadCount} risposte non lette"
   unregister_service_985238e9: "Annulla registrazione servizio"
   unreserved_e86b7425: "Non prenotato"
@@ -19710,6 +19752,7 @@ it:
   updated_permissions_page_f2e91060: "Pagina autorizzazioni aggiornata"
   updated_terms_of_service_82f34148: "Termini del servizio aggiornati"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "UI aggiornata per consentire la ricerca e la visualizzazione di utenti e corsi all'interno di un account."
+  updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Aggiorna la visualizzazione delle icone dopo l’applicazione dei criteri nell'intestazione compito della colonna Nuovo registro dei voti"
   updating_6edbab78: Aggiornamento
   updating_discussion_failed_aadb2d35: "Aggiornamento discussione non riuscito"
   upload_8b403d05: Carica
@@ -19766,6 +19809,8 @@ it:
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "Utilizza il punto e virgola per separare i campi nelle esportazioni dei fogli di calcolo"
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Utilizza i punti e virgola per separare i campi nelle esportazioni del registro dei voti"
   use_the_new_assignments_page_dd292b9d: "Usa la pagina del nuovo compito"
+  use_the_new_assignments_student_page_944262af: "Utilizza la pagina dello studenti dei nuovi compiti"
+  use_the_new_assignments_teacher_page_8add7e46: "Utilizza la pagina dei nuovi compiti dell'insegnante"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Usa il nuovo strumento esterno Collaborazioni abilitando ulteriori opzioni per gli strumenti da utilizzare per collaborare"
   use_the_new_document_annotation_tool_2cbc98d0: "Usa il nuovo strumento di annotazione documenti"
   use_the_new_interface_for_managing_permissions_907e8e8f: "Utilizza la nuova interfaccia per la gestione delle autorizzazioni"
@@ -20315,6 +20360,7 @@ it:
   we_were_unable_to_find_a_tool_profile_match_for_ve_5645a3e0: "Non siamo riusciti a trovare una corrispondenza con il profilo dello strumento per vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\"."
   we_were_unable_to_find_matches_below_f1c6d1ed: "Non siamo riusciti a trovare le corrispondenze di seguito."
   we_were_unable_to_find_matches_below_select_any_yo_87035b30: "Non siamo riusciti a trovare le corrispondenze di seguito. Seleziona chiunque tu voglia creare come nuovo utente. Le persone non selezionate verrano ignorate al momento."
+  we_were_unable_to_remove_this_course_from_your_fav_70fa598d: "Impossibile rimuovere questo corso dai tuoi preferiti."
   we_were_unable_to_update_the_app_659f5bc6: "Non siamo riusciti ad aggiornare l'app."
   web_conference: 
     default_name_for_courses: "Conferenza web corso"
@@ -20574,6 +20620,9 @@ it:
       Stai per perdere tutte le modifiche non salvate.
       
       Vuoi continuare comunque?
+  you_are_about_to_remove_this_course_from_your_dash_7e806db6: |-
+      Stai per rimuovere questo corso dal dashboard. Sarà comunque disponibile
+                    andando su Corsi > Tutti i corsi nel menù principale.
   you_are_currently_acting_as_user_name_8d2be0ee: "Al momento stai agendo come %{user_name}"
   you_are_currently_logged_into_student_view_3e8a1da: "Al momento sei connesso alla visualizzazione studenti"
   you_are_here_54075d8c: "Sei qui:"
@@ -20652,6 +20701,8 @@ it:
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "Hai inserito un voto non valido per questo studente. Controlla il valore e il tipo di valutazione, quindi riprova."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Hai apportato modifiche alle domande in questo quiz.* Queste modifiche non verranno visualizzate agli studenti fino al salvataggio del quiz."
   you_have_no_collaboration_apps_configured_talk_to__6733123a: "Non hai app di collaborazione configurate. Chiedi al tuo insegnante di configurarne alcune."
+  you_have_no_courses_favorited_reloading_this_page__a2bae9de: "Non hai corsi preferiti. Se si carica nuovamente questa pagina si vedranno tutti \n\
+      \x20     i corsi attivi. Per aggiungere preferiti, vai a "
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Non hai esiti. *Fai clic qui* per crearne uno."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Non hai esiti. Fai clic qui per accedere alla pagina degli esiti."
   you_have_reached_the_domain_limit_if_you_wish_to_a_587db18: "Hai raggiunto il limite di dominio, se desideri aggiungere altri elementi all’elenco degli elementi consentiti, rimuovi prima gli altri."

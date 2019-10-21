@@ -56,44 +56,6 @@ const publishCourse = () => {
     })
 }
 
-$('#course_status_form').submit(e => {
-  const input = e.target.elements.namedItem('course[event]')
-  const value = input && input.value
-  if (value === 'offer') {
-    e.preventDefault()
-
-    const defaultView = defaultViewStore.getState().savedDefaultView
-    const container = document.getElementById('choose_home_page_not_modules')
-    if (container) {
-      axios.get(`/api/v1/courses/${ENV.COURSE.id}/modules`).then(({data: modules}) => {
-        if (defaultView === 'modules' && modules.length === 0) {
-          ReactDOM.render(
-            <HomePagePromptContainer
-              forceOpen
-              store={defaultViewStore}
-              courseId={ENV.COURSE.id}
-              wikiFrontPageTitle={ENV.COURSE.front_page_title}
-              wikiUrl={ENV.COURSE.pages_url}
-              returnFocusTo={$('.btn-publish').get(0)}
-              onSubmit={() => {
-                if (defaultViewStore.getState().savedDefaultView !== 'modules') {
-                  publishCourse()
-                }
-              }}
-            />,
-            container
-          )
-        } else {
-          publishCourse()
-        }
-      })
-    } else {
-      // we don't have the ability to change to change the course home page so just publish it
-      publishCourse()
-    }
-  }
-})
-
 class ChooseHomePageButton extends React.Component {
   state = {
     dialogOpen: false
@@ -138,11 +100,6 @@ class ChooseHomePageButton extends React.Component {
   }
 }
 
-const container = document.getElementById('choose_home_page')
-if (container) {
-  ReactDOM.render(<ChooseHomePageButton store={defaultViewStore} />, container)
-}
-
 const addToDoSidebar = parent => {
   initializePlanner({
     env: window.ENV, // missing STUDENT_PLANNER_COURSES, which is what we want
@@ -161,6 +118,49 @@ const addToDoSidebar = parent => {
 }
 
 $(() => {
+  $('#course_status_form').submit(e => {
+    const input = e.target.elements.namedItem('course[event]')
+    const value = input && input.value
+    if (value === 'offer') {
+      e.preventDefault()
+
+      const defaultView = defaultViewStore.getState().savedDefaultView
+      const container = document.getElementById('choose_home_page_not_modules')
+      if (container) {
+        axios.get(`/api/v1/courses/${ENV.COURSE.id}/modules`).then(({data: modules}) => {
+          if (defaultView === 'modules' && modules.length === 0) {
+            ReactDOM.render(
+              <HomePagePromptContainer
+                forceOpen
+                store={defaultViewStore}
+                courseId={ENV.COURSE.id}
+                wikiFrontPageTitle={ENV.COURSE.front_page_title}
+                wikiUrl={ENV.COURSE.pages_url}
+                returnFocusTo={$('.btn-publish').get(0)}
+                onSubmit={() => {
+                  if (defaultViewStore.getState().savedDefaultView !== 'modules') {
+                    publishCourse()
+                  }
+                }}
+              />,
+              container
+            )
+          } else {
+            publishCourse()
+          }
+        })
+      } else {
+        // we don't have the ability to change to change the course home page so just publish it
+        publishCourse()
+      }
+    }
+  })
+
+  const container = document.getElementById('choose_home_page')
+  if (container) {
+    ReactDOM.render(<ChooseHomePageButton store={defaultViewStore} />, container)
+  }
+
   const todo_container = document.querySelector('.todo-list')
   if (todo_container) {
     addToDoSidebar(todo_container)
