@@ -199,7 +199,7 @@ test('#initialize should set url from html url', function() {
 })
 
 test('#initialize should set edit_url from html url', function() {
-  equal(this.quiz.get('edit_url'), 'http://localhost:3000/courses/1/assignments/7/edit')
+  equal(this.quiz.get('edit_url'), 'http://localhost:3000/courses/1/assignments/7/edit?quiz_lti')
 })
 
 test('#initialize should set publish_url from html url', function() {

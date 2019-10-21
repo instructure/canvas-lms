@@ -88,7 +88,7 @@ export default class Quiz extends Backbone.Model {
     if (this.get('html_url')) {
       this.set('base_url', this.get('html_url').replace(/(quizzes|assignments)\/\d+/, '$1'))
       this.set('url', `${this.get('base_url')}/${this.get('id')}`)
-      this.set('edit_url', `${this.get('base_url')}/${this.get('id')}/edit`)
+      this.set('edit_url', this.edit_url())
       this.set('publish_url', this.publish_url())
       this.set('unpublish_url', this.unpublish_url())
       this.set(
@@ -144,6 +144,11 @@ export default class Quiz extends Backbone.Model {
       return `${this.get('base_url')}/unpublish/quiz`
     }
     return `${this.get('base_url')}/unpublish`
+  }
+
+  edit_url() {
+    const query_string = this.isQuizzesNext() ? '?quiz_lti' : ''
+    return `${this.get('base_url')}/${this.get('id')}/edit${query_string}`
   }
 
   initAllDates() {

@@ -1109,15 +1109,27 @@ describe AssignmentsController do
         @course.root_account.enable_feature! :newquizzes_on_quiz_page
       end
 
-      it 'sets active tab to quizzes' do
+      it 'sets active tab to quizzes for new quizzes' do
         user_session(@teacher)
-        get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+        get 'new', params: { course_id: @course.id, quiz_lti: true }
         expect(assigns[:active_tab]).to eq('quizzes')
       end
 
-      it 'sets crumb to Quizzes' do
+      it 'sets crumb to Quizzes for new quizzes' do
         user_session(@teacher)
-        get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+        get 'new', params: { course_id: @course.id, quiz_lti: true }
+        expect(assigns[:_crumbs]).to include(['Quizzes', "/courses/#{@course.id}/quizzes", {}])
+      end
+
+      it 'sets active tab to quizzes for editing quizzes' do
+        user_session(@teacher)
+        post 'edit', params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
+        expect(assigns[:active_tab]).to eq('quizzes')
+      end
+
+      it 'sets crumb to Quizzes for editing quizzes' do
+        user_session(@teacher)
+        post 'new', params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
         expect(assigns[:_crumbs]).to include(['Quizzes', "/courses/#{@course.id}/quizzes", {}])
       end
     end

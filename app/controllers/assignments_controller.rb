@@ -33,10 +33,10 @@ class AssignmentsController < ApplicationController
   before_action :require_context
   add_crumb(
     proc { t '#crumbs.assignments', "Assignments" },
-    except: [:destroy, :syllabus, :index, :new]
+    except: [:destroy, :syllabus, :index, :new, :edit]
   ) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
-  before_action(except: [:new]) { |c| c.active_tab = "assignments" }
-  before_action(only: [:new]) { |c| setup_active_tab(c) }
+  before_action(except: [:new, :edit]) { |c| c.active_tab = "assignments" }
+  before_action(only: [:new, :edit]) { |c| setup_active_tab(c) }
   before_action :normalize_title_param, :only => [:new, :edit]
 
   def index
@@ -522,7 +522,7 @@ class AssignmentsController < ApplicationController
   def new
     @assignment ||= @context.assignments.temp_record
     @assignment.workflow_state = 'unpublished'
-    add_crumb_on_new_page
+    add_crumb_on_new_quizzes(true)
 
     if params[:submission_types] == 'discussion_topic'
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
@@ -537,6 +537,7 @@ class AssignmentsController < ApplicationController
   def edit
     rce_js_env
     @assignment ||= @context.assignments.active.find(params[:id])
+    add_crumb_on_new_quizzes(false)
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
@@ -830,14 +831,16 @@ class AssignmentsController < ApplicationController
     @context.filter_speed_grader_by_student_group?
   end
 
-  def add_crumb_on_new_page
+  def add_crumb_on_new_quizzes(new_quiz)
+    return if !new_quiz && @assignment.new_record?
+
     if on_quizzes_page? && params.key?(:quiz_lti)
       add_crumb(t('#crumbs.quizzes', "Quizzes"), course_quizzes_path(@context))
     else
       add_crumb(t('#crumbs.assignments', "Assignments"), course_assignments_path(@context))
     end
 
-    add_crumb(t('Create new'))
+    add_crumb(t('Create new')) if new_quiz
   end
 
   def setup_active_tab(controller)
