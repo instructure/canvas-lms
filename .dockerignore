@@ -1,3 +1,4 @@
+.env*
 .git
 .bundle/config
 client_apps/canvas_quizzes/node_modules/

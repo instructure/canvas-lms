@@ -50,6 +50,7 @@ services:
       - ./script:/app/script
       - ./spec:/app/spec
       - ./db/migrate:/app/db/migrate
+      - ./docker-compose:/app/docker-compose
      # Note: if you try and mount the entire "public" directory as a volume, it will mask the stuff generated inside 
      # the container at build time during compile_assets and you'll get all sorts of "not found" console errors.
     networks:

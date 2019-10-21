@@ -1,5 +1,16 @@
-test:
-  domain: localhost
+common: &default_settings
+  domain: <%= ENV['DOMAIN'] %>
 
 development:
-  domain: "canvasweb"
+  <<: *default_settings
+
+test:
+  <<: *default_settings
+  domain: localhost
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings
+
