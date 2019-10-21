@@ -815,6 +815,15 @@ class BzController < ApplicationController
     render :json => response_object
   end
 
+  # This is not meant to be run in production! It's only for dev, test, and staging servers
+  def reset_user_retained_data
+    raise NotImplementedError.new "This method is not implemented for this configuration" unless BeyondZConfiguration.dev_tools_enabled
+    raise ActionController::ParameterMissing.new "You must pass a user_id parameter to this method" unless params[:user_id]
+    RetainedData.where(:user_id => params[:user_id]).destroy_all
+    flash[:html_notice] = t("Magic field data deleted for user_id =  %{user_id}.", :user_id => params[:user_id])
+    redirect_to settings_profile_path
+  end
+
   def retained_data_stats
     @aggregate_result = ActiveRecord::Base.connection.execute("
       SELECT

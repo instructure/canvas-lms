@@ -2251,6 +2251,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method :request_delete_account_link
 
+  def show_dev_tools
+    BeyondZConfiguration.dev_tools_enabled
+  end
+  helper_method :show_dev_tools
+
   def setup_live_events_context
     ctx = {}
     ctx[:root_account_id] = @domain_root_account.global_id if @domain_root_account

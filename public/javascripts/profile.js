@@ -341,4 +341,18 @@ define([
     });
     event.preventDefault();
   });
+
+  $(".reset_retained_data_button").click(function(event) {
+    event.preventDefault();
+    $("#reset_retained_data_dialog").dialog({
+      title: 'Reset Magic Fields Data',
+      width: 500
+    });
+
+    $(".ui-dialog").focus();
+  }).fixDialogButtons();
+  $("#reset_retained_data_dialog.cancel_button").click(function() {
+    $("#reset_retained_data_dialog").dialog('close');
+  });
+
 });

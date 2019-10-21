@@ -11,6 +11,7 @@ development:
   qualtrics_library_id: TODO
   qualtrics_api_token: TODO
   qualtrics_host: TODO
+  dev_tools_enabled: true
 
 test:
   base_url: https://test.bebraven.org/
@@ -25,3 +26,4 @@ test:
   qualtrics_library_id: TODO
   qualtrics_api_token: TODO
   qualtrics_host: TODO
+  dev_tools_enabled: true
