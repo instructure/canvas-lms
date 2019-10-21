@@ -213,7 +213,7 @@ course_card_images:
   applies_to: Course
   root_opt_in: true
 responsive_layout:
-  state: allowed
+  state: hidden
   display_name: Responsive Layout
   description: This is a feature to allow the development of a responsive layout
   applies_to: RootAccount

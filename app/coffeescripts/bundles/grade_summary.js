@@ -77,7 +77,10 @@ GradebookSummaryRouter.prototype.routes = {
   'tab-:route(/*path)': 'tab'
 }
 
-GradeSummary.renderSelectMenuGroup()
+let router
+$(() => {
+  GradeSummary.renderSelectMenuGroup()
 
-var router = new GradebookSummaryRouter()
-Backbone.history.start()
+  router = new GradebookSummaryRouter()
+  Backbone.history.start()
+})
