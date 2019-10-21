@@ -38,6 +38,13 @@ if [[ -z "$FORCE" && "$(docker-compose ps | wc -l)" -gt 2 ]] ; then
   exit 1
 fi
 
+if [ -f "docker-compose.override.yml" ]; then
+  echo "docker-compose.override.yml exists, skipping copy of default configuration"
+else
+  echo "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
+  cp config/docker-compose.override.yml.example docker-compose.override.yml
+fi
+
 [[ -z "$SKIP_CODE" ]] && ./script/canvas_update -n data
 [[ -z "$SKIP_BUILD" ]] && docker-compose build --pull
 if [[ -z "$SKIP_BUILD" ]] ; then
