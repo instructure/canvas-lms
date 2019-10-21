@@ -105,7 +105,7 @@ namespace :deploy do
   desc "Copy config files from <deploy_to>/config to the release directory"
   task :copy_config do
     on roles(:app) do
-      execute :sudo, 'rsync -avr --exclude='*.env*', "#{fetch(:deploy_to)}/config/*", "#{release_path}/config"
+      execute :sudo, 'rsync -avr --exclude="*.env*"', "#{fetch(:deploy_to)}/config/*", "#{release_path}/config"
       execute :sudo, 'cp -p', "#{fetch(:deploy_to)}/config/.env.local", "#{release_path}"
     end
   end
