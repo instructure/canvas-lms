@@ -85,6 +85,11 @@ module Types
       end
     end
 
+    field :media_object, Types::MediaObjectType, null: true
+    def media_object
+      Loaders::MediaObjectLoader.load(object.media_object_id)
+    end
+
     field :submission_attempt, Integer, null: false
 
     field :url, Types::UrlType, null: true

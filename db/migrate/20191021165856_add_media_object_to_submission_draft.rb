@@ -16,20 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
-  DRAFTABLE_SUBMISSION_TYPES = %w[
-    media_recording
-    online_text_entry
-    online_upload
-    online_url
-  ].freeze
+class AddMediaObjectToSubmissionDraft < ActiveRecord::Migration[5.2]
+  tag :predeploy
 
-  class DraftableSubmissionType < BaseEnum
-    graphql_name 'DraftableSubmissionType'
-    description 'Types of submissions that can have a submission draft'
-
-    DRAFTABLE_SUBMISSION_TYPES.each { |draftable_type|
-      value(draftable_type)
-    }
+  def change
+    # This is actually adding the media_id e.g. m-123456 rather than the media_object.id
+    add_column :submission_drafts, :media_object_id, :string
   end
 end

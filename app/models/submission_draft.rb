@@ -18,6 +18,7 @@
 
 class SubmissionDraft < ActiveRecord::Base
   belongs_to :submission, inverse_of: :submission_drafts
+  belongs_to :media_object, primary_key: :media_id
   has_many :submission_draft_attachments, inverse_of: :submission_draft, dependent: :delete_all
   has_many :attachments, through: :submission_draft_attachments
 
@@ -27,6 +28,7 @@ class SubmissionDraft < ActiveRecord::Base
   validates :body, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
   validate :submission_attempt_matches_submission
   validates :url, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
+  validate :media_object_id_matches_media_object
 
   before_save :validate_url
 
@@ -43,11 +45,19 @@ class SubmissionDraft < ActiveRecord::Base
     end
   end
 
+  def media_object_id_matches_media_object
+    if self.media_object_id.present? && self.media_object.blank?
+      err = I18n.t('the media_object_id must match an existing media object')
+      errors.add(:media_object_id, err)
+    end
+  end
+  private :media_object_id_matches_media_object
+
   def submission_attempt_matches_submission
     current_submission_attempt = self.submission&.attempt || 0
     this_submission_attempt = self.submission_attempt || 0
     if this_submission_attempt > (current_submission_attempt + 1)
-      err = 'submission draft cannot be more then one attempt ahead of the current submission'
+      err = I18n.t('submission draft cannot be more then one attempt ahead of the current submission')
       errors.add(:submission_draft_attempt, err)
     end
   end
@@ -76,6 +86,8 @@ class SubmissionDraft < ActiveRecord::Base
     submission_types = self.submission.assignment.submission_types.split(',')
     submission_types.each do |type|
       case type
+      when 'media_recording'
+        return true if self.media_object_id.present?
       when 'online_text_entry'
         return true if meets_text_entry_criteria?
       when 'online_upload'

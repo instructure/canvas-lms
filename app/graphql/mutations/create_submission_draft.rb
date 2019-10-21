@@ -32,6 +32,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
   argument :attempt, Integer, required: false
   argument :body, String, required: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
+  argument :media_id, ID, required: false
   argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Submission')
   argument :url, String, required: false
 
@@ -54,6 +55,8 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
     #       the active submission.
     submission_draft.active_submission_type = input[:active_submission_type]
     case input[:active_submission_type]
+    when 'media_recording'
+      submission_draft.media_object_id = input[:media_id]
     when 'online_text_entry'
       submission_draft.body = input[:body]
     when 'online_upload'
@@ -62,7 +65,6 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
       submission_draft.url = input[:url]
     end
 
-    # for drafts we allow the body and url to be null or empty, so there's nothing to validate
     submission_draft.save!
 
     {submission_draft: submission_draft}

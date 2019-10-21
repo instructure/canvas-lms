@@ -1077,6 +1077,7 @@ input CreateSubmissionDraftInput {
   attempt: Int
   body: String
   fileIds: [ID!]
+  mediaId: ID
   submissionId: ID!
   url: String
 }
@@ -1128,6 +1129,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
 Types of submissions that can have a submission draft
 """
 enum DraftableSubmissionType {
+  media_recording
   online_text_entry
   online_upload
   online_url
@@ -2868,6 +2870,7 @@ type SubmissionDraft implements LegacyIDInterface {
   activeSubmissionType: DraftableSubmissionType
   attachments: [File!]
   body: String
+  mediaObject: MediaObject
   meetsAssignmentCriteria: Boolean!
   meetsTextEntryCriteria: Boolean!
   meetsUploadCriteria: Boolean!
