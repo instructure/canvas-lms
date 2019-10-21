@@ -24,13 +24,13 @@ def withGerritCredentials = { Closure command ->
   ]) { command() }
 }
 
-def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null ->
+def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null, String sourceRef = null ->
   withGerritCredentials({ ->
     println "Fetching ${repo} plugin"
     sh """
       mkdir -p ${path}/${customRepoDestination ?: repo}
       GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-        git archive --remote=ssh://$GERRIT_URL/${repo} master ${sourcePath == null ? '' : sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
+        git archive --remote=ssh://$GERRIT_URL/${repo} ${sourceRef == null ? 'master' : sourceRef} ${sourcePath == null ? '' : sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
     """
   })
 }
@@ -91,7 +91,14 @@ pipeline {
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
             println "Plugin list: ${gems}"
             /* fetch plugins */
-            gems.each { gem -> fetchFromGerrit(gem, 'gems/plugins') }
+            gems.each { gem ->
+              if (env.GERRIT_PROJECT == gem) {
+                /* this is the commit we're testing */
+                fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
+              } else {
+                fetchFromGerrit(gem, 'gems/plugins')
+              }
+            }
             fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             sh '''
               mv gerrit_builder/canvas-lms/config/* config/
