@@ -663,6 +663,9 @@ class EnrollmentsApiController < ApplicationController
     if options[:user_id] != 'self'
       errors << "enrollment[user_id] must be 'self' when self-enrolling"
     end
+    if MasterCourses::MasterTemplate.is_master_course?(@context)
+      errors << "course is not open for self-enrollment"
+    end
     return render_create_errors(errors) if errors.present?
 
     @current_user.validation_root_account = @domain_root_account

@@ -123,6 +123,17 @@ describe "course settings" do
       expect(message).not_to include_text('self_enrollment_code')
     end
 
+    it "should not show the self enrollment code and url for blueprint templates even if enabled" do
+      a = Account.default
+      a.courses << @course
+      a.settings[:self_enrollment] = 'manually_created'
+      a.save!
+      @course.update_attributes(:self_enrollment => true)
+      MasterCourses::MasterTemplate.set_as_master_course(@course)
+      get "/courses/#{@course.id}/settings"
+      expect(f('.self_enrollment_message')).to_not be_displayed
+    end
+
     it "should enable announcement limit if show announcements enabled" do
       get "/courses/#{@course.id}/settings"
 

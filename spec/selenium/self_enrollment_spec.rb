@@ -20,16 +20,26 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "self enrollment" do
   include_context "in-process server selenium tests"
 
-  context "in a full course" do
-    it "should not be allowed" do
-      Account.default.allow_self_enrollment!
-      course_factory(active_all: true)
-      @course.self_enrollment = true
-      @course.self_enrollment_limit = 0
-      @course.save!
-      get "/enroll/#{@course.self_enrollment_code}"
-      expect(f("#content")).not_to contain_css("form#enroll_form")
-    end
+  it "should not be allowed in a full course" do
+    Account.default.allow_self_enrollment!
+    course_factory(active_all: true)
+    @course.self_enrollment = true
+    @course.self_enrollment_limit = 0
+    @course.save!
+    get "/enroll/#{@course.self_enrollment_code}"
+    expect(f("#content")).not_to contain_css("form#enroll_form")
+  end
+
+  it "should not be allowed in a blueprint course" do
+    Account.default.allow_self_enrollment!
+    course_factory(active_all: true)
+    @course.self_enrollment = true
+    @course.save!
+    MasterCourses::MasterTemplate.set_as_master_course(@course)
+    get "/enroll/#{@course.self_enrollment_code}"
+    content = f("#content")
+    expect(content).not_to contain_css("form#enroll_form")
+    expect(content).to include_text("Enrollment is closed")
   end
 
   shared_examples_for "open registration" do
