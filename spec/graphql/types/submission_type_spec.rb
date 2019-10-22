@@ -83,6 +83,25 @@ describe Types::SubmissionType do
       submission_unread_count = submission_type.resolve('unreadCommentCount')
       expect(submission_unread_count).to eq 0
     end
+
+    it 'treats submission comments for attempt nil, 0, and 1 as the same' do
+      @submission.submission_comments.create!(comment: 'foo', attempt: nil)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 0)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 1)
+      submission_unread_count = submission_type.resolve('unreadCommentCount')
+      expect(submission_unread_count).to eq 3
+    end
+
+    it 'only displays unread count for the given submission attempt' do
+      @submission.attempt = 2
+      @submission.save!
+      @submission.submission_comments.create!(comment: 'foo', attempt: nil)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 0)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 1)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 2)
+      submission_unread_count = submission_type.resolve('unreadCommentCount')
+      expect(submission_unread_count).to eq 1
+    end
   end
 
   describe "score and grade" do
