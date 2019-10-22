@@ -1926,9 +1926,12 @@ class CoursesController < ApplicationController
           set_js_assignment_data
           js_env(:SIS_NAME => AssignmentUtil.post_to_sis_friendly_name(@context))
           js_env(
-            :QUIZ_LTI_ENABLED => @context.feature_enabled?(:quizzes_next) &&
+            QUIZ_LTI_ENABLED: @context.feature_enabled?(:quizzes_next) &&
               !@context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
-              @context.quiz_lti_tool.present?
+              @context.quiz_lti_tool.present?,
+            FLAGS: {
+              newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+            }
           )
           js_env(:COURSE_HOME => true)
           @upcoming_assignments = get_upcoming_assignments(@context)

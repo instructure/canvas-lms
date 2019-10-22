@@ -211,6 +211,34 @@ describe AssignmentsController do
       expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be false
     end
 
+    it "should set FLAGS/newquizzes_on_quiz_page in js_env if 'newquizzes_on_quiz_page' is enabled" do
+      user_session @teacher
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.enable_feature! :newquizzes_on_quiz_page
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:FLAGS][:newquizzes_on_quiz_page]).to be_truthy
+    end
+
+    it "should not set FLAGS/newquizzes_on_quiz_page in js_env if 'newquizzes_on_quiz_page' is disabled" do
+      user_session @teacher
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.disable_feature! :newquizzes_on_quiz_page
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:FLAGS][:newquizzes_on_quiz_page]).to be_falsey
+    end
+
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)

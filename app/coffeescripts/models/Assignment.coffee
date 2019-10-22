@@ -356,11 +356,15 @@ export default class Assignment extends Model
     return @get 'published' unless arguments.length > 0
     @set 'published', newPublished
 
+  useNewQuizIcon: () =>
+    ENV.FLAGS && ENV.FLAGS.newquizzes_on_quiz_page && @isQuizLTIAssignment()
+
   position: (newPosition) ->
     return @get('position') || 0 unless arguments.length > 0
     @set 'position', newPosition
 
   iconType: =>
+    return 'quiz icon-Solid' if @useNewQuizIcon()
     return 'quiz' if @isQuiz()
     return 'discussion' if @isDiscussionTopic()
     return 'document' if @isPage()

@@ -119,6 +119,19 @@ test('does not render Migrate Button if migrateQuizEnabled is false', () => {
   equal(view.$('.migrate').length, 0)
 })
 
+test('shows solid quiz icon for new.quizzes', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'quizzes.next'})
+  const view = createView(quiz, {canManage: true})
+  equal(view.$('i.icon-quiz.icon-Solid').length, 1)
+})
+
+test('shows line quiz icon for old quizzes', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
+  equal(view.$('i.icon-quiz').length, 1)
+  equal(view.$('i.icon-quiz.icon-Solid').length, 0)
+})
+
 test('#migrateQuiz is called', function() {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})

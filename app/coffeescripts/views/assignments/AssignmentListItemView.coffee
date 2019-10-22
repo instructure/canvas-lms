@@ -275,7 +275,7 @@ export default class AssignmentListItemView extends Backbone.View
     e.preventDefault()
     @model.duplicate(@addAssignmentToList)
 
-  onDuplicateFailedRetry: (e, action) => 
+  onDuplicateFailedRetry: (e, action) =>
     e.preventDefault()
     $button = $(e.target)
     $button.prop('disabled', true)
@@ -284,7 +284,7 @@ export default class AssignmentListItemView extends Backbone.View
       @delete(silent: true)
     ).always -> $button.prop('disabled', false)
 
-  onMigrateFailedRetry: (e, action) => 
+  onMigrateFailedRetry: (e, action) =>
     e.preventDefault()
     $button = $(e.target)
     $button.prop('disabled', true)

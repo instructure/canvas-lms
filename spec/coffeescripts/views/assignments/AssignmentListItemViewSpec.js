@@ -1359,3 +1359,77 @@ test('renders for assignment if assignment is released by a rule', () => {
   const view = createView(model)
   equal(view.$('.mastery-path-icon').length, 1)
 })
+
+QUnit.module('AssignListItemViewSpec - assignment icons', {
+  setup() {
+    fakeENV.setup({
+      current_user_roles: ['teacher'],
+      URLS: {assignment_sort_base_url: 'test'}
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('renders discussion icon for discussion topic', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    submission_types: ['discussion_topic']
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-discussion').length, 1)
+})
+
+test('renders quiz icon for old quizzes', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    submission_types: ['online_quiz']
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-quiz').length, 1)
+})
+
+test('renders page icon for wiki page', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    submission_types: ['wiki_page']
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-document').length, 1)
+})
+
+test('renders solid quiz icon for new quizzes', () => {
+  ENV.FLAGS = {newquizzes_on_quiz_page: true}
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    is_quiz_lti_assignment: true
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-quiz.icon-Solid').length, 1)
+})
+
+test('renders assignment icon for new quizzes if FF is off', () => {
+  ENV.FLAGS = {newquizzes_on_quiz_page: false}
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    is_quiz_lti_assignment: true
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-quiz.icon-Solid').length, 0)
+  equal(view.$('i.icon-assignment').length, 1)
+})
+
+test('renders assignment icon for other assignments', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo'
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-assignment').length, 1)
+})
