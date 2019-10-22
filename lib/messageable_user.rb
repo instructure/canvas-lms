@@ -17,7 +17,7 @@
 #
 
 class MessageableUser < User
-  COLUMNS = ['id', 'updated_at', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{ |col| "users.#{col}" }
+  COLUMNS = ['id', 'updated_at', 'account_pronoun_id', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{ |col| "users.#{col}" }
   SELECT = COLUMNS.join(", ")
   AVAILABLE_CONDITIONS = "users.workflow_state IN ('registered', 'pre_registered')"
 

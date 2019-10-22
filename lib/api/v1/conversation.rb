@@ -128,6 +128,7 @@ module Api::V1::Conversation
     if options[:include_participant_avatars]
       ActiveRecord::Associations::Preloader.new.preload(users, {:pseudonym => :account}) # for avatar_url
     end
+    ActiveRecord::Associations::Preloader.new.preload(users, :account_pronoun)
 
     preload_common_contexts(current_user, users) if options[:include_participant_contexts]
     users.map { |user| conversation_user_json(user, current_user, session, options) }
@@ -139,6 +140,9 @@ module Api::V1::Conversation
       :name => user.short_name,
       :full_name => user.name
     }
+    if user.account_pronoun && Account.site_admin.feature_enabled?(:account_pronouns)
+      result[:pronoun] = user.account_pronoun.display_pronoun if @domain_root_account.settings[:can_add_pronouns]
+    end
     if options[:include_participant_contexts]
       result[:common_courses] = current_user.address_book.common_courses(user)
       result[:common_groups] = current_user.address_book.common_groups(user)
