@@ -19,6 +19,7 @@
 import {Assignment} from '../graphqlData/Assignment'
 import {bool, func, string} from 'prop-types'
 import {FormField} from '@instructure/ui-form-field'
+import {friendlyTypeName, getCurrentSubmissionType} from '../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {Component, lazy, Suspense} from 'react'
@@ -44,31 +45,6 @@ export default class AttemptTab extends Component {
     updateEditingDraft: func,
     updateUploadingFiles: func,
     uploadingFiles: bool
-  }
-
-  friendlyTypeName = type => {
-    switch (type) {
-      case 'media_recording':
-        return I18n.t('Media')
-      case 'online_text_entry':
-        return I18n.t('Text Entry')
-      case 'online_upload':
-        return I18n.t('File')
-      case 'online_url':
-        return I18n.t('URL')
-      default:
-        throw new Error('submission type not yet supported in A2')
-    }
-  }
-
-  getCurrentSubmissionType = () => {
-    if (this.props.submission.url !== null) {
-      return 'online_url'
-    } else if (this.props.submission.body !== null && this.props.submission.body !== '') {
-      return 'online_text_entry'
-    } else if (this.props.submission.attachments.length !== 0) {
-      return 'online_upload'
-    }
   }
 
   renderFileUpload = () => {
@@ -182,7 +158,7 @@ export default class AttemptTab extends Component {
           </option>
           {this.props.assignment.submissionTypes.map(type => (
             <option key={type} value={type}>
-              {this.friendlyTypeName(type)}
+              {friendlyTypeName(type)}
             </option>
           ))}
         </select>
@@ -193,7 +169,7 @@ export default class AttemptTab extends Component {
   render() {
     if (this.props.assignment.submissionTypes.length > 1) {
       const submissionType = ['submitted', 'graded'].includes(this.props.submission.state)
-        ? this.getCurrentSubmissionType()
+        ? getCurrentSubmissionType(this.props.submission)
         : this.props.activeSubmissionType
       return (
         <div data-testid="attempt-tab">
