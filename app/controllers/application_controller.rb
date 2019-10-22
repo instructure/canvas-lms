@@ -256,7 +256,7 @@ class ApplicationController < ActionController::Base
 
     tools.select! do |tool|
       tool.visible_with_permission_check?(type, @current_user, context, session) &&
-        tool.feature_flag_enabled?
+        tool.feature_flag_enabled?(context)
     end
 
     tools.map do |tool|
