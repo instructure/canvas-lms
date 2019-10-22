@@ -712,4 +712,19 @@ module Canvas::LiveEvents
   def self.learning_outcome_link_updated(link)
     post_event_stringified('learning_outcome_link_updated', get_learning_outcome_link_data(link).merge(updated_at: link.updated_at))
   end
+
+  def self.grade_override(score, old_score, enrollment, course)
+    return unless score.course_score && score.override_score != old_score
+    data = {
+      score_id: score.id,
+      enrollment_id: score.enrollment_id,
+      user_id: enrollment.user_id,
+      course_id: enrollment.course_id,
+      grading_period_id: score.grading_period_id,
+      override_score: score.override_score,
+      old_override_score: old_score,
+      updated_at: score.updated_at,
+    }
+    post_event_stringified('grade_override', data, amended_context(course))
+  end
 end

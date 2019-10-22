@@ -53,7 +53,12 @@ class Mutations::SetOverrideScore < Mutations::BaseMutation
       raise ActiveRecord::RecordNotFound if score.blank?
       verify_authorized_action!(score.course, :manage_grades)
 
-      score.update(override_score: input[:override_score])
+      old_score = score[:override_score]
+      new_score = input[:override_score]
+      score.update(override_score: new_score)
+
+      Canvas::LiveEvents.grade_override(score, old_score, enrollment, enrollment.course)
+
       next unless enrollment == requested_enrollment
 
       return_value = if score.valid?

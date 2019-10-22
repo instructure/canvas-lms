@@ -1358,4 +1358,17 @@ describe Canvas::LiveEvents do
       end
     end
   end
+
+  describe 'grade_override' do
+    it 'does not send event when score does not change' do
+      course_model
+      enrollment_model
+
+      score = Score.new(override_score: 100.0, course_score: true)
+      old_score = 100.0
+
+      expect(Canvas::LiveEvents).not_to receive(:post_event_stringified)
+      Canvas::LiveEvents.grade_override(score, old_score, @enrollment, @course)
+    end
+  end
 end
