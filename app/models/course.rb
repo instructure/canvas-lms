@@ -2747,7 +2747,7 @@ class Course < ActiveRecord::Base
   def external_tool_tabs(opts, user)
     tools = self.context_external_tools.active.having_setting('course_navigation')
     tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain_ids).to_a
-    tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled? }
+    tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled?(self) }
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
 

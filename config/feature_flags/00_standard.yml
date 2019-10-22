@@ -434,7 +434,7 @@ compact_live_event_payloads:
     live event payloads if this feature is enabled.
 analytics_2:
   state: hidden
-  applies_to: RootAccount
+  applies_to: Course
   display_name: New Course and User Analytics
   description: Show new analytics for course and user data
   after_state_change_proc: analytics_2_after_state_change_hook
