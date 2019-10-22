@@ -1234,7 +1234,7 @@ class ApplicationController < ActionController::Base
   #
   # If asset is an AR model, then its asset_string will be used. If it's an array,
   # it should look like [ "subtype", context ], like [ "pages", course ].
-  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true)
+  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true, context: nil)
     # ideally this could just be `user = file_access_user` now, but that causes
     # problems with some integration specs where getting @files_domain set
     # reliably is... difficult
@@ -1273,7 +1273,7 @@ class ApplicationController < ActionController::Base
         }
       end
 
-      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
+      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level, context: context)
 
       @accessed_asset
     end

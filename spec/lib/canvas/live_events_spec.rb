@@ -565,7 +565,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }.compact!).once
+      }.compact!, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access(@course, 'category', 'role', 'participation')
     end
@@ -581,7 +581,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }).once
+      }, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation')
     end
@@ -597,7 +597,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }).once
+      }, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access(@page, 'category', 'role', 'participation')
     end
@@ -615,9 +615,34 @@ describe Canvas::LiveEvents do
         level: 'participation',
         filename: @attachment.filename,
         display_name: @attachment.display_name
-      }.compact!).once
+      }.compact!, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation')
+    end
+
+    it "should provide a different context if a different context is provided" do
+      attachment_model
+      context = OpenStruct.new(global_id: '1')
+
+      expect_event('asset_accessed', {
+        asset_name: "unknown.loser",
+        asset_type: 'attachment',
+        asset_id: @attachment.global_id.to_s,
+        asset_subtype: nil,
+        category: 'files',
+        role: 'role',
+        level: 'participation',
+        filename: @attachment.filename,
+        display_name: @attachment.display_name
+      }.compact!,
+      {
+        compact_live_events: true,
+        context_type: context.class.to_s,
+        context_id: '1'
+      }
+      ).once
+
+      Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation', context: context)
     end
   end
 

@@ -488,7 +488,7 @@ module Canvas::LiveEvents
     }, amended_context(submission.assignment.context))
   end
 
-  def self.asset_access(asset, category, role, level)
+  def self.asset_access(asset, category, role, level, context: nil)
     asset_subtype = nil
     if asset.is_a?(Array)
       asset_subtype = asset[0]
@@ -497,15 +497,19 @@ module Canvas::LiveEvents
       asset_obj = asset
     end
 
-    post_event_stringified('asset_accessed', {
-      asset_name: asset_obj.try(:name) || asset_obj.try(:title),
-      asset_type: asset_obj.class.reflection_type_name,
-      asset_id: asset_obj.global_id,
-      asset_subtype: asset_subtype,
-      category: category,
-      role: role,
-      level: level
-    }.merge(LiveEvents::EventSerializerProvider.serialize(asset_obj)))
+    post_event_stringified(
+      'asset_accessed',
+      {
+        asset_name: asset_obj.try(:name) || asset_obj.try(:title),
+        asset_type: asset_obj.class.reflection_type_name,
+        asset_id: asset_obj.global_id,
+        asset_subtype: asset_subtype,
+        category: category,
+        role: role,
+        level: level
+      }.merge(LiveEvents::EventSerializerProvider.serialize(asset_obj)),
+      amended_context(context)
+    )
   end
 
   def self.quiz_export_complete(content_export)
