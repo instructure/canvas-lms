@@ -1,16 +1,14 @@
 common: &default_settings
-  domain: <%= ENV['DOMAIN'] %>
+  cache_store: redis_store
 
 development:
   <<: *default_settings
 
 test:
   <<: *default_settings
-  domain: localhost
 
 staging:
   <<: *default_settings
 
 production:
   <<: *default_settings
-

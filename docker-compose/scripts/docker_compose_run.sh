@@ -22,7 +22,6 @@ else
   echo "Ok!"
 fi
 
-cp -a /app/docker-compose/config/* /app/config/
 cp -a /app/docker-compose/.env /app/.env
 
 echo "Checking if the AWS ENV vars are setup"

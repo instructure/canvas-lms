@@ -2,12 +2,13 @@
 #
 # "Raven" is the ruby library that is the client to sentry, and it's
 # config file would be "config/raven.yml". If that config doesn't exist,
-# nothing happens.  If it *does*, we register a callback with Canvas::Errors
-# so that every time an exception is reported, we can fire off a sentry
-# call to track it and aggregate it for us.
+# or the "dsn" setting is missing, nothing happens.  If it *does*, 
+# we register a callback with Canvas::Errors so that every time an 
+# exception is reported, we can fire off a sentry call to track it 
+# and aggregate it for us.
 settings = ConfigFile.load("raven")
 
-if settings.present?
+if settings.present? && !settings[:dsn].blank?
   require "raven/base"
   Raven.configure do |config|
     config.logger = Rails.logger

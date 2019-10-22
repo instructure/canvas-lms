@@ -6,7 +6,7 @@ common: &default_settings
   # for any region, but will require a bounce through a US region, so will
   # be slower. It's recommended that you set this for whichever region
   # your bucket is in.
-  # s3_endpoint: s3-eu-west-1.amazonaws.com  domain: <%= ENV['DOMAIN'] %>
+  # s3_endpoint: s3-eu-west-1.amazonaws.com
 
 development:
   <<: *default_settings

@@ -1,7 +1,5 @@
 common: &default_settings
-  ## storage: s3 - would require valid amazon_s3.yml
-  storage: <%= ENV['FILE_STORE'] %>
-  path_prefix: <%= ENV['FILE_STORE_PATH_PREFIX'] %>
+  storage: s3
 
 development:
   <<: *default_settings
