@@ -1,0 +1,14 @@
+common: &default_settings
+  cache_store: redis_store
+
+development:
+  <<: *default_settings
+
+test:
+  <<: *default_settings
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings

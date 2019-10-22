@@ -4,6 +4,7 @@ common: &default_settings
   encoding: utf8
   database: <%= ENV['PGDATABASE'] %>
   username: <%= ENV['PGUSER'] %>
+  password: <%= ENV['PGPASSWORD'] %>
   timeout: 5000
 
 development:
@@ -24,4 +25,3 @@ staging:
 
 production:
   <<: *default_settings
-

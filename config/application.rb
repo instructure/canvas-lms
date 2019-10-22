@@ -53,12 +53,14 @@ module CanvasRails
     # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
     config.time_zone = 'UTC'
 
-    log_config = File.exist?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
+    log_config_path = Rails.root + 'config/logging.yml'
+    log_config = File.exist?(log_config_path) && YAML.safe_load(ERB.new(File.read(log_config_path)).result)[Rails.env]
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
     opts = {}
     require 'canvas_logger'
 
     config.log_level = log_config['log_level']
+
     log_level = ActiveSupport::Logger.const_get(config.log_level.to_s.upcase)
     opts[:skip_thread_context] = true if log_config['log_context'] == false
 
@@ -252,5 +254,6 @@ module CanvasRails
       config.action_dispatch.rack_cache[:ignore_headers] =
         %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
     end
+
   end
 end

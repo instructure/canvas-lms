@@ -1,0 +1,19 @@
+common: &default_settings
+  domain: <%= ENV['DOMAIN'] %>
+  ssl: true
+
+development:
+  <<: *default_settings
+  ssl: false
+
+test:
+  <<: *default_settings
+  domain: localhost
+  ssl: false
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings
+

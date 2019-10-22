@@ -54,7 +54,7 @@ set :nvm_map_bins, %w{node npm}
 # set :pty, true
 
 # Default value for :linked_files is []
-#set :linked_files, %w{config/database.yml}
+set :linked_files, %w{.env.local build.js}
 
 # Default value for linked_dirs is []
 # Oh nelly, DO NOT add the "config" dir in here.  Symlinked config files don't work
@@ -105,8 +105,14 @@ namespace :deploy do
   desc "Copy config files from <deploy_to>/config to the release directory"
   task :copy_config do
     on roles(:app) do
-      execute :sudo, 'rsync -avr --exclude='*.env*', "#{fetch(:deploy_to)}/config/*", "#{release_path}/config"
-      execute :sudo, 'cp -p', "#{fetch(:deploy_to)}/config/.env.local", "#{release_path}"
+      # Note: we can phase this out soon b/c all configs except cassandra.yml have been cutover to read
+      # from ENV vars. Once we disable and remove the cassandra.yml config then we can remove this task.
+      # For individual files we need to persist across deploys, we can drop them in the shared directory 
+      # and use linked_files (see above). Note that sym linked dirs don't work for some core configs though.
+      cassandra_config_path="#{fetch(:deploy_to)}/config/cassandra.yml"
+      if File.exist?(cassandra_config_path)
+        execute :sudo, 'cp -p', "#{cassandra_config_path}", "#{release_path}"
+      end
     end
   end
 
@@ -270,7 +276,7 @@ namespace :deploy do
       execute :sudo, 'chown -R', "#{group}:#{group}", "#{release_path}"
       execute :sudo, 'chown', "#{user}:#{group}", '/tmp/attachment_fu' # tmp directly used to export grades.
       within release_path do
-        execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru", "tmp/"
+        execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", ".env*", "config.ru", "tmp/"
         execute :sudo, 'chmod 440', "config/*.yml"
         execute :sudo, 'chmod 660', "config/google_calendar_auth.json", raise_on_non_zero_exit: false # this file is special b/c the google/api_client needs to write to it when it refreshes the token
       end

@@ -1,0 +1,32 @@
+common: &default_settings
+  base_url: <%= ENV['BZ_BASE_URL'] %>
+  change_password_path: /users/edit
+  nonexistent_user_path: /users/not_on_lms
+  bitly_access_token: <%= ENV['BZ_BITLY_ACCESS_TOKEN'] %>
+  help_url: <%= ENV['BZ_HELP_URL'] %>
+  google_analytics_account: <%= ENV['BZ_GOOGLE_ANALYTICS_ID'] %>
+  docusign_api_key: <%= ENV['BZ_DOCUSIGN_API_KEY'] %>
+  docusign_api_secret: <%= ENV['BZ_DOCUSIGN_API_SECRET'] %>
+  docusign_host: <%= ENV['BZ_DOCUSIGN_HOST'] %>
+  docusign_return_url: <%= ENV['BZ_DOCUSIGN_RETURN_URL'] %>
+  qualtrics_library_id: <%= ENV['BZ_QUALTRICS_LIBRARY_ID'] %>
+  qualtrics_api_token: <%= ENV['BZ_QUALTRICS_API_TOKEN'] %>
+  qualtrics_host: <%= ENV['BZ_QUALTRICS_HOST'] %>
+  # This is a list of user ids for folks that should be allowed to
+  # save HTML without sanitizing it. E.g. staff editing content.
+  unrestricted_html_users: <%= ENV['BZ_UNRESTRICTED_HTML_USERS'] %>
+
+development:
+  <<: *default_settings
+  dev_tools_enabled: true
+
+test:
+  <<: *default_settings
+  dev_tools_enabled: true
+
+staging:
+  <<: *default_settings
+  dev_tools_enabled: true
+
+production:
+  <<: *default_settings

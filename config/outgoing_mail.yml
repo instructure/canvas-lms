@@ -1,0 +1,22 @@
+common: &default_settings
+  address: <%= ENV['MAIL_ADDRESS'] %>
+  port: <%= ENV['MAIL_PORT'] %>
+  domain: <%= ENV['MAIL_DOMAIN'] %>
+  user_name: <%= ENV['MAIL_USERNAME'] %>
+  password: <%= ENV['MAIL_PASSWORD'] %>
+  authentication: <%= ENV['MAIL_AUTHENTICATION'] %>
+  outgoing_address: <%= ENV['MAIL_OUTGOING_ADDRESS'] %>
+  default_name: <%= ENV['MAIL_DEFAULT_NAME'] %>
+  delivery_method: <%= ENV['MAIL_DELIVERY_METHOD'] %>
+development:
+  <<: *default_settings
+
+test:
+  <<: *default_settings
+  domain: localhost
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings

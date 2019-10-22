@@ -1,0 +1,20 @@
+common: &default_settings
+  servers: 
+    - <%= ENV['REDIS_HOST_1'] %>
+    # Note: you can add more servers here. If we do that, create more ENV vars for them.
+
+development:
+  <<: *default_settings
+
+test:
+  <<: *default_settings
+  # warning: the redis database will get cleared before each test, so if you
+  # use this server for anything else, make sure to set aside a database id for
+  # these tests to use.
+  database: 1
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings

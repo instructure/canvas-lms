@@ -1,0 +1,15 @@
+common: &default_settings
+  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>
+
+development:
+  <<: *default_settings
+
+test:
+  <<: *default_settings
+  domain: localhost
+
+staging:
+  <<: *default_settings
+
+production:
+  <<: *default_settings

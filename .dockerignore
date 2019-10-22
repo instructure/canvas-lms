@@ -1,6 +1,7 @@
 .env*
 .git
 .bundle/config
+docker-compose/
 client_apps/canvas_quizzes/node_modules/
 client_apps/canvas_quizzes/dist/
 client_apps/canvas_quizzes/tmp/

@@ -1,6 +1,0 @@
-development:
-  address: mailcatcher
-  port: 1025
-  domain: canvasweb
-  outgoing_address: canvas@canvasweb
-  default_name: Instructure Canvas Docker Dev

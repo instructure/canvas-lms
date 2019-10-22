@@ -1,16 +1,16 @@
 common: &default_settings
-  domain: <%= ENV['DOMAIN'] %>
+  storage: s3
 
 development:
   <<: *default_settings
 
 test:
   <<: *default_settings
-  domain: localhost
+  storage: local
+  path_prefix: tmp/files
 
 staging:
   <<: *default_settings
 
 production:
   <<: *default_settings
-

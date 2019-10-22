@@ -1,4 +1,0 @@
-development:
-  logger: rails
-  log_context: false
-  log_level: debug
