@@ -35,6 +35,42 @@ import {omitProps} from '@instructure/ui-react-utils'
 import {px} from '@instructure/ui-utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
+export const stepLabels = {
+  get available() {
+    return I18n.t('Available')
+  },
+  get graded() {
+    return I18n.t('Graded')
+  },
+  get newAttempt() {
+    return I18n.t('New Attempt')
+  },
+  get next() {
+    return I18n.t('Next')
+  },
+  get notGradedYet() {
+    return I18n.t('Not Graded Yet')
+  },
+  get previous() {
+    return I18n.t('Previous')
+  },
+  get submit() {
+    return I18n.t('Submit')
+  },
+  get submitted() {
+    return I18n.t('Submitted')
+  },
+  get unavailable() {
+    return I18n.t('Unavailable')
+  },
+  get upload() {
+    return I18n.t('Upload')
+  },
+  get uploaded() {
+    return I18n.t('Uploaded')
+  }
+}
+
 class StepItem extends Component {
   static propTypes = {
     status: oneOf(['button', 'complete', 'incomplete', 'in-progress', 'unavailable']),
@@ -87,19 +123,19 @@ class StepItem extends Component {
 
     if (!icon && status === 'button') {
       switch (this.props.label) {
-        case 'Previous':
+        case stepLabels.previous:
           return this.renderButton(
             IconArrowOpenStartSolid,
             context.prevButtonAction,
             I18n.t('View Previous Submission')
           )
-        case 'Next':
+        case stepLabels.next:
           return this.renderButton(
             IconArrowOpenEndSolid,
             context.nextButtonAction,
             I18n.t('View Next Submission')
           )
-        case 'New Attempt':
+        case stepLabels.newAttempt:
           return this.renderButton(
             IconPlusSolid,
             context.startNewAttemptAction,
