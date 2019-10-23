@@ -1,5 +1,5 @@
 common: &default_settings
-  dsn: <%= ENV['RAVEN_DSN'] %>
+  dsn: <%= ENV['SENTRY_DSN'] %>
 
 development:
   <<: *default_settings
