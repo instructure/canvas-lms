@@ -287,9 +287,11 @@ describe UsersController do
   context "todo items" do
 
     it "should respect grading permissions" do
-      course_with_student_logged_in(:course_name => "some-course", active_all: true)
+      course_with_student_logged_in(:course_name => "some-course", :active_all => 1)
       @student = @user
-      course_with_ta(course: @course, active_all: true)
+      course_with_teacher(course: @course, :active_all => 1)
+      @teacher = @user
+      course_with_ta(course: @course, :active_all => 1)
       @ta = @user
       assignment = @course.assignments.create!(grading_type: "points", points_possible: 10.0, submission_types: "online_text_entry", workflow_state: "published")
       assignment.submit_homework(@student, submission_type: "online_text_entry", body: "<p>blah blah blah</p>")
