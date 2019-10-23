@@ -45,6 +45,7 @@ end
 describe Api::V1::DiscussionTopics do
   before :once do
     @test_api = DiscussionTopicsTestCourseApi.new
+    @test_api.instance_variable_set :@domain_root_account, Account.default
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
     student_in_course(:active_all => true, :course => @course)
@@ -105,6 +106,24 @@ describe Api::V1::DiscussionTopics do
     end
   end
 
+  it "includes the user's pronoun when enabled" do
+    @me.update! account_pronoun: AccountPronoun.create!(pronoun: "she/her", account: Account.default)
+
+    expect(
+      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil).key?("user_pronoun")
+    ).to eq false
+
+    @test_api.instance_variable_get(:@domain_root_account).tap { |domain_root_account|
+      domain_root_account.settings[:can_add_pronouns] = true
+      domain_root_account.save!
+    }
+    Account.site_admin.enable_feature! :account_pronouns
+
+    expect(
+      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)["user_pronoun"]
+    ).to eq "she/her"
+  end
+
   it 'should render a podcast_url using the discussion topic\'s context if there is no @context_enrollment/@context' do
     @topic.update_attribute :podcast_enabled, true
     data = nil
@@ -134,8 +153,6 @@ describe Api::V1::DiscussionTopics do
 
   context "with assignment" do
     before :once do
-      @test_api.instance_variable_set(:@domain_root_account, Account.default)
-
       @topic.assignment = assignment_model(:course => @course)
       @topic.save!
     end
