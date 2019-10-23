@@ -31,8 +31,8 @@ import {shallowEqualArrays} from 'shallow-equal'
 
 function depsHaveChanged(priorDeps, newDeps, opts) {
   return (
-    (!opts.deep && !shallowEqualArrays(priorDeps, newDeps))
-    || (opts.deep && !isEqual(priorDeps, newDeps))
+    (!opts.deep && !shallowEqualArrays(priorDeps, newDeps)) ||
+    (opts.deep && !isEqual(priorDeps, newDeps))
   )
 }
 
@@ -41,7 +41,12 @@ export default function useImmediate(fn, newDeps, opts = {}) {
   const cleanupFn = useRef(null)
 
   // schedule the final cleanup for when the component unmounts
-  useEffect(() => () => { if (cleanupFn.current) cleanupFn.current() }, [])
+  useEffect(
+    () => () => {
+      if (cleanupFn.current) cleanupFn.current()
+    },
+    []
+  )
 
   // Like useEffect, we want to run the fn and its cleanup every time if deps are not specified
   const depsChanged = !newDeps || depsHaveChanged(priorDeps.current, newDeps, opts)

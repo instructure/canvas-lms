@@ -21,11 +21,11 @@ import _ from 'underscore'
 import fcUtil from '../util/fcUtil'
 import I18n from 'i18n!EditAppointmentGroupDetails'
 import htmlEscape from 'str/htmlEscape'
-import commonEventFactory from '../calendar/commonEventFactory'
-import TimeBlockList from '../calendar/TimeBlockList'
+import commonEventFactory from './commonEventFactory'
+import TimeBlockList from './TimeBlockList'
 import editAppointmentGroupTemplate from 'jst/calendar/editAppointmentGroup'
 import genericSelectTemplate from 'jst/calendar/genericSelect'
-import ContextSelector from '../calendar/ContextSelector'
+import ContextSelector from './ContextSelector'
 import preventDefault from '../fn/preventDefault'
 import {publish as jqueryPublish} from 'vendor/jquery.ba-tinypubsub'
 import 'jquery.ajaxJSON'
@@ -75,7 +75,9 @@ export default class EditAppointmentGroupDetails {
           value="${htmlEscape(this.appointment_group.max_appointments_per_participant)}"
           min="1"
           style="width: 40px"
-          aria-label="${htmlEscape(I18n.t('Maximum number of appointments a participant can attend'))}"
+          aria-label="${htmlEscape(
+            I18n.t('Maximum number of appointments a participant can attend')
+          )}"
         />`
       })
     )
@@ -120,8 +122,17 @@ export default class EditAppointmentGroupDetails {
     this.form.find('.ag_contexts_selector').click(preventDefault(this.toggleContextsMenu))
 
     // make sure this is the spot
-    const timeBlocks = (this.apptGroup.appointments || []).map(appt => [fcUtil.wrap(appt.start_at), fcUtil.wrap(appt.end_at), true])
-    this.timeBlockList = new TimeBlockList(this.form.find(".time-block-list-body"), this.form.find(".splitter"), timeBlocks, { date: this.event && this.event.date })
+    const timeBlocks = (this.apptGroup.appointments || []).map(appt => [
+      fcUtil.wrap(appt.start_at),
+      fcUtil.wrap(appt.end_at),
+      true
+    ])
+    this.timeBlockList = new TimeBlockList(
+      this.form.find('.time-block-list-body'),
+      this.form.find('.splitter'),
+      timeBlocks,
+      {date: this.event && this.event.date}
+    )
 
     this.form.find('[name="slot_duration"]').change(e => {
       if (this.form.find('[name="autosplit_option"]').is(':checked')) {
@@ -187,6 +198,7 @@ export default class EditAppointmentGroupDetails {
   creating() {
     return !this.editing()
   }
+
   editing() {
     return this.apptGroup.id != null
   }
@@ -204,12 +216,13 @@ export default class EditAppointmentGroupDetails {
     this.checkBoxInputChange(checkbox, input)
     const apptLimit = parseInt(input.val())
     const apptCounts = {}
-    this.apptGroup.appointments && this.apptGroup.appointments.forEach(a => {
-      a.child_events.forEach(e => {
-        if (!apptCounts[e.user.id]) apptCounts[e.user.id] = 0
-        apptCounts[e.user.id] += 1
+    this.apptGroup.appointments &&
+      this.apptGroup.appointments.forEach(a => {
+        a.child_events.forEach(e => {
+          if (!apptCounts[e.user.id]) apptCounts[e.user.id] = 0
+          apptCounts[e.user.id] += 1
+        })
       })
-    })
     return this.helpIconShowIf(checkbox, _.some(apptCounts, (count, userId) => count > apptLimit))
   }
 
@@ -338,7 +351,7 @@ export default class EditAppointmentGroupDetails {
     }
 
     const onSuccess = data => {
-      (data.new_appointments || []).forEach(eventData => {
+      ;(data.new_appointments || []).forEach(eventData => {
         const event = commonEventFactory(eventData, this.contexts)
         jqueryPublish('CommonEvent/eventSaved', event)
       })

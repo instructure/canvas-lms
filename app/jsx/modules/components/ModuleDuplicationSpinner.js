@@ -26,15 +26,13 @@ export default function ModuleDuplicationSpinner(_props) {
   return (
     <Grid startAt="medium" vAlign="middle" rowSpacing="none" colSpacing="none">
       <Grid.Row vAlign="middle" rowSpacing="none">
-        <Grid.Col hAlign='center' textAlign='center'>
-          <Spinner renderTitle={I18n.t('Duplicating Module')}/>
+        <Grid.Col hAlign="center" textAlign="center">
+          <Spinner renderTitle={I18n.t('Duplicating Module')} />
         </Grid.Col>
       </Grid.Row>
       <Grid.Row>
-        <Grid.Col hAlign='center' textAlign='center'>
-          <Text>
-            {I18n.t('Duplicating Module...')}
-          </Text>
+        <Grid.Col hAlign="center" textAlign="center">
+          <Text>{I18n.t('Duplicating Module...')}</Text>
         </Grid.Col>
       </Grid.Row>
     </Grid>

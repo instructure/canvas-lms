@@ -73,6 +73,20 @@ describe('StudentsSearcher', () => {
     expect(closest(getByText('Message Students'), 'button')).toBeTruthy()
   })
 
+  it('enables "Message Students" when students are not anonymized', () => {
+    const assignment = mockAssignment({anonymizeStudents: false})
+    const {getByText} = renderStudentsSearcher([], assignment)
+    const button = closest(getByText('Message Students'), 'button')
+    expect(button.disabled).toBeFalsy()
+  })
+
+  it('disables "Message Students" when students are anonymized', () => {
+    const assignment = mockAssignment({anonymizeStudents: true})
+    const {getByText} = renderStudentsSearcher([], assignment)
+    const button = closest(getByText('Message Students'), 'button')
+    expect(button.disabled).toBeTruthy()
+  })
+
   it('should open speedgrader link in a new tab', () => {
     const {getByText} = renderStudentsSearcher()
     const sgLink = closest(getByText('Speedgrader'), 'a')

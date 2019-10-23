@@ -27,7 +27,7 @@ import outcomeFormTemplate from 'jst/outcomes/outcomeForm'
 import criterionTemplate from 'jst/outcomes/_criterion'
 import criterionHeaderTemplate from 'jst/outcomes/_criterionHeader'
 import {showConfirmOutcomeEdit} from 'jsx/outcomes/ConfirmOutcomeEditModal'
-import { addCriterionInfoButton } from 'jsx/outcomes/CriterionInfo'
+import {addCriterionInfoButton} from 'jsx/outcomes/CriterionInfo'
 import 'jqueryui/dialog'
 
 // For outcomes in the main content view.
@@ -128,14 +128,19 @@ export default class OutcomeView extends OutcomeContentBase {
 
   editRating(e) {
     e.preventDefault()
-    const childIdx = $(e.currentTarget).closest('.rating').index()
-    const $th = $(`.criterion thead tr > th:nth-child(${childIdx+1})`)
+    const childIdx = $(e.currentTarget)
+      .closest('.rating')
+      .index()
+    const $th = $(`.criterion thead tr > th:nth-child(${childIdx + 1})`)
     const $showWrapper = $(e.currentTarget).parents('.show:first')
     const $editWrapper = $showWrapper.next()
 
     $showWrapper.attr('aria-expanded', 'false').hide()
     $editWrapper.attr('aria-expanded', 'true').show()
-    $th.find('h5').attr('aria-expanded', 'false').hide()
+    $th
+      .find('h5')
+      .attr('aria-expanded', 'false')
+      .hide()
     return $editWrapper.find('.outcome_rating_description').focus()
   }
 
@@ -145,7 +150,7 @@ export default class OutcomeView extends OutcomeContentBase {
     if (this.$('.rating').length > 1) {
       const deleteBtn = $(e.currentTarget)
       const childIdx = deleteBtn.closest('.rating').index()
-      const $th = $(`.criterion thead tr > th:nth-child(${childIdx+1})`)
+      const $th = $(`.criterion thead tr > th:nth-child(${childIdx + 1})`)
       let focusTarget = deleteBtn
         .closest('.rating')
         .prev()
@@ -165,8 +170,10 @@ export default class OutcomeView extends OutcomeContentBase {
 
   saveRating(e) {
     e.preventDefault()
-    const childIdx = $(e.currentTarget).closest('.rating').index()
-    const $th = $(`.criterion thead tr > th:nth-child(${childIdx+1})`)
+    const childIdx = $(e.currentTarget)
+      .closest('.rating')
+      .index()
+    const $th = $(`.criterion thead tr > th:nth-child(${childIdx + 1})`)
     const $editWrapper = $(e.currentTarget).parents('.edit:first')
     const $showWrapper = $editWrapper.prev()
     $th.find('h5').text($editWrapper.find('input.outcome_rating_description').val())
@@ -179,7 +186,10 @@ export default class OutcomeView extends OutcomeContentBase {
     $showWrapper.find('.points').text(points)
     $editWrapper.attr('aria-expanded', 'false').hide()
     $showWrapper.attr('aria-expanded', 'true').show()
-    $th.find('h5').attr('aria-expanded', 'true').show()
+    $th
+      .find('h5')
+      .attr('aria-expanded', 'true')
+      .show()
     $showWrapper.find('.edit_rating').focus()
     return this.updateRatings()
   }
@@ -187,21 +197,21 @@ export default class OutcomeView extends OutcomeContentBase {
   insertRating(e) {
     e.preventDefault()
     const $rating = $(criterionTemplate({description: '', points: '', _index: 99}))
-    const childIdx = $(e.currentTarget).closest('.rating-header').index()
+    const childIdx = $(e.currentTarget)
+      .closest('.rating-header')
+      .index()
     const $ratingHeader = $(criterionHeaderTemplate({description: '', _index: 99}))
     const $tr = $('.criterion tbody tr')
     $(e.currentTarget)
       .closest('.rating-header')
       .after($ratingHeader)
-    $tr.find(`> td:nth-child(${childIdx+1})`).after($rating)
+    $tr.find(`> td:nth-child(${childIdx + 1})`).after($rating)
     $rating
       .find('.show')
       .hide()
       .next()
       .show(200)
-    $ratingHeader
-      .hide()
-      .show(200)
+    $ratingHeader.hide().show(200)
     $rating.find('.edit input:first').focus()
     return this.updateRatings()
   }
@@ -272,13 +282,15 @@ export default class OutcomeView extends OutcomeContentBase {
       case 'edit':
       case 'add':
         this.$el.html(
-          outcomeFormTemplate(_.extend(data, {
-            calculationMethods: this.model.calculationMethods(),
-            use_rce_enhancements: ENV.use_rce_enhancements
-        }))
+          outcomeFormTemplate(
+            _.extend(data, {
+              calculationMethods: this.model.calculationMethods(),
+              use_rce_enhancements: ENV.use_rce_enhancements
+            })
+          )
         )
 
-        addCriterionInfoButton(this.$el.find("#react-info-link")[0])
+        addCriterionInfoButton(this.$el.find('#react-info-link')[0])
 
         this.readyForm()
         break

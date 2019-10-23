@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 class TestUserApi
   include Api::V1::User
@@ -2185,6 +2186,55 @@ describe "Users API", type: :request do
           {:expected_status => 200}
         )
         expect(json['hexcode']).to eq '#ababab'
+      end
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before :once do
+        course_factory(:active_all => true)
+        @shard1.activate do
+          @user = user_factory(:account => Account.create!, :active_all => true)
+        end
+        @course.enroll_student(@user, :enrollment_state => 'active')
+      end
+
+      it "should save colors relative to user's shard" do
+        json = api_call(:put, "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
+          { controller: 'users', action: 'set_custom_color', format: 'json',
+            id: @user.id.to_s, asset_string: "course_#{@course.id}", hexcode: 'ababab'
+          }, {}, {}, {:expected_status => 200}
+        )
+        expect(json['hexcode']).to eq '#ababab'
+        expect(@user.reload.preferences[:custom_colors]["course_#{@course.global_id}"]).to eq '#ababab'
+      end
+
+      it "should retrieve colors relative to user's shard" do
+        @user.preferences[:custom_colors] = {"course_#{@course.global_id}" => '#ababab'}
+        @user.save!
+        json = api_call(:get, "/api/v1/users/#{@user.id}/colors",
+          { controller: 'users', action: 'get_custom_colors', format: 'json', id: @user.id.to_s
+          }, {}, {}, {:expected_status => 200}
+        )
+        expect(json["custom_colors"]["course_#{@course.local_id}"]).to eq '#ababab'
+      end
+
+      it "should ignore old cross-shard data" do
+        @shard1.activate do
+          @cs_course = Course.create!(:account => Account.first)
+          @cs_course.enroll_student(@user, :enrollment_state => "active")
+          @user.preferences[:custom_colors] = {
+            "course_#{@cs_course.global_id}" => '#ffffff', # old data plz ignore
+            "course_#{@cs_course.local_id}" => '#ababab' # new data
+          }
+          @user.save!
+        end
+        json = api_call(:get, "/api/v1/users/#{@user.id}/colors",
+          { controller: 'users', action: 'get_custom_colors', format: 'json', id: @user.id.to_s
+          }, {}, {}, {:expected_status => 200}
+        )
+        expect(json["custom_colors"]["course_#{@cs_course.global_id}"]).to eq '#ababab'
       end
     end
   end

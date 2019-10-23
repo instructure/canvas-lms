@@ -54,40 +54,38 @@ export default function useFetchApi({
   headers = {},
   fetchOpts = {}
 }) {
-  useImmediate(() => {
-    if (forceResult !== undefined) {
-      success(forceResult)
-      return
-    }
+  useImmediate(
+    () => {
+      if (forceResult !== undefined) {
+        success(forceResult)
+        return
+      }
 
-    // prevent sending results and errors from stale queries
-    const {activeSuccess, activeError, activeLoading, abort, signal} = abortable({success, error, loading})
-    activeLoading(true)
-    doFetchApi({
-      path,
-      headers,
-      params,
-      fetchOpts: {signal, ...fetchOpts}
-    })
-      .then(result => {
-        if (convert && result) result = convert(result)
-        activeLoading(false)
-        activeSuccess(result)
+      // prevent sending results and errors from stale queries
+      const {activeSuccess, activeError, activeLoading, abort, signal} = abortable({
+        success,
+        error,
+        loading
       })
-      .catch(err => {
-        activeLoading(false)
-        activeError(err)
+      activeLoading(true)
+      doFetchApi({
+        path,
+        headers,
+        params,
+        fetchOpts: {signal, ...fetchOpts}
       })
-    return abort
-  }, [
-    success,
-    error,
-    loading,
-    path,
-    convert,
-    headers,
-    params,
-    fetchOpts,
-    forceResult
-  ], {deep: true})
+        .then(result => {
+          if (convert && result) result = convert(result)
+          activeLoading(false)
+          activeSuccess(result)
+        })
+        .catch(err => {
+          activeLoading(false)
+          activeError(err)
+        })
+      return abort
+    },
+    [success, error, loading, path, convert, headers, params, fetchOpts, forceResult],
+    {deep: true}
+  )
 }

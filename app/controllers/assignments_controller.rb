@@ -31,8 +31,12 @@ class AssignmentsController < ApplicationController
   include KalturaHelper
   include SyllabusHelper
   before_action :require_context
-  add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
-  before_action { |c| c.active_tab = "assignments" }
+  add_crumb(
+    proc { t '#crumbs.assignments', "Assignments" },
+    except: [:destroy, :syllabus, :index, :new]
+  ) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
+  before_action(except: [:new]) { |c| c.active_tab = "assignments" }
+  before_action(only: [:new]) { |c| setup_active_tab(c) }
   before_action :normalize_title_param, :only => [:new, :edit]
 
   def index
@@ -96,12 +100,21 @@ class AssignmentsController < ApplicationController
           # TODO: Look at how the `@locked` stuff is used bellow, in A1 the pre-reqs are only being
           #       calculated if needed, but we are doing it every time here.
           assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+          submission = @assignment.submissions.find_by(user: @current_user)
+          graphql_submisison_id = nil
+          if submission
+            graphql_submisison_id = CanvasSchema.id_from_object(
+              submission,
+              CanvasSchema.resolve_type(submission, nil),
+              nil
+            )
+          end
 
           js_env({
             ASSIGNMENT_ID: params[:id],
             COURSE_ID: @context.id,
             PREREQS: assignment_prereqs,
-            SUBMISSION_ID: @assignment.submissions.where(user: @current_user).pluck(:id).first
+            SUBMISSION_ID: graphql_submisison_id
           })
           css_bundle :assignments_2_student
           js_bundle :assignments_2_show_student
@@ -202,7 +215,7 @@ class AssignmentsController < ApplicationController
           PREREQS: assignment_prereqs
         })
 
-        if @context.feature_enabled?(:assignments_2) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+        if @context.feature_enabled?(:assignments_2_teacher) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
           if can_do(@context, @current_user, :read_as_admin)
             css_bundle :assignments_2_teacher
             js_bundle :assignments_2_show_teacher
@@ -510,7 +523,7 @@ class AssignmentsController < ApplicationController
   def new
     @assignment ||= @context.assignments.temp_record
     @assignment.workflow_state = 'unpublished'
-    add_crumb t "Create new"
+    add_crumb_on_new_page
 
     if params[:submission_types] == 'discussion_topic'
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
@@ -780,5 +793,29 @@ class AssignmentsController < ApplicationController
     return false if @assignment.group_category? && !@assignment.grade_group_students_individually?
 
     @context.filter_speed_grader_by_student_group?
+  end
+
+  def add_crumb_on_new_page
+    if on_quizzes_page? && params.key?(:quiz_lti)
+      add_crumb(t('#crumbs.quizzes', "Quizzes"), course_quizzes_path(@context))
+    else
+      add_crumb(t('#crumbs.assignments', "Assignments"), course_assignments_path(@context))
+    end
+
+    add_crumb(t('Create new'))
+  end
+
+  def setup_active_tab(controller)
+    if on_quizzes_page? && params.key?(:quiz_lti)
+      controller.active_tab = "quizzes"
+      return
+    end
+
+    controller.active_tab = "assignments"
+  end
+
+  def on_quizzes_page?
+    @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && \
+      @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?
   end
 end

@@ -62,6 +62,7 @@ pipeline {
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
+    CACHE_TAG = "canvas-lms:previous-image"
   }
 
   stages {
@@ -119,8 +120,8 @@ pipeline {
                 GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
                   git fetch origin $GERRIT_BRANCH
 
-                git config user.name $GERRIT_EVENT_ACCOUNT_NAME
-                git config user.email $GERRIT_EVENT_ACCOUNT_EMAIL
+                git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
+                git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
                 # this helps current build issues where cleanup is needed before proceeding.
                 # however the later git rebase --abort should be enough once this has
@@ -148,7 +149,11 @@ pipeline {
     stage('Build Image') {
       steps {
         timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
-          sh 'docker build -t $PATCHSET_TAG .'
+          dockerCacheLoad(image: "$CACHE_TAG")
+          sh '''
+            docker build -t $PATCHSET_TAG .
+            docker tag $PATCHSET_TAG $CACHE_TAG
+          '''
         }
       }
     }
@@ -169,6 +174,8 @@ pipeline {
         stage('Smoke Test') {
           steps {
             timeout(time: 10) {
+              sh 'build/new-jenkins/docker-compose-pull.sh'
+              sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
               sh 'build/new-jenkins/docker-compose-build-up.sh'
               sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
               sh 'build/new-jenkins/smoke-test.sh'
@@ -263,6 +270,7 @@ pipeline {
                 docker tag $PATCHSET_TAG $MERGE_TAG
                 docker push $MERGE_TAG
               '''
+              dockerCacheStore(image: "$CACHE_TAG")
             }
           }
         }

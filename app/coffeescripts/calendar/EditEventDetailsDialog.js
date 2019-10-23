@@ -19,12 +19,12 @@
 import $ from 'jquery'
 import I18n from 'i18n!calendar'
 import _ from 'underscore'
-import EditCalendarEventDetails from '../calendar/EditCalendarEventDetails'
-import EditAssignmentDetails from '../calendar/EditAssignmentDetails'
-import EditApptCalendarEventDialog from '../calendar/EditApptCalendarEventDialog'
-import EditAppointmentGroupDetails from '../calendar/EditAppointmentGroupDetails'
-import EditPlannerNoteDetails from '../calendar/EditPlannerNoteDetails'
-import EditToDoItemDetails from '../calendar/EditToDoItemDetails'
+import EditCalendarEventDetails from './EditCalendarEventDetails'
+import EditAssignmentDetails from './EditAssignmentDetails'
+import EditApptCalendarEventDialog from './EditApptCalendarEventDialog'
+import EditAppointmentGroupDetails from './EditAppointmentGroupDetails'
+import EditPlannerNoteDetails from './EditPlannerNoteDetails'
+import EditToDoItemDetails from './EditToDoItemDetails'
 import editEventTemplate from 'jst/calendar/editEvent'
 import 'jqueryui/dialog'
 import 'jqueryui/tabs'
@@ -69,7 +69,7 @@ export default class EditEventDetailsDialog {
       tabs.tabs('remove', 3)
       tabs.tabs('remove', 2)
       tabs.tabs('remove', 1)
-     this.calendarEventForm.activate()
+      this.calendarEventForm.activate()
     } else if (this.event.eventType.match(/assignment/)) {
       tabs.tabs('select', 1)
       if (this.canManageAppointments()) tabs.tabs('remove', 4)
@@ -117,7 +117,7 @@ export default class EditEventDetailsDialog {
     }
   }
 
-  contextChange(newContext){
+  contextChange(newContext) {
     // Update the style of the dialog box to reflect the current context
     dialog.removeClass(dialog.data('group_class'))
     dialog.addClass(`group_${newContext}`).data('group_class', `group_${newContext}`)

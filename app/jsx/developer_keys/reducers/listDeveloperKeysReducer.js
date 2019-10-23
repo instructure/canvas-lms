@@ -70,8 +70,8 @@ const developerKeysHandlers = {
   },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE]: (state, action) => ({
     ...state,
-    list: state.list.map(
-      developerKey => (action.payload.id === developerKey.id ? action.payload : developerKey)
+    list: state.list.map(developerKey =>
+      action.payload.id === developerKey.id ? action.payload : developerKey
     )
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE]: (state, action) => {
@@ -79,14 +79,14 @@ const developerKeysHandlers = {
       if (developerKey.id !== action.payload.developer_key_id.toString()) {
         return developerKey
       }
-      return Object.assign({}, developerKey, {developer_key_account_binding: action.payload})
+      return {...developerKey, developer_key_account_binding: action.payload}
     })
 
     const newInheritedList = state.inheritedList.map(developerKey => {
       if (developerKey.id !== action.payload.developer_key_id.toString()) {
         return developerKey
       }
-      return Object.assign({}, developerKey, {developer_key_account_binding: action.payload})
+      return {...developerKey, developer_key_account_binding: action.payload}
     })
 
     return {
@@ -97,7 +97,9 @@ const developerKeysHandlers = {
   },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_DELETE]: (state, action) => ({
     ...state,
-    list: state.list.filter(developerKey => action.payload.id.toString() !== developerKey.id.toString())
+    list: state.list.filter(
+      developerKey => action.payload.id.toString() !== developerKey.id.toString()
+    )
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_PREPEND]: (state, action) => {
     const list = state.list.slice()

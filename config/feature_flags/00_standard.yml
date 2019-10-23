@@ -218,10 +218,6 @@ responsive_layout:
   description: This is a feature to allow the development of a responsive layout
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
-  environments:
-    production:
-      state: disabled
 force_rtl:
   state: hidden
   display_name: Turn on RTL Even For Non-RTL Languages
@@ -366,16 +362,6 @@ non_scoring_rubrics:
   description: If enabled, the option will be presented to have non-scoring rubrics.
   applies_to: RootAccount
   root_opt_in: true
-assignments_2:
-  state: hidden
-  display_name: Assignments 2
-  description: Use the new assignments page
-  applies_to: Course
-  root_opt_in: true
-  beta: true
-  environments:
-    production:
-      state: disabled
 slack_notifications:
   state: hidden
   display_name: Slack Notifications
@@ -406,7 +392,6 @@ rce_enhancements:
   description: Allow switching to the enhanced RCE
   applies_to: Course
   root_opt_in: true
-  beta: true
   environments:
     production:
       state: hidden
@@ -452,6 +437,7 @@ analytics_2:
   applies_to: RootAccount
   display_name: New Course and User Analytics
   description: Show new analytics for course and user data
+  after_state_change_proc: analytics_2_after_state_change_hook
 new_gradebook_plagiarism_indicator:
   state: hidden
   applies_to: RootAccount
@@ -461,3 +447,10 @@ new_gradebook_plagiarism_indicator:
   environments:
     production:
       state: disabled
+unfavorite_course_from_dashboard:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Favorites From Dashboard
+  description: This allows the user to unfavorite a course directly from its
+    dashboard card.
+  root_opt_in: true

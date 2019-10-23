@@ -19,5 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import GradebookHistoryApp from '../gradebook-history/GradebookHistoryApp'
+import ready from '@instructure/ready'
 
-ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'))
+ready(() => {
+  ReactDOM.render(<GradebookHistoryApp />, document.getElementById('content'))
+})

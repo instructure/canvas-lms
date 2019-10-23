@@ -15,30 +15,29 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import Backbone from "Backbone";
-import ModuleCollection from "../../collections/ModuleCollection";
-import template from "jst/modules/ProgressionStudentView";
-import collectionTemplate from "jst/modules/ProgressionModuleCollection";
-import PaginatedCollectionView from "../PaginatedCollectionView";
-import ProgressionModuleView from "./ProgressionModuleView";
+import Backbone from 'Backbone'
+import ModuleCollection from '../../collections/ModuleCollection'
+import template from 'jst/modules/ProgressionStudentView'
+import collectionTemplate from 'jst/modules/ProgressionModuleCollection'
+import PaginatedCollectionView from '../PaginatedCollectionView'
+import ProgressionModuleView from './ProgressionModuleView'
 
 export default class ProgressionStudentView extends Backbone.View {
-
   initialize() {
-    super.initialize(...arguments);
-    this.$index = this.model.collection.view.$el;
-    this.$students = this.$index.find('#progression_students');
-    return this.$modules = this.$index.find('#progression_modules');
+    super.initialize(...arguments)
+    this.$index = this.model.collection.view.$el
+    this.$students = this.$index.find('#progression_students')
+    return (this.$modules = this.$index.find('#progression_modules'))
   }
 
   afterRender() {
-    super.afterRender(...arguments);
-    if (!this.model.collection.currentStudentView) this.showProgressions();
-    return this.syncHeight();
+    super.afterRender(...arguments)
+    if (!this.model.collection.currentStudentView) this.showProgressions()
+    return this.syncHeight()
   }
 
   createProgressions() {
-    const studentId = this.model.get('id');
+    const studentId = this.model.get('id')
     const modules = new ModuleCollection(null, {
       course_id: ENV.COURSE_ID,
       per_page: 50,
@@ -46,12 +45,12 @@ export default class ProgressionStudentView extends Backbone.View {
         student_id: studentId,
         include: ['items']
       }
-    });
-    modules.student_id = studentId;
-    modules.syncHeight = this.syncHeight;
-    modules.fetch();
+    })
+    modules.student_id = studentId
+    modules.syncHeight = this.syncHeight
+    modules.fetch()
 
-    const studentUrl = `${ENV.COURSE_USERS_PATH}/${studentId}`;
+    const studentUrl = `${ENV.COURSE_USERS_PATH}/${studentId}`
     this.progressions = new PaginatedCollectionView({
       collection: modules,
       itemView: ProgressionModuleView,
@@ -59,46 +58,46 @@ export default class ProgressionStudentView extends Backbone.View {
       student: this.model.attributes,
       studentUrl,
       autoFetch: true
-    });
+    })
 
-    this.progressions.render();
-    return this.progressions.$el.appendTo(this.$modules);
+    this.progressions.render()
+    return this.progressions.$el.appendTo(this.$modules)
   }
 
   showProgressions() {
-    this.$modules.attr('aria-busy', 'true');
+    this.$modules.attr('aria-busy', 'true')
     if (this.model.collection.currentStudentView != null) {
-      this.model.collection.currentStudentView.hideProgressions();
+      this.model.collection.currentStudentView.hideProgressions()
     }
-    this.model.collection.currentStudentView = this;
+    this.model.collection.currentStudentView = this
 
-    this.syncHeight();
-    this.$el.addClass('active').attr('aria-selected', true);
+    this.syncHeight()
+    this.$el.addClass('active').attr('aria-selected', true)
     if (!this.progressions) {
-      return this.createProgressions();
+      return this.createProgressions()
     } else {
-      return this.progressions.show();
+      return this.progressions.show()
     }
   }
 
   hideProgressions() {
-    this.progressions.hide();
-    return this.$el.removeClass('active').removeAttr('aria-selected');
+    this.progressions.hide()
+    return this.$el.removeClass('active').removeAttr('aria-selected')
   }
 
   syncHeight = () => {
     return setTimeout(() => {
-      this.$students.height(this.$modules.height());
-      return this.$students.find('.collectionViewItems').
-        height((this.$students.height() || 0) - (this.$students.find('.header').height() || 16) - 16);
-    }
-    , 0);
+      this.$students.height(this.$modules.height())
+      return this.$students
+        .find('.collectionViewItems')
+        .height(
+          (this.$students.height() || 0) - (this.$students.find('.header').height() || 16) - 16
+        )
+    }, 0)
   }
-};
+}
 
 ProgressionStudentView.prototype.tagName = 'li'
 ProgressionStudentView.prototype.className = 'student'
 ProgressionStudentView.prototype.template = template
 ProgressionStudentView.prototype.events = {click: 'showProgressions'}
-
-

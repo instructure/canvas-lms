@@ -23,7 +23,6 @@ import 'jquery.instructure_forms'
 import 'jquery.ajaxJSON'
 
 export default class SelfEnrollmentForm extends Backbone.View {
-
   static initClass() {
     this.prototype.events = {
       'change input[name=initial_action]': 'changeAction',
@@ -147,7 +146,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
   logOut(refresh = false) {
     return $.ajaxJSON('/logout', 'DELETE', {}, () => {
       if (refresh) location.reload(true)
-    });
+    })
   }
 
   logOutAndRefresh(e) {

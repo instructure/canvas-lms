@@ -19,5 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import GraphiQLApp from '../graphiql/GraphiQLApp'
+import ready from '@instructure/ready'
 
-ReactDOM.render(<GraphiQLApp/>, document.getElementById('graphiql'))
+ready(() => {
+  ReactDOM.render(<GraphiQLApp />, document.getElementById('graphiql'))
+})

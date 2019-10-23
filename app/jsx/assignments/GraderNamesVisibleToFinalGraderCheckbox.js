@@ -30,7 +30,7 @@ export default class GraderNamesVisibleToFinalGraderCheckbox extends React.Compo
 
   handleChange = ({target: checkbox}) => {
     this.setState({checked: checkbox.checked})
-  };
+  }
 
   render() {
     return (

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import * as contentRendering from "../../src/rce/contentRendering";
+import * as contentRendering from "../contentRendering";
+import {videoFromTray, videoFromUpload, audioFromTray, audioFromUpload} from './contentHelpers'
 
 describe("contentRendering", () => {
   describe("renderLink", () => {
@@ -33,8 +33,7 @@ describe("contentRendering", () => {
 
     it("uses link data to build html", () => {
       const rendered = contentRendering.renderLink(link);
-      assert.equal(
-        rendered,
+      expect(rendered).toEqual(
         '<a href="/some/path" title="Here Be Links">Click On Me</a>'
       );
     });
@@ -42,8 +41,7 @@ describe("contentRendering", () => {
     it("can use url if no href", () => {
       link.href = undefined;
       const rendered = contentRendering.renderLink(link);
-      assert.equal(
-        rendered,
+      expect(rendered).toEqual(
         '<a href="/other/path" title="Here Be Links">Click On Me</a>'
       );
     });
@@ -51,8 +49,7 @@ describe("contentRendering", () => {
     it("defaults title to 'Link'", () => {
       link.title = undefined;
       const rendered = contentRendering.renderLink(link);
-      assert.equal(
-        rendered,
+      expect(rendered).toEqual(
         '<a href="/some/path" title="Link">Click On Me</a>'
       );
     });
@@ -60,8 +57,7 @@ describe("contentRendering", () => {
     it("defaults contents to title", () => {
       link.text = undefined;
       const rendered = contentRendering.renderLink(link);
-      assert.equal(
-        rendered,
+      expect(rendered).toEqual(
         '<a href="/some/path" title="Here Be Links">Here Be Links</a>'
       );
     });
@@ -70,7 +66,7 @@ describe("contentRendering", () => {
       link.text = undefined;
       link.title = undefined;
       const rendered = contentRendering.renderLink(link);
-      assert.equal(rendered, '<a href="/some/path" title="Link">Link</a>');
+      expect(rendered).toEqual('<a href="/some/path" title="Link">Link</a>');
     });
 
     it("renders the link with all attributes", () => {
@@ -82,8 +78,7 @@ describe("contentRendering", () => {
         text: "somefile.pdf"
       }
       const rendered = contentRendering.renderLink(doc, doc.text)
-      assert.equal(
-        rendered,
+      expect(rendered).toEqual(
         '<a ' +
         'href="/some/path" target="_blank" rel="noopener" title="Link" ' +
         'class="instructure_file_link instructure_scribd_file">' +
@@ -104,20 +99,20 @@ describe("contentRendering", () => {
 
     it("builds image html from image data", () => {
       const rendered = contentRendering.renderImage(image);
-      assert.equal(rendered, '<img alt="Here Be Images" src="/some/path"/>');
+      expect(rendered).toEqual('<img alt="Here Be Images" src="/some/path"/>');
     });
 
     it("uses url if no href", () => {
       image.href = undefined;
       const rendered = contentRendering.renderImage(image);
-      assert.equal(rendered, '<img alt="Here Be Images" src="/other/path"/>');
+      expect(rendered).toEqual('<img alt="Here Be Images" src="/other/path"/>');
     });
 
     it("defaults alt text to image display_name", () => {
       image.title = undefined;
       image.display_name = "foo";
       const rendered = contentRendering.renderImage(image);
-      assert.equal(rendered, '<img alt="foo" src="/some/path"/>');
+      expect(rendered).toEqual('<img alt="foo" src="/some/path"/>');
     });
 
     it("includes optional other attributes", () => {
@@ -127,7 +122,7 @@ describe("contentRendering", () => {
         maxHeight: "17rem"
       }
       const rendered = contentRendering.renderImage(image);
-      assert.equal(rendered, '<img alt="Here Be Images" src="/some/path" foo="bar" style="max-width:100px;max-height:17rem"/>');
+      expect(rendered).toEqual('<img alt="Here Be Images" src="/some/path" foo="bar" style="max-width:100px;max-height:17rem"/>');
     })
 
     it("builds linked image html from linked image data", () => {
@@ -138,18 +133,84 @@ describe("contentRendering", () => {
       };
 
       const rendered = contentRendering.renderLinkedImage(linkElem, image);
-      assert.equal(
-        rendered,
+      expect(rendered).toEqual(
         '<a href="http://example.com" data-mce-href="http://example.com"><img alt="Here Be Images" src="/some/path"/></a>'
       );
     });
     it("renders a linked image if object has link property", () => {
       image.link = "http://someurl";
       const rendered = contentRendering.renderImage(image);
-      assert.equal(
-        rendered,
+      expect(rendered).toEqual(
         '<a href="http://someurl" target="_blank" rel="noopener noreferrer"><img alt="Here Be Images" src="/some/path"/></a>'
       );
     });
   });
+
+  describe('renderVideo', () => {
+    it('builds iframe src from tray video data', () => {
+      const video = videoFromTray()
+      const src = contentRendering.mediaIframeSrcFromFile(video)
+      expect(src).toEqual(
+        '/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&type=video'
+      )
+    })
+
+    it('builds iframe src from uploaded video data', () => {
+      const video = videoFromUpload()
+      const src = contentRendering.mediaIframeSrcFromFile(video)
+      expect(src).toEqual(
+        '/url/to/m-media-id?type=video'
+      )
+    })
+
+    it('builds the html from tray video data', () => {
+      const video = videoFromTray()
+      const rendered = contentRendering.renderVideo(video)
+      expect(rendered).toEqual(
+        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="17" src="/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&amp;type=video" style="width:400px;height:225px;display:inline-block"></iframe>'
+      )
+    })
+
+    it('builds the html from uploaded video data', () => {
+      const video = videoFromUpload()
+      const rendered = contentRendering.renderVideo(video)
+      expect(rendered).toEqual(
+        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="m-media-id" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block"></iframe>'
+      )
+    })
+  })
+
+  describe('renderAudio', () => {
+    it('builds iframe src from tray audio data', () => {
+      const audio = audioFromTray()
+      const src = contentRendering.mediaIframeSrcFromFile(audio)
+      expect(src).toEqual(
+        '/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&type=audio'
+      )
+    })
+
+    it('builds iframe src from uploaded audio data', () => {
+      const audio = audioFromUpload()
+      const src = contentRendering.mediaIframeSrcFromFile(audio)
+      expect(src).toEqual(
+        '/url/to/m-media-id?type=audio'
+      )
+    })
+
+    it('builds the html from tray audio data', () => {
+      const audio = audioFromTray()
+      const rendered = contentRendering.renderAudio(audio)
+      expect(rendered).toEqual(
+        '<iframe data-media-id="29" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:300px;height:2.813rem;display:inline-block"></iframe>'
+      )
+    })
+
+    it('builds the html from uploaded audio data', () => {
+      const audio = audioFromUpload()
+      const rendered = contentRendering.renderAudio(audio)
+      expect(rendered).toEqual(
+        '<iframe data-media-id="m-media-id" src="/url/to/m-media-id?type=audio" style="width:300px;height:2.813rem;display:inline-block"></iframe>'
+      )
+    })
+  })
 });

@@ -26,10 +26,10 @@ import 'jquery.instructure_date_and_time'
 import 'jquery.instructure_forms'
 import 'jquery.instructure_misc_helpers'
 import 'vendor/date'
-import commonEventFactory from '../calendar/commonEventFactory'
+import commonEventFactory from './commonEventFactory'
 import coupleTimeFields from '../util/coupleTimeFields'
 import fcUtil from '../util/fcUtil'
-import '../calendar/fcMomentHandlebarsHelpers'
+import './fcMomentHandlebarsHelpers'
 
 export default class EditCalendarEventDetails {
   constructor(selector, event, contextChangeCB, closeCB) {

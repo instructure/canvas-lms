@@ -32,30 +32,23 @@ const deepMerge = (lhs, rhs) => {
   }
 }
 
-const combine = (promiseOfJson1, promiseOfJson2) => (
-  Promise.all([promiseOfJson1, promiseOfJson2])
-    .then(([json1, json2]) => deepMerge(json1, json2))
-)
+const combine = (promiseOfJson1, promiseOfJson2) =>
+  Promise.all([promiseOfJson1, promiseOfJson2]).then(([json1, json2]) => deepMerge(json1, json2))
 
-const parse = (response) => (
-  response.text()
-    .then((text) => (JSON.parse(text.replace('while(1);', ''))))
-)
+const parse = response => response.text().then(text => JSON.parse(text.replace('while(1);', '')))
 
-export const fetchUrl = (url) => (
+export const fetchUrl = url =>
   fetch(url, {
     credentials: 'include'
+  }).then(response => {
+    const linkHeader = response.headers.get('link')
+    const next = linkHeader ? parseLinkHeader(linkHeader).next : null
+    if (next) {
+      return combine(parse(response), fetchUrl(next.url))
+    } else {
+      return parse(response)
+    }
   })
-    .then((response) => {
-      const linkHeader = response.headers.get('link')
-      const next = linkHeader ? parseLinkHeader(linkHeader).next : null
-      if (next) {
-        return combine(parse(response), fetchUrl(next.url))
-      } else {
-        return parse(response)
-      }
-    })
-)
 
 const fetchOutcomes = (courseId, studentId) => {
   let outcomeGroups
@@ -75,22 +68,29 @@ const fetchOutcomes = (courseId, studentId) => {
       outcomeGroups = groups
       outcomeLinks = links
       outcomeRollups = rollups
-      outcomeAssignmentsByOutcomeId = _.groupBy(alignments, 'learning_outcome_id');
+      outcomeAssignmentsByOutcomeId = _.groupBy(alignments, 'learning_outcome_id')
     })
-    .then(() => (
-      Promise.all(outcomeLinks.map((outcomeLink) => (
-        fetchUrl(`/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=assignments&per_page=100`)
-      )))
-    ))
-    .then((responses) => {
+    .then(() =>
+      Promise.all(
+        outcomeLinks.map(outcomeLink =>
+          fetchUrl(
+            `/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=assignments&per_page=100`
+          )
+        )
+      )
+    )
+    .then(responses => {
       outcomeResultsByOutcomeId = responses.reduce((acc, response, i) => {
-        acc[outcomeLinks[i].outcome.id] = response.outcome_results.filter((r) => !r.hidden);
+        acc[outcomeLinks[i].outcome.id] = response.outcome_results.filter(r => !r.hidden)
         return acc
       }, {})
-      assignmentsByAssignmentId = _.keyBy(_.flatten(responses.map((response) => response.linked.assignments)), (a) => a.id)
+      assignmentsByAssignmentId = _.keyBy(
+        _.flatten(responses.map(response => response.linked.assignments)),
+        a => a.id
+      )
     })
     .then(() => {
-      const outcomes = outcomeLinks.map((outcomeLink) => ({
+      const outcomes = outcomeLinks.map(outcomeLink => ({
         // outcome ids are not unique (can appear in multiple groups), so we add unique
         // id to manage expansion/contraction
         expansionId: uuid(),
@@ -99,12 +99,12 @@ const fetchOutcomes = (courseId, studentId) => {
       }))
 
       // filter empty outcome groups
-      const outcomesByGroup = _.groupBy(outcomes, (o) => o.groupId)
-      outcomeGroups = outcomeGroups.filter((g) => outcomesByGroup[g.id])
+      const outcomesByGroup = _.groupBy(outcomes, o => o.groupId)
+      outcomeGroups = outcomeGroups.filter(g => outcomesByGroup[g.id])
 
       // add rollup scores, mastered
-      const outcomesById = _.keyBy(outcomes, (o) => o.id)
-      outcomeRollups.rollups[0].scores.forEach((scoreData) => {
+      const outcomesById = _.keyBy(outcomes, o => o.id)
+      outcomeRollups.rollups[0].scores.forEach(scoreData => {
         const outcome = outcomesById[scoreData.links.outcome]
         if (outcome) {
           outcome.score = scoreData.score
@@ -113,15 +113,15 @@ const fetchOutcomes = (courseId, studentId) => {
       })
 
       // add results, assignments
-      outcomes.forEach((outcome) => {
+      outcomes.forEach(outcome => {
         outcome.assignments = outcomeAssignmentsByOutcomeId[outcome.id] || []
         outcome.results = outcomeResultsByOutcomeId[outcome.id] || []
-        outcome.results.forEach((result) => {
+        outcome.results.forEach(result => {
           const key = result.links.assignment || result.links.alignment
           result.assignment = assignmentsByAssignmentId[key]
         })
       })
-      return { outcomeGroups, outcomes }
+      return {outcomeGroups, outcomes}
     })
 }
 

@@ -19,21 +19,19 @@ import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {TextInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-layout'
 import I18n from 'i18n!edit_rubricPoints'
 
-import { assessmentShape } from './types'
+import {assessmentShape} from './types'
 
-export const roundIfWhole = (n) => (
-  I18n.toNumber(n, { precision: Math.floor(n) === n ? 0 : 2, strip_insignificant_zeros: true })
-)
-const pointString = (points) =>
-  (points.text === null) ? roundIfWhole(points.value) : points.text
+export const roundIfWhole = n =>
+  I18n.toNumber(n, {precision: Math.floor(n) === n ? 0 : 2, strip_insignificant_zeros: true})
+const pointString = points => (points.text === null ? roundIfWhole(points.value) : points.text)
 
-export const possibleString = (possible) =>
+export const possibleString = possible =>
   I18n.t('%{possible} pts', {
-    possible: I18n.toNumber(possible, { precision: 2, strip_insignificant_zeros: true })
+    possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true})
   })
 
 export const scoreString = (points, possible) =>
@@ -42,37 +40,23 @@ export const scoreString = (points, possible) =>
     possible: possibleString(possible)
   })
 
-const invalid = () => [{ text: I18n.t('Invalid score'), type: 'error' }]
-const pointError = (points) => points.valid ? [] : invalid()
+const invalid = () => [{text: I18n.t('Invalid score'), type: 'error'}]
+const pointError = points => (points.valid ? [] : invalid())
 
-const noExtraCredit = () => [
-  { text: I18n.t('Cannot give outcomes extra credit'), type: 'error' }
-]
+const noExtraCredit = () => [{text: I18n.t('Cannot give outcomes extra credit'), type: 'error'}]
 const extraCreditError = (points, possible, allowExtraCredit) =>
-  !allowExtraCredit && (points.value > possible) ? noExtraCredit() : []
+  !allowExtraCredit && points.value > possible ? noExtraCredit() : []
 
-const Points = (props) => {
-  const {
-    allowExtraCredit,
-    assessing,
-    assessment,
-    onPointChange,
-    pointsPossible
-  } = props
+const Points = props => {
+  const {allowExtraCredit, assessing, assessment, onPointChange, pointsPossible} = props
 
   if (assessment === null) {
-    return (
-      <div className="react-rubric-cell graded-points">
-        {possibleString(pointsPossible)}
-      </div>
-    )
+    return <div className="react-rubric-cell graded-points">{possibleString(pointsPossible)}</div>
   } else {
     const points = _.get(assessment, 'points')
     if (!assessing) {
       return (
-        <div className="react-rubric-cell graded-points">
-          {scoreString(points, pointsPossible)}
-        </div>
+        <div className="react-rubric-cell graded-points">{scoreString(points, pointsPossible)}</div>
       )
     } else {
       return (
@@ -80,13 +64,13 @@ const Points = (props) => {
           <Flex alignItems="end" wrapItems>
             <Flex.Item size="4rem" margin="none small none none">
               <TextInput
-                inline
-                label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
+                display='inline-block'
+                renderLabel={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
                 messages={[
                   ...pointError(points),
                   ...extraCreditError(points, pointsPossible, allowExtraCredit)
                 ]}
-                onChange={(e) => onPointChange(e.target.value)}
+                onChange={e => onPointChange(e.target.value)}
                 value={pointString(points)}
                 width="4rem"
               />
@@ -105,7 +89,7 @@ Points.propTypes = {
   assessing: PropTypes.bool,
   assessment: PropTypes.shape(assessmentShape),
   onPointChange: PropTypes.func,
-  pointsPossible: PropTypes.number.isRequired,
+  pointsPossible: PropTypes.number.isRequired
 }
 Points.defaultProps = {
   allowExtraCredit: true,

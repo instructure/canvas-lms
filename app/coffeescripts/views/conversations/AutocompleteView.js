@@ -34,7 +34,6 @@ import '../../jquery/scrollIntoView'
 const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1)
 
 export default class AutocompleteView extends Backbone.View {
-
   static initClass() {
     // Public: Limit selection to one result.
     this.optionProperty('single')

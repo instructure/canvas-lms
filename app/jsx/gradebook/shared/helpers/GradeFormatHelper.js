@@ -20,7 +20,7 @@ import I18n from 'i18n!sharedGradeFormatHelper'
 import round from 'compiled/util/round'
 import numberHelper from '../../../shared/helpers/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
-import {scoreToGrade} from '../../../gradebook/GradingSchemeHelper'
+import {scoreToGrade} from '../../GradingSchemeHelper'
 
 const POINTS = 'points'
 const PERCENT = 'percent'

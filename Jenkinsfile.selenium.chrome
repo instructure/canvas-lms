@@ -26,7 +26,7 @@ pipeline {
   }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
+    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml:docker-compose.new-jenkins-knapsack.yml'
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
@@ -35,6 +35,9 @@ pipeline {
     KNAPSACK_TEST_FILE_PATTERN = '{spec/selenium,gems/plugins/*/spec_canvas/selenium}/**/*_spec.rb'
     KNAPSACK_EXCLUDE_REGEX = '/performance/'
     KNAPSACK_TEST_DIR = 'spec'
+    // for now 1 until we stabilize some of the flaky specs
+    RERUNS_RETRY = 1
+    MAX_FAIL = 80
   }
 
   stages {
@@ -53,24 +56,11 @@ pipeline {
                       sh 'rm -rf ./tmp/spec_failures'
                       timeout(time: 60) {
                         sh 'printenv | sort'
+                        sh 'build/new-jenkins/docker-compose-pull.sh'
+                        sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
                         sh 'build/new-jenkins/docker-compose-build-up.sh'
                         sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-                        def retries = 1
-                        result = sh (
-                          script: 'build/new-jenkins/rspec-tests.sh',
-                          returnStatus:true
-                        )
-                        while (result != 0 && retries > 0) {
-                          println "Re-Running failed tests"
-                          result = sh (
-                            script: 'build/new-jenkins/rspec-tests.sh only-failures',
-                            returnStatus: true
-                          )
-                          retries--
-                        }
-                        if (result != 0) {
-                          error("Rspec exited exit code ${result}")
-                        }
+                        sh 'build/new-jenkins/rspec-with-retries.sh'
                       }
                     }
                     catch (ex) {

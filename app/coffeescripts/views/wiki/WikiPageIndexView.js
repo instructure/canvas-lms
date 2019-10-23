@@ -119,7 +119,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (!this.$sortHeaders) return
 
     const {sortOrders} = this.collection
-    for (let sortHeader of Array.from(this.$sortHeaders)) {
+    for (const sortHeader of Array.from(this.$sortHeaders)) {
       const $sortHeader = $(sortHeader)
       const $i = $sortHeader.find('i')
 

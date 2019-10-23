@@ -17,7 +17,7 @@
  */
 
 import axios from 'axios'
-import install13Tool from '../install13Tool';
+import install13Tool from '../install13Tool'
 
 const clientId = 10000000009
 const createUrl = 'https://www.test.com/accounts/1/tool_configuration'
@@ -39,6 +39,9 @@ describe('fetchToolConfiguration', () => {
 
   it('post the client id and verify_uniqueness if true to the create url', () => {
     install13Tool(clientId, createUrl, true)
-    expect(axios.post).toHaveBeenCalledWith(createUrl, {client_id: clientId, external_tool: { verify_uniqueness: true }})
+    expect(axios.post).toHaveBeenCalledWith(createUrl, {
+      client_id: clientId,
+      external_tool: {verify_uniqueness: true}
+    })
   })
 })

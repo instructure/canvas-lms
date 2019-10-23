@@ -17,19 +17,20 @@
  */
 
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import 'context_modules'
 import WikiPage from 'compiled/models/WikiPage'
 import WikiPageView from 'compiled/views/wiki/WikiPageView'
 import MarkAsDone from 'compiled/util/markAsDone'
 import LockManager from '../blueprint_courses/apps/LockManager'
 import 'compiled/jquery/ModuleSequenceFooter'
-import { monitorLtiMessages } from 'lti/messages'
+import {monitorLtiMessages} from 'lti/messages'
 
 const lockManager = new LockManager()
-lockManager.init({ itemType: 'wiki_page', page: 'show' })
+lockManager.init({itemType: 'wiki_page', page: 'show'})
 
 $(() =>
-  $('#content').on('click', '#mark-as-done-checkbox', function () {
+  $('#content').on('click', '#mark-as-done-checkbox', function() {
     MarkAsDone.toggle(this)
   })
 )
@@ -41,21 +42,38 @@ const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
   contextAssetString: ENV.context_asset_string
 })
 
-const wikiPageView = new WikiPageView({
-  el: '#wiki_page_show',
-  model: wikiPage,
-  modules_path: ENV.MODULES_PATH,
-  wiki_pages_path: ENV.WIKI_PAGES_PATH,
-  wiki_page_edit_path: ENV.WIKI_PAGE_EDIT_PATH,
-  wiki_page_history_path: ENV.WIKI_PAGE_HISTORY_PATH,
-  WIKI_RIGHTS: ENV.WIKI_RIGHTS,
-  PAGE_RIGHTS: ENV.PAGE_RIGHTS,
-  course_id: ENV.COURSE_ID,
-  course_home: ENV.COURSE_HOME,
-  course_title: ENV.COURSE_TITLE,
-  display_show_all_pages: ENV.DISPLAY_SHOW_ALL_LINK
-})
+ready(() => {
+  const wikiPageView = new WikiPageView({
+    el: '#wiki_page_show',
+    model: wikiPage,
+    modules_path: ENV.MODULES_PATH,
+    wiki_pages_path: ENV.WIKI_PAGES_PATH,
+    wiki_page_edit_path: ENV.WIKI_PAGE_EDIT_PATH,
+    wiki_page_history_path: ENV.WIKI_PAGE_HISTORY_PATH,
+    WIKI_RIGHTS: ENV.WIKI_RIGHTS,
+    PAGE_RIGHTS: ENV.PAGE_RIGHTS,
+    course_id: ENV.COURSE_ID,
+    course_home: ENV.COURSE_HOME,
+    course_title: ENV.COURSE_TITLE,
+    display_show_all_pages: ENV.DISPLAY_SHOW_ALL_LINK,
+    show_immersive_reader: ENV.IMMERSIVE_READER_ENABLED
+  })
 
-wikiPageView.render()
+  wikiPageView.render()
+
+  const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+  if (immersive_reader_mount_point) {
+    import('../shared/components/ImmersiveReader')
+      .then(ImmersiveReader => {
+        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {
+          title: document.querySelector('.page-title').textContent,
+          content: document.querySelector('.show-content').innerHTML
+        })
+      })
+      .catch(e => {
+        console.log('Error loading immersive readers.', e)
+      })
+  }
+})
 
 monitorLtiMessages()

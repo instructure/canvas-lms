@@ -23,24 +23,19 @@ import {Text} from '@instructure/ui-elements'
 import {Checkbox, Select, TextArea} from '@instructure/ui-forms'
 import I18n from 'i18n!edit_rubricComments'
 
-import { assessmentShape } from './types'
+import {assessmentShape} from './types'
 
-const ellipsis = () => I18n.t("…")
+const ellipsis = () => I18n.t('…')
 
-const truncate = (comment) =>
-  comment.length > 100 ? [comment.slice(0, 99), ellipsis()] : [comment]
+const truncate = comment => (comment.length > 100 ? [comment.slice(0, 99), ellipsis()] : [comment])
 
-const FreeFormComments = (props) => {
-  const {
-    allowSaving,
-    savedComments,
-    comments,
-    large,
-    saveLater,
-    setComments,
-    setSaveLater
-  } = props
-  const first = <option key="first" value="first">{I18n.t('[ Select ]')}</option>
+const FreeFormComments = props => {
+  const {allowSaving, savedComments, comments, large, saveLater, setComments, setSaveLater} = props
+  const first = (
+    <option key="first" value="first">
+      {I18n.t('[ Select ]')}
+    </option>
+  )
 
   const options = savedComments.map((comment, ix) => (
     // eslint-disable-next-line react/no-array-index-key
@@ -49,16 +44,16 @@ const FreeFormComments = (props) => {
     </option>
   ))
   const selector = [
-    (
-      <Select
-        key="select"
-        label={I18n.t('Saved Comments')}
-        assistiveText={I18n.t('Select from saved comments')}
-        onChange={(_unused, el) => { setComments(savedComments[el.value])} }
-      >
-        {[first, ...options]}
-      </Select>
-    ),
+    <Select
+      key="select"
+      label={I18n.t('Saved Comments')}
+      assistiveText={I18n.t('Select from saved comments')}
+      onChange={(_unused, el) => {
+        setComments(savedComments[el.value])
+      }}
+    >
+      {[first, ...options]}
+    </Select>,
     <br key="br" />
   ]
 
@@ -69,16 +64,16 @@ const FreeFormComments = (props) => {
           checked={saveLater}
           label={I18n.t('Save this comment for reuse')}
           size="small"
-          onChange={(event) => setSaveLater(event.target.checked)}
+          onChange={event => setSaveLater(event.target.checked)}
         />
       )
     }
   }
 
   const label = I18n.t('Comments')
-  const toScreenReader = (el) => <ScreenReaderContent>{el}</ScreenReaderContent>
+  const toScreenReader = el => <ScreenReaderContent>{el}</ScreenReaderContent>
 
-  const commentClass = `edit-freeform-comments-${large ? "large" : "small"}`
+  const commentClass = `edit-freeform-comments-${large ? 'large' : 'small'}`
   return (
     <div className={commentClass}>
       {options.length > 0 ? selector : null}
@@ -87,7 +82,7 @@ const FreeFormComments = (props) => {
         label={large ? label : toScreenReader(label)}
         placeholder={large ? undefined : label}
         maxHeight="50rem"
-        onChange={(e) => setComments(e.target.value)}
+        onChange={e => setComments(e.target.value)}
         resize="vertical"
         size="small"
         value={comments}
@@ -111,26 +106,26 @@ FreeFormComments.defaultProps = {
   saveLater: false
 }
 
-const commentElement = (assessment) => {
+const commentElement = assessment => {
   if (assessment.comments_html || assessment.comments) {
     return (
       <div>
-        <Text size="small" weight="bold">{I18n.t("Comments")}</Text>
-        {
-          assessment.comments_html
-            ? <div dangerouslySetInnerHTML={{ __html: assessment.comments_html }} />
-            : <div>{assessment.comments}</div>
-        }
+        <Text size="small" weight="bold">
+          {I18n.t('Comments')}
+        </Text>
+        {assessment.comments_html ? (
+          <div dangerouslySetInnerHTML={{__html: assessment.comments_html}} />
+        ) : (
+          <div>{assessment.comments}</div>
+        )}
       </div>
     )
-  }
-  else {
+  } else {
     return null
   }
 }
 
-
-export const CommentText = ({ assessment, placeholder, weight }) => (
+export const CommentText = ({assessment, placeholder, weight}) => (
   <span className="react-rubric-break-words">
     <Text size="x-small" weight={weight}>
       {assessment !== null ? commentElement(assessment) : placeholder}
@@ -147,21 +142,22 @@ CommentText.defaultProps = {
   placeholder: ''
 }
 
-const Comments = (props) => {
-  const { editing, assessment, footer, ...commentProps } = props
+const Comments = props => {
+  const {editing, assessment, footer, ...commentProps} = props
   if (!editing || assessment === null) {
     return (
       <div className="rubric-freeform">
         <CommentText
           assessment={assessment}
-          placeholder={I18n.t("This area will be used by the assessor to leave comments related to this criterion.")}
+          placeholder={I18n.t(
+            'This area will be used by the assessor to leave comments related to this criterion.'
+          )}
           weight="normal"
         />
         {footer}
       </div>
     )
-  }
-  else {
+  } else {
     return (
       <FreeFormComments
         comments={assessment.comments}

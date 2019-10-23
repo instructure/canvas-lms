@@ -37,20 +37,22 @@ class CourseHomeDialog extends React.Component {
     courseId: PropTypes.string.isRequired,
     isPublishing: PropTypes.bool.isRequired,
     onSubmit: PropTypes.func,
-    returnFocusTo: PropTypes.instanceOf(Element),
+    returnFocusTo: PropTypes.instanceOf(Element)
   }
 
   static defaultProps = {
-    onSubmit: () => { window.location.reload() },
-    wikiFrontPageTitle: null,
+    onSubmit: () => {
+      window.location.reload()
+    },
+    wikiFrontPageTitle: null
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = props.store.getState()
   }
 
-  renderWikiLabelContent () {
+  renderWikiLabelContent() {
     const {wikiUrl, wikiFrontPageTitle} = this.props
     if (wikiFrontPageTitle) {
       return (
@@ -58,8 +60,7 @@ class CourseHomeDialog extends React.Component {
           <Text size="small" color="secondary">
             &nbsp;&nbsp;
             <i>{wikiFrontPageTitle}</i>
-            &nbsp;
-            [<Link href={wikiUrl}>{I18n.t('Change')}</Link>]
+            &nbsp; [<Link href={wikiUrl}>{I18n.t('Change')}</Link>]
           </Text>
         </span>
       )
@@ -68,15 +69,13 @@ class CourseHomeDialog extends React.Component {
       <span>
         <AccessibleContent>*</AccessibleContent>
         <ScreenReaderContent>
-          <Link href={wikiUrl}>
-            {I18n.t('Front Page must be set first')}
-          </Link>
+          <Link href={wikiUrl}>{I18n.t('Front Page must be set first')}</Link>
         </ScreenReaderContent>
       </span>
     )
   }
 
-  renderWikiLabel () {
+  renderWikiLabel() {
     return (
       <span>
         {I18n.t('Pages Front Page')}
@@ -85,14 +84,16 @@ class CourseHomeDialog extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const {selectedDefaultView} = this.state
     const {wikiFrontPageTitle, wikiUrl} = this.props
 
     const inputs = [
       {
         value: 'feed',
-        get label() {return I18n.t('Course Activity Stream')},
+        get label() {
+          return I18n.t('Course Activity Stream')
+        },
         checked: selectedDefaultView === 'feed'
       },
       {
@@ -103,24 +104,32 @@ class CourseHomeDialog extends React.Component {
       },
       {
         value: 'modules',
-        get label() {return I18n.t('Course Modules')},
+        get label() {
+          return I18n.t('Course Modules')
+        },
         checked: selectedDefaultView === 'modules'
       },
       {
         value: 'assignments',
-        get label() {return I18n.t('Assignments List')},
+        get label() {
+          return I18n.t('Assignments List')
+        },
         checked: selectedDefaultView === 'assignments'
       },
       {
         value: 'syllabus',
-        get label() {return I18n.t('Syllabus')},
+        get label() {
+          return I18n.t('Syllabus')
+        },
         checked: selectedDefaultView === 'syllabus'
       }
     ]
 
-    const instructions = this.props.isPublishing ?
-      I18n.t('Before publishing your course, you must either publish a module in the Modules page, or choose a different home page.') :
-      I18n.t("Select what you'd like to display on the home page.")
+    const instructions = this.props.isPublishing
+      ? I18n.t(
+          'Before publishing your course, you must either publish a module in the Modules page, or choose a different home page.'
+        )
+      : I18n.t("Select what you'd like to display on the home page.")
 
     return (
       <Modal
@@ -144,50 +153,52 @@ class CourseHomeDialog extends React.Component {
             onChange={(e, val) => this.onChange(val)}
             defaultValue={selectedDefaultView}
           >
-            {inputs.map(input =>
+            {inputs.map(input => (
               <RadioInput
                 key={input.value}
                 checked={input.checked}
                 value={input.value}
                 label={input.label}
                 disabled={input.disabled}
-              />)
-            }
+              />
+            ))}
           </RadioInputGroup>
 
-          {
-            wikiFrontPageTitle ? (
-              null
-            ) : (
-              <div className="content-box-mini">
-              * <Button variant="link" href={wikiUrl} theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}>
+          {wikiFrontPageTitle ? null : (
+            <div className="content-box-mini">
+              *
+              <Button
+                variant="link"
+                href={wikiUrl}
+                theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+              >
                 {I18n.t('Front Page must be set first')}
-                </Button>
-              </div>
-            )
-          }
-
+              </Button>
+            </div>
+          )}
         </Modal.Body>
 
         <Modal.Footer>
-          <Button onClick={this.props.onRequestClose} margin="0 x-small">{I18n.t('Cancel')}</Button>
+          <Button onClick={this.props.onRequestClose} margin="0 x-small">
+            {I18n.t('Cancel')}
+          </Button>
           <Button
             onClick={this.onSubmit}
             disabled={this.props.isPublishing && this.state.selectedDefaultView === 'modules'}
             variant="primary"
-          >{
-            this.props.isPublishing ? I18n.t('Choose and Publish') : I18n.t('Save')
-          }</Button>
+          >
+            {this.props.isPublishing ? I18n.t('Choose and Publish') : I18n.t('Save')}
+          </Button>
         </Modal.Footer>
       </Modal>
-    );
+    )
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.store.addChangeListener(this.onStoreChange)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.store.removeChangeListener(this.onStoreChange)
   }
 
@@ -207,20 +218,22 @@ class CourseHomeDialog extends React.Component {
     const {selectedDefaultView, savedDefaultView} = this.state
     let savingPromise
     if (selectedDefaultView !== savedDefaultView) {
-      savingPromise = axios.put(`/api/v1/courses/${this.props.courseId}`, {
-        course: {default_view: this.state.selectedDefaultView}
-      }).then(({data: course}) => course.default_view)
+      savingPromise = axios
+        .put(`/api/v1/courses/${this.props.courseId}`, {
+          course: {default_view: this.state.selectedDefaultView}
+        })
+        .then(({data: course}) => course.default_view)
     } else {
       savingPromise = Promise.resolve(savedDefaultView)
     }
 
-    savingPromise.then((newDefaultView) => {
+    savingPromise.then(newDefaultView => {
       this.props.store.setState({savedDefaultView: newDefaultView})
       this.props.onSubmit()
     })
   }
 
-  onChange = (value) => {
+  onChange = value => {
     this.props.store.setState({selectedDefaultView: value})
   }
 }

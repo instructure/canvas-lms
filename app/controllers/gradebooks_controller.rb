@@ -68,6 +68,7 @@ class GradebooksController < ApplicationController
     css_bundle :grade_summary
 
     @google_analytics_page_title = t("Grades for Student")
+    load_grade_summary_data
     render stream: can_stream_template?
   end
 
@@ -159,7 +160,6 @@ class GradebooksController < ApplicationController
 
     js_env(js_hash)
   end
-  helper_method :load_grade_summary_data
 
   def save_assignment_order
     if authorized_action(@context, @current_user, :read)
@@ -688,6 +688,7 @@ class GradebooksController < ApplicationController
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
           nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
           outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
+          group_comments_per_attempt: @assignment.a2_enabled?,
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
           help_url: help_link_url,

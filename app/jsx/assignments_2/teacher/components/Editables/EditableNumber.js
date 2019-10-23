@@ -183,12 +183,12 @@ export default class EditableNumber extends React.Component {
         onChange={this.handleInputChange}
         onKeyDown={this.handleKey}
         onKeyUp={this.handleKey}
-        label={<ScreenReaderContent>this.props.label</ScreenReaderContent>}
+        renderLabel={<ScreenReaderContent>this.props.label</ScreenReaderContent>}
         onBlur={onBlur}
         inputRef={createChainedFunction(this.getInputRef, editorRef)}
-        inline={this.props.inline}
+        display={this.props.inline ? 'inline-block' : 'block'}
         size={this.props.size}
-        required={this.props.required}
+        isRequired={this.props.required}
       />
     )
   }

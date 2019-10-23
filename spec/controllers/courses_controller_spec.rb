@@ -2716,7 +2716,7 @@ describe CoursesController do
       expect(json[0]).to include({ "id" => student1.id, "uuid" => student1.uuid })
     end
 
-    it 'can sort uesrs' do
+    it 'can sort users' do
       student1.update!(name: 'Student B')
       student2.update!(name: 'Student A')
 
@@ -2745,7 +2745,7 @@ describe CoursesController do
       expect(response).to be_bad_request
     end
 
-    it 'requires the user to have manage content permission for the course' do
+    it 'requires the user to have an admin role for the course' do
       course_with_student_logged_in
       get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
       expect(response).to be_unauthorized
@@ -2755,6 +2755,16 @@ describe CoursesController do
       @course.root_account.disable_feature!(:direct_share)
       get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
       expect(response).to be_forbidden
+    end
+
+    it 'should return email, url avatar, and name' do
+      user_session(@teacher)
+      @search_context = @course
+      course_with_teacher(name: 'course teacher')
+      @teacher.account.enable_service(:avatars)
+      get 'content_share_users', params: {course_id: @search_context.id, search_term: 'course'}
+      json = json_parse(response.body)
+      expect(json[0]).to include({'email' => nil, 'name' => 'course teacher', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
     end
 
     it 'searches for teachers, TAs, and designers' do
@@ -2767,7 +2777,50 @@ describe CoursesController do
       course_with_observer(name: 'course observer')
       get 'content_share_users', params: {course_id: @search_context.id, search_term: 'course'}
       json = json_parse(response.body)
-      expect(json.map{|user| user['display_name']}).to match_array(['course teacher', 'course ta', 'course designer'])
+      expect(json.map{|user| user['name']}).to eq(['course designer', 'course ta', 'course teacher'])
+    end
+
+    it 'should not return users with only deleted enrollments or deleted courses' do
+      user_session(@teacher)
+      @search_context = @course
+      course_with_teacher(name: 'course teacher').destroy
+      get 'content_share_users', params: {course_id: @search_context.id, search_term: 'course'}
+      json = json_parse(response.body)
+      expect(json.map{|user| user['name']}).not_to include('course teacher')
+
+      course_with_ta(name: 'course ta')
+      @course.destroy
+      get 'content_share_users', params: {course_id: @search_context.id, search_term: 'course'}
+      json = json_parse(response.body)
+      expect(json.map{|user| user['name']}).not_to include('course ta')
+    end
+
+    it 'search for root and sub-account admins' do
+      user_session(@teacher)
+      @search_context = @course
+      sub_account = account_model(parent_account: @course.root_account)
+      account_admin = user_factory(name: 'account admin')
+      sub_account_admin = user_factory(name: 'sub-account admin')
+      account_admin_user(account: @course.root_account, user: account_admin)
+      account_admin_user(account: sub_account, user: sub_account_admin)
+
+      get 'content_share_users', params: {course_id: @search_context.id, search_term: 'admin'}
+      json = json_parse(response.body)
+      expect(json.map{|user| user['name']}).to eq(['account admin', 'sub-account admin'])
+    end
+
+    it 'should not return users with deleted admin accounts' do
+      user_session(@teacher)
+      sub_account = account_model(parent_account: @course.root_account)
+      account_admin = user_factory(name: 'account admin')
+      sub_account_admin = user_factory(name: 'sub-account admin')
+      account_admin_user(account: @course.root_account, user: account_admin).destroy
+      account_admin_user(account: sub_account, user: sub_account_admin)
+      sub_account.destroy
+
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'admin'}
+      json = json_parse(response.body)
+      expect(json.map{|user| user['name']}).not_to include('account admin', 'sub-account admin')
     end
 
     it 'should not return the searching user' do
@@ -2776,7 +2829,23 @@ describe CoursesController do
       course_with_teacher(name: 'course teacher')
       get 'content_share_users', params: {course_id: @search_context.id, search_term: 'teacher'}
       json = json_parse(response.body)
-      expect(json.map{|user| user['display_name']}).to match_array(['course teacher'])
+      expect(json.map{|user| user['name']}).to match_array(['course teacher'])
+    end
+
+    it 'should not return admin roles that do not have the "manage_content" permission' do
+      user_session(@teacher)
+      account_admin = user_factory(name: 'less privileged account admin')
+      role = custom_account_role('manage_content', account: @course.root_account)
+      account_admin_user(account: @course.root_account, user: account_admin, role: role)
+
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'less privileged'}
+      json = json_parse(response.body)
+      expect(json.map{|user| user['name']}).not_to include('less privileged account admin')
+
+      role.role_overrides.create!(enabled: true, permission: 'manage_content', context: @course.root_account)
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'less privileged'}
+      json = json_parse(response.body)
+      expect(json.map{|user| user['name']}).to include('less privileged account admin')
     end
   end
 end

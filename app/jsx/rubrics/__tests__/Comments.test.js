@@ -17,54 +17,57 @@
  */
 import sinon from 'sinon'
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import Comments from '../Comments'
 
-import { assessments } from './fixtures'
+import {assessments} from './fixtures'
 
 describe('The Comments component', () => {
   const props = {
     editing: true,
     assessment: assessments.freeForm.data[1],
-    savedComments: [
-      'I award you no points',
-      'May god have mercy on your soul'
-    ],
+    savedComments: ['I award you no points', 'May god have mercy on your soul'],
     saveLater: false,
     setComments: sinon.spy(),
     setSaveLater: sinon.spy()
   }
 
-  const component = (mods) => shallow(<Comments {...{ ...props, ...mods }} />)
-  const editor = (mods) => component(mods).find('FreeFormComments').shallow()
-  const rating = (mods) => component(mods).find('CommentText').shallow()
+  const component = mods => shallow(<Comments {...{...props, ...mods}} />)
+  const editor = mods =>
+    component(mods)
+      .find('FreeFormComments')
+      .shallow()
+  const rating = mods =>
+    component(mods)
+      .find('CommentText')
+      .shallow()
 
   it('renders the root component as expected when editing', () => {
     expect(component()).toMatchSnapshot()
   })
 
   it('directly renders comments_html', () => {
-    const el = rating({ editing: false }).findWhere((e) => e.children().length === 0).last()
+    const el = rating({editing: false})
+      .findWhere(e => e.children().length === 0)
+      .last()
     expect(el.html()).toMatchSnapshot()
   })
 
   it('renders a placeholder when no assessment provided', () => {
-    expect(rating({ editing: false, assessment: null })).toMatchSnapshot()
+    expect(rating({editing: false, assessment: null})).toMatchSnapshot()
   })
 
   it('shows no selector when no comments are presented', () => {
-    expect(component({ savedComments: [] }).find('Select')).toHaveLength(0)
+    expect(component({savedComments: []}).find('Select')).toHaveLength(0)
   })
 
   it('can used saved comments from before', () => {
     const setComments = sinon.spy()
-    const el = editor({ setComments })
+    const el = editor({setComments})
     const option = el.find('option').last()
-    el.find('Select').prop('onChange')(null, { value: option.prop('value') })
+    el.find('Select').prop('onChange')(null, {value: option.prop('value')})
 
-    expect(setComments.args).toEqual([
-      [option.text()]
-    ])
+    expect(setComments.args).toEqual([[option.text()]])
   })
 
   it('truncates long saved comments', () => {
@@ -72,27 +75,29 @@ describe('The Comments component', () => {
     this is the song that never ends, yes it goes on and on my friends
     some people started singing it not knowing what it was
     and they'll continue singing it forever just because
-    `.trim().repeat(50)
-    const el = editor({ savedComments: [long] })
+    `
+      .trim()
+      .repeat(50)
+    const el = editor({savedComments: [long]})
     const option = el.find('option').last()
     expect(option.text()).toHaveLength(100) // includes the trailing '…'
   })
 
   it('can check / uncheck save for later', () => {
     const setSaveLater = sinon.spy()
-    const el = editor({ setSaveLater })
-    el.find('Checkbox').prop('onChange')({ target: { checked: true } })
+    const el = editor({setSaveLater})
+    el.find('Checkbox').prop('onChange')({target: {checked: true}})
 
     expect(setSaveLater.args).toEqual([[true]])
   })
 
   it('can disable save later checkbox', () => {
-    const el = editor({ allowSaving: false })
+    const el = editor({allowSaving: false})
     expect(el.find('Checkbox')).toHaveLength(0)
   })
 
   it('renders a footer after the comment when provided', () => {
-    const el = component({ editing: false, footer: <div>this is a footer</div> })
+    const el = component({editing: false, footer: <div>this is a footer</div>})
 
     expect(el.shallow()).toMatchSnapshot()
   })

@@ -23,6 +23,7 @@ export const SubmissionDraft = {
   fragment: gql`
     fragment SubmissionDraft on SubmissionDraft {
       _id
+      activeSubmissionType
       attachments {
         ...SubmissionDraftFile
       }
@@ -35,6 +36,7 @@ export const SubmissionDraft = {
 
   shape: shape({
     _id: string,
+    activeSubmissionType: string,
     attachments: arrayOf(SubmissionDraftFile.shape),
     body: string,
     meetsAssignmentCriteria: bool,
@@ -44,6 +46,7 @@ export const SubmissionDraft = {
 
 export const SubmissionDraftDefaultMocks = {
   SubmissionDraft: () => ({
+    activeSubmissionType: null,
     attachments: () => [],
     body: null,
     meetsAssignmentCriteria: false,

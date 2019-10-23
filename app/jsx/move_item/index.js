@@ -23,7 +23,7 @@ import MoveItemTray from './MoveItemTray'
 
 const ROOT_ID = 'move_item_tray'
 
-export function renderTray (props, rootContainer = document.body) {
+export function renderTray(props, rootContainer = document.body) {
   let root = document.getElementById(ROOT_ID)
 
   if (!root) {
@@ -32,26 +32,26 @@ export function renderTray (props, rootContainer = document.body) {
     rootContainer.appendChild(root)
   }
 
-  ReactDOM.render(<MoveItemTray {...props} ref={(tray) => tray && tray.open()} />, root)
+  ReactDOM.render(<MoveItemTray {...props} ref={tray => tray && tray.open()} />, root)
 }
 
 export const backbone = {
-  collectionToItems (collection, getItems = (col) => col.models) {
+  collectionToItems(collection, getItems = col => col.models) {
     return getItems(collection).map(item => ({
       id: item.attributes.id,
-      title: item.attributes.name || item.attributes.title,
+      title: item.attributes.name || item.attributes.title
     }))
   },
 
-  collectionToGroups (collection, getItems, filter = () => true) {
-    return collection.models.filter(filter).map((item) => ({
+  collectionToGroups(collection, getItems, filter = () => true) {
+    return collection.models.filter(filter).map(item => ({
       id: item.attributes.id,
       title: item.attributes.name || item.attributes.title,
-      items: this.collectionToItems(getItems(item)),
+      items: this.collectionToItems(getItems(item))
     }))
   },
 
-  reorderInCollection (order, model, collection = model.collection) {
+  reorderInCollection(order, model, collection = model.collection) {
     order.forEach((id, index) => {
       const item = collection.get(id)
       if (item) item.set('position', index + 1)
@@ -62,7 +62,7 @@ export const backbone = {
     collection.reset(collection.models)
   },
 
-  reorderAcrossCollections (order, collId, model, keys) {
+  reorderAcrossCollections(order, collId, model, keys) {
     let newColl = model.collection.view.parentCollection.get(collId).get(keys.model)
 
     // if item moved across collections
@@ -80,13 +80,13 @@ export const backbone = {
     this.reorderInCollection(order, model, newColl)
   },
 
-  reorderAllItemsIntoNewCollection (order, collId, model, keys) {
+  reorderAllItemsIntoNewCollection(order, collId, model, keys) {
     let newColl = model.collection.get(collId).get(keys.model)
     // if item moved across collections
     if (newColl && newColl !== model.collection) {
       const allAssignments = model.get(keys.model).models.slice()
 
-      allAssignments.forEach((asg) => {
+      allAssignments.forEach(asg => {
         model.get(keys.model).remove(asg)
         newColl.add(asg)
       })
@@ -102,7 +102,7 @@ export const backbone = {
   }
 }
 
-export function reorderElements (order, container, idToItemSelector = id => `#${id}`) {
+export function reorderElements(order, container, idToItemSelector = id => `#${id}`) {
   const itemMap = order.reduce((items, id) => {
     const item = container.querySelector(idToItemSelector(id))
     if (item == null) return items
@@ -111,5 +111,7 @@ export function reorderElements (order, container, idToItemSelector = id => `#${
     return items
   }, {})
 
-  order.forEach(id => { if (itemMap[id] != null) container.appendChild(itemMap[id]) })
+  order.forEach(id => {
+    if (itemMap[id] != null) container.appendChild(itemMap[id])
+  })
 }

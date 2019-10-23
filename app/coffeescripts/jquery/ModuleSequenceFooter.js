@@ -47,15 +47,17 @@ import 'jquery.ajaxJSON'
 //   }
 let msfInstanceCounter = 0
 
-$.fn.moduleSequenceFooter = function (options = {}) {
+$.fn.moduleSequenceFooter = function(options = {}) {
   // You must pass in a assetType and assetId or we throw an error.
   if (!options.assetType || !options.assetID) {
     throw 'Option must be set with assetType and assetID'
-
   }
 
   this.msfAnimation = enabled =>
-    this.find('.module-sequence-padding, .module-sequence-footer').toggleClass('no-animation', !enabled)
+    this.find('.module-sequence-padding, .module-sequence-footer').toggleClass(
+      'no-animation',
+      !enabled
+    )
 
   // After fetching, @msfInstance will have the following
   // @hide: bool
@@ -68,11 +70,13 @@ $.fn.moduleSequenceFooter = function (options = {}) {
       return
     }
 
-    this.html(template({
-      instanceNumber: this.msfInstance.instanceNumber,
-      previous: this.msfInstance.previous,
-      next: this.msfInstance.next,
-    }))
+    this.html(
+      template({
+        instanceNumber: this.msfInstance.instanceNumber,
+        previous: this.msfInstance.previous,
+        next: this.msfInstance.next
+      })
+    )
     if (options && options.animation !== undefined) {
       this.msfAnimation(options.animation)
     }
@@ -83,7 +87,6 @@ $.fn.moduleSequenceFooter = function (options = {}) {
 }
 
 export default class ModuleSequenceFooter {
-
   // Icon class map used to determine which icon class should be placed
   // on a tooltip
   // @api private
@@ -102,7 +105,7 @@ export default class ModuleSequenceFooter {
   // Sets up the class variables and generates a url. Fetch should be
   // called somewhere else to set up the data.
 
-  constructor (options = {}) {
+  constructor(options = {}) {
     this.instanceNumber = msfInstanceCounter++
     this.courseID = options.courseID || (typeof ENV !== 'undefined' && ENV.course_id)
     this.assetID = options.assetID
@@ -113,7 +116,7 @@ export default class ModuleSequenceFooter {
     this.url = `/api/v1/courses/${this.courseID}/module_item_sequence`
   }
 
-  getQueryParams (qs) {
+  getQueryParams(qs) {
     let tokens
     qs = qs.split('+').join(' ')
     const params = {}
@@ -130,20 +133,34 @@ export default class ModuleSequenceFooter {
   // fetch is finished. This will then setup data to be used elsewhere.
   // @api public
 
-  fetch () {
+  fetch() {
     const params = this.getQueryParams(this.location.search)
     if (params.module_item_id) {
-      return $.ajaxJSON(this.url, 'GET', {
-        asset_type: 'ModuleItem',
-        asset_id: params.module_item_id,
-        frame_external_urls: true
-      }, this.success, null, {})
+      return $.ajaxJSON(
+        this.url,
+        'GET',
+        {
+          asset_type: 'ModuleItem',
+          asset_id: params.module_item_id,
+          frame_external_urls: true
+        },
+        this.success,
+        null,
+        {}
+      )
     } else {
-      return $.ajaxJSON(this.url, 'GET', {
-        asset_type: this.assetType,
-        asset_id: this.assetID,
-        frame_external_urls: true
-      }, this.success, null, {})
+      return $.ajaxJSON(
+        this.url,
+        'GET',
+        {
+          asset_type: this.assetType,
+          asset_id: this.assetID,
+          frame_external_urls: true
+        },
+        this.success,
+        null,
+        {}
+      )
     }
   }
 
@@ -151,7 +168,7 @@ export default class ModuleSequenceFooter {
   // can only have 1 item in the data set for this to work else we hide the sequence bar.
   // # @api private
 
-  success = (data) => {
+  success = data => {
     this.modules = data.modules
 
     // Currently only supports 1 item in the items array
@@ -183,23 +200,25 @@ export default class ModuleSequenceFooter {
   // to display the module name instead of the item title.
   // @api private
 
-  buildPreviousData () {
+  buildPreviousData() {
     this.previous.url = this.item.prev.html_url
 
     if (this.item.current.module_id === this.item.prev.module_id) {
-      this.previous.tooltip =
-        `<i class='${htmlEscape(this.iconClasses[this.item.prev.type])}'></i> ${
-          htmlEscape(this.item.prev.title)
-        }`
-      this.previous.tooltipText = I18n.t('prev_module_item_desc', 'Previous: *item*', {wrapper: this.item.prev.title})
+      this.previous.tooltip = `<i class='${htmlEscape(
+        this.iconClasses[this.item.prev.type]
+      )}'></i> ${htmlEscape(this.item.prev.title)}`
+      this.previous.tooltipText = I18n.t('prev_module_item_desc', 'Previous: *item*', {
+        wrapper: this.item.prev.title
+      })
     } else {
       // module id is different
       const module = _.find(this.modules, m => m.id === this.item.prev.module_id)
-      this.previous.tooltip =
-        `<strong style='float:left'>${
-          htmlEscape(I18n.t('prev_module', 'Previous Module:'))
-        }</strong> <br> ${htmlEscape(module.name)}`
-      this.previous.tooltipText = I18n.t('prev_module_desc', 'Previous Module: *module*', {wrapper: module.name})
+      this.previous.tooltip = `<strong style='float:left'>${htmlEscape(
+        I18n.t('prev_module', 'Previous Module:')
+      )}</strong> <br> ${htmlEscape(module.name)}`
+      this.previous.tooltipText = I18n.t('prev_module_desc', 'Previous Module: *module*', {
+        wrapper: module.name
+      })
     }
   }
 
@@ -216,43 +235,47 @@ export default class ModuleSequenceFooter {
   // to display the module name instead of the item title.
   // @api private
 
-  buildNextPathData () {
+  buildNextPathData() {
     const masteryPath = this.item.mastery_path
     if (masteryPath.awaiting_choice) {
       this.next.url = masteryPath.choose_url
       this.next.tooltipText = I18n.t('Choose the next mastery path')
     } else {
       const lockedMessage = I18n.t('Next mastery path is currently locked')
-      const processingMessage = I18n.t('Next mastery path is still processing, please periodically refresh the page')
+      const processingMessage = I18n.t(
+        'Next mastery path is still processing, please periodically refresh the page'
+      )
       const tooltipText = masteryPath.locked ? lockedMessage : processingMessage
       this.next.modules_tab_disabled = masteryPath.modules_tab_disabled
       this.next.url = masteryPath.modules_url
       this.next.tooltipText = tooltipText
     }
     // xsslint safeString.property tooltipText
-    this.next.tooltip = `<i class='${htmlEscape(this.iconClasses.ModuleItem)}'/> ${this.next.tooltipText}`
+    this.next.tooltip = `<i class='${htmlEscape(this.iconClasses.ModuleItem)}'/> ${
+      this.next.tooltipText
+    }`
   }
 
-  buildNextData () {
+  buildNextData() {
     this.next.url = this.item.next.html_url
     if (this.item.current.module_id === this.item.next.module_id) {
-      this.next.tooltip =
-        `<i class='${htmlEscape(this.iconClasses[this.item.next.type])}'></i> ${
-          htmlEscape(this.item.next.title)
-        }`
+      this.next.tooltip = `<i class='${htmlEscape(
+        this.iconClasses[this.item.next.type]
+      )}'></i> ${htmlEscape(this.item.next.title)}`
       this.next.tooltipText = I18n.t('Next: *item*', {wrapper: this.item.next.title})
     } else {
       // module id is different
       const module = _.find(this.modules, m => m.id === this.item.next.module_id)
-      this.next.tooltip =
-        `<strong style='float:left'>${
-          htmlEscape(I18n.t('next_module', 'Next Module:'))
-        }</strong> <br> ${htmlEscape(module.name)}`
-      this.next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', {wrapper: module.name})
+      this.next.tooltip = `<strong style='float:left'>${htmlEscape(
+        I18n.t('next_module', 'Next Module:')
+      )}</strong> <br> ${htmlEscape(module.name)}`
+      this.next.tooltipText = I18n.t('next_module_desc', 'Next Module: *module*', {
+        wrapper: module.name
+      })
     }
   }
 
-  awaitingPathProgress () {
+  awaitingPathProgress() {
     const masteryPath = this.item.mastery_path
     if (masteryPath && masteryPath.is_student) {
       return masteryPath.awaiting_choice || masteryPath.locked || masteryPath.still_processing

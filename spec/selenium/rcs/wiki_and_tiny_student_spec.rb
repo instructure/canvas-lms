@@ -93,17 +93,18 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(new_page).to be_published
     end
 
-    it "should not allow students to add links to new pages unless they can create pages" do
+    it "should not allow students to add links to new pages" do
       create_wiki_page("test_page", false, "public")
       get "/courses/#{@course.id}/pages/test_page/edit"
       fj('button:contains("Pages")').click
       wait_for_ajax_requests
 
       expect(f("#content")).not_to contain_css('#rcs-LinkToNewPage-btn-link')
+    end
 
+    it "should allow students to add links to pages if they can create them" do
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!
-
       get "/courses/#{@course.id}/pages/somenewpage/edit" # page that doesn't exist
       fj('button:contains("Pages")').click
       wait_for_ajax_requests

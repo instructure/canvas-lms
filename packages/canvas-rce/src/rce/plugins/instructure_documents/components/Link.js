@@ -52,10 +52,12 @@ export default function Link(props) {
     })
 
     const attrs = {
+      id: props.id,
       href: props.href,
       target: '_blank',
       class: clazz,
-      text: props.display_name || props.filename // because onClick only takes a single object
+      text: props.display_name || props.filename, // because onClick only takes a single object
+      content_type: props.content_type
     }
     if (canPreview) {
       attrs['data-canvas-previewable'] = true

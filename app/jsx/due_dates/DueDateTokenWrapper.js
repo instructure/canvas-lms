@@ -19,13 +19,13 @@
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import OverrideStudentStore from '../due_dates/OverrideStudentStore'
+import OverrideStudentStore from './OverrideStudentStore'
 import Override from 'compiled/models/AssignmentOverride'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 import I18n from 'i18n!DueDateTokenWrapper'
 import $ from 'jquery'
 import SearchHelpers from '../shared/helpers/searchHelpers'
-import DisabledTokenInput from '../due_dates/DisabledTokenInput'
+import DisabledTokenInput from './DisabledTokenInput'
 
 const DueDateWrapperConsts = {
   MINIMUM_SEARCH_LENGTH: 3,
@@ -36,7 +36,6 @@ const DueDateWrapperConsts = {
 }
 
 class DueDateTokenWrapper extends React.Component {
-
   static propTypes = {
     tokens: PropTypes.array.isRequired,
     handleTokenAdd: PropTypes.func.isRequired,
@@ -50,9 +49,13 @@ class DueDateTokenWrapper extends React.Component {
   }
 
   MINIMUM_SEARCH_LENGTH = DueDateWrapperConsts.MINIMUM_SEARCH_LENGTH
+
   MAXIMUM_STUDENTS_TO_SHOW = DueDateWrapperConsts.MAXIMUM_STUDENTS_TO_SHOW
+
   MAXIMUM_SECTIONS_TO_SHOW = DueDateWrapperConsts.MAXIMUM_SECTIONS_TO_SHOW
+
   MAXIMUM_GROUPS_TO_SHOW = DueDateWrapperConsts.MAXIMUM_GROUPS_TO_SHOW
+
   MS_TO_DEBOUNCE_SEARCH = DueDateWrapperConsts.MS_TO_DEBOUNCE_SEARCH
 
   // -------------------

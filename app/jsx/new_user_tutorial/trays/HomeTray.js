@@ -29,18 +29,14 @@ const HomeTray = () => (
     image="/images/tutorial-tray-images/publish.png"
   >
     <Text as="p">
-      {
-        I18n.t(`When people visit your course, this is the first page they'll see.
-          We've set your homepage to Modules, but you have the option to change it.`)
-      }
+      {I18n.t(`When people visit your course, this is the first page they'll see.
+          We've set your homepage to Modules, but you have the option to change it.`)}
     </Text>
     <Text as="p">
-      {
-        I18n.t(`You can publish your course from the home page whenever you’re ready
-          to share it with students. Until your course is published, only instructors will be able to access it.`)
-      }
+      {I18n.t(`You can publish your course from the home page whenever you’re ready
+          to share it with students. Until your course is published, only instructors will be able to access it.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default HomeTray

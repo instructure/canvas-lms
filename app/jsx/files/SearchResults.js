@@ -21,12 +21,12 @@ import _ from 'underscore'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import SearchResults from 'compiled/react_files/components/SearchResults'
-import NoResults from '../files/NoResults'
-import ColumnHeaders from '../files/ColumnHeaders'
+import NoResults from './NoResults'
+import ColumnHeaders from './ColumnHeaders'
 import Folder from 'compiled/models/Folder'
-import FolderChild from '../files/FolderChild'
-import LoadingIndicator from '../files/LoadingIndicator'
-import FilePreview from '../files/FilePreview'
+import FolderChild from './FolderChild'
+import LoadingIndicator from './LoadingIndicator'
+import FilePreview from './FilePreview'
 import page from 'page'
 import FocusStore from 'compiled/react_files/modules/FocusStore'
 
@@ -34,7 +34,7 @@ SearchResults.displayErrors = function(errors) {
   let error_message = null
 
   if (errors != null) {
-    error_message = errors.map((error) => <li>{error.message}</li>)
+    error_message = errors.map(error => <li>{error.message}</li>)
   }
 
   return (
@@ -62,9 +62,9 @@ SearchResults.renderFilePreview = function() {
   if (this.props.query.preview != null && this.state.collection.length) {
     return (
       /*
-         * Prepare and render the FilePreview if needed.
-         * As long as ?preview is present in the url.
-         */
+       * Prepare and render the FilePreview if needed.
+       * As long as ?preview is present in the url.
+       */
       <FilePreview
         isOpen
         params={this.props.params}
@@ -113,22 +113,22 @@ SearchResults.render = function() {
             )
           )
           .map(child => (
-              <FolderChild
-                key={child.cid}
-                model={child}
-                isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
-                toggleSelected={this.props.toggleItemSelected.bind(null, child)}
-                userCanManageFilesForContext={this.props.userCanManageFilesForContext}
-                userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
-                usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
-                externalToolsForContext={this.props.externalToolsForContext}
-                previewItem={this.props.previewItem.bind(null, child)}
-                dndOptions={this.props.dndOptions}
-                modalOptions={this.props.modalOptions}
-                clearSelectedItems={this.props.clearSelectedItems}
-                onMove={this.props.onMove}
-              />
-            ))}
+            <FolderChild
+              key={child.cid}
+              model={child}
+              isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
+              toggleSelected={this.props.toggleItemSelected.bind(null, child)}
+              userCanManageFilesForContext={this.props.userCanManageFilesForContext}
+              userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
+              usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+              externalToolsForContext={this.props.externalToolsForContext}
+              previewItem={this.props.previewItem.bind(null, child)}
+              dndOptions={this.props.dndOptions}
+              modalOptions={this.props.modalOptions}
+              clearSelectedItems={this.props.clearSelectedItems}
+              onMove={this.props.onMove}
+            />
+          ))}
 
         <LoadingIndicator isLoading={!this.state.collection.loadedAll} />
 

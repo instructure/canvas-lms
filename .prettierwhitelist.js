@@ -10,9 +10,10 @@ function appAndSpecFilesFor(path) {
 // or if there is a folder of code that your team controls that you want
 // to start ensuring conforms to prettier, add it to this array to opt-in
 // now to conform to prettier.
-const PRETTIER_WHITELIST = module.exports =  [
+const PRETTIER_WHITELIST = (module.exports = [
   './*.js',
-  'app/jsx/*.js',
+  'app/jsx/**/*.js',
+  'app/coffeescripts/**/*.js',
   'frontend_build/**/*.js',
   'packages/canvas-media/src/**/*.js',
   'script/**/*.js',
@@ -40,6 +41,7 @@ const PRETTIER_WHITELIST = module.exports =  [
   appAndSpecDirsFor('login'),
   appAndSpecDirsFor('permissions'),
   appAndSpecDirsFor('shared/components'),
+  appAndSpecDirsFor('shared/direct_share'),
   appAndSpecDirsFor('speed_grader'),
   appAndSpecDirsFor('theme_editor')
-]
+])

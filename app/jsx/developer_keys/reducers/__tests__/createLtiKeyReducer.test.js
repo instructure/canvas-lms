@@ -33,7 +33,7 @@ function freshState() {
     privacyLevel: '',
     updateCustomizationsPending: false,
     updateCustomizationsSuccessful: false,
-    updateCustomizationsError: null,
+    updateCustomizationsError: null
   }
 }
 

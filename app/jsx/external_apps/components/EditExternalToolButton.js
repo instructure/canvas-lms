@@ -22,9 +22,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '../../shared/components/InstuiModal'
 import 'compiled/jquery.rails_flash_notifications'
-import store from '../../external_apps/lib/ExternalAppsStore'
-import ConfigurationForm from '../../external_apps/components/ConfigurationForm'
-import Lti2Edit from '../../external_apps/components/Lti2Edit'
+import store from '../lib/ExternalAppsStore'
+import ConfigurationForm from './ConfigurationForm'
+import Lti2Edit from './Lti2Edit'
 
 export default class EditExternalToolButton extends React.Component {
   static propTypes = {

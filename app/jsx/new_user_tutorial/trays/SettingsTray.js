@@ -28,12 +28,10 @@ const AssignmentsTray = () => (
     image="/images/tutorial-tray-images/settings.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Update and view sections, course details, navigation, feature
-                options and external app integrations, all visible only to Instructors.`)
-      }
+      {I18n.t(`Update and view sections, course details, navigation, feature
+                options and external app integrations, all visible only to Instructors.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default AssignmentsTray

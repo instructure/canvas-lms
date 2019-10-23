@@ -20,177 +20,179 @@ import _ from 'underscore'
 import AssignmentOverride from 'compiled/models/AssignmentOverride'
 import Section from 'compiled/models/Section'
 
-  var TokenActions = {
+const TokenActions = {
+  // -------------------
+  //   Adding Tokens
+  // -------------------
 
-    // -------------------
-    //   Adding Tokens
-    // -------------------
+  handleTokenAdd(newToken, overridesFromRow, rowKey, dates) {
+    this.setOverrideInitializer(rowKey, dates)
 
-    handleTokenAdd(newToken, overridesFromRow, rowKey, dates){
-      this.setOverrideInitializer(rowKey, dates)
+    if (newToken.course_section_id) {
+      return this.handleSectionTokenAdd(newToken, overridesFromRow)
+    } else if (newToken.group_id) {
+      return this.handleGroupTokenAdd(newToken, overridesFromRow)
+    } else if (newToken.noop_id) {
+      return this.handleNoopTokenAdd(newToken, overridesFromRow)
+    } else {
+      return this.handleStudentTokenAdd(newToken, overridesFromRow)
+    }
+  },
 
-      if(newToken.course_section_id) {
-        return this.handleSectionTokenAdd(newToken, overridesFromRow)
-      }
-      else if (newToken.group_id) {
-        return this.handleGroupTokenAdd(newToken, overridesFromRow)
-      }
-      else if (newToken.noop_id) {
-        return this.handleNoopTokenAdd(newToken, overridesFromRow)
-      } else {
-        return this.handleStudentTokenAdd(newToken, overridesFromRow)
-      }
-    },
+  // -- Adding Sections --
 
-    // -- Adding Sections --
+  handleSectionTokenAdd(token, overridesFromRow) {
+    const newOverride = this.newOverrideForRow({
+      course_section_id: token.course_section_id,
+      title: token.name
+    })
 
-    handleSectionTokenAdd(token, overridesFromRow) {
-      var newOverride = this.newOverrideForRow({
-        course_section_id: token.course_section_id,
-        title: token.name
-      })
+    return _.union(overridesFromRow, [newOverride])
+  },
 
-      return _.union(overridesFromRow, [newOverride])
-    },
+  // -- Adding Groups --
 
-    // -- Adding Groups --
+  handleGroupTokenAdd(token, overridesFromRow) {
+    const newOverride = this.newOverrideForRow({
+      group_id: token.group_id,
+      title: token.name
+    })
 
-    handleGroupTokenAdd(token, overridesFromRow){
-      var newOverride = this.newOverrideForRow({
-        group_id: token.group_id,
-        title: token.name
-      })
+    return _.union(overridesFromRow, [newOverride])
+  },
 
-      return _.union(overridesFromRow, [newOverride])
-    },
+  // -- Adding Students --
 
-    // -- Adding Students --
+  handleStudentTokenAdd(token, overridesFromRow) {
+    const existingAdhocOverride = this.findAdhoc(overridesFromRow)
 
-    handleStudentTokenAdd(token, overridesFromRow){
-      var existingAdhocOverride = this.findAdhoc(overridesFromRow)
+    return existingAdhocOverride
+      ? this.addStudentToExistingAdhocOverride(token, existingAdhocOverride, overridesFromRow)
+      : this.createNewAdhocOverrideForRow(token, overridesFromRow)
+  },
 
-      return existingAdhocOverride ?
-        this.addStudentToExistingAdhocOverride(token, existingAdhocOverride, overridesFromRow) :
-        this.createNewAdhocOverrideForRow(token, overridesFromRow)
-    },
+  addStudentToExistingAdhocOverride(newToken, existingOverride, overridesFromRow) {
+    const newStudentIds = existingOverride.get('student_ids').concat(newToken.id)
+    const newOverride = existingOverride.set('student_ids', newStudentIds)
+    newOverride.unset('title', {silent: true})
 
-    addStudentToExistingAdhocOverride(newToken, existingOverride, overridesFromRow){
-      var newStudentIds = existingOverride.get( "student_ids" ).concat( newToken.id )
-      var newOverride = existingOverride.set("student_ids", newStudentIds)
-      newOverride.unset("title", {silent: true})
+    return _.chain(overridesFromRow)
+      .difference([existingOverride])
+      .union([newOverride])
+      .value()
+  },
 
-      return _.chain(overridesFromRow).
-               difference([existingOverride]).
-               union([newOverride]).
-               value()
-    },
+  createNewAdhocOverrideForRow(newToken, overridesFromRow) {
+    const freshOverride = this.newOverrideForRow({student_ids: []})
+    return this.addStudentToExistingAdhocOverride(newToken, freshOverride, overridesFromRow)
+  },
 
-    createNewAdhocOverrideForRow(newToken, overridesFromRow){
-      var freshOverride = this.newOverrideForRow({ student_ids: [] })
-      return this.addStudentToExistingAdhocOverride(newToken, freshOverride, overridesFromRow)
-    },
+  // -- Adding Noop --
 
-    // -- Adding Noop --
+  handleNoopTokenAdd(token, overridesFromRow) {
+    const newOverride = this.newOverrideForRow({
+      noop_id: token.noop_id,
+      title: token.name
+    })
 
-    handleNoopTokenAdd(token, overridesFromRow){
-      var newOverride = this.newOverrideForRow({
-        noop_id: token.noop_id,
-        title: token.name
-      })
+    if (token == AssignmentOverride.conditionalRelease) {
+      overridesFromRow = this.removeDefaultSection(overridesFromRow)
+    }
 
-      if(token == AssignmentOverride.conditionalRelease) {
-        overridesFromRow = this.removeDefaultSection(overridesFromRow)
-      }
+    return _.union(overridesFromRow, [newOverride])
+  },
 
-      return _.union(overridesFromRow, [newOverride])
-    },
+  // -------------------
+  //  Removing Tokens
+  // -------------------
 
-    // -------------------
-    //  Removing Tokens
-    // -------------------
+  handleTokenRemove(tokenToRemove, overridesFromRow) {
+    if (tokenToRemove.course_section_id) {
+      return this.handleSectionTokenRemove(tokenToRemove, overridesFromRow)
+    } else if (tokenToRemove.group_id) {
+      return this.handleGroupTokenRemove(tokenToRemove, overridesFromRow)
+    } else if (tokenToRemove.noop_id) {
+      return this.handleNoopTokenRemove(tokenToRemove, overridesFromRow)
+    } else {
+      return this.handleStudentTokenRemove(tokenToRemove, overridesFromRow)
+    }
+  },
 
-    handleTokenRemove(tokenToRemove, overridesFromRow){
-      if(tokenToRemove.course_section_id) {
-        return this.handleSectionTokenRemove(tokenToRemove, overridesFromRow)
-      }
-      else if (tokenToRemove.group_id) {
-        return this.handleGroupTokenRemove(tokenToRemove, overridesFromRow)
-      }
-      else if (tokenToRemove.noop_id) {
-        return this.handleNoopTokenRemove(tokenToRemove, overridesFromRow)
-      }
-      else {
-        return this.handleStudentTokenRemove(tokenToRemove, overridesFromRow)
-      }
-    },
+  handleSectionTokenRemove(tokenToRemove, overridesFromRow) {
+    return this.removeForType('course_section_id', tokenToRemove, overridesFromRow)
+  },
 
-    handleSectionTokenRemove(tokenToRemove, overridesFromRow){
-      return this.removeForType("course_section_id", tokenToRemove, overridesFromRow)
-    },
+  handleGroupTokenRemove(tokenToRemove, overridesFromRow) {
+    return this.removeForType('group_id', tokenToRemove, overridesFromRow)
+  },
 
-    handleGroupTokenRemove(tokenToRemove, overridesFromRow){
-      return this.removeForType("group_id", tokenToRemove, overridesFromRow)
-    },
+  handleNoopTokenRemove(tokenToRemove, overridesFromRow) {
+    return this.removeForType('noop_id', tokenToRemove, overridesFromRow)
+  },
 
-    handleNoopTokenRemove(tokenToRemove, overridesFromRow){
-      return this.removeForType("noop_id", tokenToRemove, overridesFromRow)
-    },
+  removeForType(selector, tokenToRemove, overridesFromRow) {
+    const overrideToRemove = _.find(
+      overridesFromRow,
+      override => override.get(selector) == tokenToRemove[selector]
+    )
 
-    removeForType(selector, tokenToRemove, overridesFromRow){
-      var overrideToRemove = _.find(overridesFromRow, override => override.get(selector) == tokenToRemove[selector])
+    return _.difference(overridesFromRow, [overrideToRemove])
+  },
 
-      return _.difference(overridesFromRow, [overrideToRemove])
-    },
+  removeDefaultSection(overridesFromRow) {
+    return this.handleTokenRemove(
+      {course_section_id: Section.defaultDueDateSectionID},
+      overridesFromRow
+    )
+  },
 
-    removeDefaultSection(overridesFromRow){
-      return this.handleTokenRemove({ course_section_id: Section.defaultDueDateSectionID}, overridesFromRow)
-    },
+  handleStudentTokenRemove(tokenToRemove, overridesFromRow) {
+    const adhocOverride = this.findAdhoc(overridesFromRow, tokenToRemove.student_id)
+    const newStudentIds = _.difference(adhocOverride.get('student_ids'), [tokenToRemove.student_id])
 
-    handleStudentTokenRemove(tokenToRemove, overridesFromRow){
-      var adhocOverride = this.findAdhoc(overridesFromRow, tokenToRemove.student_id)
-      var newStudentIds = _.difference(adhocOverride.get("student_ids"), [tokenToRemove.student_id])
+    if (_.isEmpty(newStudentIds)) {
+      return _.difference(overridesFromRow, [adhocOverride])
+    }
 
-      if ( _.isEmpty(newStudentIds) ) {
-        return _.difference(overridesFromRow, [adhocOverride])
-      }
+    const newOverride = adhocOverride.set('student_ids', newStudentIds)
+    newOverride.unset('title', {silent: true})
+    return _.chain(overridesFromRow)
+      .difference([adhocOverride])
+      .union([newOverride])
+      .value()
+  },
 
-      var newOverride = adhocOverride.set("student_ids", newStudentIds)
-      newOverride.unset("title", {silent: true})
-      return _.chain(overridesFromRow).
-               difference([adhocOverride]).
-               union([newOverride]).
-               value()
-    },
+  setOverrideInitializer(rowKey, dates) {
+    if (!dates) dates = {}
 
-    setOverrideInitializer(rowKey, dates){
-      if (!dates) dates = {}
+    const date_attrs = {
+      due_at: dates.due_at,
+      due_at_overridden: !!dates.due_at,
+      lock_at: dates.lock_at,
+      lock_at_overridden: !!dates.lock_at,
+      unlock_at: dates.unlock_at,
+      unlock_at_overridden: !!dates.unlock_at,
+      rowKey
+    }
 
-      var date_attrs = {
-        due_at: dates["due_at"],
-        due_at_overridden: !!dates["due_at"],
-        lock_at: dates["lock_at"],
-        lock_at_overridden: !!dates["lock_at"],
-        unlock_at: dates["unlock_at"],
-        unlock_at_overridden: !!dates["unlock_at"],
-        rowKey: rowKey
-      }
+    this.newOverrideForRow = function(attributes) {
+      const all_attrs = _.extend(date_attrs, attributes)
+      return new AssignmentOverride(all_attrs)
+    }
+  },
 
-      this.newOverrideForRow = function(attributes){
-        let all_attrs = _.extend(date_attrs, attributes)
-        return new AssignmentOverride(all_attrs)
-      }
-    },
+  // -------------------
+  //      Helpers
+  // -------------------
 
-    // -------------------
-    //      Helpers
-    // -------------------
-
-    findAdhoc(collection, idToRemove){
-      return _.find(collection, (ov) =>{
-        return !!ov.get("student_ids") &&
-          (idToRemove ? _.includes(ov.get("student_ids"), idToRemove) : true)
-      })
-    },
+  findAdhoc(collection, idToRemove) {
+    return _.find(collection, ov => {
+      return (
+        !!ov.get('student_ids') &&
+        (idToRemove ? _.includes(ov.get('student_ids'), idToRemove) : true)
+      )
+    })
   }
+}
 
 export default TokenActions

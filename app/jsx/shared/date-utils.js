@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment';
+import moment from 'moment'
 import React from 'react'
 import 'jquery.instructure_date_and_time'
 
@@ -27,15 +27,14 @@ import {IconTimerLine} from '@instructure/ui-icons'
 /*
  * returns whether or not the current date is passed the date
  */
-export function isPassedDelayedPostAt({ checkDate, delayedDate }) {
+export function isPassedDelayedPostAt({checkDate, delayedDate}) {
   const checkMomentDate = checkDate ? moment(checkDate) : moment()
   const checkDelayedDate = moment(delayedDate)
   return checkMomentDate.isAfter(checkDelayedDate)
 }
 
-export function makeTimestamp({ delayed_post_at, posted_at }, delayedLabel, postedOnLabel) {
-  return (delayed_post_at
-    && !isPassedDelayedPostAt({ checkDate: null, delayedDate: delayed_post_at}))
+export function makeTimestamp({delayed_post_at, posted_at}, delayedLabel, postedOnLabel) {
+  return delayed_post_at && !isPassedDelayedPostAt({checkDate: null, delayedDate: delayed_post_at})
     ? {
         title: (
           <span>

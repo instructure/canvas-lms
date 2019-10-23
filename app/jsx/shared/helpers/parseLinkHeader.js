@@ -22,22 +22,20 @@
  *
  */
 
+const regex = /<(http.*?)>; rel="([a-z]*)"/g
 
-
-  var regex = /<(http.*?)>; rel="([a-z]*)"/g;
-
-  var parseLinkHeader = (axiosResponse) => {
-    var links = {};
-    var header = (axiosResponse.headers) ? axiosResponse.headers.link : null;
-    if (!header) {
-      return links;
-    }
-    var link = regex.exec(header);
-    while (link) {
-      links[link[2]] = link[1];
-      link = regex.exec(header);
-    }
-    return links;
-  };
+const parseLinkHeader = axiosResponse => {
+  const links = {}
+  const header = axiosResponse.headers ? axiosResponse.headers.link : null
+  if (!header) {
+    return links
+  }
+  let link = regex.exec(header)
+  while (link) {
+    links[link[2]] = link[1]
+    link = regex.exec(header)
+  }
+  return links
+}
 
 export default parseLinkHeader

@@ -32,11 +32,13 @@ function dataReady(data, service_id) {
     parentWindow[callback].ready(data)
     setTimeout(() => {
       if (callback === 'external_tool_dialog') {
-        $("#dialog_message").text(I18n.t("popup_success", "Success! This popup should close on its own..."));
+        $('#dialog_message').text(
+          I18n.t('popup_success', 'Success! This popup should close on its own...')
+        )
       } else {
-        $("#dialog_message").text('');
+        $('#dialog_message').text('')
       }
-    }, 1000);
+    }, 1000)
   } else {
     $('#dialog_message').text(
       I18n.t(
@@ -50,15 +52,18 @@ function dataReady(data, service_id) {
 // Handles lti 1.0 responses for Assignments 2 which expects a
 // vanilla JS event from LTI tools in the following form.
 function a2DataReady(data) {
-  parentWindow.postMessage({
-    messageType: 'A2ExternalContentReady',
-    content_items: data,
-    msg: ENV.message,
-    log: ENV.log,
-    errormsg: ENV.error_message,
-    errorlog: ENV.error_log,
-    ltiEndpoint: ENV.lti_endpoint
-  }, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+  parentWindow.postMessage(
+    {
+      messageType: 'A2ExternalContentReady',
+      content_items: data,
+      msg: ENV.message,
+      log: ENV.log,
+      errormsg: ENV.error_message,
+      errorlog: ENV.error_log,
+      ltiEndpoint: ENV.lti_endpoint
+    },
+    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+  )
 }
 
 const {lti_response_messages} = ENV

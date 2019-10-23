@@ -115,9 +115,7 @@ export default class StudentsTable extends React.Component {
     const assignmentLid = this.props.assignment.lid
     const courseLid = this.props.assignment.course.lid
     const attempts = student.submission.submissionHistories.nodes.map(attempt => {
-      const viewLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}&student_id=${
-        student.lid
-      }&attempt=${attempt.attempt}`
+      const viewLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}&student_id=${student.lid}&attempt=${attempt.attempt}`
       return (
         <View as="div" margin="0 0 x-small" key={attempt.attempt}>
           <Button

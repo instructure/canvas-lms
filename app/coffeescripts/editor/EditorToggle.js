@@ -65,7 +65,7 @@ export default function EditorToggle(elem, options) {
 }
 
 Object.assign(EditorToggle.prototype, Backbone.Events, {
-// #
+  // #
   // Toggles between editing the content and displaying it
   // @api public
   toggle() {

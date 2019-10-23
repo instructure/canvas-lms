@@ -116,18 +116,18 @@ export default class NewCourseModal extends React.Component {
           <Modal.Body>
             <FormFieldGroup layout="stacked" rowSpacing="small" description="">
               <TextInput
-                label={I18n.t('Course Name')}
+                renderLabel={I18n.t('Course Name')}
                 value={data.name}
                 onChange={onChange('name')}
-                required
+                isRequired
                 messages={errors.name && [{type: 'error', text: errors.name}]}
               />
 
               <TextInput
-                label={I18n.t('Reference Code')}
+                renderLabel={I18n.t('Reference Code')}
                 value={data.course_code}
                 onChange={onChange('course_code')}
-                required
+                isRequired
                 messages={errors.course_code && [{type: 'error', text: errors.course_code}]}
               />
 

@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 import CollectionView from '../CollectionView'
-import FeatureFlagView from '../feature_flags/FeatureFlagView'
+import FeatureFlagView from './FeatureFlagView'
 import template from 'jst/feature_flags/featureFlagList'
 
 export default class FeatureFlagListView extends CollectionView {

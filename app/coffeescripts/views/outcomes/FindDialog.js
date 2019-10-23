@@ -30,7 +30,6 @@ import 'jquery.disableWhileLoading'
 
 // Creates a popup dialog similar to the main outcomes browser minus the toolbar.
 export default class FindDialog extends DialogBaseView {
-
   dialogOptions() {
     return {
       id: 'import_dialog',
@@ -43,12 +42,12 @@ export default class FindDialog extends DialogBaseView {
       buttons: [
         {
           text: I18n.t('#buttons.cancel', 'Cancel'),
-          click: (e) => this.cancel(e)
+          click: e => this.cancel(e)
         },
         {
           text: I18n.t('#buttons.import', 'Import'),
           class: 'btn-primary',
-          click: (e) => this.import(e)
+          click: e => this.import(e)
         }
       ]
     }
@@ -125,11 +124,12 @@ export default class FindDialog extends DialogBaseView {
           source_outcome_group_id: model.get('id'),
           async: true
         })
-          .pipe((resp) => {
-          progress.set('url', resp.url);
-          progress.poll();
-          return progress.pollDfd;
-        }).pipe(() => $.ajaxJSON(progress.get('results').outcome_group_url, 'GET'));
+          .pipe(resp => {
+            progress.set('url', resp.url)
+            progress.poll()
+            return progress.pollDfd
+          })
+          .pipe(() => $.ajaxJSON(progress.get('results').outcome_group_url, 'GET'))
       } else {
         url = this.selectedGroup.get('outcomes_url')
         dfd = $.ajaxJSON(url, 'POST', {outcome_id: model.get('id')})
@@ -153,7 +153,14 @@ export default class FindDialog extends DialogBaseView {
           this.close()
           return $.flashMessage(I18n.t('flash.importSuccess', 'Import successful'))
         })
-        .fail(() => $.flashError(I18n.t('flash.importError', "An error occurred while importing. Please try again later.")));
+        .fail(() =>
+          $.flashError(
+            I18n.t(
+              'flash.importError',
+              'An error occurred while importing. Please try again later.'
+            )
+          )
+        )
     }
   }
 

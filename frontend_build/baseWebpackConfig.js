@@ -82,6 +82,7 @@ module.exports = {
     }
   },
   optimization: {
+    // concatenateModules: false, // uncomment if you want to get more accurate stuff from `yarn webpack:analyze`
     moduleIds: 'hashed',
     minimizer: [
       new TerserPlugin({

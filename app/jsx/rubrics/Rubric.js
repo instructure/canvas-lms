@@ -29,17 +29,18 @@ import {getSavedComments} from './helpers'
 import {rubricShape, rubricAssessmentShape, rubricAssociationShape} from './types'
 import {roundIfWhole} from './Points'
 
-const totalString = (score) => I18n.t('Total Points: %{total}', {
-  total: I18n.toNumber(score, { precision: 2, strip_insignificant_zeros: true })
-})
+const totalString = score =>
+  I18n.t('Total Points: %{total}', {
+    total: I18n.toNumber(score, {precision: 2, strip_insignificant_zeros: true})
+  })
 
 const totalAssessingString = (score, possible) =>
   I18n.t('Total Points: %{total} out of %{possible}', {
     total: roundIfWhole(score),
-    possible: I18n.toNumber(possible, { precision: 2, strip_insignificant_zeros: true })
+    possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true})
   })
 
-const Rubric = (props) => {
+const Rubric = props => {
   const {
     allowExtraCredit,
     customRatings,
@@ -54,20 +55,18 @@ const Rubric = (props) => {
   const peerReview = get(rubricAssessment, 'assessment_type') === 'peer_review'
   const assessing = onAssessmentChange !== null
   const priorData = get(rubricAssessment, 'data', [])
-  const byCriteria = keyBy(priorData, (ra) => ra.criterion_id)
-  const criteriaById = keyBy(rubric.criteria, (c) => c.id)
+  const byCriteria = keyBy(priorData, ra => ra.criterion_id)
+  const criteriaById = keyBy(rubric.criteria, c => c.id)
   const hidePoints = get(rubricAssociation, 'hide_points', false)
   const freeForm = rubric.free_form_criterion_comments
 
-  const onCriteriaChange = (id) => (update) => {
-    const data = priorData.map((prior) => (
-      prior.criterion_id === id ? { ...prior, ...update } : prior
-    ))
+  const onCriteriaChange = id => update => {
+    const data = priorData.map(prior => (prior.criterion_id === id ? {...prior, ...update} : prior))
 
-    const ignore = (c) => isUndefined(c) ? true : c.ignore_for_scoring
+    const ignore = c => (isUndefined(c) ? true : c.ignore_for_scoring)
     const points = data
-      .filter((result) => !ignore(criteriaById[result.criterion_id]))
-      .map((result) => get(result, 'points.value', 0))
+      .filter(result => !ignore(criteriaById[result.criterion_id]))
+      .map(result => get(result, 'points.value', 0))
 
     onAssessmentChange({
       ...rubricAssessment,
@@ -78,13 +77,19 @@ const Rubric = (props) => {
 
   // we show the last column for points or comments button
   const showPointsColumn = () => {
-    if (isSummary) { return false }
-    if (!hidePoints) { return true }
-    if (assessing && !freeForm) { return true } // comments button
+    if (isSummary) {
+      return false
+    }
+    if (!hidePoints) {
+      return true
+    }
+    if (assessing && !freeForm) {
+      return true
+    } // comments button
     return false
   }
 
-  const criteria = rubric.criteria.map((criterion) => {
+  const criteria = rubric.criteria.map(criterion => {
     const assessment = byCriteria[criterion.id]
     return (
       <Criterion
@@ -110,22 +115,26 @@ const Rubric = (props) => {
   const hideScoreTotal = get(rubricAssociation, 'hide_score_total') === true
   const noScore = get(rubricAssociation, 'score') === null
   const showTotalPoints = !hidePoints && !hideScoreTotal
-  const maxRatings = max(rubric.criteria.map((c) => c.ratings.length))
+  const maxRatings = max(rubric.criteria.map(c => c.ratings.length))
   const minSize = () => {
     if (isSummary || flexWidth) return {}
     else {
       const ratingCorrection = freeForm ? 15 : 7.5 * maxRatings
-      return { 'minWidth': `${15 + ratingCorrection}rem` }
+      return {minWidth: `${15 + ratingCorrection}rem`}
     }
   }
 
   const headingCells = [
-    <th key='TableHeadingCriteria'scope="col" className="rubric-criteria">
+    <th key="TableHeadingCriteria" scope="col" className="rubric-criteria">
       {I18n.t('Criteria')}
     </th>,
-    <th key='TableHeadingRatings' scope="col" colSpan={isSummary ? "2" : null} className="ratings">{I18n.t('Ratings')}</th>,
+    <th key="TableHeadingRatings" scope="col" colSpan={isSummary ? '2' : null} className="ratings">
+      {I18n.t('Ratings')}
+    </th>,
     showPointsColumn() ? (
-      <th key='TableHeadingPoints'className="rubric-points" scope="col">{I18n.t('Pts')}</th>
+      <th key="TableHeadingPoints" className="rubric-points" scope="col">
+        {I18n.t('Pts')}
+      </th>
     ) : null
   ]
 
@@ -134,17 +143,13 @@ const Rubric = (props) => {
       <Table caption={<ScreenReaderContent>{rubric.title}</ScreenReaderContent>}>
         <thead>
           {/* This row is a hack to force the fixed layout to render as if the title does not exist */}
-          <tr style={{visibility: 'collapse'}}>
-            {headingCells}
-          </tr>
+          <tr style={{visibility: 'collapse'}}>{headingCells}</tr>
           <tr>
             <th colSpan="3" scope="colgroup" className="rubric-title">
               {rubric.title}
             </th>
           </tr>
-          <tr>
-            {headingCells}
-          </tr>
+          <tr>{headingCells}</tr>
         </thead>
         <tbody className="criterions">
           {criteria}
@@ -170,10 +175,10 @@ Rubric.propTypes = {
   customRatings: PropTypes.arrayOf(PropTypes.object),
   onAssessmentChange: PropTypes.func,
   rubric: PropTypes.shape(rubricShape).isRequired,
-  rubricAssessment: (props) => {
+  rubricAssessment: props => {
     const shape = PropTypes.shape(rubricAssessmentShape)
     const rubricAssessment = props.onAssessmentChange ? shape.isRequired : shape
-    return PropTypes.checkPropTypes({ rubricAssessment }, props, 'prop', 'Rubric')
+    return PropTypes.checkPropTypes({rubricAssessment}, props, 'prop', 'Rubric')
   },
   rubricAssociation: PropTypes.shape(rubricAssociationShape),
   isSummary: PropTypes.bool,

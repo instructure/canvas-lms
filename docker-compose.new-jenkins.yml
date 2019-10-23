@@ -16,21 +16,16 @@ services:
       RAILS_DB_PASSWORD: ''
       DATABASE_URL: "postgres://postgres@postgres:5432/canvas_test"
       RANDOMIZE_SEQUENCES: 1
-      CI_NODE_TOTAL: $CI_NODE_TOTAL
-      CI_NODE_INDEX: $CI_NODE_INDEX
-      KNAPSACK_ENABLED: $KNAPSACK_ENABLED
-      KNAPSACK_TEST_FILE_PATTERN: $KNAPSACK_TEST_FILE_PATTERN
-      KNAPSACK_EXCLUDE_REGEX: $KNAPSACK_EXCLUDE_REGEX
-      KNAPSACK_TEST_DIR: $KNAPSACK_TEST_DIR
-      KNAPSACK_GENERATE_REPORT: $KNAPSACK_GENERATE_REPORT
+      RERUNS_RETRY: $RERUNS_RETRY
+      MAX_FAIL: $MAX_FAIL
 
   redis:
-    image: redis:alpine
+    image: starlord.inscloudgate.net/jenkins/redis:alpine
 
   postgres:
-    build: ./build/docker-compose/postgres/9.5
+    image: starlord.inscloudgate.net/jenkins/postgres:9.5
 
   cassandra:
-    build: ./build/docker-compose/cassandra
+    image: starlord.inscloudgate.net/jenkins/cassandra:2.2
     environment:
       CASSANDRA_START_RPC: 'true'

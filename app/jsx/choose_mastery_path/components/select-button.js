@@ -20,33 +20,34 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import I18n from 'i18n!choose_mastery_path'
-  const { func, bool } = PropTypes
+
+const {func, bool} = PropTypes
 
 export default class SelectButton extends React.Component {
   static propTypes = {
     isSelected: bool,
     isDisabled: bool,
-    onSelect: func.isRequired,
+    onSelect: func.isRequired
   }
 
   onClick = () => {
-    const { isSelected, isDisabled } = this.props
+    const {isSelected, isDisabled} = this.props
     if (!isSelected && !isDisabled) {
       this.props.onSelect()
     }
-  };
+  }
 
-  render () {
-    const { isSelected, isDisabled } = this.props
+  render() {
+    const {isSelected, isDisabled} = this.props
     const isBadge = isSelected || isDisabled
 
     const btnClasses = classNames({
-      'btn': !isBadge,
+      btn: !isBadge,
       'btn-primary': !isBadge,
       'ic-badge': isBadge,
       'cmp-button': true,
       'cmp-button__selected': isSelected,
-      'cmp-button__disabled': isDisabled,
+      'cmp-button__disabled': isDisabled
     })
 
     let text = ''

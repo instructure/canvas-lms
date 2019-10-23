@@ -28,13 +28,11 @@ const SyllabusTray = () => (
     image="/images/tutorial-tray-images/syllabus.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Communicate to your students exactly what will be required
+      {I18n.t(`Communicate to your students exactly what will be required
           of them throughout the course in chronological order. Generate a
-          built-in Syllabus based on Assignments and Events that you've created.`)
-      }
+          built-in Syllabus based on Assignments and Events that you've created.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
-export default SyllabusTray;
+export default SyllabusTray

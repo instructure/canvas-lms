@@ -2416,7 +2416,9 @@ class Course < ActiveRecord::Base
     self.shard.activate do
       RequestCache.cache(key, user, self, opts) do
         Rails.cache.fetch_with_batched_keys([key, self.global_asset_string, opts].compact.cache_key, batch_object: user, batched_keys: :enrollments) do
-          yield
+          Shackles.activate(:master) do
+            yield
+          end
         end
       end
     end

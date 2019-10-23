@@ -97,7 +97,7 @@ export default function MediaPanel(props) {
   }, [contextType, files.length, hasMore, isLoading, fetchInitialMedia])
 
   const handleFileClick = file => {
-    props.onLinkClick(file)
+    props.onMediaEmbed(file)
   }
 
   return (
@@ -130,7 +130,7 @@ MediaPanel.propTypes = {
   contextType: string.isRequired,
   fetchInitialMedia: func.isRequired,
   fetchNextMedia: func.isRequired,
-  onLinkClick: func.isRequired,
+  onMediaEmbed: func.isRequired,
   media: objectOf(shape({
     files: arrayOf(shape(fileShape)).isRequired,
     bookmark: string,

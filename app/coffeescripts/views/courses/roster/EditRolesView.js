@@ -25,7 +25,6 @@ import '../../../jquery.rails_flash_notifications'
 import 'jquery.disableWhileLoading'
 
 export default class EditRolesView extends DialogBaseView {
-
   static initClass() {
     this.mixin(RosterDialogMixin)
 
@@ -65,7 +64,9 @@ export default class EditRolesView extends DialogBaseView {
     const enrollments = this.model.enrollments()
 
     // section ids that already have the new role
-    const existing_section_ids = _.filter(enrollments, en => en.role_id === new_role_id).map(en => en.course_section_id)
+    const existing_section_ids = _.filter(enrollments, en => en.role_id === new_role_id).map(
+      en => en.course_section_id
+    )
 
     const new_enrollments = []
     const deleted_enrollments = []

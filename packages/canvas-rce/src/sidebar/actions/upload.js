@@ -20,10 +20,8 @@ import * as files from "./files";
 import * as images from "./images";
 import Bridge from "../../bridge";
 import {fileEmbed} from "../../common/mimeClass";
-import {VIDEO_SIZE_OPTIONS} from '../../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
 import {isPreviewable} from '../../rce/plugins/shared/Previewable'
-import alertHandler from '../../rce/alertHandler';
-import formatMessage from '../../format-message';
+import {isImage, isAudioOrVideo} from '../../rce/plugins/shared/fileTypeUtils'
 
 export const COMPLETE_FILE_UPLOAD = "COMPLETE_FILE_UPLOAD";
 export const FAIL_FILE_UPLOAD = "FAIL_FILE_UPLOAD";
@@ -133,16 +131,24 @@ export function allUploadCompleteActions(results, fileMetaProps, contextType) {
   return actions;
 }
 
+function linkingExistingContent() {
+  return Bridge.existingContentToLink() || Bridge.existingContentToLinkIsImg()
+}
 export function embedUploadResult(results, selectedTabType) {
   const embedData = fileEmbed(results);
 
-  if (
-    selectedTabType === 'images' &&
-    embedData.type === 'image' &&
-    !(Bridge.existingContentToLink() && !Bridge.existingContentToLinkIsImg())
-  ) {
+  if (selectedTabType === 'images' && isImage(embedData.type) && !linkingExistingContent()) {
     const {href, url, title, display_name, alt_text} = results
     Bridge.insertImage({href, url, title, display_name, alt_text});
+  } else if (selectedTabType === 'media' && isAudioOrVideo(embedData.type) && !linkingExistingContent()) {
+    Bridge.embedMedia({
+      id: embedData.id,
+      embedded_iframe_url: results.embedded_iframe_url,
+      href: results.url,
+      media_id: results.media_id,
+      title: results.title,
+      type: embedData.type
+    })
   } else {
     Bridge.insertLink({
       'data-canvas-previewable': isPreviewable(results['content-type']),
@@ -183,67 +189,27 @@ export function fetchFolders(bookmark) {
   };
 }
 
-function generateUploadOptions(mediatypes, sessionData) {
-  const sessionDataCopy = JSON.parse(JSON.stringify(sessionData))
-  delete sessionDataCopy.kaltura_setting
-  return {
-    kaltura_session: sessionDataCopy,
-    allowedMediaTypes: mediatypes,
-    uploadUrl: sessionData.kaltura_setting.uploadUrl,
-    entryUrl: sessionData.kaltura_setting.entryUrl,
-    uiconfUrl: sessionData.kaltura_setting.uiconfUrl,
-    entryDefaults: {
-      partnerData: sessionData.kaltura_setting.partner_data
+// uploads handled via canvas-media
+export function mediaUploadComplete(error, uploadData) {
+  return (dispatch, _getState) => {
+    const {mediaObject, uploadedFile} = uploadData
+    if (error) {
+      dispatch(failMediaUpload(error))
+      dispatch(removePlaceholdersFor(uploadedFile.name))
+    } else {
+      const embedData = {
+        embedded_iframe_url:mediaObject.embedded_iframe_url,
+        media_id: mediaObject.media_object.media_id,
+        type: uploadedFile.type,
+        title: uploadedFile.name
+      }
+      dispatch(removePlaceholdersFor(uploadedFile.name))
+      embedUploadResult(embedData, 'media')
+      dispatch(mediaUploadSuccess())
     }
   }
 }
 
-function addUploaderReadyEventListeners(uploader, file) {
-  uploader.addEventListener('K5.ready', () => {
-    uploader.uploadFile(file)
-  })
-}
-
-function addUploaderFileErrorEventListeners(uploader, dispatch) {
-  uploader.addEventListener('K5.fileError', (error) => {
-    dispatch(failMediaUpload(error));
-  })
-}
-
-function addUploaderFileCompleteEventListeners(uploader, dispatch, editor, dismiss, context, source) {
-  uploader.addEventListener('K5.complete', (mediaServerMediaObject) => {
-    mediaServerMediaObject.contextCode = `${context.contextType}_${context.contextId}`
-    mediaServerMediaObject.type = `${context.contextType}_${context.contextId}`
-    source.uploadMediaToCanvas(mediaServerMediaObject).then((mediaObject) => {
-      const videoElement = editor.dom.add(editor.getBody(), 'div', { 'id': `media_object_${mediaObject.media_object.media_id}` }, ' ')
-      editor.dom.setStyles(videoElement, {'width': VIDEO_SIZE_OPTIONS.width, 'height': VIDEO_SIZE_OPTIONS.height})
-      editor.dom.add(videoElement, 'iframe', {'src': mediaObject.embedded_iframe_url, 'width': '100%', 'height': '100%', 'scrolling': 'no'});
-      dispatch(mediaUploadSuccess())
-      dismiss()
-    }).catch((error)=> {
-      dispatch(failMediaUpload(error))
-    })
-  })
-}
-
-export function saveMediaRecording(file, editor, dismiss) {
-  return (dispatch, getState) => {
-    dispatch(startLoading())
-    const { source, contextId, contextType } = getState()
-    return source.mediaServerSession()
-    .then((mediaServerSession) => {
-      const session = generateUploadOptions(['video', 'audio', 'webm', 'video/webm', 'audio/webm'], mediaServerSession)
-      Bridge.setMediaServerSession(session)
-      addUploaderReadyEventListeners(Bridge.mediaServerUploader, file)
-      addUploaderFileErrorEventListeners(Bridge.mediaServerUploader, dispatch)
-      addUploaderFileCompleteEventListeners(Bridge.mediaServerUploader, dispatch, editor, dismiss, {contextId, contextType}, source)
-      return Bridge.mediaServerUploader
-    })
-    .catch(error => {
-      dispatch(failMediaUpload(error))
-    })
-  }
-}
 
 export function createMediaServerSession() {
   return (dispatch, getState) => {
@@ -264,7 +230,9 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
     return source.fetchMediaFolder({ jwt, host, contextId, contextType })
     .then(({folders}) => {
       fileMetaProps.parentFolderId = folders[0].id
-      delete fileMetaProps.domObject.preview // don't need this anymore
+      if (fileMetaProps.domObject) {
+        delete fileMetaProps.domObject.preview // don't need this anymore
+      }
       dispatch(uploadPreflight(tabContext, fileMetaProps))
     })
     .catch((e) => {

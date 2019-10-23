@@ -31,17 +31,17 @@ import fcUtil from '../util/fcUtil'
 import userSettings from '../userSettings'
 import colorSlicer from 'color-slicer'
 import calendarAppTemplate from 'jst/calendar/calendarApp'
-import commonEventFactory from '../calendar/commonEventFactory'
-import ShowEventDetailsDialog from '../calendar/ShowEventDetailsDialog'
-import EditEventDetailsDialog from '../calendar/EditEventDetailsDialog'
-import Scheduler from '../calendar/Scheduler'
+import commonEventFactory from './commonEventFactory'
+import ShowEventDetailsDialog from './ShowEventDetailsDialog'
+import EditEventDetailsDialog from './EditEventDetailsDialog'
+import Scheduler from './Scheduler'
 import CalendarNavigator from '../views/calendar/CalendarNavigator'
 import AgendaView from '../views/calendar/AgendaView'
-import calendarDefaults from '../calendar/CalendarDefaults'
+import calendarDefaults from './CalendarDefaults'
 import ContextColorer from '../contextColorer'
 import deparam from '../util/deparam'
 import htmlEscape from 'str/htmlEscape'
-import calendarEventFilter from '../calendar/CalendarEventFilter'
+import calendarEventFilter from './CalendarEventFilter'
 import schedulerActions from 'jsx/calendar/scheduler/actions'
 import 'fullcalendar'
 import 'fullcalendar/dist/lang-all'
@@ -259,13 +259,13 @@ export default class Calendar {
   // This is used to set a custom time format for regions who use 24 hours time.
   // We return null in the non 24 time case so that we can allow the fullcallendar npm package
   // to set whatever time format calendar events should be
-  eventTimeFormat () {
-    return I18n.lookup('time.formats.tiny_on_the_hour') === "%k:%M" ? "HH:mm" : null
+  eventTimeFormat() {
+    return I18n.lookup('time.formats.tiny_on_the_hour') === '%k:%M' ? 'HH:mm' : null
   }
 
   today = () => {
     return this.gotoDate(fcUtil.now())
-  };
+  }
 
   // FullCalendar callbacks
   getEvents = (start, end, timezone, donecb, datacb) => {
@@ -274,16 +274,25 @@ export default class Calendar {
 
     const _donecb = events => {
       if (this.displayAppointmentEvents) {
-        return this.dataSource.getEventsForAppointmentGroup(this.displayAppointmentEvents, aEvents => {
-          // Make sure any events in the current appointment group get marked -
-          // order is important here, as some events in aEvents may also appear in
-          // events. So clear events first, then mark aEvents. Our de-duping algorithm
-          // will keep the duplicates at the end of the list first.
-          events.forEach(event => event.removeClass('current-appointment-group'))
-          aEvents.forEach(event => event.addClass('current-appointment-group'))
-          this.gettingEvents = false
-          donecb(calendarEventFilter(this.displayAppointmentEvents, events.concat(aEvents), this.schedulerState))
-        })
+        return this.dataSource.getEventsForAppointmentGroup(
+          this.displayAppointmentEvents,
+          aEvents => {
+            // Make sure any events in the current appointment group get marked -
+            // order is important here, as some events in aEvents may also appear in
+            // events. So clear events first, then mark aEvents. Our de-duping algorithm
+            // will keep the duplicates at the end of the list first.
+            events.forEach(event => event.removeClass('current-appointment-group'))
+            aEvents.forEach(event => event.addClass('current-appointment-group'))
+            this.gettingEvents = false
+            donecb(
+              calendarEventFilter(
+                this.displayAppointmentEvents,
+                events.concat(aEvents),
+                this.schedulerState
+              )
+            )
+          }
+        )
       } else {
         this.gettingEvents = false
         if (datacb) {
@@ -295,11 +304,12 @@ export default class Calendar {
     }
 
     let _datacb
-    if (datacb) _datacb = events => datacb(calendarEventFilter(this.displayAppointmentEvents, events, this.schedulerState))
+    if (datacb)
+      _datacb = events =>
+        datacb(calendarEventFilter(this.displayAppointmentEvents, events, this.schedulerState))
 
     return this.dataSource.getEvents(start, end, contexts, _donecb, _datacb)
-  };
-
+  }
 
   // Close all event details popup on the page and have them cleaned up.
   closeEventPopups() {
@@ -315,7 +325,7 @@ export default class Calendar {
   windowResize = view => {
     this.closeEventPopups()
     this.drawNowLine()
-  };
+  }
 
   eventRender = (event, element, view) => {
     const $element = $(element)
@@ -335,7 +345,9 @@ export default class Calendar {
 
     const screenReaderTitleHint = event.eventType.match(/assignment/)
       ? I18n.t('Assignment Title:')
-      : event.eventType === 'planner_note' ? I18n.t('To Do:') : I18n.t('Event Title:')
+      : event.eventType === 'planner_note'
+      ? I18n.t('To Do:')
+      : I18n.t('Event Title:')
 
     let reservedText = ''
     if (event.isAppointmentGroupEvent()) {
@@ -360,11 +372,9 @@ export default class Calendar {
       .find('.fc-content')
       .prepend(
         $(
-          `<span class='screenreader-only'>${
-            htmlEscape(I18n.t('calendar_title', 'Calendar:'))
-          } ${
-            htmlEscape(event.contextInfo.name)
-          }</span>`
+          `<span class='screenreader-only'>${htmlEscape(
+            I18n.t('calendar_title', 'Calendar:')
+          )} ${htmlEscape(event.contextInfo.name)}</span>`
         )
       )
     $element
@@ -373,7 +383,7 @@ export default class Calendar {
     $element.find('.fc-title').toggleClass('calendar__event--completed', event.isCompleted())
     element.find('.fc-content').prepend($('<i />', {class: `icon-${event.iconType()}`}))
     return true
-  };
+  }
 
   eventAfterRender = (event, element, view) => {
     this.enableExternalDrags(element)
@@ -392,7 +402,11 @@ export default class Calendar {
         .find('.ui-resizable-handle')
         .remove()
     }
-    if (event.eventType.match(/assignment/) && event.isDueStrictlyAtMidnight() && view.name === 'month') {
+    if (
+      event.eventType.match(/assignment/) &&
+      event.isDueStrictlyAtMidnight() &&
+      view.name === 'month'
+    ) {
       element.find('.fc-time').empty()
     }
     if (
@@ -413,23 +427,23 @@ export default class Calendar {
         view
       )
     }
-  };
+  }
 
   eventDragStart = (event, jsEvent, ui, view) => {
     $('.fc-highlight-skeleton').remove()
     this.lastEventDragged = event
     this.closeEventPopups()
-  };
+  }
 
   eventResizeStart = (event, jsEvent, ui, view) => {
     this.closeEventPopups()
-  };
+  }
 
   // event triggered by items being dropped from within the calendar
   eventDrop = (event, delta, revertFunc, jsEvent, ui, view) => {
     const minuteDelta = delta.asMinutes()
     return this._eventDrop(event, minuteDelta, event.allDay, revertFunc)
-  };
+  }
 
   _eventDrop(event, minuteDelta, allDay, revertFunc) {
     let endDate, startDate
@@ -485,7 +499,7 @@ export default class Calendar {
 
   eventResize = (event, delta, revertFunc, jsEvent, ui, view) => {
     return event.saveDates(null, revertFunc)
-  };
+  }
 
   activeContexts() {
     const allowedContexts =
@@ -503,7 +517,7 @@ export default class Calendar {
     event = commonEventFactory(null, this.activeContexts())
     event.date = this.getCurrentDate()
     return new EditEventDetailsDialog(event, this.useBetterScheduler).show()
-  };
+  }
 
   eventClick = (event, jsEvent, view) => {
     const $event = $(jsEvent.currentTarget)
@@ -515,7 +529,7 @@ export default class Calendar {
       $event.data('showEventDetailsDialog', detailsDialog)
       return detailsDialog.show(jsEvent)
     }
-  };
+  }
 
   dayClick = (date, jsEvent, view) => {
     if (this.displayAppointmentEvents) {
@@ -528,15 +542,15 @@ export default class Calendar {
     event.date = date
     event.allDay = !date.hasTime()
     return new EditEventDetailsDialog(event, this.useBetterScheduler).show()
-  };
+  }
 
   updateFragment(opts) {
     const replaceState = !!opts.replaceState
     opts = _.omit(opts, 'replaceState')
     const data = this.dataFromDocumentHash()
     let changed = false
-    for (let k in opts) {
-      let v = opts[k]
+    for (const k in opts) {
+      const v = opts[k]
       if (data[k] !== v) changed = true
       if (v) {
         data[k] = v
@@ -545,11 +559,11 @@ export default class Calendar {
       }
     }
     if (changed) {
-      const fragment = "#" + $.param(data, this)
-      if (replaceState || location.hash === "") {
-        return history.replaceState(null, "", fragment)
+      const fragment = '#' + $.param(data, this)
+      if (replaceState || location.hash === '') {
+        return history.replaceState(null, '', fragment)
       } else {
-        return location.href = fragment
+        return (location.href = fragment)
       }
     }
   }
@@ -557,7 +571,7 @@ export default class Calendar {
   viewRender = view => {
     this.setDateTitle(view.title)
     this.drawNowLine()
-  };
+  }
 
   enableExternalDrags = eventEl => {
     return $(eventEl).draggable({
@@ -570,7 +584,7 @@ export default class Calendar {
       // clone doesn't seem to work :(
       helper: 'clone'
     })
-  };
+  }
 
   isSameWeek(date1, date2) {
     const week1 = fcUtil
@@ -605,12 +619,12 @@ export default class Calendar {
     const secondHeight =
       (($('.fc-time-grid').css('height') || '').replace('px', '') || 0) / 24 / 60 / 60
     this.$nowLine.css('top', `${seconds * secondHeight}px`)
-  };
+  }
 
   setDateTitle = title => {
     this.header.setHeaderText(title)
     return this.schedulerNavigator.setTitle(title)
-  };
+  }
 
   // event triggered by items being dropped from outside the calendar
   drop = (date, jsEvent, ui) => {
@@ -627,7 +641,7 @@ export default class Calendar {
       return
     }
     return this.calendar.fullCalendar('renderEvent', event)
-  };
+  }
 
   // callback from minicalendar telling us an event from here was dragged there
   dropOnMiniCalendar(date, allDay, jsEvent, ui) {
@@ -674,7 +688,7 @@ export default class Calendar {
     }
 
     return this.gotoDate(this.getCurrentDate())
-  };
+  }
 
   reloadClick = event => {
     if (event != null) {
@@ -687,7 +701,7 @@ export default class Calendar {
       }
       return this.calendar.fullCalendar('refetchEvents')
     }
-  };
+  }
 
   // Subscriptions
 
@@ -705,19 +719,19 @@ export default class Calendar {
       event._end = event.end ? fcUtil.clone(event.end) : null
     }
     return this.calendar.fullCalendar('updateEvent', event)
-  };
+  }
 
   eventDeleting = event => {
     event.addClass('event_pending')
     return this.updateEvent(event)
-  };
+  }
 
   eventDeleted = event => {
     if (event.isAppointmentGroupEvent() && event.calendarEvent.parent_event_id) {
       this.handleUnreserve(event)
     }
     return this.calendar.fullCalendar('removeEvents', event.id)
-  };
+  }
 
   // when an appointment event was deleted, clear the reserved flag and increment the available slot count on the parent
   handleUnreserve = event => {
@@ -738,7 +752,7 @@ export default class Calendar {
 
       return this.refetchEvents()
     }
-  };
+  }
 
   eventSaving = event => {
     if (!event.start) {
@@ -750,7 +764,7 @@ export default class Calendar {
     } else {
       return this.updateEvent(event)
     }
-  };
+  }
 
   eventSaved = event => {
     event.removeClass('event_pending')
@@ -768,7 +782,7 @@ export default class Calendar {
     // to dated, and in that case we don't know whether to just update it or
     // add it. Some new state would need to be kept to track that.
     this.closeEventPopups()
-  };
+  }
 
   eventSaveFailed = event => {
     event.removeClass('event_pending')
@@ -777,7 +791,7 @@ export default class Calendar {
     } else {
       return this.updateEvent(event)
     }
-  };
+  }
 
   // When an assignment event is updated, update its related overrides.
   updateOverrides = event => {
@@ -786,7 +800,7 @@ export default class Calendar {
         override.updateAssignmentTitle(event.title)
       }
     })
-  };
+  }
 
   visibleContextListChanged = newList => {
     this.visibleContextList = newList
@@ -794,21 +808,21 @@ export default class Calendar {
       this.loadAgendaView()
     }
     return this.calendar.fullCalendar('refetchEvents')
-  };
+  }
 
   ajaxStarted = () => {
     this.activeAjax += 1
     return this.header.animateLoading(true)
-  };
+  }
 
   ajaxEnded = () => {
     this.activeAjax -= 1
     return this.header.animateLoading(this.activeAjax > 0)
-  };
+  }
 
   refetchEvents = () => {
     return this.calendar.fullCalendar('refetchEvents')
-  };
+  }
 
   // Methods
 
@@ -821,12 +835,12 @@ export default class Calendar {
     }
     this.setCurrentDate(date)
     this.drawNowLine()
-  };
+  }
 
   navigateDate = d => {
     const date = fcUtil.wrap(d)
     this.gotoDate(date)
-  };
+  }
 
   handleArrow(type) {
     let start
@@ -939,7 +953,7 @@ export default class Calendar {
       this.scheduler.hide()
       return this.header.hidePrevNext()
     }
-  };
+  }
 
   loadAgendaView() {
     const date = this.getCurrentDate()
@@ -980,7 +994,7 @@ export default class Calendar {
         })
       )
     }, 500)
-  };
+  }
 
   showSchedulerSingle(group) {
     this.agenda.viewingGroup = group
@@ -993,7 +1007,7 @@ export default class Calendar {
     this.scheduler.doneClick()
     this.header.showSchedulerTitle()
     return this.schedulerNavigator.hide()
-  };
+  }
 
   colorizeContexts = () => {
     // Get any custom colors that have been set
@@ -1033,7 +1047,7 @@ export default class Calendar {
 
       $styleContainer.html(`<style>${html}</style>`)
     })
-  };
+  }
 
   dataFromDocumentHash = () => {
     let data = {}
@@ -1049,7 +1063,7 @@ export default class Calendar {
       data = {}
     }
     return data
-  };
+  }
 
   onSchedulerStateChange = () => {
     const newState = this.schedulerStore.getState()
@@ -1065,7 +1079,7 @@ export default class Calendar {
         return this.loadAgendaView()
       }
     }
-  };
+  }
 
   findAppointmentModeGroups = () => {
     if (this.schedulerState.inFindAppointmentMode && this.schedulerState.selectedCourse) {
@@ -1075,7 +1089,7 @@ export default class Calendar {
     } else {
       return []
     }
-  };
+  }
 
   ensureCourseVisible(course) {
     $.publish('Calendar/ensureCourseVisible', course.asset_string)
@@ -1092,7 +1106,7 @@ export default class Calendar {
       range.end = fcUtil.unwrap(view.intervalEnd)
     }
     return range
-  };
+  }
 
   findNextAppointment = () => {
     // determine whether any reservable appointment slots are visible
@@ -1133,5 +1147,5 @@ export default class Calendar {
         }
       }
     )
-  };
+  }
 }

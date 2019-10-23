@@ -28,14 +28,14 @@ export default class ToolConfiguration extends React.Component {
   // require changing how the form button's actions are used to get the data from the
   // form.
   generateToolConfiguration = () => {
-    return this.configMethodsRef.generateToolConfiguration();
+    return this.configMethodsRef.generateToolConfiguration()
   }
 
   valid = () => {
     return this.configMethodsRef.valid()
   }
 
-  setConfigurationMethodsRef = node => this.configMethodsRef = node;
+  setConfigurationMethodsRef = node => (this.configMethodsRef = node)
 
   body() {
     if (!this.props.createLtiKeyState.customizing) {

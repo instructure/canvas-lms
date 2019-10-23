@@ -19,7 +19,7 @@
 import I18n from 'i18n!notification_preferences'
 import $ from 'jquery'
 import _ from 'underscore'
-import NotificationGroupMappings from '../notifications/NotificationGroupMappings'
+import NotificationGroupMappings from './NotificationGroupMappings'
 import notificationPreferencesTemplate from 'jst/profiles/notification_preferences'
 import PolicyCell from 'jsx/notification_preferences/PolicyCell'
 import 'jquery.disableWhileLoading'
@@ -28,8 +28,7 @@ import '../jquery.rails_flash_notifications'
 import 'jqueryui/tooltip'
 
 export default class NotificationPreferences {
-
-  constructor (options) {
+  constructor(options) {
     this.buildPolicyCellsProps = this.buildPolicyCellsProps.bind(this)
     this.policyCellProps = this.policyCellProps.bind(this)
     this.communicationEventGroups = this.communicationEventGroups.bind(this)
@@ -41,27 +40,32 @@ export default class NotificationPreferences {
     this.initGrid = this.initGrid.bind(this)
     this.options = options
     // Define the buttons for display. The 'code' must match up to the Notification::FREQ_* constants.
-    this.buttonData = [{
-      code: 'immediately',
-      icon: 'icon-check',
-      text: I18n.t('frequencies.immediately', 'ASAP'),
-      title: I18n.t('frequencies.title.right_away', 'Notify me right away'),
-    }, {
-      code: 'daily',
-      icon: 'icon-clock',
-      text: I18n.t('frequencies.daily', 'Daily'),
-      title: I18n.t('frequencies.title.daily', 'Send daily summary'),
-    }, {
-      code: 'weekly',
-      icon: 'icon-calendar-month',
-      text: I18n.t('frequencies.weekly', 'Weekly'),
-      title: I18n.t('frequencies.title.weekly', 'Send weekly summary'),
-    }, {
-      code: 'never',
-      icon: 'icon-x',
-      text: I18n.t('frequencies.never', 'Never'),
-      title: I18n.t('frequencies.title.never', 'Do not send me anything'),
-    }]
+    this.buttonData = [
+      {
+        code: 'immediately',
+        icon: 'icon-check',
+        text: I18n.t('frequencies.immediately', 'ASAP'),
+        title: I18n.t('frequencies.title.right_away', 'Notify me right away')
+      },
+      {
+        code: 'daily',
+        icon: 'icon-clock',
+        text: I18n.t('frequencies.daily', 'Daily'),
+        title: I18n.t('frequencies.title.daily', 'Send daily summary')
+      },
+      {
+        code: 'weekly',
+        icon: 'icon-calendar-month',
+        text: I18n.t('frequencies.weekly', 'Weekly'),
+        title: I18n.t('frequencies.title.weekly', 'Send weekly summary')
+      },
+      {
+        code: 'never',
+        icon: 'icon-x',
+        text: I18n.t('frequencies.never', 'Never'),
+        title: I18n.t('frequencies.title.never', 'Do not send me anything')
+      }
+    ]
 
     this.limitedButtonData = [_.head(this.buttonData), _.last(this.buttonData)]
 
@@ -72,7 +76,7 @@ export default class NotificationPreferences {
     this.showObservedNames = this.options.show_observed_names
 
     // Give each channel a 'name'
-    this.channels.forEach((c) => {
+    this.channels.forEach(c => {
       c.name = {
         email: I18n.t('Email Address'),
         sms: I18n.t('Cell Number'),
@@ -88,8 +92,11 @@ export default class NotificationPreferences {
   }
 
   buildPolicyCellsProps = category =>
-    this.channels.map((channel) => {
-      const policy = _.find(this.policies, p => p.communication_channel_id === channel.id && p.category === category.category)
+    this.channels.map(channel => {
+      const policy = _.find(
+        this.policies,
+        p => p.communication_channel_id === channel.id && p.category === category.category
+      )
       const frequency = policy ? policy.frequency : 'never'
       return this.policyCellProps(category, channel, frequency)
     })
@@ -108,7 +115,7 @@ export default class NotificationPreferences {
     }
   }
 
-  communicationEventGroups () {
+  communicationEventGroups() {
     // Want return structure to be like this...
     //    {
     //      name: 'Course Activities',
@@ -133,14 +140,14 @@ export default class NotificationPreferences {
     for (const groupName in this.mappings.groups) {
       const items = this.mappings.groups[groupName]
       const groupItems = []
-      items.forEach((categoryName) => {
+      items.forEach(categoryName => {
         // Find the event and add it if found
         const category = _.find(this.categories, e => e.category === categoryName)
         if (category) {
           const item = {
             title: category.display_name,
             description: category.category_description,
-            policyCells: this.buildPolicyCellsProps(category),
+            policyCells: this.buildPolicyCellsProps(category)
           }
           if (category.option) {
             item.checkName = category.option.name
@@ -163,33 +170,35 @@ export default class NotificationPreferences {
   }
 
   // Find and return the button data for the given code.
-  findButtonDataForCode (buttonCode) {
+  findButtonDataForCode(buttonCode) {
     return _.find(this.buttonData, b => b.code === buttonCode)
   }
 
   // Build the HTML notifications table.
-  buildTable () {
+  buildTable() {
     const eventGroups = this.communicationEventGroups()
-    $('#notification-preferences').append(notificationPreferencesTemplate({
-      channels: this.channels,
-      eventGroups,
-      buttonData: this.buttonData,
-      showObservedNames: {
-        available: this.showObservedNames != null,
-        name: 'send_observed_names_in_notifications',
-        on: this.showObservedNames,
-        label: I18n.t('Show name of observed students in notifications.'),
-      }
-    }))
+    $('#notification-preferences').append(
+      notificationPreferencesTemplate({
+        channels: this.channels,
+        eventGroups,
+        buttonData: this.buttonData,
+        showObservedNames: {
+          available: this.showObservedNames != null,
+          name: 'send_observed_names_in_notifications',
+          on: this.showObservedNames,
+          label: I18n.t('Show name of observed students in notifications.')
+        }
+      })
+    )
 
     // Display Bootstrap-like popover tooltip on category names. Allow entire cell to trigger popup.
     $('#notification-preferences .category-name.show-popover').tooltip({
       position: {
         my: 'left center',
         at: 'right+20 center',
-        collision: 'none none',
+        collision: 'none none'
       },
-      tooltipClass: 'popover left middle horizontal',
+      tooltipClass: 'popover left middle horizontal'
     })
 
     this.renderAllPolicyCells(eventGroups)
@@ -202,10 +211,10 @@ export default class NotificationPreferences {
   }
 
   // Record the value for the cell.
-  renderAllPolicyCells (eventGroups) {
-    eventGroups.forEach((group) => {
-      group.items.forEach((item) => {
-        item.policyCells.forEach((cell) => {
+  renderAllPolicyCells(eventGroups) {
+    eventGroups.forEach(group => {
+      group.items.forEach(item => {
+        item.policyCells.forEach(cell => {
           const selector = `.comm-event-option[data-category='${cell.category}'][data-channelid='${cell.channelId}']`
           const $elt = $(selector)
           PolicyCell.renderAt($elt.find('.comm-event-option-contents')[0], cell)
@@ -215,31 +224,47 @@ export default class NotificationPreferences {
   }
 
   // Record the value for the cell.
-  saveNewPolicyValue (category, channelId, newValue) {
+  saveNewPolicyValue(category, channelId, newValue) {
     const data = {
       category,
       channel_id: channelId,
-      frequency: newValue,
+      frequency: newValue
     }
-    this.$notificationSaveStatus.disableWhileLoading($.ajaxJSON(this.updateUrl, 'PUT', data, null, () =>
-      $.flashError(I18n.t('communication.errors.saving_preferences_failed', 'Oops! Something broke.  Please try again'))
-    ), this.spinOpts)
+    this.$notificationSaveStatus.disableWhileLoading(
+      $.ajaxJSON(this.updateUrl, 'PUT', data, null, () =>
+        $.flashError(
+          I18n.t(
+            'communication.errors.saving_preferences_failed',
+            'Oops! Something broke.  Please try again'
+          )
+        )
+      ),
+      this.spinOpts
+    )
   }
 
   // Setup event bindings.
-  setupEventBindings () {
+  setupEventBindings() {
     const $notificationPrefs = $('#notification-preferences')
 
     // Catch the change for a user preference and record it at the server.
-    $notificationPrefs.find('.user-pref-check').on('change', (e) => {
+    $notificationPrefs.find('.user-pref-check').on('change', e => {
       const check = $(e.currentTarget)
       const checkStatus = check.attr('checked') === 'checked'
       // Send user preference value to server
       const data = {user: {}}
       data.user[check.attr('name')] = checkStatus
-      this.$notificationSaveStatus.disableWhileLoading($.ajaxJSON(this.updateUrl, 'PUT', data, null, () =>
-        $.flashError(I18n.t('communication.errors.saving_preferences_failed', 'Oops! Something broke.  Please try again'))
-      ), this.spinOpts)
+      this.$notificationSaveStatus.disableWhileLoading(
+        $.ajaxJSON(this.updateUrl, 'PUT', data, null, () =>
+          $.flashError(
+            I18n.t(
+              'communication.errors.saving_preferences_failed',
+              'Oops! Something broke.  Please try again'
+            )
+          )
+        ),
+        this.spinOpts
+      )
     })
   }
 
@@ -247,7 +272,7 @@ export default class NotificationPreferences {
   spinOpts = {length: 4, radius: 5, width: 3}
 
   // Initialize the grid.
-  initGrid () {
+  initGrid() {
     this.buildTable()
   }
 }

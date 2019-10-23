@@ -226,5 +226,77 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       expect(sidebar_files.count).to eq 3
     end
   end
+
+  context "wiki sidebar images and locking/hiding" do
+    before(:each) do
+      stub_rcs_config
+      course_with_teacher_logged_in(:active_all => true, :name => 'wiki course')
+      @root_folder = Folder.root_folders(@course).first
+      @sub_folder = @root_folder.sub_folders.create!(:name => "subfolder", :context => @course)
+
+      @visible_attachment = @course.attachments.build(:filename => 'foo.png', :folder => @root_folder)
+      @visible_attachment.content_type = 'image/png'
+      @visible_attachment.save!
+
+      @attachment = @course.attachments.build(:filename => 'foo2.png', :folder => @sub_folder)
+      @attachment.content_type = 'image/png'
+      @attachment.save!
+    end
+
+    it "should show image files if their containing folder is locked" do
+      @sub_folder.locked = true
+      @sub_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 2
+    end
+
+    it "should show image files if their containing folder is hidden" do
+      @sub_folder.workflow_state = 'hidden'
+      @sub_folder.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 2
+    end
+
+    it "should show image files if the files navigation tab is hidden" do
+      @course.tab_configuration = [{:id => Course::TAB_FILES, :hidden => true}]
+      @course.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 2
+    end
+
+    it "should show image files if they are hidden" do
+      @attachment.file_state = 'hidden'
+      @attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 2
+    end
+
+    it "should show image files if they are locked" do
+      @attachment.locked = true
+      @attachment.save!
+
+      get "/courses/#{@course.id}/discussion_topics/new"
+      expect(f('#editor_tabs')).to be_displayed
+      click_images_tab
+      wait_for_ajaximations
+      expect(sidebar_images.count).to eq 2
+    end
+  end
 end
 

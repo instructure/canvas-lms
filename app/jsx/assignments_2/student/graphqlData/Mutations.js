@@ -91,13 +91,21 @@ export const CREATE_SUBMISSION_COMMENT = gql`
 export const CREATE_SUBMISSION_DRAFT = gql`
   mutation CreateSubmissionDraft(
     $id: ID!
+    $activeSubmissionType: DraftableSubmissionType!
     $attempt: Int!
     $body: String
     $fileIds: [ID!]
     $url: String
   ) {
     createSubmissionDraft(
-      input: {submissionId: $id, attempt: $attempt, body: $body, fileIds: $fileIds, url: $url}
+      input: {
+        submissionId: $id
+        activeSubmissionType: $activeSubmissionType
+        attempt: $attempt
+        body: $body
+        fileIds: $fileIds
+        url: $url
+      }
     ) {
       submissionDraft {
         ...SubmissionDraft

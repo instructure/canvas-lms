@@ -441,4 +441,42 @@ describe Types::SubmissionType do
       ).to eq [[], [@rubric_assessment.id.to_s], []]
     end
   end
+
+  describe 'turnitin_data' do
+    tii_data = {
+      similarity_score: 10,
+      state: 'acceptable',
+      report_url: 'http://example.com',
+      status: 'scored'
+    }
+
+    before(:once) do
+      @submission.turnitin_data[@submission.asset_string] = tii_data
+      @submission.save!
+    end
+
+    it 'returns turnitin_data' do
+      expect(
+        submission_type.resolve('turnitinData { target { ...on Submission { _id } } }')
+      ).to eq [@submission.id.to_s]
+      expect(
+        submission_type.resolve('turnitinData { status }')
+      ).to eq [tii_data[:status]]
+      expect(
+        submission_type.resolve('turnitinData { score }')
+      ).to eq [tii_data[:similarity_score]]
+    end
+  end
+
+  describe 'submissionType' do
+    before(:once) do
+      @assignment.submit_homework(@student, body: 'bar', submission_type: 'online_text_entry')
+    end
+
+    it 'returns the submissionType' do
+      expect(
+        submission_type.resolve('submissionType')
+      ).to eq 'online_text_entry'
+    end
+  end
 end

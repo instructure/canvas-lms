@@ -120,6 +120,7 @@ describe('FileUpload', () => {
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {
           id: '1',
+          activeSubmissionType: 'online_upload',
           attempt: 1,
           fileIds: ['1', '2']
         }
@@ -174,6 +175,7 @@ describe('FileUpload', () => {
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {
           id: '1',
+          activeSubmissionType: 'online_upload',
           attempt: 1,
           fileIds: ['1']
         }
@@ -220,6 +222,7 @@ describe('FileUpload', () => {
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {
           id: '1',
+          activeSubmissionType: 'online_upload',
           attempt: 2,
           fileIds: ['1']
         }
@@ -242,6 +245,7 @@ describe('FileUpload', () => {
       expect(props.createSubmissionDraft).toHaveBeenCalledWith({
         variables: {
           id: '1',
+          activeSubmissionType: 'online_upload',
           attempt: 1,
           fileIds: ['1']
         }

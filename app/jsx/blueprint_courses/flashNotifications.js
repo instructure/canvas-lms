@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { showFlashAlert } from '../shared/FlashAlert'
+import {showFlashAlert} from '../shared/FlashAlert'
 import actions from './actions'
 
 export default class FlashNotifications {
-  static subscribe (store) {
+  static subscribe(store) {
     store.subscribe(() => {
       const nots = store.getState().notifications
-      nots.forEach((not) => {
+      nots.forEach(not => {
         showFlashAlert(not)
         store.dispatch(actions.clearNotification(not.id))
       })

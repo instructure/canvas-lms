@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, arrayOf, string, number } from 'prop-types'
+import {shape, arrayOf, string, number} from 'prop-types'
 
 const propTypes = {}
 

@@ -17,31 +17,29 @@
  */
 
 import I18n from 'i18n!direct_share_course_tray'
-import React, {Suspense, lazy} from 'react'
-import {Spinner} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
-import CanvasTray from 'jsx/shared/components/CanvasTray'
+import React, {lazy} from 'react'
+import CanvasLazyTray from 'jsx/shared/components/CanvasLazyTray'
 
 const DirectShareCoursePanel = lazy(() => import('jsx/shared/direct_share/DirectShareCoursePanel'))
 
-export default function DirectShareCourseTray({sourceCourseId, contentSelection, onDismiss, ...trayProps}) {
-  const suspenseFallback = (
-    <View as="div" textAlign="center">
-      <Spinner renderTitle={I18n.t('Loading...')} />
-    </View>
-  )
-
+export default function DirectShareCourseTray({
+  sourceCourseId,
+  contentSelection,
+  onDismiss,
+  ...trayProps
+}) {
   return (
-    <CanvasTray label={I18n.t('Copy To...')} placement="end" onDismiss={onDismiss} {...trayProps}>
-      <View as="div" padding="small 0 0 0">
-        <Suspense fallback={suspenseFallback}>
-          <DirectShareCoursePanel
-            sourceCourseId={sourceCourseId}
-            contentSelection={contentSelection}
-            onCancel={onDismiss}
-          />
-        </Suspense>
-      </View>
-    </CanvasTray>
+    <CanvasLazyTray
+      label={I18n.t('Copy To...')}
+      placement="end"
+      onDismiss={onDismiss}
+      {...trayProps}
+    >
+      <DirectShareCoursePanel
+        sourceCourseId={sourceCourseId}
+        contentSelection={contentSelection}
+        onCancel={onDismiss}
+      />
+    </CanvasLazyTray>
   )
 }

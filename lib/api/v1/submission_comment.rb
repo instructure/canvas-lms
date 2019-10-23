@@ -20,6 +20,7 @@ module Api::V1::SubmissionComment
   include GradebookSettingsHelpers
 
   ANONYMOUS_MODERATED_JSON_ATTRIBUTES = %i[
+    attempt
     author_id
     author_name
     cached_attachments

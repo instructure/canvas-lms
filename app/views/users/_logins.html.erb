@@ -19,7 +19,14 @@
 <% if can_do(@user, @current_user, :manage, :manage_user_details) %>
   <% css_bundle :user_logins %>
   <% js_bundle :user_logins %>
-  <% js_env :PASSWORD_POLICY => (@domain_root_account.try(:password_policy) || {}) %>
+  <script>
+    Object.assign(
+      ENV,
+      <%= raw StringifyIds.recursively_stringify_ids({
+        :PASSWORD_POLICY => @domain_root_account.try(:password_policy) || {}
+      }).to_json %>
+    )
+  </script>
   <fieldset id="login_information">
     <legend>
       <h4 class="profileHeader">

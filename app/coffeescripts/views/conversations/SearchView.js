@@ -21,7 +21,6 @@ import {View} from 'Backbone'
 import AutocompleteView from './AutocompleteView'
 
 export default class SearchView extends View {
-
   static initClass() {
     this.prototype.els = {'#search-autocomplete': '$autocomplete'}
   }

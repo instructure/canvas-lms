@@ -224,20 +224,73 @@ describe('UploadFile', () => {
       expect(fakeEditor.content).toEqual('<img src="http://fake/path" />')
     })
 
-    it('calls contentProps.startMediaUpload when Computer panel is selected', () => {
-      const fakeMediaUpload = jest.fn()
-      const fakeFile = {
-        name: 'foo.png',
-        size: 3000,
-        type: 'image/png'
-      }
-      handleSubmit(fakeEditor, 'images/*', 'COMPUTER', { theFile: fakeFile}, { startMediaUpload: fakeMediaUpload })
-      expect(fakeMediaUpload).toHaveBeenCalledWith("images", {
-        parentFolderId: 'media',
-        name: 'foo.png',
-        size: 3000,
-        contentType: 'image/png',
-        domObject: fakeFile
+    describe('contentProps.startMediaUpload', () => {
+      it('called for images when Computer panel is selected', () => {
+        const fakeMediaUpload = jest.fn()
+        const fakeFile = {
+          name: 'foo.png',
+          size: 3000,
+          type: 'image/png'
+        }
+        handleSubmit(fakeEditor, 'images/*', 'COMPUTER', { theFile: fakeFile}, { startMediaUpload: fakeMediaUpload })
+        expect(fakeMediaUpload).toHaveBeenCalledWith("images", {
+          parentFolderId: 'media',
+          name: 'foo.png',
+          size: 3000,
+          contentType: 'image/png',
+          domObject: fakeFile
+        })
+      })
+
+      it('called for video media when Computer panel is selected', () => {
+        const fakeMediaUpload = jest.fn()
+        const fakeFile = {
+          name: 'foo.mov',
+          size: 3000,
+          type: 'video/mov'
+        }
+        handleSubmit(fakeEditor, 'video/*', 'COMPUTER', { theFile: fakeFile}, { startMediaUpload: fakeMediaUpload })
+        expect(fakeMediaUpload).toHaveBeenCalledWith("media", {
+          parentFolderId: 'media',
+          name: 'foo.mov',
+          size: 3000,
+          contentType: 'video/mov',
+          domObject: fakeFile
+        })
+      })
+
+      it('called for audio media when Computer panel is selected', () => {
+        const fakeMediaUpload = jest.fn()
+        const fakeFile = {
+          name: 'foo.mp3',
+          size: 3000,
+          type: 'audio/mp3'
+        }
+        handleSubmit(fakeEditor, 'audio/*', 'COMPUTER', { theFile: fakeFile}, { startMediaUpload: fakeMediaUpload })
+        expect(fakeMediaUpload).toHaveBeenCalledWith("media", {
+          parentFolderId: 'media',
+          name: 'foo.mp3',
+          size: 3000,
+          contentType: 'audio/mp3',
+          domObject: fakeFile
+        })
+      })
+
+      it('called for documents when Computer panel is selected', () => {
+        const fakeMediaUpload = jest.fn()
+        const fakeFile = {
+          name: 'foo.txt',
+          size: 3000,
+          type: 'text/plain'
+        }
+        handleSubmit(fakeEditor, 'video/*', 'COMPUTER', { theFile: fakeFile}, { startMediaUpload: fakeMediaUpload })
+        expect(fakeMediaUpload).toHaveBeenCalledWith("documents", {
+          parentFolderId: 'media',
+          name: 'foo.txt',
+          size: 3000,
+          contentType: 'text/plain',
+          domObject: fakeFile
+        })
       })
     })
 

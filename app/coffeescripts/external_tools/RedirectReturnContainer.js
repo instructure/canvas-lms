@@ -29,15 +29,15 @@ export default class RedirectReturnContainer {
     } else {
       return this.redirectToSuccessUrl()
     }
-  };
+  }
 
   _contentCancel = (event, data) => {
     location.href = this.cancelUrl
-  };
+  }
 
   redirectToSuccessUrl = () => {
     location.href = this.successUrl
-  };
+  }
 
   createMigration = file_url => {
     const data = {
@@ -49,7 +49,7 @@ export default class RedirectReturnContainer {
 
     const migrationUrl = `/api/v1/courses/${ENV.course_id}/content_migrations`
     return $.ajaxJSON(migrationUrl, 'POST', data, this.redirectToSuccessUrl, this.handleError)
-  };
+  }
 
   handleError(data) {
     return $.flashError(data.message)

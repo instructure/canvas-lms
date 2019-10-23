@@ -22,26 +22,26 @@ import 'jquery.cookie'
 
 const helper = new NotificationsHelper()
 
-function initFlashContainer () {
+function initFlashContainer() {
   helper.initHolder()
   helper.initScreenreaderHolder()
 }
 initFlashContainer()
 
 // Pops up a small notification box at the top of the screen.
-$.flashMessage = function (content, timeout = 3000) {
+$.flashMessage = function(content, timeout = 3000) {
   helper.createNode('success', content, timeout)
   createScreenreaderNodeWithDelay(content)
 }
 
 // Pops up a small error box at the top of the screen.
-$.flashError = function (content, timeout) {
+$.flashError = function(content, timeout) {
   helper.createNode('error', content, timeout)
   createScreenreaderNodeWithDelay(content)
 }
 
 // Pops up a small warning box at the top of the screen.
-$.flashWarning = function (content, timeout = 3000) {
+$.flashWarning = function(content, timeout = 3000) {
   helper.createNode('warning', content, timeout)
   createScreenreaderNodeWithDelay(content)
 }
@@ -53,12 +53,13 @@ $.screenReaderFlashError = content => helper.createScreenreaderNode(content, fal
 // This is for when you want to clear the flash message content prior to
 // updating it with new content.  Makes it so the SR only reads this one
 // message.
-$.screenReaderFlashMessageExclusive = (content, polite = false) => helper.createScreenreaderNodeExclusive(content, polite)
+$.screenReaderFlashMessageExclusive = (content, polite = false) =>
+  helper.createScreenreaderNodeExclusive(content, polite)
 
 $.initFlashContainer = () => initFlashContainer()
 
-function renderServerNotifications () {
-  if ((typeof ENV !== 'undefined') && ENV && ENV.notices) {
+function renderServerNotifications() {
+  if (typeof ENV !== 'undefined' && ENV && ENV.notices) {
     ENV.notices.forEach(notice => {
       helper.createNode(notice.type, notice.content, undefined, undefined, notice.classes)
       createScreenreaderNodeWithDelay(notice.content, false)
@@ -66,7 +67,7 @@ function renderServerNotifications () {
   }
 }
 
-function createScreenreaderNodeWithDelay (content, closable = true) {
+function createScreenreaderNodeWithDelay(content, closable = true) {
   setTimeout(() => helper.createScreenreaderNode(content, closable), 100)
 }
 

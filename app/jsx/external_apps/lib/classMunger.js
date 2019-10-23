@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var classMunger = function(staticClassName, conditionalClassNames) {
-  var classNames = [];
-  if (typeof conditionalClassNames == 'undefined') {
-    conditionalClassNames = staticClassName;
+const classMunger = function(staticClassName, conditionalClassNames) {
+  const classNames = []
+  if (typeof conditionalClassNames === 'undefined') {
+    conditionalClassNames = staticClassName
   } else {
-    classNames.push(staticClassName);
+    classNames.push(staticClassName)
   }
-  for (var className in conditionalClassNames) {
-    if (!!conditionalClassNames[className]) {
-      classNames.push(className);
+  for (const className in conditionalClassNames) {
+    if (conditionalClassNames[className]) {
+      classNames.push(className)
     }
   }
-  return classNames.join(' ');
-};
+  return classNames.join(' ')
+}
 
 export default classMunger

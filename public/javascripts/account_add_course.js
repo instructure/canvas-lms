@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!accounts'
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import htmlEscape from './str/htmlEscape'
 import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
@@ -25,6 +26,7 @@ import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery.rails_flash_notifications'
 import './jquery.templateData' /* fillTemplateData */
 
+ready(() => {
   $(".add_course_link").click(event => {
     event.preventDefault();
     $("#add_course_form :text").val("");
@@ -69,3 +71,4 @@ import './jquery.templateData' /* fillTemplateData */
   $("#add_course_dialog .cancel_button").click(() => {
     $("#add_course_dialog").dialog('close');
   });
+})

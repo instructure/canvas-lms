@@ -28,7 +28,7 @@ xsslint jqueryObject.identifier el
 */
 
 Backbone.syncWithoutMultipart = Backbone.sync
-Backbone.syncWithMultipart = function (method, model, options) {
+Backbone.syncWithMultipart = function(method, model, options) {
   // Create a hidden iframe
   const iframeId = _.uniqueId('file_upload_iframe_')
   const $iframe = $(`<iframe id="${iframeId}" name="${iframeId}"></iframe>`).hide()
@@ -39,10 +39,10 @@ Backbone.syncWithMultipart = function (method, model, options) {
     create: 'POST',
     update: 'PUT',
     delete: 'DELETE',
-    read: 'GET',
+    read: 'GET'
   }[method]
 
-  function toForm (object, nested, asArray) {
+  function toForm(object, nested, asArray) {
     const inputs = _.map(object, (attr, key) => {
       if (nested) key = `${nested}[${asArray ? '' : key}]`
 
@@ -56,12 +56,17 @@ Backbone.syncWithMultipart = function (method, model, options) {
       } else if (!`${key}`.match(/^_/) && attr != null && attr instanceof Date) {
         return $('<input/>', {
           name: key,
-          value: attr.toISOString(),
+          value: attr.toISOString()
         })[0]
-      } else if (!`${key}`.match(/^_/) && attr != null && typeof attr !== 'object' && typeof attr !== 'function') {
+      } else if (
+        !`${key}`.match(/^_/) &&
+        attr != null &&
+        typeof attr !== 'object' &&
+        typeof attr !== 'function'
+      ) {
         return $('<input/>', {
           name: key,
-          value: attr,
+          value: attr
         })[0]
       }
     })
@@ -86,7 +91,7 @@ Backbone.syncWithMultipart = function (method, model, options) {
     )
   }
 
-  _.each(toForm(model.toJSON()), (el) => {
+  _.each(toForm(model.toJSON()), el => {
     if (!el) return
     // s3 expects the file param last
     $form[el.name === 'file' ? 'append' : 'prepend'](el)
@@ -94,9 +99,8 @@ Backbone.syncWithMultipart = function (method, model, options) {
 
   $(document.body).prepend($iframe, $form)
 
-  function callback () {
-    const iframeBody = $iframe[0].contentDocument &&
-                       $iframe[0].contentDocument.body
+  function callback() {
+    const iframeBody = $iframe[0].contentDocument && $iframe[0].contentDocument.body
 
     let response = $.parseJSON($(iframeBody).text())
     // in case the form redirects after receiving the upload (API uploads),
@@ -125,6 +129,8 @@ Backbone.syncWithMultipart = function (method, model, options) {
   return dfd
 }
 
-export default (Backbone.sync = function (method, model, options) {
-  return Backbone[options && options.multipart ? 'syncWithMultipart' : 'syncWithoutMultipart'].apply(this, arguments)
-})
+export default Backbone.sync = function(method, model, options) {
+  return Backbone[
+    options && options.multipart ? 'syncWithMultipart' : 'syncWithoutMultipart'
+  ].apply(this, arguments)
+}

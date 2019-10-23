@@ -21,18 +21,18 @@ import processSingleContentItem from '../processSingleContentItem'
 
 const content_items = [
   {
-    type: "link",
+    type: 'link',
     title: 'title',
     url: 'http://www.tool.com'
   },
   {
-    type: "ltiResourceLink",
+    type: 'ltiResourceLink',
     title: 'LTI Link',
     url: 'http://www.tool.com/lti'
   }
 ]
 
-const data = (overrides) => ({
+const data = overrides => ({
   content_items,
   msg: 'message',
   log: 'log',
@@ -61,14 +61,14 @@ describe('processSingleContentItem', () => {
   })
 
   it('extracts the first content item', () => {
-    processSingleContentItem({data: data()}).then((result) => {
+    processSingleContentItem({data: data()}).then(result => {
       expect(result).toEqual(content_items[0])
     })
   })
 
   describe('when no content items are provided', () => {
     it('returns "undefined"', () => {
-      processSingleContentItem({data: data({content_items: []})}).then((result) => {
+      processSingleContentItem({data: data({content_items: []})}).then(result => {
         expect(result).toBeUndefined()
       })
     })

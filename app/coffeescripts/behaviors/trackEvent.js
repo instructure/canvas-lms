@@ -27,7 +27,7 @@ import {trackEvent} from 'jquery.google-analytics'
 //     data-track-action="some action"
 //     data-track-value="some value"
 //   >click here</a>
-$('body').on('click', '[data-track-category]', function () {
+$('body').on('click', '[data-track-category]', function() {
   const {trackCategory, trackLabel, trackAction, trackValue} = $(this).data()
   trackEvent(trackCategory, trackAction, trackLabel, trackValue)
 })

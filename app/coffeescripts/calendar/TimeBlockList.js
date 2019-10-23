@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!calendar'
-import TimeBlockListManager from '../calendar/TimeBlockListManager'
-import TimeBlockRow from '../calendar/TimeBlockRow'
+import TimeBlockListManager from './TimeBlockListManager'
+import TimeBlockRow from './TimeBlockRow'
 import 'jquery.instructure_date_and_time'
 import 'jquery.instructure_forms'
 import 'vendor/date'

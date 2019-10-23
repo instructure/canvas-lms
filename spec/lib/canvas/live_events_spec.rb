@@ -1207,4 +1207,155 @@ describe Canvas::LiveEvents do
       end
     end
   end
+
+  describe 'learning_outcomes' do
+    before do
+      @context = course_model
+    end
+
+    context 'created' do
+      it 'should trigger a learning_outcome_created live event' do
+        outcome_model
+
+        expect_event('learning_outcome_created', {
+          learning_outcome_id: @outcome.id.to_s,
+          context_type: @outcome.context_type,
+          context_id: @outcome.context_id.to_s,
+          display_name: @outcome.display_name,
+          short_description: @outcome.short_description,
+          description: @outcome.description,
+          vendor_guid: @outcome.vendor_guid,
+          calculation_method: @outcome.calculation_method,
+          calculation_int: @outcome.calculation_int,
+          rubric_criterion: @outcome.rubric_criterion,
+          title: @outcome.title,
+          workflow_state: @outcome.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_created(@outcome)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger a learning_outcome_updated live event' do
+        outcome_model
+
+        @outcome.update!(short_description: 'this is new')
+
+        expect_event('learning_outcome_updated', {
+          learning_outcome_id: @outcome.id.to_s,
+          context_type: @outcome.context_type,
+          context_id: @outcome.context_id.to_s,
+          display_name: @outcome.display_name,
+          short_description: @outcome.short_description,
+          description: @outcome.description,
+          vendor_guid: @outcome.vendor_guid,
+          calculation_method: @outcome.calculation_method,
+          calculation_int: @outcome.calculation_int,
+          rubric_criterion: @outcome.rubric_criterion,
+          title: @outcome.title,
+          updated_at: @outcome.updated_at,
+          workflow_state: @outcome.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_updated(@outcome)
+      end
+    end
+  end
+
+  describe 'learning_outcome_groups' do
+    before do
+      @context = course_model
+    end
+
+    context 'created' do
+      it 'should trigger a learning_outcome_group_created live event' do
+        outcome_group_model
+
+
+        expect_event('learning_outcome_group_created', {
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          context_id: @outcome_group.context_id.to_s,
+          context_type: @outcome_group.context_type,
+          title: @outcome_group.title,
+          description: @outcome_group.description,
+          vendor_guid: @outcome_group.vendor_guid,
+          parent_outcome_group_id: @outcome_group.learning_outcome_group_id.to_s,
+          workflow_state: @outcome_group.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_group_created(@outcome_group)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger a learning_outcome_group_updated live event' do
+        outcome_group_model
+
+        @outcome_group.update!(title: 'this is new')
+
+        expect_event('learning_outcome_group_updated', {
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          context_id: @outcome_group.context_id.to_s,
+          context_type: @outcome_group.context_type,
+          title: @outcome_group.title,
+          description: @outcome_group.description,
+          vendor_guid: @outcome_group.vendor_guid,
+          parent_outcome_group_id: @outcome_group.learning_outcome_group_id.to_s,
+          updated_at: @outcome_group.updated_at,
+          workflow_state: @outcome_group.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_group_updated(@outcome_group)
+      end
+    end
+  end
+
+  describe 'learning_outcome_links' do
+    before do
+      @context = course_model
+    end
+
+    context 'created' do
+      it 'should trigger a learning_outcome_link_created live event' do
+        outcome_model
+        outcome_group_model
+
+        link = @outcome_group.add_outcome(@outcome)
+
+        expect_event('learning_outcome_link_created', {
+          learning_outcome_link_id: link.id.to_s,
+          learning_outcome_id: @outcome.id.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          context_id: link.context_id.to_s,
+          context_type: link.context_type,
+          workflow_state: link.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_link_created(link)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger a learning_outcome_link_updated live event' do
+        outcome_model
+        outcome_group_model
+
+        link = @outcome_group.add_outcome(@outcome)
+        link.destroy!
+
+        expect_event('learning_outcome_link_updated', {
+          learning_outcome_link_id: link.id.to_s,
+          learning_outcome_id: @outcome.id.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          context_id: link.context_id.to_s,
+          context_type: link.context_type,
+          workflow_state: link.workflow_state,
+          updated_at: link.updated_at
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_link_updated(link)
+      end
+    end
+  end
 end

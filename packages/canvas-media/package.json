@@ -7,8 +7,8 @@
   "module": "es/index.js",
   "sideEffects": false,
   "scripts": {
-    "test": "jest",
-    "jest": "jest",
+    "test": "jest --runInBand",
+    "jest": "jest --runInBand",
     "build:canvas": "babel --root-mode upward src -d es & JEST_WORKER_ID=true babel --root-mode upward src -d lib"
   },
   "repository": {
@@ -22,6 +22,7 @@
   "homepage": "https://github.com/instructure/canvas-lms#readme",
   "dependencies": {
     "@instructure/canvas-theme": "^6.8.1",
+    "@instructure/k5uploader": "^1.0.0",
     "@instructure/media-capture": "^5",
     "@instructure/ui-a11y": "^6.8.1",
     "@instructure/ui-alerts": "^6.8.1",
@@ -52,6 +53,8 @@
   "devDependencies": {
     "@testing-library/dom": "^6",
     "@testing-library/react": "^9",
-    "@testing-library/user-event": "^4.1.0"
+    "@testing-library/user-event": "^4.1.0",
+    "moxios": "^0.4",
+    "sinon": "^7"
   }
 }

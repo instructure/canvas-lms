@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import tz from 'timezone'
 import _ from 'underscore'
@@ -26,10 +26,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 class FriendlyDatetime extends Component {
   static propTypes = {
-    dateTime: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.instanceOf(Date)
-    ]).isRequired,
+    dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
     format: PropTypes.string,
     prefix: PropTypes.string,
     showTime: PropTypes.bool
@@ -37,7 +34,7 @@ class FriendlyDatetime extends Component {
 
   static defaultProps = {
     format: null,
-    prefix: "",
+    prefix: '',
     showTime: false
   }
 
@@ -45,56 +42,64 @@ class FriendlyDatetime extends Component {
   // tz.parse, $.fudge, $.datetimeString, etc.
   // As long as @props.datetime stays same, we don't have to recompute our output.
   // memoizing like this beat React.addons.PureRenderMixin 3x
-  render = _.memoize(() => {
-    // Separate props not used by the `time` element
-    const {showTime, ...timeElementProps} = this.props
+  render = _.memoize(
+    () => {
+      // Separate props not used by the `time` element
+      const {showTime, ...timeElementProps} = this.props
 
-    let datetime = this.props.dateTime
-    if (!datetime) {
-      return (<time />)
-    }
-    if (!_.isDate(datetime)) {
-      datetime = tz.parse(datetime)
-    }
-    const fudged = $.fudgeDateForProfileTimezone(datetime)
-    let friendly
-    if (this.props.format) {
-      friendly = tz.format(datetime, this.props.format)
-    } else if (showTime) {
-      friendly = $.datetimeString(datetime)
-    } else {
-      friendly = $.friendlyDatetime(fudged)
-    }
+      let datetime = this.props.dateTime
+      if (!datetime) {
+        return <time />
+      }
+      if (!_.isDate(datetime)) {
+        datetime = tz.parse(datetime)
+      }
+      const fudged = $.fudgeDateForProfileTimezone(datetime)
+      let friendly
+      if (this.props.format) {
+        friendly = tz.format(datetime, this.props.format)
+      } else if (showTime) {
+        friendly = $.datetimeString(datetime)
+      } else {
+        friendly = $.friendlyDatetime(fudged)
+      }
 
-    const timeProps = Object.assign({}, timeElementProps, {
-      title: $.datetimeString(datetime),
-      dateTime: datetime.toISOString(),
-    })
+      const timeProps = {
+        ...timeElementProps,
+        title: $.datetimeString(datetime),
+        dateTime: datetime.toISOString()
+      }
 
-    let fixedPrefix = this.props.prefix
-    if (fixedPrefix && !fixedPrefix.endsWith(' ')) {
-      fixedPrefix += ' '
-    }
+      let fixedPrefix = this.props.prefix
+      if (fixedPrefix && !fixedPrefix.endsWith(' ')) {
+        fixedPrefix += ' '
+      }
 
-    return (
-      <span data-testid="friendly-date-time">
-        <ScreenReaderContent>
-          {fixedPrefix + friendly}
-        </ScreenReaderContent>
+      return (
+        <span data-testid="friendly-date-time">
+          <ScreenReaderContent>{fixedPrefix + friendly}</ScreenReaderContent>
 
-        <time {...timeProps} ref={(c) => { this.time = c }} aria-hidden="true">
-          <span className="visible-desktop">
-            {/* something like: Mar 6, 2014 */}
-            {fixedPrefix + friendly}
-          </span>
-          <span className="hidden-desktop">
-            {/* something like: 3/3/2014 */}
-            {fudged.toLocaleDateString()}
-          </span>
-        </time>
-      </span>
-    )
-  }, () => this.props.dateTime)
+          <time
+            {...timeProps}
+            ref={c => {
+              this.time = c
+            }}
+            aria-hidden="true"
+          >
+            <span className="visible-desktop">
+              {/* something like: Mar 6, 2014 */}
+              {fixedPrefix + friendly}
+            </span>
+            <span className="hidden-desktop">
+              {/* something like: 3/3/2014 */}
+              {fudged.toLocaleDateString()}
+            </span>
+          </time>
+        </span>
+      )
+    },
+    () => this.props.dateTime
+  )
 }
 
 export default FriendlyDatetime

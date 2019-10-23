@@ -19,59 +19,56 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!react_collaborations'
-  class LoadMore extends React.Component {
 
-    static propTypes = {
-      hasMore: PropTypes.bool.isRequired,
-      loadMore: PropTypes.func.isRequired,
-      isLoading: PropTypes.bool,
-      children: PropTypes.any
-    }
-
-    componentDidUpdate (oldProps) {
-      let oldCount = React.Children.count(oldProps.children)
-      let newCount = React.Children.count(this.props.children)
-      // not first results and not on delete
-      if (oldCount > 0 && newCount > oldCount) {
-        let element = this.refs.parent.querySelector(`*:nth-child(${oldCount + 1}) .lor-result a`)
-        if (element) {
-          element.focus()
-        }
-      }
-    }
-
-    render () {
-      const hasChildren = React.Children.count(this.props.children) > 0
-      const opacity = this.props.isLoading ? 1 : 0
-
-      return (
-        <div className='LoadMore' ref='parent'>
-          {this.props.children}
-
-          {this.props.hasMore && !this.props.isLoading &&
-            <div className='LoadMore-button'>
-              <button className='Button--link' onClick={this.props.loadMore}>
-                {I18n.t('Load more results')}
-              </button>
-            </div>
-          }
-
-          {hasChildren && this.props.hasMore &&
-            <div
-              aria-hidden={!this.props.isLoading}
-              className='LoadMore-loader'>
-            </div>
-          }
-        </div>
-      )
-    }
-  };
-
-  LoadMore.propTypes = {
+class LoadMore extends React.Component {
+  static propTypes = {
     hasMore: PropTypes.bool.isRequired,
     loadMore: PropTypes.func.isRequired,
     isLoading: PropTypes.bool,
     children: PropTypes.any
-  };
+  }
+
+  componentDidUpdate(oldProps) {
+    const oldCount = React.Children.count(oldProps.children)
+    const newCount = React.Children.count(this.props.children)
+    // not first results and not on delete
+    if (oldCount > 0 && newCount > oldCount) {
+      const element = this.refs.parent.querySelector(`*:nth-child(${oldCount + 1}) .lor-result a`)
+      if (element) {
+        element.focus()
+      }
+    }
+  }
+
+  render() {
+    const hasChildren = React.Children.count(this.props.children) > 0
+    const opacity = this.props.isLoading ? 1 : 0
+
+    return (
+      <div className="LoadMore" ref="parent">
+        {this.props.children}
+
+        {this.props.hasMore && !this.props.isLoading && (
+          <div className="LoadMore-button">
+            <button className="Button--link" onClick={this.props.loadMore}>
+              {I18n.t('Load more results')}
+            </button>
+          </div>
+        )}
+
+        {hasChildren && this.props.hasMore && (
+          <div aria-hidden={!this.props.isLoading} className="LoadMore-loader" />
+        )}
+      </div>
+    )
+  }
+}
+
+LoadMore.propTypes = {
+  hasMore: PropTypes.bool.isRequired,
+  loadMore: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool,
+  children: PropTypes.any
+}
 
 export default LoadMore

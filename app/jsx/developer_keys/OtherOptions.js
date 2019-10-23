@@ -41,7 +41,9 @@ const OtherOptions = props => (
         <td>
           {I18n.t('Privacy Level')}
           <Tooltip
-            tip={I18n.t("A Public privacy level will send the launching user's personally identifying information to the tool provider. Setting this to Private may adversely affect tools that depend on that information.")}
+            tip={I18n.t(
+              "A Public privacy level will send the launching user's personally identifying information to the tool provider. Setting this to Private may adversely affect tools that depend on that information."
+            )}
             on={['click', 'hover', 'focus']}
           >
             <Button variant="icon" icon={IconInfoLine}>

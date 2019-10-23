@@ -18,71 +18,70 @@
 
 import Backbone from 'Backbone'
 
-  /**
-   * Creates a data store with some initial state.
-   *
-   * ```js
-   * var UserStore = createStore({loaded: false, users: []});
-   *
-   * UserStore.load = function() {
-   *   $.getJSON('/users', function(users) {
-   *     UserStore.setState({loaded: true, users});
-   *   });
-   * };
-   * ```
-   *
-   * Then in a component:
-   *
-   * ```js
-   * var UsersView = React.createClass({
-   *   getInitialState () {
-   *     return UserStore.getState();
-   *   },
-   *
-   *   componentDidMount () {
-   *     UserStore.addChangeListener(this.handleStoreChange);
-   *     UserStore.load();
-   *   },
-   *
-   *   handleStoreChange () {
-   *     this.setState(UserStore.getState());
-   *   }
-   * });
-   * ```
-   */
+/**
+ * Creates a data store with some initial state.
+ *
+ * ```js
+ * var UserStore = createStore({loaded: false, users: []});
+ *
+ * UserStore.load = function() {
+ *   $.getJSON('/users', function(users) {
+ *     UserStore.setState({loaded: true, users});
+ *   });
+ * };
+ * ```
+ *
+ * Then in a component:
+ *
+ * ```js
+ * var UsersView = React.createClass({
+ *   getInitialState () {
+ *     return UserStore.getState();
+ *   },
+ *
+ *   componentDidMount () {
+ *     UserStore.addChangeListener(this.handleStoreChange);
+ *     UserStore.load();
+ *   },
+ *
+ *   handleStoreChange () {
+ *     this.setState(UserStore.getState());
+ *   }
+ * });
+ * ```
+ */
 
-  function createStore(initialState) {
-    var events = {...Backbone.Events};
-    var state = initialState || {};
+function createStore(initialState) {
+  const events = {...Backbone.Events}
+  let state = initialState || {}
 
-    return {
-      setState (newState) {
-        Object.assign(state, newState);
-        this.emitChange();
-      },
+  return {
+    setState(newState) {
+      Object.assign(state, newState)
+      this.emitChange()
+    },
 
-      getState () {
-        return state;
-      },
+    getState() {
+      return state
+    },
 
-      clearState() {
-        state = {};
-        this.emitChange();
-      },
+    clearState() {
+      state = {}
+      this.emitChange()
+    },
 
-      addChangeListener  (listener) {
-        events.on('change', listener);
-      },
+    addChangeListener(listener) {
+      events.on('change', listener)
+    },
 
-      removeChangeListener  (listener) {
-        events.off('change', listener);
-      },
+    removeChangeListener(listener) {
+      events.off('change', listener)
+    },
 
-      emitChange () {
-        events.trigger('change');
-      }
-
-    };
-  };
+    emitChange() {
+      events.trigger('change')
+    }
+  }
+}
 
 export default createStore

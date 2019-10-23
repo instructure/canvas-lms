@@ -27,10 +27,9 @@ import 'jquery.instructure_misc_helpers'
 import 'vendor/date'
 import fcUtil from '../util/fcUtil'
 import ValidatedFormView from '../views/ValidatedFormView'
-import '../calendar/fcMomentHandlebarsHelpers'
+import './fcMomentHandlebarsHelpers'
 
 export default class EditToDoItemDetails extends ValidatedFormView {
-
   template = editToDoItemTemplate
 
   constructor(selector, event, contextChangeCB, closeCB) {
@@ -58,18 +57,18 @@ export default class EditToDoItemDetails extends ValidatedFormView {
   }
 
   activate() {
-    let title;
-    switch(this.event.object.plannable_type) {
-    case 'wiki_page':
-      title = I18n.t('Page')
-      break
-    case 'discussion_topic':
-      title = I18n.t('Discussion')
-      break
-    default:
-      title = I18n.t('To Do Item')
+    let title
+    switch (this.event.object.plannable_type) {
+      case 'wiki_page':
+        title = I18n.t('Page')
+        break
+      case 'discussion_topic':
+        title = I18n.t('Discussion')
+        break
+      default:
+        title = I18n.t('To Do Item')
     }
-    $("#edit_event_tabs .edit_todo_item_option").text(title)
+    $('#edit_event_tabs .edit_todo_item_option').text(title)
 
     $('#edit_todo_item_form_holder .more_options_link').attr('href', this.event.editUrl)
   }
@@ -77,7 +76,7 @@ export default class EditToDoItemDetails extends ValidatedFormView {
   setupTimeAndDatePickers() {
     // select the appropriate fields
     const $date = this.$el.find('.date_field')
-    const $time = this.$el.find(".time_field.note_time")
+    const $time = this.$el.find('.time_field.note_time')
 
     // set them up as appropriate variants of datetime_field
     $date.datetime_field({
@@ -99,7 +98,7 @@ export default class EditToDoItemDetails extends ValidatedFormView {
 
     const todo_date = data.date
     if (todo_date) {
-      const { time } = data
+      const {time} = data
       let due_at = todo_date.toString('yyyy-MM-dd')
       if (time) {
         due_at += time.toString(' HH:mm')

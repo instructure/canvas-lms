@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import React from 'react'
 import LoadMore from '../load-more'
 
 describe('LoadMore', () => {
   const defaultProps = {
     hasMore: false,
-    loadMore() { },
+    loadMore() {},
     isLoading: false
   }
 
@@ -35,6 +35,6 @@ describe('LoadMore', () => {
     const mockLoadMore = jest.fn()
     const wrapper = shallow(<LoadMore {...defaultProps} hasMore loadMore={mockLoadMore} />)
     wrapper.find('.Button--link').simulate('click')
-    expect(mockLoadMore).toBeCalled()
+    expect(mockLoadMore).toHaveBeenCalled()
   })
 })

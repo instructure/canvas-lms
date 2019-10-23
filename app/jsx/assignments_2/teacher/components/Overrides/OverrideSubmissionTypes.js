@@ -142,7 +142,12 @@ export default class OverrideSubmissionTypes extends React.Component {
     slotType: SimpleType
   }
 
-  static urlType = {name: I18n.t('URL'), icon: IconLinkLine, value: 'online_url', slotType: SimpleType}
+  static urlType = {
+    name: I18n.t('URL'),
+    icon: IconLinkLine,
+    value: 'online_url',
+    slotType: SimpleType
+  }
 
   static submissionTypes = [
     OverrideSubmissionTypes.appType,

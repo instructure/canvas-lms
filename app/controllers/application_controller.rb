@@ -119,60 +119,71 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {}, overwrite = false)
+    if hash.present? && @js_env_has_been_rendered
+      begin
+        raise "you tried to add something to js_env after js_env has been rendered. if you are streaming templates, you must js_env from the controller not the view"
+      rescue => e
+        ErrorReport.log_exception('js_env_with_streaming', e)
+        raise e unless Rails.env.production?
+      end
+    end
+
     return {} unless request.format.html? || request.format == "*/*" || @include_js_env
     # set some defaults
     unless @js_env
-      editor_css = [
-        active_brand_config_url('css'),
-        view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
-      ]
+      benchmark("init @js_env") do
+        editor_css = [
+          active_brand_config_url('css'),
+          view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
+        ]
 
-      editor_hc_css = [
-        active_brand_config_url('css', { force_high_contrast: true }),
-        view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor', false, { force_high_contrast: true }))
-      ]
+        editor_hc_css = [
+          active_brand_config_url('css', { force_high_contrast: true }),
+          view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor', false, { force_high_contrast: true }))
+        ]
 
-      @js_env = {
-        ASSET_HOST: Canvas::Cdn.add_brotli_to_host_if_supported(request),
-        active_brand_config_json_url: active_brand_config_url('json'),
-        url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
-        url_for_high_contrast_tinymce_editor_css: editor_hc_css,
-        current_user_id: @current_user.try(:id),
-        current_user_roles: @current_user.try(:roles, @domain_root_account),
-        current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
-        files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
-        DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
-        k12: k12?,
-        use_responsive_layout: use_responsive_layout?,
-        use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
-        help_link_name: help_link_name,
-        help_link_icon: help_link_icon,
-        use_high_contrast: @current_user.try(:prefers_high_contrast?),
-        LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances(request.user_agent),
-        DEEP_LINKING_POST_MESSAGE_ORIGIN: request.base_url,
-        DEEP_LINKING_LOGGING: Setting.get('deep_linking_logging', nil),
-        SETTINGS: {
-          open_registration: @domain_root_account.try(:open_registration?),
-          collapse_global_nav: @current_user.try(:collapse_global_nav?),
-          show_feedback_link: show_feedback_link?
-        },
-      }
-      @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
-      @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
-      @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
-      @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
-      @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
-      @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
-      @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
-      unless @js_env[:LOCALE]
-        I18n.set_locale_with_localizer
-        @js_env[:LOCALE] = I18n.locale.to_s
-        @js_env[:BIGEASY_LOCALE] = I18n.bigeasy_locale
-        @js_env[:FULLCALENDAR_LOCALE] = I18n.fullcalendar_locale
-        @js_env[:MOMENT_LOCALE] = I18n.moment_locale
+        @js_env = {
+          ASSET_HOST: Canvas::Cdn.add_brotli_to_host_if_supported(request),
+          active_brand_config_json_url: active_brand_config_url('json'),
+          url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
+          url_for_high_contrast_tinymce_editor_css: editor_hc_css,
+          current_user_id: @current_user.try(:id),
+          current_user_roles: @current_user.try(:roles, @domain_root_account),
+          current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
+          files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
+          DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
+          k12: k12?,
+          use_responsive_layout: use_responsive_layout?,
+          use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
+          help_link_name: help_link_name,
+          help_link_icon: help_link_icon,
+          use_high_contrast: @current_user.try(:prefers_high_contrast?),
+          LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances(request.user_agent),
+          DEEP_LINKING_POST_MESSAGE_ORIGIN: request.base_url,
+          DEEP_LINKING_LOGGING: Setting.get('deep_linking_logging', nil),
+          SETTINGS: {
+            open_registration: @domain_root_account.try(:open_registration?),
+            collapse_global_nav: @current_user.try(:collapse_global_nav?),
+            show_feedback_link: show_feedback_link?
+          },
+        }
+        @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
+        @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
+        @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
+        @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
+        @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
+        @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
+        @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
+        unless @js_env[:LOCALE]
+          I18n.set_locale_with_localizer
+          @js_env[:LOCALE] = I18n.locale.to_s
+          @js_env[:BIGEASY_LOCALE] = I18n.bigeasy_locale
+          @js_env[:FULLCALENDAR_LOCALE] = I18n.fullcalendar_locale
+          @js_env[:MOMENT_LOCALE] = I18n.moment_locale
+        end
+
+        @js_env[:lolcalize] = true if ENV['LOLCALIZE']
       end
-
-      @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end
 
     hash.each do |k,v|
@@ -186,6 +197,13 @@ class ApplicationController < ActionController::Base
     @js_env
   end
   helper_method :js_env
+
+  def render_js_env
+    res = StringifyIds.recursively_stringify_ids(js_env.clone).to_json
+    @js_env_has_been_rendered = true
+    res
+  end
+  helper_method :render_js_env
 
   # add keys to JS environment necessary for the RCE at the given risk level
   def rce_js_env(domain: request.env['HTTP_HOST'])
@@ -1648,7 +1666,7 @@ class ApplicationController < ActionController::Base
           @return_url = success_url
         else
           if @context
-            @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
+            @return_url = set_return_url
           else
             @return_url = external_content_success_url('external_tool_redirect')
           end
@@ -1716,6 +1734,19 @@ class ApplicationController < ActionController::Base
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
       redirect_to named_context_url(context, error_redirect_symbol)
     end
+  end
+
+  def set_return_url
+    ref = request.referer
+    # when flag is enabled, new quizzes quiz creation can only be initiated from quizzes page
+    # but we still use the assignment#new page to create the quiz.
+    # also handles launch from existing quiz on quizzes page.
+    if @assignment&.quiz_lti?
+      if (ref.include?('assignments/new') || ref.include?('quiz')) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+        return polymorphic_url([@context, :quizzes])
+      end
+    end
+    named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
   end
 
   def lti_launch_params(adapter)
@@ -2476,6 +2507,8 @@ class ApplicationController < ActionController::Base
     ctx[:user_agent] = request.headers['User-Agent']
     ctx[:client_ip] = request.remote_ip
     ctx[:url] = request.url
+    # The Caliper spec uses the spelling "referrer", so use it in the Canvas output JSON too.
+    ctx[:referrer] = request.referer
     ctx[:producer] = 'canvas'
 
     if @domain_root_account&.feature_enabled?(:compact_live_event_payloads)

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useState} from 'react'
+import React, {Suspense, useRef, useState} from 'react'
 import {arrayOf, bool, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 
 import {Billboard} from '@instructure/ui-billboard'
@@ -31,6 +31,8 @@ import {VideoPlayer} from '@instructure/ui-media-player'
 import LoadingIndicator from './shared/LoadingIndicator'
 import RocketSVG from './RocketSVG'
 import translationShape from './translationShape'
+import useComputerPanelFocus from './useComputerPanelFocus'
+import useSizeVideoPlayer from './useSizeVideoPlayer'
 
 const ClosedCaptionPanel = React.lazy(() => import('./ClosedCaptionCreator'))
 
@@ -52,13 +54,25 @@ export default function ComputerPanel({
   } = uploadMediaTranslations.UploadMediaStrings
   const [messages, setMessages] = useState([])
   const [mediaTracksCheckbox, setMediaTracksCheckbox] = useState(false)
+
+  // right-size the video player
+  const previewPanelRef = useRef(null)
+  const {playerWidth, playerHeight} = useSizeVideoPlayer(theFile, previewPanelRef)
+
+  const clearButtonRef = useRef(null)
+  const panelRef = useRef(null)
+  useComputerPanelFocus(theFile, panelRef, clearButtonRef)
+
   if (hasUploadedFile) {
-    const sources = [{label: theFile.name, src: URL.createObjectURL(theFile)}]
+    const src = URL.createObjectURL(theFile)
     return (
-      <>
+      <div style={{position: 'relative'}} ref={previewPanelRef}>
         <Flex direction="row-reverse" margin="none none medium">
           <Flex.Item>
             <Button
+              buttonRef={el => {
+                clearButtonRef.current = el
+              }}
               onClick={() => {
                 setFile(null)
                 setHasUploadedFile(false)
@@ -76,33 +90,37 @@ export default function ComputerPanel({
             </PresentationContent>
           </Flex.Item>
         </Flex>
-        <View as="div" height="100%" width="100%" textAlign="center">
-          <VideoPlayer sources={sources} />
+        <View as="div" width={playerWidth} height={playerHeight} textAlign="center" margin="0 auto">
+          <VideoPlayer sources={[{label: theFile.name, src}]} controls={renderControls} />
         </View>
-        <View display="block" padding="medium medium medium 0">
-          <Checkbox
-            onChange={event => setMediaTracksCheckbox(event.target.checked)}
-            checked={mediaTracksCheckbox}
-            label={ADD_CLOSED_CAPTIONS_OR_SUBTITLES}
-            value="mediaTracks"
-          />
-        </View>
-        {mediaTracksCheckbox && (
-          <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
-            <ClosedCaptionPanel
-              languages={languages}
-              liveRegion={liveRegion}
-              uploadMediaTranslations={uploadMediaTranslations}
-              updateSubtitles={updateSubtitles}
-            />
-          </Suspense>
+        {isVideo(theFile.type) && (
+          <>
+            <View display="block" padding="medium medium medium 0">
+              <Checkbox
+                onChange={event => setMediaTracksCheckbox(event.target.checked)}
+                checked={mediaTracksCheckbox}
+                label={ADD_CLOSED_CAPTIONS_OR_SUBTITLES}
+                value="mediaTracks"
+              />
+            </View>
+            {mediaTracksCheckbox && (
+              <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
+                <ClosedCaptionPanel
+                  languages={languages}
+                  liveRegion={liveRegion}
+                  uploadMediaTranslations={uploadMediaTranslations}
+                  updateSubtitles={updateSubtitles}
+                />
+              </Suspense>
+            )}
+          </>
         )}
-      </>
+      </div>
     )
   }
 
   return (
-    <div>
+    <div ref={panelRef}>
       <FileDrop
         accept={accept}
         onDropAccepted={([file]) => {
@@ -131,6 +149,39 @@ export default function ComputerPanel({
       />
     </div>
   )
+
+  function renderControls(VPC) {
+    if (isAudio(theFile.type)) {
+      return (
+        <VPC>
+          <VPC.PlayPauseButton />
+          <VPC.Timebar />
+          <VPC.Volume />
+          <VPC.PlaybackSpeed />
+          <VPC.TrackChooser />
+        </VPC>
+      )
+    }
+    return (
+      <VPC>
+        <VPC.PlayPauseButton />
+        <VPC.Timebar />
+        <VPC.Volume />
+        <VPC.PlaybackSpeed />
+        <VPC.TrackChooser />
+        <VPC.SourceChooser />
+        {document.fullscreenEnabled && <VPC.FullScreenButton />}
+      </VPC>
+    )
+  }
+}
+
+function isVideo(type) {
+  return /^video/.test(type)
+}
+
+function isAudio(type) {
+  return /^audio/.test(type)
 }
 
 ComputerPanel.propTypes = {

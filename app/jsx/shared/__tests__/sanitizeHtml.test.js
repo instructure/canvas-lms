@@ -18,7 +18,6 @@
 
 import sanitizeHtml from 'jsx/shared/sanitizeHtml'
 
-
 it('sanitizes html with tinymce', async () => {
   await import('@instructure/canvas-rce-old/lib/async')
   expect(sanitizeHtml('<img src=x onerror="alert(1)">')).toBe('<img src="x" />')

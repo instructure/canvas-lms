@@ -2215,6 +2215,7 @@ EG = {
     if (isConcluded || isClosedForSubmission) {
       $full_width_container.addClass('with_enrollment_notice')
     }
+    EG.showDiscussion()
   },
 
   isStudentConcluded(student) {
@@ -2861,6 +2862,13 @@ EG = {
     return commentElement
   },
 
+  currentDisplayedSubmission() {
+    const displayedHistory = this.currentStudent.submission?.submission_history?.[
+      this.currentStudent.submission.currentSelectedIndex
+    ]
+    return displayedHistory?.submission || this.currentStudent.submission
+  },
+
   showDiscussion() {
     const that = this
     const commentRenderingOptions = {
@@ -2871,8 +2879,18 @@ EG = {
 
     $comments.html('')
 
+    const submission = EG.currentDisplayedSubmission()
     if (this.currentStudent.submission && this.currentStudent.submission.submission_comments) {
       $.each(this.currentStudent.submission.submission_comments, (i, comment) => {
+        if (ENV.group_comments_per_attempt) {
+          // Due to the fact that the unsubmitted attempt 0 submission is no longer viewable
+          // from the submission histories after the attempt 1 submission has been submitted,
+          // treat comments from attempt 0 and attempt 1 as if they were both on attempt 1.
+          if ((comment.attempt || 1) !== (submission.attempt || 1)) {
+            return
+          }
+        }
+
         const commentElement = that.renderComment(comment, commentRenderingOptions)
 
         if (commentElement) {
@@ -2935,6 +2953,11 @@ EG = {
       'submission[draft_comment]': draftComment,
       [`submission[${anonymizableId}]`]: EG.currentStudent[anonymizableId]
     }
+
+    if (ENV.group_comments_per_attempt) {
+      formData['submission[attempt]'] = EG.currentDisplayedSubmission().attempt
+    }
+
     if ($('#media_media_recording').data('comment_id')) {
       $.extend(formData, {
         'submission[media_comment_type]': $('#media_media_recording').data('comment_type'),
@@ -2991,11 +3014,17 @@ EG = {
     // stuff that comes back from ajax doesnt have a submission history but handleSubmissionSelectionChange
     // depends on it being there. so mimic it.
     if (typeof submission.submission_history === 'undefined') {
-      submission.submission_history = [
-        {
-          submission: $.extend(true, {}, submission)
-        }
-      ]
+      let historyIndex =
+        student.submission?.submission_history?.findIndex(history => {
+          const historySubmission = history.submission || history
+          if (historySubmission.attempt == null) {
+            return false
+          }
+          return historySubmission.attempt === submission.attempt
+        }) || 0
+      historyIndex = historyIndex === -1 ? 0 : historyIndex
+      submission.submission_history = Array.from({length: historyIndex + 1})
+      submission.submission_history[historyIndex] = {submission: $.extend(true, {}, submission)}
     }
 
     $.extend(true, student.submission, submission)

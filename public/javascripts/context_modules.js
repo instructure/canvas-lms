@@ -65,11 +65,10 @@ function scrollTo ($thing, time = 500) {
 }
 
   function refreshDuplicateLinkStatus($module) {
-    $module.find('.duplicate_module_menu_item').hide()
     if (ENV.DUPLICATE_ENABLED && !$module.find('.context_module_item.quiz').length && !$module.find('.cannot-duplicate').length) {
-      $module.find('.duplicate_module_menu_item').show()
+      $module.find('.duplicate_module_menu_item').removeAttr('hidden')
     } else {
-      $module.find('.duplicate_module_menu_item').hide()
+      $module.find('.duplicate_module_menu_item').attr('hidden', true)
     }
   }
 
@@ -1595,7 +1594,7 @@ function scrollTo ($thing, time = 500) {
     $("#add_context_module_form .cancel_button").click(event => {
       modules.hideEditModule(true);
     });
-    setTimeout(function() {
+    requestAnimationFrame(function() {
       var $items = [];
       $("#context_modules .context_module_items").each(function() {
         $items.push($(this));
@@ -1606,7 +1605,7 @@ function scrollTo ($thing, time = 500) {
           var opts = modules.sortable_module_options;
           opts['update'] = modules.updateModuleItemPositions;
           $item.sortable(opts);
-          setTimeout(next, 10);
+          requestAnimationFrame(next);
         }
       };
       next();
@@ -1618,7 +1617,7 @@ function scrollTo ($thing, time = 500) {
       });
       modules.refreshModuleList();
       modules.refreshed = true;
-    }, 1000);
+    });
 
     function initNewItemPublishButton($item, data) {
       var publishData = {
@@ -1833,13 +1832,9 @@ function scrollTo ($thing, time = 500) {
     }
   }
 
-  var toggleModuleCollapse = function(event, goSlow) {
+  var toggleModuleCollapse = function(event) {
     event.preventDefault();
     var expandCallback = null;
-    if(goSlow && $.isFunction(goSlow)) {
-      expandCallback = goSlow;
-      goSlow = null;
-    }
     var collapse = $(this).hasClass('collapse_module_link') ? '1' : '0';
     var $module = $(this).parents(".context_module");
     var reload_entries = $module.find(".content .context_module_items").children().length === 0;
@@ -1873,31 +1868,11 @@ function scrollTo ($thing, time = 500) {
       }
 
     }
-    if(reload_entries || goSlow) {
+    if(reload_entries) {
       $module.loadingImage();
     }
     var url = $(this).attr('href');
-    if(goSlow) {
-      url = $module.find(".edit_module_link").attr('href');
-    }
-    $.ajaxJSON(url, (goSlow ? 'GET' : 'POST'), {collapse: collapse}, data => {
-      if(goSlow) {
-        $module.loadingImage('remove');
-        var items = data;
-        var next = function() {
-          var item = items.shift();
-          if(item) {
-            modules.addItemToModule($module, item.content_tag);
-            next();
-          } else {
-            $module.find(".context_module_items.ui-sortable").sortable('refresh');
-            toggle(true);
-            modules.updateProgressionState($module);
-            $("#context_modules").triggerHandler('slow_load');
-          }
-        };
-        next();
-      } else {
+    $.ajaxJSON(url, 'POST', {collapse: collapse}, data => {
         if(reload_entries) {
           $module.loadingImage('remove');
           for(var idx in data) {
@@ -1907,7 +1882,6 @@ function scrollTo ($thing, time = 500) {
           toggle();
           modules.updateProgressionState($module);
         }
-      }
     }, data => {
       $module.loadingImage('remove');
     });
@@ -2077,20 +2051,26 @@ function scrollTo ($thing, time = 500) {
     });
 
     if($("#context_modules").hasClass('editable')) {
-      setTimeout(modules.initModuleManagement, 1000);
+      requestAnimationFrame(modules.initModuleManagement);
       modules.loadMasterCourseData();
+    }
+
+    function moduleContentIsHidden(contentEl) {
+      return (contentEl.style.display === 'none') || contentEl.parentElement.classList.contains('collapsed_module')
     }
 
     // need the assignment data to check past due state
     modules.updateAssignmentData(() => {
-      modules.updateProgressions(() => {
+      modules.updateProgressions(function afterUpdateProgressions() {
         if (window.location.hash && !window.location.hash.startsWith('#!')) {
           try {
             scrollTo($(window.location.hash))
           } catch (error) {}
         } else {
-          if ($(".context_module:first .content:visible").length == 0) {
-            scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"))
+          const firstContextModuleContent = document.querySelector('.context_module')?.querySelector('.content')
+          if (!firstContextModuleContent || moduleContentIsHidden(firstContextModuleContent)) {
+            const firstVisibleModuleContent = [...document.querySelectorAll('.context_module .content')].find(el => !moduleContentIsHidden(el))
+            if (firstVisibleModuleContent) scrollTo($(firstVisibleModuleContent).parents(".context_module"))
           }
         }
       });
@@ -2115,7 +2095,6 @@ function scrollTo ($thing, time = 500) {
       $("#context_module_" + collapsedModules[idx]).addClass('collapsed_module');
     }
 
-    var foundModules = [];
     var $contextModules = $("#context_modules .context_module");
     if (!$contextModules.length) {
       $('#no_context_modules_message').show();
@@ -2124,21 +2103,6 @@ function scrollTo ($thing, time = 500) {
     $contextModules.each(function() {
       modules.updateProgressionState($(this));
     });
-    $contextModules.filter(":visible").each(function() {
-      if($(this).find(".content:visible").length > 0) {
-        foundExpanded = true;
-      } else if(foundExpanded) {
-        foundModules.push($(this));
-      }
-    });
-    $("#context_modules").bind('slow_load', () => {
-      var $module = foundModules.shift();
-      if($module) {
-        $module.find(".expand_module_link:first").triggerHandler('click', true);
-      }
-    });
-
-
   });
 
 export default modules;

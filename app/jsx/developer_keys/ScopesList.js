@@ -101,8 +101,8 @@ export default class ScopesList extends React.Component {
 
   availableGetScopes() {
     return this.allScopes(this.props.availableScopes)
-    .filter(s => s.verb === 'GET')
-    .map(s => s.scope)
+      .filter(s => s.verb === 'GET')
+      .map(s => s.scope)
   }
 
   allScopes(availableScopes) {
@@ -123,10 +123,11 @@ export default class ScopesList extends React.Component {
                     <Checkbox
                       label={
                         <ScreenReaderContent>
-                          {
-                            this.state.readOnlySelected ? I18n.t('Disable all read only scopes.') : I18n.t('Enable all read only scopes.')
-                          }
-                        </ScreenReaderContent>}
+                          {this.state.readOnlySelected
+                            ? I18n.t('Disable all read only scopes.')
+                            : I18n.t('Enable all read only scopes.')}
+                        </ScreenReaderContent>
+                      }
                       onChange={this.handleReadOnlySelected}
                       checked={this.state.readOnlySelected}
                       inline
@@ -144,7 +145,10 @@ export default class ScopesList extends React.Component {
             <Flex.Item grow shrink>
               {this.state.availableScopes.map(scopeGroup => {
                 return Object.keys(scopeGroup).reduce((result, key) => {
-                  if (this.noFilter() || key.toLowerCase().indexOf(this.props.filter.toLowerCase()) > -1) {
+                  if (
+                    this.noFilter() ||
+                    key.toLowerCase().indexOf(this.props.filter.toLowerCase()) > -1
+                  ) {
                     result.push(
                       <LazyLoad
                         offset={1000}

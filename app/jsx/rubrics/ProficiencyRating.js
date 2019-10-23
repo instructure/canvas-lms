@@ -22,15 +22,16 @@ import {Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!ProficiencyRating'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-overlays'
-import {RadioInput, TextInput} from '@instructure/ui-forms'
+import {RadioInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import ColorPicker, { PREDEFINED_COLORS } from '../shared/ColorPicker'
+import ColorPicker, {PREDEFINED_COLORS} from '../shared/ColorPicker'
 
-function formatColor (color) {
+function formatColor(color) {
   if (color[0] !== '#') {
-    return `#${color}`;
+    return `#${color}`
   }
-  return color;
+  return color
 }
 
 export default class ProficiencyRating extends React.Component {
@@ -56,9 +57,9 @@ export default class ProficiencyRating extends React.Component {
     pointsError: null
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
-    this.state = { showColorPopover: false }
+    this.state = {showColorPopover: false}
     this.descriptionInput = null
     this.pointsInput = null
     this.trashButton = null
@@ -73,9 +74,10 @@ export default class ProficiencyRating extends React.Component {
 
   componentDidUpdate() {
     if (this.props.focusField === 'trash') {
-      setTimeout(() => (
-        this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()
-      ), 700)
+      setTimeout(
+        () => (this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()),
+        700
+      )
     } else if (this.props.focusField === 'description') {
       this.descriptionInput.focus()
     } else if (this.props.focusField === 'points') {
@@ -101,35 +103,35 @@ export default class ProficiencyRating extends React.Component {
 
   setColor = (unformattedColor, _successFn, _errorFn) => {
     const color = formatColor(unformattedColor)
-    this.setState({ showColorPopover: false })
+    this.setState({showColorPopover: false})
     this.props.onColorChange(color)
   }
 
-  handleDescriptionChange = (e) => {
+  handleDescriptionChange = e => {
     this.props.onDescriptionChange(e.target.value)
   }
 
-  handleMasteryChange = (_e) => {
+  handleMasteryChange = _e => {
     this.props.onMasteryChange()
   }
 
-  handlePointChange = (e) => {
+  handlePointChange = e => {
     this.props.onPointsChange(e.target.value)
   }
 
-  handleMenuToggle = (show) => {
-    this.setState({ showColorPopover: show })
+  handleMenuToggle = show => {
+    this.setState({showColorPopover: show})
   }
 
   handleMenuClose = () => {
-    this.setState({ showColorPopover: false })
+    this.setState({showColorPopover: false})
   }
 
   handleDelete = () => {
     this.props.onDelete()
   }
 
-  errorMessage = (error) => error ? [{ text: error, type: 'error' }] : null
+  errorMessage = error => (error ? [{text: error, type: 'error'}] : null)
 
   render() {
     const {
@@ -146,16 +148,19 @@ export default class ProficiencyRating extends React.Component {
         <td style={{textAlign: 'center', verticalAlign: 'top', padding: '1.1rem 0 0 0'}}>
           <div style={{display: 'inline-block'}}>
             <RadioInput
-              ref={(input) => { this.radioInput = input }}
+              ref={input => {
+                this.radioInput = input
+              }}
               label={<ScreenReaderContent>{I18n.t('Change mastery')}</ScreenReaderContent>}
               checked={mastery}
-              onChange={this.handleMasteryChange} />
+              onChange={this.handleMasteryChange}
+            />
           </div>
         </td>
         <td className="description" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setDescriptionRef}
-            label={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
+            renderLabel={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
             messages={this.errorMessage(descriptionError)}
             onChange={this.handleDescriptionChange}
             defaultValue={description}
@@ -164,7 +169,7 @@ export default class ProficiencyRating extends React.Component {
         <td className="points" style={{verticalAlign: 'top'}}>
           <TextInput
             ref={this.setPointsRef}
-            label={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
+            renderLabel={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
             messages={this.errorMessage(pointsError)}
             onChange={this.handlePointChange}
             defaultValue={I18n.n(points)}
@@ -172,10 +177,7 @@ export default class ProficiencyRating extends React.Component {
           />
         </td>
         <td className="color" style={{verticalAlign: 'top'}}>
-          <Popover
-            on="click"
-            show={this.state.showColorPopover}
-            onToggle={this.handleMenuToggle}>
+          <Popover on="click" show={this.state.showColorPopover} onToggle={this.handleMenuToggle}>
             <Popover.Trigger>
               <Button ref={this.setColorRef} variant="link">
                 <div>
@@ -211,9 +213,7 @@ export default class ProficiencyRating extends React.Component {
               variant="icon"
               icon={<IconTrashLine />}
             >
-              <ScreenReaderContent>
-                {I18n.t('Delete proficiency rating')}
-              </ScreenReaderContent>
+              <ScreenReaderContent>{I18n.t('Delete proficiency rating')}</ScreenReaderContent>
             </Button>
           </div>
         </td>

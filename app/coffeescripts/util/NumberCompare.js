@@ -17,10 +17,14 @@
 
 import _ from 'underscore'
 
-export default function numberCompare (a, b, options = {}) {
-  return !_.isNumber(a) ?
-    (!_.isNumber(b) ? 0 : 1)
-  : !_.isNumber(b) ?
-    -1 :
-    options.descending ? b - a : a - b
+export default function numberCompare(a, b, options = {}) {
+  return !_.isNumber(a)
+    ? !_.isNumber(b)
+      ? 0
+      : 1
+    : !_.isNumber(b)
+    ? -1
+    : options.descending
+    ? b - a
+    : a - b
 }

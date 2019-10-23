@@ -59,9 +59,7 @@ function render(options) {
   if (options.enrollmentLabel) {
     const title = I18n.t('This user is currently not able to access the course')
     // xsslint safeString.identifier title
-    enrollmentStatus = `&nbsp;<span title="${title}" class="label">${
-      options.enrollmentLabel
-    }</span>`
+    enrollmentStatus = `&nbsp;<span title="${title}" class="label">${options.enrollmentLabel}</span>`
   }
 
   if (options.secondaryInfo) {

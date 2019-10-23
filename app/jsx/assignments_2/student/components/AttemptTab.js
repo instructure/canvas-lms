@@ -18,9 +18,14 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import {bool, func} from 'prop-types'
+import {FormField} from '@instructure/ui-form-field'
+import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import React, {Component, lazy, Suspense} from 'react'
 import {Submission} from '../graphqlData/Submission'
+import SubmissionChoiceSVG from '../SVG/SubmissionChoice.svg'
+import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
+import {Text} from '@instructure/ui-elements'
 
 const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
 const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
@@ -37,6 +42,25 @@ export default class AttemptTab extends Component {
     updateEditingDraft: func,
     updateUploadingFiles: func,
     uploadingFiles: bool
+  }
+
+  state = {
+    activeSubmissionType: this.props.submission?.submissionDraft?.activeSubmissionType || null
+  }
+
+  friendlyTypeName = type => {
+    switch (type) {
+      case 'media_recording':
+        return I18n.t('Media')
+      case 'online_text_entry':
+        return I18n.t('Text Entry')
+      case 'online_upload':
+        return I18n.t('File')
+      case 'online_url':
+        return I18n.t('URL')
+      default:
+        throw new Error('submission type not yet supported in A2')
+    }
   }
 
   renderFileUpload = () => {
@@ -96,9 +120,8 @@ export default class AttemptTab extends Component {
     )
   }
 
-  renderByType() {
-    // TODO: we need to ensure we handle multiple submission types eventually
-    switch (this.props.assignment.submissionTypes[0]) {
+  renderByType(submissionType) {
+    switch (submissionType) {
       case 'media_recording':
         return this.renderMediaAttempt()
       case 'online_text_entry':
@@ -112,7 +135,59 @@ export default class AttemptTab extends Component {
     }
   }
 
+  renderUnselectedType() {
+    return (
+      <SVGWithTextPlaceholder
+        text={I18n.t('Choose One Submission Type')}
+        url={SubmissionChoiceSVG}
+      />
+    )
+  }
+
+  renderSubmissionTypeSelector() {
+    return (
+      <FormField
+        id="select-submission-type"
+        label={<Text weight="bold">{I18n.t('Submission Type')}</Text>}
+      >
+        <select
+          onChange={event => this.setState({activeSubmissionType: event.target.value})}
+          style={{
+            margin: '0 0 10px 0',
+            width: '225px'
+          }}
+          value={this.state.activeSubmissionType || 'default'}
+        >
+          <option hidden key="default" value="default">
+            {I18n.t('Choose One')}
+          </option>
+          {this.props.assignment.submissionTypes.map(type => (
+            <option key={type} value={type}>
+              {this.friendlyTypeName(type)}
+            </option>
+          ))}
+        </select>
+      </FormField>
+    )
+  }
+
   render() {
-    return <div data-testid="attempt-tab">{this.renderByType()}</div>
+    if (this.props.assignment.submissionTypes.length > 1) {
+      return (
+        <div data-testid="attempt-tab">
+          {this.renderSubmissionTypeSelector()}
+          {this.state.activeSubmissionType !== null &&
+          this.props.assignment.submissionTypes.includes(this.state.activeSubmissionType)
+            ? this.renderByType(this.state.activeSubmissionType)
+            : this.renderUnselectedType()}
+        </div>
+      )
+    } else {
+      return (
+        <div data-testid="attempt-tab">
+          {this.renderByType(this.props.assignment.submissionTypes[0])}
+        </div>
+      )
+    }
   }
 }

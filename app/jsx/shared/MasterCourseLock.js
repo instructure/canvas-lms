@@ -22,7 +22,7 @@ import axios from 'axios'
 import classnames from 'classnames'
 import I18n from 'i18n!MasterCourseLock'
 import FilesystemObject from 'compiled/models/FilesystemObject'
-import { showFlashError } from './FlashAlert'
+import {showFlashError} from './FlashAlert'
 
 class MasterCourseLock extends React.Component {
   static propTypes = {
@@ -30,32 +30,32 @@ class MasterCourseLock extends React.Component {
     canManage: PropTypes.bool.isRequired
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = this.extractStateFromModel(props.model)
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const setState = model => this.setState(this.extractStateFromModel(model))
     this.props.model.on('change', setState, this)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.props.model.off(null, null, this)
   }
 
   /* == Custom Functions == */
-  setLocked (locked) {
+  setLocked(locked) {
     if (this.props.model) {
       this.props.model.set('restricted_by_master_course', locked)
     }
   }
 
-  isLocked () {
+  isLocked() {
     return !!(this.props.model && this.props.model.get('restricted_by_master_course'))
   }
 
-  canLockUnlock () {
+  canLockUnlock() {
     return this.props.canManage && this.props.model.get('is_master_course_master_content')
   }
 
@@ -67,7 +67,7 @@ class MasterCourseLock extends React.Component {
   // components internal state
   //
   // returns object
-  extractStateFromModel (model) {
+  extractStateFromModel(model) {
     return {
       locked: !!model.get('restricted_by_master_course')
     }
@@ -76,25 +76,31 @@ class MasterCourseLock extends React.Component {
   // Function Summary
   // allow locking/unlocking in this component.
   toggleLockedState = () => {
-    const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('this file');
-    axios.put(
-      `/api/v1/courses/${ENV.COURSE_ID}/blueprint_templates/default/restrict_item`,
-      {
+    const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('this file')
+    axios
+      .put(`/api/v1/courses/${ENV.COURSE_ID}/blueprint_templates/default/restrict_item`, {
         content_type: 'attachment',
         content_id: this.props.model.id,
         restricted: !this.isLocked()
-      }).then((/* response */) => {
+      })
+      .then((/* response */) => {
         this.setLocked(!this.isLocked())
-      }).catch(
-        showFlashError(I18n.t('An error occurred changing the lock state for "%{fileName}"', {fileName}))
+      })
+      .catch(
+        showFlashError(
+          I18n.t('An error occurred changing the lock state for "%{fileName}"', {fileName})
+        )
       )
   }
 
   // modeled after PUblishCloud to implement the adjacent lock icon|button
-  render () {
+  render() {
     const locked = this.isLocked()
-    const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('This file');
-    const wrapperClass = classnames('lock-icon', {disabled: !this.canLockUnlock(), 'lock-icon-locked': this.isLocked()})
+    const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('This file')
+    const wrapperClass = classnames('lock-icon', {
+      disabled: !this.canLockUnlock(),
+      'lock-icon-locked': this.isLocked()
+    })
     const buttonClass = `btn-link ${locked ? 'locked-status locked' : 'unlocked-status unlocked'}`
     const iconClass = locked ? 'icon-blueprint-lock' : 'icon-blueprint'
     const title = locked ? I18n.t('Locked') : I18n.t('Unlocked')
@@ -103,22 +109,22 @@ class MasterCourseLock extends React.Component {
       : I18n.t('%{fileName}  is Unlocked - Click to modify', {fileName})
     return (
       <span className={wrapperClass}>
-        {
-          this.canLockUnlock() ?
-            <button
-              type="button"
-              data-tooltip="left"
-              onClick={this.toggleLockedState}
-              className={buttonClass}
-              title={title}
-              aria-label={label}
-            >
-              <i className={iconClass} />
-            </button> :
-            <i className={iconClass} data-tooltip="left" title={title}>
-              <span className="lock-text screenreader-only">{title}</span>
-            </i>
-        }
+        {this.canLockUnlock() ? (
+          <button
+            type="button"
+            data-tooltip="left"
+            onClick={this.toggleLockedState}
+            className={buttonClass}
+            title={title}
+            aria-label={label}
+          >
+            <i className={iconClass} />
+          </button>
+        ) : (
+          <i className={iconClass} data-tooltip="left" title={title}>
+            <span className="lock-text screenreader-only">{title}</span>
+          </i>
+        )}
       </span>
     )
   }

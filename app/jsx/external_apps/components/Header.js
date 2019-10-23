@@ -27,7 +27,7 @@ export default class Header extends React.Component {
     this.linkRef.focus()
   }
 
-  setLinkRef = (node) => this.linkRef = node
+  setLinkRef = node => (this.linkRef = node)
 
   render() {
     return (

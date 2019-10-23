@@ -23,7 +23,8 @@ import I18n from 'i18n!assignments_2'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
-import {TextInput, TextArea, Select} from '@instructure/ui-forms'
+import {TextArea, Select} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 import {hasSubmission} from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
@@ -104,7 +105,7 @@ export default class MessageStudentsWhoForm extends React.Component {
         this.props.pointsThreshold === null ? '' : this.props.pointsThreshold.toString()
       return (
         <NumberInput
-          label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
+          renderLabel={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
           placeholder={I18n.t('Points')}
           value={points}
           onChange={this.handlePointsChangeString}
@@ -165,7 +166,7 @@ export default class MessageStudentsWhoForm extends React.Component {
         </Select>
 
         <TextInput
-          label={I18n.t('Subject:')}
+          renderLabel={I18n.t('Subject:')}
           value={this.props.subject}
           onChange={this.handleChangeSubject}
           data-testid="subject-input"

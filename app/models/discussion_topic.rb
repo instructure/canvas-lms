@@ -204,7 +204,10 @@ class DiscussionTopic < ActiveRecord::Base
     return unless self.is_section_specific? ? @sections_changed : self.is_section_specific_before_last_save
     self.class.connection.after_transaction_commit do
       if self.context_module_tags.preload(:context_module).exists?
-        self.context_module_tags.map(&:context_module).uniq.each(&:invalidate_progressions)
+        self.context_module_tags.map(&:context_module).uniq.each do |cm|
+          cm.invalidate_progressions
+          cm.touch
+        end
       end
     end
   end

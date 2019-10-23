@@ -19,14 +19,18 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import PreviewModal from '../PreviewModal'
+import {mockShare} from 'jsx/content_shares/__tests__/test-utils'
 
 describe('content_shares/PreviewModal', () => {
   it('renders an iframe with the appropriate src', () => {
     window.ENV = {COMMON_CARTRIDGE_VIEWER_URL: 'http://example.com'}
-    render(<PreviewModal open />)
+    const share = mockShare()
+    render(<PreviewModal open share={share} />)
     const iframe = document.querySelector('iframe')
     expect(iframe).toBeInTheDocument()
-    expect(iframe.getAttribute('src')).toBe('http://example.com')
+    expect(iframe.getAttribute('src')).toBe(
+      `http://example.com?cartridge=${encodeURIComponent(share.content_export.attachment.url)}`
+    )
   })
 
   it('dismisses the modal', () => {

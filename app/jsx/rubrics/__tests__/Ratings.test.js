@@ -17,9 +17,9 @@
  */
 import React from 'react'
 import $ from 'jquery'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import sinon from 'sinon'
-import Ratings, { Rating } from '../Ratings'
+import Ratings, {Rating} from '../Ratings'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
 import 'compiled/jquery.rails_flash_notifications'
@@ -29,9 +29,9 @@ describe('The Ratings component', () => {
     assessing: false,
     footer: null,
     tiers: [
-      { id: '1', description: 'Superb', points: 10 },
-      { id: '2', description: 'Meh', long_description: 'More Verbosity', points: 5 },
-      { id: '3', description: 'Subpar', points: 1 }
+      {id: '1', description: 'Superb', points: 10},
+      {id: '2', description: 'Meh', long_description: 'More Verbosity', points: 5},
+      {id: '3', description: 'Subpar', points: 1}
     ],
     defaultMasteryThreshold: 10,
     assessmentRatingId: '2',
@@ -41,33 +41,37 @@ describe('The Ratings component', () => {
     useRange: false
   }
 
-  const component = (mods) => shallow(<Ratings {...{ ...props, ...mods }} />)
+  const component = mods => shallow(<Ratings {...{...props, ...mods}} />)
   it('renders the root component as expected', () => {
     expect(component()).toMatchSnapshot()
   })
 
   it('renders the Rating sub-components as expected when range rating enabled', () => {
     const useRange = true
-    component({ useRange }).find('Rating')
-      .forEach((el) => expect(el.shallow()).toMatchSnapshot())
+    component({useRange})
+      .find('Rating')
+      .forEach(el => expect(el.shallow()).toMatchSnapshot())
   })
 
   it('properly select the first matching rating when two tiers have the same point value and no ID is passed', () => {
     const tiers = [
-      { description: 'Superb', points: 10 },
-      { description: 'Meh', points: 5 },
-      { description: 'Meh 2, The Sequel', points: 5 },
-      { description: 'Subpar', points: 1 }
+      {description: 'Superb', points: 10},
+      {description: 'Meh', points: 5},
+      {description: 'Meh 2, The Sequel', points: 5},
+      {description: 'Subpar', points: 1}
     ]
     const assessmentRatingId = null
-    const selected = component({ tiers, assessmentRatingId }).find('Rating').map((el) =>
-      el.prop('selected'))
+    const selected = component({tiers, assessmentRatingId})
+      .find('Rating')
+      .map(el => el.prop('selected'))
     expect(selected).toEqual([false, true, false, false])
   })
 
   it('highlights the right rating when no assessmentRatingId present', () => {
     const ratings = (points, useRange = false, assessmentRatingId = null) =>
-      component({ points, useRange, assessmentRatingId }).find('Rating').map((el) => el.shallow().hasClass('selected'))
+      component({points, useRange, assessmentRatingId})
+        .find('Rating')
+        .map(el => el.shallow().hasClass('selected'))
 
     expect(ratings(10)).toEqual([true, false, false])
     expect(ratings(8)).toEqual([false, false, false])
@@ -83,22 +87,29 @@ describe('The Ratings component', () => {
   it('calls onPointChange and flashes VO message when a rating is clicked', () => {
     const onPointChange = sinon.spy()
     const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
-    const el = component({ onPointChange })
+    const el = component({onPointChange})
 
-    el.find('Rating').first().prop('onClick').call()
-    expect(onPointChange.args[0]).toEqual([{id: '1', "description": "Superb", "points": 10}])
+    el.find('Rating')
+      .first()
+      .prop('onClick')
+      .call()
+    expect(onPointChange.args[0]).toEqual([{id: '1', description: 'Superb', points: 10}])
     expect(flashMock).toHaveBeenCalledTimes(1)
     flashMock.mockRestore()
   })
 
   it('uses the right default mastery level colors', () => {
     const mastery = (points, assessmentRatingId) =>
-      component({ points, assessmentRatingId }).find('Rating').map((el) => el.prop('tierColor'))
+      component({points, assessmentRatingId})
+        .find('Rating')
+        .map(el => el.prop('tierColor'))
     expect(mastery(10, '1')).toEqual([null, 'transparent', 'transparent'])
     expect(mastery(5, '2')).toEqual(['transparent', null, 'transparent'])
-    expect(mastery(1 , '3')).toEqual(['transparent', 'transparent', null])
+    expect(mastery(1, '3')).toEqual(['transparent', 'transparent', null])
     const shaderClasses = (points, assessmentRatingId) =>
-      component({ points, assessmentRatingId }).find('Rating').map((el) => el.prop('shaderClass'))
+      component({points, assessmentRatingId})
+        .find('Rating')
+        .map(el => el.prop('shaderClass'))
     expect(shaderClasses(10, '1')).toEqual(['meetsMasteryShader', null, null])
     expect(shaderClasses(5, '2')).toEqual([null, 'nearMasteryShader', null])
     expect(shaderClasses(1, '3')).toEqual([null, null, 'wellBelowMasteryShader'])
@@ -106,12 +117,14 @@ describe('The Ratings component', () => {
 
   it('uses the right custom rating colors', () => {
     const customRatings = [
-      {points: 10, color: "09BCD3"},
-      {points: 5, color: "65499D"},
-      {points: 1, color: "F8971C"}
+      {points: 10, color: '09BCD3'},
+      {points: 5, color: '65499D'},
+      {points: 1, color: 'F8971C'}
     ]
     const ratings = (points, assessmentRatingId, useRange = false) =>
-      component({points, assessmentRatingId, useRange, customRatings}).find('Rating').map((el) => el.prop('tierColor'))
+      component({points, assessmentRatingId, useRange, customRatings})
+        .find('Rating')
+        .map(el => el.prop('tierColor'))
     expect(ratings(10, '1')).toEqual(['#09BCD3', 'transparent', 'transparent'])
     expect(ratings(5, '2')).toEqual(['transparent', '#65499D', 'transparent'])
     expect(ratings(1, '3')).toEqual(['transparent', 'transparent', '#F8971C'])
@@ -120,13 +133,15 @@ describe('The Ratings component', () => {
 
   describe('custom ratings', () => {
     const customRatings = [
-      {points: 100, color: "100100"},
-      {points: 60, color: "606060"},
-      {points: 10, color: "101010"},
-      {points: 1, color: "111111"}
+      {points: 100, color: '100100'},
+      {points: 60, color: '606060'},
+      {points: 10, color: '101010'},
+      {points: 1, color: '111111'}
     ]
     const ratings = (points, assessmentRatingId, pointsPossible = 10) =>
-      component({ points, assessmentRatingId, pointsPossible, customRatings, useRange: true }).find('Rating').map((el) => el.prop('tierColor'))
+      component({points, assessmentRatingId, pointsPossible, customRatings, useRange: true})
+        .find('Rating')
+        .map(el => el.prop('tierColor'))
 
     it('scales points to custom ratings', () => {
       expect(ratings(10, '1')).toEqual(['#100100', 'transparent', 'transparent'])
@@ -144,14 +159,13 @@ describe('The Ratings component', () => {
     })
   })
 
-
-  const ratingComponent = (overrides) => (
+  const ratingComponent = overrides => (
     <Rating {...props.tiers[0]} isSummary={false} assessing {...overrides} />
   )
 
   it('is navigable and clickable when assessing', () => {
     const onClick = sinon.spy()
-    const wrapper = shallow(ratingComponent({ onClick }))
+    const wrapper = shallow(ratingComponent({onClick}))
     const div = wrapper.find('div').at(0)
     expect(div.prop('tabIndex')).toEqual(0)
     div.simulate('click')
@@ -160,7 +174,7 @@ describe('The Ratings component', () => {
 
   it('is not navigable or clickable when not assessing', () => {
     const onClick = sinon.spy()
-    const wrapper = shallow(ratingComponent({ assessing: false, onClick }))
+    const wrapper = shallow(ratingComponent({assessing: false, onClick}))
     const div = wrapper.find('div').at(0)
     expect(div.prop('tabIndex')).toBeNull()
     expect(div.prop('role')).toBeNull()
@@ -169,7 +183,7 @@ describe('The Ratings component', () => {
   })
 
   it('only renders the single selected Rating with a footer in summary mode', () => {
-    const el = component({ points: 5, isSummary: true, footer: <div>ow my foot</div> })
+    const el = component({points: 5, isSummary: true, footer: <div>ow my foot</div>})
     const ratings = el.find('Rating')
 
     expect(ratings).toHaveLength(1)
@@ -179,7 +193,12 @@ describe('The Ratings component', () => {
   })
 
   it('renders a default rating if none of the ratings are selected', () => {
-    const el = component({ points: 6, assessmentRatingId: null, isSummary: true, footer: <div>ow my foot</div> })
+    const el = component({
+      points: 6,
+      assessmentRatingId: null,
+      isSummary: true,
+      footer: <div>ow my foot</div>
+    })
     const ratings = el.find('Rating')
 
     expect(ratings).toHaveLength(1)
@@ -189,7 +208,7 @@ describe('The Ratings component', () => {
   })
 
   it('hides points on the default rating if points are hidden', () => {
-    const el = component({ points: 6, isSummary: true, footer: <div>ow my foot</div> })
+    const el = component({points: 6, isSummary: true, footer: <div>ow my foot</div>})
     const rating = el.find('Rating')
     expect(rating.prop('hidePoints')).toBe(true)
   })

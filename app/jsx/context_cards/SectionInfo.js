@@ -22,33 +22,35 @@ import I18n from 'i18n!student_context_traySectionInfo'
 
 const sectionShape = PropTypes.shape({
   name: PropTypes.string.isRequired
-});
+})
 const enrollmentsShape = PropTypes.shape({
   section: sectionShape.isRequired
-});
+})
 const userShape = PropTypes.shape({
   enrollments: PropTypes.arrayOf(enrollmentsShape).isRequired
-});
+})
 
-  class SectionInfo extends React.Component {
-    static propTypes = {
-      user: userShape.isRequired
-    }
+class SectionInfo extends React.Component {
+  static propTypes = {
+    user: userShape.isRequired
+  }
 
-    render () {
-      const sections = this.props.user.enrollments
-        .map(e => e.section)
-        .filter(s => s != null);
+  render() {
+    const sections = this.props.user.enrollments.map(e => e.section).filter(s => s != null)
 
-      if (sections.length > 0) {
-        const sectionNames = sections.map((section) => {
+    if (sections.length > 0) {
+      const sectionNames = sections
+        .map(section => {
           return section.name
-        }).sort()
-        return (
-          <span>{I18n.t("Section: %{section_names}", { section_names: sectionNames.join(', ') })}</span>
-        )
-      } else { return null }
+        })
+        .sort()
+      return (
+        <span>{I18n.t('Section: %{section_names}', {section_names: sectionNames.join(', ')})}</span>
+      )
+    } else {
+      return null
     }
   }
+}
 
 export default SectionInfo

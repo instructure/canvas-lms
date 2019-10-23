@@ -218,15 +218,18 @@ export default class IndexHeader extends Component {
   }
 }
 
-const connectState = state =>
-  Object.assign(
-    {
-      isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
-      selectedCount: state.selectedAnnouncements.length,
-      isToggleLocking: state.isToggleLocking
-    },
-    select(state, ['contextType', 'contextId', 'permissions', 'atomFeedUrl', 'announcementsLocked'])
-  )
+const connectState = state => ({
+  isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
+  selectedCount: state.selectedAnnouncements.length,
+  isToggleLocking: state.isToggleLocking,
+  ...select(state, [
+    'contextType',
+    'contextId',
+    'permissions',
+    'atomFeedUrl',
+    'announcementsLocked'
+  ])
+})
 const selectedActions = [
   'searchAnnouncements',
   'toggleSelectedAnnouncementsLock',

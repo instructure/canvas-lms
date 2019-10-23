@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import { render, shallow } from 'enzyme'
-import { Set } from 'immutable'
+import {render, shallow} from 'enzyme'
+import {Set} from 'immutable'
 import OutcomeGroup from '../OutcomeGroup'
 
 const outcome = (id, title) => ({
@@ -29,10 +29,7 @@ const outcome = (id, title) => ({
   mastery_points: 3,
   points_possible: 5,
   calculation_method: 'highest',
-  ratings: [
-    { description: 'My first rating' },
-    { description: 'My second rating' }
-  ],
+  ratings: [{description: 'My first rating'}, {description: 'My second rating'}],
   results: [
     {
       id: 1,
@@ -47,54 +44,50 @@ const outcome = (id, title) => ({
   ]
 })
 
-const defaultProps = (props = {}) => (
-  Object.assign({
-    outcomeGroup: {
-      id: 10,
-      title: 'My group'
-    },
-    outcomes: [
-      {
-        id: 1,
-        expansionId: 100,
-        mastered: false,
-        mastery_points: 3,
-        points_possible: 5,
-        calculation_method: 'highest',
-        ratings: [
-          { description: 'My first rating' },
-          { description: 'My second rating' }
-        ],
-        results: [
-          {
+const defaultProps = (props = {}) => ({
+  outcomeGroup: {
+    id: 10,
+    title: 'My group'
+  },
+  outcomes: [
+    {
+      id: 1,
+      expansionId: 100,
+      mastered: false,
+      mastery_points: 3,
+      points_possible: 5,
+      calculation_method: 'highest',
+      ratings: [{description: 'My first rating'}, {description: 'My second rating'}],
+      results: [
+        {
+          id: 1,
+          score: 1,
+          percent: 0.1,
+          assignment: {
             id: 1,
-            score: 1,
-            percent: 0.1,
-            assignment: {
-              id: 1,
-              html_url: 'http://foo',
-              name: 'My assignment',
-              submission_types: 'online_quiz'
-            }
+            html_url: 'http://foo',
+            name: 'My assignment',
+            submission_types: 'online_quiz'
           }
-        ],
-        title: 'My outcome'
-      }
-    ],
-    expanded: false,
-    expandedOutcomes: Set(),
-    onExpansionChange: () => {}
-  }, props)
-)
+        }
+      ],
+      title: 'My outcome'
+    }
+  ],
+  expanded: false,
+  expandedOutcomes: Set(),
+  onExpansionChange: () => {},
+  ...props
+})
 
 it('renders the OutcomeGroup component', () => {
-  const wrapper = shallow(<OutcomeGroup {...defaultProps()}/>)
+  const wrapper = shallow(<OutcomeGroup {...defaultProps()} />)
   expect(wrapper).toMatchSnapshot()
 })
 
 describe('header', () => {
   it('includes the outcome group name', () => {
-    const wrapper = shallow(<OutcomeGroup {...defaultProps()}/>)
+    const wrapper = shallow(<OutcomeGroup {...defaultProps()} />)
     const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('My group')
@@ -135,6 +128,6 @@ describe('handleToggle()', () => {
     props.onExpansionChange = jest.fn()
     const wrapper = shallow(<OutcomeGroup {...props} />)
     wrapper.instance().handleToggle(null, true)
-    expect(props.onExpansionChange).toBeCalledWith('group', 10, true)
+    expect(props.onExpansionChange).toHaveBeenCalledWith('group', 10, true)
   })
 })

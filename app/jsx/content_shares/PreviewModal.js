@@ -17,11 +17,25 @@
  */
 
 import React from 'react'
+import {bool, func} from 'prop-types'
 import I18n from 'i18n!content_share_preview_overlay'
 import {Button} from '@instructure/ui-buttons'
 import CanvasModal from 'jsx/shared/components/CanvasModal'
+import contentShareShape from 'jsx/shared/proptypes/contentShare'
 
-export default function PreviewModal({open, onDismiss}) {
+PreviewModal.propTypes = {
+  open: bool,
+  share: contentShareShape,
+  onDismiss: func
+}
+
+export default function PreviewModal({open, share, onDismiss}) {
+  function sharePreviewUrl() {
+    if (!share) return null
+    const downloadUrl = encodeURIComponent(share.content_export.attachment.url)
+    return `${ENV.COMMON_CARTRIDGE_VIEWER_URL}?cartridge=${downloadUrl}`
+  }
+
   function Footer() {
     return <Button onClick={onDismiss}>{I18n.t('Close')}</Button>
   }
@@ -39,7 +53,7 @@ export default function PreviewModal({open, onDismiss}) {
       <iframe
         style={{width: '100%', height: '100%', border: 'none', display: 'block'}}
         title={I18n.t('Content Share Preview')}
-        src={ENV.COMMON_CARTRIDGE_VIEWER_URL}
+        src={sharePreviewUrl()}
       />
     </CanvasModal>
   )

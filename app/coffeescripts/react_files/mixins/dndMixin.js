@@ -110,7 +110,7 @@ export default {
           }
         }
       )
-      .done(this.clearSelectedItems);
+      .done(this.clearSelectedItems)
   }
 }
 //      @clearSelectedItems()

@@ -20,6 +20,9 @@ module Api::V1::MediaObject
 
   def media_object_api_json(media_object, current_user, session)
     hash = {}
+    hash['user_entered_title'] = media_object.user_entered_title
+    hash['title'] = media_object.title
+    hash['media_id'] = media_object.media_id
     hash['can_add_captions'] = media_object.grants_right?(current_user, session, :add_captions)
     hash['media_sources'] = media_sources_json(media_object)
 

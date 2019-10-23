@@ -19,7 +19,7 @@ import $ from 'jquery'
 import privacyNoticeTpl from 'jst/profiles/notifications/privacyNotice'
 import '../jquery/fixDialogButtons'
 
-export default function privacyNotice () {
+export default function privacyNotice() {
   if (ENV.READ_PRIVACY_INFO || !ENV.ACCOUNT_PRIVACY_NOTICE) return
 
   const $privacyNotice = $(privacyNoticeTpl())

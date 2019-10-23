@@ -125,11 +125,11 @@ describe('RCE Plugins > CanvasContentTray', () => {
     })
 
     it('is the images panel for image content types', async () => {
-      await showTrayForPlugin('images')
+      await showTrayForPlugin('course_images')
       expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
     })
 
-    it.only('is the media panel for media content types', async () => {
+    it('is the media panel for media content types', async () => {
       await showTrayForPlugin('course_media')
       expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
     })

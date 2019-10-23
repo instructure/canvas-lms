@@ -1100,11 +1100,30 @@ class CoursesController < ApplicationController
     return render json: { message: "Feature disabled" }, status: :forbidden unless @context.root_account.feature_enabled?(:direct_share)
     reject!('Search term required') unless params[:search_term]
     return unless authorized_action(@context, @current_user, :manage_content)
-    users = UserSearch.for_user_in_context(params[:search_term], @context.root_account,
-      @current_user, session, {enrollment_type: ['Ta', 'Teacher', 'Designer']}).
-      where.not(id: @current_user.id)
-    users = Api.paginate(users, self, api_v1_course_content_share_users_url)
-    render :json => users.map { |u| user_display_json(u, @context.root_account) }
+
+    users_scope = User.where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(params[:search_term])).
+      where.not(id: @current_user.id).active.distinct
+    admin_users_scope = users_scope.joins(account_users: [:account, :role]).merge(AccountUser.active).merge(Account.active)
+
+    union_scope = users_scope.joins(enrollments: :course).merge(Enrollment.active.of_admin_type).merge(Course.active).
+      union(
+        root_account_scope(admin_users_scope.merge(Role.full_account_admin), @context.root_account_id),
+        root_account_scope(admin_users_scope.merge(Role.custom_account_admin_with_permission('manage_content')), @context.root_account_id),
+        sub_account_scope(admin_users_scope.merge(Role.full_account_admin), @context.root_account_id),
+        sub_account_scope(admin_users_scope.merge(Role.custom_account_admin_with_permission('manage_content')), @context.root_account_id)
+      ).
+      order(:name).
+      distinct
+    users = Api.paginate(union_scope, self, api_v1_course_content_share_users_url)
+    render :json => users_json(users, @current_user, session, ['avatar_url', 'email'])
+  end
+
+  def root_account_scope(scope, root_account_id)
+    scope.where(account_users: {account_id: root_account_id})
+  end
+
+  def sub_account_scope(scope, root_account_id)
+    scope.where(account_users: {accounts: {root_account_id: root_account_id}})
   end
 
   include Api::V1::PreviewHtml
@@ -1989,46 +2008,6 @@ class CoursesController < ApplicationController
       end
     end
   end
-
-  def set_js_course_wizard_data
-    # Course Wizard JS Info
-    js_env({:COURSE_WIZARD => {
-      :just_saved =>  @context_just_saved,
-      :checklist_states => {
-        :import_step => !@context.attachments.active.exists?,
-        :assignment_step => !@context.assignments.active.exists?,
-        :add_student_step => !@context.students.exists?,
-        :navigation_step => @context.tab_configuration.empty?,
-        :home_page_step => true, # The current wizard just always marks this as complete.
-        :calendar_event_step => !@context.calendar_events.active.exists?,
-        :add_ta_step => !@context.tas.exists?,
-        :publish_step => @context.workflow_state === "available"
-      },
-      :urls => {
-        :content_import => context_url(@context, :context_content_migrations_url),
-        :add_assignments => context_url(@context, :context_assignments_url, :wizard => 1),
-        :add_students => course_users_path(course_id: @context),
-        :add_files => context_url(@context, :context_files_url, :wizard => 1),
-        :select_navigation => context_url(@context, :context_details_url),
-        :course_calendar => calendar_path(course_id: @context),
-        :add_tas => course_users_path(:course_id => @context),
-        :publish_course => course_path(@context)
-      },
-      :permissions => {
-        # Sending the permissions just so maybe later we can extract this easier.
-        :can_manage_content => can_do(@context, @current_user, :manage_content),
-        :can_manage_students => can_do(@context, @current_user, :manage_students),
-        :can_manage_assignments => can_do(@context, @current_user, :manage_assignments),
-        :can_manage_files => can_do(@context, @current_user, :manage_files),
-        :can_update => can_do(@context, @current_user, :update),
-        :can_manage_calendar => can_do(@context, @current_user, :manage_calendar),
-        :can_manage_admin_users => can_do(@context, @current_user, :manage_admin_users),
-        :can_change_course_state => can_do(@context, @current_user, :change_course_state)
-      }
-    }
-    })
-  end
-  helper_method :set_js_course_wizard_data
 
   def confirm_action
     get_context

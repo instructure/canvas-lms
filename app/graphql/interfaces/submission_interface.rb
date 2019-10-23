@@ -176,6 +176,8 @@ module Interfaces::SubmissionInterface
   field :missing, Boolean, method: :missing?, null: true
   field :grade_matches_current_submission, Boolean,
     'was the grade given on the current submission (resubmission)', null: true
+  field :submission_type, Types::AssignmentSubmissionType, null: true
+
 
   field :attachments, [Types::FileType], null: true
   def attachments
@@ -198,6 +200,25 @@ module Interfaces::SubmissionInterface
         end
       end
     end
+  end
+
+  field :turnitin_data, [Types::TurnitinDataType], null: true
+  def turnitin_data
+    return nil if object.turnitin_data.empty?
+
+    promises = object.turnitin_data.keys.map do |asset_string|
+      Loaders::AssetStringLoader.load(asset_string).then do |turnitin_context|
+        next if turnitin_context.nil?
+
+        data = object.turnitin_data[asset_string]
+        {
+          target: turnitin_context,
+          score: data[:similarity_score],
+          status: data[:status]
+        }
+      end
+    end
+    Promise.all(promises).then(&:compact)
   end
 
   field :submission_draft, Types::SubmissionDraftType, null: true

@@ -87,21 +87,22 @@ describe('DirectShareCoursePanel', () => {
   })
 
   it('starts a copy operation and reports status', async () => {
-    fetchMock.postOnce(
-      'path:/api/v1/courses/abc/content_migrations',
-      {id: '8', workflow_state: 'running'}
-    )
-    const {getByText, getAllByText, getByLabelText} = render(
+    fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', {
+      id: '8',
+      workflow_state: 'running'
+    })
+    const {getByText, getByLabelText, queryByText} = render(
       <DirectShareCoursePanel
         sourceCourseId="42"
         contentSelection={{discussion_topics: ['1123']}}
-      />)
+      />
+    )
     const input = getByLabelText(/select a course/i)
     fireEvent.click(input)
     fireEvent.click(getByText('abc'))
-    const copyButton = getByText(/copy/i).closest('button')
-    fireEvent.click(copyButton)
-    expect(copyButton.getAttribute('disabled')).toBe('')
+    fireEvent.click(getByText(/copy/i))
+    expect(queryByText('Copy')).toBeNull()
+    expect(getByText('Close')).toBeInTheDocument()
     const [, fetchOptions] = fetchMock.lastCall()
     expect(fetchOptions.method).toBe('POST')
     expect(JSON.parse(fetchOptions.body)).toMatchObject({
@@ -109,10 +110,11 @@ describe('DirectShareCoursePanel', () => {
       select: {discussion_topics: ['1123']},
       settings: {source_course_id: '42'}
     })
-    expect(getAllByText(/start/i)).toHaveLength(2)
+    expect(getByText(/start/i)).toBeInTheDocument()
     await act(() => fetchMock.flush(true))
-    expect(getAllByText(/success/)).toHaveLength(2)
-    expect(copyButton.getAttribute('disabled')).toBe('')
+    expect(getByText(/success/)).toBeInTheDocument()
+    expect(queryByText('Copy')).toBeNull()
+    expect(getByText('Close')).toBeInTheDocument()
   })
 
   describe('errors', () => {
@@ -126,15 +128,17 @@ describe('DirectShareCoursePanel', () => {
 
     it('reports an error if the fetch fails', async () => {
       fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
-      const {getByText, getAllByText, getByLabelText} = render(<DirectShareCoursePanel sourceCourseId="42" />)
+      const {getByText, getByLabelText, queryByText} = render(
+        <DirectShareCoursePanel sourceCourseId="42" />
+      )
       const input = getByLabelText(/select a course/i)
       fireEvent.click(input)
       fireEvent.click(getByText('abc'))
-      const copyButton = getByText(/copy/i).closest('button')
-      fireEvent.click(copyButton)
+      fireEvent.click(getByText('Copy'))
       await act(() => fetchMock.flush(true))
-      expect(getAllByText(/problem/i)).toHaveLength(2)
-      expect(copyButton.getAttribute('disabled')).toBe('')
+      expect(getByText(/problem/i)).toBeInTheDocument()
+      expect(queryByText('Copy')).toBeNull()
+      expect(getByText('Close')).toBeInTheDocument()
     })
   })
 })

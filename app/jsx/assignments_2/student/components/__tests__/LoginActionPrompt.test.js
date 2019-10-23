@@ -33,6 +33,6 @@ describe('LoginActionPrompt', () => {
 
     const {getByText} = render(<LoginActionPrompt assignment={mockAssignment()} />)
     fireEvent.click(getByText('Log in'))
-    expect(window.location.assign).toBeCalledWith('/login')
+    expect(window.location.assign).toHaveBeenCalledWith('/login')
   })
 })

@@ -623,7 +623,7 @@ module Canvas::LiveEvents
     }
   end
 
-  def self.get_learning_outcome_data(result)
+  def self.get_learning_outcome_result_data(result)
     {
       learning_outcome_id: result.learning_outcome_id,
       mastery: result.learning_outcome_id,
@@ -641,10 +641,75 @@ module Canvas::LiveEvents
   end
 
   def self.learning_outcome_result_updated(result)
-    post_event_stringified('learning_outcome_result_updated', get_learning_outcome_data(result).merge(updated_at: result.updated_at))
+    post_event_stringified('learning_outcome_result_updated', get_learning_outcome_result_data(result).merge(updated_at: result.updated_at))
   end
 
   def self.learning_outcome_result_created(result)
-    post_event_stringified('learning_outcome_result_created', get_learning_outcome_data(result))
+    post_event_stringified('learning_outcome_result_created', get_learning_outcome_result_data(result))
+  end
+
+  def self.get_learning_outcome_data(outcome)
+    {
+      learning_outcome_id: outcome.id,
+      context_type: outcome.context_type,
+      context_id: outcome.context_id,
+      display_name: outcome.display_name,
+      short_description: outcome.short_description,
+      description: outcome.description,
+      vendor_guid: outcome.vendor_guid,
+      calculation_method: outcome.calculation_method,
+      calculation_int: outcome.calculation_int,
+      rubric_criterion: outcome.rubric_criterion,
+      title: outcome.title,
+      workflow_state: outcome.workflow_state
+    }
+  end
+
+  def self.learning_outcome_updated(outcome)
+    post_event_stringified('learning_outcome_updated', get_learning_outcome_data(outcome).merge(updated_at: outcome.updated_at))
+  end
+
+  def self.learning_outcome_created(outcome)
+    post_event_stringified('learning_outcome_created', get_learning_outcome_data(outcome))
+  end
+
+  def self.get_learning_outcome_group_data(group)
+    {
+      learning_outcome_group_id: group.id,
+      context_id: group.context_id,
+      context_type: group.context_type,
+      title: group.title,
+      description: group.description,
+      vendor_guid: group.vendor_guid,
+      parent_outcome_group_id: group.learning_outcome_group_id,
+      workflow_state: group.workflow_state
+    }
+  end
+
+  def self.learning_outcome_group_updated(group)
+    post_event_stringified('learning_outcome_group_updated', get_learning_outcome_group_data(group).merge(updated_at: group.updated_at))
+  end
+
+  def self.learning_outcome_group_created(group)
+    post_event_stringified('learning_outcome_group_created', get_learning_outcome_group_data(group))
+  end
+
+  def self.get_learning_outcome_link_data(link)
+    {
+      learning_outcome_link_id: link.id,
+      learning_outcome_id: link.content_id,
+      learning_outcome_group_id: link.associated_asset_id,
+      context_id: link.context_id,
+      context_type: link.context_type,
+      workflow_state: link.workflow_state
+    }
+  end
+
+  def self.learning_outcome_link_created(link)
+    post_event_stringified('learning_outcome_link_created', get_learning_outcome_link_data(link))
+  end
+
+  def self.learning_outcome_link_updated(link)
+    post_event_stringified('learning_outcome_link_updated', get_learning_outcome_link_data(link).merge(updated_at: link.updated_at))
   end
 end

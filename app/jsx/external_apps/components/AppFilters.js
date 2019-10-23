@@ -54,7 +54,7 @@ export default class AppFilters extends React.Component {
     $.screenReaderFlashMessageExclusive(I18n.t('%{count} apps found', {count: apps.length}))
   }
 
-  focus () {
+  focus() {
     this.filterText.focus()
   }
 

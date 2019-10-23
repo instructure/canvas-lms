@@ -79,10 +79,7 @@ export default class CustomHelpLinkMenu extends React.Component {
             </Button>
           }
         >
-          <Menu.Group
-            label={I18n.t('Add help menu links')}
-            onSelect={this.handleAddLinkSelection}
-          >
+          <Menu.Group label={I18n.t('Add help menu links')} onSelect={this.handleAddLinkSelection}>
             <Menu.Item key="add_custom_link" value="add_custom_link">
               {I18n.t('Add Custom Link')}
             </Menu.Item>

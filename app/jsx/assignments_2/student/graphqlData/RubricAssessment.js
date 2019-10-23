@@ -54,7 +54,7 @@ export const RubricAssessment = {
     }),
     data: arrayOf(RubricAssessmentRating.shape),
     rubricAssociation: RubricAssociation.shape,
-    score: number.isRequired
+    score: number
   })
 }
 

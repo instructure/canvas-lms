@@ -19,7 +19,7 @@ import Backbone from 'node_modules-version-of-backbone'
 import _ from 'underscore'
 
 _.extend(Backbone.Model.prototype, {
-  initialize () {
+  initialize() {
     if (this.computedAttributes != null) {
       return this._configureComputedAttributes()
     }
@@ -62,10 +62,10 @@ _.extend(Backbone.Model.prototype, {
   //  model.set 'first_name', 'Jane'
   //  model.get 'fullName' #> 'Jane Doe'
   //  model.get 'occupation' #> 'programmer'
-  _configureComputedAttributes () {
+  _configureComputedAttributes() {
     const set = methodName => this.set(methodName, this[methodName]())
 
-    _.each(this.computedAttributes, (methodName) => {
+    _.each(this.computedAttributes, methodName => {
       if (typeof methodName === 'string') {
         return set(methodName)
       } else {
@@ -75,7 +75,7 @@ _.extend(Backbone.Model.prototype, {
         return this.bind(eventName, () => set(methodName.name))
       }
     })
-  },
+  }
 })
 
 export default Backbone.Model

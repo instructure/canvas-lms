@@ -18,31 +18,37 @@ import axios from 'axios'
 
 const stringIds = {Accept: 'application/json+canvas-string-ids'}
 
-export function getRootFolder (contextType, contextId) {
+export function getRootFolder(contextType, contextId) {
   return axios.get(`/api/v1/${contextType}/${contextId}/folders/root`, stringIds)
 }
 
-function createFormData (data) {
+function createFormData(data) {
   const formData = new FormData()
   Object.keys(data).forEach(key => formData.append(key, data[key]))
   return formData
 }
 
-function onFileUploadInfoReceived (file, uploadInfo, onSuccess, onFailure) {
-  const formData = createFormData({...uploadInfo.upload_params, 'file': file})
+function onFileUploadInfoReceived(file, uploadInfo, onSuccess, onFailure) {
+  const formData = createFormData({...uploadInfo.upload_params, file})
   const config = {'Content-Type': 'multipart/form-data', ...stringIds}
-  axios.post(uploadInfo.upload_url, formData, config)
+  axios
+    .post(uploadInfo.upload_url, formData, config)
     .then(response => onSuccess(response.data))
     .catch(response => onFailure(response))
 }
 
-export function uploadFile (file, folderId, onSuccess, onFailure) {
-  axios.post(`/api/v1/folders/${folderId}/files`, {
-    name: file.name,
-    size: file.size,
-    parent_folder_id: folderId,
-    on_duplicate: 'rename'
-  }, stringIds)
-  .then(response => onFileUploadInfoReceived(file, response.data, onSuccess, onFailure))
-  .catch(response => onFailure(response))
+export function uploadFile(file, folderId, onSuccess, onFailure) {
+  axios
+    .post(
+      `/api/v1/folders/${folderId}/files`,
+      {
+        name: file.name,
+        size: file.size,
+        parent_folder_id: folderId,
+        on_duplicate: 'rename'
+      },
+      stringIds
+    )
+    .then(response => onFileUploadInfoReceived(file, response.data, onSuccess, onFailure))
+    .catch(response => onFailure(response))
 }

@@ -60,12 +60,16 @@ export default class ImageSearch extends React.Component {
   componentDidUpdate() {
     let toFocus
     if (this.state.pageDirection === 'prev') {
-        toFocus = this._imageSearchControlPrev || this._imageSearchControlNext || this._imageSearchInput
+      toFocus =
+        this._imageSearchControlPrev || this._imageSearchControlNext || this._imageSearchInput
     } else if (this.state.pageDirection === 'next') {
-        toFocus = this._imageSearchControlNext || this._imageSearchControlPrev || this._imageSearchInput
+      toFocus =
+        this._imageSearchControlNext || this._imageSearchControlPrev || this._imageSearchInput
     }
     if (toFocus) {
-      setTimeout(() => { toFocus.focus() }, 0)
+      setTimeout(() => {
+        toFocus.focus()
+      }, 0)
     }
   }
 
@@ -73,7 +77,7 @@ export default class ImageSearch extends React.Component {
     this.setState(ImageSearchStore.getState())
   }
 
-  handleInput = (event) => {
+  handleInput = event => {
     event.preventDefault()
 
     if (event.target.value === '') {
@@ -101,12 +105,17 @@ export default class ImageSearch extends React.Component {
 
   renderAlert() {
     if (!this.state.alert) return null
-    const alert = (<Alert
-      screenReaderOnly
-      liveRegion={() => document.getElementById('flash_screenreader_holder')}
-    >
-      {I18n.t('%{count} images found for %{term}', {count: this.state.searchResults.length, term: this.state.searchTerm})}
-    </Alert>)
+    const alert = (
+      <Alert
+        screenReaderOnly
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+      >
+        {I18n.t('%{count} images found for %{term}', {
+          count: this.state.searchResults.length,
+          term: this.state.searchTerm
+        })}
+      </Alert>
+    )
     return alert
   }
 
@@ -121,23 +130,35 @@ export default class ImageSearch extends React.Component {
       return (
         <div className="ImageSearch__images">
           {this.state.searchResults.map(photo => {
-            const photo_url = photo.raw_url + (photo.raw_url.includes('?') ? '&' : '?') + qs.stringify(unsplashParams)
-            return <ImageSearchItem
-              key={photo.id}
-              confirmationId={photo.id}
-              src={photo_url}
-              description={photo.alt || photo.description || this.state.searchTerm}
-              selectImage={this.props.selectImage}
-              userUrl={photo.user_url}
-              userName={photo.user}
-            />
+            const photo_url =
+              photo.raw_url +
+              (photo.raw_url.includes('?') ? '&' : '?') +
+              qs.stringify(unsplashParams)
+            return (
+              <ImageSearchItem
+                key={photo.id}
+                confirmationId={photo.id}
+                src={photo_url}
+                description={photo.alt || photo.description || this.state.searchTerm}
+                selectImage={this.props.selectImage}
+                userUrl={photo.user_url}
+                userName={photo.user}
+              />
+            )
           })}
         </div>
       )
-    } else if (!this.state.searching && this.state.searchTerm && !this.state.searchResults.length && this.state.alert) {
+    } else if (
+      !this.state.searching &&
+      this.state.searchTerm &&
+      !this.state.searchResults.length &&
+      this.state.alert
+    ) {
       return (
         <div className="ImageSearch__images">
-          <Text>{I18n.t("No results found for %{searchTerm}", {searchTerm: this.state.searchTerm})}</Text>
+          <Text>
+            {I18n.t('No results found for %{searchTerm}', {searchTerm: this.state.searchTerm})}
+          </Text>
         </div>
       )
     }
@@ -151,22 +172,31 @@ export default class ImageSearch extends React.Component {
     return (
       <Flex as="div" width="100%" justifyItems="space-between" margin="small 0 small">
         <Flex.Item>
-          { this.state.prevUrl && <Button variant="link"
-            buttonRef={(e) => this._imageSearchControlPrev = e}
-            onClick={this.loadPreviousPage}
-            icon={IconArrowOpenStartLine}
-          >
-            {I18n.t('Previous Page')}
-          </Button> }
+          {this.state.prevUrl && (
+            <Button
+              variant="link"
+              buttonRef={e => (this._imageSearchControlPrev = e)}
+              onClick={this.loadPreviousPage}
+              icon={IconArrowOpenStartLine}
+            >
+              {I18n.t('Previous Page')}
+            </Button>
+          )}
         </Flex.Item>
         <Flex.Item>
-          { this.state.nextUrl && <Button variant="link"
-            buttonRef={(e) => this._imageSearchControlNext = e}
-            onClick={this.loadNextPage}
-            iconPlacement="end"
-          >
-            {I18n.t('Next Page')}<View padding="0 0 0 x-small"><IconArrowOpenEndLine /></View>
-          </Button> }
+          {this.state.nextUrl && (
+            <Button
+              variant="link"
+              buttonRef={e => (this._imageSearchControlNext = e)}
+              onClick={this.loadNextPage}
+              iconPlacement="end"
+            >
+              {I18n.t('Next Page')}
+              <View padding="0 0 0 x-small">
+                <IconArrowOpenEndLine />
+              </View>
+            </Button>
+          )}
         </Flex.Item>
       </Flex>
     )
@@ -181,9 +211,9 @@ export default class ImageSearch extends React.Component {
         </View>
         <View as="div" margin="small 0 small">
           <TextInput
-            inputRef={(e) => this._imageSearchInput = e}
+            inputRef={e => (this._imageSearchInput = e)}
             placeholder={I18n.t('Search')}
-            label={<ScreenReaderContent>{I18n.t("Search")}</ScreenReaderContent>}
+            renderLabel={<ScreenReaderContent>{I18n.t('Search')}</ScreenReaderContent>}
             value={this.state.searchTerm}
             type="search"
             layout="inline"

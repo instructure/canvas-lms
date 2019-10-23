@@ -86,7 +86,8 @@ export default class DiscussionDeleteModal extends Component {
             onClick={this.hideDeleteConfirm}
           >
             {I18n.t('Cancel')}
-          </Button>&nbsp;
+          </Button>
+          &nbsp;
           <Button
             ref={c => {
               this.confirmDeleteBtn = c

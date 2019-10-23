@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import DueDateCalendarPicker from '../due_dates/DueDateCalendarPicker'
+import DueDateCalendarPicker from './DueDateCalendarPicker'
 import I18n from 'i18n!DueDateCalendars'
 import cx from 'classnames'
 

@@ -68,7 +68,8 @@
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
 
-  before_action :load_media_object
+  before_action :load_media_object, :except => [:index]
+  before_action :require_user, :only => [:index]
 
   # @{not an}API Show Media Object Details
   #
@@ -83,10 +84,25 @@ class MediaObjectsController < ApplicationController
     render :json => media_object_api_json(@media_object, @current_user, session)
   end
 
+  # @API List Media Objects
+  #
+  # Returns all Media Objects Created by the user making the request.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/media_objects \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [MediaObject]
+  def index
+    media_objects = Api.paginate(MediaObject.where(user: @current_user).active, self, api_v1_media_objects_url).
+      map{ |mo| media_object_api_json(mo, @current_user, session)}
+    render :json => media_objects
+  end
+
   def iframe_media_player
     js_env media_sources: media_sources_json(@media_object)
     js_bundle :media_player_iframe_content
-    render html: '', layout: 'layouts/bare'
+    render html: "<div><div>#{I18n.t('Loading...')}</div></div>".html_safe, layout: 'layouts/bare'
   end
 
   private

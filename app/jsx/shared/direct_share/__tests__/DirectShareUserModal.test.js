@@ -28,7 +28,7 @@ describe('DirectShareUserModal', () => {
   let ariaLive
 
   beforeAll(() => {
-    window.ENV = {COURSE_ID: "42"}
+    window.ENV = {COURSE_ID: '42'}
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
     ariaLive.setAttribute('role', 'alert')
@@ -54,18 +54,32 @@ describe('DirectShareUserModal', () => {
 
   it('disables the send button immediately', () => {
     const {getByText} = render(<DirectShareUserModal open courseId="1" />)
-    expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
+    expect(
+      getByText('Send')
+        .closest('button')
+        .getAttribute('disabled')
+    ).toBe('')
   })
 
   it('enables the copy button when a user is selected', () => {
-    const {getByText, getAllByText, getByLabelText} = render(<DirectShareUserModal open courseId="1" />)
+    const {getByText, getAllByText, getByLabelText} = render(
+      <DirectShareUserModal open courseId="1" />
+    )
     fireEvent.change(getByLabelText(/send to:/i), {target: {value: 'abc'}})
     act(() => jest.runAllTimers()) // let the debounce happen
     fireEvent.click(getByText('abc'))
-    expect(getByText('Send').closest('button').getAttribute('disabled')).toBe(null)
+    expect(
+      getByText('Send')
+        .closest('button')
+        .getAttribute('disabled')
+    ).toBe(null)
     // remove the selected user from the list
     fireEvent.click(getAllByText('abc')[1]) // first one is SR alert
-    expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
+    expect(
+      getByText('Send')
+        .closest('button')
+        .getAttribute('disabled')
+    ).toBe('')
   })
 
   it('disables the send button when a search has started', () => {
@@ -73,7 +87,11 @@ describe('DirectShareUserModal', () => {
     fireEvent.change(getByLabelText(/send to:/i), {target: {value: 'abc'}})
     act(() => jest.runAllTimers()) // let the debounce happen
     fireEvent.click(getByText('Send'))
-    expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
+    expect(
+      getByText('Send')
+        .closest('button')
+        .getAttribute('disabled')
+    ).toBe('')
   })
 
   it('starts a share operation and reports status', async () => {
@@ -103,7 +121,9 @@ describe('DirectShareUserModal', () => {
 
   it('clears user selection when the modal is closed', async () => {
     fetchMock.get('*', [{id: 'abc', display_name: 'abc'}])
-    const {queryByText, getByText, findByLabelText, rerender} = render(<DirectShareUserModal open />)
+    const {queryByText, getByText, findByLabelText, rerender} = render(
+      <DirectShareUserModal open />
+    )
     const input = await findByLabelText('Send to:') // allow lazy code to load
     fireEvent.focus(input)
     fireEvent.change(input, {target: {value: 'abc'}})
@@ -139,7 +159,6 @@ describe('DirectShareUserModal', () => {
       fireEvent.click(getByText('Send'))
       await act(() => fetchMock.flush(true))
       expect(getByText(/error/i)).toBeInTheDocument()
-
     })
   })
 })

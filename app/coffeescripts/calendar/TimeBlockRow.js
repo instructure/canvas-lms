@@ -21,7 +21,7 @@ import I18n from 'i18n!calendar'
 import timeBlockRowTemplate from 'jst/calendar/TimeBlockRow'
 import fcUtil from '../util/fcUtil'
 import datePickerFormat from 'jsx/shared/helpers/datePickerFormat'
-import '../calendar/fcMomentHandlebarsHelpers' // make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
+import './fcMomentHandlebarsHelpers' // make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
 
 export default class TimeBlockRow {
   constructor(TimeBlockList, data) {
@@ -151,10 +151,15 @@ export default class TimeBlockRow {
   }
 
   blank() {
-    return (this.$date.data('blank') && this.$start_time.data('blank') && this.$end_time.data('blank'))
+    return (
+      this.$date.data('blank') && this.$start_time.data('blank') && this.$end_time.data('blank')
+    )
   }
 
   incomplete() {
-    return (!this.blank() && (this.$date.data('blank') || this.$start_time.data('blank') || this.$end_time.data('blank')))
+    return (
+      !this.blank() &&
+      (this.$date.data('blank') || this.$start_time.data('blank') || this.$end_time.data('blank'))
+    )
   }
 }

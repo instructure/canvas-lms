@@ -71,6 +71,20 @@
 #       }
 #     }
 #
+# @model EnrollmentTermsList
+#     {
+#       "id": "EnrollmentTermsList",
+#       "description": "",
+#       "properties": {
+#         "enrollment_terms": {
+#           "description": "a paginated list of all terms in the account",
+#           "type": "array",
+#           "example": [],
+#           "items": { "$ref": "EnrollmentTerm" }
+#         }
+#       }
+#     }
+#
 class TermsApiController < ApplicationController
   before_action :require_context, :require_root_account, :require_account_access
 
@@ -78,7 +92,7 @@ class TermsApiController < ApplicationController
 
   # @API List enrollment terms
   #
-  # A paginated list of all of the terms in the account.
+  # An object with a paginated list of all of the terms in the account.
   #
   # @argument workflow_state[] [String, "active"|"deleted"|"all"]
   #   If set, only returns terms that are in the given state.
@@ -119,7 +133,7 @@ class TermsApiController < ApplicationController
   #     ]
   #   }
   #
-  # @returns [EnrollmentTerm]
+  # @returns EnrollmentTermsList
   def index
     terms = @context.enrollment_terms.order('start_at DESC, end_at DESC, id ASC')
 

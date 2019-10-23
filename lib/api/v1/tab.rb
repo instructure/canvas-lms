@@ -51,7 +51,14 @@ module Api::V1::Tab
     end
 
     if tab[:args]
-      send(method, *tab[:args], opts)
+      # If last argument is a hash (of options), we can't add on another options hash;
+      # we need to merge it into the existing options.
+      if tab[:args].last.is_a?(Hash) || tab[:args].last.is_a?(ActionController::Parameters)
+        # can't do tab[:args].last.merge(opts), that may convert :host to 'host'
+        send(method, *tab[:args][0..-2], opts.merge(tab[:args].last))
+      else
+        send(method, *tab[:args], opts)
+      end
     elsif tab[:no_args]
       send(method, opts)
     else

@@ -29,9 +29,10 @@ import 'jqueryui/popup'
  */
 
 export default class KyleMenu {
-
-  constructor (trigger, options) {
-    ['onOpen', 'select', 'onClose', 'close', 'keepButtonActive'].forEach(m => this[m] = this[m].bind(this))
+  constructor(trigger, options) {
+    ;['onOpen', 'select', 'onClose', 'close', 'keepButtonActive'].forEach(
+      m => (this[m] = this[m].bind(this))
+    )
     this.$trigger = $(trigger).data('kyleMenu', this)
     this.$ariaMenuWrapper = this.$trigger.parent()
     this.opts = $.extend(true, {}, KyleMenu.defaults, options)
@@ -60,17 +61,17 @@ export default class KyleMenu {
     if (this.opts.appendMenuTo) {
       // to keep tab order when appended out of place
       this.$menu.on({
-        keydown: (e) => {
+        keydown: e => {
           if (e.keyCode === $.ui.keyCode.TAB) {
             let tabKey
             if (e.shiftKey) {
               tabKey = {
                 which: $.ui.keyCode.TAB,
-                shiftKey: true,
+                shiftKey: true
               }
             } else {
               tabKey = {
-                which: $.ui.keyCode.TAB,
+                which: $.ui.keyCode.TAB
               }
             }
 
@@ -84,7 +85,7 @@ export default class KyleMenu {
       const _open = popupInstance.open
       const self = this
       // monkey patch just this plugin instance not $.ui.popup.prototype.open
-      popupInstance.open = function () {
+      popupInstance.open = function() {
         self.$menu.appendTo(self.opts.appendMenuTo)
         return _open.apply(this, arguments)
       }
@@ -104,24 +105,24 @@ export default class KyleMenu {
     this.$menu.on({
       menuselect: this.select,
       popupopen: this.onOpen,
-      popupclose: this.onClose,
+      popupclose: this.onClose
     })
   }
 
-  onOpen (event) {
+  onOpen(event) {
     this.$ariaMenuWrapper.attr('role', 'application')
     this.adjustCarat(event)
     this.$menu.addClass('ui-state-open')
     if (this.opts.notifyMenuActiveOnParent) this.$notifyParent.addClass('menu_active')
   }
 
-  open () {
+  open() {
     this.$menu.popup('open')
   }
 
-  select (e, ui) {
+  select(e, ui) {
     let $target
-    if ('click' !== (e.originalEvent && e.originalEvent.type) && ($target = $(ui.item).find('a'))) {
+    if ((e.originalEvent && e.originalEvent.type) !== 'click' && ($target = $(ui.item).find('a'))) {
       e.preventDefault()
       const el = $target[0]
       const event = document.createEvent('MouseEvent')
@@ -131,7 +132,7 @@ export default class KyleMenu {
     this.close()
   }
 
-  onClose () {
+  onClose() {
     if (this.opts.appendMenuTo) this.$menu.insertBefore(this.$placeholder)
     this.$trigger.removeClass('ui-state-active')
     this.$ariaMenuWrapper.removeAttr('role')
@@ -154,18 +155,18 @@ export default class KyleMenu {
     }
   }
 
-  close () {
+  close() {
     this.$menu.hasClass('ui-state-open') && this.$menu.popup('close').removeClass('ui-state-open')
   }
 
-  keepButtonActive () {
+  keepButtonActive() {
     if (this.$menu.is('.ui-state-open') && this.$trigger.is('.btn, .ui-button')) {
       this.$trigger.addClass('ui-state-active')
     }
   }
 
   // handle sticking the carat right below where you clicked on the button
-  adjustCarat (event) {
+  adjustCarat(event) {
     if (this.$carat) this.$carat.remove()
     if (this.$trigger.is('.btn, .ui-button')) this.$trigger.addClass('ui-state-active')
 
@@ -175,7 +176,7 @@ export default class KyleMenu {
     // the menu may have flipped above the trigger
     const mbox = this.$menu[0].getBoundingClientRect()
     const tbox = this.$trigger[0].getBoundingClientRect()
-    const caratIsBelow = (mbox.top + mbox.height) < tbox.top
+    const caratIsBelow = mbox.top + mbox.height < tbox.top
     const caratY = mbox.height - 2
 
     // if it is a mouse event, it will have a 'pageX' otherwise use the middle of the trigger
@@ -207,8 +208,8 @@ export default class KyleMenu {
 }
 
 // expose jQuery plugin
-$.fn.kyleMenu = function (options) {
-  return this.each(function () {
+$.fn.kyleMenu = function(options) {
+  return this.each(function() {
     if (!$(this).data().kyleMenu) new KyleMenu(this, options)
   })
 }

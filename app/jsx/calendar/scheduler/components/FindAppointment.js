@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '../../../shared/components/InstuiModal'
 import I18n from 'i18n!react_scheduler'
-import Actions from '../../../calendar/scheduler/actions'
+import Actions from '../actions'
 import preventDefault from 'compiled/fn/preventDefault'
 
 export default class FindAppointment extends React.Component {
@@ -37,23 +37,28 @@ export default class FindAppointment extends React.Component {
 
   handleSubmit() {
     this.props.store.dispatch(Actions.actions.setCourse(this.state.selectedCourse))
-    this.props.store.dispatch(Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode))
+    this.props.store.dispatch(
+      Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode)
+    )
     this.setState({
       isModalOpen: false,
       selectedCourse: {}
     })
   }
+
   selectCourse(courseId) {
     this.setState({
       selectedCourse: this.props.courses.filter(c => c.id === courseId)[0]
     })
   }
+
   openModal() {
     this.setState({
       isModalOpen: true,
       selectedCourse: this.props.courses.length > 0 ? this.props.courses[0] : {}
     })
   }
+
   endAppointmentMode() {
     this.props.store.dispatch(Actions.actions.setFindAppointmentMode(false))
     this.setState({isModalOpen: false})
@@ -91,14 +96,18 @@ export default class FindAppointment extends React.Component {
                 value={this.state.selectedCourse.id}
                 className="ic-Input"
               >
-                {this.props.courses.map(c =>
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                )}
+                {this.props.courses.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
               </select>
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="primary" type="submit">{I18n.t('Submit')}</Button>
+            <Button variant="primary" type="submit">
+              {I18n.t('Submit')}
+            </Button>
           </Modal.Footer>
         </Modal>
       </div>

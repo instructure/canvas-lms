@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 
 import ManualConfiguration from '..'
 
@@ -34,12 +34,12 @@ const props = (overrides = {}) => {
 
 it('renders form', () => {
   const wrapper = mount(<ManualConfiguration {...props()} />)
-  expect(wrapper.find("RequiredValues").exists()).toBe(true)
+  expect(wrapper.find('RequiredValues').exists()).toBe(true)
 })
 
 it('generates the toolConfiguration', () => {
   const wrapper = mount(<ManualConfiguration {...props()} />)
   const toolConfig = wrapper.instance().generateToolConfiguration()
-  expect(toolConfig.scopes).toBeDefined();
-  expect(toolConfig.extensions.length).toEqual(1);
+  expect(toolConfig.scopes).toBeDefined()
+  expect(toolConfig.extensions.length).toEqual(1)
 })

@@ -100,7 +100,7 @@ class ContentSharesController < ApplicationController
   before_action :require_direct_share_enabled
   before_action :require_user
   before_action :get_user_param
-  before_action :require_current_user, :except => %w(show index)
+  before_action :require_current_user, :except => %w(show index unread_count)
   before_action :get_receivers, :only => %w(create add_users)
 
   def require_direct_share_enabled
@@ -190,6 +190,23 @@ class ContentSharesController < ApplicationController
         shares = Api.paginate(@user.sent_content_shares.by_date, self, api_v1_user_sent_content_shares_url)
         render json: sent_content_shares_json(shares, @current_user, session)
       end
+    end
+  end
+
+  # @API Get unread shares count
+  # Return the number of content shares a user has received that have not yet been read. Use +self+ as the user_id
+  # to retrieve your own content shares. Only linked observers and administrators may view other users'
+  # content shares.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/self/content_shares/unread_count'
+  #
+  # @returns { "unread_count": "integer" }
+  def unread_count
+    if authorized_action(@user, @current_user, :read)
+      unread_shares = @user.received_content_shares.where(read_state: "unread")
+      render json: { unread_count: unread_shares.count }
     end
   end
 

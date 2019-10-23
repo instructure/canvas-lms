@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { shape, bool, string, number, oneOfType } from 'prop-types'
+import {shape, bool, string, number, oneOfType} from 'prop-types'
 
 const masterCourseData = shape({
   canManageCourse: bool,
@@ -24,8 +24,8 @@ const masterCourseData = shape({
   isMasterCourse: bool,
   accountId: oneOfType([string, number]),
   masterCourse: shape({
-    id: oneOfType([string, number]).isRequired,
-  }),
+    id: oneOfType([string, number]).isRequired
+  })
 })
 
 export default masterCourseData

@@ -39,29 +39,6 @@ module Types
       Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES)
     ]
 
-    SUBMISSION_TYPES = %w[
-      attendance
-      discussion_topic
-      external_tool
-      media_recording
-      none
-      not_graded
-      on_paper
-      online_quiz
-      online_text_entry
-      online_upload
-      online_url
-      wiki_page
-    ].to_set
-
-    class AssignmentSubmissionType < Types::BaseEnum
-      graphql_name "SubmissionType"
-      description "Types of submissions an assignment accepts"
-      SUBMISSION_TYPES.each { |submission_type|
-        value(submission_type)
-      }
-    end
-
     class AssignmentGradingType < Types::BaseEnum
       graphql_name "GradingType"
       Assignment::ALLOWED_GRADING_TYPES.each { |type| value(type) }
@@ -304,7 +281,7 @@ module Types
       GRADING_TYPES[assignment.grading_type]
     end
 
-    field :submission_types, [AssignmentSubmissionType],
+    field :submission_types, [Types::AssignmentSubmissionType],
       null: true
     def submission_types
       # there's some weird data in the db so we'll just ignore anything that

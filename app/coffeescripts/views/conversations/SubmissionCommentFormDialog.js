@@ -29,7 +29,6 @@ import 'jquery.elastic'
 // reusable message composition dialog
 
 export default class SubmissionCommentFormDialog extends DialogBaseView {
-
   static initClass() {
     this.prototype.template = template
 

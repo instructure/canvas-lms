@@ -23,7 +23,6 @@ import ValidatedMixin from '../../ValidatedMixin'
 import AddPeopleApp from 'jsx/add_people/add_people_app'
 
 export default class RosterView extends Backbone.View {
-
   static initClass() {
     this.mixin(ValidatedMixin)
 

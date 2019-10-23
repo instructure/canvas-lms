@@ -204,7 +204,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       else
         type == :full
       end
-      h[:syllabus_body] = type == :full || master_template.course.syllabus_updated_at&.>(last_export_at)
+      h[:syllabus_body] = type == :full || master_template.course.syllabus_updated_at&.>(last_export_at || master_template.created_at)
     end
   end
 

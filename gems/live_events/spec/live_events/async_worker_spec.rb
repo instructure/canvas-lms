@@ -20,7 +20,7 @@ require 'spec_helper'
 
 describe LiveEvents::AsyncWorker do
   let(:put_records_return) { [] }
-  let(:stream_client) { double(stream_name: stream_name) }
+  let(:stream_client) { double(stream_name: stream_name, put_records: OpenStruct.new(records: [], error_code: nil, error_message: nil)) }
   let(:stream_name) { 'stream_name_x' }
   let(:event_name) { 'event_name' }
   let(:event) do
@@ -49,6 +49,10 @@ describe LiveEvents::AsyncWorker do
     end
 
     def error(data)
+      data
+    end
+
+    def debug(data)
       data
     end
   end
@@ -111,12 +115,31 @@ describe LiveEvents::AsyncWorker do
 
       expect(@worker.push(event, partition_key)).to be false
     end
+
+    context 'with error putting to kinesis' do
+      it "should write errors to logger" do
+        results = OpenStruct.new(records: [
+          OpenStruct.new(error_code: 'failure', error_message: 'failure message')
+        ])
+        allow(stream_client).to receive(:put_records).once.and_return(results)
+        statsd_double = double
+        LiveEvents.statsd = statsd_double
+        expect(statsd_double).to receive(:time).and_yield
+        expect(statsd_double).to receive(:increment).with('live_events.events.send_errors', any_args)
+        @worker.start!
+
+        4.times { @worker.push event, partition_key }
+
+        @worker.stop!
+      end
+    end
   end
 
   describe "exit handling" do
     it "should drain the queue" do
       @worker.push(event, partition_key)
       expect(@worker).to receive(:at_exit).and_yield
+      expect(LiveEvents.logger).not_to receive(:error)
       @worker.start!
       @worker.send(:at_exit)
     end

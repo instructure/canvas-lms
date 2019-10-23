@@ -20,7 +20,7 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '../../shared/components/InstuiModal'
-import store from '../../external_apps/lib/ExternalAppsStore'
+import store from '../lib/ExternalAppsStore'
 import {Button} from '@instructure/ui-buttons'
 
 export default class Lti2ReregistrationUpdateModal extends React.Component {
@@ -70,15 +70,17 @@ export default class Lti2ReregistrationUpdateModal extends React.Component {
         onDismiss={this.closeModal}
         label={I18n.t('Update %{tool}', {tool: this.props.tool.name})}
       >
-        <Modal.Body>
-          {I18n.t('Would you like to accept or dismiss this update?')}
-        </Modal.Body>
+        <Modal.Body>{I18n.t('Would you like to accept or dismiss this update?')}</Modal.Body>
         <Modal.Footer>
           <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
           &nbsp;
-          <Button onClick={this.dismissUpdate} variant="danger">{I18n.t('Dismiss')}</Button>
+          <Button onClick={this.dismissUpdate} variant="danger">
+            {I18n.t('Dismiss')}
+          </Button>
           &nbsp;
-          <Button onClick={this.acceptUpdate} variant="primary">{I18n.t('Accept')}</Button>
+          <Button onClick={this.acceptUpdate} variant="primary">
+            {I18n.t('Accept')}
+          </Button>
         </Modal.Footer>
       </Modal>
     )

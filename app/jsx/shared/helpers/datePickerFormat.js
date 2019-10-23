@@ -23,8 +23,9 @@
 // %b %-d, %Y
 import tz from 'timezone'
 
-export default function datePickerFormat (format) {
-  return tz.adjustFormat(quoteLiteralStrings(format))
+export default function datePickerFormat(format) {
+  return tz
+    .adjustFormat(quoteLiteralStrings(format))
     .replace(/%Y/, 'yy') // Year (eg. 2017)
     .replace(/%b/, 'M') // Month (eg. May)
     .replace(/%-?d/, 'd') // Day of Month (eg. 3)
@@ -34,8 +35,8 @@ export default function datePickerFormat (format) {
   // *Time info removed because it's already added by the datetime picker
 }
 
-function quoteLiteralStrings (format) {
-  let ret = ""
+function quoteLiteralStrings(format) {
+  let ret = ''
   let inLiteral = false
   const open = () => {
     if (!inLiteral) {
@@ -53,13 +54,13 @@ function quoteLiteralStrings (format) {
     if (format[i] === ' ') {
       close()
       ret += ' '
-    } else if (format[i] === "%" && format[i+1] === '-' && format[i+2] != null) {
+    } else if (format[i] === '%' && format[i + 1] === '-' && format[i + 2] != null) {
       close()
-      ret += `%-${format[i+2]}`
+      ret += `%-${format[i + 2]}`
       i += 2
-    } else if (format[i] === "%" && format[i+1] != null) {
+    } else if (format[i] === '%' && format[i + 1] != null) {
       close()
-      ret += `%${format[i+1]}`
+      ret += `%${format[i + 1]}`
       i += 1
     } else {
       open()

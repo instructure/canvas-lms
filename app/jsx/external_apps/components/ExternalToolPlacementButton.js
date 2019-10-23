@@ -21,7 +21,7 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '../../shared/components/InstuiModal'
-import store from '../../external_apps/lib/ExternalAppsStore'
+import store from '../lib/ExternalAppsStore'
 import 'compiled/jquery.rails_flash_notifications'
 import {Button} from '@instructure/ui-buttons'
 
@@ -77,7 +77,7 @@ export default class ExternalToolPlacementButton extends React.Component {
       account_navigation: I18n.t('Account Navigation'),
       assignment_edit: I18n.t('Assignment Edit'),
       assignment_selection: I18n.t('Assignment Selection'),
-      assignment_view: I18n.t("Assignment View"),
+      assignment_view: I18n.t('Assignment View'),
       similarity_detection: I18n.t('Similarity Detection'),
       assignment_menu: I18n.t('Assignment Menu'),
       collaboration: I18n.t('Collaboration'),
@@ -124,9 +124,7 @@ export default class ExternalToolPlacementButton extends React.Component {
       onDismiss={this.closeModal}
       label={I18n.t('App Placements')}
     >
-      <Modal.Body>
-        {this.placements() || I18n.t('No Placements Enabled')}
-      </Modal.Body>
+      <Modal.Body>{this.placements() || I18n.t('No Placements Enabled')}</Modal.Body>
       <Modal.Footer>
         <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
       </Modal.Footer>

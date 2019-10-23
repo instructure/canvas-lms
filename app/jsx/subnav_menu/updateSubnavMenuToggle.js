@@ -55,25 +55,25 @@ const subnavMenuTranslations = {
   }
 }
 
-  const updateSubnavMenuToggle = function (pathname = window.location.pathname) {
-    // update subnav menu toggle for accessibility
-    const subnavMenuExpanded = document.body.classList.contains('course-menu-expanded')
-    const subnavMenuAction = subnavMenuExpanded ? 'hide' : 'show'
-    let subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].default
+const updateSubnavMenuToggle = function(pathname = window.location.pathname) {
+  // update subnav menu toggle for accessibility
+  const subnavMenuExpanded = document.body.classList.contains('course-menu-expanded')
+  const subnavMenuAction = subnavMenuExpanded ? 'hide' : 'show'
+  let subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].default
 
-    if (pathname.match(/^\/profile/)) {
-      subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].account
-    } else if (pathname.match(/^\/accounts/)) {
-      subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].admin
-    } else if (pathname.match(/^\/courses/)) {
-      subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].courses
-    } else if (pathname.match(/^\/groups/)) {
-      subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].groups
-    }
-
-    const subnavMenuToggle = document.getElementById('courseMenuToggle')
-    subnavMenuToggle.setAttribute('aria-label', subnavMenuToggleText)
-    subnavMenuToggle.setAttribute('title', subnavMenuToggleText)
+  if (pathname.match(/^\/profile/)) {
+    subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].account
+  } else if (pathname.match(/^\/accounts/)) {
+    subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].admin
+  } else if (pathname.match(/^\/courses/)) {
+    subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].courses
+  } else if (pathname.match(/^\/groups/)) {
+    subnavMenuToggleText = subnavMenuTranslations[subnavMenuAction].groups
   }
+
+  const subnavMenuToggle = document.getElementById('courseMenuToggle')
+  subnavMenuToggle.setAttribute('aria-label', subnavMenuToggleText)
+  subnavMenuToggle.setAttribute('title', subnavMenuToggleText)
+}
 
 export default updateSubnavMenuToggle

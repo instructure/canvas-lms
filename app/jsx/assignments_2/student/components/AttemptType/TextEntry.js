@@ -67,7 +67,8 @@ export default class TextEntry extends React.Component {
 
     if (!this.props.editingDraft) {
       if (['submitted', 'graded'].includes(this.props.submission.state)) {
-        this.viewTextSubmission.focus()
+        // TODO: attempting to focus on a View doesn't work, need to revisit this after
+        // we discuss how we want to handle focusable elements for higher-order components
       } else if (prevProps.editingDraft) {
         this.editTextEntryButton.focus()
       } else if (this.getDraftBody() === null) {
@@ -165,6 +166,7 @@ export default class TextEntry extends React.Component {
     await this.props.createSubmissionDraft({
       variables: {
         id: this.props.submission.id,
+        activeSubmissionType: 'online_text_entry',
         attempt: this.props.submission.attempt || 1,
         body: rceText
       }
@@ -230,15 +232,7 @@ export default class TextEntry extends React.Component {
 
   renderSubmission() {
     return (
-      <View
-        as="div"
-        borderWidth="small"
-        padding="xx-small"
-        data-testid="text-submission"
-        ref={el => {
-          this.viewTextSubmission = el
-        }}
-      >
+      <View as="div" borderWidth="small" padding="xx-small" data-testid="text-submission">
         <div dangerouslySetInnerHTML={{__html: this.props.submission.body}} />
       </View>
     )

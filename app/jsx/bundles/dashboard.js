@@ -22,26 +22,29 @@ import 'jquery.disableWhileLoading'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import DashboardHeader from '../dashboard/DashboardHeader'
+import ready from '@instructure/ready'
 
-const dashboardHeaderContainer = document.getElementById('dashboard_header_container');
-if (dashboardHeaderContainer) {
-  const dashboard_view = ENV.PREFERENCES.dashboard_view;
+ready(() => {
+  const dashboardHeaderContainer = document.getElementById('dashboard_header_container')
+  if (dashboardHeaderContainer) {
+    const dashboard_view = ENV.PREFERENCES.dashboard_view
 
-  ReactDOM.render(
-    <DashboardHeader
-      dashboard_view={dashboard_view}
-      planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
-      flashError={$.flashError}
-      flashMessage={$.flashMessage}
-      screenReaderFlashMessage={$.screenReaderFlashMessage}
-      env={window.ENV}
-    />,
-    dashboardHeaderContainer
-  )
-} else {
-  // if we are on the root dashboard page, then we conditinally load the
-  // stream items and initialize the backbone view in DashboardHeader
-  // but on a course dashboard, erb html is there as part of the page load and
-  // we can initialize the backbone view immediately
-  import('../views/DashboardView').then(({default: DashboardView}) => new DashboardView())
-}
+    ReactDOM.render(
+      <DashboardHeader
+        dashboard_view={dashboard_view}
+        planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
+        flashError={$.flashError}
+        flashMessage={$.flashMessage}
+        screenReaderFlashMessage={$.screenReaderFlashMessage}
+        env={window.ENV}
+      />,
+      dashboardHeaderContainer
+    )
+  } else {
+    // if we are on the root dashboard page, then we conditinally load the
+    // stream items and initialize the backbone view in DashboardHeader
+    // but on a course dashboard, erb html is there as part of the page load and
+    // we can initialize the backbone view immediately
+    import('../views/DashboardView').then(({default: DashboardView}) => new DashboardView())
+  }
+})
