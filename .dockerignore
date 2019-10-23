@@ -6,14 +6,6 @@ client_apps/canvas_quizzes/node_modules/
 client_apps/canvas_quizzes/dist/
 client_apps/canvas_quizzes/tmp/
 config/*.example
-config/*.yml
-# Exclude the config files that are actually checked in and should be part of the image
-# Every other config should be set at runtime.
-!config/brandable_css.yml
-!config/browsers.yml
-!config/fontcustom.yml
-!config/styleguide.yml
-!config/testem.yml
 coverage/
 coverage-js/
 gems/*/node_modules/
