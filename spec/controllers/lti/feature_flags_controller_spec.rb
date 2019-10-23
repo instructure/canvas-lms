@@ -35,7 +35,8 @@ describe Lti::FeatureFlagsController do
       'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true,  autoexpand: true),
       'javascript_csp' => Feature.new(feature: 'javascript_csp', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true,  autoexpand: true),
       'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed', development: true, release_notes_url: 'http://example.com', display_name: "not localized", description: "srsly"),
-      'compact_live_event_payloads' => Feature.new(feature: 'compact_live_event_payloads', applies_to: 'RootAccount', state: 'allowed')
+      'compact_live_event_payloads' => Feature.new(feature: 'compact_live_event_payloads', applies_to: 'RootAccount', state: 'allowed'),
+      'site_admin_feature' => Feature.new(feature: 'site_admin_feature', applies_to: 'SiteAdmin', state: 'on', display_name: lambda { "SiteAdmin Feature FRD" }, description: lambda { "FRD!!" }, beta: true,  autoexpand: true )
     })
   end
 
@@ -54,7 +55,7 @@ describe Lti::FeatureFlagsController do
     context 'with an account lti_context_id' do
       it_behaves_like 'course or account lti service' do
         let(:params) do
-          { 
+          {
             account_id: Lti::Asset.opaque_identifier_for(account),
             feature: 'account_feature'
           }
@@ -65,7 +66,7 @@ describe Lti::FeatureFlagsController do
     context 'with an account canvas id' do
       it_behaves_like 'course or account lti service' do
         let(:params) do
-          { 
+          {
             account_id: account.id,
             feature: 'account_feature'
           }
@@ -76,7 +77,7 @@ describe Lti::FeatureFlagsController do
     context 'with a course lti_context_id' do
       it_behaves_like 'course or account lti service' do
         let(:params) do
-          { 
+          {
             course_id: Lti::Asset.opaque_identifier_for(course),
             feature: 'course_feature'
           }
@@ -87,11 +88,26 @@ describe Lti::FeatureFlagsController do
     context 'with a course canvas id' do
       it_behaves_like 'course or account lti service' do
         let(:params) do
-          { 
+          {
             course_id: course.id,
             feature: 'course_feature'
           }
         end
+      end
+    end
+
+    context 'with a site-admin-only feature' do
+      let(:action) { :show }
+      let(:params_overrides) do
+        {
+          account_id: account.id,
+          feature: 'site_admin_feature'
+        }
+      end
+
+      it 'returns a valid feature' do
+        send_request
+        expect(response.body).not_to eq("null")
       end
     end
 
