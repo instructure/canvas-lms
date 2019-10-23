@@ -1,4 +1,8 @@
 common: &default_settings
+  # Important note: make sure and use the variation of the setting
+  # that has the secret key set. It will fail otherwise.
+  # Login to Heroku, open the Sentry add-on and go here to get it:
+  # https://docs.sentry.io/clients/ruby/config/
   dsn: <%= ENV['SENTRY_DSN'] %>
 
 development:
