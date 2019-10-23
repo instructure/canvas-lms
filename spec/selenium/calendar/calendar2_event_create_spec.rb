@@ -69,7 +69,7 @@ describe "calendar2" do
         replace_content(f('#calendar_event_location_name'), location_name)
         replace_content(f('#calendar_event_location_address'), location_address)
         # submit_form makes the spec fragile
-        f('#editCalendarEventFull').submit
+        wait_for_new_page_load { f('#editCalendarEventFull').submit }
         expect(CalendarEvent.last.location_name).to eq location_name
         expect(CalendarEvent.last.location_address).to eq location_address
       end

@@ -9,11 +9,15 @@ services:
       remote_url: http://selenium-chrome:4444/wd/hub
       browser: chrome
       RCE_HOST: "http://canvasrceapi"
+      # these are so we can use prod compiled assets in test environment
       USE_OPTIMIZED_JS: 'true'
       SASS_STYLE: 'compressed'
 
   selenium-chrome:
     image: starlord.inscloudgate.net/jenkins/selenium-chrome:3.141.59-selenium
+    environment:
+      SCREEN_WIDTH: 1680
+      SCREEN_HEIGHT: 1050
 
   canvasrceapi:
     image: starlord.inscloudgate.net/jeremyp/canvas-rce-api_web
