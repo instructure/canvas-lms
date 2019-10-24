@@ -158,7 +158,7 @@
   max-width: 100%;
 }
 
-.user_content iframe {
+.user_content iframe[data-media-id] {
   background-color: #eee;
 }
 
