@@ -17,6 +17,7 @@
  */
 import {arrayOf, bool, number, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
+import {MediaObject} from './MediaObject'
 import {SubmissionDraft} from './SubmissionDraft'
 import {SubmissionFile} from './File'
 
@@ -38,6 +39,9 @@ export const SubmissionInterface = {
       gradeHidden
       gradingStatus
       latePolicyStatus
+      mediaObject {
+        ...MediaObject
+      }
       state
       submissionDraft {
         ...SubmissionDraft
@@ -47,6 +51,7 @@ export const SubmissionInterface = {
       unreadCommentCount
       url
     }
+    ${MediaObject.fragment}
     ${SubmissionFile.fragment}
     ${SubmissionDraft.fragment}
   `,
@@ -62,6 +67,7 @@ export const SubmissionInterface = {
     gradeHidden: bool.isRequired,
     gradingStatus: string,
     latePolicyStatus: string,
+    mediaObject: MediaObject.shape,
     state: string.isRequired,
     submissionDraft: SubmissionDraft.shape,
     submissionStatus: string,
@@ -83,6 +89,7 @@ export const DefaultMocks = {
     grade: null,
     gradingStatus: null,
     latePolicyStatus: null,
+    mediaObject: null,
     state: 'unsubmitted',
     submissionDraft: null,
     submissionStatus: 'unsubmitted',

@@ -105,6 +105,7 @@ export default class AttemptTab extends Component {
     return (
       <Suspense fallback={<LoadingIndicator />}>
         <MediaAttempt
+          key={this.props.submission.attempt}
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
           submission={this.props.submission}

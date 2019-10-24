@@ -133,6 +133,14 @@ export default class SubmissionManager extends Component {
     this.setState({submittingAssignment: true})
 
     switch (this.state.activeSubmissionType) {
+      case 'media_recording':
+        if (this.props.submission.submissionDraft.mediaObject?._id) {
+          await this.submitToGraphql(submitMutation, {
+            mediaId: this.props.submission.submissionDraft.mediaObject._id,
+            type: this.state.activeSubmissionType
+          })
+        }
+        break
       case 'online_upload':
         if (
           this.props.submission.submissionDraft.attachments &&
@@ -173,6 +181,10 @@ export default class SubmissionManager extends Component {
   shouldRenderSubmit = () => {
     let activeTypeMeetsCriteria = false
     switch (this.state.activeSubmissionType) {
+      case 'media_recording':
+        activeTypeMeetsCriteria = this.props.submission?.submissionDraft
+          ?.meetsMediaRecordingCriteria
+        break
       case 'online_text_entry':
         activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsTextEntryCriteria
         break

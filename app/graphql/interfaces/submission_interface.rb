@@ -236,6 +236,11 @@ module Interfaces::SubmissionInterface
     end
   end
 
+  field :media_object, Types::MediaObjectType, null: true
+  def media_object
+    Loaders::MediaObjectLoader.load(object.media_comment_id)
+  end
+
   field :turnitin_data, [Types::TurnitinDataType], null: true
   def turnitin_data
     return nil if object.turnitin_data.empty?

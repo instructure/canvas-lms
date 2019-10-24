@@ -1097,6 +1097,7 @@ input CreateSubmissionInput {
   assignmentId: ID!
   body: String
   fileIds: [ID!]
+  mediaId: ID
   submissionType: OnlineSubmissionType!
   url: String
 }
@@ -2011,6 +2012,7 @@ enum NodeType {
 Types that can be submitted online
 """
 enum OnlineSubmissionType {
+  media_recording
   online_text_entry
   online_upload
   online_url
@@ -2718,6 +2720,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   id: ID!
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  mediaObject: MediaObject
   missing: Boolean
   posted: Boolean!
   postedAt: DateTime
@@ -2969,6 +2972,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   gradingStatus: SubmissionGradingStatus
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  mediaObject: MediaObject
   missing: Boolean
   posted: Boolean!
   postedAt: DateTime
@@ -3118,6 +3122,7 @@ interface SubmissionInterface {
   gradingStatus: SubmissionGradingStatus
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  mediaObject: MediaObject
   missing: Boolean
   posted: Boolean!
   postedAt: DateTime
