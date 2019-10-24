@@ -164,7 +164,7 @@ function gradedStepContainer(props, context) {
 
 function selectStepContainer(props, context) {
   const {assignment, submission, isCollapsed, forceLockStatus} = props
-  if (forceLockStatus || assignment.lockInfo.isLocked) {
+  if (!submission || forceLockStatus || assignment.lockInfo.isLocked) {
     return unavailableStepContainer({isCollapsed}, context)
   } else if (submission.state === 'graded') {
     return gradedStepContainer({isCollapsed, assignment, submission}, context)

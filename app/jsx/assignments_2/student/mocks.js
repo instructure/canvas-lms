@@ -54,6 +54,9 @@ const ASSIGNMENT_QUERY = gql`
   query AssignmentQuery {
     assignment(id: "1") {
       ...Assignment
+      rubric {
+        id
+      }
     }
   }
   ${Assignment.fragment}

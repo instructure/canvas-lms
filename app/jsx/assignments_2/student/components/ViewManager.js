@@ -43,31 +43,6 @@ function makeDummyNextSubmission(submission) {
   }
 }
 
-function getAssignmentEnvVariables() {
-  const baseUrl = `${window.location.origin}/${ENV.context_asset_string.split('_')[0]}s/${
-    ENV.context_asset_string.split('_')[1]
-  }`
-
-  const env = {
-    assignmentUrl: `${baseUrl}/assignments`,
-    courseId: ENV.context_asset_string.split('_')[1],
-    currentUser: ENV.current_user,
-    modulePrereq: null,
-    moduleUrl: `${baseUrl}/modules`
-  }
-
-  if (ENV.PREREQS?.items?.[0]?.prev) {
-    const prereq = ENV.PREREQS.items[0].prev
-    env.modulePrereq = {
-      title: prereq.title,
-      link: prereq.html_url,
-      __typename: 'modulePrereq'
-    }
-  }
-
-  return env
-}
-
 function getInitialSubmission(initialQueryData) {
   const submissionsConnection = initialQueryData.assignment.submissionsConnection
   if (!submissionsConnection || submissionsConnection.nodes.length === 0) {
@@ -172,11 +147,12 @@ class ViewManager extends React.Component {
     return nextState
   }
 
-  getAssignmentWithEnv = () => {
+  getAssignment = () => {
+    // Srtip out the submission connections here so our children cannot accidently
+    // use that instead of the explict submission we are passing down as a prop
     const assignment = this.props.initialQueryData.assignment
     const assignmentCopy = JSON.parse(JSON.stringify(assignment))
     delete assignmentCopy.submissionsConnection
-    assignmentCopy.env = getAssignmentEnvVariables()
     return assignmentCopy
   }
 
@@ -296,7 +272,7 @@ class ViewManager extends React.Component {
   }
 
   render() {
-    const assignment = this.getAssignmentWithEnv()
+    const assignment = this.getAssignment()
     const submission = this.getDisplayedSubmission()
 
     return (

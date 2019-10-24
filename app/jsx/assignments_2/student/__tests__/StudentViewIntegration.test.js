@@ -21,10 +21,14 @@ import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import {createCache} from '../../../canvas-apollo'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {
+  LOGGED_OUT_STUDENT_VIEW_QUERY,
+  STUDENT_VIEW_QUERY,
+  SUBMISSION_HISTORIES_QUERY
+} from '../graphqlData/Queries'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../mocks'
 import React from 'react'
-import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import StudentViewQuery from '../components/StudentViewQuery'
 import {SubmissionMocks} from '../graphqlData/Submission'
 
@@ -225,6 +229,43 @@ describe('student view integration tests', () => {
       fireEvent.click(startButton)
 
       expect(await findByTestId('text-editor')).toBeInTheDocument()
+    })
+  })
+
+  describe('logged out user on a public assignment', () => {
+    async function createPublicAssignmentMocks(overrides = {}) {
+      const query = LOGGED_OUT_STUDENT_VIEW_QUERY
+      const variables = {assignmentLid: '1'}
+      const result = await mockQuery(query, overrides, variables)
+      return {
+        request: {query, variables},
+        result
+      }
+    }
+
+    it('renders the assignment', async () => {
+      const overrides = [{Assignment: {name: 'Test Assignment', rubric: null}}]
+      const mocks = [await createPublicAssignmentMocks(overrides)]
+      const {findAllByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <StudentViewQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+      expect((await findAllByText('Test Assignment'))[0]).toBeInTheDocument()
+    })
+
+    it('renders a rubric if present', async () => {
+      const overrides = [
+        {Assignment: {name: 'Test Assignment', rubric: {}}},
+        {Rubric: {title: 'Test Rubric'}}
+      ]
+      const mocks = [await createPublicAssignmentMocks(overrides)]
+      const {findAllByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <StudentViewQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+      expect((await findAllByText('Test Rubric'))[0]).toBeInTheDocument()
     })
   })
 })
