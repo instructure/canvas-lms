@@ -6,10 +6,8 @@ addAssignees: true
 
 # A list of reviewers to be added to pull requests (GitHub user name)
 reviewers:
-  - ccutrer
   - claydiffrient
   - djbender
-  - omarkhan
   - simonista
   - spencerolson
   - tierra
