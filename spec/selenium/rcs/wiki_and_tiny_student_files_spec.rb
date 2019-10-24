@@ -87,22 +87,20 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       expect(sidebar_tabs).not_to contain_jqcss('[role="presentation"]:contains("Files")')
     end
 
-    it "should not show sub-folder in the sidebar if it is locked" do
+    it "should not show sub-folder in the sidebar if it is locked", ignore_js_errors: true do
       @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :locked => true)
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       click_files_tab
 
       expect(sidebar_files.count).to eq 2
       expect(sidebar).to include_text("visible subfolder")
     end
 
-    it "should not show sub-folder in the sidebar if it is hidden" do
+    it "should not show sub-folder in the sidebar if it is hidden", ignore_js_errors: true do
       @root_folder.sub_folders.create!(:name => "subfolder", :context => @course, :workflow_state => 'hidden')
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       click_files_tab
       expect(sidebar_files.count).to eq 2
       expect(sidebar).to include_text("visible subfolder")
@@ -115,7 +113,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @text_file.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       click_files_tab
       expect(sidebar_files.count).to eq 2
       expect(sidebar).to include_text("foo.txt")
@@ -128,7 +125,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @text_file.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       click_files_tab
       expect(sidebar_files.count).to eq 2
       expect(sidebar).to include_text("foo.txt")
@@ -156,7 +152,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
     it "should show images in subfolder if not locked or hidden" do
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       click_images_tab
       expect(sidebar_images.count).to eq 2
       expect(sidebar).to include_text("foo2.png")
@@ -167,7 +162,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @sub_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       click_images_tab
       expect(sidebar_images.count).to eq 1
       expect(sidebar_image_tag['alt']).to eq "foo.png"
@@ -178,7 +172,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @sub_folder.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       click_images_tab
       expect(sidebar_images.count).to eq 1
       expect(sidebar_image_tag['alt']).to eq "foo.png"
@@ -190,7 +183,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @course.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       images_link = fj('[role="presentation"]:contains("Images")')
       expect(images_link.text).to match(/Images/i) # files tab should be missing
       images_link.click
@@ -203,7 +195,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       click_images_tab
       expect(sidebar_images.count).to eq 1
       expect(sidebar_image_tag['alt']).to eq "foo.png"
@@ -214,7 +205,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @attachment.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      expect(sidebar_tabs).to be_displayed
       click_images_tab
       expect(sidebar_images.count).to eq 1
       expect(sidebar_image_tag['alt']).to eq "foo.png"
