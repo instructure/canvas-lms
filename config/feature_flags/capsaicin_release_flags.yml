@@ -1,11 +1,4 @@
 ---
-a11y_left_menu:
-  state: hidden
-  display_name: Accessible Sidebar Menu
-  description: Improve accessibility of left-hand menu through better
-    use of color plus visual and screenreader indicators of inactive menu
-    items.
-  applies_to: RootAccount
 check_submission_file_type:
   state: hidden
   applies_to: RootAccount

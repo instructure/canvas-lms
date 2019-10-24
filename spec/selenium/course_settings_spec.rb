@@ -28,7 +28,7 @@ describe "course settings" do
   it "should show unused tabs to teachers" do
     get "/courses/#{@course.id}/settings"
     wait_for_ajaximations
-    expect(ff("#section-tabs .section.section-tab-hidden").count).to be > 0
+    expect(ff("#section-tabs .section.section-hidden").count).to be > 0
   end
 
   describe "course details" do

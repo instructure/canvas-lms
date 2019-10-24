@@ -119,8 +119,6 @@
       <% if @show_left_side %>
         <% if @no_left_side_list_view
             list_view_class = ''
-          elsif @domain_root_account.try(:feature_enabled?, :a11y_left_menu)
-            list_view_class = 'list-view-a11y-left-menu-flag'
           else
             list_view_class = 'list-view'
           end
