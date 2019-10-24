@@ -911,6 +911,9 @@ class UsersController < ApplicationController
       reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
 
     grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
+    grading_collection = BookmarkedCollection.filter(grading_collection) do |assignment|
+      assignment.context.grants_right?(@current_user, session, :manage_grades)
+    end
     grading_collection = BookmarkedCollection.transform(grading_collection) do |a|
       todo_item_json(a, @current_user, session, 'grading')
     end
