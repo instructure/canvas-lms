@@ -1,11 +1,4 @@
 ---
-check_submission_file_type:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Check Submission File Type
-  description: |-
-    This feature makes the submissions file upload api check the filetype against
-    the allowed extensions of the associated assignment.
 caps_site_admin_test_feature:
   state: allowed
   applies_to: SiteAdmin
