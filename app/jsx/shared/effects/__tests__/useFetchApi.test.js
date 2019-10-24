@@ -38,16 +38,22 @@ describe('useFetchApi', () => {
     expect(loading).toHaveBeenCalledWith(false)
   })
 
-  it('fetches and reports success with results', async () => {
+  it('fetches and reports success and meta with results', async () => {
     const path = '/api/v1/blah'
-    const response = {key: 'value'}
+    const response = {headers: {Link: '<http://api?page=1>;rel="first"'}, body: {key: 'value'}}
     fetchMock.mock(`path:${path}`, response)
     const success = jest.fn()
+    const meta = jest.fn()
     const error = jest.fn()
-    renderHook(() => useFetchApi({success, error, path}))
+    renderHook(() => useFetchApi({success, error, meta, path}))
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)
-    expect(success).toHaveBeenCalledWith(response)
+    expect(success).toHaveBeenCalledWith(response.body)
+    expect(meta).toHaveBeenCalled()
+    expect(meta.mock.calls[0][0]).toMatchObject({
+      link: {first: {page: '1'}},
+      response: {status: 200}
+    })
     expect(error).not.toHaveBeenCalled()
   })
 
@@ -55,12 +61,14 @@ describe('useFetchApi', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 401)
     const success = jest.fn()
+    const meta = jest.fn()
     const error = jest.fn()
     const loading = jest.fn()
-    renderHook(() => useFetchApi({success, error, loading, path}))
+    renderHook(() => useFetchApi({success, error, meta, loading, path}))
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)
     expect(success).not.toHaveBeenCalled()
+    expect(meta).not.toHaveBeenCalled()
     expect(error.mock.calls[0][0].response.status).toEqual(401)
     expect(loading).toHaveBeenCalledWith(false)
   })
@@ -108,7 +116,7 @@ describe('useFetchApi', () => {
     expect(success).toHaveBeenCalledWith({bar: 'baz'})
   })
 
-  it('does not call convert if result is undefined', async () => {
+  it('does not call convert if result is null', async () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 200)
     const convert = jest.fn()
@@ -116,7 +124,7 @@ describe('useFetchApi', () => {
     renderHook(() => useFetchApi({success, path, convert}))
     await fetchMock.flush(true)
     expect(convert).not.toHaveBeenCalled()
-    expect(success).toHaveBeenCalledWith(undefined)
+    expect(success).toHaveBeenCalledWith(null)
   })
 
   it('fetches again if path has changed', async () => {
@@ -124,8 +132,9 @@ describe('useFetchApi', () => {
     fetchMock.mock('end:blah', response, {repeat: 1})
     fetchMock.mock('end:frog', response, {repeat: 1})
     const success = jest.fn()
+    const meta = jest.fn()
     const error = jest.fn()
-    const {rerender} = renderHook(({path}) => useFetchApi({success, error, path}), {
+    const {rerender} = renderHook(({path}) => useFetchApi({success, error, meta, path}), {
       initialProps: {path: '/api/v1/blah'}
     })
     await fetchMock.flush(true)
@@ -133,6 +142,7 @@ describe('useFetchApi', () => {
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)
     expect(success).toHaveBeenCalledTimes(2)
+    expect(meta).toHaveBeenCalledTimes(2)
     expect(error).not.toHaveBeenCalled()
   })
 
@@ -216,8 +226,10 @@ describe('useFetchApi', () => {
 
   it('reports forceResult when specified, without calling fetch', () => {
     const success = jest.fn()
-    renderHook(() => useFetchApi({success, path: '/blah', forceResult: {fake: 'news'}}))
+    const meta = jest.fn()
+    renderHook(() => useFetchApi({success, meta, path: '/blah', forceResult: {fake: 'news'}}))
     expect(success).toHaveBeenCalledWith({fake: 'news'})
+    expect(meta).not.toHaveBeenCalled()
   })
 
   it('only reports forceResult once if it has not changed', () => {
@@ -232,12 +244,14 @@ describe('useFetchApi', () => {
 
   it('reports new results if forceResult is changed', () => {
     const success = jest.fn()
+    const meta = jest.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
-      initialProps: {success, path: '/blah', forceResult: {fake: 'news'}}
+      initialProps: {success, meta, path: '/blah', forceResult: {fake: 'news'}}
     })
     expect(success).toHaveBeenCalledWith({fake: 'news'})
     rerender({success, path: '/blah', forceResult: {other: 'thing'}})
     expect(success).toHaveBeenCalledTimes(2)
+    expect(meta).not.toHaveBeenCalled()
     expect(success).toHaveBeenCalledWith({other: 'thing'})
   })
 
@@ -245,23 +259,31 @@ describe('useFetchApi', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, {fetch: 'result'})
     const success = jest.fn()
+    const meta = jest.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
-      initialProps: {success, path, forceResult: {fake: 'news'}}
+      initialProps: {success, meta, path, forceResult: {fake: 'news'}}
     })
-    rerender({success, path})
+    rerender({success, meta, path})
     await fetchMock.flush(true)
     expect(success).toHaveBeenCalledWith({fetch: 'result'})
+    expect(meta).toHaveBeenCalledWith(
+      expect.objectContaining({link: null, response: expect.anything()})
+    )
   })
 
   it('reports forceResult if changed from undefined', async () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, {fetch: 'result'})
     const success = jest.fn()
-    const {rerender} = renderHook(props => useFetchApi(props), {initialProps: {success, path}})
+    const meta = jest.fn()
+    const {rerender} = renderHook(props => useFetchApi(props), {
+      initialProps: {success, meta, path}
+    })
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)
-    rerender({success, path, forceResult: {force: 'value'}})
+    rerender({success, meta, path, forceResult: {force: 'value'}})
     expect(success).toHaveBeenCalledWith({force: 'value'})
+    expect(meta).toHaveBeenCalledTimes(1)
   })
 
   it('ignores first success results if another fetch starts before it finishes', async () => {
@@ -270,17 +292,19 @@ describe('useFetchApi', () => {
       .mock('end:foo=42', {first: 41}, {repeat: 1})
       .mock('end:foo=44', {second: 42}, {repeat: 1})
     const success = jest.fn()
+    const meta = jest.fn()
     const error = jest.fn()
-    const {rerender} = renderHook(({params}) => useFetchApi({success, error, path, params}), {
+    const {rerender} = renderHook(({params}) => useFetchApi({success, meta, error, path, params}), {
       initialProps: {params: {foo: 42}}
     })
     // don't wait for flush, just start another one
-    // await fetchMock.flush(true)
     rerender({params: {foo: 44}})
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)
     expect(success).toHaveBeenCalledTimes(1)
     expect(success).toHaveBeenCalledWith({second: 42})
+    expect(meta).toHaveBeenCalledTimes(1)
+    expect(meta).toHaveBeenCalledWith(expect.objectContaining({link: null}))
     expect(error).not.toHaveBeenCalled()
   })
 

@@ -17,8 +17,8 @@
 #
 
 require 'uri'
-require 'jwt'
 require 'json'
+require 'json/jwt'
 
 module CanvasPandaPub
 
@@ -93,13 +93,13 @@ module CanvasPandaPub
     # Returns a String token.
 
     def generate_token(channel, read = false, write = false, expires = 1.hour.from_now)
-      JWT.encode({
+      JSON::JWT.new({
         keyId: @key_id,
         channel: "/#{@application_id}#{channel}",
         pub: write,
         sub: read,
         exp: expires.to_i
-      }, @key_secret)
+      }).sign(@key_secret, "HS256").to_s
     end
   end
 end

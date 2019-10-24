@@ -40,14 +40,8 @@ const helper = {
     }
 
     // final fallback to old parseFloat - this allows us to still support scientific 'e' notation
-    if (input.toString().indexOf('e') > -1 && isNaN(num)) {
+    if (input.toString().match(/e/) && isNaN(num)) {
       num = parseFloat(input)
-
-      // Over 'e20' these don't produce usable numbers,
-      // so we just have to cap it for simplicity's sake...
-      if (num.toString().indexOf('e') > -1) {
-        return NaN
-      }
     }
 
     return num

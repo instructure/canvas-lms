@@ -506,6 +506,32 @@ describe SearchController, type: :request do
       end
     end
 
+    context "caching" do
+      specs_require_cache(:redis_cache_store)
+
+      it "should show new groups in existing categories" do
+        json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
+          {:controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}_groups", :synthetic_contexts => "1"})
+        expect(json.map{|r| r["id"]}).to eq ["group_#{@group.id}"]
+
+        Timecop.freeze(1.minute.from_now) do
+          group2 = @course.groups.create(:name => "whee new group", :group_category => @group.group_category)
+          json2 = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
+            {:controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}_groups", :synthetic_contexts => "1"})
+          expect(json2.map{|r| r["id"]}).to match_array ["group_#{@group.id}", "group_#{group2.id}"]
+
+          new_student = User.create!
+          @course.enroll_student(new_student, :enrollment_state => "active")
+          group2.add_user(new_student)
+
+          # show group members too
+          json3 = api_call(:get, "/api/v1/search/recipients.json?context=group_#{group2.id}",
+            {:controller => 'search', :action => 'recipients', :format => 'json', :context => "group_#{group2.id}"})
+          expect(json3.map{|r| r["id"]}).to eq [new_student.id]
+        end
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 

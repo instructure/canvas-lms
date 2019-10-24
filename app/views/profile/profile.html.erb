@@ -94,6 +94,20 @@
       <span id="hints_sortable_name" class="edit_or_show_data data_description"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
     </td>
   </tr>
+  <% if Account.site_admin.feature_enabled?(:account_pronouns) && @domain_root_account.settings[:can_add_pronouns] %>
+    <tr>
+      <th scope="row"><%= f.blabel :pronoun, :en => "Pronoun" %></th>
+      <td><span id="pronoun" class="<%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%= @user.account_pronoun&.display_pronoun || t("None") %></span>
+        <select id="pronoun_list_id" name="user[account_pronoun_id]" class="edit_data">
+          <option <%= "selected" if !@user.account_pronoun_id %>><%= t("None") %></option>
+          <% @domain_root_account.pronouns.each do |pronoun| %>
+            <option value="<%= pronoun.id %>" <%= "selected" if pronoun.id == @user.account_pronoun_id%> ><%=pronoun.display_pronoun%></option>
+          <% end %>
+        </select>
+        <span id="hints_sortable_name" class="edit_or_show_data data_description"><br/><%= t("This pronoun appears after last name") %></span>
+      </td>
+    </tr>
+  <% end %>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
   <% if active_email_channels.length > 1 %>
     <tr>

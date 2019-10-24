@@ -21,6 +21,7 @@ import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Select} from '@instructure/ui-select'
 
+import natcompare from 'compiled/util/natcompare'
 import I18n from 'i18n!gradezilla_default_gradebook_components_content_filters_content_filter'
 
 function renderItem(option, {disabled, highlightedItemId, selectedItemId}) {
@@ -85,7 +86,12 @@ export default function ContentFilter(props) {
     }
   }
 
-  const options = [{id: allItemsId, name: allItemsLabel}].concat(items)
+  let options = [{id: allItemsId, name: allItemsLabel}]
+  if (props.sortAlphabetically) {
+    options = options.concat(items.sort(natcompare.byKey('name')))
+  } else {
+    options = options.concat(items)
+  }
 
   return (
     <Select
@@ -129,9 +135,11 @@ ContentFilter.propTypes = {
   ).isRequired,
 
   onSelect: func.isRequired,
-  selectedItemId: string
+  selectedItemId: string,
+  sortAlphabetically: bool
 }
 
 ContentFilter.defaultProps = {
-  selectedItemId: null
+  selectedItemId: null,
+  sortAlphabetically: false
 }

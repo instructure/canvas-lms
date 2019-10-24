@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { REQUEST_DOCS, RECEIVE_DOCS, FAIL_DOCS } from "../actions/documents";
-import { CHANGE_CONTEXT } from "../actions/context"
+import {REQUEST_DOCS, RECEIVE_DOCS, FAIL_DOCS} from '../actions/documents'
+import {CHANGE_CONTEXT} from '../actions/context'
 
 // manages the state for a specific collection. assumes the action is intended
 // for this collection (see collections.js)
@@ -51,9 +51,9 @@ export default function documentsReducer(prevState = {}, action) {
       state[ctxt] = {
         isLoading: false,
         error: action.payload.error
-      };
+      }
       if (action.payload.files && action.payload.files.length === 0) {
-        state[ctxt].bookmark = null;
+        state[ctxt].bookmark = null
       }
       return state
     }
@@ -63,6 +63,6 @@ export default function documentsReducer(prevState = {}, action) {
     }
 
     default:
-      return prevState;
+      return prevState
   }
 }

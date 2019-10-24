@@ -2765,7 +2765,7 @@ describe User do
   describe "otp remember me cookie" do
     before do
       @user = User.new
-      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.otp_secret_key = ROTP::Base32.random
     end
 
     it "should add an ip to an existing cookie" do

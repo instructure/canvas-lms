@@ -15,19 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, { Component } from 'react';
+import React, {Component} from 'react'
 import {themeable} from '@instructure/ui-themeable'
-import {animatable} from '../../dynamic-ui';
-import formatMessage from '../../format-message';
-import moment from 'moment-timezone';
-import { getFullDateAndTime } from '../../utilities/dateUtils';
+import moment from 'moment-timezone'
 import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-elements'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconXLine} from '@instructure/ui-icons'
-import { bool, string, number, func, object } from 'prop-types';
-import styles from './styles.css';
-import theme from './theme.js';
+import {bool, string, number, func, object} from 'prop-types'
+import {getFullDateAndTime} from '../../utilities/dateUtils'
+import formatMessage from '../../format-message'
+import {animatable} from '../../dynamic-ui'
+import styles from './styles.css'
+import theme from './theme.js'
 
 export class Opportunity extends Component {
   static propTypes = {
@@ -42,42 +42,41 @@ export class Opportunity extends Component {
     plannerOverride: object,
     registerAnimatable: func,
     deregisterAnimatable: func,
-    animatableIndex: number,
+    animatableIndex: number
   }
 
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
 
-    const tzMomentizedDate = moment.tz(props.dueAt, props.timeZone);
-    this.fullDate = getFullDateAndTime(tzMomentizedDate);
+    const tzMomentizedDate = moment.tz(props.dueAt, props.timeZone)
+    this.fullDate = getFullDateAndTime(tzMomentizedDate)
   }
 
   static defaultProps = {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
-    dismiss: () => {},
+    dismiss: () => {}
   }
 
-  componentDidMount () {
-    this.props.registerAnimatable('opportunity', this, this.props.animatableIndex, [this.props.id]);
+  componentDidMount() {
+    this.props.registerAnimatable('opportunity', this, this.props.animatableIndex, [this.props.id])
   }
 
-  componentWillReceiveProps (newProps) {
-    this.props.deregisterAnimatable('opportunity', this, [this.props.id]);
-    this.props.registerAnimatable('opportunity', this, newProps.animatableIndex, [newProps.id]);
+  componentWillReceiveProps(newProps) {
+    this.props.deregisterAnimatable('opportunity', this, [this.props.id])
+    this.props.registerAnimatable('opportunity', this, newProps.animatableIndex, [newProps.id])
   }
 
-  componentWillUnmount () {
-    this.props.deregisterAnimatable('opportunity', this, [this.props.id]);
+  componentWillUnmount() {
+    this.props.deregisterAnimatable('opportunity', this, [this.props.id])
   }
 
-
-  linkRef = (ref) => {
-    this.link = ref;
+  linkRef = ref => {
+    this.link = ref
   }
 
-  getFocusable () {
-    return this.link;
+  getFocusable() {
+    return this.link
   }
 
   dismiss = () => {
@@ -86,8 +85,8 @@ export class Opportunity extends Component {
     }
   }
 
-  renderButton () {
-    const isDismissed = this.props.plannerOverride && this.props.plannerOverride.dismissed;
+  renderButton() {
+    const isDismissed = this.props.plannerOverride && this.props.plannerOverride.dismissed
     return (
       <div className={styles.close}>
         {isDismissed ? null : (
@@ -96,72 +95,71 @@ export class Opportunity extends Component {
             variant="icon"
             icon={IconXLine}
             size="small"
-            title={formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
+            title={formatMessage('Dismiss {opportunityName}', {
+              opportunityName: this.props.opportunityTitle
+            })}
           >
             <ScreenReaderContent>
-              {formatMessage("Dismiss {opportunityName}", {opportunityName: this.props.opportunityTitle})}
+              {formatMessage('Dismiss {opportunityName}', {
+                opportunityName: this.props.opportunityTitle
+              })}
             </ScreenReaderContent>
           </Button>
         )}
       </div>
-    );
+    )
   }
 
-  renderPoints () {
+  renderPoints() {
     if (typeof this.props.points !== 'number') {
       return (
         <ScreenReaderContent>
           {formatMessage('There are no points associated with this item')}
         </ScreenReaderContent>
-      );
+      )
     }
     return (
       <div className={styles.points}>
         <ScreenReaderContent>
-            {formatMessage("{points} points", {points: this.props.points})}
+          {formatMessage('{points} points', {points: this.props.points})}
         </ScreenReaderContent>
         <PresentationContent>
-          <span className={styles.pointsNumber}>
-            {this.props.points}
-          </span>
-          {formatMessage("points")}
+          <span className={styles.pointsNumber}>{this.props.points}</span>
+          {formatMessage('points')}
         </PresentationContent>
       </div>
-    );
+    )
   }
 
-  render () {
+  render() {
     return (
       <div className={styles.root}>
         <div className={styles.oppNameAndTitle}>
-          <div className={styles.oppName}>
-            {this.props.courseName}
-          </div>
+          <div className={styles.oppName}>{this.props.courseName}</div>
           <div className={styles.title}>
             <Button
               variant="link"
               theme={{mediumPadding: '0', mediumHeight: 'normal'}}
               href={this.props.url}
               buttonRef={this.linkRef}
-              >
-                {this.props.opportunityTitle}
-              </Button>
+            >
+              {this.props.opportunityTitle}
+            </Button>
           </div>
         </div>
         <div className={styles.footer}>
           <div className={styles.status}>
-            <Pill text={formatMessage('Missing')} variant="danger"/>
+            <Pill text={formatMessage('Missing')} variant="danger" />
             <div className={styles.due}>
-              <span className={styles.dueText}>
-                {formatMessage('Due:')}</span> {this.fullDate}
+              <span className={styles.dueText}>{formatMessage('Due:')}</span> {this.fullDate}
             </div>
           </div>
           {this.renderPoints()}
         </div>
         {this.renderButton()}
       </div>
-    );
+    )
   }
 }
 
-export default animatable(themeable(theme, styles)(Opportunity));
+export default animatable(themeable(theme, styles)(Opportunity))

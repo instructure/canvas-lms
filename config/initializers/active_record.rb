@@ -265,7 +265,9 @@ class ActiveRecord::Base
   def touch_context
     return if (@@skip_touch_context ||= false || @skip_touch_context ||= false)
     if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
-      self.context_type.constantize.where(id: self.context_id).update_all(updated_at: Time.now.utc)
+      self.class.connection.after_transaction_commit do
+        self.context_type.constantize.where(id: self.context_id).update_all(updated_at: Time.now.utc)
+      end
     end
   rescue
     Canvas::Errors.capture_exception(:touch_context, $ERROR_INFO)

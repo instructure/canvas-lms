@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Button,CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {Heading} from '@instructure/ui-elements'
 import {Checkbox, RadioInput, RadioInputGroup, Select, TextArea} from '@instructure/ui-forms'
@@ -27,9 +27,16 @@ import {IconQuestionLine} from '@instructure/ui-icons'
 import {Flex, View} from '@instructure/ui-layout'
 import {Tooltip, Tray} from '@instructure/ui-overlays'
 
-import {CUSTOM, MIN_HEIGHT, MIN_WIDTH, imageSizes, labelForImageSize, scaleToSize} from '../ImageEmbedOptions'
+import {
+  CUSTOM,
+  MIN_HEIGHT,
+  MIN_WIDTH,
+  imageSizes,
+  labelForImageSize,
+  scaleToSize
+} from '../ImageEmbedOptions'
 import formatMessage from '../../../../format-message'
-import DimensionsInput, { useDimensionsState } from '../../shared/DimensionsInput'
+import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 
 export default function ImageOptionsTray(props) {
   const {imageOptions, onRequestClose, open} = props
@@ -102,19 +109,19 @@ export default function ImageOptionsTray(props) {
       <Flex.Item>{formatMessage('Alt Text')}</Flex.Item>
 
       <Flex.Item margin="0 0 0 xx-small">
-          <Tooltip
-            on={['hover', 'focus']}
-            placement="top"
-            tip={
-              <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
-                {tooltipText}
-              </View>
-            }
-          >
-            <Button icon={IconQuestionLine} size="small" variant="icon">
-              <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
-            </Button>
-          </Tooltip>
+        <Tooltip
+          on={['hover', 'focus']}
+          placement="top"
+          tip={
+            <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
+              {tooltipText}
+            </View>
+          }
+        >
+          <Button icon={IconQuestionLine} size="small" variant="icon">
+            <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
+          </Button>
+        </Tooltip>
       </Flex.Item>
     </Flex>
   )
@@ -128,7 +135,8 @@ export default function ImageOptionsTray(props) {
   }
 
   const saveDisabled =
-    displayAs === 'embed' && ((!isDecorativeImage && altText === '') || (imageSize === CUSTOM && !dimensionsState.isValid))
+    displayAs === 'embed' &&
+    ((!isDecorativeImage && altText === '') || (imageSize === CUSTOM && !dimensionsState.isValid))
 
   return (
     <Tray
@@ -147,9 +155,7 @@ export default function ImageOptionsTray(props) {
         <Flex.Item as="header" padding="medium">
           <Flex direction="row">
             <Flex.Item grow shrink>
-              <Heading as="h2">
-                {formatMessage('Image Options')}
-              </Heading>
+              <Heading as="h2">{formatMessage('Image Options')}</Heading>
             </Flex.Item>
 
             <Flex.Item>
@@ -239,11 +245,7 @@ export default function ImageOptionsTray(props) {
               padding="small medium"
               textAlign="end"
             >
-              <Button
-                disabled={saveDisabled}
-                onClick={handleSave}
-                variant="primary"
-              >
+              <Button disabled={saveDisabled} onClick={handleSave} variant="primary">
                 {formatMessage('Done')}
               </Button>
             </Flex.Item>

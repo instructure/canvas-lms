@@ -18,7 +18,7 @@
 
 import React, {useEffect, useRef, useState} from 'react'
 import {arrayOf, bool, func, instanceOf, oneOfType, string} from 'prop-types'
-import { StyleSheet, css } from "aphrodite";
+import {StyleSheet, css} from 'aphrodite'
 
 import {FileDrop} from '@instructure/ui-forms'
 import {Billboard} from '@instructure/ui-billboard'
@@ -37,7 +37,7 @@ import formatMessage from '../../../../format-message'
 import {getIconFromType, isAudioOrVideo, isImage, isText} from '../fileTypeUtils'
 
 function readFile(theFile) {
-  const p =  new Promise((resolve, reject) => {
+  const p = new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
       let result = reader.result
@@ -49,15 +49,13 @@ function readFile(theFile) {
     reader.onerror = () => {
       reject()
     }
-    if(isImage(theFile.type)) {
+    if (isImage(theFile.type)) {
       reader.readAsDataURL(theFile)
     } else if (isText(theFile.type)) {
       reader.readAsText(theFile)
-    } else if(isAudioOrVideo(theFile.type)) {
+    } else if (isAudioOrVideo(theFile.type)) {
       const sources = [{label: theFile.name, src: URL.createObjectURL(theFile)}]
-      resolve(
-        <VideoPlayer sources={sources} />
-      )
+      resolve(<VideoPlayer sources={sources} />)
     } else {
       const icon = getIconFromType(theFile.type)
       resolve(icon)
@@ -83,21 +81,30 @@ export default function ComputerPanel({
     async function getPreview() {
       setPreview({preview: null, isLoading: true})
       try {
-      const preview = await readFile(theFile)
+        const preview = await readFile(theFile)
         setPreview({preview, isLoading: false})
-        if (isImage(theFile.type)) {  // we need the preview to know the image size to show the placeholder
+        if (isImage(theFile.type)) {
+          // we need the preview to know the image size to show the placeholder
           theFile.preview = preview
           setFile(theFile)
         }
-      } catch(ex) {
-        setPreview({preview: null, error: formatMessage('An error occurred generating the file preview'), isLoading: false})
+      } catch (ex) {
+        setPreview({
+          preview: null,
+          error: formatMessage('An error occurred generating the file preview'),
+          isLoading: false
+        })
       }
     }
     getPreview()
   })
 
   const previewPanelRef = useRef(null)
-  const {playerWidth, playerHeight} = useSizeVideoPlayer(theFile, previewPanelRef, preview.isLoading)
+  const {playerWidth, playerHeight} = useSizeVideoPlayer(
+    theFile,
+    previewPanelRef,
+    preview.isLoading
+  )
 
   const clearButtonRef = useRef(null)
   const panelRef = useRef(null)
@@ -110,14 +117,13 @@ export default function ComputerPanel({
           <Text color="secondary">{formatMessage('Generating preview...')}</Text>
         </div>
       )
-    }
-    else if(preview.error) {
+    } else if (preview.error) {
       return (
         <div className={css(styles.previewContainer)} aria-live="polite">
           <Text color="error">{preview.error}</Text>
         </div>
       )
-    } else if(preview.preview) {
+    } else if (preview.preview) {
       if (isImage(theFile.type)) {
         return (
           <Img
@@ -138,7 +144,7 @@ export default function ComputerPanel({
             <TruncateText maxLines={21}>{preview.preview}</TruncateText>
           </View>
         )
-      } else if(isAudioOrVideo(theFile.type)) {
+      } else if (isAudioOrVideo(theFile.type)) {
         return preview.preview
       } else {
         return (
@@ -180,14 +186,21 @@ export default function ComputerPanel({
             </PresentationContent>
           </Flex.Item>
         </Flex>
-      {(isAudioOrVideo(theFile.type)) ?
-        (<View as="div" height={playerHeight} width={playerWidth} textAlign="center" margin="0 auto">
-          {renderPreview()}
-        </View>) :
-        <View as="div" height="300px" width="300px" margin="0 auto">
-          {renderPreview()}
-        </View>
-      }
+        {isAudioOrVideo(theFile.type) ? (
+          <View
+            as="div"
+            height={playerHeight}
+            width={playerWidth}
+            textAlign="center"
+            margin="0 auto"
+          >
+            {renderPreview()}
+          </View>
+        ) : (
+          <View as="div" height="300px" width="300px" margin="0 auto">
+            {renderPreview()}
+          </View>
+        )}
       </div>
     )
   }

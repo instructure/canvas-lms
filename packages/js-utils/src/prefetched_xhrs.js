@@ -1,8 +1,24 @@
-
+/*
+ * Copyright (C) 2019 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // These are helpful methods you can use along side the ruby ApplicationHelper::prefetch_xhr helper method in canvas
 
-export function getPrefetchedXHR(id){
+export function getPrefetchedXHR(id) {
   return window.prefetched_xhrs && window.prefetched_xhrs[id]
 }
 
@@ -15,9 +31,9 @@ export function getPrefetchedXHR(id){
  */
 export function asAxios(fetchRequest) {
   if (!fetchRequest) return
-  return fetchRequest.then(checkStatus).then(res =>
-    res.json().then(data => ({data, headers: {link: res.headers.get('Link')}}))
-  )
+  return fetchRequest
+    .then(checkStatus)
+    .then(res => res.json().then(data => ({data, headers: {link: res.headers.get('Link')}})))
 }
 
 /**
@@ -41,7 +57,6 @@ export function asText(fetchRequest) {
   if (!fetchRequest) return
   return fetchRequest.then(checkStatus).then(res => res.text())
 }
-
 
 /**
  * filter a response to raise an error on a 400+ status

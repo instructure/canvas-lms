@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export default function generator (typography) {
+export default function generator(typography) {
   return {
     lineHeight: typography.lineHeightCondensed,
     itemMargin: '0.0625rem'
-  };
+  }
 }

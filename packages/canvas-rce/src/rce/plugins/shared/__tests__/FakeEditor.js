@@ -38,7 +38,7 @@ export default class FakeEditor {
         this._selectedNode = this.$container.appendChild($temp.firstChild)
       },
 
-      collapse: () => this._collapsed = true,
+      collapse: () => (this._collapsed = true),
       isCollapsed: () => this._collapsed
     }
 

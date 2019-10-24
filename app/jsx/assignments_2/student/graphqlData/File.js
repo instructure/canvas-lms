@@ -42,6 +42,7 @@ export const SubmissionDraftFile = {
 export const SubmissionFile = {
   fragment: gql`
     fragment SubmissionFile on File {
+      _id
       displayName
       id
       mimeClass
@@ -52,6 +53,7 @@ export const SubmissionFile = {
   `,
 
   shape: shape({
+    _id: string,
     displayName: string,
     id: string,
     mimeClass: string,
@@ -81,7 +83,7 @@ export const SubmissionCommentFile = {
   })
 }
 
-export const FileDefaultMocks = {
+export const DefaultMocks = {
   File: () => ({
     mimeClass: 'image'
   })

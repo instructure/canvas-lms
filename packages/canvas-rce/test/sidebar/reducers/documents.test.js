@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import assert from "assert";
-import documentsReducer from "../../../src/sidebar/reducers/documents";
-import * as actions from "../../../src/sidebar/actions/documents";
-import {CHANGE_CONTEXT} from "../../../src/sidebar/actions/context";
+import assert from 'assert'
+import documentsReducer from '../../../src/sidebar/reducers/documents'
+import * as actions from '../../../src/sidebar/actions/documents'
+import {CHANGE_CONTEXT} from '../../../src/sidebar/actions/context'
 
-describe("Documents reducer", () => {
-  let state;
+describe('Documents reducer', () => {
+  let state
   beforeEach(() => {
     state = {
       course: {
@@ -32,57 +32,57 @@ describe("Documents reducer", () => {
       },
       contextType: 'course'
     }
-  });
+  })
 
-  it("does not modify the state if for unknown actions", () => {
-    assert(documentsReducer(state, { type: "unknown.action" }) === state);
-  });
+  it('does not modify the state if for unknown actions', () => {
+    assert(documentsReducer(state, {type: 'unknown.action'}) === state)
+  })
 
-  describe("REQUEST_DOCS", () => {
-    it("marks documents as loading", () => {
-      const action = { type: actions.REQUEST_DOCS, payload: {contextType: 'user'} };
-      assert(documentsReducer(state, action).user.isLoading);
-    });
-  });
+  describe('REQUEST_DOCS', () => {
+    it('marks documents as loading', () => {
+      const action = {type: actions.REQUEST_DOCS, payload: {contextType: 'user'}}
+      assert(documentsReducer(state, action).user.isLoading)
+    })
+  })
 
-  describe("RECEIVE_DOCS", () => {
-    it("appends new fils to the existing array", () => {
+  describe('RECEIVE_DOCS', () => {
+    it('appends new fils to the existing array', () => {
       const action = {
         type: actions.RECEIVE_DOCS,
         payload: {
-          files: [{ id: 1 }, { id: 2 }],
+          files: [{id: 1}, {id: 2}],
           contextType: 'course'
         }
-      };
-      assert.equal(documentsReducer(state, action).course.files.length, 2);
-    });
+      }
+      assert.equal(documentsReducer(state, action).course.files.length, 2)
+    })
 
     it("hasMore if there's a bookmark", () => {
       const action = {
         type: actions.RECEIVE_DOCS,
         payload: {
-          files: [{ id: 1 }, { id: 2 }],
-          bookmark: "some bookmark",
+          files: [{id: 1}, {id: 2}],
+          bookmark: 'some bookmark',
           contextType: 'course'
         }
-      };
-      assert(documentsReducer(state, action).course.hasMore);
-    });
+      }
+      assert(documentsReducer(state, action).course.hasMore)
+    })
 
-    it("clears isLoading state", () => {
-      state.isLoading = true;
+    it('clears isLoading state', () => {
+      state.isLoading = true
       const action = {
         type: actions.RECEIVE_DOCS,
         payload: {
-          files: [{ id: 1 }, { id: 2 }],
+          files: [{id: 1}, {id: 2}],
           contextType: 'course'
         }
-      };
-      assert.equal(documentsReducer(state, action).course.isLoading, false);
-    });
-  });
+      }
+      assert.equal(documentsReducer(state, action).course.isLoading, false)
+    })
+  })
 
-  describe("CHANGE_CONTEXT", () => {
+  describe('CHANGE_CONTEXT', () => {
     it('creates the new documents context if it does not exist', () => {
       const action = {
         type: CHANGE_CONTEXT,
@@ -98,5 +98,4 @@ describe("Documents reducer", () => {
       })
     })
   })
-
-});
+})

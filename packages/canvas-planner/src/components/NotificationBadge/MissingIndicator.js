@@ -16,20 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { string } from 'prop-types';
-import formatMessage from '../../format-message';
+import React from 'react'
+import {string} from 'prop-types'
+import formatMessage from '../../format-message'
 
-import Indicator from './Indicator';
+import Indicator from './Indicator'
 
-export default function MissingIndicator (props) {
-  const badgeMessage = formatMessage('Missing items for {title}', {title: props.title});
-  return <Indicator
-    title={badgeMessage}
-    variant="danger"
-  />;
+export default function MissingIndicator(props) {
+  const badgeMessage = formatMessage('Missing items for {title}', {title: props.title})
+  return <Indicator title={badgeMessage} variant="danger" />
 }
 
 MissingIndicator.propTypes = {
-  title: string.isRequired,
-};
+  title: string.isRequired
+}

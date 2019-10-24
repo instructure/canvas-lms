@@ -30,7 +30,7 @@ describe "assignment groups" do
 
     before(:each) do
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([])
-      make_full_screen
+
       course_with_teacher_logged_in
       stub_rcs_config
     end

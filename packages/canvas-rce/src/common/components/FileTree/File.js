@@ -16,37 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from "react";
-import { number, string, shape, func } from "prop-types";
-import { css } from "aphrodite";
-import styles from "./styles";
-import { IconDocumentLine } from '@instructure/ui-icons'
+import React, {Component} from 'react'
+import {number, string, shape, func} from 'prop-types'
+import {css} from 'aphrodite'
+import styles from './styles'
+import {IconDocumentLine} from '@instructure/ui-icons'
 
 export default class File extends Component {
   handleSelect = () => {
-    const { onSelect, file } = this.props;
+    const {onSelect, file} = this.props
     if (onSelect) {
-      onSelect(file.id);
+      onSelect(file.id)
     }
-  };
+  }
 
   icon() {
     switch (this.props.file.type) {
       default:
-        return <IconDocumentLine />;
+        return <IconDocumentLine />
     }
   }
 
   render() {
-    const { name } = this.props.file;
+    const {name} = this.props.file
     return (
-      <button
-        className={css(styles.button, styles.file)}
-        onClick={this.handleSelect}
-      >
+      <button className={css(styles.button, styles.file)} onClick={this.handleSelect}>
         {this.icon()} {name}
       </button>
-    );
+    )
   }
 }
 
@@ -57,4 +54,4 @@ File.propTypes = {
     type: string
   }).isRequired,
   onSelect: func
-};
+}

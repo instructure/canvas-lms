@@ -289,7 +289,6 @@ describe "context modules" do
     end
 
     it "should show student progress once discussion-contribute requirement is met", priority: "1", test_id: 126693 do
-      make_full_screen
       @discussion_1 = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
       tag = @module1.add_item({id: @discussion_1.id, type: 'assignment'})
       add_requirement({tag.id => {type: 'must_contribute'}})
@@ -300,7 +299,7 @@ describe "context modules" do
       type_in_tiny 'textarea', 'something to submit'
       f('button[type="submit"]').click
       validate_access_to_module
-      resize_screen_to_normal
+
     end
 
     it "should show student progress once wiki page-view requirement is met", priority: "1", test_id: 126700 do

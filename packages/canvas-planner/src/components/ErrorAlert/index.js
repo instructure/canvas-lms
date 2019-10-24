@@ -15,33 +15,35 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 
 export default class ErrorAlert extends Component {
   static propTypes = {
     error: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Error)]),
     children: PropTypes.node.isRequired
-  };
+  }
 
   static defaultProps = {
     error: null
-  };
-
-  renderDetail () {
-    // don't want to show the raw error to the user, but it might come in handy.
-    return this.props.error
-      ? <span style={{display:'none'}}>{this.props.error.message || this.props.error.toString()}</span>
-      : null;
   }
 
-  render () {
+  renderDetail() {
+    // don't want to show the raw error to the user, but it might come in handy.
+    return this.props.error ? (
+      <span style={{display: 'none'}}>
+        {this.props.error.message || this.props.error.toString()}
+      </span>
+    ) : null
+  }
+
+  render() {
     return (
-      <Alert variant='error' margin="small">
+      <Alert variant="error" margin="small">
         {this.props.children}
         {this.renderDetail()}
       </Alert>
-    );
+    )
   }
 }

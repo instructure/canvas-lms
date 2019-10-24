@@ -32,7 +32,10 @@ test('registerRoutes registers route onEnter and onExit handlers for each route'
   pageSpy.exit = sinon.spy()
 
   const router = new Router(pageSpy)
-  router.registerRoutes([{ onEnter: () => {}, onExit: () => {} }, { onEnter: () => {}, onExit: () => {} }])
+  router.registerRoutes([
+    {onEnter: () => {}, onExit: () => {}},
+    {onEnter: () => {}, onExit: () => {}}
+  ])
   equal(pageSpy.callCount, 2)
   equal(pageSpy.exit.callCount, 2)
 })
@@ -42,7 +45,7 @@ test('registerRoute does not register route onEnter and onExit handlers if not p
   pageSpy.exit = sinon.spy()
 
   const router = new Router(pageSpy)
-  router.registerRoute({ onEnter: null, onExit: null })
+  router.registerRoute({onEnter: null, onExit: null})
   equal(pageSpy.callCount, 0)
   equal(pageSpy.exit.callCount, 0)
 })
@@ -52,7 +55,7 @@ test('registerRoute registers route onEnter and onExit handlers if provided', ()
   pageSpy.exit = sinon.spy()
 
   const router = new Router(pageSpy)
-  router.registerRoute({ onEnter: () => {}, onExit: () => {} })
+  router.registerRoute({onEnter: () => {}, onExit: () => {}})
   equal(pageSpy.callCount, 1)
   equal(pageSpy.exit.callCount, 1)
 })
@@ -68,7 +71,7 @@ test('start sets base and starts pagejs', () => {
 })
 
 test('handleEnter returns a function that calls enter handler and next', () => {
-  const ctx = { params: { id: '5' } }
+  const ctx = {params: {id: '5'}}
   const nextSpy = sinon.spy()
   const route = {
     onEnter: sinon.spy()
@@ -83,7 +86,7 @@ test('handleEnter returns a function that calls enter handler and next', () => {
 })
 
 test('handleExit returns a function that calls exit handler and next', () => {
-  const ctx = { params: { id: '5' } }
+  const ctx = {params: {id: '5'}}
   const nextSpy = sinon.spy()
   const route = {
     onExit: sinon.spy()

@@ -32,17 +32,17 @@ export function propsFromState(state) {
     upload,
     session,
     newPageLinkExpanded
-  } = state;
+  } = state
 
-  const collections = {};
+  const collections = {}
   for (const key in state.collections) {
-    const collection = state.collections[key];
+    const collection = state.collections[key]
     collections[key] = {
       links: collection.links,
       lastError: collection.error,
       isLoading: !!collection.loading,
       hasMore: !!collection.bookmark
-    };
+    }
   }
 
   return {
@@ -61,5 +61,5 @@ export function propsFromState(state) {
     session,
     newPageLinkExpanded,
     ...ui
-  };
+  }
 }

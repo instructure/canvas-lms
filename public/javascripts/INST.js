@@ -33,7 +33,12 @@ if (window.devicePixelRatio) {
   INST.browser.webkit = true
 
   // from: http://www.byond.com/members/?command=view_post&post=53727
-  INST.browser[(escape(navigator.javaEnabled.toString()) == 'function%20javaEnabled%28%29%20%7B%20%5Bnative%20code%5D%20%7D') ? 'chrome' : 'safari'] = true
+  INST.browser[
+    escape(navigator.javaEnabled.toString()) ==
+    'function%20javaEnabled%28%29%20%7B%20%5Bnative%20code%5D%20%7D'
+      ? 'chrome'
+      : 'safari'
+  ] = true
 }
 
 // this is just using jquery's browser sniffing result of if its firefox, it

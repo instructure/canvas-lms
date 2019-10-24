@@ -16,112 +16,112 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {func, string} from "prop-types";
+import {func, string} from 'prop-types'
 
-import React from "react";
-import LinkSet from "./LinkSet";
-import formatMessage from "../../../../format-message";
+import React from 'react'
+import LinkSet from './LinkSet'
+import formatMessage from '../../../../format-message'
 import AccordionSection from './AccordionSection'
 
 function typeCollection(contextId, contextType) {
   switch (contextType) {
-    case "course":
+    case 'course':
       return {
         links: [
           {
             href: `/courses/${contextId}/announcements`,
-            title: formatMessage("Announcements")
+            title: formatMessage('Announcements')
           },
           {
             href: `/courses/${contextId}/assignments`,
-            title: formatMessage("Assignments")
+            title: formatMessage('Assignments')
           },
           {
             href: `/courses/${contextId}/discussion_topics`,
-            title: formatMessage("Discussions")
+            title: formatMessage('Discussions')
           },
           {
             href: `/courses/${contextId}/grades`,
-            title: formatMessage("Grades")
+            title: formatMessage('Grades')
           },
           {
             href: `/courses/${contextId}/users`,
-            title: formatMessage("People")
+            title: formatMessage('People')
           },
           {
             href: `/courses/${contextId}/pages`,
-            title: formatMessage("Pages")
+            title: formatMessage('Pages')
           },
           {
             href: `/courses/${contextId}/files`,
-            title: formatMessage("Files")
+            title: formatMessage('Files')
           },
           {
             href: `/courses/${contextId}/assignments/syllabus`,
-            title: formatMessage("Syllabus")
+            title: formatMessage('Syllabus')
           },
           // outcomes
           {
             href: `/courses/${contextId}/quizzes`,
-            title: formatMessage("Quizzes")
+            title: formatMessage('Quizzes')
           },
           {
             href: `/courses/${contextId}/modules`,
-            title: formatMessage("Modules")
+            title: formatMessage('Modules')
           },
           // conferences
           {
             href: `/courses/${contextId}/collaborations`,
-            title: formatMessage("Collaborations")
+            title: formatMessage('Collaborations')
           }
           // settings
         ]
-      };
-    case "group":
+      }
+    case 'group':
       return {
         links: [
           {
             href: `/groups/${contextId}/pages`,
-            title: formatMessage("Wiki Home")
+            title: formatMessage('Wiki Home')
           },
           {
             href: `/groups/${contextId}/discussion_topics`,
-            title: formatMessage("Discussions Index")
+            title: formatMessage('Discussions Index')
           },
           {
             href: `/groups/${contextId}/announcements`,
-            title: formatMessage("Announcement List")
+            title: formatMessage('Announcement List')
           },
           {
             href: `/groups/${contextId}/files`,
-            title: formatMessage("Files Index")
+            title: formatMessage('Files Index')
           },
           {
             href: `/groups/${contextId}/collaborations`,
-            title: formatMessage("Collaborations")
+            title: formatMessage('Collaborations')
           },
           {
             href: `/groups/${contextId}/users`,
-            title: formatMessage("People")
+            title: formatMessage('People')
           }
         ]
-      };
+      }
     default:
       // user, TODO
       return {
         links: [
           {
             href: `/users/${contextId}/files`,
-            title: formatMessage("Files Index")
+            title: formatMessage('Files Index')
           }
         ]
-      };
+      }
   }
 }
 export default function NavigationPanel(props) {
   const collection = typeCollection(props.contextId, props.contextType)
   let navigationSummary = ''
-  if(props.contextType === 'course') {
+  if (props.contextType === 'course') {
     navigationSummary = formatMessage('Course Navigation')
   } else if (props.contextType === 'group') {
     navigationSummary = formatMessage('Group Navigation')
@@ -137,14 +137,10 @@ export default function NavigationPanel(props) {
         expanded={props.selectedAccordionIndex === 'navigation'}
         label={navigationSummary}
       >
-        <LinkSet
-          type="navigation"
-          collection={collection}
-          onLinkClick={props.onLinkClick}
-        />
+        <LinkSet type="navigation" collection={collection} onLinkClick={props.onLinkClick} />
       </AccordionSection>
     </div>
-  );
+  )
 }
 
 NavigationPanel.propTypes = {
@@ -153,4 +149,4 @@ NavigationPanel.propTypes = {
   onChangeAccordion: func.isRequired,
   selectedAccordionIndex: string,
   onLinkClick: func
-};
+}

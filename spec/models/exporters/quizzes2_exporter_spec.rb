@@ -81,13 +81,46 @@ describe "Quizzes2 Exporter" do
 
     it "doesn't fail when exporting an ungraded quiz and SIS grade export is enabled" do
       @course.enable_feature!(:post_grades)
-      survey_quiz =  @course.quizzes.create!(title: 'blah', quiz_type: 'survey')
+      survey_quiz = @course.quizzes.create!(title: 'blah', quiz_type: 'survey')
       ce = @course.content_exports.create!(
         export_type: ContentExport::QUIZZES2,
         selected_content: survey_quiz.id
       )
       exporter = Exporters::Quizzes2Exporter.new(ce)
       expect { exporter.export }.to change { @course.assignments.count }.by(1)
+    end
+
+    context 'when newquizzes_on_quiz_page is enabled' do
+      before do
+        @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
+      end
+
+      it 'sets correct workflow_state' do
+        @quizzes2.export
+        assignment = @course.assignments.where.not(id: @quiz.assignment.id).first
+        expect(assignment.workflow_state).to eq 'migrating'
+        expect(assignment.migrate_from_id).to be(@quiz.id)
+      end
+
+      context 'when failed assignment is provided' do
+        let(:failed_assignment) do
+          @course.assignments.create!(
+            position: 777,
+            assignment_group: assignment_group
+          )
+        end
+
+        let(:assignment_group) do
+          @course.assignment_groups.create!(name: 'group_123')
+        end
+
+        it 'creates assignment with expected group and position' do
+          @quizzes2.export(failed_assignment_id: failed_assignment.id)
+          assignment = @course.assignments.where.not(id: @quiz.assignment.id).first
+          expect(assignment.position).to be(777)
+          expect(assignment.assignment_group.id).to be(assignment_group.id)
+        end
+      end
     end
   end
 end

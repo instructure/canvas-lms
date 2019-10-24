@@ -21,7 +21,7 @@ export const CHANGE_CONTEXT_TYPE = 'CHANGE_CONTEXT_TYPE'
 export const CHANGE_CONTEXT_ID = 'CHANGE_CONTEXT_ID'
 
 export function changeContext({contextType, contextId}) {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(changeContextType(contextType))
     dispatch(changeContextId(contextId))
     dispatch({type: CHANGE_CONTEXT, payload: {contextType, contextId}})

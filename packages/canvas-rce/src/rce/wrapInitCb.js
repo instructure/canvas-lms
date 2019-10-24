@@ -16,37 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import IframesTableFix from "./IframesTableFix";
+import IframesTableFix from './IframesTableFix'
 
 // mirror attributes onto tinymce editor (if this can be done
 // via tiny api, it is preferable, but I dont see a way)
-export default function wrapInitCb(
-  mirroredAttrs,
-  editorOptions,
-  MutationObserver
-) {
-  MutationObserver =
-    MutationObserver === undefined ? window.MutationObserver : MutationObserver;
-  const oldInitInstCb = editorOptions.init_instance_callback;
+export default function wrapInitCb(mirroredAttrs, editorOptions, MutationObserver) {
+  MutationObserver = MutationObserver === undefined ? window.MutationObserver : MutationObserver
+  const oldInitInstCb = editorOptions.init_instance_callback
   editorOptions.init_instance_callback = function(ed) {
-    const attrs = mirroredAttrs || {};
-    const el = ed.getElement();
+    const attrs = mirroredAttrs || {}
+    const el = ed.getElement()
     if (el) {
       Object.keys(attrs).forEach(attr => {
-        el.setAttribute(attr, attrs[attr]);
-      });
+        el.setAttribute(attr, attrs[attr])
+      })
 
       // add data to textarea so it can be found by canvas
       // (which unfortunately relies on this a lot)
-      el.dataset.rich_text = true;
+      el.dataset.rich_text = true
     }
 
     // hookAddVisual for hacky <td><iframe> fix
-    const ifr = new IframesTableFix();
-    ifr.hookAddVisual(ed, MutationObserver);
+    const ifr = new IframesTableFix()
+    ifr.hookAddVisual(ed, MutationObserver)
 
     // wrap old cb (dont overwrite)
-    oldInitInstCb && oldInitInstCb(ed);
-  };
-  return editorOptions;
+    oldInitInstCb && oldInitInstCb(ed)
+  }
+  return editorOptions
 }

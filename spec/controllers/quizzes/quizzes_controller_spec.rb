@@ -272,6 +272,79 @@ describe Quizzes::QuizzesController do
         expect(assigns[:js_env][:FLAGS][:DIRECT_SHARE_ENABLED]).to eq(false)
       end
     end
+
+    context 'when newquizzes_on_quiz_page FF is enabled' do
+      let_once(:course_assignments) do
+        group = @course.assignment_groups.create(:name => "some group")
+        (0..3).map do |i|
+          @course.assignments.create(
+            title: "some assignment #{i}",
+            assignment_group: group,
+            due_at: Time.zone.now + 1.week,
+            external_tool_tag_attributes: { content: tool },
+            workflow_state: workflow_states[i]
+          )
+        end
+      end
+
+      let_once(:course_quizzes) do
+        [course_quiz, course_quiz(true)]
+      end
+
+      let_once(:workflow_states) do
+        [:unpublished, :published, :unpublished, :published]
+      end
+
+      let_once(:tool) do
+        @course.context_external_tools.create!(
+          name: 'Quizzes.Next',
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          tool_id: 'Quizzes 2',
+          url: 'http://example.com/launch'
+        )
+      end
+
+      before :once do
+        @course.root_account.settings[:provision] = {'lti' => 'lti url'}
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.enable_feature! :quizzes_next
+        @course.root_account.enable_feature! :newquizzes_on_quiz_page
+        # make the last two of course_assignments to be quiz_lti assignment
+        (2..3).each { |i| course_assignments[i].quiz_lti! && course_assignments[i].save! }
+        course_quizzes
+      end
+
+      context "teacher interface" do
+        it "includes all old quizzes and new quizzes" do
+          user_session(@teacher)
+          get 'index', params: { course_id: @course.id }
+          expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
+          expect(controller.js_env[:QUIZZES][:assignment].count).to eq(4)
+          expect(
+            controller.js_env[:QUIZZES][:assignment].map{ |x| x[:id] }
+          ).to contain_exactly(
+            course_quizzes[0].id,
+            course_quizzes[1].id,
+            course_assignments[2].id,
+            course_assignments[3].id
+          )
+        end
+      end
+
+      context "student interface" do
+        it "includes published quizzes" do
+          user_session(@student)
+          get 'index', params: { course_id: @course.id }
+          expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
+          expect(controller.js_env[:QUIZZES][:assignment].count).to eq(2)
+          expect(
+            controller.js_env[:QUIZZES][:assignment].map{ |x| x[:id] }
+          ).to contain_exactly(course_quizzes[1].id, course_assignments[3].id)
+        end
+      end
+    end
   end
 
   describe "POST 'new'" do

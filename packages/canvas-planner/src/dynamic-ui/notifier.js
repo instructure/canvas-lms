@@ -16,41 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import {func, shape} from 'prop-types';
+import React from 'react'
+import {func, shape} from 'prop-types'
 
-function getDisplayName (WrappedComponent) {
-  return `Notifier(${WrappedComponent.displayName})`;
+function getDisplayName(WrappedComponent) {
+  return `Notifier(${WrappedComponent.displayName})`
 }
 
 export function notifier(WrappedComponent) {
   return class Notifier extends React.Component {
-    static displayName = getDisplayName(WrappedComponent);
+    static displayName = getDisplayName(WrappedComponent)
 
     static contextTypes = {
       dynamicUiManager: shape({
         triggerUpdates: func,
-        preTriggerUpdates: func,
-      }),
+        preTriggerUpdates: func
+      })
     }
 
     preTriggerUpdates = (...args) => {
       if (this.context.dynamicUiManager) {
-        this.context.dynamicUiManager.preTriggerUpdates(...args);
+        this.context.dynamicUiManager.preTriggerUpdates(...args)
       }
     }
 
     triggerUpdates = (...args) => {
       if (this.context.dynamicUiManager) {
-        this.context.dynamicUiManager.triggerUpdates(...args);
+        this.context.dynamicUiManager.triggerUpdates(...args)
       }
     }
 
-    render () {
-      return <WrappedComponent {...this.props}
-        triggerDynamicUiUpdates={this.triggerUpdates}
-        preTriggerDynamicUiUpdates={this.preTriggerUpdates}
-      />;
+    render() {
+      return (
+        <WrappedComponent
+          {...this.props}
+          triggerDynamicUiUpdates={this.triggerUpdates}
+          preTriggerDynamicUiUpdates={this.preTriggerUpdates}
+        />
+      )
     }
-  };
+  }
 }

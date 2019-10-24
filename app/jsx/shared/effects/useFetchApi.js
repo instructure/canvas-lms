@@ -19,10 +19,8 @@
 import useImmediate from '../hooks/useImmediate'
 import doFetchApi from './doFetchApi'
 
-// useImmediate for deep comparisons and may help avoid browser flickering
-
 // utility for making it easy to abort the fetch
-function abortable({success, error, loading}) {
+function abortable({success, error, loading, meta}) {
   const aborter = new AbortController()
   let active = true
   return {
@@ -35,6 +33,9 @@ function abortable({success, error, loading}) {
     activeLoading: (...p) => {
       if (active && loading) loading(...p)
     },
+    activeMeta: (...p) => {
+      if (active && meta) meta(...p)
+    },
     abort: () => {
       active = false
       aborter.abort()
@@ -43,17 +44,35 @@ function abortable({success, error, loading}) {
   }
 }
 
+// NOTE: if identity of any of the output functions changes, the prior fetch will be aborted and a
+// new fetch will start, just as if you had changed an input parameter. This will result in a react
+// error: "too many rerenders". An common example of this problem is this:
+//
+// useFetchApi({path: '/api/v1/foo', success: json => setSomeState(mungeApi(json))})
+//
+// The success function is recreated every time this is called, so it has a new identity. Instead of
+// doing this, you could use the convert parameter:
+//
+// useFetchApi({path: '/api/v1/foo', success: setSomeState, convert: mungeApi})
+//
+// If that doesn't suit your use case, another approach would be the useCallback hook to preserve
+// the identity of your callbacks.
 export default function useFetchApi({
-  success,
-  error,
-  loading,
-  path,
-  convert,
-  forceResult,
-  params = {},
-  headers = {},
-  fetchOpts = {}
+  // data output callbacks
+  success, // (parsed json object of the response body) => {}
+  error, // (Error object from doFetchApi) => {}
+  loading, // (boolean that specifies whether a fetch is in progress) => {}
+  meta, // other information about the fetch: ({link, response}) => {}. called only when success is called.
+
+  // inputs
+  path, // the url to fetch; often a relative path
+  convert, // allows you to convert the json response data into another format before calling success
+  forceResult, // specify this to bypass the fetch and report this to success instead. meta is not called.
+  params = {}, // url parameters
+  headers = {}, // additoinal request headers
+  fetchOpts = {} // other options to pass to fetch
 }) {
+  // useImmediate for deep comparisons and may help avoid browser flickering
   useImmediate(
     () => {
       if (forceResult !== undefined) {
@@ -62,10 +81,11 @@ export default function useFetchApi({
       }
 
       // prevent sending results and errors from stale queries
-      const {activeSuccess, activeError, activeLoading, abort, signal} = abortable({
+      const {activeSuccess, activeError, activeLoading, activeMeta, abort, signal} = abortable({
         success,
         error,
-        loading
+        loading,
+        meta
       })
       activeLoading(true)
       doFetchApi({
@@ -74,10 +94,11 @@ export default function useFetchApi({
         params,
         fetchOpts: {signal, ...fetchOpts}
       })
-        .then(result => {
-          if (convert && result) result = convert(result)
+        .then(({json, response, link}) => {
+          if (convert && json) json = convert(json)
           activeLoading(false)
-          activeSuccess(result)
+          activeMeta({response, link})
+          activeSuccess(json)
         })
         .catch(err => {
           activeLoading(false)
@@ -85,7 +106,7 @@ export default function useFetchApi({
         })
       return abort
     },
-    [success, error, loading, path, convert, headers, params, fetchOpts, forceResult],
+    [success, error, loading, meta, path, convert, headers, params, fetchOpts, forceResult],
     {deep: true}
   )
 }

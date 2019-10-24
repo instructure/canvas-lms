@@ -33,11 +33,10 @@ QUnit.module('BlueprintCourse app', {
   }
 })
 
-const defaultData = () => Object.assign(select(getSampleData(), [
-  'terms',
-  'masterCourse',
-  ['childCourse', 'course'],
-]), { canManageCourse: true })
+const defaultData = () =>
+  Object.assign(select(getSampleData(), ['terms', 'masterCourse', ['childCourse', 'course']]), {
+    canManageCourse: true
+  })
 
 test('mounts BlueprintSidebar to container component', () => {
   blueprint = new BlueprintCourse(container, defaultData())
@@ -56,9 +55,16 @@ test('change log route onEnter calls app showChangeLog with params from URL', ()
   blueprint = new BlueprintCourse(container, defaultData())
   blueprint.render()
   blueprint.app.showChangeLog = sinon.spy()
-  blueprint.routes[0].onEnter({ params: { blueprintType: 'template', templateId: '2', changeId: '3' } }, () => {})
+  blueprint.routes[0].onEnter(
+    {params: {blueprintType: 'template', templateId: '2', changeId: '3'}},
+    () => {}
+  )
   equal(blueprint.app.showChangeLog.callCount, 1)
-  deepEqual(blueprint.app.showChangeLog.getCall(0).args[0], { blueprintType: 'template', templateId: '2', changeId: '3' })
+  deepEqual(blueprint.app.showChangeLog.getCall(0).args[0], {
+    blueprintType: 'template',
+    templateId: '2',
+    changeId: '3'
+  })
 
   blueprint.app.hideChangeLog = sinon.spy()
   blueprint.routes[0].onExit({}, () => {})

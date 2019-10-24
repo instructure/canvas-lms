@@ -16,18 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const ADD_IMAGE = "action.images.add_image";
-export const REQUEST_IMAGES = "action.images.request_images";
-export const RECEIVE_IMAGES = "action.images.receive_images";
-export const FAIL_IMAGES_LOAD = "action.images.fail_images_load";
+export const ADD_IMAGE = 'action.images.add_image'
+export const REQUEST_IMAGES = 'action.images.request_images'
+export const RECEIVE_IMAGES = 'action.images.receive_images'
+export const FAIL_IMAGES_LOAD = 'action.images.fail_images_load'
 
-export function createAddImage({
-  id,
-  filename,
-  display_name,
-  url,
-  thumbnail_url
-}, contextType) {
+export function createAddImage({id, filename, display_name, url, thumbnail_url}, contextType) {
   return {
     type: ADD_IMAGE,
     payload: {
@@ -40,55 +34,60 @@ export function createAddImage({
       },
       contextType
     }
-  };
+  }
 }
 
 export function requestImages(contextType) {
-  return { type: REQUEST_IMAGES, payload: {contextType} };
+  return {type: REQUEST_IMAGES, payload: {contextType}}
 }
 
 export function receiveImages({response, contextType}) {
   const {files, bookmark} = response
-  return {type: RECEIVE_IMAGES, payload: {files, bookmark, contextType}};
+  return {type: RECEIVE_IMAGES, payload: {files, bookmark, contextType}}
 }
 
 export function failImagesLoad({error, contextType}) {
-  return { type: FAIL_IMAGES_LOAD, payload: {error, contextType} };
+  return {type: FAIL_IMAGES_LOAD, payload: {error, contextType}}
 }
-
 
 // dispatches the start of the load, requests a page for the collection from
 // the source, then dispatches the loaded page to the store on success or
 // clears the load on failure
 export function fetchImages() {
   return (dispatch, getState) => {
-    const state = getState();
-    dispatch(requestImages(state.contextType));
+    const state = getState()
+    dispatch(requestImages(state.contextType))
     return state.source
       .fetchImages(state)
       .then(response => dispatch(receiveImages({response, contextType: state.contextType})))
-      .catch(error => dispatch(failImagesLoad({error, contextType: state.contextType})));
-  };
+      .catch(error => dispatch(failImagesLoad({error, contextType: state.contextType})))
+  }
 }
 // fetches a page only if a page is not already being loaded and the
 // collection is not yet completely loaded
 export function fetchNextImages() {
   return (dispatch, getState) => {
-    const state = getState();
+    const state = getState()
     const images = state.images[state.contextType]
     if (images && !images.isLoading && images.hasMore) {
-      return dispatch(fetchImages());
+      return dispatch(fetchImages())
     }
-  };
+  }
 }
 // fetches the next page (subject to conditions on fetchNextImages) only if the
 // collection is currently empty
 export function fetchInitialImages() {
   return (dispatch, getState) => {
-    const state = getState();
+    const state = getState()
     const images = state.images[state.contextType]
-    if (images && images.hasMore && !images.isLoading && images.files && images.files.length === 0) {
-      return dispatch(fetchImages());
+    if (
+      images &&
+      images.hasMore &&
+      !images.isLoading &&
+      images.files &&
+      images.files.length === 0
+    ) {
+      return dispatch(fetchImages())
     }
-  };
+  }
 }

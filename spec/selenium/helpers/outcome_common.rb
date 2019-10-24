@@ -357,7 +357,7 @@ module OutcomeCommon
   end
 
   def should_create_an_outcome_group_nested
-    make_full_screen
+
     get outcome_url
 
     ## when

@@ -111,6 +111,7 @@ Object.entries({
       ok(
         header
           .find('Tooltip')
+          .first()
           .prop('tip')
           .match(RegExp(expectedTip, 'i')),
         'has right tooltip'

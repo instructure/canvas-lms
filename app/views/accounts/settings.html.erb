@@ -213,6 +213,13 @@
                       </td>
                     </tr>
                   <% end %>
+                  <% if Account.site_admin.feature_enabled?(:account_pronouns) %>
+                    <tr>
+                      <td colspan="2"><%= settings.check_box :can_add_pronouns, :checked => @domain_root_account.settings[:can_add_pronouns] %>
+                        <%= settings.label :can_add_pronouns, en: "Users can add pronouns as an identifier" %>
+                      </td>
+                    </tr>
+                  <% end %>
                   <tr>
                     <td colspan="2"><%= settings.check_box :restrict_quiz_questions, :checked => @account.settings[:restrict_quiz_questions] %>
                       <%= settings.label :restrict_quiz_questions, :en => "Restrict students from viewing quiz questions after course end date" %>
@@ -258,7 +265,6 @@
                     </tr>
                   <% end %>
                 <% end %>
-
                 <%= settings.fields_for :restrict_student_past_view do |r| %>
                   <% hash = @account.restrict_student_past_view %>
                   <% disabled = hash[:locked] && hash[:inherited] %>

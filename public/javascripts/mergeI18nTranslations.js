@@ -27,7 +27,7 @@ function fastMerge(destination, source) {
     if (typeof destination[key] === 'object') {
       fastMerge(destination[key], val)
     } else {
-      destination[key] =  val
+      destination[key] = val
     }
   }
   return destination

@@ -25,7 +25,7 @@ describe 'Theme Editor' do
   include ThemeEditorCommon
 
   before(:each) do
-    make_full_screen
+
     course_with_admin_logged_in
   end
 

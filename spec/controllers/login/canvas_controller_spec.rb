@@ -340,7 +340,7 @@ describe Login::CanvasController do
       Account.default.save!
 
       user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
-      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.otp_secret_key = ROTP::Base32.random
       @user.save!
     end
 
@@ -369,7 +369,7 @@ describe Login::CanvasController do
     it "should ignore a cookie from an old secret_key" do
       cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, '127.0.0.1')
 
-      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.otp_secret_key = ROTP::Base32.random
       @user.save!
 
       post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}

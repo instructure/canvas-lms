@@ -57,7 +57,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
 
     const data = value === 'excused' ? {excuse: true} : {latePolicyStatus: value}
     if (value === 'late') {
-      data.secondsLateOverride = 0
+      data.secondsLateOverride = this.props.submission.secondsLate
     }
 
     if (this.props.submissionUpdating) {

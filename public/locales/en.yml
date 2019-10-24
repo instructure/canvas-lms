@@ -732,7 +732,9 @@ en:
   new_post_policy_icons_da13a62c: New Post Policy Icons
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: Updates the display of Post Policy icons in the New Gradebook assignment column header.
   gradebook_import_reserved_names_bugfix_apg_122_32a77a18: Gradebook Import Reserved Names Bugfix (APG-122)
-  behaviour_change_related_to_the_bugfix_in_apg_122__370fb242: Behaviour change related to the bugfix in APG-122. Don't allow custom columns to be created that are titled the same as gradebook importer reserved names
+  behaviour_change_related_to_the_bugfix_in_apg_122__63cfa767: Behaviour change related to the bugfix in APG-122. Do not allow custom columns to be created that are titled the same as gradebook importer reserved names, also ignore non-active custom columns on gradebook import as well as those that use reserved names.
+  add_grading_scheme_to_admin_grade_reports_23eb8c6e: Add Grading Scheme to Admin Grade Reports
+  includes_grade_values_in_the_admin_grade_reports_a28200da: Includes grade values in the admin grade reports.
   accessible_sidebar_menu_b30baf97: Accessible Sidebar Menu
   improve_accessibility_of_left_hand_menu_through_be_908fb002: Improve accessibility of left-hand menu through better use of color plus visual and screenreader indicators of inactive menu items.
   check_submission_file_type_b3dbf3fd: Check Submission File Type
@@ -747,6 +749,12 @@ en:
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   assignments_2_student_view_224cb233: Assignments 2 Student View
   use_the_new_assignments_student_page_944262af: Use the new assignments student page
+  pronouns_for_users_da46fb5: Pronouns for users
+  pronouns_users_can_show_after_their_name_e80821c7: Pronouns users can show after their name
+  system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
+  differentiate_between_system_and_user_generated_li_dc466585: |-
+    Differentiate between system- and user-generated live events
+    in the Canvas Data Services tool
   announcement_successfully_created_731a707f: Announcement successfully created
   announcement_creation_failed_f7d227f5: Announcement creation failed
   announcement_successfully_updated_7bc5130: Announcement successfully updated
@@ -1023,6 +1031,7 @@ en:
         prevent_course_renaming_by_teachers: Don't let teachers rename their courses
         allow_sending_scores_in_emails: Students can opt-in to receiving scores in email notifications
         include_students_in_global_survey: Include students in global surveys
+        can_add_pronouns: Users can add pronouns as an identifier
         restrict_quiz_questions: Restrict students from viewing quiz questions after course end date
         locked: Lock this setting for sub-accounts and courses
         restrict_student_future_listing: Restrict students from viewing future courses in enrollments list
@@ -1860,6 +1869,12 @@ en:
       assignment_delete: This assignment has been deleted
       assignment_not_available: The assignment you requested is not available to your course section.
       created: Assignment was successfully created.
+      quizzes_published:
+        one: 1 quiz successfully published!
+        other: "%{count} quizzes successfully published!"
+      quizzes_unpublished:
+        one: 1 quiz successfully unpublished!
+        other: "%{count} quizzes successfully unpublished!"
     new_assignment: New Assignment
     errors:
       google_docs_masquerade_rejected: Unable to connect to Google Docs as a masqueraded user.
@@ -5006,6 +5021,7 @@ en:
         name: Full Name
         short_name: Display Name
         sortable_name: Sortable Name
+        pronoun: Pronoun
         default_email: Default Email
         locale: Language
         time_zone: Time Zone
@@ -6765,6 +6781,9 @@ en:
     errors:
       invalid_account_notification_end_at: Account notification end time precedes start time
   institution_announcement_announcement_title_f017c1e0: 'Institution announcement: "%{announcement_title}"'
+  she_her_c8b5e3be: she/her
+  he_him_a64fe27e: he/him
+  they_them_d6125799: they/them
   account_user:
     types:
       account_admin: Account Admin
@@ -8640,12 +8659,6 @@ en:
   term_41f37cae: term
   term_id_74b933ef: term id
   term_sis_7edb8ab7: term sis
-  current_score_74777363: current score
-  final_score_61e15cf3: final score
-  enrollment_state_7a9c55e2: enrollment state
-  unposted_current_score_c1dd3879: unposted current score
-  unposted_final_score_c19c35b3: unposted final score
-  override_score_53994655: override score
   no_grading_periods_configured_for_this_term_ca22393e: no grading periods configured for this term
   grading_period_set_f49fe74c: grading period set
   grading_period_set_id_f2377529: grading period set id
@@ -8655,6 +8668,22 @@ en:
   name_unposted_current_score_e98e95fd: "%{name} unposted current score"
   name_unposted_final_score_124708d2: "%{name} unposted final score"
   name_override_score_7f6a5216: "%{name} override score"
+  name_current_grade_d8da149f: "%{name} current grade"
+  name_final_grade_460da69d: "%{name} final grade"
+  name_unposted_current_grade_824d0c98: "%{name} unposted current grade"
+  name_unposted_final_grade_798491b7: "%{name} unposted final grade"
+  name_override_grade_14a9cb73: "%{name} override grade"
+  current_score_74777363: current score
+  final_score_61e15cf3: final score
+  enrollment_state_7a9c55e2: enrollment state
+  unposted_current_score_c1dd3879: unposted current score
+  unposted_final_score_c19c35b3: unposted final score
+  override_score_53994655: override score
+  current_grade_1fb4ea06: current grade
+  final_grade_a22c596: final grade
+  unposted_current_grade_aa1ea11c: unposted current grade
+  unposted_final_grade_aa5facd6: unposted final grade
+  override_grade_385adf30: override grade
   student_sis_id_abe6b292: student sis id
   assignment_title_8a707dd2: assignment title
   assignment_id_96baa1b7: assignment id
@@ -8742,8 +8771,6 @@ en:
   zendesk:
     engine:
       plugin_name: Zendesk
-  paypal:
-    exception: We're sorry, an error has occurred, please try again later.
   catalog_already_enabled_56478a3c: Catalog already enabled
   catalog_users_already_exist_2894b8c4: Catalog users already exist
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: Host is unreachable or not pointing to Catalog
@@ -8791,6 +8818,13 @@ en:
   the_beginning_date_range_for_the_courses_to_report_82353138: The beginning date range for the courses to report on
   the_ending_date_for_the_courses_to_report_on_1c417d5e: The ending date for the courses to report on
   the_ending_date_range_for_the_courses_to_report_on_99e0ea8f: The ending date range for the courses to report on
+  lbs_report_header_lbs_no: LBSNo
+  lbs_report_header_student_name: Student Name
+  lbs_report_header_program_code: Program Code
+  lbs_report_header_course_code: Course Code
+  lbs_report_header_final_score: Final Score
+  lbs_report_header_scores: Scores
+  lbs_report_notes: Notes
   orbis_report_header_canvas_course_id: course id
   orbis_report_header_course_sis_id: course sis id
   orbis_report_header_course_name: course name
@@ -11945,6 +11979,8 @@ en:
   download_submissions_7454665f: Download Submissions
   click_to_change_profile_picture_for_display_name_6a4b41db: Click to change profile picture for %{display_name}
   user_s_settings_d65644b4: "%{user}'s Settings"
+  none_3b5e34d2: None
+  this_pronoun_appears_after_last_name_bf5c0bf5: This pronoun appears after last name
   system_default_language_28a1052d: System Default (%{language})
   remove_account_from_this_profile_c3095eb2: Remove account from this profile
   unregister_service_985238e9: Unregister Service
@@ -15169,9 +15205,9 @@ en:
   upload_8b403d05: Upload
   remove_submission_draft_f5c7f58b: Remove submission draft
   start_entry_4b491f60: Start Entry
-  please_enter_a_url_d2c868b5: Please enter a url
+  please_enter_a_valid_url_e_g_http_example_com_b97051b4: Please enter a valid url (e.g. http://example.com)
   website_url_input_1a3eab25: Website url input
-  paste_url_8213b83: Paste URL
+  http_67e238b4: http://
   preview_website_url_eb5b8a5f: Preview website url
   website_url_b995c5b6: Website Url
   all_submission_comments_have_been_marked_as_read_74c0683b: All submission comments have been marked as read
@@ -15185,6 +15221,7 @@ en:
   attach_a_file_86a4fc00: Attach a File
   record_audio_video_d9993f6c: Record Audio/Video
   send_comment_4e05f2fb: Send Comment
+  load_more_comments_dc00ac34: Load More Comments
   submitted_318fad53: Submitted
   not_submitted_fff47f17: Not submitted
   you_cannot_leave_leave_comments_until_you_submit_t_d3dcb44c: You cannot leave leave comments until you submit the assignment
@@ -15631,11 +15668,17 @@ en:
   submitted_submitdate_bdd3bf09: 'Submitted: %{submitDate}'
   view_submission_ff3da5d: View Submission
   select_student_name_caaff244: Select student %{name}
+  starting_import_operation_f25745f0: Starting import operation
+  import_started_successfully_a3467411: Import started successfully
+  there_was_a_problem_starting_import_operation_4c42c5e: There was a problem starting import operation
   content_share_preview_166f6562: Content Share Preview
   no_content_has_been_shared_with_you_667fde6c: No content has been shared with you.
+  are_you_sure_you_wan_to_remove_this_item_19f55b5f: Are you sure you wan to remove this item?
+  there_was_an_error_removing_the_item_f8324776: There was an error removing the item
   retrieval_of_received_shares_failed_6c5583e3: Retrieval of Received Shares failed
   received_content_53049822: Received Content
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: The list below is content that has been shared with you. You can preview the content, import it into your course, or remove it from the list.
+  import_e929507b: Import...
   manage_options_for_name_83278ad0: Manage options for %{name}
   unread_ee6db4aa: unread
   read_7cabda44: read
@@ -15644,7 +15687,6 @@ en:
   last_login_b7bc0479: 'Last login:'
   high_b5cbd048: High
   low_eab1cadd: Low
-  none_3b5e34d2: None
   section_section_names_98f172e6: 'Section: %{section_names}'
   view_grades_for_name_45aeb2f2: View grades for %{name}
   view_analytics_for_name_9b31594e: View analytics for %{name}
@@ -16237,7 +16279,7 @@ en:
   i_hold_the_copyright_71ee91b1: I hold the copyright
   i_have_obtained_permission_to_use_this_file_6386f087: I have obtained permission to use this file.
   the_material_is_in_the_public_domain_279c39a3: The material is in the public domain
-  the_material_is_subject_to_fair_use_exception_41bc6a4b: The material is subject to fair use exception
+  the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2: The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws
   the_material_is_licensed_under_creative_commons_3242cb5e: The material is licensed under Creative Commons
   creative_commons_license_725584ae: 'Creative Commons License:'
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: If you do not select usage rights now, this file will be unpublished after it's uploaded.
@@ -16393,11 +16435,8 @@ en:
   late_policies_42bac80: Late Policies
   advanced_36b35b8: Advanced
   missing_submission_grade_must_be_numeric_1a142ef2: Missing submission grade must be numeric
-  missing_submission_grade_must_be_between_0_and_100_ae0dd8bd: Missing submission grade must be between 0 and 100
   late_submission_deduction_must_be_numeric_5b3f468e: Late submission deduction must be numeric
-  late_submission_deduction_must_be_between_0_and_10_9cde872d: Late submission deduction must be between 0 and 100
   lowest_possible_grade_must_be_numeric_3d97659d: Lowest possible grade must be numeric
-  lowest_possible_grade_must_be_between_0_and_100_51256ea5: Lowest possible grade must be between 0 and 100
   automatically_apply_grade_for_missing_submissions_2b5c1a72: Automatically apply grade for missing submissions
   missing_policies_4f195e0b: Missing policies
   grade_percentage_for_missing_submissions_dc7ccac: Grade percentage for missing submissions
@@ -16711,15 +16750,15 @@ en:
   all_courses_a7dbb853: All Courses
   all_groups_cea25817: All Groups
   loading_f99d93d4: "...Loading"
-  count_unread_messages_99d6bf17:
-    one: 1 unread message
-    other: "%{count} unread messages"
   courses_tray_cec46d6e: Courses tray
   groups_tray_ef3e2649: Groups tray
   admin_tray_3b680e7b: Admin tray
   profile_tray_bcec5044: Profile tray
   title_tray_ec9f7488: "%{title} tray"
   global_navigation_tray_35612e2e: Global navigation tray
+  count_unread_messages_99d6bf17:
+    one: 1 unread message
+    other: "%{count} unread messages"
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.
   user_profile_picture_46bffbc7: User profile picture
   end_course_set_up_tutorial_f358b85d: End Course Set-up Tutorial
@@ -17783,6 +17822,7 @@ en:
   report_issue_b5f1db0e: Report Issue
   comment_failed_to_post_please_try_again_later_e2d19a0a: Comment failed to post! Please try again later.
   comment_submitted_d9934b: Comment submitted!
+  immersive_reader_failed_to_load_bc8d4dd4: Immersive Reader Failed to Load
   select_a_course_4710371f: Select a Course
   common_timezones_2b00baba: Common Timezones
   all_timezones_5e8afa7b: All Timezones
@@ -18225,6 +18265,10 @@ en:
   oops_something_went_wrong_with_making_a_copy_of_or_7e9d6695: Oops! Something went wrong with making a copy of "%{originalAssignmentName}"
   retry_duplicating_originalassignmentname_884aee1: Retry duplicating "%{originalAssignmentName}"
   cancel_duplicating_originalassignmentname_fd7ee1d8: Cancel duplicating "%{originalAssignmentName}"
+  migrating_name_e05aa53e: Migrating "%{name}"
+  oops_something_went_wrong_with_migrating_name_acdbc98b: Oops! Something went wrong with migrating "%{name}"
+  retry_migrating_name_bdc802ef: Retry migrating "%{name}"
+  cancel_migrating_name_cfc745c2: Cancel migrating "%{name}"
   importing_name_8f2b131d: Importing "%{name}"
   oops_something_went_wrong_importing_name_d382cac1: Oops! Something went wrong importing "%{name}"
   cancel_importing_name_a0b6f3e1: Cancel importing "%{name}"
@@ -18538,8 +18582,13 @@ en:
   old_quiz_e8dafede: Old Quiz
   quiz_settings_4e17f005: Quiz Settings
   view_question_banks_188a9e0f: View Question Banks
+  making_a_copy_of_original_assignment_name_8f029a9b: Making a copy of "%{original_assignment_name}"
+  oops_something_went_wrong_with_making_a_copy_of_or_22787360: Oops! Something went wrong with making a copy of "%{original_assignment_name}"
+  retry_duplicating_original_assignment_name_90b83bb8: Retry duplicating "%{original_assignment_name}"
+  cancel_duplicating_original_assignment_name_e974c534: Cancel duplicating "%{original_assignment_name}"
   edit_mastery_paths_for_title_label_41d81451: Edit Mastery Paths for %{title_label}
   options_for_title_label_17f821ff: Options for %{title_label}
+  duplicate_quiz_name_79fdcb3e: Duplicate Quiz %{name}
   migrate_quiz_5d0f777: Migrate Quiz
   migrate_67c9f753: Migrate
   send_quiz_to_user_e8c47177: Send Quiz to User

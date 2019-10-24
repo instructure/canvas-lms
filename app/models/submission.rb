@@ -2481,9 +2481,10 @@ class Submission < ActiveRecord::Base
     if assignment.post_manually?
       posted_at.blank?
     else
-      # there must be a grade to hide otherwise we're incorrectly indicating
-      # that a grade is hidden when there isn't one present
-      graded? && !posted?
+      # Only indicate that the grade is hidden if there's an actual grade.
+      # Similarly, hide the grade if the student resubmits (which will keep
+      # the old grade but bump the workflow back to "submitted").
+      (graded? || resubmitted?) && !posted?
     end
   end
 

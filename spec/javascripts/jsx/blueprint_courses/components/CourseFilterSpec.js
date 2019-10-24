@@ -35,7 +35,7 @@ QUnit.module('CourseFilter', hooks => {
   })
 
   hooks.afterEach(() => {
-    fixtures.innerHTML = ""
+    fixtures.innerHTML = ''
   })
 
   test('renders the CourseFilter component', () => {
@@ -44,10 +44,10 @@ QUnit.module('CourseFilter', hooks => {
     ok(node.exists())
   })
 
-  test('onChange fires with search filter when text is entered in search box', (assert) => {
+  test('onChange fires with search filter when text is entered in search box', assert => {
     const done = assert.async()
     const props = defaultProps()
-    props.onChange = (filter) => {
+    props.onChange = filter => {
       equal(filter.search, 'giraffe')
       done()
     }
@@ -66,7 +66,7 @@ QUnit.module('CourseFilter', hooks => {
     ok(props.onActivate.calledOnce)
   })
 
-  test('onChange not fired when < 3 chars are entered in search text input', (assert) => {
+  test('onChange not fired when < 3 chars are entered in search text input', assert => {
     const done = assert.async()
     const props = defaultProps()
     props.onChange = sinon.spy()
@@ -80,7 +80,7 @@ QUnit.module('CourseFilter', hooks => {
     }, 0)
   })
 
-  test('onChange fired when 3 chars are entered in search text input', (assert) => {
+  test('onChange fired when 3 chars are entered in search text input', assert => {
     const done = assert.async()
     const props = defaultProps()
     props.onChange = sinon.spy()
@@ -133,10 +133,10 @@ QUnit.module('CourseFilter', hooks => {
       getOption(optionLabel).click()
     }
 
-    test('onChange fires with term filter when term is selected', (assert) => {
+    test('onChange fires with term filter when term is selected', assert => {
       const done = assert.async()
       const props = defaultProps()
-      props.onChange = (filter) => {
+      props.onChange = filter => {
         equal(filter.term, '1')
         done()
       }
@@ -148,10 +148,10 @@ QUnit.module('CourseFilter', hooks => {
       selectOption('Term One')
     })
 
-    test('onChange fires with subaccount filter when a subaccount is selected', (assert) => {
+    test('onChange fires with subaccount filter when a subaccount is selected', assert => {
       const done = assert.async()
       const props = defaultProps()
-      props.onChange = (filter) => {
+      props.onChange = filter => {
         equal(filter.subAccount, '2')
         done()
       }
@@ -163,6 +163,4 @@ QUnit.module('CourseFilter', hooks => {
       selectOption('Account Two')
     })
   })
-
-
 })

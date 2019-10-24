@@ -9,3 +9,10 @@ assignments_2_student:
   environments:
     production:
       state: disabled
+
+account_pronouns:
+  state: hidden
+  display_name: Pronouns for users
+  description: Pronouns users can show after their name
+  applies_to: SiteAdmin
+  root_opt_in: true

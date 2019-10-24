@@ -43,9 +43,9 @@ function parsedOrNull($element, attribute) {
   // is constrained by a style attribute with max-width, max-height.
   // While it doesn't have a 'width' or 'height' attribute, we can
   // still get its width and height directly from the img element
-  const value = $element.hasAttribute(attribute) ?
-    $element.getAttribute(attribute) :
-    $element[attribute]
+  const value = $element.hasAttribute(attribute)
+    ? $element.getAttribute(attribute)
+    : $element[attribute]
   return value ? Math.round(Number.parseInt(value, 10)) : null
 }
 
@@ -89,9 +89,7 @@ export function scaleToSize(imageSize, naturalWidth, naturalHeight) {
     return {width: naturalWidth, height: naturalHeight}
   }
 
-  const [dimension] = Object.entries(sizeByMaximumDimension).find(
-    ([, size]) => size === imageSize
-  )
+  const [dimension] = Object.entries(sizeByMaximumDimension).find(([, size]) => size === imageSize)
   const scaleFactor = dimension / Math.max(naturalWidth, naturalHeight)
   return {
     height: Math.round(naturalHeight * scaleFactor),

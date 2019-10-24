@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const TOGGLE_NEWPAGE_FORM = "TOGGLE_NEWPAGE_FORM";
+export const TOGGLE_NEWPAGE_FORM = 'TOGGLE_NEWPAGE_FORM'
 
 export function openOrCloseNewPageForm() {
-  return { type: TOGGLE_NEWPAGE_FORM };
+  return {type: TOGGLE_NEWPAGE_FORM}
 }

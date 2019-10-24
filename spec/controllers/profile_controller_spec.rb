@@ -73,6 +73,9 @@ describe ProfileController do
   end
 
   describe "update" do
+    before :each do
+      AccountPronoun.create_defaults
+    end
     it "should allow changing the default e-mail address and nothing else" do
       user_session(@user, @pseudonym)
       expect(@cc.position).to eq 1
@@ -82,6 +85,26 @@ describe ProfileController do
       expect(response).to be_successful
       expect(@cc2.reload.position).to eq 1
       expect(@cc.reload.position).to eq 2
+    end
+
+    it "should allow changing pronoun" do
+      user_session(@user, @pseudonym)
+      expect(@user.account_pronoun).to eq nil
+      put 'update', params: {:user => {:account_pronoun_id => AccountPronoun.first.id}}, format: 'json'
+      expect(response).to be_successful
+      @user.reload
+      expect(@user.account_pronoun).to eq AccountPronoun.first
+    end
+
+    it "should allow unsetting pronoun" do
+      user_session(@user, @pseudonym)
+      @user.account_pronoun = AccountPronoun.first
+      @user.save!
+      expect(@user.account_pronoun).to eq AccountPronoun.first
+      put 'update', params: {:user => {:account_pronoun_id => ''}}, format: 'json'
+      expect(response).to be_successful
+      @user.reload
+      expect(@user.account_pronoun).to eq nil
     end
 
     it "should clear email cache" do

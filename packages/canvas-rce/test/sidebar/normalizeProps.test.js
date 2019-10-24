@@ -16,24 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import normalizeProps from "../../src/sidebar/normalizeProps";
-import Bridge from "../../src/bridge";
+import assert from 'assert'
+import normalizeProps from '../../src/sidebar/normalizeProps'
+import Bridge from '../../src/bridge'
 
-describe("Sidebar normalizeProps", () => {
-  it("defaults onLinkClick to Bridge.insertLink", () => {
-    const normalized = normalizeProps({});
-    assert.equal(normalized.onLinkClick, Bridge.insertLink);
-  });
+describe('Sidebar normalizeProps', () => {
+  it('defaults onLinkClick to Bridge.insertLink', () => {
+    const normalized = normalizeProps({})
+    assert.equal(normalized.onLinkClick, Bridge.insertLink)
+  })
 
-  it("allows overriding onLinkClick", () => {
-    const onLinkClick = () => {};
-    const normalized = normalizeProps({ onLinkClick });
-    assert.equal(normalized.onLinkClick, onLinkClick);
-  });
+  it('allows overriding onLinkClick', () => {
+    const onLinkClick = () => {}
+    const normalized = normalizeProps({onLinkClick})
+    assert.equal(normalized.onLinkClick, onLinkClick)
+  })
 
-  it("retains other props", () => {
-    const normalized = normalizeProps({ canUploadFiles: true });
-    assert.ok(normalized.canUploadFiles);
-  });
-});
+  it('retains other props', () => {
+    const normalized = normalizeProps({canUploadFiles: true})
+    assert.ok(normalized.canUploadFiles)
+  })
+})

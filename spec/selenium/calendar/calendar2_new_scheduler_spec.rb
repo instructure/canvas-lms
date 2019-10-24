@@ -35,7 +35,7 @@ describe "scheduler" do
 
     before :each do
       user_session(@student1)
-      make_full_screen
+
     end
 
     it 'shows the find appointment button with feature flag turned on', priority: "1", test_id: 2908326 do

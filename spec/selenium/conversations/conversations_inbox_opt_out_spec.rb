@@ -61,7 +61,7 @@ describe "conversations new" do
         get '/profile/communication'
         expect(f("#content")).not_to contain_css('td[data-category="conversation_message"]')
         expect(policy.reload.frequency).to eq "immediately"
-        expect(f("#global_nav_conversations_link .menu-item__badge")).to have_attribute('style', "display: none\;")
+        expect(f("#global_nav_conversations_link .menu-item__badge")).not_to be_displayed
       end
     end
   end

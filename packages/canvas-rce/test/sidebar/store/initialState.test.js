@@ -16,26 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import initialState from "../../../src/sidebar/store/initialState";
-import RceApiSource from "../../../src/sidebar/sources/api";
+import assert from 'assert'
+import initialState from '../../../src/sidebar/store/initialState'
+import RceApiSource from '../../../src/sidebar/sources/api'
 
-describe("Sidebar initialState", () => {
-  let source, apiSource;
+describe('Sidebar initialState', () => {
+  let source, apiSource
 
   beforeEach(() => {
     source = {
       initializeCollection() {
-        return {};
+        return {}
       },
       initializeUpload() {
-        return {};
+        return {}
       },
       initializeImages() {
-        return {};
+        return {}
       },
       initializeFlickr() {
-        return {};
+        return {}
       },
       initializeDocuments() {
         return {}
@@ -43,58 +43,58 @@ describe("Sidebar initialState", () => {
       initializeMedia() {
         return {}
       }
-    };
-    apiSource = new RceApiSource();
-  });
+    }
+    apiSource = new RceApiSource()
+  })
 
-  it("accepts provided contextType", () => {
-    const state = initialState({ contextType: "group" });
-    assert.equal(state.contextType, "group");
-  });
+  it('accepts provided contextType', () => {
+    const state = initialState({contextType: 'group'})
+    assert.equal(state.contextType, 'group')
+  })
 
-  it("normalizes provided contextType", () => {
-    const state = initialState({ contextType: "groups" });
-    assert.equal(state.contextType, "group");
-  });
+  it('normalizes provided contextType', () => {
+    const state = initialState({contextType: 'groups'})
+    assert.equal(state.contextType, 'group')
+  })
 
-  it("accepts provided jwt", () => {
-    const state = initialState({ jwt: "theJWT" });
-    assert.equal(state.jwt, "theJWT");
-  });
+  it('accepts provided jwt', () => {
+    const state = initialState({jwt: 'theJWT'})
+    assert.equal(state.jwt, 'theJWT')
+  })
 
-  it("accepts provided source", () => {
-    const state = initialState({ source });
-    assert.deepEqual(state.source, source);
-  });
+  it('accepts provided source', () => {
+    const state = initialState({source})
+    assert.deepEqual(state.source, source)
+  })
 
-  it("accepts provided collections", () => {
-    const collections = { iKnowBetterThan: "theStore" };
-    const state = initialState({ collections });
-    assert.deepEqual(state.collections, collections);
-  });
+  it('accepts provided collections', () => {
+    const collections = {iKnowBetterThan: 'theStore'}
+    const state = initialState({collections})
+    assert.deepEqual(state.collections, collections)
+  })
 
-  describe("defaults", () => {
-    it("contextType to undefined", () => {
-      assert.equal(initialState().contextType, undefined);
-    });
+  describe('defaults', () => {
+    it('contextType to undefined', () => {
+      assert.equal(initialState().contextType, undefined)
+    })
 
-    it("jwt to undefined", () => {
-      assert.equal(initialState().jwt, undefined);
-    });
+    it('jwt to undefined', () => {
+      assert.equal(initialState().jwt, undefined)
+    })
 
-    it("source to the api source", () => {
-      assert.deepEqual(initialState().source, apiSource);
-    });
+    it('source to the api source', () => {
+      assert.deepEqual(initialState().source, apiSource)
+    })
 
-    it("initial collections using source", () => {
+    it('initial collections using source', () => {
       const state = initialState({
         source: Object.assign(source, {
           initializeCollection(endpoint) {
-            return { links: [], bookmark: endpoint, loading: false };
+            return {links: [], bookmark: endpoint, loading: false}
           }
         })
-      });
-      assert.equal(state.collections.announcements.bookmark, "announcements");
-    });
-  });
-});
+      })
+      assert.equal(state.collections.announcements.bookmark, 'announcements')
+    })
+  })
+})

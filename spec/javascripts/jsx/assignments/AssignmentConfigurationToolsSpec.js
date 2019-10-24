@@ -111,10 +111,7 @@ QUnit.module('AssignmentConfigurationsTools', {
 
 test('it renders', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   ok(wrapper.exists())
 })
@@ -123,20 +120,14 @@ test('it uses the correct tool definitions URL', () => {
   const courseId = 1
   const correctUrl = `/api/v1/courses/${courseId}/lti_apps/launch_definitions`
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={courseId}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={courseId} secureParams={secureParams} />
   )
   equal(wrapper.instance().getDefinitionsUrl(), correctUrl)
 })
 
 test('it renders a "none" option', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({tools: toolDefinitions})
 
@@ -145,10 +136,7 @@ test('it renders a "none" option', () => {
 
 test('it renders "none" for tool type when no tool is selected', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({tools: toolDefinitions})
   const toolType = wrapper.find('#configuration-tool-type').instance()
@@ -157,10 +145,7 @@ test('it renders "none" for tool type when no tool is selected', () => {
 
 test('it renders each tool', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({tools: toolDefinitions})
   equal(wrapper.find('#similarity_detection_tool option').length, toolDefinitions.length + 1)
@@ -168,10 +153,7 @@ test('it renders each tool', () => {
 
 test('it builds the correct Launch URL for LTI 1 tools', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   const tool = toolDefinitions[0]
   const correctUrl = `${'/courses/1/external_tools/retrieve?borderless=true&' +
@@ -182,10 +164,7 @@ test('it builds the correct Launch URL for LTI 1 tools', () => {
 
 test('it builds the correct Launch URL for LTI 2 tools', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   const tool = toolDefinitions[3]
   const correctUrl = `/courses/1/lti/basic_lti_launch_request/5?display=borderless&secure_params=${secureParams}`
@@ -195,10 +174,7 @@ test('it builds the correct Launch URL for LTI 2 tools', () => {
 
 test('it renders the proper tool type for LTI 1.x tools', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({tools: toolDefinitions})
   const toolSelect = wrapper.find('#similarity_detection_tool')
@@ -211,10 +187,7 @@ test('it renders the proper tool type for LTI 1.x tools', () => {
 
 test('it renders the proper tool type for LTI 2 tools', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({tools: toolDefinitions})
   const toolSelect = wrapper.find('#similarity_detection_tool')
@@ -240,10 +213,7 @@ test('it renders proper tool when duplicate IDs but unique tool types are presen
 
 test('shows beginning info alert and adds styles to iframe', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.before_external_content_info_alert').simulate('focus')
@@ -253,10 +223,7 @@ test('shows beginning info alert and adds styles to iframe', () => {
 
 test('shows ending info alert and adds styles to iframe', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.after_external_content_info_alert').simulate('focus')
@@ -266,10 +233,7 @@ test('shows ending info alert and adds styles to iframe', () => {
 
 test('hides beginning info alert and adds styles to iframe', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.before_external_content_info_alert').simulate('focus')
@@ -280,10 +244,7 @@ test('hides beginning info alert and adds styles to iframe', () => {
 
 test('hides ending info alert and adds styles to iframe', () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.after_external_content_info_alert').simulate('focus')
@@ -294,10 +255,7 @@ test('hides ending info alert and adds styles to iframe', () => {
 
 test("doesn't show alerts or add border to iframe by default", () => {
   const wrapper = mount(
-    <AssignmentConfigurationTools.configTools
-      courseId={1}
-      secureParams={secureParams}
-    />
+    <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
   )
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')

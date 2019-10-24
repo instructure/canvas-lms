@@ -30,8 +30,8 @@ let applicationElement
 const mountDialog = (opts = {}) => {
   opts = {
     header: 'This is a dialog',
-    source: { label: 'foo', id: '0' },
-    destinations: [{ label: 'bar', id: '1' }, { label: 'baz', id: '2' }],
+    source: {label: 'foo', id: '0'},
+    destinations: [{label: 'bar', id: '1'}, {label: 'baz', id: '2'}],
     ...opts
   }
 
@@ -41,7 +41,7 @@ const mountDialog = (opts = {}) => {
 }
 
 QUnit.module('MoveToDialog', {
-  setup () {
+  setup() {
     root = document.createElement('div')
     appRoot = document.createElement('div')
     applicationElement = document.createElement('div')
@@ -51,17 +51,17 @@ QUnit.module('MoveToDialog', {
     document.getElementById('fixtures').appendChild(applicationElement)
   },
 
-  teardown () {
+  teardown() {
     ReactDOM.unmountComponentAtNode(root)
     appRoot.removeAttribute('aria-hidden')
     document.getElementById('fixtures').innerHTML = ''
   }
 })
 
-test('calls onMove with a destination id when selected', (assert) => {
+test('calls onMove with a destination id when selected', assert => {
   const done = assert.async()
   const dialog = mountDialog({
-    onMove: (val) => {
+    onMove: val => {
       ok(val === '1')
       done()
     }
@@ -70,10 +70,10 @@ test('calls onMove with a destination id when selected', (assert) => {
   TestUtils.Simulate.click(button)
 })
 
-test('does not call onMove when cancelled via close button', (assert) => {
+test('does not call onMove when cancelled via close button', assert => {
   const done = assert.async()
   const dialog = mountDialog({
-    onMove: (val) => {
+    onMove: val => {
       ok(false)
     },
     onClose: () => {
@@ -85,7 +85,7 @@ test('does not call onMove when cancelled via close button', (assert) => {
   TestUtils.Simulate.click(button)
 })
 
-test('does not fail when no onMove is specified', (assert) => {
+test('does not fail when no onMove is specified', assert => {
   const done = assert.async()
   const dialog = mountDialog({
     onClose: () => {

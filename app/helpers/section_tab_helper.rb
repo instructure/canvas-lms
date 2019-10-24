@@ -146,9 +146,14 @@ module SectionTabHelper
       end
     end
 
+    def a_aria_current_page
+      'page' if @tab.active?(@active_tab)
+    end
+
     def a_attributes
       { href: @tab.path,
         title: @tab.label,
+        'aria-current': a_aria_current_page,
         class: a_classes }.tap do |h|
         h[:target] = @tab.target if @tab.target?
       end
@@ -223,10 +228,15 @@ module SectionTabHelper
       end
     end
 
+    def a_aria_current_page
+      'page' if @tab.active?(@active_tab)
+    end
+
     def a_attributes
       { href: @tab.path,
         title: a_title,
         'aria-label': a_aria_label,
+        'aria-current': a_aria_current_page,
         class: a_classes }.tap do |h|
           h[:target] = @tab.target if @tab.target?
           h['data-tooltip'] = '' if @tab.hide? || @tab.unused?
@@ -241,7 +251,9 @@ module SectionTabHelper
     end
 
     def li_classes
-      ['section']
+      [ 'section' ].tap do |a|
+        a << 'section-hidden' if @tab.hide? || @tab.unused?
+      end
     end
 
     def indicate_hidden

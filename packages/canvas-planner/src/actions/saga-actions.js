@@ -16,66 +16,72 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as LA from './loading-actions.js';
-import {anyNewActivityDays, didWeFindToday} from '../utilities/statusUtils';
-import {itemsToDays} from '../utilities/daysUtils';
+import * as LA from './loading-actions.js'
+import {anyNewActivityDays, didWeFindToday} from '../utilities/statusUtils'
+import {itemsToDays} from '../utilities/daysUtils'
 
 export const mergeFutureItems = (newFutureItems, response) => (dispatch, getState) => {
-  dispatch(LA.gotPartialFutureDays(itemsToDays(newFutureItems), response));
-  const state = getState();
+  dispatch(LA.gotPartialFutureDays(itemsToDays(newFutureItems), response))
+  const state = getState()
   const completeDays = extractCompleteDays(
-    state.loading.partialFutureDays, state.loading.allFutureItemsLoaded, 'asc',
-  );
-  return mergeCompleteDays(completeDays, dispatch, state.loading.allFutureItemsLoaded, response);
-};
+    state.loading.partialFutureDays,
+    state.loading.allFutureItemsLoaded,
+    'asc'
+  )
+  return mergeCompleteDays(completeDays, dispatch, state.loading.allFutureItemsLoaded, response)
+}
 
 export const mergePastItems = (newPastItems, response) => (dispatch, getState) => {
-  dispatch(LA.gotPartialPastDays(itemsToDays(newPastItems), response));
-  const state = getState();
+  dispatch(LA.gotPartialPastDays(itemsToDays(newPastItems), response))
+  const state = getState()
   const completeDays = extractCompleteDays(
-    state.loading.partialPastDays, state.loading.allPastItemsLoaded, 'desc',
-  );
-  return mergeCompleteDays(completeDays, dispatch, state.loading.allPastItemsLoaded, response);
-};
+    state.loading.partialPastDays,
+    state.loading.allPastItemsLoaded,
+    'desc'
+  )
+  return mergeCompleteDays(completeDays, dispatch, state.loading.allPastItemsLoaded, response)
+}
 
 function mergePastItemsFor(foundPredicate, newPastItems, response, dispatch, getState) {
-  dispatch(LA.gotPartialPastDays(itemsToDays(newPastItems), response));
-  const state = getState();
+  dispatch(LA.gotPartialPastDays(itemsToDays(newPastItems), response))
+  const state = getState()
   const completeDays = extractCompleteDays(
-    state.loading.partialPastDays, state.loading.allPastItemsLoaded, 'desc',
-  );
+    state.loading.partialPastDays,
+    state.loading.allPastItemsLoaded,
+    'desc'
+  )
   if (foundPredicate(completeDays) || state.loading.allPastItemsLoaded) {
-    return mergeCompleteDays(completeDays, dispatch, state.loading.allPastItemsLoaded, response);
+    return mergeCompleteDays(completeDays, dispatch, state.loading.allPastItemsLoaded, response)
   }
-  return false;
+  return false
 }
 
 export const mergePastItemsForNewActivity = (newPastItems, response) => (dispatch, getState) => {
-  return mergePastItemsFor(anyNewActivityDays, newPastItems, response, dispatch, getState);
-};
-
-export const mergePastItemsForToday = (newPastItems, response) => (dispatch, getState) => {
- return mergePastItemsFor(didWeFindToday, newPastItems, response, dispatch, getState);
-};
-
-export const consumePeekIntoPast = (newPastItems, response) => (dispatch, getState) => {
-  const hasSomeItems = newPastItems.length > 0;
-  dispatch(LA.peekedIntoPast({hasSomeItems}));
-  return true;
-};
-
-function mergeCompleteDays (completeDays, dispatch, allItemsLoaded, response) {
-  if (completeDays.length || allItemsLoaded) {
-    dispatch(LA.gotDaysSuccess(completeDays, response));
-    return true;
-  }
-  return false;
+  return mergePastItemsFor(anyNewActivityDays, newPastItems, response, dispatch, getState)
 }
 
-function extractCompleteDays (daysArray, everythingCompleted, direction) {
-  const partialDays = daysArray.slice();
-  if (direction === 'desc') partialDays.reverse();
-  if (everythingCompleted) return partialDays;
-  const completeDays = partialDays.slice(0, -1);
-  return completeDays;
+export const mergePastItemsForToday = (newPastItems, response) => (dispatch, getState) => {
+  return mergePastItemsFor(didWeFindToday, newPastItems, response, dispatch, getState)
+}
+
+export const consumePeekIntoPast = (newPastItems, response) => (dispatch, getState) => {
+  const hasSomeItems = newPastItems.length > 0
+  dispatch(LA.peekedIntoPast({hasSomeItems}))
+  return true
+}
+
+function mergeCompleteDays(completeDays, dispatch, allItemsLoaded, response) {
+  if (completeDays.length || allItemsLoaded) {
+    dispatch(LA.gotDaysSuccess(completeDays, response))
+    return true
+  }
+  return false
+}
+
+function extractCompleteDays(daysArray, everythingCompleted, direction) {
+  const partialDays = daysArray.slice()
+  if (direction === 'desc') partialDays.reverse()
+  if (everythingCompleted) return partialDays
+  const completeDays = partialDays.slice(0, -1)
+  return completeDays
 }

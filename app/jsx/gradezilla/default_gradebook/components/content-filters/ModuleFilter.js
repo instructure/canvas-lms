@@ -33,6 +33,7 @@ export default function ModuleFilter(props) {
       items={modules}
       label={I18n.t('Module Filter')}
       selectedItemId={selectedModuleId}
+      sortAlphabetically
     />
   )
 }

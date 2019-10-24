@@ -20,10 +20,6 @@ class TeacherViewPageV2
     include SeleniumDependencies
 
     # Selectors
-    def a2_page_loading_spinner
-      f("div[data-cid='Spinner']:contains('Loading...')")
-    end
-
     def details_tab
       fj("div[role='tab']:contains('Details')")
     end

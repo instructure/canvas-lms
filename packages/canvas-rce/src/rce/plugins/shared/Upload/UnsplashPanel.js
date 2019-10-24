@@ -19,13 +19,13 @@
 import React, {useState, useEffect, useReducer, useRef, useCallback} from 'react'
 import {string, func, object} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
-import {Flex, View } from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Avatar, Img, Spinner} from '@instructure/ui-elements'
-import { ScreenReaderContent } from '@instructure/ui-a11y'
-import { Alert } from '@instructure/ui-alerts'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Alert} from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
 
-import { Button } from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {debounce} from 'lodash'
 import formatMessage from '../../../../format-message'
 import {StyleSheet, css} from '../../../../common/aphroditeExtensions'
@@ -76,28 +76,24 @@ const useUnsplashSearch = source => {
 
   useEffect(() => {
     const fetchData = () => {
-
-        dispatch({type: 'FETCH'})
-        source
-          .searchUnsplash(state.searchTerm, state.searchPage)
-          .then(results => {
-            dispatch({type: 'FETCH_SUCCESS', payload: results})
-          })
-          .catch(() => {
-            dispatch({type: 'FETCH_FAILURE'})
-          })
-      }
+      dispatch({type: 'FETCH'})
+      source
+        .searchUnsplash(state.searchTerm, state.searchPage)
+        .then(results => {
+          dispatch({type: 'FETCH_SUCCESS', payload: results})
+        })
+        .catch(() => {
+          dispatch({type: 'FETCH_FAILURE'})
+        })
+    }
     if (effectFirstRun.current) {
       effectFirstRun.current = false
-      return
     } else if (state.results[state.searchPage]) {
-      return // It's already in cache
-    } else {
-      if (state.searchTerm.length > 0) {
-        fetchData()
-      }
+      // It's already in cache
+    } else if (state.searchTerm.length > 0) {
+      fetchData()
     }
-  }, [state.searchTerm, state.searchPage])
+  }, [state.searchTerm, state.searchPage, state.results, source])
 
   const search = (term, page) => {
     dispatch({
@@ -145,7 +141,10 @@ function renderAlert(term, hasLoaded, totalResults, results, page, liveRegion) {
     }
     return (
       <Alert variant="info" transition="none" screenReaderOnly liveRegion={liveRegion}>
-        {formatMessage('{totalResults} results found, {numDisplayed} results currently displayed', { totalResults, numDisplayed: results[page].length })}
+        {formatMessage('{totalResults} results found, {numDisplayed} results currently displayed', {
+          totalResults,
+          numDisplayed: results[page].length
+        })}
       </Alert>
     )
   }
@@ -171,7 +170,7 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
     if (resultRefs[focusedImageIndex]) {
       resultRefs[focusedImageIndex].focus()
     }
-  }, [focusedImageIndex])
+  }, [focusedImageIndex, resultRefs])
 
   return (
     <>
@@ -331,11 +330,11 @@ export const styles = StyleSheet.create({
 
 export const hoverStyles = StyleSheet.create({
   imageWrapper: {
-    [`#:hover ${css(styles.imageAttribution)}`] : {
+    [`#:hover ${css(styles.imageAttribution)}`]: {
       opacity: 0.8
     },
-    [`#:focus-within ${css(styles.imageAttribution)}`] : {
+    [`#:focus-within ${css(styles.imageAttribution)}`]: {
       opacity: 0.8
-    },
+    }
   }
 })

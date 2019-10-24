@@ -25,7 +25,7 @@ describe "add_people" do
   before(:each) do
     # in the people table, the kyle menu can be off the screen
     # and uninteractable if the window is too small
-    make_full_screen
+
   end
 
   context "as a teacher" do

@@ -77,6 +77,7 @@ class ExternalFeedAggregator
 
   def process_feed(feed)
     begin
+      LiveEvents.set_context(Canvas::LiveEvents.amended_context(feed.context))
       @logger.info("feed found: #{feed.url}")
       @logger.info('requesting entries')
       require 'net/http'

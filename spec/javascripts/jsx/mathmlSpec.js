@@ -20,7 +20,7 @@ import $ from 'jquery'
 import * as mathml from 'mathml'
 
 QUnit.module('MathML and MathJax test', {
-  setup () {
+  setup() {
     const mathElem = document.createElement('math')
     mathElem.innerHTML = '<mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>'
     $('body')[0].appendChild(mathElem)

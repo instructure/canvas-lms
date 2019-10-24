@@ -16,73 +16,67 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 
-import React, { Component } from "react";
-import Loading from "./Loading";
-import formatMessage from "../../format-message";
-import { Button } from '@instructure/ui-buttons'
-import { StyleSheet, css } from "aphrodite";
+import React, {Component} from 'react'
+import Loading from './Loading'
+import formatMessage from '../../format-message'
+import {Button} from '@instructure/ui-buttons'
+import {StyleSheet, css} from 'aphrodite'
 
 class LoadMore extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       nextFocus: Infinity
-    };
+    }
   }
 
   componentDidUpdate() {
-    const focusable = this.focusableElements();
+    const focusable = this.focusableElements()
     if (focusable.length > this.state.nextFocus) {
-      const next = focusable[this.state.nextFocus];
+      const next = focusable[this.state.nextFocus]
       if (next) {
-        next.focus();
+        next.focus()
       }
     }
   }
 
   focusableElements() {
     if (!this.props.focusSelector) {
-      return [];
+      return []
     }
-    return this.refs.parent.querySelectorAll(this.props.focusSelector);
+    return this.refs.parent.querySelectorAll(this.props.focusSelector)
   }
 
   loadMore = ev => {
-    this.setState({ nextFocus: this.focusableElements().length });
-    this.props.loadMore(ev);
-  };
+    this.setState({nextFocus: this.focusableElements().length})
+    this.props.loadMore(ev)
+  }
 
   render() {
-    const hasChildren = React.Children.count(this.props.children) > 0;
-    const opacity = this.props.isLoading ? 1 : 0;
+    const hasChildren = React.Children.count(this.props.children) > 0
+    const opacity = this.props.isLoading ? 1 : 0
 
     return (
       <div ref="parent">
         {this.props.children}
 
-        {this.props.hasMore &&
-          !this.props.isLoading && (
-            <div className={css(styles.button)}>
-              <Button variant="link" onClick={this.loadMore} fluidWidth>
-                {formatMessage("Load more results")}
-              </Button>
-            </div>
-          )}
+        {this.props.hasMore && !this.props.isLoading && (
+          <div className={css(styles.button)}>
+            <Button variant="link" onClick={this.loadMore} fluidWidth>
+              {formatMessage('Load more results')}
+            </Button>
+          </div>
+        )}
 
-        {hasChildren &&
-          this.props.hasMore && (
-            <div
-              aria-hidden={!this.props.isLoading}
-              className={css(styles.loader)}
-              style={{ opacity }}
-            >
-              <Loading />
-            </div>
-          )}
+        {hasChildren && this.props.hasMore && (
+          <div aria-hidden={!this.props.isLoading} className={css(styles.loader)} style={{opacity}}>
+            <Loading />
+          </div>
+        )}
       </div>
-    );
+    )
   }
 }
 
@@ -92,24 +86,24 @@ LoadMore.propTypes = {
   isLoading: PropTypes.bool,
   focusSelector: PropTypes.string,
   children: PropTypes.any /* Immutable.List is not a valid 'node' */
-};
+}
 
 export const styles = StyleSheet.create({
   loader: {
-    display: "block",
-    margin: "20px 0 40px 0",
-    clear: "both",
-    paddingRight: "30px" /* needed for centering */,
-    textAlign: "center",
-    fontSize: "13px",
-    height: "15px",
-    color: "#666"
+    display: 'block',
+    margin: '20px 0 40px 0',
+    clear: 'both',
+    paddingRight: '30px' /* needed for centering */,
+    textAlign: 'center',
+    fontSize: '13px',
+    height: '15px',
+    color: '#666'
   },
   button: {
-    textAlign: "center",
-    marginTop: "1em",
-    clear: "both"
+    textAlign: 'center',
+    marginTop: '1em',
+    clear: 'both'
   }
-});
+})
 
-export default LoadMore;
+export default LoadMore

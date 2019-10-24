@@ -51,6 +51,14 @@ describe ExternalFeedAggregator do
       expect(@feed.external_feed_entries.length).to eq 1
     end
 
+    it "should set the LiveEvents context" do
+      response = Net::HTTPSuccess.new(1.1, 200, "OK")
+      expect(response).to receive(:body).and_return(rss_example)
+      expect(CanvasHttp).to receive(:get).with(@feed.url).and_return(response)
+      expect(LiveEvents).to receive(:set_context).once
+      ExternalFeedAggregator.new.process_feed(@feed)
+    end
+
   end
 
 def rss_example

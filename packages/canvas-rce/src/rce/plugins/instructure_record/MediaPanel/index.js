@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react';
-import {arrayOf, bool, func, objectOf, shape, string} from 'prop-types';
+import React, {useEffect, useRef} from 'react'
+import {arrayOf, bool, func, objectOf, shape, string} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
-import formatMessage from '../../../../format-message';
+import formatMessage from '../../../../format-message'
 
 import {Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
@@ -36,36 +36,25 @@ function hasFiles(media) {
 }
 
 function isEmpty(media) {
-  return (
-    !hasFiles(media) &&
-    !media.hasMore &&
-    !media.isLoading
-  );
+  return !hasFiles(media) && !media.hasMore && !media.isLoading
 }
 
 function renderLinks(files, handleClick, lastItemRef) {
   return files.map((f, index) => {
     let focusRef = null
-    if (index === files.length -1) {
+    if (index === files.length - 1) {
       focusRef = lastItemRef
     }
-    return (
-      <Link
-        key={f.id}
-        {...f}
-        onClick={handleClick}
-        focusRef={focusRef}
-      />
-    )
+    return <Link key={f.id} {...f} onClick={handleClick} focusRef={focusRef} />
   })
 }
 
 function renderLoadingError(_error) {
   return (
     <View as="div" role="alert" margin="medium">
-      <Text color="error">{formatMessage("Loading failed.")}</Text>
+      <Text color="error">{formatMessage('Loading failed.')}</Text>
     </View>
-  );
+  )
 }
 
 export default function MediaPanel(props) {
@@ -101,11 +90,7 @@ export default function MediaPanel(props) {
   }
 
   return (
-    <View
-      as="div"
-      data-testid="instructure_links-MediaPanel"
-    >
-
+    <View as="div" data-testid="instructure_links-MediaPanel">
       {renderLinks(files, handleFileClick, lastItemRef)}
 
       {loader.isLoading && <LoadingIndicator loader={loader} />}
@@ -118,12 +103,11 @@ export default function MediaPanel(props) {
 
       {isEmpty(media) && (
         <View as="div" padding="medium">
-          {formatMessage("No results.")}
+          {formatMessage('No results.')}
         </View>
       )}
-
     </View>
-  );
+  )
 }
 
 MediaPanel.propTypes = {
@@ -131,11 +115,13 @@ MediaPanel.propTypes = {
   fetchInitialMedia: func.isRequired,
   fetchNextMedia: func.isRequired,
   onMediaEmbed: func.isRequired,
-  media: objectOf(shape({
-    files: arrayOf(shape(fileShape)).isRequired,
-    bookmark: string,
-    hasMore: bool,
-    isLoading: bool,
-    error: string
-  })).isRequired
+  media: objectOf(
+    shape({
+      files: arrayOf(shape(fileShape)).isRequired,
+      bookmark: string,
+      hasMore: bool,
+      isLoading: bool,
+      error: string
+    })
+  ).isRequired
 }

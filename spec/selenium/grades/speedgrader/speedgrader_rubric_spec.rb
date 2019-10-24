@@ -77,7 +77,7 @@ describe "speed grader - rubrics" do
     @association.save!
 
     Speedgrader.visit(@course.id, @assignment.id)
-    make_full_screen
+
     Speedgrader.view_rubric_button.click
     expand_right_pane
     # grade both criteria

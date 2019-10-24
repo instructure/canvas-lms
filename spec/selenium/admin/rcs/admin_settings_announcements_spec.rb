@@ -76,7 +76,7 @@ describe "settings tabs" do
     before do
       course_with_admin_logged_in
       stub_rcs_config
-      make_full_screen
+
     end
 
     it "should add and delete an announcement" do

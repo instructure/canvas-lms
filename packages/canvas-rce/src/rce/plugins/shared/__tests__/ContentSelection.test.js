@@ -106,12 +106,12 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       })
 
       it('returns None type if there are no children', () => {
-        $element.id = "media_object_1234"
+        $element.id = 'media_object_1234'
         expect(getContentFromElement($element).type).toEqual(NONE_TYPE)
       })
 
       it('returns None type if there are more than one children', () => {
-        $element.id = "media_object_1234"
+        $element.id = 'media_object_1234'
         $element.appendChild(document.createElement('iframe'))
         $element.appendChild(document.createElement('span'))
         $element.appendChild(document.createElement('span'))
@@ -119,13 +119,13 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       })
 
       it('returns None type if children element is not an iframe', () => {
-        $element.id = "media_object_1234"
+        $element.id = 'media_object_1234'
         $element.appendChild(document.createElement('span'))
         expect(getContentFromElement($element).type).toEqual(NONE_TYPE)
       })
 
       it('returns id if iframe and div are set', () => {
-        $element.id = "media_object_1234"
+        $element.id = 'media_object_1234'
         $element.appendChild(document.createElement('iframe'))
         expect(getContentFromElement($element).id).toEqual('1234')
       })

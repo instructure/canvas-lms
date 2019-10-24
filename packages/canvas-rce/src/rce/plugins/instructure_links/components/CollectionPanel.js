@@ -31,7 +31,7 @@ export default function CollectionPanel(props) {
   }
 
   function fetchInitialPage() {
-    if(props.fetchInitialPage) {
+    if (props.fetchInitialPage) {
       props.fetchInitialPage(props.collection)
     }
   }
@@ -54,7 +54,7 @@ export default function CollectionPanel(props) {
         />
       </AccordionSection>
     </div>
-  );
+  )
 }
 
 CollectionPanel.propTypes = {
@@ -72,9 +72,9 @@ CollectionPanel.propTypes = {
   toggleNewPageForm: func,
   onChangeAccordion: func.isRequired,
   selectedAccordionIndex: string
-};
+}
 
 CollectionPanel.defaultProps = {
   renderNewPageLink: false,
   suppressRenderEmpty: false
-};
+}

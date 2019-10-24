@@ -16,255 +16,253 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as contentInsertion from "../contentInsertion";
+import * as contentInsertion from '../contentInsertion'
 import {videoFromTray, videoFromUpload, audioFromTray, audioFromUpload} from './contentHelpers'
 
-describe("contentInsertion", () => {
-  let editor, node;
+describe('contentInsertion', () => {
+  let editor, node
 
   beforeEach(() => {
     node = {
-      content: "",
-      className: "",
-      id: ""
-    };
+      content: '',
+      className: '',
+      id: ''
+    }
 
     editor = {
-      content: "",
-      classes: "",
+      content: '',
+      classes: '',
       isHidden: () => {
-        return false;
+        return false
       },
       selection: {
         getNode: () => {
-          return null;
+          return null
         },
         getContent: () => {
-          return "";
+          return ''
         },
         getEnd: () => {
-          return node;
+          return node
         },
         getRng: () => ({})
       },
       dom: {
         getParent: () => {
-          return null;
+          return null
         },
         decode: input => {
-          return input;
+          return input
         },
         $: () => {
           return {
             is: () => {
-              return false;
+              return false
             }
-          };
+          }
         }
       },
       focus: () => {},
       insertContent: content => {
-        editor.content += content;
+        editor.content += content
       },
       iframeElement: {
         getBoundingClientRect: () => {
-          return { left: 0, top: 0, bottom: 0, right: 0 };
+          return {left: 0, top: 0, bottom: 0, right: 0}
         }
       }
-    };
-  });
+    }
+  })
 
   afterEach(() => {
     jest.restoreAllMocks()
   })
 
-  describe("insertLink", () => {
-    let link;
+  describe('insertLink', () => {
+    let link
 
     beforeEach(() => {
       link = {
-        href: "/some/path",
-        url: "/other/path",
-        title: "Here Be Links",
-        text: "Click On Me",
+        href: '/some/path',
+        url: '/other/path',
+        title: 'Here Be Links',
+        text: 'Click On Me',
         selectionDetails: {
           node: undefined,
           range: undefined
         }
-      };
-    });
+      }
+    })
 
-    it("builds an anchor link with appropriate embed class", () => {
-      link.embed = { type: "image" };
-      contentInsertion.insertLink(editor, link);
+    it('builds an anchor link with appropriate embed class', () => {
+      link.embed = {type: 'image'}
+      contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
         '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
-      );
-    });
+      )
+    })
 
-    it("uses link data to build html", () => {
-      link.embed = { type: "scribd" };
-      contentInsertion.insertLink(editor, link);
+    it('uses link data to build html', () => {
+      link.embed = {type: 'scribd'}
+      contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
         '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
-      );
-    });
+      )
+    })
 
-    it("can use url if no href", () => {
-      link.href = undefined;
+    it('can use url if no href', () => {
+      link.href = undefined
       link.url = '/other/path'
-      contentInsertion.insertLink(editor, link);
-      expect(editor.content).toEqual(
-        '<a href="/other/path" title="Here Be Links">Click On Me</a>'
-      );
-    });
+      contentInsertion.insertLink(editor, link)
+      expect(editor.content).toEqual('<a href="/other/path" title="Here Be Links">Click On Me</a>')
+    })
 
-    it("cleans a url with no protocol", () => {
-      link.href = "www.google.com";
-      contentInsertion.insertLink(editor, link);
+    it('cleans a url with no protocol', () => {
+      link.href = 'www.google.com'
+      contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
         '<a href="http://www.google.com" title="Here Be Links">Click On Me</a>'
-      );
-    });
+      )
+    })
 
-    it("sets embed id with media entry id for videos", () => {
-      link.embed = { type: "video", id: "0_22h0jy7g" };
-      contentInsertion.insertLink(editor, link);
+    it('sets embed id with media entry id for videos', () => {
+      link.embed = {type: 'video', id: '0_22h0jy7g'}
+      contentInsertion.insertLink(editor, link)
       expect(editor.content.match(link.embed.id)).toBeTruthy()
-    });
+    })
 
-    it("sets embed id with media entry id for audio", () => {
-      link.embed = { type: "audio", id: "0_22h0jy7g" };
-      contentInsertion.insertLink(editor, link);
+    it('sets embed id with media entry id for audio', () => {
+      link.embed = {type: 'audio', id: '0_22h0jy7g'}
+      contentInsertion.insertLink(editor, link)
       expect(editor.content.match(link.embed.id)).toBeTruthy()
-    });
-  });
+    })
+  })
 
-  describe("insertContent", () => {
-    it("accepts string content", () => {
-      const content = "Some Chunk Of Content";
-      contentInsertion.insertContent(editor, content);
-      expect(editor.content).toEqual("Some Chunk Of Content");
-    });
+  describe('insertContent', () => {
+    it('accepts string content', () => {
+      const content = 'Some Chunk Of Content'
+      contentInsertion.insertContent(editor, content)
+      expect(editor.content).toEqual('Some Chunk Of Content')
+    })
 
-    it("calls replaceTextareaSelection() when editor is hidden", () => {
-      const content = "blah";
-      const elem = { selectionStart: 0, selectionEnd: 3, value: "subcontent" };
+    it('calls replaceTextareaSelection() when editor is hidden', () => {
+      const content = 'blah'
+      const elem = {selectionStart: 0, selectionEnd: 3, value: 'subcontent'}
       editor.isHidden = () => {
-        return true;
-      };
+        return true
+      }
       editor.getElement = () => {
-        return elem;
-      };
-      contentInsertion.insertContent(editor, content);
-      expect("blahcontent").toEqual(elem.value);
-    });
-  });
+        return elem
+      }
+      contentInsertion.insertContent(editor, content)
+      expect('blahcontent').toEqual(elem.value)
+    })
+  })
 
-  describe("insertImage", () => {
-    let image;
+  describe('insertImage', () => {
+    let image
     beforeEach(() => {
       image = {
-        href: "/some/path",
-        url: "/other/path",
-        title: "Here Be Images"
-      };
-    });
+        href: '/some/path',
+        url: '/other/path',
+        title: 'Here Be Images'
+      }
+    })
 
-    it("builds image html from image data", () => {
-      contentInsertion.insertImage(editor, image);
+    it('builds image html from image data', () => {
+      contentInsertion.insertImage(editor, image)
       expect(editor.content).toEqual(
         '<img alt="Here Be Images" src="/some/path" style="max-width:320px;max-height:320px"/>'
-      );
-    });
+      )
+    })
 
-    it("uses url if no href", () => {
-      image.href = undefined;
-      contentInsertion.insertImage(editor, image);
+    it('uses url if no href', () => {
+      image.href = undefined
+      contentInsertion.insertImage(editor, image)
       expect(editor.content).toEqual(
         '<img alt="Here Be Images" src="/other/path" style="max-width:320px;max-height:320px"/>'
-      );
-    });
+      )
+    })
 
-    it("builds linked image html from linked image data", () => {
+    it('builds linked image html from linked image data', () => {
       const containerElem = {
-        nodeName: "A",
+        nodeName: 'A',
         getAttribute: () => {
-          return "http://bogus.edu";
+          return 'http://bogus.edu'
         }
-      };
-      const ed = { ...editor};
+      }
+      const ed = {...editor}
       ed.insertContent = content => {
-        ed.content += content;
-      };
+        ed.content += content
+      }
       ed.selection.getNode = () => {
-        return { ...node, nodeName: "IMG"};
-      };
+        return {...node, nodeName: 'IMG'}
+      }
       ed.selection.getRng = () => ({
         startContainer: containerElem,
         endContainer: containerElem
-      });
+      })
 
-      contentInsertion.insertImage(ed, image);
+      contentInsertion.insertImage(ed, image)
       expect(ed.content).toEqual(
         '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path"/></a>'
-      );
-    });
-  });
+      )
+    })
+  })
 
-  describe("existingContentToLink", () => {
-    it("returns true if content selected", () => {
+  describe('existingContentToLink', () => {
+    it('returns true if content selected', () => {
       editor.selection.getContent = () => {
-        return "content";
-      };
+        return 'content'
+      }
       const link = {
         selectionDetails: {
           node: undefined
         }
-      };
+      }
       expect(contentInsertion.existingContentToLink(editor, link)).toBe(true)
-    });
-    it("returns false if content not selected", () => {
+    })
+    it('returns false if content not selected', () => {
       const link = {
         selectionDetails: {
           node: false
         }
-      };
+      }
       expect(contentInsertion.existingContentToLink(editor, link)).toBe(false)
-    });
+    })
 
     it('returns true when only an editor is passed with a selection', () => {
       editor.selection.getContent = () => {
-        return "content";
-      };
+        return 'content'
+      }
       expect(contentInsertion.existingContentToLink(editor)).toBe(true)
     })
-  });
+  })
 
-  describe("existingContentToLinkIsImg", () => {
-    it("returns false if no content selected", () => {
-      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false);
-    });
-    it("returns false if selected content is not img", () => {
+  describe('existingContentToLinkIsImg', () => {
+    it('returns false if no content selected', () => {
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false)
+    })
+    it('returns false if selected content is not img', () => {
       editor.selection.getContent = () => {
-        return "content";
-      };
-      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false);
-    });
-    it("returns true if selected content is img", () => {
+        return 'content'
+      }
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(false)
+    })
+    it('returns true if selected content is img', () => {
       editor.selection.getContent = () => {
-        return "content";
-      };
+        return 'content'
+      }
       editor.dom.$ = () => {
         return {
           is: () => {
-            return true;
+            return true
           }
-        };
-      };
-      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(true);
-    });
-  });
+        }
+      }
+      expect(contentInsertion.existingContentToLinkIsImg(editor)).toBe(true)
+    })
+  })
 
   describe('insertVideo', () => {
     beforeEach(() => {
@@ -273,7 +271,6 @@ describe("contentInsertion", () => {
         querySelector: () => 'the inserted iframe'
       }
     })
-
 
     it('inserts video from upload into iframe', () => {
       jest.spyOn(editor, 'insertContent')
@@ -324,4 +321,4 @@ describe("contentInsertion", () => {
       expect(result).toEqual('the inserted iframe')
     })
   })
-});
+})

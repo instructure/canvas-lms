@@ -44,35 +44,40 @@ QUnit.module('CanvasCropper', hooks => {
     assert.expect(1)
     const done = assert.async()
 
-    wrapper.instance().crop().then((image) => {
-      ok(image instanceof Blob, 'image object is a blob')
-      done()
-    })
+    wrapper
+      .instance()
+      .crop()
+      .then(image => {
+        ok(image instanceof Blob, 'image object is a blob')
+        done()
+      })
   })
 })
 
-function dataURItoBlob (dataURI) {
+function dataURItoBlob(dataURI) {
   // convert base64 to raw binary data held in a string
   // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-  const byteString = atob(dataURI.split(',')[1]);
+  const byteString = atob(dataURI.split(',')[1])
 
   // separate out the mime component
-  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+  const mimeString = dataURI
+    .split(',')[0]
+    .split(':')[1]
+    .split(';')[0]
 
   // write the bytes of the string to an ArrayBuffer
-  const ab = new ArrayBuffer(byteString.length);
-  const ia = new Uint8Array(ab);
+  const ab = new ArrayBuffer(byteString.length)
+  const ia = new Uint8Array(ab)
   for (let i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
+    ia[i] = byteString.charCodeAt(i)
   }
 
   // write the ArrayBuffer to a blob, and you're done
-  const blob = new Blob([ab], {type: mimeString});
-  return blob;
+  const blob = new Blob([ab], {type: mimeString})
+  return blob
 }
 
-const filedata =
-`data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QB0RXhpZgAATU0AKgAAAAgAB
+const filedata = `data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QB0RXhpZgAATU0AKgAAAAgAB
 AESAAMAAAABAAEAAAEaAAUAAAABAAAAPgEbAAUAAAABAAAARodpAAQAAAABAAAATgAAAAAAAABIA
 AAAAQAAAEgAAAABAAKgAgAEAAAAAQAAAJagAwAEAAAAAQAAAJEAAAAA/+EKCWh0dHA6Ly9ucy5hZ
 G9iZS5jb20veGFwLzEuMC8APD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZ
@@ -251,4 +256,4 @@ enA/I1GfxHIdtBfIa1nN0H+FBXAVHUKB8KVnyifJTXibNjUHo8f7+61GEBfbFHjzZ8t7I4XdZkbN
 5zU+xDLzK+7sCN6T4ihTRCDwoEJnl2/LU4OS2UyQcqCz8FHUHHRQiSCyZJuZhHQ0OAPJOlAlA8zZ
 QBh8H/dgbpTHdsOXHBwUb+ib+f7xX8PrRqy+KJgnwcWWqXibzqyAE+KuhZciEpEDNZwJqJkBqosJ
 O/C4fqsQHKdhBXwqSG6KeQmych9Xh/YKasFpzP1pECArcV1FyIPC7ppQgaXScWuz1qGB/TZeZLJD
-ML5FfFCSpsjJKXh/wAc29b+3e150/ZeN/zf8/2rxUp/g3m/5eX5v//Z`;
+ML5FfFCSpsjJKXh/wAc29b+3e150/ZeN/zf8/2rxUp/g3m/5eX5v//Z`

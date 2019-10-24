@@ -102,7 +102,8 @@ module Lti::Ims::NamesAndRolesMatchers
       'family_name' => (user.last_name if %w(public name_only).include?(privacy(opts))),
       'email' => (user.email if %w(public email_only).include?(privacy(opts))),
       'lis_person_sourcedid' => (expected_sourced_id(user) if %w(public name_only).include?(privacy(opts))),
-      'user_id' => expected_lti_id(Lti::Ims::Providers::MembershipsProvider.unwrap(user))
+      'user_id' => expected_lti_id(Lti::Ims::Providers::MembershipsProvider.unwrap(user)),
+      'lti11_legacy_user_id' => Lti::Asset.opaque_identifier_for(user)
     }.compact
   end
 

@@ -32,7 +32,8 @@ import $ from 'jquery'
  */
 export function trackEvent(category, action, label, value) {
   if (window.ga) {
-    (window.requestIdleCallback || window.setTimeout)(() => { // don't ever block anything else going on
+    ;(window.requestIdleCallback || window.setTimeout)(() => {
+      // don't ever block anything else going on
       window.ga('send', 'event', category, action, label, value)
     })
   }

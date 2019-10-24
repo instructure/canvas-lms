@@ -83,11 +83,11 @@ describe('ContentShareUserSearchSelector', () => {
     const selectInput = getByLabelText(/send to/i)
     fireEvent.click(selectInput)
     useContentShareUserSearchApi.mockImplementationOnce(({success}) =>
-      success([{id: 'foo', display_name: 'shrek'}])
+      success([{id: 'foo', name: 'shrek'}])
     )
     fireEvent.change(selectInput, {target: {value: 'shr'}})
     act(() => jest.runAllTimers()) // let the debounce happen
     fireEvent.click(getByText('shrek'))
-    expect(handleUserSelected).toHaveBeenCalledWith({id: 'foo', display_name: 'shrek'})
+    expect(handleUserSelected).toHaveBeenCalledWith({id: 'foo', name: 'shrek'})
   })
 })

@@ -299,7 +299,8 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: null,
       DEPRECATION_SENTRY_DSN: null,
-      GIT_COMMIT: null
+      GIT_COMMIT: null,
+      ALWAYS_APPEND_UI_TESTABLE_LOCATORS: null
     }),
 
     // Only include timezone data starting from 2011 (canvaseption) to 15 years from now,

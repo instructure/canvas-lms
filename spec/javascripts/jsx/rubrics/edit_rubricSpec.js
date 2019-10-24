@@ -25,26 +25,29 @@ QUnit.module('edit_rubric', {
 })
 
 test('hidePoints hides elements marked with class toggle_for_hide_points', () => {
-  $(document.body).append($(
-    '<div class="edit_rubric_test">' +
-    ' <div class="rubric">' +
-    '   <span class="toggle_for_hide_points">Hello</span>' +
-    ' </div>' +
-    '</div>'
-  ))
+  $(document.body).append(
+    $(
+      '<div class="edit_rubric_test">' +
+        ' <div class="rubric">' +
+        '   <span class="toggle_for_hide_points">Hello</span>' +
+        ' </div>' +
+        '</div>'
+    )
+  )
   rubricEditing.hidePoints($('.rubric'))
   ok($('.toggle_for_hide_points').hasClass('hidden'))
 })
 
-
 test('showPoints shows elements marked with class toggle_for_hide_points', () => {
-  $(document.body).append($(
-    '<div class="edit_rubric_test">' +
-    ' <div class="rubric">' +
-    '   <span class="toggle_for_hide_points hidden">Hello</span>' +
-    ' </div>' +
-    '</div>'
-  ))
+  $(document.body).append(
+    $(
+      '<div class="edit_rubric_test">' +
+        ' <div class="rubric">' +
+        '   <span class="toggle_for_hide_points hidden">Hello</span>' +
+        ' </div>' +
+        '</div>'
+    )
+  )
   rubricEditing.showPoints($('.rubric'))
   notOk($('.toggle_for_hide_points').hasClass('hidden'))
 })
@@ -62,14 +65,18 @@ const rubricHtml =
   '   </div>' +
   '  </form>' +
   ' </div>' +
-  '</div>';
+  '</div>'
 
 test('clicking hide_points checkbox hides grading_rubric checkbox', () => {
   $(document.body).append($(rubricHtml))
   rubricEditing.init()
   $('.hide_points_checkbox').prop('checked', true)
   $('.hide_points_checkbox').triggerHandler('change')
-  ok($('.rubric_grading').attr('style').includes('display: none;'))
+  ok(
+    $('.rubric_grading')
+      .attr('style')
+      .includes('display: none;')
+  )
 })
 
 test('clicking hide_points checkbox unchecks grading_rubric checkbox if checked', () => {
@@ -86,7 +93,11 @@ test('clicking hide_points checkbox hides totalling_rubric checkbox', () => {
   rubricEditing.init()
   $('.hide_points_checkbox').prop('checked', true)
   $('.hide_points_checkbox').triggerHandler('change')
-  ok($('.totalling_rubric').attr('style').includes('display: none'))
+  ok(
+    $('.totalling_rubric')
+      .attr('style')
+      .includes('display: none')
+  )
 })
 
 test('clicking hide_points checkbox unchecks totalling_rubric checkbox if checked', () => {
@@ -104,8 +115,8 @@ test('clicking hidden hide_points checkbox does not hide grading_rubric and tota
   $('.hide_points_checkbox').hide()
   $('.hide_points_checkbox').prop('checked', true)
   $('.hide_points_checkbox').triggerHandler('change')
-  notOk($('.rubric_grading').is(":hidden"))
-  notOk($('.totalling_rubric').is(":hidden"))
+  notOk($('.rubric_grading').is(':hidden'))
+  notOk($('.totalling_rubric').is(':hidden'))
 })
 
 test('clicking hidden grading_rubric checkbox does not hide totalling_rubric checkbox', () => {

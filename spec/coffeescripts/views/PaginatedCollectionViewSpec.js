@@ -29,7 +29,6 @@ let collection = null
 let view = null
 const fixtures = $('#fixtures')
 
-
 function createServer() {
   server = sinon.fakeServer.create()
   return (server.sendPage = function(page, url) {
@@ -94,7 +93,8 @@ function assertItemRendered(id) {
 
 function scrollToBottom() {
   // scroll within 100px of the bottom of the current list (<500 triggers a fetch)
-  fixtures[0].scrollTop = view.$el.position().top + view.$el.height() - fixtures.position().top - 100
+  fixtures[0].scrollTop =
+    view.$el.position().top + view.$el.height() - fixtures.position().top - 100
   ok(fixtures[0].scrollTop > 0)
 }
 test('renders items', () => {

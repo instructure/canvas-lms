@@ -109,9 +109,9 @@ describe('student view integration tests', () => {
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
 
       const mocks = await createGraphqlMocks({
-        CreateSubmissionDraftPayload: () => ({
-          submissionDraft: () => ({attachments: [{displayName: 'test.jpg'}]})
-        })
+        CreateSubmissionDraftPayload: {
+          submissionDraft: {attachments: [{displayName: 'test.jpg'}]}
+        }
       })
 
       const {container, getAllByText} = render(
@@ -138,21 +138,18 @@ describe('student view integration tests', () => {
           query: STUDENT_VIEW_QUERY,
           variables: {assignmentLid: '1', submissionID: '1'},
           overrides: {
-            Submission: () => ({
-              ...SubmissionMocks.graded,
-              attempt: 5
-            })
+            Submission: {...SubmissionMocks.graded, attempt: 5}
           }
         },
         {
           query: SUBMISSION_HISTORIES_QUERY,
           variables: {submissionID: '1'},
           overrides: {
-            Node: () => ({__typename: 'Submission'}),
-            PageInfo: () => ({hasPreviousPage: true}),
-            SubmissionHistoryConnection: () => ({
+            Node: {__typename: 'Submission'},
+            PageInfo: {hasPreviousPage: true},
+            SubmissionHistoryConnection: {
               nodes: [{attempt: 3}, {attempt: 4}]
-            })
+            }
           }
         }
       ]
@@ -213,8 +210,8 @@ describe('student view integration tests', () => {
     it.skip('opens the RCE when the Start Entry button is clicked', async () => {
       // TODO: get this to work with latest @testing-library
       const mocks = await createTextMocks({
-        Assignment: () => ({submissionTypes: ['online_text_entry']}),
-        SubmissionDraft: () => ({body: ''})
+        Assignment: {submissionTypes: ['online_text_entry']},
+        SubmissionDraft: {body: ''}
       })
 
       const {findByTestId} = render(

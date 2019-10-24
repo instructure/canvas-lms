@@ -135,7 +135,7 @@ module Gradezilla
     end
 
     def self.hidden_pill_locator
-       "//*[@data-cid='Pill'][//span[text() = 'Hidden']]"
+      "//*[@id='SubmissionTray__Content']//span[text() = 'Hidden']/../../.."
     end
 
     # methods

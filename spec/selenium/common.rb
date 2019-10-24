@@ -115,7 +115,7 @@ shared_context "in-process server selenium tests" do
   include Rails.application.routes.url_helpers
 
   prepend_before :each do
-    resize_screen_to_normal
+    resize_screen_to_standard
     SeleniumDriverSetup.allow_requests!
     driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
   end
@@ -130,7 +130,7 @@ shared_context "in-process server selenium tests" do
     retry_count = 0
     begin
       default_url_options[:host] = app_host_and_port
-      close_modal_if_present { resize_screen_to_normal } unless @driver.nil?
+      close_modal_if_present { resize_screen_to_standard } unless @driver.nil?
     rescue
       if maybe_recover_from_exception($ERROR_INFO) && (retry_count += 1) < 3
         retry

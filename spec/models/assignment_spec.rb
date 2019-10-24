@@ -1314,6 +1314,42 @@ describe Assignment do
     end
   end
 
+  describe "scope: migrating_for_too_long" do
+    subject { described_class.migrating_for_too_long }
+
+    let_once(:unpublished_assignment) do
+      @course.assignments.create!(workflow_state: 'unpublished', **assignment_valid_attributes)
+    end
+    let_once(:new_migrating_assignment) do
+      @course.assignments.create!(
+        workflow_state: 'migrating',
+        duplication_started_at: 5.seconds.ago,
+        **assignment_valid_attributes
+      )
+    end
+    let_once(:old_migrating_assignment) do
+      @course.assignments.create!(
+        workflow_state: 'migrating',
+        duplication_started_at: 20.minutes.ago,
+        **assignment_valid_attributes
+      )
+    end
+
+    it { is_expected.to eq([old_migrating_assignment]) }
+
+    describe ".clean_up_migrating_assignments" do
+      it "marks all assignments that have been migrating for too long as failed_to_migrate" do
+        expect(old_migrating_assignment.duplication_started_at).not_to be_nil
+        expect(old_migrating_assignment.workflow_state).to eq 'migrating'
+        described_class.clean_up_migrating_assignments
+        expect(
+          old_migrating_assignment.reload.duplication_started_at
+        ).to be_nil
+        expect(old_migrating_assignment.workflow_state).to eq 'failed_to_migrate'
+      end
+    end
+  end
+
   describe "#representatives" do
     context "individual students" do
       it "sorts by sortable_name" do
@@ -4086,6 +4122,15 @@ describe Assignment do
       })
     end
 
+    context "to attach submission comment files" do
+      it 'is true when a student can read an assignment but the assignment is locked' do
+        @assignment.lock_at = 1.week.ago
+        @assignment.submission_types = 'online_upload'
+        @assignment.save!
+        expect(@assignment.grants_right?(@student, :attach_submission_comment_files)).to be true
+      end
+    end
+
     context "to delete" do
       context "when there are no grading periods" do
         it "is true for admins" do
@@ -5790,6 +5835,38 @@ describe Assignment do
       @quiz.lock_at = 1.hours.ago
       @quiz.save!
       expect(Assignment.not_locked.count).to eq 0
+    end
+  end
+
+  context "with_latest_due_date" do
+    before :once do
+      course_factory
+      @s2 = @course.course_sections.create! name: 'other section'
+      @dates = (0..7).map { |x| DateTime.new(2020, 1, 10 + x, 12, 0, 0) }
+      @a1 = @course.assignments.create!(title: 'no due date')
+      @a2 = @course.assignments.create!(title: 'no overrides', due_at: @dates[0])
+      @a3 = @course.assignments.create!(title: 'latest is override', due_at: @dates[1])
+      assignment_override_model(assignment: @a3, set: @course.default_section, due_at: @dates[2])
+      @a4 = @course.assignments.create!(title: 'latest is base', due_at: @dates[4])
+      assignment_override_model(assignment: @a4, set: @course.default_section, due_at: @dates[3])
+      @a5 = @course.assignments.create!(title: 'two overrides', due_at: @dates[5])
+      assignment_override_model(assignment: @a5, set: @course.default_section, due_at: @dates[4])
+      assignment_override_model(assignment: @a5, set: @s2, due_at: @dates[6])
+      @a6 = @course.assignments.create!(title: 'only overrides')
+      assignment_override_model(assignment: @a6, set: @s2, due_at: @dates[6])
+      assignment_override_model(assignment: @a6, set: @course.default_section, due_at: @dates[7])
+    end
+
+    it "returns the latest override in each circumstance" do
+      assignments = @course.assignments.with_latest_due_date.reorder('latest_due_date').to_a
+      expect(assignments.map { |a| [a.title, a.latest_due_date] }).to eq([
+        ['no overrides', @dates[0]],
+        ['latest is override', @dates[2]],
+        ['latest is base', @dates[4]],
+        ['two overrides', @dates[6]],
+        ['only overrides', @dates[7]],
+        ['no due date', nil]
+      ])
     end
   end
 

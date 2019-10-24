@@ -604,7 +604,6 @@ module AccountReports
         headers << I18n.t('created_by_sis')
         headers << I18n.t('context_id')
         headers << I18n.t('context_type')
-        headers << I18n.t('group_category_id')
         headers << I18n.t('max_membership')
       end
 
@@ -633,7 +632,6 @@ module AccountReports
           row << g.sis_batch_id? unless @sis_format
           row << g.context_id unless @sis_format
           row << g.context_type unless @sis_format
-          row << g.group_category_id unless @sis_format
           row << g.max_membership unless @sis_format
           csv << row
         end

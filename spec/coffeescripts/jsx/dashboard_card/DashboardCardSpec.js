@@ -142,7 +142,7 @@ test('#removeCourseFromFavorites succeeds', function(async) {
   this.component.removeCourseFromFavorites()
 
   return moxiosWait(function() {
-    let request = moxios.requests.mostRecent()
+    const request = moxios.requests.mostRecent()
     request.respondWith({
       status: 200,
       response: []
@@ -168,7 +168,7 @@ test('#removeCourseFromFavorites fails', function(async) {
   this.component.removeCourseFromFavorites()
 
   return moxiosWait(function() {
-    let request = moxios.requests.mostRecent()
+    const request = moxios.requests.mostRecent()
     request.respondWith({
       status: 403,
       response: []

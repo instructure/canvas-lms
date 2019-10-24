@@ -83,6 +83,19 @@ RSpec.describe SubmissionDraft do
     end
   end
 
+  describe '#validates_url' do
+    context 'the assignment is an online_url type' do
+      before(:once) do
+        @submission.assignment.submission_types = 'online_url'
+      end
+
+      it 'prefixes the url with a scheme if missing' do
+        @submission_draft.update!(url: 'www.google.com')
+        expect(@submission_draft.url).to eq('http://www.google.com')
+      end
+    end
+  end
+
   describe '#meets_assignment_criteria?' do
     context 'the assignment is an online_text_entry type' do
       before(:once) do
@@ -138,6 +151,11 @@ RSpec.describe SubmissionDraft do
       it 'returns true if there is a url' do
         @submission_draft.url = 'http://www.google.com'
         expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+      end
+
+      it 'returns false if the url is not valid' do
+        @submission_draft.url = 'oogy boogy'
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
       end
 
       it 'returns false if the url is empty' do

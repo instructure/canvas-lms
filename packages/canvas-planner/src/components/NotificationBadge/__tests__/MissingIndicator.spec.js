@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { shallow } from 'enzyme';
-import MissingIndicator from '../MissingIndicator';
+import React from 'react'
+import {shallow} from 'enzyme'
+import MissingIndicator from '../MissingIndicator'
 
 it('renders an indicator with the danger variant and a title', () => {
-  const wrapper = shallow(<MissingIndicator title={'blah'} />);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<MissingIndicator title="blah" />)
+  expect(wrapper).toMatchSnapshot()
+})

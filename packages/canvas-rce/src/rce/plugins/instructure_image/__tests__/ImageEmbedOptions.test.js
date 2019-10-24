@@ -496,9 +496,7 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
     })
 
     it(`returns 'Extra Large' when given '${EXTRA_LARGE}'`, () => {
-      expect(labelForImageSize(EXTRA_LARGE)).toEqual(
-        'Extra Large'
-      )
+      expect(labelForImageSize(EXTRA_LARGE)).toEqual('Extra Large')
     })
 
     it(`returns 'Custom' when given '${CUSTOM}'`, () => {

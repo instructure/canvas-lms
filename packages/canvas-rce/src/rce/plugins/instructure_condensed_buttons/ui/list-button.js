@@ -55,11 +55,16 @@ const listTypes = {
 
 function selectedListType(listTypes, editor) {
   const selected = ListUtils.getSelectedStyleType(editor)
-  return selected && listTypes.find(style => {
-    if (selected.listType === 'OL' && style === 'ordered-default' && !selected.listStyleType) return true
-    if (selected.listType === 'UL' && style === 'unordered-default' && !selected.listStyleType) return true
-    return style === selected.listStyleType
-  })
+  return (
+    selected &&
+    listTypes.find(style => {
+      if (selected.listType === 'OL' && style === 'ordered-default' && !selected.listStyleType)
+        return true
+      if (selected.listType === 'UL' && style === 'unordered-default' && !selected.listStyleType)
+        return true
+      return style === selected.listStyleType
+    })
+  )
 }
 
 const isWithinList = (editor, e) => {
@@ -92,20 +97,24 @@ export default function register(editor) {
 
     onAction: () => {
       const selected = listTypes[selectedListType(Object.keys(listTypes), editor)]
-      const cmd =  (selected && selected.listType == 'OL') ? 'InsertOrderedList' : 'InsertUnorderedList'
+      const cmd =
+        selected && selected.listType == 'OL' ? 'InsertOrderedList' : 'InsertUnorderedList'
       editor.execCommand(cmd)
     },
 
     onItemAction: (splitButtonApi, value) => {
       const listType = listTypes[value]
-      const styleDetail = (value === 'unordered-default' || value === 'ordered-default') ? false : value
+      const styleDetail =
+        value === 'unordered-default' || value === 'ordered-default' ? false : value
       Actions.applyListFormat(editor, listType.listType, styleDetail)
     },
 
     select: value => !!selectedListType([value], editor),
 
     onSetup: api => {
-      const $svgContainer = editor.$(editor.editorContainer.querySelector(`[aria-label="${buttonLabel}"] .tox-icon`))
+      const $svgContainer = editor.$(
+        editor.editorContainer.querySelector(`[aria-label="${buttonLabel}"] .tox-icon`)
+      )
       const allIcons = editor.ui.registry.getAll().icons
 
       const nodeChangeHandler = e => {
@@ -125,4 +134,3 @@ export default function register(editor) {
     }
   })
 }
-

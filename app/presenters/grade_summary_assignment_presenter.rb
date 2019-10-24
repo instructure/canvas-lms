@@ -53,8 +53,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def hide_grade_from_student?
-    return assignment.muted? unless assignment.course&.post_policies_enabled?
-    assignment.post_manually? ? !submission.posted? : (submission.graded? && !submission.posted?)
+    submission.blank? || submission.hide_grade_from_student?
   end
 
   def graded?

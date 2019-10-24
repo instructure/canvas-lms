@@ -18,13 +18,13 @@
 
 import ReactModal from 'node_modules-version-of-react-modal'
 
-  var appElement = document.getElementById('application');
+const appElement = document.getElementById('application')
 
-  // In general this will be present, but in the case that it's not present,
-  // you'll need to set your own which most likely occurs during tests.
+// In general this will be present, but in the case that it's not present,
+// you'll need to set your own which most likely occurs during tests.
 
-  if (appElement) {
-    ReactModal.setAppElement(document.getElementById('application'));
-  }
+if (appElement) {
+  ReactModal.setAppElement(document.getElementById('application'))
+}
 
 export default ReactModal

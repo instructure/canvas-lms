@@ -238,6 +238,11 @@ describe GradeSummaryAssignmentPresenter do
   end
 
   describe "#hide_grade_from_student?" do
+    it "returns true if the submission object is nil" do
+      submissionless_presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, nil)
+      expect(submissionless_presenter).to be_hide_grade_from_student
+    end
+
     context "when post policies are enabled" do
       before(:each) { @course.enable_feature!(:new_gradebook) }
       before(:each) { PostPolicy.enable_feature! }
@@ -268,8 +273,13 @@ describe GradeSummaryAssignmentPresenter do
           expect(presenter).not_to be_hide_grade_from_student
         end
 
-        it "returns false when the student's submission is not posted" do
-          @submission.update!(posted_at: nil)
+        it "returns false when the student's submission is not posted and no grade has been issued" do
+          expect(presenter).not_to be_hide_grade_from_student
+        end
+
+        it "returns false when the student has submitted something but no grade is posted" do
+          @assignment.update!(submission_types: "online_text_entry")
+          @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "hi")
           expect(presenter).not_to be_hide_grade_from_student
         end
 
@@ -277,6 +287,16 @@ describe GradeSummaryAssignmentPresenter do
           @assignment.grade_student(@student, grader: @teacher, score: 5)
           @submission.reload
           @submission.update!(posted_at: nil)
+          expect(presenter).to be_hide_grade_from_student
+        end
+
+        it "returns true when the student has resubmitted to a previously graded and subsequently hidden submission" do
+          @assignment.update!(submission_types: "online_text_entry")
+          @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "hi")
+          @assignment.grade_student(@student, score: 0, grader: @teacher)
+          @assignment.hide_submissions
+          @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "I will not lose")
+          @submission.reload
           expect(presenter).to be_hide_grade_from_student
         end
       end

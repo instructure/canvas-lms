@@ -20,22 +20,21 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ConfigurationFormXml from 'jsx/external_apps/components/ConfigurationFormXml'
 
-const component = TestUtils.renderIntoDocument (
+const component = TestUtils.renderIntoDocument(
   <ConfigurationFormXml
-    name='Test tool'
-    consumerKey='key'
-    sharedSecret='secret'
-    configUrl='http://example.com'
-    allowMembershipServiceAccess={true}
-    membershipServiceFeatureFlagEnabled={true}
+    name="Test tool"
+    consumerKey="key"
+    sharedSecret="secret"
+    configUrl="http://example.com"
+    allowMembershipServiceAccess
+    membershipServiceFeatureFlagEnabled
   />
-);
+)
 
-QUnit.module('ConfigurationFormXml#getFormData()');
+QUnit.module('ConfigurationFormXml#getFormData()')
 
 test('returns expected output with membership service feature flag enabled', () => {
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormXml);
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormXml)
   app.refs.allow_membership_service_access.setState({value: true})
-  equal(app.getFormData().allow_membership_service_access, true);
-});
-
+  equal(app.getFormData().allow_membership_service_access, true)
+})

@@ -1237,7 +1237,7 @@ describe "context modules" do
 
     it "should add an external tool item to a module from apps", priority: "1", test_id: 126706 do
       get "/courses/#{@course.id}/settings"
-      make_full_screen
+
       f("#tab-tools-link").click
       f(".add_tool_link.lm").click
       f("#configuration_type_selector").click

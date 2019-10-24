@@ -21,8 +21,7 @@ import 'jquery.toJSON'
 
 // TODO: share code with 'unflatten' module
 
-const $datepickerEl = () =>
-  $(`<input type='text' name='date' class='datetime_field_enabled'/>`)
+const $datepickerEl = () => $(`<input type='text' name='date' class='datetime_field_enabled'/>`)
 
 QUnit.module('jquery.toJSON', {
   setup() {

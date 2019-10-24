@@ -87,7 +87,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   }
 
   function mountComponent(additionalProps = {}, customState = {}) {
-    const allProps = Object.assign({}, props, additionalProps)
+    const allProps = {...props, ...additionalProps}
     wrapper = mount(<SpeedGraderProvisionalGradeSelector {...allProps} />, {appendTo: $container})
 
     wrapper.setState({detailsVisible: true, ...customState})

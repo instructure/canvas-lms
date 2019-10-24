@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import StudentContextTray from 'jsx/context_cards/StudentContextTray'
 
-QUnit.module('StudentContextTray', (hooks) => {
+QUnit.module('StudentContextTray', hooks => {
   let tray
   const courseId = '1'
   const studentId = '1'
@@ -60,7 +60,7 @@ QUnit.module('StudentContextTray', (hooks) => {
     )
 
     const fakeEvent = {
-      preventDefault () {}
+      preventDefault() {}
     }
     component.handleRequestClose(fakeEvent)
     ok(document.activeElement === document.getElementById('someButton'))
@@ -68,21 +68,21 @@ QUnit.module('StudentContextTray', (hooks) => {
 
   QUnit.module('analytics button', () => {
     const user = {
-      short_name: "wooper",
+      short_name: 'wooper',
       enrollments: []
-    };
+    }
 
     const course = {
       permissions: {
         view_analytics: true
       },
-      submissionsConnection: { edges: [] }
-    };
+      submissionsConnection: {edges: []}
+    }
 
     const analytics = {
-      participations: { level: 2 },
-      page_views: { level: 3 }
-    };
+      participations: {level: 2},
+      page_views: {level: 3}
+    }
 
     test('it renders with analytics data', () => {
       const userWithAnalytics = {...user, analytics}
@@ -98,7 +98,8 @@ QUnit.module('StudentContextTray', (hooks) => {
             course
           }}
         />,
-        document.getElementById('fixtures'))
+        document.getElementById('fixtures')
+      )
       const quickLinks = tray.renderQuickLinks(userWithAnalytics, course)
       const children = quickLinks.props.children.filter(quickLink => quickLink !== null)
 
@@ -120,18 +121,27 @@ QUnit.module('StudentContextTray', (hooks) => {
             user: userWithAnalytics,
             course
           }}
-          externalTools={[{title: "Analytics Beta",
-            base_url: "http://example.com/courses/1/external_tools/29?launch_type=student_context_card",
-            tool_id: "fd75124a-140e-470f-944c-114d2d93bb40",
-            icon_url: null,
-            canvas_icon_class: "icon-analytics"}]}
+          externalTools={[
+            {
+              title: 'Analytics Beta',
+              base_url:
+                'http://example.com/courses/1/external_tools/29?launch_type=student_context_card',
+              tool_id: 'fd75124a-140e-470f-944c-114d2d93bb40',
+              icon_url: null,
+              canvas_icon_class: 'icon-analytics'
+            }
+          ]}
         />,
-        document.getElementById('fixtures'))
+        document.getElementById('fixtures')
+      )
       const quickLinks = tray.renderQuickLinks(userWithAnalytics, course)
       const children = quickLinks.props.children.filter(quickLink => quickLink !== null)
 
       equal(children.length, 1)
-      equal(children[0][0].props.children.props.href, 'http://example.com/courses/1/external_tools/29?launch_type=student_context_card&student_id=1')
+      equal(
+        children[0][0].props.children.props.href,
+        'http://example.com/courses/1/external_tools/29?launch_type=student_context_card&student_id=1'
+      )
     })
 
     test('it does not render without analytics data', () => {
@@ -146,7 +156,8 @@ QUnit.module('StudentContextTray', (hooks) => {
             course
           }}
         />,
-        document.getElementById('fixtures'))
+        document.getElementById('fixtures')
+      )
       const quickLinks = tray.renderQuickLinks(user, course)
       const children = quickLinks.props.children.filter(quickLink => quickLink !== null)
       ok(children.length === 0)

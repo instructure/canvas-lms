@@ -248,6 +248,58 @@ describe AssignmentsApiController, type: :request do
                           assignment8)
       end
 
+      context 'by due date' do
+        before :once do
+          @section1 = @course.course_sections.create! name: 'section1'
+          @student1 = student_in_course(name: 'student1', active_all: true, section: @section1).user
+
+          @section2 = @course.course_sections.create! name: 'section2'
+          @student2 = student_in_course(name: 'student2', active_all: true, section: @section2).user
+
+          due_at = 1.month.ago
+          @course.assignments.where(title: %w(assignment1 assignment4 assignment7)).each do |a|
+            a.due_at = due_at
+            a.save!
+          end
+          assignment_override_model(assignment: @course.assignments.where(title: 'assignment4').take,
+                                    set: @section1,
+                                    due_at: 2.months.from_now)
+
+          due_at = 1.month.from_now
+          @course.assignments.where(title: %w(assignment2 assignment3 assignment5)).each do |a|
+            a.due_at = due_at
+            a.save!
+          end
+          assignment_override_model(assignment: @course.assignments.where(title: 'assignment3').take,
+                                    set: @section2,
+                                    due_at: 2.months.ago)
+          assignment_override_model(assignment: @course.assignments.where(title: 'assignment3').take,
+                                    set: @course.default_section,
+                                    due_at: 3.months.from_now)
+
+          DueDateCacher.recompute_course(@course, run_immediately: true)
+        end
+
+        it "sorts the returned list of assignments by latest due date for teachers (nulls last)" do
+          json = api_get_assignments_user_index(@teacher, @course, @teacher, order_by: 'due_at')
+          order = %w(assignment1 assignment7 assignment2 assignment5 assignment4 assignment3 assignment6 assignment8)
+          expect(json.map { |a| a['name'] }).to eq order
+          expect(json.sort_by { |a| [a['due_at'] || CanvasSort::Last, a['name']] }.map { |a| a['name'] }).to eq order
+        end
+
+        it "sorts the returned list of assignments by overridden due date for students (nulls last)" do
+          json = api_get_assignments_user_index(@student1, @course, @teacher, order_by: 'due_at')
+          order = %w(assignment1 assignment7 assignment2 assignment3 assignment5 assignment4 assignment6 assignment8)
+          expect(json.map { |a| a['name'] }).to eq order
+          expect(json.sort_by { |a| [a['due_at'] || CanvasSort::Last, a['name']] }.map { |a| a['name'] }).to eq order
+
+          json = api_get_assignments_user_index(@student2, @course, @teacher, order_by: 'due_at')
+          order = %w(assignment3 assignment1 assignment4 assignment7 assignment2 assignment5 assignment6 assignment8)
+          expect(json.map { |a| a['name'] }).to eq order
+          expect(json.sort_by { |a| [a['due_at'] || CanvasSort::Last, a['name']] }.map { |a| a['name'] }).to eq order
+        end
+      end
+
       it "returns assignments by assignment group" do
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/assignment_groups/#{@group2.id}/assignments",
@@ -1353,6 +1405,34 @@ describe AssignmentsApiController, type: :request do
         expect(duplicated_assignments.count).to eq 2
         new_assignment = duplicated_assignments.where.not(id: failed_assignment.id).first
         expect(new_assignment.workflow_state).to eq('duplicating')
+      end
+
+      context "when result_type is specified (Quizzes.Next serialization)" do
+        before do
+          @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
+        end
+
+        it "outputs quiz shell json using quizzes.next serializer" do
+          url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json" \
+            "?target_assignment_id=#{failed_assignment.id}&target_course_id=#{course_copied.id}" \
+            "&result_type=Quiz"
+
+          json = api_call_as_user(
+            @teacher, :post,
+            url,
+            {
+              controller: "assignments_api",
+              action: "duplicate",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: assignment.id.to_s,
+              target_assignment_id: failed_assignment.id,
+              target_course_id: course_copied.id,
+              result_type: 'Quiz'
+            }
+          )
+          expect(json['quiz_type']).to eq('quizzes.next')
+        end
       end
     end
   end
@@ -4504,6 +4584,25 @@ describe AssignmentsApiController, type: :request do
           expect(uri.query).to include('assignment_id=')
         end
       end
+
+      context "when result_type is specified (Quizzes.Next serialization)" do
+        before do
+          @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
+        end
+
+        it "outputs quiz shell json using quizzes.next serializer" do
+          @assignment = @course.assignments.create!(:title => "Test Assignment",:description => "foo")
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+                          { :controller => "assignments_api", :action => "show",
+                            :format => "json", :course_id => @course.id.to_s,
+                            :id => @assignment.id.to_s,
+                            :all_dates => true,
+                            result_type: 'Quiz'},
+                          {:override_assignment_dates => 'false'})
+          expect(json['quiz_type']).to eq('quizzes.next')
+        end
+      end
     end
 
     context "draft state" do
@@ -5159,7 +5258,7 @@ def api_get_assignments_index_from_course(course, params = {})
   api_call(:get, "/api/v1/courses/#{course.id}/assignments.json", options)
 end
 
-def api_get_assignments_user_index(user, course, api_user = @user)
+def api_get_assignments_user_index(user, course, api_user = @user, params = {})
   api_call_as_user(api_user, :get,
            "/api/v1/users/#{user.id}/courses/#{course.id}/assignments.json",
            {
@@ -5168,7 +5267,7 @@ def api_get_assignments_user_index(user, course, api_user = @user)
                :format => 'json',
                :course_id => course.id.to_s,
                :user_id => user.id.to_s
-           })
+           }.merge(params))
 end
 
 def create_frozen_assignment_in_course(_course)

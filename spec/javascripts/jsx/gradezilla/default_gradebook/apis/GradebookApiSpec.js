@@ -176,31 +176,35 @@ QUnit.module('GradebookApi.updateSubmission', hooks => {
     return _.find(server.requests, request => request.url.includes(updateSubmissionUrl))
   }
 
-  test('sends a put request to the "update submission" url', () => GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-    latePolicyStatus: 'none'
-  }).then(() => {
-    const request = getRequest()
-    strictEqual(request.method, 'PUT')
-    strictEqual(request.url, updateSubmissionUrl)
-  }))
+  test('sends a put request to the "update submission" url', () =>
+    GradebookApi.updateSubmission(courseId, assignmentId, userId, {
+      latePolicyStatus: 'none'
+    }).then(() => {
+      const request = getRequest()
+      strictEqual(request.method, 'PUT')
+      strictEqual(request.url, updateSubmissionUrl)
+    }))
 
-  test('includes params for updating a submission', () => GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-    latePolicyStatus: 'none'
-  }).then(() => {
-    const bodyData = JSON.parse(getRequest().requestBody)
-    deepEqual(bodyData.submission.late_policy_status, 'none')
-  }))
+  test('includes params for updating a submission', () =>
+    GradebookApi.updateSubmission(courseId, assignmentId, userId, {
+      latePolicyStatus: 'none'
+    }).then(() => {
+      const bodyData = JSON.parse(getRequest().requestBody)
+      deepEqual(bodyData.submission.late_policy_status, 'none')
+    }))
 
-  test('includes params to request visibility for the submission', () => GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-    latePolicyStatus: 'none'
-  }).then(() => {
-    const bodyData = JSON.parse(getRequest().requestBody)
-    strictEqual(bodyData.include.includes('visibility'), true)
-  }))
+  test('includes params to request visibility for the submission', () =>
+    GradebookApi.updateSubmission(courseId, assignmentId, userId, {
+      latePolicyStatus: 'none'
+    }).then(() => {
+      const bodyData = JSON.parse(getRequest().requestBody)
+      strictEqual(bodyData.include.includes('visibility'), true)
+    }))
 
-  test('sends the column data to the success handler', () => GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-    latePolicyStatus: 'none'
-  }).then(({data}) => {
-    deepEqual(data, submissionData)
-  }))
+  test('sends the column data to the success handler', () =>
+    GradebookApi.updateSubmission(courseId, assignmentId, userId, {
+      latePolicyStatus: 'none'
+    }).then(({data}) => {
+      deepEqual(data, submissionData)
+    }))
 })

@@ -19,8 +19,7 @@
 import setDefaultToolValues from '../setDefaultToolValues'
 
 describe('setDefaultToolValues', () => {
-
-  const definition_type = "ContextExternalTool"
+  const definition_type = 'ContextExternalTool'
   const definition_id = '22'
   const tool = {
     definition_type,
@@ -49,7 +48,9 @@ describe('setDefaultToolValues', () => {
     setDefaultToolValues(result, tool)
   })
 
-  afterEach(() => { window.postMessage.mockReset() })
+  afterEach(() => {
+    window.postMessage.mockReset()
+  })
 
   afterAll(() => {
     window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = postMessageOrigin
@@ -57,24 +58,30 @@ describe('setDefaultToolValues', () => {
   })
 
   it('sends a postMessage to the window with results', () => {
-    expect(window.postMessage).toHaveBeenCalledWith({
-      messageType: 'defaultToolContentReady',
-      content: result
-    }, 'canvas.instructure.com')
+    expect(window.postMessage).toHaveBeenCalledWith(
+      {
+        messageType: 'defaultToolContentReady',
+        content: result
+      },
+      'canvas.instructure.com'
+    )
   })
 
   it('sets the definition type', () => {
-    expect(document.querySelector('#assignment_external_tool_tag_attributes_content_type').value)
-      .toEqual(definition_type)
+    expect(
+      document.querySelector('#assignment_external_tool_tag_attributes_content_type').value
+    ).toEqual(definition_type)
   })
 
   it('sets the definition id', () => {
-    expect(document.querySelector('#assignment_external_tool_tag_attributes_content_id').value)
-      .toEqual(definition_id)
+    expect(
+      document.querySelector('#assignment_external_tool_tag_attributes_content_id').value
+    ).toEqual(definition_id)
   })
 
   it('sets the tool URL', () => {
-    expect(document.querySelector('#assignment_external_tool_tag_attributes_url').value)
-      .toEqual(url)
+    expect(document.querySelector('#assignment_external_tool_tag_attributes_url').value).toEqual(
+      url
+    )
   })
 })

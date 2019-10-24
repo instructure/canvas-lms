@@ -16,43 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- import React from 'react'
- import * as enzyme from 'enzyme'
- import MoveItemTray from 'jsx/move_item/MoveItemTray'
+import React from 'react'
+import * as enzyme from 'enzyme'
+import MoveItemTray from 'jsx/move_item/MoveItemTray'
 
- QUnit.module('MoveItemTray component')
+QUnit.module('MoveItemTray component')
 
- const defaultProps = () => ({
-   title: 'Move Item',
-   items: [{
-     id: '10',
-     title: 'Foo Bar',
-   }],
-   moveOptions: {
-     siblings: [
-       { id: '12', title: 'Making Cake'},
-       { id: '30', title: 'Very Hard Quiz'}
-     ]
-   },
-   focusOnExit: () => {},
-   formatSaveUrl: () => {},
-   onMoveSuccess: () => {},
-   onExited: () => {},
-   applicationElement: () => document.getElementById('fixtures')
- })
+const defaultProps = () => ({
+  title: 'Move Item',
+  items: [
+    {
+      id: '10',
+      title: 'Foo Bar'
+    }
+  ],
+  moveOptions: {
+    siblings: [{id: '12', title: 'Making Cake'}, {id: '30', title: 'Very Hard Quiz'}]
+  },
+  focusOnExit: () => {},
+  formatSaveUrl: () => {},
+  onMoveSuccess: () => {},
+  onExited: () => {},
+  applicationElement: () => document.getElementById('fixtures')
+})
 
- test('renders the MoveItemTray component', () => {
-   const tree = enzyme.mount(<MoveItemTray {...defaultProps()} />)
-   ok(tree.exists())
- })
+test('renders the MoveItemTray component', () => {
+  const tree = enzyme.mount(<MoveItemTray {...defaultProps()} />)
+  ok(tree.exists())
+})
 
- test('renders one MoveSelect component on initial open', () => {
-   const tree = enzyme.shallow(<MoveItemTray {...defaultProps()} />)
-   const node = tree.find('MoveSelect')
-   equal(node.length, 1);
- })
+test('renders one MoveSelect component on initial open', () => {
+  const tree = enzyme.shallow(<MoveItemTray {...defaultProps()} />)
+  const node = tree.find('MoveSelect')
+  equal(node.length, 1)
+})
 
- test('open sets the state.open to true', () => {
+test('open sets the state.open to true', () => {
   const tree = enzyme.mount(<MoveItemTray {...defaultProps()} />)
   const instance = tree.instance()
   instance.open()
@@ -84,14 +83,14 @@ test('onMoveSelect calls onMoveSuccess with move data', () => {
   const tree = enzyme.mount(<MoveItemTray {...props} />)
   const instance = tree.instance()
   const clock = sinon.useFakeTimers()
-  instance.onMoveSelect({ order: ['1', '2', '3'], groupId: '5', itemIds: ['2'] })
+  instance.onMoveSelect({order: ['1', '2', '3'], groupId: '5', itemIds: ['2']})
   clock.tick(500)
-  ok(props.onMoveSuccess.calledWith, { data: ['1', '2', '3'], groupId: '5', itemIda: ['2'] })
+  ok(props.onMoveSuccess.calledWith, {data: ['1', '2', '3'], groupId: '5', itemIda: ['2']})
   clock.restore()
 })
 
 test('calls onFocus on the result of focusOnExit on close', () => {
-  const focusItem = { focus: sinon.spy() }
+  const focusItem = {focus: sinon.spy()}
   const props = defaultProps()
   props.focusOnExit = () => focusItem
   const tree = enzyme.mount(<MoveItemTray {...props} />)

@@ -17,7 +17,8 @@
  */
 
 import $ from 'jquery'
-import 'jquery.cookie'
+import getCookie from '../helpers/getCookie'
+import parseLinkHeader from 'parse-link-header'
 
 function constructRelativeUrl({path, params}) {
   const queryString = $.param(params)
@@ -35,7 +36,7 @@ export default async function doFetchApi({
 }) {
   const fetchHeaders = {
     Accept: 'application/json+canvas-string-ids, application/json',
-    'X-CSRF-Token': $.cookie('_csrf_token')
+    'X-CSRF-Token': getCookie('_csrf_token')
   }
   if (body && typeof body !== 'string') {
     body = JSON.stringify(body)
@@ -52,7 +53,8 @@ export default async function doFetchApi({
     err.response = response // in case anyone wants to check it for something
     throw err
   }
+  const link = parseLinkHeader(response.headers.get('Link'))
   const text = await response.text()
-  const json = text.length > 0 ? JSON.parse(text) : undefined
-  return json
+  const json = text.length > 0 ? JSON.parse(text) : null
+  return {json, response, link}
 }

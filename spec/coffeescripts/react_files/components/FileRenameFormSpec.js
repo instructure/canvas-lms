@@ -34,7 +34,8 @@ QUnit.module('FileRenameForm', {
       }
     }
     this.renderForm = props => {
-      this.form = ReactDOM.render(<FileRenameForm {...defaultProps} {...props} />,
+      this.form = ReactDOM.render(
+        <FileRenameForm {...defaultProps} {...props} />,
         $('<div>').appendTo('#fixtures')[0]
       )
     }

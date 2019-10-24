@@ -35,6 +35,7 @@ export default function AssignmentGroupFilter(props) {
       items={assignmentGroups}
       label={I18n.t('Assignment Group Filter')}
       selectedItemId={selectedAssignmentGroupId || ALL_ITEMS_ID}
+      sortAlphabetically
     />
   )
 }

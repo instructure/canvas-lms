@@ -19,7 +19,7 @@
 if (!window.ENV) {
   window.ENV = {}
 }
-export default (window.ENV.FILES_CONTEXTS = [
+export default window.ENV.FILES_CONTEXTS = [
   {
     asset_string: 'course_1',
     name: 'ryans test course',
@@ -29,4 +29,4 @@ export default (window.ENV.FILES_CONTEXTS = [
       read_contents: true
     }
   }
-])
+]

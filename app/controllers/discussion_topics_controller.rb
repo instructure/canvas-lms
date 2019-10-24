@@ -408,7 +408,6 @@ class DiscussionTopicsController < ApplicationController
             publish: user_can_moderate
           },
           discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
-          DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :manage_content) && @domain_root_account&.feature_enabled?(:direct_share),
         }
         if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && @js_env&.dig(:COURSE_ID).blank?
           hash[:COURSE_ID] = @context.id.to_s
@@ -416,6 +415,9 @@ class DiscussionTopicsController < ApplicationController
         conditional_release_js_env(includes: :active_rules)
         append_sis_data(hash)
         js_env(hash)
+        js_env({
+          DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :manage_content) && @domain_root_account&.feature_enabled?(:direct_share)
+        }, true)
         set_tutorial_js_env
 
         if user_can_edit_course_settings?

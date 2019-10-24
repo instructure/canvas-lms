@@ -19,92 +19,106 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import { getByText } from '@testing-library/dom'
+import {getByText} from '@testing-library/dom'
 import CourseImagePicker from 'jsx/course_settings/components/CourseImagePicker'
 
-const wrapper = document.getElementById('fixtures');
-const reset_env = window.ENV;
+const wrapper = document.getElementById('fixtures')
+const reset_env = window.ENV
 
 QUnit.module('CourseImagePicker Component', {
   renderComponent(props = {}) {
     let courseImagePicker
     const element = React.createElement(CourseImagePicker, {
-      ref: (node) => { courseImagePicker = node },
+      ref: node => {
+        courseImagePicker = node
+      },
       courseId: 0,
       ...props
-    });
-    ReactDOM.render(element, wrapper);
+    })
+    ReactDOM.render(element, wrapper)
     return courseImagePicker
   },
 
   teardown() {
-    ReactDOM.unmountComponentAtNode(wrapper);
-    window.ENV = reset_env;
+    ReactDOM.unmountComponentAtNode(wrapper)
+    window.ENV = reset_env
   }
-});
+})
 
 test('dragging overlay modal appears when accepting a drag', function() {
-  const component = this.renderComponent();
+  const component = this.renderComponent()
 
-  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
+  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker')
 
   TestUtils.Simulate.dragEnter(area, {
     dataTransfer: {
       types: ['Files']
     }
-  });
+  })
 
-  ok(TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 1, 'the dragging overlay appeared');
-});
+  ok(
+    TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 1,
+    'the dragging overlay appeared'
+  )
+})
 
 test('dragging overlay modal does not appear when denying a non-file drag', function() {
-  const component = this.renderComponent();
+  const component = this.renderComponent()
 
-  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
+  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker')
 
   TestUtils.Simulate.dragEnter(area, {
     dataTransfer: {
       types: ['notFile']
     }
-  });
+  })
 
-  ok(TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 0, 'the dragging overlay did not appear');
-});
+  ok(
+    TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 0,
+    'the dragging overlay did not appear'
+  )
+})
 
 test('dragging overlay modal disappears when you leave the drag area', function() {
-  const component = this.renderComponent();
+  const component = this.renderComponent()
 
-  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
+  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker')
 
   TestUtils.Simulate.dragEnter(area, {
     dataTransfer: {
       types: ['Files']
     }
-  });
+  })
 
-  ok(component.state.draggingFile, 'draggingFile state is set');
-  TestUtils.Simulate.dragLeave(area);
-  ok(!component.state.draggingFile, 'draggingFile state is correctly false');
-});
+  ok(component.state.draggingFile, 'draggingFile state is set')
+  TestUtils.Simulate.dragLeave(area)
+  ok(!component.state.draggingFile, 'draggingFile state is correctly false')
+})
 
 test('calls the handleFileUpload prop when drop occurs', function() {
-  let called = false;
-  const handleFileUploadFunc = () => { called = true };
-  const component = this.renderComponent({ courseId: "101", handleFileUpload: handleFileUploadFunc });
+  let called = false
+  const handleFileUploadFunc = () => {
+    called = true
+  }
+  const component = this.renderComponent({courseId: '101', handleFileUpload: handleFileUploadFunc})
 
-  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker');
+  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker')
 
-  TestUtils.Simulate.drop(area);
+  TestUtils.Simulate.drop(area)
 
-  ok(called, 'handleFileUpload was called');
-});
+  ok(called, 'handleFileUpload was called')
+})
 
 test('Unsplash tab can be selected', function() {
-  window.ENV.use_unsplash_image_search = true;
-  const component = this.renderComponent({ courseId: "101"});
-  const imageSearchTab = getByText(wrapper, 'Unsplash');
+  window.ENV.use_unsplash_image_search = true
+  const component = this.renderComponent({courseId: '101'})
+  const imageSearchTab = getByText(wrapper, 'Unsplash')
 
-  TestUtils.Simulate.click(imageSearchTab);
+  TestUtils.Simulate.click(imageSearchTab)
 
-  strictEqual(TestUtils.scryRenderedDOMComponentsWithClass(component, 'Unsplash__logo').length, 1, 'the Unsplash tab content should appear')
-});
+  strictEqual(
+    TestUtils.scryRenderedDOMComponentsWithClass(component, 'Unsplash__logo').length,
+    1,
+    'the Unsplash tab content should appear'
+  )
+})

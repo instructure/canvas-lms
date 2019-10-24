@@ -72,6 +72,7 @@ class Group < ActiveRecord::Base
   before_save :update_max_membership_from_group_category
 
   after_create :refresh_group_discussion_topics
+  after_save :touch_context, :if => :saved_change_to_workflow_state?
 
   after_update :clear_cached_short_name, :if => :saved_change_to_name?
 

@@ -32,9 +32,9 @@ QUnit.module('FileUploadQuestionView', {
       {preflightUrl: 'url.com'}
     )
     this.view = new FileUploadQuestion({model: this.model})
-    $(
-      '<input value="C:\\fakepath\\file.upload.zip" class="file-upload hidden" />'
-    ).appendTo(this.view.$el)
+    $('<input value="C:\\fakepath\\file.upload.zip" class="file-upload hidden" />').appendTo(
+      this.view.$el
+    )
     this.view.$el.appendTo('#fixtures')
     this.view.render()
   },
@@ -62,7 +62,7 @@ test('#deleteAttachment fires "attachmentManipulationComplete" event', function(
 })
 
 test('#deleteAttachment clears file input', function() {
-  equal(this.view.$fileUpload.val(), "C:\\fakepath\\file.upload.zip")
+  equal(this.view.$fileUpload.val(), 'C:\\fakepath\\file.upload.zip')
   this.view.deleteAttachment($.Event('keydown', {keyCode: 64}))
   equal(this.view.$fileUpload.val(), '')
 })

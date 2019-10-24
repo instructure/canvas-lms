@@ -20,7 +20,7 @@ export function videoFromTray() {
   return {
     class: 'instructure_file_link', // if from tray
     content_type: 'video/quicktime',
-    href: "/url/to/course/file",
+    href: '/url/to/course/file',
     id: 17,
     target: '_blank',
     text: 'filename.mov'
@@ -36,7 +36,7 @@ export function videoFromUpload() {
   }
 }
 
- export function audioFromTray() {
+export function audioFromTray() {
   return {
     class: 'instructure_file_link',
     content_type: 'audio/mp3',

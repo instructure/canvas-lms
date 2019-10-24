@@ -127,7 +127,10 @@ QUnit.module('SubmissionTrayRadioInputGroup#handleRadioInputChanged', suiteHooks
 
   suiteHooks.beforeEach(() => {
     updateSubmission = sinon.stub()
-    wrapper = mountComponent({updateSubmission})
+    wrapper = mountComponent({
+      submission: {excused: false, late: false, missing: false, secondsLate: 250},
+      updateSubmission
+    })
   })
 
   suiteHooks.afterEach(() => {
@@ -141,13 +144,13 @@ QUnit.module('SubmissionTrayRadioInputGroup#handleRadioInputChanged', suiteHooks
     deepEqual(updateSubmission.getCall(0).args[0], {latePolicyStatus: 'missing'})
   })
 
-  test('calls updateSubmission with secondsLateOverride set to 0 if the "late" option is selected', () => {
+  test('calls updateSubmission with secondsLateOverride set to the submission secondsLate if the "late" option is selected', () => {
     const event = {target: {value: 'late'}}
     wrapper.instance().handleRadioInputChanged(event)
     strictEqual(updateSubmission.callCount, 1)
     deepEqual(updateSubmission.getCall(0).args[0], {
       latePolicyStatus: 'late',
-      secondsLateOverride: 0
+      secondsLateOverride: 250
     })
   })
 

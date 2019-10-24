@@ -58,7 +58,7 @@ export const RubricAssessment = {
   })
 }
 
-export const RubricAssessmentDefaultMocks = {
+export const DefaultMocks = {
   RubricAssessment: () => ({
     _id: '1',
     assessmentType: 'grading',

@@ -44,7 +44,7 @@ describe('DirectShareUserModal', () => {
     jest.useFakeTimers()
 
     useContentShareUserSearchApi.mockImplementationOnce(({success}) => {
-      success([{id: 'abc', display_name: 'abc'}, {id: 'cde', display_name: 'cde'}])
+      success([{id: 'abc', name: 'abc'}, {id: 'cde', name: 'cde'}])
     })
   })
 
@@ -120,7 +120,7 @@ describe('DirectShareUserModal', () => {
   })
 
   it('clears user selection when the modal is closed', async () => {
-    fetchMock.get('*', [{id: 'abc', display_name: 'abc'}])
+    fetchMock.get('*', [{id: 'abc', name: 'abc'}])
     const {queryByText, getByText, findByLabelText, rerender} = render(
       <DirectShareUserModal open />
     )

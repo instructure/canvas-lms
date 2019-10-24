@@ -23,6 +23,10 @@ import {SubmissionFile} from './File'
 export const SubmissionInterface = {
   fragment: gql`
     fragment SubmissionInterface on SubmissionInterface {
+      attachment {
+        # this refers to the screenshot of the submission if it is a url submission
+        ...SubmissionFile
+      }
       attachments {
         ...SubmissionFile
       }
@@ -31,9 +35,9 @@ export const SubmissionInterface = {
       deductedPoints
       enteredGrade
       grade
+      gradeHidden
       gradingStatus
       latePolicyStatus
-      posted
       state
       submissionDraft {
         ...SubmissionDraft
@@ -48,15 +52,16 @@ export const SubmissionInterface = {
   `,
 
   shape: shape({
+    attachment: SubmissionFile.shape,
     attachments: arrayOf(SubmissionFile.shape),
     attempt: number.isRequired,
     body: string,
     deductedPoints: number,
     enteredGrade: string,
     grade: string,
+    gradeHidden: bool.isRequired,
     gradingStatus: string,
     latePolicyStatus: string,
-    posted: bool.isRequired,
     state: string.isRequired,
     submissionDraft: SubmissionDraft.shape,
     submissionStatus: string,
@@ -66,17 +71,18 @@ export const SubmissionInterface = {
   })
 }
 
-export const SubmissionInterfaceDefaultMocks = {
+export const DefaultMocks = {
   SubmissionInterface: () => ({
+    attachment: null,
     attachments: () => [],
     attempt: 0,
     body: null,
     deductedPoints: null,
     enteredGrade: null,
+    gradeHidden: false,
     grade: null,
     gradingStatus: null,
     latePolicyStatus: null,
-    posted: true,
     state: 'unsubmitted',
     submissionDraft: null,
     submissionStatus: 'unsubmitted',

@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const REQUEST_MEDIA = "REQUEST_MEDIA";
-export const RECEIVE_MEDIA = "RECEIVE_MEDIA";
-export const FAIL_MEDIA = "FAIL_MEDIA";
+export const REQUEST_MEDIA = 'REQUEST_MEDIA'
+export const RECEIVE_MEDIA = 'RECEIVE_MEDIA'
+export const FAIL_MEDIA = 'FAIL_MEDIA'
 
 export function requestMedia(contextType) {
-  return { type: REQUEST_MEDIA, payload: {contextType} };
+  return {type: REQUEST_MEDIA, payload: {contextType}}
 }
 
 export function receiveMedia({response, contextType}) {
-  const { files, bookmark } = response;
-  return { type: RECEIVE_MEDIA, payload: {files, bookmark, contextType }};
+  const {files, bookmark} = response
+  return {type: RECEIVE_MEDIA, payload: {files, bookmark, contextType}}
 }
 
 export function failMedia({error, contextType}) {
-  return { type: FAIL_MEDIA, payload: {error, contextType}};
+  return {type: FAIL_MEDIA, payload: {error, contextType}}
 }
 
 // dispatches the start of the load, requests a page for the collection from
@@ -38,37 +38,37 @@ export function failMedia({error, contextType}) {
 // clears the load on failure
 export function fetchMedia() {
   return (dispatch, getState) => {
-    const state = getState();
-    dispatch(requestMedia(state.contextType));
+    const state = getState()
+    dispatch(requestMedia(state.contextType))
     return state.source
       .fetchMedia(state)
       .then(response => dispatch(receiveMedia({response, contextType: state.contextType})))
-      .catch(error => dispatch(failMedia({error, contextType: state.contextType})));
-  };
+      .catch(error => dispatch(failMedia({error, contextType: state.contextType})))
+  }
 }
 
 // fetches a page only if a page is not already being loaded and the
 // collection is not yet completely loaded
 export function fetchNextMedia() {
   return (dispatch, getState) => {
-    const state = getState();
+    const state = getState()
     const media = state.media[state.contextType]
 
     if (media && !media.isLoading && media.hasMore) {
-      return dispatch(fetchMedia());
+      return dispatch(fetchMedia())
     }
-  };
+  }
 }
 
 // fetches the next page (subject to conditions on fetchNextMedia) only if the
 // collection is currently empty
 export function fetchInitialMedia() {
   return (dispatch, getState) => {
-    const state = getState();
+    const state = getState()
     const media = state.media[state.contextType]
 
     if (media && media.hasMore && !media.isLoading && media.files && media.files.length === 0) {
-      return dispatch(fetchMedia());
+      return dispatch(fetchMedia())
     }
-  };
+  }
 }

@@ -22,23 +22,27 @@ import * as FlashAlert from 'jsx/shared/FlashAlert'
 
 const createMockStore = state => ({
   subs: [],
-  subscribe (cb) { this.subs.push(cb) },
+  subscribe(cb) {
+    this.subs.push(cb)
+  },
   getState: () => state,
   dispatch: () => {},
-  mockStateChange () { this.subs.forEach(sub => sub()) },
+  mockStateChange() {
+    this.subs.forEach(sub => sub())
+  }
 })
 
 QUnit.module('Blueprint Course FlashNotifications', {
-  teardown () {
+  teardown() {
     FlashAlert.destroyContainer()
   }
 })
 
-test('subscribes to a store and calls showFlashAlert for each notification in state', (assert) => {
+test('subscribes to a store and calls showFlashAlert for each notification in state', assert => {
   const done = assert.async()
   const flashAlertSpy = sinon.spy(FlashAlert, 'showFlashAlert')
   const mockStore = createMockStore({
-    notifications: [{ id: '1', message: 'hello' }, { id: '2', message: 'world' }]
+    notifications: [{id: '1', message: 'hello'}, {id: '2', message: 'world'}]
   })
 
   FlashNotifications.subscribe(mockStore)
@@ -46,17 +50,17 @@ test('subscribes to a store and calls showFlashAlert for each notification in st
 
   setTimeout(() => {
     equal(flashAlertSpy.callCount, 2)
-    deepEqual(flashAlertSpy.firstCall.args, [{ id: '1', message: 'hello' }])
-    deepEqual(flashAlertSpy.secondCall.args, [{ id: '2', message: 'world' }])
+    deepEqual(flashAlertSpy.firstCall.args, [{id: '1', message: 'hello'}])
+    deepEqual(flashAlertSpy.secondCall.args, [{id: '2', message: 'world'}])
     flashAlertSpy.restore()
     done()
   }, 1)
 })
 
-test('subscribes to a store and dispatches clearNotifications for each notification in state', (assert) => {
+test('subscribes to a store and dispatches clearNotifications for each notification in state', assert => {
   const done = assert.async()
   const mockStore = createMockStore({
-    notifications: [{ id: '1', message: 'hello' }, { id: '2', message: 'world' }]
+    notifications: [{id: '1', message: 'hello'}, {id: '2', message: 'world'}]
   })
   const dispatchSpy = sinon.spy(mockStore, 'dispatch')
 

@@ -27,7 +27,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
   let component
   let props
 
-  function getProps(override={}) {
+  function getProps(override = {}) {
     props = {
       bridge: new Bridge(),
       containingContext: {type: 'course', contextId: '1201', userId: '17'},
@@ -56,7 +56,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
     throw new Error('not mounted')
   }
 
-    async function showTrayForPlugin(plugin) {
+  async function showTrayForPlugin(plugin) {
     act(() => {
       props.bridge.controller.showTrayForPlugin(plugin)
     })

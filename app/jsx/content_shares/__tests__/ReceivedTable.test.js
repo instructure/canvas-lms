@@ -39,7 +39,7 @@ describe('content shares table', () => {
     expect(container.querySelector('th')).toBeInTheDocument()
     expect(container.querySelector('td')).toBeInTheDocument()
     expect(getByText(assignmentShare.name)).toBeInTheDocument()
-    expect(getByText(assignmentShare.content_type)).toBeInTheDocument()
+    expect(getByText('Assignment')).toBeInTheDocument()
     expect(getByText(assignmentShare.sender.display_name)).toBeInTheDocument()
     expect(getAllByText(/2019/)[0]).toBeInTheDocument()
     expect(getByText(/manage options/i)).toBeInTheDocument()
@@ -48,10 +48,10 @@ describe('content shares table', () => {
   it('renders multiple rows of share data', () => {
     const {getByText} = render(<ReceivedTable shares={[assignmentShare, readDiscussionShare]} />)
     expect(getByText(assignmentShare.name)).toBeInTheDocument()
-    expect(getByText(assignmentShare.content_type)).toBeInTheDocument()
+    expect(getByText('Assignment')).toBeInTheDocument()
 
     expect(getByText(readDiscussionShare.name)).toBeInTheDocument()
-    expect(getByText(readDiscussionShare.content_type)).toBeInTheDocument()
+    expect(getByText('Discussion Topic')).toBeInTheDocument()
   })
 
   it('renders no unread dot for read items', () => {
@@ -90,7 +90,15 @@ describe('content shares table', () => {
     const previewOption = getByTestId('import-menu-action')
     fireEvent.click(previewOption)
     expect(onImport).toHaveBeenCalledTimes(1)
-    expect(onImport).toHaveBeenCalledWith(assignmentShare.id)
+    expect(onImport).toHaveBeenCalledWith(assignmentShare)
     expect(onPreview).toHaveBeenCalledTimes(0)
+  })
+
+  it('triggers handler for remove menu action', () => {
+    const onRemove = jest.fn()
+    const {getByText} = render(<ReceivedTable shares={[assignmentShare]} onRemove={onRemove} />)
+    fireEvent.click(getByText(/manage options/i))
+    fireEvent.click(getByText('Remove'))
+    expect(onRemove).toHaveBeenCalledWith(assignmentShare)
   })
 })

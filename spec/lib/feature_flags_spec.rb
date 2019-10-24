@@ -230,23 +230,23 @@ describe FeatureFlags do
         end
 
         it "should find hidden features if override_hidden is given" do
-          expect(t_site_admin.lookup_feature_flag('hidden_feature', true)).to be_default
-          expect(t_root_account.lookup_feature_flag('hidden_feature', true)).to be_default
-          expect(t_sub_account.lookup_feature_flag('hidden_feature', true)).to be_default
-          expect(t_course.lookup_feature_flag('hidden_feature', true)).to be_default
-          expect(t_user.lookup_feature_flag('hidden_user_feature', true)).to be_default
+          expect(t_site_admin.lookup_feature_flag('hidden_feature', override_hidden: true)).to be_default
+          expect(t_root_account.lookup_feature_flag('hidden_feature', override_hidden: true)).to be_default
+          expect(t_sub_account.lookup_feature_flag('hidden_feature', override_hidden: true)).to be_default
+          expect(t_course.lookup_feature_flag('hidden_feature', override_hidden: true)).to be_default
+          expect(t_user.lookup_feature_flag('hidden_user_feature', override_hidden: true)).to be_default
         end
 
         it "should not create the implicit-off root_opt_in flag" do
-          flag = t_root_account.lookup_feature_flag('hidden_root_opt_in_feature', true)
+          flag = t_root_account.lookup_feature_flag('hidden_root_opt_in_feature', override_hidden: true)
           expect(flag).to be_default
           expect(flag).to be_hidden
         end
 
         it "override_hidden should not trump root_opt_in" do
-          expect(t_root_account.lookup_feature_flag('hidden_root_opt_in_feature', true)).to be_default
-          expect(t_sub_account.lookup_feature_flag('hidden_root_opt_in_feature', true)).to be_nil
-          expect(t_course.lookup_feature_flag('hidden_root_opt_in_feature', true)).to be_nil
+          expect(t_root_account.lookup_feature_flag('hidden_root_opt_in_feature', override_hidden: true)).to be_default
+          expect(t_sub_account.lookup_feature_flag('hidden_root_opt_in_feature', override_hidden: true)).to be_nil
+          expect(t_course.lookup_feature_flag('hidden_root_opt_in_feature', override_hidden: true)).to be_nil
         end
       end
 
@@ -367,8 +367,8 @@ describe FeatureFlags do
       enable_cache do
         t_root_account.feature_flag('course_feature2')
         expect(Rails.cache).to be_exist(t_root_account.feature_flag_cache_key('course_feature2'))
-        expect(t_root_account).to receive(:feature_flags).never
-        t_root_account.feature_flag('course_feature2')
+        expect(FeatureFlag).to receive(:where).never
+        t_root_account.reload.feature_flag('course_feature2')
       end
     end
 
@@ -385,6 +385,17 @@ describe FeatureFlags do
         t_root_account.feature_flag('course_feature')
         t_root_account.feature_flags.where(feature: 'course_feature').first.destroy
         expect(Rails.cache).not_to be_exist(t_cache_key)
+      end
+    end
+
+    it "should skip the cache if requested" do
+      enable_cache do
+        flag = t_root_account.feature_flag('course_feature')
+        expect(flag.state).to eq 'allowed'
+        allow(flag).to receive(:clear_cache).and_return(true) # pretend it was delayed
+        flag.update_attribute(:state, 'on') # update in db
+        expect(t_root_account.feature_flag('course_feature').state).to eq 'allowed' # still pulls from cache
+        expect(t_root_account.feature_flag('course_feature', skip_cache: true).state).to eq 'on' # skips it
       end
     end
   end

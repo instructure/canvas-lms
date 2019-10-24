@@ -26,7 +26,9 @@ QUnit.module('MessageStudents dialog', hooks => {
 
   function selectedStudentNames() {
     // Ignore the "template" entry, which is still in the list
-    const $studentNames = document.querySelectorAll('#message_students_dialog .student_list .student:not(.blank) .name')
+    const $studentNames = document.querySelectorAll(
+      '#message_students_dialog .student_list .student:not(.blank) .name'
+    )
     return [...$studentNames].map(nameElement => nameElement.innerText)
   }
 
@@ -39,7 +41,7 @@ QUnit.module('MessageStudents dialog', hooks => {
         {name: 'Boudica', sortableName: 'Boudica', id: '1', score: 50},
         {name: 'Vercingetorix', sortableName: 'Vercingetorix', id: '2', score: 40},
         {name: 'Ariovistus', sortableName: 'Ariovistus', id: '10', score: 53},
-        {name: 'Gaius Julius Caesar', sortableName: 'Caesar, Gaius Julius', id: '20', score: 48},
+        {name: 'Gaius Julius Caesar', sortableName: 'Caesar, Gaius Julius', id: '20', score: 48}
       ],
       title: 'My Great Course!!!'
     }
@@ -101,10 +103,12 @@ QUnit.module('MessageStudents dialog', hooks => {
 
   test('renders the students alphabetically by sortable name', () => {
     messageStudents(settings)
-    deepEqual(
-      selectedStudentNames(),
-      ['Ariovistus', 'Boudica', 'Gaius Julius Caesar', 'Vercingetorix']
-    )
+    deepEqual(selectedStudentNames(), [
+      'Ariovistus',
+      'Boudica',
+      'Gaius Julius Caesar',
+      'Vercingetorix'
+    ])
   })
 
   test('includes users with IDs higher than Javascript numbers can handle', () => {
@@ -117,9 +121,12 @@ QUnit.module('MessageStudents dialog', hooks => {
     settings.students.push(crossShardStudent)
 
     messageStudents(settings)
-    deepEqual(
-      selectedStudentNames(),
-      ['Ariovistus', 'Boudica', 'Gaius Julius Caesar', 'Vercingetorix', 'Student From Another World']
-    )
+    deepEqual(selectedStudentNames(), [
+      'Ariovistus',
+      'Boudica',
+      'Gaius Julius Caesar',
+      'Vercingetorix',
+      'Student From Another World'
+    ])
   })
 })

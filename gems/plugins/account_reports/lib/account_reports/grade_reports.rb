@@ -73,12 +73,8 @@ module AccountReports
       headers << I18n.t('term')
       headers << I18n.t('term id')
       headers << I18n.t('term sis')
-      headers << I18n.t('current score')
-      headers << I18n.t('final score')
-      headers << I18n.t('enrollment state')
-      headers << I18n.t('unposted current score')
-      headers << I18n.t('unposted final score')
-      headers << I18n.t('override score') if include_override_score?
+
+      headers.concat(grading_field_headers)
 
       courses = root_account.all_courses
       courses = courses.where(:enrollment_term_id => term) if term
@@ -97,6 +93,8 @@ module AccountReports
         users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
         users.uniq!
         users_by_id = users.index_by(&:id)
+        courses_by_id = Course.where(id: student_chunk.map(&:course_id)).preload(:grading_standard).index_by(&:id)
+
         pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
         student_chunk.each_with_index do |student, i|
           p = loaded_pseudonym(pseudonyms,
@@ -104,6 +102,7 @@ module AccountReports
                                include_deleted: @include_deleted,
                                enrollment: student)
           next unless p
+          course = courses_by_id[student["course_id"]]
           arr = []
           arr << student["user_name"]
           arr << student["user_id"]
@@ -118,12 +117,7 @@ module AccountReports
           arr << student["term_name"]
           arr << student["term_id"]
           arr << student["term_sis_id"]
-          arr << student["current_score"]
-          arr << student["final_score"]
-          arr << student["enroll_state"]
-          arr << student["unposted_current_score"]
-          arr << student["unposted_final_score"]
-          arr << student["override_score"] if include_override_score?
+          arr.concat(grading_field_values(student: student, course: course))
           add_report_row(row: arr, row_number: i, report_runner: runner)
         end
       end
@@ -138,26 +132,31 @@ module AccountReports
         root_account.enrollment_terms.active :
         root_account.enrollment_terms.where(id: @account_report.parameters[:enrollment_term_id])
 
-      term_reports = terms.reduce({}) do |reports, term|
-        reports[term.name] = mgp_term_csv(term)
-        reports
-      end
+      courses = root_account.all_courses.order(:id)
+      courses = courses.where(enrollment_term_id: terms)
+      courses = add_course_sub_account_scope(courses)
+      courses = courses.active unless @include_deleted
+      total = courses.count
 
-      send_report(term_reports)
+      term_reports = terms.each_with_object({}) do |term, reports|
+        header = mgp_term_header(term)
+        if header
+          reports[term.name] = header
+          courses.where(enrollment_term_id: term).find_ids_in_batches(batch_size: 10_000) { |batch| create_report_runners(batch, total) } unless total == 0
+        else
+          # for parallel reports we need to have at least runner to be able to finish the report
+          @runner ||= @account_report.account_report_runners.create!
+          reports[term.name] = [I18n.t("no grading periods configured for this term")]
+        end
+      end
+      # if we made a runner for an empty term, we can mark it as completed.
+      @runner&.complete
+      write_report_in_batches([], files: term_reports)
     end
 
-    def mgp_term_csv(term)
-      students = student_grade_scope
-      students = students.where(c: {enrollment_term_id: term})
-
+    def mgp_term_header(term)
       gp_set = term.grading_period_group
-      unless gp_set
-        not_found = Tempfile.open(%w[not-found csv])
-        not_found.puts I18n.t("no grading periods configured for this term")
-        not_found.close
-        return not_found
-      end
-      grading_periods = gp_set.grading_periods.active.order(:start_date)
+      return false unless gp_set
 
       headers = []
       headers << I18n.t('student name')
@@ -175,72 +174,73 @@ module AccountReports
       headers << I18n.t('term sis')
       headers << I18n.t('grading period set')
       headers << I18n.t('grading period set id')
-      grading_periods.each { |gp|
+      gp_set.grading_periods.active.order(:start_date).each do |gp|
         headers << I18n.t('%{name} grading period id', name: gp.title)
         headers << I18n.t('%{name} current score', name: gp.title)
         headers << I18n.t('%{name} final score', name: gp.title)
         headers << I18n.t('%{name} unposted current score', name: gp.title)
         headers << I18n.t('%{name} unposted final score', name: gp.title)
         headers << I18n.t('%{name} override score', name: gp.title) if include_override_score?
-      }
-      headers << I18n.t('current score')
-      headers << I18n.t('final score')
-      headers << I18n.t('enrollment state')
-      headers << I18n.t('unposted current score')
-      headers << I18n.t('unposted final score')
-      headers << I18n.t('override score') if include_override_score?
 
-      generate_and_run_report headers do |csv|
-        course_ids = root_account.all_courses.where(:enrollment_term_id => term).order(:id).pluck(:id)
-        course_ids.each_slice(1000) do |batched_course_ids|
-          students.where(:course_id => batched_course_ids).preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-            users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
-            users.uniq!
-            users_by_id = users.index_by(&:id)
-            pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
-            students_by_course = student_chunk.group_by { |x| x.course_id }
-            students_by_course.each do |course_id, course_students|
-              scores = indexed_scores(course_students, grading_periods)
-              course_students.each do |student|
-                p = loaded_pseudonym(pseudonyms,
-                                     users_by_id[student.user_id],
-                                     include_deleted: @include_deleted,
-                                     enrollment: student)
-                next unless p
-                arr = []
-                arr << student["user_name"]
-                arr << student["user_id"]
-                arr << p.sis_user_id
-                arr << p.integration_id if include_integration_id?
-                arr << student["course_name"]
-                arr << student["course_id"]
-                arr << student["course_sis_id"]
-                arr << student["section_name"]
-                arr << student["course_section_id"]
-                arr << student["section_sis_id"]
-                arr << student["term_name"]
-                arr << student["term_id"]
-                arr << student["term_sis_id"]
-                arr << gp_set.title
-                arr << gp_set.id
-                grading_periods.each do |gp|
-                  scores_for_student = grading_period_scores_for_student(student, gp, scores)
-                  arr << gp.id
-                  arr << scores_for_student[:current_score]
-                  arr << scores_for_student[:final_score]
-                  arr << scores_for_student[:unposted_current_score]
-                  arr << scores_for_student[:unposted_final_score]
-                  arr << scores_for_student[:override_score] if include_override_score?
-                end
-                arr << student["current_score"]
-                arr << student["final_score"]
-                arr << student["enroll_state"]
-                arr << student["unposted_current_score"]
-                arr << student["unposted_final_score"]
-                arr << student["override_score"] if include_override_score?
-                csv << arr
-              end
+        next unless include_grading_scheme_values?
+        headers << I18n.t('%{name} current grade', name: gp.title)
+        headers << I18n.t('%{name} final grade', name: gp.title)
+        headers << I18n.t('%{name} unposted current grade', name: gp.title)
+        headers << I18n.t('%{name} unposted final grade', name: gp.title)
+        headers << I18n.t('%{name} override grade', name: gp.title) if include_override_score?
+      end
+      headers.concat(grading_field_headers)
+    end
+
+    def mgp_grade_export_runner(runner)
+      term = root_account.enrollment_terms.where(id: root_account.all_courses.where(id: runner.batch_items.first).select(:enrollment_term_id)).take
+      gp_set = term.grading_period_group
+      grading_periods = gp_set.grading_periods.active.order(:start_date)
+      return unless grading_periods
+
+      students = student_grade_scope.where(course_id: runner.batch_items)
+      courses_by_id = Course.where(id: runner.batch_items).preload(:grading_standard).index_by(&:id)
+      students.where(course_id: runner.batch_items).preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
+        users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
+        users.uniq!
+        users_by_id = users.index_by(&:id)
+        pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
+        students_by_course = student_chunk.group_by { |x| x.course_id }
+        students_by_course.each do |_course_id, course_students|
+          scores = indexed_scores(course_students, grading_periods)
+          course_students.each_with_index do |student, i|
+            p = loaded_pseudonym(pseudonyms,
+                                 users_by_id[student.user_id],
+                                 include_deleted: @include_deleted,
+                                 enrollment: student)
+            next unless p
+            course = courses_by_id[student["course_id"]]
+            arr = []
+            arr << student["user_name"]
+            arr << student["user_id"]
+            arr << p.sis_user_id
+            arr << p.integration_id if include_integration_id?
+            arr << student["course_name"]
+            arr << student["course_id"]
+            arr << student["course_sis_id"]
+            arr << student["section_name"]
+            arr << student["course_section_id"]
+            arr << student["section_sis_id"]
+            arr << student["term_name"]
+            arr << student["term_id"]
+            arr << student["term_sis_id"]
+            arr << gp_set.title
+            arr << gp_set.id
+
+            grading_periods.each do |gp|
+              scores_for_student = grading_period_scores_for_student(student, gp, scores)
+
+              arr << gp.id
+              arr.concat(grading_period_grading_field_values(scores_for_student: scores_for_student))
             end
+
+            arr.concat(grading_field_values(student: student, course: course))
+            add_report_row(row: arr, row_number: i, report_runner: runner, file: term.name)
           end
         end
       end
@@ -310,13 +310,88 @@ module AccountReports
            AND enrollments.workflow_state IN ('active', 'completed')
            AND sc.workflow_state <> 'deleted'")
       end
-
-      # this can be removed when both reports are using parallel
-      students = add_course_sub_account_scope(students, 'c')
+      students
     end
 
     def include_override_score?
       @account.feature_allowed?(:final_grades_override)
+    end
+
+    def include_grading_scheme_values?
+      @account.root_account.feature_enabled?(:add_grading_scheme_to_admin_grade_reports)
+    end
+
+    def grading_field_headers
+      headers = []
+
+      headers << I18n.t("current score")
+      headers << I18n.t("final score")
+      headers << I18n.t("enrollment state")
+      headers << I18n.t("unposted current score")
+      headers << I18n.t("unposted final score")
+      headers << I18n.t("override score") if include_override_score?
+
+      if include_grading_scheme_values?
+        headers << I18n.t("current grade")
+        headers << I18n.t("final grade")
+        headers << I18n.t("unposted current grade")
+        headers << I18n.t("unposted final grade")
+        headers << I18n.t("override grade") if include_override_score?
+      end
+
+      headers
+    end
+
+    # We expect "student" to be an object of the sort returned by the query in student_grade_scope
+    def grading_field_values(student:, course:)
+      fields = []
+
+      fields << student["current_score"]
+      fields << student["final_score"]
+      # enroll_state is sandwiched somewhat awkwardly in here but we don't want to change the
+      # existing order of these columns
+      fields << student["enroll_state"]
+      fields << student["unposted_current_score"]
+      fields << student["unposted_final_score"]
+      fields << student["override_score"] if include_override_score?
+
+      if include_grading_scheme_values?
+        fields << course&.score_to_grade(student["current_score"])
+        fields << course&.score_to_grade(student["final_score"])
+        fields << course&.score_to_grade(student["unposted_current_score"])
+        fields << course&.score_to_grade(student["unposted_final_score"])
+        fields << course&.score_to_grade(student["override_score"]) if include_override_score?
+      end
+
+      fields
+    end
+
+    def grading_period_grading_field_values(scores_for_student:)
+      fields = []
+      fields << scores_for_student[:current_score]
+      fields << scores_for_student[:final_score]
+      fields << scores_for_student[:unposted_current_score]
+      fields << scores_for_student[:unposted_final_score]
+      fields << scores_for_student[:override_score] if include_override_score?
+
+      return fields unless include_grading_scheme_values?
+
+      # scores_for_student is either an ersatz Score object (with the expected
+      # methods but only a subset of fields) or an empty hash (if we're looking
+      # at a student with no data in a given grading period). In the latter
+      # case, don't try to calculate grades for scores that don't exist.
+      if scores_for_student.respond_to?(:current_grade)
+        fields << scores_for_student.current_grade
+        fields << scores_for_student.final_grade
+        fields << scores_for_student.unposted_current_grade
+        fields << scores_for_student.unposted_final_grade
+        fields << scores_for_student.override_grade if include_override_score?
+      else
+        buffer_field_count = include_override_score? ? 5 : 4
+        fields.concat([nil] * buffer_field_count)
+      end
+
+      fields
     end
   end
 end

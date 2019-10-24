@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -18,28 +17,30 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import merge from 'lodash/merge'
 
 import ConfirmDeleteModal from 'jsx/announcements/components/ConfirmDeleteModal'
 
-const makeProps = (props = {}) => merge({
-  onConfirm () {},
-  onCancel () {},
-  onHide () {},
-  modalRef () {},
-  selectedCount: 1,
-  applicationElement: () => document.getElementById('fixtures'),
-}, props)
+const makeProps = (props = {}) =>
+  merge(
+    {
+      onConfirm() {},
+      onCancel() {},
+      onHide() {},
+      modalRef() {},
+      selectedCount: 1,
+      applicationElement: () => document.getElementById('fixtures')
+    },
+    props
+  )
 
 QUnit.module('ConfirmDeleteModal component')
 
-test('should call onConfirm prop after confirming delete', (assert) => {
+test('should call onConfirm prop after confirming delete', assert => {
   const done = assert.async()
   const confirmSpy = sinon.spy()
-  const tree = shallow(
-    <ConfirmDeleteModal {...makeProps({ onConfirm: confirmSpy })} />
-  )
+  const tree = shallow(<ConfirmDeleteModal {...makeProps({onConfirm: confirmSpy})} />)
   tree.find('#confirm_delete_announcements').simulate('click')
   setTimeout(() => {
     equal(confirmSpy.callCount, 1)
@@ -47,14 +48,10 @@ test('should call onConfirm prop after confirming delete', (assert) => {
   })
 })
 
-
-
-test('should call onHide prop after confirming delete', (assert) => {
+test('should call onHide prop after confirming delete', assert => {
   const done = assert.async()
   const hideSpy = sinon.spy()
-  const tree = shallow(
-    <ConfirmDeleteModal {...makeProps({ onHide: hideSpy })} />
-  )
+  const tree = shallow(<ConfirmDeleteModal {...makeProps({onHide: hideSpy})} />)
   tree.find('#confirm_delete_announcements').simulate('click')
   setTimeout(() => {
     equal(hideSpy.callCount, 1)
@@ -62,12 +59,10 @@ test('should call onHide prop after confirming delete', (assert) => {
   })
 })
 
-test('should call onCancel prop after cancelling', (assert) => {
+test('should call onCancel prop after cancelling', assert => {
   const done = assert.async()
   const cancelSpy = sinon.spy()
-  const tree = shallow(
-    <ConfirmDeleteModal {...makeProps({ onCancel: cancelSpy })} />
-  )
+  const tree = shallow(<ConfirmDeleteModal {...makeProps({onCancel: cancelSpy})} />)
   tree.find('#cancel_delete_announcements').simulate('click')
   setTimeout(() => {
     equal(cancelSpy.callCount, 1)
@@ -75,16 +70,13 @@ test('should call onCancel prop after cancelling', (assert) => {
   })
 })
 
-test('should call onHide prop after cancelling', (assert) => {
+test('should call onHide prop after cancelling', assert => {
   const done = assert.async()
   const hideSpy = sinon.spy()
-  const tree = shallow(
-    <ConfirmDeleteModal {...makeProps({ onHide: hideSpy })} />
-  )
+  const tree = shallow(<ConfirmDeleteModal {...makeProps({onHide: hideSpy})} />)
   tree.find('#confirm_delete_announcements').simulate('click')
   setTimeout(() => {
     equal(hideSpy.callCount, 1)
     done()
   })
 })
-

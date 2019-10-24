@@ -16,25 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { AlertHandler } from '../alertHandler';
+import {AlertHandler} from '../alertHandler'
 
 describe('AlertHandler', () => {
   describe('handleAlert', () => {
     it("throws an error if alertFun hasn't been set", () => {
-      const alerter = new AlertHandler();
-      expect(() => alerter.handleAlert({
-        text: 'Something went wrong uploading, check your connection and try again.',
-        variant: 'error'
-      })).toThrowError('Tried to alert without alertFunc being set first');
+      const alerter = new AlertHandler()
+      expect(() =>
+        alerter.handleAlert({
+          text: 'Something went wrong uploading, check your connection and try again.',
+          variant: 'error'
+        })
+      ).toThrow('Tried to alert without alertFunc being set first')
     })
     it('calls alertFunc when it has been set', () => {
-      const alerter = new AlertHandler();
-      alerter.alertFunc = jest.fn();
+      const alerter = new AlertHandler()
+      alerter.alertFunc = jest.fn()
       alerter.handleAlert({
         text: 'Something went wrong uploading, check your connection and try again.',
         variant: 'error'
       })
-      expect(alerter.alertFunc).toHaveBeenCalled();
+      expect(alerter.alertFunc).toHaveBeenCalled()
     })
   })
 })

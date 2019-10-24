@@ -20,9 +20,20 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
     @current_user = current_user
   end
 
-  def perform(submissions)
+  def load(submission)
+    # By default if we pass two submissions with the same id but a different
+    # attempt, they will get uniqued into a single submission before they reach
+    # the perform method. This breaks submission histories/versionable. Work
+    # around this by passing in the submission.id and submission.attempt to
+    # the perform method instead.
+    super([submission.global_id, submission.attempt])
+  end
+
+  def perform(submission_ids_and_attempts)
+    submission_ids = submission_ids_and_attempts.map(&:first)
+
     unread_count_hash = Submission.
-      where(id: submissions).
+      where(id: submission_ids).
       joins(:submission_comments).
       where(
         'NOT EXISTS (?)',
@@ -30,10 +41,21 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
           where('viewed_submission_comments.submission_comment_id=submission_comments.id').
           where(:user_id => @current_user)
       ).
-      group(:submission_id).
+      group(:submission_id, 'submission_comments.attempt').
       count
 
-    submissions.each { |s| fulfill(s, unread_count_hash[s.id] || 0) }
+    submission_ids_and_attempts.each do |submission_id, attempt|
+      # Group attempts nil, zero, and one together as one set of unread counts
+      count = if (attempt || 0) <= 1
+        (unread_count_hash[[submission_id, nil]] || 0) +
+        (unread_count_hash[[submission_id, 0]] || 0) +
+        (unread_count_hash[[submission_id, 1]] || 0)
+      else
+        unread_count_hash[[submission_id, attempt]] || 0
+      end
+
+      fulfill([submission_id, attempt], count)
+    end
   end
 end
 
@@ -159,6 +181,11 @@ module Interfaces::SubmissionInterface
   field :posted, Boolean, method: :posted?, null: false
   field :state, Types::SubmissionStateType, method: :workflow_state, null: false
 
+  field :grade_hidden, Boolean, null: false
+  def grade_hidden
+    !submission.user_can_read_grade?(current_user, session)
+  end
+
   field :submission_status, String, null: true
   def submission_status
     if submission.submission_type == 'online_quiz'
@@ -178,6 +205,11 @@ module Interfaces::SubmissionInterface
     'was the grade given on the current submission (resubmission)', null: true
   field :submission_type, Types::AssignmentSubmissionType, null: true
 
+
+  field :attachment, Types::FileType, null: true
+  def attachment
+    load_association(:attachment)
+  end
 
   field :attachments, [Types::FileType], null: true
   def attachments

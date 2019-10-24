@@ -16,49 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import * as actions from "../../../src/sidebar/actions/flickr";
-import { spiedStore } from "./utils";
+import assert from 'assert'
+import * as actions from '../../../src/sidebar/actions/flickr'
+import {spiedStore} from './utils'
 
-describe("Flickr data actions", () => {
+describe('Flickr data actions', () => {
   const successSource = {
     searchFlickr() {
       return new Promise(resolve => {
-        resolve([{ go: "baduk" }]);
-      });
+        resolve([{go: 'baduk'}])
+      })
     }
-  };
-
-  const defaults = {
-    jwt: "theJWT",
-    source: successSource
-  };
-
-  function setupState(props) {
-    const { jwt, source } = { ...defaults, ...props};
-    return { jwt, source };
   }
 
-  describe("searchFlickr", () => {
-    it("chains through search to results", done => {
-      const baseState = setupState();
-      baseState.flickr = { searching: false };
-      const store = spiedStore(baseState);
-      store.dispatch(actions.searchFlickr("weiqi")).then(() => {
+  const defaults = {
+    jwt: 'theJWT',
+    source: successSource
+  }
+
+  function setupState(props) {
+    const {jwt, source} = {...defaults, ...props}
+    return {jwt, source}
+  }
+
+  describe('searchFlickr', () => {
+    it('chains through search to results', done => {
+      const baseState = setupState()
+      baseState.flickr = {searching: false}
+      const store = spiedStore(baseState)
+      store.dispatch(actions.searchFlickr('weiqi')).then(() => {
         assert.ok(
           store.spy.calledWith({
             type: actions.START_FLICKR_SEARCH,
-            term: "weiqi"
+            term: 'weiqi'
           })
-        );
+        )
         assert.ok(
           store.spy.calledWith({
             type: actions.RECEIVE_FLICKR_RESULTS,
-            results: [{ go: "baduk" }]
+            results: [{go: 'baduk'}]
           })
-        );
-        done();
-      });
-    });
-  });
-});
+        )
+        done()
+      })
+    })
+  })
+})

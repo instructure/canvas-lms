@@ -354,12 +354,7 @@ class Course < ActiveRecord::Base
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
 
-    scope = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
-    unless user_is_teacher
-      scope = scope.where("content_tags.content_type <> ? OR content_tags.content_id IN (?)", "DiscussionTopic",
-        self.discussion_topics.published.visible_to_student_sections(user).select(:id))
-    end
-    scope
+    DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
   end
 
   def sequential_module_item_ids
@@ -450,7 +445,7 @@ class Course < ActiveRecord::Base
   def image
     @image ||= if self.image_id.present?
       self.shard.activate do
-        self.attachments.active.where(id: self.image_id).take&.public_download_url
+        self.attachments.active.where(id: self.image_id).take&.public_download_url(1.week)
       end
     elsif self.image_url
       self.image_url
@@ -2752,7 +2747,7 @@ class Course < ActiveRecord::Base
   def external_tool_tabs(opts, user)
     tools = self.context_external_tools.active.having_setting('course_navigation')
     tools += ContextExternalTool.active.having_setting('course_navigation').where(context_type: 'Account', context_id: account_chain_ids).to_a
-    tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled? }
+    tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled?(self) }
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
 

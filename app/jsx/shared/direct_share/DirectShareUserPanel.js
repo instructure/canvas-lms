@@ -21,7 +21,7 @@ import React from 'react'
 import {arrayOf, func, string} from 'prop-types'
 import {Tag} from '@instructure/ui-elements'
 import ContentShareUserSearchSelector from '../components/ContentShareUserSearchSelector'
-import basicUser from '../proptypes/user'
+import {basicUser} from '../proptypes/user'
 
 DirectShareUserPanel.propTypes = {
   courseId: string,
@@ -41,8 +41,8 @@ export default function DirectShareUserPanel({
       <Tag
         key={user.id}
         dismissible
-        title={I18n.t('Remove %{name}', {name: user.display_name})}
-        text={user.display_name}
+        title={I18n.t('Remove %{name}', {name: user.name})}
+        text={user.name}
         onClick={() => onUserRemoved(user)}
       />
     ))

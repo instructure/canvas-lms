@@ -22,7 +22,6 @@ import {render, fireEvent} from '@testing-library/react'
 import ExpandoText from '../ExpandoText'
 
 describe('RCE Plugins > LtiTool', () => {
-
   function renderComponent(text) {
     return render(
       <div style={{width: '10rem'}}>
@@ -38,7 +37,7 @@ describe('RCE Plugins > LtiTool', () => {
 
   it('renders the text', () => {
     const {getByText} = renderComponent('hello world')
-    expect(getByText("hello world")).toBeInTheDocument()
+    expect(getByText('hello world')).toBeInTheDocument()
   })
 
   it('renders the down-arrow when expanded', () => {

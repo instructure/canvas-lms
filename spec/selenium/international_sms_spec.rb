@@ -36,7 +36,7 @@ describe "international sms" do
       ]
 
       get '/profile/settings'
-      make_full_screen
+
       find('.add_contact_link').click
       wait_for_ajaximations
 
@@ -57,7 +57,7 @@ describe "international sms" do
 
     it 'allows a phone number to be entered', priority: "1", test_id: 602158 do
       get '/profile/settings'
-      make_full_screen
+
       find('.add_contact_link').click
       wait_for_ajaximations
 

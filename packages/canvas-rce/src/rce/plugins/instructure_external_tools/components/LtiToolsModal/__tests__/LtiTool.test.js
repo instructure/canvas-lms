@@ -22,13 +22,12 @@ import {render} from '@testing-library/react'
 import LtiTool from '../LtiTool'
 
 describe('RCE Plugins > LtiTool', () => {
-
-  function getProps(override={}) {
+  function getProps(override = {}) {
     const props = {
-      title: "Tool 1",
+      title: 'Tool 1',
       id: 1,
-      description: "This is tool 1.",
-      image: "tool1/icon.png",
+      description: 'This is tool 1.',
+      image: 'tool1/icon.png',
       onAction: () => {},
       ...override
     }
@@ -41,7 +40,7 @@ describe('RCE Plugins > LtiTool', () => {
 
   it('renters the tool title', () => {
     const {getByText} = renderComponent()
-    expect(getByText("Tool 1")).toBeInTheDocument()
+    expect(getByText('Tool 1')).toBeInTheDocument()
   })
 
   it('renters the tool image', () => {
@@ -51,6 +50,6 @@ describe('RCE Plugins > LtiTool', () => {
 
   it('renders the tool description', () => {
     const {getByText} = renderComponent()
-    expect(getByText("This is tool 1.")).toBeInTheDocument()
+    expect(getByText('This is tool 1.')).toBeInTheDocument()
   })
 })

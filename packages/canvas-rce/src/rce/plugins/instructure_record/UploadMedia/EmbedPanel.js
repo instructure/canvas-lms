@@ -17,19 +17,20 @@
  */
 
 import React from 'react'
-import { string, func } from 'prop-types'
-import { TextArea } from '@instructure/ui-forms'
+import {string, func} from 'prop-types'
+import {TextArea} from '@instructure/ui-forms'
 import formatMessage from '../../../../format-message'
 
-export default function EmbedPanel ({embedCode, setEmbedCode}) {
+export default function EmbedPanel({embedCode, setEmbedCode}) {
   return (
     <TextArea
       maxHeight="10rem"
       label={formatMessage('Embed Video Code')}
       value={embedCode}
-      onChange={(e) =>{
-        setEmbedCode(e.target.value)}
-      }/>
+      onChange={e => {
+        setEmbedCode(e.target.value)
+      }}
+    />
   )
 }
 

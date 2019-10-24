@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/fa.json";
-import "../rce/languages/fa_IR";
+import formatMessage from '../format-message'
+import locale from '../../locales/fa.json'
+import '../rce/languages/fa_IR'
 
-formatMessage.addLocale({ fa: locale });
+formatMessage.addLocale({fa: locale})

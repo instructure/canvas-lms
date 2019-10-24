@@ -18,7 +18,6 @@
 // does Rails-style flash message/error boxes that drop down from the top of the screen
 import $ from 'jquery'
 import NotificationsHelper from 'jsx/railsFlashNotificationsHelper'
-import 'jquery.cookie'
 
 const helper = new NotificationsHelper()
 

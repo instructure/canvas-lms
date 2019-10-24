@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { showSidebar, hideSidebar } from "./actions/ui";
+import {showSidebar, hideSidebar} from './actions/ui'
 
 class SidebarFacade {
   constructor(store) {
-    this.store = store;
+    this.store = store
   }
 
   show() {
-    this.store.dispatch(showSidebar());
+    this.store.dispatch(showSidebar())
   }
 
   hide() {
-    this.store.dispatch(hideSidebar());
+    this.store.dispatch(hideSidebar())
   }
 }
 
-export default SidebarFacade;
+export default SidebarFacade

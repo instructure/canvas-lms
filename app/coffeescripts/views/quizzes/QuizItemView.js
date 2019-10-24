@@ -28,6 +28,7 @@ import DateAvailableColumnView from '../assignments/DateAvailableColumnView'
 import SisButtonView from '../SisButtonView'
 import template from 'jst/quizzes/QuizItemView'
 import 'jquery.disableWhileLoading'
+import Quiz from '../../models/Quiz'
 
 export default class ItemView extends Backbone.View {
   static initClass() {
@@ -47,7 +48,13 @@ export default class ItemView extends Backbone.View {
       'click .delete-item': 'onDelete',
       'click .migrate': 'migrateQuiz',
       'click .quiz-copy-to': 'copyQuizTo',
-      'click .quiz-send-to': 'sendQuizTo'
+      'click .quiz-send-to': 'sendQuizTo',
+      'click .duplicate_assignment': 'onDuplicate',
+      'click .duplicate-failed-retry': 'onDuplicateFailedRetry',
+      'click .migrate-failed-retry': 'onMigrateFailedRetry',
+      'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel',
+      'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
+      'click .migrate-failed-cancel': 'onDuplicateOrImportFailedCancel'
     }
 
     this.prototype.messages = {
@@ -61,6 +68,7 @@ export default class ItemView extends Backbone.View {
   initialize(options) {
     this.initializeChildViews()
     this.observeModel()
+    this.model.pollUntilFinishedLoading(3000)
     return super.initialize(...arguments)
   }
 
@@ -121,23 +129,33 @@ export default class ItemView extends Backbone.View {
   }
 
   migrateQuizEnabled() {
-    return ENV.FLAGS && ENV.FLAGS.migrate_quiz_enabled
+    const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
+    return ENV.FLAGS && ENV.FLAGS.migrate_quiz_enabled && isOldQuiz
   }
 
   migrateQuiz(e) {
     e.preventDefault()
     const courseId = ENV.context_asset_string.split('_')[1]
     const quizId = this.options.model.id
-    const url = `/api/v1/courses/${courseId}/content_exports?export_type=quizzes2&quiz_id=${quizId}`
+    const url = `/api/v1/courses/${courseId}/content_exports?export_type=quizzes2&quiz_id=${quizId}&include[]=migrated_quiz`
     const dfd = $.ajaxJSON(url, 'POST')
     this.$el.disableWhileLoading(dfd)
     return $.when(dfd)
-      .done((response, status, deferred) => {
+      .done(response => {
+        this.addMigratedQuizToList(response)
         return $.flashMessage(I18n.t('Migration in progress'))
       })
       .fail(() => {
         return $.flashError(I18n.t('An error occurred while migrating.'))
       })
+  }
+
+  addMigratedQuizToList(response) {
+    if (!response) return
+    const quizzes = response.migrated_quiz
+    if (quizzes) {
+      this.addQuizToList(quizzes[0])
+    }
   }
 
   canDelete() {
@@ -152,12 +170,14 @@ export default class ItemView extends Backbone.View {
   }
 
   // delete quiz item
-  delete() {
+  delete(opts) {
     this.$el.hide()
     return this.model.destroy({
       success: () => {
         this.$el.remove()
-        return $.flashMessage(this.messages.deleteSuccessful)
+        if (opts.silent !== true) {
+          $.flashMessage(this.messages.deleteSuccessful)
+        }
       },
       error: () => {
         this.$el.show()
@@ -178,7 +198,8 @@ export default class ItemView extends Backbone.View {
 
   observeModel() {
     this.model.on('change:published', this.updatePublishState, this)
-    return this.model.on('change:loadingOverrides', this.render, this)
+    this.model.on('change:loadingOverrides', this.render, this)
+    this.model.on('change:workflow_state', this.render, this)
   }
 
   updatePublishState() {
@@ -187,6 +208,69 @@ export default class ItemView extends Backbone.View {
 
   canManage() {
     return ENV.PERMISSIONS.manage
+  }
+
+  canDuplicate() {
+    const userIsAdmin = _.includes(ENV.current_user_roles, 'admin')
+    const canManage = this.canManage()
+    const canDuplicate = this.model.get('can_duplicate')
+    return (userIsAdmin || canManage) && canDuplicate
+  }
+
+  onDuplicate(e) {
+    if (!this.canDuplicate()) return
+    e.preventDefault()
+    this.model.duplicate(this.addQuizToList.bind(this))
+  }
+
+  addQuizToList(response) {
+    if (!response) return
+    const quiz = new Quiz(response)
+    if (ENV.PERMISSIONS.by_assignment_id) {
+      ENV.PERMISSIONS.by_assignment_id[quiz.id] =
+        ENV.PERMISSIONS.by_assignment_id[quiz.originalAssignmentID()]
+    }
+    this.model.collection.add(quiz)
+    this.focusOnQuiz(response)
+  }
+
+  focusOnQuiz(quiz) {
+    $(`#assignment_${quiz.id}`)
+      .attr('tabindex', -1)
+      .focus()
+  }
+
+  onDuplicateOrImportFailedCancel(e) {
+    e.preventDefault()
+    this.delete({silent: true})
+  }
+
+  onDuplicateFailedRetry(e) {
+    e.preventDefault()
+    const button = $(e.target)
+    button.prop('disabled', true)
+    this.model
+      .duplicate_failed(response => {
+        this.addQuizToList(response)
+        this.delete({silent: true})
+      })
+      .always(() => {
+        button.prop('disabled', false)
+      })
+  }
+
+  onMigrateFailedRetry(e) {
+    e.preventDefault()
+    const button = $(e.target)
+    button.prop('disabled', true)
+    this.model
+      .retry_migration(response => {
+        this.addMigratedQuizToList(response)
+        this.delete({silent: true})
+      })
+      .always(() => {
+        button.prop('disabled', false)
+      })
   }
 
   toJSON() {
@@ -206,8 +290,15 @@ export default class ItemView extends Backbone.View {
     }
 
     base.migrateQuizEnabled = this.migrateQuizEnabled
+    base.canDuplicate = this.canDuplicate()
+    base.isDuplicating = this.model.get('workflow_state') === 'duplicating'
+    base.failedToDuplicate = this.model.get('workflow_state') === 'failed_to_duplicate'
+    base.isMigrating = this.model.get('workflow_state') === 'migrating'
+    base.failedToMigrate = this.model.get('workflow_state') === 'failed_to_migrate'
     base.showAvailability = this.model.multipleDueDates() || !this.model.defaultDates().available()
     base.showDueDate = this.model.multipleDueDates() || this.model.singleSectionDueDate()
+    base.name = this.model.name()
+    base.isQuizzesNext = this.model.isQuizzesNext()
 
     base.is_locked =
       this.model.get('is_master_course_child_content') &&

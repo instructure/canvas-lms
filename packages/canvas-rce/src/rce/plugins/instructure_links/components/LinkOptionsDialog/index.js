@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {bool, func, oneOf, string} from 'prop-types'
-import {Button,CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {Heading} from '@instructure/ui-elements'
 import {TextInput} from '@instructure/ui-text-input'
@@ -53,9 +53,8 @@ export default function LinkOptionsDialog(props) {
     setUrl(event.target.value)
   }
 
-  const label = props.operation === CREATE_LINK
-    ? formatMessage('Insert Link')
-    : formatMessage('Edit Link')
+  const label =
+    props.operation === CREATE_LINK ? formatMessage('Insert Link') : formatMessage('Edit Link')
 
   return (
     <Modal
@@ -73,12 +72,7 @@ export default function LinkOptionsDialog(props) {
       size="medium"
     >
       <Modal.Header>
-        <CloseButton
-          offset="medium"
-          placement="end"
-          variant="icon"
-          onClick={props.onRequestClose}
-        >
+        <CloseButton offset="medium" placement="end" variant="icon" onClick={props.onRequestClose}>
           {formatMessage('Close')}
         </CloseButton>
         <Heading>{label}</Heading>
@@ -104,7 +98,7 @@ export default function LinkOptionsDialog(props) {
       </Modal.Body>
 
       <Modal.Footer>
-        <input type="submit" style={{display: 'none'}}/>
+        <input type="submit" style={{display: 'none'}} />
         <Button variant="default" onClick={props.onRequestClose} margin="0 small">
           {formatMessage('Close')}
         </Button>

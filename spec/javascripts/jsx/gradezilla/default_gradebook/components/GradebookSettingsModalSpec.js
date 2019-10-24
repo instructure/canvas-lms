@@ -28,7 +28,6 @@ import PostPolicies from 'jsx/gradezilla/default_gradebook/PostPolicies'
 import * as PostPolicyApi from 'jsx/gradezilla/default_gradebook/PostPolicies/PostPolicyApi'
 import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 
-/* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookSettingsModal', suiteHooks => {
   let $container
   let component
@@ -391,7 +390,8 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       await mountOpenAndLoad()
       getAutomaticallyApplyMissingCheckbox().click()
       const $input = getModalElement().querySelector('#missing-submission-grade')
-      fireEvent.change($input, {target: {value: '-1'}})
+      fireEvent.change($input, {target: {value: 'abc'}})
+      fireEvent.blur($input)
       strictEqual(getUpdateButton().disabled, true)
     })
 
@@ -456,7 +456,8 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
           return mountOpenAndLoad().then(() => {
             getAutomaticallyApplyMissingCheckbox().click()
             const $input = getModalElement().querySelector('#missing-submission-grade')
-            fireEvent.change($input, {target: {value: '-1'}})
+            fireEvent.change($input, {target: {value: 'abc'}})
+            fireEvent.blur($input)
           })
         })
 
@@ -802,4 +803,3 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
   })
 })
-/* eslint-enable qunit/no-identical-names */

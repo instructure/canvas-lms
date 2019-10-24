@@ -16,28 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import {bool, func, string} from 'prop-types';
-import formatMessage from '../../../../format-message';
+import React from 'react'
+import {bool, func, string} from 'prop-types'
+import formatMessage from '../../../../format-message'
 
 import {collectionsShape} from './propTypes'
-import NavigationPanel from './NavigationPanel';
+import NavigationPanel from './NavigationPanel'
 import CollectionPanel from './CollectionPanel'
 
 import {View} from '@instructure/ui-layout'
 import {pickProps} from '@instructure/ui-react-utils'
 
 function LinksPanel(props) {
-  const isCourse = props.contextType === "course";
-  const isGroup = props.contextType === "group";
+  const isCourse = props.contextType === 'course'
+  const isGroup = props.contextType === 'group'
 
   const collectionProps = pickProps(props, CollectionPanel.propTypes)
 
   return (
-    <View
-      as="div"
-      data-testid="instructure_links-LinksPanel"
-    >
+    <View as="div" data-testid="instructure_links-LinksPanel">
       {(isCourse || isGroup) && (
         <CollectionPanel
           {...collectionProps}
@@ -50,7 +47,7 @@ function LinksPanel(props) {
         <CollectionPanel
           {...collectionProps}
           collection="assignments"
-          label={formatMessage("Assignments")}
+          label={formatMessage('Assignments')}
         />
       )}
 
@@ -58,7 +55,7 @@ function LinksPanel(props) {
         <CollectionPanel
           {...collectionProps}
           collection="quizzes"
-          label={formatMessage("Quizzes")}
+          label={formatMessage('Quizzes')}
         />
       )}
 
@@ -66,7 +63,7 @@ function LinksPanel(props) {
         <CollectionPanel
           {...collectionProps}
           collection="announcements"
-          label={formatMessage("Announcements")}
+          label={formatMessage('Announcements')}
         />
       )}
 
@@ -74,7 +71,7 @@ function LinksPanel(props) {
         <CollectionPanel
           {...collectionProps}
           collection="discussions"
-          label={formatMessage("Discussions")}
+          label={formatMessage('Discussions')}
         />
       )}
 
@@ -82,7 +79,7 @@ function LinksPanel(props) {
         <CollectionPanel
           {...collectionProps}
           collection="modules"
-          label={formatMessage("Modules")}
+          label={formatMessage('Modules')}
         />
       )}
 
@@ -94,7 +91,7 @@ function LinksPanel(props) {
         selectedAccordionIndex={props.selectedAccordionIndex}
       />
     </View>
-  );
+  )
 }
 
 LinksPanel.propTypes = {
@@ -107,10 +104,10 @@ LinksPanel.propTypes = {
   fetchNextPage: func,
   onLinkClick: func,
   canCreatePages: bool
-};
+}
 
 LinksPanel.defaultProps = {
-  selectedAccordionIndex: ""
-};
+  selectedAccordionIndex: ''
+}
 
-export default LinksPanel;
+export default LinksPanel

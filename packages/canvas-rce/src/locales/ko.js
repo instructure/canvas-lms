@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/ko.json";
-import "../rce/languages/ko_KR";
+import formatMessage from '../format-message'
+import locale from '../../locales/ko.json'
+import '../rce/languages/ko_KR'
 
-formatMessage.addLocale({ ko: locale });
+formatMessage.addLocale({ko: locale})

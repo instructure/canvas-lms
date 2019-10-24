@@ -155,6 +155,7 @@ class ApplicationController < ActionController::Base
           k12: k12?,
           use_responsive_layout: use_responsive_layout?,
           use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
+          DIRECT_SHARE_ENABLED: @domain_root_account.try(:feature_enabled?, :direct_share),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -256,7 +257,7 @@ class ApplicationController < ActionController::Base
 
     tools.select! do |tool|
       tool.visible_with_permission_check?(type, @current_user, context, session) &&
-        tool.feature_flag_enabled?
+        tool.feature_flag_enabled?(context)
     end
 
     tools.map do |tool|
@@ -272,6 +273,7 @@ class ApplicationController < ActionController::Base
     }.merge(url_params)
 
     hash = {
+      :id => tool.id,
       :title => tool.label_for(type, I18n.locale),
       :base_url =>  polymorphic_url([context, :external_tool], url_params)
     }
@@ -1741,7 +1743,7 @@ class ApplicationController < ActionController::Base
     # when flag is enabled, new quizzes quiz creation can only be initiated from quizzes page
     # but we still use the assignment#new page to create the quiz.
     # also handles launch from existing quiz on quizzes page.
-    if @assignment&.quiz_lti?
+    if ref.present? && @assignment&.quiz_lti?
       if (ref.include?('assignments/new') || ref.include?('quiz')) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
         return polymorphic_url([@context, :quizzes])
       end

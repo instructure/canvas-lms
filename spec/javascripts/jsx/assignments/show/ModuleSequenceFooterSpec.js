@@ -81,7 +81,11 @@ QUnit.module('renderModuleSequenceFooter', hooks => {
   QUnit.module('when filter_speed_grader_by_student_group is true', contextHooks => {
     contextHooks.beforeEach(() => {
       env.group_categories = [
-        {id: '2201', groups: [{id: '2101', name: 'group 1'}, {id: '2102', name: 'group 2'}], name: 'group category 1'}
+        {
+          id: '2201',
+          groups: [{id: '2101', name: 'group 1'}, {id: '2102', name: 'group 2'}],
+          name: 'group category 1'
+        }
       ]
       env.SETTINGS.filter_speed_grader_by_student_group = true
       env.selected_student_group_id = '2101'
@@ -95,7 +99,9 @@ QUnit.module('renderModuleSequenceFooter', hooks => {
 
     test('rendered select dropdown contains group categories', () => {
       renderModuleSequenceFooter()
-      const groupCategoryNames = [...getSelect().querySelectorAll('optgroup')].map($optgroup => $optgroup.label)
+      const groupCategoryNames = [...getSelect().querySelectorAll('optgroup')].map(
+        $optgroup => $optgroup.label
+      )
       deepEqual(groupCategoryNames, ['group category 1'])
     })
 

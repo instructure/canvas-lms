@@ -17,7 +17,7 @@
  */
 import {darken} from '@instructure/ui-color-utils'
 
-export default function generator ({ borders, colors, typography, spacing }) {
+export default function generator({borders, colors, typography, spacing}) {
   return {
     fontSize: typography.fontSizeXSmall,
     fontFamily: typography.fontFamily,
@@ -33,13 +33,13 @@ export default function generator ({ borders, colors, typography, spacing }) {
     borderRadius: borders.radiusMedium,
     focusRingWidth: borders.widthSmall,
     focusRingColor: colors.brand
-  };
+  }
 }
 
-generator.canvas = function (variables) {
+generator.canvas = function(variables) {
   return {
-    background: variables["ic-brand-primary"],
-    backgroundHover: darken(variables["ic-brand-primary"], 5),
-    focusRingColor: variables["ic-brand-primary"],
-  };
-};
+    background: variables['ic-brand-primary'],
+    backgroundHover: darken(variables['ic-brand-primary'], 5),
+    focusRingColor: variables['ic-brand-primary']
+  }
+}

@@ -21,21 +21,47 @@ import CommentTextArea from './CommentTextArea'
 import ErrorBoundary from '../../../../shared/components/ErrorBoundary'
 import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import GenericErrorPage from '../../../../shared/components/GenericErrorPage/index'
+import I18n from 'i18n!assignments_2'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
-import {useQuery} from 'react-apollo'
-import React from 'react'
+import {Button} from '@instructure/ui-buttons'
+import React, {useState} from 'react'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 import {Submission} from '../../graphqlData/Submission'
+import {useQuery} from 'react-apollo'
 
-function CommentsTab(props) {
+export default function CommentsTab(props) {
+  const [isFetchingMoreComments, setIsFetchingMoreComments] = useState(false)
+
   const queryVariables = {
     submissionId: props.submission.id,
     submissionAttempt: props.submission.attempt
   }
 
-  const {loading, error, data} = useQuery(SUBMISSION_COMMENT_QUERY, {
+  const {loading, error, data, fetchMore} = useQuery(SUBMISSION_COMMENT_QUERY, {
     variables: queryVariables
   })
+
+  const loadMoreComments = async () => {
+    setIsFetchingMoreComments(true)
+    await fetchMore({
+      variables: {
+        cursor: data.submissionComments.commentsConnection.pageInfo.startCursor,
+        ...queryVariables
+      },
+      updateQuery: (previousResult, {fetchMoreResult}) => {
+        const newNodes = fetchMoreResult.submissionComments.commentsConnection.nodes
+        const newPageInfo = fetchMoreResult.submissionComments.commentsConnection.pageInfo
+        const results = JSON.parse(JSON.stringify(previousResult))
+        results.submissionComments.commentsConnection.pageInfo = newPageInfo
+
+        if (newNodes.length) {
+          results.submissionComments.commentsConnection.nodes.push(...newNodes)
+        }
+        return results
+      }
+    })
+    setIsFetchingMoreComments(false)
+  }
 
   if (loading) return <LoadingIndicator />
   if (error) {
@@ -62,6 +88,15 @@ function CommentsTab(props) {
           comments={data.submissionComments.commentsConnection.nodes}
           submission={props.submission}
         />
+        <div className="load-more-comments-button-container">
+          {isFetchingMoreComments && <LoadingIndicator />}
+          {data.submissionComments.commentsConnection.pageInfo.hasPreviousPage &&
+            !isFetchingMoreComments && (
+              <Button variant="primary" onClick={loadMoreComments}>
+                {I18n.t('Load More Comments')}
+              </Button>
+            )}
+        </div>
       </div>
     </ErrorBoundary>
   )
@@ -71,5 +106,3 @@ CommentsTab.propTypes = {
   assignment: Assignment.shape,
   submission: Submission.shape
 }
-
-export default React.memo(CommentsTab)

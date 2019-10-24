@@ -17,15 +17,15 @@
  */
 
 if (!Object.assign) {
-  Object.assign = function assign (...args) {
-    const first = args.shift();
-    args.forEach((arg) => {
-      const keys = Object.keys(arg);
-      keys.forEach((key) => {
+  Object.assign = function assign(...args) {
+    const first = args.shift()
+    args.forEach(arg => {
+      const keys = Object.keys(arg)
+      keys.forEach(key => {
         first[key] = arg[key]
       })
     })
-    return first;
+    return first
   }
 }
 
@@ -39,108 +39,106 @@ if (!Object.assign) {
    to avoid the side-effect. see CNVS-30988.
 */
 
-define([
-  'jquery'
-], ($) => {
-  const $questionContent = {bind () {}}
+define(['jquery'], $ => {
+  const $questionContent = {bind() {}}
 
   QUnit.module('isChangeMultiFuncBound', {
-    setup () {
-      sandbox.stub($, '_data');
-      sandbox.stub($.fn, 'ready');
+    setup() {
+      sandbox.stub($, '_data')
+      sandbox.stub($.fn, 'ready')
     }
   })
 
-  test('gets events from data on first element', (assert) => {
-    const done = assert.async();
-    const $el = [{}];
+  test('gets events from data on first element', assert => {
+    const done = assert.async()
+    const $el = [{}]
     require(['quizzes'], ({isChangeMultiFuncBound}) => {
-      isChangeMultiFuncBound($el);
-      ok($._data.calledWithExactly($el[0], 'events'));
-      done();
-    });
-  });
+      isChangeMultiFuncBound($el)
+      ok($._data.calledWithExactly($el[0], 'events'))
+      done()
+    })
+  })
 
-  test('returns true if el has correct change event', (assert) => {
-    const done = assert.async();
-    const $el = [{}];
+  test('returns true if el has correct change event', assert => {
+    const done = assert.async()
+    const $el = [{}]
     const events = {
       change: [{handler: {origFuncNm: 'changeMultiFunc'}}]
     }
     require(['quizzes'], ({isChangeMultiFuncBound}) => {
-      $._data.returns(events);
-      ok(isChangeMultiFuncBound($el));
-      done();
-    });
-  });
+      $._data.returns(events)
+      ok(isChangeMultiFuncBound($el))
+      done()
+    })
+  })
 
-  test('returns false if el has incorrect change event', (assert) => {
-    const done = assert.async();
-    const $el = [{}];
+  test('returns false if el has incorrect change event', assert => {
+    const done = assert.async()
+    const $el = [{}]
     const events = {
       change: [{handler: {name: 'other'}}]
     }
     require(['quizzes'], ({isChangeMultiFuncBound}) => {
-      $._data.returns(events);
-      ok(!isChangeMultiFuncBound($el));
-      done();
-    });
-  });
+      $._data.returns(events)
+      ok(!isChangeMultiFuncBound($el))
+      done()
+    })
+  })
 
   QUnit.module('rebindMultiChange', {
-    setup () {
-      sandbox.stub($questionContent, 'bind');
-      sandbox.stub($, '_data');
-      sandbox.stub($.fn, 'ready');
-      $questionContent.bind.returns({change () {}});
+    setup() {
+      sandbox.stub($questionContent, 'bind')
+      sandbox.stub($, '_data')
+      sandbox.stub($.fn, 'ready')
+      $questionContent.bind.returns({change() {}})
     }
-  });
+  })
 
-  test('rebinds event on questionContent', (assert) => {
-    const done = assert.async();
-    const questionType = 'multiple_dropdowns_question';
+  test('rebinds event on questionContent', assert => {
+    const done = assert.async()
+    const questionType = 'multiple_dropdowns_question'
     const events = {
       change: [{handler: {name: 'other'}}]
     }
-    $._data.returns(events);
+    $._data.returns(events)
     require(['quizzes'], ({quiz}) => {
-      sandbox.stub(quiz, 'loadJQueryElemById');
-      quiz.loadJQueryElemById.returns($questionContent);
-      quiz.rebindMultiChange(questionType, 'question_content_0', {});
-      equal($questionContent.bind.callCount, 1);
-      done();
-    });
-  });
+      sandbox.stub(quiz, 'loadJQueryElemById')
+      quiz.loadJQueryElemById.returns($questionContent)
+      quiz.rebindMultiChange(questionType, 'question_content_0', {})
+      equal($questionContent.bind.callCount, 1)
+      done()
+    })
+  })
 
-  test('does nothing if "change" event exists', (assert) => {
-    const done = assert.async();
-    const questionType = 'multiple_dropdowns_question';
+  test('does nothing if "change" event exists', assert => {
+    const done = assert.async()
+    const questionType = 'multiple_dropdowns_question'
     const events = {
       change: [{handler: {origFuncNm: 'changeMultiFunc'}}]
     }
-    $._data.returns(events);
+    $._data.returns(events)
     require(['quizzes'], ({quiz}) => {
-      sandbox.stub(quiz, 'loadJQueryElemById');
-      quiz.loadJQueryElemById.returns($questionContent);
-      quiz.rebindMultiChange(questionType, 'question_content_0', {});
-      equal($questionContent.bind.callCount, 0);
-      done();
-    });
-  });
+      sandbox.stub(quiz, 'loadJQueryElemById')
+      quiz.loadJQueryElemById.returns($questionContent)
+      quiz.rebindMultiChange(questionType, 'question_content_0', {})
+      equal($questionContent.bind.callCount, 0)
+      done()
+    })
+  })
 
-  test('does nothing if wrong questionType', (assert) => {
-    const done = assert.async();
-    const questionType = 'other_question';
+  test('does nothing if wrong questionType', assert => {
+    const done = assert.async()
+    const questionType = 'other_question'
     const events = {
       change: [{handler: {name: 'other'}}]
     }
-    $._data.returns(events);
+    $._data.returns(events)
     require(['quizzes'], ({quiz}) => {
-      sandbox.stub(quiz, 'loadJQueryElemById');
-      quiz.loadJQueryElemById.returns($questionContent);
-      quiz.rebindMultiChange(questionType, 'question_content_0', {});
-      equal($questionContent.bind.callCount, 0);
-      done();
-    });
-  });
-});
+      sandbox.stub(quiz, 'loadJQueryElemById')
+      quiz.loadJQueryElemById.returns($questionContent)
+      quiz.rebindMultiChange(questionType, 'question_content_0', {})
+      equal($questionContent.bind.callCount, 0)
+      done()
+    })
+  })
+})

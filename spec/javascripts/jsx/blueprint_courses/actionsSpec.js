@@ -29,73 +29,74 @@ const mockApiClient = (method, res) => {
 }
 
 const mockSuccess = (method, data = {}) => mockApiClient(method, Promise.resolve(data))
-const mockFail = (method, err = new Error('Request Failed')) => mockApiClient(method, Promise.reject(err))
+const mockFail = (method, err = new Error('Request Failed')) =>
+  mockApiClient(method, Promise.reject(err))
 
 QUnit.module('Blueprint Course redux actions', {
-  teardown () {
+  teardown() {
     if (sandbox) sandbox.restore()
     sandbox = null
   }
 })
 
 test('notifyInfo dispatches NOTIFY_INFO with type "info" and payload', () => {
-  const action = actions.notifyInfo({ message: 'test' })
-  deepEqual(action, { type: 'NOTIFY_INFO', payload: { type: 'info', message: 'test' } })
+  const action = actions.notifyInfo({message: 'test'})
+  deepEqual(action, {type: 'NOTIFY_INFO', payload: {type: 'info', message: 'test'}})
 })
 
 test('notifyInfo dispatches NOTIFY_ERROR with type "error" and payload', () => {
-  const action = actions.notifyError({ message: 'test' })
-  deepEqual(action, { type: 'NOTIFY_ERROR', payload: { type: 'error', message: 'test' } })
+  const action = actions.notifyError({message: 'test'})
+  deepEqual(action, {type: 'NOTIFY_ERROR', payload: {type: 'error', message: 'test'}})
 })
 
 test('loadChange dispatches LOAD_CHANGE_START if not already loading', () => {
   const changeId = '2'
-  const getState = () => ({ changeLogs: { [changeId]: { status: LoadStates.states.not_loaded } } })
+  const getState = () => ({changeLogs: {[changeId]: {status: LoadStates.states.not_loaded}}})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.loadChange({ changeId })(dispatchSpy, getState)
+  actions.loadChange({changeId})(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'LOAD_CHANGE_START', payload: { changeId } }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'LOAD_CHANGE_START', payload: {changeId}}])
 })
 
 test('loadChange does not dispatch LOAD_CHANGE_START if change is already loading', () => {
   const changeId = '2'
-  const getState = () => ({ changeLogs: { [changeId]: { status: LoadStates.states.loading } } })
+  const getState = () => ({changeLogs: {[changeId]: {status: LoadStates.states.loading}}})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.loadChange({ changeId })(dispatchSpy, getState)
+  actions.loadChange({changeId})(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 0)
 })
 
-test('loadChange dispatches LOAD_CHANGE_SUCCESS if API returns successfully', (assert) => {
+test('loadChange dispatches LOAD_CHANGE_SUCCESS if API returns successfully', assert => {
   const done = assert.async()
   const changeId = '2'
-  const getState = () => ({ changeLogs: { [changeId]: { status: LoadStates.states.not_loaded } } })
+  const getState = () => ({changeLogs: {[changeId]: {status: LoadStates.states.not_loaded}}})
   const dispatchSpy = sinon.spy()
 
-  mockSuccess('getFullMigration', { foo: 'bar' })
-  actions.loadChange({ changeId })(dispatchSpy, getState)
+  mockSuccess('getFullMigration', {foo: 'bar'})
+  actions.loadChange({changeId})(dispatchSpy, getState)
 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
-    deepEqual(dispatchSpy.secondCall.args, [{ type: 'LOAD_CHANGE_SUCCESS', payload: { foo: 'bar' } }])
+    deepEqual(dispatchSpy.secondCall.args, [{type: 'LOAD_CHANGE_SUCCESS', payload: {foo: 'bar'}}])
     done()
   }, 1)
 })
 
-test('loadChange dispatches LOAD_CHANGE_FAIL if API returns error', (assert) => {
+test('loadChange dispatches LOAD_CHANGE_FAIL if API returns error', assert => {
   const done = assert.async()
 
   const changeId = '2'
-  const getState = () => ({ changeLogs: { [changeId]: { status: LoadStates.states.not_loaded } } })
+  const getState = () => ({changeLogs: {[changeId]: {status: LoadStates.states.not_loaded}}})
   const dispatchSpy = sinon.spy()
 
   mockFail('getFullMigration')
-  actions.loadChange({ changeId })(dispatchSpy, getState)
+  actions.loadChange({changeId})(dispatchSpy, getState)
 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
@@ -107,47 +108,47 @@ test('loadChange dispatches LOAD_CHANGE_FAIL if API returns error', (assert) => 
 
 test('selectChangeLog dispatches SELECT_CHANGE_LOG with changeId', () => {
   const changeId = '2'
-  const getState = () => ({ changeLogs: {} })
+  const getState = () => ({changeLogs: {}})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.selectChangeLog({ changeId })(dispatchSpy, getState)
+  actions.selectChangeLog({changeId})(dispatchSpy, getState)
 
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'SELECT_CHANGE_LOG', payload: { changeId } }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'SELECT_CHANGE_LOG', payload: {changeId}}])
 })
 
 test('selectChangeLog dispatches LOAD_CHANGE_START if change not already loaded', () => {
   const changeId = '2'
-  const getState = () => ({ changeLogs: { [changeId]: { status: LoadStates.states.not_loaded } } })
+  const getState = () => ({changeLogs: {[changeId]: {status: LoadStates.states.not_loaded}}})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.selectChangeLog({ changeId })(dispatchSpy, getState)
+  actions.selectChangeLog({changeId})(dispatchSpy, getState)
 
-  deepEqual(dispatchSpy.secondCall.args, [{ type: 'LOAD_CHANGE_START', payload: { changeId } }])
+  deepEqual(dispatchSpy.secondCall.args, [{type: 'LOAD_CHANGE_START', payload: {changeId}}])
 })
 
 test('selectChangeLog does not dispatch LOAD_CHANGE_START if change already loaded', () => {
   const changeId = '2'
-  const getState = () => ({ changeLogs: { [changeId]: { status: LoadStates.states.loaded } } })
+  const getState = () => ({changeLogs: {[changeId]: {status: LoadStates.states.loaded}}})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
-  actions.selectChangeLog({ changeId })(dispatchSpy, getState)
+  actions.selectChangeLog({changeId})(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'SELECT_CHANGE_LOG', payload: { changeId } }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'SELECT_CHANGE_LOG', payload: {changeId}}])
 })
 
 test('selectChangeLog does not dispatch LOAD_CHANGE_START if changeId is null', () => {
-  const getState = () => ({ changeLogs: {} })
+  const getState = () => ({changeLogs: {}})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getFullMigration')
   actions.selectChangeLog(null)(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ payload: null, type: 'SELECT_CHANGE_LOG' }])
+  deepEqual(dispatchSpy.firstCall.args, [{payload: null, type: 'SELECT_CHANGE_LOG'}])
 })
 
 test('loadHistory dispatches LOAD_HISTORY_START', () => {
@@ -158,25 +159,25 @@ test('loadHistory dispatches LOAD_HISTORY_START', () => {
   actions.loadHistory()(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'LOAD_HISTORY_START' }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'LOAD_HISTORY_START'}])
 })
 
-test('loadHistory dispatches LOAD_HISTORY_SUCCESS if API returns successfully', (assert) => {
+test('loadHistory dispatches LOAD_HISTORY_SUCCESS if API returns successfully', assert => {
   const done = assert.async()
   const getState = () => ({})
   const dispatchSpy = sinon.spy()
 
-  mockSuccess('getSyncHistory', { foo: 'bar' })
+  mockSuccess('getSyncHistory', {foo: 'bar'})
   actions.loadHistory()(dispatchSpy, getState)
 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
-    deepEqual(dispatchSpy.secondCall.args, [{ type: 'LOAD_HISTORY_SUCCESS', payload: { foo: 'bar' } }])
+    deepEqual(dispatchSpy.secondCall.args, [{type: 'LOAD_HISTORY_SUCCESS', payload: {foo: 'bar'}}])
     done()
   }, 1)
 })
 
-test('loadHistory dispatches LOAD_HISTORY_FAIL if API returns error', (assert) => {
+test('loadHistory dispatches LOAD_HISTORY_FAIL if API returns error', assert => {
   const done = assert.async()
   const getState = () => ({})
   const dispatchSpy = sinon.spy()
@@ -200,26 +201,28 @@ test('loadCourses dispatches LOAD_COURSES_START', () => {
   actions.loadCourses()(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'LOAD_COURSES_START' }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'LOAD_COURSES_START'}])
 })
 
-test('loadCourses dispatches LOAD_COURSES_SUCCESS if API returns successfully', (assert) => {
+test('loadCourses dispatches LOAD_COURSES_SUCCESS if API returns successfully', assert => {
   const done = assert.async()
 
   const getState = () => ({})
   const dispatchSpy = sinon.spy()
 
-  mockSuccess('getCourses', { data: [{ foo: 'bar' }] })
+  mockSuccess('getCourses', {data: [{foo: 'bar'}]})
   actions.loadCourses()(dispatchSpy, getState)
 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
-    deepEqual(dispatchSpy.secondCall.args, [{ type: 'LOAD_COURSES_SUCCESS', payload: [{ foo: 'bar' }] }])
+    deepEqual(dispatchSpy.secondCall.args, [
+      {type: 'LOAD_COURSES_SUCCESS', payload: [{foo: 'bar'}]}
+    ])
     done()
   }, 1)
 })
 
-test('loadCourses dispatches LOAD_COURSES_FAIL if API returns error', (assert) => {
+test('loadCourses dispatches LOAD_COURSES_FAIL if API returns error', assert => {
   const done = assert.async()
 
   const getState = () => ({})
@@ -244,26 +247,28 @@ test('loadUnsyncedChanges dispatches LOAD_UNSYNCED_CHANGES_START', () => {
   actions.loadUnsyncedChanges()(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'LOAD_UNSYNCED_CHANGES_START' }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'LOAD_UNSYNCED_CHANGES_START'}])
 })
 
-test('loadUnsyncedChanges dispatches LOAD_UNSYNCED_CHANGES_SUCCESS if API returns successfully', (assert) => {
+test('loadUnsyncedChanges dispatches LOAD_UNSYNCED_CHANGES_SUCCESS if API returns successfully', assert => {
   const done = assert.async()
 
   const getState = () => ({})
   const dispatchSpy = sinon.spy()
 
-  mockSuccess('loadUnsyncedChanges', { data: [{ foo: 'bar' }] })
+  mockSuccess('loadUnsyncedChanges', {data: [{foo: 'bar'}]})
   actions.loadUnsyncedChanges()(dispatchSpy, getState)
 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
-    deepEqual(dispatchSpy.secondCall.args, [{ type: 'LOAD_UNSYNCED_CHANGES_SUCCESS', payload: [{ foo: 'bar' }] }])
+    deepEqual(dispatchSpy.secondCall.args, [
+      {type: 'LOAD_UNSYNCED_CHANGES_SUCCESS', payload: [{foo: 'bar'}]}
+    ])
     done()
   }, 1)
 })
 
-test('loadUnsyncedChanges dispatches LOAD_UNSYNCED_CHANGES_FAIL if API returns error', (assert) => {
+test('loadUnsyncedChanges dispatches LOAD_UNSYNCED_CHANGES_FAIL if API returns error', assert => {
   const done = assert.async()
 
   const getState = () => ({})
@@ -281,18 +286,18 @@ test('loadUnsyncedChanges dispatches LOAD_UNSYNCED_CHANGES_FAIL if API returns e
 })
 
 test('loadAssociations dispatches LOAD_ASSOCIATIONS_START if not already in progress', () => {
-  const getState = () => ({ isLoadingAssociations: false })
+  const getState = () => ({isLoadingAssociations: false})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getAssociations')
   actions.loadAssociations()(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'LOAD_ASSOCIATIONS_START' }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'LOAD_ASSOCIATIONS_START'}])
 })
 
 test('loadAssociations does not dispatch LOAD_ASSOCIATIONS_START if already in progress', () => {
-  const getState = () => ({ isLoadingAssociations: true })
+  const getState = () => ({isLoadingAssociations: true})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('getAssociations')
@@ -301,23 +306,28 @@ test('loadAssociations does not dispatch LOAD_ASSOCIATIONS_START if already in p
   equal(dispatchSpy.callCount, 0)
 })
 
-test('loadAssociations dispatches LOAD_ASSOCIATIONS_SUCCESS if API returns successfully', (assert) => {
+test('loadAssociations dispatches LOAD_ASSOCIATIONS_SUCCESS if API returns successfully', assert => {
   const done = assert.async()
 
   const getState = () => ({})
   const dispatchSpy = sinon.spy()
 
-  mockSuccess('getAssociations', { data: [{ foo: 'bar', term_name: 'Foo Term' }] })
+  mockSuccess('getAssociations', {data: [{foo: 'bar', term_name: 'Foo Term'}]})
   actions.loadAssociations()(dispatchSpy, getState)
 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
-    deepEqual(dispatchSpy.secondCall.args, [{ type: 'LOAD_ASSOCIATIONS_SUCCESS', payload: [{ foo: 'bar', term: { id: '0', name: 'Foo Term' } }] }])
+    deepEqual(dispatchSpy.secondCall.args, [
+      {
+        type: 'LOAD_ASSOCIATIONS_SUCCESS',
+        payload: [{foo: 'bar', term: {id: '0', name: 'Foo Term'}}]
+      }
+    ])
     done()
   }, 1)
 })
 
-test('loadAssociations dispatches LOAD_ASSOCIATIONS_FAIL if API returns error', (assert) => {
+test('loadAssociations dispatches LOAD_ASSOCIATIONS_FAIL if API returns error', assert => {
   const done = assert.async()
 
   const getState = () => ({})
@@ -342,31 +352,33 @@ test('saveAssociations dispatches SAVE_ASSOCIATIONS_START', () => {
   actions.saveAssociations()(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'SAVE_ASSOCIATIONS_START' }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'SAVE_ASSOCIATIONS_START'}])
 })
 
-test('saveAssociations dispatches SAVE_ASSOCIATIONS_SUCCESS if API returns successfully', (assert) => {
+test('saveAssociations dispatches SAVE_ASSOCIATIONS_SUCCESS if API returns successfully', assert => {
   const done = assert.async()
 
-  const getState = () => ({ addedAssociations: ['2'], removedAssociations: ['1'] })
+  const getState = () => ({addedAssociations: ['2'], removedAssociations: ['1']})
   const dispatchSpy = sinon.spy()
 
-  mockSuccess('saveAssociations', { data: [{ foo: 'bar', term_name: 'Foo Term' }] })
+  mockSuccess('saveAssociations', {data: [{foo: 'bar', term_name: 'Foo Term'}]})
   actions.saveAssociations()(dispatchSpy, getState)
 
   setTimeout(() => {
-    deepEqual(dispatchSpy.secondCall.args, [{ type: 'SAVE_ASSOCIATIONS_SUCCESS', payload: { added: ['2'], removed: ['1'] } }])
+    deepEqual(dispatchSpy.secondCall.args, [
+      {type: 'SAVE_ASSOCIATIONS_SUCCESS', payload: {added: ['2'], removed: ['1']}}
+    ])
     done()
   }, 1)
 })
 
-test('saveAssociations dispatches NOTIFY_INFO if API returns successfully', (assert) => {
+test('saveAssociations dispatches NOTIFY_INFO if API returns successfully', assert => {
   const done = assert.async()
 
-  const getState = () => ({ addedAssociations: ['2'], removedAssociations: ['1'] })
+  const getState = () => ({addedAssociations: ['2'], removedAssociations: ['1']})
   const dispatchSpy = sinon.spy()
 
-  mockSuccess('saveAssociations', { data: [{ foo: 'bar', term_name: 'Foo Term' }] })
+  mockSuccess('saveAssociations', {data: [{foo: 'bar', term_name: 'Foo Term'}]})
   actions.saveAssociations()(dispatchSpy, getState)
 
   setTimeout(() => {
@@ -375,14 +387,14 @@ test('saveAssociations dispatches NOTIFY_INFO if API returns successfully', (ass
   }, 1)
 })
 
-test('saveAssociations calls beginMigration if API returns successfully and there were added associations', (assert) => {
+test('saveAssociations calls beginMigration if API returns successfully and there were added associations', assert => {
   const done = assert.async()
 
-  const getState = () => ({ addedAssociations: ['2'], removedAssociations: ['1'] })
+  const getState = () => ({addedAssociations: ['2'], removedAssociations: ['1']})
   const dispatchSpy = sinon.spy()
   const beginMigrationSpy = sinon.spy(actions, 'beginMigration')
 
-  mockSuccess('saveAssociations', { data: [{ foo: 'bar', term_name: 'Foo Term' }] })
+  mockSuccess('saveAssociations', {data: [{foo: 'bar', term_name: 'Foo Term'}]})
   actions.saveAssociations()(dispatchSpy, getState)
 
   setTimeout(() => {
@@ -392,14 +404,14 @@ test('saveAssociations calls beginMigration if API returns successfully and ther
   }, 1)
 })
 
-test('saveAssociations does not call beginMigration if API returns successfully and there were no added associations', (assert) => {
+test('saveAssociations does not call beginMigration if API returns successfully and there were no added associations', assert => {
   const done = assert.async()
 
-  const getState = () => ({ addedAssociations: [], removedAssociations: ['1'] })
+  const getState = () => ({addedAssociations: [], removedAssociations: ['1']})
   const dispatchSpy = sinon.spy()
   const beginMigrationSpy = sinon.spy(actions, 'beginMigration')
 
-  mockSuccess('saveAssociations', { data: [{ foo: 'bar', term_name: 'Foo Term' }] })
+  mockSuccess('saveAssociations', {data: [{foo: 'bar', term_name: 'Foo Term'}]})
   actions.saveAssociations()(dispatchSpy, getState)
 
   setTimeout(() => {
@@ -409,7 +421,7 @@ test('saveAssociations does not call beginMigration if API returns successfully 
   }, 1)
 })
 
-test('saveAssociations dispatches SAVE_ASSOCIATIONS_FAIL if API returns error', (assert) => {
+test('saveAssociations dispatches SAVE_ASSOCIATIONS_FAIL if API returns error', assert => {
   const done = assert.async()
 
   const getState = () => ({})
@@ -434,25 +446,27 @@ test('beginMigration dispatches BEGIN_MIGRATION_START', () => {
   actions.beginMigration()(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'BEGIN_MIGRATION_START' }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'BEGIN_MIGRATION_START'}])
 })
 
-test('beginMigration dispatches BEGIN_MIGRATION_SUCCESS if API returns successfully', (assert) => {
+test('beginMigration dispatches BEGIN_MIGRATION_SUCCESS if API returns successfully', assert => {
   const done = assert.async()
 
   const getState = () => ({})
   const dispatchSpy = sinon.spy()
 
-  mockSuccess('beginMigration', { data: { workflow_state: MigrationStates.states.queued } })
+  mockSuccess('beginMigration', {data: {workflow_state: MigrationStates.states.queued}})
   actions.beginMigration()(dispatchSpy, getState)
 
   setTimeout(() => {
-    deepEqual(dispatchSpy.secondCall.args, [{ type: 'BEGIN_MIGRATION_SUCCESS', payload: { workflow_state: MigrationStates.states.queued } }])
+    deepEqual(dispatchSpy.secondCall.args, [
+      {type: 'BEGIN_MIGRATION_SUCCESS', payload: {workflow_state: MigrationStates.states.queued}}
+    ])
     done()
   }, 1)
 })
 
-test('beginMigration dispatches BEGIN_MIGRATION_FAIL if API returns error', (assert) => {
+test('beginMigration dispatches BEGIN_MIGRATION_FAIL if API returns error', assert => {
   const done = assert.async()
 
   const getState = () => ({})
@@ -468,14 +482,14 @@ test('beginMigration dispatches BEGIN_MIGRATION_FAIL if API returns error', (ass
   }, 1)
 })
 
-test('beginMigration calls startMigrationStatusPoll if API returns successfully and the new migration is in a loading state', (assert) => {
+test('beginMigration calls startMigrationStatusPoll if API returns successfully and the new migration is in a loading state', assert => {
   const done = assert.async()
 
   const getState = () => ({})
   const dispatchSpy = sinon.spy()
   const startPollSpy = sinon.spy(actions, 'startMigrationStatusPoll')
 
-  mockSuccess('beginMigration', { data: { workflow_state: MigrationStates.states.queued } })
+  mockSuccess('beginMigration', {data: {workflow_state: MigrationStates.states.queued}})
   actions.beginMigration()(dispatchSpy, getState)
 
   setTimeout(() => {
@@ -485,13 +499,13 @@ test('beginMigration calls startMigrationStatusPoll if API returns successfully 
   }, 1)
 })
 
-test('beginMigration does not call startMigrationStatusPoll if API returns successfully and new migration is not in  aloading state', (assert) => {
+test('beginMigration does not call startMigrationStatusPoll if API returns successfully and new migration is not in  aloading state', assert => {
   const done = assert.async()
 
   const getState = () => ({})
   const startPollSpy = sinon.spy(actions, 'startMigrationStatusPoll')
 
-  mockSuccess('beginMigration', { data: { workflow_state: MigrationStates.states.completed } })
+  mockSuccess('beginMigration', {data: {workflow_state: MigrationStates.states.completed}})
   actions.beginMigration()(() => {}, getState)
 
   setTimeout(() => {
@@ -501,7 +515,7 @@ test('beginMigration does not call startMigrationStatusPoll if API returns succe
   }, 1)
 })
 
-test('startMigrationStatusPoll calls pollMigrationStatus on an interval', (assert) => {
+test('startMigrationStatusPoll calls pollMigrationStatus on an interval', assert => {
   const done = assert.async()
 
   const realTime = actions.constants.MIGRATION_POLL_TIME
@@ -510,7 +524,7 @@ test('startMigrationStatusPoll calls pollMigrationStatus on an interval', (asser
   const getState = () => ({})
   const pollMigrationSpy = sinon.spy(actions, 'pollMigrationStatus')
 
-  mockSuccess('checkMigration', { data: { workflow_state: MigrationStates.states.completed } })
+  mockSuccess('checkMigration', {data: {workflow_state: MigrationStates.states.completed}})
   actions.startMigrationStatusPoll()(() => {}, getState)
 
   setTimeout(() => {
@@ -523,18 +537,18 @@ test('startMigrationStatusPoll calls pollMigrationStatus on an interval', (asser
 })
 
 test('checkMigration dispatches CHECK_MIGRATION_START if not already in progress', () => {
-  const getState = () => ({ isCheckingMigration: false })
+  const getState = () => ({isCheckingMigration: false})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('checkMigration')
   actions.checkMigration()(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'CHECK_MIGRATION_START' }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'CHECK_MIGRATION_START'}])
 })
 
 test('checkMigration does not dispatch CHECK_MIGRATION_START if already in progress', () => {
-  const getState = () => ({ isCheckingMigration: true })
+  const getState = () => ({isCheckingMigration: true})
   const dispatchSpy = sinon.spy()
 
   mockSuccess('checkMigration')
@@ -543,23 +557,25 @@ test('checkMigration does not dispatch CHECK_MIGRATION_START if already in progr
   equal(dispatchSpy.callCount, 0)
 })
 
-test('checkMigration dispatches CHECK_MIGRATION_SUCCESS if API returns successfully', (assert) => {
+test('checkMigration dispatches CHECK_MIGRATION_SUCCESS if API returns successfully', assert => {
   const done = assert.async()
 
   const getState = () => ({})
   const dispatchSpy = sinon.spy()
 
-  mockSuccess('checkMigration', { data: { workflow_state: MigrationStates.states.completed } })
+  mockSuccess('checkMigration', {data: {workflow_state: MigrationStates.states.completed}})
   actions.checkMigration()(dispatchSpy, getState)
 
   setTimeout(() => {
     equal(dispatchSpy.callCount, 2)
-    deepEqual(dispatchSpy.secondCall.args, [{ type: 'CHECK_MIGRATION_SUCCESS', payload: { workflow_state: MigrationStates.states.completed } }])
+    deepEqual(dispatchSpy.secondCall.args, [
+      {type: 'CHECK_MIGRATION_SUCCESS', payload: {workflow_state: MigrationStates.states.completed}}
+    ])
     done()
   }, 1)
 })
 
-test('checkMigration dispatches CHECK_MIGRATION_FAIL if API returns error', (assert) => {
+test('checkMigration dispatches CHECK_MIGRATION_FAIL if API returns error', assert => {
   const done = assert.async()
 
   const getState = () => ({})
@@ -578,62 +594,54 @@ test('checkMigration dispatches CHECK_MIGRATION_FAIL if API returns error', (ass
 
 test('addAssociations dispatches ADD_COURSE_ASSOCIATIONS when added associations are new', () => {
   const getState = () => ({
-    courses: [
-      { id: '1', name: 'First Course' },
-      { id: '2', name: 'Second Course' },
-    ],
-    existingAssociations: [],
+    courses: [{id: '1', name: 'First Course'}, {id: '2', name: 'Second Course'}],
+    existingAssociations: []
   })
   const dispatchSpy = sinon.spy()
   actions.addAssociations(['1'])(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'ADD_COURSE_ASSOCIATIONS', payload: [{ id: '1', name: 'First Course' }] }])
+  deepEqual(dispatchSpy.firstCall.args, [
+    {type: 'ADD_COURSE_ASSOCIATIONS', payload: [{id: '1', name: 'First Course'}]}
+  ])
 })
 
 test('addAssociations dispatches UNDO_REMOVE_COURSE_ASSOCIATIONS when added associations are existing', () => {
   const getState = () => ({
-    courses: [
-      { id: '1', name: 'First Course' },
-      { id: '2', name: 'Second Course' },
-    ],
-    existingAssociations: [{ id: '1', name: 'First Course' }],
+    courses: [{id: '1', name: 'First Course'}, {id: '2', name: 'Second Course'}],
+    existingAssociations: [{id: '1', name: 'First Course'}]
   })
   const dispatchSpy = sinon.spy()
   actions.addAssociations(['1'])(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'UNDO_REMOVE_COURSE_ASSOCIATIONS', payload: ['1'] }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'UNDO_REMOVE_COURSE_ASSOCIATIONS', payload: ['1']}])
 })
 
 test('removeAssociations dispatches REMOVE_COURSE_ASSOCIATIONS when removed associations are existing', () => {
   const getState = () => ({
-    courses: [
-      { id: '1', name: 'First Course' },
-      { id: '2', name: 'Second Course' },
-    ],
-    existingAssociations: [{ id: '1', name: 'First Course' }],
+    courses: [{id: '1', name: 'First Course'}, {id: '2', name: 'Second Course'}],
+    existingAssociations: [{id: '1', name: 'First Course'}]
   })
   const dispatchSpy = sinon.spy()
   actions.removeAssociations(['1'])(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'REMOVE_COURSE_ASSOCIATIONS', payload: [{ id: '1', name: 'First Course'}] }])
+  deepEqual(dispatchSpy.firstCall.args, [
+    {type: 'REMOVE_COURSE_ASSOCIATIONS', payload: [{id: '1', name: 'First Course'}]}
+  ])
 })
 
 test('removeAssociations dispatches UNDO_ADD_COURSE_ASSOCIATIONS when removed associations are new', () => {
   const getState = () => ({
-    courses: [
-      { id: '1', name: 'First Course' },
-      { id: '2', name: 'Second Course' },
-    ],
-    existingAssociations: [],
+    courses: [{id: '1', name: 'First Course'}, {id: '2', name: 'Second Course'}],
+    existingAssociations: []
   })
   const dispatchSpy = sinon.spy()
   actions.removeAssociations(['1'])(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'UNDO_ADD_COURSE_ASSOCIATIONS', payload: ['1'] }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'UNDO_ADD_COURSE_ASSOCIATIONS', payload: ['1']}])
 })
 
 test('startMigrationStatusPoll calls checkMigration if interval is not already in progress', () => {
@@ -644,7 +652,7 @@ test('startMigrationStatusPoll calls checkMigration if interval is not already i
   actions.startMigrationStatusPoll()(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'CHECK_MIGRATION_START' }])
+  deepEqual(dispatchSpy.firstCall.args, [{type: 'CHECK_MIGRATION_START'}])
   actions.stopMigrationStatusPoll()()
 })
 
@@ -668,10 +676,10 @@ test('pollMigrationStatus calls checkMigration if is not checking migration and 
   const checkMigrationSpy = sinon.spy(actions, 'checkMigration')
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.queued,
+    migrationStatus: MigrationStates.states.queued
   })
 
-  mockSuccess('checkMigration', { data: { workflow_state: MigrationStates.states.completed } })
+  mockSuccess('checkMigration', {data: {workflow_state: MigrationStates.states.completed}})
   actions.pollMigrationStatus()(() => {}, getState)
 
   equal(checkMigrationSpy.callCount, 1)
@@ -682,10 +690,10 @@ test('pollMigrationStatus does not call checkMigration if is not checking migrat
   const checkMigrationSpy = sinon.spy(actions, 'checkMigration')
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.unknown,
+    migrationStatus: MigrationStates.states.unknown
   })
 
-  mockSuccess('checkMigration', { data: { workflow_state: MigrationStates.states.completed } })
+  mockSuccess('checkMigration', {data: {workflow_state: MigrationStates.states.completed}})
   actions.pollMigrationStatus()(() => {}, getState)
 
   equal(checkMigrationSpy.callCount, 0)
@@ -696,10 +704,10 @@ test('pollMigrationStatus does not call checkMigration if is checking migration 
   const checkMigrationSpy = sinon.spy(actions, 'checkMigration')
   const getState = () => ({
     isCheckingMigration: true,
-    migrationStatus: MigrationStates.states.unknown,
+    migrationStatus: MigrationStates.states.unknown
   })
 
-  mockSuccess('checkMigration', { data: { workflow_state: MigrationStates.states.completed } })
+  mockSuccess('checkMigration', {data: {workflow_state: MigrationStates.states.completed}})
   actions.pollMigrationStatus()(() => {}, getState)
 
   equal(checkMigrationSpy.callCount, 0)
@@ -710,7 +718,7 @@ test('pollMigrationStatus calls stopMigrationStatusPoll if last migration is in 
   const stopMigrationSpy = sinon.spy(actions, 'stopMigrationStatusPoll')
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.completed,
+    migrationStatus: MigrationStates.states.completed
   })
   actions.pollMigrationStatus()(() => {}, getState)
 
@@ -722,7 +730,7 @@ test('pollMigrationStatus dispatched NOTIFY_INFO if last migration state is comp
   const dispatchSpy = sinon.spy()
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.completed,
+    migrationStatus: MigrationStates.states.completed
   })
   actions.pollMigrationStatus()(dispatchSpy, getState)
 
@@ -734,7 +742,7 @@ test('pollMigrationStatus dispatched NOTIFY_ERROR if last migration state is exp
   const dispatchSpy = sinon.spy()
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.exports_failed,
+    migrationStatus: MigrationStates.states.exports_failed
   })
   actions.pollMigrationStatus()(dispatchSpy, getState)
 
@@ -746,7 +754,7 @@ test('pollMigrationStatus dispatched NOTIFY_ERROR if last migration state is imp
   const dispatchSpy = sinon.spy()
   const getState = () => ({
     isCheckingMigration: false,
-    migrationStatus: MigrationStates.states.imports_failed,
+    migrationStatus: MigrationStates.states.imports_failed
   })
   actions.pollMigrationStatus()(dispatchSpy, getState)
 

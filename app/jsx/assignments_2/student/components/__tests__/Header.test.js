@@ -67,7 +67,7 @@ it('displays element filler when scroll offset is in correct place', async () =>
 
 it('will render the uncollapsed step container when scroll offset is less than scroll threshold', async () => {
   const props = await mockAssignmentAndSubmission({
-    Submission: () => SubmissionMocks.submitted
+    Submission: SubmissionMocks.submitted
   })
   const {getByTestId, queryByTestId} = render(<Header {...props} />)
   const scrollEvent = new Event('scroll')
@@ -98,10 +98,10 @@ it('will not render LatePolicyStatusDisplay if the submission is not late', asyn
 
 it('will render LatePolicyStatusDisplay if the submission status is late', async () => {
   const props = await mockAssignmentAndSubmission({
-    Submission: () => ({
+    Submission: {
       ...SubmissionMocks.graded,
       submissionStatus: 'late'
-    })
+    }
   })
   const {getByTestId} = render(<Header {...props} />)
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
@@ -109,10 +109,10 @@ it('will render LatePolicyStatusDisplay if the submission status is late', async
 
 it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', async () => {
   const props = await mockAssignmentAndSubmission({
-    Submission: () => ({
+    Submission: {
       ...SubmissionMocks.graded,
       latePolicyStatus: 'late'
-    })
+    }
   })
   const {getByTestId} = render(<Header {...props} />)
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
@@ -120,20 +120,20 @@ it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', async 
 
 it('will render the latest grade instead of the displayed submissions grade', async () => {
   const latestSubmission = await mockSubmission({
-    Submission: () => ({
+    Submission: {
       ...SubmissionMocks.graded,
       grade: '147',
       enteredGrade: '147'
-    })
+    }
   })
 
   const props = await mockAssignmentAndSubmission({
-    Assignment: () => ({pointsPossible: 150}),
-    Submission: () => ({
+    Assignment: {pointsPossible: 150},
+    Submission: {
       ...SubmissionMocks.graded,
       grade: '131',
       enteredGrade: '131'
-    })
+    }
   })
 
   const {queryByText, queryAllByText} = render(

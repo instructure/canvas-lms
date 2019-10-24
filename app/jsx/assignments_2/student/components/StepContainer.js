@@ -48,8 +48,8 @@ function availableStepContainer(props, context) {
         ) : null}
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Upload')} status="in-progress" />
-        <StepItem label={I18n.t('Submit')} />
-        <StepItem label={I18n.t('Not Graded Yet')} />
+        <StepItem label={I18n.t('Submit')} status="incomplete" />
+        <StepItem label={I18n.t('Not Graded Yet')} status="incomplete" />
         {context.nextButtonEnabled && !props.isCollapsed ? (
           <StepItem label={I18n.t('Next')} status="button" />
         ) : null}
@@ -71,9 +71,9 @@ function unavailableStepContainer(props, context) {
           <StepItem label={I18n.t('Previous')} status="button" />
         ) : null}
         <StepItem label={I18n.t('Unavailable')} status="unavailable" />
-        <StepItem label={I18n.t('Upload')} />
-        <StepItem label={I18n.t('Submit')} />
-        <StepItem label={I18n.t('Not Graded Yet')} />
+        <StepItem label={I18n.t('Upload')} status="incomplete" />
+        <StepItem label={I18n.t('Submit')} status="incomplete" />
+        <StepItem label={I18n.t('Not Graded Yet')} status="incomplete" />
         {context.nextButtonEnabled && !props.isCollapsed ? (
           <StepItem label={I18n.t('Next')} status="button" />
         ) : null}
@@ -97,7 +97,7 @@ function uploadedStepContainer(props, context) {
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
         <StepItem label={I18n.t('Submit')} status="in-progress" />
-        <StepItem label={I18n.t('Not Graded Yet')} />
+        <StepItem label={I18n.t('Not Graded Yet')} status="incomplete" />
       </Steps>
     </div>
   )
@@ -118,7 +118,7 @@ function submittedStepContainer(props, context) {
         <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem label={I18n.t('Uploaded')} status="complete" />
         <StepItem label={I18n.t('Submitted')} status="complete" />
-        <StepItem label={I18n.t('Not Graded Yet')} />
+        <StepItem label={I18n.t('Not Graded Yet')} status="incomplete" />
         {allowNextAttempt(props.assignment, props.submission) &&
         !context.nextButtonEnabled &&
         !props.isCollapsed ? (

@@ -114,10 +114,12 @@ describe "courses" do
         course_with_student_submissions
         @course.default_view = 'feed'
         @course.save
-        get "/courses/#{@course.id}"
+        wait_for_new_page_load { get "/courses/#{@course.id}" }
         course_status_buttons = ff('#course_status_actions button')
-        expect_new_page_load { course_status_buttons.first.click }
-        assert_flash_notice_message('successfully updated')
+        course_status_buttons.first.click
+        wait_for(method: nil, timeout: 5) {
+          assert_flash_notice_message('successfully updated')
+        }
         validate_action_button(:first, 'Unpublished')
       end
 
@@ -142,10 +144,11 @@ describe "courses" do
 
     describe 'course wizard' do
       def go_to_checklist
-        get "/courses/#{@course.id}"
-        f(".wizard_popup_link").click()
-        expect(f(".ic-wizard-box")).to be_displayed
-        wait_for_ajaximations
+        expect_new_page_load { get "/courses/#{@course.id}" }
+        f(".wizard_popup_link").click
+        wait_for(method: nil, timeout: 5) {
+          expect(f(".ic-wizard-box")).to be_displayed
+        }
       end
 
       def check_if_item_complete(item)
@@ -269,23 +272,17 @@ describe "courses" do
       submit_form(form)
       value = f("#course_form input#course_storage_quota_mb")['value']
       expect(value).to eq "10"
+    end
 
+    it "should save quota when not changed" do
       # then try just saving it (without resetting it)
+      course_with_admin_logged_in
+      @course.update_attributes!(storage_quota: 10.megabytes)
       get "/courses/#{@course.id}/settings"
       form = f("#course_form")
-      value = f("#course_form input#course_storage_quota_mb")['value']
-      expect(value).to eq "10"
       submit_form(form)
-      form = f("#course_form")
-      value = f("#course_form input#course_storage_quota_mb")['value']
-      expect(value).to eq "10"
-
-      # then make sure it's right after a reload
-      get "/courses/#{@course.id}/settings"
-      value = f("#course_form input#course_storage_quota_mb")['value']
-      expect(value).to eq "10"
-      @course.reload
-      expect(@course.storage_quota).to eq 10.megabytes
+      value = @course.storage_quota
+      expect(value).to eq 10.megabytes
     end
 
     it "should redirect to the gradebook when switching courses when viewing a students grades" do
@@ -440,7 +437,8 @@ describe "courses" do
       enroll_student(@student, false)
 
       create_session(@student.pseudonym)
-      get "/courses/#{@course.id}"
+      wait_for_new_page_load { get "/courses/#{@course.id}" }
+      wait_for_ajaximations
       assert_flash_notice_message "Invitation accepted!"
       expect(f("#content")).not_to contain_css(".ic-notification button[name='accept'] ")
     end
@@ -449,9 +447,11 @@ describe "courses" do
       enroll_student(@student, false)
 
       create_session(@student.pseudonym)
-      get "/courses/#{@course.id}"
+      wait_for_new_page_load { get "/courses/#{@course.id}" }
       f(".ic-notification button[name='accept'] ").click
-      assert_flash_notice_message "Invitation accepted!"
+      wait_for(method: nil, timeout: 5) {
+        assert_flash_notice_message "Invitation accepted!"
+      }
     end
 
     it "should reject a course invitation" do
@@ -524,10 +524,6 @@ describe "courses" do
 
   it "should display announcements on course home page if enabled and is wiki" do
     course_with_teacher_logged_in :active_all => true
-
-    get "/courses/#{@course.id}"
-
-    expect(element_exists?('#announcements_on_home_page')).to be_falsey
 
     text = "here's some html or whatever"
     html = "<p>#{text}</p>"

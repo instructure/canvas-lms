@@ -76,10 +76,10 @@ test('speedgraderUrl replaces :student_id in SPEEDGRADER_URL_TEMPLATE with the u
 })
 
 test('recognizes current user as its original author', function() {
-  const nonAuthorEntry = new Entry ({
+  const nonAuthorEntry = new Entry({
     id: 2,
     message: 'a reply',
-    parent_id:1,
+    parent_id: 1,
     user_id: 100
   })
 

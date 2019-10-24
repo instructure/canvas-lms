@@ -109,6 +109,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should not show file in the sidebar if it is hidden" do
+      skip("Find out why Image tab isn't clickable COREFE-375")
       attachment_model(:uploaded_data => stub_file_data('foo.txt', nil, 'text/html'), :content_type => 'text/html')
       @text_file.file_state = 'hidden'
       @text_file.save!

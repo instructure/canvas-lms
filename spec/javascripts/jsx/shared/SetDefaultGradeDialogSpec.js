@@ -67,7 +67,11 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
   test('#show text', () => {
     dialog = new SetDefaultGradeDialog({assignment})
     dialog.show()
-    ok(getDialog().querySelector('#default_grade_description').innerText.includes('same grade'))
+    ok(
+      getDialog()
+        .querySelector('#default_grade_description')
+        .innerText.includes('same grade')
+    )
     closeDialog()
   })
 
@@ -76,7 +80,9 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
     dialog = new SetDefaultGradeDialog({assignment: percentAssignmentParams})
     dialog.show()
     ok(
-      getDialog().querySelector('#default_grade_description').innerText.includes('same percent grade')
+      getDialog()
+        .querySelector('#default_grade_description')
+        .innerText.includes('same percent grade')
     )
     closeDialog()
   })
