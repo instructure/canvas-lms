@@ -102,6 +102,13 @@ describe('TextEntry', () => {
         expect(getByTestId('text-editor')).toBeInTheDocument()
       })
 
+      it('renders the loading indicator of the RCE', async () => {
+        const props = await makeProps({editingDraft: true})
+        const {getByText} = render(<TextEntry {...props} />)
+
+        expect(getByText('Loading')).toBeInTheDocument()
+      })
+
       it('renders the Cancel button when the RCE is loaded', async () => {
         const props = await makeProps({editingDraft: true})
         const {getByTestId, getByText} = render(<TextEntry {...props} />)
