@@ -122,6 +122,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should not show file in the sidebar if it is locked" do
+      skip("flaky spec to be fixed in COREFE-378")
       attachment_model(:uploaded_data => stub_file_data('foo.txt', nil, 'text/html'), :content_type => 'text/html')
       @text_file.locked = true
       @text_file.save!
