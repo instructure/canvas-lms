@@ -59,17 +59,17 @@ module UserLearningObjectScopes
     published_visible_assignments
   end
 
-  def course_ids_for_todo_lists(permission_type, course_ids: nil, contexts: nil, include_concluded: false)
+  def course_ids_for_todo_lists(participation_type, course_ids: nil, contexts: nil, include_concluded: false)
     shard.activate do
       course_ids_result = Shackles.activate(:slave) do
         if include_concluded
           all_course_ids
         else
-          case permission_type
+          case participation_type
           when :student
             participating_student_course_ids
-          else
-            manageable_enrollments_by_permission(permission_type).map(&:course_id)
+          when :instructor
+            participating_instructor_course_ids
           end
         end
       end
@@ -277,7 +277,7 @@ module UserLearningObjectScopes
 
   # opts forwaded to course_ids_for_todo_lists
   def submissions_needing_grading_count(**opts)
-    course_ids = course_ids_for_todo_lists(:manage_grades, **opts)
+    course_ids = course_ids_for_todo_lists(:instructor, **opts)
     Submission.active.
       needs_grading.
       joins("INNER JOIN #{Enrollment.quoted_table_name} AS grader_enrollments ON assignments.context_id = grader_enrollments.course_id").
@@ -300,7 +300,7 @@ module UserLearningObjectScopes
   )
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
+    objects_needing('Assignment', 'grading', :instructor, params, 120.minutes, **params) do |assignment_scope|
       as = assignment_scope.
         joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id").
         where(enrollments: {user_id: self, workflow_state: 'active', type: ['TeacherEnrollment', 'TaEnrollment']}).
@@ -343,7 +343,7 @@ module UserLearningObjectScopes
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing('Assignment', 'moderation', :select_final_grade, params, 120.minutes, **params) do |assignment_scope|
+    objects_needing('Assignment', 'moderation', :instructor, params, 120.minutes, **params) do |assignment_scope|
       scope = assignment_scope.active.
         expecting_submission.
         where(final_grader: self, moderated_grading: true).
