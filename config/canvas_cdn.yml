@@ -1,0 +1,21 @@
+defaults: &defaults
+  host: "<%= ENV['CDN_HOST'] %>"
+  region: "<%= ENV['CDN_HOST'] %>"
+  bucket: "<%= ENV['CDN_BUCKET'] %>"
+  aws_access_key_id: "<%= ENV['S3_ACCESS_KEY_ID'] %>"
+  aws_secret_access_key: "<%= ENV['S3_ACCESS_KEY'] %>"
+  enabled: <%= ENV['CDN_ENABLED'] %> #set false to not push anything to s3 and serve assets from same hostname as rails
+
+development:
+  enabled: false
+
+test:
+  enabled: <%= ENV['CDN_ENABLED'] %>
+#
+# production:
+#   host: d2et0h3tpqzqbr.cloudfront.net
+#   region: us-west-2
+#   bucket: canvas-docker-cdn-prod
+#   aws_access_key_id: "<%= ENV['S3_ACCESS_KEY_ID'] %>"
+#   aws_secret_access_key: "<%= ENV['S3_ACCESS_KEY'] %>"
+#   enabled: true #set false to not push anything to s3 and serve assets from same hostname as rails

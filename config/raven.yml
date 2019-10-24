@@ -1,0 +1,4 @@
+development:
+  dsn: 'https://d97d51e75ca844d9a89c9f08eea6123a:eb57770802eb423aaf2d5918b18a7212@sentry.strongmind.com/2'
+production:
+  dsn: 'https://d97d51e75ca844d9a89c9f08eea6123a:eb57770802eb423aaf2d5918b18a7212@sentry.strongmind.com/2'

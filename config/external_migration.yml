@@ -1,0 +1,14 @@
+# This is where temporary files for external migrations will be stored while being processed
+# Possible keys (default value)
+# data_folder (system temp dir)- the path to use (must be writable by daemon processes)
+# keep_after_complete (false) - whether to delete data from system when done (keeping it around can make debugging easier) 
+
+production:
+  keep_after_complete: false
+  
+development:
+  data_folder: exports/
+  keep_after_complete: false 
+     
+test:
+  keep_after_complete: false

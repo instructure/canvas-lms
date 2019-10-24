@@ -1,0 +1,26 @@
+version: '2'
+services:
+  web:
+    ports:
+      - 80:3000
+    image: strongmind/canvas-web:staging
+    restart: always
+    env_file: ./canvas.env
+    volumes:
+      - ./id_rsa:/root/.ssh/id_rsa
+      - ./ssh_config:/root/.ssh/config
+    logging:
+      options:
+        max-size: 2000m
+
+  worker:
+    image: strongmind/canvas-worker:staging
+    restart: always
+    env_file: ./canvas.env
+    volumes:
+      - ./id_rsa:/root/.ssh/id_rsa
+      - ./ssh_config:/root/.ssh/config
+    logging:
+      options:
+        max-size: 2000m
+

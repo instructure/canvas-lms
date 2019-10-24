@@ -1,0 +1,19 @@
+development:
+  session_store: "<%= ENV['SESSION_STORE'] %>"
+  expire_after: <%= ENV['SESSION_EXPIRE_AFTER'] %> # 1 day in seconds
+
+production:
+  session_store: "<%= ENV['SESSION_STORE'] %>"
+  expire_after: <%= ENV['SESSION_EXPIRE_AFTER'] %> # 1 day in seconds
+  # uncomment this option if your canvas install is over HTTPS, and the cookies
+  # will be SSL-only
+  #
+  # secure: true
+  #
+  # change the time that "stay logged in" tokens are valid for, defaults to 1 month
+  #
+  # expire_remember_me_after: 2592000
+
+test:
+  session_store: "<%= ENV['SESSION_STORE'] %>"
+  expire_after: <%= ENV['SESSION_EXPIRE_AFTER'] %> # 1 day in seconds

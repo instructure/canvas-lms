@@ -1,0 +1,16 @@
+production: &production
+  address: <%= ENV['OUTGOING_MAIL_ADDRESS'] %>
+  port: <%= ENV['OUTGOING_MAIL_PORT'] %>
+  user_name: <%= ENV['OUTGOING_MAIL_USER_NAME'] %>
+  password: <%= ENV['OUTGOING_MAIL_PASSWORD'] %>
+  authentication: <%= ENV['OUTGOING_MAIL_AUTHENTICATION'] %> # plain, login, or cram_md5
+  domain: <%= ENV['OUTGOING_MAIL_DOMAIN'] %>
+  outgoing_address: <%= ENV['OUTGOING_MAIL_OUTGOING_ADDRESS'] %>
+  default_name: <%= ENV['OUTGOING_MAIL_DEFAULT_NAME'] %>
+  enable_starttls_auto: <%= ENV['OUTGOING_MAIL_DEFAULT_AUTO_STARTTLS'] %> 
+
+development:
+  <<: *production
+
+test:
+  delivery_method: "test"

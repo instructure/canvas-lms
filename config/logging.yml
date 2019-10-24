@@ -1,0 +1,22 @@
+development:
+  logger: rails
+  log_context: false
+# (log_context defaults to true)
+  log_level: debug
+# (defaults to debug. if using syslog, you can also use its built in log level
+# filtering. however, setting the log_level here instead allows canvas to
+# change the log level on the fly for specific requests)
+
+test:
+  logger: rails
+
+production:
+  logger: rails
+  log_level: info
+#  logger: syslog
+#  app_ident: canvas-lms
+#  daemon_ident: canvas-lms-daemon
+#  include_pid: false
+#  facilities:
+#  - user
+#  - local3

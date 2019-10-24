@@ -1,0 +1,19 @@
+version: '2'
+services:
+  web:
+    ports:
+      - 80:3000
+    image: strongmind/canvas-web
+    restart: always
+    env_file: ./canvas.env
+    logging:
+      options:
+        max-size: 2000m
+
+  worker:
+    image: strongmind/canvas-worker
+    restart: always
+    env_file: ./canvas.env
+    logging:
+      options:
+        max-size: 2000m

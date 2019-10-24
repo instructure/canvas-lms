@@ -1,0 +1,84 @@
+version: '2'
+services:
+  redis:
+    image: redis:latest
+    restart: always
+
+  postgresql:
+    image: sameersbn/postgresql:9.6-2  # Documentation: https://github.com/sameersbn/docker-postgresql
+    container_name: postgresql
+    restart: always
+    environment:
+    - PG_TRUST_LOCALNET=true
+    - REPLICATION_HOST=master
+    env_file: ./canvas.env
+    volumes:
+    - ./postgresql:/var/lib/postgresql:Z
+    ports:
+    - "5432:5432"
+    logging:
+      options:
+        max-size: 10m
+
+  pipeline:
+    image: strongmind/echoserver
+    restart: always
+    ports:
+    - "8080:8080"
+
+  web:
+    stdin_open: true
+    tty: true
+    ports:
+    - 3000:3000
+    expose:
+    - 3000
+    image: strongmind/canvas-web-devel
+    restart: always
+    env_file: ./canvas.env
+    depends_on:
+    - postgresql
+    - redis
+    - pipeline
+    volumes:
+    - .:/usr/src/:cached
+    - ./cached_root/:/root/:cached
+    logging:
+      options:
+        max-size: 2000m
+
+  waf:
+    image: my-modsec-crs
+    ports:
+    - 80:80
+    environment:
+     - PROXY=1
+     - PROXYLOCATION=http://web:3000/
+    depends_on:
+    - web
+
+  worker:
+    stdin_open: true
+    tty: true
+    image: strongmind/canvas-worker-devel
+    restart: always
+    env_file: ./canvas.env
+    depends_on:
+    - postgresql
+    - redis
+    volumes:
+    - .:/usr/src/
+    - ./cached_root/:/root/
+    logging:
+      options:
+        max-size: 2000m
+
+  webpack:
+    image: strongmind/canvas-web-devel
+    restart: always
+    env_file: ./canvas.env
+    depends_on:
+    - web
+    volumes:
+    - .:/usr/src/
+    entrypoint: /usr/src/webpack-dev.sh

@@ -1,0 +1,20 @@
+development:
+  adapter: postgresql
+  host: <%= ENV['DB_HOST'] %>
+  port: <%= ENV['DB_PORT'] %>
+  encoding: utf8
+  username: <%= ENV['DB_USER'] %>
+  database: <%= ENV['DB_NAME'] %>
+  password: <%= ENV['DB_PASS'] %>
+  timeout: 5000
+
+production:
+  adapter: postgresql
+  host: <%= ENV['DB_HOST'] %>
+  port: <%= ENV['DB_PORT'] %>
+  encoding: utf8
+  username: <%= ENV['DB_USER'] %>
+  database: <%= ENV['DB_NAME'] %>
+  password: <%= ENV['DB_PASS'] %>
+  timeout: 5000
+
