@@ -4026,7 +4026,7 @@ describe Course, 'tabs_available' do
     tabs = @course.external_tool_tabs({}, User.new)
     expect(tabs.map{|t| t[:id]}).not_to include(tool.asset_string)
 
-    @course.enable_feature!(:analytics_2)
+    @course.root_account.enable_feature!(:analytics_2)
     tabs = @course.external_tool_tabs({}, User.new)
     expect(tabs.map{|t| t[:id]}).to include(tool.asset_string)
   end

@@ -1580,23 +1580,12 @@ describe ContextExternalTool do
         analytics_2_tool_factory
       end
 
-      it 'should return true if the feature is enabled in context' do
-        @course.enable_feature!(:analytics_2)
-        expect(tool.feature_flag_enabled?(@course)).to be true
-      end
-
-      it 'should return true if the feature is enabled in higher context' do
-        Account.default.enable_feature!(:analytics_2)
-        expect(tool.feature_flag_enabled?(@course)).to be true
-      end
-
-      it 'should check the feature flag in the tool context if none provided' do
-        Account.default.enable_feature!(:analytics_2)
+      it 'should return true if the feature is enabled' do
+        @course.root_account.enable_feature!(:analytics_2)
         expect(tool.feature_flag_enabled?).to be true
       end
 
       it 'should return false if the feature is disabled' do
-        expect(tool.feature_flag_enabled?(@course)).to be false
         expect(tool.feature_flag_enabled?).to be false
       end
 

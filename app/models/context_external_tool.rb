@@ -809,9 +809,9 @@ end
     tool_id == QUIZ_LTI
   end
 
-  def feature_flag_enabled?(context = nil)
+  def feature_flag_enabled?
     feature = TOOL_FEATURE_MAPPING[tool_id]
-    !feature || (context || self.context).feature_enabled?(feature)
+    !feature || context.root_account.feature_enabled?(feature)
   end
 
   private

@@ -868,7 +868,7 @@ RSpec.describe ApplicationController do
       external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
       expect(external_tools).not_to include({title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2})
 
-      @course.enable_feature!(:analytics_2)
+      @course.root_account.enable_feature!(:analytics_2)
       external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
       expect(external_tools).to include({title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2})
     end
