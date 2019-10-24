@@ -2872,6 +2872,7 @@ type SubmissionDraft implements LegacyIDInterface {
   body: String
   mediaObject: MediaObject
   meetsAssignmentCriteria: Boolean!
+  meetsMediaRecordingCriteria: Boolean!
   meetsTextEntryCriteria: Boolean!
   meetsUploadCriteria: Boolean!
   meetsUrlCriteria: Boolean!

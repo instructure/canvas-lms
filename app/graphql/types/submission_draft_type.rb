@@ -49,38 +49,35 @@ module Types
       end
     end
 
+    field :meets_media_recording_criteria, Boolean, null: false
+    def meets_media_recording_criteria
+      object.meets_media_recording_criteria?
+    end
+
     field :meets_text_entry_criteria, Boolean, null: false
     def meets_text_entry_criteria
-      load_association(:submission).then do |submission|
-        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
-          object.meets_text_entry_criteria?
-        end
-      end
+      object.meets_text_entry_criteria?
     end
 
     field :meets_upload_criteria, Boolean, null: false
     def meets_upload_criteria
-      load_association(:submission).then do |submission|
-        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
-          object.meets_upload_criteria?
-        end
+      load_association(:attachments).then do
+        object.meets_upload_criteria?
       end
     end
 
     field :meets_url_criteria, Boolean, null: false
     def meets_url_criteria
-      load_association(:submission).then do |submission|
-        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
-          object.meets_url_criteria?
-        end
-      end
+      object.meets_url_criteria?
     end
 
     field :meets_assignment_criteria, Boolean, null: false
     def meets_assignment_criteria
-      load_association(:submission).then do |submission|
-        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
-          object.meets_assignment_criteria?
+      load_association(:attachments).then do
+        load_association(:submission).then do |submission|
+          Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
+            object.meets_assignment_criteria?
+          end
         end
       end
     end

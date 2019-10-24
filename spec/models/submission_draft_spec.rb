@@ -120,6 +120,21 @@ RSpec.describe SubmissionDraft do
     end
   end
 
+  describe '#meets_media_recording_criteria?' do
+    before(:once) do
+      @submission.assignment.submission_types = 'media_recording'
+    end
+
+    it 'returns true if there is a media_object_id' do
+      @submission_draft.media_object_id = @media_object.media_id
+      expect(@submission_draft.meets_media_recording_criteria?).to eq(true)
+    end
+
+    it 'returns false if there is no media_object_id' do
+      expect(@submission_draft.meets_media_recording_criteria?).to eq(false)
+    end
+  end
+
   describe '#meets_assignment_criteria?' do
     context 'the assignment is an online_text_entry type' do
       before(:once) do

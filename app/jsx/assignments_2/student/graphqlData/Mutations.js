@@ -95,6 +95,7 @@ export const CREATE_SUBMISSION_DRAFT = gql`
     $attempt: Int!
     $body: String
     $fileIds: [ID!]
+    $mediaId: ID
     $url: String
   ) {
     createSubmissionDraft(
@@ -104,6 +105,7 @@ export const CREATE_SUBMISSION_DRAFT = gql`
         attempt: $attempt
         body: $body
         fileIds: $fileIds
+        mediaId: $mediaId
         url: $url
       }
     ) {

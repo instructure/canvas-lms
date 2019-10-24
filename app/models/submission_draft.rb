@@ -63,6 +63,10 @@ class SubmissionDraft < ActiveRecord::Base
   end
   private :submission_attempt_matches_submission
 
+  def meets_media_recording_criteria?
+    self.media_object_id.present?
+  end
+
   def meets_text_entry_criteria?
     self.body.present?
   end
@@ -87,7 +91,7 @@ class SubmissionDraft < ActiveRecord::Base
     submission_types.each do |type|
       case type
       when 'media_recording'
-        return true if self.media_object_id.present?
+        return true if meets_media_recording_criteria?
       when 'online_text_entry'
         return true if meets_text_entry_criteria?
       when 'online_upload'

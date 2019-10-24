@@ -16,17 +16,66 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {fireEvent, render} from '@testing-library/react'
 import MediaAttempt from '../MediaAttempt'
-import {mockAssignment} from '../../../mocks'
-import {render} from '@testing-library/react'
+import {mockAssignmentAndSubmission} from '../../../mocks'
 import React from 'react'
 
+const submissionDraftOverrides = {
+  Submission: {
+    submissionDraft: {
+      activeSubmissionType: 'media_recording',
+      attachments: () => [],
+      body: null,
+      meetsMediaRecordingCriteria: true,
+      mediaObject: {
+        _id: 'm-123456',
+        id: '1',
+        title: 'dope video'
+      }
+    }
+  }
+}
+
+const makeProps = async overrides => {
+  const assignmentAndSubmission = await mockAssignmentAndSubmission(overrides)
+  return {
+    ...assignmentAndSubmission,
+    createSubmissionDraft: jest.fn(),
+    updateUploadingFiles: jest.fn(),
+    uploadingFiles: false
+  }
+}
+
 describe('MediaAttempt', () => {
-  it('renders the upload tab by default', async () => {
-    const assignment = await mockAssignment()
-    const {getByText} = render(<MediaAttempt assignment={assignment} />)
-    expect(getByText('Record/Upload')).toBeInTheDocument()
-    expect(getByText('Add Media')).toBeInTheDocument()
+  describe('unsubmitted', () => {
+    it('renders the upload tab by default', async () => {
+      const props = await makeProps()
+      const {getByText} = render(<MediaAttempt {...props} />)
+      expect(getByText('Record/Upload')).toBeInTheDocument()
+      expect(getByText('Add Media')).toBeInTheDocument()
+    })
+
+    it('renders the current submission draft', async () => {
+      const props = await makeProps(submissionDraftOverrides)
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      expect(getByTestId('media-recording')).toBeInTheDocument()
+    })
+
+    it('removes the current submission draft when the media is removed', async () => {
+      const props = await makeProps(submissionDraftOverrides)
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      const trashButton = getByTestId('remove-media-recording')
+      fireEvent.click(trashButton)
+
+      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+        variables: {
+          id: '1',
+          activeSubmissionType: 'media_recording',
+          attempt: 1
+        }
+      })
+    })
   })
 
   // This will crash given the media modal requires browser specifics
