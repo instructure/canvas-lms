@@ -84,7 +84,7 @@ body#tinyrce {
   border-style: none;
 }
 
-iframe {
+iframe[data-media-id] {
   background-color: #eee;
 }
 
