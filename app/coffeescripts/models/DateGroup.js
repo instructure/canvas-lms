@@ -98,7 +98,9 @@ export default class DateGroup extends Backbone.Model {
   }
 }
 DateGroup.prototype.defaults = {
-  title: I18n.t('everyone_else', 'Everyone else'),
+  get title() {
+    return I18n.t('everyone_else', 'Everyone else')
+  },
   due_at: null,
   unlock_at: null,
   lock_at: null
