@@ -45,13 +45,15 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
       count
 
     submission_ids_and_attempts.each do |submission_id, attempt|
+      relative_submission_id = Shard.relative_id_for(submission_id, Shard.current, Shard.current)
+
       # Group attempts nil, zero, and one together as one set of unread counts
       count = if (attempt || 0) <= 1
-        (unread_count_hash[[submission_id, nil]] || 0) +
-        (unread_count_hash[[submission_id, 0]] || 0) +
-        (unread_count_hash[[submission_id, 1]] || 0)
+        (unread_count_hash[[relative_submission_id, nil]] || 0) +
+        (unread_count_hash[[relative_submission_id, 0]] || 0) +
+        (unread_count_hash[[relative_submission_id, 1]] || 0)
       else
-        unread_count_hash[[submission_id, attempt]] || 0
+        unread_count_hash[[relative_submission_id, attempt]] || 0
       end
 
       fulfill([submission_id, attempt], count)
