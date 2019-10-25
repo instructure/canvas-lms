@@ -78,6 +78,26 @@ describe('MediaAttempt', () => {
     })
   })
 
+  describe('submitted', () => {
+    it('renders the current submission', async () => {
+      const props = await makeProps({
+        Submission: {
+          mediaObject: {
+            _id: 'm-123456',
+            id: '1',
+            title: 'dope_vid.mov'
+          },
+          state: 'submitted'
+        }
+      })
+      const {getByTestId, queryByTestId} = render(
+        <MediaAttempt {...props} uploadingFiles={false} />
+      )
+      expect(queryByTestId('remove-media-recording')).not.toBeInTheDocument()
+      expect(getByTestId('media-recording')).toBeInTheDocument()
+    })
+  })
+
   // This will crash given the media modal requires browser specifics
   // fwiw get a real browser or test with selenium
   // it('opens media modal when button is clicked', async () => {
