@@ -39,6 +39,12 @@ import 'ajax_errors'
 import 'compiled/behaviors/activate'
 import 'compiled/behaviors/tooltip'
 
+// This is because most pages use this and by having it all in it's own chunk it makes webpack
+// split out a ton of stuff (like @instructure/ui-view) into multiple chunks because its chunking
+// algorithm decides that because that chunk would either be too small or it would cause more than
+// our maxAsyncRequests it should concat it into mutlple parents.
+require.include('./bundles/navigation_header')
+
 if (!window.bundles) window.bundles = []
 window.bundles.push = loadBundle
 // process any queued ones

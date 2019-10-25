@@ -20,7 +20,7 @@
 // jqueryui dialog
 // jquery disableWhileLoading
 
-import I18n from 'i18n!help_dialog'
+import I18n from 'i18n!helpDialog'
 import helpDialogTemplate from 'jst/helpDialog'
 import $ from 'jquery'
 import _ from 'underscore'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!ProfileTray'
 import React from 'react'
 import {arrayOf, bool, object, shape, string} from 'prop-types'
 import {Avatar, Badge, Heading, List, Text, Spinner} from '@instructure/ui-elements'

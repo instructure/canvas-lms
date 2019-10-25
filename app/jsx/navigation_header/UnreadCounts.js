@@ -43,7 +43,7 @@ import React, {useRef, useState, useEffect} from 'react'
 import {createPortal} from 'react-dom'
 import {any, func, number, string} from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!UnreadCounts'
 
 const DEFAULT_POLL_INTERVAL = 60000
 
