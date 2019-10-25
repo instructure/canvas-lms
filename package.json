@@ -307,6 +307,8 @@
   },
   "resolutions": {
     "jquery": "https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS",
+    "tinycolor2": "This is to to provide just the minimal functionality instUI uses. we can remove if instUI  merges the commit to use this too",
+    "tinycolor2": "https://github.com/instructure/tinycolor.git#master",
     "graphael": "this is just here so yarn.lock looks the same whether the analytics plugin is checked out or not",
     "graphael": "https://github.com/ryankshaw/graphael.git",
     "node-sass": "if we let node-sass upgrade to recent versions, it causes: SIS-3125",
