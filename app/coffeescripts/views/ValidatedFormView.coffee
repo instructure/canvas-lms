@@ -24,6 +24,7 @@ import 'jquery.toJSON'
 import 'jquery.disableWhileLoading'
 import 'jquery.instructure_forms'
 import {send} from 'jsx/shared/rce/RceCommandShim'
+import {shimGetterShorthand} from '../legacyCoffeesScriptHelpers'
 
 ##
 # Sets model data from a form, saves it, and displays errors returned in a
@@ -218,10 +219,10 @@ export default class ValidatedFormView extends Backbone.View
       catch error
         {}
 
-  translations:
-    required: I18n.t "required", "Required"
-    blank: I18n.t "blank", "Required"
-    unsaved: I18n.t "unsaved_changes", "You have unsaved changes."
+  translations: shimGetterShorthand {},
+    required: -> I18n.t "required", "Required"
+    blank: -> I18n.t "blank", "Required"
+    unsaved: -> I18n.t "unsaved_changes", "You have unsaved changes."
 
   ##
   # Errors are displayed relative to the field to which they belong. If

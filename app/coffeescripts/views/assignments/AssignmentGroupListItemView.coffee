@@ -27,6 +27,7 @@ import DeleteGroupView from './DeleteGroupView'
 import preventDefault from '../../fn/preventDefault'
 import template from 'jst/assignments/AssignmentGroupListItem'
 import AssignmentKeyBindingsMixin from './AssignmentKeyBindingsMixin'
+import {shimGetterShorthand} from '../../legacyCoffeesScriptHelpers'
 
 export default class AssignmentGroupListItemView extends DraggableCollectionView
   @mixin AssignmentKeyBindingsMixin
@@ -57,8 +58,8 @@ export default class AssignmentGroupListItemView extends DraggableCollectionView
     'click .move_contents':  'onMoveContents'
     'click .move_group':  'onMoveGroup'
 
-  messages:
-    toggleMessage: I18n.t('toggle_message', "toggle assignment visibility")
+  messages: shimGetterShorthand {},
+    toggleMessage: -> I18n.t('toggle_message', "toggle assignment visibility")
 
   # call remove on children so that they can clean up old dialogs.
   # this should eventually happen at a higher level (eg for all views), but
