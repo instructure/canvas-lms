@@ -42,7 +42,9 @@ export default class MoveItemTray extends React.Component {
   }
 
   static defaultProps = {
-    title: I18n.t('Move To'),
+    get title() {
+      return I18n.t('Move To')
+    },
     focusOnExit: () => null,
     formatSaveUrl: () => null,
     formatSaveData: order => ({order: order.join(',')}),

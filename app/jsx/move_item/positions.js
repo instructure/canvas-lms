@@ -38,12 +38,16 @@ export function removeAllFromOrder(set, items) {
 export const positions = {
   first: {
     type: 'absolute',
-    label: I18n.t('At the Top'),
+    get label() {
+      return I18n.t('At the Top')
+    },
     apply: ({items, order}) => [...items, ...removeAllFromOrder(order, items)]
   },
   before: {
     type: 'relative',
-    label: I18n.t('Before..'),
+    get label() {
+      return I18n.t('Before..')
+    },
     apply: ({order, items, relativeTo}) => {
       const cleanedOrder = removeAllFromOrder(order, items)
       return [...cleanedOrder.slice(0, relativeTo), ...items, ...cleanedOrder.slice(relativeTo)]
@@ -51,7 +55,9 @@ export const positions = {
   },
   after: {
     type: 'relative',
-    label: I18n.t('After..'),
+    get label() {
+      return I18n.t('After..')
+    },
     apply: ({order, items, relativeTo}) => {
       const cleanedOrder = removeAllFromOrder(order, items)
       return [
@@ -63,7 +69,9 @@ export const positions = {
   },
   last: {
     type: 'absolute',
-    label: I18n.t('At the Bottom'),
+    get label() {
+      return I18n.t('At the Bottom')
+    },
     apply: ({order, items}) => [...removeAllFromOrder(order, items), ...items]
   }
 }

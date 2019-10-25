@@ -245,10 +245,18 @@ class DueDateTokenWrapper extends React.Component {
 
   headerOption = (heading, set) => {
     const headerText = {
-      student: I18n.t('Student'),
-      course_section: I18n.t('Course Section'),
-      group: I18n.t('Group'),
-      conditional_release: I18n.t('Mastery Paths')
+      get student() {
+        return I18n.t('Student')
+      },
+      get course_section() {
+        return I18n.t('Course Section')
+      },
+      get group() {
+        return I18n.t('Group')
+      },
+      get conditional_release() {
+        return I18n.t('Mastery Paths')
+      }
     }[heading]
 
     const canSelect = heading === 'conditional_release'
