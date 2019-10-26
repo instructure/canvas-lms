@@ -18,7 +18,7 @@
     "message": "Ocorreu um erro ao tentar descartar a oportunidade."
   },
   "announcement_fb4cb645": {
-    "message": "Anúncio"
+    "message": "Aviso"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Tem certeza de que deseja excluir este item do planejador?"
@@ -72,7 +72,7 @@
     "message": "Fechar"
   },
   "close_opportunity_center_popup_9907d981": {
-    "message": "Fechar popup do Centro de Oportunidades"
+    "message": "Fechar pop-up do Centro de Oportunidades"
   },
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidade}\n  other {# oportunidades}\n}"
@@ -111,7 +111,7 @@
     "message": "Detalhes:"
   },
   "discussion_6719c51d": {
-    "message": "Discussão"
+    "message": "Fórum"
   },
   "dismiss_itemtitle_a9fae1b3": {
     "message": "Descartar { itemTitle }"
@@ -213,7 +213,7 @@
     "message": "Parece que não há nada aqui"
   },
   "missing_1a256b3b": {
-    "message": "Faltando"
+    "message": "Faltante"
   },
   "missing_items_for_title_516511f8": {
     "message": "Itens ausentes para { title }"
@@ -237,10 +237,10 @@
     "message": "Próximo mês"
   },
   "no_due_dates_assigned_e8f5bac8": {
-    "message": "Nenhuma data de vencimento atribuída"
+    "message": "Nenhum prazo de entrega atribuído"
   },
   "no_grade_3b4d7f3e": {
-    "message": "Sem Nota"
+    "message": "Sem nota"
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "Nada no momento"
@@ -267,7 +267,7 @@
     "message": "{ numPoints } pontos"
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
-    "message": "*Apenas o período de classificação mais recente é exibido."
+    "message": "*Apenas o período de avaliação mais recente é exibido."
   },
   "opportunities_popup_f6703842": {
     "message": "pop-up de oportunidades"
@@ -279,10 +279,10 @@
     "message": "Página"
   },
   "peer_review_74f26a13": {
-    "message": "Revisão por colegas"
+    "message": "Revisão por pares"
   },
   "peer_review_for_itemtitle_358cb413": {
-    "message": "Revisão por colegas para { itemTitle }"
+    "message": "Revisão por pares para { itemTitle }"
   },
   "points_bceb5005": {
     "message": "pontos"
@@ -297,7 +297,7 @@
     "message": "pts"
   },
   "quiz_e0dcce8f": {
-    "message": "Questionário"
+    "message": "Teste"
   },
   "reminder_date_4564d12d": {
     "message": "Lembrete: { date }"
