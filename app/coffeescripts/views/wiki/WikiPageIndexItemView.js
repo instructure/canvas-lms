@@ -267,7 +267,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
 
   copyWikiPageTo(ev) {
     ev.preventDefault()
-    console.log(`copy page ${this.model.get('page_id')} to course`)
+    this.indexView.setCopyToItem(this.model)
   }
 }
 WikiPageIndexItemView.initClass()

@@ -27,6 +27,7 @@ import template from 'jst/wiki/WikiPageIndex'
 import StickyHeaderMixin from '../StickyHeaderMixin'
 import splitAssetString from '../../str/splitAssetString'
 import ContentTypeExternalToolTray from './ContentTypeExternalToolTray'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 import 'jquery.disableWhileLoading'
 
 export default class WikiPageIndexView extends PaginatedCollectionView {
@@ -43,7 +44,8 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       els: {
         '.no-pages': '$noPages',
         '.no-pages a:first-child': '$noPagesLink',
-        '.header-row a[data-sort-field]': '$sortHeaders'
+        '.header-row a[data-sort-field]': '$sortHeaders',
+        '#copy-to-mount-point': '$copyToMountPoint'
       }
     })
 
@@ -58,6 +60,10 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
   initialize(options) {
     super.initialize(...arguments)
+
+    // Poor man's dependency injection just so we can stub out the react component
+    this.DirectShareCourseTray = DirectShareCourseTray
+
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
 
     if (!this.itemViewOptions) this.itemViewOptions = {}
@@ -213,6 +219,20 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         onDismiss={this.closeExternalTool}
       />,
       mountPoint
+    )
+  }
+
+  setCopyToItem(newCopyToItem) {
+    const pageId = newCopyToItem?.id
+    const {DirectShareCourseTray: CourseTray} = this
+    ReactDOM.render(
+      <CourseTray
+        open={newCopyToItem !== null}
+        sourceCourseId={ENV.COURSE_ID}
+        contentSelection={{pages: [pageId]}}
+        onDismiss={() => this.setCopyToItem(null)}
+      />,
+      this.$copyToMountPoint[0]
     )
   }
 
