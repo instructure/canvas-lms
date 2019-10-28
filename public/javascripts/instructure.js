@@ -24,6 +24,7 @@ import _ from 'underscore'
 import tz from 'timezone'
 import htmlEscape from './str/htmlEscape'
 import preventDefault from 'compiled/fn/preventDefault'
+import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import './instructure_helper'
 import 'jqueryui/draggable'
 import './jquery.ajaxJSON'
@@ -455,22 +456,16 @@ function handleYoutubeLink () {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      import('jsx/shared/rce/RichContentEditor').then(({default: RichContentEditor}) => {
-        if (!ENV.use_rce_enhancements) {
-          RichContentEditor.initSidebar({
-            show: function() { $('#sidebar_content').hide() },
-            hide: function() { $('#sidebar_content').show() }
-          })
-        }
-        RichContentEditor.loadNewEditor($editor, { focus: true })
+      RichContentEditor.initSidebar({
+        show: function() { $('#sidebar_content').hide() },
+        hide: function() { $('#sidebar_content').show() }
       })
+      RichContentEditor.loadNewEditor($editor, { focus: true })
     }).bind('richTextEnd', (event, $editor) => {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      import('jsx/shared/rce/RichContentEditor').then(({default: RichContentEditor}) => {
-        RichContentEditor.destroyRCE($editor);
-      })
+      RichContentEditor.destroyRCE($editor);
     });
 
     $(".communication_message .content .links .show_users_link,.communication_message .header .show_users_link").click(function(event) {
