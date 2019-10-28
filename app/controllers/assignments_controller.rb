@@ -613,7 +613,7 @@ class AssignmentsController < ApplicationController
         VALID_DATE_RANGE: CourseDateRange.new(@context),
       }
 
-      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
