@@ -50,7 +50,6 @@ window.bundles.push = loadBundle
 // process any queued ones
 window.bundles.forEach(loadBundle)
 
-import('./runOnEveryPageButDontBlockAnythingElse')
 if (ENV.csp)
   import('./account_settings/alert_enforcement').then(({default: setupCSP}) =>
     setupCSP(window.document)
@@ -97,6 +96,10 @@ if (!supportsCSSVars) {
     window.canvasCssVariablesPolyfill = canvasCssVariablesPolyfill
   })
 }
+
+;(window.requestIdleCallback || window.setTimeout)(() => {
+  import('./runOnEveryPageButDontBlockAnythingElse')
+})
 
 ready(() => {
   // This is in a setTimeout to have it run on the next time through the event loop
