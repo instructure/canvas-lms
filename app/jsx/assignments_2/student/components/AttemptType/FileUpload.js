@@ -224,7 +224,7 @@ export default class FileUpload extends Component {
               onDropRejected={this.handleDropRejected}
             />
           </Flex.Item>
-          <Flex.Item textAlign="center">
+          <Flex.Item padding="xx-small" textAlign="center">
             <MoreOptions
               assignmentID={this.props.assignment._id}
               courseID={this.props.assignment.env.courseId}
