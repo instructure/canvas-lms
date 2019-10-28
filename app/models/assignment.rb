@@ -1780,16 +1780,16 @@ class Assignment < ActiveRecord::Base
       if t.instance_of? ContextExternalTool
         tool_settings_context_external_tools << t
       elsif t.instance_of? Lti::MessageHandler
-        product_family = t.resource_handler.tool_proxy.product_family
+        product_family = t.tool_proxy.product_family
         assignment_configuration_tool_lookups.new(
           tool_vendor_code: product_family.vendor_code,
           tool_product_code: product_family.product_code,
           tool_resource_type_code: t.resource_handler.resource_type_code,
-          tool_type: 'Lti::MessageHandler'
+          tool_type: 'Lti::MessageHandler',
+          context_type: t.tool_proxy.context_type
         )
       end
     end
-    tools
   end
   protected :tool_settings_tools=
 

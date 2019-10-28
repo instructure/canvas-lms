@@ -108,6 +108,8 @@ module Lti
     def recreate_missing_subscriptions
       Rails.logger.info { "in: MessageHandler::recreate_missing_subscriptions, handler_id: #{id}" }
       # Only attempt to recreate subscriptions for account level plagiarism tools
+      # In the future, if we want to support courses, we also need to update
+      # AssignmentConfigurationToolLookup.recreate_missing_subscriptions
       return unless tool_proxy&.context.is_a?(Account) &&
         capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
 

@@ -128,6 +128,7 @@ module Lti
       }
     end
 
+    # TODO: this method is unused. remove.
     def configured_assignments
       message_handler = resources.preload(:message_handlers).map(&:message_handlers).flatten.find do |mh|
         mh.capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)

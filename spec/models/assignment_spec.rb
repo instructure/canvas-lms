@@ -1069,6 +1069,30 @@ describe Assignment do
       @assignment.tool_settings_tool = nil
       @assignment.save!
     end
+
+    context 'when the tool proxy is account-level' do
+      it 'sets the lookup context_type to Account when the tool proxy is account-level' do
+        setup_assignment_with_homework
+        course.assignments << @assignment
+        @assignment.tool_settings_tool = message_handler
+        @assignment.save!
+        lookup = @assignment.assignment_configuration_tool_lookups.last
+        expect(lookup.context_type).to eq('Account')
+      end
+    end
+
+    context 'when the tool proxy is course-level' do
+      let(:tool_proxy_context) { course }
+
+      it 'sets the lookup context_type to Course when the tool proxy' do
+        setup_assignment_with_homework
+        course.assignments << @assignment
+        @assignment.tool_settings_tool = message_handler
+        @assignment.save!
+        lookup = @assignment.assignment_configuration_tool_lookups.last
+        expect(lookup.context_type).to eq('Course')
+      end
+    end
   end
 
   describe "#duplicate" do
@@ -1181,6 +1205,7 @@ describe Assignment do
       before do
         allow(Lti::AssignmentSubscriptionsHelper).to receive(:new).and_return(subscription_helper)
         assignment.assignment_configuration_tool_lookups.create!(
+          context_type: 'Account',
           tool_vendor_code: product_family.vendor_code,
           tool_product_code: product_family.product_code,
           tool_resource_type_code: resource_handler.resource_type_code,
