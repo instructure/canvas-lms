@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {element, func, oneOf, oneOfType, string} from 'prop-types'
+import {element, oneOf, string} from 'prop-types'
 import React, {Component} from 'react'
 
 import ButtonContext from '../../../student/components/Context'
@@ -74,7 +74,7 @@ export const stepLabels = {
 class StepItem extends Component {
   static propTypes = {
     status: oneOf(['button', 'complete', 'incomplete', 'in-progress', 'unavailable']),
-    label: oneOfType([func, string, element]).isRequired,
+    label: string.isRequired,
     icon: element,
     pinSize: string,
     placement: oneOf(['first', 'last', 'interior'])
@@ -178,15 +178,6 @@ class StepItem extends Component {
     }
   }
 
-  renderLabel = () => {
-    const {label, status} = this.props
-    if (typeof label === 'function') {
-      return label(status)
-    } else {
-      return label
-    }
-  }
-
   render() {
     const {status, placement} = this.props
 
@@ -218,10 +209,12 @@ class StepItem extends Component {
             <ButtonContext.Consumer>{context => this.renderIcon(context)}</ButtonContext.Consumer>
           </span>
         </span>
-        <span className="step-item-label" aria-hidden={this.props.status === 'button'}>
-          {this.renderLabel()}
-          <ScreenReaderContent>{status}</ScreenReaderContent>
+        <span className="step-item-label" aria-hidden>
+          {this.props.label}
         </span>
+        {this.props.status !== 'button' && (
+          <ScreenReaderContent>{`${this.props.label} ${status}`}</ScreenReaderContent>
+        )}
       </span>
     )
   }
