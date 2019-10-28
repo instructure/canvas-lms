@@ -3318,6 +3318,7 @@ class Assignment < ActiveRecord::Base
 
   def a2_enabled?
     return false unless course.feature_enabled?(:assignments_2_student)
+    return false if non_digital_submission?
     return false if external_tool? || quiz? || discussion_topic? || wiki_page? ||
       group_category? || peer_reviews?
     true

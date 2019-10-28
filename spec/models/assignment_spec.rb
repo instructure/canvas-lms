@@ -6791,6 +6791,55 @@ describe Assignment do
     end
   end
 
+  describe '#a2_enabled?' do
+    before do
+      allow(@course).to receive(:feature_enabled?) { false }
+      allow(@course).to receive(:feature_enabled?).with(:assignments_2_student) { true }
+    end
+
+    let(:assignment) do
+      @course.assignments.create!(assignment_valid_attributes)
+    end
+
+    it 'returns false if the assignment_2_student flag is not enabled' do
+      allow(@course).to receive(:feature_enabled?).with(:assignments_2_student) { false }
+      assignment.submission_types = 'online_text_entry'
+
+      expect(assignment.a2_enabled?).to be(false)
+    end
+
+    [
+      'discussion_topic',
+      'external_tool',
+      'on_paper',
+      'online_quiz',
+      'none',
+      'not_graded',
+      'wiki_page',
+      ''
+    ].each do |type|
+      it "returns false if submission type is set to #{type}" do
+        assignment.build_wiki_page
+        assignment.build_discussion_topic
+        assignment.build_quiz
+        assignment.submission_types = type
+
+        expect(assignment.a2_enabled?).to be(false)
+      end
+    end
+
+    [
+      'online_text_entry',
+      'online_upload',
+      'online_url'
+    ].each do |type|
+      it "returns true if the flag is on and the submission type is #{type}" do
+        assignment.submission_types = type
+        expect(assignment.a2_enabled?).to be(true)
+      end
+    end
+  end
+
   describe 'title validation' do
     let(:assignment) do
       @course.assignments.create!(assignment_valid_attributes)
