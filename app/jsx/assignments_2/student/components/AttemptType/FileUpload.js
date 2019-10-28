@@ -18,10 +18,10 @@
 
 import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {Assignment} from '../../graphqlData/Assignment'
-import {bool, func} from 'prop-types'
 import {chunk} from 'lodash'
 import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import elideString from '../../../../shared/helpers/elideString'
+import {func} from 'prop-types'
 import {getFileThumbnail} from '../../../../shared/helpers/fileHelper'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
@@ -48,11 +48,11 @@ export default class FileUpload extends Component {
     assignment: Assignment.shape,
     createSubmissionDraft: func,
     submission: Submission.shape,
-    updateUploadingFiles: func,
-    uploadingFiles: bool
+    updateUploadingFiles: func
   }
 
   state = {
+    filesToUpload: [],
     messages: []
   }
 
@@ -103,12 +103,19 @@ export default class FileUpload extends Component {
       this.context.setOnFailure(I18n.t('Error adding files to submission draft'))
       return
     }
+    this.setState({
+      filesToUpload: files.map(() => {
+        return {isLoading: true}
+      })
+    })
     this.updateUploadingFiles(async () => {
       try {
         const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
         await this.createSubmissionDraft(newFiles.map(file => file.id))
       } catch (err) {
         this.context.setOnFailure(I18n.t('Error updating submission draft'))
+      } finally {
+        this.setState({filesToUpload: []})
       }
     })
   }
@@ -239,6 +246,9 @@ export default class FileUpload extends Component {
   }
 
   renderUploadedFile(file) {
+    if (file.isLoading) {
+      return <LoadingIndicator />
+    }
     return (
       <Billboard
         heading={I18n.t('Uploaded')}
@@ -268,7 +278,10 @@ export default class FileUpload extends Component {
   }
 
   renderUploadBoxAndUploadedFiles() {
-    const files = this.getDraftAttachments()
+    let files = this.getDraftAttachments()
+    if (this.state.filesToUpload.length) {
+      files = files.concat(this.state.filesToUpload)
+    }
     // The first two uploaded files are rendered on the same row as the upload box
     const firstFileRow = files.slice(0, 2)
     // All uploaded files after the first two are rendered on rows below the upload
@@ -312,8 +325,6 @@ export default class FileUpload extends Component {
             </Grid.Row>
           </Grid>
         )}
-
-        {this.props.uploadingFiles && <LoadingIndicator />}
       </div>
     )
   }

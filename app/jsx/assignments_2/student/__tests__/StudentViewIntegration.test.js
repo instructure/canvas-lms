@@ -119,7 +119,7 @@ describe('student view integration tests', () => {
         }
       })
 
-      const {container, getAllByText} = render(
+      const {container, findByText, findAllByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MockedProvider mocks={mocks} cache={createCache()}>
             <StudentViewQuery assignmentLid="1" submissionID="1" />
@@ -132,7 +132,37 @@ describe('student view integration tests', () => {
         container.querySelector('input[id="inputFileDrop"]')
       )
       fireEvent.change(fileInput, {target: {files}})
-      expect(await waitForElement(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
+      await findByText('Loading')
+      expect((await findAllByText('test.jpg'))[0]).toBeInTheDocument()
+    })
+
+    it('displays a loading indicator for each new file being uploaded', async () => {
+      window.URL.createObjectURL = jest.fn()
+      uploadFileModule.uploadFiles = jest.fn()
+      uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
+      $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+
+      const mocks = await createGraphqlMocks({
+        CreateSubmissionDraftPayload: {
+          submissionDraft: {attachments: [{}, {}]}
+        }
+      })
+
+      const {container, findAllByText} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" submissionID="1" />
+          </MockedProvider>
+        </AlertManagerContext.Provider>
+      )
+
+      const files = [new File(['foo'], 'file1.jpg', {type: 'image/jpg'})]
+      const fileInput = await waitForElement(() =>
+        container.querySelector('input[id="inputFileDrop"]')
+      )
+      fireEvent.change(fileInput, {target: {files}})
+      const elements = await findAllByText('Loading')
+      expect(elements).toHaveLength(2)
     })
   })
 
