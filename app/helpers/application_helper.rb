@@ -191,6 +191,7 @@ module ApplicationHelper
   # puts the "main" webpack entry and the moment & timezone files in the <head> of the document
   def include_head_js
     paths = []
+    paths << active_brand_config_url('js')
     # We preemptive load these timezone/locale data files so they are ready
     # by the time our app-code runs and so webpack doesn't need to know how to load them
     paths << "/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
