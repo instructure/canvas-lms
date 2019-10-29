@@ -1712,9 +1712,11 @@ fa:
     add_topic_to: "افزودن موضوع بحث به %{module}"
   add_more_e1ffaa65: "افزودن موارد دیگر"
   add_new_announcement_ddacd624: "افزودن اطلاعیه جدید"
+  add_new_domain_e097d4a0: "افزودن دامنه جدید"
   add_new_group_7ac49f31: "افزودن گروه جدید"
   add_new_set_of_due_dates_e8e240f: "افزودن مجموعه جدید تاریخ های مهلت"
   add_new_term_d2217c0d: "افزودن نیمسال جدید"
+  add_old_quiz_f4c546a: "افزودن امتحان قبلی"
   add_people_7ee4b2ec: "افزودن افراد"
   add_people_to_coursename_5ea234e1: "افزودن افراد به %{courseName}"
   add_quiz_cebfa28b: "افزودن آزمون"
@@ -1848,6 +1850,7 @@ fa:
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "اجازه دادن به بارگیری و مشاهده محتوای درس به صورت آفلاین"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "امکان تخصیص تصاویر به درس و استفاده از کارت های داشبورد فراهم شود."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "اجازه دهید کارت های داشبورد برای هر کاربر دوباره مرتب شوند."
+  allow_final_grade_override_a21a79ee: "به نمره نهایی اجازه بازنویسی داده شود"
   allow_in_mastery_paths_5332c786: "دادن امکان ورود به مسیرهای تسلط"
   allow_intra_group_peer_reviews_53f1e455: "اجازه دادن به بازبینی های گروهی درون گروهی"
   allow_lor_tools: "به کاربران اجازه داده شود ابزارهای بیرونی پیکربندی شده برای LOR را مشاهده و از آنها استفاده نمایند."
@@ -1865,6 +1868,11 @@ fa:
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "به اساتید امکان می دهد داده های نمره را برای صدور گروهی به یکپارچه‌سازی‌های سامانه اطلاعات دانشجو، علامت‌گذاری کنند."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "امکان تکرار ماژول ها در کانواس"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "امکان زمان بندی رویدادهای تکرار شونده تقویم را فراهم می کند"
+  allows_user_to_add_discussions_in_the_discussions__1b3d9a53: "اجازه دادن به کاربر جهت شرکت در بحث ها در صفحه بحث و گفتگوها"
+  allows_user_to_edit_the_course_syllabus_a28ff262: "به کاربر جهت ویرایش سرفصل درس اجازه داده شود."
+  allows_user_to_publish_conclude_and_delete_courses_336cf352: "اجازه دادن به کاربر جهت انتشار، نتیجه گیری و حذف دوره ها."
+  allows_user_to_view_last_activity_and_total_activi_786a7286: "اجازه دادن به کاربر جهت مشاهده آخرین فعالیت و اطلاعات کلیه فعالیتها در صفحه فرد"
+  allows_user_to_view_the_course_statistics_button_i_f44b2c7a: "اجازه دادن به کاربران جهت مشاهد دکمه آمار مربوط به درس در تنظیمات دروس"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "برای کاربران دارای شماره تلفن بین المللی امکان دریافت پیام های متنی از کانواس را فراهم می کند."
   always_3a59e701: همیشه
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "RCE و نوار کناری همیشه از یک سرویس محتوای غنی کانواس بارگذاری شود"
@@ -4244,6 +4252,7 @@ fa:
   configure_individual_learning_paths_for_students_b_e2fce294: "بر اساس نتایج ارزیابی، مسیرهای یادگیری جداگانه ای را برای دانشجویان پیکربندی کنید."
   configure_tool_app_3b1bb50b: "برنامه %{tool} پیکربندی شود؟"
   configure_toolname_app_651371be: "پیکربندی برنامه %{toolName}"
+  confirm_communication_channel_81c48d08: "تایید کانال ارتباطی"
   confirm_contact_method_29d6fe4b: "تأیید روش تماس"
   confirm_delete_6febeafb: "تائید حذف"
   confirm_deletion_b2efe7d4: "حذف را تأیید کنید"
@@ -5085,6 +5094,8 @@ fa:
     unstar_conversation: "برداشتن ستاره گفتگو"
   conversations_69a8dc26: گفتگوها
   copy_9748f9f: "کپی کردن"
+  copy_page_to_another_course_405cc07c: "کپی صفحه به دوره دیگر"
+  copy_quiz_to_course_74f9c8c1: "کپی امتحان به دوره"
   copy_to_folder_32ecc3c3: "کپی کردن در پوشه"
   copying_628a9607: "در حال کپی کردن.."
   copyright_holder_66ee111: "دارنده حق نشر:"
@@ -5192,6 +5203,7 @@ fa:
   count_unsynced_changes_1fc147e5: "%{count} تغییر همگام نشده"
   count_users_374d6e47: "(%{count} کاربر)"
   country_is_required_b0afbf52: "کشور لازم است"
+  country_or_region_is_required_86917b39: "کشور یا ناحیه اجباری می باشد."
   course: 
     access_denied: "دسترسی انکار شد"
     batch_update_message: 
@@ -5484,6 +5496,7 @@ fa:
   course_settings_f6d0bbf8: "تنظیمات درس"
   course_settings_sub_navigation_b95deae: "پیمایش فرعی تنظیمات درس"
   course_setup_checklist_78dcff7e: "فهرست علامتگذاری راه اندازی درس"
+  course_setup_checklist_course_home_page_f8baa04a: "چک لیست تنظیمات درس، صفحه اصلی درس"
   course_setup_wizard_is_showing_a7c087c1: "راهنمای گام به گام راه اندازی درس در حال نمایش است."
   course_sis_7ae8f649: "سامانه اطلاعات دانشجویی درس"
   course_sis_df8b379: "سامانه اطلاعات دانشجویی درس"
@@ -6418,6 +6431,7 @@ fa:
   delete_current_message_5da0221a: "حذف پیام فعلی"
   delete_current_module_item_21fefc54: "حذف ماژول/مورد فعلی"
   delete_custom_help_link_814f0509: "حذف پیوند راهنمای سفارشی"
+  delete_domain_5ba75b7c: "حذف دامنه"
   delete_entry_title_5e59727b: "حذف ورودی %{title}"
   delete_grading_period_dba36e59: "حذف دوره نمره گذاری"
   delete_grading_period_set_b35358dd: "حذف مجموعه دوره نمره گذاری"
@@ -7547,6 +7561,7 @@ fa:
   error_message_2b9d12ee: "خطا: %{message}"
   error_rendering_duplicated_module_db821097: "خطا در تفسیر ماژول تکراری"
   error_reports_7d6c8b1e: "گزارش خطاها"
+  error_retrieving_content_c07ee76b: "خطا در بازیابی محتوا"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "خطا در بازیابی ابزارهای تشخیص شباهت"
   error_running_quizzes_2_export_cfecedba: "خطا در اجرای صدور Quizzes 2."
   error_uploading_file_e2d31b56: "خطا در بارگذاری فایل."
@@ -9434,6 +9449,7 @@ fa:
   hide_course_sections_for_course_name_bd1911af: "مخفی کردن بخش‌های درس برای درس %{name}"
   hide_courses_navigation_menu_6f7c4cfd: "مخفی کردن منوی پیمایش درس‌ها"
   hide_courses_without_enrollments_6df4dfad: "مخفی کردن درس های بدون ثبت نام"
+  hide_details_df9ef4a2: "مخفی کردن جزئیات"
   hide_e057ff36: "مخفی کردن"
   hide_groups_navigation_menu_62e8b3d0: "مخفی کردن منوی پیمایش گروه‌ها"
   hide_navigation_menu_f0b3e90: "مخفی کردن منوی پیمایش "
@@ -12763,6 +12779,7 @@ fa:
   no_e16d9132: خیر
   no_email_8585ad7e: "نامه الکترونیکی موجود نیست"
   no_exports_to_display_7f1b630b: "هیچ صدوری برای نمایش وجود ندارد"
+  no_file_submitted_a879fa53: "فایلی ارسال نشده است."
   no_final_grade_selected_3595c9c: "هیچ نمره نهایی انتخاب نشده"
   no_grade_3fa326c: "نمره موجود نیست"
   no_grade_assigned_90e531f5: "هیچ نمره ای تخصیص داده نشده."
@@ -13195,6 +13212,7 @@ fa:
   ok_c47544a2: تأیید
   ok_ff1b646a: تأیید
   okay_1772bbeb: "صحیح است"
+  old_quiz_e8dafede: "امتحان قبلی"
   oldest_newest_4de86803: "قدیمی‌ترین - جدیدترین"
   oldgradebookgradebookKeyboardNav: 
     keyboard_assignment_desc: "رفتن به صفحه جزئیات تکلیف فعلی"
@@ -13513,6 +13531,7 @@ fa:
       unsaved_changes: "ذخیره سازی تغییرات را لغو کرده اید. می خواهید بدون ذخیره سازی این تغییرات ادامه دهید؟ "
   pages_e5414c2c: "صفحه ها"
   pages_front_page_9ce5188: "صفحه آغازین صفحه ها"
+  pages_settings_968392a3: "تنظیمات صفحه ها"
   pages_tutorial_tray_169464a9: "سینی خودآموز صفحه ها"
   paginated_collection: 
     no_items: "هیچ موردی یافت نشد."
@@ -14443,7 +14462,7 @@ fa:
       take_picture: "گرفتن عکس"
     upload_file_view: 
       choose_a_picture: "انتخاب عکس"
-      crop_instructions: "برای بریدن تصویر، قسمت انتخاب شده را بکشید و سپس روی دکمه \"ذخیره\" در قسمت زیر کلیک کنید."
+      crop_instructions: "برای برش تصویر، انتخاب شده را درگ کرده یا از کلیدهای جهتی به منظور جابجایی انتخاب شده استفاده کنید و جهت نغییر اندازه انتخاب شده از کلیدهای شیفت و جهتی کیبورد استفاده کنید. سپس جهت ذخیره روی کلید \"ذخیره\" کلیک کنید. "
   progress_9de4af8f: پیشرفت
   progress_for_account_name_ef203250: "پیشرفت برای %{account_name}"
   progress_loading_bar_a26b8861: "نوار پیشرفت/بارگذاری"
@@ -16803,6 +16822,7 @@ fa:
         current_enrollments: "ثبت نام های جاری"
         decrosslist_section: "لغو فهرست بندی متقابل این بخش"
   sections_94731e51: بخش‌ها
+  security_tab_failed_to_load_2d2242a: "بارگذاری زبانه امنیتی انجام نشد."
   see_rubric_results_62a6447d: "مشاهده نتایج دستورالعمل ارزیابی"
   see_scoring_details_f7fd1f3b: "مشاهده اطلاعات نمره گذاری"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*برخی ابزارهای LTI را ببینید* که با کانواس عالی کار می کنند."
@@ -16864,6 +16884,7 @@ fa:
   selected_274ce24f: "انتخاب شده"
   selected_all_courses_9cfef57f: "همه درس‌ها انتخاب شده"
   selected_answer: "این پاسخ را انتخاب کرده اید."
+  selected_content_is_not_an_lti_link_11780d96: "محتوای انتخاب شده یک لینک LTI نمی باشد."
   selected_course_course_a581f834: "درس %{course} انتخاب شده"
   selected_subtree_a7693937: "%{subtree} انتخاب شده"
   self_enrollments: 
@@ -16916,6 +16937,8 @@ fa:
   send_message_to_name_c8ac05fc: "ارسال پیام برای %{name}"
   send_notification_81773687: "ارسال اعلان"
   send_only_to_the_following_types_of_users_d8465c11: "فقط به انواع کاربران زیر ارسال شود:"
+  send_page_to_another_user_6ef5a7c1: "ارسال صفحه به دوره دیگر"
+  send_quiz_to_user_e8c47177: "ارسال امتحان به کاربر"
   send_this_announcement_to_unenrolled_users_4ea549d7: "این اطلاعیه برای کاربران لغو ثبت نام شده ارسال شود"
   send_this_announcement_to_users_with_the_account_r_bd69c809: "این اطلاعیه برای کاربران دارای نقش حساب %{role} ارسال شود"
   send_this_announcement_to_users_with_the_course_ro_46904d40: "این اطلاعیه برای کاربران دارای نقش درس %{role} ارسال شود"
@@ -17702,6 +17725,7 @@ fa:
   show_current_grade_5bf4e0d9: "نمایش نمره فعلی"
   show_dashboard_card_view_41ebd6c6: "نمایش نمای کارت داشبورد"
   show_deleted_replies_a2e0a36f: "نمایش پاسخ های حذف شده"
+  show_details_194cf390: "نمایش جزئیات"
   show_exceptions_270ea1c5: "نمایش استثناءها"
   show_final_grade_a95e14dc: "نمایش نمره نهایی"
   show_groups_navigation_menu_1521d38d: "نمایش منوی پیمایش گروه ها"
@@ -18596,6 +18620,7 @@ fa:
   there_are_currently_no_associated_courses_fba1754f: "در حال حاضر هیچ دوره مرتبطی وجود ندارد."
   there_are_no_announcements_for_this_course_5ee649c3: "هیچ اطلاعیه ای برای این درس وجود ندارد."
   there_are_no_available_signups_for_this_course_26b05c56: "در حال حاضر هیچ ثبت نام در دسترسی برای این درس وجود ندارد."
+  there_are_no_reports_for_you_to_view_b716717a: "گزارشی جهت مشاهده برای شما وجود ندارد."
   there_are_no_unsaved_changes_9276e87c: "تغییرات ذخیره سازی نشده وجود ندارد"
   there_are_no_unsynced_changes_4e8f0838: "هیچ تغییر ناهمگامی وجود ندارد"
   there_was_a_failure_logging_out_at_your_idp_30070527: "در هنگام خروج در IdP ایرادی رخ داد"
@@ -19048,6 +19073,7 @@ fa:
     folder_tree_instructions: "از کلیدهای پیمایش بالا و پایین برای پیمایش در درخت استفاده کنید. کلید راست را برای باز کردن پوشه ها، کلید چپ را برای جمع کردن و کلید enter را برای انتخاب مورد انتخابی فشار دهید."
   trinidad_and_tobago_1_fc2d8d1c: "ترینیداد و توباگو (+1)"
   truncated_56b1a661: "کوتاه شده"
+  trusted_account_669ba397: "حساب تایید شده"
   turned_in_submission_date_e9180b8b: "تحویل داده شد: %{submission_date}"
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: "غیر فعال کردن این آموزش، سینی آموزش را از نمای همه درس‌های شما حذف خواهد کرد. این مورد می‌تواند در زیر قسمت گزینه‌های ویژگی در تنظیمات کاربری شما، دوباره فعال شود. "
   turnitin: 
