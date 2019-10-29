@@ -115,7 +115,9 @@ function constructJSXVideoEmbedding(video) {
         height: VIDEO_SIZE_DEFAULT.height,
         display: 'inline-block'
       }}
-      title={video.name || video.text}
+      title={formatMessage('Video player for {title}', {
+        title: video.title || video.name || video.text
+      })}
     />
   )
 }
@@ -136,7 +138,9 @@ function constructJSXAudioEmbedding(audio) {
         height: AUDIO_PLAYER_SIZE.height,
         display: 'inline-block'
       }}
-      title={audio.name || audio.text}
+      title={formatMessage('Audio player for {title}', {
+        title: audio.title || audio.name || audio.text
+      })}
     />
   )
 }

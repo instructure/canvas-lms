@@ -20,7 +20,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
-import formatMessage from '../../../../format-message'
 import {asVideoElement} from '../../shared/ContentSelection'
 import VideoOptionsTray from '.'
 
@@ -73,7 +72,7 @@ export default class TrayController {
       this._editor.dom.setStyles(this.$videoContainer, styl)
       this._editor.dom.setStyles(this.$videoContainer.firstElementChild, styl)
 
-      const title = formatMessage('Video player for {title}', {title: videoOptions.titleText})
+      const title = videoOptions.titleText
       this._editor.dom.setAttrib(this.$videoContainer, 'data-mce-p-title', title)
       this._editor.dom.setAttrib(
         this.$videoContainer,
