@@ -1,0 +1,350 @@
+{
+    "add_8523c19b": {
+        "message": "افزودن"
+    },
+    "address_3159962f": {
+        "message": "نشانی:"
+    },
+    "all_4321c3a1": {
+        "message": "همه"
+    },
+    "all_day_fb42c4fc": {
+        "message": "تمام روز"
+    },
+    "announcement_fb4cb645": {
+        "message": "اطلاعیه"
+    },
+    "announcement_list_da155734": {
+        "message": "فهرست اطلاعیه"
+    },
+    "announcements_a4b8ed4a": {
+        "message": "اطلاعیه ها"
+    },
+    "apps_54d24a47": {
+        "message": "برنامه ها"
+    },
+    "aspect_ratio_will_be_preserved_cb5fdfb8": {
+        "message": "نسبت ابعاد حفظ خواهد شد"
+    },
+    "assignment_976578a8": {
+        "message": "تکلیف"
+    },
+    "assignments_1e02582c": {
+        "message": "تکلیف ها"
+    },
+    "calendar_a8563bb2": {
+        "message": "تقویم:"
+    },
+    "calendar_event_89aadc1c": {
+        "message": "رویداد تقویم"
+    },
+    "cancel_caeb1e68": {
+        "message": "لغو"
+    },
+    "canvas_plugins_705a5016": {
+        "message": "افزونه های کانواس"
+    },
+    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+        "message": "برای درج پیوند به یک صفحه، روی آن صفحه کلیک کنید."
+    },
+    "click_to_embed_imagename_c41ea8df": {
+        "message": "Click to embed { imageName }"
+    },
+    "click_to_insert_a_link_into_the_editor_c19613aa": {
+        "message": "Click to insert a link into the editor."
+    },
+    "close_d634289d": {
+        "message": "بستن"
+    },
+    "collaborations_5c56c15f": {
+        "message": "همکاری ها"
+    },
+    "content_type_2cf90d95": {
+        "message": "نوع محتوا"
+    },
+    "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    },
+    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    },
+    "course_8a63b4a3": {
+        "message": "درس"
+    },
+    "course_files_62deb8f8": {
+        "message": "فایل های درس"
+    },
+    "course_navigation_dd035109": {
+        "message": "پیمایش درس"
+    },
+    "custom_6979cd81": {
+        "message": "سفارشی"
+    },
+    "date_ee500367": {
+        "message": "تاریخ"
+    },
+    "decrease_indent_de6343ab": {
+        "message": "کاهش تورفتگی"
+    },
+    "delete_a6efa79d": {
+        "message": "حذف"
+    },
+    "details_98a31b68": {
+        "message": "اطلاعات"
+    },
+    "details_a6f427c3": {
+        "message": "جزئیات:"
+    },
+    "dimensions_45ddb7b7": {
+        "message": "ابعاد"
+    },
+    "discussion_6719c51d": {
+        "message": "بحث"
+    },
+    "discussions_a5f96392": {
+        "message": "بحث ها"
+    },
+    "discussions_index_6c36ced": {
+        "message": "فهرست بحث ها"
+    },
+    "done_54e3d4b6": {
+        "message": "انجام شد"
+    },
+    "due_5d7267be": {
+        "message": "مهلت:"
+    },
+    "due_multiple_dates_cc0ee3f5": {
+        "message": "مهلت: چند تاریخ"
+    },
+    "edit_c5fbea07": {
+        "message": "ویرایش"
+    },
+    "embed_image_1080badc": {
+        "message": "درج تصویر"
+    },
+    "excused_cf8792eb": {
+        "message": "معاف شد"
+    },
+    "files_c300e900": {
+        "message": "فایل ها"
+    },
+    "files_index_af7c662b": {
+        "message": "فهرست فایل ها"
+    },
+    "generating_preview_45b53be0": {
+        "message": "در حال ایجاد پیش نمایش..."
+    },
+    "graded_25cd3fcd": {
+        "message": "نمره گذاری شده"
+    },
+    "grades_a61eba0a": {
+        "message": "نمره ها"
+    },
+    "group_navigation_99f191a": {
+        "message": "پیمایش گروه"
+    },
+    "header_f28f73db": {
+        "message": "عنوان"
+    },
+    "images_7ce26570": {
+        "message": "تصاویر"
+    },
+    "increase_indent_6d550a4a": {
+        "message": "افزایش تورفتگی"
+    },
+    "insert_equella_links_49a8dacd": {
+        "message": "Insert Equella Links"
+    },
+    "insert_link_6dc23cae": {
+        "message": "درج پیوند"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "درج معادله ریاضی"
+    },
+    "invalid_file_type_881cc9b2": {
+        "message": "نوع فایل معتبر نیست"
+    },
+    "keyboard_shortcuts_ed1844bd": {
+        "message": "میانبرهای صفحه کلید"
+    },
+    "late_2be42b88": {
+        "message": "با تأخیر"
+    },
+    "link_7262adec": {
+        "message": "پیوند"
+    },
+    "link_to_other_content_in_the_course_879163b5": {
+        "message": "به محتوای دیگر موجود در درس پیوند دهید."
+    },
+    "link_to_other_content_in_the_group_3fe25379": {
+        "message": "به محتوای دیگر در گروه پیوند دهید."
+    },
+    "links_14b70841": {
+        "message": "پیوندها"
+    },
+    "load_more_a36f9cf9": {
+        "message": "بارگذاری بیشتر"
+    },
+    "load_more_results_460f49a9": {
+        "message": "Load more results"
+    },
+    "loading_25990131": {
+        "message": "در حال بارگذاری..."
+    },
+    "loading_725811ca": {
+        "message": "در حال بارگذاری"
+    },
+    "loading_bde52856": {
+        "message": "در حال بارگذاری"
+    },
+    "loading_failed_b3524381": {
+        "message": "Loading failed..."
+    },
+    "location_3b6ff307": {
+        "message": "مکان:"
+    },
+    "media_af190855": {
+        "message": "رسانه"
+    },
+    "missing_1a256b3b": {
+        "message": "جا افتاده"
+    },
+    "modules_c4325335": {
+        "message": "ماژول ها"
+    },
+    "my_files_eea33f44": {
+        "message": "فایل های من"
+    },
+    "new_13daf639": {
+        "message": "جدید"
+    },
+    "next_month_749b1778": {
+        "message": "ماه بعد"
+    },
+    "next_page_d2a39853": {
+        "message": "صفحه بعد"
+    },
+    "no_results_940393cf": {
+        "message": "No results."
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "چیزی در حال حاضر موجود نیست"
+    },
+    "open_this_keyboard_shortcuts_dialog_9658b83a": {
+        "message": "باز کردن این کادر گفتکوی میانبرهای صفحه کلید"
+    },
+    "options_3ab0ea65": {
+        "message": "گزینه ها"
+    },
+    "page_50c4823d": {
+        "message": "صفحه"
+    },
+    "pages_e5414c2c": {
+        "message": "صفحه ها"
+    },
+    "peer_review_74f26a13": {
+        "message": "بازبینی گروهی"
+    },
+    "people_b4ebb13c": {
+        "message": "افراد"
+    },
+    "points_bceb5005": {
+        "message": "امتیازها"
+    },
+    "previous_month_bb1e3c84": {
+        "message": "ماه قبل"
+    },
+    "previous_page_928fc112": {
+        "message": "صفحه قبل"
+    },
+    "pts_699bd9aa": {
+        "message": "امتیاز"
+    },
+    "published_c944a23d": {
+        "message": "منتشر شده"
+    },
+    "quiz_e0dcce8f": {
+        "message": "آزمون"
+    },
+    "quizzes_7e598f57": {
+        "message": "آزمون ها"
+    },
+    "record_7c9448b": {
+        "message": "ضبط کردن"
+    },
+    "recording_98da6bda": {
+        "message": "در حال ضبط"
+    },
+    "rich_content_editor_2708ef21": {
+        "message": "ویرایشگر محتوای غنی"
+    },
+    "save_11a80ec3": {
+        "message": "ذخیره سازی"
+    },
+    "search_280d00bd": {
+        "message": "جستجو"
+    },
+    "selected_274ce24f": {
+        "message": "انتخاب شده"
+    },
+    "size_b30e1077": {
+        "message": "اندازه"
+    },
+    "something_went_wrong_89195131": {
+        "message": "اشکالی رخ داده است."
+    },
+    "sort_by_e75f9e3e": {
+        "message": "مرتب کردن بر اساس"
+    },
+    "start_over_f7552aa9": {
+        "message": "شروع دوباره"
+    },
+    "submit_a3cc6859": {
+        "message": "ارسال"
+    },
+    "submitted_318fad53": {
+        "message": "ارسال شد"
+    },
+    "syllabus_f191f65b": {
+        "message": "سرفصل"
+    },
+    "time_2b5aac58": {
+        "message": "زمان"
+    },
+    "title_ee03d132": {
+        "message": "عنوان"
+    },
+    "to_do_1d554f36": {
+        "message": "برای اقدام"
+    },
+    "to_do_items_loading_d1cdfcd5": {
+        "message": "در حال بارگزاری موارد اقدام"
+    },
+    "today_76e10f9c": {
+        "message": "امروز"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "فردا"
+    },
+    "unpublished_dfd8801": {
+        "message": "منتشر نشده"
+    },
+    "upload_file_fd2361b8": {
+        "message": "بارگذاری فایل"
+    },
+    "upload_media_ce31135a": {
+        "message": "بارگذاری رسانه"
+    },
+    "url_22a5f3b8": {
+        "message": "نشانی اینترنتی"
+    },
+    "video_player_b371005": {
+        "message": "پخش کننده فیلم"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "صفحه اصلی ویکی"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "دیروز"
+    }
+}

@@ -1,0 +1,632 @@
+{
+    "accessibility_checker_b3af1f6c": {
+        "message": "Перевірка доступності"
+    },
+    "add_8523c19b": {
+        "message": "Додати"
+    },
+    "add_to_do_7537af64": {
+        "message": "Додайте до плану роботи"
+    },
+    "add_to_do_7def3c37": {
+        "message": "Додайте до плану роботи"
+    },
+    "address_3159962f": {
+        "message": "Адреса:"
+    },
+    "align_11050992": {
+        "message": "Вирівняти"
+    },
+    "align_center_ca078feb": {
+        "message": "Вирівняти по центру"
+    },
+    "align_left_e9f1f93b": {
+        "message": "Вирівняти по лівому краю"
+    },
+    "align_right_9bad3ac1": {
+        "message": "Вирівняти по правому краю"
+    },
+    "alignment_and_indentation_f7de34bf": {
+        "message": "Вирівнювання та відступ"
+    },
+    "all_4321c3a1": {
+        "message": "Всі"
+    },
+    "all_day_fb42c4fc": {
+        "message": "Весь день"
+    },
+    "all_items_loaded_aa256183": {
+        "message": "Всі елементи завантажені"
+    },
+    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+        "message": "Виникла помилка при спробі відхилити цю можливість."
+    },
+    "an_error_occurred_generating_the_file_preview_cf259955": {
+        "message": " Сталася помилка під час створення попереднього перегляду файлу"
+    },
+    "announcement_fb4cb645": {
+        "message": "Оголошення"
+    },
+    "announcement_list_da155734": {
+        "message": "Список оголошень"
+    },
+    "announcements_a4b8ed4a": {
+        "message": "Оголошення"
+    },
+    "apps_54d24a47": {
+        "message": "Застосунки"
+    },
+    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+        "message": "Ви впевнені, що хочете видалити цей елемент планувальника?"
+    },
+    "aspect_ratio_will_be_preserved_cb5fdfb8": {
+        "message": "Співвідношення сторін збережеться"
+    },
+    "assignment_976578a8": {
+        "message": "Завдання"
+    },
+    "assignments_1e02582c": {
+        "message": "Завдання"
+    },
+    "assignmenttype_title_6612d008": {
+        "message": "{ assignmentType } { title }."
+    },
+    "assignmenttype_title_all_day_on_datetime_9768903c": {
+        "message": "{ assignmentType } { title }, всі дні о { datetime }."
+    },
+    "assignmenttype_title_at_datetime_478f0709": {
+        "message": "{ assignmentType } { title }, в { datetime }."
+    },
+    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+        "message": "{ assignmentType } { title }, в { datetime } до { endTime }"
+    },
+    "assignmenttype_title_due_datetime_a112d8ff": {
+        "message": "{ assignmentType } { title }, до { datetime }."
+    },
+    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+        "message": "{ assignmentType } { title } має бути виконано { datetime }."
+    },
+    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+        "message": "{ assignmentType } { title } помічено як завершене."
+    },
+    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+        "message": "{ assignmentType } { title } не помічено як завершене."
+    },
+    "assignmenttype_title_posted_datetime_cab69444": {
+        "message": "{ assignmentType } { title } розміщено { datetime }."
+    },
+    "assignmenttype_title_reminder_datetime_33fa66d5": {
+        "message": "{ assignmentType } { title }, нагадування { datetime }."
+    },
+    "beginning_of_your_to_do_history_61ef2dce": {
+        "message": "Початок вашої історії завдань"
+    },
+    "calendar_a8563bb2": {
+        "message": "Календар:"
+    },
+    "calendar_event_89aadc1c": {
+        "message": "Календарна подія"
+    },
+    "cancel_caeb1e68": {
+        "message": "Скасувати"
+    },
+    "canvas_planner_98ed106": {
+        "message": "Планувальник Canvas"
+    },
+    "canvas_plugins_705a5016": {
+        "message": "Canvas Модулі"
+    },
+    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+        "message": "Натисніть на будь-яку сторінку, щоб вставити посилання на цю сторінку."
+    },
+    "click_to_embed_imagename_c41ea8df": {
+        "message": "Натисніть на вбудоване { imageName }"
+    },
+    "click_to_insert_a_link_into_the_editor_c19613aa": {
+        "message": "Натисніть, щоб вставити  посилання на редактор."
+    },
+    "close_d634289d": {
+        "message": "Закрити"
+    },
+    "close_opportunity_center_popup_9907d981": {
+        "message": "Закрити спливаюче вікно Центру можливостей"
+    },
+    "collaborations_5c56c15f": {
+        "message": "Сумісна робота"
+    },
+    "content_type_2cf90d95": {
+        "message": "Тип вмісту"
+    },
+    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+        "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}"
+    },
+    "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+        "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
+    },
+    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
+    },
+    "course_8a63b4a3": {
+        "message": "Курс"
+    },
+    "course_files_62deb8f8": {
+        "message": "Файли курсу"
+    },
+    "course_navigation_dd035109": {
+        "message": "Навігація курсу"
+    },
+    "course_to_do_bcbbab54": {
+        "message": "Зробити { course }"
+    },
+    "custom_6979cd81": {
+        "message": "Звичай"
+    },
+    "date_at_time_dbdb1b99": {
+        "message": "{ date } в { time }"
+    },
+    "date_ee500367": {
+        "message": "Дата"
+    },
+    "date_is_not_a_valid_date_4ef9f8ba": {
+        "message": "#{ date } не є допустимою датою."
+    },
+    "date_is_required_8660ec22": {
+        "message": "Потрібно вказати дату"
+    },
+    "date_time_d9fbf2d7": {
+        "message": "Дата та час:"
+    },
+    "decrease_indent_de6343ab": {
+        "message": "Зменшити відступ"
+    },
+    "delete_a6efa79d": {
+        "message": "Видалити"
+    },
+    "details_98a31b68": {
+        "message": "Подробиці"
+    },
+    "details_a6f427c3": {
+        "message": "Подробиці:"
+    },
+    "dimensions_45ddb7b7": {
+        "message": "Розміри"
+    },
+    "discussion_6719c51d": {
+        "message": "Обговорення"
+    },
+    "discussions_a5f96392": {
+        "message": "Обговорення"
+    },
+    "discussions_index_6c36ced": {
+        "message": "Індекс обговорення"
+    },
+    "dismiss_itemtitle_a9fae1b3": {
+        "message": "Відхилити { itemTitle }"
+    },
+    "dismiss_opportunityname_5995176f": {
+        "message": "Відхилити { opportunityName }"
+    },
+    "dismissed_8b0b1fc9": {
+        "message": "Відхилено"
+    },
+    "dismissed_opportunities_f0826640": {
+        "message": "Відхилені можливості"
+    },
+    "done_54e3d4b6": {
+        "message": "Готово"
+    },
+    "due_5d7267be": {
+        "message": "Очікується:"
+    },
+    "due_date_124fdd99": {
+        "message": "До: { date }"
+    },
+    "due_multiple_dates_cc0ee3f5": {
+        "message": "Очікується: Кілька дат"
+    },
+    "edit_c5fbea07": {
+        "message": "Редагувати"
+    },
+    "edit_title_72e5a21e": {
+        "message": "Редагувати { title }"
+    },
+    "embed_image_1080badc": {
+        "message": "Вставити забраження"
+    },
+    "error_loading_grades_e0b38f4d": {
+        "message": "Помилка завантаження оцінок"
+    },
+    "error_loading_more_items_3f109d9f": {
+        "message": "Помилка завантаження інших елементів"
+    },
+    "error_loading_past_items_2881dbb1": {
+        "message": "Помилка завантаження попередніх елементів"
+    },
+    "excused_cf8792eb": {
+        "message": "Виправдано"
+    },
+    "failed_to_delete_to_do_64edff49": {
+        "message": "Не вдалося видалити завдання"
+    },
+    "failed_to_get_new_activity_17e7ec7c": {
+        "message": "Не вдалося отримати нову активність"
+    },
+    "failed_to_load_opportunities_52ab6404": {
+        "message": "Не вдалося завантажити можливості"
+    },
+    "failed_to_save_to_do_ddc7503b": {
+        "message": "Не вдалося зберегти завдання"
+    },
+    "feedback_6dcc1991": {
+        "message": "Зворотній зв''язок"
+    },
+    "files_c300e900": {
+        "message": "Файли"
+    },
+    "files_index_af7c662b": {
+        "message": "Індекс файлів"
+    },
+    "generating_preview_45b53be0": {
+        "message": "Генерується попередній перегляд..."
+    },
+    "go_to_card_view_dashboard_9d03970e": {
+        "message": "Перейти на Панель інструментів Card View"
+    },
+    "graded_25cd3fcd": {
+        "message": "Оцінено"
+    },
+    "grades_a61eba0a": {
+        "message": "Оцінки"
+    },
+    "grades_are_loading_c899652d": {
+        "message": "Оцінки завантажені"
+    },
+    "grades_loaded_5056277c": {
+        "message": "Оцінки завантажені"
+    },
+    "group_navigation_99f191a": {
+        "message": "Навігація групи"
+    },
+    "header_f28f73db": {
+        "message": "Заголовок"
+    },
+    "images_7ce26570": {
+        "message": "Зображення"
+    },
+    "increase_indent_6d550a4a": {
+        "message": "Збільшити відступ"
+    },
+    "insert_equella_links_49a8dacd": {
+        "message": "Вставити посилання Equella"
+    },
+    "insert_link_6dc23cae": {
+        "message": "Вставити посилання"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Вставити математичну формулу"
+    },
+    "invalid_file_type_881cc9b2": {
+        "message": "Недійсний тип файлу"
+    },
+    "items_completed_items_plural_1_item_other_items_717d579f": {
+        "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
+    },
+    "keyboard_shortcuts_ed1844bd": {
+        "message": "Гарячі клавіши"
+    },
+    "late_2be42b88": {
+        "message": "Пізніше"
+    },
+    "link_7262adec": {
+        "message": "Посилання"
+    },
+    "link_to_other_content_in_the_course_879163b5": {
+        "message": "Посилання на інший вміст у курсі."
+    },
+    "link_to_other_content_in_the_group_3fe25379": {
+        "message": "Посилання на інший вміст у групі."
+    },
+    "links_14b70841": {
+        "message": "Посилання"
+    },
+    "load_more_a36f9cf9": {
+        "message": "Завантажити більше"
+    },
+    "load_more_results_460f49a9": {
+        "message": "Завантажити більше результатів"
+    },
+    "load_prior_dates_f2b0f6f0": {
+        "message": "Завантажте попередні дати"
+    },
+    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+        "message": "Завантажено { count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n}"
+    },
+    "loading_25990131": {
+        "message": "Завантаження..."
+    },
+    "loading_725811ca": {
+        "message": "завантаження"
+    },
+    "loading_bde52856": {
+        "message": "Завантаження"
+    },
+    "loading_failed_b3524381": {
+        "message": "Невдале завантаження..."
+    },
+    "loading_grades_c842c887": {
+        "message": "Завантаження оцінок"
+    },
+    "loading_past_items_ca499e75": {
+        "message": "Завантаження попередніх елементів"
+    },
+    "loading_planner_items_947a813d": {
+        "message": "Завантаження елементів планувальника"
+    },
+    "location_3b6ff307": {
+        "message": "Місцезнаходження:"
+    },
+    "looks_like_there_isn_t_anything_here_d9bcef49": {
+        "message": "Виглядає наче тут нічого немає"
+    },
+    "media_af190855": {
+        "message": "Носій інформації"
+    },
+    "missing_1a256b3b": {
+        "message": "Відсутній"
+    },
+    "missing_items_for_title_516511f8": {
+        "message": "Відсутні елементи для { title }"
+    },
+    "modules_c4325335": {
+        "message": "Розділи"
+    },
+    "my_files_eea33f44": {
+        "message": "Мої файли"
+    },
+    "my_grades_98834476": {
+        "message": "Мої оцінки"
+    },
+    "new_13daf639": {
+        "message": "Новий"
+    },
+    "new_activity_8b84847d": {
+        "message": "Нова діяльність"
+    },
+    "new_activity_for_title_14c9c3af": {
+        "message": "Нова діяльність для { title }"
+    },
+    "new_opportunities_7d349c4d": {
+        "message": "Нові можливості"
+    },
+    "next_month_749b1778": {
+        "message": "Наступний місяць"
+    },
+    "next_page_d2a39853": {
+        "message": "Наступна Сторінка"
+    },
+    "no_due_dates_assigned_e8f5bac8": {
+        "message": "Термін виконання не призначено"
+    },
+    "no_grade_3b4d7f3e": {
+        "message": "Оцінка відсутня"
+    },
+    "no_results_940393cf": {
+        "message": "Результати відсутні."
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "Зараз нічого"
+    },
+    "nothing_here_needs_attention_c4eaded6": {
+        "message": "Тут ніщо не вимагає уваги."
+    },
+    "nothing_more_to_do_b665da42": {
+        "message": "План роботи порожній"
+    },
+    "nothing_new_needs_attention_3ac548d4": {
+        "message": "Ніщо нове не потребує уваги."
+    },
+    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+        "message": "На сьогодні нічого не заплановано. Виберіть елемент, який використовували останнім."
+    },
+    "nothing_planned_today_selecting_next_item_f6718aa": {
+        "message": "На сьогодні нічого не заплановано. Виберіть наступний елемент."
+    },
+    "nothing_planned_yet_8675ffe9": {
+        "message": "Досі нічого не заплановано"
+    },
+    "numpoints_points_8621a43b": {
+        "message": "{ numPoints } балів"
+    },
+    "only_most_recent_grading_period_shown_f1ad6458": {
+        "message": "*Покано тільки останній період оцінювання."
+    },
+    "open_this_keyboard_shortcuts_dialog_9658b83a": {
+        "message": "Вікрити діалогове вікно гарячих клавіш"
+    },
+    "optional_add_course_ef0d70fc": {
+        "message": "Опціонально: Додати курс"
+    },
+    "options_3ab0ea65": {
+        "message": "Параметри"
+    },
+    "page_50c4823d": {
+        "message": "Сторінка"
+    },
+    "pages_e5414c2c": {
+        "message": "Сторінки"
+    },
+    "peer_review_74f26a13": {
+        "message": "Експертна оцінка"
+    },
+    "peer_review_for_itemtitle_358cb413": {
+        "message": "Експертна оцінка для { itemTitle }"
+    },
+    "people_b4ebb13c": {
+        "message": "Люди"
+    },
+    "points_bceb5005": {
+        "message": "бали"
+    },
+    "points_points_63e59cce": {
+        "message": "{ points } балів"
+    },
+    "previous_month_bb1e3c84": {
+        "message": "Попередній місяць"
+    },
+    "previous_page_928fc112": {
+        "message": "Попередня сторінка"
+    },
+    "pts_699bd9aa": {
+        "message": "бали"
+    },
+    "published_c944a23d": {
+        "message": "опубліковано"
+    },
+    "quiz_e0dcce8f": {
+        "message": "Контрольна робота"
+    },
+    "quizzes_7e598f57": {
+        "message": "Контрольні Роботи"
+    },
+    "record_7c9448b": {
+        "message": "Записати"
+    },
+    "record_upload_media_5fdce166": {
+        "message": "Запис/завантаження медіа"
+    },
+    "recording_98da6bda": {
+        "message": "Запис"
+    },
+    "reminder_date_4564d12d": {
+        "message": "Нагадування: { date }"
+    },
+    "replies_4a8577c8": {
+        "message": "Відповіді"
+    },
+    "rich_content_editor_2708ef21": {
+        "message": "Редактор збагаченого контенту"
+    },
+    "save_11a80ec3": {
+        "message": "Зберегти"
+    },
+    "scroll_up_to_see_your_history_19b14cad": {
+        "message": "Прокрутіть вверх, щоб побачити свою історію!"
+    },
+    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+        "message": "Прокрутіть до попереднього елементу з новою діяльністю."
+    },
+    "search_280d00bd": {
+        "message": "Пошук"
+    },
+    "selected_274ce24f": {
+        "message": "Обраний"
+    },
+    "show_all_ae37d610": {
+        "message": "Показати все"
+    },
+    "show_my_grades_ebd08684": {
+        "message": "Показати мої оцінки"
+    },
+    "size_b30e1077": {
+        "message": "Розмір"
+    },
+    "start_over_f7552aa9": {
+        "message": "Почати з початку"
+    },
+    "startdate_to_enddate_d245175b": {
+        "message": "{ startDate } до { endDate }"
+    },
+    "startdatetime_enddatetime_20abc10e": {
+        "message": "{ startDateTime } - { endDateTime }"
+    },
+    "startdatetime_endtime_49741bbe": {
+        "message": "{ startDateTime } - { endTime }"
+    },
+    "starttime_to_endtime_d7cc249d": {
+        "message": "{ startTime } до { endTime }"
+    },
+    "submit_a3cc6859": {
+        "message": "Підтвердити"
+    },
+    "submitted_318fad53": {
+        "message": "Підтверджено"
+    },
+    "success_to_do_created_e34ed395": {
+        "message": "Успіх: План робіт створений"
+    },
+    "syllabus_f191f65b": {
+        "message": "Навчальний план"
+    },
+    "task_16b0ef38": {
+        "message": "Завдання"
+    },
+    "the_date_and_time_this_to_do_is_due_74c823d4": {
+        "message": "Дата та час, до якого це потрібно виконати"
+    },
+    "there_are_no_points_associated_with_this_item_449c712a": {
+        "message": "З цим елементом не пов''язані бали"
+    },
+    "time_2b5aac58": {
+        "message": "Час"
+    },
+    "title_ee03d132": {
+        "message": "Назва"
+    },
+    "title_is_required_6ddcab69": {
+        "message": "заголовок обов''язковий"
+    },
+    "to_do_1d554f36": {
+        "message": "Зробити"
+    },
+    "to_do_date_4b211ad0": {
+        "message": "Зробити: { date }"
+    },
+    "to_do_items_loading_d1cdfcd5": {
+        "message": "Завантажувати елементи плану робіт"
+    },
+    "today_76e10f9c": {
+        "message": "Сьогодні"
+    },
+    "today_at_date_8ac30d6": {
+        "message": "Сьогодні в { date }"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "Завтра"
+    },
+    "tomorrow_at_date_b53f2cf1": {
+        "message": "Завтра в { date }"
+    },
+    "unable_to_mark_as_complete_8141856d": {
+        "message": "Неможливо позначити як завершений."
+    },
+    "unpublished_dfd8801": {
+        "message": "Неопублікований"
+    },
+    "upload_media_ce31135a": {
+        "message": "Завантажити медіа контент"
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "video_player_b371005": {
+        "message": "Відеопрогравач"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "Домашня сторінка Wiki"
+    },
+    "yesterday_at_date_1aa6d18e": {
+        "message": "Вчора в { date }"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "Вчора"
+    },
+    "you_have_media_feedback_f5f9aba8": {
+        "message": "Ви маєте відгук у вигляді медіа файлу."
+    },
+    "you_must_provide_a_date_and_time_a86839d2": {
+        "message": "Ви маєте задати дату та час."
+    },
+    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+        "message": "Ви прокрутили назад до самого першого завдання!"
+    }
+}
