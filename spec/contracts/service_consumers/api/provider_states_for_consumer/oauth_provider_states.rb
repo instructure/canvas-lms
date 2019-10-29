@@ -54,4 +54,23 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
         to receive(:get_jwk_from_url).and_return(jwk)
     end
   end
+
+  provider_state 'a course with live events' do
+    set_up do
+      Canvas::Security.class_eval do
+        @old_decode_jwt = self.method(:decode_jwt)
+
+        def self.decode_jwt(body, keys = [])
+          @old_decode_jwt.call(body, keys, ignore_expiration: true)
+        end
+      end
+    end
+
+    tear_down do
+      Canvas::Security.class_eval do
+        define_singleton_method(:decode_jwt, @old_decode_jwt)
+        remove_instance_variable(:@old_decode_jwt)
+      end
+    end
+  end
 end

@@ -23,7 +23,7 @@ class PactApiConsumerProxy
   def call(env)
     # Users calling the API will know the user name of the
     # user that they want to identify as. For example, "Admin1".
-    if expects_auth_header?(env)
+    if expects_auth_header_added?(env)
       user = find_requesting_user(env)
 
       # You can create an access token without having a pseudonym;
@@ -44,8 +44,24 @@ class PactApiConsumerProxy
 
   private
 
-  def expects_auth_header?(env)
-    env[AUTH_HEADER]
+  def expects_auth_header_added?(env)
+    # If the auth header exists, and can *not* be read
+    # as a JWT, then we add an access token to it.
+    # If it can be read as a JWT, then leave it as it is.
+    if env[AUTH_HEADER]
+      begin
+        JSON::JWT.decode(env[AUTH_HEADER].split.last) # Remove the "Bearer "
+      rescue JSON::JWT::InvalidFormat
+        return true
+      rescue Exception
+        # Other exceptions (like VerificationFailed) are OK -- we do not
+        # expect a new token to be filled in if we get here. JWT
+        # verification should be stubbed in the provider state.
+        return false
+      end
+    else
+      false
+    end
   end
 
   def find_requesting_user(env)
