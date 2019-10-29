@@ -19518,6 +19518,10 @@ timezone@^1.0.18:
   resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.22.tgz#a1e23d4250a8810fcf0d122f1c9b41e50e5c633c"
   integrity sha512-xDkfblPtNhzU0fYm5FhWNzqECX2mzvpBgd+Pf5F8yAQmbxeWL4+6f496iGqdu0WllF7TxSlE6mmRH4uFnACVuQ==
 
+"timezone@https://registry.npmjs.org/@brentburgoyne/timezone/-/timezone-1.0.24.tgz":
+  version "1.0.24"
+  resolved "https://registry.npmjs.org/@brentburgoyne/timezone/-/timezone-1.0.24.tgz#b2e0d85d21b74aed1c7acd460aae38c2f32092e3"
+
 timsort@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/timsort/-/timsort-0.3.0.tgz#405411a8e7e6339fe64db9a234de11dc31e02bd4"
