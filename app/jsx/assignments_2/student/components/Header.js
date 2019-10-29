@@ -85,7 +85,7 @@ class Header extends React.Component {
     // be used, this is a quick and dirty measure that will not persist to consumer use.
     return (
       <Flex.Item as="div" align="end" textAlign="end">
-        {I18n.t('Calculated by:')}
+        {I18n.t('Calculated by: ')}
         <a>{I18n.t('Most Recent')}</a>
       </Flex.Item>
     )
