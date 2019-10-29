@@ -145,7 +145,7 @@ describe "courses" do
 
     describe 'course wizard' do
       def go_to_checklist
-        expect_new_page_load { get "/courses/#{@course.id}" }
+        get "/courses/#{@course.id}"
         f(".wizard_popup_link").click
         wait_for(method: nil, timeout: 5) {
           expect(f(".ic-wizard-box")).to be_displayed
