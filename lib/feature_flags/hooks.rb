@@ -130,8 +130,11 @@ module FeatureFlags
       end
     end
 
-    def self.analytics_2_after_state_change_hook(_user, context,_old_state, _new_state)
-      Lti::NavigationCache.new(context).invalidate_cache_key
+    def self.analytics_2_after_state_change_hook(_user, context, _old_state, _new_state)
+      # if we clear the nav cache before HAStore clears, it can be recached with stale FF data
+      nav_cache = Lti::NavigationCache.new(context.root_account)
+      nav_cache.send_later_if_production_enqueue_args(:invalidate_cache_key, {run_at: 1.minute.from_now, max_attempts: 1})
+      nav_cache.send_later_if_production_enqueue_args(:invalidate_cache_key, {run_at: 5.minute.from_now, max_attempts: 1})
     end
   end
 end
