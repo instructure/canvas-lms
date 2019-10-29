@@ -1976,6 +1976,8 @@ class CoursesController < ApplicationController
           js_bundle :wiki_page_show
           css_bundle :wiki_page, :tinymce
         when 'modules'
+          js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
+
           js_bundle :context_modules
           css_bundle :content_next, :context_modules2
         when 'assignments'
