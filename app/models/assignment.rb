@@ -1117,7 +1117,7 @@ class Assignment < ActiveRecord::Base
 
     p.dispatch :submissions_posted
     p.to { |assignment|
-      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+      assignment.course.participating_instructors
     }
     p.data(&:posting_params_for_notifications)
     p.whenever { |assignment|
