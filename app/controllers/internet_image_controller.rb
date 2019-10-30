@@ -119,7 +119,7 @@ class InternetImageController < ApplicationController
   # @argument id [Required, String]
   #   The ID from the image_search result.
   #
-  # @response message Confirmation success message or error
+  # @response_field message Confirmation success message or error
 
   def image_selection
     return render json: { message: 'id param is required'}, status: :bad_request unless params[:id]
