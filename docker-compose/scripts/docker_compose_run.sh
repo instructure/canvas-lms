@@ -9,8 +9,12 @@ fi
 echo "Checking that bundle install doesn't need to run"
 bundle check &> /dev/null
 if [ $? -ne 0 ]; then
-  echo "Bundle check FAILED / ERROR. Make sure the bundle install <ARGS> worked in the Docker container build"
-  exit 1
+  echo "Bundle check FAILED / ERROR. Re-running bundle install b/c you're probably trying to update the gems and want to generate a new Gemfile.lock."
+  echo "To get rid of this error and speed up Docker restarts, do a rebuild of the container image once you get the Gemfile.lock updated."
+  echo ""
+  echo "bundle install --path vendor/bundle --without=sqlite mysql --jobs 4"
+  bundle install --path vendor/bundle --without=sqlite mysql --jobs 4
+  bundle check &> /dev/null || { echo >&2 "Error: Failed running bundle install and Gemfile.lock does not match the installed gems."; exit 1; }
 else
   echo "Ok!"
 fi

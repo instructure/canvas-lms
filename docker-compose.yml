@@ -46,6 +46,8 @@ services:
       - ./app:/app/app
       - ./lib:/app/lib
       - ./config:/app/config
+      - ./Gemfile.d:/app/Gemfile.d
+      - ./Gemfile.lock:/app/Gemfile.lock
       - ./log:/app/log
       - ./script:/app/script
       - ./spec:/app/spec
