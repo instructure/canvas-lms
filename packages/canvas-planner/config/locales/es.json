@@ -12,7 +12,7 @@
     "message": "Todo el día"
   },
   "all_items_loaded_aa256183": {
-    "message": "Todos los elementos cargados"
+    "message": "Todos los items cargados"
   },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Ocurrió un error al intentar descartar la oportunidad."
@@ -21,7 +21,7 @@
     "message": "Anuncio"
   },
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "¿Está seguro de que desea eliminar este elemento del planificador?"
+    "message": "¿Está seguro de que desea eliminar este item del planificador?"
   },
   "assignment_976578a8": {
     "message": "Tarea"
@@ -39,7 +39,7 @@
     "message": "{ assignmentType } { title }, a las { datetime } hasta las { endTime }"
   },
   "assignmenttype_title_due_datetime_a112d8ff": {
-    "message": "{ assignmentType } { title }, fecha límite { datetime }."
+    "message": "{ assignmentType } { title }, fecha de entrega { datetime }."
   },
   "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
     "message": "{ assignmentType } { title } tiene un tiempo para tareas por hacer a las { datetime }."
@@ -78,7 +78,7 @@
     "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidad}\n  other {# oportunidades}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Mostrar # elemento completado}\n  other {Mostrar # elementos completados}\n}"
+    "message": "{ count, plural,\n    one {Mostrar # item completado}\n  other {Mostrar # items completados}\n}"
   },
   "course_8a63b4a3": {
     "message": "Curso"
@@ -111,7 +111,7 @@
     "message": "Detalles:"
   },
   "discussion_6719c51d": {
-    "message": "Foro"
+    "message": "Foro de discusión"
   },
   "dismiss_itemtitle_a9fae1b3": {
     "message": "Descartar { itemTitle }"
@@ -126,10 +126,10 @@
     "message": "Oportunidades descartadas"
   },
   "due_5d7267be": {
-    "message": "Fecha límite:"
+    "message": "Fecha de entrega:"
   },
   "due_date_124fdd99": {
-    "message": "Fecha límite: { date }"
+    "message": "Fecha de entrega: { date }"
   },
   "edit_c5fbea07": {
     "message": "Editar"
@@ -141,10 +141,10 @@
     "message": "Error al cargar las calificaciones"
   },
   "error_loading_more_items_3f109d9f": {
-    "message": "Error al cargar más elementos"
+    "message": "Error al cargar más items"
   },
   "error_loading_past_items_2881dbb1": {
-    "message": "Error al cargar elementos anteriores"
+    "message": "Error al cargar items anteriores"
   },
   "excused_cf8792eb": {
     "message": "Justificado"
@@ -162,7 +162,7 @@
     "message": "Error al guardar tareas por hacer"
   },
   "feedback_6dcc1991": {
-    "message": "Retroalimentación"
+    "message": "Valoración"
   },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Vaya a la vista de tarjetas en el tablero"
@@ -180,7 +180,7 @@
     "message": "{ items } { items, plural,\n     =1 {elemento}\n  other {elementos}\n} completado(s)"
   },
   "late_2be42b88": {
-    "message": "Atrasado"
+    "message": "Con atraso"
   },
   "load_more_a36f9cf9": {
     "message": "Cargar más"
@@ -189,7 +189,7 @@
     "message": "Cargar fechas anteriores"
   },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-    "message": "{ count, plural,\n     =0 {# elementos}\n    one {# elemento}\n  other {# elementos}\n} cargado(s)"
+    "message": "{ count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n} cargado(s)"
   },
   "loading_25990131": {
     "message": "Cargando..."
@@ -201,10 +201,10 @@
     "message": "Cargando calificaciones"
   },
   "loading_past_items_ca499e75": {
-    "message": "Cargando elementos anteriores"
+    "message": "Cargando items anteriores"
   },
   "loading_planner_items_947a813d": {
-    "message": "Cargando elementos del planificador"
+    "message": "Cargando items del planificador"
   },
   "location_3b6ff307": {
     "message": "Ubicación:"
@@ -213,10 +213,10 @@
     "message": "Parece que no hay nada aquí"
   },
   "missing_1a256b3b": {
-    "message": "Faltante"
+    "message": "Deficiente"
   },
   "missing_items_for_title_516511f8": {
-    "message": "Elementos faltantes para { title }"
+    "message": "Items faltantes para { title }"
   },
   "my_grades_98834476": {
     "message": "Mis calificaciones"
@@ -234,10 +234,10 @@
     "message": "Nuevas oportunidades"
   },
   "next_month_749b1778": {
-    "message": "Mes siguiente"
+    "message": "Próximo mes"
   },
   "no_due_dates_assigned_e8f5bac8": {
-    "message": "No hay fechas límite asignadas"
+    "message": "No hay fechas de entrega asignadas"
   },
   "no_grade_3b4d7f3e": {
     "message": "Sin calificación"
@@ -255,10 +255,10 @@
     "message": "No hay nada nuevo que requiera atención."
   },
   "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-    "message": "Nada planificado para hoy. Seleccionar el elemento más reciente."
+    "message": "Nada planificado para hoy. Seleccionar el item más reciente."
   },
   "nothing_planned_today_selecting_next_item_f6718aa": {
-    "message": "Nada planificado para hoy. Seleccionar el elemento siguiente."
+    "message": "Nada planificado para hoy. Seleccionar el item siguiente."
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Nada planificado aún"
@@ -294,10 +294,10 @@
     "message": "Mes anterior"
   },
   "pts_699bd9aa": {
-    "message": "puntos"
+    "message": "pts"
   },
   "quiz_e0dcce8f": {
-    "message": "Evaluación"
+    "message": "Examen"
   },
   "reminder_date_4564d12d": {
     "message": "Recordatorio: { date }"
@@ -312,7 +312,7 @@
     "message": "¡Desplácese para ver su historial!"
   },
   "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-    "message": "Se desplaza hasta el elemento anterior con nueva actividad."
+    "message": "Se desplaza hasta el item anterior con nueva actividad."
   },
   "show_all_ae37d610": {
     "message": "Mostrar todos"
@@ -321,7 +321,7 @@
     "message": "Mostrar mis calificaciones"
   },
   "startdate_to_enddate_d245175b": {
-    "message": "{ startDate } hasta { endDate }"
+    "message": "{ startDate } a { endDate }"
   },
   "startdatetime_enddatetime_20abc10e": {
     "message": "{ startDateTime } - { endDateTime }"
@@ -330,10 +330,10 @@
     "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
-    "message": "{ startTime } hasta { endTime }"
+    "message": "{ startTime } a { endTime }"
   },
   "submitted_318fad53": {
-    "message": "Presentado"
+    "message": "Entregado"
   },
   "success_to_do_created_e34ed395": {
     "message": "Éxito: Tarea por hacer creada"
@@ -342,10 +342,10 @@
     "message": "Tarea"
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
-    "message": "Se vence la fecha y la hora límite para hacer esto"
+    "message": "Se vence la fecha y la hora de entrega para hacer esto"
   },
   "there_are_no_points_associated_with_this_item_449c712a": {
-    "message": "No hay puntos asociados con este elemento"
+    "message": "No hay puntos asociados con este item"
   },
   "time_2b5aac58": {
     "message": "Hora"
@@ -363,7 +363,7 @@
     "message": "Por hacer: { date }"
   },
   "to_do_items_loading_d1cdfcd5": {
-    "message": "Cargando los elementos por hacer"
+    "message": "Cargando los items por hacer"
   },
   "today_76e10f9c": {
     "message": "Hoy"
@@ -378,7 +378,7 @@
     "message": "Mañana a las { date }"
   },
   "unable_to_mark_as_complete_8141856d": {
-    "message": "No se puede marcar como completada."
+    "message": "No se puede marcar como completa."
   },
   "yesterday_at_date_1aa6d18e": {
     "message": "Ayer a las { date }"
@@ -387,7 +387,7 @@
     "message": "Ayer"
   },
   "you_have_media_feedback_f5f9aba8": {
-    "message": "Tiene una devolución de medios."
+    "message": "Tiene una valoración de multimedia."
   },
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "Debe brindar una fecha y una hora."
