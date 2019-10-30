@@ -1,6 +1,7 @@
-# Help with logging on Heroku. Also helps with static assets, but I'm focused on logging right now.
-# Commented out until we actually cutover to Heroku since this disables the current logging on our AWS EC2 instance
-#gem 'rails_12factor', group: :production
+# Make sure we log to stdout for compatibility with Heroku's logging infrastructure.
+# This also helps with static assets, but I'm focused on logging right now so I don't know
+# the implications there.
+gem 'rails_12factor', group: :production
 
 # Structured JSON logging to stdout.
 gem "logjam_agent", github: "beyond-z/logjam_agent"

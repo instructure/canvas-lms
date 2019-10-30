@@ -748,6 +748,11 @@ GEM
       activemodel (~> 4.0)
     rails-patch-json-encode (0.0.1)
       multi_json
+    rails_12factor (0.0.3)
+      rails_serve_static_assets
+      rails_stdout_logging
+    rails_serve_static_assets (0.0.5)
+    rails_stdout_logging (0.0.5)
     railties (4.0.13)
       actionpack (= 4.0.13)
       activesupport (= 4.0.13)
@@ -1106,6 +1111,7 @@ DEPENDENCIES
   rails (= 4.0.13)
   rails-observers (= 0.1.2)
   rails-patch-json-encode (= 0.0.1)
+  rails_12factor
   rake (= 10.5.0)
   ratom-nokogiri (= 0.10.4)
   rb-fchange
