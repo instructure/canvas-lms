@@ -6,12 +6,12 @@ require File.expand_path('../../config/boot',  expanded_path)
 
 require 'base64'
 require 'json'
-require 'redis-store'
+require 'redis'
 
 # this purposely has no config so that it can spin up quickly;
 # just copy this script elsewhere and modify if you have a
 # non-default configuration
-cache = Redis::Store::Factory.create
+cache = Redis.new
 
 data = JSON.load(STDIN.read)
 data.each do |event|
