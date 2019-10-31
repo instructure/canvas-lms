@@ -427,13 +427,19 @@ class GradeCalculator
 
     @course.touch
 
-    @course.shard.activate do
-      save_course_and_grading_period_scores
-      save_course_and_grading_period_metadata
-      score_rows = group_score_rows
-      if @grading_period.nil? && score_rows.any?
-        dropped_rows = group_dropped_rows
-        save_assignment_group_scores(score_rows.join(','), dropped_rows.join(','))
+    save_scores_in_transaction
+  end
+
+  def save_scores_in_transaction
+    Score.transaction do
+      @course.shard.activate do
+        save_course_and_grading_period_scores
+        save_course_and_grading_period_metadata
+        score_rows = group_score_rows
+        if @grading_period.nil? && score_rows.any?
+          dropped_rows = group_dropped_rows
+          save_assignment_group_scores(score_rows.join(','), dropped_rows.join(','))
+        end
       end
     end
   end
