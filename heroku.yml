@@ -17,10 +17,4 @@ build:
     RAILS_ENV: production
     DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
 run:
-#  web: bundle exec puma -C config/puma.rb
-# TODO:
-  # Temporarily try using rails to see if the app comes up. Somethign is crashing...
-  # Nope! Let's try just using bash and seeing if we can connect
-  #web: bundle exec bin/rails s
-  # lets' just run any command that shoiuldn't exit
-  web: tail -f /app/log/*
+  web: bundle exec puma -C config/puma.rb
