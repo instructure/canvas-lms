@@ -1,5 +1,6 @@
 common: &default_settings
-  logger: rails
+  # Options are: rails, syslog, stdout
+  logger: <%= ENV['LOGGER_TYPE'] %>
   
   # Log Level seems like the only setting here we would want to change without a code release.
   log_level: <%= ENV['LOG_LEVEL'] %> 

@@ -77,6 +77,9 @@ module CanvasRails
         opts[:include_pid] = true if log_config["include_pid"] == true
         config.logger = SyslogWrapper.new(ident, facilities, opts)
         config.logger.level = log_level
+      when "stdout"
+        # Nothing to do here. The rails12factor gem configures this for us.
+        pp "Rails.logger is configured to log to STDOUT."
       else
         log_path = config.paths['log'].first
 
