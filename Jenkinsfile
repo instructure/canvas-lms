@@ -35,6 +35,45 @@ def fetchFromGerrit = { String repo, String path, String customRepoDestination =
   })
 }
 
+def fullSuccessName(name) {
+  return "_successes/${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}-${name}-success"
+}
+
+def hasSuccess(name) {
+  copyArtifacts(filter: "_successes/*",
+                optional: true,
+                projectName: '/${JOB_NAME}',
+                parameters: "GERRIT_CHANGE_NUMBER=${env.GERRIT_CHANGE_NUMBER},GERRIT_PATCHSET_NUMBER=${GERRIT_PATCHSET_NUMBER}",
+                selector: lastCompleted())
+  if (fileExists("_successes")) {
+    archiveArtifacts(artifacts: "_successes/*",
+                    projectName: '/${JOB_NAME}')
+  }
+  return fileExists(fullSuccessName(name))
+}
+
+def saveSuccess(name) {
+  def success_name = fullSuccessName(name)
+  sh "mkdir -p _successes"
+  sh "echo 'success' >> ${success_name}"
+  archiveArtifacts(artifacts: "_successes/*",
+                   projectName: '/${JOB_NAME}')
+  echo "===> success saved /${env.JOB_NAME}: ${success_name}"
+}
+
+// runs the body if it has not previously succeeded.
+// if you don't want the success of the body to mark the
+// given name as successful, pass in save = false.
+def skipIfPreviouslySuccessful(name, save = true, body) {
+  if (hasSuccess(name)) {
+    echo "===> block already successful, skipping: ${fullSuccessName(name)}"
+  } else {
+    echo "===> running block: ${fullSuccessName(name)}"
+    body.call()
+    if (save) saveSuccess(name)
+  }
+}
+
 def build_parameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
   string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
@@ -155,22 +194,26 @@ pipeline {
 
     stage('Build Image') {
       steps {
-        timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
-          dockerCacheLoad(image: "$CACHE_TAG")
-          sh '''
-            docker build -t $PATCHSET_TAG .
-            docker tag $PATCHSET_TAG $CACHE_TAG
-          '''
+        skipIfPreviouslySuccessful("build-and-push-image", save = false) {
+          timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
+            dockerCacheLoad(image: "$CACHE_TAG")
+            sh '''
+              docker build -t $PATCHSET_TAG .
+              docker tag $PATCHSET_TAG $CACHE_TAG
+            '''
+          }
         }
       }
     }
 
     stage('Publish Patchset Image') {
       steps {
-        timeout(time: 5) {
-          // always push the patchset tag otherwise when a later
-          // patchset is merged this patchset tag is overwritten
-          sh 'docker push $PATCHSET_TAG'
+        skipIfPreviouslySuccessful("build-and-push-image") {
+          timeout(time: 5) {
+            // always push the patchset tag otherwise when a later
+            // patchset is merged this patchset tag is overwritten
+            sh 'docker push $PATCHSET_TAG'
+          }
         }
       }
     }
@@ -180,30 +223,36 @@ pipeline {
         // TODO: this is temporary until we can get some actual builds passing
         stage('Smoke Test') {
           steps {
-            timeout(time: 10) {
-              sh 'build/new-jenkins/docker-compose-pull.sh'
-              sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
-              sh 'build/new-jenkins/docker-compose-build-up.sh'
-              sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-              sh 'build/new-jenkins/smoke-test.sh'
+            skipIfPreviouslySuccessful("smoke-test") {
+              timeout(time: 10) {
+                sh 'build/new-jenkins/docker-compose-pull.sh'
+                sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+                sh 'build/new-jenkins/docker-compose-build-up.sh'
+                sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+                sh 'build/new-jenkins/smoke-test.sh'
+              }
             }
           }
         }
         stage('Linters') {
           steps {
-            build(
-              job: 'test-suites/linters',
-              parameters: build_parameters
-            )
+            skipIfPreviouslySuccessful("linters") {
+              build(
+                job: 'test-suites/linters',
+                parameters: build_parameters
+              )
+            }
           }
         }
 
         stage('Vendored Gems') {
           steps {
-            build(
-              job: 'test-suites/vendored-gems',
-              parameters: build_parameters
-            )
+            skipIfPreviouslySuccessful("vendored-gems") {
+              build(
+                job: 'test-suites/vendored-gems',
+                parameters: build_parameters
+              )
+            }
           }
         }
 /*
@@ -211,69 +260,81 @@ pipeline {
  *  Uncomment stage to run when developing.
  *       stage('Selenium Chrome') {
  *         steps {
- *           // propagate set to false until we can get tests passing
- *           build(
- *             job: 'test-suites/selenium-chrome',
- *             propagate: false,
- *             parameters: build_parameters
- *           )
+ *           skipIfPreviouslySuccessful("selenium-chrome") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/selenium-chrome',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
  *         }
  *       }
  *
  *       stage('Rspec') {
  *         steps {
- *           // propagate set to false until we can get tests passing
- *           build(
- *             job: 'test-suites/rspec',
- *             propagate: false,
- *             parameters: build_parameters
- *           )
+ *           skipIfPreviouslySuccessful("rspec") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/rspec',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
  *         }
  *       }
  *
  *       stage('Selenium Performance Chrome') {
  *         steps {
- *           // propagate set to false until we can get tests passing
- *           build(
- *             job: 'test-suites/selenium-performance-chrome',
- *             propagate: false,
- *             parameters: build_parameters
- *           )
+ *           skipIfPreviouslySuccessful("selenium-performance-chrome") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/selenium-performance-chrome',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
  *         }
  *       }
  *
  *       stage('Contract Tests') {
  *         steps {
- *           // propagate set to false until we can get tests passing
- *           build(
- *             job: 'test-suites/contract-tests',
- *             propagate: false,
- *             parameters: build_parameters
- *           )
+ *           skipIfPreviouslySuccessful("contract-tests") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/contract-tests',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
  *         }
  *       }
  *
  *       stage('Frontend') {
  *         steps {
- *           // propagate set to false until we can get tests passing
- *           build(
- *             job: 'test-suites/frontend',
- *             propagate: false,
- *             parameters: build_parameters
- *           )
+ *           skipIfPreviouslySuccessful("frontend") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/frontend',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
  *         }
  *       }
  *
  *       stage('Xbrowser') {
  *         steps {
- *           // propagate set to false until we can get tests passing
- *           build(
- *             job: 'test-suites/xbrowser',
- *             propagate: false,
- *             parameters: build_parameters
- *           )
+ *           skipIfPreviouslySuccessful("xbrowser") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/xbrowser',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
  *         }
- *        }
+ *       }
  */
       }
     }
