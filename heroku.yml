@@ -17,4 +17,6 @@ build:
     RAILS_ENV: production
     DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
 run:
-  web: bundle exec puma -C config/puma.rb
+#  web: bundle exec puma -C config/puma.rb
+  # Temporarily try using rails to see if the app comes up. Somethign is crashing...
+  web: bundle exec bin/rails s
