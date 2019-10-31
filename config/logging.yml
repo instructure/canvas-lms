@@ -16,12 +16,7 @@ staging:
 
 production:
   <<: *default_settings
-  # TODO: just testing if this makes the logs work in Heroku. If so, figure out
-  # how to deal with dev vs production logs using ENV vars.
-  logger: syslog
-  app_ident: canvas-lms
-  facilities:
-    - user
+
 # Another option we could setup.
 #  logger: syslog
 #  app_ident: canvas-lms
