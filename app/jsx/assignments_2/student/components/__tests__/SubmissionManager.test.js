@@ -114,6 +114,9 @@ describe('SubmissionManager', () => {
   describe('with multiple submission types drafted', () => {
     it('renders a confirmation modal if the submit button is pressed', async () => {
       const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          submissionTypes: ['online_text_entry', 'online_url']
+        },
         Submission: {
           submissionDraft: {
             activeSubmissionType: 'online_text_entry',

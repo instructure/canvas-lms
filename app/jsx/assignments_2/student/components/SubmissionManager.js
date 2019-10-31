@@ -38,11 +38,24 @@ export default class SubmissionManager extends Component {
   }
 
   state = {
-    activeSubmissionType: this.props.submission?.submissionDraft?.activeSubmissionType || null,
     editingDraft: false,
     openSubmitModal: false,
     submittingAssignment: false,
     uploadingFiles: false
+  }
+
+  componentDidMount() {
+    this.setState({
+      activeSubmissionType: this.getActiveSubmissionTypeFromProps()
+    })
+  }
+
+  getActiveSubmissionTypeFromProps = () => {
+    if (this.props.assignment.submissionTypes.length > 1) {
+      return this.props.submission?.submissionDraft?.activeSubmissionType || null
+    } else {
+      return this.props.assignment.submissionTypes[0]
+    }
   }
 
   updateActiveSubmissionType = activeSubmissionType => {
