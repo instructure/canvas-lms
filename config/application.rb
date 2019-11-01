@@ -79,7 +79,7 @@ module CanvasRails
         config.logger.level = log_level
       when "stdout"
         # Nothing to do here. The rails12factor gem configures this for us.
-        pp "Rails.logger is configured to log to STDOUT."
+        puts "Rails.logger is configured to log to STDOUT."
       else
         log_path = config.paths['log'].first
 
