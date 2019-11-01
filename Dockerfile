@@ -36,7 +36,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && n 0.12.14 \
   && rm -rf /var/lib/apt/lists/* \
   && gem install bundler -v 1.15.2 \
-  && mkdir /app
+  && mkdir /app \
+  && useradd -m dockeruser \
+  && chown dockeruser:dockeruser /app
 
 WORKDIR /app
 
@@ -48,12 +50,14 @@ COPY Gemfile.d /app/Gemfile.d
 COPY gems /app/gems
 COPY config/canvas_rails4_2.rb /app/config/
 
+USER dockeruser
 #RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4 --verbose
 RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4
 
 # Copy the files needed for rake canvas:compile_assets to work
 # By explicitly doing only the files needed, rebuilds won't re-run 
 # 'canvas:compile_assets' unless one of these changes.
+USER root
 COPY .babelrc .bowerrc .fontcustom-manifest.json .i18nignore .jshintrc .npmrc .selinimumignore \
       package.json \
       npm-shrinkwrap.json \
@@ -99,11 +103,17 @@ COPY script /app/script
 COPY spec/javascripts /app/spec/javascripts
 COPY spec/coffeescripts /app/spec/coffeescripts
 
-# A few notes about the RUN command below.
+# We have to mkdir app/views/info b/c bin/dress_code tries to write styleguide.html.erb to this dir.
+# Files are copied as root, so we need to change ownership
 #
-# 1) We have to mkdir app/views/info b/c bin/dress_code tries to write styleguide.html.erb to this dir.
-#
-# 2) We have to explicitly run `npm install` for canvas_i18nliner b/c it uses an older version
+# Heroku doesn't run with root privilege, so setup the app as a non-root user
+# See: https://devcenter.heroku.com/articles/container-registry-and-runtime#testing-an-image-locally
+RUN mkdir -p /app/app/views/info/ \
+    && find /app /home/dockeruser ! -user dockeruser -print0 | xargs -0 chown -h dockeruser:dockeruser
+    
+USER dockeruser
+
+# We have to explicitly run `npm install` for canvas_i18nliner b/c it uses an older version
 # of the i18nliner gem (18nliner@0.0.16) than the rest of the app (18nliner@0.1.6). Ideally,
 # we would upgrade canvas_i18nliner as shown in these commits: 
 #  - https://github.com/instructure/canvas-lms/commit/f02b43f5744c32fdf0864c14d6c21c8a77311596#diff-8e298f3a69736b529005b3495d96c273
@@ -122,16 +132,15 @@ COPY spec/coffeescripts /app/spec/coffeescripts
 #    at Object.<anonymous> (/app/gems/canvas_i18nliner/bin/i18nliner:3:1)
 #Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works
 
-RUN mkdir -p /app/app/views/info/ && \
-    cd /app/gems/canvas_i18nliner/ && npm install -dd && \
-    bundle exec rake canvas:compile_assets --trace
+RUN cd /app/gems/canvas_i18nliner/ && npm install -dd \
+    && bundle exec rake canvas:compile_assets --trace
 
 # Do this last (after bundle install and canvas:compile_assets) so that the previous steps are cached
 # and don't have to run again when we change things and rebuild (it just uses the cache).
 # Note: in .dockerignore we exclude vendor/bundle and other things like node_modules and public/dist so the 
 # host machine values in there (maybe from a manual build) 
 # don't get copied in. Only the fresh built ones are inside the container.
-COPY . /app
+COPY --chown=dockeruser:dockeruser . /app
 
 # Let either heroku.yml (for prod) or docker-compose.yml (for dev) specify the start command)
 # Decouple the container itself from how we'll start it in each env.
