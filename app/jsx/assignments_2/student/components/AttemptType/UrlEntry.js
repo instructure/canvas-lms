@@ -110,8 +110,8 @@ class UrlEntry extends React.Component {
     const url = e.target.value
 
     this.setState({
-      typingTimeout: setTimeout(() => {
-        this.createSubmissionDraft(url)
+      typingTimeout: setTimeout(async () => {
+        await this.createSubmissionDraft(url)
         this.props.updateEditingDraft(false)
       }, 1000), // set a timeout of 1 second
       url
