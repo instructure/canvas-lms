@@ -11,7 +11,16 @@ ARG RAILS_ENV=development
 ENV LC_ALL "en_US.UTF-8" 
 ENV LANG "en_US.UTF-8"
 
-# Use bash to make `heroku ps:exec` work. See: https://stackoverflow.com/questions/46652928/shell-into-a-docker-container-running-on-a-heroku-dyno-how
+# Needed by heroku ps:exec to work. Also the re-linking of /bin/sh below is for that too.
+# See: https://devcenter.heroku.com/articles/exec#using-with-docker
+WORKDIR /tmp
+RUN wget "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/openssh/1:7.2p2-4ubuntu2.8/openssh_7.2p2.orig.tar.gz" \
+    && tar xfz openssh_7.2p2.orig.tar.gz \
+    && cd openssh-7.2p2 \
+    && ./configure \
+    && make \
+    && make install 
+
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh \
   && apt-get -qqy remove ruby ruby-dev ruby1.9.1 ruby1.9.1-dev libruby1.9.1 \
   && apt-get -qqy autoremove \
