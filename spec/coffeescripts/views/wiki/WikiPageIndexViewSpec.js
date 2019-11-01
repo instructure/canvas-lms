@@ -59,6 +59,24 @@ test('opens and closes the direct share course tray', function() {
   ok(trayComponent.secondCall.calledWithMatch({open: false}))
 })
 
+test('opens and closes the direct share user modal', function() {
+  const userModal = sandbox.stub(this.view, 'DirectShareUserModal').returns(null)
+  this.collection.trigger('fetch')
+  this.view.$el.find('.send-wiki-page-to').click()
+  ok(
+    userModal.firstCall.calledWithMatch({
+      open: true,
+      courseId: 'a course',
+      contentShare: {
+        content_id: '42',
+        content_type: 'page'
+      }
+    })
+  )
+  userModal.firstCall.args[0].onDismiss()
+  ok(userModal.secondCall.calledWithMatch({open: false}))
+})
+
 QUnit.module('WikiPageIndexView:sort', {
   setup() {
     this.collection = new WikiPageCollection()

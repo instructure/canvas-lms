@@ -20,7 +20,7 @@ import {oneOf, shape, string} from 'prop-types'
 import displayUser from 'jsx/shared/proptypes/user'
 import contentExport from 'jsx/shared/proptypes/contentExport'
 
-const CONTENT_SHARE_TYPES = [
+export const CONTENT_SHARE_TYPES = [
   'assignment',
   'discussion_topic',
   'page',
