@@ -776,6 +776,12 @@ type Course implements AssignmentsConnectionInterface & LegacyIDInterface & Node
     last: Int
   ): GroupConnection
   id: ID!
+
+  """
+  Returns a URL for the course image (this is the image used on dashboard
+  course cards)
+  """
+  imageUrl: URL
   modulesConnection(
     """
     Returns the elements in the list that come after the specified cursor.
