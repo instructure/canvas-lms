@@ -140,9 +140,13 @@ module Canvas::Redis
     # don't block, because they are viewed as maintenance-type commands that
     # wouldn't be run as part of normal code, but could be useful to run
     # one-off in script/console if you aren't using twemproxy, or in specs:
+    #
+    # Note: I removed "auth" from this list since we are using Heroku redis addon which requires
+    # authentication. This may not be the correct solution though. E.g. maybe passing a 'redis_auth'
+    # config key or explicitly calling Redis::execute_command('AUTH', 'mypasswd'). Since we don't
+    # have Twemproxy setup between us and the redis server, this is prob safe though.
     ALLOWED_UNSUPPORTED = %w[
       keys
-      auth
       quit
       flushall
       flushdb
