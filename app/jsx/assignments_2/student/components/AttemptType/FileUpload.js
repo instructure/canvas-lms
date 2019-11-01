@@ -103,9 +103,13 @@ export default class FileUpload extends Component {
       this.context.setOnFailure(I18n.t('Error adding files to submission draft'))
       return
     }
+
     this.setState({
-      filesToUpload: files.map(() => {
-        return {isLoading: true}
+      filesToUpload: files.map(file => {
+        if (file.url) {
+          return {isLoading: true, _id: file.url}
+        }
+        return {isLoading: true, _id: file.name}
       })
     })
     this.updateUploadingFiles(async () => {
@@ -313,10 +317,14 @@ export default class FileUpload extends Component {
     )
   }
 
+  shouldRenderFiles = () => {
+    return this.getDraftAttachments().length !== 0 || this.state.filesToUpload.length !== 0
+  }
+
   render() {
     return (
       <div data-testid="upload-pane" style={{marginBottom: theme.variables.spacing.xxLarge}}>
-        {this.getDraftAttachments().length !== 0 ? (
+        {this.shouldRenderFiles() ? (
           this.renderUploadBoxAndUploadedFiles()
         ) : (
           <Grid>
