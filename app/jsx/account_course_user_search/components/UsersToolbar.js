@@ -38,7 +38,7 @@ export default function UsersToolbar(props) {
   const placeholder = I18n.t('Search people...')
   return (
     <form onSubmit={preventDefault(props.onApplyFilters)}>
-      <FormFieldGroup layout="columns" description="">
+      <FormFieldGroup layout="columns" description="" vAlign="top">
         <Grid.Col width="auto">
           <CanvasSelect
             id="userType"
