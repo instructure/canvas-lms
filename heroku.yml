@@ -1,48 +1,13 @@
 # For database provisioning, see: https://devcenter.heroku.com/articles/ruby-database-provisioning
-# As a PoC, clone the staging RDS database and try pointing this app at it using: heroku config:set DATABASE_URL: <scheme>://<username>:<password>@<host>
+# As a PoC, clone the staging RDS database and try pointing this app at it using: heroku config:set DATABASE_URL=<scheme>://<username>:<password>@<host>
 # Reference the DATABASE_URL in config/database.yml? Right now, that file doesn't exist. Generally, we need to add the configs into heroku.
 # If i check it into src control... will that impact the currect env? I don't think so, but need to check how capistrano would deal if those files were checked in.
 
 # Runtime scripts, addons, ENV vars, et. Not available at build time.
 setup:
   config:
-# TODO: starting with no configs here to see what release commands echo. Then try adding this
-# to see if that's what's needed for the heroku ENV vars to be passed to the image.
-#    RAILS_ENV: production
-#    AWS_BUCKET: fakeawsbucket
-#    AWS_ACCESS_KEY_ID: fakeawskey
-#    AWS_SECRET_ACCESS_KEY: fakeawssecretkey
-#    DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
-#    BZ_BASE_URL: stagingportal-bebraven-dot-org.herokuapp.com
-#    BZ_BITLY_ACCESS_TOKEN: fakebitlytoken
-#    BZ_DOCUSIGN_HOST: TODO
-#    BZ_DOCUSIGN_API_KEY: TODO
-#    BZ_DOCUSIGN_API_SECRET: TODO
-#    BZ_DOCUSIGN_RETURN_URL: TODO
-#    #BZ_GOOGLE_ANALYTICS_ID: ''
-#    BZ_HELP_URL: http://some/fake/help/url
-#    BZ_QUALTRICS_HOST: TODO
-#    BZ_QUALTRICS_API_TOKEN: TODO
-#    BZ_QUALTRICS_LIBRARY_ID: TODO
-#    # All tech/product folks exempted
-#    BZ_UNRESTRICTED_HTML_USERS: '[1, 125, 217, 703, 1968, 2147, 2844, 2855, 3053, 3064, 3104, 3122]'
-#    ENCRYPTION_KEY: fakeencryptionkey
-    LOG_LEVEL: debug
-    LOGGER_TYPE: stdout
-#    # Before setting up any actual email sending in the dev env, need to make sure emails
-#    # won't go out to actual people. Only test accounts @bebraven.org or some other mechanism
-#    # See https://mailcatcher.me for an option
-#    MAIL_ADDRESS: mailcatcher
-#    MAIL_DOMAIN: fakemaildomain
-#    MAIL_PORT: 1025
-#    #MAIL_USERNAME: smtpusername
-#    #MAIL_PASSWORD: smtppassword
-#    #MAIL_AUTHENTICATION: plain
-#    MAIL_OUTGOING_ADDRESS: fake@fake.com
-#    MAIL_DEFAULT_NAME: 'Canvas Heroku Docker TEST'
-#    MAIL_DELIVERY_METHOD: test
-#    #SENTRY_DSN: ''
-#    REDIS_HOST_1: redis://fakeredis
+    RAILS_ENV: production
+    DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
 
 # Note that config values in here are only available at Build time, not runtime. Use setup: section for runtime vars.
 build:
@@ -54,13 +19,6 @@ build:
   config:
     RAILS_ENV: production
     DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
-
-# TODO: was getting 
-# === Fetching app code..
-# =!= Couldn't find the release image configured for this app. Is there a matching run process?
-#release:
-#  command:
-#    - ./heroku_troubleshooting_release.sh 
 
 run:
   web: bundle exec puma -C config/puma.rb
