@@ -52,9 +52,12 @@ build:
     RAILS_ENV: production
     DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
 
-release:
-  command:
-    - ./heroku_troubleshooting_release.sh 
+# TODO: was getting 
+# === Fetching app code..
+# =!= Couldn't find the release image configured for this app. Is there a matching run process?
+#release:
+#  command:
+#    - ./heroku_troubleshooting_release.sh 
 
 run:
   web: bundle exec puma -C config/puma.rb
