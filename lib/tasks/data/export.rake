@@ -7,7 +7,8 @@ namespace :data do
       admin = User.find 1
       scores_model_by_id = {
         71 => Course71ProjectScore,
-        73 => Course73ProjectScore
+        73 => Course73ProjectScore,
+        81 => Course81ProjectScore
       }
       course_id = args[:course_id].to_i
       klass = scores_model_by_id[course_id]
