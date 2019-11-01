@@ -47,7 +47,10 @@ setup:
 # Note that config values in here are only available at Build time, not runtime. Use setup: section for runtime vars.
 build:
   docker:
-    web: Dockerfile
+# TODO: just verifying that a small docker manifest will come up by using an alternate Dockerfile.
+# If this works, move to using multi-stage builds to reduce the manifest size.
+#    web: Dockerfile
+    web: Dockerfile.production
   config:
     RAILS_ENV: production
     DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
