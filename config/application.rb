@@ -27,10 +27,6 @@ end
 
 module CanvasRails
   class Application < Rails::Application
-
-# TODO: remove me. Still trying to figure out what's going on in heroku!
-puts "Running application.rb! LOGGER_TYPE=#{ENV['LOGGER_TYPE']}"
-
     config.autoload_paths += [config.root.join('lib').to_s]
     $LOAD_PATH << config.root.to_s
     config.encoding = 'utf-8'
