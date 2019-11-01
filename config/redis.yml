@@ -1,6 +1,10 @@
 common: &default_settings
   servers: 
-    - <%= ENV['REDIS_HOST_1'] %>
+    # Note: the name of this key matters when using the heroku redis addon.
+    # Heroku may rotate the URL (which has a password in it) so we need to use
+    # their value.
+    - <%= ENV['REDIS_URL'] %>
+
     # Note: you can add more servers here. If we do that, create more ENV vars for them.
 
 development:
