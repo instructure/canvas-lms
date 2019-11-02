@@ -18751,7 +18751,7 @@ ru:
         submission_thirty_minutes_left: "Этот контрольный опрос будет отправлен через тридцать минут"
       question_answered: "Получен ответ"
       question_unanswered: "Еще не отвечено"
-      saved_at: "Тестирование сохранена в %{t}"
+      saved_at: "Тестирование сохранено в %{t}"
       saving: Сохранение...
       saving_not_needed: "Нет новых данных для сохранения. Последняя проверка была %{t}"
       seconds_count: 
