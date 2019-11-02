@@ -634,7 +634,7 @@ zh-Hant:
       comm_message_item: 
         created_at: 創建日期
         from_name: 來自
-        reply_to: 回復
+        reply_to: 回覆
         sent_at: 發送日期
         to: "至 "
       comm_messages_content_pane: 
@@ -1378,7 +1378,7 @@ zh-Hant:
       notifications: 
         custom_name_description: "如果選定，則這將取代 Canvas 通知中發送的所有其他品牌推廣。"
         email_date: 日期
-        email_reply_to: 回復
+        email_reply_to: 回覆
         email_to: 至
         example: 範例：
         external_services: 發送到外部服務的通知
@@ -2297,7 +2297,7 @@ zh-Hant:
   an_error_occurred_changing_the_lock_state_for_file_77443f15: "變更 \"%{fileName}\" 的鎖定狀態時發生錯誤"
   an_error_occurred_loading_outcomes_data_cfd18b61: 載入學習成果數據時發生錯誤。
   an_error_occurred_making_a_network_request_d1bda348: 發出連線請求時發生錯誤
-  an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*發生錯誤*，請稍後重新發佈您的回復"
+  an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*發生錯誤*，請稍後重新發佈您的回覆"
   an_error_occurred_please_try_again_95361e05: 發生了一個錯誤。請重試。
   an_error_occurred_please_try_again_later_84223241: 發生了一個錯誤。請稍後再試。
   an_error_occurred_publishing_grades_cfdf7631: 發佈分數時出現一個錯誤。
@@ -5919,8 +5919,8 @@ zh-Hant:
       mark_as_unread: 標記為未讀
       more_options: 更多選項
       page_title_header: 交談（Conversation）
-      reply: 回復
-      reply_all: 全部回復
+      reply: 回覆
+      reply_all: 全部回覆
       search_for_recipients: 搜索收件者
       search_names_groups_courses: 搜索名稱、群組和課程
       sending: 正在發送
@@ -5951,7 +5951,7 @@ zh-Hant:
       more_options: 更多選項
       no_subject: 無主題
       reply: 回覆
-      reply_all: 全部回復
+      reply_all: 全部回覆
     message_form_dialog: 
       body: 主體
       comboboxInstructions: 收信人：（請鍵入並選擇收信人。按一下下拉箭頭，以選取結果。如果您沒有找到任何可接受的選項，可自行輸入收信人信息。）
@@ -5984,7 +5984,7 @@ zh-Hant:
       message_actions: 訊息操作
       more_options: 更多選項
       reply: 回復
-      reply_all: 全部回復
+      reply_all: 全部回覆
     message_list: 
       messages: 訊息
     message_progress_bar_text: 
@@ -7831,7 +7831,7 @@ zh-Hant:
       until: 直到
     assignment_todo: 
       todo_date: "待辦日期：%{date}"
-    cannot_unpublish_with_replies: 如果有學生回復，則無法取消發佈
+    cannot_unpublish_with_replies: 如果有學生回覆，則無法取消發佈
     confirm_delete_announcement: 
       one: "是否確定要刪除這 %{count} 個宣告？"
       other: "您是否確定要刪除這 %{count} 個通告？"
@@ -7876,7 +7876,7 @@ zh-Hant:
     edit_crumb: 編輯
     edit_view: 
       allow_liking: 允許點讚
-      allow_threaded_replies: 允許執行緒回復
+      allow_threaded_replies: 允許執行緒回覆
       attachment: 附件
       available_from: 可用起始時間：
       buttons: 
@@ -7885,7 +7885,7 @@ zh-Hant:
         save_and_publish: 保存並發佈
       delay_posting: 延遲發佈
       enable_podcast_feed: 啟用播客摘要
-      include_replies_in_podcast_feed: 包含學生在播客摘要中的回復
+      include_replies_in_podcast_feed: 包含學生在播客摘要中的回覆
       only_graders_can_like: 僅限評分者能點讚
       options: 選項
       page_header_title: 新討論
@@ -7897,7 +7897,7 @@ zh-Hant:
       topic_title: 主題標題
       until: 直到
       use_for_grading: 已評分
-      users_must_post_before_seeing_replies: 使用者必須發佈，然後才能看到回復
+      users_must_post_before_seeing_replies: 使用者必須發佈，然後才能看到回覆
     entry: 
       authors_name: 作者姓名
       delete_message: 刪除此訊息
@@ -7913,7 +7913,7 @@ zh-Hant:
     error_draft_state_unauthorized: 您無權設置此主題至草稿狀態。
     error_draft_state_with_posts: 此主題無法設置至草稿狀態，因為其包含帖子。
     error_group_announcement: 您不能在通告上使用分組討論。
-    error_group_change: 您不能更改有回復的討論分組。
+    error_group_change: 您不能更改有回覆的討論分組。
     error_section_permission: "您沒有權限修改分班的討論區%{section_ids}"
     error_todo_date_assignment: 如討論主題已評分，則不能添加日期
     error_todo_date_unauthorized: 您無權添加此主題至學生的待辦事項列表。
@@ -7950,13 +7950,13 @@ zh-Hant:
       your_search_did_not_match_any_discussion_topics: 您的搜索未找到任何相符的討論主題。
     new_and_total_badge: 
       reply_count_tooltip: 
-        one: "1 個回復。"
-        other: "%{count} 個回復。"
-        zero: 無回復。
+        one: "1 個回覆。"
+        other: "%{count} 個回覆。"
+        zero: 無回覆。
       unread_count_tooltip: 
-        one: "1 個未讀回復。"
-        other: "%{count} 個未讀回復。"
-        zero: 沒有未讀回復。
+        one: "1 個未讀回覆。"
+        other: "%{count} 個未讀回覆。"
+        zero: 沒有未讀回覆。
     page_nav: 
       Page: 頁面
       current_page: 當前
@@ -7971,16 +7971,16 @@ zh-Hant:
         not_published: 未發佈
         published: 已發佈
     reply_count_tooltip: 
-      one: "1 個回復。"
-      other: "%{count} 個回復。"
-      zero: 無回復。
+      one: "1 個回覆。"
+      other: "%{count} 個回覆。"
+      zero: 無回覆。
     show: 
       add_rubric: 添加題目
       announcement_closed: 本通告已結束以徵求評論
       announcement_locked: "使用者將看不到此通告的內容，直至 %{date}"
       announcement_locked_until: "此通告已被鎖定，直至 %{time}"
       authors_name: 作者姓名
-      collapse_replies: 收起回復
+      collapse_replies: 收起回覆
       confirm_delete_discussion: 是否確定要刪除此討論？
       delete: 刪除
       delete_current_message: 刪除當前郵件
@@ -7989,12 +7989,12 @@ zh-Hant:
       edit: 編輯
       edit_current_message: 編輯當前郵件
       edited_by: "此主題由 %{user} 編輯"
-      expand_replies: 展開回復
+      expand_replies: 展開回覆
       from_context: "來自 *%{context_name}*"
-      initial_post_required: 僅限至少公佈過一個回復的人才可以看到回復。
+      initial_post_required: 僅限至少公佈過一個回覆的人才可以看到回覆。
       links: 
         peer_reviews: 同行檢閱
-      loading_replies: 正在載入回復...
+      loading_replies: 正在載入回覆...
       lock_topic: 結束以徵求評論
       locked: 已結束此主題以徵求意見
       manage_announcement: 管理通告
@@ -8033,9 +8033,9 @@ zh-Hant:
     this_is_a_group_discussion: 這是群組討論
     topic_deleted_notice: "%{topic_title} 已成功删除"
     unread_count_tooltip: 
-      one: "1 個未讀回復。"
-      other: "%{count} 個未讀回復。"
-      zero: 沒有未讀回復。
+      one: "1 個未讀回覆。"
+      other: "%{count} 個未讀回覆。"
+      zero: 沒有未讀回覆。
     user_settings_view: 
       manually_mark_as_read: 手動標記帖子為已讀取
       my_settings: 我的設置
@@ -8057,7 +8057,7 @@ zh-Hant:
     discussions: 討論
     edit_settings: 編輯討論設置
     entry_collection_view: 
-      add_reply_to_topic: 添加回復至主題
+      add_reply_to_topic: 添加回覆至主題
     entry_content: 
       authors_name: 作者姓名
       collapsible_subdiscussion: 摺疊分組討論
@@ -8070,7 +8070,7 @@ zh-Hant:
       manage_discussion_entry: 管理討論輸入項目
       open_in_speedgrader: "在 SpeedGrader 中打開"
       unknown_author: ">未知作者"
-      write_a_reply: 回復
+      write_a_reply: 回覆
     entry_stats: 
       show_more: 顯示更多
     flash: 
@@ -8095,15 +8095,15 @@ zh-Hant:
       anonymous_user: 匿名
     pinned_discussions: 已釘選的討論
     reply: 
-      saving_reply: 正在保存回復...
+      saving_reply: 正在保存回覆...
     reply_attachment: 
       attachment_label: 附件
       remove_attachment: 刪除
     reply_form: 
       attach_file: 附加
       cancel: 取消
-      post_reply: 發佈回復
-      write_a_reply: 回復
+      post_reply: 發佈回覆
+      write_a_reply: 回覆
     results_entry: 
       authors_name: 作者姓名
       edited_comment: "由 *%{editor.display_name}* 編輯%{edited_at}"
@@ -8111,7 +8111,7 @@ zh-Hant:
       view_in_discussion: 檢視討論
     show_all_n_replies: 
       one: "顯示全部 %{count} 個回覆"
-      other: "顯示全部 %{count} 個回復"
+      other: "顯示全部 %{count} 個回覆"
     show_due_dates: 顯示截止日期
     subscribe: 訂閱此主題
     subscribed: 已訂閱
@@ -9445,7 +9445,7 @@ zh-Hant:
   filter_discussions_by_unread_6c48322: 透過『未讀取』篩選器對討論進行篩選
   filter_e3398407: 篩選器
   filter_ip_addresses_2f296bd2: "篩選 IP 地址"
-  filter_replies_by_unread_342e8e90: 透過『未讀取』篩選器對回復進行篩選
+  filter_replies_by_unread_342e8e90: 透過『未讀取』篩選器對回覆進行篩選
   filter_replies_by_unread_caf870ea: 通過『未讀取』篩選器對回復進行篩選
   filter_roles_12cf2271: 篩選角色
   filter_speedgrader_by_student_group_53683142: "依學生群組篩選 SpeedGrader"
@@ -10204,7 +10204,7 @@ zh-Hant:
         mute_assignment: 靜音任務
         unmute_assignment: 取消靜音任務
       headers: 
-        anonymous_submission: 這名學生的回復已隱藏，因為此作業為匿名狀態。
+        anonymous_submission: 這名學生的回覆已隱藏，因為此作業為匿名狀態。
         assessment: 評估
         grading: 評分
         no_group_submission: 此群組沒有關於此作業的提交件
@@ -12648,7 +12648,7 @@ zh-Hant:
         discussion_entry_reply_message: 使用以下連結加入交談，或透過回覆此郵件進行註解。
         html: 
           body: "使用者 %{user} 在通告上發佈了一條新評論：%{course} 的 %{discussion_topic}"
-          discussion_entry_reply_message: "使用以下連結加入交談，或透過回復此郵件進行評論。允許的時候，如果您需要附上附件，請登入至 Canvas 並回覆通告。"
+          discussion_entry_reply_message: "使用以下連結加入交談，或透過回覆此郵件進行評論。允許的時候，如果您需要附上附件，請登入至 Canvas 並回覆通告。"
           link: 點此加入檢視通告
           subject: "通告 %{discussion_topic}: %{course} 的新評論"
         subject: "通告 %{discussion_topic}: %{course} 的新評論"
@@ -13204,7 +13204,7 @@ zh-Hant:
         audio_comment: 該訊息包括媒體註解。要收聽或回覆，請按一下以下連結：
         html: 
           attached_files: 附加的文檔：
-          audio_comment: 該訊息包括媒體評論。要收聽或回復，請按一下以下連結：
+          audio_comment: 該訊息包括媒體評論。要收聽或回覆，請按一下以下連結：
           download: 下載
           pre_you_can: 您可以
           reply_to_conversation_message: "您可以透過直接回覆此電子郵件在 Canvas 中回覆此訊息。如果您需要附上附件，請登入至 Canvas 並透過收件匣回覆。"
@@ -13228,10 +13228,10 @@ zh-Hant:
     conversation_message: 
       email: 
         attached_files: 附加的文檔：
-        audio_comment: 該訊息包括媒體評論。要收聽或回復，請按一下以下連結：
+        audio_comment: 該訊息包括媒體評論。要收聽或回覆，請按一下以下連結：
         html: 
           attached_files: 附加的文檔：
-          audio_comment: 該訊息包括媒體評論。要收聽或回復，請按一下以下連結：
+          audio_comment: 該訊息包括媒體評論。要收聽或回覆，請按一下以下連結：
           download: 下載
           pre_you_can: 您可以
           reply_to_conversation_message: "您可以透過直接回覆此電子郵件在 Canvas 中回覆此訊息。如果您需要附上附件，請登入至 Canvas 並透過收件匣回覆。"
@@ -13311,7 +13311,7 @@ zh-Hant:
             Canvas Network
         course_starts_next_week: 您的課程下週開始
     dialog: 
-      title: 發送回復訊息
+      title: 發送回覆訊息
     email: 
       footer: |-
           您之所以會收到這封電子郵件，是因為您參與了使用 Canvas 的一個或多個課程。要更改或關閉電子郵件通知，請瀏覽：
@@ -13673,7 +13673,7 @@ zh-Hant:
         from_name: 發件人名稱
         notification_name: 通知名稱
         path_type: 路徑類型
-        reply_to: 回復
+        reply_to: 回覆
         sent_at: 發送日期
         subject: 主題
         to: 至
@@ -13791,7 +13791,7 @@ zh-Hant:
         discussion_entry_reply_message: 使用以下連結加入交談，或回覆此郵件發佈註解。
         html: 
           body: "%{user} 發佈了關於 %{course} 的思路 %{discussion_topic} 的新評論："
-          discussion_entry_reply_message: "使用以下連結加入交談，或透過回復此郵件進行評論。允許的時候，如果您需要附上附件，請登入至 Canvas 並回覆討論。"
+          discussion_entry_reply_message: "使用以下連結加入交談，或透過回覆此郵件進行評論。允許的時候，如果您需要附上附件，請登入至 Canvas 並回覆討論。"
           link: 按一下此處加入交談
           subject: "關於 %{discussion_topic}: %{course} 的新評論"
         subject: "關於 %{discussion_topic}: %{course} 的新評論"
@@ -14059,7 +14059,7 @@ zh-Hant:
           link_message: 按一下此處以檢視評論
           someone: 某人
           subject: "提交件評論：%{user}，%{assignment}，%{context}"
-          submission_comment_link_message: "您可以使用以下連結檢閱提交件的詳細資料，或者可以透過回應此訊息回復此評論。允許的時候，如果您需要附上附件，請登入至 Canvas 並回覆提交項目。"
+          submission_comment_link_message: "您可以使用以下連結檢閱提交件的詳細資料，或者可以透過回應此訊息回覆此評論。允許的時候，如果您需要附上附件，請登入至 Canvas 並回覆提交項目。"
         link_message: 您可以在此處檢閱提交件的詳細資料：
         someone: 某人
         subject: "提交件評論：%{user}，%{assignment}，%{context}"
@@ -15041,7 +15041,7 @@ zh-Hant:
     all_submissions_display: 所有提交件
     announcement_created_by_you_description: |-
         *  您創建的通告
-        *  您所創建的通告的回復
+        *  您所創建的通告的回覆
     announcement_created_by_you_display: 您創建的通告
     announcement_description: 您的課程中的新通告
     announcement_display: 通告
@@ -15149,7 +15149,7 @@ zh-Hant:
       added_to_conversation: 添加至交談（Conversation）
       alert: 警示
       announcement_created_by_you: 您創建的通告
-      announcement_reply: 通告回復
+      announcement_reply: 通告回覆
       appointment_canceled_by_user: 使用者取消的預約
       appointment_deleted_for_user: 為使用者刪除的預約
       appointment_group_deleted: 已刪除的預約群組
@@ -18756,16 +18756,16 @@ zh-Hant:
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: 用更豐富易用的新文件夾樹取代現有文件夾樹。
   reply_389d6fb9: 回覆
   reply_from_name: "%{name} 透過 Canvas 通知"
-  reply_to_comment_72d96728: 回復評論
+  reply_to_comment_72d96728: 回覆評論
   reply_to_conversation_f1aa0d4: 回覆交談
   reply_to_conversation_subject_4b2e6fe7: "回覆交談 %{subject}"
   reply_to_conversation_text_cd45c48f: "回覆交談 %{text}"
-  reply_to_current_message_55391f5b: 回復當前郵件
+  reply_to_current_message_55391f5b: 回覆當前郵件
   reply_to_main_discussion_29823888: 回復主要討論
   reply_to_this_message_in_canvas_2542e450: "在 Canvas 回覆此訊息。"
   reply_to_this_message_in_canvas_7ec72dce: "在 Canvas 回覆此訊息"
-  reply_to_title_f227303f: "回復%{title}"
-  reply_to_topic_12412b0f: 回復主題
+  reply_to_title_f227303f: "回覆%{title}"
+  reply_to_topic_12412b0f: 回覆主題
   report_has_been_aborted_2b5763ed: 報告已中止
   report_issue_b5f1db0e: 報告問題
   reported_3de7086a: 已報告
@@ -18842,7 +18842,7 @@ zh-Hant:
   retry_migrating_name_bdc802ef: "重新嘗試遷移 \"%{name}\""
   return_to_parent_folder_4ece2184: 返回至母檔案夾
   revert_to_actual_score_f665eea9: 還原至實際分數
-  revert_to_old_ui_3211da41: "回復成舊 UI"
+  revert_to_old_ui_3211da41: "回覆成舊 UI"
   review_now_318a6a3e: 立即查看
   reviewer_b993ce28: 檢閲人
   reviewers_successfully_added_bd4b629a: 成功添加檢閲人
@@ -20931,7 +20931,7 @@ zh-Hant:
   subject_114b2e98: 主題
   subject_1bc03dea: 主題：
   subject_must_contain_fewer_than_255_characters_2e72cd02: "主題不得多於 255 個字符。"
-  subject_reply_to: "回復：%{subject}"
+  subject_reply_to: "回覆：%{subject}"
   submission: 
     atom_no_author: 無作者
     attached_files_comment: 見所附文檔。
@@ -21687,7 +21687,7 @@ zh-Hant:
   this_is_not_a_valid_grade_9cc2cb8: 此為一個無效的評分
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: 當前為該學生所選取的評分。
   this_is_the_default_email_address_f3c421fb: 這是預設的電郵地址
-  this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "這是新的功能預覽 UI。目前是唯讀的。若要回復成舊 UI，請按一下按鈕。這樣將會停用「新的功能新增標記」並重新整理頁面。"
+  this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "這是新的功能預覽 UI。目前是唯讀的。若要回覆成舊 UI，請按一下按鈕。這樣將會停用「新的功能新增標記」並重新整理頁面。"
   this_is_your_course_landing_page_33d445ec: 這是您的課程登入頁面
   this_is_your_course_landing_page_f87a920d: 這是您的課程登入頁面！
   this_is_your_current_theme_4331709b: 其合適您的當前主題
@@ -21696,7 +21696,7 @@ zh-Hant:
   this_login_is_for_provider_6f17462: "本次登入者是 %{provider}"
   this_may_take_a_bit_48fe4235: 這可能需要等一會...
   this_may_take_a_bit_c061d0f6: 這可能需要等一會...
-  this_message_includes_media_comments_to_listen_or__5fc98641: "該訊息包括媒體評論。如需收聽或回復，請按一下以下連結：%{link}。"
+  this_message_includes_media_comments_to_listen_or__5fc98641: "該訊息包括媒體評論。如需收聽或回覆，請按一下以下連結：%{link}。"
   this_message_includes_media_comments_to_listen_or__75ea03a1: 此訊息包括媒體評論。要收聽或回覆，請點按以下連結：
   this_message_includes_media_comments_to_listen_or__df72d662: "此訊息包括媒體評論。要收聽或回覆，請點按此連結：%{link}.  允許的時候，如果您需要附上附件，請登入至 Canvas 並回覆提交項目。"
   this_module_is_locked_until_completing_all_of_the__ddf06070: "本單元目前已被鎖定，直至完成下列單元的所有要求: %{prerequisites}"
@@ -23532,7 +23532,7 @@ zh-Hant:
   you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "您可以通過回復本訊息回復評論，或使用連結檢視提交的具體內容：%{link}。"
   you_can_reply_to_this_comment_by_responding_to_thi_4fd1379e: "您可以通過回覆本訊息回覆評論，或使用連結檢視提交的具體內容：%{link}.  允許的時候，如果您需要附上附件，請登入至 Canvas 並回覆提交項目"
   you_can_reply_to_this_message_in_canvas_by_clickin_f5f5f7a3: "您可以透過點撃此連結在 Canvas 中回覆此訊息：%{link}."
-  you_can_reply_to_this_message_in_canvas_by_replyin_c9f9abb: "您可以透過直接回复此電子邮件在 Canvas 中回復此郵件，或按一下以下連結：%{link}.  如果您需要附上附件，請登入至 Canvas 並透過收件匣回覆。"
+  you_can_reply_to_this_message_in_canvas_by_replyin_c9f9abb: "您可以透過直接回复此電子邮件在 Canvas 中回覆此郵件，或按一下以下連結：%{link}.  如果您需要附上附件，請登入至 Canvas 並透過收件匣回覆。"
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "您可以透過直接回复此電子邮件在 Canvas 中回復此郵件，或按一下以下連結：%{link}。"
   you_can_review_the_submission_details_by_clicking__58a7753: 您可以透過按一下以下連結，檢閱提交項目的詳細資料：
   you_can_review_the_submission_details_by_clicking__9abc5515: "您可以透過按一下以下連結檢閱提交件的詳細資料：%{link}。"
@@ -23613,7 +23613,7 @@ zh-Hant:
   you_must_enter_a_date_f8eabfb1: 您必須輸入日期
   you_must_have_a_student_or_section_selected_a99e45df: 您必須選中一個學生或分班
   you_must_input_a_section_b8d370fe: 您必須輸入一個分班
-  you_must_log_in_to_view_replies_9ccd4da0: 您必須先登入才能檢視回復
+  you_must_log_in_to_view_replies_9ccd4da0: 您必須先登入才能檢視回覆
   you_must_provide_a_date_with_a_time_ec369ff4: 您必須提供有時間的日期。
   you_must_provide_a_value_or_unselect_the_option_3b28b754: 您必須提供或取消選擇該選項。
   you_must_select_a_course_to_copy_content_from_e7bd9e09: 您必須選擇一門課程，以從中複製內容
