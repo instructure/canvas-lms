@@ -8603,6 +8603,7 @@ pt:
   enter_a_valid_date_46d77547: "Insira uma data válida"
   enter_a_what_if_score_668c91a3: "Inserir pontuação de Hipóteses"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Introduzir \"{{ACCOUNT_DOMAIN}}\" para substituir o domínio da conta raiz do utilizador"
+  enter_at_least_count_characters_1c7a0b36: "Digite pelo menos %{count} caracteres"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Introduzir \"{{CANVAS_USER_ID}}\" para substituir o ID Canvas exclusivo do utilizador"
   enter_grades_as_e113e606: "Digite Classificações as"
   enter_or_find_an_external_tool_url_6aebbd0d: "Insira ou encontre uma Ferramenta Externa URL"
