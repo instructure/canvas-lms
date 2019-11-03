@@ -8,17 +8,17 @@
 
 common: &default_settings
   # Required license key associated with your New Relic account.
-  license_key: <%= ENV['NEWRELIC_LICENSE'] %>
+  license_key: <%= ENV['NEW_RELIC_LICENSE_KEY'] %>
 
   # Your application name. Renaming here affects where data displays in New
   # Relic.  For more details, see https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/renaming-applications
-  app_name: <%= ENV['NEWRELIC_APPNAME'] %>
+  app_name: <%= ENV['NEW_RELIC_APP_NAME'] %>
 
   # To disable the agent regardless of other settings, uncomment the following:
   # agent_enabled: false
 
   # Logging level for log/newrelic_agent.log
-  log_level: info
+  log_level: <%= ENV['LOG_LEVEL'] %>
 
 
 # Environment-specific settings are in this section.
@@ -26,7 +26,6 @@ common: &default_settings
 # If your application has other named environments, configure them here.
 development:
   <<: *default_settings
-  app_name: <%= ENV['NEWRELIC_APPNAME'] %>
 
 test:
   <<: *default_settings
@@ -35,7 +34,6 @@ test:
 
 staging:
   <<: *default_settings
-  app_name: <%= ENV['NEWRELIC_APPNAME'] %>
 
 production:
   <<: *default_settings

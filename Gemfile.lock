@@ -703,6 +703,7 @@ GEM
     net-ssh (3.2.0)
     netaddr (1.5.0)
     netrc (0.11.0)
+    newrelic_rpm (6.7.0.359)
     oauth-instructure (0.4.10)
     oauth2 (1.0.0)
       faraday (>= 0.8, < 0.10)
@@ -1091,6 +1092,7 @@ DEPENDENCIES
   net-ldap (= 0.10.1)
   net-ssh (= 3.2.0)
   netaddr (= 1.5.0)
+  newrelic_rpm
   nokogiri (= 1.6.6.2.20150813143452)!
   nokogiri-xmlsec-me-harder (= 0.9.3pre)!
   oauth-instructure (= 0.4.10)
