@@ -1284,9 +1284,9 @@ class ApplicationController < ActionController::Base
       # I want just a fraction of the info printed to my custom debug
       # because I typically only care about our own modifications
       BZDebug.log("#{exception.class} (#{exception.message}):")
-      BZDebug.log("  " + exception.backtrace[0])
-      BZDebug.log("  " + exception.backtrace[1])
-      BZDebug.log("  " + exception.backtrace[2])
+      BZDebug.log("  " + exception.backtrace[0]) if exception.backtrace[0]
+      BZDebug.log("  " + exception.backtrace[1]) if exception.backtrace[1]
+      BZDebug.log("  " + exception.backtrace[2]) if exception.backtrace[2]
     end
 
     if config.consider_all_requests_local
