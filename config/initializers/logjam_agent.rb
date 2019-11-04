@@ -33,6 +33,7 @@ module LogjamAgent
   # Also, setting the level has no effect on console logging in development.
   # self.log_device_log_level = Logger::WARN   # log warnings, errors, fatals and unknown log messages
   # self.log_device_log_level = Logger::NONE   # log nothing at all
+  self.log_device_log_level =  ActiveSupport::Logger.const_get(ENV['LOG_LEVEL'].to_s.upcase) if ENV['LOG_LEVEL']
 
   # Configure lines which will not be logged locally.
   # They will still be sent to the logjam server. Defaults to nil.
