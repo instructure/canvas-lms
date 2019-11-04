@@ -257,6 +257,9 @@
   "describe_the_image_e65d2e32": {
     "message": "(Describe the image)"
   },
+  "describe_the_video_2fe8f46a": {
+    "message": "(Describe the video)"
+  },
   "details_98a31b68": {
     "message": "Details"
   },
@@ -359,6 +362,9 @@
   },
   "embed_preview_2d741e1f": {
     "message": "Embed Preview"
+  },
+  "embed_video_a97a64af": {
+    "message": "Embed Video"
   },
   "embed_video_code_703e10f2": {
     "message": "Embed Video Code"
@@ -1020,6 +1026,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Used by screen readers to describe the content of an image"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Used by screen readers to describe the video"
+  },
   "user_documents_c206e61f": {
     "message": "User Documents"
   },
@@ -1040,6 +1049,9 @@
   },
   "video_player_b371005": {
     "message": "Video Player"
+  },
+  "video_player_for_title_ffd9fbc4": {
+    "message": "Video player for { title }"
   },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "View keyboard shortcuts"
