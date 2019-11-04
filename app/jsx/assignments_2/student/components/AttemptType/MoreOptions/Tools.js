@@ -19,6 +19,7 @@
 import {arrayOf, bool, func, string} from 'prop-types'
 import CanvasFiles from './CanvasFiles'
 import {ExternalTool} from '../../../graphqlData/ExternalTool'
+import I18n from 'i18n!assignments_2_MoreOptions_Tools'
 import React, {useState} from 'react'
 import {UserGroups} from '../../../graphqlData/UserGroups'
 
@@ -51,7 +52,7 @@ const Tools = props => {
           isSelected={selectedIndex === 0}
           key="CanvasFiles"
           padding="0"
-          renderTitle="Canvas Files"
+          renderTitle={I18n.t('Canvas Files')}
         >
           <div style={tabContentStyle}>
             <CanvasFiles

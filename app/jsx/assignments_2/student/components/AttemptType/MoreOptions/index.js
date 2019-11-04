@@ -20,7 +20,7 @@ import {bool, func, string} from 'prop-types'
 import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import {EXTERNAL_TOOLS_QUERY} from '../../../graphqlData/Queries'
 import GenericErrorPage from '../../../../../shared/components/GenericErrorPage/index'
-import I18n from 'i18n!assignments_2_initial_query'
+import I18n from 'i18n!assignments_2_MoreOptions'
 import LoadingIndicator from '../../../../shared/LoadingIndicator'
 import {Query} from 'react-apollo'
 import React from 'react'
@@ -99,7 +99,7 @@ class MoreOptions extends React.Component {
           open={this.state.open}
           onDismiss={this.handleModalClose}
           size="large"
-          label="More Options"
+          label={I18n.t('More Options')}
           shouldCloseOnDocumentClick
         >
           <Modal.Header>
