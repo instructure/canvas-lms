@@ -2093,6 +2093,41 @@ describe MasterCourses::MasterMigration do
       expect(a_to.reload.external_tool_tag).to eq tag # don't change
     end
 
+    context "caching" do
+      specs_require_cache(:redis_cache_store)
+
+      it "stuff" do
+        @copy_to = course_factory(:active_all => true)
+        student = user_factory(:active_all => true)
+        @copy_to.enroll_student(student, :enrollment_state => 'active')
+        @sub = @template.add_child_course!(@copy_to)
+
+        a = @copy_from.assignments.create!(:title => "some assignment")
+        q = @copy_from.quizzes.create!(:title => "some quiz")
+        run_master_migration
+
+        a_to = @copy_to.assignments.where(:migration_id => mig_id(a)).first
+        q_to = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
+        ares1 = a_to.context_module_tag_info(student, @copy_to, has_submission: false)
+        expect(ares1[:due_date]).to be_nil
+        qres1 = q_to.context_module_tag_info(student, @copy_to, has_submission: false)
+        expect(qres1[:due_date]).to be_nil
+        due_at = 1.day.from_now
+        Timecop.freeze(1.minute.from_now) do
+          a.update_attribute(:due_at, due_at)
+          q.update_attribute(:due_at, due_at)
+          run_master_migration
+        end
+        expect(a_to.reload.due_at.to_i).to eq due_at.to_i
+        ares2 = a_to.context_module_tag_info(student, @copy_to, has_submission: false)
+        expect(ares2[:due_date]).to eq due_at.iso8601
+
+        expect(q_to.reload.due_at.to_i).to eq due_at.to_i
+        qres2 = q_to.context_module_tag_info(student, @copy_to, has_submission: false)
+        expect(qres2[:due_date]).to eq due_at.iso8601
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 

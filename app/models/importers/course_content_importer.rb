@@ -210,6 +210,7 @@ module Importers
           course.touch
         end
 
+        clear_assignment_and_quiz_caches(migration)
         DueDateCacher.recompute_course(course, update_grades: true, executing_user: migration.user)
       end
 
@@ -353,6 +354,13 @@ module Importers
       rescue
         migration.add_warning(t(:due_dates_warning, "Couldn't adjust the due dates."), $!)
       end
+    end
+
+    def self.clear_assignment_and_quiz_caches(migration)
+      assignments = migration.imported_migration_items_by_class(Assignment).select(&:update_cached_due_dates?)
+      Assignment.clear_cache_keys(assignments, :availability) if assignments.any?
+      quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz).select(&:should_clear_availability_cache)
+      Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?
     end
 
     def self.post_processing?(migration)
