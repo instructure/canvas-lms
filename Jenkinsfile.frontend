@@ -61,25 +61,6 @@ pipeline {
         setDockerUp()
       }
     }
-    stage('Linters') {
-      parallel {
-        stage('ESLint - JSX') {
-          steps {
-            sh 'build/new-jenkins/frontend/linter-eslint.sh'
-          }
-        }
-        stage('Stylelint') {
-          steps {
-            sh 'build/new-jenkins/frontend/linter-stylelint.sh'
-          }
-        }
-        stage('XSSLint') {
-          steps {
-            sh 'build/new-jenkins/frontend/linter-xss.sh'
-          }
-        }
-      }
-    }
     stage('Tests Setup') {
       environment {
         COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'

@@ -189,6 +189,15 @@ pipeline {
             }
           }
         }
+        stage('Linters') {
+          steps {
+            // propagate set to false until we can get tests passing
+            build(
+              job: 'linters',
+              parameters: build_parameters
+            )
+          }
+        }
 /*
  *  Don't run these on all patch sets until we have them ready to report results.
  *  Uncomment stage to run when developing.
