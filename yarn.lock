@@ -12395,7 +12395,7 @@ jquery.elastic@1.0.0:
 
 jquery@2.x, jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS":
   version "1.7.2"
-  resolved "https://github.com/ryankshaw/jquery.git#1529762158a452fecdeb31b826d3d9c3ff9530dd"
+  resolved "https://github.com/ryankshaw/jquery.git#3a48a84c713291b790a2556d9ba036ec4d53c52f"
 
 js-base64@^2.1.8, js-base64@^2.1.9, js-base64@^2.4.3:
   version "2.5.1"
