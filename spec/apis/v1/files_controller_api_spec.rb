@@ -590,7 +590,8 @@ describe "Files API", type: :request do
           "id" => @user.id,
           "display_name" => @user.short_name,
           "avatar_image_url" => User.avatar_fallback_url(nil, request),
-          "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+          "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+          "pronouns"=>nil
         }
       ]
     end
@@ -653,7 +654,8 @@ describe "Files API", type: :request do
             "id" => user.id,
             "display_name" => user.short_name,
             "avatar_image_url" => User.avatar_fallback_url(nil, request),
-            "html_url" => "http://www.example.com/about/#{user.id}"
+            "html_url" => "http://www.example.com/about/#{user.id}",
+            "pronouns"=>nil
           }
         ]
       end
@@ -1029,7 +1031,8 @@ describe "Files API", type: :request do
         "id" => @user.id,
         "display_name" => @user.short_name,
         "avatar_image_url" => User.avatar_fallback_url(nil, request),
-        "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+        "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+        "pronouns"=>nil
       })
     end
 

@@ -61,10 +61,7 @@ export default class Message extends Model
         for id in message.participating_user_ids when id isnt message.author_id
           if participant = findParticipant(id)
             message.participants.push participant
-            if participant.pronoun
-              message.participantNames.push {name: participant.name, pronoun: participant.pronoun}
-            else
-              message.participantNames.push {name: participant.name}
+            message.participantNames.push {name: participant.name, pronouns: participant.pronouns}
 
         if message.participants.length > 2
           message.summarizedParticipantNames = message.participantNames.slice(0, 2)

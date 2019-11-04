@@ -847,6 +847,11 @@ class AccountsController < ApplicationController
           end
         end
 
+        pronouns = params[:account].delete :pronouns
+        if pronouns && !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:account_pronouns)
+          @account.pronouns = pronouns
+        end
+
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
           sorted_help_links = custom_help_links.to_unsafe_h.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort_by{|_k, h| _k.to_i}

@@ -145,8 +145,8 @@ module Api::V1::DiscussionTopics
       end
     end
 
-    if @domain_root_account.settings[:can_add_pronouns] && Account.site_admin.feature_enabled?(:account_pronouns)
-      json[:user_pronoun] = user.account_pronoun&.display_pronoun
+    if user.pronouns
+      json[:user_pronouns] = user.pronouns
     end
 
     json

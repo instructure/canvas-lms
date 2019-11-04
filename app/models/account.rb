@@ -21,6 +21,7 @@ require 'atom'
 class Account < ActiveRecord::Base
   include Context
   include OutcomeImportContext
+  include Pronouns
 
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 
@@ -305,9 +306,12 @@ class Account < ActiveRecord::Base
   end
 
   def pronouns
-    self.shard.activate do
-      AccountPronoun.where(account: [self, nil]).to_a
-    end
+    return [] unless settings[:can_add_pronouns]
+    settings[:pronouns]&.map{|p| translate_pronouns(p)} || Pronouns.default_pronouns
+  end
+
+  def pronouns=(pronouns)
+    settings[:pronouns] = pronouns&.map{|p| untranslate_pronouns(p)}&.reject(&:blank?)
   end
 
   def mfa_settings

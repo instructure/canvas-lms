@@ -60,7 +60,7 @@ ProfileTab.propTypes = {
 }
 
 export default function ProfileTray(props) {
-  const {userDisplayName, userAvatarURL, loaded, userPronoun, tabs, counts} = props
+  const {userDisplayName, userAvatarURL, loaded, userPronouns, tabs, counts} = props
   return (
     <View as="div" padding="medium">
       <View textAlign="center">
@@ -75,9 +75,9 @@ export default function ProfileTray(props) {
         <div style={{wordBreak: 'break-word'}}>
           <Heading level="h3" as="h2">
             {userDisplayName}
-            {userPronoun && (
+            {userPronouns && (
               <Text size="large" fontStyle="italic">
-                &nbsp;({userPronoun})
+                &nbsp;({userPronouns})
               </Text>
             )}
           </Heading>
@@ -104,7 +104,7 @@ ProfileTray.propTypes = {
   userDisplayName: string.isRequired,
   userAvatarURL: string.isRequired,
   loaded: bool.isRequired,
-  userPronoun: string,
+  userPronouns: string,
   tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired,
   counts: object.isRequired
 }

@@ -14,16 +14,33 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class CreateAccountPronouns < ActiveRecord::Migration[5.2]
-  tag :predeploy
-  def change
-    create_table :account_pronouns do |t|
-      t.belongs_to :account, foreign_key: true, limit: 8, index: true
-      t.string :pronoun, null: false
-      t.timestamps
-      t.string :workflow_state
-    end
+module Pronouns
+
+  DEFAULT_PRONOUNS = {
+    "she_her" => -> { I18n.t('She/Her') },
+    "he_him" => -> { I18n.t('He/Him') },
+    "they_them" => -> { I18n.t('They/Them') }
+  }.freeze
+
+  def self.default_pronouns
+    DEFAULT_PRONOUNS.values.map(&:call)
   end
+
+  def clean_pronouns(string)
+    string.strip.presence
+  end
+
+  def translate_pronouns(pronouns)
+    DEFAULT_PRONOUNS[pronouns]&.call || pronouns
+  end
+
+  def untranslate_pronouns(pronouns)
+    pronouns = clean_pronouns(pronouns)
+    DEFAULT_PRONOUNS.each do |k,v|
+      return k if pronouns == v.call
+    end
+    pronouns
+  end
+
 end

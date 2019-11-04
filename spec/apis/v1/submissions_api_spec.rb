@@ -741,7 +741,8 @@ describe 'Submissions API', type: :request do
       "id" => @student.id,
       "display_name" => "User",
       "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}",
-      "avatar_image_url" => User.avatar_fallback_url(nil, request)
+      "avatar_image_url" => User.avatar_fallback_url(nil, request),
+      "pronouns" => nil
     })
   end
 
@@ -927,7 +928,8 @@ describe 'Submissions API', type: :request do
               "id" => @teacher.id,
               "display_name" => "User",
               "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-              "avatar_image_url" => User.avatar_fallback_url(nil, request)
+              "avatar_image_url" => User.avatar_fallback_url(nil, request),
+              "pronouns" => nil
            },
            "author_name"=>"User",
            "id" => comment.id,
@@ -1253,7 +1255,8 @@ describe 'Submissions API', type: :request do
              "id" => @teacher.id,
              "display_name" => "User",
              "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-             "avatar_image_url" => User.avatar_fallback_url(nil, request)
+             "avatar_image_url" => User.avatar_fallback_url(nil, request),
+             "pronouns" => nil
            },
            "author_name"=>"User",
            "id"=>comment.id,
@@ -4721,6 +4724,7 @@ describe 'Submissions API', type: :request do
           [{"id"=>@student1.id,
             "display_name"=>"User",
             "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
+            "pronouns" => nil,
             "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student1.id}",
             "in_moderation_set"=>true,
             "selected_provisional_grade_id"=>pg.id,
@@ -4739,6 +4743,7 @@ describe 'Submissions API', type: :request do
            {"id"=>@student2.id,
             "display_name"=>"User",
             "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
+            "pronouns" => nil,
             "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student2.id}",
             "in_moderation_set"=>false,
             "selected_provisional_grade_id"=>nil,
