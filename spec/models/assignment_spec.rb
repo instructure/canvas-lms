@@ -7823,20 +7823,37 @@ describe Assignment do
         let(:section1) { @course.course_sections.create! }
         let(:submissions_posted_messages) do
           Message.where(
-            communication_channel: teacher.email_channel,
             notification: notification
           )
         end
 
         before(:each) do
           section1.enroll_user(student1, "StudentEnrollment", "active")
-          teacher.update!(email: "fakeemail@example.com", workflow_state: :registered)
+          student1.update!(email: "studentemail@example.com", workflow_state: :registered)
+          student1.email_channel.update!(workflow_state: :active)
+          teacher.update!(email: "teacheremail@example.com", workflow_state: :registered)
           teacher.email_channel.update!(workflow_state: :active)
           teacher_enrollment.update!(workflow_state: :active)
         end
 
         it "does not broadcast a notification when not including posting_params" do
           expect { assignment.post_submissions }.not_to change { submissions_posted_messages.count }
+        end
+
+        it "does not broadcast a notification for students" do
+          expect {
+            assignment.post_submissions(posting_params: { graded_only: false })
+          }.not_to change {
+            submissions_posted_messages.where(communication_channel: student1.communication_channels).count
+          }
+        end
+
+        it "broadcasts a notification for teachers" do
+          expect {
+            assignment.post_submissions(posting_params: { graded_only: false })
+          }.to change {
+            submissions_posted_messages.where(communication_channel: teacher.communication_channels).count
+          }.by(1)
         end
 
         it "broadcasts a notification when posting to everyone" do
