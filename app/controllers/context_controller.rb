@@ -173,11 +173,11 @@ class ContextController < ApplicationController
       end
     elsif @context.is_a?(Group)
       if @context.grants_right?(@current_user, :read_as_admin)
-        @users = @context.participating_users
+        @users = @context.participating_users.distinct.order_by_sortable_name
       else
-        @users = @context.participating_users_in_context(sort: true)
+        @users = @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
       end
-      @primary_users = { t('roster.group_members', 'Group Members') => @users.preload(:account_pronoun).distinct.order_by_sortable_name.to_a }
+      @primary_users = { t('roster.group_members', 'Group Members') => @users }
       if course = @context.context.try(:is_a?, Course) && @context.context
         @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.participating_instructors.order_by_sortable_name.distinct }
       end

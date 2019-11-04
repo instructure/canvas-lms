@@ -40,7 +40,7 @@ ProfileTab.propTypes = {
   html_url: string.isRequired
 }
 
-export default function ProfileTray({userDisplayName, userAvatarURL, loaded, userPronoun, tabs}) {
+export default function ProfileTray(props) {
   return (
     <View as="div" padding="medium">
       <View textAlign="center">
@@ -55,9 +55,9 @@ export default function ProfileTray({userDisplayName, userAvatarURL, loaded, use
         <div style={{wordBreak: 'break-word'}}>
           <Heading level="h3" as="h2">
             {userDisplayName}
-            {userPronoun && (
+            {userPronouns && (
               <Text size="large" fontStyle="italic">
-                &nbsp;({userPronoun})
+                &nbsp;({userPronouns})
               </Text>
             )}
           </Heading>
@@ -86,4 +86,5 @@ ProfileTray.propTypes = {
   loaded: bool.isRequired,
   userPronoun: string,
   tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired
+
 }

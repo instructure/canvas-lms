@@ -13,6 +13,6 @@ assignments_2_student:
 account_pronouns:
   state: hidden
   display_name: Pronouns for users
-  description: Pronouns users can show after their name
-  applies_to: SiteAdmin
+  description: Allows users to pick pronouns that will be displayed after their name when it is shown in the user interface.
+  applies_to: RootAccount
   root_opt_in: true

@@ -41,6 +41,8 @@ module Types
       "A short name the user has selected, for use in conversations or other less formal places through the site.",
       null: true
 
+    field :pronouns, String, null: true
+
     field :avatar_url, UrlType, null: true
 
     def avatar_url
@@ -78,13 +80,6 @@ module Types
           object == context[:current_user] ||
             enrollment.grants_right?(context[:current_user], context[:session], :read)
         }
-      end
-    end
-
-    field :pronoun, String, null: true
-    def pronoun
-      if @context[:domain_root_account].settings[:can_add_pronouns]
-        load_association(:account_pronoun).then { |p| p&.display_pronoun }
       end
     end
 

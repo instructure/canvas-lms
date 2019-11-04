@@ -231,11 +231,11 @@ export default class StudentContextTray extends React.Component {
                               size="large"
                               href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
                               aria-label={I18n.t("Go to %{name}'s profile", {
-                                name: user.short_name + ' ' + user.pronoun
+                                name: user.short_name + ' ' + user.pronouns
                               })}
                               theme={{largePadding: '0', largeHeight: 'normal'}}
                             >
-                              {user.short_name} {user.pronoun ? <i>{user.pronoun}</i> : ''}
+                              {user.short_name} {user.pronouns ? <i>{user.pronouns}</i> : ''}
                             </Button>
                           </Heading>
                         </div>

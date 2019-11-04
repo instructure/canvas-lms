@@ -106,21 +106,14 @@ describe Api::V1::DiscussionTopics do
     end
   end
 
-  it "includes the user's pronoun when enabled" do
-    @me.update! account_pronoun: AccountPronoun.create!(pronoun: "she/her", account: Account.default)
+  it "includes the user's pronouns when enabled" do
+    @me.update! pronouns: "she/her"
 
     expect(
-      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil).key?("user_pronoun")
-    ).to eq false
-
-    @test_api.instance_variable_get(:@domain_root_account).tap { |domain_root_account|
-      domain_root_account.settings[:can_add_pronouns] = true
-      domain_root_account.save!
-    }
-    Account.site_admin.enable_feature! :account_pronouns
-
+      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil).key?("user_pronouns")
+    ).to eq true
     expect(
-      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)["user_pronoun"]
+      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)["user_pronouns"]
     ).to eq "she/her"
   end
 
@@ -2593,8 +2586,8 @@ describe DiscussionTopicsController, type: :request do
       expect(json['unread_entries'].sort).to eq (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
 
       expect(json['participants'].sort_by { |h| h['id'] }).to eq [
-                                                                   {'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}"},
-                                                                   {'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}"},
+                                                                   {'id' => @student.id, "pronouns"=>nil, 'display_name' => @student.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}"},
+                                                                   {'id' => @teacher.id,"pronouns"=>nil, 'display_name' => @teacher.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}"},
                                                                  ].sort_by { |h| h['id'] }
 
       reply_reply1_attachment_json = {

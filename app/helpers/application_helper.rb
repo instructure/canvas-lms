@@ -31,11 +31,11 @@ module ApplicationHelper
     Rails.cache.fetch(['context_user_name', context, user_id].cache_key, {:expires_in=>15.minutes}) do
       user = user.respond_to?(:short_name) ? user : User.find(user_id)
       name = user.short_name || user.name
-      if user.account_pronoun && @domain_root_account.settings[:can_add_pronouns] && Account.site_admin.feature_enabled?(:account_pronouns)
-        pronoun = user.account_pronoun.display_pronoun
-        name = "#{ERB::Util.h(name)} <i>(#{ERB::Util.h(pronoun)})</i>".html_safe
+      if user.pronouns
+        "#{ERB::Util.h(name)} <i>(#{ERB::Util.h(user.pronouns)})</i>".html_safe
+      else
+        name
       end
-      name
     end
   end
 

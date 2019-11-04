@@ -21,6 +21,7 @@ require 'atom'
 class User < ActiveRecord::Base
   GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
   include TurnitinID
+  include Pronouns
 
   # this has to be before include Context to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
@@ -172,7 +173,6 @@ class User < ActiveRecord::Base
   has_many :past_lti_ids, class_name: 'UserPastLtiId', inverse_of: :user
 
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
-  belongs_to :account_pronoun
 
   include StickySisFields
   are_sis_sticky :name, :sortable_name, :short_name
@@ -2877,5 +2877,13 @@ class User < ActiveRecord::Base
       break if ObserverPairingCode.active.where(code: code).count == 0
     end
     observer_pairing_codes.create(expires_at: 7.days.from_now, code: code)
+  end
+
+  def pronouns
+    translate_pronouns(read_attribute(:pronouns))
+  end
+
+  def pronouns=(pronouns)
+    write_attribute(:pronouns, untranslate_pronouns(pronouns))
   end
 end
