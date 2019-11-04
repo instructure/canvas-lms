@@ -104,6 +104,25 @@ describe Types::CourseType do
         GQL
         expect(result.sort).to match course.assignments.published.map(&:to_param).sort
       end
+
+      it "returns assignments in order by position" do
+        ag = @course.assignment_groups.create! name: "Other Assignments", position: 1
+        other_ag_assignment = @course.assignments.create! assignment_group: ag, name: "other ag"
+
+        @term1_assignment1.assignment_group.update!(position: 2)
+        @term2_assignment1.update!(position: 1)
+        @term1_assignment1.update!(position: 2)
+
+        expect(
+          course_type.resolve(<<~GQL, current_user: @student)
+            assignmentsConnection(filter: {gradingPeriodId: null}) { edges { node { _id } } }
+          GQL
+        ).to eq [
+          other_ag_assignment,
+          @term2_assignment1,
+          @term1_assignment1,
+        ].map { |a| a.id.to_s }
+      end
     end
   end
 
