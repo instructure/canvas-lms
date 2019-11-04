@@ -39,7 +39,7 @@ class SubmissionDraft < ActiveRecord::Base
         # otherwise leaves the url as whatever the user submitted as thier draft
         value, = CanvasHttp.validate_url(self.url)
         self.send("url=", value)
-      rescue URI::Error, ArgumentError
+      rescue
         return
       end
     end
@@ -80,7 +80,7 @@ class SubmissionDraft < ActiveRecord::Base
     begin
       CanvasHttp.validate_url(self.url)
       true
-    rescue URI::Error, ArgumentError
+    rescue
       false
     end
   end

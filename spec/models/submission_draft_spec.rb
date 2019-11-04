@@ -197,6 +197,11 @@ RSpec.describe SubmissionDraft do
         expect(@submission_draft.meets_assignment_criteria?).to eq(false)
       end
 
+      it 'returns false if the url is malformed' do
+        @submission_draft.url = 'http:www.google.com'
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+
       it 'returns false if the url is empty' do
         @submission_draft.url = ''
         expect(@submission_draft.meets_assignment_criteria?).to eq(false)
