@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {element, oneOf, string} from 'prop-types'
-import React, {Component} from 'react'
-
 import ButtonContext from '../../../student/components/Context'
 import classNames from 'classnames'
-import I18n from 'i18n!assignments_2_shared_Steps_StepItem'
+import {element, oneOf, string} from 'prop-types'
+import I18n from 'i18n!assignments_2_shared_Steps'
+import React, {Component} from 'react'
+
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {
@@ -82,6 +82,21 @@ class StepItem extends Component {
 
   static defaultProps = {
     placement: 'interior'
+  }
+
+  getStatusI18n() {
+    switch (this.props.status) {
+      case 'button':
+        return I18n.t('button')
+      case 'complete':
+        return I18n.t('complete')
+      case 'incomplete':
+        return I18n.t('incomplete')
+      case 'in-progress':
+        return I18n.t('in-progress')
+      case 'unavailable':
+        return I18n.t('unavailable')
+    }
   }
 
   /**
@@ -179,12 +194,10 @@ class StepItem extends Component {
   }
 
   render() {
-    const {status, placement} = this.props
-
     const classes = {
       'step-item-step': true,
-      [status]: true,
-      [`placement--${placement}`]: true
+      [this.props.status]: true,
+      [`placement--${this.props.placement}`]: true
     }
 
     return (
@@ -213,7 +226,7 @@ class StepItem extends Component {
           {this.props.label}
         </span>
         {this.props.status !== 'button' && (
-          <ScreenReaderContent>{`${this.props.label} ${status}`}</ScreenReaderContent>
+          <ScreenReaderContent>{`${this.props.label} ${this.getStatusI18n()}`}</ScreenReaderContent>
         )}
       </span>
     )
