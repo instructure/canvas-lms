@@ -30,8 +30,6 @@
     'edit' => "<i class='icon-edit'></i>".html_safe,
     'delete' => "<i class='icon-end'></i>".html_safe,
     'duplicate' => "<i class='icon-copy-course'></i>".html_safe,
-    'copy_to' => "<i class='icon-duplicate'></i>".html_safe,
-    'send_to' => "<i class='icon-user'></i>".html_safe,
   }
 
   menu_type_to_class = {
@@ -251,26 +249,6 @@
               ><%= t("Move to...") %></a>
             </li>
             <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
-            <% if @domain_root_account&.feature_enabled?(:direct_share) %>
-              <li role="presentation">
-                <a
-                  href="#"
-                  class="module_item_send_to"
-                  title="<%= t("Send this module item to another user...") %>"
-                  aria-label="<%= t("Send this module item to another user...") %>"
-                  ><%= @module_item_image_tags['send_to'] %> <%= t('Send To...') %>
-                </a>
-              </li>
-              <li role="presentation">
-                <a
-                  href="#"
-                  class="module_item_copy_to"
-                  title="<%= t('Copy this module item to a course...') %>"
-                  aria-label="<%= t('Copy this module item to a course...') %>"
-                  ><%= @module_item_image_tags['copy_to'] %> <%= t('Copy To...') %>
-                </a>
-              </li>
-            <% end %>
             <% menu_type_to_class.each do |menu_type, content_class| %>
               <% if !module_item || module_item.content.is_a?(content_class) %>
                 <%

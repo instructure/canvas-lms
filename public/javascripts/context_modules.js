@@ -1857,26 +1857,6 @@ modules.initModuleManagement = function() {
       .catch(showFlashError('Error duplicating item'))
   })
 
-  $('.module_copy_to').live('click', event => {
-    event.preventDefault()
-    console.log('copy module to course')
-  })
-
-  $('.module_send_to').live('click', event => {
-    event.preventDefault()
-    console.log('send module to user')
-  })
-
-  $('.module_item_copy_to').live('click', event => {
-    event.preventDefault()
-    console.log('copy module item to course')
-  })
-
-  $('.module_item_send_to').live('click', event => {
-    event.preventDefault()
-    console.log('send module item to user')
-  })
-
   $('#add_module_prerequisite_dialog .cancel_button').click(() => {
     $('#add_module_prerequisite_dialog').dialog('close')
   })
