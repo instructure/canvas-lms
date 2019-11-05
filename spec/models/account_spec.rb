@@ -57,15 +57,33 @@ describe Account do
     # @a.to_atom.should be_is_a(Atom::Entry)
   # end
   #
-  it "should list all account pronouns" do
-    account1 = Account.create!
-    account2 = Account.create!
-    AccountPronoun.create_defaults
-    ap1 = AccountPronoun.create!(pronoun: "account 1 pronoun", account: account1)
-    AccountPronoun.create!(pronoun: "account 2 pronoun", account: account2)
-    expect(account1.pronouns.count).to eq 4
-    expect(account1.pronouns).to include(ap1)
-    expect(account2.pronouns).not_to include(ap1)
+  context "pronouns" do
+    it "uses an empty array if the setting is not on" do
+      account = Account.create!
+      expect(account.pronouns).to be_empty
+
+      # still returns empty array even if you explicitly set some
+      account.pronouns = ["Dude/Guy", "Dudette/Gal"]
+      expect(account.pronouns).to be_empty
+    end
+
+    it "uses defaults if setting is enabled and nothing is explicitly set" do
+      account = Account.create!
+      account.settings[:can_add_pronouns] = true
+      expect(account.pronouns).to eq ["She/Her", "He/Him", "They/Them"]
+    end
+
+    it "uses custom set things if explicitly provided (and strips whitespace)" do
+      account = Account.create!
+      account.settings[:can_add_pronouns] = true
+      account.pronouns = [" Dude/Guy   ", "She/Her  "]
+
+      # it "untranslates" "she/her" when it serializes it to the db
+      expect(account.settings[:pronouns]).to eq ["Dude/Guy", "she_her"]
+      # it "translates" "she/her" when it reads it
+      expect(account.pronouns).to eq ["Dude/Guy", "She/Her"]
+
+    end
   end
 
   context "course lists" do

@@ -14,23 +14,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-#
-class AccountPronoun < ActiveRecord::Base
-  include Canvas::SoftDeletable
-  belongs_to :account
 
-  DEFAULT_OPTIONS = {
-    :she_her => -> { t('she/her') },
-    :he_him => -> { t('he/him') },
-    :they_them => -> { t('they/them') }
-  }.freeze
+class DropAccountPronouns < ActiveRecord::Migration[5.2]
+  tag :postdeploy
 
-  def self.create_defaults
-    DEFAULT_OPTIONS.each_key {|pronoun| self.where(pronoun: pronoun, account_id: nil).first_or_create!}
-  end
-
-  def display_pronoun
-    self.account_id ? self.pronoun : DEFAULT_OPTIONS[self.pronoun.to_sym].call
+  def change
+    drop_table :account_pronouns
+    remove_column :users, :account_pronoun_id, :int, limit: 8
   end
 end

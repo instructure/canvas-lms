@@ -252,7 +252,7 @@ export default class Navigation extends React.Component {
         return (
           <ProfileTray
             userDisplayName={window.ENV.current_user.display_name}
-            userPronoun={window.ENV.current_user.pronoun}
+            userPronouns={window.ENV.current_user.pronouns}
             userAvatarURL={
               window.ENV.current_user.avatar_is_fallback
                 ? null

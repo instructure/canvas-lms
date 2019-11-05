@@ -14,16 +14,11 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class CreateAccountPronouns < ActiveRecord::Migration[5.2]
+class AddPronounsToUsers < ActiveRecord::Migration[5.2]
   tag :predeploy
+
   def change
-    create_table :account_pronouns do |t|
-      t.belongs_to :account, foreign_key: true, limit: 8, index: true
-      t.string :pronoun, null: false
-      t.timestamps
-      t.string :workflow_state
-    end
+    add_column :users, :pronouns, :string
   end
 end

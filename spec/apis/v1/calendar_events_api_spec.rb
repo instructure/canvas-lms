@@ -875,13 +875,15 @@ describe CalendarEventsApiController, type: :request do
               "id" => @student1.id,
               "display_name" => @student1.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/about/#{@student1.id}"
+              "html_url" => "http://www.example.com/about/#{@student1.id}",
+              "pronouns"=>nil
             },
             {
               "id" => @student2.id,
               "display_name" => @student2.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/users/#{@student2.id}"
+              "html_url" => "http://www.example.com/users/#{@student2.id}",
+              "pronouns"=>nil
             }
           ]
         end
@@ -894,13 +896,15 @@ describe CalendarEventsApiController, type: :request do
               "id" => @student1.id,
               "display_name" => @student1.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/users/#{@student1.id}"
+              "html_url" => "http://www.example.com/users/#{@student1.id}",
+              "pronouns"=>nil
             },
             {
               "id" => @student2.id,
               "display_name" => @student2.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/users/#{@student2.id}"
+              "html_url" => "http://www.example.com/users/#{@student2.id}",
+              "pronouns"=>nil
             }
           ]
         end
@@ -932,13 +936,15 @@ describe CalendarEventsApiController, type: :request do
               "id" => @student1.id,
               "display_name" => @student1.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/about/#{@student1.id}"
+              "html_url" => "http://www.example.com/about/#{@student1.id}",
+              "pronouns"=>nil
             },
             {
               "id" => @student2.id,
               "display_name" => @student2.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/users/#{@student2.id}"
+              "html_url" => "http://www.example.com/users/#{@student2.id}",
+              "pronouns"=>nil
             }
           ]
           json = api_call(:get, "/api/v1/calendar_events/#{event2.id}/participants",
@@ -948,7 +954,8 @@ describe CalendarEventsApiController, type: :request do
               "id" => @student.id,
               "display_name" => @student.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/about/#{@student.id}"
+              "html_url" => "http://www.example.com/about/#{@student.id}",
+              "pronouns"=>nil
             }
           ]
         end

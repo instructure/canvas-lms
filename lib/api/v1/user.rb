@@ -42,7 +42,6 @@ module Api::V1::User
     if opts[:group_memberships]
       ActiveRecord::Associations::Preloader.new.preload(users, :group_memberships)
     end
-    ActiveRecord::Associations::Preloader.new.preload(users, :account_pronoun)
   end
 
   def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment=nil, tool_includes: [])
@@ -66,8 +65,8 @@ module Api::V1::User
                       :integration_id => pseudonym&.integration_id
         end
 
-        if user.account_pronoun && @domain_root_account && Account.site_admin.feature_enabled?(:account_pronouns) && @domain_root_account.settings[:can_add_pronouns]
-          json[:pronoun] = user.account_pronoun.display_pronoun
+        if user.pronouns
+          json[:pronouns] = user.pronouns
         end
 
         if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
@@ -201,12 +200,9 @@ module Api::V1::User
       id: user.id,
       display_name: user.short_name,
       avatar_image_url: avatar_url_for_user(user),
-      html_url: participant_url
+      html_url: participant_url,
+      pronouns: user.pronouns
     }
-    if user.account_pronoun && @domain_root_account
-      hash[:pronoun] = user.account_pronoun.display_pronoun if @domain_root_account.settings[:can_add_pronouns] != false &&
-        Account.site_admin.feature_enabled?(:account_pronouns)
-    end
     hash[:avatar_is_fallback] = user.avatar_image_url.nil? if includes.include?(:avatar_is_fallback) && avatars_enabled_for_user?(user)
     hash[:fake_student] = true if user.fake_student?
     hash

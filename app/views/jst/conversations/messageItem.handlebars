@@ -2,19 +2,19 @@
   <div class="span8 user-info">
     {{>avatar author}}
     <div class="message-author-and-participants">
-      <b class="username">{{author.name}}{{#if author.pronoun}} <i>({{author.pronoun}})</i> {{/if}}</b>{{#if participants.length}},{{/if}}
+      <b class="username">{{author.name}}{{#if author.pronouns}} <i>({{author.pronouns}})</i> {{/if}}</b>{{#if participants.length}},{{/if}}
 
       <span class="message-participants-wrapper">
         <span class="message-participants" aria-live="polite"></span>
         <div class="hidden">
           <span class="summarized-message-participants">
             {{#each summarizedParticipantNames}}
-              <span>{{name}}{{#if pronoun}} <i>({{pronoun}})</i>{{/if}}</span>
+              <span>{{name}}{{#if pronouns}} <i>({{pronouns}})</i>{{/if}}</span>
             {{/each}}...
           </span>
           <span class="full-message-participants">
             {{#each participantNames}}
-              <span>{{name}}{{#if pronoun}} <i>({{pronoun}})</i>{{/if}}</span>
+              <span>{{name}}{{#if pronouns}} <i>({{pronouns}})</i>{{/if}}</span>
             {{/each}}
           </span>
         </div>

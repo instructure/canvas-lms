@@ -81,23 +81,13 @@ describe Types::UserType do
     end
   end
 
-  context "pronoun" do
-    before(:each) do
-      AccountPronoun.create_defaults
-    end
-
-    it "returns user pronoun" do
+  context "pronouns" do
+    it "returns user pronouns" do
       @student.account.root_account.settings[:can_add_pronouns] = true
       @student.account.root_account.save!
-      @student.account_pronoun_id = AccountPronoun.first
+      @student.pronouns = "Dude/Guy"
       @student.save!
-      expect(user_type.resolve("pronoun")).to eq AccountPronoun.first.display_pronoun
-    end
-
-    it "will not return pronoun if account setting is not set" do
-      @student.account_pronoun_id = AccountPronoun.first
-      @student.save!
-      expect(user_type.resolve("pronoun")).to eq nil
+      expect(user_type.resolve("pronouns")).to eq "Dude/Guy"
     end
   end
 

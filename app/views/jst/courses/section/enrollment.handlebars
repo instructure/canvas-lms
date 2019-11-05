@@ -15,7 +15,7 @@
      data-student_id={{user_id}}
      {{/ifEqual}}
      class="name {{#ifEqual type "StudentEnrollment"}}student_context_card_trigger{{/ifEqual}}"
-     >{{user.sortable_name}}{{#if user.pronoun}}<i> ({{user.pronoun}})</i>{{/if}}</a>
+     >{{user.sortable_name}}{{#if user.pronouns}}<i> ({{user.pronouns}})</i>{{/if}}</a>
   <div class="short_name">{{user.short_name}}</div>
   <div class="enrollment_type">{{typeLabel}}</div>
   <div class="email">{{user.login_id}}</div>
