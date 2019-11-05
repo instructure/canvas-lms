@@ -57,6 +57,7 @@ module CanvasRails
     log_config = File.exist?(log_config_path) && YAML.safe_load(ERB.new(File.read(log_config_path)).result)[Rails.env]
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
     opts = {}
+
     require 'canvas_logger'
 
     config.log_level = log_config['log_level']
@@ -77,10 +78,16 @@ module CanvasRails
         opts[:include_pid] = true if log_config["include_pid"] == true
         config.logger = SyslogWrapper.new(ident, facilities, opts)
         config.logger.level = log_level
-      when "stdout"
-        # Nothing to do here. The rails12factor gem configures this for us.
+     when "stdout"
+        # Note: the rails12factor gem is supposed to configure this automatically, with the
+        # rails_stdout_logging gem. But something, somewhere still seems to set it up to write 
+        # to the actual log file so we're explicitly initializing it here.
+        # Note: this is confusing b/c we're using Rails4, but if you look at the src code,
+        # 3 and 4 use the same initializer
+        require 'rails_stdout_logging/rails3'
+        RailsStdoutLogging::Rails3.set_logger(config)
         puts "Rails.logger is configured to log to STDOUT."
-      else
+     else
         log_path = config.paths['log'].first
 
         if ENV['RUNNING_AS_DAEMON'] == 'true'
