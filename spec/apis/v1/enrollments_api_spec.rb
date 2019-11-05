@@ -1865,6 +1865,93 @@ describe EnrollmentsApiController, type: :request do
       end
     end
 
+    context "as an observer in a course" do
+      let(:course) { Course.create! }
+      let(:observed_student) { User.create! }
+      let(:hidden_student) { User.create! }
+      let(:observer) { User.create! }
+
+      let(:request_params) do
+        {
+          action: "index",
+          controller: "enrollments_api",
+          course_id: course.id,
+          format: :json
+        }
+      end
+
+      let(:enrollment_json) do
+        api_call_as_user(observer, :get, "/api/v1/courses/#{course.id}/enrollments", request_params)
+      end
+
+      let(:student_enrollments) do
+        enrollment_json.select { |enrollment| enrollment["type"] == "StudentEnrollment" }
+      end
+
+      let(:observer_enrollments) do
+        enrollment_json.select { |enrollment| enrollment["type"] == "ObserverEnrollment" }
+      end
+
+      before(:each) do
+        course.enroll_student(observed_student, active_all: true)
+        course.enroll_student(hidden_student, active_all: true)
+
+        observer.register!
+        # add an observer, but don't link them to any students yet
+        course.enroll_user(observer, 'ObserverEnrollment')
+        user_session(observer)
+      end
+
+      context "when the observer is observing at least one student in the course" do
+        before(:each) do
+          course.enroll_user(observer, 'ObserverEnrollment', associated_user_id: observed_student.id)
+        end
+
+        it "returns a successful response" do
+          api_call_as_user(observer, :get, "/api/v1/courses/#{course.id}/enrollments", request_params)
+          expect(response.code).to eq "200"
+        end
+
+        it "includes active enrollments for each observed student" do
+          expect(student_enrollments.pluck("user_id")).to contain_exactly(observed_student.id)
+        end
+
+        it "includes both the observer's base enrollment and enrollments associated with observees" do
+          expect(observer_enrollments.pluck("user_id", "associated_user_id")).to match_array([
+            [observer.id, nil],
+            [observer.id, observed_student.id]
+          ])
+        end
+
+        it "does not include enrollments for students the user is not observing" do
+          expect(student_enrollments.pluck("user_id")).not_to include(hidden_student.id)
+        end
+
+        it "does not include students who were once observed but no longer are" do
+          observer.observer_enrollments.find_by(associated_user_id: observed_student.id).destroy
+          aggregate_failures do
+            expect(student_enrollments).to be_empty
+            expect(observer_enrollments.length).to eq 1
+            expect(observer_enrollments.first["associated_user_id"]).to be nil
+          end
+        end
+
+        it "returns unauthorized if the user has no non-deleted observer enrollments" do
+          observer.observer_enrollments.destroy_all
+          api_call_as_user(observer, :get, "/api/v1/courses/#{course.id}/enrollments", request_params)
+          expect(response.code).to eq "401"
+        end
+      end
+
+      it "returns only the base ObserverEnrollment if the observer has not been linked to any students" do
+        aggregate_failures do
+          expect(enrollment_json.length).to eq 1
+          expect(enrollment_json.first["user_id"]).to be observer.id
+          expect(enrollment_json.first["associated_user_id"]).to be nil
+        end
+      end
+    end
+
     context "a user without permissions" do
       before :once do
         @user = user_with_pseudonym(:name => 'Don Draper', :username => 'ddraper@sterling-cooper.com')
