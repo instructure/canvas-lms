@@ -193,7 +193,7 @@ pipeline {
           steps {
             // propagate set to false until we can get tests passing
             build(
-              job: 'linters',
+              job: 'test-suites/linters',
               parameters: build_parameters
             )
           }
@@ -205,7 +205,7 @@ pipeline {
  *         steps {
  *           // propagate set to false until we can get tests passing
  *           build(
- *             job: 'selenium-chrome',
+ *             job: 'test-suites/selenium-chrome',
  *             propagate: false,
  *             parameters: build_parameters
  *           )
@@ -216,7 +216,7 @@ pipeline {
  *         steps {
  *           // propagate set to false until we can get tests passing
  *           build(
- *             job: 'vendored-gems',
+ *             job: 'test-suites/vendored-gems',
  *             parameters: build_parameters
  *           )
  *         }
@@ -226,7 +226,7 @@ pipeline {
  *         steps {
  *           // propagate set to false until we can get tests passing
  *           build(
- *             job: 'rspec',
+ *             job: 'test-suites/rspec',
  *             propagate: false,
  *             parameters: build_parameters
  *           )
@@ -237,7 +237,7 @@ pipeline {
  *         steps {
  *           // propagate set to false until we can get tests passing
  *           build(
- *             job: 'selenium-performance-chrome',
+ *             job: 'test-suites/selenium-performance-chrome',
  *             propagate: false,
  *             parameters: build_parameters
  *           )
@@ -248,7 +248,7 @@ pipeline {
  *         steps {
  *           // propagate set to false until we can get tests passing
  *           build(
- *             job: 'contract-tests',
+ *             job: 'test-suites/contract-tests',
  *             propagate: false,
  *             parameters: build_parameters
  *           )
@@ -259,7 +259,7 @@ pipeline {
  *         steps {
  *           // propagate set to false until we can get tests passing
  *           build(
- *             job: 'frontend',
+ *             job: 'test-suites/frontend',
  *             propagate: false,
  *             parameters: build_parameters
  *           )
@@ -270,7 +270,7 @@ pipeline {
  *         steps {
  *           // propagate set to false until we can get tests passing
  *           build(
- *             job: 'xbrowser',
+ *             job: 'test-suites/xbrowser',
  *             propagate: false,
  *             parameters: build_parameters
  *           )
