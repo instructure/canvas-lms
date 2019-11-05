@@ -454,3 +454,9 @@ unfavorite_course_from_dashboard:
   description: This allows the user to unfavorite a course directly from its
     dashboard card.
   root_opt_in: true
+commons_favorites:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Import Commons Favorites
+  description: If Commons is installed, allows importing favorited content
+    items from within Canvas.
