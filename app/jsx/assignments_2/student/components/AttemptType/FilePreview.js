@@ -92,9 +92,7 @@ export default class FilePreview extends Component {
       <Button variant="icon" size="large" onClick={() => this.selectFile(index)}>
         <img
           alt={I18n.t('%{filename} preview', {filename: file.displayName})}
-          height="100"
           src={file.thumbnailUrl}
-          width="100"
         />
         <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
       </Button>
@@ -116,6 +114,8 @@ export default class FilePreview extends Component {
 
   renderFileIcons = () => {
     const iconsContainerStyle = {
+      borderRight: `1px solid ${theme.variables.colors.borderMedium}`,
+      margin: '-1px',
       padding: theme.variables.spacing.small
     }
 
@@ -134,7 +134,7 @@ export default class FilePreview extends Component {
                 ? this.renderThumbnail(file, index)
                 : this.renderIcon(file, index)}
             </Tooltip>
-            <div style={{display: 'block'}}>
+            <div style={{display: 'block', margin: '2px 0 0 0'}}>
               <Text size="small">{this.capitalize(this.translateMimeClass(file.mimeClass))}</Text>
             </div>
           </div>
