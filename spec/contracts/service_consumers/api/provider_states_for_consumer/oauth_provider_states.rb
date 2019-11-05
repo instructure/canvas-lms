@@ -45,6 +45,7 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
           "https://canvas.instructure.com/lti/data_services/scope/list",
           "https://canvas.instructure.com/lti/data_services/scope/destroy",
           "https://canvas.instructure.com/lti/data_services/scope/list_event_types",
+          "https://canvas.instructure.com/lti/feature_flags/scope/show",
         ]
       )
       allow_any_instance_of(Canvas::Oauth::Provider).
