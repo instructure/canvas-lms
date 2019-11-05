@@ -256,6 +256,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change', hash_including({
         submission_id: @quiz_submission.submission.global_id.to_s,
         assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
+        assignment_name: @quiz_submission.submission.assignment.name,
         grader_id: nil,
         student_id: @quiz_submission.user.global_id.to_s,
         user_id: @quiz_submission.user.global_id.to_s
@@ -271,6 +272,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change', hash_including(
         submission_id: submission.global_id.to_s,
         assignment_id: submission.global_assignment_id.to_s,
+        assignment_name: submission.assignment.name,
         grader_id: @teacher.global_id.to_s,
         student_id: @student.global_id.to_s,
         user_id: @student.global_id.to_s
@@ -289,6 +291,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change',
         hash_including({
           assignment_id: submission.global_assignment_id.to_s,
+          assignment_name: submission.assignment.name,
           user_id: @student.global_id.to_s,
           student_id: @student.global_id.to_s,
           student_sis_id: nil

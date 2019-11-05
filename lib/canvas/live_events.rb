@@ -473,6 +473,7 @@ module Canvas::LiveEvents
     post_event_stringified('grade_change', {
       submission_id: submission.global_id,
       assignment_id: submission.global_assignment_id,
+      assignment_name: submission.assignment.name,
       grade: submission.grade,
       old_grade: old_submission.try(:grade),
       score: submission.score,
