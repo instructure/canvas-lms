@@ -359,14 +359,14 @@ describe AssignmentOverrideApplicator do
 
       describe 'for students' do
         it 'returns group overrides' do
-          result = AssignmentOverrideApplicator.group_override(@assignment, @student)
-          expect(result).to eq @override
+          result = AssignmentOverrideApplicator.group_overrides(@assignment, @student)
+          expect(result).to eq [@override]
         end
 
         it 'returns groups overrides for graded discussions' do
           create_group_override_for_discussion
-          result = AssignmentOverrideApplicator.group_override(@assignment, @student)
-          expect(result).to eq @override
+          result = AssignmentOverrideApplicator.group_overrides(@assignment, @student)
+          expect(result).to eq [@override]
         end
 
         it "should not include group override for groups other than the user's" do
@@ -387,13 +387,25 @@ describe AssignmentOverrideApplicator do
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to be_empty
         end
+
+        it "should still return something when there are old deleted group overrides" do
+          @override.destroy!
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          expect(overrides).to be_empty
+
+          override2 = assignment_override_model(:assignment => @assignment)
+          override2.set = @group
+          override2.save!
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          expect(overrides).to eq [override2]
+        end
       end
 
       describe 'for teachers' do
         it 'works' do
           teacher_in_course
-          result = AssignmentOverrideApplicator.group_override(@assignment, @teacher)
-          expect(result).to eq @override
+          result = AssignmentOverrideApplicator.group_overrides(@assignment, @teacher)
+          expect(result).to eq [@override]
         end
       end
 
