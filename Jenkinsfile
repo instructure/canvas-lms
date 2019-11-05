@@ -108,7 +108,7 @@ pipeline {
     stage('Print Env Variables') {
       steps {
         timeout(time: 20, unit: 'SECONDS') {
-        sh 'printenv | sort'
+          sh 'printenv | sort'
         }
       }
     }
@@ -226,6 +226,18 @@ pipeline {
           }
         }
 
+        stage('Linters') {
+          steps {
+            skipIfPreviouslySuccessful("linters") {
+              build(
+                job: 'test-suites/linters',
+                propagate: false,
+                parameters: build_parameters
+              )
+            }
+          }
+        }
+
         stage('Vendored Gems') {
           steps {
             skipIfPreviouslySuccessful("vendored-gems") {
@@ -303,17 +315,6 @@ pipeline {
  *           }
  *         }
  *       }
- *
- *      stage('Linters') {
- *        steps {
- *          skipIfPreviouslySuccessful("linters") {
- *            build(
- *              job: 'test-suites/linters',
- *              parameters: build_parameters
- *            )
- *          }
- *        }
- *      }
  *
  *       stage('Xbrowser') {
  *         steps {
