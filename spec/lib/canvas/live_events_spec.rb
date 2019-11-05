@@ -1151,7 +1151,7 @@ describe Canvas::LiveEvents do
       it 'should include result in created live event' do
         expect_event('learning_outcome_result_created', {
           learning_outcome_id: result.learning_outcome_id.to_s,
-          mastery: result.learning_outcome_id,
+          mastery: result.mastery,
           score: result.score,
           created_at: result.created_at,
           attempt: result.attempt,
@@ -1173,7 +1173,7 @@ describe Canvas::LiveEvents do
         result.update!(attempt: 1)
         expect_event('learning_outcome_result_updated', {
           learning_outcome_id: result.learning_outcome_id.to_s,
-          mastery: result.learning_outcome_id,
+          mastery: result.mastery,
           score: result.score,
           created_at: result.created_at,
           updated_at: result.updated_at,
