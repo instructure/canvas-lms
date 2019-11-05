@@ -1,12 +1,24 @@
 common: &default_settings
+  # Heroku uses DATABASE_URL to configure the connection to the postgres addon
+  # However, we can't just use that directly as some of these articles talk about:
+  #
+  #   https://edgeguides.rubyonrails.org/configuring.html#configuring-a-database
+  #   https://devcenter.heroku.com/articles/heroku-postgresql#connecting-in-rails
+  #   https://github.com/rails/rails/pull/13582/files
+  #
+  # b/c we're on Rails 4.0 and there are things across the Canvas codebase that rely on database.yml,
+  # like the switchman gem. So, we continue to use this file and if the DATABASE_URL is set,
+  # we parse it into these PGXXX env vars in config/application.rb
+  #
+  # Keep this is mind b/c if a DATABASE_URL is set it will take precendence over any PGXXX variables!
   adapter: postgresql
-  host: <%= ENV['PGHOST'] %> 
+  timeout: 5000
   encoding: utf8
+  host: <%= ENV['PGHOST'] %> 
   database: <%= ENV['PGDATABASE'] %>
   username: <%= ENV['PGUSER'] %>
   password: <%= ENV['PGPASSWORD'] %>
-  timeout: 5000
-
+  
 development:
   <<: *default_settings
   open: true

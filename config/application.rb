@@ -18,6 +18,31 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
+# Make the .env variables available before waiting for before_configuration
+# so that we can get teh database environment variables setup properly
+# before anything has to connect.
+# See: https://github.com/bkeepers/dotenv#note-on-load-order
+Dotenv::Railtie.load
+
+if ENV['DATABASE_URL']
+  begin
+    # Parse the database config environment variables out of the DATABASE_URL
+    # See config/database.yml for why we do this
+    # The format is: postgres://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]
+    # E.g.           postgres://myuser:mypassword@mydbhost:myport/mydbname
+    puts "### Found a DATABASE_URL environment variable. Configuring the database connection with that instead of: PGDATABASE, PGUSER, PGPASSWORD, PGHOST"
+    database_uri = URI.parse(ENV["DATABASE_URL"])
+    ENV['PGDATABASE'] = "#{(database_uri.path || "").split("/")[1]}"
+    ENV['PGUSER'] = database_uri.user
+    ENV['PGPASSWORD'] = database_uri.password
+    ENV['PGHOST'] = database_uri.host
+    # Note: if you want to get fancier, here is a good example of parsing out other
+    # DB config stuff from the DATABASE_URL: https://gist.github.com/gullitmiranda/62082f2e47c364ef9617 
+  rescue URI::InvalidURIError
+    raise "Invalid DATABASE_URL=#{ENV["DATABASE_URL"]}. Fatal error."
+  end
+end
+
 if CANVAS_RAILS4_0
   ActiveRecord::Base.class_eval do
     mattr_accessor :dump_schema_after_migration, instance_writer: false
