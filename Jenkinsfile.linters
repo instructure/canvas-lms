@@ -31,6 +31,13 @@ pipeline {
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
   stages {
+    // this is here because someone forgot to add the post cleanup in this build.
+    // remove this after it runs for a little bit.
+    stage('temp-cleanup') {
+      steps {
+        sh 'build/new-jenkins/docker-cleanup.sh'
+      }
+    }
     stage('ESLint - JSX') {
       steps {
         sh 'build/new-jenkins/frontend/linter-eslint.sh'
@@ -45,6 +52,12 @@ pipeline {
       steps {
         sh 'build/new-jenkins/frontend/linter-xss.sh'
       }
+    }
+  }
+
+  post {
+    cleanup {
+      sh 'build/new-jenkins/docker-cleanup.sh'
     }
   }
 }
