@@ -40,7 +40,7 @@ ProfileTab.propTypes = {
   html_url: string.isRequired
 }
 
-export default function ProfileTray(props) {
+export default function ProfileTray({userDisplayName, userAvatarURL, loaded, userPronouns, tabs}) {
   return (
     <View as="div" padding="medium">
       <View textAlign="center">
@@ -84,7 +84,7 @@ ProfileTray.propTypes = {
   userDisplayName: string.isRequired,
   userAvatarURL: string.isRequired,
   loaded: bool.isRequired,
-  userPronoun: string,
+  userPronouns: string,
   tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired
 
 }
