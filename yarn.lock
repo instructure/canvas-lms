@@ -1603,7 +1603,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-heading@^6.14.0":
+"@instructure/ui-heading@6", "@instructure/ui-heading@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-heading/-/ui-heading-6.14.0.tgz#7fde4ac1bb5fe00cddea4afc00eca54a12b2378c"
   integrity sha512-XAhPkz318Zp2YApdJIZAGPNbx/W2vGxQk9Y4b7ECr5Y1k9xIEcPyP8s1hkeB074xluy7+5j19PjtuxwtURC8XQ==
