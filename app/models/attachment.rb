@@ -1813,7 +1813,7 @@ class Attachment < ActiveRecord::Base
     addition = 1
     dir = File.dirname(filename)
     dir = dir == "." ? "" : "#{dir}/"
-    extname = filename[/(\.[A-Za-z][A-Za-z0-9]*)+$/] || ''
+    extname = filename[/(\.[A-Za-z][A-Za-z0-9]*)*(\.[A-Za-z0-9]*)$/] || ''
     basename = File.basename(filename, extname)
 
     until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}")
