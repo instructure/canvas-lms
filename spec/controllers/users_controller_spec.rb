@@ -79,6 +79,11 @@ describe UsersController do
       expect(tool.label_for(:user_navigation, :en)).to eq 'English Label'
     end
 
+    it "includes the correct context_asset_string" do
+      get :external_tool, params: {id:tool.id, user_id:user.id}
+      expect(controller.js_env[:context_asset_string]).to eq "user_#{user.id}"
+    end
+
     context 'using LTI 1.3 when specified' do
       include_context 'lti_1_3_spec_helper'
 
