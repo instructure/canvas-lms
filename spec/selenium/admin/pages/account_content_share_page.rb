@@ -16,49 +16,43 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative '../../common'
 
-module AdminSettingsPage
+module AccountContentSharePage
   # ---------------------- Elements ----------------------
-  def admin_left_nav_menu
-    f("#section-tabs")
+  def content_share_main_content
+    f('#content')
   end
 
-  def analytics_menu_item
-    f('a.analytics_plugin')
+  def received_table_rows
+    ff('table tr')
   end
 
-  def global_nav_profile_link
-    f('#global_nav_profile_link')
+  def received_item_row(item_name)
+    fj("tr:contains('#{item_name}')")
   end
 
-  def profile_tray
-    f("div[role='dialog'][aria-label='Profile tray']")
-  end
-  
-  def profile_tray_menu_items
-    f("div[role='dialog'][aria-label='Profile tray'] ul")
+  def manage_received_item_button(item_name)
+    fj("button:contains('Manage options for #{item_name}')")
   end
 
-  def profile_tray_content_share_link
-    fj("a:contains('Shared Content')")
-  end
-  
-  def profile_tray_spinner
-    fj("li title:contains('Loading')")
+  def received_item_actions_menu
+    ff("ul[role='menu'] li")
   end
 
+  def remove_received_item
+    fj("li:contains('Remove')")
+  end
+
+  def unread_item_button_icon(item_name)
+    fj("button:contains('#{item_name} is unread, click to mark as read')")
+  end
+
+  def read_item_button_icon(item_name)
+    fj("button:contains('#{item_name} has been read')")
+  end
   # ---------------------- Actions -----------------------
-  def visit_admin_settings_tab(account_id)
-    get "/accounts/#{account_id}/settings"
+  def visit_content_share_page
+    get "/profile/content_shares"
   end
 
   # ---------------------- Methods -----------------------
-  def wait_for_profile_tray_spinner
-    begin
-      spinner = profile_tray_spinner
-      keep_trying_until(3) { (spinner.displayed? == false) }
-    rescue Selenium::WebDriver::Error::TimeoutError
-      # ignore - sometimes spinner doesn't appear in Chrome
-    end
-    wait_for_ajaximations
-  end
 end
