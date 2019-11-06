@@ -17,7 +17,9 @@
  */
 
 import $ from 'jquery'
+import {Alert} from '@instructure/ui-alerts'
 import Backbone from 'Backbone'
+import {Link, Text} from '@instructure/ui-elements'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Paginator from '../shared/components/Paginator'
@@ -36,6 +38,8 @@ const GradebookRouter = Backbone.Router.extend({
     this.isLoaded = false
     this.views = {}
     this.views.assignment = new Gradebook(ENV.GRADEBOOK_OPTIONS)
+
+    this.renderOldGradebookReplacementNotice()
 
     if (ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled) {
       this.views.outcome = this.initOutcomes()
@@ -63,6 +67,22 @@ const GradebookRouter = Backbone.Router.extend({
         loadPage={p => this.views.outcome.loadPage(p)}
       />,
       document.getElementById('outcome-gradebook-paginator')
+    )
+  },
+
+  renderOldGradebookReplacementNotice() {
+    const newGradebookInfoURL =
+      'https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-guide-table-of-contents#jive_content_id_New_Gradebook'
+    ReactDOM.render(
+      <Alert variant="warning">
+        <Text>
+          This version of Gradebook is being replaced by an updated Gradebook on January 18, 2020.
+          <Link href={newGradebookInfoURL} margin="0 xx-small">
+            Learn More
+          </Link>
+        </Text>
+      </Alert>,
+      document.getElementById('replacement_notice_mount_point')
     )
   },
 

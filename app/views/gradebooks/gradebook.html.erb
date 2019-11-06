@@ -28,6 +28,7 @@
 <div id="keyboard_navigation"></div>
 <div id="gradebook_wrapper">
 <h1 class="screenreader-only"><%= t('Gradebook') %></h1>
+  <div id="replacement_notice_mount_point"></div>
   <div class="gradebook-header">
     <div class="accessibility_warning">
       <%= link_to t('Warning: For improved accessibility, please click here to use the Individual View Gradebook.'), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => "accessibility_warning", :class => "screenreader-only" %>
