@@ -15,45 +15,36 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative './page_objects/student_assignment_page_v2'
 require_relative '../common'
-require_relative '../helpers/assignments_common'
 
 
 describe 'assignments' do
   include_context "in-process server selenium tests"
-  include AssignmentsCommon
 
   context 'as a student' do
 
     before(:once) do
-      Account.default.enable_feature!(:assignments_2_student)
-      course_with_student(course: @course, active_all: true)
+      course_with_student(active_all: true)
+      @course.account.root_account.enable_feature!(:assignments_2_student)
       @assignment = @course.assignments.create!(
         name: 'locked_assignment',
         due_at: 5.days.ago,
-        lock_at: 3.days.ago
+        lock_at: 3.days.ago,
+        submission_types: 'online_text_entry'
       )
     end
 
-    before(:each) do
+    before do
       user_session(@student)
-      StudentAssignmentPageV2.visit(@course, @assignment)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
     end
 
-    xit 'should show locked image' do
-      skip('Unskip in COMMS-2074')
-      expect(StudentAssignmentPageV2.assignment_locked_image).to be_displayed
+    it 'should show a locked image' do
+      expect(f("img[alt='Assignment Locked']")).to be_displayed
     end
 
-    xit 'should show locked stepper' do
-      skip('Unskip in COMMS-2074')
-      expect(StudentAssignmentPageV2.lock_icon).to be_displayed
-    end
-
-    xit 'a locked assignment should not show details container' do
-      skip('Unskip in COMMS-2074')
-      expect(f("#content")).not_to contain_css StudentAssignmentPageV2.details_toggle_css
+    it 'should show a locked stepper' do
+      expect(f("svg[name='IconLock']")).to be_displayed
     end
   end
 end
