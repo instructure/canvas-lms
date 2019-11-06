@@ -1,5 +1,7 @@
 common: &default_settings
-  domain: <%= ENV['DOMAIN'] %>
+  # For heroku Review Apps, the HEROKU_APP_NAME holds the app DOMAIN.
+  # That should take precendence if both variables exist.
+  domain: <%= ENV.fetch('HEROKU_APP_NAME', ENV['DOMAIN']) %>
   ssl: true
 
 development:

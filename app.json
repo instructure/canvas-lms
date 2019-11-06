@@ -1,0 +1,71 @@
+{
+  "name": "canvas-lms",
+  "scripts": {
+    "postdeploy": "bundle exec rake heroku:reviewapps:postdeploy"
+  },
+  "env": {
+    "AWS_ACCESS_KEY_ID": {
+      "required": true
+    },
+    "AWS_BUCKET": {
+      "required": true
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "required": true
+    },
+    "BZ_BASE_URL": {
+      "required": true
+    },
+    "BZ_HELP_URL": {
+      "required": true
+    },
+    "BZ_UNRESTRICTED_HTML_USERS": {
+      "required": true
+    },
+    "DB_POOL": {
+      "required": true
+    },
+    "ENCRYPTION_KEY": {
+      "required": true
+    },
+    "HEROKU_APP_NAME": {
+      "required": true
+    },
+    "HEROKU_PARENT_APP_NAME": {
+      "required": true
+    },
+    "LOG_LEVEL": {
+      "required": true
+    },
+    "LOGGER_TYPE": {
+      "required": true
+    },
+    "MAIL_DEFAULT_NAME": {
+      "required": true
+    },
+    "MAIL_DELIVERY_METHOD": {
+      "required": true
+    },
+    "RAILS_ENV": {
+      "required": true
+    },
+    "RAILS_MAX_THREADS": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "standard-2x"
+    }
+  },
+  "addons": [
+    "papertrail",
+    {
+      "plan": "heroku-postgresql:standard-0"
+    },
+    "heroku-redis"
+  ],
+  "buildpacks": [],
+  "stack": "container"
+}
