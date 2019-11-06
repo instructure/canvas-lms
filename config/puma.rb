@@ -65,4 +65,9 @@ on_worker_boot do
     config['reaping_frequency'] = ENV['DB_REAP_FREQ'] || 15 # seconds
     ActiveRecord::Base.establish_connection(config)
   end
+
+  # We're in smart spawning mode, and need to make unique connections for this fork.
+  # Copied from config/application.rb where this is done for PhusionPassenger after fork.
+  Canvas.reconnect_redis
+
 end
