@@ -26,8 +26,8 @@ import LogoutButton from '../LogoutButton'
 import {AccessibleContent} from '@instructure/ui-a11y'
 
 // Trying to keep this as generalized as possible, but it's still a bit
-// gross matching on the label text sent to us from Rails
-const labelsToCounts = [{label: 'Shared Content', countName: 'unreadShares'}]
+// gross matching on the id of the tray tabs given to us by Rails
+const idsToCounts = [{id: 'content_shares', countName: 'unreadShares'}]
 
 const a11yCount = count => (
   <AccessibleContent alt={I18n.t('%{count} unread.', {count})}>{count}</AccessibleContent>
@@ -35,7 +35,7 @@ const a11yCount = count => (
 
 function ProfileTab({id, html_url, label, counts}) {
   function renderCountBadge() {
-    const found = labelsToCounts.filter(x => x.label === label)
+    const found = idsToCounts.filter(x => x.id === id)
     if (found.length === 0) return null // no count defined for this label
     const count = counts[found[0].countName]
     if (count === 0) return null // zero count is not displayed

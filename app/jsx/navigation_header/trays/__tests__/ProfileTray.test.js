@@ -43,7 +43,7 @@ describe('ProfileTray', () => {
           html_url: '/bar'
         },
         {
-          id: 'shared',
+          id: 'content_shares',
           label: 'Shared Content',
           html_url: '/shared'
         }
