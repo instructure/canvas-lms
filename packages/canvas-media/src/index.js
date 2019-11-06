@@ -19,7 +19,7 @@ import {arrayOf, bool, func, shape, string} from 'prop-types'
 import React, {Suspense} from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-overlays'
 import {Tabs} from '@instructure/ui-tabs'
 

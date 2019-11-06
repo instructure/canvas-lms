@@ -32,6 +32,7 @@
     "@instructure/ui-elements": "6",
     "@instructure/ui-forms": "6",
     "@instructure/ui-icons": "6",
+    "@instructure/ui-heading": "6",
     "@instructure/ui-layout": "6",
     "@instructure/ui-media-player": "^5",
     "@instructure/ui-overlays": "6",
