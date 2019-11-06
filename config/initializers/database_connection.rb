@@ -11,6 +11,7 @@ Rails.application.config.after_initialize do
     # make with these settings so they don't exceed the database connection limit.
     config = ActiveRecord::Base.configurations[Rails.env] || Rails.application.config.database_configuration[Rails.env]
     config['pool'] = ENV['DB_POOL'] || ENV['RAILS_MAX_THREADS'] || 5
+    config['reaping_frequency'] = ENV['DB_REAP_FREQ'] || 15 # seconds
     ActiveRecord::Base.establish_connection(config)
   end
 end
