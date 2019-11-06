@@ -34,189 +34,219 @@ import './jquery.disableWhileLoading'
 import 'message_students' /* messageStudents */
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 
+$(document).ready(function() {
+  if (ENV.QUIZ_SUBMISSION_EVENTS_URL) {
+    QuizLogAuditingEventDumper(true)
+  }
 
-  $(document).ready(function () {
-    if(ENV.QUIZ_SUBMISSION_EVENTS_URL) {
-      QuizLogAuditingEventDumper(true);
-    }
+  $('#preview_quiz_button').click(e => {
+    $('#js-sequential-warning-dialogue div a').attr('href', $('#preview_quiz_button').attr('href'))
+  })
 
-    $('#preview_quiz_button').click(e => {
-      $('#js-sequential-warning-dialogue div a').attr('href',$('#preview_quiz_button').attr('href'));
-    });
-
-    function ensureStudentsLoaded(callback) {
-      if ($('#quiz_details').length) {
-        return callback();
-      } else {
-        return $.get(ENV.QUIZ_DETAILS_URL, html => {
-          $("#quiz_details_wrapper").html(html);
-          callback();
-        });
-      }
-    }
-
-    var arrowApplicator = new QuizArrowApplicator();
-    arrowApplicator.applyArrows();
-    // quiz_show is being pulled into ember show for now. only hide inputs
-    // when we don't have a .allow-inputs
-    if (!$('.allow-inputs').length) {
-      inputMethods.disableInputs('[type=radio], [type=checkbox]');
-      inputMethods.setWidths();
-    }
-
-    $('form.edit_quizzes_quiz').on('submit', function(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      $(this).find('.loading').removeClass('hidden');
-      var data = $(this).serializeArray();
-      var url = $(this).attr('action');
-      $.ajax({
-        url: url,
-        data: data,
-        type: 'POST',
-        success: function() {
-          $('.edit_quizzes_quiz').parents('.alert').hide();
-        }
-      });
-    });
-
-    $(".delete_quiz_link").click(function(event) {
-      event.preventDefault();
-      var deleteConfirmMessage = I18n.t('confirms.delete_quiz', "Are you sure you want to delete this quiz?");
-      var submittedCount = parseInt($('#quiz_details_wrapper').data('submitted-count'));
-      if (submittedCount > 0) {
-        deleteConfirmMessage += "\n\n" + I18n.t('confirms.delete_quiz_submissions_warning',
-          {'one': "Warning: 1 student has already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.",
-           'other': "Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook."},
-          {'count': submittedCount});
-      }
-      $("nothing").confirmDelete({
-        url: $(this).attr('href'),
-        message: deleteConfirmMessage,
-        success: function() {
-          window.location.href = ENV.QUIZZES_URL;
-        }
-      });
-    });
-
-    var hasOpenedQuizDetails = false;
-    $(".quiz_details_link").click(event => {
-      event.preventDefault();
-      $("#quiz_details_wrapper").disableWhileLoading(
-        ensureStudentsLoaded(() => {
-          var $quizResultsText = $('#quiz_details_text');
-          $("#quiz_details").slideToggle();
-          if (hasOpenedQuizDetails) {
-            if (ENV.IS_SURVEY) {
-              $quizResultsText.text(I18n.t('links.show_student_survey_results',
-                                           'Show Student Survey Results'));
-            } else {
-              $quizResultsText.text(I18n.t('links.show_student_quiz_results',
-                                           'Show Student Quiz Results'));
-            }
-          } else {
-            if (ENV.IS_SURVEY) {
-              $quizResultsText.text(I18n.t('links.hide_student_survey_results',
-                                           'Hide Student Survey Results'));
-            } else {
-              $quizResultsText.text(I18n.t('links.hide_student_quiz_results',
-                                           'Hide Student Quiz Results'));
-            }
-          }
-          hasOpenedQuizDetails = !hasOpenedQuizDetails;
-        })
-      );
-    });
-
-    $(".message_students_link").click(event => {
-      event.preventDefault();
-      ensureStudentsLoaded(() => {
-        var submissionList = ENV.QUIZ_SUBMISSION_LIST;
-        var unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS;
-        var submittedStudents = submissionList.SUBMITTED_STUDENTS;
-        var haveTakenQuiz = I18n.t('students_who_have_taken_the_quiz', "Students who have taken the quiz");
-        var haveNotTakenQuiz = I18n.t('students_who_have_not_taken_the_quiz', "Students who have NOT taken the quiz");
-        var dialog = new MessageStudentsDialog({
-          context: ENV.QUIZ.title,
-          recipientGroups: [
-            { name: haveTakenQuiz, recipients: submittedStudents },
-            { name: haveNotTakenQuiz, recipients: unsubmittedStudents }
-          ]
-        });
-        dialog.open();
-      });
-    });
-
-    $("#let_students_take_this_quiz_button").ifExists(function($link){
-      var $unlock_for_how_long_dialog = $("#unlock_for_how_long_dialog");
-
-      $link.click(() => {
-        $unlock_for_how_long_dialog.dialog('open');
-        return false;
-      });
-
-      var $lock_at = $(this).find('.datetime_field');
-
-      $unlock_for_how_long_dialog.dialog({
-        autoOpen: false,
-        modal: true,
-        resizable: false,
-        width: 400,
-        buttons: {
-          'Unlock' : function(){
-            $('#quiz_unlock_form')
-              // append this back to the form since it got moved to be a child of body when we called .dialog('open')
-              .append($(this).dialog('destroy'))
-              .find('#quiz_lock_at').val($lock_at.data('iso8601')).end()
-              .submit();
-          }
-        }
-      });
-
-      $lock_at.datetime_field();
-    });
-
-    $('#lock_this_quiz_now_link').ifExists($link => {
-      $link.click(e => {
-        e.preventDefault();
-        $('#quiz_lock_form').submit();
+  function ensureStudentsLoaded(callback) {
+    if ($('#quiz_details').length) {
+      return callback()
+    } else {
+      return $.get(ENV.QUIZ_DETAILS_URL, html => {
+        $('#quiz_details_wrapper').html(html)
+        callback()
       })
-    });
-
-    if ($('ul.page-action-list').find('li').length > 0) {
-      $('ul.page-action-list').show();
     }
+  }
 
-    $('#publish_quiz_form').formSubmit({
-      beforeSubmit: function(data) {
-        $(this).find('button').attr('disabled', true).text(I18n.t('buttons.publishing', "Publishing..."));
-      },
-      success: function(data) {
-        $(this).find('button').text(I18n.t('buttons.already_published', "Published!"));
-        location.reload();
+  const arrowApplicator = new QuizArrowApplicator()
+  arrowApplicator.applyArrows()
+  // quiz_show is being pulled into ember show for now. only hide inputs
+  // when we don't have a .allow-inputs
+  if (!$('.allow-inputs').length) {
+    inputMethods.disableInputs('[type=radio], [type=checkbox]')
+    inputMethods.setWidths()
+  }
+
+  $('form.edit_quizzes_quiz').on('submit', function(e) {
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    $(this)
+      .find('.loading')
+      .removeClass('hidden')
+    const data = $(this).serializeArray()
+    const url = $(this).attr('action')
+    $.ajax({
+      url,
+      data,
+      type: 'POST',
+      success() {
+        $('.edit_quizzes_quiz')
+          .parents('.alert')
+          .hide()
       }
-    });
+    })
+  })
 
-    var $el = $('#quiz-publish-link');
-    var model = new Quiz($.extend(ENV.QUIZ, {unpublishable: !$el.hasClass("disabled")}));
-    var view = new PublishButtonView({model: model, el: $el});
-
-    var refresh = function() {
-      location.href = location.href;
+  $('.delete_quiz_link').click(function(event) {
+    event.preventDefault()
+    let deleteConfirmMessage = I18n.t(
+      'confirms.delete_quiz',
+      'Are you sure you want to delete this quiz?'
+    )
+    const submittedCount = parseInt($('#quiz_details_wrapper').data('submitted-count'))
+    if (submittedCount > 0) {
+      deleteConfirmMessage +=
+        '\n\n' +
+        I18n.t(
+          'confirms.delete_quiz_submissions_warning',
+          {
+            one:
+              'Warning: 1 student has already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.',
+            other:
+              'Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.'
+          },
+          {count: submittedCount}
+        )
     }
-    view.on("publish", refresh);
-    view.on("unpublish", refresh);
-    view.render();
+    $('nothing').confirmDelete({
+      url: $(this).attr('href'),
+      message: deleteConfirmMessage,
+      success() {
+        window.location.href = ENV.QUIZZES_URL
+      }
+    })
+  })
 
-    var graphsRoot = document.getElementById('crs-graphs')
-    var detailsParent = document.getElementById('not_right_side')
-    CyoeStats.init(graphsRoot, detailsParent)
+  let hasOpenedQuizDetails = false
+  $('.quiz_details_link').click(event => {
+    event.preventDefault()
+    $('#quiz_details_wrapper').disableWhileLoading(
+      ensureStudentsLoaded(() => {
+        const $quizResultsText = $('#quiz_details_text')
+        $('#quiz_details').slideToggle()
+        if (hasOpenedQuizDetails) {
+          if (ENV.IS_SURVEY) {
+            $quizResultsText.text(
+              I18n.t('links.show_student_survey_results', 'Show Student Survey Results')
+            )
+          } else {
+            $quizResultsText.text(
+              I18n.t('links.show_student_quiz_results', 'Show Student Quiz Results')
+            )
+          }
+        } else if (ENV.IS_SURVEY) {
+          $quizResultsText.text(
+            I18n.t('links.hide_student_survey_results', 'Hide Student Survey Results')
+          )
+        } else {
+          $quizResultsText.text(
+            I18n.t('links.hide_student_quiz_results', 'Hide Student Quiz Results')
+          )
+        }
+        hasOpenedQuizDetails = !hasOpenedQuizDetails
+      })
+    )
+  })
 
-    if ($('#assignment_external_tools').length) {
-      AssignmentExternalTools.attach(
-        $('#assignment_external_tools')[0],
-        "assignment_view",
-        parseInt(ENV.COURSE_ID, 10),
-        parseInt(ENV.QUIZ.assignment_id, 10));
+  $('.message_students_link').click(event => {
+    event.preventDefault()
+    ensureStudentsLoaded(() => {
+      const submissionList = ENV.QUIZ_SUBMISSION_LIST
+      const unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS
+      const submittedStudents = submissionList.SUBMITTED_STUDENTS
+      const haveTakenQuiz = I18n.t(
+        'students_who_have_taken_the_quiz',
+        'Students who have taken the quiz'
+      )
+      const haveNotTakenQuiz = I18n.t(
+        'students_who_have_not_taken_the_quiz',
+        'Students who have NOT taken the quiz'
+      )
+      const dialog = new MessageStudentsDialog({
+        context: ENV.QUIZ.title,
+        recipientGroups: [
+          {name: haveTakenQuiz, recipients: submittedStudents},
+          {name: haveNotTakenQuiz, recipients: unsubmittedStudents}
+        ]
+      })
+      dialog.open()
+    })
+  })
+
+  $('#let_students_take_this_quiz_button').ifExists(function($link) {
+    const $unlock_for_how_long_dialog = $('#unlock_for_how_long_dialog')
+
+    $link.click(() => {
+      $unlock_for_how_long_dialog.dialog('open')
+      return false
+    })
+
+    const $lock_at = $(this).find('.datetime_field')
+
+    $unlock_for_how_long_dialog.dialog({
+      autoOpen: false,
+      modal: true,
+      resizable: false,
+      width: 400,
+      buttons: {
+        Unlock() {
+          $('#quiz_unlock_form')
+            // append this back to the form since it got moved to be a child of body when we called .dialog('open')
+            .append($(this).dialog('destroy'))
+            .find('#quiz_lock_at')
+            .val($lock_at.data('iso8601'))
+            .end()
+            .submit()
+        }
+      }
+    })
+
+    $lock_at.datetime_field()
+  })
+
+  $('#lock_this_quiz_now_link').ifExists($link => {
+    $link.click(e => {
+      e.preventDefault()
+      $('#quiz_lock_form').submit()
+    })
+  })
+
+  if ($('ul.page-action-list').find('li').length > 0) {
+    $('ul.page-action-list').show()
+  }
+
+  $('#publish_quiz_form').formSubmit({
+    beforeSubmit(data) {
+      $(this)
+        .find('button')
+        .attr('disabled', true)
+        .text(I18n.t('buttons.publishing', 'Publishing...'))
+    },
+    success(data) {
+      $(this)
+        .find('button')
+        .text(I18n.t('buttons.already_published', 'Published!'))
+      location.reload()
     }
-  });
+  })
+
+  const $el = $('#quiz-publish-link')
+  const model = new Quiz($.extend(ENV.QUIZ, {unpublishable: !$el.hasClass('disabled')}))
+  const view = new PublishButtonView({model, el: $el})
+
+  const refresh = function() {
+    location.href = location.href
+  }
+  view.on('publish', refresh)
+  view.on('unpublish', refresh)
+  view.render()
+
+  const graphsRoot = document.getElementById('crs-graphs')
+  const detailsParent = document.getElementById('not_right_side')
+  CyoeStats.init(graphsRoot, detailsParent)
+
+  if ($('#assignment_external_tools').length) {
+    AssignmentExternalTools.attach(
+      $('#assignment_external_tools')[0],
+      'assignment_view',
+      parseInt(ENV.COURSE_ID, 10),
+      parseInt(ENV.QUIZ.assignment_id, 10)
+    )
+  }
+})

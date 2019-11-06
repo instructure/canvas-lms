@@ -17,8 +17,6 @@
 #
 
 class SubmissionDraft < ActiveRecord::Base
-  include CustomValidations
-
   belongs_to :submission, inverse_of: :submission_drafts
   has_many :submission_draft_attachments, inverse_of: :submission_draft, dependent: :delete_all
   has_many :attachments, through: :submission_draft_attachments
@@ -28,7 +26,22 @@ class SubmissionDraft < ActiveRecord::Base
   validates :submission, uniqueness: { scope: :submission_attempt }
   validates :body, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
   validate :submission_attempt_matches_submission
-  validates_as_url :url
+  validates :url, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
+
+  before_save :validate_url
+
+  def validate_url
+    if self.url.present?
+      begin
+        # also updates the url with a scheme if missing and is a valid url
+        # otherwise leaves the url as whatever the user submitted as thier draft
+        value, = CanvasHttp.validate_url(self.url)
+        self.send("url=", value)
+      rescue URI::Error, ArgumentError
+        return
+      end
+    end
+  end
 
   def submission_attempt_matches_submission
     current_submission_attempt = self.submission&.attempt || 0
@@ -40,21 +53,38 @@ class SubmissionDraft < ActiveRecord::Base
   end
   private :submission_attempt_matches_submission
 
+  def meets_text_entry_criteria?
+    self.body.present?
+  end
+
+  def meets_upload_criteria?
+    self.attachments.present?
+  end
+
+  def meets_url_criteria?
+    return false if self.url.blank?
+    begin
+      CanvasHttp.validate_url(self.url)
+      true
+    rescue URI::Error, ArgumentError
+      false
+    end
+  end
+
+  # this checks if any type on the assignment is drafted
   def meets_assignment_criteria?
-    # we just need to meet draft criteria for a single type to be valid
     submission_types = self.submission.assignment.submission_types.split(',')
     submission_types.each do |type|
       case type
       when 'online_text_entry'
-        return true if self.body.present?
+        return true if meets_text_entry_criteria?
       when 'online_upload'
-        return true if self.attachments.present?
+        return true if meets_upload_criteria?
       when 'online_url'
-        return true if self.url.present?
+        return true if meets_url_criteria?
       end
     end
 
-    # return false if we did not meet our draft requirements for any of the types
     false
   end
 end

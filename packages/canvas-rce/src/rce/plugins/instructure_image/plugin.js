@@ -65,10 +65,11 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
               bridge.showTrayForPlugin(COURSE_PLUGIN_KEY)
             }
           })
-      }
+        }
 
-      callback(items)
-    }})
+        callback(items)
+      }
+    })
 
     /*
      * Register the Image "Options" button that will open the Image Options

@@ -66,7 +66,9 @@ QUnit.module('DashboardCardBox', suiteHooks => {
       component = ref
     }
     const Box = getDroppableDashboardCardBox(ReactDndTestBackend)
-    const CardBox = <Box connectDropTarget={el => el} courseCards={props.courseCards} ref={bindRef}/>
+    const CardBox = (
+      <Box connectDropTarget={el => el} courseCards={props.courseCards} ref={bindRef} />
+    )
     ReactDOM.render(CardBox, $container)
   }
 
@@ -93,8 +95,8 @@ QUnit.module('DashboardCardBox', suiteHooks => {
   }
 
   function getUnfavoriteButton() {
-    return [...getDashboardMenu().querySelectorAll('.DashboardCardMenu__MovementItem')].find($button =>
-      $button.textContent.includes('Unfavorite')
+    return [...getDashboardMenu().querySelectorAll('.DashboardCardMenu__MovementItem')].find(
+      $button => $button.textContent.includes('Unfavorite')
     )
   }
 
@@ -116,7 +118,9 @@ QUnit.module('DashboardCardBox', suiteHooks => {
   }
 
   async function getNoFavoritesAlert() {
-    const noFavoritesAlert = await getDashboardBoxElement().querySelector('.no-favorites-alert-container')
+    const noFavoritesAlert = await getDashboardBoxElement().querySelector(
+      '.no-favorites-alert-container'
+    )
     return noFavoritesAlert
   }
 
@@ -139,10 +143,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
       mountComponent()
       const card = getDashboardCardElements()[0]
       const url = '/api/v1/users/self/favorites/courses/1'
-      server.respondWith(
-        'DELETE', url,
-        [200, {}, ""]
-      )
+      server.respondWith('DELETE', url, [200, {}, ''])
       server.respond()
 
       removeCardFromFavorites(card)

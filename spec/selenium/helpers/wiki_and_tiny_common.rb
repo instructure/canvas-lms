@@ -206,12 +206,34 @@ module WikiAndTinyCommon
     wait_for_ajax_requests
   end
 
+  def add_file_to_rce_next
+    title = "text_file.txt"
+    @root_folder = Folder.root_folders(@course).first
+    @text_file = @root_folder.attachments.create!(:filename => title,
+                                                  :context => @course) { |a| a.content_type = 'text/plain' }
+    get "/courses/#{@course.id}/pages/front-page/edit"
+    wait_for_tiny(f("form.edit-form .edit-content"))
+    selector = 'button[aria-label="Documents"]'
+    button = driver.execute_script("return document.querySelector('#{selector}')")
+    f('button[aria-label="More..."]').click unless button
+    f(selector).click
+    f('[role="menuitem"][title="Course Documents"]').click
+    fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')").click
+
+    force_click('form.edit-form button.submit')
+    wait_for_ajax_requests
+  end
+
   def tiny_rce_ifr_id
     f('.tox-editor-container iframe')['id']
   end
 
   def wiki_page_body_ifr_id
     f('.mce-container iframe')['id']
+  end
+
+  def rce_page_body_ifr_id
+    f('iframe.tox-edit-area__iframe')['id']
   end
 
   def wiki_page_editor_id

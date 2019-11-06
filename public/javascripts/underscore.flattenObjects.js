@@ -17,20 +17,24 @@
  */
 
 import _ from 'underscore'
-  // backward is a stupid requirement for discussions
-  _.flattenObjects = function(array, key, backward, output) {
-    if (!_.isArray(array)) {array = [array];}
-    if (!_.isArray(output)) {output = [];}
-    _.each(array, object => {
-      output.push(object);
-      if (object[key]) {
-        var children = object[key]
-        if (backward) {
-          children = _.clone(children)
-          children.reverse()
-        }
-        _.flattenObjects(children, key, backward, output);
+// backward is a stupid requirement for discussions
+_.flattenObjects = function(array, key, backward, output) {
+  if (!_.isArray(array)) {
+    array = [array]
+  }
+  if (!_.isArray(output)) {
+    output = []
+  }
+  _.each(array, object => {
+    output.push(object)
+    if (object[key]) {
+      let children = object[key]
+      if (backward) {
+        children = _.clone(children)
+        children.reverse()
       }
-    });
-    return output;
-  };
+      _.flattenObjects(children, key, backward, output)
+    }
+  })
+  return output
+}

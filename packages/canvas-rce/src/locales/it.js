@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/it.json";
-import "../rce/languages/it";
+import formatMessage from '../format-message'
+import locale from '../../locales/it.json'
+import '../rce/languages/it'
 
-formatMessage.addLocale({ it: locale });
+formatMessage.addLocale({it: locale})

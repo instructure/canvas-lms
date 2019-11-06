@@ -16,96 +16,96 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import flickr from "../../../src/sidebar/reducers/flickr";
-import * as actions from "../../../src/sidebar/actions/flickr";
+import assert from 'assert'
+import flickr from '../../../src/sidebar/reducers/flickr'
+import * as actions from '../../../src/sidebar/actions/flickr'
 
-describe("Flickr reducer", () => {
-  let state;
-  let action;
+describe('Flickr reducer', () => {
+  let state
+  let action
 
   beforeEach(() => {
-    state = {};
-  });
+    state = {}
+  })
 
-  it("does not modify the state if for unknown actions", () => {
-    assert(flickr(state, { type: "unknown.action" }) === state);
-  });
+  it('does not modify the state if for unknown actions', () => {
+    assert(flickr(state, {type: 'unknown.action'}) === state)
+  })
 
-  describe("START_FLICKR_SEARCH", () => {
+  describe('START_FLICKR_SEARCH', () => {
     beforeEach(() => {
       action = {
         type: actions.START_FLICKR_SEARCH,
-        term: "chess"
-      };
-    });
+        term: 'chess'
+      }
+    })
 
-    it("sets searching to true", () => {
-      assert.ok(flickr(state, action).searching);
-    });
+    it('sets searching to true', () => {
+      assert.ok(flickr(state, action).searching)
+    })
 
-    it("sets term from action", () => {
-      assert(flickr(state, action).searchTerm === "chess");
-    });
-  });
+    it('sets term from action', () => {
+      assert(flickr(state, action).searchTerm === 'chess')
+    })
+  })
 
-  describe("RECEIVE_FLICKR_RESULTS", () => {
+  describe('RECEIVE_FLICKR_RESULTS', () => {
     beforeEach(() => {
       action = {
         type: actions.RECEIVE_FLICKR_RESULTS,
         results: [1, 2, 3]
-      };
-    });
+      }
+    })
 
-    it("turns searching off", () => {
-      assert.ok(!flickr(state, action).searching);
-    });
+    it('turns searching off', () => {
+      assert.ok(!flickr(state, action).searching)
+    })
 
-    it("passes results through for display", () => {
-      assert.equal(3, flickr(state, action).searchResults.length);
-    });
-  });
+    it('passes results through for display', () => {
+      assert.equal(3, flickr(state, action).searchResults.length)
+    })
+  })
 
-  describe("FAIL_FLICKR_SEARCH", () => {
+  describe('FAIL_FLICKR_SEARCH', () => {
     beforeEach(() => {
       action = {
         type: actions.FAIL_FLICKR_SEARCH,
         results: [1, 2, 3]
-      };
-      state.formExpanded = true;
-      state.searchTerm = "chess";
-    });
+      }
+      state.formExpanded = true
+      state.searchTerm = 'chess'
+    })
 
-    it("disables searching flag", () => {
-      assert.equal(false, flickr(state, action).searching);
-    });
+    it('disables searching flag', () => {
+      assert.equal(false, flickr(state, action).searching)
+    })
 
-    it("blanks the search term", () => {
-      assert.equal("", flickr(state, action).searchTerm);
-    });
+    it('blanks the search term', () => {
+      assert.equal('', flickr(state, action).searchTerm)
+    })
 
-    it("empties the search results", () => {
-      assert(flickr(state, action).searchResults.length === 0);
-    });
+    it('empties the search results', () => {
+      assert(flickr(state, action).searchResults.length === 0)
+    })
 
-    it("leaves the form state as it is", () => {
-      assert.equal(state.formExpanded, flickr(state, action).formExpanded);
-    });
-  });
+    it('leaves the form state as it is', () => {
+      assert.equal(state.formExpanded, flickr(state, action).formExpanded)
+    })
+  })
 
-  describe("TOGGLE_FLICKR_FORM", () => {
+  describe('TOGGLE_FLICKR_FORM', () => {
     beforeEach(() => {
-      action = { type: actions.TOGGLE_FLICKR_FORM };
-      state.formExpanded = true;
-    });
+      action = {type: actions.TOGGLE_FLICKR_FORM}
+      state.formExpanded = true
+    })
 
-    it("reverses current state", () => {
-      assert.equal(!state.formExpanded, flickr(state, action).formExpanded);
-    });
+    it('reverses current state', () => {
+      assert.equal(!state.formExpanded, flickr(state, action).formExpanded)
+    })
 
-    it("goes back and forth for each invocation", () => {
-      state.formExpanded = false;
-      assert.equal(true, flickr(state, action).formExpanded);
-    });
-  });
-});
+    it('goes back and forth for each invocation', () => {
+      state.formExpanded = false
+      assert.equal(true, flickr(state, action).formExpanded)
+    })
+  })
+})

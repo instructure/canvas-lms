@@ -92,7 +92,7 @@ function renderCommentsTab({assignment, submission}) {
     )
   }
 
-  if (!submission.posted) {
+  if (submission.gradeHidden) {
     return (
       <SVGWithTextPlaceholder
         text={I18n.t(

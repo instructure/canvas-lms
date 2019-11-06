@@ -27,7 +27,7 @@ import {SubmissionMocks} from '../../graphqlData/Submission'
 
 describe('SubmissionManager', () => {
   it('renders the AttemptTab', async () => {
-    const props = await mockAssignmentAndSubmission({})
+    const props = await mockAssignmentAndSubmission()
     const {getByTestId} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
@@ -38,7 +38,7 @@ describe('SubmissionManager', () => {
   })
 
   it('does not render a submit button when the draft criteria is not met', async () => {
-    const props = await mockAssignmentAndSubmission({})
+    const props = await mockAssignmentAndSubmission()
     const {queryByText} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
@@ -48,9 +48,9 @@ describe('SubmissionManager', () => {
     expect(queryByText('Submit')).not.toBeInTheDocument()
   })
 
-  it('renders a submit button when the draft criteria is met', async () => {
+  it('renders a submit button when the draft criteria is met for the active type', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
     })
     const {getByText} = render(
       <MockedProvider>
@@ -61,9 +61,27 @@ describe('SubmissionManager', () => {
     expect(getByText('Submit')).toBeInTheDocument()
   })
 
+  it('does not render the submit button if the draft criteria is not met for the active type', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        submissionDraft: {
+          activeSubmissionType: 'online_upload',
+          body: 'some text here'
+        }
+      }
+    })
+    const {queryByText} = render(
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByText('Submit')).not.toBeInTheDocument()
+  })
+
   it('disables the submit button after it is pressed', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: () => SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
     })
 
     const variables = {

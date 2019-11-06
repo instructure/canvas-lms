@@ -34,7 +34,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
 
       props = {
         disabled: false,
-        sections: [{id: '2001', name: 'Section 1'}, {id: '2002', name: 'Section 2'}],
+        sections: [{id: '2002', name: 'Section 2'}, {id: '2001', name: 'Section 1'}],
         onSelect: sinon.stub(),
         selectedSectionId: '0'
       }
@@ -76,7 +76,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         equal($allItemsOption.textContent.trim(), 'All Sections')
       })
 
-      test('labels each option using the related section name', () => {
+      test('labels each option using the related section name in alphabetical order', () => {
         renderComponent()
         filter.clickToExpand()
         const labels = filter.$options.slice(1).map($option => $option.textContent.trim())

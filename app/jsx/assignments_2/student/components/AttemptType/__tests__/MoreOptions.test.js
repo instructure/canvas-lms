@@ -130,9 +130,9 @@ describe('MoreOptions', () => {
 
   it('renders the more options modal when the button is clicked', async () => {
     const overrides = {
-      ExternalToolConnection: () => ({
+      ExternalToolConnection: {
         nodes: [{}]
-      })
+      }
     }
     const mocks = await createGraphqlMocks(overrides)
     const {findByTestId, getByTestId} = render(
@@ -149,9 +149,9 @@ describe('MoreOptions', () => {
   describe('LTI Tools', () => {
     it('renders the external tools in tabs', async () => {
       const overrides = {
-        ExternalToolConnection: () => ({
+        ExternalToolConnection: {
           nodes: [{_id: '1', name: 'Tool 1'}, {_id: '2', name: 'Tool 2'}]
-        })
+        }
       }
       const mocks = await createGraphqlMocks(overrides)
       const {findAllByRole, getByTestId} = render(
@@ -169,9 +169,9 @@ describe('MoreOptions', () => {
 
     it('closes the modal when it receives the "LtiDeepLinkingResponse" event', async () => {
       const overrides = {
-        ExternalToolConnection: () => ({
+        ExternalToolConnection: {
           nodes: [{_id: '1', name: 'Tool 1'}, {_id: '2', name: 'Tool 2'}]
-        })
+        }
       }
       const mocks = await createGraphqlMocks(overrides)
       const {findByTestId, getByTestId, queryByTestId} = render(
@@ -206,9 +206,9 @@ describe('MoreOptions', () => {
 
     it('renders the canvas files tab', async () => {
       const overrides = {
-        ExternalToolConnection: () => ({
+        ExternalToolConnection: {
           nodes: [{}]
-        })
+        }
       }
       const mocks = await createGraphqlMocks(overrides)
       const {findAllByRole, getByTestId} = render(
@@ -230,9 +230,9 @@ describe('MoreOptions', () => {
 
     it('renders user, group, and course folders', async () => {
       const overrides = {
-        ExternalToolConnection: () => ({
+        ExternalToolConnection: {
           nodes: [{}]
-        })
+        }
       }
       const mocks = await createGraphqlMocks(overrides)
       const {findAllByText, getByTestId} = render(
@@ -257,9 +257,9 @@ describe('MoreOptions', () => {
 
     it('renders the folder contents when a folder is selected', async () => {
       const overrides = {
-        ExternalToolConnection: () => ({
+        ExternalToolConnection: {
           nodes: [{}]
-        })
+        }
       }
       const mocks = await createGraphqlMocks(overrides)
       const {findAllByText, findByTestId, getByTestId} = render(
@@ -287,9 +287,9 @@ describe('MoreOptions', () => {
 
     it('allows folder navigation through breadcrumbs', async () => {
       const overrides = {
-        ExternalToolConnection: () => ({
+        ExternalToolConnection: {
           nodes: [{}]
-        })
+        }
       }
       const mocks = await createGraphqlMocks(overrides)
       const {findAllByText, findByTestId, getByTestId} = render(
@@ -323,9 +323,9 @@ describe('MoreOptions', () => {
 
     it('hides the upload button until a file has been selected', async () => {
       const overrides = {
-        ExternalToolConnection: () => ({
+        ExternalToolConnection: {
           nodes: [{}]
-        })
+        }
       }
       const mocks = await createGraphqlMocks(overrides)
       const {findAllByText, findByText, getByTestId, queryByText} = render(
@@ -355,9 +355,9 @@ describe('MoreOptions', () => {
 
     it('calls the handleCanvasFiles prop function when the upload button is clicked', async () => {
       const overrides = {
-        ExternalToolConnection: () => ({
+        ExternalToolConnection: {
           nodes: [{}]
-        })
+        }
       }
       const mocks = await createGraphqlMocks(overrides)
       const {findAllByText, findByText, getByTestId} = render(

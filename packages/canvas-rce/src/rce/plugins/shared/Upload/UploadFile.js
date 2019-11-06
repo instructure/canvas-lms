@@ -27,8 +27,8 @@ import indicatorRegion from '../../../indicatorRegion'
 import {isImage, isAudioOrVideo} from '../fileTypeUtils'
 import indicate from '../../../../common/indicate'
 
-import {StoreProvider} from "../StoreContext"
-import RceApiSource from "../../../../sidebar/sources/api";
+import {StoreProvider} from '../StoreContext'
+import RceApiSource from '../../../../sidebar/sources/api'
 import Bridge from '../../../../bridge'
 
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
@@ -38,7 +38,15 @@ const UnsplashPanel = React.lazy(() => import('./UnsplashPanel'))
 /**
  * Handles uploading data based on what type of data is submitted.
  */
-export const handleSubmit = (editor, accept, selectedPanel, uploadData, storeProps, source, afterInsert = () => {}) => {
+export const handleSubmit = (
+  editor,
+  accept,
+  selectedPanel,
+  uploadData,
+  storeProps,
+  source,
+  afterInsert = () => {}
+) => {
   switch (selectedPanel) {
     case 'COMPUTER': {
       const {theFile} = uploadData
@@ -56,13 +64,15 @@ export const handleSubmit = (editor, accept, selectedPanel, uploadData, storePro
         tabContext = 'media'
       }
       storeProps.startMediaUpload(tabContext, fileMetaData)
-      break;
+      break
     }
     case 'UNSPLASH': {
-      const { unsplashData } = uploadData
+      const {unsplashData} = uploadData
       source.pingbackUnsplash(unsplashData.id)
-      editor.insertContent(editor.dom.createHTML('img', {src: unsplashData.url, alt: unsplashData.alt}))
-      break;
+      editor.insertContent(
+        editor.dom.createHTML('img', {src: unsplashData.url, alt: unsplashData.alt})
+      )
+      break
     }
     case 'URL': {
       const {fileUrl} = uploadData
@@ -83,8 +93,8 @@ export const handleSubmit = (editor, accept, selectedPanel, uploadData, storePro
   afterInsert()
 }
 
-function shouldBeDisabled ({fileUrl, theFile, unsplashData}, selectedPanel) {
-  switch(selectedPanel) {
+function shouldBeDisabled({fileUrl, theFile, unsplashData}, selectedPanel) {
+  switch (selectedPanel) {
     case 'COMPUTER':
       return !theFile
     case 'UNSPLASH':
@@ -92,24 +102,34 @@ function shouldBeDisabled ({fileUrl, theFile, unsplashData}, selectedPanel) {
     case 'URL':
       return !fileUrl
     default:
-      return false; // When in doubt, don't disable (but we shouldn't get here either)
+      return false // When in doubt, don't disable (but we shouldn't get here either)
   }
 }
 
-export function UploadFile({accept, editor, label, panels, onDismiss, trayProps, onSubmit = handleSubmit}) {
+export function UploadFile({
+  accept,
+  editor,
+  label,
+  panels,
+  onDismiss,
+  trayProps,
+  onSubmit = handleSubmit
+}) {
   const [theFile, setFile] = useState(null)
   const [hasUploadedFile, setHasUploadedFile] = useState(false)
   const [fileUrl, setFileUrl] = useState('')
   const [selectedPanel, setSelectedPanel] = useState(panels[0])
-  const [unsplashData, setUnsplashData] = useState({id: null, url: null});
+  const [unsplashData, setUnsplashData] = useState({id: null, url: null})
 
   trayProps = trayProps || Bridge.trayProps.get(editor)
 
-  const source = trayProps.source || new RceApiSource({
-    jwt: trayProps.jwt,
-    refreshToken: trayProps.refreshToken,
-    host: trayProps.host
-  });
+  const source =
+    trayProps.source ||
+    new RceApiSource({
+      jwt: trayProps.jwt,
+      refreshToken: trayProps.refreshToken,
+      host: trayProps.host
+    })
 
   function renderLoading() {
     return formatMessage('Loading')
@@ -117,10 +137,16 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
 
   function renderTabs() {
     return panels.map(panel => {
-      switch(panel) {
+      switch (panel) {
         case 'COMPUTER':
           return (
-            <Tabs.Panel key={panel} renderTitle={function () { return formatMessage('Computer')}} selected={selectedPanel === 'COMPUTER'}>
+            <Tabs.Panel
+              key={panel}
+              renderTitle={function() {
+                return formatMessage('Computer')
+              }}
+              selected={selectedPanel === 'COMPUTER'}
+            >
               <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                 <ComputerPanel
                   editor={editor}
@@ -136,21 +162,33 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
           )
         case 'UNSPLASH':
           return (
-            <Tabs.Panel key={panel} renderTitle={function () { return 'Unsplash'}} selected={selectedPanel === 'UNSPLASH'}>
+            <Tabs.Panel
+              key={panel}
+              renderTitle={function() {
+                return 'Unsplash'
+              }}
+              selected={selectedPanel === 'UNSPLASH'}
+            >
               <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
-                  <UnsplashPanel
-                    editor={editor}
-                    setUnsplashData={setUnsplashData}
-                    source={source}
-                    brandColor={trayProps.brandColor}
-                    liveRegion={trayProps.liveRegion}
-                  />
-                </Suspense>
-              </Tabs.Panel>
+                <UnsplashPanel
+                  editor={editor}
+                  setUnsplashData={setUnsplashData}
+                  source={source}
+                  brandColor={trayProps.brandColor}
+                  liveRegion={trayProps.liveRegion}
+                />
+              </Suspense>
+            </Tabs.Panel>
           )
         case 'URL':
           return (
-            <Tabs.Panel key={panel} renderTitle={function () { return formatMessage('URL')}} selected={selectedPanel === 'URL'}>
+            <Tabs.Panel
+              key={panel}
+              renderTitle={function() {
+                return formatMessage('URL')
+              }}
+              selected={selectedPanel === 'URL'}
+            >
               <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
                 <UrlPanel fileUrl={fileUrl} setFileUrl={setFileUrl} />
               </Suspense>
@@ -175,9 +213,17 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
           onSubmit={e => {
             e.preventDefault()
             if (disabledSubmit) {
-              return false;
+              return false
             }
-            onSubmit(editor, accept, selectedPanel, {fileUrl, theFile, unsplashData}, contentProps, source, onDismiss)
+            onSubmit(
+              editor,
+              accept,
+              selectedPanel,
+              {fileUrl, theFile, unsplashData},
+              contentProps,
+              source,
+              onDismiss
+            )
           }}
           open
           shouldCloseOnDocumentClick
@@ -190,9 +236,7 @@ export function UploadFile({accept, editor, label, panels, onDismiss, trayProps,
             <Heading>{label}</Heading>
           </Modal.Header>
           <Modal.Body>
-          <Tabs
-              onRequestTabChange={(event, { index }) => setSelectedPanel(panels[index])}
-            >
+            <Tabs onRequestTabChange={(event, {index}) => setSelectedPanel(panels[index])}>
               {renderTabs()}
             </Tabs>
           </Modal.Body>
@@ -217,4 +261,3 @@ UploadFile.propTypes = {
   panels: arrayOf(oneOf(['COMPUTER', 'UNSPLASH', 'URL'])),
   trayProps: object
 }
-

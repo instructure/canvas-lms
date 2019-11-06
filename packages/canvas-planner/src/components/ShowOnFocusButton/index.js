@@ -15,82 +15,83 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, { Component } from 'react';
-import { findDOMNode } from 'react-dom';
-import { node, object, func } from 'prop-types';
+import React, {Component} from 'react'
+import {findDOMNode} from 'react-dom'
+import {node, object, func} from 'prop-types'
 
 import {themeable} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
-import styles from './styles.css';
-import theme from './theme.js';
+import styles from './styles.css'
+import theme from './theme.js'
 
 class ShowOnFocusButton extends Component {
-
   static propTypes = {
     buttonProps: object,
     srProps: object,
     children: node.isRequired,
     buttonRef: func
-  };
+  }
 
   static defaultProps = {
-    buttonRef: () =>{}
-  };
+    buttonRef: () => {}
+  }
 
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
     this.state = {
       visible: false
-    };
+    }
   }
 
-  handleFocus = (e) => {
-    this.setState({
-      visible: true
-    }, () => {
-      findDOMNode(this.btnRef).focus();
-    });
+  handleFocus = e => {
+    this.setState(
+      {
+        visible: true
+      },
+      () => {
+        findDOMNode(this.btnRef).focus()
+      }
+    )
   }
 
-  handleBlur = (e) => {
+  handleBlur = e => {
     this.setState({
       visible: false
-    });
+    })
   }
 
-  renderButton () {
-    const { buttonProps, children } = this.props;
+  renderButton() {
+    const {buttonProps, children} = this.props
     return (
       <Button
         variant="link"
-        buttonRef={(btn) => { this.btnRef = btn; this.props.buttonRef(btn); }}
+        buttonRef={btn => {
+          this.btnRef = btn
+          this.props.buttonRef(btn)
+        }}
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
         {...buttonProps}
       >
         {children}
       </Button>
-    );
+    )
   }
 
-  renderInvisibleButton () {
-    const { srProps } = this.props;
-    return (
-      <ScreenReaderContent {...srProps}>
-        {this.renderButton()}
-      </ScreenReaderContent>
-    );
+  renderInvisibleButton() {
+    const {srProps} = this.props
+    return <ScreenReaderContent {...srProps}>{this.renderButton()}</ScreenReaderContent>
   }
 
-  render () {
+  render() {
     if (this.state.visible) {
-      return this.renderButton();
+      return this.renderButton()
     } else {
-      return this.renderInvisibleButton();
+      return this.renderInvisibleButton()
     }
   }
 }
 
-export default themeable(theme, styles)(ShowOnFocusButton);
+export default themeable(theme, styles)(ShowOnFocusButton)

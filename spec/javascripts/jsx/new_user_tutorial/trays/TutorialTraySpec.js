@@ -17,124 +17,123 @@
  */
 
 /* global QUnit */
-import React from 'react';
-import {shallow, mount} from 'enzyme';
-import TutorialTray from 'jsx/new_user_tutorial/trays/TutorialTray';
+import React from 'react'
+import {shallow, mount} from 'enzyme'
+import TutorialTray from 'jsx/new_user_tutorial/trays/TutorialTray'
 import createTutorialStore from 'jsx/new_user_tutorial/utils/createTutorialStore'
 
 QUnit.module('TutorialTray Spec', {
-  setup () {
-    const applicationElement = document.createElement('div');
-    applicationElement.id = 'application';
-    document.getElementById('fixtures').appendChild(applicationElement);
-    store = createTutorialStore();
+  setup() {
+    const applicationElement = document.createElement('div')
+    applicationElement.id = 'application'
+    document.getElementById('fixtures').appendChild(applicationElement)
+    store = createTutorialStore()
   },
 
-  teardown () {
-    document.getElementById('fixtures').innerHTML = '';
+  teardown() {
+    document.getElementById('fixtures').innerHTML = ''
   }
-});
+})
 
-let store;
+let store
 
-const getDefaultProps = overrides => (
-  Object.assign({}, {
-    label: 'TutorialTray Test',
-    returnFocusToFunc () {
-      return {
-        focus () {
-          return document.body;
-        }
+const getDefaultProps = overrides => ({
+  label: 'TutorialTray Test',
+  returnFocusToFunc() {
+    return {
+      focus() {
+        return document.body
       }
-    },
-    store
-  }, overrides)
-);
+    }
+  },
+  store,
+  ...overrides
+})
 
 test('Renders', () => {
   const wrapper = shallow(
     <TutorialTray {...getDefaultProps()}>
       <div>Some Content</div>
     </TutorialTray>
-  );
-  ok(wrapper.exists());
+  )
+  ok(wrapper.exists())
   wrapper.unmount()
-});
+})
 
 test('handleEntering sets focus on the toggle button', () => {
   const wrapper = mount(
     <TutorialTray {...getDefaultProps()}>
       <div>Some Content</div>
     </TutorialTray>
-  );
-  wrapper.instance().handleToggleClick();
-  wrapper.instance().handleEntering();
+  )
+  wrapper.instance().handleToggleClick()
+  wrapper.instance().handleEntering()
 
-  ok(wrapper.instance().toggleButton.button.focused);
+  ok(wrapper.instance().toggleButton.button.focused)
   wrapper.unmount()
-});
+})
 
 test('handleExiting calls focus on the return value of the returnFocusToFunc', () => {
-  const spy = sinon.spy();
-  const fakeReturnFocusToFunc = () => ({ focus: spy });
+  const spy = sinon.spy()
+  const fakeReturnFocusToFunc = () => ({focus: spy})
   const wrapper = mount(
     <TutorialTray {...getDefaultProps({returnFocusToFunc: fakeReturnFocusToFunc})}>
       <div>Some Content</div>
     </TutorialTray>
-  );
+  )
 
-  wrapper.instance().handleExiting();
+  wrapper.instance().handleExiting()
 
-  ok(spy.called);
+  ok(spy.called)
   wrapper.unmount()
-});
+})
 
 test('handleToggleClick toggles the isCollapsed state of the store', () => {
   const wrapper = mount(
     <TutorialTray {...getDefaultProps()}>
       <div>Some Content</div>
     </TutorialTray>
-  );
+  )
 
-  wrapper.instance().handleToggleClick();
+  wrapper.instance().handleToggleClick()
 
-  ok(store.getState().isCollapsed);
+  ok(store.getState().isCollapsed)
   wrapper.unmount()
-});
+})
 
 test('initial state sets endUserTutorialShown to false', () => {
   const wrapper = shallow(
     <TutorialTray {...getDefaultProps()}>
       <div>Some Content</div>
     </TutorialTray>
-  );
+  )
 
-  equal(wrapper.state('endUserTutorialShown'), false);
+  equal(wrapper.state('endUserTutorialShown'), false)
   wrapper.unmount()
-});
+})
 
 test('handleEndTutorialClick sets endUserTutorialShown to true', () => {
   const wrapper = shallow(
     <TutorialTray {...getDefaultProps()}>
       <div>Some Content</div>
     </TutorialTray>
-  );
+  )
 
-  wrapper.instance().handleEndTutorialClick();
+  wrapper.instance().handleEndTutorialClick()
 
-  equal(wrapper.state('endUserTutorialShown'), true);
+  equal(wrapper.state('endUserTutorialShown'), true)
   wrapper.unmount()
-});
+})
 
 test('closeEndTutorialDialog sets endUserTutorialShown to false', () => {
   const wrapper = shallow(
     <TutorialTray {...getDefaultProps()}>
       <div>Some Content</div>
     </TutorialTray>
-  );
+  )
 
-  wrapper.instance().closeEndTutorialDialog();
+  wrapper.instance().closeEndTutorialDialog()
 
-  equal(wrapper.state('endUserTutorialShown'), false);
+  equal(wrapper.state('endUserTutorialShown'), false)
   wrapper.unmount()
-});
+})

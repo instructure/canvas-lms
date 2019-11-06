@@ -44,7 +44,10 @@ QUnit.module('BlueprintSidebar', hooks => {
 
   test('clicking open button sets isOpen to true', () => {
     wrapper = enzyme.mount(<BlueprintSidebar />)
-    wrapper.find('.bcs__trigger button').at(0).simulate('click')
+    wrapper
+      .find('.bcs__trigger button')
+      .at(0)
+      .simulate('click')
     clock.tick(500)
     strictEqual(wrapper.instance().state.isOpen, true)
   })

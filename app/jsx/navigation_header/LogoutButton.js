@@ -19,17 +19,14 @@
 import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!LogoutButton'
-
-function readCookie(key) {
-  return (document.cookie.match(`(^|; )${encodeURIComponent(key)}=([^;]*)`) || 0)[2]
-}
+import getCookie from '../shared/helpers/getCookie'
 
 export default function LogoutButton(props) {
   return (
     <form action="/logout" method="post">
       <input name="utf8" value="✓" type="hidden" />
       <input name="_method" value="delete" type="hidden" />
-      <input name="authenticity_token" value={readCookie('_csrf_token')} type="hidden" />
+      <input name="authenticity_token" value={getCookie('_csrf_token')} type="hidden" />
       <Button type="submit" {...props}>
         {I18n.t('Logout')}
       </Button>

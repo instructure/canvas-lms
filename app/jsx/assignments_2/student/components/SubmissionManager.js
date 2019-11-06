@@ -36,9 +36,14 @@ export default class SubmissionManager extends Component {
   }
 
   state = {
+    activeSubmissionType: this.props.submission?.submissionDraft?.activeSubmissionType || null,
     editingDraft: false,
     submittingAssignment: false,
     uploadingFiles: false
+  }
+
+  updateActiveSubmissionType = activeSubmissionType => {
+    this.setState({activeSubmissionType})
   }
 
   updateEditingDraft = editingDraft => {
@@ -119,46 +124,65 @@ export default class SubmissionManager extends Component {
   }
 
   submitAssignment = async submitMutation => {
-    if (this.state.submittingAssignment) {
+    if (this.state.submittingAssignment || this.state.activeSubmissionType === null) {
       return
     }
     this.setState({submittingAssignment: true})
 
-    await Promise.all(
-      this.props.assignment.submissionTypes.map(async type => {
-        switch (type) {
-          case 'online_upload':
-            if (
-              this.props.submission.submissionDraft.attachments &&
-              this.props.submission.submissionDraft.attachments.length > 0
-            ) {
-              this.submitToGraphql(submitMutation, {
-                type,
-                fileIds: this.props.submission.submissionDraft.attachments.map(file => file._id)
-              })
-            }
-            break
-          case 'online_text_entry':
-            if (
-              this.props.submission.submissionDraft.body &&
-              this.props.submission.submissionDraft.body.length > 0
-            ) {
-              this.submitToGraphql(submitMutation, {
-                type,
-                body: this.props.submission.submissionDraft.body
-              })
-            }
+    switch (this.state.activeSubmissionType) {
+      case 'online_upload':
+        if (
+          this.props.submission.submissionDraft.attachments &&
+          this.props.submission.submissionDraft.attachments.length > 0
+        ) {
+          await this.submitToGraphql(submitMutation, {
+            fileIds: this.props.submission.submissionDraft.attachments.map(file => file._id),
+            type: this.state.activeSubmissionType
+          })
         }
-      })
-    )
+        break
+      case 'online_text_entry':
+        if (
+          this.props.submission.submissionDraft.body &&
+          this.props.submission.submissionDraft.body.length > 0
+        ) {
+          await this.submitToGraphql(submitMutation, {
+            body: this.props.submission.submissionDraft.body,
+            type: this.state.activeSubmissionType
+          })
+        }
+        break
+      case 'online_url':
+        if (this.props.submission.submissionDraft.url) {
+          await this.submitToGraphql(submitMutation, {
+            url: this.props.submission.submissionDraft.url,
+            type: this.state.activeSubmissionType
+          })
+        }
+        break
+      default:
+        throw new Error('submission type not yet supported in A2')
+    }
 
     this.setState({submittingAssignment: false})
   }
 
   shouldRenderSubmit = () => {
+    let activeTypeMeetsCriteria = false
+    switch (this.state.activeSubmissionType) {
+      case 'online_text_entry':
+        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsTextEntryCriteria
+        break
+      case 'online_upload':
+        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUploadCriteria
+        break
+      case 'online_url':
+        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUrlCriteria
+    }
+
     return (
       this.props.submission.submissionDraft &&
-      this.props.submission.submissionDraft.meetsAssignmentCriteria &&
+      activeTypeMeetsCriteria &&
       !this.state.uploadingFiles &&
       !this.state.editingDraft
     )
@@ -184,10 +208,12 @@ export default class SubmissionManager extends Component {
       >
         {createSubmissionDraft => (
           <AttemptTab
+            activeSubmissionType={this.state.activeSubmissionType}
             assignment={this.props.assignment}
             createSubmissionDraft={createSubmissionDraft}
             editingDraft={this.state.editingDraft}
             submission={this.props.submission}
+            updateActiveSubmissionType={this.updateActiveSubmissionType}
             updateEditingDraft={this.updateEditingDraft}
             updateUploadingFiles={this.updateUploadingFiles}
             uploadingFiles={this.state.uploadingFiles}

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import React from 'react'
 import {render} from '@testing-library/react'
 import MediaPanel from '../index'
@@ -29,7 +28,10 @@ function getPanelProps(contextType, mediaprops) {
     onMediaMebed: () => {},
     media: {
       [contextType]: {
-        files: [], bookmark: null, isLoading: false, hasMore: false,
+        files: [],
+        bookmark: null,
+        isLoading: false,
+        hasMore: false,
         ...mediaprops
       }
     }
@@ -50,14 +52,14 @@ function renderComponent(props) {
 
 function makeFiles(override) {
   return {
-    files: [1,2].map(i => {
+    files: [1, 2].map(i => {
       return {
         id: i,
         filename: `file${i}.mp4`,
         content_type: 'video/mp4',
         display_name: `file${i}`,
         href: `http://the.net/${i}`,
-        date: `2019-05-25T13:0${i}:00Z`,
+        date: `2019-05-25T13:0${i}:00Z`
       }
     }),
     bookmark: null,
@@ -87,7 +89,9 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
   })
 
   it('renders load more button if there is more', () => {
-    const {getByText} = renderComponent(getPanelProps('course', makeFiles({hasMore: true, bookmark: 'next.docs'})))
+    const {getByText} = renderComponent(
+      getPanelProps('course', makeFiles({hasMore: true, bookmark: 'next.docs'}))
+    )
 
     expect(getByText('Load More')).toBeInTheDocument()
   })
@@ -133,10 +137,9 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
     expect(getByText('Loading')).toBeInTheDocument()
   })
 
-
   it('shows spinner while loading more', () => {
     const {getByText} = renderComponent(
-      getPanelProps('course', makeFiles({isLoading: true, hasMore: true})),
+      getPanelProps('course', makeFiles({isLoading: true, hasMore: true}))
     )
 
     expect(getByText('Loading')).toBeInTheDocument()

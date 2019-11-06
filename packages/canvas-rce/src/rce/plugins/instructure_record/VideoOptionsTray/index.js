@@ -17,7 +17,7 @@
  */
 
 import {bool, func, shape, string} from 'prop-types'
-import {Button,CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {Flex} from '@instructure/ui-layout'
 import {Heading} from '@instructure/ui-elements'
@@ -60,17 +60,13 @@ export default function VideoOptionsTray(props) {
 
         <Flex.Item as="form" grow margin="none" shrink>
           <Flex justifyItems="space-between" direction="column" height="100%">
-
             <Flex.Item
               background="light"
               borderWidth="small none none none"
               padding="small medium"
               textAlign="end"
             >
-              <Button
-                onClick={handleSave}
-                variant="primary"
-              >
+              <Button onClick={handleSave} variant="primary">
                 {formatMessage('Done')}
               </Button>
             </Flex.Item>

@@ -104,7 +104,6 @@ class ContextModulesController < ApplicationController
       log_asset_access([ "modules", @context ], "modules", "other")
       load_modules
 
-      js_env(DIRECT_SHARE_ENABLED: @domain_root_account&.feature_enabled?(:direct_share))
       set_tutorial_js_env
 
       if @is_student

@@ -29,44 +29,44 @@ import {
   QUOTA_EXCEEDED_UPLOAD,
   START_LOADING,
   STOP_LOADING
-} from "../actions/upload";
-import { combineReducers } from "redux";
+} from '../actions/upload'
+import {combineReducers} from 'redux'
 
 function uploading(state = false, action) {
   switch (action.type) {
     case START_FILE_UPLOAD:
-      return true;
+      return true
     case FAIL_FILE_UPLOAD:
     case COMPLETE_FILE_UPLOAD:
     case QUOTA_EXCEEDED_UPLOAD:
-      return false;
+      return false
     default:
-      return state;
+      return state
   }
 }
 
 function error(state = {}, action) {
   switch (action.type) {
     case COMPLETE_FILE_UPLOAD:
-      return {};
+      return {}
     case QUOTA_EXCEEDED_UPLOAD:
       return {
         ...state,
         type: action.type
-      };
+      }
     default:
-      return state;
+      return state
   }
 }
 
 function formExpanded(state = false, action) {
   switch (action.type) {
     case COMPLETE_FILE_UPLOAD:
-      return false;
+      return false
     case TOGGLE_UPLOAD_FORM:
-      return !state;
+      return !state
     default:
-      return state;
+      return state
   }
 }
 
@@ -80,10 +80,10 @@ function folders(state = {}, action) {
           name: action.name,
           parentId: action.parentId
         }
-      };
+      }
     case FAIL_FOLDERS_LOAD:
     default:
-      return state;
+      return state
   }
 }
 
@@ -91,12 +91,12 @@ function rootFolderId(state = null, action) {
   switch (action.type) {
     case RECEIVE_FOLDER:
       if (action.parentId === null) {
-        return action.id;
+        return action.id
       } else {
-        return state;
+        return state
       }
     default:
-      return state;
+      return state
   }
 }
 
@@ -105,54 +105,54 @@ function rootFolderId(state = null, action) {
 function folderTree(state = {}, action) {
   switch (action.type) {
     case PROCESSED_FOLDER_BATCH: {
-      const folders = action.folders;
-      const tree = {};
+      const folders = action.folders
+      const tree = {}
 
       for (const folderId in folders) {
-        const folder = folders[folderId];
-        tree[folder.id] = tree[folder.id] || [];
+        const folder = folders[folderId]
+        tree[folder.id] = tree[folder.id] || []
         if (folder.parentId) {
-          tree[folder.parentId] = tree[folder.parentId] || [];
-          tree[folder.parentId].push(folder.id);
+          tree[folder.parentId] = tree[folder.parentId] || []
+          tree[folder.parentId].push(folder.id)
         }
       }
 
       for (const parentFolderId in tree) {
-        const children = tree[parentFolderId];
-        children.sort((a, b) => folders[a].name.localeCompare(folders[b].name));
+        const children = tree[parentFolderId]
+        children.sort((a, b) => folders[a].name.localeCompare(folders[b].name))
       }
 
-      return tree;
+      return tree
     }
     default:
-      return state;
+      return state
   }
 }
 
 function loadingFolders(state = false, action) {
   switch (action.type) {
     case START_LOADING:
-      return true;
+      return true
     case STOP_LOADING:
-      return false;
+      return false
     case FAIL_FOLDERS_LOAD: {
-      return false;
+      return false
     }
     default:
-      return state;
+      return state
   }
 }
 
 function uploadingMediaStatus(state = false, action) {
   switch (action.type) {
     case START_LOADING:
-      return {loading: true, uploaded: false, error: false};
+      return {loading: true, uploaded: false, error: false}
     case FAIL_MEDIA_UPLOAD:
-      return {loading: false, uploaded: false, error: true};
+      return {loading: false, uploaded: false, error: true}
     case MEDIA_UPLOAD_SUCCESS:
-      return {loading: false, uploaded: true, error: false};
+      return {loading: false, uploaded: true, error: false}
     default:
-      return state;
+      return state
   }
 }
 
@@ -165,4 +165,4 @@ export default combineReducers({
   error,
   loadingFolders,
   uploadingMediaStatus
-});
+})

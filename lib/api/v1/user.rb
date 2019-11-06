@@ -65,6 +65,10 @@ module Api::V1::User
                       :integration_id => pseudonym&.integration_id
         end
 
+        if user.pronouns
+          json[:pronouns] = user.pronouns
+        end
+
         if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
           json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
           json[:root_account] = HostUrl.context_host(pseudonym&.account) if include_root_account
@@ -196,7 +200,8 @@ module Api::V1::User
       id: user.id,
       display_name: user.short_name,
       avatar_image_url: avatar_url_for_user(user),
-      html_url: participant_url
+      html_url: participant_url,
+      pronouns: user.pronouns
     }
     hash[:avatar_is_fallback] = user.avatar_image_url.nil? if includes.include?(:avatar_is_fallback) && avatars_enabled_for_user?(user)
     hash[:fake_student] = true if user.fake_student?

@@ -16,37 +16,69 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, lazy} from 'react'
 import I18n from 'i18n!content_share'
+import CanvasLazyTray from 'jsx/shared/components/CanvasLazyTray'
 import ContentHeading from './ContentHeading'
 import ReceivedTable from './ReceivedTable'
 import PreviewModal from './PreviewModal'
 import {Spinner, Text} from '@instructure/ui-elements'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
+import doFetchApi from 'jsx/shared/effects/doFetchApi'
+import Paginator from 'jsx/shared/components/Paginator'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
+const CourseImportPanel = lazy(() => import('./CourseImportPanel'))
 const NoContent = () => <Text size="large">{I18n.t('No content has been shared with you.')}</Text>
 
 export default function ReceivedContentView() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [shares, setShares] = useState([])
-  const [currentPreviewShare, setCurrentPreviewShare] = useState(null)
+  const [responseMeta, setResponseMeta] = useState({})
+  const [currentPage, setCurrentPage] = useState(1)
+  const [currentContentShare, setCurrentContentShare] = useState(null)
+  const [whichModalOpen, setWhichModalOpen] = useState(null)
 
   const getSharesUrl = '/api/v1/users/self/content_shares/received'
 
   useFetchApi({
     success: setShares,
+    meta: setResponseMeta,
     error: setError,
     loading: setIsLoading,
-    path: getSharesUrl
+    path: getSharesUrl,
+    params: {page: currentPage}
   })
 
-  function onPreview(share) {
-    setCurrentPreviewShare(share)
+  function removeShareFromList(doomedShare) {
+    setShares(shares.filter(share => share.id !== doomedShare.id))
   }
 
-  function onImport(shareId) {
-    console.log(`onImport action for ${shareId}`)
+  function onPreview(share) {
+    setCurrentContentShare(share)
+    setWhichModalOpen('preview')
+  }
+
+  function onImport(share) {
+    setCurrentContentShare(share)
+    setWhichModalOpen('import')
+  }
+
+  function onRemove(share) {
+    // eslint-disable-next-line no-alert
+    const shouldRemove = window.confirm(I18n.t('Are you sure you wan to remove this item?'))
+    if (shouldRemove) {
+      doFetchApi({path: `/api/v1/users/self/content_shares/${share.id}`, method: 'DELETE'})
+        .then(() => removeShareFromList(share))
+        .catch(err =>
+          showFlashAlert({message: I18n.t('There was an error removing the item'), err})
+        )
+    }
+  }
+
+  function closeModal() {
+    setWhichModalOpen(null)
   }
 
   function renderBody() {
@@ -54,8 +86,31 @@ export default function ReceivedContentView() {
 
     if (isLoading) return <Spinner renderTitle={I18n.t('Loading')} />
     if (someContent)
-      return <ReceivedTable shares={shares} onPreview={onPreview} onImport={onImport} />
+      return (
+        <ReceivedTable
+          shares={shares}
+          onPreview={onPreview}
+          onImport={onImport}
+          onRemove={onRemove}
+        />
+      )
     return <NoContent />
+  }
+
+  function renderPagination() {
+    if (responseMeta.link) {
+      const last = parseInt(responseMeta.link.last.page, 10)
+      if (!Number.isNaN(last)) {
+        return (
+          <Paginator
+            loadPage={setCurrentPage}
+            page={currentPage}
+            pageCount={last}
+            margin="small 0 0 0"
+          />
+        )
+      }
+    }
   }
 
   if (error) throw new Error(I18n.t('Retrieval of Received Shares failed'))
@@ -71,11 +126,20 @@ export default function ReceivedContentView() {
         )}
       />
       {renderBody()}
+      {renderPagination()}
       <PreviewModal
-        open={currentPreviewShare !== null}
-        share={currentPreviewShare}
-        onDismiss={() => setCurrentPreviewShare(null)}
+        open={whichModalOpen === 'preview'}
+        share={currentContentShare}
+        onDismiss={closeModal}
       />
+      <CanvasLazyTray
+        label={I18n.t('Import...')}
+        open={whichModalOpen === 'import'}
+        placement="end"
+        onDismiss={closeModal}
+      >
+        <CourseImportPanel contentShare={currentContentShare} onClose={closeModal} />
+      </CanvasLazyTray>
     </>
   )
 }

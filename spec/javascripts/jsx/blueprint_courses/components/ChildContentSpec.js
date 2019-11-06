@@ -30,7 +30,7 @@ const defaultProps = () => ({
   masterCourse: getSampleData().masterCourse,
   realRef: () => {},
   routeTo: () => {},
-  selectChangeLog: () => {},
+  selectChangeLog: () => {}
 })
 
 test('renders the ChildContent component', () => {

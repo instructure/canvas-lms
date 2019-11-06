@@ -19,11 +19,11 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import SectionFilter from 'jsx/gradezilla/default_gradebook/components/content-filters/SectionFilter'
+import ModuleFilter from 'jsx/gradezilla/default_gradebook/components/content-filters/ModuleFilter'
 import ContentFilterDriver from './ContentFilterDriver'
 
 QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () => {
-  QUnit.module('SectionFilter', suiteHooks => {
+  QUnit.module('ModuleFilter', suiteHooks => {
     let $container
     let component
     let filter
@@ -34,9 +34,9 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
 
       props = {
         disabled: false,
-        sections: [{id: '2001', name: 'Section 1'}, {id: '2002', name: 'Section 2'}],
+        modules: [{id: '2002', name: 'Module 2'}, {id: '2001', name: 'Module 1'}],
         onSelect: sinon.stub(),
-        selectedSectionId: '0'
+        selectedModuleId: '0'
       }
 
       component = null
@@ -48,46 +48,46 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
     })
 
     function renderComponent() {
-      component = render(<SectionFilter {...props} />, {container: $container})
-      filter = ContentFilterDriver.findWithLabelText('Section Filter', $container)
+      component = render(<ModuleFilter {...props} />, {container: $container})
+      filter = ContentFilterDriver.findWithLabelText('Module Filter', $container)
     }
 
-    test('labels the filter with "Section Filter"', () => {
+    test('labels the filter with "Module Filter"', () => {
       renderComponent()
-      equal(filter.labelText, 'Section Filter')
+      equal(filter.labelText, 'Module Filter')
     })
 
-    test('displays the name of the selected section as the value', () => {
-      props.selectedSectionId = '2002'
+    test('displays the name of the selected module as the value', () => {
+      props.selectedModuleId = '2002'
       renderComponent()
-      equal(filter.selectedItemLabel, 'Section 2')
+      equal(filter.selectedItemLabel, 'Module 2')
     })
 
-    test('displays "All Sections" as the value when selected', () => {
+    test('displays "All Modules" as the value when selected', () => {
       renderComponent()
-      equal(filter.selectedItemLabel, 'All Sections')
+      equal(filter.selectedItemLabel, 'All Modules')
     })
 
-    QUnit.module('sections list', () => {
-      test('labels the "all items" option with "All Sections"', () => {
+    QUnit.module('modules list', () => {
+      test('labels the "all items" option with "All Modules"', () => {
         renderComponent()
         filter.clickToExpand()
         const $allItemsOption = filter.$options[0]
-        equal($allItemsOption.textContent.trim(), 'All Sections')
+        equal($allItemsOption.textContent.trim(), 'All Modules')
       })
 
-      test('labels each option using the related section name', () => {
+      test('labels each option using the related module name in alphabetical order', () => {
         renderComponent()
         filter.clickToExpand()
         const labels = filter.$options.slice(1).map($option => $option.textContent.trim())
-        deepEqual(labels, ['Section 1', 'Section 2'])
+        deepEqual(labels, ['Module 1', 'Module 2'])
       })
 
       test('disables non-selected options when the filter is disabled', () => {
         props.disabled = true
         renderComponent()
         filter.clickToExpand()
-        const $option = filter.getOptionWithLabel('Section 2')
+        const $option = filter.getOptionWithLabel('Module 2')
         strictEqual($option.getAttribute('aria-disabled'), 'true')
       })
     })
@@ -96,25 +96,25 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
       test('calls the .onSelect callback', () => {
         renderComponent()
         filter.clickToExpand()
-        filter.clickToSelectOption('Section 1')
+        filter.clickToSelectOption('Module 1')
         strictEqual(props.onSelect.callCount, 1)
       })
 
-      test('includes the section id when calling the .onSelect callback', () => {
+      test('includes the module id when calling the .onSelect callback', () => {
         renderComponent()
         filter.clickToExpand()
-        filter.clickToSelectOption('Section 1')
-        const [selectedSectionId] = props.onSelect.lastCall.args
-        strictEqual(selectedSectionId, '2001')
+        filter.clickToSelectOption('Module 1')
+        const [selectedModuleId] = props.onSelect.lastCall.args
+        strictEqual(selectedModuleId, '2001')
       })
 
-      test('includes "0" when the "All Sections" is clicked', () => {
-        props.selectedSectionId = '2001'
+      test('includes "0" when the "All Modules" is clicked', () => {
+        props.selectedModuleId = '2001'
         renderComponent()
         filter.clickToExpand()
-        filter.clickToSelectOption('All Sections')
-        const [selectedSectionId] = props.onSelect.lastCall.args
-        strictEqual(selectedSectionId, '0')
+        filter.clickToSelectOption('All Modules')
+        const [selectedModuleId] = props.onSelect.lastCall.args
+        strictEqual(selectedModuleId, '0')
       })
     })
   })

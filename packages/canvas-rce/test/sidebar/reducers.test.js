@@ -16,107 +16,98 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import * as actions from "../../src/sidebar/actions/data";
-import reducer from "../../src/sidebar/reducers";
+import assert from 'assert'
+import * as actions from '../../src/sidebar/actions/data'
+import reducer from '../../src/sidebar/reducers'
 
-describe("Sidebar reducer", () => {
+describe('Sidebar reducer', () => {
   // collection key to use in testing
   const state = {
-    contextType: "course",
+    contextType: 'course',
     collections: {
       announcements: {
         // has bookmark, not loading
-        links: [{ href: "announcement", title: "Announcement" }],
-        bookmark: "announcementsBookmark",
+        links: [{href: 'announcement', title: 'Announcement'}],
+        bookmark: 'announcementsBookmark',
         loading: false
       },
       modules: {
         // has bookmark, is loading
-        links: [{ href: "module", title: "Module" }],
-        bookmark: "modulesBookmark",
+        links: [{href: 'module', title: 'Module'}],
+        bookmark: 'modulesBookmark',
         loading: true
       }
     }
-  };
+  }
 
-  describe("REQUEST_PAGE", () => {
-    it("sets the loading flag on the appropriate collection", () => {
-      const newState = reducer(state, actions.requestPage("announcements"));
-      assert.equal(newState.collections.announcements.loading, true);
-    });
+  describe('REQUEST_PAGE', () => {
+    it('sets the loading flag on the appropriate collection', () => {
+      const newState = reducer(state, actions.requestPage('announcements'))
+      assert.equal(newState.collections.announcements.loading, true)
+    })
 
-    it("leaves the other collections alone", () => {
-      const newState = reducer(state, actions.requestPage("modules"));
-      assert.deepEqual(
-        newState.collections.announcements,
-        state.collections.announcements
-      );
-    });
+    it('leaves the other collections alone', () => {
+      const newState = reducer(state, actions.requestPage('modules'))
+      assert.deepEqual(newState.collections.announcements, state.collections.announcements)
+    })
 
-    it("leaves non-collection keys alone", () => {
-      const newState = reducer(state, actions.requestPage("announcements"));
-      assert.equal(newState.contextType, state.contextType);
-    });
-  });
+    it('leaves non-collection keys alone', () => {
+      const newState = reducer(state, actions.requestPage('announcements'))
+      assert.equal(newState.contextType, state.contextType)
+    })
+  })
 
-  describe("RECEIVE_PAGE", () => {
+  describe('RECEIVE_PAGE', () => {
     const page = {
-      links: [{ href: "newLink", title: "New Link" }],
-      bookmark: "newBookmark"
-    };
+      links: [{href: 'newLink', title: 'New Link'}],
+      bookmark: 'newBookmark'
+    }
 
-    it("appends results to the appropriate collection", () => {
-      const newState = reducer(state, actions.receivePage("modules", page));
-      assert.equal(newState.collections.modules.links.length, 2);
-      assert.deepEqual(newState.collections.modules.links[1], page.links[0]);
-    });
+    it('appends results to the appropriate collection', () => {
+      const newState = reducer(state, actions.receivePage('modules', page))
+      assert.equal(newState.collections.modules.links.length, 2)
+      assert.deepEqual(newState.collections.modules.links[1], page.links[0])
+    })
 
-    it("updates the bookmark on the appropriate collection", () => {
-      const newState = reducer(state, actions.receivePage("modules", page));
-      assert.equal(newState.collections.modules.bookmark, page.bookmark);
-    });
+    it('updates the bookmark on the appropriate collection', () => {
+      const newState = reducer(state, actions.receivePage('modules', page))
+      assert.equal(newState.collections.modules.bookmark, page.bookmark)
+    })
 
-    it("clears the loading flag on the appropriate collection", () => {
-      const newState = reducer(state, actions.receivePage("modules", page));
-      assert.equal(newState.collections.modules.loading, false);
-    });
+    it('clears the loading flag on the appropriate collection', () => {
+      const newState = reducer(state, actions.receivePage('modules', page))
+      assert.equal(newState.collections.modules.loading, false)
+    })
 
-    it("leaves the other collections alone", () => {
-      const newState = reducer(state, actions.requestPage("announcements", page));
-      assert.deepEqual(newState.collections.modules, state.collections.modules);
-    });
-  });
+    it('leaves the other collections alone', () => {
+      const newState = reducer(state, actions.requestPage('announcements', page))
+      assert.deepEqual(newState.collections.modules, state.collections.modules)
+    })
+  })
 
-  describe("FAIL_PAGE", () => {
-    it("clears the loading flag on the appropriate collection", () => {
-      const newState = reducer(state, actions.failPage("modules"));
-      assert.equal(newState.collections.modules.loading, false);
-    });
+  describe('FAIL_PAGE', () => {
+    it('clears the loading flag on the appropriate collection', () => {
+      const newState = reducer(state, actions.failPage('modules'))
+      assert.equal(newState.collections.modules.loading, false)
+    })
 
-    it("clears the bookmark if the links are empty", () => {
-      const emptyModules = { ...state.collections.modules, links: []};
-      const emptyModulesCollections = { ...state.collections, modules: emptyModules};
-      const emptyModulesState = { ...state, collections: emptyModulesCollections};
-      const newState = reducer(emptyModulesState, actions.failPage("modules"));
-      assert.equal(newState.collections.modules.bookmark, null);
-    });
+    it('clears the bookmark if the links are empty', () => {
+      const emptyModules = {...state.collections.modules, links: []}
+      const emptyModulesCollections = {...state.collections, modules: emptyModules}
+      const emptyModulesState = {...state, collections: emptyModulesCollections}
+      const newState = reducer(emptyModulesState, actions.failPage('modules'))
+      assert.equal(newState.collections.modules.bookmark, null)
+    })
 
-    it("leaves the links and bookmark on that collection alone otherwise", () => {
-      const newState = reducer(state, actions.failPage("modules"));
-      assert.deepEqual(
-        newState.collections.modules.links,
-        state.collections.modules.links
-      );
-      assert.equal(
-        newState.collections.modules.bookmark,
-        state.collections.modules.bookmark
-      );
-    });
+    it('leaves the links and bookmark on that collection alone otherwise', () => {
+      const newState = reducer(state, actions.failPage('modules'))
+      assert.deepEqual(newState.collections.modules.links, state.collections.modules.links)
+      assert.equal(newState.collections.modules.bookmark, state.collections.modules.bookmark)
+    })
 
-    it("leaves the other collections alone", () => {
-      const newState = reducer(state, actions.failPage("announcements"));
-      assert.deepEqual(newState.collections.modules, state.collections.modules);
-    });
-  });
-});
+    it('leaves the other collections alone', () => {
+      const newState = reducer(state, actions.failPage('announcements'))
+      assert.deepEqual(newState.collections.modules, state.collections.modules)
+    })
+  })
+})

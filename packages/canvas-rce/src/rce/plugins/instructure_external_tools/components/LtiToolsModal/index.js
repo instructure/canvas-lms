@@ -33,7 +33,9 @@ import LtiTool from './LtiTool'
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
 const getFilterResults = (term, thingsToFilter) => {
-  if (term.length <= 0) { return thingsToFilter }
+  if (term.length <= 0) {
+    return thingsToFilter
+  }
   const query = term ? new RegExp(term, 'i') : null
   return thingsToFilter.filter(item => query && query.test(item.title))
 }
@@ -52,7 +54,7 @@ export function LtiToolsModal(props) {
       data-mce-component
       liveRegion={getLiveRegion}
       size="medium"
-      label={formatMessage('LTI Tools')}
+      label={formatMessage('Apps')}
       onDismiss={props.onDismiss}
       open
       shouldCloseOnDocumentClick
@@ -67,12 +69,12 @@ export function LtiToolsModal(props) {
         <Flex height="35rem" as="div" direction="column">
           <Flex.Item as="div">
             <View as="div" borderWidth="none none small none" padding="x-small">
-            <TextInput
-              type="search"
-              renderLabel={formatMessage('Search')}
-              renderAfterInput={<IconSearchLine inline={false} />}
-              onChange={handleFilterChange}
-            />
+              <TextInput
+                type="search"
+                renderLabel={formatMessage('Search')}
+                renderAfterInput={<IconSearchLine inline={false} />}
+                onChange={handleFilterChange}
+              />
             </View>
           </Flex.Item>
           <Flex.Item as="div" shouldShrink shouldGrow>

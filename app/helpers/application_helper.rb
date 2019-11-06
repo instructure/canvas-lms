@@ -30,7 +30,12 @@ module ApplicationHelper
     user_id = user.id if user.is_a?(User) || user.is_a?(OpenObject)
     Rails.cache.fetch(['context_user_name', context, user_id].cache_key, {:expires_in=>15.minutes}) do
       user = user.respond_to?(:short_name) ? user : User.find(user_id)
-      user.short_name || user.name
+      name = user.short_name || user.name
+      if user.pronouns
+        "#{ERB::Util.h(name)} <i>(#{ERB::Util.h(user.pronouns)})</i>".html_safe
+      else
+        name
+      end
     end
   end
 

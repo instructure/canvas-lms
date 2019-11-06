@@ -1043,17 +1043,17 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [[@group1.id.to_s, "group1sis", @group1.group_category_id.to_s, nil,
                                         @account.id.to_s, nil, nil, nil, "group1name", "available", "true",
-                                        @account.id.to_s, 'Account', @group1.group_category.id.to_s, nil],
+                                        @account.id.to_s, 'Account', nil],
                                        [@group2.id.to_s, "group2sis", @group2.group_category_id.to_s, nil,
                                         @sub_account.id.to_s, "sub1", nil, nil, "group2name", "available",
-                                        "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s, "2"],
+                                        "true", @sub_account.id.to_s, 'Account', "2"],
                                        [@group3.id.to_s, nil, nil, nil, @sub_account.id.to_s, "sub1", nil,
                                         nil, "group3name", "available", "false", @sub_account.id.to_s,
-                                        'Account', nil, nil],
+                                        'Account', nil],
                                        [@group5.id.to_s, "group5sis", @group5.group_category_id.to_s, nil,
                                         nil, nil,
                                         @course1.id.to_s, "SIS_COURSE_ID_1", "group5name", "available", "true",
-                                        @course1.id.to_s, 'Course', @group5.group_category.id.to_s, nil]]
+                                        @course1.id.to_s, 'Course', nil]]
       end
 
       it "should run the provisioning report on a sub account" do
@@ -1063,13 +1063,13 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 3
         expect(parsed).to match_array [[@group2.id.to_s, "group2sis", @group2.group_category_id.to_s, nil,
                                         @sub_account.id.to_s, "sub1", nil, nil, "group2name", "available",
-                                        "true", @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s, "2"],
+                                        "true", @sub_account.id.to_s, 'Account', "2"],
                                        [@group3.id.to_s, nil, nil, nil, @sub_account.id.to_s, "sub1", nil,
-                                        nil, "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil,
+                                        nil, "group3name", "available", "false", @sub_account.id.to_s, 'Account',
                                         nil],
                                        [@group5.id.to_s, "group5sis", @group5.group_category_id.to_s, nil,
                                         nil, nil, @course1.id.to_s, "SIS_COURSE_ID_1", "group5name", "available",
-                                        "true", @course1.id.to_s, 'Course', @group5.group_category.id.to_s, nil]]
+                                        "true", @course1.id.to_s, 'Course', nil]]
       end
 
       it "includes sub-sub-account groups when run on a sub account" do
@@ -1081,14 +1081,14 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [[@group2.id.to_s, "group2sis", @group2.group_category_id.to_s, nil,
                                         @sub_account.id.to_s, "sub1", nil, nil, "group2name", "available", "true",
-                                        @sub_account.id.to_s, 'Account', @group2.group_category.id.to_s, "2"],
+                                        @sub_account.id.to_s, 'Account', "2"],
                                        [@group3.id.to_s, nil, nil, nil, @sub_account.id.to_s, "sub1", nil, nil,
-                                        "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil, nil],
+                                        "group3name", "available", "false", @sub_account.id.to_s, 'Account', nil],
                                        [@group5.id.to_s, "group5sis", @group5.group_category_id.to_s, nil, nil, nil,
                                         @course1.id.to_s, "SIS_COURSE_ID_1", "group5name", "available", "true",
-                                        @course1.id.to_s, 'Course', @group5.group_category.id.to_s, nil],
+                                        @course1.id.to_s, 'Course', nil],
                                        [group6.id.to_s, nil, nil, nil, sub_sub_account.id.to_s, nil, nil, nil,
-                                        "group6name", "available", "false", sub_sub_account.id.to_s, 'Account', nil,
+                                        "group6name", "available", "false", sub_sub_account.id.to_s, 'Account',
                                         nil]]
       end
     end

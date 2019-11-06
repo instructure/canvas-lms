@@ -41,6 +41,8 @@ module Types
       "A short name the user has selected, for use in conversations or other less formal places through the site.",
       null: true
 
+    field :pronouns, String, null: true
+
     field :avatar_url, UrlType, null: true
 
     def avatar_url

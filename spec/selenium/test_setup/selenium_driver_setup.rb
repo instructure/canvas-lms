@@ -372,7 +372,7 @@ module SeleniumDriverSetup
       when :chrome
         caps = Selenium::WebDriver::Remote::Capabilities.chrome
         caps['chromeOptions'] = {
-          args: %w[disable-dev-shm-usage no-sandbox],
+          args: %w[disable-dev-shm-usage no-sandbox window-size=1680,1050],
           w3c: false
         }
       when :edge

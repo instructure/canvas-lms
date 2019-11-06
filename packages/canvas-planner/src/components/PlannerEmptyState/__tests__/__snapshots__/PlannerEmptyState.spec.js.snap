@@ -42,7 +42,7 @@ exports[`renders desert when completely empty 1`] = `
     >
       Go to Card View Dashboard
     </Link>
-     |
+    |
     <Button
       as="button"
       buttonRef={[Function]}

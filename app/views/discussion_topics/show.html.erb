@@ -103,9 +103,9 @@
               </a>
               <ul class="al-options">
                 <% unless @initial_post_required %>
-                  <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
+                  <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="true"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
                   <% if false # keep this command out of the interface for now %>
-                    <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
+                    <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="true"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
                   <% end %>
                 <% end %>
 
@@ -118,7 +118,7 @@
                                                :speed_grader_context_gradebook_url,
                                                :assignment_id => @topic.assignment.id) %>"
                          target="_blank">
-                    <i class="icon-speed-grader" aria-hidden="hidden"></i>
+                    <i class="icon-speed-grader" aria-hidden="true"></i>
                     <%= t :speed_grader, "SpeedGrader™" %>
                   </a></li>
                 <% end %>
@@ -128,7 +128,7 @@
                      href="<%= context_url(@topic.assignment.context,
                                            :context_assignment_peer_reviews_url,
                                            @topic.assignment.id) %>">
-                    <i class="icon-peer-review" aria-hidden="hidden"></i>
+                    <i class="icon-peer-review" aria-hidden="true"></i>
                     <%= t 'links.peer_reviews', "Peer Reviews" %>
                   </a></li>
                 <% end %>
@@ -141,7 +141,7 @@
                       data-no-rubric-exists="<%= !@discussion_presenter.has_attached_rubric? %>"
                       data-focus-returns-to=".announcement_cog"
                     >
-                      <i class="icon-rubric" aria-hidden="hidden"></i>
+                      <i class="icon-rubric" aria-hidden="true"></i>
                       <%= @discussion_presenter.has_attached_rubric? ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
                     </a>
                   </li>
@@ -312,14 +312,14 @@
                  title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
                  role="button"
                  aria-label="<%= t('You are unsubscribed and will not be notified of new comments. Click to subscribe') %> ">
-                <i class='icon-discussion-check' aria-hidden="hidden"></i>
+                <i class='icon-discussion-check' aria-hidden="true"></i>
                 <%= t(:topic_subscribe, 'Subscribe') %>
               </a>
               <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
                  title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
                  role="button"
                  aria-label="<%= t('You are subscribed and will be notified of new comments. Click to unsubscribe') %> ">
-                <i class='icon-discussion-check' aria-hidden="hidden"></i>
+                <i class='icon-discussion-check' aria-hidden="true"></i>
                 <%= t(:topic_unsubscribe, 'Subscribed') %>
               </a>
             </div>

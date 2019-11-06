@@ -150,7 +150,6 @@ describe "Files API", type: :request do
         'url' => file_download_url(@attachment, :verifier => @attachment.uuid, :download => '1', :download_frd => '1'),
         'content-type' => 'text/plain',
         'display_name' => 'test.txt',
-        'workflow_state' => 'processed',
         'filename' => @attachment.filename,
         'size' => @attachment.size,
         'unlock_at' => nil,
@@ -190,7 +189,6 @@ describe "Files API", type: :request do
         'url' => file_download_url(@attachment, :verifier => @attachment.uuid, :download => '1', :download_frd => '1'),
         'content-type' => 'text/plain',
         'display_name' => 'test.txt',
-        'workflow_state' => 'processed',
         'filename' => @attachment.filename,
         'size' => @attachment.size,
         'unlock_at' => nil,
@@ -592,7 +590,8 @@ describe "Files API", type: :request do
           "id" => @user.id,
           "display_name" => @user.short_name,
           "avatar_image_url" => User.avatar_fallback_url(nil, request),
-          "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+          "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+          "pronouns"=>nil
         }
       ]
     end
@@ -655,7 +654,8 @@ describe "Files API", type: :request do
             "id" => user.id,
             "display_name" => user.short_name,
             "avatar_image_url" => User.avatar_fallback_url(nil, request),
-            "html_url" => "http://www.example.com/about/#{user.id}"
+            "html_url" => "http://www.example.com/about/#{user.id}",
+            "pronouns"=>nil
           }
         ]
       end
@@ -892,7 +892,6 @@ describe "Files API", type: :request do
               'url' => file_download_url(@att, :verifier => @att.uuid, :download => '1', :download_frd => '1'),
               'content-type' => "image/png",
               'display_name' => 'test-frd.png',
-              'workflow_state' => 'processed',
               'filename' => @att.filename,
               'size' => @att.size,
               'unlock_at' => nil,
@@ -1031,7 +1030,8 @@ describe "Files API", type: :request do
         "id" => @user.id,
         "display_name" => @user.short_name,
         "avatar_image_url" => User.avatar_fallback_url(nil, request),
-        "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+        "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+        "pronouns"=>nil
       })
     end
 

@@ -33,10 +33,10 @@ class AssignmentsController < ApplicationController
   before_action :require_context
   add_crumb(
     proc { t '#crumbs.assignments', "Assignments" },
-    except: [:destroy, :syllabus, :index, :new]
+    except: [:destroy, :syllabus, :index, :new, :edit]
   ) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
-  before_action(except: [:new]) { |c| c.active_tab = "assignments" }
-  before_action(only: [:new]) { |c| setup_active_tab(c) }
+  before_action(except: [:new, :edit]) { |c| c.active_tab = "assignments" }
+  before_action(only: [:new, :edit]) { |c| setup_active_tab(c) }
   before_action :normalize_title_param, :only => [:new, :edit]
 
   def index
@@ -71,7 +71,9 @@ class AssignmentsController < ApplicationController
           HAS_ASSIGNMENTS: @context.active_assignments.count > 0,
           QUIZ_LTI_ENABLED: quiz_lti_tool_enabled?,
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
-          DIRECT_SHARE_ENABLED: @domain_root_account&.feature_enabled?(:direct_share),
+          FLAGS: {
+            newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+          }
         }
 
         set_default_tool_env!(@context, hash)
@@ -523,7 +525,7 @@ class AssignmentsController < ApplicationController
   def new
     @assignment ||= @context.assignments.temp_record
     @assignment.workflow_state = 'unpublished'
-    add_crumb_on_new_page
+    add_crumb_on_new_quizzes(true)
 
     if params[:submission_types] == 'discussion_topic'
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
@@ -538,6 +540,7 @@ class AssignmentsController < ApplicationController
   def edit
     rce_js_env
     @assignment ||= @context.assignments.active.find(params[:id])
+    add_crumb_on_new_quizzes(false)
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]
       @assignment.due_at = params[:due_at] if params[:due_at]
@@ -681,6 +684,42 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  # pulish a N.Q assignment from Quizzes Page
+  def publish_quizzes
+    if authorized_action(@context, @current_user, :manage_assignments)
+      @assignments = @context.assignments.active.where(id: params[:quizzes])
+      @assignments.each(&:publish!)
+
+      flash[:notice] = t('notices.quizzes_published',
+                         { :one => "1 quiz successfully published!",
+                           :other => "%{count} quizzes successfully published!" },
+                         :count => @assignments.length)
+
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+        format.json { render :json => {}, :status => :ok }
+      end
+    end
+  end
+
+  # unpulish a N.Q assignment from Quizzes Page
+  def unpublish_quizzes
+    if authorized_action(@context, @current_user, :manage_assignments)
+      @assignments = @context.assignments.active.where(id: params[:quizzes], workflow_state: 'published')
+      @assignments.each(&:unpublish!)
+
+      flash[:notice] = t('notices.quizzes_unpublished',
+                         { :one => "1 quiz successfully unpublished!",
+                           :other => "%{count} quizzes successfully unpublished!" },
+                         :count => @assignments.length)
+
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+        format.json { render :json => {}, :status => :ok }
+      end
+    end
+  end
+
   protected
 
   def set_default_tool_env!(context, hash)
@@ -795,14 +834,16 @@ class AssignmentsController < ApplicationController
     @context.filter_speed_grader_by_student_group?
   end
 
-  def add_crumb_on_new_page
+  def add_crumb_on_new_quizzes(new_quiz)
+    return if !new_quiz && @assignment.new_record?
+
     if on_quizzes_page? && params.key?(:quiz_lti)
       add_crumb(t('#crumbs.quizzes', "Quizzes"), course_quizzes_path(@context))
     else
       add_crumb(t('#crumbs.assignments', "Assignments"), course_assignments_path(@context))
     end
 
-    add_crumb(t('Create new'))
+    add_crumb(t('Create new')) if new_quiz
   end
 
   def setup_active_tab(controller)

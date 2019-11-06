@@ -27,111 +27,127 @@ import './jquery.loadingImg'
 import './jquery.templateData'
 
 $(document).ready(function() {
-  $(".add_bank_link").click(event => {
-    event.preventDefault();
-    var $bank = $("#question_bank_blank").clone(true).attr('id', 'question_bank_new');
-    $("#questions").prepend($bank.show());
-    $bank.find(".edit_bank_link").click();
-  });
-  $(".question_bank .delete_bank_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".question_bank").confirmDelete({
-      url: $(this).attr('href'),
-      message: I18n.t("delete_question_bank_prompt", "Are you sure you want to delete this bank of questions?"),
-      success: function() {
-        $(this).slideUp(function() {
-          $(this).remove();
-        });
-      }
-    });
-  });
-  $(".question_bank .bookmark_bank_link").click(function(event) {
-    event.preventDefault();
-    var $link = $(this);
-    var $bank = $link.parents(".question_bank");
+  $('.add_bank_link').click(event => {
+    event.preventDefault()
+    const $bank = $('#question_bank_blank')
+      .clone(true)
+      .attr('id', 'question_bank_new')
+    $('#questions').prepend($bank.show())
+    $bank.find('.edit_bank_link').click()
+  })
+  $('.question_bank .delete_bank_link').click(function(event) {
+    event.preventDefault()
+    $(this)
+      .parents('.question_bank')
+      .confirmDelete({
+        url: $(this).attr('href'),
+        message: I18n.t(
+          'delete_question_bank_prompt',
+          'Are you sure you want to delete this bank of questions?'
+        ),
+        success() {
+          $(this).slideUp(function() {
+            $(this).remove()
+          })
+        }
+      })
+  })
+  $('.question_bank .bookmark_bank_link').click(function(event) {
+    event.preventDefault()
+    const $link = $(this)
+    const $bank = $link.parents('.question_bank')
     $.ajaxJSON($(this).attr('href'), 'POST', {}, data => {
-      $bank.find(".bookmark_bank_link").toggle();
-      $bank.find(".bookmark_bank_link:visible:first").focus();
-    });
-  });
-  $(".question_bank .edit_bank_link").click(function(event) {
-    event.preventDefault();
-    var $bank = $(this).parents(".question_bank");
-    var data = $bank.getTemplateData({textValues: ['title']});
-    $bank.find(".header_content").hide();
-    var $form = $("#edit_bank_form");
-    $bank.find(".header").prepend($form.show());
-    $form.attr('action', $(this).attr('href'));
-    $form.attr('method', 'PUT');
-    if($bank.attr('id') == 'question_bank_new') {
-      $form.attr('action', $("#bank_urls .add_bank_url").attr('href'));
-      $form.attr('method', 'POST');
+      $bank.find('.bookmark_bank_link').toggle()
+      $bank.find('.bookmark_bank_link:visible:first').focus()
+    })
+  })
+  $('.question_bank .edit_bank_link').click(function(event) {
+    event.preventDefault()
+    const $bank = $(this).parents('.question_bank')
+    const data = $bank.getTemplateData({textValues: ['title']})
+    $bank.find('.header_content').hide()
+    const $form = $('#edit_bank_form')
+    $bank.find('.header').prepend($form.show())
+    $form.attr('action', $(this).attr('href'))
+    $form.attr('method', 'PUT')
+    if ($bank.attr('id') == 'question_bank_new') {
+      $form.attr('action', $('#bank_urls .add_bank_url').attr('href'))
+      $form.attr('method', 'POST')
     }
-    $form.fillFormData(data, {object_name: 'assessment_question_bank'});
-    $form.find(":text:visible:first").focus().select();
-  });
-  $("#edit_bank_form .bank_name_box").keycodes('return esc tab', function(event) {
-    if(event.keyString == 'esc') {
-      $(this).parents(".question_bank").addClass('dont_save')
-      $(this).blur();
-    } else if(event.keyString == 'return') {
-      $("#edit_bank_form").submit();
-    } else if(event.keyString == 'tab') {
+    $form.fillFormData(data, {object_name: 'assessment_question_bank'})
+    $form
+      .find(':text:visible:first')
+      .focus()
+      .select()
+  })
+  $('#edit_bank_form .bank_name_box').keycodes('return esc tab', function(event) {
+    if (event.keyString == 'esc') {
+      $(this)
+        .parents('.question_bank')
+        .addClass('dont_save')
+      $(this).blur()
+    } else if (event.keyString == 'return') {
+      $('#edit_bank_form').submit()
+    } else if (event.keyString == 'tab') {
       $('nav#breadcrumbs a:visible:first').focus()
-      event.preventDefault();
+      event.preventDefault()
     }
-  });
-  $("#edit_bank_form .bank_name_box").blur(function() {
-    var $bank = $(this).parents(".question_bank");
-    if(!$bank.hasClass('dont_save') && !$bank.hasClass('save_in_progress') && $bank.attr('id') != 'question_bank_new') {
-      $("#edit_bank_form").submit();
-      return;
+  })
+  $('#edit_bank_form .bank_name_box').blur(function() {
+    const $bank = $(this).parents('.question_bank')
+    if (
+      !$bank.hasClass('dont_save') &&
+      !$bank.hasClass('save_in_progress') &&
+      $bank.attr('id') != 'question_bank_new'
+    ) {
+      $('#edit_bank_form').submit()
+      return
     }
-    $bank.removeClass('dont_save');
-    $bank.find(".header_content").show();
-    $("body").append($("#edit_bank_form").hide());
-    if($bank.attr('id') == 'question_bank_new') {
-      $bank.remove();
+    $bank.removeClass('dont_save')
+    $bank.find('.header_content').show()
+    $('body').append($('#edit_bank_form').hide())
+    if ($bank.attr('id') == 'question_bank_new') {
+      $bank.remove()
     }
-  });
-  $("#edit_bank_form").formSubmit({
+  })
+  $('#edit_bank_form').formSubmit({
     object_name: 'assessment_question_bank',
-    beforeSubmit: function(data) {
-      var $bank = $(this).parents(".question_bank");
-      $bank.attr('id', 'question_bank_adding');
+    beforeSubmit(data) {
+      const $bank = $(this).parents('.question_bank')
+      $bank.attr('id', 'question_bank_adding')
       try {
         $bank.addClass('save_in_progress')
-        $bank.find(".bank_name_box").blur();
-      } catch(e) { }
+        $bank.find('.bank_name_box').blur()
+      } catch (e) {}
       $bank.fillTemplateData({
-        data: data
-      });
-      $bank.loadingImage();
-      return $bank;
+        data
+      })
+      $bank.loadingImage()
+      return $bank
     },
-    success: function(data, $bank) {
-      $bank.loadingImage('remove');
+    success(data, $bank) {
+      $bank.loadingImage('remove')
       $bank.removeClass('save_in_progress')
-      var bank = data.assessment_question_bank;
-      bank.last_updated_at = $.datetimeString(bank.updated_at);
+      const bank = data.assessment_question_bank
+      bank.last_updated_at = $.datetimeString(bank.updated_at)
       $bank.fillTemplateData({
         data: bank,
         hrefValues: ['id']
       })
       // if you can convince fillTemplateData to do this, please be my guest
       $bank.find('.links a').each((_, link) => {
-        link.setAttribute('title', link.getAttribute('title').replace('{{ title }}', bank.title));
-      });
+        link.setAttribute('title', link.getAttribute('title').replace('{{ title }}', bank.title))
+      })
       $bank.find('.links a span').each((_, span) => {
-        span.textContent = span.textContent.replace('{{ title }}', bank.title);
-      });
+        span.textContent = span.textContent.replace('{{ title }}', bank.title)
+      })
       $bank.find('a.title')[0].focus()
     },
-    error: function(data, $bank) {
-      $bank.loadingImage('remove');
+    error(data, $bank) {
+      $bank.loadingImage('remove')
       $bank.removeClass('save_in_progress')
-      $bank.find(".edit_bank_link").click();
-      $("#edit_bank_form").formErrors(data);
+      $bank.find('.edit_bank_link').click()
+      $('#edit_bank_form').formErrors(data)
     }
-  });
-});
+  })
+})

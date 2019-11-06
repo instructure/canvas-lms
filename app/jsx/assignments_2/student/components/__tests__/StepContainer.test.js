@@ -18,9 +18,10 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import {legacyMockSubmission, mockAssignment} from '../../test-utils'
+import {mockAssignmentAndSubmission} from '../../mocks'
 import StepContainer from '../StepContainer'
 import StudentViewContext from '../Context'
+import {SubmissionMocks} from '../../graphqlData/Submission'
 
 const unavailableSteps = ['Unavailable', 'Upload', 'Submit', 'Not Graded Yet']
 const availableSteps = ['Available', 'Upload', 'Submit', 'Not Graded Yet']
@@ -44,318 +45,207 @@ function verifySteps(stepContainer, stepArray, getStep) {
   })
 }
 
-it('will render collapsed label if steps is collapsed', () => {
-  const assignment = mockAssignment()
-  const submission = legacyMockSubmission()
-  assignment.lockInfo.isLocked = false
-  submission.state = 'submitted'
-  const {getAllByText, getByTestId} = render(
-    <StepContainer assignment={assignment} submission={submission} isCollapsed />
-  )
-
+it('will render collapsed label if steps is collapsed', async () => {
+  const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
+  const {getAllByText, getByTestId} = render(<StepContainer {...props} isCollapsed />)
   expect(getByTestId('collapsed-step-container')).toContainElement(getAllByText('Submitted')[0])
 })
 
-it('will not render collapsed label if steps is not collapsed', () => {
-  const assignment = mockAssignment()
-  const submission = legacyMockSubmission()
-  assignment.lockInfo.isLocked = false
-  const label = 'TEST'
-  submission.state = 'submitted'
+it('will not render collapsed label if steps is not collapsed', async () => {
+  const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
   const {getByText, queryByTestId} = render(
-    <StepContainer
-      assignment={assignment}
-      isCollapsed={false}
-      submission={submission}
-      collapsedLabel={label}
-    />
+    <StepContainer {...props} isCollapsed={false} collapsedLabel="TEST" />
   )
-
   expect(queryByTestId('collapsed-step-container')).not.toBeInTheDocument()
   expect(getByText('Uploaded')).toBeInTheDocument()
 })
 
 describe('the assignment is unavailable', () => {
-  it('will render the unavailable state tracker with all the appropriate steps', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = true
-    const {getByTestId, getByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
+  it('will render the unavailable state tracker with all the appropriate steps', async () => {
+    const props = await mockAssignmentAndSubmission({LockInfo: {isLocked: true}})
+    const {getByText, getByTestId} = render(<StepContainer {...props} />)
     verifySteps(getByTestId('unavailable-step-container'), unavailableSteps, getByText)
   })
 
-  it('will render the unavailable state tracker if assignment is locked', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = true
-    const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
-
+  it('will render the unavailable state tracker if assignment is locked', async () => {
+    const props = await mockAssignmentAndSubmission({LockInfo: {isLocked: true}})
+    const {getByTestId} = render(<StepContainer {...props} />)
     expect(getByTestId('unavailable-step-container')).toBeInTheDocument()
   })
 })
 
 describe('the assignment is available', () => {
-  it('will render the available state tracker with all the appropriate steps', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'unsubmitted'
-    const {getByTestId, getByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
+  it('will render the available state tracker with all the appropriate steps', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
     verifySteps(getByTestId('available-step-container'), availableSteps, getByText)
   })
 
-  it('will render the availaible state tracker if assignment is not locked, not uploaded, and not submitted', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'unsubmitted'
-    const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
-
+  it('will render the availaible state tracker if assignment is not locked, uploaded, or submitted', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByTestId} = render(<StepContainer {...props} />)
     expect(getByTestId('available-step-container')).toBeInTheDocument()
   })
 
-  it('will render the availaible state tracker if there are no attachments', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.submissionDraft = {_id: '3', attachments: []}
-    submission.state = 'unsubmitted'
-    const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
-
+  it('will render the availaible state tracker if there are no attachments', async () => {
+    const props = await mockAssignmentAndSubmission({SubmissionDraft: {attachments: []}})
+    const {getByTestId} = render(<StepContainer {...props} />)
     expect(getByTestId('available-step-container')).toBeInTheDocument()
   })
 
-  it('will render the availaible state tracker if there is an empty submission draft', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.submissionDraft = {}
-    submission.state = 'unsubmitted'
-    const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
-
+  it('will render the availaible state tracker if there is an empty submission draft', async () => {
+    const props = await mockAssignmentAndSubmission({SubmissionDraft: null})
+    const {getByTestId} = render(<StepContainer {...props} />)
     expect(getByTestId('available-step-container')).toBeInTheDocument()
   })
 })
 
 describe('the assignment is uploaded', () => {
-  it('will render the uploaded state tracker with all appropriate steps', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.submissionDraft = {id: '3', meetsAssignmentCriteria: true}
-    submission.state = 'unsubmitted'
-    const {getByTestId, getByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
+  it('will render the uploaded state tracker with all appropriate steps', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+    })
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
     verifySteps(getByTestId('uploaded-step-container'), uploadedSteps, getByText)
   })
 
-  it('will render the uploaded state tracker if an assignment is not submitted', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.submissionDraft = {id: '3', meetsAssignmentCriteria: true}
-    submission.state = 'unsubmitted'
-    const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
-
+  it('will render the uploaded state tracker if an assignment is not submitted', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+    })
+    const {getByTestId} = render(<StepContainer {...props} />)
     expect(getByTestId('uploaded-step-container')).toBeInTheDocument()
   })
 })
 
 describe('the assignment is submitted', () => {
-  it('will render the submitted state tracker with all appropriate steps', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId, getByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
+  it('will render the submitted state tracker with all appropriate steps', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
     verifySteps(getByTestId('submitted-step-container'), submittedSteps, getByText)
   })
 
-  it('will render the submitted state tracker if an assignment is not graded', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId} = render(<StepContainer assignment={assignment} submission={submission} />)
-
+  it('will render the submitted state tracker if an assignment is not graded', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
+    const {getByTestId} = render(<StepContainer {...props} />)
     expect(getByTestId('submitted-step-container')).toBeInTheDocument()
   })
 
-  it('will render the Previous step if the Previous button is enabled', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
+  it('will render the Previous step if the Previous button is enabled', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
     const {getByTestId, getByText} = render(
       <StudentViewContext.Provider value={{prevButtonEnabled: true}}>
-        <StepContainer assignment={assignment} submission={submission} />
+        <StepContainer {...props} />
       </StudentViewContext.Provider>
     )
     expect(getByTestId('submitted-step-container')).toContainElement(getByText('Previous'))
   })
 
-  it('will not render the Previous step if the Previous button is not enabled', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
+  it('will not render the Previous step if the Previous button is not enabled', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
     const {getByTestId, queryByText} = render(
       <StudentViewContext.Provider value={{prevButtonEnabled: false}}>
-        <StepContainer assignment={assignment} submission={submission} />
+        <StepContainer {...props} />
       </StudentViewContext.Provider>
     )
     expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('Previous'))
   })
 
-  it('will render the Next step if it is enabled', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
+  it('will render the Next step if it is enabled', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
     const {getByTestId, getByText} = render(
       <StudentViewContext.Provider value={{nextButtonEnabled: true}}>
-        <StepContainer assignment={assignment} submission={submission} />
+        <StepContainer {...props} />
       </StudentViewContext.Provider>
     )
     expect(getByTestId('submitted-step-container')).toContainElement(getByText('Next'))
   })
 
-  it('will not render the Next step if it is not enabled', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
+  it('will not render the Next step if it is not enabled', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
     const {getByTestId, queryByText} = render(
       <StudentViewContext.Provider value={{nextButtonEnabled: false}}>
-        <StepContainer assignment={assignment} submission={submission} />
+        <StepContainer {...props} />
       </StudentViewContext.Provider>
     )
     expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('Next'))
   })
 
-  it('will render the New Attempt step if more attempts are allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId, getByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
+  it('will render the New Attempt step if more attempts are allowed', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
     expect(getByTestId('submitted-step-container')).toContainElement(getByText('New Attempt'))
   })
 
-  it('will not render the New Attempt step if more attempts are not allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.allowedAttempts = 1
-    assignment.lockInfo.isLocked = false
-    submission.state = 'submitted'
-    const {getByTestId, queryByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
+  it('will not render the New Attempt step if more attempts are not allowed', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {allowedAttempts: 1},
+      Submission: SubmissionMocks.submitted
+    })
+    const {getByTestId, queryByText} = render(<StepContainer {...props} />)
     expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('New Attempt'))
   })
 })
 
 describe('the assignment is graded', () => {
-  it('will render the graded state tracker with all appropriate steps', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
-    const {getByTestId, getByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
+  it('will render the graded state tracker with all appropriate steps', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
     verifySteps(getByTestId('graded-step-container'), gradedSteps, getByText)
   })
 
-  it('will render the Previous step if the Previous button is enabled', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
+  it('will render the Previous step if the Previous button is enabled', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
     const {getByTestId, getByText} = render(
       <StudentViewContext.Provider value={{prevButtonEnabled: true}}>
-        <StepContainer assignment={assignment} submission={submission} />
+        <StepContainer {...props} />
       </StudentViewContext.Provider>
     )
     expect(getByTestId('graded-step-container')).toContainElement(getByText('Previous'))
   })
 
-  it('will not render the Previous step if the Previous button is not enabled', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
+  it('will not render the Previous step if the Previous button is not enabled', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
     const {getByTestId, queryByText} = render(
       <StudentViewContext.Provider value={{prevButtonEnabled: false}}>
-        <StepContainer assignment={assignment} submission={submission} />
+        <StepContainer {...props} />
       </StudentViewContext.Provider>
     )
     expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('Previous'))
   })
 
-  it('will render the Next step if the Next button is is enabled', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
+  it('will render the Next step if the Next button is is enabled', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
     const {getByTestId, getByText} = render(
       <StudentViewContext.Provider value={{nextButtonEnabled: true}}>
-        <StepContainer assignment={assignment} submission={submission} />
+        <StepContainer {...props} />
       </StudentViewContext.Provider>
     )
     expect(getByTestId('graded-step-container')).toContainElement(getByText('Next'))
   })
 
-  it('will not render the Next step if the Next button is not enabled', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
+  it('will not render the Next step if the Next button is not enabled', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
     const {getByTestId, queryByText} = render(
       <StudentViewContext.Provider value={{nextButtonEnabled: false}}>
-        <StepContainer assignment={assignment} submission={submission} />
+        <StepContainer {...props} />
       </StudentViewContext.Provider>
     )
     expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('Next'))
   })
 
-  it('will render the New Attempt button if more attempts are allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
-    const {getByTestId, getByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
+  it('will render the New Attempt button if more attempts are allowed', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
+    const {getByTestId, getByText} = render(<StepContainer {...props} />)
     expect(getByTestId('graded-step-container')).toContainElement(getByText('New Attempt'))
   })
 
-  it('will not render the New Attempt step if more attempts are not allowed', () => {
-    const assignment = mockAssignment()
-    const submission = legacyMockSubmission()
-    assignment.allowedAttempts = 1
-    assignment.lockInfo.isLocked = false
-    submission.state = 'graded'
-    const {getByTestId, queryByText} = render(
-      <StepContainer assignment={assignment} submission={submission} />
-    )
-
+  it('will not render the New Attempt step if more attempts are not allowed', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {allowedAttempts: 1},
+      Submission: SubmissionMocks.graded
+    })
+    const {getByTestId, queryByText} = render(<StepContainer {...props} />)
     expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('New Attempt'))
   })
 })

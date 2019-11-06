@@ -15,60 +15,60 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import $ from 'jquery';
-import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
+import $ from 'jquery'
+import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache'
 
 QUnit.module('JQuerySelectorCache', hooks => {
-  let selectorCache;
-  let fixtures;
+  let selectorCache
+  let fixtures
 
   hooks.beforeEach(() => {
-    fixtures = document.getElementById('fixtures');
-    fixtures.innerHTML = '<div id="foo">testing!</div>';
-    selectorCache = new JQuerySelectorCache();
-  });
+    fixtures = document.getElementById('fixtures')
+    fixtures.innerHTML = '<div id="foo">testing!</div>'
+    selectorCache = new JQuerySelectorCache()
+  })
 
   hooks.afterEach(() => {
-    fixtures.innerHTML = '';
-  });
+    fixtures.innerHTML = ''
+  })
 
   QUnit.module('#get', () => {
     test('returns a jquery selector', () => {
-      const response = selectorCache.get('#foo');
-      strictEqual(response instanceof $, true);
-    });
+      const response = selectorCache.get('#foo')
+      strictEqual(response instanceof $, true)
+    })
 
     test('returns the selector for the given element', () => {
-      const response = selectorCache.get('#foo');
-      strictEqual(response.text(), 'testing!');
-    });
+      const response = selectorCache.get('#foo')
+      strictEqual(response.text(), 'testing!')
+    })
 
     test('returns a valid selector even if the element does not exist', () => {
-      const response = selectorCache.get('#does_not_exist');
-      strictEqual(response.length, 0);
-    });
+      const response = selectorCache.get('#does_not_exist')
+      strictEqual(response.length, 0)
+    })
 
     test('reuses the cached value on subsequent requests', () => {
-      const first = selectorCache.get('#foo');
-      const second = selectorCache.get('#foo');
-      strictEqual(first, second);
-    });
-  });
+      const first = selectorCache.get('#foo')
+      const second = selectorCache.get('#foo')
+      strictEqual(first, second)
+    })
+  })
 
   QUnit.module('#set', () => {
     test('caches the value that subsequent `get` calls will use', () => {
-      selectorCache.set('#foo');
-      sinon.stub(selectorCache, 'set');
-      selectorCache.get('#foo');
+      selectorCache.set('#foo')
+      sinon.stub(selectorCache, 'set')
+      selectorCache.get('#foo')
       // we verify the `get` call uses the cached value
       // by asserting that `set` is not called
-      strictEqual(selectorCache.set.callCount, 0);
-    });
+      strictEqual(selectorCache.set.callCount, 0)
+    })
 
     test('stores the appropriate selector for the given value', () => {
-      selectorCache.set('#foo');
-      const value = selectorCache.get('#foo');
-      strictEqual(value.text(), 'testing!');
-    });
-  });
-});
+      selectorCache.set('#foo')
+      const value = selectorCache.get('#foo')
+      strictEqual(value.text(), 'testing!')
+    })
+  })
+})

@@ -30,6 +30,7 @@ QUnit.module('Filterable', {
       static initClass() {
         this.mixin(Filterable)
       }
+
       template() {
         return `\
 <input class="filterable">

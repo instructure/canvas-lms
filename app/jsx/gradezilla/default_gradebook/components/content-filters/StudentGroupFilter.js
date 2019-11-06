@@ -19,12 +19,14 @@
 import React from 'react'
 import {arrayOf, shape, string} from 'prop-types'
 
+import natcompare from 'compiled/util/natcompare'
 import I18n from 'i18n!gradezilla_default_gradebook_components_content_filters_student_group_filter'
+
 import ContentFilter from './ContentFilter'
 
 function normalizeStudentGroupSets(studentGroupSets) {
   return studentGroupSets.map(category => ({
-    children: [...category.groups].sort((a, b) => a.id - b.id),
+    children: [...category.groups].sort(natcompare.byKey('name')),
     id: category.id,
     name: category.name
   }))
@@ -41,6 +43,7 @@ export default function StudentGroupFilter(props) {
       items={normalizeStudentGroupSets(studentGroupSets)}
       label={I18n.t('Student Group Filter')}
       selectedItemId={selectedStudentGroupId}
+      sortAlphabetically
     />
   )
 }

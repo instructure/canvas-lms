@@ -16,35 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios';
-import parseLinkHeader from 'parse-link-header';
-import { put, select, call, all, takeEvery } from 'redux-saga/effects';
-import { getFirstLoadedMoment, getLastLoadedMoment } from '../utilities/dateUtils';
-import { transformApiToInternalGrade } from '../utilities/apiUtils';
+import axios from 'axios'
+import parseLinkHeader from 'parse-link-header'
+import {put, select, call, all, takeEvery} from 'redux-saga/effects'
+import {getFirstLoadedMoment, getLastLoadedMoment} from '../utilities/dateUtils'
+import {transformApiToInternalGrade} from '../utilities/apiUtils'
+
+import {gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError} from './loading-actions'
 
 import {
-  gotItemsError, sendFetchRequest, gotGradesSuccess, gotGradesError
-} from './loading-actions';
+  mergeFutureItems,
+  mergePastItems,
+  mergePastItemsForNewActivity,
+  mergePastItemsForToday,
+  consumePeekIntoPast
+} from './saga-actions'
 
-import {
-  mergeFutureItems, mergePastItems, mergePastItemsForNewActivity,
-  mergePastItemsForToday, consumePeekIntoPast,
-} from './saga-actions';
-
-
-export default function* allSagas () {
-  yield all([
-    call(watchForSagas),
-  ]);
+export default function* allSagas() {
+  yield all([call(watchForSagas)])
 }
 
-function* watchForSagas () {
-  yield takeEvery('START_LOADING_PAST_SAGA', loadPastSaga);
-  yield takeEvery('START_LOADING_FUTURE_SAGA', loadFutureSaga);
-  yield takeEvery('START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA', loadPastUntilNewActivitySaga);
-  yield takeEvery('START_LOADING_GRADES_SAGA', loadGradesSaga);
-  yield takeEvery('START_LOADING_PAST_UNTIL_TODAY_SAGA', loadPastUntilTodaySaga);
-  yield takeEvery('PEEK_INTO_PAST_SAGA', peekIntoPastSaga);
+function* watchForSagas() {
+  yield takeEvery('START_LOADING_PAST_SAGA', loadPastSaga)
+  yield takeEvery('START_LOADING_FUTURE_SAGA', loadFutureSaga)
+  yield takeEvery('START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA', loadPastUntilNewActivitySaga)
+  yield takeEvery('START_LOADING_GRADES_SAGA', loadGradesSaga)
+  yield takeEvery('START_LOADING_PAST_UNTIL_TODAY_SAGA', loadPastUntilTodaySaga)
+  yield takeEvery('PEEK_INTO_PAST_SAGA', peekIntoPastSaga)
 }
 
 // fromMomentFunction: function
@@ -59,85 +57,87 @@ function* watchForSagas () {
 //        false if the new items did not meet the conditions and we should load more items
 // opts: for sendFetchRequest
 //   intoThePast
-function* loadingLoop (fromMomentFunction, actionCreator, opts) {
+function* loadingLoop(fromMomentFunction, actionCreator, opts) {
   try {
-    let currentState = null;
-    const getState = () => currentState; // don't want create a new function inside a loop
-    let continueLoading = true;
+    let currentState = null
+    const getState = () => currentState // don't want create a new function inside a loop
+    let continueLoading = true
     while (continueLoading) {
-      currentState = yield select();
-      const fromMoment = fromMomentFunction(currentState);
-      const loadingOptions = {fromMoment, getState, ...opts};
-      const {transformedItems, response} = yield call(sendFetchRequest, loadingOptions);
-      const thunk = yield call(actionCreator, transformedItems, response);
-      const stopLoading = yield put(thunk);
+      currentState = yield select()
+      const fromMoment = fromMomentFunction(currentState)
+      const loadingOptions = {fromMoment, getState, ...opts}
+      const {transformedItems, response} = yield call(sendFetchRequest, loadingOptions)
+      const thunk = yield call(actionCreator, transformedItems, response)
+      const stopLoading = yield put(thunk)
       // the saga lib catches exceptions thrown by `put` and returns undefined in that case.
       // make sure we got a boolean like we expect.
       if (typeof stopLoading !== 'boolean') {
-        throw new Error(`saga error invoking action ${actionCreator.name}. It returned a non-boolean: ${stopLoading}`);
+        throw new Error(
+          `saga error invoking action ${actionCreator.name}. It returned a non-boolean: ${stopLoading}`
+        )
       }
-      continueLoading = !stopLoading;
+      continueLoading = !stopLoading
     }
   } catch (e) {
-    yield put(gotItemsError(e));
+    yield put(gotItemsError(e))
   }
 }
 
-export function* loadPastSaga () {
-  yield* loadingLoop(fromMomentPast, mergePastItems, {intoThePast: true});
+export function* loadPastSaga() {
+  yield* loadingLoop(fromMomentPast, mergePastItems, {intoThePast: true})
 }
 
-export function* loadFutureSaga () {
-  yield* loadingLoop(fromMomentFuture, mergeFutureItems, {intoThePast: false});
+export function* loadFutureSaga() {
+  yield* loadingLoop(fromMomentFuture, mergeFutureItems, {intoThePast: false})
 }
 
-export function* loadPastUntilNewActivitySaga () {
-  yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {intoThePast: true});
+export function* loadPastUntilNewActivitySaga() {
+  yield* loadingLoop(fromMomentPast, mergePastItemsForNewActivity, {intoThePast: true})
 }
 
-export function* peekIntoPastSaga () {
-  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {intoThePast: true, perPage: 1});
+export function* peekIntoPastSaga() {
+  yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {intoThePast: true, perPage: 1})
 }
 
-export function* loadGradesSaga () {
+export function* loadGradesSaga() {
   const loadingOptions = {
     params: {
       include: ['total_scores', 'current_grading_period_scores'],
       enrollment_type: 'student',
-      enrollment_state: 'active',
-    },
-  };
+      enrollment_state: 'active'
+    }
+  }
   try {
     // exhaust pagination because we really do need all the grades.
-    let loadingUrl = '/api/v1/users/self/courses';
-    let gradesData = {};
+    let loadingUrl = '/api/v1/users/self/courses'
+    const gradesData = {}
     while (loadingUrl != null) {
-      const response = yield call(axios.get, loadingUrl, loadingOptions);
+      const response = yield call(axios.get, loadingUrl, loadingOptions)
       response.data.forEach(apiData => {
-        const internalGrade = transformApiToInternalGrade(apiData);
-        gradesData[internalGrade.courseId] = internalGrade;
-      });
+        const internalGrade = transformApiToInternalGrade(apiData)
+        gradesData[internalGrade.courseId] = internalGrade
+      })
 
-      const links = parseLinkHeader(response.headers.link);
-      loadingUrl = links && links.next ? links.next.url : null;
+      const links = parseLinkHeader(response.headers.link)
+      loadingUrl = links && links.next ? links.next.url : null
     }
-    yield put(gotGradesSuccess(gradesData));
+    yield put(gotGradesSuccess(gradesData))
   } catch (loadingError) {
-    yield put(gotGradesError(loadingError));
-    throw loadingError;
+    yield put(gotGradesError(loadingError))
+    throw loadingError
   }
 }
 
-export function* loadPastUntilTodaySaga () {
-  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {intoThePast: true});
+export function* loadPastUntilTodaySaga() {
+  yield* loadingLoop(fromMomentPast, mergePastItemsForToday, {intoThePast: true})
 }
 
-function fromMomentPast (state) {
-  return getFirstLoadedMoment(state.days, state.timeZone);
+function fromMomentPast(state) {
+  return getFirstLoadedMoment(state.days, state.timeZone)
 }
 
-function fromMomentFuture (state) {
-  const lastMoment = getLastLoadedMoment(state.days, state.timeZone);
-  if (state.days.length) lastMoment.add(1, 'days');
-  return lastMoment;
+function fromMomentFuture(state) {
+  const lastMoment = getLastLoadedMoment(state.days, state.timeZone)
+  if (state.days.length) lastMoment.add(1, 'days')
+  return lastMoment
 }

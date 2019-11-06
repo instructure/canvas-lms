@@ -21,7 +21,7 @@ describe "people" do
   include_context "in-process server selenium tests"
 
   before(:each) do
-    make_full_screen
+
   end
 
   def add_user(option_text, username, user_list_selector)

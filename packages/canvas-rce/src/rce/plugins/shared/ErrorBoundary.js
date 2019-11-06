@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 import formatMessage from '../../../format-message'
 
 // TODO: a placeholder. Design a better one. See CORE-2826
@@ -26,8 +26,8 @@ export default class ErrorBoundary extends React.Component {
   }
 
   constructor(props) {
-    super(props);
-    this.state = { hasError: false }
+    super(props)
+    this.state = {hasError: false}
   }
 
   static getDerivedStateFromError(error) {
@@ -35,7 +35,7 @@ export default class ErrorBoundary extends React.Component {
     return {
       hasError: true,
       error
-    };
+    }
   }
 
   render() {
@@ -48,7 +48,6 @@ export default class ErrorBoundary extends React.Component {
         </div>
       )
     }
-    return this.props.children;
+    return this.props.children
   }
-
 }

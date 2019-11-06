@@ -17,7 +17,7 @@ The easiest way to get a working development environment is to run:
 This will guide you through the process of installing docker, dinghy/dory,
 building the docker images, and setting up Canvas.
 
-If you would rather do things manually, read on!
+If you would rather do things manually, read on! And be sure to check the [Troubleshooting](#Troubleshooting) section below.
 
 ## Recommendations
 
@@ -66,7 +66,7 @@ Now you're ready to build all of the containers. This will take a while as a lot
 
 ```bash
 docker-compose run --rm web bundle install
-docker-compose run --rm web bundle exec rake db:create db:initial_setup canvas:compile_assets_dev
+docker-compose run --rm web bundle exec rake db:create db:initial_setup canvas:compile_assets
 ```
 
 Now you should be able to start up and access canvas like you would any other container.
@@ -225,11 +225,17 @@ Now you can just run commands like `dcrx rake db:migrate` or `dcr bundle install
 
 ## Troubleshooting
 
+### Building docker container
+If you get an error about some gems requiring a newer ruby, you may have to change `2.4-xenial` to `2.5` in the `FROM` line in Dockerfile.
+
+### Permissions
 If you are having trouble running the `web` container, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
 
 ```
 chown -R 1000:1000 canvas-lms
 ```
+
+Instead of `1000`, you may need to use `9999` -- the `docker` user inside the container may have uid `9999`.
 
 Or the permissions change (which will make Docker work, but causes the git working directory to become filthy):
 
@@ -260,6 +266,7 @@ Or it can be disabled permanently by editing `/etc/selinux/config` thusly:
 SELINUX=disabled
 ```
 
+### Performance
 If you are having performance or other issues with your web container
 starting up, you may try adding `DISABLE_SPRING: 1` to your
 `docker-compose.override.yml` file, like so:
@@ -270,6 +277,13 @@ web: &WEB
     DISABLE_SPRING: 1
 ```
 
+Sometimes, very poor performance (or not loading at all) can be due to webpack
+problems. Running
+`docker-compose run --rm web bundle exec rake canvas:compile_assets` again, or
+`docker-compose run --rm web bundle exec rake js:webpack_development` again, may help.
+
+
+### DNS
 If you are getting DNS resolution errors, and you use Docker for Mac or Linux,
 make sure [dory](https://github.com/FreedomBen/dory) is running:
 
@@ -282,3 +296,5 @@ If dory is not running, you can start it with:
 ```
 dory up
 ```
+
+Alternatively, you can use Dinghy or Traefik to handle DNS resolution.

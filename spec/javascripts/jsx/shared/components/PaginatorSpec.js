@@ -17,17 +17,21 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 import merge from 'lodash/merge'
 import Paginator from 'jsx/shared/components/Paginator'
 
 QUnit.module('Paginator component')
 
-const makeProps = (props = {}) => merge({
-  page: 0,
-  pageCount: 0,
-  parent: {}
-}, props)
+const makeProps = (props = {}) =>
+  merge(
+    {
+      page: 0,
+      pageCount: 0,
+      parent: {}
+    },
+    props
+  )
 
 test('renders the Paginator component', () => {
   const pager = shallow(<Paginator {...makeProps()} />)

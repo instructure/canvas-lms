@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component, useRef } from "react";
-import {bool, func} from "prop-types";
+import React, {Component, useRef} from 'react'
+import {bool, func} from 'prop-types'
 import {linksShape, linkType} from './propTypes'
-import formatMessage from "../../../../format-message";
-import { ScreenReaderContent } from '@instructure/ui-a11y'
+import formatMessage from '../../../../format-message'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {List} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import uid from '@instructure/uid'
@@ -64,8 +64,8 @@ function IncrementalLoader(props) {
 
 class LinkSet extends Component {
   constructor(props) {
-    super(props);
-    this.describedByID = `rce-LinkSet-describedBy-${uid()}`;
+    super(props)
+    this.describedByID = `rce-LinkSet-describedBy-${uid()}`
     this.loadMoreButtonRef = null
   }
 
@@ -74,11 +74,7 @@ class LinkSet extends Component {
   }
 
   isEmpty(props) {
-    return (
-      !this.hasLinks(props) &&
-      !props.collection.hasMore &&
-      !props.collection.isLoading
-    );
+    return !this.hasLinks(props) && !props.collection.hasMore && !props.collection.isLoading
   }
 
   renderLinks(lastItemRef) {
@@ -96,7 +92,7 @@ class LinkSet extends Component {
     return (
       <>
         <ScreenReaderContent id={this.describedByID}>
-          {formatMessage("Click to insert a link into the editor.")}
+          {formatMessage('Click to insert a link into the editor.')}
         </ScreenReaderContent>
 
         <List variant="unstyled" as="ul" margin="0">
@@ -113,24 +109,26 @@ class LinkSet extends Component {
           ))}
         </List>
       </>
-    );
+    )
   }
 
   renderEmptyIndicator() {
     return (
-      <View as="div" padding="medium">{formatMessage("No results.")}</View>
-    );
+      <View as="div" padding="medium">
+        {formatMessage('No results.')}
+      </View>
+    )
   }
 
   renderLoadingError() {
     if (this.props.collection.lastError) {
       return (
         <span className="rcs-LinkSet-LoadFailed" role="alert">
-          {formatMessage("Loading failed...")}
+          {formatMessage('Loading failed...')}
         </span>
-      );
+      )
     }
-    return null;
+    return null
   }
 
   render() {
@@ -168,4 +166,4 @@ LinkSet.propTypes = {
   suppressRenderEmpty: bool
 }
 
-export default LinkSet;
+export default LinkSet

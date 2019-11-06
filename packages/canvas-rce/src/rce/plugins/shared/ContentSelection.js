@@ -30,7 +30,6 @@ export const DISPLAY_AS_LINK = 'link'
 export const DISPLAY_AS_EMBED = 'embed'
 export const DISPLAY_AS_EMBED_DISABLED = 'embed-disabled'
 
-
 export function asImageEmbed($element) {
   const nodeName = $element.nodeName.toLowerCase()
   if (nodeName !== 'img') {
@@ -87,14 +86,14 @@ function asVideoElement($element) {
     return null
   }
 
-  if (!$element.id.includes("media_object") ||  $element.children[0].tagName !== "IFRAME") {
+  if (!$element.id.includes('media_object') || $element.children[0].tagName !== 'IFRAME') {
     return null
   }
 
   return {
     $element,
     type: VIDEO_EMBED_TYPE,
-    id: $element.id.split("_")[2]
+    id: $element.id.split('_')[2]
   }
 }
 
@@ -123,7 +122,12 @@ export function getContentFromElement($element, editor) {
     return asNone()
   }
 
-  const content = asLink($element, editor) || asImageEmbed($element) || asVideoElement($element) || asText($element, editor) || asNone($element)
+  const content =
+    asLink($element, editor) ||
+    asImageEmbed($element) ||
+    asVideoElement($element) ||
+    asText($element, editor) ||
+    asNone($element)
   return content
 }
 

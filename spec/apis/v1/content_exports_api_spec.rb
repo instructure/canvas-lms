@@ -574,6 +574,62 @@ describe ContentExportsApiController, type: :request do
       end
 
     end
+
+    context "when :newquizzes_on_quiz_page FF is enabled" do
+      let(:course) { t_course }
+      let(:quiz) do
+        Quizzes::Quiz.create(
+          title: 'test quiz',
+          description: 'default quiz description',
+          context: course
+        )
+      end
+
+      before do
+        course.root_account.settings[:provision] = {'lti' => 'lti url'}
+        course.root_account.save!
+        course.enable_feature!(:quizzes_next)
+        course.root_account.enable_feature!(:newquizzes_on_quiz_page)
+      end
+
+      it "output migrated quiz in json" do
+        json = api_call_as_user(
+          t_teacher,
+          :post,
+          "/api/v1/courses/#{t_course.id}/content_exports?export_type=quizzes2&include[]=migrated_quiz",
+          {
+            controller: 'content_exports_api',
+            action: 'create',
+            format: 'json',
+            course_id: t_course.to_param,
+            export_type: 'quizzes2',
+            include: ["migrated_quiz"],
+            quiz_id: quiz.id
+          }
+        )
+        expect(json.dig('migrated_quiz').count).to be 1
+        expect(json.dig('migrated_quiz')[0].dig('quiz_type')).to eq 'quizzes.next'
+      end
+
+      it "output migrated assignment in json" do
+        json = api_call_as_user(
+          t_teacher,
+          :post,
+          "/api/v1/courses/#{t_course.id}/content_exports?export_type=quizzes2&include[]=migrated_assignment",
+          {
+            controller: 'content_exports_api',
+            action: 'create',
+            format: 'json',
+            course_id: t_course.to_param,
+            export_type: 'quizzes2',
+            include: ["migrated_assignment"],
+            quiz_id: quiz.id
+          }
+        )
+        expect(json.dig('migrated_assignment').count).to be 1
+        expect(json.dig('migrated_assignment')[0].dig('new_positions')).not_to be_nil
+      end
+    end
   end
 
   describe "#content_list" do

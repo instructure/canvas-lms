@@ -1037,30 +1037,6 @@ describe SpeedGrader::Assignment do
         expect(json_submission4['score']).to eq(@assignment.points_possible*0.48)
         expect(json_submission4['url']).to eq(urls[3])
       end
-
-      context "when quizzes_next_submission_history FF is turned off" do
-        before do
-          allow(@assignment.root_account).
-            to receive(:feature_enabled?).
-            with(:filter_speed_grader_by_student_group).and_return(false)
-          allow(@assignment.root_account).
-            to receive(:feature_enabled?).
-            with(:quizzes_next_submission_history).and_return(false)
-        end
-
-        it "doesn't use BasicLTI::QuizzesNextVersionedSubmission object" do
-          expect(BasicLTI::QuizzesNextVersionedSubmission).not_to receive(:new)
-          json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-          submission_history = json.fetch(:submissions).first.fetch(:submission_history)
-          expect(submission_history.count).to be url_grades.count
-          expect(submission_history.map{|x| x.values.first['score']}).to eq(
-            url_grades.map{|x| @assignment.points_possible*x[:grade]}.reverse
-          )
-          expect(submission_history.map{|x| x.values.first['external_tool_url']}).to eq(
-            url_grades.map{|x| x[:url]}.reverse
-          )
-        end
-      end
     end
   end
 

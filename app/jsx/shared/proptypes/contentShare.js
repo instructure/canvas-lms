@@ -17,7 +17,7 @@
  */
 
 import {oneOf, shape, string} from 'prop-types'
-import basicUser from 'jsx/shared/proptypes/user'
+import displayUser from 'jsx/shared/proptypes/user'
 import contentExport from 'jsx/shared/proptypes/contentExport'
 
 const CONTENT_SHARE_TYPES = [
@@ -36,7 +36,7 @@ const contentShareShape = shape({
   created_at: string.isRequired,
   updated_at: string.isRequired,
   read_state: string.isRequired,
-  sender: basicUser.isRequired,
+  sender: displayUser.isRequired,
   content_export: contentExport
 })
 

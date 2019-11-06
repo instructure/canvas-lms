@@ -123,7 +123,7 @@ module Api::V1::Submission
   SUBMISSION_JSON_METHODS = %w(late missing seconds_late entered_grade entered_score).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries).freeze
 
-  def submission_attempt_json(attempt, assignment, user, session, context = nil, params = {})
+  def submission_attempt_json(attempt, assignment, user, session, context = nil, params = {}, quiz_submission_version = nil)
     context ||= assignment.context
     includes = Array.wrap(params[:include])
 
@@ -155,7 +155,7 @@ module Api::V1::Submission
 
     unless params[:exclude_response_fields] && params[:exclude_response_fields].include?('preview_url')
       preview_args = { 'preview' => '1' }
-      preview_args['version'] = attempt.quiz_submission_version || attempt.version_number
+      preview_args['version'] = quiz_submission_version || attempt.quiz_submission_version || attempt.version_number
       hash['preview_url'] = course_assignment_submission_url(context, assignment, attempt[:user_id], preview_args)
     end
 
@@ -236,7 +236,7 @@ module Api::V1::Submission
   end
 
   def quiz_submission_attempt_json(attempt, assignment, user, session, context = nil, params)
-    hash = submission_attempt_json(attempt.submission, assignment, user, session, context, params)
+    hash = submission_attempt_json(attempt.submission, assignment, user, session, context, params, attempt.version_number)
     hash.each_key{|k| hash[k] = attempt[k] if attempt[k]}
     hash[:submission_data] = attempt[:submission_data]
     hash[:submitted_at] = attempt[:finished_at]

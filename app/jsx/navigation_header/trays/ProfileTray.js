@@ -19,7 +19,7 @@
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import {string, bool, arrayOf, shape} from 'prop-types'
-import {Avatar, Heading, List, Spinner} from '@instructure/ui-elements'
+import {Avatar, Heading, List, Text, Spinner} from '@instructure/ui-elements'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-layout'
 import LogoutButton from '../LogoutButton'
@@ -40,7 +40,7 @@ ProfileTab.propTypes = {
   html_url: string.isRequired
 }
 
-export default function ProfileTray({userDisplayName, userAvatarURL, loaded, tabs}) {
+export default function ProfileTray({userDisplayName, userAvatarURL, loaded, userPronouns, tabs}) {
   return (
     <View as="div" padding="medium">
       <View textAlign="center">
@@ -52,9 +52,16 @@ export default function ProfileTray({userDisplayName, userAvatarURL, loaded, tab
           inline={false}
           margin="auto"
         />
-        <Heading level="h3" as="h2">
-          {userDisplayName}
-        </Heading>
+        <div style={{wordBreak: 'break-word'}}>
+          <Heading level="h3" as="h2">
+            {userDisplayName}
+            {userPronouns && (
+              <Text size="large" fontStyle="italic">
+                &nbsp;({userPronouns})
+              </Text>
+            )}
+          </Heading>
+        </div>
         <LogoutButton size="small" margin="medium 0 x-small 0" />
       </View>
       <hr role="presentation" />
@@ -77,5 +84,7 @@ ProfileTray.propTypes = {
   userDisplayName: string.isRequired,
   userAvatarURL: string.isRequired,
   loaded: bool.isRequired,
+  userPronouns: string,
   tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired
+
 }

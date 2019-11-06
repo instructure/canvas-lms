@@ -655,6 +655,10 @@ describe GradebookImporter do
       student_data["custom_column_data"]
     end
 
+    before(:once) do
+      Account.site_admin.enable_feature!(:gradebook_reserved_importer_bugfix)
+    end
+
     before do
       @student = User.create!
       course_with_student(course: @course, user: @student, active_enrollment: true)
@@ -681,6 +685,32 @@ describe GradebookImporter do
       )
       col = @gi.upload.gradebook.fetch('custom_columns').find { |custom_column| custom_column.fetch('title') == 'CustomColumn3' }
       expect(col).to eq nil
+    end
+
+    it "excludes hidden custom columns" do
+      @course.custom_gradebook_columns.create!({title: "CustomColumn3", workflow_state: :hidden})
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn1,CustomColumn2,CustomColumn3,Assignment 1",
+        ",#{@student.id},,test 1,test 2,test 3,10"
+      )
+      col = @gi.upload.gradebook.fetch('custom_columns').find { |custom_column| custom_column.fetch('title') == 'CustomColumn3' }
+      expect(col).to eq nil
+    end
+
+    GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES.each do |reserved_column|
+      it "excludes custom columns with reserved importer column #{reserved_column}" do
+        # The custom columns have a validation to prevent this, but since this was allowed for a long time, we will skip
+        # the validation that blocks us from creating bad column names.
+        build_col = @course.custom_gradebook_columns.build({title: reserved_column, read_only: false})
+        build_col.save!(validate: false)
+
+        importer_with_rows(
+          "Student,ID,Section,CustomColumn1,CustomColumn2,#{reserved_column},Assignment 1",
+          ",#{@student.id},,test 1,test 2,test 3,10"
+        )
+        col = @gi.upload.gradebook.fetch('custom_columns').find { |custom_column| custom_column.fetch('title') == reserved_column }
+        expect(col).to eq nil
+      end
     end
 
     it "expects custom column datum from non read only columns" do

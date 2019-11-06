@@ -16,34 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware } from "redux";
-import thunkMiddleware from "redux-thunk";
-import { batch, batching } from "redux-batch-middleware";
-import sinon from "sinon";
+import {createStore, applyMiddleware} from 'redux'
+import thunkMiddleware from 'redux-thunk'
+import {batch, batching} from 'redux-batch-middleware'
+import sinon from 'sinon'
 
 // creates a reducer that just alerts a spy on each action and leaves state
 // alone. the associated spy is hung off the returned reducer
 export function spiedReducer() {
-  const spy = sinon.spy();
+  const spy = sinon.spy()
   const reducer = (state = {}, action) => {
-    if (action.type !== "@@redux/INIT") {
-      spy(action);
+    if (action.type !== '@@redux/INIT') {
+      spy(action)
     }
-    return state;
-  };
-  reducer.spy = spy;
-  return reducer;
+    return state
+  }
+  reducer.spy = spy
+  return reducer
 }
 
 // creates a store with the given state and with a spiedReducer; the spy from
 // the reducer is also hung off the returned store
 export function spiedStore(state) {
-  const reducer = spiedReducer();
-  const store = createStore(
-    batching(reducer),
-    state,
-    applyMiddleware(thunkMiddleware, batch)
-  );
-  store.spy = reducer.spy;
-  return store;
+  const reducer = spiedReducer()
+  const store = createStore(batching(reducer), state, applyMiddleware(thunkMiddleware, batch))
+  store.spy = reducer.spy
+  return store
 }

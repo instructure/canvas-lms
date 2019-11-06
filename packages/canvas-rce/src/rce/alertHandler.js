@@ -23,8 +23,8 @@
  * @class AlertHandler
  */
 export class AlertHandler {
-  constructor  (alertFunc) {
-    this.alertFunc = alertFunc;
+  constructor(alertFunc) {
+    this.alertFunc = alertFunc
   }
 
   /**
@@ -33,7 +33,7 @@ export class AlertHandler {
    *
    * @memberof AlertHandler
    */
-  handleAlert = (alert) => {
+  handleAlert = alert => {
     if (this.alertFunc == null) {
       throw new Error('Tried to alert without alertFunc being set first')
     }

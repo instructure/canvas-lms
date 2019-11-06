@@ -26,23 +26,25 @@ import MomentFormats from 'moment_formats'
 let _tz = __tz
 let currentLocale = 'en_US' // default to US locale
 let momentLocale = 'en'
-const _preloadedData = window.__PRELOADED_TIMEZONE_DATA__ || (window.__PRELOADED_TIMEZONE_DATA__ = {})
+const _preloadedData =
+  window.__PRELOADED_TIMEZONE_DATA__ || (window.__PRELOADED_TIMEZONE_DATA__ = {})
 
 // wrap it up in a set of methods that will always call the most up-to-date
 // version. each method is intended to act as a subset of bigeasy's generic
 // tz() functionality.
 const tz = {
-
   _preloadedData,
 
   // wrap's moment() for parsing datetime strings. assumes the string to be
   // parsed is in the profile timezone unless if contains an offset string
   // *and* a format token to parse it, and unfudges the result.
-  moment (input, format) {
+  moment(input, format) {
     // ensure first argument is a string and second is a format or an array
     // of formats
     if (!_.isString(input) || !(_.isString(format) || _.isArray(format))) {
-      throw new Error('tz.moment only works on string+format(s). just use moment() directly for any other signature')
+      throw new Error(
+        'tz.moment only works on string+format(s). just use moment() directly for any other signature'
+      )
     }
 
     // call out to moment, leaving the result alone if invalid
@@ -89,7 +91,7 @@ const tz = {
   // otherwise returns a Date (rather than _tz()'s timestamp integer)
   // because, when treated correctly, they are interchangeable but the Date
   // is more convenient.
-  raw_parse (value) {
+  raw_parse(value) {
     const timestamp = _tz(value)
     if (typeof timestamp === 'number') {
       return new Date(timestamp)
@@ -103,7 +105,7 @@ const tz = {
   // parsing will be attempted with tz.moment() according to the formats
   // defined in MomentFormats.getFormats(). also note that raw_parse('') will
   // return the epoch, but parse('') will return null.
-  parse (value) {
+  parse(value) {
     // hard code '' and null as unparseable
     if (value === '' || value == null) return null
 
@@ -129,9 +131,9 @@ const tz = {
 
   // format a date value (parsing it if necessary). returns null for parse
   // failure on the value or an unrecognized format string.
-  format (value, format, otherZone) {
+  format(value, format, otherZone) {
     let localTz = _tz
-    const usingOtherZone = (arguments.length === 3 && otherZone)
+    const usingOtherZone = arguments.length === 3 && otherZone
     if (usingOtherZone) {
       if (!(otherZone in _preloadedData)) return null
       localTz = _tz(_preloadedData[otherZone])
@@ -155,7 +157,7 @@ const tz = {
     return formatted
   },
 
-  adjustFormat (format) {
+  adjustFormat(format) {
     // translate recognized 'date.formats.*' and 'time.formats.*' to
     // appropriate format strings according to locale.
     if (format.match(/^(date|time)\.formats\./)) {
@@ -169,9 +171,13 @@ const tz = {
         // in all the regexes is to make sure we match (once unreversed), e.g.,
         // both %l and %%%l (literal-% + %l) but not %%l (literal-% + l).
         format = locale_format
-          .split('').reverse().join('')
+          .split('')
+          .reverse()
+          .join('')
           .replace(/([lke])(?=%(%%)*(?!%))/, '$1-')
-          .split('').reverse().join('')
+          .split('')
+          .reverse()
+          .join('')
       }
     }
 
@@ -184,25 +190,32 @@ const tz = {
     // promoted to the equivalent 24-hour indicator when the locale defines
     // %P as an empty string. ("reverse, look-ahead, reverse" pattern for
     // same reason as above)
-    format = format.split('').reverse().join('')
-    if (!tz.hasMeridian() &&
-        ((format.match(/[lI][-_]?%(%%)*(?!%)/) &&
-          format.match(/p%(%%)*(?!%)/i)) ||
-          format.match(/r[-_]?%(%%)*(?!%)/))) {
+    format = format
+      .split('')
+      .reverse()
+      .join('')
+    if (
+      !tz.hasMeridian() &&
+      ((format.match(/[lI][-_]?%(%%)*(?!%)/) && format.match(/p%(%%)*(?!%)/i)) ||
+        format.match(/r[-_]?%(%%)*(?!%)/))
+    ) {
       format = format.replace(/l(?=[-_]?%(%%)*(?!%))/, 'k')
       format = format.replace(/I(?=[-_]?%(%%)*(?!%))/, 'H')
       format = format.replace(/r(?=[-_]?%(%%)*(?!%))/, 'T')
     }
-    format = format.split('').reverse().join('')
+    format = format
+      .split('')
+      .reverse()
+      .join('')
 
     return format
   },
 
-  hasMeridian () {
+  hasMeridian() {
     return _tz(new Date(), '%P') !== ''
   },
 
-  useMeridian () {
+  useMeridian() {
     if (!this.hasMeridian()) return false
     const tiny = I18n.lookup('time.formats.tiny')
     return tiny && tiny.match(/%-?l/)
@@ -213,7 +226,7 @@ const tz = {
   // directives was mistakenly a format string. returns the modified Date
   // otherwise. typical directives will be for date math, e.g. '-3 days'.
   // non-format unrecognized directives are ignored.
-  shift (value) {
+  shift(value) {
     // make sure we have a good value first
     const datetime = tz.parse(value)
     if (datetime == null) return null
@@ -234,11 +247,11 @@ const tz = {
 
   // allow snapshotting and restoration, and extending through the
   // vendor-provided tz()'s functional composition
-  snapshot () {
+  snapshot() {
     return [_tz, currentLocale, momentLocale]
   },
 
-  restore (snapshot) {
+  restore(snapshot) {
     // we can't actually check that the snapshot has appropriate values, but
     // we can at least verify the shape of [function, string, string]
     if (!_.isArray(snapshot)) throw new Error('invalid tz() snapshot')
@@ -250,7 +263,7 @@ const tz = {
     momentLocale = snapshot[2]
   },
 
-  extendConfiguration () {
+  extendConfiguration() {
     const extended = _tz(...arguments)
     if (typeof extended !== 'function') throw new Error('invalid tz() extension')
     _tz = extended
@@ -260,8 +273,8 @@ const tz = {
   // feature can be a chunk of previously loaded data, which is applied
   // immediately, or the name of a data file to load and then apply
   // asynchronously.
-  applyFeature (data, name) {
-    function extendConfig (preloadedData) {
+  applyFeature(data, name) {
+    function extendConfig(preloadedData) {
       tz.extendConfiguration(preloadedData, name)
       return Promise.resolve()
     }
@@ -281,21 +294,24 @@ const tz = {
   // preload a specific data file without having to actually
   // change the timezone to do it. Future "applyFeature" calls
   // will apply synchronously if their data is already preloaded.
-  preload (name, data) {
+  preload(name, data) {
     if (arguments.length > 1) {
       _preloadedData[name] = data
       return _preloadedData[name]
     } else if (_preloadedData[name]) {
       return _preloadedData[name]
     } else {
-      return new Promise((resolve, reject) => reject(new Error(
-          `In webpack, loading timezones on-demand is not supported. ${
-          name}" should already be script-tagged onto the page from Rails.`
-        )))
+      return new Promise((resolve, reject) =>
+        reject(
+          new Error(
+            `In webpack, loading timezones on-demand is not supported. ${name}" should already be script-tagged onto the page from Rails.`
+          )
+        )
+      )
     }
   },
 
-  changeLocale () {
+  changeLocale() {
     if (arguments.length > 2) {
       currentLocale = arguments[1]
       momentLocale = arguments[2]
@@ -308,23 +324,25 @@ const tz = {
     return this.applyFeature.apply(this, args)
   },
 
-  isMidnight (date) {
-    if (date == null) { return false }
+  isMidnight(date) {
+    if (date == null) {
+      return false
+    }
     return tz.format(date, '%R') === '00:00'
   },
 
-  changeToTheSecondBeforeMidnight (date) {
+  changeToTheSecondBeforeMidnight(date) {
     return tz.parse(tz.format(date, '%F 23:59:59'))
   },
 
-  setToEndOfMinute (date) {
+  setToEndOfMinute(date) {
     return tz.parse(tz.format(date, '%F %R:59'))
   },
 
   // finds the given time of day on the given date ignoring dst conversion and such.
   // e.g. if time is 2016-05-20 14:00:00 and date is 2016-03-17 23:59:59, the result will
   // be 2016-03-17 14:00:00
-  mergeTimeAndDate (time, date) {
+  mergeTimeAndDate(time, date) {
     return tz.parse(tz.format(date, '%F ') + tz.format(time, '%T'))
   }
 }

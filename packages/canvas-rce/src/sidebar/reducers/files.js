@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ADD_FILE } from "../actions/files";
+import {ADD_FILE} from '../actions/files'
 
 export default function filesReducer(state = {}, action) {
   switch (action.type) {
@@ -30,8 +30,8 @@ export default function filesReducer(state = {}, action) {
           url: action.url,
           embed: action.embed
         }
-      };
+      }
     default:
-      return state;
+      return state
   }
 }

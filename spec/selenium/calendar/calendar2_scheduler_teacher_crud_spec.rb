@@ -36,7 +36,7 @@ describe "scheduler" do
 
     before(:each) do
       course_with_teacher_logged_in
-      make_full_screen
+
     end
 
     it "should create a new appointment group" do

@@ -29,13 +29,11 @@ describe('RCE Plugins > Filter', () => {
     currentFilterSettings = null
   })
 
-  function FilterWithHooks(props={}) {
+  function FilterWithHooks(props = {}) {
     const [filterSettings, setFilterSettings] = useFilterSettings()
     currentFilterSettings = filterSettings
 
-    return (
-      <Filter {...filterSettings} onChange={setFilterSettings} {...props} />
-    )
+    return <Filter {...filterSettings} onChange={setFilterSettings} {...props} />
   }
 
   function renderComponent(props) {

@@ -36,7 +36,9 @@ test('it calls selectImage when clicked', () => {
     <ImageSearchItem url="http://imageUrl" selectImage={selectImage} />
   )
 
-  TestUtils.Simulate.click(TestUtils.findRenderedDOMComponentWithClass(imageItem, 'ImageSearch__item'))
+  TestUtils.Simulate.click(
+    TestUtils.findRenderedDOMComponentWithClass(imageItem, 'ImageSearch__item')
+  )
 
   ok(called, 'selectImage was called')
 })

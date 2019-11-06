@@ -18,67 +18,67 @@
 
 import Bridge from '..'
 
-describe("Editor/Sidebar bridge", () => {
+describe('Editor/Sidebar bridge', () => {
   afterEach(() => {
-    Bridge.focusEditor(null);
+    Bridge.focusEditor(null)
     jest.restoreAllMocks()
-  });
+  })
 
-  it("focusEditor sets the active editor", () => {
-    const editor = {};
-    Bridge.focusEditor(editor);
-    expect(Bridge.activeEditor()).toBe(editor);
-  });
+  it('focusEditor sets the active editor', () => {
+    const editor = {}
+    Bridge.focusEditor(editor)
+    expect(Bridge.activeEditor()).toBe(editor)
+  })
 
-  describe("detachEditor", () => {
-    const activeEditor = {};
-    const otherEditor = {};
+  describe('detachEditor', () => {
+    const activeEditor = {}
+    const otherEditor = {}
 
     beforeEach(() => {
-      Bridge.focusEditor(activeEditor);
-    });
+      Bridge.focusEditor(activeEditor)
+    })
 
-    it("given active editor clears the active editor", () => {
-      Bridge.detachEditor(activeEditor);
-      expect(Bridge.activeEditor()).toBe(null);
-    });
+    it('given active editor clears the active editor', () => {
+      Bridge.detachEditor(activeEditor)
+      expect(Bridge.activeEditor()).toBe(null)
+    })
 
-    it("given some other editor leaves the active editor alone", () => {
-      Bridge.detachEditor(otherEditor);
-      expect(Bridge.activeEditor()).toBe(activeEditor);
-    });
-  });
+    it('given some other editor leaves the active editor alone', () => {
+      Bridge.detachEditor(otherEditor)
+      expect(Bridge.activeEditor()).toBe(activeEditor)
+    })
+  })
 
-  describe("renderEditor", () => {
-    it("sets the active editor", () => {
-      const editor = {};
-      Bridge.renderEditor(editor);
-      expect(Bridge.activeEditor()).toBe(editor);
-    });
+  describe('renderEditor', () => {
+    it('sets the active editor', () => {
+      const editor = {}
+      Bridge.renderEditor(editor)
+      expect(Bridge.activeEditor()).toBe(editor)
+    })
 
-    it("accepts the first editor rendered when many rendered in a row", () => {
-      const editor1 = { 1: 1 };
-      const editor2 = { 2: 2 };
-      const editor3 = { 3: 3 };
-      Bridge.renderEditor(editor1);
-      Bridge.renderEditor(editor2);
-      Bridge.renderEditor(editor3);
+    it('accepts the first editor rendered when many rendered in a row', () => {
+      const editor1 = {1: 1}
+      const editor2 = {2: 2}
+      const editor3 = {3: 3}
+      Bridge.renderEditor(editor1)
+      Bridge.renderEditor(editor2)
+      Bridge.renderEditor(editor3)
       expect(Bridge.activeEditor()).toBe(editor1)
-    });
-  });
+    })
+  })
 
-  describe("content insertion", () => {
-    const link = {};
-    let editor = {};
+  describe('content insertion', () => {
+    const link = {}
+    let editor = {}
 
     beforeEach(() => {
-      jest.spyOn(console, "warn");
+      jest.spyOn(console, 'warn')
       editor = {
         insertLink: jest.fn(),
         insertVideo: jest.fn(),
         insertAudio: jest.fn(),
         props: {
-          textareaId: "fake_editor",
+          textareaId: 'fake_editor',
           tinymce: {
             get(_id) {
               return {
@@ -86,39 +86,38 @@ describe("Editor/Sidebar bridge", () => {
                   getRng: jest.fn(() => 'some-range'),
                   getNode: jest.fn(() => 'some-node')
                 }
-              };
+              }
             }
           }
         }
-      };
-    });
+      }
+    })
 
-    describe("insertLink", () => {
-      it("insertLink with an active editor forwards the link to createLink", () => {
-
-        Bridge.focusEditor(editor);
-        Bridge.insertLink(link);
+    describe('insertLink', () => {
+      it('insertLink with an active editor forwards the link to createLink', () => {
+        Bridge.focusEditor(editor)
+        Bridge.insertLink(link)
         expect(editor.insertLink).toHaveBeenCalledWith(link)
-      });
+      })
 
-      it("insertLink with no active editor is a no-op, but warns", () => {
+      it('insertLink with no active editor is a no-op, but warns', () => {
         Bridge.focusEditor(undefined)
         Bridge.insertLink(link)
         expect(console.warn).toHaveBeenCalled() // eslint-disable-line no-console
-      });
+      })
 
-      it("adds selectionDetails to links", () => {
-        Bridge.focusEditor(editor);
-        Bridge.insertLink({});
+      it('adds selectionDetails to links', () => {
+        Bridge.focusEditor(editor)
+        Bridge.insertLink({})
         expect(editor.insertLink).toHaveBeenCalledWith({
           selectionDetails: {
-            node: "some-node",
-            range: "some-range"
+            node: 'some-node',
+            range: 'some-range'
           }
-        });
-      });
+        })
+      })
 
-      it("calls hideTray when necessary", () => {
+      it('calls hideTray when necessary', () => {
         const hideTray = jest.fn()
         Bridge.attachController({hideTray})
         Bridge.focusEditor(editor)
@@ -133,7 +132,7 @@ describe("Editor/Sidebar bridge", () => {
         Bridge.insertLink({}, false)
         expect(hideTray).not.toHaveBeenCalled()
       })
-    });
+    })
 
     describe('embedMedia', () => {
       let hideTray
@@ -162,4 +161,4 @@ describe("Editor/Sidebar bridge", () => {
       })
     })
   })
-});
+})

@@ -27,14 +27,10 @@ QUnit.module('StudentContextTray/Rating', () => {
 
   QUnit.module('formatValueText', hooks => {
     hooks.beforeEach(() => {
-      subject = TestUtils.renderIntoDocument(
-        <Rating label="whatever" metric={{level: 1}} />
-      )
+      subject = TestUtils.renderIntoDocument(<Rating label="whatever" metric={{level: 1}} />)
     })
 
-    const valueText = [
-      'None', 'Low', 'Moderate', 'High'
-    ]
+    const valueText = ['None', 'Low', 'Moderate', 'High']
     valueText.forEach((v, i) => {
       test(`returns value ${v} for rating ${i}`, () => {
         equal(subject.formatValueText(i, 3), v)
@@ -46,7 +42,7 @@ QUnit.module('StudentContextTray/Rating', () => {
     test('delegates to InstUIRating', () => {
       subject = TestUtils.renderIntoDocument(
         <Rating
-          label='Participation'
+          label="Participation"
           metric={{
             level: participationsLevel
           }}

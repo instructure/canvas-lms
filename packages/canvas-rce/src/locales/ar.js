@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/ar.json";
-import "../rce/languages/ar_SA";
+import formatMessage from '../format-message'
+import locale from '../../locales/ar.json'
+import '../rce/languages/ar_SA'
 
-formatMessage.addLocale({ ar: locale });
+formatMessage.addLocale({ar: locale})

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { actions } from 'jsx/conditional_release_stats/actions'
+import {actions} from 'jsx/conditional_release_stats/actions'
 import reducer from 'jsx/conditional_release_stats/reducers/root-reducer'
 
 QUnit.module('Conditional Release Stats reducer')
@@ -36,10 +36,7 @@ test('sets the correct trigger assignment', () => {
 })
 
 test('updates range boundaries with correct values', () => {
-  const ranges = [
-    { upper_bound: '10' },
-    { upper_bound: '11' },
-  ]
+  const ranges = [{upper_bound: '10'}, {upper_bound: '11'}]
 
   const newState = reduce(actions.setScoringRanges(ranges))
   deepEqual(newState.ranges, ranges, 'scoring range is changed')
@@ -80,35 +77,46 @@ test('selects range', () => {
 })
 
 test('selects student', () => {
-  const newState = reduce({ type: 'SELECT_STUDENT', payload: 1 })
+  const newState = reduce({type: 'SELECT_STUDENT', payload: 1})
   equal(newState.selectedPath.student, 1, 'selects student index')
 })
 
 test('tests cache student', () => {
-  const newState = reduce(actions.addStudentToCache({ studentId: '1', data: {
-    trigger_assignment: {
-      assignment: { id: '1' },
-      submission: { grade: '100' },
+  const newState = reduce(
+    actions.addStudentToCache({
+      studentId: '1',
+      data: {
+        trigger_assignment: {
+          assignment: {id: '1'},
+          submission: {grade: '100'}
+        },
+        follow_on_assignments: [
+          {
+            score: 100,
+            assignment: {id: '2'}
+          }
+        ]
+      }
+    })
+  )
+  deepEqual(
+    newState.studentCache,
+    {
+      '1': {
+        triggerAssignment: {
+          assignment: {id: '1'},
+          submission: {grade: '100'}
+        },
+        followOnAssignments: [
+          {
+            score: 100,
+            assignment: {id: '2'}
+          }
+        ]
+      }
     },
-    follow_on_assignments: [
-      {
-        score: 100,
-        assignment: { id: '2' },
-      },
-    ],
-  }}))
-  deepEqual(newState.studentCache, { '1': {
-    triggerAssignment: {
-      assignment: { id: '1' },
-      submission: { grade: '100' },
-    },
-    followOnAssignments: [
-      {
-        score: 100,
-        assignment: { id: '2' },
-      },
-    ],
-  }}, 'caches correct student')
+    'caches correct student'
+  )
 })
 
 test('load start', () => {

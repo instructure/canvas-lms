@@ -29,6 +29,9 @@ export const SubmissionDraft = {
       }
       body
       meetsAssignmentCriteria
+      meetsTextEntryCriteria
+      meetsUploadCriteria
+      meetsUrlCriteria
       url
     }
     ${SubmissionDraftFile.fragment}
@@ -39,17 +42,23 @@ export const SubmissionDraft = {
     activeSubmissionType: string,
     attachments: arrayOf(SubmissionDraftFile.shape),
     body: string,
-    meetsAssignmentCriteria: bool,
+    meetsAssignmentCriteria: bool.isRequired,
+    meetsTextEntryCriteria: bool.isRequired,
+    meetsUploadCriteria: bool.isRequired,
+    meetsUrlCriteria: bool.isRequired,
     url: string
   })
 }
 
-export const SubmissionDraftDefaultMocks = {
+export const DefaultMocks = {
   SubmissionDraft: () => ({
     activeSubmissionType: null,
     attachments: () => [],
     body: null,
     meetsAssignmentCriteria: false,
+    meetsTextEntryCriteria: false,
+    meetsUploadCriteria: false,
+    meetsUrlCriteria: false,
     url: null
   })
 }

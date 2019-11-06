@@ -46,6 +46,7 @@ QUnit.module('Quizzes::LogAuditing::EventManager - Event delivery', {
       static initClass() {
         this.prototype.eventType = 'test_event'
       }
+
       install(deliver) {
         return specThis.testEventFactory.on('change', deliver)
       }

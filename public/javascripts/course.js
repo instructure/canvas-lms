@@ -19,12 +19,17 @@
 import I18n from 'i18n!courses'
 import $ from 'jquery'
 
-  $(document).ready(() => {
-    $(".reject_button").click(event => {
-      var result = confirm(I18n.t('confirm_reject_invitation', "Are you sure you want to reject the invitation to participate in this course?"));
-      if(!result) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-    });
-  });
+$(document).ready(() => {
+  $('.reject_button').click(event => {
+    const result = confirm(
+      I18n.t(
+        'confirm_reject_invitation',
+        'Are you sure you want to reject the invitation to participate in this course?'
+      )
+    )
+    if (!result) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  })
+})

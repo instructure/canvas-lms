@@ -16,53 +16,53 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import sinon from "sinon";
-import wrapInitCb from "../../src/rce/wrapInitCb";
+import assert from 'assert'
+import sinon from 'sinon'
+import wrapInitCb from '../../src/rce/wrapInitCb'
 
-let mirroredAttrs, edOpts, setAttrStub, fakeEditor, elStub, origInitCB;
+let mirroredAttrs, edOpts, setAttrStub, fakeEditor, elStub, origInitCB
 
 class MockMutationObserver {
   observer() {}
 }
 
-describe("wrapInitCb", () => {
+describe('wrapInitCb', () => {
   before(() => {
     mirroredAttrs = {
-      foo: "bar"
-    };
-    origInitCB = sinon.stub();
+      foo: 'bar'
+    }
+    origInitCB = sinon.stub()
     edOpts = {
       init_instance_callback: origInitCB
-    };
-    setAttrStub = sinon.stub();
+    }
+    setAttrStub = sinon.stub()
     elStub = {
       setAttribute: setAttrStub,
-      dataset: { rich_text: false }
-    };
+      dataset: {rich_text: false}
+    }
     fakeEditor = {
       getElement: () => elStub,
       addVisual: () => {}
-    };
-  });
+    }
+  })
 
-  it("tries to add attributes to el in cb", () => {
-    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver);
-    newEdOpts.init_instance_callback(fakeEditor);
-    assert.ok(setAttrStub.calledWith("foo", "bar"));
-  });
+  it('tries to add attributes to el in cb', () => {
+    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver)
+    newEdOpts.init_instance_callback(fakeEditor)
+    assert.ok(setAttrStub.calledWith('foo', 'bar'))
+  })
 
-  it("sets rich_text on el", () => {
-    elStub.dataset.rich_text = false;
-    assert.ok(!elStub.dataset.rich_text);
-    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver);
-    newEdOpts.init_instance_callback(fakeEditor);
-    assert.ok(elStub.dataset.rich_text);
-  });
+  it('sets rich_text on el', () => {
+    elStub.dataset.rich_text = false
+    assert.ok(!elStub.dataset.rich_text)
+    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver)
+    newEdOpts.init_instance_callback(fakeEditor)
+    assert.ok(elStub.dataset.rich_text)
+  })
 
-  it("still calls old cb", () => {
-    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver);
-    newEdOpts.init_instance_callback(fakeEditor);
-    assert.ok(origInitCB.calledWith(fakeEditor));
-  });
-});
+  it('still calls old cb', () => {
+    const newEdOpts = wrapInitCb(mirroredAttrs, edOpts, MockMutationObserver)
+    newEdOpts.init_instance_callback(fakeEditor)
+    assert.ok(origInitCB.calledWith(fakeEditor))
+  })
+})

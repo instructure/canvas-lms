@@ -3514,6 +3514,40 @@ describe CoursesController, type: :request do
       expect(json['tabs'].map{ |tab| tab['id'] }).to match_array(expected_tabs)
     end
 
+    context "include[]=sections" do
+      before :once do
+        @other_section = @course1.course_sections.create! name: 'Other Section', start_at: DateTime.parse('2020-01-01T00:00:00Z')
+      end
+
+      it 'includes enrolled sections if requested' do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=sections",
+          { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json', :include => ['sections'] })
+        expect(json['sections']).to eq([{
+          'id' => @course1.default_section.id,
+          'name' => @course1.default_section.name,
+          'start_at' => nil,
+          'end_at' => nil,
+          'enrollment_role' => 'TeacherEnrollment'
+        }])
+      end
+
+      it 'includes all sections for admins without enrollments (minus enrollment_role)' do
+        json = api_call_as_user(account_admin_user, :get, "/api/v1/courses/#{@course1.id}.json?include[]=sections",
+          { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json', :include => ['sections'] })
+        expect(json['sections']).to match_array([{
+          'id' => @course1.default_section.id,
+          'name' => @course1.default_section.name,
+          'start_at' => nil,
+          'end_at' => nil
+        }, {
+          'id' => @other_section.id,
+          'name' => @other_section.name,
+          'start_at' => '2020-01-01T00:00:00Z',
+          'end_at' => nil
+        }])
+      end
+    end
+
     context "when scoped to account" do
       before :once do
         @admin = account_admin_user(:account => @course.account, :active_all => true)

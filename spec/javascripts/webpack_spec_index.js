@@ -25,7 +25,7 @@ import {filterUselessConsoleMessages} from '@instructure/js-utils'
 
 filterUselessConsoleMessages(console)
 
-Enzyme.configure({ adapter: new Adapter() })
+Enzyme.configure({adapter: new Adapter()})
 
 if (process.env.SENTRY_DSN) {
   // This should allow us to capture more errors rather than just
@@ -34,45 +34,42 @@ if (process.env.SENTRY_DSN) {
   Raven.config(process.env.SENTRY_DSN, {
     ignoreErrors: ['renderIntoDiv', 'renderSidebarIntoDiv'], // silence the `Cannot read property 'renderIntoDiv' of null` errors we get from the pre- rce_enhancements old rce code
     release: process.env.GIT_COMMIT
-  }).install();
+  }).install()
 
-  let deprecationsReporter = null;
+  let deprecationsReporter = null
 
   if (process.env.DEPRECATION_SENTRY_DSN) {
     // We'll use this to collect deprecation warnings
     // Doing this like this isn't exactly... documented per se, but there is a
     // nice comment in the code about it here:
     // https://github.com/getsentry/sentry-javascript/blob/master/packages/raven-js/src/singleton.js#L33
-    deprecationsReporter = new Raven.Client();
+    deprecationsReporter = new Raven.Client()
     deprecationsReporter.config(process.env.DEPRECATION_SENTRY_DSN, {
       ignoreErrors: ['renderIntoDiv', 'renderSidebarIntoDiv'], // silence the `Cannot read property 'renderIntoDiv' of null` errors we get from the pre- rce_enhancements old rce code
       release: process.env.GIT_COMMIT
-    });
+    })
 
-    setupRavenConsoleLoggingPlugin(deprecationsReporter, { loggerName: 'console-qunit' });
-
+    setupRavenConsoleLoggingPlugin(deprecationsReporter, {loggerName: 'console-qunit'})
   }
-
 
   // QUnit is assumed global
   QUnit.testStart(({module, name}) => {
-    Raven.setExtraContext(); // Clear all extra data from the context.
+    Raven.setExtraContext() // Clear all extra data from the context.
 
     const context = {
       spec: `${module}: ${name}`
-    };
-    Raven.setExtraContext(context);
+    }
+    Raven.setExtraContext(context)
 
     if (deprecationsReporter) {
-      deprecationsReporter.setExtraContext();
-      deprecationsReporter.setExtraContext(context);
+      deprecationsReporter.setExtraContext()
+      deprecationsReporter.setExtraContext(context)
     }
-
   })
 }
 
 // Handle making sure we load in timezone data to prevent errors.
-(window.__PRELOADED_TIMEZONE_DATA__ || (window.__PRELOADED_TIMEZONE_DATA__ = {}))['en_US'] = en_US
+;(window.__PRELOADED_TIMEZONE_DATA__ || (window.__PRELOADED_TIMEZONE_DATA__ = {})).en_US = en_US
 
 document.dir = 'ltr'
 const fixturesDiv = document.createElement('div')
@@ -103,7 +100,7 @@ if (process.env.JSPEC_PATH) {
     requireAll(require.context(`../../${process.env.JSPEC_PATH}`))
   }
 } else {
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'coffee')) {
+  if (!process.env.JSPEC_GROUP || process.env.JSPEC_GROUP === 'coffee') {
     // run specs for ember screenreader gradebook
     requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.js$/))
 
@@ -112,14 +109,14 @@ if (process.env.JSPEC_PATH) {
   }
 
   // Run the js tests in 3 different groups for speed but also for isolating pollution from other specs
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsa')) {
+  if (!process.env.JSPEC_GROUP || process.env.JSPEC_GROUP === 'jsa') {
     requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/[a-f].*Spec$/))
   }
   // run all the gradebook/grading/gradezilla tests on their own
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsg')) {
+  if (!process.env.JSPEC_GROUP || process.env.JSPEC_GROUP === 'jsg') {
     requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/g.*Spec/))
   }
-  if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'jsh')) {
+  if (!process.env.JSPEC_GROUP || process.env.JSPEC_GROUP === 'jsh') {
     requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/[h-z].*Spec/))
   }
 }

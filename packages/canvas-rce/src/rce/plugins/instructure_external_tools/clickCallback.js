@@ -20,7 +20,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 export default function clickCallback(ed, ltiButtons) {
-
   return import('./components/LtiToolsModal').then(({LtiToolsModal}) => {
     let container = document.querySelector('.canvas-rce-upload-container')
     if (!container) {
@@ -35,11 +34,8 @@ export default function clickCallback(ed, ltiButtons) {
     }
 
     ReactDOM.render(
-      <LtiToolsModal
-        editor={ed}
-        onDismiss={handleDismiss}
-        ltiButtons={ltiButtons}
-      />, container
+      <LtiToolsModal editor={ed} onDismiss={handleDismiss} ltiButtons={ltiButtons} />,
+      container
     )
   })
 }

@@ -21,40 +21,57 @@ import * as apollo from 'react-apollo'
 import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import CommentContent from '../CommentsTab/CommentContent'
 import CommentsTab from '../CommentsTab'
-import {
-  commentGraphqlMock,
-  mockAssignment,
-  mockComments,
-  legacyMockSubmission,
-  singleAttachment,
-  singleComment
-} from '../../test-utils'
-import {mockAssignmentAndSubmission} from '../../mocks'
+import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
+import {mockAssignmentAndSubmission, mockQuery, mockSubmission} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
 import {render, waitForElement, fireEvent, wait, act} from '@testing-library/react'
 import React from 'react'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 
-function createUnreadCommentMock() {
-  const comments = mockComments()
-  comments.commentsConnection.nodes[0].read = false
-
-  return [
-    {
-      request: {
-        query: SUBMISSION_COMMENT_QUERY,
-        variables: {
-          submissionAttempt: 0,
-          submissionId: '1'
-        }
-      },
-      result: {
-        data: {
-          submissionComments: comments
-        }
-      }
-    }
+async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}) {
+  const variables = {submissionAttempt: 0, submissionId: '1', ...variableOverrides}
+  const allOverrides = [
+    {DateTime: '2010-10-16T23:59:59-06:00'},
+    {Node: {__typename: 'Submission'}},
+    {SubmissionCommentConnection: {nodes: []}},
+    overrides
   ]
+  const result = await mockQuery(SUBMISSION_COMMENT_QUERY, allOverrides, variables)
+  return {
+    request: {
+      query: SUBMISSION_COMMENT_QUERY,
+      variables
+    },
+    result
+  }
+}
+
+async function mockCreateSubmissionComment() {
+  const variables = {
+    submissionAttempt: 0,
+    id: '1',
+    comment: 'lion',
+    fileIds: [],
+    mediaObjectId: null
+  }
+  const overrides = {
+    DateTime: '2010-11-16T23:59:59-06:00',
+    User: {shortName: 'sent user'},
+    SubmissionComment: {comment: 'test reply comment'}
+  }
+  const result = await mockQuery(CREATE_SUBMISSION_COMMENT, overrides, variables)
+  return {
+    request: {
+      query: CREATE_SUBMISSION_COMMENT,
+      variables
+    },
+    result
+  }
+}
+
+async function mockComments(overrides = {}) {
+  const queryResult = await mockSubmissionCommentQuery(overrides)
+  return queryResult.result.data.submissionComments.commentsConnection.nodes
 }
 
 let mockedSetOnFailure = null
@@ -84,16 +101,14 @@ describe('CommentsTab', () => {
   })
 
   it('renders error alert when data returned from mutation fails', async () => {
-    const errorMock = commentGraphqlMock(mockComments())
-    errorMock[1].error = new Error('aw shucks')
+    const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+    mocks[1].error = new Error('aw shucks')
+    const props = await mockAssignmentAndSubmission()
+
     const {getByPlaceholderText, getByText} = render(
       mockContext(
-        <MockedProvider
-          defaultOptions={{mutate: {errorPolicy: 'all'}}}
-          mocks={errorMock}
-          addTypename
-        >
-          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
         </MockedProvider>
       )
     )
@@ -107,51 +122,121 @@ describe('CommentsTab', () => {
   })
 
   it('renders Comments', async () => {
-    const basicMock = commentGraphqlMock(mockComments())
+    const mocks = [await mockSubmissionCommentQuery()]
+    const props = await mockAssignmentAndSubmission()
     const {getByTestId} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+      <MockedProvider mocks={mocks}>
+        <CommentsTab {...props} />
       </MockedProvider>
     )
-
     expect(await waitForElement(() => getByTestId('comments-container'))).toBeInTheDocument()
   })
 
-  it('renders CommentTextArea', async () => {
-    const basicMock = commentGraphqlMock(mockComments())
-    const {getByLabelText} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+  it('renders Load More Comments button when pages remain', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        pageInfo: {
+          hasPreviousPage: true
+        }
+      }
+    }
+
+    const mocks = [await mockSubmissionCommentQuery(overrides)]
+    const props = await mockAssignmentAndSubmission()
+
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <CommentsTab {...props} />
       </MockedProvider>
     )
 
+    expect(await waitForElement(() => getByText('Load More Comments'))).toBeInTheDocument()
+  })
+
+  it('does not render Load More Comments button when no pages remain', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        pageInfo: {
+          hasPreviousPage: false
+        }
+      }
+    }
+
+    const mocks = [await mockSubmissionCommentQuery(overrides)]
+    const props = await mockAssignmentAndSubmission()
+
+    const {queryByText} = render(
+      <MockedProvider mocks={mocks}>
+        <CommentsTab {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByText('Load More Comments')).not.toBeInTheDocument()
+  })
+
+  it('loads more comments when button is clicked', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        pageInfo: {
+          hasPreviousPage: true
+        }
+      }
+    }
+
+    const mocks = [
+      await mockSubmissionCommentQuery(overrides),
+      await mockSubmissionCommentQuery(overrides, {cursor: 'Hello World'})
+    ]
+    const props = await mockAssignmentAndSubmission()
+
+    const querySpy = jest.spyOn(apollo, 'useQuery')
+
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <CommentsTab {...props} />
+      </MockedProvider>
+    )
+
+    const loadMoreButton = await waitForElement(() => getByText('Load More Comments'))
+    fireEvent.click(loadMoreButton)
+
+    expect(querySpy).toHaveBeenCalledTimes(3)
+  })
+
+  it('renders CommentTextArea', async () => {
+    const mocks = [await mockSubmissionCommentQuery()]
+    const props = await mockAssignmentAndSubmission()
+    const {getByLabelText} = render(
+      <MockedProvider mocks={mocks}>
+        <CommentsTab {...props} />
+      </MockedProvider>
+    )
     expect(await waitForElement(() => getByLabelText('Comment input box'))).toBeInTheDocument()
   })
 
   it('notifies user when comment successfully sent', async () => {
-    const basicMock = commentGraphqlMock(mockComments())
+    const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+    const props = await mockAssignmentAndSubmission()
     const {getByPlaceholderText, getByText} = render(
       mockContext(
-        <MockedProvider mocks={basicMock} addTypename>
-          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
         </MockedProvider>
       )
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
     fireEvent.click(getByText('Send Comment'))
-
-    await waitForElement(() => getByText('sent user'))
-
-    expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent')
+    await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent'))
   })
 
   it('renders the optimistic response with env current user', async () => {
-    const basicMock = commentGraphqlMock(mockComments())
+    const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+    const props = await mockAssignmentAndSubmission()
     const {findByPlaceholderText, getByText, findByText} = render(
       mockContext(
-        <MockedProvider mocks={basicMock} addTypename>
-          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
         </MockedProvider>
       )
     )
@@ -159,33 +244,33 @@ describe('CommentsTab', () => {
     fireEvent.change(textArea, {target: {value: 'lion'}})
     fireEvent.click(getByText('Send Comment'))
 
-    expect(await findByText('optimistic user')).toBeTruthy()
+    expect(await findByText('bob')).toBeTruthy()
   })
 
   it('renders the message when sent', async () => {
-    const basicMock = commentGraphqlMock(mockComments())
-    const {getAllByTestId, getByPlaceholderText, getByText} = render(
+    const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
+    const props = await mockAssignmentAndSubmission()
+    const {getByPlaceholderText, getByText, findByText} = render(
       mockContext(
-        <MockedProvider mocks={basicMock} addTypename>
-          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
         </MockedProvider>
       )
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
     fireEvent.click(getByText('Send Comment'))
-
-    const rows = getAllByTestId('comment-row')
-    expect(rows[0]).toHaveTextContent('lion')
-    expect(await waitForElement(() => getByText('sent user'))).toBeInTheDocument()
+    expect(await findByText('test reply comment')).toBeInTheDocument()
+    expect(await findByText(/sent user/i)).toBeInTheDocument()
   })
 
-  it('renders loading indicator when loading query', () => {
-    const basicMock = commentGraphqlMock(mockComments())
+  it('renders loading indicator when loading query', async () => {
+    const mocks = [await mockSubmissionCommentQuery()]
+    const props = await mockAssignmentAndSubmission()
     const {getByTitle} = render(
       mockContext(
-        <MockedProvider mocks={basicMock} addTypename>
-          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
         </MockedProvider>
       )
     )
@@ -193,12 +278,13 @@ describe('CommentsTab', () => {
   })
 
   it('catches error when api returns incorrect data', async () => {
-    const noDataMock = commentGraphqlMock(mockComments())
-    noDataMock[0].result = {data: null}
+    const mocks = [await mockSubmissionCommentQuery()]
+    mocks[0].result = {data: null}
+    const props = await mockAssignmentAndSubmission()
     const {getByText} = render(
       mockContext(
-        <MockedProvider mocks={noDataMock} addTypename>
-          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
         </MockedProvider>
       )
     )
@@ -206,13 +292,13 @@ describe('CommentsTab', () => {
   })
 
   it('renders error when query errors', async () => {
-    const errorMock = commentGraphqlMock(mockComments())
-    errorMock[0].result = null
-    errorMock[0].error = new Error('aw shucks')
+    const mocks = [await mockSubmissionCommentQuery()]
+    mocks[0].error = new Error('aw shucks')
+    const props = await mockAssignmentAndSubmission()
     const {getByText} = render(
       mockContext(
-        <MockedProvider mocks={errorMock}>
-          <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
         </MockedProvider>
       )
     )
@@ -224,15 +310,21 @@ describe('CommentsTab', () => {
     jest.useFakeTimers()
 
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({unreadCommentCount: 1})
+      Submission: {unreadCommentCount: 1}
     })
+    const overrides = {
+      SubmissionCommentConnection: {
+        nodes: [{read: false}]
+      }
+    }
+    const mocks = [await mockSubmissionCommentQuery(overrides)]
 
     const mockMutation = jest.fn()
     apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
 
     render(
       mockContext(
-        <MockedProvider mocks={createUnreadCommentMock()} addTypename>
+        <MockedProvider mocks={mocks}>
           <CommentsTab {...props} />
         </MockedProvider>
       )
@@ -240,22 +332,28 @@ describe('CommentsTab', () => {
 
     await wait(() => {
       act(() => jest.runAllTimers())
-      expect(mockMutation).toHaveBeenCalledWith({variables: {commentIds: ['1'], submissionId: '1'}})
     })
+    expect(mockMutation).toHaveBeenCalledWith({variables: {commentIds: ['1'], submissionId: '1'}})
   })
 
   it('renders an error when submission comments fail to be marked as read', async () => {
     jest.useFakeTimers()
 
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({unreadCommentCount: 1})
+      Submission: {unreadCommentCount: 1}
     })
+    const overrides = {
+      SubmissionCommentConnection: {
+        nodes: [{read: false}]
+      }
+    }
+    const mocks = [await mockSubmissionCommentQuery(overrides)]
 
     apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: true}])
 
     render(
       mockContext(
-        <MockedProvider mocks={createUnreadCommentMock()} addTypename>
+        <MockedProvider mocks={mocks}>
           <CommentsTab {...props} />
         </MockedProvider>
       )
@@ -272,14 +370,20 @@ describe('CommentsTab', () => {
     jest.useFakeTimers()
 
     const props = await mockAssignmentAndSubmission({
-      Submission: () => ({unreadCommentCount: 1})
+      Submission: {unreadCommentCount: 1}
     })
+    const overrides = {
+      SubmissionCommentConnection: {
+        nodes: [{read: false}]
+      }
+    }
+    const mocks = [await mockSubmissionCommentQuery(overrides)]
 
     apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: false}])
 
     render(
       mockContext(
-        <MockedProvider mocks={createUnreadCommentMock()} addTypename>
+        <MockedProvider mocks={mocks}>
           <CommentsTab {...props} />
         </MockedProvider>
       )
@@ -292,55 +396,10 @@ describe('CommentsTab', () => {
     )
   })
 
-  // the arc media player has some custom needs for rendering in jsdom that we will need to investigate.  Uncomment when
-  // we take this more serious
-  // it('renders a media Comment', async () => {
-  // const mediaComments = mockComments()
-  // mediaComments.commentsConnection.nodes[0].mediaObject = singleMediaObject()
-  // const mediaCommentMocks = commentGraphqlMock(mediaComments)
-
-  // const {getByText} = render(
-  // <MockedProvider mocks={mediaCommentMocks} addTypename>
-  // <CommentsTab assignment={mockAssignment()} />
-  // </MockedProvider>
-  // )
-
-  // expect(await waitForElement(() => getByText('100x1024'))).toBeInTheDocument()
-  // })
-
-  // it('renders an audio only media Comment', async () => {
-  // const mediaComment = singleMediaObject({
-  // title: 'audio only media comment',
-  // mediaType: 'audio/mp4',
-  // mediaSources: [
-  // {
-  // __typename: 'MediaSource',
-  // type: 'audio/mp4',
-  // src: 'http://some-awesome-url/goes/here',
-  // height: '1024',
-  // width: '100'
-  // }
-  // ]
-  // })
-  // const audioOnlyComments = mockComments()
-  // audioOnlyComments.commentsConnection.nodes[0].mediaObject = mediaComment
-  // const audioOnlyMocks = commentGraphqlMock(audioOnlyComments)
-
-  // const {container} = render(
-  // <MockedProvider mocks={audioOnlyMocks} addTypename>
-  // <CommentsTab assignment={mockAssignment()} />
-  // </MockedProvider>
-  // )
-
-  // const srcElement = await waitForElement(() =>
-  // container.querySelector('source[src="http://some-awesome-url/goes/here"]')
-  // )
-  // expect(srcElement).toBeInTheDocument()
-  // })
-
   it('renders place holder text when no comments', async () => {
+    const submission = await mockSubmission()
     const {getByText} = render(
-      mockContext(<CommentContent comments={[]} submission={legacyMockSubmission()} />)
+      mockContext(<CommentContent comments={[]} submission={submission} />)
     )
 
     expect(
@@ -350,94 +409,122 @@ describe('CommentsTab', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders comment rows when provided', () => {
-    const comments = [singleComment({_id: '6'}), singleComment()]
+  it('renders comment rows when provided', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        nodes: [{_id: '1'}, {_id: '2'}]
+      }
+    }
+    const comments = await mockComments(overrides)
+    const submission = await mockSubmission()
     const {getAllByTestId} = render(
-      mockContext(<CommentContent comments={comments} submission={legacyMockSubmission()} />)
+      mockContext(<CommentContent comments={comments} submission={submission} />)
     )
     const rows = getAllByTestId('comment-row')
 
     expect(rows).toHaveLength(comments.length)
   })
 
-  it('renders shortname when shortname is provided', () => {
+  it('renders shortname when shortname is provided', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {nodes: [{}]},
+      User: {shortName: 'bob builder'}
+    }
+    const comments = await mockComments(overrides)
+    const submission = await mockSubmission()
     const {getAllByText} = render(
-      mockContext(
-        <CommentContent comments={[singleComment()]} submission={legacyMockSubmission()} />
-      )
+      mockContext(<CommentContent comments={comments} submission={submission} />)
     )
     expect(getAllByText('bob builder')).toHaveLength(1)
   })
 
-  it('renders Anonymous when author is not provided', () => {
-    const comment = singleComment()
-    comment.author = null
+  it('renders Anonymous when author is not provided', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {nodes: [{author: null}]}
+    }
+    const comments = await mockComments(overrides)
+    const submission = await mockSubmission()
     const {getAllByText, queryAllByText} = render(
-      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
+      mockContext(<CommentContent comments={comments} submission={submission} />)
     )
 
     expect(queryAllByText('bob builder')).toHaveLength(0)
     expect(getAllByText('Anonymous')).toHaveLength(1)
   })
 
-  it('displays a single attachment', () => {
-    const comment = singleComment()
-    const attachment = singleAttachment()
-    comment.attachments = [attachment]
+  it('displays a single attachment', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {nodes: [{}]},
+      File: {url: 'test-url.com', displayName: 'Test Display Name'}
+    }
+    const comments = await mockComments(overrides)
+    const submission = await mockSubmission()
     const {container, getByText} = render(
-      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
+      mockContext(<CommentContent comments={comments} submission={submission} />)
     )
 
-    const renderedAttachment = container.querySelector(`a[href*='${attachment.url}']`)
+    const renderedAttachment = container.querySelector("a[href*='test-url.com']")
     expect(renderedAttachment).toBeInTheDocument()
-    expect(renderedAttachment).toContainElement(getByText(attachment.displayName))
+    expect(renderedAttachment).toContainElement(getByText('Test Display Name'))
   })
 
-  it('displays multiple attachments', () => {
-    const comment = singleComment()
-    const attachment1 = singleAttachment()
-    const attachment2 = singleAttachment({
-      _id: '30',
-      displayName: 'attachment2',
-      url: 'https://second-attachment/url.com'
-    })
-    comment.attachments = [attachment1, attachment2]
+  it('displays multiple attachments', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        nodes: [
+          {
+            attachments: [
+              {url: 'attachment1.com', displayName: 'attachment1'},
+              {url: 'attachment2.com', displayName: 'attachment2'}
+            ]
+          }
+        ]
+      }
+    }
+    const comments = await mockComments(overrides)
+    const submission = await mockSubmission()
     const {container, getByText} = render(
-      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
+      mockContext(<CommentContent comments={comments} submission={submission} />)
     )
 
-    const renderedAttachment1 = container.querySelector(`a[href*='${attachment1.url}']`)
+    const renderedAttachment1 = container.querySelector("a[href*='attachment1.com']")
     expect(renderedAttachment1).toBeInTheDocument()
-    expect(renderedAttachment1).toContainElement(getByText(attachment1.displayName))
+    expect(renderedAttachment1).toContainElement(getByText('attachment1'))
 
-    const renderedAttachment2 = container.querySelector(`a[href*='${attachment2.url}']`)
+    const renderedAttachment2 = container.querySelector("a[href*='attachment2.com']")
     expect(renderedAttachment2).toBeInTheDocument()
-    expect(renderedAttachment2).toContainElement(getByText(attachment2.displayName))
+    expect(renderedAttachment2).toContainElement(getByText('attachment2'))
   })
 
-  it('does not display attachments if there are none', () => {
-    const comment = singleComment()
+  it('does not display attachments if there are none', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {nodes: [{attachments: []}]}
+    }
+    const comments = await mockComments(overrides)
+    const submission = await mockSubmission()
+
     const {container} = render(
-      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
+      mockContext(<CommentContent comments={comments} submission={submission} />)
     )
 
     expect(container.querySelector('a[href]')).toBeNull()
   })
 
-  it('displays the comments in reverse chronological order', () => {
-    const comments = [
-      ['2019-03-01T14:32:37-07:00', 'last comment'],
-      ['2019-03-03T14:32:37-07:00', 'first comment'],
-      ['2019-03-02T14:32:37-07:00', 'middle comment']
-    ].map((comment, index) =>
-      singleComment({
-        _id: index.toString(),
-        updatedAt: comment[0],
-        comment: comment[1]
-      })
-    )
+  it('displays the comments in reverse chronological order', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {
+        nodes: [
+          {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', comment: 'last comment'},
+          {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', comment: 'first comment'},
+          {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'}
+        ]
+      }
+    }
+    const comments = await mockComments(overrides)
+    const submission = await mockSubmission()
+
     const {getAllByTestId} = render(
-      mockContext(<CommentContent comments={comments} submission={legacyMockSubmission()} />)
+      mockContext(<CommentContent comments={comments} submission={submission} />)
     )
 
     const rows = getAllByTestId('comment-row')
@@ -451,18 +538,21 @@ describe('CommentsTab', () => {
     expect(rows[2]).toHaveTextContent('Fri Mar 1, 2019 9:32pm')
   })
 
-  it('includes an icon on an attachment', () => {
-    const comment = singleComment()
-    const attachment = singleAttachment()
-    comment.attachments = [attachment]
+  it('includes an icon on an attachment', async () => {
+    const overrides = {
+      SubmissionCommentConnection: {nodes: [{}]},
+      File: {url: 'test-url.com', displayName: 'Test Display Name', mimeClass: 'pdf'}
+    }
+    const comments = await mockComments(overrides)
+    const submission = await mockSubmission()
 
     const {container, getByText} = render(
-      mockContext(<CommentContent comments={[comment]} submission={legacyMockSubmission()} />)
+      mockContext(<CommentContent comments={comments} submission={submission} />)
     )
 
-    const renderedAttachment = container.querySelector(`a[href*='${attachment.url}']`)
+    const renderedAttachment = container.querySelector("a[href*='test-url.com']")
     expect(renderedAttachment).toBeInTheDocument()
-    expect(renderedAttachment).toContainElement(getByText(attachment.displayName))
+    expect(renderedAttachment).toContainElement(getByText('Test Display Name'))
     expect(renderedAttachment).toContainElement(container.querySelector("svg[name='IconPdf']"))
   })
 })

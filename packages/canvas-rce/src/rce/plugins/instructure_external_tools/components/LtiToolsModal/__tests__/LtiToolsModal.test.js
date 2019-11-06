@@ -22,38 +22,37 @@ import {render, fireEvent} from '@testing-library/react'
 import {LtiToolsModal} from '../index'
 
 describe('RCE Plugins > LtiToolModal', () => {
-
-  function getProps(override={}) {
+  function getProps(override = {}) {
     const props = {
       onDismiss: () => {},
       ltiButtons: [
         {
-            title: "Tool 1",
-            id: 1,
-            description: "This is tool 1.",
-            image: "tool1/icon.png",
-            onAction: () => {}
+          title: 'Tool 1',
+          id: 1,
+          description: 'This is tool 1.',
+          image: 'tool1/icon.png',
+          onAction: () => {}
         },
         {
-            title: "Tool 2",
-            id: 2,
-            description: "This is tool 2",
-            image: "/tool2/image.png",
-            onAction: () => {}
+          title: 'Tool 2',
+          id: 2,
+          description: 'This is tool 2',
+          image: '/tool2/image.png',
+          onAction: () => {}
         },
         {
-            title: "Tool 3",
-            id: 3,
-            image: "https://www.edu-apps.org/assets/lti_public_resources/tool3.png",
-            onAction: () => {}
+          title: 'Tool 3',
+          id: 3,
+          image: 'https://www.edu-apps.org/assets/lti_public_resources/tool3.png',
+          onAction: () => {}
         },
         {
-            title: "Diffrient Tool",
-            id: 4,
-            image: "https://www.edu-apps.org/assets/lti_public_resources/tool3.png",
-            onAction: () => {}
+          title: 'Diffrient Tool',
+          id: 4,
+          image: 'https://www.edu-apps.org/assets/lti_public_resources/tool3.png',
+          onAction: () => {}
         }
-    ],
+      ],
       ...override
     }
     return props
@@ -65,12 +64,12 @@ describe('RCE Plugins > LtiToolModal', () => {
 
   it('is labeled "Select App"', () => {
     const {getByLabelText} = renderComponent()
-    expect(getByLabelText("LTI Tools")).toBeInTheDocument()
+    expect(getByLabelText('Apps')).toBeInTheDocument()
   })
 
   it('has heading "Select App"', () => {
     const {getByText} = renderComponent()
-    expect(getByText("Select App")).toBeInTheDocument()
+    expect(getByText('Select App')).toBeInTheDocument()
   })
 
   it('shows the 3 tools', () => {
@@ -82,7 +81,11 @@ describe('RCE Plugins > LtiToolModal', () => {
     expect(getByText('This is tool 2')).toBeInTheDocument()
     expect(baseElement.querySelector('img[src="/tool2/image.png"]')).toBeInTheDocument()
     expect(getByText('Tool 3')).toBeInTheDocument()
-    expect(baseElement.querySelector('img[src="https://www.edu-apps.org/assets/lti_public_resources/tool3.png"]')).toBeInTheDocument()
+    expect(
+      baseElement.querySelector(
+        'img[src="https://www.edu-apps.org/assets/lti_public_resources/tool3.png"]'
+      )
+    ).toBeInTheDocument()
   })
 
   it('calls onDismiss when clicking Cancel', () => {
@@ -107,14 +110,15 @@ describe('RCE Plugins > LtiToolModal', () => {
     const {getByText} = renderComponent({
       onDismiss,
       ltiButtons: [
-      {
-          title: "Tool 1",
+        {
+          title: 'Tool 1',
           id: 1,
-          description: "This is tool 1.",
-          image: "tool1/icon.png",
+          description: 'This is tool 1.',
+          image: 'tool1/icon.png',
           onAction: doAction
-      }
-    ]})
+        }
+      ]
+    })
     const tool1 = getByText('Tool 1')
     tool1.click()
     expect(doAction).toHaveBeenCalled()
@@ -125,7 +129,7 @@ describe('RCE Plugins > LtiToolModal', () => {
     it('shows only results that match the filter value', () => {
       const {getByText, queryByText, getByLabelText} = renderComponent()
       const searchBox = getByLabelText('Search')
-      fireEvent.change(searchBox, { target: { value: 'diff' } })
+      fireEvent.change(searchBox, {target: {value: 'diff'}})
       expect(queryByText('Tool 1')).not.toBeInTheDocument()
       expect(getByText('Diffrient Tool')).toBeInTheDocument()
     })
@@ -133,7 +137,7 @@ describe('RCE Plugins > LtiToolModal', () => {
     it('shows a no results alert when there are no results', () => {
       const {getByText, getByLabelText} = renderComponent()
       const searchBox = getByLabelText('Search')
-      fireEvent.change(searchBox, { target: { value: 'instructure' } })
+      fireEvent.change(searchBox, {target: {value: 'instructure'}})
       expect(getByText('No results found for instructure')).toBeInTheDocument()
     })
   })

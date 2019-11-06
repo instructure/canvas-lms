@@ -21,6 +21,7 @@ require 'atom'
 class Account < ActiveRecord::Base
   include Context
   include OutcomeImportContext
+  include Pronouns
 
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 
@@ -200,6 +201,7 @@ class Account < ActiveRecord::Base
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
+  add_setting :can_add_pronouns, :boolean => true, :root_only => true, :default => false
 
   add_setting :self_enrollment
   add_setting :equella_endpoint
@@ -301,6 +303,15 @@ class Account < ActiveRecord::Base
     else
       root_account.try(:sub_account_includes?) && root_account.try(:allow_global_includes?)
     end
+  end
+
+  def pronouns
+    return [] unless settings[:can_add_pronouns]
+    settings[:pronouns]&.map{|p| translate_pronouns(p)} || Pronouns.default_pronouns
+  end
+
+  def pronouns=(pronouns)
+    settings[:pronouns] = pronouns&.map{|p| untranslate_pronouns(p)}&.reject(&:blank?)
   end
 
   def mfa_settings

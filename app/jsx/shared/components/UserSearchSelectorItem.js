@@ -22,23 +22,23 @@ import React from 'react'
 import {Avatar, Text} from '@instructure/ui-elements'
 import {Flex} from '@instructure/ui-layout'
 
-import basicUser from '../proptypes/user'
+import {basicUser} from '../proptypes/user'
 
 UserSearchSelectorItem.propTypes = {
   user: basicUser
 }
 
 export default function UserSearchSelectorItem({user}) {
-  const {display_name, email, avatar_image_url} = user
+  const {name, email, avatar_url} = user
   return (
     <Flex>
       <Flex.Item>
-        <Avatar name={display_name} src={avatar_image_url} />
+        <Avatar name={name} src={avatar_url} />
       </Flex.Item>
       <Flex.Item padding="0 0 0 small" grow>
         <Flex direction="column">
           <Flex.Item>
-            <Text size="medium">{display_name}</Text>
+            <Text size="medium">{name}</Text>
           </Flex.Item>
           <Flex.Item>
             <Text size="small">{email}</Text>

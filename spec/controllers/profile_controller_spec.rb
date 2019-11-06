@@ -84,6 +84,27 @@ describe ProfileController do
       expect(@cc.reload.position).to eq 2
     end
 
+    it "should allow changing pronouns" do
+      user_session(@user, @pseudonym)
+      expect(@user.pronouns).to eq nil
+      put 'update', params: {:user => {:pronouns => "  He/Him "}}, format: 'json'
+      expect(response).to be_successful
+      @user.reload
+      expect(@user.read_attribute(:pronouns)).to eq "he_him"
+      expect(@user.pronouns).to eq "He/Him"
+    end
+
+    it "should allow unsetting pronouns" do
+      user_session(@user, @pseudonym)
+      @user.pronouns = " Dude/Guy  "
+      @user.save!
+      expect(@user.pronouns).to eq "Dude/Guy"
+      put 'update', params: {:user => {:pronouns => ''}}, format: 'json'
+      expect(response).to be_successful
+      @user.reload
+      expect(@user.pronouns).to eq nil
+    end
+
     it "should clear email cache" do
       enable_cache do
         @user.email # prime cache

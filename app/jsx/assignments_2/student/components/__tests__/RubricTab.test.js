@@ -23,7 +23,7 @@ import {RUBRIC_QUERY} from '../../graphqlData/Queries'
 
 function gradedOverrides() {
   return {
-    Submission: () => ({
+    Submission: {
       rubricAssessmentsConnection: {
         nodes: [
           {
@@ -43,25 +43,25 @@ function gradedOverrides() {
           }
         ]
       }
-    }),
-    Course: () => ({
+    },
+    Course: {
       account: {
         proficiencyRatingsConnection: {
           nodes: [{}]
         }
       }
-    })
+    }
   }
 }
 
 function ungradedOverrides() {
   return {
-    Submission: () => ({rubricAssessmentsConnection: null}),
-    Course: () => ({
+    Submission: {rubricAssessmentsConnection: null},
+    Course: {
       account: {
         proficiencyRatingsConnection: null
       }
-    })
+    }
   }
 }
 
@@ -76,10 +76,10 @@ async function makeProps(opts = {}) {
   const overrides = opts.graded ? gradedOverrides() : ungradedOverrides()
   const allOverrides = [
     {
-      Node: () => ({__typename: 'Rubric'}),
-      Rubric: () => ({
+      Node: {__typename: 'Rubric'},
+      Rubric: {
         criteria: [{}]
-      }),
+      },
       ...overrides
     }
   ]

@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export default function generator ({ borders, colors, media, spacing, typography }) {
+export default function generator({borders, colors, media, spacing, typography}) {
   return {
     fontFamily: typography.fontFamily,
     lineHeight: typography.lineHeightCondensed,
@@ -49,20 +49,20 @@ export default function generator ({ borders, colors, media, spacing, typography
     titleTextDecorationHover: 'underline',
     titleColor: colors.brand,
     ...media
-  };
+  }
 }
 
-generator['canvas-a11y'] = generator['modern-a11y'] = function ({ colors }) {
+generator['canvas-a11y'] = generator['modern-a11y'] = function({colors}) {
   return {
     heroTextDecoration: 'underline',
     heroTextDecorationHover: 'none',
-    titleColor: colors.licorice,
-  };
-};
+    titleColor: colors.licorice
+  }
+}
 
-generator.canvas = function (variables) {
+generator.canvas = function(variables) {
   return {
-    groupColor: variables["ic-brand-primary"],
-    titleColor: variables["ic-brand-primary"]
-  };
-};
+    groupColor: variables['ic-brand-primary'],
+    titleColor: variables['ic-brand-primary']
+  }
+}

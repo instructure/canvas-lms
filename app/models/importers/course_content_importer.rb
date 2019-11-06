@@ -185,9 +185,12 @@ module Importers
         if data['external_content']
           Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data['external_content'])
         end
-        migration.update_import_progress(98)
+        migration.update_import_progress(97)
 
         insert_into_module(course, migration)
+        migration.update_import_progress(98)
+
+        move_to_assignment_group(course, migration)
         migration.update_import_progress(99)
 
         adjust_dates(course, migration)
@@ -230,6 +233,26 @@ module Importers
       start_pos = migration.migration_settings[:insert_into_module_position]
       start_pos = start_pos.to_i unless start_pos.nil? # 0 = start; nil = end
       mod.insert_items(imported_items, start_pos)
+    end
+
+    def self.move_to_assignment_group(course, migration)
+      ag_id = migration.migration_settings[:move_to_assignment_group_id]
+      return unless ag_id.present?
+
+      ag = course.assignment_groups.find_by_id(ag_id)
+      return unless ag
+
+      assignments = migration.imported_migration_items_by_class(Assignment)
+      return unless assignments.any?
+
+      # various callbacks run on assignment_group_id change, so we'll do these one by one
+      # (the expected use case for this feature is a migration containing a single assignment anyhow)
+      assignments.each do |assignment|
+        next if assignment.assignment_group == ag
+        assignment.assignment_group = ag
+        assignment.position = nil
+        assignment.save!
+      end
     end
 
     def self.adjust_dates(course, migration)

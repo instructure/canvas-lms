@@ -108,7 +108,7 @@
     "moment": "^2.10.6",
     "newless": "^0.3.0",
     "normalize-scroll-left": "^0.2",
-    "page": "visionmedia/page.js#1.6.4",
+    "page": "^1.11",
     "parse-decimal-number": "1.0.0",
     "parse-link-header": "^1",
     "prop-types": "^15",

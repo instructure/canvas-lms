@@ -304,6 +304,14 @@ class Assignment < ActiveRecord::Base
     )
   end
 
+  def self.clean_up_migrating_assignments
+    migrating_for_too_long.update_all(
+      duplication_started_at: nil,
+      workflow_state: 'failed_to_migrate',
+      updated_at: Time.zone.now
+    )
+  end
+
   def group_category_changes_ok?
     return unless group_category_id_changed?
 
@@ -1152,6 +1160,11 @@ class Assignment < ActiveRecord::Base
       event :fail_to_import, :transitions_to => :fail_to_import
     end
     state :fail_to_import
+    state :migrating do
+      event :finish_migrating, :transitions_to => :unpublished
+      event :fail_to_migrate, :transitions_to => :failed_to_migrate
+    end
+    state :failed_to_migrate
     state :deleted
   end
 
@@ -1544,7 +1557,14 @@ class Assignment < ActiveRecord::Base
       visible_to_user?(user) &&
       !excused_for?(user)
     }
-    can :submit and can :attach_submission_comment_files
+    can :submit
+
+    given do |user, session|
+      (submittable_type? || submission_types == "discussion_topic") &&
+      context.grants_right?(user, session, :participate_as_student) &&
+      visible_to_user?(user)
+    end
+    can :attach_submission_comment_files
 
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
     can :read
@@ -2564,6 +2584,15 @@ class Assignment < ActiveRecord::Base
           WHERE s.user_id = #{User.connection.quote(user)} AND s.workflow_state <> 'deleted') AS assignments")
   end
 
+  scope :with_latest_due_date, -> do
+    from("(SELECT GREATEST(a.due_at, MAX(ao.due_at)) latest_due_date, a.*
+          FROM #{Assignment.quoted_table_name} a
+          LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
+          ON ao.assignment_id = a.id
+          AND ao.due_at_overridden
+          GROUP BY a.id) AS assignments")
+  end
+
   scope :updated_after, lambda { |*args|
     if args.first
       where("assignments.updated_at IS NULL OR assignments.updated_at>?", args.first)
@@ -2620,11 +2649,24 @@ class Assignment < ActiveRecord::Base
   scope :published, -> { where(:workflow_state => 'published') }
 
   scope :duplicating_for_too_long, -> {
-    where("workflow_state = 'duplicating' AND duplication_started_at < ?", 15.minutes.ago)
+    where(
+      "workflow_state = 'duplicating' AND duplication_started_at < ?",
+      Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
+    )
   }
 
   scope :importing_for_too_long, -> {
-    where("workflow_state = 'importing' AND importing_started_at < ?", 15.minutes.ago)
+    where(
+      "workflow_state = 'importing' AND importing_started_at < ?",
+      Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
+    )
+  }
+
+  scope :migrating_for_too_long, -> {
+    where(
+      "workflow_state = 'migrating' AND duplication_started_at < ?",
+      Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
+    )
   }
 
   def overdue?

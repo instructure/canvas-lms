@@ -16,45 +16,46 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-const axios = require('axios');
-const moxios = require('moxios');
-const {moxiosWait, moxiosRespond} = require('../index');
+const axios = require('axios')
+const moxios = require('moxios')
+const {moxiosWait, moxiosRespond} = require('../index')
 
 describe('moxiosWait', () => {
   it('rejects if the passed function throws', () => {
     const waitPromise = moxiosWait(() => {
-      throw new Error('intentional error for testing');
-    });
+      throw new Error('intentional error for testing')
+    })
     return new Promise((resolve, reject) => {
       waitPromise
         .then(() => reject('did not expect waitPromise to resolve'))
         .catch(() => resolve('yay, this is what its supposed to do'))
-      ;
-    });
-  });
-});
+    })
+  })
+})
 
 describe('moxiosRespond', () => {
   beforeEach(() => {
-    moxios.install();
-  });
+    moxios.install()
+  })
 
   afterEach(() => {
-    moxios.uninstall();
-  });
+    moxios.uninstall()
+  })
 
   it('throws if the request promise parameter is missing', () => {
-    expect(() => moxiosRespond('blah')).toThrow();
-  });
+    expect(() => moxiosRespond('blah')).toThrow()
+  })
 
   it('merges options into the response', () => {
-    const requestPromise = axios.get('http://example.com');
-    const responsePromise = moxiosRespond({some: 'data'}, requestPromise, {status: 418, headers: {key: 'value'}});
-    return responsePromise.catch((err) => {
-      expect(err.response.data).toMatchObject({some: 'data'});
-      expect(err.response.headers).toMatchObject({key: 'value'});
-      expect(err.response.status).toBe(418);
-    });
-  });
-});
+    const requestPromise = axios.get('http://example.com')
+    const responsePromise = moxiosRespond({some: 'data'}, requestPromise, {
+      status: 418,
+      headers: {key: 'value'}
+    })
+    return responsePromise.catch(err => {
+      expect(err.response.data).toMatchObject({some: 'data'})
+      expect(err.response.headers).toMatchObject({key: 'value'})
+      expect(err.response.status).toBe(418)
+    })
+  })
+})

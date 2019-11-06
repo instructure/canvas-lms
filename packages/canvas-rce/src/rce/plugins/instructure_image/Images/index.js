@@ -29,7 +29,7 @@ import {
   useIncrementalLoading
 } from '../../../../common/incremental-loading'
 import ImageList from '../ImageList'
-import formatMessage from '../../../../format-message';
+import formatMessage from '../../../../format-message'
 
 export default function Images(props) {
   const {fetchInitialImages, fetchNextImages, contextType} = props
@@ -60,10 +60,7 @@ export default function Images(props) {
   }, [contextType, files.length, hasMore, isLoading, fetchInitialImages])
 
   return (
-    <View
-      as="div"
-      data-testid="instructure_links-ImagesPanel"
-    >
+    <View as="div" data-testid="instructure_links-ImagesPanel">
       <Flex alignItems="center" direction="column" justifyItems="space-between" height="100%">
         <Flex.Item overflowY="visible" width="100%">
           <ImageList images={files} lastItemRef={lastItemRef} onImageClick={props.onImageEmbed} />
@@ -86,7 +83,7 @@ export default function Images(props) {
 
       {error && (
         <View as="div" role="alert" margin="medium">
-          <Text color="error">{formatMessage("Loading failed.")}</Text>
+          <Text color="error">{formatMessage('Loading failed.')}</Text>
         </View>
       )}
     </View>
@@ -97,12 +94,14 @@ Images.propTypes = {
   fetchInitialImages: func.isRequired,
   fetchNextImages: func.isRequired,
   contextType: string.isRequired,
-  images: objectOf(shape({
-    files: arrayOf(shape(fileShape)).isRequired,
-    bookmark: string,
-    hasMore: bool.isRequired,
-    isLoading: bool.isRequired,
-    error: string
-  })).isRequired,
+  images: objectOf(
+    shape({
+      files: arrayOf(shape(fileShape)).isRequired,
+      bookmark: string,
+      hasMore: bool.isRequired,
+      isLoading: bool.isRequired,
+      error: string
+    })
+  ).isRequired,
   onImageEmbed: func.isRequired
 }

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { REQUEST_MEDIA, RECEIVE_MEDIA, FAIL_MEDIA } from "../actions/media";
-import { CHANGE_CONTEXT } from "../actions/context"
+import {REQUEST_MEDIA, RECEIVE_MEDIA, FAIL_MEDIA} from '../actions/media'
+import {CHANGE_CONTEXT} from '../actions/context'
 
 // manages the state for a specific collection. assumes the action is intended
 // for this collection (see collections.js)
@@ -38,29 +38,29 @@ export default function mediaReducer(prevState = {}, action) {
       return state
 
     case RECEIVE_MEDIA:
-        state[ctxt] = {
-          files: state[ctxt].files.concat(action.payload.files),
-          bookmark: action.payload.bookmark,
-          isLoading: false,
-          hasMore: !!action.payload.bookmark
-        }
+      state[ctxt] = {
+        files: state[ctxt].files.concat(action.payload.files),
+        bookmark: action.payload.bookmark,
+        isLoading: false,
+        hasMore: !!action.payload.bookmark
+      }
       return state
 
     case FAIL_MEDIA: {
       state[ctxt] = {
         isLoading: false,
         error: action.payload.error
-      };
+      }
       if (action.payload.files && action.payload.files.length === 0) {
-        state[ctxt].bookmark = null;
+        state[ctxt].bookmark = null
       }
       return state
     }
 
     case CHANGE_CONTEXT:
-      return state;
+      return state
 
     default:
-      return prevState;
+      return prevState
   }
 }

@@ -18,31 +18,31 @@
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 
 export default class QuizFormulaSolution {
-  constructor (result) {
+  constructor(result) {
     this.result = result
   }
 
-  rawValue () {
+  rawValue() {
     return numberHelper.parse(this.rawText())
   }
 
-  rawText () {
+  rawText() {
     if (this.result === null || this.result === undefined) {
       return 'NaN'
     }
     return this.result.substring(1).trim()
   }
 
-  isValid () {
+  isValid() {
     return !!(this._wellFormedString() && this._appropriateSolutionValue())
   }
 
-  _wellFormedString () {
+  _wellFormedString() {
     const result = this.result
     return !!(result.match(/^=/) && result != '= NaN' && result != '= Infinity')
   }
 
-  _appropriateSolutionValue () {
+  _appropriateSolutionValue() {
     const rawVal = this.rawValue()
     return !!(rawVal == 0 || rawVal)
   }

@@ -16,33 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import * as contentInsertionUtils from "../../src/rce/contentInsertionUtils";
+import assert from 'assert'
+import * as contentInsertionUtils from '../../src/rce/contentInsertionUtils'
 
-describe("contentInsertionUtils", () => {
-  describe("cleanUrl", () => {
-    it("doesnt hurt a good url", () => {
-      const url = "http://www.google.com";
-      const output = contentInsertionUtils.cleanUrl(url);
-      assert.equal(output, url);
-    });
+describe('contentInsertionUtils', () => {
+  describe('cleanUrl', () => {
+    it('doesnt hurt a good url', () => {
+      const url = 'http://www.google.com'
+      const output = contentInsertionUtils.cleanUrl(url)
+      assert.equal(output, url)
+    })
 
-    it("turns email addresses into mailto links", () => {
-      const output = contentInsertionUtils.cleanUrl("ethan@instructure.com");
-      assert.equal(output, "mailto:ethan@instructure.com");
-    });
+    it('turns email addresses into mailto links', () => {
+      const output = contentInsertionUtils.cleanUrl('ethan@instructure.com')
+      assert.equal(output, 'mailto:ethan@instructure.com')
+    })
 
-    it("adding a protocol to unprotocoled addresses", () => {
-      const input = "www.example.com";
-      const output = contentInsertionUtils.cleanUrl(input);
-      assert.equal(output, "http://" + input);
-    });
+    it('adding a protocol to unprotocoled addresses', () => {
+      const input = 'www.example.com'
+      const output = contentInsertionUtils.cleanUrl(input)
+      assert.equal(output, 'http://' + input)
+    })
 
-    it("doesnt mailto links with @ in them", () => {
+    it('doesnt mailto links with @ in them', () => {
       const url =
-        "https://www.google.com/maps/place/331+E+Winchester+St,+Murray,+UT+84107/@40.633021,-111.880836,17z/data=!3m1!4b1!4m2!3m1!1s0x875289b8a03ae74d:0x2e83de307059e47d";
-      const output = contentInsertionUtils.cleanUrl(url);
-      assert.equal(output, url);
-    });
-  });
-});
+        'https://www.google.com/maps/place/331+E+Winchester+St,+Murray,+UT+84107/@40.633021,-111.880836,17z/data=!3m1!4b1!4m2!3m1!1s0x875289b8a03ae74d:0x2e83de307059e47d'
+      const output = contentInsertionUtils.cleanUrl(url)
+      assert.equal(output, url)
+    })
+  })
+})

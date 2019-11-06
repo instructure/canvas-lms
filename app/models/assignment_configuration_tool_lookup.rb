@@ -55,7 +55,7 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
         "account_id: #{account.id}, handler_id: #{message_handler.id}"
       end
       Assignment.active.where(
-        context_id: Course.not_deleted.where(account: account).pluck(:id)
+        context_id: Course.not_deleted.where(root_account: account).pluck(:id)
       ).find_in_batches do |assignments|
         recreate_subscriptions(message_handler, assignments)
       end

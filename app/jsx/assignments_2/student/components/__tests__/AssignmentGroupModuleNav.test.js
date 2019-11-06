@@ -17,35 +17,32 @@
  */
 
 import AssignmentGroupModuleNav from '../AssignmentGroupModuleNav'
-import {mockAssignment} from '../../test-utils'
+import {mockAssignment} from '../../mocks'
 import React from 'react'
 import {render} from '@testing-library/react'
 
 describe('AssignmentGroupModuleNav', () => {
-  it('renders module and assignment group links correctly', () => {
-    const assignment = mockAssignment({
-      assignmentGroup: {name: 'Test assignmentGroup'},
-      modules: [{id: '1', name: 'Test Module'}],
-      env: {
-        assignmentUrl: 'testassignmentgrouplink',
-        moduleUrl: 'testmodulelink'
-      }
+  it('renders module and assignment group links correctly', async () => {
+    const assignment = await mockAssignment({
+      Assignment: {modules: [{}]}
     })
     const {container, getByTestId} = render(<AssignmentGroupModuleNav assignment={assignment} />)
 
     const moduleLink = getByTestId('module-link')
     const assignmentGroupLink = getByTestId('assignmentgroup-link')
 
-    expect(moduleLink).toContainElement(container.querySelector('a[href="testmodulelink"]'))
+    expect(moduleLink).toContainElement(container.querySelector('a[href="mocked-module-url"]'))
     expect(assignmentGroupLink).toContainElement(
-      container.querySelector('a[href="testassignmentgrouplink"]')
+      container.querySelector('a[href="mocked-assignment-url"]')
     )
   })
 
-  it('renders module and assignment group text correctly', () => {
-    const assignment = mockAssignment({
-      modules: [{id: '1', name: 'Test Module'}],
-      assignmentGroup: {name: 'Test assignmentGroup'}
+  it('renders module and assignment group text correctly', async () => {
+    const assignment = await mockAssignment({
+      Assignment: {
+        modules: [{name: 'Test Module'}],
+        assignmentGroup: {name: 'Test assignmentGroup'}
+      }
     })
     const {getByTestId, getByText} = render(<AssignmentGroupModuleNav assignment={assignment} />)
 
@@ -56,10 +53,12 @@ describe('AssignmentGroupModuleNav', () => {
     expect(assignmentGroupLink).toContainElement(getByText('Test assignmentGroup'))
   })
 
-  it('will not render module container if not present', () => {
-    const assignment = mockAssignment({
-      modules: [],
-      assignmentGroup: {name: 'Test assignmentGroup'}
+  it('will not render module container if not present', async () => {
+    const assignment = await mockAssignment({
+      Assignment: {
+        modules: [],
+        assignmentGroup: {name: 'Test assignmentGroup'}
+      }
     })
     const {getByTestId, getByText, queryByTestId} = render(
       <AssignmentGroupModuleNav assignment={assignment} />
@@ -72,10 +71,12 @@ describe('AssignmentGroupModuleNav', () => {
     expect(assignmentGroupLink).toContainElement(getByText('Test assignmentGroup'))
   })
 
-  it('will not render assignment group container if not present', () => {
-    const assignment = mockAssignment({
-      modules: [{id: '1', name: 'Test Module'}],
-      assignmentGroup: null
+  it('will not render assignment group container if not present', async () => {
+    const assignment = await mockAssignment({
+      Assignment: {
+        modules: [{name: 'Test Module'}],
+        assignmentGroup: null
+      }
     })
     const {getByTestId, getByText, queryByTestId} = render(
       <AssignmentGroupModuleNav assignment={assignment} />
@@ -88,18 +89,21 @@ describe('AssignmentGroupModuleNav', () => {
     expect(assignmentGroupLink).toBeNull()
   })
 
-  it('will render nothing if null props provided', () => {
-    const assignment = mockAssignment({modules: [], assignmentGroup: null})
+  it('will render nothing if null props provided', async () => {
+    const assignment = await mockAssignment({
+      Assignment: {modules: [], assignmentGroup: null}
+    })
     const {queryByTestId} = render(<AssignmentGroupModuleNav assignment={assignment} />)
 
     expect(queryByTestId('module-link')).toBeNull()
     expect(queryByTestId('assignmentgroup-link')).toBeNull()
   })
 
-  it('renders multiple modules', () => {
-    const assignment = mockAssignment({
-      modules: [{id: '1', name: 'Test Module 1'}, {id: '2', name: 'Test Module 2'}],
-      assignmentGroup: null
+  it('renders multiple modules', async () => {
+    const assignment = await mockAssignment({
+      Assignment: {
+        modules: [{name: 'Test Module 1'}, {name: 'Test Module 2'}]
+      }
     })
     const {getAllByTestId, getByText} = render(<AssignmentGroupModuleNav assignment={assignment} />)
 
@@ -109,15 +113,11 @@ describe('AssignmentGroupModuleNav', () => {
     expect(modules[1]).toContainElement(getByText('Test Module 2'))
   })
 
-  it('limits the maximum number of modules rendered', () => {
-    const assignment = mockAssignment({
-      modules: [
-        {id: '1', name: 'Test Module 1'},
-        {id: '2', name: 'Test Module 2'},
-        {id: '3', name: 'Test Module 3'},
-        {id: '4', name: 'Test Module 4'}
-      ],
-      assignmentGroup: null
+  it('limits the maximum number of modules rendered', async () => {
+    const assignment = await mockAssignment({
+      Assignment: {
+        modules: [{}, {}, {}, {}]
+      }
     })
     const {getAllByTestId, getByTestId, getByText} = render(
       <AssignmentGroupModuleNav assignment={assignment} />
@@ -125,9 +125,6 @@ describe('AssignmentGroupModuleNav', () => {
 
     const modules = getAllByTestId('module-link')
     expect(modules.length).toEqual(2)
-    expect(modules[0]).toContainElement(getByText('Test Module 1'))
-    expect(modules[1]).toContainElement(getByText('Test Module 2'))
-
     const moreModules = getByTestId('more-module-link')
     expect(moreModules).toContainElement(getByText('More Modules'))
   })

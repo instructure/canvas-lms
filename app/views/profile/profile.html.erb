@@ -94,6 +94,22 @@
       <span id="hints_sortable_name" class="edit_or_show_data data_description"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
     </td>
   </tr>
+  <%# even if @domain_root_account.settings[:can_add_pronouns] is false, we still want to let someone that has pronouns set to see this so they can unset them  %>
+  <% if @user.pronouns || @domain_root_account.settings[:can_add_pronouns] %>
+    <tr>
+      <th scope="row"><%= f.blabel :pronouns, :en => "Pronouns" %></th>
+      <td>
+        <span id="pronouns" class="<%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%= @user.pronouns || t("None") %></span>
+        <span class="edit_data">
+          <%= f.select(:pronouns, options_for_select(([[t("None"), '']] + @domain_root_account.pronouns), @user.pronouns) ) %>
+        </span>
+        <span class="edit_or_show_data data_description">
+          <br/>
+          <%= t("These pronouns will appear after your name when shown in the UI") %>
+        </span>
+      </td>
+    </tr>
+  <% end %>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
   <% if active_email_channels.length > 1 %>
     <tr>

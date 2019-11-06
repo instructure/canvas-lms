@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {submitContentItem, recordEulaAgreement, verifyPledgeIsChecked} from 'submit_assignment_helper'
+import {
+  submitContentItem,
+  recordEulaAgreement,
+  verifyPledgeIsChecked
+} from 'submit_assignment_helper'
 import $ from 'jquery'
 
 const formHtml = `\
@@ -188,7 +192,8 @@ test('returns false if the checkbox exists and is not checked', () => {
 })
 
 test('alerts the user is the checkbox is not checked', () => {
-  const errorMessage = 'You must agree to the submission pledge before you can submit this assignment.'
+  const errorMessage =
+    'You must agree to the submission pledge before you can submit this assignment.'
 
   const alertSpy = sinon.spy()
   const original_alert = window.alert

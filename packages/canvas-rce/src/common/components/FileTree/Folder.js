@@ -16,42 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 
-import React, { Component } from "react";
-import File from "./File";
-import Loading from "../Loading";
-import { css } from "aphrodite";
-import styles from "./styles";
-import { IconMiniArrowDownLine, IconMiniArrowEndLine, IconFolderLine } from '@instructure/ui-icons'
+import React, {Component} from 'react'
+import File from './File'
+import Loading from '../Loading'
+import {css} from 'aphrodite'
+import styles from './styles'
+import {IconMiniArrowDownLine, IconMiniArrowEndLine, IconFolderLine} from '@instructure/ui-icons'
 
 export default class Folder extends Component {
   handleToggle = () => {
-    const { onToggle, folder } = this.props;
+    const {onToggle, folder} = this.props
     if (onToggle) {
-      onToggle(folder.id);
+      onToggle(folder.id)
     }
-  };
+  }
 
   files() {
-    return this.props.folder.fileIds
-      .map(id => this.props.files[id])
-      .filter(file => file != null);
+    return this.props.folder.fileIds.map(id => this.props.files[id]).filter(file => file != null)
   }
 
   subFolders() {
     return this.props.folder.folderIds
       .map(id => this.props.folders[id])
-      .filter(folder => folder != null);
+      .filter(folder => folder != null)
   }
 
   toggleIcon() {
-    const { expanded } = this.props.folder;
-    return expanded ? <IconMiniArrowDownLine /> : <IconMiniArrowEndLine />;
+    const {expanded} = this.props.folder
+    return expanded ? <IconMiniArrowDownLine /> : <IconMiniArrowEndLine />
   }
 
   render() {
-    const { folders, folder, files, onSelect, onToggle } = this.props;
+    const {folders, folder, files, onSelect, onToggle} = this.props
     return (
       <div className={css(styles.node)}>
         <button
@@ -83,10 +81,9 @@ export default class Folder extends Component {
           </ul>
         )}
 
-        {folder.expanded &&
-          folder.loading && <Loading className={css(styles.loading)} />}
+        {folder.expanded && folder.loading && <Loading className={css(styles.loading)} />}
       </div>
-    );
+    )
   }
 }
 
@@ -96,7 +93,7 @@ const folderPropType = PropTypes.shape({
   loading: PropTypes.bool,
   fileIds: PropTypes.arrayOf(PropTypes.number),
   folderIds: PropTypes.arrayOf(PropTypes.number)
-});
+})
 
 Folder.propTypes = {
   folders: PropTypes.objectOf(folderPropType),
@@ -104,9 +101,9 @@ Folder.propTypes = {
   folder: folderPropType.isRequired,
   onToggle: PropTypes.func,
   onSelect: File.propTypes.onSelect
-};
+}
 
 Folder.defaultProps = {
   files: [],
   folders: []
-};
+}

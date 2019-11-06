@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/nn.json";
+import formatMessage from '../format-message'
+import locale from '../../locales/nn.json'
 
-formatMessage.addLocale({ nn: locale });
+formatMessage.addLocale({nn: locale})

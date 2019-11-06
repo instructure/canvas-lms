@@ -19,25 +19,28 @@
 import $ from 'jquery'
 import {firstNameFirst, lastNameFirst, nameParts} from './user_utils'
 
-$(function () {
-  var $short_name = $('input[name="user[short_name]"]')
+$(function() {
+  const $short_name = $('input[name="user[short_name]"]')
   // Sometimes user[name] is used for search forms on the same page as edit forms;
   // so find the name by starting with the short_name
-  var $name = $short_name.parents('form').find('input[name="user[name]"]');
-  var $sortable_name = $('input[name="user[sortable_name]"]');
-  var prior_name = $name.attr('value');
+  const $name = $short_name.parents('form').find('input[name="user[name]"]')
+  const $sortable_name = $('input[name="user[sortable_name]"]')
+  let prior_name = $name.attr('value')
   $name.keyup(function() {
-    var name = $name.attr('value');
-    var sortable_name = $sortable_name.attr('value');
-    var sortable_name_parts = nameParts(sortable_name);
-    if (jQuery.trim(sortable_name) === '' || firstNameFirst(sortable_name_parts) === $.trim(prior_name)) {
-      var parts = nameParts(name, sortable_name_parts[1]);
-      $sortable_name.attr('value', lastNameFirst(parts));
+    const name = $name.attr('value')
+    const sortable_name = $sortable_name.attr('value')
+    const sortable_name_parts = nameParts(sortable_name)
+    if (
+      jQuery.trim(sortable_name) === '' ||
+      firstNameFirst(sortable_name_parts) === $.trim(prior_name)
+    ) {
+      const parts = nameParts(name, sortable_name_parts[1])
+      $sortable_name.attr('value', lastNameFirst(parts))
     }
-    var short_name = $short_name.attr('value');
+    const short_name = $short_name.attr('value')
     if (jQuery.trim(short_name) === '' || short_name === prior_name) {
-      $short_name.attr('value', name);
+      $short_name.attr('value', name)
     }
-    prior_name = $(this).attr('value');
-  });
-});
+    prior_name = $(this).attr('value')
+  })
+})

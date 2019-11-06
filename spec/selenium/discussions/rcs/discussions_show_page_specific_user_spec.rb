@@ -143,7 +143,7 @@ describe "discussions" do
       let(:topic) { teacher_topic }
 
       before(:each) do
-        resize_screen_to_normal
+
         user_session(teacher)
       end
 

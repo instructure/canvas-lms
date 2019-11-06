@@ -223,7 +223,7 @@ describe Login::CasController do
     account_with_cas(account: Account.default)
 
     user_with_pseudonym(active_all: 1, username: 'user')
-    @user.otp_secret_key = ROTP::Base32.random_base32
+    @user.otp_secret_key = ROTP::Base32.random
     @user.save!
 
     stubby("yes\nuser\n")

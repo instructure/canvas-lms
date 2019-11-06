@@ -102,6 +102,19 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         deepEqual(filter.optionLabels.slice(1), ['Item 1', 'Item 2'])
       })
 
+      QUnit.module('when sortAlphabetically is enabled', hooks => {
+        hooks.beforeEach(() => {
+          props.sortAlphabetically = true
+          props.items = [{id: '2', name: 'Item 2'}, {id: '1', name: 'Item 1'}]
+        })
+
+        test('labels each item option using the related item .name in alphabetical order', () => {
+          renderComponent()
+          filter.clickToExpand()
+          deepEqual(filter.optionLabels.slice(1), ['Item 1', 'Item 2'])
+        })
+      })
+
       QUnit.module('when using option groups', hooks => {
         hooks.beforeEach(() => {
           props.items = [

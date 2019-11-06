@@ -26,9 +26,7 @@ QUnit.module('PostAssignmentGradesTray PostTypes', suiteHooks => {
   let context
 
   function getLabel(text) {
-    return [...$container.querySelectorAll('label')].find($label =>
-      $label.textContent === text
-    )
+    return [...$container.querySelectorAll('label')].find($label => $label.textContent === text)
   }
 
   function getGradedPostType() {

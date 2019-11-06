@@ -22,7 +22,7 @@ import {Submission} from './Submission'
 import {SubmissionComment} from './SubmissionComment'
 import {SubmissionDraft} from './SubmissionDraft'
 
-export const MutationDefaultMocks = {
+export const DefaultMocks = {
   CreateSubmissionCommentPayload: () => ({errors: null}),
   CreateSubmissionDraftPayload: () => ({errors: null}),
   CreateSubmissionPayload: () => ({errors: null}),
@@ -124,6 +124,9 @@ export const MARK_SUBMISSION_COMMENT_READ = gql`
     markSubmissionCommentsRead(
       input: {submissionCommentIds: $commentIds, submissionId: $submissionId}
     ) {
+      submissionComments {
+        _id
+      }
       errors {
         ...Error
       }

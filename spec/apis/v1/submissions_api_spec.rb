@@ -741,7 +741,8 @@ describe 'Submissions API', type: :request do
       "id" => @student.id,
       "display_name" => "User",
       "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}",
-      "avatar_image_url" => User.avatar_fallback_url(nil, request)
+      "avatar_image_url" => User.avatar_fallback_url(nil, request),
+      "pronouns" => nil
     })
   end
 
@@ -844,9 +845,10 @@ describe 'Submissions API', type: :request do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => quiz.assignment.id.to_s },
           { :include => %w(submission_history) })
-
     expect(json.first['submission_history'].count).to eq 2
     expect(json.first['submission_history'].first.include? "submission_data").to be_truthy
+    expect(json.first['submission_history'][0]['preview_url']).to include '&version=2'
+    expect(json.first['submission_history'][1]['preview_url']).to include '&version=1'
   end
 
   it "returns the correct submitted_at date for each quiz submission" do
@@ -926,7 +928,8 @@ describe 'Submissions API', type: :request do
               "id" => @teacher.id,
               "display_name" => "User",
               "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-              "avatar_image_url" => User.avatar_fallback_url(nil, request)
+              "avatar_image_url" => User.avatar_fallback_url(nil, request),
+              "pronouns" => nil
            },
            "author_name"=>"User",
            "id" => comment.id,
@@ -1096,7 +1099,6 @@ describe 'Submissions API', type: :request do
              "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser",
-             "workflow_state" => "pending_upload",
              "upload_status" => "success",
              "id" => sub1.attachments.first.id,
              "uuid" => sub1.attachments.first.uuid,
@@ -1197,7 +1199,6 @@ describe 'Submissions API', type: :request do
                 "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser",
-                "workflow_state" => "pending_upload",
                 "upload_status" => "success",
                 "id" => sub1.attachments.first.id,
                 "uuid" => sub1.attachments.first.uuid,
@@ -1254,7 +1255,8 @@ describe 'Submissions API', type: :request do
              "id" => @teacher.id,
              "display_name" => "User",
              "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-             "avatar_image_url" => User.avatar_fallback_url(nil, request)
+             "avatar_image_url" => User.avatar_fallback_url(nil, request),
+             "pronouns" => nil
            },
            "author_name"=>"User",
            "id"=>comment.id,
@@ -1312,7 +1314,6 @@ describe 'Submissions API', type: :request do
               {"content-type" => "image/png",
                "display_name" => "snapshot.png",
                "filename" => "snapshot.png",
-               "workflow_state" => "pending_upload",
                "upload_status" => "success",
                "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
                "id" => sub2a1.id,
@@ -1351,7 +1352,6 @@ describe 'Submissions API', type: :request do
          [{"content-type" => "image/png",
            "display_name" => "snapshot.png",
            "filename" => "snapshot.png",
-           "workflow_state" => "pending_upload",
            "upload_status" => "success",
            "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
            "id" => sub2a1.id,
@@ -4724,6 +4724,7 @@ describe 'Submissions API', type: :request do
           [{"id"=>@student1.id,
             "display_name"=>"User",
             "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
+            "pronouns" => nil,
             "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student1.id}",
             "in_moderation_set"=>true,
             "selected_provisional_grade_id"=>pg.id,
@@ -4742,6 +4743,7 @@ describe 'Submissions API', type: :request do
            {"id"=>@student2.id,
             "display_name"=>"User",
             "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
+            "pronouns" => nil,
             "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student2.id}",
             "in_moderation_set"=>false,
             "selected_provisional_grade_id"=>nil,

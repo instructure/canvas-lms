@@ -17,14 +17,28 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import ReceivedContentView from 'jsx/content_shares/ReceivedContentView'
 import {assignmentShare} from 'jsx/content_shares/__tests__/test-utils'
+import fetchMock from 'fetch-mock'
 
 jest.mock('jsx/shared/effects/useFetchApi')
 
 describe('view of received content', () => {
+  let liveRegion
+
+  beforeAll(() => {
+    liveRegion = document.createElement('div')
+    liveRegion.id = 'flash_screenreader_holder'
+    liveRegion.setAttribute('role', 'alert')
+    document.body.appendChild(liveRegion)
+  })
+
+  afterAll(() => {
+    if (liveRegion) liveRegion.remove()
+  })
+
   it('renders spinner while loading', () => {
     useFetchApi.mockImplementationOnce(({loading}) => loading(true))
     const {getByText} = render(<ReceivedContentView />)
@@ -67,6 +81,37 @@ describe('view of received content', () => {
     }).toThrow('Retrieval of Received Shares failed')
   })
 
+  it('shows pagination when the link header indicates there are multiple pages', () => {
+    useFetchApi.mockImplementationOnce(({success, meta}) => {
+      const link = {
+        last: {page: '5', url: 'last'}
+      }
+      meta({link})
+      success([assignmentShare])
+    })
+    const {getByText} = render(<ReceivedContentView />)
+
+    // other numbers can be left out due to compact representation
+    const expectedNums = ['1', '2', '3', '4', '5']
+    expectedNums.forEach(n => {
+      expect(getByText(n)).toBeInTheDocument()
+    })
+  })
+
+  it('updates the current page when a page number is clicked', () => {
+    useFetchApi.mockImplementationOnce(({success, meta}) => {
+      const link = {
+        last: {page: '5', url: 'last'}
+      }
+      meta({link})
+      success([assignmentShare])
+    })
+    const {getByText} = render(<ReceivedContentView />)
+    fireEvent.click(getByText('3'))
+    const lastFetchCall = useFetchApi.mock.calls.pop()
+    expect(lastFetchCall[0]).toMatchObject({params: {page: 3}})
+  })
+
   it('displays a preview modal when requested', () => {
     const shares = [assignmentShare]
     useFetchApi.mockImplementationOnce(({loading, success}) => {
@@ -77,5 +122,79 @@ describe('view of received content', () => {
     fireEvent.click(getByText(/manage options/i))
     fireEvent.click(getByText('Preview'))
     expect(document.querySelector('iframe')).toBeInTheDocument()
+  })
+
+  it('displays the import tray when requested', async () => {
+    const shares = [assignmentShare]
+    useFetchApi.mockImplementationOnce(({loading, success}) => {
+      loading(false)
+      success(shares)
+    })
+    const {getByText, findByText} = render(<ReceivedContentView />)
+    fireEvent.click(getByText(/manage options/i))
+    fireEvent.click(getByText('Import'))
+    expect(await findByText(/select a course/i)).toBeInTheDocument()
+  })
+
+  describe('remove', () => {
+    const oldWindowConfirm = window.confirm
+
+    beforeEach(() => {
+      window.confirm = jest.fn()
+    })
+
+    afterEach(() => {
+      window.confirm = oldWindowConfirm
+      fetchMock.restore()
+    })
+
+    it('removes a content share when requested', async () => {
+      const shares = [assignmentShare]
+      useFetchApi.mockImplementationOnce(({loading, success}) => {
+        loading(false)
+        success(shares)
+      })
+      fetchMock.mock(`path:/api/v1/users/self/content_shares/${assignmentShare.id}`, 200, {
+        method: 'DELETE'
+      })
+      window.confirm.mockImplementation(() => true)
+      const {getByText, queryByText} = render(<ReceivedContentView />)
+      fireEvent.click(getByText(/manage options/i))
+      fireEvent.click(getByText('Remove'))
+      await act(() => fetchMock.flush(true))
+      expect(queryByText(assignmentShare.name)).toBeNull()
+    })
+
+    it('does nothing when user declines to remove', async () => {
+      const shares = [assignmentShare]
+      useFetchApi.mockImplementationOnce(({loading, success}) => {
+        loading(false)
+        success(shares)
+      })
+      window.confirm.mockImplementation(() => false)
+      jest.spyOn(window, 'fetch')
+      const {getByText} = render(<ReceivedContentView />)
+      fireEvent.click(getByText(/manage options/i))
+      fireEvent.click(getByText('Remove'))
+      expect(window.fetch).not.toHaveBeenCalled()
+      expect(getByText(assignmentShare.name)).toBeInTheDocument()
+    })
+
+    it('displays an error when the fetch fails', async () => {
+      const shares = [assignmentShare]
+      useFetchApi.mockImplementationOnce(({loading, success}) => {
+        loading(false)
+        success(shares)
+      })
+      fetchMock.mock(`path:/api/v1/users/self/content_shares/${assignmentShare.id}`, 401, {
+        method: 'DELETE'
+      })
+      window.confirm.mockImplementation(() => true)
+      const {getByText, getAllByText} = render(<ReceivedContentView />)
+      fireEvent.click(getByText(/manage options/i))
+      fireEvent.click(getByText('Remove'))
+      await act(() => fetchMock.flush(true))
+      expect(getAllByText(/401/)[0]).toBeInTheDocument()
+    })
   })
 })

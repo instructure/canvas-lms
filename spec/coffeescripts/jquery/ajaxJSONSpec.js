@@ -104,7 +104,7 @@ test('returns true if status is 401 and message is unauthenticated', () => {
 let abortXhr
 
 QUnit.module('$.ajaxJSON.abortRequest', {
-  setup () {
+  setup() {
     abortXhr = {
       readyState: 0,
       abort: sinon.spy()
@@ -143,7 +143,7 @@ test('does not call success or error handler', () => {
   const spy = sinon.spy()
   $.ajaxJSON('/api', 'GET', {}, spy, spy)
   $.ajaxJSON.abortRequest(xhr)
-  xhr.readyStateChange(sinon.FakeXMLHttpRequest.DONE);
+  xhr.readyStateChange(sinon.FakeXMLHttpRequest.DONE)
   fakeXhr.restore()
   ok(spy.notCalled)
 })

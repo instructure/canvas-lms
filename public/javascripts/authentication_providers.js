@@ -19,39 +19,40 @@
 import $ from 'jquery'
 import 'jquery.instructure_misc_helpers'
 
-  var authenticationProviders = {
-    hideAllNewAuthTypeForms: function(){
-      var newForms = document.querySelectorAll(".auth-form-container--new");
-      Array.prototype.forEach.call(newForms, (el, id) => {
-        el.style.display = "none";
-      });
-    },
+var authenticationProviders = {
+  hideAllNewAuthTypeForms() {
+    const newForms = document.querySelectorAll('.auth-form-container--new')
+    Array.prototype.forEach.call(newForms, (el, id) => {
+      el.style.display = 'none'
+    })
+  },
 
-    showFormFor: function(authType){
-      var formId = authType + "_form";
-      var form =  document.getElementById(formId);
-      if(form !== null){
-        form.style.display = "";
-        setTimeout(() => {
-          $(form).find(":focusable:first").focus();
-          form.scrollIntoView();
-        }, 100);
-      }
-    },
-
-    hideNoAuthMessage: function(){
-      var noAuthMessage = document.getElementById("no_auth");
-      if(noAuthMessage !== null){
-        noAuthMessage.style.display = "none";
-      }
-    },
-
-    changedAuthType: function(authType){
-      authenticationProviders.hideNoAuthMessage();
-      authenticationProviders.hideAllNewAuthTypeForms();
-      authenticationProviders.showFormFor(authType);
+  showFormFor(authType) {
+    const formId = authType + '_form'
+    const form = document.getElementById(formId)
+    if (form !== null) {
+      form.style.display = ''
+      setTimeout(() => {
+        $(form)
+          .find(':focusable:first')
+          .focus()
+        form.scrollIntoView()
+      }, 100)
     }
-  };
+  },
 
-  export default authenticationProviders;
+  hideNoAuthMessage() {
+    const noAuthMessage = document.getElementById('no_auth')
+    if (noAuthMessage !== null) {
+      noAuthMessage.style.display = 'none'
+    }
+  },
 
+  changedAuthType(authType) {
+    authenticationProviders.hideNoAuthMessage()
+    authenticationProviders.hideAllNewAuthTypeForms()
+    authenticationProviders.showFormFor(authType)
+  }
+}
+
+export default authenticationProviders

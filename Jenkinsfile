@@ -24,13 +24,13 @@ def withGerritCredentials = { Closure command ->
   ]) { command() }
 }
 
-def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null ->
+def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null, String sourceRef = null ->
   withGerritCredentials({ ->
     println "Fetching ${repo} plugin"
     sh """
       mkdir -p ${path}/${customRepoDestination ?: repo}
       GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-        git archive --remote=ssh://$GERRIT_URL/${repo} master ${sourcePath == null ? '' : sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
+        git archive --remote=ssh://$GERRIT_URL/${repo} ${sourceRef == null ? 'master' : sourceRef} ${sourcePath == null ? '' : sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
     """
   })
 }
@@ -91,7 +91,14 @@ pipeline {
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
             println "Plugin list: ${gems}"
             /* fetch plugins */
-            gems.each { gem -> fetchFromGerrit(gem, 'gems/plugins') }
+            gems.each { gem ->
+              if (env.GERRIT_PROJECT == gem) {
+                /* this is the commit we're testing */
+                fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
+              } else {
+                fetchFromGerrit(gem, 'gems/plugins')
+              }
+            }
             fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             sh '''
               mv gerrit_builder/canvas-lms/config/* config/
@@ -182,82 +189,85 @@ pipeline {
             }
           }
         }
-
-        stage('Selenium Chrome') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'selenium-chrome',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Vendored Gems') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'vendored-gems',
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Rspec') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'rspec',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Selenium Performance Chrome') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'selenium-performance-chrome',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Contract Tests') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'contract-tests',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Frontend') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'frontend',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Xbrowser') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'xbrowser',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
+/*
+ *  Don't run these on all patch sets until we have them ready to report results.
+ *  Uncomment stage to run when developing.
+ *       stage('Selenium Chrome') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'selenium-chrome',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Vendored Gems') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'vendored-gems',
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Rspec') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'rspec',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Selenium Performance Chrome') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'selenium-performance-chrome',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Contract Tests') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'contract-tests',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Frontend') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'frontend',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *       }
+ *
+ *       stage('Xbrowser') {
+ *         steps {
+ *           // propagate set to false until we can get tests passing
+ *           build(
+ *             job: 'xbrowser',
+ *             propagate: false,
+ *             parameters: build_parameters
+ *           )
+ *         }
+ *        }
+ */
       }
     }
 

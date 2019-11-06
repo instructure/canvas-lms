@@ -29,221 +29,200 @@ QUnit.module('ImageSearch View', {
   teardown: () => {
     $('#flash_screenreader_holder').remove()
   }
-});
+})
 
 const getDummySearchResults = () => {
-  const photos = [{
-    id: 'crazy_id_1',
-    alt: 'alt desc for photo 1',
-    description: "desc for photo 1",
-    raw_url: "url1"
-  },
-  {
-    id: 'crazy_id_2',
-    description: "desc for photo 2",
-    raw_url: "url2"
-  },
-  {
-    id: 'crazy_id_3',
-    description: null,
-    raw_url: "url3"
-  }];
+  const photos = [
+    {
+      id: 'crazy_id_1',
+      alt: 'alt desc for photo 1',
+      description: 'desc for photo 1',
+      raw_url: 'url1'
+    },
+    {
+      id: 'crazy_id_2',
+      description: 'desc for photo 2',
+      raw_url: 'url2'
+    },
+    {
+      id: 'crazy_id_3',
+      description: null,
+      raw_url: 'url3'
+    }
+  ]
 
-  return photos;
+  return photos
 }
 
 test('it renders', () => {
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
-  ok(imageSearch);
-});
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
+  ok(imageSearch)
+})
 
 test('it searches for images on input change', () => {
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
-  let called = false;
-  imageSearch.search = () => called = true;
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
+  let called = false
+  imageSearch.search = () => (called = true)
 
-  const searchInput = TestUtils.findRenderedDOMComponentWithTag(imageSearch, "input");
-  searchInput.value = "foos";
+  const searchInput = TestUtils.findRenderedDOMComponentWithTag(imageSearch, 'input')
+  searchInput.value = 'foos'
 
   const fakeInputEvent = {
     target: searchInput,
     preventDefault: () => {}
-  };
+  }
 
-  imageSearch.handleInput(fakeInputEvent);
+  imageSearch.handleInput(fakeInputEvent)
 
-  ok(called, 'search was called');
-});
+  ok(called, 'search was called')
+})
 
 test('it clears search results when input is cleared', () => {
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
-  let called = false;
-  imageSearch.clearResults = () => called = true;
-  imageSearch.search = () => {}; // stub out so as not to hit actual search api
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
+  let called = false
+  imageSearch.clearResults = () => (called = true)
+  imageSearch.search = () => {} // stub out so as not to hit actual search api
 
-  const searchInput = TestUtils.findRenderedDOMComponentWithTag(imageSearch, "input");
-  searchInput.value = "";
+  const searchInput = TestUtils.findRenderedDOMComponentWithTag(imageSearch, 'input')
+  searchInput.value = ''
 
   const fakeInputEvent = {
     target: searchInput,
     preventDefault: () => {}
-  };
+  }
 
-  imageSearch.handleInput(fakeInputEvent);
+  imageSearch.handleInput(fakeInputEvent)
 
-  ok(called, 'clearResults was called');
-});
+  ok(called, 'clearResults was called')
+})
 
 test('it hides previous and next when there is only one page of results', assert => {
   const done = assert.async()
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
 
-  const searchResults = getDummySearchResults();
+  const searchResults = getDummySearchResults()
 
   imageSearch.setState({searchResults, prevUrl: null, nextUrl: null}, () => {
     ok(
       Boolean(!imageSearch._imageSearchControlNext && !imageSearch._imageSearchControlPrev),
       'next and previous are not present'
-    );
-    done();
-  });
-});
+    )
+    done()
+  })
+})
 
 test('it only renders next page when there is a next-page', assert => {
   const done = assert.async()
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
 
-  const searchResults = getDummySearchResults();
+  const searchResults = getDummySearchResults()
 
-  imageSearch.setState({searchResults, prevUrl: null, nextUrl: "http://next"}, () => {
+  imageSearch.setState({searchResults, prevUrl: null, nextUrl: 'http://next'}, () => {
     ok(
-      Boolean(imageSearch._imageSearchControlNext &&
-        !imageSearch._imageSearchControlPrev),
+      Boolean(imageSearch._imageSearchControlNext && !imageSearch._imageSearchControlPrev),
       'next button is present'
-    );
-    done();
-  });
-});
+    )
+    done()
+  })
+})
 
 test('it only renders previous when there is a previous-page', assert => {
   const done = assert.async()
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
 
-  const searchResults = getDummySearchResults();
+  const searchResults = getDummySearchResults()
 
-  imageSearch.setState({searchResults, prevUrl: "http://prev", nextUrl: null}, () => {
+  imageSearch.setState({searchResults, prevUrl: 'http://prev', nextUrl: null}, () => {
     ok(
-      Boolean(!imageSearch._imageSearchControlNext &&
-        imageSearch._imageSearchControlPrev),
-      'previous button is present');
-    done();
-  });
-});
+      Boolean(!imageSearch._imageSearchControlNext && imageSearch._imageSearchControlPrev),
+      'previous button is present'
+    )
+    done()
+  })
+})
 
 test('it enables next and previous when there are both next and previous pages', assert => {
   const done = assert.async()
-  const image = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
+  const image = TestUtils.renderIntoDocument(<ImageSearch />)
 
-  const searchResults = getDummySearchResults();
+  const searchResults = getDummySearchResults()
 
-  image.setState({searchResults, prevUrl: "http://prev", nextUrl: "http://next"}, () => {
-    ok(Boolean(image._imageSearchControlNext && image._imageSearchControlPrev),
-      'next and previous are both present');
-    done();
-  });
-});
+  image.setState({searchResults, prevUrl: 'http://prev', nextUrl: 'http://next'}, () => {
+    ok(
+      Boolean(image._imageSearchControlNext && image._imageSearchControlPrev),
+      'next and previous are both present'
+    )
+    done()
+  })
+})
 
 test('it loads next page of results when next is clicked', assert => {
   const done = assert.async()
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
-  let called = false;
-  imageSearch.loadNextPage = () => called = true;
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
+  let called = false
+  imageSearch.loadNextPage = () => (called = true)
 
-  const searchResults = getDummySearchResults();
+  const searchResults = getDummySearchResults()
 
-  imageSearch.setState({searchResults, prevUrl: null, nextUrl: "http://next"}, () => {
-    TestUtils.Simulate.click(imageSearch._imageSearchControlNext);
-    ok(called, 'clicking next triggered next results action');
-    done();
-  });
-});
+  imageSearch.setState({searchResults, prevUrl: null, nextUrl: 'http://next'}, () => {
+    TestUtils.Simulate.click(imageSearch._imageSearchControlNext)
+    ok(called, 'clicking next triggered next results action')
+    done()
+  })
+})
 
 test('it loads previous page of results when previous is clicked', assert => {
   const done = assert.async()
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
-  let called = false;
-  imageSearch.loadPreviousPage = () => called = true;
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
+  let called = false
+  imageSearch.loadPreviousPage = () => (called = true)
 
-  const searchResults = getDummySearchResults();
+  const searchResults = getDummySearchResults()
 
-  imageSearch.setState({searchResults, prevUrl: "http://prev", nextUrl: null}, () => {
-    TestUtils.Simulate.click(imageSearch._imageSearchControlPrev);
-    ok(called, 'clicking previous triggered previous results action');
-    done();
-  });
-});
+  imageSearch.setState({searchResults, prevUrl: 'http://prev', nextUrl: null}, () => {
+    TestUtils.Simulate.click(imageSearch._imageSearchControlPrev)
+    ok(called, 'clicking previous triggered previous results action')
+    done()
+  })
+})
 
 test('it renders search results', assert => {
   const done = assert.async()
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
 
-  const searchResults = getDummySearchResults();
+  const searchResults = getDummySearchResults()
 
   imageSearch.setState({searchResults}, () => {
     strictEqual(
-      TestUtils.scryRenderedDOMComponentsWithClass(imageSearch, "ImageSearch__item").length,
+      TestUtils.scryRenderedDOMComponentsWithClass(imageSearch, 'ImageSearch__item').length,
       3,
       'rendered image search results'
-    );
-    done();
-  });
-});
+    )
+    done()
+  })
+})
 
 test('it shows text when no results found', assert => {
   const done = assert.async()
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  );
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
 
   imageSearch.setState({searchResults: [], searchTerm: 'lkjlkj', alert: 'failure'}, () => {
     strictEqual(
       TestUtils.findRenderedDOMComponentWithClass(imageSearch, 'ImageSearch__images').innerText,
       'No results found for lkjlkj',
       'rendered no search results'
-    );
-    done();
-  });
-});
+    )
+    done()
+  })
+})
 
 test('it shows appropriate alt text for results', assert => {
   const done = assert.async()
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  )
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
 
   const searchResults = getDummySearchResults()
   imageSearch.setState({searchResults, searchTerm: 'cats'}, () => {
-    const images = TestUtils.scryRenderedDOMComponentsWithClass(imageSearch, "ImageSearch__img")
+    const images = TestUtils.scryRenderedDOMComponentsWithClass(imageSearch, 'ImageSearch__img')
     strictEqual(images[0].alt, 'alt desc for photo 1')
     strictEqual(images[1].alt, 'desc for photo 2')
     strictEqual(images[2].alt, 'cats')
@@ -253,9 +232,7 @@ test('it shows appropriate alt text for results', assert => {
 
 test('it announces when search results are returned for screenreaders', assert => {
   const done = assert.async()
-  const imageSearch = TestUtils.renderIntoDocument(
-    <ImageSearch />
-  )
+  const imageSearch = TestUtils.renderIntoDocument(<ImageSearch />)
 
   const searchResults = getDummySearchResults()
   imageSearch.setState({searchResults, searchTerm: 'cats', alert: 'success'}, () => {

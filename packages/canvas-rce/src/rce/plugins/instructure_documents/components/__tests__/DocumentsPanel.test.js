@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import React from 'react'
 import {render} from '@testing-library/react'
 import DocumentsPanel from '../DocumentsPanel'
@@ -25,7 +24,10 @@ function getDocumentProps(contextType, docprops) {
   return {
     documents: {
       [contextType]: {
-        files: [], bookmark: null, isLoading: false, hasMore: false,
+        files: [],
+        bookmark: null,
+        isLoading: false,
+        hasMore: false,
         ...docprops
       }
     },
@@ -47,14 +49,14 @@ function renderComponent(props) {
 
 function makeDocuments(override) {
   return {
-    files: [1,2].map(i => {
+    files: [1, 2].map(i => {
       return {
         id: i,
         filename: `file${i}.txt`,
         content_type: 'text/plain',
         display_name: `file${i}`,
         href: `http://the.net/${i}`,
-        date: `2019-05-25T13:0${i}:00Z`,
+        date: `2019-05-25T13:0${i}:00Z`
       }
     }),
     bookmark: null,
@@ -84,7 +86,9 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
   })
 
   it('renders load more button if there is more', () => {
-    const {getByText} = renderComponent(getDocumentProps('course', makeDocuments({hasMore: true, bookmark: 'next.docs'})))
+    const {getByText} = renderComponent(
+      getDocumentProps('course', makeDocuments({hasMore: true, bookmark: 'next.docs'}))
+    )
 
     expect(getByText('Load More')).toBeInTheDocument()
   })
@@ -130,10 +134,9 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
     expect(getByText('Loading')).toBeInTheDocument()
   })
 
-
   it('shows spinner while loading more', () => {
     const {getByText} = renderComponent(
-      getDocumentProps('course', makeDocuments({isLoading: true, hasMore: true})),
+      getDocumentProps('course', makeDocuments({isLoading: true, hasMore: true}))
     )
 
     expect(getByText('Loading')).toBeInTheDocument()

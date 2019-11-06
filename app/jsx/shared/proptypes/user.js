@@ -18,18 +18,26 @@
 
 import {shape, string} from 'prop-types'
 
-const basicUser = shape({
+// corresponds to user_display_json in the Ruby json serializers
+const displayUser = shape({
   id: string.isRequired,
   display_name: string.isRequired,
-  avatar_image_url: string,
+  avatar_image_url: string
+})
+export default displayUser
+
+// corresponds to user_json in the Ruby json serializers
+export const basicUser = shape({
+  id: string.isRequired,
+  name: string.isRequired,
+  avatar_url: string,
   email: string
 })
-export default basicUser
 
 // we might add more comprehensive user shapes in the future
 export const author = shape({
   id: string.isRequired,
-  display_name: string.isRequired,
+  name: string.isRequired,
   avatar_image_url: string,
   html_url: string.isRequired
 })

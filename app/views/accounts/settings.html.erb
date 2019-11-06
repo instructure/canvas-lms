@@ -258,7 +258,6 @@
                     </tr>
                   <% end %>
                 <% end %>
-
                 <%= settings.fields_for :restrict_student_past_view do |r| %>
                   <% hash = @account.restrict_student_past_view %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
@@ -345,6 +344,36 @@
             <% end %>
           </fieldset>
         <% end %>
+        <% if !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:account_pronouns) %>
+          <fieldset>
+            <legend><%= t("Personal Pronouns") %></legend>
+            <%= f.fields_for :settings do |settings| %>
+              <%= settings.check_box :can_add_pronouns, :checked => @account.settings[:can_add_pronouns], class: "element_toggler", "aria-controls": "personal_pronouns_options" %>
+              <%= settings.label :can_add_pronouns, en: "Enable Personal Pronouns" %>
+              <div id="personal_pronouns_options" <%= hidden(true) unless @account.settings[:can_add_pronouns] %>>
+                <table class="formtable">
+                  <tbody>
+                    <% ((@account.pronouns.presence || Pronouns.default_pronouns) + [nil]).each do |pronouns| %>
+                      <tr class="pronouns_row <%= raw ' blank" style="display: none;' if pronouns.nil? %>">
+                        <td> <input type="text" name="account[pronouns][]" value="<%= pronouns %>"/></td>
+                        <td> <a href="#" title="<%= t("Remove Pronouns") %>" class="close" data-remove=".pronouns_row"><i class="icon-end standalone-icon"></i></a> </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+                <button
+                  type="button"
+                  class="Button"
+                  onclick="$('.pronouns_row.blank').clone().removeClass('blank').show().insertBefore('.pronouns_row.blank')"
+                >
+                  <i class='icon-add'></i>
+                  <%= t("Add pronouns option") %>
+                </button>
+              </div>
+            <% end %>
+          </fieldset>
+        <% end %>
+
         <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) %>
           <% TermsOfService.ensure_terms_for_account(@account) %>
           <% js_bundle :terms_of_service_modal%>

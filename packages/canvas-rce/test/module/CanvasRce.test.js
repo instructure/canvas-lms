@@ -16,66 +16,65 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import assert from "assert";
-import proxyquire from "proxyquire";
-import Bridge from "../../src/bridge";
-import sinon from "sinon";
-import ReactDOM from "react-dom";
+import React from 'react'
+import assert from 'assert'
+import proxyquire from 'proxyquire'
+import Bridge from '../../src/bridge'
+import sinon from 'sinon'
+import ReactDOM from 'react-dom'
 
 class fakeRCEWrapper extends React.Component {
   static displayName() {
-    return "FakeRCEWrapper";
+    return 'FakeRCEWrapper'
   }
 
   render() {
-    return null;
+    return null
   }
 }
 
-fakeRCEWrapper["@noCallThru"] = true;
+fakeRCEWrapper['@noCallThru'] = true
 
-const CanvasRce = proxyquire("../../src/rce/CanvasRce", {
-  "./RCEWrapper": fakeRCEWrapper,
-  "./tinyRCE": {
-    "@noCallThru": true,
-    DOM: { loadCSS: () => {} }
+const CanvasRce = proxyquire('../../src/rce/CanvasRce', {
+  './RCEWrapper': fakeRCEWrapper,
+  './tinyRCE': {
+    '@noCallThru': true,
+    DOM: {loadCSS: () => {}}
   },
-  "../../locales/index": { "@noCallThru": true }
-}).default;
+  '../../locales/index': {'@noCallThru': true}
+}).default
 
-describe("CanvasRce", () => {
-
-  let target;
+describe('CanvasRce', () => {
+  let target
 
   beforeEach(() => {
-    target = document.createElement("div");
-    document.body.appendChild(target);
-  });
+    target = document.createElement('div')
+    document.body.appendChild(target)
+  })
 
   const renderCanvasRce = props => {
     const mergedProps = {
       rceProps: {
-          editorOptions: () => {
-            return {};
-          },
-          textareaId: "someUniqueId",
-          language: "en"
+        editorOptions: () => {
+          return {}
         },
+        textareaId: 'someUniqueId',
+        language: 'en'
+      },
       ...props
-    };
-    ReactDOM.render(<CanvasRce {...mergedProps} />, target);
-  };
+    }
+    ReactDOM.render(<CanvasRce {...mergedProps} />, target)
+  }
 
   afterEach(() => {
-    Bridge.focusEditor(null);
-  });
+    Bridge.focusEditor(null)
+  })
 
-  it("bridges newly rendered editors", done => {
+  it('bridges newly rendered editors', done => {
     const renderCallback = rendered => {
-      assert.equal(Bridge.activeEditor(), rendered);
-      done();
-    };
-    renderCanvasRce({ renderCallback });
-  });
-});
+      assert.equal(Bridge.activeEditor(), rendered)
+      done()
+    }
+    renderCanvasRce({renderCallback})
+  })
+})

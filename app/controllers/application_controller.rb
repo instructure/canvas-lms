@@ -155,6 +155,7 @@ class ApplicationController < ActionController::Base
           k12: k12?,
           use_responsive_layout: use_responsive_layout?,
           use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
+          DIRECT_SHARE_ENABLED: @domain_root_account.try(:feature_enabled?, :direct_share),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -272,6 +273,7 @@ class ApplicationController < ActionController::Base
     }.merge(url_params)
 
     hash = {
+      :id => tool.id,
       :title => tool.label_for(type, I18n.locale),
       :base_url =>  polymorphic_url([context, :external_tool], url_params)
     }

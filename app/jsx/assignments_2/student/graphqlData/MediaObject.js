@@ -42,13 +42,15 @@ export const MediaObject = {
     id: string.isRequired,
     mediaSources: arrayOf(MediaSource.shape),
     mediaType: string,
+    mediaTracks: arrayOf(MediaTrack.shape),
     title: string
   })
 }
 
-export const MediaObjectDefaultMocks = {
+export const DefaultMocks = {
   MediaObject: () => ({
     mediaSources: [{}],
+    mediaTracks: [{}],
     mediaType: 'video',
     title: 'Mocked Video'
   })

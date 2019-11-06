@@ -347,59 +347,61 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def render_events_for_user(user, route_url)
-    scope = if @type == :assignment
-      assignment_scope(
-        user,
-        submission_types: params.fetch(:submission_types, []),
-        exclude_submission_types: params.fetch(:exclude_submission_types, [])
-      )
-    else
-      calendar_event_scope(user)
-    end
-
-    events = Api.paginate(scope, self, route_url)
-    ActiveRecord::Associations::Preloader.new.preload(events, :child_events) if @type == :event
-    if @type == :assignment
-      events = apply_assignment_overrides(events, user)
-      mark_submitted_assignments(user, events)
-      includes = Array(params[:include])
-      if includes.include?("submission")
-        submissions = Submission.active.where(assignment_id: events, user_id: user).
-          group_by(&:assignment_id)
+    Shackles.activate(:slave) do
+      scope = if @type == :assignment
+        assignment_scope(
+          user,
+          submission_types: params.fetch(:submission_types, []),
+          exclude_submission_types: params.fetch(:exclude_submission_types, [])
+        )
+      else
+        calendar_event_scope(user)
       end
-      # preload data used by assignment_json
-      ActiveRecord::Associations::Preloader.new.preload(events, :discussion_topic)
-      Shard.partition_by_shard(events) do |shard_events|
-        having_submission = Assignment.assignment_ids_with_submissions(shard_events.map(&:id))
-        shard_events.each do |event|
-          event.has_submitted_submissions = having_submission.include?(event.id)
+
+      events = Api.paginate(scope, self, route_url)
+      ActiveRecord::Associations::Preloader.new.preload(events, :child_events) if @type == :event
+      if @type == :assignment
+        events = apply_assignment_overrides(events, user)
+        mark_submitted_assignments(user, events)
+        includes = Array(params[:include])
+        if includes.include?("submission")
+          submissions = Submission.active.where(assignment_id: events, user_id: user).
+            group_by(&:assignment_id)
         end
+        # preload data used by assignment_json
+        ActiveRecord::Associations::Preloader.new.preload(events, :discussion_topic)
+        Shard.partition_by_shard(events) do |shard_events|
+          having_submission = Assignment.assignment_ids_with_submissions(shard_events.map(&:id))
+          shard_events.each do |event|
+            event.has_submitted_submissions = having_submission.include?(event.id)
+          end
 
-        having_student_submission = Submission.active.having_submission.
-            where(assignment_id: shard_events).
-            where.not(user_id: nil).
-            distinct.
-            pluck(:assignment_id).to_set
-        shard_events.each do |event|
-          event.has_student_submissions = having_student_submission.include?(event.id)
+          having_student_submission = Submission.active.having_submission.
+              where(assignment_id: shard_events).
+              where.not(user_id: nil).
+              distinct.
+              pluck(:assignment_id).to_set
+          shard_events.each do |event|
+            event.has_student_submissions = having_student_submission.include?(event.id)
+          end
         end
       end
-    end
 
-    if @errors.empty?
-      calendar_events, assignments = events.partition { |e| e.is_a?(CalendarEvent) }
-      ActiveRecord::Associations::Preloader.new.preload(calendar_events, [:context, :parent_event])
-      ActiveRecord::Associations::Preloader.new.preload(assignments, Api::V1::Assignment::PRELOADS)
-      ActiveRecord::Associations::Preloader.new.preload(assignments.map(&:context), [:account, :grading_period_groups, :enrollment_term])
+      if @errors.empty?
+        calendar_events, assignments = events.partition { |e| e.is_a?(CalendarEvent) }
+        ActiveRecord::Associations::Preloader.new.preload(calendar_events, [:context, :parent_event])
+        ActiveRecord::Associations::Preloader.new.preload(assignments, Api::V1::Assignment::PRELOADS)
+        ActiveRecord::Associations::Preloader.new.preload(assignments.map(&:context), [:account, :grading_period_groups, :enrollment_term])
 
-      json = events.map do |event|
-        subs = submissions[event.id] if submissions
-        sub = subs.sort_by(&:submitted_at).last if subs
-        event_json(event, user, session, {excludes: params[:excludes], submission: sub})
+        json = events.map do |event|
+          subs = submissions[event.id] if submissions
+          sub = subs.sort_by(&:submitted_at).last if subs
+          event_json(event, user, session, {excludes: params[:excludes], submission: sub})
+        end
+        render :json => json
+      else
+        render json: {errors: @errors.as_json}, status: :bad_request
       end
-      render :json => json
-    else
-      render json: {errors: @errors.as_json}, status: :bad_request
     end
   end
 

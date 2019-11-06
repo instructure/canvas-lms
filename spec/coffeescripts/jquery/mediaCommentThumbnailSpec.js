@@ -67,13 +67,15 @@ test('creates a thumbnail span with a background image URL generated from kaltur
 
 test('creates screenreader text describing media comment', function() {
   $('.instructure_inline_media_comment', this.$fixtures).mediaCommentThumbnail('normal')
-  const screenreaderText = document.querySelector('.media_comment_thumbnail .screenreader-only').innerText
+  const screenreaderText = document.querySelector('.media_comment_thumbnail .screenreader-only')
+    .innerText
   strictEqual(screenreaderText, 'Play media comment by Tom from Oct 22 at 7:10pm.')
 })
 
 test('creates generic screenreader text if no authoring info provided', function() {
   this.$fixtures.html('')
-  this.$fixtures.append($(`
+  this.$fixtures.append(
+    $(`
     <a
       id="media_comment_23"
       class="instructure_inline_media_comment video_comment"
@@ -81,8 +83,10 @@ test('creates generic screenreader text if no authoring info provided', function
     >
       this is a media comment
     </a>
-  `))
+  `)
+  )
   $('.instructure_inline_media_comment', this.$fixtures).mediaCommentThumbnail('normal')
-  const screenreaderText = document.querySelector('.media_comment_thumbnail .screenreader-only').innerText
+  const screenreaderText = document.querySelector('.media_comment_thumbnail .screenreader-only')
+    .innerText
   strictEqual(screenreaderText, 'Play media comment.')
 })

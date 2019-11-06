@@ -36,7 +36,7 @@ export const MediaTrack = {
   })
 }
 
-export const MediaTrackDefaultMocks = {
+export const DefaultMocks = {
   MediaTrack: () => ({
     _id: '1',
     locale: 'en',

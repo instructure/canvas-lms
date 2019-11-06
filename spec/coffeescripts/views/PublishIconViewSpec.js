@@ -28,14 +28,17 @@ QUnit.module('PublishIconView', {
         published: false,
         publishable: true
       }
+
       publish() {
         this.set('published', true)
         return $.Deferred().resolve()
       }
+
       unpublish() {
         this.set('published', false)
         return $.Deferred().resolve()
       }
+
       disabledMessage() {
         return "can't unpublish"
       }

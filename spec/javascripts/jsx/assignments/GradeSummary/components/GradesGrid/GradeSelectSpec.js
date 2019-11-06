@@ -274,9 +274,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   QUnit.module('when the input is dismissed by clicking elsewhere', () => {
     function clickOffAndWaitForValue(value) {
-      return clickOff().then(() =>
-        waitFor(() => getTextInput().value === value)
-      )
+      return clickOff().then(() => waitFor(() => getTextInput().value === value))
     }
     test('does not call the onSelect prop', async () => {
       await mountAndClick()

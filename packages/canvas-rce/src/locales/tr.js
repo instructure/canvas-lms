@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/tr.json";
-import "../rce/languages/tr_TR";
+import formatMessage from '../format-message'
+import locale from '../../locales/tr.json'
+import '../rce/languages/tr_TR'
 
-formatMessage.addLocale({ tr: locale });
+formatMessage.addLocale({tr: locale})

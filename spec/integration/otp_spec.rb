@@ -24,7 +24,7 @@ describe "one time passwords" do
     Account.default.settings[:mfa_settings] = :required
     Account.default.save!
     user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
-    @user.otp_secret_key = ROTP::Base32.random_base32
+    @user.otp_secret_key = ROTP::Base32.random
     @user.save!
   end
 

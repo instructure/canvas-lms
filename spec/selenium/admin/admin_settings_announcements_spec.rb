@@ -75,7 +75,7 @@ describe "settings tabs" do
 
     before do
       course_with_admin_logged_in
-      make_full_screen
+
     end
 
     it "should add and delete an announcement" do

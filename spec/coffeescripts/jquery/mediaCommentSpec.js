@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 import MediaUtils from 'compiled/jquery/mediaComment'
-import 'jqueryui/dialog';
-import 'jquery.disableWhileLoading';
+import 'jqueryui/dialog'
+import 'jquery.disableWhileLoading'
 
 QUnit.module('mediaComment', {
   setup() {
@@ -40,12 +40,12 @@ const mockServerResponse = (server, id, type = 'video') => {
       {
         content_type: 'flv',
         url: 'http://some_flash_url.com',
-        bitrate: "200"
+        bitrate: '200'
       },
       {
         content_type: 'mp4',
         url: 'http://some_mp4_url.com',
-        bitrate: "100"
+        bitrate: '100'
       }
     ]
   }
@@ -61,12 +61,12 @@ const mockXssServerResponse = (server, id) => {
       {
         content_type: 'flv',
         url: 'javascript:alert(document.cookie);//',
-        bitrate: "200"
+        bitrate: '200'
       },
       {
         content_type: 'mp4',
         url: 'javascript:alert(document.cookie);//',
-        bitrate: "100"
+        bitrate: '100'
       }
     ]
   }

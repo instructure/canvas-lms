@@ -336,7 +336,7 @@ class ProfileController < ApplicationController
     respond_to do |format|
       user_params = params[:user] ? params[:user].
         permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
-          :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate)
+          :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
         : {}
       if !@user.user_can_edit_name?
         user_params.delete(:name)

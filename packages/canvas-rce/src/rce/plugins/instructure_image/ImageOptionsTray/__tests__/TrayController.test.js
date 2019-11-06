@@ -151,7 +151,9 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
         tray = getTray()
         tray.setAltText('Bill Murray, always amazing')
         tray.$doneButton.click()
-        expect(editors[0].$container.querySelector('img').getAttribute('alt')).toEqual('Bill Murray, always amazing')
+        expect(editors[0].$container.querySelector('img').getAttribute('alt')).toEqual(
+          'Bill Murray, always amazing'
+        )
       })
     })
 
@@ -170,7 +172,9 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
       it('sets a data attribute to persist the option', () => {
         tray.setIsDecorativeImage(true)
         tray.$doneButton.click()
-        expect(editors[0].$container.querySelector('img').getAttribute('data-is-decorative')).toEqual('true')
+        expect(
+          editors[0].$container.querySelector('img').getAttribute('data-is-decorative')
+        ).toEqual('true')
       })
     })
 
@@ -186,11 +190,15 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
       })
 
       it('updates the image element alt text', () => {
-        expect(editors[0].$container.querySelector('img').getAttribute('alt')).toEqual('Bill Murray, always amazing')
+        expect(editors[0].$container.querySelector('img').getAttribute('alt')).toEqual(
+          'Bill Murray, always amazing'
+        )
       })
 
       it('sets a data attribute to persist the option', () => {
-        expect(editors[0].$container.querySelector('img').getAttribute('data-is-decorative')).toBeNull()
+        expect(
+          editors[0].$container.querySelector('img').getAttribute('data-is-decorative')
+        ).toBeNull()
       })
     })
 

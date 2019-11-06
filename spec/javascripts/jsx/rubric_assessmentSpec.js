@@ -131,7 +131,7 @@ QUnit.module('RubricAssessment', moduleHooks => {
   })
 
   QUnit.module('#assessmentData', () => {
-    const createRubric = (contents = "") => $(`<div class="rubric">${contents}</div>`)
+    const createRubric = (contents = '') => $(`<div class="rubric">${contents}</div>`)
 
     test('returns the user ID if assessment_user_id exists in the environment', () => {
       ENV.RUBRIC_ASSESSMENT.assessment_user_id = '123'
@@ -182,7 +182,7 @@ QUnit.module('RubricAssessment', moduleHooks => {
     })
   })
 
-  QUnit.module('#populateRubric', (hooks) => {
+  QUnit.module('#populateRubric', hooks => {
     let $rubric
 
     hooks.beforeEach(() => {

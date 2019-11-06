@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createAction, createActions } from 'jsx/conditional_release_stats/helpers/actions'
+import {createAction, createActions} from 'jsx/conditional_release_stats/helpers/actions'
 
 QUnit.module('Conditional Release Stats action helpers')
 
@@ -30,11 +30,10 @@ test('creates a new action', () => {
 
 test('creates multiple actions', () => {
   const actionDefs = ['ACTION_ONE', 'ANOTHER_MORE_COMPLEX_ACTION_NAME']
-  const { actionTypes, actions } = createActions(actionDefs)
+  const {actionTypes, actions} = createActions(actionDefs)
 
   equal(actions.actionOne.type, 'ACTION_ONE')
   equal(actionTypes.ACTION_ONE, 'ACTION_ONE')
   equal(actions.anotherMoreComplexActionName.type, 'ANOTHER_MORE_COMPLEX_ACTION_NAME')
   equal(actionTypes.ANOTHER_MORE_COMPLEX_ACTION_NAME, 'ANOTHER_MORE_COMPLEX_ACTION_NAME')
 })
-

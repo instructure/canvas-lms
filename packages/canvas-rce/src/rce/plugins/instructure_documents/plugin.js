@@ -16,22 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../../../format-message"
-import clickCallback from "./clickCallback"
+import formatMessage from '../../../format-message'
+import clickCallback from './clickCallback'
 import bridge from '../../../bridge'
 
 const COURSE_PLUGIN_KEY = 'course_documents'
 const USER_PLUGIN_KEY = 'user_documents'
 
-tinymce.create("tinymce.plugins.InstructureDocumentsPlugin", {
+tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
   init(ed) {
     const contextType = ed.settings.canvas_rce_user_context.type
 
     // Register commands
-    ed.addCommand(
-      "mceInstructureDocuments",
-      clickCallback.bind(this, ed, document)
-    );
+    ed.addCommand('mceInstructureDocuments', clickCallback.bind(this, ed, document))
 
     const menuItems = [
       {
@@ -62,19 +59,16 @@ tinymce.create("tinymce.plugins.InstructureDocumentsPlugin", {
     }
 
     // Register button
-    ed.ui.registry.addMenuButton("instructure_documents", {
+    ed.ui.registry.addMenuButton('instructure_documents', {
       tooltip: formatMessage('Documents'),
-      icon: "document",
+      icon: 'document',
       fetch(callback) {
         const items = menuItems
         callback(items)
       }
-    });
+    })
   }
-});
+})
 
 // Register plugin
-tinymce.PluginManager.add(
-  "instructure_documents",
-  tinymce.plugins.InstructureDocumentsPlugin
-);
+tinymce.PluginManager.add('instructure_documents', tinymce.plugins.InstructureDocumentsPlugin)

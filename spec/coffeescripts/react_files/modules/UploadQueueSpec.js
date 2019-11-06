@@ -68,7 +68,7 @@ test('processes one upload at a time', function(assert) {
   equal(this.queue.length(), 2) // first item starts, remainder are waiting
   window.setTimeout(() => {
     equal(this.queue.length(), 1) // after two more ticks there is only one remaining
-    done();
+    done()
   }, 2)
   this.queue.createUploader = original
 })

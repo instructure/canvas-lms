@@ -520,6 +520,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should not scroll to the top of the page after using an equation button", ignore_js_errors: true do
+      resize_screen_to_small
       visit_front_page_edit(@course)
       scroll_page_to_bottom
 
@@ -530,6 +531,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       misc_tab.click
       f('#Misc_tab li:nth-child(35) a').click
       scroll_location = driver.execute_script("return window.scrollY")
+      resize_screen_to_standard # set browser back to default
       expect(scroll_location).not_to be 0
     end
 

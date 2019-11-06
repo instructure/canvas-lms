@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { changeTab, changeAccordion } from "../actions/ui";
-import { fetchInitialPage, fetchNextPage } from "../actions/data";
-import { fetchInitialImages, fetchNextImages } from "../actions/images";
+import {changeTab, changeAccordion} from '../actions/ui'
+import {fetchInitialPage, fetchNextPage} from '../actions/data'
+import {fetchInitialImages, fetchNextImages} from '../actions/images'
 import {
   createMediaServerSession,
   fetchFolders,
@@ -27,13 +27,13 @@ import {
   mediaUploadComplete,
   uploadPreflight,
   uploadToMediaFolder
-} from "../actions/upload";
-import { searchFlickr, openOrCloseFlickrForm } from "../actions/flickr";
-import { toggle as toggleFolder } from "../actions/files";
-import { openOrCloseNewPageForm } from "../actions/links";
-import { fetchInitialDocs, fetchNextDocs } from "../actions/documents";
-import { fetchInitialMedia, fetchNextMedia } from "../actions/media";
-import { changeContext } from "../actions/context";
+} from '../actions/upload'
+import {searchFlickr, openOrCloseFlickrForm} from '../actions/flickr'
+import {toggle as toggleFolder} from '../actions/files'
+import {openOrCloseNewPageForm} from '../actions/links'
+import {fetchInitialDocs, fetchNextDocs} from '../actions/documents'
+import {fetchInitialMedia, fetchNextMedia} from '../actions/media'
+import {changeContext} from '../actions/context'
 
 export default function propsFromDispatch(dispatch) {
   return {
@@ -60,6 +60,6 @@ export default function propsFromDispatch(dispatch) {
     fetchNextDocs: () => dispatch(fetchNextDocs()),
     fetchInitialMedia: () => dispatch(fetchInitialMedia()),
     fetchNextMedia: () => dispatch(fetchNextMedia()),
-    onChangeContext: (newContext) => dispatch(changeContext(newContext))
-  };
+    onChangeContext: newContext => dispatch(changeContext(newContext))
+  }
 }

@@ -136,7 +136,7 @@ describe "help dialog" do
       settings_menu.click
 
       trigger = f('ul[role=menu] span[name=help][role=menuitem]')
-      make_full_screen
+
       trigger.location_once_scrolled_into_view
       expect(trigger).to be_displayed
     end

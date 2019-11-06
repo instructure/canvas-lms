@@ -45,6 +45,7 @@ end
 describe Api::V1::DiscussionTopics do
   before :once do
     @test_api = DiscussionTopicsTestCourseApi.new
+    @test_api.instance_variable_set :@domain_root_account, Account.default
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
     student_in_course(:active_all => true, :course => @course)
@@ -105,6 +106,17 @@ describe Api::V1::DiscussionTopics do
     end
   end
 
+  it "includes the user's pronouns when enabled" do
+    @me.update! pronouns: "she/her"
+
+    expect(
+      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil).key?("user_pronouns")
+    ).to eq true
+    expect(
+      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)["user_pronouns"]
+    ).to eq "she/her"
+  end
+
   it 'should render a podcast_url using the discussion topic\'s context if there is no @context_enrollment/@context' do
     @topic.update_attribute :podcast_enabled, true
     data = nil
@@ -132,10 +144,13 @@ describe Api::V1::DiscussionTopics do
     expect(data[:assignment]).to be_nil
   end
 
+  it "should not die if user is nil (like when a non-logged-in user visits a public course)" do
+    data = @test_api.discussion_topic_api_json(@topic, @topic.context, nil, nil)
+    expect(data).to be_present
+  end
+
   context "with assignment" do
     before :once do
-      @test_api.instance_variable_set(:@domain_root_account, Account.default)
-
       @topic.assignment = assignment_model(:course => @course)
       @topic.save!
     end
@@ -378,7 +393,6 @@ describe DiscussionTopicsController, type: :request do
                           "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                           "filename" => "content.txt",
                           "display_name" => "content.txt",
-                          "workflow_state" => "processed",
                           "id" => @attachment.id,
                           "uuid" => @attachment.uuid,
                           "folder_id" => @attachment.folder_id,
@@ -1506,7 +1520,6 @@ describe DiscussionTopicsController, type: :request do
           "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
           "filename" => "content.txt",
           "display_name" => "content.txt",
-          "workflow_state" => "processed",
           "id" => attachment.id,
           "uuid" => attachment.uuid,
           "folder_id" => attachment.folder_id,
@@ -2578,8 +2591,8 @@ describe DiscussionTopicsController, type: :request do
       expect(json['unread_entries'].sort).to eq (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
 
       expect(json['participants'].sort_by { |h| h['id'] }).to eq [
-                                                                   {'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}"},
-                                                                   {'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}"},
+                                                                   {'id' => @student.id, "pronouns"=>nil, 'display_name' => @student.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}"},
+                                                                   {'id' => @teacher.id,"pronouns"=>nil, 'display_name' => @teacher.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}"},
                                                                  ].sort_by { |h| h['id'] }
 
       reply_reply1_attachment_json = {
@@ -2587,7 +2600,6 @@ describe DiscussionTopicsController, type: :request do
         "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
         "filename" => "unknown.loser",
         "display_name" => "unknown.loser",
-        "workflow_state" => "pending_upload",
         "id" => @attachment.id,
         "uuid" => @attachment.uuid,
         "folder_id" => @attachment.folder_id,

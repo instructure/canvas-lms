@@ -280,7 +280,9 @@ class DueDateCacher
             WHERE submissions.id IS NULL;
         SQL
 
-        Assignment.connection.execute(query)
+        Submission.transaction do
+          Submission.connection.execute(query)
+        end
 
         next unless record_due_date_changed_events? && auditable_entries.present?
 

@@ -55,7 +55,7 @@ export const RubricCriterion = {
   })
 }
 
-export const RubricCriterionDefaultMocks = {
+export const DefaultMocks = {
   RubricCriterion: () => ({
     _id: '1',
     criterionUseRange: false,

@@ -60,6 +60,7 @@ const SCC_QUERY = gql`
     user: legacyNode(type: User, _id: $studentId) {
       ... on User {
         _id
+        pronouns
         short_name: shortName
         avatar_url: avatarUrl
         enrollments(courseId: $courseId) {

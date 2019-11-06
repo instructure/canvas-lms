@@ -126,6 +126,25 @@ RSpec.describe ApplicationController do
       expect(@controller.js_env[:TIMEZONE]).to eq 'America/Juneau'
     end
 
+    describe "DIRECT_SHARE_ENABLED feature flag" do
+      it "sets the env var to true when FF is enabled" do
+        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        allow(root_account).to receive(:feature_enabled?).and_return(false)
+        allow(root_account).to receive(:feature_enabled?).with(:direct_share).and_return(true)
+        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
+        controller.instance_variable_set(:@domain_root_account, root_account)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
+      end
+
+      it "sets the env var to false when FF is disabled" do
+        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        allow(root_account).to receive(:feature_enabled?).and_return(false)
+        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
+        controller.instance_variable_set(:@domain_root_account, root_account)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+      end
+    end
+
     it "sets the contextual timezone from the context" do
       Time.zone = "Mountain Time (US & Canada)"
       controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
@@ -857,7 +876,7 @@ RSpec.describe ApplicationController do
       allow(controller).to receive(:polymorphic_url).and_return("http://example.com")
       external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
 
-      expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
+      expect(external_tools).to eq([{:id=>tool.id, :title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
     end
 
     it "doesn't return tools that are mapped to disabled feature flags" do
@@ -870,7 +889,7 @@ RSpec.describe ApplicationController do
 
       @course.enable_feature!(:analytics_2)
       external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
-      expect(external_tools).to include({title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2})
+      expect(external_tools).to include({:id=>tool.id, title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2})
     end
   end
 
@@ -912,7 +931,7 @@ RSpec.describe ApplicationController do
 
     it 'returns a hash' do
       hash = controller.external_tool_display_hash(@tool, :account_navigation)
-      left_over_keys = hash.keys - [:base_url, :title, :icon_url, :canvas_icon_class]
+      left_over_keys = hash.keys - [:id, :base_url, :title, :icon_url, :canvas_icon_class]
       expect(left_over_keys).to eq []
     end
 

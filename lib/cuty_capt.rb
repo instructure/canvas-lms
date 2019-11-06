@@ -30,7 +30,7 @@
 # display is whatever display cutycapt should use. (You should probably use Xvfb.)
 
 require 'resolv'
-require 'netaddr'
+require 'ipaddr'
 require 'action_controller_test_process'
 
 class CutyCapt
@@ -56,7 +56,7 @@ class CutyCapt
   end
 
   def self.process_config
-    @@config[:ip_blacklist] = @@config[:ip_blacklist].map {|ip| NetAddr::CIDR.create(ip) } if @@config[:ip_blacklist]
+    @@config[:ip_blacklist] = @@config[:ip_blacklist].map {|ip| IPAddr.new(ip) } if @@config[:ip_blacklist]
     @@config[:domain_blacklist] = @@config[:domain_blacklist].map {|domain| Resolv::DNS::Name.create(domain) } if @@config[:domain_blacklist]
   end
 
@@ -85,7 +85,7 @@ class CutyCapt
 
     addresses = Resolv.getaddresses(uri.host)
     return false if addresses.blank?
-    if config[:ip_blacklist] && addresses.any? {|address| config[:ip_blacklist].any? {|cidr| cidr.matches?(address) rescue false } }
+    if config[:ip_blacklist] && addresses.any? {|address| config[:ip_blacklist].any? {|cidr| cidr.include?(address) rescue false } }
       logger.warn("Skipping url because of blacklisted IP address: #{url}")
       return false
     end

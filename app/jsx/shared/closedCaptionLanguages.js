@@ -39,8 +39,12 @@ const closedCaptionLanguages = {
   get zh() {
     return I18n.t('Chinese')
   },
-  'zh-cn': I18n.t('Chinese Simplified'),
-  'zh-tw': I18n.t('Chinese Traditional'),
+  get 'zh-cn'() {
+    return I18n.t('Chinese Simplified')
+  },
+  get 'zh-tw'() {
+    return I18n.t('Chinese Traditional')
+  },
   get hr() {
     return I18n.t('Croatian')
   },

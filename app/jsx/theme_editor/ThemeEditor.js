@@ -28,6 +28,7 @@ import submitHtmlForm from './submitHtmlForm'
 import SaveThemeButton from './SaveThemeButton'
 import ThemeEditorModal from './ThemeEditorModal'
 import ThemeEditorSidebar from './ThemeEditorSidebar'
+import getCookie from '../shared/helpers/getCookie'
 
 /* eslint no-alert:0 */
 const TABS = [
@@ -512,7 +513,7 @@ export default class ThemeEditor extends React.Component {
           className="Theme__container"
         >
           <input name="utf8" type="hidden" value="✓" />
-          <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
+          <input name="authenticity_token" type="hidden" value={getCookie('_csrf_token')} />
 
           <div
             className={`Theme__layout ${!this.props.hasUnsavedChanges &&

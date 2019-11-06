@@ -18,40 +18,40 @@
 
 function sanitizePlugins(plugins) {
   if (plugins !== undefined) {
-    let cleanPlugins = plugins;
-    if (typeof plugins === "string") {
-      cleanPlugins = plugins.split(",").map(plugin => {
-        return plugin.replace(/\s/g, "");
-      });
+    let cleanPlugins = plugins
+    if (typeof plugins === 'string') {
+      cleanPlugins = plugins.split(',').map(plugin => {
+        return plugin.replace(/\s/g, '')
+      })
     }
-    return cleanPlugins;
+    return cleanPlugins
   }
-  return plugins;
+  return plugins
 }
 
-const extPluginsToRemove = ["instructure_embed"];
+const extPluginsToRemove = ['instructure_embed']
 
 function sanitizeExternalPlugins(external_plugins) {
   if (external_plugins !== undefined) {
-    const cleanExternalPlugins = {};
+    const cleanExternalPlugins = {}
     Object.keys(external_plugins).forEach(key => {
       if (external_plugins.hasOwnProperty(key)) {
         if (extPluginsToRemove.indexOf(key) == -1) {
-          cleanExternalPlugins[key] = external_plugins[key];
+          cleanExternalPlugins[key] = external_plugins[key]
         }
       }
-    });
-    return cleanExternalPlugins;
+    })
+    return cleanExternalPlugins
   }
-  return external_plugins;
+  return external_plugins
 }
 
 export default function sanitizeEditorOptions(options) {
-  const fixed = { ...options};
+  const fixed = {...options}
 
-  fixed.plugins = sanitizePlugins(options.plugins);
-  fixed.external_plugins = sanitizeExternalPlugins(options.external_plugins);
-  fixed.toolbar = options.toolbar;
+  fixed.plugins = sanitizePlugins(options.plugins)
+  fixed.external_plugins = sanitizeExternalPlugins(options.external_plugins)
+  fixed.toolbar = options.toolbar
 
-  return fixed;
+  return fixed
 }

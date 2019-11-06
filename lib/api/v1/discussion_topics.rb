@@ -145,6 +145,10 @@ module Api::V1::DiscussionTopics
       end
     end
 
+    if user&.pronouns
+      json[:user_pronouns] = user.pronouns
+    end
+
     json
   end
 

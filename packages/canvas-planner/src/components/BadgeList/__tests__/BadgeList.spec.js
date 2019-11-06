@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react';
-import { shallow } from 'enzyme';
-import BadgeList from '../index';
+import React from 'react'
+import {shallow} from 'enzyme'
 import {Pill} from '@instructure/ui-elements'
+import BadgeList from '../index'
 
 it('renders Pill components as list items', () => {
   const wrapper = shallow(
@@ -27,6 +27,6 @@ it('renders Pill components as list items', () => {
       <Pill text="Pill 2" />
       <Pill text="Pill 3" />
     </BadgeList>
-  );
-  expect(wrapper).toMatchSnapshot();
-});
+  )
+  expect(wrapper).toMatchSnapshot()
+})

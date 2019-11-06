@@ -21,19 +21,19 @@ import * as enzyme from 'enzyme'
 import BlueprintModal from 'jsx/blueprint_courses/components/BlueprintModal'
 
 QUnit.module('BlueprintModal component', {
-  setup () {
+  setup() {
     const appElement = document.createElement('div')
     appElement.id = 'application'
     document.getElementById('fixtures').appendChild(appElement)
   },
 
-  teardown () {
+  teardown() {
     document.getElementById('fixtures').innerHTML = ''
   }
 })
 
 const defaultProps = () => ({
-  isOpen: true,
+  isOpen: true
 })
 
 const render = (props = defaultProps(), children = <p>content</p>) => (
@@ -57,7 +57,7 @@ test('renders the Done button when there are no changes', () => {
 test('renders the Save + Cancel buttons when there are changes', () => {
   const props = {
     ...defaultProps(),
-    hasChanges: true,
+    hasChanges: true
   }
   const wrapper = enzyme.shallow(render(props))
   const buttons = wrapper.find('ModalFooter').find('Button')
@@ -70,7 +70,7 @@ test('renders the Done button when there are changes, but is in the process of s
   const props = {
     ...defaultProps(),
     hasChanges: true,
-    isSaving: true,
+    isSaving: true
   }
   const wrapper = enzyme.shallow(render(props))
   const buttons = wrapper.find('ModalFooter').find('Button')

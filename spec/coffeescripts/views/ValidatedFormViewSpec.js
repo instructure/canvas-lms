@@ -71,6 +71,7 @@ class MyForm extends ValidatedFormView {
     this.model.url = '/fail'
     return this.render()
   }
+
   template() {
     return `
       <input type="text" name="first_name" value="123">
@@ -252,10 +253,10 @@ test('validate always calls showErrors', 2, function() {
   ok(this.form.showErrors.called, 'showErrors called with errors')
 })
 
-test('RCE Present: Calls the sendFunc to determine if it is ready', function (){
+test('RCE Present: Calls the sendFunc to determine if it is ready', function() {
   const origVal = window.ENV.use_rce_enhancements
-  window.ENV.use_rce_enhancements = true;
-  const fakeSendFunc = sinon.stub().returns(true);
+  window.ENV.use_rce_enhancements = true
+  const fakeSendFunc = sinon.stub().returns(true)
   const textArea = $('<textarea data-rich_text="true"></textarea>')
   this.form.$el.append(textArea)
   this.form.submit(null, fakeSendFunc)
@@ -263,17 +264,17 @@ test('RCE Present: Calls the sendFunc to determine if it is ready', function (){
   ok(fakeSendFunc.args[0][0][0] === textArea[0], 'the rce argument is the proper text area')
   ok(fakeSendFunc.args[0][1] === 'checkReadyToGetCode', 'command argument is checkReadyToGetCode')
   ok(fakeSendFunc.args[0][2] === window.confirm, 'promptFunc is window.confirm by default')
-  window.ENV.use_rce_enhancements = origVal;
+  window.ENV.use_rce_enhancements = origVal
 })
 
-test('RCE Present: Ends execution if sendFunc returns false', function () {
+test('RCE Present: Ends execution if sendFunc returns false', function() {
   const origVal = window.ENV.use_rce_enhancements
-  window.ENV.use_rce_enhancements = true;
+  window.ENV.use_rce_enhancements = true
   sandbox.spy(this.form, 'validateFormData')
-  const fakeSendFunc = sinon.stub().returns(false);
+  const fakeSendFunc = sinon.stub().returns(false)
   const textArea = $('<textarea data-rich_text="true"></textarea>')
   this.form.$el.append(textArea)
   this.form.submit(null, fakeSendFunc)
   ok(!this.form.validateFormData.called, 'validateFormData was not called')
-  window.ENV.use_rce_enhancements = origVal;
+  window.ENV.use_rce_enhancements = origVal
 })

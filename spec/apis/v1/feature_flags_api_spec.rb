@@ -229,6 +229,21 @@ describe "Feature Flags API", type: :request do
                {}, {}, { expected_status: 404 })
     end
 
+    it "should skip cache for admins" do
+      original = t_root_account.method(:lookup_feature_flag)
+      @checked = false
+      allow_any_instantiation_of(t_root_account).to receive(:lookup_feature_flag) do |feature, opts|
+        if feature.to_s == "root_account_feature"
+          @checked = true
+          expect(opts[:skip_cache]).to eq true
+        end
+        original.call(feature, *opts)
+      end
+      api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features/flags/root_account_feature",
+        { controller: 'feature_flags', action: 'show', format: 'json', account_id: t_root_account.to_param, feature: 'root_account_feature' })
+      expect(@checked).to eq true # should actually check the expectation
+    end
+
     it "should return the correct format" do
       json = api_call_as_user(t_teacher, :get, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                { controller: 'feature_flags', action: 'show', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })

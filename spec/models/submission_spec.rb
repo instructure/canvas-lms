@@ -6787,7 +6787,7 @@ describe Submission do
         it { is_expected.to be_hide_grade_from_student }
         it { is_expected.not_to be_hide_grade_from_student(for_plagiarism: true) }
 
-        context 'when a submissions is posted' do
+        context 'when a submission is posted' do
           before { submission.update!(posted_at: Time.zone.now) }
           it { is_expected.not_to be_hide_grade_from_student }
         end
@@ -6797,9 +6797,37 @@ describe Submission do
         before { assignment.ensure_post_policy(post_manually: false) }
         it { is_expected.not_to be_hide_grade_from_student }
 
-        context 'when submission is posted' do
+        context 'when a submission is posted' do
           before { submission.update!(posted_at: Time.zone.now) }
           it { is_expected.not_to be_hide_grade_from_student }
+        end
+
+        context "when a submission is graded but not posted" do
+          before do
+            assignment.grade_student(student, score: 5, grader: teacher)
+            assignment.hide_submissions
+          end
+          it { is_expected.to be_hide_grade_from_student }
+        end
+
+        context "when homework has been submitted, but the submission is not graded or posted" do
+          before do
+            assignment.update!(submission_types: "online_text_entry")
+            assignment.submit_homework(student, submission_type: "online_text_entry", body: "hi")
+          end
+          it { is_expected.not_to be_hide_grade_from_student }
+        end
+
+        context "when a student re-submits to a previously graded and subsequently hidden submission" do
+          before do
+            assignment.update!(submission_types: "online_text_entry")
+            assignment.submit_homework(student, submission_type: "online_text_entry", body: "hi")
+            assignment.grade_student(student, score: 0, grader: teacher)
+            assignment.hide_submissions
+            assignment.submit_homework(student, submission_type: "online_text_entry", body: "I will never give up")
+          end
+
+          it { is_expected.to be_hide_grade_from_student }
         end
       end
     end

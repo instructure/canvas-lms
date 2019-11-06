@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from "sinon";
-import Bridge from "../../src/bridge";
+import sinon from 'sinon'
+import Bridge from '../../src/bridge'
 
-describe("Bridge actions, embed image", () => {
-  let mockEditor, origEditor;
+describe('Bridge actions, embed image', () => {
+  let mockEditor, origEditor
 
   beforeEach(() => {
     mockEditor = {
@@ -30,48 +30,48 @@ describe("Bridge actions, embed image", () => {
       insertLink: sinon.spy(),
       insertImagePlaceholder: sinon.spy(),
       removePlaceholders: sinon.spy()
-    };
-    origEditor = Bridge.getEditor();
-    Bridge.focusEditor(mockEditor);
-  });
+    }
+    origEditor = Bridge.getEditor()
+    Bridge.focusEditor(mockEditor)
+  })
 
   afterEach(() => {
-    Bridge.focusEditor(origEditor);
-  });
+    Bridge.focusEditor(origEditor)
+  })
 
-  it("inserts an image when no selection", () => {
-    mockEditor.existingContentToLink.returns(false);
-    Bridge.embedImage({});
-    sinon.assert.called(mockEditor.insertImage);
-  });
+  it('inserts an image when no selection', () => {
+    mockEditor.existingContentToLink.returns(false)
+    Bridge.embedImage({})
+    sinon.assert.called(mockEditor.insertImage)
+  })
 
-  it("inserts an image when image is selected", () => {
-    mockEditor.existingContentToLink.returns(true);
-    mockEditor.existingContentToLinkIsImg.returns(true);
-    Bridge.embedImage({});
-    sinon.assert.called(mockEditor.insertImage);
-  });
+  it('inserts an image when image is selected', () => {
+    mockEditor.existingContentToLink.returns(true)
+    mockEditor.existingContentToLinkIsImg.returns(true)
+    Bridge.embedImage({})
+    sinon.assert.called(mockEditor.insertImage)
+  })
 
-  it("inserts a link through the bridge", () => {
+  it('inserts a link through the bridge', () => {
     mockEditor.props = {
-      textareaId: "fake_editor",
+      textareaId: 'fake_editor',
       tinymce: {
         get(id) {
           return {
             selection: {
-              getRng: sinon.stub().returns("some-range"),
-              getNode: sinon.stub().returns("some-node")
+              getRng: sinon.stub().returns('some-range'),
+              getNode: sinon.stub().returns('some-node')
             }
-          };
+          }
         }
       }
-    };
-    mockEditor.existingContentToLink.returns(true);
-    Bridge.embedImage({});
+    }
+    mockEditor.existingContentToLink.returns(true)
+    Bridge.embedImage({})
     sinon.assert.calledWithMatch(mockEditor.insertLink, {
-      embed: { type: "image" }
-    });
-  });
+      embed: {type: 'image'}
+    })
+  })
 
   it('inserts a image placeholder through the bridge', () => {
     Bridge.insertImagePlaceholder({})
@@ -82,4 +82,4 @@ describe("Bridge actions, embed image", () => {
     Bridge.removePlaceholders('abc')
     sinon.assert.called(mockEditor.removePlaceholders)
   })
-});
+})

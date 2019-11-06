@@ -23,9 +23,8 @@ import VideoOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
 
-export const VIDEO_SIZE_DEFAULT = { height: '225px', width: '400px' }
+export const VIDEO_SIZE_DEFAULT = {height: '225px', width: '400px'}
 export const AUDIO_PLAYER_SIZE = {width: '300px', height: '2.813rem'}
-
 
 export default class TrayController {
   constructor() {
@@ -64,7 +63,10 @@ export default class TrayController {
   _applyVideoOptions(videoOptions) {
     const editor = this._editor
     const $videoContainer = editor.selection.getNodeVIDEO_SIZE_DEFAULTVIDEO_SIZE_DEFAULT
-    $videoContainer.setAttribute("style",`height: ${VIDEO_SIZE_DEFAULT[videoOptions.videoSize].height}; width:${VIDEO_SIZE_DEFAULT[videoOptions.videoSize].width}`);
+    $videoContainer.setAttribute(
+      'style',
+      `height: ${VIDEO_SIZE_DEFAULT[videoOptions.videoSize].height}; width:${VIDEO_SIZE_DEFAULT[videoOptions.videoSize].width}`
+    )
     this._dismissTray()
   }
 

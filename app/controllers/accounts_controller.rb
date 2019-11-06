@@ -847,6 +847,11 @@ class AccountsController < ApplicationController
           end
         end
 
+        pronouns = params[:account].delete :pronouns
+        if pronouns && !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:account_pronouns)
+          @account.pronouns = pronouns
+        end
+
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
           sorted_help_links = custom_help_links.to_unsafe_h.select{|_k, h| h['state'] != 'deleted' && h['state'] != 'new'}.sort_by{|_k, h| _k.to_i}
@@ -1413,7 +1418,7 @@ class AccountsController < ApplicationController
   PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords, :admins_can_view_notifications,
                                    :allow_invitation_previews, :allow_sending_scores_in_emails,
                                    :author_email_in_notifications, :canvadocs_prefer_office_online,
-                                   :consortium_parent_account, :consortium_can_create_own_accounts,
+                                   :consortium_parent_account, :consortium_can_create_own_accounts, :can_add_pronouns,
                                    :shard_per_account, :consortium_autocreate_web_of_trust,
                                    :consortium_autocreate_reverse_trust,
                                    :default_storage_quota, :default_storage_quota_mb,

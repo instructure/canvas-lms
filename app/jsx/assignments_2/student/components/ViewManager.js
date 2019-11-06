@@ -96,7 +96,7 @@ function getAllSubmissions({initialQueryData, submissionHistoriesQueryData}) {
   // comments without having to pipe both the initial submission and
   // currently displayed submission to all components.
   const submissionHistories = getSubmissionHistories(submissionHistoriesQueryData).map(history => {
-    return {...history, id: initialSubmission.id}
+    return {...history, _id: initialSubmission._id, id: initialSubmission.id}
   })
   submissionHistories.push(initialSubmission)
   return submissionHistories

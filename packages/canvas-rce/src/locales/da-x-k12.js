@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/da-x-k12.json"
-import "../rce/languages/da";
+import formatMessage from '../format-message'
+import locale from '../../locales/da-x-k12.json'
+import '../rce/languages/da'
 
-formatMessage.addLocale({ "da-x-k12": locale });
+formatMessage.addLocale({'da-x-k12': locale})

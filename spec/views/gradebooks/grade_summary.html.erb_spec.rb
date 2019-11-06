@@ -209,7 +209,7 @@ describe "/gradebooks/grade_summary" do
         end
 
         it "shows turnitin plagiarism tooltip" do
-          expect(response).to have_tag('.tooltip_text:contains("See Turnitin results")')
+          expect(response).to have_tag("a[data-tooltip='left'][title='Similarity score -- more information']")
         end
       end
 
@@ -227,7 +227,7 @@ describe "/gradebooks/grade_summary" do
         end
 
         it "shows turnitin plagiarism tooltip" do
-          expect(response).to have_tag('.tooltip_text:contains("See Turnitin results")')
+          expect(response).to have_tag("a[data-tooltip='left'][title='Similarity score -- more information']")
         end
       end
 
@@ -245,7 +245,7 @@ describe "/gradebooks/grade_summary" do
         end
 
         it "shows turnitin plagiarism tooltip" do
-          expect(response).to have_tag('.tooltip_text:contains("See Turnitin results")')
+          expect(response).to have_tag("a[data-tooltip='left'][title='Similarity score -- more information']")
         end
       end
     end

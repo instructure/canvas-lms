@@ -102,7 +102,11 @@ test('on change, accepts arbitrary input and saves to state', function() {
 
 test('screenreader text contains contextual label describing inserting row', () => {
   const screenreaderTexts = [...document.getElementsByClassName('screenreader-only')]
-  ok(screenreaderTexts.find(screenreaderText => screenreaderText.textContent === 'Insert row below A'))
+  ok(
+    screenreaderTexts.find(
+      screenreaderText => screenreaderText.textContent === 'Insert row below A'
+    )
+  )
 })
 
 test('screenreader text contains contextual label describing removing row', () => {

@@ -49,6 +49,33 @@ module Types
       end
     end
 
+    field :meets_text_entry_criteria, Boolean, null: false
+    def meets_text_entry_criteria
+      load_association(:submission).then do |submission|
+        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
+          object.meets_text_entry_criteria?
+        end
+      end
+    end
+
+    field :meets_upload_criteria, Boolean, null: false
+    def meets_upload_criteria
+      load_association(:submission).then do |submission|
+        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
+          object.meets_upload_criteria?
+        end
+      end
+    end
+
+    field :meets_url_criteria, Boolean, null: false
+    def meets_url_criteria
+      load_association(:submission).then do |submission|
+        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
+          object.meets_url_criteria?
+        end
+      end
+    end
+
     field :meets_assignment_criteria, Boolean, null: false
     def meets_assignment_criteria
       load_association(:submission).then do |submission|

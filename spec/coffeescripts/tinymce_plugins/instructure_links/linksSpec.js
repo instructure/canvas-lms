@@ -139,7 +139,8 @@ test('it prevents the event from propogating up the chain', function() {
 })
 
 test('it closes the dialog box', function() {
-  sandbox.mock(this.box)
+  sandbox
+    .mock(this.box)
     .expects('dialog')
     .once()
     .withArgs('close')
@@ -148,7 +149,8 @@ test('it closes the dialog box', function() {
 })
 
 test('it inserts the link properly', function() {
-  sandbox.mock(this.editor)
+  sandbox
+    .mock(this.editor)
     .expects('createLink')
     .once()
     .withArgs('promptValue', 'classes', {'preview-alt': 'preview alt text'})
@@ -187,7 +189,7 @@ test('it adds in inline_disabled if checked', () => {
 
 let renderDialog_ed = null
 
-QUnit.module("InstructureLinks Tinymce Plugin: renderDialog", {
+QUnit.module('InstructureLinks Tinymce Plugin: renderDialog', {
   setup() {
     renderDialog_ed = {
       getBody: () => null,
@@ -197,32 +199,32 @@ QUnit.module("InstructureLinks Tinymce Plugin: renderDialog", {
         getNode: () => ({nodeName: 'SPAN'}),
         getRng: () => {}
       }
-    };
+    }
   },
   teardown() {
-    $("#instructure_link_prompt").remove()
+    $('#instructure_link_prompt').remove()
   }
 })
 
-test("it resets the text field if no existing link is selected", () => {
+test('it resets the text field if no existing link is selected', () => {
   EditorLinks.renderDialog(renderDialog_ed)
-  const $prompt = $("#instructure_link_prompt .prompt")
-  const $btn = $("#instructure_link_prompt .btn")
-  $prompt.val("someurl")
+  const $prompt = $('#instructure_link_prompt .prompt')
+  const $btn = $('#instructure_link_prompt .btn')
+  $prompt.val('someurl')
   $btn.click()
   EditorLinks.renderDialog(renderDialog_ed)
-  equal($prompt.val(), "")
+  equal($prompt.val(), '')
 })
 
-test("it sets the text field to the href if link is selected", () => {
+test('it sets the text field to the href if link is selected', () => {
   EditorLinks.renderDialog(renderDialog_ed)
-  const $prompt = $("#instructure_link_prompt .prompt")
-  const $btn = $("#instructure_link_prompt .btn")
-  $prompt.val("otherurl")
+  const $prompt = $('#instructure_link_prompt .prompt')
+  const $btn = $('#instructure_link_prompt .btn')
+  $prompt.val('otherurl')
   $btn.click()
   const a = document.createElement('a')
   a.href = 'linkurl'
   renderDialog_ed.selection.getNode = () => a
   EditorLinks.renderDialog(renderDialog_ed)
-  equal($prompt.val(), "linkurl")
+  equal($prompt.val(), 'linkurl')
 })

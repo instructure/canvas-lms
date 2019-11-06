@@ -15,21 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react';
-import ErrorAlert from '../index';
-import {shallow} from 'enzyme';
+import React from 'react'
+import {shallow} from 'enzyme'
+import ErrorAlert from '../index'
 
 it('renders', () => {
-  const wrapper = shallow(<ErrorAlert>uh oh</ErrorAlert>);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<ErrorAlert>uh oh</ErrorAlert>)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders with string details', () => {
-  const wrapper = shallow(<ErrorAlert error='whoops'>uh oh</ErrorAlert>);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<ErrorAlert error="whoops">uh oh</ErrorAlert>)
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders with Error details', () => {
-  const wrapper = shallow(<ErrorAlert error={new Error('whoops')}>uh oh</ErrorAlert>);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<ErrorAlert error={new Error('whoops')}>uh oh</ErrorAlert>)
+  expect(wrapper).toMatchSnapshot()
+})

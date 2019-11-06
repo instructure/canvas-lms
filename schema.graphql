@@ -2657,6 +2657,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   """
   _id: ID!
   assignment: Assignment
+  attachment: File
   attachments: [File!]
   attempt: Int!
   body: String
@@ -2704,6 +2705,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   """
   excused: Boolean
   grade: String
+  gradeHidden: Boolean!
 
   """
   was the grade given on the current submission (resubmission)
@@ -2867,6 +2869,9 @@ type SubmissionDraft implements LegacyIDInterface {
   attachments: [File!]
   body: String
   meetsAssignmentCriteria: Boolean!
+  meetsTextEntryCriteria: Boolean!
+  meetsUploadCriteria: Boolean!
+  meetsUrlCriteria: Boolean!
   submissionAttempt: Int!
   url: URL
 }
@@ -2902,6 +2907,7 @@ enum SubmissionGradingStatus {
 
 type SubmissionHistory implements SubmissionInterface & Timestamped {
   assignment: Assignment
+  attachment: File
   attachments: [File!]
   attempt: Int!
   body: String
@@ -2949,6 +2955,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   """
   excused: Boolean
   grade: String
+  gradeHidden: Boolean!
 
   """
   was the grade given on the current submission (resubmission)
@@ -3050,6 +3057,7 @@ Types for submission or submission history
 """
 interface SubmissionInterface {
   assignment: Assignment
+  attachment: File
   attachments: [File!]
   attempt: Int!
   body: String
@@ -3096,6 +3104,7 @@ interface SubmissionInterface {
   """
   excused: Boolean
   grade: String
+  gradeHidden: Boolean!
 
   """
   was the grade given on the current submission (resubmission)
@@ -3365,6 +3374,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
   groups: [Group!]
   id: ID!
   name: String
+  pronouns: String
 
   """
   A short name the user has selected, for use in conversations or other less formal places through the site.

@@ -35,11 +35,14 @@ function CommentContent(props) {
   const [markCommentsRead, {data, called: mutationCalled, error: mutationError}] = useMutation(
     MARK_SUBMISSION_COMMENT_READ,
     {
-      update(cache) {
+      update(cache, {data}) {
         // ValidationError, different then the mutationError
         if (data?.markSubmissionCommentsRead?.errors) {
           return
         }
+
+        const ids = data.markSubmissionCommentsRead.submissionComments.map(c => c._id)
+        const updatedCommentIDs = new Set(ids)
 
         const submissionQueryVariables = {
           id: props.submission.id,
@@ -57,7 +60,12 @@ function CommentContent(props) {
         }
 
         const submission = JSON.parse(JSON.stringify(cache.readFragment(submissionQueryVariables)))
-        submission.unreadCommentCount = 0
+
+        submission.unreadCommentCount = Math.max(
+          0,
+          submission.unreadCommentCount - updatedCommentIDs.size
+        )
+
         cache.writeFragment({
           ...submissionQueryVariables,
           data: {...submission, __typename: 'Submission'}
@@ -66,7 +74,12 @@ function CommentContent(props) {
         const {submissionComments} = JSON.parse(
           JSON.stringify(cache.readQuery(commentQueryVariables))
         )
-        submissionComments.commentsConnection.nodes.forEach(comment => (comment.read = true))
+        submissionComments.commentsConnection.nodes.forEach(comment => {
+          if (updatedCommentIDs.has(comment._id)) {
+            comment.read = true
+          }
+        })
+
         cache.writeQuery({
           ...commentQueryVariables,
           data: {submissionComments}

@@ -518,6 +518,36 @@ describe Course do
     end
   end
 
+  describe "move to assignment group" do
+    before :once do
+      course_factory
+      @course.require_assignment_group
+      @new_group = @course.assignment_groups.create!(name: 'new group')
+      @params = {"copy" => {"assignments" => {"1865116014002" => true}}}
+      json = File.open(File.join(IMPORT_JSON_DIR, 'assignment.json')).read
+      @data = {"assignments" => JSON.parse(json)}.with_indifferent_access
+      @migration = @course.content_migrations.build
+      @migration.migration_settings[:migration_ids_to_import] = @params
+      @migration.migration_settings[:move_to_assignment_group_id] = @new_group.id
+      @migration.save!
+    end
+
+    it "puts a new assignment into assignment group" do
+      other_assign = @course.assignments.create! title: 'other', assignment_group: @new_group
+      Importers::CourseContentImporter.import_content(@course, @data, @params, @migration)
+      new_assign = @course.assignments.where(migration_id: '1865116014002').take
+      expect(new_assign.assignment_group_id).to eq @new_group.id
+    end
+
+    it "moves existing assignment into assignment group" do
+      existing_assign = @course.assignments.create! title: 'blah', migration_id: '1865116014002'
+      expect(existing_assign.assignment_group_id).not_to eq @new_group.id
+      Importers::CourseContentImporter.import_content(@course, @data, @params, @migration)
+      expect(existing_assign.reload.assignment_group_id).to eq @new_group.id
+    end
+
+  end
+
   it 'should be able to i18n without keys' do
     expect { Importers::CourseContentImporter.translate('stuff') }.not_to raise_error
   end

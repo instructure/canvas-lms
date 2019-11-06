@@ -75,7 +75,7 @@ test('creates a fullcalendar instance', () => {
 test('returns correct format for 24 hour times', () => {
   const cal = makeCal()
   const stub = sinon.stub(I18n, 'lookup').returns('%k:%M')
-  strictEqual(cal.eventTimeFormat(), "HH:mm")
+  strictEqual(cal.eventTimeFormat(), 'HH:mm')
   stub.restore()
 })
 

@@ -41,26 +41,26 @@ export const PANELS = {
 
 const ALERT_TIMEOUT = 5000
 const ACCEPTED_FILE_TYPES = [
-  "3gp",
-  "aac",
-  "amr",
-  "asf",
-  "avi",
-  "flac",
-  "flv",
-  "m4a",
-  "m4v",
-  "mkv",
-  "mov",
-  "mp3",
-  "mp4",
-  "mpeg",
-  "mpg",
-  "ogg",
-  "qt",
-  "wav",
-  "wma",
-  "wmv"
+  '3gp',
+  'aac',
+  'amr',
+  'asf',
+  'avi',
+  'flac',
+  'flv',
+  'm4a',
+  'm4v',
+  'mkv',
+  'mov',
+  'mp3',
+  'mp4',
+  'mpeg',
+  'mpg',
+  'ogg',
+  'qt',
+  'wav',
+  'wma',
+  'wmv'
 ]
 
 export const handleSubmit = (editor, selectedPanel, uploadData, saveMediaRecording, onDismiss) => {
@@ -69,7 +69,7 @@ export const handleSubmit = (editor, selectedPanel, uploadData, saveMediaRecordi
       const {theFile} = uploadData
       saveMediaRecording('media', theFile)
       onDismiss()
-      break;
+      break
     }
     case PANELS.EMBED: {
       const {embedCode} = uploadData
@@ -99,29 +99,19 @@ function loadingErrorSuccess(states) {
     )
   } else if (states.uploadingMediaStatus.error) {
     return (
-      <Alert
-        variant="error"
-        margin="small"
-        timeout={ALERT_TIMEOUT}
-      >
+      <Alert variant="error" margin="small" timeout={ALERT_TIMEOUT}>
         {formatMessage('Error uploading video/audio recording')}
       </Alert>
     )
   } else if (states.uploadingMediaStatus.uploaded) {
-    return (
-      <Alert
-        timeout={ALERT_TIMEOUT}
-      >
-        {formatMessage('Video/audio recording uploaded')}
-      </Alert>
-    )
+    return <Alert timeout={ALERT_TIMEOUT}>{formatMessage('Video/audio recording uploaded')}</Alert>
   }
 }
 
 export function UploadMedia(props) {
   const [theFile, setFile] = useState(null)
   const [hasUploadedFile, setHasUploadedFile] = useState(false)
-  const [ selectedPanel, setSelectedPanel ] = useState(0)
+  const [selectedPanel, setSelectedPanel] = useState(0)
   const trayProps = Bridge.trayProps.get(props.editor)
   const [embedCode, setEmbedCode] = useState('')
 
@@ -143,13 +133,25 @@ export function UploadMedia(props) {
           </Modal.Header>
           <Modal.Body>
             {loadingErrorSuccess(contentProps.upload)}
-            <Tabs shouldFocusOnRender size="large" selectedIndex={selectedPanel} onRequestTabChange={newIndex => setSelectedPanel(newIndex)}>
+            <Tabs
+              shouldFocusOnRender
+              size="large"
+              selectedIndex={selectedPanel}
+              onRequestTabChange={newIndex => setSelectedPanel(newIndex)}
+            >
               <Tabs.Panel title={formatMessage('Computer')}>
-                <Suspense fallback={
-                  <View as="div" height="100%" width="100%" textAlign="center">
-                    <Spinner renderTitle={renderLoadingMedia} size="large" margin="0 0 0 medium" />
-                  </View>
-                } size="large">
+                <Suspense
+                  fallback={
+                    <View as="div" height="100%" width="100%" textAlign="center">
+                      <Spinner
+                        renderTitle={renderLoadingMedia}
+                        size="large"
+                        margin="0 0 0 medium"
+                      />
+                    </View>
+                  }
+                  size="large"
+                >
                   <ComputerPanel
                     editor={props.editor}
                     theFile={theFile}
@@ -162,39 +164,62 @@ export function UploadMedia(props) {
                 </Suspense>
               </Tabs.Panel>
               <Tabs.Panel title={formatMessage('Record')}>
-                <Suspense fallback={
-                  <View as="div" height="100%" width="100%" textAlign="center">
-                    <Spinner renderTitle={renderLoadingMedia} size="large" margin="0 0 0 medium" />
-                  </View>
-                }>
-                  <MediaRecorder editor={props.editor} dismiss={props.onDismiss} contentProps={contentProps}/>
+                <Suspense
+                  fallback={
+                    <View as="div" height="100%" width="100%" textAlign="center">
+                      <Spinner
+                        renderTitle={renderLoadingMedia}
+                        size="large"
+                        margin="0 0 0 medium"
+                      />
+                    </View>
+                  }
+                >
+                  <MediaRecorder
+                    editor={props.editor}
+                    dismiss={props.onDismiss}
+                    contentProps={contentProps}
+                  />
                 </Suspense>
               </Tabs.Panel>
               <Tabs.Panel title={formatMessage('Embed')}>
-                <Suspense fallback={
-                  <View as="div" height="100%" width="100%" textAlign="center">
-                    <Spinner renderTitle={renderLoadingMedia} size="large" margin="0 0 0 medium" />
-                  </View>
-                }>
+                <Suspense
+                  fallback={
+                    <View as="div" height="100%" width="100%" textAlign="center">
+                      <Spinner
+                        renderTitle={renderLoadingMedia}
+                        size="large"
+                        margin="0 0 0 medium"
+                      />
+                    </View>
+                  }
+                >
                   <EmbedPanel embedCode={embedCode} setEmbedCode={setEmbedCode} />
                 </Suspense>
               </Tabs.Panel>
             </Tabs>
           </Modal.Body>
-          {selectedPanel !== PANELS.RECORD &&
+          {selectedPanel !== PANELS.RECORD && (
             <Modal.Footer>
               <Button onClick={props.onDismiss}>{formatMessage('Close')}</Button>&nbsp;
               <Button
                 onClick={e => {
                   e.preventDefault()
-                  handleSubmit(props.editor, selectedPanel, {embedCode, theFile}, contentProps.saveMediaRecording, props.onDismiss)
+                  handleSubmit(
+                    props.editor,
+                    selectedPanel,
+                    {embedCode, theFile},
+                    contentProps.saveMediaRecording,
+                    props.onDismiss
+                  )
                 }}
                 variant="primary"
-                type="submit">
+                type="submit"
+              >
                 {formatMessage('Submit')}
               </Button>
             </Modal.Footer>
-          }
+          )}
         </Modal>
       )}
     </StoreProvider>

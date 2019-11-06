@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {string} from 'prop-types'
-import { StyleSheet, css } from "aphrodite";
+import {StyleSheet, css} from 'aphrodite'
 
 import {Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
@@ -37,8 +37,8 @@ export default function ExpandoText(props) {
       position="relative"
       aria-expanded={descExpanded}
       focused={focused}
-      onClick={(event) => {
-        if(event.target.tagName !== 'A' || event.target.tagName !== 'BUTTON') {
+      onClick={event => {
+        if (event.target.tagName !== 'A' || event.target.tagName !== 'BUTTON') {
           // let the user click on links and buttons
           setDescExpanded(!descExpanded)
         }
@@ -49,7 +49,7 @@ export default function ExpandoText(props) {
       <span style={{display: 'flex', alignItems: 'start'}}>
         <span style={{marginRight: '.25rem', display: 'inline-block'}}>
           <Text color="secondary">
-            {descExpanded ? <IconArrowOpenDownLine/> : <IconArrowOpenEndLine/>}
+            {descExpanded ? <IconArrowOpenDownLine /> : <IconArrowOpenEndLine />}
           </Text>
         </span>
         <span style={{flexGrow: '1', minWidth: '10rem'}}>
@@ -98,4 +98,4 @@ export const styles = StyleSheet.create({
     height: '1.2rem',
     textOverflow: 'ellipsis'
   }
-});
+})

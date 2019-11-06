@@ -211,6 +211,34 @@ describe AssignmentsController do
       expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be false
     end
 
+    it "should set FLAGS/newquizzes_on_quiz_page in js_env if 'newquizzes_on_quiz_page' is enabled" do
+      user_session @teacher
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.enable_feature! :newquizzes_on_quiz_page
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:FLAGS][:newquizzes_on_quiz_page]).to be_truthy
+    end
+
+    it "should not set FLAGS/newquizzes_on_quiz_page in js_env if 'newquizzes_on_quiz_page' is disabled" do
+      user_session @teacher
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
+      @course.root_account.disable_feature! :newquizzes_on_quiz_page
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:FLAGS][:newquizzes_on_quiz_page]).to be_falsey
+    end
+
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
@@ -230,19 +258,6 @@ describe AssignmentsController do
       allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
-    end
-
-    it "js_env DIRECT_SHARE_ENABLED when direct_share feature is enabled" do
-      @course.root_account.enable_feature!(:direct_share)
-      user_session(@teacher)
-      get 'index', params: {:course_id => @course.id}
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to eq true
-    end
-
-    it "js_env DIRECT_SHARE_ENABLED when direct_share feature is disabled" do
-      user_session(@teacher)
-      get 'index', params: {:course_id => @course.id}
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to eq false
     end
 
     context "draft state" do
@@ -1122,15 +1137,27 @@ describe AssignmentsController do
         @course.root_account.enable_feature! :newquizzes_on_quiz_page
       end
 
-      it 'sets active tab to quizzes' do
+      it 'sets active tab to quizzes for new quizzes' do
         user_session(@teacher)
-        get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+        get 'new', params: { course_id: @course.id, quiz_lti: true }
         expect(assigns[:active_tab]).to eq('quizzes')
       end
 
-      it 'sets crumb to Quizzes' do
+      it 'sets crumb to Quizzes for new quizzes' do
         user_session(@teacher)
-        get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+        get 'new', params: { course_id: @course.id, quiz_lti: true }
+        expect(assigns[:_crumbs]).to include(['Quizzes', "/courses/#{@course.id}/quizzes", {}])
+      end
+
+      it 'sets active tab to quizzes for editing quizzes' do
+        user_session(@teacher)
+        post 'edit', params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
+        expect(assigns[:active_tab]).to eq('quizzes')
+      end
+
+      it 'sets crumb to Quizzes for editing quizzes' do
+        user_session(@teacher)
+        post 'new', params: { course_id: @course.id, id: @assignment.id, quiz_lti: true }
         expect(assigns[:_crumbs]).to include(['Quizzes', "/courses/#{@course.id}/quizzes", {}])
       end
     end
@@ -1556,6 +1583,41 @@ describe AssignmentsController do
       expect(assigns[:assignment]).not_to be_nil
       expect(assigns[:assignment]).not_to be_frozen
       expect(assigns[:assignment]).to be_deleted
+    end
+  end
+
+  describe "POST 'publish'" do
+    it "should require authorization" do
+      post 'publish_quizzes', params: { course_id: @course.id, quizzes: [@assignment.id] }
+      assert_unauthorized
+    end
+
+    it "should publish unpublished assignments" do
+      user_session(@teacher)
+      @assignment = @course.assignments.build(title: 'New quiz!', workflow_state: 'unpublished')
+      @assignment.save!
+
+      expect(@assignment).not_to be_published
+      post 'publish_quizzes', params: { course_id: @course.id, quizzes: [@assignment.id] }
+
+      expect(@assignment.reload).to be_published
+    end
+  end
+
+  describe "POST 'unpublish'" do
+    it "should require authorization" do
+      post 'unpublish_quizzes', params: { course_id: @course.id, quizzes: [@assignment.id] }
+      assert_unauthorized
+    end
+
+    it "should unpublish published quizzes" do
+      user_session(@teacher)
+      @assignment = @course.assignments.create(title: 'New quiz!', workflow_state: 'published')
+
+      expect(@assignment).to be_published
+      post 'unpublish_quizzes', params: { course_id: @course.id, quizzes: [@assignment.id] }
+
+      expect(@assignment.reload).not_to be_published
     end
   end
 

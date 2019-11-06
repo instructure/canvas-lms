@@ -37,15 +37,14 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
 
         studentGroupSets: [
           {
-            groups: [{id: '2101', name: 'Group A1'}, {id: '2102', name: 'Group A2'}],
-            id: '2151',
-            name: 'Group Set A'
-          },
-
-          {
             groups: [{id: '2103', name: 'Group B1'}, {id: '2104', name: 'Group B2'}],
             id: '2152',
             name: 'Group Set B'
+          },
+          {
+            groups: [{id: '2101', name: 'Group A2'}, {id: '2102', name: 'Group A1'}],
+            id: '2151',
+            name: 'Group Set A'
           }
         ],
 
@@ -72,7 +71,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
     })
 
     test('displays the name of the selected student group as the value', () => {
-      props.selectedStudentGroupId = '2102'
+      props.selectedStudentGroupId = '2101'
       renderComponent()
       equal(filter.selectedItemLabel, 'Group A2')
     })
@@ -83,7 +82,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
     })
 
     QUnit.module('student group sets', () => {
-      test('labels each group set option group using the related name', () => {
+      test('labels each group set option group using the related name in alphabetical order', () => {
         renderComponent()
         filter.clickToExpand()
         const labels = filter.optionGroupLabels
@@ -99,7 +98,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         equal($allItemsOption.textContent.trim(), 'All Student Groups')
       })
 
-      test('labels each option using the related student group name', () => {
+      test('labels each option using the related student group name in alphabetical order', () => {
         renderComponent()
         filter.clickToExpand()
         const labels = filter.$options.slice(1).map($option => $option.textContent.trim())
@@ -128,7 +127,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         filter.clickToExpand()
         filter.clickToSelectOption('Group A1')
         const [selectedStudentGroupId] = props.onSelect.lastCall.args
-        strictEqual(selectedStudentGroupId, '2101')
+        strictEqual(selectedStudentGroupId, '2102')
       })
 
       test('includes "0" when the "All Student Groups" is clicked', () => {

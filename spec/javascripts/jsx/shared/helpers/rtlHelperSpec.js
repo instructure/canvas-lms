@@ -21,8 +21,7 @@
 import {direction} from 'jsx/shared/helpers/rtlHelper'
 
 QUnit.module('rtlHelper', () => {
-  QUnit.module('.direction', (hooks) => {
-    
+  QUnit.module('.direction', hooks => {
     let el
     hooks.beforeEach(() => {
       el = document.createElement('div')

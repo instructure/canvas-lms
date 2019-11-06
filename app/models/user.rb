@@ -21,6 +21,7 @@ require 'atom'
 class User < ActiveRecord::Base
   GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
   include TurnitinID
+  include Pronouns
 
   # this has to be before include Context to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
@@ -1808,6 +1809,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  def participating_current_and_concluded_course_ids
+    cached_course_ids('current_and_concluded') do |enrollments|
+      enrollments.current_and_concluded.not_inactive_by_date_ignoring_access
+    end
+  end
+
   def participating_student_current_and_concluded_course_ids
     cached_course_ids('student_current_and_concluded') do |enrollments|
       enrollments.current_and_concluded.not_inactive_by_date_ignoring_access.where(type: %w{StudentEnrollment StudentViewEnrollment})
@@ -2870,5 +2877,13 @@ class User < ActiveRecord::Base
       break if ObserverPairingCode.active.where(code: code).count == 0
     end
     observer_pairing_codes.create(expires_at: 7.days.from_now, code: code)
+  end
+
+  def pronouns
+    translate_pronouns(read_attribute(:pronouns))
+  end
+
+  def pronouns=(pronouns)
+    write_attribute(:pronouns, untranslate_pronouns(pronouns))
   end
 end
