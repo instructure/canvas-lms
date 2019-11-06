@@ -29,6 +29,10 @@ import SisButtonView from '../SisButtonView'
 import template from 'jst/quizzes/QuizItemView'
 import 'jquery.disableWhileLoading'
 import Quiz from '../../models/Quiz'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
 
 export default class ItemView extends Backbone.View {
   static initClass() {
@@ -62,6 +66,10 @@ export default class ItemView extends Backbone.View {
       multipleDates: I18n.t('multiple_due_dates', 'Multiple Dates'),
       deleteSuccessful: I18n.t('flash.removed', 'Quiz successfully deleted.'),
       deleteFail: I18n.t('flash.fail', 'Quiz deletion failed.')
+    }
+
+    this.prototype.els = {
+      '.al-trigger': '$settingsButton'
     }
   }
 
@@ -186,14 +194,46 @@ export default class ItemView extends Backbone.View {
     })
   }
 
+  renderCopyToTray(open) {
+    const quizId = this.model.get('id')
+    ReactDOM.render(
+      <DirectShareCourseTray
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentSelection={{quizzes: [quizId]}}
+        onDismiss={() => {
+          this.renderCopyToTray(false)
+          return setTimeout(() => this.$settingsButton.focus(), 100)
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
   copyQuizTo(ev) {
     ev.preventDefault()
-    console.log(`copy quiz ${this.model.get('id')} to course`)
+    this.renderCopyToTray(true)
+  }
+
+  renderSendToTray(open) {
+    const quizId = this.model.get('id')
+    ReactDOM.render(
+      <DirectShareUserModal
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentShare={{content_type: 'quiz', content_id: quizId}}
+        onDismiss={() => {
+          this.renderSendToTray(false)
+          return setTimeout(() => this.$settingsButton.focus(), 100)
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
   }
 
   sendQuizTo(ev) {
     ev.preventDefault()
-    console.log(`send quiz ${this.model.get('id')} to user`)
+    this.renderSendToTray(true)
   }
 
   observeModel() {
