@@ -1026,9 +1026,15 @@ export default do ->
       submission.excused = !!submission.excused
       submission.hidden = !!submission.hidden
       submission.rawGrade = submission.grade # save the unformatted version of the grade too
-      submission.grade = GradeFormatHelper.formatGrade(submission.grade, {
-        gradingType: submission.gradingType, delocalize: false
-      })
+
+      if assignment = @assignments[submission.assignment_id]
+        submission.gradingType = assignment.grading_type
+
+        if submission.gradingType != "pass_fail"
+          submission.grade = GradeFormatHelper.formatGrade(submission.grade, {
+            gradingType: submission.gradingType, delocalize: false
+          })
+
       cell = student["assignment_#{submission.assignment_id}"] ||= {}
       _.extend(cell, submission)
 
