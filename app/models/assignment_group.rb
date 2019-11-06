@@ -67,6 +67,7 @@ class AssignmentGroup < ActiveRecord::Base
     end
     self.default_assignment_name = self.name
     self.default_assignment_name = self.default_assignment_name.singularize if I18n.locale == :en
+    self.position = self.position_was if self.will_save_change_to_position? && self.position.nil? # don't allow setting to nil
   end
   protected :generate_default_values
 

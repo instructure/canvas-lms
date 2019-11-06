@@ -873,6 +873,7 @@ class Assignment < ActiveRecord::Base
     self.title ||= (self.assignment_group.default_assignment_name rescue nil) || "Assignment"
 
     self.infer_all_day
+    self.position = self.position_was if self.will_save_change_to_position? && self.position.nil? # don't allow setting to nil
 
     if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
       ensure_assignment_group(false)
