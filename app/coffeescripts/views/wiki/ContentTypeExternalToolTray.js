@@ -54,7 +54,8 @@ ContentTypeExternalToolTray.propTypes = {
   targetResourceType: oneOf(knownResourceTypes).isRequired,
   allowItemSelection: bool.isRequired,
   selectableItems: arrayOf(oneOf(knownResourceTypes)).isRequired,
-  onDismiss: func
+  onDismiss: func,
+  open: bool
 }
 
 export default function ContentTypeExternalToolTray({
@@ -64,7 +65,8 @@ export default function ContentTypeExternalToolTray({
   targetResourceType,
   allowItemSelection,
   selectableItems,
-  onDismiss
+  onDismiss,
+  open
 }) {
   const queryParams = {
     com_instructure_course_accept_canvas_resource_types: acceptedResourceTypes,
@@ -74,16 +76,16 @@ export default function ContentTypeExternalToolTray({
     display: 'borderless',
     placement
   }
-  const prefix = tool.base_url.indexOf('?') === -1 ? '?' : '&'
-  const iframeUrl = `${tool.base_url}${prefix}${$.param(queryParams)}`
-
+  const prefix = tool?.base_url.indexOf('?') === -1 ? '?' : '&'
+  const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`
+  const title = tool ? tool.title : ''
   return (
-    <CanvasTray open label={tool.title} onDismiss={onDismiss} placement="end" size="regular">
+    <CanvasTray open={open} label={title} onDismiss={onDismiss} placement="end" size="regular">
       <iframe
         data-testid="ltiIframe"
         style={iframeStyle}
         src={iframeUrl}
-        title={tool.title}
+        title={title}
         data-lti-launch="true"
       />
     </CanvasTray>

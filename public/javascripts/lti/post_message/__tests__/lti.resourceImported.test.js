@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,4 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const whitelist = ['requestFullWindowLaunch', 'lti.resourceImported']
+import handler from '../lti.resourceImported'
+import {ltiState} from '../handleLtiPostMessage'
+
+const resourceImportedMessage = {
+  messageType: 'lti.resourceImported',
+  data: 'http://localhost/test'
+}
+
+describe('lti.resourceImported', () => {
+  afterAll(() => {
+    delete ltiState.tray
+  })
+
+  it('adds refreshOnClose state to window', () => {
+    handler(resourceImportedMessage)
+    expect(ltiState.tray).toEqual({refreshOnClose: true})
+  })
+})

@@ -22,6 +22,16 @@ import WikiPageIndexView from 'compiled/views/wiki/WikiPageIndexView'
 import $ from 'jquery'
 import 'jquery.disableWhileLoading'
 import fakeENV from 'helpers/fakeENV'
+import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
+
+const indexMenuLtiTool = {
+  id: '18',
+  title: 'Named LTI Tool',
+  base_url: 'http://localhost/courses/1/external_tools/18?launch_type=wiki_index_menu',
+  tool_id: 'named_lti_tool',
+  icon_url: 'http://localhost:3001/icon.png',
+  canvas_icon_class: null
+}
 
 QUnit.module('WikiPageIndexView:direct_share', {
   setup() {
@@ -75,6 +85,71 @@ test('opens and closes the direct share user modal', function() {
   )
   userModal.firstCall.args[0].onDismiss()
   ok(userModal.secondCall.calledWithMatch({open: false}))
+})
+
+QUnit.module('WikiPageIndexView:open_external_tool', {
+  setup() {
+    fakeENV.setup()
+    ENV.COURSE_ID = 'a course'
+    this.model = new WikiPage({page_id: '42'})
+    this.collection = new WikiPageCollection([this.model])
+    this.view = new WikiPageIndexView({
+      collection: this.collection,
+      WIKI_RIGHTS: {
+        create_page: true,
+        manage: true
+      },
+      wikiIndexPlacements: indexMenuLtiTool
+    })
+  },
+
+  teardown() {
+    fakeENV.teardown()
+    delete window.ltiTrayState
+  }
+})
+
+test('opens and closes the lti tray and returns focus', function() {
+  const trayComponent = sandbox.stub(this.view, 'ContentTypeExternalToolTray').returns(null)
+  this.collection.trigger('fetch')
+  const toolbarKabobMenu = this.view.$el.find('.al-trigger')[0]
+  this.view.setExternalToolTray(indexMenuLtiTool, toolbarKabobMenu)
+  ok(
+    trayComponent.firstCall.calledWithMatch({
+      tool: indexMenuLtiTool,
+      placement: 'wiki_index_menu',
+      acceptedResourceTypes: ['page'],
+      targetResourceType: 'page',
+      allowItemSelection: false,
+      selectableItems: [],
+      open: true
+    })
+  )
+  trayComponent.firstCall.args[0].onDismiss()
+  ok(trayComponent.secondCall.calledWithMatch({open: false}))
+})
+
+test('reloads page when closing tray if needed', function() {
+  const trayComponent = sandbox.stub(this.view, 'ContentTypeExternalToolTray').returns(null)
+  const pageReload = sandbox.stub(this.view, 'reloadPage').returns(null)
+  this.collection.trigger('fetch')
+  const toolbarKabobMenu = this.view.$el.find('.al-trigger')[0]
+  this.view.setExternalToolTray(indexMenuLtiTool, toolbarKabobMenu)
+  ok(
+    trayComponent.firstCall.calledWithMatch({
+      tool: indexMenuLtiTool,
+      placement: 'wiki_index_menu',
+      acceptedResourceTypes: ['page'],
+      targetResourceType: 'page',
+      allowItemSelection: false,
+      selectableItems: [],
+      open: true
+    })
+  )
+  ltiState.tray = {refreshOnClose: true}
+  trayComponent.firstCall.args[0].onDismiss()
+  ok(trayComponent.secondCall.calledWithMatch({open: false}))
+  ok(pageReload.called)
 })
 
 QUnit.module('WikiPageIndexView:sort', {

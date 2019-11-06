@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import handleLtiPostMessage from '../handleLtiPostMessage'
+import handleLtiPostMessage, {ltiState} from '../handleLtiPostMessage'
 
 const requestFullWindowLaunchMessage = {
   messageType: 'requestFullWindowLaunch',
@@ -45,5 +45,11 @@ describe('handleLtiPostMessage', () => {
       const wasCalled = await handleLtiPostMessage(postMessageEvent({messageType: 'notSupported'}))
       expect(wasCalled).toBeFalsy()
     })
+  })
+})
+
+describe('ltiState', () => {
+  it('is empty initially', () => {
+    expect(ltiState).toEqual({})
   })
 })

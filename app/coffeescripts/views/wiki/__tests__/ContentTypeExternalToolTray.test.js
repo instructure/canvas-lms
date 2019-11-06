@@ -34,6 +34,7 @@ describe('ContentTypeExternalToolTray', () => {
         targetResourceType="page"
         allowItemSelection
         selectableItems={[{id: '1', name: 'module 1'}]}
+        open
         {...props}
       />
     )

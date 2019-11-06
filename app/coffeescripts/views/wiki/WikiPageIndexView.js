@@ -30,6 +30,7 @@ import ContentTypeExternalToolTray from './ContentTypeExternalToolTray'
 import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
 import 'jquery.disableWhileLoading'
+import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
 
 export default class WikiPageIndexView extends PaginatedCollectionView {
   static initClass() {
@@ -38,13 +39,15 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       events: {
         'click .new_page': 'createNewPage',
         'keyclick .new_page': 'createNewPage',
-        'click .header-row a[data-sort-field]': 'sort'
+        'click .header-row a[data-sort-field]': 'sort',
+        'click .header-bar-right .menu_tool_link': 'openExternalTool'
       },
 
       els: {
         '.no-pages': '$noPages',
         '.no-pages a:first-child': '$noPagesLink',
         '.header-row a[data-sort-field]': '$sortHeaders',
+        '#external-tool-mount-point': '$externalToolMountPoint',
         '#copy-to-mount-point': '$copyToMountPoint',
         '#send-to-mount-point': '$sendToMountPoint'
       }
@@ -65,6 +68,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     // Poor man's dependency injection just so we can stub out the react components
     this.DirectShareCourseTray = DirectShareCourseTray
     this.DirectShareUserModal = DirectShareUserModal
+    this.ContentTypeExternalToolTray = ContentTypeExternalToolTray
 
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
 
@@ -198,29 +202,40 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     })
   }
 
-  closeExternalTool() {
-    const mountPoint = $('#externalToolMountPoint')[0]
-    ReactDOM.unmountComponentAtNode(mountPoint)
-  }
-
   openExternalTool(ev) {
     if (ev != null) {
       ev.preventDefault()
     }
-
     const tool = this.wikiIndexPlacements.find(t => t.id === ev.target.dataset.toolId)
-    const mountPoint = $('#externalToolMountPoint')[0]
+    this.setExternalToolTray(tool, $('.al-trigger')[0])
+  }
+
+  reloadPage() {
+    window.location.reload()
+  }
+
+  setExternalToolTray(tool, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setExternalToolTray(null)
+      returnFocusTo.focus()
+      if (ltiState?.tray?.refreshOnClose) {
+        this.reloadPage()
+      }
+    }
+
+    const {ContentTypeExternalToolTray: ExternalToolTray} = this
     ReactDOM.render(
-      <ContentTypeExternalToolTray
+      <ExternalToolTray
         tool={tool}
         placement="wiki_index_menu"
         acceptedResourceTypes={['page']}
         targetResourceType="page"
         allowItemSelection={false}
         selectableItems={[]}
-        onDismiss={this.closeExternalTool}
+        onDismiss={handleDismiss}
+        open={tool !== null}
       />,
-      mountPoint
+      this.$externalToolMountPoint[0]
     )
   }
 

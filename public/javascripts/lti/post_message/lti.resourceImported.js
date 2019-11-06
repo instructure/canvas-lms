@@ -15,31 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {ltiState} from './handleLtiPostMessage'
 
-import {whitelist} from './messageTypes'
-
-// page-global storage for data relevant to LTI postMessage events
-const ltiState = {}
-export {ltiState}
-
-const handleLtiPostMessage = async e => {
-  const {messageType, data} = e.data
-  let handler
-
-  // Enforce messageType whitelist
-  if (!whitelist.includes(messageType)) {
-    console.error(`invalid messageType: ${messageType}`)
-    return false
+const handler = () => {
+  if (!ltiState.tray) {
+    ltiState.tray = {}
   }
-
-  try {
-    const handlerModule = await import(`./${messageType}.js`)
-    handler = handlerModule.default
-    handler(data)
-    return true
-  } catch (error) {
-    console.error(`Error loading or executing message handler for "${messageType}"`, error)
-  }
+  ltiState.tray.refreshOnClose = true
 }
 
-export default handleLtiPostMessage
+export default handler
