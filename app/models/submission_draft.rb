@@ -30,6 +30,8 @@ class SubmissionDraft < ActiveRecord::Base
   validates :url, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
   validate :media_object_id_matches_media_object
 
+  sanitize_field :body, CanvasSanitize::SANITIZE
+
   before_save :validate_url
 
   def validate_url
