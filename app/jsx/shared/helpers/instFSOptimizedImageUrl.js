@@ -40,7 +40,9 @@ const dpiMultiplier =
  * @returns <String> url with query string parameters added
  */
 export default function instFSOptimizedImageUrl(url, {x, y}) {
-  url += (url.includes('?') ? '&' : '?') + `geometry=${x * dpiMultiplier}x${y * dpiMultiplier}`
-  if (supportsWebp) url += '&format=webp'
+  if (url && url.startsWith('https://inst-fs-')) {
+    url += (url.includes('?') ? '&' : '?') + `geometry=${x * dpiMultiplier}x${y * dpiMultiplier}`
+    if (supportsWebp) url += '&format=webp'
+  }
   return url
 }
