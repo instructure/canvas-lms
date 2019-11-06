@@ -38,6 +38,7 @@ if ENV['DATABASE_URL']
     ENV['PGHOST'] = database_uri.host
     # Note: if you want to get fancier, here is a good example of parsing out other
     # DB config stuff from the DATABASE_URL: https://gist.github.com/gullitmiranda/62082f2e47c364ef9617 
+    # If you decide to set the pool through this, do it in config/puma.rb and config/initializers/database_connection.rb
   rescue URI::InvalidURIError
     raise "Invalid DATABASE_URL=#{ENV["DATABASE_URL"]}. Fatal error."
   end
@@ -111,7 +112,7 @@ module CanvasRails
         # 3 and 4 use the same initializer
         require 'rails_stdout_logging/rails3'
         RailsStdoutLogging::Rails3.set_logger(config)
-        puts "Rails.logger is configured to log to STDOUT."
+        Rails.logger.info "### Rails.logger is configured to log to STDOUT."
      else
         log_path = config.paths['log'].first
 
