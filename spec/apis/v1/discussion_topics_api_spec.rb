@@ -144,6 +144,11 @@ describe Api::V1::DiscussionTopics do
     expect(data[:assignment]).to be_nil
   end
 
+  it "should not die if user is nil (like when a non-logged-in user visits a public course)" do
+    data = @test_api.discussion_topic_api_json(@topic, @topic.context, nil, nil)
+    expect(data).to be_present
+  end
+
   context "with assignment" do
     before :once do
       @topic.assignment = assignment_model(:course => @course)
