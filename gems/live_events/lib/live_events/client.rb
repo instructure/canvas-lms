@@ -76,6 +76,14 @@ module LiveEvents
       tags = { event: event_name }
 
       ctx ||= {}
+      if ctx.empty?
+        begin
+          raise "LiveEvent context is empty!"
+        rescue => e
+          LiveEvents.logger.error(([e.message]+e.backtrace).join($INPUT_RECORD_SEPARATOR))
+        end
+      end
+
       attributes = ctx.except(*ATTRIBUTE_BLACKLIST).merge({
         event_name: event_name,
         event_time: time.utc.iso8601(3)
