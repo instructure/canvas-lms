@@ -143,6 +143,33 @@ describe('SearchItemSelector', () => {
     expect(getByText(/no results/i)).toBeInTheDocument()
   })
 
+  it('removes the existing input if the contextId changes', () => {
+    useManagedCourseSearchApi.mockImplementationOnce(({success}) =>
+      success([{id: 'foo', name: 'bar'}])
+    )
+    const handleCourseSelected = jest.fn()
+    const {getByText, getByLabelText, rerender} = render(
+      <SearchItemSelector
+        itemSearchFunction={useManagedCourseSearchApi}
+        onItemSelected={handleCourseSelected}
+        renderLabel="Select a course"
+      />
+    )
+    const selectInput = getByLabelText(/select a course/i)
+    fireEvent.click(selectInput)
+    fireEvent.click(getByText('bar'))
+    expect(selectInput.value).toBe('bar')
+    rerender(
+      <SearchItemSelector
+        contextId="1"
+        itemSearchFunction={useManagedCourseSearchApi}
+        onItemSelected={handleCourseSelected}
+        renderLabel="Select a course"
+      />
+    )
+    expect(selectInput.value).toBe('')
+  })
+
   // not sure how to suppress the error output this creates. oh well.
   it('throws errors for handling by an ErrorBoundary', () => {
     const testError = new Error('test error')
