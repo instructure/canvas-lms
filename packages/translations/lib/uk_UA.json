@@ -38,6 +38,12 @@
     "all_items_loaded_aa256183": {
         "message": "Всі елементи завантажені"
     },
+    "alphabetical_55b5b4e0": {
+        "message": "Алфавітний"
+    },
+    "alt_text_611fb322": {
+        "message": "Альтернативний текст"
+    },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Виникла помилка при спробі відхилити цю можливість."
     },
@@ -98,6 +104,12 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, нагадування { datetime }."
     },
+    "audio_and_video_recording_is_not_available_c7173efc": {
+        "message": "Запис аудіо та відео не доступний"
+    },
+    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+        "message": "Автоматично відкритий поточний попередній перегляд. \n(Попередній перегляд відображається лише після збереження)"
+    },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Початок вашої історії завдань"
     },
@@ -116,6 +128,9 @@
     "canvas_plugins_705a5016": {
         "message": "Canvas Модулі"
     },
+    "clear_selected_file_82388e50": {
+        "message": "Очистити вибраний файл"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Натисніть на будь-яку сторінку, щоб вставити посилання на цю сторінку."
     },
@@ -125,6 +140,9 @@
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Натисніть, щоб вставити  посилання на редактор."
     },
+    "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+        "message": "Закрийте меню або діалогове вікно. Що також повертає вас до області редактора"
+    },
     "close_d634289d": {
         "message": "Закрити"
     },
@@ -133,6 +151,12 @@
     },
     "collaborations_5c56c15f": {
         "message": "Сумісна робота"
+    },
+    "computer_1d7dfa6f": {
+        "message": "Комп''ютер"
+    },
+    "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
+        "message": "Вміст все ще завантажується, якщо ви продовжите, він не буде вбудований належним чином."
     },
     "content_type_2cf90d95": {
         "message": "Тип вмісту"
@@ -191,6 +215,9 @@
     "dimensions_45ddb7b7": {
         "message": "Розміри"
     },
+    "disable_in_line_preview_2a675175": {
+        "message": "Вимкнути поточний попередній перегляд."
+    },
     "discussion_6719c51d": {
         "message": "Обговорення"
     },
@@ -212,8 +239,20 @@
     "dismissed_opportunities_f0826640": {
         "message": "Відхилені можливості"
     },
+    "documents_81393201": {
+        "message": "Документи"
+    },
     "done_54e3d4b6": {
         "message": "Готово"
+    },
+    "drag_a_file_here_1bf656d5": {
+        "message": "Перетягніть файл сюди"
+    },
+    "drag_a_file_here_39357b48": {
+        "message": "Перетягніть файл сюди"
+    },
+    "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+        "message": "Перетягніть і відпустіть, або клацніть для перегляду вашого комп''ютера"
     },
     "due_5d7267be": {
         "message": "Очікується:"

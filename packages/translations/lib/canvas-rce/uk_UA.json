@@ -9,6 +9,8 @@
     "message": "Вирівнювання та відступ"
   },
   "all_4321c3a1": { "message": "Всі" },
+  "alphabetical_55b5b4e0": { "message": "Алфавітний" },
+  "alt_text_611fb322": { "message": "Альтернативний текст" },
   "an_error_occurred_generating_the_file_preview_cf259955": {
     "message": " Сталася помилка під час створення попереднього перегляду файлу"
   },
@@ -19,8 +21,15 @@
     "message": "Співвідношення сторін збережеться"
   },
   "assignments_1e02582c": { "message": "Завдання" },
+  "audio_and_video_recording_is_not_available_c7173efc": {
+    "message": "Запис аудіо та відео не доступний"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Автоматично відкритий поточний попередній перегляд. \n(Попередній перегляд відображається лише після збереження)"
+  },
   "cancel_caeb1e68": { "message": "Скасувати" },
   "canvas_plugins_705a5016": { "message": "Canvas Модулі" },
+  "clear_selected_file_82388e50": { "message": "Очистити вибраний файл" },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Натисніть на будь-яку сторінку, щоб вставити посилання на цю сторінку."
   },
@@ -30,8 +39,15 @@
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Натисніть, щоб вставити  посилання на редактор."
   },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Закрийте меню або діалогове вікно. Що також повертає вас до області редактора"
+  },
   "close_d634289d": { "message": "Закрити" },
   "collaborations_5c56c15f": { "message": "Сумісна робота" },
+  "computer_1d7dfa6f": { "message": "Комп''ютер" },
+  "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
+    "message": "Вміст все ще завантажується, якщо ви продовжите, він не буде вбудований належним чином."
+  },
   "content_type_2cf90d95": { "message": "Тип вмісту" },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
@@ -41,9 +57,18 @@
   "custom_6979cd81": { "message": "Звичай" },
   "decrease_indent_de6343ab": { "message": "Зменшити відступ" },
   "dimensions_45ddb7b7": { "message": "Розміри" },
+  "disable_in_line_preview_2a675175": {
+    "message": "Вимкнути поточний попередній перегляд."
+  },
   "discussions_a5f96392": { "message": "Обговорення" },
   "discussions_index_6c36ced": { "message": "Індекс обговорення" },
+  "documents_81393201": { "message": "Документи" },
   "done_54e3d4b6": { "message": "Готово" },
+  "drag_a_file_here_1bf656d5": { "message": "Перетягніть файл сюди" },
+  "drag_a_file_here_39357b48": { "message": "Перетягніть файл сюди" },
+  "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+    "message": "Перетягніть і відпустіть, або клацніть для перегляду вашого комп''ютера"
+  },
   "due_multiple_dates_cc0ee3f5": { "message": "Очікується: Кілька дат" },
   "embed_image_1080badc": { "message": "Вставити забраження" },
   "files_c300e900": { "message": "Файли" },

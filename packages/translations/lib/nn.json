@@ -5,6 +5,9 @@
     "add_8523c19b": {
         "message": "Legg til"
     },
+    "add_cc_subtitles_55f0394e": {
+        "message": "Legg til undertekstar"
+    },
     "add_to_do_7537af64": {
         "message": "Legg til gjeremål"
     },
@@ -104,6 +107,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, påminning om frist den { datetime }."
     },
+    "audio_and_video_recording_is_not_available_c7173efc": {
+        "message": "Innspeling av lyd og bilde er ikkje tilgjengeleg."
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Opne automatisk i integrert førehandsvising (sjå førehandsvisinga etter lagring)"
     },
@@ -124,6 +130,9 @@
     },
     "canvas_plugins_705a5016": {
         "message": "Canvas-programtillegg"
+    },
+    "choose_caption_file_9c45bc4e": {
+        "message": "Vel undertekstfil"
     },
     "circle_unordered_list_9e3a0763": {
         "message": "sirkulær uordna liste"
@@ -158,6 +167,9 @@
     "computer_1d7dfa6f": {
         "message": "Datamaskin"
     },
+    "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
+        "message": "Innhald lastar framleis og vil ikkje bli integrert godt nok dersom du held fram."
+    },
     "content_subtype_5ce35e88": {
         "message": "Innhald underkategori"
     },
@@ -171,10 +183,10 @@
         "message": "{ count, plural,\n     =0 {# muligheter}\n    one {# mulighet}\n  other {# muligheter}\n}"
     },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+        "message": "{ count, plural,\n    one {# element lasta}\n  other {# element lasta}\n}"
     },
     "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+        "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte element}\n}"
     },
     "course_8a63b4a3": {
         "message": "Emne"
@@ -290,6 +302,9 @@
     "done_54e3d4b6": {
         "message": "Fullført"
     },
+    "drag_a_file_here_1bf656d5": {
+        "message": "Dra ei fil hit"
+    },
     "drag_a_file_here_39357b48": {
         "message": "Dra fila hit"
     },
@@ -298,6 +313,9 @@
     },
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Dragrep. Bruk piltastane opp og ned for å endre storleik"
+    },
+    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
+        "message": "Dra og slipp, eller klikk for å hente fil frå disk"
     },
     "due_5d7267be": {
         "message": "Frist:"
@@ -325,6 +343,9 @@
     },
     "embed_828fac4a": {
         "message": "Sett inn"
+    },
+    "embed_code_314f1bd5": {
+        "message": "Integrer kode"
     },
     "embed_image_1080badc": {
         "message": "Sett inn bilde"
@@ -464,6 +485,9 @@
     "insert_math_equation_57c6e767": {
         "message": "Sett inn matematikklikning"
     },
+    "invalid_file_c11ba11": {
+        "message": "Ugyldig fil"
+    },
     "invalid_file_type_881cc9b2": {
         "message": "Ugyldig filtype"
     },
@@ -553,6 +577,9 @@
     },
     "mic_a7f3d311": {
         "message": "Mic"
+    },
+    "miscellaneous_and_apps_f450a387": {
+        "message": "DIverse og appar"
     },
     "missing_1a256b3b": {
         "message": "Manglar"
@@ -949,6 +976,9 @@
     },
     "upload_document_253f0478": {
         "message": "Last opp dokument"
+    },
+    "upload_error_f9c00e27": {
+        "message": "Opplastingsfeil"
     },
     "upload_file_fd2361b8": {
         "message": "Last opp fil"
