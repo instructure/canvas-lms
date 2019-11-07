@@ -32,7 +32,7 @@ module ApplicationHelper
       user = user.respond_to?(:short_name) ? user : User.find(user_id)
       name = user.short_name || user.name
       if user.pronouns
-        "#{ERB::Util.h(name)} <i>(#{ERB::Util.h(user.pronouns)})</i>".html_safe
+        "#{name} (#{user.pronouns})"
       else
         name
       end
