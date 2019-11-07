@@ -12,7 +12,7 @@ namespace :heroku do
         # https://stackoverflow.com/questions/33293169/heroku-review-apps-copy-db-to-review-app
         # https://medium.com/uplaunch/software-deployment-pipeline-w-heroku-3f45e2d5445e
         puts "  Setting up Review App database: #{ENV['DATABASE_URL']} using the STAGING_DATABASE_URL from the parent app: #{ENV['DATABASE_URL']}"
-        cmd = "pg_dump --no-owner -Fc #{ENV['STAGING_DATABASE_URL']} | pg_restore --clean --no-owner --no-acl -n public -d #{ENV['DATABASE_URL']}"
+        cmd = "pg_dump --no-owner --no-acl -Fc #{ENV['STAGING_DATABASE_URL']} | pg_restore --no-owner --no-acl -j 4 -n public -d #{ENV['DATABASE_URL']}"
         puts cmd
         exec cmd
 
