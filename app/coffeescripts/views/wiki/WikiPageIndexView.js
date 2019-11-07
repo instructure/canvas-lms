@@ -38,8 +38,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       events: {
         'click .new_page': 'createNewPage',
         'keyclick .new_page': 'createNewPage',
-        'click .header-row a[data-sort-field]': 'sort',
-        'click .menu_tool_link': 'openExternalTool'
+        'click .header-row a[data-sort-field]': 'sort'
       },
 
       els: {
