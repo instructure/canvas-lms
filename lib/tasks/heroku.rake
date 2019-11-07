@@ -6,17 +6,18 @@ namespace :heroku do
     task :postdeploy do
 
       puts "### Running postdeploy rake task for the newly created Heroku Review App: #{ENV['HEROKU_APP_NAME']}"
+      puts "  Setting up database #{ENV['DATABASE_URL']} using the STAGING_DATABASE_URL from the parent app"
+      # See:
+      # https://stackoverflow.com/questions/33293169/heroku-review-apps-copy-db-to-review-app
+      # https://medium.com/uplaunch/software-deployment-pipeline-w-heroku-3f45e2d5445e
+      cmd = "pg_dump -Fc $STAGING_DATABASE_URL | pg_restore --clean --no-owner --no-acl -n public -d $DATABASE_URL"
+      puts cmd
+      exec cmd
 
-      # TODO: create and populate a real database." 
-      Rake::Task['db:create'].invoke
-
-      # Note: we still run migrations on the database once we cutover to load
-      # one with real data in case they were in the code used to create the 
-      # app and need to be applied.
+      # The Review App may be for a pull request with db migrations,
+      # so we always run those. 
       Rake::Task['db:migrate'].invoke
 
-      # TODO: create and populate a real database." 
-      Rake::Task['db:initial_setup'].invoke
     end
   
   end # Namespace: reviewapps

@@ -51,6 +51,9 @@
     },
     "RAILS_MAX_THREADS": {
       "required": true
+    },
+    "STAGING_DATABASE_URL": {
+      "required": true
     }
   },
   "formation": {
