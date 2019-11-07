@@ -76,6 +76,8 @@ class ApplicationController < ActionController::Base
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
   after_action :add_csp_for_root
+  after_action :teardown_live_events_context
+
   # multiple actions might be called on a single controller instance in specs
   before_action :clear_js_env if Rails.env.test?
 
