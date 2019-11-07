@@ -29,6 +29,8 @@ class User < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
 
+  self.ignored_columns = %i[type creation_unique_id creation_sis_batch_id creation_email sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id]
+
 
   include Context
   include ModelCache
