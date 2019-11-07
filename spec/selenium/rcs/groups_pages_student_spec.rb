@@ -388,7 +388,7 @@ describe "groups" do
       end
 
       it "should only allow group members to access files", priority: "1", test_id: 273626 do
-        expect_new_page_load { get files_page }
+        get files_page
         verify_no_course_user_access(files_page)
       end
 

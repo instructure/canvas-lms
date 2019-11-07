@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useRef, useState} from 'react'
+import React, {Suspense, useEffect, useRef, useState} from 'react'
 import {arrayOf, bool, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 
 import {Billboard} from '@instructure/ui-billboard'
@@ -62,6 +62,12 @@ export default function ComputerPanel({
   const clearButtonRef = useRef(null)
   const panelRef = useRef(null)
   useComputerPanelFocus(theFile, panelRef, clearButtonRef)
+
+  useEffect(() => {
+    if (previewPanelRef?.current && mediaTracksCheckbox) {
+      previewPanelRef.current.scrollIntoView(false)
+    }
+  }, [mediaTracksCheckbox])
 
   if (hasUploadedFile) {
     const src = URL.createObjectURL(theFile)

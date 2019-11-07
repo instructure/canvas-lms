@@ -696,6 +696,15 @@ describe EnrollmentsApiController, type: :request do
         expect(json["message"]).to be_include "enrollment[user_id] must be 'self' when self-enrolling"
       end
 
+      it "should require the course to be in a valid state" do
+        MasterCourses::MasterTemplate.set_as_master_course(@course)
+        raw_api_call :post, @path, @path_options,
+          {enrollment: {user_id: 'self', self_enrollment_code: @course.self_enrollment_code}}
+        expect(response.code).to eql '400'
+        json = JSON.parse(response.body)
+        expect(json["message"]).to be_include "course is not open for self-enrollment"
+      end
+
       it "should let anyone self-enroll" do
         json = api_call :post, @path, @path_options,
           {

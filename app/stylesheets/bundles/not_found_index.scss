@@ -1,0 +1,49 @@
+/*
+ * Copyright (C) 2018 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@keyframes notFoundFadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.not_found_page_game_root {
+  margin-top: 48px;
+  animation-name: notFoundFadeIn;
+  animation-duration: .55s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease;
+  opacity: 1;
+}
+
+.not_found_page_artwork {
+  margin-top: 24px;
+  animation-name: notFoundFadeIn;
+  animation-duration: .55s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease;
+  opacity: 1;
+}

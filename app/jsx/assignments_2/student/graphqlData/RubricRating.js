@@ -39,6 +39,6 @@ export const RubricRating = {
 
 export const DefaultMocks = {
   RubricRating: () => ({
-    _id: '1'
+    id: '1'
   })
 }

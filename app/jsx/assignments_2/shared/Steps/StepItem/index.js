@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {element, func, oneOf, oneOfType, string} from 'prop-types'
-import React, {Component} from 'react'
-
 import ButtonContext from '../../../student/components/Context'
 import classNames from 'classnames'
-import I18n from 'i18n!assignments_2_shared_Steps_StepItem'
+import {element, oneOf, string} from 'prop-types'
+import I18n from 'i18n!assignments_2_shared_Steps'
+import React, {Component} from 'react'
+
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {
@@ -35,10 +35,46 @@ import {omitProps} from '@instructure/ui-react-utils'
 import {px} from '@instructure/ui-utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
+export const stepLabels = {
+  get available() {
+    return I18n.t('Available')
+  },
+  get graded() {
+    return I18n.t('Graded')
+  },
+  get newAttempt() {
+    return I18n.t('New Attempt')
+  },
+  get next() {
+    return I18n.t('Next')
+  },
+  get notGradedYet() {
+    return I18n.t('Not Graded Yet')
+  },
+  get previous() {
+    return I18n.t('Previous')
+  },
+  get submit() {
+    return I18n.t('Submit')
+  },
+  get submitted() {
+    return I18n.t('Submitted')
+  },
+  get unavailable() {
+    return I18n.t('Unavailable')
+  },
+  get upload() {
+    return I18n.t('Upload')
+  },
+  get uploaded() {
+    return I18n.t('Uploaded')
+  }
+}
+
 class StepItem extends Component {
   static propTypes = {
     status: oneOf(['button', 'complete', 'incomplete', 'in-progress', 'unavailable']),
-    label: oneOfType([func, string, element]).isRequired,
+    label: string.isRequired,
     icon: element,
     pinSize: string,
     placement: oneOf(['first', 'last', 'interior'])
@@ -46,6 +82,21 @@ class StepItem extends Component {
 
   static defaultProps = {
     placement: 'interior'
+  }
+
+  getStatusI18n() {
+    switch (this.props.status) {
+      case 'button':
+        return I18n.t('button')
+      case 'complete':
+        return I18n.t('complete')
+      case 'incomplete':
+        return I18n.t('incomplete')
+      case 'in-progress':
+        return I18n.t('in-progress')
+      case 'unavailable':
+        return I18n.t('unavailable')
+    }
   }
 
   /**
@@ -87,19 +138,19 @@ class StepItem extends Component {
 
     if (!icon && status === 'button') {
       switch (this.props.label) {
-        case 'Previous':
+        case stepLabels.previous:
           return this.renderButton(
             IconArrowOpenStartSolid,
             context.prevButtonAction,
             I18n.t('View Previous Submission')
           )
-        case 'Next':
+        case stepLabels.next:
           return this.renderButton(
             IconArrowOpenEndSolid,
             context.nextButtonAction,
             I18n.t('View Next Submission')
           )
-        case 'New Attempt':
+        case stepLabels.newAttempt:
           return this.renderButton(
             IconPlusSolid,
             context.startNewAttemptAction,
@@ -142,22 +193,11 @@ class StepItem extends Component {
     }
   }
 
-  renderLabel = () => {
-    const {label, status} = this.props
-    if (typeof label === 'function') {
-      return label(status)
-    } else {
-      return label
-    }
-  }
-
   render() {
-    const {status, placement} = this.props
-
     const classes = {
       'step-item-step': true,
-      [status]: true,
-      [`placement--${placement}`]: true
+      [this.props.status]: true,
+      [`placement--${this.props.placement}`]: true
     }
 
     return (
@@ -182,10 +222,12 @@ class StepItem extends Component {
             <ButtonContext.Consumer>{context => this.renderIcon(context)}</ButtonContext.Consumer>
           </span>
         </span>
-        <span className="step-item-label" aria-hidden={this.props.status === 'button'}>
-          {this.renderLabel()}
-          <ScreenReaderContent>{status}</ScreenReaderContent>
+        <span className="step-item-label" aria-hidden>
+          {this.props.label}
         </span>
+        {this.props.status !== 'button' && (
+          <ScreenReaderContent>{`${this.props.label} ${this.getStatusI18n()}`}</ScreenReaderContent>
+        )}
       </span>
     )
   }

@@ -102,35 +102,4 @@ describe "/context_modules/index" do
     page = Nokogiri('<document>' + response.body + '</document>')
     expect(page.css(".offline_web_export").length).to eq 1
   end
-
-  context "direct_share" do
-    it "does not show module sharing menu items if direct_share is disabled" do
-      course_with_teacher
-      context_module = @course.context_modules.create!
-      context_module.add_item :type => 'context_module_sub_header'
-      view_context(@course, @user)
-      assign(:modules, @course.context_modules.active)
-      render 'context_modules/index'
-      page = Nokogiri('<document>' + response.body + '</document>')
-      expect(page.css(".module_copy_to").length).to eq 0
-      expect(page.css(".module_send_to").length).to eq 0
-      expect(page.css(".module_item_copy_to").length).to eq 0
-      expect(page.css(".module_item_send_to").length).to eq 0
-    end
-
-    it "shows module sharing menu items if direct_share is enabled" do
-      course_with_teacher
-      @course.root_account.enable_feature!(:direct_share)
-      context_module = @course.context_modules.create!
-      context_module.add_item :type => 'context_module_sub_header'
-      view_context(@course, @teacher)
-      assign(:modules, @course.context_modules.active)
-      render 'context_modules/index'
-      page = Nokogiri('<document>' + response.body + '</document>')
-      expect(page.css(".module_copy_to").length).to eq 1
-      expect(page.css(".module_send_to").length).to eq 1
-      expect(page.css(".module_item_copy_to").length).to eq 1
-      expect(page.css(".module_item_send_to").length).to eq 1
-    end
-  end
 end

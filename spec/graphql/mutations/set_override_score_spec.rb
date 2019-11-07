@@ -93,6 +93,11 @@ describe Mutations::SetOverrideScore do
         result = CanvasSchema.execute(mutation_str(override_score: nil), context: context)
         expect(result.dig("data", "setOverrideScore", "grades", "overrideScore")).to be nil
       end
+
+      it "creates a live event" do
+        expect(Canvas::LiveEvents).to receive(:grade_override)
+        CanvasSchema.execute(mutation_str(override_score: 100.0), context: context)
+      end
     end
 
     describe "model changes" do

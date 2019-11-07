@@ -56,13 +56,13 @@ module.exports = {
     // This just reflects how big the 'main' entry is at the time of writing. Every
     // time we get it smaller we should change this to the new smaller number so it
     // only goes down over time instead of growing bigger over time
-    maxEntrypointSize: 990000,
+    maxEntrypointSize: 1200000,
     // This is how big our biggest js bundles are at the time of writing. We should
     // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
     // tracking them too. Then, as we work to get all chunks smaller, we should change
     // this number to the size of our biggest known asset and hopefully someday get
     // to where they are all under the default value of 250000 and then remove this
-    maxAssetSize: 1500000,
+    maxAssetSize: 1200000,
     assetFilter: assetFilename => {
       const thingsWeKnowAreWayTooBig = [
         'canvas-rce-async-chunk',

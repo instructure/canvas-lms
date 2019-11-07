@@ -305,7 +305,9 @@ describe('sources/api', () => {
 
     it('throws an exception when an error occurs', () => {
       fetchMock.mock(uri, 500)
-      assert.rejects(() => apiSource.preflightUpload(fileProps, apiProps))
+      return apiSource.preflightUpload(fileProps, apiProps).catch(e => {
+        assert(e)
+      })
     })
   })
 
@@ -329,12 +331,15 @@ describe('sources/api', () => {
 
     it('calls alertFunc if there is a problem', () => {
       fetchMock.once(uploadUrl, 500, {overwriteRoutes: true})
-      return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-        sinon.assert.calledWith(alertFuncSpy, {
-          text: 'Something went wrong uploading, check your connection and try again.',
-          variant: 'error'
+      return apiSource
+        .uploadFRD(fileDomObject, preflightProps)
+        .then(() => {
+          sinon.assert.calledWith(alertFuncSpy, {
+            text: 'Something went wrong uploading, check your connection and try again.',
+            variant: 'error'
+          })
         })
-      })
+        .catch(() => {})
     })
 
     describe('files', () => {

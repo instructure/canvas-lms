@@ -157,7 +157,7 @@ describe('contentRendering', () => {
       const video = videoFromTray()
       const rendered = contentRendering.renderVideo(video)
       expect(rendered).toEqual(
-        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="17" src="/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&amp;type=video" style="width:400px;height:225px;display:inline-block"></iframe>'
+        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="17" data-media-type="video" src="/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&amp;type=video" style="width:400px;height:225px;display:inline-block" title="filename.mov"></iframe>'
       )
     })
 
@@ -165,7 +165,7 @@ describe('contentRendering', () => {
       const video = videoFromUpload()
       const rendered = contentRendering.renderVideo(video)
       expect(rendered).toEqual(
-        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="m-media-id" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block"></iframe>'
+        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="m-media-id" data-media-type="video" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block"></iframe>'
       )
     })
   })
@@ -187,7 +187,7 @@ describe('contentRendering', () => {
       const audio = audioFromTray()
       const rendered = contentRendering.renderAudio(audio)
       expect(rendered).toEqual(
-        '<iframe data-media-id="29" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:300px;height:2.813rem;display:inline-block"></iframe>'
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:300px;height:2.813rem;display:inline-block" title="filename.mp3"></iframe>'
       )
     })
 
@@ -195,7 +195,7 @@ describe('contentRendering', () => {
       const audio = audioFromUpload()
       const rendered = contentRendering.renderAudio(audio)
       expect(rendered).toEqual(
-        '<iframe data-media-id="m-media-id" src="/url/to/m-media-id?type=audio" style="width:300px;height:2.813rem;display:inline-block"></iframe>'
+        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:300px;height:2.813rem;display:inline-block"></iframe>'
       )
     })
   })

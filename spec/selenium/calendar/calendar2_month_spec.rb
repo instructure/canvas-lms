@@ -223,20 +223,6 @@ describe "calendar2" do
           extended_day_text = format_time_for_view(date_of_next_day.to_datetime + 1.day)
           expect(f('.event-details-timestring .date-range').text).to eq("#{original_day_text} - #{extended_day_text}")
         end
-
-        it "allows dropping onto the minical" do
-          skip("fix in COMMS-2096")
-          event = make_event(start: @initial_time)
-          load_month_view
-          quick_jump_to_date(@initial_time_str)
-
-          drag_and_drop_element(f('.calendar .fc-event'), fj("#minical .fc-day-number[data-date=#{@one_day_later_str}]"))
-          expect(fj("#minical .fc-bg .fc-day.event[data-date=#{@one_day_later_str}]")).to be
-          wait_for_ajaximations
-
-          event.reload
-          expect(event.start_at).to eq(@one_day_later)
-        end
       end
 
       it "more options link should go to calendar event edit page" do

@@ -144,6 +144,7 @@ describe "submissions" do
 
 
     it "should not allow a user to submit a file-submission assignment with an empty file", priority: "1" do
+      skip('flaky, will be fixed in ADMIN-3015')
       @assignment.submission_types = 'online_upload'
       @assignment.save!
       filename, fullpath, data = get_file("empty_file.txt")
@@ -250,6 +251,7 @@ describe "submissions" do
 
     it "should not allow a submission with only comments", priority: "1", test_id: 237027 do
       skip_if_safari(:alert)
+      skip('flash alert is fragile, will be addressed in ADMIN-3015')
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click

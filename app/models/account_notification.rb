@@ -18,6 +18,7 @@
 class AccountNotification < ActiveRecord::Base
   validates_presence_of :start_at, :end_at, :subject, :message, :account_id
   validate :validate_dates
+  validate :send_message_not_set_for_site_admin
   belongs_to :account, :touch => true
   belongs_to :user
   has_many :account_notification_roles, dependent: :destroy
@@ -26,6 +27,7 @@ class AccountNotification < ActiveRecord::Base
   sanitize_field :message, CanvasSanitize::SANITIZE
 
   after_save :create_alert
+  after_save :queue_message_broadcast
 
   ACCOUNT_SERVICE_NOTIFICATION_FLAGS = %w[account_survey_notifications]
   validates_inclusion_of :required_account_service, in: ACCOUNT_SERVICE_NOTIFICATION_FLAGS, allow_nil: true
@@ -43,7 +45,7 @@ class AccountNotification < ActiveRecord::Base
       self.send_later_enqueue_args(:create_alert, {
         :run_at => self.start_at,
         :on_conflict => :overwrite,
-        :singleton => "create_notification_alert:#{self.id}"
+        :singleton => "create_notification_alert:#{self.global_id}"
       })
       return
     end
@@ -194,5 +196,96 @@ class AccountNotification < ActiveRecord::Base
     months_into_current_period = months_since_start_time % months_in_period
     mod_value = (Random.new(periods_since_start_time).rand(months_in_period) + months_into_current_period) % months_in_period
     user_id % months_in_period == mod_value
+  end
+
+  attr_accessor :message_recipients
+  has_a_broadcast_policy
+
+  set_broadcast_policy do |p|
+    p.dispatch :account_notification
+    p.to { self.message_recipients }
+    p.whenever { |record|
+      record.should_send_message? && record.message_recipients.present?
+    }
+  end
+
+  def send_message_not_set_for_site_admin
+    if self.send_message? && self.account.site_admin?
+      # i mean maybe we could try but there are almost certainly better ways to send mass emails than this
+      errors.add(:send_message, 'Cannot send messages for site admin accounts')
+    end
+  end
+
+  def should_send_message?
+    self.send_message? && !self.messages_sent_at &&
+      (self.start_at.nil? || (self.start_at < Time.now.utc)) &&
+      (self.end_at.nil? || (self.end_at > Time.now.utc))
+  end
+
+  def queue_message_broadcast
+    if self.send_message? && !self.messages_sent_at && !self.message_recipients
+      self.send_later_enqueue_args(:broadcast_messages, {
+        :run_at => self.start_at || Time.now.utc,
+        :on_conflict => :overwrite,
+        :singleton => "account_notification_broadcast_messages:#{self.global_id}",
+        :max_attempts => 1})
+    end
+  end
+
+  def self.users_per_message_batch
+    Setting.get("account_notification_message_batch_size", "1000").to_i
+  end
+
+  def broadcast_messages
+    return unless self.should_send_message? # sanity check before we start grabbing user ids
+
+    # don't try to send a message to an entire account in one job
+    self.applicable_user_ids.each_slice(self.class.users_per_message_batch) do |sliced_user_ids|
+      begin
+        self.message_recipients = sliced_user_ids.map{|id| "user_#{id}"}
+        self.save # trigger the broadcast policy
+      ensure
+        self.message_recipients = nil
+      end
+    end
+    self.update_attribute(:messages_sent_at, Time.now.utc)
+  end
+
+  def applicable_user_ids
+    roles = self.account_notification_roles.preload(:role).to_a.map(&:role)
+    Shackles.activate(:slave) do
+      self.class.applicable_user_ids_for_account_and_roles(self.account, roles)
+    end
+  end
+
+  def self.applicable_user_ids_for_account_and_roles(account, roles)
+    account.shard.activate do
+      all_account_ids = Account.sub_account_ids_recursive(account.id) + [account.id]
+      user_ids = Set.new
+      get_everybody = roles.empty?
+
+      course_roles = roles.select{|role| role.course_role?}.map(&:role_for_shard)
+      if get_everybody || course_roles.any?
+        Course.find_ids_in_ranges do |min_id, max_id|
+          course_ids = Course.active.where(:id => min_id..max_id, :account_id => all_account_ids).pluck(:id)
+          next unless course_ids.any?
+          course_ids.each_slice(50) do |sliced_course_ids|
+            scope = Enrollment.active_or_pending.where(:course_id => sliced_course_ids)
+            scope = scope.where(:role_id => course_roles) unless get_everybody
+            user_ids += scope.distinct.pluck(:user_id)
+          end
+        end
+      end
+
+      account_roles = roles.select{|role| role.account_role?}.map(&:role_for_shard)
+      if get_everybody || account_roles.any?
+        AccountUser.find_ids_in_ranges do |min_id, max_id|
+          scope = AccountUser.where(:id => min_id..max_id).active.where(:account_id => all_account_ids)
+          scope = scope.where(:role_id => account_roles) unless get_everybody
+          user_ids += scope.distinct.pluck(:user_id)
+        end
+      end
+      user_ids.to_a.sort
+    end
   end
 end

@@ -77,6 +77,7 @@ describe('Editor/Sidebar bridge', () => {
         insertLink: jest.fn(),
         insertVideo: jest.fn(),
         insertAudio: jest.fn(),
+        insertEmbedCode: jest.fn(),
         props: {
           textareaId: 'fake_editor',
           tinymce: {
@@ -158,6 +159,15 @@ describe('Editor/Sidebar bridge', () => {
         expect(Bridge.insertAudio).toHaveBeenCalledWith(theMedia)
         expect(editor.insertAudio).toHaveBeenCalledWith(theMedia)
         expect(hideTray).toHaveBeenCalled()
+      })
+    })
+
+    describe('insertEmbedCode', () => {
+      it('inserts embed code', () => {
+        Bridge.focusEditor(editor)
+        const theCode = 'insert me'
+        Bridge.insertEmbedCode(theCode)
+        expect(editor.insertEmbedCode).toHaveBeenCalledWith(theCode)
       })
     })
   })

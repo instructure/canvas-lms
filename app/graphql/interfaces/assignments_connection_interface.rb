@@ -41,12 +41,33 @@ module Interfaces::AssignmentsConnectionInterface
 
   def assignments_connection(filter: {}, course:)
     if filter.key?(:grading_period_id)
-      assignments_scope(course, filter[:grading_period_id])
+      apply_order(
+        assignments_scope(course, filter[:grading_period_id])
+      )
     else
       Loaders::CurrentGradingPeriodLoader.load(course)
         .then do |gp, has_grading_periods|
-        assignments_scope(course, gp&.id, has_grading_periods)
+        apply_order(
+          assignments_scope(course, gp&.id, has_grading_periods)
+        )
       end
     end
   end
+
+  def apply_order(assignments)
+    # we could force the types that implement assignment_scope to implement
+    # this method but i don't think there's going to be any more and this seems
+    # a lot more straigthforward
+    case self
+    when Types::AssignmentGroupType
+      assignments.reorder(:position, :id)
+    when Types::CourseType
+      assignments.
+        joins(:assignment_group).
+        # this +select+ is necessary because the assignments scope may be DISTINCT
+        select("assignments.*, assignment_groups.position AS group_position").
+        reorder(:group_position, :position, :id)
+    end
+  end
+  private :apply_order
 end

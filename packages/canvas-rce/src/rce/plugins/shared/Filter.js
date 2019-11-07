@@ -77,7 +77,7 @@ function buildContentOptions(userContextType) {
     contentOptions.splice(
       1,
       0,
-      <option value="course_files" icon={IconFolderLine}>
+      <option key="course_files" value="course_files" icon={IconFolderLine}>
         {fileLabelFromContext('course')}
       </option>
     )
@@ -173,11 +173,6 @@ Filter.propTypes = {
    * `sortValue` defines how items in the CanvasContentTray are sorted
    */
   sortValue: string.isRequired,
-
-  /**
-   * `contextType` is the context in which we are querying for files
-   */
-  contextType: oneOf(['user', 'course']), // 'group' some day
 
   /**
    * The user's context

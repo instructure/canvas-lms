@@ -26,7 +26,7 @@ class DelayedMessage < ActiveRecord::Base
       :attachment, :assignment_override, :group_membership, :calendar_event,
       :wiki_page, :assessment_request, :account_user, :web_conference,
       :account, :user, :appointment_group, :collaborator, :account_report,
-      :alert, :content_migration,
+      :alert, :content_migration, :account_notification,
       {
         context_communication_channel: 'CommunicationChannel',
         quiz_submission: 'Quizzes::QuizSubmission',

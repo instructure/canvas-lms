@@ -56,8 +56,8 @@ it('should render collapsed class when collapsed', () => {
 it('should render with StepItems', () => {
   ReactDOM.render(
     <Steps label="Settings">
-      <StepItem label={status => `Phase one ${status}`} status="complete" />
-      <StepItem label={status => `Phase two ${status}`} status="in-progress" />
+      <StepItem label="Phase one" status="complete" />
+      <StepItem label="Phase two" status="in-progress" />
       <StepItem label="Phase three" />
     </Steps>,
     document.getElementById('fixtures')
@@ -69,8 +69,8 @@ it('should render with StepItems', () => {
 it('should render aria-current for the item that is in progress', () => {
   ReactDOM.render(
     <Steps label="Settings">
-      <StepItem label={status => `Phase one ${status}`} status="complete" />
-      <StepItem label={status => `Phase two ${status}`} status="in-progress" />
+      <StepItem label="Phase one" status="complete" />
+      <StepItem label="Phase two" status="in-progress" />
       <StepItem label="Phase three" />
     </Steps>,
     document.getElementById('fixtures')

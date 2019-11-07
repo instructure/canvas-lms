@@ -25,10 +25,18 @@ import {SubmissionMocks} from '../../graphqlData/Submission'
 import ViewManager from '../ViewManager'
 
 jest.setTimeout(10000)
+jest.mock('../Attempt')
 
 async function mockStudentViewResult(overrides = {}) {
   const variables = {assignmentLid: '1', submissionID: '1'}
   const result = await mockQuery(STUDENT_VIEW_QUERY, overrides, variables)
+  result.data.assignment.env = {
+    assignmentUrl: 'mocked-assignment-url',
+    courseId: '1',
+    currentUser: {id: '1', display_name: 'bob', avatar_image_url: 'awesome.avatar.url'},
+    modulePrereq: null,
+    moduleUrl: 'mocked-module-url'
+  }
   return result.data
 }
 

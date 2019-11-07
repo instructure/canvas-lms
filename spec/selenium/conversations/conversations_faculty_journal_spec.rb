@@ -190,14 +190,6 @@ describe "conversations new" do
       expect(f('.user_note')).to be_displayed
     end
 
-    it "should not have the Faculty Journal entry checkbox visible", priority: "1", test_id: 523384 do
-      skip('Currently broken and shelved CNVS-17248')
-      f('#compose-btn').click
-      expect(f('.user_note')).not_to be_displayed
-      compose course: @course, to: [@s1, @s2, @s3], body: 'Give the Turkey his day', send: false
-      expect(f('.user_note')).not_to be_displayed
-    end
-
     it "should send a message with faculty journal checked", priority: "1", test_id: 75433 do
       conversations
       # First verify teacher can send a message with faculty journal entry checked to one student

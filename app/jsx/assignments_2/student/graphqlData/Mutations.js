@@ -36,6 +36,7 @@ export const CREATE_SUBMISSION = gql`
     $type: OnlineSubmissionType!
     $body: String
     $fileIds: [ID!]
+    $mediaId: ID
     $url: String
   ) {
     createSubmission(
@@ -44,6 +45,7 @@ export const CREATE_SUBMISSION = gql`
         submissionType: $type
         body: $body
         fileIds: $fileIds
+        mediaId: $mediaId
         url: $url
       }
     ) {
@@ -95,6 +97,7 @@ export const CREATE_SUBMISSION_DRAFT = gql`
     $attempt: Int!
     $body: String
     $fileIds: [ID!]
+    $mediaId: ID
     $url: String
   ) {
     createSubmissionDraft(
@@ -104,6 +107,7 @@ export const CREATE_SUBMISSION_DRAFT = gql`
         attempt: $attempt
         body: $body
         fileIds: $fileIds
+        mediaId: $mediaId
         url: $url
       }
     ) {

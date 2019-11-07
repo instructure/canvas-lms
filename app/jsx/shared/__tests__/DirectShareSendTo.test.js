@@ -17,31 +17,139 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
+import useContentShareUserSearchApi from '../effects/useContentShareUserSearchApi'
+import DirectShareUserModal from '../direct_share/DirectShareUserModal'
 
-function renderSendToDialog(learningObject = {}, propsOverride = {}) {
-  return render()
-}
+jest.mock('jsx/shared/effects/useContentShareUserSearchApi')
+
+const usersList = [
+  {
+    id: '123',
+    name: 'Teacher3 Middle LastName3',
+    created_at: '2019-10-28T15:45:32-06:00',
+    sortable_name: 'LastName3, Teacher3 Middle',
+    short_name: 'Teacher3 Middle LastName3',
+    sis_user_id: null,
+    integration_id: null,
+    login_id: 'Teacher3@mail.com',
+    email: 'Teacher3@mail.com'
+  },
+  {
+    id: '456',
+    name: 'Teacher4 Middle LastName4',
+    created_at: '2019-10-28T15:45:57-06:00',
+    sortable_name: 'LastName4, Teacher4 Middle',
+    short_name: 'Teacher4 Middle LastName4',
+    sis_user_id: null,
+    integration_id: null,
+    login_id: 'Teacher4@mail.com',
+    email: 'Teacher4@mail.com'
+  }
+]
 
 describe('DirectShareSendToDialog', () => {
+  let ariaLive
+
+  beforeAll(async () => {
+    window.ENV = {COURSE_ID: '123'}
+    ariaLive = document.createElement('div')
+    ariaLive.id = 'flash_screenreader_holder'
+    ariaLive.setAttribute('role', 'alert')
+    document.body.appendChild(ariaLive)
+    // There is currently a conflict between Lazy loading promises and jest timers being out of sync
+    // so this is a temp way to bypass that state until it is fixed in jest
+    jest.useFakeTimers()
+    const {unmount} = render(<DirectShareUserModal open />)
+    await Promise.resolve().then(() => jest.runAllTimers())
+    unmount()
+  })
+
+  afterAll(() => {
+    delete window.ENV
+    if (ariaLive) ariaLive.remove()
+  })
+
   describe('dialog controls', () => {
-    it('closes the dialog when X is clicked', () => {})
-    it('closes the dialog when cancel button is clicked', () => {})
+    it('handles error when fetching users api fails', () => {
+      const {getByText, getByLabelText} = render(<DirectShareUserModal open courseId="123" />)
+      useContentShareUserSearchApi.mockImplementationOnce(({error}) =>
+        error([{status: 400, body: 'error'}])
+      )
+      const input = getByLabelText(/send to:/i)
+      fireEvent.focus(input)
+      fireEvent.change(input, {target: {value: 'teac'}})
+
+      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
   })
+
   describe('share with', () => {
-    it('populates the list of users in dropdwon', () => {})
-    it('filters the users based on search input', () => {})
-    it('filters the users when search returns empty', () => {})
-    it('adds recipients to final list', () => {})
-    it('allows removal of recipient from final list', () => {})
-  })
-  describe('share button', () => {
-    it('is enabled when a recipient is selected', () => {})
-    it('is diabled when no recipient is selected', () => {})
-  })
-  describe('sharing content', () => {
-    it('displays loading state when message is beng sent', () => {})
-    it('displays success and closes the dialog when the api call succeeds', async () => {})
-    it('displays an error on the dialog', async () => {})
+    beforeEach(() => {
+      useContentShareUserSearchApi.mockImplementationOnce(({success}) => {
+        success(usersList)
+      })
+    })
+
+    it('displays loading state when fetching user list', () => {
+      const {getByRole, getByLabelText} = render(<DirectShareUserModal open />)
+      const input = getByLabelText(/send to:/i)
+      fireEvent.focus(input)
+      fireEvent.change(input, {target: {value: 'teac'}})
+      const alertContainer = getByRole('alert')
+
+      expect(alertContainer).toHaveTextContent(/Loading options.../i)
+    })
+
+    it('displays user search results', () => {
+      const {getByText, getByLabelText} = render(<DirectShareUserModal open courseId="123" />)
+      const input = getByLabelText(/send to:/i)
+      fireEvent.focus(input)
+      fireEvent.change(input, {target: {value: 'teac'}})
+      act(() => jest.runAllTimers())
+
+      expect(getByText(/Teacher3 Middle LastName3/i)).toBeInTheDocument()
+      expect(getByText(/Teacher4 Middle LastName4/i)).toBeInTheDocument()
+    })
+
+    it('adds recipients to final list', () => {
+      const {getByText, getByTitle, getByLabelText, queryByTitle} = render(
+        <DirectShareUserModal open />
+      )
+      const input = getByLabelText(/send to:/i)
+      fireEvent.focus(input)
+      fireEvent.change(input, {target: {value: 'teac'}})
+      act(() => jest.runAllTimers())
+      fireEvent.click(getByText('Teacher3 Middle LastName3'))
+
+      expect(getByTitle(/Remove Teacher3 Middle LastName3/i)).toBeInTheDocument()
+      expect(queryByTitle(/Teacher4 Middle LastName4/i)).toBeNull()
+    })
+
+    it('allows removal of recipient from final list', () => {
+      const {getByText, getByTitle, getByLabelText, queryByTitle} = render(
+        <DirectShareUserModal open />
+      )
+      const input = getByLabelText(/send to:/i)
+      fireEvent.focus(input)
+      fireEvent.change(input, {target: {value: 'teac'}})
+      act(() => jest.runAllTimers())
+      fireEvent.click(getByText('Teacher3 Middle LastName3'))
+      expect(getByTitle(/Remove Teacher3 Middle LastName3/i)).toBeInTheDocument()
+      const removeUserButton = getByTitle(/Remove Teacher3 Middle LastName3/i).closest('button')
+      fireEvent.click(removeUserButton)
+
+      expect(queryByTitle(/Remove Teacher3 Middle LastName3/i)).toBeNull()
+    })
+
+    it('disables Send button when no recipient is selected', () => {
+      const {getByText} = render(<DirectShareUserModal open courseId="123" />)
+
+      expect(
+        getByText('Send')
+          .closest('button')
+          .getAttribute('disabled')
+      ).toBe('')
+    })
   })
 })

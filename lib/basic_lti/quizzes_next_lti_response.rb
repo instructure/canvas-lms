@@ -22,8 +22,7 @@ module BasicLTI
     protected
 
     # this is an override of parent method
-    # rubocop:disable Naming/MethodName
-    def handle_replaceResult(tool, _course, assignment, user)
+    def handle_replace_result(tool, assignment, user)
       self.body = "<replaceResultResponse />"
       return true unless valid_request?(assignment)
       quiz_lti_submission = QuizzesNextVersionedSubmission.new(assignment, user)
@@ -35,7 +34,6 @@ module BasicLTI
       return quiz_lti_submission.revert_history(result_url, -tool.id) if submission_reopened?
       quiz_lti_submission.commit_history(result_url, grade, -tool.id)
     end
-    # rubocop:enable Naming/MethodName
 
     private
 

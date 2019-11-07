@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, {Component} from 'react'
-import {func, bool, string, shape, arrayOf} from 'prop-types'
+import {func, bool, string, shape, arrayOf, oneOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
@@ -50,7 +50,7 @@ import {discussionList} from '../../shared/proptypes/discussion'
 import propTypes from '../propTypes'
 import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
-import contentShareShape from 'jsx/shared/proptypes/contentShare'
+import {CONTENT_SHARE_TYPES} from 'jsx/shared/proptypes/contentShare'
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
@@ -70,7 +70,10 @@ export default class DiscussionsIndex extends Component {
     copyToOpen: bool.isRequired,
     copyToSelection: shape({discussion_topics: arrayOf(string)}),
     sendToOpen: bool.isRequired,
-    sendToSelection: contentShareShape,
+    sendToSelection: shape({
+      content_id: string,
+      content_type: oneOf(CONTENT_SHARE_TYPES)
+    }),
     DIRECT_SHARE_ENABLED: bool.isRequired,
     COURSE_ID: string
   }

@@ -66,7 +66,7 @@ gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.15.14'
   gem 'fugit', '1.3.3', require: false
     gem 'et-orbi', '1.2.2', require: false
-gem 'switchman-inst-jobs', '1.3.5'
+gem 'switchman-inst-jobs', '1.3.6'
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.28.0', require: false
 gem 'ffi', '1.11.1', require: false

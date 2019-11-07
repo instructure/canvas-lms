@@ -72,7 +72,7 @@
 
   <div class="ic-Form-control">
     <div class="ic-Label" id="aria-announcements-send-to-group">
-      <%= t "Send to" %>
+      <%= t "Show to" %>
       <%= roles_message(@account) %>
     </div>
     <div class="grid-row">
@@ -178,6 +178,20 @@
       </div>
     </div>
   </div>
+
+  <% unless @account.site_admin? %>
+    <div class="ic-Form-control ic-Form-control--checkbox">
+      <%= f.check_box :send_message, :checked => announcement.send_message? && !announcement.messages_sent_at,
+          :id => "account_notification_send_message_#{announcement.id}" %>
+      <% if announcement.messages_sent_at? %>
+        <%= f.label :send_message, t("Re-send notification directly to users when announcement starts"),
+            :class => "ic-Label", :for => "account_notification_send_message_#{announcement.id}" %>
+      <% else %>
+        <%= f.label :send_message, t("Send notification directly to users when announcement starts"),
+            :class => "ic-Label", :for => "account_notification_send_message_#{announcement.id}" %>
+      <% end %>
+    </div>
+  <% end %>
 
   <div class="ic-Form-actions">
     <%= button_tag(t("Cancel"), :class => "element_toggler btn button-secondary edit_cancel_focus", 'aria-controls' => "edit_notification_form_#{announcement.id}", 'data-cancel-focus-id' => announcement.id) %>

@@ -34,7 +34,7 @@ import {
   IconInboxLine,
   IconCalendarMonthLine
 } from '@instructure/ui-icons'
-import I18n from 'i18n!MobileNavigation'
+import I18n from 'i18n!MobileGlobalMenu'
 import HelpDialog from '../help_dialog/HelpDialog'
 import LogoutButton from './LogoutButton'
 

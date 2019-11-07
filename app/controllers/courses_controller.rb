@@ -1826,7 +1826,7 @@ class CoursesController < ApplicationController
         @context_membership = @context.enrollments.where(user_id: @current_user).except(:preload).first # for AUA
 
         if authorized_action(@course, @current_user, :read)
-          log_asset_access(["home", @context], "home", "other")
+          log_asset_access(["home", @context], "home", "other", nil, @context_membership.class.to_s, context: @context)
           enrollments = @course.current_enrollments.where(:user_id => @current_user).to_a
           if includes.include?("observed_users") &&
             enrollments.any?(&:assigned_observer?)
@@ -1877,7 +1877,7 @@ class CoursesController < ApplicationController
       if @context.grants_right?(@current_user, session, :read)
         check_for_readonly_enrollment_state
 
-        log_asset_access(["home", @context], "home", "other")
+        log_asset_access(["home", @context], "home", "other", nil, @context_enrollment.class.to_s, context: @context)
 
         check_incomplete_registration
 
@@ -1976,6 +1976,8 @@ class CoursesController < ApplicationController
           js_bundle :wiki_page_show
           css_bundle :wiki_page, :tinymce
         when 'modules'
+          js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
+
           js_bundle :context_modules
           css_bundle :content_next, :context_modules2
         when 'assignments'
@@ -3107,7 +3109,7 @@ class CoursesController < ApplicationController
       enrollments = user.participating_enrollments
       ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
     else
-      enrollments = user.cached_current_enrollments(preload_courses: true)
+      enrollments = user.cached_currentish_enrollments(preload_courses: true)
     end
 
     if include_observed

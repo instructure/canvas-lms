@@ -73,7 +73,7 @@ module RCSSidebarPage
   end
 
   def files_tab
-    fj('[role="presentation"]:contains("Files")')
+    fj('[role=tablist] [role=presentation]:not([aria-disabled]):contains("Files")')
   end
 
   def upload_new_file
@@ -156,6 +156,7 @@ module RCSSidebarPage
 
   def click_files_tab
     files_tab.click
+    wait_for_ajaximations
   end
 
   def click_images_tab

@@ -715,9 +715,15 @@ export function initializeCollection(endpoint) {
   }
 }
 
-export function initializeDocuments(props) {
+export function initializeDocuments(_props) {
   return {
-    [props.contextType]: {
+    course: {
+      files: [],
+      bookmark: 'documents1',
+      isLoading: false,
+      hasMore: true
+    },
+    user: {
       files: [],
       bookmark: 'documents1',
       isLoading: false,
@@ -726,9 +732,15 @@ export function initializeDocuments(props) {
   }
 }
 
-export function initializeMedia(props) {
+export function initializeMedia(_props) {
   return {
-    [props.contextType]: {
+    course: {
+      files: [],
+      bookmark: 'media1',
+      isLoading: false,
+      hasMore: true
+    },
+    user: {
       files: [],
       bookmark: 'media1',
       isLoading: false,
@@ -808,7 +820,7 @@ export function fetchPage(uri) {
       if (PAGES[uri]) {
         resolve(PAGES[uri])
       } else {
-        reject('bad page!')
+        reject(new Error('bad page!'))
       }
     }, 1000)
   })
@@ -820,7 +832,7 @@ export function searchFlickr(term) {
       if (FLICKR_RESULTS[term]) {
         resolve(FLICKR_RESULTS[term])
       } else {
-        reject('No search results!')
+        reject(new Error('No search results!'))
       }
     }, 1000)
   })
@@ -832,7 +844,7 @@ export function searchUnsplash(term) {
       if (UNSPLASH_RESULTS[term]) {
         resolve(UNSPLASH_RESULTS[term])
       } else {
-        reject('No search results!')
+        reject(new Error('No search results!'))
       }
     }, 1000)
   })

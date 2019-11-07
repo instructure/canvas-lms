@@ -158,18 +158,20 @@ export default class IndexMenu extends React.Component {
           {this.renderDisablePostToSis()}
           {this.renderTools()}
         </ul>
-        <ExternalToolModalLauncher
-          tool={this.state.selectedTool}
-          isOpen={this.state.modalIsOpen}
-          onRequestClose={this.closeModal}
-          contextType={this.props.contextType}
-          contextId={this.props.contextId}
-          launchType="course_assignments_menu"
-          title={
-            this.state.selectedTool &&
-            this.state.selectedTool.placements.course_assignments_menu.title
-          }
-        />
+        {this.state.modalIsOpen && (
+          <ExternalToolModalLauncher
+            tool={this.state.selectedTool}
+            isOpen={this.state.modalIsOpen}
+            onRequestClose={this.closeModal}
+            contextType={this.props.contextType}
+            contextId={this.props.contextId}
+            launchType="course_assignments_menu"
+            title={
+              this.state.selectedTool &&
+              this.state.selectedTool.placements.course_assignments_menu.title
+            }
+          />
+        )}
       </div>
     )
   }

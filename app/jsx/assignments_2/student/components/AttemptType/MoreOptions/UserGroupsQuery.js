@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, func, string} from 'prop-types'
+import {arrayOf, bool, func, string} from 'prop-types'
 import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import {ExternalTool} from '../../../graphqlData/ExternalTool'
 import GenericErrorPage from '../../../../../shared/components/GenericErrorPage/index'
@@ -29,7 +29,8 @@ import {USER_GROUPS_QUERY} from '../../../graphqlData/Queries'
 
 const UserGroupsQuery = props => {
   const {loading, error, data} = useQuery(USER_GROUPS_QUERY, {
-    variables: {userID: props.userID}
+    variables: {userID: props.userID},
+    skip: !props.renderCanvasFiles
   })
 
   if (loading) return <LoadingIndicator />
@@ -42,23 +43,26 @@ const UserGroupsQuery = props => {
       />
     )
   }
+  const groups = props.renderCanvasFiles ? data.legacyNode : null
 
   return (
     <Tools
       assignmentID={props.assignmentID}
       courseID={props.courseID}
       handleCanvasFileSelect={props.handleCanvasFileSelect}
+      renderCanvasFiles={props.renderCanvasFiles}
       tools={props.tools}
-      userGroups={data.legacyNode}
+      userGroups={groups}
     />
   )
 }
 UserGroupsQuery.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
-  handleCanvasFileSelect: func.isRequired,
+  handleCanvasFileSelect: func,
+  renderCanvasFiles: bool,
   tools: arrayOf(ExternalTool.shape),
-  userID: string.isRequired
+  userID: string
 }
 
 export default UserGroupsQuery

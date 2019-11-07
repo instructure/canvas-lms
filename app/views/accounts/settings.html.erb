@@ -1091,7 +1091,7 @@ acknowledge that you have read and agreed to the
         <% end %>
         <div class="ic-Form-control">
           <div class="ic-Label" id="aria-announcements-send-to-group">
-            <%= t "Send to" %>
+            <%= t "Show to" %>
             <%= roles_message(@account) %>
           </div>
           <div class="grid-row">
@@ -1177,6 +1177,13 @@ acknowledge that you have read and agreed to the
           </div>
 
         </div>
+
+        <% unless @account.site_admin? %>
+          <div class="ic-Form-control ic-Form-control--checkbox">
+            <%= f.check_box :send_message %>
+            <%= f.label :send_message, t("Send notification directly to users when announcement starts"), :class => "ic-Label" %>
+          </div>
+        <% end %>
 
         <div class="ic-Form-actions">
           <button type="Button" class="element_toggler Button Button--secondary add_notification_cancel_focus" aria-controls="add_notification_form">

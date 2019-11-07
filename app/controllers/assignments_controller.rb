@@ -90,47 +90,50 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  def render_a2_student_view?
+    @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
+      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+  end
+
+  def render_a2_student_view
+    submission = @assignment.submissions.find_by(user: @current_user)
+    graphql_submisison_id = nil
+    if submission
+      graphql_submisison_id = CanvasSchema.id_from_object(
+        submission,
+        CanvasSchema.resolve_type(submission, nil),
+        nil
+      )
+    end
+
+    assignment_prereqs =
+      if @locked && !@locked[:can_view]
+        context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+      else
+        {}
+      end
+
+    js_env({
+      ASSIGNMENT_ID: params[:id],
+      COURSE_ID: @context.id,
+      PREREQS: assignment_prereqs,
+      SUBMISSION_ID: graphql_submisison_id
+    })
+    css_bundle :assignments_2_student
+    js_bundle :assignments_2_show_student
+    render html: '', layout: true
+  end
+
   def show
     Shackles.activate(:slave) do
       @assignment ||= @context.assignments.find(params[:id])
-
-      # TODO: Make sure we aren't stripping out any needed functionality that is
-      #       happening when this controller is hit without A2 enabled. Specifically
-      #       `ensure_assignment_group`, `context_module_action`, and `log_asset_access`.
-      if @assignment.a2_enabled? && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
-        unless can_do(@context, @current_user, :read_as_admin)
-          # TODO: Look at how the `@locked` stuff is used bellow, in A1 the pre-reqs are only being
-          #       calculated if needed, but we are doing it every time here.
-          assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
-          submission = @assignment.submissions.find_by(user: @current_user)
-          graphql_submisison_id = nil
-          if submission
-            graphql_submisison_id = CanvasSchema.id_from_object(
-              submission,
-              CanvasSchema.resolve_type(submission, nil),
-              nil
-            )
-          end
-
-          js_env({
-            ASSIGNMENT_ID: params[:id],
-            COURSE_ID: @context.id,
-            PREREQS: assignment_prereqs,
-            SUBMISSION_ID: graphql_submisison_id
-          })
-          css_bundle :assignments_2_student
-          js_bundle :assignments_2_show_student
-          render html: '', layout: true
-          return
-        end
-      end
-
 
       if @assignment.deleted?
         flash[:notice] = t 'notices.assignment_delete', "This assignment has been deleted"
         redirect_to named_context_url(@context, :context_assignments_url)
         return
       end
+
       if authorized_action(@assignment, @current_user, :read)
         if @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
           flash[:error] = t 'notices.assignment_not_available', "The assignment you requested is not available to your course section."
@@ -164,6 +167,11 @@ class AssignmentsController < ApplicationController
         end
 
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
+
+        if render_a2_student_view?
+          render_a2_student_view
+          return
+        end
 
         env = js_env({COURSE_ID: @context.id})
         env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
@@ -613,7 +621,7 @@ class AssignmentsController < ApplicationController
         VALID_DATE_RANGE: CourseDateRange.new(@context),
       }
 
-      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
       hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?

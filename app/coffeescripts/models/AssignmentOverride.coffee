@@ -19,6 +19,7 @@ import Backbone from 'Backbone'
 import _ from 'underscore'
 import Section from './Section'
 import I18n from 'i18n!assignmentOverride'
+import {shimGetterShorthand} from '../legacyCoffeesScriptHelpers'
 
 export default class AssignmentOverride extends Backbone.Model
 
@@ -34,9 +35,10 @@ export default class AssignmentOverride extends Backbone.Model
     lock_at_overridden: true
     lock_at: null
 
-  @conditionalRelease:
-    name: I18n.t("Mastery Paths")
+  @conditionalRelease: shimGetterShorthand
     noop_id: '1'
+  ,
+    name: -> I18n.t("Mastery Paths")
 
   initialize: ->
     super

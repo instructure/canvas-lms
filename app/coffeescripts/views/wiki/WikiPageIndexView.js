@@ -27,6 +27,8 @@ import template from 'jst/wiki/WikiPageIndex'
 import StickyHeaderMixin from '../StickyHeaderMixin'
 import splitAssetString from '../../str/splitAssetString'
 import ContentTypeExternalToolTray from './ContentTypeExternalToolTray'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
 import 'jquery.disableWhileLoading'
 
 export default class WikiPageIndexView extends PaginatedCollectionView {
@@ -43,7 +45,9 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       els: {
         '.no-pages': '$noPages',
         '.no-pages a:first-child': '$noPagesLink',
-        '.header-row a[data-sort-field]': '$sortHeaders'
+        '.header-row a[data-sort-field]': '$sortHeaders',
+        '#copy-to-mount-point': '$copyToMountPoint',
+        '#send-to-mount-point': '$sendToMountPoint'
       }
     })
 
@@ -58,6 +62,11 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
   initialize(options) {
     super.initialize(...arguments)
+
+    // Poor man's dependency injection just so we can stub out the react components
+    this.DirectShareCourseTray = DirectShareCourseTray
+    this.DirectShareUserModal = DirectShareUserModal
+
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
 
     if (!this.itemViewOptions) this.itemViewOptions = {}
@@ -203,8 +212,57 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     const tool = this.wikiIndexPlacements.find(t => t.id === ev.target.dataset.toolId)
     const mountPoint = $('#externalToolMountPoint')[0]
     ReactDOM.render(
-      <ContentTypeExternalToolTray tool={tool} onDismiss={this.closeExternalTool} />,
+      <ContentTypeExternalToolTray
+        tool={tool}
+        placement="wiki_index_menu"
+        acceptedResourceTypes={['page']}
+        targetResourceType="page"
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={this.closeExternalTool}
+      />,
       mountPoint
+    )
+  }
+
+  setCopyToItem(newCopyToItem, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setCopyToItem(null)
+      returnFocusTo.focus()
+    }
+
+    const pageId = newCopyToItem?.id
+    const {DirectShareCourseTray: CourseTray} = this
+    ReactDOM.render(
+      <CourseTray
+        open={newCopyToItem !== null}
+        sourceCourseId={ENV.COURSE_ID}
+        contentSelection={{pages: [pageId]}}
+        shouldReturnFocus={false}
+        onDismiss={handleDismiss}
+      />,
+      this.$copyToMountPoint[0]
+    )
+  }
+
+  setSendToItem(newSendToItem, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setSendToItem(null)
+      // focus still gets mucked up even with shouldReturnFocus={false}, so set it later.
+      setTimeout(() => returnFocusTo.focus(), 100)
+    }
+
+    const pageId = newSendToItem?.id
+    const {DirectShareUserModal: UserModal} = this
+    ReactDOM.render(
+      <UserModal
+        open={newSendToItem !== null}
+        courseId={ENV.COURSE_ID}
+        contentShare={{content_type: 'page', content_id: pageId}}
+        shouldReturnFocus={false}
+        onDismiss={handleDismiss}
+      />,
+      this.$sendToMountPoint[0]
     )
   }
 

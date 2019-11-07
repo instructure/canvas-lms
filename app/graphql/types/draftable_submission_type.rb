@@ -18,6 +18,7 @@
 
 module Types
   DRAFTABLE_SUBMISSION_TYPES = %w[
+    media_recording
     online_text_entry
     online_upload
     online_url

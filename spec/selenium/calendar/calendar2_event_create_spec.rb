@@ -159,11 +159,7 @@ describe "calendar2" do
         day2 = 2.days.from_now.to_date
 
         get '/calendar2'
-        fj('.calendar .fc-week .fc-today').click
-        edit_event_dialog = f('#edit_event_tabs')
-        edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
-        title = edit_event_form.find('#calendar_event_title')
-        replace_content(title, "Test Event")
+        f('.calendar .fc-week .fc-today').click
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
 

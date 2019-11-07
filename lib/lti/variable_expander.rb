@@ -1294,6 +1294,58 @@ module Lti
                        -> {@attachment.usage_rights.legal_copyright},
                        USAGE_RIGHTS_GUARD
 
+    # Returns the types of resources that can be imported to the current page, forwarded from the request.
+    # Value is an array of one or more values of: ["assignment", "assignment_group", "audio",
+    # "discussion_topic", "document", "image", "module", "quiz", "page", "video"]
+    #
+    # @example
+    #   ```
+    #   ["page"]
+    #   ["module"]
+    #   ["assignment", "discussion_topic", "page", "quiz", "module"]
+    #   ```
+    register_expansion 'com.instructure.Course.accept_canvas_resource_types', [],
+                       -> { @request.parameters['com_instructure_course_accept_canvas_resource_types'] },
+                       default_name: 'com_instructure_course_accept_canvas_resource_types'
+
+    # Returns the target resource type for the current page, forwarded from the request.
+    # Value is the largest logical unit of the page. Possible values are: ["assignment", "assignment_group",
+    # "audio", "discussion_topic", "document", "image", "module", "quiz", "page", "video"]
+    #   on Pages Index -> 'page'
+    #   on Modules -> 'module'
+    #   and so on.
+    #
+    # @example
+    #   ```
+    #   page
+    #   ```
+    register_expansion 'com.instructure.Course.canvas_resource_type', [],
+                       -> { @request.parameters['com_instructure_course_canvas_resource_type'] },
+                       default_name: 'com_instructure_course_canvas_resource_type'
+
+    # Returns whether a content can be imported into a specific group on the page, forwarded from the request.
+    # True for Modules page and Assignment Groups page. False for other content index pages.
+    #
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion 'com.instructure.Course.allow_canvas_resource_selection', [],
+                       -> { @request.parameters['com_instructure_course_allow_canvas_resource_selection'] },
+                       default_name: 'com_instructure_course_allow_canvas_resource_selection'
+
+    # Returns a list of content groups which can be selected, providing ID and name of each group,
+    # forwarded from the request.
+    # Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
+    #
+    # @example
+    #   ```
+    #   [{"id": "3", name: "First Module"}, {"id": "5", name: "Second Module"]
+    #   ```
+    register_expansion 'com.instructure.Course.available_canvas_resources', [],
+                       -> { @request.parameters['com_instructure_course_available_canvas_resources'] },
+                       default_name: 'com_instructure_course_available_canvas_resources'
+
     private
 
     def sis_pseudonym

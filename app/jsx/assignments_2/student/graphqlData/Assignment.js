@@ -47,9 +47,6 @@ export const Assignment = {
       muted
       name
       pointsPossible
-      rubric {
-        id
-      }
       submissionTypes
       unlockAt
     }
@@ -72,9 +69,6 @@ export const Assignment = {
     muted: bool.isRequired,
     name: string.isRequired,
     pointsPossible: number.isRequired,
-    rubric: shape({
-      id: string.isRequired
-    }),
     submissionTypes: arrayOf(string.isRequired),
     unlockAt: string
   })

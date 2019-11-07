@@ -64,6 +64,16 @@ describe('content shares table', () => {
     expect(queryByTestId('received-table-row-unread')).toBeInTheDocument()
   })
 
+  it('calls the onUpdate action if the unread dot is clicked on', () => {
+    const onUpdate = jest.fn()
+
+    const {getByTestId} = render(
+      <ReceivedTable shares={[unreadDiscussionShare]} onUpdate={onUpdate} />
+    )
+    fireEvent.click(getByTestId('received-table-row-unread'))
+    expect(onUpdate).toHaveBeenCalledWith(unreadDiscussionShare.id, {read_state: 'read'})
+  })
+
   it('triggers handler for preview menu action', () => {
     const onPreview = jest.fn()
     const onImport = jest.fn()

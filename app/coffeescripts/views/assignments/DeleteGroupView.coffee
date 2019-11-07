@@ -22,12 +22,14 @@ import DialogFormView from '../DialogFormView'
 import template from 'jst/assignments/DeleteGroup'
 import wrapper from 'jst/EmptyDialogFormWrapper'
 import 'jquery.disableWhileLoading'
+import {shimGetterShorthand} from '../../legacyCoffeesScriptHelpers'
 
 export default class DeleteGroupView extends DialogFormView
-  defaults:
+  defaults: shimGetterShorthand
     width: 500
     height: 350
-    title: I18n.t('Delete Assignment Group')
+  ,
+    title: -> I18n.t('Delete Assignment Group')
 
   els:
     '.assignment_count': '$assignmentCount'

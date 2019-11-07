@@ -77,16 +77,18 @@ class ChooseHomePageButton extends React.Component {
           <i className="icon-target" aria-hidden="true" />
           &nbsp;{I18n.t('Choose Home Page')}
         </button>
-        <CourseHomeDialog
-          store={this.props.store}
-          open={this.state.dialogOpen}
-          onRequestClose={this.onClose}
-          courseId={ENV.COURSE.id}
-          wikiFrontPageTitle={ENV.COURSE.front_page_title}
-          wikiUrl={ENV.COURSE.pages_url}
-          returnFocusTo={this.chooseButton}
-          isPublishing={false}
-        />
+        {this.state.dialogOpen && (
+          <CourseHomeDialog
+            store={this.props.store}
+            open={this.state.dialogOpen}
+            onRequestClose={this.onClose}
+            courseId={ENV.COURSE.id}
+            wikiFrontPageTitle={ENV.COURSE.front_page_title}
+            wikiUrl={ENV.COURSE.pages_url}
+            returnFocusTo={this.chooseButton}
+            isPublishing={false}
+          />
+        )}
       </div>
     )
   }

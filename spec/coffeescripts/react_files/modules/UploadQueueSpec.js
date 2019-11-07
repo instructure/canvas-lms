@@ -17,14 +17,16 @@
  */
 
 import UploadQueue from 'compiled/react_files/modules/UploadQueue'
+import sinon from 'sinon'
 import $ from 'jquery'
 
-const mockFileOptions = (name = 'foo', type = 'bar') => ({
+const mockFileOptions = (name = 'foo', type = 'bar', expandZip = false) => ({
   file: {
     size: 1,
     name,
     type
-  }
+  },
+  expandZip
 })
 const mockFileUploader = file => ({
   upload() {
@@ -102,4 +104,13 @@ test('getAllUploaders includes the current uploader', function() {
   equal(all.indexOf(sentinel), 0)
   this.queue.currentUploader = undefined
   this.queue.attemptNextUpload = original
+})
+
+test('Calls onChange', function() {
+  const spy = sinon.spy(this.queue, 'onChange')
+  const foo = mockFileOptions('foo', 'bar', true)
+  const uploader = this.queue.createUploader(foo)
+
+  uploader.onProgress()
+  equal(spy.calledOnce, true)
 })

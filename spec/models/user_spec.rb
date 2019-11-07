@@ -1599,7 +1599,7 @@ describe User do
     end
   end
 
-  describe "cached_current_enrollments" do
+  describe "cached_currentish_enrollments" do
     it "should include temporary invitations" do
       user_with_pseudonym(:active_all => 1)
       @user1 = @user
@@ -1610,7 +1610,7 @@ describe User do
       course_factory(active_all: true)
       @enrollment = @course.enroll_user(@user2)
 
-      expect(@user1.cached_current_enrollments).to eq [@enrollment]
+      expect(@user1.cached_currentish_enrollments).to eq [@enrollment]
     end
 
     context "sharding" do
@@ -1627,7 +1627,7 @@ describe User do
           course2.offer!
           course2.enroll_student(user)
         end
-        expect(user.cached_current_enrollments).to eq [e1, e2]
+        expect(user.cached_currentish_enrollments).to eq [e1, e2]
       end
 
       it "should properly update when using new redis cache keys" do
@@ -1636,13 +1636,13 @@ describe User do
           user = User.create!
           course1 = Account.default.courses.create!(:workflow_state => "available")
           e1 = course1.enroll_student(user, :enrollment_state => "active")
-          expect(user.cached_current_enrollments).to eq [e1]
+          expect(user.cached_currentish_enrollments).to eq [e1]
           e2 = @shard1.activate do
             account2 = Account.create!
             course2 = account2.courses.create!(:workflow_state => "available")
             course2.enroll_student(user, :enrollment_state => "active")
           end
-          expect(user.cached_current_enrollments).to eq [e1, e2]
+          expect(user.cached_currentish_enrollments).to eq [e1, e2]
         end
       end
     end

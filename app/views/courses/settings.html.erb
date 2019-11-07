@@ -346,7 +346,7 @@
         </td>
       </tr>
       <tr>
-        <td class="form-label"><%= f.label :license, :en => "License" %></td>
+        <td class="form-label"><label for="course_license"><%= before_label('license', %{License}) %></label></td>
         <td colspan="3">
           <% if can_manage %>
             <% cc, non_cc = Course.licenses.map { |id, attrs| [attrs[:readable_license].call, id]}.partition{|n, id| id.start_with?('cc')} %>
@@ -433,7 +433,7 @@
       </tr><tr>
         <td></td>
         <td colspan="3">
-          <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? %>">
+          <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? && !is_master_course %>">
             <% if @context.root_account.self_registration? %>
               <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
                     This course has enabled open enrollment. Students can

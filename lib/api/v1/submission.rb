@@ -32,6 +32,11 @@ module Api::V1::Submission
     context ||= assignment.context
     hash = submission_attempt_json(submission, assignment, current_user, session, context, params)
 
+    # The "body" attribute is intended to store the contents of text-entry
+    # submissions, but for quizzes it contains a string that includes grading
+    # information. Only return it if the caller has permissions.
+    hash['body'] = nil if assignment.quiz? && !submission.grants_right?(current_user, :read_grade)
+
     if includes.include?("submission_history")
       if submission.quiz_submission && assignment.quiz && !assignment.quiz.anonymous_survey?
         hash['submission_history'] = submission.quiz_submission.versions.map do |ver|

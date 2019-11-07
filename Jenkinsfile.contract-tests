@@ -42,7 +42,7 @@ pipeline {
       }
     }
 
-    stage ('Contract Tests') {
+    stage ('API Contract Tests') {
       steps {
         timeout(time: 10) {
           sh """

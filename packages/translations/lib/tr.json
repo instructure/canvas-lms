@@ -1,0 +1,380 @@
+{
+    "add_8523c19b": {
+        "message": "Ekle"
+    },
+    "address_3159962f": {
+        "message": "Adres:"
+    },
+    "align_11050992": {
+        "message": "Hizala"
+    },
+    "align_center_ca078feb": {
+        "message": "Ortala"
+    },
+    "align_left_e9f1f93b": {
+        "message": "Sola dayalı"
+    },
+    "align_right_9bad3ac1": {
+        "message": "Sağa dayalı"
+    },
+    "alignment_and_indentation_f7de34bf": {
+        "message": "Hizlama ve içerden başlatma"
+    },
+    "all_4321c3a1": {
+        "message": "Tümü"
+    },
+    "all_day_fb42c4fc": {
+        "message": "Tüm Gün"
+    },
+    "alphabetical_55b5b4e0": {
+        "message": "Alfabetik"
+    },
+    "alt_text_611fb322": {
+        "message": "Etiket Metni"
+    },
+    "announcement_fb4cb645": {
+        "message": "Duyuru"
+    },
+    "announcement_list_da155734": {
+        "message": "Duyuru Listesi"
+    },
+    "announcements_a4b8ed4a": {
+        "message": "Duyurular"
+    },
+    "apps_54d24a47": {
+        "message": "Uygulamalar"
+    },
+    "aspect_ratio_will_be_preserved_cb5fdfb8": {
+        "message": "Genişleme oranı korumalıdır"
+    },
+    "assignment_976578a8": {
+        "message": "Ödev"
+    },
+    "assignments_1e02582c": {
+        "message": "Ödevler"
+    },
+    "calendar_a8563bb2": {
+        "message": "Takvim:"
+    },
+    "calendar_event_89aadc1c": {
+        "message": "Takvim Olayı"
+    },
+    "cancel_caeb1e68": {
+        "message": "İptal"
+    },
+    "canvas_planner_98ed106": {
+        "message": "Canvas Planlayıcı"
+    },
+    "canvas_plugins_705a5016": {
+        "message": "Canvas Eklentileri"
+    },
+    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+        "message": "Herhangi bir sayfaya bağlantı eklemek için ilgili sayfaya tıklayın."
+    },
+    "click_to_embed_imagename_c41ea8df": {
+        "message": "{ imageName } görselini eklemek için tıklayınız"
+    },
+    "click_to_insert_a_link_into_the_editor_c19613aa": {
+        "message": "Düzenleyiciye bağlantı eklemek için tıklayın."
+    },
+    "close_d634289d": {
+        "message": "Kapat"
+    },
+    "collaborations_5c56c15f": {
+        "message": "İşbirliğine Yönelik Çalışmalar"
+    },
+    "content_type_2cf90d95": {
+        "message": "İçerik Tipi"
+    },
+    "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    },
+    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    },
+    "course_8a63b4a3": {
+        "message": "Ders"
+    },
+    "course_files_62deb8f8": {
+        "message": "Ders Dosyaları"
+    },
+    "course_navigation_dd035109": {
+        "message": "Ders Gezinme Menüsü"
+    },
+    "custom_6979cd81": {
+        "message": "Özelleştir"
+    },
+    "date_ee500367": {
+        "message": "Tarih"
+    },
+    "decrease_indent_de6343ab": {
+        "message": "İçerden başlatma sınırını azalt"
+    },
+    "delete_a6efa79d": {
+        "message": "Sil"
+    },
+    "details_98a31b68": {
+        "message": "Ayrıntılar"
+    },
+    "details_a6f427c3": {
+        "message": "Ayrıntılar:"
+    },
+    "dimensions_45ddb7b7": {
+        "message": "Tanımlamalar"
+    },
+    "discussion_6719c51d": {
+        "message": "Tartışma"
+    },
+    "discussions_a5f96392": {
+        "message": "Tartışmalar"
+    },
+    "discussions_index_6c36ced": {
+        "message": "Tartışma Başlıkları"
+    },
+    "done_54e3d4b6": {
+        "message": "Tamam"
+    },
+    "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+        "message": "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
+    },
+    "due_5d7267be": {
+        "message": "Bitiş:"
+    },
+    "due_multiple_dates_cc0ee3f5": {
+        "message": "Teslim Tarihi: Birden Çok Gün"
+    },
+    "edit_c5fbea07": {
+        "message": "Düzenle"
+    },
+    "embed_image_1080badc": {
+        "message": "Görsel Ekle"
+    },
+    "excused_cf8792eb": {
+        "message": "Mazeretli"
+    },
+    "external_links_3d9f074e": {
+        "message": "Harici Bağlantılar"
+    },
+    "files_c300e900": {
+        "message": "Dosyalar"
+    },
+    "files_index_af7c662b": {
+        "message": "Dosya Başlıkları"
+    },
+    "generating_preview_45b53be0": {
+        "message": "Oluşturma önizlemesi..."
+    },
+    "graded_25cd3fcd": {
+        "message": "Notlandırmalı"
+    },
+    "grades_a61eba0a": {
+        "message": "Notlar"
+    },
+    "group_navigation_99f191a": {
+        "message": "Grup Gezinme Menüsü"
+    },
+    "header_f28f73db": {
+        "message": "Başlık"
+    },
+    "images_7ce26570": {
+        "message": "Görseller"
+    },
+    "increase_indent_6d550a4a": {
+        "message": "İçerden başlat"
+    },
+    "insert_equella_links_49a8dacd": {
+        "message": "Equella Bağlantısı Ekle"
+    },
+    "insert_link_6dc23cae": {
+        "message": "Bağlantı Ekle"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Matematik Denklemi Ekle"
+    },
+    "invalid_file_type_881cc9b2": {
+        "message": "Geçersiz dosya türü"
+    },
+    "keyboard_shortcuts_ed1844bd": {
+        "message": "Klavye Kısayolları"
+    },
+    "late_2be42b88": {
+        "message": "Geç"
+    },
+    "link_7262adec": {
+        "message": "Bağlantı"
+    },
+    "link_to_other_content_in_the_course_879163b5": {
+        "message": "Ders içindeki başka bir içeriğe bağla."
+    },
+    "link_to_other_content_in_the_group_3fe25379": {
+        "message": "Gruptaki diğer içeriğe bağla"
+    },
+    "links_14b70841": {
+        "message": "Bağlantılar"
+    },
+    "load_more_a36f9cf9": {
+        "message": "Daha fazla yükle"
+    },
+    "load_more_results_460f49a9": {
+        "message": "Daha fazla sonuç yükle"
+    },
+    "loading_25990131": {
+        "message": "Yükleniyor..."
+    },
+    "loading_bde52856": {
+        "message": "Yükleniyor"
+    },
+    "loading_failed_b3524381": {
+        "message": "Yükleme Başarısız..."
+    },
+    "loading_past_items_ca499e75": {
+        "message": "Önceki öğeler yükleniyor"
+    },
+    "loading_planner_items_947a813d": {
+        "message": "Planlayıcı öğeleri yükleniyor"
+    },
+    "location_3b6ff307": {
+        "message": "Konum:"
+    },
+    "media_af190855": {
+        "message": "Medya"
+    },
+    "missing_1a256b3b": {
+        "message": "Eksik"
+    },
+    "modules_c4325335": {
+        "message": "Modüller"
+    },
+    "my_files_eea33f44": {
+        "message": "Dosyalarım"
+    },
+    "new_13daf639": {
+        "message": "Yeni"
+    },
+    "new_activity_8b84847d": {
+        "message": "Yeni Etkinlik"
+    },
+    "next_month_749b1778": {
+        "message": "Sonraki Hafta"
+    },
+    "no_results_940393cf": {
+        "message": "Sonuç yok."
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "Şimdilik bir şey yok"
+    },
+    "optional_add_course_ef0d70fc": {
+        "message": "Tercihen: Kurs Ekle"
+    },
+    "options_3ab0ea65": {
+        "message": "Seçenekler"
+    },
+    "page_50c4823d": {
+        "message": "Sayfa"
+    },
+    "pages_e5414c2c": {
+        "message": "Sayfalar"
+    },
+    "peer_review_74f26a13": {
+        "message": "Akran Değerlendirme"
+    },
+    "people_b4ebb13c": {
+        "message": "Katılımcılar"
+    },
+    "points_bceb5005": {
+        "message": "puanlar"
+    },
+    "points_points_63e59cce": {
+        "message": "{ points } puan"
+    },
+    "previous_month_bb1e3c84": {
+        "message": "Önceki Hafta"
+    },
+    "pts_699bd9aa": {
+        "message": "not"
+    },
+    "published_c944a23d": {
+        "message": "yayınlandı"
+    },
+    "quiz_e0dcce8f": {
+        "message": "Kısa Sınav"
+    },
+    "quizzes_7e598f57": {
+        "message": "Kısa sınavlar"
+    },
+    "record_7c9448b": {
+        "message": "Kayıt"
+    },
+    "recording_98da6bda": {
+        "message": "Kaydediliyor"
+    },
+    "rich_content_editor_2708ef21": {
+        "message": "Zengin İçerik Editörü"
+    },
+    "save_11a80ec3": {
+        "message": "Kaydet"
+    },
+    "search_280d00bd": {
+        "message": "Ara"
+    },
+    "size_b30e1077": {
+        "message": "Boyut"
+    },
+    "something_went_wrong_89195131": {
+        "message": "Bazı sorunlar oluştu."
+    },
+    "sort_by_e75f9e3e": {
+        "message": "Sırala"
+    },
+    "start_over_f7552aa9": {
+        "message": "Baştan Başla"
+    },
+    "submit_a3cc6859": {
+        "message": "Gönder"
+    },
+    "submitted_318fad53": {
+        "message": "Gönderildi"
+    },
+    "syllabus_f191f65b": {
+        "message": "Ders Programı"
+    },
+    "task_16b0ef38": {
+        "message": "Görev"
+    },
+    "time_2b5aac58": {
+        "message": "Süre"
+    },
+    "title_ee03d132": {
+        "message": "Başlık"
+    },
+    "title_is_required_6ddcab69": {
+        "message": "başlık gereklidir"
+    },
+    "to_do_1d554f36": {
+        "message": "Yapılacaklar"
+    },
+    "today_76e10f9c": {
+        "message": "Bugün"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "Yarın"
+    },
+    "unpublished_dfd8801": {
+        "message": "yayınlanmadı"
+    },
+    "upload_file_fd2361b8": {
+        "message": "Dosya Yükle"
+    },
+    "upload_media_ce31135a": {
+        "message": "Ortama Yükle"
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "Wiki Ana Sayfası"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "Dün"
+    }
+}

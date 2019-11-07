@@ -18,19 +18,22 @@
 
 import I18n from 'i18n!direct_share_user_modal'
 import React, {Suspense, lazy, useState, useRef} from 'react'
-import {string} from 'prop-types'
+import {oneOf, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 import CanvasModal from 'jsx/shared/components/CanvasModal'
-import contentShareShape from 'jsx/shared/proptypes/contentShare'
+import {CONTENT_SHARE_TYPES} from 'jsx/shared/proptypes/contentShare'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 
 const DirectShareUserPanel = lazy(() => import('./DirectShareUserPanel'))
 
 DirectShareUserModal.propTypes = {
-  contentShare: contentShareShape,
+  contentShare: shape({
+    content_id: string,
+    content_type: oneOf(CONTENT_SHARE_TYPES)
+  }),
   courseId: string
 }
 

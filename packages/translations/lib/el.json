@@ -1,0 +1,320 @@
+{
+    "add_8523c19b": {
+        "message": "Πρόσθεση"
+    },
+    "address_3159962f": {
+        "message": "Διεύθυνση:"
+    },
+    "all_4321c3a1": {
+        "message": "Όλα"
+    },
+    "announcement_fb4cb645": {
+        "message": "Ανακοίνωση"
+    },
+    "announcement_list_da155734": {
+        "message": "Λίστα Ανακοινώσεων"
+    },
+    "announcements_a4b8ed4a": {
+        "message": "Ανακοινώσεις"
+    },
+    "apps_54d24a47": {
+        "message": "Εφαρμογές"
+    },
+    "aspect_ratio_will_be_preserved_cb5fdfb8": {
+        "message": "Ο λόγος του μήκους της εικόνας προς το ύψος της θα διατηρηθεί"
+    },
+    "assignment_976578a8": {
+        "message": "Εργασία"
+    },
+    "assignments_1e02582c": {
+        "message": "Εργασίες"
+    },
+    "calendar_a8563bb2": {
+        "message": "Ημερολόγιο:"
+    },
+    "calendar_event_89aadc1c": {
+        "message": "Γεγονός στο Ημερολόγιο"
+    },
+    "cancel_caeb1e68": {
+        "message": "Ακύρωση"
+    },
+    "canvas_plugins_705a5016": {
+        "message": "Προσθήκες του Canvas"
+    },
+    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+        "message": "Κάντε κλικ σε οποιαδήποτε σελίδα για να εισαγάγετε σύνδεσμο προς αυτή τη σελίδα."
+    },
+    "click_to_embed_imagename_c41ea8df": {
+        "message": "Κάντε κλικ για να ενσωματώσετε την εικόνα { imageName }"
+    },
+    "click_to_insert_a_link_into_the_editor_c19613aa": {
+        "message": "Κάντε κλικ για να εισάγετε σύνδεσμο μέσα στον επεξεργαστή"
+    },
+    "close_d634289d": {
+        "message": "Κλείσιμο"
+    },
+    "collaborations_5c56c15f": {
+        "message": "Συνεργασίες"
+    },
+    "content_type_2cf90d95": {
+        "message": "Τύπος Περιεχομένου"
+    },
+    "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    },
+    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    },
+    "course_8a63b4a3": {
+        "message": "Μάθημα"
+    },
+    "course_files_62deb8f8": {
+        "message": "Αρχεία Μαθήματος"
+    },
+    "course_navigation_dd035109": {
+        "message": "Πλοήγηση στο μάθημα"
+    },
+    "date_ee500367": {
+        "message": "Ημερομηνία"
+    },
+    "decrease_indent_de6343ab": {
+        "message": "Μείωση Εσοχής Κειμένου"
+    },
+    "delete_a6efa79d": {
+        "message": "Διαγραφή"
+    },
+    "details_98a31b68": {
+        "message": "Λεπτομέρειες"
+    },
+    "details_a6f427c3": {
+        "message": "Λεπτομέρειες:"
+    },
+    "dimensions_45ddb7b7": {
+        "message": "Διαστάσεις"
+    },
+    "discussion_6719c51d": {
+        "message": "Συζήτηση"
+    },
+    "discussions_a5f96392": {
+        "message": "Συζητήσεις"
+    },
+    "discussions_index_6c36ced": {
+        "message": "Ευρετήριο Συζητήσεων"
+    },
+    "done_54e3d4b6": {
+        "message": "Ολοκληρώθηκε"
+    },
+    "due_5d7267be": {
+        "message": "Καταληκτική Ημερ/νία:"
+    },
+    "due_multiple_dates_cc0ee3f5": {
+        "message": "<mrk mid=\"4290\" mtype=\"seg\">Καταληκτική Ημερ/νία:</mrk> <mrk mid=\"4291\" mtype=\"seg\">Πολλαπλές Ημερομηνίες</mrk>"
+    },
+    "edit_c5fbea07": {
+        "message": "Διαμόρφωση"
+    },
+    "embed_image_1080badc": {
+        "message": "Ενσωμάτωση εικόνας"
+    },
+    "excused_cf8792eb": {
+        "message": "Δικαιολογημένος/η"
+    },
+    "files_c300e900": {
+        "message": "Αρχεία"
+    },
+    "files_index_af7c662b": {
+        "message": "Ευρετήριο Αρχείων"
+    },
+    "generating_preview_45b53be0": {
+        "message": "Δημιουργία προεπισκόπησης..."
+    },
+    "graded_25cd3fcd": {
+        "message": "Βαθμολογημένα"
+    },
+    "grades_a61eba0a": {
+        "message": "Βαθμοί"
+    },
+    "group_navigation_99f191a": {
+        "message": "Πλοήγηση στην Ομάδα"
+    },
+    "header_f28f73db": {
+        "message": "Επικεφαλίδα"
+    },
+    "images_7ce26570": {
+        "message": "Εικόνες"
+    },
+    "increase_indent_6d550a4a": {
+        "message": "Αύξηση Εσοχής Κειμένου"
+    },
+    "insert_equella_links_49a8dacd": {
+        "message": "Εισαγωγή Συνδέσμων τύπου Equella"
+    },
+    "insert_link_6dc23cae": {
+        "message": "Εισαγωγή Συνδέσμου"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Εισαγωγή Μαθηματικής Εξίσωσης"
+    },
+    "invalid_file_type_881cc9b2": {
+        "message": "Μη έγκυρος τύπος αρχείου"
+    },
+    "keyboard_shortcuts_ed1844bd": {
+        "message": "Συντομεύσεις πληκτρολογίου"
+    },
+    "late_2be42b88": {
+        "message": "Πρόσφατο/α"
+    },
+    "link_7262adec": {
+        "message": "Σύνδεσμος"
+    },
+    "link_to_other_content_in_the_course_879163b5": {
+        "message": "Σύνδεση προς άλλο περιεχόμενο του μαθήματος."
+    },
+    "link_to_other_content_in_the_group_3fe25379": {
+        "message": "Σύνδεση προς άλλο περιεχόμενο της ομάδας."
+    },
+    "links_14b70841": {
+        "message": "Σύνδεσμοι"
+    },
+    "load_more_a36f9cf9": {
+        "message": "Φόρτωση περισσότερων"
+    },
+    "load_more_results_460f49a9": {
+        "message": "Φόρτωση περισσότερων αποτελεσμάτων"
+    },
+    "loading_25990131": {
+        "message": "Φόρτωση..."
+    },
+    "loading_725811ca": {
+        "message": "φόρτωση"
+    },
+    "loading_bde52856": {
+        "message": "Φόρτωση"
+    },
+    "loading_failed_b3524381": {
+        "message": "Η Φόρτωση Απέτυχε"
+    },
+    "location_3b6ff307": {
+        "message": "Τοποθεσία:"
+    },
+    "media_af190855": {
+        "message": "Δεδομένα"
+    },
+    "missing_1a256b3b": {
+        "message": "Απομένει"
+    },
+    "modules_c4325335": {
+        "message": "Ενότητες"
+    },
+    "my_files_eea33f44": {
+        "message": "Τα Αρχεία Μου"
+    },
+    "new_13daf639": {
+        "message": "Νέο"
+    },
+    "no_results_940393cf": {
+        "message": "Δεν υπάρχουν Αποτελέσματα"
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "Τίποτα για την ώρα"
+    },
+    "options_3ab0ea65": {
+        "message": "Επιλογές"
+    },
+    "page_50c4823d": {
+        "message": "Σελίδα"
+    },
+    "pages_e5414c2c": {
+        "message": "Σελίδες"
+    },
+    "peer_review_74f26a13": {
+        "message": "Αξιολόγηση Ομότιμων"
+    },
+    "people_b4ebb13c": {
+        "message": "Κοινό"
+    },
+    "points_bceb5005": {
+        "message": "Μόρια"
+    },
+    "pts_699bd9aa": {
+        "message": "pts"
+    },
+    "published_c944a23d": {
+        "message": "δημοσιευμένο/α"
+    },
+    "quiz_e0dcce8f": {
+        "message": "Κουίζ"
+    },
+    "quizzes_7e598f57": {
+        "message": "Κουίζ"
+    },
+    "record_7c9448b": {
+        "message": "Ηχογράφηση"
+    },
+    "recording_98da6bda": {
+        "message": "Εγγράφεται"
+    },
+    "replies_4a8577c8": {
+        "message": "Απαντήσεις"
+    },
+    "rich_content_editor_2708ef21": {
+        "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
+    },
+    "save_11a80ec3": {
+        "message": "Αποθήκευση"
+    },
+    "search_280d00bd": {
+        "message": "Αναζήτηση"
+    },
+    "size_b30e1077": {
+        "message": "Μέγεθος"
+    },
+    "start_over_f7552aa9": {
+        "message": "Ξεκινήστε Ξανά"
+    },
+    "submit_a3cc6859": {
+        "message": "Υποβολή"
+    },
+    "submitted_318fad53": {
+        "message": "Υποβλήθηκαν"
+    },
+    "syllabus_f191f65b": {
+        "message": "Αναλυτικό Πρόγραμμα"
+    },
+    "time_2b5aac58": {
+        "message": "Χρόνος"
+    },
+    "title_ee03d132": {
+        "message": "Τίτλος"
+    },
+    "to_do_1d554f36": {
+        "message": "Υποχρεώσεις"
+    },
+    "today_76e10f9c": {
+        "message": "Σήμερα"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "Αύριο"
+    },
+    "unpublished_dfd8801": {
+        "message": "μη δημοσιευμένο"
+    },
+    "upload_file_fd2361b8": {
+        "message": "Φόρτωση Αρχείου"
+    },
+    "upload_media_ce31135a": {
+        "message": "Μεταφόρτωση Αρχείου Πολυμέσων"
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "video_player_b371005": {
+        "message": "Πρόγραμμα Αναπαραγωγής Βίντεο"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "Αρχική Σελίδα Wiki"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "Χτες"
+    }
+}

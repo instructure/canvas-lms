@@ -19,10 +19,12 @@
 import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
-import {Button} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {CREATE_SUBMISSION, CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
+import {friendlyTypeName, multipleTypesDrafted} from '../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../shared/LoadingIndicator'
+import {Modal} from '@instructure/ui-overlays'
 import {Mutation} from 'react-apollo'
 import React, {Component} from 'react'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
@@ -36,10 +38,24 @@ export default class SubmissionManager extends Component {
   }
 
   state = {
-    activeSubmissionType: this.props.submission?.submissionDraft?.activeSubmissionType || null,
     editingDraft: false,
+    openSubmitModal: false,
     submittingAssignment: false,
     uploadingFiles: false
+  }
+
+  componentDidMount() {
+    this.setState({
+      activeSubmissionType: this.getActiveSubmissionTypeFromProps()
+    })
+  }
+
+  getActiveSubmissionTypeFromProps = () => {
+    if (this.props.assignment.submissionTypes.length > 1) {
+      return this.props.submission?.submissionDraft?.activeSubmissionType || null
+    } else {
+      return this.props.assignment.submissionTypes[0]
+    }
   }
 
   updateActiveSubmissionType = activeSubmissionType => {
@@ -130,6 +146,14 @@ export default class SubmissionManager extends Component {
     this.setState({submittingAssignment: true})
 
     switch (this.state.activeSubmissionType) {
+      case 'media_recording':
+        if (this.props.submission.submissionDraft.mediaObject?._id) {
+          await this.submitToGraphql(submitMutation, {
+            mediaId: this.props.submission.submissionDraft.mediaObject._id,
+            type: this.state.activeSubmissionType
+          })
+        }
+        break
       case 'online_upload':
         if (
           this.props.submission.submissionDraft.attachments &&
@@ -170,6 +194,10 @@ export default class SubmissionManager extends Component {
   shouldRenderSubmit = () => {
     let activeTypeMeetsCriteria = false
     switch (this.state.activeSubmissionType) {
+      case 'media_recording':
+        activeTypeMeetsCriteria = this.props.submission?.submissionDraft
+          ?.meetsMediaRecordingCriteria
+        break
       case 'online_text_entry':
         activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsTextEntryCriteria
         break
@@ -198,6 +226,19 @@ export default class SubmissionManager extends Component {
     }
   }
 
+  handleSubmitConfirmation = submitMutation => {
+    this.submitAssignment(submitMutation)
+    this.setState({openSubmitModal: false})
+  }
+
+  handleSubmitButton = submitMutation => {
+    if (multipleTypesDrafted(this.props.submission)) {
+      this.setState({openSubmitModal: true})
+    } else {
+      this.handleSubmitConfirmation(submitMutation)
+    }
+  }
+
   renderAttemptTab = () => {
     return (
       <Mutation
@@ -220,6 +261,50 @@ export default class SubmissionManager extends Component {
           />
         )}
       </Mutation>
+    )
+  }
+
+  renderSubmitConfirmation = submitMutation => {
+    return (
+      <Modal
+        data-testid="submission-confirmation-modal"
+        label={I18n.t('Submit Confirmation')}
+        onDismiss={() => this.setState({openSubmitModal: false})}
+        open={this.state.openSubmitModal}
+        size="small"
+      >
+        <Modal.Body>
+          <CloseButton
+            offset="x-small"
+            onClick={() => this.setState({openSubmitModal: false})}
+            placement="end"
+            variant="icon"
+          >
+            {I18n.t('Close')}
+          </CloseButton>
+          {I18n.t(
+            'You are submitting a %{submissionType} submission. Only one submission type is allowed. All other submission types will be deleted.',
+            {submissionType: friendlyTypeName(this.state.activeSubmissionType)}
+          )}
+          <div>
+            <Button
+              data-testid="cancel-submit"
+              margin="x-small x-small 0 0"
+              onClick={() => this.setState({openSubmitModal: false})}
+            >
+              {I18n.t('Cancel')}
+            </Button>
+            <Button
+              data-testid="confirm-submit"
+              margin="x-small 0 0 0"
+              onClick={() => this.handleSubmitConfirmation(submitMutation)}
+              variant="primary"
+            >
+              {I18n.t('Okay')}
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
     )
   }
 
@@ -269,16 +354,19 @@ export default class SubmissionManager extends Component {
             update={this.clearSubmissionHistoriesCache}
           >
             {submitMutation => (
-              <Button
-                id="submit-button"
-                data-testid="submit-button"
-                disabled={this.state.submittingAssignment}
-                variant="primary"
-                margin="xx-small 0"
-                onClick={() => this.submitAssignment(submitMutation)}
-              >
-                {I18n.t('Submit')}
-              </Button>
+              <>
+                <Button
+                  id="submit-button"
+                  data-testid="submit-button"
+                  disabled={this.state.submittingAssignment}
+                  variant="primary"
+                  margin="xx-small 0"
+                  onClick={() => this.handleSubmitButton(submitMutation)}
+                >
+                  {I18n.t('Submit')}
+                </Button>
+                {this.state.openSubmitModal && this.renderSubmitConfirmation(submitMutation)}
+              </>
             )}
           </Mutation>
         </div>

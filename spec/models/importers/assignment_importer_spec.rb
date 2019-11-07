@@ -448,12 +448,31 @@ describe "Importing assignments" do
           tool_vendor_code: vendor_code,
           tool_product_code: product_code,
           tool_resource_type_code: resource_type_code,
-          tool_type: 'Lti::MessageHandler'
+          tool_type: 'Lti::MessageHandler',
+          context_type: 'Course'
         )
 
         Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
         assignment.reload
         expect(assignment.assignment_configuration_tool_lookups.count).to eq 1
+      end
+
+      it "creates assignment_configuration_tool_lookups with the proper context_type" do
+        actl1 = assignment.assignment_configuration_tool_lookups.create!(
+          tool_vendor_code: vendor_code,
+          tool_product_code: product_code,
+          tool_resource_type_code: resource_type_code,
+          tool_type: 'Lti::MessageHandler',
+          context_type: 'Account'
+        )
+
+        Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
+        assignment.reload
+        expect(assignment.assignment_configuration_tool_lookups.count).to eq 2
+        new_actls = assignment.assignment_configuration_tool_lookups.reject do |actl|
+          actl.id == actl1.id
+        end
+        expect(new_actls.map(&:context_type)).to eq(['Course'])
       end
     end
 

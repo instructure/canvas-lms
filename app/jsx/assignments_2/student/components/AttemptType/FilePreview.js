@@ -41,6 +41,37 @@ export default class FilePreview extends Component {
     selectedFile: 0
   }
 
+  translateMimeClass(mimeClass) {
+    switch (mimeClass) {
+      case 'audio':
+        return I18n.t('audio')
+      case 'code':
+        return I18n.t('code')
+      case 'doc':
+        return I18n.t('doc')
+      case 'flash':
+        return I18n.t('flash')
+      case 'html':
+        return I18n.t('html')
+      case 'image':
+        return I18n.t('image')
+      case 'pdf':
+        return I18n.t('pdf')
+      case 'ppt':
+        return I18n.t('ptt')
+      case 'text':
+        return I18n.t('text')
+      case 'video':
+        return I18n.t('video')
+      case 'xls':
+        return I18n.t('xls')
+      case 'zip':
+        return I18n.t('zip')
+      default:
+        return I18n.t('file')
+    }
+  }
+
   capitalize = s => {
     if (typeof s !== 'string') return ''
     return s.charAt(0).toUpperCase() + s.slice(1)
@@ -61,9 +92,7 @@ export default class FilePreview extends Component {
       <Button variant="icon" size="large" onClick={() => this.selectFile(index)}>
         <img
           alt={I18n.t('%{filename} preview', {filename: file.displayName})}
-          height="100"
           src={file.thumbnailUrl}
-          width="100"
         />
         <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
       </Button>
@@ -85,6 +114,8 @@ export default class FilePreview extends Component {
 
   renderFileIcons = () => {
     const iconsContainerStyle = {
+      borderRight: `1px solid ${theme.variables.colors.borderMedium}`,
+      margin: '-1px',
       padding: theme.variables.spacing.small
     }
 
@@ -103,8 +134,8 @@ export default class FilePreview extends Component {
                 ? this.renderThumbnail(file, index)
                 : this.renderIcon(file, index)}
             </Tooltip>
-            <div style={{display: 'block'}}>
-              <Text size="small">{this.capitalize(file.mimeClass)}</Text>
+            <div style={{display: 'block', margin: '2px 0 0 0'}}>
+              <Text size="small">{this.capitalize(this.translateMimeClass(file.mimeClass))}</Text>
             </div>
           </div>
         ))}

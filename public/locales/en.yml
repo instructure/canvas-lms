@@ -376,6 +376,9 @@ en:
         only_one_folder: Can't set folder path and folder id
       over_quota: file size exceeds quota
     basic_lti:
+      no_parseable_score:
+        result: 'Unable to parse resultScore: %{grade}'
+        result_total: 'Unable to parse resultTotalScore: %{grade}'
       bad_score: Score is not between 0 and 1
       no_score: No score given
       no_points_comment: |-
@@ -735,26 +738,26 @@ en:
   behaviour_change_related_to_the_bugfix_in_apg_122__63cfa767: Behaviour change related to the bugfix in APG-122. Do not allow custom columns to be created that are titled the same as gradebook importer reserved names, also ignore non-active custom columns on gradebook import as well as those that use reserved names.
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: Add Grading Scheme to Admin Grade Reports
   includes_grade_values_in_the_admin_grade_reports_a28200da: Includes grade values in the admin grade reports.
-  accessible_sidebar_menu_b30baf97: Accessible Sidebar Menu
-  improve_accessibility_of_left_hand_menu_through_be_908fb002: Improve accessibility of left-hand menu through better use of color plus visual and screenreader indicators of inactive menu items.
-  check_submission_file_type_b3dbf3fd: Check Submission File Type
-  this_feature_makes_the_submissions_file_upload_api_aeb97ad6: |-
-    This feature makes the submissions file upload api check the filetype against
-    the allowed extensions of the associated assignment.
+  custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
+  use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   this_is_a_siteadmin_test_feature_flag_3ab5184: This is a SiteAdmin test Feature Flag
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: This flag will not cause any change in behavior.
   assignments_2_teacher_view_3cd3aeda: Assignments 2 Teacher View
   use_the_new_assignments_teacher_page_8add7e46: Use the new assignments teacher page
-  custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
-  use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   assignments_2_student_view_224cb233: Assignments 2 Student View
   use_the_new_assignments_student_page_944262af: Use the new assignments student page
   pronouns_for_users_da46fb5: Pronouns for users
-  pronouns_users_can_show_after_their_name_e80821c7: Pronouns users can show after their name
+  allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: Allows users to pick pronouns that will be displayed after their name when it is shown in the user interface.
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_dc466585: |-
     Differentiate between system- and user-generated live events
     in the Canvas Data Services tool
+  live_event_subscription_webhooks_1dae83bb: Live Event Subscription Webhooks
+  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+    Allow Live Event Subscription to be set to be delivered
+    via HTTPS webhooks
+  live_event_tool_documentation_f6dcc3d7: Live Event Tool Documentation
+  show_embedded_documentation_in_live_events_lti_too_cbe229f3: Show embedded documentation in Live Events LTI Tool
   announcement_successfully_created_731a707f: Announcement successfully created
   announcement_creation_failed_f7d227f5: Announcement creation failed
   announcement_successfully_updated_7bc5130: Announcement successfully updated
@@ -1031,11 +1034,11 @@ en:
         prevent_course_renaming_by_teachers: Don't let teachers rename their courses
         allow_sending_scores_in_emails: Students can opt-in to receiving scores in email notifications
         include_students_in_global_survey: Include students in global surveys
-        can_add_pronouns: Users can add pronouns as an identifier
         restrict_quiz_questions: Restrict students from viewing quiz questions after course end date
         locked: Lock this setting for sub-accounts and courses
         restrict_student_future_listing: Restrict students from viewing future courses in enrollments list
         value: Disable comments on announcements
+        can_add_pronouns: Enable Personal Pronouns
         domain: 'Domain:'
         admins_can_change_passwords: Password setting by admins
         admins_can_view_notifications: Admins can view notifications
@@ -1673,6 +1676,19 @@ en:
             sis_default:
               parameters:
                 note: "*Term settings only impact Courses, Sections, Enrollments, and X list CSV files."
+    wssu:
+      user_access:
+        parameters:
+          account_reports:
+            usu:
+              enrollment_type:
+                header: Enrollment Type
+          all: All Enrollments
+          students: Student Enrollments
+          teachers: Teacher Enrollments
+          ta: Ta Enrollments
+          observer: Observer Enrollments
+          designer: Designer Enrollments
     additional_settings:
       account_status: Account Status
       new_account_domain_title: New Account Domain
@@ -1751,6 +1767,7 @@ en:
   links:
     dashboard: My Dashboard
     errors:
+      4xx_feedback: Click here to tell us what you were looking for.
       feedback: Click here to tell us what happened
   application:
     notices:
@@ -3003,7 +3020,7 @@ en:
         student_progression: Module Progression by Student
         student_progress: Student Progress
     url_show:
-      new_tab: This site needs to be opened in a new browser window.
+      new_tab: This site was opened in a new browser window.
     module_started: In Progress
     module_complete: Complete
     module_unlocked: Unlocked
@@ -5021,7 +5038,7 @@ en:
         name: Full Name
         short_name: Display Name
         sortable_name: Sortable Name
-        pronoun: Pronoun
+        pronouns: Pronouns
         default_email: Default Email
         locale: Language
         time_zone: Time Zone
@@ -6538,6 +6555,8 @@ en:
     revisions:
       page_revisions_title: "%{title} revisions: %{context_name}"
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: An object of type %{graphql_type} was hidden due to insufficient scopes on access token
+  media_recording_submissions_require_a_media_id_to__ff740090: "%{media_recording} submissions require a %{media_id} to submit"
+  the_media_id_does_not_correspond_to_an_existing_me_eab16c08: The %{media_id} does not correspond to an existing media object
   no_attachments_found_for_the_following_ids_ids_49c9192f: 'No attachments found for the following ids: %{ids}'
   you_must_attach_at_least_one_file_to_this_assignme_9f39ce12: You must attach at least one file to this assignment
   invalid_file_type_881cc9b2: Invalid file type
@@ -6552,8 +6571,8 @@ en:
     announcement: announcement
     invitation: invitation
     warning: warning
-  if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(If none are selected, send to everyone in the entire account)"
-  if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(If none are selected, send to everyone in the entire sub-account)"
+  if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(If none are selected, show to everyone in the entire account)"
+  if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(If none are selected, show to everyone in the entire sub-account)"
   use_parent_account_setting_f25a721f: Use parent account setting
   turnitin_settings:
     originality_report_visible_immediately: Immediately
@@ -6695,8 +6714,6 @@ en:
   admin_navigation_menu_77b801a2: Admin Navigation Menu
   groups_navigation_menu_76b5acc6: Groups Navigation Menu
   context_navigation_menu_514c5889: Context Navigation Menu
-  disabled_in_course_settings_d15ee35d: "* Disabled in Course Settings"
-  no_content_has_been_added_f36bab43: "* No content has been added"
   disabled_not_visible_to_students_48d4a90d: Disabled. Not visible to students
   no_content_not_visible_to_students_b59f4867: No content. Not visible to students
   label_disabled_not_visible_to_students_da093eec: "%{label}. Disabled. Not visible to students"
@@ -6754,8 +6771,6 @@ en:
     things: Things
     hi: Hi
     hello: Hello
-    Help: Help
-    Back: Back
     which_course_is_this_question_about: Which course is this question about?
     message_will_be_sent_to_all_the_teachers_tas_in_the_course: Message will be sent to all the Teachers / TA's in the course.
     message: Message
@@ -6781,9 +6796,6 @@ en:
     errors:
       invalid_account_notification_end_at: Account notification end time precedes start time
   institution_announcement_announcement_title_f017c1e0: 'Institution announcement: "%{announcement_title}"'
-  she_her_c8b5e3be: she/her
-  he_him_a64fe27e: he/him
-  they_them_d6125799: they/them
   account_user:
     types:
       account_admin: Account Admin
@@ -7489,6 +7501,7 @@ en:
       blueprint_sync_complete: Blueprint Sync Complete
       blueprint_content_added: Blueprint Content Added
       content_link_error: Content Link Error
+      account_notification: Account Notification
     categories:
       all_submissions: All Submissions
       announcement: Announcement
@@ -7515,6 +7528,7 @@ en:
       recording_ready: Recording Ready
       blueprint: Blueprint
       content_link_error: Content Link Error
+      account_notification: Account Notification
     announcement_display: Announcement
     announcement_created_by_you_display: Announcement Created By You
     course_content_display: Course Content
@@ -7542,6 +7556,7 @@ en:
     recording_ready_display: Recording Ready
     blueprint_display: Blueprint Sync
     content_link_error_display: Content Link Error
+    account_notification_display: Global Announcements
     missing_display_display: For %{category} notifications
     announcement_description: New Announcement in your course
     announcement_created_by_you_description: |-
@@ -7613,6 +7628,7 @@ en:
       *Instructor and Admin only:*
 
       Location and content of a failed link that a student has interacted with
+    account_notification_description: Institution-wide announcements (also displayed on Dashboard pages)
     missing_description_description: For %{category} notifications
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
     Include scores when alerting about grades.
@@ -7939,6 +7955,8 @@ en:
   student_5da6bfd1: Student
   submission_comment:
     unknown_author: Someone
+  the_media_object_id_must_match_an_existing_media_o_62195fef: the media_object_id must match an existing media object
+  submission_draft_cannot_be_more_then_one_attempt_a_43f45197: submission draft cannot be more then one attempt ahead of the current submission
   default_9db103d: Default
   custom_6979cd81: Custom
   no_terms_eab5ee7b: No Terms
@@ -8413,8 +8431,6 @@ en:
         error: 'Error:'
       404_message:
         title: Page Not Found
-        headings:
-          page: Page Not Found
       500_message:
         title: Page Error
         headings:
@@ -9197,6 +9213,10 @@ en:
       footer: |-
         You received this email because you are participating in one or more classes using Canvas.  To change or turn off email notifications, visit:
         %{url}
+    account_notification:
+      email:
+        html:
+          link: View Announcement on Dashboard
     account_user_notification:
       email:
         subject: Account Admin Notification
@@ -10842,6 +10862,9 @@ en:
   outcome_group_with_canvas_id_id_not_found_5c2469cd: Outcome group with canvas id %{id} not found
   parent_references_not_found_prior_to_this_row_miss_31723438: 'Parent references not found prior to this row: %{missing}'
   invalid_date_or_datetime_for_field_b38fe386: Invalid date or datetime for %{field}
+  she_her_3f459cc2: She/Her
+  he_him_99aea1a8: He/Him
+  they_them_f4d17a04: They/Them
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: Can't perform diffing against more than one file of the same type
   couldn_t_generate_diff_message_a0528b20: 'Couldn''t generate diff: %{message}'
   malformed_csv_aaa4b7f2: Malformed CSV
@@ -11046,7 +11069,7 @@ en:
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: Enter "{{ACCOUNT_DOMAIN}}" to substitute the user's root account domain
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: Enter "{{CANVAS_USER_ID}}" to substitute the user's unique Canvas ID
   only_show_announcement_on_current_account_domain_fc341eea: Only show announcement on current account domain
-  send_to_ce05b460: Send to
+  show_to_d57767f: Show to
   course_roles_1314f962: Course roles
   send_this_announcement_to_users_with_the_course_ro_46904d40: Send this announcement to users with the course role of %{role}
   unenrolled_users_e7632d24: Unenrolled users
@@ -11055,6 +11078,8 @@ en:
   send_this_announcement_to_users_with_the_account_r_bd69c809: Send this announcement to users with the account role of %{role}
   announcement_starts_at_2e987a38: Announcement starts at
   announcement_ends_at_4ccc2a7e: Announcement ends at
+  re_send_notification_directly_to_users_when_announ_c421cea5: Re-send notification directly to users when announcement starts
+  send_notification_directly_to_users_when_announcem_c3aac61c: Send notification directly to users when announcement starts
   cancel_caeb1e68: Cancel
   save_changes_698abe77: Save Changes
   external_integration_keys_8b4f4548: External Integration Keys
@@ -11094,6 +11119,9 @@ en:
   slack_api_key_92f0c667: Slack Api Key
   current_slack_api_key_9eba6a5: 'Current Slack Api Key:'
   new_slack_api_key_453d04d: New Slack Api Key
+  personal_pronouns_7d271f52: Personal Pronouns
+  remove_pronouns_5ff760ff: Remove Pronouns
+  add_pronouns_option_906ff625: Add pronouns option
   acceptable_use_policy_29a28124: Acceptable Use Policy
   license_type_6b74b543: License Type
   old_policy_39e4f77: Old Policy
@@ -11468,10 +11496,6 @@ en:
   duplicate_module_name_ab26e5c3: Duplicate %{module_name}
   duplicate_this_module_79ca8243: Duplicate this module
   duplicate_31cec192: Duplicate
-  send_this_module_to_another_user_50cb27c8: Send this module to another user...
-  send_to_b940900a: Send To...
-  copy_this_module_to_a_course_ddd12cc7: Copy this module to a course...
-  copy_to_64f8456b: Copy To...
   up_c553575d: Up
   previous_module_item_2bb5e499: Previous Module/Item
   down_5831a426: Down
@@ -11531,7 +11555,9 @@ en:
   remove_this_item_from_the_module_4b2ceab7: Remove this item from the module
   remove_f47dc62a: Remove
   send_this_module_item_to_another_user_14d4fd60: Send this module item to another user...
+  send_to_b940900a: Send To...
   copy_this_module_item_to_a_course_790a0cf4: Copy this module item to a course...
+  copy_to_64f8456b: Copy To...
   prerequisites_49659f16: 'Prerequisites:'
   open_title_in_a_new_window_b29fed77: Open %{title} in a new window
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: You are trying to launch insecure content from within a secure site (canvas). Some web browsers may prevent this content from loading.
@@ -11980,7 +12006,7 @@ en:
   click_to_change_profile_picture_for_display_name_6a4b41db: Click to change profile picture for %{display_name}
   user_s_settings_d65644b4: "%{user}'s Settings"
   none_3b5e34d2: None
-  this_pronoun_appears_after_last_name_bf5c0bf5: This pronoun appears after last name
+  these_pronouns_will_appear_after_your_name_when_sh_6b7ff5b2: These pronouns will appear after your name when shown in the UI
   system_default_language_28a1052d: System Default (%{language})
   remove_account_from_this_profile_c3095eb2: Remove account from this profile
   unregister_service_985238e9: Unregister Service
@@ -14036,6 +14062,9 @@ en:
   duration_hours_hours_and_minutes_minutes_d5da8c3: 'Duration: %{hours} hours and %{minutes} minutes'
   duration_minutes_minutes_d7b9182b: 'Duration: %{minutes} minutes'
   duration_1_minute_29c7d5ab: 'Duration: 1 minute'
+  helpDialog:
+    Help: Help
+    Back: Back
   sequence_footer:
     prev_module_item_desc: 'Previous: *item*'
     prev_module: 'Previous Module:'
@@ -15155,21 +15184,44 @@ en:
   attached_d7423f41: Attached
   preview_filename_f1b58572: Preview %{filename}
   remove_filename_dab5c02e: Remove %{filename}
+  new_attempt_57eae3d9: New Attempt
+  not_graded_yet_82f63c67: Not Graded Yet
+  submitted_318fad53: Submitted
+  unavailable_46d2c344: Unavailable
+  upload_8b403d05: Upload
+  uploaded_285a2bfb: Uploaded
+  button_a1577211: button
+  complete_4f4efbc: complete
+  incomplete_95612d72: incomplete
+  in_progress_13b9e26f: in-progress
+  unavailable_c04e4c93: unavailable
   view_previous_submission_2b57bb85: View Previous Submission
   view_next_submission_d2a429d: View Next Submission
   create_new_attempt_19c96c03: Create New Attempt
+  warning_step_has_children_that_aren_t_stepitem_com_32a3f351: Warning Step has children that aren't StepItem components
+  warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: 'Warning: Step has two StepItems with a status of in-progress'
   missing_1a256b3b: Missing
   late_2be42b88: Late
   more_modules_d9a9f003: More Modules
+  now_viewing_attempt_current_attempt_918e616: Now viewing Attempt %{current_attempt}
   attempt_current_attempt_ef626179: Attempt %{current_attempt}
   attempt_current_attempt_of_max_attempts_427ed508: Attempt %{current_attempt} of %{max_attempts}
-  media_af190855: Media
-  text_entry_e1808b2f: Text Entry
-  file_c851020d: File
-  url_22a5f3b8: URL
   choose_one_submission_type_cf4eda5b: Choose One Submission Type
   submission_type_a925fc5f: Submission Type
   choose_one_2c4277df: Choose One
+  audio_1c89b0c8: audio
+  code_93e9abbb: code
+  doc_c63509f8: doc
+  flash_ab3ad95e: flash
+  html_fc8563c6: html
+  image_c1c98202: image
+  pdf_4e842f10: pdf
+  ptt_f7ff4c09: ptt
+  text_df773ce4: text
+  video_78335c71: video
+  xls_e593104b: xls
+  zip_26961da: zip
+  file_6863ad33: file
   preview_unavailable_aacd459a: Preview Unavailable
   download_c7ffdfb9: Download
   no_submission_fb131a40: No Submission
@@ -15179,8 +15231,6 @@ en:
   upload_file_fd2361b8: Upload File
   file_permitted_filetypes_714e4e8d: 'File permitted: %{fileTypes}'
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
-  uploaded_285a2bfb: Uploaded
-  media_submission_464829f0: Media Submission
   add_media_cfa37b54: Add Media
   record_upload_35dfb2ab: Record/Upload
   file_select_filename_folder_contents_9146bab7: File select, %{filename} folder contents
@@ -15198,11 +15248,14 @@ en:
   date_modified_e1c8ac8f: Date Modified
   modified_by_c1584b3c: Modified By
   size_b30e1077: Size
+  root_523acd46: Root
+  current_folder_path_e094d59: current folder path
   assignments_2_student_error_page_3ca3e0df: Assignments 2 Student Error Page
-  course_external_tools_query_error_d5110efe: Course external tools query error
+  canvas_files_889a274f: Canvas Files
   user_groups_query_error_bba6a6b7: User groups query error
   more_options_272b4953: More Options
-  upload_8b403d05: Upload
+  course_external_tools_query_error_d5110efe: Course external tools query error
+  text_entry_e1808b2f: Text Entry
   remove_submission_draft_f5c7f58b: Remove submission draft
   start_entry_4b491f60: Start Entry
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: Please enter a valid url (e.g. http://example.com)
@@ -15222,7 +15275,6 @@ en:
   record_audio_video_d9993f6c: Record Audio/Video
   send_comment_4e05f2fb: Send Comment
   load_more_comments_dc00ac34: Load More Comments
-  submitted_318fad53: Submitted
   not_submitted_fff47f17: Not submitted
   you_cannot_leave_leave_comments_until_you_submit_t_d3dcb44c: You cannot leave leave comments until you submit the assignment
   attempt_attempt_d3911720: Attempt %{attempt}
@@ -15232,7 +15284,7 @@ en:
   ungraded_pointspossible_e2f86bd9: ungraded/%{pointsPossible}
   ungraded_147a0dce: ungraded
   formattedgrade_points_90505a61: "%{formattedGrade} Points"
-  calculated_by_baa3c8f3: 'Calculated by:'
+  calculated_by_4ac40468: 'Calculated by: '
   most_recent_b2797d2: Most Recent
   attempt_attempt_grade_c01f45df: 'Attempt %{attempt}: %{grade}'
   late_penalty_minus_count_points_810572fe:
@@ -15260,13 +15312,16 @@ en:
   go_to_prerequisite_175c1f3f: Go to Prerequisite
   ta_8d966626: TA
   assignments_2_student_initial_query_error_52aa5ebd: Assignments 2 Student initial query error
-  not_graded_yet_82f63c67: Not Graded Yet
-  unavailable_46d2c344: Unavailable
-  new_attempt_57eae3d9: New Attempt
   failed_to_load_more_submissions_148ff11f: Failed to load more submissions
   submission_draft_updated_e953166a: Submission draft updated
+  submit_confirmation_4d366dd1: Submit Confirmation
+  you_are_submitting_a_submissiontype_submission_onl_29c1cdc1: You are submitting a %{submissionType} submission. Only one submission type is allowed. All other submission types will be deleted.
+  okay_1772bbeb: Okay
   error_sending_submission_d32dc075: Error sending submission
   submission_sent_3f0d2ee1: Submission sent
+  media_af190855: Media
+  file_c851020d: File
+  url_22a5f3b8: URL
   points_is_required_9a9d05b2: Points is required
   points_must_be_a_number_0_daa4f7dc: Points must be a number >= 0
   points_must_0_3bff353: Points must >= 0
@@ -15680,8 +15735,8 @@ en:
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: The list below is content that has been shared with you. You can preview the content, import it into your course, or remove it from the list.
   import_e929507b: Import...
   manage_options_for_name_83278ad0: Manage options for %{name}
-  unread_ee6db4aa: unread
-  read_7cabda44: read
+  name_is_unread_click_to_mark_as_read_1d18db92: "%{name} is unread, click to mark as read"
+  name_has_been_read_663891a5: "%{name} has been read"
   content_shared_by_others_to_you_5a40bb2c: Content shared by others to you
   received_7689640e: Received
   last_login_b7bc0479: 'Last login:'
@@ -16336,8 +16391,6 @@ en:
     one: You are ready to sync 1 assignment.
     other: You are ready to sync %{count} assignments.
   score_pointspossibletranslated_c1ac019e: "%{score}/%{pointsPossibleTranslated}"
-  complete_4f4efbc: complete
-  incomplete_95612d72: incomplete
   no_submission_for_assignment_a9cb6fe2: No submission for %{assignment}
   no_grade_for_assignment_97c9bc75: No grade for %{assignment}
   scored_less_than_cutoff_on_assignment_5f5c4303: Scored less than %{cutoff} on %{assignment}
@@ -16756,14 +16809,17 @@ en:
   profile_tray_bcec5044: Profile tray
   title_tray_ec9f7488: "%{title} tray"
   global_navigation_tray_35612e2e: Global navigation tray
-  count_unread_messages_99d6bf17:
-    one: 1 unread message
-    other: "%{count} unread messages"
+  count_unread_messages_e312aa7b:
+    one: One unread message.
+    other: "%{count} unread messages."
+  count_unread_shares_ff9e91a5:
+    one: One unread share.
+    other: "%{count} unread shares."
+  count_unread_cff5855: "%{count} unread."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.
   user_profile_picture_46bffbc7: User profile picture
   end_course_set_up_tutorial_f358b85d: End Course Set-up Tutorial
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.
-  okay_1772bbeb: Okay
   expand_tutorial_tray_22630c49: Expand tutorial tray
   collapse_tutorial_tray_66ee7dc1: Collapse tutorial tray
   share_important_updates_with_users_97ec11ad: Share important updates with users
@@ -16776,8 +16832,8 @@ en:
                     into groups like Homework, In-class Work, Essays, Discussions
                     and Quizzes. Assignment groups can be weighted.
   work_and_create_together_c65f358b: Work and create together
-  provide_a_space_for_users_to_work_on_a_single_goog_8edec82b: |-
-    Provide a space for users to work on a single Google Doc
+  provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: |-
+    Provide a space for users to work on a single document
               simultaneously, from within your Canvas course.
   virtual_lectures_in_real_time_a1778dea: Virtual lectures in real-time
   conduct_virtual_lectures_virtual_office_hours_and__cc05907b: |-
@@ -16850,6 +16906,8 @@ en:
   import_tutorial_tray_8b92e956: Import Tutorial Tray
   conferences_tutorial_tray_6f071ce2: Conferences Tutorial Tray
   home_tutorial_tray_66826983: Home Tutorial Tray
+  woops_looks_like_nothing_is_here_ce69ad5: Woops... Looks like nothing is here!
+  we_couldn_t_find_that_page_34068c1d: We couldn't find that page!
   confirm_edit_outcome_a9746c99: Confirm Edit Outcome
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: This will update all rubrics using this outcome that have not yet been assessed
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: You’ve updated the scoring criteria; this will affect all students previously assessed using this outcome
@@ -16934,6 +16992,7 @@ en:
   course_roles_d2d5d666: Course Roles
   account_roles_10fea071: Account Roles
   create_14873ed7: create
+  read_7cabda44: read
   update_374eb54: update
   delete_a143a2ab: delete
   4_rows_added_44e0db4d: 4 rows added
@@ -17724,6 +17783,7 @@ en:
   add_subtitle_9f660cc: Add Subtitle
   choose_file_8d89ccab: Choose File
   select_language_7c93a900: Select Language
+  media_record_not_available_f78c16dd: Media record not available
   afrikaans_da0fe6ee: Afrikaans
   albanian_21ed929e: Albanian
   arabic_c5c87acd: Arabic
@@ -17823,7 +17883,6 @@ en:
   comment_failed_to_post_please_try_again_later_e2d19a0a: Comment failed to post! Please try again later.
   comment_submitted_d9934b: Comment submitted!
   immersive_reader_failed_to_load_bc8d4dd4: Immersive Reader Failed to Load
-  select_a_course_4710371f: Select a Course
   common_timezones_2b00baba: Common Timezones
   all_timezones_5e8afa7b: All Timezones
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"
@@ -17837,6 +17896,8 @@ en:
   gpa_scale_6710e2ee: GPA scale
   other_ddacb37d: other
   score_pts_adcb1af3: "%{score} pts"
+  select_a_course_4710371f: Select a Course
+  select_a_module_optional_7edb5cb0: Select a Module (optional)
   starting_copy_operation_cc46d911: Starting copy operation
   copy_operation_started_successfully_b2f236a1: Copy operation started successfully
   there_was_a_problem_starting_the_copy_operation_dd599cdd: There was a problem starting the copy operation
@@ -18287,9 +18348,7 @@ en:
   edit_assignment_name_mastery_paths_40b50541: Edit Assignment %{name} Mastery Paths
   delete_assignment_name_deec56e3: Delete Assignment %{name}
   send_assignment_name_to_another_user_e2ca494d: Send Assignment %{name} to another user
-  send_to_7881bf0e: Send to...
   copy_assignment_name_to_another_course_b62d0a54: Copy Assignment %{name} to another course
-  copy_to_a5396a6f: Copy to...
   assignment_group_weights_can_t_be_edited_because_t_b6b591ae: Assignment group weights can't be edited because there are assignments in one of the groups whose due dates are closed.
   weight_final_grade_based_on_assignment_groups_3124161: Weight final grade based on assignment groups
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: Are you sure you want to disable Sync to %{sisName} for all assignments?
@@ -18592,7 +18651,9 @@ en:
   migrate_quiz_5d0f777: Migrate Quiz
   migrate_67c9f753: Migrate
   send_quiz_to_user_e8c47177: Send Quiz to User
+  send_to_7881bf0e: Send to...
   copy_quiz_to_course_74f9c8c1: Copy Quiz to Course
+  copy_to_a5396a6f: Copy to...
   re_upload_submissions_form:
     reupload_submission_files: Re-Upload Submission Files
     upload_info: If you made changes to the student submission files you downloaded before, just zip them back up and upload the zip with the form below. Students will see the modified files in their comments for the submission.

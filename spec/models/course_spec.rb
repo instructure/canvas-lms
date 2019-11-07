@@ -4135,7 +4135,7 @@ describe Course, "conclusions" do
     enrollment.save!
     @course.reload
     @user.reload
-    @user.cached_current_enrollments
+    @user.cached_currentish_enrollments
 
     expect(enrollment.reload.state).to eq :active
     expect(enrollment.state_based_on_date).to eq :completed
@@ -4150,7 +4150,7 @@ describe Course, "conclusions" do
     enrollment.save!
     @course.reload
     @user.reload
-    @user.cached_current_enrollments
+    @user.cached_currentish_enrollments
     expect(enrollment.state).to eq :completed
     expect(enrollment.state_based_on_date).to eq :completed
 
@@ -4163,7 +4163,7 @@ describe Course, "conclusions" do
     @course.reload
     @course.complete!
     @user.reload
-    @user.cached_current_enrollments
+    @user.cached_currentish_enrollments
     enrollment.reload
     expect(enrollment.state).to eq :completed
     expect(enrollment.state_based_on_date).to eq :completed

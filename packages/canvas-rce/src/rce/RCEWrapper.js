@@ -108,13 +108,6 @@ function focusFirstMenuButton(el) {
   $firstMenu && $firstMenu.focus()
 }
 
-function focusContextToolbar() {
-  const $focusable = document.querySelector('.tox-tinymce-aux .tox-toolbar button')
-  if ($focusable) {
-    $focusable.focus()
-  }
-}
-
 function isElementWithinTable(node) {
   let elem = node
   while (elem) {
@@ -137,7 +130,7 @@ class RCEWrapper extends React.Component {
   static propTypes = {
     confirmFunc: PropTypes.func,
     defaultContent: PropTypes.string,
-    editorOptions: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+    editorOptions: PropTypes.object,
     handleUnmount: PropTypes.func,
     language: PropTypes.string,
     onFocus: PropTypes.func,
@@ -145,12 +138,19 @@ class RCEWrapper extends React.Component {
     onRemove: PropTypes.func,
     textareaClassName: PropTypes.string,
     textareaId: PropTypes.string,
-    tinymce: PropTypes.object, // eslint-disable-line react/forbid-prop-types
+    languages: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired
+      })
+    ),
+    tinymce: PropTypes.object,
     trayProps
   }
 
   static defaultProps = {
-    trayProps: null
+    trayProps: null,
+    languages: [{id: 'en', label: 'English'}]
   }
 
   static skinCssInjected = false
@@ -282,6 +282,21 @@ class RCEWrapper extends React.Component {
     const editor = this.mceInstance()
     const element = contentInsertion.insertContent(editor, code)
     this.contentInserted(element)
+  }
+
+  // inserting an iframe in tinymce (as is often the case with
+  // embedded content) causes it to wrap it in a span
+  // and it's often inserted into a <p> on top of that.  Find the
+  // iframe and use it to flash the indicator.
+  insertEmbedCode(code) {
+    const editor = this.mceInstance()
+    const element = contentInsertion.insertContent(editor, code)
+    const ifr = element && element.querySelector && element.querySelector('iframe')
+    if (ifr) {
+      this.contentInserted(ifr)
+    } else {
+      this.contentInserted(element)
+    }
   }
 
   insertImage(image) {
@@ -748,6 +763,7 @@ class RCEWrapper extends React.Component {
           ...this.props.trayProps
         }
         Bridge.trayProps.set(editor, trayPropsWithColor)
+        Bridge.languages = this.props.languages
         if (typeof setupCallback === 'function') {
           setupCallback(editor)
         }

@@ -54,7 +54,7 @@ export default class NotificationGroupMappings {
       Parent: [],
       Groups: ['membership_update'],
       Conferences: ['recording_ready'],
-      Alerts: ['other', 'content_link_error']
+      Alerts: ['other', 'content_link_error', 'account_notification']
     }
   }
 

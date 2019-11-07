@@ -268,6 +268,8 @@ class Notification < ActiveRecord::Base
       FREQ_IMMEDIATELY
     when 'Content Link Error'
       FREQ_DAILY
+    when 'Account Notification'
+      FREQ_IMMEDIATELY
     else
       FREQ_DAILY
     end
@@ -350,6 +352,7 @@ class Notification < ActiveRecord::Base
     t 'names.blueprint_sync_complete', 'Blueprint Sync Complete'
     t 'names.blueprint_content_added', 'Blueprint Content Added'
     t 'names.content_link_error', 'Content Link Error'
+    t 'names.account_notification', 'Account Notification'
   end
 
   # TODO: i18n ... show these anywhere we show the category today
@@ -379,6 +382,7 @@ class Notification < ActiveRecord::Base
     t 'categories.recording_ready', 'Recording Ready'
     t 'categories.blueprint', 'Blueprint'
     t 'categories.content_link_error', 'Content Link Error'
+    t 'categories.account_notification', 'Account Notification'
   end
 
   # Translatable display text to use when representing the category to the user.
@@ -440,6 +444,8 @@ class Notification < ActiveRecord::Base
       t(:blueprint_display, 'Blueprint Sync')
     when 'Content Link Error'
       t(:content_link_error_display, 'Content Link Error')
+    when 'Account Notification'
+      t(:account_notification_display, 'Global Announcements')
     else
       t(:missing_display_display, "For %{category} notifications", :category => category)
     end
@@ -555,6 +561,10 @@ BPDESC
 
 Location and content of a failed link that a student has interacted with
 CONTLINK
+    when 'Account Notification'
+      mt(:account_notification_description, <<-EOS)
+Institution-wide announcements (also displayed on Dashboard pages)
+    EOS
     else
       t(:missing_description_description, "For %{category} notifications", :category => category)
     end

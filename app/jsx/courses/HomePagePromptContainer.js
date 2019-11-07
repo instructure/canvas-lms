@@ -58,7 +58,7 @@ class HomePagePromptContainer extends React.Component {
   }
 
   render() {
-    return (
+    return this.state.dialogOpen ? (
       <CourseHomeDialog
         store={this.props.store}
         open={this.state.dialogOpen}
@@ -70,6 +70,8 @@ class HomePagePromptContainer extends React.Component {
         returnFocusTo={this.props.returnFocusTo}
         isPublishing
       />
+    ) : (
+      <></>
     )
   }
 

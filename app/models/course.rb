@@ -2559,7 +2559,7 @@ class Course < ActiveRecord::Base
       if [:restricted, :sections].include?(visibility) || (
           visibilities.any? && visibilities.all? { |v| enrollment_types.include? v[:type] }
         )
-        visibilities.map{ |s| s[:course_section_id] }
+        visibilities.map{ |s| s[:course_section_id] }.sort
       else
         :all
       end

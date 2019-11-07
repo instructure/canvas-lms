@@ -20,7 +20,7 @@ import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import ReceivedContentView from 'jsx/content_shares/ReceivedContentView'
-import {assignmentShare} from 'jsx/content_shares/__tests__/test-utils'
+import {assignmentShare, unreadDiscussionShare} from 'jsx/content_shares/__tests__/test-utils'
 import fetchMock from 'fetch-mock'
 
 jest.mock('jsx/shared/effects/useFetchApi')
@@ -134,6 +134,37 @@ describe('view of received content', () => {
     fireEvent.click(getByText(/manage options/i))
     fireEvent.click(getByText('Import'))
     expect(await findByText(/select a course/i)).toBeInTheDocument()
+  })
+
+  describe('mark as read', () => {
+    const shares = [unreadDiscussionShare]
+
+    beforeEach(() => {
+      useFetchApi.mockImplementationOnce(({loading, success}) => {
+        loading(false)
+        success(shares)
+      })
+      fetchMock.put(`/api/v1/users/self/content_shares/${unreadDiscussionShare.id}`, {
+        status: 200,
+        body: JSON.stringify({read_state: 'read', id: unreadDiscussionShare.id})
+      })
+    })
+
+    afterEach(fetchMock.reset)
+
+    it('makes an update API call', async () => {
+      const {getByTestId} = render(<ReceivedContentView />)
+      fireEvent.click(getByTestId('received-table-row-unread'))
+      await act(() => fetchMock.flush(true))
+      expect(fetchMock.called()).toBeTruthy()
+    })
+
+    it('updates the unread dot', async () => {
+      const {queryByTestId, getByTestId} = render(<ReceivedContentView />)
+      fireEvent.click(getByTestId('received-table-row-unread'))
+      await act(() => fetchMock.flush(true))
+      expect(queryByTestId('received-table-row-unread')).toBeNull()
+    })
   })
 
   describe('remove', () => {

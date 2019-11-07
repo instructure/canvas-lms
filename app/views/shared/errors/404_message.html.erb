@@ -23,17 +23,20 @@
     end
   end
   exception ||= nil
-  add_body_class 'full-width'
 %>
-<% provide :page_title, t('title', 'Page Not Found') %>
+<% content_for :page_title, t('title', 'Page Not Found') %>
 
-<div class="ic-Error-page">
-  <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/404_notfound.svg">
-  <h1><%= t('headings.page', %{Page Not Found}) %></h1>
-  <% if @not_found_message %>
-    <p><%= @not_found_message %></p>
-  <% end %>
-  <% if send_broken_content! %>
-    <p><%= I18n.t("We've let your instructor know to review this link as soon as possible.") %></p>
-  <% end %>
+<%
+
+js_bundle :not_found_index
+css_bundle :not_found_index
+
+%>
+<div>
+  <div id="not_found_root"></div>
+
+  <div class="not_found_page_artwork" style="width: 440px; margin-left: auto; margin-right: auto; text-align: center;">
+    <a href="#" style="font-size: 1.2em;" class="icon-discussion submit_error_link discussion-topic"><%= t('#links.errors.4xx_feedback', %{Click here to tell us what you were looking for.}) %></a>
+    <%= render :partial => "shared/errors/error_form", :locals => {:error_category => '404'} %>
+  </div>
 </div>

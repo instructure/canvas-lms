@@ -1234,7 +1234,7 @@ class ApplicationController < ActionController::Base
   #
   # If asset is an AR model, then its asset_string will be used. If it's an array,
   # it should look like [ "subtype", context ], like [ "pages", course ].
-  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true)
+  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true, context: nil)
     # ideally this could just be `user = file_access_user` now, but that causes
     # problems with some integration specs where getting @files_domain set
     # reliably is... difficult
@@ -1273,7 +1273,7 @@ class ApplicationController < ActionController::Base
         }
       end
 
-      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
+      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level, context: context)
 
       @accessed_asset
     end
@@ -1744,7 +1744,7 @@ class ApplicationController < ActionController::Base
     # but we still use the assignment#new page to create the quiz.
     # also handles launch from existing quiz on quizzes page.
     if ref.present? && @assignment&.quiz_lti?
-      if (ref.include?('assignments/new') || ref.include?('quiz')) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+      if (ref.include?('assignments/new') || ref =~ /courses\/*.\/quizzes/i) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
         return polymorphic_url([@context, :quizzes])
       end
     end
@@ -2465,60 +2465,62 @@ class ApplicationController < ActionController::Base
   end
 
   def setup_live_events_context
-    ctx = {}
+    benchmark("setup_live_events_context") do
+      ctx = {}
 
-    if @domain_root_account
-      ctx[:root_account_uuid] = @domain_root_account.uuid
-      ctx[:root_account_id] = @domain_root_account.global_id
-      ctx[:root_account_lti_guid] = @domain_root_account.lti_guid
+      if @domain_root_account
+        ctx[:root_account_uuid] = @domain_root_account.uuid
+        ctx[:root_account_id] = @domain_root_account.global_id
+        ctx[:root_account_lti_guid] = @domain_root_account.lti_guid
+      end
+
+      if @current_pseudonym
+        ctx[:user_login] = @current_pseudonym.unique_id
+        ctx[:user_account_id] = @current_pseudonym.global_account_id
+        ctx[:user_sis_id] = @current_pseudonym.sis_user_id
+      end
+
+      ctx[:user_id] = @current_user.global_id if @current_user
+      ctx[:time_zone] = @current_user.time_zone if @current_user
+      ctx[:developer_key_id] = @access_token.developer_key.global_id if @access_token
+      ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
+      ctx[:context_type] = @context.class.to_s if @context
+      ctx[:context_id] = @context.global_id if @context
+      ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
+      ctx[:context_account_id] = Context.get_account_or_parent_account_global_id(@context) if @context
+
+      if @context_membership
+        ctx[:context_role] =
+          if @context_membership.respond_to?(:role)
+            @context_membership.role.name
+          elsif @context_membership.respond_to?(:type)
+            @context_membership.type
+          else
+            @context_membership.class.to_s
+          end
+      end
+
+      if tctx = Thread.current[:context]
+        ctx[:request_id] = tctx[:request_id]
+        ctx[:session_id] = tctx[:session_id]
+      end
+
+      ctx[:hostname] = request.host
+      ctx[:http_method] = request.method
+      ctx[:user_agent] = request.headers['User-Agent']
+      ctx[:client_ip] = request.remote_ip
+      ctx[:url] = request.url
+      # The Caliper spec uses the spelling "referrer", so use it in the Canvas output JSON too.
+      ctx[:referrer] = request.referer
+      ctx[:producer] = 'canvas'
+
+      if @domain_root_account&.feature_enabled?(:compact_live_event_payloads)
+        ctx[:compact_live_events] = true
+      end
+
+      StringifyIds.recursively_stringify_ids(ctx)
+      LiveEvents.set_context(ctx)
     end
-
-    if @current_pseudonym
-      ctx[:user_login] = @current_pseudonym.unique_id
-      ctx[:user_account_id] = @current_pseudonym.global_account_id
-      ctx[:user_sis_id] = @current_pseudonym.sis_user_id
-    end
-
-    ctx[:user_id] = @current_user.global_id if @current_user
-    ctx[:time_zone] = @current_user.time_zone if @current_user
-    ctx[:developer_key_id] = @access_token.developer_key.global_id if @access_token
-    ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
-    ctx[:context_type] = @context.class.to_s if @context
-    ctx[:context_id] = @context.global_id if @context
-    ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
-    ctx[:context_account_id] = Context.get_account_or_parent_account_global_id(@context) if @context
-
-    if @context_membership
-      ctx[:context_role] =
-        if @context_membership.respond_to?(:role)
-          @context_membership.role.name
-        elsif @context_membership.respond_to?(:type)
-          @context_membership.type
-        else
-          @context_membership.class.to_s
-        end
-    end
-
-    if tctx = Thread.current[:context]
-      ctx[:request_id] = tctx[:request_id]
-      ctx[:session_id] = tctx[:session_id]
-    end
-
-    ctx[:hostname] = request.host
-    ctx[:http_method] = request.method
-    ctx[:user_agent] = request.headers['User-Agent']
-    ctx[:client_ip] = request.remote_ip
-    ctx[:url] = request.url
-    # The Caliper spec uses the spelling "referrer", so use it in the Canvas output JSON too.
-    ctx[:referrer] = request.referer
-    ctx[:producer] = 'canvas'
-
-    if @domain_root_account&.feature_enabled?(:compact_live_event_payloads)
-      ctx[:compact_live_events] = true
-    end
-
-    StringifyIds.recursively_stringify_ids(ctx)
-    LiveEvents.set_context(ctx)
   end
 
   # makes it so you can use the prefetch_xhr erb helper from controllers. They'll be rendered in _head.html.erb

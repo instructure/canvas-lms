@@ -88,12 +88,12 @@
 .no-results {
   background: #fff;
   border: {
-    color: #c1c7cf;
+    color: $ic-hint-text;
     radius: 3px;
     style: dashed;
     width: 1px;
   }
-  color: #878d92;
+  color: $ic-hint-text;
   margin: 5px;
   padding: 8px;
   text-align: center;

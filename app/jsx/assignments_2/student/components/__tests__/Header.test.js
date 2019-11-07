@@ -23,6 +23,8 @@ import {render} from '@testing-library/react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '../../graphqlData/Submission'
 
+jest.mock('../Attempt')
+
 it('renders normally', async () => {
   const props = await mockAssignmentAndSubmission()
   const {getByTestId} = render(<Header {...props} />)
@@ -144,4 +146,11 @@ it('will render the latest grade instead of the displayed submissions grade', as
 
   expect(queryAllByText('147/150 Points')[0]).toBeInTheDocument()
   expect(queryByText('131/150 Points')).not.toBeInTheDocument()
+})
+
+it('will render the unavailable pizza tracker if there is a module prereq lock', async () => {
+  const props = await mockAssignmentAndSubmission()
+  props.assignment.env.modulePrereq = 'simulate not null'
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('unavailable-step-container')).toBeInTheDocument()
 })

@@ -39,7 +39,8 @@ export default class FakeEditor {
       },
 
       collapse: () => (this._collapsed = true),
-      isCollapsed: () => this._collapsed
+      isCollapsed: () => this._collapsed,
+      select: node => (this._selectedNode = node)
     }
 
     this.dom = {
@@ -50,7 +51,17 @@ export default class FakeEditor {
           return parent
         }
         return null
-      }
+      },
+      setAttribs: (elem, hash) => {
+        Object.keys(hash).forEach(k => {
+          if (hash[k] == undefined) {
+            elem.removeAttribute(k)
+          } else {
+            elem.setAttribute(k, hash[k])
+          }
+        })
+      },
+      setStyles: (_elem, _hash) => {}
     }
   }
 

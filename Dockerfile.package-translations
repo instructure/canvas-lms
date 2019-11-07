@@ -1,0 +1,28 @@
+FROM instructure/node:10
+
+ARG NPM_PRIVATE_SCOPE
+ARG NPM_PRIVATE_REGISTRY
+ARG NPM_PRIVATE_USERNAME
+ARG NPM_PRIVATE_PASSWORD
+ARG NPM_PRIVATE_EMAIL
+
+USER root
+
+RUN apt-get update \
+    && apt-get install -y jq python openssh-client \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/
+
+
+# do this first so yarn install can be cached if package.json has not changed
+COPY --chown=docker:docker package.json yarn.lock babel.config.js /usr/src/app/
+COPY --chown=docker:docker packages/ /usr/src/app/packages/
+COPY --chown=docker:docker script/install_hooks /usr/src/app/script/
+COPY --chown=docker:docker build/new-jenkins/package-translations/ /usr/src/app/package-translations
+
+RUN yarn \
+    && yarn-private -W add @inst/sync-format-message-translations
+
+USER docker
+
+CMD ["tail", "-f", "/dev/null"]

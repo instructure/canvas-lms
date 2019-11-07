@@ -264,48 +264,55 @@ window.modules = (function() {
 
     updateAssignmentData(callback) {
       return $.ajaxJSON(
-        $('.assignment_info_url').attr('href'),
+        ENV.CONTEXT_MODULE_ASSIGNMENT_INFO_URL,
         'GET',
         {},
         data => {
-          $.each(data, (id, info) => {
-            const $context_module_item = $('#context_module_item_' + id)
-            const data = {}
-            if (info.points_possible != null) {
-              data.points_possible_display = I18n.t('points_possible_short', '%{points} pts', {
-                points: I18n.n(info.points_possible)
-              })
-            }
-            if (info.todo_date != null) {
-              data.due_date_display = $.dateString(info.todo_date)
-            } else if (info.due_date != null) {
-              if (info.past_due != null) {
-                $context_module_item.data('past_due', true)
+          $(() => {
+            $.each(data, (id, info) => {
+              const $context_module_item = $('#context_module_item_' + id)
+              const data = {}
+              if (info.points_possible != null) {
+                data.points_possible_display = I18n.t('points_possible_short', '%{points} pts', {
+                  points: I18n.n(info.points_possible)
+                })
               }
-              data.due_date_display = $.dateString(info.due_date)
-            } else if (info.has_many_overrides != null) {
-              data.due_date_display = I18n.t('Multiple Due Dates')
-            } else if (info.vdd_tooltip != null) {
-              info.vdd_tooltip.link_href = $context_module_item.find('a.title').attr('href')
-              $context_module_item.find('.due_date_display').html(vddTooltipView(info.vdd_tooltip))
-            } else {
-              $context_module_item.find('.due_date_display').remove()
-            }
-            $context_module_item.fillTemplateData({data, htmlValues: ['points_possible_display']})
+              if (info.todo_date != null) {
+                data.due_date_display = $.dateString(info.todo_date)
+              } else if (info.due_date != null) {
+                if (info.past_due != null) {
+                  $context_module_item.data('past_due', true)
+                }
+                data.due_date_display = $.dateString(info.due_date)
+              } else if (info.has_many_overrides != null) {
+                data.due_date_display = I18n.t('Multiple Due Dates')
+              } else if (info.vdd_tooltip != null) {
+                info.vdd_tooltip.link_href = $context_module_item.find('a.title').attr('href')
+                $context_module_item
+                  .find('.due_date_display')
+                  .html(vddTooltipView(info.vdd_tooltip))
+              } else {
+                $context_module_item.find('.due_date_display').remove()
+              }
+              $context_module_item.fillTemplateData({
+                data,
+                htmlValues: ['points_possible_display']
+              })
 
-            // clean up empty elements so they don't show borders in updated item group design
-            if (info.points_possible === null) {
-              $context_module_item.find('.points_possible_display').remove()
+              // clean up empty elements so they don't show borders in updated item group design
+              if (info.points_possible === null) {
+                $context_module_item.find('.points_possible_display').remove()
+              }
+            })
+            vddTooltip()
+            if (callback) {
+              callback()
             }
           })
-          vddTooltip()
-          if (callback) {
-            callback()
-          }
         },
         () => {
           if (callback) {
-            callback()
+            $(callback)
           }
         }
       )
@@ -1850,26 +1857,6 @@ modules.initModuleManagement = function() {
       .catch(showFlashError('Error duplicating item'))
   })
 
-  $('.module_copy_to').live('click', event => {
-    event.preventDefault()
-    console.log('copy module to course')
-  })
-
-  $('.module_send_to').live('click', event => {
-    event.preventDefault()
-    console.log('send module to user')
-  })
-
-  $('.module_item_copy_to').live('click', event => {
-    event.preventDefault()
-    console.log('copy module item to course')
-  })
-
-  $('.module_item_send_to').live('click', event => {
-    event.preventDefault()
-    console.log('send module item to user')
-  })
-
   $('#add_module_prerequisite_dialog .cancel_button').click(() => {
     $('#add_module_prerequisite_dialog').dialog('close')
   })
@@ -2278,6 +2265,35 @@ var toggleModuleCollapse = function(event) {
 
 // THAT IS THE END
 
+function moduleContentIsHidden(contentEl) {
+  return (
+    contentEl.style.display === 'none' ||
+    contentEl.parentElement.classList.contains('collapsed_module')
+  )
+}
+
+// need the assignment data to check past due state
+modules.updateAssignmentData(() => {
+  modules.updateProgressions(function afterUpdateProgressions() {
+    if (window.location.hash && !window.location.hash.startsWith('#!')) {
+      try {
+        scrollTo($(window.location.hash))
+      } catch (error) {}
+    } else {
+      const firstContextModuleContent = document
+        .querySelector('.context_module')
+        ?.querySelector('.content')
+      if (!firstContextModuleContent || moduleContentIsHidden(firstContextModuleContent)) {
+        const firstVisibleModuleContent = [
+          ...document.querySelectorAll('.context_module .content')
+        ].find(el => !moduleContentIsHidden(el))
+        if (firstVisibleModuleContent)
+          scrollTo($(firstVisibleModuleContent).parents('.context_module'))
+      }
+    }
+  })
+})
+
 $(document).ready(function() {
   $('.context_module').each(function() {
     refreshDuplicateLinkStatus($(this))
@@ -2454,35 +2470,6 @@ $(document).ready(function() {
     requestAnimationFrame(modules.initModuleManagement)
     modules.loadMasterCourseData()
   }
-
-  function moduleContentIsHidden(contentEl) {
-    return (
-      contentEl.style.display === 'none' ||
-      contentEl.parentElement.classList.contains('collapsed_module')
-    )
-  }
-
-  // need the assignment data to check past due state
-  modules.updateAssignmentData(() => {
-    modules.updateProgressions(function afterUpdateProgressions() {
-      if (window.location.hash && !window.location.hash.startsWith('#!')) {
-        try {
-          scrollTo($(window.location.hash))
-        } catch (error) {}
-      } else {
-        const firstContextModuleContent = document
-          .querySelector('.context_module')
-          ?.querySelector('.content')
-        if (!firstContextModuleContent || moduleContentIsHidden(firstContextModuleContent)) {
-          const firstVisibleModuleContent = [
-            ...document.querySelectorAll('.context_module .content')
-          ].find(el => !moduleContentIsHidden(el))
-          if (firstVisibleModuleContent)
-            scrollTo($(firstVisibleModuleContent).parents('.context_module'))
-        }
-      }
-    })
-  })
 
   $('.context_module')
     .find('.expand_module_link,.collapse_module_link')
