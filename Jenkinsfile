@@ -191,9 +191,17 @@ pipeline {
         }
         stage('Linters') {
           steps {
-            // propagate set to false until we can get tests passing
             build(
               job: 'test-suites/linters',
+              parameters: build_parameters
+            )
+          }
+        }
+
+        stage('Vendored Gems') {
+          steps {
+            build(
+              job: 'test-suites/vendored-gems',
               parameters: build_parameters
             )
           }
@@ -207,16 +215,6 @@ pipeline {
  *           build(
  *             job: 'test-suites/selenium-chrome',
  *             propagate: false,
- *             parameters: build_parameters
- *           )
- *         }
- *       }
- *
- *       stage('Vendored Gems') {
- *         steps {
- *           // propagate set to false until we can get tests passing
- *           build(
- *             job: 'test-suites/vendored-gems',
  *             parameters: build_parameters
  *           )
  *         }
