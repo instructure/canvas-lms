@@ -399,6 +399,18 @@ describe AssignmentOverrideApplicator do
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to eq [override2]
         end
+
+        context "sharding" do
+          specs_require_sharding
+
+          it "should determine cross-shard user groups correctly" do
+            cs_user = @shard1.activate { User.create! }
+            student_in_course(:course => @course, :user => cs_user)
+            @group.add_user(cs_user)
+            result = AssignmentOverrideApplicator.group_overrides(@assignment, cs_user)
+            expect(result).to eq [@override]
+          end
+        end
       end
 
       describe 'for teachers' do
