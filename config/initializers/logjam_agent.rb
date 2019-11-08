@@ -73,14 +73,12 @@ module LogjamAgent
   # display those soft exceptions differently. Defaults to `true`.
   # self.split_hard_and_soft_exceptions = true
 
-  # TODO: remove me or put behind a config. Just trying to see what Heroku shows if
-  # I just use the normal STDOUTForwarder
   # Patch the STDOUT Forwarder to send to Rails' logger instead, since stdout
   # seems to get lost somewhere.
-  #class STDOUTForwarder
-  #  def forward(data, options={})
-  #    msg = LogjamAgent.json_encode_payload(data)
-  #    Rails.logger.info msg
-  #  end
-  #end
+ class STDOUTForwarder
+    def forward(data, options={})
+      msg = LogjamAgent.json_encode_payload(data)
+      Rails.logger.info msg
+    end
+  end
 end
