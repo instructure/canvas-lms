@@ -105,11 +105,11 @@ export default class FileUpload extends Component {
     }
 
     this.setState({
-      filesToUpload: files.map(file => {
+      filesToUpload: files.map((file, i) => {
         if (file.url) {
-          return {isLoading: true, _id: file.url}
+          return {isLoading: true, _id: `${i}-${file.url}`}
         }
-        return {isLoading: true, _id: file.name}
+        return {isLoading: true, _id: `${i}-${file.name}`}
       })
     })
     this.updateUploadingFiles(async () => {
