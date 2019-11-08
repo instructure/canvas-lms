@@ -112,6 +112,9 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Audio and Video recording is not available."
   },
+  "audio_player_for_title_20cc70d": {
+    "message": "Audio player for { title }"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Automatically open an in-line preview. (Preview displays only after saving)"
   },
@@ -1049,6 +1052,9 @@
   },
   "video_player_b371005": {
     "message": "Video Player"
+  },
+  "video_player_for_9e7d373b": {
+    "message": "Video player for "
   },
   "video_player_for_title_ffd9fbc4": {
     "message": "Video player for { title }"
