@@ -270,7 +270,7 @@
     <div class="edit_submission_content form_content" style="display: none;">
       <%= before_label(:choose_submission, "Select an assignment submission to embed in this page") %><br/>
       <% submissions = @portfolio.user.submissions.except(:preload).preload(:assignment).to_a %>
-      <% if submissions.any? %>
+      <% if submissions.empty? %>
         <div style="margin: 5px 20px;"><%= t(:no_submissions, "No Submissions Found") %></div>
       <% end %>
       <ul class="submission_list">
