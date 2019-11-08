@@ -274,6 +274,65 @@ describe('FileUpload', () => {
     expect(setOnFailure).toHaveBeenCalledWith('Error adding files to submission draft')
   })
 
+  it('creates an error alert when an error message is present in the Lti response', async () => {
+    const mocks = await createGraphqlMocks()
+    const setOnFailure = jest.fn()
+    const props = await makeProps()
+    render(
+      <MockedProvider mocks={mocks}>
+        <AlertManagerContext.Provider value={{setOnFailure}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
+      </MockedProvider>
+    )
+
+    const errormsg = 'oooh eeee this is an error message'
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'LtiDeepLinkingResponse',
+          errormsg
+        }
+      })
+    )
+
+    expect(setOnFailure).toHaveBeenCalledWith(errormsg)
+  })
+
+  it('does not create a submission draft when there is an error message present in the Lti response', async () => {
+    const mocks = await createGraphqlMocks()
+    const setOnFailure = jest.fn()
+    const props = await makeProps()
+    render(
+      <MockedProvider mocks={mocks}>
+        <AlertManagerContext.Provider value={{setOnFailure}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
+      </MockedProvider>
+    )
+
+    const errormsg = 'oooh eeee this is an error message'
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'LtiDeepLinkingResponse',
+          content_items: [
+            {
+              url: 'http://lemon.com',
+              title: 'LemonRules.txt',
+              mediaType: 'plain/txt'
+            }
+          ],
+          errormsg
+        }
+      })
+    )
+
+    expect(props.createSubmissionDraft).not.toHaveBeenCalled()
+  })
+
   // Byproduct of how the dummy submissions are being handled. Check out ViewManager
   // for some context around this
   it('creates a submission draft for the current attempt when not on attempt 0', async () => {

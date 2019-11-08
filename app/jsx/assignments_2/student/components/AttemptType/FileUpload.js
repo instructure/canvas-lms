@@ -76,11 +76,19 @@ export default class FileUpload extends Component {
   }
 
   handleLTIFiles = async e => {
-    if (
-      e.data.messageType === 'LtiDeepLinkingResponse' ||
-      e.data.messageType === 'A2ExternalContentReady'
-    ) {
+    if (e.data.messageType === 'LtiDeepLinkingResponse') {
+      if (e.data.errormsg) {
+        this.context.setOnFailure(e.data.errormsg)
+        return
+      }
       await this.handleDropAccepted(e.data.content_items)
+    }
+
+    // Since LTI 1.0 handles its own message alerting we don't have to
+    if (e.data.messageType === 'A2ExternalContentReady') {
+      if (!e.data.errormsg) {
+        await this.handleDropAccepted(e.data.content_items)
+      }
     }
   }
 

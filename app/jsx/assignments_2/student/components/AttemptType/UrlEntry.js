@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {Assignment} from '../../graphqlData/Assignment'
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2_url_entry'
@@ -75,11 +76,20 @@ class UrlEntry extends React.Component {
   }
 
   handleLTIURLs = async e => {
-    if (
-      e.data.messageType === 'LtiDeepLinkingResponse' ||
-      e.data.messageType === 'A2ExternalContentReady'
-    ) {
+    if (e.data.messageType === 'LtiDeepLinkingResponse') {
+      if (e.data.errormsg) {
+        this.context.setOnFailure(e.data.errormsg)
+        return
+      }
       if (e.data.content_items.length) {
+        const url = e.data.content_items[0].url
+        this.createSubmissionDraft(url)
+      }
+    }
+
+    // Since LTI 1.0 handles its own message alerting we don't have to
+    if (e.data.messageType === 'A2ExternalContentReady') {
+      if (!e.data.errormsg && e.data.content_items.length) {
         const url = e.data.content_items[0].url
         this.createSubmissionDraft(url)
       }
@@ -218,5 +228,7 @@ UrlEntry.propTypes = {
   submission: Submission.shape,
   updateEditingDraft: func
 }
+
+UrlEntry.contextType = AlertManagerContext
 
 export default UrlEntry
