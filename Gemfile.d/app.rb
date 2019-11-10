@@ -82,9 +82,9 @@ gem 'oauth-instructure', '0.4.10', require: false
 gem 'oauth2', '1.0.0', require: false
 gem 'parallel', '1.4.1', require: false
   gem 'ruby-progressbar', '1.7.5', require: false #used to show progress of S3Uploader
-gem 'rack-mini-profiler', '0.9.2', require: false
-gem 'flamegraph', '0.1.0', require: false
-  gem 'stackprof', '0.2.7', require: false
+gem 'rack-mini-profiler', '0.9.9.2', require: false
+gem 'flamegraph', '0.9.5', require: false
+  gem 'stackprof', '0.2.10', require: false
 gem 'rake', '10.5.0'
 gem 'rdoc', '3.12'
 gem 'ratom-nokogiri', '0.10.4', require: false
