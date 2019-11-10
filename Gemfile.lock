@@ -861,6 +861,8 @@ GEM
       nokogiri-xmlsec-me-harder (~> 0.9, >= 0.9.3pre)
     sanitize (2.1.0)
       nokogiri (>= 1.4.4)
+    scout_apm (2.6.3)
+      parser
     scrypt (2.1.1)
       ffi-compiler (>= 0.0.2)
       rake
@@ -1151,6 +1153,7 @@ DEPENDENCIES
   safe_yaml (= 1.0.4)
   saml2 (= 1.0.7)
   sanitize (= 2.1.0)
+  scout_apm
   scrypt (= 2.1.1)
   selenium-webdriver (= 2.53.0)
   selinimum (= 0.0.1)!
