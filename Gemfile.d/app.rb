@@ -49,7 +49,7 @@ gem 'canvas_webex', '0.17'
 gem 'inst-jobs', '0.11.2'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
-gem 'hairtrigger', '0.2.15'
+gem 'hairtrigger', '0.2.16'
   gem 'ruby2ruby', '2.0.8', require: false
   gem 'ruby_parser', '3.7.0', require: false
 gem 'hashery', '1.3.0', require: false
