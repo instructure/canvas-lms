@@ -50,15 +50,15 @@ gem 'inst-jobs', '0.11.2'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.16'
-  gem 'ruby2ruby', '2.0.8', require: false
-  gem 'ruby_parser', '3.7.0', require: false
+  gem 'ruby2ruby', '2.4.4', require: false
+  gem 'ruby_parser', '3.14.0', require: false
 gem 'hashery', '1.3.0', require: false
 gem 'highline', '1.6.1', require: false
 gem 'hoe', '3.8.1'
 gem 'httparty', '0.13.7'
 gem 'i18n', '0.7.0'
 gem 'i18nema', '0.0.8'
-gem 'i18nliner', '0.0.12'
+gem 'i18nliner', '0.0.14'
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.1.0.beta.3', require: 'ims'
 gem 'json', '1.8.2'

@@ -287,9 +287,9 @@ PATH
   specs:
     i18n_extraction (0.0.1)
       activesupport (>= 3.2, < 4.3)
-      i18nliner (= 0.0.12)
-      ruby_parser (~> 3.7.0)
-      sexp_processor (~> 4.2)
+      i18nliner (= 0.0.14)
+      ruby_parser (~> 3.14.0)
+      sexp_processor (~> 4.13.0)
 
 PATH
   remote: gems/i18n_tasks
@@ -298,7 +298,7 @@ PATH
       activesupport (>= 3.2, < 4.3)
       i18n (~> 0.7.0)
       i18n_extraction
-      ruby_parser (~> 3.7.0)
+      ruby_parser (~> 3.14.0)
       utf8_cleaner
       ya2yaml (>= 0.30)
 
@@ -356,45 +356,6 @@ PATH
       will_paginate (= 3.0.7)
 
 PATH
-  remote: gems/plugins/academic_benchmark
-  specs:
-    academic_benchmark (1.1.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/account_reports
-  specs:
-    account_reports (1.1.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/moodle_importer
-  specs:
-    moodle_importer (1.0.0)
-      moodle2cc (= 0.2.33)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/qti_exporter
-  specs:
-    qti_exporter (1.0.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/respondus_soap_endpoint
-  specs:
-    respondus_soap_endpoint (1.1.0)
-      rails (>= 3.2, < 4.3)
-      soap4r-middleware (= 0.8.3)
-      soap4r-ruby1.9 (= 2.0.0)
-
-PATH
-  remote: gems/plugins/simply_versioned
-  specs:
-    simply_versioned (1.0.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
   remote: gems/rubocop-canvas
   specs:
     rubocop-canvas (1.0.0)
@@ -434,6 +395,45 @@ PATH
     workflow (0.0.1)
       rails (>= 3.2, < 4.3)
 
+PATH
+  remote: gems/plugins/academic_benchmark
+  specs:
+    academic_benchmark (1.1.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/account_reports
+  specs:
+    account_reports (1.1.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/moodle_importer
+  specs:
+    moodle_importer (1.0.0)
+      moodle2cc (= 0.2.33)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/qti_exporter
+  specs:
+    qti_exporter (1.0.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/respondus_soap_endpoint
+  specs:
+    respondus_soap_endpoint (1.1.0)
+      rails (>= 3.2, < 4.3)
+      soap4r-middleware (= 0.8.3)
+      soap4r-ruby1.9 (= 2.0.0)
+
+PATH
+  remote: gems/plugins/simply_versioned
+  specs:
+    simply_versioned (1.0.0)
+      rails (>= 3.2, < 4.3)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -466,7 +466,7 @@ GEM
     addressable (2.3.8)
     after_transaction_commit (1.0.1)
       activerecord (>= 3.2)
-    airbrussh (1.3.2)
+    airbrussh (1.4.0)
       sshkit (>= 1.6.1, != 1.7.0)
     arel (4.0.2)
     aroi (0.0.3)
@@ -625,6 +625,7 @@ GEM
     highline (1.6.1)
     hoe (3.8.1)
       rake (>= 0.8, < 11.0)
+    http-accept (1.7.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     httparty (0.13.7)
@@ -634,14 +635,14 @@ GEM
     i18nema (0.0.8)
       i18n (>= 0.5)
       syck (~> 1.0.0)
-    i18nliner (0.0.12)
+    i18nliner (0.0.14)
       activesupport (>= 3.0)
       erubis (~> 2.7.0)
       globby (>= 0.1.1)
       nokogiri (>= 1.5.0)
-      ruby2ruby (~> 2.0)
-      ruby_parser (~> 3.2)
-      sexp_processor (~> 4.4.0)
+      ruby2ruby (~> 2.4)
+      ruby_parser (~> 3.10)
+      sexp_processor (~> 4.10)
       ya2yaml (= 0.31)
     icalendar (1.5.4)
     iconv (1.0.4)
@@ -720,7 +721,7 @@ GEM
       rspec (>= 2.14)
     open4 (1.3.0)
     parallel (1.4.1)
-    parser (2.6.3.0)
+    parser (2.6.5.0)
       ast (~> 2.4.0)
     pg (0.18.4)
     polyglot (0.3.5)
@@ -797,7 +798,8 @@ GEM
       redis (>= 3.0)
     request_store (1.4.1)
       rack (>= 1.4)
-    rest-client (2.0.2)
+    rest-client (2.1.0)
+      http-accept (>= 1.7.0, < 2.0)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
@@ -840,16 +842,16 @@ GEM
       activesupport (>= 3.0.0)
       i18n
       iso8601
-    ruby-openid (2.7.0)
+    ruby-openid (2.9.2)
     ruby-progressbar (1.7.5)
     ruby-saml-mod (0.3.1)
       ffi
       nokogiri (~> 1.6)
-    ruby2ruby (2.0.8)
+    ruby2ruby (2.4.4)
       ruby_parser (~> 3.1)
-      sexp_processor (~> 4.0)
-    ruby_parser (3.7.0)
-      sexp_processor (~> 4.1)
+      sexp_processor (~> 4.6)
+    ruby_parser (3.14.0)
+      sexp_processor (~> 4.9)
     rubycas-client (2.3.9)
       activesupport
     rubyzip (1.1.1)
@@ -874,7 +876,7 @@ GEM
     sentry-raven (0.15.6)
       faraday (>= 0.7.6)
     sequel (4.5.0)
-    sexp_processor (4.4.5)
+    sexp_processor (4.13.0)
     shackles (1.1.0)
       activerecord (>= 4.0, < 5.1)
     shoulda-matchers (2.8.0)
@@ -908,7 +910,7 @@ GEM
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
     sqlite3 (1.3.9)
-    sshkit (1.19.1)
+    sshkit (1.20.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     stackprof (0.2.10)
@@ -1067,7 +1069,7 @@ DEPENDENCIES
   i18n_extraction!
   i18n_tasks!
   i18nema (= 0.0.8)
-  i18nliner (= 0.0.12)
+  i18nliner (= 0.0.14)
   icalendar (= 1.5.4)
   iconv (= 1.0.4)
   ims-lti (= 2.1.0.beta.3)
@@ -1145,8 +1147,8 @@ DEPENDENCIES
   ruby-openid
   ruby-progressbar (= 1.7.5)
   ruby-saml-mod (= 0.3.1)
-  ruby2ruby (= 2.0.8)
-  ruby_parser (= 3.7.0)
+  ruby2ruby (= 2.4.4)
+  ruby_parser (= 3.14.0)
   rubycas-client (= 2.3.9)
   rubyzip (= 1.1.1)
   rufus-scheduler (= 3.1.2)
