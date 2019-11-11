@@ -8,4 +8,4 @@ gem "logjam_agent", github: "beyond-z/logjam_agent"
 
 # Performance tuning halp!
 # See: https://devcenter.heroku.com/articles/scout
-gem 'scout_apm'
+gem 'scout_apm', require: false

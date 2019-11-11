@@ -243,6 +243,13 @@ module CanvasRails
 
     class NotImplemented < StandardError; end
 
+    if ENV['SCOUT_KEY']
+      require 'scout_apm'
+      # This needs to be run after all the other stuff we want to instrument is required.
+      # Experiment with moving it to an earlier point if we want more info on boot/startup though
+      ScoutApm::Rack.install!
+    end
+
     if defined?(PhusionPassenger)
       PhusionPassenger.on_event(:starting_worker_process) do |forked|
         if forked

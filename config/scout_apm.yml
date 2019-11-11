@@ -1,0 +1,13 @@
+common: &defaults
+  key: <%= ENV.fetch('SCOUT_KEY', '') %>
+  log_level: <%= ENV.fetch('SCOUT_LOG_LEVEL', 'WARN') %>
+  monitor: <%= ENV.fetch('SCOUT_MONITOR', 'false') %>
+
+development:
+  <<: *defaults
+
+test:
+  monitor: false
+
+production:
+  <<: *defaults
