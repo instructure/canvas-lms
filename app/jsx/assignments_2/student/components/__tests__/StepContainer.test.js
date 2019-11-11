@@ -61,16 +61,65 @@ it('will not render collapsed label if steps is not collapsed', async () => {
 })
 
 describe('the assignment is unavailable', () => {
-  it('will render the unavailable state tracker with all the appropriate steps', async () => {
+  it('renders the pizza tracker with the first state as unavailable for unsubmitted and undrafted assignments', async () => {
     const props = await mockAssignmentAndSubmission({LockInfo: {isLocked: true}})
     const {getByText, getByTestId} = render(<StepContainer {...props} />)
-    verifySteps(getByTestId('unavailable-step-container'), unavailableSteps, getByText)
+    verifySteps(getByTestId('available-step-container'), unavailableSteps, getByText)
   })
 
-  it('will render the unavailable state tracker if assignment is locked', async () => {
-    const props = await mockAssignmentAndSubmission({LockInfo: {isLocked: true}})
-    const {getByTestId} = render(<StepContainer {...props} />)
-    expect(getByTestId('unavailable-step-container')).toBeInTheDocument()
+  it('renders the pizza tracker with the current step icon as locked for drafted assignments', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        submissionDraft: {
+          meetsAssignmentCriteria: true
+        }
+      },
+      LockInfo: {isLocked: true}
+    })
+    const {container, getByText, getByTestId} = render(<StepContainer {...props} />)
+    verifySteps(
+      getByTestId('uploaded-step-container'),
+      ['Uploaded', 'Submit', 'Not Graded Yet'],
+      getByText
+    )
+    expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
+  })
+
+  it('renders the pizza tracker with the New Attempt step icon as locked for sumbitted assignments', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        state: 'submitted'
+      },
+      LockInfo: {isLocked: true}
+    })
+    const {container, getByText, getByTestId} = render(<StepContainer {...props} />)
+    verifySteps(
+      getByTestId('submitted-step-container'),
+      ['Uploaded', 'Submitted', 'Not Graded Yet', 'New Attempt'],
+      getByText
+    )
+    expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
+  })
+
+  it('renders the pizza tracker with the New Attempt step icon as locked for graded assignments', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        state: 'graded'
+      },
+      LockInfo: {isLocked: true}
+    })
+    const {container, getByText, getByTestId} = render(<StepContainer {...props} />)
+    verifySteps(
+      getByTestId('graded-step-container'),
+      ['Uploaded', 'Submitted', 'Graded', 'New Attempt'],
+      getByText
+    )
+    expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
+  })
+
+  it('will render the unavailable state tracker with all the appropriate steps', async () => {
+    const {getByText, getByTestId} = render(<StepContainer />)
+    verifySteps(getByTestId('unavailable-step-container'), unavailableSteps, getByText)
   })
 })
 

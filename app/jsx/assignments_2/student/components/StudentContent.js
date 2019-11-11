@@ -21,7 +21,6 @@ import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
 import I18n from 'i18n!assignments_2_student_content'
-import LockedAssignment from './LockedAssignment'
 import MissingPrereqs from './MissingPrereqs'
 import React, {Suspense, lazy} from 'react'
 import {Spinner} from '@instructure/ui-elements'
@@ -33,8 +32,6 @@ function renderContentBaseOnAvailability({assignment, submission}) {
   if (assignment.env.modulePrereq) {
     const prereq = assignment.env.modulePrereq
     return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
-  } else if (assignment.lockInfo.isLocked) {
-    return <LockedAssignment assignment={assignment} />
   } else if (submission === null) {
     // NOTE: handles case where user is not logged in
     return (

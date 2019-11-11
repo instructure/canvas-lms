@@ -26,6 +26,36 @@ import React from 'react'
 import {SubmissionMocks} from '../../graphqlData/Submission'
 
 describe('ContentTabs', () => {
+  describe('the assignment is locked aka passed the until date', () => {
+    it('renders the availability dates if the submission is unsubmitted', async () => {
+      const props = await mockAssignmentAndSubmission({
+        LockInfo: {isLocked: true}
+      })
+      const {findByText} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+      expect(await findByText('Availability Dates')).toBeInTheDocument()
+    })
+
+    it('renders the last submission if the assignment was submitted', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {lockInfo: {isLocked: true}},
+        Submission: {
+          ...SubmissionMocks.submitted,
+          attachments: [{displayName: 'test.jpg'}]
+        }
+      })
+      const {findByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+      expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
+    })
+  })
+
   describe('the submission type is online_upload', () => {
     it('renders the file upload tab when the submission is unsubmitted', async () => {
       const props = await mockAssignmentAndSubmission({
