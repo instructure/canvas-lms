@@ -3,10 +3,6 @@
 # of node and native built gems). 
 FROM heroku/cedar:14
 
-# Required for Docker heroku.yml builds to change it. 
-# See: https://devcenter.heroku.com/articles/build-docker-images-heroku-yml#setting-build-time-environment-variables
-ARG RAILS_ENV=development
-
 # Required to prevent: Error: lib/dress_code/extractor.rb:31:in `scan': invalid byte sequence in US-ASCII 
 ENV LC_ALL "en_US.UTF-8" 
 ENV LANG "en_US.UTF-8"
@@ -49,17 +45,22 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -qq \
   && useradd -m dockeruser \
   && chown dockeruser:dockeruser /app
 
+# Required for local builds to change it
+ARG RAILS_ENV=production
+ENV RAILS_ENV ${RAILS_ENV}
+
 WORKDIR /app
 
 # Copy files needed for bundle install to work.
 # By explicitly doing only the files needed, rebuilds won't re-run 
 # 'bundle install' unless one of these changes.
-COPY Gemfile Gemfile.lock /app/
-COPY Gemfile.d /app/Gemfile.d
-COPY gems /app/gems
-COPY config/canvas_rails4_2.rb /app/config/
+COPY --chown=dockeruser:dockeruser Gemfile Gemfile.lock /app/
+COPY --chown=dockeruser:dockeruser Gemfile.d /app/Gemfile.d
+COPY --chown=dockeruser:dockeruser gems /app/gems
+COPY --chown=dockeruser:dockeruser config/canvas_rails4_2.rb /app/config/
 
 USER dockeruser
+
 #RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4 --verbose
 RUN bundle install --path vendor/bundle --without=sqlite mysql --jobs 4
 
