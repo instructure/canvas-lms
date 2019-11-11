@@ -262,20 +262,6 @@ class UsersController < ApplicationController
         :original_host_with_port => request.host_with_port
       )
       redirect_to request_token.authorize_url
-    elsif params[:service] == "linked_in"
-      success_url = oauth_success_url(:service => 'linked_in')
-      request_token = LinkedIn::Connection.request_token(success_url)
-
-      OauthRequest.create(
-        :service => 'linked_in',
-        :token => request_token.token,
-        :secret => request_token.secret,
-        :return_url => return_to_url,
-        :user => @current_user,
-        :original_host_with_port => request.host_with_port
-      )
-
-      redirect_to request_token.authorize_url
     end
   end
 
@@ -340,56 +326,28 @@ class UsersController < ApplicationController
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
     else
-      if params[:service] == "linked_in"
-        begin
-          raise "No OAuth LinkedIn User" unless oauth_request.user
+      begin
+        raise "No OAuth Twitter User" unless oauth_request.user
 
-          linkedin = LinkedIn::Connection.from_request_token(
-            oauth_request.token,
-            oauth_request.secret,
-            params[:oauth_verifier]
-          )
+        twitter = Twitter::Connection.from_request_token(
+          oauth_request.token,
+          oauth_request.secret,
+          params[:oauth_verifier]
+        )
+        UserService.register(
+          :service => "twitter",
+          :access_token => twitter.access_token,
+          :user => oauth_request.user,
+          :service_domain => "twitter.com",
+          :service_user_id => twitter.service_user_id,
+          :service_user_name => twitter.service_user_name
+        )
+        oauth_request.destroy
 
-          UserService.register(
-            :service => "linked_in",
-            :access_token => linkedin.access_token,
-            :user => oauth_request.user,
-            :service_domain => "linked_in.com",
-            :service_user_id => linkedin.service_user_id,
-            :service_user_name => linkedin.service_user_name,
-            :service_user_url => linkedin.service_user_url
-          )
-          oauth_request.destroy
-
-          flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
-        rescue => e
-          Canvas::Errors.capture_exception(:oauth, e)
-          flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
-        end
-      else
-        begin
-          raise "No OAuth Twitter User" unless oauth_request.user
-
-          twitter = Twitter::Connection.from_request_token(
-            oauth_request.token,
-            oauth_request.secret,
-            params[:oauth_verifier]
-          )
-          UserService.register(
-            :service => "twitter",
-            :access_token => twitter.access_token,
-            :user => oauth_request.user,
-            :service_domain => "twitter.com",
-            :service_user_id => twitter.service_user_id,
-            :service_user_name => twitter.service_user_name
-          )
-          oauth_request.destroy
-
-          flash[:notice] = t('twitter_added', "Twitter access authorized!")
-        rescue => e
-          Canvas::Errors.capture_exception(:oauth, e)
-          flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
-        end
+        flash[:notice] = t('twitter_added', "Twitter access authorized!")
+      rescue => e
+        Canvas::Errors.capture_exception(:oauth, e)
+        flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
       end
       return_to(oauth_request.return_url, user_profile_url(@current_user))
     end

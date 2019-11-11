@@ -1882,8 +1882,6 @@ class ApplicationController < ActionController::Base
         true
       elsif feature == :twitter
         !!Twitter::Connection.config
-      elsif feature == :linked_in
-        !!LinkedIn::Connection.config
       elsif feature == :diigo
         !!Diigo::Connection.config
       elsif feature == :google_drive

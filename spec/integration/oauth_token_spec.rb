@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-%w{ Twitter LinkedIn }.each do |integration|
+%w{ Twitter }.each do |integration|
 describe integration do
   before do
     course_with_student_logged_in(:active_all => true)
@@ -26,9 +26,7 @@ describe integration do
 
   def oauth_start(integration)
     expect_any_instance_of(UsersController).to receive(:feature_and_service_enabled?).with(integration.underscore).and_return(true)
-    if integration == "LinkedIn"
-      expect(LinkedIn::Connection).to receive(:config).at_least(:once).and_return({})
-    elsif integration == "Twitter"
+    if integration == "Twitter"
       expect(Twitter::Connection).to receive(:config).at_least(:once).and_return({})
     else
       expect(integration.constantize).to receive(:config).at_least(:once).and_return({})
@@ -93,14 +91,7 @@ describe integration do
     it "should create the UserService on successful auth" do
       oauth_start(integration)
 
-      if integration == "LinkedIn"
-        expect(LinkedIn::Connection).to receive(:from_request_token).and_return(double("LinkedInConnection",
-          access_token: double("AccessToken", token: 'test_token', secret: 'test_secret'),
-          service_user_id: "test_user_id",
-          service_user_name: "test_user_name",
-          service_user_url: "test_user_url"
-        ))
-      elsif integration == "Twitter"
+      if integration == "Twitter"
         expect(Twitter::Connection).to receive(:from_request_token).and_return(double("TwitterConnection",
           access_token: double("AccessToken", token: 'test_token', secret: 'test_secret'),
           service_user_id: "test_user_id",
@@ -124,11 +115,7 @@ describe integration do
       oauth_start(integration)
 
       # pretend that somehow we think we got a valid auth token, but we actually didn't
-      if integration == "LinkedIn"
-        # mock up the response from the 3rd party service, so we don't actually contact it
-        expect(LinkedIn::Connection).to receive(:from_request_token).
-          and_raise(RuntimeError, "Third-party service totally like, failed")
-      elsif integration == "Twitter"
+      if integration == "Twitter"
         expect(Twitter::Connection).to receive(:from_request_token).
           and_raise(RuntimeError, "Third-party service totally like, failed")
       end
