@@ -1023,7 +1023,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) } #admins.include? user }
-    can :read_statistics and can :manage and can :read and can :update and can :create and can :submit and can :preview
+    can :manage and can :read and can :update and can :create and can :submit and can :preview
 
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
