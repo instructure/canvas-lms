@@ -25,19 +25,14 @@
 <%
   js_bundle :submit_assignment
   css_bundle :tinymce
-%>
-<script>
-  Object.assign(
-    ENV,
-    <%= raw StringifyIds.recursively_stringify_ids({
-      :SUBMIT_ASSIGNMENT => {
+  js_env({
+    :SUBMIT_ASSIGNMENT => {
       :ALLOWED_EXTENSIONS => (@assignment.allowed_extensions || []),
       :ID => @assignment.id,
       :GROUP_ID_FOR_USER => @assignment.group_category.try(:group_for, @current_user).try(:id)
     }
-  }).to_json %>
-  )
-</script>
+  })
+%>
 <div style="display: none;" id="submit_assignment" data-context_code="<%= @assignment.context_code %>" data-asset_string="<%= @assignment.asset_string %>">
   <div class="content" id="submit_assignment_tabs">
     <ul>

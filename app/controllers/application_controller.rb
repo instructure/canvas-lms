@@ -121,16 +121,14 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {}, overwrite = false)
-    if hash.present? && @js_env_has_been_rendered
-      begin
-        raise "you tried to add something to js_env after js_env has been rendered. if you are streaming templates, you must js_env from the controller not the view"
-      rescue => e
-        ErrorReport.log_exception('js_env_with_streaming', e)
-        raise e unless Rails.env.production?
-      end
-    end
 
     return {} unless request.format.html? || request.format == "*/*" || @include_js_env
+
+    if hash.present? && @js_env_has_been_rendered
+      add_to_js_env(hash, (@js_env_data_we_need_to_render_later ||= {}), overwrite)
+      return
+    end
+
     # set some defaults
     unless @js_env
       benchmark("init @js_env") do
@@ -189,17 +187,21 @@ class ApplicationController < ActionController::Base
       end
     end
 
-    hash.each do |k,v|
-      if @js_env[k] && !overwrite
-        raise "js_env key #{k} is already taken"
-      else
-        @js_env[k] = v
-      end
-    end
+    add_to_js_env(hash, @js_env, overwrite)
 
     @js_env
   end
   helper_method :js_env
+
+  def add_to_js_env(hash, jsenv, overwrite)
+    hash.each do |k,v|
+      if jsenv[k] && !overwrite
+        raise "js_env key #{k} is already taken"
+      else
+        jsenv[k] = v
+      end
+    end
+  end
 
   def render_js_env
     res = StringifyIds.recursively_stringify_ids(js_env.clone).to_json
