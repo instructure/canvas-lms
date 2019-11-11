@@ -116,6 +116,7 @@ describe('the Rubric component', () => {
           .at(0)
           .prop('hasPointsColumn')
       ).toBe(expected)
+      expect(el).toMatchSnapshot()
     }
 
     it('does not have a points column in summary mode', () => {

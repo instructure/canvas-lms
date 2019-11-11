@@ -128,7 +128,7 @@ const Rubric = props => {
     <th key="TableHeadingCriteria" scope="col" className="rubric-criteria">
       {I18n.t('Criteria')}
     </th>,
-    <th key="TableHeadingRatings" scope="col" colSpan={isSummary ? '2' : null} className="ratings">
+    <th key="TableHeadingRatings" scope="col" className="ratings">
       {I18n.t('Ratings')}
     </th>,
     showPointsColumn() ? (
@@ -138,6 +138,8 @@ const Rubric = props => {
     ) : null
   ]
 
+  const numColumns = 2 + (showPointsColumn() ? 1 : 0)
+
   return (
     <div className="react-rubric" style={minSize()}>
       <Table caption={<ScreenReaderContent>{rubric.title}</ScreenReaderContent>}>
@@ -145,7 +147,7 @@ const Rubric = props => {
           {/* This row is a hack to force the fixed layout to render as if the title does not exist */}
           <tr style={{visibility: 'collapse'}}>{headingCells}</tr>
           <tr>
-            <th colSpan="3" scope="colgroup" className="rubric-title">
+            <th colSpan={numColumns} scope="colgroup" className="rubric-title">
               {rubric.title}
             </th>
           </tr>
@@ -155,7 +157,7 @@ const Rubric = props => {
           {criteria}
           {showTotalPoints && (
             <tr>
-              <td colSpan="3">
+              <td colSpan={numColumns}>
                 <Flex justifyItems="end">
                   <Flex.Item data-selenium="rubric_total">
                     {hideScoreTotal || noScore ? null : total}
