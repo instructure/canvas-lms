@@ -91,11 +91,11 @@ module Lti
 #         },
 #         "tool_setting": {
 #            "description": "A ToolSetting object containing optional 'resource_type_code' and 'resource_url'",
-#            "type": "ToolSetting"
+#            "$ref": "ToolSetting"
 #         },
 #         "error_report": {
 #            "description": "A message describing the error. If set, the workflow_state will become 'error.'",
-#            "type": "String"
+#            "type": "string"
 #         },
 #         "submission_time": {
 #            "description": "The submitted_at date time of the submission.",
