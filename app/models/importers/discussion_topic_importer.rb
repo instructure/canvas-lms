@@ -140,6 +140,18 @@ module Importers
       if options[:has_group_category]
         item.group_category ||= context.group_categories.active.where(:name => options[:group_category]).first
         item.group_category ||= context.group_categories.active.where(:name => I18n.t("Project Groups")).first_or_create
+      elsif migration.for_master_course_import? && !item.is_announcement
+        if item.for_group_discussion? && !item.can_group?
+          # when this is false you can't actually unset the category in the UI so we'll keep it consistent here
+          # this is just some silliness so the attempted change gets ignored and also logged as a sync exception
+          tag = migration.master_course_subscription.content_tag_for(item)
+          unless tag.downstream_changes.include?("group_category_id")
+            tag.downstream_changes << "group_category_id"
+            tag.save
+          end
+        end
+
+        item.group_category = nil
       end
 
       item.save_without_broadcasting!
