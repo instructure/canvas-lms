@@ -7,7 +7,8 @@ if [ -e /app/tmp/pids/server.pid ]; then
 fi
 
 echo "Checking that bundle install doesn't need to run"
-bundle check &> /dev/null
+#bundle check &> /dev/null
+bundle check
 if [ $? -ne 0 ]; then
   echo "Bundle check FAILED / ERROR. Re-running bundle install b/c you're probably trying to update the gems and want to generate a new Gemfile.lock."
   echo "To get rid of this error and speed up Docker restarts, do a rebuild of the container image once you get the Gemfile.lock updated."
@@ -50,10 +51,10 @@ echo "docker-compose exec canvasweb bundle exec rake db:create"
 echo "./docker-compose/scripts/dbrefresh.sh"
 echo ""
 
-echo "Starting rails app. Go to http://canvasweb:3000 to access it (assuming you've added canvasweb to /etc/hosts)"
-bundle exec bin/rails s -p 3000 -b '0.0.0.0'
+#echo "Starting rails app. Go to http://canvasweb:3000 to access it (assuming you've added canvasweb to /etc/hosts)"
+#bundle exec bin/rails s -p 3000 -b '0.0.0.0'
 
 # TODO: when we move to heroku, switch to puma"
 # Use puma to run rails instead of running it directly so that our dev env matches prod.
-#echo "Starting the rails app using puma"
-#bundle exec puma -C config/puma.rb
+echo "Starting the rails app using puma"
+bundle exec puma -C config/puma.rb

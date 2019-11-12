@@ -289,7 +289,7 @@ PATH
       activesupport (>= 3.2, < 4.3)
       i18nliner (= 0.0.14)
       ruby_parser (~> 3.14.0)
-      sexp_processor (~> 4.13.0)
+      sexp_processor (~> 4.9)
 
 PATH
   remote: gems/i18n_tasks
