@@ -126,13 +126,7 @@ class LatePoliciesTabPanel extends React.Component {
   }
 
   state = {
-    showAlert: this.props.showAlert,
-    missingSubmissionDeductionDisplayValue:
-      this.props.latePolicy.data?.missingSubmissionDeduction || MAX_PERCENTAGE_INPUT,
-    lateSubmissionDeductionDisplayValue:
-      this.props.latePolicy.data?.lateSubmissionDeduction || MIN_PERCENTAGE_INPUT,
-    lateSubmissionMinimumPercentDisplayValue:
-      this.props.latePolicy.data?.lateSubmissionMinimumPercent || MIN_PERCENTAGE_INPUT
+    showAlert: this.props.showAlert
   }
 
   missingPolicyMessages = messages.bind(this, ['missingSubmissionDeduction'])
@@ -183,6 +177,10 @@ class LatePoliciesTabPanel extends React.Component {
   }
 
   handleBlur = name => {
+    if (this.props.latePolicy.changes[name] == null) {
+      return
+    }
+
     const decimal = bound(NumberHelper.parse(this.props.latePolicy.changes[name]))
     const errorMessage = validationErrorMessage(decimal, name)
     if (errorMessage) {
@@ -250,6 +248,31 @@ class LatePoliciesTabPanel extends React.Component {
     this.setState({showAlert: false})
   }
 
+  currentInputDisplayValue = (key, defaultValue) => {
+    const stateDisplayKey = `${key}DisplayValue`
+
+    // If the user is in the process of entering something, display it.
+    if (this.state[stateDisplayKey] != null) {
+      return this.state[stateDisplayKey]
+    }
+
+    // If the user updated this value, switched to a different tab, then came
+    // back to this tab, the updated value will be in the changes hash.
+    if (this.props.latePolicy.changes?.[key] != null) {
+      const value = this.props.latePolicy.changes[key]
+      return numberInputWillUpdateMap[key](value)
+    }
+
+    // If there have been no changes, use the value we were passed in.
+    if (this.props.latePolicy.data?.[key] != null) {
+      const value = this.props.latePolicy.data[key]
+      return numberInputWillUpdateMap[key](value)
+    }
+
+    // If we haven't been given a value yet, punt and show a default.
+    return defaultValue
+  }
+
   render() {
     if (!this.props.latePolicy.data) {
       return (
@@ -292,7 +315,10 @@ class LatePoliciesTabPanel extends React.Component {
                       }}
                       renderLabel={I18n.t('Grade percentage for missing submissions')}
                       disabled={!this.getLatePolicyAttribute('missingSubmissionDeductionEnabled')}
-                      value={this.state.missingSubmissionDeductionDisplayValue}
+                      value={this.currentInputDisplayValue(
+                        'missingSubmissionDeduction',
+                        MAX_PERCENTAGE_INPUT
+                      )}
                       onBlur={_event => this.handleBlur('missingSubmissionDeduction')}
                       onChange={(_event, val) =>
                         this.handleChange('missingSubmissionDeduction', val)
@@ -352,7 +378,10 @@ class LatePoliciesTabPanel extends React.Component {
                       }}
                       renderLabel={I18n.t('Late submission deduction percent')}
                       disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
-                      value={this.state.lateSubmissionDeductionDisplayValue}
+                      value={this.currentInputDisplayValue(
+                        'lateSubmissionDeduction',
+                        MIN_PERCENTAGE_INPUT
+                      )}
                       onBlur={_event => this.handleBlur('lateSubmissionDeduction')}
                       onChange={(_event, val) => this.handleChange('lateSubmissionDeduction', val)}
                       placeholder="0"
@@ -390,7 +419,10 @@ class LatePoliciesTabPanel extends React.Component {
                         this.lateSubmissionMinimumPercentInput = l
                       }}
                       renderLabel={I18n.t('Lowest possible grade percent')}
-                      value={this.state.lateSubmissionMinimumPercentDisplayValue}
+                      value={this.currentInputDisplayValue(
+                        'lateSubmissionMinimumPercent',
+                        MIN_PERCENTAGE_INPUT
+                      )}
                       disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
                       onBlur={_event => this.handleBlur('lateSubmissionMinimumPercent')}
                       onChange={(_event, val) =>

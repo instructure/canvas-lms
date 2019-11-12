@@ -153,14 +153,14 @@ QUnit.module(
           strictEqual(checkbox.checked, true)
         })
 
-        test("the 'Grade percentage for missing submissions' displays what's passed in via props", () => {
+        test("the 'Grade percentage for missing submissions' displays what's passed in via props, adjusted for display", () => {
           props.latePolicy.data = {
             ...DEFAULT_LATE_POLICY_DATA,
             missingSubmissionDeduction: 42
           }
           mountComponent(props)
           const input = getGradePercentageForMissingSubmissionsInput()
-          strictEqual(input.value, '42')
+          strictEqual(input.value, '58')
         })
 
         QUnit.module('given default props', contextHooks => {
@@ -659,23 +659,46 @@ QUnit.module('Gradezilla > Default Gradebook > LatePoliciesTabPanel > with enzym
     this.wrapper = mountComponent()
     const input = missingDeductionInput(this.wrapper)
     input.simulate('change', {target: {value: '22'}})
+    deepEqual(
+      changeLatePolicySpy.lastCall.args[0].changes,
+      {missingSubmissionDeduction: 78},
+      'sends changed values, with missing deduction subtracted from 100'
+    )
     input.simulate('change', {target: {value: '100'}})
+    strictEqual(changeLatePolicySpy.callCount, 2, 'calls changeLatePolicy when value changed')
+    deepEqual(
+      changeLatePolicySpy.lastCall.args[0].changes,
+      {missingSubmissionDeduction: 0},
+      'sends changed values, missing deduction subtracted from 100'
+    )
     input.simulate('blur')
-    strictEqual(changeLatePolicySpy.callCount, 3, 'calls changeLatePolicy')
-    deepEqual(changeLatePolicySpy.lastCall.args[0].changes, {}, 'does not send any changes')
+    strictEqual(
+      changeLatePolicySpy.callCount,
+      2,
+      'does not call changeLatePolicy on blur when no change'
+    )
   })
 
   test('calls the changeLatePolicy function with a validationError if the missing submission deduction input is changed and is not numeric', function() {
     this.wrapper = mountComponent()
     missingDeductionInput(this.wrapper).simulate('change', {target: {value: 'abc'}})
-    missingDeductionInput(this.wrapper).simulate('blur')
-    strictEqual(changeLatePolicySpy.callCount, 2, 'calls changeLatePolicy')
+    strictEqual(changeLatePolicySpy.callCount, 1, 'calls changeLatePolicy')
     deepEqual(
-      changeLatePolicySpy.firstCall.args[0].changes,
-      {missingSubmissionDeduction: NaN},
-      'passes NaN onChange'
+      changeLatePolicySpy.firstCall.args[0].changes.missingSubmissionDeduction,
+      NaN,
+      'passes NaN on change'
     )
-    deepEqual(changeLatePolicySpy.secondCall.args[0].changes, {}, 'passes nothing onBlur')
+
+    const newProps = {...this.wrapper.props()}
+    newProps.latePolicy.changes = {missingSubmissionDeduction: NaN}
+    this.wrapper.setProps(newProps)
+
+    missingDeductionInput(this.wrapper).simulate('blur')
+    strictEqual(
+      changeLatePolicySpy.callCount,
+      2,
+      'calls changeLatePolicy on blur when changes have been made'
+    )
     deepEqual(
       changeLatePolicySpy.firstCall.args[0].validationErrors,
       {},
@@ -793,18 +816,43 @@ QUnit.module('Gradezilla > Default Gradebook > LatePoliciesTabPanel > with enzym
     this.wrapper = mountComponent()
     const input = lateDeductionInput(this.wrapper)
     input.simulate('change', {target: {value: '22'}})
+    deepEqual(
+      changeLatePolicySpy.lastCall.args[0].changes,
+      {lateSubmissionDeduction: 22},
+      'sends changed values'
+    )
+
     input.simulate('change', {target: {value: '0'}})
+    strictEqual(changeLatePolicySpy.callCount, 2, 'calls changeLatePolicy')
+    deepEqual(
+      changeLatePolicySpy.lastCall.args[0].changes,
+      {lateSubmissionDeduction: 0},
+      'sends changed values'
+    )
+
     input.simulate('blur')
-    strictEqual(changeLatePolicySpy.callCount, 3, 'calls changeLatePolicy')
-    deepEqual(changeLatePolicySpy.lastCall.args[0].changes, {}, 'does not send any changes')
+    strictEqual(
+      changeLatePolicySpy.callCount,
+      2,
+      'does not call changeLatePolicy on blur with no changes'
+    )
   })
 
   test('calls the changeLatePolicy function with a validationError if the late submission deduction input is changed and is not numeric', function() {
     this.wrapper = mountComponent()
     lateDeductionInput(this.wrapper).simulate('change', {target: {value: 'abc'}})
+
+    const newProps = {...this.wrapper.props()}
+    newProps.latePolicy.changes = {lateSubmissionDeduction: NaN}
+    this.wrapper.setProps(newProps)
+
     lateDeductionInput(this.wrapper).simulate('blur')
     strictEqual(changeLatePolicySpy.callCount, 2, 'calls changeLatePolicy')
-    deepEqual(changeLatePolicySpy.lastCall.args[0].changes, {}, 'does not send changes')
+    deepEqual(
+      changeLatePolicySpy.lastCall.args[0].changes,
+      {lateSubmissionDeduction: NaN},
+      'includes the changed value'
+    )
     deepEqual(
       changeLatePolicySpy.lastCall.args[0].validationErrors,
       {lateSubmissionDeduction: 'Late submission deduction must be numeric'},
@@ -910,8 +958,28 @@ QUnit.module('Gradezilla > Default Gradebook > LatePoliciesTabPanel > with enzym
       wrapper = mountComponent({data})
       const input = lateSubmissionMinimumPercentInput(wrapper)
       input.simulate('change', {target: {value: '22'}})
+
+      const newProps = {
+        ...wrapper.props()
+      }
+      newProps.latePolicy.changes = {lateSubmissionMinimumPercent: 22}
+      wrapper.setProps(newProps)
+
       input.simulate('blur')
+      deepEqual(
+        changeLatePolicySpy.lastCall.args[0].changes,
+        {lateSubmissionMinimumPercent: 22},
+        'sends changes when value changed'
+      )
+
       input.simulate('change', {target: {value: '60'}})
+
+      const evenNewerProps = {
+        ...wrapper.props()
+      }
+      evenNewerProps.latePolicy.changes = {lateSubmissionMinimumPercent: 60}
+      wrapper.setProps(evenNewerProps)
+
       input.simulate('blur')
       strictEqual(changeLatePolicySpy.callCount, 4, 'calls changeLatePolicy')
       deepEqual(changeLatePolicySpy.lastCall.args[0].changes, {}, 'does not send any changes')
@@ -973,10 +1041,19 @@ QUnit.module('Gradezilla > Default Gradebook > LatePoliciesTabPanel > with enzym
       )
       deepEqual(changeLatePolicySpy.firstCall.args[0].validationErrors, {}, 'no validation errors')
 
-      wrapper.setProps({changes: {lateSubmissionMinimumPercent: NaN}})
+      const newProps = {
+        ...wrapper.props()
+      }
+      newProps.latePolicy.changes = {lateSubmissionMinimumPercent: NaN}
+      wrapper.setProps(newProps)
+
       lateSubmissionMinimumPercentInput(wrapper).simulate('blur')
       strictEqual(changeLatePolicySpy.callCount, 2, 'calls changeLatePolicy')
-      deepEqual(changeLatePolicySpy.lastCall.args[0].changes, {}, 'does not send changes')
+      deepEqual(
+        changeLatePolicySpy.lastCall.args[0].changes,
+        {lateSubmissionMinimumPercent: NaN},
+        'sends changes'
+      )
       deepEqual(
         changeLatePolicySpy.lastCall.args[0].validationErrors,
         {lateSubmissionMinimumPercent: 'Lowest possible grade must be numeric'},
