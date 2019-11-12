@@ -16582,7 +16582,7 @@ ja:
       regenerate_token: このトークンを再生成してもよろしいですか?このトークンを使用するものはすべて、更新が必要になります。
       unregister_service: このサービスへの登録を解除してもよろしいですか?
     content_shares: 
-      page_title: お知らせの基本設定
+      page_title: 共有コンテンツ
     crumb: "%{user} のプロフィール"
     crumbs: 
       observees: 監視中
