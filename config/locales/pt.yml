@@ -16611,7 +16611,7 @@ pt:
       regenerate_token: "Tem certeza de que deseja regenerar este token?  Tudo que estiver usando este token deverá ser atualizado."
       unregister_service: "Tem certeza de que deseja cancelar o registro deste serviço?"
     content_shares: 
-      page_title: "Preferências de notificações"
+      page_title: "Conteúdo partilhado"
     crumb: "%{user}, perfil de"
     crumbs: 
       observees: "A observar"
