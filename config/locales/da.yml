@@ -16597,7 +16597,7 @@ da:
       regenerate_token: "Er du sikker på, at du vil gendanne dette token? Alle ting som bruger dette token skal opdateres."
       unregister_service: "Er du sikker på, at du vil slette tjenestens registrering?"
     content_shares: 
-      page_title: Meddelelsespræferencer
+      page_title: "Delt indhold"
     crumb: "%{user}s indstillinger"
     crumbs: 
       observees: Observerer
