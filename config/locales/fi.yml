@@ -12662,7 +12662,7 @@ fi:
       regenerate_token: "Haluatko varmasti luoda tämä merkin uudelleen?  Kaikki tätä tunnistetta käyttävät täytyy päivittää."
       unregister_service: "Haluatko varmasti poistaa rekisteröinnin tältä palvelusta?"
     content_shares: 
-      page_title: Ilmoitusasetukset
+      page_title: "Jaettu sisältö"
     crumb: "%{user}n asetukset"
     crumbs: 
       observees: Havainnoidaan
