@@ -16595,7 +16595,7 @@ nb:
       regenerate_token: "Er du sikker på at du vil regenerere dette symbolet? Alt det som bruker dette symbolet vil måtte oppdateres."
       unregister_service: "Er du sikker på at du vil fjerne denne tjenesten?"
     content_shares: 
-      page_title: "Innstillinger for varslinger"
+      page_title: "Delt innhold"
     crumb: "%{user}s innstillinger"
     crumbs: 
       observees: Observerer
