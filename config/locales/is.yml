@@ -14662,7 +14662,7 @@ is:
       regenerate_token: "Viltu örugglega búa þetta tákn aftur til? Þá þarf að uppfæra allt sem notar þetta tákn."
       unregister_service: "Viltu örugglega afskrá þessa þjónustu?"
     content_shares: 
-      page_title: "Stillingar tilkynninga"
+      page_title: "Deilt efni"
     crumb: "Stillingar %{user}"
     crumbs: 
       observees: "Fylgist með"
