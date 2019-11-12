@@ -234,16 +234,6 @@ pipeline {
             }
           }
         }
-        stage('Linters') {
-          steps {
-            skipIfPreviouslySuccessful("linters") {
-              build(
-                job: 'test-suites/linters',
-                parameters: build_parameters
-              )
-            }
-          }
-        }
 
         stage('Vendored Gems') {
           steps {
@@ -322,6 +312,17 @@ pipeline {
  *           }
  *         }
  *       }
+ *
+ *      stage('Linters') {
+ *        steps {
+ *          skipIfPreviouslySuccessful("linters") {
+ *            build(
+ *              job: 'test-suites/linters',
+ *              parameters: build_parameters
+ *            )
+ *          }
+ *        }
+ *      }
  *
  *       stage('Xbrowser') {
  *         steps {
