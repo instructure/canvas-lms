@@ -16644,7 +16644,7 @@ en-AU:
       regenerate_token: "Are you sure you want to regenerate this token?  Anything using this token will have to be updated."
       unregister_service: "Are you sure you want to unregister this service?"
     content_shares: 
-      page_title: "Notification Preferences"
+      page_title: "Shared Content"
     crumb: "%{user}'s settings"
     crumbs: 
       observees: Observing
