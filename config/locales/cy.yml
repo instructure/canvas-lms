@@ -14350,7 +14350,7 @@ cy:
       regenerate_token: "Ydych chi’n siŵr eich bod am ail-greu’r tocyn hwn?  Bydd yn rhaid diweddaru unrhyw beth sy’n defnyddio’r tocyn hwn."
       unregister_service: "Ydych chi’n siŵr eich bod am ddad-gofrestru’r gwasanaeth hwn?"
     content_shares: 
-      page_title: "Dewisiadau Hysbysiadau"
+      page_title: "Cynnwys wedi'i Rannu"
     crumb: "%{user}- gosodiadau"
     crumbs: 
       observees: Arsylwi
