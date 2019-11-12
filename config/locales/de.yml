@@ -16515,7 +16515,7 @@ de:
       regenerate_token: "Möchten Sie dieses Token wirklich erneut erstellen?  Alle Anwendungen, die dieses Token nutzen, müssen dann aktualisiert werden."
       unregister_service: "Möchten Sie diesen Dienst wirklich deregistrieren?"
     content_shares: 
-      page_title: Benachrichtigungseinstellungen
+      page_title: "Geteilter Content"
     crumb: "%{user}s Einstellungen"
     crumbs: 
       observees: Beobachtet
