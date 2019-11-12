@@ -19,6 +19,7 @@
 import _ from 'lodash'
 import uuid from 'uuid'
 import parseLinkHeader from 'parse-link-header'
+import NaiveFetchDispatch from './NaiveFetchDispatch'
 
 const deepMerge = (lhs, rhs) => {
   if (lhs === undefined || lhs === null) {
@@ -37,20 +38,25 @@ const combine = (promiseOfJson1, promiseOfJson2) =>
 
 const parse = response => response.text().then(text => JSON.parse(text.replace('while(1);', '')))
 
-export const fetchUrl = url =>
-  fetch(url, {
-    credentials: 'include'
-  }).then(response => {
-    const linkHeader = response.headers.get('link')
-    const next = linkHeader ? parseLinkHeader(linkHeader).next : null
-    if (next) {
-      return combine(parse(response), fetchUrl(next.url))
-    } else {
-      return parse(response)
-    }
-  })
+export function fetchUrl(url, dispatch) {
+  return dispatch
+    .fetch(url, {
+      credentials: 'include'
+    })
+    .then(response => {
+      const linkHeader = response.headers.get('link')
+      const next = linkHeader ? parseLinkHeader(linkHeader).next : null
+      if (next) {
+        return combine(parse(response), fetchUrl(next.url, dispatch))
+      } else {
+        return parse(response)
+      }
+    })
+}
 
 const fetchOutcomes = (courseId, studentId) => {
+  const dispatch = new NaiveFetchDispatch()
+
   let outcomeGroups
   let outcomeLinks
   let outcomeRollups
@@ -58,11 +64,19 @@ const fetchOutcomes = (courseId, studentId) => {
   let outcomeResultsByOutcomeId
   let assignmentsByAssignmentId
 
+  function fetchWithDispatch(url) {
+    return fetchUrl(url, dispatch)
+  }
+
   return Promise.all([
-    fetchUrl(`/api/v1/courses/${courseId}/outcome_groups?per_page=100`),
-    fetchUrl(`/api/v1/courses/${courseId}/outcome_group_links?outcome_style=full&per_page=100`),
-    fetchUrl(`/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}&per_page=100`),
-    fetchUrl(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`)
+    fetchWithDispatch(`/api/v1/courses/${courseId}/outcome_groups?per_page=100`),
+    fetchWithDispatch(
+      `/api/v1/courses/${courseId}/outcome_group_links?outcome_style=full&per_page=100`
+    ),
+    fetchWithDispatch(
+      `/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}&per_page=100`
+    ),
+    fetchWithDispatch(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`)
   ])
     .then(([groups, links, rollups, alignments]) => {
       outcomeGroups = groups
@@ -73,7 +87,7 @@ const fetchOutcomes = (courseId, studentId) => {
     .then(() =>
       Promise.all(
         outcomeLinks.map(outcomeLink =>
-          fetchUrl(
+          fetchWithDispatch(
             `/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=assignments&per_page=100`
           )
         )
