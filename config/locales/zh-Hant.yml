@@ -16579,7 +16579,7 @@ zh-Hant:
       regenerate_token: 您是否確定要重新生成此令牌？使用該令牌的任何事項均將會被更新。
       unregister_service: 您是否確定要取消此服務註冊？
     content_shares: 
-      page_title: 通知偏好設定
+      page_title: 共用內容
     crumb: "%{user} 的設置"
     crumbs: 
       observees: 正在觀察
