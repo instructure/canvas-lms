@@ -16582,7 +16582,7 @@ nl:
       regenerate_token: "Weet je zeker dat je deze token opnieuw wilt genereren? Alles wat deze token gebruikt, moet opnieuw bijgewerkt worden."
       unregister_service: "Weet je zeker dat je deze service wilt verwijderen?"
     content_shares: 
-      page_title: Meldingsvoorkeuren
+      page_title: "Gedeelde inhoud"
     crumb: "Instellingen van %{user}"
     crumbs: 
       observees: "Bezig met waarnemen"
