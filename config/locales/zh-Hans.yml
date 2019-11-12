@@ -16573,7 +16573,7 @@ zh-Hans:
       regenerate_token: 是否确定要重新生成此令牌?必须更新使用此令牌的所有内容。
       unregister_service: 是否确定要取消注册此服务?
     content_shares: 
-      page_title: 通知首选项
+      page_title: 共享内容
     crumb: "%{user} 的个人资料"
     crumbs: 
       observees: 正在观察
