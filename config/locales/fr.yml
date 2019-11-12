@@ -16593,7 +16593,7 @@ fr:
       regenerate_token: "Voulez-vous vraiment regénérer ce jeton ? Tout ce qui utilise ce jeton devra être mis à jour."
       unregister_service: "Voulez-vous vraiment annuler l’enregistrement de ce service ?"
     content_shares: 
-      page_title: "Préférences de notification"
+      page_title: "Contenu partagé"
     crumb: "profil de %{user}"
     crumbs: 
       observees: Observer
