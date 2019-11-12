@@ -14517,7 +14517,7 @@ it:
       regenerate_token: "Vuoi rigenerare questo token?  Qualunque elemento utilizzi questo token dovrà essere aggiornato."
       unregister_service: "Vuoi annullare la registrazione a questo servizio?"
     content_shares: 
-      page_title: "Preferenze notifiche"
+      page_title: "Contenuto condiviso"
     crumb: "%{user}impostazioni di"
     crumbs: 
       observees: Osservazione

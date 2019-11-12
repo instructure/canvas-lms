@@ -15073,7 +15073,7 @@ ht:
       regenerate_token: "Ou kwè vrèman ou vle rejenet¡re token sa a? Tout bagay k ap itilize token sa a ap bezwen aktyalize."
       unregister_service: "Ou kwè vrèman ou vle anile sèvis sa a?"
     content_shares: 
-      page_title: "Preferans Notifikasyon"
+      page_title: "Pataje Kontni"
     crumb: "Paramèt %{user}"
     crumbs: 
       observees: Obsèvasyon
