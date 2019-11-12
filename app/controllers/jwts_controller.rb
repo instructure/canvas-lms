@@ -22,6 +22,7 @@
 #
 # @model JWT
 #    {
+#      "id": "JWT",
 #      "properties": {
 #        "token": {
 #           "description": "The signed, encrypted, base64 encoded JWT",
