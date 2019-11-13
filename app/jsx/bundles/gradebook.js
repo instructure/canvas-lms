@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import I18n from 'i18n!gradebook'
 import {Alert} from '@instructure/ui-alerts'
 import Backbone from 'Backbone'
 import {Link, Text} from '@instructure/ui-elements'
@@ -75,9 +76,11 @@ const GradebookRouter = Backbone.Router.extend({
     ReactDOM.render(
       <Alert variant="warning">
         <Text>
-          This version of Gradebook is being replaced by an updated Gradebook on January 18, 2020.
+          {I18n.t(
+            'This version of Gradebook is being replaced by an updated Gradebook on or before January 18, 2020.'
+          )}
           <Link href={newGradebookInfoURL} margin="0 xx-small">
-            Learn More
+            {I18n.t('Learn More')}
           </Link>
         </Text>
       </Alert>,
