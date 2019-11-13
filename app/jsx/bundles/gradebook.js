@@ -71,8 +71,7 @@ const GradebookRouter = Backbone.Router.extend({
   },
 
   renderOldGradebookReplacementNotice() {
-    const newGradebookInfoURL =
-      'https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-guide-table-of-contents#jive_content_id_New_Gradebook'
+    const newGradebookInfoURL = 'https://s.tiled.co/2bcKFN5/2019-canvas-gradebook-release'
     ReactDOM.render(
       <Alert variant="warning">
         <Text>
