@@ -1216,8 +1216,8 @@ Returns the types of resources that can be imported to the current page, forward
 Value is an array of one or more values of: ["assignment", "assignment_group", "audio",
 "discussion_topic", "document", "image", "module", "quiz", "page", "video"].
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_course_accept_canvas_resource_types*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_course_accept_canvas_resource_types*  
 
 ```
 ["page"]
@@ -1232,8 +1232,8 @@ Value is the largest logical unit of the page. Possible values are: ["assignment
   on Modules -> 'module'
   and so on.
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_course_canvas_resource_type*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_course_canvas_resource_type*  
 
 ```
 page
@@ -1242,8 +1242,8 @@ page
 Returns whether a content can be imported into a specific group on the page, forwarded from the request.
 True for Modules page and Assignment Groups page. False for other content index pages.
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_course_allow_canvas_resource_selection*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_course_allow_canvas_resource_selection*  
 
 ```
 true
@@ -1253,8 +1253,8 @@ Returns a list of content groups which can be selected, providing ID and name of
 forwarded from the request.
 Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_course_available_canvas_resources*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_course_available_canvas_resources*  
 
 ```
 [{"id": "3", name: "First Module"}, {"id": "5", name: "Second Module"]

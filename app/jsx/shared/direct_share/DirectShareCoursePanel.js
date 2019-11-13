@@ -51,7 +51,8 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
           select: contentSelection,
           settings: {
             source_course_id: sourceCourseId,
-            insert_into_module_id: selectedModule?.id
+            insert_into_module_id: selectedModule?.id,
+            insert_into_module_type: contentSelection ? Object.keys(contentSelection)[0] : null
           }
         }
       })
