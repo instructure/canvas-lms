@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {bool, func, oneOf, shape, string} from 'prop-types'
+import {bool, func, object, oneOf, shape, string} from 'prop-types'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {Heading} from '@instructure/ui-elements'
@@ -33,8 +33,10 @@ import {
 } from '../../../shared/ContentSelection'
 
 export default function LinkOptionsTray(props) {
-  const {content} = props
-  const [text, setText] = useState(content.text || '')
+  const content = props.content || {}
+  const textToLink =
+    (content.$element?.tagName === 'A' ? content.$element?.textContent : content.text) || ''
+  const [text, setText] = useState(textToLink || '')
   const [url, setUrl] = useState(content.url || '')
   const [autoOpenPreview, setAutoOpenPreview] = useState(content.displayAs === DISPLAY_AS_EMBED)
   const [disablePreview, setDisablePreview] = useState(
@@ -166,6 +168,7 @@ export default function LinkOptionsTray(props) {
 }
 LinkOptionsTray.propTypes = {
   content: shape({
+    $element: object, // the DOM's HTMLElement
     dispalyAs: oneOf([DISPLAY_AS_LINK, DISPLAY_AS_EMBED]),
     isPreviewable: bool,
     text: string,
