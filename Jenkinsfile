@@ -117,15 +117,6 @@ pipeline {
       steps {
         timeout(time: 3) {
           script {
-            /* send message to gerrit */
-            withGerritCredentials({ ->
-              sh '''
-                gerrit_message="\u2615 $JOB_BASE_NAME build started.\nTag: canvas-lms:$NAME\n$BUILD_URL"
-                ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
-                svc.cloudjenkins@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
-              '''
-            })
-
             fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
             println "Plugin list: ${gems}"
@@ -358,30 +349,6 @@ pipeline {
   }
 
   post {
-    success {
-      script {
-        withGerritCredentials({ ->
-          sh '''
-            gerrit_message="\u2713 $JOB_BASE_NAME build successful.\nTag: canvas-lms:$NAME\n$BUILD_URL"
-            ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
-              svc.cloudjenkins@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
-          '''
-        })
-      }
-    }
-
-    unsuccessful {
-      script {
-        withGerritCredentials({ ->
-          sh '''
-            gerrit_message="\u274C $JOB_BASE_NAME build failed.\nTag: canvas-lms:$NAME\n$BUILD_URL"
-            ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
-              svc.cloudjenkins@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
-          '''
-        })
-      }
-    }
-
     cleanup {
         sh 'build/new-jenkins/docker-cleanup.sh'
     }
