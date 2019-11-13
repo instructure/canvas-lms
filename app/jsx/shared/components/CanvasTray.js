@@ -21,7 +21,7 @@ import React from 'react'
 import {string, node} from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex, View} from '@instructure/ui-layout'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-overlays'
 
 import ErrorBoundary from './ErrorBoundary'
