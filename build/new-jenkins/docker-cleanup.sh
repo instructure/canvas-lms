@@ -1,11 +1,15 @@
+#!/bin/bash
+
 # sometimes things don't cleanup so run this a few times
 docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all
 docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all
 docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all
-# remove any dangling containers
-docker rmi -f $(docker images -f "dangling=true" -q)
-# find any leftover containers containing canvas-lms and remove
-docker images | grep "canvas-lms" | awk '{print $1 ":" $2}' | xargs docker rmi -f
+
+# remove all containers
+docker rm --force --volumes $(docker ps --all --quiet)
+
+# delete all containers
+docker rmi -f $(docker images --all --quiet)
 
 echo "running docker images"
 docker ps -a
