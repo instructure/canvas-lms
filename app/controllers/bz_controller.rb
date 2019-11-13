@@ -673,18 +673,24 @@ class BzController < ApplicationController
 
     data = {}
     if params[:names]
-      params[:names].each do |name|
-        next if data[name]
-        result = RetainedData.where(:user_id => user.id, :name => name)
-        if params[:include_timings]
+
+      # Add the fields that are set in the database
+      fields = RetainedData.where(:user_id => user.id, :name => params[:names]).pluck(:name, :value, :updated_at)
+      if params[:include_timings]
+        fields.each do |f| 
           obj = {}
-          obj["value"] = result.empty? ? '' : result.first.value
-          obj["timestamp"] = result.empty? ? 0 : result.first.updated_at.to_i
-          data[name] = obj
-        else
-          data[name] = result.empty? ? '' : result.first.value
+          obj["value"] = f[1]
+          obj["timestamp"] = f[2].to_i
+          data[f[0]] = obj
         end
+      else
+        fields.each { |f| data[f[0]] = f[1] }
       end
+
+      # Now add the fields not in the database, but need empty values.
+      empty_value = params[:include_timings] ? { "value" => '', "timestamp" => 0 } : ''
+      params[:names].each { |nm| data[nm] = empty_value unless data[nm] }
+
     end
     render :json => data
   end
@@ -960,8 +966,20 @@ class BzController < ApplicationController
     @email = @current_user.email
   end
 
+  # Exports the LinkedIn data for users in a courses or list of courses 
+  # and emails a .csv with the data export to the specified email address.
+  #
+  # Examples:
+  # <domain>/bz/do_linked_in_export?email=whatever&course_id=71
+  # <domain>/bz/do_linked_in_export?email=whatever&course_ids[]=71&course_ids[]=73
   def do_linked_in_export
-    work = BzController::ExportWork.new(params[:email])
+    raise ActionController::ParameterMissing.new "You must pass a email parameter to this method" unless params[:email]
+    unless params[:course_ids] || params[:course_id]
+      errorMsg = "You must pass either a course_id param or a list of course_ids[] parameters. E.g. ?course_id=X or ?course_ids[]=X&course_ids[]=Y"
+      raise ActionController::ParameterMissing.new errorMsg
+    end
+
+    work = BzController::ExportLinkedInData.new(params)
     Delayed::Job.enqueue(work, max_attempts: 1)
   end
 
@@ -976,7 +994,7 @@ class BzController < ApplicationController
     def perform
       user = User.find(@user_id)
       csv = Export::GradeDownload.csv(user, @params)
-      Mailer.bz_message(@params[:email], "Export Success: Course #{@params[:course_id]}", "Attached is your export data", "grades_download.csv" => csv).deliver
+      Mailer.bz_message(@params[:email], "Export Grades Success: Course #{@params[:course_id]}", "Attached is your export data", "grades_download.csv" => csv).deliver
       
       csv
     end
@@ -984,150 +1002,141 @@ class BzController < ApplicationController
     def on_permanent_failure(error)
       user = User.find(@user_id)
       er_id = Canvas::Errors.capture_exception("BzController::ExportGrades", error)[:error_report]
-      # email us?
-      Mailer.debug_message("Export FAIL", error.to_s).deliver
-      Mailer.bz_message(user.email, "Export Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.")
+      Mailer.debug_message("Export Grades FAIL", error.to_s).deliver
+      Mailer.bz_message(user.email, "Export Grades Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.").deliver
     end
   end
-  
-  class ExportWork # < Delayed::PerformableMethod
-    def initialize(email)
-      @email = email
+ 
+  class ExportLinkedInData # < Delayed::PerformableMethod
+    def initialize(params)
+      @email = params[:email]
+      @course_ids = [ params[:course_id] ] if params[:course_id]
+      @course_ids = params[:course_ids].reject { |id| id.blank? } if params[:course_ids]
     end
 
     def perform
       csv = linked_in_export_guts
-
-      stringio = Zip::OutputStream.write_buffer(StringIO.new('')) do |zio|
-        zio.put_next_entry("linkedin.csv")
-        zio.write(csv)
-        sleep 1 # wtf?
+        
+      unless csv.blank?
+        stringio = Zip::OutputStream.write_buffer(StringIO.new('')) do |zio|
+          zio.put_next_entry("linkedin.csv")
+          zio.write(csv)
+          sleep 1 # wtf?
+        end
+        stringio.rewind
+  
+        Mailer.bz_message(@email, "Export LinkedIn Data Success: Cours(s) #{@course_ids}", "Attached is your export data", "linkedin.zip" => stringio.sysread).deliver
+      else
+        Mailer.bz_message(@email, "Expost LinkedIn Data: Empty for: #{@course_ids}", "No active students were found with LinkedIn authorization that allowed us to download their data").deliver
       end
-      stringio.rewind
-
-      Mailer.bz_message(@email, "Export Success", "Attached is your export data", "linkedin.zip" => stringio.sysread).deliver
       # super
       csv
     end
 
     def on_permanent_failure(error)
-      er_id = Canvas::Errors.capture_exception("BzController::ExportWork", error)[:error_report]
-      # email us?
-      Mailer.debug_message("Export FAIL", error.to_s).deliver
-      Mailer.bz_message(@email, "Export Failed :(", "Your linked in export didn't work. The tech team was also emailed to look into why.")
+      er_id = Canvas::Errors.capture_exception("BzController::ExportLinkedInData", error)[:error_report]
+      Mailer.debug_message("Export LinkedIn Data FAIL", error.to_s).deliver
+      Mailer.bz_message(@email, "Export LinkedIn Data Failed :(", "Your linked in export didn't work for course(s) #{@course_ids}. The tech team was also emailed to look into why.").deliver
     end
 
     def linked_in_export_guts
-      Rails.logger.debug("### linkedin_data_export - begin")
+      Rails.logger.debug("### linkedin_data_export course_ids = #{@course_ids} - begin")
 
       connection = LinkedIn::Connection.new
 
       items = []
-      User.all.each do |u|
-        item = {}
-        item["braven-id"] = u.id
+      @course_ids.each do |course_id|
 
-        u.user_services.each do |service|
-          if service.service == "linked_in"
-            Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
-
-            # See: https://developer.linkedin.com/docs/fields/full-profile
-            fetched_li_data = true
-            #request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,job-bookmarks,honors-awards)?format=json", service.token)
-            request = connection.get_request("/v2/me", service.token)
-
-            # NOTE: The 'suggestions' field was causing this error, so we're not fetching it:
-            # {"errorCode"=>0, "message"=>"Internal API server error", "requestId"=>"Y4175L15PK", "status"=>500, "timestamp"=>1490298963387}
-            # Also, I decided not to fetch picture-urls::(original)
-
-            info = JSON.parse(request.body)
-
-            if info["errorCode"] == 0
-              fetched_li_data = false
-              Rails.logger.error("### Error exporting LinkedIn data for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
-              # TODO: if "message"=>"Unable to verify access token" we should unregister the user.  I reproduced this by registering a second
-              # account with the same LinkedIn account.  It invalidated the first.
-
-              # if info["message"] == "Internal API server error" # For certain LinkedIn accounts, requesting the job-bookmarks makes it fail. Try again without that.
-                # Rails.logger.debug("### Retrying request without job-bookmarks parameter for user = #{u.name} - #{u.email}.")
-                # fetched_li_data = true
-                # request = connection.get_request("/v1/people/~:(id,first-name,last-name,maiden-name,email-address,location,industry,num-connections,num-connections-capped,summary,specialties,public-profile-url,last-modified-timestamp,associations,interests,publications,patents,languages,skills,certifications,educations,courses,volunteer,three-current-positions,three-past-positions,num-recommenders,recommendations-received,following,honors-awards)?format=json", service.token)
-                # info = JSON.parse(request.body)
-                # info["jobBookmarks"] = "ERROR FETCHING"
-                # if info["errorCode"] == 0
-                  # fetched_li_data = false
-                  # Rails.logger.error("### Error exporting LinkedIn data (without jobs-bookmarks) for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
-                # end
-              # end
-            end
-
-            if fetched_li_data
-              Rails.logger.debug("### info = #{info.inspect}")
-              result = LinkedinExport.where(:user_id => u.id)
-              linkedin_data = nil
-              if result.empty?
-                linkedin_data = LinkedinExport.new()
-                linkedin_data.user_id = u.id
+        Course.find(course_id).students.active.eager_load(:user_services).each do |u|
+          item = {}
+          item["braven-id"] = u.id
+  
+          u.user_services.each do |service|
+            if service.service == "linked_in"
+              Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
+  
+              # See: https://developer.linkedin.com/docs/fields/full-profile
+              request = connection.get_request("/v2/me", service.token)
+              info = JSON.parse(request.body)
+              
+              # See: https://developer.linkedin.com/docs/guide/v2/error-handling
+              # Note: we're also checking for "errorCode" b/c we ran into issues in the past with V1 internal errors that returned this, so just to be safe.
+              if info["status"].blank? && info["errorCode"].blank?
+                Rails.logger.warn "### LinkedIn API response for #{u.name} - #{u.email} had more pages of data which we didn't process. Incomplete data was exported." unless info["paging"].blank?  
+                #Rails.logger.debug("### info = #{info.inspect}")
+                result = LinkedinExport.where(:user_id => u.id)
+                linkedin_data = nil
+                if result.empty?
+                  linkedin_data = LinkedinExport.new()
+                  linkedin_data.user_id = u.id
+                else
+                  linkedin_data = result.first
+                end
+  
+                linkedin_data.linkedin_id = item["id"] = info["id"]
+                linkedin_data.first_name = item["first-name"] = info["localizedFirstName"]
+                linkedin_data.last_name = item["last-name"] = info["localizedLastName"]
+                linkedin_data.maiden_name = item["maiden-name"] = info["localizedMaidenName"]
+                # no longer available
+                # linkedin_data.email_address = item["email-address"] = info["emailAddress"]
+                linkedin_data.location = item["location"] = info["location"]["postalCode"] unless info["location"].nil?
+                linkedin_data.industry = item["industry"] = info["industryName"]["localized"]["en_US"] unless info["industryName"].nil?
+  
+                linkedin_data.job_title = item["job-title"] = get_job_title(info["positions"])
+                linkedin_data.num_connections = item["num-connections"] = nil # removed in V2
+                linkedin_data.num_connections_capped = item["num-connections-capped"] = nil # removed in V2
+                linkedin_data.summary = item["summary"] = info["headline"]["localized"]["en_US"] unless info["headline"].nil?
+                linkedin_data.specialties = item["specialties"] = nil # removed in V2
+                linkedin_data.public_profile_url = item["public-profile-url"] = "http://www.linkedin.com/in/#{info["vanityName"]}"
+                # TODO: the default timestamp format of the Time object is something like: 2016-07-12 14:26:15 +0000
+                # which corresponds to 07/12/2016 2:26pm UTC
+                # if we want to format the timestamp differently, use the strftime() method on the Time object
+                linkedin_data.last_modified_timestamp = item["last-modified-timestamp"] = Time.at(info["lastModified"].to_f / 1000)
+                linkedin_data.associations = item["associations"] = nil # remove in V2
+  
+                linkedin_data.interests = item["interests"] = nil # removed in v2
+                linkedin_data.publications = item["publications"] = info["publications"]
+                linkedin_data.patents = item["patents"] = info["patents"]
+                linkedin_data.languages = item["languages"] = info["languages"]
+                linkedin_data.skills = item["skills"] = info["skills"]
+                linkedin_data.certifications = item["certifications"] = info["certifications"]
+                linkedin_data.educations = item["educations"] = info["educations"]
+                linkedin_data.courses = item["courses"] = info["courses"]
+                linkedin_data.volunteer = item["volunteer"] = info["volunteeringExperiences"]
+                # note there is also volunteeringInterests which gives a list of causes we might find interesting
+  
+                linkedin_data.most_recent_school = item["most-recent-school"] = get_most_recent_school(info["educations"])
+                linkedin_data.graduation_year = item["graduation-year"] = get_graduation_year(info["educations"])
+                linkedin_data.major = item["major"] = get_major(info["educations"])
+  
+                linkedin_data.three_current_positions = item["three-current-positions"] = current_positions(info["positions"])
+                linkedin_data.current_employer = item["current-employer"] = get_current_employer(info["positions"])
+                linkedin_data.three_past_positions = item["three-past-positions"] = non_current_positions(info["positions"])
+  
+                linkedin_data.num_recommenders = item["num-recommenders"] = nil # removed in V2
+                linkedin_data.recommendations_received = item["recommendations-received"] = nil # removed in V2
+                linkedin_data.following = item["following"] = nil # removed in V2
+                linkedin_data.job_bookmarks = item["job-bookmarks"] = nil # removed in V2
+  
+                linkedin_data.honors_awards = item["honors-awards"] = info["honors"]
+  
+                items.push(item)
+                linkedin_data.save
               else
-                linkedin_data = result.first
+                 # Example response: {"serviceErrorCode"=>65600, "message"=>"Invalid access token", "status"=>401}
+                 Rails.logger.error("### Error exporting LinkedIn Data for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
+                # TODO: we should unregister the user for certain errors, like invalid access token (see above example).
+                # I reproduced this by registering a second account with the same LinkedIn account.  It invalidated the first token.
+                # Note: we should do it in a way where we have the data in a way to be able to create a report and share out
+                # with regions to do outreach to re-authorize / fix.
               end
-
-              linkedin_data.linkedin_id = item["id"] = info["id"]
-              linkedin_data.first_name = item["first-name"] = info["localizedFirstName"]
-              linkedin_data.last_name = item["last-name"] = info["localizedLastName"]
-              linkedin_data.maiden_name = item["maiden-name"] = info["localizedMaidenName"]
-              # no longer available
-              # linkedin_data.email_address = item["email-address"] = info["emailAddress"]
-              linkedin_data.location = item["location"] = info["location"]["postalCode"] unless info["location"].nil?
-              linkedin_data.industry = item["industry"] = info["industryName"]["localized"]["en_US"] unless info["industryName"].nil?
-
-              linkedin_data.job_title = item["job-title"] = get_job_title(info["positions"])
-              linkedin_data.num_connections = item["num-connections"] = nil # removed in V2
-              linkedin_data.num_connections_capped = item["num-connections-capped"] = nil # removed in V2
-              linkedin_data.summary = item["summary"] = info["headline"]["localized"]["en_US"] unless info["headline"].nil?
-              linkedin_data.specialties = item["specialties"] = nil # removed in V2
-              linkedin_data.public_profile_url = item["public-profile-url"] = "http://www.linkedin.com/in/#{info["vanityName"]}"
-              # TODO: the default timestamp format of the Time object is something like: 2016-07-12 14:26:15 +0000
-              # which corresponds to 07/12/2016 2:26pm UTC
-              # if we want to format the timestamp differently, use the strftime() method on the Time object
-              linkedin_data.last_modified_timestamp = item["last-modified-timestamp"] = Time.at(info["lastModified"].to_f / 1000)
-              linkedin_data.associations = item["associations"] = nil # remove in V2
-
-              linkedin_data.interests = item["interests"] = nil # removed in v2
-              linkedin_data.publications = item["publications"] = info["publications"]
-              linkedin_data.patents = item["patents"] = info["patents"]
-              linkedin_data.languages = item["languages"] = info["languages"]
-              linkedin_data.skills = item["skills"] = info["skills"]
-              linkedin_data.certifications = item["certifications"] = info["certifications"]
-              linkedin_data.educations = item["educations"] = info["educations"]
-              linkedin_data.courses = item["courses"] = info["courses"]
-              linkedin_data.volunteer = item["volunteer"] = info["volunteeringExperiences"]
-              # note there is also volunteeringInterests which gives a list of causes we might find interesting
-
-              linkedin_data.most_recent_school = item["most-recent-school"] = get_most_recent_school(info["educations"])
-              linkedin_data.graduation_year = item["graduation-year"] = get_graduation_year(info["educations"])
-              linkedin_data.major = item["major"] = get_major(info["educations"])
-
-              linkedin_data.three_current_positions = item["three-current-positions"] = current_positions(info["positions"])
-              linkedin_data.current_employer = item["current-employer"] = get_current_employer(info["positions"])
-              linkedin_data.three_past_positions = item["three-past-positions"] = non_current_positions(info["positions"])
-
-              linkedin_data.num_recommenders = item["num-recommenders"] = nil # removed in V2
-              linkedin_data.recommendations_received = item["recommendations-received"] = nil # removed in V2
-              linkedin_data.following = item["following"] = nil # removed in V2
-              linkedin_data.job_bookmarks = item["job-bookmarks"] = nil # removed in V2
-
-              linkedin_data.honors_awards = item["honors-awards"] = info["honors"]
-
-              items.push(item)
-              linkedin_data.save
+            else
+              Rails.logger.debug("### LinkedIn service not registered for #{u.name} - #{u.email}")
             end
-          else
-            Rails.logger.debug("### LinkedIn service not registered for #{u.name}")
           end
         end
-      end
-
+      end # each course
+  
       csv_result = CSV.generate do |csv|
         header = []
         header << "braven-id"
@@ -1207,14 +1216,9 @@ class BzController < ApplicationController
           row << item["honors-awards"]
           csv << row
         end
-      end
+      end 
+      csv_result
     end
-
-    #def linked_in_export
-      #respond_to do |format|
-        #format.csv { render text: linked_in_export_guts }
-      #end
-    #end
 
     def get_job_title(positionsNode)
       return nil if positionsNode.nil?
@@ -1315,19 +1319,7 @@ class BzController < ApplicationController
       end
     end
 
-
-
-
-
-
-
-
-
-
-
   end
-  # end
-
 
   def last_user_url
     @current_user.last_url = params[:last_url]
