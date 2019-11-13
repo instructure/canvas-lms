@@ -245,7 +245,9 @@ module Interfaces::SubmissionInterface
   def turnitin_data
     return nil if object.turnitin_data.empty?
 
-    promises = object.turnitin_data.keys.map do |asset_string|
+    promises = object.turnitin_data.keys.
+      reject { |key| key == :last_processed_attempt }.
+      map do |asset_string|
       Loaders::AssetStringLoader.load(asset_string).then do |turnitin_context|
         next if turnitin_context.nil?
 
