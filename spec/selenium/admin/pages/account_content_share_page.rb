@@ -15,11 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative '../../common'
-
 module AccountContentSharePage
   # ---------------------- Elements ----------------------
+
   def content_share_main_content
     f('#content')
+  end
+
+  def page_application_container
+    f('#application')
   end
 
   def received_table_rows
@@ -49,10 +53,17 @@ module AccountContentSharePage
   def read_item_button_icon(item_name)
     fj("button:contains('#{item_name} has been read')")
   end
+
+  def import_content_share
+    f("span[data-testid='import-menu-action']")
+  end
+
   # ---------------------- Actions -----------------------
+
   def visit_content_share_page
     get "/profile/content_shares"
   end
 
   # ---------------------- Methods -----------------------
+  
 end

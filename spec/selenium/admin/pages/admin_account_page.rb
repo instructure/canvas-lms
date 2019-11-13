@@ -47,11 +47,13 @@ module AdminSettingsPage
   end
 
   # ---------------------- Actions -----------------------
+  
   def visit_admin_settings_tab(account_id)
     get "/accounts/#{account_id}/settings"
   end
 
   # ---------------------- Methods -----------------------
+  
   def wait_for_profile_tray_spinner
     begin
       spinner = profile_tray_spinner
@@ -61,4 +63,5 @@ module AdminSettingsPage
     end
     wait_for_ajaximations
   end
+  
 end

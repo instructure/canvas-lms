@@ -1,0 +1,50 @@
+#
+# Copyright (C) 2019 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+require_relative '../common'
+
+module CopyToTrayPage
+  # ------------------------------ Selectors -----------------------------
+
+  # ------------------------------ Elements ------------------------------
+  def copy_to_dialog
+    f("[role='dialog']")
+  end
+
+  def course_search_dropdown
+    f("input[placeholder='Begin typing to search']")
+  end
+
+  def course_dropdown_list
+   f("ul[role='listbox']")
+  end
+
+  def course_dropdown_item(course_name)
+   fj("li:contains(#{course_name})")
+  end
+
+  def copy_button
+    fj("button:contains('Copy')")
+  end
+
+  def starting_copy_operation_alert
+    f("[role=alert]")
+  end
+
+  # ------------------------------ Actions --------------------------------
+
+end

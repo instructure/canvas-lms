@@ -89,4 +89,12 @@ describe "direct share page" do
     wait_for_ajaximations
     expect(content_share_main_content.text).not_to include 'u read me'
   end
+
+  # it "launches the Import tray for a content share" do
+  #   skip('will be fixed in a new PS ADMIN-3012')
+  #   manage_received_item_button(@received_share2.name).click
+  #   import_content_share.click
+    
+  #   expect(page_application_container).to contain_css("[role='dialog'][aria-label='Import...']")
+  # end
 end
