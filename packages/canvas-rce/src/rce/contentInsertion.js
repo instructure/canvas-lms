@@ -166,17 +166,20 @@ export function insertLink(editor, link) {
   return insertUndecoratedLink(editor, linkAttrs)
 }
 
-// link edit/create logic copied from tinymce/plugins/link/plugin.js
+// link edit/create logic based on tinymce/plugins/link/plugin.js
 function insertUndecoratedLink(editor, linkAttrs) {
   const selectedElm = editor.selection.getNode()
   const anchorElm = getAnchorElement(editor, selectedElm)
+  const selectedHtml = editor.selection.getContent({format: 'html'})
   if (linkAttrs.target === '_blank') {
     linkAttrs.rel = 'noopener noreferrer'
   }
 
+  editor.focus()
   if (anchorElm) {
-    editor.focus()
     updateLink(editor, anchorElm, linkAttrs.text, linkAttrs)
+  } else if (selectedHtml) {
+    editor.execCommand('mceInsertLink', null, linkAttrs)
   } else {
     createLink(editor, selectedElm, linkAttrs.text, linkAttrs)
   }

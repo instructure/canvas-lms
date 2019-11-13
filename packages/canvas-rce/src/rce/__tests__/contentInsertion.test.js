@@ -31,6 +31,7 @@ describe('contentInsertion', () => {
 
     editor = {
       content: '',
+      selectionContent: '',
       classes: '',
       isHidden: () => {
         return false
@@ -40,7 +41,11 @@ describe('contentInsertion', () => {
           return null
         },
         getContent: () => {
-          return ''
+          return editor.selectionContent
+        },
+        setContent: content => {
+          editor.selectionContent = content
+          editor.content = content
         },
         getEnd: () => {
           return node
@@ -108,6 +113,14 @@ describe('contentInsertion', () => {
       expect(editor.content).toEqual(
         '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
       )
+    })
+
+    it('respects the current selection building the link by delegating to tinymce', () => {
+      editor.execCommand = jest.fn()
+      editor.selection.setContent('link me')
+      contentInsertion.insertLink(editor, link)
+      expect(editor.execCommand).toHaveBeenCalled()
+      expect(editor.execCommand.mock.calls[0][0]).toBe('mceInsertLink')
     })
 
     it('can use url if no href', () => {
