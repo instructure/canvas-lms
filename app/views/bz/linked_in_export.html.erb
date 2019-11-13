@@ -5,6 +5,14 @@
   <br />
   <%= text_field_tag :email, @email %>
   <br />
+  Enter the Course IDs for the Fellows whose data should be exported:
+  <br />
+  <%= text_field_tag 'course_ids[]' %>
+  <br />
+  <%= text_field_tag 'course_ids[]' %>
+  <br />
+  <%= text_field_tag 'course_ids[]' %>
+  <br />
   <%= submit_tag 'Request export' %>
 <% end %>
 
