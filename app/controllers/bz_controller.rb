@@ -1025,7 +1025,7 @@ class BzController < ApplicationController
         end
         stringio.rewind
   
-        Mailer.bz_message(@email, "Export LinkedIn Data Success: Cours(s) #{@course_ids}", "Attached is your export data", "linkedin.zip" => stringio.sysread).deliver
+        Mailer.bz_message(@email, "Export LinkedIn Data Success: Course(s) #{@course_ids}", "Attached is your export data", "linkedin.zip" => stringio.sysread).deliver
       else
         Mailer.bz_message(@email, "Expost LinkedIn Data: Empty for: #{@course_ids}", "No active students were found with LinkedIn authorization that allowed us to download their data").deliver
       end
