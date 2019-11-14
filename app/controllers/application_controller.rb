@@ -344,6 +344,11 @@ class ApplicationController < ActionController::Base
     css_bundle :blueprint_courses
 
     master_course = is_master ? @context : MasterCourses::MasterTemplate.master_course_for_child_course(@context)
+    if master_course.nil?
+      # somehow the is_child_course? value is cached but we can't actually find the subscription so clear the cache and bail
+      Rails.cache.delete(MasterCourses::ChildSubscription.course_cache_key(@context))
+      return
+    end
     bc_data = {
       isMasterCourse: is_master,
       isChildCourse: is_child,
