@@ -167,10 +167,11 @@ describe Api::V1::Course do
           "role_id" => student_role.id,
           "user_id" => @me.id,
           "enrollment_state" => "active",
+          "limit_privileges_to_course_section" => false,
           "computed_current_score" => 95.0,
           "computed_final_score" => 85.0,
           "computed_current_grade" => "A",
-          "computed_final_grade" => "B"
+          "computed_final_grade" => "B",
         }
       end
 
@@ -252,6 +253,7 @@ describe Api::V1::Course do
           "role_id" => student_role.id,
           "user_id" => @student.id,
           "enrollment_state" => "active",
+          "limit_privileges_to_course_section" => false,
           "computed_current_score" => 45.0,
           "computed_final_score" => 30.0,
           "computed_current_grade" => "F",
@@ -468,18 +470,21 @@ describe CoursesController, type: :request do
          "role_id" => @assigned_observer_enrollment.role.id,
          "user_id" => @assigned_observer_enrollment.user_id,
          "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
          "associated_user_id" => @observed_student.id
        }, {
          "type" => "observer",
          "role" => @observer_enrollment.role.name,
          "role_id" => @observer_enrollment.role.id,
          "user_id" => @observer_enrollment.user_id,
+         "limit_privileges_to_course_section" => false,
          "enrollment_state" => "active"
        }, {
          "type" => "student",
          "role" => @student_enrollment.role.name,
          "role_id" => @student_enrollment.role.id,
          "user_id" => @student_enrollment.user_id,
+         "limit_privileges_to_course_section" => false,
          "enrollment_state" => "active"
        }]
     end
@@ -498,19 +503,22 @@ describe CoursesController, type: :request do
          "role_id" => @assigned_observer_enrollment.role.id,
          "user_id" => @assigned_observer_enrollment.user_id,
          "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
          "associated_user_id" => @observed_student.id
        }, {
          "type" => "observer",
          "role" => @observer_enrollment.role.name,
          "role_id" => @observer_enrollment.role.id,
          "user_id" => @observer_enrollment.user_id,
-         "enrollment_state" => "active"
+         "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
        }, {
          "type" => "student",
          "role" => @student_enrollment.role.name,
          "role_id" => @student_enrollment.role.id,
          "user_id" => @student_enrollment.user_id,
-         "enrollment_state" => "active"
+         "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
        }]
     end
 
@@ -527,13 +535,15 @@ describe CoursesController, type: :request do
          "role_id" => @assigned_observer_enrollment.role.id,
          "user_id" => @assigned_observer_enrollment.user_id,
          "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
          "associated_user_id" => @observed_student.id
        }, {
          "type" => "observer",
          "role" => @observer_enrollment.role.name,
          "role_id" => @observer_enrollment.role.id,
          "user_id" => @observer_enrollment.user_id,
-         "enrollment_state" => "active"
+         "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
        }]
     end
   end
@@ -2307,7 +2317,8 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses.json?enrollment_role=SuperTeacher",
                       { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' })
       expect(json.collect{ |c| c['id'].to_i }).to eq [@course3.id]
-      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'user_id' => @me.id, 'enrollment_state' => 'invited' }]
+      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id,
+        'user_id' => @me.id, 'enrollment_state' => 'invited', "limit_privileges_to_course_section" => false }]
     end
   end
 
@@ -2424,7 +2435,8 @@ describe CoursesController, type: :request do
                       { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' },
                       { :state => ['unpublished'] })
       expect(json.collect{ |c| c['id'].to_i }).to eq [@course3.id]
-      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'user_id' => @me.id, 'enrollment_state' => 'invited' }]
+      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'user_id' => @me.id,
+        'enrollment_state' => 'invited', "limit_privileges_to_course_section" => false }]
       json.collect{ |c| c['workflow_state']}.each do |s|
         expect(%w{unpublished}).to include(s)
       end
@@ -3408,7 +3420,8 @@ describe CoursesController, type: :request do
         'account_id' => @course1.account_id,
         'root_account_id' => @course1.root_account_id,
         'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @me.id, 'enrollment_state' => 'active'}],
+        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id,
+          'user_id' => @me.id, 'enrollment_state' => 'active', "limit_privileges_to_course_section" => false}],
         'grading_standard_id' => nil,
         'grade_passback_setting' => nil,
         'sis_course_id' => @course1.sis_course_id,
