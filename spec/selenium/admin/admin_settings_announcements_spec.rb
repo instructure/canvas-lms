@@ -115,6 +115,10 @@ describe "settings tabs" do
     end
 
     context "messages" do
+      before do
+        Account.default.enable_feature!(:notification_for_global_announcement)
+      end
+
       it "should let you mark the checkbox to send messages for a new announcement" do
         get "/accounts/#{Account.default.id}/settings"
         wait_for_ajaximations
