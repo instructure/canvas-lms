@@ -196,7 +196,7 @@ describe GradebookUserIds do
 
   context 'given pg_collkey extension is present' do
     before do
-      requires_pg_collkey
+      skip_unless_pg_collkey_present
     end
 
     it "sorts by sortable name ascending if the user does not have any saved sort preferences" do
@@ -248,7 +248,7 @@ describe GradebookUserIds do
 
     context 'given pg_collkey extension is present' do
       before do
-        requires_pg_collkey
+        skip_unless_pg_collkey_present
       end
 
       it "sorts by student sortable name ascending" do
@@ -330,7 +330,7 @@ describe GradebookUserIds do
 
       context 'given pg_collkey extension is present' do
         before do
-          requires_pg_collkey
+          skip_unless_pg_collkey_present
         end
 
         it "orders the missing user_ids by their sortable_name and user_id" do
@@ -403,7 +403,7 @@ describe GradebookUserIds do
 
       context 'given pg_collkey extension is present' do
         before do
-          requires_pg_collkey
+          skip_unless_pg_collkey_present
         end
 
         it "orders the missing user_ids by their sortable_name and user_id" do
@@ -456,7 +456,7 @@ describe GradebookUserIds do
 
         context 'given pg_collkey extension is present' do
           before do
-            requires_pg_collkey
+            skip_unless_pg_collkey_present
           end
 
           it "returns user ids sorted by grade on the assignment" do
@@ -510,7 +510,7 @@ describe GradebookUserIds do
 
         context 'given pg_collkey extension is present' do
           before do
-            requires_pg_collkey
+            skip_unless_pg_collkey_present
           end
 
           it "returns user ids sorted by grade on the assignment" do
@@ -580,7 +580,7 @@ describe GradebookUserIds do
 
     context 'given pg_collkey extension is present' do
       before do
-        requires_pg_collkey
+        skip_unless_pg_collkey_present
       end
 
       context "with total grade" do
@@ -690,7 +690,7 @@ describe GradebookUserIds do
 
         context 'given pg_collkey extension is present' do
           before do
-            requires_pg_collkey
+            skip_unless_pg_collkey_present
           end
 
           it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do
@@ -730,7 +730,7 @@ describe GradebookUserIds do
 
         context 'given pg_collkey extension is present' do
           before do
-            requires_pg_collkey
+            skip_unless_pg_collkey_present
           end
 
           it "sorts by 'All Grading Periods' if a grading period ID of '0' is in user preferences" do

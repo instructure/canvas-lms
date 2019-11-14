@@ -1979,7 +1979,7 @@ describe User do
 
     context 'given pg_collkey extension is present' do
       before do
-        requires_pg_collkey
+        skip_unless_pg_collkey_present
       end
 
       it "sorts lexicographically" do

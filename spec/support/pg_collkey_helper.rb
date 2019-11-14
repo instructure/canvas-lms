@@ -33,7 +33,7 @@ module PGCollkeyHelper
     end
   end
 
-  def requires_pg_collkey
+  def skip_unless_pg_collkey_present
     skip "requires pg_collkey" unless pg_collkey_enabled?
   end
 end

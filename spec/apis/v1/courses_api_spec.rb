@@ -3156,7 +3156,7 @@ describe CoursesController, type: :request do
 
       describe "localized sorting" do
         before do
-          requires_pg_collkey
+          skip_unless_pg_collkey_present
         end
 
         it "should use course-level locale setting for sorting" do
