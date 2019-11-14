@@ -218,11 +218,11 @@ module Lti
     def create_placements(mh, message_handler)
 
       message_handler.placements.each do |placement|
-        placement.destroy unless ResourcePlacement::DEFAULT_PLACEMENTS.include? placement.placement
+        placement.destroy unless ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include? placement.placement
       end
 
       if (mh.enabled_capabilities & ResourcePlacement::PLACEMENT_LOOKUP.keys).blank?
-        ResourcePlacement::DEFAULT_PLACEMENTS.each do |p|
+        ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.each do |p|
           message_handler.placements.where(placement: p).first_or_create!
         end
       else

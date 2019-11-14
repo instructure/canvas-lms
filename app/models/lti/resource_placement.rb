@@ -31,7 +31,8 @@ module Lti
 
     SIMILARITY_DETECTION_LTI2 = 'Canvas.placements.similarityDetection'
 
-    DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
+    # Default placements for LTI 1 and LTI 2, ignored for LTI 1.3
+    LEGACY_DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
     PLACEMENTS = [:account_navigation,
                   :similarity_detection,
