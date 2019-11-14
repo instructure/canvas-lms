@@ -41,8 +41,6 @@ ContentTabs.propTypes = {
   submission: Submission.shape
 }
 
-// We should revisit this after the InstructureCon demo to ensure this is
-// accessible and in a class.
 function currentSubmissionGrade(assignment, submission) {
   const tabBarAlign = {
     position: 'absolute',
