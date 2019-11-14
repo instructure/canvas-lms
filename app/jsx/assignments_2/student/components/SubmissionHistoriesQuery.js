@@ -17,12 +17,17 @@
  */
 import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {Assignment, AssignmentSubmissionsConnection} from '../graphqlData/Assignment'
+import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
 import I18n from 'i18n!assignments_2_submission_histories_query'
+import Header from './Header'
 import {Query} from 'react-apollo'
-import React from 'react'
+import React, {Suspense, lazy} from 'react'
 import {shape} from 'prop-types'
+import {Spinner} from '@instructure/ui-elements'
 import {SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import ViewManager from './ViewManager'
+
+const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
 class SubmissionHistoriesQuery extends React.Component {
   static propTypes = {
@@ -91,6 +96,27 @@ class SubmissionHistoriesQuery extends React.Component {
 
   render() {
     const submission = this.getSubmission()
+    if (!submission) {
+      // User hasn't accepted course invite
+      return (
+        <>
+          <Header scrollThreshold={150} assignment={this.props.initialQueryData.assignment} />
+          <AssignmentToggleDetails
+            description={this.props.initialQueryData.assignment.description}
+          />
+          <Suspense
+            fallback={
+              <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
+            }
+          >
+            <LoggedOutTabs
+              nonAcceptedEnrollment
+              assignment={this.props.initialQueryData.assignment}
+            />
+          </Suspense>
+        </>
+      )
+    }
 
     // We have to use the newtork-only fetch policy here, because all the submissions
     // share the same id which can cause previous query results to be cached in
