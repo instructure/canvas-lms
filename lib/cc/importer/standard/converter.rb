@@ -181,7 +181,7 @@ module CC::Importer::Standard
           end
         end
       end
-      doc.at_css('body').inner_html
+      (doc.at_css('body') || doc).inner_html
     end
 
     def find_assignment(migration_id)
