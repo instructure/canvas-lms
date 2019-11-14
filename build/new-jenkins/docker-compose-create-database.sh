@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x -o errexit -o errtrace -o nounset -o pipefail
+
 docker-compose exec -T cassandra ./wait-for-it
 for keyspace in auditors global_lookups page_views; do
   docker-compose exec -T cassandra cqlsh -e "CREATE KEYSPACE ${keyspace} WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };"

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 for i in {1..360}; do
   [[ -f /volumes/.ready ]] && exit
   sleep 1

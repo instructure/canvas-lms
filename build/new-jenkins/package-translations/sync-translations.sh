@@ -1,11 +1,11 @@
 #!/bin/bash
 
+set -x -o errexit -o errtrace -o nounset -o pipefail
+
 ##
 # This file is the main file for translating packages. It will run
 # other scripts to facilitate the translation process.
-## 
-
-set -ex
+##
 
 export COMPOSE_FILE=docker-compose.new-jenkins-package-translations.yml
 

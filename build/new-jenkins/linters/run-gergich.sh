@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -x -o errexit -o errtrace -o nounset -o pipefail
 
 # the GERRIT_REFSPEC is required for the commit message to actually
 # send things to gergich

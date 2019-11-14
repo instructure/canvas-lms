@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -x -o errexit -o errtrace -o nounset -o pipefail
 
 export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Initial"
 
@@ -33,13 +33,13 @@ while true; do
     echo "CAT THE ENTIRE FILE"
     docker-compose exec -T web bash -c "cat /usr/src/app/tmp/rspec"
     if [ $1 ] && [ $1 = 'performance' ]; then
-      command="docker-compose exec -T web bundle exec rspec -O spec/spec.opts spec/selenium/performance/ --only-failures --failure-exit-code 99";
+      command="docker-compose exec -T web bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --only-failures --failure-exit-code 99";
     else
       command="build/new-jenkins/rspec-tests.sh only-failures";
     fi
   else
     if [ $1 ] && [ $1 = 'performance' ]; then
-      command="docker-compose exec -T web bundle exec rspec -O spec/spec.opts spec/selenium/performance/ --failure-exit-code 99"
+      command="docker-compose exec -T web bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --failure-exit-code 99"
     else
       command="build/new-jenkins/rspec-tests.sh"
     fi

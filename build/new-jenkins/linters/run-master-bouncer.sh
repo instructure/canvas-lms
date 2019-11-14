@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -e
+set -x -o errexit -o errtrace -o nounset -o pipefail
+
 if [[ -z "${MASTER_BOUNCER_KEY}" ]]; then
   echo "MASTER_BOUNCER_KEY not set. cannot run master_bouncer check"
   exit 0

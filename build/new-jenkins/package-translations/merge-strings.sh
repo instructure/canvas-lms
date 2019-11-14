@@ -1,11 +1,12 @@
 #!/bin/bash
 
+set -x -o errexit -o errtrace -o nounset -o pipefail
+
 ##
 # This script loops through all available packages pulling out the english
 # translations from each (/locales/en.json) and merges them together into a single
 # en.json to be sent for translation
 ##
-
 
 if ! [ -x "$(command -v jq)" ]; then
   echo 'jq not found.  Please install jq to use this script' >&2
