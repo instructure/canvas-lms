@@ -117,7 +117,7 @@
   </div>
 <% end %>
 
-<h1><%= @user.name %></h1>
+<h1><%= @user.name %> <% if @user.pronouns %><i>(<%= @user.pronouns %>)</i><% end %></h1>
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>
 <% can_manage_admins = can_do(@context, @current_user, :manage_admin_users) %>
 
