@@ -40,6 +40,12 @@ const props = (overrides = {}, placementOverrides = {}) => {
   }
 }
 
+it('allows empty placements', () => {
+  const propsNoPlacements = {...props(), placements: []}
+  const wrapper = mount(<Placements {...propsNoPlacements} />)
+  expect(wrapper.instance().valid()).toEqual(true)
+})
+
 it('generates the toolConfiguration', () => {
   const wrapper = mount(<Placements {...props()} />)
   const toolConfig = wrapper.instance().generateToolConfigurationPart()
