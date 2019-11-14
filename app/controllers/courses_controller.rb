@@ -1553,7 +1553,9 @@ class CoursesController < ApplicationController
       session[:accepted_enrollment_uuid] = enrollment.uuid
 
       if params[:action] != 'show'
-        redirect_to course_url(@context.id)
+        # Redirects back to HTTP_REFERER if it exists (so if you accept from an assignent page it will put
+        # you back on the same page you were looking at). Otherwise, it redirects back to the course homepage
+        redirect_back(fallback_location: course_url(@context.id))
       else
         @context_enrollment = enrollment
         enrollment = nil
