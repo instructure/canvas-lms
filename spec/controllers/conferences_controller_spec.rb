@@ -165,6 +165,22 @@ describe ConferencesController do
       post 'update', params: {:course_id => @course.id, :id => @conference, :web_conference => {:title => "Something else"}}, :format => 'json'
       expect(response).to be_successful
     end
+
+    it "should return user ids" do
+      user_session(@teacher)
+      @conference = @course.web_conferences.create!(conference_type: "Wimba", user: @teacher)
+      params = {
+        course_id: @course.id,
+        id: @conference,
+        web_conference: {
+          title: "Something else",
+        },
+      }
+      post :update, params: params, format: :json
+      body = JSON.parse(response.body)
+      expect(body["user_ids"]).to include(@teacher.id)
+      expect(body["user_ids"]).to include(@student.id)
+    end
   end
 
   describe "POST 'join'" do

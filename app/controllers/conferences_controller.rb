@@ -256,6 +256,7 @@ class ConferencesController < ApplicationController
             @conference.add_invitee(u)
           end
           @conference.save
+          @conference.reload # Refresh the conference from the database to get an updated list of users.
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json { render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
                                                             :url => named_context_url(@context, :context_conference_url, @conference)) }
