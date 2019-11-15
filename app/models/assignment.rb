@@ -623,6 +623,7 @@ class Assignment < ActiveRecord::Base
     run_at = @next_auto_peer_review_date || next_auto_peer_review_date
     return if run_at.blank?
 
+    run_at = 1.minute.from_now if run_at < 1.minute.from_now # delay immediate run in case associated objects are still being saved
     self.send_later_enqueue_args(:do_auto_peer_review, {
       :run_at => run_at,
       :on_conflict => :overwrite,
