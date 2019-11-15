@@ -26,3 +26,16 @@ export default function useModuleCourseSearchApi(fetchApiOpts) {
     ...fetchApiOpts
   })
 }
+
+export function useCourseModuleItemApi(fetchApiOpts) {
+  const courseId = fetchApiOpts?.params?.contextId
+  const moduleId = fetchApiOpts?.params?.moduleId
+  if (courseId && moduleId) {
+    delete fetchApiOpts.params.contextId
+    delete fetchApiOpts.params.moduleId
+  }
+  useFetchApi({
+    path: `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
+    ...fetchApiOpts
+  })
+}

@@ -40,6 +40,7 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [startCopyOperationPromise, setStartCopyOperationPromise] = useState(null)
   const [selectedModule, setSelectedModule] = useState(null)
+  const [selectedPosition, setSelectedPosition] = useState(null)
 
   function startCopyOperation() {
     setStartCopyOperationPromise(
@@ -52,7 +53,8 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
           settings: {
             source_course_id: sourceCourseId,
             insert_into_module_id: selectedModule?.id,
-            insert_into_module_type: contentSelection ? Object.keys(contentSelection)[0] : null
+            insert_into_module_type: contentSelection ? Object.keys(contentSelection)[0] : null,
+            insert_into_module_position: selectedPosition
           }
         }
       })
@@ -70,7 +72,9 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
       <CourseAndModulePicker
         selectedCourseId={selectedCourse?.id}
         setSelectedCourse={setSelectedCourse}
+        selectedModuleId={selectedModule?.id}
         setSelectedModule={setSelectedModule}
+        setModuleItemPosition={setSelectedPosition}
       />
       <ConfirmActionButtonBar
         padding="small 0 0 0"

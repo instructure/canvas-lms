@@ -50,6 +50,7 @@ export function RenderSelect({label, onChange, options, className, selectOneDefa
         <select
           data-testid={testId}
           onChange={onChange}
+          className="move-select-form"
           style={{
             margin: '0',
             width: '100%'
@@ -87,7 +88,7 @@ export default function SelectPosition({
   const positionSelected = !!(selectedPosition && selectedPosition.type === 'relative')
 
   function renderSelectSibling() {
-    const filteredItems = siblings.filter(item => item.id !== items[0].id)
+    const filteredItems = siblings.filter(item => item.id !== items[0]?.id)
     return (
       <RenderSelect
         label={I18n.t('Item Select')}
@@ -106,7 +107,7 @@ export default function SelectPosition({
 
   function renderPlaceTitle() {
     const title =
-      items.length > 1 ? I18n.t('Place') : I18n.t('Place "%{title}"', {title: items[0].title})
+      items.length === 1 ? I18n.t('Place "%{title}"', {title: items[0].title}) : I18n.t('Place')
     return <Text weight="bold">{title}</Text>
   }
 
