@@ -23,6 +23,12 @@ module ApplicationHelper
   include LocaleSelection
   include Canvas::LockExplanation
 
+  def gtag
+    tag = SettingsService.get_settings(object: "school", id: 1)['ga_tracking_id']
+    return if tag == "UA-36373320-13"
+    tag
+  end
+
   def context_user_name(context, user)
     return nil unless user
     return user.short_name if !context && user.respond_to?(:short_name)
