@@ -1054,6 +1054,9 @@ class BzController < ApplicationController
           u.user_services.each do |service|
             if service.service == "linked_in"
               Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
+
+                # TODO: ideally, we would have an initial export. Then every subsequent export would do a batch request of last madified
+                # and only return the ones that have been modified.
   
               # See: https://developer.linkedin.com/docs/fields/full-profile
               request = connection.get_request("/v2/me", service.token)
@@ -1081,8 +1084,39 @@ class BzController < ApplicationController
                 # linkedin_data.email_address = item["email-address"] = info["emailAddress"]
                 linkedin_data.location = item["location"] = info["location"]["postalCode"] unless info["location"].nil?
                 linkedin_data.industry = item["industry"] = info["industryName"]["localized"]["en_US"] unless info["industryName"].nil?
-  
-                linkedin_data.job_title = item["job-title"] = get_job_title(info["positions"])
+ 
+                # We want to go by reverse order b/c the key is the linkedIn ID of the position in the list
+                # and we assume newer ones will have a larger ID (aka created most recently)
+                if info["positions"]
+                  currentPositionProcessed = false
+                  item["three-current-positions"] = []
+                  item["three-past-positions"] = []
+                  info["positions"].sort.reverse.map { |i,p| 
+
+                    # The first position (aka job) we come across with no end data (aka to Present), set to be their current one
+                    if p["endMonthYear"].nil? # Current position
+                      unless currentPositionProcessed
+                        item["job-title"] = p["title"]["localized"]["en_US"]
+                        # TODO: this is the fail: https://sentry.io/organizations/braven-0v/issues/1323425242/?project=1728734&query=is%3Aunresolved
+                        item["current-employer"] = p["companyName"]["localized"]["en_US"]
+                        currentPositionProcessed = true
+                      end
+
+                      item["three-current-positions"] << p
+
+                    else # Previous position
+
+                      item["three-past-positions"] << p
+
+                    end
+                  }
+                  
+                  linkedin_data.job_title = item["job-title"]
+                  linkedin_data.current_employer = item["current-employer"]
+                  linkedin_data.three_current_positions = item["three-current-positions"]
+                  linkedin_data.three_past_positions = item["three-past-positions"]
+                end
+
                 linkedin_data.num_connections = item["num-connections"] = nil # removed in V2
                 linkedin_data.num_connections_capped = item["num-connections-capped"] = nil # removed in V2
                 linkedin_data.summary = item["summary"] = info["headline"]["localized"]["en_US"] unless info["headline"].nil?
@@ -1107,12 +1141,8 @@ class BzController < ApplicationController
   
                 linkedin_data.most_recent_school = item["most-recent-school"] = get_most_recent_school(info["educations"])
                 linkedin_data.graduation_year = item["graduation-year"] = get_graduation_year(info["educations"])
-                linkedin_data.major = item["major"] = get_major(info["educations"])
-  
-                linkedin_data.three_current_positions = item["three-current-positions"] = current_positions(info["positions"])
-                linkedin_data.current_employer = item["current-employer"] = get_current_employer(info["positions"])
-                linkedin_data.three_past_positions = item["three-past-positions"] = non_current_positions(info["positions"])
-  
+                linkedin_data.major = item["major"] = get_major(info["educations"])  
+ 
                 linkedin_data.num_recommenders = item["num-recommenders"] = nil # removed in V2
                 linkedin_data.recommendations_received = item["recommendations-received"] = nil # removed in V2
                 linkedin_data.following = item["following"] = nil # removed in V2
@@ -1218,60 +1248,6 @@ class BzController < ApplicationController
         end
       end 
       csv_result
-    end
-
-    def get_job_title(positionsNode)
-      return nil if positionsNode.nil?
-      # positions is an object with items as properties, we need to find the one that does not have a endMonthYear as it its current
-      positionsNode.each do |id, value|
-        if value["endMonthYear"].nil?
-          return value["title"]["localized"]["en_US"]
-        end
-      end
-      return nil
-    end
-
-    def current_positions(positionsNode)
-      remainder = []
-      return remainder if positionsNode.nil?
-      positionsNode.each do |k, v|
-        if v["endMonthYear"].nil?
-          remainder << v
-        end
-      end
-
-      begin
-        remainder.sort_by { |a| [a["startMonthYear"]["year"], a["startMonthYear"]["month"]] }
-      rescue
-        return []
-      end
-    end
-
-    def non_current_positions(positionsNode)
-      remainder = []
-      return remainder if positionsNode.nil?
-      positionsNode.each do |k, v|
-        if !v["endMonthYear"].nil?
-          remainder << v
-        end
-      end
-
-      begin
-        remainder.sort_by { |a| [a["startMonthYear"]["year"], a["startMonthYear"]["month"]] }
-      rescue
-        return []
-      end
-    end
-
-    def get_current_employer(currentPositionsNode)
-      cp = current_positions(currentPositionsNode)
-      return nil if cp.length == 0
-      current_employer_node = cp[-1]
-      if current_employer_node
-        return current_employer_node["companyName"]["localized"]["en_US"]
-      else
-        return nil
-      end
     end
 
     def get_most_recent_school(educationsNode)
