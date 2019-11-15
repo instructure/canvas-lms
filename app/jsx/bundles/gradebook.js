@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import I18n from 'i18n!gradebook'
 import {Alert} from '@instructure/ui-alerts'
 import Backbone from 'Backbone'
 import {Link, Text} from '@instructure/ui-elements'
@@ -71,14 +72,15 @@ const GradebookRouter = Backbone.Router.extend({
   },
 
   renderOldGradebookReplacementNotice() {
-    const newGradebookInfoURL =
-      'https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-guide-table-of-contents#jive_content_id_New_Gradebook'
+    const newGradebookInfoURL = 'https://s.tiled.co/2bcKFN5/2019-canvas-gradebook-release'
     ReactDOM.render(
       <Alert variant="warning">
         <Text>
-          This version of Gradebook is being replaced by an updated Gradebook on January 18, 2020.
+          {I18n.t(
+            'This version of Gradebook is being replaced by an updated Gradebook on or before January 18, 2020.'
+          )}
           <Link href={newGradebookInfoURL} margin="0 xx-small">
-            Learn More
+            {I18n.t('Learn More')}
           </Link>
         </Text>
       </Alert>,
