@@ -18,23 +18,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def withGerritCredentials = { Closure command ->
-  withCredentials([
-    sshUserPrivateKey(credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USERNAME')
-  ]) { command() }
-}
-
-def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null, String sourceRef = null ->
-  withGerritCredentials({ ->
-    println "Fetching ${repo} plugin"
-    sh """
-      mkdir -p ${path}/${customRepoDestination ?: repo}
-      GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-        git archive --remote=ssh://$GERRIT_URL/${repo} ${sourceRef == null ? 'master' : sourceRef} ${sourcePath == null ? '' : sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
-    """
-  })
-}
-
 def fullSuccessName(name) {
   return "_successes/${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}-${name}-success"
 }
@@ -81,8 +64,26 @@ def build_parameters = [
   string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
   string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
   string(name: 'GERRIT_EVENT_ACCOUNT_NAME', value: "${env.GERRIT_EVENT_ACCOUNT_NAME}"),
-  string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}")
+  string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}"),
+  string(name: 'GERRIT_CHANGE_COMMIT_MESSAGE', value: "${env.GERRIT_CHANGE_COMMIT_MESSAGE}"),
+  string(name: 'GERRIT_HOST', value: "${env.GERRIT_HOST}"),
+  string(name: 'GERGICH_PUBLISH', value: "0")
 ]
+
+def getImageTagVersion() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return flags.getImageTagVersion()
+}
+
+def runBuildImageMaybe(save_success, block) {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  if (flags.hasFlag('skip-docker-build')) {
+    echo "skip building image requested"
+  }
+  else {
+    skipIfPreviouslySuccessful("build-and-push-image", save_success, block)
+  }
+}
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -97,8 +98,7 @@ pipeline {
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
 
-    // 'refs/changes/63/181863/8' -> '63.181863.8'
-    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
+    NAME = getImageTagVersion()
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
     CACHE_TAG = "canvas-lms:previous-image"
@@ -120,19 +120,20 @@ pipeline {
       steps {
         timeout(time: 3) {
           script {
-            fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
+            def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+            credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
             println "Plugin list: ${gems}"
             /* fetch plugins */
             gems.each { gem ->
               if (env.GERRIT_PROJECT == gem) {
                 /* this is the commit we're testing */
-                fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
+                credentials.fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
               } else {
-                fetchFromGerrit(gem, 'gems/plugins')
+                credentials.fetchFromGerrit(gem, 'gems/plugins')
               }
             }
-            fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
+            credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             sh '''
               mv gerrit_builder/canvas-lms/config/* config/
               mv config/knapsack_rspec_report.json ./
@@ -155,7 +156,8 @@ pipeline {
       steps {
         timeout(time: 2) {
           script {
-            withGerritCredentials({ ->
+            def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+            credentials.withGerritCredentials({ ->
               sh '''
                 GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
                   git fetch origin $GERRIT_BRANCH
@@ -188,7 +190,7 @@ pipeline {
 
     stage('Build Image') {
       steps {
-        skipIfPreviouslySuccessful("build-and-push-image", save = false) {
+        runBuildImageMaybe(false) {
           timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
             dockerCacheLoad(image: "$CACHE_TAG")
             sh '''
@@ -202,7 +204,7 @@ pipeline {
 
     stage('Publish Patchset Image') {
       steps {
-        skipIfPreviouslySuccessful("build-and-push-image") {
+        runBuildImageMaybe(true) {
           timeout(time: 5) {
             // always push the patchset tag otherwise when a later
             // patchset is merged this patchset tag is overwritten
