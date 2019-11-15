@@ -653,7 +653,7 @@ class Course < ActiveRecord::Base
 
   def associated_accounts
     Rails.cache.fetch_with_batched_keys("associated_accounts", batch_object: self, batched_keys: :account_associations) do
-      Shackles.activate(:slave) do
+      Shackles.activate(:master) do
         if association(:course_account_associations).loaded? && !association(:non_unique_associated_accounts).loaded?
           accounts = course_account_associations.map(&:account).uniq
         else
