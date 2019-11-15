@@ -679,6 +679,15 @@ Returns the primary email of the launching user.
 ```
 "john.doe@example.com"
 ```
+## com.instructure.Person.pronouns
+Returns pronouns for the current user.
+
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *com_instructure_person_pronouns*  
+
+```
+"She/Her"
+```
 ## vnd.Canvas.Person.email.sis
 Returns the institution assigned email of the launching user.
 

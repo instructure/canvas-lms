@@ -729,6 +729,15 @@ module Lti
                        USER_GUARD,
                        default_name: 'lis_person_contact_email_primary'
 
+    # Returns pronouns for the current user
+    # @example
+    #   ```
+    #   "She/Her"
+    #   ```
+    register_expansion 'com.instructure.Person.pronouns', [],
+                       -> { @current_user.pronouns },
+                       USER_GUARD,
+                       default_name: 'com_instructure_person_pronouns'
 
     # Returns the institution assigned email of the launching user.
     # @example
