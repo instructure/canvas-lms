@@ -112,6 +112,10 @@ module RCENextPage
     fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')")
   end
 
+  def course_document_links
+    ff("[data-testid='instructure_links-Link']")
+  end
+
   def assignment_published_status
     # add selector
   end
