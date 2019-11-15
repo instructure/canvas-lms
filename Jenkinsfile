@@ -220,7 +220,6 @@ pipeline {
             skipIfPreviouslySuccessful("smoke-test") {
               timeout(time: 10) {
                 script {
-                  sh 'build/new-jenkins/docker-compose-pull.sh'
                   sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
                   def dbCommon = load 'build/new-jenkins/groovy/cache-migrations.groovy'
                   dbCommon.createMigrateBuildUpCached()
