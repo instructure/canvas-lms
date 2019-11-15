@@ -112,7 +112,7 @@ class StepItem extends Component {
    * @param a11yMessage The message to be read by the screen reader
    *                    when focus is on the rendered button
    */
-  renderButton(ButtonIcon, action, a11yMessage) {
+  renderButton(ButtonIcon, action, a11yMessage, id) {
     const icon = <ButtonIcon size="x-small" />
     return (
       <div>
@@ -124,7 +124,7 @@ class StepItem extends Component {
             }
           }}
         >
-          <Button variant="icon" icon={icon} size="small" onClick={action}>
+          <Button id={id} variant="icon" icon={icon} size="small" onClick={action}>
             <ScreenReaderContent>{a11yMessage} </ScreenReaderContent>
           </Button>
         </ApplyTheme>
@@ -142,19 +142,22 @@ class StepItem extends Component {
           return this.renderButton(
             IconArrowOpenStartSolid,
             context.prevButtonAction,
-            I18n.t('View Previous Submission')
+            I18n.t('View Previous Submission'),
+            'view-previous-attempt-button'
           )
         case stepLabels.next:
           return this.renderButton(
             IconArrowOpenEndSolid,
             context.nextButtonAction,
-            I18n.t('View Next Submission')
+            I18n.t('View Next Submission'),
+            'view-next-attempt-button'
           )
         case stepLabels.newAttempt:
           return this.renderButton(
             IconPlusSolid,
             context.startNewAttemptAction,
-            I18n.t('Create New Attempt')
+            I18n.t('Create New Attempt'),
+            'create-new-attempt-button'
           )
         default:
           return null
