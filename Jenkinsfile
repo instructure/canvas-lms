@@ -273,6 +273,19 @@ pipeline {
           }
         }
 
+        stage('Rspec') {
+          steps {
+            skipIfPreviouslySuccessful("rspec") {
+              // propagate set to false until we can get tests passing
+              build(
+                propagate: false,
+                job: 'test-suites/rspec',
+                parameters: build_parameters
+              )
+            }
+          }
+        }
+
         // keep this around in case there is changes to the subbuilds that need to happen
         // and you have no other way to test it except by running a test build.
         // stage('Test Subbuild') {
@@ -289,18 +302,6 @@ pipeline {
  *  Don't run these on all patch sets until we have them ready to report results.
  *  Uncomment stage to run when developing.
  *
- *       stage('Rspec') {
- *         steps {
- *           skipIfPreviouslySuccessful("rspec") {
- *             // propagate set to false until we can get tests passing
- *             build(
- *               job: 'test-suites/rspec',
- *               propagate: false,
- *               parameters: build_parameters
- *             )
- *           }
- *         }
- *       }
  *
  *       stage('Xbrowser') {
  *         steps {

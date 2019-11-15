@@ -9,5 +9,4 @@
 --format ErrorContext::StderrFormatter
 --tty
 --color
---profile 50
 --require './spec/spec_helper.rb'

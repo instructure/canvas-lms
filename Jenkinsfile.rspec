@@ -45,14 +45,14 @@ pipeline {
           def nodes = [:];
           for(int i = 0; i < ci_node_total; i++) {
             def index = i;
-            nodes["rspec set ${(i+1).toString().padLeft(2, '0')}"] = {
+            nodes["rspec set ${(i).toString().padLeft(2, '0')}"] = {
               withEnv(["CI_NODE_INDEX=$index", "CI_NODE_TOTAL=$ci_node_total"]) {
                 node('canvas-docker') {
                   stage("Running RSpec Set ${index}") {
                     try {
                       sh 'rm -rf ./tmp/spec_failures'
-                      sh 'build/new-jenkins/docker-cleanup.sh'
                       checkout scm
+                      sh 'build/new-jenkins/docker-cleanup.sh'
                       timeout(time: 60) {
                         sh 'printenv | sort'
                         sh 'build/new-jenkins/docker-compose-pull.sh'
