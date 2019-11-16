@@ -65,9 +65,6 @@ module Api::V1::User
                       :integration_id => pseudonym&.integration_id
         end
 
-        if user.pronouns
-          json[:pronouns] = user.pronouns
-        end
 
         if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
           json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
@@ -77,6 +74,10 @@ module Api::V1::User
             json[:login_id] = pseudonym.unique_id
           end
         end
+      end
+
+      if user.pronouns
+        json[:pronouns] = user.pronouns
       end
 
       if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
