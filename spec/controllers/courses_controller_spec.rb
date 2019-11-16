@@ -2749,6 +2749,12 @@ describe CoursesController do
       course_with_student_logged_in
       get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
       expect(response).to be_unauthorized
+
+      course_with_designer(name: 'course designer', course: @course)
+      user_session(@designer)
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
+      json = json_parse(response.body)
+      expect(json[0]).to include({'name' => 'search teacher'})
     end
 
     it 'requires the feature be enabled' do
@@ -2757,7 +2763,7 @@ describe CoursesController do
       expect(response).to be_forbidden
     end
 
-    it 'should return email, url avatar, and name' do
+    it 'should return email, url avatar (if avatars are enabled), and name' do
       user_session(@teacher)
       @search_context = @course
       course_with_teacher(name: 'course teacher')
@@ -2765,6 +2771,26 @@ describe CoursesController do
       get 'content_share_users', params: {course_id: @search_context.id, search_term: 'course'}
       json = json_parse(response.body)
       expect(json[0]).to include({'email' => nil, 'name' => 'course teacher', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+    end
+
+    it 'should search by name and email' do
+      user_session(@teacher)
+      @teacher.account.enable_service(:avatars)
+      user_model(name: "course teacher")
+      communication_channel_model(user: @user, path: 'course_teacher@test.edu')
+      course_with_teacher(user: @user, course: @course)
+
+      user_model(name: "course designer")
+      communication_channel_model(user: @user, path: 'course_designer@test.edu')
+      course_with_teacher(user: @user, course: @course)
+
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'course teacher'}
+      json = json_parse(response.body)
+      expect(json[0]).to include({'email' => 'course_teacher@test.edu', 'name' => 'course teacher', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'course_designer@test.edu'}
+      json = json_parse(response.body)
+      expect(json[0]).to include({'email' => 'course_designer@test.edu', 'name' => 'course designer', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
     end
 
     it 'searches for teachers, TAs, and designers' do

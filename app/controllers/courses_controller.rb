@@ -1101,29 +1101,40 @@ class CoursesController < ApplicationController
     reject!('Search term required') unless params[:search_term]
     return unless authorized_action(@context, @current_user, :manage_content)
 
-    users_scope = User.where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(params[:search_term])).
-      where.not(id: @current_user.id).active.distinct
-    admin_users_scope = users_scope.joins(account_users: [:account, :role]).merge(AccountUser.active).merge(Account.active)
-
-    union_scope = users_scope.joins(enrollments: :course).merge(Enrollment.active.of_admin_type).merge(Course.active).
+    users_scope = User.where.not(id: @current_user.id).active.distinct
+    union_scope = teacher_scope(name_scope(users_scope)).
       union(
-        root_account_scope(admin_users_scope.merge(Role.full_account_admin), @context.root_account_id),
-        root_account_scope(admin_users_scope.merge(Role.custom_account_admin_with_permission('manage_content')), @context.root_account_id),
-        sub_account_scope(admin_users_scope.merge(Role.full_account_admin), @context.root_account_id),
-        sub_account_scope(admin_users_scope.merge(Role.custom_account_admin_with_permission('manage_content')), @context.root_account_id)
+        teacher_scope(email_scope(users_scope)),
+        admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
+        admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
+        admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission('manage_content')),
+        admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission('manage_content'))
       ).
       order(:name).
       distinct
     users = Api.paginate(union_scope, self, api_v1_course_content_share_users_url)
-    render :json => users_json(users, @current_user, session, ['avatar_url', 'email'])
+    render :json => users_json(users, @current_user, session, ['avatar_url', 'email'], @context, nil, ['pseudonym'])
   end
 
-  def root_account_scope(scope, root_account_id)
-    scope.where(account_users: {account_id: root_account_id})
+  def admin_scope(scope, root_account_id)
+    scope.joins(account_users: [:account, :role]).
+      merge(AccountUser.active).
+      merge(Account.active).
+      where("accounts.id = ? OR accounts.root_account_id = ?", root_account_id, root_account_id)
   end
 
-  def sub_account_scope(scope, root_account_id)
-    scope.where(account_users: {accounts: {root_account_id: root_account_id}})
+  def teacher_scope(scope)
+    scope.joins(enrollments: :course).merge(Enrollment.active.of_admin_type).merge(Course.active)
+  end
+
+  def name_scope(scope)
+    scope.where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(params[:search_term]))
+  end
+
+  def email_scope(scope)
+    scope.joins(:communication_channels).
+      where(communication_channels: {workflow_state: ['active', 'unconfirmed'], path_type: 'email'}).
+      where(UserSearch.like_condition('communication_channels.path'), pattern: UserSearch.like_string_for(params[:search_term]))
   end
 
   include Api::V1::PreviewHtml
