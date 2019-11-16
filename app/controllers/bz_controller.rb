@@ -1048,123 +1048,132 @@ class BzController < ApplicationController
       @course_ids.each do |course_id|
 
         Course.find(course_id).students.active.eager_load(:user_services).each do |u|
-          item = {}
-          item["braven-id"] = u.id
+          begin
+            item = {}
+            item["braven-id"] = u.id
   
-          u.user_services.each do |service|
-            if service.service == "linked_in"
-              Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
+            u.user_services.each do |service|
+              if service.service == "linked_in"
+                Rails.logger.debug("### Found registered LinkedIn service for #{u.name}: #{service.service_user_link}")
 
                 # TODO: ideally, we would have an initial export. Then every subsequent export would do a batch request of last madified
                 # and only return the ones that have been modified.
   
-              # See: https://developer.linkedin.com/docs/fields/full-profile
-              request = connection.get_request("/v2/me", service.token)
-              info = JSON.parse(request.body)
-              
-              # See: https://developer.linkedin.com/docs/guide/v2/error-handling
-              # Note: we're also checking for "errorCode" b/c we ran into issues in the past with V1 internal errors that returned this, so just to be safe.
-              if info["status"].blank? && info["errorCode"].blank?
-                Rails.logger.warn "### LinkedIn API response for #{u.name} - #{u.email} had more pages of data which we didn't process. Incomplete data was exported." unless info["paging"].blank?  
-                #Rails.logger.debug("### info = #{info.inspect}")
-                result = LinkedinExport.where(:user_id => u.id)
-                linkedin_data = nil
-                if result.empty?
-                  linkedin_data = LinkedinExport.new()
-                  linkedin_data.user_id = u.id
-                else
-                  linkedin_data = result.first
-                end
+                # See: https://developer.linkedin.com/docs/fields/full-profile
+                request = connection.get_request("/v2/me", service.token)
+                info = JSON.parse(request.body)
+                
+                # See: https://developer.linkedin.com/docs/guide/v2/error-handling
+                # Note: we're also checking for "errorCode" b/c we ran into issues in the past with V1 internal errors that returned this, so just to be safe.
+                if info["status"].blank? && info["errorCode"].blank?
+                  Rails.logger.warn "### LinkedIn API response for #{u.name} - #{u.email} had more pages of data which we didn't process. Incomplete data was exported." unless info["paging"].blank?  
+                  #Rails.logger.debug("### info = #{info.inspect}")
+                  result = LinkedinExport.where(:user_id => u.id)
+                  linkedin_data = nil
+                  if result.empty?
+                    linkedin_data = LinkedinExport.new()
+                    linkedin_data.user_id = u.id
+                  else
+                    linkedin_data = result.first
+                  end
   
-                linkedin_data.linkedin_id = item["id"] = info["id"]
-                linkedin_data.first_name = item["first-name"] = info["localizedFirstName"]
-                linkedin_data.last_name = item["last-name"] = info["localizedLastName"]
-                linkedin_data.maiden_name = item["maiden-name"] = info["localizedMaidenName"]
-                # no longer available
-                # linkedin_data.email_address = item["email-address"] = info["emailAddress"]
-                linkedin_data.location = item["location"] = info["location"]["postalCode"] unless info["location"].nil?
-                linkedin_data.industry = item["industry"] = info["industryName"]["localized"]["en_US"] unless info["industryName"].nil?
+                  linkedin_data.linkedin_id = item["id"] = info["id"]
+                  linkedin_data.first_name = item["first-name"] = info["localizedFirstName"]
+                  linkedin_data.last_name = item["last-name"] = info["localizedLastName"]
+                  linkedin_data.maiden_name = item["maiden-name"] = info["localizedMaidenName"]
+                  # no longer available
+                  # linkedin_data.email_address = item["email-address"] = info["emailAddress"]
+                  linkedin_data.location = item["location"] = info["location"]["postalCode"] unless info["location"].nil?
+                  linkedin_data.industry = item["industry"] = info["industryName"]["localized"]["en_US"] unless info["industryName"].nil?
  
-                # We want to go by reverse order b/c the key is the linkedIn ID of the position in the list
-                # and we assume newer ones will have a larger ID (aka created most recently)
-                if info["positions"]
-                  currentPositionProcessed = false
-                  item["three-current-positions"] = []
-                  item["three-past-positions"] = []
-                  info["positions"].sort.reverse.map { |i,p| 
+                  # We want to go by reverse order b/c the key is the linkedIn ID of the position in the list
+                  # and we assume newer ones will have a larger ID (aka created most recently)
+                  if info["positions"]
+                    currentPositionProcessed = false
+                    item["three-current-positions"] = []
+                    item["three-past-positions"] = []
+                    info["positions"].sort.reverse.map { |i,p| 
 
-                    # The first position (aka job) we come across with no end data (aka to Present), set to be their current one
-                    if p["endMonthYear"].nil? # Current position
-                      unless currentPositionProcessed
-                        item["job-title"] = p["title"]["localized"]["en_US"]
-                        # TODO: this is the fail: https://sentry.io/organizations/braven-0v/issues/1323425242/?project=1728734&query=is%3Aunresolved
-                        item["current-employer"] = p["companyName"]["localized"]["en_US"]
-                        currentPositionProcessed = true
+                      # The first position (aka job) we come across with no end data (aka to Present), set to be their current one
+                      if p["endMonthYear"].nil? # Current position
+                        unless currentPositionProcessed
+                          item["job-title"] = p["title"]["localized"]["en_US"]
+                          # TODO: this is the fail: https://sentry.io/organizations/braven-0v/issues/1323425242/?project=1728734&query=is%3Aunresolved
+                          item["current-employer"] = p["companyName"]["localized"]["en_US"]
+                          currentPositionProcessed = true
+                        end
+
+                        item["three-current-positions"] << p
+
+                      else # Previous position
+
+                        item["three-past-positions"] << p
+
                       end
+                    }
+                    
+                    linkedin_data.job_title = item["job-title"]
+                    linkedin_data.current_employer = item["current-employer"]
+                    linkedin_data.three_current_positions = item["three-current-positions"]
+                    linkedin_data.three_past_positions = item["three-past-positions"]
+                  end
 
-                      item["three-current-positions"] << p
-
-                    else # Previous position
-
-                      item["three-past-positions"] << p
-
-                    end
-                  }
-                  
-                  linkedin_data.job_title = item["job-title"]
-                  linkedin_data.current_employer = item["current-employer"]
-                  linkedin_data.three_current_positions = item["three-current-positions"]
-                  linkedin_data.three_past_positions = item["three-past-positions"]
-                end
-
-                linkedin_data.num_connections = item["num-connections"] = nil # removed in V2
-                linkedin_data.num_connections_capped = item["num-connections-capped"] = nil # removed in V2
-                linkedin_data.summary = item["summary"] = info["headline"]["localized"]["en_US"] unless info["headline"].nil?
-                linkedin_data.specialties = item["specialties"] = nil # removed in V2
-                linkedin_data.public_profile_url = item["public-profile-url"] = "http://www.linkedin.com/in/#{info["vanityName"]}"
-                # TODO: the default timestamp format of the Time object is something like: 2016-07-12 14:26:15 +0000
-                # which corresponds to 07/12/2016 2:26pm UTC
-                # if we want to format the timestamp differently, use the strftime() method on the Time object
-                linkedin_data.last_modified_timestamp = item["last-modified-timestamp"] = Time.at(info["lastModified"].to_f / 1000)
-                linkedin_data.associations = item["associations"] = nil # remove in V2
+                  linkedin_data.num_connections = item["num-connections"] = nil # removed in V2
+                  linkedin_data.num_connections_capped = item["num-connections-capped"] = nil # removed in V2
+                  linkedin_data.summary = item["summary"] = info["headline"]["localized"]["en_US"] unless info["headline"].nil?
+                  linkedin_data.specialties = item["specialties"] = nil # removed in V2
+                  linkedin_data.public_profile_url = item["public-profile-url"] = "http://www.linkedin.com/in/#{info["vanityName"]}"
+                  # TODO: the default timestamp format of the Time object is something like: 2016-07-12 14:26:15 +0000
+                  # which corresponds to 07/12/2016 2:26pm UTC
+                  # if we want to format the timestamp differently, use the strftime() method on the Time object
+                  linkedin_data.last_modified_timestamp = item["last-modified-timestamp"] = Time.at(info["lastModified"].to_f / 1000)
+                  linkedin_data.associations = item["associations"] = nil # remove in V2
   
-                linkedin_data.interests = item["interests"] = nil # removed in v2
-                linkedin_data.publications = item["publications"] = info["publications"]
-                linkedin_data.patents = item["patents"] = info["patents"]
-                linkedin_data.languages = item["languages"] = info["languages"]
-                linkedin_data.skills = item["skills"] = info["skills"]
-                linkedin_data.certifications = item["certifications"] = info["certifications"]
-                linkedin_data.educations = item["educations"] = info["educations"]
-                linkedin_data.courses = item["courses"] = info["courses"]
-                linkedin_data.volunteer = item["volunteer"] = info["volunteeringExperiences"]
-                # note there is also volunteeringInterests which gives a list of causes we might find interesting
+                  linkedin_data.interests = item["interests"] = nil # removed in v2
+                  linkedin_data.publications = item["publications"] = info["publications"]
+                  linkedin_data.patents = item["patents"] = info["patents"]
+                  linkedin_data.languages = item["languages"] = info["languages"]
+                  linkedin_data.skills = item["skills"] = info["skills"]
+                  linkedin_data.certifications = item["certifications"] = info["certifications"]
+                  linkedin_data.educations = item["educations"] = info["educations"]
+                  linkedin_data.courses = item["courses"] = info["courses"]
+                  linkedin_data.volunteer = item["volunteer"] = info["volunteeringExperiences"]
+                  # note there is also volunteeringInterests which gives a list of causes we might find interesting
   
-                linkedin_data.most_recent_school = item["most-recent-school"] = get_most_recent_school(info["educations"])
-                linkedin_data.graduation_year = item["graduation-year"] = get_graduation_year(info["educations"])
-                linkedin_data.major = item["major"] = get_major(info["educations"])  
+                  # TODO: this can be wrong (and grad year and major too) if there is not date on the schools
+                  # In that case, we should choose the most recently added school.
+                  # See: https://app.asana.com/0/1133543009734854/1149776609697206
+                  linkedin_data.most_recent_school = item["most-recent-school"] = get_most_recent_school(info["educations"])
+                  linkedin_data.graduation_year = item["graduation-year"] = get_graduation_year(info["educations"])
+                  linkedin_data.major = item["major"] = get_major(info["educations"])  
  
-                linkedin_data.num_recommenders = item["num-recommenders"] = nil # removed in V2
-                linkedin_data.recommendations_received = item["recommendations-received"] = nil # removed in V2
-                linkedin_data.following = item["following"] = nil # removed in V2
-                linkedin_data.job_bookmarks = item["job-bookmarks"] = nil # removed in V2
+                  linkedin_data.num_recommenders = item["num-recommenders"] = nil # removed in V2
+                  linkedin_data.recommendations_received = item["recommendations-received"] = nil # removed in V2
+                  linkedin_data.following = item["following"] = nil # removed in V2
+                  linkedin_data.job_bookmarks = item["job-bookmarks"] = nil # removed in V2
   
-                linkedin_data.honors_awards = item["honors-awards"] = info["honors"]
+                  linkedin_data.honors_awards = item["honors-awards"] = info["honors"]
   
-                items.push(item)
-                linkedin_data.save
+                  items.push(item)
+                  linkedin_data.save
+                else
+                   # Example response: {"serviceErrorCode"=>65600, "message"=>"Invalid access token", "status"=>401}
+                   Rails.logger.error("### Error exporting LinkedIn Data for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
+                  # TODO: we should unregister the user for certain errors, like invalid access token (see above example).
+                  # I reproduced this by registering a second account with the same LinkedIn account.  It invalidated the first token.
+                  # Note: we should do it in a way where we have the data in a way to be able to create a report and share out
+                  # with regions to do outreach to re-authorize / fix.
+                end
               else
-                 # Example response: {"serviceErrorCode"=>65600, "message"=>"Invalid access token", "status"=>401}
-                 Rails.logger.error("### Error exporting LinkedIn Data for user = #{u.name} - #{u.email}.  Details: #{info.inspect}")
-                # TODO: we should unregister the user for certain errors, like invalid access token (see above example).
-                # I reproduced this by registering a second account with the same LinkedIn account.  It invalidated the first token.
-                # Note: we should do it in a way where we have the data in a way to be able to create a report and share out
-                # with regions to do outreach to re-authorize / fix.
+                Rails.logger.debug("### LinkedIn service not registered for #{u.name} - #{u.email}")
               end
-            else
-              Rails.logger.debug("### LinkedIn service not registered for #{u.name} - #{u.email}")
             end
+          rescue => e
+            Rails.logger.error("Error: LinkedIn export failed for user = #{u.name} - #{u.email}. Skipping.") 
+            Canvas::Errors.capture_exception("BzController::ExportLinkedIn", e)[:error_report]
+            raise # We should find and fix any issues with the export rather than having an incomplete export.
           end
-        end
+        end # each user
       end # each course
   
       csv_result = CSV.generate do |csv|
