@@ -1140,12 +1140,13 @@ class BzController < ApplicationController
                   linkedin_data.volunteer = item["volunteer"] = info["volunteeringExperiences"]
                   # note there is also volunteeringInterests which gives a list of causes we might find interesting
   
-                  # TODO: this can be wrong (and grad year and major too) if there is not date on the schools
-                  # In that case, we should choose the most recently added school.
-                  # See: https://app.asana.com/0/1133543009734854/1149776609697206
-                  linkedin_data.most_recent_school = item["most-recent-school"] = get_most_recent_school(info["educations"])
-                  linkedin_data.graduation_year = item["graduation-year"] = get_graduation_year(info["educations"])
-                  linkedin_data.major = item["major"] = get_major(info["educations"])  
+                  # Note that schools may or may not have dates associated with them, but the one that shows at the top in LinkedIn should be the most recent
+                  # Also, it's intentional to leave grad year blank if the recent school doesn't have a grad date instead of going back in time
+                  # to one that does. We want to know when they did or are going to graduate from their current school, not when they graduated from say, high school.
+                  most_recent_school_item = info["educations"].first[1] unless info["educations"].blank?
+                  linkedin_data.most_recent_school = item["most-recent-school"] = most_recent_school_item["schoolName"]["localized"]["en_US"]
+                  linkedin_data.graduation_year = item["graduation-year"] = most_recent_school_item["endMonthYear"]["year"] unless most_recent_school_item["endMonthYear"].nil?
+                  linkedin_data.major = item["major"] = most_recent_school_item["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"]
  
                   linkedin_data.num_recommenders = item["num-recommenders"] = nil # removed in V2
                   linkedin_data.recommendations_received = item["recommendations-received"] = nil # removed in V2
@@ -1257,51 +1258,6 @@ class BzController < ApplicationController
         end
       end 
       csv_result
-    end
-
-    def get_most_recent_school(educationsNode)
-      most_recent = get_most_recent_school_node(educationsNode)
-      begin
-        return most_recent["schoolName"]["localized"]["en_US"]
-      rescue
-        return nil
-      end
-    end
-
-    def get_most_recent_school_node(educationsNode)
-      most_recent = nil
-      return nil if educationsNode.nil?
-      educationsNode.each do |k, v|
-        next if v["startMonthYear"].nil?
-        if most_recent.nil? || v["startMonthYear"]["year"] > most_recent["startMonthYear"]["year"] || (v["startMonthYear"]["year"] == most_recent["startMonthYear"]["year"] && v["startMonthYear"]["month"] && most_recent["startMonthYear"]["month"] && v["startMonthYear"]["month"] > most_recent["startMonthYear"]["month"])
-          most_recent = v
-        end
-      end
-      return most_recent
-    end
-
-    def get_graduation_year(educationsNode)
-      return nil if educationsNode.nil?
-      node = get_most_recent_school_node(educationsNode)
-      if node.nil? || node["endMonthYear"].nil?
-        return nil
-      else
-        return node["endMonthYear"]["year"]
-      end
-    end
-
-    def get_major(educationsNode)
-      return nil if educationsNode.nil?
-      node = get_most_recent_school_node(educationsNode)
-      if node.nil?
-        return nil
-      end
-
-      begin
-        return node["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"]
-      rescue
-        return nil
-      end
     end
 
   end
