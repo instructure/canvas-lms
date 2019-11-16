@@ -1097,9 +1097,8 @@ class BzController < ApplicationController
                       # The first position (aka job) we come across with no end data (aka to Present), set to be their current one
                       if p["endMonthYear"].nil? # Current position
                         unless currentPositionProcessed
-                          item["job-title"] = p["title"]["localized"]["en_US"]
-                          # TODO: this is the fail: https://sentry.io/organizations/braven-0v/issues/1323425242/?project=1728734&query=is%3Aunresolved
-                          item["current-employer"] = p["companyName"]["localized"]["en_US"]
+                          item["job-title"] = p["title"]["localized"]["en_US"] unless p["title"].nil?
+                          item["current-employer"] = p["companyName"]["localized"]["en_US"] unless p["companyName"].nil?
                           currentPositionProcessed = true
                         end
 
@@ -1122,7 +1121,7 @@ class BzController < ApplicationController
                   linkedin_data.num_connections_capped = item["num-connections-capped"] = nil # removed in V2
                   linkedin_data.summary = item["summary"] = info["headline"]["localized"]["en_US"] unless info["headline"].nil?
                   linkedin_data.specialties = item["specialties"] = nil # removed in V2
-                  linkedin_data.public_profile_url = item["public-profile-url"] = "http://www.linkedin.com/in/#{info["vanityName"]}"
+                  linkedin_data.public_profile_url = item["public-profile-url"] = "https://www.linkedin.com/in/#{info["vanityName"]}"
                   # TODO: the default timestamp format of the Time object is something like: 2016-07-12 14:26:15 +0000
                   # which corresponds to 07/12/2016 2:26pm UTC
                   # if we want to format the timestamp differently, use the strftime() method on the Time object
@@ -1144,9 +1143,9 @@ class BzController < ApplicationController
                   # Also, it's intentional to leave grad year blank if the recent school doesn't have a grad date instead of going back in time
                   # to one that does. We want to know when they did or are going to graduate from their current school, not when they graduated from say, high school.
                   most_recent_school_item = info["educations"].first[1] unless info["educations"].blank?
-                  linkedin_data.most_recent_school = item["most-recent-school"] = most_recent_school_item["schoolName"]["localized"]["en_US"]
+                  linkedin_data.most_recent_school = item["most-recent-school"] = most_recent_school_item["schoolName"]["localized"]["en_US"] unless most_recent_school_item["schoolName"].nil?
                   linkedin_data.graduation_year = item["graduation-year"] = most_recent_school_item["endMonthYear"]["year"] unless most_recent_school_item["endMonthYear"].nil?
-                  linkedin_data.major = item["major"] = most_recent_school_item["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"]
+                  linkedin_data.major = item["major"] = most_recent_school_item["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"] unless most_recent_school_item["fieldsOfStudy"].blank?
  
                   linkedin_data.num_recommenders = item["num-recommenders"] = nil # removed in V2
                   linkedin_data.recommendations_received = item["recommendations-received"] = nil # removed in V2
