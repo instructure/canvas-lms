@@ -402,6 +402,7 @@ class ProfileController < ApplicationController
     @context = @profile
 
     short_name = params[:user] && params[:user][:short_name]
+    @user.pronouns = params[:pronouns] if params[:pronouns]
     @user.short_name = short_name if short_name && @user.user_can_edit_name?
     if params[:user_profile]
       user_profile_params = params[:user_profile].permit(:title, :bio)

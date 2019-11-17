@@ -42,10 +42,15 @@
 
     <div class="profileContent__Block">
       <% if @user_data[:can_edit_name] %>
-        <h2 class="hide-if-editing"><%= @user_data[:short_name] %></h2>
+        <h2 class="hide-if-editing"><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
         <label class="show-if-editing ic-Label"><%= t('name', 'Name') %>:
           <input aria-label="<%= t 'Name' %>" id="name_input" class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required>
         </label>
+        <%# even if @domain_root_account.settings[:can_add_pronouns] is false, we still want to let someone that has pronouns set to see this so they can unset them  %>
+        <% if @user.pronouns || @domain_root_account.settings[:can_add_pronouns] %>
+          <label for="pronouns"class="show-if-editing ic-Label"><%= t('Pronouns') %>:</label>
+          <%= select_tag :pronouns, options_for_select([[t("None"), '']] + @domain_root_account.pronouns, @user.pronouns), class:"show-if-editing" %>
+        <% end %>
         <p class="profileDetails">
           <span class="hide-if-editing"><%= @user_data[:title] %></span>
           <label class="show-if-editing ic-Label"><%= t('title', 'Title') %>:
@@ -53,7 +58,7 @@
           </label>
         </p>
       <% else %>
-        <h2><%= @user_data[:short_name] %></h2>
+        <h2><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
         <p><%= @user_data[:title] %></p>
       <% end %>
 
