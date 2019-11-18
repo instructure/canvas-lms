@@ -29,6 +29,7 @@ export default class GroupCategorySelector extends Backbone.View
 
   template: template
 
+  GROUP_CATEGORY = '#assignment_group_category'
   GROUP_CATEGORY_ID = '#assignment_group_category_id'
   CREATE_GROUP_CATEGORY_ID = '#create_group_category_id'
   HAS_GROUP_CATEGORY = '#has_group_category'
@@ -36,6 +37,7 @@ export default class GroupCategorySelector extends Backbone.View
 
   els: do ->
     els = {}
+    els["#{GROUP_CATEGORY}"] = '$groupCategory'
     els["#{GROUP_CATEGORY_ID}"] = '$groupCategoryID'
     els["#{HAS_GROUP_CATEGORY}"] = '$hasGroupCategory'
     els["#{GROUP_CATEGORY_OPTIONS}"] = '$groupCategoryOptions'
@@ -66,11 +68,11 @@ export default class GroupCategorySelector extends Backbone.View
     if _.isEmpty(@groupCategories)
       StudentGroupStore.setSelectedGroupSet(null)
     else if !selectedID? or !_.findWhere(@groupCategories, {id: selectedID.toString()})?
-      StudentGroupStore.setSelectedGroupSet('blank')
+      StudentGroupStore.setSelectedGroupSet(null)
     else
       StudentGroupStore.setSelectedGroupSet(selectedID)
     super
-    @$groupCategoryID.toggleAccessibly !_.isEmpty(@groupCategories)
+    @$groupCategory.toggleAccessibly !_.isEmpty(@groupCategories)
 
   groupCategorySelected: =>
     newSelectedId = @$groupCategoryID.val()
@@ -83,10 +85,11 @@ export default class GroupCategorySelector extends Backbone.View
       $newCategory = $('<option>')
       $newCategory.val(group.id)
       $newCategory.text(group.name)
-      @$groupCategoryID.prepend $newCategory
+      $newCategory.prop('selected', true)
+      @$groupCategoryID.append $newCategory
       @$groupCategoryID.val(group.id)
       @groupCategories.push(group)
-      @$groupCategoryID.toggleAccessibly true
+      @$groupCategory.toggleAccessibly true
     view.open()
 
   groupDiscussionChecked: =>
@@ -114,12 +117,16 @@ export default class GroupCategorySelector extends Backbone.View
     groupCategoryFrozen = _.includes frozenAttributes, 'group_category_id'
     groupCategoryLocked = !@parentModel.canGroup()
 
+    isGroupAssignment: @parentModel.groupCategoryId() && @parentModel.groupCategoryId() != 'blank'
     groupCategoryId: @parentModel.groupCategoryId()
     groupCategories: @groupCategories
-    originalGroupRemoved: !_.chain(@groupCategories)
+    groupCategoryUnselected: !@parentModel.groupCategoryId() ||
+                              @parentModel.groupCategoryId() == 'blank' ||
+                            !_.chain(@groupCategories)
                             .pluck('id')
                             .contains(@parentModel.groupCategoryId())
                             .value() && !_.isEmpty(@groupCategories)
+
     hideGradeIndividually: @hideGradeIndividually
     gradeGroupStudentsIndividually: !@hideGradeIndividually && @parentModel.gradeGroupStudentsIndividually()
     groupCategoryLocked: groupCategoryLocked
@@ -160,7 +167,8 @@ export default class GroupCategorySelector extends Backbone.View
       data.assignment.groupCategoryId()
     else
       data.group_category_id
-    if gcid == 'blank'
+
+    if gcid == "blank"
       if _.isEmpty(@groupCategories)
         errors["newGroupCategory"] = [
           message: I18n.t 'Please create a group set'
