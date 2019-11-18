@@ -46,7 +46,7 @@ ReceivedTable.propTypes = {
   onUpdate: func
 }
 
-export default function ReceivedTable({shares, onPreview, onImport, onUpdate, onRemove}) {
+export default function ReceivedTable({shares, onPreview, onImport, onRemove, onUpdate}) {
   function renderActionMenu(share) {
     return (
       <Menu

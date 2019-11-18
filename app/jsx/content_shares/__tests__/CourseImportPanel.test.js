@@ -87,6 +87,7 @@ describe('CourseImportPanel', () => {
 
   it('starts an import operation and reports status', async () => {
     const share = mockShare()
+    const onImport = jest.fn()
     fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', {
       id: '8',
       workflow_state: 'running'
@@ -95,7 +96,7 @@ describe('CourseImportPanel', () => {
       success([{id: '1', name: 'Module 1'}, {id: '2', name: 'Module 2'}])
     })
     const {getByText, getByLabelText, queryByText} = render(
-      <CourseImportPanel contentShare={share} />
+      <CourseImportPanel contentShare={share} onImport={onImport} />
     )
     fireEvent.click(getByLabelText(/select a course/i))
     fireEvent.click(getByText('abc'))
@@ -115,6 +116,9 @@ describe('CourseImportPanel', () => {
     expect(getByText(/success/)).toBeInTheDocument()
     expect(queryByText('Import')).toBeNull()
     expect(getByText('Close')).toBeInTheDocument()
+
+    expect(onImport).toHaveBeenCalledTimes(1)
+    expect(onImport.mock.calls[0][0]).toBe(share)
   })
 
   describe('errors', () => {
@@ -129,8 +133,10 @@ describe('CourseImportPanel', () => {
     it('reports an error if the fetch fails', async () => {
       fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
       fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+      const share = mockShare()
+      const onImport = jest.fn()
       const {getByText, getByLabelText, queryByText} = render(
-        <CourseImportPanel contentShare={mockShare()} />
+        <CourseImportPanel contentShare={share} onImport={onImport} />
       )
       const input = getByLabelText(/select a course/i)
       fireEvent.click(input)
@@ -140,6 +146,8 @@ describe('CourseImportPanel', () => {
       expect(getByText(/problem/i)).toBeInTheDocument()
       expect(queryByText('Import')).toBeNull()
       expect(getByText('Close')).toBeInTheDocument()
+      expect(onImport).toHaveBeenCalledTimes(1)
+      expect(onImport.mock.calls[0][0]).toBe(share)
     })
   })
 })

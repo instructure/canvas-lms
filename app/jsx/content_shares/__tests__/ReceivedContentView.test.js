@@ -39,6 +39,8 @@ describe('view of received content', () => {
     if (liveRegion) liveRegion.remove()
   })
 
+  afterEach(fetchMock.restore)
+
   it('renders spinner while loading', () => {
     useFetchApi.mockImplementationOnce(({loading}) => loading(true))
     const {getByText} = render(<ReceivedContentView />)
@@ -114,6 +116,10 @@ describe('view of received content', () => {
 
   it('displays a preview modal when requested', () => {
     const shares = [assignmentShare]
+    fetchMock.put(`/api/v1/users/self/content_shares/${assignmentShare.id}`, {
+      status: 200,
+      body: JSON.stringify({read_state: 'read', id: unreadDiscussionShare.id})
+    })
     useFetchApi.mockImplementationOnce(({loading, success}) => {
       loading(false)
       success(shares)
@@ -150,8 +156,6 @@ describe('view of received content', () => {
       })
     })
 
-    afterEach(fetchMock.reset)
-
     it('makes an update API call', async () => {
       const {getByTestId} = render(<ReceivedContentView />)
       fireEvent.click(getByTestId('received-table-row-unread'))
@@ -176,7 +180,6 @@ describe('view of received content', () => {
 
     afterEach(() => {
       window.confirm = oldWindowConfirm
-      fetchMock.restore()
     })
 
     it('removes a content share when requested', async () => {

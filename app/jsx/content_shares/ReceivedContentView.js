@@ -69,9 +69,14 @@ export default function ReceivedContentView() {
       .catch(setError)
   }
 
+  function markRead(share) {
+    onUpdate(share.id, {read_state: 'read'})
+  }
+
   function onPreview(share) {
     setCurrentContentShare(share)
     setWhichModalOpen('preview')
+    markRead(share)
   }
 
   function onImport(share) {
@@ -154,7 +159,11 @@ export default function ReceivedContentView() {
         padding="0 1.5rem"
         onDismiss={closeModal}
       >
-        <CourseImportPanel contentShare={currentContentShare} onClose={closeModal} />
+        <CourseImportPanel
+          contentShare={currentContentShare}
+          onClose={closeModal}
+          onImport={markRead}
+        />
       </CanvasLazyTray>
     </>
   )
