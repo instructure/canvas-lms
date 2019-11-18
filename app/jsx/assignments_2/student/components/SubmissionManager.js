@@ -26,6 +26,7 @@ import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../shared/LoadingIndicator'
 import {Modal} from '@instructure/ui-overlays'
 import {Mutation} from 'react-apollo'
+import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import {Submission} from '../graphqlData/Submission'
@@ -34,6 +35,10 @@ import theme from '@instructure/canvas-theme'
 export default class SubmissionManager extends Component {
   static propTypes = {
     assignment: Assignment.shape,
+    focusElement: PropTypes.oneOfType([
+      PropTypes.func,
+      PropTypes.shape({current: PropTypes.instanceOf(Component)})
+    ]),
     submission: Submission.shape
   }
 
@@ -143,7 +148,11 @@ export default class SubmissionManager extends Component {
     if (this.state.submittingAssignment || this.state.activeSubmissionType === null) {
       return
     }
-    this.setState({submittingAssignment: true})
+    this.setState({submittingAssignment: true}, () => {
+      if (this.props.focusElement) {
+        this.props.focusElement.focus()
+      }
+    })
 
     switch (this.state.activeSubmissionType) {
       case 'media_recording':
