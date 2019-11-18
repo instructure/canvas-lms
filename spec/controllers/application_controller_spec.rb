@@ -1696,3 +1696,18 @@ RSpec.describe ApplicationController, '#redirect_to_login' do
     end
   end
 end
+
+RSpec.describe ApplicationController, '#teardown_live_events_context' do
+  controller do
+    def index
+    end
+  end
+
+  it 'sets the context to nil after request' do
+    Thread.current[:context] = "something"
+
+    get :index, format: :html
+
+    expect(Thread.current[:context]).to be_nil
+  end
+end
