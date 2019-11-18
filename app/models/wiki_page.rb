@@ -110,15 +110,14 @@ class WikiPage < ActiveRecord::Base
       baddies = self.context.wiki_pages.not_deleted.where(title: "Front Page").select{|p| p.url != "front-page" }
       baddies.each{|p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
     end
-    if existing = self.context.wiki_pages.not_deleted.where(title: self.title).first
-      return if existing == self
+    if existing = self.context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => self.id).first
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
       begin
         mod = "-#{n}"
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
-      end while self.context.wiki_pages.not_deleted.where(title: new_title).exists?
+      end while self.context.wiki_pages.not_deleted.where(title: new_title).where.not(:id => self.id).exists?
 
       self.title = new_title
     end
