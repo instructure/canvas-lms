@@ -34,18 +34,11 @@
     gtag('js', new Date());
 
     gtag('config', 'UA-36373320-13');
-  </script>
 
-  <% if gtag %>
-  <script async src=<%= "https://www.googletagmanager.com/gtag/js?id=#{gtag}" %>></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', <%= gtag %>);
+    <% if gtag %>
+      gtag('config', "<%= gtag %>");
+    <% end %>
   </script>
-  <% end %>
 
   <meta charset="utf-8">
   <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
