@@ -118,7 +118,7 @@ describe('FileUpload', () => {
         <FileUpload {...props} />
       </MockedProvider>
     )
-    const uploadRender = getByTestId('non-empty-upload')
+    const uploadRender = getByTestId('upload-pane')
     expect(uploadRender).toContainElement(getAllByText('foobarbaz')[0])
   })
 
@@ -133,7 +133,7 @@ describe('FileUpload', () => {
         <FileUpload {...props} />
       </MockedProvider>
     )
-    const uploadRender = getByTestId('non-empty-upload')
+    const uploadRender = getByTestId('upload-pane')
     expect(uploadRender).toContainElement(container.querySelector('img[alt="foobarbaz preview"]'))
   })
 
@@ -149,7 +149,7 @@ describe('FileUpload', () => {
         <FileUpload {...props} />
       </MockedProvider>
     )
-    const uploadRender = getByTestId('non-empty-upload')
+    const uploadRender = getByTestId('upload-pane')
 
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconPdf"]'))
     expect(container.querySelector('img[alt="foobarbaz preview"]')).toBeNull()
@@ -512,7 +512,7 @@ describe('FileUpload', () => {
     const props = await makeProps({
       Assignment: {allowedExtensions: ['jpg']}
     })
-    const {container, getByText, queryByTestId} = render(
+    const {container, getByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
       </MockedProvider>
@@ -523,7 +523,6 @@ describe('FileUpload', () => {
     uploadFiles(fileInput, [file])
 
     expect(getByText('Invalid file type')).toBeInTheDocument()
-    expect(queryByTestId('non-empty-upload')).toBeNull()
   })
 
   it('does not render an error when adding a file that is an allowed extension', async () => {

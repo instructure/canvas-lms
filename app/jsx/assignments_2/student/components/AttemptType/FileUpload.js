@@ -301,27 +301,26 @@ export default class FileUpload extends Component {
     // and two rendered files and all subsequent rows having three rendered files
     const nextFileRows = files.length > 2 ? chunk(files.slice(2, files.length), 3) : []
     return (
-      <div data-testid="non-empty-upload">
-        <Grid>
-          <Grid.Row key={firstFileRow.map(file => file._id).join()}>
-            <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
-            {firstFileRow.map(file => (
+      <Grid>
+        <Grid.Row key="upload-box">
+          <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
+          {firstFileRow.map(file => (
+            <Grid.Col width={4} key={file._id} vAlign="bottom">
+              {this.renderUploadedFile(file)}
+            </Grid.Col>
+          ))}
+        </Grid.Row>
+        {nextFileRows.map((row, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Grid.Row key={i}>
+            {row.map(file => (
               <Grid.Col width={4} key={file._id} vAlign="bottom">
                 {this.renderUploadedFile(file)}
               </Grid.Col>
             ))}
           </Grid.Row>
-          {nextFileRows.map(row => (
-            <Grid.Row key={row.map(file => file._id).join()}>
-              {row.map(file => (
-                <Grid.Col width={4} key={file._id} vAlign="bottom">
-                  {this.renderUploadedFile(file)}
-                </Grid.Col>
-              ))}
-            </Grid.Row>
-          ))}
-        </Grid>
-      </div>
+        ))}
+      </Grid>
     )
   }
 
@@ -332,15 +331,7 @@ export default class FileUpload extends Component {
   render() {
     return (
       <div data-testid="upload-pane" style={{marginBottom: theme.variables.spacing.xxLarge}}>
-        {this.shouldRenderFiles() ? (
-          this.renderUploadBoxAndUploadedFiles()
-        ) : (
-          <Grid>
-            <Grid.Row>
-              <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
-            </Grid.Row>
-          </Grid>
-        )}
+        {this.renderUploadBoxAndUploadedFiles()}
       </div>
     )
   }
