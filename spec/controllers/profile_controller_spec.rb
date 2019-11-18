@@ -257,6 +257,12 @@ describe ProfileController do
         expect(assigns.dig(:js_env, :COMMON_CARTRIDGE_VIEWER_URL)).to eq('the_ccv_url')
       end
 
+      it "should show if the user has an account membership" do
+        user_session(account_admin_user)
+        get 'content_shares', params: {user_id: @admin.id}
+        expect(response).to render_template('content_shares')
+      end
+
       it "should 404 if user has only student enrollments" do
         user_session(@student)
         get 'content_shares', params: {user_id: @student.id}

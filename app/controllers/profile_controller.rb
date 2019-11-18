@@ -473,7 +473,7 @@ class ProfileController < ApplicationController
   end
 
   def content_shares
-    raise not_found if !@domain_root_account.feature_enabled?(:direct_share) || !@current_user.non_student_enrollment?
+    raise not_found unless @domain_root_account.feature_enabled?(:direct_share) && @current_user.can_content_share?
 
     @user ||= @current_user
     set_active_tab 'content_shares'

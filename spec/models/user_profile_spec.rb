@@ -43,6 +43,13 @@ describe UserProfile do
         expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_CONTENT_SHARES
       end
 
+      it "should show shared content tab when user has account membership" do
+        account_admin_user(account: account)
+        account.enable_feature!(:direct_share)
+        tabs = @admin.profile.tabs_available(@admin, :root_account => account)
+        expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_CONTENT_SHARES
+      end
+
       it "should not show shared content tab when user has only student enrollments" do
         student_in_course(:active_all => true)
         account.enable_feature!(:direct_share)
