@@ -250,7 +250,8 @@ pipeline {
             skipIfPreviouslySuccessful("vendored-gems") {
               build(
                 job: 'test-suites/vendored-gems',
-                parameters: build_parameters
+                parameters: build_parameters,
+                propagate: false
               )
             }
           }
