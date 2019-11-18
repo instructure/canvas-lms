@@ -45,7 +45,7 @@
       </div>
     </div>
   <% end %>
-  <h2><%= @user.short_name %></h2>
+  <h2><%= @user.short_name %> <% if @user.pronouns %><i>(<%= @user.pronouns %>)</i><% end %></h2>
 
 <style type="text/css" media="screen">
   #user-info-fieldsets{
