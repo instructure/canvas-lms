@@ -112,14 +112,19 @@ export default class FileUpload extends Component {
       return
     }
 
-    this.setState({
-      filesToUpload: files.map((file, i) => {
-        if (file.url) {
-          return {isLoading: true, _id: `${i}-${file.url}`}
-        }
-        return {isLoading: true, _id: `${i}-${file.name}`}
-      })
-    })
+    this.setState(
+      {
+        filesToUpload: files.map((file, i) => {
+          if (file.url) {
+            return {isLoading: true, _id: `${i}-${file.url}`}
+          }
+          return {isLoading: true, _id: `${i}-${file.name}`}
+        })
+      },
+      () => {
+        this.context.setOnSuccess(I18n.t('Uploading files'))
+      }
+    )
     this.updateUploadingFiles(async () => {
       try {
         const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))

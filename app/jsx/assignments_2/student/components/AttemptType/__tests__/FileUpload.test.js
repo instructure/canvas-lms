@@ -157,6 +157,7 @@ describe('FileUpload', () => {
 
   it('allows uploading multiple files at a time', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps()
     uploadFileModule.uploadFiles.mockResolvedValue([
       {id: '1', name: 'file1.jpg'},
@@ -165,7 +166,9 @@ describe('FileUpload', () => {
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -189,6 +192,7 @@ describe('FileUpload', () => {
   it('creates an error alert when the API fails to upload files', async () => {
     const mocks = await createGraphqlMocks()
     const setOnFailure = jest.fn()
+    const setOnSuccess = jest.fn()
     const props = await makeProps()
     uploadFileModule.uploadFiles.mock.results = () => {
       throw new Error('no')
@@ -196,7 +200,7 @@ describe('FileUpload', () => {
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider value={{setOnFailure}}>
+        <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
       </MockedProvider>
@@ -210,6 +214,7 @@ describe('FileUpload', () => {
 
   it('uploads files received through the LtiDeepLinkingResponse message event', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps({
       Submission: {attempt: 0}
     })
@@ -217,7 +222,9 @@ describe('FileUpload', () => {
 
     render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
 
@@ -337,6 +344,7 @@ describe('FileUpload', () => {
   // for some context around this
   it('creates a submission draft for the current attempt when not on attempt 0', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps({
       Submission: {attempt: 2}
     })
@@ -344,7 +352,9 @@ describe('FileUpload', () => {
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -365,6 +375,7 @@ describe('FileUpload', () => {
 
   it('creates a submission draft for attempt one when on attempt 0', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps({
       Submission: {attempt: 0}
     })
@@ -372,7 +383,9 @@ describe('FileUpload', () => {
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -527,12 +540,15 @@ describe('FileUpload', () => {
 
   it('does not render an error when adding a file that is an allowed extension', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps({
       Assignment: {allowedExtensions: ['jpg']}
     })
     const {container, queryByText} = render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
