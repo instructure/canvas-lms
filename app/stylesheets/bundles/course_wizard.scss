@@ -24,7 +24,6 @@
 $ic-wizard-color-dark-neutral: $ic-color-dark;
 
 .ic-wizard-box {
-  transition: all 1s $ic-transition;
   width: 100%;
   height: 100%;
   background: $ic-wizard-color-dark-neutral;
@@ -35,15 +34,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   flex-direction: column;
   background: url("/images/wizard-bg.jpg") no-repeat center center;
   background-size: cover;
-  transform: translate3d(0,100%,0);
-  opacity: 0;
   @include breakpoint(desktop) { flex-direction: row; }
-
-  &.ic-wizard-box--is-open {
-    transform: translate3d(0,0,0);
-    opacity: 1;
-  }
-
   *, *:before, *:after { box-sizing: border-box; }
 }
 
@@ -303,7 +294,3 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
     line-height: 1.6;
   }
 }
-
-
-// Styles for specific React Components
-@import "pages/course_wizard/CourseWizard";
