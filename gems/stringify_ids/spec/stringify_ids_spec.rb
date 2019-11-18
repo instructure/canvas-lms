@@ -58,6 +58,18 @@ describe StringifyIds do
       expect(input[:something_ids]).to eq ["1", "2", "3"]
     end
 
+    it 'stringifies a "SOMETHING_ID" field' do
+      input = { SOMETHING_ID: 1 }
+      StringifyIds.stringify_ids(input)
+      expect(input[:SOMETHING_ID]).to eq "1"
+    end
+
+    it 'stringifies a "SOMETHING_IDS" field' do
+      input = { SOMETHING_IDS: [1, 2, 3] }
+      StringifyIds.stringify_ids(input)
+      expect(input[:SOMETHING_IDS]).to eq ["1", "2", "3"]
+    end
+
     it 'allows reversing' do
       input = { id: "1" }
       StringifyIds.stringify_ids(input, reverse: true)

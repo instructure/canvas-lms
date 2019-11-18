@@ -154,7 +154,8 @@ describe "API Authentication", type: :request do
           expect(response).to be_successful
           json = JSON.parse(response.body)
           expect(json.size).to eq 1
-          expect(json.first['enrollments']).to eq [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @user.id, 'enrollment_state' => 'invited'}]
+          expect(json.first['enrollments']).to eq [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id,
+            'user_id' => @user.id, 'enrollment_state' => 'invited', 'limit_privileges_to_course_section' => false}]
           expect(AccessToken.authenticate(token)).to eq AccessToken.last
           expect(AccessToken.last.purpose).to eq 'fun'
 
@@ -422,7 +423,8 @@ describe "API Authentication", type: :request do
               expect(response).to be_successful
               json = JSON.parse(response.body)
               expect(json.size).to eq 1
-              expect(json.first['enrollments']).to eq [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @user.id, 'enrollment_state' => 'invited'}]
+              expect(json.first['enrollments']).to eq [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id,
+                'user_id' => @user.id, 'enrollment_state' => 'invited', 'limit_privileges_to_course_section' => false}]
               expect(AccessToken.last).to eq AccessToken.authenticate(token)
             end
           end
