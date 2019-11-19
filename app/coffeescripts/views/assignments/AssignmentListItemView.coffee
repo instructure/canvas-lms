@@ -272,7 +272,6 @@ export default class AssignmentListItemView extends Backbone.View
   addMigratedQuizToList: (response) =>
     return unless response
     quizzes = response.migrated_assignment
-    debugger
     if quizzes
       @addAssignmentToList(quizzes[0])
 
