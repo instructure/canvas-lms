@@ -38,9 +38,10 @@ exports[`renders correctly expanded 1`] = `
         <FlexItem
           as="span"
           elementRef={[Function]}
-          grow={false}
+          grow={true}
           padding="0 x-small 0 0"
           shrink={false}
+          size="0"
         >
           <Text
             as="span"
@@ -49,7 +50,9 @@ exports[`renders correctly expanded 1`] = `
             weight="bold"
             wrap="normal"
           >
-            My group
+            <TruncateWithTooltip>
+              My group
+            </TruncateWithTooltip>
           </Text>
         </FlexItem>
         <FlexItem
@@ -160,9 +163,10 @@ exports[`renders the OutcomeGroup component 1`] = `
         <FlexItem
           as="span"
           elementRef={[Function]}
-          grow={false}
+          grow={true}
           padding="0 x-small 0 0"
           shrink={false}
+          size="0"
         >
           <Text
             as="span"
@@ -171,7 +175,9 @@ exports[`renders the OutcomeGroup component 1`] = `
             weight="bold"
             wrap="normal"
           >
-            My group
+            <TruncateWithTooltip>
+              My group
+            </TruncateWithTooltip>
           </Text>
         </FlexItem>
         <FlexItem
