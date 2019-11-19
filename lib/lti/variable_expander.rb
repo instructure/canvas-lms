@@ -1304,17 +1304,20 @@ module Lti
                        USAGE_RIGHTS_GUARD
 
     # Returns the types of resources that can be imported to the current page, forwarded from the request.
-    # Value is an array of one or more values of: ["assignment", "assignment_group", "audio",
+    # Value is a comma-separated array of one or more values of: ["assignment", "assignment_group", "audio",
     # "discussion_topic", "document", "image", "module", "quiz", "page", "video"]
     #
     # @example
     #   ```
-    #   ["page"]
-    #   ["module"]
-    #   ["assignment", "discussion_topic", "page", "quiz", "module"]
+    #   "page"
+    #   "module"
+    #   "assignment,discussion_topic,page,quiz,module"
     #   ```
     register_expansion 'com.instructure.Course.accept_canvas_resource_types', [],
-                       -> { @request.parameters['com_instructure_course_accept_canvas_resource_types'] },
+                       -> {
+                         val = @request.parameters['com_instructure_course_accept_canvas_resource_types']
+                         val.is_a?(Array) ? val.join(",") : val
+                       },
                        default_name: 'com_instructure_course_accept_canvas_resource_types'
 
     # Returns the target resource type for the current page, forwarded from the request.

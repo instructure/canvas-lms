@@ -34,6 +34,11 @@ const toolShape = shape({
   icon_url: string
 })
 
+const moduleShape = shape({
+  id: string.isRequired,
+  name: string.isRequired
+})
+
 const knownResourceTypes = [
   'assignment',
   'assignment_group',
@@ -53,7 +58,7 @@ ContentTypeExternalToolTray.propTypes = {
   acceptedResourceTypes: arrayOf(oneOf(knownResourceTypes)).isRequired,
   targetResourceType: oneOf(knownResourceTypes).isRequired,
   allowItemSelection: bool.isRequired,
-  selectableItems: arrayOf(oneOf(knownResourceTypes)).isRequired,
+  selectableItems: arrayOf(moduleShape).isRequired,
   onDismiss: func,
   open: bool
 }

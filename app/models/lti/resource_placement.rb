@@ -52,6 +52,7 @@ module Lti
                   :link_selection,
                   :migration_selection,
                   :module_menu,
+                  :module_index_menu,
                   :post_grades,
                   :quiz_menu,
                   :resource_selection,
