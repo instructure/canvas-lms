@@ -33,6 +33,10 @@ module CourseWikiIndexPage
       f("ul[role='menu']")
     end
 
+    def copy_to_menu_item
+      fj("li:contains('Copy to...')")
+    end
+
     #------------------------------ Actions ------------------------------
     def visit_course_wiki_index_page(course_id)
       get "/courses/#{course_id}/pages"

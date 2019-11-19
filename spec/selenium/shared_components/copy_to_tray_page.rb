@@ -18,23 +18,35 @@
 require_relative '../common'
 
 module CopyToTrayPage
+
   # ------------------------------ Selectors -----------------------------
 
   # ------------------------------ Elements ------------------------------
+
   def copy_to_dialog
     f("[role='dialog']")
   end
 
   def course_search_dropdown
-    f("input[placeholder='Begin typing to search']")
+    main_span = fj("span label:contains('Select a Course')")
+    main_span.find_element(:css, "input[role='combobox']")
+  end
+
+  def module_search_dropdown
+    main_span = fj("span label:contains('Select a Module (optional)')")
+    main_span.find_element(:css, "input[role='combobox']")
   end
 
   def course_dropdown_list
-   f("ul[role='listbox']")
+    f("ul[role='listbox']")
   end
 
   def course_dropdown_item(course_name)
-   fj("li:contains(#{course_name})")
+    fj("li:contains(#{course_name})")
+  end
+
+  def module_dropdown_item(module_name)
+    fj("li:contains(#{module_name})")
   end
 
   def copy_button
@@ -43,6 +55,10 @@ module CopyToTrayPage
 
   def starting_copy_operation_alert
     f("[role=alert]")
+  end
+
+  def module_dropdown_list
+    f("ul[role='listbox']")
   end
 
   # ------------------------------ Actions --------------------------------
