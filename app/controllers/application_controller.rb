@@ -1286,7 +1286,8 @@ class ApplicationController < ActionController::Base
         }
       end
 
-      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level, context: context)
+      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level,
+        context: context, context_membership: @context_membership)
 
       @accessed_asset
     end
