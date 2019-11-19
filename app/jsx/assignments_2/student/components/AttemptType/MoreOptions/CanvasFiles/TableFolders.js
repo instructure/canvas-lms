@@ -38,6 +38,7 @@ const FolderButton = props => {
     <Tooltip tip={props.tip} as="div" variant="inverse">
       <div
         className="file-select-item"
+        id={props.elementId || `folder-${props.folderID}`}
         onClick={() => props.handleFolderSelect(props.folderID)}
         onKeyUp={e => {
           // Keycode 13 is the Return or Enter key
@@ -94,6 +95,7 @@ const renderParentFolder = (folder, handleFolderSelect, columnWidths) => {
   if (folder.parent_folder_id !== null && folder.parent_folder_id !== undefined) {
     return (
       <FolderButton
+        elementId="parent-folder"
         folderID={folder.parent_folder_id.toString()}
         handleFolderSelect={handleFolderSelect}
         tip="../"

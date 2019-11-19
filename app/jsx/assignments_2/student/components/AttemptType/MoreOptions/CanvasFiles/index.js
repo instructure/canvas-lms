@@ -77,7 +77,16 @@ class CanvasFiles extends React.Component {
       }
     }
     if (this._isMounted) {
-      this.setState({selectedFolderID: folderID})
+      this.setState({selectedFolderID: folderID}, () => {
+        // we are guaranteed to always have a folder in the selection, so we will either focus
+        // on the parent folder, or the first rendered folder in the root
+        const newFocus =
+          document.getElementById('parent-folder') ||
+          document.getElementById(
+            `folder-${this.state.loadedFolders[this.state.selectedFolderID].subFolderIDs[0]}`
+          )
+        newFocus.focus()
+      })
     }
   }
 
