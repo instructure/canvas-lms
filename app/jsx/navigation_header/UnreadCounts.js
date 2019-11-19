@@ -43,6 +43,7 @@ import React, {useRef, useState, useEffect} from 'react'
 import {createPortal} from 'react-dom'
 import {any, func, number, string} from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {defaultFetchOptions} from '@instructure/js-utils'
 import I18n from 'i18n!UnreadCounts'
 
 const DEFAULT_POLL_INTERVAL = 60000
@@ -104,9 +105,7 @@ export default function UnreadCounts(props) {
 
     async function getData() {
       try {
-        const result = await fetch(dataUrl, {
-          headers: {Accept: 'application/json'}
-        })
+        const result = await fetch(dataUrl, defaultFetchOptions)
         const resp = await result.json()
         const unreadCount = parseInt(resp.unread_count, 10)
         try {

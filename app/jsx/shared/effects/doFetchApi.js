@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import getCookie from '../helpers/getCookie'
 import parseLinkHeader from 'parse-link-header'
+import {defaultFetchOptions} from '@instructure/js-utils'
 
 function constructRelativeUrl({path, params}) {
   const queryString = $.param(params)
@@ -26,6 +27,8 @@ function constructRelativeUrl({path, params}) {
   return `${path}?${queryString}`
 }
 
+// NOTE: we do NOT deep-merge customFetchOptions.headers, they should be passed
+// in the headers arg instead.
 export default async function doFetchApi({
   path,
   method = 'GET',
@@ -34,18 +37,18 @@ export default async function doFetchApi({
   body,
   fetchOpts = {}
 }) {
-  const fetchHeaders = {
-    Accept: 'application/json+canvas-string-ids, application/json',
-    'X-CSRF-Token': getCookie('_csrf_token')
-  }
+  const finalFetchOptions = {...defaultFetchOptions}
+  finalFetchOptions.headers['X-CSRF-Token'] = getCookie('_csrf_token')
+
   if (body && typeof body !== 'string') {
     body = JSON.stringify(body)
-    fetchHeaders['Content-Type'] = 'application/json'
+    finalFetchOptions.headers['Content-Type'] = 'application/json'
   }
-  Object.assign(fetchHeaders, headers)
+  Object.assign(finalFetchOptions.headers, headers)
+  Object.assign(finalFetchOptions, fetchOpts)
 
   const url = constructRelativeUrl({path, params})
-  const response = await fetch(url, {headers: fetchHeaders, body, method, ...fetchOpts})
+  const response = await fetch(url, {body, method, ...finalFetchOptions})
   if (!response.ok) {
     const err = new Error(
       `doFetchApi received a bad response: ${response.status} ${response.statusText}`

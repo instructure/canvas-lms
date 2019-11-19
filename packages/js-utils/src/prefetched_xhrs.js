@@ -77,6 +77,7 @@ export function checkStatus(response) {
 export const defaultFetchOptions = {
   credentials: 'same-origin',
   headers: {
-    Accept: 'application/json+canvas-string-ids, application/json'
+    Accept: 'application/json+canvas-string-ids, application/json',
+    'X-Requested-With': 'XMLHttpRequest'
   }
 }
