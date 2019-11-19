@@ -1094,7 +1094,9 @@ class BzController < ApplicationController
                     item["three-past-positions"] = []
                     info["positions"].sort.reverse.map { |i,p| 
 
-                      # The first position (aka job) we come across with no end data (aka to Present), set to be their current one
+                      # The first position (aka job) we come across with no end date (aka to Present), set to be their current one
+                      # Note: if no job is listed as "X date to Present", then their job-title and employer will be blank. If we want
+                      # to change it to set their job title to the most recent job they had, we need to change this.
                       if p["endMonthYear"].nil? # Current position
                         unless currentPositionProcessed
                           item["job-title"] = p["title"]["localized"]["en_US"] unless p["title"].nil?
@@ -1139,10 +1141,7 @@ class BzController < ApplicationController
                   linkedin_data.volunteer = item["volunteer"] = info["volunteeringExperiences"]
                   # note there is also volunteeringInterests which gives a list of causes we might find interesting
   
-                  # Note that schools may or may not have dates associated with them, but the one that shows at the top in LinkedIn should be the most recent
-                  # Also, it's intentional to leave grad year blank if the recent school doesn't have a grad date instead of going back in time
-                  # to one that does. We want to know when they did or are going to graduate from their current school, not when they graduated from say, high school.
-                  most_recent_school_item = info["educations"].first[1] unless info["educations"].blank?
+                  most_recent_school_item = get_most_recent_school_node(info["educations"])
                   linkedin_data.most_recent_school = item["most-recent-school"] = most_recent_school_item["schoolName"]["localized"]["en_US"] unless most_recent_school_item["schoolName"].nil?
                   linkedin_data.graduation_year = item["graduation-year"] = most_recent_school_item["endMonthYear"]["year"] unless most_recent_school_item["endMonthYear"].nil?
                   linkedin_data.major = item["major"] = most_recent_school_item["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"] unless most_recent_school_item["fieldsOfStudy"].blank?
@@ -1259,7 +1258,66 @@ class BzController < ApplicationController
       csv_result
     end
 
-  end
+    def get_most_recent_school_node(educationsNode)
+      most_recent = {}
+      unless educationsNode.blank?
+        # Note that schools may or may not have dates associated with them. The one that shows at the top when visiting
+        # their profile on linkedin.com *should* be treated as the most recent, but unfortunately there is no way
+        # to determine that order through the API. 
+        #
+        # We can't rely on when the school node was added (e.g. the value of the ID being bigger meaning added more recently).
+        # b/c people may go update their profile to add historical stuff after the fact. E.g. add my college, but then at some
+        # later point go back and add my high school. We really have to go by dates.
+        #
+        # This is imperfect in the scenario where there are no dates specified, but basically we're sorting by end date first,
+        # then by start date, and then defaulting to the first item in JSON if no dates are set. 
+        # This means, that if a date is set, that takes precendence over any school with no date set which could be wrong, 
+        # but I can't come up with a better solution.
+        #
+        # Note: This scenario returns School B. Maybe we want A?
+        # School A: start 2018 - present (no end)
+        # School B: start 2017, end 2019
+        most_recent_ed_sort = -> (a,b) {
+          a_end = to_date(a[1]["endMonthYear"])
+          a_start = to_date(a[1]["startMonthYear"])
+          b_end = to_date(b[1]["endMonthYear"])
+          b_start = to_date(b[1]["startMonthYear"])
+          # Note: everything's switched b/c we want descending order
+          return b_end <=> a_end if a_end && b_end
+          return b_start <=> a_end if a_end && b_start
+          return b_end <=> a_start if a_start && b_end
+          return b_start <=> a_start if a_start && b_start
+          return -1 if a_start # if there is a date, it takes precendence so return -1 b/c it's in order
+          return 1 if b_start # ditto, but b takes precedence so return 1 b/c its out of order
+          return 0 # if no dates are set, just say they're equal. We'll deal with no dates outside of the sort.
+        }
+
+        most_recent = educationsNode.sort( & most_recent_ed_sort ).first[1];
+        if most_recent["endMonthYear"].blank? && most_recent["startMonthYear"].blank?
+          # If the one chosen from the sort has no dates, fallback to the first one returned in the JSON.
+          # It's not guaranteed to be the first shown in the UI, but fingers crossed that it's more reliable than
+          # grabbing the most recent one they added (which could be an old one, like their high school)
+          most_recent = educationsNode.first[1]
+        end
+      end
+      return most_recent
+    end
+
+    # Takes a hash like: {"month":3,"year":2019} and converts it to a Date
+    # Returns nil if no date is represented in the above format.
+    def to_date(monthYearNode)
+      d = nil
+      if monthYearNode
+        if monthYearNode["year"] && monthYearNode["month"]
+          d = Date.new(monthYearNode["year"].to_i, monthYearNode["month"].to_i)
+        elsif monthYearNode["year"]
+          d = Date.new(monthYearNode["year"].to_i)
+        end
+      end
+      return d
+    end
+
+  end # linked_in
 
   def last_user_url
     @current_user.last_url = params[:last_url]
