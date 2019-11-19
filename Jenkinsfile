@@ -340,16 +340,15 @@ pipeline {
     }
 
     stage('Publish Merged Image') {
+      when { expression { env.GERRIT_EVENT_TYPE == 'change-merged' } }
       steps {
-        timeout(time: 5) {
+        timeout(time: 10) {
           script {
-            if (env.GERRIT_EVENT_TYPE == 'change-merged') {
-              sh '''
-                docker tag $PATCHSET_TAG $MERGE_TAG
-                docker push $MERGE_TAG
-              '''
-              dockerCacheStore(image: "$CACHE_TAG")
-            }
+            sh '''
+              docker tag $PATCHSET_TAG $MERGE_TAG
+              docker push $MERGE_TAG
+            '''
+            dockerCacheStore(image: "$CACHE_TAG")
           }
         }
       }
