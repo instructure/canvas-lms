@@ -25,21 +25,27 @@ describe('Violation Tray', () => {
     fetch.resetMocks()
   })
 
+  const getProps = overrides => ({
+    violations: [],
+    whitelistedDomains: {account: []},
+    ...overrides
+  })
+
   it('displays a spinner when loading data', async () => {
-    const {findByText} = render(<ViolationTray violations={[]} />)
+    const {findByText} = render(<ViolationTray {...getProps()} />)
     // Even though there isn't an expect here... it's functionally the same,
     // if it doesn't find it... the test will fail :)
     await findByText('Loading')
   })
   it('displays an error alert when an error loading occurs', async () => {
     fetch.mockReject(new Error('fail'))
-    const {findByText} = render(<ViolationTray violations={[]} />)
+    const {findByText} = render(<ViolationTray {...getProps()} />)
     expect(await findByText(/Something went wrong loading/)).toBeInTheDocument()
   })
 
   it('displays an info alert when there are no violations', async () => {
     fetch.mockResponse(JSON.stringify([]))
-    const {findByText} = render(<ViolationTray violations={[]} />)
+    const {findByText} = render(<ViolationTray {...getProps()} />)
     expect(await findByText(/No violations/)).toBeInTheDocument()
   })
 
@@ -58,7 +64,7 @@ describe('Violation Tray', () => {
         }
       ])
     )
-    const {findByText} = render(<ViolationTray violations={[]} />)
+    const {findByText} = render(<ViolationTray {...getProps()} />)
     await findByText(/CSP Violations/)
   })
 })

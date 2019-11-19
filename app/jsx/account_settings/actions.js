@@ -190,7 +190,7 @@ export function addDomainBulkAction(domainsMap, opts = {}) {
   }
 }
 
-export function addDomain(context, contextId, domain) {
+export function addDomain(context, contextId, domain, afterAdd = () => {}) {
   context = pluralize(context)
   return (dispatch, getState, {axios}) => {
     dispatch(addDomainAction(domain, 'account', {optimistic: true}))
@@ -203,6 +203,7 @@ export function addDomain(context, contextId, domain) {
         // it doesn't hurt.
         dispatch(addDomainAction(domain, 'account'))
       })
+      .then(afterAdd)
   }
 }
 

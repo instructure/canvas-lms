@@ -19,7 +19,7 @@
 import React, {Component, Suspense} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
-import {arrayOf, bool, func, objectOf, oneOf, shape, string, number} from 'prop-types'
+import {arrayOf, bool, func, objectOf, oneOf, shape, string, number, element} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Heading, List, Table, Spinner} from '@instructure/ui-elements'
 import {TextInput} from '@instructure/ui-forms'
@@ -55,7 +55,8 @@ export class Whitelist extends Component {
       tools: objectOf(arrayOf(shape({id: string, name: string, account_id: string})))
     }).isRequired,
     maxDomains: number.isRequired,
-    accountId: string.isRequired
+    accountId: string.isRequired,
+    liveRegion: arrayOf(element).isRequired
   }
 
   static defaultProps = {
@@ -308,13 +309,19 @@ export class Whitelist extends Component {
           onDismiss={this.closeViolationTray}
           size="medium"
           placement="end"
+          liveRegion={this.props.liveRegion}
         >
           <Suspense
             fallback={
               <Spinner size="large" margin="large auto" renderTitle={() => I18n.t('Loading')} />
             }
           >
-            <ViolationTray accountId={this.props.accountId} handleClose={this.closeViolationTray} />
+            <ViolationTray
+              accountId={this.props.accountId}
+              handleClose={this.closeViolationTray}
+              addDomain={this.props.addDomain}
+              whitelistedDomains={this.props.whitelistedDomains}
+            />
           </Suspense>
         </Tray>
       </div>
@@ -332,7 +339,4 @@ const mapDispatchToProps = {
   copyInheritedIfNeeded
 }
 
-export const ConnectedWhitelist = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Whitelist)
+export const ConnectedWhitelist = connect(mapStateToProps, mapDispatchToProps)(Whitelist)

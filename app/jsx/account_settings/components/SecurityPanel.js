@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
-import {bool, oneOf, string, func, number} from 'prop-types'
+import {bool, oneOf, string, func, number, arrayOf, element} from 'prop-types'
 import {Heading, Text, Spinner} from '@instructure/ui-elements'
 import {View, Grid} from '@instructure/ui-layout'
 import {Checkbox} from '@instructure/ui-forms'
@@ -46,7 +46,8 @@ export class SecurityPanel extends Component {
     isSubAccount: bool,
     whitelistsHaveLoaded: bool,
     maxDomains: number.isRequired,
-    accountId: string.isRequired
+    accountId: string.isRequired,
+    liveRegion: arrayOf(element).isRequired
   }
 
   static defaultProps = {
@@ -125,6 +126,7 @@ export class SecurityPanel extends Component {
                   inherited={this.props.cspInherited}
                   maxDomains={this.props.maxDomains}
                   accountId={this.props.accountId}
+                  liveRegion={this.props.liveRegion}
                 />
               )}
             </Grid.Col>
@@ -152,7 +154,4 @@ const mapDispatchToProps = {
   getCurrentWhitelist
 }
 
-export const ConnectedSecurityPanel = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SecurityPanel)
+export const ConnectedSecurityPanel = connect(mapStateToProps, mapDispatchToProps)(SecurityPanel)

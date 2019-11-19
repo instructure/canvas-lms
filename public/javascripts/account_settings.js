@@ -252,6 +252,10 @@ $(document).ready(function() {
                   contextId: splitContext[1],
                   isSubAccount: !ENV.ACCOUNT.root_account,
                   initialCspSettings: ENV.CSP,
+                  liveRegion: [
+                    document.getElementById('flash_message_holder'),
+                    document.getElementById('flash_screenreader_holder')
+                  ],
                   api
                 })
               })

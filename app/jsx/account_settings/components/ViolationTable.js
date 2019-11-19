@@ -23,6 +23,7 @@ import FriendlyDatetime from '../../shared/FriendlyDatetime'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconAddSolid} from '@instructure/ui-icons'
+import {showFlashAlert} from '../../shared/FlashAlert'
 
 const HEADERS = [
   {
@@ -62,12 +63,25 @@ const getHostname = url => {
   return matches && matches[1]
 }
 
-export default function ViolationTable({violations}) {
+export default function ViolationTable({
+  violations,
+  addDomain,
+  accountId,
+  whitelistedDomains,
+  showAlert = showFlashAlert
+}) {
   const [sortBy, setSortBy] = useState('count') // Default to the most requested on top
   const [ascending, setAscending] = useState(false)
   const direction = ascending ? 'ascending' : 'descending'
 
-  const sortedViolations = [...(violations || [])].sort((a, b) => {
+  // Clear out any violations that are on the whitelist
+  // This should only happen when a violation from the log gets added
+  // to the whitelist
+  const filteredViolations = violations.filter(
+    v => !whitelistedDomains.account.includes(getHostname(v.uri))
+  )
+
+  const sortedViolations = [...(filteredViolations || [])].sort((a, b) => {
     if (a[sortBy] < b[sortBy]) {
       return -1
     }
@@ -123,7 +137,21 @@ export default function ViolationTable({violations}) {
                 />
               </Table.Cell>
               <Table.Cell textAlign="center">
-                <Button variant="icon" size="small" icon={IconAddSolid}>
+                <Button
+                  variant="icon"
+                  size="small"
+                  icon={IconAddSolid}
+                  onClick={() => {
+                    addDomain('account', accountId, hostname, () => {
+                      showAlert({
+                        message: I18n.t('Success: You added %{hostname} to the whitelist.', {
+                          hostname
+                        }),
+                        type: 'success'
+                      })
+                    })
+                  }}
+                >
                   <ScreenReaderContent>
                     {I18n.t('Add %{hostname} to the whitelist', {hostname})}
                   </ScreenReaderContent>

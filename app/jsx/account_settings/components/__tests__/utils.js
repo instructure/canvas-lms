@@ -24,7 +24,11 @@ import {configStore} from '../../store'
 const fakeAxios = {
   delete: jest.fn(() => ({then() {}})),
   get: jest.fn(() => ({then() {}})),
-  post: jest.fn(() => ({then() {}})),
+  post: jest.fn(() => ({
+    then() {
+      return {then() {}}
+    }
+  })),
   put: jest.fn(() => ({then() {}}))
 }
 

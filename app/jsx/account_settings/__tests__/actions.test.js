@@ -135,6 +135,7 @@ describe('addDomain', () => {
         then(func) {
           const fakeResponse = {}
           func(fakeResponse)
+          return {then() {}}
         }
       }))
     }
@@ -147,6 +148,27 @@ describe('addDomain', () => {
       payload: {account: 'instructure.com'},
       type: 'ADD_DOMAIN'
     })
+  })
+
+  it('calls the afterAdd function after dispatching', () => {
+    const fakeAfterAdd = jest.fn()
+    const thunk = Actions.addDomain('account', 1, 'instructure.com', fakeAfterAdd)
+    const fakeDispatch = jest.fn()
+    const fakeAxios = {
+      post: jest.fn(() => ({
+        then(func) {
+          const fakeResponse = {}
+          func(fakeResponse)
+          return {
+            then(fn) {
+              fn()
+            }
+          }
+        }
+      }))
+    }
+    thunk(fakeDispatch, null, {axios: fakeAxios})
+    expect(fakeAfterAdd).toHaveBeenCalled()
   })
 })
 
