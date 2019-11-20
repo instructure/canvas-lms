@@ -23,15 +23,15 @@ import {func, string} from 'prop-types'
 import CanvasAsyncSelect from './CanvasAsyncSelect'
 import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
 import useContentShareUserSearchApi from '../effects/useContentShareUserSearchApi'
-
 import UserSearchSelectorItem from './UserSearchSelectorItem'
-
-const {renderLabel, ...restOfSelectPropTypes} = CanvasAsyncSelect.propTypes
 
 ContentShareUserSearchSelector.propTypes = {
   courseId: string.isRequired,
   onUserSelected: func, // (basicUser) => {} (see proptypes/user.js)
-  ...restOfSelectPropTypes
+  ...(() => {
+    const {renderLabel, ...restOfSelectPropTypes} = CanvasAsyncSelect.propTypes
+    return restOfSelectPropTypes
+  })()
 }
 
 const MINIMUM_SEARCH_LENGTH = 3
