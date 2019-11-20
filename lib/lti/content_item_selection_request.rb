@@ -127,6 +127,12 @@ module Lti
       end
     end
 
+    INDEX_MENU_TOOL_TYPES = %w{
+      assignment_index_menu
+      module_index_menu
+      wiki_index_menu
+    }.freeze
+
     def placement_params(placement, assignment: nil)
       case placement
       when 'migration_selection'
@@ -139,7 +145,7 @@ module Lti
         collaboration_params
       when 'homework_submission'
         homework_submission_params(assignment)
-      when 'wiki_index_menu', 'module_index_menu'
+      when *INDEX_MENU_TOOL_TYPES
         {}
       else
         # TODO: we _could_, if configured, have any other placements return to the content migration page...

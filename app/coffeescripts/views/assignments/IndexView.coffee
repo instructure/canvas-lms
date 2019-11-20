@@ -98,7 +98,8 @@ export default class IndexView extends Backbone.View
           disableSyncToSis: @assignmentSyncSettingsView.openDisableSync.bind(@assignmentSyncSettingsView)
           sisName: ENV.SIS_NAME
           postToSisDefault: ENV.POST_TO_SIS_DEFAULT
-          hasAssignments: ENV.HAS_ASSIGNMENTS
+          hasAssignments: ENV.HAS_ASSIGNMENTS,
+          assignmentGroupsCollection: @collection
         }),
         $('#settingsMountPoint')[0]
       )
