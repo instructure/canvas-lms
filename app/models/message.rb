@@ -598,6 +598,10 @@ class Message < ActiveRecord::Base
       return nil
     end
 
+    InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{notification_name}",
+                                 short_stat: 'message.deliver',
+                                 tags: {path_type: path_type, notification_name: notification_name})
+
     check_acct = user&.account || Account.site_admin
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
