@@ -29,6 +29,7 @@ import {Mutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
+import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
 import theme from '@instructure/canvas-theme'
 
@@ -200,7 +201,7 @@ export default class SubmissionManager extends Component {
     this.setState({submittingAssignment: false})
   }
 
-  shouldRenderSubmit = () => {
+  shouldRenderSubmit(context) {
     let activeTypeMeetsCriteria = false
     switch (this.state.activeSubmissionType) {
       case 'media_recording':
@@ -221,7 +222,8 @@ export default class SubmissionManager extends Component {
       this.props.submission.submissionDraft &&
       activeTypeMeetsCriteria &&
       !this.state.uploadingFiles &&
-      !this.state.editingDraft
+      !this.state.editingDraft &&
+      !context.nextButtonEnabled
     )
   }
 
@@ -387,7 +389,11 @@ export default class SubmissionManager extends Component {
     return (
       <>
         {this.state.submittingAssignment ? <LoadingIndicator /> : this.renderAttemptTab()}
-        {this.shouldRenderSubmit() && this.renderSubmitButton()}
+        <StudentViewContext.Consumer>
+          {context => {
+            return this.shouldRenderSubmit(context) ? this.renderSubmitButton() : null
+          }}
+        </StudentViewContext.Consumer>
       </>
     )
   }
