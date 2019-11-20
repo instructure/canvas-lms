@@ -185,7 +185,7 @@ class UrlEntry extends React.Component {
   }
 
   renderAttempt = () => (
-    <View as="div" borderWidth="small" data-testid="url-entry">
+    <View as="div" borderWidth="small" data-testid="url-entry" margin="0 0 medium 0">
       <Billboard
         heading={I18n.t('Website Url')}
         hero={<IconLinkLine color="brand" />}
