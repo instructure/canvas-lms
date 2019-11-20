@@ -30,7 +30,7 @@ module SendToDialogPage
   end
 
   def user_dropdown(user_name)
-    fj("span:contains(#{user_name})")
+    fj("div span:contains(#{user_name})")
   end
 
   def send_button
