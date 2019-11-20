@@ -27,6 +27,7 @@
                   "text": "Red",
                   "correct": true,
                   "responses": 1,
+                  "user_ids": [100],
                   "user_names": ["Tatum Burch"]
                 },
                 {
@@ -34,6 +35,7 @@
                   "text": "Green",
                   "correct": true,
                   "responses": 1,
+                  "user_ids": [100],
                   "user_names": ["Tatum Burch"]
                 },
                 {
@@ -41,6 +43,7 @@
                   "text": "Blue",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -48,6 +51,7 @@
                   "text": "Teal",
                   "correct": true,
                   "responses": 5,
+                  "user_ids": [100, 101, 102, 103, 104],
                   "user_names": ["Tatum Burch","Rebecca Merritt",
                     "Geraldine Pierce","Jada Monroe","Natalie Simmons"]
                 },
@@ -55,7 +59,8 @@
                   "id": "5",
                   "text": "Purple",
                   "correct": false,
-                  "responses": 0
+                  "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -63,6 +68,7 @@
                   "text": "Yellow",
                   "correct": true,
                   "responses": 3,
+                  "user_ids": [100, 101, 102],
                   "user_names": ["Tatum Burch","Rebecca Merritt","Geraldine Pierce"]
                 },
                 {
@@ -70,6 +76,7 @@
                   "text": "Orange",
                   "correct": true,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -77,6 +84,7 @@
                   "text": "Pink",
                   "correct": false,
                   "responses": 2,
+                  "user_ids": [100, 101],
                   "user_names": ["Tatum Burch","Rebecca Merritt"]
                 },
                 {
@@ -84,6 +92,7 @@
                   "text": "Pink",
                   "correct": false,
                   "responses": 2,
+                  "user_ids": [100, 101],
                   "user_names": ["Tatum Burch","Rebecca Merritt"]
                 },
                 {
@@ -91,6 +100,7 @@
                   "text": "A",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -98,6 +108,7 @@
                   "text": "B",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -105,6 +116,7 @@
                   "text": "C",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -112,6 +124,7 @@
                   "text": "D",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -119,6 +132,7 @@
                   "text": "E",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -126,6 +140,7 @@
                   "text": "No Answer",
                   "correct": false,
                   "responses": 2,
+                  "user_ids": [100, 101],
                   "user_names": ["Tatum Burch","Rebecca Merritt"]
                 }
               ]
@@ -139,6 +154,7 @@
                   "text": "Red",
                   "correct": true,
                   "responses": 2,
+                  "user_ids": [100, 101],
                   "user_names": ["Tatum Burch","Rebecca Merritt"]
                 },
                 {
@@ -146,6 +162,7 @@
                   "text": "Green",
                   "correct": true,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -153,6 +170,7 @@
                   "text": "Blue",
                   "correct": false,
                   "responses": 2,
+                  "user_ids": [100, 101],
                   "user_names": ["Tatum Burch","Rebecca Merritt"]
                 },
                 {
@@ -160,6 +178,7 @@
                   "text": "Teal",
                   "correct": true,
                   "responses": 3,
+                  "user_ids": [100, 101, 102],
                   "user_names": ["Tatum Burch","Rebecca Merritt","Geraldine Pierce"]
                 },
                 {
@@ -167,6 +186,7 @@
                   "text": "Purple",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -174,6 +194,7 @@
                   "text": "Yellow",
                   "correct": true,
                   "responses": 3,
+                  "user_ids": [100, 101, 102],
                   "user_names": ["Tatum Burch","Rebecca Merritt","Geraldine Pierce"]
                 },
                 {
@@ -181,6 +202,7 @@
                   "text": "Orange",
                   "correct": true,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -188,6 +210,7 @@
                   "text": "Pink",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -195,6 +218,7 @@
                   "text": "Pink",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -202,6 +226,7 @@
                   "text": "A",
                   "correct": false,
                   "responses": 3,
+                  "user_ids": [100, 101, 102],
                   "user_names": ["Tatum Burch","Rebecca Merritt","Geraldine Pierce"]
                 },
                 {
@@ -209,6 +234,7 @@
                   "text": "B",
                   "correct": false,
                   "responses": 1,
+                  "user_ids": [100],
                   "user_names": ["Tatum Burch"]
                 },
                 {
@@ -216,6 +242,7 @@
                   "text": "C",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 },
                 {
@@ -223,6 +250,7 @@
                   "text": "D",
                   "correct": false,
                   "responses": 2,
+                  "user_ids": [100, 101],
                   "user_names": ["Tatum Burch","Rebecca Merritt"]
                 },
                 {
@@ -230,6 +258,7 @@
                   "text": "E",
                   "correct": false,
                   "responses": 1,
+                  "user_ids": [100],
                   "user_names": ["Tatum Burch"]
                 },
                 {
@@ -237,6 +266,7 @@
                   "text": "No Answer",
                   "correct": false,
                   "responses": 0,
+                  "user_ids": [],
                   "user_names": []
                 }
               ]
@@ -255,6 +285,7 @@
               "text": "I am a very long description of an answer that should span multiple lines.",
               "correct": true,
               "responses": 129,
+              "user_ids": [100, 101, 102],
               "user_names": ["Tatum Burch","Rebecca Merritt","Geraldine Pierce"]
             },
             {
@@ -262,6 +293,7 @@
               "text": "b",
               "correct": false,
               "responses": 1,
+              "user_ids": [100],
               "user_names": ["Tatum Burch"]
             },
             {
@@ -269,6 +301,7 @@
               "text": "c",
               "correct": false,
               "responses": 26,
+              "user_ids": [100, 101, 102],
               "user_names": ["Tatum Burch","Rebecca Merritt","Geraldine Pierce"]
             },
             {
@@ -276,6 +309,7 @@
               "text": "d",
               "correct": false,
               "responses": 0,
+              "user_ids": [],
               "user_names": []
             }
           ],

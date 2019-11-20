@@ -92,38 +92,42 @@ describe CanvasQuizStatistics::Analyzers::Essay do
 
       it 'should group items into answer type buckets with appropriate data' do
         output = subject.run([
-          { points: 0, correct: 'undefined', user_name: 'Joe0'},
-          { points: 0, correct: 'undefined', user_name: 'Joe0'},
-          { points: 0, correct: 'undefined', user_name: 'Joe0'},
-          { points: 1, correct: 'defined', user_name: 'Joe1'},
-          { points: 2, correct: 'defined', user_name: 'Joe2'},
-          { points: 3, correct: 'defined', user_name: 'Joe3'},
-          { points: 4, correct: 'defined', user_name: 'Joe4'},
-          { points: 6, correct: 'defined', user_name: 'Joe6'},
-          { points: 7, correct: 'defined', user_name: 'Joe7'},
-          { points: 8, correct: 'defined', user_name: 'Joe8'},
-          { points: 9, correct: 'defined', user_name: 'Joe9'},
-          { points: 10, correct: 'defined', user_name: 'Joe10'},
+          { points: 0, correct: 'undefined', user_id: 100, user_name: 'Joe0'},
+          { points: 0, correct: 'undefined', user_id: 100, user_name: 'Joe0'},
+          { points: 0, correct: 'undefined', user_id: 100, user_name: 'Joe0'},
+          { points: 1, correct: 'defined', user_id: 101, user_name: 'Joe1'},
+          { points: 2, correct: 'defined', user_id: 102, user_name: 'Joe2'},
+          { points: 3, correct: 'defined', user_id: 103, user_name: 'Joe3'},
+          { points: 4, correct: 'defined', user_id: 104, user_name: 'Joe4'},
+          { points: 6, correct: 'defined', user_id: 106, user_name: 'Joe6'},
+          { points: 7, correct: 'defined', user_id: 107, user_name: 'Joe7'},
+          { points: 8, correct: 'defined', user_id: 108, user_name: 'Joe8'},
+          { points: 9, correct: 'defined', user_id: 109, user_name: 'Joe9'},
+          { points: 10, correct: 'defined', user_id: 110, user_name: 'Joe10'},
         ])
         answers = output[:answers]
 
         bottom = answers[2]
         expect(bottom[:responses]).to eq 2
+        expect(bottom[:user_ids]).to include(101)
         expect(bottom[:user_names]).to include('Joe1')
         expect(bottom[:full_credit]).to be_falsey
 
         middle = answers[1]
         expect(middle[:responses]).to eq 5
+        expect(middle[:user_ids]).to include(106)
         expect(middle[:user_names]).to include('Joe6')
         expect(middle[:full_credit]).to be_falsey
 
         top = answers[0]
         expect(top[:responses]).to eq 2
+        expect(top[:user_ids]).to include(110)
         expect(top[:user_names]).to include('Joe10')
         expect(top[:full_credit]).to be_truthy
 
         undefined = answers[3]
         expect(undefined[:responses]).to eq 3
+        expect(undefined[:user_ids].uniq).to eq [100]
         expect(undefined[:user_names].uniq).to eq ['Joe0']
         expect(undefined[:full_credit]).to be_falsey
       end

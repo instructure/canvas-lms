@@ -66,6 +66,7 @@ module CanvasQuizStatistics::Analyzers
       answers = parse_answers do |answer, answer_stats|
         stats = {
           responses: 0,
+          user_ids: [],
           user_names: []
         }
 
