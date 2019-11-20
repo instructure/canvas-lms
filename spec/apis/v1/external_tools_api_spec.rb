@@ -548,6 +548,7 @@ describe ExternalToolsController, type: :request do
     et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
     et.module_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "modules index menu", display_type: 'full_width', visibility: 'admins'}
     et.quiz_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz menu", display_type: 'full_width', visibility: 'admins'}
+    et.quiz_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "quiz index menu", display_type: 'full_width', visibility: 'admins'}
     et.wiki_page_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki page menu", display_type: 'full_width', visibility: 'admins'}
     et.wiki_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "wiki index menu", display_type: 'full_width', visibility: 'admins'}
     et.student_context_card = {:url=>"http://www.example.com/ims/lti/resource", :text => "context card link", display_type: 'full_width', visibility: 'admins'}
@@ -741,8 +742,16 @@ describe ExternalToolsController, type: :request do
           "selection_height"=>400,
           "selection_width"=>800},
      "quiz_menu"=>
-         {"text"=>"quiz menu",
+        {"text"=>"quiz menu",
           "label"=>"quiz menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+    "quiz_index_menu"=>
+        {"text"=>"quiz index menu",
+          "label"=>"quiz index menu",
           "url"=>"http://www.example.com/ims/lti/resource",
           "visibility"=>'admins',
           "display_type"=>'full_width',

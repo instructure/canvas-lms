@@ -57,6 +57,7 @@ module Lti
                   :module_index_menu,
                   :post_grades,
                   :quiz_menu,
+                  :quiz_index_menu,
                   :resource_selection,
                   :student_context_card,
                   :tool_configuration,

@@ -130,6 +130,7 @@ module Lti
     INDEX_MENU_TOOL_TYPES = %w{
       assignment_index_menu
       module_index_menu
+      quiz_index_menu
       wiki_index_menu
     }.freeze
 
