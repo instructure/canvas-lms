@@ -17,12 +17,14 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import DirectShareCourseTray from '../direct_share/DirectShareCourseTray'
 import useManagedCourseSearchApi from '../effects/useManagedCourseSearchApi'
+import useModuleCourseSearchApi from '../effects/useModuleCourseSearchApi'
 
 jest.mock('jsx/shared/effects/useManagedCourseSearchApi')
+jest.mock('jsx/shared/effects/useModuleCourseSearchApi')
 
 const userManagedCoursesList = [
   {
@@ -73,6 +75,21 @@ describe('DirectShareCopyToTray', () => {
 
       expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
     })
+
+    it('handles error when course module fetch fails', async () => {
+      useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
+        success(userManagedCoursesList)
+      })
+      useModuleCourseSearchApi.mockImplementationOnce(({error}) =>
+        error([{status: 400, body: 'Error fetching data'}])
+      )
+      const {getByText} = render(<DirectShareCourseTray open />)
+      fireEvent.click(getByText(/select a course/i))
+      fireEvent.click(getByText('Course Math 101'))
+      await act(() => fetchMock.flush(true))
+
+      expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
   })
 
   describe('course dropdown', () => {
@@ -87,13 +104,6 @@ describe('DirectShareCopyToTray', () => {
       expect(getByText('Course Advanced Math 200')).toBeInTheDocument()
       expect(getByText('Course Math 101')).toBeInTheDocument()
     })
-  })
-
-  describe('destination learning object dropdown', () => {
-    it('shows all modules in selected course when launched from modules menu', () => {})
-    it('shows all assignment groups in selected course when launched from assignments menu', () => {})
-    it('locks destination to be discussion when launched from discussion menu', () => {})
-    it('shows all assignment groups in selected course when launched from quizzes menu', () => {})
   })
 
   describe('place dropdown', () => {
