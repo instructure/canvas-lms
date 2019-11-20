@@ -356,6 +356,15 @@ pipeline {
   }
 
   post {
+    failure {
+      script {
+        if ( env.GERRIT_EVENT_TYPE == 'change-merged' ) {
+          slackSend (channel: '#canvas_builds',
+            color: '#da0005',
+            message: "${env.JOB_NAME} failed on merge (<${env.BUILD_URL}|${env.BUILD_NUMBER}>)")
+        }
+      }
+    }
     cleanup {
         sh 'build/new-jenkins/docker-cleanup.sh'
     }
