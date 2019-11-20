@@ -19539,9 +19539,10 @@ tiny-lr@^0.2.1:
     parseurl "~1.3.0"
     qs "~5.1.0"
 
-tinycolor2@1.4.1, tinycolor2@^1.4.1, "tinycolor2@https://github.com/instructure/tinycolor.git#master":
+tinycolor2@1.4.1, tinycolor2@^1.4.1:
   version "1.4.1"
-  resolved "https://github.com/instructure/tinycolor.git#a1f8752bb09719c3c1e38f1b9d1d495057c2ca28"
+  resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
+  integrity sha1-9PrTM0R7wLB9TcjpIJ2POaisd+g=
 
 tinymce-a11y-checker@3.0.0-rc2:
   version "3.0.0-rc2"
