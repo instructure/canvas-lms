@@ -27,7 +27,9 @@ module QuizzesNext
                 :post_to_sis, :allowed_attempts, :permissions,
                 :html_url, :mobile_url, :can_duplicate,
                 :course_id, :original_course_id, :original_assignment_id,
-                :workflow_state, :original_assignment_name, :original_quiz_id
+                :workflow_state, :original_assignment_name, :original_quiz_id,
+                :require_lockdown_browser, :require_lockdown_browser_for_results,
+                :require_lockdown_browser_monitor, :lockdown_browser_monitor_data, :access_code
 
     def_delegators :@controller
 
@@ -81,6 +83,26 @@ module QuizzesNext
 
     def stringify_ids?
       !!(accepts_jsonapi? || stringify_json_ids?)
+    end
+
+    def require_lockdown_browser
+      object.settings&.dig('lockdown_browser', 'require_lockdown_browser') || false
+    end
+
+    def require_lockdown_browser_for_results
+      object.settings&.dig('lockdown_browser', 'require_lockdown_browser_for_results') || false
+    end
+
+    def require_lockdown_browser_monitor
+      object.settings&.dig('lockdown_browser', 'require_lockdown_browser_monitor') || false
+    end
+
+    def lockdown_browser_monitor_data
+      object.settings&.dig('lockdown_browser', 'lockdown_browser_monitor_data')
+    end
+
+    def access_code
+      object.settings&.dig('lockdown_browser', 'access_code')
     end
   end
 end
