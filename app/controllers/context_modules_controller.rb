@@ -42,7 +42,8 @@ class ContextModulesController < ApplicationController
     def modules_cache_key
       @modules_cache_key ||= begin
         visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context)
-        cache_key_items = [@context.cache_key, @can_edit, @is_student, @can_view_unpublished, 'all_context_modules_draft_10', collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)]
+        cache_key_items = [@context.cache_key, @can_edit, @is_student, @can_view_unpublished, 'all_context_modules_draft_10',
+          collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
         cache_key = cache_key_items.join('/')
         cache_key = add_menu_tools_to_cache_key(cache_key)
         cache_key = add_mastery_paths_to_cache_key(cache_key, @context, @modules, @current_user)
@@ -53,6 +54,7 @@ class ContextModulesController < ApplicationController
       @modules = @context.modules_visible_to(@current_user)
       @modules.each(&:check_for_stale_cache_after_unlocking!)
       @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).pluck(:context_module_id, :collapsed).select{|cm_id, collapsed| !!collapsed }.map(&:first)
+      @section_visibility = @context.course_section_visibility(@current_user)
 
       @can_edit = can_do(@context, @current_user, :manage_content)
       @can_view_grades = can_do(@context, @current_user, :view_all_grades)
@@ -113,6 +115,7 @@ class ContextModulesController < ApplicationController
       end
       add_body_class('padless-content')
       js_bundle :context_modules
+      js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
       css_bundle :content_next, :context_modules2
       render stream: can_stream_template?
     end

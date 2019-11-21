@@ -24,7 +24,7 @@ import {MARK_SUBMISSION_COMMENT_READ} from '../../graphqlData/Mutations'
 import noComments from '../../SVG/NoComments.svg'
 import React, {useContext, useEffect} from 'react'
 import {Submission} from '../../graphqlData/Submission'
-import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
+import {SUBMISSION_COMMENT_QUERY, SUBMISSION_HISTORIES_QUERY} from '../../graphqlData/Queries'
 import {SubmissionComment} from '../../graphqlData/SubmissionComment'
 import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
 import {useMutation} from 'react-apollo'
@@ -35,22 +35,17 @@ function CommentContent(props) {
   const [markCommentsRead, {data, called: mutationCalled, error: mutationError}] = useMutation(
     MARK_SUBMISSION_COMMENT_READ,
     {
-      update(cache, {data}) {
+      update(cache, result) {
         // ValidationError, different then the mutationError
-        if (data?.markSubmissionCommentsRead?.errors) {
+        if (result.data?.markSubmissionCommentsRead?.errors) {
           return
         }
 
-        const ids = data.markSubmissionCommentsRead.submissionComments.map(c => c._id)
+        // Set the read status for all of the submission comments we just
+        // marked as read. I'm sad apollo isn't smart enough to do this without
+        // us manually having to update the cache.
+        const ids = result.data.markSubmissionCommentsRead.submissionComments.map(c => c._id)
         const updatedCommentIDs = new Set(ids)
-
-        const submissionQueryVariables = {
-          id: props.submission.id,
-          fragment: Submission.fragment,
-          fragmentName: 'Submission',
-          variables: {submissionID: props.submission.id}
-        }
-
         const commentQueryVariables = {
           query: SUBMISSION_COMMENT_QUERY,
           variables: {
@@ -58,18 +53,6 @@ function CommentContent(props) {
             submissionAttempt: props.submission.attempt
           }
         }
-
-        const submission = JSON.parse(JSON.stringify(cache.readFragment(submissionQueryVariables)))
-
-        submission.unreadCommentCount = Math.max(
-          0,
-          submission.unreadCommentCount - updatedCommentIDs.size
-        )
-
-        cache.writeFragment({
-          ...submissionQueryVariables,
-          data: {...submission, __typename: 'Submission'}
-        })
 
         const {submissionComments} = JSON.parse(
           JSON.stringify(cache.readQuery(commentQueryVariables))
@@ -84,12 +67,52 @@ function CommentContent(props) {
           ...commentQueryVariables,
           data: {submissionComments}
         })
+
+        // Now update the unreadCommentCount. We have to handle the current
+        // submission and submission histories separately as they exist in
+        // different parts in the apollo cache. Try the current submission first
+        const submissionQueryVariables = {
+          id: props.submission.id,
+          fragment: Submission.fragment,
+          fragmentName: 'Submission',
+          variables: {submissionID: props.submission.id}
+        }
+        const cachedCurrentSubmission = cache.readFragment(submissionQueryVariables)
+
+        if (props.submission.attempt === cachedCurrentSubmission.attempt) {
+          const submission = JSON.parse(JSON.stringify(cachedCurrentSubmission))
+          const newUnreadCount = Math.max(0, submission.unreadCommentCount - updatedCommentIDs.size)
+          submission.unreadCommentCount = newUnreadCount
+          cache.writeFragment({...submissionQueryVariables, data: submission})
+        } else {
+          const cachedHistories = cache.readQuery({
+            query: SUBMISSION_HISTORIES_QUERY,
+            variables: {submissionID: props.submission.id}
+          })
+
+          const histories = JSON.parse(JSON.stringify(cachedHistories))
+          histories.node.submissionHistoriesConnection.nodes.forEach(history => {
+            if (history.attempt !== props.submission.attempt) {
+              return
+            }
+
+            const newUnreadCount = Math.max(0, history.unreadCommentCount - updatedCommentIDs.size)
+            history.unreadCommentCount = newUnreadCount
+          })
+
+          cache.writeQuery({
+            query: SUBMISSION_HISTORIES_QUERY,
+            variables: {submissionID: props.submission.id},
+            data: histories
+          })
+        }
       }
     }
   )
 
   useEffect(() => {
-    if (props.submission.unreadCommentCount > 0) {
+    const unreadComments = props.comments.filter(c => !c.read)
+    if (unreadComments.length > 0) {
       const commentIds = props.comments
         .filter(comment => comment.read === false)
         .map(comment => comment._id)

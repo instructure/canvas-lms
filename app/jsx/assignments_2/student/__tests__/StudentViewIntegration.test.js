@@ -21,14 +21,19 @@ import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import {createCache} from '../../../canvas-apollo'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {
+  LOGGED_OUT_STUDENT_VIEW_QUERY,
+  STUDENT_VIEW_QUERY,
+  SUBMISSION_HISTORIES_QUERY
+} from '../graphqlData/Queries'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../mocks'
 import React from 'react'
-import {STUDENT_VIEW_QUERY, SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import StudentViewQuery from '../components/StudentViewQuery'
 import {SubmissionMocks} from '../graphqlData/Submission'
 
 jest.setTimeout(10000) // TODO: figure out why these tests are so slow
+jest.mock('../components/Attempt')
 
 describe('student view integration tests', () => {
   beforeEach(() => {
@@ -114,7 +119,7 @@ describe('student view integration tests', () => {
         }
       })
 
-      const {container, getAllByText} = render(
+      const {container, findByText, findAllByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MockedProvider mocks={mocks} cache={createCache()}>
             <StudentViewQuery assignmentLid="1" submissionID="1" />
@@ -127,7 +132,37 @@ describe('student view integration tests', () => {
         container.querySelector('input[id="inputFileDrop"]')
       )
       fireEvent.change(fileInput, {target: {files}})
-      expect(await waitForElement(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
+      await findByText('Loading')
+      expect((await findAllByText('test.jpg'))[0]).toBeInTheDocument()
+    })
+
+    it('displays a loading indicator for each new file being uploaded', async () => {
+      window.URL.createObjectURL = jest.fn()
+      uploadFileModule.uploadFiles = jest.fn()
+      uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
+      $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+
+      const mocks = await createGraphqlMocks({
+        CreateSubmissionDraftPayload: {
+          submissionDraft: {attachments: [{}, {}]}
+        }
+      })
+
+      const {container, findAllByText} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <MockedProvider mocks={mocks} cache={createCache()}>
+            <StudentViewQuery assignmentLid="1" submissionID="1" />
+          </MockedProvider>
+        </AlertManagerContext.Provider>
+      )
+
+      const files = [new File(['foo'], 'file1.jpg', {type: 'image/jpg'})]
+      const fileInput = await waitForElement(() =>
+        container.querySelector('input[id="inputFileDrop"]')
+      )
+      fireEvent.change(fileInput, {target: {files}})
+      const elements = await findAllByText('Loading')
+      expect(elements).toHaveLength(2)
     })
   })
 
@@ -224,6 +259,43 @@ describe('student view integration tests', () => {
       fireEvent.click(startButton)
 
       expect(await findByTestId('text-editor')).toBeInTheDocument()
+    })
+  })
+
+  describe('logged out user on a public assignment', () => {
+    async function createPublicAssignmentMocks(overrides = {}) {
+      const query = LOGGED_OUT_STUDENT_VIEW_QUERY
+      const variables = {assignmentLid: '1'}
+      const result = await mockQuery(query, overrides, variables)
+      return {
+        request: {query, variables},
+        result
+      }
+    }
+
+    it('renders the assignment', async () => {
+      const overrides = [{Assignment: {name: 'Test Assignment', rubric: null}}]
+      const mocks = [await createPublicAssignmentMocks(overrides)]
+      const {findAllByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <StudentViewQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+      expect((await findAllByText('Test Assignment'))[0]).toBeInTheDocument()
+    })
+
+    it('renders a rubric if present', async () => {
+      const overrides = [
+        {Assignment: {name: 'Test Assignment', rubric: {}}},
+        {Rubric: {title: 'Test Rubric'}}
+      ]
+      const mocks = [await createPublicAssignmentMocks(overrides)]
+      const {findAllByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <StudentViewQuery assignmentLid="1" />
+        </MockedProvider>
+      )
+      expect((await findAllByText('Test Rubric'))[0]).toBeInTheDocument()
     })
   })
 })

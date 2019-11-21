@@ -92,6 +92,13 @@ describe LearningOutcomeResult do
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 0
         end
       end
+
+      context 'not graded assignment with unposted submissions' do
+        it 'excludes assignment result' do
+          assignment.update!(grading_type: 'not_graded')
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
+        end
+      end
     end
 
     context 'with quiz assignment' do

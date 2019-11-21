@@ -163,6 +163,16 @@ describe TabsController, type: :request do
       ]
     end
 
+    it 'includes tabs for institution-visible courses' do
+      course_factory(:active_all => true)
+      @course.update_attribute(:is_public_to_auth_users, true)
+      user_with_pseudonym
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                      {:controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
+                      {}, {}, {:expected_status => 200})
+      expect(json.map { |tab| tab['id'] }).to include 'home'
+    end
+
     it 'should include external tools' do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.new({

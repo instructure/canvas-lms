@@ -16,10 +16,66 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import WikiPage from 'compiled/models/WikiPage'
 import WikiPageCollection from 'compiled/collections/WikiPageCollection'
 import WikiPageIndexView from 'compiled/views/wiki/WikiPageIndexView'
 import $ from 'jquery'
 import 'jquery.disableWhileLoading'
+import fakeENV from 'helpers/fakeENV'
+
+QUnit.module('WikiPageIndexView:direct_share', {
+  setup() {
+    fakeENV.setup()
+    ENV.DIRECT_SHARE_ENABLED = true
+    ENV.COURSE_ID = 'a course'
+    this.model = new WikiPage({page_id: '42'})
+    this.collection = new WikiPageCollection([this.model])
+    this.view = new WikiPageIndexView({
+      collection: this.collection,
+      WIKI_RIGHTS: {
+        create_page: true,
+        manage: true
+      }
+    })
+  },
+
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('opens and closes the direct share course tray', function() {
+  const trayComponent = sandbox.stub(this.view, 'DirectShareCourseTray').returns(null)
+  this.collection.trigger('fetch')
+  this.view.$el.find('.copy-wiki-page-to').click()
+  ok(
+    trayComponent.firstCall.calledWithMatch({
+      open: true,
+      sourceCourseId: 'a course',
+      contentSelection: {pages: ['42']}
+    })
+  )
+  trayComponent.firstCall.args[0].onDismiss()
+  ok(trayComponent.secondCall.calledWithMatch({open: false}))
+})
+
+test('opens and closes the direct share user modal', function() {
+  const userModal = sandbox.stub(this.view, 'DirectShareUserModal').returns(null)
+  this.collection.trigger('fetch')
+  this.view.$el.find('.send-wiki-page-to').click()
+  ok(
+    userModal.firstCall.calledWithMatch({
+      open: true,
+      courseId: 'a course',
+      contentShare: {
+        content_id: '42',
+        content_type: 'page'
+      }
+    })
+  )
+  userModal.firstCall.args[0].onDismiss()
+  ok(userModal.secondCall.calledWithMatch({open: false}))
+})
 
 QUnit.module('WikiPageIndexView:sort', {
   setup() {

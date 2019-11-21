@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
-
-import {View} from '@instructure/ui-layout'
-import PropTypes from 'prop-types'
-
+import I18n from 'i18n!assignments_2_shared_Steps'
 import {omitProps, safeCloneElement} from '@instructure/ui-react-utils'
+import PropTypes from 'prop-types'
+import React, {Component} from 'react'
+import {View} from '@instructure/ui-layout'
 
 class Steps extends Component {
   static propTypes = {
@@ -36,11 +35,11 @@ class Steps extends Component {
           inProgressArr.push(props.children[child])
         }
         if (props.children[child].type.displayName !== 'StepItem') {
-          new Error("Warning Step has children that aren't StepItem components")
+          new Error(I18n.t("Warning Step has children that aren't StepItem components"))
         }
       }
       if (inProgressArr.length > 1) {
-        new Error('Warning: Step has two StepItems with a status of in-progress')
+        new Error(I18n.t('Warning: Step has two StepItems with a status of in-progress'))
       }
     }
   }

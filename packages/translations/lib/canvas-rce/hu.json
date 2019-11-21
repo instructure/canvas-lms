@@ -1,0 +1,93 @@
+{
+  "add_8523c19b": { "message": "Hozzáadás" },
+  "all_4321c3a1": { "message": "Összes" },
+  "announcement_list_da155734": { "message": "Hirdetménylista" },
+  "announcements_a4b8ed4a": { "message": "Hirdetmények" },
+  "apps_54d24a47": { "message": "Alkalmazások" },
+  "aspect_ratio_will_be_preserved_cb5fdfb8": {
+    "message": "Képarány megtartása"
+  },
+  "assignments_1e02582c": { "message": "Feladatok" },
+  "cancel_caeb1e68": { "message": "Mégse" },
+  "canvas_plugins_705a5016": { "message": "Canvas Pluginok" },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Az oldalra mutató link beszúrásához kattintson a kívánt oldalra."
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Click to embed { imageName }"
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Click to insert a link into the editor."
+  },
+  "close_d634289d": { "message": "Bezár" },
+  "collaborations_5c56c15f": { "message": "Együttműködés" },
+  "content_type_2cf90d95": { "message": "Tartalom típusa " },
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n    one {}\n  other {}\n}"
+  },
+  "course_files_62deb8f8": { "message": "Kurzusfájlok" },
+  "course_navigation_dd035109": { "message": "Kurzusnavigáció" },
+  "decrease_indent_de6343ab": { "message": "Behúzás csökkentése" },
+  "dimensions_45ddb7b7": { "message": "Méretek" },
+  "discussions_a5f96392": { "message": "Fórumok" },
+  "discussions_index_6c36ced": { "message": "Fórumok indexe" },
+  "done_54e3d4b6": { "message": "Kész" },
+  "due_multiple_dates_cc0ee3f5": {
+    "message": "Határidő: Több határidő van érvényben"
+  },
+  "embed_image_1080badc": { "message": "Beágyazott kép" },
+  "files_c300e900": { "message": "Fájlok" },
+  "files_index_af7c662b": { "message": "Fájlok indexe" },
+  "generating_preview_45b53be0": { "message": "Előnézet generálása... " },
+  "grades_a61eba0a": { "message": "Értékelések" },
+  "group_navigation_99f191a": { "message": "Csoportnavigáció" },
+  "header_f28f73db": { "message": "Fejléc" },
+  "images_7ce26570": { "message": "Képek" },
+  "increase_indent_6d550a4a": { "message": "Behúzás növelése" },
+  "insert_equella_links_49a8dacd": { "message": "Insert Equella Links" },
+  "insert_link_6dc23cae": { "message": "Link beszúrása" },
+  "insert_math_equation_57c6e767": {
+    "message": "Matematikai képlet beszúrása"
+  },
+  "invalid_file_type_881cc9b2": { "message": "Érvénytelen fájltípus" },
+  "keyboard_shortcuts_ed1844bd": { "message": "Billentyűparancsok" },
+  "link_7262adec": { "message": "Hivatkozás" },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Linkelés más kurzustartalomhoz."
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Más tartalomhoz kapcsolás a csoportban."
+  },
+  "links_14b70841": { "message": "Linkek" },
+  "load_more_results_460f49a9": { "message": "Load more results" },
+  "loading_25990131": { "message": "Betöltés..." },
+  "loading_bde52856": { "message": "Töltődik" },
+  "loading_failed_b3524381": { "message": "Loading failed..." },
+  "media_af190855": { "message": "Média" },
+  "modules_c4325335": { "message": "Modulok" },
+  "my_files_eea33f44": { "message": "Fájljaim" },
+  "next_page_d2a39853": { "message": "Következő oldal" },
+  "no_results_940393cf": { "message": "No results." },
+  "options_3ab0ea65": { "message": "Beállítások" },
+  "pages_e5414c2c": { "message": "Oldalak" },
+  "people_b4ebb13c": { "message": "Résztvevők" },
+  "previous_page_928fc112": { "message": "Előző oldal" },
+  "published_c944a23d": { "message": "publikált" },
+  "quizzes_7e598f57": { "message": "Kvízek" },
+  "record_7c9448b": { "message": "Felvétel" },
+  "recording_98da6bda": { "message": "Felvétel" },
+  "rich_content_editor_2708ef21": { "message": "Vizuális szövegszerkesztő" },
+  "save_11a80ec3": { "message": "Mentés" },
+  "search_280d00bd": { "message": "Keresés" },
+  "selected_274ce24f": { "message": "Kiválasztva" },
+  "size_b30e1077": { "message": "Méret" },
+  "start_over_f7552aa9": { "message": "Újrakezdés" },
+  "submit_a3cc6859": { "message": "Beküldés" },
+  "syllabus_f191f65b": { "message": "Tematika" },
+  "title_ee03d132": { "message": "Cím" },
+  "unpublished_dfd8801": { "message": "nem publikált" },
+  "upload_media_ce31135a": { "message": "Médiafájl feltöltése" },
+  "url_22a5f3b8": { "message": "URL" },
+  "video_player_b371005": { "message": "Videólejátszó" },
+  "wiki_home_9cd54d0": { "message": "Wiki kezdőlap" }
+}

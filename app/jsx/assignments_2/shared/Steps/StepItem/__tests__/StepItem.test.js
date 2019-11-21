@@ -41,8 +41,8 @@ it('should render unavailable status', () => {
 
 it('should render label correctly', () => {
   const {getByText} = render(<StepItem status="complete" label="progress 2" />)
-  // visible label
-  expect(getByText('progress 2')).toBeInTheDocument()
+  // aria-hidden label
+  expect(getByText('progress 2')).toBeVisible()
   // screenreader text for status
-  expect(getByText('complete')).toBeInTheDocument()
+  expect(getByText('progress 2 complete')).toBeInTheDocument()
 })

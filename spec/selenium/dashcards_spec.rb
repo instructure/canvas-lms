@@ -223,7 +223,7 @@ describe 'dashcards' do
 
     context "dashcard color picker" do
       before :each do
-        wait_for_new_page_load{ get '/' }
+        get '/'
         f('.ic-DashboardCard__header-button').click
         wait_for_ajaximations
       end

@@ -16895,7 +16895,7 @@ pl:
       regenerate_token: "Czy na pewno chcesz ponownie wygenerować token?  Konieczna będzie aktualizacja wszystkich elementów wykorzystujących ten token."
       unregister_service: "Czy na pewno chcesz wyrejestrować się z tej usługi?"
     content_shares: 
-      page_title: "Preferencje dotyczące powiadomień"
+      page_title: "Udostępniona zawartość"
     crumb: "Profil użytkownika %{user}"
     crumbs: 
       observees: Obserwowanie

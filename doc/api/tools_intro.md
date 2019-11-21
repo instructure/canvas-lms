@@ -2,16 +2,20 @@ External Tools Introduction
 ==============
 
 Canvas, like many LMSs, supports loading external resources inline using the
-<a href="http://www.imsglobal.org/lti/">IMS LTI standard</a>.
-These tools can be configured on a course or account level, and
-can be added to course modules or used to create custom assignments (see the
-LTI Outcomes service for more information on that). Canvas supports some additional
-integration points using LTI to offer a more integrated experience and to allow for
-more customization of the Canvas product, even in a cloud environment. This is
-accomplished by configuring additional settings on external tools used inside of
-Canvas.
+<a href="http://www.imsglobal.org/lti/" target="_blank">IMS LTI standard</a>.
+These tools can be deployed on a course or account level. Once configured, tools
+can be surfaced <a href="file.link_selection_placement.html" target="_blank">as links in 
+course modules</a> or used to <a href="file.assignment_selection_placement.html" 
+target="_blank">deliver custom assignment experiences</a>. Canvas supports some 
+additional integration points using LTI (see the "Placements" dropdown in the 
+left hand navigation here) to offer a more integrated experience and to allow 
+for more customization of the Canvas product. This is accomplished by <a 
+href="file.lti_dev_key_config.html" target="_blank">configuring additional settings</a>
+on external tools used inside of Canvas and by leveraging <a 
+href="https://www.imsglobal.org/lti-advantage-overview" target="_blank">LTI 
+Advantage services</a>.
 
-Because tools can be configured at any level in the system heirarchy, they can be
+Because tools can be deployed at any level in the system heirarchy, they can be
 as general or specific as needed. The Chemistry Department can add chemistry-specific
 tools without those tools cluttering everyone else's interfaces. Or, a single teacher
 who is trying out some new web service can do so without needing the tool to be
@@ -19,14 +23,15 @@ set up at the account level.
 
 ### Types of Tool Integrations
 
-Canvas currently supports the following types of tool extensions:
+Canvas currently supports the following types of tool placements:
 
-[External tool assignments, with grades passed back from the tool to Canvas](assignment_tools.html):
+External tool <a href="file.assignment_tools.html" target="_blank">assignments integrations</a>:
 
   This type of integration is part of the
-  [LTI 1.1 specification](http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html),
-  and is important in that it allows external services to take care of things
-  that can be graded automatically, or outside the LMS scope.
+  <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html" target=_"blank">LTI 1.1 
+  Outcomes Service</a> or <a href="http://www.imsglobal.org/spec/lti-ags/v2p0/" 
+  target="_blank">LTI 1.3 Assignment and Grade Services</a> and allows external services to
+  syncronize grades, and other assignment details.
 
    Example use cases might include:
 
@@ -34,7 +39,8 @@ Canvas currently supports the following types of tool extensions:
   - Evaluating a student's ability to correctly draw notes at different musical intervals
   - Giving students credit for participating in an interactive lesson on the Civil War
 
-[Adding a link/tab to the course navigation](navigation_tools.html#course_navigation):
+Adding a link/tab to the <a href="file.navigation_tools.html#course_navigation" 
+target="_blank">course navigation</a>:
 
   Example use cases might include:
 
@@ -42,8 +48,10 @@ Canvas currently supports the following types of tool extensions:
   - Adding an "ebooks" link with course required reading
   - Connecting to study room scheduling tool
   - Linking to campus communication hub
+  - Displaying a course-level dashboard (ex: analytics, student engagement, risk assessment, etc.)
 
-[Adding a link/tab to the account navigation](navigation_tools.html#account_navigation):
+Adding a link/tab to the <a href="file.navigation_tools.html#account_navigation"
+target="_blank">account navigation</a>:
 
   Example use cases might include:
 
@@ -51,30 +59,36 @@ Canvas currently supports the following types of tool extensions:
   - Building helper libraries for campus-specific customizations
   - Leveraging single sign-on for access to other systems, like SIS
 
-[Adding a link/tab to the user profile navigation](navigation_tools.html#user_navigation):
+Adding a link/tab to the <a href="file.navigation_tools.html#user_navigation
+target="_blank">
+user profile navigation</a>:
 
   Example use cases might include:
 
   - Leveraging single sign-on to student portal from within Canvas
   - Linking to an external user profile
 
-[Selecting content to add to a variety of locations](content_item.html):
+Selecting content to add to a variety of locations as <a 
+href="file.deep_linking.html" target="_blank">LTI deep links</a>:
 
   Example use cases might include:
 
-  - adding a button to embed content to the Rich Content Editor:
+  - adding a button to  <a href="file.editor_button_placement.html" 
+    target="_blank">embed content to the Rich Content Editor</a>:
 
    * Embedding resources from campus video/image repository
    * Inserting custom-designed chemistry diagrams into quiz question text
-   * Building integrations with new or subject-area-specialized web authoring services
+   * Building integrations with new or subject-area-specialized web authoring 
+     services
 
-  - selecting links for modules or external tools
+  - <a href="file.link_selection_placement.html" target="_blank">selecting links
+   for modules</a>
 
    * Building and then linking to a remixed version of an online Physics textbook
    * Selecting from a list of pre-built, interactive quizzes on blood vessels
    * Choosing a specific chapter from an e-textbook to add to a module
 
-  - creating custom assignments for Canvas
+  - <a href="file.assignment_tools.html" target="_blank">creating custom assignments for Canvas</a>
 
    * Creating a Canvas assignment that launches the student to a custom assessment
   that can be automatically graded by the tool and synced with the Canvas Gradebook
@@ -82,7 +96,8 @@ Canvas currently supports the following types of tool extensions:
   the tool returns an LTI launch url that allows the teacher to see the submission
   without leaving Canvas.
 
-  - allowing a student to submit attachments to assignments
+  - <a href="file.homework_submission_placement.html" target="_blank">allowing a
+    student to submit attachments to assignments</a>
 
    * A student launches a custom video recording tool and submits the recording to Canvas
    * A student chooses an item from a portfolio tool and submits the item to Canvas
@@ -91,14 +106,27 @@ Canvas currently supports the following types of tool extensions:
 
 ### How to Configure/Import Integrated Tools
 
-Tools extensions can be configured using LTI configuration XML as specified in the IMS
-Common Cartridge specification, or using the <a href="external_tools.html">external tools
-API</a>. Configuration XML contains all non-account-specific
-settings (everything except the consumer key and shared secret, which must always be
-entered manually). The user can retrieve the info from a standard URL that you provide
-(recommended), or paste in the XML that you provide. For more information on this
-configuration, see the "Examples" link.
+#### LTI 1.1
+Tool's placements can be configured using 
+<a href="file.tools_xml.html">LTI configuration XML</a> 
+as specified in the IMS Common Cartridge specification, or using the <a 
+href="external_tools.html">external tools API</a>. Configuration XML contains all 
+non-account-specific settings (except the consumer key and shared secret, which must always be
+entered manually). The user can <a href="https://community.canvaslms.com/docs/DOC-13117-415274482"
+target="_blank">configure the tool by a tool-provided URL</a>
+(recommended), or <a href="https://community.canvaslms.com/docs/DOC-12601-421474560" 
+target="_blank">paste in the XML</a> that the tool provides.
 
 For information on how to programmatically configured external tools, so users
 don't have to copy and paste URLs or XML, please see the Canvas
 <a href="external_tools.html">external tools API</a>.
+
+#### LTI 1.3
+Similar to LTI 1.1, tools built on the <a href="https://www.imsglobal.org/spec/lti/v1p3/" 
+target="_blank">LTI 1.3 specification</a> can be configured by either supplying clients with a 
+JSON block or URL that hosts the JSON. This JSON is used to determine the behavior of the tool
+within Canvas by <a href="https://community.canvaslms.com/docs/DOC-16729-42141110178" 
+target="_blank">configuring and LTI Developer Key</a>. Once the developer key is created and
+turned on, users with sufficient permissions can 
+<a href=https://community.canvaslms.com/docs/DOC-16730-42141110273 target="_blank">install the 
+tool using the developer key's client ID</a>.

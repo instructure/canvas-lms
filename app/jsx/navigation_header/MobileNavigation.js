@@ -41,7 +41,7 @@ export default class MobileNavigation extends React.Component {
     }).isRequired
   }
 
-  componentWillMount() {
+  componentDidMount() {
     $('.mobile-header-hamburger').on(
       'touchstart click',
       preventDefault(() => this.setState({globalNavIsOpen: true}))
@@ -69,27 +69,29 @@ export default class MobileNavigation extends React.Component {
     const closeGlobalNav = () => this.setState({globalNavIsOpen: false})
     const spinner = (
       <View display="block" textAlign="center">
-        <Spinner size="large" margin="large auto" renderTitle={I18n.t('...Loading')} />
+        <Spinner size="large" margin="large auto" renderTitle={() => I18n.t('...Loading')} />
       </View>
     )
     return (
       <>
-        <Tray
-          size="large"
-          label={I18n.t('Global Navigation')}
-          open={this.state.globalNavIsOpen}
-          onDismiss={closeGlobalNav}
-          shouldCloseOnDocumentClick
-        >
-          {this.state.globalNavIsOpen && (
-            <React.Suspense fallback={spinner}>
-              <MobileGlobalMenu
-                DesktopNavComponent={this.props.DesktopNavComponent}
-                onDismiss={closeGlobalNav}
-              />
-            </React.Suspense>
-          )}
-        </Tray>
+        {this.state.globalNavIsOpen && (
+          <Tray
+            size="large"
+            label={I18n.t('Global Navigation')}
+            open={this.state.globalNavIsOpen}
+            onDismiss={closeGlobalNav}
+            shouldCloseOnDocumentClick
+          >
+            {this.state.globalNavIsOpen && (
+              <React.Suspense fallback={spinner}>
+                <MobileGlobalMenu
+                  DesktopNavComponent={this.props.DesktopNavComponent}
+                  onDismiss={closeGlobalNav}
+                />
+              </React.Suspense>
+            )}
+          </Tray>
+        )}
         {this.state.contextNavIsOpen && (
           <React.Suspense fallback={spinner}>
             <MobileContextMenu spinner={spinner} />

@@ -964,7 +964,7 @@ describe "assignments" do
     it "should not show the moderation page if it is not a moderated assignment ", priority: "2", test_id: 609653 do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
-      expect(f('#content h1').text).to eql "Page Not Found"
+      expect(f('#content h1').text).to eql "Woops... Looks like nothing is here!"
     end
   end
 

@@ -87,7 +87,22 @@ describe Types::AssignmentGroupType do
         to eq @group.assignments.map(&:to_param)
     end
 
+    describe 'assignmentsGroupConnection' do
+      it "returns assignments in position order" do
+        @assignment.update! position: 2
+        assignment2 = @course.assignments.create! name: "a2", assignment_group: @group, position: 1
 
+        expect(
+          @group_type.resolve("assignmentsConnection { nodes { _id } }")
+        ).to eq [assignment2.id.to_s, @assignment.id.to_s]
+      end
+
+      it "doesn't include assignments from other groups" do
+        expect(
+          @group_type.resolve("assignmentsConnection { nodes { _id } }")
+        ).not_to include @other_assignment.id.to_s
+      end
+    end
 
     describe Types::AssignmentGroupRulesType do
       before do

@@ -57,19 +57,23 @@ describe('DirectShareCoursePanel', () => {
     ).toBe('')
   })
 
-  it('enables the copy button when a course is selected', () => {
+  it('enables the copy button when a course is selected', async () => {
+    fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
     const {getByText} = render(<DirectShareCoursePanel />)
     fireEvent.click(getByText(/select a course/i))
     fireEvent.click(getByText('abc'))
+    await act(() => fetchMock.flush(true))
     const copyButton = getByText(/copy/i).closest('button')
     expect(copyButton.getAttribute('disabled')).toBe(null)
   })
 
-  it('disables the copy button again when a course search is initiated', () => {
+  it('disables the copy button again when a course search is initiated', async () => {
+    fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
     const {getByText, getByLabelText} = render(<DirectShareCoursePanel />)
     const input = getByLabelText(/select a course/i)
     fireEvent.click(input)
     fireEvent.click(getByText('abc'))
+    await act(() => fetchMock.flush(true))
     fireEvent.change(input, {target: {value: 'foo'}})
     expect(
       getByText(/copy/i)
@@ -90,6 +94,7 @@ describe('DirectShareCoursePanel', () => {
       id: '8',
       workflow_state: 'running'
     })
+    fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
     const {getByText, getByLabelText, queryByText} = render(
       <DirectShareCoursePanel
         sourceCourseId="42"
@@ -127,6 +132,7 @@ describe('DirectShareCoursePanel', () => {
 
     it('reports an error if the fetch fails', async () => {
       fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
+      fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
       const {getByText, getByLabelText, queryByText} = render(
         <DirectShareCoursePanel sourceCourseId="42" />
       )

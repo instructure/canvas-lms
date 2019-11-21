@@ -17,16 +17,22 @@
  */
 
 import {Assignment} from '../../graphqlData/Assignment'
-import {Billboard} from '@instructure/ui-billboard'
-import {Button} from '@instructure/ui-buttons'
+import {bool, func} from 'prop-types'
 import closedCaptionLanguages from '../../../../shared/closedCaptionLanguages'
 import elideString from '../../../../shared/helpers/elideString'
 import I18n from 'i18n!assignments_2_media_attempt'
 import {IconTrashLine, IconAttachMediaLine} from '@instructure/ui-icons'
+import LoadingIndicator from '../../../shared/LoadingIndicator'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Submission} from '../../graphqlData/Submission'
 import UploadMedia from '@instructure/canvas-media'
 import {UploadMediaStrings, MediaCaptureStrings} from '../../../../shared/UploadMediaTranslations'
+
+import {Billboard} from '@instructure/ui-billboard'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {VideoPlayer} from '@instructure/ui-media-player'
 import {View} from '@instructure/ui-layout'
 
 const languages = Object.keys(closedCaptionLanguages).map(key => {
@@ -37,86 +43,137 @@ export const VIDEO_SIZE_OPTIONS = {height: '400px', width: '768px'}
 
 export default class MediaAttempt extends React.Component {
   static propTypes = {
-    assignment: Assignment.shape
+    assignment: Assignment.shape.isRequired,
+    createSubmissionDraft: func.isRequired,
+    submission: Submission.shape.isRequired,
+    updateUploadingFiles: func.isRequired,
+    uploadingFiles: bool.isRequired
   }
 
   state = {
-    mediaModalOpen: false,
-    mediaObject: null
+    mediaModalOpen: false
   }
 
-  onDismiss = (err, mediaObject) => {
-    this.setState({mediaModalOpen: false, mediaObject})
+  onComplete = (err, data) => {
+    this.props.updateUploadingFiles(true)
+    this.props.createSubmissionDraft({
+      variables: {
+        id: this.props.submission.id,
+        activeSubmissionType: 'media_recording',
+        attempt: this.props.submission.attempt || 1,
+        mediaId: data.mediaObject.media_object.media_id
+      }
+    })
+  }
+
+  onDismiss = () => {
+    this.setState({mediaModalOpen: false})
   }
 
   handleRemoveFile = () => {
-    this.setState({mediaObject: null})
+    this.props.updateUploadingFiles(true)
+    this.props.createSubmissionDraft({
+      variables: {
+        id: this.props.submission.id,
+        activeSubmissionType: 'media_recording',
+        attempt: this.props.submission.attempt || 1
+      }
+    })
   }
 
-  renderMediaPlayer = () => {
-    const mediaObject = this.state.mediaObject.media_object
+  renderMediaPlayer = (mediaObject, renderTrashIcon) => {
+    mediaObject.mediaSources.forEach(mediaSource => {
+      mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
+    })
+    const mediaTracks = mediaObject.mediaTracks.map(track => ({
+      src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
+      label: track.locale,
+      type: track.kind,
+      language: track.locale
+    }))
+
     return (
-      <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-        <div style={{width: VIDEO_SIZE_OPTIONS.width, height: VIDEO_SIZE_OPTIONS.height}}>
-          <iframe
-            style={{width: '100%', height: '100%'}}
-            title={I18n.t('Media Submission')}
-            src={this.state.mediaObject.embedded_iframe_url}
-          />
-        </div>
-        <div>
+      <Flex direction="column" alignItems="center">
+        <Flex.Item data-testid="media-recording">
+          <VideoPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />
+        </Flex.Item>
+        <Flex.Item overflowY="visible" margin="medium 0">
           <span aria-hidden title={mediaObject.title}>
             {elideString(mediaObject.title)}
           </span>
           <ScreenReaderContent>{mediaObject.title}</ScreenReaderContent>
-          <Button
-            icon={IconTrashLine}
-            id={mediaObject.id}
-            margin="0 0 0 x-small"
-            onClick={this.handleRemoveFile}
-            size="small"
-          >
-            <ScreenReaderContent>
-              {I18n.t('Remove %{filename}', {filename: mediaObject.title})}
-            </ScreenReaderContent>
-          </Button>
-        </div>
-      </div>
+          {renderTrashIcon && (
+            <Button
+              data-testid="remove-media-recording"
+              icon={IconTrashLine}
+              id={mediaObject.id}
+              margin="0 0 0 x-small"
+              onClick={this.handleRemoveFile}
+              size="small"
+            >
+              <ScreenReaderContent>
+                {I18n.t('Remove %{filename}', {filename: mediaObject.title})}
+              </ScreenReaderContent>
+            </Button>
+          )}
+        </Flex.Item>
+      </Flex>
     )
   }
 
+  renderSubmissionDraft = () => {
+    const mediaObject = this.props.submission.submissionDraft.mediaObject
+    return this.renderMediaPlayer(mediaObject, true)
+  }
+
+  renderSubmission = () => {
+    const mediaObject = this.props.submission.mediaObject
+    return this.renderMediaPlayer(mediaObject, false)
+  }
+
+  renderMediaUpload = () => (
+    <View as="div" borderWidth="small">
+      <UploadMedia
+        onComplete={this.onComplete}
+        onDismiss={this.onDismiss}
+        contextId={this.props.assignment.env.courseId}
+        contextType="course"
+        open={this.state.mediaModalOpen}
+        tabs={{embed: false, record: true, upload: true}}
+        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        languages={languages}
+      />
+      <Billboard
+        heading={I18n.t('Add Media')}
+        hero={<IconAttachMediaLine color="brand" />}
+        message={
+          <Button
+            size="small"
+            data-testid="media-modal-launch-button"
+            variant="primary"
+            onClick={() => this.setState({mediaModalOpen: true})}
+          >
+            {I18n.t('Record/Upload')}
+          </Button>
+        }
+      />
+    </View>
+  )
+
   render() {
-    if (this.state.mediaObject) {
-      return this.renderMediaPlayer()
+    if (this.props.uploadingFiles) {
+      return <LoadingIndicator />
     }
 
-    return (
-      <View as="div" borderWidth="small">
-        <UploadMedia
-          onDismiss={this.onDismiss}
-          contextId={this.props.assignment.env.courseId}
-          contextType="course"
-          open={this.state.mediaModalOpen}
-          tabs={{embed: false, record: true, upload: true}}
-          uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
-          liveRegion={() => document.getElementById('flash_screenreader_holder')}
-          languages={languages}
-        />
-        <Billboard
-          heading={I18n.t('Add Media')}
-          hero={<IconAttachMediaLine color="brand" />}
-          message={
-            <Button
-              size="small"
-              data-testid="media-modal-launch-button"
-              variant="primary"
-              onClick={() => this.setState({mediaModalOpen: true})}
-            >
-              {I18n.t('Record/Upload')}
-            </Button>
-          }
-        />
-      </View>
-    )
+    if (['submitted', 'graded'].includes(this.props.submission.state)) {
+      return this.renderSubmission()
+    }
+
+    if (this.props.submission.submissionDraft?.mediaObject?._id) {
+      return this.renderSubmissionDraft()
+    }
+
+    return this.renderMediaUpload()
   }
 }

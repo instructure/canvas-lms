@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {string, func} from 'prop-types'
 import {TextArea} from '@instructure/ui-forms'
 
 export default function EmbedPanel({embedCode, setEmbedCode, label}) {
+  const [code, setCode] = useState(embedCode)
   return (
     <TextArea
       maxHeight="10rem"
       label={label}
-      value={embedCode}
+      value={code}
       placeholder={label}
-      onChange={e => setEmbedCode(e.target.value)}
+      onChange={e => setCode(e.target.value)}
+      onBlur={() => setEmbedCode(code)}
     />
   )
 }

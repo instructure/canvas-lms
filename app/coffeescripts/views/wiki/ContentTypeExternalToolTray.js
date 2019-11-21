@@ -16,8 +16,9 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {string, number, shape, func} from 'prop-types'
+import {arrayOf, oneOf, bool, string, shape, func} from 'prop-types'
 import CanvasTray from 'jsx/shared/components/CanvasTray'
+import $ from 'jquery'
 
 const iframeStyle = {
   border: 'none',
@@ -27,23 +28,64 @@ const iframeStyle = {
 }
 
 const toolShape = shape({
-  id: number.isRequired,
+  id: string.isRequired,
   title: string.isRequired,
   base_url: string.isRequired,
   icon_url: string
 })
 
+const knownResourceTypes = [
+  'assignment',
+  'assignment_group',
+  'audio',
+  'discussion_topic',
+  'document',
+  'image',
+  'module',
+  'quiz',
+  'page',
+  'video'
+]
+
 ContentTypeExternalToolTray.propTypes = {
   tool: toolShape,
+  placement: string.isRequired,
+  acceptedResourceTypes: arrayOf(oneOf(knownResourceTypes)).isRequired,
+  targetResourceType: oneOf(knownResourceTypes).isRequired,
+  allowItemSelection: bool.isRequired,
+  selectableItems: arrayOf(oneOf(knownResourceTypes)).isRequired,
   onDismiss: func
 }
 
-export default function ContentTypeExternalToolTray({tool, onDismiss}) {
-  const iframeUrl = tool.base_url + '&display=borderless'
+export default function ContentTypeExternalToolTray({
+  tool,
+  placement,
+  acceptedResourceTypes,
+  targetResourceType,
+  allowItemSelection,
+  selectableItems,
+  onDismiss
+}) {
+  const queryParams = {
+    com_instructure_course_accept_canvas_resource_types: acceptedResourceTypes,
+    com_instructure_course_canvas_resource_type: targetResourceType,
+    com_instructure_course_allow_canvas_resource_selection: allowItemSelection,
+    com_instructure_course_available_canvas_resources: selectableItems,
+    display: 'borderless',
+    placement
+  }
+  const prefix = tool.base_url.indexOf('?') === -1 ? '?' : '&'
+  const iframeUrl = `${tool.base_url}${prefix}${$.param(queryParams)}`
 
   return (
     <CanvasTray open label={tool.title} onDismiss={onDismiss} placement="end" size="regular">
-      <iframe style={iframeStyle} src={iframeUrl} title={tool.title} data-lti-launch="true" />
+      <iframe
+        data-testid="ltiIframe"
+        style={iframeStyle}
+        src={iframeUrl}
+        title={tool.title}
+        data-lti-launch="true"
+      />
     </CanvasTray>
   )
 }

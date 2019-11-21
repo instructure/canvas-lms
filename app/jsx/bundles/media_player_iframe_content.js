@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CanvasMediaPlayer from '../shared/media/CanvasMediaPlayer'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
+import CanvasMediaPlayer from '../shared/media/CanvasMediaPlayer'
+import closedCaptionLanguages from '../shared/closedCaptionLanguages'
 
 ready(() => {
   // get the media_id from something like
@@ -44,10 +45,22 @@ ready(() => {
   document.body.setAttribute('style', 'margin: 0; padding: 0; border-style: none')
 
   const div = document.body.firstElementChild
+  const media_object = ENV.media_object || {}
+
+  const mediaTracks = media_object?.media_tracks.map(track => {
+    return {
+      src: `/media_objects/${media_object.id}/media_tracks/${track.id}`,
+      label: closedCaptionLanguages[track.locale] || track.locale,
+      type: track.kind,
+      language: track.locale
+    }
+  })
+
   ReactDOM.render(
     <CanvasMediaPlayer
       media_id={media_id}
-      media_sources={href_source || ENV.media_sources}
+      media_sources={href_source || media_object.media_sources}
+      media_tracks={mediaTracks}
       type={type}
     />,
     document.body.appendChild(div)

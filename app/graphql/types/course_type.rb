@@ -246,5 +246,25 @@ module Types
       return nil unless course.grants_right?(current_user, :manage_grades)
       course.assignment_post_policies
     end
+
+    field :image_url, UrlType, <<~DOC, null: true
+      Returns a URL for the course image (this is the image used on dashboard
+      course cards)
+    DOC
+    def image_url
+      return nil unless course.feature_enabled?('course_card_images')
+
+      if course.image_url
+        course.image_url
+      elsif course.image_id.present?
+        Loaders::IDLoader.for(Attachment.active).load(
+          # if `course.image` was a proper AR association, we wouldn't have to
+          # do this shard-id stuff
+          course.shard.global_id_for(Integer(course.image_id))
+        ).then { |attachment|
+          attachment&.public_download_url(1.week)
+        }
+      end
+    end
   end
 end

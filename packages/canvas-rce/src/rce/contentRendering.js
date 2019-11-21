@@ -108,13 +108,14 @@ function constructJSXVideoEmbedding(video) {
       allow="fullscreen"
       allowFullScreen
       data-media-id={`${video.media_id || video.id}`}
+      data-media-type="video"
       src={src}
       style={{
         width: VIDEO_SIZE_DEFAULT.width,
         height: VIDEO_SIZE_DEFAULT.height,
         display: 'inline-block'
       }}
-      title={video.name}
+      title={video.name || video.text}
     />
   )
 }
@@ -128,13 +129,14 @@ function constructJSXAudioEmbedding(audio) {
   return (
     <iframe
       data-media-id={`${audio.media_id || audio.id}`}
+      data-media-type="audio"
       src={src}
       style={{
         width: AUDIO_PLAYER_SIZE.width,
         height: AUDIO_PLAYER_SIZE.height,
         display: 'inline-block'
       }}
-      title={audio.name}
+      title={audio.name || audio.text}
     />
   )
 }

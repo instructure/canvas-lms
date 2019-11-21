@@ -34,6 +34,7 @@ import {Tabs} from '@instructure/ui-tabs'
 
 const CommentsTab = lazy(() => import('./CommentsTab'))
 const RubricsQuery = lazy(() => import('./RubricsQuery'))
+const RubricTab = lazy(() => import('./RubricTab'))
 
 ContentTabs.propTypes = {
   assignment: Assignment.shape,
@@ -115,7 +116,7 @@ renderCommentsTab.propTypes = {
   submission: Submission.shape
 }
 
-function ContentTabs(props) {
+function LoggedInContentTabs(props) {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0)
 
   function handleTabChange(event, {index}) {
@@ -169,4 +170,30 @@ function ContentTabs(props) {
   )
 }
 
-export default React.memo(ContentTabs)
+function LoggedOutContentTabs(props) {
+  // Note that for not logged in users we already have the rubrics data available
+  // on the assignment, and don't need to do a seperate query to get that data.
+  // This is to avoid a large time watching loading spinners on the default tab
+  // which we want to render as fast as possible.
+  return (
+    <div data-testid="assignment-2-student-content-tabs">
+      {props.assignment.rubric && (
+        <Tabs variant="default">
+          <Tabs.Panel renderTitle={I18n.t('Rubric')} selected>
+            <Suspense fallback={<LoadingIndicator />}>
+              <RubricTab rubric={props.assignment.rubric} />
+            </Suspense>
+          </Tabs.Panel>
+        </Tabs>
+      )}
+    </div>
+  )
+}
+
+export default function ContentTabs(props) {
+  if (props.submission) {
+    return <LoggedInContentTabs {...props} />
+  } else {
+    return <LoggedOutContentTabs {...props} />
+  }
+}

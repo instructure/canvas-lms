@@ -572,7 +572,7 @@ nn:
       full_name_description: "Faglærar brukar namnet for karaktersetjing."
       labels: 
         account_id: Underkonto
-        course_code: Referansekode
+        course_code: Emnekode
         enrollment_term_id: "Påmelding semester"
         full_name: "Fullstendig namn"
         name: Emnenamn
@@ -17116,8 +17116,8 @@ nn:
   redirect_uris_79534b60: "* Omdirigerings-URI-ar:"
   redirect_uris_a54bd82f: "Omdirigerings-URI-ar:"
   redirected_to_identity_provider_6c4e17d2: "Ruta om til påloggingsteneste"
-  reference_code_3e8355dd: Referansekode
-  reference_code_is_required_c32c757f: "Referansekode er obligatorisk"
+  reference_code_3e8355dd: Emnekode
+  reference_code_is_required_c32c757f: "Emnekode er obligatorisk"
   regardless_of_whether_this_permission_is_enabled_o_437ee269: "Uansett om dette løyvet er slått på eller av kan brukaren administrere hendingar i eigen kalender. "
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Uansett om dette løyvet er slått på eller av, kan brukarane administrere hendingar i eigne kalendrar. "
   regenerate_3e4679f8: Regenerer

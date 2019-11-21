@@ -18,11 +18,9 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {camelize} from '@instructure/ui-utils'
 
 import bridge from '../../../../bridge'
 import {asImageEmbed} from '../../shared/ContentSelection'
-import {renderImage} from '../../../contentRendering'
 import ImageOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-image-options-tray-container'
@@ -67,24 +65,19 @@ export default class TrayController {
     const {$img} = this
 
     if (imageOptions.displayAs === 'embed') {
+      editor.dom.setAttribs($img, {
+        alt: imageOptions.isDecorativeImage ? '' : imageOptions.altText,
+        'data-is-decorative': imageOptions.isDecorativeImage ? 'true' : null,
+        width: imageOptions.appliedWidth,
+        height: imageOptions.appliedHeight
+      })
+
       // when the image was first added to the rce, we applied
       // max-width and max-height. Remove them from the style now
-      const style = this._parseStyle($img)
-      delete style.maxWidth
-      delete style.maxHeight
-
-      const newImg = renderImage({
-        id: $img.id,
-        url: $img.src,
-        alt_text: {
-          decorativeSelected: imageOptions.isDecorativeImage,
-          altText: imageOptions.altText
-        },
-        width: imageOptions.appliedWidth,
-        height: imageOptions.appliedHeight,
-        style
+      editor.dom.setStyles($img, {
+        'max-height': '',
+        'max-width': ''
       })
-      editor.selection.setContent(newImg)
 
       // tell tinymce so the context toolbar resets
       editor.fire('ObjectResized', {
@@ -136,19 +129,5 @@ export default class TrayController {
       />
     )
     ReactDOM.render(element, this.$container)
-  }
-
-  _parseStyle(elem) {
-    const styl = elem.getAttribute('style')
-    if (styl) {
-      return styl.split(/;\s*/).reduce((sobj, oneStyle) => {
-        const [name, val] = oneStyle.split(/:\s*/)
-        if (name) {
-          sobj[camelize(name)] = val
-        }
-        return sobj
-      }, {})
-    }
-    return {}
   }
 }

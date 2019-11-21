@@ -26,6 +26,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
       attachment_with_context(@student),
       attachment_with_context(@student)
     ]
+    @media_object = factory_with_protected_attributes(MediaObject, :media_id => 'm-123456')
   end
 
   def mutation_str(
@@ -34,6 +35,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     attempt: nil,
     body: nil,
     file_ids: [],
+    media_id: nil,
     url: nil
   )
     <<~GQL
@@ -44,6 +46,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
           #{"attempt: #{attempt}" if attempt}
           #{"body: \"#{body}\"" if body}
           fileIds: #{file_ids}
+          #{"mediaId: \"#{media_id}\"" if media_id}
           #{"url: \"#{url}\"" if url}
         }) {
           submissionDraft {
@@ -55,6 +58,9 @@ RSpec.describe Mutations::CreateSubmissionDraft do
               displayName
             }
             body
+            mediaObject {
+              _id
+            }
             url
           }
           errors {
@@ -133,6 +139,18 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :url)
     ).to eq 'http://www.google.com'
+  end
+
+  it 'allows you to set a media_object_id on the submission draft' do
+    result = run_mutation(
+      submission_id: @submission.id,
+      active_submission_type: 'media_recording',
+      attempt: @submission.attempt,
+      media_id: @media_object.media_id
+    )
+    expect(
+      result.dig(:data, :createSubmissionDraft, :submissionDraft, :mediaObject, :_id)
+    ).to eq @media_object.media_id
   end
 
   it 'allows you to set an active_submission_type on the submission draft' do

@@ -64,19 +64,22 @@ describe "Favorites API", type: :request do
            "role_id" => @assigned_observer_enrollment.role.id,
            "user_id" => @assigned_observer_enrollment.user_id,
            "enrollment_state" => "active",
+           "limit_privileges_to_course_section" => false,
            "associated_user_id" => @observed_student.id
          }, {
            "type" => "observer",
            "role" => @observer_enrollment.role.name,
            "role_id" => @observer_enrollment.role.id,
            "user_id" => @observer_enrollment.user_id,
-           "enrollment_state" => "active"
+           "enrollment_state" => "active",
+           "limit_privileges_to_course_section" => false,
          }, {
            "type" => "student",
            "role" => @student_enrollment.role.name,
            "role_id" => @student_enrollment.role.id,
            "user_id" => @student_enrollment.user_id,
-           "enrollment_state" => "active"
+           "enrollment_state" => "active",
+           "limit_privileges_to_course_section" => false,
          }]
       end
     end

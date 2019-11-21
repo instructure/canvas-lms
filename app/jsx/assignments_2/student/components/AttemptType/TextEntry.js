@@ -24,6 +24,7 @@ import {Submission} from '../../graphqlData/Submission'
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {IconDocumentLine, IconTextLine, IconTrashLine} from '@instructure/ui-icons'
+import LoadingIndicator from '../../../shared/LoadingIndicator'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {View} from '@instructure/ui-layout'
 
@@ -36,7 +37,8 @@ export default class TextEntry extends React.Component {
   }
 
   state = {
-    editorLoaded: false
+    editorLoaded: false,
+    renderingEditor: false
   }
 
   _isMounted = false
@@ -101,7 +103,7 @@ export default class TextEntry extends React.Component {
   // Start w/o focus, then give it focus after initialization
   // in this.handleRCEInit
   loadRCE() {
-    this.setState({editorLoaded: true}, () => {
+    this.setState({editorLoaded: true, renderingEditor: true}, () => {
       RichContentEditor.loadNewEditor(this._textareaRef, {
         focus: false,
         manageParent: false,
@@ -116,7 +118,7 @@ export default class TextEntry extends React.Component {
   }
 
   unloadRCE() {
-    this.setState({editorLoaded: false}, () => {
+    this.setState({editorLoaded: false, renderingEditor: false}, () => {
       const documentContent = document.getElementById('content')
       if (documentContent) {
         const editorIframe = documentContent.querySelector('[id^="random_editor"]')
@@ -142,6 +144,7 @@ export default class TextEntry extends React.Component {
         this._tinyeditor.focus()
       }
     }
+    this.setState({renderingEditor: false})
   }
 
   handleEditorIframeFocus = _event => {
@@ -222,6 +225,7 @@ export default class TextEntry extends React.Component {
   renderEditor() {
     return (
       <div data-testid="text-editor">
+        {this.state.renderingEditor && <LoadingIndicator />}
         <span>
           <textarea defaultValue={this.getDraftBody()} ref={this.setTextareaRef} />
         </span>

@@ -18,10 +18,10 @@
 
 import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {Assignment} from '../../graphqlData/Assignment'
-import {bool, func} from 'prop-types'
 import {chunk} from 'lodash'
 import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import elideString from '../../../../shared/helpers/elideString'
+import {func} from 'prop-types'
 import {getFileThumbnail} from '../../../../shared/helpers/fileHelper'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
@@ -37,6 +37,7 @@ import {Flex, Grid} from '@instructure/ui-layout'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
+import theme from '@instructure/canvas-theme'
 
 function submissionFileUploadUrl(assignment) {
   return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
@@ -47,11 +48,11 @@ export default class FileUpload extends Component {
     assignment: Assignment.shape,
     createSubmissionDraft: func,
     submission: Submission.shape,
-    updateUploadingFiles: func,
-    uploadingFiles: bool
+    updateUploadingFiles: func
   }
 
   state = {
+    filesToUpload: [],
     messages: []
   }
 
@@ -102,12 +103,23 @@ export default class FileUpload extends Component {
       this.context.setOnFailure(I18n.t('Error adding files to submission draft'))
       return
     }
+
+    this.setState({
+      filesToUpload: files.map(file => {
+        if (file.url) {
+          return {isLoading: true, _id: file.url}
+        }
+        return {isLoading: true, _id: file.name}
+      })
+    })
     this.updateUploadingFiles(async () => {
       try {
         const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
         await this.createSubmissionDraft(newFiles.map(file => file.id))
       } catch (err) {
         this.context.setOnFailure(I18n.t('Error updating submission draft'))
+      } finally {
+        this.setState({filesToUpload: []})
       }
     })
   }
@@ -182,55 +194,65 @@ export default class FileUpload extends Component {
   renderUploadBox() {
     return (
       <div data-testid="upload-box">
-        <FileDrop
-          accept={
-            this.props.assignment.allowedExtensions.length
-              ? this.props.assignment.allowedExtensions
-              : ''
-          }
-          allowMultiple
-          enablePreview
-          id="inputFileDrop"
-          data-testid="input-file-drop"
-          label={
-            <Billboard
-              heading={I18n.t('Upload File')}
-              hero={DEFAULT_ICON}
-              message={
-                <Flex direction="column">
-                  {this.props.assignment.allowedExtensions.length ? (
-                    <Flex.Item>
-                      {I18n.t('File permitted: %{fileTypes}', {
-                        fileTypes: this.props.assignment.allowedExtensions
-                          .map(ext => ext.toUpperCase())
-                          .join(', ')
-                      })}
-                    </Flex.Item>
-                  ) : null}
-                  <Flex.Item padding="small 0 0">
-                    <Text size="small">
-                      {I18n.t('Drag and drop, or click to browse your computer')}
-                    </Text>
-                    <MoreOptions
-                      assignmentID={this.props.assignment._id}
-                      courseID={this.props.assignment.env.courseId}
-                      handleCanvasFiles={this.handleCanvasFiles}
-                      userID={this.props.assignment.env.currentUser.id}
-                    />
-                  </Flex.Item>
-                </Flex>
+        <Flex direction="column">
+          <Flex.Item margin="0 0 small 0" overflowY="visible">
+            <FileDrop
+              accept={
+                this.props.assignment.allowedExtensions.length
+                  ? this.props.assignment.allowedExtensions
+                  : ''
               }
+              allowMultiple
+              enablePreview
+              id="inputFileDrop"
+              data-testid="input-file-drop"
+              label={
+                <Billboard
+                  heading={I18n.t('Upload File')}
+                  hero={DEFAULT_ICON}
+                  message={
+                    <Flex direction="column">
+                      {this.props.assignment.allowedExtensions.length ? (
+                        <Flex.Item>
+                          {I18n.t('File permitted: %{fileTypes}', {
+                            fileTypes: this.props.assignment.allowedExtensions
+                              .map(ext => ext.toUpperCase())
+                              .join(', ')
+                          })}
+                        </Flex.Item>
+                      ) : null}
+                      <Flex.Item padding="small 0 0">
+                        <Text size="small">
+                          {I18n.t('Drag and drop, or click to browse your computer')}
+                        </Text>
+                      </Flex.Item>
+                    </Flex>
+                  }
+                />
+              }
+              messages={this.state.messages}
+              onDropAccepted={files => this.handleDropAccepted(files)}
+              onDropRejected={this.handleDropRejected}
             />
-          }
-          messages={this.state.messages}
-          onDropAccepted={files => this.handleDropAccepted(files)}
-          onDropRejected={this.handleDropRejected}
-        />
+          </Flex.Item>
+          <Flex.Item padding="xx-small" textAlign="center">
+            <MoreOptions
+              assignmentID={this.props.assignment._id}
+              courseID={this.props.assignment.env.courseId}
+              handleCanvasFiles={this.handleCanvasFiles}
+              renderCanvasFiles
+              userID={this.props.assignment.env.currentUser.id}
+            />
+          </Flex.Item>
+        </Flex>
       </div>
     )
   }
 
   renderUploadedFile(file) {
+    if (file.isLoading) {
+      return <LoadingIndicator />
+    }
     return (
       <Billboard
         heading={I18n.t('Uploaded')}
@@ -260,7 +282,10 @@ export default class FileUpload extends Component {
   }
 
   renderUploadBoxAndUploadedFiles() {
-    const files = this.getDraftAttachments()
+    let files = this.getDraftAttachments()
+    if (this.state.filesToUpload.length) {
+      files = files.concat(this.state.filesToUpload)
+    }
     // The first two uploaded files are rendered on the same row as the upload box
     const firstFileRow = files.slice(0, 2)
     // All uploaded files after the first two are rendered on rows below the upload
@@ -292,10 +317,14 @@ export default class FileUpload extends Component {
     )
   }
 
+  shouldRenderFiles = () => {
+    return this.getDraftAttachments().length !== 0 || this.state.filesToUpload.length !== 0
+  }
+
   render() {
     return (
-      <div data-testid="upload-pane">
-        {this.getDraftAttachments().length !== 0 ? (
+      <div data-testid="upload-pane" style={{marginBottom: theme.variables.spacing.xxLarge}}>
+        {this.shouldRenderFiles() ? (
           this.renderUploadBoxAndUploadedFiles()
         ) : (
           <Grid>
@@ -304,8 +333,6 @@ export default class FileUpload extends Component {
             </Grid.Row>
           </Grid>
         )}
-
-        {this.props.uploadingFiles && <LoadingIndicator />}
       </div>
     )
   }

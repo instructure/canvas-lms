@@ -20,11 +20,13 @@
 // This component manages "unread count" badges on things external to the
 // Navigation component. All it needs is:
 //       targetEl: a DOM node to render the count into
-//       dataUrl: the API endpoint to call to retrieve the unread count
-//                its return object is expected to contain an `unread_count`
+//       dataUrl: the API endpoint to call to retrieve the unread count.
+//                Its return object is expected to contain an `unread_count`
 //                field with the numeric unread count
 //
 // ... and optionally:
+//       srText: a function to return the text to be spoken by a screen
+//               reader. It passes the unread count as argument.
 //       onUpdate: a function to call when the count is updated.
 //                 It passes the new unread count as argument.
 //       onError: a function to call if the API call fails.
@@ -41,7 +43,7 @@ import React, {useRef, useState, useEffect} from 'react'
 import {createPortal} from 'react-dom'
 import {any, func, number, string} from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!UnreadCounts'
 
 const DEFAULT_POLL_INTERVAL = 60000
 
@@ -55,6 +57,7 @@ UnreadCounts.propTypes = {
   targetEl: any,
   onUpdate: func,
   onError: func,
+  srText: func,
   dataUrl: string.isRequired,
   pollIntervalMs: number,
   allowedAge: number,
@@ -67,13 +70,14 @@ UnreadCounts.defaultProps = {
     // eslint-disable-next-line no-console
     console.warn(`Error fetching unread count: ${msg}`)
   },
+  srText: count => I18n.t('%{count} unread.', {count}),
   pollIntervalMs: DEFAULT_POLL_INTERVAL,
   allowedAge: DEFAULT_POLL_INTERVAL / 2,
   maxTries: 5
 }
 
 export default function UnreadCounts(props) {
-  const {targetEl, onUpdate, onError, dataUrl, pollIntervalMs, allowedAge, maxTries} = props
+  const {targetEl, onUpdate, onError, srText, dataUrl, pollIntervalMs, allowedAge, maxTries} = props
   const syncState = useRef({msUntilFirstPoll: 0, savedChecked: false})
   const [count, setCount] = useState(NaN) // want to be sure to update at least once
   let error = null
@@ -174,15 +178,7 @@ export default function UnreadCounts(props) {
 
   return createPortal(
     <>
-      <ScreenReaderContent>
-        {I18n.t(
-          {
-            one: '1 unread message',
-            other: '%{count} unread messages'
-          },
-          {count}
-        )}
-      </ScreenReaderContent>
+      <ScreenReaderContent>{srText(count)}</ScreenReaderContent>
       <PresentationContent>{count}</PresentationContent>
     </>,
     targetEl

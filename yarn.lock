@@ -996,7 +996,7 @@
     tinymce "^4.5.7"
     tinymce-light-skin "~1.3.0"
 
-"@instructure/canvas-theme@6", "@instructure/canvas-theme@^6.14.0", "@instructure/canvas-theme@^6.8.1", "@instructure/canvas-theme@^6.9.0":
+"@instructure/canvas-theme@6", "@instructure/canvas-theme@^6.14.0", "@instructure/canvas-theme@^6.9.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/canvas-theme/-/canvas-theme-6.14.0.tgz#62f051ad978d16b21be3a9668df29ae37f9fe2d5"
   integrity sha512-Lx/rmtELEaZMLWwy2v6l8SGyApNzK+kKp1n5xedPwgfKZoHCj8JRB6fFcRtJHoMMpr0lixfG3UhXpLgIKP6j5g==
@@ -1118,7 +1118,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-a11y@6", "@instructure/ui-a11y@^6.14.0", "@instructure/ui-a11y@^6.8.1", "@instructure/ui-a11y@^6.9.0":
+"@instructure/ui-a11y@6", "@instructure/ui-a11y@^6.14.0", "@instructure/ui-a11y@^6.9.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-a11y/-/ui-a11y-6.14.0.tgz#28244f3408ac8689dbefe0bda4aa0e0a0675648a"
   integrity sha512-AMUiC4/lMKf9RsskuJLgKs9AHSUTzQucLmmk1xOTIO01IR/4cDhPDzl3v9HEyFAA6orDh5E7ktx13Sm5FokRlg==
@@ -1147,7 +1147,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-alerts@6", "@instructure/ui-alerts@^6.8.1":
+"@instructure/ui-alerts@6":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-alerts/-/ui-alerts-6.14.0.tgz#ef65c4bf7cbddc11f19c40f2f8d41c7b45c710eb"
   integrity sha512-fznGOzX3baP2v7J8Q9nWw2ZoqjbQitBHNdJi2IDc8AHlxQnL1E0VUkCMn1nVoQTiLljOFfbvNuUnn+pKUGpFeg==
@@ -1219,7 +1219,7 @@
     babel-plugin-transform-undefined-to-void "^6.9.4"
     core-js "^3.2.1"
 
-"@instructure/ui-billboard@6", "@instructure/ui-billboard@^6.8.1":
+"@instructure/ui-billboard@6":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-billboard/-/ui-billboard-6.14.0.tgz#4b8e666087fb9f276dcc811ae0a9a0debb039311"
   integrity sha512-3wAw7kdT2JD06NscA4ieG9eS2NLR6av6HB6xrGDsvtvc80au0HfXId/12fj9CLllaJXGQbtGCrECr1besbBHtA==
@@ -1283,7 +1283,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-buttons@6", "@instructure/ui-buttons@^6.14.0", "@instructure/ui-buttons@^6.8.1":
+"@instructure/ui-buttons@6", "@instructure/ui-buttons@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-buttons/-/ui-buttons-6.14.0.tgz#4038534c5b87fef06ac76ad796ed72c3e4f722da"
   integrity sha512-+d1L//hGkOeI6RmYMJLzca222DMh9etfmipxqWrp1GtL5FZsy1oP38oAqA/M8DwkQmq9SEwTvoTIfJF7qB1RYQ==
@@ -1322,7 +1322,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-color-utils@6", "@instructure/ui-color-utils@^6.14.0", "@instructure/ui-color-utils@^6.8.1":
+"@instructure/ui-color-utils@6", "@instructure/ui-color-utils@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-color-utils/-/ui-color-utils-6.14.0.tgz#e589401a5d81b819b16590d8c00fb36fb27eba87"
   integrity sha512-a0vD77cmH5svoVZhMClBzRa/jsKhwQSt6VRO/TyfHslbuR4PvkjiLfDDjLCWDkhQoQD4IF/1ZO3chbipXo2XCQ==
@@ -1413,7 +1413,7 @@
     "@instructure/ui-utils" "^6.14.0"
     prop-types "^15"
 
-"@instructure/ui-elements@6", "@instructure/ui-elements@^6.14.0", "@instructure/ui-elements@^6.8.1":
+"@instructure/ui-elements@6", "@instructure/ui-elements@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-6.14.0.tgz#b372ce0ea62fd8ed488714985a2d02f915f19068"
   integrity sha512-clatg4onpb/ABT5/3Q/ytGe8dknGJL/w41gEJn1NbR5oZ0WJZJGr1QgK1VRGlCnHz+LfJW8f0alGsQBHpEsjJw==
@@ -1542,7 +1542,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-forms@6", "@instructure/ui-forms@^6.14.0", "@instructure/ui-forms@^6.8.1":
+"@instructure/ui-forms@6", "@instructure/ui-forms@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-forms/-/ui-forms-6.14.0.tgz#eaa3b969ef6c822be9686e3901dc53f41cea1282"
   integrity sha512-CyXRQHGy6jIEg0dTL4uU1J15quRvb2k1jnTa83W7AVuSds+B8N95uT8Y5MZpEFnJbZ+wAVnUu5MveS9N7Z9sbQ==
@@ -1603,7 +1603,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-heading@^6.14.0":
+"@instructure/ui-heading@6", "@instructure/ui-heading@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-heading/-/ui-heading-6.14.0.tgz#7fde4ac1bb5fe00cddea4afc00eca54a12b2378c"
   integrity sha512-XAhPkz318Zp2YApdJIZAGPNbx/W2vGxQk9Y4b7ECr5Y1k9xIEcPyP8s1hkeB074xluy7+5j19PjtuxwtURC8XQ==
@@ -1646,7 +1646,7 @@
     moment-timezone "^0.5"
     prop-types "^15"
 
-"@instructure/ui-icons@6", "@instructure/ui-icons@^6.14.0", "@instructure/ui-icons@^6.8.1":
+"@instructure/ui-icons@6", "@instructure/ui-icons@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-icons/-/ui-icons-6.14.0.tgz#185938d5ceebf814c23445ae0807bbea19a172fa"
   integrity sha512-0ZwgvARi8ssbsfU2vDs+DGJCps+ndqGQPLzRI0jBj2VqatyGarTYF9JNNeFTSSrRB7F0c9LFtcctSwASblRGBw==
@@ -1679,7 +1679,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-layout@6", "@instructure/ui-layout@^6.14.0", "@instructure/ui-layout@^6.8.1", "@instructure/ui-layout@^6.9.0":
+"@instructure/ui-layout@6", "@instructure/ui-layout@^6.14.0", "@instructure/ui-layout@^6.9.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-layout/-/ui-layout-6.14.0.tgz#13797fd1def1d745ba542c2dcbbe687cbc34929a"
   integrity sha512-pjJgkt8Cmzj1bY0SlyC2cil0OuLhJZgBwXE2E/r5mnGvM6a31XxDHkcL3QUoXr2DLY3jk8WIBJM/coRvrDMUBA==
@@ -1882,7 +1882,7 @@
     prop-types "^15"
     react "^15 || ^16"
 
-"@instructure/ui-overlays@6", "@instructure/ui-overlays@^6.14.0", "@instructure/ui-overlays@^6.8.1":
+"@instructure/ui-overlays@6", "@instructure/ui-overlays@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-6.14.0.tgz#dc5a05923dcf8ef3be9ec4291ba403b07aed2014"
   integrity sha512-hCa0Ec/nzY8r/DnqHaRgt9Za27vntn0jHZvy1w2ywzKcp0lLsfeGnZMBrKVEjN13VRfimNtTgFpbQI2oq9OdRQ==
@@ -1935,7 +1935,7 @@
     no-scroll "^2.1.0"
     prop-types "^15"
 
-"@instructure/ui-pagination@6", "@instructure/ui-pagination@^6.8.1":
+"@instructure/ui-pagination@6":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-pagination/-/ui-pagination-6.14.0.tgz#c4a4ad7c666d60bea4c91fe728dcbe3268c12fee"
   integrity sha512-VU7pxeAw0SsvbOqsp2rPkLNRHNkw4IITw8ydRzCS3U5iwYjl7CUW03YJeIEsopEkr72SY31npWGLocbJfzCrIA==
@@ -2081,7 +2081,7 @@
     "@babel/runtime" "^7"
     prop-types ">= 15.7.0"
 
-"@instructure/ui-react-utils@6", "@instructure/ui-react-utils@^6.14.0", "@instructure/ui-react-utils@^6.8.1":
+"@instructure/ui-react-utils@6", "@instructure/ui-react-utils@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-react-utils/-/ui-react-utils-6.14.0.tgz#4c97ed6a1365860047fbc01fb915d2dff51bc52e"
   integrity sha512-ydMWDY8PMrebNYwKhYSJSEs63oLKbrvNdbXMOkoF7bUpQ25EC4uXdpFEIXgQNJJ2t7Ja0feV5CUMJJ7ocXxc8A==
@@ -2094,7 +2094,7 @@
     "@instructure/ui-utils" "^6.14.0"
     prop-types "^15"
 
-"@instructure/ui-select@6", "@instructure/ui-select@^6.8.1":
+"@instructure/ui-select@6":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-select/-/ui-select-6.14.0.tgz#f03c13c47058a01d9320162a59754a4c26971223"
   integrity sha512-bZBZ0+Iha/RFVU5QEFlV8d3dDMCdyD4wFZ0rXhx4HBKLQz7cfCjm7VpEhXfV40o/NXa2gCEl5ASe6G+BEVWViw==
@@ -2152,7 +2152,7 @@
     "@babel/runtime" "^7.5.0"
     glamor "^2.20.40"
 
-"@instructure/ui-svg-images@6", "@instructure/ui-svg-images@^6.14.0", "@instructure/ui-svg-images@^6.8.1":
+"@instructure/ui-svg-images@6", "@instructure/ui-svg-images@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-svg-images/-/ui-svg-images-6.14.0.tgz#7c543f17a4f5582a07c6f69bf619d6ece77ad00f"
   integrity sha512-UI2P3IiNgd+Fs/rN6kyscRbO4n8NdqyJwCBzAa5ttx8/f+OkI2smdC+IZ4P67E76n8G3p+Z1vWQsWHRgrWKYFQ==
@@ -2198,7 +2198,7 @@
     prop-types "^15"
     react "^15 || ^16"
 
-"@instructure/ui-tabs@6", "@instructure/ui-tabs@^6.8.1":
+"@instructure/ui-tabs@6":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-tabs/-/ui-tabs-6.14.0.tgz#2aed5a219a4266f623934aaf0be0636f8cadb2cc"
   integrity sha512-m+McVrIQwycZOy/cDIxIqY8/dX7K7XzlSYri5V/ynjcgUzOYiuMjCDgLjqiKKG5QmuNAOqB2EIMUF3abOcFLaA==
@@ -2251,7 +2251,7 @@
   dependencies:
     "@instructure/ui-decorator" "^6.14.0"
 
-"@instructure/ui-text-input@6", "@instructure/ui-text-input@^6.14.0", "@instructure/ui-text-input@^6.8.1":
+"@instructure/ui-text-input@6", "@instructure/ui-text-input@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-text-input/-/ui-text-input-6.14.0.tgz#607451743656d8529cf38f28157283e85f9c6014"
   integrity sha512-ZO8fxG4zaRH8RLMA3eXkS6E29CzmPyRbA9Ha6+8nN/aMPMqsBiSB2I/Rg8z8vyTC0YzT8BG888pRJxWyddW9FQ==
@@ -2271,7 +2271,7 @@
     prop-types "^15"
     react "^15 || ^16"
 
-"@instructure/ui-themeable@6", "@instructure/ui-themeable@^6.14.0", "@instructure/ui-themeable@^6.8.1", "@instructure/ui-themeable@^6.9.0":
+"@instructure/ui-themeable@6", "@instructure/ui-themeable@^6.14.0", "@instructure/ui-themeable@^6.9.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-6.14.0.tgz#b44de82f9cafcc826228afb889cced554a623c7b"
   integrity sha512-tUuLEnX0YvmOHpezxA9WkgmhFShD20sVoC4hMlmL2YGAobvtf1hV2ivvJZ9WygyRgy+2qj7tDY/wCLYh2ELu+Q==
@@ -2301,7 +2301,7 @@
     prop-types "^15"
     tinycolor2 "^1.4.1"
 
-"@instructure/ui-themes@6", "@instructure/ui-themes@^6.8.1":
+"@instructure/ui-themes@6":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-6.14.0.tgz#ef1bf360a6fc77a1f444ce46d08e1302fca836ae"
   integrity sha512-LAo+QIHQlxrTEKp4gPzD10sbOYoUainyopfQtCmRcXgj/1YmFOO/K9XEcOFOC/CQhATUmiK+KGobKlMqs9OmYA==
@@ -2317,7 +2317,7 @@
     "@babel/runtime" "^7"
     "@instructure/ui-themeable" "^5.52.3"
 
-"@instructure/ui-toggle-details@6", "@instructure/ui-toggle-details@^6.8.1":
+"@instructure/ui-toggle-details@6":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-toggle-details/-/ui-toggle-details-6.14.0.tgz#4a048f7f6a5b8b91aa47e3707997b9ecbf4df25a"
   integrity sha512-VwW6LcEbwAOKOlvZXhmS6wdfIt3gpBKy/YDkGGeoejdLGr3Ku7bbvG5hYuJ3c9wJQbn6yo8SoMQtcf4KKcr3Kg==
@@ -2455,7 +2455,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/uid@6", "@instructure/uid@^6.14.0", "@instructure/uid@^6.8.1":
+"@instructure/uid@6", "@instructure/uid@^6.14.0":
   version "6.14.0"
   resolved "https://registry.yarnpkg.com/@instructure/uid/-/uid-6.14.0.tgz#e39b483c4cee13d67fc8d1a8483e80744c9d21c3"
   integrity sha512-1D9iK7rUV+pQPNcrEUvhwP9aS2MPiR28o9mELmwYjh31g6/91SHq4Ln573qHeooUR7id/s5dtLM/SDk1qL3dQw==
@@ -12395,7 +12395,7 @@ jquery.elastic@1.0.0:
 
 jquery@2.x, jquery@>=1.2.6, jquery@>=1.5, jquery@>=1.7.1, "jquery@https://github.com/ryankshaw/jquery.git#1.7.2-with-AMD-and-CommonJS":
   version "1.7.2"
-  resolved "https://github.com/ryankshaw/jquery.git#637babee7ed47a532c962d1dce0094a098ed7c7d"
+  resolved "https://github.com/ryankshaw/jquery.git#3a48a84c713291b790a2556d9ba036ec4d53c52f"
 
 js-base64@^2.1.8, js-base64@^2.1.9, js-base64@^2.4.3:
   version "2.5.1"

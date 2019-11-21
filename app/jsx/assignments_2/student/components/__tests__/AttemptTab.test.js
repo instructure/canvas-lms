@@ -21,6 +21,7 @@ import * as uploadFileModule from '../../../../shared/upload_file'
 import AttemptTab from '../AttemptTab'
 import {fireEvent, render, waitForElement} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '../../mocks'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {SubmissionMocks} from '../../graphqlData/Submission'
 
@@ -31,7 +32,11 @@ describe('ContentTabs', () => {
         Assignment: {submissionTypes: ['online_upload']}
       })
 
-      const {getByTestId} = render(<AttemptTab {...props} />)
+      const {getByTestId} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
       expect(await waitForElement(() => getByTestId('upload-pane'))).toBeInTheDocument()
     })
 
@@ -64,7 +69,11 @@ describe('ContentTabs', () => {
           }
         })
 
-        const {getAllByText} = render(<AttemptTab {...props} />)
+        const {getAllByText} = render(
+          <MockedProvider>
+            <AttemptTab {...props} />
+          </MockedProvider>
+        )
         expect(await waitForElement(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
       })
     })

@@ -48,6 +48,9 @@ class UploadQueue {
     const uploader = fileOptions.expandZip
       ? new ZipUploader(fileOptions, folder, contextId, contextType)
       : new FileUploader(fileOptions, folder)
+    uploader.onProgress = () => {
+      this.onChange()
+    }
     uploader.cancel = () => {
       if (uploader._xhr != null) {
         uploader._xhr.abort()

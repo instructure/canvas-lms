@@ -21,17 +21,59 @@ import {render, fireEvent} from '@testing-library/react'
 import ContentTypeExternalToolTray from 'compiled/views/wiki/ContentTypeExternalToolTray'
 
 describe('ContentTypeExternalToolTray', () => {
-  const tool = {id: 1, base_url: 'https://one.lti.com', title: 'First LTI'}
+  const tool = {id: 1, base_url: 'https://one.lti.com/', title: 'First LTI'}
   const onDismiss = jest.fn()
 
+  function renderTray(props) {
+    return render(
+      <ContentTypeExternalToolTray
+        tool={tool}
+        placement="wiki_index_menu"
+        onDismiss={onDismiss}
+        acceptedResourceTypes={['page', 'module']}
+        targetResourceType="page"
+        allowItemSelection
+        selectableItems={[{id: '1', name: 'module 1'}]}
+        {...props}
+      />
+    )
+  }
+
   it('shows LTI title', () => {
-    const {getByText} = render(<ContentTypeExternalToolTray tool={tool} onDismiss={onDismiss} />)
+    const {getByText} = renderTray()
     expect(getByText(/first lti/i)).toBeInTheDocument()
   })
 
   it('calls onDismiss when close button is clicked', () => {
-    const {getByText} = render(<ContentTypeExternalToolTray tool={tool} onDismiss={onDismiss} />)
+    const {getByText} = renderTray()
     fireEvent.click(getByText('Close'))
     expect(onDismiss.mock.calls.length).toBe(1)
+  })
+
+  describe('constructs iframe src url', () => {
+    it('adds ? before parameters if none are already present', () => {
+      expect(tool.base_url).not.toContain('?')
+      const {getByTestId} = renderTray()
+      const src = getByTestId('ltiIframe').src
+      expect(src).toContain(`${tool.base_url}?`)
+    })
+
+    it('appends parameters if some exist already', () => {
+      tool.base_url = 'https://one.lti.com/?launch_type=wiki_index_menu'
+      const {getByTestId} = renderTray()
+      const src = getByTestId('ltiIframe').src
+      expect(src).toContain(`${tool.base_url}&`)
+    })
+
+    it('includes expected parameters', () => {
+      const {getByTestId} = renderTray()
+      const src = getByTestId('ltiIframe').src
+      expect(src).toContain('com_instructure_course_accept_canvas_resource_types')
+      expect(src).toContain('com_instructure_course_canvas_resource_type')
+      expect(src).toContain('com_instructure_course_allow_canvas_resource_selection')
+      expect(src).toContain('com_instructure_course_available_canvas_resources')
+      expect(src).toContain('display')
+      expect(src).toContain('placement')
+    })
   })
 })

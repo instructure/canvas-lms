@@ -18,12 +18,13 @@
 
 import React from 'react'
 import {render, waitForElement, act, cleanup} from '@testing-library/react'
+import {queries as domQueries} from '@testing-library/dom'
 import waitForExpect from 'wait-for-expect'
 import CanvasMediaPlayer, {sizeMediaPlayer} from '../CanvasMediaPlayer'
 
 afterEach(cleanup)
 
-const defaultMediaObject = () => ({
+const defaultMediaObject = (overrides = {}) => ({
   bitrate: '12345',
   content_type: 'video/mp4',
   fileExt: 'mp4',
@@ -32,7 +33,8 @@ const defaultMediaObject = () => ({
   size: '3123123123',
   src: 'anawesomeurl.test',
   label: 'an awesome label',
-  width: '500'
+  width: '500',
+  ...overrides
 })
 
 describe('CanvasMediaPlayer', () => {
@@ -48,6 +50,28 @@ describe('CanvasMediaPlayer', () => {
       />
     )
     expect(getByText('Play')).toBeInTheDocument()
+  })
+
+  it('sorts sources by bitrate, ascending', () => {
+    const {container, getByText} = render(
+      <CanvasMediaPlayer
+        media_id="dummy_media_id"
+        media_sources={[
+          defaultMediaObject({bitrate: '3000', label: '3000'}),
+          defaultMediaObject({bitrate: '2000', label: '2000'}),
+          defaultMediaObject({bitrate: '1000', label: '1000'})
+        ]}
+      />
+    )
+
+    const sourceChooser = getByText('Source Chooser')
+    sourceChooser.click()
+    const sourceList = container.querySelectorAll(
+      'ul[aria-label="Source Chooser"] ul[role="menu"] li'
+    )
+    expect(domQueries.getByText(sourceList[0], '1000')).toBeInTheDocument()
+    expect(domQueries.getByText(sourceList[1], '2000')).toBeInTheDocument()
+    expect(domQueries.getByText(sourceList[2], '3000')).toBeInTheDocument()
   })
 
   it('renders loading if there are no media sources', () => {
@@ -174,6 +198,25 @@ describe('CanvasMediaPlayer', () => {
       expect(queryByText('Playback Speed')).toBeInTheDocument()
       expect(queryByText('Source Chooser')).not.toBeInTheDocument()
       expect(queryByText('Full Screen')).toBeInTheDocument()
+    })
+
+    it('includes the CC button when there are subtitle track(s)', () => {
+      const {queryByText, queryByLabelText} = render(
+        <CanvasMediaPlayer
+          media_id="dummy_media_id"
+          media_sources={[defaultMediaObject()]}
+          media_tracks={[
+            {label: 'English', language: 'en', src: '/media_objects/more/stuff', type: 'subtitles'}
+          ]}
+        />
+      )
+      expect(queryByText('Play')).toBeInTheDocument()
+      expect(queryByLabelText('Timebar')).toBeInTheDocument()
+      expect(queryByText('Unmuted')).toBeInTheDocument()
+      expect(queryByText('Playback Speed')).toBeInTheDocument()
+      expect(queryByText('Source Chooser')).not.toBeInTheDocument()
+      expect(queryByText('Video Track')).toBeInTheDocument()
+      expect(queryByText('CC')).toBeInTheDocument()
     })
   })
 })

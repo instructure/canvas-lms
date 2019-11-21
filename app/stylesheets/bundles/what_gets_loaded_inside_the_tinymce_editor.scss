@@ -30,6 +30,10 @@ body {
   font-family: inherit !important;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 td {
   margin: 0;
 }

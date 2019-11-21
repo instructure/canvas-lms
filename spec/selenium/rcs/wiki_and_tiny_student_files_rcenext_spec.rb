@@ -78,5 +78,16 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       expect(user_image_links.count).to eq 1
       expect(tray_container).to include_text("bar.png")
     end
+
+    it "should only show one image for student after saving additional to course" do
+      @new_attachment = @course.attachments.build(:filename => 'new_course.png', :folder => @root_folder)
+      @new_attachment.content_type = 'image/png'
+      @new_attachment.save!
+      get "/courses/#{@course.id}/discussion_topics/new"
+      click_images_toolbar_button
+      click_user_images
+      expect(user_image_links.count).to eq 1
+      expect(tray_container).to include_text("bar.png")
+    end
   end
 end

@@ -110,7 +110,7 @@ describe BasicLTI::BasicOutcomes do
 
   describe ".decode_source_id" do
     it 'successfully decodes a source_id' do
-      expect(described_class.decode_source_id(tool, source_id)).to eq [@course, assignment, @user]
+      expect(described_class.decode_source_id(tool, source_id)).to eq [assignment, @user]
     end
 
     it 'throws Invalid sourcedid if sourcedid is nil' do
@@ -189,7 +189,7 @@ describe BasicLTI::BasicOutcomes do
       end
 
       it "decodes a jwt signed sourcedid" do
-        expect(described_class.decode_source_id(tool, jwt_source_id)).to eq [@course, assignment, @user]
+        expect(described_class.decode_source_id(tool, jwt_source_id)).to eq [assignment, @user]
       end
 
       it 'throws invalid JWT if token is unrecognized' do
@@ -212,7 +212,7 @@ describe BasicLTI::BasicOutcomes do
     end
   end
 
-  describe "#handle_replaceResult" do
+  describe "#handle_replace_result" do
     it "accepts a grade" do
       xml.css('resultData').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)

@@ -384,6 +384,8 @@ describe "assignments_2 feature flag and parameter" do
       end
 
       it "shows new assignments by default" do
+        @assignment.submission_types = 'online_text_entry'
+        @assignment.save!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         html = Nokogiri::HTML(response.body)
         expect(html.at_css('div#assignment_show')).not_to be

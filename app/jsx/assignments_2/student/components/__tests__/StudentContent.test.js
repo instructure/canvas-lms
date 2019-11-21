@@ -22,6 +22,8 @@ import React from 'react'
 import StudentContent from '../StudentContent'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 
+jest.mock('../Attempt')
+
 describe('Assignment Student Content View', () => {
   it('renders the student header if the assignment is unlocked', async () => {
     const props = await mockAssignmentAndSubmission()

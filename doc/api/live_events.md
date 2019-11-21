@@ -313,6 +313,7 @@ these cases, `grader_id` should be null in the body.
 | ----- | ----------- |
 | `submission_id` | The Canvas id of the submission that the grade is changing on. |
 | `assignment_id` | The Canvas id of the assignment associated with the submission. |
+| `assignment_name` | The name of the assignment associated with the submission. |
 | `grade` | The new grade. |
 | `old_grade` | The previous grade, if there was one. |
 | `score` | The new score. |

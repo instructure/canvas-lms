@@ -19,13 +19,3 @@
 #left-side {
   display: none;
 }
-
-#section-tabs .section-tab-hidden a {
-  @if $use_high_contrast {
-    color: darken($ic-course-sidenav_list-item--inactive-font-color, 45%);
-    background: lighten($ic-course-sidenav_list-item--inactive-font-color, 15%);
-  }
-  @else {
-    color: $ic-course-sidenav_list-item--inactive-font-color;
-  }
-}

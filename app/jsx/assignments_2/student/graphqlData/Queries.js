@@ -73,10 +73,26 @@ export const STUDENT_VIEW_QUERY = gql`
     assignment(id: $assignmentLid) {
       ...Assignment
       ...AssignmentSubmissionsConnection
+      rubric {
+        id
+      }
     }
   }
   ${Assignment.fragment}
   ${AssignmentSubmissionsConnection.fragment}
+`
+
+export const LOGGED_OUT_STUDENT_VIEW_QUERY = gql`
+  query GetAssignment($assignmentLid: ID!) {
+    assignment(id: $assignmentLid) {
+      ...Assignment
+      rubric {
+        ...Rubric
+      }
+    }
+  }
+  ${Assignment.fragment}
+  ${Rubric.fragment}
 `
 
 export const SUBMISSION_COMMENT_QUERY = gql`

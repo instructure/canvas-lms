@@ -37,7 +37,7 @@ if (!('MutationObserver' in window)) {
 }
 
 if (typeof window.URL.createObjectURL === 'undefined') {
-  Object.defineProperty(window.URL, 'createObjectURL', {value: () => {}})
+  Object.defineProperty(window.URL, 'createObjectURL', {value: () => 'http://example.com/whatever'})
 }
 
 window.scroll = () => {}

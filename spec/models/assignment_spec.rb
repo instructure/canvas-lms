@@ -1069,6 +1069,30 @@ describe Assignment do
       @assignment.tool_settings_tool = nil
       @assignment.save!
     end
+
+    context 'when the tool proxy is account-level' do
+      it 'sets the lookup context_type to Account when the tool proxy is account-level' do
+        setup_assignment_with_homework
+        course.assignments << @assignment
+        @assignment.tool_settings_tool = message_handler
+        @assignment.save!
+        lookup = @assignment.assignment_configuration_tool_lookups.last
+        expect(lookup.context_type).to eq('Account')
+      end
+    end
+
+    context 'when the tool proxy is course-level' do
+      let(:tool_proxy_context) { course }
+
+      it 'sets the lookup context_type to Course when the tool proxy' do
+        setup_assignment_with_homework
+        course.assignments << @assignment
+        @assignment.tool_settings_tool = message_handler
+        @assignment.save!
+        lookup = @assignment.assignment_configuration_tool_lookups.last
+        expect(lookup.context_type).to eq('Course')
+      end
+    end
   end
 
   describe "#duplicate" do
@@ -1181,6 +1205,7 @@ describe Assignment do
       before do
         allow(Lti::AssignmentSubscriptionsHelper).to receive(:new).and_return(subscription_helper)
         assignment.assignment_configuration_tool_lookups.create!(
+          context_type: 'Account',
           tool_vendor_code: product_family.vendor_code,
           tool_product_code: product_family.product_code,
           tool_resource_type_code: resource_handler.resource_type_code,
@@ -6787,6 +6812,55 @@ describe Assignment do
         allow(assignment).to receive(:points_possible_changed?).and_return(false)
         assignment.valid?
         expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
+      end
+    end
+  end
+
+  describe '#a2_enabled?' do
+    before do
+      allow(@course).to receive(:feature_enabled?) { false }
+      allow(@course).to receive(:feature_enabled?).with(:assignments_2_student) { true }
+    end
+
+    let(:assignment) do
+      @course.assignments.create!(assignment_valid_attributes)
+    end
+
+    it 'returns false if the assignment_2_student flag is not enabled' do
+      allow(@course).to receive(:feature_enabled?).with(:assignments_2_student) { false }
+      assignment.submission_types = 'online_text_entry'
+
+      expect(assignment.a2_enabled?).to be(false)
+    end
+
+    [
+      'discussion_topic',
+      'external_tool',
+      'on_paper',
+      'online_quiz',
+      'none',
+      'not_graded',
+      'wiki_page',
+      ''
+    ].each do |type|
+      it "returns false if submission type is set to #{type}" do
+        assignment.build_wiki_page
+        assignment.build_discussion_topic
+        assignment.build_quiz
+        assignment.submission_types = type
+
+        expect(assignment.a2_enabled?).to be(false)
+      end
+    end
+
+    [
+      'online_text_entry',
+      'online_upload',
+      'online_url'
+    ].each do |type|
+      it "returns true if the flag is on and the submission type is #{type}" do
+        assignment.submission_types = type
+        expect(assignment.a2_enabled?).to be(true)
       end
     end
   end

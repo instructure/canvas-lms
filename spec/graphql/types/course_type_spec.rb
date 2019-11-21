@@ -104,6 +104,25 @@ describe Types::CourseType do
         GQL
         expect(result.sort).to match course.assignments.published.map(&:to_param).sort
       end
+
+      it "returns assignments in order by position" do
+        ag = @course.assignment_groups.create! name: "Other Assignments", position: 1
+        other_ag_assignment = @course.assignments.create! assignment_group: ag, name: "other ag"
+
+        @term1_assignment1.assignment_group.update!(position: 2)
+        @term2_assignment1.update!(position: 1)
+        @term1_assignment1.update!(position: 2)
+
+        expect(
+          course_type.resolve(<<~GQL, current_user: @student)
+            assignmentsConnection(filter: {gradingPeriodId: null}) { edges { node { _id } } }
+          GQL
+        ).to eq [
+          other_ag_assignment,
+          @term2_assignment1,
+          @term1_assignment1,
+        ].map { |a| a.id.to_s }
+      end
     end
   end
 
@@ -437,6 +456,29 @@ describe Types::CourseType do
   describe 'Account' do
     it 'works' do
       expect(course_type.resolve("account { _id }")).to eq course.account.id.to_s
+    end
+  end
+
+  describe 'imageUrl' do
+    before(:once) {
+      course.enable_feature! 'course_card_images'
+    }
+
+    it 'returns nil when the feature flag is disabled' do
+      course.disable_feature! 'course_card_images'
+      expect(course_type.resolve("imageUrl")).to be_nil
+    end
+
+    it 'returns a url from an uploaded image' do
+      course.image_id = attachment_model(context: @course).id
+      course.save!
+      expect(course_type.resolve("imageUrl")).to_not be_nil
+    end
+
+    it 'returns a url from settings' do
+      course.image_url = "http://some.cool/gif.gif"
+      course.save!
+      expect(course_type.resolve("imageUrl")).to eq "http://some.cool/gif.gif"
     end
   end
 end

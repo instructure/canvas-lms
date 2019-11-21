@@ -22,8 +22,8 @@ import {func} from 'prop-types'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 import contentShareShape from 'jsx/shared/proptypes/contentShare'
 import DirectShareOperationStatus from 'jsx/shared/direct_share/DirectShareOperationStatus'
-import ManagedCourseSelector from 'jsx/shared//components/ManagedCourseSelector'
 import ConfirmActionButtonBar from 'jsx/shared/components/ConfirmActionButtonBar'
+import CourseAndModulePicker from 'jsx/shared/direct_share/CourseAndModulePicker'
 
 CourseImportPanel.propTypes = {
   contentShare: contentShareShape.isRequired,
@@ -32,6 +32,7 @@ CourseImportPanel.propTypes = {
 
 export default function CourseImportPanel({contentShare, onClose}) {
   const [selectedCourse, setSelectedCourse] = useState(null)
+  const [selectedModule, setSelectedModule] = useState(null)
   const [startImportOperationPromise, setStartImportOperationPromise] = useState(null)
 
   function startImportOperation() {
@@ -42,7 +43,8 @@ export default function CourseImportPanel({contentShare, onClose}) {
         body: {
           migration_type: 'canvas_cartridge_importer',
           settings: {
-            content_export_id: contentShare.content_export.id
+            content_export_id: contentShare.content_export.id,
+            insert_into_module_id: selectedModule?.id
           }
         }
       })
@@ -57,7 +59,11 @@ export default function CourseImportPanel({contentShare, onClose}) {
         successMsg={I18n.t('Import started successfully')}
         errorMsg={I18n.t('There was a problem starting import operation')}
       />
-      <ManagedCourseSelector onCourseSelected={setSelectedCourse} />
+      <CourseAndModulePicker
+        selectedCourseId={selectedCourse?.id}
+        setSelectedCourse={setSelectedCourse}
+        setSelectedModule={setSelectedModule}
+      />
       <ConfirmActionButtonBar
         padding="small 0 0 0"
         primaryLabel={startImportOperationPromise ? null : I18n.t('Import')}

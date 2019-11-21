@@ -15,9 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import KeyboardNavDialog from 'compiled/views/KeyboardNavDialog'
-import INST from './INST'
 import I18n from 'i18n!instructure_js'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -52,7 +50,6 @@ function handleYoutubeLink() {
   const $link = $(this)
   const href = $link.attr('href')
   const id = $.youTubeID(href || '')
-
   if (id && !$link.hasClass('inline_disabled')) {
     const $after = $(`
       <a
@@ -103,9 +100,7 @@ function handleYoutubeLink() {
     $link.addClass('youtubed').after($after)
   }
 }
-
-trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/')
-
+trackEvent('Route', window.location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/')
 const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
 export function enhanceUserContent() {
   const $content = $('#content')
@@ -140,7 +135,6 @@ export function enhanceUserContent() {
         'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
         "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
         'you should use your own custom JS file to do any such customizations.'
-
       console.error(msg, $elements)
     })
     .end()
@@ -216,7 +210,6 @@ export function enhanceUserContent() {
         }
       })
   }
-
   $('.user_content.unenhanced a,.user_content.unenhanced+div.answers a')
     .find('img.media_comment_thumbnail')
     .each(function() {
@@ -237,20 +230,17 @@ export function enhanceUserContent() {
   $('.user_content.unenhanced')
     .removeClass('unenhanced')
     .addClass('enhanced')
-
   setTimeout(() => {
     $('.user_content form.user_content_post_form:not(.submitted)')
       .submit()
       .addClass('submitted')
   }, 10)
 }
-
 $(function() {
   // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
   if (window._earlyClick) {
     // unset the onclick handler we were using to capture the events
     document.removeEventListener('click', window._earlyClick)
-
     if (window._earlyClick.clicks) {
       // wait to fire the "click" events till after all of the event hanlders loaded at dom ready are initialized
       setTimeout(function() {
@@ -264,7 +254,6 @@ $(function() {
       }, 1)
     }
   }
-
   // this next block of code adds the ellipsis on the breadcrumb if it overflows one line
   const $breadcrumbs = $('#breadcrumbs')
   if ($breadcrumbs.length) {
@@ -273,7 +262,6 @@ $(function() {
     // if we ever change the styling of the breadcrumbs so their height changes, change this too. the * 1.5 part is just in case to ever handle any padding or margin.
     const hightOfOneBreadcrumb = 27 * 1.5
     let taskID
-
     const resizeBreadcrumb = () => {
       if (taskID) (window.cancelIdleCallback || window.cancelAnimationFrame)(taskID)
       taskID = (window.requestIdleCallback || window.requestAnimationFrame)(() => {
@@ -296,9 +284,7 @@ $(function() {
     $(window).resize(resizeBreadcrumb)
     // end breadcrumb ellipsis
   }
-
   KeyboardNavDialog.prototype.bindOpenKeys.call({$el: $('#keyboard_navigation')})
-
   $('#switched_role_type').ifExists(function() {
     const context_class = $(this).attr('class')
     const $img = $('<img/>')
@@ -352,7 +338,6 @@ $(function() {
       .find('a')
       .prepend($img)
   })
-
   $('a.show_quoted_text_link').live('click', function(event) {
     const $text = $(this)
       .parents('.quoted_text_holder')
@@ -363,7 +348,6 @@ $(function() {
       $(this).hide()
     }
   })
-
   $('a.equella_content_link').live('click', function(event) {
     event.preventDefault()
     let $dialog = $('#equella_preview_dialog')
@@ -403,7 +387,6 @@ $(function() {
     $dialog.dialog('close').dialog('open')
     $dialog.find('iframe').attr('src', $(this).attr('href'))
   })
-
   // Adds a way to automatically open dialogs by just giving them the .dialog_opener class.
   // Uses the aria-controls attribute to specify id of dialog to open because that is already
   // a best practice accessibility-wise (as a side note you should also add "role=button").
@@ -416,13 +399,11 @@ $(function() {
   //
   // <a class="dialog_opener" aria-controls="my_dialog" data-dialog-opts="{resizable:false, width: 300}" role="button" href="#">
   // opens the .my_dialog dialog and passes the options {resizable:false, width: 300}
-
   // the :not clause is to not allow users access to this functionality in their content.
   $('.dialog_opener[aria-controls]:not(.user_content *)').live('click', function(event) {
     const link = this
     $('#' + $(this).attr('aria-controls')).ifExists($dialog => {
       event.preventDefault()
-
       // if the linked dialog has not already been initialized, initialize it (passing in opts)
       if (!$dialog.data('dialog')) {
         $dialog.dialog(
@@ -436,11 +417,9 @@ $(function() {
         )
         $dialog.fixDialogButtons()
       }
-
       $dialog.dialog('open')
     })
   })
-
   if ($.filePreviewsEnabled()) {
     $('a.file_preview_link').live('click', function(event) {
       event.preventDefault()
@@ -504,20 +483,17 @@ $(function() {
       )
     })
   }
-
   // publishing the 'userContent/change' will run enhanceUserContent at most once every 50ms
   let enhanceUserContentTimeout
   $.subscribe('userContent/change', () => {
     clearTimeout(enhanceUserContentTimeout)
     enhanceUserContentTimeout = setTimeout(enhanceUserContent, 50)
   })
-
   $(document).bind('user_content_change', enhanceUserContent)
   $(() => {
     setInterval(enhanceUserContent, 15000)
     setTimeout(enhanceUserContent, 15)
   })
-
   $('.zone_cached_datetime').each(function() {
     if ($(this).attr('title')) {
       const datetime = tz.parse($(this).attr('title'))
@@ -526,7 +502,6 @@ $(function() {
       }
     }
   })
-
   $('.show_sub_messages_link').click(function(event) {
     event.preventDefault()
     $(this)
@@ -596,7 +571,6 @@ $(function() {
       if (!$editor || $editor.length === 0) {
         return
       }
-
       RichContentEditor.initSidebar({
         show() {
           $('#sidebar_content').hide()
@@ -617,7 +591,6 @@ $(function() {
       }
       RichContentEditor.destroyRCE($editor)
     })
-
   $(
     '.communication_message .content .links .show_users_link,.communication_message .header .show_users_link'
   ).click(function(event) {
@@ -640,7 +613,7 @@ $(function() {
       })
   })
   $('.communication_sub_message .add_conversation_message_form').formSubmit({
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this)
         .find('button')
         .attr('disabled', true)
@@ -651,13 +624,11 @@ $(function() {
     },
     success(data) {
       $(this).loadingImage('remove')
-
       // message is the message div containing this form, and conversation the
       // owning conversation. we make a copy of this div before filling it out
       // so that we can use it for the next message (if any)
       const $message = $(this).parents('.communication_sub_message')
       const $conversation = $message.parents('.communication_message')
-
       // fill out this message, display the new info, and remove the form
       const message_data = data.messages[0]
       $message.fillTemplateData({
@@ -669,14 +640,12 @@ $(function() {
       })
       $message.find('.message').show()
       $(this).remove()
-
       // turn the "add message" button back on
       $conversation.find('.reply_message').show()
-
       // notify the user and any other watchers in the document
       $.flashMessage('Message Sent!')
       $(document).triggerHandler('user_content_change')
-      if (location.pathname === '/') {
+      if (window.location.pathname === '/') {
         trackEvent('dashboard_comment', 'create')
       }
     },
@@ -692,7 +661,7 @@ $(function() {
     }
   })
   $('.communication_sub_message .add_sub_message_form').formSubmit({
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this)
         .find('button')
         .attr('disabled', true)
@@ -744,7 +713,7 @@ $(function() {
       $(document).triggerHandler('richTextEnd', $(this).find('textarea.rich_text'))
       $(document).triggerHandler('user_content_change')
       $(this).remove()
-      if (location.href.match(/dashboard/)) {
+      if (window.location.href.match(/dashboard/)) {
         trackEvent('dashboard_comment', 'create')
       }
     },
@@ -782,18 +751,16 @@ $(function() {
     } else {
       params = {message: $form.find('textarea:visible:first').val() || ''}
     }
-    location.href = $(this).attr('href') + '?message=' + encodeURIComponent(params.message)
+    window.location.href = $(this).attr('href') + '?message=' + encodeURIComponent(params.message)
   })
   $('.communication_message.new_activity_message').ifExists(function() {
     this.find('.message_type img').click(function() {
       const $this = $(this),
         c = $.trim($this.attr('class'))
-
       $this
         .parents('.message_type')
         .find('img')
         .removeClass('selected')
-
       $this
         .addClass('selected')
         .parents('.new_activity_message')
@@ -830,7 +797,7 @@ $(function() {
         $message.find('.' + thisVal + '_roster_list').show()
       })
       .triggerHandler('change')
-    this.find('.cancel_button').click(function(event) {
+    this.find('.cancel_button').click(function(_event) {
       $(this)
         .parents('.communication_message')
         .hide()
@@ -852,7 +819,7 @@ $(function() {
         .select()
     })
     this.find('form.message_form').formSubmit({
-      beforeSubmit(data) {
+      beforeSubmit(_data) {
         $('button').attr('disabled', true)
         $('button.submit_button').text(I18n.t('status.posting_message', 'Posting Message...'))
       },
@@ -914,7 +881,7 @@ $(function() {
         } else if ($(this).hasClass('announcement_form')) {
           // do nothing
         } else {
-          location.reload()
+          window.location.reload()
         }
       },
       error(data) {
@@ -933,7 +900,6 @@ $(function() {
       $('#topic_list .topic_message').show()
       $(this).hide()
     })
-
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
   // vvvvvvvvvvvvvvvvv BEGIN stuf form making pretty dates vvvvvvvvvvvvvvvvvv
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -988,7 +954,6 @@ $(function() {
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   // ^^^^^^^^^^^^^^^^^^ END stuff for making pretty dates ^^^^^^^^^^^^^^^^^^^
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
   const sequence_url = $('#sequence_footer .sequence_details_url')
     .filter(':last')
     .attr('href')
@@ -1003,7 +968,6 @@ $(function() {
             const tag =
               (data[label + '_item'] && data[label + '_item'].content_tag) ||
               (data[label + '_module'] && data[label + '_module'].context_module)
-
             if (!data[label + '_item']) {
               tag.title = tag.title || tag.name
               if (tag.workflow_state === 'unpublished') {
@@ -1050,7 +1014,6 @@ $(function() {
       })
     }
   }
-
   // this is for things like the to-do, recent items and upcoming, it
   // happend a lot so rather than duplicating it everywhere I stuck it here
   $('#right-side').delegate('.more_link', 'click', function(event) {
@@ -1060,7 +1023,6 @@ $(function() {
       .children(':hidden')
       .show()
     $this.closest('li').remove()
-
     // if they are using the keyboard to navigate (they hit enter on the link instead of actually
     // clicking it) then put focus on the first of the now-visible items--otherwise, since the
     // .more_link is hidden, focus would be completely lost and leave a blind person stranded.
@@ -1074,7 +1036,6 @@ $(function() {
     }
     return false
   })
-
   $('#right-side').on('click', '.disable-todo-item-link', function(event) {
     event.preventDefault()
     const $item = $(this)
@@ -1104,10 +1065,8 @@ $(function() {
         }
       })
     }
-
     remove(url)
   })
-
   // in 100ms (to give time for everything else to load), find all the external links and add give them
   // the external link look and behavior (force them to open in a new tab)
   setTimeout(function() {
@@ -1118,10 +1077,8 @@ $(function() {
     ) // technique for finding "external" links copied from https://davidwalsh.name/external-links-css
     for (let i = 0; i < links.length; i++) {
       const $link = $(links[i])
-
       // don't mess with the ones that were already processed in enhanceUserContent
       if ($link.hasClass('external')) continue
-
       const $linkToReplace = $link
         .not('.open_in_a_new_tab')
         .not(':has(img)')
@@ -1134,7 +1091,6 @@ $(function() {
           indicatorText
         )
         $linkIndicator.append($('<span class="screenreader-only"/>').text(indicatorText))
-
         $linkToReplace
           .addClass('external')
           .children('span.ui-icon-extlink')

@@ -676,7 +676,8 @@ describe "Files API", type: :request do
             ['files', user],
             'files',
             'User',
-            nil
+            nil,
+            {context: nil}
           )
           subject
         end

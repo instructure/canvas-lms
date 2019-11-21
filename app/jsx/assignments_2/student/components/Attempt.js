@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {Assignment} from '../graphqlData/Assignment'
 import I18n from 'i18n!assignments_2'
-import React from 'react'
+import React, {useContext, useEffect} from 'react'
 import {Submission} from '../graphqlData/Submission'
 import {Text} from '@instructure/ui-elements'
 
@@ -29,6 +30,11 @@ export const getCurrentAttempt = submission => {
 function Attempt(props) {
   const {assignment, submission} = props
   const current_attempt = getCurrentAttempt(submission)
+  const {setOnSuccess} = useContext(AlertManagerContext)
+
+  useEffect(() => {
+    setOnSuccess(I18n.t('Now viewing Attempt %{current_attempt}', {current_attempt}))
+  }, [current_attempt, setOnSuccess])
 
   return (
     <Text size="medium" weight="bold" data-test-id="attempt">

@@ -128,7 +128,7 @@ module Lti
     # NOTE
     # The LTI 2/Live Events plagiarism detection platform lives
     # alongside two other plagiarism solutions:
-    # the Vericite plugin and the Turnitin pugin. When making changes
+    # the Vericite plugin and the Turnitin plugin. When making changes
     # to any of these three services verify no regressions are
     # introduced in the others.
 
@@ -172,9 +172,16 @@ module Lti
     #   A message describing the error. If set, the "workflow_state"
     #   will be set to "error."
     #
+    # @argument originality_report[attempt] [Integer]
+    #   If no `file_id` is given, and no file is required for the assignment
+    #   (that is, the assignment allows an online text entry), this parameter
+    #   may be given to clarify which attempt number the report is for (in the
+    #   case of resubmissions). If this field is omitted and no `file_id` is
+    #   given, the report will be created (or updated, if it exists) for the
+    #   first submission attempt with no associated file.
+    #
     # @returns OriginalityReport
     def create
-      begin
       if @report.present?
         update
       else
@@ -186,9 +193,8 @@ module Lti
           render json: @report.errors, status: :bad_request
         end
       end
-      rescue StandError => e
-        puts e.message
-      end
+    rescue StandError => e
+      puts e.message
     end
 
     # @API Edit an Originality Report
@@ -323,7 +329,8 @@ module Lti
     def create_report_params
       @_create_report_params ||= begin
         report_attributes = params.require(:originality_report).permit(create_attributes).to_unsafe_h.merge(
-          {submission_id: params.require(:submission_id)}
+          submission_id: params.require(:submission_id),
+          submission_time: @version&.submitted_at
         )
         report_attributes[:lti_link_attributes] = lti_link_params
         report_attributes
@@ -375,12 +382,34 @@ module Lti
       verify_submission_attachment(attachment, submission)
     end
 
+    def report_by_attempt(attempt)
+      # Assign @version so if create a new originality report, we can match up
+      # the submission time with the version.  This is important because they
+      # could be creating a report for the version that is not the latest.
+      @version = submission.versions.map(&:model).find{|m| m.attempt.to_s == attempt.to_s}
+      raise ActiveRecord::RecordNotFound unless @version
+      submission.originality_reports.find_by(submission_time: @version.submitted_at)
+    end
+
     def find_originality_report
       raise ActiveRecord::RecordNotFound if submission.blank?
       @report = OriginalityReport.find_by(id: params[:id])
+      # Note: we could end up looking up by file_id, attachment: nil or attempt
+      # even in the `update` or `show` endpoints, if they give us a bogus report id :/
       @report ||= report_by_attachment(attachment)
       return if params[:originality_report].blank? || attachment.present?
-      @report ||= submission.originality_reports.find_by(attachment: nil) unless attachment_required?
+      unless attachment_required?
+        # For Text Entry cases (there is never an attachment), in the `create`
+        # method, clients can choose which submission version the report is for
+        # by supplying the attempt number.  Thus we can tell if they are
+        # updating an exising report or making a new one for a new version.
+        @report ||=
+          if params.require(:originality_report)[:attempt].present?
+            report_by_attempt(params[:originality_report][:attempt])
+          else
+            submission.originality_reports.find_by(attachment: nil)
+          end
+      end
     end
 
     def report_by_attachment(attachment)

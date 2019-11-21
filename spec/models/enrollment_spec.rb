@@ -2497,11 +2497,11 @@ describe Enrollment do
         course_with_student(:active_course => 1)
         User.where(:id => @user).update_all(:updated_at => 1.year.ago)
         @user.reload
-        expect(@user.cached_current_enrollments).to eq [@enrollment]
+        expect(@user.cached_currentish_enrollments).to eq [@enrollment]
         @enrollment.reject!
         # have to get the new updated_at
         @user.reload
-        expect(@user.cached_current_enrollments).to eq []
+        expect(@user.cached_currentish_enrollments).to eq []
       end
     end
 
@@ -2510,11 +2510,11 @@ describe Enrollment do
         course_with_student(:active_course => 1)
         User.where(:id => @user).update_all(:updated_at => 1.year.ago)
         @user.reload
-        expect(@user.cached_current_enrollments).to eq [@enrollment]
+        expect(@user.cached_currentish_enrollments).to eq [@enrollment]
         @enrollment.destroy
         # have to get the new updated_at
         @user.reload
-        expect(@user.cached_current_enrollments).to eq []
+        expect(@user.cached_currentish_enrollments).to eq []
       end
     end
 
@@ -2748,28 +2748,28 @@ describe Enrollment do
   end
 
   describe 'conclude' do
-    it "should remove the enrollment from User#cached_current_enrollments" do
+    it "should remove the enrollment from User#cached_currentish_enrollments" do
       enable_cache do
         course_with_student(:active_all => 1)
         User.where(:id => @user).update_all(:updated_at => 1.day.ago)
         @user.reload
-        expect(@user.cached_current_enrollments).to eq [ @enrollment ]
+        expect(@user.cached_currentish_enrollments).to eq [ @enrollment ]
         @enrollment.conclude
         @user.reload
-        expect(@user.cached_current_enrollments).to eq []
+        expect(@user.cached_currentish_enrollments).to eq []
       end
     end
   end
 
   describe 'unconclude' do
-    it 'should add the enrollment to User#cached_current_enrollments' do
+    it 'should add the enrollment to User#cached_currentish_enrollments' do
       enable_cache do
         course_with_student active_course: true, enrollment_state: 'completed'
         User.where(:id => @student).update_all(:updated_at => 1.day.ago)
         @student.reload
-        expect(@student.cached_current_enrollments).to eq []
+        expect(@student.cached_currentish_enrollments).to eq []
         @enrollment.unconclude
-        expect(@student.cached_current_enrollments).to eq [@enrollment]
+        expect(@student.cached_currentish_enrollments).to eq [@enrollment]
       end
     end
   end

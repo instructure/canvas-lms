@@ -755,7 +755,7 @@ RSpec.describe ApplicationController do
         end
 
         it 'is set to quizzes page when launched from quizzes page' do
-          allow(controller.request).to receive(:referer).and_return('quizzes')
+          allow(controller.request).to receive(:referer).and_return('courses/1/quizzes')
           controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
           controller.send(:content_tag_redirect, course, content_tag, nil)
           expect(assigns[:return_url]).to eq 'host/quizzes'
@@ -782,6 +782,13 @@ RSpec.describe ApplicationController do
 
         it 'is set using named_context_url when not launched from quizzes page' do
           allow(controller.request).to receive(:referer).and_return('assignments')
+          controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'named_context_url'
+        end
+
+        it 'is set using named_context_url when not launched from quizzes page and referrer includes "quiz"' do
+          allow(controller.request).to receive(:referer).and_return('somequizzessub.com/assignments')
           controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
           controller.send(:content_tag_redirect, course, content_tag, nil)
           expect(assigns[:return_url]).to eq 'named_context_url'
@@ -1090,7 +1097,7 @@ describe ApplicationController do
         course_factory
         student_in_course(:user => @user, :course => @course)
         expect(@course).to_not be_available
-        expect(@user.cached_current_enrollments).to be_empty
+        expect(@user.cached_currentish_enrollments).to be_empty
         @other_group = group_model(:context => @course)
         group_model(:context => @course)
         @group.add_user(@user)

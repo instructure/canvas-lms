@@ -37,6 +37,9 @@ const consoleMessagesToIgnore = {
     // React 16.9+ generates these deprecation warnings but it doesn't do any good to hear about the ones for instUI. We can't do anything about them in this repo
     // Put any others we can't control here.
     /Please update the following components:[ (BaseTransition|Billboard|Button|Checkbox|CloseButton|Dialog|Expandable|FileDrop|Flex|FlexItem|FormFieldGroup|FormFieldLabel|FormFieldLayout|FormFieldMessage|FormFieldMessages|Grid|GridCol|GridRow|Heading|InlineSVG|Mask|ModalBody|ModalFooter|ModalHeader|NumberInput|Portal|Query|Responsive|SVGIcon|ScreenReaderContent|SelectOptionsList|SelectField|SelectMultiple|SelectOptionsList|SelectSingle|Spinner|Tab|TabList|TabPanel|Text|TextArea|TextInput|TinyMCE|ToggleDetails|ToggleFacade|Transition|TruncateText|View),?]+$/
+
+    // /is deprecated and will be removed/, // uncomment to remove instui deprecation messages
+    // /Translation for/ // uncomment to remove missing translation messages
   ]
 }
 

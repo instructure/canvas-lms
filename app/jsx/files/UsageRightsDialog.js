@@ -153,6 +153,7 @@ UsageRightsDialog.render = function() {
       open={this.props.isOpen}
       onDismiss={this.props.closeModal}
       label={I18n.t('Manage Usage Rights')}
+      shouldCloseOnDocumentClick={false} // otherwise clicking in the datepicker will dismiss the modal underneath it
     >
       <Modal.Header>
         <CloseButton

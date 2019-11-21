@@ -19,7 +19,7 @@ import {arrayOf, bool, func, shape, string} from 'prop-types'
 import React, {Suspense} from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-overlays'
 import {Tabs} from '@instructure/ui-tabs'
 
@@ -51,7 +51,8 @@ export default class UploadMedia extends React.Component {
     contextId: string,
     contextType: string,
     onStartUpload: func,
-    onComplete: func,
+    onUploadComplete: func,
+    onEmbed: func,
     onDismiss: func,
     open: bool,
     tabs: shape({
@@ -89,6 +90,7 @@ export default class UploadMedia extends React.Component {
       }
       case PANELS.EMBED: {
         this.props.onDismiss()
+        this.props.onEmbed(this.state.embedCode)
         break
       }
       default:
@@ -102,10 +104,10 @@ export default class UploadMedia extends React.Component {
     } else {
       try {
         if (this.subtitles.length > 0) {
-          await saveClosedCaptions(data.media_object.media_id, this.subtitles)
+          await saveClosedCaptions(data.mediaObject.media_object.media_id, this.subtitles)
         }
         this.props.onDismiss && this.props.onDismiss()
-        this.props.onComplete && this.props.onComplete(null, data)
+        this.props.onUploadComplete && this.props.onUploadComplete(null, data)
       } catch (ex) {
         // Handle error
         console.error(ex) // eslint-disable-line no-console

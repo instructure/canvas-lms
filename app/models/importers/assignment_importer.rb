@@ -394,7 +394,8 @@ module Importers
           tool_vendor_code: vendor_code,
           tool_product_code: product_code,
           tool_resource_type_code: resource_type_code,
-          tool_type: 'Lti::MessageHandler'
+          tool_type: 'Lti::MessageHandler',
+          context_type: context.class.name
         )
         active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
           context: context, vendor_code: vendor_code, product_code: product_code

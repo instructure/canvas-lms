@@ -271,7 +271,7 @@ describe Types::AssignmentType do
         section1_student = section1.enroll_user(User.create!, "StudentEnrollment", "active").user
         section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
         @section1_student_submission = assignment.submit_homework(section1_student, body: "hello world")
-        assignment.submit_homework(section2_student, body: "hello universe")
+        @section2_student_submission = assignment.submit_homework(section2_student, body: "hello universe")
       end
 
       it "returns submissions only for the given section" do
@@ -281,6 +281,18 @@ describe Types::AssignmentType do
           }
         GQL
         expect(section1_submission_ids.map(&:to_i)).to contain_exactly(@section1_student_submission.id)
+      end
+
+      it "respects visibility for limited teachers" do
+        teacher.enrollments.first.update! course_section: section2,
+          limit_privileges_to_course_section: true
+
+        submissions =  assignment_type.resolve(<<~GQL, current_user: teacher)
+          submissionsConnection { nodes { _id } }
+        GQL
+
+        expect(submissions).not_to include @section1_student_submission.id.to_s
+        expect(submissions).to include @section2_student_submission.id.to_s
       end
     end
   end

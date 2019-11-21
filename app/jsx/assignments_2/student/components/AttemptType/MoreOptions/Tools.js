@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {arrayOf, func, string} from 'prop-types'
+
+import {arrayOf, bool, func, string} from 'prop-types'
 import CanvasFiles from './CanvasFiles'
 import {ExternalTool} from '../../../graphqlData/ExternalTool'
+import I18n from 'i18n!assignments_2_MoreOptions_Tools'
 import React, {useState} from 'react'
 import {UserGroups} from '../../../graphqlData/UserGroups'
 
@@ -45,20 +47,22 @@ const Tools = props => {
 
   return (
     <Tabs onRequestTabChange={handleTabChange}>
-      <Tabs.Panel
-        isSelected={selectedIndex === 0}
-        key="CanvasFiles"
-        padding="0"
-        renderTitle="Canvas Files"
-      >
-        <div style={tabContentStyle}>
-          <CanvasFiles
-            courseID={props.courseID}
-            handleCanvasFileSelect={props.handleCanvasFileSelect}
-            userGroups={props.userGroups.groups}
-          />
-        </div>
-      </Tabs.Panel>
+      {props.renderCanvasFiles && (
+        <Tabs.Panel
+          isSelected={selectedIndex === 0}
+          key="CanvasFiles"
+          padding="0"
+          renderTitle={I18n.t('Canvas Files')}
+        >
+          <div style={tabContentStyle}>
+            <CanvasFiles
+              courseID={props.courseID}
+              handleCanvasFileSelect={props.handleCanvasFileSelect}
+              userGroups={props.userGroups.groups}
+            />
+          </div>
+        </Tabs.Panel>
+      )}
       {props.tools.map((tool, i) => (
         <Tabs.Panel
           isSelected={selectedIndex === i + 1}
@@ -82,7 +86,8 @@ const Tools = props => {
 Tools.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
-  handleCanvasFileSelect: func.isRequired,
+  handleCanvasFileSelect: func,
+  renderCanvasFiles: bool,
   tools: arrayOf(ExternalTool.shape),
   userGroups: UserGroups.shape
 }

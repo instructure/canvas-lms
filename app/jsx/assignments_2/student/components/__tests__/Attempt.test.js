@@ -15,38 +15,66 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import Attempt from '../Attempt'
 import {mockAssignmentAndSubmission} from '../../mocks'
 import React from 'react'
 import {render} from '@testing-library/react'
 
-describe('unlimited attempts', () => {
-  it('renders correctly', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: {attempt: 1}})
-    const {getByText} = render(<Attempt {...props} />)
-    expect(getByText('Attempt 1')).toBeInTheDocument()
+let mockedSetOnSuccess = null
+
+function mockContext(children) {
+  return (
+    <AlertManagerContext.Provider
+      value={{
+        setOnSuccess: mockedSetOnSuccess
+      }}
+    >
+      {children}
+    </AlertManagerContext.Provider>
+  )
+}
+
+describe('Attempt', () => {
+  beforeEach(() => {
+    mockedSetOnSuccess = jest.fn().mockResolvedValue({})
   })
 
-  it('renders attempt 0 as attempt 1', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: {attempt: 0}})
-    const {getByText} = render(<Attempt {...props} />)
-    expect(getByText('Attempt 1')).toBeInTheDocument()
-  })
-
-  it('renders the current submission attempt', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: {attempt: 3}})
-    const {getByText} = render(<Attempt {...props} />)
-    expect(getByText('Attempt 3')).toBeInTheDocument()
-  })
-})
-
-describe('limited attempts', () => {
-  it('renders attempt', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Submission: {attempt: 2},
-      Assignment: {allowedAttempts: 4}
+  describe('unlimited attempts', () => {
+    it('renders correctly', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: {attempt: 1}})
+      const {getByText} = render(mockContext(<Attempt {...props} />))
+      expect(getByText('Attempt 1')).toBeInTheDocument()
     })
-    const {getByText} = render(<Attempt {...props} />)
-    expect(getByText('Attempt 2 of 4')).toBeInTheDocument()
+
+    it('renders attempt 0 as attempt 1', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: {attempt: 0}})
+      const {getByText} = render(mockContext(<Attempt {...props} />))
+      expect(getByText('Attempt 1')).toBeInTheDocument()
+    })
+
+    it('renders the current submission attempt', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: {attempt: 3}})
+      const {getByText} = render(mockContext(<Attempt {...props} />))
+      expect(getByText('Attempt 3')).toBeInTheDocument()
+    })
+
+    it('alerts the screenreader of the current displayed attempt', async () => {
+      const props = await mockAssignmentAndSubmission({Submission: {attempt: 1}})
+      render(mockContext(<Attempt {...props} />))
+      expect(mockedSetOnSuccess).toHaveBeenCalledWith('Now viewing Attempt 1')
+    })
+  })
+
+  describe('limited attempts', () => {
+    it('renders attempt', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Submission: {attempt: 2},
+        Assignment: {allowedAttempts: 4}
+      })
+      const {getByText} = render(mockContext(<Attempt {...props} />))
+      expect(getByText('Attempt 2 of 4')).toBeInTheDocument()
+    })
   })
 })

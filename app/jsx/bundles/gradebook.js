@@ -17,7 +17,10 @@
  */
 
 import $ from 'jquery'
+import I18n from 'i18n!gradebook'
+import {Alert} from '@instructure/ui-alerts'
 import Backbone from 'Backbone'
+import {Link, Text} from '@instructure/ui-elements'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Paginator from '../shared/components/Paginator'
@@ -36,6 +39,8 @@ const GradebookRouter = Backbone.Router.extend({
     this.isLoaded = false
     this.views = {}
     this.views.assignment = new Gradebook(ENV.GRADEBOOK_OPTIONS)
+
+    this.renderOldGradebookReplacementNotice()
 
     if (ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled) {
       this.views.outcome = this.initOutcomes()
@@ -63,6 +68,23 @@ const GradebookRouter = Backbone.Router.extend({
         loadPage={p => this.views.outcome.loadPage(p)}
       />,
       document.getElementById('outcome-gradebook-paginator')
+    )
+  },
+
+  renderOldGradebookReplacementNotice() {
+    const newGradebookInfoURL = 'https://s.tiled.co/2bcKFN5/2019-canvas-gradebook-release'
+    ReactDOM.render(
+      <Alert variant="warning">
+        <Text>
+          {I18n.t(
+            'This version of Gradebook is being replaced by an updated Gradebook on or before January 18, 2020.'
+          )}
+          <Link href={newGradebookInfoURL} margin="0 xx-small">
+            {I18n.t('Learn More')}
+          </Link>
+        </Text>
+      </Alert>,
+      document.getElementById('replacement_notice_mount_point')
     )
   },
 

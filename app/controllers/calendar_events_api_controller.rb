@@ -754,7 +754,7 @@ class CalendarEventsApiController < ApplicationController
     @events = @events.sort_by { |e| [e.start_at || CanvasSort::Last, Canvas::ICU.collation_key(e.title)] }
 
     @contexts.each do |context|
-      log_asset_access([ "calendar_feed", context ], "calendar", 'other')
+      log_asset_access([ "calendar_feed", context ], "calendar", 'other', context: @context)
     end
     ActiveRecord::Associations::Preloader.new.preload(@events, :context)
 

@@ -657,7 +657,7 @@ class User < ActiveRecord::Base
   end
 
   def filter_visible_groups_for_user(groups)
-    enrollments = self.cached_current_enrollments(preload_dates: true, preload_courses: true)
+    enrollments = self.cached_currentish_enrollments(preload_dates: true, preload_courses: true)
     groups.select do |group|
       group.context_type != 'Course' || enrollments.any? do |en|
         en.course == group.context && !(en.inactive? || en.completed?) && (en.admin? || en.course.available?)
@@ -1718,7 +1718,11 @@ class User < ActiveRecord::Base
    # to get a head start
 
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
-  def cached_current_enrollments(opts={})
+  def cached_currentish_enrollments(opts={})
+    # this method doesn't include the "active_by_date" scope and should probably not be used since
+    # it will give enrollments which are concluded by date
+    # leaving this for existing instances where schools are used to the inconsistent behavior
+    # participating_enrollments seems to be a more accurate representation of "current courses"
     RequestCache.cache('cached_current_enrollments', self, opts) do
       enrollments = self.shard.activate do
         res = Rails.cache.fetch_with_batched_keys(
@@ -2100,7 +2104,7 @@ class User < ActiveRecord::Base
     @appointment_context_codes ||= {}
     @appointment_context_codes[include_observers] ||= Rails.cache.fetch([self, 'cached_appointment_codes', ApplicationController.region, include_observers ].cache_key, expires_in: 1.day) do
       ret = {:primary => [], :secondary => []}
-      cached_current_enrollments(preload_dates: true).each do |e|
+      cached_currentish_enrollments(preload_dates: true).each do |e|
         next unless (e.student? || (include_observers && e.observer?)) && e.active?
         ret[:primary] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
@@ -2115,7 +2119,7 @@ class User < ActiveRecord::Base
     @manageable_appointment_context_codes ||= Rails.cache.fetch(cache_key, expires_in: 1.day) do
       ret = {:full => [], :limited => [], :secondary => []}
       limited_sections = {}
-      manageable_enrollments_by_permission(:manage_calendar).each do |e|
+      manageable_enrollments_by_permission(:manage_calendar, cached_currentish_enrollments).each do |e|
         next if ret[:full].include?("course_#{e.course_id}")
         if e.limit_privileges_to_course_section
           ret[:limited] << "course_#{e.course_id}"

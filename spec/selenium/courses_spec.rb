@@ -111,10 +111,11 @@ describe "courses" do
       end
 
       it "should allow unpublishing of the course if submissions have no score or grade" do
+        skip('flaky alert. ADMIN-3022')
         course_with_student_submissions
         @course.default_view = 'feed'
         @course.save
-        wait_for_new_page_load { get "/courses/#{@course.id}" }
+        get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
         course_status_buttons.first.click
         wait_for(method: nil, timeout: 5) {
@@ -144,7 +145,7 @@ describe "courses" do
 
     describe 'course wizard' do
       def go_to_checklist
-        expect_new_page_load { get "/courses/#{@course.id}" }
+        get "/courses/#{@course.id}"
         f(".wizard_popup_link").click
         wait_for(method: nil, timeout: 5) {
           expect(f(".ic-wizard-box")).to be_displayed
@@ -176,6 +177,7 @@ describe "courses" do
       end
 
       it "should have the correct initial state" do
+        skip('ADMIN-3018')
         course_with_teacher_logged_in
         go_to_checklist
 
@@ -191,6 +193,7 @@ describe "courses" do
       end
 
       it "should complete 'Add Course Assignments' checklist item" do
+        skip('ADMIN-3018')
         course_with_teacher_logged_in
         @course.assignments.create({name: "Test Assignment"})
         go_to_checklist
@@ -198,6 +201,7 @@ describe "courses" do
       end
 
       it "should complete 'Add Students to the Course' checklist item" do
+        skip('ADMIN-3018')
         course_with_teacher_logged_in
         student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
         student_in_course(:user => student, :active_all => 1)
@@ -309,6 +313,7 @@ describe "courses" do
     end
 
     it "should load the users page using ajax" do
+      skip('flaky alert. ADMIN-3022')
       course_with_teacher_logged_in
 
       # Set up the course with > 50 users (to test scrolling)
@@ -432,22 +437,24 @@ describe "courses" do
     end
 
     it "should auto-accept the course invitation if previews are not allowed" do
+      skip('flaky alert. ADMIN-3022')
       Account.default.settings[:allow_invitation_previews] = false
       Account.default.save!
       enroll_student(@student, false)
 
       create_session(@student.pseudonym)
-      wait_for_new_page_load { get "/courses/#{@course.id}" }
+      get "/courses/#{@course.id}"
       wait_for_ajaximations
       assert_flash_notice_message "Invitation accepted!"
       expect(f("#content")).not_to contain_css(".ic-notification button[name='accept'] ")
     end
 
     it "should accept the course invitation" do
+      skip('flaky alert. ADMIN-3022')
       enroll_student(@student, false)
 
       create_session(@student.pseudonym)
-      wait_for_new_page_load { get "/courses/#{@course.id}" }
+      get "/courses/#{@course.id}"
       f(".ic-notification button[name='accept'] ").click
       wait_for(method: nil, timeout: 5) {
         assert_flash_notice_message "Invitation accepted!"
@@ -455,6 +462,7 @@ describe "courses" do
     end
 
     it "should reject a course invitation" do
+      skip('flaky alert. ADMIN-3022')
       enroll_student(@student, false)
 
       create_session(@student.pseudonym)

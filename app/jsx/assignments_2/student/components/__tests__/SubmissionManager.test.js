@@ -110,4 +110,36 @@ describe('SubmissionManager', () => {
     fireEvent.click(submitButton)
     expect(getByText('Submit').closest('button')).toHaveAttribute('disabled')
   })
+
+  describe('with multiple submission types drafted', () => {
+    it('renders a confirmation modal if the submit button is pressed', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {
+          submissionTypes: ['online_text_entry', 'online_url']
+        },
+        Submission: {
+          submissionDraft: {
+            activeSubmissionType: 'online_text_entry',
+            body: 'some text here',
+            meetsTextEntryCriteria: true,
+            meetsUrlCriteria: true,
+            url: 'http://www.google.com'
+          }
+        }
+      })
+
+      const {getByTestId, getByText} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
+
+      const submitButton = getByText('Submit')
+      fireEvent.click(submitButton)
+
+      expect(getByTestId('submission-confirmation-modal')).toBeInTheDocument()
+      expect(getByTestId('cancel-submit')).toBeInTheDocument()
+      expect(getByTestId('confirm-submit')).toBeInTheDocument()
+    })
+  })
 })

@@ -125,9 +125,10 @@ module RCENextPage
   end
 
   def possibly_hidden_toolbar_button(selector)
-    button = driver.execute_script("return document.querySelector('#{selector}')")
-    more_toolbar_button.click unless button
     f(selector)
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+      more_toolbar_button.click
+      f(selector)
   end
 
   def links_toolbar_button

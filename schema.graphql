@@ -776,6 +776,12 @@ type Course implements AssignmentsConnectionInterface & LegacyIDInterface & Node
     last: Int
   ): GroupConnection
   id: ID!
+
+  """
+  Returns a URL for the course image (this is the image used on dashboard
+  course cards)
+  """
+  imageUrl: URL
   modulesConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -1077,6 +1083,7 @@ input CreateSubmissionDraftInput {
   attempt: Int
   body: String
   fileIds: [ID!]
+  mediaId: ID
   submissionId: ID!
   url: String
 }
@@ -1096,6 +1103,7 @@ input CreateSubmissionInput {
   assignmentId: ID!
   body: String
   fileIds: [ID!]
+  mediaId: ID
   submissionType: OnlineSubmissionType!
   url: String
 }
@@ -1128,6 +1136,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
 Types of submissions that can have a submission draft
 """
 enum DraftableSubmissionType {
+  media_recording
   online_text_entry
   online_upload
   online_url
@@ -2009,6 +2018,7 @@ enum NodeType {
 Types that can be submitted online
 """
 enum OnlineSubmissionType {
+  media_recording
   online_text_entry
   online_upload
   online_url
@@ -2716,6 +2726,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   id: ID!
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  mediaObject: MediaObject
   missing: Boolean
   posted: Boolean!
   postedAt: DateTime
@@ -2868,7 +2879,9 @@ type SubmissionDraft implements LegacyIDInterface {
   activeSubmissionType: DraftableSubmissionType
   attachments: [File!]
   body: String
+  mediaObject: MediaObject
   meetsAssignmentCriteria: Boolean!
+  meetsMediaRecordingCriteria: Boolean!
   meetsTextEntryCriteria: Boolean!
   meetsUploadCriteria: Boolean!
   meetsUrlCriteria: Boolean!
@@ -2965,6 +2978,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
   gradingStatus: SubmissionGradingStatus
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  mediaObject: MediaObject
   missing: Boolean
   posted: Boolean!
   postedAt: DateTime
@@ -3114,6 +3128,7 @@ interface SubmissionInterface {
   gradingStatus: SubmissionGradingStatus
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
+  mediaObject: MediaObject
   missing: Boolean
   posted: Boolean!
   postedAt: DateTime

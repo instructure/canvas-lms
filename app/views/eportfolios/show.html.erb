@@ -269,11 +269,12 @@
     </div>
     <div class="edit_submission_content form_content" style="display: none;">
       <%= before_label(:choose_submission, "Select an assignment submission to embed in this page") %><br/>
-      <% if @portfolio.user.submissions.empty? %>
+      <% submissions = @portfolio.user.submissions.except(:preload).preload(:assignment).to_a %>
+      <% if submissions.empty? %>
         <div style="margin: 5px 20px;"><%= t(:no_submissions, "No Submissions Found") %></div>
       <% end %>
       <ul class="submission_list">
-        <% @portfolio.user.submissions.each do |submission| %>
+        <% submissions.each do |submission| %>
           <li class="submission <%= 'already_used' if (@used_submission_ids.include?(submission.id) rescue false) %>" id="submission_<%= submission.id %>">
             <a href="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>"
               style="display: none;"

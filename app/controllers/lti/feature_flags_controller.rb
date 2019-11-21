@@ -29,12 +29,12 @@ module Lti
   #         "state": {
   #           "description": "The current state of the feature flag",
   #           "example": "on",
-  #           "type": "string" 
+  #           "type": "string"
   #         },
   #         "name": {
   #           "description": "The name of the feature flag",
   #           "example": "New Feature",
-  #           "type": "string" 
+  #           "type": "string"
   #         }
   #       }
   #     }
@@ -70,7 +70,7 @@ module Lti
     end
 
     def feature
-      context.lookup_feature_flag(params.require(:feature))
+      context.lookup_feature_flag(params.require(:feature)) || Account.site_admin.lookup_feature_flag(params.require(:feature))
     rescue => e
       raise e.message.include?('no such feature') ? ActiveRecord::RecordNotFound : e
     end

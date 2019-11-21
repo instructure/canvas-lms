@@ -35,6 +35,7 @@ import AssignmentKeyBindingsMixin from './AssignmentKeyBindingsMixin'
 import 'jqueryui/tooltip'
 import '../../behaviors/tooltip'
 import '../../jquery.rails_flash_notifications'
+import {shimGetterShorthand} from '../../legacyCoffeesScriptHelpers'
 
 export default class AssignmentListItemView extends Backbone.View
   @mixin AssignmentKeyBindingsMixin
@@ -72,9 +73,9 @@ export default class AssignmentListItemView extends Backbone.View
     'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel'
     'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel'
 
-  messages:
-    confirm: I18n.t('Are you sure you want to delete this assignment?')
-    ag_move_label: I18n.beforeLabel I18n.t('Assignment Group')
+  messages: shimGetterShorthand {},
+    confirm: -> I18n.t('Are you sure you want to delete this assignment?')
+    ag_move_label: -> I18n.beforeLabel I18n.t('Assignment Group')
 
   initialize: ->
     super

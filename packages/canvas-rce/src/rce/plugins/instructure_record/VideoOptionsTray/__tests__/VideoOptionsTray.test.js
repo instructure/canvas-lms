@@ -30,7 +30,19 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
     props = {
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
-      open: true
+      open: true,
+      videoOptions: {
+        $element: null,
+        appliedHeight: 180,
+        appliedWidth: 320,
+        id: 'm-video-id',
+        naturalHeight: 730,
+        naturalWidth: 1280,
+        source: {},
+        titleText: '',
+        type: 'video-embed',
+        videoSize: 'medium'
+      }
     }
   })
 
@@ -54,5 +66,153 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
   it('is labeled with "Video Options Tray"', () => {
     renderComponent()
     expect(tray.label).toEqual('Video Options Tray')
+  })
+
+  describe('Title field', () => {
+    it('uses the value of titleText in the given video options', () => {
+      props.videoOptions.titleText = 'A turtle in a party suit.'
+      renderComponent()
+      expect(tray.titleText).toEqual('A turtle in a party suit.')
+    })
+
+    it('is blank when the given video options titleText is blank', () => {
+      props.videoOptions.titleText = ''
+      renderComponent()
+      expect(tray.titleText).toEqual('')
+    })
+
+    it('is disabled when displaying the image as a link', () => {
+      renderComponent()
+      tray.setDisplayAs('link')
+      expect(tray.titleTextDisabled).toEqual(true)
+    })
+  })
+
+  describe('"Display Options" field', () => {
+    it('is set to "embed" by default', () => {
+      renderComponent()
+      expect(tray.displayAs).toEqual('embed')
+    })
+
+    it('can be set to "Display Text Link"', () => {
+      renderComponent()
+      tray.setDisplayAs('link')
+      expect(tray.displayAs).toEqual('link')
+    })
+
+    it('can be reset to "Embed Image"', () => {
+      renderComponent()
+      tray.setDisplayAs('link')
+      tray.setDisplayAs('embed')
+      expect(tray.displayAs).toEqual('embed')
+    })
+  })
+
+  describe('"Size" field', () => {
+    it('is set using the given image options', () => {
+      renderComponent()
+      expect(tray.size).toEqual('Medium')
+    })
+
+    it('can be re-set to "Medium"', async () => {
+      renderComponent()
+      await tray.setSize('Large')
+      await tray.setSize('Medium')
+      expect(tray.size).toEqual('Medium')
+    })
+
+    it('can be set to "Large"', async () => {
+      renderComponent()
+      await tray.setSize('Large')
+      expect(tray.size).toEqual('Large')
+    })
+
+    it('can be set to "Custom"', async () => {
+      renderComponent()
+      await tray.setSize('Custom')
+      expect(tray.size).toEqual('Custom')
+    })
+  })
+
+  describe('"Done" button', () => {
+    describe('when Title Text is present', () => {
+      beforeEach(() => {
+        renderComponent()
+        tray.setTitleText('A turtle in a party suit.')
+      })
+
+      it('is enabled', () => {
+        expect(tray.doneButtonDisabled).toEqual(false)
+      })
+    })
+
+    describe('when Title Text is not present', () => {
+      beforeEach(() => {
+        renderComponent()
+        tray.setTitleText('')
+      })
+
+      it('is disabled ', () => {
+        expect(tray.doneButtonDisabled).toEqual(true)
+      })
+
+      it('is enabled when "Display Text Link" is selected', () => {
+        tray.setDisplayAs('link')
+        expect(tray.doneButtonDisabled).toEqual(false)
+      })
+    })
+  })
+
+  describe('when clicked', () => {
+    beforeEach(() => {
+      renderComponent()
+      tray.setTitleText('A turtle in a party suit.')
+    })
+
+    it('prevents the default click handler', () => {
+      const preventDefault = jest.fn()
+      // Override preventDefault before event reaches image
+      tray.$doneButton.addEventListener(
+        'click',
+        event => {
+          Object.assign(event, {preventDefault})
+        },
+        true
+      )
+      tray.$doneButton.click()
+      expect(preventDefault).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls the .onSave prop', () => {
+      tray.$doneButton.click()
+      expect(props.onSave).toHaveBeenCalledTimes(1)
+    })
+
+    describe('when calling the .onSave prop', () => {
+      it('includes the Title Text', () => {
+        tray.setTitleText('A turtle in a party suit.')
+        tray.$doneButton.click()
+        const [{titleText}] = props.onSave.mock.calls[0]
+        expect(titleText).toEqual('A turtle in a party suit.')
+      })
+
+      it('includes the "Display As" setting', () => {
+        tray.setDisplayAs('link')
+        tray.$doneButton.click()
+        const [{displayAs}] = props.onSave.mock.calls[0]
+        expect(displayAs).toEqual('link')
+      })
+
+      it('includes the size to be applied', async () => {
+        await tray.setSize('Large')
+        tray.$doneButton.click()
+        const [{appliedHeight, appliedWidth}] = props.onSave.mock.calls[0]
+        expect(appliedWidth).toEqual(400)
+        const expectedHt = Math.round(
+          (props.videoOptions.naturalHeight / props.videoOptions.naturalWidth) * 400
+        )
+        expect(appliedHeight).toEqual(expectedHt)
+      })
+    })
   })
 })

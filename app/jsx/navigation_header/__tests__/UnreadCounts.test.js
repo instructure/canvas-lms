@@ -67,7 +67,7 @@ describe('GlobalNavigation::UnreadCounts', () => {
       const start = new Date()
       render(<UnreadCounts {...props} targetEl={target} />)
       jest.runAllTimers()
-      expect(await findByText(target, `${unreadCountFromApi} unread messages`)).toBeInTheDocument()
+      expect(await findByText(target, `${unreadCountFromApi} unread.`)).toBeInTheDocument()
       expect(fetchMock).toHaveBeenCalled()
       const saved = JSON.parse(window.sessionStorage.getItem(storageKey))
       expect(saved.unreadCount).toBe(unreadCountFromApi)
@@ -81,7 +81,7 @@ describe('GlobalNavigation::UnreadCounts', () => {
       }
       window.sessionStorage.setItem(storageKey, JSON.stringify(last))
       render(<UnreadCounts {...props} targetEl={target} />)
-      expect(await findByText(target, '12 unread messages')).toBeInTheDocument()
+      expect(await findByText(target, '12 unread.')).toBeInTheDocument()
       expect(fetchMock).not.toHaveBeenCalled()
     })
 
@@ -93,7 +93,7 @@ describe('GlobalNavigation::UnreadCounts', () => {
       window.sessionStorage.setItem(storageKey, JSON.stringify(last))
       render(<UnreadCounts {...props} targetEl={target} />)
       jest.runAllTimers()
-      expect(await findByText(target, `${unreadCountFromApi} unread messages`)).toBeInTheDocument()
+      expect(await findByText(target, `${unreadCountFromApi} unread.`)).toBeInTheDocument()
       expect(fetchMock).toHaveBeenCalled()
     })
 

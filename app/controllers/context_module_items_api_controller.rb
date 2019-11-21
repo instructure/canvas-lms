@@ -490,7 +490,11 @@ class ContextModuleItemsApiController < ApplicationController
         if value_to_boolean(params[:module_item][:published])
           @tag.publish
         else
-          @tag.unpublish
+          if module_item_unpublishable?(@tag)
+            @tag.unpublish
+          else
+            return render :json => {:message => "item can't be unpublished"}, :status => :forbidden
+          end
         end
         @tag.save
         @tag.update_asset_workflow_state!

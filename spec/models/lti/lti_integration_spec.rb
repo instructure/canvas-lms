@@ -479,8 +479,7 @@ describe "LTI integration tests" do
         "#{payload}-#{Canvas::Security.hmac_sha1(payload, @tool.shard.settings[:encryption_key])}"
       end
 
-      course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
-      expect(course).to eq @course
+      assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
       expect(assignment).to eq @assignment
       expect(user).to eq @user
     end

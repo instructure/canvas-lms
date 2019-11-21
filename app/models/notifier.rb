@@ -17,24 +17,26 @@
 
 class Notifier
   def send_notification(record, dispatch, messages, to_list, data=nil)
+    recipient_keys = (to_list || []).compact.map{|o| o.is_a?(String) ? o : o.asset_string}
     messages = DelayedNotification.send_later_if_production_enqueue_args(
         :process,
         {:priority => 30, :max_attempts => 1},
         record,
         messages,
-        (to_list || []).compact.map(&:asset_string),
+        recipient_keys,
         data
     )
 
     messages ||= DelayedNotification.new(
           :asset => record,
           :notification => messages,
-          :recipient_keys => (to_list || []).compact.map(&:asset_string),
+          :recipient_keys => recipient_keys,
           :data => data
       )
 
     if Rails.env.test?
-      record.messages_sent[dispatch] = messages.is_a?(DelayedNotification) ? messages.process : messages
+      record.messages_sent[dispatch] ||= []
+      record.messages_sent[dispatch] += messages.is_a?(DelayedNotification) ? messages.process : messages
     end
 
     messages

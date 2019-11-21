@@ -62,6 +62,13 @@ $.fn.scrollTop = function() {
   }
   return $.fn.originalScrollTop.apply(this, arguments)
 }
+// Different browsers (and even different versions of the same browser) differ
+// on whether <body> or <html> is the scrolling element for a window. This is a
+// utility that returns the correct scroll y-position of the window in every
+// browser and version.
+//
+// see https://drafts.csswg.org/cssom-view/#dom-element-scrolltop for morbid
+// details of how the scrollTop attribute is calculated.
 $.windowScrollTop = function() {
   // $.browser.safari is true for chrome.
   // with chrome 61, we want the documentElement.scrollTop, so the
@@ -72,8 +79,16 @@ $.windowScrollTop = function() {
   const edgeVer = window.navigator.userAgent.match(/Edge\/(\d+)/)
   if (!edgeVer && chromeVer && parseInt(chromeVer[1], 10) > 60) {
     return $('html').scrollTop()
+  } else if ($.browser.safari) {
+    // Safari 13 has changed document.scrollingElement from <body> => <html>.
+    // As a result, it is now reporting $('body').scrollTop() == 0 as the <body>
+    // element no longer has a scrolling area.
+    // $('html').scrollTop() is now returning the scroll position like other
+    // browsers that use <html> as the scrolling element.
+    const safariVer = window.navigator.userAgent.match(/Version\/(\d+).*Safari/)
+    return (safariVer && parseInt(safariVer[1], 10) < 13 ? $('body') : $('html')).scrollTop()
   } else {
-    return ($.browser.safari ? $('body') : $('html')).scrollTop()
+    return $('html').scrollTop()
   }
 }
 

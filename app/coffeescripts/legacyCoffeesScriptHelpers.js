@@ -30,3 +30,21 @@ export function extend(child, parent) {
   child.__super__ = parent.prototype
   return child
 }
+
+/**
+ * since you can't use es6 Object initializer getter shorthand (eg: {get foo(){ return 'bar'}})
+ * in coffeescript, this is a helper to do it the manual way using Object.defineProperty
+ * @param {Object} [hostObject] the object that you want to define the getters onto
+ * @param {Object} getters key/value pairs of "propertyName" and getter functions. eg: {foo: () => "bar"}
+ * @returns {Object} hostObject
+ */
+export function shimGetterShorthand(hostObject, getters) {
+  Object.keys(getters).forEach(key =>
+    Object.defineProperty(hostObject, key, {
+      get: getters[key],
+      enumerable: true,
+      configurable: true
+    })
+  )
+  return hostObject
+}

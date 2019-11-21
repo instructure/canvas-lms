@@ -29,6 +29,7 @@ export default class Bridge {
     })
 
     this.trayProps = new WeakMap()
+    this._languages = []
   }
 
   get editorRendered() {
@@ -68,6 +69,14 @@ export default class Bridge {
       this._mediaServerUploader = null
     }
     this._mediaServerUploader = new K5Uploader(session)
+  }
+
+  get languages() {
+    return this._languages
+  }
+
+  set languages(langs) {
+    this._languages = langs
   }
 
   detachEditor(editor) {
@@ -175,6 +184,10 @@ export default class Bridge {
     } else {
       this.insertAudio(media)
     }
+  }
+
+  insertEmbedCode = embedCode => {
+    this.focusedEditor.insertEmbedCode(embedCode)
   }
 
   insertVideo = video => {

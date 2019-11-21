@@ -493,6 +493,12 @@ describe('RCEWrapper', () => {
         instance.insertAudio({})
         assert.equal(insertedSpy.getCall(0).args[0], '<iframe/>')
       })
+
+      it('inserts embed code', () => {
+        sinon.stub(contentInsertion, 'insertContent')
+        instance.insertEmbedCode('embed me!')
+        assert(insertedSpy.called)
+      })
     })
 
     describe('indicator', () => {

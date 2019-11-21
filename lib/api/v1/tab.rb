@@ -21,7 +21,7 @@ module Api::V1::Tab
   include Api::V1::ExternalTools::UrlHelpers
 
   def tabs_available_json(context, user, session, includes = [], precalculated_permissions: nil)
-    json = context_tabs(context, user, precalculated_permissions: precalculated_permissions).map { |tab|
+    json = context_tabs(context, user, session: session, precalculated_permissions: precalculated_permissions).map { |tab|
       tab_json(tab.with_indifferent_access, context, user, session) }
     json.sort!{|x,y| x['position'] <=> y['position']}
   end
@@ -76,7 +76,7 @@ module Api::V1::Tab
     end
   end
 
-  def context_tabs(context, user, precalculated_permissions: nil)
+  def context_tabs(context, user, precalculated_permissions: nil, session: nil)
     new_collaborations_enabled = context.feature_enabled?(:new_collaborations)
 
     if context.is_a?(User)
@@ -88,7 +88,8 @@ module Api::V1::Tab
       include_external: true,
       api: true,
       precalculated_permissions: precalculated_permissions,
-      root_account: root_account
+      root_account: root_account,
+      session: session
     }
 
     tabs = context.tabs_available(user, opts).select do |tab|

@@ -17,6 +17,7 @@
  */
 import {arrayOf, bool, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
+import {MediaObject} from './MediaObject'
 import {SubmissionDraftFile} from './File'
 
 export const SubmissionDraft = {
@@ -28,12 +29,17 @@ export const SubmissionDraft = {
         ...SubmissionDraftFile
       }
       body
+      mediaObject {
+        ...MediaObject
+      }
+      meetsMediaRecordingCriteria
       meetsAssignmentCriteria
       meetsTextEntryCriteria
       meetsUploadCriteria
       meetsUrlCriteria
       url
     }
+    ${MediaObject.fragment}
     ${SubmissionDraftFile.fragment}
   `,
 
@@ -42,6 +48,8 @@ export const SubmissionDraft = {
     activeSubmissionType: string,
     attachments: arrayOf(SubmissionDraftFile.shape),
     body: string,
+    mediaObject: MediaObject.shape,
+    meetsMediaRecordingCriteria: bool.isRequired,
     meetsAssignmentCriteria: bool.isRequired,
     meetsTextEntryCriteria: bool.isRequired,
     meetsUploadCriteria: bool.isRequired,
@@ -55,6 +63,8 @@ export const DefaultMocks = {
     activeSubmissionType: null,
     attachments: () => [],
     body: null,
+    mediaObject: null,
+    meetsMediaRecordingCriteria: false,
     meetsAssignmentCriteria: false,
     meetsTextEntryCriteria: false,
     meetsUploadCriteria: false,

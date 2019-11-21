@@ -18,6 +18,7 @@
 
 class OnlineSubmissionType < Types::BaseEnum
   VALID_SUBMISSION_TYPES = %w[
+    media_recording
     online_text_entry
     online_upload
     online_url
@@ -35,6 +36,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
   argument :assignment_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Assignment')
   argument :body, String, required: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
+  argument :media_id, ID, required: false
   argument :submission_type, OnlineSubmissionType, required: true
   argument :url, String, required: false
 
@@ -58,6 +60,18 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     }
 
     case submission_type
+    when 'media_recording'
+      unless input[:media_id]
+        return validation_error(
+          I18n.t('%{media_recording} submissions require a %{media_id} to submit', {media_recording: 'media_recording', media_id: 'media_id'})
+        )
+      end
+      media_object = MediaObject.by_media_id(input[:media_id]).first
+      unless media_object
+        return validation_error(I18n.t('The %{media_id} does not correspond to an existing media object', {media_id: 'media_id'}))
+      end
+      submission_params[:media_comment_type] = media_object.media_type
+      submission_params[:media_comment_id] = input[:media_id]
     when 'online_text_entry'
       submission_params[:body] = input[:body]
     when 'online_upload'

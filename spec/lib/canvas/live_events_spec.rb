@@ -256,6 +256,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change', hash_including({
         submission_id: @quiz_submission.submission.global_id.to_s,
         assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
+        assignment_name: @quiz_submission.submission.assignment.name,
         grader_id: nil,
         student_id: @quiz_submission.user.global_id.to_s,
         user_id: @quiz_submission.user.global_id.to_s
@@ -271,6 +272,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change', hash_including(
         submission_id: submission.global_id.to_s,
         assignment_id: submission.global_assignment_id.to_s,
+        assignment_name: submission.assignment.name,
         grader_id: @teacher.global_id.to_s,
         student_id: @student.global_id.to_s,
         user_id: @student.global_id.to_s
@@ -289,6 +291,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change',
         hash_including({
           assignment_id: submission.global_assignment_id.to_s,
+          assignment_name: submission.assignment.name,
           user_id: @student.global_id.to_s,
           student_id: @student.global_id.to_s,
           student_sis_id: nil
@@ -565,7 +568,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }.compact!).once
+      }.compact!, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access(@course, 'category', 'role', 'participation')
     end
@@ -581,7 +584,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }).once
+      }, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation')
     end
@@ -597,7 +600,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }).once
+      }, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access(@page, 'category', 'role', 'participation')
     end
@@ -615,9 +618,34 @@ describe Canvas::LiveEvents do
         level: 'participation',
         filename: @attachment.filename,
         display_name: @attachment.display_name
-      }.compact!).once
+      }.compact!, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation')
+    end
+
+    it "should provide a different context if a different context is provided" do
+      attachment_model
+      context = OpenStruct.new(global_id: '1')
+
+      expect_event('asset_accessed', {
+        asset_name: "unknown.loser",
+        asset_type: 'attachment',
+        asset_id: @attachment.global_id.to_s,
+        asset_subtype: nil,
+        category: 'files',
+        role: 'role',
+        level: 'participation',
+        filename: @attachment.filename,
+        display_name: @attachment.display_name
+      }.compact!,
+      {
+        compact_live_events: true,
+        context_type: context.class.to_s,
+        context_id: '1'
+      }
+      ).once
+
+      Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation', context: context)
     end
   end
 
@@ -1356,6 +1384,19 @@ describe Canvas::LiveEvents do
 
         Canvas::LiveEvents.learning_outcome_link_updated(link)
       end
+    end
+  end
+
+  describe 'grade_override' do
+    it 'does not send event when score does not change' do
+      course_model
+      enrollment_model
+
+      score = Score.new(override_score: 100.0, course_score: true)
+      old_score = 100.0
+
+      expect(Canvas::LiveEvents).not_to receive(:post_event_stringified)
+      Canvas::LiveEvents.grade_override(score, old_score, @enrollment, @course)
     end
   end
 end

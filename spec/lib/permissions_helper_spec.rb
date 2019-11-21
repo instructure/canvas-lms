@@ -208,9 +208,9 @@ describe PermissionsHelper do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
-      course_with_teacher(account: Account.default)
-      teacher_enrollment_account1 = course_with_teacher(user: @user, account: sub_account1)
-      course_with_teacher(user: @user, account: sub_account2)
+      course_with_teacher(account: Account.default, active_all: true)
+      teacher_enrollment_account1 = course_with_teacher(user: @user, account: sub_account1, active_all: true)
+      course_with_teacher(user: @user, account: sub_account2, active_all: true)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: @teacher_role, account: Account.default)
       RoleOverride.create!(permission: 'manage_calendar', enabled: true, role: @teacher_role, account: sub_account1)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: @teacher_role, account: sub_account2)
@@ -221,8 +221,8 @@ describe PermissionsHelper do
     it 'should handle locked overrides when there are sub-account overrides' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
-      course_with_teacher(account: Account.default)
-      course_with_teacher(user: @user, account: sub_account1)
+      course_with_teacher(account: Account.default, active_all: true)
+      course_with_teacher(user: @user, account: sub_account1, active_all: true)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: @teacher_role, locked: true, account: Account.default)
       RoleOverride.create!(permission: 'manage_calendar', enabled: true, role: @teacher_role, account: sub_account1)
       enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)
@@ -232,8 +232,8 @@ describe PermissionsHelper do
     it 'should handle role overrides that do not apply to self' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
-      course_with_teacher(account: Account.default)
-      teacher_enrollment_account1 = course_with_teacher(user: @user, account: sub_account1)
+      course_with_teacher(account: Account.default, active_all: true)
+      teacher_enrollment_account1 = course_with_teacher(user: @user, account: sub_account1, active_all: true)
       RoleOverride.create!(permission: 'manage_calendar', enabled: true, role: @teacher_role,
         applies_to_self: false, applies_to_descendants: true, account: Account.default)
       enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)

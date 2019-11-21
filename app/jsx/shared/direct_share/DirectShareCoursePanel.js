@@ -24,7 +24,7 @@ import {func, string} from 'prop-types'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 import contentSelectionShape from 'jsx/shared/proptypes/contentSelection'
 import ConfirmActionButtonBar from '../components/ConfirmActionButtonBar'
-import ManagedCourseSelector from '../components/ManagedCourseSelector'
+import CourseAndModulePicker from './CourseAndModulePicker'
 import DirectShareOperationStatus from './DirectShareOperationStatus'
 
 // eventually this will have options for where to place the item in the new course.
@@ -39,6 +39,7 @@ DirectShareCoursePanel.propTypes = {
 export default function DirectShareCoursePanel({sourceCourseId, contentSelection, onCancel}) {
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [startCopyOperationPromise, setStartCopyOperationPromise] = useState(null)
+  const [selectedModule, setSelectedModule] = useState(null)
 
   function startCopyOperation() {
     setStartCopyOperationPromise(
@@ -48,7 +49,10 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
         body: {
           migration_type: 'course_copy_importer',
           select: contentSelection,
-          settings: {source_course_id: sourceCourseId}
+          settings: {
+            source_course_id: sourceCourseId,
+            insert_into_module_id: selectedModule?.id
+          }
         }
       })
     )
@@ -62,7 +66,11 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
         successMsg={I18n.t('Copy operation started successfully')}
         errorMsg={I18n.t('There was a problem starting the copy operation')}
       />
-      <ManagedCourseSelector onCourseSelected={setSelectedCourse} />
+      <CourseAndModulePicker
+        selectedCourseId={selectedCourse?.id}
+        setSelectedCourse={setSelectedCourse}
+        setSelectedModule={setSelectedModule}
+      />
       <ConfirmActionButtonBar
         padding="small 0 0 0"
         primaryLabel={startCopyOperationPromise ? null : I18n.t('Copy')}

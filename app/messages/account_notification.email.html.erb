@@ -1,0 +1,21 @@
+<% define_content :link do %>
+  <%= dashboard_url %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= before_label asset.subject %> <%= asset.account.name %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "View Announcement on Dashboard" %>
+  </a>
+<% end %>
+
+<%= html_to_simple_html(asset.message,
+  :base_url => dashboard_url,
+  :tags => ['tr', 'td', 'table', 'tbody', 'caption', 'span'],
+  :attributes => {
+      'table' => [ 'border', 'style', 'cellspacing', 'cellpadding' ],
+      'span' => ['style']
+  }) %>

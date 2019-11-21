@@ -383,7 +383,7 @@ describe "speed grader" do
   context 'comments per attempt' do
     before(:once) do
       @course.enable_feature!(:assignments_2_student)
-      @assignment = @course.assignments.create(name: 'a2 assignment', points_possible: 10)
+      @assignment = @course.assignments.create(name: 'a2 assignment', points_possible: 10, submission_types: 'online_url')
       @submission1 = @assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
       @submission2 = @assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
       @comment0 = @submission1.add_comment(author: @teacher1, comment: 'comment0', attempt: 0)
