@@ -1176,7 +1176,9 @@ class BzController < ApplicationController
             most_recent_school_item = get_most_recent_school_node(info["educations"])
             linkedin_data.most_recent_school = item["most-recent-school"] = most_recent_school_item["schoolName"]["localized"]["en_US"] unless most_recent_school_item["schoolName"].nil?
             linkedin_data.graduation_year = item["graduation-year"] = most_recent_school_item["endMonthYear"]["year"] unless most_recent_school_item["endMonthYear"].nil?
-            linkedin_data.major = item["major"] = most_recent_school_item["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"] unless most_recent_school_item["fieldsOfStudy"].blank?
+            if !most_recent_school_item["fieldsOfStudy"].blank? && !most_recent_school_item["fieldsOfStudy"][0]["fieldOfStudyName"].blank?
+              linkedin_data.major = item["major"] = most_recent_school_item["fieldsOfStudy"][0]["fieldOfStudyName"]["localized"]["en_US"]
+            end
  
             linkedin_data.num_recommenders = item["num-recommenders"] = nil # removed in V2
             linkedin_data.recommendations_received = item["recommendations-received"] = nil # removed in V2
@@ -1197,7 +1199,7 @@ class BzController < ApplicationController
           end
         rescue => e
           Rails.logger.error("Error: LinkedIn export failed for user_id = #{service.user_id}.") 
-          Canvas::Errors.capture_exception("BzController::ExportLinkedIn", e)[:error_report]
+          Canvas::Errors.capture(e, type: 'BzController::ExportLinkedIn', user_id: service.user_id)
           raise # We should find and fix any issues with the export rather than having an incomplete export.
         end
       end # each user
