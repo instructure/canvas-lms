@@ -119,8 +119,11 @@ COPY spec/coffeescripts /app/spec/coffeescripts
 # Heroku doesn't run with root privilege, so setup the app as a non-root user
 # See: https://devcenter.heroku.com/articles/container-registry-and-runtime#testing-an-image-locally
 RUN mkdir -p /app/app/views/info/ \
+    && mkdir -p /app/tmp/pids/ \
+    && ln -s /app/script/canvas_init /etc/init.d/canvas_init \
+    && update-rc.d canvas_init defaults \
     && find /app /home/dockeruser ! -user dockeruser -print0 | xargs -0 chown -h dockeruser:dockeruser
-    
+
 USER dockeruser
 
 # We have to explicitly run `npm install` for canvas_i18nliner b/c it uses an older version

@@ -22,3 +22,7 @@ build:
 
 run:
   web: bundle exec puma -C config/puma.rb
+  worker:
+    command:
+      - bundle exec script/canvas_init start
+    image: web

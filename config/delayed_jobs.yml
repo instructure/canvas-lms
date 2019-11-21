@@ -1,10 +1,11 @@
 production:
   workers:
+#  - queue: canvas_queue
+#    workers: 2
+#    max_priority: 10
   - queue: canvas_queue
-    workers: 2
-    max_priority: 10
-  - queue: canvas_queue
-    workers: 4
+    workers: <%= ENV.fetch('DELAYED_JOB_WORKERS', '4') %>
+    worker_max_memory_usage: <%= ENV.fetch('DELAYED_JOB_WORKER_MAX_MEMORY', '1610612736') %>
   # if set, workers will process this many jobs and then die, causing the pool
   # to spawn another worker. this can help return memory to the OS.
   # worker_max_job_count: 20
