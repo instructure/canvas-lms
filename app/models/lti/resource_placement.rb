@@ -47,6 +47,7 @@ module Lti
                   :course_navigation,
                   :course_settings_sub_navigation,
                   :discussion_topic_menu,
+                  :discussion_topic_index_menu,
                   :editor_button,
                   :file_menu,
                   :global_navigation,

@@ -544,6 +544,7 @@ describe ExternalToolsController, type: :request do
     et.assignment_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "assignment menu", display_type: 'full_width', visibility: 'admins'}
     et.assignment_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "assignment index menu", display_type: 'full_width', visibility: 'admins'}
     et.discussion_topic_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "discussion topic menu", display_type: 'full_width', visibility: 'admins'}
+    et.discussion_topic_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "discussion topic index menu", display_type: 'full_width', visibility: 'admins'}
     et.file_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
     et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
     et.module_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "modules index menu", display_type: 'full_width', visibility: 'admins'}
@@ -712,6 +713,14 @@ describe ExternalToolsController, type: :request do
      "discussion_topic_menu"=>
          {"text"=>"discussion topic menu",
           "label"=>"discussion topic menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+      "discussion_topic_index_menu"=>
+        {"text"=>"discussion topic index menu",
+          "label"=>"discussion topic index menu",
           "url"=>"http://www.example.com/ims/lti/resource",
           "visibility"=>'admins',
           "display_type"=>'full_width',
