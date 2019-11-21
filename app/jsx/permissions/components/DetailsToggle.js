@@ -19,9 +19,9 @@
 import React from 'react'
 import {arrayOf, string} from 'prop-types'
 
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 import propTypes from '../propTypes'
 

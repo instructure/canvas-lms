@@ -280,6 +280,52 @@ describe SpeedGrader::Assignment do
       allow(Canvadoc).to receive(:mime_types).and_return("image/png")
     end
 
+    describe "has_postable_comments" do
+      before(:each) do
+        PostPolicy.enable_feature!
+        @course.root_account.enable_feature!(:allow_postable_submission_comments)
+        @course.enable_feature!(:new_gradebook)
+        @assignment.ensure_post_policy(post_manually: true)
+      end
+
+      it "is not included when allow_postable_submission_comments feature is not enabled" do
+        @course.root_account.disable_feature!(:allow_postable_submission_comments)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        expect(json[:submissions].first).not_to have_key "has_postable_comments"
+      end
+
+      it "is not included when Post Policies are not enabled" do
+        @course.disable_feature!(:new_gradebook)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        expect(json[:submissions].first).not_to have_key "has_postable_comments"
+      end
+
+      it "is true when unposted, hidden comments exist, and postable comments feature is enabled" do
+        student1_sub = @assignment.submissions.find_by!(user: @student_1)
+        student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
+        expect(submission_json["has_postable_comments"]).to be true
+      end
+
+      it "is not present when unposted, hidden comments exist, and postable comments feature is not enabled" do
+        @course.root_account.disable_feature!(:allow_postable_submission_comments)
+        student1_sub = @assignment.submissions.find_by!(user: @student_1)
+        student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
+        expect(submission_json).not_to have_key "has_postable_comments"
+      end
+
+      it "is false when unposted and only non-hidden comments exist" do
+        student1_sub = @assignment.submissions.find_by!(user: @student_1)
+        student1_sub.add_comment(author: @student1, comment: "good job!", hidden: false)
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
+        expect(submission_json["has_postable_comments"]).to be false
+      end
+    end
+
     it "returns submission lateness" do
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
       json[:submissions].each do |submission|
@@ -791,6 +837,88 @@ describe SpeedGrader::Assignment do
     end
   end
 
+  describe "filtering students by section" do
+    let_once(:course) { Course.create! }
+    let_once(:teacher) { course.enroll_teacher(User.create, enrollment_state: :active).user }
+
+    let_once(:section1) { course.course_sections.create!(name: "first") }
+
+    let_once(:section2) { course.course_sections.create!(name: "second") }
+
+    let_once(:section1_student) { User.create! }
+    let_once(:section2_student) { User.create! }
+    let_once(:default_section_student) { User.create! }
+    let_once(:sectionless_student) { User.create! }
+
+    let_once(:assignment) { course.assignments.create! }
+
+    let(:json) { SpeedGrader::Assignment.new(assignment, teacher).json }
+    let(:returned_student_ids) { json.dig(:context, :students).pluck(:id) }
+    let(:all_course_student_ids) { course.students.pluck(:id).map(&:to_s) }
+
+    before(:once) do
+      course.enroll_student(section1_student, enrollment_state: :active, section: section1)
+      course.enroll_student(section2_student, enrollment_state: :active, section: section2)
+      course.enroll_student(default_section_student, enrollment_state: :active)
+    end
+
+    before(:each) do
+      user_session(teacher)
+    end
+
+    context "for a course with New Gradebook enabled" do
+      before(:once) do
+        course.enable_feature!(:new_gradebook)
+      end
+
+      it "only returns students from the selected section if the user has selected one" do
+        teacher.preferences.deep_merge!(gradebook_settings: {
+          course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
+        })
+        expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
+      end
+
+      it "returns all eligible students if the user has not selected a section" do
+        expect(returned_student_ids).to match_array(all_course_student_ids)
+      end
+
+      it "returns all eligible students if the selected section is set to nil" do
+        teacher.preferences.deep_merge!(gradebook_settings: {
+          course.id => {'filter_rows_by' => {'section_id' => nil}}
+        })
+        expect(returned_student_ids).to match_array(all_course_student_ids)
+      end
+
+      context "when the user is filtering by both section and group" do
+        let_once(:group) do
+          category = course.group_categories.create!(name: "Group Set")
+          category.create_groups(2)
+
+          group = category.groups.first
+          group.add_user(section1_student)
+          group.add_user(section2_student)
+          group
+        end
+
+        it "restricts by both section and group when section_id and group_id are both specified" do
+          teacher.preferences.deep_merge!(gradebook_settings: {
+            course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s, 'student_group_id' => group.id.to_s}}
+          })
+          expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
+        end
+      end
+    end
+
+    context "for a course not using New Gradebook" do
+      it "does not attempt to filter by section" do
+        teacher.preferences.deep_merge!(gradebook_settings: {
+          course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
+        })
+        expect(returned_student_ids).to match_array(all_course_student_ids)
+      end
+    end
+  end
+
   context "quizzes" do
     it "works for quizzes without quiz_submissions" do
       quiz = @course.quizzes.create! :title => "Final",
@@ -954,30 +1082,6 @@ describe SpeedGrader::Assignment do
         json_submission4 = json_submission.last.fetch('submission')
         expect(json_submission4['score']).to eq(@assignment.points_possible*0.48)
         expect(json_submission4['url']).to eq(urls[3])
-      end
-
-      context "when quizzes_next_submission_history FF is turned off" do
-        before do
-          allow(@assignment.root_account).
-            to receive(:feature_enabled?).
-            with(:filter_speed_grader_by_student_group).and_return(false)
-          allow(@assignment.root_account).
-            to receive(:feature_enabled?).
-            with(:quizzes_next_submission_history).and_return(false)
-        end
-
-        it "doesn't use BasicLTI::QuizzesNextVersionedSubmission object" do
-          expect(BasicLTI::QuizzesNextVersionedSubmission).not_to receive(:new)
-          json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-          submission_history = json.fetch(:submissions).first.fetch(:submission_history)
-          expect(submission_history.count).to be url_grades.count
-          expect(submission_history.map{|x| x.values.first['score']}).to eq(
-            url_grades.map{|x| @assignment.points_possible*x[:grade]}.reverse
-          )
-          expect(submission_history.map{|x| x.values.first['external_tool_url']}).to eq(
-            url_grades.map{|x| x[:url]}.reverse
-          )
-        end
       end
     end
   end

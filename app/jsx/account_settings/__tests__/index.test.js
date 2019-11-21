@@ -19,6 +19,12 @@
 import {start} from '../index'
 
 describe('start', () => {
+  beforeEach(() => {
+    window.ENV = {
+      ACCOUNT: {id: '1234'}
+    }
+  })
+
   afterEach(() => {
     document.getElementById('fixtures').remove()
   })
@@ -39,6 +45,6 @@ describe('start', () => {
         contextId: '1',
         api: fakeAxios
       })
-    }).not.toThrowError()
+    }).not.toThrow()
   })
 })

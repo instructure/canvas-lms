@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export default function generator ({ borders, colors, spacing, typography }) {
+export default function generator({borders, colors, spacing, typography}) {
   return {
     padding: `${spacing.xSmall} ${spacing.small} ${spacing.small}`,
     borderBottom: `${borders.widthSmall} ${borders.style} ${colors.tiara}`,
@@ -26,6 +26,6 @@ export default function generator ({ borders, colors, spacing, typography }) {
     borderStyle: borders.style,
     itemMargin: spacing.small,
     itemPadding: spacing.xxSmall,
-    lineHeight: typography.lineHeightCondensed,
-  };
+    lineHeight: typography.lineHeightCondensed
+  }
 }

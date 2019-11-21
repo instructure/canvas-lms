@@ -1,8 +1,14 @@
 #!/bin/bash
 result=0
 
+pushd "$(dirname $0)"
+
 for test_script in $(find . -name test.sh); do
   pushd `dirname $test_script` > /dev/null
+  echo -e "--format doc" >> ./.rspec
+  echo -e "--format html" >> ./.rspec
+  echo -e "--out ../../tmp/spec_results/$(basename `dirname $test_script`)_results.html" >> ./.rspec
+
   echo "################ $(basename `dirname $test_script`) ################"
   ./test.sh
   let gem_result=$?
@@ -14,6 +20,8 @@ for test_script in $(find . -name test.sh); do
   fi
   popd > /dev/null
 done
+
+popd > /dev/null
 
 echo "################ RESULT FOR ALL GEMS ################"
 if [ $result -eq 0 ]; then

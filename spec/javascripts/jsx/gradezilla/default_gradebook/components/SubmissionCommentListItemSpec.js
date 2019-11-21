@@ -19,8 +19,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import SubmissionCommentListItem from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentListItem'
 import SubmissionCommentUpdateForm from 'jsx/gradezilla/default_gradebook/components/SubmissionCommentUpdateForm'
-import IconTrashLine from '@instructure/ui-icons/lib/Line/IconTrash'
-import IconEditLine from '@instructure/ui-icons/lib/Line/IconEdit'
+import {IconTrashLine, IconEditLine} from '@instructure/ui-icons'
 
 QUnit.module('SubmissionCommentListItem', {
   defaultProps() {

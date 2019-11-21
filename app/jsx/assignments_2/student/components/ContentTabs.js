@@ -17,22 +17,23 @@
  */
 
 import {Assignment} from '../graphqlData/Assignment'
-import SubmissionManager from './SubmissionManager'
-import {Badge} from '@instructure/ui-elements'
+import {Badge, Text} from '@instructure/ui-elements'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
+import {Flex} from '@instructure/ui-layout'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import {getCurrentAttempt} from './Attempt'
+import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2'
+
 import LoadingIndicator from '../../shared/LoadingIndicator'
-import React, {lazy, Suspense} from 'react'
+import React, {lazy, Suspense, useState} from 'react'
+import SubmissionManager from './SubmissionManager'
 import {Submission} from '../graphqlData/Submission'
 import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import GradeDisplay from './GradeDisplay'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Tabs} from '@instructure/ui-tabs'
 
 const CommentsTab = lazy(() => import('./CommentsTab'))
+const RubricsQuery = lazy(() => import('./RubricsQuery'))
 const RubricTab = lazy(() => import('./RubricTab'))
 
 ContentTabs.propTypes = {
@@ -40,13 +41,13 @@ ContentTabs.propTypes = {
   submission: Submission.shape
 }
 
-// We should revisit this after the InstructureCon demo to ensure this is
-// accessible and in a class.
 function currentSubmissionGrade(assignment, submission) {
   const tabBarAlign = {
     position: 'absolute',
     right: '50px'
   }
+
+  const currentGrade = submission.state === 'graded' ? submission.grade : null
 
   return (
     <div style={tabBarAlign}>
@@ -55,19 +56,19 @@ function currentSubmissionGrade(assignment, submission) {
           displaySize="medium"
           gradingType={assignment.gradingType}
           pointsPossible={assignment.pointsPossible}
-          receivedGrade={submission.grade}
+          receivedGrade={currentGrade}
         />
       </Text>
       <Text size="small">
         {submission.submittedAt ? (
           <Flex justifyItems="end">
-            <FlexItem padding="0 xx-small 0 0">{I18n.t('Submitted')}</FlexItem>
-            <FlexItem>
+            <Flex.Item padding="0 xx-small 0 0">{I18n.t('Submitted')}</Flex.Item>
+            <Flex.Item>
               <FriendlyDatetime
                 dateTime={submission.submittedAt}
                 format={I18n.t('#date.formats.full')}
               />
-            </FlexItem>
+            </Flex.Item>
           </Flex>
         ) : (
           I18n.t('Not submitted')
@@ -90,7 +91,7 @@ function renderCommentsTab({assignment, submission}) {
     )
   }
 
-  if (!submission.posted) {
+  if (submission.gradeHidden) {
     return (
       <SVGWithTextPlaceholder
         text={I18n.t(
@@ -113,20 +114,41 @@ renderCommentsTab.propTypes = {
   submission: Submission.shape
 }
 
-function ContentTabs(props) {
+function LoggedInContentTabs(props) {
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
+  const [submissionFocus, setSubmissionFocus] = useState(null)
+
+  function handleTabChange(event, {index}) {
+    setSelectedTabIndex(index)
+  }
+
   return (
     <div data-testid="assignment-2-student-content-tabs">
       {props.submission.state === 'graded' || props.submission.state === 'submitted'
         ? currentSubmissionGrade(props.assignment, props.submission)
         : null}
-      <TabList defaultSelectedIndex={0} variant="minimal">
-        <TabPanel
-          title={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
+      <Tabs
+        onRequestTabChange={handleTabChange}
+        ref={el => {
+          setSubmissionFocus(el)
+        }}
+        variant="default"
+      >
+        <Tabs.Panel
+          key="attempt-tab"
+          renderTitle={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
+          selected={selectedTabIndex === 0}
         >
-          <SubmissionManager assignment={props.assignment} submission={props.submission} />
-        </TabPanel>
-        <TabPanel
-          title={
+          <SubmissionManager
+            assignment={props.assignment}
+            focusElement={submissionFocus}
+            submission={props.submission}
+          />
+        </Tabs.Panel>
+        <Tabs.Panel
+          key="comments-tab"
+          selected={selectedTabIndex === 1}
+          renderTitle={
             <span>
               {I18n.t('Comments')}{' '}
               {!!props.submission.unreadCommentCount && (
@@ -140,17 +162,47 @@ function ContentTabs(props) {
           }
         >
           {renderCommentsTab(props)}
-        </TabPanel>
+        </Tabs.Panel>
         {props.assignment.rubric && (
-          <TabPanel title={I18n.t('Rubric')}>
+          <Tabs.Panel
+            key="rubrics-tab"
+            renderTitle={I18n.t('Rubric')}
+            selected={selectedTabIndex === 2}
+          >
             <Suspense fallback={<LoadingIndicator />}>
-              <RubricTab assignment={props.assignment} />
+              <RubricsQuery assignment={props.assignment} submission={props.submission} />
             </Suspense>
-          </TabPanel>
+          </Tabs.Panel>
         )}
-      </TabList>
+      </Tabs>
     </div>
   )
 }
 
-export default React.memo(ContentTabs)
+function LoggedOutContentTabs(props) {
+  // Note that for not logged in users we already have the rubrics data available
+  // on the assignment, and don't need to do a seperate query to get that data.
+  // This is to avoid a large time watching loading spinners on the default tab
+  // which we want to render as fast as possible.
+  return (
+    <div data-testid="assignment-2-student-content-tabs">
+      {props.assignment.rubric && (
+        <Tabs variant="default">
+          <Tabs.Panel renderTitle={I18n.t('Rubric')} selected>
+            <Suspense fallback={<LoadingIndicator />}>
+              <RubricTab rubric={props.assignment.rubric} />
+            </Suspense>
+          </Tabs.Panel>
+        </Tabs>
+      )}
+    </div>
+  )
+}
+
+export default function ContentTabs(props) {
+  if (props.submission) {
+    return <LoggedInContentTabs {...props} />
+  } else {
+    return <LoggedOutContentTabs {...props} />
+  }
+}

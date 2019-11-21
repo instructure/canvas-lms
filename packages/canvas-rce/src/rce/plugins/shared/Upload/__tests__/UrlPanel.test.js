@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {render, fireEvent, } from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import UrlPanel from '../UrlPanel'
 
 describe('UploadFile: UrlPanel', () => {
   it('calls setFileUrl when the file url input changes', () => {
     const fakeSetFileUrl = jest.fn()
-    const {getByLabelText} = render(<UrlPanel fileUrl="" setFileUrl={fakeSetFileUrl}/>)
-    fireEvent.change(getByLabelText('File URL'), { target: { value: 'instructure.com' }})
+    const {getByLabelText} = render(<UrlPanel fileUrl="" setFileUrl={fakeSetFileUrl} />)
+    fireEvent.change(getByLabelText('File URL'), {target: {value: 'instructure.com'}})
     expect(fakeSetFileUrl).toHaveBeenCalledWith('instructure.com')
   })
 })

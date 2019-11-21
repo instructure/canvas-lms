@@ -18,14 +18,11 @@
 import {ApolloProvider, Query, gql, createClient} from 'jsx/canvas-apollo'
 import React, {useState} from 'react'
 import I18n from 'i18n!mutationActivity'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import DateInput from '@instructure/ui-forms/lib/components/DateInput'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Button} from '@instructure/ui-buttons'
+import {DateInput, TextInput} from '@instructure/ui-forms'
+import {Heading, Spinner, Table} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-layout'
 
 const AuditLogForm = ({onSubmit}) => {
   const [assetString, setAssetString] = useState('')
@@ -179,7 +176,7 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
           return <p>{I18n.t('Something went wrong.')}</p>
         }
         if (loading || !data) {
-          return <Spinner title={I18n.t('Loading...')} />
+          return <Spinner renderTitle={I18n.t('Loading...')} />
         }
 
         const {nodes: logEntries, pageInfo} = data.auditLogs.mutationLogs

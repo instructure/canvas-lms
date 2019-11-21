@@ -25,6 +25,7 @@ import fakeENV from 'helpers/fakeENV'
 import CyoeHelper from 'jsx/shared/conditional_release/CyoeHelper'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
+import ReactDOM from 'react-dom'
 
 const fixtures = $('#fixtures')
 
@@ -117,6 +118,19 @@ test('does not render Migrate Button if migrateQuizEnabled is false', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
   const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
   equal(view.$('.migrate').length, 0)
+})
+
+test('shows solid quiz icon for new.quizzes', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'quizzes.next'})
+  const view = createView(quiz, {canManage: true})
+  equal(view.$('i.icon-quiz.icon-Solid').length, 1)
+})
+
+test('shows line quiz icon for old quizzes', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+  const view = createView(quiz, {canManage: true, migrate_quiz_enabled: false})
+  equal(view.$('i.icon-quiz').length, 1)
+  equal(view.$('i.icon-quiz.icon-Solid').length, 0)
 })
 
 test('#migrateQuiz is called', function() {
@@ -419,16 +433,163 @@ test('renders mastery paths link for quiz if quiz has is released by a rule', ()
   equal(view.$('.mastery-path-icon').length, 1)
 })
 
-test('does not render direct share menu items when not DIRECT_SHARE_ENABLED', () => {
-  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz)
-  equal(view.$('.quiz-copy-to').length, 0)
-  equal(view.$('.quiz-send-to').length, 0)
+test('can duplicate when a quiz can be duplicated', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_duplicate: true,
+    can_update: true
+  })
+  Object.assign(window.ENV, {current_user_roles: ['admin']})
+  const view = createView(quiz, {})
+  const json = view.toJSON()
+  ok(json.canDuplicate)
+  equal(view.$('.duplicate_assignment').length, 1)
 })
 
-test('renders direct share menu items when DIRECT_SHARE_ENABLED', () => {
-  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
-  equal(view.$('.quiz-copy-to').length, 1)
-  equal(view.$('.quiz-send-to').length, 1)
+test('duplicate option is not available when a quiz can not be duplicated (old quizzes)', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_update: true
+  })
+  Object.assign(window.ENV, {current_user_roles: ['admin']})
+  const view = createView(quiz, {})
+  const json = view.toJSON()
+  ok(!json.canDuplicate)
+  equal(view.$('.duplicate_assignment').length, 0)
+})
+
+test('clicks on Retry button to trigger another duplicating request', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate'
+  })
+  const dfd = $.Deferred()
+  const view = createView(quiz)
+  sandbox.stub(quiz, 'duplicate_failed').returns(dfd)
+  view.$(`.duplicate-failed-retry`).simulate('click')
+  ok(quiz.duplicate_failed.called)
+})
+
+test('clicks on Retry button to trigger another migrating request', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_migrate'
+  })
+  const dfd = $.Deferred()
+  const view = createView(quiz)
+  sandbox.stub(quiz, 'retry_migration').returns(dfd)
+  view.$(`.migrate-failed-retry`).simulate('click')
+  ok(quiz.retry_migration.called)
+})
+
+test('can duplicate when a user has permissons to manage assignments', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_duplicate: true,
+    can_update: true
+  })
+  Object.assign(window.ENV, {current_user_roles: ['teacher']})
+  const view = createView(quiz, {canManage: true})
+  const json = view.toJSON()
+  ok(json.canDuplicate)
+  equal(view.$('.duplicate_assignment').length, 1)
+})
+
+test('cannot duplicate when user is not admin', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_duplicate: true,
+    can_update: true
+  })
+  Object.assign(window.ENV, {current_user_roles: ['user']})
+  const view = createView(quiz, {})
+  const json = view.toJSON()
+  ok(!json.canDuplicate)
+  equal(view.$('.duplicate_assignment').length, 0)
+})
+
+test('displays duplicating message when assignment is duplicating', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'duplicating'
+  })
+  const view = createView(quiz)
+  ok(view.$el.text().includes('Making a copy of "Foo"'))
+})
+
+test('displays failed to duplicate message when assignment failed to duplicate', () => {
+  const quiz = createQuiz({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate'
+  })
+  const view = createView(quiz)
+  ok(view.$el.text().includes('Something went wrong with making a copy of "Foo"'))
+})
+
+QUnit.module('direct share', hooks => {
+  hooks.beforeEach(() => {
+    $('<div id="direct-share-mount-point">').appendTo('#fixtures')
+    fakeENV.setup({COURSE_ID: 123})
+    sinon.stub(ReactDOM, 'render')
+  })
+
+  hooks.afterEach(() => {
+    ReactDOM.render.restore()
+    fakeENV.teardown()
+    $('#direct-share-mount-point').remove()
+  })
+
+  test('does not render direct share menu items when not DIRECT_SHARE_ENABLED', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+    const view = createView(quiz)
+    equal(view.$('.quiz-copy-to').length, 0)
+    equal(view.$('.quiz-send-to').length, 0)
+  })
+
+  test('renders direct share menu items when DIRECT_SHARE_ENABLED', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    equal(view.$('.quiz-copy-to').length, 1)
+    equal(view.$('.quiz-send-to').length, 1)
+  })
+
+  test('opens and closes the Copy To tray', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-copy-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentSelection, {quizzes: [1]})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
+
+  test('opens and closes the Send To tray', () => {
+    const quiz = createQuiz({id: '1', title: 'Foo', can_update: true})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-send-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentShare, {content_type: 'quiz', content_id: '1'})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
 })

@@ -19,13 +19,12 @@
 import React from 'react'
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconInfo from '@instructure/ui-icons/lib/Line/IconInfo'
-import Table from '@instructure/ui-elements/lib/components/Table'
+import {RadioInputGroup, RadioInput} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Tooltip} from '@instructure/ui-overlays'
+import {Button} from '@instructure/ui-buttons'
+import {IconInfoLine} from '@instructure/ui-icons'
+import {Table} from '@instructure/ui-elements'
 
 const OtherOptions = props => (
   <Table margin="0 0 medium 0">
@@ -42,10 +41,12 @@ const OtherOptions = props => (
         <td>
           {I18n.t('Privacy Level')}
           <Tooltip
-            tip={I18n.t("A Public privacy level will send the launching user's personally identifying information to the tool provider. Setting this to Private may adversely affect tools that depend on that information.")}
+            tip={I18n.t(
+              "A Public privacy level will send the launching user's personally identifying information to the tool provider. Setting this to Private may adversely affect tools that depend on that information."
+            )}
             on={['click', 'hover', 'focus']}
           >
-            <Button variant="icon" icon={IconInfo}>
+            <Button variant="icon" icon={IconInfoLine}>
               <ScreenReaderContent>{I18n.t('toggle tooltip')}</ScreenReaderContent>
             </Button>
           </Tooltip>

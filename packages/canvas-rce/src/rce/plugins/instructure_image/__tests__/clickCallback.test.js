@@ -20,17 +20,18 @@ import clickCallback from '../clickCallback'
 import {getAllByLabelText} from '@testing-library/react'
 
 describe('Instructure Image Plugin: clickCallback', () => {
-  let trayProps;
+  let trayProps
   beforeEach(() => {
-      trayProps = {
-        source: {
-          initializeCollection () {},
-          initializeUpload () {},
-          initializeFlickr () {},
-          initializeImages() {},
-          initializeDocuments() {}
-        }
+    trayProps = {
+      source: {
+        initializeCollection() {},
+        initializeUpload() {},
+        initializeFlickr() {},
+        initializeImages() {},
+        initializeDocuments() {},
+        initializeMedia() {}
       }
+    }
   })
   afterEach(() => {
     document.querySelector('.canvas-rce-upload-container').remove()

@@ -33,7 +33,6 @@ let linkToStudentsDialog = null
 let invitationDialog = null
 
 export default class RosterUserView extends Backbone.View {
-
   static initClass() {
     this.prototype.tagName = 'tr'
 
@@ -58,7 +57,7 @@ export default class RosterUserView extends Backbone.View {
     this.model.currentRole = __guard__(this.model.get('enrollments')[0], x => x.role)
 
     this.$el.attr('id', `user_${options.model.get('id')}`)
-    return Array.from(this.model.get('enrollments')).map(e => this.$el.addClass(e.role))
+    return Array.from(this.model.get('enrollments')).map(e => this.$el.addClass(e.type))
   }
 
   toJSON() {
@@ -97,16 +96,15 @@ export default class RosterUserView extends Backbone.View {
 
     json.canEditSections = !json.isInactive && !_.isEmpty(this.model.sectionEditableEnrollments())
     json.canLinkStudents = json.isObserver && !ENV.course.concluded
-    json.canViewLoginIdColumn =
-      ENV.permissions.manage_admin_users || ENV.permissions.manage_students
+    json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
     json.canManage = _.some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
       this.model.hasEnrollmentType(et)
     )
       ? ENV.permissions.manage_admin_users
       : this.model.hasEnrollmentType('ObserverEnrollment')
-        ? ENV.permissions.manage_admin_users || ENV.permissions.manage_students
-        : ENV.permissions.manage_students
+      ? ENV.permissions.manage_admin_users || ENV.permissions.manage_students
+      : ENV.permissions.manage_students
     json.customLinks = this.model.get('custom_links')
 
     if (json.canViewLoginIdColumn) {
@@ -126,7 +124,7 @@ export default class RosterUserView extends Backbone.View {
       const observerEnrollments = _.filter(json.enrollments, en => en.type === 'ObserverEnrollment')
       json.enrollments = _.reject(json.enrollments, en => en.type === 'ObserverEnrollment')
 
-      json.sections = _.map(json.enrollments, en => ENV.CONTEXTS['sections'][en.course_section_id])
+      json.sections = _.map(json.enrollments, en => ENV.CONTEXTS.sections[en.course_section_id])
 
       const users = {}
       if (
@@ -135,7 +133,7 @@ export default class RosterUserView extends Backbone.View {
       ) {
         users[''] = {name: I18n.t('nobody', 'nobody')}
       } else {
-        for (let en of Array.from(observerEnrollments)) {
+        for (const en of Array.from(observerEnrollments)) {
           if (!en.observed_user) {
             continue
           }
@@ -148,7 +146,7 @@ export default class RosterUserView extends Backbone.View {
 
       return (() => {
         const result = []
-        for (let id in users) {
+        for (const id in users) {
           user = users[id]
           const ob = {
             role: I18n.t('observing_user', 'Observing: %{user_name}', {user_name: user.name})
@@ -203,7 +201,7 @@ export default class RosterUserView extends Backbone.View {
       return
     }
     const deferreds = []
-    for (let en of Array.from(this.model.get('enrollments'))) {
+    for (const en of Array.from(this.model.get('enrollments'))) {
       if (en.enrollment_state !== 'inactive') {
         const url = `/api/v1/courses/${ENV.course.id}/enrollments/${en.id}?task=deactivate`
         en.enrollment_state = 'inactive'
@@ -227,7 +225,7 @@ export default class RosterUserView extends Backbone.View {
 
   reactivateUser() {
     const deferreds = []
-    for (let en of Array.from(this.model.get('enrollments'))) {
+    for (const en of Array.from(this.model.get('enrollments'))) {
       const url = `/api/v1/courses/${ENV.course.id}/enrollments/${en.id}/reactivate`
       en.enrollment_state = 'active'
       deferreds.push($.ajaxJSON(url, 'PUT'))

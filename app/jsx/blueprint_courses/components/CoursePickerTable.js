@@ -20,71 +20,69 @@ import I18n from 'i18n!blueprint_settingsCoursePickerTable'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
+import {Text, Table} from '@instructure/ui-elements'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {Checkbox} from '@instructure/ui-forms'
 import 'compiled/jquery.rails_flash_notifications'
 
 import propTypes from '../propTypes'
 
-const { arrayOf, string } = PropTypes
+const {arrayOf, string} = PropTypes
 
 export default class CoursePickerTable extends React.Component {
   static propTypes = {
     courses: propTypes.courseList.isRequired,
     selectedCourses: arrayOf(string).isRequired,
-    onSelectedChanged: PropTypes.func,
+    onSelectedChanged: PropTypes.func
   }
 
   static defaultProps = {
-    onSelectedChanged: () => {},
+    onSelectedChanged: () => {}
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       selected: this.parseSelectedCourses(props.selectedCourses),
-      selectedAll: false,
+      selectedAll: false
     }
-    this._tableRef = null;
+    this._tableRef = null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fixIcons()
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
       selected: this.parseSelectedCourses(nextProps.selectedCourses),
-      selectedAll: nextProps.selectedCourses.length === nextProps.courses.length,
+      selectedAll: nextProps.selectedCourses.length === nextProps.courses.length
     })
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     this.fixIcons()
   }
 
-  onSelectToggle = (e) => {
+  onSelectToggle = e => {
     const index = this.props.courses.findIndex(c => c.id === e.target.value)
     const course = this.props.courses[index]
     const srMsg = e.target.checked
-                ? I18n.t('Selected course %{course}', { course: course.name })
-                : I18n.t('Unselected course %{course}', { course: course.name })
+      ? I18n.t('Selected course %{course}', {course: course.name})
+      : I18n.t('Unselected course %{course}', {course: course.name})
     $.screenReaderFlashMessage(srMsg)
 
-    this.updateSelected({ [e.target.value]: e.target.checked }, false)
+    this.updateSelected({[e.target.value]: e.target.checked}, false)
 
     setTimeout(() => {
       this.handleFocusLoss(index)
     }, 0)
   }
 
-  onSelectAllToggle = (e) => {
-    $.screenReaderFlashMessage(e.target.checked
-      ? I18n.t('Selected all courses')
-      : I18n.t('Unselected all courses'))
+  onSelectAllToggle = e => {
+    $.screenReaderFlashMessage(
+      e.target.checked ? I18n.t('Selected all courses') : I18n.t('Unselected all courses')
+    )
 
     const selected = this.props.courses.reduce((selectedMap, course) => {
       selectedMap[course.id] = e.target.checked
@@ -96,47 +94,48 @@ export default class CoursePickerTable extends React.Component {
   // in IE, instui icons are in the tab order and get focus, even if hidden
   // this fixes them up so that doesn't happen.
   // Eventually this should get folded into instui via INSTUI-572
-  fixIcons () {
+  fixIcons() {
     if (this._tableRef) {
-      Array.prototype.forEach.call(
-        this._tableRef.querySelectorAll('svg[aria-hidden]'),
-        (el) => { el.setAttribute('focusable', 'false') }
-      )
+      Array.prototype.forEach.call(this._tableRef.querySelectorAll('svg[aria-hidden]'), el => {
+        el.setAttribute('focusable', 'false')
+      })
     }
   }
 
-  parseSelectedCourses (courses = []) {
+  parseSelectedCourses(courses = []) {
     return courses.reduce((selected, courseId) => {
       selected[courseId] = true
       return selected
     }, {})
   }
 
-  updateSelected (selectedDiff, selectedAll) {
+  updateSelected(selectedDiff, selectedAll) {
     const oldSelected = this.state.selected
     const added = []
     const removed = []
 
-    this.props.courses.forEach(({ id }) => {
+    this.props.courses.forEach(({id}) => {
       if (oldSelected[id] === true && selectedDiff[id] === false) removed.push(id)
       if (oldSelected[id] !== true && selectedDiff[id] === true) added.push(id)
     })
 
-    this.props.onSelectedChanged({ added, removed })
-    this.setState({ selectedAll })
+    this.props.onSelectedChanged({added, removed})
+    this.setState({selectedAll})
   }
 
-  handleFocusLoss (index) {
+  handleFocusLoss(index) {
     if (this.props.courses.length === 0) {
       this.selectAllCheckbox.focus()
     } else if (index >= this.props.courses.length) {
       this.handleFocusLoss(index - 1)
     } else {
-      this.tableBody.querySelectorAll('.bca-table__course-row input[type="checkbox"]')[index].focus()
+      this.tableBody
+        .querySelectorAll('.bca-table__course-row input[type="checkbox"]')
+        [index].focus()
     }
   }
 
-  renderColGroup () {
+  renderColGroup() {
     return (
       <colgroup>
         <col span="1" style={{width: '3%'}} />
@@ -149,7 +148,7 @@ export default class CoursePickerTable extends React.Component {
     )
   }
 
-  renderHeaders () {
+  renderHeaders() {
     return (
       <tr>
         <th scope="col">
@@ -164,12 +163,16 @@ export default class CoursePickerTable extends React.Component {
     )
   }
 
-  renderCellText (text) {
-    return <Text color="secondary" size="small">{text}</Text>
+  renderCellText(text) {
+    return (
+      <Text color="secondary" size="small">
+        {text}
+      </Text>
+    )
   }
 
-  renderRows () {
-    return this.props.courses.map(course =>
+  renderRows() {
+    return this.props.courses.map(course => (
       <tr id={`course_${course.id}`} key={course.id} className="bca-table__course-row">
         <td>
           <Checkbox
@@ -178,7 +181,9 @@ export default class CoursePickerTable extends React.Component {
             checked={this.state.selected[course.id] === true}
             label={
               <ScreenReaderContent>
-                {I18n.t('Toggle select course %{name}', { name: course.original_name || course.name })}
+                {I18n.t('Toggle select course %{name}', {
+                  name: course.original_name || course.name
+                })}
               </ScreenReaderContent>
             }
           />
@@ -191,10 +196,10 @@ export default class CoursePickerTable extends React.Component {
           {this.renderCellText(course.teachers.map(teacher => teacher.display_name).join(', '))}
         </td>
       </tr>
-    )
+    ))
   }
 
-  renderBodyContent () {
+  renderBodyContent() {
     if (this.props.courses.length > 0) {
       return this.renderRows()
     }
@@ -206,7 +211,7 @@ export default class CoursePickerTable extends React.Component {
     )
   }
 
-  renderStickyHeaders () {
+  renderStickyHeaders() {
     // in order to create a sticky table header, we'll create a separate table with
     // just the visual sticky headers, that will be hidden from screen readers
     return (
@@ -214,9 +219,7 @@ export default class CoursePickerTable extends React.Component {
         <PresentationContent as="div">
           <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>
             {this.renderColGroup()}
-            <thead className="bca-table__head">
-              {this.renderHeaders()}
-            </thead>
+            <thead className="bca-table__head">{this.renderHeaders()}</thead>
             <tbody />
           </Table>
         </PresentationContent>
@@ -225,11 +228,15 @@ export default class CoursePickerTable extends React.Component {
             onChange={this.onSelectAllToggle}
             value="all"
             checked={this.state.selectedAll}
-            ref={(c) => { this.selectAllCheckbox = c }}
+            ref={c => {
+              this.selectAllCheckbox = c
+            }}
             label={
               <Text size="small">
-                {I18n.t({ one: 'Select (%{count}) Course', other: 'Select All (%{count}) Courses' },
-                { count: this.props.courses.length })}
+                {I18n.t(
+                  {one: 'Select (%{count}) Course', other: 'Select All (%{count}) Courses'},
+                  {count: this.props.courses.length}
+                )}
               </Text>
             }
           />
@@ -238,18 +245,26 @@ export default class CoursePickerTable extends React.Component {
     )
   }
 
-  render () {
+  render() {
     return (
-      <div className="bca-table__wrapper" ref={(el) => { this._tableRef = el }}>
+      <div
+        className="bca-table__wrapper"
+        ref={el => {
+          this._tableRef = el
+        }}
+      >
         {this.renderStickyHeaders()}
         <div className="bca-table__content-wrapper">
           <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>
             {this.renderColGroup()}
             {/* on the real table, we'll include the headers again, but make them screen reader only */}
-            <ScreenReaderContent as="thead">
-              {this.renderHeaders()}
-            </ScreenReaderContent>
-            <tbody className="bca-table__body" ref={(c) => { this.tableBody = c }}>
+            <ScreenReaderContent as="thead">{this.renderHeaders()}</ScreenReaderContent>
+            <tbody
+              className="bca-table__body"
+              ref={c => {
+                this.tableBody = c
+              }}
+            >
               {this.renderBodyContent()}
             </tbody>
           </Table>

@@ -47,7 +47,7 @@ if (ENV.page_view_update_url) import('page_views')
 // this will make nested apps that use the hash happy
 $('#skip_navigation_link').on(
   'click',
-  preventDefault(function () {
+  preventDefault(function() {
     $($(this).attr('href'))
       .attr('tabindex', -1)
       .focus()
@@ -60,12 +60,15 @@ $('#skip_navigation_link').on(
 const WIDE_BREAKPOINT = 1200
 
 function resetMenuItemTabIndexes() {
-  // in testing this, it seems that $(document).width() returns 15px less than what it should.
-  const tabIndex =
-    $('body').hasClass('course-menu-expanded') || $(document).width() >= WIDE_BREAKPOINT - 15
-      ? 0
-      : -1
-  $('#section-tabs li a').attr('tabIndex', tabIndex)
+  const $sectionTabLinks = $('#section-tabs li a')
+  if ($sectionTabLinks.length) {
+    // in testing this, it seems that $(document).width() returns 15px less than what it should.
+    const tabIndex =
+      $('body').hasClass('course-menu-expanded') || $(document).width() >= WIDE_BREAKPOINT - 15
+        ? 0
+        : -1
+    $sectionTabLinks.attr('tabIndex', tabIndex)
+  }
 }
 
 $(resetMenuItemTabIndexes)

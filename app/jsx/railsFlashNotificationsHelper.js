@@ -19,7 +19,6 @@
 import I18n from 'i18n!shared.flash_notices'
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
-import 'jqueryui/effects/drop'
 import 'jquery.cookie'
 
 function updateAriaLive({polite} = {polite: false}) {
@@ -56,7 +55,7 @@ class RailsFlashNotificationsHelper {
         }
 
         if ($(event.currentTarget).hasClass('unsupported_browser')) {
-          $.cookie('unsupported_browser_dismissed')
+          $.cookie('unsupported_browser_dismissed', true, {path: '/'})
         }
 
         $(event.currentTarget)
@@ -70,11 +69,12 @@ class RailsFlashNotificationsHelper {
     return this.holder != null
   }
 
-  createNode(type, content, timeout, cssOptions = {}) {
+  createNode(type, content, timeout, cssOptions = {}, classes = '') {
     if (this.holderReady()) {
       const node = this.generateNodeHTML(type, content)
 
       $(node)
+        .addClass(classes)
         .appendTo($(this.holder))
         .css({zIndex: 2, ...cssOptions})
         .show('fast')

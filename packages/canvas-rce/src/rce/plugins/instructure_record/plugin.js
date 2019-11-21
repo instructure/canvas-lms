@@ -16,44 +16,57 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from "escape-html";
-import clickCallback from "./clickCallback";
-import formatMessage from "../../../format-message";
+import clickCallback from './clickCallback'
+import bridge from '../../../bridge'
+import formatMessage from '../../../format-message'
 import TrayController from './VideoOptionsTray/TrayController'
 import {isVideoElement} from '../shared/ContentSelection'
 
 const trayController = new TrayController()
 
-tinymce.create("tinymce.plugins.InstructureRecord", {
+const COURSE_PLUGIN_KEY = 'course_media'
+const USER_PLUGIN_KEY = 'user_media'
+
+tinymce.create('tinymce.plugins.InstructureRecord', {
   init(ed) {
-    ed.addCommand("instructureRecord", clickCallback.bind(this, ed, document));
-    ed.ui.registry.addMenuButton("instructure_record", {
-      tooltip: htmlEscape(
-        formatMessage({
-          default: "Record/Upload Media",
-          description: "Title for RCE button to insert or record media"
-        })
-      ),
-      icon: "video",
+    const contextType = ed.settings.canvas_rce_user_context.type
+
+    ed.addCommand('instructureRecord', clickCallback.bind(this, ed, document))
+    ed.ui.registry.addMenuButton('instructure_record', {
+      tooltip: formatMessage('Record/Upload Media'),
+      icon: 'video',
       fetch(callback) {
         const items = [
           {
             type: 'menuitem',
             text: formatMessage('Upload/Record Media'),
-            onAction: () => ed.execCommand("instructureRecord"),
+            onAction: () => ed.execCommand('instructureRecord')
           },
 
-          // {
-          //   type: 'menuitem',
-          //   text: formatMessage('Course Media'), // This item needs to be adjusted to be user/context aware, i.e. Use Media
-          //   onAction() {
-          //     ed.focus(true) // activate the editor without changing focus
-          //   }
-          // }
+          {
+            type: 'menuitem',
+            text: formatMessage('My Media'),
+            onAction() {
+              ed.focus(true)
+              bridge.showTrayForPlugin(USER_PLUGIN_KEY)
+            }
+          }
         ]
-        callback(items);
+
+        if (contextType === 'course') {
+          items.splice(1, 0, {
+            type: 'menuitem',
+            text: formatMessage('Course Media'),
+            onAction() {
+              ed.focus(true) // activate the editor without changing focus
+              bridge.showTrayForPlugin(COURSE_PLUGIN_KEY)
+            }
+          })
+        }
+
+        callback(items)
       }
-    });
+    })
 
     /*
      * Register the Video "Options" button that will open the Video Options
@@ -68,22 +81,19 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
 
       text: formatMessage('Options'),
       tooltip: buttonAriaLabel
-    });
+    })
 
     ed.ui.registry.addContextToolbar('instructure-video-toolbar', {
       items: 'instructure-video-options',
       position: 'node',
-      predicate: false,
+      predicate: isVideoElement,
       scope: 'node'
     })
   },
   remove(editor) {
     trayController.hideTrayForEditor(editor)
   }
-});
+})
 
 // Register plugin
-tinymce.PluginManager.add(
-  "instructure_record",
-  tinymce.plugins.InstructureRecord
-);
+tinymce.PluginManager.add('instructure_record', tinymce.plugins.InstructureRecord)

@@ -22,51 +22,76 @@ describe 'assignments' do
   include_context "in-process server selenium tests"
 
   context 'as a student' do
-
     before(:once) do
-      Account.default.enable_feature!(:assignments_2)
+      Account.default.enable_feature!(:assignments_2_student)
       course_with_student(course: @course, active_all: true)
-      @assignment = @course.assignments.create!(
-        name: 'assignment',
-        due_at: 5.days.ago,
-        points_possible: 10,
-        submission_types: 'online_upload'
-      )
       preload_graphql_schema
     end
 
-    before(:each) do
-      user_session(@student)
-      StudentAssignmentPageV2.visit(@course, @assignment)
+    context 'assignment details' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          name: 'assignment',
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: 'online_upload'
+        )
+      end
+
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+      end
+
+      it 'should show available checkmark stepper' do
+        expect(StudentAssignmentPageV2.checkmark_icon).to be_displayed
+      end
+
+      it 'should show assignment title' do
+        expect(StudentAssignmentPageV2.assignment_title(@assignment.title)).to_not be_nil
+      end
+
+      it 'available assignment should show details toggle' do
+        expect(StudentAssignmentPageV2.details_toggle).to be_displayed
+      end
+
+      it 'should show assignment group link' do
+        expect(StudentAssignmentPageV2.assignment_group_link).to be_displayed
+      end
+
+      it 'should show assignment due date' do
+        expect(StudentAssignmentPageV2.due_date_css(@assignment.due_at)).to_not be_nil
+      end
+
+      it 'should show how many points possible the assignment is worth' do
+        expect(StudentAssignmentPageV2.points_possible_css(@assignment.points_possible)).to_not be_nil
+      end
+
+      it 'available assignment should show content tablist' do
+        expect(StudentAssignmentPageV2.content_tablist).to be_displayed
+      end
     end
 
-    it 'should show available checkmark stepper' do
-      expect(StudentAssignmentPageV2.checkmark_icon).to be_displayed
-    end
+    context 'media assignments' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          name: 'media assignment',
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: 'media_recording'
+        )
+      end
 
-    it 'should show assignment title' do
-      expect(StudentAssignmentPageV2.assignment_title(@assignment.title)).to_not be_nil
-    end
+      before(:each) do
+        stub_kaltura
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+      end
 
-    it 'available assignment should show details toggle' do
-      expect(StudentAssignmentPageV2.details_toggle).to be_displayed
+      it "should be able to open the media modal" do
+        StudentAssignmentPageV2.record_upload_button.click
+        expect(StudentAssignmentPageV2.media_modal).to be_displayed
+      end
     end
-
-    it 'should show assignment group link' do
-      expect(StudentAssignmentPageV2.assignment_group_link).to be_displayed
-    end
-
-    it 'should show assignment due date' do
-      expect(StudentAssignmentPageV2.due_date_css(@assignment.due_at)).to_not be_nil
-    end
-
-    it 'should show how many points possible the assignment is worth' do
-      expect(StudentAssignmentPageV2.points_possible_css(@assignment.points_possible)).to_not be_nil
-    end
-
-    it 'available assignment should show content tablist' do
-      expect(StudentAssignmentPageV2.content_tablist).to be_displayed
-    end
-
   end
 end

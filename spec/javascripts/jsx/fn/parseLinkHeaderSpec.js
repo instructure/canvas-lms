@@ -19,19 +19,21 @@
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 
 QUnit.module('parseLinkHeader', {
-  setup () {
+  setup() {
     this.xhr = {
-      getResponseHeader () {
-        return '<http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50>; rel="current",' +
-               '<http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50>; rel="first",' +
-               '<http://canvas.example.com/api/v1/someendpoint&page=2&per_page=50>; rel="next",' +
-               '<http://canvas.example.com/api/v1/someendpoint&page=3&per_page=50>; rel="last"'
+      getResponseHeader() {
+        return (
+          '<http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50>; rel="current",' +
+          '<http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50>; rel="first",' +
+          '<http://canvas.example.com/api/v1/someendpoint&page=2&per_page=50>; rel="next",' +
+          '<http://canvas.example.com/api/v1/someendpoint&page=3&per_page=50>; rel="last"'
+        )
       }
     }
   }
 })
 
-test('it pulls out the links from an Axios response header', function () {
+test('it pulls out the links from an Axios response header', function() {
   const links = parseLinkHeader(this.xhr)
   const expected = {
     current: 'http://canvas.example.com/api/v1/someendpoint&page=1&per_page=50',

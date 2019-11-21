@@ -395,13 +395,13 @@ test('proxies to numberFormat', function() {
   ok(numberFormat.outcomeScore.calledWithMatch(num))
 })
 
-QUnit.module('eachWithIndex', (hooks) => {
+QUnit.module('eachWithIndex', hooks => {
   let items
   let itemFunc
 
   hooks.beforeEach(() => {
     items = [{text: 'a'}, {text: 'b'}, {text: 'c'}]
-    itemFunc = (element) => `<p>Item ${element._index}: ${element.text}</p>`
+    itemFunc = element => `<p>Item ${element._index}: ${element.text}</p>`
   })
 
   test('assigns the value of startingValue to the _index variable', () => {

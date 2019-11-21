@@ -22,35 +22,59 @@ import TestUtils from 'react-dom/test-utils'
 import DeveloperKeysTable from 'jsx/developer_keys/AdminTable'
 import $ from 'jquery'
 
-QUnit.module('AdminTable',  {
+QUnit.module('AdminTable', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
   }
 })
 
 const onDevKeys = [
-  {id: `1`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z", developer_key_account_binding: {workflow_state: "off",
-  account_owns_binding: false}},
-  {id: `2`, api_key: "abc12345671", created_at: "2012-06-09T20:36:50Z"},
-  {id: `3`, api_key: "abc12345679", created_at: "2012-06-08T20:36:50Z", developer_key_account_binding: {workflow_state: "on",
-  account_owns_binding: false}}
+  {
+    id: `1`,
+    api_key: 'abc12345678',
+    created_at: '2012-06-07T20:36:50Z',
+    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false}
+  },
+  {id: `2`, api_key: 'abc12345671', created_at: '2012-06-09T20:36:50Z'},
+  {
+    id: `3`,
+    api_key: 'abc12345679',
+    created_at: '2012-06-08T20:36:50Z',
+    developer_key_account_binding: {workflow_state: 'on', account_owns_binding: false}
+  }
 ]
 
 const offDevKeys = [
-  {id: `1`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z", developer_key_account_binding: {workflow_state: "off",
-  account_owns_binding: false}},
-  {id: `3`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z", developer_key_account_binding: {workflow_state: "off",
-  account_owns_binding: false}},
-  {id: `2`, api_key: "abc12345671", created_at: "2012-06-09T20:36:50Z"}
+  {
+    id: `1`,
+    api_key: 'abc12345678',
+    created_at: '2012-06-07T20:36:50Z',
+    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false}
+  },
+  {
+    id: `3`,
+    api_key: 'abc12345678',
+    created_at: '2012-06-07T20:36:50Z',
+    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false}
+  },
+  {id: `2`, api_key: 'abc12345671', created_at: '2012-06-09T20:36:50Z'}
 ]
 
 function devKeyList(numKeys = 10) {
-  return [...Array(numKeys).keys()].map(n => ({id: `${n}`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z"}))
+  return [...Array(numKeys).keys()].map(n => ({
+    id: `${n}`,
+    api_key: 'abc12345678',
+    created_at: '2012-06-07T20:36:50Z'
+  }))
 }
 
 function disabledDevKeyList(numKeys = 10) {
-  return [...Array(numKeys).keys()].map(n => ({id: `${n}`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z",
-  developer_key_account_binding: {workflow_state: "off", account_owns_binding: false}}))
+  return [...Array(numKeys).keys()].map(n => ({
+    id: `${n}`,
+    api_key: 'abc12345678',
+    created_at: '2012-06-07T20:36:50Z',
+    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false}
+  }))
 }
 
 function component(keyList, inherited, props = {}) {
@@ -61,7 +85,7 @@ function component(keyList, inherited, props = {}) {
       developerKeysList={keyList || devKeyList()}
       ctx={{
         params: {
-          contextId: ""
+          contextId: ''
         }
       }}
       inherited={inherited}
@@ -136,7 +160,11 @@ test('makes correct screenReader notification if inherited and show more button 
   const tmp = $.screenReaderFlashMessageExclusive
   $.screenReaderFlashMessageExclusive = flashSpy
   table.createSetFocusCallback()([list[9]])
-  ok(flashSpy.calledWith("Loaded more developer keys. Focus moved to the name of the last loaded developer key in the list."))
+  ok(
+    flashSpy.calledWith(
+      'Loaded more developer keys. Focus moved to the name of the last loaded developer key in the list.'
+    )
+  )
   $.screenReaderFlashMessageExclusive = tmp
 })
 
@@ -156,7 +184,11 @@ test('makes correct screenReader notification if not inherited  and show more bu
   const tmp = $.screenReaderFlashMessageExclusive
   $.screenReaderFlashMessageExclusive = flashSpy
   table.createSetFocusCallback()([list[9]])
-  ok(flashSpy.calledWith("Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list."))
+  ok(
+    flashSpy.calledWith(
+      'Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.'
+    )
+  )
   $.screenReaderFlashMessageExclusive = tmp
 })
 
@@ -169,7 +201,6 @@ test('focuses delete icon if not inherited after key deleted', () => {
   ok(focusSpy.called)
 })
 
-
 test('makes correct screenReader notification if not inherited and key deleted', () => {
   const list = devKeyList()
   const table = component(list)
@@ -177,18 +208,21 @@ test('makes correct screenReader notification if not inherited and key deleted',
   const tmp = $.screenReaderFlashMessageExclusive
   $.screenReaderFlashMessageExclusive = flashSpy
   table.createSetFocusCallback('9')()
-  ok(flashSpy.calledWith("Developer key 9 deleted. Focus moved to the delete button of the previous developer key in the list."))
+  ok(
+    flashSpy.calledWith(
+      'Developer key 9 deleted. Focus moved to the delete button of the previous developer key in the list.'
+    )
+  )
   $.screenReaderFlashMessageExclusive = tmp
 })
 
 test('focuses on external button if first item deleted', () => {
   const list = devKeyList()
   const setFocus = sinon.spy()
-  const table = component(list, undefined, { setFocus })
+  const table = component(list, undefined, {setFocus})
   table.createSetFocusCallback('0')()
   ok(setFocus.called)
 })
-
 
 test('makes correct screenReader notification if first item deleted', () => {
   const list = devKeyList()
@@ -197,6 +231,6 @@ test('makes correct screenReader notification if first item deleted', () => {
   const tmp = $.screenReaderFlashMessageExclusive
   $.screenReaderFlashMessageExclusive = flashSpy
   table.createSetFocusCallback('0')()
-  ok(flashSpy.calledWith("Developer key 0 deleted. Focus moved to add developer key button."))
+  ok(flashSpy.calledWith('Developer key 0 deleted. Focus moved to add developer key button.'))
   $.screenReaderFlashMessageExclusive = tmp
 })

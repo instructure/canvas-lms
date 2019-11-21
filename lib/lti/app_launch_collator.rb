@@ -113,11 +113,12 @@ module Lti
 
     def self.lti2_placements(message_handler, placements)
       resource_placements = message_handler.placements.pluck(:placement)
-      if resource_placements.present?
-        valid_placements = resource_placements & placements.map(&:to_s)
-      else
-        valid_placements = ResourcePlacement::DEFAULT_PLACEMENTS
-      end
+      valid_placements =
+        if resource_placements.present?
+          resource_placements & placements.map(&:to_s)
+        else
+          ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS
+        end
       valid_placements.each_with_object({}) { |p, hsh| hsh[p.to_sym] = lti2_placement(message_handler) }
     end
 

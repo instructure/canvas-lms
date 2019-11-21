@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import get from 'lodash/get'
 
 import RequiredValues from '../RequiredValues'
@@ -44,13 +44,13 @@ it('generates the toolConfiguration', () => {
 })
 
 const checkToolConfigPart = (toolConfig, path, value) => {
-  expect(get(toolConfig, path)).toEqual(value);
+  expect(get(toolConfig, path)).toEqual(value)
 }
 
 const checkChange = (path, funcName, value, expectedValue = null) => {
   const wrapper = mount(<RequiredValues {...props()} />)
 
-  wrapper.instance()[funcName]({target: { value }})
+  wrapper.instance()[funcName]({target: {value}})
   checkToolConfigPart(
     wrapper.instance().generateToolConfigurationPart(),
     path,
@@ -67,7 +67,11 @@ it('changes the output when tool_id changes', () => {
 })
 
 it('changes the output when icon_url changes', () => {
-  checkChange(['oidc_initiation_url'], 'handleOidcInitiationUrlChange', 'http://example.com/new/login')
+  checkChange(
+    ['oidc_initiation_url'],
+    'handleOidcInitiationUrlChange',
+    'http://example.com/new/login'
+  )
 })
 
 it('changes the output when target_link_uri changes', () => {

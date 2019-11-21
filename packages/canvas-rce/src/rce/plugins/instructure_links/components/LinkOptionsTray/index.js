@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {bool, func, oneOf, shape, string} from 'prop-types'
-import {Button,CloseButton} from '@instructure/ui-buttons'
+import {bool, func, object, oneOf, shape, string} from 'prop-types'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {Heading} from '@instructure/ui-elements'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -33,22 +33,28 @@ import {
 } from '../../../shared/ContentSelection'
 
 export default function LinkOptionsTray(props) {
-  const {content} = props
-  const [text, setText] = useState(content.text || '')
+  const content = props.content || {}
+  const textToLink =
+    (content.$element?.tagName === 'A' ? content.$element?.textContent : content.text) || ''
+  const [text, setText] = useState(textToLink || '')
   const [url, setUrl] = useState(content.url || '')
   const [autoOpenPreview, setAutoOpenPreview] = useState(content.displayAs === DISPLAY_AS_EMBED)
-  const [disablePreview, setDisablePreview] = useState(content.displayAs === DISPLAY_AS_EMBED_DISABLED)
+  const [disablePreview, setDisablePreview] = useState(
+    content.displayAs === DISPLAY_AS_EMBED_DISABLED
+  )
 
   function handleSave(event) {
     event.preventDefault()
     const embedType = content.isPreviewable ? 'scribd' : null
 
     const linkAttrs = {
-      embed: embedType ? {
-        type: embedType,
-        autoOpenPreview: autoOpenPreview && !disablePreview,
-        disablePreview
-      } : null,
+      embed: embedType
+        ? {
+            type: embedType,
+            autoOpenPreview: autoOpenPreview && !disablePreview,
+            disablePreview
+          }
+        : null,
       text,
       target: '_blank',
       href: url,
@@ -86,15 +92,14 @@ export default function LinkOptionsTray(props) {
       <Flex direction="column" height="100vh">
         <Flex.Item as="header" padding="medium">
           <Flex direction="row">
+            <Flex.Item grow shrink>
+              <Heading as="h2">{formatMessage('Link Options')}</Heading>
+            </Flex.Item>
+
             <Flex.Item>
               <CloseButton placement="static" variant="icon" onClick={props.onRequestClose}>
                 {formatMessage('Close')}
               </CloseButton>
-            </Flex.Item>
-            <Flex.Item grow shrink>
-              <Heading as="h2" margin="none none none medium">
-                {formatMessage('Link Options')}
-              </Heading>
             </Flex.Item>
           </Flex>
         </Flex.Item>
@@ -106,7 +111,7 @@ export default function LinkOptionsTray(props) {
               <Flex direction="column">
                 <Flex.Item padding="small">
                   <TextInput
-                    renderLabel={() =>formatMessage('Text')}
+                    renderLabel={() => formatMessage('Text')}
                     onChange={handleTextChange}
                     value={text}
                   />
@@ -114,7 +119,7 @@ export default function LinkOptionsTray(props) {
 
                 <Flex.Item padding="small">
                   <TextInput
-                    renderLabel={() =>formatMessage('Link')}
+                    renderLabel={() => formatMessage('Link')}
                     onChange={handleLinkChange}
                     value={url}
                   />
@@ -122,10 +127,7 @@ export default function LinkOptionsTray(props) {
 
                 {content.isPreviewable && (
                   <Flex.Item margin="small none none none" padding="small">
-                    <FormFieldGroup
-                      description={formatMessage('Display Options')}
-                      layout="stacked"
-                    >
+                    <FormFieldGroup description={formatMessage('Display Options')} layout="stacked">
                       <Checkbox
                         label={formatMessage('Disable in-line preview.')}
                         name="disable-preview"
@@ -134,7 +136,9 @@ export default function LinkOptionsTray(props) {
                       />
                       {!disablePreview && (
                         <Checkbox
-                          label={formatMessage('Automatically open an in-line preview. (Preview displays only after saving)')}
+                          label={formatMessage(
+                            'Automatically open an in-line preview. (Preview displays only after saving)'
+                          )}
                           name="auto-preview"
                           onChange={handlePreviewChange}
                           checked={autoOpenPreview}
@@ -164,6 +168,7 @@ export default function LinkOptionsTray(props) {
 }
 LinkOptionsTray.propTypes = {
   content: shape({
+    $element: object, // the DOM's HTMLElement
     dispalyAs: oneOf([DISPLAY_AS_LINK, DISPLAY_AS_EMBED]),
     isPreviewable: bool,
     text: string,

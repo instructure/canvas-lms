@@ -104,7 +104,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     given { |user| user && user.id == self.user_id && self.untaken? }
     can :update
 
-    given { |user, session| self.quiz.grants_right?(user, session, :manage) || self.quiz.grants_right?(user, session, :review_grades) }
+    given { |user, session| self.quiz.grants_right?(user, session, :review_grades) }
     can :read
 
     given { |user| user &&

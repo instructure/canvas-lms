@@ -32,6 +32,6 @@ describe Types::QuizType do
     module2 = quiz.context.context_modules.create!(name: 'Module 2')
     quiz.context_module_tags.create!(context_module: module1, context: quiz.context, tag_type: 'context_module')
     quiz.context_module_tags.create!(context_module: module2, context: quiz.context, tag_type: 'context_module')
-    expect(quiz_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
+    expect(quiz_type.resolve("modules { _id }")).to match_array([module1.id.to_s, module2.id.to_s])
   end
 end

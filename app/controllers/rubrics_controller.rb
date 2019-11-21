@@ -66,14 +66,21 @@ class RubricsController < ApplicationController
   # @argument rubric_association_id [Integer]
   #   The id of the object with which this rubric is associated
   # @argument rubric[title] [String]
+  #   The title of the rubric
   # @argument rubric[free_form_criterion_comments] [Boolean]
+  #   Whether or not you can write custom comments in the ratings field for a rubric
   # @argument rubric_association[association_id] [Integer]
   #   The id of the object with which this rubric is associated
   # @argument rubric_association[association_type] ["Assignment"|"Course"|"Account"]
   #   The type of object this rubric is associated with
   # @argument rubric_association[use_for_grading] [Boolean]
+  #   Whether or not the associated rubric is used for grade calculation
   # @argument rubric_association[hide_score_total] [Boolean]
+  #   Whether or not the score total is displayed within the rubric.
+  #   This option is only available if the rubric is not used for grading.
   # @argument rubric_association[purpose] [String]
+  #   Whether or not the association is for grading (and thus linked to an assignment)
+  #   or if it's to indicate the rubric should appear in its context
   # @argument rubric[criteria] [Hash]
   #   An indexed Hash of RubricCriteria objects where the keys are integer ids and the values are the RubricCriteria objects
   def create
@@ -104,7 +111,9 @@ class RubricsController < ApplicationController
   # @argument rubric_association_id [Integer]
   #   The id of the object with which this rubric is associated
   # @argument rubric[title] [String]
+  #   The title of the rubric
   # @argument rubric[free_form_criterion_comments] [Boolean]
+  #   Whether or not you can write custom comments in the ratings field for a rubric
   # @argument rubric[skip_updating_points_possible] [Boolean]
   #   Whether or not to update the points possible
   # @argument rubric_association[association_id] [Integer]
@@ -112,8 +121,13 @@ class RubricsController < ApplicationController
   # @argument rubric_association[association_type] ["Assignment"|"Course"|"Account"]
   #   The type of object this rubric is associated with
   # @argument rubric_association[use_for_grading] [Boolean]
+  #   Whether or not the associated rubric is used for grade calculation
   # @argument rubric_association[hide_score_total] [Boolean]
-  # @argument rubric_association[purpose] [String]
+  #   Whether or not the score total is displayed within the rubric.
+  #   This option is only available if the rubric is not used for grading.
+  # @argument rubric_association[purpose] ["grading"|"bookmark"]
+  #   Whether or not the association is for grading (and thus linked to an assignment)
+  #   or if it's to indicate the rubric should appear in its context
   # @argument rubric[criteria] [Hash]
   #   An indexed Hash of RubricCriteria objects where the keys are integer ids and the values are the RubricCriteria objects
   def update

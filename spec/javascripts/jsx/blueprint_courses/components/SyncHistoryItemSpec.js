@@ -25,7 +25,7 @@ QUnit.module('SyncHistoryItem component')
 
 const defaultProps = () => ({
   heading: null,
-  migration: getSampleData().history[0],
+  migration: getSampleData().history[0]
 })
 
 test('renders the SyncHistoryItem component', () => {

@@ -21,11 +21,11 @@ import {bool, func} from 'prop-types'
 
 import I18n from 'i18n!assignments_2'
 
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
+import {Checkbox} from '@instructure/ui-forms'
+import {Flex} from '@instructure/ui-layout'
+import {Button} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {IconTrashLine} from '@instructure/ui-icons'
 import {TeacherAssignmentShape} from '../assignmentData'
 import AssignmentPoints from './Editables/AssignmentPoints'
 
@@ -75,7 +75,7 @@ export default class Toolbox extends React.Component {
 
   renderDelete() {
     return (
-      <Button margin="0 0 0 x-small" icon={<IconTrash />} onClick={this.props.onDelete}>
+      <Button margin="0 0 0 x-small" icon={<IconTrashLine />} onClick={this.props.onDelete}>
         <ScreenReaderContent>{I18n.t('delete assignment')}</ScreenReaderContent>
       </Button>
     )
@@ -107,13 +107,13 @@ export default class Toolbox extends React.Component {
     return (
       <div data-testid="teacher-toolbox">
         <Flex direction="column">
-          <FlexItem padding="xx-small xx-small small">
+          <Flex.Item padding="xx-small xx-small small">
             {this.renderPublished()}
             {this.renderDelete()}
-          </FlexItem>
-          <FlexItem padding="medium xx-small large" align="end">
+          </Flex.Item>
+          <Flex.Item padding="medium xx-small large" align="end">
             {this.renderPoints()}
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </div>
     )

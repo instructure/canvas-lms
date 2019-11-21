@@ -19,8 +19,8 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
+import {Button} from '@instructure/ui-buttons'
+import Modal from '../../shared/components/InstuiModal'
 import store from '../lib/ExternalAppsStore'
 
 export default class DeleteExternalToolButton extends React.Component {
@@ -84,18 +84,18 @@ export default class DeleteExternalToolButton extends React.Component {
             onDismiss={this.closeModal}
             label={I18n.t('Delete %{tool} App?', {tool: this.props.tool.name})}
           >
-            <ModalBody>
-              {I18n.t('Are you sure you want to remove this tool?')}
-            </ModalBody>
-            <ModalFooter>
+            <Modal.Body>{I18n.t('Are you sure you want to remove this tool?')}</Modal.Body>
+            <Modal.Footer>
               <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
               &nbsp;
-              <Button onClick={this.deleteTool} variant="danger">{I18n.t('Delete')}</Button>
-            </ModalFooter>
+              <Button onClick={this.deleteTool} variant="danger">
+                {I18n.t('Delete')}
+              </Button>
+            </Modal.Footer>
           </Modal>
         </li>
       )
     }
-    return false;
+    return false
   }
 }

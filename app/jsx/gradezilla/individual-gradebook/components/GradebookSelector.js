@@ -19,8 +19,8 @@
 import {head, tail} from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import I18n from 'i18n!gradezilla_individual_gradebook_gradebook_selector'
 
 import CanvasSelect from '../../../shared/components/CanvasSelect'

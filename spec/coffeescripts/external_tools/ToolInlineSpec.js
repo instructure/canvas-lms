@@ -122,7 +122,7 @@ test('defaults the resize height to 450px', () => {
 test('defaults the resize height to 450px if non numeric value passed', () => {
   document.querySelector('#second-wrapper').className = ''
   const launchResizer = new ToolLaunchResizer()
-  launchResizer.resize_tool_content_wrapper({'a': 1})
+  launchResizer.resize_tool_content_wrapper({a: 1})
   equal($('.tool_content_wrapper').height(), 450)
   document.querySelector('#second-wrapper').className = 'tool_content_wrapper'
 })

@@ -115,17 +115,6 @@ describe 'new ui' do
     it 'should not override high contrast theme', priority: "2", test_id: 244898 do
       BrandableCSS.save_default!('css') # make sure variable css file is up to date
       get '/profile/settings'
-      f('.ic-Super-toggle__switch').click
-      wait_for_ajaximations
-      f = FeatureFlag.last
-      expect(f.state).to eq 'on'
-      expect(f('.profile_settings.active').css_value('background-color')).to eq('rgba(0, 142, 226, 1)')
-    end
-
-    it 'should not override high contrast theme with new menu design', priority: "2", test_id: 244898 do
-      @course.account.enable_feature!(:a11y_left_menu)
-      BrandableCSS.save_default!('css') # make sure variable css file is up to date
-      get '/profile/settings'
       f('.high_contrast .ic-Super-toggle__switch').click
       wait_for_ajaximations
       f = FeatureFlag.find_by(feature: 'high_contrast')

@@ -19,10 +19,10 @@ import I18n from 'i18n!shared_components'
 import React, {Component} from 'react'
 import {func, string} from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
-import Menu from '@instructure/ui-menu/lib/components/Menu'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Button} from '@instructure/ui-buttons'
+import {IconMoreLine} from '@instructure/ui-icons'
+import {Menu} from '@instructure/ui-menu'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 export default class DiscussionManageMenu extends Component {
   static propTypes = {
@@ -58,8 +58,8 @@ export default class DiscussionManageMenu extends Component {
           onSelect={this.props.onSelect}
           onToggle={this.toggleManageMenuOpen}
           trigger={
-            <Button variant="icon" size="small" theme={{smallHeight: '1.25rem'}}>
-              <IconMore />
+            <Button variant="icon" size="small">
+              <IconMoreLine />
               <ScreenReaderContent>
                 {I18n.t('Manage options for %{name}', {name: this.props.entityTitle})}
               </ScreenReaderContent>

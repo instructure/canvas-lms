@@ -23,7 +23,7 @@ describe "course people" do
   before :each do
     # in the people table, the kyle menu can be off the screen
     # and uninteractable if the window is too small
-    make_full_screen
+
 
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
     @account = @course.account # for custom roles
@@ -374,7 +374,7 @@ describe "course people" do
       add_user(@teacher.name, "Mentor")
       teacher_row = f("#user_#{@teacher.id}")
       expect(teacher_row).to have_class("TeacherEnrollment")
-      expect(teacher_row).to have_class("Mentor")
+      expect(teacher_row).to_not have_class("Mentor")
     end
   end
 

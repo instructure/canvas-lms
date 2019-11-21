@@ -139,14 +139,6 @@ allow_opt_out_of_inbox:
       on the Inbox, and hide the Conversation's notification preferences.
   applies_to: RootAccount
   root_opt_in: true
-course_catalog:
-  state: allowed
-  display_name: Public Course Index
-  description:
-    display_course_catalog: Show a searchable list of courses in this root account
-      with the "Include this course in the public course index" flag enabled.
-  applies_to: RootAccount
-  root_opt_in: true
 gradebook_list_students_by_sortable_name:
   state: allowed
   display_name:
@@ -157,25 +149,11 @@ gradebook_list_students_by_sortable_name:
       names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and
       can be changed in settings.
   applies_to: Course
-usage_rights_required:
-  state: hidden
-  display_name: Require Usage Rights for Uploaded Files
-  description: If enabled, copyright and license information must be provided for
-    files before they are published.
-  applies_to: Course
-  root_opt_in: true
 lti2_rereg:
   state: hidden
   display_name: LTI 2 Reregistration
   description: Enable reregistration for LTI 2
   applies_to: RootAccount
-  root_opt_in: true
-  beta: true
-quizzes_lti:
-  state: hidden
-  display_name: Quiz LTI Plugin
-  description: Use the new quiz LTI tool in place of regular canvas quizzes
-  applies_to: Course
   root_opt_in: true
   beta: true
 disable_lti_post_only:
@@ -240,20 +218,9 @@ responsive_layout:
   description: This is a feature to allow the development of a responsive layout
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
   environments:
-    production:
-      state: disabled
-force_rtl:
-  state: hidden
-  display_name: Turn on RTL Even For Non-RTL Languages
-  description: This is just a dev-only feature you can turn on to get a preview of
-    how pages would look in a RTL environment, without having to change your language
-    to one that is normally RTL
-  applies_to: User
-  environments:
-    production:
-      state: disabled
+    development:
+      state: 'on'
 enable_i18n_features_in_outcomes_exports:
   state: hidden
   display_name: Enable i18n features in outcomes exports
@@ -369,6 +336,12 @@ import_to_quizzes_next:
   description: Allow importing of QTI and Common Cartridge into New Quizzes.
   applies_to: RootAccount
   root_opt_in: true
+newquizzes_on_quiz_page:
+  state: hidden
+  display_name: New Quizzes on the Quizzes page
+  description: Show New Quizzes on the Quizzes page
+  applies_to: Account
+  root_opt_in: true
 common_cartridge_page_conversion:
   state: hidden
   display_name: Common Cartridge HTML File to Page Conversion
@@ -382,24 +355,11 @@ non_scoring_rubrics:
   description: If enabled, the option will be presented to have non-scoring rubrics.
   applies_to: RootAccount
   root_opt_in: true
-assignments_2:
-  state: hidden
-  display_name: Assignments 2
-  description: Use the new assignments page
-  applies_to: Course
-  root_opt_in: true
-  beta: true
-  environments:
-    production:
-      state: disabled
 slack_notifications:
   state: hidden
   display_name: Slack Notifications
   description: The ability for users to receive notifications from slack
   applies_to: RootAccount
-  environments:
-      production:
-        state: disabled
 javascript_csp:
   state: allowed
   display_name: Content Security Policy
@@ -425,10 +385,9 @@ rce_enhancements:
   description: Allow switching to the enhanced RCE
   applies_to: Course
   root_opt_in: true
-  beta: true
   environments:
     production:
-      state: disabled
+      state: hidden
 new_features_ui:
   state: hidden
   applies_to: RootAccount
@@ -466,3 +425,31 @@ compact_live_event_payloads:
   display_name: Remove null values from live event payloads
   description: Canvas will remove keys with null values from
     live event payloads if this feature is enabled.
+analytics_2:
+  state: hidden
+  applies_to: Course
+  display_name: New Course and User Analytics
+  description: Show new analytics for course and user data
+  after_state_change_proc: analytics_2_after_state_change_hook
+new_gradebook_plagiarism_indicator:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Gradebook Plagiarism Indicator
+  description: Enables display of plagiarism reports and similarity scores in
+    the New Gradebook submission tray.
+  environments:
+    production:
+      state: disabled
+unfavorite_course_from_dashboard:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Favorites From Dashboard
+  description: This allows the user to unfavorite a course directly from its
+    dashboard card.
+  root_opt_in: true
+commons_favorites:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Import Commons Favorites
+  description: If Commons is installed, allows importing favorited content
+    items from within Canvas.

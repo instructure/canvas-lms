@@ -21,20 +21,20 @@ import ReactDOM from 'react-dom'
 import {scryRenderedDOMComponentsWithTag} from 'react-dom/test-utils'
 import DisabledTokenInput from 'jsx/due_dates/DisabledTokenInput'
 
-const wrapper = document.getElementById("fixtures");
-const tokens = ["John Smith", "Section 2", "Group 1"];
+const wrapper = document.getElementById('fixtures')
+const tokens = ['John Smith', 'Section 2', 'Group 1']
 
 QUnit.module('DisabledTokenInput', {
   setup() {
-    this.input = ReactDOM.render(<DisabledTokenInput tokens={tokens}/>, wrapper);
+    this.input = ReactDOM.render(<DisabledTokenInput tokens={tokens} />, wrapper)
   },
 
   teardown() {
-    ReactDOM.unmountComponentAtNode(wrapper);
+    ReactDOM.unmountComponentAtNode(wrapper)
   }
-});
+})
 
 test('renders a list item for each token passed in', function() {
-  const listItems = scryRenderedDOMComponentsWithTag(this.input, "li");
-  propEqual(listItems.map(item => item.textContent), tokens);
-});
+  const listItems = scryRenderedDOMComponentsWithTag(this.input, 'li')
+  propEqual(listItems.map(item => item.textContent), tokens)
+})

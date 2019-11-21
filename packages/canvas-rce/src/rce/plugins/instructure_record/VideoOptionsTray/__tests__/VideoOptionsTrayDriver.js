@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getByLabelText, queryByLabelText, wait} from '@testing-library/dom'
+import {fireEvent, getAllByText, getByLabelText, queryByLabelText, wait} from '@testing-library/dom'
 
 function getSizeOptions($sizeSelect) {
   const controlledId = $sizeSelect.getAttribute('aria-controls')
@@ -44,6 +44,14 @@ export default class VideoOptionsTrayDriver {
     return this.$element.getAttribute('aria-label')
   }
 
+  get $titleTextField() {
+    return this.$element.querySelector('textarea')
+  }
+
+  get $displayAsField() {
+    return getAllByText(this.$element, 'Display Options')[0].closest('fieldset')
+  }
+
   get $sizeSelect() {
     return getByLabelText(this.$element, 'Size')
   }
@@ -54,12 +62,33 @@ export default class VideoOptionsTrayDriver {
     )
   }
 
+  get titleText() {
+    return this.$titleTextField.value
+  }
+
+  get titleTextDisabled() {
+    return this.$titleTextField.disabled
+  }
+
+  get displayAs() {
+    return this.$displayAsField.querySelector('input[type="radio"]:checked').value
+  }
+
   get size() {
     return this.$sizeSelect.value
   }
 
   get doneButtonDisabled() {
     return this.$doneButton.disabled
+  }
+
+  setTitleText(titleText) {
+    fireEvent.change(this.$titleTextField, {target: {value: titleText}})
+  }
+
+  setDisplayAs(value) {
+    const $input = this.$displayAsField.querySelector(`input[type="radio"][value="${value}"]`)
+    $input.click()
   }
 
   async setSize(sizeText) {

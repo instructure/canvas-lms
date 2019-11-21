@@ -119,8 +119,8 @@ class Login::CanvasController < ApplicationController
       # Call for some cleanups that should be run when a user logs in
       user = pseudonym.login_assertions_for_user
       session[:login_aac] ||= pseudonym.authentication_provider_id ||
-        @domain_root_account.canvas_authentication_provider&.id ||
-        @domain_root_account.authentication_providers.active.where(auth_type: 'ldap').first&.id
+        pseudonym.ldap_authentication_provider_used&.id ||
+        @domain_root_account.canvas_authentication_provider&.id
       successful_login(user, pseudonym)
     else
       unsuccessful_login t("Invalid username or password")

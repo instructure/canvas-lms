@@ -36,9 +36,10 @@ export default class FeatureFlagAdminView extends Backbone.View {
 
     this.prototype.els = {'.alert': '$alertBox'}
 
-    this.prototype.featureGroups = ['account', 'course', 'user']
+    this.prototype.featureGroups = ['siteadmin', 'account', 'course', 'user']
 
     this.prototype.titles = {
+      siteadmin: I18n.t('siteadmin', 'Site Admin'),
       account: I18n.t('account', 'Account'),
       course: I18n.t('course', 'Course'),
       user: I18n.t('user', 'User')
@@ -62,7 +63,7 @@ export default class FeatureFlagAdminView extends Backbone.View {
   }
 
   shouldShowTitles(features) {
-    const counts = _.map(this.featureGroups, key => features[key].length)
+    const counts = _.map(this.featureGroups, key => (features[key] ? features[key].length : 0))
     return _.reject(counts, count => count === 0).length > 1
   }
 

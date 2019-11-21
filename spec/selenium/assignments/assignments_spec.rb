@@ -617,14 +617,8 @@ describe "assignments" do
       close_visible_dialog
       f('.btn-primary[type=submit]').click
       wait_for_ajaximations
-      keep_trying_until do
-        expect(driver.execute_script(
-          "return $('.errorBox').filter('[id!=error_box_template]')"
-        )).to be_present
-      end
-      errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-      expect(visBoxes.first.text).to eq "Please create a group set"
+      error_box = f('.errorBox[role=alert]')
+      expect(f('.error_text', error_box).text).to eq "Please create a group set"
     end
 
     it "shows assignment details, un-editable, for concluded teachers", priority: "2", test_id: 626906 do
@@ -970,7 +964,7 @@ describe "assignments" do
     it "should not show the moderation page if it is not a moderated assignment ", priority: "2", test_id: 609653 do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
-      expect(f('#content h1').text).to eql "Page Not Found"
+      expect(f('#content h1').text).to eql "Woops... Looks like nothing is here!"
     end
   end
 

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const ModulesTray = () => (
@@ -29,13 +29,11 @@ const ModulesTray = () => (
     image="/images/tutorial-tray-images/module_tutorial.svg"
   >
     <Text as="p">
-      {
-          I18n.t(`Organize and segment your course by topic, unit, chapter,
+      {I18n.t(`Organize and segment your course by topic, unit, chapter,
                   or week. Sequence select modules by defining criteria and
-                  prerequisites.`)
-        }
+                  prerequisites.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default ModulesTray

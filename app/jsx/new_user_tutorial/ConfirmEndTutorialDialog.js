@@ -19,8 +19,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
+import {Button} from '@instructure/ui-buttons'
+import Modal from '../shared/components/InstuiModal'
 import axios from 'axios'
 
 const API_URL = '/api/v1/users/self/features/flags/new_user_tutorial_on_off'
@@ -33,12 +33,12 @@ export default function ConfirmEndTutorialDialog({isOpen, handleRequestClose}) {
       onDismiss={handleRequestClose}
       label={I18n.t('End Course Set-up Tutorial')}
     >
-      <ModalBody>
+      <Modal.Body>
         {I18n.t(
           'Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.'
         )}
-      </ModalBody>
-      <ModalFooter>
+      </Modal.Body>
+      <Modal.Footer>
         <Button onClick={handleRequestClose}>{I18n.t('Cancel')}</Button>
         &nbsp;
         <Button
@@ -49,7 +49,7 @@ export default function ConfirmEndTutorialDialog({isOpen, handleRequestClose}) {
         >
           {I18n.t('Okay')}
         </Button>
-      </ModalFooter>
+      </Modal.Footer>
     </Modal>
   )
 }

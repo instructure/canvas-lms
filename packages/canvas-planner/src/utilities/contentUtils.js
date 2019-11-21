@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-let externalConversion;
+let externalConversion
 
-export function initializeContent (options) {
-  externalConversion = options.convertApiUserContent;
+export function initializeContent(options) {
+  externalConversion = options.convertApiUserContent
 }
 
-export function convertApiUserContent (content) {
+export function convertApiUserContent(content) {
   // allow tests to work without initialization
   if (process.env.NODE_ENV === 'test') {
-    return content;
+    return content
   }
-  return externalConversion(content);
+  return externalConversion(content)
 }

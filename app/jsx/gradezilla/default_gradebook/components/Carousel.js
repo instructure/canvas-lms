@@ -18,9 +18,8 @@
 
 import React, {Component} from 'react'
 import {bool, func, node, string} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ArrowOpenStart from '@instructure/ui-icons/lib/Line/IconArrowOpenStart'
-import ArrowOpenEnd from '@instructure/ui-icons/lib/Line/IconArrowOpenEnd'
+import {Button} from '@instructure/ui-buttons'
+import {IconArrowOpenStartLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
 
 export default class Carousel extends Component {
   componentDidUpdate(prevProps) {
@@ -55,7 +54,7 @@ export default class Carousel extends Component {
         onClick={this.handleLeftArrowClick}
         size="small"
       >
-        <ArrowOpenStart title={this.props.leftArrowDescription} />
+        <IconArrowOpenStartLine title={this.props.leftArrowDescription} />
       </Button>
     )
 
@@ -69,7 +68,7 @@ export default class Carousel extends Component {
         onClick={this.handleRightArrowClick}
         size="small"
       >
-        <ArrowOpenEnd title={this.props.rightArrowDescription} />
+        <IconArrowOpenEndLine title={this.props.rightArrowDescription} />
       </Button>
     )
 
@@ -79,7 +78,7 @@ export default class Carousel extends Component {
           {this.props.displayLeftArrow && leftArrow}
         </div>
 
-        <div style={{flex: 1}}>{this.props.children}</div>
+        <div style={{flex: 1, minWidth: 0}}>{this.props.children}</div>
 
         <div className="right-arrow-button-container">
           {this.props.displayRightArrow && rightArrow}

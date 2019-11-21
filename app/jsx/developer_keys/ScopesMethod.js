@@ -17,22 +17,22 @@
  */
 import PropTypes from 'prop-types'
 import React from 'react'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
+import {Pill} from '@instructure/ui-elements'
 
 export default class ScopesMethod extends React.Component {
   methodColorMap() {
-    return({
+    return {
       get: 'primary',
       put: 'default',
       post: 'success',
       delete: 'danger'
-    })
+    }
   }
 
   themeOverride() {
-    return({
+    return {
       color: '#6D7883'
-    })
+    }
   }
 
   render() {

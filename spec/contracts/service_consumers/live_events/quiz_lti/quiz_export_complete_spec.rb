@@ -28,7 +28,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
       )
     end
 
-    it 'keeps the contract', skip: 'QUIZ-6827' do
+    it 'keeps the contract' do
       live_event.emit_with do
         params = {
           :name => "Quizzes.Next",

@@ -19,7 +19,7 @@
 import rubricEditing from 'edit_rubric'
 import EditRubricPage from 'compiled/views/rubrics/EditRubricPage'
 
-  document.addEventListener("rubricEditDataReady", e => {
-    new EditRubricPage
-    rubricEditing.init()
-  });
+document.addEventListener('rubricEditDataReady', e => {
+  new EditRubricPage()
+  rubricEditing.init()
+})

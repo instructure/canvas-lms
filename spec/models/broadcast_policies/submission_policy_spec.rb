@@ -199,12 +199,12 @@ module BroadcastPolicies
       specify { wont_send_when{ allow(policy).to receive(:user_has_visibility?).and_return(false)}}
     end
 
-    describe "#should_dispatch_assignment_unmuted?" do
+    describe "#should_dispatch_submission_posted?" do
       let_once(:course) { Course.create! }
+      let_once(:student) { User.create! }
       let(:assignment) { course.assignments.create! }
       let(:policy) { SubmissionPolicy.new(submission) }
       let(:submission) { assignment.submissions.find_by(user: student) }
-      let_once(:student) { User.create! }
 
       before(:once) do
         course.enroll_student(student)
@@ -219,27 +219,27 @@ module BroadcastPolicies
       it "returns true when the submission is being posted and the assignment posts manually" do
         submission.update!(posted_at: Time.zone.now)
         submission.grade_posting_in_progress = true
-        expect(policy.should_dispatch_assignment_unmuted?).to be true
+        expect(policy.should_dispatch_submission_posted?).to be true
       end
 
-      it "returns false when the submission is being posted and the assignment posts automatically" do
+      it "returns true when the submission is being posted and the assignment posts automatically" do
         assignment.ensure_post_policy(post_manually: false)
         submission.update!(posted_at: Time.zone.now)
         submission.grade_posting_in_progress = true
-        expect(policy.should_dispatch_assignment_unmuted?).to be false
+        expect(policy.should_dispatch_submission_posted?).to be true
       end
 
       it "returns false when Post Policies are not enabled" do
         course.disable_feature!(:new_gradebook)
         submission.update!(posted_at: Time.zone.now)
         submission.grade_posting_in_progress = true
-        expect(policy.should_dispatch_assignment_unmuted?).to be false
+        expect(policy.should_dispatch_submission_posted?).to be false
       end
 
       it "returns false when the submission was posted longer than an hour ago" do
         submission.update!(posted_at: 2.hours.ago)
         submission.grade_posting_in_progress = true
-        expect(policy.should_dispatch_assignment_unmuted?).to be false
+        expect(policy.should_dispatch_submission_posted?).to be false
       end
     end
   end

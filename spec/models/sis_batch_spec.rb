@@ -111,6 +111,24 @@ describe SisBatch do
     expect(observer_enrollment.reload.workflow_state).to eq 'active'
   end
 
+  it 'should create new linked observer enrollments when restoring enrollments' do
+    course = @account.courses.create!(name: 'one', sis_source_id: 'c1', workflow_state: 'available')
+    user = user_with_managed_pseudonym(account: @account, sis_user_id: 'u1')
+    observer = user_with_managed_pseudonym(account: @account)
+    student_enrollment = course.enroll_user(user, 'StudentEnrollment', enrollment_state: 'active')
+
+    batch = process_csv_data([%{course_id,user_id,role,status,section_id
+                                c1,u1,student,deleted,}])
+    expect(student_enrollment.reload.workflow_state).to eq 'deleted'
+    UserObservationLink.create_or_restore(observer: observer, student: user, root_account: @account)
+    expect(course.observer_enrollments.where(:user_id => observer).take).to be_nil # doesn't make a new enrollment    
+    batch.restore_states_for_batch
+    run_jobs
+    expect(student_enrollment.reload.workflow_state).to eq 'active'
+    observer_enrollment = course.observer_enrollments.where(:user_id => observer).take # until now
+    expect(observer_enrollment.workflow_state).to eq 'active'
+  end
+
   it "should not add attachments to the list" do
     create_csv_data(['abc']) { |batch| expect(batch.attachment.position).to be_nil}
     create_csv_data(['abc']) { |batch| expect(batch.attachment.position).to be_nil}

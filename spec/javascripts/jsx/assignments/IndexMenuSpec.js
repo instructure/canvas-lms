@@ -80,7 +80,7 @@ testCase('renders a dropdown menu trigger and options list', () => {
 })
 
 testCase('renders a LTI tool modal', () => {
-  const component = renderComponent(generateProps({}))
+  const component = renderComponent(generateProps({}, {modalIsOpen: true}))
 
   const modals = TestUtils.scryRenderedComponentsWithType(component, Modal)
   equal(modals.length, 1)
@@ -94,8 +94,7 @@ testCase('Modal visibility agrees with state modalIsOpen', () => {
   equal(modal1.props.isOpen, true)
 
   const component2 = renderComponent(generateProps({}, {modalIsOpen: false}))
-  const modal2 = TestUtils.findRenderedComponentWithType(component2, Modal)
-  equal(modal2.props.isOpen, false)
+  equal(TestUtils.scryRenderedComponentsWithType(component2, Modal).length, 0)
   component1.closeModal()
   component2.closeModal()
   ReactDOM.unmountComponentAtNode(component1.node.parentElement)

@@ -346,7 +346,7 @@
         </td>
       </tr>
       <tr>
-        <td class="form-label"><%= f.label :license, :en => "License" %></td>
+        <td class="form-label"><label for="course_license"><%= before_label('license', %{License}) %></label></td>
         <td colspan="3">
           <% if can_manage %>
             <% cc, non_cc = Course.licenses.map { |id, attrs| [attrs[:readable_license].call, id]}.partition{|n, id| id.start_with?('cc')} %>
@@ -360,11 +360,16 @@
           <% end %>
         </td>
       </tr><tr>
+        <td class="form-label"><%= f.blabel :usage_rights_required, :en => "File Copyright" %></td>
+        <td id="usage_rights_required"><%= f.check_box :usage_rights_required, :disabled => !can_manage || @context.account.usage_rights_required[:locked] %>
+          <%= f.label :usage_rights_required, t('Copyright and license information must be provided for files before they are published.') %>
+        </td>
+      </tr><tr>
         <td class="form-label"><label for="course_visibility"><%= before_label('course_visibility', %{Visibility}) %></label></td>
         <td colspan="3" id="course_visibility">
-          <% if can_manage %>
+          <% if can_do(@context, @current_user, :manage_course_visibility) %>
             <span>
-              <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] }, {},  {"aria-label" => t("Course Visibility Options")} %>
+              <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] }, {}, {"aria-label" => t("Course Visibility Options")} %>
               <%= visibility_help_link %>
             </span>
             <div class="panel-border">
@@ -377,12 +382,27 @@
                 </div>
               <% end %>
             </div>
+            <br/>
+            <div class="public_options">
+              <%= f.check_box :indexed %>
+              <%= f.label :indexed, :en => "Include this course in the public course index" %>
+            </div>
+          <% else %>
+            <div>
+              <%= @context.course_visibility == 'course' ?
+                  t('If you need to make your course public please contact your administrator/support.') :
+                  t('Contact your administrator if you need to change course visibility.') %>
+            </div>
+            <span>
+              <% vis_value = @context.course_visibility_options[@context.course_visibility][:setting] %>
+              <%= f.select :course_visibility, [[vis_value, @context.course_visibility]], {}, {"disabled" => true, "aria-label" => t("Course Visibility Options")} %>
+              <%= visibility_help_link %>
+            </span>
+            <div class="public_options">
+              <%= f.check_box :indexed, disabled: true %>
+              <%= f.label :indexed, en: "Include this course in the public course index" %>
+            </div>
           <% end %>
-          <br/>
-          <div class="public_options">
-            <%= f.check_box :indexed, :disabled => !can_manage %>
-            <%= f.label :indexed, :en => "Include this course in the public course index" %>
-          </div>
         </td>
       </tr><tr>
         <td class="form-label"><label for="course_course_format"><%= before_label('course_format', %{Format}) %></label></td>
@@ -428,7 +448,7 @@
       </tr><tr>
         <td></td>
         <td colspan="3">
-          <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? %>">
+          <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? && !is_master_course %>">
             <% if @context.root_account.self_registration? %>
               <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
                     This course has enabled open enrollment. Students can

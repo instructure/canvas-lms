@@ -514,6 +514,7 @@ he:
         checking_settings: "בודק הגדרות Turnitin..."
         invalid_settings: "הגדרות Turnitin לא תקינות, אנא בדוק את מזהה החשבון ואת הערך הסודי המשותף מ- Turnitin"
         setings_confirmed: "הגדרות Turnitin אושרו!"
+    siteadmin: "מנהל אתר"
     titles: 
       configure_report: "הגדרת דו\"ח"
       open_registration_delegated_warning_dialog: "מנגנון הזדהות חיצוני מופעל"
@@ -1260,6 +1261,7 @@ he:
         domain: דומיין
         edit_institution_email: "המשתמשים יכולים לבטל את כתובת הדוא\"ל  שהוקצתה להם ע\"י הארגון"
         enable_alerts: "התראות (בטא)"
+        enable_course_catalog: "הצגת רשימה ניתנת לחיפוש של קורסים מחשבון בסיס זה המאפשרים \"הכללת קורס זה באינדקס הקורסים הפתוחים לכל\" "
         enable_eportfolios: ePortfolios
         enable_profiles: "אפשור פרופילי משתמש"
         enable_turnitin: Turnitin
@@ -1707,6 +1709,7 @@ he:
     default_name: "אין שם"
   add_collaboration_da9665ac: "הוספת שיתוף פעולה"
   add_contact_method_d2dfea03: "הוספת אופן התקשרות"
+  add_content_58b4305a: "הוספת תוכן"
   add_content_to_module_name_589a8d54: "הוספת תוכן ל %{module_name}"
   add_course_406cb773: "הוספת קורס"
   add_course_assignments_628ed6d0: "הוספת משימות קורס"
@@ -1741,6 +1744,7 @@ he:
   add_people_7ee4b2ec: "הוספת אנשים"
   add_people_to_coursename_5ea234e1: "הוספת אנשים אל: %{courseName}"
   add_proficiency_rating_d819f6b8: "הוספת דירוג מומחיות"
+  add_quiz_cebfa28b: "הוספת בוחן"
   add_quiz_ip_filter_c7b37dc5: "הוספת כתובת IP למסנן בוחן"
   add_rating_89d7fbde: "הוספת דירוג"
   add_recipient_ff135ed7: "הוספת נמען"
@@ -8967,6 +8971,7 @@ he:
   graphql_api_af4deb45: "GraphQL API"
   graphs_89fcfeb: גרפים
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "מצויין, כעת יש לך קורס. מה הלאה? ובכן, לפני שמפרסמים אותו לעולם, כדאי לוודא שהבסיס טופל כהלכה. מוצע לעבור על רשימת התיוג שבצד הדף כדי לוודא שהקורס מוכן לשימוש."
+  greek_65c5b3f7: יוונית
   green_15af4778: ירוק
   group: 
     greater_than_1: "חייב להיות גדול מ 1"
@@ -9962,6 +9967,7 @@ he:
   label_3c9a991: "%{label}:"
   labels: 
     lock_module_until: "נעילה עד"
+  language_6b3e2c7c: שפה
   last_enrollment_activity_10fe15ba: "פעילות הרשמה אחרונה"
   last_export_899a04c5: "ייצוא אחרון:"
   last_first_name_95a078f5: "שם משפחה, פרטי"
@@ -10195,6 +10201,7 @@ he:
     error_loading_banks: "שגיאה בטעינת מאגרים"
     loading_banks: "טוען מאגרים..."
   load_more_9ca37ccc: "טעינה של עוד..."
+  load_more_a36f9cf9: "טענו עוד"
   load_more_results_460f49a9: "טעינת תוצאות נוספות"
   loaded_more_collaborations_13f1d630: "נטענו שיתופים נוספים"
   loading_25990131: טוען...
@@ -10427,6 +10434,7 @@ he:
   manage_update_for_toolname_f8e3b2fb: "ניהול עדכונים עבור %{toolName}"
   manage_usage_rights_c5a8c216: "ניהול זכויות שימוש"
   manage_your_course_details_664c335f: "ניהול פרטי הקורס שלך"
+  manual_8c2665de: ידני
   manual_entry_e4a4f99a: "מופע ידני"
   manually_mark_posts_as_read_afa5d035: "סימון ידני של פרסומים כנקראו"
   mark_as_done_6fa48d2f: "סימון כבוצע"
@@ -10534,6 +10542,7 @@ he:
   media_recording_77cddc52: "הקלטת מדיה"
   media_recording_submission_b7fd1491: "הגשת הקלטת מדיה"
   media_recordings_749aef6d: "הקלטות מדיה"
+  media_submission_464829f0: "הגשת מדיה"
   median_ed291842: חציון
   median_score_4657e907: "חציון: %{score}"
   meets_expectations_bb179565: "עונה על הציפיות"
@@ -12136,6 +12145,11 @@ he:
         submitted_date: "הוגש: %{date}"
       twitter: 
         body: "התראת קנבס - בוחן הוגש: %{quiz}, %{user_name}"
+    submission_posted: 
+      email: 
+        html: 
+          body: "המרצה הפיץ עדכוני ציונים והערות על %{title}. כעת ניתן לצפות בעדכונים אלה."
+          link: "ניתן לראות זאת כאן "
     summaries: 
       email: 
         daily_body: "נרשמת לקבלת דוח יומי של כמה מהתראות מחשבון הקנבס שלך. ראה בהמשך את הדוח מתאריך %{date}:"
@@ -12303,6 +12317,7 @@ he:
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "אין אפשרות להפעיל הערכה מבוקרת עבור משימות ללא הערכה"
   moderator_49b9f2e1: מפקח
   moderator_sortorder_18063692: "מנחה%{sortOrder}"
+  modified_by_c1584b3c: "עודכן ע\"י"
   module_90d9fd32: מודול
   module_completed_50c50762: "המודול הושלם"
   module_filter_63b17d11: "מסנן מודולים"
@@ -12624,6 +12639,7 @@ he:
   no_placements_enabled_f705f28: "לא הופעלו הצבות"
   no_points_possible_368669d: "אין ניקוד אפשרי"
   no_points_possible_72db3a55: "אין ניקוד אפשרי"
+  no_results_3cda4e72: "אין תוצאות"
   no_results_f36777ee: "אין תוצאות"
   no_results_found_58717065: "לא נמצאו תוצאות"
   no_score_yet_c94e919b: "אין ציון עדיין"
@@ -18015,6 +18031,7 @@ he:
   sync_to_posttosisname_9837a8bf: "התאמה עם %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "התאמה עם %{postToSISName}"
   system_default_language_28a1052d: "שפת ברירת מחדל של המערכת (%{language})"
+  ta_8d966626: "עוזר הוראה"
   tab_1_3d6b3fb: "לשונית 1"
   tab_1_content_8944c219: "תוכן לשונית 1"
   tab_2_9adfe241: "לשונית 2"
@@ -19697,6 +19714,11 @@ he:
   your_email_b5364bee: "כתובת הדוא\"ל שלך"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "הקובץ שלך מועלה כעת לספר הציונים, וניתן לעזוב דף זה בכל עת. אם יש לך קובץ CSV גדול, עדכון השינויים יכול להמשך כמה דקות. כדי למנוע דריסת נתונים כלשהם, בבקשה לוודא שההעלאה הושלמה וספר הציונים שלך נכון, לפני המשך ביצוע שינויים. "
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "הקובץ שלך מועלה כעת לספר הציונים, וניתן לעזוב דף זה בכל עת. אם יש לך קובץ CSV גדול, עדכון השינויים יכול להמשך כמה דקות. כדי למנוע דריסת נתונים כלשהם, בבקשה לוודא שההעלאה הושלמה וספר הציונים שלך נכון, לפני המשך ביצוע שינויים. "
+  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
+      המנחה שלך פרסם שינויי הערכה והערות חדשות עבור %{title}. שנויים אלו ניתנים כעת לצפייה.
+      
+      ניתן לעיין בהם כאן:
+      %{url}
   your_message_has_been_sent_thank_you_e0284316: "הודעתך נשלחה, תודה!"
   your_message_was_sent_977f6583: "הודעתך נשלחהֱ!"
   your_name_7665e1d8: שמך

@@ -29,7 +29,6 @@ import SpeedgraderLinkView from 'compiled/views/assignments/SpeedgraderLinkView'
 import vddTooltip from 'compiled/util/vddTooltip'
 import MarkAsDone from 'compiled/util/markAsDone'
 import CyoeStats from '../conditional_release_stats/index'
-import 'compiled/jquery/ModuleSequenceFooter'
 import 'jquery.instructure_forms'
 import LockManager from '../blueprint_courses/apps/LockManager'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
@@ -37,17 +36,20 @@ import StudentGroupFilter from '../shared/StudentGroupFilter'
 import SpeedGraderLink from '../shared/SpeedGraderLink'
 
 const lockManager = new LockManager()
-lockManager.init({ itemType: 'assignment', page: 'show' })
+lockManager.init({itemType: 'assignment', page: 'show'})
 
 function onStudentGroupSelected(selectedStudentGroupId) {
   if (selectedStudentGroupId !== '0') {
-    axios.put(`/api/v1/courses/${ENV.COURSE_ID}/gradebook_settings`, qs.stringify({
-      gradebook_settings: {
-        filter_rows_by: {
-          student_group_id: selectedStudentGroupId
+    axios.put(
+      `/api/v1/courses/${ENV.COURSE_ID}/gradebook_settings`,
+      qs.stringify({
+        gradebook_settings: {
+          filter_rows_by: {
+            student_group_id: selectedStudentGroupId
+          }
         }
-      }
-    }))
+      })
+    )
 
     ENV.selected_student_group_id = selectedStudentGroupId
     renderStudentGroupFilter()
@@ -56,7 +58,8 @@ function onStudentGroupSelected(selectedStudentGroupId) {
 }
 
 function renderSpeedGraderLink() {
-  const disabled = ENV.SETTINGS.filter_speed_grader_by_student_group && !ENV.selected_student_group_id
+  const disabled =
+    ENV.SETTINGS.filter_speed_grader_by_student_group && !ENV.selected_student_group_id
   const $mountPoint = document.getElementById('speed_grader_link_mount_point')
 
   if ($mountPoint) {
@@ -87,6 +90,7 @@ function renderStudentGroupFilter() {
   }
 }
 
+const promiseToGetModuleSequenceFooter = import('compiled/jquery/ModuleSequenceFooter')
 $(() => {
   const $el = $('#assignment_publish_button')
   if ($el.length > 0) {
@@ -97,8 +101,7 @@ $(() => {
     })
     model.doNotParse()
 
-    new SpeedgraderLinkView({model, el: '#assignment-speedgrader-link'})
-        .render()
+    new SpeedgraderLinkView({model, el: '#assignment-speedgrader-link'}).render()
     const pbv = new PublishButtonView({model, el: $el})
     pbv.render()
 
@@ -107,24 +110,26 @@ $(() => {
     pbv.on('unpublish', () => $('#moderated_grading_button').hide())
   }
 
-    // Add module sequence footer
-  $('#sequence_footer').moduleSequenceFooter({
-    courseID: ENV.COURSE_ID,
-    assetType: 'Assignment',
-    assetID: ENV.ASSIGNMENT_ID,
-    location
+  // Add module sequence footer
+  promiseToGetModuleSequenceFooter.then(() => {
+    $('#sequence_footer').moduleSequenceFooter({
+      courseID: ENV.COURSE_ID,
+      assetType: 'Assignment',
+      assetID: ENV.ASSIGNMENT_ID,
+      location: window.location
+    })
   })
 
   return vddTooltip()
 })
 
 $(() =>
-  $('#content').on('click', '#mark-as-done-checkbox', function () {
+  $('#content').on('click', '#mark-as-done-checkbox', function() {
     return MarkAsDone.toggle(this)
   })
 )
 
-  // -- This is all for the _grade_assignment sidebar partial
+// -- This is all for the _grade_assignment sidebar partial
 $(() => {
   if (ENV.speed_grader_url) {
     if (ENV.SETTINGS.filter_speed_grader_by_student_group) {
@@ -136,18 +141,18 @@ $(() => {
 })
 
 $(() => {
-  $('.upload_submissions_link').click((event) => {
+  $('.upload_submissions_link').click(event => {
     event.preventDefault()
     $('#re_upload_submissions_form').slideToggle()
   })
 
-  $('.download_submissions_link').click(function (event) {
+  $('.download_submissions_link').click(function(event) {
     event.preventDefault()
     INST.downloadSubmissions($(this).attr('href'))
     $('.upload_submissions_link').slideDown()
   })
 
-  $('#re_upload_submissions_form').submit(function (event) {
+  $('#re_upload_submissions_form').submit(function(event) {
     const data = $(this).getFormData()
     if (!data.submissions_zip) {
       event.preventDefault()
@@ -156,7 +161,8 @@ $(() => {
       event.preventDefault()
       event.stopPropagation()
       $(this).formErrors({
-        submissions_zip: I18n.t('Please upload files as a .zip')})
+        submissions_zip: I18n.t('Please upload files as a .zip')
+      })
     }
   })
 
@@ -176,8 +182,9 @@ $(() => {
   if (document.getElementById('assignment_external_tools')) {
     AssignmentExternalTools.attach(
       document.getElementById('assignment_external_tools'),
-      "assignment_view",
+      'assignment_view',
       parseInt(ENV.COURSE_ID, 10),
-      parseInt(ENV.ASSIGNMENT_ID, 10));
+      parseInt(ENV.ASSIGNMENT_ID, 10)
+    )
   }
 })

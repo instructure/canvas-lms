@@ -705,12 +705,16 @@ This text has a http://www.google.com link in it...
         @submission.update!(attempt: nil)
       end
 
-      it 'raises an error if the submission_comment attempt is greater than 0' do
-        expect { @submission.submission_comments.create!(valid_attributes.merge(attempt: 1)) }.to raise_error(ActiveRecord::RecordInvalid)
+      it 'raises an error if the submission_comment attempt is greater than 1' do
+        expect { @submission.submission_comments.create!(valid_attributes.merge(attempt: 2)) }.to raise_error(ActiveRecord::RecordInvalid)
       end
 
       it 'does not raise an error if the submission_comment attempt is equal to 0' do
         expect { @submission.submission_comments.create!(valid_attributes.merge(attempt: 0)) }.not_to raise_error
+      end
+
+      it 'does not raise an error if the submission_comment attempt is equal to 1' do
+        expect { @submission.submission_comments.create!(valid_attributes.merge(attempt: 1)) }.not_to raise_error
       end
     end
 

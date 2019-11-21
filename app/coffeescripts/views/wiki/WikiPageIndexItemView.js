@@ -34,7 +34,8 @@ export default class WikiPageIndexItemView extends Backbone.View {
     this.prototype.els = {
       '.wiki-page-link': '$wikiPageLink',
       '.publish-cell': '$publishCell',
-      '.master-content-lock-cell': '$lockCell'
+      '.master-content-lock-cell': '$lockCell',
+      'a.al-trigger': '$settingsMenu'
     }
     this.prototype.events = {
       'click a.al-trigger': 'settingsMenu',
@@ -231,7 +232,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
           .find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
-    });
+    })
   }
 
   useAsFrontPage(ev) {
@@ -257,17 +258,17 @@ export default class WikiPageIndexItemView extends Backbone.View {
         const cogs = $('.collectionViewItems').find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
-    });
+    })
   }
 
   sendWikiPageTo(ev) {
     ev.preventDefault()
-    console.log(`send page ${this.model.get('page_id')} to user`)
+    this.indexView.setSendToItem(this.model, this.$settingsMenu)
   }
 
   copyWikiPageTo(ev) {
     ev.preventDefault()
-    console.log(`copy page ${this.model.get('page_id')} to course`)
+    this.indexView.setCopyToItem(this.model, this.$settingsMenu)
   }
 }
 WikiPageIndexItemView.initClass()

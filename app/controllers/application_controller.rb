@@ -76,6 +76,8 @@ class ApplicationController < ActionController::Base
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
   after_action :add_csp_for_root
+  after_action :teardown_live_events_context
+
   # multiple actions might be called on a single controller instance in specs
   before_action :clear_js_env if Rails.env.test?
 
@@ -119,74 +121,94 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {}, overwrite = false)
+
     return {} unless request.format.html? || request.format == "*/*" || @include_js_env
+
+    if hash.present? && @js_env_has_been_rendered
+      add_to_js_env(hash, (@js_env_data_we_need_to_render_later ||= {}), overwrite)
+      return
+    end
+
     # set some defaults
     unless @js_env
-      editor_css = [
-        active_brand_config_url('css'),
-        view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
-      ]
+      benchmark("init @js_env") do
+        editor_css = [
+          active_brand_config_url('css'),
+          view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
+        ]
 
-      editor_hc_css = [
-        active_brand_config_url('css', { force_high_contrast: true }),
-        view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor', false, { force_high_contrast: true }))
-      ]
+        editor_hc_css = [
+          active_brand_config_url('css', { force_high_contrast: true }),
+          view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor', false, { force_high_contrast: true }))
+        ]
 
-      @js_env = {
-        ASSET_HOST: Canvas::Cdn.add_brotli_to_host_if_supported(request),
-        active_brand_config_json_url: active_brand_config_url('json'),
-        url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
-        url_for_high_contrast_tinymce_editor_css: editor_hc_css,
-        current_user_id: @current_user.try(:id),
-        current_user_roles: @current_user.try(:roles, @domain_root_account),
-        current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
-        files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
-        DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
-        k12: k12?,
-        use_responsive_layout: use_responsive_layout?,
-        use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
-        use_unsplash_image_search: PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
-        help_link_name: help_link_name,
-        help_link_icon: help_link_icon,
-        use_high_contrast: @current_user.try(:prefers_high_contrast?),
-        LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances(request.user_agent),
-        DEEP_LINKING_POST_MESSAGE_ORIGIN: request.base_url,
-        DEEP_LINKING_LOGGING: Setting.get('deep_linking_logging', nil),
-        SETTINGS: {
-          open_registration: @domain_root_account.try(:open_registration?),
-          collapse_global_nav: @current_user.try(:collapse_global_nav?),
-          show_feedback_link: show_feedback_link?
-        },
-      }
-      @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
-      @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
-      @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
-      @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
-      @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
-      @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
-      @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
-      unless @js_env[:LOCALE]
-        I18n.set_locale_with_localizer
-        @js_env[:LOCALE] = I18n.locale.to_s
-        @js_env[:BIGEASY_LOCALE] = I18n.bigeasy_locale
-        @js_env[:FULLCALENDAR_LOCALE] = I18n.fullcalendar_locale
-        @js_env[:MOMENT_LOCALE] = I18n.moment_locale
-      end
+        @js_env = {
+          ASSET_HOST: Canvas::Cdn.add_brotli_to_host_if_supported(request),
+          active_brand_config_json_url: active_brand_config_url('json'),
+          url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
+          url_for_high_contrast_tinymce_editor_css: editor_hc_css,
+          current_user_id: @current_user.try(:id),
+          current_user_roles: @current_user.try(:roles, @domain_root_account),
+          current_user_disabled_inbox: @current_user.try(:disabled_inbox?),
+          files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
+          DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
+          k12: k12?,
+          use_responsive_layout: use_responsive_layout?,
+          use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
+          DIRECT_SHARE_ENABLED: @domain_root_account.try(:feature_enabled?, :direct_share),
+          help_link_name: help_link_name,
+          help_link_icon: help_link_icon,
+          use_high_contrast: @current_user.try(:prefers_high_contrast?),
+          LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances(request.user_agent),
+          DEEP_LINKING_POST_MESSAGE_ORIGIN: request.base_url,
+          DEEP_LINKING_LOGGING: Setting.get('deep_linking_logging', nil),
+          SETTINGS: {
+            open_registration: @domain_root_account.try(:open_registration?),
+            collapse_global_nav: @current_user.try(:collapse_global_nav?),
+            show_feedback_link: show_feedback_link?
+          },
+        }
+        @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
+        @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
+        @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
+        @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
+        @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
+        @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
+        @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
+        unless @js_env[:LOCALE]
+          I18n.set_locale_with_localizer
+          @js_env[:LOCALE] = I18n.locale.to_s
+          @js_env[:BIGEASY_LOCALE] = I18n.bigeasy_locale
+          @js_env[:FULLCALENDAR_LOCALE] = I18n.fullcalendar_locale
+          @js_env[:MOMENT_LOCALE] = I18n.moment_locale
+        end
 
-      @js_env[:lolcalize] = true if ENV['LOLCALIZE']
-    end
-
-    hash.each do |k,v|
-      if @js_env[k] && !overwrite
-        raise "js_env key #{k} is already taken"
-      else
-        @js_env[k] = v
+        @js_env[:lolcalize] = true if ENV['LOLCALIZE']
       end
     end
+
+    add_to_js_env(hash, @js_env, overwrite)
 
     @js_env
   end
   helper_method :js_env
+
+  def add_to_js_env(hash, jsenv, overwrite)
+    hash.each do |k,v|
+      if jsenv[k] && !overwrite
+        raise "js_env key #{k} is already taken"
+      else
+        jsenv[k] = v
+      end
+    end
+  end
+
+  def render_js_env
+    res = StringifyIds.recursively_stringify_ids(js_env.clone).to_json
+    @js_env_has_been_rendered = true
+    res
+  end
+  helper_method :render_js_env
 
   # add keys to JS environment necessary for the RCE at the given risk level
   def rce_js_env(domain: request.env['HTTP_HOST'])
@@ -229,21 +251,24 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def external_tools_display_hashes(type, context=@context, custom_settings=[])
+  def external_tools_display_hashes(type, context=@context, custom_settings=[], tool_ids: nil)
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
     tools = ContextExternalTool.all_tools_for(context, {:placements => type,
-      :root_account => @domain_root_account, :current_user => @current_user}).to_a
+      :root_account => @domain_root_account, :current_user => @current_user,
+      :tool_ids => tool_ids}).to_a
 
-    tools.select!{|tool|
-      tool.visible_with_permission_check?(type, @current_user, context, session)
-    }
+    tools.select! do |tool|
+      tool.visible_with_permission_check?(type, @current_user, context, session) &&
+        tool.feature_flag_enabled?(context)
+    end
 
     tools.map do |tool|
       external_tool_display_hash(tool, type, {}, context, custom_settings)
     end
   end
+  helper_method :external_tools_display_hashes
 
   def external_tool_display_hash(tool, type, url_params={}, context=@context, custom_settings=[])
     url_params = {
@@ -252,9 +277,11 @@ class ApplicationController < ActionController::Base
     }.merge(url_params)
 
     hash = {
+      :id => tool.id,
       :title => tool.label_for(type, I18n.locale),
       :base_url =>  polymorphic_url([context, :external_tool], url_params)
     }
+    hash.merge!(:tool_id => tool.tool_id) if tool.tool_id.present?
 
     extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
     extension_settings.each do |setting|
@@ -317,6 +344,11 @@ class ApplicationController < ActionController::Base
     css_bundle :blueprint_courses
 
     master_course = is_master ? @context : MasterCourses::MasterTemplate.master_course_for_child_course(@context)
+    if master_course.nil?
+      # somehow the is_child_course? value is cached but we can't actually find the subscription so clear the cache and bail
+      Rails.cache.delete(MasterCourses::ChildSubscription.course_cache_key(@context))
+      return
+    end
     bc_data = {
       isMasterCourse: is_master,
       isChildCourse: is_child,
@@ -921,13 +953,16 @@ class ApplicationController < ActionController::Base
       case state
       when :invited
         if @context_enrollment.available_at
-          flash[:html_notice] = mt "You'll need to accept the enrollment invitation before you can fully participate in this course, starting on %{date}.",
-            :date => datetime_string(@context_enrollment.available_at)
+          flash[:html_notice] = t("You'll need to *accept the enrollment invitation* before you can fully participate in this course, starting on %{date}.",
+            :wrapper => view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)),
+            :date => datetime_string(@context_enrollment.available_at))
         else
-          flash[:html_notice] = mt "You'll need to accept the enrollment invitation before you can fully participate in this course."
+          flash[:html_notice] = t("You'll need to *accept the enrollment invitation* before you can fully participate in this course.",
+            :wrapper => view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)))
         end
       when :accepted
-        flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.", :date => datetime_string(@context_enrollment.available_at))
+        flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.",
+          :date => datetime_string(@context_enrollment.available_at))
       end
     end
   end
@@ -1048,8 +1083,7 @@ class ApplicationController < ActionController::Base
       @context = @membership.group unless @problem
       @current_user = @membership.user unless @problem
     elsif pieces[0] == 'user'
-      @current_user = UserPastLtiId.where(user_uuid: pieces[1]).take&.user
-      @current_user ||= User.where(uuid: pieces[1]).first
+      find_user_from_uuid(pieces[1])
       @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid." unless @current_user
       @context = @current_user
     else
@@ -1079,6 +1113,11 @@ class ApplicationController < ActionController::Base
       return false
     end
     @context
+  end
+
+  def find_user_from_uuid(uuid)
+    @current_user = UserPastLtiId.where(user_uuid: uuid).take&.user
+    @current_user ||= User.where(uuid: uuid).first
   end
 
   def discard_flash_if_xhr
@@ -1207,7 +1246,7 @@ class ApplicationController < ActionController::Base
   #
   # If asset is an AR model, then its asset_string will be used. If it's an array,
   # it should look like [ "subtype", context ], like [ "pages", course ].
-  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true)
+  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true, context: nil)
     # ideally this could just be `user = file_access_user` now, but that causes
     # problems with some integration specs where getting @files_domain set
     # reliably is... difficult
@@ -1246,10 +1285,16 @@ class ApplicationController < ActionController::Base
         }
       end
 
-      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
+      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level, context: context)
 
       @accessed_asset
     end
+  end
+
+  def log_api_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true)
+    return if in_app? # don't log duplicate accesses for API calls made by the Canvas front-end
+    return if params[:page].to_i > 1 # don't log duplicate accesses for pages after the first
+    log_asset_access(asset, asset_category, asset_group, level, membership_type, overwrite: overwrite)
   end
 
   def log_page_view
@@ -1635,7 +1680,7 @@ class ApplicationController < ActionController::Base
           @return_url = success_url
         else
           if @context
-            @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
+            @return_url = set_return_url
           else
             @return_url = external_content_success_url('external_tool_redirect')
           end
@@ -1703,6 +1748,19 @@ class ApplicationController < ActionController::Base
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
       redirect_to named_context_url(context, error_redirect_symbol)
     end
+  end
+
+  def set_return_url
+    ref = request.referer
+    # when flag is enabled, new quizzes quiz creation can only be initiated from quizzes page
+    # but we still use the assignment#new page to create the quiz.
+    # also handles launch from existing quiz on quizzes page.
+    if ref.present? && @assignment&.quiz_lti?
+      if (ref.include?('assignments/new') || ref =~ /courses\/*.\/quizzes/i) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+        return polymorphic_url([@context, :quizzes])
+      end
+    end
+    named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
   end
 
   def lti_launch_params(adapter)
@@ -1834,8 +1892,6 @@ class ApplicationController < ActionController::Base
         true
       elsif feature == :twitter
         !!Twitter::Connection.config
-      elsif feature == :linked_in
-        !!LinkedIn::Connection.config
       elsif feature == :diigo
         !!Diigo::Connection.config
       elsif feature == :google_drive
@@ -2419,58 +2475,62 @@ class ApplicationController < ActionController::Base
   end
 
   def setup_live_events_context
-    ctx = {}
+    benchmark("setup_live_events_context") do
+      ctx = {}
 
-    if @domain_root_account
-      ctx[:root_account_uuid] = @domain_root_account.uuid
-      ctx[:root_account_id] = @domain_root_account.global_id
-      ctx[:root_account_lti_guid] = @domain_root_account.lti_guid
+      if @domain_root_account
+        ctx[:root_account_uuid] = @domain_root_account.uuid
+        ctx[:root_account_id] = @domain_root_account.global_id
+        ctx[:root_account_lti_guid] = @domain_root_account.lti_guid
+      end
+
+      if @current_pseudonym
+        ctx[:user_login] = @current_pseudonym.unique_id
+        ctx[:user_account_id] = @current_pseudonym.global_account_id
+        ctx[:user_sis_id] = @current_pseudonym.sis_user_id
+      end
+
+      ctx[:user_id] = @current_user.global_id if @current_user
+      ctx[:time_zone] = @current_user.time_zone if @current_user
+      ctx[:developer_key_id] = @access_token.developer_key.global_id if @access_token
+      ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
+      ctx[:context_type] = @context.class.to_s if @context
+      ctx[:context_id] = @context.global_id if @context
+      ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
+      ctx[:context_account_id] = Context.get_account_or_parent_account_global_id(@context) if @context
+
+      if @context_membership
+        ctx[:context_role] =
+          if @context_membership.respond_to?(:role)
+            @context_membership.role.name
+          elsif @context_membership.respond_to?(:type)
+            @context_membership.type
+          else
+            @context_membership.class.to_s
+          end
+      end
+
+      if tctx = Thread.current[:context]
+        ctx[:request_id] = tctx[:request_id]
+        ctx[:session_id] = tctx[:session_id]
+      end
+
+      ctx[:hostname] = request.host
+      ctx[:http_method] = request.method
+      ctx[:user_agent] = request.headers['User-Agent']
+      ctx[:client_ip] = request.remote_ip
+      ctx[:url] = request.url
+      # The Caliper spec uses the spelling "referrer", so use it in the Canvas output JSON too.
+      ctx[:referrer] = request.referer
+      ctx[:producer] = 'canvas'
+
+      if @domain_root_account&.feature_enabled?(:compact_live_event_payloads)
+        ctx[:compact_live_events] = true
+      end
+
+      StringifyIds.recursively_stringify_ids(ctx)
+      LiveEvents.set_context(ctx)
     end
-
-    if @current_pseudonym
-      ctx[:user_login] = @current_pseudonym.unique_id
-      ctx[:user_account_id] = @current_pseudonym.global_account_id
-      ctx[:user_sis_id] = @current_pseudonym.sis_user_id
-    end
-
-    ctx[:user_id] = @current_user.global_id if @current_user
-    ctx[:time_zone] = @current_user.time_zone if @current_user
-    ctx[:developer_key_id] = @access_token.developer_key.global_id if @access_token
-    ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
-    ctx[:context_type] = @context.class.to_s if @context
-    ctx[:context_id] = @context.global_id if @context
-    ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
-    ctx[:context_account_id] = Context.get_account_or_parent_account(@context)&.global_id if @context
-
-    if @context_membership
-      ctx[:context_role] =
-        if @context_membership.respond_to?(:role)
-          @context_membership.role.name
-        elsif @context_membership.respond_to?(:type)
-          @context_membership.type
-        else
-          @context_membership.class.to_s
-        end
-    end
-
-    if tctx = Thread.current[:context]
-      ctx[:request_id] = tctx[:request_id]
-      ctx[:session_id] = tctx[:session_id]
-    end
-
-    ctx[:hostname] = request.host
-    ctx[:http_method] = request.method
-    ctx[:user_agent] = request.headers['User-Agent']
-    ctx[:client_ip] = request.remote_ip
-    ctx[:url] = request.url
-    ctx[:producer] = 'canvas'
-
-    if @domain_root_account&.feature_enabled?(:compact_live_event_payloads)
-      ctx[:compact_live_events] = true
-    end
-
-    StringifyIds.recursively_stringify_ids(ctx)
-    LiveEvents.set_context(ctx)
   end
 
   # makes it so you can use the prefetch_xhr erb helper from controllers. They'll be rendered in _head.html.erb
@@ -2541,7 +2601,7 @@ class ApplicationController < ActionController::Base
       @streaming_template = true
       false
     else
-      Setting.get("disable_template_streaming_all", "false") != "true" &&
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_template_streaming"] &&
         Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
     end
   end

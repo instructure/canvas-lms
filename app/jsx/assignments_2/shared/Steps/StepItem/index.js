@@ -16,28 +16,65 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {element, func, oneOf, oneOfType, string} from 'prop-types'
-import React, {Component} from 'react'
-
 import ButtonContext from '../../../student/components/Context'
 import classNames from 'classnames'
-import I18n from 'i18n!assignments_2_shared_Steps_StepItem'
+import {element, oneOf, string} from 'prop-types'
+import I18n from 'i18n!assignments_2_shared_Steps'
+import React, {Component} from 'react'
 
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
-import IconArrowOpenStart from '@instructure/ui-icons/lib/Solid/IconArrowOpenStart'
-import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
-import IconLock from '@instructure/ui-icons/lib/Solid/IconLock'
-import IconPlus from '@instructure/ui-icons/lib/Solid/IconPlus'
-import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
-import px from '@instructure/ui-utils/lib/px'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {Button} from '@instructure/ui-buttons'
+import {
+  IconArrowOpenEndSolid,
+  IconArrowOpenStartSolid,
+  IconCheckMarkSolid,
+  IconLockSolid,
+  IconPlusSolid
+} from '@instructure/ui-icons'
+import {omitProps} from '@instructure/ui-react-utils'
+import {px} from '@instructure/ui-utils'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+
+export const stepLabels = {
+  get available() {
+    return I18n.t('Available')
+  },
+  get graded() {
+    return I18n.t('Graded')
+  },
+  get newAttempt() {
+    return I18n.t('New Attempt')
+  },
+  get next() {
+    return I18n.t('Next')
+  },
+  get notGradedYet() {
+    return I18n.t('Not Graded Yet')
+  },
+  get previous() {
+    return I18n.t('Previous')
+  },
+  get submit() {
+    return I18n.t('Submit')
+  },
+  get submitted() {
+    return I18n.t('Submitted')
+  },
+  get unavailable() {
+    return I18n.t('Unavailable')
+  },
+  get upload() {
+    return I18n.t('Upload')
+  },
+  get uploaded() {
+    return I18n.t('Uploaded')
+  }
+}
 
 class StepItem extends Component {
   static propTypes = {
-    status: oneOf(['button', 'complete', 'in-progress', 'unavailable']),
-    label: oneOfType([func, string, element]).isRequired,
+    status: oneOf(['button', 'complete', 'incomplete', 'in-progress', 'unavailable']),
+    label: string.isRequired,
     icon: element,
     pinSize: string,
     placement: oneOf(['first', 'last', 'interior'])
@@ -45,6 +82,21 @@ class StepItem extends Component {
 
   static defaultProps = {
     placement: 'interior'
+  }
+
+  getStatusI18n() {
+    switch (this.props.status) {
+      case 'button':
+        return I18n.t('button')
+      case 'complete':
+        return I18n.t('complete')
+      case 'incomplete':
+        return I18n.t('incomplete')
+      case 'in-progress':
+        return I18n.t('in-progress')
+      case 'unavailable':
+        return I18n.t('unavailable')
+    }
   }
 
   /**
@@ -60,19 +112,19 @@ class StepItem extends Component {
    * @param a11yMessage The message to be read by the screen reader
    *                    when focus is on the rendered button
    */
-  renderButton(ButtonIcon, action, a11yMessage) {
+  renderButton(ButtonIcon, action, a11yMessage, id) {
     const icon = <ButtonIcon size="x-small" />
     return (
       <div>
         <ApplyTheme
           theme={{
             [Button.theme]: {
-              iconColor: '#C1C8CD',
+              iconColor: '#828587',
               borderRadius: '2rem'
             }
           }}
         >
-          <Button variant="icon" icon={icon} size="small" onClick={action}>
+          <Button id={id} variant="icon" icon={icon} size="small" onClick={action}>
             <ScreenReaderContent>{a11yMessage} </ScreenReaderContent>
           </Button>
         </ApplyTheme>
@@ -86,23 +138,26 @@ class StepItem extends Component {
 
     if (!icon && status === 'button') {
       switch (this.props.label) {
-        case 'Previous':
+        case stepLabels.previous:
           return this.renderButton(
-            IconArrowOpenStart,
+            IconArrowOpenStartSolid,
             context.prevButtonAction,
-            I18n.t('View Previous Submission')
+            I18n.t('View Previous Submission'),
+            'view-previous-attempt-button'
           )
-        case 'Next':
+        case stepLabels.next:
           return this.renderButton(
-            IconArrowOpenEnd,
+            IconArrowOpenEndSolid,
             context.nextButtonAction,
-            I18n.t('View Next Submission')
+            I18n.t('View Next Submission'),
+            'view-next-attempt-button'
           )
-        case 'New Attempt':
+        case stepLabels.newAttempt:
           return this.renderButton(
-            IconPlus,
+            IconPlusSolid,
             context.startNewAttemptAction,
-            I18n.t('Create New Attempt')
+            I18n.t('Create New Attempt'),
+            'create-new-attempt-button'
           )
         default:
           return null
@@ -114,9 +169,9 @@ class StepItem extends Component {
 
   selectIcon(Icon, status) {
     if (!Icon && status === 'complete') {
-      return <IconCheckMark color="primary-inverse" />
+      return <IconCheckMarkSolid color="primary-inverse" />
     } else if (!Icon && status === 'unavailable') {
-      return <IconLock color="error" />
+      return <IconLockSolid color="error" />
     } else if (typeof Icon === 'function') {
       return <Icon />
     } else if (Icon) {
@@ -141,22 +196,11 @@ class StepItem extends Component {
     }
   }
 
-  renderLabel = () => {
-    const {label, status} = this.props
-    if (typeof label === 'function') {
-      return label(status)
-    } else {
-      return label
-    }
-  }
-
   render() {
-    const {status, placement} = this.props
-
     const classes = {
       'step-item-step': true,
-      [status]: true,
-      [`placement--${placement}`]: true
+      [this.props.status]: true,
+      [`placement--${this.props.placement}`]: true
     }
 
     return (
@@ -181,7 +225,12 @@ class StepItem extends Component {
             <ButtonContext.Consumer>{context => this.renderIcon(context)}</ButtonContext.Consumer>
           </span>
         </span>
-        <span className="step-item-label">{this.renderLabel()}</span>
+        <span className="step-item-label" aria-hidden>
+          {this.props.label}
+        </span>
+        {this.props.status !== 'button' && (
+          <ScreenReaderContent>{`${this.props.label} ${this.getStatusI18n()}`}</ScreenReaderContent>
+        )}
       </span>
     )
   }

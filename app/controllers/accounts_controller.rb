@@ -806,6 +806,12 @@ class AccountsController < ApplicationController
   # @argument account[settings][lock_all_announcements][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
   #
+  # @argument account[settings][usage_rights_required][value] [Boolean]
+  #   Copyright and license information must be provided for files before they are published.
+  #
+  # @argument account[settings][usage_rights_required][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
   # @argument account[settings][restrict_student_future_listing][value] [Boolean]
   #   Restrict students from viewing future enrollments in course list
   #
@@ -839,6 +845,11 @@ class AccountsController < ApplicationController
               @account.settings[:encrypted_slack_key_salt] = salt
             end
           end
+        end
+
+        pronouns = params[:account].delete :pronouns
+        if pronouns && !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:account_pronouns)
+          @account.pronouns = pronouns
         end
 
         custom_help_links = params[:account].delete :custom_help_links
@@ -986,6 +997,7 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :read)
       load_course_right_side
       @account_users = @account.account_users.active
+      @account_user_permissions_cache = AccountUser.create_permissions_cache(@account_users, @current_user, session)
       ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
       order_hash = {}
       @account.available_account_roles.each_with_index do |role, idx|
@@ -1407,13 +1419,13 @@ class AccountsController < ApplicationController
   PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords, :admins_can_view_notifications,
                                    :allow_invitation_previews, :allow_sending_scores_in_emails,
                                    :author_email_in_notifications, :canvadocs_prefer_office_online,
-                                   :consortium_parent_account, :consortium_can_create_own_accounts,
+                                   :consortium_parent_account, :consortium_can_create_own_accounts, :can_add_pronouns,
                                    :shard_per_account, :consortium_autocreate_web_of_trust,
                                    :consortium_autocreate_reverse_trust,
                                    :default_storage_quota, :default_storage_quota_mb,
                                    :default_group_storage_quota, :default_group_storage_quota_mb,
                                    :default_user_storage_quota, :default_user_storage_quota_mb, :default_time_zone,
-                                   :edit_institution_email, :enable_alerts, :enable_eportfolios,
+                                   :edit_institution_email, :enable_alerts, :enable_eportfolios, :enable_course_catalog,
                                    {:enable_offline_web_export => [:value]}.freeze,
                                    :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
                                    :equella_teaser, :external_notification_warning, :global_includes,
@@ -1437,6 +1449,7 @@ class AccountsController < ApplicationController
                                    :strict_sis_check, :storage_quota, :students_can_create_courses,
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
+                                   {:usage_rights_required => [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view].freeze
 
   def permitted_account_attributes

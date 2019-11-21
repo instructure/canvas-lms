@@ -22,7 +22,6 @@ import template from 'jst/quizzes/QuizItemGroupView'
 import QuizItemView from './QuizItemView'
 
 export default class ItemGroupView extends CollectionView {
-
   static initClass() {
     this.prototype.template = template
     this.prototype.itemView = QuizItemView
@@ -72,8 +71,8 @@ export default class ItemGroupView extends CollectionView {
     const title = model.get('title').toLowerCase()
     let numMatches = 0
     const keys = term.toLowerCase().split(' ')
-    for (let part of keys) {
-      //not using match to avoid javascript string to regex oddness
+    for (const part of keys) {
+      // not using match to avoid javascript string to regex oddness
       if (title.indexOf(part) !== -1) {
         numMatches++
       }

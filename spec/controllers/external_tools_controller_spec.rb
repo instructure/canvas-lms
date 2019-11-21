@@ -1037,7 +1037,7 @@ describe ExternalToolsController do
         let(:params) { raise "Override in specs" }
 
         before do
-          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(xml_response)
+          allow(CanvasHttp).to receive(:get).and_return(xml_response)
           ContextExternalTool.create!(
             context: @course,
             name: 'first tool',
@@ -1323,7 +1323,7 @@ describe ExternalToolsController do
 </cartridge_basiclti_link>
       XML
       obj = OpenStruct.new({:body => xml})
-      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(obj)
+      allow(CanvasHttp).to receive(:get).and_return(obj)
       post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}}, :format => "json"
 
       expect(response).to be_successful
@@ -1338,7 +1338,7 @@ describe ExternalToolsController do
     end
 
     it "should fail gracefully on invalid URL retrieval or timeouts" do
-      allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error)
+      allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       user_session(@teacher)
       xml = "bob"
       post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}}, :format => "json"
@@ -1346,6 +1346,19 @@ describe ExternalToolsController do
       expect(assigns[:tool]).to be_new_record
       json = json_parse(response.body)
       expect(json['errors']['config_url'][0]['message']).to eq I18n.t(:retrieve_timeout, 'could not retrieve configuration, the server response timed out')
+    end
+
+    it "should fail gracefully trying to retrieve from localhost" do
+      expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
+      user_session(@teacher)
+      xml = "bob"
+      post 'create', params: {:course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com",
+        :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url",
+        :config_url => "http://localhost:9001"}}, :format => "json"
+      expect(response).not_to be_successful
+      expect(assigns[:tool]).to be_new_record
+      json = json_parse(response.body)
+      expect(json['errors']['config_url'][0]['message']).to eq "Invalid URL"
     end
 
     context "navigation tabs caching" do
@@ -1730,6 +1743,29 @@ describe ExternalToolsController do
         expect(return_to.first).to eq("#{course_external_tools_url(@course)}/#{tool.id}")
       end
     end
+  end
+
+  describe '#sessionless_launch' do
+    before do
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      user_session(@user)
+    end
+
+    it "generates a sessionless launch" do
+      @tool = new_valid_tool(@course)
+
+      get :generate_sessionless_launch, params: {:course_id => @course.id, id: @tool.id}
+
+      expect(response).to be_successful
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+
+      expect(controller).to receive(:log_asset_access).once
+      get :sessionless_launch, params: {:course_id => @course.id, verifier: verifier}
+    end
+
   end
 
   def opaque_id(asset)

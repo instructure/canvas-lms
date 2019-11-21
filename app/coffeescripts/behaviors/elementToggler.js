@@ -46,8 +46,8 @@
 import $ from 'jquery'
 import '../jquery/fixDialogButtons'
 
-function updateTextToState (newStateOfRegion) {
-  return function () {
+function updateTextToState(newStateOfRegion) {
+  return function() {
     let newText
     const $this = $(this)
     if (!(newText = $this.data(`textWhileTarget${newStateOfRegion}`))) return
@@ -62,7 +62,7 @@ function updateTextToState (newStateOfRegion) {
   }
 }
 
-function toggleRegion ($region, showRegion, $trigger) {
+function toggleRegion($region, showRegion, $trigger) {
   let dialogOpts
   if (showRegion == null) {
     showRegion = $region.is(':ui-dialog:hidden') || $region.attr('aria-expanded') !== 'true'
@@ -72,7 +72,7 @@ function toggleRegion ($region, showRegion, $trigger) {
   // hide/un-hide .element_toggler's that point to this $region that were hidden because they have
   // the data-hide-while-target-shown attribute
   $allElementsControllingRegion
-    .filter(function () {
+    .filter(function() {
       return $(this).data('hideWhileTargetShown')
     })
     .toggle(!showRegion)
@@ -88,12 +88,15 @@ function toggleRegion ($region, showRegion, $trigger) {
   if ($region.is(':ui-dialog') || (dialogOpts = $region.data('turnIntoDialog'))) {
     if (dialogOpts && showRegion) {
       // markup said data-turn-into-dialog, but it's not a dialog yet, make it one
-      dialogOpts = $.extend({
-        autoOpen: false,
-        close () {
-          toggleRegion($region, false)
-        }
-      }, dialogOpts)
+      dialogOpts = $.extend(
+        {
+          autoOpen: false,
+          close() {
+            toggleRegion($region, false)
+          }
+        },
+        dialogOpts
+      )
       $region.dialog(dialogOpts).fixDialogButtons()
     }
 
@@ -101,7 +104,10 @@ function toggleRegion ($region, showRegion, $trigger) {
       $region.dialog('open')
 
       if ($region.data('read-on-open')) {
-        $region.dialog('widget').attr('aria-live', 'assertive').attr('aria-atomic', 'true')
+        $region
+          .dialog('widget')
+          .attr('aria-live', 'assertive')
+          .attr('aria-atomic', 'true')
       }
     } else if ($region.dialog('isOpen')) {
       $region.dialog('close')
@@ -112,8 +118,8 @@ function toggleRegion ($region, showRegion, $trigger) {
 }
 
 const elementTogglerBehavior = {
-  bind () {
-    $(document).on('click change keyclick', '.element_toggler[aria-controls]', function (event) {
+  bind() {
+    $(document).on('click change keyclick', '.element_toggler[aria-controls]', function(event) {
       let force
       const $this = $(this)
 

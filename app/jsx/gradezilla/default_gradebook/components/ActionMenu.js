@@ -19,10 +19,10 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Menu, {MenuItem, MenuItemSeparator} from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {Menu} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-elements'
 import GradebookExportManager from '../../shared/GradebookExportManager'
 import PostGradesApp from '../../SISGradePassback/PostGradesApp'
 import tz from 'timezone'
@@ -216,7 +216,7 @@ class ActionMenu extends React.Component {
     }
 
     if (tools.length) {
-      tools.push(<MenuItemSeparator key="postGradesSeparator" />)
+      tools.push(<Menu.Separator key="postGradesSeparator" />)
     }
 
     return tools
@@ -226,9 +226,9 @@ class ActionMenu extends React.Component {
     return this.props.postGradesLtis.map(tool => {
       const key = `post_grades_lti_${tool.id}`
       return (
-        <MenuItem onSelect={tool.onSelect} key={key}>
+        <Menu.Item onSelect={tool.onSelect} key={key}>
           <span data-menu-id={key}>{I18n.t('Sync to %{name}', {name: tool.name})}</span>
-        </MenuItem>
+        </Menu.Item>
       )
     })
   }
@@ -236,11 +236,11 @@ class ActionMenu extends React.Component {
   renderPostGradesFeature() {
     const sisName = this.props.postGradesFeature.label || I18n.t('SIS')
     return (
-      <MenuItem onSelect={this.launchPostGrades} key="post_grades_feature_tool">
+      <Menu.Item onSelect={this.launchPostGrades} key="post_grades_feature_tool">
         <span data-menu-id="post_grades_feature_tool">
           {I18n.t('Sync to %{sisName}', {sisName})}
         </span>
-      </MenuItem>
+      </Menu.Item>
     )
   }
 
@@ -253,17 +253,17 @@ class ActionMenu extends React.Component {
     const downloadFrdUrl = previousExport.attachmentUrl
 
     const previousMenu = (
-      <MenuItem
+      <Menu.Item
         key="previousExport"
         onSelect={() => {
           ActionMenu.gotoUrl(downloadFrdUrl)
         }}
       >
         <span data-menu-id="previous-export">{lastExportDescription}</span>
-      </MenuItem>
+      </Menu.Item>
     )
 
-    return [<MenuItemSeparator key="previousExportSeparator" />, previousMenu]
+    return [<Menu.Separator key="previousExportSeparator" />, previousMenu]
   }
 
   renderPublishGradesToSis() {
@@ -274,13 +274,13 @@ class ActionMenu extends React.Component {
     }
 
     return (
-      <MenuItem
+      <Menu.Item
         onSelect={() => {
           this.handlePublishGradesToSis()
         }}
       >
         <span data-menu-id="publish-grades-to-sis">{I18n.t('Sync grades to SIS')}</span>
-      </MenuItem>
+      </Menu.Item>
     )
   }
 
@@ -307,16 +307,16 @@ class ActionMenu extends React.Component {
         {this.renderPostGradesTools()}
         {publishGradesToSis}
 
-        <MenuItem
+        <Menu.Item
           disabled={this.disableImports()}
           onSelect={() => {
             this.handleImport()
           }}
         >
           <span data-menu-id="import">{I18n.t('Import')}</span>
-        </MenuItem>
+        </Menu.Item>
 
-        <MenuItem
+        <Menu.Item
           disabled={this.exportInProgress()}
           onSelect={() => {
             this.handleExport()
@@ -325,7 +325,7 @@ class ActionMenu extends React.Component {
           <span data-menu-id="export">
             {this.exportInProgress() ? I18n.t('Export in progress') : I18n.t('Export')}
           </span>
-        </MenuItem>
+        </Menu.Item>
 
         {[...this.renderPreviousExports()]}
       </Menu>

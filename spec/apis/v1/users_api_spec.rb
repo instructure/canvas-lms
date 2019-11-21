@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 class TestUserApi
   include Api::V1::User
@@ -336,7 +337,7 @@ describe Api::V1::User do
     def test_context(mock_context, context_to_pass)
       expect(mock_context).to receive(:account).and_return(mock_context)
       expect(mock_context).to receive(:global_id).and_return(42).twice
-      expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis).and_return(true)
+      expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis, :view_user_logins).and_return(true)
       expect(mock_context).to receive(:grants_right?).with(@admin, {}, :view_user_logins).and_return(true)
       json = if context_to_pass
         @test_api.user_json(@student, @admin, {}, [], context_to_pass)
@@ -617,7 +618,7 @@ describe Api::V1::User do
       @test_api.context = double()
       expect(@test_api.context).to receive(:global_id).and_return(42)
       expect(@test_api.context).to receive(:account).and_return(@test_api.context)
-      expect(@test_api.context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis).and_return(true)
+      expect(@test_api.context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis, :view_user_logins).and_return(true)
       @test_api.current_user = @admin
       expect(@test_api.user_json_is_admin?).to eq true
     end
@@ -626,7 +627,7 @@ describe Api::V1::User do
       mock_context = double()
       expect(mock_context).to receive(:global_id).and_return(42)
       expect(mock_context).to receive(:account).and_return(mock_context)
-      expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis).and_return(true)
+      expect(mock_context).to receive(:grants_any_right?).with(@admin, :manage_students, :read_sis, :view_user_logins).and_return(true)
       @test_api.current_user = @admin
       expect(@test_api.user_json_is_admin?(mock_context, @admin)).to eq true
     end
@@ -857,7 +858,7 @@ describe "Users API", type: :request do
       @account.all_users.order(:sortable_name).each_with_index do |user, i|
         next unless users.find { |u| u == user }
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-               { :controller => 'users', :action => 'index', :account_id => @account.id.to_param, :format => 'json' },
+               { :controller => 'users', :action => 'api_index', :account_id => @account.id.to_param, :format => 'json' },
                { :per_page => 1, :page => i + 1 })
         expect(json).to eq [{
           'name' => user.name,
@@ -879,21 +880,21 @@ describe "Users API", type: :request do
         user = User.create(:name => "u#{n}")
         user.pseudonyms.create!(:unique_id => "u#{n}@example.com", :account => @account)
       end
-      expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => 'json', :per_page => '2').size).to eq 2
+      expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", :controller => "users", :action => "api_index", :account_id => @account.id.to_param, :format => 'json', :per_page => '2').size).to eq 2
       Setting.set('api_max_per_page', '1')
-      expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => 'json', :per_page => '2').size).to eq 1
+      expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", :controller => "users", :action => "api_index", :account_id => @account.id.to_param, :format => 'json', :per_page => '2').size).to eq 1
     end
 
     it "should return unauthorized for users without permissions" do
       @account = @student.account
       @user    = @student
-      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", :controller => "users", :action => "index", :account_id => @account.id.to_param, :format => "json")
+      raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", :controller => "users", :action => "api_index", :account_id => @account.id.to_param, :format => "json")
       expect(response.code).to eql "401"
     end
 
     it "returns an error when search_term is fewer than 3 characters" do
       @account = Account.default
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'ab'}, {}, :expected_status => 400)
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'ab'}, {}, :expected_status => 400)
       error = json["errors"].first
       verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
     end
@@ -908,7 +909,7 @@ describe "Users API", type: :request do
         users[i].pseudonyms.create!(:unique_id => u[1], :account => @account) { |p| p.sis_user_id = u[1] }
       end
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'test3@example.com'})
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, {:search_term => 'test3@example.com'})
 
       expect(json.count).to eq 1
       json.each do |user|
@@ -920,13 +921,13 @@ describe "Users API", type: :request do
     it "doesn't kersplode when filtering by role and sorting" do
       @account = Account.default
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
         { :role_filter_id => student_role.id.to_s, :sort => "sis_id"})
 
       expect(json.map{|r| r['id']}).to eq [@student.id]
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
         { :role_filter_id => student_role.id.to_s, :sort => "email"})
 
       expect(json.map{|r| r['id']}).to eq [@student.id]
@@ -939,19 +940,19 @@ describe "Users API", type: :request do
       p.current_login_at = Time.now.utc
       p.save!
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: u.id.to_s })
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: u.id.to_s })
       expect(json.count).to eq 1
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
 
       # it should sort too
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
         { include: ['last_login'], sort: "last_login", order: 'desc'})
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
 
       # it should include automatically when sorting by
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
         { sort: "last_login", order: 'desc'})
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
     end
@@ -961,10 +962,10 @@ describe "Users API", type: :request do
       u = User.create!(name: 'test user')
       p = u.pseudonyms.create!(account: @account, unique_id: 'user')
 
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '1' })
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '1' })
       expect(json.length).to eq 1
       expect(response.headers['Link']).to include("rel=\"next\"")
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '2' })
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '2' })
       expect(json).to be_empty
       expect(response.headers['Link']).to_not include("rel=\"next\"")
     end
@@ -2187,6 +2188,55 @@ describe "Users API", type: :request do
         expect(json['hexcode']).to eq '#ababab'
       end
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before :once do
+        course_factory(:active_all => true)
+        @shard1.activate do
+          @user = user_factory(:account => Account.create!, :active_all => true)
+        end
+        @course.enroll_student(@user, :enrollment_state => 'active')
+      end
+
+      it "should save colors relative to user's shard" do
+        json = api_call(:put, "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
+          { controller: 'users', action: 'set_custom_color', format: 'json',
+            id: @user.id.to_s, asset_string: "course_#{@course.id}", hexcode: 'ababab'
+          }, {}, {}, {:expected_status => 200}
+        )
+        expect(json['hexcode']).to eq '#ababab'
+        expect(@user.reload.preferences[:custom_colors]["course_#{@course.global_id}"]).to eq '#ababab'
+      end
+
+      it "should retrieve colors relative to user's shard" do
+        @user.preferences[:custom_colors] = {"course_#{@course.global_id}" => '#ababab'}
+        @user.save!
+        json = api_call(:get, "/api/v1/users/#{@user.id}/colors",
+          { controller: 'users', action: 'get_custom_colors', format: 'json', id: @user.id.to_s
+          }, {}, {}, {:expected_status => 200}
+        )
+        expect(json["custom_colors"]["course_#{@course.local_id}"]).to eq '#ababab'
+      end
+
+      it "should ignore old cross-shard data" do
+        @shard1.activate do
+          @cs_course = Course.create!(:account => Account.first)
+          @cs_course.enroll_student(@user, :enrollment_state => "active")
+          @user.preferences[:custom_colors] = {
+            "course_#{@cs_course.global_id}" => '#ffffff', # old data plz ignore
+            "course_#{@cs_course.local_id}" => '#ababab' # new data
+          }
+          @user.save!
+        end
+        json = api_call(:get, "/api/v1/users/#{@user.id}/colors",
+          { controller: 'users', action: 'get_custom_colors', format: 'json', id: @user.id.to_s
+          }, {}, {}, {:expected_status => 200}
+        )
+        expect(json["custom_colors"]["course_#{@cs_course.global_id}"]).to eq '#ababab'
+      end
+    end
   end
 
   describe "dashboard positions" do
@@ -2562,15 +2612,19 @@ PUBLIC
     before :once do
       teacher1 = course_with_teacher(active_all: true).user
       @course1 = @course
-      @student1 = student_in_course(course: @course1).user
+      @student1 = student_in_course(course: @course1, active_all: true).user
       @student1.associate_with_shard(@shard1)
+      # We add another student we don't track as this brought out an error in the code when one of the tests was
+      # triggered.
+      student_in_course(course: @course1, active_all: true)
       @student2 = student_in_course(course: @course1).user
 
       @shard1.activate do
         cross_account = account_model(:name => "crossshard", :default_time_zone => 'UTC')
         teacher2 = course_with_teacher(account: cross_account, active_all: true).user
         course2 = @course
-        course2.enroll_student(@student1).accept!
+        @course2_enrollment = course2.enroll_student(@student1)
+        @course2_enrollment.accept!
         assignment = assignment_model(course: course2, submission_types: 'online_text_entry')
         @most_recent_submission = assignment.grade_student(@student1, grader: teacher2, score: 10).first
         @most_recent_submission.graded_at = 1.day.ago
@@ -2591,7 +2645,7 @@ PUBLIC
       assignment.submit_homework(@student1, submission_type: 'online_text_entry', body: 'done')
     end
 
-    it 'doesnt allow any user get another users submissions' do
+    it "doesn't allow any user to get another user's submissions" do
       api_call_as_user(@student2, :get, "/api/v1/users/#{@student1.id}/graded_submissions", {
         id: @student1.to_param,
         controller: 'users',
@@ -2620,6 +2674,19 @@ PUBLIC
       })
       expect(json.count).to eq 3
       expect(json.map { |s| s['id'] }).to eq [@most_recent_submission.id, @next_submission.id, @last_submission.id]
+    end
+
+    it 'only gets the users submissions for active enrollments when only_current_enrollments=true' do
+      @course2_enrollment.conclude
+      json = api_call_as_user(@student1, :get, "/api/v1/users/#{@student1.id}/graded_submissions?only_current_enrollments=true", {
+        id: @student1.to_param,
+        controller: 'users',
+        action: 'user_graded_submissions',
+        format: 'json',
+        only_current_enrollments: true
+      })
+      expect(json.count).to eq 2
+      expect(json.map { |s| s['id'] }).to eq [@next_submission.id, @last_submission.id]
     end
 
     it 'paginates' do

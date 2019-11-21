@@ -19,64 +19,64 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!cyoe_assignment_sidebar_breakdown_graph_bar'
-  const { string, number, func } = PropTypes
 
-  class BreakdownGraph extends React.Component {
-    static propTypes = {
-      rangeStudents: number.isRequired,
-      totalStudents: number.isRequired,
-      lowerBound: string.isRequired,
-      upperBound: string.isRequired,
-      rangeIndex: number.isRequired,
-      openSidebar: func.isRequired,
-      selectRange: func.isRequired,
-    }
+const {string, number, func} = PropTypes
 
-    selectRange = e => {
-      this.props.openSidebar(e.target)
-      this.props.selectRange(this.props.rangeIndex)
-    };
+class BreakdownGraph extends React.Component {
+  static propTypes = {
+    rangeStudents: number.isRequired,
+    totalStudents: number.isRequired,
+    lowerBound: string.isRequired,
+    upperBound: string.isRequired,
+    rangeIndex: number.isRequired,
+    openSidebar: func.isRequired,
+    selectRange: func.isRequired
+  }
 
-    renderInnerBar() {
-      const width = Math.min((this.props.rangeStudents / this.props.totalStudents) * 100, 100)
-      const progressBarStyle = { width: width + '%' }
-      if (width > 0) {
-        return (
-          <div style={progressBarStyle} className='crs-bar__horizontal-inside-fill'></div>
-        )
-      } else {
-        return null
-      }
-    }
+  selectRange = e => {
+    this.props.openSidebar(e.target)
+    this.props.selectRange(this.props.rangeIndex)
+  }
 
-    render () {
-      const { rangeStudents, totalStudents } = this.props
-      return (
-        <div className='crs-bar__container'>
-          <div className='crs-bar__horizontal-outside'>
-            <div className='crs-bar__horizontal-inside'></div>
-            { this.renderInnerBar() }
-          </div>
-          <div className='crs-bar__bottom'>
-            <span className='crs-bar__info'>{I18n.t('%{lowerBound}+ to %{upperBound}', {
-              upperBound: this.props.upperBound,
-              lowerBound: this.props.lowerBound,
-            })}
-            </span>
-            <button
-              className='crs-link-button'
-              onClick={this.selectRange}
-              title={I18n.t('View range student details')}
-            >
-              {I18n.t(
-                '%{rangeStudents} out of %{totalStudents} students',
-                { rangeStudents, totalStudents }
-              )}
-            </button>
-          </div>
-        </div>
-      )
+  renderInnerBar() {
+    const width = Math.min((this.props.rangeStudents / this.props.totalStudents) * 100, 100)
+    const progressBarStyle = {width: width + '%'}
+    if (width > 0) {
+      return <div style={progressBarStyle} className="crs-bar__horizontal-inside-fill" />
+    } else {
+      return null
     }
   }
+
+  render() {
+    const {rangeStudents, totalStudents} = this.props
+    return (
+      <div className="crs-bar__container">
+        <div className="crs-bar__horizontal-outside">
+          <div className="crs-bar__horizontal-inside" />
+          {this.renderInnerBar()}
+        </div>
+        <div className="crs-bar__bottom">
+          <span className="crs-bar__info">
+            {I18n.t('%{lowerBound}+ to %{upperBound}', {
+              upperBound: this.props.upperBound,
+              lowerBound: this.props.lowerBound
+            })}
+          </span>
+          <button
+            className="crs-link-button"
+            onClick={this.selectRange}
+            title={I18n.t('View range student details')}
+          >
+            {I18n.t('%{rangeStudents} out of %{totalStudents} students', {
+              rangeStudents,
+              totalStudents
+            })}
+          </button>
+        </div>
+      </div>
+    )
+  }
+}
 
 export default BreakdownGraph

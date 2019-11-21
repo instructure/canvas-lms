@@ -18,16 +18,13 @@
 
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import View from '@instructure/ui-layout/lib/components/View'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
-import NumberInput from '@instructure/ui-number-input/lib/components/NumberInput'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
+import {Alert} from '@instructure/ui-alerts'
+import {View, Grid} from '@instructure/ui-layout'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {NumberInput} from '@instructure/ui-number-input'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {Spinner, Text} from '@instructure/ui-elements'
+import {Checkbox} from '@instructure/ui-forms'
 
 import CanvasSelect from '../../../shared/components/CanvasSelect'
 import NumberHelper from '../../../shared/helpers/numberHelper'
@@ -35,36 +32,35 @@ import NumberHelper from '../../../shared/helpers/numberHelper'
 import Round from 'compiled/util/round'
 import I18n from 'i18n!gradezilla'
 
+const MIN_PERCENTAGE_INPUT = 0
+const MAX_PERCENTAGE_INPUT = 100
+
 function isNumeric(input) {
   return NumberHelper.validate(input)
-}
-
-function isInRange(input) {
-  const num = NumberHelper.parse(input)
-  return num >= 0 && num <= 100
 }
 
 function validationError(input) {
   if (!isNumeric(input)) {
     return 'notNumeric'
-  } else if (!isInRange(input)) {
-    return 'outOfRange'
   }
   return null
 }
 
+function bound(decimal) {
+  if (decimal < MIN_PERCENTAGE_INPUT) return MIN_PERCENTAGE_INPUT
+  if (decimal > MAX_PERCENTAGE_INPUT) return MAX_PERCENTAGE_INPUT
+  return decimal
+}
+
 const errorMessages = {
   missingSubmissionDeduction: {
-    notNumeric: I18n.t('Missing submission grade must be numeric'),
-    outOfRange: I18n.t('Missing submission grade must be between 0 and 100')
+    notNumeric: I18n.t('Missing submission grade must be numeric')
   },
   lateSubmissionDeduction: {
-    notNumeric: I18n.t('Late submission deduction must be numeric'),
-    outOfRange: I18n.t('Late submission deduction must be between 0 and 100')
+    notNumeric: I18n.t('Late submission deduction must be numeric')
   },
   lateSubmissionMinimumPercent: {
-    notNumeric: I18n.t('Lowest possible grade must be numeric'),
-    outOfRange: I18n.t('Lowest possible grade must be between 0 and 100')
+    notNumeric: I18n.t('Lowest possible grade must be numeric')
   }
 }
 
@@ -73,16 +69,29 @@ function validationErrorMessage(input, validationType) {
   return errorMessages[validationType][error]
 }
 
-function markMissingSubmissionsDefaultValue(missingSubmissionDeduction) {
-  return Round(100 - missingSubmissionDeduction, 2).toString()
-}
-
 function messages(names, validationErrors) {
   const errors = names.map(name => validationErrors[name])
   return errors.reduce(
     (acc, error) => (error ? acc.concat([{text: error, type: 'error'}]) : acc),
     []
   )
+}
+
+function subtractFromMax(decimal) {
+  return MAX_PERCENTAGE_INPUT - decimal
+}
+
+const numberInputWillUpdateMap = {
+  missingSubmissionDeduction(decimal) {
+    // the missingSubmissionDeductionDisplayValue is the difference of `100% - missingSubmissionDeduction`
+    return subtractFromMax(decimal)
+  },
+  lateSubmissionDeduction(decimal) {
+    return decimal
+  },
+  lateSubmissionMinimumPercent(decimal) {
+    return decimal
+  }
 }
 
 class LatePoliciesTabPanel extends React.Component {
@@ -116,7 +125,9 @@ class LatePoliciesTabPanel extends React.Component {
     showAlert: bool.isRequired
   }
 
-  state = {showAlert: this.props.showAlert}
+  state = {
+    showAlert: this.props.showAlert
+  }
 
   missingPolicyMessages = messages.bind(this, ['missingSubmissionDeduction'])
 
@@ -156,38 +167,54 @@ class LatePoliciesTabPanel extends React.Component {
     const updates = {lateSubmissionDeductionEnabled: checked}
     if (!checked) {
       updates.lateSubmissionMinimumPercentEnabled = false
-    } else if (this.getLatePolicyAttribute('lateSubmissionMinimumPercent') > 0) {
+    } else if (this.getLatePolicyAttribute('lateSubmissionMinimumPercent') > MIN_PERCENTAGE_INPUT) {
       updates.lateSubmissionMinimumPercentEnabled = true
     }
-    this.props.changeLatePolicy({...this.props.latePolicy, changes: this.calculateChanges(updates)})
+    this.props.changeLatePolicy({
+      ...this.props.latePolicy,
+      changes: this.calculateChanges(updates)
+    })
   }
 
-  validateAndChangeNumber = (name, inputValue) => {
-    const errorMessage = validationErrorMessage(inputValue, name)
+  handleBlur = name => {
+    if (this.props.latePolicy.changes[name] == null) {
+      return
+    }
+
+    const decimal = bound(NumberHelper.parse(this.props.latePolicy.changes[name]))
+    const errorMessage = validationErrorMessage(decimal, name)
     if (errorMessage) {
       const validationErrors = {...this.props.latePolicy.validationErrors, [name]: errorMessage}
       return this.props.changeLatePolicy({...this.props.latePolicy, validationErrors})
     }
+    const decimalDisplayValue = numberInputWillUpdateMap[name](decimal)
 
-    let newValue = Round(NumberHelper.parse(inputValue), 2)
-    if (name === 'missingSubmissionDeduction') {
-      // "Mark missing submission with 40 percent" => missingSubmissionDeduction is 60
-      newValue = 100 - newValue
-    }
-    return this.changeNumber(name, newValue)
+    this.setState({[`${name}DisplayValue`]: Round(decimalDisplayValue, 2)}, () => {
+      const changesData = {[name]: Round(decimal, 2)}
+      if (name === 'lateSubmissionMinimumPercent') {
+        changesData[`${name}Enabled`] = changesData[name] !== MIN_PERCENTAGE_INPUT
+      }
+      const updates = {
+        changes: this.calculateChanges(changesData),
+        validationErrors: {...this.props.latePolicy.validationErrors}
+      }
+      delete updates.validationErrors[name]
+      this.props.changeLatePolicy({...this.props.latePolicy, ...updates})
+    })
   }
 
-  changeNumber = (name, value) => {
-    const changesData = {[name]: value}
-    if (name === 'lateSubmissionMinimumPercent') {
-      changesData.lateSubmissionMinimumPercentEnabled = value !== 0
-    }
-    const updates = {
-      changes: this.calculateChanges(changesData),
-      validationErrors: {...this.props.latePolicy.validationErrors}
-    }
-    delete updates.validationErrors[name]
-    this.props.changeLatePolicy({...this.props.latePolicy, ...updates})
+  handleChange = (name, inputDisplayValue) => {
+    const nameDisplayValue = `${name}DisplayValue`
+    this.setState({[nameDisplayValue]: inputDisplayValue}, () => {
+      let decimal = Round(NumberHelper.parse(inputDisplayValue), 2)
+      decimal = numberInputWillUpdateMap[name](decimal)
+
+      const changes = this.calculateChanges(
+        {[name]: decimal},
+        {[nameDisplayValue]: inputDisplayValue}
+      )
+      this.props.changeLatePolicy({...this.props.latePolicy, changes})
+    })
   }
 
   changeLateSubmissionInterval = (_event, selectedOption) => {
@@ -195,17 +222,22 @@ class LatePoliciesTabPanel extends React.Component {
     this.props.changeLatePolicy({...this.props.latePolicy, changes})
   }
 
-  calculateChanges(newData) {
+  calculateChanges(changedData, changedDisplayValues = {}) {
     const changes = {...this.props.latePolicy.changes}
-    Object.keys(newData).forEach(key => {
-      const initialValue = this.props.latePolicy.data[key]
-      const newValue = newData[key]
-      if (initialValue !== newValue) {
-        changes[key] = newValue
+    Object.keys(changedData).forEach(key => {
+      const keyDisplayValue = `${key}DisplayValue`
+      const original = this.props.latePolicy.data[key]
+      const changed = changedData[key]
+      const originalAndChangedDiffer = original !== changed
+      let hasChanges = originalAndChangedDiffer
+      if (changedDisplayValues.hasOwnProperty(keyDisplayValue)) {
+        hasChanges = originalAndChangedDiffer !== changedDisplayValues[keyDisplayValue]
+      }
+
+      if (hasChanges) {
+        changes[key] = changed
       } else if (key in changes) {
-        // if the new value and the initial value match, that
-        // key/val pair should not be tracked as a change
-        delete changes[key]
+        delete changes[key] // don't track matching values
       }
     })
 
@@ -216,17 +248,43 @@ class LatePoliciesTabPanel extends React.Component {
     this.setState({showAlert: false})
   }
 
+  currentInputDisplayValue = (key, defaultValue) => {
+    const stateDisplayKey = `${key}DisplayValue`
+
+    // If the user is in the process of entering something, display it.
+    if (this.state[stateDisplayKey] != null) {
+      return this.state[stateDisplayKey]
+    }
+
+    // If the user updated this value, switched to a different tab, then came
+    // back to this tab, the updated value will be in the changes hash.
+    if (this.props.latePolicy.changes?.[key] != null) {
+      const value = this.props.latePolicy.changes[key]
+      return numberInputWillUpdateMap[key](value)
+    }
+
+    // If there have been no changes, use the value we were passed in.
+    if (this.props.latePolicy.data?.[key] != null) {
+      const value = this.props.latePolicy.data[key]
+      return numberInputWillUpdateMap[key](value)
+    }
+
+    // If we haven't been given a value yet, punt and show a default.
+    return defaultValue
+  }
+
   render() {
     if (!this.props.latePolicy.data) {
       return (
         <div id="LatePoliciesTabPanel__Container-noContent">
-          <Spinner title={I18n.t('Loading')} size="large" margin="small" />
+          <Spinner renderTitle={I18n.t('Loading')} size="large" margin="small" />
         </div>
       )
     }
 
     const {validationErrors} = this.props.latePolicy
     const data = {...this.props.latePolicy.data, ...this.props.latePolicy.changes}
+
     return (
       <div id="LatePoliciesTabPanel__Container">
         <View as="div" margin="small">
@@ -247,30 +305,34 @@ class LatePoliciesTabPanel extends React.Component {
           <View as="div" margin="small small small large">
             <div className="NumberInput__Container">
               <Grid vAlign="bottom" colSpacing="small">
-                <GridRow>
-                  <GridCol width="auto">
+                <Grid.Row>
+                  <Grid.Col width="auto">
                     <NumberInput
                       id="missing-submission-grade"
                       locale={this.props.locale}
                       inputRef={m => {
                         this.missingSubmissionDeductionInput = m
                       }}
-                      label={I18n.t('Grade percentage for missing submissions')}
+                      renderLabel={I18n.t('Grade percentage for missing submissions')}
                       disabled={!this.getLatePolicyAttribute('missingSubmissionDeductionEnabled')}
-                      value={markMissingSubmissionsDefaultValue(data.missingSubmissionDeduction)}
-                      onChange={(_e, val) =>
-                        this.validateAndChangeNumber('missingSubmissionDeduction', val)
+                      value={this.currentInputDisplayValue(
+                        'missingSubmissionDeduction',
+                        MAX_PERCENTAGE_INPUT
+                      )}
+                      onBlur={_event => this.handleBlur('missingSubmissionDeduction')}
+                      onChange={(_event, val) =>
+                        this.handleChange('missingSubmissionDeduction', val)
                       }
-                      min="0"
-                      max="100"
+                      placeholder="100"
+                      showArrows={false}
                     />
-                  </GridCol>
-                  <GridCol width="auto">
+                  </Grid.Col>
+                  <Grid.Col width="auto">
                     <View margin="0 0 x-small" display="block">
                       <Text weight="bold">{I18n.t('%')}</Text>
                     </View>
-                  </GridCol>
-                </GridRow>
+                  </Grid.Col>
+                </Grid.Row>
               </Grid>
             </div>
           </View>
@@ -306,30 +368,32 @@ class LatePoliciesTabPanel extends React.Component {
           <View as="div" margin="small small small large">
             <div style={{display: 'flex', alignItems: 'center'}}>
               <Grid vAlign="bottom" colSpacing="small">
-                <GridRow>
-                  <GridCol width="auto">
+                <Grid.Row>
+                  <Grid.Col width="auto">
                     <NumberInput
                       id="late-submission-deduction"
                       locale={this.props.locale}
                       inputRef={l => {
                         this.lateSubmissionDeductionInput = l
                       }}
-                      label={I18n.t('Late submission deduction percent')}
-                      value={data.lateSubmissionDeduction.toString()}
+                      renderLabel={I18n.t('Late submission deduction percent')}
                       disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
-                      onChange={(_e, val) =>
-                        this.validateAndChangeNumber('lateSubmissionDeduction', val)
-                      }
-                      min="0"
-                      max="100"
+                      value={this.currentInputDisplayValue(
+                        'lateSubmissionDeduction',
+                        MIN_PERCENTAGE_INPUT
+                      )}
+                      onBlur={_event => this.handleBlur('lateSubmissionDeduction')}
+                      onChange={(_event, val) => this.handleChange('lateSubmissionDeduction', val)}
+                      placeholder="0"
+                      showArrows={false}
                     />
-                  </GridCol>
-                  <GridCol width="auto">
+                  </Grid.Col>
+                  <Grid.Col width="auto">
                     <View margin="0 0 x-small" display="block">
                       <Text weight="bold">{I18n.t('%')}</Text>
                     </View>
-                  </GridCol>
-                  <GridCol width="auto">
+                  </Grid.Col>
+                  <Grid.Col width="auto">
                     <CanvasSelect
                       disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
                       id="late-submission-interval"
@@ -344,33 +408,37 @@ class LatePoliciesTabPanel extends React.Component {
                         {I18n.t('Hour')}
                       </CanvasSelect.Option>
                     </CanvasSelect>
-                  </GridCol>
-                </GridRow>
-                <GridRow>
-                  <GridCol width="auto">
+                  </Grid.Col>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Col width="auto">
                     <NumberInput
                       id="late-submission-minimum-percent"
                       locale={this.props.locale}
                       inputRef={l => {
                         this.lateSubmissionMinimumPercentInput = l
                       }}
-                      label={I18n.t('Lowest possible grade percent')}
-                      value={data.lateSubmissionMinimumPercent.toString()}
+                      renderLabel={I18n.t('Lowest possible grade percent')}
+                      value={this.currentInputDisplayValue(
+                        'lateSubmissionMinimumPercent',
+                        MIN_PERCENTAGE_INPUT
+                      )}
                       disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
-                      onChange={(_e, val) =>
-                        this.validateAndChangeNumber('lateSubmissionMinimumPercent', val)
+                      onBlur={_event => this.handleBlur('lateSubmissionMinimumPercent')}
+                      onChange={(_event, val) =>
+                        this.handleChange('lateSubmissionMinimumPercent', val)
                       }
-                      min="0"
-                      max="100"
+                      placeholder="0"
                       inline
+                      showArrows={false}
                     />
-                  </GridCol>
-                  <GridCol width="auto">
+                  </Grid.Col>
+                  <Grid.Col width="auto">
                     <View margin="0 0 x-small" display="block">
                       <Text weight="bold">{I18n.t('%')}</Text>
                     </View>
-                  </GridCol>
-                </GridRow>
+                  </Grid.Col>
+                </Grid.Row>
               </Grid>
             </div>
           </View>

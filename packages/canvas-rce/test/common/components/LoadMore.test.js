@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import React from "react";
-import ReactDOM from "react-dom";
-import LoadMore, { styles } from "../../../src/common/components/LoadMore";
-import sd from "skin-deep";
-import sinon from "sinon";
-import { css } from "aphrodite";
+import assert from 'assert'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import LoadMore, {styles} from '../../../src/common/components/LoadMore'
+import sd from 'skin-deep'
+import sinon from 'sinon'
+import {css} from 'aphrodite'
 
-describe("LoadMore", () => {
-  const noop = () => {};
+describe('LoadMore', () => {
+  const noop = () => {}
 
-  describe.skip("focus handling", () => {
-    let elem, props;
+  describe.skip('focus handling', () => {
+    let elem, props
 
     function renderChildren(items) {
       return (
@@ -39,171 +39,147 @@ describe("LoadMore", () => {
             </li>
           ))}
         </ul>
-      );
+      )
     }
 
     beforeEach(() => {
-      elem = document.createElement("div");
-      elem.tabIndex = -1;
-      document.body.appendChild(elem);
-      elem.focus();
+      elem = document.createElement('div')
+      elem.tabIndex = -1
+      document.body.appendChild(elem)
+      elem.focus()
       props = {
         hasMore: false,
         loadMore: sinon.stub(),
-        focusSelector: "li>a"
-      };
-    });
+        focusSelector: 'li>a'
+      }
+    })
 
     afterEach(() => {
-      document.body.removeChild(elem);
-    });
+      document.body.removeChild(elem)
+    })
 
-    it("focuses first additional element that matches focusSelector", () => {
-      const items = ["one"];
-      const c = ReactDOM.render(
-        <LoadMore {...props}>{renderChildren(items)}</LoadMore>,
-        elem
-      );
-      items.push("two", "three");
-      c.loadMore();
-      ReactDOM.render(
-        <LoadMore {...props}>{renderChildren(items)}</LoadMore>,
-        elem
-      );
-      assert.equal(document.activeElement.textContent, "two");
-    });
+    it('focuses first additional element that matches focusSelector', () => {
+      const items = ['one']
+      const c = ReactDOM.render(<LoadMore {...props}>{renderChildren(items)}</LoadMore>, elem)
+      items.push('two', 'three')
+      c.loadMore()
+      ReactDOM.render(<LoadMore {...props}>{renderChildren(items)}</LoadMore>, elem)
+      assert.equal(document.activeElement.textContent, 'two')
+    })
 
-    it("does not change focus unless the number of focusable children changed", () => {
-      delete props.focusSelector;
-      const items = ["one"];
-      const c = ReactDOM.render(
-        <LoadMore {...props}>{renderChildren(items)}</LoadMore>,
-        elem
-      );
-      c.loadMore();
-      props.hasMore = true;
-      ReactDOM.render(
-        <LoadMore {...props}>{renderChildren(items)}</LoadMore>,
-        elem
-      );
-      assert.equal(document.activeElement, elem);
-    });
+    it('does not change focus unless the number of focusable children changed', () => {
+      delete props.focusSelector
+      const items = ['one']
+      const c = ReactDOM.render(<LoadMore {...props}>{renderChildren(items)}</LoadMore>, elem)
+      c.loadMore()
+      props.hasMore = true
+      ReactDOM.render(<LoadMore {...props}>{renderChildren(items)}</LoadMore>, elem)
+      assert.equal(document.activeElement, elem)
+    })
 
-    it("does not change focus if unless focusSelect prop is passed", () => {
-      delete props.focusSelector;
-      const items = ["one"];
-      const c = ReactDOM.render(
-        <LoadMore {...props}>{renderChildren(items)}</LoadMore>,
-        elem
-      );
-      items.push("two");
-      c.loadMore();
-      ReactDOM.render(
-        <LoadMore {...props}>{renderChildren(items)}</LoadMore>,
-        elem
-      );
-      assert.equal(document.activeElement, elem);
-    });
+    it('does not change focus if unless focusSelect prop is passed', () => {
+      delete props.focusSelector
+      const items = ['one']
+      const c = ReactDOM.render(<LoadMore {...props}>{renderChildren(items)}</LoadMore>, elem)
+      items.push('two')
+      c.loadMore()
+      ReactDOM.render(<LoadMore {...props}>{renderChildren(items)}</LoadMore>, elem)
+      assert.equal(document.activeElement, elem)
+    })
 
-    it("does not change focus unless load more is clicked", () => {
-      const items = ["one"];
-      ReactDOM.render(
-        <LoadMore {...props}>{renderChildren(items)}</LoadMore>,
-        elem
-      );
-      items.push("two");
-      ReactDOM.render(
-        <LoadMore {...props}>{renderChildren(items)}</LoadMore>,
-        elem
-      );
-      assert.equal(document.activeElement, elem);
-    });
-  });
+    it('does not change focus unless load more is clicked', () => {
+      const items = ['one']
+      ReactDOM.render(<LoadMore {...props}>{renderChildren(items)}</LoadMore>, elem)
+      items.push('two')
+      ReactDOM.render(<LoadMore {...props}>{renderChildren(items)}</LoadMore>, elem)
+      assert.equal(document.activeElement, elem)
+    })
+  })
 
-  describe("Load more results button", () => {
-    it("renders if hasMore", () => {
+  describe('Load more results button', () => {
+    it('renders if hasMore', () => {
       const tree = sd.shallowRender(
         <LoadMore hasMore loadMore={noop}>
           Results
         </LoadMore>
-      );
-      assert.ok(tree.subTree("Button"));
-    });
+      )
+      assert.ok(tree.subTree('Button'))
+    })
 
     it("doesn't render if not hasMore", () => {
       const tree = sd.shallowRender(
         <LoadMore hasMore={false} loadMore={noop}>
           Results
         </LoadMore>
-      );
-      assert.ok(!tree.subTree("Button"));
-    });
+      )
+      assert.ok(!tree.subTree('Button'))
+    })
 
     it("doesn't render if isLoading", () => {
       const tree = sd.shallowRender(
         <LoadMore hasMore isLoading loadMore={noop}>
           Results
         </LoadMore>
-      );
-      assert.ok(!tree.subTree("Button"));
-    });
+      )
+      assert.ok(!tree.subTree('Button'))
+    })
 
-    it("calls loadMore when clicked", () => {
-      const loadMore = sinon.spy();
+    it('calls loadMore when clicked', () => {
+      const loadMore = sinon.spy()
       const tree = sd.shallowRender(
         <LoadMore hasMore loadMore={loadMore}>
           Results
         </LoadMore>
-      );
-      tree.subTree("Button").props.onClick();
-      assert.ok(loadMore.called);
-    });
-  });
+      )
+      tree.subTree('Button').props.onClick()
+      assert.ok(loadMore.called)
+    })
+  })
 
-  describe("Loading indicator", () => {
-    it("renders if non-empty and hasMore", () => {
+  describe('Loading indicator', () => {
+    it('renders if non-empty and hasMore', () => {
       const tree = sd.shallowRender(
         <LoadMore hasMore loadMore={noop}>
           <span>Result 1</span>
         </LoadMore>
-      );
-      assert.ok(tree.subTree("." + css(styles.loader)));
-    });
+      )
+      assert.ok(tree.subTree('.' + css(styles.loader)))
+    })
 
     it("doesn't render if not hasMore", () => {
       const tree = sd.shallowRender(
         <LoadMore hasMore={false} loadMore={noop}>
           <span>Result 1</span>
         </LoadMore>
-      );
-      assert.ok(!tree.subTree("." + css(styles.loader)));
-    });
+      )
+      assert.ok(!tree.subTree('.' + css(styles.loader)))
+    })
 
     it("doesn't render if empty", () => {
-      const tree = sd.shallowRender(<LoadMore hasMore loadMore={noop} />);
-      assert.ok(!tree.subTree("." + css(styles.loader)));
-    });
+      const tree = sd.shallowRender(<LoadMore hasMore loadMore={noop} />)
+      assert.ok(!tree.subTree('.' + css(styles.loader)))
+    })
 
-    it("visible if isLoading", () => {
+    it('visible if isLoading', () => {
       const tree = sd.shallowRender(
         <LoadMore hasMore isLoading loadMore={noop}>
           <span>Result 1</span>
         </LoadMore>
-      );
-      const loader = tree.subTree("." + css(styles.loader));
-      assert.ok(!loader.props["aria-hidden"]);
-      assert.equal(loader.props.style.opacity, 1);
-    });
+      )
+      const loader = tree.subTree('.' + css(styles.loader))
+      assert.ok(!loader.props['aria-hidden'])
+      assert.equal(loader.props.style.opacity, 1)
+    })
 
-    it("hidden if not isLoading", () => {
+    it('hidden if not isLoading', () => {
       const tree = sd.shallowRender(
         <LoadMore hasMore loadMore={noop}>
           <span>Result 1</span>
         </LoadMore>
-      );
-      const loader = tree.subTree("." + css(styles.loader));
-      assert.ok(loader.props["aria-hidden"]);
-      assert.equal(loader.props.style.opacity, 0);
-    });
-  });
-});
+      )
+      const loader = tree.subTree('.' + css(styles.loader))
+      assert.ok(loader.props['aria-hidden'])
+      assert.equal(loader.props.style.opacity, 0)
+    })
+  })
+})

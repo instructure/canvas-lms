@@ -53,6 +53,7 @@ describe Course do
         },
         :outline_folders => {'1865116206002' => true, '1865116207002' => true},
         :quizzes => {'1865116175002' => true},
+        :all_course_outline => true,
         :all_groups => true,
         :shift_dates=>"1",
         :old_start_date=>"Jan 23, 2009",
@@ -484,6 +485,108 @@ describe Course do
 
       Importers::CourseContentImporter.import_content(@course, data, params, migration)
     end
+  end
+
+  describe "insert into module" do
+    before :once do
+      course_factory
+      @module = @course.context_modules.create! name: 'test'
+      @module.add_item(type: 'context_module_sub_header', title: 'blah')
+      @params = {"copy" => {"assignments" => {"1865116198002" => true}}}
+      json = File.open(File.join(IMPORT_JSON_DIR, 'import_from_migration.json')).read
+      @data = JSON.parse(json).with_indifferent_access
+    end
+
+    it "appends imported items to a module" do
+      migration = @course.content_migrations.build
+      migration.migration_settings[:migration_ids_to_import] = @params
+      migration.migration_settings[:insert_into_module_id] = @module.id
+      migration.save!
+
+      Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(ContextModuleSubHeader Assignment))
+    end
+
+    it "inserts imported items into a module" do
+      migration = @course.content_migrations.build
+      migration.migration_settings[:migration_ids_to_import] = @params
+      migration.migration_settings[:insert_into_module_id] = @module.id
+      migration.migration_settings[:insert_into_module_position] = 1
+      migration.save!
+
+      Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(Assignment ContextModuleSubHeader))
+    end
+
+    it "respects insert_into_module_type" do
+      @params['copy']['discussion_topics'] = {'1864019689002' => true}
+      migration = @course.content_migrations.build
+      migration.migration_settings[:migration_ids_to_import] = @params
+      migration.migration_settings[:insert_into_module_id] = @module.id
+      migration.migration_settings[:insert_into_module_type] = 'assignment'
+      migration.save!
+      Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
+      expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(ContextModuleSubHeader Assignment))
+    end
+  end
+
+  describe "import_class_name" do
+    it "converts various forms of name to the proper AR class name" do
+      expect(Importers::CourseContentImporter.import_class_name('assignment')).to eq 'Assignment'
+      expect(Importers::CourseContentImporter.import_class_name('assignments')).to eq 'Assignment'
+      expect(Importers::CourseContentImporter.import_class_name('announcement')).to eq 'DiscussionTopic'
+      expect(Importers::CourseContentImporter.import_class_name('announcements')).to eq 'DiscussionTopic'
+      expect(Importers::CourseContentImporter.import_class_name('discussion_topic')).to eq 'DiscussionTopic'
+      expect(Importers::CourseContentImporter.import_class_name('discussion_topics')).to eq 'DiscussionTopic'
+      expect(Importers::CourseContentImporter.import_class_name('attachment')).to eq 'Attachment'
+      expect(Importers::CourseContentImporter.import_class_name('attachments')).to eq 'Attachment'
+      expect(Importers::CourseContentImporter.import_class_name('file')).to eq 'Attachment'
+      expect(Importers::CourseContentImporter.import_class_name('files')).to eq 'Attachment'
+      expect(Importers::CourseContentImporter.import_class_name('page')).to eq 'WikiPage'
+      expect(Importers::CourseContentImporter.import_class_name('pages')).to eq 'WikiPage'
+      expect(Importers::CourseContentImporter.import_class_name('wiki_page')).to eq 'WikiPage'
+      expect(Importers::CourseContentImporter.import_class_name('wiki_pages')).to eq 'WikiPage'
+      expect(Importers::CourseContentImporter.import_class_name('quiz')).to eq 'Quizzes::Quiz'
+      expect(Importers::CourseContentImporter.import_class_name('quizzes')).to eq 'Quizzes::Quiz'
+      expect(Importers::CourseContentImporter.import_class_name('module')).to eq 'ContextModule'
+      expect(Importers::CourseContentImporter.import_class_name('modules')).to eq 'ContextModule'
+      expect(Importers::CourseContentImporter.import_class_name('context_module')).to eq 'ContextModule'
+      expect(Importers::CourseContentImporter.import_class_name('context_modules')).to eq 'ContextModule'
+      expect(Importers::CourseContentImporter.import_class_name('module_item')).to eq 'ContentTag'
+      expect(Importers::CourseContentImporter.import_class_name('module_items')).to eq 'ContentTag'
+      expect(Importers::CourseContentImporter.import_class_name('content_tag')).to eq 'ContentTag'
+      expect(Importers::CourseContentImporter.import_class_name('content_tags')).to eq 'ContentTag'
+    end
+  end
+
+  describe "move to assignment group" do
+    before :once do
+      course_factory
+      @course.require_assignment_group
+      @new_group = @course.assignment_groups.create!(name: 'new group')
+      @params = {"copy" => {"assignments" => {"1865116014002" => true}}}
+      json = File.open(File.join(IMPORT_JSON_DIR, 'assignment.json')).read
+      @data = {"assignments" => JSON.parse(json)}.with_indifferent_access
+      @migration = @course.content_migrations.build
+      @migration.migration_settings[:migration_ids_to_import] = @params
+      @migration.migration_settings[:move_to_assignment_group_id] = @new_group.id
+      @migration.save!
+    end
+
+    it "puts a new assignment into assignment group" do
+      other_assign = @course.assignments.create! title: 'other', assignment_group: @new_group
+      Importers::CourseContentImporter.import_content(@course, @data, @params, @migration)
+      new_assign = @course.assignments.where(migration_id: '1865116014002').take
+      expect(new_assign.assignment_group_id).to eq @new_group.id
+    end
+
+    it "moves existing assignment into assignment group" do
+      existing_assign = @course.assignments.create! title: 'blah', migration_id: '1865116014002'
+      expect(existing_assign.assignment_group_id).not_to eq @new_group.id
+      Importers::CourseContentImporter.import_content(@course, @data, @params, @migration)
+      expect(existing_assign.reload.assignment_group_id).to eq @new_group.id
+    end
+
   end
 
   it 'should be able to i18n without keys' do

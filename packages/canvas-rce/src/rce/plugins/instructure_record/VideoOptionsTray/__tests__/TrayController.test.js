@@ -21,6 +21,51 @@ import ReactDOM from 'react-dom'
 import TrayController, {CONTAINER_ID} from '../TrayController'
 import FakeEditor from '../../../shared/__tests__/FakeEditor'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
+import * as contentSelection from '../../../shared/ContentSelection'
+
+const mockVideoPlayers = [
+  {
+    titleText: 'video title 0',
+    appliedWidth: 400,
+    appliedHeight: 300,
+    naturalWidth: 800,
+    naturalHeight: 600,
+    source: '/path/to/video0.mp4',
+    type: 'video-embed',
+    id: 'm-video-id0'
+  },
+  {
+    titleText: 'video title 1',
+    appliedWidth: 400,
+    appliedHeight: 300,
+    naturalWidth: 800,
+    naturalHeight: 600,
+    source: '/path/to/video1.mp4',
+    type: 'video-embed',
+    id: 'm-video-id1'
+  },
+  {
+    titleText: 'video title2',
+    appliedWidth: 400,
+    appliedHeight: 300,
+    naturalWidth: 800,
+    naturalHeight: 600,
+    source: '/path/to/video2.mp4',
+    type: 'video-embed',
+    id: 'm-video-id2'
+  }
+]
+
+beforeAll(() => {
+  contentSelection.asVideoElement = jest.fn(elem => {
+    const vid = elem.getAttribute('id')
+    return mockVideoPlayers.find(vp => vp.id === vid)
+  })
+})
+
+afterAll(() => {
+  jest.restoreAllMocks()
+})
 
 describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   let $videos
@@ -30,9 +75,9 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   beforeEach(() => {
     $videos = []
     editors = [new FakeEditor(), new FakeEditor()]
-    editors.forEach((editor) => {
+    editors.forEach((editor, i) => {
       editor.initialize()
-      const $video = createVideo(320, 320)
+      const $video = createVideo(i)
       $videos.push($video)
       editor.appendElement($video)
       editor.setSelectedNode($video)
@@ -49,15 +94,24 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     }
   })
 
-  function createVideo(height = 200, width = 200, id = "12345bseds") {
-    const $el = document.createElement('div')
-    $el.setAttribute("style",`height: ${height}; width:${width}`);
-    $el.id = id
-    return $el
+  function createVideo(i) {
+    const velem = document.createElement('div')
+    velem.setAttribute('id', mockVideoPlayers[i].id)
+    velem.setAttribute('title', mockVideoPlayers[i].titleText)
+    return velem
   }
 
   function getTray() {
     return VideoOptionsTrayDriver.find()
+  }
+
+  function getVideoOptionsFromTray() {
+    const driver = VideoOptionsTrayDriver.find()
+    return {
+      titleText: driver.titleText,
+      displayAs: driver.displayAs,
+      size: driver.size
+    }
   }
 
   describe('#showTrayForEditor()', () => {
@@ -65,6 +119,11 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       it('opens the tray', async () => {
         trayController.showTrayForEditor(editors[0])
         expect(getTray()).not.toBeNull()
+      })
+
+      it('uses the selected video from the editor', async () => {
+        trayController.showTrayForEditor(editors[0])
+        expect(getVideoOptionsFromTray().titleText).toEqual($videos[0].getAttribute('title'))
       })
     })
 
@@ -85,7 +144,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       beforeEach(async () => {
         trayController.showTrayForEditor(editors[0])
 
-        $otherVideo = createVideo(210, 210)
+        $otherVideo = createVideo(0)
         editors[0].setSelectedNode($otherVideo)
         trayController.showTrayForEditor(editors[0])
       })

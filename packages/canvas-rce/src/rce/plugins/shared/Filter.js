@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import {func, string} from 'prop-types'
+import React, {useEffect, useState} from 'react'
+import {func, oneOf, string} from 'prop-types'
 import {Flex, View} from '@instructure/ui-layout'
 import formatMessage from '../../../format-message'
 import {Select} from '@instructure/ui-forms'
@@ -46,8 +46,52 @@ export function useFilterSettings() {
   return [filterSettings, updateFilterSettings]
 }
 
+function fileLabelFromContext(contextType) {
+  switch (contextType) {
+    case 'user':
+      return formatMessage('My Files')
+    case 'course':
+      return formatMessage('Course Files')
+    case 'group':
+      return formatMessage('Group Files')
+    default:
+      return formatMessage('Files')
+  }
+}
+
+// ui-forms/Select chokes if one of the options is
+// undefined, which happens if you conditionally
+// create one like {test && <option>...</option>}
+// so build the options list more carefully here
+function buildContentOptions(userContextType) {
+  const contentOptions = [
+    <option key="links" value="links" icon={IconLinkLine}>
+      {formatMessage('Links')}
+    </option>,
+    <option key="user_files" value="user_files" icon={IconFolderLine}>
+      {fileLabelFromContext('user')}
+    </option>
+  ]
+
+  if (userContextType === 'course') {
+    contentOptions.splice(
+      1,
+      0,
+      <option key="course_files" value="course_files" icon={IconFolderLine}>
+        {fileLabelFromContext('course')}
+      </option>
+    )
+  }
+  return contentOptions
+}
+
 export default function Filter(props) {
-  const {contentType, contentSubtype, onChange, sortValue} = props
+  const {contentType, contentSubtype, onChange, sortValue, userContextType} = props
+
+  // only run on mounting to trigger change to correct contextType
+  useEffect(() => {
+    onChange({contentType})
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <View display="block" direction="column">
@@ -58,22 +102,14 @@ export default function Filter(props) {
         }}
         selectedOption={contentType}
       >
-        <option value="links" icon={IconLinkLine}>
-          {formatMessage('Links')}
-        </option>
-
-        <option value="files" icon={IconFolderLine}>
-          {formatMessage('Files')}
-        </option>
+        {buildContentOptions(userContextType)}
       </Select>
 
-      {contentType === 'files' && (
+      {contentType !== 'links' && (
         <Flex margin="small none none none">
           <Flex.Item grow shrink margin="none xx-small none none">
             <Select
-              label={
-                <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
-              }
+              label={<ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>}
               onChange={(e, selection) => {
                 onChange({contentSubtype: selection.value})
               }}
@@ -87,11 +123,9 @@ export default function Filter(props) {
                 {formatMessage('Documents')}
               </option>
 
-              {/*
               <option value="media" icon={IconAttachMediaLine}>
                 {formatMessage('Media')}
               </option>
-              */}
 
               <option value="all">{formatMessage('All')}</option>
             </Select>
@@ -128,7 +162,7 @@ Filter.propTypes = {
   /**
    * `contentType` is the primary filter setting (e.g. links, files)
    */
-  contentType: string.isRequired,
+  contentType: oneOf(['links', 'user_files', 'course_files']).isRequired,
 
   /**
    * `onChange` is called when any of the Filter settings are changed
@@ -138,5 +172,10 @@ Filter.propTypes = {
   /**
    * `sortValue` defines how items in the CanvasContentTray are sorted
    */
-  sortValue: string.isRequired
+  sortValue: string.isRequired,
+
+  /**
+   * The user's context
+   */
+  userContextType: oneOf(['user', 'course'])
 }

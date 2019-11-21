@@ -23,7 +23,7 @@
 #
 # @model WebZipExport
 #     {
-#       "id": "WebZip",
+#       "id": "WebZipExport",
 #       "description": "",
 #       "properties": {
 #         "id": {

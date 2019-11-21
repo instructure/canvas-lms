@@ -43,16 +43,20 @@ QUnit.module('SubmissionCommentApi.updateSubmissionComment', hooks => {
 
   test('on success, returns the submission comment with the updated comment', () => {
     server.respondWith('PUT', url, [200, {'Content-Type': 'application/json'}, responseBody])
-    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).then(response => {
-      strictEqual(response.data.comment, updatedComment)
-    })
+    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).then(
+      response => {
+        strictEqual(response.data.comment, updatedComment)
+      }
+    )
   })
 
   test('on success, returns the submission comment with an updated editedAt', () => {
     server.respondWith('PUT', url, [200, {'Content-Type': 'application/json'}, responseBody])
-    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).then(response => {
-      strictEqual(response.data.editedAt.getTime(), new Date(editedAt).getTime())
-    })
+    return SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment).then(
+      response => {
+        strictEqual(response.data.editedAt.getTime(), new Date(editedAt).getTime())
+      }
+    )
   })
 
   test('on failure, returns a rejected promise with the error', () => {

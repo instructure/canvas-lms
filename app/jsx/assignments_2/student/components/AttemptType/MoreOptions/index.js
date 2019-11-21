@@ -16,25 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ApolloClient} from 'apollo-client'
-import ExternalToolsQuery from './ExternalToolsQuery'
-import I18n from 'i18n!assignments_2_initial_query'
+import {bool, func, string} from 'prop-types'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
+import {EXTERNAL_TOOLS_QUERY} from '../../../graphqlData/Queries'
+import GenericErrorPage from '../../../../../shared/components/GenericErrorPage/index'
+import I18n from 'i18n!assignments_2_MoreOptions'
+import LoadingIndicator from '../../../../shared/LoadingIndicator'
+import {Query} from 'react-apollo'
 import React from 'react'
-import {string, instanceOf} from 'prop-types'
-import {withApollo} from 'react-apollo'
+import UserGroupsQuery from './UserGroupsQuery'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Modal, {
-  ModalHeader,
-  ModalBody,
-  ModalFooter
-} from '@instructure/ui-overlays/lib/components/Modal'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-heading'
+import {Modal} from '@instructure/ui-overlays'
 
 class MoreOptions extends React.Component {
   state = {
-    open: false
+    open: false,
+    selectedCanvasFileID: null
   }
 
   _isMounted = false
@@ -46,13 +45,22 @@ class MoreOptions extends React.Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    window.removeEventListener('message', this.handleIframeTask)
+  }
+
+  handleCanvasFileSelect = fileID => {
+    if (this._isMounted) {
+      this.setState({selectedCanvasFileID: fileID})
+    }
   }
 
   handleIframeTask = e => {
-    if (e.data.messageType === 'LtiDeepLinkingResponse') {
-      if (this._isMounted) {
-        this.setState({open: false})
-      }
+    if (
+      this._isMounted &&
+      (e.data.messageType === 'LtiDeepLinkingResponse' ||
+        e.data.messageType === 'A2ExternalContentReady')
+    ) {
+      this.handleModalClose()
     }
   }
 
@@ -64,7 +72,7 @@ class MoreOptions extends React.Component {
 
   handleModalClose = () => {
     if (this._isMounted) {
-      this.setState({open: false})
+      this.setState({open: false, selectedCanvasFileID: null})
     }
   }
 
@@ -74,59 +82,97 @@ class MoreOptions extends React.Component {
     </CloseButton>
   )
 
-  render() {
-    return (
-      <>
-        <div style={{display: 'block'}}>
-          <Button
-            data-testid="more-options-button"
-            onClick={this.handleModalOpen}
-            margin="medium 0"
-          >
-            {I18n.t('More Options')}
-          </Button>
-        </div>
-        {this.state.open && (
-          <Modal
-            as="form"
-            data-testid="more-options-modal"
-            open={this.state.open}
-            onDismiss={this.handleModalClose}
-            size="large"
-            label="More Options"
-            shouldCloseOnDocumentClick
-          >
-            <ModalHeader>
-              {this.renderCloseButton()}
-              <Heading>{I18n.t('More Options')}</Heading>
-            </ModalHeader>
-            <ModalBody padding="0 small">
-              <ExternalToolsQuery
-                assignmentID={this.props.assignmentID}
-                courseID={this.props.courseID}
-                userID={this.props.userID}
-                client={this.props.client}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button onClick={this.handleModalClose} margin="0 xx-small 0 0">
-                {I18n.t('Cancel')}
-              </Button>
-              <Button variant="primary" type="submit">
+  renderMoreOptionsButton = () => (
+    <div style={{display: 'block'}}>
+      <Button data-testid="more-options-button" onClick={this.handleModalOpen}>
+        {I18n.t('More Options')}
+      </Button>
+    </div>
+  )
+
+  renderModal = data => {
+    if (this.state.open) {
+      return (
+        <Modal
+          as="form"
+          data-testid="more-options-modal"
+          open={this.state.open}
+          onDismiss={this.handleModalClose}
+          size="large"
+          label={I18n.t('More Options')}
+          shouldCloseOnDocumentClick
+        >
+          <Modal.Header>
+            {this.renderCloseButton()}
+            <Heading>{I18n.t('More Options')}</Heading>
+          </Modal.Header>
+          <Modal.Body padding="0 small">
+            <UserGroupsQuery
+              assignmentID={this.props.assignmentID}
+              courseID={this.props.courseID}
+              handleCanvasFileSelect={this.handleCanvasFileSelect}
+              renderCanvasFiles={this.props.renderCanvasFiles}
+              tools={data.course.externalToolsConnection.nodes}
+              userID={this.props.userID}
+            />
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this.handleModalClose} margin="0 xx-small 0 0">
+              {I18n.t('Cancel')}
+            </Button>
+            {this.state.selectedCanvasFileID && (
+              <Button
+                variant="primary"
+                type="submit"
+                onClick={() => {
+                  this.props.handleCanvasFiles(this.state.selectedCanvasFileID)
+                  this.handleModalClose()
+                }}
+              >
                 {I18n.t('Upload')}
               </Button>
-            </ModalFooter>
-          </Modal>
-        )}
-      </>
+            )}
+          </Modal.Footer>
+        </Modal>
+      )
+    }
+  }
+
+  render() {
+    return (
+      <Query query={EXTERNAL_TOOLS_QUERY} variables={{courseID: this.props.courseID}}>
+        {({loading, error, data}) => {
+          if (loading) return <LoadingIndicator />
+          if (error) {
+            return (
+              <GenericErrorPage
+                imageUrl={errorShipUrl}
+                errorSubject={I18n.t('Course external tools query error')}
+                errorCategory={I18n.t('Assignments 2 Student Error Page')}
+              />
+            )
+          }
+          if (!this.props.renderCanvasFiles && !data.course.externalToolsConnection.nodes.length) {
+            return null // nothing to render
+          }
+          return (
+            <>
+              {this.renderMoreOptionsButton()}
+              {this.renderModal(data)}
+            </>
+          )
+        }}
+      </Query>
     )
   }
 }
+
 MoreOptions.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
-  userID: string.isRequired,
-  client: instanceOf(ApolloClient)
+  handleCanvasFiles: func,
+  renderCanvasFiles: bool,
+  userID: string
 }
 
-export default withApollo(MoreOptions)
+export default MoreOptions

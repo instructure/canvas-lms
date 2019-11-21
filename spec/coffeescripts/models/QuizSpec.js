@@ -177,6 +177,42 @@ test('checks for no multiple due dates from quiz overrides', () => {
   ok(!quiz.multipleDueDates())
 })
 
+QUnit.module('Quiz.Next', {
+  setup() {
+    this.quiz = new Quiz({
+      id: 7,
+      html_url: 'http://localhost:3000/courses/1/assignments/7',
+      assignment_id: 7,
+      quiz_type: 'quizzes.next'
+    })
+    this.ajaxStub = sandbox.stub($, 'ajaxJSON')
+  },
+  teardown() {}
+})
+
+test('#initialize model record id', function() {
+  equal(this.quiz.id, 'assignment_7')
+})
+
+test('#initialize should set url from html url', function() {
+  equal(this.quiz.get('url'), 'http://localhost:3000/courses/1/assignments/7')
+})
+
+test('#initialize should set edit_url from html url', function() {
+  equal(this.quiz.get('edit_url'), 'http://localhost:3000/courses/1/assignments/7/edit?quiz_lti')
+})
+
+test('#initialize should set publish_url from html url', function() {
+  equal(this.quiz.get('publish_url'), 'http://localhost:3000/courses/1/assignments/publish/quiz')
+})
+
+test('#initialize should set unpublish_url from html url', function() {
+  equal(
+    this.quiz.get('unpublish_url'),
+    'http://localhost:3000/courses/1/assignments/unpublish/quiz'
+  )
+})
+
 QUnit.module('Quiz#allDates')
 
 test('gets the due dates from the assignment overrides', () => {
@@ -289,4 +325,119 @@ test('includes singleSectionDueDate', () => {
   sandbox.stub(quiz, 'multipleDueDates').returns(false)
   const json = quiz.toView()
   equal(json.singleSectionDueDate, dueAt.toISOString())
+})
+
+QUnit.module('Quiz#duplicate')
+
+test('make ajax call with right url when duplicate is called', () => {
+  const assignmentID = '200'
+  const courseID = '123'
+  const quiz = new Quiz({
+    name: 'foo',
+    id: assignmentID,
+    course_id: courseID
+  })
+  const spy = sandbox.spy($, 'ajaxJSON')
+  quiz.duplicate()
+  ok(spy.withArgs(`/api/v1/courses/${courseID}/assignments/${assignmentID}/duplicate`).calledOnce)
+})
+
+QUnit.module('Quiz#duplicate_failed')
+
+test('make ajax call with right url when duplicate_failed is called', () => {
+  const assignmentID = '200'
+  const originalAssignmentID = '42'
+  const courseID = '123'
+  const originalCourseID = '234'
+  const quiz = new Quiz({
+    name: 'foo',
+    id: assignmentID,
+    original_assignment_id: originalAssignmentID,
+    course_id: courseID,
+    original_course_id: originalCourseID
+  })
+  const spy = sandbox.spy($, 'ajaxJSON')
+  quiz.duplicate_failed()
+  ok(
+    spy.withArgs(
+      `/api/v1/courses/${originalCourseID}/assignments/${originalAssignmentID}/duplicate?target_assignment_id=${assignmentID}&target_course_id=${courseID}`
+    ).calledOnce
+  )
+})
+
+QUnit.module('Quiz#retry_migration')
+
+test('make ajax call with right url when retry_migration is called', () => {
+  const assignmentID = '200'
+  const originalQuizID = '42'
+  const courseID = '123'
+  const quiz = new Quiz({
+    name: 'foo',
+    id: assignmentID,
+    original_quiz_id: originalQuizID,
+    course_id: courseID
+  })
+  const spy = sandbox.spy($, 'ajaxJSON')
+  quiz.retry_migration()
+  ok(
+    spy.withArgs(
+      `/api/v1/courses/${courseID}/content_exports?export_type=quizzes2&quiz_id=${originalQuizID}&include[]=migrated_quiz`
+    ).calledOnce
+  )
+})
+
+QUnit.module('Assignment#pollUntilFinishedLoading (duplicate)', {
+  setup() {
+    this.clock = sinon.useFakeTimers()
+    this.quiz = new Quiz({workflow_state: 'duplicating'})
+    sandbox.stub(this.quiz, 'fetch').returns($.Deferred().resolve())
+  },
+  teardown() {
+    this.clock.restore()
+  }
+})
+
+test('polls for updates (duplicate)', function() {
+  this.quiz.pollUntilFinishedLoading(4000)
+  this.clock.tick(2000)
+  notOk(this.quiz.fetch.called)
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.called)
+})
+
+test('stops polling when the quiz has finished duplicating', function() {
+  this.quiz.pollUntilFinishedLoading(3000)
+  this.quiz.set({workflow_state: 'unpublished'})
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.calledOnce)
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.calledOnce)
+})
+
+QUnit.module('Assignment#pollUntilFinishedLoading (migration)', {
+  setup() {
+    this.clock = sinon.useFakeTimers()
+    this.quiz = new Quiz({workflow_state: 'migrating'})
+    sandbox.stub(this.quiz, 'fetch').returns($.Deferred().resolve())
+  },
+  teardown() {
+    this.clock.restore()
+  }
+})
+
+test('polls for updates (migration)', function() {
+  this.quiz.pollUntilFinishedLoading(4000)
+  this.clock.tick(2000)
+  notOk(this.quiz.fetch.called)
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.called)
+})
+
+test('stops polling when the quiz has finished migrating', function() {
+  this.quiz.pollUntilFinishedLoading(3000)
+  this.quiz.set({workflow_state: 'unpublished'})
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.calledOnce)
+  this.clock.tick(3000)
+  ok(this.quiz.fetch.calledOnce)
 })

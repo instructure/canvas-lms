@@ -28,7 +28,7 @@ class Collaborator < ActiveRecord::Base
     p.to {
       users = self.group_id.nil? ? [self.user] : self.group.users - [self.user]
       if self.context.is_a?(Course)
-        enrolled_user_ids = self.context.enrollments.active_or_pending_by_date.where(:user_id => users).pluck(:user_id).to_set
+        enrolled_user_ids = self.context.enrollments.active_by_date.where(:user_id => users).pluck(:user_id).to_set
         users = users.select{|u| enrolled_user_ids.include?(u.id)}
       end
       if self.collaboration.collaboration_type == 'google_docs'

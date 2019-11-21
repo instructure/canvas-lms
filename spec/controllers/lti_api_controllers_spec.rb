@@ -426,7 +426,7 @@ to because the assignment has no points possible.
     it "should reject non-numeric scores" do
       expect(@assignment.submissions.not_placeholder.where(user_id: @student)).not_to be_exists
       make_call('body' => replace_result(score: "OHAI SCORES"))
-      check_failure('failure')
+      check_failure('failure', 'Unable to parse resultScore: OHAI SCORES')
     end
 
     context "pass_fail zero point assignments" do

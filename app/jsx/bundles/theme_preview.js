@@ -17,7 +17,8 @@
  */
 
 import $ from 'jquery'
+import ready from '@instructure/ready'
 import 'jqueryui/tabs'
 import 'jqueryui/button'
 
-$('#theme-preview-tabs').tabs()
+ready(() => $('#theme-preview-tabs').tabs())

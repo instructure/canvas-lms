@@ -19,7 +19,7 @@
  */
 
 pipeline {
-  agent none
+  agent { label 'canvas-docker' }
   options {
     ansiColor('xterm')
   }
@@ -29,23 +29,50 @@ pipeline {
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+    // for now 1 until we stabilize some of the flaky specs
+    RERUNS_RETRY = 1
+    MAX_FAIL = 5
   }
-  // Todo: This will run all performance tests consecutively, still need to get parallel depending on runtime
+
   stages {
     stage ('Selenium Performance Tests') {
-      agent { label 'docker' }
       steps {
-        timeout(time: 60) {
+        timeout(time: 30) {
+          checkout scm
           sh 'printenv | sort'
+          sh 'build/new-jenkins/docker-compose-pull.sh'
+          sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
           sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-          // Todo: create selenium performance chrome script
-          // sh 'build/new-jenkins/.sh'
+          sh 'build/new-jenkins/rspec-with-retries.sh performance'
         }
       }
 
       post {
+        unsuccessful {
+          // copy spec failures to local
+          sh 'mkdir -p tmp'
+          sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
+          script {
+            def htmlFiles
+            // find all results files
+            dir ('tmp') {
+              htmlFiles = findFiles glob: '**/index.html'
+            }
+            // publish html
+            publishHTML target: [
+              allowMissing: false,
+              alwaysLinkToLastBuild: false,
+              keepAll: true,
+              reportDir: "tmp",
+              reportFiles: htmlFiles.join(','),
+              reportName: 'Test Failures'
+              ]
+          }
+        }
+
         cleanup {
+          sh 'rm -rf ./tmp/spec_failures/'
           sh 'build/new-jenkins/docker-cleanup.sh'
         }
       }

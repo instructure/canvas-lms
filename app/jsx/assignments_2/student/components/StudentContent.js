@@ -24,7 +24,7 @@ import I18n from 'i18n!assignments_2_student_content'
 import LockedAssignment from './LockedAssignment'
 import MissingPrereqs from './MissingPrereqs'
 import React, {Suspense, lazy} from 'react'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-elements'
 import {Submission} from '../graphqlData/Submission'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
@@ -41,7 +41,7 @@ function renderContentBaseOnAvailability({assignment, submission}) {
       <>
         <AssignmentToggleDetails description={assignment.description} />
         <Suspense
-          fallback={<Spinner title={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
+          fallback={<Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
         >
           <LoggedOutTabs assignment={assignment} />
         </Suspense>

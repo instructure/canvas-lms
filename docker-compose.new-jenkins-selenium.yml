@@ -1,12 +1,33 @@
 # it is intended that this be used exclusive of all other docker-compose.*yml files in CI
-version: "2.1"
+version: "2.3"
 services:
   web:
     links:
       - selenium-chrome
+      - canvasrceapi
     environment:
       remote_url: http://selenium-chrome:4444/wd/hub
       browser: chrome
+      RCE_HOST: "http://canvasrceapi"
+      # these are so we can use prod compiled assets in test environment
+      USE_OPTIMIZED_JS: 'true'
+      SASS_STYLE: 'compressed'
 
   selenium-chrome:
-    build: ./docker-compose/selenium-chrome
+    image: starlord.inscloudgate.net/jenkins/selenium-chrome:3.141.59-selenium
+    environment:
+      SCREEN_WIDTH: 1680
+      SCREEN_HEIGHT: 1050
+
+  canvasrceapi:
+    image: starlord.inscloudgate.net/jeremyp/canvas-rce-api_web
+    environment:
+      ECOSYSTEM_KEY: "astringthatisactually32byteslong"
+      ECOSYSTEM_SECRET: "astringthatisactually32byteslong"
+      HTTP_PROTOCOL_OVERRIDE: "http"
+      NODE_ENV: production
+      PASSENGER_MIN_INSTANCES: 2
+      PASSENGER_MAX_POOL_SIZE: 6
+      NGINX_WORKER_CONNECTIONS: 2048
+    ports:
+      - "3001:80"

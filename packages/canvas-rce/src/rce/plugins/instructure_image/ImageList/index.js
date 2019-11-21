@@ -24,13 +24,7 @@ import Image from './Image'
 
 export default function ImageList({images, lastItemRef, onImageClick}) {
   return (
-    <Flex
-      justifyItems="start"
-      height="100%"
-      margin="xx-small"
-      padding="small"
-      wrapItems
-    >
+    <Flex justifyItems="start" height="100%" margin="xx-small" padding="small" wrapItems>
       {images.map((image, index) => {
         let focusRef = null
         if (index === images.length - 1) {

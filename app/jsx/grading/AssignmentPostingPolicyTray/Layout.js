@@ -19,13 +19,10 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, View} from '@instructure/ui-layout'
+import {List, Text} from '@instructure/ui-elements'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
 
 import I18n from 'i18n!assignment_posting_policy_tray'
 
@@ -66,11 +63,11 @@ export default function Layout(props) {
           </Text>
 
           <List margin="0 0 0 small" size="small" itemSpacing="small">
-            <ListItem>{I18n.t('Their grade for the assignment')}</ListItem>
-            <ListItem>{I18n.t('Grade change notifications')}</ListItem>
-            <ListItem>{I18n.t('Submission comments')}</ListItem>
-            <ListItem>{I18n.t('Curving assignments')}</ListItem>
-            <ListItem>{I18n.t('Score change notifications')}</ListItem>
+            <List.Item>{I18n.t('Their grade for the assignment')}</List.Item>
+            <List.Item>{I18n.t('Grade change notifications')}</List.Item>
+            <List.Item>{I18n.t('Submission comments')}</List.Item>
+            <List.Item>{I18n.t('Curving assignments')}</List.Item>
+            <List.Item>{I18n.t('Score change notifications')}</List.Item>
           </List>
 
           <Text size="small" as="p">
@@ -128,17 +125,17 @@ export default function Layout(props) {
         id="AssignmentPostingPolicyTray__Buttons"
       >
         <Flex justifyItems="end">
-          <FlexItem margin="0 small 0 0">
+          <Flex.Item margin="0 small 0 0">
             <Button onClick={props.onDismiss} disabled={!props.allowCanceling}>
               {I18n.t('Cancel')}
             </Button>
-          </FlexItem>
+          </Flex.Item>
 
-          <FlexItem>
+          <Flex.Item>
             <Button onClick={props.onSave} disabled={!props.allowSaving} variant="primary">
               {I18n.t('Save')}
             </Button>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </View>
     </>

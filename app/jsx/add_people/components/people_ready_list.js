@@ -20,70 +20,72 @@ import I18n from 'i18n!PeopleReadyList'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {personReadyToEnrollShape} from './shapes'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Table from '@instructure/ui-elements/lib/components/Table'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Alert} from '@instructure/ui-alerts'
+import {Table} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
-  class PeopleReadyList extends React.Component {
-    static propTypes = {
-      nameList: PropTypes.arrayOf(PropTypes.shape(personReadyToEnrollShape)),
-      defaultInstitutionName: PropTypes.string,
-      canReadSIS: PropTypes.bool
-    };
-    static defaultProps = {
-      nameList: [],
-      defaultInstitutionName: '',
-      canReadSIS: true
-    };
-
-    renderNotice () {
-      return (
-        this.props.nameList.length > 0
-          ? <Alert variant="success">{I18n.t('The following users are ready to be added to the course.')}</Alert>
-          : <Alert variant="info">{I18n.t('No users were selected to add to the course')}</Alert>
-      );
-    }
-    renderUserTable () {
-      let userTable = null;
-      if (this.props.nameList.length > 0) {
-        userTable = (
-          <Table caption={<ScreenReaderContent>{I18n.t('User list')}</ScreenReaderContent>}>
-            <thead>
-              <tr>
-                <th>{I18n.t('Name')}</th>
-                <th>{I18n.t('Email Address')}</th>
-                <th>{I18n.t('Login ID')}</th>
-                {this.props.canReadSIS ? <th>{I18n.t('SIS ID')}</th> : null}
-                <th>{I18n.t('Institution')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {this.props.nameList.map((n, i) => (
-                <tr key={`${n.address}_${i}`}>
-                  <th scope="row">{n.user_name}</th>
-                  <td>{n.email}</td>
-                  <td>{n.login_id || ''}</td>
-                  {this.props.canReadSIS ? <td>{n.sis_user_id || ''}</td> : null}
-                  <td>{n.account_name || this.props.defaultInstitutionName}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        );
-      }
-      return userTable;
-    }
-
-    render () {
-      return (
-        <div className="addpeople__peoplereadylist">
-          <div className="peoplereadylist__pad-box">
-            {this.renderNotice()}
-          </div>
-          {this.renderUserTable()}
-        </div>
-      );
-    }
+class PeopleReadyList extends React.Component {
+  static propTypes = {
+    nameList: PropTypes.arrayOf(PropTypes.shape(personReadyToEnrollShape)),
+    defaultInstitutionName: PropTypes.string,
+    canReadSIS: PropTypes.bool
   }
+
+  static defaultProps = {
+    nameList: [],
+    defaultInstitutionName: '',
+    canReadSIS: true
+  }
+
+  renderNotice() {
+    return this.props.nameList.length > 0 ? (
+      <Alert variant="success">
+        {I18n.t('The following users are ready to be added to the course.')}
+      </Alert>
+    ) : (
+      <Alert variant="info">{I18n.t('No users were selected to add to the course')}</Alert>
+    )
+  }
+
+  renderUserTable() {
+    let userTable = null
+    if (this.props.nameList.length > 0) {
+      userTable = (
+        <Table caption={<ScreenReaderContent>{I18n.t('User list')}</ScreenReaderContent>}>
+          <thead>
+            <tr>
+              <th>{I18n.t('Name')}</th>
+              <th>{I18n.t('Email Address')}</th>
+              <th>{I18n.t('Login ID')}</th>
+              {this.props.canReadSIS ? <th>{I18n.t('SIS ID')}</th> : null}
+              <th>{I18n.t('Institution')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.props.nameList.map((n, i) => (
+              <tr key={`${n.address}_${i}`}>
+                <th scope="row">{n.user_name}</th>
+                <td>{n.email}</td>
+                <td>{n.login_id || ''}</td>
+                {this.props.canReadSIS ? <td>{n.sis_user_id || ''}</td> : null}
+                <td>{n.account_name || this.props.defaultInstitutionName}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )
+    }
+    return userTable
+  }
+
+  render() {
+    return (
+      <div className="addpeople__peoplereadylist">
+        <div className="peoplereadylist__pad-box">{this.renderNotice()}</div>
+        {this.renderUserTable()}
+      </div>
+    )
+  }
+}
 
 export default PeopleReadyList

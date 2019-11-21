@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import dispatchInitEvent from "./dispatchInitEvent";
+import dispatchInitEvent from './dispatchInitEvent'
 import {IconLtiLine} from '@instructure/ui-icons/es/svg'
+import clickCallback from './clickCallback'
 
-
-tinymce.create("tinymce.plugins.InstructureExternalTools", {
+tinymce.create('tinymce.plugins.InstructureExternalTools', {
   init(ed, url) {
+    document.addEventListener('tinyRCE/onExternalTools', event => {
+      clickCallback(ed, event.detail.ltiButtons)
+    })
     ed.ui.registry.addIcon('lti', IconLtiLine.src)
-    dispatchInitEvent(ed, document, url);
+    dispatchInitEvent(ed, document, url)
   },
   icon: 'lti'
-});
+})
 
 // Register plugin
-tinymce.PluginManager.add(
-  "instructure_external_tools",
-  tinymce.plugins.InstructureExternalTools
-);
+tinymce.PluginManager.add('instructure_external_tools', tinymce.plugins.InstructureExternalTools)

@@ -122,7 +122,7 @@ QUnit.module('CYOE Helper', () => {
 
   test('return correct "Multiple" for releasedLabel if item is released by a multiple rules', () => {
     const env = cyoeEnv()
-    const newRule = Object.assign({}, env.CONDITIONAL_RELEASE_ENV.active_rules[0])
+    const newRule = {...env.CONDITIONAL_RELEASE_ENV.active_rules[0]}
     newRule.trigger_assignment = '3'
     env.CONDITIONAL_RELEASE_ENV.active_rules.push(newRule)
     setEnv(env)

@@ -820,6 +820,14 @@ describe DiscussionTopicsController do
       get :new, params: {course_id: @course.id}
       expect(@course.assignment_groups.count).not_to eq 0
     end
+
+    it "announcement" do
+      user_session(@teacher)
+      @course.group_weighting_scheme = 'percent'
+      @course.save!
+      get :new, params: {course_id: @course.id, is_announcement: true}
+      expect(assigns[:js_env][:CONTEXT_ID]).to eq(@course.id)
+    end
   end
 
   describe "GET 'edit'" do

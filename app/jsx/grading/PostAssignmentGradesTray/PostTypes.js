@@ -18,12 +18,9 @@
 
 import React from 'react'
 import {bool, func, oneOf} from 'prop-types'
-
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-
+import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!hide_assignment_grades_tray'
 
 export const EVERYONE = 'everyone'
@@ -47,7 +44,9 @@ export default function PostTypes({anonymousGrading, defaultValue, disabled, pos
           <>
             <Text>{I18n.t('Everyone')}</Text>
             <br />
-            <Text size="small">{I18n.t('Grades will be made visible to all students')}</Text>
+            <Text size="small">
+              {I18n.t('All students will be able to see their grade and/or submission comments.')}
+            </Text>
           </>
         }
         value={EVERYONE}
@@ -59,7 +58,9 @@ export default function PostTypes({anonymousGrading, defaultValue, disabled, pos
             <Text>{I18n.t('Graded')}</Text>
             <br />
             <Text size="small">
-              {I18n.t('Grades will be made visible to students with graded submissions')}
+              {I18n.t(
+                'Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.'
+              )}
             </Text>
           </>
         }

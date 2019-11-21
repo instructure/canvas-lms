@@ -74,7 +74,7 @@ export default class FileSelectBox extends React.Component {
 
     folders = folders.sort((a, b) =>
       // Make sure we use a sane sorting mechanism.
-       natcompare.strings(a.full_name, b.full_name)
+      natcompare.strings(a.full_name, b.full_name)
     )
 
     return folders
@@ -89,16 +89,16 @@ export default class FileSelectBox extends React.Component {
 
     const renderFiles = function(folder) {
       return folder.files.map(file => (
-          <option key={`file-${  file.id}`} value={file.id}>
-            {file.display_name}
-          </option>
-        ))
+        <option key={`file-${file.id}`} value={file.id}>
+          {file.display_name}
+        </option>
+      ))
     }
 
     return tree.map(folder => {
       if (folder.files) {
         return (
-          <optgroup key={`folder-${  folder.id}`} label={folder.full_name}>
+          <optgroup key={`folder-${folder.id}`} label={folder.full_name}>
             {renderFiles(folder)}
           </optgroup>
         )
@@ -113,7 +113,9 @@ export default class FileSelectBox extends React.Component {
           ref="selectBox"
           aria-busy={this.isLoading()}
           className="module_item_select"
-          aria-label={I18n.t('Select the file you want to associate, or add a file by selecting "New File".')}
+          aria-label={I18n.t(
+            'Select the file you want to associate, or add a file by selecting "New File".'
+          )}
           multiple
         >
           <option value="new">{I18n.t('[ New File ]')}</option>

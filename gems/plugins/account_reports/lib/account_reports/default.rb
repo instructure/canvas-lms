@@ -38,8 +38,16 @@ module AccountReports
       GradeReports.new(account_report).grade_export
     end
 
+    def self.parallel_grade_export_csv(account_report, runner)
+      GradeReports.new(account_report, runner).grade_export_runner(runner)
+    end
+
     def self.mgp_grade_export_csv(account_report)
       GradeReports.new(account_report).mgp_grade_export
+    end
+
+    def self.parallel_mgp_grade_export_csv(account_report, runner)
+      GradeReports.new(account_report, runner).mgp_grade_export_runner(runner)
     end
 
     def self.sis_export_csv(account_report)

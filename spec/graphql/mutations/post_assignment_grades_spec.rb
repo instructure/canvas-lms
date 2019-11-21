@@ -23,9 +23,9 @@ describe Mutations::PostAssignmentGrades do
   include GraphQLSpecHelper
 
   let(:assignment) { course.assignments.create! }
-  let(:course) { Course.create!(workflow_state: "available") }
-  let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
-  let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
+  let(:course) { Course.create!(workflow_state: :available) }
+  let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: :active).user }
+  let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: :active).user }
 
   def mutation_str(assignment_id: nil, **options)
     input_string = assignment_id ? "assignmentId: #{assignment_id}" : ""
@@ -277,6 +277,7 @@ describe Mutations::PostAssignmentGrades do
     before(:each) do
       @student1_submission = assignment.submissions.find_by(user: student)
       @student2_submission = assignment.submissions.find_by(user: student2)
+      assignment.ensure_post_policy(post_manually: true)
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 
@@ -291,6 +292,29 @@ describe Mutations::PostAssignmentGrades do
       execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
       post_submissions_job.invoke_job
       expect(@student1_submission.reload).to be_posted
+    end
+
+    it "posts submissions with hidden comments if graded_only is true and post comments feature is enabled" do
+      course.root_account.enable_feature!(:allow_postable_submission_comments)
+      @student2_submission.add_comment(author: teacher, comment: "good work!", hidden: true)
+      execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
+      post_submissions_job.invoke_job
+      expect(@student2_submission.reload).to be_posted
+    end
+
+    it "does not post submissions with hidden comments if graded_only is true and post comments feature is not enabled" do
+      @student2_submission.add_comment(author: teacher, comment: "good work!", hidden: true)
+      execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
+      post_submissions_job.invoke_job
+      expect(@student2_submission.reload).not_to be_posted
+    end
+
+    it "does not post submissions with no hidden comments if graded_only is true and post comments feature is enabled" do
+      course.root_account.enable_feature!(:allow_postable_submission_comments)
+      @student2_submission.add_comment(author: student, comment: "good work!", hidden: false)
+      execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
+      post_submissions_job.invoke_job
+      expect(@student2_submission.reload).not_to be_posted
     end
 
     it "does not post the ungraded submissions if graded_only is true" do
@@ -312,4 +336,62 @@ describe Mutations::PostAssignmentGrades do
     end
   end
 
+  describe "Submissions Posted notification" do
+    let_once(:notification) { Notification.find_or_create_by!(category: "Grading", name: "Submissions Posted") }
+    let(:context) { { current_user: teacher } }
+    let(:post_submissions_job) { Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last }
+    let(:teacher_enrollment) { course.teacher_enrollments.find_by!(user: teacher) }
+    let(:section) { course.course_sections.create! }
+    let(:student_in_section) { User.create! }
+    let(:submissions_posted_messages) do
+      Message.where(
+        communication_channel: teacher.email_channel,
+        notification: notification
+      )
+    end
+
+    before(:each) do
+      section.enroll_user(student_in_section, "StudentEnrollment", "active")
+      teacher.update!(email: "fakeemail@example.com", workflow_state: :registered)
+      teacher.email_channel.update!(workflow_state: :active)
+    end
+
+    it "broadcasts a notification when posting to everyone" do
+      execute_query(mutation_str(assignment_id: assignment.id), context)
+      expect {
+        post_submissions_job.invoke_job
+      }.to change {
+        submissions_posted_messages.count
+      }.by(1)
+    end
+
+    it "broadcasts a notification when posting to everyone graded" do
+      assignment.grade_student(student, grader: teacher, score: 1)
+      execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
+      expect {
+        post_submissions_job.invoke_job
+      }.to change {
+        submissions_posted_messages.count
+      }.by(1)
+    end
+
+    it "broadcasts a notification when posting to everyone by sections" do
+      execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section.id]), context)
+      expect {
+        post_submissions_job.invoke_job
+      }.to change {
+        submissions_posted_messages.count
+      }.by(1)
+    end
+
+    it "broadcasts a notification when posting to everyone graded by sections" do
+      assignment.grade_student(student_in_section, grader: teacher, score: 1)
+      execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section.id], graded_only: true), context)
+      expect {
+        post_submissions_job.invoke_job
+      }.to change {
+        submissions_posted_messages.count
+      }.by(1)
+    end
+  end
 end

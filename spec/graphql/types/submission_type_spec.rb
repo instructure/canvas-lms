@@ -83,6 +83,25 @@ describe Types::SubmissionType do
       submission_unread_count = submission_type.resolve('unreadCommentCount')
       expect(submission_unread_count).to eq 0
     end
+
+    it 'treats submission comments for attempt nil, 0, and 1 as the same' do
+      @submission.submission_comments.create!(comment: 'foo', attempt: nil)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 0)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 1)
+      submission_unread_count = submission_type.resolve('unreadCommentCount')
+      expect(submission_unread_count).to eq 3
+    end
+
+    it 'only displays unread count for the given submission attempt' do
+      @submission.attempt = 2
+      @submission.save!
+      @submission.submission_comments.create!(comment: 'foo', attempt: nil)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 0)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 1)
+      @submission.submission_comments.create!(comment: 'foo', attempt: 2)
+      submission_unread_count = submission_type.resolve('unreadCommentCount')
+      expect(submission_unread_count).to eq 1
+    end
   end
 
   describe "score and grade" do
@@ -383,6 +402,101 @@ describe Types::SubmissionType do
 
     it 'returns gradeMatchesCurrentSubmission' do
       expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to eq false
+    end
+  end
+
+  describe 'rubric_Assessments_connection' do
+    before(:once) do
+      rubric_for_course
+      rubric_association_model(
+        context: @course,
+        rubric: @rubric,
+        association_object: @assignment,
+        purpose: 'grading'
+      )
+
+      @assignment.submit_homework(@student, body: 'foo', submitted_at: 2.hour.ago)
+
+      rubric_assessment_model(
+        user: @student,
+        assessor: @teacher,
+        rubric_association: @rubric_association,
+        assessment_type: 'grading'
+      )
+    end
+
+    it 'works' do
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }')
+      ).to eq [@rubric_assessment.id.to_s]
+    end
+
+    it 'requires permission' do
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }', current_user: @student)
+      ).to eq [@rubric_assessment.id.to_s]
+    end
+
+    it 'grabs the assessment for the current submission attempt by default' do
+      @submission2 = @assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { _id } }')
+      ).to eq []
+    end
+
+    it 'grabs the assessment for the given submission attempt when using the for_attempt filter' do
+      @assignment.submit_homework(@student, body: 'bar', submitted_at: 1.hour.since)
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection(filter: {forAttempt: 2}) { nodes { _id } }')
+      ).to eq [@rubric_assessment.id.to_s]
+    end
+
+    it 'works with submission histories' do
+      @assignment.submit_homework(@student, body: 'bar', submitted_at: 1.hour.since)
+      expect(
+        submission_type.resolve(
+          'submissionHistoriesConnection { nodes { rubricAssessmentsConnection { nodes { _id } } } }'
+        )
+      ).to eq [[], [@rubric_assessment.id.to_s], []]
+    end
+  end
+
+  describe 'turnitin_data' do
+    tii_data = {
+      similarity_score: 10,
+      state: 'acceptable',
+      report_url: 'http://example.com',
+      status: 'scored'
+    }
+
+    before(:once) do
+      @submission.turnitin_data[@submission.asset_string] = tii_data
+      @submission.turnitin_data[:last_processed_attempt] = 1
+      @submission.save!
+    end
+
+    it 'returns turnitin_data' do
+      expect(
+        submission_type.resolve('turnitinData { target { ...on Submission { _id } } }')
+      ).to eq [@submission.id.to_s]
+      expect(
+        submission_type.resolve('turnitinData { status }')
+      ).to eq [tii_data[:status]]
+      expect(
+        submission_type.resolve('turnitinData { score }')
+      ).to eq [tii_data[:similarity_score]]
+    end
+  end
+
+  describe 'submissionType' do
+    before(:once) do
+      @assignment.submit_homework(@student, body: 'bar', submission_type: 'online_text_entry')
+    end
+
+    it 'returns the submissionType' do
+      expect(
+        submission_type.resolve('submissionType')
+      ).to eq 'online_text_entry'
     end
   end
 end

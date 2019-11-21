@@ -86,6 +86,10 @@ export default class ContextTracker {
         })
       },
 
+      getTimeElapsed() {
+        return stack.length ? new Date() - stack[0].startTime : 0
+      },
+
       stack
     }
   }
@@ -119,11 +123,21 @@ export default class ContextTracker {
     })
 
     this._qunit.moduleStart(moduleInfo => {
-      this._stack.push({description: moduleInfo.name, failures: [], type: 'module'})
+      this._stack.push({
+        description: moduleInfo.name,
+        failures: [],
+        startTime: new Date(),
+        type: 'module'
+      })
     })
 
     this._qunit.testStart(testInfo => {
-      this._stack.push({description: testInfo.name, failures: [], type: 'test'})
+      this._stack.push({
+        description: testInfo.name,
+        failures: [],
+        startTime: new Date(),
+        type: 'test'
+      })
     })
 
     this._qunit.testDone(() => {

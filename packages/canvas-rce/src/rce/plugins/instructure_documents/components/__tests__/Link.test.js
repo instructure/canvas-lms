@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import formatMessage from '../../../../../format-message';
+import formatMessage from '../../../../../format-message'
 import Link from '../Link'
 
 function renderComponent(props) {
@@ -101,12 +101,22 @@ describe('RCE "Documents" Plugin > Document', () => {
       expect(queryIconByName(container, 'IconPdf')).toBeInTheDocument()
     })
 
+    it('the video icon', () => {
+      const {container} = renderComponent({content_type: 'video/mp4'})
+      expect(queryIconByName(container, 'IconVideo')).toBeInTheDocument()
+    })
+
+    it('the audio icon', () => {
+      const {container} = renderComponent({content_type: 'audio/mp3'})
+      expect(queryIconByName(container, 'IconAudio')).toBeInTheDocument()
+    })
+
     it('the drag handle only on hover', () => {
       const {container, getByTestId} = renderComponent()
 
-      expect(queryIconByName(container, "IconDragHandle")).not.toBeInTheDocument()
+      expect(queryIconByName(container, 'IconDragHandle')).not.toBeInTheDocument()
       fireEvent.mouseEnter(getByTestId('instructure_links-Link'))
-      expect(queryIconByName(container, "IconDragHandle")).toBeInTheDocument()
+      expect(queryIconByName(container, 'IconDragHandle')).toBeInTheDocument()
     })
   })
 
@@ -147,4 +157,3 @@ describe('RCE "Documents" Plugin > Document', () => {
     })
   })
 })
-

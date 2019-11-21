@@ -16,34 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
-import Animation from '../animation';
-import {daysToItems} from '../../utilities/daysUtils';
-import {isNewActivityItem} from '../../utilities/statusUtils';
+import _ from 'lodash'
+import Animation from '../animation'
+import {daysToItems} from '../../utilities/daysUtils'
+import {isNewActivityItem} from '../../utilities/statusUtils'
 
 export class ScrollToLastLoadedNewActivity extends Animation {
-  fixedElement () {
-    return this.app().fixedElementForItemScrolling();
+  fixedElement() {
+    return this.app().fixedElementForItemScrolling()
   }
 
-  uiDidUpdate () {
-    const gotDaysAction = this.acceptedAction('GOT_DAYS_SUCCESS');
-    const newDays = gotDaysAction.payload.internalDays;
-    const newItems = daysToItems(newDays);
-    const newActivityItems = newItems.filter(item => isNewActivityItem(item));
-    const newActivityItemIds = newActivityItems.map(item => item.uniqueId);
-    if (newActivityItemIds.length === 0) return;
+  uiDidUpdate() {
+    const gotDaysAction = this.acceptedAction('GOT_DAYS_SUCCESS')
+    const newDays = gotDaysAction.payload.internalDays
+    const newItems = daysToItems(newDays)
+    const newActivityItems = newItems.filter(item => isNewActivityItem(item))
+    const newActivityItemIds = newActivityItems.map(item => item.uniqueId)
+    if (newActivityItemIds.length === 0) return
 
-    let {componentIds: newActivityDayComponentIds} =
-      this.registry().getLastComponent('day', newActivityItemIds);
+    let {componentIds: newActivityDayComponentIds} = this.registry().getLastComponent(
+      'day',
+      newActivityItemIds
+    )
     // only want groups in the day that have new activity items
-    newActivityDayComponentIds = _.intersection(newActivityDayComponentIds, newActivityItemIds);
+    newActivityDayComponentIds = _.intersection(newActivityDayComponentIds, newActivityItemIds)
 
-    const {component: newActivityIndicator} =
-      this.registry().getLastComponent('new-activity-indicator', newActivityDayComponentIds);
+    const {component: newActivityIndicator} = this.registry().getLastComponent(
+      'new-activity-indicator',
+      newActivityDayComponentIds
+    )
 
-    this.maintainViewportPositionOfFixedElement();
-    this.animator().focusElement(newActivityIndicator.getFocusable());
-    this.animator().scrollTo(newActivityIndicator.getScrollable(), this.manager().totalOffset());
+    this.maintainViewportPositionOfFixedElement()
+    this.animator().focusElement(newActivityIndicator.getFocusable())
+    this.animator().scrollTo(newActivityIndicator.getScrollable(), this.manager().totalOffset())
   }
 }

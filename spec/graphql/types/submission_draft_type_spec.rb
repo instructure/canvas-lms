@@ -26,6 +26,7 @@ RSpec.describe Types::SubmissionDraftType do
       submission: @submission,
       submission_attempt: @submission.attempt + 1
     )
+    @media_object = factory_with_protected_attributes(MediaObject, :media_id => 'm-123456', :title => 'CreedThoughts')
   end
 
   def resolve_submission_draft
@@ -36,13 +37,19 @@ RSpec.describe Types::SubmissionDraftType do
             nodes {
               submissionDraft {
                 _id
+                activeSubmissionType
                 attachments {
                   _id
                   displayName
                 }
                 body
+                mediaObject {
+                  _id
+                  title
+                }
                 meetsAssignmentCriteria
                 submissionAttempt
+                url
               }
             }
           }
@@ -84,5 +91,30 @@ RSpec.describe Types::SubmissionDraftType do
   it 'returns the meetsAssignmentCriteria field' do
     submission_draft = resolve_submission_draft
     expect(submission_draft['meetsAssignmentCriteria']).to eq(false)
+  end
+
+  it 'returns the draft url' do
+    @submission_draft.url = 'http://www.google.com'
+    @submission_draft.save!
+
+    submission_draft = resolve_submission_draft
+    expect(submission_draft['url']).to eq('http://www.google.com')
+  end
+
+  it 'returns the media object' do
+    @submission_draft.media_object_id = @media_object.media_id
+    @submission_draft.save!
+
+    submission_draft = resolve_submission_draft
+    expect(submission_draft['mediaObject']['_id']).to eq(@media_object.media_id)
+    expect(submission_draft['mediaObject']['title']).to eq(@media_object.title)
+  end
+
+  it 'returns the active submission type' do
+    @submission_draft.active_submission_type = 'online_upload'
+    @submission_draft.save!
+
+    submission_draft = resolve_submission_draft
+    expect(submission_draft['activeSubmissionType']).to eq('online_upload')
   end
 end

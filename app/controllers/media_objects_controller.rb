@@ -16,8 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# This isn't an API because it needs to work for non-logged in users (video in public course)
-# API Media Objects
+# @API Media Objects
 #
 # When you upload or record webcam video/audio to kaltura, it makes a Media Object
 #
@@ -25,6 +24,10 @@
 #   {
 #     // whether or not the current user can upload media_tracks (subtitles) to this Media Object
 #     "can_add_captions": true,
+#     "user_entered_title": "User Entered Title",
+#     "title": "filename-or-user-title-or-untitled",
+#     "media_id": "m-JYmy6TLsHkxcrhgYmqa7XW1HCH3wEYc",
+#     "media_type": "video",
 #     // an array of all the media_tracks uploaded to this Media Object
 #     "media_tracks": [{
 #       "kind": "captions",
@@ -68,9 +71,11 @@
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
 
-  before_action :load_media_object
+  before_action :load_media_object, :except => [:index, :update_media_object]
+  before_action :require_user, :except => [:show]
 
   # @{not an}API Show Media Object Details
+  # This isn't an API because it needs to work for non-logged in users (video in public course)
   #
   # Returns the Details of the given Media Object.
   #
@@ -83,10 +88,84 @@ class MediaObjectsController < ApplicationController
     render :json => media_object_api_json(@media_object, @current_user, session)
   end
 
+  # @API List Media Objects
+  #
+  # Returns Media Objects created by the user making the request. When
+  # using the second version, returns
+  # only those Media Objects associated with the given course.
+  #
+  # @argument sort [String, "title"|"created_at"]
+  #   Field to sort on. Default is "title"
+  #
+  #   title:: sorts on user_entered_title if available, title if not.
+  #
+  #   created_at:: sorts on the object's creation time.
+  # @argument order [String, "asc"|"desc"]
+  #   Sort direction. Default is "asc"
+  #
+  # @argument exclude[] [String, "sources"|"tracks"]
+  #   Array of data to exclude. By excluding "sources" and "tracks",
+  #   the api will not need to query kaltura, which greatly
+  #   speeds up its response.
+  #
+  #   sources:: Do not query kaltura for media_sources
+  #   tracks:: Do not query kaltura for media_tracks
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/media_objects?exclude[]=sources&exclude[]=tracks \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  #     curl https://<canvas>/api/v1/courses/17/media_objects?exclude[]=sources&exclude[]=tracks \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [MediaObject]
+  def index
+    if params[:course_id]
+      context = Course.find(params[:course_id])
+    end
+
+    where_hash = {user: @current_user}
+    where_hash[:context] = context if context
+
+    order_dir = params[:order] == "desc" ? "desc" : "asc"
+    order_by = params[:sort] || "title"
+    order_by = MediaObject.best_unicode_collation_key('COALESCE(user_entered_title, title)') if order_by == "title"
+    order_clause = {
+      order_by => order_dir
+    }
+
+    exclude = params[:exclude] || []
+    media_objects = Api.paginate(MediaObject.where(where_hash).active.order(order_clause), self, api_v1_media_objects_url).
+      map{ |mo| media_object_api_json(mo, @current_user, session, exclude)}
+    render :json => media_objects
+  end
+
+  # @API Update Media Object
+  #
+  # @argument user_entered_title [String] The new title.
+  #
+  def update_media_object
+    if params[:media_object_id]
+      @media_object = MediaObject.by_media_id(params[:media_object_id]).first
+
+      return render_unauthorized_action unless @media_object
+      return render_unauthorized_action unless @current_user&.id
+      # media objects don't have any permissions associated with them,
+      # so we just check that this is the user's media
+      return render_unauthorized_action unless @media_object.user_id == @current_user.id
+      return render json: {message: "The user_entered_title parameter must have a value"}, status: :bad_request if params[:user_entered_title].blank?
+
+      self.extend TextHelper
+      @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255)
+      @media_object.save!
+      render :json => media_object_api_json(@media_object, @current_user, session, ["sources", "tracks"])
+    end
+  end
+
   def iframe_media_player
-    js_env media_sources: media_sources_json(@media_object)
+    js_env media_object: media_object_api_json(@media_object, @current_user, session)
     js_bundle :media_player_iframe_content
-    render html: '', layout: 'layouts/bare'
+    render html: "<div><div>#{I18n.t('Loading...')}</div></div>".html_safe, layout: 'layouts/bare'
   end
 
   private

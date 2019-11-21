@@ -23,80 +23,98 @@ import Spinner from 'spin.js'
 import './jquery.ajaxJSON'
 import './jquery.instructure_misc_helpers'
 
+let lookupStarted = false
 
-  var lookupStarted = false;
-
-  INST.lookupPrerequisites = function() {
-    if (lookupStarted) {
-        return;
-    }
-
-    var $link = $("#module_prerequisites_lookup_link");
-    if ($link.length == 0) {
-        return;
-    }
-    lookupStarted = true;
-
-    var url = $link.attr('x-canvaslms-trusted-url');
-
-    var spinner = new Spinner({radius: 5});
-    spinner.spin();
-    $(spinner.el).css({opacity: 0.5, top: '25px', left: '200px'}).appendTo('.spinner');
-
-    $.ajaxJSON(url, 'GET', {}, function(data) {
-      spinner.stop();
-      if(data.locked === false) {
-        return;
-      }
-      var $ul = $("<ul/>");
-      $ul.attr('id', 'module_prerequisites_list');
-      for(var idx in data.modules) {
-        var module = data.modules[idx];
-        var $li = $("<li/>");
-        var $i = $("<i/>");
-        $li.addClass('module');
-        $li.click(function() {
-          $(this).find("ul").toggle();
-        });
-        $li.toggleClass('locked', !!module.locked);
-        if (module.locked) { $i.addClass('icon-lock'); }
-        $li.append($i);
-        var $h3 = $("<h3/>");
-        $h3.text(module.name);
-        $li.append($h3);
-        if(module.prerequisites && module.prerequisites.length > 0) {
-          var $pres = $("<ul/>");
-          for(var jdx in module.prerequisites) {
-            var pre = module.prerequisites[jdx];
-            var $pre = $("<li/>");
-            $pre.addClass('requirement');
-            $pre.toggleClass('locked_requirement', !pre.available);
-            var $a = $("<a/>");
-            $a.attr('href', pre.url);
-            $a.text(pre.title);
-            $a.toggleClass('icon-lock', !pre.available);
-            $pre.append($a);
-            var desc = pre.requirement_description;
-            if(desc) {
-              var $div = $("<div/>");
-              $div.addClass('description');
-              $div.text(desc);
-              $pre.append($div);
-            }
-            $pres.append($pre);
-          }
-          $li.append($pres);
-        }
-        $ul.append($li);
-      }
-      $link.after($ul);
-      var header = I18n.t("headers.completion_prerequisites", "Completion Prerequisites");
-      var sentence = I18n.beforeLabel(I18n.t("labels.requirements_must_be_completed", "The following requirements need to be completed before this page will be unlocked"));
-      $link.after("<br/><h3 style='margin-top: 15px;'>" + htmlEscape(header) + "</h3>" + htmlEscape(sentence));
-      $link.prev("a").hide();
-    }, data => {
-      spinner.stop();
-      $('.module_prerequisites_fallback').show();
-    })
+INST.lookupPrerequisites = function() {
+  if (lookupStarted) {
+    return
   }
-  $(document).ready(INST.lookupPrerequisites);
+
+  const $link = $('#module_prerequisites_lookup_link')
+  if ($link.length == 0) {
+    return
+  }
+  lookupStarted = true
+
+  const url = $link.attr('x-canvaslms-trusted-url')
+
+  const spinner = new Spinner({radius: 5})
+  spinner.spin()
+  $(spinner.el)
+    .css({opacity: 0.5, top: '25px', left: '200px'})
+    .appendTo('.spinner')
+
+  $.ajaxJSON(
+    url,
+    'GET',
+    {},
+    function(data) {
+      spinner.stop()
+      if (data.locked === false) {
+        return
+      }
+      const $ul = $('<ul/>')
+      $ul.attr('id', 'module_prerequisites_list')
+      for (const idx in data.modules) {
+        const module = data.modules[idx]
+        const $li = $('<li/>')
+        const $i = $('<i/>')
+        $li.addClass('module')
+        $li.click(function() {
+          $(this)
+            .find('ul')
+            .toggle()
+        })
+        $li.toggleClass('locked', !!module.locked)
+        if (module.locked) {
+          $i.addClass('icon-lock')
+        }
+        $li.append($i)
+        const $h3 = $('<h3/>')
+        $h3.text(module.name)
+        $li.append($h3)
+        if (module.prerequisites && module.prerequisites.length > 0) {
+          const $pres = $('<ul/>')
+          for (const jdx in module.prerequisites) {
+            const pre = module.prerequisites[jdx]
+            const $pre = $('<li/>')
+            $pre.addClass('requirement')
+            $pre.toggleClass('locked_requirement', !pre.available)
+            const $a = $('<a/>')
+            $a.attr('href', pre.url)
+            $a.text(pre.title)
+            $a.toggleClass('icon-lock', !pre.available)
+            $pre.append($a)
+            const desc = pre.requirement_description
+            if (desc) {
+              const $div = $('<div/>')
+              $div.addClass('description')
+              $div.text(desc)
+              $pre.append($div)
+            }
+            $pres.append($pre)
+          }
+          $li.append($pres)
+        }
+        $ul.append($li)
+      }
+      $link.after($ul)
+      const header = I18n.t('headers.completion_prerequisites', 'Completion Prerequisites')
+      const sentence = I18n.beforeLabel(
+        I18n.t(
+          'labels.requirements_must_be_completed',
+          'The following requirements need to be completed before this page will be unlocked'
+        )
+      )
+      $link.after(
+        "<br/><h3 style='margin-top: 15px;'>" + htmlEscape(header) + '</h3>' + htmlEscape(sentence)
+      )
+      $link.prev('a').hide()
+    },
+    data => {
+      spinner.stop()
+      $('.module_prerequisites_fallback').show()
+    }
+  )
+}
+$(document).ready(INST.lookupPrerequisites)

@@ -16,27 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import '@instructure/canvas-theme';
-import generateId from 'format-message-generate-id/underscored_crc32';
-import formatMessage from './src/format-message';
-import translations from './src/i18n/indexLocales';
+import '@instructure/canvas-theme'
+import generateId from 'format-message-generate-id/underscored_crc32'
 
-import Enzyme from 'enzyme';
-import Adapter from 'enzyme-adapter-react-16';
+import Enzyme from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
+
+import {filterUselessConsoleMessages} from '@instructure/js-utils'
+import translations from './src/i18n/indexLocales'
+import formatMessage from './src/format-message'
+
+filterUselessConsoleMessages(console)
 
 Enzyme.configure({
   disableLifecycleMethods: true,
   adapter: new Adapter()
-});
+})
 
 formatMessage.setup({
   generateId,
-  translations,
-});
+  translations
+})
 
-document.documentElement.setAttribute('dir', 'ltr');
+document.documentElement.setAttribute('dir', 'ltr')
 
 // set up mocks for native APIs
 if (!('MutationObserver' in window)) {
-  Object.defineProperty(window, 'MutationObserver', { value: require('@sheerun/mutationobserver-shim') });
+  Object.defineProperty(window, 'MutationObserver', {
+    value: require('@sheerun/mutationobserver-shim')
+  })
 }

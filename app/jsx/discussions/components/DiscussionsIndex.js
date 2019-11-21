@@ -17,20 +17,19 @@
  */
 
 import I18n from 'i18n!discussions_v2'
-import React, {Component, Suspense, lazy} from 'react'
-import {func, bool, string} from 'prop-types'
+import React, {Component} from 'react'
+import {func, bool, string, shape, arrayOf, oneOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
 
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Spinner, Heading, Text} from '@instructure/ui-elements'
 
-import CanvasTray from 'jsx/shared/components/CanvasTray'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
 
 import {
   ConnectedDiscussionsContainer,
@@ -51,8 +50,7 @@ import {discussionList} from '../../shared/proptypes/discussion'
 import propTypes from '../propTypes'
 import actions from '../actions'
 import {reorderDiscussionsURL} from '../utils'
-
-const ManagedCourseSelector = lazy(() => import('jsx/shared/components/ManagedCourseSelector'))
+import {CONTENT_SHARE_TYPES} from 'jsx/shared/proptypes/contentShare'
 
 export default class DiscussionsIndex extends Component {
   static propTypes = {
@@ -70,8 +68,14 @@ export default class DiscussionsIndex extends Component {
     pinnedDiscussions: discussionList.isRequired,
     unpinnedDiscussions: discussionList.isRequired,
     copyToOpen: bool.isRequired,
+    copyToSelection: shape({discussion_topics: arrayOf(string)}),
     sendToOpen: bool.isRequired,
-    DIRECT_SHARE_ENABLED: bool.isRequired
+    sendToSelection: shape({
+      content_id: string,
+      content_type: oneOf(CONTENT_SHARE_TYPES)
+    }),
+    DIRECT_SHARE_ENABLED: bool.isRequired,
+    COURSE_ID: string
   }
 
   state = {
@@ -108,7 +112,7 @@ export default class DiscussionsIndex extends Component {
   renderSpinner(title) {
     return (
       <div className="discussions-v2__spinnerWrapper">
-        <Spinner size="large" title={title} />
+        <Spinner size="large" renderTitle={title} />
         <Text size="small" as="p">
           {title}
         </Text>
@@ -248,24 +252,20 @@ export default class DiscussionsIndex extends Component {
           />
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
-          <CanvasTray
+          <DirectShareCourseTray
+            sourceCourseId={this.props.COURSE_ID}
+            contentSelection={this.props.copyToSelection}
             open={this.props.copyToOpen}
-            label={I18n.t('Copy To...')}
             onDismiss={() => this.props.setCopyToOpen(false)}
-          >
-            <Suspense fallback={<Spinner label={I18n.t('Loading...')} />}>
-              <ManagedCourseSelector />
-            </Suspense>
-          </CanvasTray>
+          />
         )}
         {this.props.DIRECT_SHARE_ENABLED && (
-          <CanvasTray
+          <DirectShareUserModal
+            courseId={this.props.COURSE_ID}
             open={this.props.sendToOpen}
-            label={I18n.t('Send To...')}
+            contentShare={this.props.sendToSelection}
             onDismiss={() => this.props.setSendToOpen(false)}
-          >
-            TODO: Implement
-          </CanvasTray>
+          />
         )}{' '}
       </View>
     )
@@ -304,11 +304,14 @@ const connectState = (state, ownProps) => {
     permissions: state.permissions,
     pinnedDiscussions: pinnedDiscussionIds.map(id => allDiscussions[id]),
     unpinnedDiscussions: unpinnedDiscussionIds.map(id => allDiscussions[id]),
-    copyToOpen: state.copyToOpen,
-    sendToOpen: state.sendToOpen,
-    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED
+    copyToOpen: state.copyTo.open,
+    copyToSelection: state.copyTo.selection,
+    sendToOpen: state.sendTo.open,
+    sendToSelection: state.sendTo.selection,
+    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,
+    COURSE_ID: state.COURSE_ID
   }
-  return Object.assign({}, ownProps, fromPagination, fromState)
+  return {...ownProps, ...fromPagination, ...fromState}
 }
 const connectActions = dispatch =>
   bindActionCreators(

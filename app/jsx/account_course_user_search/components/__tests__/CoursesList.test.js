@@ -31,10 +31,11 @@ describe('Account Course User Search CoursesList Sorting', () => {
         sis_course_id: 'SIS 1',
         workflow_state: 'alive',
         total_students: 6,
+        subaccount_name: 'subaccount name',
         teachers: [
           {
             id: '1',
-            name: 'Testing Teacher'
+            display_name: 'Testing Teacher'
           }
         ],
         term: {
@@ -47,10 +48,11 @@ describe('Account Course User Search CoursesList Sorting', () => {
         sis_course_id: 'SIS Ba',
         workflow_state: 'alive',
         total_students: 7,
+        subaccount_name: 'subaccount name',
         teachers: [
           {
             id: '1',
-            name: 'Testing Teacher'
+            display_name: 'Testing Teacher'
           }
         ],
         term: {
@@ -63,10 +65,11 @@ describe('Account Course User Search CoursesList Sorting', () => {
         sis_course_id: 'SIS Bb',
         workflow_state: 'alive',
         total_students: 6,
+        subaccount_name: 'subaccount name',
         teachers: [
           {
             id: '1',
-            name: 'Testing Teacher'
+            display_name: 'Testing Teacher'
           }
         ],
         term: {
@@ -79,10 +82,11 @@ describe('Account Course User Search CoursesList Sorting', () => {
         sis_course_id: 'SIS C',
         workflow_state: 'alive',
         total_students: 6,
+        subaccount_name: 'subaccount name',
         teachers: [
           {
             id: '1',
-            name: 'Testing Teacher'
+            display_name: 'Testing Teacher'
           }
         ],
         term: {
@@ -95,10 +99,11 @@ describe('Account Course User Search CoursesList Sorting', () => {
         sis_course_id: 'SIS De',
         workflow_state: 'alive',
         total_students: 11,
+        subaccount_name: 'subaccount name',
         teachers: [
           {
             id: '1',
-            name: 'Testing Teacher'
+            display_name: 'Testing Teacher'
           }
         ],
         term: {
@@ -110,11 +115,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
         name: 'Dz',
         sis_course_id: 'SIS Dz',
         workflow_state: 'alive',
+        subaccount_name: 'subaccount name',
         total_students: 10,
         teachers: [
           {
             id: '1',
-            name: 'Testing Teacher'
+            display_name: 'Testing Teacher'
           }
         ],
         term: {
@@ -134,7 +140,8 @@ describe('Account Course User Search CoursesList Sorting', () => {
       }
     ],
     sort: 'course_name',
-    order: 'asc'
+    order: 'asc',
+    onChangeSort: () => {}
   }
 
   map(
@@ -157,8 +164,8 @@ describe('Account Course User Search CoursesList Sorting', () => {
           />
         )
 
-        expect(wrapper.find('IconMiniArrowDown')).toHaveLength(0)
-        const upArrow = wrapper.find('IconMiniArrowUp')
+        expect(wrapper.find('IconMiniArrowDownSolid')).toHaveLength(0)
+        const upArrow = wrapper.find('IconMiniArrowUpSolid')
         expect(upArrow).toHaveLength(1)
         const header = upArrow.closest('CourseListHeader')
 
@@ -168,7 +175,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
             total_students: 'Click to sort by number of students descending'
           }[columnID] || `Click to sort by ${label} descending`
 
-        expect(header.find('Tooltip').prop('tip')).toMatch(RegExp(expectedTip, 'i'))
+        expect(
+          header
+            .find('Tooltip')
+            .first()
+            .prop('tip')
+        ).toMatch(RegExp(expectedTip, 'i'))
         expect(header.text()).toMatch(label)
       })
 
@@ -183,8 +195,8 @@ describe('Account Course User Search CoursesList Sorting', () => {
           />
         )
 
-        expect(wrapper.find('IconMiniArrowUp')).toHaveLength(0)
-        const downArrow = wrapper.find('IconMiniArrowDown')
+        expect(wrapper.find('IconMiniArrowUpSolid')).toHaveLength(0)
+        const downArrow = wrapper.find('IconMiniArrowDownSolid')
         expect(downArrow).toHaveLength(1)
         const header = downArrow.closest('CourseListHeader')
 
@@ -194,7 +206,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
             total_students: 'Click to sort by number of students ascending'
           }[columnID] || `Click to sort by ${label} ascending`
 
-        expect(header.find('Tooltip').prop('tip')).toMatch(RegExp(expectedTip, 'i'))
+        expect(
+          header
+            .find('Tooltip')
+            .first()
+            .prop('tip')
+        ).toMatch(RegExp(expectedTip, 'i'))
         expect(header.text()).toMatch(label)
       })
 

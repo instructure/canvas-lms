@@ -34,18 +34,22 @@ export default function DimensionsInput(props) {
   let messages = [{text: formatMessage('Aspect ratio will be preserved'), type: 'hint'}]
 
   if (!dimensionsState.isNumeric) {
-    messages = [{
-      text: formatMessage('Width and height must be numbers'),
-      type: 'error'
-    }]
+    messages = [
+      {
+        text: formatMessage('Width and height must be numbers'),
+        type: 'error'
+      }
+    ]
   } else if (!dimensionsState.isAtLeastMinimums) {
-    messages = [{
-      text: formatMessage('Must be at least {width} x {height}px', {
-        width: minWidth,
-        height: minHeight
-      }),
-      type: 'error'
-    }]
+    messages = [
+      {
+        text: formatMessage('Must be at least {width} x {height}px', {
+          width: minWidth,
+          height: minHeight
+        }),
+        type: 'error'
+      }
+    ]
   }
 
   return (

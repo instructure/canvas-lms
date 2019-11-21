@@ -729,7 +729,7 @@ class CoursesController < ApplicationController
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #
   # @argument course[grade_passback_setting] [String]
-  #   Optional. The grade_passback_setting for the course. Only 'nightly_sync' and '' are allowed
+  #   Optional. The grade_passback_setting for the course. Only 'nightly_sync', 'disabled', and '' are allowed
   #
   # @argument course[course_format] [String]
   #   Optional. Specifies the format of the course. (Should be 'on_campus', 'online', or 'blended')
@@ -945,6 +945,7 @@ class CoursesController < ApplicationController
     Shackles.activate(:slave) do
       get_context
       if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
+        log_api_asset_access([ "roster", @context ], 'roster', 'other')
         #backcompat limit param
         params[:per_page] ||= params[:limit]
 
@@ -1078,6 +1079,62 @@ class CoursesController < ApplicationController
       enrollments = user.not_ended_enrollments.where(:course_id => @context).preload(:course, :root_account, :sis_pseudonym) if includes.include?('enrollments')
       render :json => user_json(user, @current_user, session, includes, @context, enrollments)
     end
+  end
+
+  # @API Search for content share users
+  #
+  # Returns a paginated list of users you can share content with.  Requires the content share
+  # feature and the user must have the manage content permission for the course.
+  #
+  # @argument search_term [Required, String]
+  #   Term used to find users.  Will search available share users with the search term in their name.
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #          https://<canvas>/api/v1/courses/<course_id>/content_share_users \
+  #          -d 'search_term=smith'
+  #
+  # @returns [User]
+  def content_share_users
+    get_context
+    return render json: { message: "Feature disabled" }, status: :forbidden unless @context.root_account.feature_enabled?(:direct_share)
+    reject!('Search term required') unless params[:search_term]
+    return unless authorized_action(@context, @current_user, :manage_content)
+
+    users_scope = User.where.not(id: @current_user.id).active.distinct
+    union_scope = teacher_scope(name_scope(users_scope)).
+      union(
+        teacher_scope(email_scope(users_scope)),
+        admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
+        admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
+        admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission('manage_content')),
+        admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission('manage_content'))
+      ).
+      order(:name).
+      distinct
+    users = Api.paginate(union_scope, self, api_v1_course_content_share_users_url)
+    render :json => users_json(users, @current_user, session, ['avatar_url', 'email'], @context, nil, ['pseudonym'])
+  end
+
+  def admin_scope(scope, root_account_id)
+    scope.joins(account_users: [:account, :role]).
+      merge(AccountUser.active).
+      merge(Account.active).
+      where("accounts.id = ? OR accounts.root_account_id = ?", root_account_id, root_account_id)
+  end
+
+  def teacher_scope(scope)
+    scope.joins(enrollments: :course).merge(Enrollment.active.of_admin_type).merge(Course.active)
+  end
+
+  def name_scope(scope)
+    scope.where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(params[:search_term]))
+  end
+
+  def email_scope(scope)
+    scope.joins(:communication_channels).
+      where(communication_channels: {workflow_state: ['active', 'unconfirmed'], path_type: 'email'}).
+      where(UserSearch.like_condition('communication_channels.path'), pattern: UserSearch.like_string_for(params[:search_term]))
   end
 
   include Api::V1::PreviewHtml
@@ -1262,7 +1319,8 @@ class CoursesController < ApplicationController
   #     "allow_student_organized_groups": true,
   #     "hide_final_grades": false,
   #     "hide_distribution_graphs": false,
-  #     "lock_all_announcements": true
+  #     "lock_all_announcements": true,
+  #     "usage_rights_required": false
   #   }
   def api_settings
     get_context
@@ -1286,6 +1344,7 @@ class CoursesController < ApplicationController
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
 
+      course_card_images_enabled = @context.feature_enabled?(:course_card_images)
       js_env({
         COURSE_ID: @context.id,
         USERS_URL: "/api/v1/courses/#{@context.id}/users",
@@ -1310,7 +1369,8 @@ class CoursesController < ApplicationController
         MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:membership_service_for_lti_tools),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
         PUBLISHING_ENABLED: @publishing_enabled,
-        COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images),
+        COURSE_IMAGES_ENABLED: course_card_images_enabled,
+        use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions
       })
 
@@ -1365,6 +1425,9 @@ class CoursesController < ApplicationController
   # @argument lock_all_announcements [Boolean]
   #   Disable comments on announcements
   #
+  # @argument usage_rights_required [Boolean]
+  #   Copyright and license information must be provided for files before they are published.
+  #
   # @argument restrict_student_past_view [Boolean]
   #   Restrict students from viewing courses after end date
   #
@@ -1399,6 +1462,7 @@ class CoursesController < ApplicationController
       :hide_final_grades,
       :hide_distribution_graphs,
       :lock_all_announcements,
+      :usage_rights_required,
       :restrict_student_past_view,
       :restrict_student_future_view,
       :show_announcements_on_home_page,
@@ -1500,7 +1564,9 @@ class CoursesController < ApplicationController
       session[:accepted_enrollment_uuid] = enrollment.uuid
 
       if params[:action] != 'show'
-        redirect_to course_url(@context.id)
+        # Redirects back to HTTP_REFERER if it exists (so if you accept from an assignent page it will put
+        # you back on the same page you were looking at). Otherwise, it redirects back to the course homepage
+        redirect_back(fallback_location: course_url(@context.id))
       else
         @context_enrollment = enrollment
         enrollment = nil
@@ -1773,7 +1839,7 @@ class CoursesController < ApplicationController
         @context_membership = @context.enrollments.where(user_id: @current_user).except(:preload).first # for AUA
 
         if authorized_action(@course, @current_user, :read)
-          log_asset_access(["home", @context], "home", "other")
+          log_asset_access(["home", @context], "home", "other", nil, @context_membership.class.to_s, context: @context)
           enrollments = @course.current_enrollments.where(:user_id => @current_user).to_a
           if includes.include?("observed_users") &&
             enrollments.any?(&:assigned_observer?)
@@ -1824,7 +1890,7 @@ class CoursesController < ApplicationController
       if @context.grants_right?(@current_user, session, :read)
         check_for_readonly_enrollment_state
 
-        log_asset_access(["home", @context], "home", "other")
+        log_asset_access(["home", @context], "home", "other", nil, @context_enrollment.class.to_s, context: @context)
 
         check_incomplete_registration
 
@@ -1842,7 +1908,6 @@ class CoursesController < ApplicationController
         js_env({
                  # don't check for student enrollments because we want to show course items on the teacher's  syllabus
                  STUDENT_PLANNER_ENABLED: @domain_root_account&.feature_enabled?(:student_planner),
-                 DIRECT_SHARE_ENABLED: @domain_root_account&.feature_enabled?(:direct_share),
                  COURSE: {
                    id: @context.id.to_s,
                    pages_url: polymorphic_url([@context, :wiki_pages]),
@@ -1873,7 +1938,14 @@ class CoursesController < ApplicationController
           add_crumb(t('#crumbs.assignments', "Assignments"))
           set_js_assignment_data
           js_env(:SIS_NAME => AssignmentUtil.post_to_sis_friendly_name(@context))
-          js_env(:QUIZ_LTI_ENABLED => @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?)
+          js_env(
+            QUIZ_LTI_ENABLED: @context.feature_enabled?(:quizzes_next) &&
+              !@context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
+              @context.quiz_lti_tool.present?,
+            FLAGS: {
+              newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+            }
+          )
           js_env(:COURSE_HOME => true)
           @upcoming_assignments = get_upcoming_assignments(@context)
         when 'modules'
@@ -1917,6 +1989,8 @@ class CoursesController < ApplicationController
           js_bundle :wiki_page_show
           css_bundle :wiki_page, :tinymce
         when 'modules'
+          js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
+
           js_bundle :context_modules
           css_bundle :content_next, :context_modules2
         when 'assignments'
@@ -1951,46 +2025,6 @@ class CoursesController < ApplicationController
       end
     end
   end
-
-  def set_js_course_wizard_data
-    # Course Wizard JS Info
-    js_env({:COURSE_WIZARD => {
-      :just_saved =>  @context_just_saved,
-      :checklist_states => {
-        :import_step => !@context.attachments.active.exists?,
-        :assignment_step => !@context.assignments.active.exists?,
-        :add_student_step => !@context.students.exists?,
-        :navigation_step => @context.tab_configuration.empty?,
-        :home_page_step => true, # The current wizard just always marks this as complete.
-        :calendar_event_step => !@context.calendar_events.active.exists?,
-        :add_ta_step => !@context.tas.exists?,
-        :publish_step => @context.workflow_state === "available"
-      },
-      :urls => {
-        :content_import => context_url(@context, :context_content_migrations_url),
-        :add_assignments => context_url(@context, :context_assignments_url, :wizard => 1),
-        :add_students => course_users_path(course_id: @context),
-        :add_files => context_url(@context, :context_files_url, :wizard => 1),
-        :select_navigation => context_url(@context, :context_details_url),
-        :course_calendar => calendar_path(course_id: @context),
-        :add_tas => course_users_path(:course_id => @context),
-        :publish_course => course_path(@context)
-      },
-      :permissions => {
-        # Sending the permissions just so maybe later we can extract this easier.
-        :can_manage_content => can_do(@context, @current_user, :manage_content),
-        :can_manage_students => can_do(@context, @current_user, :manage_students),
-        :can_manage_assignments => can_do(@context, @current_user, :manage_assignments),
-        :can_manage_files => can_do(@context, @current_user, :manage_files),
-        :can_update => can_do(@context, @current_user, :update),
-        :can_manage_calendar => can_do(@context, @current_user, :manage_calendar),
-        :can_manage_admin_users => can_do(@context, @current_user, :manage_admin_users),
-        :can_change_course_state => can_do(@context, @current_user, :change_course_state)
-      }
-    }
-    })
-  end
-  helper_method :set_js_course_wizard_data
 
   def confirm_action
     get_context
@@ -2457,6 +2491,9 @@ class CoursesController < ApplicationController
       if params_for_update.has_key?(:syllabus_body)
         params_for_update[:syllabus_body] = process_incoming_html_content(params_for_update[:syllabus_body])
       end
+      unless @course.grants_right?(@current_user, :manage_course_visibility)
+        params_for_update.delete(:indexed)
+      end
 
       account_id = params[:course].delete :account_id
       if account_id && @course.account.grants_right?(@current_user, session, :manage_courses)
@@ -2542,6 +2579,10 @@ class CoursesController < ApplicationController
         elsif @course.lock_all_announcements
           @course.lock_all_announcements = false
         end
+      end
+
+      if params[:course].key?(:usage_rights_required)
+        @course.usage_rights_required = value_to_boolean(params[:course].delete(:usage_rights_required))
       end
 
       if params_for_update.has_key?(:locale) && params_for_update[:locale].blank?
@@ -2631,7 +2672,7 @@ class CoursesController < ApplicationController
 
       @course.attributes = params_for_update
 
-      if params[:course][:course_visibility].present?
+      if params[:course][:course_visibility].present? && @course.grants_right?(@current_user, :manage_course_visibility)
         visibility_configuration(params[:course])
       end
 
@@ -3084,7 +3125,7 @@ class CoursesController < ApplicationController
       enrollments = user.participating_enrollments
       ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
     else
-      enrollments = user.cached_current_enrollments(preload_courses: true)
+      enrollments = user.cached_currentish_enrollments(preload_courses: true)
     end
 
     if include_observed
@@ -3218,7 +3259,8 @@ class CoursesController < ApplicationController
   private
 
   def update_grade_passback_setting(grade_passback_setting)
-    unless grade_passback_setting.blank? || grade_passback_setting == 'nightly_sync'
+    valid_states = Setting.get('valid_grade_passback_settings', 'nightly_sync,disabled').split(',')
+    unless grade_passback_setting.blank? || valid_states.include?(grade_passback_setting)
       @course.errors.add(:grade_passback_setting, t("Invalid grade_passback_setting"))
     end
     @course.grade_passback_setting = grade_passback_setting.presence
@@ -3239,7 +3281,7 @@ class CoursesController < ApplicationController
       :syllabus_body, :public_description, :allow_student_forum_attachments, :allow_student_discussion_topics, :allow_student_discussion_editing,
       :show_total_grade_as_points, :default_wiki_editing_roles, :allow_student_organized_groups, :course_code, :default_view,
       :open_enrollment, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed,
-      :abstract_course, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates,
+      :abstract_course, :storage_quota, :storage_quota_mb, :restrict_enrollments_to_course_dates, :use_rights_required,
       :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :lock_all_announcements, :public_syllabus,
       :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,

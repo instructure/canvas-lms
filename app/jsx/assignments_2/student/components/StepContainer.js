@@ -18,13 +18,12 @@
 
 import {Assignment} from '../graphqlData/Assignment'
 import {bool} from 'prop-types'
-import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
-import StepItem from '../../shared/Steps/StepItem'
+import StepItem, {stepLabels} from '../../shared/Steps/StepItem'
 import Steps from '../../shared/Steps'
 import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 
 function renderCollapsedContainer(step) {
   return (
@@ -41,17 +40,17 @@ function allowNextAttempt(assignment, submission) {
 function availableStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="available-step-container">
-      {props.isCollapsed && renderCollapsedContainer(I18n.t('Available'))}
+      {props.isCollapsed && renderCollapsedContainer(stepLabels.available)}
       <Steps isCollapsed={props.isCollapsed}>
         {context.prevButtonEnabled && !props.isCollapsed ? (
-          <StepItem label={I18n.t('Previous')} status="button" />
+          <StepItem label={stepLabels.previous} status="button" />
         ) : null}
-        <StepItem label={I18n.t('Available')} status="complete" />
-        <StepItem label={I18n.t('Upload')} status="in-progress" />
-        <StepItem label={I18n.t('Submit')} />
-        <StepItem label={I18n.t('Not Graded Yet')} />
+        <StepItem label={stepLabels.available} status="complete" />
+        <StepItem label={stepLabels.upload} status="in-progress" />
+        <StepItem label={stepLabels.submit} status="incomplete" />
+        <StepItem label={stepLabels.notGradedYet} status="incomplete" />
         {context.nextButtonEnabled && !props.isCollapsed ? (
-          <StepItem label={I18n.t('Next')} status="button" />
+          <StepItem label={stepLabels.next} status="button" />
         ) : null}
       </Steps>
     </div>
@@ -65,17 +64,17 @@ availableStepContainer.propTypes = {
 function unavailableStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="unavailable-step-container">
-      {props.isCollapsed && renderCollapsedContainer(I18n.t('Unavailable'))}
+      {props.isCollapsed && renderCollapsedContainer(stepLabels.unavailable)}
       <Steps isCollapsed={props.isCollapsed}>
         {context.prevButtonEnabled && !props.isCollapsed ? (
-          <StepItem label={I18n.t('Previous')} status="button" />
+          <StepItem label={stepLabels.previous} status="button" />
         ) : null}
-        <StepItem label={I18n.t('Unavailable')} status="unavailable" />
-        <StepItem label={I18n.t('Upload')} />
-        <StepItem label={I18n.t('Submit')} />
-        <StepItem label={I18n.t('Not Graded Yet')} />
+        <StepItem label={stepLabels.unavailable} status="unavailable" />
+        <StepItem label={stepLabels.upload} status="incomplete" />
+        <StepItem label={stepLabels.submit} status="incomplete" />
+        <StepItem label={stepLabels.notGradedYet} status="incomplete" />
         {context.nextButtonEnabled && !props.isCollapsed ? (
-          <StepItem label={I18n.t('Next')} status="button" />
+          <StepItem label={stepLabels.next} status="button" />
         ) : null}
       </Steps>
     </div>
@@ -89,15 +88,15 @@ unavailableStepContainer.propTypes = {
 function uploadedStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="uploaded-step-container">
-      {props.isCollapsed && renderCollapsedContainer(I18n.t('Uploaded'))}
+      {props.isCollapsed && renderCollapsedContainer(stepLabels.uploaded)}
       <Steps isCollapsed={props.isCollapsed}>
         {context.prevButtonEnabled && !props.isCollapsed ? (
-          <StepItem label={I18n.t('Previous')} status="button" />
+          <StepItem label={stepLabels.previous} status="button" />
         ) : null}
-        <StepItem label={I18n.t('Available')} status="complete" />
-        <StepItem label={I18n.t('Uploaded')} status="complete" />
-        <StepItem label={I18n.t('Submit')} status="in-progress" />
-        <StepItem label={I18n.t('Not Graded Yet')} />
+        <StepItem label={stepLabels.available} status="complete" />
+        <StepItem label={stepLabels.uploaded} status="complete" />
+        <StepItem label={stepLabels.submit} status="in-progress" />
+        <StepItem label={stepLabels.notGradedYet} status="incomplete" />
       </Steps>
     </div>
   )
@@ -110,22 +109,22 @@ uploadedStepContainer.propTypes = {
 function submittedStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="submitted-step-container">
-      {props.isCollapsed && renderCollapsedContainer(I18n.t('Submitted'))}
+      {props.isCollapsed && renderCollapsedContainer(stepLabels.submitted)}
       <Steps isCollapsed={props.isCollapsed}>
         {context.prevButtonEnabled && !props.isCollapsed ? (
-          <StepItem label={I18n.t('Previous')} status="button" />
+          <StepItem label={stepLabels.previous} status="button" />
         ) : null}
-        <StepItem label={I18n.t('Available')} status="complete" />
-        <StepItem label={I18n.t('Uploaded')} status="complete" />
-        <StepItem label={I18n.t('Submitted')} status="complete" />
-        <StepItem label={I18n.t('Not Graded Yet')} />
+        <StepItem label={stepLabels.available} status="complete" />
+        <StepItem label={stepLabels.uploaded} status="complete" />
+        <StepItem label={stepLabels.submitted} status="complete" />
+        <StepItem label={stepLabels.notGradedYet} status="incomplete" />
         {allowNextAttempt(props.assignment, props.submission) &&
         !context.nextButtonEnabled &&
         !props.isCollapsed ? (
-          <StepItem label={I18n.t('New Attempt')} status="button" />
+          <StepItem label={stepLabels.newAttempt} status="button" />
         ) : null}
         {context.nextButtonEnabled && !props.isCollapsed ? (
-          <StepItem label={I18n.t('Next')} status="button" />
+          <StepItem label={stepLabels.next} status="button" />
         ) : null}
       </Steps>
     </div>
@@ -141,22 +140,22 @@ submittedStepContainer.propTypes = {
 function gradedStepContainer(props, context) {
   return (
     <div className="steps-container" data-testid="graded-step-container">
-      {props.isCollapsed && renderCollapsedContainer(I18n.t('Graded'))}
+      {props.isCollapsed && renderCollapsedContainer(stepLabels.graded)}
       <Steps isCollapsed={props.isCollapsed}>
         {context.prevButtonEnabled && !props.isCollapsed ? (
-          <StepItem label={I18n.t('Previous')} status="button" />
+          <StepItem label={stepLabels.previous} status="button" />
         ) : null}
-        <StepItem label={I18n.t('Available')} status="complete" />
-        <StepItem label={I18n.t('Uploaded')} status="complete" />
-        <StepItem label={I18n.t('Submitted')} status="complete" />
-        <StepItem label={I18n.t('Graded')} status="complete" />
+        <StepItem label={stepLabels.available} status="complete" />
+        <StepItem label={stepLabels.uploaded} status="complete" />
+        <StepItem label={stepLabels.submitted} status="complete" />
+        <StepItem label={stepLabels.graded} status="complete" />
         {allowNextAttempt(props.assignment, props.submission) &&
         !context.nextButtonEnabled &&
         !props.isCollapsed ? (
-          <StepItem label={I18n.t('New Attempt')} status="button" />
+          <StepItem label={stepLabels.newAttempt} status="button" />
         ) : null}
         {context.nextButtonEnabled && !props.isCollapsed ? (
-          <StepItem label={I18n.t('Next')} status="button" />
+          <StepItem label={stepLabels.next} status="button" />
         ) : null}
       </Steps>
     </div>
@@ -165,7 +164,7 @@ function gradedStepContainer(props, context) {
 
 function selectStepContainer(props, context) {
   const {assignment, submission, isCollapsed, forceLockStatus} = props
-  if (forceLockStatus || assignment.lockInfo.isLocked) {
+  if (!submission || forceLockStatus || assignment.lockInfo.isLocked) {
     return unavailableStepContainer({isCollapsed}, context)
   } else if (submission.state === 'graded') {
     return gradedStepContainer({isCollapsed, assignment, submission}, context)

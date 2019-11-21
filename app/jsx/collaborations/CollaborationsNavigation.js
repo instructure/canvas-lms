@@ -19,11 +19,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!react_collaborations'
-import NewCollaborationsDropDown from '../collaborations/NewCollaborationsDropDown'
+import NewCollaborationsDropDown from './NewCollaborationsDropDown'
 
 class CollaborationsNavigation extends React.Component {
-
-  renderNewCollaborationsDropDown () {
+  renderNewCollaborationsDropDown() {
     if (this.props.ltiCollaborators.ltiCollaboratorsData.length > 0) {
       return (
         <NewCollaborationsDropDown
@@ -31,18 +30,16 @@ class CollaborationsNavigation extends React.Component {
         />
       )
     }
-    return null;
+    return null
   }
 
-  render () {
+  render() {
     return (
       <div className="ic-Action-header">
         <div className="ic-Action-header__Primary">
           <h1 className="screenreader-only">{I18n.t('Collaborations')}</h1>
         </div>
-        <div className="ic-Action-header__Secondary">
-          {this.renderNewCollaborationsDropDown()}
-        </div>
+        <div className="ic-Action-header__Secondary">{this.renderNewCollaborationsDropDown()}</div>
       </div>
     )
   }
@@ -51,6 +48,6 @@ class CollaborationsNavigation extends React.Component {
 CollaborationsNavigation.propTypes = {
   ltiCollaborators: PropTypes.object.isRequired,
   actions: PropTypes.object
-};
+}
 
 export default CollaborationsNavigation

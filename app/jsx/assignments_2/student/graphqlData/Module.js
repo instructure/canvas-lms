@@ -32,4 +32,4 @@ export const Module = {
   })
 }
 
-export const ModuleDefaultMocks = {}
+export const DefaultMocks = {}

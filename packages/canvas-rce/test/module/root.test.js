@@ -16,66 +16,65 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import assert from "assert";
-import proxyquire from "proxyquire";
-import Bridge from "../../src/bridge";
-import sinon from "sinon";
-import ReactDOM from "react-dom";
+import React from 'react'
+import assert from 'assert'
+import proxyquire from 'proxyquire'
+import Bridge from '../../src/bridge'
+import sinon from 'sinon'
+import ReactDOM from 'react-dom'
 
 class fakeRCEWrapper extends React.Component {
   static displayName() {
-    return "FakeRCEWrapper";
+    return 'FakeRCEWrapper'
   }
 
   render() {
-    return null;
+    return null
   }
 }
 
-fakeRCEWrapper["@noCallThru"] = true;
+fakeRCEWrapper['@noCallThru'] = true
 
-const RceModule = proxyquire("../../src/rce/root", {
-  "./RCEWrapper": fakeRCEWrapper,
-  "./tinyRCE": {
-    "@noCallThru": true,
-    DOM: { loadCSS: () => {} }
+const RceModule = proxyquire('../../src/rce/root', {
+  './RCEWrapper': fakeRCEWrapper,
+  './tinyRCE': {
+    '@noCallThru': true,
+    DOM: {loadCSS: () => {}}
   },
-  "../../locales/index": { "@noCallThru": true }
-});
+  '../../locales/index': {'@noCallThru': true}
+})
 
-describe("RceModule", () => {
-
-  let target;
-  let props;
+describe('RceModule', () => {
+  let target
+  let props
 
   beforeEach(() => {
-    target = document.createElement("div");
+    target = document.createElement('div')
     props = {
       editorOptions: () => {
-        return {};
+        return {}
       }
-    };
-  });
+    }
+  })
 
   afterEach(() => {
-    Bridge.focusEditor(null);
-  });
+    Bridge.focusEditor(null)
+  })
 
-  it("bridges newly rendered editors", done => {
+  it('bridges newly rendered editors', done => {
     const callback = rendered => {
-      assert.equal(Bridge.activeEditor(), rendered);
-      done();
-    };
-    RceModule.renderIntoDiv(target, props, callback);
-  });
+      assert.equal(Bridge.activeEditor(), rendered)
+      done()
+    }
+    RceModule.renderIntoDiv(target, props, callback)
+  })
 
-  it("handleUnmount unmounts root component", () => {
-    sinon.stub(ReactDOM, "unmountComponentAtNode");
+  it('handleUnmount unmounts root component', () => {
+    sinon.stub(ReactDOM, 'unmountComponentAtNode')
     RceModule.renderIntoDiv(target, props, wrapper => {
-      wrapper.props.handleUnmount();
-    });
-    sinon.assert.calledWithExactly(ReactDOM.unmountComponentAtNode, target);
-    ReactDOM.unmountComponentAtNode.restore();
-  });
-});
+      wrapper.props.handleUnmount()
+    })
+    sinon.assert.calledWithExactly(ReactDOM.unmountComponentAtNode, target)
+    ReactDOM.unmountComponentAtNode.restore()
+  })
+})

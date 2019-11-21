@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import UploadQueue from '../modules/UploadQueue'
+import UploadQueue from './UploadQueue'
 import ReactDOM from 'react-dom'
 
 /*

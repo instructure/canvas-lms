@@ -24,21 +24,36 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
     global_id_field :id
 
-    field :_id, ID, "legacy canvas id", method: :id, null: false
     field :name, String, null: true
 
     field :members_connection, GroupMembershipType.connection_type, null: true
     def members_connection
       if group.grants_right?(current_user, :read_roster)
-        group.group_memberships.where(
-          workflow_state: GroupMembershipsController::ALLOWED_MEMBERSHIP_FILTER
-        )
-      else
-        nil
+        members_scope
       end
     end
+
+    field :member, GroupMembershipType, null: true do
+      argument :user_id, ID,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("User"),
+        required: true
+    end
+    def member(user_id:)
+      if group.grants_right?(current_user, :read_roster)
+        Loaders::ForeignKeyLoader.for(members_scope, :user_id).load(user_id).
+          then { |memberships| memberships.first }
+      end
+    end
+
+    def members_scope
+      group.group_memberships.where(
+        workflow_state: GroupMembershipsController::ALLOWED_MEMBERSHIP_FILTER
+      )
+    end
+    private :members_scope
   end
 end

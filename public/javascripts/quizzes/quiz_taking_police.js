@@ -47,33 +47,37 @@ The quiz taking police has arrived.
        });
      }
 */
-define([], function () {
+define([], function() {
   if (!window.Worker) {
     // if this browser doesn't support web workers, this module does nothing
     return
   }
 
-  function worker () {
-    var stopwatch
+  function worker() {
+    let stopwatch
 
-    self.addEventListener('message', function (e) {
-      var message = e.data || {}
-      switch (message.code) {
-        case 'startStopwatch':
-          stopwatch = setInterval(function () {
-            self.postMessage('stopwatchTick')
-          }, message.frequency || 1000)
-          break
-        case 'stop':
-          clearInterval(stopwatch)
-          break
-      }
-    }, false)
+    self.addEventListener(
+      'message',
+      function(e) {
+        const message = e.data || {}
+        switch (message.code) {
+          case 'startStopwatch':
+            stopwatch = setInterval(function() {
+              self.postMessage('stopwatchTick')
+            }, message.frequency || 1000)
+            break
+          case 'stop':
+            clearInterval(stopwatch)
+            break
+        }
+      },
+      false
+    )
   }
-  var code = worker.toString()
+  let code = worker.toString()
   code = code.substring(code.indexOf('{') + 1, code.lastIndexOf('}'))
 
-  var blob = new Blob([code], {type: 'application/javascript'})
-  var quizTakingPolice = new Worker(URL.createObjectURL(blob))
+  const blob = new Blob([code], {type: 'application/javascript'})
+  const quizTakingPolice = new Worker(URL.createObjectURL(blob))
   return quizTakingPolice
 })

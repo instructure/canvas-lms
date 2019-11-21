@@ -17,33 +17,58 @@
  */
 import {arrayOf, bool, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
+import {MediaObject} from './MediaObject'
 import {SubmissionDraftFile} from './File'
 
 export const SubmissionDraft = {
   fragment: gql`
     fragment SubmissionDraft on SubmissionDraft {
       _id
+      activeSubmissionType
       attachments {
         ...SubmissionDraftFile
       }
       body
+      mediaObject {
+        ...MediaObject
+      }
+      meetsMediaRecordingCriteria
       meetsAssignmentCriteria
+      meetsTextEntryCriteria
+      meetsUploadCriteria
+      meetsUrlCriteria
+      url
     }
+    ${MediaObject.fragment}
     ${SubmissionDraftFile.fragment}
   `,
 
   shape: shape({
     _id: string,
+    activeSubmissionType: string,
     attachments: arrayOf(SubmissionDraftFile.shape),
     body: string,
-    meetsAssignmentCriteria: bool
+    mediaObject: MediaObject.shape,
+    meetsMediaRecordingCriteria: bool.isRequired,
+    meetsAssignmentCriteria: bool.isRequired,
+    meetsTextEntryCriteria: bool.isRequired,
+    meetsUploadCriteria: bool.isRequired,
+    meetsUrlCriteria: bool.isRequired,
+    url: string
   })
 }
 
-export const SubmissionDraftDefaultMocks = {
+export const DefaultMocks = {
   SubmissionDraft: () => ({
+    activeSubmissionType: null,
     attachments: () => [],
     body: null,
-    meetsAssignmentCriteria: false
+    mediaObject: null,
+    meetsMediaRecordingCriteria: false,
+    meetsAssignmentCriteria: false,
+    meetsTextEntryCriteria: false,
+    meetsUploadCriteria: false,
+    meetsUrlCriteria: false,
+    url: null
   })
 }

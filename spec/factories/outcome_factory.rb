@@ -74,7 +74,7 @@ module Factories
                                                title: 'new outcome',
                                                description: '<p>This is <b>awesome</b>.</p>',
                                                calculation_method: 'highest')
-    [opts[:outcome_context], @course].compact.uniq.each do |context|
+    [opts[:outcome_context], course].compact.uniq.each do |context|
       root = context.root_outcome_group
       root.add_outcome(@outcome)
       root.save!
@@ -123,8 +123,7 @@ module Factories
         }
     }
 
-    @rubric = @course.rubrics.build
+    @rubric = course.rubrics.build
     @rubric.update_criteria(rubric_params)
-    @rubric.reload
   end
 end

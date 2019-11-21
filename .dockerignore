@@ -6,6 +6,8 @@
 
 build/
 !build/vendor/woff-code-latest.zip
+!build/gergich/
+!build/new-jenkins/package-translations
 docker-compose/
 !docker-compose/config/*
 docker-compose.local.*.yml
@@ -15,7 +17,6 @@ docker-compose.yml
 client_apps/canvas_quizzes/dist/
 client_apps/canvas_quizzes/node_modules/
 client_apps/canvas_quizzes/tmp/
-config/*.example
 coverage/
 coverage-js/
 gems/*/node_modules/

@@ -104,6 +104,7 @@ class EportfoliosController < ApplicationController
       elsif @portfolio.public
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), {:title => t('titles.feed', "Eportfolio Atom Feed") })
       end
+      js_env({ SECTION_COUNT_IDX: @page.content_sections.count })
     end
   end
 

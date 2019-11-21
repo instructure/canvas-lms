@@ -68,7 +68,7 @@ module.exports = {
       ok(violations.length === 0, err)
 
       done()
-    });
+    })
   },
 
   contains(string, substring) {

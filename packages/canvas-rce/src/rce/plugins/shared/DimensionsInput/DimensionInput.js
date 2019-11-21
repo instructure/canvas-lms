@@ -39,11 +39,11 @@ export default function DimensionInput(props) {
 
   return (
     <NumberInput
-      label={<ScreenReaderContent>{label}</ScreenReaderContent>}
+      renderLabel={<ScreenReaderContent>{label}</ScreenReaderContent>}
       onChange={handleChange}
       onDecrement={handleDecrement}
       onIncrement={handleIncrement}
-      required
+      isRequired
       showArrows={false}
       value={inputValue}
     />

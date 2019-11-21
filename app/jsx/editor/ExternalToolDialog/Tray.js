@@ -18,13 +18,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex from '@instructure/ui-layout/lib/components/Flex'
-import FlexItem from '@instructure/ui-layout/lib/components/Flex/FlexItem'
-import IconX from '@instructure/ui-icons/lib/Line/IconX'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Tray} from '@instructure/ui-overlays'
+import {Heading} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-layout'
+import {IconXLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 export default function ExternalToolDialogTray(props) {
   const {open, label, onOpen, onClose, onCloseButton, closeLabel, name, children} = props
@@ -38,20 +37,20 @@ export default function ExternalToolDialogTray(props) {
       size="regular"
     >
       <Flex direction="column" height="100vh">
-        <FlexItem padding="small">
+        <Flex.Item padding="small">
           <Flex>
-            <FlexItem margin="0 small 0 0">
-              <Button variant="icon" icon={IconX} onClick={onCloseButton} size="small">
+            <Flex.Item margin="0 small 0 0">
+              <Button variant="icon" icon={IconXLine} onClick={onCloseButton} size="small">
                 <ScreenReaderContent>{closeLabel}</ScreenReaderContent>
               </Button>
-            </FlexItem>
-            <FlexItem grow shrink>
+            </Flex.Item>
+            <Flex.Item grow shrink>
               <Heading ellipsis level="h3" as="h2">
                 {name}
               </Heading>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
-        </FlexItem>
+        </Flex.Item>
         {children}
       </Flex>
     </Tray>

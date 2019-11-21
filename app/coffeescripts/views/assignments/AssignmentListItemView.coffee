@@ -18,7 +18,11 @@
 import I18n from 'i18n!AssignmentListItemView'
 import Backbone from 'Backbone'
 import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import CyoeHelper from 'jsx/shared/conditional_release/CyoeHelper'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 import * as MoveItem from 'jsx/move_item'
 import Assignment from '../../models/Assignment'
 import PublishIconView from '../PublishIconView'
@@ -35,6 +39,7 @@ import AssignmentKeyBindingsMixin from './AssignmentKeyBindingsMixin'
 import 'jqueryui/tooltip'
 import '../../behaviors/tooltip'
 import '../../jquery.rails_flash_notifications'
+import {shimGetterShorthand} from '../../legacyCoffeesScriptHelpers'
 
 export default class AssignmentListItemView extends Backbone.View
   @mixin AssignmentKeyBindingsMixin
@@ -53,6 +58,7 @@ export default class AssignmentListItemView extends Backbone.View
   @child 'sisButtonView',           '[data-view=sis-button]'
 
   els:
+    '.al-trigger': '$settingsButton'
     '.edit_assignment': '$editAssignmentButton'
     '.move_assignment': '$moveAssignmentButton'
 
@@ -68,12 +74,13 @@ export default class AssignmentListItemView extends Backbone.View
     'click .icon-unlock': 'onLockAssignment'
     'click .move_assignment': 'onMove'
     'click .duplicate-failed-retry': 'onDuplicateFailedRetry'
+    'click .migrate-failed-retry': 'onMigrateFailedRetry'
     'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel'
     'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel'
 
-  messages:
-    confirm: I18n.t('Are you sure you want to delete this assignment?')
-    ag_move_label: I18n.beforeLabel I18n.t('Assignment Group')
+  messages: shimGetterShorthand {},
+    confirm: -> I18n.t('Are you sure you want to delete this assignment?')
+    ag_move_label: -> I18n.beforeLabel I18n.t('Assignment Group')
 
   initialize: ->
     super
@@ -262,17 +269,33 @@ export default class AssignmentListItemView extends Backbone.View
     @model.collection.add(assignment)
     @focusOnAssignment(response)
 
+  addMigratedQuizToList: (response) =>
+    return unless response
+    quizzes = response.migrated_assignment
+    debugger
+    if quizzes
+      @addAssignmentToList(quizzes[0])
+
   onDuplicate: (e) =>
     return unless @canDuplicate()
     e.preventDefault()
     @model.duplicate(@addAssignmentToList)
 
-  onDuplicateFailedRetry: (e) =>
+  onDuplicateFailedRetry: (e, action) =>
     e.preventDefault()
     $button = $(e.target)
     $button.prop('disabled', true)
     @model.duplicate_failed((response) =>
       @addAssignmentToList(response)
+      @delete(silent: true)
+    ).always -> $button.prop('disabled', false)
+
+  onMigrateFailedRetry: (e, action) =>
+    e.preventDefault()
+    $button = $(e.target)
+    $button.prop('disabled', true)
+    @model.retry_migration((response) =>
+      @addMigratedQuizToList(response)
       @delete(silent: true)
     ).always -> $button.prop('disabled', false)
 
@@ -294,12 +317,47 @@ export default class AssignmentListItemView extends Backbone.View
 
   onSendAssignmentTo: (e) =>
     e.preventDefault()
-    console.log("Send assignment #{@model.get('id')} to another user")
+    renderModal = (open) =>
+      mountPoint = document.getElementById('send-to-mount-point')
+      return unless mountPoint
+      ReactDOM.render(React.createElement(DirectShareUserModal, {
+        open: open
+        courseId: ENV.COURSE_ID
+        contentShare: {content_type: 'assignment', content_id: @model.id}
+        shouldReturnFocus: false
+        onDismiss: dismissModal
+      }), mountPoint)
 
+    dismissModal = () =>
+      renderModal(false)
+      # delay necessary because something else is messing with our focus, even with shouldReturnFocus: false
+      setTimeout(
+        () => @$settingsButton.focus()
+        100)
+
+    renderModal(true)
 
   onCopyAssignmentTo: (e) =>
     e.preventDefault()
-    console.log("Copy assignment #{@model.get('id')} to another course")
+    renderTray = (open) =>
+      mountPoint = document.getElementById('copy-to-mount-point')
+      return unless mountPoint
+      ReactDOM.render(React.createElement(DirectShareCourseTray, {
+        open: open
+        sourceCourseId: ENV.COURSE_ID
+        contentSelection: {assignments: [@model.id]}
+        shouldReturnFocus: false
+        onDismiss: dismissTray
+      }), mountPoint)
+
+    dismissTray = () =>
+      renderTray(false)
+      # delay necessary because something else is messing with our focus, even with shouldReturnFocus: false
+      setTimeout(
+        () => @$settingsButton.focus()
+        100)
+
+    renderTray(true)
 
   onUnlockAssignment: (e) =>
     e.preventDefault()

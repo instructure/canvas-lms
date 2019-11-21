@@ -18,11 +18,11 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {toLocaleString, browserTimeZone} from '@instructure/ui-i18n/lib/DateTime'
+import {DateTime} from '@instructure/ui-i18n'
 import AssignmentDate from '../AssignmentDate'
 
 const locale = 'en'
-const timeZone = browserTimeZone()
+const timeZone = DateTime.browserTimeZone()
 
 function renderAssignmentDate(props) {
   return render(
@@ -85,11 +85,11 @@ describe('AssignmentDate', () => {
       value
     })
 
-    const dateDisplay = toLocaleString(value, locale, timeZone, 'LL')
+    const dateDisplay = DateTime.toLocaleString(value, locale, timeZone, 'LL')
     const dinput = getByDisplayValue(dateDisplay)
     dinput.focus()
     fireEvent.change(dinput, {target: {value: 'x'}})
-    const timeDisplay = toLocaleString(value, locale, timeZone, 'LT')
+    const timeDisplay = DateTime.toLocaleString(value, locale, timeZone, 'LT')
     const tinput = getByDisplayValue(timeDisplay)
     tinput.focus()
 
@@ -111,11 +111,11 @@ describe('AssignmentDate', () => {
       value
     })
 
-    const dateDisplay = toLocaleString(value, locale, timeZone, 'LL')
+    const dateDisplay = DateTime.toLocaleString(value, locale, timeZone, 'LL')
     const dinput = getByDisplayValue(dateDisplay)
     dinput.focus()
     fireEvent.change(dinput, {target: {value: '2108-05-13T15:15:00-07:00'}})
-    const timeDisplay = toLocaleString(value, locale, timeZone, 'LT')
+    const timeDisplay = DateTime.toLocaleString(value, locale, timeZone, 'LT')
     const tinput = getByDisplayValue(timeDisplay)
     tinput.focus()
 

@@ -34,7 +34,7 @@ export default function GradeChangeLoggingContentView(options) {
   this.onFail = this.onFail.bind(this)
   this.options = options
   this.collection = new GradeChangeLoggingCollection()
-  Backbone.View.apply(this,arguments)
+  Backbone.View.apply(this, arguments)
   this.dateRangeSearch = new DateRangeSearchView({
     name: 'gradeChangeLogging'
   })

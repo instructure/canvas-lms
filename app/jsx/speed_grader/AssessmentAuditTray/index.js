@@ -18,12 +18,11 @@
 
 import React, {Component} from 'react'
 import {func, instanceOf} from 'prop-types'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import View from '@instructure/ui-layout/lib/components/View'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Flex, View} from '@instructure/ui-layout'
+import {Heading, Spinner} from '@instructure/ui-elements'
+import {Tray} from '@instructure/ui-overlays'
+
 import I18n from 'i18n!speed_grader'
 
 import AssessmentSummary from './components/AssessmentSummary'
@@ -56,7 +55,7 @@ export default class AssessmentAuditTray extends Component {
 
   dismiss = () => {
     this.setState({open: false})
-  };
+  }
 
   show = context => {
     this.setState({
@@ -80,7 +79,7 @@ export default class AssessmentAuditTray extends Component {
         }
       })
     /* eslint-enable promise/catch-or-return */
-  };
+  }
 
   render() {
     if (!this.state.assignment) {
@@ -99,15 +98,15 @@ export default class AssessmentAuditTray extends Component {
       >
         <View as="div" padding="small">
           <Flex as="div" margin="0 0 medium 0">
-            <FlexItem>
+            <Flex.Item>
               <CloseButton onClick={this.dismiss}>{I18n.t('Close')}</CloseButton>
-            </FlexItem>
+            </Flex.Item>
 
-            <FlexItem margin="0 0 0 small">
+            <Flex.Item margin="0 0 0 small">
               <Heading as="h2" level="h3">
                 {I18n.t('Assessment audit')}
               </Heading>
-            </FlexItem>
+            </Flex.Item>
           </Flex>
 
           {this.state.auditEventsLoaded ? (
@@ -127,7 +126,7 @@ export default class AssessmentAuditTray extends Component {
               </View>
             </>
           ) : (
-            <Spinner title={I18n.t('Loading assessment audit trail')} />
+            <Spinner renderTitle={I18n.t('Loading assessment audit trail')} />
           )}
         </View>
       </Tray>

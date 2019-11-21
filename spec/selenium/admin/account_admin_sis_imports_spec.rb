@@ -140,7 +140,7 @@ describe "sis imports ui" do
     expect(SisBatch.last.batch_mode).to eq true
     expect(SisBatch.last.options).to eq({skip_deletes: false, override_sis_stickiness: true, add_sis_stickiness: true})
 
-    expect_new_page_load { get "/accounts/#{@account.id}/sis_import" }
+    get "/accounts/#{@account.id}/sis_import"
     f("#override_sis_stickiness").click
     submit_form('#sis_importer')
     expect(f('.progress_bar_holder .progress_message')).to be_displayed

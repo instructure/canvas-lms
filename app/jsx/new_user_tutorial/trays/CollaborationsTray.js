@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const CollaborationsTray = () => (
@@ -28,12 +28,10 @@ const CollaborationsTray = () => (
     image="/images/tutorial-tray-images/collaborations.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Provide a space for users to work on a single Google Doc
-          simultaneously, from within your Canvas course.`)
-      }
+      {I18n.t(`Provide a space for users to work on a single document
+          simultaneously, from within your Canvas course.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
-export default CollaborationsTray;
+export default CollaborationsTray

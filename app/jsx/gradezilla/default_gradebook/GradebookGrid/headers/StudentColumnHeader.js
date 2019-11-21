@@ -18,18 +18,14 @@
 
 import React from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
-import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import View from '@instructure/ui-layout/lib/components/View'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Menu, {
-  MenuItem,
-  MenuItemGroup,
-  MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {IconMoreSolid} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {View, Grid} from '@instructure/ui-layout'
+
+import {Menu} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!gradezilla'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import studentRowHeaderConstants from '../../constants/studentRowHeaderConstants'
 import ColumnHeader from './ColumnHeader'
 
@@ -148,16 +144,16 @@ export default class StudentColumnHeader extends ColumnHeader {
       >
         <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
-            <GridRow>
-              <GridCol textAlign="start">
+            <Grid.Row>
+              <Grid.Col textAlign="start">
                 <View className="Gradebook__ColumnHeaderDetail" padding="0 0 0 small">
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {I18n.t('Student Name')}
                   </Text>
                 </View>
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center" width="auto">
+              <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>
                   <Menu
                     contentRef={this.bindOptionsMenuContent}
@@ -181,10 +177,10 @@ export default class StudentColumnHeader extends ColumnHeader {
                       contentRef={this.bindSortByMenuContent}
                       disabled={this.props.disabled}
                     >
-                      <MenuItemGroup
+                      <Menu.Group
                         label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
                       >
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'sortable_name' && direction === 'ascending'
                           }
@@ -192,9 +188,9 @@ export default class StudentColumnHeader extends ColumnHeader {
                           onSelect={onSortBySortableNameAscending}
                         >
                           <span>{I18n.t('A–Z')}</span>
-                        </MenuItem>
+                        </Menu.Item>
 
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'sortable_name' && direction === 'descending'
                           }
@@ -202,8 +198,8 @@ export default class StudentColumnHeader extends ColumnHeader {
                           onSelect={onSortBySortableNameDescending}
                         >
                           <span>{I18n.t('Z–A')}</span>
-                        </MenuItem>
-                      </MenuItemGroup>
+                        </Menu.Item>
+                      </Menu.Group>
                     </Menu>
 
                     <Menu
@@ -211,24 +207,24 @@ export default class StudentColumnHeader extends ColumnHeader {
                       contentRef={this.bindDisplayAsMenuContent}
                       disabled={this.props.disabled}
                     >
-                      <MenuItemGroup
+                      <Menu.Group
                         label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}
                       >
-                        <MenuItem
+                        <Menu.Item
                           key="first_last"
                           selected={this.props.selectedPrimaryInfo === 'first_last'}
                           onSelect={this.onShowFirstLastNames}
                         >
                           {studentRowHeaderConstants.primaryInfoLabels.first_last}
-                        </MenuItem>
-                        <MenuItem
+                        </Menu.Item>
+                        <Menu.Item
                           key="last_first"
                           selected={this.props.selectedPrimaryInfo === 'last_first'}
                           onSelect={this.onShowLastFirstNames}
                         >
                           {studentRowHeaderConstants.primaryInfoLabels.last_first}
-                        </MenuItem>
-                      </MenuItemGroup>
+                        </Menu.Item>
+                      </Menu.Group>
                     </Menu>
 
                     <Menu
@@ -236,91 +232,91 @@ export default class StudentColumnHeader extends ColumnHeader {
                       disabled={this.props.disabled}
                       label={I18n.t('Secondary info')}
                     >
-                      <MenuItemGroup
+                      <Menu.Group
                         label={
                           <ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>
                         }
                       >
                         {this.props.sectionsEnabled && (
-                          <MenuItem
+                          <Menu.Item
                             key="section"
                             selected={this.props.selectedSecondaryInfo === 'section'}
                             onSelect={this.onShowSectionNames}
                           >
                             {studentRowHeaderConstants.secondaryInfoLabels.section}
-                          </MenuItem>
+                          </Menu.Item>
                         )}
-                        <MenuItem
+                        <Menu.Item
                           key="sis_id"
                           selected={this.props.selectedSecondaryInfo === 'sis_id'}
                           onSelect={this.onShowSisId}
                         >
                           {this.props.sisName ||
                             studentRowHeaderConstants.secondaryInfoLabels.sis_id}
-                        </MenuItem>
+                        </Menu.Item>
 
-                        <MenuItem
+                        <Menu.Item
                           key="integration_id"
                           selected={this.props.selectedSecondaryInfo === 'integration_id'}
                           onSelect={this.onShowIntegrationId}
                         >
                           {studentRowHeaderConstants.secondaryInfoLabels.integration_id}
-                        </MenuItem>
+                        </Menu.Item>
 
-                        <MenuItem
+                        <Menu.Item
                           key="login_id"
                           selected={this.props.selectedSecondaryInfo === 'login_id'}
                           onSelect={this.onShowLoginId}
                         >
                           {this.props.loginHandleName ||
                             studentRowHeaderConstants.secondaryInfoLabels.login_id}
-                        </MenuItem>
+                        </Menu.Item>
 
                         {this.props.studentGroupsEnabled && (
-                          <MenuItem
+                          <Menu.Item
                             key="group"
                             selected={this.props.selectedSecondaryInfo === 'group'}
                             onSelect={this.onShowGroup}
                           >
                             {studentRowHeaderConstants.secondaryInfoLabels.group}
-                          </MenuItem>
+                          </Menu.Item>
                         )}
 
-                        <MenuItem
+                        <Menu.Item
                           key="none"
                           selected={this.props.selectedSecondaryInfo === 'none'}
                           onSelect={this.onHideSecondaryInfo}
                         >
                           {studentRowHeaderConstants.secondaryInfoLabels.none}
-                        </MenuItem>
-                      </MenuItemGroup>
+                        </Menu.Item>
+                      </Menu.Group>
                     </Menu>
 
-                    <MenuItemSeparator />
+                    <Menu.Separator />
 
-                    <MenuItemGroup label={I18n.t('Show')} allowMultiple>
-                      <MenuItem
+                    <Menu.Group label={I18n.t('Show')} allowMultiple>
+                      <Menu.Item
                         key="inactive"
                         selected={this.props.selectedEnrollmentFilters.includes('inactive')}
                         onSelect={this.onToggleInactive}
                         disabled={this.props.disabled}
                       >
                         {studentRowHeaderConstants.enrollmentFilterLabels.inactive}
-                      </MenuItem>
+                      </Menu.Item>
 
-                      <MenuItem
+                      <Menu.Item
                         key="concluded"
                         selected={this.props.selectedEnrollmentFilters.includes('concluded')}
                         onSelect={this.onToggleConcluded}
                         disabled={this.props.disabled}
                       >
                         {studentRowHeaderConstants.enrollmentFilterLabels.concluded}
-                      </MenuItem>
-                    </MenuItemGroup>
+                      </Menu.Item>
+                    </Menu.Group>
                   </Menu>
                 </div>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </div>
       </div>

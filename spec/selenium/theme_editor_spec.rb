@@ -25,7 +25,7 @@ describe 'Theme Editor' do
   include ThemeEditorCommon
 
   before(:each) do
-    make_full_screen
+
     course_with_admin_logged_in
   end
 
@@ -214,7 +214,8 @@ describe 'Theme Editor' do
 
   it 'should apply the theme to the account' do
     open_theme_editor(Account.default.id)
-    ff('.Theme__editor-color-block_input-text')[0].send_keys('#639') # primary brand color
+    f('input[id="brand_config[variables][ic-brand-primary]"]').send_keys('#639')
+    f('input[id="brand_config[variables][ic-link-color]"]').send_keys('#ff00ff')
     expect_new_page_load do
       preview_your_changes
       run_jobs
@@ -222,6 +223,7 @@ describe 'Theme Editor' do
     fj('button:contains("Save theme")').click
 
     name_input = f('#new_theme_theme_name')
+
     keep_trying_until(1) do
       name_input.send_keys('Test Theme')
       true
@@ -234,5 +236,9 @@ describe 'Theme Editor' do
     end
     driver.switch_to.alert.accept
     expect(fj('button:contains("Theme")').css_value('background-color')).to eq('rgba(102, 51, 153, 1)')
+
+    # also make sure instUI stuff picks up the theme variables
+    f('#global_nav_accounts_link').click
+    expect(fj('[aria-label="Admin tray"] ul li a:contains("Default Account")').css_value('color')).to eq('rgba(255, 0, 255, 1)')
   end
 end

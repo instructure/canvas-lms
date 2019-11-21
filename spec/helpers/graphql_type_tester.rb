@@ -84,11 +84,13 @@ class GraphQLTypeTester
     GQL
 
     if result["errors"]
-      raise "QraphQL query error: #{result["errors"].inspect}"
+      raise Error, result["errors"].inspect
     else
       extract_results(result)
     end
   end
+
+  Error = Class.new(StandardError)
 
   private
 

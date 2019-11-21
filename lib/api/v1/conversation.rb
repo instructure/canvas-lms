@@ -137,8 +137,10 @@ module Api::V1::Conversation
     result = {
       :id => user.id,
       :name => user.short_name,
-      :full_name => user.name
+      :full_name => user.name,
+      pronouns: user.pronouns
     }
+
     if options[:include_participant_contexts]
       result[:common_courses] = current_user.address_book.common_courses(user)
       result[:common_groups] = current_user.address_book.common_groups(user)

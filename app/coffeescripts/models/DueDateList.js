@@ -31,16 +31,16 @@ export default class DueDateList {
 
   getDefaultDueDate = () => {
     return this.overrides.getDefaultDueDate()
-  };
+  }
 
   overridesContainDefault = () => {
     return this.overrides.containsDefaultDueDate()
-  };
+  }
 
   containsSectionsWithoutOverrides = () => {
     if (this.overrides.containsDefaultDueDate()) return false
     return this.sectionsWithOverrides().length < this.courseSectionsLength
-  };
+  }
 
   sectionsWithOverrides = () => {
     return this.sections.select(section => {
@@ -50,7 +50,7 @@ export default class DueDateList {
         section.id !== this.defaultDueDateSectionId
       )
     })
-  };
+  }
 
   sectionsWithoutOverrides = () => {
     return this.sections.select(section => {
@@ -60,17 +60,17 @@ export default class DueDateList {
         section.id !== this.defaultDueDateSectionId
       )
     })
-  };
+  }
 
   // --- private helpers ---
 
   _overrideSectionIDs = () => {
     return this.overrides.courseSectionIDs()
-  };
+  }
 
   _onlyVisibleToOverrides = () => {
     return this.assignment.isOnlyVisibleToOverrides()
-  };
+  }
 
   _addOverrideForDefaultSectionIfNeeded = () => {
     if (this._onlyVisibleToOverrides()) return
@@ -80,6 +80,6 @@ export default class DueDateList {
       unlock_at: this.assignment.get('unlock_at')
     })
     return this.overrides.add(override)
-  };
+  }
 }
 DueDateList.prototype.defaultDueDateSectionId = Section.defaultDueDateSectionID

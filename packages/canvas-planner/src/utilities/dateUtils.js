@@ -15,161 +15,168 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import moment from 'moment-timezone';
-import formatMessage from '../format-message';
+import moment from 'moment-timezone'
+import formatMessage from '../format-message'
 
-let dateTimeFormatters = {};
+let dateTimeFormatters = {}
 
-export function initializeDateTimeFormatters (formatters) {
-  dateTimeFormatters = formatters;
+export function initializeDateTimeFormatters(formatters) {
+  dateTimeFormatters = formatters
 }
 
+function getTodaysDetails() {
+  const today = moment()
+  const yesterday = today.clone().subtract(1, 'days')
+  const tomorrow = today.clone().add(1, 'days')
 
-function getTodaysDetails () {
-  const today = moment();
-  const yesterday = today.clone().subtract(1, 'days');
-  const tomorrow = today.clone().add(1, 'days');
-
-  return { today, yesterday, tomorrow };
+  return {today, yesterday, tomorrow}
 }
 
-function isSpecialDay (date) {
-  const { today, yesterday, tomorrow } = getTodaysDetails();
-  const momentizedDate = new moment(date);
+function isSpecialDay(date) {
+  const {today, yesterday, tomorrow} = getTodaysDetails()
+  const momentizedDate = new moment(date)
 
-  const specialDates = [today, yesterday, tomorrow];
-  return specialDates.some(sd => sd.isSame(momentizedDate, 'day'));
+  const specialDates = [today, yesterday, tomorrow]
+  return specialDates.some(sd => sd.isSame(momentizedDate, 'day'))
 }
 
-export function isToday (date, today = moment()) {
-  const momentizedDate = new moment(date);
-  return today.isSame(momentizedDate, 'day');
+export function isToday(date, today = moment()) {
+  const momentizedDate = new moment(date)
+  return today.isSame(momentizedDate, 'day')
 }
 
-export function isInFuture (date, today = moment()) {
-  const momentizedDate = new moment(date);
-  return momentizedDate.isAfter(today, 'day');
+export function isInFuture(date, today = moment()) {
+  const momentizedDate = new moment(date)
+  return momentizedDate.isAfter(today, 'day')
 }
 
-export function isTodayOrBefore (date, today = moment()) {
-  const momentizedDate = new moment(date);
-  return momentizedDate.isBefore(today, 'day') || momentizedDate.isSame(today, 'day');
+export function isTodayOrBefore(date, today = moment()) {
+  const momentizedDate = new moment(date)
+  return momentizedDate.isBefore(today, 'day') || momentizedDate.isSame(today, 'day')
   // moment.isSameOrBefore isn't available until moment 2.11, but until we get off
   // all of ui-core, it ends up pulling in an earlier version.
-  //return momentizedDate.isSameOrBefore(today, 'day');
+  // return momentizedDate.isSameOrBefore(today, 'day');
 }
 
 // determines if the checkMoment falls on or inbetween the firstMoment and the lastMoment
-export function isInMomentRange (checkMoment, firstMoment, lastMoment) {
-  const isOnOrAfterFirst = checkMoment.isAfter(firstMoment) || checkMoment.isSame(firstMoment);
-  const isOnOrBeforeLast = checkMoment.isBefore(lastMoment) || checkMoment.isSame(lastMoment);
-  return isOnOrAfterFirst && isOnOrBeforeLast;
+export function isInMomentRange(checkMoment, firstMoment, lastMoment) {
+  const isOnOrAfterFirst = checkMoment.isAfter(firstMoment) || checkMoment.isSame(firstMoment)
+  const isOnOrBeforeLast = checkMoment.isBefore(lastMoment) || checkMoment.isSame(lastMoment)
+  return isOnOrAfterFirst && isOnOrBeforeLast
 }
 
 /**
-* Given a date (in any format that moment will digest)
-* it will return a string indicating Today, Tomorrow, Yesterday
-* or the day of the week if it doesn't fit in any of those categories
-*/
-export function getFriendlyDate (date) {
-  const { today, yesterday, tomorrow } = getTodaysDetails();
-  const momentizedDate = new moment(date);
+ * Given a date (in any format that moment will digest)
+ * it will return a string indicating Today, Tomorrow, Yesterday
+ * or the day of the week if it doesn't fit in any of those categories
+ */
+export function getFriendlyDate(date) {
+  const {today, yesterday, tomorrow} = getTodaysDetails()
+  const momentizedDate = new moment(date)
 
   if (isToday(date, today)) {
-    return formatMessage('Today');
+    return formatMessage('Today')
   } else if (yesterday.isSame(momentizedDate, 'day')) {
-    return formatMessage('Yesterday');
+    return formatMessage('Yesterday')
   } else if (tomorrow.isSame(momentizedDate, 'day')) {
-    return formatMessage('Tomorrow');
+    return formatMessage('Tomorrow')
   } else {
-    return momentizedDate.format('dddd');
+    return momentizedDate.format('dddd')
   }
 }
 
-
-export function getFullDate (date) {
+export function getFullDate(date) {
   if (isSpecialDay(date)) {
-    return moment(date).format('dddd, MMMM D');
+    return moment(date).format('dddd, MMMM D')
   } else {
-    return moment(date).format('MMMM D, YYYY');
+    return moment(date).format('MMMM D, YYYY')
   }
 }
 
-export function getShortDate (date) {
-  return moment(date).format('MMMM D');
+export function getShortDate(date) {
+  return moment(date).format('MMMM D')
 }
 
-export function getFullDateAndTime (date) {
-  const { today, yesterday, tomorrow } = getTodaysDetails();
-  const momentizedDate = new moment(date);
+export function getFullDateAndTime(date) {
+  const {today, yesterday, tomorrow} = getTodaysDetails()
+  const momentizedDate = new moment(date)
 
   if (isToday(date, today)) {
-    return formatMessage('Today at {date}', {date: momentizedDate.format('LT')});
+    return formatMessage('Today at {date}', {date: momentizedDate.format('LT')})
   } else if (yesterday.isSame(momentizedDate, 'day')) {
-    return formatMessage('Yesterday at {date}', {date: momentizedDate.format('LT')});
+    return formatMessage('Yesterday at {date}', {date: momentizedDate.format('LT')})
   } else if (tomorrow.isSame(momentizedDate, 'day')) {
-    return formatMessage('Tomorrow at {date}', {date: momentizedDate.format('LT')});
+    return formatMessage('Tomorrow at {date}', {date: momentizedDate.format('LT')})
   } else {
-    return formatMessage('{date} at {time}', {date: momentizedDate.format('LL'), time: momentizedDate.format('LT')});
+    return formatMessage('{date} at {time}', {
+      date: momentizedDate.format('LL'),
+      time: momentizedDate.format('LT')
+    })
   }
 }
 
-export function dateString (date, timeZone) {
+export function dateString(date, timeZone) {
   if (dateTimeFormatters.dateString) {
-    return dateTimeFormatters.dateString(date.toISOString(), {timezone: timeZone});
+    return dateTimeFormatters.dateString(date.toISOString(), {timezone: timeZone})
   } else {
-    return date.format('ll'); // always includes year
+    return date.format('ll') // always includes year
   }
 }
 
-export function timeString (date, timeZone) {
+export function timeString(date, timeZone) {
   if (dateTimeFormatters.timeString) {
-    return dateTimeFormatters.timeString(date.toISOString(), {timezone: timeZone});
+    return dateTimeFormatters.timeString(date.toISOString(), {timezone: timeZone})
   } else {
-    return date.format('LT');
+    return date.format('LT')
   }
 }
 
-export function dateTimeString (date, timeZone) {
+export function dateTimeString(date, timeZone) {
   if (dateTimeFormatters.datetimeString) {
-    return dateTimeFormatters.datetimeString(date.toISOString(), {timezone: timeZone});
+    return dateTimeFormatters.datetimeString(date.toISOString(), {timezone: timeZone})
   } else {
-    return date.format('lll'); // always includes year
+    return date.format('lll') // always includes year
   }
 }
 
-export function dateRangeString (startDate, endDate, timeZone) {
+export function dateRangeString(startDate, endDate, timeZone) {
   if (startDate.isSame(endDate)) {
-    return dateTimeString(startDate, timeZone);
+    return dateTimeString(startDate, timeZone)
   } else if (startDate.dayOfYear() === endDate.dayOfYear()) {
     return formatMessage('{startDateTime} - {endTime}', {
       startDateTime: dateTimeString(startDate, timeZone),
-      endTime: timeString(endDate, timeZone),
-    });
+      endTime: timeString(endDate, timeZone)
+    })
   } else {
     return formatMessage('{startDateTime} - {endDateTime}', {
       startDateTime: dateTimeString(startDate, timeZone),
-      endDateTime: dateTimeString(endDate, timeZone),
-    });
+      endDateTime: dateTimeString(endDate, timeZone)
+    })
   }
 }
 
-export function formatDayKey (date) {
-  return moment(date, moment.ISO_8601).format('YYYY-MM-DD');
+export function formatDayKey(date) {
+  return moment(date, moment.ISO_8601).format('YYYY-MM-DD')
 }
 
-export function getFirstLoadedMoment (days, timeZone) {
-  if (!days.length) return moment().tz(timeZone).startOf('day');
-  const firstLoadedDay = days[0];
-  const firstLoadedItem = firstLoadedDay[1][0];
-  if (firstLoadedItem) return firstLoadedItem.dateBucketMoment.clone();
-  return moment.tz(firstLoadedDay[0], timeZone).startOf('day');
+export function getFirstLoadedMoment(days, timeZone) {
+  if (!days.length)
+    return moment()
+      .tz(timeZone)
+      .startOf('day')
+  const firstLoadedDay = days[0]
+  const firstLoadedItem = firstLoadedDay[1][0]
+  if (firstLoadedItem) return firstLoadedItem.dateBucketMoment.clone()
+  return moment.tz(firstLoadedDay[0], timeZone).startOf('day')
 }
 
-export function getLastLoadedMoment (days, timeZone) {
-  if (!days.length) return moment().tz(timeZone).startOf('day');
-  const lastLoadedDay = days[days.length-1];
-  const loadedItem = lastLoadedDay[1][0];
-  if (loadedItem) return loadedItem.dateBucketMoment.clone();
-  return moment.tz(lastLoadedDay[0], timeZone).startOf('day');
+export function getLastLoadedMoment(days, timeZone) {
+  if (!days.length)
+    return moment()
+      .tz(timeZone)
+      .startOf('day')
+  const lastLoadedDay = days[days.length - 1]
+  const loadedItem = lastLoadedDay[1][0]
+  if (loadedItem) return loadedItem.dateBucketMoment.clone()
+  return moment.tz(lastLoadedDay[0], timeZone).startOf('day')
 }

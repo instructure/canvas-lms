@@ -64,7 +64,7 @@ module CC::Exporter::Epub
         resources = sort_by_content ? LINKED_RESOURCE_KEY.except("Attachment").values : module_ids
         remove_hidden_content_from_syllabus!
         resources.each do |resource_type|
-          hash.reverse_merge!(resource_type => create_content_template(resource_type))
+          hash.merge!(resource_type => create_content_template(resource_type))
         end
       end
     end

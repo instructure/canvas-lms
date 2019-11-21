@@ -18,8 +18,8 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Select from '@instructure/ui-forms/lib/components/Select'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Select} from '@instructure/ui-forms'
 import I18n from 'i18n!assignment_grade_summary'
 
 import numberHelper from '../../../../shared/helpers/numberHelper'

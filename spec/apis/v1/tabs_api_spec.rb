@@ -163,6 +163,16 @@ describe TabsController, type: :request do
       ]
     end
 
+    it 'includes tabs for institution-visible courses' do
+      course_factory(:active_all => true)
+      @course.update_attribute(:is_public_to_auth_users, true)
+      user_with_pseudonym
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                      {:controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
+                      {}, {}, {:expected_status => 200})
+      expect(json.map { |tab| tab['id'] }).to include 'home'
+    end
+
     it 'should include external tools' do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.new({
@@ -551,25 +561,42 @@ describe TabsController, type: :request do
     describe "user profile" do
       before(:each) { user_model }
 
-      it 'should include external tools' do
-        @tool = Account.default.context_external_tools.new({
+      let(:tool) {
+        Account.default.context_external_tools.new({
           :name => 'Example',
           :url => 'http://www.example.com',
           :consumer_key => 'key',
           :shared_secret => 'secret',
         })
-        @tool.settings.merge!({
-          :user_navigation => {
-            :enabled => 'true',
-            :url => 'http://www.example.com',
-          },
-        })
-        @tool.save!
+      }
+
+      it 'should include external tools' do
+        tool.settings[:user_navigation] = {
+          :enabled => 'true',
+          :url => 'http://www.example.com',
+        }
+        tool.save!
 
         json = api_call(:get, "/api/v1/users/#{@user.id}/tabs",
                         { :controller => 'tabs', :action => 'index', :user_id => @user.to_param, :format => 'json'})
 
         expect(json).to include(include('type' => 'external', 'label' => 'Example'))
+      end
+
+      it "handles external tools with windowTarget: _blank" do
+        tool.settings[:user_navigation] = {
+          enable: true,
+          url: 'http://www.example.com/foo',
+          windowTarget: '_blank'
+        }
+        tool.save!
+
+        json = api_call(:get, "/api/v1/users/#{@user.id}/tabs",
+                        { :controller => 'tabs', :action => 'index', :user_id => @user.to_param, :format => 'json'})
+
+        tab = json.find{|j| j['type'] == 'external'}
+        expect(tab['html_url']).to match(%r{^/users/[0-9]+/external_tools/[0-9]+\?display=borderless$})
+        expect(tab['full_url']).to match(%r{^http.*users/[0-9]+/external_tools/[0-9]+\?display=borderless$})
       end
     end
 

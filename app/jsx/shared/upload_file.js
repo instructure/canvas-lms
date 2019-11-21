@@ -26,9 +26,9 @@ import resolveProgress from './resolve_progress'
 // error messages.
 function preflightFailed(err) {
   if (err.message === 'Network Error') {
-    const wrapped = new Error(I18n.t("Canvas failed to initiate the upload."));
-    wrapped.originalError = err;
-    return Promise.reject(wrapped);
+    const wrapped = new Error(I18n.t('Canvas failed to initiate the upload.'))
+    wrapped.originalError = err
+    return Promise.reject(wrapped)
   }
   return Promise.reject(err)
 }
@@ -39,18 +39,22 @@ function fileUploadFailed(err) {
     // service could give a proper response. most likely is that an
     // authentication failure broke the OPTIONS pre-request, causing a CORS
     // fault
-    const wrapped = new Error(I18n.t("Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas."));
-    wrapped.originalError = err;
-    return Promise.reject(wrapped);
+    const wrapped = new Error(
+      I18n.t(
+        'Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas.'
+      )
+    )
+    wrapped.originalError = err
+    return Promise.reject(wrapped)
   }
   return Promise.reject(err)
 }
 
 function postUploadFailed(err) {
   if (err.message === 'Network Error') {
-    const wrapped = new Error(I18n.t("Canvas failed to complete the upload."));
-    wrapped.originalError = err;
-    return Promise.reject(wrapped);
+    const wrapped = new Error(I18n.t('Canvas failed to complete the upload.'))
+    wrapped.originalError = err
+    return Promise.reject(wrapped)
   }
   return Promise.reject(err)
 }
@@ -68,24 +72,28 @@ function postUploadFailed(err) {
  */
 export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios) {
   if (!file && !preflightData.url) {
-    throw new Error("expected either a file to upload or a url to clone", { file, preflightData });
+    throw new Error('expected either a file to upload or a url to clone', {file, preflightData})
   } else if (file && preflightData.url) {
-    throw new Error("can't upload with both a file object and a url to clone", { file, preflightData });
+    throw new Error("can't upload with both a file object and a url to clone", {
+      file,
+      preflightData
+    })
   }
 
   // force "no redirect" behavior. redirecting from the S3 POST breaks under
   // CORS in this pathway
-  preflightData.no_redirect = true;
+  preflightData.no_redirect = true
 
   // when preflightData is flat, won't parse right on server as JSON, so force
   // into a query string
   if (preflightData['attachment[context_code]']) {
-    preflightData = qs.stringify(preflightData);
+    preflightData = qs.stringify(preflightData)
   }
 
-  return ajaxLib.post(preflightUrl, preflightData)
+  return ajaxLib
+    .post(preflightUrl, preflightData)
     .catch(preflightFailed)
-    .then((response) => completeUpload(response.data, file, { ajaxLib }));
+    .then(response => completeUpload(response.data, file, {ajaxLib}))
 }
 
 /*
@@ -102,87 +110,91 @@ export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios) {
  *   `includeAvatar`: if true, request avatar information when fetching file
  *     metadata after upload.
  */
-export function completeUpload(preflightResponse, file, options={}) {
-  const ajaxLib = options.ajaxLib || axios;
+export function completeUpload(preflightResponse, file, options = {}) {
+  const ajaxLib = options.ajaxLib || axios
 
   // account for attachments wrapped in array per JSON API format
   if (preflightResponse && preflightResponse.attachments && preflightResponse.attachments[0]) {
-    preflightResponse = preflightResponse.attachments[0];
+    preflightResponse = preflightResponse.attachments[0]
   }
 
   if (!preflightResponse) {
-    throw new Error("expected a preflightResponse");
+    throw new Error('expected a preflightResponse')
   } else if (file && !preflightResponse.upload_url) {
-    throw new Error("expected a preflightResponse with an upload_url", { preflightResponse });
+    throw new Error('expected a preflightResponse with an upload_url', {preflightResponse})
   } else if (!file && !preflightResponse.progress) {
-    throw new Error("expected a preflightResponse with a progress", { preflightResponse });
+    throw new Error('expected a preflightResponse with a progress', {preflightResponse})
   }
 
-  const { upload_url, progress } = preflightResponse;
+  const {upload_url, progress} = preflightResponse
 
   if (!upload_url) {
     // cloning a url and don't need to repost elsewhere, just wait on progress
-    return resolveProgress(progress, { ajaxLib }).catch(postUploadFailed);
+    return resolveProgress(progress, {ajaxLib}).catch(postUploadFailed)
   }
 
-  let { file_param, upload_params, success_url } = preflightResponse;
-  file_param = file_param || 'file';
-  upload_params = upload_params || {};
-  success_url = success_url || upload_params.success_url;
-  const isToS3 = !!success_url;
+  let {file_param, upload_params, success_url} = preflightResponse
+  file_param = file_param || 'file'
+  upload_params = upload_params || {}
+  success_url = success_url || upload_params.success_url
+  const isToS3 = !!success_url
 
   // post upload
   // xsslint xssable.receiver.whitelist formData
-  const formData = new FormData();
-  Object.entries(upload_params).forEach(([key, value]) => formData.append(key, value));
+  const formData = new FormData()
+  Object.entries(upload_params).forEach(([key, value]) => formData.append(key, value))
   if (file) {
-    formData.append(file_param, file, options.filename);
+    formData.append(file_param, file, options.filename)
   }
 
   const upload = ajaxLib.post(upload_url, formData, {
-    responseType: (isToS3 ? 'document' : 'json'),
+    responseType: isToS3 ? 'document' : 'json',
     onUploadProgress: options.onProgress,
     withCredentials: !isToS3
-  });
+  })
 
   // finalize upload
-  return upload.catch(fileUploadFailed).then((response) => {
+  return upload.catch(fileUploadFailed).then(response => {
     if (progress) {
       // cloning a url, wait on the progress object to complete, the return its
       // results as the data
-      return resolveProgress(progress, { ajaxLib }).catch(postUploadFailed);
+      return resolveProgress(progress, {ajaxLib}).catch(postUploadFailed)
     }
-    let location, query = {};
+    let location,
+      query = {}
     if (success_url) {
       // s3 upload, follow-up at success_url with s3 data to finalize
-      const { Bucket, Key, ETag } = response.data;
-      location = success_url;
-      query = { bucket: Bucket, key: Key, etag: ETag };
+      const {Bucket, Key, ETag} = response.data
+      location = success_url
+      query = {bucket: Bucket, key: Key, etag: ETag}
     } else if (response.status === 201 && !options.ignoreResult) {
       // inst-fs upload, follow-up at location from response
-      location = response.data.location;
-      query = {};
+      location = response.data.location
+      query = {}
     }
     if (location) {
       // include avatar in query if necessary
       if (options.includeAvatar) {
-        query.include = "avatar";
+        query.include = 'avatar'
       }
       // send request to follow-up url with query
-      query = qs.stringify(query);
+      query = qs.stringify(query)
       if (query) {
         if (location.indexOf('?') !== -1) {
-          location = `${location}&${query}`;
+          location = `${location}&${query}`
         } else {
-          location = `${location}?${query}`;
+          location = `${location}?${query}`
         }
       }
-      return ajaxLib.get(location).then(({ data }) => data).catch(postUploadFailed);
+      return ajaxLib
+        .get(location)
+        .then(({data}) => data)
+        .catch(postUploadFailed)
     } else {
       // local-storage upload, this _is_ the attachment information
-      return response.data;
+      return response.data
     }
-  });
+  })
 }
 
 /*
@@ -192,7 +204,7 @@ export function completeUpload(preflightResponse, file, options={}) {
  * @returns an array of attachment objects. The attachment objects contain ids
  * that a submissions comment can link to
  */
-export async function submissionCommentAttachmentsUpload(files, courseId, assignmentId) {
+export function submissionCommentAttachmentsUpload(files, courseId, assignmentId) {
   const preflightFileUploadUrl = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/self/comments/files`
   const uploadPromises = files.map(currentFile => {
     const preflightFileData = {
@@ -210,7 +222,7 @@ export async function submissionCommentAttachmentsUpload(files, courseId, assign
  *
  * @returns an array of attachment objects.
  */
-export async function uploadFiles(files, uploadUrl) {
+export function uploadFiles(files, uploadUrl) {
   // We differentiate between a normal file and an lti content item
   // based on the existence of a url attribute on the object. Then we invoke
   // the uploadFile function with different parameters based on whether its a
@@ -219,15 +231,12 @@ export async function uploadFiles(files, uploadUrl) {
   // be found at /doc/api/file_uploads.md
   const uploadPromises = files.map(file => {
     if (file.url) {
-      return uploadFile(
-        uploadUrl,
-        {
-          url: file.url,
-          name: file.title,
-          content_type: file.mediaType,
-          submit_assignment: false
-        }
-      )
+      return uploadFile(uploadUrl, {
+        url: file.url,
+        name: file.title,
+        content_type: file.mediaType,
+        submit_assignment: false
+      })
     } else {
       return uploadFile(
         uploadUrl,

@@ -19,7 +19,7 @@
  */
 
 pipeline {
-  agent none
+  agent { label 'canvas-docker' }
   options {
     ansiColor('xterm')
   }
@@ -29,26 +29,70 @@ pipeline {
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+    PACT_BROKER = credentials('PACT_BROKER')
   }
-  // Todo: This will run all contract tests consecutively, still need to get parallel depending on runtime
-  stages {
-    stage ('Contract Tests') {
-      agent { label 'docker' }
-      steps {
-        timeout(time: 60) {
-          sh 'printenv | sort'
-          sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-          // todo create contract tests script
-          // sh 'build/new-jenkins/.sh'
-        }
-      }
 
-      post {
-        cleanup {
-          sh 'build/new-jenkins/docker-cleanup.sh'
+  stages {
+    stage('Start Docker Images') {
+      steps {
+        timeout(time: 10) {
+          sh 'docker-compose build && docker-compose up -d'
+          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
         }
       }
+    }
+
+    stage ('API Contract Tests') {
+      steps {
+        timeout(time: 10) {
+          sh """
+            docker-compose exec -T web env \
+              PACT_BROKER_HOST=inst-pact-broker.inseng.net \
+              PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
+              PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
+              JENKINS_URL="this silliness is necessary." \
+              DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true \
+              bin/contracts-verify-api
+          """
+        }
+      }
+    }
+
+    stage("Live Events Contract Tests") {
+      steps {
+        sh """
+          docker-compose exec -T web env \
+            PACT_BROKER_HOST=inst-pact-broker.inseng.net \
+            PACT_BROKER_USERNAME="${env.PACT_BROKER_USR}" \
+            PACT_BROKER_PASSWORD="${env.PACT_BROKER_PSW}" \
+            bin/contracts-verify-live-events
+        """
+      }
+    }
+  }
+
+  post {
+    failure {
+      sh 'mkdir -p spec_results'
+      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/. ./spec_results/'
+      script {
+        dir('spec_results') {
+          htmlFiles = findFiles glob: '**/index.html'
+        }
+
+        publishHTML(target: [
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: true,
+          reportDir: "spec_results",
+          reportFiles: htmlFiles.join(','),
+          reportName: 'Test Results'
+        ])
+      }
+    }
+    cleanup {
+      sh 'rm -rf spec_results/'
+      sh 'build/new-jenkins/docker-cleanup.sh'
     }
   }
 }

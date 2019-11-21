@@ -22,11 +22,11 @@ import $ from 'jquery'
 import deparam from '../util/deparam'
 
 const MEDIA_COMMENT_THUMBNAIL_SIZES = {
-  normal: { width: 140, height: 100},
-  small: { width: 70, height: 50}
+  normal: {width: 140, height: 100},
+  small: {width: 70, height: 50}
 }
 
-function createMediaCommentThumbnail (elem, size, keepOriginalText) {
+function createMediaCommentThumbnail(elem, size, keepOriginalText) {
   if (!INST.kalturaSettings) return console.log('Kaltura has not been enabled for this account')
   let idAttr, url
   const $link = $(elem)
@@ -44,19 +44,24 @@ function createMediaCommentThumbnail (elem, size, keepOriginalText) {
     $link.data('media_comment_id') ||
     $.trim($link.find('.media_comment_id:first').text()) ||
     ((idAttr = $link.attr('id')) && idAttr.match(/^media_comment_/) && idAttr.substring(14)) ||
-    $.trim($link.parent().find('.media_comment_id:first').text())
+    $.trim(
+      $link
+        .parent()
+        .find('.media_comment_id:first')
+        .text()
+    )
 
-  const authorName = $link.data('author');
-  const createdAt = $link.data('created_at');
-  let altText;
+  const authorName = $link.data('author')
+  const createdAt = $link.data('created_at')
+  let altText
 
   if (authorName && createdAt) {
-    altText = I18n.t(
-      'Play media comment by %{name} from %{createdAt}.',
-      { name: authorName, createdAt: createdAt }
-    )
+    altText = I18n.t('Play media comment by %{name} from %{createdAt}.', {
+      name: authorName,
+      createdAt
+    })
   } else {
-    altText = I18n.t('Play media comment.');
+    altText = I18n.t('Play media comment.')
   }
 
   if (id) {
@@ -86,7 +91,10 @@ function createMediaCommentThumbnail (elem, size, keepOriginalText) {
 
     let $a = $link
     if (keepOriginalText) {
-      $a = $link.clone().empty().removeClass('instructure_file_link')
+      $a = $link
+        .clone()
+        .empty()
+        .removeClass('instructure_file_link')
       const $holder = $link.parent('.instructure_file_link_holder')
       if ($holder.length) {
         $a.appendTo($holder)
@@ -106,8 +114,8 @@ function createMediaCommentThumbnail (elem, size, keepOriginalText) {
 }
 
 // public API
-export default $.fn.mediaCommentThumbnail = function (size = 'normal', keepOriginalText) {
-  return this.each(function () {
+export default $.fn.mediaCommentThumbnail = function(size = 'normal', keepOriginalText) {
+  return this.each(function() {
     // defer each thumbnail generation till the next time through the event loop to not kill browser rendering,
     // has the effect of saying "only work on thumbnailing these while the browser is not doing something else"
     _.defer(createMediaCommentThumbnail, this, size, keepOriginalText)

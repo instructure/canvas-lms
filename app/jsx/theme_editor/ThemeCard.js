@@ -21,8 +21,8 @@ import React from 'react'
 import {string, func, bool} from 'prop-types'
 import SVGWrapper from '../shared/SVGWrapper'
 
-import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import Modal from '../shared/components/InstuiModal'
+import {Button} from '@instructure/ui-buttons'
 
 export default function ThemeCard(props) {
   const getVar = props.getVariable
@@ -142,14 +142,14 @@ export default function ThemeCard(props) {
           onSubmit={props.onDelete}
           label={I18n.t('Delete Theme?')}
         >
-          <ModalBody>{I18n.t('Delete %{themeName}?', {themeName: props.name})}</ModalBody>
-          <ModalFooter>
+          <Modal.Body>{I18n.t('Delete %{themeName}?', {themeName: props.name})}</Modal.Body>
+          <Modal.Footer>
             <Button onClick={props.cancelDeleting}>{I18n.t('Cancel')}</Button>
             &nbsp;
             <Button variant="primary" type="submit">
               {I18n.t('Delete')}
             </Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       )}
       {props.isActiveBrandConfig && (

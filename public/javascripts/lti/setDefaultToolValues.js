@@ -23,8 +23,11 @@ export default function setDefaultToolValues(result, tool) {
   $('#assignment_external_tool_tag_attributes_content_id').val(tool.definition_id)
   $('#assignment_external_tool_tag_attributes_url').val(result.url)
 
-  window.postMessage({
-    messageType: 'defaultToolContentReady',
-    content: result 
-  }, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+  window.postMessage(
+    {
+      messageType: 'defaultToolContentReady',
+      content: result
+    },
+    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+  )
 }

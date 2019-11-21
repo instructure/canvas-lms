@@ -19,10 +19,10 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, func, oneOf, shape, string} from 'prop-types'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Alert} from '@instructure/ui-alerts'
+import {Flex} from '@instructure/ui-layout'
+import {Heading, Text} from '@instructure/ui-elements'
+
 import I18n from 'i18n!assignment_grade_summary'
 
 import * as AssignmentActions from '../assignment/AssignmentActions'
@@ -65,14 +65,14 @@ class Header extends Component {
     if (window.confirm(message)) {
       this.props.releaseGrades()
     }
-  };
+  }
 
   handleUnmuteClick = () => {
     const message = I18n.t('Are you sure you want to post grades for this assignment to students?')
     if (window.confirm(message)) {
       this.props.unmuteAssignment()
     }
-  };
+  }
 
   render() {
     return (
@@ -92,31 +92,31 @@ class Header extends Component {
 
         <Flex as="div" margin="large 0 0 0">
           {this.props.graders.length > 0 && (
-            <FlexItem as="div" flex="1" grow>
+            <Flex.Item as="div" flex="1" grow>
               <GradersTable />
-            </FlexItem>
+            </Flex.Item>
           )}
 
-          <FlexItem align="end" as="div" flex="2" grow>
+          <Flex.Item align="end" as="div" flex="2" grow>
             <Flex as="div" justifyItems="end">
-              <FlexItem>
+              <Flex.Item>
                 <ReleaseButton
                   gradesReleased={this.props.assignment.gradesPublished}
                   margin="0 x-small 0 0"
                   onClick={this.handleReleaseClick}
                   releaseGradesStatus={this.props.releaseGradesStatus}
                 />
-              </FlexItem>
+              </Flex.Item>
 
-              <FlexItem>
+              <Flex.Item>
                 <PostToStudentsButton
                   assignment={this.props.assignment}
                   onClick={this.handleUnmuteClick}
                   unmuteAssignmentStatus={this.props.unmuteAssignmentStatus}
                 />
-              </FlexItem>
+              </Flex.Item>
             </Flex>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </header>
     )

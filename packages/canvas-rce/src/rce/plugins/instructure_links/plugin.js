@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../../../format-message"
-import clickCallback from "./clickCallback"
+import formatMessage from '../../../format-message'
+import clickCallback from './clickCallback'
 import bridge from '../../../bridge'
-import {isFileLink} from '../shared/ContentSelection'
+import {isFileLink, asLink} from '../shared/ContentSelection'
 import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
 import {CREATE_LINK, EDIT_LINK} from './components/LinkOptionsDialog/LinkOptionsDialogController'
 
@@ -27,49 +27,35 @@ const trayController = new LinkOptionsTrayController()
 
 const PLUGIN_KEY = 'links'
 
-const getLink = function (editor, elm) {
-  return editor.dom.getParent(elm, 'a[href]');
-}
-const getLinkIfCursorOnAnchorElement = function (editor) {
-  return getAnchorElement(editor, editor.selection.getNode()) ||
-         getAnchorElement(editor, editor.selection.getStart())
+const getLink = function(editor, elm) {
+  return editor.dom.getParent(elm, 'a[href]')
 }
 
-const getAnchorElement = function (editor, node) {
+const getAnchorElement = function(editor, node) {
   const link = node.nodeName.toLowerCase() === 'a' ? node : getLink(editor, node)
-  return (link && link.href) ? link : null
-};
+  return link && link.href ? link : null
+}
 
-tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
+tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
   init(ed) {
     // Register commands
-    ed.addCommand(
-      "instructureLinkCreate",
-      clickCallback.bind(this, ed, CREATE_LINK)
-    );
-    ed.addCommand(
-      "instructureLinkEdit",
-      clickCallback.bind(this, ed, EDIT_LINK)
-    )
+    ed.addCommand('instructureLinkCreate', clickCallback.bind(this, ed, CREATE_LINK))
+    ed.addCommand('instructureLinkEdit', clickCallback.bind(this, ed, EDIT_LINK))
 
     // Register toolbar button
-    ed.ui.registry.addMenuButton("instructure_links", {
+    ed.ui.registry.addMenuButton('instructure_links', {
       tooltip: formatMessage('Links'),
-      icon: "link",
+      icon: 'link',
       fetch(callback) {
         let items
-        const link = getLinkIfCursorOnAnchorElement(ed)
-        if (link) {
+        const linkContents = asLink(ed.selection.getNode(), ed)
+        if (linkContents) {
           items = [
             {
               type: 'menuitem',
               text: formatMessage('Edit Link'),
               onAction: () => {
-                if (isFileLink(link)) {
-                  trayController.showTrayForEditor(ed)
-                } else {
-                  ed.execCommand('instructureLinkEdit')
-                }
+                trayController.showTrayForEditor(ed)
               }
             },
             {
@@ -86,7 +72,7 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
               type: 'menuitem',
               text: formatMessage('External Links'),
               onAction: () => {
-                ed.execCommand('instructureLinkCreate');
+                ed.execCommand('instructureLinkCreate')
               }
             },
             {
@@ -112,7 +98,7 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
           ed.off('NodeChange', handleNodeChange)
         }
       }
-    });
+    })
 
     // the context toolbar button
     const buttonAriaLabel = formatMessage('Show link options')
@@ -129,14 +115,11 @@ tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
     ed.ui.registry.addContextToolbar('instructure-link-toolbar', {
       items: 'instructure-link-options',
       position: 'node',
-      predicate: (elem) => isFileLink(elem, ed),
+      predicate: elem => isFileLink(elem, ed),
       scope: 'node'
     })
   }
-});
+})
 
 // Register plugin
-tinymce.PluginManager.add(
-  "instructure_links",
-  tinymce.plugins.InstructureLinksPlugin
-);
+tinymce.PluginManager.add('instructure_links', tinymce.plugins.InstructureLinksPlugin)

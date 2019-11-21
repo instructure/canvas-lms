@@ -167,10 +167,11 @@ describe Api::V1::Course do
           "role_id" => student_role.id,
           "user_id" => @me.id,
           "enrollment_state" => "active",
+          "limit_privileges_to_course_section" => false,
           "computed_current_score" => 95.0,
           "computed_final_score" => 85.0,
           "computed_current_grade" => "A",
-          "computed_final_grade" => "B"
+          "computed_final_grade" => "B",
         }
       end
 
@@ -252,6 +253,7 @@ describe Api::V1::Course do
           "role_id" => student_role.id,
           "user_id" => @student.id,
           "enrollment_state" => "active",
+          "limit_privileges_to_course_section" => false,
           "computed_current_score" => 45.0,
           "computed_final_score" => 30.0,
           "computed_current_grade" => "F",
@@ -468,18 +470,21 @@ describe CoursesController, type: :request do
          "role_id" => @assigned_observer_enrollment.role.id,
          "user_id" => @assigned_observer_enrollment.user_id,
          "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
          "associated_user_id" => @observed_student.id
        }, {
          "type" => "observer",
          "role" => @observer_enrollment.role.name,
          "role_id" => @observer_enrollment.role.id,
          "user_id" => @observer_enrollment.user_id,
+         "limit_privileges_to_course_section" => false,
          "enrollment_state" => "active"
        }, {
          "type" => "student",
          "role" => @student_enrollment.role.name,
          "role_id" => @student_enrollment.role.id,
          "user_id" => @student_enrollment.user_id,
+         "limit_privileges_to_course_section" => false,
          "enrollment_state" => "active"
        }]
     end
@@ -498,19 +503,22 @@ describe CoursesController, type: :request do
          "role_id" => @assigned_observer_enrollment.role.id,
          "user_id" => @assigned_observer_enrollment.user_id,
          "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
          "associated_user_id" => @observed_student.id
        }, {
          "type" => "observer",
          "role" => @observer_enrollment.role.name,
          "role_id" => @observer_enrollment.role.id,
          "user_id" => @observer_enrollment.user_id,
-         "enrollment_state" => "active"
+         "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
        }, {
          "type" => "student",
          "role" => @student_enrollment.role.name,
          "role_id" => @student_enrollment.role.id,
          "user_id" => @student_enrollment.user_id,
-         "enrollment_state" => "active"
+         "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
        }]
     end
 
@@ -527,13 +535,15 @@ describe CoursesController, type: :request do
          "role_id" => @assigned_observer_enrollment.role.id,
          "user_id" => @assigned_observer_enrollment.user_id,
          "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
          "associated_user_id" => @observed_student.id
        }, {
          "type" => "observer",
          "role" => @observer_enrollment.role.name,
          "role_id" => @observer_enrollment.role.id,
          "user_id" => @observer_enrollment.user_id,
-         "enrollment_state" => "active"
+         "enrollment_state" => "active",
+         "limit_privileges_to_course_section" => false,
        }]
     end
   end
@@ -1175,6 +1185,17 @@ describe CoursesController, type: :request do
       it "should update the grade_passback_setting" do
         api_call(:put, @path, @params, course: { grade_passback_setting: 'nightly_sync' })
         expect(@course.reload.grade_passback_setting).to eq 'nightly_sync'
+      end
+
+      it "should update the grade_passback_setting to disabled" do
+        api_call(:put, @path, @params, course: { grade_passback_setting: 'disabled' })
+        expect(@course.reload.grade_passback_setting).to eq 'disabled'
+      end
+
+      it "should update the grade_passback_setting to custom setting" do
+        Setting.set('valid_grade_passback_settings', 'one,two,three')
+        api_call(:put, @path, @params, course: { grade_passback_setting: 'one' })
+        expect(@course.reload.grade_passback_setting).to eq 'one'
       end
 
       it "should remove the grade_passback_setting" do
@@ -2296,7 +2317,8 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses.json?enrollment_role=SuperTeacher",
                       { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' })
       expect(json.collect{ |c| c['id'].to_i }).to eq [@course3.id]
-      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'user_id' => @me.id, 'enrollment_state' => 'invited' }]
+      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id,
+        'user_id' => @me.id, 'enrollment_state' => 'invited', "limit_privileges_to_course_section" => false }]
     end
   end
 
@@ -2413,7 +2435,8 @@ describe CoursesController, type: :request do
                       { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' },
                       { :state => ['unpublished'] })
       expect(json.collect{ |c| c['id'].to_i }).to eq [@course3.id]
-      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'user_id' => @me.id, 'enrollment_state' => 'invited' }]
+      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'user_id' => @me.id,
+        'enrollment_state' => 'invited', "limit_privileges_to_course_section" => false }]
       json.collect{ |c| c['workflow_state']}.each do |s|
         expect(%w{unpublished}).to include(s)
       end
@@ -3145,7 +3168,7 @@ describe CoursesController, type: :request do
 
       describe "localized sorting" do
         before do
-          skip("require pg_collkey") unless ActiveRecord::Base.connection.extension_installed?(:pg_collkey)
+          skip_unless_pg_collkey_present
         end
 
         it "should use course-level locale setting for sorting" do
@@ -3275,6 +3298,36 @@ describe CoursesController, type: :request do
                           :format => 'json', :include => %w(custom_links) })
         expect(json.first).to have_key 'custom_links'
       end
+
+      context "analytics 2" do
+        before :once do
+          @tool = analytics_2_tool_factory
+          Account.default.enable_feature!(:analytics_2)
+        end
+
+        it "puts analytics 2 in custom links if installed" do
+          json = api_call_as_user(@ta, :get, "/api/v1/courses/#{@course1.id}/users.json?include[]=custom_links",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.to_param,
+                            :format => 'json', :include => %w(custom_links) })
+          student1_json = json.find { |u| u['id'] == @student1.id }
+          expect(student1_json['custom_links']).to include({
+            'text' => 'Analytics 2',
+            'url' => "http://www.example.com/courses/#{@course1.id}/external_tools/#{@tool.id}?launch_type=student_context_card&student_id=#{@student1.id}",
+            'icon_class' => 'icon-analytics',
+            'tool_id' => ContextExternalTool::ANALYTICS_2
+          })
+          ta_json = json.find { |u| u['id'] == @ta.id }
+          expect(ta_json['custom_links'].map { |l| l['tool_id'] }).not_to include ContextExternalTool::ANALYTICS_2
+        end
+
+        it "respects tool permissions" do
+          json = api_call_as_user(@student1, :get, "/api/v1/courses/#{@course1.id}/users.json?include[]=custom_links",
+                          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s,
+                            :format => 'json', :include => %w(custom_links) })
+          student2_json = json.find { |u| u['id'] == @student2.id }
+          expect(student2_json['custom_links'].map { |l| l['tool_id'] }).not_to include ContextExternalTool::ANALYTICS_2
+        end
+      end
     end
 
     it "should include observed users in the enrollments if requested" do
@@ -3367,7 +3420,8 @@ describe CoursesController, type: :request do
         'account_id' => @course1.account_id,
         'root_account_id' => @course1.root_account_id,
         'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @me.id, 'enrollment_state' => 'active'}],
+        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id,
+          'user_id' => @me.id, 'enrollment_state' => 'active', "limit_privileges_to_course_section" => false}],
         'grading_standard_id' => nil,
         'grade_passback_setting' => nil,
         'sis_course_id' => @course1.sis_course_id,
@@ -3471,6 +3525,40 @@ describe CoursesController, type: :request do
         "pages", "files", "syllabus", "outcomes", "quizzes", "modules", "settings"
       ]
       expect(json['tabs'].map{ |tab| tab['id'] }).to match_array(expected_tabs)
+    end
+
+    context "include[]=sections" do
+      before :once do
+        @other_section = @course1.course_sections.create! name: 'Other Section', start_at: DateTime.parse('2020-01-01T00:00:00Z')
+      end
+
+      it 'includes enrolled sections if requested' do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=sections",
+          { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json', :include => ['sections'] })
+        expect(json['sections']).to eq([{
+          'id' => @course1.default_section.id,
+          'name' => @course1.default_section.name,
+          'start_at' => nil,
+          'end_at' => nil,
+          'enrollment_role' => 'TeacherEnrollment'
+        }])
+      end
+
+      it 'includes all sections for admins without enrollments (minus enrollment_role)' do
+        json = api_call_as_user(account_admin_user, :get, "/api/v1/courses/#{@course1.id}.json?include[]=sections",
+          { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json', :include => ['sections'] })
+        expect(json['sections']).to match_array([{
+          'id' => @course1.default_section.id,
+          'name' => @course1.default_section.name,
+          'start_at' => nil,
+          'end_at' => nil
+        }, {
+          'id' => @other_section.id,
+          'name' => @other_section.name,
+          'start_at' => '2020-01-01T00:00:00Z',
+          'end_at' => nil
+        }])
+      end
     end
 
     context "when scoped to account" do
@@ -3583,14 +3671,16 @@ describe CoursesController, type: :request do
     end
 
     it "should create the file in unlocked state if :usage_rights_required is disabled" do
-      @course.disable_feature! 'usage_rights_required'
+      @course.usage_rights_required = false
+      @course.save!
       preflight({ :name => 'test' })
       attachment = Attachment.order(:id).last
       expect(attachment.locked).to be_falsy
     end
 
     it "should create the file in locked state if :usage_rights_required is enabled" do
-      @course.enable_feature! 'usage_rights_required'
+      @course.usage_rights_required = true
+      @course.save!
       preflight({ :name => 'test' })
       attachment = Attachment.order(:id).last
       expect(attachment.locked).to be_truthy
@@ -3626,6 +3716,7 @@ describe CoursesController, type: :request do
           'restrict_student_past_view' => false,
           'restrict_student_future_view' => false,
           'show_announcements_on_home_page' => false,
+          'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
           'image_url' => nil,
           'image_id' => nil,
@@ -3655,6 +3746,7 @@ describe CoursesController, type: :request do
           :hide_distribution_graphs => true,
           :hide_final_grades => true,
           :lock_all_announcements => true,
+          :usage_rights_required => true,
           :restrict_student_past_view => true,
           :restrict_student_future_view => true,
           :show_announcements_on_home_page => false,
@@ -3673,6 +3765,7 @@ describe CoursesController, type: :request do
           'hide_distribution_graphs' => true,
           'hide_final_grades' => true,
           'lock_all_announcements' => true,
+          'usage_rights_required' => true,
           'restrict_student_past_view' => true,
           'restrict_student_future_view' => true,
           'show_announcements_on_home_page' => false,
@@ -3689,6 +3782,7 @@ describe CoursesController, type: :request do
         expect(@course.allow_student_organized_groups).to eq false
         expect(@course.hide_distribution_graphs).to eq true
         expect(@course.hide_final_grades).to eq true
+        expect(@course.usage_rights_required).to eq true
         expect(@course.lock_all_announcements).to eq true
         expect(@course.show_announcements_on_home_page).to eq false
         expect(@course.home_page_announcement_limit).to be_falsey
@@ -3723,6 +3817,7 @@ describe CoursesController, type: :request do
           'restrict_student_past_view' => false,
           'restrict_student_future_view' => false,
           'show_announcements_on_home_page' => false,
+          'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
           'image_url' => nil,
           'image_id' => nil,

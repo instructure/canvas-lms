@@ -54,8 +54,8 @@ export default {
     const errors = _.isArray(responseText.errors)
       ? this.translateErrors(responseText.errors)
       : responseText.errors && responseText.errors.base
-        ? [{message: `${responseText.errors.base}, ${responseText.status}`}]
-        : [{message}]
+      ? [{message: `${responseText.errors.base}, ${responseText.status}`}]
+      : [{message}]
 
     this.setState({errors})
     $.screenReaderFlashMessageExclusive(_.map(errors, error => error.message).join(' '))
@@ -68,14 +68,12 @@ export default {
       } else {
         return error
       }
-    });
+    })
   },
 
   updateResults(props) {
     const oldUrl = this.state.collection.url
-    this.state.collection.url = `${window.location.origin}/api/v1/${this.props.contextType}/${
-      this.props.contextId
-    }/files`
+    this.state.collection.url = `${window.location.origin}/api/v1/${this.props.contextType}/${this.props.contextId}/files`
     updateAPIQuerySortParams(this.state.collection, this.props.query)
 
     if (this.state.collection.url === oldUrl && this.state.collection.models.length > 0) {

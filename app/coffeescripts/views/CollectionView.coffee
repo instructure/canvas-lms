@@ -20,6 +20,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
 import template from 'jst/collectionView'
+import {shimGetterShorthand} from '../legacyCoffeesScriptHelpers'
 
 ##
 # Renders a collection of items with an item view. Binds to a handful of
@@ -53,9 +54,10 @@ export default class CollectionView extends Backbone.View
   els:
     '.collectionViewItems': '$list'
 
-  defaults:
+  defaults: shimGetterShorthand
     itemViewOptions: {}
-    emptyMessage: I18n.t("no_items", "No items.")
+  ,
+    emptyMessage: -> I18n.t("no_items", "No items.")
 
   ##
   # When using a different template ensure it contains an element with a

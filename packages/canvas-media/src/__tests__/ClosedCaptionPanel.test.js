@@ -15,10 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render} from '@testing-library/react'
+import {fireEvent, render, waitForElement} from '@testing-library/react'
 import React from 'react'
 
-import ClosedCaptionPanel from '../ClosedCaptionPanel'
+import ClosedCaptionCreator from '../ClosedCaptionCreator'
 
 function makeProps() {
   return {
@@ -34,11 +34,20 @@ function makeProps() {
         CLOSED_CAPTIONS_CHOOSE_FILE: 'Choose File',
         CLOSED_CAPTIONS_SELECT_LANGUAGE: 'Select Language'
       }
-    }
+    },
+    updateSubtitles: () => {}
   }
 }
 
 describe('ClosedCaptionPanel', () => {
+  const selectFile = (element, file) => {
+    fireEvent.change(element, {
+      target: {
+        files: file
+      }
+    })
+  }
+
   beforeAll(() => {
     const node = document.createElement('div')
     node.setAttribute('role', 'alert')
@@ -47,21 +56,105 @@ describe('ClosedCaptionPanel', () => {
   })
 
   it('renders normally', () => {
-    const {getByText} = render(<ClosedCaptionPanel {...makeProps()} />)
+    const {getByText} = render(<ClosedCaptionCreator {...makeProps()} />)
     expect(getByText('Add Subtitle')).toBeInTheDocument()
   })
 
-  /*
   describe('add subtitle button', () => {
-    it('adds a new row when pressed', () => {
-      expect(true).toEqual(false)
+    it('starts with a new row', () => {
+      const {getByText} = render(<ClosedCaptionCreator {...makeProps()} />)
+      expect(getByText('Choose File')).toBeInTheDocument()
+      expect(getByText('Add Subtitle').closest('button')).toHaveAttribute('disabled')
     })
 
-    it('can add multiple new rows', () => {
-      expect(true).toEqual(false)
+    it('disables trashcan on first addition', () => {
+      const {getByText, queryByText} = render(<ClosedCaptionCreator {...makeProps()} />)
+      expect(getByText('Choose File')).toBeInTheDocument()
+      expect(getByText('Add Subtitle').closest('button')).toHaveAttribute('disabled')
+      expect(queryByText('Delete Row')).not.toBeInTheDocument()
+    })
+
+    it('renders file name when one is selected', async () => {
+      const {getByText, container} = render(<ClosedCaptionCreator {...makeProps()} />)
+      expect(getByText('Choose File')).toBeInTheDocument()
+      const file = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
+      const fileInput = container.querySelector('input[type="file"]')
+      selectFile(fileInput, [file])
+
+      expect(await waitForElement(() => getByText('file1.vtt'))).toBeInTheDocument()
+    })
+
+    it('creates a new row', async () => {
+      const {getByText, getByDisplayValue, queryByText, container} = render(
+        <ClosedCaptionCreator {...makeProps()} />
+      )
+      expect(getByText('Choose File')).toBeInTheDocument()
+      const file = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
+      const fileInput = container.querySelector('input[type="file"]')
+      selectFile(fileInput, [file])
+      fireEvent.click(getByDisplayValue('Select Language'))
+      fireEvent.click(getByText('French'))
+      expect(await waitForElement(() => getByText('file1.vtt'))).toBeInTheDocument()
+      expect(queryByText('Choose File')).not.toBeInTheDocument()
+      const addButton = getByText('Add Subtitle').closest('button')
+      fireEvent.click(addButton)
+      expect(getByText('Choose File')).toBeInTheDocument()
+    })
+
+    it('deletes new row when trash is clicked', async () => {
+      const {getByText, getByDisplayValue, queryByText, container} = render(
+        <ClosedCaptionCreator {...makeProps()} />
+      )
+      expect(getByText('Choose File')).toBeInTheDocument()
+      const file = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
+      const fileInput = container.querySelector('input[type="file"]')
+      selectFile(fileInput, [file])
+      fireEvent.click(getByDisplayValue('Select Language'))
+      fireEvent.click(getByText('French'))
+      expect(await waitForElement(() => getByText('file1.vtt'))).toBeInTheDocument()
+      expect(queryByText('Choose File')).not.toBeInTheDocument()
+      const addButton = getByText('Add Subtitle').closest('button')
+      fireEvent.click(addButton)
+      expect(getByText('Choose File')).toBeInTheDocument()
+      const deleteRowButton = getByText('Delete Row').closest('button')
+      fireEvent.click(deleteRowButton)
+      expect(queryByText('Choose File')).not.toBeInTheDocument()
+    })
+
+    it('deletes subtitle row when trash is clicked', async () => {
+      const {getByText, getByDisplayValue, queryByText, container} = render(
+        <ClosedCaptionCreator {...makeProps()} />
+      )
+      expect(getByText('Choose File')).toBeInTheDocument()
+      const file1 = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
+      const file2 = new File(['foo'], 'file2.vtt', {type: 'application/vtt'})
+      const fileInput1 = container.querySelector('input[type="file"]')
+
+      // Add first subtitle
+      selectFile(fileInput1, [file1])
+      fireEvent.click(getByDisplayValue('Select Language'))
+      fireEvent.click(getByText('French'))
+      expect(await waitForElement(() => getByText('file1.vtt'))).toBeInTheDocument()
+
+      const addButton = getByText('Add Subtitle').closest('button')
+      fireEvent.click(addButton)
+
+      // Add second subtitle
+      const fileInput2 = container.querySelector('input[type="file"]')
+      selectFile(fileInput2, [file2])
+      fireEvent.click(getByDisplayValue('Select Language'))
+      fireEvent.click(getByText('English'))
+      expect(await waitForElement(() => getByText('file2.vtt'))).toBeInTheDocument()
+
+      // Delete first subtitle
+      const deleteRowButton = getByText('Delete file1.vtt').closest('button')
+      fireEvent.click(deleteRowButton)
+
+      expect(queryByText('file1.vtt')).not.toBeInTheDocument()
     })
   })
 
+  /*
   describe('adding a new closed caption', () => {
     it('has the language set to "Select Language" by default', () => {
       expect(true).toEqual(false)

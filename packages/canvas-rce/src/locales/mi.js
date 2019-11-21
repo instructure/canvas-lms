@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/mi.json";
+import formatMessage from '../format-message'
+import locale from '../../locales/mi.json'
 // no tinymce translations yet, will use english
-formatMessage.addLocale({ mi: locale });
+formatMessage.addLocale({mi: locale})

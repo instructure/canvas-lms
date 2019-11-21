@@ -28,7 +28,6 @@ import PostPolicies from 'jsx/gradezilla/default_gradebook/PostPolicies'
 import * as PostPolicyApi from 'jsx/gradezilla/default_gradebook/PostPolicies/PostPolicyApi'
 import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 
-/* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookSettingsModal', suiteHooks => {
   let $container
   let component
@@ -47,8 +46,16 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   let setCoursePostPolicyPromise
   let getAssignmentPostPoliciesPromise
   let updateCourseSettingsPromise
+  let originalQunitTimeout
 
   suiteHooks.beforeEach(() => {
+    originalQunitTimeout = QUnit.config.testTimeout
+    /*
+     * The InstUI `Modal` component is taking a while to transition,
+     * so QUnit needs to wait a little longer before timing out.
+     */
+    QUnit.config.testTimeout = 10000
+
     $container = document.createElement('div')
     document.body.appendChild($container)
 
@@ -156,6 +163,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     return ensureModalIsClosed().then(() => {
       ReactDOM.unmountComponentAtNode($container)
       $container.remove()
+      QUnit.config.testTimeout = originalQunitTimeout
     })
   })
 
@@ -209,7 +217,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   function ensureModalIsClosed() {
     if (getModalElement()) {
       component.close()
-      return  waitForModalClosed()
+      return waitForModalClosed()
     } else {
       return Promise.resolve()
     }
@@ -382,7 +390,8 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       await mountOpenAndLoad()
       getAutomaticallyApplyMissingCheckbox().click()
       const $input = getModalElement().querySelector('#missing-submission-grade')
-      fireEvent.change($input, {target: {value: '-1'}})
+      fireEvent.change($input, {target: {value: 'abc'}})
+      fireEvent.blur($input)
       strictEqual(getUpdateButton().disabled, true)
     })
 
@@ -447,7 +456,8 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
           return mountOpenAndLoad().then(() => {
             getAutomaticallyApplyMissingCheckbox().click()
             const $input = getModalElement().querySelector('#missing-submission-grade')
-            fireEvent.change($input, {target: {value: '-1'}})
+            fireEvent.change($input, {target: {value: 'abc'}})
+            fireEvent.blur($input)
           })
         })
 
@@ -597,8 +607,8 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   QUnit.module('when updating the course post policy', hooks => {
     hooks.beforeEach(() => {
       sandbox.spy(FlashAlert, 'showFlashAlert')
-      sandbox.spy(props.postPolicies, 'setCoursePostPolicy')
-      sandbox.spy(props.postPolicies, 'setAssignmentPostPolicies')
+      sinon.spy(props.postPolicies, 'setCoursePostPolicy')
+      sinon.spy(props.postPolicies, 'setAssignmentPostPolicies')
 
       return mountOpenLoadAndSelectTab('Grade Posting Policy').then(() => {
         getManuallyPostGradesOption().click()
@@ -607,7 +617,6 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
 
     hooks.afterEach(() => {
-      props.postPolicies.setCoursePostPolicy.restore()
       FlashAlert.destroyContainer()
     })
 
@@ -794,4 +803,3 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
   })
 })
-/* eslint-enable qunit/no-identical-names */

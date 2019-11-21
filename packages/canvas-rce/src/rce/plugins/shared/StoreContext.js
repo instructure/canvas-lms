@@ -28,6 +28,7 @@ function Consumer({children, ...props}) {
   return children({
     onLinkClick: bridge.insertLink,
     onImageEmbed: bridge.embedImage,
+    onMediaEmbed: bridge.embedMedia,
     ...props
   })
 }

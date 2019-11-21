@@ -17,36 +17,28 @@
  */
 
 import React from 'react'
-import createReactClass from 'create-react-class';
+import createReactClass from 'create-react-class'
 import classnames from 'classnames'
 import CurrentUploads from 'compiled/react_files/components/CurrentUploads'
-import UploadProgress from '../files/UploadProgress'
+import UploadProgress from './UploadProgress'
 
-    CurrentUploads.renderUploadProgress = function () {
-      if (this.state.currentUploads.length) {
-        var progessComponents = this.state.currentUploads.map((uploader) => {
-          return <UploadProgress uploader={uploader} key={uploader.getFileName()} />
-        });
-        return (
-          <div className='current_uploads__uploaders'>
-            {progessComponents}
-          </div>
-        );
-      } else {
-        return null;
-      }
-    };
+CurrentUploads.renderUploadProgress = function() {
+  if (this.state.currentUploads.length) {
+    const progessComponents = this.state.currentUploads.map(uploader => {
+      return <UploadProgress uploader={uploader} key={uploader.getFileName()} />
+    })
+    return <div className="current_uploads__uploaders">{progessComponents}</div>
+  } else {
+    return null
+  }
+}
 
-    CurrentUploads.render = function () {
-      var classes = classnames({
-        'current_uploads': this.state.currentUploads.length
-      });
+CurrentUploads.render = function() {
+  const classes = classnames({
+    current_uploads: this.state.currentUploads.length
+  })
 
-      return (
-        <div className={classes}>
-          {this.renderUploadProgress()}
-        </div>
-      );
-    };
+  return <div className={classes}>{this.renderUploadProgress()}</div>
+}
 
-export default createReactClass(CurrentUploads);
+export default createReactClass(CurrentUploads)

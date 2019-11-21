@@ -110,11 +110,7 @@ test('own_copyright class and screenreader text', function() {
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-copyright', 'has correct class')
-  equal(
-    uRI.refs.screenreaderText.innerHTML,
-    'Own Copyright',
-    'has correct screenreader text'
-  )
+  equal(uRI.refs.screenreaderText.innerHTML, 'Own Copyright', 'has correct screenreader text')
 })
 
 test('public_domain class', function() {
@@ -124,11 +120,7 @@ test('public_domain class', function() {
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-public-domain', 'has correct class')
-  equal(
-    uRI.refs.screenreaderText.innerHTML,
-    'Public Domain',
-    'has correct screenreader text'
-  )
+  equal(uRI.refs.screenreaderText.innerHTML, 'Public Domain', 'has correct screenreader text')
 })
 
 test('used_by_permission class', function() {
@@ -138,11 +130,7 @@ test('used_by_permission class', function() {
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-obtained-permission', 'has correct class')
-  equal(
-    uRI.refs.screenreaderText.innerHTML,
-    'Used by Permission',
-    'has correct screenreader text'
-  )
+  equal(uRI.refs.screenreaderText.innerHTML, 'Used by Permission', 'has correct screenreader text')
 })
 
 test('fair_use class', function() {
@@ -152,11 +140,7 @@ test('fair_use class', function() {
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-fair-use', 'has correct class')
-  equal(
-    uRI.refs.screenreaderText.innerHTML,
-    'Fair Use',
-    'has correct screenreader text'
-  )
+  equal(uRI.refs.screenreaderText.innerHTML, 'Fair Use', 'has correct screenreader text')
 })
 
 test('creative_commons class', function() {
@@ -166,9 +150,5 @@ test('creative_commons class', function() {
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-creative-commons', 'has correct class')
-  equal(
-    uRI.refs.screenreaderText.innerHTML,
-    'Creative Commons',
-    'has correct screenreader text'
-  )
+  equal(uRI.refs.screenreaderText.innerHTML, 'Creative Commons', 'has correct screenreader text')
 })

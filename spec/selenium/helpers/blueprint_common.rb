@@ -149,7 +149,15 @@ module BlueprintCourseCommon
       expect(details_wrapper).to contain_css('.bca-table__course-row')
     end
 
-    # reutrn the <tboey> holding the list of avaiable courses
+    def term_options
+      INSTUI_Select_options('#termsFilter').map(&:text)
+    end
+
+    def sub_account_options
+      INSTUI_Select_options('#subAccountsFilter').map(&:text)
+    end
+
+    # return the <tbody> holding the list of available courses
     def available_courses_table
       f('.bca-table__content-wrapper tbody')
     end

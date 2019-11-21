@@ -19,13 +19,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-elements'
 import I18n from 'i18n!cyoe_assignment_sidebar_student_details_view'
-import { i18nGrade } from '../../shared/conditional_release/score'
+import {i18nGrade} from '../../shared/conditional_release/score'
 import StudentAssignmentItem from './student-assignment-item'
-import { assignmentShape, studentShape } from '../shapes/index'
+import {assignmentShape, studentShape} from '../shapes/index'
 
-const { shape, string, number, arrayOf, func, bool } = PropTypes
+const {shape, string, number, arrayOf, func, bool} = PropTypes
 
 export default class StudentDetailsView extends React.Component {
   static propTypes = {
@@ -34,34 +34,40 @@ export default class StudentDetailsView extends React.Component {
     triggerAssignment: shape({
       submission: shape({
         grade: string.isRequired,
-        submitted_at: string.isRequired,
+        submitted_at: string.isRequired
       }).isRequired,
-      assignment: assignmentShape.isRequired,
+      assignment: assignmentShape.isRequired
     }),
-    followOnAssignments: arrayOf(shape({
-      score: number,
-      trend: number,
-      assignment: assignmentShape.isRequired,
-    })),
+    followOnAssignments: arrayOf(
+      shape({
+        score: number,
+        trend: number,
+        assignment: assignmentShape.isRequired
+      })
+    ),
 
     selectNextStudent: func.isRequired,
     selectPrevStudent: func.isRequired,
-    unselectStudent: func.isRequired,
+    unselectStudent: func.isRequired
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     if (this.props.student && !prevProps.student) {
       setTimeout(() => this.backButton.focus(), 100)
     }
   }
 
-  renderHeader () {
-    if (!this.props.student) { return null }
+  renderHeader() {
+    if (!this.props.student) {
+      return null
+    }
     return (
       <header className="crs-student-details__header">
         <button
           className="crs-breakdown__link crs-back-button"
-          ref={(e) => { this.backButton = e }}
+          ref={e => {
+            this.backButton = e
+          }}
           onClick={this.props.unselectStudent}
         >
           <i aria-hidden className="icon-arrow-open-left" />
@@ -71,9 +77,9 @@ export default class StudentDetailsView extends React.Component {
     )
   }
 
-  renderStudentProfile () {
-    const { student, triggerAssignment } = this.props
-    const { assignment } = triggerAssignment
+  renderStudentProfile() {
+    const {student, triggerAssignment} = this.props
+    const {assignment} = triggerAssignment
 
     const studentAvatar = student.avatar_image_url || '/images/messages/avatar-50.png'
     const conversationUrl = `/conversations?context_id=course_${assignment.course_id}&user_id=${student.id}&user_name=${student.name}`
@@ -91,8 +97,14 @@ export default class StudentDetailsView extends React.Component {
         <div className="crs-student-details__profile-inner-content">
           <img src={studentAvatar} aria-hidden className="crs-student-details__profile-image" />
           <h3 className="crs-student-details__name">{student.name}</h3>
-          <a target="_blank" rel="noopener noreferrer" href={conversationUrl} className="crs-breakdown__link">
-            <i aria-hidden className="icon-email crs-icon-email" />{I18n.t('Send Message')}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={conversationUrl}
+            className="crs-breakdown__link"
+          >
+            <i aria-hidden className="icon-email crs-icon-email" />
+            {I18n.t('Send Message')}
           </a>
         </div>
         <button
@@ -107,57 +119,64 @@ export default class StudentDetailsView extends React.Component {
     )
   }
 
-  renderTriggerAssignment () {
-    const { student, triggerAssignment } = this.props
-    const { assignment, submission } = triggerAssignment || {}
+  renderTriggerAssignment() {
+    const {student, triggerAssignment} = this.props
+    const {assignment, submission} = triggerAssignment || {}
 
     const submissionUrl = `/courses/${assignment.course_id}/assignments/${assignment.id}/submissions/${student.id}`
     let submissionDate = null
     if (submission) {
-      submissionDate = submission.submitted_at ? I18n.l('date.formats.long', new Date(submission.submitted_at)) : null
+      submissionDate = submission.submitted_at
+        ? I18n.l('date.formats.long', new Date(submission.submitted_at))
+        : null
     } else {
       submissionDate = I18n.t('Not Submitted')
     }
 
     return (
       <section className="crs-student-details__score-content">
-        <h3 className="crs-student-details__score-number">{i18nGrade(submission.grade, assignment)}</h3>
+        <h3 className="crs-student-details__score-number">
+          {i18nGrade(submission.grade, assignment)}
+        </h3>
         <div className="crs-student-details__score-title">{assignment.name}</div>
-        {
-          submissionDate ? (
-            <div className="crs-student-details__score-date">{I18n.t('Submitted: %{submitDate}', { submitDate: submissionDate })}</div>
-          ) : null
-        }
-        <a target="_blank" rel="noopener noreferrer" href={submissionUrl} className="crs-breakdown__link">
+        {submissionDate ? (
+          <div className="crs-student-details__score-date">
+            {I18n.t('Submitted: %{submitDate}', {submitDate: submissionDate})}
+          </div>
+        ) : null}
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href={submissionUrl}
+          className="crs-breakdown__link"
+        >
           {I18n.t('View Submission')}
         </a>
       </section>
     )
   }
 
-  renderFollowOnAssignments () {
+  renderFollowOnAssignments() {
     const followOnAssignments = this.props.followOnAssignments || []
     return (
       <section>
-        {
-          followOnAssignments.map((item, i) => (
-            <StudentAssignmentItem
-              key={i}
-              assignment={item.assignment}
-              score={item.score}
-              trend={item.trend}
-            />
-          ))
-        }
+        {followOnAssignments.map((item, i) => (
+          <StudentAssignmentItem
+            key={i}
+            assignment={item.assignment}
+            score={item.score}
+            trend={item.trend}
+          />
+        ))}
       </section>
     )
   }
 
-  renderContent () {
+  renderContent() {
     if (this.props.isLoading) {
       return (
         <div className="crs-student-details__loading">
-          <Spinner title={I18n.t('Loading')} size="small" />
+          <Spinner renderTitle={I18n.t('Loading')} size="small" />
           <p>{I18n.t('Loading Data..')}</p>
         </div>
       )
@@ -173,12 +192,12 @@ export default class StudentDetailsView extends React.Component {
     return null
   }
 
-  render () {
+  render() {
     const isHidden = !this.props.student
 
     const studentDetailsClasses = classNames({
       'crs-student-details': true,
-      'crs-student-details__hidden': isHidden,
+      'crs-student-details__hidden': isHidden
     })
 
     return (

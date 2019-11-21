@@ -330,7 +330,7 @@ module SeleniumDriverSetup
 
     def ruby_chrome_driver
       puts "Thread: provisioning local chrome driver"
-      Chromedriver.set_version "74.0.3729.6"
+      Chromedriver.set_version(CONFIG[:chromedriver_version] || "74.0.3729.6")
       chrome_options = Selenium::WebDriver::Chrome::Options.new
       chrome_options.add_argument('--disable-impl-side-painting')
 
@@ -366,15 +366,22 @@ module SeleniumDriverSetup
     end
 
     def desired_capabilities
-      caps = Selenium::WebDriver::Remote::Capabilities.send(browser)
-      caps.version = CONFIG[:version] unless CONFIG[:version].nil?
-      caps.platform = CONFIG[:platform] unless CONFIG[:platform].nil?
-      caps['name'] = "#{CONFIG[:platform]} - #{CONFIG[:browser]}-#{CONFIG[:version]}" unless CONFIG[:platform].nil?
-      caps["tunnel-identifier"] = CONFIG[:tunnel_id] unless CONFIG[:tunnel_id].nil?
-      caps['selenium-version'] = "3.4.0"
-      caps[:unexpectedAlertBehaviour] = 'ignore'
-      caps[:elementScrollBehavior] = 1
-      caps['screen-resolution'] = "1280x1024"
+      case browser
+      when :firefox
+        # TODO: options for firefox driver
+      when :chrome
+        caps = Selenium::WebDriver::Remote::Capabilities.chrome
+        caps['chromeOptions'] = {
+          args: %w[disable-dev-shm-usage no-sandbox window-size=1680,1050],
+          w3c: false
+        }
+      when :edge
+        # TODO: options for edge driver
+      when :safari
+        # TODO: options for safari driver
+      else
+        raise "unsupported browser #{browser}"
+      end
       caps
     end
 

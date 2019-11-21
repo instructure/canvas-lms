@@ -29,6 +29,8 @@ export const EXTRA_LARGE = 'extra-large'
 export const CUSTOM = 'custom'
 
 export const imageSizes = [SMALL, MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
+export const videoSizes = [MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
+export const defaultImageSize = 320
 
 const sizeByMaximumDimension = {
   200: SMALL,
@@ -38,8 +40,14 @@ const sizeByMaximumDimension = {
 }
 
 function parsedOrNull($element, attribute) {
-  const value = $element.getAttribute(attribute)
-  return value ? Number.parseInt(value, 10) : null
+  // when the image is first inserted into the rce, it's size
+  // is constrained by a style attribute with max-width, max-height.
+  // While it doesn't have a 'width' or 'height' attribute, we can
+  // still get its width and height directly from the img element
+  const value = $element.hasAttribute(attribute)
+    ? $element.getAttribute(attribute)
+    : $element[attribute]
+  return value ? Math.round(Number.parseInt(value, 10)) : null
 }
 
 function imageSizeFromKnownOptions(imageOptions) {
@@ -67,6 +75,44 @@ export function fromImageEmbed($element) {
   return imageOptions
 }
 
+export function fromVideoEmbed($element) {
+  // $element will be the <span> tinymce wraps around the iframe
+  // that's hosting the video player
+  let $videoElem = null
+  let naturalWidth, naturalHeight
+  if ($element.firstElementChild.tagName === 'IFRAME') {
+    const videoDoc = $element.firstElementChild.contentDocument
+    if (videoDoc) {
+      $videoElem = videoDoc.querySelector('video')
+    }
+    if ($videoElem && ($videoElem.loadedmetadata || $videoElem.readyState >= 1)) {
+      naturalWidth = $videoElem.videoWidth
+      naturalHeight = $videoElem.videoHeight
+    }
+  }
+
+  // because tinymce doesn't put the title attribute on the iframe,
+  // but maintains it on the span it adds around it.
+  const title = (
+    $element.firstElementChild.getAttribute('title') ||
+    $element.getAttribute('data-mce-p-title') ||
+    ''
+  ).replace(formatMessage('Video player for '), '')
+  const rect = $element.getBoundingClientRect()
+  const videoOptions = {
+    titleText: title || '',
+    appliedHeight: rect.height,
+    appliedWidth: rect.width,
+    naturalHeight,
+    naturalWidth,
+    source: $videoElem && $videoElem.querySelector('source')
+  }
+
+  videoOptions.videoSize = imageSizeFromKnownOptions(videoOptions)
+
+  return videoOptions
+}
+
 export function scaleImageForHeight(naturalWidth, naturalHeight, targetHeight) {
   const constraints = {minHeight: MIN_HEIGHT, minWidth: MIN_WIDTH}
   return scaleForHeight(naturalWidth, naturalHeight, targetHeight, constraints)
@@ -82,9 +128,7 @@ export function scaleToSize(imageSize, naturalWidth, naturalHeight) {
     return {width: naturalWidth, height: naturalHeight}
   }
 
-  const [dimension] = Object.entries(sizeByMaximumDimension).find(
-    ([, size]) => size === imageSize
-  )
+  const [dimension] = Object.entries(sizeByMaximumDimension).find(([, size]) => size === imageSize)
   const scaleFactor = dimension / Math.max(naturalWidth, naturalHeight)
   return {
     height: Math.round(naturalHeight * scaleFactor),

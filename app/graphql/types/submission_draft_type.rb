@@ -20,7 +20,9 @@ module Types
   class SubmissionDraftType < ApplicationObjectType
     graphql_name 'SubmissionDraft'
 
-    field :_id, ID, 'legacy canvas id', null: false, method: :id
+    implements Interfaces::LegacyIDInterface
+
+    field :active_submission_type, Types::DraftableSubmissionType, null: true
 
     field :attachments, [Types::FileType], null: true
     def attachments
@@ -47,15 +49,46 @@ module Types
       end
     end
 
+    field :meets_media_recording_criteria, Boolean, null: false
+    def meets_media_recording_criteria
+      object.meets_media_recording_criteria?
+    end
+
+    field :meets_text_entry_criteria, Boolean, null: false
+    def meets_text_entry_criteria
+      object.meets_text_entry_criteria?
+    end
+
+    field :meets_upload_criteria, Boolean, null: false
+    def meets_upload_criteria
+      load_association(:attachments).then do
+        object.meets_upload_criteria?
+      end
+    end
+
+    field :meets_url_criteria, Boolean, null: false
+    def meets_url_criteria
+      object.meets_url_criteria?
+    end
+
     field :meets_assignment_criteria, Boolean, null: false
     def meets_assignment_criteria
-      load_association(:submission).then do |submission|
-        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
-          object.meets_assignment_criteria?
+      load_association(:attachments).then do
+        load_association(:submission).then do |submission|
+          Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do
+            object.meets_assignment_criteria?
+          end
         end
       end
     end
 
+    field :media_object, Types::MediaObjectType, null: true
+    def media_object
+      Loaders::MediaObjectLoader.load(object.media_object_id)
+    end
+
     field :submission_attempt, Integer, null: false
+
+    field :url, Types::UrlType, null: true
   end
 end

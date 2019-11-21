@@ -151,7 +151,8 @@ class ContentExportsApiController < ApplicationController
       export = create_content_export_from_api(params, @context, @current_user)
       return unless export.class == ContentExport
       if export.id
-        render json: content_export_json(export, @current_user, session)
+        includes = Array(params[:include]) || []
+        render json: content_export_json(export, @current_user, session, includes)
       else
         render json: export.errors, status: :bad_request
       end

@@ -66,11 +66,23 @@ module InstFS
       setting("app-host")
     end
 
-    def jwt_secret
+    def jwt_secrets
       secret = setting("secret")
-      if secret
-        Base64.decode64(secret)
-      end
+      return [] unless secret
+      secret.split(/\s+/).map{ |key| Base64.decode64(key) }
+    end
+
+    def jwt_secret
+      # if there are multiple keys (to allow for validating during key
+      # rotation), the foremost is used for signing
+      jwt_secrets.first
+    end
+
+    def validate_capture_jwt(token)
+      Canvas::Security.decode_jwt(token, jwt_secrets)
+      true
+    rescue
+      false
     end
 
     def upload_preflight_json(context:, root_account:, user:, acting_as:, access_token:, folder:, filename:,

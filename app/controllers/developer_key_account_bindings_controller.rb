@@ -50,7 +50,7 @@
 #            "description": "True if the requested context owns the binding",
 #            "example": "true",
 #            "type": "boolean"
-#          },
+#          }
 #       }
 #     }
 class DeveloperKeyAccountBindingsController < ApplicationController

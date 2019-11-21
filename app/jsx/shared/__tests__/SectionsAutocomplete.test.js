@@ -23,7 +23,7 @@ import SectionsAutocomplete from '../SectionsAutocomplete'
 describe('Sections Autocomplete', () => {
   const defaultProps = () => ({
     sections: [{id: '1', name: 'awesome section'}],
-    flashMessage: () => {},
+    flashMessage: () => {}
   })
 
   it('renders SectionsAutocomplete', () => {
@@ -96,10 +96,7 @@ describe('Sections Autocomplete', () => {
   it('adds sections accordingly', () => {
     const props = {
       ...defaultProps(),
-      sections: [
-        {id: '1', name: 'awesome section'},
-        {id: '3', name: 'other section'}
-      ]
+      sections: [{id: '1', name: 'awesome section'}, {id: '3', name: 'other section'}]
     }
 
     const wrapper = shallow(<SectionsAutocomplete {...props} />)

@@ -38,6 +38,7 @@ class AccountReportRunner < ActiveRecord::Base
   end
 
   def write_rows
+    return unless rows
     return if rows.empty?
     Shackles.activate(:master) do
       self.class.bulk_insert_objects(rows)

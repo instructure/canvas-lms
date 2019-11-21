@@ -19,10 +19,10 @@
 import React from 'react'
 import {bool, instanceOf, number, shape, string} from 'prop-types'
 import I18n from 'i18n!gradezilla'
-import View from '@instructure/ui-layout/lib/components/View'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
+import {View} from '@instructure/ui-layout'
+import {Pill} from '@instructure/ui-elements'
 import Message from './SubmissionStatus/Message'
-import {isHidden} from '../../../grading/helpers/SubmissionHelper'
+import {isPostable} from '../../../grading/helpers/SubmissionHelper'
 
 export default class SubmissionStatus extends React.Component {
   static defaultProps = {
@@ -46,6 +46,7 @@ export default class SubmissionStatus extends React.Component {
     submission: shape({
       drop: bool,
       excused: bool,
+      hasPostableComments: bool,
       postedAt: instanceOf(Date),
       score: number,
       workflowState: string.isRequired
@@ -57,7 +58,7 @@ export default class SubmissionStatus extends React.Component {
     const statusPillComponents = []
 
     if (postPoliciesEnabled) {
-      if (isHidden(submission)) {
+      if (isPostable(submission)) {
         statusPillComponents.push(
           <Pill
             key="hidden-submission"

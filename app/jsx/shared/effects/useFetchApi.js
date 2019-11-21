@@ -16,36 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
-import {useEffect, useRef} from 'react'
+import useImmediate from '../hooks/useImmediate'
+import doFetchApi from './doFetchApi'
 
-// this is a nicety so we only run the search effect if the parameters have
-// deeply changed. If we didn't do this and the consumer of this effect wasn't
-// careful about the identity of the params object they were passing in, we
-// could wind up redoing the search on every render. This also lets us safely
-// use `{}` as a default parameter
-function useOldestUnchanged(nextParams) {
-  const oldParamsRef = useRef(nextParams)
-  const shouldUpdate = !_.isEqual(oldParamsRef.current, nextParams)
-  const result = shouldUpdate ? nextParams : oldParamsRef.current
-  useEffect(() => {
-    oldParamsRef.current = result
-  })
-  return result
-}
-
-// turn a relative path into a URL based on the current location
-function constructRelativeUrl({path, params}) {
-  const esc = encodeURIComponent
-  const queryString = Object.entries(params)
-    .map(([key, value]) => `${esc(key)}=${esc(value)}`)
-    .join('&')
-  if (!queryString.length) return path
-  return `${path}?${queryString}`
-}
-
-// utility for making it easy to abort a fetch
-function abortable({success, error}) {
+// utility for making it easy to abort the fetch
+function abortable({success, error, loading, meta}) {
   const aborter = new AbortController()
   let active = true
   return {
@@ -55,6 +30,12 @@ function abortable({success, error}) {
     activeError: (...p) => {
       if (active && error) error(...p)
     },
+    activeLoading: (...p) => {
+      if (active && loading) loading(...p)
+    },
+    activeMeta: (...p) => {
+      if (active && meta) meta(...p)
+    },
     abort: () => {
       active = false
       aborter.abort()
@@ -63,58 +44,110 @@ function abortable({success, error}) {
   }
 }
 
+// NOTE: if identity of any of the output functions changes, the prior fetch will be aborted and a
+// new fetch will start, just as if you had changed an input parameter. This will result in a react
+// error: "too many rerenders". An common example of this problem is this:
+//
+// useFetchApi({path: '/api/v1/foo', success: json => setSomeState(mungeApi(json))})
+//
+// The success function is recreated every time this is called, so it has a new identity. Instead of
+// doing this, you could use the convert parameter:
+//
+// useFetchApi({path: '/api/v1/foo', success: setSomeState, convert: mungeApi})
+//
+// If that doesn't suit your use case, another approach would be the useCallback hook to preserve
+// the identity of your callbacks.
 export default function useFetchApi({
-  success,
-  error,
-  path,
-  convert,
-  params = {},
-  headers = {},
-  fetchOpts = {}
-}) {
-  const oldestUnchangedParams = useOldestUnchanged(params)
-  const oldestUnchangedHeaders = useOldestUnchanged(headers)
-  const oldestUnchangedFetchOpts = useOldestUnchanged(fetchOpts)
-  useEffect(() => {
-    // prevent sending results and errors from stale queries
-    const {activeSuccess, activeError, abort, signal} = abortable({success, error})
-    const doFetch = async () => {
-      try {
-        const url = constructRelativeUrl({path, params: oldestUnchangedParams})
-        const response = await fetch(url, {
-          headers: {
-            Accept: 'application/json+canvas-string-ids, application/json',
-            ...oldestUnchangedHeaders
-          },
-          signal,
-          ...oldestUnchangedFetchOpts
-        })
+  // data output callbacks
+  success, // (parsed json object of the response body) => {}
+  error, // (Error object from doFetchApi) => {}
+  loading, // (boolean that specifies whether a fetch is in progress) => {}
+  meta, // other information about the fetch: ({link, response}) => {}. called only when success is called.
 
-        if (response.ok) {
-          let json = await response.json()
-          if (convert) json = convert(json)
-          activeSuccess(json)
-        } else {
-          const err = new Error(
-            `useFetchApi received a bad response: ${response.status} ${response.statusText}`
-          )
-          // attach the response to the Error object just in case some error handler wants it
-          err.response = response
-          activeError(err)
-        }
-      } catch (e) {
-        activeError(e)
+  // inputs
+  path, // the url to fetch; often a relative path
+  convert, // allows you to convert the json response data into another format before calling success
+  forceResult, // specify this to bypass the fetch and report this to success instead. meta is not called.
+  params = {}, // url parameters
+  headers = {}, // additional request headers
+
+  // Setting fetchAllpages makes useFetchApi continually fetch pages while the Link header indicates
+  // there is a next page. The success callback will be invoked for each page with a flattened array
+  // of the results accumulated thus far. The meta callback will also be called once for each page.
+  // If an error occurs on any page, the error callback will be called and pagination will stop. The
+  // loading callback will only be called with false when pagination ends. If any of the parameters
+  // change, the pagination starts over.
+  fetchAllPages = false,
+
+  fetchOpts = {} // other options to pass to fetch
+}) {
+  // useImmediate for deep comparisons and may help avoid browser flickering
+  useImmediate(
+    () => {
+      if (forceResult !== undefined) {
+        success(forceResult)
+        return
       }
-    }
-    doFetch()
-    return abort
-  }, [
-    success,
-    error,
-    path,
-    convert,
-    oldestUnchangedHeaders,
-    oldestUnchangedParams,
-    oldestUnchangedFetchOpts
-  ])
+
+      // prevent sending results and errors from stale queries
+      const {activeSuccess, activeError, activeLoading, activeMeta, abort, signal} = abortable({
+        success,
+        error,
+        loading,
+        meta
+      })
+
+      async function fetchLoop() {
+        try {
+          activeLoading(true)
+          let nextPage = false
+          let accummulatedResults = []
+          do {
+            const paramsWithPage = {...params}
+            if (nextPage) paramsWithPage.page = nextPage
+            // we don't want to flood the server with parallel requests, and we need to wait for the
+            // "next" link header before we know what the next page url is, so we actually want to
+            // await in the loop.
+            // eslint-disable-next-line no-await-in-loop
+            const {json, response, link} = await doFetchApi({
+              path,
+              headers,
+              params: paramsWithPage,
+              fetchOpts: {signal, ...fetchOpts}
+            })
+            const result = convert && json ? convert(json) : json
+            accummulatedResults = accummulatedResults.concat(result)
+
+            activeMeta({response, link})
+            if (fetchAllPages) {
+              activeSuccess(accummulatedResults)
+              nextPage = link?.next?.page
+            } else {
+              activeSuccess(result)
+            }
+          } while (nextPage)
+        } catch (err) {
+          activeError(err)
+        } finally {
+          activeLoading(false)
+        }
+      }
+      fetchLoop()
+      return abort
+    },
+    [
+      success,
+      error,
+      loading,
+      meta,
+      path,
+      convert,
+      forceResult,
+      params,
+      headers,
+      fetchAllPages,
+      fetchOpts
+    ],
+    {deep: true}
+  )
 }

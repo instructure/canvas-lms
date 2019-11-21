@@ -521,10 +521,8 @@ describe UserLearningObjectScopes do
       @course.enroll_user(@reviewee, 'StudentEnrollment',
                     :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
 
-      assignment_model(course: @course, peer_reviews: true, only_visible_to_overrides: true)
+      assignment_model(course: @course, peer_reviews: true)
 
-      @reviewer_submission = submission_model(assignment: @assignment, user: @reviewer)
-      @reviewee_submission = submission_model(assignment: @assignment, user: @reviewee)
       @assessment_request = @assignment.assign_peer_review(@reviewer, @reviewee)
     end
 
@@ -544,6 +542,7 @@ describe UserLearningObjectScopes do
     end
 
     it "should not include assessment requests for users not assigned the assignment" do
+      @assignment.update_attributes(only_visible_to_overrides: true)
       # create a new section with only the reviewer student
       # since the reviewee is no longer assigned @assignment, the reviewer should
       # have nothing to do.

@@ -185,6 +185,13 @@ module Importers
         if data['external_content']
           Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data['external_content'])
         end
+        migration.update_import_progress(97)
+
+        insert_into_module(course, migration)
+        migration.update_import_progress(98)
+
+        move_to_assignment_group(course, migration)
+        migration.update_import_progress(99)
 
         adjust_dates(course, migration)
 
@@ -203,6 +210,7 @@ module Importers
           course.touch
         end
 
+        clear_assignment_and_quiz_caches(migration)
         DueDateCacher.recompute_course(course, update_grades: true, executing_user: migration.user)
       end
 
@@ -211,6 +219,51 @@ module Importers
       migration.imported_migration_items
     ensure
       ActiveRecord::Base.skip_touch_context(false)
+    end
+
+    def self.insert_into_module(course, migration)
+      module_id = migration.migration_settings[:insert_into_module_id]
+      return unless module_id.present?
+
+      mod = course.context_modules.find_by_id(module_id)
+      return unless mod
+
+      import_type = migration.migration_settings[:insert_into_module_type]
+      imported_items = if import_type.present?
+        migration.imported_migration_items_hash[import_class_name(import_type)].values
+      else
+        migration.imported_migration_items
+      end
+      return unless imported_items.any?
+
+      start_pos = migration.migration_settings[:insert_into_module_position]
+      start_pos = start_pos.to_i unless start_pos.nil? # 0 = start; nil = end
+      mod.insert_items(imported_items, start_pos)
+    end
+
+    def self.import_class_name(import_type)
+      prefix = ContentMigration.asset_string_prefix(ContentMigration.collection_name(import_type.pluralize))
+      ActiveRecord::Base.convert_class_name(prefix)
+    end
+
+    def self.move_to_assignment_group(course, migration)
+      ag_id = migration.migration_settings[:move_to_assignment_group_id]
+      return unless ag_id.present?
+
+      ag = course.assignment_groups.find_by_id(ag_id)
+      return unless ag
+
+      assignments = migration.imported_migration_items_by_class(Assignment)
+      return unless assignments.any?
+
+      # various callbacks run on assignment_group_id change, so we'll do these one by one
+      # (the expected use case for this feature is a migration containing a single assignment anyhow)
+      assignments.each do |assignment|
+        next if assignment.assignment_group == ag
+        assignment.assignment_group = ag
+        assignment.position = nil
+        assignment.save!
+      end
     end
 
     def self.adjust_dates(course, migration)
@@ -311,6 +364,13 @@ module Importers
       rescue
         migration.add_warning(t(:due_dates_warning, "Couldn't adjust the due dates."), $!)
       end
+    end
+
+    def self.clear_assignment_and_quiz_caches(migration)
+      assignments = migration.imported_migration_items_by_class(Assignment).select(&:update_cached_due_dates?)
+      Assignment.clear_cache_keys(assignments, :availability) if assignments.any?
+      quizzes = migration.imported_migration_items_by_class(Quizzes::Quiz).select(&:should_clear_availability_cache)
+      Quizzes::Quiz.clear_cache_keys(quizzes, :availability) if quizzes.any?
     end
 
     def self.post_processing?(migration)

@@ -22,8 +22,7 @@ import FlickrActions from './actions/FlickrActions'
 import FlickrStore from './stores/FlickrStore'
 import FlickrImage from './FlickrImage'
 import SVGWrapper from './SVGWrapper'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Spinner, Text} from '@instructure/ui-elements'
 
 export default class FlickrSearch extends React.Component {
   state = FlickrStore.getState()
@@ -112,34 +111,32 @@ export default class FlickrSearch extends React.Component {
           </div>
         ) : (
           <div className="FlickrSearch__loading">
-            <Spinner title="Loading" />
+            <Spinner renderTitle="Loading" />
           </div>
         )}
 
         {photos && (
           <span className="FlickrSearch__pageNavigation">
-            {this.state.page > 1 &&
-              !this.state.searching && (
-                <a
-                  className="FlickrSearch__control"
-                  ref="flickrSearchControlPrev"
-                  href="#"
-                  onClick={this.decrementPageCount}
-                >
-                  <i className="icon-arrow-open-left" /> {I18n.t('Previous')}
-                </a>
-              )}
-            {this.state.page < photos.pages &&
-              !this.state.searching && (
-                <a
-                  className="FlickrSearch__control"
-                  ref="flickrSearchControlNext"
-                  href="#"
-                  onClick={this.incrementPageCount}
-                >
-                  {I18n.t('Next')} <i className="icon-arrow-open-right" />
-                </a>
-              )}
+            {this.state.page > 1 && !this.state.searching && (
+              <a
+                className="FlickrSearch__control"
+                ref="flickrSearchControlPrev"
+                href="#"
+                onClick={this.decrementPageCount}
+              >
+                <i className="icon-arrow-open-left" /> {I18n.t('Previous')}
+              </a>
+            )}
+            {this.state.page < photos.pages && !this.state.searching && (
+              <a
+                className="FlickrSearch__control"
+                ref="flickrSearchControlNext"
+                href="#"
+                onClick={this.incrementPageCount}
+              >
+                {I18n.t('Next')} <i className="icon-arrow-open-right" />
+              </a>
+            )}
           </span>
         )}
       </div>

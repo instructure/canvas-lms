@@ -16,35 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 
-import React, { Component } from "react";
-import { ToggleDetails } from '@instructure/ui-toggle-details'
-import { View } from '@instructure/ui-layout'
-import LinkSet from "./LinkSet";
-import NavigationPanel from "./NavigationPanel";
-import LinkToNewPage from "./LinkToNewPage";
-import formatMessage from "../../format-message";
+import React, {Component} from 'react'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {View} from '@instructure/ui-layout'
+import LinkSet from './LinkSet'
+import NavigationPanel from './NavigationPanel'
+import LinkToNewPage from './LinkToNewPage'
+import formatMessage from '../../format-message'
 
-function AccordionSection({
-  collection,
-  children,
-  onChange,
-  selectedIndex,
-  summary
-}) {
+function AccordionSection({collection, children, onChange, selectedIndex, summary}) {
   return (
     <View as="div" margin="xx-small none">
       <ToggleDetails
         variant="filled"
         summary={summary}
         expanded={selectedIndex === collection}
-        onToggle={(e, expanded) => onChange(expanded ? collection : "")}
+        onToggle={(e, expanded) => onChange(expanded ? collection : '')}
       >
         <div style={{maxHeight: '20em', overflow: 'auto'}}>{children}</div>
       </ToggleDetails>
     </View>
-  );
+  )
 }
 
 AccordionSection.propTypes = {
@@ -52,19 +46,16 @@ AccordionSection.propTypes = {
   children: PropTypes.node.isRequired,
   selectedIndex: PropTypes.string,
   summary: ToggleDetails.propTypes.summary
-};
+}
 
 function CollectionPanel(props) {
   return (
     <AccordionSection {...props}>
       <LinkSet
         fetchInitialPage={
-          props.fetchInitialPage &&
-          (() => props.fetchInitialPage(props.collection))
+          props.fetchInitialPage && (() => props.fetchInitialPage(props.collection))
         }
-        fetchNextPage={
-          props.fetchNextPage && (() => props.fetchNextPage(props.collection))
-        }
+        fetchNextPage={props.fetchNextPage && (() => props.fetchNextPage(props.collection))}
         collection={props.collections[props.collection]}
         onLinkClick={props.onLinkClick}
         suppressRenderEmpty={props.suppressRenderEmpty}
@@ -79,47 +70,45 @@ function CollectionPanel(props) {
         />
       )}
     </AccordionSection>
-  );
+  )
 }
 
 CollectionPanel.propTypes = {
   collection: PropTypes.string.isRequired,
   renderNewPageLink: PropTypes.bool,
   suppressRenderEmpty: PropTypes.bool
-};
+}
 
 CollectionPanel.defaultProps = {
   renderNewPageLink: false,
   suppressRenderEmpty: false
-};
+}
 
 function LinksPanel(props) {
-  const isCourse = props.contextType === "course";
-  const isGroup = props.contextType === "group";
+  const isCourse = props.contextType === 'course'
+  const isGroup = props.contextType === 'group'
 
   const navigationSummary = isCourse
     ? formatMessage({
-        default: "Course Navigation",
-        description:
-          "Title of Sidebar accordion tab containing links to course pages."
+        default: 'Course Navigation',
+        description: 'Title of Sidebar accordion tab containing links to course pages.'
       })
     : isGroup
-      ? formatMessage({
-          default: "Group Navigation",
-          description:
-            "Title of Sidebar accordion tab containing links to group pages."
-        })
-      : "";
+    ? formatMessage({
+        default: 'Group Navigation',
+        description: 'Title of Sidebar accordion tab containing links to group pages.'
+      })
+    : ''
 
   return (
-    <div>
+    <div data-testid="instructure_links-LinksPanel">
       <p>
-        {props.contextType === "course"
-          ? formatMessage("Link to other content in the course.")
-          : props.contextType === "group"
-            ? formatMessage("Link to other content in the group.")
-            : ""}
-        {formatMessage("Click any page to insert a link to that page.")}
+        {props.contextType === 'course'
+          ? formatMessage('Link to other content in the course.')
+          : props.contextType === 'group'
+          ? formatMessage('Link to other content in the group.')
+          : ''}
+        {formatMessage('Click any page to insert a link to that page.')}
       </p>
       <div>
         {(isCourse || isGroup) && (
@@ -127,9 +116,8 @@ function LinksPanel(props) {
             {...props}
             collection="wikiPages"
             summary={formatMessage({
-              default: "Pages",
-              description:
-                "Title of Sidebar accordion tab containing links to wiki pages."
+              default: 'Pages',
+              description: 'Title of Sidebar accordion tab containing links to wiki pages.'
             })}
             renderNewPageLink={props.canCreatePages !== false}
             suppressRenderEmpty={props.canCreatePages !== false}
@@ -140,9 +128,8 @@ function LinksPanel(props) {
             {...props}
             collection="assignments"
             summary={formatMessage({
-              default: "Assignments",
-              description:
-                "Title of Sidebar accordion tab containing links to assignments."
+              default: 'Assignments',
+              description: 'Title of Sidebar accordion tab containing links to assignments.'
             })}
           />
         )}
@@ -151,9 +138,8 @@ function LinksPanel(props) {
             {...props}
             collection="quizzes"
             summary={formatMessage({
-              default: "Quizzes",
-              description:
-                "Title of Sidebar accordion tab containing links to quizzes."
+              default: 'Quizzes',
+              description: 'Title of Sidebar accordion tab containing links to quizzes.'
             })}
           />
         )}
@@ -162,9 +148,8 @@ function LinksPanel(props) {
             {...props}
             collection="announcements"
             summary={formatMessage({
-              default: "Announcements",
-              description:
-                "Title of Sidebar accordion tab containing links to announcements."
+              default: 'Announcements',
+              description: 'Title of Sidebar accordion tab containing links to announcements.'
             })}
           />
         )}
@@ -173,9 +158,8 @@ function LinksPanel(props) {
             {...props}
             collection="discussions"
             summary={formatMessage({
-              default: "Discussions",
-              description:
-                "Title of Sidebar accordion tab containing links to discussions."
+              default: 'Discussions',
+              description: 'Title of Sidebar accordion tab containing links to discussions.'
             })}
           />
         )}
@@ -184,17 +168,12 @@ function LinksPanel(props) {
             {...props}
             collection="modules"
             summary={formatMessage({
-              default: "Modules",
-              description:
-                "Title of Sidebar accordion tab containing links to course modules."
+              default: 'Modules',
+              description: 'Title of Sidebar accordion tab containing links to course modules.'
             })}
           />
         )}
-        <AccordionSection
-          {...props}
-          collection="navigation"
-          summary={navigationSummary}
-        >
+        <AccordionSection {...props} collection="navigation" summary={navigationSummary}>
           <NavigationPanel
             contextType={props.contextType}
             contextId={props.contextId}
@@ -203,7 +182,7 @@ function LinksPanel(props) {
         </AccordionSection>
       </div>
     </div>
-  );
+  )
 }
 
 LinksPanel.propTypes = {
@@ -218,10 +197,10 @@ LinksPanel.propTypes = {
   toggleNewPageForm: LinkToNewPage.propTypes.toggleNewPageForm,
   newPageLinkExpanded: PropTypes.bool,
   canCreatePages: PropTypes.bool
-};
+}
 
 LinksPanel.defaultProps = {
-  selectedIndex: ""
-};
+  selectedIndex: ''
+}
 
-export default LinksPanel;
+export default LinksPanel

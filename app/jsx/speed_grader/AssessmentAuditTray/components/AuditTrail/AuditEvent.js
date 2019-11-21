@@ -17,13 +17,12 @@
  */
 
 import React, {PureComponent} from 'react'
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Focusable, {FocusableView} from '@instructure/ui-focusable/lib/components/Focusable'
-import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Badge, TruncateText, Text} from '@instructure/ui-elements'
+import {Flex, View} from '@instructure/ui-layout'
+import {Focusable, FocusableView} from '@instructure/ui-focusable'
+
+import {Tooltip} from '@instructure/ui-overlays'
+
 import I18n from 'i18n!speed_grader'
 
 import {
@@ -91,11 +90,11 @@ export default class AuditEvent extends PureComponent {
 
     return (
       <Flex alignItems="start" as="div" direction="row">
-        <FlexItem as="div" margin="none">
+        <Flex.Item as="div" margin="none">
           {iconView}
-        </FlexItem>
+        </Flex.Item>
 
-        <FlexItem as="div" grow margin="none none none x-small" shrink>
+        <Flex.Item as="div" grow margin="none none none x-small" shrink>
           <Text as="div" weight="bold">
             <TruncateText maxLines={2}>{label}</TruncateText>
           </Text>
@@ -107,7 +106,7 @@ export default class AuditEvent extends PureComponent {
               </Text>
             </View>
           )}
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }

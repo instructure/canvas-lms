@@ -30,36 +30,16 @@ const defaultProps = () => ({
     content: false,
     points: false,
     due_dates: false,
-    availability_dates: false,
+    availability_dates: false
   },
   restrictionsByType: {
-    assignment: { content: false,
-      points: false,
-      due_dates: false,
-      availability_dates: false,
-    },
-    discussion_topic: { content: false,
-      points: false,
-      due_dates: false,
-      availability_dates: false,
-    },
-    wiki_page: { content: false,
-      points: false,
-      due_dates: false,
-      availability_dates: false,
-    },
-    quiz: { content: false,
-      points: false,
-      due_dates: false,
-      availability_dates: false,
-    },
-    attachment: { content: false,
-      points: false,
-      due_dates: false,
-      availability_dates: false,
-    }
+    assignment: {content: false, points: false, due_dates: false, availability_dates: false},
+    discussion_topic: {content: false, points: false, due_dates: false, availability_dates: false},
+    wiki_page: {content: false, points: false, due_dates: false, availability_dates: false},
+    quiz: {content: false, points: false, due_dates: false, availability_dates: false},
+    attachment: {content: false, points: false, due_dates: false, availability_dates: false}
   },
-  lockableAttributes: ['content', 'points', 'due_dates', 'availability_dates'],
+  lockableAttributes: ['content', 'points', 'due_dates', 'availability_dates']
 })
 
 test('renders the BlueprintLockOptions component', () => {

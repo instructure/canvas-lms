@@ -548,6 +548,22 @@ describe CalendarEvent do
       end
     end
 
+    it 'should update the appointment group when a related event is deleted' do
+      ag = AppointmentGroup.create!(
+        :title => 'testing...',
+        :contexts => [@course],
+        :participants_per_appointment => 2,
+        :new_appointments => [
+          ['2012-01-01 13:00:00', '2012-01-01 14:00:00'],
+          ['2012-01-02 13:00:00', '2012-01-02 14:00:00']
+        ]
+      )
+
+      expect(AppointmentGroup.find(ag.id).start_at).to eq('2012-01-01 13:00:00')
+      ag.appointments.first.destroy
+      expect(AppointmentGroup.find(ag.id).start_at).to eq('2012-01-02 13:00:00')
+    end
+
     it "should allow multiple participants in an appointment, up to the limit" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 2,
         :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']]

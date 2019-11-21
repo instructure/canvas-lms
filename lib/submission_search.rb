@@ -61,10 +61,14 @@ class SubmissionSearch
     end
 
     search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades)
-      search_scope
+      # TODO: may want to add a preloader for this
+      allowed_user_ids = @course.users_visible_to(@searcher)
+      search_scope.where(user_id: allowed_user_ids)
     elsif @course.grants_right?(@searcher, @session, :read_grades)
       # a user can see their own submission
       search_scope.where(user_id: @searcher.id)
+    else
+      Submission.none # return nothing
     end
 
     if @options[:scored_less_than]

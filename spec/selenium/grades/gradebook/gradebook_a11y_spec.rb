@@ -25,7 +25,6 @@ describe "gradebook" do
   include ColorCommon
 
   let(:extra_setup) { }
-  let(:active_element) { driver.switch_to.active_element }
 
   before(:once) do
     gradebook_data_setup
@@ -44,7 +43,8 @@ describe "gradebook" do
 
     it "moves focus to import button during current export", priority: "2", test_id: 720459 do
       f('.generate_new_csv').click
-      expect(active_element).to have_class('ui-button')
+      wait_for_animations
+      expect { driver.switch_to.active_element }.to become(f('#import-csv'))
     end
 
     context "when a csv already exists" do
@@ -61,7 +61,7 @@ describe "gradebook" do
       it "maintains focus on export button during past csv export", priority: "2", test_id: 720460 do
         wait_for_ajax_requests
         f('#csv_export_options .ui-menu-item:not(.generate_new_csv)').click
-        expect(active_element).to have_attribute('id', 'download_csv')
+        expect { driver.switch_to.active_element }.to become(f('#download_csv'))
       end
     end
   end
@@ -74,17 +74,17 @@ describe "gradebook" do
 
     it "after hide/show student names is clicked", priority: "2", test_id: 720461 do
       f(".student_names_toggle").click
-      expect(active_element).to have_attribute('id', 'gradebook_settings')
+      expect { driver.switch_to.active_element }.to become(f('#gradebook_settings'))
     end
 
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
       f("[data-arrange-columns-by='due_date']").click
-      expect(active_element).to have_attribute('id', 'gradebook_settings')
+      expect { driver.switch_to.active_element }.to become(f('#gradebook_settings'))
     end
 
     it "after show notes is clicked", priority: "2", test_id: 720463 do
       f('.create').click
-      expect(active_element).to have_attribute('id', 'gradebook_settings')
+      expect { driver.switch_to.active_element }.to become(f('#gradebook_settings'))
     end
   end
 

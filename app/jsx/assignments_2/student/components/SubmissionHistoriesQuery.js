@@ -15,14 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {Assignment, AssignmentSubmissionsConnection} from '../graphqlData/Assignment'
-import AssignmentAlert from './AssignmentAlert'
+import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
 import I18n from 'i18n!assignments_2_submission_histories_query'
+import Header from './Header'
 import {Query} from 'react-apollo'
-import React from 'react'
+import React, {Suspense, lazy} from 'react'
 import {shape} from 'prop-types'
+import {Spinner} from '@instructure/ui-elements'
 import {SUBMISSION_HISTORIES_QUERY} from '../graphqlData/Queries'
 import ViewManager from './ViewManager'
+
+const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
 class SubmissionHistoriesQuery extends React.Component {
   static propTypes = {
@@ -91,35 +96,54 @@ class SubmissionHistoriesQuery extends React.Component {
 
   render() {
     const submission = this.getSubmission()
+    if (!submission) {
+      // User hasn't accepted course invite
+      return (
+        <>
+          <Header scrollThreshold={150} assignment={this.props.initialQueryData.assignment} />
+          <AssignmentToggleDetails
+            description={this.props.initialQueryData.assignment.description}
+          />
+          <Suspense
+            fallback={
+              <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
+            }
+          >
+            <LoggedOutTabs
+              nonAcceptedEnrollment
+              assignment={this.props.initialQueryData.assignment}
+            />
+          </Suspense>
+        </>
+      )
+    }
 
     // We have to use the newtork-only fetch policy here, because all the submissions
     // share the same id which can cause previous query results to be cached in
     // apollo and cause false-negatives for pagination.
     return (
       <Query
+        onError={() => this.context.setOnFailure(I18n.t('Failed to load more submissions'))}
         query={SUBMISSION_HISTORIES_QUERY}
         variables={{submissionID: submission.id}}
         skip={!submission || this.state.skipLoadingHistories}
         fetchPolicy="network-only"
       >
         {queryResults => {
-          const {data, error, loading} = queryResults
+          const {data, loading} = queryResults
           return (
-            <>
-              {error && (
-                <AssignmentAlert errorMessage={I18n.t('Failed to laod more submissions')} />
-              )}
-              <ViewManager
-                initialQueryData={this.props.initialQueryData}
-                submissionHistoriesQueryData={loading ? null : data}
-                loadMoreSubmissionHistories={this.generateOnLoadMore(queryResults)}
-              />
-            </>
+            <ViewManager
+              initialQueryData={this.props.initialQueryData}
+              submissionHistoriesQueryData={loading ? null : data}
+              loadMoreSubmissionHistories={this.generateOnLoadMore(queryResults)}
+            />
           )
         }}
       </Query>
     )
   }
 }
+
+SubmissionHistoriesQuery.contextType = AlertManagerContext
 
 export default SubmissionHistoriesQuery

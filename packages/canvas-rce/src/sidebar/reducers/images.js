@@ -16,42 +16,66 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ADD_IMAGE, REQUEST_IMAGES, RECEIVE_IMAGES } from "../actions/images";
+import {ADD_IMAGE, REQUEST_IMAGES, RECEIVE_IMAGES, FAIL_IMAGES_LOAD} from '../actions/images'
+import {CHANGE_CONTEXT} from '../actions/context'
 
-export default function imagesReducer(images = {}, action) {
+export default function imagesReducer(prevState = {}, action) {
+  const ctxt = action.payload && action.payload.contextType
+  const state = {...prevState}
+  if (ctxt && !state[ctxt]) {
+    state[ctxt] = {
+      files: [],
+      bookmark: null,
+      isLoading: false,
+      hasMore: true
+    }
+  }
+
   switch (action.type) {
     case ADD_IMAGE: {
-      const { id, filename, display_name, preview_url, thumbnail_url } = action;
+      const {id, filename, display_name, href, preview_url, thumbnail_url} = action.payload.newImage
 
-      return {
-        ...images,
-        records: images.records.concat({
+      state[ctxt] = {
+        files: state[ctxt].files.concat({
           id,
           filename,
           display_name,
           preview_url,
           thumbnail_url,
-          href: preview_url
+          href: preview_url || href
         })
-      };
+      }
+      return state
     }
+
     case REQUEST_IMAGES:
-      return {
-        ...images,
-        requested: true,
-        isLoading: true
-      };
-    case RECEIVE_IMAGES: {
-      const receivedImages = action.imageRecords;
-      return {
-        ...images,
-        records: images.records.concat(receivedImages),
+      state[ctxt].isLoading = true
+      return state
+
+    case RECEIVE_IMAGES:
+      state[ctxt] = {
+        files: state[ctxt].files.concat(action.payload.files),
         isLoading: false,
-        bookmark: action.bookmark,
-        hasMore: !!action.bookmark
-      };
+        bookmark: action.payload.bookmark,
+        hasMore: !!action.payload.bookmark
+      }
+      return state
+
+    case FAIL_IMAGES_LOAD:
+      state[ctxt] = {
+        isLoading: false,
+        error: action.payload.error
+      }
+      if (action.payload.files && action.payload.files.length === 0) {
+        state[ctxt].bookmark = null
+      }
+      return state
+
+    case CHANGE_CONTEXT: {
+      return state
     }
+
     default:
-      return images;
+      return prevState
   }
 }

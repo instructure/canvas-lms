@@ -40,6 +40,11 @@ module Api::V1::AssignmentGroup
     if includes.include?('assignments')
       assignments = opts[:assignments] || group.visible_assignments(user)
 
+      # Preload assignments' post policies for Assignment#assignment_json.
+      if assignments.present? && assignments.first.context.post_policies_enabled?
+        ActiveRecord::Associations::Preloader.new.preload(assignments, :post_policy)
+      end
+
       user_content_attachments = opts[:preloaded_user_content_attachments]
       unless opts[:exclude_response_fields].include?('description')
         user_content_attachments ||= api_bulk_load_user_content_attachments(assignments.map(&:description), group.context)
@@ -54,7 +59,7 @@ module Api::V1::AssignmentGroup
 
       unless opts[:exclude_response_fields].include?('in_closed_grading_period')
         closed_grading_period_hash = opts[:closed_grading_period_hash] ||
-          EffectiveDueDates.for_course(group.context, assignments).to_hash([:in_closed_grading_period])
+          in_closed_grading_period_hash(group.context, assignments)
       end
 
       hash['assignments'] = assignments.map do |assignment|
@@ -97,6 +102,56 @@ module Api::V1::AssignmentGroup
     end
 
     hash
+  end
+
+  def in_closed_grading_period_hash(context, assignments)
+    return {} if assignments.empty?
+    grading_periods = GradingPeriodGroup.for_course(context)&.grading_periods
+    closed_grading_periods = grading_periods&.closed
+
+    # If there are no closed grading periods, assignments can't be considered
+    # to be in a closed grading period.
+    return {} if closed_grading_periods.blank?
+
+    assignments_hash = {}
+    assignment_ids = assignments.pluck(:id).join(",")
+    last_grading_period = grading_periods.order(end_date: :desc).first
+
+    submissions = ActiveRecord::Base.connection.select_all(<<-SQL)
+      SELECT DISTINCT ON (assignment_id) assignment_id, user_id
+      FROM #{Submission.quoted_table_name}
+      WHERE
+        assignment_id IN (#{assignment_ids}) AND
+        grading_period_id IN (#{closed_grading_periods.pluck(:id).join(',')}) AND
+        workflow_state <> 'deleted'
+
+      UNION
+
+      SELECT DISTINCT ON (assignment_id) assignment_id, user_id
+      FROM #{Submission.quoted_table_name}
+      WHERE
+        assignment_id IN (#{assignment_ids}) AND
+        grading_period_id IS NULL AND NOW() > '#{last_grading_period.close_date}'::timestamptz AND
+        workflow_state <> 'deleted'
+    SQL
+
+    # The DISTINCT above will only have 1 submission per assignment, but that
+    # works fine for our purposes as an assignment is considered in a closed
+    # grading period if at least 1 submission is in a closed grading period.
+    # This is defined behavior from the
+    # `assignment_closed_grading_period_hash.any?` check in
+    # #assignment_group_json.
+    # Assignments that do not have at least 1 submission in a closed period
+    # will not be present in this hash.
+    submissions.as_json.each do |submission|
+      submission_hash = {in_closed_grading_period: true}
+      assignment_id = submission["assignment_id"]
+      user_id = submission["user_id"]
+      assignments_hash[assignment_id] ||= {}
+      assignments_hash[assignment_id][user_id] = submission_hash
+    end
+
+    assignments_hash
   end
 
   def update_assignment_group(assignment_group, params)

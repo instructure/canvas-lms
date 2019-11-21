@@ -16,18 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { shallow } from 'enzyme';
-import NotificationBadge, {NewActivityIndicator} from '../index';
+import React from 'react'
+import {shallow} from 'enzyme'
+import NotificationBadge, {NewActivityIndicator} from '../index'
 
 // it would be better if the snapshots contained the proper class names, but
 // jest doesn't deal with how themeable turns styles.css into code.
 it('renders an indicator', () => {
-  const wrapper = shallow(<NotificationBadge><NewActivityIndicator title="blah"/></NotificationBadge>);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(
+    <NotificationBadge>
+      <NewActivityIndicator title="blah" />
+    </NotificationBadge>
+  )
+  expect(wrapper).toMatchSnapshot()
+})
 
 it('renders an empty div', () => {
-  const wrapper = shallow(<NotificationBadge>{null}</NotificationBadge>);
-  expect(wrapper).toMatchSnapshot();
-});
+  const wrapper = shallow(<NotificationBadge>{null}</NotificationBadge>)
+  expect(wrapper).toMatchSnapshot()
+})

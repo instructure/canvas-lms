@@ -19,18 +19,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconMoveUpTopSolid from '@instructure/ui-icons/lib/Solid/IconMoveUpTop'
-import IconMoveUpSolid from '@instructure/ui-icons/lib/Solid/IconMoveUp'
-import IconMoveDownSolid from '@instructure/ui-icons/lib/Solid/IconMoveDown'
-import IconMoveDownBottomSolid from '@instructure/ui-icons/lib/Solid/IconMoveDownBottom'
+
+import {Menu} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-elements'
+import {
+  IconMoveUpTopLine,
+  IconMoveUpLine,
+  IconMoveDownLine,
+  IconMoveDownBottomLine,
+  IconStarSolid
+} from '@instructure/ui-icons'
 
 class DashboardCardMovementMenu extends React.Component {
   static propTypes = {
     assetString: PropTypes.string.isRequired,
     handleMove: PropTypes.func.isRequired,
+    isFavorited: PropTypes.bool,
     onMenuSelect: PropTypes.func,
+    onUnfavorite: PropTypes.func,
     menuOptions: PropTypes.shape({
       canMoveLeft: PropTypes.bool,
       canMoveRight: PropTypes.bool,
@@ -54,46 +60,56 @@ class DashboardCardMovementMenu extends React.Component {
     const {canMoveLeft, canMoveRight, canMoveToBeginning, canMoveToEnd} = this.props.menuOptions
 
     return (
-      <Menu onSelect={this.props.onMenuSelect}>
+      <Menu label={I18n.t('Dashboard Card Movement Menu')} onSelect={this.props.onMenuSelect}>
         {!!canMoveToBeginning && (
-          <MenuItem onSelect={this.handleMoveCard(0)}>
+          <Menu.Item onSelect={this.handleMoveCard(0)}>
             <span className="DashboardCardMenu__MovementItem">
-              <IconMoveUpTopSolid className="DashboardCardMenu__MovementIcon" />
+              <IconMoveUpTopLine className="DashboardCardMenu__MovementIcon" />
               <Text weight="bold" size="small">
-                {I18n.t('Top')}
+                {I18n.t('Move to top')}
               </Text>
             </span>
-          </MenuItem>
+          </Menu.Item>
         )}
         {!!canMoveLeft && (
-          <MenuItem onSelect={this.handleMoveCard(this.props.currentPosition - 1)}>
+          <Menu.Item onSelect={this.handleMoveCard(this.props.currentPosition - 1)}>
             <span className="DashboardCardMenu__MovementItem">
-              <IconMoveUpSolid className="DashboardCardMenu__MovementIcon" />
+              <IconMoveUpLine className="DashboardCardMenu__MovementIcon" />
               <Text weight="bold" size="small">
-                {I18n.t('Ahead')}
+                {I18n.t('Move up')}
               </Text>
             </span>
-          </MenuItem>
+          </Menu.Item>
         )}
         {!!canMoveRight && (
-          <MenuItem onSelect={this.handleMoveCard(this.props.currentPosition + 1)}>
+          <Menu.Item onSelect={this.handleMoveCard(this.props.currentPosition + 1)}>
             <span className="DashboardCardMenu__MovementItem">
-              <IconMoveDownSolid className="DashboardCardMenu__MovementIcon" />
+              <IconMoveDownLine className="DashboardCardMenu__MovementIcon" />
               <Text weight="bold" size="small">
-                {I18n.t('Behind')}
+                {I18n.t('Move down')}
               </Text>
             </span>
-          </MenuItem>
+          </Menu.Item>
         )}
         {!!canMoveToEnd && (
-          <MenuItem onSelect={this.handleMoveCard(this.props.lastPosition)}>
+          <Menu.Item onSelect={this.handleMoveCard(this.props.lastPosition)}>
             <span className="DashboardCardMenu__MovementItem">
-              <IconMoveDownBottomSolid className="DashboardCardMenu__MovementIcon" />
+              <IconMoveDownBottomLine className="DashboardCardMenu__MovementIcon" />
               <Text weight="bold" size="small">
-                {I18n.t('Bottom')}
+                {I18n.t('Move to bottom')}
               </Text>
             </span>
-          </MenuItem>
+          </Menu.Item>
+        )}
+        {!!this.props.isFavorited && (
+          <Menu.Item id="unfavorite" onClick={this.props.onUnfavorite}>
+            <span className="DashboardCardMenu__MovementItem">
+              <IconStarSolid className="DashboardCardMenu__MovementIcon" />
+              <Text weight="bold" size="small">
+                {I18n.t('Unfavorite')}
+              </Text>
+            </span>
+          </Menu.Item>
         )}
       </Menu>
     )

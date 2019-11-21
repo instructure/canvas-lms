@@ -41,6 +41,7 @@ const MediaCaptureStrings = {
 
 const UploadMediaStrings = {
   LOADING_MEDIA: I18n.t('Loading Media'),
+  ADD_CLOSED_CAPTIONS_OR_SUBTITLES: I18n.t('Add CC/Subtitle'),
   COMPUTER_PANEL_TITLE: I18n.t('Computer'),
   DRAG_FILE_TEXT: I18n.t('Drag a File Here'),
   RECORD_PANEL_TITLE: I18n.t('Record'),
@@ -60,7 +61,8 @@ const UploadMediaStrings = {
   CLOSED_CAPTIONS_ADD_SUBTITLE: I18n.t('Subtitle'),
   CLOSED_CAPTIONS_ADD_SUBTITLE_SCREENREADER: I18n.t('Add Subtitle'),
   CLOSED_CAPTIONS_CHOOSE_FILE: I18n.t('Choose File'),
-  CLOSED_CAPTIONS_SELECT_LANGUAGE: I18n.t('Select Language')
+  CLOSED_CAPTIONS_SELECT_LANGUAGE: I18n.t('Select Language'),
+  MEDIA_RECORD_NOT_AVAILABLE: I18n.t('Media record not available')
 }
 
 export {MediaCaptureStrings, UploadMediaStrings}

@@ -25,13 +25,13 @@
 const fs = require('fs')
 const path = require('path')
 
-module.exports = function babelPresetPretranslatedFormatMessage (context, opts = {}) {
+module.exports = function babelPresetPretranslatedFormatMessage(context, opts = {}) {
   return {
     plugins: getFormatMessageConfig(opts)
   }
 }
 
-function getFormatMessageConfig ({
+function getFormatMessageConfig({
   translationsDir = 'translations',
   extractDefaultTranslations = process.env.NODE_ENV !== 'test'
 }) {
@@ -41,25 +41,31 @@ function getFormatMessageConfig ({
   const BUILD_LOCALE = process.env.BUILD_LOCALE
   if (BUILD_LOCALE) {
     formatMessageConfig = [
-      ['transform-format-message', {
-        generateId: 'underscored_crc32',
-        inline: true,
-        locale: BUILD_LOCALE,
-        translations: {
-          [BUILD_LOCALE]: require(path.join(process.cwd(), translationsDir, BUILD_LOCALE))
+      [
+        'transform-format-message',
+        {
+          generateId: 'underscored_crc32',
+          inline: true,
+          locale: BUILD_LOCALE,
+          translations: {
+            [BUILD_LOCALE]: require(path.join(process.cwd(), translationsDir, BUILD_LOCALE))
+          }
         }
-      }]
+      ]
     ]
 
-  // In test mode, sometimes we are only dealing with a subset of files so if we extracted strings we'd be missing some
+    // In test mode, sometimes we are only dealing with a subset of files so if we extracted strings we'd be missing some
   } else if (extractDefaultTranslations) {
     try {
       fs.accessSync(path.join(process.cwd(), translationsDir, 'en.json'), fs.W_OK)
       formatMessageConfig = [
-        ['extract-format-message', {
-          generateId: 'underscored_crc32',
-          outFile: 'translations/en.json'
-        }]
+        [
+          'extract-format-message',
+          {
+            generateId: 'underscored_crc32',
+            outFile: 'translations/en.json'
+          }
+        ]
       ]
     } catch (e) {
       // Skip string extraction since we don't have write access to translations/en.json

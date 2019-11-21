@@ -21,12 +21,15 @@ require 'atom'
 class User < ActiveRecord::Base
   GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
   include TurnitinID
+  include Pronouns
 
   # this has to be before include Context to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
     col = table ? "#{table}.sortable_name" : 'sortable_name'
     best_unicode_collation_key(col)
   end
+
+  self.ignored_columns = %i[type creation_unique_id creation_sis_batch_id creation_email sis_name bio merge_to unread_inbox_items_count visibility account_pronoun_id]
 
 
   include Context
@@ -654,7 +657,7 @@ class User < ActiveRecord::Base
   end
 
   def filter_visible_groups_for_user(groups)
-    enrollments = self.cached_current_enrollments(preload_dates: true, preload_courses: true)
+    enrollments = self.cached_currentish_enrollments(preload_dates: true, preload_courses: true)
     groups.select do |group|
       group.context_type != 'Course' || enrollments.any? do |en|
         en.course == group.context && !(en.inactive? || en.completed?) && (en.admin? || en.course.available?)
@@ -1443,7 +1446,20 @@ class User < ActiveRecord::Base
   end
 
   def custom_colors
-    preferences[:custom_colors] ||= {}
+    colors_hash = (preferences[:custom_colors] ||= {})
+    if Shard.current != self.shard
+      # translate asset strings to be relative to current shard
+      colors_hash = Hash[
+        colors_hash.map do |asset_string, value|
+          opts = asset_string.split("_")
+          id_relative_to_user_shard = opts.pop.to_i
+          next if id_relative_to_user_shard > Shard::IDS_PER_SHARD && Shard.shard_for(id_relative_to_user_shard) == self.shard # this is old data and should be ignored
+          new_id = Shard.relative_id_for(id_relative_to_user_shard, self.shard, Shard.current)
+          ["#{opts.join('_')}_#{new_id}", value]
+        end.compact
+      ]
+    end
+    colors_hash
   end
 
   def dashboard_positions
@@ -1702,7 +1718,11 @@ class User < ActiveRecord::Base
    # to get a head start
 
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
-  def cached_current_enrollments(opts={})
+  def cached_currentish_enrollments(opts={})
+    # this method doesn't include the "active_by_date" scope and should probably not be used since
+    # it will give enrollments which are concluded by date
+    # leaving this for existing instances where schools are used to the inconsistent behavior
+    # participating_enrollments seems to be a more accurate representation of "current courses"
     RequestCache.cache('cached_current_enrollments', self, opts) do
       enrollments = self.shard.activate do
         res = Rails.cache.fetch_with_batched_keys(
@@ -1792,6 +1812,23 @@ class User < ActiveRecord::Base
     @_non_student_enrollment = Rails.cache.fetch_with_batched_keys(['has_non_student_enrollment', ApplicationController.region ].cache_key, batch_object: self, batched_keys: :enrollments) do
       self.enrollments.shard(in_region_associated_shards).where.not(type: %w{StudentEnrollment StudentViewEnrollment ObserverEnrollment}).
         where.not(workflow_state: %w{rejected inactive deleted}).exists?
+    end
+  end
+
+  def account_membership?
+    return @_account_membership if defined?(@_account_membership)
+    @_account_membership = Rails.cache.fetch_with_batched_keys(['has_account_user', ApplicationController.region ].cache_key, batch_object: self, batched_keys: :account_users) do
+      self.account_users.shard(in_region_associated_shards).active.exists?
+    end
+  end
+
+  def can_content_share?
+    non_student_enrollment? || account_membership?
+  end
+
+  def participating_current_and_concluded_course_ids
+    cached_course_ids('current_and_concluded') do |enrollments|
+      enrollments.current_and_concluded.not_inactive_by_date_ignoring_access
     end
   end
 
@@ -2078,7 +2115,7 @@ class User < ActiveRecord::Base
     @appointment_context_codes ||= {}
     @appointment_context_codes[include_observers] ||= Rails.cache.fetch([self, 'cached_appointment_codes', ApplicationController.region, include_observers ].cache_key, expires_in: 1.day) do
       ret = {:primary => [], :secondary => []}
-      cached_current_enrollments(preload_dates: true).each do |e|
+      cached_currentish_enrollments(preload_dates: true).each do |e|
         next unless (e.student? || (include_observers && e.observer?)) && e.active?
         ret[:primary] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
@@ -2093,7 +2130,7 @@ class User < ActiveRecord::Base
     @manageable_appointment_context_codes ||= Rails.cache.fetch(cache_key, expires_in: 1.day) do
       ret = {:full => [], :limited => [], :secondary => []}
       limited_sections = {}
-      manageable_enrollments_by_permission(:manage_calendar).each do |e|
+      manageable_enrollments_by_permission(:manage_calendar, cached_currentish_enrollments).each do |e|
         next if ret[:full].include?("course_#{e.course_id}")
         if e.limit_privileges_to_course_section
           ret[:limited] << "course_#{e.course_id}"
@@ -2857,5 +2894,13 @@ class User < ActiveRecord::Base
       break if ObserverPairingCode.active.where(code: code).count == 0
     end
     observer_pairing_codes.create(expires_at: 7.days.from_now, code: code)
+  end
+
+  def pronouns
+    translate_pronouns(read_attribute(:pronouns))
+  end
+
+  def pronouns=(pronouns)
+    write_attribute(:pronouns, untranslate_pronouns(pronouns))
   end
 end

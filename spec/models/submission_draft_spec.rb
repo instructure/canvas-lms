@@ -25,6 +25,7 @@ RSpec.describe SubmissionDraft do
       submission: @submission,
       submission_attempt: @submission.attempt
     )
+    @media_object = factory_with_protected_attributes(MediaObject, :media_id => 'm-123456', :title => 'CreedThoughts')
   end
 
   describe 'attachments' do
@@ -48,6 +49,23 @@ RSpec.describe SubmissionDraft do
     it 'are deleted if a submission draft is deleted' do
       @submission_draft.destroy!
       expect(SubmissionDraftAttachment.count).to eq 0
+    end
+  end
+
+  describe 'media_object' do
+    before(:once) do
+      @submission_draft.media_object_id = @media_object.media_id
+    end
+
+    it 'can be accessed on a submission draft' do
+      expect(@submission_draft.media_object).to eq @media_object
+    end
+
+    it 'can be changed by updating the media_object_id' do
+      media_object = factory_with_protected_attributes(MediaObject, :media_id => 'm-654321', :title => 'BeetsBearsBattleStarGalactica')
+      @submission_draft.media_object_id = media_object.media_id
+      expect(@submission_draft.media_object.media_id).to eq(media_object.media_id)
+      expect(@submission_draft.media_object.title).to eq(media_object.title)
     end
   end
 
@@ -80,6 +98,40 @@ RSpec.describe SubmissionDraft do
       expect{
         SubmissionDraft.create!(submission: @submission, submission_attempt: @submission.attempt + 2)
       }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'cannot have a media_object_it that does not correspond to a media object' do
+      expect{
+        SubmissionDraft.create!(submission: @submission, submission_attempt: @submission.attempt, media_object_id: 'oogyboogy')
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
+  describe '#validates_url' do
+    context 'the assignment is an online_url type' do
+      before(:once) do
+        @submission.assignment.submission_types = 'online_url'
+      end
+
+      it 'prefixes the url with a scheme if missing' do
+        @submission_draft.update!(url: 'www.google.com')
+        expect(@submission_draft.url).to eq('http://www.google.com')
+      end
+    end
+  end
+
+  describe '#meets_media_recording_criteria?' do
+    before(:once) do
+      @submission.assignment.submission_types = 'media_recording'
+    end
+
+    it 'returns true if there is a media_object_id' do
+      @submission_draft.media_object_id = @media_object.media_id
+      expect(@submission_draft.meets_media_recording_criteria?).to eq(true)
+    end
+
+    it 'returns false if there is no media_object_id' do
+      expect(@submission_draft.meets_media_recording_criteria?).to eq(false)
     end
   end
 
@@ -126,6 +178,62 @@ RSpec.describe SubmissionDraft do
 
       it 'returns false if drafts exist for a different type' do
         @submission_draft.body = 'some body'
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+    end
+
+    context 'the assignment is an online_url type' do
+      before(:once) do
+        @submission.assignment.submission_types = 'online_url'
+      end
+
+      it 'returns true if there is a url' do
+        @submission_draft.url = 'http://www.google.com'
+        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+      end
+
+      it 'returns false if the url is not valid' do
+        @submission_draft.url = 'oogy boogy'
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+
+      it 'returns false if the url is malformed' do
+        @submission_draft.url = 'http:www.google.com'
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+
+      it 'returns false if the url is empty' do
+        @submission_draft.url = ''
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+
+      it 'returns false if drafts exist for a different type' do
+        attachment = attachment_model
+        @submission_draft.attachments = [attachment]
+
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+    end
+
+    context 'the assignment is a media_recording type' do
+      before(:once) do
+        @submission.assignment.submission_types = 'media_recording'
+      end
+
+      it 'returns true if there is a media_object_id' do
+        @submission_draft.media_object_id = @media_object.media_id
+        expect(@submission_draft.meets_assignment_criteria?).to eq(true)
+      end
+
+      it 'returns false if the media_object_id is empty' do
+        @submission_draft.media_object_id = ''
+        expect(@submission_draft.meets_assignment_criteria?).to eq(false)
+      end
+
+      it 'returns false if drafts exist for a different type' do
+        attachment = attachment_model
+        @submission_draft.attachments = [attachment]
+
         expect(@submission_draft.meets_assignment_criteria?).to eq(false)
       end
     end

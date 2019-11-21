@@ -22,7 +22,7 @@ import I18n from 'i18n!assignments_2'
 
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
+import {FormField} from '@instructure/ui-form-field'
 import uid from '@instructure/uid'
 
 import TeacherViewContext from '../TeacherViewContext'

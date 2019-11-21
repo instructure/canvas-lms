@@ -1813,7 +1813,7 @@ class Attachment < ActiveRecord::Base
     addition = 1
     dir = File.dirname(filename)
     dir = dir == "." ? "" : "#{dir}/"
-    extname = filename[/(\.[A-Za-z][A-Za-z0-9]*)+$/] || ''
+    extname = filename[/(\.[A-Za-z][A-Za-z0-9]*)*(\.[A-Za-z0-9]*)$/] || ''
     basename = File.basename(filename, extname)
 
     until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}")
@@ -1965,8 +1965,7 @@ class Attachment < ActiveRecord::Base
   def set_publish_state_for_usage_rights
     if self.context &&
        (!self.folder || !self.folder.for_submissions?) &&
-       self.context.respond_to?(:feature_enabled?) &&
-       self.context.feature_enabled?(:usage_rights_required)
+          self.context.respond_to?(:usage_rights_required?) && self.context.usage_rights_required?
       self.locked = self.usage_rights.nil?
     else
       self.locked = false

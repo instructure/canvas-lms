@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Bridge from "../bridge";
+import Bridge from '../bridge'
 
 export default function(props) {
   return {
     // default handlers, can be overridden by props
     onLinkClick: Bridge.insertLink,
     onImageEmbed: Bridge.embedImage,
+    onMediaEmbed: Bridge.embedMedia,
 
     // other props, including overrides
     ...props
-  };
+  }
 }

@@ -27,7 +27,7 @@ module CustomValidations
           value, uri = CanvasHttp.validate_url(value, allowed_schemes: allowed_schemes)
 
           record.send("#{attr}=", value)
-        rescue URI::Error, ArgumentError
+        rescue CanvasHttp::Error, URI::Error, ArgumentError
           record.errors.add attr, 'is not a valid URL'
         end
       end

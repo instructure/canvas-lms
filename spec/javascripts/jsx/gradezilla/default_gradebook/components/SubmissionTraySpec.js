@@ -55,6 +55,7 @@ QUnit.module('SubmissionTray', hooks => {
       onGradeSubmission() {},
       onRequestClose() {},
       onClose() {},
+      showSimilarityScore: true,
       submissionUpdating: false,
       isOpen: true,
       courseId: '1',
@@ -73,22 +74,29 @@ QUnit.module('SubmissionTray', hooks => {
         enteredScore: 10,
         excused: false,
         grade: '7',
-        gradedAt: null,
+        gradedAt: new Date().toISOString(),
+        hasPostableComments: false,
         id: '2501',
         late: false,
         missing: false,
         pointsDeducted: 3,
         postedAt: null,
+        score: 7,
         secondsLate: 0,
-        score: 7
+        submissionType: 'online_text_entry',
+        userId: '27',
+        workflowState: 'graded'
       },
       updateSubmission() {},
       updateSubmissionComment() {},
       assignment: {
         anonymizeStudents: false,
+        courseId: '1',
         name: 'Book Report',
         gradingType: 'points',
         htmlUrl: 'http://htmlUrl/',
+        id: '30',
+        moderatedGrading: false,
         muted: false,
         pointsPossible: 10,
         postManually: false,
@@ -289,6 +297,24 @@ QUnit.module('SubmissionTray', hooks => {
     })
   })
 
+  QUnit.module('when passing true for postPoliciesEnabled', contextHooks => {
+    contextHooks.beforeEach(() => {
+      defaultProps.postPoliciesEnabled = true
+    })
+
+    test('"Hidden" is displayed when a submission is graded and unposted', () => {
+      defaultProps.submission.workflowState = 'graded'
+      mountComponent()
+      ok(content.textContent.includes('Hidden'))
+    })
+
+    test('"Hidden" is displayed when a submission has comments and is unposted', () => {
+      defaultProps.submission.hasPostableComments = true
+      mountComponent()
+      ok(content.textContent.includes('Hidden'))
+    })
+  })
+
   test('shows avatar if avatar is not null', () => {
     const avatarUrl = 'http://bob_is_not_a_domain/me.jpg?filter=make_me_pretty'
     const gradesUrl = 'http://gradesUrl/'
@@ -327,13 +353,6 @@ QUnit.module('SubmissionTray', hooks => {
     defaultProps.isInNoGradingPeriod = true
     mountComponent()
     ok(content.textContent.includes('This submission is not in any grading period'))
-  })
-
-  test('passes along postPoliciesEnabled prop to SubmissionStatus', () => {
-    defaultProps.postPoliciesEnabled = true
-    defaultProps.submission.workflowState = 'graded'
-    mountComponent()
-    ok(content.textContent.includes('Hidden'))
   })
 
   test('shows student name', () => {
@@ -666,7 +685,69 @@ QUnit.module('SubmissionTray', hooks => {
     })
   })
 
-  test('renders the new comment form if the editedCommentId is null', () => {
+  QUnit.module('Similarity Score', function(similarityHooks) {
+    let submission
+
+    similarityHooks.beforeEach(function() {
+      submission = defaultProps.submission
+      submission.turnitin_data = {submission_2501: {status: 'scored', similarity_score: 55}}
+    })
+
+    test('does not render if students are anonymized', function() {
+      defaultProps.assignment.anonymizeStudents = true
+      mountComponent()
+      notOk(content.textContent.includes('55.0% similarity score'))
+    })
+
+    test('does not render if the submission has no originality data', function() {
+      submission.turnitin_data = {}
+      mountComponent()
+      notOk(content.textContent.includes('55.0% similarity score'))
+    })
+
+    test('does not render if the showSimilarityScore prop is false', function() {
+      mountComponent({showSimilarityScore: false})
+      notOk(content.textContent.includes('55.0% similarity score'))
+    })
+
+    QUnit.module('when originality data exists and students are not anonymized', function() {
+      test('renders the similarity score with data from the submission', function() {
+        mountComponent()
+        ok(content.textContent.includes('55.0% similarity score'))
+      })
+
+      test('includes a link to the originality report for the submission', function() {
+        mountComponent()
+        ok(content.querySelector('a[href$="/submissions/27/turnitin/submission_2501"]'))
+      })
+
+      test('includes a message when the submission is a file upload submission with multiple reports', function() {
+        submission.submissionType = 'online_upload'
+        submission.attachments = [{id: '1001'}, {id: '1002'}]
+        submission.turnitinData = {
+          attachment_1001: {status: 'pending'},
+          attachment_1002: {status: 'error'}
+        }
+        mountComponent()
+        ok(
+          content.textContent.includes(
+            'This submission has plagiarism data for multiple attachments.'
+          )
+        )
+      })
+
+      test('does not include a "multiple reports" when the submission only has one report', function() {
+        mountComponent()
+        notOk(
+          content.textContent.includes(
+            'This submission has plagiarism data for multiple attachments.'
+          )
+        )
+      })
+    })
+  })
+
+  test('renders the new comment form if the editedCommentId is null', function() {
     mountComponent()
     ok(content.querySelector('textarea[placeholder="Leave a comment"]'))
   })

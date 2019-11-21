@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
 
 describe UsersController, type: :request do
@@ -217,6 +217,34 @@ describe UsersController, type: :request do
     json = api_call :get, "/api/v1/users/self/todo", :controller => "users", :action => "todo_items", :format => "json"
     expect(json.map {|e| e['assignment']['id']}).to include ungraded.id
     expect(json.map {|e| e['assignment']['id']}).not_to include past_ungraded.id
+  end
+
+  it "should respect grading permissions (users endpoint)" do
+    course_with_ta(course: @teacher_course, active_all: true)
+    @ta = @user
+    json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
+    expect(json.map {|e| e['assignment']['id']}).to include @a2.id
+
+    RoleOverride.create!(context: @course.account,
+                         permission: 'manage_grades',
+                         role: ta_role,
+                         enabled: false)
+
+    json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
+    expect(json.length).to eq 0
+  end
+
+  it "should not include items from courses concluded by terms dates if the user is also an admin" do
+    account_admin_user(account: @teacher_course.root_account, user: @user)
+    json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
+    expect(json.map {|e| e['assignment']['id']}).to include @a2.id
+
+    et = @teacher_course.enrollment_term
+    et.end_at = 1.day.ago
+    et.save!
+
+    json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
+    expect(json).to eq []
   end
 
   it "includes ungraded quizzes by request" do
@@ -497,7 +525,7 @@ describe UsersController, type: :request do
       expect(json['assignments_needing_submitting']).to eq 16
     end
 
-    it "doesnt count assignments that dont need grading" do
+    it "doesn't count assignments that don't need grading" do
       a = Assignment.create!(:context => @teacher_course,
                          :due_at => 1.day.from_now,
                          :title => 'no grading',

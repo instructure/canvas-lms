@@ -19,8 +19,8 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
+import {Button} from '@instructure/ui-buttons'
+import Modal from '../../shared/components/InstuiModal'
 
 export default class DeploymentIdButton extends React.Component {
   static propTypes = {
@@ -60,12 +60,10 @@ export default class DeploymentIdButton extends React.Component {
           onDismiss={this.closeModal}
           label={I18n.t('Deployment Id for %{tool} App', {tool: this.props.tool.name})}
         >
-          <ModalBody>
-            {this.props.tool.deployment_id}
-          </ModalBody>
-          <ModalFooter>
+          <Modal.Body>{this.props.tool.deployment_id}</Modal.Body>
+          <Modal.Footer>
             <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </li>
     )

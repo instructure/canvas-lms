@@ -127,9 +127,7 @@ describe Types::MutationLogType do
     result = audit_log_query({
       assetString: @asset_string,
       endTime: 1.day.ago.iso8601,
-    }, current_user: @admin)
-      .tap { |x| pp x }
-      .dig("data", "auditLogs", "mutationLogs")
+    }, current_user: @admin).dig("data", "auditLogs", "mutationLogs")
 
     expect(result["nodes"].size).to eq 1
     expect(result.dig("nodes", 0, "timestamp")).to be < 1.day.ago
@@ -138,9 +136,7 @@ describe Types::MutationLogType do
       assetString: @asset_string,
       startTime: 2.years.ago.iso8601,
       endTime: 1.years.ago.iso8601,
-    }, current_user: @admin)
-      .tap { |x| pp x }
-      .dig("data", "auditLogs", "mutationLogs")
+    }, current_user: @admin).dig("data", "auditLogs", "mutationLogs")
 
     expect(result["nodes"].size).to eq 0
   end

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {isGraded, isHidden} from '../../../../grading/helpers/SubmissionHelper'
+import {isGraded, isPostable} from '../../../../grading/helpers/SubmissionHelper'
 import {optionsForGradingType} from '../../../shared/EnterGradesAsSetting'
 import AssignmentColumnHeader from './AssignmentColumnHeader'
 
@@ -26,11 +26,19 @@ function getSubmission(student, assignmentId) {
   const submission = student[`assignment_${assignmentId}`]
 
   if (!submission) {
-    return {excused: false, latePolicyStatus: null, postedAt: null, score: null, submittedAt: null}
+    return {
+      excused: false,
+      hasPostableComments: false,
+      latePolicyStatus: null,
+      postedAt: null,
+      score: null,
+      submittedAt: null
+    }
   }
 
   return {
     excused: submission.excused,
+    hasPostableComments: submission.has_postable_comments,
     latePolicyStatus: submission.late_policy_status,
     postedAt: submission.posted_at,
     score: submission.score,
@@ -56,12 +64,15 @@ function getProps(column, gradebook, options) {
   const students = visibleStudentsForAssignment.map(student => ({
     id: student.id,
     isInactive: student.isInactive,
+    isTestStudent: student.enrollments[0].type === 'StudentViewEnrollment',
     name: student.name,
     sortableName: student.sortable_name,
     submission: getSubmission(student, assignmentId)
   }))
 
-  const hasGrades = students.some(student => isGraded(student.submission))
+  const hasGradesOrPostableComments = students.some(
+    student => isGraded(student.submission) || student.submission.hasPostableComments
+  )
 
   return {
     ref: options.ref,
@@ -103,8 +114,8 @@ function getProps(column, gradebook, options) {
     },
 
     hideGradesAction: {
-      hasGrades,
-      hasGradesToHide: students.some(student => student.submission.postedAt != null),
+      hasGradesOrPostableComments,
+      hasGradesOrCommentsToHide: students.some(student => student.submission.postedAt != null),
       onSelect(onExited) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showHideAssignmentGradesTray({assignmentId, onExited})
@@ -114,8 +125,9 @@ function getProps(column, gradebook, options) {
 
     postGradesAction: {
       featureEnabled: gradebook.postPolicies != null,
-      hasGrades,
-      hasGradesToPost: students.some(student => isHidden(student.submission)),
+      hasGradesOrPostableComments,
+      hasGradesOrCommentsToPost: students.some(student => isPostable(student.submission)),
+      newIconsEnabled: !!gradebook.options.new_post_policy_icons_enabled,
       onSelect(onExited) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showPostAssignmentGradesTray({assignmentId, onExited})

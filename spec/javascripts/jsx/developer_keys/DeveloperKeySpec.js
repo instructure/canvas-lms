@@ -19,58 +19,69 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
-import Image from '@instructure/ui-elements/lib/components/Img'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import {Img, Link} from '@instructure/ui-elements'
 
-import DeveloperKey from 'jsx/developer_keys/DeveloperKey';
+import DeveloperKey from 'jsx/developer_keys/DeveloperKey'
 
 class TestTable extends React.Component {
-  render () {
-    return (<table><tbody>{this.props.children}</tbody></table>)
+  render() {
+    return (
+      <table>
+        <tbody>{this.props.children}</tbody>
+      </table>
+    )
   }
 }
 
-function makeTable (keyProps) {
-  return (<TestTable><DeveloperKey {...keyProps} /></TestTable>)
+function makeTable(keyProps) {
+  return (
+    <TestTable>
+      <DeveloperKey {...keyProps} />
+    </TestTable>
+  )
 }
 
-function renderComponent (props) {
-  return TestUtils.renderIntoDocument(makeTable(props));
+function renderComponent(props) {
+  return TestUtils.renderIntoDocument(makeTable(props))
 }
 
-function testWrapperOk (keyProps, expectedString) {
+function testWrapperOk(keyProps, expectedString) {
   const component = renderComponent(keyProps)
-  const renderedText = ReactDOM.findDOMNode(TestUtils.findRenderedDOMComponentWithTag(component, 'tr')).innerHTML;
+  const renderedText = ReactDOM.findDOMNode(
+    TestUtils.findRenderedDOMComponentWithTag(component, 'tr')
+  ).innerHTML
   ok(renderedText.includes(expectedString))
 }
 
-function testWrapperNotOk (keyProps, expectedString) {
-  const component = TestUtils.renderIntoDocument(makeTable(keyProps));
-  const renderedText = ReactDOM.findDOMNode(TestUtils.findRenderedDOMComponentWithTag(component, 'tr')).innerHTML;
+function testWrapperNotOk(keyProps, expectedString) {
+  const component = TestUtils.renderIntoDocument(makeTable(keyProps))
+  const renderedText = ReactDOM.findDOMNode(
+    TestUtils.findRenderedDOMComponentWithTag(component, 'tr')
+  ).innerHTML
   notOk(renderedText.includes(expectedString))
 }
 
 const defaultProps = {
   developerKey: {
     access_token_count: 77,
-    account_name: "bob account",
-    api_key: "rYcJ7LnUbSAuxiMh26tXTSkaYWyfRPh2lr6FqTLqx0FRsmv44EVZ2yXC8Rgtabc3",
-    created_at: "2018-02-09T20:36:50Z",
-    email: "bob@myemail.com",
-    icon_url: "http://my_image.com",
-    id: "10000000000004",
-    last_used_at: "2018-06-07T20:36:50Z",
-    name: "Atomic fireball",
-    notes: "all the notas",
-    redirect_uri: "http://my_redirect_uri.com",
-    redirect_uris: "",
-    user_id: "53532",
-    user_name: "billy bob",
-    vendor_code: "b3w9w9bf",
-    workflow_state: "active",
-    visible: false,
+    account_name: 'bob account',
+    api_key: 'rYcJ7LnUbSAuxiMh26tXTSkaYWyfRPh2lr6FqTLqx0FRsmv44EVZ2yXC8Rgtabc3',
+    created_at: '2018-02-09T20:36:50Z',
+    email: 'bob@myemail.com',
+    icon_url: 'http://my_image.com',
+    id: '10000000000004',
+    last_used_at: '2018-06-07T20:36:50Z',
+    name: 'Atomic fireball',
+    notes: 'all the notas',
+    redirect_uri: 'http://my_redirect_uri.com',
+    redirect_uris: '',
+    user_id: '53532',
+    user_name: 'billy bob',
+    vendor_code: 'b3w9w9bf',
+    workflow_state: 'active',
+    visible: false
   },
-  store: { dispatch: () => {} },
+  store: {dispatch: () => {}},
   actions: {
     // These should really be stubs and tested as to when they are called
     makeVisibleDeveloperKey: () => {},
@@ -79,16 +90,16 @@ const defaultProps = {
     deactivateDeveloperKey: () => {},
     deleteDeveloperKey: () => {},
     editDeveloperKey: () => {},
-    developerKeysModalOpen: () => {},
+    developerKeysModalOpen: () => {}
   },
-  ctx: { params: { contextId: 'context' } }
+  ctx: {params: {contextId: 'context'}}
 }
 
-function updateDefaultProps (updates = {}) {
-  const props = Object.assign({}, defaultProps)
-  Object.keys(updates).forEach((key) => {
+function updateDefaultProps(updates = {}) {
+  const props = {...defaultProps}
+  Object.keys(updates).forEach(key => {
     if (defaultProps[key]) {
-      props[key] = Object.assign({}, defaultProps[key], updates[key])
+      props[key] = {...defaultProps[key], ...updates[key]}
     } else {
       props[key] = updates[key]
     }
@@ -100,86 +111,86 @@ QUnit.module('DeveloperKey', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
   }
-});
+})
 test('includes developerName', () => {
-  testWrapperOk(defaultProps, "Atomic fireball")
-});
+  testWrapperOk(defaultProps, 'Atomic fireball')
+})
 
 test('includes Unnamed Tool when developerName us null', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { name: null } }), "Unnamed Tool")
-});
+  testWrapperOk(updateDefaultProps({developerKey: {name: null}}), 'Unnamed Tool')
+})
 
 test('includes Unnamed Tool when developerName empty string case', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { name: '' } }), "Unnamed Tool")
-});
+  testWrapperOk(updateDefaultProps({developerKey: {name: ''}}), 'Unnamed Tool')
+})
 
 test('includes email', () => {
-  testWrapperOk(defaultProps, "bob@myemail.com")
-});
+  testWrapperOk(defaultProps, 'bob@myemail.com')
+})
 
 test('includes No Email when userName is null and email missing', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { user_name: null, email: null } }), "No Email")
-});
+  testWrapperOk(updateDefaultProps({developerKey: {user_name: null, email: null}}), 'No Email')
+})
 
 test('includes No Email when userName is empty string and email is missing', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { user_name: '', email: null } }), "No Email")
-});
+  testWrapperOk(updateDefaultProps({developerKey: {user_name: '', email: null}}), 'No Email')
+})
 
 test('includes an image when name is present', () => {
   const component = renderComponent(defaultProps)
-  ok(TestUtils.findRenderedComponentWithType(component, Image))
-});
+  ok(TestUtils.findRenderedComponentWithType(component, Img))
+})
 
 test('includes an img box when name is null', () => {
-  const propsModified = updateDefaultProps({ developerKey: { name: null } })
+  const propsModified = updateDefaultProps({developerKey: {name: null}})
   const component = renderComponent(propsModified)
-  ok(TestUtils.findRenderedComponentWithType(component, Image))
-});
+  ok(TestUtils.findRenderedComponentWithType(component, Img))
+})
 
 test('does not inactive when workflow_state is active', () => {
   testWrapperNotOk(defaultProps, 'inactive')
-});
+})
 
 test('includes a user link', () => {
   const component = renderComponent(defaultProps)
   ok(TestUtils.findRenderedComponentWithType(component, Link))
-});
+})
 
 test('does not include a user link when user_id is null', () => {
-  const propsModified = updateDefaultProps({ developerKey: { user_id: null } })
+  const propsModified = updateDefaultProps({developerKey: {user_id: null}})
   const component = renderComponent(propsModified)
   equal(TestUtils.scryRenderedComponentsWithType(component, Link).length, 0)
-});
+})
 
 test('includes a redirect_uri', () => {
   testWrapperOk(defaultProps, 'URI:')
   testWrapperOk(defaultProps, 'http://my_redirect_uri.com')
-});
+})
 
 test('does not include a redirect_uri when redirect_uri is null', () => {
-  testWrapperNotOk(updateDefaultProps({ developerKey: { redirect_uri: null } }), 'URI:')
-});
+  testWrapperNotOk(updateDefaultProps({developerKey: {redirect_uri: null}}), 'URI:')
+})
 
 test('includes a last_used_at', () => {
-  testWrapperOk(defaultProps, "2018-06-07T20:36:50Z")
-});
+  testWrapperOk(defaultProps, '2018-06-07T20:36:50Z')
+})
 
 test('includes "Never" when last_used_at is null', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { last_used_at: null } }), 'Never')
-});
+  testWrapperOk(updateDefaultProps({developerKey: {last_used_at: null}}), 'Never')
+})
 
 test('it renders the developer key state control', () => {
   testWrapperOk(defaultProps, 'Key state for the current account')
 })
 
 test('renders No Email when email is missing', () => {
-  testWrapperOk(updateDefaultProps({ developerKey: { email: null } }), 'No Email')
+  testWrapperOk(updateDefaultProps({developerKey: {email: null}}), 'No Email')
 })
 
-const inheritedProps = updateDefaultProps({ inherited: true })
+const inheritedProps = updateDefaultProps({inherited: true})
 
 test('does not include user info when inherited is true', () => {
-  testWrapperNotOk(inheritedProps, "billy bob")
+  testWrapperNotOk(inheritedProps, 'billy bob')
 })
 
 test('does not include redirect_uri info when inherited is true', () => {
@@ -198,5 +209,8 @@ test('does not include developer key modification icons', () => {
 })
 
 test('does not include developer key secret', () => {
-  testWrapperNotOk(inheritedProps, 'rYcJ7LnUbSAuxiMh26tXTSkaYWyfRPh2lr6FqTLqx0FRsmv44EVZ2yXC8Rgtabc3')
+  testWrapperNotOk(
+    inheritedProps,
+    'rYcJ7LnUbSAuxiMh26tXTSkaYWyfRPh2lr6FqTLqx0FRsmv44EVZ2yXC8Rgtabc3'
+  )
 })

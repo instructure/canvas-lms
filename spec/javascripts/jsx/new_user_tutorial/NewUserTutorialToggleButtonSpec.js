@@ -47,12 +47,12 @@ test('shows IconMoveStart when isCollapsed is true', () => {
   const store = createTutorialStore({isCollapsed: true})
   const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
 
-  ok(wrapper.find('IconMoveStart').exists())
+  ok(wrapper.find('IconMoveStartLine').exists())
 })
 
 test('shows IconMoveEnd when isCollapsed is false', () => {
   const store = createTutorialStore({isCollapsed: false})
   const wrapper = shallow(<NewUserTutorialToggleButton store={store} />)
 
-  ok(wrapper.find('IconMoveEnd').exists())
+  ok(wrapper.find('IconMoveEndLine').exists())
 })

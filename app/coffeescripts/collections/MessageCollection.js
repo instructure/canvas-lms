@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 import PaginatedCollection from '../collections/PaginatedCollection'
 import Message from '../models/Message'
 
@@ -41,7 +40,7 @@ export default class MessageCollection extends PaginatedCollection {
     if (newPos > lastPos) {
       range.reverse()
     }
-    return range.forEach(x => x.set('selected', true));
+    return range.forEach(x => x.set('selected', true))
   }
 }
 MessageCollection.prototype.model = Message

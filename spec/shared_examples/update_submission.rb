@@ -161,6 +161,44 @@ RSpec.shared_examples 'a submission update action' do |controller|
             expect(submission_json["submission"]["body"]).to be_nil
           end
         end
+
+        context "when assignment posts manually" do
+          before do
+            PostPolicy.enable_feature!
+            course.enable_feature!(:new_gradebook)
+            assignment.post_policy.update!(post_manually: true)
+          end
+
+          it "does not render the submission body when submission is unposted" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            expect(submission_json["submission"]["body"]).to be_nil
+          end
+
+          it "does not render the submission body when updating What-If scores and submission is unposted" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body)
+            expect(submission_json["submission"]["body"]).to be_nil
+          end
+
+          it "renders the submission body when submission is posted" do
+            assignment.post_submissions
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            expect(submission_json["submission"]["body"]).to be_present
+          end
+
+          it "renders the submission body when updating What-If scores and submission is posted" do
+            assignment.post_submissions
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body)
+            expect(submission_json["submission"]["body"]).to be_present
+          end
+        end
       end
 
       context "current user is teacher" do
@@ -201,6 +239,28 @@ RSpec.shared_examples 'a submission update action' do |controller|
             put :update, params: params, format: :json
             submission_json = JSON.parse(response.body)
             expect(submission_json["submission"]["body"]).to eq submission.reload.body
+          end
+        end
+
+        context "when assignment posts manually" do
+          before do
+            PostPolicy.enable_feature!
+            course.enable_feature!(:new_gradebook)
+            assignment.post_policy.update!(post_manually: true)
+          end
+
+          it "renders the submission body when submission is unposted" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            expect(submission_json["submission"]["body"]).to be_present
+          end
+
+          it "renders the submission body when updating What-If scores and submission is unposted" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body)
+            expect(submission_json["submission"]["body"]).to be_present
           end
         end
       end
@@ -407,6 +467,44 @@ RSpec.shared_examples 'a submission update action' do |controller|
         expect(body['grade']).to be nil
         expect(body['published_grade']).to be nil
         expect(body['published_score']).to be nil
+      end
+
+      context "when assignment has anonymous peer reviewers" do
+        before(:each) do
+          @assignment.update!(peer_reviews: true, anonymous_peer_reviews: true)
+          @peer_reviewer = @course.enroll_student(User.create!, enrollment_state: :active).user
+          peer_reviewer_submission = @assignment.submissions.find_by(user: @peer_reviewer)
+          AssessmentRequest.create!(
+            assessor: @peer_reviewer,
+            assessor_asset: peer_reviewer_submission,
+            asset: @submission,
+            user: @student
+          )
+        end
+
+        it "does not return submission user_id when user is a peer reviewer" do
+          user_session(@peer_reviewer)
+          @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @student.id }
+          @params = { course_id: @course.id, assignment_id: @assignment.id, submission: {student_entered_score: '2'} }.merge(@resource_pair)
+          put :update, params: @params, format: :json
+          expect(body).not_to have_key "user_id"
+        end
+
+        it "returns submission user_id when user is a teacher" do
+          user_session(@teacher)
+          @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @student.id }
+          @params = { course_id: @course.id, assignment_id: @assignment.id, submission: {student_entered_score: '2'} }.merge(@resource_pair)
+          put :update, params: @params, format: :json
+          expect(body).to have_key "user_id"
+        end
+
+        it "returns submission user_id when user owns the submission" do
+          user_session(@student)
+          @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @student.id }
+          @params = { course_id: @course.id, assignment_id: @assignment.id, submission: {student_entered_score: '2'} }.merge(@resource_pair)
+          put :update, params: @params, format: :json
+          expect(body).to have_key "user_id"
+        end
       end
 
       describe "comments" do

@@ -53,16 +53,17 @@ describe LiveEvents::Client do
   end
 
   let(:test_stream_name) { 'my_stream' }
+  let(:fclient) { FakeStreamClient.new(test_stream_name) }
 
   before(:each) do
     stub_config
-    fclient = FakeStreamClient.new(test_stream_name)
     LiveEvents.logger = LELogger.new
     LiveEvents.max_queue_size = -> { 100 }
     LiveEvents.stream_client = fclient
     LiveEvents.clear_context!
 
     @client = LiveEvents::Client.new nil, fclient, test_stream_name
+    LiveEvents.worker.start!
   end
 
   def expect_put_records(payload, stream_client = LiveEvents.stream_client)
@@ -79,6 +80,7 @@ describe LiveEvents::Client do
       })
 
       expect(res[:endpoint]).to eq("http://example.com:6543/")
+      LiveEvents.worker.stop!
     end
   end
 

@@ -23,18 +23,42 @@ describe InstFS do
     before do
       @app_host = 'http://test.host'
       @secret = "supersecretyup"
+      @rotating_secret = "anothersecret"
+      @secrets = [@secret, @rotating_secret]
+      encoded_secrets = @secrets.map{ |secret| Base64.encode64(secret) }.join(" ")
       allow(InstFS).to receive(:enabled?).and_return(true)
       allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
       allow(Canvas::DynamicSettings).to receive(:find).
         with(service: "inst-fs", default_ttl: 5.minutes).
         and_return({
           'app-host' => @app_host,
-          'secret' => Base64.encode64(@secret)
+          'secret' => encoded_secrets
         })
     end
 
-    it "returns decoded base 64 secret" do
+    it "returns primary decoded base 64 secret" do
       expect(InstFS.jwt_secret).to eq(@secret)
+    end
+
+    it "returns all decoded base 64 secrets" do
+      expect(InstFS.jwt_secrets).to eq(@secrets)
+    end
+
+    context "validate_capture_jwt" do
+      it "returns true for jwt signed with primary key" do
+        token = Canvas::Security.create_jwt({}, nil, @secret, :HS512)
+        expect(InstFS.validate_capture_jwt(token)).to eq(true)
+      end
+
+      it "returns true for jwt signed with rotating key" do
+        token = Canvas::Security.create_jwt({}, nil, @rotating_secret, :HS512)
+        expect(InstFS.validate_capture_jwt(token)).to eq(true)
+      end
+
+      it "returns false for jwt signed with bogus key" do
+        token = Canvas::Security.create_jwt({}, nil, "boguskey", :HS512)
+        expect(InstFS.validate_capture_jwt(token)).to eq(false)
+      end
     end
 
     context "authenticated_url" do
@@ -529,8 +553,13 @@ describe InstFS do
     it "instfs is not enabled" do
       expect(InstFS.enabled?).to be false
     end
+
     it "doesn't error on jwt_secret" do
       expect(InstFS.jwt_secret).to be_nil
+    end
+
+    it "returns empty list of secrets" do
+      expect(InstFS.jwt_secrets).to eq([])
     end
   end
 end

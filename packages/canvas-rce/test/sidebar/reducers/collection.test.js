@@ -16,64 +16,64 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import collection from "../../../src/sidebar/reducers/collection";
-import * as actions from "../../../src/sidebar/actions/data";
+import assert from 'assert'
+import collection from '../../../src/sidebar/reducers/collection'
+import * as actions from '../../../src/sidebar/actions/data'
 
-describe("Collection reducer", () => {
-  let state;
+describe('Collection reducer', () => {
+  let state
 
   beforeEach(() => {
-    state = {};
-  });
+    state = {}
+  })
 
-  it("does not modify the state if for unknown actions", () => {
-    assert(collection(state, { type: "unknown.action" }) === state);
-  });
+  it('does not modify the state if for unknown actions', () => {
+    assert(collection(state, {type: 'unknown.action'}) === state)
+  })
 
-  describe("REQUEST_PAGE", () => {
+  describe('REQUEST_PAGE', () => {
     const action = {
       type: actions.REQUEST_PAGE
-    };
+    }
 
-    it("sets the loading flag", () => {
-      assert.equal(collection(state, action).loading, true);
-    });
+    it('sets the loading flag', () => {
+      assert.equal(collection(state, action).loading, true)
+    })
 
-    it("preserves existing state", () => {
-      state.arbitrary = "data";
-      assert.equal(collection(state, action).arbitrary, "data");
-    });
-  });
+    it('preserves existing state', () => {
+      state.arbitrary = 'data'
+      assert.equal(collection(state, action).arbitrary, 'data')
+    })
+  })
 
-  describe("FAIL_PAGE", () => {
-    let action;
+  describe('FAIL_PAGE', () => {
+    let action
 
     beforeEach(() => {
       action = {
         type: actions.FAIL_PAGE,
-        error: "somethingBad"
-      };
-      state.bookmark = "someBookmark";
-      state.links = [];
-    });
+        error: 'somethingBad'
+      }
+      state.bookmark = 'someBookmark'
+      state.links = []
+    })
 
-    it("deactivates loading", () => {
-      state.loading = true;
-      assert.equal(collection(state, action).loading, false);
-    });
+    it('deactivates loading', () => {
+      state.loading = true
+      assert.equal(collection(state, action).loading, false)
+    })
 
-    it("includes the error in state", () => {
-      assert.equal(collection(state, action).error, "somethingBad");
-    });
+    it('includes the error in state', () => {
+      assert.equal(collection(state, action).error, 'somethingBad')
+    })
 
-    it("blanks the bookmark if there are no links", () => {
-      assert.equal(collection(state, action).bookmark, null);
-    });
+    it('blanks the bookmark if there are no links', () => {
+      assert.equal(collection(state, action).bookmark, null)
+    })
 
-    it("leaves the bookmark when links are present", () => {
-      state.links = [{}, {}, {}];
-      assert.equal(collection(state, action).bookmark, "someBookmark");
-    });
-  });
-});
+    it('leaves the bookmark when links are present', () => {
+      state.links = [{}, {}, {}]
+      assert.equal(collection(state, action).bookmark, 'someBookmark')
+    })
+  })
+})

@@ -17,22 +17,31 @@
  */
 import {arrayOf, bool, number, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
+import {MediaObject} from './MediaObject'
 import {SubmissionDraft} from './SubmissionDraft'
 import {SubmissionFile} from './File'
 
 export const SubmissionInterface = {
   fragment: gql`
     fragment SubmissionInterface on SubmissionInterface {
+      attachment {
+        # this refers to the screenshot of the submission if it is a url submission
+        ...SubmissionFile
+      }
       attachments {
         ...SubmissionFile
       }
       attempt
+      body
       deductedPoints
       enteredGrade
       grade
+      gradeHidden
       gradingStatus
       latePolicyStatus
-      posted
+      mediaObject {
+        ...MediaObject
+      }
       state
       submissionDraft {
         ...SubmissionDraft
@@ -40,42 +49,52 @@ export const SubmissionInterface = {
       submissionStatus
       submittedAt
       unreadCommentCount
+      url
     }
+    ${MediaObject.fragment}
     ${SubmissionFile.fragment}
     ${SubmissionDraft.fragment}
   `,
 
   shape: shape({
+    attachment: SubmissionFile.shape,
     attachments: arrayOf(SubmissionFile.shape),
     attempt: number.isRequired,
+    body: string,
     deductedPoints: number,
     enteredGrade: string,
     grade: string,
+    gradeHidden: bool.isRequired,
     gradingStatus: string,
     latePolicyStatus: string,
-    posted: bool.isRequired,
+    mediaObject: MediaObject.shape,
     state: string.isRequired,
     submissionDraft: SubmissionDraft.shape,
     submissionStatus: string,
     submittedAt: string,
-    unreadCommentCount: number.isRequired
+    unreadCommentCount: number.isRequired,
+    url: string
   })
 }
 
-export const SubmissionInterfaceDefaultMocks = {
+export const DefaultMocks = {
   SubmissionInterface: () => ({
+    attachment: null,
     attachments: () => [],
     attempt: 0,
+    body: null,
     deductedPoints: null,
     enteredGrade: null,
+    gradeHidden: false,
     grade: null,
     gradingStatus: null,
     latePolicyStatus: null,
-    posted: true,
+    mediaObject: null,
     state: 'unsubmitted',
     submissionDraft: null,
     submissionStatus: 'unsubmitted',
     submittedAt: null,
-    unreadCommentCount: 0
+    unreadCommentCount: 0,
+    url: null
   })
 }

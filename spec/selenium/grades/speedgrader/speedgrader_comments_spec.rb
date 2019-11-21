@@ -380,6 +380,56 @@ describe "speed grader" do
     end
   end
 
+  context 'comments per attempt' do
+    before(:once) do
+      @course.enable_feature!(:assignments_2_student)
+      @assignment = @course.assignments.create(name: 'a2 assignment', points_possible: 10, submission_types: 'online_url')
+      @submission1 = @assignment.submit_homework(@student, body: 'Attempt 1', submitted_at: 2.hours.ago)
+      @submission2 = @assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
+      @comment0 = @submission1.add_comment(author: @teacher1, comment: 'comment0', attempt: 0)
+      @comment1 = @submission1.add_comment(author: @teacher1, comment: 'comment1', attempt: 1)
+      @comment2 = @submission2.add_comment(author: @teacher1, comment: 'comment2', attempt: 2)
+    end
+
+    before(:each) do
+      Speedgrader.visit(@course.id, @assignment.id)
+    end
+
+    it 'shows comments based on the group' do
+      expect(Speedgrader.comments.length).to eq 1
+      expect(Speedgrader.comments.first).to include_text('comment2')
+    end
+
+    it 'switches displayed comments when selecting a new submission history' do
+      Speedgrader.click_submissions_to_view
+      Speedgrader.select_option_submission_to_view('0')
+      expect(Speedgrader.comments.length).to eq 2
+      expect(Speedgrader.comments.first).to include_text('comment0')
+      expect(Speedgrader.comments.second).to include_text('comment1')
+    end
+
+    it 'displays a new comment for whatever attempt is currently being displayed' do
+      Speedgrader.click_submissions_to_view
+      Speedgrader.select_option_submission_to_view('0')
+      Speedgrader.add_comment_and_submit('grader comment')
+      wait_for_ajaximations
+      expect(Speedgrader.comments.length).to eq 3
+      expect(Speedgrader.comments.first).to include_text('comment0')
+      expect(Speedgrader.comments.second).to include_text('comment1')
+      expect(Speedgrader.comments.third).to include_text('grader comment')
+      expect(Speedgrader.new_comment_text_area.text).to be_empty
+    end
+
+    it 'lets you switch displayed comments after submitting a new comment' do
+      Speedgrader.add_comment_and_submit('grader comment')
+      Speedgrader.click_submissions_to_view
+      Speedgrader.select_option_submission_to_view('0')
+      expect(Speedgrader.comments.length).to eq 2
+      expect(Speedgrader.comments.first).to include_text('comment0')
+      expect(Speedgrader.comments.second).to include_text('comment1')
+    end
+  end
+
   context 'group assignment comments' do
     before(:once) do
       @assignment = create_assignment_for_group('online_url', true)

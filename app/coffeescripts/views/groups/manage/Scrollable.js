@@ -22,7 +22,7 @@ let $document, $window
 const CLASS_ATTRIBUTE = 'ui-cnvs-scrollable'
 const SCROLL_RATE = 10
 
-let $footer = $window = $document = null
+let $footer = ($window = $document = null)
 const p = str => parseInt(str, 10)
 
 export default {

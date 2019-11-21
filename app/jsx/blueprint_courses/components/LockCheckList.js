@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
+import {Checkbox} from '@instructure/ui-forms'
 import propTypes from '../propTypes'
 import {lockLabels} from '../labels'
 
@@ -27,14 +27,14 @@ export default class LockCheckList extends React.Component {
     locks: propTypes.itemLocks.isRequired,
     lockableAttributes: propTypes.lockableAttributeList.isRequired,
     onChange: PropTypes.func,
-    formName: PropTypes.string.isRequired,
+    formName: PropTypes.string.isRequired
   }
 
   static defaultProps = {
-    onChange: () => {},
+    onChange: () => {}
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       locks: props.locks
@@ -48,15 +48,18 @@ export default class LockCheckList extends React.Component {
   onChange = (e, value) => {
     const locks = this.state.locks
     locks[value] = e.target.checked
-    this.setState({
-      locks
-    }, () => this.props.onChange(locks))
+    this.setState(
+      {
+        locks
+      },
+      () => this.props.onChange(locks)
+    )
   }
 
-  render () {
+  render() {
     return (
       <div>
-        {this.props.lockableAttributes.map(item =>
+        {this.props.lockableAttributes.map(item => (
           <div key={item} className="bcs_check_box-group">
             <input type="hidden" name={`course${this.props.formName}[${item}]`} value={false} />
             <Checkbox
@@ -67,7 +70,7 @@ export default class LockCheckList extends React.Component {
               onChange={this.onChangeFunctions[item]}
             />
           </div>
-        )}
+        ))}
       </div>
     )
   }

@@ -32,6 +32,11 @@ describe UserMerge do
       expect(user2).to be_deleted
     end
 
+    it 'fails if a user is a test user' do
+      fake_student = course1.student_view_student
+      expect { UserMerge.from(user2).into(fake_student) }.to raise_error('cannot merge a test student')
+    end
+
     it 'should require mark as failed on failure users' do
       mergeme = UserMerge.from(user2)
       # make any method that gets called raise an error

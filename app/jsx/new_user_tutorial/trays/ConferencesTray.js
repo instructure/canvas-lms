@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const ConferencesTray = () => (
@@ -28,14 +28,12 @@ const ConferencesTray = () => (
     image="/images/tutorial-tray-images/conferences.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Conduct virtual lectures, virtual office hours, and student
+      {I18n.t(`Conduct virtual lectures, virtual office hours, and student
           groups. Broadcast real-time audio and video, share presentation
           slides, give demonstrations of applications and online resources,
-          and more.`)
-      }
+          and more.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
-export default ConferencesTray;
+export default ConferencesTray

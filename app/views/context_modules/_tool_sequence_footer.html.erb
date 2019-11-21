@@ -29,10 +29,8 @@
       </a>
     <% end %>
     <% if assignment_presenter.can_view_speed_grader_link?(@current_user) %>
-      <a target="_blank" id="speedgrader_button" class="btn button-sidebar-wide" href="<%= context_url(assignment.context, :speed_grader_context_gradebook_url, :assignment_id => assignment.id) %>">
-        <i class="icon-speed-grader"></i>
-        <%= t :speed_grader, "Speed Grader™" %>
-      </a>
+      <div id="student_group_filter_container"></div>
+      <div id="speed_grader_link_container"></div>
     <% end %>
   <% end %>
 <% end %>

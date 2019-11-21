@@ -153,20 +153,30 @@ SeleniumSpecsLinter:
   Message: Your commit modifies selenium specs, when your changes might be more appropriately
       tested at a lower level. Please limit your selenium specs to happy-path scenarios.
 
+Simple/CoffeeLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "**/*[^Gradebook,Assignment].coffee"
+  Message: Your commit modifies CoffeeScript. You should probably decaffeinate 
+    (https://decaffeinate-project.org/repl/) it then make your changes in the JS file instead.
+    CoffeeScript is deprecated in canvas and we eventually want to get rid of all of it.
+    If you've given that honest thought and your team still feels it makes sense leave this file
+    as CoffeeScript for now and you don't want to see this message
+    about it anymore, you can add it to the pattern in gems/tatl_tael/config/default.yml
+
 Simple/CoffeeSpecsLinter:
   Severity: "warn"
   Precondition:
     Include:
     - "app/coffeescripts/**.coffee"
-    Whitelist:
-    - "app/coffeescripts/bundles/**"
   Requirement:
     Include:
     - "app/jsx/**/__tests__/**"
-    - "spec/coffeescripts/**.coffee"
-    - "spec/coffeescripts/jsx/**"
-    - "spec/javascripts/jsx/**"
-  Message: Your commit includes coffee changes, but does not include coffee or jsx
+    - "app/coffeescripts/**/__tests__/**"
+    - "spec/coffeescripts/**"
+    - "spec/javascripts/**"
+  Message: Your commit includes coffee changes, but does not include Jest
     specs. Please add some to verify your changes.
 
 Simple/JsxSpecsLinter:
@@ -177,9 +187,8 @@ Simple/JsxSpecsLinter:
   Requirement:
     Include:
     - "app/jsx/**/__tests__/**"
-    - "spec/coffeescripts/jsx/**"
     - "spec/javascripts/jsx/**"
-  Message: Your commit includes coffee changes, but does not include coffee or jsx
+  Message: Your commit includes JavaScript changes, but does not include Jest
     specs. Please add some to verify your changes.
 
 Simple/PublicJsSpecsLinter:
@@ -190,16 +199,15 @@ Simple/PublicJsSpecsLinter:
     Whitelist:
     - "**/bower/**"
     - "**/mediaelement/**"
-    - "**/shims/**"
     - "**/vendor/**"
     - "**/symlink_to_node_modules/**"
   Requirement:
     Include:
     - "app/jsx/**/__tests__/**"
-    - "spec/coffeescripts/**"
+    - "public/javascripts/**/__tests__/**"
     - "spec/javascripts/**"
   Message: Your commit includes changes to public/javascripts, but does not include
-    specs (coffee or jsx). Please add some to verify your changes. Even $.fn.crazyMethods
+    Jest specs. Please add some to verify your changes. Even $.fn.crazyMethods
     can and should be tested (and not via selenium).
 
 Simple/NewErbLinter:
@@ -210,8 +218,8 @@ Simple/NewErbLinter:
     Statuses:
     - added
   Message: |-
-    Your commit includes new ERB files, which has been a no-no in Canvas since 2011. All new UI should be built in React on top of documented APIs.
-    Maybe try doing something like this in your controller instead:
+    Your commit includes new ERB files but you may be able to accomplish
+    everything you need by doing something like this in your controller instead:
 
         @page_title = t('Your Page Title')
         add_body_class 'whatever-classes you-want-to-add-to-body'
@@ -219,3 +227,14 @@ Simple/NewErbLinter:
         css_bundle :any_css_bundles_you_want
         js_env({whatever: 'you need to put in window.ENV'})
         render :html => "".html_safe, :layout => true
+
+Simple/NewQunitLinter:
+  Severity: "warn"
+  Precondition:
+    Include:
+    - "spec/coffeescripts/**"
+    - "spec/javascripts/**"
+    Statuses:
+    - added
+  Message: |-
+    Your commit adds new qUnit files but all new tests should be in Jest.

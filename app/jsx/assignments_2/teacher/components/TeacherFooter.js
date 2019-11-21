@@ -20,7 +20,7 @@ import React from 'react'
 import {func} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import {Button} from '@instructure/ui-buttons'
-import theme from '@instructure/ui-themes/lib/canvas/base'
+import theme from '@instructure/canvas-theme'
 
 TeacherFooter.propTypes = {
   onCancel: func.isRequired,

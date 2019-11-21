@@ -369,6 +369,9 @@ CanvasRails::Application.routes.draw do
     post 'quizzes/unpublish' => 'quizzes/quizzes#unpublish'
     post 'quizzes/:id/toggle_post_to_sis' => "quizzes/quizzes#toggle_post_to_sis"
 
+    post 'assignments/publish/quiz'   => 'assignments#publish_quizzes'
+    post 'assignments/unpublish/quiz' => 'assignments#unpublish_quizzes'
+
     post 'quizzes/new' => 'quizzes/quizzes#new' # use POST instead of GET (not idempotent)
     resources :quizzes, controller: 'quizzes/quizzes', except: :new do
       get :managed_quiz_data
@@ -485,6 +488,7 @@ CanvasRails::Application.routes.draw do
   get 'media_objects/:id/thumbnail' => 'context#media_object_thumbnail', as: :media_object_thumbnail
   get 'media_objects/:media_object_id/info' => 'media_objects#show', as: :media_object_info
   get 'media_objects_iframe/:media_object_id' => 'media_objects#iframe_media_player', as: :media_object_iframe
+  get 'media_objects_iframe' => 'media_objects#iframe_media_player', as: :media_object_iframe_href
   get 'media_objects/:media_object_id/media_tracks/:id' => 'media_tracks#show', as: :show_media_tracks
   post 'media_objects/:media_object_id/media_tracks' => 'media_tracks#create', as: :create_media_tracks
   delete 'media_objects/:media_object_id/media_tracks/:media_track_id' => 'media_tracks#destroy', as: :delete_media_tracks
@@ -844,6 +848,7 @@ CanvasRails::Application.routes.draw do
       get :communication
       put :communication_update
       get :settings
+      get :content_shares
       get :observees
     end
   end
@@ -974,6 +979,7 @@ CanvasRails::Application.routes.draw do
       # we keep it around for backward compatibility though
       get 'courses/:course_id/search_users', action: :users
       get 'courses/:course_id/users/:id', action: :user, as: 'course_user'
+      get 'courses/:course_id/content_share_users', action: :content_share_users, as: 'course_content_share_users'
       get 'courses/:course_id/activity_stream', action: :activity_stream, as: 'course_activity_stream'
       get 'courses/:course_id/activity_stream/summary', action: :activity_stream_summary, as: 'course_activity_stream_summary'
       get 'courses/:course_id/todo', action: :todo_items, as: 'course_todo_list_items'
@@ -988,6 +994,8 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/folders/by_path', controller: :folders, action: :resolve_path
       get 'courses/:course_id/folders/media', controller: :folders, action: :media_folder
       get 'courses/:course_id/folders/:id', controller: :folders, action: :show, as: 'course_folder'
+      get 'media_objects', controller: 'media_objects', action: :index, as: :media_objects
+      get 'courses/:course_id/media_objects', controller: 'media_objects', action: :index, as: :course_media_objects
       put 'accounts/:account_id/courses', action: :batch_update
       post 'courses/:course_id/ping', action: :ping, as: 'course_ping'
 
@@ -1346,7 +1354,7 @@ CanvasRails::Application.routes.draw do
       delete 'users/self/todo/:asset_string/:purpose', action: :ignore_item, as: 'users_todo_ignore'
       post 'accounts/:account_id/users', action: :create
       post 'accounts/:account_id/self_registration', action: :create_self_registered_user
-      get 'accounts/:account_id/users', action: :index, as: 'account_users'
+      get 'accounts/:account_id/users', action: :api_index, as: 'account_users'
 
       get 'users/:id', action: :api_show
       put 'users/:id', action: :update
@@ -1619,6 +1627,10 @@ CanvasRails::Application.routes.draw do
     scope(controller: :internet_image) do
       get 'image_search', action: :image_search
       post 'image_selection/:id', action: :image_selection
+    end
+
+    scope(controller: :immersive_reader) do
+      get 'immersive_reader/authenticate', action: :authenticate
     end
 
     scope(controller: :search) do
@@ -2166,6 +2178,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :planner) do
       get 'planner/items', action: :index, as: :planner_items
+      get 'users/:user_id/planner/items', action: :index, as: :user_planner_items
     end
 
     scope(controller: :planner_overrides) do
@@ -2186,6 +2199,13 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :content_shares) do
       post 'users/:user_id/content_shares', action: :create
+      get 'users/:user_id/content_shares/sent', action: :index, defaults: { list: 'sent' }, as: :user_sent_content_shares
+      get 'users/:user_id/content_shares/received', action: :index, defaults: { list: 'received' }, as: :user_received_content_shares
+      get 'users/:user_id/content_shares/unread_count', action: :unread_count
+      get 'users/:user_id/content_shares/:id', action: :show
+      delete 'users/:user_id/content_shares/:id', action: :destroy
+      post 'users/:user_id/content_shares/:id/add_users', action: :add_users
+      put 'users/:user_id/content_shares/:id', action: :update
     end
 
     scope(:controller => :csp_settings) do
@@ -2203,9 +2223,13 @@ CanvasRails::Application.routes.draw do
     scope(:controller => :context) do
       post 'media_objects', action: 'create_media_object', as: :create_media_object
     end
+
+    scope(:controller => :media_objects) do
+      put 'media_objects/:media_object_id', action: 'update_media_object', as: :update_media_object
+    end
   end
 
-  # this is not a "normal" api endpoint in the sense that it is not documented or
+    # this is not a "normal" api endpoint in the sense that it is not documented or
     # generally available to hosted customers. it also does not respect the normal
     # pagination options; however, jobs_controller already accepts `limit` and `offset`
     # paramaters and defines a sane default limit
@@ -2349,6 +2373,9 @@ CanvasRails::Application.routes.draw do
       post "/accounts/:account_id/data_services", action: :create, as: :data_services_create
       get "/accounts/:account_id/data_services/:id", action: :show, as: :data_services_show
       put "/accounts/:account_id/data_services/:id", action: :update, as: :data_services_update
+      get "/accounts/:account_id/data_services", action: :index, as: :data_services_index
+      get "/accounts/:account_id/event_types", action: :event_types_index, as: :data_services_event_types
+      delete "/accounts/:account_id/data_services/:id", action: :destroy, as: :data_services_destroy
     end
 
     # Names and Roles Provisioning (NRPS) v2 Service
@@ -2360,6 +2387,14 @@ CanvasRails::Application.routes.draw do
     # Security
     scope(controller: 'lti/ims/security') do
       get "security/jwks", action: :jwks, as: :jwks_show
+    end
+
+    # Feature Flags
+    scope(controller: 'lti/feature_flags') do
+      %w(course account).each do |context|
+        prefix = "#{context}s/:#{context}_id"
+        get "/#{prefix}/feature_flags/:feature", action: :show
+      end
     end
   end
 

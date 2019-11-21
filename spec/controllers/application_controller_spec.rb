@@ -30,7 +30,8 @@ RSpec.describe ApplicationController do
       format: double(:html? => true),
       user_agent: nil,
       remote_ip: '0.0.0.0',
-      base_url: 'https://canvas.test'
+      base_url: 'https://canvas.test',
+      referer: nil
     )
     allow(controller).to receive(:request).and_return(request_double)
   end
@@ -123,6 +124,25 @@ RSpec.describe ApplicationController do
       expect(@controller.js_env[:FULLCALENDAR_LOCALE]).to eq 'fr'
       expect(@controller.js_env[:MOMENT_LOCALE]).to eq 'fr'
       expect(@controller.js_env[:TIMEZONE]).to eq 'America/Juneau'
+    end
+
+    describe "DIRECT_SHARE_ENABLED feature flag" do
+      it "sets the env var to true when FF is enabled" do
+        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        allow(root_account).to receive(:feature_enabled?).and_return(false)
+        allow(root_account).to receive(:feature_enabled?).with(:direct_share).and_return(true)
+        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
+        controller.instance_variable_set(:@domain_root_account, root_account)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
+      end
+
+      it "sets the env var to false when FF is disabled" do
+        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        allow(root_account).to receive(:feature_enabled?).and_return(false)
+        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
+        controller.instance_variable_set(:@domain_root_account, root_account)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+      end
     end
 
     it "sets the contextual timezone from the context" do
@@ -722,9 +742,67 @@ RSpec.describe ApplicationController do
         end
       end
 
+      context 'return_url' do
+        before do
+          controller.instance_variable_set(:"@context", course)
+          content_tag.update_attributes!(context: assignment_model)
+          allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
+          allow(controller).to receive(:render)
+          allow(controller).to receive(:lti_launch_params)
+          allow(controller).to receive(:require_user).and_return(true)
+          allow(controller).to receive(:named_context_url).and_return('named_context_url')
+          allow(controller).to receive(:polymorphic_url).and_return('host/quizzes')
+        end
+
+        it 'is set to quizzes page when launched from quizzes page' do
+          allow(controller.request).to receive(:referer).and_return('courses/1/quizzes')
+          controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'host/quizzes'
+        end
+
+        it 'is set to quizzes page when launched from assignments/new' do
+          allow(controller.request).to receive(:referer).and_return('assignments/new')
+          controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'host/quizzes'
+        end
+
+        it 'is not set to quizzes page when flag is disabled' do
+          allow(controller.request).to receive(:referer).and_return('assignments/new')
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'named_context_url'
+        end
+
+        it 'is not set to quizzes page when there is no referer' do
+          allow(controller.request).to receive(:referer).and_return(nil)
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'named_context_url'
+        end
+
+        it 'is set using named_context_url when not launched from quizzes page' do
+          allow(controller.request).to receive(:referer).and_return('assignments')
+          controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'named_context_url'
+        end
+
+        it 'is set using named_context_url when not launched from quizzes page and referrer includes "quiz"' do
+          allow(controller.request).to receive(:referer).and_return('somequizzessub.com/assignments')
+          controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:return_url]).to eq 'named_context_url'
+        end
+      end
+
       it 'returns the full path for the redirect url' do
         expect(controller).to receive(:named_context_url).with(course, :context_url, {:include_host => true})
-        expect(controller).to receive(:named_context_url).with(course, :context_external_content_success_url, 'external_tool_redirect', {:include_host => true}).and_return('wrong_url')
+        expect(controller).to receive(:named_context_url).with(
+          course,
+          :context_external_content_success_url,
+          'external_tool_redirect',
+          {:include_host => true}
+        ).and_return('wrong_url')
         allow(controller).to receive(:render)
         allow(controller).to receive_messages(js_env:[])
         controller.instance_variable_set(:"@context", course)
@@ -805,7 +883,20 @@ RSpec.describe ApplicationController do
       allow(controller).to receive(:polymorphic_url).and_return("http://example.com")
       external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
 
-      expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
+      expect(external_tools).to eq([{:id=>tool.id, :title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
+    end
+
+    it "doesn't return tools that are mapped to disabled feature flags" do
+      @course = course_model
+      tool = analytics_2_tool_factory(context: @course)
+
+      allow(controller).to receive(:polymorphic_url).and_return('http://example.com')
+      external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
+      expect(external_tools).not_to include({title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2})
+
+      @course.enable_feature!(:analytics_2)
+      external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
+      expect(external_tools).to include({:id=>tool.id, title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2})
     end
   end
 
@@ -847,7 +938,7 @@ RSpec.describe ApplicationController do
 
     it 'returns a hash' do
       hash = controller.external_tool_display_hash(@tool, :account_navigation)
-      left_over_keys = hash.keys - [:base_url, :title, :icon_url, :canvas_icon_class]
+      left_over_keys = hash.keys - [:id, :base_url, :title, :icon_url, :canvas_icon_class]
       expect(left_over_keys).to eq []
     end
 
@@ -1006,7 +1097,7 @@ describe ApplicationController do
         course_factory
         student_in_course(:user => @user, :course => @course)
         expect(@course).to_not be_available
-        expect(@user.cached_current_enrollments).to be_empty
+        expect(@user.cached_currentish_enrollments).to be_empty
         @other_group = group_model(:context => @course)
         group_model(:context => @course)
         @group.add_user(@user)
@@ -1100,7 +1191,8 @@ describe ApplicationController do
         client_ip: '0.0.0.0',
         producer: 'canvas',
         url: 'http://test.host',
-        http_method: 'GET'
+        http_method: 'GET',
+        referrer: nil
       }
     end
 
@@ -1121,6 +1213,15 @@ describe ApplicationController do
       controller.instance_variable_set(:@context, course_model(sis_source_id: 'banana'))
       controller.send(:setup_live_events_context)
       expect(LiveEvents.get_context[:context_sis_source_id]).to eq 'banana'
+    end
+
+    context "when there is a HTTP referrer" do
+      it "includes the referer in 'referrer' (two 'r's)" do
+        url = 'http://example.com/some-referer-url'
+        controller.request.headers['HTTP_REFERER'] = url
+        controller.send(:setup_live_events_context)
+        expect(LiveEvents.get_context).to eq(non_conditional_values.merge(referrer: url))
+      end
     end
 
     context 'when a domain_root_account exists' do

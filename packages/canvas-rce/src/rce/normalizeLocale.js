@@ -20,96 +20,96 @@
 // locales that canvas now sends. old locales absent from this mapping (e.g.
 // pt-BR) didn't change.
 const mapping = {
-  "ar-SA": "ar",
-  "da-DK": "da",
-  "de-DE": "de",
-  "en-US": "en",
-  "es-ES": "es",
-  "fa-IR": "fa",
-  "fr-FR": "fr",
-  "he-IL": "he",
-  "hy-AM": "hy",
-  "ja-JP": "ja",
-  "ko-KR": "ko",
-  "mi-NZ": "mi",
-  "nb-NO": "nb",
-  "nl-NL": "nl",
-  "pl-PL": "pl",
-  "pt-PT": "pt",
-  "ru-RU": "ru",
-  "sv-SE": "sv",
-  "tr-TR": "tr",
-  "zh-CN": "zh-Hans",
-  "zh-HK": "zh-Hant"
-};
+  'ar-SA': 'ar',
+  'da-DK': 'da',
+  'de-DE': 'de',
+  'en-US': 'en',
+  'es-ES': 'es',
+  'fa-IR': 'fa',
+  'fr-FR': 'fr',
+  'he-IL': 'he',
+  'hy-AM': 'hy',
+  'ja-JP': 'ja',
+  'ko-KR': 'ko',
+  'mi-NZ': 'mi',
+  'nb-NO': 'nb',
+  'nl-NL': 'nl',
+  'pl-PL': 'pl',
+  'pt-PT': 'pt',
+  'ru-RU': 'ru',
+  'sv-SE': 'sv',
+  'tr-TR': 'tr',
+  'zh-CN': 'zh-Hans',
+  'zh-HK': 'zh-Hant'
+}
 
 // these are the recognized standard and custom locales. remember to extend
 // this list when support for a locale is added.
 const recognized = [
-  "ar",
-  "bg",
-  "cs",
-  "cy",
-  "da",
-  "da-x-k12",
-  "de",
-  "el",
-  "en",
-  "en-AU",
-  "en-AU-x-unimelb",
-  "en-GB",
-  "en-GB-x-lbs",
-  "en-GB-x-ukhe",
-  "es",
-  "fa",
-  "fa-IR",
-  "fr",
-  "fr-CA",
-  "he",
-  "ht",
-  "hu",
-  "hy",
-  "is",
-  "it",
-  "ja",
-  "ko",
-  "mi",
-  "nb",
-  "nb-x-k12",
-  "nl",
-  "nn",
-  "pl",
-  "pt",
-  "pt-BR",
-  "ro",
-  "ru",
-  "sq",
-  "sr",
-  "sv",
-  "sv-x-k12",
-  "tr",
-  "uk",
-  "vi",
-  "zh-Hans",
-  "zh-Hant"
-];
+  'ar',
+  'bg',
+  'cs',
+  'cy',
+  'da',
+  'da-x-k12',
+  'de',
+  'el',
+  'en',
+  'en-AU',
+  'en-AU-x-unimelb',
+  'en-GB',
+  'en-GB-x-lbs',
+  'en-GB-x-ukhe',
+  'es',
+  'fa',
+  'fa-IR',
+  'fr',
+  'fr-CA',
+  'he',
+  'ht',
+  'hu',
+  'hy',
+  'is',
+  'it',
+  'ja',
+  'ko',
+  'mi',
+  'nb',
+  'nb-x-k12',
+  'nl',
+  'nn',
+  'pl',
+  'pt',
+  'pt-BR',
+  'ro',
+  'ru',
+  'sq',
+  'sr',
+  'sv',
+  'sv-x-k12',
+  'tr',
+  'uk',
+  'vi',
+  'zh-Hans',
+  'zh-Hant'
+]
 
 export default function normalizeLocale(locale) {
   if (!locale) {
     // default to english
-    return "en";
+    return 'en'
   } else if (recognized.indexOf(locale) >= 0) {
     // pass through recognized locales
-    return locale;
+    return locale
   } else if (mapping[locale]) {
     // translate recognized old-style locale to standard style
-    return mapping[locale];
-  } else if (locale.match("-x-")) {
+    return mapping[locale]
+  } else if (locale.match('-x-')) {
     // reduce unrecognized custom locales to their base locale
-    locale = locale.split("-x-")[0];
-    return normalizeLocale(locale);
+    locale = locale.split('-x-')[0]
+    return normalizeLocale(locale)
   } else {
     // default to english for unrecognized locales
-    return "en";
+    return 'en'
   }
 }

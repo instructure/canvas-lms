@@ -25,8 +25,8 @@ import I18n from 'i18n!discussions_v2'
 import moment from 'moment'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
-import {Text, Heading} from '@instructure/ui-elements/lib/components'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Text, Heading} from '@instructure/ui-elements'
 import update from 'immutability-helper'
 
 import select from '../../shared/select'
@@ -157,7 +157,7 @@ export class DiscussionsContainer extends Component {
       }
     })
     this.setState({discussions: newDiscussions.discussions})
-  };
+  }
 
   renderDiscussions() {
     return this.state.discussions.map(discussion =>
@@ -234,7 +234,7 @@ export const mapState = (state, ownProps) => {
     discussions: filteredDiscussions,
     permissions: state.permissions
   }
-  return Object.assign({}, ownProps, propsFromState)
+  return {...ownProps, ...propsFromState}
 }
 
 const mapDispatch = dispatch => {

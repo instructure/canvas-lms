@@ -15,21 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-layout'
-import {Spinner} from '@instructure/ui-elements'
-import {Text} from '@instructure/ui-elements'
-import ErrorAlert from '../ErrorAlert';
-import formatMessage from '../../format-message';
-import TV from './tv.svg';
+import {Spinner, Text} from '@instructure/ui-elements'
+
+import ErrorAlert from '../ErrorAlert'
+import formatMessage from '../../format-message'
+import TV from './tv.svg'
 
 export default class LoadingPastIndicator extends Component {
   static propTypes = {
-    loadingPast: PropTypes.bool,            // actively loading?
-    allPastItemsLoaded: PropTypes.bool,     // there are no more?
-    loadingError: PropTypes.string          // message if there was an error attempting to loaad items
+    loadingPast: PropTypes.bool, // actively loading?
+    allPastItemsLoaded: PropTypes.bool, // there are no more?
+    loadingError: PropTypes.string // message if there was an error attempting to loaad items
   }
+
   static defaultProps = {
     loadingPast: false,
     allPastItemsLoaded: false,
@@ -39,7 +40,7 @@ export default class LoadingPastIndicator extends Component {
   // Don't try to animate this component here. If we want this to animate, it should be coordinated
   // with other animations in the dynamic ui manager.
 
-  renderError () {
+  renderError() {
     if (this.props.loadingError) {
       // Show an Alert for the user, while including the underlying root cause error
       // in a hidden div in case we need to know what it was
@@ -49,11 +50,11 @@ export default class LoadingPastIndicator extends Component {
             {formatMessage('Error loading past items')}
           </ErrorAlert>
         </div>
-      );
+      )
     }
   }
 
-  renderNoMore () {
+  renderNoMore() {
     if (this.props.allPastItemsLoaded) {
       return (
         <View as="div" padding="small" textAlign="center">
@@ -64,33 +65,41 @@ export default class LoadingPastIndicator extends Component {
             {formatMessage('Beginning of Your To-Do History')}
           </Text>
           <Text size="medium" as="div">
-            {formatMessage('You\'ve scrolled back to your very first To-Do!')}
+            {formatMessage("You've scrolled back to your very first To-Do!")}
           </Text>
         </View>
-      );
+      )
     }
   }
 
-  renderLoading () {
+  renderLoading() {
     if (this.props.loadingPast && !this.props.allPastItemsLoaded) {
       return (
         <View as="div" padding="medium small small small" textAlign="center">
-          <Spinner size="small" margin="0 x-small 0 0" renderTitle={() => formatMessage('Loading past items')}/>
+          <Spinner
+            size="small"
+            margin="0 x-small 0 0"
+            renderTitle={() => formatMessage('Loading past items')}
+          />
           <Text size="small" color="secondary">
             {formatMessage('Loading past items')}
           </Text>
         </View>
-      );
+      )
     }
   }
 
-  render () {
+  render() {
     return (
-      <div ref={(elt) => { this.rootDiv = elt; }}>
+      <div
+        ref={elt => {
+          this.rootDiv = elt
+        }}
+      >
         {this.renderError()}
         {this.renderNoMore()}
         {this.renderLoading()}
       </div>
-    );
+    )
   }
 }

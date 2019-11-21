@@ -1,0 +1,17 @@
+<% assignment = asset.assignment %>
+
+<% define_content :link do %>
+  <%= polymorphic_url([assignment.context, assignment, asset]) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t "Submission Posted: %{title}, %{course}", title: assignment.title, course: assignment.context.name %>
+<% end %>
+
+<%= t <<-BODY, title: assignment.title, course: assignment.context.name, url: content(:link)
+Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
+
+Your can view it here:
+%{url}
+BODY
+%>

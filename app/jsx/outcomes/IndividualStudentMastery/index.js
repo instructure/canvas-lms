@@ -19,14 +19,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!IndividualStudentMasteryIndex'
-import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
-import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Flex} from '@instructure/ui-layout'
+import {List, Spinner, Text} from '@instructure/ui-elements'
 import natcompare from 'compiled/util/natcompare'
 import OutcomeGroup from './OutcomeGroup'
 import fetchOutcomes from './fetchOutcomes'
-import { Set } from 'immutable'
+import {Set} from 'immutable'
 import * as shapes from './shapes'
 
 class IndividualStudentMastery extends React.Component {
@@ -42,19 +40,19 @@ class IndividualStudentMastery extends React.Component {
     outcomeProficiency: null
   }
 
-  constructor () {
+  constructor() {
     super()
-    this.state = { loading: true, error: null, expandedGroups: Set(), expandedOutcomes: Set() }
+    this.state = {loading: true, error: null, expandedGroups: Set(), expandedOutcomes: Set()}
   }
 
-  componentDidMount () {
-    const { courseId, studentId } = this.props
+  componentDidMount() {
+    const {courseId, studentId} = this.props
     return fetchOutcomes(courseId, studentId)
-      .then(({ outcomeGroups, outcomes }) => {
-        this.setState({ outcomeGroups, outcomes })
+      .then(({outcomeGroups, outcomes}) => {
+        this.setState({outcomeGroups, outcomes})
       })
-      .then(() => this.setState({ loading: false }))
-      .catch((e) => this.setState({ loading: false, error: e }))
+      .then(() => this.setState({loading: false}))
+      .catch(e => this.setState({loading: false, error: e}))
   }
 
   onElementExpansionChange = (type, id, newState) => {
@@ -65,8 +63,10 @@ class IndividualStudentMastery extends React.Component {
         groups = groups.add(id)
       } else {
         groups = groups.delete(id)
-        const idsToRemove = this.state.outcomes.filter((o) => o.groupId === id).map((o) => o.expansionId)
-        outcomes = outcomes.filterNot((oid) => idsToRemove.includes(oid))
+        const idsToRemove = this.state.outcomes
+          .filter(o => o.groupId === id)
+          .map(o => o.expansionId)
+        outcomes = outcomes.filterNot(oid => idsToRemove.includes(oid))
       }
     } else if (type === 'outcome') {
       if (newState) {
@@ -75,90 +75,105 @@ class IndividualStudentMastery extends React.Component {
         outcomes = outcomes.delete(id)
       }
     }
-    this.setState({
-      expandedGroups: groups,
-      expandedOutcomes: outcomes
-    }, () => this.notifyExpansionChange())
+    this.setState(
+      {
+        expandedGroups: groups,
+        expandedOutcomes: outcomes
+      },
+      () => this.notifyExpansionChange()
+    )
   }
 
-  contract () {
-    this.setState({
-      expandedGroups: Set(),
-      expandedOutcomes: Set()
-    }, () => this.notifyExpansionChange())
-}
-
-  expand () {
-    this.setState({
-      expandedGroups: Set(this.state.outcomeGroups.map((g) => g.id)),
-      expandedOutcomes: Set(this.state.outcomes.map((o) => o.expansionId))
-    }, () => this.notifyExpansionChange())
+  contract() {
+    this.setState(
+      {
+        expandedGroups: Set(),
+        expandedOutcomes: Set()
+      },
+      () => this.notifyExpansionChange()
+    )
   }
 
-  notifyExpansionChange () {
+  expand() {
+    this.setState(
+      {
+        expandedGroups: Set(this.state.outcomeGroups.map(g => g.id)),
+        expandedOutcomes: Set(this.state.outcomes.map(o => o.expansionId))
+      },
+      () => this.notifyExpansionChange()
+    )
+  }
+
+  notifyExpansionChange() {
     this.props.onExpansionChange(this.anyExpanded(), this.anyContracted())
   }
 
-  anyExpanded () {
+  anyExpanded() {
     return this.state.expandedGroups.size > 0 || this.state.expandedOutcomes.size > 0
   }
 
-  anyContracted () {
-    return this.state.outcomeGroups.length > this.state.expandedGroups.size
-      || this.state.outcomes.length > this.state.expandedOutcomes.size
+  anyContracted() {
+    return (
+      this.state.outcomeGroups.length > this.state.expandedGroups.size ||
+      this.state.outcomes.length > this.state.expandedOutcomes.size
+    )
   }
 
-  renderLoading () {
+  renderLoading() {
     return (
       <Flex justifyItems="center" alignItems="center" padding="medium">
-        <FlexItem><Spinner size="large" title={I18n.t('Loading outcome results')} /></FlexItem>
+        <Flex.Item>
+          <Spinner size="large" renderTitle={I18n.t('Loading outcome results')} />
+        </Flex.Item>
       </Flex>
     )
   }
 
-  renderError () {
+  renderError() {
     return (
       <Flex justifyItems="start" alignItems="center" padding="medium 0">
-        <FlexItem><Text color="error">{ I18n.t('An error occurred loading outcomes data.') }</Text></FlexItem>
+        <Flex.Item>
+          <Text color="error">{I18n.t('An error occurred loading outcomes data.')}</Text>
+        </Flex.Item>
       </Flex>
     )
   }
 
-  renderEmpty () {
+  renderEmpty() {
     return (
       <Flex justifyItems="start" alignItems="center" padding="medium 0">
-        <FlexItem><Text>{ I18n.t('There are no outcomes in the course.') }</Text></FlexItem>
+        <Flex.Item>
+          <Text>{I18n.t('There are no outcomes in the course.')}</Text>
+        </Flex.Item>
       </Flex>
     )
   }
 
-  renderGroups () {
-    const { outcomeGroups, outcomes } = this.state
-    const { outcomeProficiency } = this.props
+  renderGroups() {
+    const {outcomeGroups, outcomes} = this.state
+    const {outcomeProficiency} = this.props
     return (
       <div>
         <List variant="unstyled">
-          {
-            outcomeGroups.sort(natcompare.byKey('title')).map((outcomeGroup) => (
-              <ListItem key={outcomeGroup.id}>
-                <OutcomeGroup
-                  outcomeGroup={outcomeGroup}
-                  outcomes={outcomes.filter((o) => (o.groupId.toString() === outcomeGroup.id.toString() ))}
-                  expanded={this.state.expandedGroups.has(outcomeGroup.id)}
-                  expandedOutcomes={this.state.expandedOutcomes}
-                  onExpansionChange={this.onElementExpansionChange}
-                  outcomeProficiency={outcomeProficiency}
-               />
-              </ListItem>
-            ))
-          }
+          {outcomeGroups.sort(natcompare.byKey('title')).map(outcomeGroup => (
+            <List.Item key={outcomeGroup.id}>
+              <OutcomeGroup
+                outcomeGroup={outcomeGroup}
+                outcomes={outcomes.filter(o => o.groupId.toString() === outcomeGroup.id.toString())}
+                expanded={this.state.expandedGroups.has(outcomeGroup.id)}
+                expandedOutcomes={this.state.expandedOutcomes}
+                onExpansionChange={this.onElementExpansionChange}
+                outcomeProficiency={outcomeProficiency}
+              />
+            </List.Item>
+          ))}
         </List>
       </div>
     )
   }
 
-  render () {
-    const { error, loading, outcomeGroups } = this.state
+  render() {
+    const {error, loading, outcomeGroups} = this.state
 
     if (loading) {
       return this.renderLoading()

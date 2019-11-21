@@ -36,6 +36,7 @@ describe DiscussionTopic do
     opts.reverse_merge!({
       :workflow_state => "active"
     })
+    topic.sections_changed = true
     topic.is_section_specific = true
     topic.discussion_topic_section_visibilities <<
       DiscussionTopicSectionVisibility.new(
@@ -298,6 +299,18 @@ describe DiscussionTopic do
 
     it "should be visible to students when topic is not locked" do
       expect(@topic.visible_for?(@student)).to be_truthy
+    end
+
+    it 'should clear the context modules cache on section change' do
+      context_module = @course.context_modules.create!(name: 'some module')
+      context_module.add_item(type: 'discussion_topic', id: @topic.id)
+      context_module.updated_at = 1.day.ago
+      context_module.save!
+      last_updated_at = context_module.updated_at
+      add_section_to_topic(@topic, @course.course_sections.create!)
+      @topic.save!
+      context_module.reload
+      expect(last_updated_at).not_to eq context_module.updated_at
     end
 
     it "should be visible to students when topic delayed_post_at is in the future" do
@@ -606,11 +619,13 @@ describe DiscussionTopic do
   describe "allow_student_discussion_topics setting" do
 
     before(:once) do
-      @topic = @course.discussion_topics.create!(:user => @teacher)
+      @topic = @course.discussion_topics.create!(:user => @teacher, :unlock_at => 1.week.from_now)
+      @admin = account_admin_user(:account => @course.root_account)
     end
 
     it "should allow students to create topics by default" do
       expect(@topic.check_policy(@teacher)).to include :create
+      expect(@topic.check_policy(@admin)).to include :create
       expect(@topic.check_policy(@student)).to include :create
       expect(@topic.check_policy(@course.student_view_student)).to include :create
     end
@@ -620,6 +635,7 @@ describe DiscussionTopic do
       @course.save!
       @topic.reload
       expect(@topic.check_policy(@teacher)).to include :create
+      expect(@topic.check_policy(@admin)).to include :create
       expect(@topic.check_policy(@student)).not_to include :create
       expect(@topic.check_policy(@course.student_view_student)).not_to include :create
     end

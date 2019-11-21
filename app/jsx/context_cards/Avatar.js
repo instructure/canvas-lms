@@ -19,9 +19,7 @@
 import I18n from 'i18n!student_context_trayAvatar'
 import React from 'react'
 import PropTypes from 'prop-types'
-import InstUIAvatar from '@instructure/ui-elements/lib/components/Avatar'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Link from '@instructure/ui-elements/lib/components/Link'
+import {Avatar as InstUIAvatar, Text, Link} from '@instructure/ui-elements'
 
 class Avatar extends React.Component {
   static propTypes = {
@@ -31,39 +29,33 @@ class Avatar extends React.Component {
       short_name: PropTypes.string,
       _id: PropTypes.string
     }).isRequired,
-    courseId: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number
-    ]).isRequired,
-    canMasquerade: PropTypes.bool.isRequired,
+    courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    canMasquerade: PropTypes.bool.isRequired
   }
 
-  render () {
+  render() {
     const {user, courseId, canMasquerade} = this.props
 
     if (Object.keys(user).includes('avatar_url')) {
-      const name = user.short_name || user.name || 'user';
+      const name = user.short_name || user.name || 'user'
       return (
         <div className="StudentContextTray__Avatar">
-          <Link href={`/courses/${this.props.courseId}/users/${user._id}`} aria-label={I18n.t('Go to %{name}\'s profile', {name})}>
-            <InstUIAvatar
-              size="x-large"
-              name={name}
-              src={user.avatar_url}
-            />
+          <Link
+            href={`/courses/${this.props.courseId}/users/${user._id}`}
+            aria-label={I18n.t("Go to %{name}'s profile", {name})}
+          >
+            <InstUIAvatar size="x-large" name={name} src={user.avatar_url} />
           </Link>
-          {
-            canMasquerade && (
-              <Text size="x-small" weight="bold" as="div">
-                <a
-                  href={`/courses/${courseId}?become_user_id=${user._id}`}
-                  aria-label={I18n.t('Act as %{name}', { name: user.short_name })}
-                >
-                  {I18n.t('Act as User')}
-                </a>
-              </Text>
-            )
-          }
+          {canMasquerade && (
+            <Text size="x-small" weight="bold" as="div">
+              <a
+                href={`/courses/${courseId}?become_user_id=${user._id}`}
+                aria-label={I18n.t('Act as %{name}', {name: user.short_name})}
+              >
+                {I18n.t('Act as User')}
+              </a>
+            </Text>
+          )}
         </div>
       )
     }

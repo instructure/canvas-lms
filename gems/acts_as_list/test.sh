@@ -2,4 +2,4 @@
 set -e
 
 bundle check || bundle install
-bundle exec ruby test/list_test.rb
+bundle exec rspec spec

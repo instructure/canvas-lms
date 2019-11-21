@@ -36,7 +36,6 @@ RichContentEditor.preloadRemoteModule()
 // #
 // View for editing a calendar event on it's own page
 export default class EditCalendarEventView extends Backbone.View {
-
   initialize() {
     this.render = this.render.bind(this)
     this.attachKeyboardShortcuts = this.attachKeyboardShortcuts.bind(this)
@@ -51,7 +50,7 @@ export default class EditCalendarEventView extends Backbone.View {
     super.initialize(...arguments)
     this.model.fetch().done(() => {
       const picked_params = _.pick(
-        Object.assign({}, this.model.attributes, deparam()),
+        {...this.model.attributes, ...deparam()},
         'start_at',
         'start_date',
         'start_time',
@@ -152,7 +151,8 @@ export default class EditCalendarEventView extends Backbone.View {
     if (confirm(msg)) {
       return this.$el.disableWhileLoading(
         this.model.destroy({
-          success: () => this.redirectWithMessage(
+          success: () =>
+            this.redirectWithMessage(
               I18n.t('event_deleted', '%{event_title} deleted successfully', {
                 event_title: this.model.get('title')
               })
@@ -170,10 +170,12 @@ export default class EditCalendarEventView extends Backbone.View {
     )
     return $('.show_if_using_sections input').prop('disabled', !this.model.get('use_section_dates'))
   }
+
   toggleUseSectionDates(e) {
     this.model.set('use_section_dates', !this.model.get('use_section_dates'))
     return this.updateRemoveChildEvents(e)
   }
+
   toggleHtmlView(event) {
     if (event != null) event.preventDefault()
 
@@ -230,7 +232,8 @@ export default class EditCalendarEventView extends Backbone.View {
           $dialog.dialog('close')
           this.$el.disableWhileLoading(
             this.model.save(eventData, {
-              success: () => this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully'))
+              success: () =>
+                this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully'))
             })
           )
           return $dialog.remove()
@@ -305,6 +308,7 @@ export default class EditCalendarEventView extends Backbone.View {
 
     return data
   }
+
   static title() {
     return super.title('event', 'Event')
   }

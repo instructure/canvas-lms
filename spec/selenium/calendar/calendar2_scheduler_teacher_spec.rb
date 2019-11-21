@@ -37,7 +37,7 @@ describe "scheduler" do
 
     before(:each) do
       user_session(@teacher)
-      make_full_screen
+
     end
 
     it "should bring up 'edit appointment group' modal when clicking 'create an appointment group' scheduler button" do

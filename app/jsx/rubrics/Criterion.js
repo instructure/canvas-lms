@@ -18,31 +18,31 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import Dialog from '@instructure/ui-a11y/lib/components/Dialog'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconOutcomes from '@instructure/ui-icons/lib/Line/IconOutcomes'
-import Modal, { ModalHeader, ModalBody } from '@instructure/ui-overlays/lib/components/Modal'
+import {Dialog, ScreenReaderContent} from '@instructure/ui-a11y'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Heading, Text} from '@instructure/ui-elements'
+import {IconOutcomesLine} from '@instructure/ui-icons'
+import {Modal} from '@instructure/ui-overlays'
 import I18n from 'i18n!edit_rubricCriterion'
 
 import numberHelper from 'jsx/shared/helpers/numberHelper'
-import { assessmentShape, criterionShape } from './types'
+import {assessmentShape, criterionShape} from './types'
 import CommentButton from './CommentButton'
-import Comments, { CommentText } from './Comments'
+import Comments, {CommentText} from './Comments'
 import Points from './Points'
 import Ratings from './Ratings'
 
 const OutcomeIcon = () => (
   <span>
-    <IconOutcomes />&nbsp;
-    <ScreenReaderContent>{I18n.t('This criterion is linked to a Learning Outcome')}</ScreenReaderContent>
+    <IconOutcomesLine />
+    &nbsp;
+    <ScreenReaderContent>
+      {I18n.t('This criterion is linked to a Learning Outcome')}
+    </ScreenReaderContent>
   </span>
 )
 
-const LongDescription = ({ showLongDescription }) => (
+const LongDescription = ({showLongDescription}) => (
   <Button fluidWidth variant="link" onClick={() => showLongDescription()}>
     <Text size="x-small">{I18n.t('view longer description')}</Text>
   </Button>
@@ -51,35 +51,29 @@ LongDescription.propTypes = {
   showLongDescription: PropTypes.func.isRequired
 }
 
-const LongDescriptionDialog = ({ open, close, longDescription }) => {
+const LongDescriptionDialog = ({open, close, longDescription}) => {
   const modalHeader = I18n.t('Criterion Long Description')
   return (
     <Modal
-       open={open}
-       onDismiss={close}
-       size="medium"
-       label={modalHeader}
-       shouldCloseOnDocumentClick
+      open={open}
+      onDismiss={close}
+      size="medium"
+      label={modalHeader}
+      shouldCloseOnDocumentClick
     >
-      <ModalHeader>
-        <CloseButton
-          placement="end"
-          offset="medium"
-          variant="icon"
-          onClick={close}
-        >
+      <Modal.Header>
+        <CloseButton placement="end" offset="medium" variant="icon" onClick={close}>
           Close
         </CloseButton>
         <Heading>{modalHeader}</Heading>
-      </ModalHeader>
-      <ModalBody>
+      </Modal.Header>
+      <Modal.Body>
         <Text lineHeight="double">
-          <div dangerouslySetInnerHTML={{ __html: longDescription }} />
+          <div dangerouslySetInnerHTML={{__html: longDescription}} />
         </Text>
-      </ModalBody>
+      </Modal.Body>
     </Modal>
   )
-  /* eslint-enable react/no-danger */
 }
 LongDescriptionDialog.propTypes = {
   close: PropTypes.func.isRequired,
@@ -90,28 +84,28 @@ LongDescriptionDialog.defaultProps = {
   open: false
 }
 
-const Threshold = ({ threshold }) => (
+const Threshold = ({threshold}) => (
   <Text size="x-small" weight="normal">
-    {
-      I18n.t('threshold: %{pts}', {
-        pts: I18n.toNumber(threshold, { precision: 2, strip_insignificant_zeros: true } )
-      })
-    }
+    {I18n.t('threshold: %{pts}', {
+      pts: I18n.toNumber(threshold, {precision: 2, strip_insignificant_zeros: true})
+    })}
   </Text>
 )
-Threshold.defaultProps = { threshold: null }
-Threshold.propTypes = { threshold: PropTypes.number }
+Threshold.defaultProps = {threshold: null}
+Threshold.propTypes = {threshold: PropTypes.number}
 
 export default class Criterion extends React.Component {
   state = {}
 
-  closeModal = () => { this.setState({ dialogOpen: false }) }
-
-  openModal = () => {
-    this.setState({ dialogOpen: true })
+  closeModal = () => {
+    this.setState({dialogOpen: false})
   }
 
-  render () {
+  openModal = () => {
+    this.setState({dialogOpen: true})
+  }
+
+  render() {
     const {
       allowExtraCredit,
       allowSavedComments,
@@ -125,23 +119,25 @@ export default class Criterion extends React.Component {
       hidePoints,
       hasPointsColumn
     } = this.props
-    const { dialogOpen } = this.state
+    const {dialogOpen} = this.state
     const isOutcome = criterion.learning_outcome_id !== undefined
     const useRange = criterion.criterion_use_range
     const ignoreForScoring = criterion.ignore_for_scoring
     const assessing = onAssessmentChange !== null && assessment !== null
-    const updatePoints = (tier) => {
+    const updatePoints = tier => {
       // Tier will be a string if entered directly from the point input field. In those situations,
       // the tier description and ID will be added based off the point value upon saving in the
       // rubric_association model
-      if (typeof tier === "string") {
-        tier = _.find(criterion.ratings, (rating) => rating.points.toString() === tier) || {points: tier}
+      if (typeof tier === 'string') {
+        tier = _.find(criterion.ratings, rating => rating.points.toString() === tier) || {
+          points: tier
+        }
       }
       const text = tier.points
       const value = numberHelper.parse(text)
       const valid = !Number.isNaN(value)
       onAssessmentChange({
-        points: { text, valid, value: valid ? value : undefined },
+        points: {text, valid, value: valid ? value : undefined},
         description: tier.description,
         id: tier.id
       })
@@ -149,8 +145,9 @@ export default class Criterion extends React.Component {
     const onPointChange = assessing ? updatePoints : undefined
 
     const pointsPossible = criterion.points
-    const pointsElement = () => (
-      (!hidePoints && !ignoreForScoring) && (
+    const pointsElement = () =>
+      !hidePoints &&
+      !ignoreForScoring && (
         <Points
           key="points"
           allowExtraCredit={!isOutcome || allowExtraCredit}
@@ -160,16 +157,10 @@ export default class Criterion extends React.Component {
           pointsPossible={pointsPossible}
         />
       )
-    )
 
-    const pointsComment = () => (
-      <CommentText key="comment" assessment={assessment} weight="light" />
-    )
+    const pointsComment = () => <CommentText key="comment" assessment={assessment} weight="light" />
 
-    const summaryFooter = () => [
-      pointsComment(),
-      pointsElement()
-    ]
+    const summaryFooter = () => [pointsComment(), pointsElement()]
 
     const commentRating = (
       <Comments
@@ -179,8 +170,8 @@ export default class Criterion extends React.Component {
         footer={isSummary ? pointsElement() : null}
         large={freeForm}
         savedComments={savedComments}
-        setSaveLater={(saveCommentsForLater) => onAssessmentChange({ saveCommentsForLater })}
-        setComments={(comments) => onAssessmentChange({ comments })}
+        setSaveLater={saveCommentsForLater => onAssessmentChange({saveCommentsForLater})}
+        setComments={comments => onAssessmentChange({comments})}
       />
     )
 
@@ -194,7 +185,9 @@ export default class Criterion extends React.Component {
       }
     }
 
-    const ratings = freeForm ? commentRating : (
+    const ratings = freeForm ? (
+      commentRating
+    ) : (
       <Ratings
         assessing={assessing}
         customRatings={customRatings}
@@ -211,13 +204,12 @@ export default class Criterion extends React.Component {
       />
     )
 
-    const editComments = () => onAssessmentChange({
-      commentFocus: true,
-      editComments: true
-    })
-    const commentButton = assessment !== null ? (
-      <CommentButton onClick={editComments} />
-    ) : null
+    const editComments = () =>
+      onAssessmentChange({
+        commentFocus: true,
+        editComments: true
+      })
+    const commentButton = assessment !== null ? <CommentButton onClick={editComments} /> : null
 
     const longDescription = criterion.long_description
     const threshold = criterion.mastery_points
@@ -232,32 +224,24 @@ export default class Criterion extends React.Component {
             </Text>
           </div>
           <div className="long-description">
-            {
-              longDescription !== "" ? (
-                <LongDescription showLongDescription={this.openModal} />
-              ) : null
-            }
+            {longDescription !== '' ? (
+              <LongDescription showLongDescription={this.openModal} />
+            ) : null}
             <LongDescriptionDialog
               close={this.closeModal}
               longDescription={longDescription}
               open={dialogOpen}
-              />
+            />
           </div>
-          {
-            !(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null
-          }
+          {!(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null}
         </th>
-        <td className="ratings">
-          {ratings}
-        </td>
-        {
-          hasPointsColumn && (
-            <td className="criterion_points">
-              {pointsElement()}
-              {assessing && !freeForm && !editingComments ? commentButton : null}
-            </td>
-          )
-        }
+        <td className="ratings">{ratings}</td>
+        {hasPointsColumn && (
+          <td className="criterion_points">
+            {pointsElement()}
+            {assessing && !freeForm && !editingComments ? commentButton : null}
+          </td>
+        )}
       </tr>
     )
   }

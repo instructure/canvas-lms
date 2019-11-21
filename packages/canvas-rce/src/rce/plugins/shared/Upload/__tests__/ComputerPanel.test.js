@@ -17,193 +17,205 @@
  */
 
 import React from 'react'
-import '@testing-library/jest-dom/extend-expect'
 import {render, fireEvent, waitForElement, cleanup} from '@testing-library/react'
-import {act} from 'react-dom/test-utils';
+import {act} from 'react-dom/test-utils'
 import ComputerPanel from '../ComputerPanel'
 
 afterEach(cleanup)
 
 describe('UploadFile: ComputerPanel', () => {
-    it('shows a failure message if the file is rejected', () => {
-      const notAnImageFile = new File(["foo"], "foo.txt", {
-        type: "text/plain",
-      });
-      const handleSetFile = jest.fn()
-      const handleSetHasUploadedFile = jest.fn()
-      const {getByLabelText, getByText} = render(<ComputerPanel theFile={null}
+  it('shows a failure message if the file is rejected', () => {
+    const notAnImageFile = new File(['foo'], 'foo.txt', {
+      type: 'text/plain'
+    })
+    const handleSetFile = jest.fn()
+    const handleSetHasUploadedFile = jest.fn()
+    const {getByLabelText, getByText} = render(
+      <ComputerPanel
+        theFile={null}
         setFile={handleSetFile}
         hasUploadedFile={false}
         setHasUploadedFile={handleSetHasUploadedFile}
         accept="image/*"
-        label="Upload File" />)
-      const dropZone = getByLabelText(/Upload File/, { selector: 'input' })
-      fireEvent.change(dropZone, {
-        target: {
-          files: [notAnImageFile]
-        }
-      })
-      expect(getByText('Invalid file type')).toBeVisible()
+        label="Upload File"
+      />
+    )
+    const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
+    fireEvent.change(dropZone, {
+      target: {
+        files: [notAnImageFile]
+      }
+    })
+    expect(getByText('Invalid file type')).toBeVisible()
+  })
+
+  it('accepts file files', () => {
+    const aFile = new File(['foo'], 'foo.png', {
+      type: 'image/png'
+    })
+    const handleSetFile = jest.fn()
+    const handleSetHasUploadedFile = jest.fn()
+    const {getByLabelText, queryByText} = render(
+      <ComputerPanel
+        theFile={null}
+        setFile={handleSetFile}
+        hasUploadedFile={false}
+        setHasUploadedFile={handleSetHasUploadedFile}
+        accept="image/*"
+        label="Upload File"
+      />
+    )
+    const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
+    fireEvent.change(dropZone, {
+      target: {
+        files: [aFile]
+      }
+    })
+    expect(queryByText('Invalid file type')).toBeNull()
+  })
+
+  it('clears error messages if a valid file is added', () => {
+    const notAnImageFile = new File(['foo'], 'foo.txt', {
+      type: 'text/plain'
+    })
+    const aFile = new File(['foo'], 'foo.png', {
+      type: 'image/png'
+    })
+    const handleSetFile = jest.fn()
+    const handleSetHasUploadedFile = jest.fn()
+    const {getByLabelText, getByText, queryByText} = render(
+      <ComputerPanel
+        theFile={null}
+        setFile={handleSetFile}
+        hasUploadedFile={false}
+        setHasUploadedFile={handleSetHasUploadedFile}
+        accept="image/*"
+        label="Upload File"
+      />
+    )
+    const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
+    fireEvent.change(dropZone, {
+      target: {
+        files: [notAnImageFile]
+      }
+    })
+    expect(getByText('Invalid file type')).toBeVisible()
+    fireEvent.change(dropZone, {
+      target: {
+        files: [aFile]
+      }
     })
 
-    it('accepts file files', () => {
-        const aFile = new File(["foo"], "foo.png", {
-          type: "image/png",
-        });
-        const handleSetFile = jest.fn()
-        const handleSetHasUploadedFile = jest.fn()
-        const {getByLabelText, queryByText} = render(<ComputerPanel theFile={null}
+    expect(queryByText('Invalid file type')).toBeNull()
+  })
+
+  describe('file preview', () => {
+    it('shows the image preview when hasUploadedFile is true for an image file', async () => {
+      const aFile = new File(['foo'], 'foo.png', {
+        type: 'image/png'
+      })
+      const handleSetFile = jest.fn()
+      const handleSetHasUploadedFile = jest.fn()
+      const {getByText, getByLabelText} = render(
+        <ComputerPanel
+          theFile={aFile}
           setFile={handleSetFile}
-          hasUploadedFile={false}
+          hasUploadedFile
           setHasUploadedFile={handleSetHasUploadedFile}
           accept="image/*"
-          label="Upload File" />)
-        const dropZone = getByLabelText(/Upload File/, { selector: 'input' })
-        fireEvent.change(dropZone, {
-          target: {
-            files: [aFile]
-          }
-        })
-        expect(queryByText('Invalid file type')).toBeNull()
+          label="Upload File"
+        />
+      )
+      expect(getByText('Generating preview...')).toBeInTheDocument()
+      const preview = await waitForElement(() => getByLabelText('foo.png image preview'))
+      expect(preview).toBeInTheDocument()
     })
 
-    it('clears error messages if a valid file is added', () => {
-      const notAnImageFile = new File(["foo"], "foo.txt", {
-        type: "text/plain",
-      });
-      const aFile = new File(["foo"], "foo.png", {
-        type: "image/png",
-      });
+    it('shows the text file preview when hasUploadedFile is true for a text file', async () => {
+      const aFile = new File(['foo'], 'foo.txt', {
+        type: 'text/plain'
+      })
       const handleSetFile = jest.fn()
       const handleSetHasUploadedFile = jest.fn()
-      const {getByLabelText, getByText, queryByText} = render(<ComputerPanel theFile={null}
-        setFile={handleSetFile}
-        hasUploadedFile={false}
-        setHasUploadedFile={handleSetHasUploadedFile}
-        accept="image/*"
-        label="Upload File" />)
-      const dropZone = getByLabelText(/Upload File/, { selector: 'input' })
-      fireEvent.change(dropZone, {
-        target: {
-          files: [notAnImageFile]
-        }
-      })
-      expect(getByText('Invalid file type')).toBeVisible()
-      fireEvent.change(dropZone, {
-        target: {
-          files: [aFile]
-        }
-      })
-
-      expect(queryByText('Invalid file type')).toBeNull()
+      const {getByText, getByLabelText} = render(
+        <ComputerPanel
+          theFile={aFile}
+          setFile={handleSetFile}
+          hasUploadedFile
+          setHasUploadedFile={handleSetHasUploadedFile}
+          accept="text/*"
+          label="Upload File"
+        />
+      )
+      expect(getByText('Generating preview...')).toBeInTheDocument()
+      const preview = await waitForElement(() => getByLabelText('foo.txt text preview'))
+      expect(preview).toBeInTheDocument()
     })
 
-    describe('file preview', () => {
-      it('shows the image preview when hasUploadedFile is true for an image file', async () => {
-        const aFile = new File(["foo"], "foo.png", {
-          type: "image/png",
-        });
-        const handleSetFile = jest.fn()
-        const handleSetHasUploadedFile = jest.fn()
-        const {getByText, getByLabelText} = render(
-          <ComputerPanel
-            theFile={aFile}
-            setFile={handleSetFile}
-            hasUploadedFile
-            setHasUploadedFile={handleSetHasUploadedFile}
-            accept="image/*"
-          />
-        )
-        expect(getByText('Generating preview...')).toBeInTheDocument()
-        const preview = await waitForElement(() => getByLabelText('foo.png image preview'))
-        expect(preview).toBeInTheDocument()
+    it('shows the generic file preview when hasUploadedFile is true for a file not an image or text', async () => {
+      const aFile = new File(['foo'], 'foo.pdf', {
+        type: 'application/pdf'
       })
-
-      it('shows the text file preview when hasUploadedFile is true for a text file', async () => {
-        const aFile = new File(["foo"], "foo.txt", {
-          type: "text/plain",
-        });
-        const handleSetFile = jest.fn()
-        const handleSetHasUploadedFile = jest.fn()
-        const {getByText, getByLabelText} = render(
-          <ComputerPanel
-            theFile={aFile}
-            setFile={handleSetFile}
-            hasUploadedFile
-            setHasUploadedFile={handleSetHasUploadedFile}
-            accept="text/*"
-            label="Upload File"
-          />
-        )
-        expect(getByText('Generating preview...')).toBeInTheDocument()
-        const preview = await waitForElement(() => getByLabelText('foo.txt text preview'))
-        expect(preview).toBeInTheDocument()
-      })
-
-      it('shows the generic file preview when hasUploadedFile is true for a file not an image or text', async () => {
-        const aFile = new File(["foo"], "foo.pdf", {
-          type: "application/pdf",
-        });
-        const handleSetFile = jest.fn()
-        const handleSetHasUploadedFile = jest.fn()
-        const {getByText, getByLabelText} = render(
-          <ComputerPanel
-            theFile={aFile}
-            setFile={handleSetFile}
-            hasUploadedFile
-            setHasUploadedFile={handleSetHasUploadedFile}
-            accept="text/*"
-            label="Upload File"
-          />
-        )
-        expect(getByText('Generating preview...')).toBeInTheDocument()
-        const preview = await waitForElement(() => getByLabelText('foo.pdf file icon'))
-        expect(preview).toBeInTheDocument()
-      })
-
-      it('clicking the trash button removes the file preview', async () => {
-        const aFile = new File(["foo"], "foo.txt", {
-          type: "text/plain",
-        });
-        const handleSetFile = jest.fn()
-        const handleSetHasUploadedFile = jest.fn()
-        const {getByText} = render(
-          <ComputerPanel
-            theFile={aFile}
-            setFile={handleSetFile}
-            hasUploadedFile
-            setHasUploadedFile={handleSetHasUploadedFile}
-            accept="text/*"
-            label="Upload File"
-          />
-        )
-        const clearButton = await waitForElement(() => getByText('Clear selected file'))
-        expect(clearButton).toBeInTheDocument()
-        act(() => {
-          fireEvent.click(clearButton)
-        })
-        expect(handleSetHasUploadedFile).toHaveBeenCalledWith(false)
-        expect(handleSetFile).toHaveBeenCalledWith(null)
-      })
-
-      it('Renders a video player preview if afile type is a video', async () => {
-        const aFile = new File(["foo"], "foo.mp4", {
-          type: "video/mp4",
-        });
-        const handleSetFile = jest.fn()
-        const handleSetHasUploadedFile = jest.fn()
-        const {getByText} = render(
-          <ComputerPanel
-            theFile={aFile}
-            setFile={handleSetFile}
-            hasUploadedFile
-            setHasUploadedFile={handleSetHasUploadedFile}
-            accept="mp4"
-            label="Upload File"
-          />
-        )
-        const playButton = await waitForElement(() => getByText('Play'))
-        expect(playButton).toBeInTheDocument()
-      })
+      const handleSetFile = jest.fn()
+      const handleSetHasUploadedFile = jest.fn()
+      const {getByText, getByLabelText} = render(
+        <ComputerPanel
+          theFile={aFile}
+          setFile={handleSetFile}
+          hasUploadedFile
+          setHasUploadedFile={handleSetHasUploadedFile}
+          accept="text/*"
+          label="Upload File"
+        />
+      )
+      expect(getByText('Generating preview...')).toBeInTheDocument()
+      const preview = await waitForElement(() => getByLabelText('foo.pdf file icon'))
+      expect(preview).toBeInTheDocument()
     })
+
+    it('clicking the trash button removes the file preview', async () => {
+      const aFile = new File(['foo'], 'foo.txt', {
+        type: 'text/plain'
+      })
+      const handleSetFile = jest.fn()
+      const handleSetHasUploadedFile = jest.fn()
+      const {getByText} = render(
+        <ComputerPanel
+          theFile={aFile}
+          setFile={handleSetFile}
+          hasUploadedFile
+          setHasUploadedFile={handleSetHasUploadedFile}
+          accept="text/*"
+          label="Upload File"
+        />
+      )
+      const clearButton = await waitForElement(() => getByText('Clear selected file'))
+      expect(clearButton).toBeInTheDocument()
+      act(() => {
+        fireEvent.click(clearButton)
+      })
+      expect(handleSetHasUploadedFile).toHaveBeenCalledWith(false)
+      expect(handleSetFile).toHaveBeenCalledWith(null)
+    })
+
+    it('Renders a video player preview if afile type is a video', async () => {
+      const aFile = new File(['foo'], 'foo.mp4', {
+        type: 'video/mp4'
+      })
+      const handleSetFile = jest.fn()
+      const handleSetHasUploadedFile = jest.fn()
+      const {getByText} = render(
+        <ComputerPanel
+          theFile={aFile}
+          setFile={handleSetFile}
+          hasUploadedFile
+          setHasUploadedFile={handleSetHasUploadedFile}
+          accept="mp4"
+          label="Upload File"
+        />
+      )
+      const playButton = await waitForElement(() => getByText('Play'))
+      expect(playButton).toBeInTheDocument()
+    })
+  })
 })

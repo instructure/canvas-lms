@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount, shallow } from 'enzyme'
+import {mount, shallow} from 'enzyme'
 import SyncChange from 'jsx/blueprint_courses/components/SyncChange'
 import getSampleData from '../getSampleData'
 import ReactDOM from 'react-dom'
@@ -26,7 +26,7 @@ import $ from 'jquery'
 QUnit.module('SyncChange component')
 
 const defaultProps = () => ({
-  change: getSampleData().history[0].changes[0],
+  change: getSampleData().history[0].changes[0]
 })
 
 test('renders the SyncChange component', () => {
@@ -38,7 +38,7 @@ test('renders the SyncChange component', () => {
 test('renders the SyncChange component expanded when state.isExpanded = true', () => {
   const props = {...defaultProps(), isLoadingHistory: true}
   const tree = shallow(<SyncChange {...props} />)
-  tree.setState({ isExpanded: true })
+  tree.setState({isExpanded: true})
   const node = tree.find('.bcs__history-item__change__expanded')
   ok(node.exists())
 })
@@ -63,14 +63,14 @@ test('displays the correct exception count', () => {
 test('displays the correct exception types', () => {
   const props = defaultProps()
   props.isLoadingHistory = true
-  ReactDOM.render(<SyncChange {...props} />, document.getElementById("fixtures"))
-  $(".bcs__history-item__content button").click()
-  const exceptionGroups = $("li.bcs__history-item__change-exceps__group")
+  ReactDOM.render(<SyncChange {...props} />, document.getElementById('fixtures'))
+  $('.bcs__history-item__content button').click()
+  const exceptionGroups = $('li.bcs__history-item__change-exceps__group')
   let exceptionGroup = exceptionGroups.first()
-  equal(exceptionGroup.text(), "Points changed exceptions:Default Term - Course 1")
+  equal(exceptionGroup.text(), 'Points changed exceptions:Default Term - Course 1')
   exceptionGroup = $(exceptionGroups[1])
-  equal(exceptionGroup.text(), "Content changed exceptions:Default Term - Course 5")
+  equal(exceptionGroup.text(), 'Content changed exceptions:Default Term - Course 5')
   exceptionGroup = $(exceptionGroups[2])
-  equal(exceptionGroup.text(), "Deleted content exceptions:Default Term - Course 56")
-  ReactDOM.unmountComponentAtNode(document.getElementById("fixtures"))
+  equal(exceptionGroup.text(), 'Deleted content exceptions:Default Term - Course 56')
+  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })

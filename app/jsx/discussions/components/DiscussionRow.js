@@ -29,32 +29,29 @@ import cx from 'classnames'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
 
-import Badge from '@instructure/ui-elements/lib/components/Badge'
-import View from '@instructure/ui-layout/lib/components/View'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-
-import IconAssignmentLine from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconBookmarkLine from '@instructure/ui-icons/lib/Line/IconBookmark'
-import IconBookmarkSolid from '@instructure/ui-icons/lib/Solid/IconBookmark'
-import IconCopySolid from '@instructure/ui-icons/lib/Solid/IconCopy'
-import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
-import IconDuplicate from '@instructure/ui-icons/lib/Line/IconDuplicate'
-import IconLock from '@instructure/ui-icons/lib/Line/IconLock'
-import IconLtiLine from '@instructure/ui-icons/lib/Line/IconLti'
-import IconPeerReviewLine from '@instructure/ui-icons/lib/Line/IconPeerReview'
-import IconPinLine from '@instructure/ui-icons/lib/Line/IconPin'
-import IconPinSolid from '@instructure/ui-icons/lib/Solid/IconPin'
-import IconPublishSolid from '@instructure/ui-icons/lib/Solid/IconPublish'
-import IconTrashSolid from '@instructure/ui-icons/lib/Solid/IconTrash'
-import IconUnlock from '@instructure/ui-icons/lib/Line/IconUnlock'
-import IconUnpublishedLine from '@instructure/ui-icons/lib/Line/IconUnpublished'
-import IconUpdownLine from '@instructure/ui-icons/lib/Line/IconUpdown'
-import IconUser from '@instructure/ui-icons/lib/Line/IconUser'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
+import {Badge, Heading, Pill, Text} from '@instructure/ui-elements'
+import {View, Grid} from '@instructure/ui-layout'
+import {
+  IconAssignmentLine,
+  IconBookmarkLine,
+  IconBookmarkSolid,
+  IconCopySolid,
+  IconDragHandleLine,
+  IconDuplicateLine,
+  IconLockLine,
+  IconLtiLine,
+  IconPeerReviewLine,
+  IconPinLine,
+  IconPinSolid,
+  IconPublishSolid,
+  IconTrashSolid,
+  IconUnlockLine,
+  IconUnpublishedLine,
+  IconUpdownLine,
+  IconUserLine
+} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Menu} from '@instructure/ui-menu'
 
 import DiscussionModel from 'compiled/models/DiscussionTopic'
 import LockIconView from 'compiled/views/LockIconView'
@@ -115,8 +112,8 @@ export class DiscussionRow extends Component {
     connectDropTarget: func,
     contextType: string.isRequired,
     deleteDiscussion: func.isRequired,
-    setCopyToOpen: func.isRequired,
-    setSendToOpen: func.isRequired,
+    setCopyTo: func.isRequired,
+    setSendTo: func.isRequired,
     discussion: discussionShape.isRequired,
     discussionTopicMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
     displayDeleteMenuItem: bool.isRequired,
@@ -217,10 +214,19 @@ export class DiscussionRow extends Component {
         )
         break
       case 'copyTo':
-        this.props.setCopyToOpen(true)
+        this.props.setCopyTo({
+          open: true,
+          selection: {discussion_topics: [this.props.discussion.id]}
+        })
         break
       case 'sendTo':
-        this.props.setSendToOpen(true)
+        this.props.setSendTo({
+          open: true,
+          selection: {
+            content_type: 'discussion_topic',
+            content_id: this.props.discussion.id
+          }
+        })
         break
 
       case 'masterypaths':
@@ -421,14 +427,14 @@ export class DiscussionRow extends Component {
   }
 
   createMenuItem = (itemKey, visibleItemLabel, screenReaderContent) => (
-    <MenuItem
+    <Menu.Item
       key={itemKey}
       value={{action: itemKey, id: this.props.discussion.id}}
       id={`${itemKey}-discussion-menu-option`}
     >
       {visibleItemLabel}
       <ScreenReaderContent>{screenReaderContent}</ScreenReaderContent>
-    </MenuItem>
+    </Menu.Item>
   )
 
   renderMenuToolIcon(menuTool) {
@@ -466,7 +472,7 @@ export class DiscussionRow extends Component {
       const screenReaderContent = this.props.discussion.locked
         ? I18n.t('Open discussion %{title} for comments', {title: discussionTitle})
         : I18n.t('Close discussion %{title} for comments', {title: discussionTitle})
-      const icon = this.props.discussion.locked ? <IconUnlock /> : <IconLock />
+      const icon = this.props.discussion.locked ? <IconUnlockLine /> : <IconLockLine />
       menuList.push(
         this.createMenuItem(
           'togglelocked',
@@ -519,20 +525,20 @@ export class DiscussionRow extends Component {
         this.createMenuItem(
           'sendTo',
           <span aria-hidden="true">
-            <IconUser />
+            <IconUserLine />
             &nbsp;&nbsp;{I18n.t('Send To...')}
           </span>,
-          I18n.t('Send {%title} to user', {title: discussionTitle})
+          I18n.t('Send %{title} to user', {title: discussionTitle})
         )
       )
       menuList.push(
         this.createMenuItem(
           'copyTo',
           <span aria-hidden="true">
-            <IconDuplicate />
+            <IconDuplicateLine />
             &nbsp;&nbsp;{I18n.t('Copy To...')}
           </span>,
-          I18n.t('Copy {%title} to course', {title: discussionTitle})
+          I18n.t('Copy %{title} to course', {title: discussionTitle})
         )
       )
     }
@@ -551,7 +557,7 @@ export class DiscussionRow extends Component {
     if (this.props.discussionTopicMenuTools.length > 0) {
       this.props.discussionTopicMenuTools.forEach(menuTool => {
         menuList.push(
-          <MenuItem
+          <Menu.Item
             key={menuTool.base_url}
             value={{
               action: 'ltiMenuTool',
@@ -563,7 +569,7 @@ export class DiscussionRow extends Component {
           >
             <span aria-hidden="true">{this.renderMenuToolIcon(menuTool)}</span>
             <ScreenReaderContent>{menuTool.title}</ScreenReaderContent>
-          </MenuItem>
+          </Menu.Item>
         )
       })
     }
@@ -762,26 +768,26 @@ export class DiscussionRow extends Component {
             <span className="ic-drag-handle-container">{this.renderIcon()}</span>
             <span className="ic-discussion-content-container">
               <Grid startAt="medium" vAlign="middle" rowSpacing="none" colSpacing="none">
-                <GridRow vAlign="middle">
-                  <GridCol vAlign="middle" textAlign="start">
+                <Grid.Row vAlign="middle">
+                  <Grid.Col vAlign="middle" textAlign="start">
                     {this.renderTitle()}
                     {this.renderSectionsTooltip()}
-                  </GridCol>
-                  <GridCol vAlign="top" textAlign="end">
+                  </Grid.Col>
+                  <Grid.Col vAlign="top" textAlign="end">
                     {this.renderUpperRightBadges()}
-                  </GridCol>
-                </GridRow>
-                <GridRow>
-                  <GridCol textAlign="start">
+                  </Grid.Col>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Col textAlign="start">
                     <span aria-hidden="true">{this.renderLastReplyAt()}</span>
-                  </GridCol>
-                  <GridCol textAlign="center">
+                  </Grid.Col>
+                  <Grid.Col textAlign="center">
                     <span aria-hidden="true">{this.renderAvailabilityDate()}</span>
-                  </GridCol>
-                  <GridCol textAlign="end">
+                  </Grid.Col>
+                  <Grid.Col textAlign="end">
                     <span aria-hidden="true">{this.renderDueDate()}</span>
-                  </GridCol>
-                </GridRow>
+                  </Grid.Col>
+                </Grid.Row>
               </Grid>
             </span>
           </div>
@@ -807,11 +813,11 @@ export class DiscussionRow extends Component {
     return (
       <div>
         <Grid startAt="medium" vAlign="middle" colSpacing="none">
-          <GridRow>
+          <Grid.Row>
             {/* discussion topics is different for badges so we use our own read indicator instead of passing to isRead */}
-            <GridCol width="auto">{this.renderBlueUnreadBadge()}</GridCol>
-            <GridCol>{this.renderDiscussion()}</GridCol>
-          </GridRow>
+            <Grid.Col width="auto">{this.renderBlueUnreadBadge()}</Grid.Col>
+            <Grid.Col>{this.renderDiscussion()}</Grid.Col>
+          </Grid.Row>
         </Grid>
       </div>
     )
@@ -824,8 +830,8 @@ const mapDispatch = dispatch => {
     'duplicateDiscussion',
     'toggleSubscriptionState',
     'updateDiscussion',
-    'setCopyToOpen',
-    'setSendToOpen'
+    'setCopyTo',
+    'setSendTo'
   ]
   return bindActionCreators(select(actions, actionKeys), dispatch)
 }
@@ -861,7 +867,7 @@ const mapState = (state, ownProps) => {
     isMasterCourse: masterCourse,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED
   }
-  return Object.assign({}, ownProps, propsFromState)
+  return {...ownProps, ...propsFromState}
 }
 
 export const DraggableDiscussionRow = compose(

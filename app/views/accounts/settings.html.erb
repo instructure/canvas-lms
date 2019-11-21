@@ -258,7 +258,6 @@
                     </tr>
                   <% end %>
                 <% end %>
-
                 <%= settings.fields_for :restrict_student_past_view do |r| %>
                   <% hash = @account.restrict_student_past_view %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
@@ -305,6 +304,25 @@
                     </td>
                   </tr>
                 <% end %>
+
+                <%= settings.fields_for :usage_rights_required do |r| %>
+                  <% hash = @account.usage_rights_required %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr>
+                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                      <%= r.label :value, t("Copyright and license information must be provided for files before they are published.") %>
+                    </td>
+                  </tr>
+                  <% unless disabled %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+
               <% end %>
             <% end %>
           </table>
@@ -312,7 +330,7 @@
 
         <%= render partial: 'additional_settings', locals: { f: f } %>
 
-        <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) && @account.feature_enabled?(:slack_notifications)%>
+        <% if !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:slack_notifications)%>
           <% slack_api_key = @account.root_account.settings[:encrypted_slack_key] ? Canvas::Security.decrypt_password(@account.root_account.settings[:encrypted_slack_key], @account.root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key') : '' %>
           <fieldset>
             <legend><%= t("Slack Api Key") %></legend>
@@ -326,6 +344,36 @@
             <% end %>
           </fieldset>
         <% end %>
+        <% if !@account.site_admin? && @account.root_account? && @account.feature_enabled?(:account_pronouns) %>
+          <fieldset>
+            <legend><%= t("Personal Pronouns") %></legend>
+            <%= f.fields_for :settings do |settings| %>
+              <%= settings.check_box :can_add_pronouns, :checked => @account.settings[:can_add_pronouns], class: "element_toggler", "aria-controls": "personal_pronouns_options" %>
+              <%= settings.label :can_add_pronouns, en: "Enable Personal Pronouns" %>
+              <div id="personal_pronouns_options" <%= hidden(true) unless @account.settings[:can_add_pronouns] %>>
+                <table class="formtable">
+                  <tbody>
+                    <% ((@account.pronouns.presence || Pronouns.default_pronouns) + [nil]).each do |pronouns| %>
+                      <tr class="pronouns_row <%= raw ' blank" style="display: none;' if pronouns.nil? %>">
+                        <td> <input type="text" name="account[pronouns][]" value="<%= pronouns %>"/></td>
+                        <td> <a href="#" title="<%= t("Remove Pronouns") %>" class="close" data-remove=".pronouns_row"><i class="icon-end standalone-icon"></i></a> </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+                <button
+                  type="button"
+                  class="Button"
+                  onclick="$('.pronouns_row.blank').clone().removeClass('blank').show().insertBefore('.pronouns_row.blank')"
+                >
+                  <i class='icon-add'></i>
+                  <%= t("Add pronouns option") %>
+                </button>
+              </div>
+            <% end %>
+          </fieldset>
+        <% end %>
+
         <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) %>
           <% TermsOfService.ensure_terms_for_account(@account) %>
           <% js_bundle :terms_of_service_modal%>
@@ -519,6 +567,11 @@
               <div>
                 <%= settings.check_box :author_email_in_notifications, :checked => @account.author_email_in_notifications? %>
                 <%= settings.label     :author_email_in_notifications, :en => "Show the email address of sender for user interaction Notifications" %>
+              </div>
+
+              <div>
+                <%= settings.check_box :enable_course_catalog, :checked => @account.settings[:enable_course_catalog] %>
+                <%= settings.label     :enable_course_catalog, :en => "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled." %>
               </div>
 
             <% end %>
@@ -1038,7 +1091,7 @@ acknowledge that you have read and agreed to the
         <% end %>
         <div class="ic-Form-control">
           <div class="ic-Label" id="aria-announcements-send-to-group">
-            <%= t "Send to" %>
+            <%= t "Show to" %>
             <%= roles_message(@account) %>
           </div>
           <div class="grid-row">
@@ -1125,6 +1178,13 @@ acknowledge that you have read and agreed to the
 
         </div>
 
+        <% if !@account.site_admin? && @account.root_account.feature_enabled?(:notification_for_global_announcement) %>
+          <div class="ic-Form-control ic-Form-control--checkbox">
+            <%= f.check_box :send_message %>
+            <%= f.label :send_message, t("Send notification directly to users when announcement starts"), :class => "ic-Label" %>
+          </div>
+        <% end %>
+
         <div class="ic-Form-actions">
           <button type="Button" class="element_toggler Button Button--secondary add_notification_cancel_focus" aria-controls="add_notification_form">
             <%= t('#buttons.cancel', %{Cancel}) %>
@@ -1136,11 +1196,12 @@ acknowledge that you have read and agreed to the
       <% end %>
     <% end %>
   </div>
-
-  <div id="tab-reports">
-    <p><%= t("Loading...") %></p>
-    <!-- this will be populated by an xhr request to AccountsController::reports_tab -->
-  </div>
+  <% if can_do(@context, @current_user, :read_reports) %>
+    <div id="tab-reports">
+      <p><%= t("Loading...") %></p>
+      <!-- this will be populated by an xhr request to AccountsController::reports_tab -->
+    </div>
+  <% end %>
   <% if can_do(@context, @current_user, :read_as_admin) %>
       <div id="tab-tools">
         <%= render :partial => 'external_tools/external_tools', :object => @context.context_external_tools.active %>

@@ -15,44 +15,50 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../../spec_helper'
-require_relative '../views_helper'
 
-describe '_tool_sequence_footer' do
-  it 'renders a speedgrader link if user can view all grades but not manage grades' do
+require "spec_helper"
+require_relative "../views_helper"
+
+describe "_tool_sequence_footer" do
+  before(:once) do
     course_with_ta
-    @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
-    view_context(@course, @ta)
-    content_tag = ContentTag.new
-    assignment = @course.assignments.create!(title: 'an assignment')
-    content_tag.assignment = assignment
-    assign(:tag, content_tag)
-    render partial: 'context_modules/tool_sequence_footer'
-    expect((content_for :right_side)).to have_tag("a[href=\"/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}\"]")
+    @content_tag = ContentTag.new
+    assignment = @course.assignments.create!(title: "an assignment")
+    @content_tag.assignment = assignment
+    assign(:tag, @content_tag)
   end
 
-  it 'renders a speedgrader link if user can manage grades but not view all grades' do
-    course_with_ta
-    @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
-    view_context(@course, @ta)
-    content_tag = ContentTag.new
-    assignment = @course.assignments.create!(title: 'an assignment')
-    content_tag.assignment = assignment
-    assign(:tag, content_tag)
-    render partial: 'context_modules/tool_sequence_footer'
-    expect((content_for :right_side)).to have_tag("a[href=\"/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}\"]")
+  context "when user can view speedgrader" do
+    before(:each) do
+      view_context(@course, @ta)
+    end
+
+    it "renders a speedgrader link container if user can view speedgrader" do
+      render partial: "context_modules/tool_sequence_footer"
+      expect((content_for :right_side)).to have_tag("div[id='speed_grader_link_container']")
+    end
+
+    it "renders a student group container if user can view speedgrader" do
+      render partial: "context_modules/tool_sequence_footer"
+      expect((content_for :right_side)).to have_tag("div[id='student_group_filter_container']")
+    end
   end
 
-  it 'does not render a speedgrader link if user can neither manage grades nor view all grades' do
-    course_with_ta
-    @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
-    @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
-    view_context(@course, @ta)
-    content_tag = ContentTag.new
-    assignment = @course.assignments.create!(title: 'an assignment')
-    content_tag.assignment = assignment
-    assign(:tag, content_tag)
-    render partial: 'context_modules/tool_sequence_footer'
-    expect((content_for :right_side)).not_to have_tag("a[href=\"/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}\"]")
+  context "when user cannot view speedgrader" do
+    before(:each) do
+      view_context(@course, @ta)
+      @course.account.role_overrides.create!(permission: 'view_all_grades', role: ta_role, enabled: false)
+      @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
+    end
+
+    it "does not render a speedgrader link container if user cannot view speedgrader" do
+      render partial: "context_modules/tool_sequence_footer"
+      expect((content_for :right_side)).not_to have_tag("div[id='speed_grader_link_container']")
+    end
+
+    it "does not render a student group container if user cannot view speedgrader" do
+      render partial: "context_modules/tool_sequence_footer"
+      expect((content_for :right_side)).not_to have_tag("div[id='student_group_filter_container']")
+    end
   end
 end

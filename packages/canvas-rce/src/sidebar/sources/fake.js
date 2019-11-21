@@ -22,9 +22,19 @@ const PAGES = {
   // page of announcements
   announcements: {
     links: [
-      { href: "/courses/1/announcements", title: "Announcements List", date: '2018-04-22T13:00:00Z', date_type: 'posted' },
-      { href: "/courses/1/announcements/2", title: "Announcement 2", date: '2018-04-22T13:00:00Z', date_type: 'delayed_post' },
-      { href: "/courses/1/announcements/1", title: "Announcement 1" }
+      {
+        href: '/courses/1/announcements',
+        title: 'Announcements List',
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'posted'
+      },
+      {
+        href: '/courses/1/announcements/2',
+        title: 'Announcement 2',
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'delayed_post'
+      },
+      {href: '/courses/1/announcements/1', title: 'Announcement 1'}
     ],
     bookmark: null
   },
@@ -32,21 +42,57 @@ const PAGES = {
   // first page of assignments
   assignments: {
     links: [
-      { href: "/courses/1/assignments", title: "Assignment List", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' },
-      { href: "/courses/1/assignments/1", title: "Assignment 1", published: false, date: '2018-04-22T13:00:00Z', date_type: 'due' },
-      { href: "/courses/1/assignments/2", title: "Assignment 2", published: false, date: null, date_type: null },
-      { href: "/courses/1/assignments/3", title: "Assignment 3", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' },
-      { href: "/courses/1/assignments/4", title: "Quiz 1", published: true }
+      {
+        href: '/courses/1/assignments',
+        title: 'Assignment List',
+        published: true,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'due'
+      },
+      {
+        href: '/courses/1/assignments/1',
+        title: 'Assignment 1',
+        published: false,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'due'
+      },
+      {
+        href: '/courses/1/assignments/2',
+        title: 'Assignment 2',
+        published: false,
+        date: null,
+        date_type: null
+      },
+      {
+        href: '/courses/1/assignments/3',
+        title: 'Assignment 3',
+        published: true,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'due'
+      },
+      {href: '/courses/1/assignments/4', title: 'Quiz 1', published: true}
     ],
     // refers to second page of assignments
-    bookmark: "assignments2"
+    bookmark: 'assignments2'
   },
 
   // second page of assignments
   assignments2: {
     links: [
-      { href: "/courses/1/assignments/5", title: "Quiz 2", published: false, date: '2018-04-22T13:00:00Z', date_type: 'due' },
-      { href: "/courses/1/assignments/6", title: "Quiz 3", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' }
+      {
+        href: '/courses/1/assignments/5',
+        title: 'Quiz 2',
+        published: false,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'due'
+      },
+      {
+        href: '/courses/1/assignments/6',
+        title: 'Quiz 3',
+        published: true,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'due'
+      }
     ],
     bookmark: null
   },
@@ -54,22 +100,70 @@ const PAGES = {
   // page of discussions
   discussions: {
     links: [
-      { href: "/courses/1/discussion_topics", title: "Discussion Index", published: false, date: '2018-04-22T13:00:00Z', date_type: 'due' },
-      { href: "/courses/1/discussion_topics/4", title: "Discussion 2", published: true, date: '2018-04-22T13:00:00Z', date_type: 'todo' },
-      { href: "/courses/1/discussion_topics/3", title: "Discussion 1", published: true , date: '2018-04-22T13:00:00Z', date_type: 'todo'},
-      { href: "/courses/1/discussion_topics/2", title: "Announcement 2", published: false, date: null, date_type: null },
-      { href: "/courses/1/discussion_topics/1", title: "Announcement 1", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' }
+      {
+        href: '/courses/1/discussion_topics',
+        title: 'Discussion Index',
+        published: false,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'due'
+      },
+      {
+        href: '/courses/1/discussion_topics/4',
+        title: 'Discussion 2',
+        published: true,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'todo'
+      },
+      {
+        href: '/courses/1/discussion_topics/3',
+        title: 'Discussion 1',
+        published: true,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'todo'
+      },
+      {
+        href: '/courses/1/discussion_topics/2',
+        title: 'Announcement 2',
+        published: false,
+        date: null,
+        date_type: null
+      },
+      {
+        href: '/courses/1/discussion_topics/1',
+        title: 'Announcement 1',
+        published: true,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'due'
+      }
     ],
     // intentionally referring to page that doesn't exist to test failure mode
-    bookmark: "discussions2"
+    bookmark: 'discussions2'
   },
 
   // page of modules
   modules: {
     links: [
-      { href: "/courses/1/modules", title: "Modules List", published: true, date: '2018-04-22T13:00:00Z', date_type: 'published' },
-      { href: "/courses/1/modules/2", title: "Module 2", published: false, date: null, date_type: 'published' },
-      { href: "/courses/1/modules/1", title: "Module 1", published: true, date: '2018-04-22T13:00:00Z', date_type: 'published' }
+      {
+        href: '/courses/1/modules',
+        title: 'Modules List',
+        published: true,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'published'
+      },
+      {
+        href: '/courses/1/modules/2',
+        title: 'Module 2',
+        published: false,
+        date: null,
+        date_type: 'published'
+      },
+      {
+        href: '/courses/1/modules/1',
+        title: 'Module 1',
+        published: true,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'published'
+      }
     ],
     bookmark: null
   },
@@ -83,8 +177,20 @@ const PAGES = {
   // page of wiki pages
   wikiPages: {
     links: [
-      { href: "/courses/1/pages/wiki-page-1", title: "Wiki Page 1", published: true, date: '2018-04-22T13:00:00Z', date_type: 'todo' },
-      { href: "/courses/1/pages/wiki-page-2", title: "Wiki Page 2", published: false, date: null, date_type: 'todo' }
+      {
+        href: '/courses/1/pages/wiki-page-1',
+        title: 'Wiki Page 1',
+        published: true,
+        date: '2018-04-22T13:00:00Z',
+        date_type: 'todo'
+      },
+      {
+        href: '/courses/1/pages/wiki-page-2',
+        title: 'Wiki Page 2',
+        published: false,
+        date: null,
+        date_type: 'todo'
+      }
     ],
     bookmark: null
   },
@@ -94,18 +200,18 @@ const PAGES = {
     files: [
       {
         id: 1,
-        type: "text/plain",
-        name: "File 1",
-        url: "/files/1"
+        type: 'text/plain',
+        name: 'File 1',
+        url: '/files/1'
       },
       {
         id: 2,
-        type: "text/plain",
-        name: "File 2",
-        url: "/files/2"
+        type: 'text/plain',
+        name: 'File 2',
+        url: '/files/2'
       }
     ],
-    bookmark: "files2"
+    bookmark: 'files2'
   },
 
   // root files page 2
@@ -113,9 +219,9 @@ const PAGES = {
     files: [
       {
         id: 3,
-        type: "text/plain",
-        name: "File 3",
-        url: "/files/3"
+        type: 'text/plain',
+        name: 'File 3',
+        url: '/files/3'
       }
     ],
     bookmark: null
@@ -126,15 +232,15 @@ const PAGES = {
     files: [
       {
         id: 4,
-        type: "text/plain",
-        name: "File 4",
-        url: "/files/4"
+        type: 'text/plain',
+        name: 'File 4',
+        url: '/files/4'
       },
       {
         id: 5,
-        type: "text/plain",
-        name: "File 5",
-        url: "/files/5"
+        type: 'text/plain',
+        name: 'File 5',
+        url: '/files/5'
       }
     ],
     bookmark: null
@@ -151,13 +257,13 @@ const PAGES = {
     folders: [
       {
         id: 1,
-        name: "Folder 1",
+        name: 'Folder 1',
         parentId: 42,
-        filesUrl: "folder1files",
-        foldersUrl: "folder1folders"
+        filesUrl: 'folder1files',
+        foldersUrl: 'folder1folders'
       }
     ],
-    bookmark: "folders2"
+    bookmark: 'folders2'
   },
 
   // root folders page 2
@@ -165,10 +271,10 @@ const PAGES = {
     folders: [
       {
         id: 2,
-        name: "Folder 2",
+        name: 'Folder 2',
         parentId: 42,
-        filesUrl: "emptyfiles",
-        foldersUrl: "emptyfolders"
+        filesUrl: 'emptyfiles',
+        foldersUrl: 'emptyfolders'
       }
     ],
     bookmark: null
@@ -179,10 +285,10 @@ const PAGES = {
     folders: [
       {
         id: 3,
-        name: "Folder 1 Sub",
+        name: 'Folder 1 Sub',
         parentId: 1,
-        filesUrl: "emptyfiles",
-        foldersUrl: "emptyfolders"
+        filesUrl: 'emptyfiles',
+        foldersUrl: 'emptyfolders'
       }
     ],
     bookmark: null
@@ -193,13 +299,13 @@ const PAGES = {
     folders: [],
     bookmark: null
   }
-};
+}
 
 const FOLDERS = [
-  { id: 1, name: "Folder 1", filesUrl: "filesurl", foldersUrl: "foldersurl" },
-  { id: 2, name: "Folder 2", filesUrl: "filesurl", foldersUrl: "foldersurl" },
-  { id: 3, name: "Folder 3", filesUrl: "filesurl", foldersUrl: "foldersurl" }
-];
+  {id: 1, name: 'Folder 1', filesUrl: 'filesurl', foldersUrl: 'foldersurl'},
+  {id: 2, name: 'Folder 2', filesUrl: 'filesurl', foldersUrl: 'foldersurl'},
+  {id: 3, name: 'Folder 3', filesUrl: 'filesurl', foldersUrl: 'foldersurl'}
+]
 
 export function buildImage(index, name, height, width) {
   const id = 123000001 + index
@@ -242,93 +348,93 @@ const brokenImage = {
 const IMAGE_RESPONSES = [
   {
     bookmark: 'http://canvas/images/2',
-    images: [
-      images[0],
-      brokenImage,
-      ...images.slice(1, 10)
-    ]
+    files: [images[0], brokenImage, ...images.slice(1, 10)]
   },
 
   {
     bookmark: 'http://canvas/images/3',
     bookmarkForThis: 'http://canvas/images/2',
-    images: images.slice(10, 20)
+    files: images.slice(10, 20)
   },
 
   {
     bookmark: null,
     bookmarkForThis: 'http://canvas/images/3',
-    images: images.slice(20)
+    files: images.slice(20)
   }
 ]
 
 const FLICKR_RESULTS = {
   go: [
     {
-      id: "1",
-      href: "https://farm9.static.flickr.com/8491/8297692520_4e7a43ffcf_s.jpg",
-      title: "Game of Go in our club."
+      id: '1',
+      href: 'https://farm9.static.flickr.com/8491/8297692520_4e7a43ffcf_s.jpg',
+      title: 'Game of Go in our club.'
     },
     {
-      id: "2",
-      href: "https://farm1.static.flickr.com/5/7270219_6d3f41bc71_s.jpg",
-      title: "Another game of Go"
+      id: '2',
+      href: 'https://farm1.static.flickr.com/5/7270219_6d3f41bc71_s.jpg',
+      title: 'Another game of Go'
     },
     {
-      id: "3",
-      href: "https://farm1.static.flickr.com/8/9686480_c726bf6c5d_s.jpg",
-      title: "the fourth game"
+      id: '3',
+      href: 'https://farm1.static.flickr.com/8/9686480_c726bf6c5d_s.jpg',
+      title: 'the fourth game'
     }
   ],
   chess: [
     {
-      id: "4",
-      href: "https://farm5.static.flickr.com/4051/4627936161_39df5d616a_s.jpg",
-      title: "Chess."
+      id: '4',
+      href: 'https://farm5.static.flickr.com/4051/4627936161_39df5d616a_s.jpg',
+      title: 'Chess.'
     },
     {
-      id: "5",
-      href: "https://farm8.static.flickr.com/7428/9646564428_0e359a1092_s.jpg",
-      title: "chess"
+      id: '5',
+      href: 'https://farm8.static.flickr.com/7428/9646564428_0e359a1092_s.jpg',
+      title: 'chess'
     },
     {
-      id: "6",
-      href: "https://farm9.static.flickr.com/8309/7961751980_66333f83cf_s.jpg",
-      title: "champion chess"
+      id: '6',
+      href: 'https://farm9.static.flickr.com/8309/7961751980_66333f83cf_s.jpg',
+      title: 'champion chess'
     }
   ]
-};
+}
 
-const DOCUMENTS = {
-  documents1: {
-    files: [1,2,3].map(i => {
-      return {
-        id: i,
-        filename: `file${i}.txt`,
-        content_type: 'text/plain',
-        display_name: `file${i}`,
-        href: `http://the.net/${i}`,
-        date: `2019-05-25T13:0${i}:00Z`,
-      }
-    }),
-    bookmark: 'documents2',
-    hasMore: true
-  },
-  documents2: {
-    files: [4,5,6].map(i => {
-      return {
-        id: i,
-        filename: `file${i}.txt`,
-        content_type: 'text/plain',
-        display_name: `file${i}`,
-        href: `http://the.net/${i}`,
-        date: `2019-05-25T13:0${i}:00Z`,
-      }
-    }),
-    bookmark: null,
-    hasMore: false
+function makeFiles(bookmark_base, extension, content_type) {
+  return {
+    [`${bookmark_base}1`]: {
+      files: [1, 2, 3].map(i => {
+        return {
+          id: i,
+          filename: `file${i}.${extension}`,
+          content_type,
+          display_name: `file${i}`,
+          href: `http://the.net/${i}`,
+          date: `2019-05-25T13:0${i}:00Z`
+        }
+      }),
+      bookmark: `${bookmark_base}2`,
+      hasMore: true
+    },
+    [`${bookmark_base}2`]: {
+      files: [4, 5, 6].map(i => {
+        return {
+          id: i,
+          filename: `file${i}.${extension}`,
+          content_type,
+          display_name: `file${i}`,
+          href: `http://the.net/${i}`,
+          date: `2019-05-25T13:0${i}:00Z`
+        }
+      }),
+      bookmark: null,
+      hasMore: false
+    }
   }
 }
+const DOCUMENTS = makeFiles('documents', 'txt', 'text/plain')
+const MEDIA = makeFiles('media', 'mp3', 'audio/mp3')
 
 const UNSPLASH_RESULTS = {
   kittens1: {
@@ -563,25 +669,26 @@ const UNSPLASH_RESULTS = {
 
 export function getSession() {
   return Promise.resolve({
-    contextType: "course",
+    contextType: 'course',
     contextId: 47,
     canUploadFiles: true,
     usageRightsRequired: true
-  });
+  })
 }
 
 export function initializeFolders() {
-  return {};
+  return {}
 }
 
-export function initializeImages() {
+export function initializeImages(props) {
   return {
-    records: [],
-    bookmark: undefined,
-    hasMore: false,
-    isLoading: false,
-    requested: false
-  };
+    [props.contextType]: {
+      files: [],
+      bookmark: undefined,
+      hasMore: true,
+      isLoading: false
+    }
+  }
 }
 
 export function initializeUpload() {
@@ -589,7 +696,7 @@ export function initializeUpload() {
     uploading: false,
     folders: {},
     formExpanded: false
-  };
+  }
 }
 
 export function initializeFlickr() {
@@ -597,7 +704,7 @@ export function initializeFlickr() {
     searchResults: [],
     searching: false,
     formExpanded: false
-  };
+  }
 }
 
 export function initializeCollection(endpoint) {
@@ -605,34 +712,61 @@ export function initializeCollection(endpoint) {
     links: [],
     bookmark: endpoint,
     loading: false
-  };
+  }
 }
 
-export function initializeDocuments() {
+export function initializeDocuments(_props) {
   return {
-    files: [],
-    bookmark: 'documents1',
-    isLoading: false
+    course: {
+      files: [],
+      bookmark: 'documents1',
+      isLoading: false,
+      hasMore: true
+    },
+    user: {
+      files: [],
+      bookmark: 'documents1',
+      isLoading: false,
+      hasMore: true
+    }
+  }
+}
+
+export function initializeMedia(_props) {
+  return {
+    course: {
+      files: [],
+      bookmark: 'media1',
+      isLoading: false,
+      hasMore: true
+    },
+    user: {
+      files: [],
+      bookmark: 'media1',
+      isLoading: false,
+      hasMore: true
+    }
   }
 }
 
 export function fetchFolders() {
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve({ folders: FOLDERS });
-    }, 1000);
-  });
+      resolve({folders: FOLDERS})
+    }, 1000)
+  })
 }
 
-export function fetchFiles(uri = "files") {
-  return Promise.resolve(PAGES[uri]);
+export function fetchFiles(uri = 'files') {
+  return Promise.resolve(PAGES[uri])
 }
 
 export function fetchImages(props) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       let response
-      if (props.bookmark) {
+      const bookmark = props.images[props.contextType] && props.images[props.contextType].bookmark
+      if (bookmark) {
         response = IMAGE_RESPONSES.find(response => response.bookmarkForThis === props.bookmark)
       } else {
         response = IMAGE_RESPONSES[0]
@@ -644,7 +778,7 @@ export function fetchImages(props) {
         reject(new Error('Invalid bookmark'))
       }
     }, FAKE_TIMEOUT)
-  });
+  })
 }
 
 export function fetchMediaFolder() {
@@ -654,17 +788,17 @@ export function fetchMediaFolder() {
 export function preflightUpload() {
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve({});
-    }, FAKE_TIMEOUT);
-  });
+      resolve({})
+    }, FAKE_TIMEOUT)
+  })
 }
 
 export function uploadFRD() {
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve(images[0]);
-    }, 250);
-  });
+      resolve(images[0])
+    }, 250)
+  })
 }
 
 export function fetchRootFolder(props) {
@@ -673,35 +807,35 @@ export function fetchRootFolder(props) {
       {
         id: 0,
         name: `${props.contextType} files`,
-        filesUrl: "files",
-        foldersUrl: "folders"
+        filesUrl: 'files',
+        foldersUrl: 'folders'
       }
     ]
-  });
+  })
 }
 
 export function fetchPage(uri) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (PAGES[uri]) {
-        resolve(PAGES[uri]);
+        resolve(PAGES[uri])
       } else {
-        reject("bad page!");
+        reject(new Error('bad page!'))
       }
-    }, 1000);
-  });
+    }, 1000)
+  })
 }
 
 export function searchFlickr(term) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (FLICKR_RESULTS[term]) {
-        resolve(FLICKR_RESULTS[term]);
+        resolve(FLICKR_RESULTS[term])
       } else {
-        reject("No search results!");
+        reject(new Error('No search results!'))
       }
-    }, 1000);
-  });
+    }, 1000)
+  })
 }
 
 export function searchUnsplash(term) {
@@ -710,35 +844,37 @@ export function searchUnsplash(term) {
       if (UNSPLASH_RESULTS[term]) {
         resolve(UNSPLASH_RESULTS[term])
       } else {
-        reject('No search results!')
+        reject(new Error('No search results!'))
       }
     }, 1000)
-  });
+  })
 }
 
 export function pingbackUnsplash() {
-  return Promise.resolve("")
+  return Promise.resolve('')
 }
 
 export function setUsageRights(id, usageRights) {
-  const msg = "Setting the following usage rights for file (id: %s):";
-  console.log(msg, id, usageRights); // eslint-disable-line no-console
+  const msg = 'Setting the following usage rights for file (id: %s):'
+  console.log(msg, id, usageRights) // eslint-disable-line no-console
 }
 
 export function getFile(id) {
   return Promise.resolve({
     id,
-    type: "text/plain",
-    name: "Test File",
-    url: "test.txt",
-    embed: { type: "file" }
-  });
+    type: 'text/plain',
+    name: 'Test File',
+    url: 'test.txt',
+    embed: {type: 'file'}
+  })
 }
 
-export function fetchDocs(bookmark) {
+export function fetchDocs(state) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       let response
+      const bookmark =
+        state.documents[state.contextType] && state.documents[state.contextType].bookmark
       if (bookmark) {
         response = DOCUMENTS[bookmark]
       }
@@ -749,5 +885,23 @@ export function fetchDocs(bookmark) {
         reject(new Error('Invalid bookmark'))
       }
     }, FAKE_TIMEOUT)
-  });
+  })
+}
+
+export function fetchMedia(state) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      let response
+      const bookmark = state.media[state.contextType] && state.media[state.contextType].bookmark
+      if (bookmark) {
+        response = MEDIA[bookmark]
+      }
+
+      if (response) {
+        resolve(response)
+      } else {
+        reject(new Error('Invalid bookmark'))
+      }
+    }, FAKE_TIMEOUT)
+  })
 }

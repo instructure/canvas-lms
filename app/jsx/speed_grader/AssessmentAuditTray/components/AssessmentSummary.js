@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {number, shape, string} from 'prop-types'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {PresentationContent} from '@instructure/ui-a11y'
+import {Flex} from '@instructure/ui-layout'
+import {Pill, Text} from '@instructure/ui-elements'
+
 import I18n from 'i18n!speed_grader'
 
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
@@ -77,7 +77,7 @@ export default function AssessmentSummary(props) {
       padding="small"
       textAlign="center"
     >
-      <FlexItem id="audit-tray-final-grade">
+      <Flex.Item id="audit-tray-final-grade">
         <Text aria-labelledby="audit-tray-final-grade-label" weight="bold">
           <Text as="div" size="x-large">
             {scoreText}
@@ -93,19 +93,19 @@ export default function AssessmentSummary(props) {
             <FriendlyDatetime dateTime={props.finalGradeDate} showTime />
           </Text>
         </Text>
-      </FlexItem>
+      </Flex.Item>
 
-      <FlexItem as="div" borderWidth="none none small" margin="small none" padding="none" />
+      <Flex.Item as="div" borderWidth="none none small" margin="small none" padding="none" />
 
-      <FlexItem id="audit-tray-grades-posted">
+      <Flex.Item id="audit-tray-grades-posted">
         <Text as="div">{I18n.t('Posted to student')}</Text>
 
         <Text as="div" fontStyle="italic" size="small" weight="bold">
           <FriendlyDatetime dateTime={props.assignment.gradesPublishedAt} showTime />
         </Text>
-      </FlexItem>
+      </Flex.Item>
 
-      <FlexItem>
+      <Flex.Item>
         <Pill
           as="div"
           id="audit-tray-overall-anonymity-label"
@@ -123,7 +123,7 @@ export default function AssessmentSummary(props) {
         >
           {overallAnonymityDescription}
         </Text>
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }

@@ -21,6 +21,16 @@ require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 describe "Default Account Reports" do
   include ReportSpecHelper
 
+  let(:grading_standard_data) do
+    {
+      "A" => 0.9,
+      "B" => 0.8,
+      "C" => 0.7,
+      "D" => 0.6,
+      "F" => 0.0
+    }
+  end
+
   before(:once) do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
@@ -53,6 +63,12 @@ describe "Default Account Reports" do
     @course1.enrollment_term_id = @term1.id
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.save!
+    grading_standard = @course1.grading_standards.create!(
+      title: "The Greatest Grading Standard",
+      data: grading_standard_data
+    )
+    @course1.update!(default_grading_standard: grading_standard)
+
     @course2 = course_factory(:course_name => 'Math 101', :account => @account, :active_course => true)
 
     @enrollment1 = @course1.enroll_user(@user1, 'StudentEnrollment', :enrollment_state => :active)
@@ -324,6 +340,69 @@ describe "Default Account Reports" do
                                "SIS_COURSE_ID_1", "English 101", @course1.course_sections.first.id.to_s, nil, "Fall",
                                @term1.id.to_s, "fall12", nil, "88.0", "active", "82.0", "92.0", "102.0"]
     end
+
+    describe "grading scheme values" do
+      context "when the 'Add Grading Scheme to Admin Grade Reports' flag is enabled on the root account" do
+        before(:each) do
+          @account.root_account.enable_feature!(:add_grading_scheme_to_admin_grade_reports)
+        end
+
+        let(:parsed_report) { read_report('grade_export_csv', {order: 14, header: true}) }
+        let(:header_line) { parsed_report[0] }
+
+        let(:parsed_report_by_column) { read_report('grade_export_csv', {order: 14, header: true, parse_header: true}) }
+
+        it "includes columns for the grading scheme values in the report header" do
+          aggregate_failures do
+            expect(header_line).to include("current grade")
+            expect(header_line).to include("final grade")
+            expect(header_line).to include("unposted current grade")
+            expect(header_line).to include("unposted final grade")
+            expect(header_line).to include("override grade")
+          end
+        end
+
+        it "includes commensurate grade values for courses with a grading standard" do
+          line_using_grading_standard = parsed_report_by_column.detect do |line|
+            line["course"] == @course1.name && line["student name"] == "John St. Clair"
+          end
+
+          aggregate_failures do
+            expect(line_using_grading_standard["current grade"]).to eq nil
+            expect(line_using_grading_standard["final grade"]).to eq "B"
+            expect(line_using_grading_standard["unposted current grade"]).to eq "B"
+            expect(line_using_grading_standard["unposted final grade"]).to eq "A"
+            expect(line_using_grading_standard["override grade"]).to eq "A"
+          end
+        end
+
+        it "includes empty values for courses without a grading standard" do
+          line_not_using_grading_standard = parsed_report_by_column.detect do |line|
+            line["course"] == @course2.name && line["student name"] == "Michael Bolton"
+          end
+          aggregate_failures do
+            expect(line_not_using_grading_standard["current grade"]).to be nil
+            expect(line_not_using_grading_standard["final grade"]).to be nil
+            expect(line_not_using_grading_standard["unposted current grade"]).to be nil
+            expect(line_not_using_grading_standard["unposted final grade"]).to be nil
+            expect(line_not_using_grading_standard["override grade"]).to be nil
+          end
+        end
+      end
+
+      it "omits columns for the grading scheme values when the flag is not enabled" do
+        parsed_report = read_report('grade_export_csv', {order: 14, header: true})
+        header_line = parsed_report[0]
+
+        aggregate_failures do
+          expect(header_line).not_to include("current grade")
+          expect(header_line).not_to include("final grade")
+          expect(header_line).not_to include("unposted current grade")
+          expect(header_line).not_to include("unposted final grade")
+          expect(header_line).not_to include("override grade")
+        end
+      end
+    end
   end
 
   describe "MGP Grade Export" do
@@ -353,6 +432,12 @@ describe "Default Account Reports" do
         future = gpg.grading_periods.create! title: "Future", start_date: 1.day.from_now, end_date: 1.week.from_now
 
         @account.enable_feature!(:final_grades_override)
+
+        grading_standard = @course2.grading_standards.create!(
+          title: "The Worst Grading Standard",
+          data: grading_standard_data
+        )
+        @course2.update!(default_grading_standard: grading_standard)
 
         @course3 = course_factory(:course_name => 'Fun 404', :account => @account, :active_course => true)
         @course3.enroll_user(@user2, 'StudentEnrollment', :enrollment_state => :active)
@@ -532,6 +617,75 @@ describe "Default Account Reports" do
         first_row = csv[0]
 
         expect(first_row).not_to include("Past override score", "Future override score")
+      end
+
+      describe "grading scheme values" do
+        context "when the Add Grading Scheme to Admin Grade Reports flag is enabled" do
+          before(:each) do
+            @account.enable_feature!(:final_grades_override)
+            @account.root_account.enable_feature!(:add_grading_scheme_to_admin_grade_reports)
+          end
+
+          let(:default_term_csv) do
+            reports = read_report(
+              "mgp_grade_export_csv",
+              params: {enrollment_term_id: @default_term.id},
+              parse_header: true,
+              order: "skip"
+            )
+            reports["Default Term.csv"]
+          end
+
+          it "returns commensurate grade values for courses using grading schemes" do
+            jason_row = default_term_csv.detect { |row| row["course"] == @course2.name && row["student name"] == "Michael Bolton" }
+            aggregate_failures do
+              expect(jason_row["Past current grade"]).to eq "F"
+              expect(jason_row["Past final grade"]).to eq "F"
+              expect(jason_row["Past unposted current grade"]).to eq "F"
+              expect(jason_row["Past unposted final grade"]).to eq "F"
+              expect(jason_row["Past override grade"]).to eq "F"
+
+              expect(jason_row["current grade"]).to eq "F"
+              expect(jason_row["final grade"]).to eq "F"
+              expect(jason_row["unposted current grade"]).to eq "D"
+              expect(jason_row["unposted final grade"]).to eq "D"
+            end
+          end
+
+          it "returns empty values for courses not using a grading scheme" do
+            mike_row = default_term_csv.detect { |row| row["course"] == @course3.name && row["student name"] == "Michael Bolton" }
+            aggregate_failures do
+              expect(mike_row["Past current grade"]).to be nil
+              expect(mike_row["Past final grade"]).to be nil
+              expect(mike_row["Past unposted current grade"]).to be nil
+              expect(mike_row["Past unposted final grade"]).to be nil
+              expect(mike_row["Past override grade"]).to be nil
+
+              expect(mike_row["current grade"]).to be nil
+              expect(mike_row["final grade"]).to be nil
+              expect(mike_row["unposted current grade"]).to be nil
+              expect(mike_row["unposted final grade"]).to be nil
+              expect(mike_row["override grade"]).to be nil
+            end
+          end
+        end
+
+        it "omits grading scheme values if the Add Grading Scheme to Admin Grade Reports flag is disabled" do
+          reports = read_report("mgp_grade_export_csv",
+                                params: {enrollment_term_id: @default_term.id},
+                                header: true,
+                                order: "skip")
+          csv = reports["Default Term.csv"]
+          header_row = csv[0]
+
+          aggregate_failures do
+            expect(header_row).not_to include("Past current grade")
+            expect(header_row).not_to include("Past final grade")
+            expect(header_row).not_to include("Past unposted current grade")
+            expect(header_row).not_to include("Past unposted final grade")
+            expect(header_row).not_to include("Past override grade")
+          end
+        end
       end
     end
   end

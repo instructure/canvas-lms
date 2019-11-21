@@ -19,15 +19,14 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-layout'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
 
 import {showFlashError} from '../shared/FlashAlert'
 import I18n from 'i18n!grade_summary'
-import SelectMenu from "./SelectMenu"
+import SelectMenu from './SelectMenu'
 
 export default class SelectMenuGroup extends React.Component {
   static propTypes = {
@@ -161,7 +160,7 @@ export default class SelectMenuGroup extends React.Component {
   render() {
     return (
       <Flex alignItems="end" wrapItems margin="0 0 small 0">
-        <FlexItem>
+        <Flex.Item>
           {this.props.students.length > 1 && (
             <SelectMenu
               defaultValue={this.props.selectedStudentID}
@@ -215,9 +214,9 @@ export default class SelectMenuGroup extends React.Component {
             textAttribute={0}
             valueAttribute={1}
           />
-        </FlexItem>
+        </Flex.Item>
 
-        <FlexItem margin="0 0 0 small">
+        <Flex.Item margin="0 0 0 small">
           <Button
             disabled={this.state.processing || this.noSelectMenuChanged()}
             id="apply_select_menus"
@@ -233,7 +232,7 @@ export default class SelectMenuGroup extends React.Component {
               {I18n.t('Apply filters. Note: clicking this button will cause the page to reload.')}
             </ScreenReaderContent>
           </Button>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }

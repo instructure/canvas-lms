@@ -18,22 +18,18 @@
 
 import React, {useState} from 'react'
 import {func, instanceOf, shape} from 'prop-types'
-import {fileShape} from './propTypes'
+import {fileShape} from '../../shared/fileShape'
 import classnames from 'classnames'
 
-import {StyleSheet, css} from "aphrodite";
+import {StyleSheet, css} from 'aphrodite'
 import {AccessibleContent} from '@instructure/ui-a11y'
 import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
-import {
-  IconDragHandleLine,
-  IconPublishSolid,
-  IconUnpublishedSolid
-} from '@instructure/ui-icons'
+import {IconDragHandleLine, IconPublishSolid, IconUnpublishedSolid} from '@instructure/ui-icons'
 
-import formatMessage from '../../../../format-message';
-import {renderLink as renderLinkHtml} from "../../../contentRendering";
-import dragHtml from "../../../../sidebar/dragHtml";
+import formatMessage from '../../../../format-message'
+import {renderLink as renderLinkHtml} from '../../../contentRendering'
+import dragHtml from '../../../../sidebar/dragHtml'
 import {getIconFromType} from '../../shared/fileTypeUtils'
 import {isPreviewable} from '../../shared/Previewable'
 
@@ -52,10 +48,12 @@ export default function Link(props) {
     })
 
     const attrs = {
+      id: props.id,
       href: props.href,
       target: '_blank',
       class: clazz,
-      text: props.display_name || props.filename // because onClick only takes a single object
+      text: props.display_name || props.filename, // because onClick only takes a single object
+      content_type: props.content_type
     }
     if (canPreview) {
       attrs['data-canvas-previewable'] = true
@@ -64,8 +62,8 @@ export default function Link(props) {
   }
 
   function handleLinkClick(e) {
-    e.preventDefault();
-    props.onClick(linkAttrsFromDoc());
+    e.preventDefault()
+    props.onClick(linkAttrsFromDoc())
   }
 
   function handleLinkKey(e) {
@@ -77,7 +75,7 @@ export default function Link(props) {
 
   function handleDragStart(e) {
     const linkAttrs = linkAttrsFromDoc()
-    dragHtml(e, renderLinkHtml(linkAttrs, linkAttrs.text));
+    dragHtml(e, renderLinkHtml(linkAttrs, linkAttrs.text))
   }
 
   function handleDragEnd(e) {
@@ -90,7 +88,7 @@ export default function Link(props) {
 
   let elementRef = null
   if (props.focusRef) {
-    elementRef = ref => props.focusRef.current = ref
+    elementRef = ref => (props.focusRef.current = ref)
   }
 
   return (
@@ -126,17 +124,23 @@ export default function Link(props) {
               <Flex>
                 <Flex.Item padding="0 x-small 0 0">
                   <Text color={color}>
-                    <Icon size="x-small"/>
+                    <Icon size="x-small" />
                   </Text>
                 </Flex.Item>
                 <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
-                  <View as="div" margin="0">{display_name || filename}</View>
-                  {dateString ? (<View as="div">{dateString}</View>) : null}
+                  <View as="div" margin="0">
+                    {display_name || filename}
+                  </View>
+                  {dateString ? <View as="div">{dateString}</View> : null}
                 </Flex.Item>
                 <Flex.Item>
                   <AccessibleContent alt={publishedMsg}>
                     <Text color={color}>
-                      {published ? <IconPublishSolid inline={false} /> : <IconUnpublishedSolid inline={false} />}
+                      {published ? (
+                        <IconPublishSolid inline={false} />
+                      ) : (
+                        <IconUnpublishedSolid inline={false} />
+                      )}
                     </Text>
                   </AccessibleContent>
                 </Flex.Item>
@@ -154,7 +158,7 @@ Link.propTypes = {
     current: instanceOf(Element)
   }),
   ...fileShape,
-  onClick: func.isRequired,
+  onClick: func.isRequired
 }
 
 Link.defaultProps = {
@@ -167,4 +171,4 @@ const styles = StyleSheet.create({
       'outline-offset': '-4px'
     }
   }
-});
+})

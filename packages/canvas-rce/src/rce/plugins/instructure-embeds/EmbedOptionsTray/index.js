@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {bool, func, shape, string} from 'prop-types'
-import {Button,CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {Heading} from '@instructure/ui-elements'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
@@ -83,7 +83,7 @@ export default function EmbedOptionsTray(props) {
               <Flex direction="column">
                 <Flex.Item padding="small">
                   <TextInput
-                    label={formatMessage('Text')}
+                    renderLabel={formatMessage('Text')}
                     onChange={handleTextChange}
                     value={text}
                   />
@@ -91,7 +91,7 @@ export default function EmbedOptionsTray(props) {
 
                 <Flex.Item padding="small">
                   <TextInput
-                    label={formatMessage('Link')}
+                    renderLabel={formatMessage('Link')}
                     onChange={handleLinkChange}
                     value={link}
                   />

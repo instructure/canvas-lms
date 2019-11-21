@@ -13,71 +13,51 @@
 //
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
-
-import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import Navigation from 'jsx/navigation_header/Navigation'
-import waitForExpect from 'wait-for-expect'
+import {render} from '@testing-library/react'
+import Navigation from '../Navigation'
+
+const unreadComponent = jest.fn(() => <></>)
 
 describe('GlobalNavigation', () => {
-  let componentHolder, $inbox_data
-
-  function renderComponent() {
-    ReactDOM.render(<Navigation />, componentHolder)
-  }
-
   beforeEach(() => {
-    fetch.resetMocks()
-
-    componentHolder = document.createElement('div')
-    document.body.appendChild(componentHolder)
-    // Need to setup the global nav stuff we are testing
-    $inbox_data = $(`
-    <a
-      id="global_nav_conversations_link"
-      href="/conversations"
-      class="ic-app-header__menu-list-link"
-    >
-      <div class="menu-item-icon-container">
-        <span class="menu-item__badge" style="display: none">0</span>
-      </div>
-    </a>
-  `).appendTo(document.body)
+    unreadComponent.mockClear()
     window.ENV.current_user_id = 10
-    ENV.current_user_disabled_inbox = false
-  })
-
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(componentHolder)
-    componentHolder.remove()
-    $inbox_data.remove()
+    window.ENV.current_user_disabled_inbox = false
+    window.ENV.DIRECT_SHARE_ENABLED = true
   })
 
   it('renders', () => {
-    fetch.mockResponse(JSON.stringify({unread_count: 0}))
-    expect(() => renderComponent()).not.toThrow()
+    expect(() => render(<Navigation unreadComponent={unreadComponent} />)).not.toThrow()
   })
 
-  it('shows the inbox badge when necessary', async () => {
-    fetch.mockResponse(JSON.stringify({unread_count: 12}))
-    renderComponent()
-    let $badge
-    await waitForExpect(() => {
-      $badge = $('#global_nav_conversations_link').find('.menu-item__badge')
-      expect($badge.text()).toBe('12 unread messages12')
+  describe('unread badges', () => {
+    it('renders both the shares unread and the inbox unread component', () => {
+      render(<Navigation unreadComponent={unreadComponent} />)
+      expect(unreadComponent).toHaveBeenCalledTimes(2)
+      const urls = unreadComponent.mock.calls.map(parms => parms[0].dataUrl)
+      expect(urls).toEqual(
+        expect.arrayContaining([
+          '/api/v1/users/self/content_shares/unread_count',
+          '/api/v1/conversations/unread_count'
+        ])
+      )
     })
-    expect($badge.css('display')).toBe('')
-  })
 
-  it('does not show the inbox badge when the user has opted out of notifications', async () => {
-    ENV.current_user_disabled_inbox = true
-    renderComponent()
-    let $badge
-    await waitForExpect(() => {
-      $badge = $('#global_nav_conversations_link').find('.menu-item__badge')
-      expect($badge.text()).toBe('0')
+    it('does not render the shares unread component when the FF is off', () => {
+      ENV.DIRECT_SHARE_ENABLED = false
+      render(<Navigation unreadComponent={unreadComponent} />)
+      expect(unreadComponent).toHaveBeenCalledTimes(1)
+      expect(unreadComponent.mock.calls[0][0].dataUrl).toBe('/api/v1/conversations/unread_count')
     })
-    expect($badge.css('display')).toBe('none')
+
+    it('does not render the inbox unread component when user has opted out of notifications', () => {
+      ENV.current_user_disabled_inbox = true
+      render(<Navigation unreadComponent={unreadComponent} />)
+      expect(unreadComponent).toHaveBeenCalledTimes(1)
+      expect(unreadComponent.mock.calls[0][0].dataUrl).toBe(
+        '/api/v1/users/self/content_shares/unread_count'
+      )
+    })
   })
 })

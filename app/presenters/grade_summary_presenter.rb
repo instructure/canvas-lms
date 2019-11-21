@@ -169,7 +169,7 @@ class GradeSummaryPresenter
     when :module
       sorted_by_modules(assignments)
     when :assignment_group
-      assignments.sort_by { |a| [a.assignment_group.position, a.position] }
+      assignments.sort_by { |a| [a.assignment_group.position, a.position].map{|p| p || CanvasSort::Last} }
     end
   end
 

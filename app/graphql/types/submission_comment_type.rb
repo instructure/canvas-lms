@@ -37,8 +37,8 @@ module Types
     graphql_name 'SubmissionComment'
 
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
-    field :_id, ID, 'legacy canvas id', null: true, method: :id
     field :comment, String, null: true
 
     field :author, Types::UserType, null: true

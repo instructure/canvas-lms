@@ -631,6 +631,20 @@ describe CommunicationChannelsController do
         expect(response).to render_template('confirm')
         expect(assigns[:merge_opportunities]).to eq [[@user1, [@pseudonym1]]]
       end
+
+      context 'cross-shard user' do
+        specs_require_sharding
+
+        it 'lets users confirm an email address on either shard' do
+          @shard1.activate do
+            @cc = @user.communication_channels.create!(:path => 'new1@foo.com')
+            user_session(@user)
+            post 'confirm', params: {:nonce => @cc.confirmation_code}
+            @cc.reload
+            expect(@cc.workflow_state).to eq 'active'
+          end
+        end
+      end
     end
 
     describe "invitations" do

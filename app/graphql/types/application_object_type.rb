@@ -18,6 +18,15 @@
 
 module Types
   class ApplicationObjectType < GraphQL::Schema::Object
+    # this is using graphql-ruby's built-in authorization framework
+    #
+    # we are purposely not using it anywhere else in the app for performance
+    # reasons (we don't want to accidentally run permission checks on a long
+    # list of objects, for example)
+    def self.authorized?(_value, context)
+      super && AuthenticationMethods.graphql_type_authorized?(context[:access_token], graphql_name)
+    end
+
     def current_user
       context[:current_user]
     end

@@ -15,20 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {arrayOf, string} from 'prop-types'
+
+import {arrayOf, bool, func, string} from 'prop-types'
 import CanvasFiles from './CanvasFiles'
 import {ExternalTool} from '../../../graphqlData/ExternalTool'
-import React from 'react'
+import I18n from 'i18n!assignments_2_MoreOptions_Tools'
+import React, {useState} from 'react'
 import {UserGroups} from '../../../graphqlData/UserGroups'
 
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-
-const iframeContainerStyle = {
-  maxWidth: '1366px',
-  height: '0',
-  paddingBottom: '55%',
-  position: 'relative'
-}
+import {Tabs} from '@instructure/ui-tabs'
 
 const iframeStyle = {
   border: 'none',
@@ -37,27 +32,62 @@ const iframeStyle = {
   position: 'absolute'
 }
 
-const Tools = props => (
-  <TabList defaultSelectedIndex={0} variant="minimal">
-    <TabPanel title="Canvas Files">
-      <CanvasFiles courseID={props.courseID} userGroups={props.userGroups.groups} />
-    </TabPanel>
-    {props.tools.map(tool => (
-      <TabPanel title={tool.name} key={tool._id}>
-        <div style={iframeContainerStyle}>
-          <iframe
-            style={iframeStyle}
-            src={launchUrl(props.assignmentID, props.courseID, tool)}
-            title={tool.name}
-          />
-        </div>
-      </TabPanel>
-    ))}
-  </TabList>
-)
+const tabContentStyle = {
+  height: '0',
+  paddingBottom: '55%',
+  position: 'relative'
+}
+
+const Tools = props => {
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
+  const handleTabChange = (_, {index}) => {
+    setSelectedIndex(index)
+  }
+
+  return (
+    <Tabs onRequestTabChange={handleTabChange} margin="xx-small 0 0 0">
+      {props.renderCanvasFiles && (
+        <Tabs.Panel
+          isSelected={selectedIndex === 0}
+          key="CanvasFiles"
+          padding="xx-small 0"
+          renderTitle={I18n.t('Canvas Files')}
+        >
+          <div style={tabContentStyle}>
+            <CanvasFiles
+              courseID={props.courseID}
+              handleCanvasFileSelect={props.handleCanvasFileSelect}
+              userGroups={props.userGroups.groups}
+            />
+          </div>
+        </Tabs.Panel>
+      )}
+      {props.tools.map((tool, i) => (
+        <Tabs.Panel
+          isSelected={selectedIndex === i + 1}
+          key={tool._id}
+          padding="xx-small 0"
+          renderTitle={tool.name}
+        >
+          <div style={tabContentStyle}>
+            <iframe
+              style={iframeStyle}
+              src={launchUrl(props.assignmentID, props.courseID, tool)}
+              title={tool.name}
+            />
+          </div>
+        </Tabs.Panel>
+      ))}
+    </Tabs>
+  )
+}
+
 Tools.propTypes = {
   assignmentID: string.isRequired,
   courseID: string.isRequired,
+  handleCanvasFileSelect: func,
+  renderCanvasFiles: bool,
   tools: arrayOf(ExternalTool.shape),
   userGroups: UserGroups.shape
 }

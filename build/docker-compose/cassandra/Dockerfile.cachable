@@ -1,0 +1,7 @@
+FROM starlord.inscloudgate.net/jenkins/cassandra:2.2
+
+RUN mkdir -p /data/data /data/commitlog /data/saved_caches\
+  && chown -R cassandra:cassandra /data \
+  && chmod 777 /data
+COPY ./cassandra.yaml /etc/cassandra/cassandra.yaml
+CMD ["-d", "cassandra.config=/etc/cassandra/cassandra.yaml"]

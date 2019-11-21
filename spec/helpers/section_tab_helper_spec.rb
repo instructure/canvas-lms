@@ -169,7 +169,6 @@ describe SectionTabHelper do
         )
 
         expect(tag.a_attributes.keys).to include(:href, :class)
-        expect(tag.a_attributes.keys).not_to include(:'aria-label')
       end
 
       it 'includes a target if tab has the target attribute' do
@@ -177,145 +176,21 @@ describe SectionTabHelper do
         expect(tag.a_attributes[:target]).to eq '_blank'
       end
 
+      it 'does not include aria-current if tab is not active' do
+        tag = SectionTabHelperSpec::SectionTabTag.new(new_window_tab, course)
+        expect(tag.a_attributes[:'aria-current']).to eq nil
+      end
+
+      it 'includes aria-current if tab is active' do
+        tag = SectionTabHelperSpec::SectionTabTag.new(new_window_tab, course, new_window_tab[:css_class])
+        expect(tag.a_attributes[:'aria-current']).to eq 'page'
+      end
     end
 
     describe '#a_tag' do
       context 'when tab is not hidden' do
         let(:string) do
           SectionTabHelperSpec::SectionTabTag.new(
-            tab_assignments, course
-          ).a_tag
-        end
-        let(:html) { Nokogiri::HTML.fragment(string).children[0] }
-
-        it 'should be an a tag' do
-          expect(html.name).to eq 'a'
-        end
-
-        it 'should include text from tab label' do
-          expect(html.text).to eq tab_assignments[:label]
-        end
-      end
-
-      context 'when tab is hidden' do
-        let(:string) do
-          SectionTabHelperSpec::SectionTabTag.new(
-            tab_assignments.merge(hidden: true), course
-          ).a_tag
-        end
-        let(:html) { Nokogiri::HTML.fragment(string).children[0] }
-
-        it 'should include a nested span tag' do
-          expect(html.children.any? do |child|
-            child.name == 'span'
-          end).to be_truthy
-        end
-      end
-    end
-
-    describe '#li_classess' do
-      it 'should return an array including element `section`' do
-        tag = SectionTabHelperSpec::SectionTabTag.new(
-          tab_assignments, course
-        )
-        expect(tag.li_classes).to be_a Array
-        expect(tag.li_classes).to include('section')
-      end
-
-      it 'should include `section-tab-hidden` if tab is hidden' do
-        tag = SectionTabHelperSpec::SectionTabTag.new(
-          tab_assignments.merge(hidden: true), course
-        )
-
-        expect(tag.li_classes).to include('section-tab-hidden')
-      end
-    end
-
-
-    describe '#to_html' do
-      let(:string) do
-        SectionTabHelperSpec::SectionTabTag.new(
-          tab_assignments, course
-        ).to_html
-      end
-      let(:html) { Nokogiri::HTML.fragment(string).children[0] }
-
-      it 'should be an li tag' do
-        expect(html.name).to eq 'li'
-      end
-
-      it 'should include a nested a tag' do
-        expect(html.children.any? do |child|
-          child.name == 'a'
-        end).to be_truthy
-      end
-    end
-  end
-
-  describe 'SectionTabTagNew' do
-    # has screenreader
-    let_once(:tab_assignments) do
-      Course.default_tabs.find do |tab|
-        tab[:id] == Course::TAB_ASSIGNMENTS
-      end
-    end
-    # does not have screenreader
-    let_once(:tab_pages) do
-      Course.default_tabs.find do |tab|
-        tab[:id] == Course::TAB_PAGES
-      end
-    end
-    let(:new_window_tab) do
-      {
-        id: 1,
-        label: "my_tab",
-        css_class: "my_class",
-        href: :course_external_tool_path,
-        external:  true,
-        target: "_blank",
-        args: [1, 1]
-      }
-    end
-
-    describe '#a_classes' do
-      it 'should be an array including tab css_class' do
-        tag = SectionTabHelperSpec::SectionTabTagNew.new(
-          tab_assignments, course
-        )
-        expect(tag.a_classes).to be_a Array
-        expect(tag.a_classes).to include tab_assignments[:css_class]
-        expect(tag.a_classes).not_to include 'active'
-      end
-
-      it 'should include `active` class if tab is active' do
-        tag = SectionTabHelperSpec::SectionTabTagNew.new(
-          tab_assignments, course, tab_assignments[:css_class]
-        )
-
-        expect(tag.a_classes).to include 'active'
-      end
-    end
-
-    describe '#a_attributes' do
-      it 'should include keys href & class' do
-        tag = SectionTabHelperSpec::SectionTabTagNew.new(
-          tab_pages, course
-        )
-
-        expect(tag.a_attributes.keys).to include(:href, :class)
-      end
-
-      it 'includes a target if tab has the target attribute' do
-        tag = SectionTabHelperSpec::SectionTabTagNew.new(new_window_tab, course)
-        expect(tag.a_attributes[:target]).to eq '_blank'
-      end
-
-    end
-
-    describe '#a_tag' do
-      context 'when tab is not hidden' do
-        let(:string) do
-          SectionTabHelperSpec::SectionTabTagNew.new(
             tab_assignments, course
           ).a_tag
         end
@@ -337,7 +212,7 @@ describe SectionTabHelper do
 
       context 'when tab is unused' do
         let(:string) do
-          SectionTabHelperSpec::SectionTabTagNew.new(
+          SectionTabHelperSpec::SectionTabTag.new(
             tab_assignments.merge(hidden_unused: true), course
           ).a_tag
         end
@@ -357,7 +232,7 @@ describe SectionTabHelper do
 
       context 'when tab is hidden' do
         let(:string) do
-          SectionTabHelperSpec::SectionTabTagNew.new(
+          SectionTabHelperSpec::SectionTabTag.new(
             tab_assignments.merge(hidden: true), course
           ).a_tag
         end
@@ -378,17 +253,25 @@ describe SectionTabHelper do
 
     describe '#li_classess' do
       it 'should return an array including element `section`' do
-        tag = SectionTabHelperSpec::SectionTabTagNew.new(
+        tag = SectionTabHelperSpec::SectionTabTag.new(
           tab_assignments, course
         )
         expect(tag.li_classes).to be_a Array
         expect(tag.li_classes).to include('section')
       end
+
+      it 'should include `section-hidden` if tab is hidden' do
+        tag = SectionTabHelperSpec::SectionTabTag.new(
+            tab_assignments.merge(hidden: true), course
+        )
+
+        expect(tag.li_classes).to include('section-hidden')
+      end
     end
 
     describe '#to_html' do
       let(:string) do
-        SectionTabHelperSpec::SectionTabTagNew.new(
+        SectionTabHelperSpec::SectionTabTag.new(
           tab_assignments, course
         ).to_html
       end

@@ -24,9 +24,9 @@ import environment from './environment'
 import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper'
 import NumberHelper from '../shared/helpers/numberHelper'
 import I18n from 'i18n!gradebook_history'
-import IconOffLine from '@instructure/ui-icons/lib/Line/IconOff'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import {IconOffLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Tooltip} from '@instructure/ui-overlays'
 
 function anonymouslyGraded(gradedAnonymously) {
   return gradedAnonymously ? (

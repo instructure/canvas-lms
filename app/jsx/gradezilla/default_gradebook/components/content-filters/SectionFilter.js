@@ -33,6 +33,7 @@ export default function SectionFilter(props) {
       items={sections}
       label={I18n.t('Section Filter')}
       selectedItemId={selectedSectionId}
+      sortAlphabetically
     />
   )
 }

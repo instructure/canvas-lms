@@ -17,41 +17,38 @@
  */
 
 import {arrayOf, bool, number, shape, string} from 'prop-types'
-import {Criterion} from './Criterion'
 import gql from 'graphql-tag'
+import {RubricCriterion} from './RubricCriterion'
 
 export const Rubric = {
   fragment: gql`
     fragment Rubric on Rubric {
-      _id
-      context_id: contextId
       criteria {
-        ...Criterion
+        ...RubricCriterion
       }
       free_form_criterion_comments: freeFormCriterionComments
+      hide_score_total: hideScoreTotal
+      id: _id
       points_possible: pointsPossible
       title
     }
-    ${Criterion.fragment}
+    ${RubricCriterion.fragment}
   `,
 
   shape: shape({
-    _id: string.isRequired,
-    context_id: string.isRequired,
-    criteria: arrayOf(Criterion.shape),
+    criteria: arrayOf(RubricCriterion.shape),
     free_form_criterion_comments: bool,
+    hide_score_total: bool,
+    id: string.isRequired,
     points_possible: number.isRequired,
     title: string.isRequired
   })
 }
 
-export const RubricDefaultMocks = {
+export const DefaultMocks = {
   Rubric: () => ({
-    _id: '1',
-    contextId: '2',
+    id: '1',
     criteria: [{}],
-    freeFormCriterionComments: false,
-    pointsPossible: 10,
-    title: 'Rubric Title'
+    freeFormCriterionComments: false
   })
 }

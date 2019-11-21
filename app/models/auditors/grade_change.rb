@@ -233,12 +233,12 @@ class Auditors::GradeChange
 
   end
 
-  def self.record(submission, event_type=nil)
+  def self.record(skip_insert: false, submission:, event_type: nil)
     return unless submission
     submission.shard.activate do
       record = Auditors::GradeChange::Record.generate(submission, event_type)
       Canvas::LiveEvents.grade_changed(submission, record.previous_submission, record.previous_assignment)
-      Auditors::GradeChange::Stream.insert(record)
+      Auditors::GradeChange::Stream.insert(record) unless skip_insert
     end
   end
 

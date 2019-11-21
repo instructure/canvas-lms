@@ -17,50 +17,48 @@
  */
 
 import I18n from 'i18n!blueprint_coursesLockToggle'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import {Button} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-overlays'
+import {Text} from '@instructure/ui-elements'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 
-import IconLock from '@instructure/ui-icons/lib/Solid/IconBlueprintLock'
-import IconUnlock from '@instructure/ui-icons/lib/Solid/IconBlueprint'
+import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
 
 const modes = {
   ADMIN_LOCKED: {
     label: I18n.t('Locked'),
-    icon: IconLock,
+    icon: IconBlueprintLockSolid,
     tooltip: I18n.t('Unlock'),
     variant: 'primary'
   },
   ADMIN_UNLOCKED: {
     label: I18n.t('Blueprint'),
-    icon: IconUnlock,
+    icon: IconBlueprintSolid,
     tooltip: I18n.t('Lock'),
     variant: 'default'
   },
   ADMIN_WILLUNLOCK: {
     label: I18n.t('Blueprint'),
-    icon: IconUnlock,
+    icon: IconBlueprintSolid,
     tooltip: I18n.t('Unlock'),
     variant: 'default'
   },
   ADMIN_WILLLOCK: {
     label: I18n.t('Locked'),
-    icon: IconLock,
+    icon: IconBlueprintLockSolid,
     tooltip: I18n.t('Lock'),
     variant: 'primary'
   },
   TEACH_LOCKED: {
     label: I18n.t('Locked'),
-    icon: IconLock
+    icon: IconBlueprintLockSolid
   },
   TEACH_UNLOCKED: {
     label: I18n.t('Blueprint'),
-    icon: IconUnlock
+    icon: IconBlueprintSolid
   }
 }
 
@@ -68,15 +66,15 @@ export default class LockToggle extends Component {
   static propTypes = {
     isLocked: PropTypes.bool.isRequired,
     isToggleable: PropTypes.bool,
-    onClick: PropTypes.func,
+    onClick: PropTypes.func
   }
 
   static defaultProps = {
     isToggleable: false,
-    onClick: () => {},
+    onClick: () => {}
   }
 
-  static setupRootNode (wrapperSelector, childIndex, cb) {
+  static setupRootNode(wrapperSelector, childIndex, cb) {
     const toggleNode = document.createElement('span')
     // sometimes we have to wait for the DOM to settle down first
     const intId = setInterval(() => {
@@ -89,7 +87,7 @@ export default class LockToggle extends Component {
     }, 200)
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {}
 
@@ -116,7 +114,7 @@ export default class LockToggle extends Component {
     }
   }
 
-  render () {
+  render() {
     const Icon = this.state.mode.icon
     const text = <span className="bpc-lock-toggle__label">{this.state.mode.label || '-'}</span>
     let toggle = null
@@ -124,7 +122,9 @@ export default class LockToggle extends Component {
     if (this.props.isToggleable) {
       const variant = this.state.mode.variant
       const tooltip = this.state.mode.tooltip
-      const srLabel = this.props.isLocked ? I18n.t('Locked. Click to unlock.') : I18n.t('Unlocked. Click to lock.')
+      const srLabel = this.props.isLocked
+        ? I18n.t('Locked. Click to unlock.')
+        : I18n.t('Unlocked. Click to lock.')
 
       toggle = (
         <Tooltip tip={tooltip} placement="top" variant="inverse" on={['hover', 'focus']}>
@@ -146,14 +146,14 @@ export default class LockToggle extends Component {
     } else {
       toggle = (
         <span className="bpc__lock-no__toggle">
-          <span className="bpc__lock-no__toggle-icon"><Icon /></span>
+          <span className="bpc__lock-no__toggle-icon">
+            <Icon />
+          </span>
           <Text size="small">{text}</Text>
         </span>
       )
     }
 
-    return (
-      <span className="bpc-lock-toggle">{toggle}</span>
-    )
+    return <span className="bpc-lock-toggle">{toggle}</span>
   }
 }

@@ -17,17 +17,16 @@
  */
 
 import I18n from 'i18n!blueprint_course_sidebar'
-import React, { Component, lazy, Suspense } from 'react'
+import React, {Component, lazy, Suspense} from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import {Button} from '@instructure/ui-buttons'
+import {Text, Spinner} from '@instructure/ui-elements'
+import {Tooltip} from '@instructure/ui-overlays'
+import {PresentationContent} from '@instructure/ui-a11y'
 
 import propTypes from '../propTypes'
 import actions from '../actions'
@@ -35,13 +34,12 @@ import MigrationStates from '../migrationStates'
 
 import BlueprintSidebar from './BlueprintSidebar'
 import BlueprintModal from './BlueprintModal'
-import { ConnectedMigrationSync as MigrationSync } from './MigrationSync'
-import { ConnectedMigrationOptions as MigrationOptions } from './MigrationOptions'
+import {ConnectedMigrationSync as MigrationSync} from './MigrationSync'
+import {ConnectedMigrationOptions as MigrationOptions} from './MigrationOptions'
 
 const BlueprintAssociations = lazy(() => import('./ConnectedBlueprintAssociations'))
 const SyncHistory = lazy(() => import('./ConnectedSyncHistory'))
 const UnsyncedChanges = lazy(() => import('./ConnectedUnsyncedChanges'))
-
 
 export default class CourseSidebar extends Component {
   static propTypes = {
@@ -63,31 +61,33 @@ export default class CourseSidebar extends Component {
     clearAssociations: PropTypes.func.isRequired,
     enableSendNotification: PropTypes.func.isRequired,
     loadUnsyncedChanges: PropTypes.func.isRequired,
-    contentRef: PropTypes.func, // to get reference to the content of the Tray facilitates unit testing
+    contentRef: PropTypes.func // to get reference to the content of the Tray facilitates unit testing
   }
 
   static defaultProps = {
     unsyncedChanges: [],
     contentRef: null,
     migrationStatus: MigrationStates.states.unknown,
-    realRef: () => {},
+    realRef: () => {}
   }
 
   state = {
     isModalOpen: false,
-    modalId: null,
+    modalId: null
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.realRef(this)
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     // if migration is going from a loading state to a non-loading state
     // aka a migration probably just ended and we should refresh the list
     // of unsynced changes
-    if (MigrationStates.isLoadingState(this.props.migrationStatus) &&
-       !MigrationStates.isLoadingState(nextProps.migrationStatus)) {
+    if (
+      MigrationStates.isLoadingState(this.props.migrationStatus) &&
+      !MigrationStates.isLoadingState(nextProps.migrationStatus)
+    ) {
       this.props.loadUnsyncedChanges()
     }
   }
@@ -108,70 +108,78 @@ export default class CourseSidebar extends Component {
         hasChanges: this.props.hasAssociationChanges,
         isSaving: this.props.isSavingAssociations,
         onSave: this.props.saveAssociations,
-        onCancel: () => this.closeModal(() => {
-          this.asscBtn.focus()
-          this.props.clearAssociations()
-        }),
+        onCancel: () =>
+          this.closeModal(() => {
+            this.asscBtn.focus()
+            this.props.clearAssociations()
+          })
       },
       children: (
-        <Suspense fallback={<div>{I18n.t('Loading assotiations...')}</div>}>
+        <Suspense fallback={<div>{I18n.t('Loading associations...')}</div>}>
           <BlueprintAssociations />
         </Suspense>
       ),
-      onCancel: () => this.closeModal(() => {
-        this.asscBtn.focus()
-        this.props.clearAssociations()
-      }),
+      onCancel: () =>
+        this.closeModal(() => {
+          this.asscBtn.focus()
+          this.props.clearAssociations()
+        })
     }),
     syncHistory: () => ({
       props: {
         title: I18n.t('Sync History'),
-        onCancel: () => this.closeModal(() => {
-          if (this.syncHistoryBtn) this.syncHistoryBtn.focus()
-        }),
+        onCancel: () =>
+          this.closeModal(() => {
+            if (this.syncHistoryBtn) this.syncHistoryBtn.focus()
+          })
       },
       children: (
         <Suspense fallback={<div>{I18n.t('Loading sync history...')}</div>}>
           <SyncHistory />
         </Suspense>
-      ),
+      )
     }),
     unsyncedChanges: () => ({
       props: {
         title: I18n.t('Unsynced Changes'),
         hasChanges: this.props.unsyncedChanges.length > 0,
-        onCancel: () => this.closeModal(() => {
-          this.unsyncedChangesBtn.focus()
-        }),
-        saveButton: <MigrationSync
-          id="unsynced_changes_modal_sync"
-          showProgress={false}
-          onClick={() => this.closeModal(() => {
-            if (this.unsyncedChangesBtn) {
-              this.unsyncedChangesBtn.focus()
-            } else {
-              this.syncHistoryBtn.focus()
+        onCancel: () =>
+          this.closeModal(() => {
+            this.unsyncedChangesBtn.focus()
+          }),
+        saveButton: (
+          <MigrationSync
+            id="unsynced_changes_modal_sync"
+            showProgress={false}
+            onClick={() =>
+              this.closeModal(() => {
+                if (this.unsyncedChangesBtn) {
+                  this.unsyncedChangesBtn.focus()
+                } else {
+                  this.syncHistoryBtn.focus()
+                }
+              })
             }
-          })}
-        />
+          />
+        )
       },
       children: (
         <Suspense fallback={<div>{I18n.t('Loading unsynced changes...')}</div>}>
-        <UnsyncedChanges />
+          <UnsyncedChanges />
         </Suspense>
-      ),
+      )
     })
   }
 
-  closeModal = (cb) => {
+  closeModal = cb => {
     this.clearRoutes()
-    this.setState({ isModalOpen: false }, cb)
+    this.setState({isModalOpen: false}, cb)
   }
 
   handleAssociationsClick = () => {
     this.setState({
       isModalOpen: true,
-      modalId: 'associations',
+      modalId: 'associations'
     })
   }
 
@@ -182,11 +190,11 @@ export default class CourseSidebar extends Component {
   handleUnsyncedChangesClick = () => {
     this.setState({
       isModalOpen: true,
-      modalId: 'unsyncedChanges',
+      modalId: 'unsyncedChanges'
     })
   }
 
-  handleSendNotificationClick = (event) => {
+  handleSendNotificationClick = event => {
     const enabled = event.target.checked
     this.props.enableSendNotification(enabled)
   }
@@ -195,26 +203,27 @@ export default class CourseSidebar extends Component {
     this.props.routeTo('#!/blueprint')
   }
 
-  openHistoryModal () {
+  openHistoryModal() {
     this.setState({
       isModalOpen: true,
-      modalId: 'syncHistory',
+      modalId: 'syncHistory'
     })
   }
 
-  showChangeLog (params) {
+  showChangeLog(params) {
     this.props.selectChangeLog(params)
     this.openHistoryModal()
   }
 
-  hideChangeLog () {
+  hideChangeLog() {
     this.props.selectChangeLog(null)
   }
 
-  maybeRenderSyncButton () {
+  maybeRenderSyncButton() {
     const hasAssociations = this.props.associations.length > 0
     const syncIsActive = MigrationStates.isLoadingState(this.props.migrationStatus)
-    const hasUnsyncedChanges = this.props.hasLoadedUnsyncedChanges && this.props.unsyncedChanges.length > 0
+    const hasUnsyncedChanges =
+      this.props.hasLoadedUnsyncedChanges && this.props.unsyncedChanges.length > 0
 
     if (hasAssociations && (syncIsActive || hasUnsyncedChanges)) {
       return (
@@ -226,10 +235,12 @@ export default class CourseSidebar extends Component {
     return null
   }
 
-  maybeRenderUnsyncedChanges () {
+  maybeRenderUnsyncedChanges() {
     // if has no associations or sync in progress, hide
     const hasAssociations = this.props.associations.length > 0
-    const isSyncing = MigrationStates.isLoadingState(this.props.migrationStatus) || this.props.isLoadingBeginMigration
+    const isSyncing =
+      MigrationStates.isLoadingState(this.props.migrationStatus) ||
+      this.props.isLoadingBeginMigration
 
     if (!hasAssociations || isSyncing) {
       return null
@@ -245,16 +256,23 @@ export default class CourseSidebar extends Component {
       return (
         <div className="bcs__row">
           <Button
-            aria-label={I18n.t({ one: 'There is 1 Unsynced Change', other: 'There are %{count} Unsynced Changes' }, { count: this.props.unsyncedChanges.length })}
+            aria-label={I18n.t(
+              {one: 'There is 1 Unsynced Change', other: 'There are %{count} Unsynced Changes'},
+              {count: this.props.unsyncedChanges.length}
+            )}
             id="mcUnsyncedChangesBtn"
-            ref={(c) => { this.unsyncedChangesBtn = c }}
+            ref={c => {
+              this.unsyncedChangesBtn = c
+            }}
             variant="link"
             onClick={this.handleUnsyncedChangesClick}
           >
             <Text>{I18n.t('Unsynced Changes')}</Text>
           </Button>
           <PresentationContent>
-            <Text><span className="bcs__row-right-content">{this.props.unsyncedChanges.length}</span></Text>
+            <Text>
+              <span className="bcs__row-right-content">{this.props.unsyncedChanges.length}</span>
+            </Text>
           </PresentationContent>
           <MigrationOptions />
         </div>
@@ -264,54 +282,73 @@ export default class CourseSidebar extends Component {
     return null
   }
 
-  maybeRenderAssociations () {
+  maybeRenderAssociations() {
     if (!this.props.canManageCourse) return null
-    const isSyncing = MigrationStates.isLoadingState(this.props.migrationStatus) || this.props.isLoadingBeginMigration
+    const isSyncing =
+      MigrationStates.isLoadingState(this.props.migrationStatus) ||
+      this.props.isLoadingBeginMigration
     const length = this.props.associations.length
     const button = (
       <div className="bcs__row bcs__row__associations">
         <Button
-          aria-label={I18n.t({ one: 'There is 1 Association', other: 'There are %{count} Associations' }, { count: length })}
+          aria-label={I18n.t(
+            {one: 'There is 1 Association', other: 'There are %{count} Associations'},
+            {count: length}
+          )}
           disabled={isSyncing}
           id="mcSidebarAsscBtn"
-          ref={(c) => { this.asscBtn = c }}
+          ref={c => {
+            this.asscBtn = c
+          }}
           variant="link"
           onClick={this.handleAssociationsClick}
         >
           <Text>{I18n.t('Associations')}</Text>
         </Button>
         <PresentationContent>
-          <Text><span className="bcs__row-right-content">{length}</span></Text>
+          <Text>
+            <span className="bcs__row-right-content">{length}</span>
+          </Text>
         </PresentationContent>
       </div>
     )
 
     if (isSyncing) {
-      return <Tooltip variant="inverse" tip={I18n.t('Not available during sync')} placement="bottom">{button}</Tooltip>
+      return (
+        <Tooltip variant="inverse" tip={I18n.t('Not available during sync')} placement="bottom">
+          {button}
+        </Tooltip>
+      )
     } else {
       return button
     }
   }
 
-  renderSpinner (title) {
+  renderSpinner(title) {
     return (
       <div style={{textAlign: 'center'}}>
-        <Spinner size="small" title={title} />
-        <Text size="small" as="p">{title}</Text>
+        <Spinner size="small" renderTitle={title} />
+        <Text size="small" as="p">
+          {title}
+        </Text>
       </div>
     )
   }
 
-  renderModal () {
+  renderModal() {
     if (this.modals[this.state.modalId]) {
       const modal = this.modals[this.state.modalId]()
-      return <BlueprintModal {...modal.props} isOpen={this.state.isModalOpen}>{modal.children}</BlueprintModal>
+      return (
+        <BlueprintModal {...modal.props} isOpen={this.state.isModalOpen}>
+          {modal.children}
+        </BlueprintModal>
+      )
     } else {
       return null
     }
   }
 
-  render () {
+  render() {
     return (
       <BlueprintSidebar
         onOpen={this.onOpenSidebar}
@@ -321,7 +358,14 @@ export default class CourseSidebar extends Component {
         <div>
           {this.maybeRenderAssociations()}
           <div className="bcs__row">
-            <Button id="mcSyncHistoryBtn" ref={(c) => { this.syncHistoryBtn = c }} variant="link" onClick={this.handleSyncHistoryClick}>
+            <Button
+              id="mcSyncHistoryBtn"
+              ref={c => {
+                this.syncHistoryBtn = c
+              }}
+              variant="link"
+              onClick={this.handleSyncHistoryClick}
+            >
               <Text>{I18n.t('Sync History')}</Text>
             </Button>
           </div>
@@ -334,18 +378,24 @@ export default class CourseSidebar extends Component {
 }
 
 const connectState = state =>
-  Object.assign(select(state, [
-    'canManageCourse',
-    'hasLoadedAssociations',
-    'isLoadingBeginMigration',
-    'isSavingAssociations',
-    ['existingAssociations', 'associations'],
-    'unsyncedChanges',
-    'isLoadingUnsyncedChanges',
-    'hasLoadedUnsyncedChanges',
-    'migrationStatus'
-  ]), {
-    hasAssociationChanges: (state.addedAssociations.length + state.removedAssociations.length) > 0,
-  })
+  Object.assign(
+    select(state, [
+      'canManageCourse',
+      'hasLoadedAssociations',
+      'isLoadingBeginMigration',
+      'isSavingAssociations',
+      ['existingAssociations', 'associations'],
+      'unsyncedChanges',
+      'isLoadingUnsyncedChanges',
+      'hasLoadedUnsyncedChanges',
+      'migrationStatus'
+    ]),
+    {
+      hasAssociationChanges: state.addedAssociations.length + state.removedAssociations.length > 0
+    }
+  )
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedCourseSidebar = connect(connectState, connectActions)(CourseSidebar)
+export const ConnectedCourseSidebar = connect(
+  connectState,
+  connectActions
+)(CourseSidebar)

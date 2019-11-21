@@ -15,26 +15,35 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, { Component } from 'react';
-import classnames from 'classnames';
+import React, {Component} from 'react'
+import classnames from 'classnames'
 import {themeable, ApplyTheme} from '@instructure/ui-themeable'
 import {Text, Pill, Avatar} from '@instructure/ui-elements'
 import {Checkbox, CheckboxFacade} from '@instructure/ui-forms'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
-import {IconAssignmentLine, IconQuizLine, IconAnnouncementLine, IconDiscussionLine, IconCalendarMonthLine, IconDocumentLine, IconEditLine, IconPeerReviewLine} from '@instructure/ui-icons'
-import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
-import BadgeList from '../BadgeList';
-import CalendarEventModal from '../CalendarEventModal';
-import responsiviser from '../responsiviser';
-import styles from './styles.css';
-import theme from './theme.js';
-import { arrayOf, bool, number, string, func, shape, object } from 'prop-types';
-import { badgeShape, userShape, statusShape, sizeShape, feedbackShape } from '../plannerPropTypes';
-import { showPillForOverdueStatus } from '../../utilities/statusUtils';
-import { momentObj } from 'react-moment-proptypes';
-import formatMessage from '../../format-message';
-import {animatable} from '../../dynamic-ui';
+import {
+  IconAssignmentLine,
+  IconQuizLine,
+  IconAnnouncementLine,
+  IconDiscussionLine,
+  IconCalendarMonthLine,
+  IconDocumentLine,
+  IconEditLine,
+  IconPeerReviewLine
+} from '@instructure/ui-icons'
+import {arrayOf, bool, number, string, func, shape, object} from 'prop-types'
+import {momentObj} from 'react-moment-proptypes'
+import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
+import BadgeList from '../BadgeList'
+import CalendarEventModal from '../CalendarEventModal'
+import responsiviser from '../responsiviser'
+import styles from './styles.css'
+import theme from './theme.js'
+import {badgeShape, userShape, statusShape, sizeShape, feedbackShape} from '../plannerPropTypes'
+import {showPillForOverdueStatus} from '../../utilities/statusUtils'
+import formatMessage from '../../format-message'
+import {animatable} from '../../dynamic-ui'
 
 export class PlannerItem extends Component {
   static propTypes = {
@@ -68,307 +77,319 @@ export class PlannerItem extends Component {
     feedback: shape(feedbackShape),
     location: string,
     endTime: momentObj,
-    timeZone: string.isRequired,
-  };
+    timeZone: string.isRequired
+  }
 
   static defaultProps = {
     badges: [],
     responsiveSize: 'large',
-    allDay: false,
-  };
+    allDay: false
+  }
 
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
     this.state = {
       calendarEventModalOpen: false,
-      completed: props.completed,
-    };
+      completed: props.completed
+    }
   }
 
-  componentDidMount () {
-    this.props.registerAnimatable('item', this, this.props.animatableIndex, [this.props.uniqueId]);
+  componentDidMount() {
+    this.props.registerAnimatable('item', this, this.props.animatableIndex, [this.props.uniqueId])
   }
 
-  componentWillReceiveProps (nextProps) {
-    this.props.deregisterAnimatable('item', this, [this.props.uniqueId]);
-    this.props.registerAnimatable('item', this, nextProps.animatableIndex, [nextProps.uniqueId]);
+  componentWillReceiveProps(nextProps) {
+    this.props.deregisterAnimatable('item', this, [this.props.uniqueId])
+    this.props.registerAnimatable('item', this, nextProps.animatableIndex, [nextProps.uniqueId])
     this.setState({
-      completed: nextProps.completed,
-    });
+      completed: nextProps.completed
+    })
   }
 
-  componentWillUnmount () {
-    this.props.deregisterAnimatable('item', this, [this.props.uniqueId]);
+  componentWillUnmount() {
+    this.props.deregisterAnimatable('item', this, [this.props.uniqueId])
   }
 
-  toDoLinkClick = (e) => {
-    e.preventDefault();
-    this.props.updateTodo({updateTodoItem: {...this.props}});
+  toDoLinkClick = e => {
+    e.preventDefault()
+    this.props.updateTodo({updateTodoItem: {...this.props}})
   }
 
-  registerRootDivRef = (elt) => {
-    this.rootDivRef = elt;
+  registerRootDivRef = elt => {
+    this.rootDivRef = elt
   }
 
-  registerFocusElementRef = (elt) => {
-    this.checkboxRef = elt;
+  registerFocusElementRef = elt => {
+    this.checkboxRef = elt
   }
 
-  getFocusable = (which) => {
-    return (which === 'update' || which === 'delete') ? this.itemLink : this.checkboxRef;
+  getFocusable = which => {
+    return which === 'update' || which === 'delete' ? this.itemLink : this.checkboxRef
   }
 
-  getScrollable () {
-    return this.rootDivRef;
+  getScrollable() {
+    return this.rootDivRef
   }
 
   getLayout() {
-    return this.props.responsiveSize;
+    return this.props.responsiveSize
   }
 
-  hasDueTime () {
-    return this.props.date &&
+  hasDueTime() {
+    return (
+      this.props.date &&
       !(
-        this.props.associated_item === "Announcement" ||
-        this.props.associated_item === "Calendar Event"
-      );
+        this.props.associated_item === 'Announcement' ||
+        this.props.associated_item === 'Calendar Event'
+      )
+    )
   }
 
-  showEndTime () {
-    return this.props.date &&
-          !this.props.allDay &&
-           this.props.endTime && !this.props.endTime.isSame(this.props.date);
+  showEndTime() {
+    return (
+      this.props.date &&
+      !this.props.allDay &&
+      this.props.endTime &&
+      !this.props.endTime.isSame(this.props.date)
+    )
   }
 
-  hasBadges () {
-    return this.props.badges && this.props.badges.length && this.props.badges.length > 0;
+  hasBadges() {
+    return this.props.badges && this.props.badges.length && this.props.badges.length > 0
   }
 
-  assignmentType () {
-    switch(this.props.associated_item) {
+  assignmentType() {
+    switch (this.props.associated_item) {
       case 'Quiz':
-        return formatMessage('Quiz');
+        return formatMessage('Quiz')
       case 'Discussion':
-        return formatMessage('Discussion');
+        return formatMessage('Discussion')
       case 'Assignment':
-        return formatMessage('Assignment');
+        return formatMessage('Assignment')
       case 'Page':
-        return formatMessage('Page');
+        return formatMessage('Page')
       case 'Announcement':
-        return formatMessage('Announcement');
+        return formatMessage('Announcement')
       case 'To Do':
-        return formatMessage('To Do');
+        return formatMessage('To Do')
       case 'Calendar Event':
-        return formatMessage('Calendar Event');
+        return formatMessage('Calendar Event')
       case 'Peer Review':
-        return formatMessage('Peer Review');
+        return formatMessage('Peer Review')
       default:
-        return formatMessage('Task');
+        return formatMessage('Task')
     }
   }
 
   renderDateField = () => {
     if (this.props.date) {
       if (this.props.allDay) {
-        return formatMessage('All Day');
+        return formatMessage('All Day')
       }
 
-      if (this.props.associated_item === "Calendar Event") {
+      if (this.props.associated_item === 'Calendar Event') {
         if (this.showEndTime()) {
-          return formatMessage("{startTime} to {endTime}", {
-            startTime: this.props.date.format("LT"),
-            endTime: this.props.endTime.format("LT")
-          });
+          return formatMessage('{startTime} to {endTime}', {
+            startTime: this.props.date.format('LT'),
+            endTime: this.props.endTime.format('LT')
+          })
         } else {
-          return formatMessage(this.props.date.format("LT"));
+          return formatMessage(this.props.date.format('LT'))
         }
       }
 
       if (this.hasDueTime()) {
-        if (this.props.associated_item === "Peer Review") {
-          return formatMessage("Reminder: {date}", {date: this.props.date.format("LT")});
+        if (this.props.associated_item === 'Peer Review') {
+          return formatMessage('Reminder: {date}', {date: this.props.date.format('LT')})
         } else if (this.props.dateStyle === 'todo') {
-          return formatMessage("To Do: {date}", {date: this.props.date.format("LT")});
-        }  else {
-          return formatMessage("Due: {date}", {date: this.props.date.format("LT")});
+          return formatMessage('To Do: {date}', {date: this.props.date.format('LT')})
+        } else {
+          return formatMessage('Due: {date}', {date: this.props.date.format('LT')})
         }
       }
 
-
-      return this.props.date.format("LT");
+      return this.props.date.format('LT')
     }
-    return null;
+    return null
   }
 
-  linkLabel () {
-    const assignmentType = this.assignmentType();
-    const datetimeformat = this.props.allDay === true ? 'LL' : 'LLLL';
+  linkLabel() {
+    const assignmentType = this.assignmentType()
+    const datetimeformat = this.props.allDay === true ? 'LL' : 'LLLL'
     const params = {
       assignmentType,
       title: this.props.title,
       datetime: this.props.date ? this.props.date.format(datetimeformat) : null
-    };
+    }
 
     if (this.props.date) {
       if (this.props.allDay) {
-        return formatMessage('{assignmentType} {title}, all day on {datetime}.', params);
+        return formatMessage('{assignmentType} {title}, all day on {datetime}.', params)
       }
 
-      if (this.props.associated_item === "Calendar Event") {
+      if (this.props.associated_item === 'Calendar Event') {
         if (this.showEndTime()) {
-          params.endTime = this.props.endTime.format('LT');
-          return formatMessage('{assignmentType} {title}, at {datetime} until {endTime}', params);
+          params.endTime = this.props.endTime.format('LT')
+          return formatMessage('{assignmentType} {title}, at {datetime} until {endTime}', params)
         } else {
-          return formatMessage('{assignmentType} {title}, at {datetime}.', params);
+          return formatMessage('{assignmentType} {title}, at {datetime}.', params)
         }
       }
 
       if (this.hasDueTime()) {
         if (this.props.dateStyle === 'todo') {
-          return formatMessage('{assignmentType} {title} has a to do time at {datetime}.', params);
+          return formatMessage('{assignmentType} {title} has a to do time at {datetime}.', params)
         } else if (this.props.associated_item === 'Peer Review') {
-          return formatMessage('{assignmentType} {title}, reminder {datetime}.', params);
+          return formatMessage('{assignmentType} {title}, reminder {datetime}.', params)
         } else {
-          return formatMessage('{assignmentType} {title}, due {datetime}.', params);
+          return formatMessage('{assignmentType} {title}, due {datetime}.', params)
         }
       }
 
-      if (this.props.associated_item === "Announcement") {
-        return formatMessage('{assignmentType} {title} posted {datetime}.', params);
+      if (this.props.associated_item === 'Announcement') {
+        return formatMessage('{assignmentType} {title} posted {datetime}.', params)
       }
     }
-    return formatMessage('{assignmentType} {title}.', params);
+    return formatMessage('{assignmentType} {title}.', params)
   }
 
   openCalendarEventModal = () => {
-    this.setState({calendarEventModalOpen: true});
+    this.setState({calendarEventModalOpen: true})
   }
 
   closeCalendarEventModal = () => {
-    this.setState({calendarEventModalOpen: false});
+    this.setState({calendarEventModalOpen: false})
   }
 
   renderIcon = () => {
-    const currentUser = this.props.currentUser || {};
+    const currentUser = this.props.currentUser || {}
 
-    switch(this.props.associated_item) {
-        case "Assignment":
-          return <IconAssignmentLine />;
-        case "Quiz":
-          return <IconQuizLine />;
-        case "Discussion":
-          return <IconDiscussionLine />;
-        case "Announcement":
-          return <IconAnnouncementLine />;
-        case "Calendar Event":
-          return <IconCalendarMonthLine />;
-        case "Page":
-          return <IconDocumentLine />;
-        case "Peer Review":
-          return <IconPeerReviewLine />;
-        default:
-          return <Avatar name={currentUser.displayName || '?'} src={currentUser.avatarUrl} size="small" />;
+    switch (this.props.associated_item) {
+      case 'Assignment':
+        return <IconAssignmentLine />
+      case 'Quiz':
+        return <IconQuizLine />
+      case 'Discussion':
+        return <IconDiscussionLine />
+      case 'Announcement':
+        return <IconAnnouncementLine />
+      case 'Calendar Event':
+        return <IconCalendarMonthLine />
+      case 'Page':
+        return <IconDocumentLine />
+      case 'Peer Review':
+        return <IconPeerReviewLine />
+      default:
+        return (
+          <Avatar name={currentUser.displayName || '?'} src={currentUser.avatarUrl} size="small" />
+        )
     }
   }
 
-  renderCalendarEventModal () {
-    if (this.props.associated_item !== 'Calendar Event') return null;
-    return <CalendarEventModal
-      open={this.state.calendarEventModalOpen}
-      requestClose={this.closeCalendarEventModal}
-      title={this.props.title}
-      html_url={this.props.html_url}
-      courseName={this.props.courseName}
-      currentUser={this.props.currentUser}
-      location={this.props.location}
-      address={this.props.address}
-      details={this.props.details}
-      startTime={this.props.date}
-      endTime={this.props.endTime}
-      allDay={!!this.props.allDay}
-      timeZone={this.props.timeZone}
-    />;
+  renderCalendarEventModal() {
+    if (this.props.associated_item !== 'Calendar Event') return null
+    return (
+      <CalendarEventModal
+        open={this.state.calendarEventModalOpen}
+        requestClose={this.closeCalendarEventModal}
+        title={this.props.title}
+        html_url={this.props.html_url}
+        courseName={this.props.courseName}
+        currentUser={this.props.currentUser}
+        location={this.props.location}
+        address={this.props.address}
+        details={this.props.details}
+        startTime={this.props.date}
+        endTime={this.props.endTime}
+        allDay={!!this.props.allDay}
+        timeZone={this.props.timeZone}
+      />
+    )
   }
 
-  renderTitle () {
-    const linkProps = {};
+  renderTitle() {
+    const linkProps = {}
     if (this.props.associated_item === 'To Do') {
-      linkProps.onClick = this.toDoLinkClick;
+      linkProps.onClick = this.toDoLinkClick
     }
     if (this.props.associated_item === 'Calendar Event') {
-      linkProps.onClick = this.openCalendarEventModal;
+      linkProps.onClick = this.openCalendarEventModal
     } else {
-      linkProps.href = this.props.html_url;
+      linkProps.href = this.props.html_url
     }
 
-    return <div className={styles.title} style={{position: 'relative'}}>
-      <Button
-        variant="link"
-        theme={{mediumPadding: '0', mediumHeight: 'normal'}}
-        buttonRef={(link) => {this.itemLink = link;}}
-        {...linkProps}
-      >
-        <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
-        <PresentationContent>{this.props.title}</PresentationContent>
-        {this.renderCalendarEventModal()}
-      </Button>
-    </div>;
+    return (
+      <div className={styles.title} style={{position: 'relative'}}>
+        <Button
+          variant="link"
+          theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+          buttonRef={link => {
+            this.itemLink = link
+          }}
+          {...linkProps}
+        >
+          <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
+          <PresentationContent>{this.props.title}</PresentationContent>
+          {this.renderCalendarEventModal()}
+        </Button>
+      </div>
+    )
   }
 
   renderBadges = () => {
     if (this.props.badges.length) {
       return (
         <BadgeList>
-          {this.props.badges.map((b) => (
-            <Pill
-              key={b.id}
-              text={b.text}
-              variant={b.variant}
-            />
+          {this.props.badges.map(b => (
+            <Pill key={b.id} text={b.text} variant={b.variant} />
           ))}
         </BadgeList>
-      );
+      )
     }
-    return null;
+    return null
   }
 
   renderItemSubMetric = () => {
-   if (this.props.points) {
-     return (
-      <div className={styles.score}>
-        <Text color="secondary">
-          <Text size="large">{this.props.points}</Text>
-          <Text size="x-small">&nbsp;
-            { formatMessage('pts') }
+    if (this.props.points) {
+      return (
+        <div className={styles.score}>
+          <Text color="secondary">
+            <Text size="large">{this.props.points}</Text>
+            <Text size="x-small">
+              &nbsp;
+              {formatMessage('pts')}
+            </Text>
           </Text>
-        </Text>
-      </div>
-     );
+        </div>
+      )
     }
     if (this.props.associated_item === 'To Do') {
       return (
         <div className={styles.editButton}>
-          <ApplyTheme theme={{
-            [Button.theme]: {iconColor: this.props.color}
-          }}>
-            <Button variant='icon' icon={IconEditLine} onClick={this.toDoLinkClick}>
+          <ApplyTheme
+            theme={{
+              [Button.theme]: {iconColor: this.props.color}
+            }}
+          >
+            <Button variant="icon" icon={IconEditLine} onClick={this.toDoLinkClick}>
               <ScreenReaderContent>{formatMessage('Edit')}</ScreenReaderContent>
             </Button>
           </ApplyTheme>
         </div>
-      );
+      )
     }
-    return null;
+    return null
   }
 
   renderItemMetrics = () => {
-    const secondaryClasses = classnames(styles.secondary, !this.hasBadges() ? styles.secondary_no_badges: '');
-    const metricsClasses = classnames(styles.metrics, {[styles.with_end_time]: this.showEndTime()});
+    const secondaryClasses = classnames(
+      styles.secondary,
+      !this.hasBadges() ? styles.secondary_no_badges : ''
+    )
+    const metricsClasses = classnames(styles.metrics, {[styles.with_end_time]: this.showEndTime()})
     return (
       <div className={secondaryClasses}>
-        <div className={styles.badges}>
-          {this.renderBadges()}
-        </div>
+        <div className={styles.badges}>{this.renderBadges()}</div>
         <div className={metricsClasses}>
           {this.renderItemSubMetric()}
           <div className={styles.due}>
@@ -378,20 +399,22 @@ export class PlannerItem extends Component {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   renderType = () => {
     if (!this.props.associated_item) {
-      return formatMessage('{course} TO DO', { course: this.props.courseName || '' });
+      return formatMessage('{course} TO DO', {course: this.props.courseName || ''})
     } else {
-      return `${this.props.courseName || ''} ${this.assignmentType()}`;
+      return `${this.props.courseName || ''} ${this.assignmentType()}`
     }
   }
 
   renderItemDetails = () => {
     return (
-      <div className={classnames(styles.details, !this.hasBadges() ? styles.details_no_badges: '')}>
+      <div
+        className={classnames(styles.details, !this.hasBadges() ? styles.details_no_badges : '')}
+      >
         <div className={styles.type}>
           <Text size="x-small" color="secondary">
             {this.renderType()}
@@ -399,35 +422,38 @@ export class PlannerItem extends Component {
         </div>
         {this.renderTitle()}
       </div>
-    );
+    )
   }
 
-  renderNotificationBadge () {
+  renderNotificationBadge() {
     if (!this.props.showNotificationBadge) {
-      return null;
+      return null
     }
 
-    const newItem = this.props.newActivity;
-    let missing = false;
-    if (showPillForOverdueStatus('missing', {status: this.props.status, context: this.props.context})) {
-      missing = true;
+    const newItem = this.props.newActivity
+    let missing = false
+    if (
+      showPillForOverdueStatus('missing', {status: this.props.status, context: this.props.context})
+    ) {
+      missing = true
     }
 
     if (newItem || missing) {
-      const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator;
+      const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator
       return (
         <NotificationBadge responsiveSize={this.props.responsiveSize}>
           <div className={styles.activityIndicator}>
             <IndicatorComponent
-            title={this.props.title}
-            itemIds={[this.props.uniqueId]}
-            animatableIndex={this.props.animatableIndex}
-            getFocusable={this.getFocusable} />
+              title={this.props.title}
+              itemIds={[this.props.uniqueId]}
+              animatableIndex={this.props.animatableIndex}
+              getFocusable={this.getFocusable}
+            />
           </div>
         </NotificationBadge>
-      );
+      )
     } else {
-      return <NotificationBadge responsiveSize={this.props.responsiveSize} />;
+      return <NotificationBadge responsiveSize={this.props.responsiveSize} />
     }
   }
 
@@ -437,60 +463,77 @@ export class PlannerItem extends Component {
       checkedBorderColor: this.props.color,
       borderColor: this.props.color,
       hoverBorderColor: this.props.color
-    };
+    }
   }
 
-  renderExtraInfo () {
-    const feedback = this.props.feedback;
+  renderExtraInfo() {
+    const feedback = this.props.feedback
     if (feedback) {
-      const comment = feedback.is_media ? formatMessage("You have media feedback.") : feedback.comment;
+      const comment = feedback.is_media
+        ? formatMessage('You have media feedback.')
+        : feedback.comment
       return (
         <div className={styles.feedback}>
           <span className={styles.feedbackAvatar}>
-            <Avatar name={feedback.author_name || '?'} src={feedback.author_avatar_url} size="small"/>
+            <Avatar
+              name={feedback.author_name || '?'}
+              src={feedback.author_avatar_url}
+              size="small"
+            />
           </span>
-          <span className={styles.feedbackComment}><Text fontStyle="italic">{comment}</Text></span>
+          <span className={styles.feedbackComment}>
+            <Text fontStyle="italic">{comment}</Text>
+          </span>
         </div>
-      );
+      )
     }
-    const location = this.props.location;
+    const location = this.props.location
     if (location) {
       return (
         <div className={styles.location}>
           <Text color="secondary">{location}</Text>
         </div>
-      );
+      )
     }
-    return null;
+    return null
   }
 
-  render () {
-    const assignmentType = this.assignmentType();
-    const checkboxLabel = this.state.completed ?
-      formatMessage('{assignmentType} {title} is marked as done.',
-        { assignmentType: assignmentType, title: this.props.title }) :
-      formatMessage('{assignmentType} {title} is not marked as done.',
-        { assignmentType: assignmentType, title: this.props.title });
+  render() {
+    const assignmentType = this.assignmentType()
+    const checkboxLabel = this.state.completed
+      ? formatMessage('{assignmentType} {title} is marked as done.', {
+          assignmentType,
+          title: this.props.title
+        })
+      : formatMessage('{assignmentType} {title} is not marked as done.', {
+          assignmentType,
+          title: this.props.title
+        })
 
     return (
-      <div className={classnames(styles.root, styles[this.getLayout()], 'planner-item')} ref={this.registerRootDivRef}>
+      <div
+        className={classnames(styles.root, styles[this.getLayout()], 'planner-item')}
+        ref={this.registerRootDivRef}
+      >
         {this.renderNotificationBadge()}
         <div className={styles.completed}>
-          <ApplyTheme theme={{
-            [CheckboxFacade.theme]: this.getCheckboxTheme()
-          }}>
-          <Checkbox
-            ref={this.registerFocusElementRef}
-            label={<ScreenReaderContent>{checkboxLabel}</ScreenReaderContent>}
-            checked={this.props.toggleAPIPending ? !this.state.completed : this.state.completed}
-            onChange={this.props.toggleCompletion}
-            disabled={this.props.toggleAPIPending}
-          />
+          <ApplyTheme
+            theme={{
+              [CheckboxFacade.theme]: this.getCheckboxTheme()
+            }}
+          >
+            <Checkbox
+              ref={this.registerFocusElementRef}
+              label={<ScreenReaderContent>{checkboxLabel}</ScreenReaderContent>}
+              checked={this.props.toggleAPIPending ? !this.state.completed : this.state.completed}
+              onChange={this.props.toggleCompletion}
+              disabled={this.props.toggleAPIPending}
+            />
           </ApplyTheme>
         </div>
         <div
           className={this.props.associated_item === 'To Do' ? styles.avatar : styles.icon}
-          style={{ color: this.props.color }}
+          style={{color: this.props.color}}
           aria-hidden="true"
         >
           {this.renderIcon()}
@@ -503,9 +546,9 @@ export class PlannerItem extends Component {
           {this.renderExtraInfo()}
         </div>
       </div>
-    );
+    )
   }
 }
 
-const ResponsivePlannerItem = responsiviser()(PlannerItem);
-export default animatable(themeable(theme, styles)(ResponsivePlannerItem));
+const ResponsivePlannerItem = responsiviser()(PlannerItem)
+export default animatable(themeable(theme, styles)(ResponsivePlannerItem))

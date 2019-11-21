@@ -16,120 +16,120 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import sinon from "sinon";
-import IframesTableFix from "../../src/rce/IframesTableFix";
+import assert from 'assert'
+import sinon from 'sinon'
+import IframesTableFix from '../../src/rce/IframesTableFix'
 
 let table,
   editor,
   ifr,
-  sandbox = sinon.createSandbox();
+  sandbox = sinon.createSandbox()
 
 class MockMutationObserver {
   observe() {}
 }
 
-describe("IframesTableFix - for CNVS-37129", () => {
+describe('IframesTableFix - for CNVS-37129', () => {
   beforeEach(() => {
-    table = { name: "table" };
+    table = {name: 'table'}
     editor = {
       addVisual: () => {},
-      dom: { select: () => {} }
-    };
-    ifr = new IframesTableFix();
-  });
+      dom: {select: () => {}}
+    }
+    ifr = new IframesTableFix()
+  })
 
   afterEach(() => {
-    sandbox.restore();
-  });
+    sandbox.restore()
+  })
 
-  it("ensures hackTableInsertion hooks editor.addVisual", () => {
+  it('ensures hackTableInsertion hooks editor.addVisual', () => {
     const mock = sandbox
       .mock(ifr)
-      .expects("addMutationObserverToTables")
+      .expects('addMutationObserverToTables')
       .twice()
-      .withArgs(editor);
-    ifr.hookAddVisual(editor, MockMutationObserver);
-    editor.addVisual();
-    mock.verify();
-  });
+      .withArgs(editor)
+    ifr.hookAddVisual(editor, MockMutationObserver)
+    editor.addVisual()
+    mock.verify()
+  })
 
-  it("ensures addMutationObserverToTables adds MutationObserver to table", () => {
+  it('ensures addMutationObserverToTables adds MutationObserver to table', () => {
     sandbox
-      .stub(editor.dom, "select")
-      .withArgs("table")
-      .returns([table]);
+      .stub(editor.dom, 'select')
+      .withArgs('table')
+      .returns([table])
     const mock = sandbox
       .mock(MockMutationObserver.prototype)
-      .expects("observe")
+      .expects('observe')
       .once()
-      .withArgs(table);
-    sandbox.stub(ifr, "fixIframes");
-    ifr.addMutationObserverToTables(editor, MockMutationObserver);
-    mock.verify();
-  });
+      .withArgs(table)
+    sandbox.stub(ifr, 'fixIframes')
+    ifr.addMutationObserverToTables(editor, MockMutationObserver)
+    mock.verify()
+  })
 
-  it("ensures addMutationObserverToTables adds MutationObserver to table only once", () => {
+  it('ensures addMutationObserverToTables adds MutationObserver to table only once', () => {
     sandbox
-      .stub(editor.dom, "select")
-      .withArgs("table")
-      .returns([table]);
+      .stub(editor.dom, 'select')
+      .withArgs('table')
+      .returns([table])
     const mock = sandbox
       .mock(MockMutationObserver.prototype)
-      .expects("observe")
+      .expects('observe')
       .once()
-      .withArgs(table);
-    sandbox.stub(ifr, "fixIframes");
-    ifr.addMutationObserverToTables(editor, MockMutationObserver);
-    ifr.addMutationObserverToTables(editor, MockMutationObserver);
-    mock.verify();
-  });
+      .withArgs(table)
+    sandbox.stub(ifr, 'fixIframes')
+    ifr.addMutationObserverToTables(editor, MockMutationObserver)
+    ifr.addMutationObserverToTables(editor, MockMutationObserver)
+    mock.verify()
+  })
 
-  it("ensures fixIframes is called from mutationobserver", () => {
+  it('ensures fixIframes is called from mutationobserver', () => {
     sandbox
-      .stub(editor.dom, "select")
-      .withArgs("table")
-      .returns([table]);
-    sandbox.stub(MockMutationObserver.prototype, "observe");
+      .stub(editor.dom, 'select')
+      .withArgs('table')
+      .returns([table])
+    sandbox.stub(MockMutationObserver.prototype, 'observe')
     const mock = sandbox
       .mock(ifr)
-      .expects("fixIframes")
-      .once();
-    ifr.addMutationObserverToTables(editor, MockMutationObserver);
-    mock.verify();
-  });
+      .expects('fixIframes')
+      .once()
+    ifr.addMutationObserverToTables(editor, MockMutationObserver)
+    mock.verify()
+  })
 
-  it("ensures fixIframes fixes iframes", () => {
-    const innerHTML = "<span>gomer</span>";
+  it('ensures fixIframes fixes iframes', () => {
+    const innerHTML = '<span>gomer</span>'
     const elem = {
-      tagName: "SPAN",
+      tagName: 'SPAN',
       getAttribute: () => {
-        return "iframe";
+        return 'iframe'
       }
-    };
-    const td = { children: [elem], innerHTML };
+    }
+    const td = {children: [elem], innerHTML}
     sandbox
-      .stub(editor.dom, "select")
-      .withArgs("td")
-      .returns([td]);
-    ifr.fixIframes(editor);
-    assert(td.innerHTML === `<div>${  innerHTML  }</div>`);
-  });
+      .stub(editor.dom, 'select')
+      .withArgs('td')
+      .returns([td])
+    ifr.fixIframes(editor)
+    assert(td.innerHTML === `<div>${innerHTML}</div>`)
+  })
 
-  it("ensure fixIframes does not fix non-iframes", () => {
-    const innerHTML = "<p><span>gomer</span></p>";
+  it('ensure fixIframes does not fix non-iframes', () => {
+    const innerHTML = '<p><span>gomer</span></p>'
     const elem = {
-      tagName: "P",
+      tagName: 'P',
       getAttribute: () => {
-        return "iframe";
+        return 'iframe'
       }
-    };
-    const td = { children: [elem], innerHTML };
+    }
+    const td = {children: [elem], innerHTML}
     sandbox
-      .stub(editor.dom, "select")
-      .withArgs("td")
-      .returns([td]);
-    ifr.fixIframes(editor);
-    assert(td.innerHTML === innerHTML);
-  });
-});
+      .stub(editor.dom, 'select')
+      .withArgs('td')
+      .returns([td])
+    ifr.fixIframes(editor)
+    assert(td.innerHTML === innerHTML)
+  })
+})

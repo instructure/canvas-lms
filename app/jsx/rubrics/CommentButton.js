@@ -17,25 +17,20 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconFeedback from '@instructure/ui-icons/lib/Line/IconFeedback'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Button} from '@instructure/ui-buttons'
+import {IconFeedbackLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import I18n from 'i18n!edit_rubricCommentButton'
 
-const CommentButton = ({ onClick }) => (
+const CommentButton = ({onClick}) => (
   <div>
-    <Button
-      variant="icon"
-      icon={<IconFeedback />}
-      margin="0 x-small 0 0"
-      onClick={onClick}
-    >
+    <Button variant="icon" icon={<IconFeedbackLine />} margin="0 x-small 0 0" onClick={onClick}>
       <ScreenReaderContent>{I18n.t('Add Additional Comments')}</ScreenReaderContent>
     </Button>
   </div>
 )
 CommentButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired
 }
 
 export default CommentButton

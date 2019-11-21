@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!assignments_2_thing'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import PropTypes from 'prop-types'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
 

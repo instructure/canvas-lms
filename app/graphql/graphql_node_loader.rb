@@ -21,6 +21,8 @@ module GraphQLNodeLoader
     check_read_permission = make_permission_check(ctx, :read)
 
     case type
+    when "Account"
+      Loaders::IDLoader.for(Account).load(id).then(check_read_permission)
     when "Course"
       Loaders::IDLoader.for(Course).load(id).then(check_read_permission)
     when "Assignment"
@@ -126,6 +128,8 @@ module GraphQLNodeLoader
           progress
         end
       end
+    when 'Rubric'
+      Loaders::IDLoader.for(Rubric).load(id).then(check_read_permission)
     when "Term"
       Loaders::IDLoader.for(EnrollmentTerm).load(id).then do |enrollment_term|
         Loaders::AssociationLoader.for(EnrollmentTerm, :root_account).load(enrollment_term).then do

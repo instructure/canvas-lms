@@ -20,7 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import LinksPanel from '../LinksPanel'
 
-function makeCollection(overrides={}) {
+function makeCollection(overrides = {}) {
   return {
     hasMore: false,
     isLoading: false,
@@ -32,17 +32,14 @@ function makeCollection(overrides={}) {
 function renderComponent(renderer, props) {
   return renderer(
     <LinksPanel
-      selectedAccordionIndex=''
+      selectedAccordionIndex=""
       onChangeAccordion={() => {}}
-      contextType='course'
+      contextType="course"
       contextId="1"
       collections={{
         wikiPages: makeCollection(),
         assignments: makeCollection({
-          links: [
-            {href: 'url1', title: 'link1'},
-            {href: 'url2', title: 'link2'}
-          ]
+          links: [{href: 'url1', title: 'link1'}, {href: 'url2', title: 'link2'}]
         }),
         quizzes: makeCollection(),
         announcements: makeCollection(),
@@ -50,10 +47,7 @@ function renderComponent(renderer, props) {
         modules: {
           hasMore: false,
           isLoading: false,
-          links: [
-            {href: 'url3', title: 'link3'},
-            {href: 'url4', title: 'link4'}
-          ]
+          links: [{href: 'url3', title: 'link3'}, {href: 'url4', title: 'link4'}]
         }
       }}
       fetchInitialPage={() => {}}

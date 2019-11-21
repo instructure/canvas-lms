@@ -472,16 +472,23 @@ class ContentTag < ActiveRecord::Base
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     differentiable_classes = ['Assignment','DiscussionTopic', 'Quiz','Quizzes::Quiz', 'WikiPage']
     scope = for_non_differentiable_classes(course_ids, differentiable_classes)
-    non_cyoe_courses = Course.where(id: course_ids).reject{|course| ConditionalRelease::Service.enabled_in_context?(course)}
-    if non_cyoe_courses
+
+    cyoe_courses, non_cyoe_courses = Course.where(id: course_ids).partition{|course| ConditionalRelease::Service.enabled_in_context?(course)}
+    if non_cyoe_courses.any?
       scope = scope.union(where(context_id: non_cyoe_courses, context_type: 'Course', content_type: 'WikiPage'))
     end
+    if cyoe_courses.any?
+      scope = scope.union(
+        for_non_differentiable_wiki_pages(cyoe_courses.map(&:id)),
+        for_differentiable_wiki_pages(user_ids, cyoe_courses.map(&:id))
+      )
+    end
     scope.union(
-      for_non_differentiable_wiki_pages(course_ids),
-      for_non_differentiable_discussions(course_ids),
+      for_non_differentiable_discussions(course_ids).
+        merge(DiscussionTopic.visible_to_student_sections(user_ids)),
       for_differentiable_assignments(user_ids, course_ids),
-      for_differentiable_wiki_pages(user_ids, course_ids),
-      for_differentiable_discussions(user_ids, course_ids),
+      for_differentiable_discussions(user_ids, course_ids).
+        merge(DiscussionTopic.visible_to_student_sections(user_ids)),
       for_differentiable_quizzes(user_ids, course_ids)
     )
   }
@@ -491,11 +498,11 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_non_differentiable_discussions, lambda {|course_ids|
-    joins("JOIN #{DiscussionTopic.quoted_table_name} as dt ON dt.id = content_tags.content_id").
+    joins("JOIN #{DiscussionTopic.quoted_table_name} as discussion_topics ON discussion_topics.id = content_tags.content_id").
       where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND content_tags.content_type = 'DiscussionTopic'
-             AND dt.assignment_id IS NULL",course_ids)
+             AND discussion_topics.assignment_id IS NULL", course_ids)
   }
 
   scope :for_non_differentiable_wiki_pages, lambda {|course_ids|
@@ -527,14 +534,14 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_differentiable_discussions, lambda {|user_ids, course_ids|
-    joins("JOIN #{DiscussionTopic.quoted_table_name} as dt ON dt.id = content_tags.content_id
+    joins("JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id = content_tags.content_id
            AND content_tags.content_type = 'DiscussionTopic'").
-      joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = dt.assignment_id").
+      joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = discussion_topics.assignment_id").
       where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND asv.course_id IN (?)
              AND content_tags.content_type = 'DiscussionTopic'
-             AND dt.assignment_id IS NOT NULL
+             AND discussion_topics.assignment_id IS NOT NULL
              AND asv.user_id = ANY( '{?}'::INT8[] )
       ",course_ids,course_ids,user_ids)
   }

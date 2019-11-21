@@ -36,12 +36,11 @@ describe "reply attachment" do
   end
 
   it "should allow reply after cancel" do
-    skip('this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714')
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     f('.discussion-reply-box').click
     wait_for_ajaximations
     f('.cancel_button').click
-    f('.discussion-reply-box').click
+    force_click('.discussion-reply-box')
     wait_for_ajaximations
     begin
       tinymce = f('.mce-tinymce')

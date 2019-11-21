@@ -18,13 +18,12 @@
 
 import React, {Component} from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconArrowOpenDownLine from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
-import IconCheckSolid from '@instructure/ui-icons/lib/Solid/IconCheck'
-import IconEndSolid from '@instructure/ui-icons/lib/Solid/IconEnd'
+import {Button} from '@instructure/ui-buttons'
+import {Menu} from '@instructure/ui-menu'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
+import {IconArrowOpenDownLine, IconCheckSolid, IconEndSolid} from '@instructure/ui-icons'
+
 import I18n from 'i18n!gradezilla'
 import GradeFormatHelper from '../../../../../gradebook/shared/helpers/GradeFormatHelper'
 import {parseTextValue} from '../../../../../grading/helpers/GradeInputHelper'
@@ -166,9 +165,9 @@ export default class CompleteIncompleteGradeInput extends Component {
             }
           >
             {menuItems.map(menuItem => (
-              <MenuItem key={menuItem.status} value={menuItem.value}>
+              <Menu.Item key={menuItem.status} value={menuItem.value}>
                 {componentForGrade(menuItem.status, {forMenu: true})}
-              </MenuItem>
+              </Menu.Item>
             ))}
           </Menu>
         </div>

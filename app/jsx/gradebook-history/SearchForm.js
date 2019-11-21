@@ -21,13 +21,11 @@ import {connect} from 'react-redux'
 import {arrayOf, func, shape, string} from 'prop-types'
 import I18n from 'i18n!gradebook_history'
 import moment from 'moment'
-import Select from '@instructure/ui-forms/lib/components/Select'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import View from '@instructure/ui-layout/lib/components/View'
-import DateInput from '@instructure/ui-forms/lib/components/DateInput'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
-import {GridCol} from '@instructure/ui-layout/lib/components/Grid'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Select, DateInput} from '@instructure/ui-forms'
+import {Button} from '@instructure/ui-buttons'
+import {View, Grid} from '@instructure/ui-layout'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import SearchFormActions from './actions/SearchFormActions'
 import {showFlashAlert} from '../shared/FlashAlert'
 
@@ -346,7 +344,7 @@ class SearchFormComponent extends Component {
             />
           </FormFieldGroup>
 
-          <GridCol width="auto">
+          <Grid.Col width="auto">
             <div style={{margin: '1.85rem 0 0 0'}}>
               <Button
                 onClick={this.handleSubmit}
@@ -357,7 +355,7 @@ class SearchFormComponent extends Component {
                 {I18n.t('Filter')}
               </Button>
             </div>
-          </GridCol>
+          </Grid.Col>
         </FormFieldGroup>
       </View>
     )

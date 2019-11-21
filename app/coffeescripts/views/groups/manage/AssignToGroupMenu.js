@@ -24,12 +24,13 @@ import '../../../jquery/outerclick'
 
 export default class AssignToGroupMenu extends PopoverMenuView {
   static initClass() {
-    this.prototype.defaults = Object.assign({}, PopoverMenuView.prototype.defaults, {zIndex: 10})
+    this.prototype.defaults = {...PopoverMenuView.prototype.defaults, zIndex: 10}
 
-    this.prototype.events = Object.assign({}, PopoverMenuView.prototype.events, {
+    this.prototype.events = {
+      ...PopoverMenuView.prototype.events,
       'click .set-group': 'setGroup',
       'focusin .focus-bound': 'boundFocused'
-    })
+    }
 
     this.prototype.tagName = 'div'
 

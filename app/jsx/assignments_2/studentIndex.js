@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import AlertManager from '../shared/components/AlertManager'
 import {ApolloProvider, createClient} from '../canvas-apollo'
 import ErrorBoundary from '../shared/components/ErrorBoundary'
-import errorShipUrl from './student/SVG/ErrorShip.svg'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import GenericErrorPage from '../shared/components/GenericErrorPage/index'
-import SubmissionIDQuery from './student/components/SubmissionIDQuery'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import StudentViewQuery from './student/components/StudentViewQuery'
 
 const client = createClient()
 
@@ -37,7 +38,12 @@ export default function renderAssignmentsApp(env, elt) {
           />
         }
       >
-        <SubmissionIDQuery assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
+        <AlertManager>
+          <StudentViewQuery
+            assignmentLid={ENV.ASSIGNMENT_ID.toString()}
+            submissionID={ENV.SUBMISSION_ID?.toString()}
+          />
+        </AlertManager>
       </ErrorBoundary>
     </ApolloProvider>,
     elt

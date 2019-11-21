@@ -20,17 +20,10 @@ import I18n from 'i18n!permission_button'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconPublish from '@instructure/ui-icons/lib/Solid/IconPublish'
-import IconTrouble from '@instructure/ui-icons/lib/Line/IconTrouble'
-import IconLock from '@instructure/ui-icons/lib/Solid/IconLock'
-import View from '@instructure/ui-layout/lib/components/View'
-import Menu, {
-  MenuItem,
-  MenuItemGroup,
-  MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu'
+import {Text} from '@instructure/ui-elements'
+import {IconPublishSolid, IconTroubleLine, IconLockSolid} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-layout'
+import {Menu} from '@instructure/ui-menu'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
@@ -134,11 +127,11 @@ export default class PermissionButton extends Component {
       >
         {this.props.permission.enabled ? (
           <Text color="success">
-            <IconPublish size="x-small" />
+            <IconPublishSolid size="x-small" />
           </Text>
         ) : (
           <Text color="error">
-            <IconTrouble size="x-small" />
+            <IconTroubleLine size="x-small" />
           </Text>
         )}
       </button>
@@ -170,7 +163,7 @@ export default class PermissionButton extends Component {
       onBlur={this.props.inTray ? () => {} : this.closeMenu}
       shouldFocusTriggerOnClose={false}
     >
-      <MenuItemGroup
+      <Menu.Group
         label=""
         selected={[
           this.checkedSelection(
@@ -180,7 +173,7 @@ export default class PermissionButton extends Component {
           )
         ]}
       >
-        <MenuItem
+        <Menu.Item
           id="permission_table_enable_menu_item"
           value={MENU_ID_ENABLED}
           onClick={() =>
@@ -195,8 +188,8 @@ export default class PermissionButton extends Component {
           }
         >
           <Text>{I18n.t('Enable')}</Text>
-        </MenuItem>
-        <MenuItem
+        </Menu.Item>
+        <Menu.Item
           id="permission_table_enable_and_lock_menu_item"
           value={MENU_ID_ENABLED_AND_LOCKED}
           onClick={() =>
@@ -211,8 +204,8 @@ export default class PermissionButton extends Component {
           }
         >
           <Text>{I18n.t('Enable and Lock')}</Text>
-        </MenuItem>
-        <MenuItem
+        </Menu.Item>
+        <Menu.Item
           id="permission_table_disable_menu_item"
           value={MENU_ID_DISABLED}
           onClick={() =>
@@ -227,8 +220,8 @@ export default class PermissionButton extends Component {
           }
         >
           <Text as="span">{I18n.t('Disable')}</Text>
-        </MenuItem>
-        <MenuItem
+        </Menu.Item>
+        <Menu.Item
           id="permission_table_disable_and_lock_menu_item"
           value={MENU_ID_DISABLED_AND_LOCKED}
           onClick={() =>
@@ -243,10 +236,10 @@ export default class PermissionButton extends Component {
           }
         >
           <Text>{I18n.t('Disable and Lock')}</Text>
-        </MenuItem>
+        </Menu.Item>
 
-        <MenuItemSeparator />
-        <MenuItem
+        <Menu.Separator />
+        <Menu.Item
           id="permission_table_use_default_menu_item"
           value={MENU_ID_DEFAULT}
           onClick={() =>
@@ -263,8 +256,8 @@ export default class PermissionButton extends Component {
           <View as="div" textAlign="center">
             <Text>{I18n.t('Use Default')}</Text>
           </View>
-        </MenuItem>
-      </MenuItemGroup>
+        </Menu.Item>
+      </Menu.Group>
     </Menu>
   )
 
@@ -290,7 +283,7 @@ export default class PermissionButton extends Component {
           }
         >
           <Text color="primary">
-            <IconLock />
+            <IconLockSolid />
           </Text>
         </div>
       </div>

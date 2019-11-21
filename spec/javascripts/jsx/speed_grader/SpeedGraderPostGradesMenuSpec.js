@@ -35,9 +35,9 @@ QUnit.module('SpeedGraderPostGradesMenu', hooks => {
 
   function renderAndOpenMenu(customProps) {
     const props = {
-      allowHidingGrades: true,
-      allowPostingGrades: true,
-      hasGrades: true,
+      allowHidingGradesOrComments: true,
+      allowPostingGradesOrComments: true,
+      hasGradesOrPostableComments: true,
       onHideGrades: () => {},
       onPostGrades: () => {},
       ...customProps
@@ -65,32 +65,32 @@ QUnit.module('SpeedGraderPostGradesMenu', hooks => {
   }
 
   QUnit.module('menu trigger', () => {
-    test('is rendered as an "off" icon when allowPostingGrades is true', () => {
-      renderAndOpenMenu({allowPostingGrades: true})
+    test('is rendered as an "off" icon when allowPostingGradesOrComments is true', () => {
+      renderAndOpenMenu({allowPostingGradesOrComments: true})
       ok(getMenuTrigger().querySelector('svg[name="IconOff"]'))
     })
 
-    test('is rendered as an "eye" icon when allowPostingGrades is false', () => {
-      renderAndOpenMenu({allowPostingGrades: false})
+    test('is rendered as an "eye" icon when allowPostingGradesOrComments is false', () => {
+      renderAndOpenMenu({allowPostingGradesOrComments: false})
       ok(getMenuTrigger().querySelector('svg[name="IconEye"]'))
     })
   })
 
   QUnit.module('"Post Grades" menu item', () => {
-    QUnit.module('when allowPostingGrades is true', itemHooks => {
+    QUnit.module('when allowPostingGradesOrComments is true', itemHooks => {
       let postGradesSpy
 
       itemHooks.beforeEach(() => {
         postGradesSpy = sinon.spy()
-        renderAndOpenMenu({allowPostingGrades: true, onPostGrades: postGradesSpy})
-      })
-
-      test('enables the "Post Grades" menu item', () => {
-        notOk(getPostGradesMenuItem().getAttribute('aria-disabled'))
+        renderAndOpenMenu({allowPostingGradesOrComments: true, onPostGrades: postGradesSpy})
       })
 
       test('retains the text "Post Grades"', () => {
         strictEqual(getPostGradesMenuItem().textContent, 'Post Grades')
+      })
+
+      test('enables the "Post Grades" menu item', () => {
+        notOk(getPostGradesMenuItem().getAttribute('aria-disabled'))
       })
 
       test('fires the onPostGrades event when clicked', () => {
@@ -99,42 +99,52 @@ QUnit.module('SpeedGraderPostGradesMenu', hooks => {
       })
     })
 
-    QUnit.module('when allowPostingGrades is false', itemHooks => {
-      itemHooks.beforeEach(() => {
-        renderAndOpenMenu({allowPostingGrades: false})
+    QUnit.module('when allowPostingGradesOrComments is false', contextHooks => {
+      let context
+
+      contextHooks.beforeEach(() => {
+        context = {allowPostingGradesOrComments: false}
       })
 
-      test('disables the "Post Grades" menu item', () => {
-        strictEqual(getPostGradesMenuItem().getAttribute('aria-disabled'), 'true')
+      QUnit.module('when hasGradesOrPostableComments is false', itemHooks => {
+        itemHooks.beforeEach(() => {
+          context.hasGradesOrPostableComments = false
+          renderAndOpenMenu(context)
+        })
+
+        test('sets the text to "No Grades to Post"', () => {
+          strictEqual(getPostGradesMenuItem().textContent, 'No Grades to Post')
+        })
+
+        test('disables the "No Grades to Post" menu item', () => {
+          strictEqual(getPostGradesMenuItem().getAttribute('aria-disabled'), 'true')
+        })
       })
 
-      test('sets the text to "All Grades Posted"', () => {
-        strictEqual(getPostGradesMenuItem().textContent, 'All Grades Posted')
-      })
-    })
+      QUnit.module('when hasGradesOrPostableComments is true', itemHooks => {
+        itemHooks.beforeEach(() => {
+          context.hasGradesOrPostableComments = true
+          renderAndOpenMenu(context)
+        })
 
-    QUnit.module('when hasGrades is false', itemHooks => {
-      itemHooks.beforeEach(() => {
-        renderAndOpenMenu({hasGrades: false})
-      })
+        test('sets the text to "All Grades Posted"', () => {
+          strictEqual(getPostGradesMenuItem().textContent, 'All Grades Posted')
+        })
 
-      test('disables the "Post Grades" menu item', () => {
-        strictEqual(getPostGradesMenuItem().getAttribute('aria-disabled'), 'true')
-      })
-
-      test('sets the text to "No Grades to Post"', () => {
-        strictEqual(getPostGradesMenuItem().textContent, 'No Grades to Post')
+        test('disables the "All Grades Posted" menu item', () => {
+          strictEqual(getPostGradesMenuItem().getAttribute('aria-disabled'), 'true')
+        })
       })
     })
   })
 
   QUnit.module('"Hide Grades" menu item', () => {
-    QUnit.module('when allowHidingGrades is true', itemHooks => {
+    QUnit.module('when allowHidingGradesOrComments is true', itemHooks => {
       let hideGradesSpy
 
       itemHooks.beforeEach(() => {
         hideGradesSpy = sinon.spy()
-        renderAndOpenMenu({allowHidingGrades: true, onHideGrades: hideGradesSpy})
+        renderAndOpenMenu({allowHidingGradesOrComments: true, onHideGrades: hideGradesSpy})
       })
 
       test('enables the "Hide Grades" menu item', () => {
@@ -151,31 +161,41 @@ QUnit.module('SpeedGraderPostGradesMenu', hooks => {
       })
     })
 
-    QUnit.module('when allowHidingGrades is false', itemHooks => {
-      itemHooks.beforeEach(() => {
-        renderAndOpenMenu({allowHidingGrades: false})
+    QUnit.module('when allowHidingGradesOrComments is false', contextHooks => {
+      let context
+
+      contextHooks.beforeEach(() => {
+        context = {allowHidingGradesOrComments: false}
       })
 
-      test('disables the "Hide Grades" menu item', () => {
-        strictEqual(getHideGradesMenuItem().getAttribute('aria-disabled'), 'true')
+      QUnit.module('when hasGradesOrPostableComments is false', itemHooks => {
+        itemHooks.beforeEach(() => {
+          context.hasGradesOrPostableComments = false
+          renderAndOpenMenu(context)
+        })
+
+        test('sets the text to "No Grades to Hide"', () => {
+          strictEqual(getHideGradesMenuItem().textContent, 'No Grades to Hide')
+        })
+
+        test('disables the "No Grades to Hide" menu item', () => {
+          strictEqual(getHideGradesMenuItem().getAttribute('aria-disabled'), 'true')
+        })
       })
 
-      test('sets the text to "All Grades Hidden"', () => {
-        strictEqual(getHideGradesMenuItem().textContent, 'All Grades Hidden')
-      })
-    })
+      QUnit.module('when hasGradesOrPostableComments is true', itemHooks => {
+        itemHooks.beforeEach(() => {
+          context.hasGradesOrPostableComments = true
+          renderAndOpenMenu(context)
+        })
 
-    QUnit.module('when hasGrades is false', itemHooks => {
-      itemHooks.beforeEach(() => {
-        renderAndOpenMenu({hasGrades: false})
-      })
+        test('sets the text to "All Grades Hidden"', () => {
+          strictEqual(getHideGradesMenuItem().textContent, 'All Grades Hidden')
+        })
 
-      test('disables the "Hide Grades" menu item', () => {
-        strictEqual(getHideGradesMenuItem().getAttribute('aria-disabled'), 'true')
-      })
-
-      test('sets the text to "No Grades to Hide"', () => {
-        strictEqual(getHideGradesMenuItem().textContent, 'No Grades to Hide')
+        test('disables the "All Grades Hidden" menu item', () => {
+          strictEqual(getHideGradesMenuItem().getAttribute('aria-disabled'), 'true')
+        })
       })
     })
   })

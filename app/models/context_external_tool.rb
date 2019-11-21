@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require 'redcarpet'
 
 class ContextExternalTool < ActiveRecord::Base
   include Workflow
@@ -55,6 +56,8 @@ class ContextExternalTool < ActiveRecord::Base
 
   DISABLED_STATE = 'disabled'.freeze
   QUIZ_LTI = 'Quizzes 2'.freeze
+  ANALYTICS_2 = 'fd75124a-140e-470f-944c-114d2d93bb40'.freeze
+  TOOL_FEATURE_MAPPING = { ANALYTICS_2 => :analytics_2 }.freeze
 
   workflow do
     state :anonymous
@@ -161,7 +164,10 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def has_placement?(type)
-    if Lti::ResourcePlacement::DEFAULT_PLACEMENTS.include? type.to_s
+    # Only LTI 1.0 tools (no developer key) support default placements
+    # (LTI 2 tools also, but those are not handled by this class)
+    if developer_key_id.blank? &&
+        Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include?(type.to_s)
       !!(self.selectable && (self.domain || self.url))
     else
       self.context_external_tool_placements.to_a.any?{|p| p.placement_type == type.to_s}
@@ -296,6 +302,7 @@ class ContextExternalTool < ActiveRecord::Base
   def process_extended_configuration
     return unless (config_type == 'by_url' && config_url) || (config_type == 'by_xml' && config_xml)
     tool_hash = nil
+    @config_errors = []
     begin
        converter = CC::Importer::BLTIConverter.new
        if config_type == 'by_url'
@@ -307,8 +314,6 @@ class ContextExternalTool < ActiveRecord::Base
        tool_hash = {:error => e.message}
     end
 
-
-    @config_errors = []
     error_field = config_type == 'by_xml' ? 'config_xml' : 'config_url'
     converter = CC::Importer::BLTIConverter.new
     tool_hash = if config_type == 'by_url'
@@ -328,7 +333,7 @@ class ContextExternalTool < ActiveRecord::Base
     self.name = real_name unless real_name.blank?
   rescue CC::Importer::BLTIConverter::CCImportError => e
     @config_errors << [error_field, e.message]
-  rescue URI::Error
+  rescue URI::Error, CanvasHttp::Error
     @config_errors << [:config_url, "Invalid URL"]
   rescue ActiveRecord::RecordInvalid => e
     @config_errors += Array(e.record.errors)
@@ -619,6 +624,7 @@ end
       scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
       scope = scope.placements(*placements)
       scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
+      scope = scope.where(tool_id: options[:tool_ids]) if options[:tool_ids].present?
       if Canvas::Plugin.value_to_boolean(options[:only_visible])
         scope = scope.visible(options[:current_user], context, options[:session], options[:visibility_placements], scope)
       end
@@ -678,8 +684,11 @@ end
 
   scope :placements, lambda { |*placements|
     if placements.present?
-      default_placement_sql = if (placements.map(&:to_s) & Lti::ResourcePlacement::DEFAULT_PLACEMENTS).present?
-                          "(context_external_tools.not_selectable IS NOT TRUE AND
+      # Default placements are only applicable to LTI 1.0. Ignore
+      # LTI 1.3 tools with developer_key_id IS NULL
+      default_placement_sql = if (placements.map(&:to_s) & Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).present?
+                          "(context_external_tools.developer_key_id IS NULL AND
+                           context_external_tools.not_selectable IS NOT TRUE AND
                            ((COALESCE(context_external_tools.url, '') <> '' ) OR
                            (COALESCE(context_external_tools.domain, '') <> ''))) OR "
                         else
@@ -806,6 +815,11 @@ end
     tool_id == QUIZ_LTI
   end
 
+  def feature_flag_enabled?(context = nil)
+    feature = TOOL_FEATURE_MAPPING[tool_id]
+    !feature || (context || self.context).feature_enabled?(feature)
+  end
+
   private
 
   def self.context_id_for(asset, shard)
@@ -873,6 +887,7 @@ end
 
   def self.editor_button_json(tools, context, user, session=nil)
     tools.select! {|tool| visible?(tool.editor_button['visibility'], user, context, session)}
+    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new({link_attributes: {target: '_blank'}}))
     tools.map do |tool|
       {
           :name => tool.label_for(:editor_button, I18n.locale),
@@ -882,7 +897,12 @@ end
           :canvas_icon_class => tool.editor_button(:canvas_icon_class),
           :width => tool.editor_button(:selection_width),
           :height => tool.editor_button(:selection_height),
-          :use_tray => tool.editor_button(:use_tray) == "true"
+          :use_tray => tool.editor_button(:use_tray) == "true",
+          :description => if tool.description
+                            Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
+                          else
+                            ""
+                          end
       }
     end
   end

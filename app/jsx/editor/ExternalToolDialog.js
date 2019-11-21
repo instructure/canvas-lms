@@ -21,11 +21,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ExternalToolDialogModal from './ExternalToolDialog/Modal'
 import ExternalToolDialogTray from './ExternalToolDialog/Tray'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import {Alert} from '@instructure/ui-alerts'
 import I18n from 'i18n!ExternalToolDialog'
 import {send} from '../shared/rce/RceCommandShim'
 import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
-import FlexItem from '@instructure/ui-layout/lib/components/Flex/FlexItem'
+import {Flex} from '@instructure/ui-layout'
 import processEditorContentItems from '../deep_linking/processors/processEditorContentItems'
 
 const EMPTY_BUTTON = {
@@ -54,7 +54,8 @@ export default class ExternalToolDialog extends React.Component {
       selection: PropTypes.shape({
         getContent: PropTypes.func.isRequired
       }),
-      getContent: PropTypes.func.isRequired
+      getContent: PropTypes.func.isRequired,
+      focus: PropTypes.func.isRequired
     }).isRequired,
     contextAssetString: PropTypes.string.isRequired,
     iframeAllowances: PropTypes.string.isRequired,
@@ -140,6 +141,7 @@ export default class ExternalToolDialog extends React.Component {
 
   handleRemove = () => {
     this.setState({button: EMPTY_BUTTON})
+    this.props.editor.focus()
   }
 
   handleInfoAlertFocus = ev => this.setState({infoAlert: ev.target})
@@ -174,7 +176,7 @@ export default class ExternalToolDialog extends React.Component {
           closeLabel={I18n.t('Close')}
           name={button.name}
         >
-          <FlexItem>
+          <Flex.Item>
             <div
               ref={ref => (this.beforeInfoAlertRef = ref)}
               tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
@@ -186,7 +188,7 @@ export default class ExternalToolDialog extends React.Component {
             >
               <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
             </div>
-          </FlexItem>
+          </Flex.Item>
           <iframe
             title={label}
             ref={ref => (this.iframeRef = ref)}
@@ -202,8 +204,9 @@ export default class ExternalToolDialog extends React.Component {
             }}
             allow={iframeAllowances}
             borderstyle="0"
+            data-lti-launch="true"
           />
-          <FlexItem>
+          <Flex.Item>
             <div
               ref={ref => (this.afterInfoAlertRef = ref)}
               tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
@@ -215,7 +218,7 @@ export default class ExternalToolDialog extends React.Component {
             >
               <Alert margin="small">{I18n.t('The preceding content is partner provided')}</Alert>
             </div>
-          </FlexItem>
+          </Flex.Item>
         </Overlay>
       </>
     )

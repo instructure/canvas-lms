@@ -20,8 +20,7 @@ import React from 'react'
 import {string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
 
 export default class OperatorType extends React.Component {
@@ -38,9 +37,9 @@ export default class OperatorType extends React.Component {
     return (
       <View display="inline-block" width="100%">
         <Flex margin="0 x-small 0 0" justifyItems="center">
-          <FlexItem borderWidth="small" borderRadius="medium" padding="x-small x-small">
+          <Flex.Item borderWidth="small" borderRadius="medium" padding="x-small x-small">
             <Text>{display}</Text>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </View>
     )

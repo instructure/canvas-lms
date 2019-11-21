@@ -18,82 +18,87 @@
 
 import $ from 'jquery'
 import React from 'react'
-import { mount } from 'enzyme'
-import CollaborationsToolLaunch from  'jsx/collaborations/CollaborationsToolLaunch'
+import {mount} from 'enzyme'
+import CollaborationsToolLaunch from 'jsx/collaborations/CollaborationsToolLaunch'
 
 let fixtures
 
 QUnit.module('CollaborationsToolLaunch screenreader functionality', {
-  setup () {
+  setup() {
     fixtures = $('#fixtures')
     fixtures.append('<div id="main" style="height: 700px; width: 700px" />')
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
   },
 
-  teardown () {
+  teardown() {
     fixtures.empty()
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
   }
 })
 
 test('shows beginning info alert and adds styles to iframe', () => {
-  const wrapper = mount(
-    <CollaborationsToolLaunch />
-  )
+  const wrapper = mount(<CollaborationsToolLaunch />)
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.before_external_content_info_alert').simulate('focus')
   equal(wrapper.state().beforeExternalContentAlertClass, '')
-  deepEqual(wrapper.state().iframeStyle, { border: '2px solid #008EE2', width: '-4px' })
+  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '-4px'})
 })
 
 test('shows ending info alert and adds styles to iframe', () => {
-  const wrapper = mount(
-    <CollaborationsToolLaunch />
-  )
+  const wrapper = mount(<CollaborationsToolLaunch />)
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.after_external_content_info_alert').simulate('focus')
   equal(wrapper.state().afterExternalContentAlertClass, '')
-  deepEqual(wrapper.state().iframeStyle, { border: '2px solid #008EE2', width: '-4px' })
+  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '-4px'})
 })
 
 test('hides beginning info alert and adds styles to iframe', () => {
-  const wrapper = mount(
-    <CollaborationsToolLaunch />
-  )
+  const wrapper = mount(<CollaborationsToolLaunch />)
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.before_external_content_info_alert').simulate('focus')
   wrapper.find('.before_external_content_info_alert').simulate('blur')
   equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
-  deepEqual(wrapper.state().iframeStyle, { border: 'none', width: '100%' })
+  deepEqual(wrapper.state().iframeStyle, {border: 'none', width: '100%'})
 })
 
 test('hides ending info alert and adds styles to iframe', () => {
-  const wrapper = mount(
-    <CollaborationsToolLaunch />
-  )
+  const wrapper = mount(<CollaborationsToolLaunch />)
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   wrapper.find('.after_external_content_info_alert').simulate('focus')
   wrapper.find('.after_external_content_info_alert').simulate('blur')
   equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
-  deepEqual(wrapper.state().iframeStyle, { border: 'none', width: '100%' })
+  deepEqual(wrapper.state().iframeStyle, {border: 'none', width: '100%'})
 })
 
 test("doesn't show alerts or add border to iframe by default", () => {
-  const wrapper = mount(
-    <CollaborationsToolLaunch />
-  )
+  const wrapper = mount(<CollaborationsToolLaunch />)
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
   equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
   deepEqual(wrapper.state().iframeStyle, {})
 })
 
-test("sets the iframe allowances", () => {
-  const wrapper = mount(
-    <CollaborationsToolLaunch />
-  )
+test('sets the iframe allowances', () => {
+  const wrapper = mount(<CollaborationsToolLaunch />)
   wrapper.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
   equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
   equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
-  ok(wrapper.find('.tool_launch').instance().getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+  ok(
+    wrapper
+      .find('.tool_launch')
+      .instance()
+      .getAttribute('allow'),
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
+  )
+})
+
+test("sets the 'data-lti-launch' attribute on the iframe", () => {
+  const wrapper = mount(<CollaborationsToolLaunch />)
+  equal(
+    wrapper
+      .find('.tool_launch')
+      .instance()
+      .getAttribute('data-lti-launch'),
+    'true'
+  )
 })

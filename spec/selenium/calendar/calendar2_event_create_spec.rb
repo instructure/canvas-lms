@@ -69,7 +69,7 @@ describe "calendar2" do
         replace_content(f('#calendar_event_location_name'), location_name)
         replace_content(f('#calendar_event_location_address'), location_address)
         # submit_form makes the spec fragile
-        f('#editCalendarEventFull').submit
+        wait_for_new_page_load { f('#editCalendarEventFull').submit }
         expect(CalendarEvent.last.location_name).to eq location_name
         expect(CalendarEvent.last.location_address).to eq location_address
       end
@@ -124,7 +124,7 @@ describe "calendar2" do
 
       it "should create an event that is recurring", priority: "1", test_id: 223510 do
         Account.default.enable_feature!(:recurring_calendar_events)
-        make_full_screen
+
         get '/calendar2'
         expect(f('#context-list li:nth-of-type(1)').text).to include(@teacher.name)
         expect(f('#context-list li:nth-of-type(2)').text).to include(@course.name)
@@ -159,11 +159,7 @@ describe "calendar2" do
         day2 = 2.days.from_now.to_date
 
         get '/calendar2'
-        fj('.calendar .fc-week .fc-today').click
-        edit_event_dialog = f('#edit_event_tabs')
-        edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
-        title = edit_event_form.find('#calendar_event_title')
-        replace_content(title, "Test Event")
+        f('.calendar .fc-week .fc-today').click
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
 
@@ -277,7 +273,7 @@ describe "calendar2" do
       end
 
       it "respects the calendars checkboxes" do
-        make_full_screen
+
         get "/calendar2"
         expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
 

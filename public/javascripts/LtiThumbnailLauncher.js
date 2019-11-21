@@ -20,17 +20,17 @@ import $ from 'jquery'
 
 const selector = '.lti-thumbnail-launch'
 
-function handleLaunch (event) {
+function handleLaunch(event) {
   event.preventDefault()
   ltiThumbnailLauncher.launch($(event.target).closest(selector))
 }
 
 class LtiThumbnailLauncher {
-  constructor () {
+  constructor() {
     $(document.body).delegate(selector, 'click', handleLaunch)
   }
 
-  launch (element) {
+  launch(element) {
     const placement = JSON.parse(element.attr('target'))
     const iframe = $('<iframe/>', {
       src: element.attr('href'),

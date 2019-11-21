@@ -20,52 +20,55 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments_2_student_points_display'
 
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Flex} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
 import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper'
 
-const ACCESSIBLE = 'accessible'
-
-function defaultValue(gradingType, pointsPossible, options = {}) {
+export default function PointsDisplay({displaySize, gradingType, pointsPossible, receivedGrade}) {
+  // We need to have a different ungraded values for screenreaders and visual users
+  // because voiceover does not read the '–' character in a string like '-/10'
+  let ungradedScreenreaderString = null
+  let ungradedVisualString = null
   switch (gradingType) {
     case 'points':
-      return options.content === ACCESSIBLE
-        ? I18n.t('ungraded out of %{pointsPossible}', {pointsPossible})
-        : `–/${pointsPossible}`
+      ungradedScreenreaderString = I18n.t('ungraded/%{pointsPossible}', {pointsPossible})
+      ungradedVisualString = `–/${pointsPossible}`
+      break
     case 'pass_fail':
-      return I18n.t('ungraded')
+      ungradedScreenreaderString = I18n.t('ungraded')
+      ungradedVisualString = I18n.t('ungraded')
+      break
     default:
-      return options.content === ACCESSIBLE ? I18n.t('ungraded') : '–'
+      ungradedScreenreaderString = I18n.t('ungraded')
+      ungradedVisualString = '–'
+      break
   }
-}
 
-function PointsDisplay(props) {
-  const {displaySize, gradingType, pointsPossible, receivedGrade} = props
+  const formatGrade = ({forScreenReader}) => {
+    const formattedGrade = GradeFormatHelper.formatGrade(receivedGrade, {
+      gradingType,
+      pointsPossible,
+      defaultValue: forScreenReader ? ungradedScreenreaderString : ungradedVisualString,
+      formatType: 'points_out_of_fraction'
+    })
+
+    if (gradingType === 'points') {
+      return I18n.t('%{formattedGrade} Points', {formattedGrade})
+    } else {
+      return formattedGrade
+    }
+  }
 
   return (
     <div>
-      <ScreenReaderContent>
-        {GradeFormatHelper.formatGrade(receivedGrade, {
-          gradingType,
-          pointsPossible,
-          defaultValue: defaultValue(gradingType, pointsPossible, {content: ACCESSIBLE}),
-          formatType: 'points_out_of_fraction'
-        })}
-        {gradingType === 'points' ? I18n.t(' Points') : null}
-      </ScreenReaderContent>
+      <ScreenReaderContent>{formatGrade({forScreenReader: true})}</ScreenReaderContent>
       <Flex aria-hidden="true" direction="column" textAlign="end">
-        <FlexItem>
+        <Flex.Item>
           <Text transform="capitalize" size={displaySize} data-testid="grade-display">
-            {GradeFormatHelper.formatGrade(receivedGrade, {
-              gradingType,
-              pointsPossible,
-              defaultValue: defaultValue(gradingType, pointsPossible),
-              formatType: 'points_out_of_fraction'
-            })}
-            {gradingType === 'points' ? I18n.t(' Points') : null}
+            {formatGrade({forScreenReader: false})}
           </Text>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </div>
   )
@@ -82,5 +85,3 @@ PointsDisplay.defaultProps = {
   displaySize: 'x-large',
   gradingType: 'points'
 }
-
-export default React.memo(PointsDisplay)

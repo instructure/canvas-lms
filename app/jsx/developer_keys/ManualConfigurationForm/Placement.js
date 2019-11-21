@@ -19,45 +19,46 @@ import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import { Alert } from '@instructure/ui-alerts'
-import View from '@instructure/ui-layout/lib/components/View'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
-import TextInput from '@instructure/ui-forms/lib/components/TextInput';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import { ToggleDetails } from '@instructure/ui-toggle-details';
-import { RadioInputGroup } from '@instructure/ui-forms/lib/components';
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput';
+import {Alert} from '@instructure/ui-alerts'
+import {View} from '@instructure/ui-layout'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {TextInput, RadioInputGroup, RadioInput} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 export default class Placement extends React.Component {
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
     let placement
     if (this.alwaysDeeplinking.includes(props.placementName)) {
-      placement =  {...props.placement, message_type: 'LtiDeepLinkingRequest' }
+      placement = {...props.placement, message_type: 'LtiDeepLinkingRequest'}
     } else if (!props.placement.message_type) {
-      placement =  {...props.placement, message_type: 'LtiResourceLinkRequest' }
+      placement = {...props.placement, message_type: 'LtiResourceLinkRequest'}
     } else {
       placement = props.placement
     }
 
-    this.state = { placement }
+    this.state = {placement}
   }
 
-  alwaysDeeplinking = ["editor_button", "migration_selection", "homework_submission"]
+  alwaysDeeplinking = ['editor_button', 'migration_selection', 'homework_submission']
 
-  canBeEither = ["assignment_selection", "link_selection"]
+  canBeEither = ['assignment_selection', 'link_selection']
 
-  isAlwaysDeeplinking (placementName) {
+  isAlwaysDeeplinking(placementName) {
     return this.alwaysDeeplinking.includes(placementName)
   }
 
-  messageTypeSelectable (placementName) {
+  messageTypeSelectable(placementName) {
     return this.canBeEither.includes(placementName)
   }
 
-  isSpecialType (placementName) {
-    return this.isAlwaysDeeplinking(placementName) ||
-      this.state.placement.message_type === "LtiDeepLinkingRequest" && this.messageTypeSelectable(placementName)
+  isSpecialType(placementName) {
+    return (
+      this.isAlwaysDeeplinking(placementName) ||
+      (this.state.placement.message_type === 'LtiDeepLinkingRequest' &&
+        this.messageTypeSelectable(placementName))
+    )
   }
 
   generateToolConfigurationPart = () => {
@@ -69,124 +70,112 @@ export default class Placement extends React.Component {
   }
 
   handleTargetLinkUriChange = e => {
-    const value = e.target.value;
+    const value = e.target.value
     this.setState(state => ({placement: {...state.placement, target_link_uri: value}}))
   }
 
-  handleMessageTypeChange = (_, value) => this.setState(state => ({placement: {...state.placement, message_type: value}}))
+  handleMessageTypeChange = (_, value) =>
+    this.setState(state => ({placement: {...state.placement, message_type: value}}))
 
   handleIconUrlChange = e => {
-    const value = e.target.value;
+    const value = e.target.value
     this.setState(state => ({placement: {...state.placement, icon_url: value}}))
   }
 
   handleTextChange = e => {
-    const value = e.target.value;
+    const value = e.target.value
     this.setState(state => ({placement: {...state.placement, text: value}}))
   }
 
   handleSelectionHeightChange = e => {
-    const value = e.target.value;
+    const value = e.target.value
     this.setState(state => ({placement: {...state.placement, selection_height: value}}))
   }
 
   handleSelectionWidthChange = e => {
-    const value = e.target.value;
+    const value = e.target.value
     this.setState(state => ({placement: {...state.placement, selection_width: value}}))
   }
 
   render() {
-    const { placement } = this.state;
-    const { placementName, displayName } = this.props;
+    const {placement} = this.state
+    const {placementName, displayName} = this.props
 
-    return <View as="div" margin="medium 0">
-      <ToggleDetails
-        summary={displayName}
-        fluidWidth
-      >
-        <View
-          as="div"
-          margin="small"
-        >
-          <FormFieldGroup
-            description={<ScreenReaderContent>{I18n.t("Placement Values")}</ScreenReaderContent>}
-          >
-            {
-              this.isSpecialType(placementName)
-                ? <Alert
-                    variant="warning"
-                    margin="small"
-                  >
-                    {I18n.t("This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality")}
-                  </Alert>
-                : null
-            }
+    return (
+      <View as="div" margin="medium 0">
+        <ToggleDetails summary={displayName} fluidWidth>
+          <View as="div" margin="small">
             <FormFieldGroup
-              description={<ScreenReaderContent>{I18n.t("Request Values")}</ScreenReaderContent>}
-              layout="columns"
+              description={<ScreenReaderContent>{I18n.t('Placement Values')}</ScreenReaderContent>}
             >
-              <TextInput
-                name={`${placementName}_target_link_uri`}
-                value={placement.target_link_uri}
-                label={I18n.t("Target Link URI")}
-                onChange={this.handleTargetLinkUriChange}
-              />
-              <RadioInputGroup
-                name={`${placementName}_message_type`}
-                value={placement.message_type}
-                description={I18n.t("Select Message Type")}
-                required
-                onChange={this.handleMessageTypeChange}
-                disabled={!this.messageTypeSelectable(placementName)}
+              {this.isSpecialType(placementName) ? (
+                <Alert variant="warning" margin="small">
+                  {I18n.t(
+                    'This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality'
+                  )}
+                </Alert>
+              ) : null}
+              <FormFieldGroup
+                description={<ScreenReaderContent>{I18n.t('Request Values')}</ScreenReaderContent>}
+                layout="columns"
               >
-                <RadioInput
-                  value="LtiDeepLinkingRequest"
-                  label="LtiDeepLinkingRequest"
+                <TextInput
+                  name={`${placementName}_target_link_uri`}
+                  value={placement.target_link_uri}
+                  label={I18n.t('Target Link URI')}
+                  onChange={this.handleTargetLinkUriChange}
                 />
-                <RadioInput
-                  value="LtiResourceLinkRequest"
-                  label="LtiResourceLinkRequest"
+                <RadioInputGroup
+                  name={`${placementName}_message_type`}
+                  value={placement.message_type}
+                  description={I18n.t('Select Message Type')}
+                  required
+                  onChange={this.handleMessageTypeChange}
+                  disabled={!this.messageTypeSelectable(placementName)}
+                >
+                  <RadioInput value="LtiDeepLinkingRequest" label="LtiDeepLinkingRequest" />
+                  <RadioInput value="LtiResourceLinkRequest" label="LtiResourceLinkRequest" />
+                </RadioInputGroup>
+              </FormFieldGroup>
+              <FormFieldGroup
+                description={<ScreenReaderContent>{I18n.t('Label Values')}</ScreenReaderContent>}
+                layout="columns"
+              >
+                <TextInput
+                  name={`${placementName}_icon_url`}
+                  value={placement.icon_url}
+                  label={I18n.t('Icon Url')}
+                  onChange={this.handleIconUrlChange}
                 />
-              </RadioInputGroup>
+                <TextInput
+                  name={`${placementName}_text`}
+                  value={placement.text}
+                  label={I18n.t('Text')}
+                  onChange={this.handleTextChange}
+                />
+              </FormFieldGroup>
+              <FormFieldGroup
+                description={<ScreenReaderContent>{I18n.t('Display Values')}</ScreenReaderContent>}
+                layout="columns"
+              >
+                <TextInput
+                  name={`${placementName}_selection_height`}
+                  value={placement.selection_height && placement.selection_height.toString()}
+                  label={I18n.t('Selection Height')}
+                  onChange={this.handleSelectionHeightChange}
+                />
+                <TextInput
+                  name={`${placementName}_selection_width`}
+                  value={placement.selection_width && placement.selection_width.toString()}
+                  label={I18n.t('Selection Width')}
+                  onChange={this.handleSelectionWidthChange}
+                />
+              </FormFieldGroup>
             </FormFieldGroup>
-            <FormFieldGroup
-              description={<ScreenReaderContent>{I18n.t("Label Values")}</ScreenReaderContent>}
-              layout="columns"
-            >
-              <TextInput
-                name={`${placementName}_icon_url`}
-                value={placement.icon_url}
-                label={I18n.t("Icon Url")}
-                onChange={this.handleIconUrlChange}
-              />
-              <TextInput
-                name={`${placementName}_text`}
-                value={placement.text}
-                label={I18n.t("Text")}
-                onChange={this.handleTextChange}
-              />
-            </FormFieldGroup>
-            <FormFieldGroup
-              description={<ScreenReaderContent>{I18n.t("Display Values")}</ScreenReaderContent>}
-              layout="columns"
-            >
-              <TextInput
-                name={`${placementName}_selection_height`}
-                value={placement.selection_height && placement.selection_height.toString()}
-                label={I18n.t("Selection Height")}
-                onChange={this.handleSelectionHeightChange}
-              />
-              <TextInput
-                name={`${placementName}_selection_width`}
-                value={placement.selection_width && placement.selection_width.toString()}
-                label={I18n.t("Selection Width")}
-                onChange={this.handleSelectionWidthChange}
-              />
-            </FormFieldGroup>
-          </FormFieldGroup>
-        </View>
-      </ToggleDetails>
-    </View>
+          </View>
+        </ToggleDetails>
+      </View>
+    )
   }
 }
 

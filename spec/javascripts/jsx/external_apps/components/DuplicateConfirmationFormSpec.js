@@ -23,9 +23,9 @@ import DuplicateConfirmationForm from 'jsx/external_apps/components/DuplicateCon
 
 let domNode
 
-function renderComponent (props) {
-  domNode = domNode || document.createElement('div');
-  ReactDOM.render(<DuplicateConfirmationForm {...props} />, domNode);
+function renderComponent(props) {
+  domNode = domNode || document.createElement('div')
+  ReactDOM.render(<DuplicateConfirmationForm {...props} />, domNode)
 }
 
 const props = {
@@ -35,53 +35,53 @@ const props = {
   toolData: {},
   configurationType: '',
   store: {}
-};
+}
 
 QUnit.module('DuplicateConfirmationForm', {
-  teardown () {
-    document.querySelector('#fixtures').innerHTML = '';
+  teardown() {
+    document.querySelector('#fixtures').innerHTML = ''
   }
-});
+})
 
 test('renders the component', () => {
-  renderComponent(props);
-  const component = domNode.querySelector('#duplicate-confirmation-form');
-  ok(component);
-});
+  renderComponent(props)
+  const component = domNode.querySelector('#duplicate-confirmation-form')
+  ok(component)
+})
 
 test('calls the onCancel prop when the "cancel install" button is clicked', () => {
-  renderComponent(props);
-  const component = domNode.querySelector('#duplicate-confirmation-form');
-  const button = domNode.querySelector('#cancel-install');
-  TestUtils.Simulate.click(button);
+  renderComponent(props)
+  const component = domNode.querySelector('#duplicate-confirmation-form')
+  const button = domNode.querySelector('#cancel-install')
+  TestUtils.Simulate.click(button)
   ok(props.onCancel.calledOnce)
-});
+})
 
-test ('calls the force install function if the "install anyway" button is clicked', () => {
-  const saveSpy = sinon.spy();
-  const propsDup = Object.assign({}, props);
-  propsDup.store = { save: saveSpy }
-  renderComponent(propsDup);
-  const button = domNode.querySelector('#continue-install');
-  TestUtils.Simulate.click(button);
+test('calls the force install function if the "install anyway" button is clicked', () => {
+  const saveSpy = sinon.spy()
+  const propsDup = {...props}
+  propsDup.store = {save: saveSpy}
+  renderComponent(propsDup)
+  const button = domNode.querySelector('#continue-install')
+  TestUtils.Simulate.click(button)
   ok(saveSpy.calledOnce)
-});
+})
 
-test ('calls the force install prop if the "install anyway" button is clicked', () => {
-  const saveSpy = sinon.spy();
-  const propsDup = Object.assign({}, { forceSaveTool: saveSpy });
-  renderComponent(propsDup);
-  const button = domNode.querySelector('#continue-install');
-  TestUtils.Simulate.click(button);
+test('calls the force install prop if the "install anyway" button is clicked', () => {
+  const saveSpy = sinon.spy()
+  const propsDup = {forceSaveTool: saveSpy}
+  renderComponent(propsDup)
+  const button = domNode.querySelector('#continue-install')
+  TestUtils.Simulate.click(button)
   ok(saveSpy.calledOnce)
-});
+})
 
-test ('sets "verifyUniqueness" to undefined when doing a force install', () => {
-  const saveSpy = sinon.spy();
-  const propsDup = Object.assign({}, props);
-  propsDup.store = { save: saveSpy }
-  renderComponent(propsDup);
-  const button = domNode.querySelector('#continue-install');
-  TestUtils.Simulate.click(button);
+test('sets "verifyUniqueness" to undefined when doing a force install', () => {
+  const saveSpy = sinon.spy()
+  const propsDup = {...props}
+  propsDup.store = {save: saveSpy}
+  renderComponent(propsDup)
+  const button = domNode.querySelector('#continue-install')
+  TestUtils.Simulate.click(button)
   equal(saveSpy.getCall(0).args[1].verifyUniqueness, undefined)
-});
+})

@@ -441,7 +441,6 @@ export default class EditView extends ValidatedFormView
     #
     # If the user has not changed the due date, don't touch the seconds value
     # (so that we don't clobber a due date set by the API).
-    # debugger
     return null unless newDate
 
     adjustedDate = new Date(newDate)

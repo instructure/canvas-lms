@@ -18,8 +18,8 @@
 
 import I18n from 'i18n!discussions_v2'
 import React, {Component} from 'react'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
+import {Button} from '@instructure/ui-buttons'
+import Modal from '../../shared/components/InstuiModal'
 import {bool, func, number} from 'prop-types'
 
 export default class DiscussionDeleteModal extends Component {
@@ -69,7 +69,7 @@ export default class DiscussionDeleteModal extends Component {
           this.confirmDeleteModal = c
         }}
       >
-        <ModalBody>
+        <Modal.Body>
           {I18n.t(
             {
               one: 'You are about to delete 1 discussion. Are you sure?',
@@ -77,8 +77,8 @@ export default class DiscussionDeleteModal extends Component {
             },
             {count: this.props.selectedCount}
           )}
-        </ModalBody>
-        <ModalFooter>
+        </Modal.Body>
+        <Modal.Footer>
           <Button
             ref={c => {
               this.cancelDeleteBtn = c
@@ -86,7 +86,8 @@ export default class DiscussionDeleteModal extends Component {
             onClick={this.hideDeleteConfirm}
           >
             {I18n.t('Cancel')}
-          </Button>&nbsp;
+          </Button>
+          &nbsp;
           <Button
             ref={c => {
               this.confirmDeleteBtn = c
@@ -97,7 +98,7 @@ export default class DiscussionDeleteModal extends Component {
           >
             {I18n.t('Delete')}
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </Modal>
     )
   }

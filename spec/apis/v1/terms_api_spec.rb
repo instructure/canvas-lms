@@ -160,6 +160,19 @@ describe TermsApiController, type: :request do
         expect(res).to match_array([@term1.name, @term2.name])
       end
 
+      it "should allow teachers to view" do
+        c = @account.courses.create!(:enrollment_term => @term1)
+        teacher_in_course(:course => c, :active_all => true)
+        res = get_terms.map{ |t| t['name'] }
+        expect(res).to match_array([@term1.name, @term2.name])
+      end
+
+      it "should not allow other enrollment types to view" do
+        c = @account.courses.create!(:enrollment_term => @term1)
+        student_in_course(:course => c, :active_all => true)
+        expect_terms_index_401
+      end
+
       it "should require context to be root_account and error nicely" do
         subaccount = @account.sub_accounts.create!(name: 'subaccount')
         account_admin_user(account: @account)

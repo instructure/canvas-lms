@@ -140,7 +140,10 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
     })
 
     test('resets the selected sections', async () => {
-      const hideAssignmentGradesForSectionsStub = sinon.stub(Api, 'hideAssignmentGradesForSections')
+      const hideAssignmentGradesForSectionsStub = sandbox.stub(
+        Api,
+        'hideAssignmentGradesForSections'
+      )
       getSectionToggleInput().click()
       getSectionInput('Sophomores').click()
       await show()
@@ -148,7 +151,6 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       getSectionInput('Freshmen').click()
       getHideButton().click()
       deepEqual(hideAssignmentGradesForSectionsStub.firstCall.args[1], ['2001'])
-      hideAssignmentGradesForSectionsStub.restore()
     })
   })
 
@@ -236,20 +238,17 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
     }
 
     hooks.beforeEach(() => {
-      resolveHideAssignmentGradesStatusStub = sinon.stub(Api, 'resolveHideAssignmentGradesStatus')
-      hideAssignmentGradesStub = sinon
+      resolveHideAssignmentGradesStatusStub = sandbox.stub(Api, 'resolveHideAssignmentGradesStatus')
+      hideAssignmentGradesStub = sandbox
         .stub(Api, 'hideAssignmentGrades')
         .returns(Promise.resolve({id: PROGRESS_ID, workflowState: 'queued'}))
-      showFlashAlertStub = sinon.stub(FlashAlert, 'showFlashAlert')
+      showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert')
 
       return show()
     })
 
     hooks.afterEach(() => {
       FlashAlert.destroyContainer()
-      showFlashAlertStub.restore()
-      hideAssignmentGradesStub.restore()
-      resolveHideAssignmentGradesStatusStub.restore()
     })
 
     test('is present', () => ok(getHideButton()))
@@ -331,10 +330,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
 
     QUnit.module('on failure', contextHooks => {
       contextHooks.beforeEach(() => {
-        hideAssignmentGradesStub.restore()
-        hideAssignmentGradesStub = sinon
-          .stub(Api, 'hideAssignmentGrades')
-          .returns(Promise.reject(new Error('An Error Message')))
+        hideAssignmentGradesStub.returns(Promise.reject(new Error('An Error Message')))
         return clickHide()
       })
 
@@ -360,13 +356,9 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       let hideAssignmentGradesForSectionsStub
 
       contextHooks.beforeEach(() => {
-        hideAssignmentGradesForSectionsStub = sinon
+        hideAssignmentGradesForSectionsStub = sandbox
           .stub(Api, 'hideAssignmentGradesForSections')
           .returns(Promise.resolve({id: PROGRESS_ID, workflowState: 'queued'}))
-      })
-
-      contextHooks.afterEach(() => {
-        hideAssignmentGradesForSectionsStub.restore()
       })
 
       test('is not disabled', async () => {

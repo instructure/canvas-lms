@@ -17,15 +17,15 @@
  */
 
 import I18n from 'i18n!blueprint_settingsSyncChange'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import cx from 'classnames'
 
 import get from 'lodash/get'
-import Grid, { GridRow, GridCol } from '@instructure/ui-layout/lib/components/Grid'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
-import { IconLock, IconUnlock } from './BlueprintLocks'
+import {Grid} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {IconLock, IconUnlock} from './BlueprintLocks'
 
 import propTypes from '../propTypes'
 
@@ -33,31 +33,40 @@ import {itemTypeLabels, changeTypeLabels, exceptionTypeLabels} from '../labels'
 
 class SyncChange extends Component {
   static propTypes = {
-    change: propTypes.migrationChange.isRequired,
+    change: propTypes.migrationChange.isRequired
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      isExpanded: false,
+      isExpanded: false
     }
   }
 
   toggleExpanded = () => {
-    this.setState({ isExpanded: !this.state.isExpanded })
+    this.setState({isExpanded: !this.state.isExpanded})
   }
 
-  renderText = text => <Text size="small" weight="bold">{text}</Text>
+  renderText = text => (
+    <Text size="small" weight="bold">
+      {text}
+    </Text>
+  )
+
   renderSpace = () => <span style={{display: 'inline-block', width: '20px'}} />
 
-  renderExceptionGroup (exType, items) {
+  renderExceptionGroup(exType, items) {
     return (
       <li key={exType} className="bcs__history-item__change-exceps__group">
         {this.renderText(exceptionTypeLabels[exType])}
         <ul className="bcs__history-item__change-exceps__courses">
           {items.map(item => (
             <li key={item.course_id}>
-              {get(item, 'term.name') || ''} - {item.name}{this.renderSpace()}{item.sis_course_id}{this.renderSpace()}{item.course_code}
+              {get(item, 'term.name') || ''} - {item.name}
+              {this.renderSpace()}
+              {item.sis_course_id}
+              {this.renderSpace()}
+              {item.course_code}
             </li>
           ))}
         </ul>
@@ -65,9 +74,9 @@ class SyncChange extends Component {
     )
   }
 
-  renderExceptions () {
+  renderExceptions() {
     const exGroups = this.props.change.exceptions.reduce((groups, ex) => {
-      ex.conflicting_changes.forEach((conflict) => {
+      ex.conflicting_changes.forEach(conflict => {
         groups[conflict] = groups[conflict] || []
         groups[conflict].push(ex)
       })
@@ -76,51 +85,60 @@ class SyncChange extends Component {
 
     return (
       <ul className="bcs__history-item__change-exceps">
-        {Object.keys(exGroups)
-          .map(groupType => this.renderExceptionGroup(groupType, exGroups[groupType]))}
+        {Object.keys(exGroups).map(groupType =>
+          this.renderExceptionGroup(groupType, exGroups[groupType])
+        )}
       </ul>
     )
   }
 
-  render () {
-    const { asset_type, asset_name, change_type, exceptions, locked } = this.props.change
+  render() {
+    const {asset_type, asset_name, change_type, exceptions, locked} = this.props.change
     const hasExceptions = exceptions.length > 0
     const classes = cx({
       'bcs__history-item__change': true,
-      'bcs__history-item__change__expanded': this.state.isExpanded,
+      'bcs__history-item__change__expanded': this.state.isExpanded
     })
 
     return (
       <div className={classes} onClick={this.toggleExpanded}>
         <div className="bcs__history-item__content">
-          {hasExceptions &&
+          {hasExceptions && (
             <ToggleDetails
               summary={<ScreenReaderContent>{I18n.t('Show exceptions')}</ScreenReaderContent>}
               expanded={this.state.isExpanded}
             >
               {this.renderExceptions()}
-            </ToggleDetails>}
+            </ToggleDetails>
+          )}
           <div className="bcs__history-item__lock-icon">
-            <Text size="large" color="secondary">{locked ? <IconLock /> : <IconUnlock />}</Text>
+            <Text size="large" color="secondary">
+              {locked ? <IconLock /> : <IconUnlock />}
+            </Text>
           </div>
           <div className="bcs__history-item__content-grid">
             <Grid colSpacing="none">
-              <GridRow>
-                <GridCol width={6}>{this.renderText(asset_name)}</GridCol>
-                <GridCol width={2}>{this.renderText(itemTypeLabels[asset_type])}</GridCol>
-                <GridCol width={2}>{this.renderText(changeTypeLabels[change_type])}</GridCol>
-                <GridCol width={2}>
+              <Grid.Row>
+                <Grid.Col width={6}>{this.renderText(asset_name)}</Grid.Col>
+                <Grid.Col width={2}>{this.renderText(itemTypeLabels[asset_type])}</Grid.Col>
+                <Grid.Col width={2}>{this.renderText(changeTypeLabels[change_type])}</Grid.Col>
+                <Grid.Col width={2}>
                   <div style={{textAlign: 'right'}}>
                     {hasExceptions ? (
                       <Text size="x-small" color="secondary">
                         <span className="pill">
-                          {I18n.t({ one: '%{count} exception', other: '%{count} exceptions' }, { count: exceptions.length })}
+                          {I18n.t(
+                            {one: '%{count} exception', other: '%{count} exceptions'},
+                            {count: exceptions.length}
+                          )}
                         </span>
                       </Text>
-                    ) : this.renderText(I18n.t('Applied'))}
+                    ) : (
+                      this.renderText(I18n.t('Applied'))
+                    )}
                   </div>
-                </GridCol>
-              </GridRow>
+                </Grid.Col>
+              </Grid.Row>
             </Grid>
           </div>
         </div>

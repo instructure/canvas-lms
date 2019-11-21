@@ -18,19 +18,18 @@
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
-import $ from 'jquery'
 
-import Select from '@instructure/ui-forms/lib/components/Select';
-import { AccessibleContent } from '@instructure/ui-a11y'
-import { capitalizeFirstLetter } from '@instructure/ui-utils'
+import {Select} from '@instructure/ui-forms'
+import {AccessibleContent} from '@instructure/ui-a11y'
+import {capitalizeFirstLetter} from '@instructure/ui-utils'
 import difference from 'lodash/difference'
 import filter from 'lodash/filter'
 
 import Placement from './Placement'
 
 export default class Placements extends React.Component {
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
     this.state = {
       placements: this.props.placements
     }
@@ -41,32 +40,31 @@ export default class Placements extends React.Component {
     return Object.values(this.placementRefs).map(p => p.generateToolConfigurationPart())
   }
 
-  valid = () => {
-    if (Object.values(this.placementRefs).length === 0) {
-      $.flashError(I18n.t('Must have at least one placement defined.'))
-      return false
-    }
-    if (Object.values(this.placementRefs).some(p => !p.valid())) {
-      return false
-    }
-    return true
-  }
+  valid = () => Object.values(this.placementRefs).every(p => p.valid())
 
   placements(obj) {
-    return obj.map(o => o.placement);
+    return obj.map(o => o.placement)
   }
 
   placementDisplayName(p) {
-    return p.split("_").map(n => capitalizeFirstLetter(n)).join(" ");
+    return p
+      .split('_')
+      .map(n => capitalizeFirstLetter(n))
+      .join(' ')
   }
 
   handlePlacementSelect = (_, opts) => {
-    const { placements } = this.state;
+    const {placements} = this.state
     const selected = opts.map(o => o.id)
     const removed = difference(this.placements(placements), selected)
-    const added = difference(selected, this.placements(placements));
+    const added = difference(selected, this.placements(placements))
     removed.forEach(p => delete this.placementRefs[`${p}Ref`])
-    this.setState({placements: [...filter(placements, p => !removed.includes(p.placement)), ...this.newPlacements(added)]});
+    this.setState({
+      placements: [
+        ...filter(placements, p => !removed.includes(p.placement)),
+        ...this.newPlacements(added)
+      ]
+    })
   }
 
   setPlacementRef = placement => node => {
@@ -86,40 +84,40 @@ export default class Placements extends React.Component {
   }
 
   render() {
-    const { placements } = this.state;
-    const { validPlacements } = this.props;
+    const {placements} = this.state
+    const {validPlacements} = this.props
 
     return (
       <>
         <Select
-          label={I18n.t("Placements")}
+          label={I18n.t('Placements')}
           editable
-          formatSelectedOption={(tag) => (
-            <AccessibleContent alt={I18n.t("Remove %{placement}", {placement: tag.label})}>{tag.label}</AccessibleContent>
+          formatSelectedOption={tag => (
+            <AccessibleContent alt={I18n.t('Remove %{placement}', {placement: tag.label})}>
+              {tag.label}
+            </AccessibleContent>
           )}
           multiple
           selectedOption={this.placements(placements)}
           onChange={this.handlePlacementSelect}
         >
-          {
-            validPlacements.map(p => {
-              return <option value={p} key={p}>{this.placementDisplayName(p)}</option>
-            })
-          }
-        </Select>
-        {
-          placements.map(
-            p => (
-              <Placement
-                ref={this.setPlacementRef(p.placement)}
-                placementName={p.placement}
-                displayName={this.placementDisplayName(p.placement)}
-                placement={p}
-                key={p.placement}
-              />
+          {validPlacements.map(p => {
+            return (
+              <option value={p} key={p}>
+                {this.placementDisplayName(p)}
+              </option>
             )
-          )
-        }
+          })}
+        </Select>
+        {placements.map(p => (
+          <Placement
+            ref={this.setPlacementRef(p.placement)}
+            placementName={p.placement}
+            displayName={this.placementDisplayName(p.placement)}
+            placement={p}
+            key={p.placement}
+          />
+        ))}
       </>
     )
   }
@@ -127,12 +125,14 @@ export default class Placements extends React.Component {
 
 Placements.propTypes = {
   validPlacements: PropTypes.arrayOf(PropTypes.string),
-  placements: PropTypes.arrayOf(PropTypes.shape({
-    placement: PropTypes.string.isRequired
-  }))
+  placements: PropTypes.arrayOf(
+    PropTypes.shape({
+      placement: PropTypes.string.isRequired
+    })
+  )
 }
 
 Placements.defaultProps = {
-  placements: [{placement: "account_navigation"}, {placement: "link_selection"}],
+  placements: [{placement: 'account_navigation'}, {placement: 'link_selection'}],
   validPlacements: []
 }

@@ -127,13 +127,13 @@ QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
       test('renders a checkmark when the grade is "complete"', () => {
         props.submission.rawGrade = 'complete'
         wrapper = mountComponent()
-        strictEqual(wrapper.find('IconCheckMark').length, 1)
+        strictEqual(wrapper.find('IconCheckMarkSolid').length, 1)
       })
 
       test('renders an x-mark when the grade is "incomplete"', () => {
         props.submission.rawGrade = 'incomplete'
         wrapper = mountComponent()
-        strictEqual(wrapper.find('IconEnd').length, 1)
+        strictEqual(wrapper.find('IconEndSolid').length, 1)
       })
     })
   })

@@ -16,19 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import noop from "./noop";
-import uiReducer from "./ui";
-import collectionsReducer from "./collections";
-import files from "./files";
-import folders from "./folders";
-import rootFolderId from "./rootFolderId";
-import imagesReducer from "./images";
-import documentsReducer from "./documents";
-import upload from "./upload";
-import flickrReducer from "./flickr";
-import session from "./session";
-import newPageLinkReducer from "./newPageLinkExpanded";
-import { combineReducers } from "redux";
+import noop from './noop'
+import uiReducer from './ui'
+import collectionsReducer from './collections'
+import files from './files'
+import folders from './folders'
+import rootFolderId from './rootFolderId'
+import imagesReducer from './images'
+import documentsReducer from './documents'
+import mediaReducer from './media'
+import upload from './upload'
+import flickrReducer from './flickr'
+import session from './session'
+import newPageLinkReducer from './newPageLinkExpanded'
+import {changeContextType, changeContextId} from './context'
+import {combineReducers} from 'redux'
 
 // combine for root level state.
 export default combineReducers({
@@ -36,16 +38,18 @@ export default combineReducers({
   source: noop,
   jwt: noop,
   host: noop,
-  contextType: noop,
-  contextId: noop,
+  containingContext: noop,
+  contextType: changeContextType,
+  contextId: changeContextId,
   collections: collectionsReducer,
   files,
   folders,
   rootFolderId,
   images: imagesReducer,
   documents: documentsReducer,
+  media: mediaReducer,
   upload,
   flickr: flickrReducer,
   session,
   newPageLinkExpanded: newPageLinkReducer
-});
+})

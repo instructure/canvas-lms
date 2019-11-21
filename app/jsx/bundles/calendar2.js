@@ -41,25 +41,33 @@ const header = new CalendarHeader({
   showScheduler: ENV.CALENDAR.SHOW_SCHEDULER && !ENV.CALENDAR.BETTER_SCHEDULER
 })
 
-const calendar = new Calendar('#calendar-app', ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.MANAGE_CONTEXTS, eventDataSource, {
-  activateEvent: ENV.CALENDAR.ACTIVE_EVENT,
-  viewStart: ENV.CALENDAR.VIEW_START,
-  showScheduler: ENV.CALENDAR.SHOW_SCHEDULER,
-  header,
-  userId: ENV.current_user_id,
-  schedulerStore,
-  onLoadAppointmentGroups: (agMap) => {
-    if (ENV.CALENDAR.BETTER_SCHEDULER) {
-      const courses = eventDataSource.contexts.filter(context => agMap.hasOwnProperty(context.asset_string))
-      if (courses.length > 0) {
-        ReactDOM.render(
-          <FindAppointment courses={courses} store={schedulerStore} />,
-          $('#select-course-component')[0]
+const calendar = new Calendar(
+  '#calendar-app',
+  ENV.CALENDAR.CONTEXTS,
+  ENV.CALENDAR.MANAGE_CONTEXTS,
+  eventDataSource,
+  {
+    activateEvent: ENV.CALENDAR.ACTIVE_EVENT,
+    viewStart: ENV.CALENDAR.VIEW_START,
+    showScheduler: ENV.CALENDAR.SHOW_SCHEDULER,
+    header,
+    userId: ENV.current_user_id,
+    schedulerStore,
+    onLoadAppointmentGroups: agMap => {
+      if (ENV.CALENDAR.BETTER_SCHEDULER) {
+        const courses = eventDataSource.contexts.filter(context =>
+          agMap.hasOwnProperty(context.asset_string)
         )
+        if (courses.length > 0) {
+          ReactDOM.render(
+            <FindAppointment courses={courses} store={schedulerStore} />,
+            $('#select-course-component')[0]
+          )
+        }
       }
     }
   }
-})
+)
 
 new MiniCalendar('#minical', calendar)
 new UndatedEventsList('#undated-events', eventDataSource, calendar)
@@ -67,25 +75,32 @@ drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, eventDataSour
 
 let keyboardUser = true
 
-$('.calendar-button').on('mousedown', (e) => {
+$('.calendar-button').on('mousedown', e => {
   keyboardUser = false
-  $(e.target).find('.accessibility-warning').addClass('screenreader-only')
+  $(e.target)
+    .find('.accessibility-warning')
+    .addClass('screenreader-only')
 })
 
-$(document).on('keydown', (e) => {
-  if (e.which === 9) { // checking for tab press
+$(document).on('keydown', e => {
+  if (e.which === 9) {
+    // checking for tab press
     keyboardUser = true
   }
 })
 
-$('.calendar-button').on('focus', (e) => {
+$('.calendar-button').on('focus', e => {
   if (keyboardUser) {
-    $(e.target).find('.accessibility-warning').removeClass('screenreader-only')
+    $(e.target)
+      .find('.accessibility-warning')
+      .removeClass('screenreader-only')
   }
 })
 
 $('.calendar-button').on('focusout', e =>
-  $(e.target).find('.accessibility-warning').addClass('screenreader-only')
+  $(e.target)
+    .find('.accessibility-warning')
+    .addClass('screenreader-only')
 )
 
 $('.rs-section .accessibility-warning').on('focus', e =>

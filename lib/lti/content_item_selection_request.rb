@@ -139,6 +139,8 @@ module Lti
         collaboration_params
       when 'homework_submission'
         homework_submission_params(assignment)
+      when 'wiki_index_menu', 'module_index_menu'
+        {}
       else
         # TODO: we _could_, if configured, have any other placements return to the content migration page...
         raise "Content-Item not supported at this placement"

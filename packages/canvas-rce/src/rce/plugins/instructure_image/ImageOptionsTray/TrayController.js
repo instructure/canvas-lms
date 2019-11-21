@@ -65,23 +65,32 @@ export default class TrayController {
     const {$img} = this
 
     if (imageOptions.displayAs === 'embed') {
-      $img.alt = imageOptions.altText
-      $img.setAttribute('data-is-decorative', imageOptions.isDecorativeImage)
-      $img.setAttribute('height', imageOptions.appliedHeight)
-      $img.setAttribute('width', imageOptions.appliedWidth)
+      editor.dom.setAttribs($img, {
+        alt: imageOptions.isDecorativeImage ? '' : imageOptions.altText,
+        'data-is-decorative': imageOptions.isDecorativeImage ? 'true' : null,
+        width: imageOptions.appliedWidth,
+        height: imageOptions.appliedHeight
+      })
+
+      // when the image was first added to the rce, we applied
+      // max-width and max-height. Remove them from the style now
+      editor.dom.setStyles($img, {
+        'max-height': '',
+        'max-width': ''
+      })
+
       // tell tinymce so the context toolbar resets
       editor.fire('ObjectResized', {
         target: $img,
         width: imageOptions.appliedWidth,
         height: imageOptions.appliedHeight
       })
-      this._dismissTray()
     } else {
       const link = `<a href="${$img.src}" target="_blank">${$img.src}</a>`
       editor.selection.setContent(link)
-      this._dismissTray()
-      editor.focus()
     }
+    this._dismissTray()
+    editor.focus()
   }
 
   _dismissTray() {

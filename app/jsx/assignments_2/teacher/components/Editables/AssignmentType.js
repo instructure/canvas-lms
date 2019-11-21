@@ -20,24 +20,26 @@ import React from 'react'
 import {bool, func, oneOf, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Flex} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
 
-import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconGroup from '@instructure/ui-icons/lib/Line/IconGroup'
-import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
-import IconPeerReview from '@instructure/ui-icons/lib/Line/IconPeerReview'
+import {
+  IconAssignmentLine,
+  IconGroupLine,
+  IconQuizLine,
+  IconPeerReviewLine
+} from '@instructure/ui-icons'
 
 import SelectableText from './SelectableText'
 
-const assignment_type = {value: 'assignment', label: I18n.t('Assignment'), icon: IconAssignment}
+const assignment_type = {value: 'assignment', label: I18n.t('Assignment'), icon: IconAssignmentLine}
 const peer_review_type = {
   value: 'peer-review',
   label: I18n.t('Peer Review Assignment'),
-  icon: IconPeerReview
+  icon: IconPeerReviewLine
 }
-const group_type = {value: 'group', label: I18n.t('Group Assignment'), icon: IconGroup}
-const quiz_type = {value: 'quiz', label: I18n.t('Quiz'), icon: IconQuiz}
+const group_type = {value: 'group', label: I18n.t('Group Assignment'), icon: IconGroupLine}
+const quiz_type = {value: 'quiz', label: I18n.t('Quiz'), icon: IconQuizLine}
 
 const assignmentTypePlaceholder = I18n.t('Assignment Type')
 
@@ -75,12 +77,12 @@ export default class AssignmentType extends React.Component {
 
     return (
       <Flex>
-        <FlexItem>
+        <Flex.Item>
           <selectedType.icon />
-        </FlexItem>
-        <FlexItem margin="0 0 0 small">
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
           <Text>{selectedType.label}</Text>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }

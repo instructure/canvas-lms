@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Menu, {MenuItem} from '@instructure/ui-menu/lib/components/Menu'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
-import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
+import {Flex, View} from '@instructure/ui-layout'
+import {Menu} from '@instructure/ui-menu'
+import {Button} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {IconPlusLine} from '@instructure/ui-icons'
 
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
@@ -39,27 +38,23 @@ export default class DeveloperKeyModalTrigger extends React.Component {
 
   developerKeyMenuItem(title, onClick) {
     return (
-      <MenuItem onClick={onClick} type="button">
+      <Menu.Item onClick={onClick} type="button">
         <Flex>
-          <FlexItem padding="0 x-small 0 0" margin="0 0 xxx-small 0">
+          <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
             <IconPlusLine />
-          </FlexItem>
-          <FlexItem>
+          </Flex.Item>
+          <Flex.Item>
             <ScreenReaderContent>{I18n.t('Create an')}</ScreenReaderContent>
             {title}
-          </FlexItem>
+          </Flex.Item>
         </Flex>
-      </MenuItem>
+      </Menu.Item>
     )
   }
 
   triggerButton() {
     return (
-      <Button
-        variant="primary"
-        buttonRef={this.props.setAddKeyButtonRef}
-        icon={IconPlusLine}
-      >
+      <Button variant="primary" buttonRef={this.props.setAddKeyButtonRef} icon={IconPlusLine}>
         <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
         {I18n.t('Developer Key')}
       </Button>

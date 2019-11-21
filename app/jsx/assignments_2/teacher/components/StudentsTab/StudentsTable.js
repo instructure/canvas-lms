@@ -22,12 +22,12 @@ import I18n from 'i18n!assignments_2'
 
 import {TeacherAssignmentShape, SubmissionShape} from '../../assignmentData'
 
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-layout'
 import {Table} from '@instructure/ui-table'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
+import {Button} from '@instructure/ui-buttons'
+import {IconExpandStartLine} from '@instructure/ui-icons'
+import {Avatar} from '@instructure/ui-elements'
 import SubmissionStatusPill from '../../../shared/SubmissionStatusPill'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 import StudentTray from './StudentTray'
@@ -115,9 +115,7 @@ export default class StudentsTable extends React.Component {
     const assignmentLid = this.props.assignment.lid
     const courseLid = this.props.assignment.course.lid
     const attempts = student.submission.submissionHistories.nodes.map(attempt => {
-      const viewLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}&student_id=${
-        student.lid
-      }&attempt=${attempt.attempt}`
+      const viewLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}&student_id=${student.lid}&attempt=${attempt.attempt}`
       return (
         <View as="div" margin="0 0 x-small" key={attempt.attempt}>
           <Button
@@ -179,7 +177,7 @@ export default class StudentsTable extends React.Component {
     return (
       <Button
         variant="icon"
-        icon={<IconExpandStart rotate="180" />}
+        icon={<IconExpandStartLine rotate="180" />}
         data-student-id={student.lid}
         ref={b => (this.trayButton = b)}
         onClick={this.handleTrayOpen}

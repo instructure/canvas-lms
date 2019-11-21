@@ -241,6 +241,7 @@ class WikiPagesApiController < ApplicationController
   # @returns [Page]
   def index
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
+      log_api_asset_access([ "pages", @context ], "pages", "other")
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki_pages.select(WikiPage.column_names - ['body']).preload(:user)
@@ -658,7 +659,7 @@ class WikiPagesApiController < ApplicationController
 
   def assign_todo_date
     return if params.dig(:wiki_page, :student_todo_at).nil? && params.dig(:wiki_page, :student_planner_checkbox).nil?
-    if @context.root_account.feature_enabled?(:student_planner) && @page.context.grants_any_right?(@current_user, session, :manage)
+    if @context.root_account.feature_enabled?(:student_planner) && @page.context.grants_any_right?(@current_user, session, :manage_content)
       @page.todo_date = params.dig(:wiki_page, :student_todo_at) if params.dig(:wiki_page, :student_todo_at)
       # Only clear out if the checkbox is explicitly specified in the request
       if params[:wiki_page].key?("student_planner_checkbox") &&

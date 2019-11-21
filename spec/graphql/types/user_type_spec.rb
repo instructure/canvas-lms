@@ -34,7 +34,7 @@ describe Types::UserType do
     @teacher = teacher
   end
 
-  let(:user_type) { GraphQLTypeTester.new(@student, current_user: @teacher, request: ActionDispatch::TestRequest.create ) }
+  let(:user_type) { GraphQLTypeTester.new(@student, current_user: @teacher, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create ) }
   let(:user) { @student }
 
   context "node" do
@@ -80,6 +80,17 @@ describe Types::UserType do
       expect(user_type.resolve("avatarUrl")).to be_nil
     end
   end
+
+  context "pronouns" do
+    it "returns user pronouns" do
+      @student.account.root_account.settings[:can_add_pronouns] = true
+      @student.account.root_account.save!
+      @student.pronouns = "Dude/Guy"
+      @student.save!
+      expect(user_type.resolve("pronouns")).to eq "Dude/Guy"
+    end
+  end
+
 
   context "enrollments" do
     before(:once) do
@@ -134,6 +145,26 @@ describe Types::UserType do
       expect(user_type.resolve("email", current_user: nil)).to be_nil
       expect(user_type.resolve("email", current_user: @other_student)).to be_nil
       expect(user_type.resolve("email", current_user: @random_person)).to be_nil
+    end
+  end
+
+  context "groups" do
+    before(:once) do
+      @user_group_ids = (1..5).map {
+        group_with_user({user: @student, active_all: true}).group_id.to_s
+      }
+      @deleted_user_group_ids = (1..3).map {
+        group = group_with_user({user: @student, active_all: true})
+        group.destroy
+        group.group_id.to_s
+      }
+    end
+
+    it "fetches the groups associated with a user" do
+      user_type.resolve('groups { _id }', current_user: @student).all? do |id|
+        expect(@user_group_ids.include?(id)).to be true
+        expect(@deleted_user_group_ids.include?(id)).to be false
+      end
     end
   end
 end

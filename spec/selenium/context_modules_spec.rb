@@ -286,7 +286,8 @@ describe "context modules" do
 
     before(:once) do
       course_factory(active_course: true)
-      Account.default.enable_feature!(:usage_rights_required)
+      @course.usage_rights_required = true
+      @course.save!
       #adding file to course
       @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
       @file.context = @course
@@ -318,7 +319,6 @@ describe "context modules" do
 
     it "should set usage rights on a file in a module", priority: "1", test_id: 369251 do
       get "/courses/#{@course.id}/modules"
-      make_full_screen
       add_existing_module_item('#attachments_select', 'File', FILE_NAME)
       ff('.icon-publish')[0].click
       wait_for_ajaximations

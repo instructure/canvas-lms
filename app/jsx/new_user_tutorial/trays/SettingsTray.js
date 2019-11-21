@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const AssignmentsTray = () => (
@@ -28,12 +28,10 @@ const AssignmentsTray = () => (
     image="/images/tutorial-tray-images/settings.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Update and view sections, course details, navigation, feature
-                options and external app integrations, all visible only to Instructors.`)
-      }
+      {I18n.t(`Update and view sections, course details, navigation, feature
+                options and external app integrations, all visible only to Instructors.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default AssignmentsTray

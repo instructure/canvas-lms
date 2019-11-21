@@ -58,11 +58,22 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
     visible_enrollments = visible_enrollments.where(user_id: input[:only_student_ids]) if input[:only_student_ids]
     visible_enrollments = visible_enrollments.where.not(user_id: input[:skip_student_ids]) if input[:skip_student_ids]
 
-    submissions_scope = input[:graded_only] ? assignment.submissions.graded : assignment.submissions
-    submissions_scope = submissions_scope.joins(user: :enrollments).merge(visible_enrollments)
+    submissions_scope = if input[:graded_only] && course.root_account.feature_enabled?(:allow_postable_submission_comments)
+      assignment.submissions.postable
+    elsif input[:graded_only]
+      assignment.submissions.graded
+    else
+      assignment.submissions
+    end
 
+    submissions_scope = submissions_scope.joins(user: :enrollments).merge(visible_enrollments)
     submission_ids = submissions_scope.pluck(:id)
     progress = course.progresses.new(tag: "post_assignment_grades")
+
+    posting_params = {
+      graded_only: !!input[:graded_only],
+      section_names: sections&.pluck(:name)
+    }
 
     if progress.save
       progress.process_job(
@@ -70,7 +81,8 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
         :post_submissions,
         {preserve_method_args: true},
         progress: progress,
-        submission_ids: submission_ids
+        submission_ids: submission_ids,
+        posting_params: posting_params
       )
       return {assignment: assignment, progress: progress, sections: sections}
     else

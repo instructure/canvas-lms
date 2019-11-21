@@ -21,7 +21,6 @@ import gql from 'graphql-tag'
 import {AssignmentGroup} from './AssignmentGroup'
 import {LockInfo} from './LockInfo'
 import {Module} from './Module'
-import {Rubric} from './Rubric'
 import {Submission} from './Submission'
 
 // TODO - Pass ENV data down in react context instead of jimmied onto the assignment
@@ -48,16 +47,12 @@ export const Assignment = {
       muted
       name
       pointsPossible
-      rubric {
-        ...Rubric
-      }
       submissionTypes
       unlockAt
     }
     ${AssignmentGroup.fragment}
     ${LockInfo.fragment}
     ${Module.fragment}
-    ${Rubric.fragment}
   `,
 
   shape: shape({
@@ -74,7 +69,6 @@ export const Assignment = {
     muted: bool.isRequired,
     name: string.isRequired,
     pointsPossible: number.isRequired,
-    rubric: Rubric.shape,
     submissionTypes: arrayOf(string.isRequired),
     unlockAt: string
   })
@@ -102,7 +96,7 @@ export const AssignmentSubmissionsConnection = {
   })
 }
 
-export const AssignmentDefaultMocks = {
+export const DefaultMocks = {
   Assignment: () => ({
     _id: '1',
     allowedAttempts: null,
@@ -110,6 +104,7 @@ export const AssignmentDefaultMocks = {
     gradingType: 'points',
     muted: false,
     pointsPossible: 10,
+    rubric: null,
     submissionsConnection: {
       nodes: [{}] // only return one submission
     },

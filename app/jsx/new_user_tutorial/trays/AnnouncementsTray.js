@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const AnnouncementsTray = () => (
@@ -28,12 +28,10 @@ const AnnouncementsTray = () => (
     image="/images/tutorial-tray-images/announcements.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Share important information with all users in your course.
-          Choose to get a copy of your own announcements in Notifications.`)
-      }
+      {I18n.t(`Share important information with all users in your course.
+          Choose to get a copy of your own announcements in Notifications.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default AnnouncementsTray

@@ -17,40 +17,42 @@
  */
 
 import React from 'react'
-import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
-import List, { ListItem } from '@instructure/ui-elements/lib/components/List'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import IconSettings from '@instructure/ui-icons/lib/Line/IconSettings'
-import IconSyllabus from '@instructure/ui-icons/lib/Line/IconSyllabus'
-import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconCalendarMonth from '@instructure/ui-icons/lib/Line/IconCalendarMonth'
-import IconDiscussion from '@instructure/ui-icons/lib/Line/IconDiscussion'
-import IconModule from '@instructure/ui-icons/lib/Line/IconModule'
-import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
-import IconQuestion from '@instructure/ui-icons/lib/Line/IconQuestion'
-import IconDocument from '@instructure/ui-icons/lib/Line/IconDocument'
-import IconImage from '@instructure/ui-icons/lib/Solid/IconImage'
-import IconLink from '@instructure/ui-icons/lib/Solid/IconLink'
+import {Flex} from '@instructure/ui-layout'
+import {List, Text, Link, Heading} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {
+  IconSettingsLine,
+  IconSyllabusLine,
+  IconAssignmentLine,
+  IconCalendarMonthLine,
+  IconDiscussionLine,
+  IconModuleLine,
+  IconQuizLine,
+  IconQuestionLine,
+  IconDocumentLine,
+  IconImageSolid,
+  IconLinkSolid
+} from '@instructure/ui-icons'
+
 import I18n from 'i18n!link_validator'
 
 const TYPE_INFO = {
-  course_card_image:    { icon: IconSettings,      label: I18n.t('Course Settings') },
-  syllabus:             { icon: IconSyllabus,      label: I18n.t('Syllabus') },
-  assignment:           { icon: IconAssignment,    label: I18n.t('Assignment') },
-  calendar_event:       { icon: IconCalendarMonth, label: I18n.t('Event') },
-  discussion_topic:     { icon: IconDiscussion,    label: I18n.t('Discussion') },
-  module:               { icon: IconModule,        label: I18n.t('Module') },
-  quiz:                 { icon: IconQuiz,          label: I18n.t('Quiz') },
-  wiki_page:            { icon: IconDocument,      label: I18n.t('Page') },
-  assessment_question:  { icon: IconQuestion,      label: I18n.t('Assessment Question') },
-  quiz_question:        { icon: IconQuestion,      label: I18n.t('Quiz Question') }
+  course_card_image: {icon: IconSettingsLine, label: I18n.t('Course Settings')},
+  syllabus: {icon: IconSyllabusLine, label: I18n.t('Syllabus')},
+  assignment: {icon: IconAssignmentLine, label: I18n.t('Assignment')},
+  calendar_event: {icon: IconCalendarMonthLine, label: I18n.t('Event')},
+  discussion_topic: {icon: IconDiscussionLine, label: I18n.t('Discussion')},
+  module: {icon: IconModuleLine, label: I18n.t('Module')},
+  quiz: {icon: IconQuizLine, label: I18n.t('Quiz')},
+  wiki_page: {icon: IconDocumentLine, label: I18n.t('Page')},
+  assessment_question: {icon: IconQuestionLine, label: I18n.t('Assessment Question')},
+  quiz_question: {icon: IconQuestionLine, label: I18n.t('Quiz Question')}
 }
 
 const REASON_DESCRIPTION = {
-  course_mismatch: I18n.t('Links to other courses in this resource may not be accessible by the students in this course:'),
+  course_mismatch: I18n.t(
+    'Links to other courses in this resource may not be accessible by the students in this course:'
+  ),
   unpublished_item: I18n.t('Unpublished content referenced in this resource:'),
   missing_item: I18n.t('Non-existent content referenced in this resource:'),
   broken_link: I18n.t('External links in this resource were unreachable:'),
@@ -59,7 +61,7 @@ const REASON_DESCRIPTION = {
 }
 
 function simplifyReason(link) {
-  switch(link.reason) {
+  switch (link.reason) {
     case 'course_mismatch':
     case 'unpublished_item':
     case 'deleted':
@@ -92,23 +94,25 @@ export default function ValidatorResultsRow(props) {
     const links = []
 
     errors.forEach(error => {
-      const IconClass = error.image ? IconImage : IconLink
+      const IconClass = error.image ? IconImageSolid : IconLinkSolid
       const link_text = getLinkText(error)
-      const link = <ListItem key={error.url}>
-          <IconClass color="success"/>
+      const link = (
+        <List.Item key={error.url}>
+          <IconClass color="success" />
           &ensp;
           <Link href={error.url}>{link_text}</Link>
-        </ListItem>
+        </List.Item>
+      )
       links.push(link)
     })
 
     rows.push(
-      <ListItem key={reason}>
+      <List.Item key={reason}>
         {REASON_DESCRIPTION[reason]}
         <List variant="unstyled" margin="none x-small small small">
           {links}
         </List>
-      </ListItem>
+      </List.Item>
     )
   })
 
@@ -118,17 +122,17 @@ export default function ValidatorResultsRow(props) {
     TypeIcon = typeInfo.icon
     label = typeInfo.label
   } else {
-    TypeIcon = IconDocument
+    TypeIcon = IconDocumentLine
     label = props.result.type
   }
 
   return (
     <div className="result">
       <Flex>
-        <FlexItem align="start">
-          <TypeIcon color="success" size="small"/>
-        </FlexItem>
-        <FlexItem margin="none none none small">
+        <Flex.Item align="start">
+          <TypeIcon color="success" size="small" />
+        </Flex.Item>
+        <Flex.Item margin="none none none small">
           <Heading level="h3" as="h2">
             <Button
               variant="link"
@@ -138,12 +142,17 @@ export default function ValidatorResultsRow(props) {
               {props.result.name}
             </Button>
           </Heading>
-          <Text size="x-small" transform="uppercase" lineHeight="condensed" letterSpacing="expanded">{label}</Text>
-        </FlexItem>
+          <Text
+            size="x-small"
+            transform="uppercase"
+            lineHeight="condensed"
+            letterSpacing="expanded"
+          >
+            {label}
+          </Text>
+        </Flex.Item>
       </Flex>
-      <List margin="none x-small small x-large">
-        {rows}
-      </List>
+      <List margin="none x-small small x-large">{rows}</List>
     </div>
   )
 }

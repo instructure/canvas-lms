@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/fr_CA.json";
-import "../rce/languages/fr_FR";
+import formatMessage from '../format-message'
+import locale from '../../locales/fr_CA.json'
+import '../rce/languages/fr_FR'
 
-formatMessage.addLocale({ "fr-CA": locale });
+formatMessage.addLocale({'fr-CA': locale})

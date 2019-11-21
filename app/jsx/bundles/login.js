@@ -18,19 +18,19 @@
 
 import $ from 'jquery'
 import LoginFormSwitcher from '../login/LoginFormSwitcher'
+import ready from '@instructure/ready'
 import 'login'
 
-const switcher = new LoginFormSwitcher(
-    $('#login_form'),
-    $('#forgot_password_form')
-  )
+ready(() => {
+  const switcher = new LoginFormSwitcher($('#login_form'), $('#forgot_password_form'))
 
-$('.forgot_password_link').click((event) => {
-  event.preventDefault()
-  return switcher.switchToForgotPassword()
-})
+  $('.forgot_password_link').click(event => {
+    event.preventDefault()
+    return switcher.switchToForgotPassword()
+  })
 
-$('.login_link').click((event) => {
-  event.preventDefault()
-  return switcher.switchToLogin()
+  $('.login_link').click(event => {
+    event.preventDefault()
+    return switcher.switchToLogin()
+  })
 })

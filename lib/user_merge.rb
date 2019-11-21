@@ -34,6 +34,7 @@ class UserMerge
   def into(target_user)
     return unless target_user
     return if target_user == from_user
+    raise 'cannot merge a test student' if from_user.preferences[:fake_student] || target_user.preferences[:fake_student]
     @target_user = target_user
     target_user.associate_with_shard(from_user.shard, :shadow)
     # we also store records for the from_user on the target shard for a split
@@ -161,13 +162,14 @@ class UserMerge
 
     from_user.reload
     target_user.touch
+    target_user.clear_cache_key(*Canvas::CacheRegister::ALLOWED_TYPES['User'])
     from_user.destroy
     @merge_data.workflow_state = 'active'
     @merge_data.save!
   rescue => e
     @merge_data&.update_attribute(:workflow_state, 'failed')
-    @merge_data.items.create!(user: target_user, item_type: 'merge_error', item: e.backtrace.unshift(e.message))
-    Canvas::Errors.capture(e, type: :user_merge, merge_data_id: @merge_data&.id)
+    @merge_data.items.create!(user: target_user, item_type: 'merge_error', item: e.backtrace.unshift(e.message)) if @merge_data
+    Canvas::Errors.capture(e, type: :user_merge, merge_data_id: @merge_data&.id, from_user_id: from_user&.id, target_user_id: target_user&.id)
     raise
   end
 

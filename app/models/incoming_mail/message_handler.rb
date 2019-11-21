@@ -138,7 +138,9 @@ module IncomingMail
     end
 
     def valid_secure_id?(original_message_id, secure_id)
-      Canvas::Security.verify_hmac_sha1(secure_id, original_message_id)
+      options = {}
+      options[:truncate] = 15 if secure_id.length == 16
+      Canvas::Security.verify_hmac_sha1(secure_id, original_message_id, options)
     end
 
     def valid_user_and_context?(context, user)

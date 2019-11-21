@@ -27,21 +27,19 @@ import NonCanvasType from './SubmissionTypes/NonCanvasType'
 import OperatorType from './SubmissionTypes/OperatorType'
 import SimpleType from './SubmissionTypes/SimpleType'
 import {Heading, Pill} from '@instructure/ui-elements'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
-import Menu, {
-  MenuItem,
-  MenuItemGroup,
-  MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu'
-import View from '@instructure/ui-layout/lib/components/View'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {Menu} from '@instructure/ui-menu'
+import {View} from '@instructure/ui-layout'
 import AddHorizontalRuleButton from '../AddHorizontalRuleButton'
 
-import IconAttachMedia from '@instructure/ui-icons/lib/Line/IconAttachMedia'
-import IconDocument from '@instructure/ui-icons/lib/Line/IconDocument'
-import IconIntegrations from '@instructure/ui-icons/lib/Line/IconIntegrations'
-import IconImage from '@instructure/ui-icons/lib/Line/IconImage'
-import IconLink from '@instructure/ui-icons/lib/Line/IconLink'
-import IconUnpublished from '@instructure/ui-icons/lib/Line/IconUnpublished'
+import {
+  IconAttachMediaLine,
+  IconDocumentLine,
+  IconIntegrationsLine,
+  IconImageLine,
+  IconLinkLine,
+  IconUnpublishedLine
+} from '@instructure/ui-icons'
 
 export default class OverrideSubmissionTypes extends React.Component {
   static contextType = TeacherViewContext
@@ -100,14 +98,14 @@ export default class OverrideSubmissionTypes extends React.Component {
 
   static appType = {
     name: I18n.t('App'),
-    icon: IconIntegrations,
+    icon: IconIntegrationsLine,
     value: 'external_tool',
     slotType: ExternalToolType
   }
 
   static fileType = {
     name: I18n.t('File'),
-    icon: IconDocument,
+    icon: IconDocumentLine,
     value: 'online_upload',
     options: OverrideSubmissionTypes.docTypeOptions,
     slotType: FileType
@@ -115,7 +113,7 @@ export default class OverrideSubmissionTypes extends React.Component {
 
   static imageType = {
     name: I18n.t('Image'),
-    icon: IconImage,
+    icon: IconImageLine,
     value: 'image',
     options: OverrideSubmissionTypes.imageTypeOptions,
     slotType: FileType
@@ -123,7 +121,7 @@ export default class OverrideSubmissionTypes extends React.Component {
 
   static mediaType = {
     name: I18n.t('Media'),
-    icon: IconAttachMedia,
+    icon: IconAttachMediaLine,
     value: 'media_recording',
     options: OverrideSubmissionTypes.mediaTypeOptions,
     slotType: FileType
@@ -131,7 +129,7 @@ export default class OverrideSubmissionTypes extends React.Component {
 
   static nonCanvasType = {
     name: I18n.t('Non Canvas'),
-    icon: IconUnpublished,
+    icon: IconUnpublishedLine,
     value: 'non_canvas',
     options: OverrideSubmissionTypes.nonCanvasOptions,
     slotType: NonCanvasType
@@ -139,12 +137,17 @@ export default class OverrideSubmissionTypes extends React.Component {
 
   static textType = {
     name: I18n.t('Text Entry'),
-    icon: IconDocument,
+    icon: IconDocumentLine,
     value: 'online_text_entry',
     slotType: SimpleType
   }
 
-  static urlType = {name: I18n.t('URL'), icon: IconLink, value: 'online_url', slotType: SimpleType}
+  static urlType = {
+    name: I18n.t('URL'),
+    icon: IconLinkLine,
+    value: 'online_url',
+    slotType: SimpleType
+  }
 
   static submissionTypes = [
     OverrideSubmissionTypes.appType,
@@ -185,12 +188,12 @@ export default class OverrideSubmissionTypes extends React.Component {
     return OverrideSubmissionTypes.submissionTypes.map(t => {
       const Icon = t.icon
       return (
-        <MenuItem key={t.value} value={t.value}>
+        <Menu.Item key={t.value} value={t.value}>
           <div>
             <Icon />
             <View margin="0 0 0 x-small">{t.name}</View>
           </div>
-        </MenuItem>
+        </Menu.Item>
       )
     })
   }
@@ -224,23 +227,23 @@ export default class OverrideSubmissionTypes extends React.Component {
           <AddHorizontalRuleButton label={I18n.t('Add submission type')} onClick={() => {}} />
         }
       >
-        <MenuItemGroup label={I18n.t('Submission Type')} onSelect={this.onSelectSubmissionType}>
+        <Menu.Group label={I18n.t('Submission Type')} onSelect={this.onSelectSubmissionType}>
           {this.getMenuItems()}
-        </MenuItemGroup>
-        <MenuItemSeparator />
-        <MenuItemGroup label={I18n.t('Default')} onSelect={() => {}} selected={['or']}>
-          <MenuItem key="or" value="or">
+        </Menu.Group>
+        <Menu.Separator />
+        <Menu.Group label={I18n.t('Default')} onSelect={() => {}} selected={['or']}>
+          <Menu.Item key="or" value="or">
             <div>{I18n.t('Or')}</div>
-          </MenuItem>
-          <MenuItem key="and" value="and" disabled>
+          </Menu.Item>
+          <Menu.Item key="and" value="and" disabled>
             <div>
               {I18n.t('And')}
               <View margin="0 0 0 small">
                 <Pill variant="primary" text={I18n.t('COMING SOON')} />
               </View>
             </div>
-          </MenuItem>
-        </MenuItemGroup>
+          </Menu.Item>
+        </Menu.Group>
       </Menu>
     )
   }

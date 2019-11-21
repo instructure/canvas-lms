@@ -4416,6 +4416,19 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       students = gradebook.studentsThatCanSeeAssignment('2302') // re-cache
       deepEqual(Object.keys(students), ['1102'])
     })
+
+    test('includes test students', function() {
+      gradebook.gotChunkOfStudents(allStudents)
+
+      const testStudent = {
+        id: '9901',
+        name: 'Test Student',
+        enrollments: [{type: 'StudentViewEnrollment', grades: {html_url: 'http://example.ur/'}}]
+      }
+      gradebook.gotChunkOfStudents([testStudent])
+      const students = gradebook.studentsThatCanSeeAssignment('2301')
+      deepEqual(Object.keys(students), ['1101', '1102', '9901'])
+    })
   })
 })
 
@@ -5567,8 +5580,8 @@ QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
       }
     })
     this.gradebook.setAssignmentGroups({
-      '1': {id: '1'},
-      '2': {id: '2'}
+      '1': {id: '1', name: 'First'},
+      '2': {id: '2', name: 'Second'}
     })
     sinon.spy(this.gradebook, 'setFilterColumnsBySetting')
     sandbox.spy($, 'ajaxJSON')
@@ -8445,7 +8458,7 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
     const promise = gradebook.apiCreateSubmissionComment('a comment')
     return promise.then(() => {
       strictEqual(updateSubmissionCommentsStub.callCount, 1)
-    });
+    })
   })
 
   test('calls showFlashSuccess on a successful call', () => {
@@ -8456,7 +8469,7 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
     const promise = gradebook.apiCreateSubmissionComment('a comment')
     return promise.then(() => {
       strictEqual(showFlashSuccessStub.callCount, 1)
-    });
+    })
   })
 
   test('calls the success function on an unsuccessful call', () => {
@@ -8467,7 +8480,7 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
     const promise = gradebook.apiCreateSubmissionComment('a comment')
     return promise.then(() => {
       strictEqual(setCommentsUpdatingStub.callCount, 1)
-    });
+    })
   })
 
   test('calls showFlashError on an unsuccessful call', () => {
@@ -8478,7 +8491,7 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
     const promise = gradebook.apiCreateSubmissionComment('a comment')
     return promise.then(() => {
       strictEqual(showFlashErrorStub.callCount, 1)
-    });
+    })
   })
 
   test('includes comment group_comment in call', () => {
@@ -8650,7 +8663,7 @@ test('calls the success function on a successful call', function() {
   const promise = this.gradebook.apiDeleteSubmissionComment('42')
   return promise.then(() => {
     strictEqual(removeSubmissionCommentStub.callCount, 1)
-  });
+  })
 })
 
 test('calls showFlashSuccess on a successful call', function() {
@@ -8662,7 +8675,7 @@ test('calls showFlashSuccess on a successful call', function() {
   const promise = this.gradebook.apiDeleteSubmissionComment('42')
   return promise.then(() => {
     strictEqual(showFlashSuccessStub.callCount, 1)
-  });
+  })
 })
 
 test('calls the success function on an unsuccessful call', function() {
@@ -8674,7 +8687,7 @@ test('calls the success function on an unsuccessful call', function() {
   const promise = this.gradebook.apiDeleteSubmissionComment('42')
   return promise.then(() => {
     strictEqual(showFlashErrorStub.callCount, 1)
-  });
+  })
 })
 
 test('calls removeSubmissionComment on success', function() {
@@ -8687,7 +8700,7 @@ test('calls removeSubmissionComment on success', function() {
   const promise = this.gradebook.apiDeleteSubmissionComment('42', successStub, () => {})
   return promise.then(() => {
     strictEqual(removeSubmissionCommentStub.callCount, 1)
-  });
+  })
 })
 
 QUnit.module('#removeSubmissionComment', {

@@ -155,7 +155,7 @@ module Services
           allow(non_root_account_context).to receive(:root_account).and_return(root_account_object)
           expect(HTTParty).to receive(:send) do |method, endpoint, options|
             expect(method).to eq(:get)
-            expect(endpoint).to eq('http://example.com/api/subscriptions')
+            expect(endpoint).to eq('http://example.com/api/root_account_subscriptions')
             jwt = Canvas::Security::ServicesJwt.new(options[:headers]['Authorization'].gsub('Bearer ',''), false).original_token
             expect(jwt["DeveloperKey"]).to eq('10000000000003')
             expect(jwt["RootAccountId"]).to eq('10000000000007')

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { reorderElements, backbone } from 'jsx/move_item'
+import {reorderElements, backbone} from 'jsx/move_item'
 
 const container = document.getElementById('fixtures')
 
@@ -53,18 +53,14 @@ test('reorderElements ignores non-existent elements', () => {
 test('backbone.collectionToItems parses collection correctly', () => {
   const coll = {
     models: [
-      { attributes: { id: '4', name: 'foo', thing: 'fizz' } },
-      { attributes: { id: '6', title: 'bar', beep: 'boop' } },
-      { attributes: { id: '8', name: 'buzz' } },
+      {attributes: {id: '4', name: 'foo', thing: 'fizz'}},
+      {attributes: {id: '6', title: 'bar', beep: 'boop'}},
+      {attributes: {id: '8', name: 'buzz'}}
     ]
   }
 
   const result = backbone.collectionToItems(coll)
-  const desired = [
-    { id: '4', title: 'foo' },
-    { id: '6', title: 'bar' },
-    { id: '8', title: 'buzz' }
-  ]
+  const desired = [{id: '4', title: 'foo'}, {id: '6', title: 'bar'}, {id: '8', title: 'buzz'}]
 
   deepEqual(result, desired)
 })
@@ -72,36 +68,37 @@ test('backbone.collectionToItems parses collection correctly', () => {
 test('backbone.collectionToGroups parses collection correctly', () => {
   const coll = {
     models: [
-      { attributes: {
-        id: '4',
-        name: 'foo',
-        users: { models: [
-          { attributes: { id: '4', name: 'foo', thing: 'fizz' } },
-          { attributes: { id: '6', title: 'bar', beep: 'boop' } },
-        ] }
-       }
-     },
-     { attributes: {
-       id: '6',
-       title: 'bar',
-       users: { models: [
-        { attributes: { id: '4', name: 'foo', thing: 'fizz' } },
-        { attributes: { id: '6', title: 'bar', beep: 'boop' } },
-       ] }
+      {
+        attributes: {
+          id: '4',
+          name: 'foo',
+          users: {
+            models: [
+              {attributes: {id: '4', name: 'foo', thing: 'fizz'}},
+              {attributes: {id: '6', title: 'bar', beep: 'boop'}}
+            ]
+          }
+        }
+      },
+      {
+        attributes: {
+          id: '6',
+          title: 'bar',
+          users: {
+            models: [
+              {attributes: {id: '4', name: 'foo', thing: 'fizz'}},
+              {attributes: {id: '6', title: 'bar', beep: 'boop'}}
+            ]
+          }
+        }
       }
-    }]
+    ]
   }
 
   const result = backbone.collectionToGroups(coll, col => col.attributes.users)
   const desired = [
-    { id: '4', title: 'foo', items: [
-      { id: '4', title: 'foo' },
-      { id: '6', title: 'bar' }]
-    },
-    { id: '6', title: 'bar', items: [
-      { id: '4', title: 'foo' },
-      { id: '6', title: 'bar' }]
-    },
+    {id: '4', title: 'foo', items: [{id: '4', title: 'foo'}, {id: '6', title: 'bar'}]},
+    {id: '6', title: 'bar', items: [{id: '4', title: 'foo'}, {id: '6', title: 'bar'}]}
   ]
 
   deepEqual(result, desired)

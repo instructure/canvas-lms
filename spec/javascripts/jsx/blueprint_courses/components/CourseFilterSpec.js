@@ -17,95 +17,150 @@
  */
 
 import React from 'react'
+import {render} from '@testing-library/react'
 import * as enzyme from 'enzyme'
 import CourseFilter from 'jsx/blueprint_courses/components/CourseFilter'
 import getSampleData from '../getSampleData'
 
-QUnit.module('CourseFilter component')
-
 const defaultProps = () => ({
   subAccounts: getSampleData().subAccounts,
-  terms: getSampleData().terms,
+  terms: getSampleData().terms
 })
+let fixtures
 
-test('renders the CourseFilter component', () => {
-  const tree = enzyme.shallow(<CourseFilter {...defaultProps()} />)
-  const node = tree.find('.bca-course-filter')
-  ok(node.exists())
-})
+QUnit.module('CourseFilter', hooks => {
+  hooks.beforeEach(() => {
+    fixtures = document.getElementById('fixtures')
+    fixtures.innerHTML = '<div id="flash_screenreader_holder" role="alert"></div>'
+  })
 
-test('onChange fires with search filter when text is entered in search box', (assert) => {
-  const done = assert.async()
-  const props = defaultProps()
-  props.onChange = (filter) => {
-    equal(filter.search, 'giraffe')
-    done()
-  }
-  const tree = enzyme.mount(<CourseFilter {...props} />)
-  const input = tree.find('TextInput input')
-  input.instance().value = 'giraffe'
-  input.simulate('change')
-})
+  hooks.afterEach(() => {
+    fixtures.innerHTML = ''
+  })
 
-test('onChange fires with term filter when term is selected', (assert) => {
-  const done = assert.async()
-  const props = defaultProps()
-  props.onChange = (filter) => {
-    equal(filter.term, '1')
-    done()
-  }
-  const tree = enzyme.mount(<CourseFilter {...props} />)
-  const input = tree.find('select').at(0)
-  input.instance().value = '1'
-  input.simulate('change')
-})
+  test('renders the CourseFilter component', () => {
+    const tree = enzyme.shallow(<CourseFilter {...defaultProps()} />)
+    const node = tree.find('.bca-course-filter')
+    ok(node.exists())
+  })
 
-test('onChange fires with subaccount filter when a subaccount is selected', (assert) => {
-  const done = assert.async()
-  const props = defaultProps()
-  props.onChange = (filter) => {
-    equal(filter.subAccount, '1')
-    done()
-  }
-  const tree = enzyme.mount(<CourseFilter {...props} />)
-  const input = tree.find('select').at(1)
-  input.instance().value = '1'
-  input.simulate('change')
-})
+  test('onChange fires with search filter when text is entered in search box', assert => {
+    const done = assert.async()
+    const props = defaultProps()
+    props.onChange = filter => {
+      equal(filter.search, 'giraffe')
+      done()
+    }
+    const tree = enzyme.mount(<CourseFilter {...props} />)
+    const input = tree.find('input[type="search"]')
+    input.instance().value = 'giraffe'
+    input.simulate('change')
+  })
 
-test('onActivate fires when filters are focussed', () => {
-  const props = defaultProps()
-  props.onActivate = sinon.spy()
-  const tree = enzyme.mount(<CourseFilter {...props} />)
-  const input = tree.find('TextInput input')
-  input.simulate('focus')
-  ok(props.onActivate.calledOnce)
-})
+  test('onActivate fires when filters are focused', () => {
+    const props = defaultProps()
+    props.onActivate = sinon.spy()
+    const tree = enzyme.mount(<CourseFilter {...props} />)
+    const input = tree.find('input[type="search"]')
+    input.simulate('focus')
+    ok(props.onActivate.calledOnce)
+  })
 
-test('onChange not fired when < 3 chars are entered in search text input', (assert) => {
-  const done = assert.async()
-  const props = defaultProps()
-  props.onChange = sinon.spy()
-  const tree = enzyme.mount(<CourseFilter {...props} />)
-  const input = tree.find('input[type="search"]')
-  input.instance().value = 'aa'
-  input.simulate('change')
-  setTimeout(() => {
-    equal(props.onChange.callCount, 0)
-    done()
-  }, 0)
-})
+  test('onChange not fired when < 3 chars are entered in search text input', assert => {
+    const done = assert.async()
+    const props = defaultProps()
+    props.onChange = sinon.spy()
+    const tree = enzyme.mount(<CourseFilter {...props} />)
+    const input = tree.find('input[type="search"]')
+    input.instance().value = 'aa'
+    input.simulate('change')
+    setTimeout(() => {
+      equal(props.onChange.callCount, 0)
+      done()
+    }, 0)
+  })
 
-test('onChange fired when 3 chars are entered in search text input', (assert) => {
-  const done = assert.async()
-  const props = defaultProps()
-  props.onChange = sinon.spy()
-  const tree = enzyme.mount(<CourseFilter {...props} />)
-  const input = tree.find('input[type="search"]')
-  input.instance().value = 'aaa'
-  input.simulate('change')
-  setTimeout(() => {
-    ok(props.onChange.calledOnce)
-    done()
-  }, 0)
+  test('onChange fired when 3 chars are entered in search text input', assert => {
+    const done = assert.async()
+    const props = defaultProps()
+    props.onChange = sinon.spy()
+    const tree = enzyme.mount(<CourseFilter {...props} />)
+    const input = tree.find('input[type="search"]')
+    input.instance().value = 'aaa'
+    input.simulate('change')
+    setTimeout(() => {
+      ok(props.onChange.calledOnce)
+      done()
+    }, 0)
+  })
+
+  QUnit.module('CourseFilter > Filter behavior', suiteHooks => {
+    let container
+    let component
+    let select
+
+    suiteHooks.afterEach(() => {
+      component.unmount()
+      container.remove()
+    })
+
+    function renderComponent(props) {
+      return render(<CourseFilter {...props} />, {container})
+    }
+
+    function clickToExpand() {
+      select.click()
+    }
+
+    function getOptionsList() {
+      const optionsListId = select.getAttribute('aria-controls')
+      return document.getElementById(optionsListId)
+    }
+
+    function getOption(optionLabel) {
+      return getOptions().find($option => $option.textContent.trim() === optionLabel)
+    }
+
+    function getOptions() {
+      return [...getOptionsList().querySelectorAll('[role="option"]')]
+    }
+
+    function getOptionLabels() {
+      return getOptions().map(option => option.textContent.trim())
+    }
+
+    function selectOption(optionLabel) {
+      getOption(optionLabel).click()
+    }
+
+    test('onChange fires with term filter when term is selected', assert => {
+      const done = assert.async()
+      const props = defaultProps()
+      props.onChange = filter => {
+        equal(filter.term, '1')
+        done()
+      }
+      container = document.body.appendChild(document.createElement('div'))
+      component = renderComponent(props)
+      select = container.querySelectorAll('input[type="text"]')[0]
+
+      clickToExpand()
+      selectOption('Term One')
+    })
+
+    test('onChange fires with subaccount filter when a subaccount is selected', assert => {
+      const done = assert.async()
+      const props = defaultProps()
+      props.onChange = filter => {
+        equal(filter.subAccount, '2')
+        done()
+      }
+      container = document.body.appendChild(document.createElement('div'))
+      component = renderComponent(props)
+      select = container.querySelectorAll('input[type="text"]')[1]
+
+      clickToExpand()
+      selectOption('Account Two')
+    })
+  })
 })

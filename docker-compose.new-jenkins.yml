@@ -1,5 +1,5 @@
 # it is intended that this be used exclusive of all other docker-compose.*yml files in CI
-version: "2.1"
+version: "2.3"
 services:
   web:
     # use master if NAME is unavailable
@@ -7,16 +7,50 @@ services:
     links:
       - postgres
       - redis
+      - cassandra
+      - dynamodb
     environment:
-      ENCRYPTION_KEY: 598f25a47a708a96be4bd398cc512c71df1b24114e5af4f8f9c4d2ed777c9906519a07f9452e369a6fa27f8b31e8f768da1422fa47bbf9d8fbd46620dc863002
+      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       RAILS_ENV: test
       RAILS_DB_NAME_TEST: 'canvas_test'
       RAILS_DB_HOST: postgres
       RAILS_DB_PASSWORD: ''
       DATABASE_URL: "postgres://postgres@postgres:5432/canvas_test"
+      RANDOMIZE_SEQUENCES: 1
+      RERUNS_RETRY:
+      MAX_FAIL:
+
+      # knapsack
+      CI_NODE_TOTAL:
+      CI_NODE_INDEX:
+      KNAPSACK_ENABLED:
+      KNAPSACK_TEST_FILE_PATTERN:
+      KNAPSACK_EXCLUDE_REGEX:
+      KNAPSACK_TEST_DIR:
+      KNAPSACK_GENERATE_REPORT:
+
 
   redis:
-    image: redis:alpine
+    image: starlord.inscloudgate.net/jenkins/redis:alpine
 
   postgres:
-    build: ./build/docker-compose/postgres/9.5
+    image: canvas-lms:previous-postgres-image
+    build:
+      context: ./build/docker-compose/postgres/9.5/
+      dockerfile: ./Dockerfile
+    environment:
+      PGDATA: /data
+
+  cassandra:
+    image: canvas-lms:previous-cassandra-image
+    build:
+      context: ./build/docker-compose/cassandra/
+      dockerfile: ./Dockerfile.cachable
+    environment:
+      CASSANDRA_START_RPC: 'true'
+
+  dynamodb:
+    image: canvas-lms:previous-dynamodb-image
+    build:
+      context: ./build/docker-compose/dynamodb/
+      dockerfile: ./Dockerfile.cachable

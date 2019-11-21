@@ -46,7 +46,7 @@ module BrandableCSS
     "ic-brand-global-nav-menu-item__badge-text" => lambda { I18n.t("Nav Badge Text") },
     "ic-brand-global-nav-logo-bgd" => lambda { I18n.t("Nav Logo Background") },
     "ic-brand-header-image" => lambda { I18n.t("Nav Logo") },
-    "ic-brand-mobile-global-nav-logo" => lambda { I18n.t("Mobile Global Nav Logo") },
+    "ic-brand-mobile-global-nav-logo" => lambda { I18n.t("Responsive Global Nav Logo") },
     "ic-brand-watermark" => lambda { I18n.t("Watermark") },
     "ic-brand-watermark-opacity" => lambda { I18n.t("Watermark Opacity") },
     "ic-brand-favicon" => lambda { I18n.t("Favicon") },

@@ -70,6 +70,35 @@ describe Message do
       expect(msg.html_body.index('<!DOCTYPE')).to eq 0
     end
 
+    it "should use slack template if present" do
+      @au = AccountUser.create(:account => account_model)
+      course_with_student
+      alert = @course.alerts.create!(recipients: [:student],
+        criteria: [
+          criterion_type: 'Interaction',
+          threshold: 7
+        ])
+      mock_template = "slack template"
+      expect_any_instance_of(Message).to receive(:get_template).with('alert.slack.erb').and_return(mock_template)
+      msg = generate_message(:alert, :slack, alert)
+      expect(msg.body).to eq mock_template
+    end
+
+    it "should sms template if no slack template present" do
+      @au = AccountUser.create(:account => account_model)
+      course_with_student
+      alert = @course.alerts.create!(recipients: [:student],
+                                      criteria: [
+                                        criterion_type: 'Interaction',
+                                        threshold: 7
+                                      ])
+      mock_template = "sms template"
+      expect_any_instance_of(Message).to receive(:get_template).with('alert.slack.erb').and_return(nil)
+      expect_any_instance_of(Message).to receive(:get_template).with('alert.sms.erb').and_return(mock_template)
+      msg = generate_message(:alert, :slack, alert)
+      expect(msg.body).to eq mock_template
+    end
+
     it "should not html escape the subject" do
       assignment_model(:title => "hey i have weird&<stuff> in my name but that's okay")
       msg = generate_message(:assignment_created, :email, @assignment)
@@ -268,6 +297,16 @@ describe Message do
       allow(Mailer).to receive(:create_message).and_return(double(deliver_now: "Response!"))
       expect(message.workflow_state).to eq("staged")
       expect{ message.deliver }.not_to raise_error
+    end
+
+    it "logs stats on deliver" do
+      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.my_name",
+                                                             {short_stat: "message.deliver",
+                                                              tags: {path_type: "email", notification_name: 'my_name'}})
+
+      message = message_model(dispatch_at: Time.now - 1, notification_name: 'my_name', workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, path_type: 'email', user: @user)
+      expect(message).to receive(:dispatch).and_return(true)
+      @message.deliver
     end
 
     context 'push' do
@@ -625,7 +664,7 @@ describe Message do
     url = "a" * 256
     msg = Message.new
     msg.url = url
-    msg.save!
+    expect{ msg.save! }.to_not raise_error
   end
 
   describe "#context_context" do

@@ -17,6 +17,7 @@
 
 module Lti
   # @API Data Services
+  # @internal
   #
   # Data service api for tools.
   #
@@ -58,6 +59,21 @@ module Lti
   #          }
   #       }
   #     }
+  #
+  #     @model DataServiceEventTypes
+  #         {
+  #            "id": "DataServiceEventTypes",
+  #            "description": "A categorized list of all possible event types",
+  #            "properties": {
+  #               "EventCategory": {
+  #                 "description": "An array of strings representing the event types in the category.",
+  #                 "example": ["assignment_created"],
+  #                 "type": "array",
+  #                 "items": {"type": "string"}
+  #               }
+  #             }
+  #         }
+  #
   class DataServicesController < ApplicationController
     include Ims::Concerns::AdvantageServices
     MIME_TYPE = 'application/vnd.canvas.dataservices+json'.freeze
@@ -65,7 +81,10 @@ module Lti
     ACTION_SCOPE_MATCHERS = {
       create: all_of(TokenScopes::LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
       show: all_of(TokenScopes::LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE),
-      update: all_of(TokenScopes::LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE)
+      update: all_of(TokenScopes::LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
+      index: all_of(TokenScopes::LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE),
+      destroy: all_of(TokenScopes::LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE),
+      event_types_index: all_of(TokenScopes::LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE)
     }.freeze.with_indifferent_access
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do
@@ -102,11 +121,17 @@ module Lti
     # @argument subscription[TransportType] [Required, String]
     #   Must be either 'sqs' or 'https'.
     #
+    # @argument subscription[OwnerId] [Optional, String]
+    #   The globalId of the user making the subscription. If not present, will default
+    #   to the tool id. The user will be validated to exist on account and have
+    #   the data_services permission, otherwise will throw a 422 error.
+    #
     # @returns DataServiceSubscription
     def create
       sub = params.require(:subscription)
       SubscriptionsValidator.validate_subscription_context!(sub)
-      response = Services::LiveEventsSubscriptionService.create(jwt_body, sub.to_unsafe_h)
+      sub = add_owner(sub.to_unsafe_h)
+      response = Services::LiveEventsSubscriptionService.create(jwt_body, sub)
       forward_service_response(response)
     end
 
@@ -114,31 +139,39 @@ module Lti
     # Updates a Data Service Event subscription for the specified event type and
     # context.
     #
-    # @argument subscription[ContextId] [Required, String]
+    # @argument subscription[ContextId] [Optional, String]
     #   The id of the context for the subscription.
     #
-    # @argument subscription[ContextType] [Required, String]
+    # @argument subscription[ContextType] [Optional, String]
     #   The type of context for the subscription. Must be 'assignment',
     #   'account', or 'course'.
     #
-    # @argument subscription[EventTypes] [Required, Array]
+    # @argument subscription[EventTypes] [Optional, Array]
     #   Array of strings representing the event types for
     #   the subscription.
     #
-    # @argument subscription[Format] [Required, String]
+    # @argument subscription[Format] [Optional, String]
     #   Format to deliver the live events. Must be 'live-event' or 'caliper'.
     #
-    # @argument subscription[TransportMetadata] [Required, Object]
+    # @argument subscription[TransportMetadata] [Optional, Object]
     #   An object with a single key: 'Url'. Example: { "Url": "sqs.example" }
     #
-    # @argument subscription[TransportType] [Required, String]
+    # @argument subscription[TransportType] [Optional, String]
     #   Must be either 'sqs' or 'https'.
+    #
+    # @argument subscription[State] [Optional, String]
+    #   Must be either 'Active' or 'Deleted"
+    #
+    # @argument subscription[UpdatedBy] [Optional, String]
+    #   The globalId of the user updating the subscription. If not present, will default
+    #   to the tool id. The user will be validated to exist on account and have
+    #   the data_services permission, otherwise will throw a 422 error.
     #
     # @returns DataServiceSubscription
     def update
       sub = params.require(:subscription)
-      SubscriptionsValidator.validate_subscription_context!(sub)
-      updates = { 'Id': params[:id] }.merge(sub.to_unsafe_h)
+      SubscriptionsValidator.validate_subscription_context!(sub) if sub[:ContextType]
+      updates = add_updater({ 'Id': params[:id] }.merge(sub.to_unsafe_h))
       response = Services::LiveEventsSubscriptionService.update(jwt_body, updates)
       forward_service_response(response)
     end
@@ -149,6 +182,41 @@ module Lti
     # @returns DataServiceSubscription
     def show
       response = Services::LiveEventsSubscriptionService.show(jwt_body, params.require(:id))
+      forward_service_response(response)
+    end
+
+    # @API List all Data Services Event Subscriptions
+    #
+    # This endpoint returns a paginated list with a default limit of 100 items per result set.
+    # You can retrieve the next result set by setting a 'StartKey' header in your next request
+    # with the value of the 'EndKey' header in the response.
+    #
+    # Note that this will return all active subscription and the last 90 days of deleted subscriptions.
+    #
+    # Example use of a 'StartKey' header object:
+    #   { "Id":"71d6dfba-0547-477d-b41d-db8cb528c6d1","OwnerId":"domain.instructure.com" }
+    #
+    # @returns DataServiceSubscription
+    def index
+      response = Services::LiveEventsSubscriptionService.index(jwt_body, query: { limit_deleted: 90 })
+      forward_service_response(response)
+    end
+
+
+    # @API Destroy a Data Services Event Subscription
+    # Destroy existing Data Services Event Subscription
+    #
+    # @returns DataServiceSubscription
+    def destroy
+      response = Services::LiveEventsSubscriptionService.destroy(jwt_body, params.require(:id))
+      forward_service_response(response)
+    end
+
+    # @API List all event types in categories
+    #
+    # @returns DataServiceEventTypes
+    def event_types_index
+      response = Services::LiveEventsSubscriptionService.event_types_index(jwt_body, message_type)
       forward_service_response(response)
     end
 
@@ -179,7 +247,31 @@ module Lti
     end
 
     def context
-      Account.active.find(params[:account_id])
+      @context ||= Account.active.find_by(lti_context_id: params[:account_id])
+    end
+
+    def message_type
+      params[:message_type] || 'live-event'
+    end
+
+    def add_updater(sub)
+      if params[:subscription][:UpdatedBy]
+        u = User.find(params[:subscription][:UpdatedBy])
+        raise ActiveRecord::RecordInvalid unless context.grants_right?(u, nil, :manage_data_services)
+        sub.merge(UpdatedByType: 'person')
+      else
+        sub.merge(UpdatedBy: tool.global_id.to_s, UpdatedByType: 'external_tool')
+      end
+    end
+
+    def add_owner(sub)
+      if params[:subscription][:OwnerId]
+        u = User.find(params[:subscription][:OwnerId])
+        raise ActiveRecord::RecordInvalid unless context.grants_right?(u, nil, :manage_data_services)
+        sub.merge(OwnerType: 'person')
+      else
+        sub.merge(OwnerId: tool.global_id.to_s, OwnerType: 'external_tool')
+      end
     end
   end
 end

@@ -90,8 +90,18 @@ function install_dependencies {
 
 function create_dinghy_vm {
   if ! dinghy status | grep -q 'not created'; then
-    message "I found an existing dinghy VM. We'll use that."
-    return 0
+    existing_memory="$(docker-machine inspect --format "{{.Driver.Memory}}" "${DOCKER_MACHINE_NAME}")"
+    if [[ "$existing_memory" -lt "$DINGHY_MEMORY" ]]; then
+      echo "
+  Canvas requires at least 8GB of memory dedicated to the VM. Please recreate
+  your VM with a memory value of at least ${DINGHY_MEMORY}. For Example:
+
+      $ dinghy create --memory ${DINGHY_MEMORY}"
+      exit 1
+    else
+      message "Using existing dinghy VM..."
+      return 0
+    fi
   fi
 
   prompt 'OK to create a dinghy VM? [y/n]' confirm
@@ -182,6 +192,12 @@ function setup_docker_environment {
     setup_docker_as_nonroot
     install_dory
     start_dory
+  fi
+  if [ -f "docker-compose.override.yml" ]; then
+    message "docker-compose.override.yml exists, skipping copy of default configuration"
+  else
+    message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
+    cp config/docker-compose.override.yml.example docker-compose.override.yml
   fi
 }
 

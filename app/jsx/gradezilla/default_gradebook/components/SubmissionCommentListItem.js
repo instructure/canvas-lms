@@ -19,12 +19,11 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 import I18n from 'i18n!gradezilla'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Link from '@instructure/ui-elements/lib/components/Link'
-import IconEditLine from '@instructure/ui-icons/lib/Line/IconEdit'
-import IconTrashLine from '@instructure/ui-icons/lib/Line/IconTrash'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Avatar, Link, Text} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+
+import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
+
 import DateHelper from '../../../shared/helpers/dateHelper'
 import TextHelper from 'compiled/str/TextHelper'
 import CommentPropTypes from '../propTypes/CommentPropTypes'

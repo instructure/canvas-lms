@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'minitest/autorun'
 require 'active_support'
 
 # this is a weird thing we have to do to avoid a weird circular
@@ -39,25 +38,25 @@ describe Autoextend do
   it "should autoextend a class afterwards" do
     module AutoextendSpec::MyExtension; end
     Autoextend.hook(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension")
-    defined?(AutoextendSpec::Class).must_equal nil
+    expect(defined?(AutoextendSpec::Class)).to eq nil
     class AutoextendSpec::Class; end
-    AutoextendSpec::Class.ancestors.must_include AutoextendSpec::MyExtension
+    expect(AutoextendSpec::Class.ancestors).to include AutoextendSpec::MyExtension
   end
 
   it "should autoextend an already defined class" do
     class AutoextendSpec::Class; end
     module AutoextendSpec::MyExtension; end
     Autoextend.hook(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension")
-    AutoextendSpec::Class.ancestors.must_include AutoextendSpec::MyExtension
+    expect(AutoextendSpec::Class.ancestors).to include AutoextendSpec::MyExtension
   end
 
   it "should call a block" do
     called = 42
     Autoextend.hook(:"AutoextendSpec::Class") { AutoextendSpec::Class.instance_variable_set(:@called, called) }
-    defined?(AutoextendSpec::Class).must_equal nil
+    expect(defined?(AutoextendSpec::Class)).to equal nil
     class AutoextendSpec::Class; end
 
-    AutoextendSpec::Class.instance_variable_get(:@called).must_equal 42
+    expect(AutoextendSpec::Class.instance_variable_get(:@called)).to equal 42
   end
 
   describe "modules" do
@@ -69,7 +68,7 @@ describe Autoextend do
         singleton_class.include(AutoextendSpec::M1)
       end
       # M2 is _before_ M1, but _after_ Class
-      AutoextendSpec::Class.singleton_class.ancestors.must_equal [
+      expect(AutoextendSpec::Class.singleton_class.ancestors). to eq [
         AutoextendSpec::Class.singleton_class,
         AutoextendSpec::M2,
         AutoextendSpec::M1
@@ -82,7 +81,7 @@ describe Autoextend do
     class AutoextendSpec::Class; end
     module AutoextendSpec::MyExtension; end
     Autoextend.hook(:"AutoextendSpec::Class", AutoextendSpec::MyExtension)
-    AutoextendSpec::Class.ancestors.must_include AutoextendSpec::MyExtension
+    expect(AutoextendSpec::Class.ancestors).to include AutoextendSpec::MyExtension
   end
 
   # yes, this whole spec is awful and pollutes global state,
@@ -97,12 +96,12 @@ describe Autoextend do
       Autoextend.hook(:"AutoextendSpec::TestModule::Nested") do
         hooked += 1
       end
-      defined?(AutoextendSpec::TestModule).must_equal(nil)
-      hooked.must_equal(0)
+      expect(defined?(AutoextendSpec::TestModule)).to equal(nil)
+      expect(hooked).to equal(0)
       _x = AutoextendSpec::TestModule
       # this could have only been detected by Rails' autoloading
-      defined?(AutoextendSpec::TestModule).must_equal('constant')
-      hooked.must_equal(2)
+      expect(defined?(AutoextendSpec::TestModule)).to eq('constant')
+      expect(hooked).to equal(2)
     end
   end
 end

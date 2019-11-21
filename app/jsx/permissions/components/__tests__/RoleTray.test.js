@@ -91,7 +91,7 @@ it('renders delete icon if deletable is true', () => {
   const props = makeDefaultProps()
   props.deletable = true
   const tree = shallow(<RoleTray {...props} />)
-  const node = tree.find('IconTrash')
+  const node = tree.find('IconTrashLine')
   expect(node.exists()).toBeTruthy()
 })
 
@@ -99,7 +99,7 @@ it('does not render delete icon if deletable is false', () => {
   const props = makeDefaultProps()
   props.deletable = false
   const tree = shallow(<RoleTray {...props} />)
-  const node = tree.find('IconTrash')
+  const node = tree.find('IconTrashLine')
   expect(node.exists()).toBeFalsy()
 })
 
@@ -130,7 +130,7 @@ it('renders edit icon if editable is true', () => {
   const props = makeDefaultProps()
   props.editable = true
   const tree = shallow(<RoleTray {...props} />)
-  const node = tree.find('IconEdit')
+  const node = tree.find('IconEditLine')
   expect(node.exists()).toBeTruthy()
 })
 
@@ -138,7 +138,7 @@ it('does not render edit icon if editable is false', () => {
   const props = makeDefaultProps()
   props.editable = false
   const tree = shallow(<RoleTray {...props} />)
-  const node = tree.find('IconEdit')
+  const node = tree.find('IconEditLine')
   expect(node.exists()).toBeFalsy()
 })
 
@@ -160,16 +160,16 @@ it('renders the last changed', () => {
 it('renders the close button when edit mode is not set', () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
-  expect(tree.find('IconX').exists()).toBeTruthy()
-  expect(tree.find('IconArrowStart').exists()).toBeFalsy()
+  expect(tree.find('IconXSolid').exists()).toBeTruthy()
+  expect(tree.find('IconArrowStartSolid').exists()).toBeFalsy()
 })
 
 it('renders the back button when edit mode is set', () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
   tree.setState({editTrayVisable: true})
-  expect(tree.find('IconX').exists()).toBeFalsy()
-  expect(tree.find('IconArrowStart').exists()).toBeTruthy()
+  expect(tree.find('IconXSolid').exists()).toBeFalsy()
+  expect(tree.find('IconArrowStartSolid').exists()).toBeTruthy()
 })
 
 it('calls props.hideTray() and correctly sets state when hideTray is called', () => {

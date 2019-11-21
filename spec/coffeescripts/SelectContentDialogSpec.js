@@ -67,6 +67,13 @@ test('sets the iframe allowances', function() {
   equal($dialog.find('#resource_selection_iframe').attr('allow'), this.allowances.join('; '))
 })
 
+test('sets the iframe "data-lti-launch" attribute', function() {
+  const l = document.getElementById('test-tool')
+  SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
+  const $dialog = $('#resource_selection_dialog')
+  equal($dialog.find('#resource_selection_iframe').attr('data-lti-launch'), 'true')
+})
+
 test('it removes the confirm alert if a selection is passed back', () => {
   const l = document.getElementById('test-tool')
   SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)

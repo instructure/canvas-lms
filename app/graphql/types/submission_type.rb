@@ -16,6 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+
+#############################################################################
+# NOTE: In most cases you shouldn't add new fields here, instead they should
+#       be added to interfaces/submission_interface.rb so that they work for
+#       both submissions and submission histories
+#############################################################################
+
+
 module Types
   class SubmissionHistoryFilterInputType < Types::BaseInputObject
     graphql_name 'SubmissionHistoryFilterInput'
@@ -35,13 +43,9 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::SubmissionInterface
+    implements Interfaces::LegacyIDInterface
 
-    field :_id, ID, 'legacy canvas id', method: :id, null: false
     global_id_field :id
-
-    # NOTE: In most cases you shouldn't add new fields here, instead they should
-    #       be added to interfaces/submission_interface.rb so that they work for
-    #       both submissions and submission histories
 
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}

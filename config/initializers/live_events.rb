@@ -19,6 +19,9 @@ class StubbedClient
   def self.put_records(records:, stream_name:)
     events = records.map { |e| JSON.parse(e[:data]).dig('attributes', 'event_name') }.join(' | ')
     puts "Events #{events} put to stream #{stream_name}: #{records}"
+    OpenStruct.new(
+      records: records.map { |r| OpenStruct.new(error_code: 'failure', error_message: 'this fails' ) }
+    )
   end
 
   def self.stream_name

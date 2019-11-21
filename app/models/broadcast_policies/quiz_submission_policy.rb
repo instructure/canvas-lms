@@ -52,7 +52,7 @@ module BroadcastPolicies
     def quiz_is_accepting_messages_for_student?
       quiz_submission &&
       quiz.assignment &&
-      !quiz.muted? &&
+      quiz_posted?(quiz_submission) &&
       quiz.context.available? &&
       !quiz.deleted?
     end
@@ -76,6 +76,15 @@ module BroadcastPolicies
     def user_is_actively_enrolled?
       return false if quiz_submission.user.nil?
       quiz_submission.user.not_removed_enrollments.where(course_id: quiz.context_id).any?
+    end
+
+    def quiz_posted?(quiz_submission)
+      quiz = quiz_submission.quiz
+      if quiz.assignment.context.post_policies_enabled?
+        quiz_submission.posted?
+      else
+        !quiz.muted?
+      end
     end
   end
 end

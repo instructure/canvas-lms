@@ -1164,6 +1164,10 @@ describe Attachment do
       expect(Attachment.make_unique_filename('blah.tar.bz2', ['blah.tar.bz2'])).to eq 'blah-1.tar.bz2'
     end
 
+    it "deals with extensions starting with a digit" do
+      expect(Attachment.make_unique_filename('blah.3dm', ['blah.3dm'])).to eq 'blah-1.3dm'
+    end
+
     it "does not treat numbers after a decimal point as extensions" do
       expect(Attachment.make_unique_filename('section 11.5.doc', ['section 11.5.doc'])).to eq 'section 11.5-1.doc'
       expect(Attachment.make_unique_filename('3.3.2018 footage.mp4', ['3.3.2018 footage.mp4'])).to eq '3.3.2018 footage-1.mp4'
@@ -1764,7 +1768,8 @@ describe Attachment do
       cc.confirm!
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
-      @course.enable_feature! :usage_rights_required
+      @course.usage_rights_required = true
+      @course.save!
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
       @attachment.set_publish_state_for_usage_rights
       @attachment.save!

@@ -19,12 +19,10 @@
 import React from 'react'
 import {bool, string, element, func} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import View from '@instructure/ui-layout/lib/components/View'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Flex, View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
+import {IconTrashLine} from '@instructure/ui-icons'
 
 export default class ExternalToolType extends React.Component {
   static propTypes = {
@@ -55,20 +53,20 @@ export default class ExternalToolType extends React.Component {
           margin="x-small 0 0"
         >
           <Flex margin="0 x-small 0 0" padding="0 0 0 small">
-            <FlexItem padding="0 0 xx-small">{this.props.icon}</FlexItem>
-            <FlexItem width="10rem">
+            <Flex.Item padding="0 0 xx-small">{this.props.icon}</Flex.Item>
+            <Flex.Item width="10rem">
               <div
                 style={{lineHeight: '2.25', padding: '0 .75rem', border: '1px solid transparent'}}
               >
                 {this.props.name}
               </div>
-            </FlexItem>
+            </Flex.Item>
             {this.props.readOnly ? null : (
-              <FlexItem margin="0 0 0 small" grow textAlign="end">
-                <Button icon={IconTrash} onClick={this.onDelete}>
+              <Flex.Item margin="0 0 0 small" grow textAlign="end">
+                <Button icon={IconTrashLine} onClick={this.onDelete}>
                   <ScreenReaderContent>{I18n.t('Delete this submission type')}</ScreenReaderContent>
                 </Button>
-              </FlexItem>
+              </Flex.Item>
             )}
           </Flex>
         </View>

@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import { Button } from '@instructure/ui-buttons'
-import { RadioInput, RadioInputGroup, Select, TextInput } from '@instructure/ui-forms'
-import { ToggleDetails } from '@instructure/ui-toggle-details'
-import '@instructure/canvas-theme';
+import React, {Component} from 'react'
+import ReactDOM from 'react-dom'
+import {Button} from '@instructure/ui-buttons'
+import {RadioInput, RadioInputGroup, Select} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import '@instructure/canvas-theme'
 
-import { renderIntoDiv, renderSidebarIntoDiv } from "../src/async";
-import locales from "../src/locales";
-import CanvasRce from "../src/rce/CanvasRce";
-import * as fakeSource from "../src/sidebar/sources/fake";
+import {renderIntoDiv, renderSidebarIntoDiv} from '../src/async'
+import locales from '../src/locales'
+import CanvasRce from '../src/rce/CanvasRce'
+import * as fakeSource from '../src/sidebar/sources/fake'
 
 function getProps(textareaId, state) {
   return {
@@ -46,10 +47,10 @@ function getProps(textareaId, state) {
       }
     },
 
-    textareaClassName: "exampleClassOne",
+    textareaClassName: 'exampleClassOne',
     textareaId,
-    onFocus: () => console.log("rce focused"), // eslint-disable-line no-console
-    onBlur: () => console.log("rce blurred"),  // eslint-disable-line no-console
+    onFocus: () => console.log('rce focused'), // eslint-disable-line no-console
+    onBlur: () => console.log('rce blurred'), // eslint-disable-line no-console
 
     trayProps: {
       canUploadFiles: true,
@@ -59,34 +60,28 @@ function getProps(textareaId, state) {
       jwt: state.jwt,
       source: state.jwt && state.sourceType === 'real' ? undefined : fakeSource
     }
-  };
+  }
 }
 
 function renderDemos(state) {
   const {host, jwt, contextType, contextId, sourceType} = state
 
-  renderIntoDiv(
-    document.getElementById("editor1"),
-    getProps("textarea1", state)
-  );
+  renderIntoDiv(document.getElementById('editor1'), getProps('textarea1', state))
 
-  renderIntoDiv(
-    document.getElementById("editor2"),
-    getProps("textarea2", state)
-  );
+  renderIntoDiv(document.getElementById('editor2'), getProps('textarea2', state))
 
   ReactDOM.render(
-    <CanvasRce rceProps={getProps("textarea3", state)} />,
-    document.getElementById("editor3")
-  );
+    <CanvasRce rceProps={getProps('textarea3', state)} />,
+    document.getElementById('editor3')
+  )
 
-  const parsedUrl = new URL(window.location.href);
-  if (parsedUrl.searchParams.get("sidebar") === "no") {
-    return;
+  const parsedUrl = new URL(window.location.href)
+  if (parsedUrl.searchParams.get('sidebar') === 'no') {
+    return
   }
 
-  const sidebarEl = document.getElementById("sidebar");
-  ReactDOM.render(<div />, sidebarEl);
+  const sidebarEl = document.getElementById('sidebar')
+  ReactDOM.render(<div />, sidebarEl)
   renderSidebarIntoDiv(sidebarEl, {
     source: jwt && sourceType === 'real' ? undefined : fakeSource,
     host,
@@ -94,7 +89,7 @@ function renderDemos(state) {
     contextType,
     contextId,
     canUploadFiles: true
-  });
+  })
 }
 
 function getSetting(settingKey, defaultValue) {
@@ -102,7 +97,7 @@ function getSetting(settingKey, defaultValue) {
 }
 
 function saveSettings(state) {
-  ['dir', 'sourceType', 'lang', 'host', 'jwt', 'contextType', 'contextId'].forEach(settingKey => {
+  ;['dir', 'sourceType', 'lang', 'host', 'jwt', 'contextType', 'contextId'].forEach(settingKey => {
     localStorage.setItem(settingKey, state[settingKey])
   })
 }
@@ -116,16 +111,16 @@ class DemoOptions extends Component {
     jwt: getSetting('jwt', ''),
     contextType: getSetting('contextType', 'course'),
     contextId: getSetting('contextId', '1')
-  };
+  }
 
   handleChange = () => {
-    document.documentElement.setAttribute("dir", this.state.dir);
+    document.documentElement.setAttribute('dir', this.state.dir)
     saveSettings(this.state)
-    renderDemos(this.state);
-  };
+    renderDemos(this.state)
+  }
 
   componentDidMount() {
-    this.handleChange();
+    this.handleChange()
   }
 
   render() {
@@ -133,15 +128,15 @@ class DemoOptions extends Component {
       <ToggleDetails expanded summary="Configuration Options">
         <form
           onSubmit={e => {
-            e.preventDefault();
-            this.handleChange();
+            e.preventDefault()
+            this.handleChange()
           }}
         >
           <RadioInputGroup
             description="Source Type"
             variant="toggle"
             name="source"
-            onChange={(event, value) => this.setState({ sourceType: value })}
+            onChange={(event, value) => this.setState({sourceType: value})}
             value={this.state.sourceType}
           >
             <RadioInput label="Fake" value="fake" />
@@ -154,7 +149,7 @@ class DemoOptions extends Component {
             variant="toggle"
             name="dir"
             value={this.state.dir}
-            onChange={(event, value) => this.setState({ dir: value })}
+            onChange={(event, value) => this.setState({dir: value})}
           >
             <RadioInput label="LTR" value="ltr" />
             <RadioInput label="RTL" value="rtl" />
@@ -163,9 +158,9 @@ class DemoOptions extends Component {
           <Select
             label="Language"
             value={this.state.lang}
-            onChange={(_e, option) => this.setState({ lang: option.value })}
+            onChange={(_e, option) => this.setState({lang: option.value})}
           >
-            {["en", ...Object.keys(locales)].map(locale => (
+            {['en', ...Object.keys(locales)].map(locale => (
               <option key={locale} value={locale}>
                 {locale}
               </option>
@@ -173,23 +168,21 @@ class DemoOptions extends Component {
           </Select>
 
           <TextInput
-            label="API Host"
+            renderLabel="API Host"
             value={this.state.host}
-            onChange={e => this.setState({ host: e.target.value })}
+            onChange={e => this.setState({host: e.target.value})}
           />
 
           <TextInput
-            label="Canvas JWT"
+            renderLabel="Canvas JWT"
             value={this.state.jwt}
-            onChange={e => this.setState({ jwt: e.target.value })}
+            onChange={e => this.setState({jwt: e.target.value})}
           />
 
           <Select
             label="Context Type"
             selectedOption={this.state.contextType}
-            onChange={(_e, option) =>
-              this.setState({ contextType: option.value })
-            }
+            onChange={(_e, option) => this.setState({contextType: option.value})}
           >
             <option value="course">Course</option>
             <option value="group">Group</option>
@@ -197,16 +190,16 @@ class DemoOptions extends Component {
           </Select>
 
           <TextInput
-            label="Context ID"
+            renderLabel="Context ID"
             value={this.state.contextId}
-            onChange={e => this.setState({ contextId: e.target.value })}
+            onChange={e => this.setState({contextId: e.target.value})}
           />
 
           <Button type="submit">Update</Button>
         </form>
       </ToggleDetails>
-    );
+    )
   }
 }
 
-ReactDOM.render(<DemoOptions />, document.getElementById("options"));
+ReactDOM.render(<DemoOptions />, document.getElementById('options'))

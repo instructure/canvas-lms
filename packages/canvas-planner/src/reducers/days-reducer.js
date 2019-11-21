@@ -16,15 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { handleActions } from 'redux-actions';
-import { mergeDays, deleteItemFromDays } from '../utilities/daysUtils';
+import {handleActions} from 'redux-actions'
+import {mergeDays, deleteItemFromDays} from '../utilities/daysUtils'
 
-function deletedPlannerItem (state, action) {
-  if (action.error) return state;
-  return deleteItemFromDays(state, action.payload);
+function deletedPlannerItem(state, action) {
+  if (action.error) return state
+  return deleteItemFromDays(state, action.payload)
 }
 
-export default handleActions({
-  GOT_DAYS_SUCCESS: (state, action) => mergeDays(state, action.payload.internalDays),
-  DELETED_PLANNER_ITEM: deletedPlannerItem,
-}, []);
+export default handleActions(
+  {
+    GOT_DAYS_SUCCESS: (state, action) => mergeDays(state, action.payload.internalDays),
+    DELETED_PLANNER_ITEM: deletedPlannerItem
+  },
+  []
+)

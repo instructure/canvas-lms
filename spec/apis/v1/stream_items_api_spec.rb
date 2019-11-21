@@ -402,6 +402,7 @@ describe UsersController, type: :request do
       'excused' => false,
       'grader_id' => @teacher.id,
       'graded_at' => @sub.graded_at.as_json,
+      'posted_at' => @sub.posted_at.as_json,
       'score' => 12.0,
       'entered_score' => 12.0,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
@@ -430,6 +431,7 @@ describe UsersController, type: :request do
           'author' => {
             'id' => @teacher.id,
             'display_name' => 'teacher',
+            'pronouns' => nil,
             'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
             'avatar_image_url' => User.avatar_fallback_url(nil, request)
           },
@@ -445,6 +447,7 @@ describe UsersController, type: :request do
           'author' => {
             'id' => @user.id,
             'display_name' => 'User',
+            'pronouns' => nil,
             'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
             'avatar_image_url' => User.avatar_fallback_url(nil, request)
           },
@@ -531,6 +534,7 @@ describe UsersController, type: :request do
       'excused' => false,
       'grader_id' => @teacher.id,
       'graded_at' => nil,
+      'posted_at' => nil,
       'score' => nil,
       'entered_score' => nil,
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
@@ -560,7 +564,8 @@ describe UsersController, type: :request do
             'id' => @teacher.id,
             'display_name' => 'teacher',
             'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-            'avatar_image_url' => User.avatar_fallback_url(nil, request)
+            'avatar_image_url' => User.avatar_fallback_url(nil, request),
+            'pronouns' => nil
           },
           'author_name' => 'teacher',
           'author_id' => @teacher.id,
@@ -575,6 +580,7 @@ describe UsersController, type: :request do
             'id' => @user.id,
             'display_name' => 'User',
             'html_url' => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
+            'pronouns' => nil,
             'avatar_image_url' => User.avatar_fallback_url(nil, request)
           },
           'author_name' => 'User',
@@ -617,7 +623,6 @@ describe UsersController, type: :request do
       'user' => {
         "name"=>"User", "sortable_name"=>"User", "id"=>@sub.user_id, "short_name"=>"User", "created_at"=>@user.created_at.iso8601
       },
-
       'context_type' => 'Course',
       'course_id' => @course.id,
     }]

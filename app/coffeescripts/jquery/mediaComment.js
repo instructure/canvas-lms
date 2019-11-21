@@ -23,7 +23,7 @@ import mejs from 'vendor/mediaelement-and-player'
 import MediaElementKeyActionHandler from 'jsx/mediaelement/MediaElementKeyActionHandler'
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
-import sanitizeUrl from 'jsx/shared/helpers/sanitizeUrl';
+import sanitizeUrl from 'jsx/shared/helpers/sanitizeUrl'
 
 // #
 // a module for some of the transformation functions pulled out of the middle
@@ -53,8 +53,8 @@ const MediaCommentUtils = {
   //
   // @returns {jQuery Object} a new dom element (not yet attached anywhere)
   //   that is the media element
-  getElement (tagType, st_tags, width, height) {
-    const dimensions = (tagType === 'video') ? ` width="${width}" height="${height}"` : ''
+  getElement(tagType, st_tags, width, height) {
+    const dimensions = tagType === 'video' ? ` width="${width}" height="${height}"` : ''
     const html = `<${tagType} ${dimensions} preload="metadata" controls>${st_tags}</${tagType}>`
     return $(html)
   }
@@ -70,10 +70,10 @@ $.extend(mejs.MediaElementDefaults, {
   // default if the <video width> is not specified
   defaultVideoWidth: VIDEO_WIDTH,
   // default if the <video height> is not specified
-  defaultVideoHeight: VIDEO_HEIGHT,
+  defaultVideoHeight: VIDEO_HEIGHT
 })
 
-mejs.MepDefaults.success = function (mediaElement, domObject) {
+mejs.MepDefaults.success = function(mediaElement, domObject) {
   import('../util/kalturaAnalytics').then(({default: kalturaAnalytics}) => {
     kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
   })
@@ -91,23 +91,33 @@ mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'sourcechoose
 // enable the playback speed selector
 mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'speed')
 
-function getSourcesAndTracks (id) {
+function getSourcesAndTracks(id) {
   const dfd = new $.Deferred()
-  $.getJSON(`/media_objects/${id}/info`, (data) => {
+  $.getJSON(`/media_objects/${id}/info`, data => {
     // this 'when ...' is because right now in canvas, none of the mp3 urls actually work.
     // see: CNVS-12998
-    const sources = data.media_sources.filter(source => source.content_type !== 'audio/mp3').map((source) =>
-    // xsslint safeString.function sanitizeUrl
-    `<source
-        type='${htmlEscape(source.content_type)}'
-        src='${sanitizeUrl(htmlEscape(source.url))}'
-        title='${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(Math.floor(source.bitrate / 1024))} kbps'
-      />`
-    )
+    const sources = data.media_sources
+      .filter(source => source.content_type !== 'audio/mp3')
+      // mediaplayer plays the first source by default, which tends to be the highest
+      // resolution. sort so we play the lowest res. by default
+      .sort((a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10))
+      .map(
+        source =>
+          // xsslint safeString.function sanitizeUrl
+          `<source
+            type='${htmlEscape(source.content_type)}'
+            src='${sanitizeUrl(htmlEscape(source.url))}'
+            title='${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(
+            Math.floor(source.bitrate / 1024)
+          )} kbps'
+          />`
+      )
 
-    const tracks = _.map(data.media_tracks, (track) => {
+    const tracks = _.map(data.media_tracks, track => {
       const languageName = mejs.language.codes[track.locale] || track.locale
-      return `<track kind='${htmlEscape(track.kind)}' label='${htmlEscape(languageName)}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(track.locale)}' />`
+      return `<track kind='${htmlEscape(track.kind)}' label='${htmlEscape(
+        languageName
+      )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(track.locale)}' />`
     })
 
     const types = _.map(data.media_sources, source => source.content_type)
@@ -116,11 +126,16 @@ function getSourcesAndTracks (id) {
   return dfd
 }
 
-function createMediaTag ({sourcesAndTracks, mediaType, height, width, mediaPlayerOptions}) {
+function createMediaTag({sourcesAndTracks, mediaType, height, width, mediaPlayerOptions}) {
   let tagType = mediaType === 'video' ? 'video' : 'audio'
   const st_tags = sourcesAndTracks.sources.concat(sourcesAndTracks.tracks).join('')
-  function willPlayAudioInFlash () {
-    const opts = $.extend({mode: 'auto'}, mejs.MediaElementDefaults, mejs.MepDefaults, mediaPlayerOptions)
+  function willPlayAudioInFlash() {
+    const opts = $.extend(
+      {mode: 'auto'},
+      mejs.MediaElementDefaults,
+      mejs.MepDefaults,
+      mediaPlayerOptions
+    )
     const element = MediaCommentUtils.getElement('audio', st_tags)
     const playback = mejs.HtmlMediaElementShim.determinePlayback(
       element[0],
@@ -136,7 +151,11 @@ function createMediaTag ({sourcesAndTracks, mediaType, height, width, mediaPlaye
   // A lot of our recorded audio is actually served up via video/mp4 or video/flv.
   // We need to trick the flash player into playing the video, but looking like
   // an audio player.
-  if (mediaType === 'audio' && sourcesAndTracks.types[0].match(/^video\//) && willPlayAudioInFlash()) {
+  if (
+    mediaType === 'audio' &&
+    sourcesAndTracks.types[0].match(/^video\//) &&
+    willPlayAudioInFlash()
+  ) {
     tagType = 'video'
     mediaPlayerOptions.mode = 'auto_plugin'
     mediaPlayerOptions.isVideo = false
@@ -147,7 +166,7 @@ function createMediaTag ({sourcesAndTracks, mediaType, height, width, mediaPlaye
 }
 
 const mediaCommentActions = {
-  create (mediaType, callback, onClose, defaultTitle) {
+  create(mediaType, callback, onClose, defaultTitle) {
     $('#media_recorder_container').removeAttr('id')
     this.attr('id', 'media_recorder_container')
     pubsub.unsubscribe('media_comment_created')
@@ -159,29 +178,32 @@ const mediaCommentActions = {
     return $.mediaComment.init(mediaType, initOpts)
   },
 
-  show_inline (id, mediaType = 'video', downloadUrl) {
+  show_inline(id, mediaType = 'video', downloadUrl) {
     // todo: replace .andSelf with .addBack when JQuery is upgraded.
-    const $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
+    const $holder = $(this)
+      .closest('.instructure_file_link_holder')
+      .andSelf()
+      .first()
     $holder.text(I18n.t('loading', 'Loading media...'))
 
-    const showInline = function (id, holder) {
+    const showInline = function(id, holder) {
       const width = Math.min(holder.closest('div,p,table').width() || VIDEO_WIDTH, VIDEO_WIDTH)
-      const height = Math.round(width / 336 * 240)
-      return getSourcesAndTracks(id).done((sourcesAndTracks) => {
+      const height = Math.round((width / 336) * 240)
+      return getSourcesAndTracks(id).done(sourcesAndTracks => {
         if (sourcesAndTracks.sources.length) {
           const mediaPlayerOptions = {
             can_add_captions: sourcesAndTracks.can_add_captions,
             mediaCommentId: id,
             googleAnalyticsTitle: id,
             menuTimeoutMouseLeave: 50,
-            success (media) {
+            success(media) {
               holder.focus()
               media.play()
             },
             keyActions: [
               {
                 keys: _.values(MediaElementKeyActionHandler.keyCodes),
-                action (player, media, keyCode, event) {
+                action(player, media, keyCode, event) {
                   if (player.isVideo) {
                     player.showControls()
                     player.startControlsTimer()
@@ -189,9 +211,9 @@ const mediaCommentActions = {
 
                   const handler = new MediaElementKeyActionHandler(mejs, player, media, event)
                   handler.dispatch()
-                },
+                }
               }
-            ],
+            ]
           }
 
           const $mediaTag = createMediaTag({
@@ -199,21 +221,29 @@ const mediaCommentActions = {
             mediaPlayerOptions,
             mediaType,
             height,
-            width,
+            width
           })
           $mediaTag.appendTo(holder.html(''))
           const player = new MediaElementPlayer($mediaTag, mediaPlayerOptions)
           $mediaTag.data('mediaelementplayer', player)
         } else {
-          holder.text(I18n.t('media_still_converting', 'Media is currently being converted, please try again in a little bit.'))
+          holder.text(
+            I18n.t(
+              'media_still_converting',
+              'Media is currently being converted, please try again in a little bit.'
+            )
+          )
         }
       })
     }
 
     if (id === 'maybe') {
       const detailsUrl = downloadUrl.replace(/\/download.*/, '')
-      const onError = () => $holder.text(I18n.t('Media has been queued for conversion, please try again in a little bit.'))
-      const onSuccess = function (data) {
+      const onError = () =>
+        $holder.text(
+          I18n.t('Media has been queued for conversion, please try again in a little bit.')
+        )
+      const onSuccess = function(data) {
         if (data.attachment && data.attachment.media_entry_id !== 'maybe') {
           $holder.text('')
           return showInline(data.attachment.media_entry_id, $holder)
@@ -227,9 +257,11 @@ const mediaCommentActions = {
     }
   },
 
-  show (id, mediaType = 'video', openingElement = null) {
+  show(id, mediaType = 'video', openingElement = null) {
     // if a media comment is still open, close it.
-    $('.play_media_comment').find('.ui-dialog-titlebar-close').click()
+    $('.play_media_comment')
+      .find('.ui-dialog-titlebar-close')
+      .click()
 
     const $this = $(this)
 
@@ -266,38 +298,55 @@ const mediaCommentActions = {
           }
         },
         open: event => {
-          $(event.currentTarget).closest('.ui-dialog')
+          $(event.currentTarget)
+            .closest('.ui-dialog')
             .attr('role', 'dialog')
             .attr('aria-label', I18n.t('Play Media Comment'))
-          $(event.currentTarget).parent().find('.ui-dialog-titlebar-close').focus()
+          $(event.currentTarget)
+            .parent()
+            .find('.ui-dialog-titlebar-close')
+            .focus()
         }
       })
 
       // Populate dialog box with a video
-      return $dialog.disableWhileLoading(getSourcesAndTracks(id).done((sourcesAndTracks) => {
-        if (sourcesAndTracks.sources.length) {
-          const mediaPlayerOptions = {
-            can_add_captions: sourcesAndTracks.can_add_captions,
-            mediaCommentId: id,
-            googleAnalyticsTitle: id,
+      return $dialog.disableWhileLoading(
+        getSourcesAndTracks(id).done(sourcesAndTracks => {
+          if (sourcesAndTracks.sources.length) {
+            const mediaPlayerOptions = {
+              can_add_captions: sourcesAndTracks.can_add_captions,
+              mediaCommentId: id,
+              googleAnalyticsTitle: id
+            }
+
+            const $mediaTag = createMediaTag({
+              sourcesAndTracks,
+              mediaPlayerOptions,
+              mediaType,
+              height,
+              width
+            })
+            $mediaTag.appendTo($dialog.html(''))
+
+            $this.data({
+              mediaelementplayer: new MediaElementPlayer($mediaTag, mediaPlayerOptions),
+              media_comment_dialog: $dialog
+            })
+          } else {
+            $dialog.text(
+              I18n.t(
+                'media_still_converting',
+                'Media is currently being converted, please try again in a little bit.'
+              )
+            )
           }
-
-          const $mediaTag = createMediaTag({sourcesAndTracks, mediaPlayerOptions, mediaType, height, width})
-          $mediaTag.appendTo($dialog.html(''))
-
-          $this.data({
-            mediaelementplayer: new MediaElementPlayer($mediaTag, mediaPlayerOptions),
-            media_comment_dialog: $dialog
-          })
-        } else {
-          $dialog.text(I18n.t('media_still_converting', 'Media is currently being converted, please try again in a little bit.'))
-        }
-      }))
+        })
+      )
     }
   }
 }
 
-$.fn.mediaComment = function (command, ...restArgs) {
+$.fn.mediaComment = function(command, ...restArgs) {
   if (!INST.kalturaSettings) {
     return console.log('Kaltura has not been enabled for this account')
   } else {

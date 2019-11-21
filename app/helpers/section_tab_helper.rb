@@ -34,9 +34,9 @@ module SectionTabHelper
     :view_all_grades
   ].freeze
 
-  def available_section_tabs(context, precalculated_permissions=nil)
-    AvailableSectionTabs.new(
-      context, @current_user, @domain_root_account, session, precalculated_permissions
+  def available_section_tabs
+    @available_section_tabs ||= AvailableSectionTabs.new(
+      @context, @current_user, @domain_root_account, session
     ).to_a
   end
 
@@ -56,13 +56,13 @@ module SectionTabHelper
 
   def section_tabs
     @section_tabs ||= begin
-      if @context && available_section_tabs(@context).any?
+      if @context && available_section_tabs.any?
         content_tag(:nav, {
           :role => 'navigation',
           :'aria-label' => nav_name
         }) do
           concat(content_tag(:ul, id: 'section-tabs') do
-            available_section_tabs(@context).map do |tab|
+            available_section_tabs.map do |tab|
               section_tab_tag(tab, @context, get_active_tab)
             end
           end)
@@ -73,8 +73,7 @@ module SectionTabHelper
   end
 
   def section_tab_tag(tab, context, active_tab)
-    tab_generator = @domain_root_account.try(:feature_enabled?, :a11y_left_menu) ? SectionTabTagNew : SectionTabTag
-    concat(tab_generator.new(tab, context, active_tab).to_html)
+    concat(SectionTabTag.new(tab, context, active_tab).to_html)
   end
 
   class AvailableSectionTabs
@@ -146,64 +145,6 @@ module SectionTabHelper
       end
     end
 
-    def a_attributes
-      { href: @tab.path,
-        title: @tab.label,
-        class: a_classes }.tap do |h|
-        h[:target] = @tab.target if @tab.target?
-      end
-    end
-
-    def a_tag
-      content_tag(:a, a_attributes) do
-        concat(@tab.label)
-        concat(span_tag)
-      end
-    end
-
-    def li_classes
-      [ 'section' ].tap do |a|
-        a << 'section-tab-hidden' if @tab.hide? || @tab.unused?
-      end
-    end
-
-    def span_tag
-      if @tab.hide? || @tab.unused?
-        if @tab.hide?
-          text = I18n.t('* Disabled in Course Settings')
-        else
-          text = I18n.t('* No content has been added')
-        end
-        content_tag(:span, text, {
-          id: 'inactive_nav_link',
-          class: 'screenreader-only'
-        })
-      end
-    end
-
-    def to_html
-      content_tag(:li, a_tag, {
-        class: li_classes
-      })
-    end
-  end
-
-  class SectionTabTagNew
-    include ActionView::Context
-    include ActionView::Helpers::TagHelper
-    include ActionView::Helpers::TextHelper
-
-    def initialize(tab, context, active_tab=nil)
-      @tab = SectionTabPresenter.new(tab, context)
-      @active_tab = active_tab
-    end
-
-    def a_classes
-      [ @tab.css_class.downcase.replace_whitespace('-') ].tap do |a|
-        a << 'active' if @tab.active?(@active_tab)
-      end
-    end
-
     def a_title
       if @tab.hide?
         I18n.t('Disabled. Not visible to students')
@@ -223,10 +164,15 @@ module SectionTabHelper
       end
     end
 
+    def a_aria_current_page
+      'page' if @tab.active?(@active_tab)
+    end
+
     def a_attributes
       { href: @tab.path,
         title: a_title,
         'aria-label': a_aria_label,
+        'aria-current': a_aria_current_page,
         class: a_classes }.tap do |h|
           h[:target] = @tab.target if @tab.target?
           h['data-tooltip'] = '' if @tab.hide? || @tab.unused?
@@ -241,7 +187,9 @@ module SectionTabHelper
     end
 
     def li_classes
-      ['section']
+      [ 'section' ].tap do |a|
+        a << 'section-hidden' if @tab.hide? || @tab.unused?
+      end
     end
 
     def indicate_hidden

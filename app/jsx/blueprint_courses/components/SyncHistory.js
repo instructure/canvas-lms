@@ -16,22 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 import I18n from 'i18n!blueprint_settingsSyncHistory'
 import select from '../../shared/select'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Text, Spinner} from '@instructure/ui-elements'
 import SyncHistoryItem from './SyncHistoryItem'
 
 import actions from '../actions'
 import propTypes from '../propTypes'
 import LoadStates from '../loadStates'
 
-const { func, bool } = PropTypes
+const {func, bool} = PropTypes
 
 export default class SyncHistory extends Component {
   static propTypes = {
@@ -42,22 +41,22 @@ export default class SyncHistory extends Component {
     associations: propTypes.courseList,
     loadAssociations: func.isRequired,
     isLoadingAssociations: bool.isRequired,
-    hasLoadedAssociations: bool.isRequired,
+    hasLoadedAssociations: bool.isRequired
   }
 
   static defaultProps = {
     migrations: [],
-    associations: [],
+    associations: []
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      associations: this.mapAssociations(props.associations),
+      associations: this.mapAssociations(props.associations)
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (!this.props.hasLoadedHistory) {
       this.props.loadHistory()
     }
@@ -66,22 +65,22 @@ export default class SyncHistory extends Component {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     this.setState({
-      associations: this.mapAssociations(nextProps.associations),
+      associations: this.mapAssociations(nextProps.associations)
     })
   }
 
-  mapAssociations (assocs = []) {
-    return assocs.reduce((map, asc) => Object.assign(map, { [asc.id]: asc }), {})
+  mapAssociations(assocs = []) {
+    return assocs.reduce((map, asc) => Object.assign(map, {[asc.id]: asc}), {})
   }
 
-  renderLoading () {
+  renderLoading() {
     if (this.props.isLoadingHistory || this.props.isLoadingAssociations) {
       const title = I18n.t('Loading Sync History')
       return (
         <div style={{textAlign: 'center'}}>
-          <Spinner title={title} />
+          <Spinner renderTitle={title} />
           <Text as="p">{title}</Text>
         </div>
       )
@@ -90,10 +89,10 @@ export default class SyncHistory extends Component {
     return null
   }
 
-  render () {
+  render() {
     // inject course data into exceptions
-    const migrations = this.props.migrations.map((mig) => {
-      mig.changes.map((change) => {
+    const migrations = this.props.migrations.map(mig => {
+      mig.changes.map(change => {
         change.exceptions.map(ex => Object.assign(ex, this.state.associations[ex.course_id] || {}))
         return change
       })
@@ -102,32 +101,34 @@ export default class SyncHistory extends Component {
 
     return (
       <div className="bcs__history">
-        {this.renderLoading() || migrations.map(migration =>
-          (<SyncHistoryItem key={migration.id} migration={migration} />)
-        )}
+        {this.renderLoading() ||
+          migrations.map(migration => <SyncHistoryItem key={migration.id} migration={migration} />)}
       </div>
     )
   }
 }
 
-const connectState = (state) => {
+const connectState = state => {
   const selectedChange = state.selectedChangeLog && state.changeLogs[state.selectedChangeLog]
   const historyState = selectedChange
-  ? {
-    hasLoadedHistory: LoadStates.hasLoaded(selectedChange.status),
-    isLoadingHistory: LoadStates.isLoading(selectedChange.status),
-    migrations: selectedChange.data ? [selectedChange.data] : [],
-  } : select(state, [
-    'hasLoadedHistory',
-    'isLoadingHistory',
-    'migrations',
-  ])
+    ? {
+        hasLoadedHistory: LoadStates.hasLoaded(selectedChange.status),
+        isLoadingHistory: LoadStates.isLoading(selectedChange.status),
+        migrations: selectedChange.data ? [selectedChange.data] : []
+      }
+    : select(state, ['hasLoadedHistory', 'isLoadingHistory', 'migrations'])
 
-  return Object.assign(select(state, [
-    'hasLoadedAssociations',
-    'isLoadingAssociations',
-    ['existingAssociations', 'associations'],
-  ]), historyState)
+  return Object.assign(
+    select(state, [
+      'hasLoadedAssociations',
+      'isLoadingAssociations',
+      ['existingAssociations', 'associations']
+    ]),
+    historyState
+  )
 }
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedSyncHistory = connect(connectState, connectActions)(SyncHistory)
+export const ConnectedSyncHistory = connect(
+  connectState,
+  connectActions
+)(SyncHistory)

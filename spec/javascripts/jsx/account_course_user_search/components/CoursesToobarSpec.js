@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
+import {render} from '@testing-library/react'
 import {shallow} from 'enzyme'
 import CoursesToolbar from 'jsx/account_course_user_search/components/CoursesToolbar'
 
-const props = {
+const allTermsProps = {
   can_create_courses: true,
   onUpdateFilters: () => {},
   onApplyFilters: () => {},
@@ -64,53 +65,83 @@ const props = {
   }
 }
 
-QUnit.module('CoursesToolbar', () => {
+QUnit.module('CoursesToolbar', suiteHooks => {
+  let container
+  let component
+
+  suiteHooks.beforeEach(() => {
+    container = document.body.appendChild(document.createElement('div'))
+  })
+
+  suiteHooks.afterEach(() => {
+    component.unmount()
+    container.remove()
+  })
+
+  function renderComponent(props) {
+    component = render(<CoursesToolbar {...props} />, {container})
+  }
+
+  function getSelect() {
+    return container.querySelector('input[type="text"]')
+  }
+
+  function clickToExpand() {
+    getSelect().click()
+  }
+
+  function getOptionsList() {
+    const optionsListId = getSelect().getAttribute('aria-controls')
+    return document.getElementById(optionsListId)
+  }
+
+  function getOptions() {
+    return [...getOptionsList().querySelectorAll('[role="option"]')]
+  }
+
+  function getOptionLabels() {
+    return getOptions().map(option => option.textContent.trim())
+  }
+
   test('groups terms properly', () => {
-    const wrapper = shallow(<CoursesToolbar {...props} />)
-    deepEqual(wrapper.find('optgroup[label="Active Terms"] option').map(n => n.text()), [
+    renderComponent(allTermsProps)
+    clickToExpand()
+    getOptionLabels()
+
+    deepEqual(getOptionLabels(), [
+      'All Terms',
       'Active Term 1',
-      'Term With No Start Or End 1'
-    ])
-
-    deepEqual(wrapper.find('optgroup[label="Future Terms"] option').map(n => n.text()), [
+      'Term With No Start Or End 1',
       'Future Term 1',
-      'Future Term 2'
-    ])
-
-    deepEqual(wrapper.find('optgroup[label="Past Terms"] option').map(n => n.text()), [
+      'Future Term 2',
       'Past Term 1'
     ])
   })
 
   test('shows "loading" until terms are loaded', () => {
     const propsWithNoTerms = {
-      ...props,
+      ...allTermsProps,
       terms: {
         loading: true
       }
     }
-    const wrapper = shallow(<CoursesToolbar {...propsWithNoTerms} />)
-    equal(wrapper.find('option[disabled]').text(), 'Loading more terms...')
-    notOk(wrapper.find('optgroup[label="Active Terms"]').exists())
+    renderComponent(propsWithNoTerms)
+    clickToExpand()
+    deepEqual(getOptionLabels(), ['All Terms', 'Loading more terms...'])
   })
 
   QUnit.module('blueprint_courses checkbox', () => {
     test('clicking it causes "onUpdateFilters" to be called', () => {
       const onUpdateFilters = sinon.stub()
       const checkbox = shallow(
-        <CoursesToolbar
-          {...props}
-          onUpdateFilters={onUpdateFilters}
-        />
+        <CoursesToolbar {...allTermsProps} onUpdateFilters={onUpdateFilters} />
       ).find('Checkbox[label="Show only blueprint courses"]')
 
       checkbox.simulate('change', {target: {checked: true}})
-      ok(onUpdateFilters.calledWith({"blueprint": true}))
+      ok(onUpdateFilters.calledWith({blueprint: true}))
 
       checkbox.simulate('change', {target: {checked: false}})
       ok(onUpdateFilters.calledWith({blueprint: null}))
     })
   })
-
 })
-

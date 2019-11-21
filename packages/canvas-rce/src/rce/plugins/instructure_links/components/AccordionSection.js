@@ -18,19 +18,13 @@
 
 import React from 'react'
 import {bool, func, node, string} from 'prop-types'
-import formatMessage from "../../../../format-message";
+import formatMessage from '../../../../format-message'
 
-import {ToggleGroup} from "@instructure/ui-toggle-details"
+import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 
-export default function AccordionSection({
-  collection,
-  children,
-  onToggle,
-  expanded,
-  label
-}) {
+export default function AccordionSection({collection, children, onToggle, expanded, label}) {
   const toggleLabel = expanded
     ? formatMessage('Collapse to hide {types}', {types: label})
     : formatMessage('Expand to see {types}', {types: label})
@@ -38,15 +32,19 @@ export default function AccordionSection({
     <View as="div" borderWidth="0 0 small 0" data-testid="instructure_links-AccordionSection">
       <ToggleGroup
         toggleLabel={toggleLabel}
-        summary={<View display="inline-block" padding="0 0 0 small"><Text weight="bold">{label}</Text></View>}
+        summary={
+          <View display="inline-block" padding="0 0 0 small">
+            <Text weight="bold">{label}</Text>
+          </View>
+        }
         expanded={expanded}
-        onToggle={(_e, expanded) => onToggle(expanded ? collection : "")}
+        onToggle={(_e, expanded) => onToggle(expanded ? collection : '')}
         border={false}
       >
         <>{children}</>
       </ToggleGroup>
     </View>
-  );
+  )
 }
 
 AccordionSection.propTypes = {
@@ -55,4 +53,4 @@ AccordionSection.propTypes = {
   onToggle: func.isRequired,
   expanded: bool.isRequired,
   label: string.isRequired
-};
+}

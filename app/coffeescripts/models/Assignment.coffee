@@ -65,7 +65,7 @@ export default class Assignment extends Model
   isPage: => @_hasOnlyType 'wiki_page'
   isExternalTool: => @_hasOnlyType 'external_tool'
 
-  defaultToolName: => escape(ENV.DEFAULT_ASSIGNMENT_TOOL_NAME).replace(/%20/g, ' ')
+  defaultToolName: => ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && escape(ENV.DEFAULT_ASSIGNMENT_TOOL_NAME).replace(/%20/g, ' ')
   defaultToolUrl: => ENV.DEFAULT_ASSIGNMENT_TOOL_URL
   isNotGraded: => @_hasOnlyType 'not_graded'
   isAssignment: =>
@@ -356,11 +356,15 @@ export default class Assignment extends Model
     return @get 'published' unless arguments.length > 0
     @set 'published', newPublished
 
+  useNewQuizIcon: () =>
+    ENV.FLAGS && ENV.FLAGS.newquizzes_on_quiz_page && @isQuizLTIAssignment()
+
   position: (newPosition) ->
     return @get('position') || 0 unless arguments.length > 0
     @set 'position', newPosition
 
   iconType: =>
+    return 'quiz icon-Solid' if @useNewQuizIcon()
     return 'quiz' if @isQuiz()
     return 'discussion' if @isDiscussionTopic()
     return 'document' if @isPage()
@@ -371,6 +375,12 @@ export default class Assignment extends Model
     return 'Discussion' if @isDiscussionTopic()
     return 'WikiPage' if @isPage()
     return 'Assignment'
+
+  objectTypeDisplayName: ->
+    return I18n.t('Quiz') if @isQuiz()
+    return I18n.t('Discussion Topic') if @isDiscussionTopic()
+    return I18n.t('Page') if @isPage()
+    return I18n.t('Assignment')
 
   htmlUrl: =>
     @get 'html_url'
@@ -447,11 +457,20 @@ export default class Assignment extends Model
   isDuplicating: =>
     @get('workflow_state') == 'duplicating'
 
+  isMigrating: =>
+    @get('workflow_state') == 'migrating'
+
   failedToDuplicate: =>
     @get('workflow_state') == 'failed_to_duplicate'
 
+  failedToMigrate: =>
+    @get('workflow_state') == 'failed_to_migrate'
+
   originalCourseID: =>
     @get('original_course_id')
+
+  originalQuizID: =>
+    @get('original_quiz_id')
 
   originalAssignmentID: =>
     @get('original_assignment_id')
@@ -491,14 +510,14 @@ export default class Assignment extends Model
       'labelId', 'position', 'postToSIS', 'multipleDueDates', 'nonBaseDates',
       'allDates', 'hasDueDate', 'hasPointsPossible', 'singleSectionDueDate',
       'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
-      'omitFromFinalGrade', 'isDuplicating', 'failedToDuplicate',
+      'omitFromFinalGrade', 'isDuplicating', 'isMigrating', 'failedToDuplicate',
       'originalAssignmentName', 'is_quiz_assignment', 'isQuizLTIAssignment',
-      'isImporting', 'failedToImport',
+      'isImporting', 'failedToImport', 'failedToMigrate',
       'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
       'submissionTypesFrozen', 'anonymousInstructorAnnotations',
       'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox',
       'defaultToolName', 'isDefaultTool', 'isNonDefaultExternalTool', 'defaultToNone',
-      'defaultToOnline', 'defaultToOnPaper'
+      'defaultToOnline', 'defaultToOnPaper', 'objectTypeDisplayName'
     ]
 
     hash =
@@ -621,17 +640,30 @@ export default class Assignment extends Model
     $.ajaxJSON "/api/v1/courses/#{original_course_id}/assignments/#{original_assignment_id}/duplicate#{query_string}",
       'POST', {}, callback
 
+  # caller is failed migrated assignment
+  retry_migration: (callback) =>
+    course_id = @courseID()
+    original_quiz_id = @originalQuizID()
+    failed_assignment_id = @get('id')
+    $.ajaxJSON "/api/v1/courses/#{course_id}/content_exports?export_type=quizzes2&quiz_id=#{original_quiz_id}&failed_assignment_id=#{failed_assignment_id}&include[]=migrated_assignment",
+      'POST', {}, callback
+
   pollUntilFinishedDuplicating: (interval = 3000) =>
     @pollUntilFinished(interval, @isDuplicating)
 
   pollUntilFinishedImporting: (interval = 3000) =>
     @pollUntilFinished(interval, @isImporting)
 
+  pollUntilFinishedMigrating: (interval = 3000) =>
+    @pollUntilFinished(interval, @isMigrating)
+
   pollUntilFinishedLoading: (interval = 3000) =>
     if @isDuplicating()
       @pollUntilFinishedDuplicating(interval)
     else if @isImporting()
       @pollUntilFinishedImporting(interval)
+    else if @isMigrating()
+      @pollUntilFinishedMigrating(interval)
 
   pollUntilFinished: (interval, isFinished) =>
     # TODO: implement pandapub streaming updates

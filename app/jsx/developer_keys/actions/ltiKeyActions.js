@@ -149,12 +149,22 @@ actions.ltiKeysUpdateCustomizationsSuccessful = payload => ({
 })
 
 actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS = 'LTI_KEYS_UPDATE_CUSTOMIZATIONS'
-actions.ltiKeysUpdateCustomizations = (developerKey, disabled_placements, developerKeyId, toolConfiguration, customFields, privacyLevel) => dispatch => {
+actions.ltiKeysUpdateCustomizations = (
+  developerKey,
+  disabled_placements,
+  developerKeyId,
+  toolConfiguration,
+  customFields,
+  privacyLevel
+) => dispatch => {
   dispatch(actions.ltiKeysUpdateCustomizationsStart())
   const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
   return axios
     .put(url, {
       developer_key: {
+        name: developerKey.name,
+        notes: developerKey.notes,
+        email: developerKey.email,
         scopes: developerKey.scopes,
         redirect_uris: developerKey.redirect_uris
       },
@@ -165,7 +175,7 @@ actions.ltiKeysUpdateCustomizations = (developerKey, disabled_placements, develo
         privacy_level: privacyLevel
       }
     })
-    .then((data) => {
+    .then(data => {
       actions.ltiKeysUpdateCustomizationsSuccessful()
       return data.data
     })

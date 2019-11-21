@@ -41,7 +41,7 @@ it('renders the expandable button if expandable prop is true', () => {
   const props = createRowProps('banana', '1')
   props.expandable = true
   const tree = shallow(<RoleTrayTableRow {...props} />)
-  const node = tree.find('IconArrowOpenStart')
+  const node = tree.find('IconArrowOpenStartSolid')
   expect(node.exists()).toBeTruthy()
 })
 
@@ -49,7 +49,7 @@ it('does not render the expandable button if expandable prop is false', () => {
   const props = createRowProps('banana', '1')
   props.expandable = false
   const tree = shallow(<RoleTrayTableRow {...props} />)
-  const node = tree.find('IconArrowOpenStart')
+  const node = tree.find('IconArrowOpenStartSolid')
   expect(node.exists()).toBeFalsy()
 })
 

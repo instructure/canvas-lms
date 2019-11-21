@@ -19,9 +19,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeResult do
+  let_once(:course) do
+    Course.create!
+  end
+
+  let_once(:student) do
+    course.enroll_student(User.create!, active_all: true).user
+  end
 
   let_once :quiz do
-    quiz_model(assignment: assignment_model)
+    quiz_model(assignment: course.assignments.create!)
   end
 
   let_once :learning_outcome_result do
@@ -29,78 +36,83 @@ describe LearningOutcomeResult do
   end
 
   def create_and_associate_lor(association_object, associated_asset = nil)
-    assignment_model
-    outcome = @course.created_learning_outcomes.create!(title: 'outcome')
+    outcome = course.created_learning_outcomes.create!(title: 'outcome')
 
     LearningOutcomeResult.new(
       alignment: ContentTag.create!({
         title: 'content',
-        context: @course,
+        context: course,
         learning_outcome: outcome
-      })
+      }),
+      user: student
     ).tap do |lor|
       lor.association_object = association_object
-      lor.context = @course
+      lor.context = course
       lor.associated_asset = associated_asset || association_object
       lor.save!
     end
   end
 
   describe '#submitted_or_assessed_at' do
-    before(:once) do
-      @submitted_at = 1.month.ago
-      @assessed_at = 2.weeks.ago
-    end
+    let_once(:submitted_at) { 1.month.ago }
+    let_once(:assessed_at) { 2.weeks.ago }
 
     it 'returns #submitted_at when present' do
-      learning_outcome_result.update_attributes(submitted_at: @submitted_at)
-      expect(learning_outcome_result.submitted_or_assessed_at).to eq(@submitted_at)
+      learning_outcome_result.update_attributes(submitted_at: submitted_at)
+      expect(learning_outcome_result.submitted_or_assessed_at).to eq(submitted_at)
     end
 
     it 'returns #assessed_at when #submitted_at is not present' do
       learning_outcome_result.assign_attributes({
-        assessed_at: @assessed_at,
+        assessed_at: assessed_at,
         submitted_at: nil
       })
-      expect(learning_outcome_result.submitted_or_assessed_at).to eq(@assessed_at)
+      expect(learning_outcome_result.submitted_or_assessed_at).to eq(assessed_at)
     end
   end
 
   describe 'exclude_muted_associations scope' do
     shared_examples_for 'muting assignment' do
-      context 'unmuted assignment' do
+      let(:outcome_result_scope) do
+        LearningOutcomeResult.where(
+          association_type: outcome_result_association_object.class,
+          association_id: outcome_result_association_object.id
+        )
+      end
+
+      context 'assignment with posted submissions' do
         it 'includes assignment result' do
-          total = LearningOutcomeResult.count
-          expect(LearningOutcomeResult.exclude_muted_associations.count).to eq total
+          assignment.submission_for_student(student).update!(posted_at: Time.zone.now)
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
         end
       end
 
-      context 'muted assignment' do
-        before do
-          assignment.mute!
-        end
-
+      context 'assignment with unposted submissions' do
         it 'excludes assignment result' do
-          total = LearningOutcomeResult.count
-          expect(LearningOutcomeResult.exclude_muted_associations.count).to eq(total-1)
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 0
+        end
+      end
+
+      context 'not graded assignment with unposted submissions' do
+        it 'excludes assignment result' do
+          assignment.update!(grading_type: 'not_graded')
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
         end
       end
     end
 
     context 'with quiz assignment' do
-      let_once :assignment do
-        quiz.assignment
-      end
+      let_once(:assignment) { quiz.assignment }
+      let_once(:outcome_result_association_object) { quiz }
 
       include_examples 'muting assignment'
     end
 
     context 'with assignment result' do
-      let_once :assignment do
-        assignment_model
-      end
+      let_once(:assignment) { course.assignments.create! }
+      let_once(:outcome_result_association_object) { assignment }
 
-      let_once :assignment_learning_outcome_result do
+      before(:once) do
         create_and_associate_lor(assignment)
       end
 
@@ -108,13 +120,15 @@ describe LearningOutcomeResult do
     end
 
     context 'with rubric association result' do
-      let_once :assignment do
-        assignment_model
+      let_once(:assignment) { course.assignments.create! }
+      let_once(:rubric_association) do
+        rubric_assessment_model(user: student, context: course, association_object: assignment, purpose: 'grading')
+        @rubric_association
       end
+      let_once(:outcome_result_association_object) { rubric_association }
 
-      let_once :assignment_learning_outcome_result do
-        rubric_assessment_model(user: @user, context: @course, association_object: assignment, purpose: 'grading')
-        create_and_associate_lor(@rubric_association, assignment)
+      before(:once) do
+        create_and_associate_lor(rubric_association, assignment)
       end
 
       include_examples 'muting assignment'
@@ -235,7 +249,7 @@ describe LearningOutcomeResult do
 
     it 'returns the Assignment from the artifact if one doesnt explicitly exist' do
       lor = create_and_associate_lor(nil)
-      lor.artifact = rubric_assessment_model(user: @user, context: @course)
+      lor.artifact = rubric_assessment_model(user: student, context: course)
       expect(lor.assignment).to eq(lor.artifact.submission.assignment)
     end
 

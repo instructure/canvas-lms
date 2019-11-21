@@ -262,20 +262,6 @@ class UsersController < ApplicationController
         :original_host_with_port => request.host_with_port
       )
       redirect_to request_token.authorize_url
-    elsif params[:service] == "linked_in"
-      success_url = oauth_success_url(:service => 'linked_in')
-      request_token = LinkedIn::Connection.request_token(success_url)
-
-      OauthRequest.create(
-        :service => 'linked_in',
-        :token => request_token.token,
-        :secret => request_token.secret,
-        :return_url => return_to_url,
-        :user => @current_user,
-        :original_host_with_port => request.host_with_port
-      )
-
-      redirect_to request_token.authorize_url
     end
   end
 
@@ -340,58 +326,77 @@ class UsersController < ApplicationController
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
     else
-      if params[:service] == "linked_in"
-        begin
-          raise "No OAuth LinkedIn User" unless oauth_request.user
+      begin
+        raise "No OAuth Twitter User" unless oauth_request.user
 
-          linkedin = LinkedIn::Connection.from_request_token(
-            oauth_request.token,
-            oauth_request.secret,
-            params[:oauth_verifier]
-          )
+        twitter = Twitter::Connection.from_request_token(
+          oauth_request.token,
+          oauth_request.secret,
+          params[:oauth_verifier]
+        )
+        UserService.register(
+          :service => "twitter",
+          :access_token => twitter.access_token,
+          :user => oauth_request.user,
+          :service_domain => "twitter.com",
+          :service_user_id => twitter.service_user_id,
+          :service_user_name => twitter.service_user_name
+        )
+        oauth_request.destroy
 
-          UserService.register(
-            :service => "linked_in",
-            :access_token => linkedin.access_token,
-            :user => oauth_request.user,
-            :service_domain => "linked_in.com",
-            :service_user_id => linkedin.service_user_id,
-            :service_user_name => linkedin.service_user_name,
-            :service_user_url => linkedin.service_user_url
-          )
-          oauth_request.destroy
-
-          flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
-        rescue => e
-          Canvas::Errors.capture_exception(:oauth, e)
-          flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
-        end
-      else
-        begin
-          raise "No OAuth Twitter User" unless oauth_request.user
-
-          twitter = Twitter::Connection.from_request_token(
-            oauth_request.token,
-            oauth_request.secret,
-            params[:oauth_verifier]
-          )
-          UserService.register(
-            :service => "twitter",
-            :access_token => twitter.access_token,
-            :user => oauth_request.user,
-            :service_domain => "twitter.com",
-            :service_user_id => twitter.service_user_id,
-            :service_user_name => twitter.service_user_name
-          )
-          oauth_request.destroy
-
-          flash[:notice] = t('twitter_added', "Twitter access authorized!")
-        rescue => e
-          Canvas::Errors.capture_exception(:oauth, e)
-          flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
-        end
+        flash[:notice] = t('twitter_added', "Twitter access authorized!")
+      rescue => e
+        Canvas::Errors.capture_exception(:oauth, e)
+        flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
       end
       return_to(oauth_request.return_url, user_profile_url(@current_user))
+    end
+  end
+
+  def index
+    get_context
+    if @context.feature_enabled?(:course_user_search) && !params.key?(:term)
+      @account ||= @context
+      return course_user_search
+    end
+
+    return unless authorized_action(@context, @current_user, :read_roster)
+    @root_account = @context.root_account
+    @query = (params[:user] && params[:user][:name]) || params[:term]
+    js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings'])
+    Shackles.activate(:slave) do
+      if @context && @context.is_a?(Account) && @query
+        @users = @context.users_name_like(@query)
+      elsif params[:enrollment_term_id].present? && @root_account == @context
+        @users = @context.fast_all_users.
+            where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").
+              joins(:course).
+              where(Enrollment::QueryBuilder.new(:active).conditions).
+              where(courses: { enrollment_term_id: params[:enrollment_term_id]}))
+      else
+        @users = @context.fast_all_users
+      end
+
+      @users = @users.paginate(:page => params[:page])
+
+      respond_to do |format|
+        if @users.length == 1 && params[:term]
+          format.html {
+            redirect_to(named_context_url(@context, :context_user_url, @users.first))
+          }
+        else
+          @enrollment_terms = []
+          if @root_account == @context
+            @enrollment_terms = @context.enrollment_terms.active
+          end
+          format.html
+        end
+        format.json {
+          cancel_cache_buster
+          expires_in 30.minutes
+          render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
+        }
+      end
     end
   end
 
@@ -406,12 +411,12 @@ class UsersController < ApplicationController
   #   a numeric form. It will only search against other fields if non-numeric
   #   in form, or if the numeric value doesn't yield any matches. Queries by
   #   administrative users will search on SIS ID, login ID, name, or email
-  #   address; non-administrative queries will only be compared against name.
+  #   address
   #
   # @argument enrollment_type [String]
   #   When set, only return users enrolled with the specified course-level base role.
-  #   This can be a base role type of 'StudentEnrollment', 'TeacherEnrollment',
-  #   'TaEnrollment', 'ObserverEnrollment', or 'DesignerEnrollment'.
+  #   This can be a base role type of 'student', 'teacher',
+  #   'ta', 'observer', or 'designer'.
   #
   # @argument sort [String, "username"|"email"|"sis_id"|"last_login"]
   #   The column to sort results by.
@@ -425,77 +430,30 @@ class UsersController < ApplicationController
   #       -H 'Authorization: Bearer <token>'
   #
   # @returns [User]
-  def index
+  def api_index
     get_context
-    if !api_request? && @context.feature_enabled?(:course_user_search) && !params.key?(:term)
-      @account ||= @context
-      return course_user_search
+    return unless authorized_action(@context, @current_user, :read_roster)
+    search_term = params[:search_term].presence
+    page_opts = {}
+    if search_term
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
+        {
+          order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
+          enrollment_type: params[:enrollment_type]
+        })
+      page_opts[:total_entries] = nil # doesn't calculate a total count
+    else
+      users = UserSearch.scope_for(@context, @current_user,
+        {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
+          enrollment_type: params[:enrollment_type]})
     end
 
-    if authorized_action(@context, @current_user, :read_roster)
-      @root_account = @context.root_account
-      @query = (params[:user] && params[:user][:name]) || params[:term]
-      js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings'])
-      Shackles.activate(:slave) do
-        if @context && @context.is_a?(Account) && @query
-          @users = @context.users_name_like(@query)
-        elsif params[:enrollment_term_id].present? && @root_account == @context
-          @users = @context.fast_all_users.
-              where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").
-                joins(:course).
-                where(Enrollment::QueryBuilder.new(:active).conditions).
-                where(courses: { enrollment_term_id: params[:enrollment_term_id]}))
-        elsif !api_request?
-          @users = @context.fast_all_users
-        end
-
-        if api_request?
-          search_term = params[:search_term].presence
-          page_opts = {}
-          if search_term
-            users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
-              {
-                order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
-                enrollment_type: params[:enrollment_type]
-              })
-            page_opts[:total_entries] = nil # doesn't calculate a total count
-          else
-            users = UserSearch.scope_for(@context, @current_user,
-              {order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
-                enrollment_type: params[:enrollment_type]})
-          end
-
-          includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
-          includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
-          users = users.with_last_login if includes.include?('last_login') && !search_term
-          users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
-          user_json_preloads(users, includes.include?('email'))
-          return render :json => users.map { |u| user_json(u, @current_user, session, includes)}
-        else
-          @users ||= []
-          @users = @users.paginate(:page => params[:page])
-        end
-
-        respond_to do |format|
-          if @users.length == 1 && params[:term]
-            format.html {
-              redirect_to(named_context_url(@context, :context_user_url, @users.first))
-            }
-          else
-            @enrollment_terms = []
-            if @root_account == @context
-              @enrollment_terms = @context.enrollment_terms.active
-            end
-            format.html
-          end
-          format.json {
-            cancel_cache_buster
-            expires_in 30.minutes
-            render(:json => @users.map { |u| { :label => u.name, :id => u.id } })
-          }
-        end
-      end
-    end
+    includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
+    includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
+    users = users.with_last_login if includes.include?('last_login') && !search_term
+    users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
+    user_json_preloads(users, includes.include?('email'))
+    render :json => users.map { |u| user_json(u, @current_user, session, includes)}
   end
 
 
@@ -527,6 +485,7 @@ class UsersController < ApplicationController
       js_env act_as_user_data: {
         user: {
           name: @user.name,
+          pronouns: @user.pronouns,
           short_name: @user.short_name,
           id: @user.id,
           avatar_image_url: @user.avatar_image_url,
@@ -1322,6 +1281,7 @@ class UsersController < ApplicationController
     success_url = user_profile_url(@current_user)
     @return_url = named_context_url(@current_user, :context_external_content_success_url, 'external_tool_redirect', {include_host: true})
     @redirect_return = true
+    @context = @current_user
     js_env(:redirect_return_success_url => success_url,
            :redirect_return_cancel_url => success_url)
 
@@ -1334,7 +1294,9 @@ class UsersController < ApplicationController
     variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                                         current_user: @current_user,
                                                                         current_pseudonym: @current_pseudonym,
-                                                                        tool: @tool})
+                                                                        tool: @tool}
+                                                  )
+    Canvas::LiveEvents.asset_access(@tool, "external_tools", @current_user.class.name, nil)
     adapter = if @tool.use_1_3?
       Lti::LtiAdvantageAdapter.new(
         tool: @tool,
@@ -1724,16 +1686,19 @@ class UsersController < ApplicationController
       return render(json: { :message => "Invalid Hexcode Provided" }, status: :bad_request)
     end
 
-    unless params[:hexcode].nil?
-      user.custom_colors[params[:asset_string]] = normalize_hexcode(params[:hexcode])
-    end
+    user.shard.activate do
+      # translate asset string to be relative to user's shard
+      unless params[:hexcode].nil?
+        user.custom_colors[context.asset_string] = normalize_hexcode(params[:hexcode])
+      end
 
-    respond_to do |format|
-      format.json do
-        if user.save
-          render(json: { hexcode: user.custom_colors[params[:asset_string]]})
-        else
-          render(json: user.errors, status: :bad_request)
+      respond_to do |format|
+        format.json do
+          if user.save
+            render(json: { hexcode: user.custom_colors[context.asset_string]})
+          else
+            render(json: user.errors, status: :bad_request)
+          end
         end
       end
     end
@@ -2496,6 +2461,8 @@ class UsersController < ApplicationController
   #
   # @argument include[] [String, "assignment"]
   #   Associations to include with the group.
+  # @argument only_current_enrollments [boolean]
+  #   Returns submissions for only currently active enrollments
   #
   # @returns [Submission]
   #
@@ -2503,10 +2470,17 @@ class UsersController < ApplicationController
     @user = api_find(User, params[:id])
     if authorized_action(@user, @current_user, :read_grades)
       collections = []
+      only_current_enrollments = value_to_boolean(params[:only_current_enrollments])
+
       # Plannable Bookmarker enables descending order
       bookmarker = Plannable::Bookmarker.new(Submission, true, :graded_at, :id)
       Shard.with_each_shard(@user.associated_shards) do
-        collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, Submission.for_user(@user).graded)]
+        submissions = if only_current_enrollments
+          Submission.joins(assignment: { course: :student_enrollments }).merge(Enrollment.current.for_user(@user))
+        else
+          Submission.all
+        end
+        collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, submissions.for_user(@user).graded)]
       end
 
       scope = BookmarkedCollection.merge(*collections)

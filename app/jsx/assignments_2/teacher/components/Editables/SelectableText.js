@@ -20,10 +20,10 @@ import React from 'react'
 import {bool, string, func, element, oneOf, oneOfType, arrayOf, shape} from 'prop-types'
 import isEqual from 'lodash/isEqual'
 
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Select from '@instructure/ui-forms/lib/components/Select'
-import InPlaceEdit from '@instructure/ui-editable/lib/components/InPlaceEdit'
-import createChainedFunction from '@instructure/ui-utils/lib/createChainedFunction'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Select} from '@instructure/ui-forms'
+import {InPlaceEdit} from '@instructure/ui-editable'
+import {createChainedFunction} from '@instructure/ui-utils'
 
 const optShape = shape({
   label: string.isRequired,

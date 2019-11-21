@@ -95,7 +95,7 @@ module LiveEvents
       if @client && !new_client?
         @client
       else
-        @client = LiveEvents::Client.new(LiveEvents::Client.config, @stream_client, @stream_client&.stream_name)
+        @client = LiveEvents::Client.new(LiveEvents::Client.config, @stream_client, @stream_client&.stream_name, worker: @worker)
       end
     end
 

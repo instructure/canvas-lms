@@ -21,14 +21,10 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!dashboard'
 import axios from 'axios'
 
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Menu, {
-  MenuItem,
-  MenuItemGroup,
-  MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconMoreLine from '@instructure/ui-icons/lib/Line/IconMore'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Menu} from '@instructure/ui-menu'
+import {Button} from '@instructure/ui-buttons'
+import {IconMoreLine} from '@instructure/ui-icons'
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {
@@ -91,31 +87,33 @@ export default class DashboardOptionsMenu extends React.Component {
         }
         contentRef={el => (this.menuContentRef = el)}
       >
-        <MenuItemGroup
+        <Menu.Group
           label={I18n.t('Dashboard View')}
           onSelect={this.handleViewOptionSelect}
           selected={[this.props.view]}
         >
-          <MenuItem value="cards">{I18n.t('Card View')}</MenuItem>
-          {this.props.planner_enabled && <MenuItem value="planner">{I18n.t('List View')}</MenuItem>}
-          <MenuItem value="activity">{I18n.t('Recent Activity')}</MenuItem>
-        </MenuItemGroup>
-        {cardView && <MenuItemSeparator />}
+          <Menu.Item value="cards">{I18n.t('Card View')}</Menu.Item>
+          {this.props.planner_enabled && (
+            <Menu.Item value="planner">{I18n.t('List View')}</Menu.Item>
+          )}
+          <Menu.Item value="activity">{I18n.t('Recent Activity')}</Menu.Item>
+        </Menu.Group>
+        {cardView && <Menu.Separator />}
         {cardView && (
-          <MenuItemGroup
+          <Menu.Group
             label={
               <ScreenReaderContent>
                 {I18n.t('Toggle course card color overlays')}
               </ScreenReaderContent>
             }
           >
-            <MenuItem
+            <Menu.Item
               onSelect={(_e, _, isSelected) => this.handleColorOverlayOptionSelect(isSelected)}
               selected={this.state.showColorOverlays}
             >
               {I18n.t('Color Overlay')}
-            </MenuItem>
-          </MenuItemGroup>
+            </Menu.Item>
+          </Menu.Group>
         )}
       </Menu>
     )

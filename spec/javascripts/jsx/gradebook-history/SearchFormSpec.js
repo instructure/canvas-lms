@@ -19,9 +19,9 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import {SearchFormComponent} from 'jsx/gradebook-history/SearchForm'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import DateInput from '@instructure/ui-forms/lib/components/DateInput'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
+import {Button} from '@instructure/ui-buttons'
+import {DateInput} from '@instructure/ui-forms'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import {destroyContainer} from 'jsx/shared/FlashAlert'
 import Fixtures from './Fixtures'
 

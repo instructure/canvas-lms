@@ -82,6 +82,7 @@ class Enrollment::BatchStateUpdater
 
   def self.touch_and_update_associations(user_ids)
     User.where(id: user_ids).touch_all
+    User.clear_cache_keys(user_ids, :enrollments)
     User.update_account_associations(user_ids)
   end
 

@@ -53,9 +53,11 @@ class DueDateCacher
     self.executing_users ||= []
     self.executing_users.push(user)
 
-    result = yield
-
-    self.executing_users.pop
+    begin
+      result = yield
+    ensure
+      self.executing_users.pop
+    end
     result
   end
 
@@ -278,7 +280,9 @@ class DueDateCacher
             WHERE submissions.id IS NULL;
         SQL
 
-        Assignment.connection.execute(query)
+        Submission.transaction do
+          Submission.connection.execute(query)
+        end
 
         next unless record_due_date_changed_events? && auditable_entries.present?
 

@@ -31,7 +31,12 @@ import $ from 'jquery'
  * see: https://developers.google.com/analytics/devguides/collection/analyticsjs/events
  */
 export function trackEvent(category, action, label, value) {
-  if (window.ga) window.ga('send', 'event', category, action, label, value)
+  if (window.ga) {
+    ;(window.requestIdleCallback || window.setTimeout)(() => {
+      // don't ever block anything else going on
+      window.ga('send', 'event', category, action, label, value)
+    })
+  }
 }
 
 // we put it on the jQuery object just for backwards compatibility,

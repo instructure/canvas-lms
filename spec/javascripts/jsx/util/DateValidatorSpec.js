@@ -22,53 +22,47 @@ const DATE_IN_CLOSED_PERIOD = '2015-07-23T03:59:59Z'
 const DATE_IN_OPEN_PERIOD = '2015-09-23T03:59:59Z'
 
 function generateData(opts = {}) {
-  return Object.assign(
-    {
-      id: '32',
-      assignment_id: '57',
-      title: '1 student',
-      due_at: '2015-09-23T03:59:59Z',
-      all_day: true,
-      all_day_date: '2015-09-22',
-      unlock_at: null,
-      lock_at: null,
-      student_ids: ['2'],
-      due_at_overridden: true,
-      unlock_at_overridden: true,
-      lock_at_overridden: true,
-      rowKey: '2015-09-23T03:59:59Z',
-      persisted: true
-    },
-    opts
-  )
+  return {
+    id: '32',
+    assignment_id: '57',
+    title: '1 student',
+    due_at: '2015-09-23T03:59:59Z',
+    all_day: true,
+    all_day_date: '2015-09-22',
+    unlock_at: null,
+    lock_at: null,
+    student_ids: ['2'],
+    due_at_overridden: true,
+    unlock_at_overridden: true,
+    lock_at_overridden: true,
+    rowKey: '2015-09-23T03:59:59Z',
+    persisted: true,
+    ...opts
+  }
 }
 
 function generateGradingPeriods(periodOneOpts = {}, periodTwoOpts = {}) {
-  const periodOne = Object.assign(
-    {
-      id: '1',
-      title: 'Closed Period',
-      startDate: new Date('2015-07-01T06:00:00.000Z'),
-      endDate: new Date('2015-08-31T06:00:00.000Z'),
-      closeDate: new Date('2015-08-31T06:00:00.000Z'),
-      isLast: false,
-      isClosed: true
-    },
-    periodOneOpts
-  )
+  const periodOne = {
+    id: '1',
+    title: 'Closed Period',
+    startDate: new Date('2015-07-01T06:00:00.000Z'),
+    endDate: new Date('2015-08-31T06:00:00.000Z'),
+    closeDate: new Date('2015-08-31T06:00:00.000Z'),
+    isLast: false,
+    isClosed: true,
+    ...periodOneOpts
+  }
 
-  const periodTwo = Object.assign(
-    {
-      id: '2',
-      title: 'Period',
-      startDate: new Date('2015-09-01T06:00:00.000Z'),
-      endDate: new Date('2015-10-31T06:00:00.000Z'),
-      closeDate: new Date('2015-12-31T06:00:00.000Z'),
-      isLast: true,
-      isClosed: false
-    },
-    periodTwoOpts
-  )
+  const periodTwo = {
+    id: '2',
+    title: 'Period',
+    startDate: new Date('2015-09-01T06:00:00.000Z'),
+    endDate: new Date('2015-10-31T06:00:00.000Z'),
+    closeDate: new Date('2015-12-31T06:00:00.000Z'),
+    isLast: true,
+    isClosed: false,
+    ...periodTwoOpts
+  }
 
   return [periodOne, periodTwo]
 }

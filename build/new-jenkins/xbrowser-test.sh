@@ -1,3 +1,4 @@
 #!/bin/bash
 
-docker-compose exec -T web bundle exec rspec -f doc --format html --out results.html --tag xbrowser spec/selenium/
+# -O spec/spec.opts runs rspec with our formatters for failure reports
+docker-compose exec -T web bundle exec rspec -O spec/spec.opts --tag xbrowser spec/selenium/

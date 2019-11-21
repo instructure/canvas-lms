@@ -25,7 +25,7 @@ import ConfigureExternalToolButton from 'jsx/external_apps/components/ConfigureE
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
-const createElement = tool => <ConfigureExternalToolButton tool={tool} returnFocus={()=>{}} />
+const createElement = tool => <ConfigureExternalToolButton tool={tool} returnFocus={() => {}} />
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 const getDOMNodes = function(data) {
   const component = renderComponent(data)

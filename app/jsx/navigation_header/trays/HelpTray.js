@@ -16,19 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!HelpTray'
 import React from 'react'
 import {bool, array, func, string} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import {View} from '@instructure/ui-layout'
+import {Heading} from '@instructure/ui-elements'
 import HelpDialog from '../../help_dialog/HelpDialog'
 
 export default function HelpTray({trayTitle, closeTray, links, hasLoaded}) {
   return (
     <View as="div" padding="medium" id="help_tray">
-      <Heading level="h3" as="h2">{trayTitle}</Heading>
-      <hr role="presentation"/>
-      <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray}/>
+      <Heading level="h3" as="h2">
+        {trayTitle}
+      </Heading>
+      <hr role="presentation" />
+      <HelpDialog links={links} hasLoaded={hasLoaded} onFormSubmit={closeTray} />
     </View>
   )
 }
@@ -41,7 +43,9 @@ HelpTray.propTypes = {
 }
 
 HelpTray.defaultProps = {
-  trayTitle: I18n.t('Help'),
+  get trayTitle() {
+    return I18n.t('Help')
+  },
   hasLoaded: false,
   links: []
 }

@@ -17,16 +17,15 @@
  */
 
 import React, {PureComponent} from 'react'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleGroup'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
-import View from '@instructure/ui-layout/lib/components/View'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {Button} from '@instructure/ui-buttons'
+import {Flex, View} from '@instructure/ui-layout'
+import {IconWarningLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text, TruncateText} from '@instructure/ui-elements'
+import {ToggleGroup} from '@instructure/ui-toggle-details'
+import {Tooltip} from '@instructure/ui-overlays'
+
 import I18n from 'i18n!speed_grader'
 
 import DateEventGroup from './DateEventGroup'
@@ -55,32 +54,32 @@ export default class CreatorEventGroup extends PureComponent {
     return (
       <View as="div">
         <ApplyTheme theme={themeOverride}>
-          <ToggleDetails
+          <ToggleGroup
             border={false}
             id={`creator-event-group-${creator.key}`}
             summary={
               <Flex as="div" direction="row">
-                <FlexItem grow size="0" padding="none xx-small none none">
+                <Flex.Item grow size="0" padding="none xx-small none none">
                   <Text as="h3">
                     <TruncateText maxLines={1}>
                       <Text weight="bold">{creatorName}</Text> ({roleLabel})
                     </TruncateText>
                   </Text>
-                </FlexItem>
+                </Flex.Item>
 
                 {!anonymousOnly && (
-                  <FlexItem>
+                  <Flex.Item>
                     <Tooltip
                       on={['click', 'focus', 'hover']}
                       placement="start"
                       tip={message}
                       variant="inverse"
                     >
-                      <Button icon={<IconWarning color="error" />} size="medium" variant="icon">
+                      <Button icon={<IconWarningLine color="error" />} size="medium" variant="icon">
                         <ScreenReaderContent>{I18n.t('Toggle tooltip')}</ScreenReaderContent>
                       </Button>
                     </Tooltip>
-                  </FlexItem>
+                  </Flex.Item>
                 )}
               </Flex>
             }
@@ -91,7 +90,7 @@ export default class CreatorEventGroup extends PureComponent {
                 <DateEventGroup dateEventGroup={dateEventGroup} key={dateEventGroup.startDateKey} />
               ))}
             </div>
-          </ToggleDetails>
+          </ToggleGroup>
         </ApplyTheme>
 
         <View as="div" borderWidth="none none small" margin="none" padding="none" />

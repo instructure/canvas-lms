@@ -19,7 +19,7 @@ import $ from 'jquery'
 import 'jquery.ajaxJSON'
 
 export default {
-  toggle (button) {
+  toggle(button) {
     const data = $(button).data.bind($(button))
     return $.ajaxJSON(data('url'), data('isChecked') ? 'DELETE' : 'PUT', {}, () => {
       data('isChecked', !data('isChecked'))

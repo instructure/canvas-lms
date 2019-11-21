@@ -17,21 +17,23 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import ScopesGroup from '../ScopesGroup'
 
-const scopes = [{
-    "resource":"account_domain_lookups",
-    "verb":"GET",
-    "path":"/api/v1/accounts/search",
-    "scope":"url:GET|/api/v1/accounts/search"
+const scopes = [
+  {
+    resource: 'account_domain_lookups',
+    verb: 'GET',
+    path: '/api/v1/accounts/search',
+    scope: 'url:GET|/api/v1/accounts/search'
   },
   {
-    "resource":"account_domain_lookups",
-    "verb":"POST",
-    "path":"/api/v1/accounts/search",
-    "scope":"url:POST|/api/v1/accounts/search"
-  }]
+    resource: 'account_domain_lookups',
+    verb: 'POST',
+    path: '/api/v1/accounts/search',
+    scope: 'url:POST|/api/v1/accounts/search'
+  }
+]
 
 const props = {
   setSelectedScopes: jest.fn(),
@@ -44,38 +46,41 @@ const props = {
 it("adds all scopes to 'selected scopes' when the checkbox is checked", () => {
   const wrapper = mount(<ScopesGroup {...props} />)
   const checkBox = wrapper.find('input[type="checkbox"]')
-  checkBox.simulate('change', { target: { checked: true } })
-  expect(props.setSelectedScopes).toBeCalled()
+  checkBox.simulate('change', {target: {checked: true}})
+  expect(props.setSelectedScopes).toHaveBeenCalled()
 })
 
 it("removes all scopes from 'selected scopes' when the checbox is unchecked", () => {
   const wrapper = mount(<ScopesGroup {...props} />)
   const checkBox = wrapper.find('input[type="checkbox"]')
-  checkBox.simulate('change', { target: { checked: true } })
-  checkBox.simulate('change', { target: { checked: false } })
+  checkBox.simulate('change', {target: {checked: true}})
+  checkBox.simulate('change', {target: {checked: false}})
   expect(props.setSelectedScopes).toHaveBeenCalledTimes(3)
 })
 
-it("checks the selected scopes", () => {
+it('checks the selected scopes', () => {
   const wrapper = mount(<ScopesGroup {...props} />)
-  wrapper.find('button').first().simulate('click')
+  wrapper
+    .find('button')
+    .first()
+    .simulate('click')
   const checkBox = wrapper.find('input[value="url:GET|/api/v1/accounts/search"]').first()
   expect(checkBox.props().checked).toBe(true)
 })
 
-it("renders the http verb for each selected scope", () => {
+it('renders the http verb for each selected scope', () => {
   const wrapper = mount(<ScopesGroup {...props} />)
   const button = wrapper.find('button').first()
   expect(button.text()).toContain('GET')
 })
 
-it("does not render the http verb for non-selected scopes", () => {
+it('does not render the http verb for non-selected scopes', () => {
   const wrapper = mount(<ScopesGroup {...props} />)
   const button = wrapper.find('button').first()
   expect(button.text()).not.toContain('POST')
 })
 
-it("renders the scope group name", () => {
+it('renders the scope group name', () => {
   const wrapper = mount(<ScopesGroup {...props} />)
   const button = wrapper.find('button').first()
   expect(button.text()).toContain(props.name)

@@ -272,6 +272,23 @@ class ContentMigrationsController < ApplicationController
   #   The question bank to import questions into if not specified in the content
   #   package, if both bank id and name are set, id will take precedence.
   #
+  # @argument settings[insert_into_module_id] [Integer]
+  #   The id of a module in the target course. This will add all imported items
+  #   (that can be added to a module) to the given module.
+  #
+  # @argument settings[insert_into_module_type] [String,"assignment"|"discussion_topic"|"file"|"page"|"quiz"]
+  #   If provided (and +insert_into_module_id+ is supplied),
+  #   only add objects of the specified type to the module.
+  #
+  # @argument settings[insert_into_module_position] [Integer]
+  #   The (1-based) position to insert the imported items into the course
+  #   (if +insert_into_module_id+ is supplied). If this parameter
+  #   is omitted, items will be added to the end of the module.
+  #
+  # @argument settings[move_to_assignment_group_id] [Integer]
+  #   The id of an assignment group in the target course. If provided, all
+  #   imported assignments will be moved to the given assignment group.
+  #
   # @argument date_shift_options[shift_dates] [Boolean]
   #   Whether to shift dates in the copied course
   #
@@ -304,6 +321,15 @@ class ContentMigrationsController < ApplicationController
   #   parameters for the desired content. Then call the
   #   {api:ContentMigrationsController#update Update endpoint} and provide these
   #   copy parameters to start the import.
+  #
+  # @argument select [Optional, Hash, "folders"|"files"|"attachments"|"quizzes"|"assignments"|"announcements"|"calendar_events"|"discussion_topics"|"modules"|"module_items"|"pages"|"rubrics"]
+  #   For +course_copy_importer+ migrations, this parameter allows you to select
+  #   the objects to copy without using the +selective_import+ argument and
+  #   +waiting_for_select+ state as is required for uploaded imports (though that
+  #   workflow is also supported for course copy migrations).
+  #   The keys are object types like 'files', 'folders', 'pages', etc. The value
+  #   for each key is a list of object ids. An id can be an integer or a string.
+  #   Multiple object types can be selected in the same call.
   #
   # @example_request
   #
@@ -504,6 +530,13 @@ class ContentMigrationsController < ApplicationController
         @content_migration.workflow_state = 'exported'
         params[:do_not_run] = true
       end
+    elsif params[:select] && params[:migration_type] == 'course_copy_importer'
+      copy_options = ContentMigration.process_copy_params(params[:select]&.to_unsafe_h,
+        global_identifiers: @content_migration.use_global_identifiers?,
+        for_content_export: true)
+      @content_migration.migration_settings[:migration_ids_to_import] ||= {}
+      @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
+      @content_migration.copy_options = copy_options
     elsif params[:copy]
       copy_options = ContentMigration.process_copy_params(params[:copy]&.to_unsafe_h,
         global_identifiers: @content_migration.use_global_identifiers?)

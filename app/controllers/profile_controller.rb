@@ -336,7 +336,7 @@ class ProfileController < ApplicationController
     respond_to do |format|
       user_params = params[:user] ? params[:user].
         permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
-          :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate)
+          :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
         : {}
       if !@user.user_can_edit_name?
         user_params.delete(:name)
@@ -402,6 +402,7 @@ class ProfileController < ApplicationController
     @context = @profile
 
     short_name = params[:user] && params[:user][:short_name]
+    @user.pronouns = params[:pronouns] if params[:pronouns]
     @user.short_name = short_name if short_name && @user.user_can_edit_name?
     if params[:user_profile]
       user_profile_params = params[:user_profile].permit(:title, :bio)
@@ -469,5 +470,19 @@ class ProfileController < ApplicationController
     js_bundle :user_observees
 
     render html: '', layout: true
+  end
+
+  def content_shares
+    raise not_found unless @domain_root_account.feature_enabled?(:direct_share) && @current_user.can_content_share?
+
+    @user ||= @current_user
+    set_active_tab 'content_shares'
+    @context = @user.profile
+
+    ccv_settings = Canvas::DynamicSettings.find('common_cartridge_viewer') || {}
+    js_env({
+      COMMON_CARTRIDGE_VIEWER_URL: ccv_settings['base_url']
+    })
+    render :content_shares
   end
 end

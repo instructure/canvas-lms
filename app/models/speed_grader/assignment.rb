@@ -36,7 +36,7 @@ module SpeedGrader
       submission_json_fields = %i(id submitted_at workflow_state grade
                                   grade_matches_current_submission graded_at turnitin_data
                                   submission_type score points_deducted assignment_id submission_comments
-                                  grading_period_id excused updated_at)
+                                  grading_period_id excused updated_at attempt)
 
       submission_json_fields << (anonymous_students?(current_user: current_user, assignment: assignment) ? :anonymous_id : :user_id)
       submission_json_fields << :posted_at if course.post_policies_enabled?
@@ -74,7 +74,7 @@ module SpeedGrader
       # valid submission object, which means no inactive or concluded students
       # even if the user has elected to show them in gradebook
       includes = assignment.anonymize_students? ? [] : gradebook_includes(user: current_user, course: course)
-      students = assignment.representatives(user: current_user, includes: includes, group_id: group_id_filter) do |rep, others|
+      students = assignment.representatives(user: current_user, includes: includes, group_id: group_id_filter, section_id: section_id_filter) do |rep, others|
         others.each { |s| res[:context][:rep_for_student][s.id] = rep.id }
       end
 
@@ -175,6 +175,10 @@ module SpeedGrader
         if provisional_grader_or_moderator?
           provisional_grade = sub.provisional_grade(current_user, preloaded_grades: preloaded_provisional_grades)
           json.merge! provisional_grade_to_json(provisional_grade)
+        end
+
+        if course.root_account.feature_enabled?(:allow_postable_submission_comments) && course.post_policies_enabled?
+          json[:has_postable_comments] = sub.submission_comments.select(&:hidden?).present?
         end
 
         json[:submission_comments] = anonymous_moderated_submission_comments_json(
@@ -412,6 +416,11 @@ module SpeedGrader
 
       # If we selected a group that is now deleted, don't use it
       Group.active.exists?(id: group_id) ? group_id : nil
+    end
+
+    def section_id_filter
+      return nil unless course.feature_enabled?(:new_gradebook)
+      current_user.preferences.dig(:gradebook_settings, course.id, 'filter_rows_by', 'section_id')
     end
   end
 end

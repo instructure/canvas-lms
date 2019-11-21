@@ -1,0 +1,8 @@
+<% assignment = asset.assignment %>
+
+<%= t <<-BODY, title: assignment.title, course: assignment.context.name, url: polymorphic_url([assignment.context, assignment, asset])
+Your instructor has released grade changes and new comments for %{title}, %{course}.
+
+More info at %{url}
+BODY
+%>

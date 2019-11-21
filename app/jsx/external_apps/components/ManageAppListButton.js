@@ -19,10 +19,10 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal, { ModalBody, ModalFooter } from '../../shared/components/InstuiModal'
-import ConfigOptionField from '../../external_apps/components/ConfigOptionField'
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import View from '@instructure/ui-layout/lib/components/View';
+import Modal from '../../shared/components/InstuiModal'
+import ConfigOptionField from './ConfigOptionField'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-layout'
 
 export default class ManageAppListButton extends React.Component {
   static propTypes = {
@@ -99,7 +99,7 @@ export default class ManageAppListButton extends React.Component {
           onDismiss={this.closeModal}
           label={I18n.t('Manage App List')}
         >
-          <ModalBody>
+          <Modal.Body>
             <p
               dangerouslySetInnerHTML={{
                 __html: I18n.t(
@@ -125,12 +125,12 @@ export default class ManageAppListButton extends React.Component {
                 handleChange={this.handleChange}
               />
             </form>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <Button onClick={this.closeModal}>{I18n.t('Cancel')}</Button>
             &nbsp;
             <Button onClick={this.handleSubmit}>{I18n.t('Save')}</Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </View>
     )

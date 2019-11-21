@@ -27,3 +27,5 @@ if (!('MutationObserver' in window)) {
     value: require('@sheerun/mutationobserver-shim')
   })
 }
+
+window.scroll = () => {}

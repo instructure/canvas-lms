@@ -22,19 +22,18 @@ import {connect} from 'react-redux'
 import {debounce} from 'lodash'
 import I18n from 'i18n!announcements_v2'
 import React, {Component} from 'react'
-
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconLock from '@instructure/ui-icons/lib/Line/IconLock'
-import IconPlus from '@instructure/ui-icons/lib/Line/IconPlus'
-import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import IconUnlock from '@instructure/ui-icons/lib/Line/IconUnlock'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Button} from '@instructure/ui-buttons'
+import {FormField} from '@instructure/ui-form-field'
+import {Grid, View} from '@instructure/ui-layout'
+import {
+  IconLockLine,
+  IconPlusLine,
+  IconSearchLine,
+  IconTrashLine,
+  IconUnlockLine
+} from '@instructure/ui-icons'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextInput} from '@instructure/ui-forms'
 
 import actions from '../actions'
 import ExternalFeedsTray from './ExternalFeedsTray'
@@ -112,8 +111,8 @@ export default class IndexHeader extends Component {
       <View>
         <View margin="0 0 medium" display="block">
           <Grid>
-            <GridRow hAlign="space-between">
-              <GridCol width={2}>
+            <Grid.Row hAlign="space-between">
+              <Grid.Col width={2}>
                 <FormField
                   id="announcement-filter"
                   label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
@@ -133,8 +132,8 @@ export default class IndexHeader extends Component {
                     ))}
                   </select>
                 </FormField>
-              </GridCol>
-              <GridCol width={4}>
+              </Grid.Col>
+              <Grid.Col width={4}>
                 <TextInput
                   label={
                     <ScreenReaderContent>
@@ -147,8 +146,8 @@ export default class IndexHeader extends Component {
                   onChange={this.onSearch}
                   name="announcements_search"
                 />
-              </GridCol>
-              <GridCol width={6} textAlign="end">
+              </Grid.Col>
+              <Grid.Col width={6} textAlign="end">
                 {this.props.permissions.manage_content &&
                   !this.props.announcementsLocked &&
                   (this.props.isToggleLocking ? (
@@ -159,7 +158,7 @@ export default class IndexHeader extends Component {
                       id="lock_announcements"
                       onClick={this.props.toggleSelectedAnnouncementsLock}
                     >
-                      <IconLock />
+                      <IconLockLine />
                       <ScreenReaderContent>
                         {I18n.t('Lock Selected Announcements')}
                       </ScreenReaderContent>
@@ -172,7 +171,7 @@ export default class IndexHeader extends Component {
                       id="lock_announcements"
                       onClick={this.props.toggleSelectedAnnouncementsLock}
                     >
-                      <IconUnlock />
+                      <IconUnlockLine />
                       <ScreenReaderContent>
                         {I18n.t('Unlock Selected Announcements')}
                       </ScreenReaderContent>
@@ -189,7 +188,7 @@ export default class IndexHeader extends Component {
                       this.deleteBtn = c
                     }}
                   >
-                    <IconTrash />
+                    <IconTrashLine />
                     <ScreenReaderContent>
                       {I18n.t('Delete Selected Announcements')}
                     </ScreenReaderContent>
@@ -201,13 +200,13 @@ export default class IndexHeader extends Component {
                     variant="primary"
                     id="add_announcement"
                   >
-                    <IconPlus />
+                    <IconPlusLine />
                     <ScreenReaderContent>{I18n.t('Add announcement')}</ScreenReaderContent>
                     <PresentationContent>{I18n.t('Announcement')}</PresentationContent>
                   </Button>
                 )}
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </View>
         <ExternalFeedsTray
@@ -219,15 +218,18 @@ export default class IndexHeader extends Component {
   }
 }
 
-const connectState = state =>
-  Object.assign(
-    {
-      isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
-      selectedCount: state.selectedAnnouncements.length,
-      isToggleLocking: state.isToggleLocking
-    },
-    select(state, ['contextType', 'contextId', 'permissions', 'atomFeedUrl', 'announcementsLocked'])
-  )
+const connectState = state => ({
+  isBusy: state.isLockingAnnouncements || state.isDeletingAnnouncements,
+  selectedCount: state.selectedAnnouncements.length,
+  isToggleLocking: state.isToggleLocking,
+  ...select(state, [
+    'contextType',
+    'contextId',
+    'permissions',
+    'atomFeedUrl',
+    'announcementsLocked'
+  ])
+})
 const selectedActions = [
   'searchAnnouncements',
   'toggleSelectedAnnouncementsLock',

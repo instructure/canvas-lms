@@ -54,9 +54,12 @@ export const SubmissionComment = {
   })
 }
 
-export const SubmissionCommentDefaultMocks = {
-  SubmissionComment: () => ({
-    attachments: [{}],
-    read: true
-  })
+export const DefaultMocks = {
+  SubmissionComment: () => {
+    return {
+      _id: 1,
+      attachments: [{}],
+      read: true
+    }
+  }
 }

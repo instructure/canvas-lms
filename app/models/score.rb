@@ -80,6 +80,10 @@ class Score < ActiveRecord::Base
     score_to_grade(unposted_final_score)
   end
 
+  def override_grade
+    override_score.present? ? score_to_grade(override_score) : nil
+  end
+
   def effective_final_score
     override_score || final_score
   end

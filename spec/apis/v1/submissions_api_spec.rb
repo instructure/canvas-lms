@@ -741,7 +741,8 @@ describe 'Submissions API', type: :request do
       "id" => @student.id,
       "display_name" => "User",
       "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}",
-      "avatar_image_url" => User.avatar_fallback_url(nil, request)
+      "avatar_image_url" => User.avatar_fallback_url(nil, request),
+      "pronouns" => nil
     })
   end
 
@@ -844,9 +845,10 @@ describe 'Submissions API', type: :request do
             :format => 'json', :course_id => @course.id.to_s,
             :assignment_id => quiz.assignment.id.to_s },
           { :include => %w(submission_history) })
-
     expect(json.first['submission_history'].count).to eq 2
     expect(json.first['submission_history'].first.include? "submission_data").to be_truthy
+    expect(json.first['submission_history'][0]['preview_url']).to include '&version=2'
+    expect(json.first['submission_history'][1]['preview_url']).to include '&version=1'
   end
 
   it "returns the correct submitted_at date for each quiz submission" do
@@ -900,6 +902,7 @@ describe 'Submissions API', type: :request do
         "excused" => sub1.excused,
         "grader_id"=>@teacher.id,
         "graded_at"=>sub1.graded_at.as_json,
+        "posted_at"=>sub1.posted_at.as_json,
         "body"=>"test!",
         "assignment_id" => a1.id,
         "cached_due_date" => nil,
@@ -925,7 +928,8 @@ describe 'Submissions API', type: :request do
               "id" => @teacher.id,
               "display_name" => "User",
               "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-              "avatar_image_url" => User.avatar_fallback_url(nil, request)
+              "avatar_image_url" => User.avatar_fallback_url(nil, request),
+              "pronouns" => nil
            },
            "author_name"=>"User",
            "id" => comment.id,
@@ -1081,6 +1085,7 @@ describe 'Submissions API', type: :request do
         "excused" => sub1.excused,
         "grader_id"=>@teacher.id,
         "graded_at"=>sub1.graded_at.as_json,
+        "posted_at"=>sub1.posted_at.as_json,
         "body"=>"test!",
         "assignment_id" => a1.id,
         "submitted_at"=>"1970-01-01T03:00:00Z",
@@ -1094,7 +1099,6 @@ describe 'Submissions API', type: :request do
              "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
              "filename" => "unknown.loser",
              "display_name" => "unknown.loser",
-             "workflow_state" => "pending_upload",
              "upload_status" => "success",
              "id" => sub1.attachments.first.id,
              "uuid" => sub1.attachments.first.uuid,
@@ -1122,6 +1126,7 @@ describe 'Submissions API', type: :request do
            "excused" => nil,
            "grader_id"=>nil,
            "graded_at"=>nil,
+           "posted_at"=>nil,
            "body"=>"test!",
            "assignment_id" => a1.id,
            "submitted_at"=>"1970-01-01T01:00:00Z",
@@ -1148,6 +1153,7 @@ describe 'Submissions API', type: :request do
            "excused" => nil,
            "grader_id"=>nil,
            "graded_at"=>nil,
+           "posted_at"=>nil,
            "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
@@ -1180,6 +1186,7 @@ describe 'Submissions API', type: :request do
            "excused" => false,
            "grader_id"=>@teacher.id,
            "graded_at"=>sub1.graded_at.as_json,
+           "posted_at"=>sub1.posted_at.as_json,
            "assignment_id" => a1.id,
            "media_comment" =>
             { "media_type"=>"video",
@@ -1192,7 +1199,6 @@ describe 'Submissions API', type: :request do
                 "url" => "http://www.example.com/files/#{sub1.attachments.first.id}/download?download_frd=1&verifier=#{sub1.attachments.first.uuid}",
                 "filename" => "unknown.loser",
                 "display_name" => "unknown.loser",
-                "workflow_state" => "pending_upload",
                 "upload_status" => "success",
                 "id" => sub1.attachments.first.id,
                 "uuid" => sub1.attachments.first.uuid,
@@ -1249,7 +1255,8 @@ describe 'Submissions API', type: :request do
              "id" => @teacher.id,
              "display_name" => "User",
              "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-             "avatar_image_url" => User.avatar_fallback_url(nil, request)
+             "avatar_image_url" => User.avatar_fallback_url(nil, request),
+             "pronouns" => nil
            },
            "author_name"=>"User",
            "id"=>comment.id,
@@ -1276,6 +1283,7 @@ describe 'Submissions API', type: :request do
         "grader_id"=>@teacher.id,
         "cached_due_date" => nil,
         "graded_at"=>sub2.graded_at.as_json,
+        "posted_at"=>sub2.posted_at.as_json,
         "assignment_id" => a1.id,
         "body"=>nil,
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=1",
@@ -1290,6 +1298,7 @@ describe 'Submissions API', type: :request do
            "excused" => false,
            "grader_id"=>@teacher.id,
            "graded_at"=>sub2.graded_at.as_json,
+           "posted_at"=>sub2.posted_at.as_json,
            "assignment_id" => a1.id,
            "body"=>nil,
            "submitted_at"=>"1970-01-01T04:00:00Z",
@@ -1305,7 +1314,6 @@ describe 'Submissions API', type: :request do
               {"content-type" => "image/png",
                "display_name" => "snapshot.png",
                "filename" => "snapshot.png",
-               "workflow_state" => "pending_upload",
                "upload_status" => "success",
                "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
                "id" => sub2a1.id,
@@ -1344,7 +1352,6 @@ describe 'Submissions API', type: :request do
          [{"content-type" => "image/png",
            "display_name" => "snapshot.png",
            "filename" => "snapshot.png",
-           "workflow_state" => "pending_upload",
            "upload_status" => "success",
            "url" => "http://www.example.com/files/#{sub2a1.id}/download?download_frd=1&verifier=#{sub2a1.uuid}",
            "id" => sub2a1.id,
@@ -1682,6 +1689,59 @@ describe 'Submissions API', type: :request do
       expect(response).to be_forbidden
     end
 
+    describe "has_postable_comments" do
+      let(:assignment) { @course.assignments.create! }
+      let(:student1_sub) { assignment.submissions.find_by(user: @student1) }
+
+      before(:each) do
+        @course.root_account.enable_feature!(:allow_postable_submission_comments)
+        PostPolicy.enable_feature!
+        @course.enable_feature!(:new_gradebook)
+        assignment.ensure_post_policy(post_manually: true)
+      end
+
+      def student_json(params = {grouped: true, student_ids: [@student1.to_param]})
+        api_call(
+          :get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          {
+            controller: "submissions_api",
+            action: "for_students",
+            format: "json",
+            course_id: @course.to_param
+          },
+          params
+        ).first
+      end
+
+      it "is not included when allow_postable_submission_comments feature is not enabled" do
+        @course.root_account.disable_feature!(:allow_postable_submission_comments)
+        expect(student_json.fetch("submissions").first).not_to have_key "has_postable_comments"
+      end
+
+      it "is not included when Post Policies are not enabled" do
+        @course.disable_feature!(:new_gradebook)
+        expect(student_json.fetch("submissions").first).not_to have_key "has_postable_comments"
+      end
+
+      it "is not included when params[:grouped] is not present" do
+        submission_json = student_json({student_ids: [@student1.to_param]})
+        expect(submission_json).not_to have_key "has_postable_comments"
+      end
+
+      it "is true when unposted and hidden comments exist" do
+        student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
+        submission_json = student_json.fetch("submissions").find { |s| s.fetch("id") == student1_sub.id }
+        expect(submission_json.fetch("has_postable_comments")).to be true
+      end
+
+      it "is false when unposted and only non-hidden comments exist" do
+        student1_sub.add_comment(author: @student, comment: "fun assignment!", hidden: false)
+        submission_json = student_json.fetch("submissions").find { |s| s.fetch("id") == student1_sub.id }
+        expect(submission_json.fetch("has_postable_comments")).to be false
+      end
+    end
+
     context 'OriginalityReport' do
       it 'includes has_originality_report if the submission has an originality_report' do
         attachment_model
@@ -1771,8 +1831,7 @@ describe 'Submissions API', type: :request do
         expect(json.first['provisional_grades']).to_not be_empty
         speedgrader_url = URI.parse(json.first['provisional_grades'].first['speedgrader_url'])
         expect(speedgrader_url).to match_path("/courses/#{@course.id}/gradebook/speed_grader").
-          and_query({'assignment_id' => @assignment.id, 'student_id' => @student.id}).
-          and_fragment({"provisional_grade_id" => @provisional_grade.id})
+          and_query({assignment_id: @assignment.id, student_id: @student.id})
       end
 
       it "can include users" do
@@ -3278,6 +3337,56 @@ describe 'Submissions API', type: :request do
     expect(submission.submission_comments.order("id DESC").first).to be_hidden
   end
 
+  context "with post policies enabled" do
+    let_once(:course) { Course.create! }
+    let_once(:assignment) { course.assignments.create! }
+    let_once(:student) { course.enroll_student(User.create!, enrollment_state: :active).user }
+    let_once(:teacher) { course.enroll_teacher(User.create!, enrollment_state: :active).user }
+    let_once(:submission) { assignment.submissions.find_by!(user: student) }
+
+    before(:once) do
+      PostPolicy.enable_feature!
+      course.enable_feature!(:new_gradebook)
+      @user = teacher
+    end
+
+    it "hides comments when the assignment posts manually and submission is not posted" do
+      assignment.ensure_post_policy(post_manually: true)
+      api_call(
+        :put,
+        "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions/#{student.id}",
+        {
+          controller: "submissions_api",
+          action: "update",
+          format: "json",
+          course_id: course.to_param,
+          assignment_id: assignment.to_param,
+          user_id: student.to_param
+        },
+        { comment: { text_comment: "a comment!" } }
+      )
+      expect(submission.submission_comments.order("id DESC").first).to be_hidden
+    end
+
+    it "does not hide comments when the submission is already posted" do
+      submission.update!(posted_at: Time.zone.now)
+      api_call(
+        :put,
+        "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions/#{student.id}",
+        {
+          controller: "submissions_api",
+          action: "update",
+          format: "json",
+          course_id: course.to_param,
+          assignment_id: assignment.to_param,
+          user_id: student.to_param
+        },
+        { comment: { text_comment: "a comment!" } }
+      )
+      expect(submission.submission_comments.order("id DESC").first).not_to be_hidden
+    end
+  end
+
   it "does not hide student comments on muted assignments" do
     course_with_teacher(:active_all => true)
     student    = user_factory(active_all: true)
@@ -3513,7 +3622,7 @@ describe 'Submissions API', type: :request do
     @submission = Submission.first
     expect(json['submission_comments'].size).to eq 1
     comment = json['submission_comments'].first
-    expect(comment['comment']).to eq 'This is a media comment.'
+    expect(comment['comment']).to eq ''
     expect(comment['media_comment']['url']).to eq "http://www.example.com/users/#{@user.id}/media_download?entryId=1234&redirect=1&type=mp4"
     expect(comment['media_comment']["content-type"]).to eq "audio/mp4"
   end
@@ -3937,28 +4046,18 @@ describe 'Submissions API', type: :request do
       end
 
       it "allows any filetype when there are no restrictions on type" do
-        @assignment.root_account.enable_feature!(:check_submission_file_type)
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
         assert_status(200)
       end
 
       it "rejects uploading files when filetype is not allowed" do
-        @assignment.root_account.enable_feature!(:check_submission_file_type)
         @assignment.update_attributes(:allowed_extensions => ['doc'])
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
         assert_status(400)
       end
 
       it "allows filetype when restricted and is correct filetype" do
-        @assignment.root_account.enable_feature!(:check_submission_file_type)
         @assignment.update_attributes(:allowed_extensions => ['txt'])
-        preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
-        assert_status(200)
-      end
-
-      it "will allow you to upload any type when feature not enabled" do
-        @assignment.root_account.disable_feature!(:check_submission_file_type)
-        @assignment.update_attributes(:allowed_extensions => ['doc'])
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
         assert_status(200)
       end
@@ -4668,6 +4767,7 @@ describe 'Submissions API', type: :request do
           [{"id"=>@student1.id,
             "display_name"=>"User",
             "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
+            "pronouns" => nil,
             "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student1.id}",
             "in_moderation_set"=>true,
             "selected_provisional_grade_id"=>pg.id,
@@ -4682,10 +4782,11 @@ describe 'Submissions API', type: :request do
                 "grade_matches_current_submission"=>true,
                 "graded_anonymously"=>nil,
                 "final"=>false,
-                "speedgrader_url"=>"http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{@student1.id}#%7B%22provisional_grade_id%22:#{pg.id}%7D"}]},
+                "speedgrader_url"=>"http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{@student1.id}"}]},
            {"id"=>@student2.id,
             "display_name"=>"User",
             "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
+            "pronouns" => nil,
             "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student2.id}",
             "in_moderation_set"=>false,
             "selected_provisional_grade_id"=>nil,
@@ -4705,8 +4806,7 @@ describe 'Submissions API', type: :request do
         anonymous_id = @assignment.submission_for_student(@student1).anonymous_id
         json = json.map { |el| el['provisional_grades'][0] }.compact
         expect(json[0]['speedgrader_url']).to match_path("http://www.example.com/courses/#{@course.id}/gradebook/speed_grader").
-          and_query({'assignment_id' => @assignment.id, 'anonymous_id' => anonymous_id}).
-          and_fragment({ 'provisional_grade_id' => pg.id })
+          and_query({assignment_id: @assignment.id, anonymous_id: anonymous_id})
         expect(json[0]['scorer_id']).to eq @ta.id
         expect(json[0]['anonymous_grader_id']).to be_nil
       end

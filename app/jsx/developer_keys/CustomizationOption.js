@@ -18,13 +18,12 @@
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
-
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
-import IconLink from '@instructure/ui-icons/lib/Line/IconLink'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import {Button} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-forms'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {IconLinkLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Tooltip} from '@instructure/ui-overlays'
 
 export default class CustomizationOption extends React.Component {
   deepLinkingIcon() {
@@ -32,12 +31,12 @@ export default class CustomizationOption extends React.Component {
       return null
     }
 
-    return(
+    return (
       <Tooltip
         tip={I18n.t('Tool supports Deep Linking at this placement')}
         on={['click', 'hover', 'focus']}
       >
-        <Button variant="icon" icon={IconLink}>
+        <Button variant="icon" icon={IconLinkLine}>
           <ScreenReaderContent>{I18n.t('toggle tooltip')}</ScreenReaderContent>
         </Button>
       </Tooltip>

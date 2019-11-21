@@ -19,7 +19,7 @@ import I18n from 'i18n!notification_preferences'
 
 // This class create the Notification Preferences display table and manages the data storage for it.
 export default class NotificationGroupMappings {
-  constructor (options) {
+  constructor(options) {
     // Define the visual grouping and order for the groups and items. The strings below are not used for direct
     // display but are the group names and category names used internally. The 'getGroupDisplayName' method
     // gets the I18n version of the group name. The display text used for the items gets set through the
@@ -40,7 +40,7 @@ export default class NotificationGroupMappings {
         'all_submissions',
         'late_grading',
         'submission_comment',
-        'blueprint',
+        'blueprint'
       ],
       Discussions: ['discussion', 'discussion_entry'],
       Communication: ['added_to_conversation', 'conversation_message', 'conversation_created'],
@@ -49,17 +49,17 @@ export default class NotificationGroupMappings {
         'appointment_signups',
         'appointment_cancelations',
         'appointment_availability',
-        'calendar',
+        'calendar'
       ],
       Parent: [],
       Groups: ['membership_update'],
       Conferences: ['recording_ready'],
-      Alerts: ['other', 'content_link_error'],
+      Alerts: ['other', 'content_link_error', 'account_notification']
     }
   }
 
   // Get the I18n display text to use for the group name.
-  getGroupDisplayName (groupName) {
+  getGroupDisplayName(groupName) {
     switch (groupName) {
       case 'Course':
         return I18n.t('groups.course', 'Course Activities')

@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import LinkOptionsDialog from '../../LinkOptionsDialog'
+import LinkOptionsDialog from '..'
 import LinkOptionsDialogDriver from './LinkOptionsDialogDriver'
 
 describe('RCE "Links" Plugin > LinkOptionsDialog', () => {

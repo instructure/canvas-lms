@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import normalizeLocale from "./rce/normalizeLocale";
-import { renderIntoDiv as render } from "./rce/root";
-import "tinymce";
+import normalizeLocale from './rce/normalizeLocale'
+import {renderIntoDiv as render} from './rce/root'
+import 'tinymce'
 
-if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== "en") {
+if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== 'en') {
   try {
     // In a pretranslated build, this should not result in a network request for a new chunk.
     // We still tell tinymce about the translations it should use, but those should be included in
@@ -28,26 +28,22 @@ if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== "en") {
     // performance and smaller bundle size since it won't have to include all the chunk info
     // for all the possible locales in the webpack runtime and will be less network roundtrips.
 
-    require(`./rce/languages/${process.env.BUILD_LOCALE}`);
+    require(`./rce/languages/${process.env.BUILD_LOCALE}`)
   } catch (e) {
     // gracefully proceed if we do not have a language file for this locale
     // eslint-disable-next-line no-console
-    console.warn(
-      `could not find canvas-rce language: ${process.env.BUILD_LOCALE}`
-    );
+    console.warn(`could not find canvas-rce language: ${process.env.BUILD_LOCALE}`)
   }
 }
 
 export function renderIntoDiv(editorEl, props, cb) {
-  const language = normalizeLocale(props.language);
-  if (process.env.BUILD_LOCALE || language === "en") {
-    render(editorEl, props, cb);
+  const language = normalizeLocale(props.language)
+  if (process.env.BUILD_LOCALE || language === 'en') {
+    render(editorEl, props, cb)
   } else {
     // unlike the pretranslated builds, in the default, non-pretranslated build,
     // this will cause a new network round trip to get all the locale info we
     // and tinymce need.
-    import(`./locales/${language}`).then(() => render(editorEl, props, cb));
+    import(`./locales/${language}`).then(() => render(editorEl, props, cb))
   }
 }
-
-export { renderIntoDiv as renderSidebarIntoDiv } from "./sidebar/root";

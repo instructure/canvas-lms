@@ -19,13 +19,13 @@
 import React from 'react'
 import {bool, string, func, number, oneOf, oneOfType} from 'prop-types'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import {NumberInput} from '@instructure/ui-number-input'
-import InPlaceEdit from '@instructure/ui-editable/lib/components/InPlaceEdit'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import View from '@instructure/ui-layout/lib/components/View'
-import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
-import createChainedFunction from '@instructure/ui-utils/lib/createChainedFunction'
+import {InPlaceEdit} from '@instructure/ui-editable'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {View} from '@instructure/ui-layout'
+import {omitProps} from '@instructure/ui-react-utils'
+import {createChainedFunction} from '@instructure/ui-utils'
 
 export default class EditableNumber extends React.Component {
   static propTypes = {
@@ -183,12 +183,12 @@ export default class EditableNumber extends React.Component {
         onChange={this.handleInputChange}
         onKeyDown={this.handleKey}
         onKeyUp={this.handleKey}
-        label={<ScreenReaderContent>this.props.label</ScreenReaderContent>}
+        renderLabel={<ScreenReaderContent>this.props.label</ScreenReaderContent>}
         onBlur={onBlur}
         inputRef={createChainedFunction(this.getInputRef, editorRef)}
-        inline={this.props.inline}
+        display={this.props.inline ? 'inline-block' : 'block'}
         size={this.props.size}
-        required={this.props.required}
+        isRequired={this.props.required}
       />
     )
   }

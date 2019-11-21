@@ -19,7 +19,7 @@
 import I18n from 'i18n!quizzes.timing'
 import $ from 'jquery'
 
-export default function addAriaDescription ($answer, id) {
+export default function addAriaDescription($answer, id) {
   const text = I18n.t('Answer %{answerId}', {answerId: id})
   const labelId = `answer${id}`
 

@@ -19,11 +19,10 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, bool, shape, string} from 'prop-types'
-import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Grid, View} from '@instructure/ui-layout'
+import {Heading, Text} from '@instructure/ui-elements'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+
 import I18n from 'i18n!assignment_grade_summary'
 
 import * as GradeActions from '../../grades/GradeActions'
@@ -57,28 +56,28 @@ function GradersTable(props) {
       </ScreenReaderContent>
 
       <Grid rowSpacing="small">
-        <GridRow>
-          <GridCol>
+        <Grid.Row>
+          <Grid.Col>
             <Text weight="bold">{I18n.t('Grader')}</Text>
-          </GridCol>
+          </Grid.Col>
 
           {showAcceptGradesColumn && (
-            <GridCol>
+            <Grid.Col>
               <Text weight="bold">{I18n.t('Accept Grades')}</Text>
-            </GridCol>
+            </Grid.Col>
           )}
-        </GridRow>
+        </Grid.Row>
 
         {rows.map(row => (
-          <GridRow id={`grader-row-${row.graderId}`} key={row.graderId}>
-            <GridCol>
+          <Grid.Row id={`grader-row-${row.graderId}`} key={row.graderId}>
+            <Grid.Col>
               <label className="grader-label" htmlFor={`grader-row-accept-${row.graderId}`}>
                 {row.graderName}
               </label>
-            </GridCol>
+            </Grid.Col>
 
             {showAcceptGradesColumn && (
-              <GridCol>
+              <Grid.Col>
                 <AcceptGradesButton
                   id={`grader-row-accept-${row.graderId}`}
                   acceptGradesStatus={row.acceptGradesStatus}
@@ -86,9 +85,9 @@ function GradersTable(props) {
                   selectionDetails={row.selectionDetails}
                   graderName={row.graderName}
                 />
-              </GridCol>
+              </Grid.Col>
             )}
-          </GridRow>
+          </Grid.Row>
         ))}
       </Grid>
     </View>

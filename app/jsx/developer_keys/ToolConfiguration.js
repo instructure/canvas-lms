@@ -18,7 +18,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
+import {Grid} from '@instructure/ui-layout'
 import CustomizationForm from './CustomizationForm'
 import ToolConfigurationForm from './ToolConfigurationForm'
 
@@ -28,14 +28,14 @@ export default class ToolConfiguration extends React.Component {
   // require changing how the form button's actions are used to get the data from the
   // form.
   generateToolConfiguration = () => {
-    return this.configMethodsRef.generateToolConfiguration();
+    return this.configMethodsRef.generateToolConfiguration()
   }
 
   valid = () => {
     return this.configMethodsRef.valid()
   }
 
-  setConfigurationMethodsRef = node => this.configMethodsRef = node;
+  setConfigurationMethodsRef = node => (this.configMethodsRef = node)
 
   body() {
     if (!this.props.createLtiKeyState.customizing) {
@@ -75,9 +75,9 @@ export default class ToolConfiguration extends React.Component {
 
   render() {
     return (
-      <GridRow>
-        <GridCol>{this.body()}</GridCol>
-      </GridRow>
+      <Grid.Row>
+        <Grid.Col>{this.body()}</Grid.Col>
+      </Grid.Row>
     )
   }
 }

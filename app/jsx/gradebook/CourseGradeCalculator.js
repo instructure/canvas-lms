@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 import round from 'compiled/util/round'
-import AssignmentGroupGradeCalculator from '../gradebook/AssignmentGroupGradeCalculator'
+import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
 import {
   bigSum,
   sum,

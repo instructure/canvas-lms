@@ -80,14 +80,14 @@ describe Api::V1::GradeChangeEvent do
 
     @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
     @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
-    @events << Auditors::GradeChange.record(@submission)
+    @events << Auditors::GradeChange.record(submission: @submission)
 
     @submission = @assignment.grade_student(@student, grade: 7, grader: @teacher).first
-    @events << Auditors::GradeChange.record(@submission)
+    @events << Auditors::GradeChange.record(submission: @submission)
     @previous_grade = @submission.grade
 
     @submission = @assignment.grade_student(@student, grade: 6, grader: @teacher, graded_anonymously: true).first
-    @event = Auditors::GradeChange.record(@submission)
+    @event = Auditors::GradeChange.record(submission: @submission)
     @events << @event
   end
 
@@ -114,7 +114,7 @@ describe Api::V1::GradeChangeEvent do
 
   it "formats excused submissions" do
     @excused = @assignment.grade_student(@student, grader: @teacher, excused: true).first
-    @event = Auditors::GradeChange.record(@excused)
+    @event = Auditors::GradeChange.record(submission: @excused)
 
     event = subject.grade_change_event_json(@event, @student, @session)
     expect(event[:grade_before]).to eq @submission.grade
@@ -125,9 +125,9 @@ describe Api::V1::GradeChangeEvent do
 
   it "formats formerly excused submissions" do
     @excused = @assignment.grade_student(@student, grader: @teacher, excused: true).first
-    Auditors::GradeChange.record(@excused)
+    Auditors::GradeChange.record(submission: @excused)
     @unexcused = @assignment.grade_student(@student, grader: @teacher, excused: false).first
-    @event = Auditors::GradeChange.record(@unexcused)
+    @event = Auditors::GradeChange.record(submission: @unexcused)
 
     event = subject.grade_change_event_json(@event, @student, @session)
     expect(event[:grade_before]).to eq nil

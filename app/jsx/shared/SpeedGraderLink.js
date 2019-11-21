@@ -18,26 +18,23 @@
 
 import React from 'react'
 import {bool, string} from 'prop-types'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import {Tooltip} from '@instructure/ui-overlays'
 import I18n from 'i18n!assignment'
 
 function renderLink(anchorProps) {
   // This uses a plain <a /> rather than Instructure-UI's <Link /> because
   // <Tooltip /> and disabled <Link /> currently do not work together.
   return (
-    <a
-      className="icon-speed-grader"
-      rel="noopener noreferrer"
-      target="_blank"
-      {...anchorProps}
-    >
+    <a rel="noopener noreferrer" target="_blank" {...anchorProps}>
       {I18n.t('SpeedGrader™')}
     </a>
   )
 }
 
 function SpeedGraderLink(props) {
+  const className = props.className ? `icon-speed-grader ${props.className}` : 'icon-speed-grader'
   let anchorProps = {
+    className,
     href: props.href
   }
 
@@ -46,7 +43,9 @@ function SpeedGraderLink(props) {
       ...anchorProps,
       'aria-disabled': 'true',
       'aria-describedby': props.disabledTip,
-      onClick: (event) => {event.preventDefault()},
+      onClick: event => {
+        event.preventDefault()
+      },
       role: 'button',
       style: {opacity: 0.5}
     }
@@ -56,10 +55,13 @@ function SpeedGraderLink(props) {
     <Tooltip placement="bottom" tip={props.disabledTip} variant="inverse">
       {renderLink(anchorProps)}
     </Tooltip>
-  ) : renderLink(anchorProps)
+  ) : (
+    renderLink(anchorProps)
+  )
 }
 
 SpeedGraderLink.propTypes = {
+  className: string,
   disabled: bool.isRequired,
   href: string.isRequired,
   disabledTip: string

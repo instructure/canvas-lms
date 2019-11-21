@@ -22,6 +22,7 @@ exports[`The Ratings component only renders the single selected Rating with a fo
       lineHeight="condensed"
       size="small"
       weight="bold"
+      wrap="normal"
     >
       Meh
     </Text>
@@ -31,6 +32,7 @@ exports[`The Ratings component only renders the single selected Rating with a fo
     letterSpacing="normal"
     lineHeight="condensed"
     size="small"
+    wrap="normal"
   >
     More Verbosity
   </Text>
@@ -84,6 +86,7 @@ exports[`The Ratings component renders a default rating if none of the ratings a
       lineHeight="condensed"
       size="small"
       weight="bold"
+      wrap="normal"
     >
       No details
     </Text>
@@ -93,6 +96,7 @@ exports[`The Ratings component renders a default rating if none of the ratings a
     letterSpacing="normal"
     lineHeight="condensed"
     size="small"
+    wrap="normal"
   />
   <div
     className="rating-footer"
@@ -143,6 +147,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
       letterSpacing="normal"
       size="small"
       weight="bold"
+      wrap="normal"
     >
       10 to &gt;5 pts
     </Text>
@@ -156,6 +161,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
       lineHeight="condensed"
       size="small"
       weight="bold"
+      wrap="normal"
     >
       Superb
     </Text>
@@ -165,6 +171,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
     letterSpacing="normal"
     lineHeight="condensed"
     size="small"
+    wrap="normal"
   />
   <div
     className="rating-footer"
@@ -211,6 +218,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
       letterSpacing="normal"
       size="small"
       weight="bold"
+      wrap="normal"
     >
       5 to &gt;1 pts
     </Text>
@@ -224,6 +232,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
       lineHeight="condensed"
       size="small"
       weight="bold"
+      wrap="normal"
     >
       Meh
     </Text>
@@ -233,6 +242,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
     letterSpacing="normal"
     lineHeight="condensed"
     size="small"
+    wrap="normal"
   >
     More Verbosity
   </Text>
@@ -281,6 +291,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
       letterSpacing="normal"
       size="small"
       weight="bold"
+      wrap="normal"
     >
       1 to &gt;0 pts
     </Text>
@@ -294,6 +305,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
       lineHeight="condensed"
       size="small"
       weight="bold"
+      wrap="normal"
     >
       Subpar
     </Text>
@@ -303,6 +315,7 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
     letterSpacing="normal"
     lineHeight="condensed"
     size="small"
+    wrap="normal"
   />
   <div
     className="rating-footer"

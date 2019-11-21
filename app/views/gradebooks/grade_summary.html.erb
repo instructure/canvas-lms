@@ -18,7 +18,6 @@
 <%
   provide :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
 %>
-<% load_grade_summary_data %>
 <%
   whatif_instructions = t("You can view your grades based on What-If scores so that you know how grades will be affected by upcoming or resubmitted assignments. You can test scores for an assignment that already includes a score, or an assignment that has yet to be graded.")
 
@@ -334,7 +333,6 @@
                 url = '#'
                 anchor_title = t('Similarity score -- more information')
                 alt_text = t('See Turnitin results')
-                tooltip_text = t('See Turnitin results')
 
                 if can_do(submission, @current_user, :view_turnitin_report)
                   turnitin = assignment_presenter.turnitin
@@ -343,9 +341,8 @@
                   elsif assignment_presenter.originality_report? && turnitin
                     asset_string = assignment_presenter.file&.asset_string || assignment_presenter.submission&.asset_string
                     url = polymorphic_url([@context, assignment, submission, :originality_report], asset_string: asset_string)
-                    anchor_title = t('Originality Report')
-                    alt_text = t('Originality Report')
-                    tooltip_text = t('Originality Report')
+                    anchor_title = turnitin[:error_message] ? turnitin[:error_message] : t('Originality Report')
+                    alt_text = turnitin[:error_message] ? turnitin[:error_message] : t('Originality Report')
                   elsif assignment_presenter.is_online_upload? && assignment_presenter.file
                     asset_string = assignment_presenter.file.asset_string
                     url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @presenter.student_id, asset_string)
@@ -353,11 +350,8 @@
                 end
               %>
               <% if url && url != '#' %>
-                <a class="tooltip" title="<%= anchor_title %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank">
+                <a title="<%= anchor_title %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank" data-tooltip="left">
                   <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png", :alt => alt_text) : image_tag("blank.png", :alt => '') %>
-                  <span class="tooltip_wrap right">
-                    <span class="tooltip_text"><%= tooltip_text %></span>
-                  </span>
                 </a>
               <% end %>
             <% end %>

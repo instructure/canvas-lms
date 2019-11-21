@@ -8,6 +8,7 @@ exports[`FileBrowser renders 1`] = `
     as="span"
     letterSpacing="normal"
     size="medium"
+    wrap="normal"
   >
     Available folders
   </Text>
@@ -40,8 +41,8 @@ exports[`FileBrowser renders 1`] = `
     <Spinner
       as="div"
       className="file-browser__loading"
+      renderTitle="Loading folders"
       size="small"
-      title="Loading folders"
       variant="default"
     />
   </div>

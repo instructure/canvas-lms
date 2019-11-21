@@ -42,6 +42,7 @@ exports[`The Comments component renders a placeholder when no assessment provide
     letterSpacing="normal"
     size="x-small"
     weight="normal"
+    wrap="normal"
   >
     This area will be used by the assessor to leave comments related to this criterion.
   </Text>

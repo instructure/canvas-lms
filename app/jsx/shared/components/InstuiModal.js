@@ -18,12 +18,10 @@
 
 import React from 'react'
 import {string} from 'prop-types'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!modal'
-import Modal, {ModalHeader} from '@instructure/ui-overlays/lib/components/Modal'
-
-export {ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
+import {Modal} from '@instructure/ui-overlays'
 
 /*
 ---
@@ -34,12 +32,9 @@ This is just a wrapper around the default instructure-ui Modal that:
 Use this whenever you don't want to do anything custom with your header or your close button
 
 You should be able to use it exactly like you'd use an instUi Modal by changing:
-import Modal, {ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
+import {Modal} from '@instructure/ui-overlays'
 to
-import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
-
-eg:
-import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
+import Modal from '../shared/components/InstuiModal'
 
 <Modal
   open={this.state.open}
@@ -47,13 +42,13 @@ import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
   label="this will be shown as the header of the modal and read to screenreaders as the label"
 >
   <form onSubmit={this.handleFormSubmit}
-    <ModalBody>
+    <Modal.Body>
       content of the modal goes here, notice you don't need to do anything for the close button.
-    </ModalBody>
-    <ModalFooter>
+    </Modal.Body>
+    <Modal.Footer>
       <Button onClick={functionToHandleModalDismissal}>Close</Button>&nbsp;
       <Button type="submit" variant="primary">Submit</Button>
-    </ModalFooter>
+    </Modal.Footer>
   </form>
 </Modal>
 
@@ -77,16 +72,18 @@ export default function CanvasInstUIModal({
       label={label}
       onDismiss={onDismiss}
     >
-      <ModalHeader>
+      <Modal.Header>
         <CloseButton placement="end" offset="medium" onClick={onDismiss}>
           {closeButtonLabel || I18n.t('Close')}
         </CloseButton>
         <Heading>{label}</Heading>
-      </ModalHeader>
+      </Modal.Header>
       {children}
     </Modal>
   )
 }
+
+;['Header', 'Body', 'Footer'].forEach(prop => (CanvasInstUIModal[prop] = Modal[prop]))
 
 CanvasInstUIModal.propTypes = {
   ...Modal.propTypes,

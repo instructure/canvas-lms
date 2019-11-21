@@ -130,6 +130,10 @@ shared_examples 'announcements_page_v2' do
   include GroupsCommon
   include SharedExamplesCommon
 
+  before(:each) do
+    stub_rcs_config
+  end
+
   it "should display the announcement button" do
     get announcements_page
     expect(f('#add_announcement')).to be_displayed
@@ -161,7 +165,6 @@ shared_examples 'announcements_page_v2' do
 
     fj('[role="tabpanel"] button:contains("Announcements")').click
     wait_for_ajaximations
-    skip('figure out why when you expand any of the accordions in the rcs sidbar, it doesnt show anything CORE-2714')
     expect(fln('Group Announcement')).to be_displayed
     expect(f("#content")).not_to contain_link('Course Announcement')
   end
@@ -193,6 +196,10 @@ shared_examples 'pages_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
+  before(:each) do
+    stub_rcs_config
+  end
+
   it "should load pages index and display all pages", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273610, teacher: 324927) do
     @testgroup.first.wiki_pages.create!(title: "Page 1", user: @teacher)
     @testgroup.first.wiki_pages.create!(title: "Page 2", user: @teacher)
@@ -212,7 +219,6 @@ shared_examples 'pages_page' do |context|
     wait_for_ajaximations
     fj('button:contains("Pages")').click
     wait_for_ajaximations
-    skip('figure out why when you expand any of the accordions in the rcs sidbar, it doesnt show anything CORE-2714')
     expect(fln(group_page.title.to_s)).to be_displayed
     expect(f("#content")).not_to contain_link(course_page.title.to_s)
   end
@@ -248,6 +254,10 @@ shared_examples 'discussions_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
+  before(:each) do
+    stub_rcs_config
+  end
+
   it "should only list in-group discussions in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930), ignore_js_errors: true do
     # create group and course announcements
     group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
@@ -259,7 +269,6 @@ shared_examples 'discussions_page' do |context|
     expect_new_page_load { f('#add_discussion').click }
     expect(f('#editor_tabs')).to be_displayed
     fj('button:contains("Discussions")').click
-    skip('figure out why when you expand any of the accordions in the rcs sidbar, it doesnt show anything CORE-2714')
     wait_for_ajaximations
     expect(fln(group_dt.title.to_s)).to be_displayed
     expect(f("#content")).not_to contain_link(course_dt.title.to_s)

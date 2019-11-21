@@ -187,7 +187,7 @@ actions.developerKeysModalOpen = (type = 'api') => {
 
 actions.DEVELOPER_KEYS_MODAL_CLOSE = 'DEVELOPER_KEYS_MODAL_CLOSE'
 actions.developerKeysModalClose = () => {
-  window.location.hash = ""
+  window.location.hash = ''
   return {type: actions.DEVELOPER_KEYS_MODAL_CLOSE}
 }
 
@@ -199,8 +199,8 @@ actions.setBindingWorkflowStateSuccessful = () => ({
   type: actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL
 })
 
-actions.SET_BINDING_WORKFLOW_STATE_FAILED = 'SET_BINDING_WORKFLOW_STATE_FAILED';
-actions.setBindingWorkflowStateFailed = () => ({ type: actions.SET_BINDING_WORKFLOW_STATE_FAILED });
+actions.SET_BINDING_WORKFLOW_STATE_FAILED = 'SET_BINDING_WORKFLOW_STATE_FAILED'
+actions.setBindingWorkflowStateFailed = () => ({type: actions.SET_BINDING_WORKFLOW_STATE_FAILED})
 
 actions.LIST_DEVELOPER_KEY_SCOPES_FAILED = 'LIST_DEVELOPER_KEY_SCOPES_FAILED'
 actions.listDeveloperKeyScopesFailed = () => ({type: actions.LIST_DEVELOPER_KEY_SCOPES_FAILED})
@@ -218,7 +218,10 @@ actions.LIST_DEVELOPER_KEY_SCOPES_FAILED = 'LIST_DEVELOPER_KEY_SCOPES_FAILED'
 actions.listDeveloperKeyScopesFailed = () => ({type: actions.LIST_DEVELOPER_KEY_SCOPES_FAILED})
 
 actions.LIST_DEVELOPER_KEY_SCOPES_SET = 'LIST_DEVELOPER_KEY_SCOPES_SET'
-actions.listDeveloperKeyScopesSet = selectedScopes => ({type: actions.LIST_DEVELOPER_KEY_SCOPES_SET, payload: selectedScopes})
+actions.listDeveloperKeyScopesSet = selectedScopes => ({
+  type: actions.LIST_DEVELOPER_KEY_SCOPES_SET,
+  payload: selectedScopes
+})
 
 actions.listDeveloperKeyScopes = accountId => dispatch => {
   dispatch(actions.listDeveloperKeyScopesStart())
@@ -307,30 +310,40 @@ actions.getDeveloperKeys = (url, newSearch) => (dispatch, _getState) => {
     `${url}?${inherited}`,
     dispatch,
     actions.listInheritedDeveloperKeysSuccessful,
-    actions.listInheritedDeveloperKeysFailed,
-  );
-};
+    actions.listInheritedDeveloperKeysFailed
+  )
+}
 
-function retrieveRemainingDevKeys(url, developerKeysPassedIn, dispatch, retrieve, success, failure, callback) {
-  return axios.get(url)
-    .then((response) => {
-      const { next } = parseLinkHeader(response.headers.link);
-      const developerKeys = developerKeysPassedIn.concat(response.data);
+function retrieveRemainingDevKeys(
+  url,
+  developerKeysPassedIn,
+  dispatch,
+  retrieve,
+  success,
+  failure,
+  callback
+) {
+  return axios
+    .get(url)
+    .then(response => {
+      const {next} = parseLinkHeader(response.headers.link)
+      const developerKeys = developerKeysPassedIn.concat(response.data)
       if (next) {
-        dispatch(retrieve(next, developerKeys, callback));
-      }
-      else {
-        const payload = { next, developerKeys };
-        dispatch(success(payload));
-        if (callback) { callback(payload.developerKeys) }
+        dispatch(retrieve(next, developerKeys, callback))
+      } else {
+        const payload = {next, developerKeys}
+        dispatch(success(payload))
+        if (callback) {
+          callback(payload.developerKeys)
+        }
         return payload
       }
     })
     .catch(err => dispatch(failure(err)))
 }
 
-actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn, callback) => (dispatch) => {
-  dispatch(actions.listDeveloperKeysStart());
+actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn, callback) => dispatch => {
+  dispatch(actions.listDeveloperKeysStart())
 
   return retrieveRemainingDevKeys(
     url,
@@ -343,8 +356,8 @@ actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn, callback) => (d
   )
 }
 
-actions.getRemainingInheritedDeveloperKeys = (url, developerKeysPassedIn, callback) => (dispatch) => {
-  dispatch(actions.listInheritedDeveloperKeysStart());
+actions.getRemainingInheritedDeveloperKeys = (url, developerKeysPassedIn, callback) => dispatch => {
+  dispatch(actions.listInheritedDeveloperKeysStart())
 
   return retrieveRemainingDevKeys(
     `${url}?${inherited}`,
@@ -417,12 +430,13 @@ actions.makeVisibleDeveloperKey = developerKey => (dispatch, _getState) => {
     .catch(err => dispatch(actions.makeVisibleDeveloperKeyFailed(err)))
 }
 
-actions.deleteDeveloperKey = (developerKey) => (dispatch) => {
-  dispatch(actions.deleteDeveloperKeyStart());
+actions.deleteDeveloperKey = developerKey => dispatch => {
+  dispatch(actions.deleteDeveloperKeyStart())
 
   const url = `/api/v1/developer_keys/${developerKey.id}`
-  return axios.delete(url)
-    .then((response) => {
+  return axios
+    .delete(url)
+    .then(response => {
       dispatch(actions.listDeveloperKeysDelete(response.data))
       dispatch(actions.deleteDeveloperKeySuccessful())
     })

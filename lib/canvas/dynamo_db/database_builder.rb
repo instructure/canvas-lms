@@ -72,7 +72,7 @@ module Canvas
       end
 
       def self.configs(environment = default_environment)
-        YAML.load(Canvas::DynamicSettings.find(tree: :private)['dynamodb.yml'] || '{}').with_indifferent_access
+        ConfigFile.load('dynamodb', environment) || {}
       end
 
       def self.categories

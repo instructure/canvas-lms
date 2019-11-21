@@ -23,7 +23,7 @@ module Gradezilla
 
     def self.tab(label:)
       # only works if not currently active
-      ff('[data-cid="Tab"][role="presentation"]').find do |el|
+      ff('[role="tab"]').find do |el|
         el.text == label
       end
     end

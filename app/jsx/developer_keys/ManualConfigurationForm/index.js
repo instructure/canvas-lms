@@ -20,14 +20,14 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import get from 'lodash/get'
 
-import View from '@instructure/ui-layout/lib/components/View'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import {View} from '@instructure/ui-layout'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import RequiredValues from './RequiredValues'
 import Services from './Services'
-import AdditionalSettings from './AdditionalSettings';
-import Placements from './Placements';
+import AdditionalSettings from './AdditionalSettings'
+import Placements from './Placements'
 
 export default class ManualConfigurationForm extends React.Component {
   state = {
@@ -40,43 +40,45 @@ export default class ManualConfigurationForm extends React.Component {
       scopes: this.servicesRef.generateToolConfigurationPart(),
       ...this.additionalRef.generateToolConfigurationPart()
     }
-    toolConfig.extensions[0].settings.placements = this.placementsRef.generateToolConfigurationPart();
+    toolConfig.extensions[0].settings.placements = this.placementsRef.generateToolConfigurationPart()
     return toolConfig
   }
 
   valid = () => {
     this.setState({showMessages: true})
-    return this.requiredRef.valid()
-      && this.servicesRef.valid()
-      && this.additionalRef.valid()
-      && this.placementsRef.valid()
+    return (
+      this.requiredRef.valid() &&
+      this.servicesRef.valid() &&
+      this.additionalRef.valid() &&
+      this.placementsRef.valid()
+    )
   }
 
-  setRequiredRef = node => this.requiredRef = node;
+  setRequiredRef = node => (this.requiredRef = node)
 
-  setServicesRef = node => this.servicesRef = node;
+  setServicesRef = node => (this.servicesRef = node)
 
-  setAdditionalRef = node => this.additionalRef = node;
+  setAdditionalRef = node => (this.additionalRef = node)
 
-  setPlacementsRef = node => this.placementsRef = node;
+  setPlacementsRef = node => (this.placementsRef = node)
 
   additionalSettings = () => {
-    const { toolConfiguration } = this.props
+    const {toolConfiguration} = this.props
     return get(toolConfiguration, ['extensions', '0'])
   }
 
   customFields = () => {
-    const { toolConfiguration } = this.props
+    const {toolConfiguration} = this.props
     return get(toolConfiguration, ['custom_fields'])
   }
 
   placements = () => {
-    const { toolConfiguration } = this.props
+    const {toolConfiguration} = this.props
     return get(toolConfiguration, ['extensions', '0', 'settings', 'placements'])
   }
 
   render() {
-    const { toolConfiguration, validScopes, validPlacements } = this.props;
+    const {toolConfiguration, validScopes, validPlacements} = this.props
 
     return (
       <View>
@@ -84,10 +86,26 @@ export default class ManualConfigurationForm extends React.Component {
           description={<ScreenReaderContent>{I18n.t('Manual Configuration')}</ScreenReaderContent>}
           layout="stacked"
         >
-          <RequiredValues ref={this.setRequiredRef} toolConfiguration={toolConfiguration} showMessages={this.state.showMessages} />
-          <Services ref={this.setServicesRef} validScopes={validScopes} scopes={toolConfiguration.scopes} />
-          <AdditionalSettings ref={this.setAdditionalRef}  additionalSettings={this.additionalSettings()} custom_fields={this.customFields()} />
-          <Placements ref={this.setPlacementsRef}  validPlacements={validPlacements} placements={this.placements()} />
+          <RequiredValues
+            ref={this.setRequiredRef}
+            toolConfiguration={toolConfiguration}
+            showMessages={this.state.showMessages}
+          />
+          <Services
+            ref={this.setServicesRef}
+            validScopes={validScopes}
+            scopes={toolConfiguration.scopes}
+          />
+          <AdditionalSettings
+            ref={this.setAdditionalRef}
+            additionalSettings={this.additionalSettings()}
+            custom_fields={this.customFields()}
+          />
+          <Placements
+            ref={this.setPlacementsRef}
+            validPlacements={validPlacements}
+            placements={this.placements()}
+          />
         </FormFieldGroup>
       </View>
     )

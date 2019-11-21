@@ -87,18 +87,14 @@ export default class Lti2Iframe extends React.Component {
       if (message.subject === 'lti.lti2Registration') {
         this.props.handleInstall(message, event)
       }
-    } catch(_error) {
+    } catch (_error) {
       // Something else posted the message.
     }
   }
 
   render() {
-    const beforeAlertStyles = `before_external_content_info_alert ${
-      this.state.beforeExternalContentAlertClass
-    }`
-    const afterAlertStyles = `after_external_content_info_alert ${
-      this.state.afterExternalContentAlertClass
-    }`
+    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
 
     return (
       <div id="lti2-iframe-container" style={this.props.hideComponent ? {display: 'none'} : {}}>
@@ -125,6 +121,7 @@ export default class Lti2Iframe extends React.Component {
             ref={e => {
               this.iframe = e
             }}
+            data-lti-launch="true"
           />
           <div
             onFocus={this.handleAlertFocus}

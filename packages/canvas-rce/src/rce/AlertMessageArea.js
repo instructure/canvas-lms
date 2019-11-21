@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { Alert }  from '@instructure/ui-alerts'
+import {Alert} from '@instructure/ui-alerts'
 import React from 'react'
-import { arrayOf, func, number, shape, string } from 'prop-types'
+import {arrayOf, func, number, shape, string} from 'prop-types'
 
 /**
  * Shows messages that have been provided to it in the RCE
  */
-export default function AlertMessageArea({ messages, afterDismiss, liveRegion }) {
+export default function AlertMessageArea({messages, afterDismiss, liveRegion}) {
   return (
     <div>
       {messages.map(message => (
@@ -41,11 +41,13 @@ export default function AlertMessageArea({ messages, afterDismiss, liveRegion })
 }
 
 AlertMessageArea.propTypes = {
-  messages: arrayOf(shape({
-    id: number,
-    variant: string,
-    text: string,
-  })).isRequired,
+  messages: arrayOf(
+    shape({
+      id: number,
+      variant: string,
+      text: string
+    })
+  ).isRequired,
   afterDismiss: func,
   liveRegion: func.isRequired
 }

@@ -199,6 +199,10 @@ class MediaObject < ActiveRecord::Base
     self.title
   end
 
+  def guaranteed_title
+    self.user_entered_title.presence || self.title.presence || I18n.t("Untitled")
+  end
+
   def process_retrieved_details(entry, media_type, assets)
     if entry
       self.title = self.title.presence || entry[:name]

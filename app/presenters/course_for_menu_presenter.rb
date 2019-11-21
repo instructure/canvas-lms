@@ -40,6 +40,7 @@ class CourseForMenuPresenter
       subtitle: subtitle,
       enrollmentType: course.primary_enrollment_type,
       id: course.id,
+      isFavorited: course.favorite_for_user?(@user) && @user.account.feature_enabled?(:unfavorite_course_from_dashboard),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
       position: @user.dashboard_positions[course.asset_string] || nil,
     }.tap do |hash|

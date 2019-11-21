@@ -33,11 +33,17 @@ class RubricAssociationsController < ApplicationController
   # @argument rubric_association[association_type] ["Assignment"|"Course"|"Account"]
   #   The type of object this rubric is associated with
   # @argument rubric_association[title] [String]
+  #   The name of the object this rubric is associated with
   # @argument rubric_association[use_for_grading] [Boolean]
+  #   Whether or not the associated rubric is used for grade calculation
   # @argument rubric_association[hide_score_total] [Boolean]
-  # @argument rubric_association[purpose] [String]
-  # @argument rubric_association[url] [String]
+  #   Whether or not the score total is displayed within the rubric.
+  #   This option is only available if the rubric is not used for grading.
+  # @argument rubric_association[purpose] ["grading"|"bookmark"]
+  #   Whether or not the association is for grading (and thus linked to an assignment)
+  #   or if it's to indicate the rubric should appear in its context
   # @argument rubric_association[bookmarked] [Boolean]
+  #   Whether or not the associated rubric appears in its context
   #
   # @returns RubricAssociation
   def create
@@ -57,11 +63,17 @@ class RubricAssociationsController < ApplicationController
   # @argument rubric_association[association_type] ["Assignment"|"Course"|"Account"]
   #   The type of object this rubric is associated with
   # @argument rubric_association[title] [String]
+  #   The name of the object this rubric is associated with
   # @argument rubric_association[use_for_grading] [Boolean]
+  #   Whether or not the associated rubric is used for grade calculation
   # @argument rubric_association[hide_score_total] [Boolean]
-  # @argument rubric_association[purpose] [String]
-  # @argument rubric_association[url] [String]
+  #   Whether or not the score total is displayed within the rubric.
+  #   This option is only available if the rubric is not used for grading.
+  # @argument rubric_association[purpose] ["grading"|"bookmark"]
+  #   Whether or not the association is for grading (and thus linked to an assignment)
+  #   or if it's to indicate the rubric should appear in its context
   # @argument rubric_association[bookmarked] [Boolean]
+  #   Whether or not the associated rubric appears in its context
   #
   # @returns RubricAssociation
   def update

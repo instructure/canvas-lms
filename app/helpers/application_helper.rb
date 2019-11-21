@@ -23,14 +23,22 @@ module ApplicationHelper
   include LocaleSelection
   include Canvas::LockExplanation
 
+  def context_user_name_display(user)
+    name = user.try(:short_name) || user.try(:name)
+    if user.try(:pronouns)
+      "#{name} (#{user.pronouns})"
+    else
+      name
+    end
+  end
+
   def context_user_name(context, user)
     return nil unless user
-    return user.short_name if !context && user.respond_to?(:short_name)
-    user_id = user
-    user_id = user.id if user.is_a?(User) || user.is_a?(OpenObject)
+    return context_user_name_display(user) if user.respond_to?(:short_name)
+
+    user_id = user.is_a?(OpenObject) ? user.id : user
     Rails.cache.fetch(['context_user_name', context, user_id].cache_key, {:expires_in=>15.minutes}) do
-      user = user.respond_to?(:short_name) ? user : User.find(user_id)
-      user.short_name || user.name
+      context_user_name_display(User.find(user_id))
     end
   end
 
@@ -170,9 +178,23 @@ module ApplicationHelper
     (use_optimized_js? ? '/dist/webpack-production' : '/dist/webpack-dev').freeze
   end
 
+  def load_scripts_async_in_order(script_urls)
+    # this is how you execute scripts in order, in a way that doesn’t block rendering,
+    # and without having to use 'defer' to wait until the whole DOM is loaded.
+    # see: https://www.html5rocks.com/en/tutorials/speed/script-loading/
+    javascript_tag "
+      ;#{script_urls.map{ |url| javascript_path(url)}}.forEach(function(src) {
+        var s = document.createElement('script')
+        s.src = src
+        s.async = false
+        document.head.appendChild(s)
+      });"
+  end
+
   # puts the "main" webpack entry and the moment & timezone files in the <head> of the document
   def include_head_js
     paths = []
+    paths << active_brand_config_url('js')
     # We preemptive load these timezone/locale data files so they are ready
     # by the time our app-code runs and so webpack doesn't need to know how to load them
     paths << "/timezone/#{js_env[:TIMEZONE]}.js" if js_env[:TIMEZONE]
@@ -197,7 +219,8 @@ module ApplicationHelper
       paths.each { |url| concat preload_link_tag(javascript_path(url)) }
       chunk_urls.each { |url| concat preload_link_tag(url) }
 
-      concat javascript_include_tag(*(paths + chunk_urls), defer: true)
+
+      concat load_scripts_async_in_order(paths + chunk_urls)
       concat include_js_bundles
     end
   end
@@ -233,8 +256,12 @@ module ApplicationHelper
   end
 
   def include_css_bundles
-    unless css_bundles.empty?
-      bundles = css_bundles.map do |(bundle,plugin)|
+    @rendered_css_bundles ||= []
+    new_css_bundles = css_bundles - @rendered_css_bundles
+    @rendered_css_bundles += new_css_bundles
+
+    unless new_css_bundles.empty?
+      bundles = new_css_bundles.map do |(bundle,plugin)|
         css_url_for(bundle, plugin)
       end
       bundles << css_url_for("disable_transitions") if disable_css_transitions?
@@ -247,20 +274,16 @@ module ApplicationHelper
     Rails.env.test? && ENV.fetch("DISABLE_CSS_TRANSITIONS", "1") == "1"
   end
 
-  def use_rtl?
-    I18n.rtl? || @current_user.try(:feature_enabled?, :force_rtl)
-  end
-
   # this is exactly the same as our sass helper with the same name
   # see: https://www.npmjs.com/package/sass-direction
   def direction(left_or_right)
-    use_rtl? ? {'left' => 'right', 'right' => 'left'}[left_or_right] : left_or_right
+    I18n.rtl? ? {'left' => 'right', 'right' => 'left'}[left_or_right] : left_or_right
   end
 
   def css_variant(opts = {})
     variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
     use_high_contrast = @current_user && @current_user.prefers_high_contrast? || opts[:force_high_contrast]
-    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') + (use_rtl? ? '_rtl' : '')
+    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') + (I18n.rtl? ? '_rtl' : '')
   end
 
   def css_url_for(bundle_name, plugin=false, opts = {})
@@ -342,8 +365,8 @@ module ApplicationHelper
       !@body_class_no_headers &&
       @current_user &&
       @context.is_a?(Course) &&
-      embedded_chat_enabled &&
-      external_tool_tab_visible('chat')
+      external_tool_tab_visible('chat') &&
+      embedded_chat_enabled
   end
 
   def active_external_tool_by_id(tool_id)
@@ -369,9 +392,10 @@ module ApplicationHelper
   end
 
   def external_tool_tab_visible(tool_id)
+    return false unless available_section_tabs.any?{|tc| tc[:external]} # if the course has no external tool tabs, we know it won't have a chat one so we can bail early before querying the db/redis for it
     tool = active_external_tool_by_id(tool_id)
     return false unless tool
-    @context.tabs_available(@current_user).find {|tc| tc[:id] == tool.asset_string}.present?
+    available_section_tabs.find {|tc| tc[:id] == tool.asset_string}.present?
   end
 
   def license_help_link
@@ -440,13 +464,23 @@ module ApplicationHelper
 
   def inst_env
     global_inst_object = { :environment =>  Rails.env }
+
+    # TODO: get these kaltura settings out of the global INST object completely.
+    # Only load them when trying to record a video
+    if @context.try_rescue(:allow_media_comments?) || controller_name == 'conversations'
+      kalturaConfig = CanvasKaltura::ClientV3.config
+      if kalturaConfig
+        global_inst_object[:allowMediaComments] = true
+        global_inst_object[:kalturaSettings] = kalturaConfig.try(:slice,
+          'domain', 'resource_domain', 'rtmp_domain',
+          'partner_id', 'subpartner_id', 'player_ui_conf',
+          'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
+          'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'
+        )
+      end
+    end
+
     {
-      :allowMediaComments       => CanvasKaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => CanvasKaltura::ClientV3.config.try(:slice,
-                                    'domain', 'resource_domain', 'rtmp_domain',
-                                    'partner_id', 'subpartner_id', 'player_ui_conf',
-                                    'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
-                                    'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'),
       :equellaEnabled           => !!equella_enabled?,
       :disableGooglePreviews    => !service_enabled?(:google_docs_previews),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
@@ -702,7 +736,9 @@ module ApplicationHelper
     end
 
     if includes.present?
-      javascript_include_tag(*includes, defer: true)
+      # Loading them like this puts them in the same queue as our script tags we load in
+      # include_head_js. We need that because we need them to load _after_ our jquery loads.
+      load_scripts_async_in_order(includes)
     end
   end
 

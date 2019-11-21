@@ -21,8 +21,8 @@ import _ from 'underscore'
 import template from 'jst/conversations/message'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {Checkbox} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 export default class MessageView extends View {
   initialize(...args) {
@@ -64,7 +64,8 @@ export default class MessageView extends View {
     if (
       (e && e.target.className.match(/star|read-state/)) ||
       this.$selectCheckbox[0].contains(e.target)
-    ) return
+    )
+      return
 
     if (e.shiftKey) return this.model.collection.selectRange(this.model)
 
@@ -97,8 +98,8 @@ export default class MessageView extends View {
         ? I18n.t('Starred "%{subject}", Click to unstar.', {subject})
         : I18n.t('Starred "(No Subject)", Click to unstar.')
       : subject
-        ? I18n.t('Not starred "%{subject}", Click to star.', {subject})
-        : I18n.t('Not starred "(No Subject)", Click to star.')
+      ? I18n.t('Not starred "%{subject}", Click to star.', {subject})
+      : I18n.t('Not starred "(No Subject)", Click to star.')
     this.$starBtnScreenReaderMessage.text(text)
   }
 
@@ -159,11 +160,11 @@ Object.assign(MessageView.prototype, {
     '.select-checkbox': '$selectCheckbox'
   },
   events: {
-    'click': 'onSelect',
+    click: 'onSelect',
     'click .open-message': 'onSelect',
     'click .star-btn': 'toggleStar',
     'click .read-state': 'toggleRead',
-    'mousedown': 'onMouseDown'
+    mousedown: 'onMouseDown'
   },
   messages: {
     read: I18n.t('Mark as read'),

@@ -18,8 +18,8 @@
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Table from '@instructure/ui-elements/lib/components/Table'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Table} from '@instructure/ui-elements'
 
 import CustomizationOption from './CustomizationOption'
 
@@ -85,5 +85,5 @@ CustomizationTable.propTypes = {
 }
 
 CustomizationTable.defaultProps = {
-  messageTypeFor: () => ('')
+  messageTypeFor: () => ''
 }

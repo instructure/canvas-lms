@@ -27,7 +27,6 @@ import 'jqueryui/draggable'
 import 'jqueryui/droppable'
 
 export default class GroupUsersView extends PaginatedCollectionView {
-
   static initClass() {
     this.prototype.defaults = {
       ...PaginatedCollectionView.prototype.defaults,
@@ -223,7 +222,7 @@ export default class GroupUsersView extends PaginatedCollectionView {
 
   // enable draggable on the child GroupUserView (view)
   _initDrag(view) {
-    view.$el.draggable(Object.assign({}, this.dragOptions))
+    view.$el.draggable({...this.dragOptions})
     return view.$el.on('dragstart', (event, ui) => {
       ui.helper.css('width', view.$el.width())
       $(event.target).draggable('option', 'containment', 'document')

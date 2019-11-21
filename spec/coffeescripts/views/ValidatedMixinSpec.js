@@ -33,15 +33,15 @@ QUnit.module('ValidatedMixin', {
   }
 })
 
-test('it can find tinymce instances as fields', (assert) => {
-
+test('it can find tinymce instances as fields', assert => {
   const done = assert.async()
-  tinymce.init({
-    selector: '#fixtures textarea#a42',
-    }).then(() => {
+  tinymce
+    .init({
+      selector: '#fixtures textarea#a42'
+    })
+    .then(() => {
       const element = ValidatedMixin.findField('message')
       equal(element.length, 1)
       done()
     })
-
 })

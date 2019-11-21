@@ -23,16 +23,20 @@ import Lti2Permissions from 'jsx/external_apps/components/Lti2Permissions'
 QUnit.module('ExternalApps.Lti2Permissions')
 
 test('renders', () => {
-  ok(mount(<Lti2Permissions
-    tool={{
-      app_id: 3,
-      app_type: 'Lti::ToolProxy',
-      description: null,
-      enabled: false,
-      installed_locally: true,
-      name: 'Twitter'
-    }}
-    handleCancelLti2={() => {}}
-    handleActivateLti2={() => {}}
-  />).exists())
+  ok(
+    mount(
+      <Lti2Permissions
+        tool={{
+          app_id: 3,
+          app_type: 'Lti::ToolProxy',
+          description: null,
+          enabled: false,
+          installed_locally: true,
+          name: 'Twitter'
+        }}
+        handleCancelLti2={() => {}}
+        handleActivateLti2={() => {}}
+      />
+    ).exists()
+  )
 })

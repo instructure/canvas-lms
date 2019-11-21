@@ -39,15 +39,15 @@ describe('EmbedPanel', () => {
     const handleChange = jest.fn()
     const {getByPlaceholderText} = render(
       <EmbedPanel
-        embedCode="the best value of the embed"
+        embedCode="the value of the embed"
         label="embed label"
         setEmbedCode={handleChange}
       />
     )
     const textArea = getByPlaceholderText('embed label')
-    fireEvent.change(textArea, {target: {value: 'TEST VALUE'}})
+    fireEvent.change(textArea, {target: {value: 'a better value'}})
 
     expect(handleChange).toHaveBeenCalledTimes(1)
-    expect(handleChange.mock.calls[0][0]).toBe('TEST VALUE')
+    expect(handleChange.mock.calls[0][0]).toBe('a better value')
   })
 })

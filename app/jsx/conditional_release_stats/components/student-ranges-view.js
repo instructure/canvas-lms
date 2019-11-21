@@ -18,81 +18,76 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
-import View from '@instructure/ui-layout/lib/components/View'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import IconMiniArrowDown from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import IconMiniArrowEnd from '@instructure/ui-icons/lib/Solid/IconMiniArrowEnd'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {View} from '@instructure/ui-layout'
+import {IconMiniArrowDownSolid, IconMiniArrowEndSolid} from '@instructure/ui-icons'
 import classNames from 'classnames'
 import I18n from 'i18n!cyoe_assignment_sidebar_student_ranges_view'
 import {transformScore} from '../../shared/conditional_release/score'
-import { assignmentShape, studentShape } from '../shapes/index'
+import {assignmentShape, studentShape} from '../shapes/index'
 import StudentRange from './student-range'
 
-const { array, func, object } = PropTypes
+const {array, func, object} = PropTypes
 
 export default class StudentRangesView extends React.Component {
-    static propTypes = {
-      assignment: assignmentShape.isRequired,
-      ranges: array.isRequired,
-      selectedPath: object.isRequired,
-      student: studentShape,
+  static propTypes = {
+    assignment: assignmentShape.isRequired,
+    ranges: array.isRequired,
+    selectedPath: object.isRequired,
+    student: studentShape,
 
-      // actions
-      selectStudent: func.isRequired
-    }
-
-    constructor (props) {
-      super()
-      this.state = {selectedRange: props.selectedPath.range}
-    }
-
-    handleToggle = (i) => {
-      this.setState({selectedRange: i})
-    }
-
-    renderTabs () {
-      return this.props.ranges.map((range, i) => {
-        const expanded = this.state.selectedRange === i
-        const lower = transformScore(range.scoring_range.lower_bound, this.props.assignment, false)
-        const upper = transformScore(range.scoring_range.upper_bound, this.props.assignment, true)
-        const rangeTitle = `> ${lower} - ${upper}`
-        return (
-          <View as='div' padding='xxx-small'>
-            <ToggleDetails
-              variant='filled'
-              key={i}
-              expanded={expanded}
-              summary={rangeTitle}
-              onToggle={() => this.handleToggle(i)}
-              size='large'
-              iconExpanded={IconMiniArrowDown}
-              icon={IconMiniArrowEnd}
-            >
-              <StudentRange
-                range={range}
-                onStudentSelect={this.props.selectStudent}
-               />
-            </ToggleDetails>
-          </View>
-        )
-      })
-    }
-
-    render () {
-      const isHidden = !!this.props.student
-
-      const classes = classNames({
-        'crs-ranges-view': true,
-        'crs-ranges-view__hidden': isHidden,
-      })
-      return (
-        <div className={classes}>
-          <header className='crs-ranges-view__header'>
-            <h4>{I18n.t('Mastery Paths Breakdown')}</h4>
-          </header>
-            {this.renderTabs()}
-        </div>
-      )
-    }
+    // actions
+    selectStudent: func.isRequired
   }
+
+  constructor(props) {
+    super()
+    this.state = {selectedRange: props.selectedPath.range}
+  }
+
+  handleToggle = i => {
+    this.setState({selectedRange: i})
+  }
+
+  renderTabs() {
+    return this.props.ranges.map((range, i) => {
+      const expanded = this.state.selectedRange === i
+      const lower = transformScore(range.scoring_range.lower_bound, this.props.assignment, false)
+      const upper = transformScore(range.scoring_range.upper_bound, this.props.assignment, true)
+      const rangeTitle = `> ${lower} - ${upper}`
+      return (
+        <View as="div" padding="xxx-small">
+          <ToggleDetails
+            variant="filled"
+            key={i}
+            expanded={expanded}
+            summary={rangeTitle}
+            onToggle={() => this.handleToggle(i)}
+            size="large"
+            iconExpanded={IconMiniArrowDownSolid}
+            icon={IconMiniArrowEndSolid}
+          >
+            <StudentRange range={range} onStudentSelect={this.props.selectStudent} />
+          </ToggleDetails>
+        </View>
+      )
+    })
+  }
+
+  render() {
+    const isHidden = !!this.props.student
+
+    const classes = classNames({
+      'crs-ranges-view': true,
+      'crs-ranges-view__hidden': isHidden
+    })
+    return (
+      <div className={classes}>
+        <header className="crs-ranges-view__header">
+          <h4>{I18n.t('Mastery Paths Breakdown')}</h4>
+        </header>
+        {this.renderTabs()}
+      </div>
+    )
+  }
+}

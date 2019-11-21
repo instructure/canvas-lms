@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
-import {arrayOf, bool, func, shape} from 'prop-types'
-import {Flex} from '@instructure/ui-layout'
+import React, {useEffect, useRef} from 'react'
+import {arrayOf, bool, func, objectOf, shape, string} from 'prop-types'
+import {fileShape} from '../../shared/fileShape'
+import {Flex, View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
 
 import {
   LoadMoreButton,
@@ -26,12 +28,13 @@ import {
   LoadingStatus,
   useIncrementalLoading
 } from '../../../../common/incremental-loading'
-import Image from '../ImageList/Image'
 import ImageList from '../ImageList'
+import formatMessage from '../../../../format-message'
 
 export default function Images(props) {
-  const {fetchImages, images} = props
-  const {hasMore, isLoading, records} = images
+  const {fetchInitialImages, fetchNextImages, contextType} = props
+  const images = props.images[contextType]
+  const {hasMore, isLoading, error, files} = images
   const lastItemRef = useRef(null)
 
   const loader = useIncrementalLoading({
@@ -40,21 +43,27 @@ export default function Images(props) {
     lastItemRef,
 
     onLoadInitial() {
-      fetchImages({calledFromRender: true})
+      fetchInitialImages()
     },
 
     onLoadMore() {
-      fetchImages({calledFromRender: false})
+      fetchNextImages()
     },
 
-    records
+    records: files
   })
 
+  useEffect(() => {
+    if (hasMore && !isLoading && files.length === 0) {
+      fetchInitialImages()
+    }
+  }, [contextType, files.length, hasMore, isLoading, fetchInitialImages])
+
   return (
-    <>
+    <View as="div" data-testid="instructure_links-ImagesPanel">
       <Flex alignItems="center" direction="column" justifyItems="space-between" height="100%">
         <Flex.Item overflowY="visible" width="100%">
-          <ImageList images={records} lastItemRef={lastItemRef} onImageClick={props.onImageEmbed} />
+          <ImageList images={files} lastItemRef={lastItemRef} onImageClick={props.onImageEmbed} />
         </Flex.Item>
 
         {loader.isLoading && (
@@ -71,16 +80,28 @@ export default function Images(props) {
       </Flex>
 
       <LoadingStatus loader={loader} />
-    </>
+
+      {error && (
+        <View as="div" role="alert" margin="medium">
+          <Text color="error">{formatMessage('Loading failed.')}</Text>
+        </View>
+      )}
+    </View>
   )
 }
 
 Images.propTypes = {
-  fetchImages: func.isRequired,
-  images: shape({
-    hasMore: bool.isRequired,
-    isLoading: bool.isRequired,
-    records: arrayOf(Image.propTypes.image).isRequired
-  }),
+  fetchInitialImages: func.isRequired,
+  fetchNextImages: func.isRequired,
+  contextType: string.isRequired,
+  images: objectOf(
+    shape({
+      files: arrayOf(shape(fileShape)).isRequired,
+      bookmark: string,
+      hasMore: bool.isRequired,
+      isLoading: bool.isRequired,
+      error: string
+    })
+  ).isRequired,
   onImageEmbed: func.isRequired
 }

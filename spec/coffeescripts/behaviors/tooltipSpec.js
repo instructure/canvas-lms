@@ -41,4 +41,3 @@ test('can be compelled to abandon collision detection', () => {
   tooltip.setPosition(opts)
   equal(opts.position.collision, 'none')
 })
-

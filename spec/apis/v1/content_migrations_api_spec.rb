@@ -345,6 +345,17 @@ describe ContentMigrationsController, type: :request do
       expect(migration.job_progress).to be_nil
     end
 
+    it "should queue a course copy with immediate select" do
+      assignment = @course.assignments.create! title: 'test'
+      json = api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer', :select => {:assignments => [assignment.to_param]}, :settings => {:source_course_id => @course.to_param}})
+      expect(json["workflow_state"]).to eq 'running'
+      migration = ContentMigration.find json['id']
+      expect(migration.workflow_state).to eq "exporting"
+      expect(migration.job_progress).not_to be_nil
+      key = CC::CCHelper.create_key(assignment, global: true)
+      expect(migration.copy_options).to eq({'assignments' => {key => '1'}})
+    end
+
     it "should queue for course copy on concluded courses" do
       source_course = Course.create(name: 'source course')
       source_course.enroll_teacher(@user)
@@ -730,6 +741,32 @@ describe ContentMigrationsController, type: :request do
       prev_export.update_attribute(:global_identifiers, false)
       json = api_call(:get, @migration_url + '?type=discussion_topics', @params.merge({type: 'discussion_topics'}))
       key = CC::CCHelper.create_key(@dt1, global: false)
+      expect(json.first["migration_id"]).to eq key
+      expect(json.first["property"]).to include key
+    end
+  end
+
+  describe 'content selection cross-shard' do
+    specs_require_sharding
+
+    it "should actually return local identifiers created from the correct shard if needed" do
+      @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/selective_data"
+      @params = {:controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'content_list', :id => @migration.id.to_param}
+
+      @shard1.activate do
+        account = Account.create!
+        @cs_course = Course.create!(:account => account)
+        @dt1 = @cs_course.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      end
+      @migration.migration_type = 'course_copy_importer'
+      @migration.migration_settings[:source_course_id] = @cs_course.id
+      @migration.source_course = @cs_course
+      @migration.save!
+
+      prev_export = @cs_course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      prev_export.update_attribute(:global_identifiers, false)
+      json = api_call(:get, @migration_url + '?type=discussion_topics', @params.merge({type: 'discussion_topics'}))
+      key = @shard1.activate { CC::CCHelper.create_key(@dt1, global: false) }
       expect(json.first["migration_id"]).to eq key
       expect(json.first["property"]).to include key
     end

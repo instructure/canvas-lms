@@ -19,39 +19,42 @@
 import $ from 'jquery'
 import I18n from 'i18n!user_grades'
 import './jquery.ajaxJSON'
-  $(document).ready(function() {
-    $(".grading_periods_selector").each(function () {
-      var $selector = $(this),
-          selectedOption = $selector.find('option:selected').val();
-      $selector.val(selectedOption);
-    });
 
-    $('.grading_periods_selector').on('change', function(e) {
-      var selector = $(this),
-          gradingPeriodId = selector.val(),
-          enrollmentId = selector.attr('data-enrollment-id');
+$(document).ready(function() {
+  $('.grading_periods_selector').each(function() {
+    const $selector = $(this),
+      selectedOption = $selector.find('option:selected').val()
+    $selector.val(selectedOption)
+  })
 
-      $.ajaxJSON(
-        ENV.grades_for_student_url,
-        'GET',
-        {
-          grading_period_id: gradingPeriodId,
-          enrollment_id: enrollmentId
-        },
-        totals => {
-          var $percentDisplay = $(this).closest('tr').children('.percent'),
-              gradeToShow;
+  $('.grading_periods_selector').on('change', function(e) {
+    const selector = $(this),
+      gradingPeriodId = selector.val(),
+      enrollmentId = selector.attr('data-enrollment-id')
 
-          if (totals.hide_final_grades) {
-            gradeToShow = '--';
-          } else if (totals.grade || totals.grade === 0) {
-            gradeToShow = totals.grade + '%';
-          } else {
-            gradeToShow = I18n.t('no grade');
-          }
+    $.ajaxJSON(
+      ENV.grades_for_student_url,
+      'GET',
+      {
+        grading_period_id: gradingPeriodId,
+        enrollment_id: enrollmentId
+      },
+      totals => {
+        let $percentDisplay = $(this)
+            .closest('tr')
+            .children('.percent'),
+          gradeToShow
 
-          $percentDisplay.text(gradeToShow);
-        });
+        if (totals.hide_final_grades) {
+          gradeToShow = '--'
+        } else if (totals.grade || totals.grade === 0) {
+          gradeToShow = totals.grade + '%'
+        } else {
+          gradeToShow = I18n.t('no grade')
+        }
 
-    });
-  });
+        $percentDisplay.text(gradeToShow)
+      }
+    )
+  })
+})

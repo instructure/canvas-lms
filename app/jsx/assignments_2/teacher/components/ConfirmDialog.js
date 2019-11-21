@@ -20,18 +20,10 @@ import React from 'react'
 import {bool, func, string, shape} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-
-import Mask from '@instructure/ui-overlays/lib/components/Mask'
-import Modal, {
-  ModalHeader,
-  ModalBody,
-  ModalFooter
-} from '@instructure/ui-overlays/lib/components/Modal'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Heading, Spinner} from '@instructure/ui-elements'
+import {Mask, Modal} from '@instructure/ui-overlays'
+import {View} from '@instructure/ui-layout'
 
 export default class ConfirmDialog extends React.Component {
   static propTypes = {
@@ -97,7 +89,7 @@ export default class ConfirmDialog extends React.Component {
 
   renderBusyMaskBody() {
     if (this.props.busyMaskBody) return this.props.busyMaskBody()
-    return <Spinner size="small" title={this.props.spinnerLabel} />
+    return <Spinner size="small" renderTitle={this.props.spinnerLabel} />
   }
 
   renderButton = (buttonProps, index) => {
@@ -119,7 +111,7 @@ export default class ConfirmDialog extends React.Component {
           open={this.props.open}
           onDismiss={this.props.onDismiss}
         >
-          <ModalHeader>
+          <Modal.Header>
             <Heading level="h2">{this.props.heading}</Heading>
             <CloseButton
               placement="end"
@@ -129,16 +121,16 @@ export default class ConfirmDialog extends React.Component {
             >
               {this.props.closeLabel}
             </CloseButton>
-          </ModalHeader>
-          <ModalBody padding="0">
+          </Modal.Header>
+          <Modal.Body padding="0">
             <div style={{position: 'relative'}}>
               <View as="div" padding="medium">
                 {this.props.body()}
                 {this.props.working ? <Mask>{this.renderBusyMaskBody()}</Mask> : null}
               </View>
             </div>
-          </ModalBody>
-          <ModalFooter>{this.props.buttons().map(this.renderButton)}</ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>{this.props.buttons().map(this.renderButton)}</Modal.Footer>
         </Modal>
       )
     )

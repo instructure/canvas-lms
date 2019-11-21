@@ -26,7 +26,7 @@ QUnit.module('ChildChangeLog component')
 
 const defaultProps = () => ({
   status: loadStates.states.not_loaded,
-  migration: getSampleData().history[0],
+  migration: getSampleData().history[0]
 })
 
 test('renders the ChildChangeLog component', () => {

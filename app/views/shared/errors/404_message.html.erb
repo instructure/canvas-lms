@@ -23,12 +23,19 @@
     end
   end
   exception ||= nil
-  add_body_class 'full-width'
 %>
-<% provide :page_title, t('title', 'Page Not Found') %>
+<% content_for :page_title, t('title', 'Page Not Found') %>
+
+<%
+
+js_bundle :not_found_index
+css_bundle :not_found_index
+
+%>
+<div>
+  <div id="not_found_root"></div>
 
 <div class="ic-Error-page">
-  <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/404_notfound.svg">
   <h1><%= t('headings.page', %{Page Not Found}) %></h1>
   <% if @not_found_message %>
     <p><%= @not_found_message %></p>
@@ -36,4 +43,5 @@
   <% if send_broken_content! %>
     <p><%= I18n.t("We've let your instructor know to review this link as soon as possible.") %></p>
   <% end %>
+</div>
 </div>

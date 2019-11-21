@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../lti2_course_spec_helper.rb')
+require 'sharding_spec_helper'
+require 'lti2_course_spec_helper'
 
 require 'csv'
 require 'socket'
@@ -4020,6 +4020,17 @@ describe Course, 'tabs_available' do
     expect(settings).to include(:hidden=>false)
   end
 
+  it 'hides tabs for feature flagged external tools' do
+    tool = analytics_2_tool_factory
+
+    tabs = @course.external_tool_tabs({}, User.new)
+    expect(tabs.map{|t| t[:id]}).not_to include(tool.asset_string)
+
+    @course.enable_feature!(:analytics_2)
+    tabs = @course.external_tool_tabs({}, User.new)
+    expect(tabs.map{|t| t[:id]}).to include(tool.asset_string)
+  end
+
 end
 
 describe Course, 'scoping' do
@@ -4124,7 +4135,7 @@ describe Course, "conclusions" do
     enrollment.save!
     @course.reload
     @user.reload
-    @user.cached_current_enrollments
+    @user.cached_currentish_enrollments
 
     expect(enrollment.reload.state).to eq :active
     expect(enrollment.state_based_on_date).to eq :completed
@@ -4139,7 +4150,7 @@ describe Course, "conclusions" do
     enrollment.save!
     @course.reload
     @user.reload
-    @user.cached_current_enrollments
+    @user.cached_currentish_enrollments
     expect(enrollment.state).to eq :completed
     expect(enrollment.state_based_on_date).to eq :completed
 
@@ -4152,7 +4163,7 @@ describe Course, "conclusions" do
     @course.reload
     @course.complete!
     @user.reload
-    @user.cached_current_enrollments
+    @user.cached_currentish_enrollments
     enrollment.reload
     expect(enrollment.state).to eq :completed
     expect(enrollment.state_based_on_date).to eq :completed
@@ -5336,36 +5347,66 @@ describe Course, 'touch_root_folder_if_necessary' do
   end
 
   context "inheritable settings" do
-    before :each do
-      account_model
-      course_factory(:account => @account)
+    shared_examples 'inherited setting should inherit' do
+      before :each do
+        account_model
+        course_factory(:account => @account)
+      end
+
+      def set_value(value)
+        @course.send(:"#{setting}=", value)
+      end
+
+      def calculated_value
+        @course.send(:"#{setting}?")
+      end
+
+      it "should inherit account values by default" do
+        expect(calculated_value).to be_falsey
+
+        @account.settings[setting] = {:locked => false, :value => true}
+        @account.save!
+
+        expect(calculated_value).to be_truthy
+
+        set_value(false)
+        @course.save!
+
+        expect(calculated_value).to be_falsey
+      end
+
+      it "should be overridden by locked values from the account" do
+        @account.settings[setting] = {:locked => true, :value => true}
+        @account.save!
+
+        expect(calculated_value).to be_truthy
+
+        # explicitly setting shouldn't change anything
+        set_value(false)
+        @course.save!
+
+        expect(calculated_value).to be_truthy
+      end
     end
 
-    it "should inherit account values by default" do
-      expect(@course.restrict_student_future_view?).to be_falsey
-
-      @account.settings[:restrict_student_future_view] = {:locked => false, :value => true}
-      @account.save!
-
-      expect(@course.restrict_student_future_view?).to be_truthy
-
-      @course.restrict_student_future_view = false
-      @course.save!
-
-      expect(@course.restrict_student_future_view?).to be_falsey
+    describe "restrict_student_future_view" do
+      let(:setting) { :restrict_student_future_view }
+      include_examples 'inherited setting should inherit'
     end
 
-    it "should be overridden by locked values from the account" do
-      @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
-      @account.save!
+    describe "restrict_student_past_view" do
+      let(:setting) { :restrict_student_past_view }
+      include_examples 'inherited setting should inherit'
+    end
 
-      expect(@course.restrict_student_future_view?).to be_truthy
+    describe "lock_all_announcements" do
+      let(:setting) { :lock_all_announcements }
+      include_examples 'inherited setting should inherit'
+    end
 
-      # explicitly setting shouldn't change anything
-      @course.restrict_student_future_view = false
-      @course.save!
-
-      expect(@course.restrict_student_future_view?).to be_truthy
+    describe "usage_rights_required" do
+      let(:setting) { :usage_rights_required }
+      include_examples 'inherited setting should inherit'
     end
   end
 end

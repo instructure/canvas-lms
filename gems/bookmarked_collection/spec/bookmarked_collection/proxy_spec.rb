@@ -104,6 +104,18 @@ describe BookmarkedCollection::Proxy do
       end
     end
 
+    it "doesn't blow up when filtering everything out" do
+      bookmarker = BookmarkedCollection::SimpleBookmarker.new(@scope.klass, :id)
+      @proxy = BookmarkedCollection.wrap(bookmarker, @scope)
+      @proxy = BookmarkedCollection.filter(@proxy) do |item|
+        false
+      end
+      collection = @proxy.instance_variable_get(:@collection)
+      expect(collection).to receive(:execute_pager).exactly(2).times.and_call_original
+      pager = @proxy.paginate(per_page: 1)
+      expect(pager).to eq []
+    end
+
     context 'transforming' do
       before do
         bookmarker = BookmarkedCollection::SimpleBookmarker.new(@scope.klass, :id)

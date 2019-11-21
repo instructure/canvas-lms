@@ -21,11 +21,9 @@ import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '../../shared/components/InstuiModal'
-import store from '../../external_apps/lib/ExternalAppsStore'
+import store from '../lib/ExternalAppsStore'
 import 'compiled/jquery.rails_flash_notifications'
-import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody';
-import ModalFooter from '@instructure/ui-overlays/lib/components/Modal/ModalFooter';
-import Button from '@instructure/ui-buttons/lib/components/Button';
+import {Button} from '@instructure/ui-buttons'
 
 export default class ExternalToolPlacementButton extends React.Component {
   static propTypes = {
@@ -79,7 +77,7 @@ export default class ExternalToolPlacementButton extends React.Component {
       account_navigation: I18n.t('Account Navigation'),
       assignment_edit: I18n.t('Assignment Edit'),
       assignment_selection: I18n.t('Assignment Selection'),
-      assignment_view: I18n.t("Assignment View"),
+      assignment_view: I18n.t('Assignment View'),
       similarity_detection: I18n.t('Similarity Detection'),
       assignment_menu: I18n.t('Assignment Menu'),
       collaboration: I18n.t('Collaboration'),
@@ -95,12 +93,14 @@ export default class ExternalToolPlacementButton extends React.Component {
       link_selection: I18n.t('Link Selection'),
       migration_selection: I18n.t('Migration Selection'),
       module_menu: I18n.t('Module Menu'),
+      module_index_menu: I18n.t('Modules Index Menu'),
       post_grades: I18n.t('Sync Grades'),
       quiz_menu: I18n.t('Quiz Menu'),
       student_context_card: I18n.t('Student Context Card'),
       tool_configuration: I18n.t('Tool Configuration'),
       user_navigation: I18n.t('User Navigation'),
-      wiki_page_menu: I18n.t('Page Menu')
+      wiki_page_menu: I18n.t('Page Menu'),
+      wiki_index_menu: I18n.t('Pages Index Menu')
     }
 
     const tool = this.state.tool
@@ -125,12 +125,10 @@ export default class ExternalToolPlacementButton extends React.Component {
       onDismiss={this.closeModal}
       label={I18n.t('App Placements')}
     >
-      <ModalBody>
-        {this.placements() || I18n.t('No Placements Enabled')}
-      </ModalBody>
-      <ModalFooter>
+      <Modal.Body>{this.placements() || I18n.t('No Placements Enabled')}</Modal.Body>
+      <Modal.Footer>
         <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
-      </ModalFooter>
+      </Modal.Footer>
     </Modal>
   )
 

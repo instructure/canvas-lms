@@ -8,6 +8,12 @@ database, but a targetted set of interesting actions such as
 
 ## Development and Testing
 
+There are two components to local development:
+- the kinesis stream (which can hook into the `live-events-publish` lambda)
+- the subscription service and its UI (`live-events-subscriptions`, `live-events-lti`)
+
+### Kinesis Stream
+
 To enabled Live Events, you need to configure the plugin in the /plugins
 interface. If using the docker-compose dev setup, there is a "fake
 kinesis" available in docker-compose/kinesis.override.yml available for
@@ -15,7 +21,7 @@ use. Once it's up, make sure you have the `aws` cli installed, and run
 the following command to create a stream (with canvas running):
 
 ```bash
-AWS_ACCESS_KEY_ID=key AWS_SECRET_ACCESS_KEY=secret aws --endpoint-url http://kinesis.canvaslms.docker/ kinesis create-stream --stream-name=live-events --shard-count=1 --region=us-east-1
+AWS_ACCESS_KEY_ID=key AWS_SECRET_ACCESS_KEY=secret aws --endpoint-url http://kinesis.docker/ kinesis create-stream --stream-name=live-events --shard-count=1 --region=us-east-1
 ```
 
 Once the stream is created, configure your Canvas (by going to the /plugins url on your running Canvas) to use
@@ -41,6 +47,64 @@ You can view the stream with the `tail_kinesis` tool:
 ```bash
 docker-compose run --rm web script/tail_kinesis http://kinesis:4567 live-events
 ```
+
+#### Stubbing Kinesis
+
+Instead of viewing events in the kinesis stream, you can also add this env variable
+to your docker compose configuration: `STUB_LIVE_EVENTS_KINESIS`, with any value.
+This will redirect live events from the kinesis stream to stdout. You still have
+to configure the live events plugin for this to work.
+
+#### Connecting to local Publisher Lambda
+
+The `live-events-publish repo should be checked out and running locally.
+This contains the publisher lambda, and other infrastructure including a local
+kinesis stream. Note the url of that kinesis stream, which may look like
+`http://kinesis.live-events-publish.docker:4567`.
+
+There should already be a stream created in that container, with the name
+found in `docker-compose.yml`, in the `KINESIS_LOCAL_STREAM_NAME` environment
+variable. If that stream doesn't exist, create it with this `aws` command:
+
+```bash
+AWS_ACCESS_KEY_ID=ACCESS_KEY AWS_SECRET_ACCESS_KEY=SECRET_KEY aws --endpoint-url http://kinesis.live-events-publish.docker/ kinesis create-stream --stream-name=live-events-local-test-stream --shard-count=1 --region=us-east-1
+```
+
+Configure the Canvas plugin by following the instructions above, with these settings:
+
+| Setting Name          | Value                                     |
+| --------------------- | ----------------------------------------- |
+| Kinesis Stream Name   | live-events-local-test-stream             |
+| AWS Region            | us-east-1                                 |
+| AWS Endpoint          | http://kinesis.live-events-publish.docker |
+| AWS Access Key ID     | ACCESS_KEY                                |
+| AWS Secret Access Key | SECRET_KEY                                |
+
+Restart Canvas, and events should start flowing to the kinesis stream, and to
+the publisher lambda itself. You can view the stream and publisher lambda
+activity by looking at the output of `docker-compose up` in the `live-events-publish`
+repo.
+
+### Subscription Management
+
+#### Connecting to local Subscription Service
+
+The `live-events-subscriptions` repo should be checked out and running locally.
+This contains the subscriptions for live events, which the publisher uses when
+propagating events.
+
+To connect Canvas with the subscription service, open `config/dynamic_settings.yml`
+and make sure that the `live-events-subscription-service` prefix contains the
+proper `app-host` value, which should be the url where your local subscription
+service is running. Instructions for connecting on the subscription service side
+are found in the `live-events-subscriptions` repo, in `README.md`.
+
+#### Connecting to local Live Events LTI Tool
+
+The `live-events-lti` repo should also be checked out and running locally. This
+is an LTI tool which provides a UI for managing the subscriptions contained in
+the subscription service. Instructions for configuring this LTI tool are
+contained in the `live-events-lti` repo, in `README.md`.
 
 ## Contract Tests
 

@@ -26,6 +26,7 @@ import NeverDropCollectionView from './NeverDropCollectionView'
 import DialogFormView from '../DialogFormView'
 import template from 'jst/assignments/CreateGroup'
 import wrapper from 'jst/EmptyDialogFormWrapper'
+import {shimGetterShorthand} from '../../legacyCoffeesScriptHelpers'
 import '../../jquery.rails_flash_notifications'
 
 SHORT_HEIGHT = 250
@@ -51,12 +52,12 @@ export default class CreateGroupView extends DialogFormView
   @optionProperty 'course'
   @optionProperty 'userIsAdmin'
 
-  messages:
-    non_number: I18n.t('You must use a number')
-    positive_number: I18n.t('You must use a positive number')
-    max_number: I18n.t('You cannot use a number greater than the number of assignments')
-    no_name_error: I18n.t('A name is required')
-    name_too_long_error: I18n.t('Name is too long')
+  messages: shimGetterShorthand {},
+    non_number: -> I18n.t('You must use a number')
+    positive_number: -> I18n.t('You must use a positive number')
+    max_number: -> I18n.t('You cannot use a number greater than the number of assignments')
+    no_name_error: -> I18n.t('A name is required')
+    name_too_long_error: -> I18n.t('Name is too long')
 
   initialize: ->
     super

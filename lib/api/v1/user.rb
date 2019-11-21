@@ -44,7 +44,7 @@ module Api::V1::User
     end
   end
 
-  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment=nil)
+  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment=nil, tool_includes: [])
     includes ||= []
     excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
@@ -65,6 +65,7 @@ module Api::V1::User
                       :integration_id => pseudonym&.integration_id
         end
 
+
         if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
           json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
           json[:root_account] = HostUrl.context_host(pseudonym&.account) if include_root_account
@@ -73,6 +74,10 @@ module Api::V1::User
             json[:login_id] = pseudonym.unique_id
           end
         end
+      end
+
+      if user.pronouns
+        json[:pronouns] = user.pronouns
       end
 
       if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
@@ -85,7 +90,7 @@ module Api::V1::User
       end
       # include a permissions check here to only allow teachers and admins
       # to see user email addresses.
-      if includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_email_addresses)
+      if tool_includes.include?('email') || (includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_email_addresses))
         json[:email] = user.email
       end
 
@@ -139,7 +144,7 @@ module Api::V1::User
         json[:time_zone] = zone.name
       end
 
-      if includes.include?('lti_id')
+      if tool_includes.include?('lti_id') || includes.include?('lti_id')
         json[:lti_id] = Lti::Asset.old_id_for_user_in_context(user, context) || user.lti_context_id
       end
 
@@ -160,6 +165,11 @@ module Api::V1::User
     if includes.include?('group_ids') && !context.is_a?(Groups)
       ActiveRecord::Associations::Preloader.new.preload(context, :groups)
     end
+
+    if includes.include?('email') && !excludes.include?('personal_info') && context.grants_right?(current_user, session, :read_email_addresses)
+      ActiveRecord::Associations::Preloader.new.preload(users, :communication_channels)
+    end
+    ActiveRecord::Associations::Preloader.new.preload(users, :pseudonyms)
 
     users.map{ |user| user_json(user, current_user, session, includes, context, enrollments, excludes) }
   end
@@ -191,7 +201,8 @@ module Api::V1::User
       id: user.id,
       display_name: user.short_name,
       avatar_image_url: avatar_url_for_user(user),
-      html_url: participant_url
+      html_url: participant_url,
+      pronouns: user.pronouns
     }
     hash[:avatar_is_fallback] = user.avatar_image_url.nil? if includes.include?(:avatar_is_fallback) && avatars_enabled_for_user?(user)
     hash[:fake_student] = true if user.fake_student?
@@ -218,7 +229,7 @@ module Api::V1::User
         permissions_account = context.is_a?(Account) ? context : context.account
       end
       !!(
-        permissions_context.grants_any_right?(current_user, :manage_students, :read_sis) ||
+        permissions_context.grants_any_right?(current_user, :manage_students, :read_sis, :view_user_logins) ||
         permissions_account.membership_for_user(current_user) ||
         permissions_account.root_account.grants_right?(current_user, :manage_sis)
       )

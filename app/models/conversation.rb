@@ -321,12 +321,6 @@ class Conversation < ActiveRecord::Base
   end
 
   def preload_users_and_context_codes
-    # Bullet doesn't catch our sneaky narrow preload here, so manually notify it
-    if defined?(Bullet) && Bullet.start?
-      conversation_participants.each do |record|
-        Bullet::Detector::Association.add_object_associations(record, :user)
-      end
-    end
     users = User.where(:id => conversation_participants.map(&:user_id)).pluck(:id, :updated_at).map do |id, updated_at|
       User.send(:instantiate, 'id' => id, 'updated_at' => updated_at)
     end
@@ -675,7 +669,7 @@ class Conversation < ActiveRecord::Base
     Shard.with_each_shard(shards) do
       shackles_env = conversations.any?{|c| c.updated_at && c.updated_at > 10.seconds.ago} ? :master : :slave
       user_map = Shackles.activate(shackles_env) do
-        User.select("users.id, users.updated_at, users.short_name, users.name, users.avatar_image_url, users.avatar_image_source, last_authored_at, conversation_id").
+        User.select("users.id, users.updated_at, users.short_name, users.name, users.avatar_image_url, users.pronouns, users.avatar_image_source, last_authored_at, conversation_id").
           joins(:all_conversations).
           where(:conversation_participants => { :conversation_id => conversations }).
           order(Conversation.nulls(:last, :last_authored_at, :desc), Conversation.best_unicode_collation_key("COALESCE(short_name, name)")).

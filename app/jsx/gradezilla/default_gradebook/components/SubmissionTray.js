@@ -19,24 +19,22 @@
 import React from 'react'
 import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
 import I18n from 'i18n!gradezilla'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconSpeedGraderLine from '@instructure/ui-icons/lib/Line/IconSpeedGrader'
+import {Alert} from '@instructure/ui-alerts'
+import {Avatar, Heading, Spinner, Text} from '@instructure/ui-elements'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-layout'
+import {Tray} from '@instructure/ui-overlays'
+import {IconSpeedGraderLine} from '@instructure/ui-icons'
 import Carousel from './Carousel'
 import GradeInput from './GradeInput'
 import LatePolicyGrade from './LatePolicyGrade'
 import CommentPropTypes from '../propTypes/CommentPropTypes'
+import SimilarityScore from './SimilarityScore'
 import SubmissionCommentListItem from './SubmissionCommentListItem'
 import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
 import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
+import {extractSimilarityInfo} from '../../../grading/helpers/SubmissionHelper'
 
 function renderAvatar(name, avatarUrl) {
   return (
@@ -113,7 +111,8 @@ export default class SubmissionTray extends React.Component {
       pointsDeducted: number,
       postedAt: string.isRequired,
       secondsLate: number.isRequired,
-      assignmentId: string.isRequired
+      assignmentId: string.isRequired,
+      hasPostableComments: bool.isRequired
     }),
     isFirstAssignment: bool.isRequired,
     isLastAssignment: bool.isRequired,
@@ -142,7 +141,8 @@ export default class SubmissionTray extends React.Component {
     isInClosedGradingPeriod: bool.isRequired,
     isInNoGradingPeriod: bool.isRequired,
     isNotCountedForScore: bool.isRequired,
-    onAnonymousSpeedGraderClick: func.isRequired
+    onAnonymousSpeedGraderClick: func.isRequired,
+    showSimilarityScore: bool.isRequired
   }
 
   cancelCommenting = () => {
@@ -202,7 +202,7 @@ export default class SubmissionTray extends React.Component {
 
     return (
       <div style={{textAlign: 'center'}}>
-        <Spinner title={I18n.t('Loading comments')} size="large" />
+        <Spinner renderTitle={I18n.t('Loading comments')} size="large" />
       </div>
     )
   }
@@ -243,6 +243,31 @@ export default class SubmissionTray extends React.Component {
           </Button>
         </View>
       </View>
+    )
+  }
+
+  renderSimilarityScore() {
+    const {assignment, submission} = this.props
+    const similarityInfo = extractSimilarityInfo(submission)
+    if (assignment.anonymizeStudents || similarityInfo == null) {
+      return
+    }
+
+    const {
+      id: entryId,
+      data: {similarity_score, status}
+    } = similarityInfo.entries[0]
+    const reportType = similarityInfo.type
+    const assignmentPath = `/courses/${assignment.courseId}/assignments/${assignment.id}`
+    const reportUrl = `${assignmentPath}/submissions/${submission.userId}/${reportType}/${entryId}`
+
+    return (
+      <SimilarityScore
+        hasAdditionalData={similarityInfo.entries.length > 1}
+        reportUrl={reportUrl}
+        similarityScore={similarity_score}
+        status={status}
+      />
     )
   }
 
@@ -349,6 +374,8 @@ export default class SubmissionTray extends React.Component {
             </View>
 
             <View as="div" style={{overflowY: 'auto', flex: '1 1 auto'}}>
+              {this.props.showSimilarityScore && this.renderSimilarityScore()}
+
               <SubmissionStatus
                 assignment={this.props.assignment}
                 isConcluded={this.props.student.isConcluded}

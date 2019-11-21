@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fromImageEmbed} from '../instructure_image/ImageEmbedOptions'
+import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOptions'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -29,7 +29,6 @@ export const NONE_TYPE = 'none'
 export const DISPLAY_AS_LINK = 'link'
 export const DISPLAY_AS_EMBED = 'embed'
 export const DISPLAY_AS_EMBED_DISABLED = 'embed-disabled'
-
 
 export function asImageEmbed($element) {
   const nodeName = $element.nodeName.toLowerCase()
@@ -45,61 +44,59 @@ export function asImageEmbed($element) {
 }
 
 export function asLink($element, editor) {
-  const nodeName = $element.nodeName.toLowerCase()
-  if (nodeName !== 'a' || !$element.href) {
-    return null
-  }
-
-  if ($element.nodeName.toLowerCase() !== 'a' && editor) {
+  let $link = $element
+  if ($link.tagName !== 'A') {
     // the user may have selected some text that is w/in a link
     // but didn't include the <a>. Let's see if that's true
-    $element = editor.dom.getParent($element, 'a[href]')
+    $link = editor.dom.getParent($link, 'a[href]')
   }
-  if (!$element || $element.nodeName.toLowerCase() !== 'a' || !$element.href) {
+
+  if (!$link || $link.tagName !== 'A' || !$link.href) {
     return null
   }
 
-  const path = new URL($element.href).pathname
+  const path = new URL($link.href).pathname
   const type = FILE_DOWNLOAD_PATH_REGEX.test(path) ? FILE_LINK_TYPE : LINK_TYPE
   let displayAs = DISPLAY_AS_LINK
-  if ($element.classList.contains('auto_open')) {
+  if ($link.classList.contains('auto_open')) {
     displayAs = DISPLAY_AS_EMBED
-  } else if ($element.classList.contains('inline_disabled')) {
+  } else if ($link.classList.contains('inline_disabled')) {
     displayAs = DISPLAY_AS_EMBED_DISABLED
   }
 
   return {
-    $element,
+    $element: $link,
     displayAs,
-    text: $element.textContent,
+    text: editor.selection.getContent() || $link.textContent,
     type,
-    isPreviewable: $element.hasAttribute('data-canvas-previewable'),
-    url: $element.href
+    isPreviewable: $link.hasAttribute('data-canvas-previewable'),
+    url: $link.href
   }
 }
 
-function asVideoElement($element) {
-  if (!$element.id) {
-    return null
-  }
-
-  if ($element.childElementCount !== 1) {
-    return null
-  }
-
-  if (!$element.id.includes("media_object") ||  $element.children[0].tagName !== "IFRAME") {
+// the video element is a bit tricky.
+// tinymce won't let me add many attributes to the iframe,
+// even though I've listed them in tinymce.config.js
+// extended_valid_elements.
+// we have to rely on the span tinymce wraps around the iframe
+// and it's attributes, even though this could change with future
+// tinymce releases.
+// see https://github.com/tinymce/tinymce/issues/5181
+export function asVideoElement($element) {
+  if (!isVideoElement($element)) {
     return null
   }
 
   return {
+    ...fromVideoEmbed($element),
     $element,
     type: VIDEO_EMBED_TYPE,
-    id: $element.id.split("_")[2]
+    id: $element.getAttribute('data-mce-p-data-media-id')
   }
 }
 
 function asText($element, editor) {
-  const text = editor && editor.selection.getNode().textContent
+  const text = editor && editor.selection.getContent({format: 'text'})
   if (!text) {
     return null
   }
@@ -123,7 +120,12 @@ export function getContentFromElement($element, editor) {
     return asNone()
   }
 
-  const content = asLink($element, editor) || asImageEmbed($element) || asVideoElement($element) || asText($element, editor) || asNone($element)
+  const content =
+    asLink($element, editor) ||
+    asImageEmbed($element) ||
+    asVideoElement($element) ||
+    asText($element, editor) ||
+    asNone($element)
   return content
 }
 
@@ -146,6 +148,13 @@ export function getContentFromEditor(editor, expandSelection = false) {
   return getContentFromElement($element, editor)
 }
 
+// if the selection is somewhere w/in a <a>,
+// find the <a> and return it's info
+export function getLinkContentFromEditor(editor) {
+  const $element = editor.selection.getNode()
+  return $element ? asLink($element, editor) : null
+}
+
 export function isFileLink($element, editor) {
   return !!asLink($element, editor)
 }
@@ -155,5 +164,25 @@ export function isImageEmbed($element) {
 }
 
 export function isVideoElement($element) {
-  return !!asVideoElement($element)
+  // the video is hosted in an iframe, but tinymce
+  // wraps it in a span with swizzled attribute names
+  if (!$element.getAttribute) {
+    return false
+  }
+
+  if ($element.firstElementChild?.tagName !== 'IFRAME') {
+    return false
+  }
+
+  const media_obj_id = $element.getAttribute('data-mce-p-data-media-id')
+  if (!media_obj_id) {
+    return false
+  }
+
+  const media_type = $element.getAttribute('data-mce-p-data-media-type')
+  if (media_type !== 'video') {
+    return false
+  }
+
+  return true
 }

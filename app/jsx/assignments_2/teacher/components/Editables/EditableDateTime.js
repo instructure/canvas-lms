@@ -20,15 +20,15 @@ import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
-import {toLocaleString} from '@instructure/ui-i18n/lib/DateTime'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import DateTimeInput from '@instructure/ui-forms/lib/components/DateTimeInput'
-import IconCalendarMonth from '@instructure/ui-icons/lib/Line/IconCalendarMonth'
+import {DateTime} from '@instructure/ui-i18n'
+import {Button} from '@instructure/ui-buttons'
+import {DateTimeInput} from '@instructure/ui-forms'
+import {IconCalendarMonthLine} from '@instructure/ui-icons'
 import {Editable} from '@instructure/ui-editable'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {FocusableView} from '@instructure/ui-focusable'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
 
 export default class EditableDateTime extends React.Component {
   static propTypes = {
@@ -157,7 +157,7 @@ export default class EditableDateTime extends React.Component {
     if (readOnly || mode === 'view') {
       if (this.props.value) {
         const dt = this.props.value
-          ? toLocaleString(
+          ? DateTime.toLocaleString(
               this.props.value,
               this.props.locale,
               this.props.timeZone,
@@ -217,7 +217,7 @@ export default class EditableDateTime extends React.Component {
           size="small"
           variant="icon"
           margin="0 0 0 x-small"
-          icon={IconCalendarMonth}
+          icon={IconCalendarMonthLine}
           onClick={onClick}
           onFocus={this.delayedHandler(onFocus)}
           onBlur={onBlur}
@@ -249,11 +249,13 @@ export default class EditableDateTime extends React.Component {
         {...containerProps}
       >
         <Flex inline direction="row" justifyItems="space-between" width="100%">
-          <FlexItem grow shrink>
+          <Flex.Item grow shrink>
             {this.renderEditor(getEditorProps())}
             {this.renderViewer(getViewerProps())}
-          </FlexItem>
-          <FlexItem margin="0 0 0 xx-small">{this.renderEditButton(getEditButtonProps())}</FlexItem>
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 xx-small">
+            {this.renderEditButton(getEditButtonProps())}
+          </Flex.Item>
         </Flex>
       </View>
     )

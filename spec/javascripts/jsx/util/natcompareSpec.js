@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import natcompare from 'compiled/util/natcompare';
+import natcompare from 'compiled/util/natcompare'
 
 const valuesToSort = [
-  { id: 1, name: 'john, john' },
-  { id: 2, name: 'abel' },
-  { id: 3, name: 'John, John' },
-  { id: 4, name: 'abel' },
-  { id: 5, name: 'johnson, john' },
-  { id: 6, name: 'âbel' },
-  { id: 7, name: 'Abel' },
-  { id: 8, name: 'joh, jonny' },
-  { id: 9, name: 'joh  jonny' },
-];
+  {id: 1, name: 'john, john'},
+  {id: 2, name: 'abel'},
+  {id: 3, name: 'John, John'},
+  {id: 4, name: 'abel'},
+  {id: 5, name: 'johnson, john'},
+  {id: 6, name: 'âbel'},
+  {id: 7, name: 'Abel'},
+  {id: 8, name: 'joh, jonny'},
+  {id: 9, name: 'joh  jonny'}
+]
 
-QUnit.module('sorts values properly when used to compare strings');
+QUnit.module('sorts values properly when used to compare strings')
 
 test('puts remaining words in the right order since there are no collisions possible', () => {
   const expectedSortedStrings = [
@@ -43,8 +43,8 @@ test('puts remaining words in the right order since there are no collisions poss
     'john, john',
     'John, John',
     'johnson, john'
-  ];
-  const sortedValueNames = valuesToSort.sort(natcompare.byKey('name')).map(item => item.name);
+  ]
+  const sortedValueNames = valuesToSort.sort(natcompare.byKey('name')).map(item => item.name)
 
-  deepEqual(sortedValueNames, expectedSortedStrings);
-});
+  deepEqual(sortedValueNames, expectedSortedStrings)
+})

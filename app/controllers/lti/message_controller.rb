@@ -196,6 +196,8 @@ module Lti
         message.add_custom_params(ToolSetting.custom_settings(tool_proxy.id, @context, message.resource_link_id))
         @lti_launch.params = launch_params(tool_proxy: tool_proxy, message: message, private_key: tool_proxy.shared_secret)
 
+        log_asset_access(tool_proxy, "external_tools", "external_tools")
+
         render Lti::AppUtil.display_template(display_override: params[:display]) and return
       end
     end

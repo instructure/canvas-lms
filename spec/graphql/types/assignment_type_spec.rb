@@ -70,15 +70,9 @@ describe Types::AssignmentType do
   end
 
   it "works with rubric" do
-    rubric = Rubric.create!(title: 'hi', context: course)
-    assignment.build_rubric_association(:rubric => rubric,
-                                         :purpose => 'grading',
-                                         :use_for_grading => true,
-                                         :context => course)
-    assignment.rubric_association.save!
-    expect(assignment_type.resolve("rubric { _id }")).to eq rubric.id.to_s
-    expect(assignment_type.resolve("rubric { freeFormCriterionComments }")).to eq assignment.rubric.free_form_criterion_comments
-    expect(assignment_type.resolve("rubric { freeFormCriterionComments }")).to eq rubric.free_form_criterion_comments
+    rubric_for_course
+    rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: 'grading')
+    expect(assignment_type.resolve("rubric { _id }")).to eq @rubric.id.to_s
   end
 
   it "works with moderated grading" do
@@ -277,7 +271,7 @@ describe Types::AssignmentType do
         section1_student = section1.enroll_user(User.create!, "StudentEnrollment", "active").user
         section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
         @section1_student_submission = assignment.submit_homework(section1_student, body: "hello world")
-        assignment.submit_homework(section2_student, body: "hello universe")
+        @section2_student_submission = assignment.submit_homework(section2_student, body: "hello universe")
       end
 
       it "returns submissions only for the given section" do
@@ -287,6 +281,18 @@ describe Types::AssignmentType do
           }
         GQL
         expect(section1_submission_ids.map(&:to_i)).to contain_exactly(@section1_student_submission.id)
+      end
+
+      it "respects visibility for limited teachers" do
+        teacher.enrollments.first.update! course_section: section2,
+          limit_privileges_to_course_section: true
+
+        submissions =  assignment_type.resolve(<<~GQL, current_user: teacher)
+          submissionsConnection { nodes { _id } }
+        GQL
+
+        expect(submissions).not_to include @section1_student_submission.id.to_s
+        expect(submissions).to include @section2_student_submission.id.to_s
       end
     end
   end

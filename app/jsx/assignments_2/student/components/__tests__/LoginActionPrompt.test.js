@@ -17,22 +17,24 @@
  */
 import React from 'react'
 import LoginActionPrompt from '../LoginActionPrompt'
-import {mockAssignment} from '../../test-utils'
+import {mockAssignment} from '../../mocks'
 import {render, waitForElement, fireEvent} from '@testing-library/react'
 
 describe('LoginActionPrompt', () => {
   it('renders component locked and feedback text labels correctly', async () => {
-    const {getByText} = render(<LoginActionPrompt assignment={mockAssignment()} />)
+    const assignment = await mockAssignment()
+    const {getByText} = render(<LoginActionPrompt assignment={assignment} />)
     expect(await waitForElement(() => getByText('Submission Locked'))).toBeInTheDocument()
     expect(await waitForElement(() => getByText('Log in to submit'))).toBeInTheDocument()
   })
 
-  it('login button redirects towards login page', () => {
+  it('login button redirects towards login page', async () => {
     delete window.location
     window.location = {assign: jest.fn()}
 
-    const {getByText} = render(<LoginActionPrompt assignment={mockAssignment()} />)
+    const assignment = await mockAssignment()
+    const {getByText} = render(<LoginActionPrompt assignment={assignment} />)
     fireEvent.click(getByText('Log in'))
-    expect(window.location.assign).toBeCalledWith('/login')
+    expect(window.location.assign).toHaveBeenCalledWith('/login')
   })
 })

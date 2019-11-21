@@ -16,111 +16,241 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, func, shape, string} from 'prop-types'
 import axios from 'axios'
-import errorShipUrl from '../../../../SVG/ErrorShip.svg'
+import BreadcrumbLinkWithTip from './BreadcrumbLinkWithTip'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
+import FileSelectTable from './FileSelectTable'
 import GenericErrorPage from '../../../../../../shared/components/GenericErrorPage/index'
-import I18n from 'i18n!assignments_2'
+import I18n from 'i18n!assignments_2_MoreOptions_CanvasFiles'
+import LoadingIndicator from '../../../../../shared/LoadingIndicator'
 import parseLinkHeader from '../../../../../../shared/parseLinkHeader'
 import React from 'react'
 
-import TreeBrowser from '@instructure/ui-tree-browser/lib/components/TreeBrowser'
+import {Breadcrumb} from '@instructure/ui-breadcrumb'
+import {Flex} from '@instructure/ui-layout'
 
 class CanvasFiles extends React.Component {
   state = {
-    collections: {0: {collections: []}},
-    error: null
+    loadedFolders: {'0': {id: '0', name: I18n.t('Root'), subFileIDs: [], subFolderIDs: []}},
+    loadedFiles: {},
+    error: null,
+    pendingAPIRequests: 0,
+    selectedFolderID: '0'
   }
+
+  FILE_TYPE = 'files'
+
+  FOLDER_TYPE = 'folders'
+
+  ROOT_FOLDER_ID = '0'
 
   _isMounted = false
 
   componentDidMount() {
     this._isMounted = true
-    this.getUserRootFolders()
+    this.loadUserRootFolders()
   }
 
   componentWillUnmount() {
     this._isMounted = false
   }
 
-  getUserRootFolders = () => {
-    const opts = {Accept: 'application/json+canvas-string-ids'}
-    // update user folders
-    this.updateFolders('/api/v1/users/self/folders/root', opts)
-
-    // update course folders
-    this.updateFolders(`/api/v1/courses/${this.props.courseID}/folders/root`, opts)
-
-    // update group folders
-    this.props.userGroups.forEach(group => {
-      this.updateFolders(`/api/v1/groups/${group._id}/folders/root`, {...opts, name: group.name})
-    })
+  folderContentApiUrl = (folderID, type) => {
+    return `/api/v1/folders/${folderID}/${type}?include=user`
   }
 
-  folderFileApiUrl = folderID => {
-    return `/api/v1/folders/${folderID}/folders`
+  folderContentsLoaded = (folderID, type) => {
+    const folder = this.state.loadedFolders[folderID]
+    return type === this.FILE_TYPE
+      ? folder && folder.subFileIDs && folder.subFileIDs.length
+      : folder && folder.subFolderIDs && folder.subFolderIDs.length
   }
 
-  formatFolderData = (folder, opts) => {
-    return {
-      id: folder.id,
-      collections: [],
-      items: [],
-      name: opts.name ? opts.name : folder.name,
-      context: `/${folder.context_type.toLowerCase()}s/${folder.context_id}`,
-      locked: folder.locked_for_user,
-      descriptor: folder.locked_for_user ? I18n.t('Locked') : null
+  handleUpdateSelectedFolder = folderID => {
+    if (folderID !== this.ROOT_FOLDER_ID) {
+      if (!this.folderContentsLoaded(folderID, this.FILE_TYPE)) {
+        this.loadFolderContents(folderID, this.FILE_TYPE)
+      }
+      if (!this.folderContentsLoaded(folderID, this.FOLDER_TYPE)) {
+        this.loadFolderContents(folderID, this.FOLDER_TYPE)
+      }
+    }
+    if (this._isMounted) {
+      this.setState({selectedFolderID: folderID}, () => {
+        // we are guaranteed to always have a folder in the selection, so we will either focus
+        // on the parent folder, or the first rendered folder in the root
+        const newFocus =
+          document.getElementById('parent-folder') ||
+          document.getElementById(
+            `folder-${this.state.loadedFolders[this.state.selectedFolderID].subFolderIDs[0]}`
+          )
+        newFocus.focus()
+      })
     }
   }
 
-  updateFolders = async (url, opts = {}) => {
+  loadUserRootFolders = () => {
+    if (!this.folderContentsLoaded(this.ROOT_FOLDER_ID, this.FOLDER_TYPE)) {
+      const opts = {Accepts: 'application/json+canvas-string-ids'}
+      // load user folders
+      this.loadFolderContents(
+        this.ROOT_FOLDER_ID,
+        this.FOLDER_TYPE,
+        '/api/v1/users/self/folders/root',
+        opts
+      )
+
+      // load course folders
+      this.loadFolderContents(
+        this.ROOT_FOLDER_ID,
+        this.FOLDER_TYPE,
+        `/api/v1/courses/${this.props.courseID}/folders/root`,
+        opts
+      )
+
+      // load group folders
+      this.props.userGroups.forEach(group => {
+        this.loadFolderContents(
+          this.ROOT_FOLDER_ID,
+          this.FOLDER_TYPE,
+          `/api/v1/groups/${group._id}/folders/root`,
+          {...opts, group_name: group.name}
+        )
+      })
+    }
+  }
+
+  loadFolderContents = async (folderID, type, url, opts = {}) => {
     try {
-      const resp = await axios.get(url, opts)
-      const folders = Array.isArray(resp.data) ? resp.data : [resp.data]
-      this.updateCollectionsList(folders, opts)
+      if (this._isMounted) {
+        this.setState(prevState => ({pendingAPIRequests: prevState.pendingAPIRequests + 1}))
+      }
+      const requestUrl = url || this.folderContentApiUrl(folderID, type)
+      const resp = await axios.get(requestUrl, opts)
+      const newItems = Array.isArray(resp.data) ? resp.data : [resp.data]
+      if (opts.group_name) {
+        newItems.forEach(item => (item.name = opts.group_name))
+      }
+      this.updateLoadedItems(type, newItems)
 
       const nextUrl = parseLinkHeader(resp.headers.link).next
       if (nextUrl) {
-        this.updateFolders(nextUrl)
+        this.loadFolderContents(folderID, type, nextUrl, opts)
       }
-
-      folders.forEach(folder => {
-        if (folder.folders_count > 0) {
-          this.updateFolders(this.folderFileApiUrl(folder.id, 'folders'))
-        }
-      })
     } catch (err) {
       if (this._isMounted) {
         this.setState({error: err})
       }
+    } finally {
+      if (this._isMounted) {
+        this.setState(prevState => ({pendingAPIRequests: prevState.pendingAPIRequests - 1}))
+      }
     }
   }
 
-  updateCollectionsList = (folders, opts) => {
+  updateLoadedItems = (type, newItems) => {
+    if (type === this.FILE_TYPE) {
+      this.updateLoadedFiles(newItems)
+    } else {
+      this.updateLoadedFolders(newItems)
+    }
+  }
+
+  formatFolderData = folder => {
+    return {
+      ...folder,
+      subFolderIDs: [],
+      subFileIDs: []
+    }
+  }
+
+  updateLoadedFolders = newFolders => {
     if (this._isMounted) {
       this.setState(prevState => {
-        const newCollections = JSON.parse(JSON.stringify(prevState.collections))
-        folders.forEach(folder => {
-          const collection = this.formatFolderData(folder, opts)
-          const parent_id = folder.parent_folder_id || 0
+        const loadedFolders = JSON.parse(JSON.stringify(prevState.loadedFolders))
+        newFolders.forEach(folder => {
+          folder = this.formatFolderData(folder)
+          folder.parent_folder_id = folder.parent_folder_id || 0
 
-          // get or create parent collection object
-          const parent = newCollections.hasOwnProperty(parent_id)
-            ? newCollections[parent_id]
-            : {collections: []}
-          if (!parent.collections.includes(collection.id)) {
-            parent.collections.push(collection.id)
-            newCollections[parent_id] = {...newCollections[parent_id], ...parent}
+          const parent = loadedFolders.hasOwnProperty(folder.parent_folder_id)
+            ? loadedFolders[folder.parent_folder_id]
+            : {subFileIDs: [], subFolderIDs: []}
+          if (!parent.subFolderIDs.includes(folder.id)) {
+            parent.subFolderIDs.push(folder.id)
+            loadedFolders[folder.parent_folder_id] = {
+              ...loadedFolders[folder.parent_folder_id],
+              ...parent
+            }
           }
 
-          if (newCollections[collection.id]) {
-            collection.collections = newCollections[collection.id].collections
+          if (loadedFolders[folder.id]) {
+            folder.subFolderIDs = loadedFolders[folder.id].subFolderIDs
           }
-          newCollections[collection.id] = collection
+          loadedFolders[folder.id] = folder
         })
-        return {collections: newCollections}
+        return {loadedFolders}
       })
     }
+  }
+
+  updateLoadedFiles = newFiles => {
+    if (this._isMounted) {
+      this.setState(prevState => {
+        const loadedFolders = JSON.parse(JSON.stringify(prevState.loadedFolders))
+        const loadedFiles = JSON.parse(JSON.stringify(prevState.loadedFiles))
+        newFiles.forEach(file => {
+          const parentID = file.folder_id || 0
+
+          const parent = loadedFolders.hasOwnProperty(parentID)
+            ? loadedFolders[parentID]
+            : {subFileIDs: [], subFolderIDs: []}
+          if (!parent.subFileIDs.includes(file.id)) {
+            parent.subFileIDs.push(file.id)
+            loadedFolders[parentID] = {...loadedFolders[parentID], ...parent}
+          }
+
+          loadedFiles[file.id] = file
+        })
+        return {loadedFolders, loadedFiles}
+      })
+    }
+  }
+
+  renderFolderPathBreadcrumb = () => {
+    const path = []
+    let folder = this.state.loadedFolders[this.state.selectedFolderID]
+    while (folder) {
+      path.unshift({id: folder.id, name: folder.name})
+      folder = this.state.loadedFolders[folder.parent_folder_id]
+    }
+
+    return (
+      <Flex.Item padding="medium xx-small xx-small xx-small">
+        <Breadcrumb label={I18n.t('current folder path')}>
+          {path.map((currentFolder, i) => {
+            // special case to make the last folder in the path (i.e. the current folder)
+            // not a link
+            if (i === path.length - 1) {
+              return (
+                <BreadcrumbLinkWithTip key={currentFolder.id} tip={currentFolder.name}>
+                  {currentFolder.name}
+                </BreadcrumbLinkWithTip>
+              )
+            }
+            return (
+              <BreadcrumbLinkWithTip
+                key={currentFolder.id}
+                tip={currentFolder.name}
+                onClick={() => this.handleUpdateSelectedFolder(currentFolder.id)}
+              >
+                {currentFolder.name}
+              </BreadcrumbLinkWithTip>
+            )
+          })}
+        </Breadcrumb>
+      </Flex.Item>
+    )
   }
 
   render() {
@@ -133,21 +263,32 @@ class CanvasFiles extends React.Component {
         />
       )
     }
+
     return (
-      <TreeBrowser
-        rootId={0}
-        showRootCollection={false}
-        collections={this.state.collections}
-        items={{}}
-        size="small"
-        variant="indent"
-      />
+      <Flex direction="column" data-testid="more-options-file-select">
+        {this.renderFolderPathBreadcrumb()}
+        <Flex.Item>
+          <FileSelectTable
+            folders={this.state.loadedFolders}
+            files={this.state.loadedFiles}
+            selectedFolderID={this.state.selectedFolderID}
+            handleCanvasFileSelect={this.props.handleCanvasFileSelect}
+            handleFolderSelect={this.handleUpdateSelectedFolder}
+          />
+        </Flex.Item>
+        {this.state.pendingAPIRequests && (
+          <Flex.Item>
+            <LoadingIndicator />
+          </Flex.Item>
+        )}
+      </Flex>
     )
   }
 }
 
 CanvasFiles.propTypes = {
   courseID: string.isRequired,
+  handleCanvasFileSelect: func.isRequired,
   userGroups: arrayOf(
     shape({
       _id: string,

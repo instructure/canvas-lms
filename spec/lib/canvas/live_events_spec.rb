@@ -256,6 +256,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change', hash_including({
         submission_id: @quiz_submission.submission.global_id.to_s,
         assignment_id: @quiz_submission.submission.global_assignment_id.to_s,
+        assignment_name: @quiz_submission.submission.assignment.name,
         grader_id: nil,
         student_id: @quiz_submission.user.global_id.to_s,
         user_id: @quiz_submission.user.global_id.to_s
@@ -271,6 +272,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change', hash_including(
         submission_id: submission.global_id.to_s,
         assignment_id: submission.global_assignment_id.to_s,
+        assignment_name: submission.assignment.name,
         grader_id: @teacher.global_id.to_s,
         student_id: @student.global_id.to_s,
         user_id: @student.global_id.to_s
@@ -289,6 +291,7 @@ describe Canvas::LiveEvents do
       expect_event('grade_change',
         hash_including({
           assignment_id: submission.global_assignment_id.to_s,
+          assignment_name: submission.assignment.name,
           user_id: @student.global_id.to_s,
           student_id: @student.global_id.to_s,
           student_sis_id: nil
@@ -565,7 +568,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }.compact!).once
+      }.compact!, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access(@course, 'category', 'role', 'participation')
     end
@@ -581,7 +584,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }).once
+      }, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation')
     end
@@ -597,7 +600,7 @@ describe Canvas::LiveEvents do
         category: 'category',
         role: 'role',
         level: 'participation'
-      }).once
+      }, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access(@page, 'category', 'role', 'participation')
     end
@@ -615,9 +618,34 @@ describe Canvas::LiveEvents do
         level: 'participation',
         filename: @attachment.filename,
         display_name: @attachment.display_name
-      }.compact!).once
+      }.compact!, {compact_live_events: true}).once
 
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation')
+    end
+
+    it "should provide a different context if a different context is provided" do
+      attachment_model
+      context = OpenStruct.new(global_id: '1')
+
+      expect_event('asset_accessed', {
+        asset_name: "unknown.loser",
+        asset_type: 'attachment',
+        asset_id: @attachment.global_id.to_s,
+        asset_subtype: nil,
+        category: 'files',
+        role: 'role',
+        level: 'participation',
+        filename: @attachment.filename,
+        display_name: @attachment.display_name
+      }.compact!,
+      {
+        compact_live_events: true,
+        context_type: context.class.to_s,
+        context_id: '1'
+      }
+      ).once
+
+      Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation', context: context)
     end
   end
 
@@ -845,12 +873,13 @@ describe Canvas::LiveEvents do
     it 'triggers a live event with user details' do
       user_with_pseudonym
 
-      session = { return_to: 'http://www.canvaslms.com/' }
+      session = { return_to: 'http://www.canvaslms.com/', session_id: SecureRandom.uuid }
       context = {
         user_id: @user.global_id.to_s,
         user_login: @pseudonym.unique_id,
         user_account_id: @pseudonym.global_account_id.to_s,
-        user_sis_id: @pseudonym.sis_user_id
+        user_sis_id: @pseudonym.sis_user_id,
+        session_id: session[:session_id]
       }
 
       expect_event(
@@ -1122,7 +1151,7 @@ describe Canvas::LiveEvents do
       it 'should include result in created live event' do
         expect_event('learning_outcome_result_created', {
           learning_outcome_id: result.learning_outcome_id.to_s,
-          mastery: result.learning_outcome_id,
+          mastery: result.mastery,
           score: result.score,
           created_at: result.created_at,
           attempt: result.attempt,
@@ -1144,7 +1173,7 @@ describe Canvas::LiveEvents do
         result.update!(attempt: 1)
         expect_event('learning_outcome_result_updated', {
           learning_outcome_id: result.learning_outcome_id.to_s,
-          mastery: result.learning_outcome_id,
+          mastery: result.mastery,
           score: result.score,
           created_at: result.created_at,
           updated_at: result.updated_at,
@@ -1160,6 +1189,214 @@ describe Canvas::LiveEvents do
 
         Canvas::LiveEvents.learning_outcome_result_updated(result)
       end
+    end
+  end
+
+  describe 'user' do
+    context 'created' do
+      it 'should trigger a user_created live event' do
+        user_with_pseudonym
+
+        expect_event('user_created', {
+          user_id: @user.global_id.to_s,
+          uuid: @user.uuid,
+          name: @user.name,
+          short_name: @user.short_name,
+          workflow_state: @user.workflow_state,
+          created_at: @user.created_at,
+          updated_at: @user.updated_at,
+          user_login: @pseudonym&.unique_id,
+          user_sis_id: @pseudonym&.sis_user_id
+        }.compact!).once
+
+        Canvas::LiveEvents.user_created(@user)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger a user_updated live event' do
+        user_with_pseudonym
+
+        @user.update!(name: "Test Name")
+
+        expect_event('user_updated', {
+          user_id: @user.global_id.to_s,
+          uuid: @user.uuid,
+          name: @user.name,
+          short_name: @user.short_name,
+          workflow_state: @user.workflow_state,
+          created_at: @user.created_at,
+          updated_at: @user.updated_at,
+          user_login: @pseudonym&.unique_id,
+          user_sis_id: @pseudonym&.sis_user_id
+        }.compact!).once
+
+        Canvas::LiveEvents.user_updated(@user)
+      end
+    end
+  end
+
+  describe 'learning_outcomes' do
+    before do
+      @context = course_model
+    end
+
+    context 'created' do
+      it 'should trigger a learning_outcome_created live event' do
+        outcome_model
+
+        expect_event('learning_outcome_created', {
+          learning_outcome_id: @outcome.id.to_s,
+          context_type: @outcome.context_type,
+          context_id: @outcome.context_id.to_s,
+          display_name: @outcome.display_name,
+          short_description: @outcome.short_description,
+          description: @outcome.description,
+          vendor_guid: @outcome.vendor_guid,
+          calculation_method: @outcome.calculation_method,
+          calculation_int: @outcome.calculation_int,
+          rubric_criterion: @outcome.rubric_criterion,
+          title: @outcome.title,
+          workflow_state: @outcome.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_created(@outcome)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger a learning_outcome_updated live event' do
+        outcome_model
+
+        @outcome.update!(short_description: 'this is new')
+
+        expect_event('learning_outcome_updated', {
+          learning_outcome_id: @outcome.id.to_s,
+          context_type: @outcome.context_type,
+          context_id: @outcome.context_id.to_s,
+          display_name: @outcome.display_name,
+          short_description: @outcome.short_description,
+          description: @outcome.description,
+          vendor_guid: @outcome.vendor_guid,
+          calculation_method: @outcome.calculation_method,
+          calculation_int: @outcome.calculation_int,
+          rubric_criterion: @outcome.rubric_criterion,
+          title: @outcome.title,
+          updated_at: @outcome.updated_at,
+          workflow_state: @outcome.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_updated(@outcome)
+      end
+    end
+  end
+
+  describe 'learning_outcome_groups' do
+    before do
+      @context = course_model
+    end
+
+    context 'created' do
+      it 'should trigger a learning_outcome_group_created live event' do
+        outcome_group_model
+
+
+        expect_event('learning_outcome_group_created', {
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          context_id: @outcome_group.context_id.to_s,
+          context_type: @outcome_group.context_type,
+          title: @outcome_group.title,
+          description: @outcome_group.description,
+          vendor_guid: @outcome_group.vendor_guid,
+          parent_outcome_group_id: @outcome_group.learning_outcome_group_id.to_s,
+          workflow_state: @outcome_group.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_group_created(@outcome_group)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger a learning_outcome_group_updated live event' do
+        outcome_group_model
+
+        @outcome_group.update!(title: 'this is new')
+
+        expect_event('learning_outcome_group_updated', {
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          context_id: @outcome_group.context_id.to_s,
+          context_type: @outcome_group.context_type,
+          title: @outcome_group.title,
+          description: @outcome_group.description,
+          vendor_guid: @outcome_group.vendor_guid,
+          parent_outcome_group_id: @outcome_group.learning_outcome_group_id.to_s,
+          updated_at: @outcome_group.updated_at,
+          workflow_state: @outcome_group.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_group_updated(@outcome_group)
+      end
+    end
+  end
+
+  describe 'learning_outcome_links' do
+    before do
+      @context = course_model
+    end
+
+    context 'created' do
+      it 'should trigger a learning_outcome_link_created live event' do
+        outcome_model
+        outcome_group_model
+
+        link = @outcome_group.add_outcome(@outcome)
+
+        expect_event('learning_outcome_link_created', {
+          learning_outcome_link_id: link.id.to_s,
+          learning_outcome_id: @outcome.id.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          context_id: link.context_id.to_s,
+          context_type: link.context_type,
+          workflow_state: link.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_link_created(link)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger a learning_outcome_link_updated live event' do
+        outcome_model
+        outcome_group_model
+
+        link = @outcome_group.add_outcome(@outcome)
+        link.destroy!
+
+        expect_event('learning_outcome_link_updated', {
+          learning_outcome_link_id: link.id.to_s,
+          learning_outcome_id: @outcome.id.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          context_id: link.context_id.to_s,
+          context_type: link.context_type,
+          workflow_state: link.workflow_state,
+          updated_at: link.updated_at
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_link_updated(link)
+      end
+    end
+  end
+
+  describe 'grade_override' do
+    it 'does not send event when score does not change' do
+      course_model
+      enrollment_model
+
+      score = Score.new(override_score: 100.0, course_score: true)
+      old_score = 100.0
+
+      expect(Canvas::LiveEvents).not_to receive(:post_event_stringified)
+      Canvas::LiveEvents.grade_override(score, old_score, @enrollment, @course)
     end
   end
 end

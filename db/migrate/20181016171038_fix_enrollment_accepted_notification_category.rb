@@ -20,6 +20,7 @@ class FixEnrollmentAcceptedNotificationCategory < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def change
+    return if ::Rails.env.test?
     # Fix the category that this notification belongs to. Note that changing
     # the category doesn't actually change the notification policy for users
     # to use their settings for this category group. We manually fix those up

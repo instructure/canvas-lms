@@ -19,6 +19,7 @@
 class Types::LegacyNodeType < Types::BaseEnum
   graphql_name "NodeType"
 
+  value "Account"
   value "Assignment"
   value "AssignmentGroup"
   value "Course"
@@ -34,6 +35,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "Page"
   value "PostPolicy"
   value "Progress"
+  value "Rubric"
   value "Section"
   value "Submission"
   value "Term"

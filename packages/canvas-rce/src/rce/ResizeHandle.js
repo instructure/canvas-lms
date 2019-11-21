@@ -33,7 +33,7 @@ export default function ResizeHandle(props) {
       event.preventDefault()
       event.stopPropagation()
       props.onDrag(event, {deltaY: -RESIZE_STEP})
-    } else if(event.keyCode === keycode.codes.down) {
+    } else if (event.keyCode === keycode.codes.down) {
       event.preventDefault()
       event.stopPropagation()
       props.onDrag(event, {deltaY: RESIZE_STEP})
@@ -54,32 +54,32 @@ export default function ResizeHandle(props) {
   const [isFocused, setIsFocused] = useState(false)
 
   return (
-      <View
-        aria-label={formatMessage("Drag handle. Use up and down arrows to resize")}
-        as="span"
-        borderRadius="medium"
-        display="inline-block"
-        focused={isFocused}
-        padding="0 0 0 xx-small"
-        position="relative"
-        role="button"
-        tabIndex={props.tabIndex}
-        onKeyDown={handleKey}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+    <View
+      aria-label={formatMessage('Drag handle. Use up and down arrows to resize')}
+      as="span"
+      borderRadius="medium"
+      display="inline-block"
+      focused={isFocused}
+      padding="0 0 0 xx-small"
+      position="relative"
+      role="button"
+      tabIndex={props.tabIndex}
+      onKeyDown={handleKey}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+    >
+      <DraggableCore
+        offsetParent={document.body}
+        onDrag={props.onDrag}
+        onStart={() => setDragging(true)}
+        onStop={() => setDragging(false)}
       >
-        <DraggableCore
-          offsetParent={document.body}
-          onDrag={props.onDrag}
-          onStart={() => setDragging(true)}
-          onStop={() => setDragging(false)}
-        >
-          <View cursor="ns-resize">
-            <IconDragHandleLine />
-          </View>
-        </DraggableCore>
-        <DraggingBlocker dragging={dragging} />
-      </View>
+        <View cursor="ns-resize">
+          <IconDragHandleLine />
+        </View>
+      </DraggableCore>
+      <DraggingBlocker dragging={dragging} />
+    </View>
   )
 }
 

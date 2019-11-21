@@ -16,31 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from "sinon";
-import { spiedStore } from "./utils";
-import * as session from "../../../src/sidebar/actions/session";
+import sinon from 'sinon'
+import {spiedStore} from './utils'
+import * as session from '../../../src/sidebar/actions/session'
 
-describe("Session actions", () => {
-  describe("get", () => {
-    let store, state, data;
+describe('Session actions', () => {
+  describe('get', () => {
+    let store, state, data
 
     const source = {
       getSession: () => Promise.resolve(data)
-    };
+    }
 
     beforeEach(() => {
-      data = { canUploadFiles: true };
-      state = { source };
-      store = spiedStore(state);
-    });
+      data = {canUploadFiles: true}
+      state = {source}
+      store = spiedStore(state)
+    })
 
-    it("dispatches RECEIVE_SESSION with data from source", () => {
+    it('dispatches RECEIVE_SESSION with data from source', () => {
       return store.dispatch(session.get).then(() => {
         sinon.assert.calledWithMatch(store.spy, {
           type: session.RECEIVE_SESSION,
           data
-        });
-      });
-    });
-  });
-});
+        })
+      })
+    })
+  })
+})

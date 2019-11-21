@@ -5,6 +5,7 @@ exports[`renders the AlignmentResult component 1`] = `
   alignItems="stretch"
   as="span"
   direction="column"
+  elementRef={[Function]}
   inline={false}
   justifyItems="start"
   padding="small"
@@ -13,6 +14,7 @@ exports[`renders the AlignmentResult component 1`] = `
 >
   <FlexItem
     as="span"
+    elementRef={[Function]}
     grow={false}
     shrink={false}
   >
@@ -40,16 +42,23 @@ exports[`renders the AlignmentResult component 1`] = `
   </FlexItem>
   <FlexItem
     as="span"
+    elementRef={[Function]}
     grow={false}
     padding="x-small 0"
     shrink={false}
   >
     <View
+      borderColor="default"
       debug={false}
       display="auto"
+      focusColor="info"
+      focusPosition="offset"
+      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="x-small 0 0 0"
+      position="static"
+      shouldAnimateFocus={true}
     >
       <Text
         as="span"
@@ -57,6 +66,7 @@ exports[`renders the AlignmentResult component 1`] = `
         letterSpacing="normal"
         size="small"
         weight="bold"
+        wrap="normal"
       >
         Your score: 1
       </Text>
@@ -65,6 +75,7 @@ exports[`renders the AlignmentResult component 1`] = `
   <FlexItem
     as="span"
     borderWidth="small"
+    elementRef={[Function]}
     grow={false}
     shrink={false}
   >

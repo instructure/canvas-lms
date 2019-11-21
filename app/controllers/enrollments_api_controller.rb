@@ -410,8 +410,7 @@ class EnrollmentsApiController < ApplicationController
                                     course_index_enrollments :
                                     user_index_enrollments
 
-      enrollments = enrollments.joins(:user).select("enrollments.*").
-        order(:type, User.sortable_name_order_by_clause("users"), :id)
+      enrollments = enrollments.joins(:user).select("enrollments.*, users.sortable_name AS sortable_name")
 
       has_courses = enrollments.where_clause.instance_variable_get(:@predicates).
         any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
@@ -464,8 +463,11 @@ class EnrollmentsApiController < ApplicationController
         end
       end
 
+      bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
+        {:type => {:skip_collation => true}, :sortable_name => {:type => :string, :null => false}}, :id)
+      collection = BookmarkedCollection.wrap(bookmarker, enrollments)
       enrollments = Api.paginate(
-        enrollments,
+        collection,
         self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
       ActiveRecord::Associations::Preloader.new.preload(enrollments, [:user, :course, :course_section, :root_account, :sis_pseudonym])
@@ -663,6 +665,9 @@ class EnrollmentsApiController < ApplicationController
     if options[:user_id] != 'self'
       errors << "enrollment[user_id] must be 'self' when self-enrolling"
     end
+    if MasterCourses::MasterTemplate.is_master_course?(@context)
+      errors << "course is not open for self-enrollment"
+    end
     return render_create_errors(errors) if errors.present?
 
     @current_user.validation_root_account = @domain_root_account
@@ -839,17 +844,26 @@ class EnrollmentsApiController < ApplicationController
       return scope && scope.where(course_id: @context.id)
     end
 
-    if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
+    if @context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
       scope = @context.apply_enrollment_visibility(@context.all_enrollments, @current_user).where(enrollment_index_conditions)
 
       unless params[:state].present?
         include_inactive = @context.grants_right?(@current_user, session, :read_as_admin)
         scope = include_inactive ? scope.all_active_or_pending : scope.active_or_pending
       end
-      scope
-    else
-      false
+      return scope
+    elsif @context.user_has_been_observer?(@current_user)
+      # Observers can see enrollments for the users they're observing, as well
+      # as their own enrollments
+      observer_enrollments = @context.observer_enrollments.active.where(user_id: @current_user)
+      observed_student_ids = observer_enrollments.pluck(:associated_user_id).uniq.compact
+
+      return @context.enrollments.where(user: @current_user).where(enrollment_index_conditions).union(
+        @context.student_enrollments.where(user_id: observed_student_ids).where(enrollment_index_conditions)
+      )
     end
+
+    render_unauthorized_action and return false
   end
 
   # Internal: Collect user enrollments that @current_user has permissions to

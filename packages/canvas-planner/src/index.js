@@ -16,83 +16,92 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import PlannerApp from './components/PlannerApp';
-import PlannerHeader from './components/PlannerHeader';
-import ToDoSidebar from './components/ToDoSidebar';
-import i18n from './i18n';
-import configureStore from './store/configureStore';
-import {
-  initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems,
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Provider} from 'react-redux'
+import moment from 'moment-timezone'
+import PlannerApp from './components/PlannerApp'
+import PlannerHeader from './components/PlannerHeader'
+import ToDoSidebar from './components/ToDoSidebar'
+import i18n from './i18n'
+import configureStore from './store/configureStore'
+import {initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems} from './actions'
+import {registerScrollEvents} from './utilities/scrollUtils'
+import {initialize as initializeAlerts} from './utilities/alertUtils'
+import {initializeContent} from './utilities/contentUtils'
+import {initializeDateTimeFormatters} from './utilities/dateUtils'
+import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui'
 
- } from './actions';
-import { registerScrollEvents } from './utilities/scrollUtils';
-import { initialize as initializeAlerts } from './utilities/alertUtils';
-import { initializeContent } from './utilities/contentUtils';
-import { initializeDateTimeFormatters } from './utilities/dateUtils';
-import moment from 'moment-timezone';
-import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui';
+let externalPlannerActive
+const plannerActive = () => (externalPlannerActive ? externalPlannerActive() : false)
 
-let externalPlannerActive;
-const plannerActive = () => externalPlannerActive ? externalPlannerActive() : false;
+const dynamicUiManager = new DynamicUiManager({plannerActive})
+export const store = configureStore(dynamicUiManager)
 
-const dynamicUiManager = new DynamicUiManager({plannerActive});
-export const store = configureStore(dynamicUiManager);
-
-function handleScrollIntoPastAttempt () {
-  if (!plannerActive()) return;
-  if (!store.getState().loading.loadingPast && !store.getState().loading.loadingFuture && !store.getState().loading.allPastItemsLoaded) {
-    store.dispatch(scrollIntoPast());
+function handleScrollIntoPastAttempt() {
+  if (!plannerActive()) return
+  if (
+    !store.getState().loading.loadingPast &&
+    !store.getState().loading.loadingFuture &&
+    !store.getState().loading.allPastItemsLoaded
+  ) {
+    store.dispatch(scrollIntoPast())
   }
 }
 
-function handleScrollIntoFutureAttempt () {
-  if (!plannerActive()) return;
-  if (!store.getState().loading.loadingPast && !store.getState().loading.loadingFuture && !store.getState().loading.allFutureItemsLoaded) {
-    store.dispatch(loadFutureItems());
+function handleScrollIntoFutureAttempt() {
+  if (!plannerActive()) return
+  if (
+    !store.getState().loading.loadingPast &&
+    !store.getState().loading.loadingFuture &&
+    !store.getState().loading.allFutureItemsLoaded
+  ) {
+    store.dispatch(loadFutureItems())
   }
 }
 
-function externalFocusableWrapper (externalFallbackFocusable) {
+function externalFocusableWrapper(externalFallbackFocusable) {
   return {
-    getFocusable () { return externalFallbackFocusable; },
-    getScrollable () { return externalFallbackFocusable; },
-  };
+    getFocusable() {
+      return externalFallbackFocusable
+    },
+    getScrollable() {
+      return externalFallbackFocusable
+    }
+  }
 }
 
 const defaultOptions = {
   getActiveApp: () => '',
-  stickyZIndex: 3,
-};
+  stickyZIndex: 3
+}
 
-const defaultEnv = {};
+const defaultEnv = {}
 
-const plannerHeaderId = "dashboard_header_container";
-const plannerNewActivityButtonId = "new_activity_button"
+const plannerHeaderId = 'dashboard_header_container'
+const plannerNewActivityButtonId = 'new_activity_button'
 
-function mergeDefaultOptions (options) {
-  const newOpts = {...defaultOptions, ...options};
-  newOpts.env = {...defaultEnv, ...options.env};
+function mergeDefaultOptions(options) {
+  const newOpts = {...defaultOptions, ...options}
+  newOpts.env = {...defaultEnv, ...options.env}
 
   // special handling for these env vars because sometimes they come in
   // explicitly set to false instead of just not being defined in options.env
-  if (!newOpts.env.STUDENT_PLANNER_COURSES) newOpts.env.STUDENT_PLANNER_COURSES = [];
-  if (!newOpts.env.STUDENT_PLANNER_GROUPS) newOpts.env.STUDENT_PLANNER_GROUPS = [];
-  return newOpts;
+  if (!newOpts.env.STUDENT_PLANNER_COURSES) newOpts.env.STUDENT_PLANNER_COURSES = []
+  if (!newOpts.env.STUDENT_PLANNER_GROUPS) newOpts.env.STUDENT_PLANNER_GROUPS = []
+  return newOpts
 }
 
-function initializeCourseAndGroupColors (options) {
-  if (!options.env.PREFERENCES) return;
+function initializeCourseAndGroupColors(options) {
+  if (!options.env.PREFERENCES) return
   options.env.STUDENT_PLANNER_COURSES = options.env.STUDENT_PLANNER_COURSES.map(dc => ({
     ...dc,
     color: options.env.PREFERENCES.custom_colors[dc.assetString]
-  }));
+  }))
   options.env.STUDENT_PLANNER_GROUPS = options.env.STUDENT_PLANNER_GROUPS.map(dg => ({
     ...dg,
     color: options.env.PREFERENCES.custom_colors[dg.assetString] || '#666666'
-  }));
+  }))
 }
 
 // You have to call this first, before you call loadPlannerDashboard or renderToDoSidebar
@@ -124,66 +133,69 @@ function initializeCourseAndGroupColors (options) {
 // getActiveApp,                <optional - method to get the current dashboard>
 // changeDashboardView,         <optional - method to change the current dashboard>
 // forCourse,                   <optional - course id if this is a sidebar for a specific course page>
-let initializedOptions = null;
-export function initializePlanner (options) {
-  if (initializedOptions) throw new Error('initializePlanner may not be called more than once');
+let initializedOptions = null
+export function initializePlanner(options) {
+  if (initializedOptions) throw new Error('initializePlanner may not be called more than once')
 
-  options = mergeDefaultOptions(options);
+  options = mergeDefaultOptions(options)
 
   if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
-    throw new Error('env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner');
+    throw new Error('env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner')
   }
 
-  const {flashError, flashMessage, srFlashMessage} = options;
+  const {flashError, flashMessage, srFlashMessage} = options
   if (!(flashError && flashMessage && srFlashMessage)) {
-    throw new Error('flash message callbacks are required options for initializePlanner');
+    throw new Error('flash message callbacks are required options for initializePlanner')
   }
 
   if (!options.convertApiUserContent) {
-    throw new Error('convertApiUserContent is a required option for initializePlanner');
+    throw new Error('convertApiUserContent is a required option for initializePlanner')
   }
 
-  externalPlannerActive = () => options.getActiveApp() === 'planner';
+  externalPlannerActive = () => options.getActiveApp() === 'planner'
 
-  i18n.init(options.env.MOMENT_LOCALE);
-  moment.locale(options.env.MOMENT_LOCALE);
-  moment.tz.setDefault(options.env.TIMEZONE);
+  i18n.init(options.env.MOMENT_LOCALE)
+  moment.locale(options.env.MOMENT_LOCALE)
+  moment.tz.setDefault(options.env.TIMEZONE)
   initializeAlerts({
     visualSuccessCallback: flashMessage,
     visualErrorCallback: flashError,
-    srAlertCallback: srFlashMessage,
-  });
-  initializeContent(options);
-  initializeDateTimeFormatters(options.dateTimeFormatters);
+    srAlertCallback: srFlashMessage
+  })
+  initializeContent(options)
+  initializeDateTimeFormatters(options.dateTimeFormatters)
 
-  options.plannerNewActivityButtonId = plannerNewActivityButtonId;
-  dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId);
-    
+  options.plannerNewActivityButtonId = plannerNewActivityButtonId
+  dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
+
   if (options.externalFallbackFocusable) {
     dynamicUiManager.registerAnimatable(
-      'item', externalFocusableWrapper(options.externalFallbackFocusable), -1, [specialFallbackFocusId('item')]
-    );
+      'item',
+      externalFocusableWrapper(options.externalFallbackFocusable),
+      -1,
+      [specialFallbackFocusId('item')]
+    )
   }
 
-  initializeCourseAndGroupColors(options);
+  initializeCourseAndGroupColors(options)
 
-  initializedOptions = options;
-  store.dispatch(initialOptions(options));
+  initializedOptions = options
+  store.dispatch(initialOptions(options))
 }
 
-export function resetPlanner () {
-  initializedOptions = null;
+export function resetPlanner() {
+  initializedOptions = null
 }
 
-function render (element) {
+function render(element) {
   registerScrollEvents({
     scrollIntoPast: handleScrollIntoPastAttempt,
     scrollIntoFuture: handleScrollIntoFutureAttempt,
-    scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos),
-  });
+    scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos)
+  })
 
   ReactDOM.render(
-    <DynamicUiProvider manager={dynamicUiManager} >
+    <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
         <PlannerApp
           appRef={app => dynamicUiManager.setApp(app)}
@@ -193,18 +205,20 @@ function render (element) {
           focusFallback={() => dynamicUiManager.focusFallback('item')}
         />
       </Provider>
-    </DynamicUiProvider>, element);
+    </DynamicUiProvider>,
+    element
+  )
 
-  store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')));
+  store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
 }
 
 // This method allows you to render the header items into a separate DOM node
-function renderHeader (element, auxElement) {
-  const ariaHideElement = document.getElementById('application');
+function renderHeader(element, auxElement) {
+  const ariaHideElement = document.getElementById('application')
 
   // Using this pattern because default params don't merge objects
   ReactDOM.render(
-    <DynamicUiProvider manager={dynamicUiManager} >
+    <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
         <PlannerHeader
           stickyZIndex={initializedOptions.stickyZIndex}
@@ -215,14 +229,17 @@ function renderHeader (element, auxElement) {
           auxElement={auxElement}
         />
       </Provider>
-    </DynamicUiProvider>, element);
+    </DynamicUiProvider>,
+    element
+  )
 }
 
 // This method allows you to render the To Do Sidebar into a separate DOM node
-export function renderToDoSidebar (element) {
-  if (!initializedOptions) throw new Error('initializePlanner must be called before renderToDoSidebar');
+export function renderToDoSidebar(element) {
+  if (!initializedOptions)
+    throw new Error('initializePlanner must be called before renderToDoSidebar')
 
-  const env = initializedOptions.env;
+  const env = initializedOptions.env
 
   ReactDOM.render(
     <Provider store={store}>
@@ -233,22 +250,24 @@ export function renderToDoSidebar (element) {
         changeDashboardView={initializedOptions.changeDashboardView}
         forCourse={initializedOptions.forCourse}
       />
-    </Provider>
-  , element);
+    </Provider>,
+    element
+  )
 }
 
-export function loadPlannerDashboard () {
-  if (!initializedOptions) throw new Error('initializePlanner must be called before loadPlannerDashboard');
+export function loadPlannerDashboard() {
+  if (!initializedOptions)
+    throw new Error('initializePlanner must be called before loadPlannerDashboard')
 
-  const element = document.getElementById('dashboard-planner');
-  const headerElement = document.getElementById('dashboard-planner-header');
-  const headerAuxElement = document.getElementById('dashboard-planner-header-aux');
+  const element = document.getElementById('dashboard-planner')
+  const headerElement = document.getElementById('dashboard-planner-header')
+  const headerAuxElement = document.getElementById('dashboard-planner-header-aux')
 
   if (element) {
-    render(element);
+    render(element)
   }
 
   if (headerElement) {
-    renderHeader(headerElement, headerAuxElement);
+    renderHeader(headerElement, headerAuxElement)
   }
 }

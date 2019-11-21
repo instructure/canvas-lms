@@ -18,10 +18,9 @@
 
 import React from 'react'
 import {oneOf, string} from 'prop-types'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import IconInfoLine from '@instructure/ui-icons/lib/Line/IconInfo'
-import IconWarningLine from '@instructure/ui-icons/lib/Line/IconWarning'
+import {Grid} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
+import {IconInfoLine, IconWarningLine} from '@instructure/ui-icons'
 
 const VARIANT_MAP = {
   info: {color: 'primary', Icon: IconInfoLine},
@@ -32,18 +31,18 @@ const Message = ({message, variant}) => {
   const {Icon, color} = VARIANT_MAP[variant]
   return (
     <Grid>
-      <GridRow vAlign="middle" hAlign="start" colSpacing="small">
-        <GridCol width="auto" textAlign="start">
+      <Grid.Row vAlign="middle" hAlign="start" colSpacing="small">
+        <Grid.Col width="auto" textAlign="start">
           <Text color={color}>
             <Icon style={{display: 'block'}} />
           </Text>
-        </GridCol>
-        <GridCol>
+        </Grid.Col>
+        <Grid.Col>
           <Text color={color} size="small">
             {message}
           </Text>
-        </GridCol>
-      </GridRow>
+        </Grid.Col>
+      </Grid.Row>
     </Grid>
   )
 }

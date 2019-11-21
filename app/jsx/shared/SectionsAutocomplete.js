@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import Select from '@instructure/ui-forms/lib/components/Select'
-import View from '@instructure/ui-layout/lib/components/View'
-import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
+import {Select} from '@instructure/ui-forms'
+import {View} from '@instructure/ui-layout'
+import {AccessibleContent} from '@instructure/ui-a11y'
 import React from 'react'
 import $ from 'jquery'
 import I18n from 'i18n!sections_autocomplete'
@@ -27,13 +27,13 @@ import propTypes from './proptypes/sectionShape'
 const ALL_SECTIONS_OBJ = {id: 'all', name: I18n.t('All Sections')}
 
 function extractIds(arr) {
-  return arr.map((element) => element.id)
+  return arr.map(element => element.id)
 }
 
-function sortSectionName(a,b) {
-  if(a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-  if(a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-  return 0;
+function sortSectionName(a, b) {
+  if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+  if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+  return 0
 }
 
 function setDiff(first, second) {
@@ -57,8 +57,8 @@ export default class SectionsAutocomplete extends React.Component {
   static defaultProps = {
     selectedSections: [ALL_SECTIONS_OBJ],
     disabled: false,
-    disableDiscussionOptions: (() => {}),
-    enableDiscussionOptions: (() => {}),
+    disableDiscussionOptions: () => {},
+    enableDiscussionOptions: () => {},
     flashMessage: $.screenReaderFlashMessage
   }
 
@@ -92,11 +92,16 @@ export default class SectionsAutocomplete extends React.Component {
 
   onAutocompleteChange = (_, value) => {
     this.announceSectionDifference(extractIds(value))
-    if(!value.length) {
-      this.setState({selectedSectionsValue: [], messages: [{ text: I18n.t('A section is required'), type: 'error' }]})
+    if (!value.length) {
+      this.setState({
+        selectedSectionsValue: [],
+        messages: [{text: I18n.t('A section is required'), type: 'error'}]
+      })
     } else if (this.state.selectedSectionsValue.includes(ALL_SECTIONS_OBJ.id)) {
       this.setState({
-        selectedSectionsValue: extractIds(value.filter((section) => section.id !== ALL_SECTIONS_OBJ.id)),
+        selectedSectionsValue: extractIds(
+          value.filter(section => section.id !== ALL_SECTIONS_OBJ.id)
+        ),
         messages: []
       })
     } else if (extractIds(value).includes(ALL_SECTIONS_OBJ.id)) {
@@ -114,31 +119,22 @@ export default class SectionsAutocomplete extends React.Component {
     }
   }
 
-  render () {
+  render() {
     // NOTE: the hidden input is used by the erb that this component is rendered in
     // If we do not have the hidden component then the erb tries to grab the element
     // and will block the submission because it does not exist
     // One day we should probably try to decouple this
-    if(this.props.disabled) {
-      return(
+    if (this.props.disabled) {
+      return (
         <div id="disabled_sections_autocomplete">
-          <input
-            name="specific_sections"
-            type="hidden"
-            value={this.state.selectedSectionsValue}/>
+          <input name="specific_sections" type="hidden" value={this.state.selectedSectionsValue} />
         </div>
-      );
+      )
     }
 
     return (
-      <View
-        display="block"
-        margin="0 0 large 0"
-      >
-        <input
-          name="specific_sections"
-          type="hidden"
-          value={this.state.selectedSectionsValue}/>
+      <View display="block" margin="0 0 large 0">
+        <input name="specific_sections" type="hidden" value={this.state.selectedSectionsValue} />
         <Select
           editable
           label={I18n.t('Post to')}
@@ -147,11 +143,13 @@ export default class SectionsAutocomplete extends React.Component {
           multiple
           disabled={this.props.disabled}
           onChange={this.onAutocompleteChange}
-          formatSelectedOption={(tag) => (
-            <AccessibleContent alt={I18n.t(`Remove %{label}`, {label: tag.label})}>{tag.label}</AccessibleContent>
+          formatSelectedOption={tag => (
+            <AccessibleContent alt={I18n.t(`Remove %{label}`, {label: tag.label})}>
+              {tag.label}
+            </AccessibleContent>
           )}
         >
-          {this.state.sections.map((section) => (
+          {this.state.sections.map(section => (
             <option key={section.id} value={section.id}>
               {section.name}
             </option>

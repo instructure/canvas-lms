@@ -75,10 +75,11 @@ export default class GroupEditView extends DialogFormView {
   }
 
   toJSON() {
-    const json = Object.assign({}, super.toJSON(...arguments), {
+    const json = {
+      ...super.toJSON(...arguments),
       role: this.groupCategory.get('role'),
       nameOnly: this.options.nameOnly
-    })
+    }
     return json
   }
 }

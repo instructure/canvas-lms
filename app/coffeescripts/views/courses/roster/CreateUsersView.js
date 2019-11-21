@@ -22,7 +22,6 @@ import template from 'jst/courses/roster/createUsers'
 import wrapper from 'jst/EmptyDialogFormWrapper'
 
 export default class CreateUsersView extends DialogFormView {
-
   static initClass() {
     this.optionProperty('rolesCollection')
     this.optionProperty('courseModel')

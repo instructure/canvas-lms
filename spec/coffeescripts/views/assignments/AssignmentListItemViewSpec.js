@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {getByText, queryByText, findByText, waitForElementToBeRemoved} from '@testing-library/dom'
+import fetchMock from 'fetch-mock'
 import Backbone from 'Backbone'
 import Assignment from 'compiled/models/Assignment'
 import Submission from 'compiled/models/Submission'
@@ -124,6 +126,7 @@ const createView = function(model, options) {
   options = {
     canManage: true,
     canReadGrades: false,
+    courseId: '42',
     ...options
   }
   ENV.PERMISSIONS = {
@@ -139,6 +142,7 @@ const createView = function(model, options) {
   ENV.POST_TO_SIS = options.post_to_sis
   ENV.DUPLICATE_ENABLED = options.duplicateEnabled
   ENV.DIRECT_SHARE_ENABLED = options.directShareEnabled
+  ENV.COURSE_ID = options.courseId
 
   const view = new AssignmentListItemView({
     model,
@@ -170,6 +174,10 @@ const genSetup = function(model = assignment1()) {
 const genTeardown = function() {
   fakeENV.teardown()
   $('#fixtures').empty()
+  // cleanup instui dialogs and trays that render in a portal outside of #fixtures
+  $('[role="dialog"]')
+    .closest('span[dir="ltr"]')
+    .remove()
 }
 
 QUnit.module('AssignmentListItemViewSpec', {
@@ -292,12 +300,23 @@ test('does not initialize sis toggle if sis enabled, can manage and is unpublish
   ok(!view.sisButtonView)
 })
 
-test('shows sharing and copying menu items if DIRECT_SHARE_ENABLED', function() {
-  const view = createView(this.model, {
-    directShareEnabled: true
-  })
-  ok(view.$('.send_assignment_to').length)
-  ok(view.$('.copy_assignment_to').length)
+test('opens and closes the direct share send to user dialog', async function() {
+  const view = createView(this.model, {directShareEnabled: true})
+  $('#fixtures').append('<div id="send-to-mount-point" />')
+  view.$('.send_assignment_to').click()
+  ok(await findByText(document.body, 'Send to:'))
+  getByText(document.body, 'Close').click()
+  await waitForElementToBeRemoved(() => queryByText(document.body, 'Send to:'))
+})
+
+test('opens and closes the direct share copy to course tray', async function() {
+  const view = createView(this.model, {directShareEnabled: true})
+  $('#fixtures').append('<div id="copy-to-mount-point" />')
+  view.$('.copy_assignment_to').click()
+  fetchMock.mock('/users/self/manageable_courses', [])
+  ok(await findByText(document.body, 'Select a Course'))
+  getByText(document.body, 'Close').click()
+  await waitForElementToBeRemoved(() => queryByText(document.body, 'Select a Course'))
 })
 
 test('does not show sharing and copying menu items if not DIRECT_SHARE_ENABLED', function() {
@@ -742,6 +761,19 @@ test('clicks on Retry button to trigger another duplicating request', () => {
   sandbox.spy(model, 'duplicate_failed')
   view.$(`#assignment_${model.id} .duplicate-failed-retry`).click()
   ok(model.duplicate_failed.called)
+})
+
+test('clicks on Retry button to trigger another migrating request', () => {
+  const model = buildAssignment({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_migrate'
+  })
+  const view = createView(model)
+  sandbox.spy(model, 'retry_migration')
+  view.$(`#assignment_${model.id} .migrate-failed-retry`).click()
+  ok(model.retry_migration.called)
 })
 
 test('cannot duplicate when user is not admin', () => {
@@ -1345,4 +1377,78 @@ test('renders for assignment if assignment is released by a rule', () => {
   })
   const view = createView(model)
   equal(view.$('.mastery-path-icon').length, 1)
+})
+
+QUnit.module('AssignListItemViewSpec - assignment icons', {
+  setup() {
+    fakeENV.setup({
+      current_user_roles: ['teacher'],
+      URLS: {assignment_sort_base_url: 'test'}
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('renders discussion icon for discussion topic', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    submission_types: ['discussion_topic']
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-discussion').length, 1)
+})
+
+test('renders quiz icon for old quizzes', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    submission_types: ['online_quiz']
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-quiz').length, 1)
+})
+
+test('renders page icon for wiki page', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    submission_types: ['wiki_page']
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-document').length, 1)
+})
+
+test('renders solid quiz icon for new quizzes', () => {
+  ENV.FLAGS = {newquizzes_on_quiz_page: true}
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    is_quiz_lti_assignment: true
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-quiz.icon-Solid').length, 1)
+})
+
+test('renders assignment icon for new quizzes if FF is off', () => {
+  ENV.FLAGS = {newquizzes_on_quiz_page: false}
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo',
+    is_quiz_lti_assignment: true
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-quiz.icon-Solid').length, 0)
+  equal(view.$('i.icon-assignment').length, 1)
+})
+
+test('renders assignment icon for other assignments', () => {
+  const model = buildAssignment({
+    id: 1,
+    title: 'Foo'
+  })
+  const view = createView(model)
+  equal(view.$('i.icon-assignment').length, 1)
 })

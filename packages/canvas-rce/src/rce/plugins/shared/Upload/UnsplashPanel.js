@@ -19,13 +19,13 @@
 import React, {useState, useEffect, useReducer, useRef, useCallback} from 'react'
 import {string, func, object} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
-import {Flex, View } from '@instructure/ui-layout'
+import {Flex, View} from '@instructure/ui-layout'
 import {Avatar, Img, Spinner} from '@instructure/ui-elements'
-import { ScreenReaderContent } from '@instructure/ui-a11y'
-import { Alert } from '@instructure/ui-alerts'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Alert} from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
 
-import { Button } from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {debounce} from 'lodash'
 import formatMessage from '../../../../format-message'
 import {StyleSheet, css} from '../../../../common/aphroditeExtensions'
@@ -76,28 +76,24 @@ const useUnsplashSearch = source => {
 
   useEffect(() => {
     const fetchData = () => {
-
-        dispatch({type: 'FETCH'})
-        source
-          .searchUnsplash(state.searchTerm, state.searchPage)
-          .then(results => {
-            dispatch({type: 'FETCH_SUCCESS', payload: results})
-          })
-          .catch(() => {
-            dispatch({type: 'FETCH_FAILURE'})
-          })
-      }
+      dispatch({type: 'FETCH'})
+      source
+        .searchUnsplash(state.searchTerm, state.searchPage)
+        .then(results => {
+          dispatch({type: 'FETCH_SUCCESS', payload: results})
+        })
+        .catch(() => {
+          dispatch({type: 'FETCH_FAILURE'})
+        })
+    }
     if (effectFirstRun.current) {
       effectFirstRun.current = false
-      return
     } else if (state.results[state.searchPage]) {
-      return // It's already in cache
-    } else {
-      if (state.searchTerm.length > 0) {
-        fetchData()
-      }
+      // It's already in cache
+    } else if (state.searchTerm.length > 0) {
+      fetchData()
     }
-  }, [state.searchTerm, state.searchPage])
+  }, [state.searchTerm, state.searchPage, state.results, source])
 
   const search = (term, page) => {
     dispatch({
@@ -145,7 +141,10 @@ function renderAlert(term, hasLoaded, totalResults, results, page, liveRegion) {
     }
     return (
       <Alert variant="info" transition="none" screenReaderOnly liveRegion={liveRegion}>
-        {formatMessage('{totalResults} results found, {numDisplayed} results currently displayed', { totalResults, numDisplayed: results[page].length })}
+        {formatMessage('{totalResults} results found, {numDisplayed} results currently displayed', {
+          totalResults,
+          numDisplayed: results[page].length
+        })}
       </Alert>
     )
   }
@@ -171,14 +170,14 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
     if (resultRefs[focusedImageIndex]) {
       resultRefs[focusedImageIndex].focus()
     }
-  }, [focusedImageIndex])
+  }, [focusedImageIndex, resultRefs])
 
   return (
     <>
       <UnsplashSVG width="10em" />
       <TextInput
         type="search"
-        label={formatMessage('Search Term')}
+        renderLabel={formatMessage('Search Term')}
         value={term}
         onChange={(e, val) => {
           setFocusedImageIndex(0)
@@ -199,10 +198,7 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
           <View margin="small">
             {renderAlert(term, hasLoaded, totalResults, results, page, liveRegion)}
           </View>
-          <div
-            className={css(styles.container)}
-            data-testid="UnsplashResultsContainer"
-          >
+          <div className={css(styles.container)} data-testid="UnsplashResultsContainer">
             {results[page] &&
               results[page].map((resultImage, index) => (
                 <div
@@ -219,23 +215,25 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
                       setSelectedImage(resultImage.id)
                       setUnsplashData({
                         id: resultImage.id,
-                        url: resultImage.urls.link
+                        url: resultImage.urls.link,
+                        alt: resultImage.alt_text
                       })
                     }}
                   >
                     <div
                       className={css(styles.imageContainer)}
                       style={
-                          resultImage.id === selectedImage ? {
-                            border: `5px solid ${brandColor}`,
-                            padding: '2px'
-                          } : null}
-                      >
-                      {
-                        resultImage.id === selectedImage ?
-                        (<ScreenReaderContent>{formatMessage('Selected')}</ScreenReaderContent>) :
-                        null
+                        resultImage.id === selectedImage
+                          ? {
+                              border: `5px solid ${brandColor}`,
+                              padding: '2px'
+                            }
+                          : null
                       }
+                    >
+                      {resultImage.id === selectedImage ? (
+                        <ScreenReaderContent>{formatMessage('Selected')}</ScreenReaderContent>
+                      ) : null}
                       <Img
                         src={resultImage.urls.thumbnail}
                         alt={resultImage.alt_text}
@@ -243,11 +241,14 @@ export default function UnsplashPanel({editor, source, setUnsplashData, brandCol
                         height="10em"
                       />
                     </div>
-                    </Button>
+                  </Button>
                   <div className={css(styles.imageAttribution)}>
-                    <Attribution name={resultImage.user.name} avatarUrl={resultImage.user.avatar} profileUrl={resultImage.user.url} />
+                    <Attribution
+                      name={resultImage.user.name}
+                      avatarUrl={resultImage.user.avatar}
+                      profileUrl={resultImage.user.url}
+                    />
                   </div>
-
                 </div>
               ))}
           </div>
@@ -329,11 +330,11 @@ export const styles = StyleSheet.create({
 
 export const hoverStyles = StyleSheet.create({
   imageWrapper: {
-    [`#:hover ${css(styles.imageAttribution)}`] : {
+    [`#:hover ${css(styles.imageAttribution)}`]: {
       opacity: 0.8
     },
-    [`#:focus-within ${css(styles.imageAttribution)}`] : {
+    [`#:focus-within ${css(styles.imageAttribution)}`]: {
       opacity: 0.8
-    },
+    }
   }
 })

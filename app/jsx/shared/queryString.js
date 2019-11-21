@@ -16,16 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function encodeQueryString (params) {
-  return params.map((param) => {
-    const key = Object.keys(param)[0]
-    const value = param[key]
-    return value !== null ? `${key}=${value}` : null
-  }).filter(Boolean).join('&')
+export function encodeQueryString(params) {
+  return params
+    .map(param => {
+      const key = Object.keys(param)[0]
+      const value = param[key]
+      return value !== null ? `${key}=${value}` : null
+    })
+    .filter(Boolean)
+    .join('&')
 }
 
-export function decodeQueryString (string) {
-  return string.split('&')
+export function decodeQueryString(string) {
+  return string
+    .split('&')
     .map(pair => pair.split('='))
-    .map(([key, value]) => ({ [key]: value }))
+    .map(([key, value]) => ({[key]: value}))
 }

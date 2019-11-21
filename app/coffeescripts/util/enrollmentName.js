@@ -18,13 +18,23 @@
 import I18n from 'i18n!enrollmentNames'
 
 const types = {
-  StudentEnrollment: I18n.t('student', 'Student'),
-  TeacherEnrollment: I18n.t('teacher', 'Teacher'),
-  TaEnrollment: I18n.t('teacher_assistant', 'TA'),
-  ObserverEnrollment: I18n.t('observer', 'Observer'),
-  DesignerEnrollment: I18n.t('course_designer', 'Course Designer'),
+  get StudentEnrollment() {
+    return I18n.t('student', 'Student')
+  },
+  get TeacherEnrollment() {
+    return I18n.t('teacher', 'Teacher')
+  },
+  get TaEnrollment() {
+    return I18n.t('teacher_assistant', 'TA')
+  },
+  get ObserverEnrollment() {
+    return I18n.t('observer', 'Observer')
+  },
+  get DesignerEnrollment() {
+    return I18n.t('course_designer', 'Course Designer')
+  }
 }
 
-export default function enrollmentName (type) {
+export default function enrollmentName(type) {
   return types[type] || type
 }

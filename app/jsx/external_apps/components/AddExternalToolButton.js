@@ -27,7 +27,6 @@ import Lti2Iframe from 'jsx/external_apps/components/Lti2Iframe'
 import Lti2Permissions from 'jsx/external_apps/components/Lti2Permissions'
 import DuplicateConfirmationForm from 'jsx/external_apps/components/DuplicateConfirmationForm'
 import 'compiled/jquery.rails_flash_notifications'
-import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody';
 import fetchToolConfiguration from '../lib/fetchToolConfiguration'
 import toolConfigurationError from '../lib/toolConfigurationError'
 import install13Tool from '../lib/install13Tool'
@@ -35,7 +34,7 @@ import install13Tool from '../lib/install13Tool'
 export default class AddExternalToolButton extends React.Component {
   static propTypes = {}
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       modalIsOpen: props.modalIsOpen,
@@ -54,7 +53,7 @@ export default class AddExternalToolButton extends React.Component {
 
   throttleCreation = false
 
-  get isInstalling13Tool () {
+  get isInstalling13Tool() {
     return this.state.type === 'byClientId'
   }
 
@@ -64,7 +63,7 @@ export default class AddExternalToolButton extends React.Component {
       modalIsOpen: true,
       tool: {},
       isLti2: false,
-      lti2RegistrationUrl: null,
+      lti2RegistrationUrl: null
     })
   }
 
@@ -111,7 +110,7 @@ export default class AddExternalToolButton extends React.Component {
     )
   }
 
-  _duplicate_check_error (errors) {
+  _duplicate_check_error(errors) {
     if (errors.tool_currently_installed) {
       this.setState({duplicateTool: true})
       this.throttleCreation = false
@@ -122,7 +121,9 @@ export default class AddExternalToolButton extends React.Component {
 
   _errorHandler = xhr => {
     const errors = JSON.parse(xhr.responseText).errors
-    if (this._duplicate_check_error(errors)) { return }
+    if (this._duplicate_check_error(errors)) {
+      return
+    }
 
     let errorMessage = I18n.t('We were unable to add the app.')
     if (this.state.configurationType !== 'manual') {
@@ -164,7 +165,7 @@ export default class AddExternalToolButton extends React.Component {
         data.client_id,
         ENV.TOOL_CONFIGURATION_SHOW_URL,
         toolConfigurationError
-      ).then((toolConfiguration) => {
+      ).then(toolConfiguration => {
         this.setState({
           type: 'byClientId',
           toolConfiguration,
@@ -188,23 +189,21 @@ export default class AddExternalToolButton extends React.Component {
   }
 
   create13Tool = (verify_uniqueness = true) => {
-    return install13Tool(
-      this.state.clientId,
-      ENV.EXTERNAL_TOOLS_CREATE_URL,
-      verify_uniqueness
-    ).then(
-      () => {
-        this._successHandler()
+    return install13Tool(this.state.clientId, ENV.EXTERNAL_TOOLS_CREATE_URL, verify_uniqueness)
+      .then(
+        () => {
+          this._successHandler()
+          this.closeModal()
+        },
+        response => {
+          const errors = response.response.data.errors
+          this._duplicate_check_error(errors)
+        }
+      )
+      .catch(() => {
+        $.flashError(I18n.t('We were unable to add the app.'))
         this.closeModal()
-      },
-      (response) => {
-        const errors = response.response.data.errors
-        this._duplicate_check_error(errors)
-      }
-    ).catch(() => {
-      $.flashError(I18n.t('We were unable to add the app.'))
-      this.closeModal()
-    })
+      })
   }
 
   renderForm = () => {
@@ -233,17 +232,17 @@ export default class AddExternalToolButton extends React.Component {
       const {clientId} = this.state
       const toolName = this.state.toolConfiguration.settings.title
 
-      return(
+      return (
         <ConfirmationForm
           onCancel={() => {
-            this.closeModal();
+            this.closeModal()
           }}
           onConfirm={() => this.create13Tool()}
           message={I18n.t(
             'Tool "%{toolName}" found for client ID %{clientId}. Would you like to install it?',
-            { toolName, clientId }
+            {toolName, clientId}
           )}
-          confirmLabel={I18n.t("Install")}
+          confirmLabel={I18n.t('Install')}
         />
       )
     } else {
@@ -298,9 +297,7 @@ export default class AddExternalToolButton extends React.Component {
           label={I18n.t('Add App')}
           size="large"
         >
-          <ModalBody>
-            {this.renderForm()}
-          </ModalBody>
+          <Modal.Body>{this.renderForm()}</Modal.Body>
         </Modal>
       </span>
     )

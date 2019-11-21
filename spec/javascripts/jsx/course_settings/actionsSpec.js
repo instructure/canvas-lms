@@ -18,41 +18,41 @@
 
 import Actions from 'jsx/course_settings/actions'
 
-QUnit.module('Course Settings Actions');
+QUnit.module('Course Settings Actions')
 
 test('calling setModalVisibility produces the proper object', () => {
-  let actual = Actions.setModalVisibility(true);
+  let actual = Actions.setModalVisibility(true)
   let expected = {
     type: 'MODAL_VISIBILITY',
     payload: {
       showModal: true
     }
-  };
+  }
 
-  deepEqual(actual, expected, 'the objects match');
+  deepEqual(actual, expected, 'the objects match')
 
-  actual = Actions.setModalVisibility(false);
+  actual = Actions.setModalVisibility(false)
   expected = {
     type: 'MODAL_VISIBILITY',
     payload: {
       showModal: false
     }
-  };
+  }
 
   deepEqual(actual, expected)
-});
+})
 
 test('calling gotCourseImage produces the proper object', () => {
-  const actual = Actions.gotCourseImage('http://imageUrl');
+  const actual = Actions.gotCourseImage('http://imageUrl')
   const expected = {
     type: 'GOT_COURSE_IMAGE',
     payload: {
       imageUrl: 'http://imageUrl'
     }
-  };
+  }
 
-  deepEqual(actual, expected, 'the objects match');
-});
+  deepEqual(actual, expected, 'the objects match')
+})
 
 test('getCourseImage', assert => {
   const done = assert.async()
@@ -60,48 +60,48 @@ test('getCourseImage', assert => {
     data: {
       image: 'http://imageUrl'
     }
-  };
+  }
 
   const fakeAjaxLib = {
-    get (url) {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(fakeResponse), 100);
-      });
+    get(url) {
+      return new Promise(resolve => {
+        setTimeout(() => resolve(fakeResponse), 100)
+      })
     }
-  };
+  }
 
   const expectedAction = {
     type: 'GOT_COURSE_IMAGE',
     payload: {
       imageUrl: 'http://imageUrl'
     }
-  };
+  }
 
-  Actions.getCourseImage(1, fakeAjaxLib)((dispatched) => {
-    deepEqual(dispatched, expectedAction, 'the proper action was dispatched');
+  Actions.getCourseImage(1, fakeAjaxLib)(dispatched => {
+    deepEqual(dispatched, expectedAction, 'the proper action was dispatched')
     done()
-  });
-});
+  })
+})
 
 test('setCourseImageId creates the proper action', () => {
-  const actual = Actions.setCourseImageId('http://imageUrl', 12);
+  const actual = Actions.setCourseImageId('http://imageUrl', 12)
   const expected = {
     type: 'SET_COURSE_IMAGE_ID',
     payload: {
       imageUrl: 'http://imageUrl',
       imageId: 12
     }
-  };
+  }
 
-  deepEqual(actual, expected, 'the objects match');
-});
+  deepEqual(actual, expected, 'the objects match')
+})
 
 test('prepareSetImage with a imageUrl calls putImageData', () => {
-  sinon.spy(Actions, 'putImageData');
-  Actions.prepareSetImage('http://imageUrl', 12, 0);
-  ok(Actions.putImageData.called, 'putImageData was called');
-  Actions.putImageData.restore();
-});
+  sinon.spy(Actions, 'putImageData')
+  Actions.prepareSetImage('http://imageUrl', 12, 0)
+  ok(Actions.putImageData.called, 'putImageData was called')
+  Actions.putImageData.restore()
+})
 
 test('prepareSetImage without a imageUrl calls the API to get the url', assert => {
   const done = assert.async()
@@ -109,143 +109,151 @@ test('prepareSetImage without a imageUrl calls the API to get the url', assert =
     data: {
       url: 'http://imageUrl'
     }
-  };
+  }
 
   const fakeAjaxLib = {
-    get (url) {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(fakeResponse), 100);
-      });
+    get(url) {
+      return new Promise(resolve => {
+        setTimeout(() => resolve(fakeResponse), 100)
+      })
     }
-  };
+  }
 
-  sinon.spy(Actions, 'putImageData');
+  sinon.spy(Actions, 'putImageData')
 
-  Actions.prepareSetImage(null, 1, 0, fakeAjaxLib)((dispatched) => {
-    ok(Actions.putImageData.called, 'putImageData was called indicating successfully hit API');
-    Actions.putImageData.restore();
+  Actions.prepareSetImage(null, 1, 0, fakeAjaxLib)(dispatched => {
+    ok(Actions.putImageData.called, 'putImageData was called indicating successfully hit API')
+    Actions.putImageData.restore()
     done()
-  });
-});
+  })
+})
 
 test('uploadImageSearchUrl without a confirmationId should not call confirmImageSelection', () => {
-  sinon.spy(Actions, 'confirmImageSelection');
-  Actions.uploadImageSearchUrl('http://imageUrl', 1)(() => {});
-  notOk(Actions.confirmImageSelection.called);
-  Actions.confirmImageSelection.restore();
-});
+  sinon.spy(Actions, 'confirmImageSelection')
+  Actions.uploadImageSearchUrl('http://imageUrl', 1)(() => {})
+  notOk(Actions.confirmImageSelection.called)
+  Actions.confirmImageSelection.restore()
+})
 
 test('uploadImageSearchUrl with a confirmationId calls confirmImageSelection', () => {
-  sinon.spy(Actions, 'confirmImageSelection');
-  Actions.uploadImageSearchUrl('http://imageUrl', 1, 'id')(() => {});
-  ok(Actions.confirmImageSelection.called);
-  Actions.confirmImageSelection.restore();
-});
+  sinon.spy(Actions, 'confirmImageSelection')
+  Actions.uploadImageSearchUrl('http://imageUrl', 1, 'id')(() => {})
+  ok(Actions.confirmImageSelection.called)
+  Actions.confirmImageSelection.restore()
+})
 
 test('uploadFile returns false when image is not valid', assert => {
   const done = assert.async()
   const fakeDragonDropEvent = {
     dataTransfer: {
-      files: [{
-        name: 'test file',
-        size: 12345,
-        type: 'image/tiff'
-      }]
+      files: [
+        {
+          name: 'test file',
+          size: 12345,
+          type: 'image/tiff'
+        }
+      ]
     },
     preventDefault: () => {}
-  };
+  }
 
   const expectedAction = {
     type: 'REJECTED_UPLOAD',
     payload: {
       rejectedFiletype: 'image/tiff'
     }
-  };
+  }
 
-
-  Actions.uploadFile(fakeDragonDropEvent, 1)((dispatched) => {
-    deepEqual(dispatched, expectedAction, 'the REJECTED_UPLOAD action was fired');
+  Actions.uploadFile(fakeDragonDropEvent, 1)(dispatched => {
+    deepEqual(dispatched, expectedAction, 'the REJECTED_UPLOAD action was fired')
     done()
-  });
-
-});
+  })
+})
 
 test('uploadFile dispatches UPLOADING_IMAGE when file type is valid', assert => {
   const done = assert.async()
   const fakeDragonDropEvent = {
     dataTransfer: {
-      files: [{
-        name: 'test file',
-        size: 12345,
-        type: 'image/jpeg'
-      }]
+      files: [
+        {
+          name: 'test file',
+          size: 12345,
+          type: 'image/jpeg'
+        }
+      ]
     },
     preventDefault: () => {}
-  };
+  }
 
   const expectedAction = {
     type: 'UPLOADING_IMAGE'
-  };
+  }
 
-  Actions.uploadFile(fakeDragonDropEvent, 1)((dispatched) => {
-      if (dispatched.type === 'UPLOADING_IMAGE') {
-        deepEqual(dispatched, expectedAction, 'the UPLOADING_IMAGE action was fired');
-        done()
-      }
-  });
-});
+  Actions.uploadFile(fakeDragonDropEvent, 1)(dispatched => {
+    if (dispatched.type === 'UPLOADING_IMAGE') {
+      deepEqual(dispatched, expectedAction, 'the UPLOADING_IMAGE action was fired')
+      done()
+    }
+  })
+})
 
 test('uploadFile dispatches prepareSetImage when successful', assert => {
   const done = assert.async()
   const successUrl = 'http://successUrl'
-  const preflightResponse = new Promise((resolve) => {
-    setTimeout(() => resolve({
-      data: {
-        upload_params: {fakeKey: 'fakeValue', success_url: successUrl},
-        upload_url: 'http://uploadUrl'
-      }
-    }));
-  });
-
-  const successResponse = new Promise((resolve) => {
-    setTimeout(() => resolve({
-      data: {
-        url: 'http://fileDownloadUrl',
-        id: 1
-      }
-    }));
+  const preflightResponse = new Promise(resolve => {
+    setTimeout(() =>
+      resolve({
+        data: {
+          upload_params: {fakeKey: 'fakeValue', success_url: successUrl},
+          upload_url: 'http://uploadUrl'
+        }
+      })
+    )
   })
 
-  const postStub = sinon.stub();
+  const successResponse = new Promise(resolve => {
+    setTimeout(() =>
+      resolve({
+        data: {
+          url: 'http://fileDownloadUrl',
+          id: 1
+        }
+      })
+    )
+  })
+
+  const postStub = sinon.stub()
   const getStub = sinon.stub()
   postStub.onCall(0).returns(preflightResponse)
-  postStub.onCall(1).returns(Promise.resolve({ data: {} }));
+  postStub.onCall(1).returns(Promise.resolve({data: {}}))
   getStub.returns(successResponse)
 
   const fakeAjaxLib = {
     post: postStub,
     get: getStub
-  };
+  }
 
   const fakeDragonDropEvent = {
     dataTransfer: {
-      files: [{
-        name: 'test file',
-        size: 12345,
-        type: 'image/jpeg'
-      }]
+      files: [
+        new File(['fake'], 'fake.jpg', {
+          name: 'test file',
+          size: 12345,
+          type: 'image/jpeg'
+        })
+      ]
     },
     preventDefault: () => {}
-  };
+  }
 
-  sinon.spy(Actions, 'prepareSetImage');
+  sinon.spy(Actions, 'prepareSetImage')
 
-  Actions.uploadFile(fakeDragonDropEvent, 1, fakeAjaxLib)((dispatched) => {
+  Actions.uploadFile(fakeDragonDropEvent, 1, fakeAjaxLib)(dispatched => {
     if (dispatched.type !== 'UPLOADING_IMAGE') {
       ok(getStub.calledWith(successUrl), 'made request to success url')
-      ok(Actions.prepareSetImage.called, 'prepareSetImage was called');
-      Actions.prepareSetImage.restore();
+      ok(Actions.prepareSetImage.called, 'prepareSetImage was called')
+      Actions.prepareSetImage.restore()
       done()
     }
-  });
+  })
 })

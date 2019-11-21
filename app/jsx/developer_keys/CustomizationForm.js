@@ -19,28 +19,30 @@ import invert from 'lodash/invert'
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Heading} from '@instructure/ui-elements'
+import {TextArea} from '@instructure/ui-forms'
+import {View} from '@instructure/ui-layout'
 import CustomizationTable from './CustomizationTable'
 import OtherOptions from './OtherOptions'
 
-export const customFieldsStringToObject = (data) => {
+export const customFieldsStringToObject = data => {
   const output = {}
   data.split('\n').forEach(field => {
     const value = field.split('=')
-    if(value.length > 1) {
+    if (value.length > 1) {
       output[value[0]] = value[1]
     }
   })
   return output
 }
 
-export const objectToCustomVariablesString = (custom_fields) => {
-  if(!custom_fields || Object.keys(custom_fields).length === 0) { return '' }
-  return Object.keys(custom_fields).map(
-    k => `${k}=${custom_fields[k]}`
-  ).join('\n')
+export const objectToCustomVariablesString = custom_fields => {
+  if (!custom_fields || Object.keys(custom_fields).length === 0) {
+    return ''
+  }
+  return Object.keys(custom_fields)
+    .map(k => `${k}=${custom_fields[k]}`)
+    .join('\n')
 }
 
 const validationMessage = [{text: I18n.t('Invalid custom fields.'), type: 'error'}]
@@ -109,12 +111,14 @@ export default class CustomizationForm extends React.Component {
       return []
     }
 
-    if (!(extension && extension.settings)) {
+    if (!extension?.settings?.placements) {
       return []
     }
 
     // Intersection of requested placements and valid placements
-    return Object.keys(extension.settings).filter(placement => validPlacements.includes(placement))
+    return extension.settings.placements.filter(placement =>
+      validPlacements.includes(placement.placement)
+    )
   }
 
   componentDidMount() {
@@ -147,12 +151,12 @@ export default class CustomizationForm extends React.Component {
 
   messageTypeFor = placement => {
     const extension = this.canvasExtension
-
-    if (!(extension && extension.settings[placement])) {
+    const place = extension?.settings?.placements?.find(p => p.placement === placement)
+    if (!place) {
       return null
     }
 
-    return extension.settings[placement].message_type
+    return place.message_type
   }
 
   toggleArrayItem(array, value) {
@@ -165,14 +169,11 @@ export default class CustomizationForm extends React.Component {
     return array
   }
 
-  updateCustomFields = (e) => {
+  updateCustomFields = e => {
     const customFieldsObject = customFieldsStringToObject(e.target.value)
     const toUpdate = Object.keys(customFieldsObject).length > 0 ? customFieldsObject : null
     this.setState({custom_fields: e.target.value, valid: !!toUpdate})
-    this.props.updateToolConfiguration(
-      toUpdate,
-      'custom_fields'
-    )
+    this.props.updateToolConfiguration(toUpdate, 'custom_fields')
   }
 
   scopeTable() {
@@ -200,7 +201,7 @@ export default class CustomizationForm extends React.Component {
     return (
       <CustomizationTable
         name={I18n.t('Placements')}
-        options={placements}
+        options={placements.map(p => p.placement)}
         onOptionToggle={this.handlePlacementChange}
         selectedOptions={this.props.disabledPlacements}
         type="placement"

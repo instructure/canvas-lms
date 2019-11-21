@@ -17,11 +17,13 @@
 #
 
 module PermissionsHelper
-  def manageable_enrollments_by_permission(permission)
+  def manageable_enrollments_by_permission(permission, enrollments=nil)
     permission = permission.to_sym
     raise "invalid permission" unless RoleOverride.permissions.keys.include?(permission)
 
-    enrollments = cached_current_enrollments(preload_courses: true, preload_dates: true)
+    enrollments ||= participating_enrollments
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, :enrollment_state)
     allowed_ens = []
     Shard.partition_by_shard(enrollments) do |sharded_enrollments|
       perms_hash = get_permissions_info_by_account(sharded_enrollments.map(&:course), sharded_enrollments, [permission])

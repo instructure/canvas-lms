@@ -16,140 +16,145 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import sinon from "sinon";
-import * as actions from "../../../src/sidebar/actions/images";
+import assert from 'assert'
+import sinon from 'sinon'
+import * as actions from '../../../src/sidebar/actions/images'
 
-describe("Image actions", () => {
-  describe("createAddImage", () => {
-    it("has the right action type", () => {
-      const action = actions.createAddImage({});
-      assert(action.type === actions.ADD_IMAGE);
-    });
+describe('Image actions', () => {
+  describe('createAddImage', () => {
+    it('has the right action type', () => {
+      const action = actions.createAddImage({}, 'course')
+      assert(action.type === actions.ADD_IMAGE)
+    })
 
-    it("includes id from first param", () => {
-      const id = 47;
-      const action = actions.createAddImage({ id });
-      assert(action.id === id);
-    });
+    it('includes id from first param', () => {
+      const id = 47
+      const action = actions.createAddImage({id}, 'course')
+      assert(action.payload.newImage.id === id)
+    })
 
-    it("includes filename from first param", () => {
-      const filename = "foo";
-      const action = actions.createAddImage({ filename });
-      assert(action.filename === filename);
-    });
+    it('includes filename from first param', () => {
+      const filename = 'foo'
+      const action = actions.createAddImage({filename}, 'course')
+      assert(action.payload.newImage.filename === filename)
+    })
 
-    it("includes display_name from first param", () => {
-      const display_name = "bar";
-      const action = actions.createAddImage({ display_name });
-      assert(action.display_name === display_name);
-    });
+    it('includes display_name from first param', () => {
+      const display_name = 'bar'
+      const action = actions.createAddImage({display_name}, 'course')
+      assert(action.payload.newImage.display_name === display_name)
+    })
 
-    it("includes preview_url from first param", () => {
-      const url = "some_url";
-      const action = actions.createAddImage({ url });
-      assert(action.preview_url === url);
-    });
+    it('includes preview_url from first param', () => {
+      const url = 'some_url'
+      const action = actions.createAddImage({url}, 'course')
+      assert(action.payload.newImage.preview_url === url)
+    })
 
-    it("includes thumbnail_url from first param", () => {
-      const thumbnail_url = "other_url";
-      const action = actions.createAddImage({ thumbnail_url });
-      assert(action.thumbnail_url === thumbnail_url);
-    });
-  });
+    it('includes thumbnail_url from first param', () => {
+      const thumbnail_url = 'other_url'
+      const action = actions.createAddImage({thumbnail_url}, 'course')
+      assert(action.payload.newImage.thumbnail_url === thumbnail_url)
+    })
+  })
 
-  describe("fetchImages", () => {
-    let fakeStore;
+  describe('fetchImages', () => {
+    let fakeStore
 
-    beforeEach(() => {
-      fakeStore = {
-        fetchImages: () => {
-          return new Promise(resolve => {
-            resolve({ images: [{ one: "1" }, { two: "2" }, { three: "3" }] });
-          });
+    it('fetches initial page if necessary, part 1', () => {
+      const dispatchSpy = sinon.spy()
+      const getState = () => {
+        return {
+          images: {
+            user: {
+              files: [],
+              bookmark: null,
+              hasMore: true,
+              isLoading: false
+            }
+          },
+          contextType: 'user'
         }
-      };
-    });
+      }
+      actions.fetchInitialImages()(dispatchSpy, getState)
+      assert(dispatchSpy.called)
+    })
 
-    it("fetches if first render", () => {
-      const dispatchSpy = sinon.spy();
+    it('fetches initial page if necessary, part 2', () => {
+      const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           images: {
-            records: [],
-            hasMore: false,
-            isLoading: false,
-            requested: false
+            user: {
+              files: [],
+              bookmark: null,
+              hasMore: true,
+              isLoading: false
+            }
           },
-          source: fakeStore
-        };
-      };
-      return actions
-        .fetchImages({ calledFromRender: true })(dispatchSpy, getState)
-        .then(() => {
-          assert(dispatchSpy.called);
-        });
-    });
+          contextType: 'user'
+        }
+      }
+      actions.fetchNextImages()(dispatchSpy, getState)
+      assert(dispatchSpy.called)
+    })
 
-    it("skips the fetch if subsequent renders", () => {
-      const dispatchSpy = sinon.spy();
+    it('skips the fetch if subsequent renders', () => {
+      const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           images: {
-            records: [{ one: "1" }, { two: "2" }, { three: "3" }],
-            hasMore: false,
-            isLoading: false,
-            requested: true
+            user: {
+              files: [{one: '1'}, {two: '2'}, {three: '3'}],
+              hasMore: true,
+              isLoading: false,
+              requested: true
+            }
           },
-          source: fakeStore
-        };
-      };
-      return actions
-        .fetchImages({ calledFromRender: true })(dispatchSpy, getState)
-        .then(() => {
-          assert(!dispatchSpy.called);
-        });
-    });
+          contextType: 'user'
+        }
+      }
+      actions.fetchInitialImages()(dispatchSpy, getState)
+      assert(!dispatchSpy.called)
+    })
 
-    it("fetches if requested and there are more to load", () => {
-      const dispatchSpy = sinon.spy();
+    it('fetches if requested and there are more to load', () => {
+      const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           images: {
-            records: [{ one: "1" }, { two: "2" }, { three: "3" }],
-            hasMore: true,
-            bookmark: "someurl",
-            isLoading: false
+            user: {
+              files: [{one: '1'}, {two: '2'}, {three: '3'}],
+              hasMore: true,
+              bookmark: 'someurl',
+              isLoading: false
+            }
           },
-          source: fakeStore
-        };
-      };
-      return actions
-        .fetchImages({})(dispatchSpy, getState)
-        .then(() => {
-          assert(dispatchSpy.called);
-        });
-    });
+          contextType: 'user'
+        }
+      }
+      actions.fetchNextImages()(dispatchSpy, getState)
+      assert(dispatchSpy.called)
+    })
 
-    it("does not fetch if requested but no more to load", () => {
-      const dispatchSpy = sinon.spy();
+    it('does not fetch if requested but no more to load', () => {
+      const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           images: {
-            records: [{ one: "1" }, { two: "2" }, { three: "3" }],
-            hasMore: false,
-            bookmark: "someurl",
-            isLoading: false,
-            requested: true
+            user: {
+              files: [{one: '1'}, {two: '2'}, {three: '3'}],
+              hasMore: false,
+              bookmark: 'someurl',
+              isLoading: false,
+              requested: true
+            }
           },
-          source: fakeStore
-        };
-      };
-      return actions
-        .fetchImages({})(dispatchSpy, getState)
-        .then(() => {
-          assert(!dispatchSpy.called);
-        });
-    });
-  });
-});
+          contextType: 'user'
+        }
+      }
+      actions.fetchNextImages()(dispatchSpy, getState)
+      assert(!dispatchSpy.called)
+    })
+  })
+})

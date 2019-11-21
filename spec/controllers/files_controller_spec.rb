@@ -774,7 +774,8 @@ describe FilesController do
 
     context "usage_rights_required" do
       before do
-        @course.enable_feature! :usage_rights_required
+        @course.usage_rights_required = true
+        @course.save!
         user_session(@teacher)
         @file.update_attribute(:locked, true)
       end
@@ -960,7 +961,8 @@ describe FilesController do
     end
 
     it "should create the file in unlocked state if :usage_rights_required is disabled" do
-      @course.disable_feature! :usage_rights_required
+      @course.usage_rights_required = false
+      @course.save!
       user_session(@teacher)
       post 'create_pending', params: {:attachment => {
           :context_code => @course.asset_string,
@@ -971,7 +973,8 @@ describe FilesController do
     end
 
     it "should create the file in locked state if :usage_rights_required is enabled" do
-      @course.enable_feature! :usage_rights_required
+      @course.usage_rights_required = true
+      @course.save!
       user_session(@teacher)
       post 'create_pending', params: {:attachment => {
           :context_code => @course.asset_string,
@@ -1024,7 +1027,8 @@ describe FilesController do
     end
 
     it "does not require usage rights for group submissions to be visible to students" do
-      @course.root_account.enable_feature! :usage_rights_required
+      @course.usage_rights_required = true
+      @course.save!
       user_session(@student)
       category = group_category
       assignment = @course.assignments.create(:group_category => category, :submission_types => 'online_upload')
@@ -1189,7 +1193,7 @@ describe FilesController do
   describe "POST api_capture" do
     before :each do
       allow(InstFS).to receive(:enabled?).and_return(true)
-      allow(InstFS).to receive(:jwt_secret).and_return("jwt signing key")
+      allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
       @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
     end
 

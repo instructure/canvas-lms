@@ -20,48 +20,44 @@ import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ConfigurationFormManual from 'jsx/external_apps/components/ConfigurationFormManual'
 
-QUnit.module('External Apps Manual Configuration Form');
+QUnit.module('External Apps Manual Configuration Form')
 
 const fakeStore = {
-  findAppByShortName () {
+  findAppByShortName() {
     return {
       short_name: 'someApp',
       config_options: []
-    };
+    }
   }
-};
+}
 
-const component = TestUtils.renderIntoDocument (
+const component = TestUtils.renderIntoDocument(
   <ConfigurationFormManual
-    domain=''
-    description=''
+    domain=""
+    description=""
     shortName="someApp"
     store={fakeStore}
-    allowMembershipServiceAccess={true}
-    membershipServiceFeatureFlagEnabled={true}
+    allowMembershipServiceAccess
+    membershipServiceFeatureFlagEnabled
   />
-);
+)
 
 test('domain field should not be null', () => {
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual)
 
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
-
-  equal(app.props.domain, '');
-});
+  equal(app.props.domain, '')
+})
 
 test('description field should not be null', () => {
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual)
 
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
+  equal(app.props.description, '')
+})
 
-  equal(app.props.description, '');
-});
-
-QUnit.module('ConfigurationFormManual#getFormData()');
+QUnit.module('ConfigurationFormManual#getFormData()')
 
 test('returns expected output with membership service feature flag enabled', () => {
-
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual);
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationFormManual)
   app.refs.allow_membership_service_access.setState({value: true})
-  equal(app.getFormData().allow_membership_service_access, true);
-});
-
+  equal(app.getFormData().allow_membership_service_access, true)
+})

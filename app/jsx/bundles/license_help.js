@@ -23,19 +23,26 @@ import 'jquery.instructure_misc_plugins'
 import 'jquery.loadingImg'
 
 const licenceTypes = ['by', 'nc', 'nd', 'sa']
-const toggleButton = (el, check) => $(el).toggleClass('selected', !!check).attr('aria-checked', !!check)
+const toggleButton = (el, check) =>
+  $(el)
+    .toggleClass('selected', !!check)
+    .attr('aria-checked', !!check)
 const checkButton = el => toggleButton(el, true)
 const uncheckButton = el => toggleButton(el, false)
 
-$('.license_help_link').live('click', function (event) {
+$('.license_help_link').live('click', function(event) {
   event.preventDefault()
   let $dialog = $('#license_help_dialog')
   const $select = $(this).prev('select')
   if (!$dialog.length) {
     $dialog = $('<div/>')
-    $dialog.attr('id', 'license_help_dialog').hide().loadingImage().appendTo('body')
+    $dialog
+      .attr('id', 'license_help_dialog')
+      .hide()
+      .loadingImage()
+      .appendTo('body')
 
-    $dialog.delegate('.option', 'click', function (event) {
+    $dialog.delegate('.option', 'click', function(event) {
       event.preventDefault()
       const select = !$(this).is('.selected')
       toggleButton(this, select)
@@ -53,12 +60,18 @@ $('.license_help_link').live('click', function (event) {
     })
 
     $dialog.delegate('.select_license', 'click', () => {
-      if ($dialog.data('select')) { $dialog.data('select').val($dialog.data('current_license') || 'private') }
+      if ($dialog.data('select')) {
+        $dialog.data('select').val($dialog.data('current_license') || 'private')
+      }
       return $dialog.dialog('close')
     })
 
     $dialog.bind('license_change', (event, license) => {
-      $dialog.find('.license').removeClass('active').filter(`.${license}`).addClass('active')
+      $dialog
+        .find('.license')
+        .removeClass('active')
+        .filter(`.${license}`)
+        .addClass('active')
       uncheckButton($dialog.find('.option'))
       if ($dialog.find('.license.active').length === 0) {
         license = 'private'
@@ -66,7 +79,7 @@ $('.license_help_link').live('click', function (event) {
       }
       $dialog.data('current_license', license)
       if (license.match(/^cc/)) {
-        licenceTypes.forEach((type) => {
+        licenceTypes.forEach(type => {
           if (type === 'by' || license.match(`_${type}`)) {
             checkButton($dialog.find(`.option.${type}`))
           }
@@ -76,9 +89,9 @@ $('.license_help_link').live('click', function (event) {
 
     $dialog.bind('option_change', () => {
       const args = ['cc']
-      licenceTypes.forEach((type) => {
+      licenceTypes.forEach(type => {
         if ($dialog.find(`.option.${type}`).is('.selected')) {
-          args.push(type);
+          args.push(type)
         }
       })
 
@@ -92,10 +105,10 @@ $('.license_help_link').live('click', function (event) {
       width: 700
     })
     $.get('/partials/_license_help.html', html =>
-        $dialog
-          .loadingImage('remove')
-          .html(html)
-          .triggerHandler('license_change', $select.val() || 'private')
+      $dialog
+        .loadingImage('remove')
+        .html(html)
+        .triggerHandler('license_change', $select.val() || 'private')
     )
   }
 

@@ -100,6 +100,14 @@ module RCENextPage
     fj("[aria-label='Course Images'] button:contains('#{title}')")
   end
 
+  def image_links
+    ff("[aria-label='Course Images'] button")
+  end
+
+  def user_image_links
+    ff("[data-testid='instructure_links-ImagesPanel'] button")
+  end
+
   def document_link(title)
     fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')")
   end
@@ -117,9 +125,10 @@ module RCENextPage
   end
 
   def possibly_hidden_toolbar_button(selector)
-    button = driver.execute_script("return document.querySelector('#{selector}')")
-    more_toolbar_button.click unless button
     f(selector)
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+      more_toolbar_button.click
+      f(selector)
   end
 
   def links_toolbar_button
@@ -143,11 +152,19 @@ module RCENextPage
   end
 
   def lti_tools_button
-    possibly_hidden_toolbar_button('button[aria-label="LTI Tools"')
+    possibly_hidden_toolbar_button('button[aria-label="Apps"')
+  end
+
+  def lti_tools_modal
+    f('[role="dialog"][aria-label="Apps"]')
   end
 
   def course_images
     f('[role="menuitem"][title="Course Images"]')
+  end
+
+  def user_images
+    f('[role="menuitem"][title="My Images"]')
   end
 
   def upload_image_button
@@ -299,7 +316,7 @@ module RCENextPage
   end
 
   def tray_container
-    f('[data-cid="Tray"]')
+    f('[data-testid="CanvasContentTray"]')
   end
 
   def display_text_link_option
@@ -323,7 +340,7 @@ module RCENextPage
   end
 
   def decorative_options_checkbox
-    f('[data-cid="Checkbox"]')
+    fxpath('//div/input[@type="checkbox"]/..')
   end
 
   # ---------------------- Actions ----------------------
@@ -410,6 +427,11 @@ module RCENextPage
 
   def click_course_images
     course_images.click
+    wait_for_ajaximations
+  end
+
+  def click_user_images
+    user_images.click
     wait_for_ajaximations
   end
 

@@ -32,9 +32,12 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       developer_key: developer_key
     )
   end
-  let(:tool_proxy) do
+  let(:tool_proxy_context) { account }
+  let(:tool_proxy) { create_tool_proxy(tool_proxy_context) }
+
+  def create_tool_proxy(context)
     tp = Lti::ToolProxy.create!(
-      context: account,
+      context: context,
       guid: SecureRandom.uuid,
       shared_secret: 'abc',
       product_family: product_family,
@@ -101,10 +104,11 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       },
       lti_version: '1'
     )
-    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+    Lti::ToolProxyBinding.where(context_id: context.id, context_type: context.class.to_s,
                                 tool_proxy_id: tp).first_or_create!
     tp
   end
+
   let(:resource_handler) do
     Lti::ResourceHandler.create!(
       resource_type_code: 'code',
@@ -120,10 +124,10 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       tool_proxy: tool_proxy
     )
   end
-  let(:tool_proxy_binding) {
-    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+  let(:tool_proxy_binding) do
+    Lti::ToolProxyBinding.where(context_id: tool_proxy_context, context_type: tool_proxy_context.class.to_s,
                                 tool_proxy_id: tool_proxy).first_or_create!
-  }
+  end
   let(:tool_profile) do
     {
       "lti_version" => "LTI-2p0", "product_instance" => {

@@ -146,7 +146,7 @@ export default class Gradebook
 
       $('li.external-tools-dialog > a[data-url], button.external-tools-dialog').on 'click keyclick', (event) ->
         postGradesDialog = new PostGradesFrameDialog({
-          returnFocusTo: $('#post_grades'),
+          returnFocusTo: $('#post_grades, #post_grades_action, #download_csv').first(),
           baseUrl: $(event.target).attr('data-url'),
           launchHeight: $(event.target).attr('data-height'),
           launchWidth: $(event.target).attr('data-width'),

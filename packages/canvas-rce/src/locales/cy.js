@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/cy.json";
-import "../rce/languages/cy";
+import formatMessage from '../format-message'
+import locale from '../../locales/cy.json'
+import '../rce/languages/cy'
 
-formatMessage.addLocale({ cy: locale });
+formatMessage.addLocale({cy: locale})

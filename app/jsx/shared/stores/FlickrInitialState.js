@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-  const FlickrInitialState = {
-	searching: false,
-	searchResults: [],
-	searchTerm: '',
-	page: 1
-  };
+const FlickrInitialState = {
+  searching: false,
+  searchResults: [],
+  searchTerm: '',
+  page: 1
+}
 
 export default FlickrInitialState

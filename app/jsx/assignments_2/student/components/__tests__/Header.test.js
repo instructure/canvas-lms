@@ -23,6 +23,8 @@ import {render} from '@testing-library/react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '../../graphqlData/Submission'
 
+jest.mock('../Attempt')
+
 it('renders normally', async () => {
   const props = await mockAssignmentAndSubmission()
   const {getByTestId} = render(<Header {...props} />)
@@ -67,7 +69,7 @@ it('displays element filler when scroll offset is in correct place', async () =>
 
 it('will render the uncollapsed step container when scroll offset is less than scroll threshold', async () => {
   const props = await mockAssignmentAndSubmission({
-    Submission: () => SubmissionMocks.submitted
+    Submission: SubmissionMocks.submitted
   })
   const {getByTestId, queryByTestId} = render(<Header {...props} />)
   const scrollEvent = new Event('scroll')
@@ -98,10 +100,10 @@ it('will not render LatePolicyStatusDisplay if the submission is not late', asyn
 
 it('will render LatePolicyStatusDisplay if the submission status is late', async () => {
   const props = await mockAssignmentAndSubmission({
-    Submission: () => ({
+    Submission: {
       ...SubmissionMocks.graded,
       submissionStatus: 'late'
-    })
+    }
   })
   const {getByTestId} = render(<Header {...props} />)
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
@@ -109,10 +111,10 @@ it('will render LatePolicyStatusDisplay if the submission status is late', async
 
 it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', async () => {
   const props = await mockAssignmentAndSubmission({
-    Submission: () => ({
+    Submission: {
       ...SubmissionMocks.graded,
       latePolicyStatus: 'late'
-    })
+    }
   })
   const {getByTestId} = render(<Header {...props} />)
   expect(getByTestId('late-policy-container')).toBeInTheDocument()
@@ -120,20 +122,20 @@ it('will render LatePolicyStatusDisplay if the latePolicyStatus is late', async 
 
 it('will render the latest grade instead of the displayed submissions grade', async () => {
   const latestSubmission = await mockSubmission({
-    Submission: () => ({
+    Submission: {
       ...SubmissionMocks.graded,
       grade: '147',
       enteredGrade: '147'
-    })
+    }
   })
 
   const props = await mockAssignmentAndSubmission({
-    Assignment: () => ({pointsPossible: 150}),
-    Submission: () => ({
+    Assignment: {pointsPossible: 150},
+    Submission: {
       ...SubmissionMocks.graded,
       grade: '131',
       enteredGrade: '131'
-    })
+    }
   })
 
   const {queryByText, queryAllByText} = render(
@@ -144,4 +146,11 @@ it('will render the latest grade instead of the displayed submissions grade', as
 
   expect(queryAllByText('147/150 Points')[0]).toBeInTheDocument()
   expect(queryByText('131/150 Points')).not.toBeInTheDocument()
+})
+
+it('will render the unavailable pizza tracker if there is a module prereq lock', async () => {
+  const props = await mockAssignmentAndSubmission()
+  props.assignment.env.modulePrereq = 'simulate not null'
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('unavailable-step-container')).toBeInTheDocument()
 })

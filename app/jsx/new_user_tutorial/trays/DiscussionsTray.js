@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const DiscussionsTray = () => (
@@ -28,12 +28,10 @@ const DiscussionsTray = () => (
     image="/images/tutorial-tray-images/discussions.svg"
   >
     <Text as="p">
-      {
-        I18n.t(`Create as many discussion topics as needed, as assignments
-          for grading or as a forum for shared ideas and information.`)
-      }
+      {I18n.t(`Create as many discussion topics as needed, as assignments
+          for grading or as a forum for shared ideas and information.`)}
     </Text>
   </TutorialTrayContent>
-);
+)
 
-export default DiscussionsTray;
+export default DiscussionsTray

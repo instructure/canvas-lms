@@ -184,11 +184,12 @@ describe ContentMigration do
   end
 
   context "zip file import" do
-    def test_zip_import(context, filename="file.zip", filecount=1)
+    def setup_zip_import(context, filename="file.zip", import_immediately = false)
       zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/#{filename}")
       cm = ContentMigration.new(:context => context, :user => @user)
       cm.migration_type = 'zip_file_importer'
       cm.migration_settings[:folder_id] = Folder.root_folders(context).first.id
+      cm.migration_settings['import_immediately'] = import_immediately
       cm.save!
 
       attachment = Attachment.new
@@ -201,27 +202,47 @@ describe ContentMigration do
       cm.save!
 
       cm.queue_migration
+      cm
+    end
+
+    def test_zip_import(context, cm, filecount = 1)
       run_jobs
       expect(cm.reload).to be_imported
       expect(context.reload.attachments.count).to eq filecount
     end
 
     it "should import into a course" do
-      test_zip_import(@course)
+      cm = setup_zip_import(@course)
+      test_zip_import(@course, cm)
     end
 
     it "should import into a user" do
-      test_zip_import(@user)
+      cm = setup_zip_import(@user)
+      test_zip_import(@user, cm)
     end
 
     it "should import into a group" do
       group_with_user
-      test_zip_import(@group)
+      cm = setup_zip_import(@group)
+      test_zip_import(@group, cm)
     end
 
     it "should not expand the mac system folder" do
-      test_zip_import(@course, "macfile.zip", 4)
+      cm = setup_zip_import(@course, "macfile.zip")
+      test_zip_import(@course, cm, 4)
       expect(@course.folders.pluck(:name)).to_not include("__MACOSX")
+    end
+
+    it "should update unzip progress often" do
+      cm = setup_zip_import(@course, "macfile.zip")
+      expect_any_instantiation_of(cm).to receive(:update_import_progress).exactly(6).times
+      run_jobs
+    end
+
+    it "should update unzip progress often with fast import" do
+      cm = setup_zip_import(@course, "macfile.zip", true)
+      expect_any_instantiation_of(cm).to receive(:update_import_progress).exactly(6).times
+      run_jobs
     end
   end
 

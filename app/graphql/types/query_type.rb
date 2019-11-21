@@ -31,6 +31,14 @@ module Types
       GraphQLNodeLoader.load(type, _id, context)
     end
 
+    field :account, Types::AccountType, null: true do
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+    end
+    def account(id:)
+      GraphQLNodeLoader.load("Account", id, context)
+    end
+
     field :course, Types::CourseType, null: true do
       argument :id, ID, "a graphql or legacy id", required: true,
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
@@ -55,6 +63,14 @@ module Types
       GraphQLNodeLoader.load("AssignmentGroup", id, context)
     end
 
+    field :submission, Types::SubmissionType, null: true do
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
+    end
+    def submission(id:)
+      GraphQLNodeLoader.load("Submission", id, context)
+    end
+
     field :term, Types::TermType, null: true do
       argument :id, ID, "a graphql or legacy id", required: true,
         prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Term")
@@ -69,7 +85,7 @@ module Types
     def all_courses
         # TODO: really need a way to share similar logic like this
         # with controllers in api/v1
-        current_user&.cached_current_enrollments(preload_courses: true).
+        current_user&.cached_currentish_enrollments(preload_courses: true).
           index_by(&:course_id).values.
           sort_by! { |enrollment|
             Canvas::ICU.collation_key(enrollment.course.nickname_for(current_user))

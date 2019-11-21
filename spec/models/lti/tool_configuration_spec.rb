@@ -37,11 +37,6 @@ module Lti
     let(:tool_configuration) { described_class.new(settings: settings) }
     let(:developer_key) { DeveloperKey.create }
 
-    before do
-      settings[:public_jwk_url] = 'https://test.com'
-      settings
-    end
-
     describe 'validations' do
       subject { tool_configuration.save }
 
@@ -136,6 +131,51 @@ module Lti
 
         it { is_expected.to eq true }
       end
+
+      context 'when public_jwk is not present' do
+        let (:settings) do
+          s = super()
+          s.delete('public_jwk')
+          s['public_jwk_url'] = "https://test.com"
+          s
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to eq true }
+      end
+
+      context 'when public_jwk_url is not present' do
+        let (:settings) do
+          s = super()
+          s.delete('public_jwk_url')
+          s['public_jwk'] = public_jwk
+          s
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to eq true }
+      end
+
+      context 'when public_jwk_url and public_jwk are not present' do
+        let (:settings) do
+          s = super()
+          s.delete('public_jwk_url')
+          s.delete('public_jwk')
+          s
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to eq false }
+      end
     end
 
     describe 'after_update' do
@@ -174,7 +214,7 @@ module Lti
 
       before do
         tool_configuration.developer_key = developer_key
-        tool_configuration.privacy_level = 'public'
+        extensions['privacy_level'] = 'public'
       end
 
       shared_examples_for 'a new context external tool' do
@@ -211,7 +251,7 @@ module Lti
         end
 
         context 'when no privacy level is set' do
-          before { tool_configuration.privacy_level = nil }
+          before { extensions['privacy_level'] = nil }
 
           it 'sets the workflow_state to "anonymous"' do
             expect(subject.workflow_state).to eq 'anonymous'
@@ -387,7 +427,7 @@ module Lti
         end
 
         before do
-          allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
+          allow(CanvasHttp).to receive(:get).and_return(stubbed_response)
         end
 
         it 'fetches JSON from the URL' do
@@ -395,7 +435,7 @@ module Lti
         end
 
         context 'when a timeout occurs' do
-          before { allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error) }
+          before { allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error) }
 
           it 'raises exception if timeout occurs' do
             expect{ tool_configuration }.to raise_error /Could not retrieve settings, the server response timed out./
@@ -408,7 +448,7 @@ module Lti
           before do
             allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
             allow(stubbed_response).to receive('[]').and_return('application/json')
-            allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
+            allow(CanvasHttp).to receive(:get).and_return(stubbed_response)
           end
 
           context 'when the response is "not found"' do

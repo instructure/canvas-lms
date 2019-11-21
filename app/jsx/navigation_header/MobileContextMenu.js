@@ -18,99 +18,94 @@
 
 import React from 'react'
 import {string, shape, node} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-layout'
+import {Button} from '@instructure/ui-buttons'
+import {List, Text} from '@instructure/ui-elements'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
-
 import splitAssetString from 'compiled/str/splitAssetString'
-
-import IconHome from '@instructure/ui-icons/lib/Line/IconHome'
-import IconAnnouncement from '@instructure/ui-icons/lib/Line/IconAnnouncement'
-import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconDiscussion from '@instructure/ui-icons/lib/Line/IconDiscussion'
-import IconDocument from '@instructure/ui-icons/lib/Line/IconDocument'
-import IconGradebook from '@instructure/ui-icons/lib/Line/IconGradebook'
-import IconUser from '@instructure/ui-icons/lib/Line/IconUser'
-import IconFolder from '@instructure/ui-icons/lib/Line/IconFolder'
-import IconOutcomes from '@instructure/ui-icons/lib/Line/IconOutcomes'
-import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
-import IconModule from '@instructure/ui-icons/lib/Line/IconModule'
-import IconSyllabus from '@instructure/ui-icons/lib/Line/IconSyllabus'
-import IconSettings from '@instructure/ui-icons/lib/Line/IconSettings'
-import IconVideoCamera from '@instructure/ui-icons/lib/Line/IconVideoCamera'
-import IconLti from '@instructure/ui-icons/lib/Line/IconLti'
-import IconEmpty from '@instructure/ui-icons/lib/Line/IconEmpty'
-import IconCourses from '@instructure/ui-icons/lib/Line/IconCourses'
-import IconGroup from '@instructure/ui-icons/lib/Line/IconGroup'
-import IconStats from '@instructure/ui-icons/lib/Line/IconStats'
-import IconRubric from '@instructure/ui-icons/lib/Line/IconRubric'
-import IconBank from '@instructure/ui-icons/lib/Line/IconBank'
-import IconEssay from '@instructure/ui-icons/lib/Line/IconEssay'
-import IconMaterialsRequired from '@instructure/ui-icons/lib/Line/IconMaterialsRequired'
-import IconLock from '@instructure/ui-icons/lib/Line/IconLock'
-import IconStandards from '@instructure/ui-icons/lib/Line/IconStandards'
-import IconAnnotate from '@instructure/ui-icons/lib/Line/IconAnnotate'
-import IconPostToSis from '@instructure/ui-icons/lib/Line/IconPostToSis'
-import IconAnalytics from '@instructure/ui-icons/lib/Line/IconAnalytics'
-import IconAdmin from '@instructure/ui-icons/lib/Line/IconAdmin'
-import IconHourGlass from '@instructure/ui-icons/lib/Line/IconHourGlass'
+import {
+  IconHomeLine,
+  IconAnnouncementLine,
+  IconAssignmentLine,
+  IconDiscussionLine,
+  IconDocumentLine,
+  IconGradebookLine,
+  IconUserLine,
+  IconFolderLine,
+  IconOutcomesLine,
+  IconQuizLine,
+  IconModuleLine,
+  IconSyllabusLine,
+  IconSettingsLine,
+  IconVideoCameraLine,
+  IconLtiLine,
+  IconEmptyLine,
+  IconCoursesLine,
+  IconGroupLine,
+  IconStatsLine,
+  IconRubricLine,
+  IconBankLine,
+  IconEssayLine,
+  IconMaterialsRequiredLine,
+  IconLockLine,
+  IconStandardsLine,
+  IconAnnotateLine,
+  IconPostToSisLine,
+  IconAnalyticsLine,
+  IconAdminLine,
+  IconHourGlassLine
+} from '@instructure/ui-icons'
 
 const icons = {
-  home: IconHome,
-  announcements: IconAnnouncement,
-  assignments: IconAssignment,
-  discussions: IconDiscussion,
-  pages: IconDocument,
-  grades: IconGradebook,
-  people: IconGroup,
-  files: IconFolder,
-  outcomes: IconOutcomes,
-  quizzes: IconQuiz,
-  modules: IconModule,
-  syllabus: IconSyllabus,
-  settings: IconSettings,
-  profile_settings: IconSettings,
-  conferences: IconVideoCamera,
-  courses: IconCourses,
-  users: IconGroup,
-  statistics: IconStats,
-  permissions: IconEmpty,
-  rubrics: IconRubric,
-  grading_standards: IconGradebook,
-  question_banks: IconBank,
-  faculty_journal: IconEssay,
-  terms: IconAnnotate,
-  authentication: IconLock,
-  brand_configs: IconMaterialsRequired,
-  developer_keys: IconStandards,
-  notifications: IconAnnouncement,
-  profile: IconUser,
-  sis_import: IconPostToSis,
-  analytics_plugin: IconAnalytics,
-  analytics: IconAnalytics,
-  admin_tools: IconAdmin,
-  plugins: IconLti,
-  jobs: IconHourGlass
+  home: IconHomeLine,
+  announcements: IconAnnouncementLine,
+  assignments: IconAssignmentLine,
+  discussions: IconDiscussionLine,
+  pages: IconDocumentLine,
+  grades: IconGradebookLine,
+  people: IconGroupLine,
+  files: IconFolderLine,
+  outcomes: IconOutcomesLine,
+  quizzes: IconQuizLine,
+  modules: IconModuleLine,
+  syllabus: IconSyllabusLine,
+  settings: IconSettingsLine,
+  profile_settings: IconSettingsLine,
+  conferences: IconVideoCameraLine,
+  courses: IconCoursesLine,
+  users: IconGroupLine,
+  statistics: IconStatsLine,
+  permissions: IconEmptyLine,
+  rubrics: IconRubricLine,
+  grading_standards: IconGradebookLine,
+  question_banks: IconBankLine,
+  faculty_journal: IconEssayLine,
+  terms: IconAnnotateLine,
+  authentication: IconLockLine,
+  brand_configs: IconMaterialsRequiredLine,
+  developer_keys: IconStandardsLine,
+  notifications: IconAnnouncementLine,
+  profile: IconUserLine,
+  sis_import: IconPostToSisLine,
+  analytics_plugin: IconAnalyticsLine,
+  analytics: IconAnalyticsLine,
+  admin_tools: IconAdminLine,
+  plugins: IconLtiLine,
+  jobs: IconHourGlassLine
 }
 
-const getIcon = tab => icons[tab.id] || (tab.type === 'external' ? IconLti : IconEmpty)
+const getIcon = tab => icons[tab.id] || (tab.type === 'external' ? IconLtiLine : IconEmptyLine)
 
 function ContextTab({tab, active_context_tab}) {
   const Icon = getIcon(tab)
   return (
-    <ListItem>
+    <List.Item>
       <View display="block" borderWidth="0 0 small 0" padding="x-small 0">
         <Button icon={Icon} variant="link" href={tab.html_url} fluidWidth>
-          {active_context_tab === tab.id ? (
-            <Text weight="bold">{tab.label}</Text>
-          ) : (
-            tab.label
-          )}
+          {active_context_tab === tab.id ? <Text weight="bold">{tab.label}</Text> : tab.label}
         </Button>
       </View>
-    </ListItem>
+    </List.Item>
   )
 }
 ContextTab.propTypes = {
@@ -131,7 +126,7 @@ export default class MobileContextMenu extends React.Component {
   static propTypes = {
     spinner: node.isRequired,
     contextType: string.isRequired,
-    contextId: string.isRequired,
+    contextId: string.isRequired
   }
 
   static defaultProps = {
@@ -149,7 +144,9 @@ export default class MobileContextMenu extends React.Component {
   }
 
   async fetchTabs() {
-    const url = `/api/v1/${encodeURIComponent(this.props.contextType)}/${encodeURIComponent(this.props.contextId)}/tabs`
+    const url = `/api/v1/${encodeURIComponent(this.props.contextType)}/${encodeURIComponent(
+      this.props.contextId
+    )}/tabs`
     const storedTabs = sessionStorage.getItem(url)
     if (storedTabs) {
       this.setState({tabs: JSON.parse(storedTabs), tabsHaveLoaded: true})

@@ -27,20 +27,25 @@ describe('RCE Plugins > CanvasContentTray', () => {
   let component
   let props
 
-  beforeEach(() => {
-    jest.setTimeout(20000)
-
+  function getProps(override = {}) {
     props = {
       bridge: new Bridge(),
+      containingContext: {type: 'course', contextId: '1201', userId: '17'},
       contextId: '1201',
-      contextType: 'Course',
+      contextType: 'course',
       source: fakeSource,
-      themeUrl: 'http://localhost/tinymce-theme.swf'
+      themeUrl: 'http://localhost/tinymce-theme.swf',
+      ...override
     }
+    return props
+  }
+
+  beforeEach(() => {
+    jest.setTimeout(20000)
   })
 
-  function renderComponent() {
-    component = render(<CanvasContentTray {...props} />)
+  function renderComponent(trayprops) {
+    component = render(<CanvasContentTray {...getProps(trayprops)} />)
   }
 
   function getTray() {
@@ -51,43 +56,89 @@ describe('RCE Plugins > CanvasContentTray', () => {
     throw new Error('not mounted')
   }
 
-    async function showTrayForPlugin(plugin) {
+  async function showTrayForPlugin(plugin) {
     act(() => {
       props.bridge.controller.showTrayForPlugin(plugin)
     })
     await wait(getTray, {timeout: 19500})
   }
 
-  describe('Tray Label', () => {
-    beforeEach(renderComponent)
+  function getTrayLabel() {
+    return getTray().getAttribute('aria-label')
+  }
 
-    function getTrayLabel() {
-      return getTray().getAttribute('aria-label')
-    }
+  describe('Tray Label', () => {
+    beforeEach(() => {
+      renderComponent()
+    })
 
     it('is labeled with "Course Links" when using the "links" content type', async () => {
       await showTrayForPlugin('links')
       expect(getTrayLabel()).toEqual('Course Links')
     })
 
+    // course
     it('is labeled with "Course Images" when using the "images" content type', async () => {
-      await showTrayForPlugin('images')
+      await showTrayForPlugin('course_images')
       expect(getTrayLabel()).toEqual('Course Images')
     })
 
-    it.skip('is labeled with "Course Media" when using the "media" content type', async () => {
-      await showTrayForPlugin('media')
+    it('is labeled with "Course Media" when using the "media" content type', async () => {
+      await showTrayForPlugin('course_media')
       expect(getTrayLabel()).toEqual('Course Media')
     })
 
-    it('is labeled with "Course Documents" when using the "documents" content type', async () => {
-      await showTrayForPlugin('documents')
+    it('is labeled with "Course Documents" when using the "course_documents" content type', async () => {
+      await showTrayForPlugin('course_documents')
       expect(getTrayLabel()).toEqual('Course Documents')
+    })
+
+    // user
+    it('is labeled with "User Images" when using the "user_images" content type', async () => {
+      await showTrayForPlugin('user_images')
+      expect(getTrayLabel()).toEqual('User Images')
+    })
+
+    it('is labeled with "User Media" when using the "user_media" content type', async () => {
+      await showTrayForPlugin('user_media')
+      expect(getTrayLabel()).toEqual('User Media')
+    })
+
+    it('is labeled with "User Documents" when using the "user_documents" content type', async () => {
+      await showTrayForPlugin('user_documents')
+      expect(getTrayLabel()).toEqual('User Documents')
+    })
+  })
+
+  describe('content panel', () => {
+    beforeEach(() => {
+      renderComponent()
+    })
+    it('is the links panel for links content types', async () => {
+      await showTrayForPlugin('links')
+      expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+    })
+
+    it('is the documents panel for document content types', async () => {
+      await showTrayForPlugin('course_documents')
+      expect(component.getByTestId('instructure_links-DocumentsPanel')).toBeInTheDocument()
+    })
+
+    it('is the images panel for image content types', async () => {
+      await showTrayForPlugin('course_images')
+      expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
+    })
+
+    it('is the media panel for media content types', async () => {
+      await showTrayForPlugin('course_media')
+      expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
     })
   })
 
   describe('focus', () => {
-    beforeEach(renderComponent)
+    beforeEach(() => {
+      renderComponent()
+    })
 
     it('is set on tinymce after tray closes', async () => {
       const mockFocus = jest.fn()

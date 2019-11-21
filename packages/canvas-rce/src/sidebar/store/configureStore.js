@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware } from "redux";
-import rootReducer from "../reducers";
-import initialState from "./initialState";
-import thunkMiddleware from "redux-thunk";
-import { batch, batching } from "redux-batch-middleware";
+import {createStore, applyMiddleware} from 'redux'
+import rootReducer from '../reducers'
+import initialState from './initialState'
+import thunkMiddleware from 'redux-thunk'
+import {batch, batching} from 'redux-batch-middleware'
 
 export default function(props, state) {
   const store = createStore(
     batching(rootReducer),
     state || initialState(props),
     applyMiddleware(thunkMiddleware, batch)
-  );
+  )
 
-  return store;
+  return store
 }

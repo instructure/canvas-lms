@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require 'rotp'
 
-describe User do
+require_relative '../sharding_spec_helper'
 
+describe User do
   context "validation" do
     it "should create a new instance given valid attributes" do
       expect(user_model).to be_valid
@@ -1599,7 +1599,7 @@ describe User do
     end
   end
 
-  describe "cached_current_enrollments" do
+  describe "cached_currentish_enrollments" do
     it "should include temporary invitations" do
       user_with_pseudonym(:active_all => 1)
       @user1 = @user
@@ -1610,7 +1610,7 @@ describe User do
       course_factory(active_all: true)
       @enrollment = @course.enroll_user(@user2)
 
-      expect(@user1.cached_current_enrollments).to eq [@enrollment]
+      expect(@user1.cached_currentish_enrollments).to eq [@enrollment]
     end
 
     context "sharding" do
@@ -1627,7 +1627,7 @@ describe User do
           course2.offer!
           course2.enroll_student(user)
         end
-        expect(user.cached_current_enrollments).to eq [e1, e2]
+        expect(user.cached_currentish_enrollments).to eq [e1, e2]
       end
 
       it "should properly update when using new redis cache keys" do
@@ -1636,13 +1636,13 @@ describe User do
           user = User.create!
           course1 = Account.default.courses.create!(:workflow_state => "available")
           e1 = course1.enroll_student(user, :enrollment_state => "active")
-          expect(user.cached_current_enrollments).to eq [e1]
+          expect(user.cached_currentish_enrollments).to eq [e1]
           e2 = @shard1.activate do
             account2 = Account.create!
             course2 = account2.courses.create!(:workflow_state => "available")
             course2.enroll_student(user, :enrollment_state => "active")
           end
-          expect(user.cached_current_enrollments).to eq [e1, e2]
+          expect(user.cached_currentish_enrollments).to eq [e1, e2]
         end
       end
     end
@@ -1977,43 +1977,29 @@ describe User do
       ids << User.create!(:name => "john john")
     end
 
-    let_once :has_pg_collkey do
-      status = if User.connection.extension_installed?(:pg_collkey)
-        begin
-          Bundler.require 'icu'
-          true
-        rescue LoadError
-          skip 'requires icu locally SD-2747'
-          false
-        end
-      end
-
-      status || false
-    end
-
-    context 'when pg_collkey is installed' do
+    context 'given pg_collkey extension is present' do
       before do
-        skip 'requires pg_collkey installed SD-2747' unless has_pg_collkey
+        skip_unless_pg_collkey_present
       end
 
-      it "should sort lexicographically" do
+      it "sorts lexicographically" do
         ascending_sortable_names = User.order_by_sortable_name.where(id: ids).map(&:sortable_name)
         expect(ascending_sortable_names).to eq(["john, john", "John, John", "Johnson, John"])
       end
 
-      it "should sort support direction toggle" do
+      it "sorts support direction toggle" do
         descending_sortable_names = User.order_by_sortable_name(:direction => :descending).
           where(id: ids).map(&:sortable_name)
         expect(descending_sortable_names).to eq(["Johnson, John", "John, John", "john, john"])
       end
 
-      it "should sort support direction toggle with a prior select" do
+      it "sorts support direction toggle with a prior select" do
         descending_sortable_names = User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).
           where(id: ids).map(&:sortable_name)
         expect(descending_sortable_names).to eq ["Johnson, John", "John, John", "john, john"]
       end
 
-      it "should sort by the current locale with pg_collkey if possible" do
+      it "sorts by the current locale" do
         I18n.locale = :es
         expect(User.sortable_name_order_by_clause).to match(/'es'/)
         expect(User.sortable_name_order_by_clause).not_to match(/'root'/)
@@ -2021,29 +2007,6 @@ describe User do
         I18n.locale = :en
         expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
         expect(User.sortable_name_order_by_clause).to match(/'root'/)
-      end
-    end
-
-    context 'when pg_collkey is not installed' do
-      before do
-        skip 'requires pg_collkey to not be installed SD-2747' if has_pg_collkey
-      end
-
-      it "should sort lexicographically" do
-        ascending_sortable_names = User.order_by_sortable_name.where(id: ids).map(&:sortable_name)
-        expect(ascending_sortable_names).to eq(["John, John", "john, john", "Johnson, John"])
-      end
-
-      it "should sort support direction toggle" do
-        descending_sortable_names = User.order_by_sortable_name(:direction => :descending).
-          where(id: ids).map(&:sortable_name)
-        expect(descending_sortable_names).to eq(["Johnson, John", "john, john", "John, John"])
-      end
-
-      it "should sort support direction toggle with a prior select" do
-        descending_sortable_names = User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).
-          where(id: ids).map(&:sortable_name)
-        expect(descending_sortable_names).to eq ["Johnson, John", "john, john", "John, John"]
       end
     end
 
@@ -2765,7 +2728,7 @@ describe User do
   describe "otp remember me cookie" do
     before do
       @user = User.new
-      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.otp_secret_key = ROTP::Base32.random
     end
 
     it "should add an ip to an existing cookie" do

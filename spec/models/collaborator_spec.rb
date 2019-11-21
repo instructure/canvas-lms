@@ -32,7 +32,7 @@ describe Collaborator do
   context 'broadcast policy' do
     it 'should notify collaborating users', priority: "1", test_id: 193152 do
       user = user_with_pseudonym(:active_all => true)
-      @course.enroll_student(user)
+      @course.enroll_student(user, :enrollment_state => 'active')
       NotificationPolicy.create(:notification => @notification,
                                 :communication_channel => user.communication_channel,
                                 :frequency => 'immediately')
@@ -55,7 +55,7 @@ describe Collaborator do
       group = group_model(:name => 'Test group', :context => @course)
       users = (1..2).map { user_with_pseudonym(:active_all => true) }
       users.each do |u|
-        @course.enroll_student(u)
+        @course.enroll_student(u, :enrollment_state => 'active')
         group.add_user(u, 'active')
       end
       @collaboration.update_members([], [group.id])
@@ -64,10 +64,10 @@ describe Collaborator do
     end
 
     it 'should not notify members of a group in an unpublished course' do
-      @course.update_attribute(:workflow_state, "claimed")
       group = group_model(:name => 'Test group', :context => @course)
       user = user_with_pseudonym(:active_all => true)
       @course.enroll_student(user)
+      @course.update_attribute(:workflow_state, 'claimed')
       group.add_user(user, 'active')
       @collaboration.update_members([], [group.id])
       expect(@collaboration.collaborators.detect { |c| c.group_id.present? }.

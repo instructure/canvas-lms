@@ -50,10 +50,11 @@
           <% if @current_user %>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/profile') %>">
               <a id="global_nav_profile_link" role="button" href="/profile" class="ic-app-header__menu-list-link">
-                <div class="menu-item-icon-container" aria-hidden="true">
-                  <div class="ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
+                <div class="menu-item-icon-container">
+                  <div aria-hidden="true" class="ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
                     <img src="<%= @current_user.try { |usr| avatar_image_attrs(usr).first } %>" alt="<%= @current_user.short_name %>" />
                   </div>
+                  <span class="menu-item__badge"></span>
                 </div>
                 <div class="menu-item__text">
                   <%= t('Account') %>
@@ -128,7 +129,7 @@
             <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
               <div class="menu-item-icon-container">
                 <span aria-hidden="true"><%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_inbox.svg") %></span>
-                <span class="menu-item__badge" style="display: none">0</span>
+                <span class="menu-item__badge"></span>
               </div>
               <div class="menu-item__text">
                 <%= t('Inbox') %>

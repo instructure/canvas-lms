@@ -19,8 +19,8 @@
 import I18n from 'i18n!theme_editor'
 import React from 'react'
 import {bool, func, object} from 'prop-types'
-import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import View from '@instructure/ui-layout/lib/components/View'
+import {TabList} from '@instructure/ui-tabs'
+import {View} from '@instructure/ui-layout'
 import types from './PropTypes'
 import ThemeEditorAccordion from './ThemeEditorAccordion'
 import ThemeEditorFileUpload from './ThemeEditorFileUpload'
@@ -29,7 +29,7 @@ export default function ThemeEditorSidebar(props) {
   if (props.allowGlobalIncludes) {
     return (
       <TabList variant="minimal" size="medium" padding="0">
-        <TabPanel title={I18n.t('Edit')}>
+        <TabList.Panel title={I18n.t('Edit')}>
           <ThemeEditorAccordion
             variableSchema={props.variableSchema}
             brandConfigVariables={props.brandConfig.variables}
@@ -39,8 +39,8 @@ export default function ThemeEditorSidebar(props) {
             themeState={props.themeState}
             handleThemeStateChange={props.handleThemeStateChange}
           />
-        </TabPanel>
-        <TabPanel title={I18n.t('Upload')} padding="0">
+        </TabList.Panel>
+        <TabList.Panel title={I18n.t('Upload')} padding="0">
           <div className="Theme__editor-upload-overrides">
             <div className="Theme__editor-upload-warning">
               <div className="Theme__editor-upload-warning_icon">
@@ -126,7 +126,7 @@ export default function ThemeEditorSidebar(props) {
               />
             </div>
           </div>
-        </TabPanel>
+        </TabList.Panel>
       </TabList>
     )
   }

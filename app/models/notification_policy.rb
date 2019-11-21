@@ -129,7 +129,8 @@ class NotificationPolicy < ActiveRecord::Base
   # Finds the current policy for a given communication channel, or creates it (with default)
   # and/or updates it
   def self.find_or_update_for(communication_channel, notification_name, frequency = nil)
-    notification_name = notification_name.titleize
+    # Titlize changes SMS to Sms :sadlol:
+    notification_name = notification_name.titleize unless notification_name == 'Confirm SMS Communication Channel'
     notification = BroadcastPolicy.notification_finder.by_name(notification_name)
     raise ActiveRecord::RecordNotFound unless notification
     communication_channel.shard.activate do

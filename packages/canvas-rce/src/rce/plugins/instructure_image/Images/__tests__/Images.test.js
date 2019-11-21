@@ -30,12 +30,16 @@ describe('RCE "Images" Plugin > Images', () => {
     component = null
 
     props = {
-      fetchImages: jest.fn(),
+      fetchInitialImages: jest.fn(),
+      fetchNextImages: jest.fn(),
       images: {
-        hasMore: false,
-        isLoading: false,
-        records: []
+        course: {
+          hasMore: false,
+          isLoading: false,
+          files: []
+        }
       },
+      contextType: 'course',
       onImageEmbed() {}
     }
   })
@@ -66,14 +70,9 @@ describe('RCE "Images" Plugin > Images', () => {
   }
 
   describe('upon initial render', () => {
-    it('calls the .fetchImages prop', () => {
+    it('calls the .fetchInitialImages prop', () => {
       renderComponent()
-      expect(props.fetchImages).toHaveBeenCalledTimes(1)
-    })
-
-    it('includes .calledFromRender set to `true` when calling .fetchImages', () => {
-      renderComponent()
-      expect(props.fetchImages).toHaveBeenCalledWith({calledFromRender: true})
+      expect(props.fetchInitialImages).toHaveBeenCalledTimes(1)
     })
 
     it('does not display the "Load More" button', () => {
@@ -85,8 +84,7 @@ describe('RCE "Images" Plugin > Images', () => {
   describe('after updating for initial data load', () => {
     beforeEach(() => {
       renderComponent()
-      props.fetchImages = jest.fn()
-      props.images.isLoading = true
+      props.images[props.contextType].isLoading = true
       renderComponent()
     })
 
@@ -94,8 +92,8 @@ describe('RCE "Images" Plugin > Images', () => {
       expect(getLoadingIndicator()).toBeInTheDocument()
     })
 
-    it('does not call the .fetchImages prop again', () => {
-      expect(props.fetchImages).toHaveBeenCalledTimes(0)
+    it('does not call the .fetchInitialImages prop again', () => {
+      expect(props.fetchInitialImages).toHaveBeenCalledTimes(1)
     })
 
     it('does not display the "Load More" button', () => {
@@ -107,10 +105,10 @@ describe('RCE "Images" Plugin > Images', () => {
   describe('after initial load resolves with images', () => {
     beforeEach(() => {
       renderComponent()
-      props.images.isLoading = true
+      props.images[props.contextType].isLoading = true
       renderComponent()
-      props.images.isLoading = false
-      props.images.records = [
+      props.images[props.contextType].isLoading = false
+      props.images[props.contextType].files = [
         buildImage(0, 'example_1.png', 100, 200),
         buildImage(1, 'example_2.png', 101, 201),
         buildImage(2, 'example_3.png', 102, 202)
@@ -128,20 +126,20 @@ describe('RCE "Images" Plugin > Images', () => {
     })
 
     it('displays the "Load More" button when more results can be loaded', () => {
-      props.images.hasMore = true
+      props.images[props.contextType].hasMore = true
       renderComponent()
       expect(getLoadMoreButton()).toBeInTheDocument()
     })
 
     it('does not display the "Load More" button when no more results can be loaded', () => {
-      props.images.hasMore = false
+      props.images[props.contextType].hasMore = false
       renderComponent()
       expect(getLoadMoreButton()).not.toBeInTheDocument()
     })
 
     it('does not change focus', () => {
       const previousActiveElement = document.activeElement
-      props.images.hasMore = false
+      props.images[props.contextType].hasMore = false
       renderComponent()
       expect(document.activeElement).toEqual(previousActiveElement)
     })
@@ -153,14 +151,14 @@ describe('RCE "Images" Plugin > Images', () => {
       renderComponent()
 
       // Begin initial load after mounting
-      props.images.isLoading = true
+      props.images[props.contextType].isLoading = true
       renderComponent()
 
       // Initial load completes
-      props.images = {
+      props.images[props.contextType] = {
         hasMore: true,
         isLoading: false,
-        records: [
+        files: [
           buildImage(0, 'example_1.png', 100, 200),
           buildImage(1, 'example_2.png', 101, 201),
           buildImage(2, 'example_3.png', 102, 202)
@@ -170,7 +168,7 @@ describe('RCE "Images" Plugin > Images', () => {
       fireEvent.focus(getLoadMoreButton())
 
       // Load more
-      props.images.isLoading = true
+      props.images[props.contextType].isLoading = true
       renderComponent()
     })
 
@@ -196,14 +194,14 @@ describe('RCE "Images" Plugin > Images', () => {
       renderComponent()
 
       // Begin initial load after mounting
-      props.images.isLoading = true
+      props.images[props.contextType].isLoading = true
       renderComponent()
 
       // Initial load completes
-      props.images = {
+      props.images[props.contextType] = {
         hasMore: true,
         isLoading: false,
-        records: [
+        files: [
           buildImage(0, 'example_1.png', 100, 200),
           buildImage(1, 'example_2.png', 101, 201),
           buildImage(2, 'example_3.png', 102, 202)
@@ -212,14 +210,14 @@ describe('RCE "Images" Plugin > Images', () => {
       renderComponent()
 
       // Load more
-      props.images.isLoading = true
+      props.images[props.contextType].isLoading = true
       renderComponent()
 
       // Additional images loaded
-      props.images = {
+      props.images[props.contextType] = {
         hasMore: true,
         isLoading: false,
-        records: [...props.images.records, buildImage(3, 'example_4.png', 103, 203)]
+        files: [...props.images[props.contextType].files, buildImage(3, 'example_4.png', 103, 203)]
       }
     })
 
@@ -229,13 +227,13 @@ describe('RCE "Images" Plugin > Images', () => {
     })
 
     it('displays the "Load More" button when more results can be loaded', () => {
-      props.images.hasMore = true
+      props.images[props.contextType].hasMore = true
       renderComponent()
       expect(getLoadMoreButton()).toBeInTheDocument()
     })
 
     it('does not display the "Load More" button when no more results can be loaded', () => {
-      props.images.hasMore = false
+      props.images[props.contextType].hasMore = false
       renderComponent()
       expect(getLoadMoreButton()).not.toBeInTheDocument()
     })

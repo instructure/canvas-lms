@@ -50,11 +50,7 @@ Object.assign(CommonEvent.prototype, {
   },
 
   isAppointmentGroupFilledEvent() {
-    return (
-      this.object &&
-      this.object.child_events &&
-      this.object.child_events.length > 0
-    )
+    return this.object && this.object.child_events && this.object.child_events.length > 0
   },
 
   isAppointmentGroupEvent() {
@@ -207,10 +203,7 @@ Object.assign(CommonEvent.prototype, {
 
   assignmentType() {
     if (!this.assignment) return
-    if (
-      this.assignment.submission_types &&
-      this.assignment.submission_types.length
-    ) {
+    if (this.assignment.submission_types && this.assignment.submission_types.length) {
       const type = this.assignment.submission_types[0]
       if (type === 'online_quiz') return 'quiz'
       if (type === 'discussion_topic') return 'discussion'
@@ -219,7 +212,7 @@ Object.assign(CommonEvent.prototype, {
   },
 
   plannerObjectType() {
-    switch(this.object.plannable_type) {
+    switch (this.object.plannable_type) {
       case 'discussion_topic':
         return 'discussion'
       case 'wiki_page':

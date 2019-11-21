@@ -44,6 +44,7 @@ function addUploaderReadyEventListeners(uploader, file) {
 
 function addUploaderFileErrorEventListeners(uploader, done) {
   uploader.addEventListener('K5.fileError', error => {
+    uploader.destroy()
     done(error)
   })
 }
@@ -67,8 +68,10 @@ function addUploaderFileCompleteEventListeners(uploader, context, file, done) {
 
     try {
       const canvasMediaObject = await axios.post('/api/v1/media_objects', body)
-      done(null, canvasMediaObject.data)
+      uploader.destroy()
+      done(null, {mediaObject: canvasMediaObject.data, uploadedFile: file})
     } catch (e) {
+      uploader.destroy()
       done(e)
     }
   })
@@ -91,4 +94,27 @@ export default async function saveMediaRecording(file, contextId, contextType, d
   } catch (err) {
     done(err)
   }
+}
+
+export async function saveClosedCaptions(mediaId, files) {
+  const axiosRequests = []
+  files.forEach(function(file) {
+    const p = new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = function(e) {
+        const content = e.target.result
+        const params = {
+          content,
+          locale: file.language.selectedOptionId
+        }
+        axios
+          .post(`/media_objects/${mediaId}/media_tracks`, params)
+          .then(resolve)
+          .catch(reject)
+      }
+      reader.readAsText(file.file)
+    })
+    axiosRequests.push(p)
+  })
+  return Promise.all(axiosRequests)
 }

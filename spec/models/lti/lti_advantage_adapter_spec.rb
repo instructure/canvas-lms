@@ -142,6 +142,21 @@ describe Lti::LtiAdvantageAdapter do
       expect(login_message['client_id']).to eq tool.global_developer_key_id
     end
 
+    context 'when the user has a past lti context id' do
+      before do
+        user.past_lti_ids.create!(
+          context: course,
+          user_uuid: SecureRandom.uuid,
+          user_lti_id: SecureRandom.uuid,
+          user_lti_context_id: SecureRandom.uuid
+        )
+      end
+
+      it 'sets the "login_hint" to the current user LTI ID' do
+        expect(login_message['login_hint']).to eq user.past_lti_ids.first.user_lti_context_id
+      end
+    end
+
     context 'when the DB has a region configured' do
       specs_require_sharding
 

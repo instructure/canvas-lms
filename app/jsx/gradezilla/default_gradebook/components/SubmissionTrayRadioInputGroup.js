@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 import SubmissionTrayRadioInput from './SubmissionTrayRadioInput'
 import {statusesTitleMap} from '../constants/statuses'
 import I18n from 'i18n!gradezilla'
@@ -57,7 +57,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
 
     const data = value === 'excused' ? {excuse: true} : {latePolicyStatus: value}
     if (value === 'late') {
-      data.secondsLateOverride = 0
+      data.secondsLateOverride = this.props.submission.secondsLate
     }
 
     if (this.props.submissionUpdating) {

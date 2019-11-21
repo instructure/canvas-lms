@@ -17,64 +17,63 @@
  */
 
 import $ from 'jquery'
-  $(document).ready(() => {
-    var $start_debugging = $('.start_debugging'),
-        $stop_debugging = $('.stop_debugging'),
-        $refresh_debugging = $('.refresh_debugging');
 
-    var stop_debugging = function($link){
-      var $container = $link.closest('div.debugging')
-      $container.find('.start_debugging').show();
-      $container.find('.refresh_debugging').hide();
-      $container.find('.stop_debugging').hide();
-      var debug_data = $container.find('.debug_data');
-      debug_data.html("");
-      debug_data.hide();
-    };
+$(document).ready(() => {
+  const $start_debugging = $('.start_debugging'),
+    $stop_debugging = $('.stop_debugging'),
+    $refresh_debugging = $('.refresh_debugging')
 
-    var load_debug_data = function($link, new_debug_session){
-      var url = $link.attr('href');
-      var method = 'GET';
-      var debug_data;
-      if(new_debug_session){
-        method = 'PUT';
-      }
-      $.ajaxJSON(url, method, {}, data => {
-        if (data) {
-          if (data.debugging) {
-            debug_data = $link.closest('div.debugging').find('.debug_data');
-            debug_data.html($.raw(data.debug_data));
-            debug_data.show();
-          } else {
-            stop_debugging();
-          }
+  const stop_debugging = function($link) {
+    const $container = $link.closest('div.debugging')
+    $container.find('.start_debugging').show()
+    $container.find('.refresh_debugging').hide()
+    $container.find('.stop_debugging').hide()
+    const debug_data = $container.find('.debug_data')
+    debug_data.html('')
+    debug_data.hide()
+  }
+
+  const load_debug_data = function($link, new_debug_session) {
+    const url = $link.attr('href')
+    let method = 'GET'
+    let debug_data
+    if (new_debug_session) {
+      method = 'PUT'
+    }
+    $.ajaxJSON(url, method, {}, data => {
+      if (data) {
+        if (data.debugging) {
+          debug_data = $link.closest('div.debugging').find('.debug_data')
+          debug_data.html($.raw(data.debug_data))
+          debug_data.show()
+        } else {
+          stop_debugging()
         }
-      });
-    };
+      }
+    })
+  }
 
-    $start_debugging.click(event => {
-      event.preventDefault();
-      var $link = $(event.target)
-      load_debug_data($link, true);
-      $link.hide();
-      var $container = $link.closest('div.debugging');
-      $container.find('.refresh_debugging').show();
-      $container.find('.stop_debugging').show();
-    });
+  $start_debugging.click(event => {
+    event.preventDefault()
+    const $link = $(event.target)
+    load_debug_data($link, true)
+    $link.hide()
+    const $container = $link.closest('div.debugging')
+    $container.find('.refresh_debugging').show()
+    $container.find('.stop_debugging').show()
+  })
 
-    $refresh_debugging.click(event => {
-      event.preventDefault();
-      load_debug_data($(event.target), false);
-    });
+  $refresh_debugging.click(event => {
+    event.preventDefault()
+    load_debug_data($(event.target), false)
+  })
 
-    $stop_debugging.click(event => {
-      event.preventDefault();
-      var $link = $(event.target)
-      stop_debugging($link);
+  $stop_debugging.click(event => {
+    event.preventDefault()
+    const $link = $(event.target)
+    stop_debugging($link)
 
-      var url = $link.attr('href');
-      $.ajaxJSON(url, 'DELETE', {}, data => {
-      });
-    });
-
-  });
+    const url = $link.attr('href')
+    $.ajaxJSON(url, 'DELETE', {}, data => {})
+  })
+})

@@ -16,20 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import {cleanUrl} from './contentInsertionUtils';
-import formatMessage from "../format-message";
+import React from 'react'
+import {renderToStaticMarkup} from 'react-dom/server'
+import {cleanUrl} from './contentInsertionUtils'
+import formatMessage from '../format-message'
+import {
+  VIDEO_SIZE_DEFAULT,
+  AUDIO_PLAYER_SIZE
+} from './plugins/instructure_record/VideoOptionsTray/TrayController'
+import {isAudio} from './plugins/shared/fileTypeUtils'
 
 export function renderLink(data, contents) {
   const linkAttrs = {...data}
-  linkAttrs.href = linkAttrs.href || linkAttrs.url;
+  linkAttrs.href = linkAttrs.href || linkAttrs.url
   delete linkAttrs.url
   if (linkAttrs.href) {
-    linkAttrs.href = cleanUrl(linkAttrs.href);
+    linkAttrs.href = cleanUrl(linkAttrs.href)
   }
-  linkAttrs.title = linkAttrs.title || formatMessage("Link");
-  const children = contents || linkAttrs.text || linkAttrs.title;
+  linkAttrs.title = linkAttrs.title || formatMessage('Link')
+  const children = contents || linkAttrs.text || linkAttrs.title
   delete linkAttrs.selectionDetails
   delete linkAttrs.text
   linkAttrs.className = linkAttrs.class
@@ -40,47 +45,106 @@ export function renderLink(data, contents) {
     if (typeof linkAttrs[attr] === 'boolean') linkAttrs[attr] = linkAttrs[attr].toString()
   })
 
-  return renderToStaticMarkup(
-    <a {...linkAttrs}>
-      {children}
-    </a>
-  );
+  return renderToStaticMarkup(<a {...linkAttrs}>{children}</a>)
 }
 
 export function renderDoc(doc) {
-  return `<a target="_blank" rel="noopener noreferrer" href="${doc.href}">${doc.display_name || doc.filename}</a>`
+  return `<a target="_blank" rel="noopener noreferrer" href="${doc.href}">${doc.display_name ||
+    doc.filename}</a>`
 }
 
 export function renderLinkedImage(linkElem, image) {
-  const linkHref = linkElem.getAttribute("href");
+  const linkHref = linkElem.getAttribute('href')
 
   return renderToStaticMarkup(
     <a href={linkHref} data-mce-href={linkHref}>
-      {constructJSXImageElement(image, { doNotLink: true })}
+      {constructJSXImageElement(image, {doNotLink: true})}
     </a>
-  );
+  )
 }
 
 export function constructJSXImageElement(image, opts = {}) {
-  const href = image.href || image.url;
-  let ret = <img alt={image.title || image.display_name} src={href} />;
-  if (image.alt_text) {
-    if (image.alt_text.decorativeSelected) {
-      ret = <img alt="" data-decorative="true" src={href} />;
+  const {href, url, title, display_name, alt_text, link, ...otherAttributes} = image
+  const src = href || url
+  let altText = title || display_name
+  if (alt_text) {
+    if (alt_text.decorativeSelected) {
+      altText = ''
+      otherAttributes['data-is-decorative'] = 'true'
     } else {
-      ret = <img alt={image.alt_text.altText} src={href} />;
+      altText = alt_text.altText
     }
   }
-  if (image.link && !opts.doNotLink) {
-    ret = (
-      <a href={image.link} target="_blank" rel="noopener noreferrer">
+
+  const ret = (
+    <img alt={altText} src={src} width={image.width} height={image.height} {...otherAttributes} />
+  )
+  if (link && !opts.doNotLink) {
+    return (
+      <a href={link} target="_blank" rel="noopener noreferrer">
         {ret}
       </a>
-    );
+    )
   }
-  return ret;
+  return ret
 }
 
-export function renderImage(image) {
-  return renderToStaticMarkup(constructJSXImageElement(image));
+export function renderImage(image, opts) {
+  return renderToStaticMarkup(constructJSXImageElement(image, opts))
+}
+
+export function mediaIframeSrcFromFile(fileProps) {
+  const type = isAudio(fileProps.content_type || fileProps.type) ? 'audio' : 'video'
+  if (fileProps.embedded_iframe_url) {
+    return `${fileProps.embedded_iframe_url}?type=${type}`
+  }
+  return `/media_objects_iframe?mediahref=${encodeURIComponent(fileProps.href)}&type=${type}`
+}
+
+function constructJSXVideoEmbedding(video) {
+  const src = mediaIframeSrcFromFile(video)
+  return (
+    <iframe
+      allow="fullscreen"
+      allowFullScreen
+      data-media-id={`${video.media_id || video.id}`}
+      data-media-type="video"
+      src={src}
+      style={{
+        width: VIDEO_SIZE_DEFAULT.width,
+        height: VIDEO_SIZE_DEFAULT.height,
+        display: 'inline-block'
+      }}
+      title={formatMessage('Video player for {title}', {
+        title: video.title || video.name || video.text
+      })}
+    />
+  )
+}
+
+export function renderVideo(video) {
+  return renderToStaticMarkup(constructJSXVideoEmbedding(video))
+}
+
+function constructJSXAudioEmbedding(audio) {
+  const src = mediaIframeSrcFromFile(audio)
+  return (
+    <iframe
+      data-media-id={`${audio.media_id || audio.id}`}
+      data-media-type="audio"
+      src={src}
+      style={{
+        width: AUDIO_PLAYER_SIZE.width,
+        height: AUDIO_PLAYER_SIZE.height,
+        display: 'inline-block'
+      }}
+      title={formatMessage('Audio player for {title}', {
+        title: audio.title || audio.name || audio.text
+      })}
+    />
+  )
+}
+
+export function renderAudio(audio) {
+  return renderToStaticMarkup(constructJSXAudioEmbedding(audio))
 }

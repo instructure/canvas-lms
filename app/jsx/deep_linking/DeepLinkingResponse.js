@@ -19,24 +19,26 @@
 import I18n from 'i18n!external_content.success'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Spinner, Text} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-layout'
 
 export class RetrievingContent extends React.Component {
   static messageType = 'LtiDeepLinkingResponse'
 
   componentDidMount() {
     const parentWindow = this.parentWindow()
-    parentWindow.postMessage({
-      messageType: RetrievingContent.messageType,
-      content_items: ENV.content_items,
-      msg: ENV.message,
-      log: ENV.log,
-      errormsg: ENV.error_message,
-      errorlog: ENV.error_log,
-      ltiEndpoint: ENV.lti_endpoint
-    }, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+    parentWindow.postMessage(
+      {
+        messageType: RetrievingContent.messageType,
+        content_items: ENV.content_items,
+        msg: ENV.message,
+        log: ENV.log,
+        errormsg: ENV.error_message,
+        errorlog: ENV.error_log,
+        ltiEndpoint: ENV.lti_endpoint
+      },
+      ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+    )
   }
 
   render() {
@@ -44,16 +46,16 @@ export class RetrievingContent extends React.Component {
     return (
       <div>
         <Flex justifyItems="center" margin="x-large 0 large 0">
-          <FlexItem>
-            <Spinner title={message} size="large" />
-          </FlexItem>
+          <Flex.Item>
+            <Spinner renderTitle={message} size="large" />
+          </Flex.Item>
         </Flex>
         <Flex justifyItems="center" margin="0 0 large">
-          <FlexItem>
+          <Flex.Item>
             <Text size="x-large" fontStyle="italic">
               {message}
             </Text>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </div>
     )

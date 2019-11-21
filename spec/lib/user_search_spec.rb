@@ -166,6 +166,7 @@ describe UserSearch do
           before do
             pseudonym.sis_user_id = "SOME_SIS_ID"
             pseudonym.unique_id = "SOME_UNIQUE_ID@example.com"
+            pseudonym.current_login_at = Time.utc(2019,11,11)
             pseudonym.save!
           end
 
@@ -197,6 +198,11 @@ describe UserSearch do
             expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq []
           end
 
+          it 'returns the last_login column when searching and sorting' do
+            results = UserSearch.for_user_in_context("UNIQUE_ID", course, user, nil, sort: 'last_login')
+            expect(results.first.last_login).to eq(Time.utc(2019,11,11))
+          end
+
           it 'can match an SIS id and a user name in the same query' do
             pseudonym.sis_user_id = "MARTHA_SIS_ID"
             pseudonym.save!
@@ -213,6 +219,14 @@ describe UserSearch do
               sis_user_id: '1tyler', account_id: course.root_account_id)
             users = UserSearch.for_user_in_context('Tyler', course, user, nil, sort: 'sis_id')
             expect(users.map(&:name)).to eq ['Tyler Pickett', 'Rose Tyler', 'Tyler Teacher']
+          end
+
+          it 'does not return users twice if it matches their name and an old login' do
+            tyler = User.find_by(name: 'Tyler Pickett')
+            tyler.pseudonyms.create!(unique_id: 'Yo', account_id: course.root_account_id, current_login_at: Time.zone.now)
+            tyler.pseudonyms.create!(unique_id: 'Pickett', account_id: course.root_account_id, current_login_at: 1.week.ago)
+            users = UserSearch.for_user_in_context('Pickett', course, user, nil, sort: 'username')
+            expect(users.map(&:name)).to eq ['Tyler Pickett']
           end
         end
 

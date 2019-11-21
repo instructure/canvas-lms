@@ -25,6 +25,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::ModuleItemInterface
     implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
 
     # In the application_controller we use this logged_in_user to reflect either the
     # masqueraded user or the actual user. For our purposes since we only want the
@@ -35,7 +36,6 @@ module Types
     end
 
     global_id_field :id
-    field :_id, ID, 'legacy canvas id', null: false, method: :id
 
     field :content_type, String, null: true
 

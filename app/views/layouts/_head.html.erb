@@ -16,12 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 -%><!DOCTYPE html>
-<html class="scripts-not-loaded" dir="<%= use_rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
+<html class="scripts-not-loaded" dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>"   lang=<%= raw I18n.locale.to_json %>>
 <head>
   <meta charset="utf-8">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&amp;subset=latin-ext&amp;display=swap" rel="stylesheet">
-  <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
+  <% unless params && (params[:controller]&.starts_with?('login/') || params[:controller]&.starts_with?('oauth'))  # some windows apps need to do the oauth login dance from an ie11 webview %>
+    <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
+  <% end %>
   <%=
     # polyfill browsers that don't have a baseline of features we use like Promise or Object.assign
     polyfill_url = "/ie11-polyfill.js"
@@ -49,7 +51,7 @@
       ))
     end
   %>
-  <script>window.fetchIgnoredByNewRelic = window.fetch</script><%= browser_performance_monitor_embed %>
+  <%= browser_performance_monitor_embed %>
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
   <%= stylesheet_link_tag(active_brand_config_url('css'), media: "all") %>
@@ -57,7 +59,7 @@
   <%= include_custom_meta_tags %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
-  <%= include_css_bundles %>
+  <%= benchmark("include_css_bundles") { include_css_bundles } %>
   <%= include_account_css %>
   <script>
     <%#
@@ -78,10 +80,16 @@
     }
     document.addEventListener('click', _earlyClick)
   </script>
-  <%= javascript_include_tag(active_brand_config_url('js'), defer: true) %>
 
   <% js_bundle :navigation_header unless @headers == false %>
-  <%= include_head_js %>
+
+  <% js_env(active_context_tab: get_active_tab) %>
+  <script>
+    INST = <%= benchmark("rendering INST") { raw(inst_env.to_json) } %>;
+    ENV = <%= benchmark("rendering ENV") { raw(render_js_env) } %>;
+  </script>
+
+  <%= benchmark("include_head_js") { include_head_js } %>
   <% @xhrs_to_prefetch_from_controller&.each do |args| %>
     <%= prefetch_xhr(*args) %>
   <% end %>

@@ -21,7 +21,7 @@ describe "people" do
   include_context "in-process server selenium tests"
 
   before(:each) do
-    make_full_screen
+
   end
 
   def add_user(option_text, username, user_list_selector)
@@ -385,6 +385,22 @@ describe "people" do
 
     # TODO reimplement per CNVS-29609, but make sure we're testing at the right level
     it "should validate that a TA cannot rename a teacher"
+
+    it "includes login id column if the user has :view_user_logins, even if they don't have :manage_students" do
+      RoleOverride.create!(:context => Account.default, :permission => 'manage_students', :role => ta_role, :enabled => false)
+      get "/courses/#{@course.id}/users"
+      index = ff('table.roster th').map(&:text).find_index('Login ID')
+      expect(index).not_to be_nil
+      ta_row = ff("table.roster #user_#{@ta.id} td").map(&:text)
+      expect(ta_row[index].strip).to eq @ta.pseudonym.unique_id
+    end
+
+    it "does not include login id column if the user does not have :view_user_logins, even if they do have :manage_students" do
+      RoleOverride.create!(:context => Account.default, :permission => 'view_user_logins', :role => ta_role, :enabled => false)
+      get "/courses/#{@course.id}/users"
+      index = ff('table.roster th').map(&:text).find_index('Login ID')
+      expect(index).to be_nil
+    end
   end
 
   context "people as a student" do

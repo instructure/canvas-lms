@@ -28,6 +28,7 @@
 <div id="keyboard_navigation"></div>
 <div id="gradebook_wrapper">
 <h1 class="screenreader-only"><%= t('Gradebook') %></h1>
+  <div id="replacement_notice_mount_point"></div>
   <div class="gradebook-header">
     <div class="accessibility_warning">
       <%= link_to t('Warning: For improved accessibility, please click here to use the Individual View Gradebook.'), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => "accessibility_warning", :class => "screenreader-only" %>
@@ -72,7 +73,7 @@
           <% elsif @post_grades_tools.count == 1 %>
             <% case @post_grades_tools[0][:type] %>
             <% when :lti %>
-            <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-url="<%= @post_grades_tools[0][:data_url]%>" data-width="<%= @post_grades_tools[0][:data_width]%>" data-height="<%= @post_grades_tools[0][:data_height]%>"><%= @post_grades_tools[0][:name]%></button>
+            <button id="post_grades_action" class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-url="<%= @post_grades_tools[0][:data_url]%>" data-width="<%= @post_grades_tools[0][:data_width]%>" data-height="<%= @post_grades_tools[0][:data_height]%>"><%= @post_grades_tools[0][:name]%></button>
             <% when :post_grades %>
             <span class="post-grades-placeholder"></span>
             <% end %>
@@ -103,7 +104,7 @@
       <div class="gradebook_menu">
         <span class="ui-buttonset">
           <% if @gradebook_is_editable && @context.allows_gradebook_uploads? %>
-            <%= link_to(new_course_gradebook_upload_path(@context), class: "ui-button") do %>
+            <%= link_to(new_course_gradebook_upload_path(@context), class: "ui-button", id: "import-csv") do %>
               <i class="icon-import"></i>
               <%= t 'Import' %>
             <% end %>

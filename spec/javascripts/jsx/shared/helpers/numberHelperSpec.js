@@ -93,6 +93,11 @@ test('returns input if already a number', () => {
   equal(numberHelper.parse(input), input)
 })
 
+test('supports e notation', () => {
+  numberHelper._parseNumber.restore()
+  equal(numberHelper.parse('3e2'), 300)
+})
+
 test('parses toString value of objects', () => {
   numberHelper._parseNumber.restore()
   const obj = {toString: () => `2${separator}3`}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Modal, {ModalBody} from './components/InstuiModal'
+import Modal from './components/InstuiModal'
 import $ from 'jquery'
 import React from 'react'
 import {bool} from 'prop-types'
@@ -100,13 +100,15 @@ export default class TermsOfServiceModal extends React.Component {
             size="fullscreen"
             label={termsOfServiceText}
           >
-            <ModalBody>
+            <Modal.Body>
               {this.props.preview ? (
-                <div dangerouslySetInnerHTML={{__html: this.state.TERMS_OF_SERVICE_CUSTOM_CONTENT}} />
+                <div
+                  dangerouslySetInnerHTML={{__html: this.state.TERMS_OF_SERVICE_CUSTOM_CONTENT}}
+                />
               ) : (
                 <TermsOfServiceCustomContents />
               )}
-            </ModalBody>
+            </Modal.Body>
           </Modal>
         )}
       </span>

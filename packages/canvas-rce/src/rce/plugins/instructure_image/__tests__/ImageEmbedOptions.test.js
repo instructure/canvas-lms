@@ -25,6 +25,7 @@ import {
   MIN_HEIGHT,
   SMALL,
   fromImageEmbed,
+  fromVideoEmbed,
   labelForImageSize,
   scaleImageForHeight,
   scaleImageForWidth,
@@ -496,9 +497,7 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
     })
 
     it(`returns 'Extra Large' when given '${EXTRA_LARGE}'`, () => {
-      expect(labelForImageSize(EXTRA_LARGE)).toEqual(
-        'Extra Large'
-      )
+      expect(labelForImageSize(EXTRA_LARGE)).toEqual('Extra Large')
     })
 
     it(`returns 'Custom' when given '${CUSTOM}'`, () => {
@@ -508,5 +507,40 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
     it(`returns 'Custom' when given any other value`, () => {
       expect(labelForImageSize('unknown')).toEqual('Custom')
     })
+  })
+
+  describe('fromVideoEmbed', () => {
+    let $container
+    let $video
+
+    beforeEach(() => {
+      $container = document.body.appendChild(document.createElement('div'))
+
+      const $tinymce_iframe_span = document.createElement('span')
+      $tinymce_iframe_span.setAttribute('data-mce-p-title', 'Video player for My Title')
+      $tinymce_iframe_span.setAttribute('style', 'display:inline-block;width:320px;height:180px;')
+      $container.appendChild($tinymce_iframe_span)
+
+      const $iframe = document.createElement('iframe')
+      $tinymce_iframe_span.appendChild($iframe)
+
+      $video = $tinymce_iframe_span
+    })
+
+    afterEach(() => {
+      $container.remove()
+    })
+
+    function getVideoOptions() {
+      return fromVideoEmbed($video)
+    }
+
+    it('gets the title', () => {
+      expect(getVideoOptions().titleText).toEqual('My Title')
+    })
+
+    // that's all we can unit test because we can't fill the iframe
+    // with a video document, and the element doesn't have a size
+    // in jsdom
   })
 })

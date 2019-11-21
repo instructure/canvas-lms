@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { Provider } from 'react-redux'
+import {Provider} from 'react-redux'
 import {mount} from 'enzyme'
 import createStore from 'jsx/blueprint_courses/store'
 import {ConnectedUnsyncedChanges} from 'jsx/blueprint_courses/components/UnsyncedChanges'
@@ -59,20 +59,20 @@ const defaultProps = {
 
   willSendNotification: false,
   willIncludeCustomNotificationMessage: false,
-  notificationMessage: '',
+  notificationMessage: ''
 }
 const actionProps = {
   loadUnsyncedChanges: noop,
   enableSendNotification: noop,
   includeCustomNotificationMessage: noop,
-  setNotificationMessage: noop,
+  setNotificationMessage: noop
 }
 
-function mockStore (props = {...defaultProps}) {
+function mockStore(props = {...defaultProps}) {
   return createStore({...props})
 }
 
-function connect (props = {...defaultProps}) {
+function connect(props = {...defaultProps}) {
   const store = mockStore()
   return (
     <Provider store={store}>
@@ -101,8 +101,8 @@ test('renders the changes properly', () => {
   const tree = mount(connect())
   const changes = tree.find('.bcs__unsynced-item')
   equal(changes.length, 3)
-  const locks = tree.find('.bcs__unsynced-item IconBlueprintLock')
+  const locks = tree.find('.bcs__unsynced-item IconBlueprintLockSolid')
   equal(locks.length, 1)
-  const unlocks = tree.find('.bcs__unsynced-item IconBlueprint')
+  const unlocks = tree.find('.bcs__unsynced-item IconBlueprintSolid')
   equal(unlocks.length, 2)
 })

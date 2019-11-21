@@ -16,36 +16,52 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!AccounntsTray'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {View} from '@instructure/ui-layout'
+import {Heading, List, Spinner} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
 
 export default function AccountsTray({accounts, hasLoaded}) {
   return (
     <View as="div" padding="medium">
-      <Heading level="h3" as="h2">{I18n.t('Admin')}</Heading>
-      <hr role="presentation"/>
+      <Heading level="h3" as="h2">
+        {I18n.t('Admin')}
+      </Heading>
+      <hr role="presentation" />
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
-          accounts.map(account =>
-            <ListItem key={account.id}>
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/accounts/${account.id}`}>{account.name}</Button>
-            </ListItem>
-          ).concat([
-            <ListItem key="hr"><hr role="presentation"/></ListItem>,
-            <ListItem key="all">
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/accounts">{I18n.t('All Accounts')}</Button>
-            </ListItem>
-          ])
+          accounts
+            .map(account => (
+              <List.Item key={account.id}>
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href={`/accounts/${account.id}`}
+                >
+                  {account.name}
+                </Button>
+              </List.Item>
+            ))
+            .concat([
+              <List.Item key="hr">
+                <hr role="presentation" />
+              </List.Item>,
+              <List.Item key="all">
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href="/accounts"
+                >
+                  {I18n.t('All Accounts')}
+                </Button>
+              </List.Item>
+            ])
         ) : (
-          <ListItem>
+          <List.Item>
             <Spinner size="small" title={I18n.t('Loading')} />
-          </ListItem>
+          </List.Item>
         )}
       </List>
     </View>
@@ -53,10 +69,12 @@ export default function AccountsTray({accounts, hasLoaded}) {
 }
 
 AccountsTray.propTypes = {
-  accounts: arrayOf(shape({
-    id: string.isRequired,
-    name: string.isRequired
-  })).isRequired,
+  accounts: arrayOf(
+    shape({
+      id: string.isRequired,
+      name: string.isRequired
+    })
+  ).isRequired,
   hasLoaded: bool.isRequired
 }
 

@@ -100,13 +100,14 @@ describe "quizzes log auditing" do
 
       it 'should show that a session had started and that it is has been read', priority: "2", test_id:605108 do
         skip_if_safari(:alert)
+        resize_screen_to_small
         scroll_page_to_bottom # the question viewed event is triggered by page scroll
         wait_for_ajax_requests
         submit_quiz
 
         sub = @quiz.quiz_submissions.where(:user_id => @student).first
         user_session(@teacher)
-
+        resize_screen_to_standard
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
         expect(f('#ic-EventStream')).to include_text('Session started')
         expect(f('#ic-EventStream')).to include_text('Viewed (and possibly read)')

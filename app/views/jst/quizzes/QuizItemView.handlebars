@@ -9,10 +9,55 @@
     class="ig-row"
   {{/if}}
 >
+{{#if isMigrating}}
+  <div class="ig-row__layout">
+    {{>spinner}} {{#t}}Migrating "{{name}}"{{/t}}
+  </div>
+{{else}} {{#if failedToMigrate}}
+  <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with migrating "{{name}}"{{/t}}</span>
+  <div class="migrate-failed-actions">
+    <button class="migrate-failed-retry btn btn-primary">
+      <span class="screenreader-only">{{#t}}Retry migrating "{{name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
+    </button>
+    <button class="duplicate-failed-cancel btn">
+      <span class="screenreader-only">{{#t}}Cancel migrating "{{name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+    </button>
+  </div>
+{{else}} {{#if isDuplicating}}
+  <div class="ig-row__layout">
+    {{>spinner}} {{#t}}Making a copy of "{{original_assignment_name}}"{{/t}}
+  </div>
+{{else}} {{#if failedToDuplicate}}
+  <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong with making a copy of "{{original_assignment_name}}"{{/t}}</span>
+  <div class="duplicate-failed-actions">
+    <button class="duplicate-failed-retry btn btn-primary">
+      <span class="screenreader-only">{{#t}}Retry duplicating "{{original_assignment_name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Retry{{/t}}</span>
+    </button>
+    <button class="duplicate-failed-cancel btn">
+      <span class="screenreader-only">{{#t}}Cancel duplicating "{{original_assignment_name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+    </button>
+  </div>
+{{else}} {{#if isImporting}}
+  <div class="ig-row__layout">
+    {{>spinner}} {{#t}}Importing "{{name}}"{{/t}}
+  </div>
+{{else}} {{#if failedToImport}}
+  <span aria-live="polite" role="alert" aria-atomic="true">{{#t}}Oops! Something went wrong importing "{{name}}"{{/t}}</span>
+  <div class="import-failed-actions">
+    <button class="import-failed-cancel btn">
+      <span class="screenreader-only">{{#t}}Cancel importing "{{name}}"{{/t}}</span>
+      <span aria-hidden="true">{{#t}}Cancel{{/t}}</span>
+    </button>
+  </div>
+{{else}}
   <div class="ig-row__layout">
 
     <div class="ig-type-icon">
-      <i class="icon-quiz" aria-hidden="true"></i>
+      <i class="icon-quiz{{#if isQuizzesNext}} icon-Solid{{/if}}" aria-hidden="true"></i>
     </div>
 
     <div class="ig-info">
@@ -60,6 +105,16 @@
           <li role="presentation">
             <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
           </li>
+          {{#if canDuplicate}}
+          <li>
+            <a
+              class="duplicate_assignment icon-copy-course"
+              id="assignment_{{id}}_settings_duplicate_item"
+              aria-label="{{#t}}Duplicate Quiz {{name}}{{/t}}"
+              data-focus-returns-to"assign_{{id}}_manage_link"
+            >{{#t}}Duplicate{{/t}}</a>
+          </li>
+          {{/if}}
           {{#if cyoe.isCyoeAble}}
           <li role="presentation">
               <a href="{{edit_url}}?return_to={{return_to}}#mastery-paths-editor" class="icon-mastery-path" tabindex="-1" role="menuitem" title="{{#t}}Edit Mastery Paths for {{title_label}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
@@ -94,4 +149,5 @@
     {{/if}}
 
   </div>
+{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
 </div>

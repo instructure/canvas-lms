@@ -20,51 +20,48 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!student_context_trayRating'
 import classnames from 'classnames'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import InstUIRating from '@instructure/ui-elements/lib/components/Rating'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Heading, Rating as InstUIRating, Text} from '@instructure/ui-elements'
 
-  class Rating extends React.Component {
-    static propTypes = {
-      metric: PropTypes.shape({
-        level: PropTypes.number
-      }).isRequired,
-      label: PropTypes.string.isRequired,
-    }
+class Rating extends React.Component {
+  static propTypes = {
+    metric: PropTypes.shape({
+      level: PropTypes.number
+    }).isRequired,
+    label: PropTypes.string.isRequired
+  }
 
-    formatValueText (currentRating, maxRating) {
-      const valueText = {}
-      valueText[I18n.t('High')] = currentRating === maxRating
-      valueText[I18n.t('Moderate')] = currentRating === 2
-      valueText[I18n.t('Low')] = currentRating === 1
-      valueText[I18n.t('None')] = currentRating === 0
-      return classnames(valueText)
-    }
+  formatValueText(currentRating, maxRating) {
+    const valueText = {}
+    valueText[I18n.t('High')] = currentRating === maxRating
+    valueText[I18n.t('Moderate')] = currentRating === 2
+    valueText[I18n.t('Low')] = currentRating === 1
+    valueText[I18n.t('None')] = currentRating === 0
+    return classnames(valueText)
+  }
 
-    render () {
-      const {label, metric} = this.props;
-      return (
-        <div
-          className="StudentContextTray-Rating">
-          <Heading level="h5" as="h4">
-            {label}
-          </Heading>
-          <div className="StudentContextTray-Rating__Stars">
-            <InstUIRating
-              formatValueText={this.formatValueText}
-              label={this.props.label}
-              valueNow={metric.level}
-              valueMax={3}
-            />
-            <div>
-              <Text size="small" color="brand">
-                {this.formatValueText(metric.level, 3)}
-              </Text>
-            </div>
+  render() {
+    const {label, metric} = this.props
+    return (
+      <div className="StudentContextTray-Rating">
+        <Heading level="h5" as="h4">
+          {label}
+        </Heading>
+        <div className="StudentContextTray-Rating__Stars">
+          <InstUIRating
+            formatValueText={this.formatValueText}
+            label={this.props.label}
+            valueNow={metric.level}
+            valueMax={3}
+          />
+          <div>
+            <Text size="small" color="brand">
+              {this.formatValueText(metric.level, 3)}
+            </Text>
           </div>
         </div>
-      )
-    }
+      </div>
+    )
   }
+}
 
 export default Rating

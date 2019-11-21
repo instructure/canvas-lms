@@ -182,30 +182,32 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def publish_rubric_assessments!
-    copy_rubric_assessments!(submission)
-  end
+    self.rubric_assessments.each do |provisional_assessment|
+      rubric_association = provisional_assessment.rubric_association
 
-  def copy_rubric_assessments!(dest_artifact)
-    self.rubric_assessments.each do |prov_assmt|
-      assoc = prov_assmt.rubric_association
+      params = {
+        artifact: submission,
+        assessment_type: provisional_assessment.assessment_type
+      }
 
-      pub_assmt = nil
-      # see RubricAssociation#assess
-      if dest_artifact.is_a?(Submission)
-        if assoc.assessments_unique_per_asset?(prov_assmt.assessment_type)
-          pub_assmt = assoc.rubric_assessments.where(artifact_id: dest_artifact.id, artifact_type: dest_artifact.class_name,
-                                                     assessment_type: prov_assmt.assessment_type).first
-        else
-          pub_assmt = assoc.rubric_assessments.where(artifact_id: dest_artifact.id, artifact_type: dest_artifact.class_name,
-                                                     assessment_type: prov_assmt.assessment_type, assessor_id: prov_assmt.assessor).first
-        end
+      unless rubric_association.assessments_unique_per_asset?(provisional_assessment.assessment_type)
+        params = params.merge({assessor_id: provisional_assessment.assessor})
       end
-      pub_assmt ||= assoc.rubric_assessments.build(:assessor => prov_assmt.assessor, :artifact => dest_artifact,
-                                                   :user => self.student, :rubric => assoc.rubric, :assessment_type => prov_assmt.assessment_type)
-      pub_assmt.score = prov_assmt.score
-      pub_assmt.data = prov_assmt.data
 
-      pub_assmt.save!
+      rubric_assessment = rubric_association.rubric_assessments.find_by(params)
+      rubric_assessment ||= rubric_association.rubric_assessments.build(
+        params.merge(
+          assessor: provisional_assessment.assessor,
+          user: self.student,
+          rubric: rubric_association.rubric,
+        )
+      )
+
+      rubric_assessment.score = provisional_assessment.score
+      rubric_assessment.data = provisional_assessment.data
+      rubric_assessment.submission.grade_posting_in_progress = submission.grade_posting_in_progress
+
+      rubric_assessment.save!
     end
   end
 

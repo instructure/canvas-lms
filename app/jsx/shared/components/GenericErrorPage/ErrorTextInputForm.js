@@ -17,8 +17,9 @@
  */
 import I18n from 'i18n!generic_error_page'
 import React from 'react'
-import {TextArea, TextInput} from '@instructure/ui-forms'
-import View from '@instructure/ui-layout/lib/components/View'
+import {TextArea} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
 import {func, string} from 'prop-types'
 
@@ -33,7 +34,7 @@ function ErrorTextInputForm(props) {
       <View margin="small">
         <TextInput
           onChange={props.handleChangeOptionalEmail}
-          label={I18n.t('Email Address (Optional)')}
+          renderLabel={I18n.t('Email Address (Optional)')}
           value={props.optionalEmail}
         />
       </View>

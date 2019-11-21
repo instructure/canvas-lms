@@ -18,12 +18,13 @@
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 
-import SingleSelect from '../SingleSelect'
+import SingleSelect from '../shared/SingleSelect'
 
 function makeProps() {
   return {
     liveRegion: () => document.getElementById('flash_screenreader_holder'),
     options: [{id: '1', label: 'foo'}, {id: '2', label: 'bar'}, {id: '3', label: 'baz'}],
+    selectedOption: () => {},
     renderLabel: <>Test Label</>
   }
 }
@@ -50,9 +51,14 @@ describe('SingleSelect', () => {
   })
 
   it('changes the selected on click', () => {
-    const {getByDisplayValue, getByText} = render(<SingleSelect {...makeProps()} />)
+    const props = makeProps()
+    const callback = jest.fn()
+    props.selectedOption = callback
+    const {getByDisplayValue, getByText} = render(<SingleSelect {...props} />)
     fireEvent.click(getByDisplayValue('foo'))
     fireEvent.click(getByText('bar'))
     expect(getByDisplayValue('bar')).toBeInTheDocument()
+    expect(callback).toHaveBeenCalledTimes(1)
+    expect(callback).toHaveBeenCalledWith({selectedOptionId: '2', inputValue: 'bar'})
   })
 })

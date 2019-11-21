@@ -18,15 +18,11 @@
 
 import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import IconMiniArrowDownSolid from '@instructure/ui-icons/lib/Solid/IconMiniArrowDown'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Menu, {
-  MenuItem,
-  MenuItemGroup,
-  MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {Menu} from '@instructure/ui-menu'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!gradezilla'
 import {filterLabels} from '../constants/ViewOptions'
 
@@ -115,128 +111,128 @@ class ViewOptionsMenu extends React.Component {
     return (
       <Menu trigger={renderTriggerButton(this.bindButton)} contentRef={this.bindMenuContent}>
         <Menu contentRef={this.bindArrangeByMenuContent} label={I18n.t('Arrange By')}>
-          <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Arrange By')}</ScreenReaderContent>}>
-            <MenuItem
+          <Menu.Group label={<ScreenReaderContent>{I18n.t('Arrange By')}</ScreenReaderContent>}>
+            <Menu.Item
               disabled={this.props.columnSortSettings.disabled}
               selected={this.areColumnsOrderedBy('default')}
               onSelect={this.props.columnSortSettings.onSortByDefault}
             >
               {I18n.t('Default Order')}
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuItem
+            <Menu.Item
               disabled={this.props.columnSortSettings.disabled}
               selected={this.areColumnsOrderedBy('name', 'ascending')}
               onSelect={this.props.columnSortSettings.onSortByNameAscending}
             >
               {I18n.t('Assignment Name - A-Z')}
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuItem
+            <Menu.Item
               disabled={this.props.columnSortSettings.disabled}
               selected={this.areColumnsOrderedBy('name', 'descending')}
               onSelect={this.props.columnSortSettings.onSortByNameDescending}
             >
               {I18n.t('Assignment Name - Z-A')}
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuItem
+            <Menu.Item
               disabled={this.props.columnSortSettings.disabled}
               selected={this.areColumnsOrderedBy('due_date', 'ascending')}
               onSelect={this.props.columnSortSettings.onSortByDueDateAscending}
             >
               {I18n.t('Due Date - Oldest to Newest')}
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuItem
+            <Menu.Item
               disabled={this.props.columnSortSettings.disabled}
               selected={this.areColumnsOrderedBy('due_date', 'descending')}
               onSelect={this.props.columnSortSettings.onSortByDueDateDescending}
             >
               {I18n.t('Due Date - Newest to Oldest')}
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuItem
+            <Menu.Item
               disabled={this.props.columnSortSettings.disabled}
               selected={this.areColumnsOrderedBy('points', 'ascending')}
               onSelect={this.props.columnSortSettings.onSortByPointsAscending}
             >
               {I18n.t('Points - Lowest to Highest')}
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuItem
+            <Menu.Item
               disabled={this.props.columnSortSettings.disabled}
               selected={this.areColumnsOrderedBy('points', 'descending')}
               onSelect={this.props.columnSortSettings.onSortByPointsDescending}
             >
               {I18n.t('Points - Highest to Lowest')}
-            </MenuItem>
+            </Menu.Item>
 
             {this.props.columnSortSettings.modulesEnabled && (
-              <MenuItem
+              <Menu.Item
                 disabled={this.props.columnSortSettings.disabled}
                 selected={this.areColumnsOrderedBy('module_position', 'ascending')}
                 onSelect={this.props.columnSortSettings.onSortByModuleAscending}
               >
                 {I18n.t('Module - First to Last')}
-              </MenuItem>
+              </Menu.Item>
             )}
 
             {this.props.columnSortSettings.modulesEnabled && (
-              <MenuItem
+              <Menu.Item
                 disabled={this.props.columnSortSettings.disabled}
                 selected={this.areColumnsOrderedBy('module_position', 'descending')}
                 onSelect={this.props.columnSortSettings.onSortByModuleDescending}
               >
                 {I18n.t('Module - Last to First')}
-              </MenuItem>
+              </Menu.Item>
             )}
-          </MenuItemGroup>
+          </Menu.Group>
         </Menu>
 
-        <MenuItemSeparator />
+        <Menu.Separator />
 
         {this.props.filterSettings.available.length > 0 && (
           <Menu contentRef={this.bindFiltersMenuContent} label={I18n.t('Filters')}>
-            <MenuItemGroup
+            <Menu.Group
               allowMultiple
               label={<ScreenReaderContent>{I18n.t('Filters')}</ScreenReaderContent>}
               onSelect={this.onFilterSelect}
               selected={this.props.filterSettings.selected}
             >
               {this.props.filterSettings.available.map(filterKey => (
-                <MenuItem key={filterKey} value={filterKey}>
+                <Menu.Item key={filterKey} value={filterKey}>
                   {filterLabels[filterKey]}
-                </MenuItem>
+                </Menu.Item>
               ))}
-            </MenuItemGroup>
+            </Menu.Group>
           </Menu>
         )}
 
-        {this.props.filterSettings.available.length > 0 && <MenuItemSeparator />}
+        {this.props.filterSettings.available.length > 0 && <Menu.Separator />}
 
-        <MenuItem ref={this.bindStausMenuItem} onSelect={this.props.onSelectShowStatusesModal}>
+        <Menu.Item ref={this.bindStausMenuItem} onSelect={this.props.onSelectShowStatusesModal}>
           {I18n.t('Statuses…')}
-        </MenuItem>
+        </Menu.Item>
 
-        <MenuItemSeparator />
+        <Menu.Separator />
 
-        <MenuItemGroup allowMultiple label={I18n.t('Columns')}>
-          <MenuItem
+        <Menu.Group allowMultiple label={I18n.t('Columns')}>
+          <Menu.Item
             disabled={this.props.teacherNotes.disabled}
             onSelect={this.props.teacherNotes.onSelect}
             selected={this.props.teacherNotes.selected}
           >
             <span data-menu-item-id="show-notes-column">{I18n.t('Notes')}</span>
-          </MenuItem>
+          </Menu.Item>
 
-          <MenuItem
+          <Menu.Item
             selected={this.props.showUnpublishedAssignments}
             onSelect={this.props.onSelectShowUnpublishedAssignments}
           >
             {I18n.t('Unpublished Assignments')}
-          </MenuItem>
-        </MenuItemGroup>
+          </Menu.Item>
+        </Menu.Group>
       </Menu>
     )
   }

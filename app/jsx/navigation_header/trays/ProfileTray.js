@@ -16,34 +16,51 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!ProfileTray'
 import React from 'react'
-import {string, bool, arrayOf, shape} from 'prop-types'
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {arrayOf, bool, object, shape, string} from 'prop-types'
+import {Avatar, Badge, Heading, List, Text, Spinner} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-layout'
 import LogoutButton from '../LogoutButton'
+import {AccessibleContent} from '@instructure/ui-a11y'
 
-function ProfileTab({id, html_url, label}) {
+// Trying to keep this as generalized as possible, but it's still a bit
+// gross matching on the id of the tray tabs given to us by Rails
+const idsToCounts = [{id: 'content_shares', countName: 'unreadShares'}]
+
+const a11yCount = count => (
+  <AccessibleContent alt={I18n.t('%{count} unread.', {count})}>{count}</AccessibleContent>
+)
+
+function ProfileTab({id, html_url, label, counts}) {
+  function renderCountBadge() {
+    const found = idsToCounts.filter(x => x.id === id)
+    if (found.length === 0) return null // no count defined for this label
+    const count = counts[found[0].countName]
+    if (count === 0) return null // zero count is not displayed
+    return <Badge count={count} standalone margin="0 0 xxx-small small" formatOutput={a11yCount} />
+  }
+
   return (
-    <ListItem key={id}>
-      <Button variant="link" theme={{mediumPadding: '0', mediumHeight: '1.5rem'}} href={html_url}>
+    <List.Item key={id}>
+      <Button variant="link" margin="none" href={html_url}>
         {label}
+        {renderCountBadge()}
       </Button>
-    </ListItem>
+    </List.Item>
   )
 }
 
 ProfileTab.propTypes = {
   id: string.isRequired,
   label: string.isRequired,
-  html_url: string.isRequired
+  html_url: string.isRequired,
+  counts: object
 }
 
-export default function ProfileTray({userDisplayName, userAvatarURL, loaded, tabs}) {
+export default function ProfileTray(props) {
+  const {userDisplayName, userAvatarURL, loaded, userPronouns, tabs, counts} = props
   return (
     <View as="div" padding="medium">
       <View textAlign="center">
@@ -55,21 +72,28 @@ export default function ProfileTray({userDisplayName, userAvatarURL, loaded, tab
           inline={false}
           margin="auto"
         />
-        <Heading level="h3" as="h2">
-          {userDisplayName}
-        </Heading>
-        <LogoutButton size="small" margin="medium 0" />
+        <div style={{wordBreak: 'break-word'}}>
+          <Heading level="h3" as="h2">
+            {userDisplayName}
+            {userPronouns && (
+              <Text size="large" fontStyle="italic">
+                &nbsp;({userPronouns})
+              </Text>
+            )}
+          </Heading>
+        </div>
+        <LogoutButton size="small" margin="medium 0 x-small 0" />
       </View>
       <hr role="presentation" />
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List variant="unstyled" margin="0" itemSpacing="small">
         {loaded ? (
-          tabs.map(tab => <ProfileTab key={tab.id} {...tab} />)
+          tabs.map(tab => <ProfileTab key={tab.id} {...tab} counts={counts} />)
         ) : (
-          <ListItem key="loading">
+          <List.Item key="loading">
             <div style={{textAlign: 'center'}}>
-              <Spinner margin="medium" title="Loading" />
+              <Spinner margin="medium" renderTitle="Loading" />
             </div>
-          </ListItem>
+          </List.Item>
         )}
       </List>
     </View>
@@ -80,5 +104,7 @@ ProfileTray.propTypes = {
   userDisplayName: string.isRequired,
   userAvatarURL: string.isRequired,
   loaded: bool.isRequired,
-  tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired
+  userPronouns: string,
+  tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired,
+  counts: object.isRequired
 }

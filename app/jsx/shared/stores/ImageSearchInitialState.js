@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  const ImageSearchInitialState = {
-    searching: false,
-    searchResults: [],
-    searchTerm: '',
-    alert: null,
-  };
+const ImageSearchInitialState = {
+  searching: false,
+  searchResults: [],
+  searchTerm: '',
+  alert: null
+}
 
 export default ImageSearchInitialState

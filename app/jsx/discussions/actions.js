@@ -66,14 +66,16 @@ const types = [
   'DELETE_FOCUS_PENDING',
   'DELETE_FOCUS_CLEANUP',
   'CLEAN_DISCUSSION_FOCUS',
+  'SET_COPY_TO',
   'SET_COPY_TO_OPEN',
+  'SET_SEND_TO',
   'SET_SEND_TO_OPEN'
 ]
 
 const actions = Object.assign(createActions(...types), discussionActions.actionCreators)
 
 function copyAndUpdateDiscussion(discussion, updatedFields, focusOn) {
-  const discussionCopy = Object.assign({}, discussion)
+  const discussionCopy = {...discussion}
   Object.keys(updatedFields).forEach(key => {
     if (!Object.prototype.hasOwnProperty.call(discussion, key)) {
       throw new Error(`field ${key} does not exist in the discussion`)

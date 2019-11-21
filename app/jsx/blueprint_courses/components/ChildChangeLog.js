@@ -17,16 +17,15 @@
  */
 
 import I18n from 'i18n!blueprint_coursesChildChangeLog'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 
-import React, { Component } from 'react';
-import { connect } from 'react-redux'
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import {Text, Spinner} from '@instructure/ui-elements'
+import {PresentationContent} from '@instructure/ui-a11y'
 
-import ChangeLogRow, { ChangeRow } from './ChangeLogRow'
+import ChangeLogRow, {ChangeRow} from './ChangeLogRow'
 import SyncHistoryItem from './SyncHistoryItem'
 
 import propTypes from '../propTypes'
@@ -35,20 +34,20 @@ import LoadStates from '../loadStates'
 export default class ChildChangeLog extends Component {
   static propTypes = {
     status: PropTypes.oneOf(LoadStates.statesList),
-    migration: propTypes.migration,
+    migration: propTypes.migration
   }
 
   static defaultProps = {
     migration: null,
-    status: null,
+    status: null
   }
 
-  renderLoading () {
+  renderLoading() {
     if (this.props.status && LoadStates.isLoading(this.props.status)) {
       const title = I18n.t('Loading Change Log')
       return (
         <div className="bcc__change-log__loading" style={{textAlign: 'center'}}>
-          <Spinner title={title} />
+          <Spinner renderTitle={title} />
           <PresentationContent>
             <Text as="p">{title}</Text>
           </PresentationContent>
@@ -59,8 +58,8 @@ export default class ChildChangeLog extends Component {
     return null
   }
 
-  renderChanges () {
-    const { migration } = this.props
+  renderChanges() {
+    const {migration} = this.props
     if (migration) {
       return (
         <SyncHistoryItem
@@ -82,18 +81,17 @@ export default class ChildChangeLog extends Component {
     return null
   }
 
-  render () {
-    return (
-      <div className="bcc__change-log">
-        {this.renderLoading() || this.renderChanges()}
-      </div>
-    )
+  render() {
+    return <div className="bcc__change-log">{this.renderLoading() || this.renderChanges()}</div>
   }
 }
 
 const connectState = state => ({
   status: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog].status,
-  migration: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog].data,
+  migration: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog].data
 })
 const connectActions = () => ({})
-export const ConnectedChildChangeLog = connect(connectState, connectActions)(ChildChangeLog)
+export const ConnectedChildChangeLog = connect(
+  connectState,
+  connectActions
+)(ChildChangeLog)

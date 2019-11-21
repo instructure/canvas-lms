@@ -168,6 +168,7 @@ class CollaborationsController < ApplicationController
   def api_index
     return unless authorized_action(@context, @current_user, :read) &&
       (tab_enabled?(@context.class::TAB_COLLABORATIONS) || tab_enabled?(@context.class::TAB_COLLABORATIONS_NEW))
+    log_api_asset_access([ "collaborations", @context ], "collaborations", "other")
 
     url = @context.instance_of?(Course) ? api_v1_course_collaborations_index_url : api_v1_group_collaborations_index_url
 

@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
+require_relative 'common'
+require_relative 'helpers/wiki_and_tiny_common'
+require_relative 'helpers/public_courses_context'
+require_relative 'helpers/files_common'
 
 describe "Wiki Pages" do
   include_context "in-process server selenium tests"
@@ -95,8 +95,7 @@ describe "Wiki Pages" do
       expect_flash_message :info
     end
 
-    it "should update the page with changes made in another window", priority: "1", test_id: 126833 do
-      skip('CORE-2714 when the rcs is enabled, this raises SpecTimeLimit::Error: Exceeded the 31 sec historical threshold for this particular spec.')
+    it "should update with changes made in other window", priority: "1", test_id: 126833, custom_timeout: 40.seconds do
       @course.wiki_pages.create!(title: 'Page1')
       edit_page('this is')
       driver.execute_script("window.open()")

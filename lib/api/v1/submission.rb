@@ -32,6 +32,11 @@ module Api::V1::Submission
     context ||= assignment.context
     hash = submission_attempt_json(submission, assignment, current_user, session, context, params)
 
+    # The "body" attribute is intended to store the contents of text-entry
+    # submissions, but for quizzes it contains a string that includes grading
+    # information. Only return it if the caller has permissions.
+    hash['body'] = nil if assignment.quiz? && !submission.grants_right?(current_user, :read_grade)
+
     if includes.include?("submission_history")
       if submission.quiz_submission && assignment.quiz && !assignment.quiz.anonymous_survey?
         hash['submission_history'] = submission.quiz_submission.versions.map do |ver|
@@ -63,6 +68,10 @@ module Api::V1::Submission
         avatars: avatars,
         includes: includes
       )
+    end
+
+    if includes.include?("has_postable_comments")
+      hash["has_postable_comments"] = submission.submission_comments.select(&:hidden?).present?
     end
 
     if includes.include?("submission_comments")
@@ -119,16 +128,15 @@ module Api::V1::Submission
 
   SUBMISSION_JSON_FIELDS = %w(id user_id url score grade excused attempt submission_type submitted_at body
     assignment_id graded_at grade_matches_current_submission grader_id workflow_state late_policy_status
-    points_deducted grading_period_id cached_due_date extra_attempts).freeze
+    points_deducted grading_period_id cached_due_date extra_attempts posted_at).freeze
   SUBMISSION_JSON_METHODS = %w(late missing seconds_late entered_grade entered_score).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries).freeze
 
-  def submission_attempt_json(attempt, assignment, user, session, context = nil, params = {})
+  def submission_attempt_json(attempt, assignment, user, session, context = nil, params = {}, quiz_submission_version = nil)
     context ||= assignment.context
     includes = Array.wrap(params[:include])
 
     json_fields = SUBMISSION_JSON_FIELDS
-    json_fields += ['posted_at'] if context.post_policies_enabled?
     json_methods = SUBMISSION_JSON_METHODS.dup # dup because AR#to_json modifies the :methods param in-place
     other_fields = SUBMISSION_OTHER_FIELDS
 
@@ -156,7 +164,7 @@ module Api::V1::Submission
 
     unless params[:exclude_response_fields] && params[:exclude_response_fields].include?('preview_url')
       preview_args = { 'preview' => '1' }
-      preview_args['version'] = attempt.quiz_submission_version || attempt.version_number
+      preview_args['version'] = quiz_submission_version || attempt.quiz_submission_version || attempt.version_number
       hash['preview_url'] = course_assignment_submission_url(context, assignment, attempt[:user_id], preview_args)
     end
 
@@ -237,7 +245,7 @@ module Api::V1::Submission
   end
 
   def quiz_submission_attempt_json(attempt, assignment, user, session, context = nil, params)
-    hash = submission_attempt_json(attempt.submission, assignment, user, session, context, params)
+    hash = submission_attempt_json(attempt.submission, assignment, user, session, context, params, attempt.version_number)
     hash.each_key{|k| hash[k] = attempt[k] if attempt[k]}
     hash[:submission_data] = attempt[:submission_data]
     hash[:submitted_at] = attempt[:finished_at]
@@ -309,8 +317,9 @@ module Api::V1::Submission
   end
 
   def provisional_grade_json(course:, assignment:, submission:, provisional_grade:, current_user:, avatars: false, includes: [])
-    json = provisional_grade.grade_attributes
-    json.merge!(speedgrader_url: speed_grader_url(submission, assignment, provisional_grade, current_user))
+    speedgrader_url = speed_grader_url(submission: submission, assignment: assignment, current_user: current_user)
+    json = provisional_grade.grade_attributes.merge(speedgrader_url: speedgrader_url)
+
     if includes.include?('submission_comments')
       json['submission_comments'] = anonymous_moderated_submission_comments_json(
         course: course,
@@ -321,6 +330,7 @@ module Api::V1::Submission
         avatars: avatars
       )
     end
+
     if assignment.can_view_other_grader_identities?(current_user)
       if includes.include?('rubric_assessment')
         json['rubric_assessments'] = provisional_grade.rubric_assessments.map do |ra|
@@ -336,6 +346,7 @@ module Api::V1::Submission
         provisional_grade.attachment_info(current_user, a)
       end
     end
+
     json
   end
 
@@ -366,19 +377,17 @@ module Api::V1::Submission
     submission.originality_reports.present?
   end
 
-  def speed_grader_url(submission, assignment, provisional_grade, current_user)
-    url_params = {
-      course_id: assignment.context.id,
-      assignment_id: assignment.id,
-      anchor: { provisional_grade_id: provisional_grade.id }.to_json
-    }
-    if assignment.can_view_student_names?(current_user)
-      url_params[:student_id] = submission.user_id
+  def speed_grader_url(submission:, assignment:, current_user:)
+    student_or_anonymous_id = if assignment.can_view_student_names?(current_user)
+      { student_id: submission.user_id }
     else
-      url_params[:anonymous_id] = submission.anonymous_id
+      { anonymous_id: submission.anonymous_id }
     end
 
-    speed_grader_course_gradebook_url(**url_params)
+    speed_grader_course_gradebook_url({
+      course_id: assignment.context_id,
+      assignment_id: assignment
+    }.merge(student_or_anonymous_id))
   end
 
   def quizzes_next_submission?(submission)

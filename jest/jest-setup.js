@@ -18,38 +18,9 @@
 
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
+import {filterUselessConsoleMessages} from '@instructure/js-utils'
 
-const consoleMessagesToIgnore = {
-  error: [
-    // /Failed prop type/, // uncomment if you want to focus on stuff besides propType warnings
-
-    'Warning: [Focusable] Exactly one tabbable child is required (0 found).',
-
-    // This is from @instructure/ui-menu, nothing we can do about it ourselves
-    /Function components cannot be given refs\. Attempts to access this ref will fail[\s\S]*in (CanvasInstUIModal|PopoverTrigger)/,
-
-  ],
-  warn: [
-    // /Please update the following components/, // Uncomment this if all the react 16.9 deprecations are cluttering up the console and you want to focus on something else
-
-    // '@instructure/ui-select' itself generates this warning, we assume they will figure it out themselves
-    /\[Options\] is experimental and its API could change significantly in a future release[\s\S]*\(created by Selectable\)/,
-
-    // React 16.9+ generates these deprecation warnings but it doesn't do any good to hear about the ones for instUI. We can't do anything about them in this repo
-    // Put any others we can't control here.
-    /Please update the following components:[ (BaseTransition|Button|Checkbox|CloseButton|Dialog|Expandable|Flex|FlexItem|FormFieldGroup|FormFieldLabel|FormFieldLayout|FormFieldMessages|Grid|GridCol|GridRow|Heading|InlineSVG|Mask|ModalBody|ModalFooter|ModalHeader|NumberInput|Portal|Query|Responsive|SVGIcon|ScreenReaderContent|SelectOptionsList|SelectField|SelectMultiple|SelectOptionsList|SelectSingle|Tab|TabList|TabPanel|Text|TextArea|TextInput|TinyMCE|ToggleDetails|ToggleFacade|Transition|TruncateText|View),?]+$/
-  ]
-}
-
-Object.keys(consoleMessagesToIgnore).forEach(key => {
-  const original = console[key]
-  console[key] = function() {
-    const combinedMsg = Array.prototype.join.call(arguments)
-    const shouldIgnore = pattern => combinedMsg[typeof pattern === 'string' ? 'includes' : 'match'](pattern)
-    if (consoleMessagesToIgnore[key].some(shouldIgnore)) return
-    return original.apply(this, arguments)
-  }
-})
+filterUselessConsoleMessages(console)
 
 global.fetch = require('jest-fetch-mock')
 

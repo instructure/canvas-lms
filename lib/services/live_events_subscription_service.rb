@@ -81,9 +81,14 @@ module Services
         request(:delete, "/api/subscriptions/#{subscription_id}", options)
       end
 
-      def index(jwt_body, opts)
+      def index(jwt_body, opts = {}, query: {})
+        options = { headers: headers(jwt_body, opts), query: query }
+        request(:get, '/api/root_account_subscriptions', options)
+      end
+
+      def event_types_index(jwt_body, message_type, opts = {})
         options = { headers: headers(jwt_body, opts) }
-        request(:get, '/api/subscriptions', options)
+        request(:get, "/api/event_types?message_type=#{message_type}", options)
       end
 
       private

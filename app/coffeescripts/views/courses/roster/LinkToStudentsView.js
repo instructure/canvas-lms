@@ -24,7 +24,6 @@ import linkToStudentsViewTemplate from 'jst/courses/roster/LinkToStudentsView'
 import 'jquery.disableWhileLoading'
 
 export default class LinkToStudentsView extends DialogBaseView {
-
   static initClass() {
     this.mixin(RosterDialogMixin)
 

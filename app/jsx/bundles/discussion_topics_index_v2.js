@@ -17,19 +17,23 @@
  */
 
 import createDiscussionsIndex from 'jsx/discussions'
+import ready from '@instructure/ready'
 
-const [contextType, contextId] = ENV.context_asset_string.split('_')
+ready(() => {
+  const [contextType, contextId] = ENV.context_asset_string.split('_')
 
-const root = document.querySelector('#content')
-const app = createDiscussionsIndex(root, {
-  permissions: ENV.permissions,
-  roles: ENV.current_user_roles,
-  masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
-  discussionTopicMenuTools: ENV.discussion_topic_menu_tools,
-  contextCodes: [ENV.context_asset_string],
-  currentUserId: ENV.current_user.id,
-  DIRECT_SHARE_ENABLED: ENV.DIRECT_SHARE_ENABLED,
-  contextType,
-  contextId
+  const root = document.querySelector('#content')
+  const app = createDiscussionsIndex(root, {
+    permissions: ENV.permissions,
+    roles: ENV.current_user_roles,
+    masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
+    discussionTopicMenuTools: ENV.discussion_topic_menu_tools,
+    contextCodes: [ENV.context_asset_string],
+    currentUserId: ENV.current_user.id,
+    DIRECT_SHARE_ENABLED: ENV.DIRECT_SHARE_ENABLED,
+    COURSE_ID: ENV.COURSE_ID,
+    contextType,
+    contextId
+  })
+  app.render()
 })
-app.render()

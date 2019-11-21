@@ -18,6 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def ci_node_total = 20; // how many nodes to run on
 pipeline {
   agent none
   options {
@@ -29,27 +30,96 @@ pipeline {
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+    KNAPSACK_ENABLED = 1
+    KNAPSACK_GENERATE_REPORT = 'false'
+    KNAPSACK_TEST_FILE_PATTERN = '{spec/selenium,gems/plugins/*/spec_canvas/selenium}/**/*_spec.rb'
+    KNAPSACK_EXCLUDE_REGEX = '/performance/'
+    KNAPSACK_TEST_DIR = 'spec'
+    // for now 1 until we stabilize some of the flaky specs
+    RERUNS_RETRY = 1
+    MAX_FAIL = 80
   }
 
   stages {
-    stage ('Run Tests Parallel') {
-      parallel {
-        stage('Selenium Tests') {
-          agent { label 'docker' }
-          steps {
-            timeout(time: 60) {
-              sh 'printenv | sort'
-              sh 'build/new-jenkins/docker-compose-build-up.sh'
-              sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-              // Todo: create script for selenium tests
-              sh 'build/new-jenkins/smoke-test.sh'
+    stage ('Distribute Selenium Tests') {
+      steps {
+        script {
+          def nodes = [:];
+          for(int i = 0; i < ci_node_total; i++) {
+            def index = i;
+            nodes["selenium set ${(i+1).toString().padLeft(2, '0')}"] = {
+              withEnv(["CI_NODE_INDEX=$index", "CI_NODE_TOTAL=$ci_node_total"]) {
+                node('canvas-docker') {
+                  stage("Running Selenium Set ${index}") {
+                    try {
+                      checkout scm
+                      sh 'rm -rf ./tmp/spec_failures'
+                      timeout(time: 60) {
+                        sh 'printenv | sort'
+                        sh 'build/new-jenkins/docker-compose-pull.sh'
+                        sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+                        sh 'build/new-jenkins/docker-compose-build-up.sh'
+                        sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+                        sh 'build/new-jenkins/rspec-with-retries.sh'
+                      }
+                    }
+                    catch (ex) {
+                      // copy spec failures to local
+                      sh 'mkdir -p tmp'
+                      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp/spec_failures/'
+                      throw ex
+                    }
+                    finally {
+                      dir ('tmp') {
+                        stash name: "selenium_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
+                      }
+                      sh 'rm -rf ./tmp/spec_failures'
+                      sh 'build/new-jenkins/docker-cleanup.sh'
+                    }
+                  }
+                }
+              }
             }
           }
-          post {
-            cleanup {
-              sh 'build/new-jenkins/docker-cleanup.sh'
+          parallel(nodes);
+        }
+      }
+    }
+  }
+
+  post {
+    failure {
+      script {
+        node {
+          sh 'rm -rf ./compiled_failures'
+          def htmlFiles;
+          dir('compiled_failures') {
+            for(int i = 0; i < ci_node_total; i++) {
+              def index = i;
+              dir ("node_${index}") {
+                unstash "selenium_failures_${index}"
+              }
             }
+            htmlFiles = findFiles glob: '**/index.html'
+
+            def indexHtml = "<body style=\"font-family:sans-serif;line-height:1.25;font-size:14px\">"
+            htmlFiles.each {
+              def spec = (it =~ /.*spec_failures\/(.*)\/index/)[0][1]
+              indexHtml += "<a href=\"${it}\">${spec}</a><br>"
+            }
+            indexHtml += "</body>"
+            writeFile file: "index.html", text: indexHtml
           }
+
+          publishHTML target: [
+            allowMissing: false,
+            alwaysLinkToLastBuild: false,
+            keepAll: true,
+            reportDir: 'compiled_failures',
+            reportFiles: "index.html," + htmlFiles.join(','),
+            reportName: 'Test Failures'
+          ]
+          sh 'rm -rf ./compiled_failures'
         }
       }
     }

@@ -20,9 +20,8 @@ import React from 'react'
 import page from 'page'
 import $ from 'jquery'
 import classnames from 'classnames'
-import Mask from '@instructure/ui-overlays/lib/components/Mask'
-import Overlay from '@instructure/ui-overlays/lib/components/Overlay'
-import FilePreviewInfoPanel from '../files/FilePreviewInfoPanel'
+import {Mask, Overlay} from '@instructure/ui-overlays'
+import FilePreviewInfoPanel from './FilePreviewInfoPanel'
 import CollectionHandler from 'compiled/react_files/utils/collectionHandler'
 import preventDefault from 'compiled/fn/preventDefault'
 
@@ -54,9 +53,7 @@ export default class FilePreview extends React.PureComponent {
 
   componentWillMount() {
     if (this.props.isOpen) {
-      this.getItemsToView(this.props, items =>
-        this.setState(this.stateProperties(items))
-      )
+      this.getItemsToView(this.props, items => this.setState(this.stateProperties(items)))
     }
   }
 
@@ -107,7 +104,10 @@ export default class FilePreview extends React.PureComponent {
   }
 
   getItemsToView = (props, cb) => {
-    if (typeof cb !== 'function') throw new Error("getItemsToView(props: obj, callback: fn) requires `callback` to be a function")
+    if (typeof cb !== 'function')
+      throw new Error(
+        'getItemsToView(props: obj, callback: fn) requires `callback` to be a function'
+      )
     // Sets up our collection that we will be using.
     let initialItem = null
     const onlyIdsToPreview = props.query.only_preview && props.query.only_preview.split(',')
@@ -183,10 +183,10 @@ export default class FilePreview extends React.PureComponent {
     )
   }
 
-  stateProperties = (items) => ({
+  stateProperties = items => ({
     initialItem: items.initialItem,
     displayedItem: items.initialItem,
-    otherItems: items.otherItems,
+    otherItems: items.otherItems
   })
 
   renderArrowLink = direction => {
@@ -207,6 +207,7 @@ export default class FilePreview extends React.PureComponent {
             this.getNavigationParams({id: nextItem.id})
           )}`}
           className="ef-file-preview-container-arrow-link"
+          onClick={e => page.clickHandler(e.nativeEvent)}
         >
           <div className="ef-file-preview-arrow-link">
             <span className="screenreader-only">{linkText}</span>
@@ -270,21 +271,20 @@ export default class FilePreview extends React.PureComponent {
                 {this.state.initialItem ? this.state.initialItem.displayName() : ''}
               </h1>
               <div className="ef-file-preview-header-buttons">
-                {this.state.displayedItem &&
-                  !this.state.displayedItem.get('locked_for_user') && (
-                    <a
-                      href={this.state.displayedItem.get('url')}
-                      download
-                      className="ef-file-preview-header-download ef-file-preview-button"
-                    >
-                      <i className="icon-download" />
-                      <span className="hidden-phone">{` ${I18n.t('Download')}`}</span>
-                    </a>
-                  )}
+                {this.state.displayedItem && !this.state.displayedItem.get('locked_for_user') && (
+                  <a
+                    href={this.state.displayedItem.get('url')}
+                    download
+                    className="ef-file-preview-header-download ef-file-preview-button"
+                  >
+                    <i className="icon-download" />
+                    <span className="hidden-phone">{` ${I18n.t('Download')}`}</span>
+                  </a>
+                )}
                 <button
                   type="button"
                   className={showInfoPanelClasses}
-                  ref={e => this.infoButton = e}
+                  ref={e => (this.infoButton = e)}
                   onClick={this.toggle('showInfoPanel')}
                 >
                   {/* Wrap content in a div because firefox doesn't support display: flex on buttons */}
@@ -296,7 +296,7 @@ export default class FilePreview extends React.PureComponent {
                 <button
                   type="button"
                   onClick={preventDefault(this.closeModal)}
-                  ref={e => this.closeButton = e}
+                  ref={e => (this.closeButton = e)}
                   className="ef-file-preview-header-close ef-file-preview-button"
                 >
                   <i className="icon-end" />

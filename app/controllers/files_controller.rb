@@ -383,7 +383,7 @@ class FilesController < ApplicationController
         {
           asset_string: context.asset_string,
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
-          usage_rights_required: context.feature_enabled?(:usage_rights_required),
+          usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
           permissions: {
             manage_files: context.grants_right?(@current_user, session, :manage_files),
           },
@@ -857,9 +857,7 @@ class FilesController < ApplicationController
     end
 
     # check service authorization
-    begin
-      Canvas::Security.decode_jwt(params[:token], [ InstFS.jwt_secret ])
-    rescue
+    unless InstFS.validate_capture_jwt(params[:token])
       head :forbidden
       return
     end
@@ -1110,7 +1108,7 @@ class FilesController < ApplicationController
       @attachment.hidden = value_to_boolean(params[:hidden]) if params.key?(:hidden)
 
       @attachment.set_publish_state_for_usage_rights if @attachment.context.is_a?(Group)
-      if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?)  && @context.feature_enabled?(:usage_rights_required)
+      if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:usage_rights_required?) && @context.usage_rights_required?
         return render :json => { :message => I18n.t('This file must have usage_rights set before it can be published.') }, :status => :bad_request
       end
       if (@attachment.folder_id_changed? || @attachment.display_name_changed?) && @attachment.folder.active_file_attachments.where(display_name: @attachment.display_name).where("id<>?", @attachment.id).exists?

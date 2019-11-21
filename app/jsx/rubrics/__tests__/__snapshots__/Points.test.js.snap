@@ -8,6 +8,7 @@ exports[`The Points component renders the component when assessing with the expe
     alignItems="end"
     as="span"
     direction="row"
+    elementRef={[Function]}
     inline={false}
     justifyItems="start"
     visualDebug={false}
@@ -15,27 +16,29 @@ exports[`The Points component renders the component when assessing with the expe
   >
     <FlexItem
       as="span"
+      elementRef={[Function]}
       grow={false}
       margin="none small none none"
       shrink={false}
       size="4rem"
     >
       <TextInput
-        disabled={false}
-        inline={true}
+        display="inline-block"
+        inputContainerRef={[Function]}
         inputRef={[Function]}
-        label={
+        interaction="enabled"
+        isRequired={false}
+        messages={Array []}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        renderLabel={
           <ScreenReaderContent
             as="span"
           >
             Points
           </ScreenReaderContent>
         }
-        layout="stacked"
-        messages={Array []}
-        onChange={[Function]}
-        readOnly={false}
-        required={false}
         size="medium"
         textAlign="start"
         type="text"
@@ -45,6 +48,7 @@ exports[`The Points component renders the component when assessing with the expe
     </FlexItem>
     <FlexItem
       as="span"
+      elementRef={[Function]}
       grow={false}
       margin="small none none none"
       shrink={false}

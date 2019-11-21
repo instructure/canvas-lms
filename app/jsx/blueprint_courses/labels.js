@@ -19,59 +19,142 @@
 import I18n from 'i18n!blueprint_settings_labels'
 
 const itemTypeLabels = {
-  assignment: I18n.t('Assignment'),
-  assignment_group: I18n.t('Assignment Group'),
-  quiz: I18n.t('Quiz'),
-  discussion_topic: I18n.t('Discussion'),
-  wiki_page: I18n.t('Page'),
-  attachment: I18n.t('File'),
-  context_module: I18n.t('Module'),
-  announcement: I18n.t('Announcement'),
-  assessment_question_bank: I18n.t('Question Bank'),
-  calendar_event: I18n.t('Event'),
-  learning_outcome: I18n.t('Outcome'),
-  learning_outcome_group: I18n.t('Outcome Group'),
-  rubric: I18n.t('Rubric'),
-  context_external_tool: I18n.t('External Tool'),
-  folder: I18n.t('Folder'),
-  syllabus: I18n.t('Syllabus'),
-  settings: I18n.t('Settings')
+  get assignment() {
+    return I18n.t('Assignment')
+  },
+  get assignment_group() {
+    return I18n.t('Assignment Group')
+  },
+  get quiz() {
+    return I18n.t('Quiz')
+  },
+  get discussion_topic() {
+    return I18n.t('Discussion')
+  },
+  get wiki_page() {
+    return I18n.t('Page')
+  },
+  get attachment() {
+    return I18n.t('File')
+  },
+  get context_module() {
+    return I18n.t('Module')
+  },
+  get announcement() {
+    return I18n.t('Announcement')
+  },
+  get assessment_question_bank() {
+    return I18n.t('Question Bank')
+  },
+  get calendar_event() {
+    return I18n.t('Event')
+  },
+  get learning_outcome() {
+    return I18n.t('Outcome')
+  },
+  get learning_outcome_group() {
+    return I18n.t('Outcome Group')
+  },
+  get rubric() {
+    return I18n.t('Rubric')
+  },
+  get context_external_tool() {
+    return I18n.t('External Tool')
+  },
+  get folder() {
+    return I18n.t('Folder')
+  },
+  get syllabus() {
+    return I18n.t('Syllabus')
+  },
+  get settings() {
+    return I18n.t('Settings')
+  }
 }
 
 const itemTypeLabelPlurals = {
-  assignment: I18n.t('Assignments'),
-  quiz: I18n.t('Quizzes'),
-  discussion_topic: I18n.t('Discussions'),
-  wiki_page: I18n.t('Pages'),
-  attachment: I18n.t('Files'),
+  get assignment() {
+    return I18n.t('Assignments')
+  },
+  get quiz() {
+    return I18n.t('Quizzes')
+  },
+  get discussion_topic() {
+    return I18n.t('Discussions')
+  },
+  get wiki_page() {
+    return I18n.t('Pages')
+  },
+  get attachment() {
+    return I18n.t('Files')
+  }
 }
 
 const changeTypeLabels = {
-  created: I18n.t('Created'),
-  updated: I18n.t('Updated'),
-  deleted: I18n.t('Deleted'),
+  get created() {
+    return I18n.t('Created')
+  },
+  get updated() {
+    return I18n.t('Updated')
+  },
+  get deleted() {
+    return I18n.t('Deleted')
+  }
 }
 
 const exceptionTypeLabels = {
-  points: I18n.t('Points changed exceptions:'),
-  content: I18n.t('Content changed exceptions:'),
-  due_dates: I18n.t('Due Dates changed exceptions:'),
-  availability_dates: I18n.t('Availability Dates changed exceptions:'),
-  settings: I18n.t('Settings changed exceptions:'),
-  deleted: I18n.t('Deleted content exceptions:')
+  get points() {
+    return I18n.t('Points changed exceptions:')
+  },
+  get content() {
+    return I18n.t('Content changed exceptions:')
+  },
+  get due_dates() {
+    return I18n.t('Due Dates changed exceptions:')
+  },
+  get availability_dates() {
+    return I18n.t('Availability Dates changed exceptions:')
+  },
+  get settings() {
+    return I18n.t('Settings changed exceptions:')
+  },
+  get deleted() {
+    return I18n.t('Deleted content exceptions:')
+  }
 }
 
 const lockTypeLabel = {
-  locked: I18n.t('Locked'),
-  unlocked: I18n.t('Unlocked'),
+  get locked() {
+    return I18n.t('Locked')
+  },
+  get unlocked() {
+    return I18n.t('Unlocked')
+  }
 }
 
 const lockLabels = {
-  content: I18n.t('Content'),
-  points: I18n.t('Points'),
-  settings: I18n.t('Settings'),
-  due_dates: I18n.t('Due Dates'),
-  availability_dates: I18n.t('Availability Dates'),
+  get content() {
+    return I18n.t('Content')
+  },
+  get points() {
+    return I18n.t('Points')
+  },
+  get settings() {
+    return I18n.t('Settings')
+  },
+  get due_dates() {
+    return I18n.t('Due Dates')
+  },
+  get availability_dates() {
+    return I18n.t('Availability Dates')
+  }
 }
 
-export {itemTypeLabels, changeTypeLabels, exceptionTypeLabels, lockTypeLabel, lockLabels, itemTypeLabelPlurals}
+export {
+  itemTypeLabels,
+  changeTypeLabels,
+  exceptionTypeLabels,
+  lockTypeLabel,
+  lockLabels,
+  itemTypeLabelPlurals
+}

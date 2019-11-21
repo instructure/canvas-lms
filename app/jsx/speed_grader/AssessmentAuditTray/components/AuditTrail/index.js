@@ -17,7 +17,7 @@
  */
 
 import React, {PureComponent} from 'react'
-import View from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 
 import CreatorEventGroup from './CreatorEventGroup'
 import * as propTypes from './propTypes'

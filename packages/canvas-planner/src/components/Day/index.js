@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react';
-import classnames from 'classnames';
-import moment from 'moment-timezone';
+import React, {Component} from 'react'
+import classnames from 'classnames'
+import moment from 'moment-timezone'
 import {themeable} from '@instructure/ui-themeable'
 import {Heading, Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
-import { shape, string, number, arrayOf, func } from 'prop-types';
-import { userShape, itemShape } from '../plannerPropTypes';
-import styles from './styles.css';
-import theme from './theme.js';
-import { getFriendlyDate, getFullDate, isToday } from '../../utilities/dateUtils';
-import Grouping from '../Grouping';
-import formatMessage from '../../format-message';
-import { animatable } from '../../dynamic-ui';
+import {shape, string, number, arrayOf, func} from 'prop-types'
+import {userShape, itemShape} from '../plannerPropTypes'
+import styles from './styles.css'
+import theme from './theme.js'
+import {getFriendlyDate, getFullDate, isToday} from '../../utilities/dateUtils'
+import Grouping from '../Grouping'
+import formatMessage from '../../format-message'
+import {animatable} from '../../dynamic-ui'
 
 export class Day extends Component {
   static propTypes = {
@@ -41,45 +41,51 @@ export class Day extends Component {
     updateTodo: func,
     registerAnimatable: func.isRequired,
     deregisterAnimatable: func.isRequired,
-    currentUser: shape(userShape),
-  };
+    currentUser: shape(userShape)
+  }
+
   static defaultProps = {
-    animatableIndex: 0,
-  };
-
-  constructor (props) {
-    super(props);
-
-    const tzMomentizedDate = moment.tz(props.day, props.timeZone);
-    this.friendlyName = getFriendlyDate(tzMomentizedDate);
-    this.fullDate = getFullDate(tzMomentizedDate);
+    animatableIndex: 0
   }
 
-  componentDidMount () {
-    this.props.registerAnimatable('day', this, this.props.animatableIndex, this.itemUniqueIds());
+  constructor(props) {
+    super(props)
+
+    const tzMomentizedDate = moment.tz(props.day, props.timeZone)
+    this.friendlyName = getFriendlyDate(tzMomentizedDate)
+    this.fullDate = getFullDate(tzMomentizedDate)
   }
 
-  componentWillReceiveProps (nextProps) {
-    this.props.deregisterAnimatable('day', this, this.itemUniqueIds());
-    this.props.registerAnimatable('day', this, nextProps.animatableIndex, this.itemUniqueIds(nextProps));
+  componentDidMount() {
+    this.props.registerAnimatable('day', this, this.props.animatableIndex, this.itemUniqueIds())
   }
 
-  componentWillUnmount () {
-    this.props.deregisterAnimatable('day', this, this.itemUniqueIds());
+  componentWillReceiveProps(nextProps) {
+    this.props.deregisterAnimatable('day', this, this.itemUniqueIds())
+    this.props.registerAnimatable(
+      'day',
+      this,
+      nextProps.animatableIndex,
+      this.itemUniqueIds(nextProps)
+    )
   }
 
-  itemUniqueIds (props) {
+  componentWillUnmount() {
+    this.props.deregisterAnimatable('day', this, this.itemUniqueIds())
+  }
+
+  itemUniqueIds(props) {
     props = props || this.props
-    return (props.itemsForDay || []).map(item => item.uniqueId);
+    return (props.itemsForDay || []).map(item => item.uniqueId)
   }
 
-  hasItems () {
-    return this.props.itemsForDay && this.props.itemsForDay.length > 0;
+  hasItems() {
+    return this.props.itemsForDay && this.props.itemsForDay.length > 0
   }
 
   renderGrouping(groupKey, groupItems, index) {
-    const courseInfo = groupItems[0].context || {};
-    const groupColor = (courseInfo.color ? courseInfo.color : this.props.currentUser.color) || null;
+    const courseInfo = groupItems[0].context || {}
+    const groupColor = (courseInfo.color ? courseInfo.color : this.props.currentUser.color) || null
     return (
       <Grouping
         title={courseInfo.title}
@@ -97,76 +103,67 @@ export class Day extends Component {
         toggleCompletion={this.props.toggleCompletion}
         currentUser={this.props.currentUser}
       />
-    );
+    )
   }
 
-  renderGroupings () {
-    const groupings = [];
-    let currGroupItems;
-    let currGroupKey;
-    const nItems = this.props.itemsForDay.length;
+  renderGroupings() {
+    const groupings = []
+    let currGroupItems
+    let currGroupKey
+    const nItems = this.props.itemsForDay.length
 
     for (let i = 0; i < nItems; ++i) {
-      let item = this.props.itemsForDay[i];
-      let groupKey = (item.context && item.context.id) ? `${item.context.type}${item.context.id}` : 'Notes';
+      const item = this.props.itemsForDay[i]
+      const groupKey =
+        item.context && item.context.id ? `${item.context.type}${item.context.id}` : 'Notes'
       if (groupKey !== currGroupKey) {
-        if (currGroupKey) { // emit the grouping we've been working
-          groupings.push(this.renderGrouping(currGroupKey, currGroupItems, groupings.length));
+        if (currGroupKey) {
+          // emit the grouping we've been working
+          groupings.push(this.renderGrouping(currGroupKey, currGroupItems, groupings.length))
         }
         // start new grouping
-        currGroupKey = groupKey;
-        currGroupItems = [item];
+        currGroupKey = groupKey
+        currGroupItems = [item]
       } else {
-        currGroupItems.push(item);
+        currGroupItems.push(item)
       }
     }
     // the last groupings// emit the grouping we've been working
-    groupings.push(this.renderGrouping(currGroupKey, currGroupItems, groupings.length));
-    return groupings;
+    groupings.push(this.renderGrouping(currGroupKey, currGroupItems, groupings.length))
+    return groupings
   }
 
-  render () {
-    const thisIsToday = isToday(this.props.day);
+  render() {
+    const thisIsToday = isToday(this.props.day)
 
     return (
-      <div className={classnames(styles.root, 'planner-day', {'planner-today': thisIsToday})} >
-          <Heading
-            border={(this.hasItems()) ? 'none' : 'bottom'}
+      <div className={classnames(styles.root, 'planner-day', {'planner-today': thisIsToday})}>
+        <Heading border={this.hasItems() ? 'none' : 'bottom'}>
+          <Text
+            as="div"
+            transform="uppercase"
+            lineHeight="condensed"
+            size={thisIsToday ? 'large' : 'medium'}
           >
-            <Text
-              as="div"
-              transform="uppercase"
-              lineHeight="condensed"
-              size={thisIsToday ? 'large' : 'medium'}
-            >
-              {this.friendlyName}
-            </Text>
-            <Text
-              as="div"
-              lineHeight="condensed"
-            >
-              {this.fullDate}
-            </Text>
-          </Heading>
+            {this.friendlyName}
+          </Text>
+          <Text as="div" lineHeight="condensed">
+            {this.fullDate}
+          </Text>
+        </Heading>
 
         <div>
-          {
-            (this.hasItems()) ? (
-              this.renderGroupings()
-            ) : (
-              <View
-                textAlign="center"
-                display="block"
-                margin="small 0 0 0"
-              >
-                {formatMessage('Nothing Planned Yet')}
-              </View>
-            )
-          }
+          {this.hasItems() ? (
+            this.renderGroupings()
+          ) : (
+            <View textAlign="center" display="block" margin="small 0 0 0">
+              {formatMessage('Nothing Planned Yet')}
+            </View>
+          )}
         </div>
       </div>
-    );
+    )
   }
 }
 
-export default animatable(themeable(theme, styles)(Day));
+export default animatable(themeable(theme, styles)(Day))

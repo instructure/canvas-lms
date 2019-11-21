@@ -16,57 +16,76 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!CoursesTray'
 import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-layout'
+import {Heading, List, Spinner, Text} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
 
 export default function CoursesTray({courses, hasLoaded}) {
   return (
     <View as="div" padding="medium">
-      <Heading level="h3" as="h2">{I18n.t('Courses')}</Heading>
-      <hr role="presentation"/>
+      <Heading level="h3" as="h2">
+        {I18n.t('Courses')}
+      </Heading>
+      <hr role="presentation" />
       <List variant="unstyled" margin="small 0" itemSpacing="small">
         {hasLoaded ? (
-          courses.map(course =>
-            <ListItem key={course.id}>
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href={`/courses/${course.id}`}>{course.name}</Button>
-              {course.enrollment_term_id > 1 &&
-                <Text as="div" size="x-small" weight="light">{course.term.name}</Text>
-              }
-            </ListItem>
-          ).concat([
-            <ListItem key="hr"><hr role="presentation"/></ListItem>,
-            <ListItem key="all">
-              <Button variant="link" theme={{ mediumPadding: '0', mediumHeight: '1.5rem' }} href="/courses">{I18n.t('All Courses')}</Button>
-            </ListItem>
-          ])
+          courses
+            .map(course => (
+              <List.Item key={course.id}>
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href={`/courses/${course.id}`}
+                >
+                  {course.name}
+                </Button>
+                {course.enrollment_term_id > 1 && (
+                  <Text as="div" size="x-small" weight="light">
+                    {course.term.name}
+                  </Text>
+                )}
+              </List.Item>
+            ))
+            .concat([
+              <List.Item key="hr">
+                <hr role="presentation" />
+              </List.Item>,
+              <List.Item key="all">
+                <Button
+                  variant="link"
+                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  href="/courses"
+                >
+                  {I18n.t('All Courses')}
+                </Button>
+              </List.Item>
+            ])
         ) : (
-          <ListItem>
-            <Spinner size="small" title={I18n.t('Loading')} />
-          </ListItem>
+          <List.Item>
+            <Spinner size="small" renderTitle={I18n.t('Loading')} />
+          </List.Item>
         )}
       </List>
       <br />
-        <Text as="div">
-          {I18n.t(
-            'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
-          )}
-        </Text>
+      <Text as="div">
+        {I18n.t(
+          'Welcome to your courses! To customize the list of courses,  click on the "All Courses" link and star the courses to display.'
+        )}
+      </Text>
     </View>
   )
 }
 
 CoursesTray.propTypes = {
-  courses: arrayOf(shape({
-    id: string.isRequired,
-    name: string.isRequired
-  })).isRequired,
+  courses: arrayOf(
+    shape({
+      id: string.isRequired,
+      name: string.isRequired
+    })
+  ).isRequired,
   hasLoaded: bool.isRequired
 }
 

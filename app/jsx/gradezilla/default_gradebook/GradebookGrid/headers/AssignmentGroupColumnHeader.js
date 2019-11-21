@@ -18,13 +18,13 @@
 
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
-import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Menu, {MenuItem, MenuItemGroup} from '@instructure/ui-menu/lib/components/Menu'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {IconMoreSolid} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {Grid} from '@instructure/ui-layout'
+import {Menu} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-elements'
 import I18n from 'i18n!gradezilla'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import ColumnHeader from './ColumnHeader'
 
 function AssignmentGroupDetail({assignmentGroup, weightedGroups}) {
@@ -104,19 +104,19 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
       >
         <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
-            <GridRow>
-              <GridCol textAlign="center" width="auto">
+            <Grid.Row>
+              <Grid.Col textAlign="center" width="auto">
                 <div className="Gradebook__ColumnHeaderIndicators" />
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center">
+              <Grid.Col textAlign="center">
                 <AssignmentGroupDetail
                   assignmentGroup={assignmentGroup}
                   weightedGroups={weightedGroups}
                 />
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center" width="auto">
+              <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>
                   <Menu
                     contentRef={this.bindOptionsMenuContent}
@@ -129,10 +129,10 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
                     onDismiss={this.props.onMenuDismiss}
                   >
                     <Menu label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent}>
-                      <MenuItemGroup
+                      <Menu.Group
                         label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
                       >
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'ascending'
@@ -141,9 +141,9 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
                           onSelect={sortBySetting.onSortByGradeAscending}
                         >
                           <span>{I18n.t('Grade - Low to High')}</span>
-                        </MenuItem>
+                        </Menu.Item>
 
-                        <MenuItem
+                        <Menu.Item
                           selected={
                             selectedSortSetting === 'grade' &&
                             sortBySetting.direction === 'descending'
@@ -152,13 +152,13 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
                           onSelect={sortBySetting.onSortByGradeDescending}
                         >
                           <span>{I18n.t('Grade - High to Low')}</span>
-                        </MenuItem>
-                      </MenuItemGroup>
+                        </Menu.Item>
+                      </Menu.Group>
                     </Menu>
                   </Menu>
                 </div>
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </div>
       </div>

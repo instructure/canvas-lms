@@ -198,7 +198,6 @@ test('returns true when submissionType is "external_tool"', () => {
   equal(assignment.isNonDefaultExternalTool(), true)
 })
 
-
 QUnit.module('Assignment#isExternalTool')
 
 test('returns true if record is external tool', () => {
@@ -220,7 +219,26 @@ QUnit.module('Assignment#defaultToolName', {
 
 test('escapes the name retrieved from the js env', () => {
   const assignment = new Assignment({name: 'foo'})
-  equal(assignment.defaultToolName(), 'Default Tool %3Ca href%3D%22https%3A//www.somethingbad.com%22%3E')
+  equal(
+    assignment.defaultToolName(),
+    'Default Tool %3Ca href%3D%22https%3A//www.somethingbad.com%22%3E'
+  )
+})
+
+QUnit.module('Assignment#defaultToolName', {
+  setup() {
+    fakeENV.setup({
+      DEFAULT_ASSIGNMENT_TOOL_NAME: undefined
+    })
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('does not convert undefined to string', () => {
+  const assignment = new Assignment({name: 'foo'})
+  equal(assignment.defaultToolName(), undefined)
 })
 
 test('returns false if record is not external tool', () => {
@@ -288,12 +306,12 @@ QUnit.module('Assignment#moderatedGrading', () => {
   })
 
   test('returns false if the moderated_grading attribute is set to false', () => {
-    const assignment = new Assignment({ moderated_grading: false })
+    const assignment = new Assignment({moderated_grading: false})
     strictEqual(assignment.moderatedGrading(), false)
   })
 
   test('returns true if the moderated_grading attribute is set to true', () => {
-    const assignment = new Assignment({ moderated_grading: true })
+    const assignment = new Assignment({moderated_grading: true})
     strictEqual(assignment.moderatedGrading(), true)
   })
 })
@@ -1281,15 +1299,38 @@ test('make ajax call with right url when duplicate_failed is called', () => {
   })
   const spy = sandbox.spy($, 'ajaxJSON')
   assignment.duplicate_failed()
-  ok(spy.withArgs(
-    `/api/v1/courses/${originalCourseID}/assignments/${originalAssignmentID}/duplicate?target_assignment_id=${assignmentID}&target_course_id=${courseID}`
-  ).calledOnce)
+  ok(
+    spy.withArgs(
+      `/api/v1/courses/${originalCourseID}/assignments/${originalAssignmentID}/duplicate?target_assignment_id=${assignmentID}&target_course_id=${courseID}`
+    ).calledOnce
+  )
+})
+
+QUnit.module('Assignment#retry_migration')
+
+test('make ajax call with right url when retry_migration is called', () => {
+  const assignmentID = '200'
+  const originalQuizID = '42'
+  const courseID = '123'
+  const assignment = new Assignment({
+    name: 'foo',
+    id: assignmentID,
+    original_quiz_id: originalQuizID,
+    course_id: courseID
+  })
+  const spy = sandbox.spy($, 'ajaxJSON')
+  assignment.retry_migration()
+  ok(
+    spy.withArgs(
+      `/api/v1/courses/${courseID}/content_exports?export_type=quizzes2&quiz_id=${originalQuizID}&failed_assignment_id=${assignmentID}&include[]=migrated_assignment`
+    ).calledOnce
+  )
 })
 
 QUnit.module('Assignment#pollUntilFinishedDuplicating', {
   setup() {
     this.clock = sinon.useFakeTimers()
-    this.assignment = new Assignment({ workflow_state: 'duplicating' })
+    this.assignment = new Assignment({workflow_state: 'duplicating'})
     sandbox.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
   },
   teardown() {
@@ -1305,9 +1346,9 @@ test('polls for updates', function() {
   ok(this.assignment.fetch.called)
 })
 
-test('stops polling when the assignment has finished duplicating', function () {
+test('stops polling when the assignment has finished duplicating', function() {
   this.assignment.pollUntilFinishedDuplicating()
-  this.assignment.set({ workflow_state: 'unpublished' })
+  this.assignment.set({workflow_state: 'unpublished'})
   this.clock.tick(3000)
   ok(this.assignment.fetch.calledOnce)
   this.clock.tick(3000)
@@ -1317,7 +1358,7 @@ test('stops polling when the assignment has finished duplicating', function () {
 QUnit.module('Assignment#pollUntilFinishedImporting', {
   setup() {
     this.clock = sinon.useFakeTimers()
-    this.assignment = new Assignment({ workflow_state: 'importing' })
+    this.assignment = new Assignment({workflow_state: 'importing'})
     sandbox.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
   },
   teardown() {
@@ -1333,16 +1374,44 @@ test('polls for updates', function() {
   ok(this.assignment.fetch.called)
 })
 
-test('stops polling when the assignment has finished importing', function () {
+test('stops polling when the assignment has finished importing', function() {
   this.assignment.pollUntilFinishedImporting()
-  this.assignment.set({ workflow_state: 'unpublished' })
+  this.assignment.set({workflow_state: 'unpublished'})
   this.clock.tick(3000)
   ok(this.assignment.fetch.calledOnce)
   this.clock.tick(3000)
   ok(this.assignment.fetch.calledOnce)
 })
 
-QUnit.module('Assignment#gradersAnonymousToGraders', (hooks) => {
+QUnit.module('Assignment#pollUntilFinishedMigrating', {
+  setup() {
+    this.clock = sinon.useFakeTimers()
+    this.assignment = new Assignment({workflow_state: 'migrating'})
+    sandbox.stub(this.assignment, 'fetch').returns($.Deferred().resolve())
+  },
+  teardown() {
+    this.clock.restore()
+  }
+})
+
+test('polls for updates', function() {
+  this.assignment.pollUntilFinishedMigrating()
+  this.clock.tick(2000)
+  notOk(this.assignment.fetch.called)
+  this.clock.tick(2000)
+  ok(this.assignment.fetch.called)
+})
+
+test('stops polling when the assignment has finished migrating', function() {
+  this.assignment.pollUntilFinishedMigrating()
+  this.assignment.set({workflow_state: 'unpublished'})
+  this.clock.tick(3000)
+  ok(this.assignment.fetch.calledOnce)
+  this.clock.tick(3000)
+  ok(this.assignment.fetch.calledOnce)
+})
+
+QUnit.module('Assignment#gradersAnonymousToGraders', hooks => {
   let assignment
 
   hooks.beforeEach(() => {
@@ -1361,7 +1430,7 @@ QUnit.module('Assignment#gradersAnonymousToGraders', (hooks) => {
   })
 })
 
-QUnit.module('Assignment#graderCommentsVisibleToGraders', (hooks) => {
+QUnit.module('Assignment#graderCommentsVisibleToGraders', hooks => {
   let assignment
 
   hooks.beforeEach(() => {
@@ -1380,7 +1449,7 @@ QUnit.module('Assignment#graderCommentsVisibleToGraders', (hooks) => {
   })
 })
 
-QUnit.module('Assignment#showGradersAnonymousToGradersCheckbox', (hooks) => {
+QUnit.module('Assignment#showGradersAnonymousToGradersCheckbox', hooks => {
   let assignment
 
   hooks.beforeEach(() => {

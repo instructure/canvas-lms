@@ -34,7 +34,7 @@ class Login::OtpController < ApplicationController
     # OR if we're not waiting on OTP, we're configuring
     if session[:pending_otp] && !secret_key ||
         !session[:pending_otp] && !configuring?
-      session[:pending_otp_secret_key] = ROTP::Base32.random_base32
+      session[:pending_otp_secret_key] = ROTP::Base32.random
       @first_reconfiguration = true
     end
     if session[:pending_otp_communication_channel_id]
@@ -85,7 +85,7 @@ class Login::OtpController < ApplicationController
     drift = 300 if session[:pending_otp_communication_channel_id] ||
         (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
 
-    if !force_fail && ROTP::TOTP.new(secret_key).verify_with_drift(verification_code, drift) ||
+    if !force_fail && ROTP::TOTP.new(secret_key).verify(verification_code, drift_behind: drift, drift_ahead: drift) ||
       @current_user.authenticate_one_time_password(verification_code)
       if configuring?
         @current_user.one_time_passwords.scope.delete_all

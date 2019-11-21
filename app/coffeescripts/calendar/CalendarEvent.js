@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-elements'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
@@ -68,7 +68,7 @@ export default class CalendarEvent extends Backbone.Model {
     return result
   }
 
-  fetch(otps={}) {
+  fetch(otps = {}) {
     let sectionsDfd, syncDfd
 
     this.showSpinner()
@@ -83,7 +83,7 @@ export default class CalendarEvent extends Backbone.Model {
       sectionsDfd = Depaginate(this.get('sections_url'))
     }
 
-    const combinedSuccess = (syncArgs=[], sectionsResp=[]) => {
+    const combinedSuccess = (syncArgs = [], sectionsResp = []) => {
       this.hideSpinner()
 
       const [syncResp, syncStatus, syncXhr] = syncArgs
@@ -100,9 +100,8 @@ export default class CalendarEvent extends Backbone.Model {
   showSpinner() {
     ReactDOM.render(
       <div>
-        <Spinner title={I18n.t('Loading')} size="medium" />
-      </div>
-    ,
+        <Spinner renderTitle={I18n.t('Loading')} size="medium" />
+      </div>,
       this.view.el
     )
   }
@@ -123,7 +122,7 @@ export default class CalendarEvent extends Backbone.Model {
     if (errHandler) return errHandler()
   }
 
-  static mergeSectionsIntoCalendarEvent(eventData={}, sections) {
+  static mergeSectionsIntoCalendarEvent(eventData = {}, sections) {
     eventData.recurring_calendar_events = ENV.RECURRING_CALENDAR_EVENTS_ENABLED
     eventData.course_sections = sections
     eventData.use_section_dates = !!(eventData.child_events && eventData.child_events.length)

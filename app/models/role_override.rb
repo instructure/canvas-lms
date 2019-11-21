@@ -31,7 +31,9 @@ class RoleOverride < ActiveRecord::Base
 
   def clear_caches
     self.class.connection.after_transaction_commit do
-      self.account.send_later_if_production(:clear_downstream_caches, :role_overrides)
+      self.account.send_later_if_production_enqueue_args(:clear_downstream_caches,
+        {:singleton => "clear_downstream_role_caches:#{self.account.global_id}"},
+        :role_overrides)
       self.role.touch
     end
   end
@@ -145,6 +147,23 @@ class RoleOverride < ActiveRecord::Base
        :true_for => %w(AccountAdmin),
        :available_to => %w(AccountAdmin AccountMembership),
      },
+    :manage_course_visibility => {
+      :label => lambda { t("Change course visibility") },
+      :label_v2 => lambda { t("Courses - change visibility") },
+      :available_to => [
+        'AccountAdmin',
+        'AccountMembership',
+        'TeacherEnrollment',
+        'TaEnrollment',
+        'DesignerEnrollment'
+      ],
+      :true_for => [
+        'AccountAdmin',
+        'TeacherEnrollment',
+        'TaEnrollment',
+        'DesignerEnrollment'
+      ]
+    },
      :manage_developer_keys => {
        :label => lambda { t('permissions.manage_developer_keys', "Manage developer keys") },
        :label_v2 => lambda { t("Developer Keys - manage ") },

@@ -26,16 +26,13 @@ import propTypes from '../propTypes'
 import React, {Component} from 'react'
 import select from '../../shared/select'
 
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 import DiscussionSettings from './DiscussionSettings'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconPlus from '@instructure/ui-icons/lib/Line/IconPlus'
-import IconSearchLine from '@instructure/ui-icons/lib/Line/IconSearch'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import View from '@instructure/ui-layout/lib/components/View'
+import {FormField} from '@instructure/ui-form-field'
+import {Grid, View} from '@instructure/ui-layout'
+import {IconPlusLine, IconSearchLine} from '@instructure/ui-icons'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextInput} from '@instructure/ui-forms'
 
 const filters = {
   all: I18n.t('All'),
@@ -96,8 +93,8 @@ export default class IndexHeader extends Component {
       <View>
         <View display="block">
           <Grid>
-            <GridRow hAlign="space-between">
-              <GridCol width={2}>
+            <Grid.Row hAlign="space-between">
+              <Grid.Col width={2}>
                 <FormField
                   id="discussion-filter"
                   label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
@@ -117,8 +114,8 @@ export default class IndexHeader extends Component {
                     ))}
                   </select>
                 </FormField>
-              </GridCol>
-              <GridCol width={4}>
+              </Grid.Col>
+              <Grid.Col width={4}>
                 <TextInput
                   label={
                     <ScreenReaderContent>
@@ -130,15 +127,15 @@ export default class IndexHeader extends Component {
                   onChange={this.onSearchStringChange}
                   name="discussion_search"
                 />
-              </GridCol>
-              <GridCol width={6} textAlign="end">
+              </Grid.Col>
+              <Grid.Col width={6} textAlign="end">
                 {this.props.permissions.create && (
                   <Button
                     href={`/${this.props.contextType}s/${this.props.contextId}/discussion_topics/new`}
                     variant="primary"
                     id="add_discussion"
                   >
-                    <IconPlus />
+                    <IconPlusLine />
                     <ScreenReaderContent>{I18n.t('Add discussion')}</ScreenReaderContent>
                     <PresentationContent>{I18n.t('Discussion')}</PresentationContent>
                   </Button>
@@ -154,8 +151,8 @@ export default class IndexHeader extends Component {
                     isSavingSettings={this.props.isSavingSettings}
                   />
                 ) : null}
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </View>
       </View>
@@ -163,19 +160,17 @@ export default class IndexHeader extends Component {
   }
 }
 
-const connectState = state =>
-  Object.assign(
-    {},
-    select(state, [
-      'contextType',
-      'contextId',
-      'permissions',
-      'userSettings',
-      'courseSettings',
-      'isSavingSettings',
-      'isSettingsModalOpen'
-    ])
-  )
+const connectState = state => ({
+  ...select(state, [
+    'contextType',
+    'contextId',
+    'permissions',
+    'userSettings',
+    'courseSettings',
+    'isSavingSettings',
+    'isSettingsModalOpen'
+  ])
+})
 const selectedActions = [
   'fetchUserSettings',
   'searchDiscussions',

@@ -110,6 +110,12 @@ module Lti
         expect(parsed_body).to eq expected_assignment
       end
 
+      it 'returns an assignment by lti assignment id' do
+        get "#{endpoint}/#{assignment.lti_context_id}", headers: request_headers
+        parsed_body = JSON.parse(response.body)
+        expect(parsed_body).to eq expected_assignment
+      end
+
       it 'returns an assignment with user lti id' do
         get "#{endpoint}/#{assignment.id}", params: { user_id: student.lti_context_id }, headers: request_headers
         parsed_body = JSON.parse(response.body)

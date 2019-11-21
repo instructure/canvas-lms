@@ -21,57 +21,57 @@ import $ from 'jquery'
 import 'jqueryui/dialog'
 import 'rubricEditBinding' // event handler for rubricEditDataReady
 
-  var quizRubric = {
-    ready: function() {
-      var $dialog = $("#rubrics.rubric_dialog");
-      $dialog.dialog({
-        title: I18n.t('titles.details', "Assignment Rubric Details"),
-        width: 600,
-        resizable: true
-      });
-    },
+var quizRubric = {
+  ready() {
+    const $dialog = $('#rubrics.rubric_dialog')
+    $dialog.dialog({
+      title: I18n.t('titles.details', 'Assignment Rubric Details'),
+      width: 600,
+      resizable: true
+    })
+  },
 
-    buildLoadingDialog: function(){
-      var $loading = $("<div/>");
-      $loading.text(I18n.t('loading', "Loading..."));
-      $("body").append($loading);
-      $loading.dialog({
-        width: 400,
-        height: 200
-      });
-      return $loading;
-    },
+  buildLoadingDialog() {
+    const $loading = $('<div/>')
+    $loading.text(I18n.t('loading', 'Loading...'))
+    $('body').append($loading)
+    $loading.dialog({
+      width: 400,
+      height: 200
+    })
+    return $loading
+  },
 
-    replaceLoadingDialog: function(html, $loading){
-      $("body").append(html);
-      $loading.dialog('close');
-      $loading.remove();
-      quizRubric.ready();
-    },
+  replaceLoadingDialog(html, $loading) {
+    $('body').append(html)
+    $loading.dialog('close')
+    $loading.remove()
+    quizRubric.ready()
+  },
 
-    createRubricDialog: function(url, preloadedHtml) {
-      var $dialog = $("#rubrics.rubric_dialog");
-      if($dialog.length) {
-        quizRubric.ready();
+  createRubricDialog(url, preloadedHtml) {
+    const $dialog = $('#rubrics.rubric_dialog')
+    if ($dialog.length) {
+      quizRubric.ready()
+    } else {
+      const $loading = quizRubric.buildLoadingDialog()
+      if (preloadedHtml === undefined || preloadedHtml === null) {
+        $.get(url, html => {
+          quizRubric.replaceLoadingDialog(html, $loading)
+        })
       } else {
-        var $loading = quizRubric.buildLoadingDialog();
-        if(preloadedHtml === undefined || preloadedHtml === null){
-          $.get(url, html => {
-            quizRubric.replaceLoadingDialog(html, $loading);
-          });
-        } else {
-          quizRubric.replaceLoadingDialog(preloadedHtml, $loading);
-        }
+        quizRubric.replaceLoadingDialog(preloadedHtml, $loading)
       }
     }
-  };
+  }
+}
 
-  $(document).ready(function() {
-    $(".show_rubric_link").click(function(event) {
-      event.preventDefault();
-      var url = $(this).attr('rel');
-      quizRubric.createRubricDialog(url);
-    });
-  });
+$(document).ready(function() {
+  $('.show_rubric_link').click(function(event) {
+    event.preventDefault()
+    const url = $(this).attr('rel')
+    quizRubric.createRubricDialog(url)
+  })
+})
 
-export default quizRubric;
+export default quizRubric

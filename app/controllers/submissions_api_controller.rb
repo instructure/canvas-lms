@@ -472,6 +472,10 @@ class SubmissionsApiController < ApplicationController
     end
 
     if params[:grouped].present?
+      if @context.root_account.feature_enabled?(:allow_postable_submission_comments) && @context.post_policies_enabled?
+        includes << "has_postable_comments"
+      end
+
       scope = (@section || @context).all_student_enrollments.
         preload(:root_account, :sis_pseudonym, :user => :pseudonyms).
         where(:user_id => student_ids).order(:user_id)
@@ -483,8 +487,17 @@ class SubmissionsApiController < ApplicationController
       if params[:workflow_state].present?
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
-      submissions_scope = submissions_scope.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
-      submissions = submissions_scope.preload(:originality_reports, :quiz_submission).to_a
+
+      submission_preloads = [:originality_reports, :quiz_submission]
+      submission_preloads << :attachment unless params[:exclude_response_fields]&.include?("attachments")
+      submissions = submissions_scope.preload(submission_preloads).to_a
+
+      ActiveRecord::Associations::Preloader.new.preload(
+        submissions,
+        :submission_comments,
+        {select: [:hidden, :submission_id]}
+      )
+
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
@@ -606,7 +619,7 @@ class SubmissionsApiController < ApplicationController
   def create_file
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
-    if @assignment.root_account.feature_enabled?(:check_submission_file_type) && @assignment.allowed_extensions.any?
+    if @assignment.allowed_extensions.any?
       filetype = infer_upload_content_type(params)
       reject!(t('unable to find filetype')) unless filetype
       extension = File.mime_types[filetype]
@@ -841,7 +854,7 @@ class SubmissionsApiController < ApplicationController
         comment = {
           comment: comment[:text_comment],
           author: @current_user,
-          hidden: @assignment.muted? && admin_in_context
+          hidden: @submission.hide_grade_from_student? && admin_in_context
         }.merge(
           comment.permit(:media_comment_id, :media_comment_type, :group_comment).to_unsafe_h
         ).with_indifferent_access

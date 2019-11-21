@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!course_images'
 import _ from 'underscore'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Spinner} from '@instructure/ui-elements'
 import {Tabs} from '@instructure/ui-tabs'
 import UploadArea from './UploadArea'
 import FlickrSearch from '../../shared/FlickrSearch'
@@ -41,7 +41,14 @@ export default class CourseImagePicker extends React.Component {
   }
 
   state = {
-    draggingFile: false
+    draggingFile: false,
+    selectedIndex: 0
+  }
+
+  handleTabChange = (event, {index}) => {
+    this.setState({
+      selectedIndex: index
+    })
   }
 
   onDrop = e => {
@@ -70,9 +77,10 @@ export default class CourseImagePicker extends React.Component {
   }
 
   render() {
+    const selectedIndex = this.state.selectedIndex
     return (
-      <Tabs margin="large auto" size="large">
-        <Tabs.Panel title={I18n.t('Computer')}>
+      <Tabs margin="large auto" maxWidth="60%" onRequestTabChange={this.handleTabChange}>
+        <Tabs.Panel renderTitle={I18n.t('Computer')} isSelected={selectedIndex === 0}>
           <div
             className="CourseImagePicker"
             onDrop={this.onDrop}
@@ -82,7 +90,7 @@ export default class CourseImagePicker extends React.Component {
           >
             {this.props.uploadingImage && (
               <div className="CourseImagePicker__Overlay">
-                <Spinner title="Loading" />
+                <Spinner renderTitle="Loading" />
               </div>
             )}
             {this.state.draggingFile && (
@@ -104,7 +112,7 @@ export default class CourseImagePicker extends React.Component {
           </div>
         </Tabs.Panel>
         {ENV.use_unsplash_image_search ? (
-          <Tabs.Panel title={I18n.t('Unsplash')}>
+          <Tabs.Panel renderTitle={I18n.t('Unsplash')} isSelected={selectedIndex === 1}>
             <ImageSearch
               selectImage={(imageUrl, confirmationId) =>
                 this.props.handleImageSearchUrlUpload(imageUrl, confirmationId)
@@ -112,7 +120,7 @@ export default class CourseImagePicker extends React.Component {
             />
           </Tabs.Panel>
         ) : (
-          <Tabs.Panel title={I18n.t('Flickr')}>
+          <Tabs.Panel renderTitle={I18n.t('Flickr')} isSelected={selectedIndex === 1}>
             <FlickrSearch
               selectImage={imageUrl => this.props.handleImageSearchUrlUpload(imageUrl)}
             />

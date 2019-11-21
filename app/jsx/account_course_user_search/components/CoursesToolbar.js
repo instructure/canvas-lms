@@ -18,14 +18,13 @@
 
 import React from 'react'
 import {arrayOf, string, bool, func, shape, oneOf} from 'prop-types'
-import {isEqual, groupBy, map} from 'lodash'
-import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Select from '@instructure/ui-core/lib/components/Select'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
+import {isEqual, groupBy, map, compact} from 'lodash'
+import {IconPlusLine} from '@instructure/ui-icons'
+import {Button} from '@instructure/ui-buttons'
+import {Checkbox, TextInput} from '@instructure/ui-forms'
+import {Grid} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import CanvasSelect from '../../shared/components/CanvasSelect'
 import I18n from 'i18n!account_course_user_search'
 import preventDefault from 'compiled/fn/preventDefault'
 import {propType as termsPropType} from '../store/TermsStore'
@@ -43,6 +42,19 @@ const termGroups = {
   past: I18n.t('Past Terms')
 }
 
+const allTermsGroup = (
+  <CanvasSelect.Group key="allGroup" id="allGroup" label={I18n.t('Show courses from')}>
+    <CanvasSelect.Option key="all" id="all" value="">
+      {I18n.t('All Terms')}
+    </CanvasSelect.Option>
+  </CanvasSelect.Group>
+)
+const loadingTermsOption = (
+  <CanvasSelect.Option key="loading" id="loading" value="loading" disabled>
+    {I18n.t('Loading more terms...')}
+  </CanvasSelect.Option>
+)
+
 export default function CoursesToolbar({
   can_create_courses,
   terms,
@@ -59,58 +71,70 @@ export default function CoursesToolbar({
       ? I18n.t('Search courses by teacher...')
       : I18n.t('Search courses...')
 
+  const termOptions = []
+  termOptions.push(allTermsGroup)
+  termOptions.push(
+    ...compact(
+      // Create Group options for terms and remove empty items
+      map(
+        termGroups,
+        (label, key) =>
+          groupedTerms[key] && (
+            <CanvasSelect.Group key={key} id={key} label={label}>
+              {groupedTerms[key].map(term => (
+                <CanvasSelect.Option key={term.id} id={term.id} value={term.id}>
+                  {term.name}
+                </CanvasSelect.Option>
+              ))}
+            </CanvasSelect.Group>
+          )
+      )
+    )
+  )
+  if (terms.loading) {
+    termOptions.push(loadingTermsOption)
+  }
+
   return (
     <div>
       <form onSubmit={preventDefault(onApplyFilters)} disabled={isLoading}>
         <Grid vAlign="top" startAt="medium">
-          <GridRow>
-            <GridCol>
+          <Grid.Row>
+            <Grid.Col>
               <Grid colSpacing="small" rowSpacing="small" startAt="large">
-                <GridRow>
-                  <GridCol width="2">
-                    <Select
+                <Grid.Row>
+                  <Grid.Col width={4}>
+                    <CanvasSelect
+                      id="termFilter"
                       label={<ScreenReaderContent>{I18n.t('Filter by term')}</ScreenReaderContent>}
                       value={draftFilters.enrollment_term_id}
-                      onChange={e => onUpdateFilters({enrollment_term_id: e.target.value})}
+                      onChange={(e, value) => onUpdateFilters({enrollment_term_id: value})}
                     >
-                      <optgroup label={I18n.t('Show courses from')}>
-                        <option key="all" value="">
-                          {I18n.t('All Terms')}
-                        </option>
-                      </optgroup>
-                      {map(
-                        termGroups,
-                        (label, key) =>
-                          groupedTerms[key] && (
-                            <optgroup key={key} label={label}>
-                              {groupedTerms[key].map(term => (
-                                <option key={term.id} value={term.id}>
-                                  {term.name}
-                                </option>
-                              ))}
-                            </optgroup>
-                          )
-                      )}
-                      {terms.loading && <option disabled>{I18n.t('Loading more terms...')}</option>}
-                    </Select>
-                  </GridCol>
-                  <GridCol width="2">
-                    <Select
+                      {termOptions}
+                    </CanvasSelect>
+                  </Grid.Col>
+                  <Grid.Col width={2}>
+                    <CanvasSelect
+                      id="searchByFilter"
                       label={<ScreenReaderContent>{I18n.t('Search by')}</ScreenReaderContent>}
-                      value={draftFilters.search_by}
-                      onChange={e => onUpdateFilters({search_by: e.target.value})}
+                      value={draftFilters.search_by || 'course'}
+                      onChange={(e, value) => onUpdateFilters({search_by: value})}
                     >
-                      <optgroup label={I18n.t('Search by')}>
-                        <option key="course" value="course">
+                      <CanvasSelect.Group
+                        key="search"
+                        id="searchByGroup"
+                        label={I18n.t('Search by')}
+                      >
+                        <CanvasSelect.Option key="course" id="course" value="course">
                           {I18n.t('Course')}
-                        </option>
-                        <option key="teacher" value="teacher">
+                        </CanvasSelect.Option>
+                        <CanvasSelect.Option key="teacher" id="teacher" value="teacher">
                           {I18n.t('Teacher')}
-                        </option>
-                      </optgroup>
-                    </Select>
-                  </GridCol>
-                  <GridCol width="8">
+                        </CanvasSelect.Option>
+                      </CanvasSelect.Group>
+                    </CanvasSelect>
+                  </Grid.Col>
+                  <Grid.Col width={6}>
                     <TextInput
                       type="search"
                       label={<ScreenReaderContent>{searchLabel}</ScreenReaderContent>}
@@ -128,10 +152,10 @@ export default function CoursesToolbar({
                       onFocus={() => toggleSRMessage(false)}
                       messages={errors.search_term && [{type: 'error', text: errors.search_term}]}
                     />
-                  </GridCol>
-                </GridRow>
-                <GridRow>
-                  <GridCol width="auto">
+                  </Grid.Col>
+                </Grid.Row>
+                <Grid.Row>
+                  <Grid.Col width="auto">
                     <Checkbox
                       checked={isEqual(draftFilters.enrollment_type, ['student'])}
                       onChange={e =>
@@ -139,28 +163,28 @@ export default function CoursesToolbar({
                       }
                       label={I18n.t('Hide courses without students')}
                     />
-                  </GridCol>
-                  <GridCol>
+                  </Grid.Col>
+                  <Grid.Col>
                     <Checkbox
                       checked={draftFilters.blueprint}
                       onChange={e => onUpdateFilters({blueprint: e.target.checked ? true : null})}
                       label={I18n.t('Show only blueprint courses')}
                     />
-                  </GridCol>
-                </GridRow>
+                  </Grid.Col>
+                </Grid.Row>
               </Grid>
-            </GridCol>
+            </Grid.Col>
             {can_create_courses && (
-              <GridCol width="auto">
+              <Grid.Col width="auto">
                 <NewCourseModal terms={terms}>
                   <Button aria-label={I18n.t('Create new course')}>
                     <IconPlusLine />
                     {I18n.t('Course')}
                   </Button>
                 </NewCourseModal>
-              </GridCol>
+              </Grid.Col>
             )}
-          </GridRow>
+          </Grid.Row>
         </Grid>
       </form>
     </div>

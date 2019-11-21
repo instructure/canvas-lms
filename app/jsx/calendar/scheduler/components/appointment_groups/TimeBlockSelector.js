@@ -25,8 +25,8 @@ import TimeBlockListManager from 'compiled/calendar/TimeBlockListManager'
 import 'jquery.instructure_date_and_time'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Button} from '@instructure/ui-buttons'
 import TimeBlockSelectRow from './TimeBlockSelectRow'
 import NumberHelper from '../../../../shared/helpers/numberHelper'
 
@@ -51,7 +51,7 @@ export default class TimeBlockSelector extends React.Component {
           timeData: {}
         }
       ],
-      slotValue: "30",
+      slotValue: '30',
       slotMessage: null
     }
   }
@@ -139,18 +139,21 @@ export default class TimeBlockSelector extends React.Component {
 
   isSlotValueValid(value) {
     const val = NumberHelper.parse(value)
-    return value.trim().length === 0 || !Number.isNaN(val) && val > 0
+    return value.trim().length === 0 || (!Number.isNaN(val) && val > 0)
   }
 
   handleSlotValueChange = (_event, slotValue) => {
-    const slotMessage =  this.isSlotValueValid(slotValue) ? null : [{type: 'error', text: I18n.t('Must be a number > 0')}]
+    const slotMessage = this.isSlotValueValid(slotValue)
+      ? null
+      : [{type: 'error', text: I18n.t('Must be a number > 0')}]
     this.setState({slotValue, slotMessage})
   }
 
   handleSlotValueIncrement = () => {
     this.setState((state, _props) => {
       const val = NumberHelper.parse(state.slotValue)
-      if (Number.isNaN(val)) { // current value can't be incremented, do nothing
+      if (Number.isNaN(val)) {
+        // current value can't be incremented, do nothing
         return null
       }
       return {
@@ -163,7 +166,8 @@ export default class TimeBlockSelector extends React.Component {
   handleSlotValueDecrement = () => {
     this.setState((state, _props) => {
       const val = NumberHelper.parse(state.slotValue)
-      if (Number.isNaN(val)) { // current value can't be decremented, do nothing
+      if (Number.isNaN(val)) {
+        // current value can't be decremented, do nothing
         return null
       }
       return {
@@ -193,20 +197,22 @@ export default class TimeBlockSelector extends React.Component {
         <FormFieldGroup
           layout="columns"
           vAlign="bottom"
-          description={<ScreenReaderContent>{I18n.t('Divide into equal time slots (in minutes')}</ScreenReaderContent>}
+          description={
+            <ScreenReaderContent>
+              {I18n.t('Divide into equal time slots (in minutes')}
+            </ScreenReaderContent>
+          }
           messages={this.state.slotMessage}
         >
           <NumberInput
-            label={I18n.t('Divide into equal slots (value is in minutes)')}
+            renderLabel={I18n.t('Divide into equal slots (value is in minutes)')}
             value={this.state.slotValue}
             onChange={this.handleSlotValueChange}
             onIncrement={this.handleSlotValueIncrement}
             onDecrement={this.handleSlotValueDecrement}
             id="TimeBlockSelector__DivideSection-Input"
           />
-          <Button onClick={this.handleSlotDivision}>
-            {I18n.t('Create Slots')}
-          </Button>
+          <Button onClick={this.handleSlotDivision}>{I18n.t('Create Slots')}</Button>
         </FormFieldGroup>
       </div>
     )

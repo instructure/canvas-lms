@@ -60,7 +60,10 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     }.compact
   end
 
-  before { user_session(admin) }
+  before {
+    user_session(admin)
+    settings['extensions'][0]['privacy_level'] = privacy_level
+  }
 
   shared_examples_for 'an action that requires manage developer keys' do |skip_404|
     context 'when the user has manage_developer_keys' do
@@ -115,7 +118,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     context 'when the request does not time out' do
       before do
-        allow_any_instance_of(Net::HTTP).to receive(:request).and_return(ok_response)
+        allow(CanvasHttp).to receive(:get).and_return(ok_response)
       end
 
       it 'uses the tool configuration JSON from the settings_url' do
@@ -143,7 +146,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     context 'when the request times out' do
       before do
-        allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error)
+        allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       end
 
       it { is_expected.to have_http_status :unprocessable_entity }
@@ -162,7 +165,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       before do
         allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
         allow(stubbed_response).to receive('[]').and_return('application/json')
-        allow_any_instance_of(Net::HTTP).to receive(:request).and_return(stubbed_response)
+        allow(CanvasHttp).to receive(:get).and_return(stubbed_response)
       end
 
       context 'when the response is "not found"' do
@@ -258,7 +261,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
-  shared_examples_for 'an endpoint that validates public_jwk' do
+  shared_examples_for 'an endpoint that validates public_jwk and public_jwk_url' do
     let(:make_request) { raise 'set in examples' }
     let(:tool_config_public_jwk) do
       {
@@ -270,14 +273,41 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         "use" => "sig"
       }
     end
+    let(:settings) do
+      s = super()
+      s['public_jwk_url'] = "https://test.com"
+      s
+    end
 
     subject do
       make_request
+      return nil if json_parse['errors'].blank?
       json_parse['errors'].first['message']
     end
 
     context 'when the public jwk is missing' do
       let(:public_jwk) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when the public jwk url is missing' do
+      let(:settings) do
+        s = super()
+        s.delete('public_jwk_url')
+        s
+      end
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when both the public jwk and public jwk url are missing' do
+      let(:public_jwk) { nil }
+      let(:settings) do
+        s = super()
+        s.delete('public_jwk_url')
+        s
+      end
 
       it { is_expected.to be_present }
     end
@@ -347,7 +377,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       let(:make_request) { post :create, params: params }
     end
 
-    it_behaves_like 'an endpoint that validates public_jwk' do
+    it_behaves_like 'an endpoint that validates public_jwk and public_jwk_url' do
       let(:make_request) { post :create, params: params }
     end
 
@@ -424,7 +454,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       end
     end
 
-    it_behaves_like 'an endpoint that validates public_jwk' do
+    it_behaves_like 'an endpoint that validates public_jwk and public_jwk_url' do
       let(:make_request) { put :update, params: params }
     end
 

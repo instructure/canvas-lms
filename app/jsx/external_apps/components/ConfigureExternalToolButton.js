@@ -19,8 +19,8 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import {shape, func} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, {ModalBody, ModalFooter}  from '../../shared/components/InstuiModal'
+import {Button} from '@instructure/ui-buttons'
+import Modal from '../../shared/components/InstuiModal'
 import iframeAllowances from '../lib/iframeAllowances'
 
 export default class ConfigureExternalToolButton extends React.Component {
@@ -29,7 +29,7 @@ export default class ConfigureExternalToolButton extends React.Component {
     returnFocus: func.isRequired
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       modalIsOpen: props.modalIsOpen,
@@ -85,12 +85,8 @@ export default class ConfigureExternalToolButton extends React.Component {
   }
 
   renderIframe = () => {
-    const beforeAlertStyles = `before_external_content_info_alert ${
-      this.state.beforeExternalContentAlertClass
-    }`
-    const afterAlertStyles = `after_external_content_info_alert ${
-      this.state.afterExternalContentAlertClass
-    }`
+    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
+    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
 
     return (
       <div>
@@ -115,6 +111,7 @@ export default class ConfigureExternalToolButton extends React.Component {
           ref={e => {
             this.iframe = e
           }}
+          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}
@@ -160,10 +157,10 @@ export default class ConfigureExternalToolButton extends React.Component {
           label={I18n.t('Configure %{tool} App?', {tool: this.props.tool.name})}
           size="large"
         >
-          <ModalBody>{this.renderIframe()}</ModalBody>
-          <ModalFooter>
+          <Modal.Body>{this.renderIframe()}</Modal.Body>
+          <Modal.Footer>
             <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </li>
     )

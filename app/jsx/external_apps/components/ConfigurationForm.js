@@ -20,12 +20,12 @@ import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ConfigurationFormManual from '../../external_apps/components/ConfigurationFormManual'
-import ConfigurationFormUrl from '../../external_apps/components/ConfigurationFormUrl'
-import ConfigurationFormXml from '../../external_apps/components/ConfigurationFormXml'
+import ConfigurationFormManual from './ConfigurationFormManual'
+import ConfigurationFormUrl from './ConfigurationFormUrl'
+import ConfigurationFormXml from './ConfigurationFormXml'
 import ConfigurationFormLti13 from './ConfigurationFormLti13'
-import ConfigurationFormLti2 from '../../external_apps/components/ConfigurationFormLti2'
-import ConfigurationTypeSelector from '../../external_apps/components/ConfigurationTypeSelector'
+import ConfigurationFormLti2 from './ConfigurationFormLti2'
+import ConfigurationTypeSelector from './ConfigurationTypeSelector'
 
 export default class ConfigurationForm extends React.Component {
   static propTypes = {
@@ -39,7 +39,7 @@ export default class ConfigurationForm extends React.Component {
   }
 
   static defaultProps = {
-    showConfigurationSelector: true,
+    showConfigurationSelector: true
   }
 
   constructor(props, context) {
@@ -209,9 +209,11 @@ export default class ConfigurationForm extends React.Component {
     }
 
     if (this.state.configurationType === 'byClientId') {
-      return(
+      return (
         <ConfigurationFormLti13
-          ref={(el) => { this.lti13Form = el }}
+          ref={el => {
+            this.lti13Form = el
+          }}
         />
       )
     }

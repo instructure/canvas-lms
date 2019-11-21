@@ -16,6 +16,7 @@ exports[`renders correctly expanded 1`] = `
       as="span"
       data-selenium="outcome"
       direction="row"
+      elementRef={[Function]}
       inline={false}
       justifyItems="space-between"
       visualDebug={false}
@@ -23,12 +24,14 @@ exports[`renders correctly expanded 1`] = `
     >
       <FlexItem
         as="span"
+        elementRef={[Function]}
         grow={false}
         shrink={true}
       >
         <Flex
           as="span"
           direction="column"
+          elementRef={[Function]}
           inline={false}
           justifyItems="start"
           visualDebug={false}
@@ -36,6 +39,7 @@ exports[`renders correctly expanded 1`] = `
         >
           <FlexItem
             as="span"
+            elementRef={[Function]}
             grow={false}
             shrink={false}
           >
@@ -43,10 +47,12 @@ exports[`renders correctly expanded 1`] = `
               as="span"
               letterSpacing="normal"
               size="medium"
+              wrap="normal"
             >
               <Flex
                 as="span"
                 direction="row"
+                elementRef={[Function]}
                 inline={false}
                 justifyItems="start"
                 visualDebug={false}
@@ -54,6 +60,7 @@ exports[`renders correctly expanded 1`] = `
               >
                 <FlexItem
                   as="span"
+                  elementRef={[Function]}
                   grow={false}
                   shrink={false}
                 >
@@ -119,6 +126,7 @@ exports[`renders correctly expanded 1`] = `
                 </FlexItem>
                 <FlexItem
                   as="span"
+                  elementRef={[Function]}
                   grow={false}
                   padding="0 x-small"
                   shrink={true}
@@ -146,6 +154,7 @@ exports[`renders correctly expanded 1`] = `
           </FlexItem>
           <FlexItem
             as="span"
+            elementRef={[Function]}
             grow={false}
             shrink={false}
           >
@@ -153,6 +162,7 @@ exports[`renders correctly expanded 1`] = `
               as="span"
               letterSpacing="normal"
               size="small"
+              wrap="normal"
             >
               1 alignment
             </Text>
@@ -161,6 +171,7 @@ exports[`renders correctly expanded 1`] = `
       </FlexItem>
       <FlexItem
         as="span"
+        elementRef={[Function]}
         grow={false}
         shrink={false}
       >
@@ -172,6 +183,7 @@ exports[`renders correctly expanded 1`] = `
               as="span"
               letterSpacing="normal"
               size="medium"
+              wrap="normal"
             >
               1
               /
@@ -377,6 +389,7 @@ exports[`renders correctly expanded with no results 1`] = `
       as="span"
       data-selenium="outcome"
       direction="row"
+      elementRef={[Function]}
       inline={false}
       justifyItems="space-between"
       visualDebug={false}
@@ -384,12 +397,14 @@ exports[`renders correctly expanded with no results 1`] = `
     >
       <FlexItem
         as="span"
+        elementRef={[Function]}
         grow={false}
         shrink={true}
       >
         <Flex
           as="span"
           direction="column"
+          elementRef={[Function]}
           inline={false}
           justifyItems="start"
           visualDebug={false}
@@ -397,6 +412,7 @@ exports[`renders correctly expanded with no results 1`] = `
         >
           <FlexItem
             as="span"
+            elementRef={[Function]}
             grow={false}
             shrink={false}
           >
@@ -404,10 +420,12 @@ exports[`renders correctly expanded with no results 1`] = `
               as="span"
               letterSpacing="normal"
               size="medium"
+              wrap="normal"
             >
               <Flex
                 as="span"
                 direction="row"
+                elementRef={[Function]}
                 inline={false}
                 justifyItems="start"
                 visualDebug={false}
@@ -415,6 +433,7 @@ exports[`renders correctly expanded with no results 1`] = `
               >
                 <FlexItem
                   as="span"
+                  elementRef={[Function]}
                   grow={false}
                   shrink={false}
                 >
@@ -454,6 +473,7 @@ exports[`renders correctly expanded with no results 1`] = `
                 </FlexItem>
                 <FlexItem
                   as="span"
+                  elementRef={[Function]}
                   grow={false}
                   padding="0 x-small"
                   shrink={true}
@@ -481,6 +501,7 @@ exports[`renders correctly expanded with no results 1`] = `
           </FlexItem>
           <FlexItem
             as="span"
+            elementRef={[Function]}
             grow={false}
             shrink={false}
           >
@@ -488,6 +509,7 @@ exports[`renders correctly expanded with no results 1`] = `
               as="span"
               letterSpacing="normal"
               size="small"
+              wrap="normal"
             >
               1 alignment
             </Text>
@@ -496,6 +518,7 @@ exports[`renders correctly expanded with no results 1`] = `
       </FlexItem>
       <FlexItem
         as="span"
+        elementRef={[Function]}
         grow={false}
         shrink={false}
       >
@@ -549,6 +572,7 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
       as="span"
       data-selenium="outcome"
       direction="row"
+      elementRef={[Function]}
       inline={false}
       justifyItems="space-between"
       visualDebug={false}
@@ -556,12 +580,14 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
     >
       <FlexItem
         as="span"
+        elementRef={[Function]}
         grow={false}
         shrink={true}
       >
         <Flex
           as="span"
           direction="column"
+          elementRef={[Function]}
           inline={false}
           justifyItems="start"
           visualDebug={false}
@@ -569,6 +595,7 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
         >
           <FlexItem
             as="span"
+            elementRef={[Function]}
             grow={false}
             shrink={false}
           >
@@ -576,10 +603,12 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
               as="span"
               letterSpacing="normal"
               size="medium"
+              wrap="normal"
             >
               <Flex
                 as="span"
                 direction="row"
+                elementRef={[Function]}
                 inline={false}
                 justifyItems="start"
                 visualDebug={false}
@@ -587,6 +616,7 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
               >
                 <FlexItem
                   as="span"
+                  elementRef={[Function]}
                   grow={false}
                   shrink={false}
                 >
@@ -618,6 +648,7 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
                 </FlexItem>
                 <FlexItem
                   as="span"
+                  elementRef={[Function]}
                   grow={false}
                   padding="0 x-small"
                   shrink={true}
@@ -645,6 +676,7 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
           </FlexItem>
           <FlexItem
             as="span"
+            elementRef={[Function]}
             grow={false}
             shrink={false}
           >
@@ -652,6 +684,7 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
               as="span"
               letterSpacing="normal"
               size="small"
+              wrap="normal"
             >
               No alignments
             </Text>
@@ -660,6 +693,7 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
       </FlexItem>
       <FlexItem
         as="span"
+        elementRef={[Function]}
         grow={false}
         shrink={false}
       >
@@ -676,16 +710,23 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
 >
   <View
     as="div"
+    borderColor="default"
     debug={false}
     display="auto"
+    focusColor="info"
+    focusPosition="offset"
+    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="small"
+    position="static"
+    shouldAnimateFocus={true}
   >
     <Text
       as="span"
       letterSpacing="normal"
       size="medium"
+      wrap="normal"
     >
       No alignments are available for this outcome.
     </Text>
@@ -709,6 +750,7 @@ exports[`renders the Outcome component 1`] = `
       as="span"
       data-selenium="outcome"
       direction="row"
+      elementRef={[Function]}
       inline={false}
       justifyItems="space-between"
       visualDebug={false}
@@ -716,12 +758,14 @@ exports[`renders the Outcome component 1`] = `
     >
       <FlexItem
         as="span"
+        elementRef={[Function]}
         grow={false}
         shrink={true}
       >
         <Flex
           as="span"
           direction="column"
+          elementRef={[Function]}
           inline={false}
           justifyItems="start"
           visualDebug={false}
@@ -729,6 +773,7 @@ exports[`renders the Outcome component 1`] = `
         >
           <FlexItem
             as="span"
+            elementRef={[Function]}
             grow={false}
             shrink={false}
           >
@@ -736,10 +781,12 @@ exports[`renders the Outcome component 1`] = `
               as="span"
               letterSpacing="normal"
               size="medium"
+              wrap="normal"
             >
               <Flex
                 as="span"
                 direction="row"
+                elementRef={[Function]}
                 inline={false}
                 justifyItems="start"
                 visualDebug={false}
@@ -747,6 +794,7 @@ exports[`renders the Outcome component 1`] = `
               >
                 <FlexItem
                   as="span"
+                  elementRef={[Function]}
                   grow={false}
                   shrink={false}
                 >
@@ -812,6 +860,7 @@ exports[`renders the Outcome component 1`] = `
                 </FlexItem>
                 <FlexItem
                   as="span"
+                  elementRef={[Function]}
                   grow={false}
                   padding="0 x-small"
                   shrink={true}
@@ -839,6 +888,7 @@ exports[`renders the Outcome component 1`] = `
           </FlexItem>
           <FlexItem
             as="span"
+            elementRef={[Function]}
             grow={false}
             shrink={false}
           >
@@ -846,6 +896,7 @@ exports[`renders the Outcome component 1`] = `
               as="span"
               letterSpacing="normal"
               size="small"
+              wrap="normal"
             >
               1 alignment
             </Text>
@@ -854,6 +905,7 @@ exports[`renders the Outcome component 1`] = `
       </FlexItem>
       <FlexItem
         as="span"
+        elementRef={[Function]}
         grow={false}
         shrink={false}
       >
@@ -865,6 +917,7 @@ exports[`renders the Outcome component 1`] = `
               as="span"
               letterSpacing="normal"
               size="medium"
+              wrap="normal"
             >
               1
               /

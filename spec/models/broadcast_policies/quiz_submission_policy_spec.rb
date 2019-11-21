@@ -22,10 +22,10 @@ module BroadcastPolicies
   describe QuizSubmissionPolicy do
 
     let(:course) do
-      double("Course", available?: true, id: 1)
+      instance_double("Course", available?: true, id: 1, post_policies_enabled?: false)
     end
     let(:assignment) do
-      double("Assignment")
+      instance_double("Assignment", context: course)
     end
     let(:quiz) do
       double(
@@ -39,7 +39,7 @@ module BroadcastPolicies
       )
     end
     let(:submission) do
-      double("Submission", graded_at: Time.zone.now)
+      instance_double("Submission", graded_at: Time.zone.now, posted?: true)
     end
     let(:enrollment) do
       double("Enrollment", course_id: course.id, inactive?: false)
@@ -50,6 +50,7 @@ module BroadcastPolicies
     let(:quiz_submission) do
       double("Quizzes::QuizSubmission",
              quiz: quiz,
+             posted?: true,
              submission: submission,
              user: user,
              context: course
@@ -90,6 +91,13 @@ module BroadcastPolicies
         end
       end
 
+      context "with post policies" do
+        before { allow(course).to receive(:post_policies_enabled?).and_return true }
+
+        it 'is true when the dependent inputs are true' do
+          expect(policy).to be_should_dispatch_submission_graded
+        end
+      end
     end
 
     describe '#should_dispatch_submission_needs_grading?' do
@@ -151,6 +159,16 @@ module BroadcastPolicies
         wont_send_when do
           allow(quiz_submission).to receive(:changed_in_state).
             with(:complete, :fields => [:score]).and_return false
+        end
+      end
+
+      context "with post policies" do
+        before { allow(course).to receive(:post_policies_enabled?).and_return true }
+
+        specify { wont_send_when { allow(quiz_submission).to receive(:posted?).and_return false } }
+
+        it 'is true when the dependent inputs are true' do
+          expect(policy).to be_should_dispatch_submission_grade_changed
         end
       end
     end

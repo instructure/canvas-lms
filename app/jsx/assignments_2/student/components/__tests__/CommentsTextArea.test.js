@@ -15,26 +15,76 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import * as uploadFileModule from '../../../../shared/upload_file'
 import $ from 'jquery'
-import {
-  commentGraphqlMock,
-  mockAssignment,
-  mockComments,
-  legacyMockSubmission,
-  mockMultipleAttachments
-} from '../../test-utils'
-import {fireEvent, render, waitForElement} from '@testing-library/react'
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
+import {fireEvent, render, wait, waitForElement} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 
-import CommentTextArea from '../CommentsTab/CommentTextArea'
 import CommentsTab from '../CommentsTab'
-import * as uploadFileModule from '../../../../shared/upload_file'
+import CommentTextArea from '../CommentsTab/CommentTextArea'
+import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
+import {mockQuery, mockAssignmentAndSubmission} from '../../mocks'
+import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
+
+jest.setTimeout(10000)
+
+async function mockSubmissionCommentQuery() {
+  const variables = {submissionAttempt: 0, submissionId: '1'}
+  const overrides = {
+    Node: {__typename: 'Submission'},
+    SubmissionCommentConnection: {
+      nodes: [{}]
+    }
+  }
+  const result = await mockQuery(SUBMISSION_COMMENT_QUERY, overrides, variables)
+  return {
+    request: {
+      query: SUBMISSION_COMMENT_QUERY,
+      variables
+    },
+    result
+  }
+}
+
+async function mockCreateSubmissionComment(variables = {}) {
+  const result = await mockQuery(CREATE_SUBMISSION_COMMENT, [], variables)
+  return {
+    request: {
+      query: CREATE_SUBMISSION_COMMENT,
+      variables
+    },
+    result
+  }
+}
+
+let mockedSetOnFailure = null
+let mockedSetOnSuccess = null
+
+function mockContext(children) {
+  return (
+    <AlertManagerContext.Provider
+      value={{
+        setOnFailure: mockedSetOnFailure,
+        setOnSuccess: mockedSetOnSuccess
+      }}
+    >
+      {children}
+    </AlertManagerContext.Provider>
+  )
+}
 
 describe('CommentTextArea', () => {
   beforeAll(() => {
     window.URL.createObjectURL = jest.fn()
     $('body').append('<div role="alert" id="flash_screenreader_holder" />')
+  })
+
+  beforeEach(() => {
+    mockedSetOnFailure = jest.fn().mockResolvedValue({})
+    mockedSetOnSuccess = jest.fn().mockResolvedValue({})
   })
 
   const uploadFiles = (element, files) => {
@@ -45,28 +95,31 @@ describe('CommentTextArea', () => {
     })
   }
 
-  it('renders the CommentTextArea by default', () => {
+  it('renders the CommentTextArea by default', async () => {
+    const props = await mockAssignmentAndSubmission()
     const {getByText} = render(
       <MockedProvider>
-        <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentTextArea {...props} />
       </MockedProvider>
     )
     expect(getByText('Attach a File')).toBeInTheDocument()
   })
 
-  it('renders the input for controlling file inputs', () => {
+  it('renders the input for controlling file inputs', async () => {
+    const props = await mockAssignmentAndSubmission()
     const {container} = render(
       <MockedProvider>
-        <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentTextArea {...props} />
       </MockedProvider>
     )
     expect(container.querySelector('input[id="attachmentFile"]')).toBeInTheDocument()
   })
 
   it('renders the same number of attachments as files', async () => {
+    const props = await mockAssignmentAndSubmission()
     const {container, getByText} = render(
       <MockedProvider>
-        <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentTextArea {...props} />
       </MockedProvider>
     )
     const fileInput = await waitForElement(() =>
@@ -84,9 +137,10 @@ describe('CommentTextArea', () => {
   })
 
   it('concats to previously uploaded files', async () => {
+    const props = await mockAssignmentAndSubmission()
     const {container, getByText} = render(
       <MockedProvider>
-        <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentTextArea {...props} />
       </MockedProvider>
     )
     const fileInput = await waitForElement(() =>
@@ -112,9 +166,10 @@ describe('CommentTextArea', () => {
   })
 
   it('can remove uploaded files', async () => {
+    const props = await mockAssignmentAndSubmission()
     const {container, getByText, queryByText} = render(
       <MockedProvider>
-        <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentTextArea {...props} />
       </MockedProvider>
     )
     const fileInput = await waitForElement(() =>
@@ -141,9 +196,10 @@ describe('CommentTextArea', () => {
   })
 
   it('sets focus to the attachment file button after removing all attachments', async () => {
+    const props = await mockAssignmentAndSubmission()
     const {container, getByText} = render(
       <MockedProvider>
-        <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentTextArea {...props} />
       </MockedProvider>
     )
     const fileInput = await waitForElement(() =>
@@ -164,9 +220,10 @@ describe('CommentTextArea', () => {
   })
 
   it('sets focus to the next file in the list if the first file is removed', async () => {
+    const props = await mockAssignmentAndSubmission()
     const {container, getByText} = render(
       <MockedProvider>
-        <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentTextArea {...props} />
       </MockedProvider>
     )
     const fileInput = await waitForElement(() =>
@@ -191,9 +248,10 @@ describe('CommentTextArea', () => {
   })
 
   it('sets focus to the previous file in the list if any other file is removed', async () => {
+    const props = await mockAssignmentAndSubmission()
     const {container, getByText} = render(
       <MockedProvider>
-        <CommentTextArea assignment={mockAssignment()} submission={legacyMockSubmission()} />
+        <CommentTextArea {...props} />
       </MockedProvider>
     )
     const fileInput = await waitForElement(() =>
@@ -224,15 +282,27 @@ describe('CommentTextArea', () => {
       {id: '2', name: 'awesome-test-image2.png'},
       {id: '3', name: 'awesome-test-image3.png'}
     ]
-    const mockedComments = mockComments()
-    mockedComments.attachments = mockMultipleAttachments()
-    const basicMock = commentGraphqlMock(mockedComments)
-    const {container, getByPlaceholderText, getByText} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+
+    const variables = {
+      submissionAttempt: 0,
+      id: '1',
+      comment: 'lion',
+      fileIds: ['1', '2', '3'],
+      mediaObjectId: null
+    }
+    const mocks = await Promise.all([
+      mockSubmissionCommentQuery(),
+      mockCreateSubmissionComment(variables)
+    ])
+    const props = await mockAssignmentAndSubmission()
+    const {container, findByPlaceholderText, findByText} = render(
+      mockContext(
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
+        </MockedProvider>
+      )
     )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
+    const textArea = await findByPlaceholderText('Submit a Comment')
     const fileInput = await waitForElement(() =>
       container.querySelector('input[id="attachmentFile"]')
     )
@@ -244,10 +314,10 @@ describe('CommentTextArea', () => {
     uploadFiles(fileInput, [file1, file2, file3])
 
     fireEvent.change(textArea, {target: {value: 'lion'}})
-    fireEvent.click(getByText('Send Comment'))
+    fireEvent.click(await findByText('Send Comment'))
 
     uploadFileModule.submissionCommentAttachmentsUpload = mockedFunctionPlacedholder
-    expect(await waitForElement(() => getByText('Submission comment sent'))).toBeInTheDocument()
+    await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalledWith('Submission comment sent'))
   })
 
   it('users cannot send submission comments with not files or text', async () => {
@@ -257,12 +327,16 @@ describe('CommentTextArea', () => {
       {id: '2', name: 'awesome-test-image2.png'},
       {id: '3', name: 'awesome-test-image3.png'}
     ]
-    const mockedComments = mockComments()
-    mockedComments.attachments = mockMultipleAttachments()
-    const basicMock = commentGraphqlMock(mockedComments)
+
+    const variables = {submissionAttempt: 0, id: '1', comment: '', fileIds: ['1', '2', '3']}
+    const mocks = await Promise.all([
+      mockSubmissionCommentQuery(),
+      mockCreateSubmissionComment(variables)
+    ])
+    const props = await mockAssignmentAndSubmission()
     const {getByPlaceholderText, getByText, queryAllByText} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
+      <MockedProvider mocks={mocks}>
+        <CommentsTab {...props} />
       </MockedProvider>
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
@@ -273,54 +347,24 @@ describe('CommentTextArea', () => {
     expect(await waitForElement(() => queryAllByText('Submission comment sent'))).toHaveLength(0)
   })
 
-  it('notifies users when a submission comments with files is not sent', async () => {
-    const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
-    uploadFileModule.submissionCommentAttachmentsUpload = () => [
-      {id: '1', name: 'awesome-test-image1.png'},
-      {id: '2', name: 'awesome-test-image2.png'},
-      {id: '3', name: 'awesome-test-image3.png'}
-    ]
-    const mockedComments = mockComments()
-    mockedComments.attachments = mockMultipleAttachments()
-    const errorMock = commentGraphqlMock(mockedComments)
-    errorMock[2].result = {errors: [{message: 'Error!'}]}
-
-    const {container, getByPlaceholderText, getByText} = render(
-      <MockedProvider defaultOptions={{mutate: {errorPolicy: 'all'}}} mocks={errorMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
-    )
-    const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
-    const fileInput = await waitForElement(() =>
-      container.querySelector('input[id="attachmentFile"]')
-    )
-
-    const file1 = new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'})
-    const file2 = new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'})
-    const file3 = new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
-    uploadFiles(fileInput, [file1, file2, file3])
-
-    fireEvent.change(textArea, {target: {value: 'lion'}})
-    fireEvent.click(getByText('Send Comment'))
-    uploadFileModule.submissionCommentAttachmentsUpload = mockedFunctionPlacedholder
-
-    expect(
-      await waitForElement(() => getByText('Error sending submission comment'))
-    ).toBeInTheDocument()
-  })
-
   it('notifies users of error when file fails to upload', async () => {
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
     uploadFileModule.submissionCommentAttachmentsUpload = () => {
       throw new Error('Error uploading file to canvas API')
     }
-    const mockedComments = mockComments()
-    mockedComments.attachments = mockMultipleAttachments()
-    const basicMock = commentGraphqlMock(mockedComments)
+
+    const variables = {submissionAttempt: 0, id: '1', comment: 'lion', fileIds: ['1', '2', '3']}
+    const mocks = await Promise.all([
+      mockSubmissionCommentQuery(),
+      mockCreateSubmissionComment(variables)
+    ])
+    const props = await mockAssignmentAndSubmission()
     const {container, getByPlaceholderText, getByText, queryAllByText} = render(
-      <MockedProvider mocks={basicMock} addTypename>
-        <CommentsTab assignment={mockAssignment()} submission={legacyMockSubmission()} />
-      </MockedProvider>
+      mockContext(
+        <MockedProvider mocks={mocks}>
+          <CommentsTab {...props} />
+        </MockedProvider>
+      )
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     const fileInput = await waitForElement(() =>
@@ -336,9 +380,7 @@ describe('CommentTextArea', () => {
     fireEvent.click(getByText('Send Comment'))
     uploadFileModule.submissionCommentAttachmentsUpload = mockedFunctionPlacedholder
 
-    expect(
-      await waitForElement(() => getByText('Error sending submission comment'))
-    ).toBeInTheDocument()
+    expect(mockedSetOnFailure).toHaveBeenCalledWith('Error sending submission comment')
 
     // Should not allow user to submit again if comments have error
     expect(await waitForElement(() => queryAllByText('Send Comment'))).toHaveLength(0)

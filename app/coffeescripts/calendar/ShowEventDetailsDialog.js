@@ -21,12 +21,12 @@ import I18n from 'i18n!calendar'
 import htmlEscape from 'str/htmlEscape'
 import Popover from '../util/Popover'
 import fcUtil from '../util/fcUtil'
-import commonEventFactory from '../calendar/commonEventFactory'
-import EditEventDetailsDialog from '../calendar/EditEventDetailsDialog'
+import commonEventFactory from './commonEventFactory'
+import EditEventDetailsDialog from './EditEventDetailsDialog'
 import eventDetailsTemplate from 'jst/calendar/eventDetails'
 import deleteItemTemplate from 'jst/calendar/deleteItem'
 import reservationOverLimitDialog from 'jst/calendar/reservationOverLimitDialog'
-import MessageParticipantsDialog from '../calendar/MessageParticipantsDialog'
+import MessageParticipantsDialog from './MessageParticipantsDialog'
 import preventDefault from '../fn/preventDefault'
 import _ from 'underscore'
 import axios from 'axios'
@@ -134,7 +134,12 @@ export default class ShowEventDetailsDialog {
     if (!errorHandled) {
       // defer to the default error dialog
       $.ajaxJSON.unhandledXHRs.push(request)
-      return $.fn.defaultAjaxError.func.call($.fn.defaultAjaxError.object, data, request, ...otherArgs)
+      return $.fn.defaultAjaxError.func.call(
+        $.fn.defaultAjaxError.object,
+        data,
+        request,
+        ...otherArgs
+      )
     }
   }
 
@@ -288,7 +293,9 @@ export default class ShowEventDetailsDialog {
     ) {
       const MAX_PAGE_SIZE = 25
       axios
-        .get(`api/v1/calendar_events/${this.event.object.parent_event_id}/participants?per_page=${MAX_PAGE_SIZE}`)
+        .get(
+          `api/v1/calendar_events/${this.event.object.parent_event_id}/participants?per_page=${MAX_PAGE_SIZE}`
+        )
         .then(response => {
           if (response.data && response.data.length) {
             const $ul = $('<ul>')
@@ -297,20 +304,21 @@ export default class ShowEventDetailsDialog {
               $ul.append($li)
             })
 
-            if(response.data.length > (MAX_PAGE_SIZE - 1)) {
-              const $lidot = $('<li>').text("(...)")
+            if (response.data.length > MAX_PAGE_SIZE - 1) {
+              const $lidot = $('<li>').text('(...)')
               $ul.append($lidot)
             }
 
-            const $header = $('<th>').attr("id", 'attendees_header_text').attr("scope", 'row').text('Attendees')
+            const $header = $('<th>')
+              .attr('id', 'attendees_header_text')
+              .attr('scope', 'row')
+              .text('Attendees')
             $('#reservations').empty()
             $('#reservations').append($header)
             $('#reservations').append($ul)
-
           } else {
             $('#reservations').remove()
           }
-
         })
         .catch(() => $('#reservations').remove())
     }
@@ -357,7 +365,7 @@ export default class ShowEventDetailsDialog {
     this.popover = new Popover(jsEvent, eventDetailsTemplate(params))
     this.popover.el.data('showEventDetailsDialog', this)
 
-    const element = document.getElementById("event-details-trap-focus")
+    const element = document.getElementById('event-details-trap-focus')
     this.popover.trapFocus(element)
 
     this.popover.el.find('.view_event_link').click(preventDefault(this.openShowPage))

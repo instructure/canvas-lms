@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import store from '../lib/ExternalAppsStore'
 import ExternalToolsTableRow from './ExternalToolsTableRow'
 import InfiniteScroll from './InfiniteScroll'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import splitAssetString from 'compiled/str/splitAssetString'
 
@@ -45,7 +45,7 @@ export default class ExternalToolsTable extends React.Component {
   componentDidMount() {
     store.addChangeListener(this.onChange)
     if (!store.getState().isLoaded) {
-      store.fetch();
+      store.fetch()
     }
   }
 
@@ -61,7 +61,7 @@ export default class ExternalToolsTable extends React.Component {
 
   loader = () => <div className="loadingIndicator" />
 
-  setFocusAbove = (tool) => () => {
+  setFocusAbove = tool => () => {
     const toolRow = tool && this[`externalTool${tool.app_id}`]
     if (toolRow && toolRow.button) {
       toolRow.focus()
@@ -70,7 +70,7 @@ export default class ExternalToolsTable extends React.Component {
     }
   }
 
-  setToolRowRef = (tool) => (node) => {
+  setToolRowRef = tool => node => {
     this[`externalTool${tool.app_id}`] = node
   }
 
@@ -78,12 +78,10 @@ export default class ExternalToolsTable extends React.Component {
     if (store.getState().externalTools.length === 0) {
       return null
     }
-    let t = null;
-    return store
-      .getState()
-      .externalTools
-      .map((tool) => {
-        t = <ExternalToolsTableRow
+    let t = null
+    return store.getState().externalTools.map(tool => {
+      t = (
+        <ExternalToolsTableRow
           key={tool.app_id}
           ref={this.setToolRowRef(tool)}
           tool={tool}
@@ -92,8 +90,9 @@ export default class ExternalToolsTable extends React.Component {
           store={store}
           contextType={this.assetContextType}
         />
-        return t;
-      })
+      )
+      return t
+    })
   }
 
   render() {
@@ -123,9 +122,7 @@ export default class ExternalToolsTable extends React.Component {
                 </th>
               </tr>
             </thead>
-            <tbody className="collectionViewItems">
-              {this.trs()}
-            </tbody>
+            <tbody className="collectionViewItems">{this.trs()}</tbody>
           </table>
         </InfiniteScroll>
       </div>

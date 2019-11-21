@@ -16,30 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import $ from 'jquery'
-import I18n from 'i18n!new_nav'
+import I18n from 'i18n!Navigation'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {func} from 'prop-types'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import CoursesTray from './trays/CoursesTray'
-import GroupsTray from './trays/GroupsTray'
-import AccountsTray from './trays/AccountsTray'
-import ProfileTray from './trays/ProfileTray'
-import HelpTray from './trays/HelpTray'
+import {Tray} from '@instructure/ui-overlays'
+import {CloseButton} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-elements'
+import UnreadCounts from './UnreadCounts'
 import preventDefault from 'compiled/fn/preventDefault'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
+
+const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
+const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
+const AccountsTray = React.lazy(() => import('./trays/AccountsTray'))
+const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
+const HelpTray = React.lazy(() => import('./trays/HelpTray'))
 
 const EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
 const ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
-
-const UNREAD_COUNT_POLL_INTERVAL = 60000 // 60 seconds
-const UNREAD_COUNT_ALLOWED_AGE = UNREAD_COUNT_POLL_INTERVAL / 2
-const UNREAD_COUNT_SESSION_STORAGE_KEY = `unread_count_for_${window.ENV.current_user_id}`
 
 const TYPE_URL_MAP = {
   courses: '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments',
@@ -55,9 +52,29 @@ const TYPE_FILTER_MAP = {
 
 const RESOURCE_COUNT = 10
 
+// give the trays that slide out from the the nav bar
+// a place to mount. It has to be outside the <div id=application>
+// to aria-hide everything but the tray when open.
+let portal
+function getPortal() {
+  if (!portal) {
+    portal = document.createElement('div')
+    portal.id = 'nav-tray-portal'
+    // the <header> has z-index: 100. This has to be behind it,
+    portal.setAttribute('style', 'position: relative; z-index: 99;')
+    document.body.appendChild(portal)
+  }
+  return portal
+}
+
 export default class Navigation extends React.Component {
   static propTypes = {
-    onDataRecieved: func
+    unreadComponent: func, // for testing only
+    onDataReceived: func
+  }
+
+  static defaultProps = {
+    unreadComponent: UnreadCounts
   }
 
   state = {
@@ -66,7 +83,7 @@ export default class Navigation extends React.Component {
     courses: [],
     help: [],
     profile: [],
-    unread_count: 0,
+    unreadSharesCount: 0,
     isTrayOpen: false,
     type: null,
     coursesLoading: false,
@@ -81,7 +98,7 @@ export default class Navigation extends React.Component {
     profileAreLoaded: false
   }
 
-  componentWillMount() {
+  componentDidMount() {
     /**
      * Mount up stuff to our existing DOM elements, yes, it's not very
      * React-y, but it is workable and maintainable, plus it doesn't require
@@ -92,63 +109,32 @@ export default class Navigation extends React.Component {
     // / Hover Events
     // ////////////////////////////////
 
-    _.forEach(TYPE_URL_MAP, (url, type) => {
+    Object.keys(TYPE_URL_MAP).forEach(type => {
       $(`#global_nav_${type}_link`).one('mouseover', () => {
-        this.getResource(url, type)
+        this.getResource(TYPE_URL_MAP[type], type)
       })
     })
 
     // ////////////////////////////////
     // / Click Events
     // ////////////////////////////////
-    ;['courses', 'groups', 'accounts', 'profile', 'help'].forEach(type => {
+    Object.keys(TYPE_URL_MAP).forEach(type => {
       $(`#global_nav_${type}_link`).on(
         'click',
         preventDefault(this.handleMenuClick.bind(this, type))
       )
     })
-
-    // give the trays that slide out from the the nav bar
-    // a place to mount. It has to be outside the <div id=application>
-    // to aria-hide everything but the tray when open.
-    let portal = document.getElementById('nav-tray-portal')
-    if (!portal) {
-      portal = document.createElement('div')
-      portal.id = 'nav-tray-portal'
-      // the <header> has z-index: 100. This has to be behind it,
-      portal.setAttribute('style', 'position: relative; z-index: 99;')
-      document.body.appendChild(portal)
-    }
   }
 
-  componentDidMount() {
-    if (
-      !this.unread_count_attempts &&
-      window.ENV.current_user_id &&
-      !window.ENV.current_user_disabled_inbox &&
-      this.unreadCountElement() &&
-      !(window.ENV.current_user && window.ENV.current_user.fake_student)
-    ) {
-      let msUntilIShouldStartPolling = 0
-      const saved = sessionStorage.getItem(UNREAD_COUNT_SESSION_STORAGE_KEY)
-      if (saved) {
-        const {updatedAt, unread_count} = JSON.parse(saved)
-        const millisecondsSinceLastUpdate = new Date() - updatedAt
-        if (millisecondsSinceLastUpdate < UNREAD_COUNT_ALLOWED_AGE) {
-          this.updateUnreadCount(unread_count)
-          msUntilIShouldStartPolling = UNREAD_COUNT_ALLOWED_AGE - millisecondsSinceLastUpdate
-        }
-      }
-      setTimeout(() => this.pollUnreadCount(), msUntilIShouldStartPolling)
-    }
-  }
-
-  componentWillUpdate(newProps, newState) {
-    if (newState.activeItem !== this.state.activeItem) {
-      $(`.${ACTIVE_CLASS}`).removeClass(ACTIVE_CLASS)
-      $(`#global_nav_${newState.activeItem}_link`)
+  componentDidUpdate(_prevProps, prevState) {
+    if (prevState.activeItem !== this.state.activeItem) {
+      $(`.${ACTIVE_CLASS}`)
+        .removeClass(ACTIVE_CLASS)
+        .removeAttr('aria-current')
+      $(`#global_nav_${this.state.activeItem}_link`)
         .closest('li')
         .addClass(ACTIVE_CLASS)
+        .attr('aria-current', 'page')
     }
   }
 
@@ -180,11 +166,14 @@ export default class Navigation extends React.Component {
       }
 
       // finished
-      this.setState({
-        [type]: newData,
-        [`${type}Loading`]: false,
-        [`${type}AreLoaded`]: true
-      }, this.props.onDataRecieved)
+      this.setState(
+        {
+          [type]: newData,
+          [`${type}Loading`]: false,
+          [`${type}AreLoaded`]: true
+        },
+        this.props.onDataReceived
+      )
     })
   }
 
@@ -194,67 +183,6 @@ export default class Navigation extends React.Component {
       return data.filter(filterFunc)
     }
     return data
-  }
-
-  async pollUnreadCount() {
-    this.unread_count_attempts = (this.unread_count_attempts || 0) + 1
-    if (this.unread_count_attempts > 5) return
-
-    // don't let this count against us in newRelic's SPA load time stats
-    const fetch = window.fetchIgnoredByNewRelic || window.fetch
-
-    try {
-      const {unread_count} = await (await fetch('/api/v1/conversations/unread_count', {
-        headers: {Accept: 'application/json'}
-      })).json()
-
-      try {
-        sessionStorage.setItem(
-          UNREAD_COUNT_SESSION_STORAGE_KEY,
-          JSON.stringify({
-            updatedAt: +new Date(),
-            unread_count
-          })
-        )
-      } catch (e) {
-        // maybe session storage is full or something, ignore
-      }
-      this.updateUnreadCount(unread_count)
-    } catch (error) {
-      console.warn('something went wrong updating unread count', error)
-    }
-    setTimeout(() => this.pollUnreadCount(), this.unread_count_attempts * UNREAD_COUNT_POLL_INTERVAL)
-  }
-
-  unreadCountElement() {
-    return (
-      this._unreadCountElement ||
-      (this._unreadCountElement = $('#global_nav_conversations_link').find('.menu-item__badge')[0])
-    )
-  }
-
-  updateUnreadCount(count) {
-    count = parseInt(count, 10)
-    this.setState({unread_count: count}, this.props.onDataRecieved)
-    ReactDOM.render(
-      <>
-        <ScreenReaderContent>
-          {I18n.t(
-            {
-              one: '1 unread message',
-              other: '%{count} unread messages'
-            },
-            {count}
-          )}
-        </ScreenReaderContent>
-        <PresentationContent>{count}</PresentationContent>
-      </>,
-      this.unreadCountElement()
-    )
-    const badgeElements = [this.unreadCountElement(), document.getElementById('mobileHeaderInboxUnreadBadge')]
-    badgeElements.forEach(el => {
-      if (el) el.style.display = count > 0 ? '' : 'none'
-    })
   }
 
   determineActiveLink() {
@@ -324,6 +252,7 @@ export default class Navigation extends React.Component {
         return (
           <ProfileTray
             userDisplayName={window.ENV.current_user.display_name}
+            userPronouns={window.ENV.current_user.pronouns}
             userAvatarURL={
               window.ENV.current_user.avatar_is_fallback
                 ? null
@@ -331,6 +260,7 @@ export default class Navigation extends React.Component {
             }
             loaded={this.state.profileAreLoaded}
             tabs={this.state.profile}
+            counts={{unreadShares: this.state.unreadSharesCount}}
           />
         )
       case 'help':
@@ -364,22 +294,100 @@ export default class Navigation extends React.Component {
     }
   }
 
+  // Also have to attend to the unread dot on the mobile view inbox
+  onInboxUnreadUpdate(unreadCount) {
+    const el = document.getElementById('mobileHeaderInboxUnreadBadge')
+    if (el) el.style.display = unreadCount > 0 ? '' : 'none'
+    if (typeof this.props.onDataReceived === 'function') this.props.onDataReceived()
+  }
+
+  onSharesUnreadUpdate(unreadCount) {
+    if (this.state.unreadSharesCount !== unreadCount)
+      this.setState({unreadSharesCount: unreadCount})
+  }
+
+  inboxUnreadSRText(count) {
+    return I18n.t(
+      {
+        one: 'One unread message.',
+        other: '%{count} unread messages.'
+      },
+      {count}
+    )
+  }
+
+  sharesUnreadSRText(count) {
+    return I18n.t(
+      {
+        one: 'One unread share.',
+        other: '%{count} unread shares.'
+      },
+      {count}
+    )
+  }
+
   render() {
+    const UnreadComponent = this.props.unreadComponent
+
     return (
-      <Tray
-        label={this.getTrayLabel()}
-        size="small"
-        open={this.state.isTrayOpen}
-        onDismiss={this.closeTray}
-        shouldCloseOnDocumentClick
-        mountNode={document.getElementById('nav-tray-portal')}
-        theme={{smallWidth: '28em'}}
-      >
-        <CloseButton placement="end" onClick={this.closeTray}>
-          {I18n.t('Close')}
-        </CloseButton>
-        <div className="tray-with-space-for-global-nav">{this.renderTrayContent()}</div>
-      </Tray>
+      <>
+        {this.state.isTrayOpen && (
+          <Tray
+            label={this.getTrayLabel()}
+            size="small"
+            open={this.state.isTrayOpen}
+            onDismiss={this.closeTray}
+            shouldCloseOnDocumentClick
+            mountNode={getPortal()}
+            theme={{smallWidth: '28em'}}
+          >
+            <CloseButton placement="end" onClick={this.closeTray}>
+              {I18n.t('Close')}
+            </CloseButton>
+            <div className="tray-with-space-for-global-nav">
+              <React.Suspense
+                fallback={
+                  <View display="block" textAlign="center">
+                    <Spinner
+                      size="large"
+                      margin="large auto"
+                      renderTitle={() => I18n.t('...Loading')}
+                    />
+                  </View>
+                }
+              >
+                {this.renderTrayContent()}
+              </React.Suspense>
+            </div>
+          </Tray>
+        )}
+        {ENV.DIRECT_SHARE_ENABLED && (
+          <UnreadComponent
+            targetEl={
+              this.unreadSharesCountElement ||
+              (this.unreadSharesCountElement = document.querySelector(
+                '#global_nav_profile_link .menu-item__badge'
+              ))
+            }
+            dataUrl="/api/v1/users/self/content_shares/unread_count"
+            onUpdate={unreadCount => this.onSharesUnreadUpdate(unreadCount)}
+            srText={this.sharesUnreadSRText}
+          />
+        )}
+        {!ENV.current_user_disabled_inbox && (
+          <UnreadComponent
+            targetEl={
+              this.unreadInboxCountElement ||
+              (this.unreadInboxCountElement = document.querySelector(
+                '#global_nav_conversations_link .menu-item__badge'
+              ))
+            }
+            dataUrl="/api/v1/conversations/unread_count"
+            onUpdate={unreadCount => this.onInboxUnreadUpdate(unreadCount)}
+            srText={this.inboxUnreadSRText}
+          />
+        )}
+      </>
     )
   }
 }

@@ -19,8 +19,8 @@
 import React from 'react'
 import {func} from 'prop-types'
 import {Query} from 'react-apollo'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Spinner} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 import I18n from 'i18n!assignments_2'
 
@@ -38,7 +38,7 @@ export default function StudentSearchQuery({variables, children}) {
         if (loading) {
           return (
             <View as="div" textAlign="center" padding="large 0">
-              <Spinner size="large" title={I18n.t('Loading...')} />
+              <Spinner size="large" renderTitle={I18n.t('Loading...')} />
             </View>
           )
         } else if (error) {

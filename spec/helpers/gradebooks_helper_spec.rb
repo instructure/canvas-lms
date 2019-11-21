@@ -21,22 +21,30 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GradebooksHelper do
-  FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
-    def anonymous_grading?
-      anonymous_grading
-    end
-  end.freeze
-  FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
-                              :workflow_state, :excused?).freeze
-  FakeQuiz = Struct.new(:survey, :anonymous_submissions) do
-    def survey?
-      survey
-    end
+  before do
+    FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
+      def anonymous_grading?
+        anonymous_grading
+      end
+    end.freeze
+    FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
+                                :workflow_state, :excused?).freeze
+    FakeQuiz = Struct.new(:survey, :anonymous_submissions) do
+      def survey?
+        survey
+      end
 
-    def anonymous_survey?
-      survey? && anonymous_submissions
-    end
-  end.freeze
+      def anonymous_survey?
+        survey? && anonymous_submissions
+      end
+    end.freeze
+  end
+
+  after do
+    Object.send(:remove_const, :FakeAssignment)
+    Object.send(:remove_const, :FakeSubmission)
+    Object.send(:remove_const, :FakeQuiz)
+  end
 
   let(:assignment) { FakeAssignment.new }
   let(:submission) { FakeSubmission.new(assignment) }

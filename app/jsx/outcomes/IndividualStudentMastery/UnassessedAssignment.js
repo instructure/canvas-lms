@@ -17,36 +17,32 @@
  */
 
 import React from 'react'
-import { object } from 'prop-types'
+import {object} from 'prop-types'
 import I18n from 'i18n!IndividualStudentMasteryUnassessedAssignment'
 import _ from 'lodash'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import View from '@instructure/ui-layout/lib/components/View'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
-import { ListItem } from '@instructure/ui-elements/lib/components/List'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {View} from '@instructure/ui-layout'
+import {Button} from '@instructure/ui-buttons'
+import {IconAssignmentLine, IconQuizLine} from '@instructure/ui-icons'
+import {List} from '@instructure/ui-elements'
 
-const UnassessedAssignment = ({ assignment }) => {
-  const { id, url, submission_types, title } = assignment
+const UnassessedAssignment = ({assignment}) => {
+  const {id, url, submission_types, title} = assignment
   return (
-    <ListItem key={id}>
+    <List.Item key={id}>
       <View padding="small" display="block">
         <ApplyTheme theme={{[Button.theme]: {linkColor: '#68777D', fontWeight: '700'}}}>
           <Button
             href={url}
             variant="link"
             theme={{mediumPadding: '0', mediumHeight: 'normal'}}
-            icon={
-              _.includes(submission_types, 'online_quiz') ?
-              IconQuiz : IconAssignment
-            }
+            icon={_.includes(submission_types, 'online_quiz') ? IconQuizLine : IconAssignmentLine}
           >
-            {title} ({ I18n.t('Not yet assessed') })
+            {title} ({I18n.t('Not yet assessed')})
           </Button>
         </ApplyTheme>
       </View>
-    </ListItem>
+    </List.Item>
   )
 }
 

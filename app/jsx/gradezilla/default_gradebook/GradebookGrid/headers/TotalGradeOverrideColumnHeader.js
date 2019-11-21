@@ -17,9 +17,9 @@
  */
 
 import React, {PureComponent} from 'react'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Grid, View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-elements'
+
 import I18n from 'i18n!gradezilla'
 
 export default class TotalGradeOverrideColumnHeader extends PureComponent {
@@ -46,23 +46,23 @@ export default class TotalGradeOverrideColumnHeader extends PureComponent {
       <div className="Gradebook__ColumnHeaderContent">
         <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
-            <GridRow>
-              <GridCol textAlign="center" width="auto">
+            <Grid.Row>
+              <Grid.Col textAlign="center" width="auto">
                 <div className="Gradebook__ColumnHeaderIndicators" />
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center">
+              <Grid.Col textAlign="center">
                 <View className="Gradebook__ColumnHeaderDetail">
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {I18n.t('Override')}
                   </Text>
                 </View>
-              </GridCol>
+              </Grid.Col>
 
-              <GridCol textAlign="center" width="auto">
+              <Grid.Col textAlign="center" width="auto">
                 <div className="Gradebook__ColumnHeaderAction" />
-              </GridCol>
-            </GridRow>
+              </Grid.Col>
+            </Grid.Row>
           </Grid>
         </div>
       </div>

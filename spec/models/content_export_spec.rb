@@ -131,6 +131,70 @@ describe ContentExport do
         expect(@ce.workflow_state).to eq "failed"
       end
     end
+
+    context 'when newquizzes_on_quiz_page is enabled' do
+      before do
+        @course.enable_feature!(:quizzes_next)
+        @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
+      end
+
+      it 'sets up assignment and content_export settings' do
+        expect(@ce).to receive(:export)
+        @ce.queue_api_job({})
+        expect(@ce.settings['quizzes2']).not_to be_nil
+        assignment_id = @ce.settings['quizzes2']['assignment']['assignment_id']
+        assignment = Assignment.find_by(id: assignment_id)
+        expect(assignment).not_to be_nil
+      end
+
+      # CC export is the first step of Quiz migration
+      # Canvas then sends live events to N.Q
+      # N.Q finally imports the CC package
+      it 'completes CC export for new quizzes migration' do
+        cc_exporter = CC::CCExporter.new(@ce)
+        expect(CC::CCExporter).to receive(:new).and_return(cc_exporter)
+        expect(cc_exporter).to receive(:export).and_call_original
+        @ce.quizzes2_build_assignment
+        @ce.export_without_send_later
+        expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.public_download_url)
+        expect(@ce.export_type).to eq('quizzes2')
+      end
+
+      it 'marks failure if CC export is failed' do
+        cc_exporter = CC::CCExporter.new(@ce)
+        expect(CC::CCExporter).to receive(:new).and_return(cc_exporter)
+        # CC exporter fails and returns false
+        expect(cc_exporter).to receive(:export).and_return(false)
+        @ce.quizzes2_build_assignment
+        assignment_id = @ce.settings['quizzes2']['assignment']['assignment_id']
+        @ce.export_without_send_later
+        assignment = Assignment.find_by(id: assignment_id)
+        expect(assignment.workflow_state).to eq('failed_to_migrate')
+        expect(@ce.workflow_state).to eq('failed')
+      end
+
+      context 'when failed assignment is provided' do
+        let(:failed_assignment) do
+          @course.assignments.create!(
+            position: 777,
+            assignment_group: assignment_group
+          )
+        end
+
+        let(:assignment_group) do
+          @course.assignment_groups.create!(name: 'group_123')
+        end
+
+        it 'creates assignment with expected group and position' do
+          @ce.quizzes2_build_assignment(failed_assignment_id: failed_assignment.id)
+          expect(@ce.settings[:quizzes2][:assignment]).not_to be_empty
+          assignment_id = @ce.settings[:quizzes2][:assignment][:assignment_id]
+          assignment = Assignment.find(assignment_id)
+          expect(assignment.position).to be(777)
+          expect(assignment.assignment_group.id).to be(assignment_group.id)
+        end
+      end
+    end
   end
 
   context "add_item_to_export" do
@@ -217,6 +281,12 @@ describe ContentExport do
 
     it "does not mark as expired if setting is 0" do
       Setting.set('content_exports_expire_after_days', '0')
+      ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
+      expect(@ce.reload).not_to be_expired
+    end
+
+    it "does not mark expired if part of a ContentShare" do
+      @teacher.sent_content_shares.create!(read_state: 'read', name: 'test', content_export_id: @ce.id)
       ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
       expect(@ce.reload).not_to be_expired
     end

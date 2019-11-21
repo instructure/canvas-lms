@@ -164,6 +164,7 @@ describe "assignment rubrics" do
       f('#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
       wait_for_ajaximations
       expect(f('#rubric_'+@rubric.id.to_s+' .rubric_title .title')).to include_text(@rubric.title)
+      expect(f('#rubrics span .rubric_total').text).to eq '8'
     end
 
     it "should not adjust points when importing an outcome to an assignment", priority: "1", test_id: 2896223 do
@@ -425,6 +426,46 @@ describe "assignment rubrics" do
 
         # The min points of the cell to the right should not have changed.
         expect(ffj('.range_rating:visible .min_points')[1]).to include_text "0"
+      end
+
+      it "should properly update the lowest rating range when scaled up" do
+        rubric_params = {
+          :criteria => {
+            "0" => {
+              :criterion_use_range => true,
+              :points => 100,
+              :description => "no outcome row",
+              :long_description => 'non outcome criterion',
+              :ratings => {
+                "0" => {
+                  :points => 100,
+                  :description => "Amazing",
+                },
+                "1" => {
+                    :points => 50,
+                    :description => "Reduced Marks",
+                },
+                "2" => {
+                    :points => 20,
+                    :description => "Less than twenty percent",
+                }
+              }
+            }
+          }
+        }
+        @rubric.update_criteria(rubric_params)
+        @rubric.reload
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["100.0", "50.0", "20.0"]
+
+        f(' .rubric_title .icon-edit').click
+        wait_for_ajaximations
+        criterion_points = fj('.criterion_points:visible')
+
+        set_value(criterion_points, '200')
+        fj(".save_button:visible").click
+        wait_for_ajaximations
+        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["200", "100", "40"]
       end
 
       it "should display explicit rating when range is infinitely small", priority: "1", test_id: 220339 do

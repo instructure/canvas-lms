@@ -23,6 +23,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
+    implements Interfaces::LegacyIDInterface
 
     alias :assignment :object
 
@@ -37,29 +38,6 @@ module Types
     GRADING_TYPES = Hash[
       Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES)
     ]
-
-    SUBMISSION_TYPES = %w[
-      attendance
-      discussion_topic
-      external_tool
-      media_recording
-      none
-      not_graded
-      on_paper
-      online_quiz
-      online_text_entry
-      online_upload
-      online_url
-      wiki_page
-    ].to_set
-
-    class AssignmentSubmissionType < Types::BaseEnum
-      graphql_name "SubmissionType"
-      description "Types of submissions an assignment accepts"
-      SUBMISSION_TYPES.each { |submission_type|
-        value(submission_type)
-      }
-    end
 
     class AssignmentGradingType < Types::BaseEnum
       graphql_name "GradingType"
@@ -119,7 +97,6 @@ module Types
     end
 
     global_id_field :id
-    field :_id, ID, "legacy canvas id", null: false, method: :id
 
     field :name, String, null: true
 
@@ -210,6 +187,9 @@ module Types
     field :can_unpublish, Boolean, method: :can_unpublish?, null: true
 
     field :rubric, RubricType, null: true
+    def rubric
+      load_association(:rubric)
+    end
 
     def lock_info
       load_locked_for { |lock_info| lock_info || {} }
@@ -301,7 +281,7 @@ module Types
       GRADING_TYPES[assignment.grading_type]
     end
 
-    field :submission_types, [AssignmentSubmissionType],
+    field :submission_types, [Types::AssignmentSubmissionType],
       null: true
     def submission_types
       # there's some weird data in the db so we'll just ignore anything that

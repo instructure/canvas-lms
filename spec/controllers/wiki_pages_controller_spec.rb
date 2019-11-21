@@ -40,21 +40,6 @@ describe WikiPagesController do
     end
   end
 
-  describe "GET 'index'" do
-    it "sets DIRECT_SHARE_ENABLED when enabled" do
-      @course.account.enable_feature!(:direct_share)
-      get 'index', params: {course_id: @course.id}
-      expect(response).to be_successful
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(true)
-    end
-
-    it "does not set DIRECT_SHARE_ENABLED when disabled" do
-      get 'index', params: {course_id: @course.id}
-      expect(response).to be_successful
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
-    end
-  end
-
   context "with page" do
     before do
       @page = @course.wiki_pages.create!(title: "ponies5ever", body: "")
@@ -119,6 +104,69 @@ describe WikiPagesController do
             expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_truthy
           end
         end
+      end
+    end
+
+    describe "immersive reader" do
+      context "as a teacher" do
+        before do
+          course_with_teacher(active_all: true)
+          @page = @course.wiki_pages.create!(title: "immersive reader", body: "")
+          user_session @teacher
+        end
+
+        context "feature enabled" do
+          before do
+            @course.root_account.enable_feature! :immersive_reader_wiki_pages
+          end
+
+          it "should render with the proper JS_ENV set" do
+            get 'show', params: {course_id: @course.id, id: @page.url}
+            expect(response).to be_successful
+            expect(controller.js_env[:IMMERSIVE_READER_ENABLED]).to be_truthy
+          end
+        end
+      end
+
+      context "as a student" do
+        before do
+          course_with_student(active_all: true)
+          @page = @course.wiki_pages.create!(title: "immersive reader", body: "")
+          user_session @student
+        end
+
+        context "feature enabled" do
+          before do
+            @course.root_account.enable_feature! :immersive_reader_wiki_pages
+          end
+
+          it "should render with the proper JS_ENV set" do
+            get 'show', params: {course_id: @course.id, id: @page.url}
+            expect(response).to be_successful
+            expect(controller.js_env[:IMMERSIVE_READER_ENABLED]).to be_truthy
+          end
+        end
+      end
+    end
+
+    context "placements for Commons Favorites Import" do
+      before do
+        allow(controller).to receive(:external_tools_display_hashes).and_return(["tool 1", "tool 2"])
+      end
+
+      it "js_env has no placements when feature is disabled" do
+        @course.root_account.disable_feature! :commons_favorites
+        get 'show', params: {course_id: @course.id, id: @page.url}
+        expect(response).to be_successful
+        expect(controller.external_tools_display_hashes(:wiki_index_menu)).to eq ["tool 1", "tool 2"]
+        expect(controller.js_env[:wiki_index_menu_tools]).to eq []
+      end
+
+      it "js_env has placements when feature is enabled" do
+        @course.root_account.enable_feature! :commons_favorites
+        get 'show', params: {course_id: @course.id, id: @page.url}
+        expect(response).to be_successful
+        expect(controller.js_env[:wiki_index_menu_tools]).to eq ["tool 1", "tool 2"]
       end
     end
 

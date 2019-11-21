@@ -17,39 +17,44 @@
  */
 
 import React from 'react'
-import {render, cleanup} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import {getByText as domGetByText} from '@testing-library/dom'
 import ProfileTray from '../ProfileTray'
 
 const imageUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
-describe('ProfileTray', () =>{
+describe('ProfileTray', () => {
   let props
 
   beforeEach(() => {
     props = {
       userDisplayName: 'Sample Student',
       userAvatarURL: imageUrl,
+      counts: {unreadShares: 12},
       tabs: [
         {
           id: 'foo',
-          label: "Foo",
-          html_url: "/foo"
+          label: 'Foo',
+          html_url: '/foo'
         },
         {
           id: 'bar',
-          label: "Bar",
-          html_url: "/bar"
+          label: 'Bar',
+          html_url: '/bar'
+        },
+        {
+          id: 'content_shares',
+          label: 'Shared Content',
+          html_url: '/shared'
         }
       ],
       loaded: true
     }
   })
 
-  afterEach(cleanup)
-
   it('renders the component', () => {
     const {getByText} = render(<ProfileTray {...props} />)
-    getByText("Sample Student")
+    getByText('Sample Student')
   })
 
   it('renders the avatar', () => {
@@ -60,13 +65,19 @@ describe('ProfileTray', () =>{
 
   it('renders loading spinner', () => {
     const {getByTitle, queryByText} = render(<ProfileTray {...props} loaded={false} />)
-    getByTitle("Loading")
-    expect(queryByText("Foo")).toBeFalsy()
+    getByTitle('Loading')
+    expect(queryByText('Foo')).toBeFalsy()
   })
 
   it('renders the tabs', () => {
     const {getByText} = render(<ProfileTray {...props} />)
-    getByText("Foo")
-    getByText("Bar")
+    getByText('Foo')
+    getByText('Bar')
+  })
+
+  it('renders the unread count badge on Shared Content', () => {
+    const {container} = render(<ProfileTray {...props} />)
+    const elt = container.firstChild.querySelector('a[href="/shared"]')
+    domGetByText(elt, '12 unread.')
   })
 })

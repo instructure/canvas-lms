@@ -29,6 +29,10 @@ class Submission::ShowPresenter
     @context = @assignment.context
   end
 
+  def default_url_options
+    { protocol: HostUrl.protocol, host: HostUrl.context_host(@context.root_account) }
+  end
+
   # NB: Currently this method assumes that the only possible source of anonymity
   # on the submission details is anonymous peer reviews (since teachers cannot
   # view the page at all if anonymous grading is enabled). If it becomes possible

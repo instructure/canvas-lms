@@ -19,23 +19,23 @@
 import axios from 'axios'
 
 function delayAsPromise(interval) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, interval);
-  });
+  return new Promise(resolve => {
+    setTimeout(resolve, interval)
+  })
 }
 
 // takes a object description of a Canvas Progress object (per the API docs)
 // and polls every `interval` until the progress completes or fails. returns a
 // Promise that resolves when the progress completes and that rejects when it
 // fails.
-export default function resolveProgress(progress, options={}) {
-  const ajaxLib = options.ajaxLib || axios;
+export default function resolveProgress(progress, options = {}) {
+  const ajaxLib = options.ajaxLib || axios
 
-  const { url, workflow_state, results, message } = progress;
+  const {url, workflow_state, results, message} = progress
   if (workflow_state === 'queued' || workflow_state === 'running') {
     // poll again after a delay. default to once a second if not specified, and
     // wait at least 100ms between polls even if asked for less.
-    let { interval } = options;
+    let {interval} = options
     if (process.env.NODE_ENV === 'test' && !interval) {
       interval = 0 // gotta go fast
     } else {
@@ -44,15 +44,15 @@ export default function resolveProgress(progress, options={}) {
     }
     return delayAsPromise(interval)
       .then(() => ajaxLib.get(url))
-      .then((response) => {
-        const newProgress = response.data;
+      .then(response => {
+        const newProgress = response.data
         return resolveProgress(newProgress, options)
-      });
+      })
   } else if (workflow_state === 'completed') {
     // done
-    return Promise.resolve(results);
+    return Promise.resolve(results)
   } else {
     // failed
-    return Promise.reject(message);
+    return Promise.reject(message)
   }
 }

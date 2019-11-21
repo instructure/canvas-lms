@@ -136,4 +136,11 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
     )
     equal(component.iframe.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
   })
+
+  test('sets the iframe data-lti-launch attribute', () => {
+    const component = TestUtils.renderIntoDocument(
+      <ExternalToolModalLauncher {...generateProps({isOpen: true})} />
+    )
+    equal(component.iframe.getAttribute('data-lti-launch'), 'true')
+  })
 })

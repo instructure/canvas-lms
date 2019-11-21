@@ -85,7 +85,7 @@ describe "student planner" do
 
   context "responsive layout" do
     it "changes layout on browser resize" do
-      resize_screen_to_normal
+
       go_to_list_view
 
       expect(f('.large.ic-Dashboard-header__layout')).to be_present
@@ -99,7 +99,7 @@ describe "student planner" do
       driver.manage.window.resize_to(500, dimension.height)
       expect(f('.small.ic-Dashboard-header__layout')).to be_present
       expect(f('.small.PlannerApp')).to be_present
-      resize_screen_to_normal
+
     end
   end
 
@@ -175,8 +175,9 @@ describe "student planner" do
       go_to_list_view
 
       validate_object_displayed(@course.name,'Peer Review')
-      expect(list_view_planner_items.second).to contain_css(peer_review_icon_selector)
-      expect(list_view_planner_items.second).to contain_jqcss(peer_review_reminder_selector)
+      expect(list_view_planner_item("Planner Course Peer Review")).to contain_css(peer_review_icon_selector)
+      expect(list_view_planner_item("Planner Course Peer Review")).to contain_jqcss(peer_review_reminder_selector)
+      expect(list_view_planner_item("Planner Course Assignment")).not_to contain_css(peer_review_icon_selector)
     end
 
     it "navigates to peer review submission when clicked" do
@@ -548,6 +549,22 @@ describe "student planner" do
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         expect(get_value('input[name="student_todo_at"]')).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
+    end
+
+    it "allows account admins with content management rights to add todo dates" do
+      @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page')
+      admin = account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+      user_session(admin)
+
+      expect(@course.grants_right?(admin, :manage)).to eq false # sanity check
+      expect(@course.grants_right?(admin, :manage_content)).to eq true
+
+      get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+      f('#student_planner_checkbox').click
+      wait_for_ajaximations
+      f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+      expect_new_page_load{fj('button:contains("Save")').click}
+      expect(@wiki.reload.todo_date).to be_present
     end
 
     it "shows correct default time in an ungraded discussion" do

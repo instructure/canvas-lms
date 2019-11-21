@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shape, string, arrayOf} from 'prop-types'
-import Modal, {ModalBody} from '../shared/components/InstuiModal'
+import Modal from './components/InstuiModal'
 import I18n from 'i18n!keyboardShortcutModal'
 
 export default class KeyboardShortcutModal extends React.Component {
@@ -68,7 +68,7 @@ export default class KeyboardShortcutModal extends React.Component {
         label={I18n.t('Keyboard Shortcuts')}
         onDismiss={this.closeModal}
       >
-        <ModalBody>
+        <Modal.Body>
           <div className="keyboard_navigation">
             <span className="screenreader-only">
               {I18n.t(
@@ -88,7 +88,7 @@ export default class KeyboardShortcutModal extends React.Component {
               {I18n.t('Press the esc key to close this modal')}
             </span>
           </div>
-        </ModalBody>
+        </Modal.Body>
       </Modal>
     )
   }

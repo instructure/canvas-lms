@@ -20,20 +20,16 @@ import I18n from 'i18n!confirmOutcomeEditModal'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {func, shape, bool} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Button} from '@instructure/ui-buttons'
 
-import Modal, { ModalBody, ModalFooter } from '../shared/components/InstuiModal'
+import Modal from '../shared/components/InstuiModal'
 
-const willUpdateRubrics = ({ changed, hasUpdateableRubrics }) => changed && hasUpdateableRubrics
+const willUpdateRubrics = ({changed, hasUpdateableRubrics}) => changed && hasUpdateableRubrics
 
-const willUpdateScores = ({assessed, changed, modifiedFields}) => (
-  changed && assessed && (
-    modifiedFields.masteryPoints ||
-    modifiedFields.scoringMethod
-  )
-)
+const willUpdateScores = ({assessed, changed, modifiedFields}) =>
+  changed && assessed && (modifiedFields.masteryPoints || modifiedFields.scoringMethod)
 
-export function showConfirmOutcomeEdit (props) {
+export function showConfirmOutcomeEdit(props) {
   if (!willUpdateRubrics(props) && !willUpdateScores(props)) {
     setTimeout(props.onConfirm)
     return
@@ -42,11 +38,14 @@ export function showConfirmOutcomeEdit (props) {
   parent.setAttribute('class', 'confirm-outcome-edit-modal-container')
   document.body.appendChild(parent)
 
-  function showConfirmOutcomeEditRef (modal) {
+  function showConfirmOutcomeEditRef(modal) {
     if (modal) modal.show()
   }
 
-  ReactDOM.render(<ConfirmOutcomeEditModal {...props} parent={() => parent} ref={showConfirmOutcomeEditRef} />, parent)
+  ReactDOM.render(
+    <ConfirmOutcomeEditModal {...props} parent={() => parent} ref={showConfirmOutcomeEditRef} />,
+    parent
+  )
 }
 
 export default class ConfirmOutcomeEditModal extends Component {
@@ -59,11 +58,11 @@ export default class ConfirmOutcomeEditModal extends Component {
       scoringMethod: bool.isRequired
     }).isRequired,
     onConfirm: func.isRequired,
-    parent: func.isRequired,
+    parent: func.isRequired
   }
 
   state = {
-    show: false,
+    show: false
   }
 
   onConfirm = () => {
@@ -75,20 +74,19 @@ export default class ConfirmOutcomeEditModal extends Component {
     this.hide()
   }
 
-  show () {
-    this.setState({ show: true })
+  show() {
+    this.setState({show: true})
   }
 
-  hide () {
-    this.setState({ show: false },
-      () => {
-        const parent = this.props.parent ? this.props.parent() : null
-        if (parent) ReactDOM.unmountComponentAtNode(parent)
-      })
+  hide() {
+    this.setState({show: false}, () => {
+      const parent = this.props.parent ? this.props.parent() : null
+      if (parent) ReactDOM.unmountComponentAtNode(parent)
+    })
   }
 
-  render () {
-    const { assessed, changed, hasUpdateableRubrics, modifiedFields } = this.props
+  render() {
+    const {assessed, changed, hasUpdateableRubrics, modifiedFields} = this.props
     return (
       <Modal
         label={I18n.t('Confirm Edit Outcome')}
@@ -96,41 +94,36 @@ export default class ConfirmOutcomeEditModal extends Component {
         onDismiss={this.onCancel}
         size="small"
       >
-        <ModalBody>
+        <Modal.Body>
           <div>
             <ul>
-              {
-                willUpdateRubrics({ changed, hasUpdateableRubrics }) && (
-                  <li>
-                    {
-                      I18n.t('This will update all rubrics using this outcome that have not yet been assessed')
-                    }
-                  </li>
-                )
-              }
-              {
-                willUpdateScores({ assessed, changed, modifiedFields }) && (
-                  <li>
-                    {
-                      I18n.t('You’ve updated the scoring criteria; this will affect all students ' +
-                             'previously assessed using this outcome')
-                    }
-                  </li>
-                )
-              }
+              {willUpdateRubrics({changed, hasUpdateableRubrics}) && (
+                <li>
+                  {I18n.t(
+                    'This will update all rubrics using this outcome that have not yet been assessed'
+                  )}
+                </li>
+              )}
+              {willUpdateScores({assessed, changed, modifiedFields}) && (
+                <li>
+                  {I18n.t(
+                    'You’ve updated the scoring criteria; this will affect all students ' +
+                      'previously assessed using this outcome'
+                  )}
+                </li>
+              )}
             </ul>
           </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            onClick={this.onCancel}
-            id='cancel-outcome-edit-modal'
-          >{I18n.t('Cancel')}</Button>&nbsp;
-          <Button
-            onClick={this.onConfirm}
-            id='confirm-outcome-edit-modal'
-            variant="primary">{I18n.t('Save')}</Button>
-        </ModalFooter>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this.onCancel} id="cancel-outcome-edit-modal">
+            {I18n.t('Cancel')}
+          </Button>
+          &nbsp;
+          <Button onClick={this.onConfirm} id="confirm-outcome-edit-modal" variant="primary">
+            {I18n.t('Save')}
+          </Button>
+        </Modal.Footer>
       </Modal>
     )
   }

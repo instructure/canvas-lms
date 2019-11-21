@@ -8,7 +8,7 @@ FROM instructure/ruby-passenger:2.4-xenial
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV "production"
 ENV NGINX_MAX_UPLOAD_SIZE 10g
-ENV YARN_VERSION 1.16.0-1
+ENV YARN_VERSION 1.19.1-1
 
 # Work around github.com/zertosh/v8-compile-cache/issues/2
 # This can be removed once yarn pushes a release including the fixed version
@@ -32,6 +32,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
        libicu-dev \
        postgresql-client-9.5 \
        unzip \
+       pbzip2 \
        fontforge \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
@@ -98,6 +99,7 @@ RUN mkdir -p .yardoc \
 
 USER docker
 # update Gemfile.lock in cases where a lock file was pulled in during the `COPY . $APP_HOME` step
-RUN bundle lock --update
+RUN bundle lock --local --conservative
+
 # TODO: switch to canvas:compile_assets_dev once we stop using this Dockerfile in production/e2e
 RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets

@@ -76,11 +76,11 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         equal($allItemsOption.textContent.trim(), 'All Assignment Groups')
       })
 
-      test('labels each option using the related assignment group name', () => {
+      test('labels each option using the related assignment group name in alphabetical order', () => {
         renderComponent()
         filter.clickToExpand()
         const labels = filter.$options.slice(1).map($option => $option.textContent.trim())
-        deepEqual(labels, ['In-Class', 'Homework'])
+        deepEqual(labels, ['Homework', 'In-Class'])
       })
 
       test('disables non-selected options when the filter is disabled', () => {

@@ -27,7 +27,7 @@
       <span class="screenreader-only"><%= I18n.t("Assessment not yet Completed") %></span>
     <% end %>
     <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, request ? request.asset.user_id : '{{ user_id }}') %>">
-      <span class="asset_user_name"><%= request.try_rescue(:asset).try_rescue(:user).try_rescue(:last_name_first) || nbsp %></span>
+      <span class="asset_user_name"><%= request.try_rescue(:asset).try_rescue(:user).try_rescue(:last_name_first) || nbsp %> <% if request.try_rescue(:asset).try_rescue(:user).try_rescue(:pronouns) %> <i>(<%= request.try_rescue(:asset).try_rescue(:user).try_rescue(:pronouns) %>)</i><% end %></span>
     </a>
   </span>
   <span class="user_id" style="display: none;"><%= request.try_rescue(:asset).try_rescue(:user_id) || nbsp %></span>

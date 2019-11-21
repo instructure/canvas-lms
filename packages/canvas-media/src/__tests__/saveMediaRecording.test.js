@@ -18,7 +18,7 @@
 import K5Uploader from '@instructure/k5uploader'
 import moxios from 'moxios'
 import sinon from 'sinon'
-import saveMediaRecording from '../saveMediaRecording'
+import saveMediaRecording, {saveClosedCaptions} from '../saveMediaRecording'
 
 function mediaServerSession() {
   return {
@@ -99,7 +99,10 @@ describe('saveMediaRecording', () => {
         uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
         await new Promise(setTimeout)
         expect(doneFunction2).toHaveBeenCalledTimes(1)
-        expect(doneFunction2.mock.calls[0][1].data).toBe('media object data')
+        expect(doneFunction2.mock.calls[0][1]).toEqual({
+          mediaObject: {data: 'media object data'},
+          uploadedFile: {file: 'thing'}
+        })
         expect(doneFunction2.mock.calls[0][0]).toBe(null)
       }
     )
@@ -123,5 +126,61 @@ describe('saveMediaRecording', () => {
         expect(doneFunction2.mock.calls[0][0].message).toBe('Request failed with status code 500')
       }
     )
+  })
+})
+
+describe('saveClosedCaptions', () => {
+  beforeEach(() => {
+    moxios.install()
+  })
+  afterEach(() => {
+    moxios.uninstall()
+  })
+  it('returns success promise if axios requests returns correctly', done => {
+    const mediaId = '4'
+    const fileContents = 'file contents'
+    const file = new Blob([fileContents], {type: 'text/plain'})
+    const fileAndLanguage = {
+      language: {selectedOptionId: 'en'},
+      file
+    }
+    moxios.stubRequest(`/media_objects/${mediaId}/media_tracks`, {
+      status: 200,
+      response: {data: 'media object data'}
+    })
+    const successPromise = saveClosedCaptions(mediaId, [fileAndLanguage])
+    return successPromise
+      .then(() => {
+        expect(true).toBe(true)
+        done()
+      })
+      .catch(() => {
+        expect(false).toBe(true)
+        done()
+      })
+  })
+
+  it('returns failure promise if axios request fails', done => {
+    const mediaId = '4'
+    const fileContents = 'file contents'
+    const file = new Blob([fileContents], {type: 'text/plain'})
+    const fileAndLanguage = {
+      language: {selectedOptionId: 'en'},
+      file
+    }
+    moxios.stubRequest(`/media_objects/${mediaId}/media_tracks`, {
+      status: 500,
+      response: {data: 'media object data'}
+    })
+    const successPromise = saveClosedCaptions(mediaId, [fileAndLanguage])
+    return successPromise
+      .then(() => {
+        expect(false).toBe(true)
+        done()
+      })
+      .catch(() => {
+        expect(true).toBe(true)
+        done()
+      })
   })
 })

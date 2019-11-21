@@ -47,7 +47,7 @@
 #        },
 #       "latest_migration": {
 #         "description": "Details of the latest migration",
-#         "type": "BlueprintMigration"
+#         "$ref": "BlueprintMigration"
 #        }
 #     }
 #   }

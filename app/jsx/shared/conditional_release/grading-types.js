@@ -18,27 +18,37 @@
 
 import I18n from 'i18n!cyoe_assignment_sidebar_grading_types'
 
-  const GradingTypes = {
-    points: {
-      label: I18n.t('points'),
-      key: 'points',
+const GradingTypes = {
+  points: {
+    get label() {
+      return I18n.t('points')
     },
-    percent: {
-      label: I18n.t('percent'),
-      key: 'percent',
+    key: 'points'
+  },
+  percent: {
+    get label() {
+      return I18n.t('percent')
     },
-    letter_grade: {
-      label: I18n.t('letter grade'),
-      key: 'letter_grade',
+    key: 'percent'
+  },
+  letter_grade: {
+    get label() {
+      return I18n.t('letter grade')
     },
-    gpa_scale: {
-      label: I18n.t('GPA scale'),
-      key: 'gpa_scale',
+    key: 'letter_grade'
+  },
+  gpa_scale: {
+    get label() {
+      return I18n.t('GPA scale')
     },
-    other: {
-      label: I18n.t('other'),
-      key: 'other',
+    key: 'gpa_scale'
+  },
+  other: {
+    get label() {
+      return I18n.t('other')
     },
+    key: 'other'
   }
+}
 
 export default GradingTypes

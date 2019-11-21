@@ -30,26 +30,43 @@ import deparam from 'compiled/util/deparam'
 import CourseCollection from 'compiled/collections/CourseCollection'
 import FavoriteCourseCollection from 'compiled/collections/FavoriteCourseCollection'
 import GroupCollection from 'compiled/collections/GroupCollection'
-import 'compiled/behaviors/unread_conversations'
 import 'jquery.disableWhileLoading'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { decodeQueryString } from 'jsx/shared/queryString'
+import {decodeQueryString} from 'jsx/shared/queryString'
 import ConversationStatusFilter from 'jsx/shared/components/ConversationStatusFilter'
 
 const ConversationsRouter = Backbone.Router.extend({
-
   routes: {
     '': 'index',
     'filter=:state': 'filter'
   },
   sendingCount: 0,
 
-  initialize () {
-    ['onSelected', 'selectConversation', 'onSubmissionReply', 'onReply', 'onReplyAll', 'onArchive',
-      'onDelete', 'onCompose', 'onMarkUnread', 'onMarkRead', 'onForward', 'onStarToggle', 'onFilter',
-      'onCourse', '_replyFromRemote', '_initViews', 'onSubmit', 'onAddMessage', 'onSubmissionAddMessage',
-      'onSearch', 'onKeyDown'].forEach(method => this[method] = this[method].bind(this))
+  initialize() {
+    ;[
+      'onSelected',
+      'selectConversation',
+      'onSubmissionReply',
+      'onReply',
+      'onReplyAll',
+      'onArchive',
+      'onDelete',
+      'onCompose',
+      'onMarkUnread',
+      'onMarkRead',
+      'onForward',
+      'onStarToggle',
+      'onFilter',
+      'onCourse',
+      '_replyFromRemote',
+      '_initViews',
+      'onSubmit',
+      'onAddMessage',
+      'onSubmissionAddMessage',
+      'onSearch',
+      'onKeyDown'
+    ].forEach(method => (this[method] = this[method].bind(this)))
     const dfd = this._initCollections()
     this._initViews()
     this._attachEvents()
@@ -61,7 +78,7 @@ const ConversationsRouter = Backbone.Router.extend({
   // name - The name of the query string param.
   //
   // Returns a string value or null.
-  param (name) {
+  param(name) {
     const regex = new RegExp(`${name}=([^&]+)`)
     const value = window.location.search.match(regex)
     if (value) return decodeURIComponent(value[1])
@@ -74,8 +91,8 @@ const ConversationsRouter = Backbone.Router.extend({
   // fn - A function called with each selected message. Used for side-effecting.
   //
   // Returns an array of impacted message IDs.
-  batchUpdate (event, fn = $.noop) {
-    const messages = _.map(this.list.selectedMessages, (message) => {
+  batchUpdate(event, fn = $.noop) {
+    const messages = _.map(this.list.selectedMessages, message => {
       fn.call(this, message)
       return message.get('id')
     })
@@ -85,14 +102,15 @@ const ConversationsRouter = Backbone.Router.extend({
     })
     if (event === 'destroy') this.list.selectedMessages = []
     if (event === 'archive' && this.filters.type !== 'sent') this.list.selectedMessages = []
-    if (event === 'mark_as_read' && this.filters.type === 'archived') this.list.selectedMessages = []
+    if (event === 'mark_as_read' && this.filters.type === 'archived')
+      this.list.selectedMessages = []
     if (event === 'unstar' && this.filters.type === 'starred') this.list.selectedMessages = []
     return messages
   },
 
   lastFetch: null,
 
-  onSelected (model) {
+  onSelected(model) {
     if (this.lastFetch) this.lastFetch.abort()
     this.header.onModelChange(null, this.model)
     this.detail.onModelChange(null, this.model)
@@ -111,7 +129,6 @@ const ConversationsRouter = Backbone.Router.extend({
       this.header.toggleReplyBtn(true)
       this.header.toggleReplyAllBtn(true)
       this.header.hideForwardBtn(true)
-      return
     } else {
       model = this.list.selectedMessage()
       if (model.get('messages')) {
@@ -129,7 +146,7 @@ const ConversationsRouter = Backbone.Router.extend({
     }
   },
 
-  selectConversation (model) {
+  selectConversation(model) {
     if (model) model.set('canArchive', this.filters.type !== 'sent')
 
     this.header.onModelChange(model, null)
@@ -137,11 +154,11 @@ const ConversationsRouter = Backbone.Router.extend({
     this.detail.render()
   },
 
-  onSubmissionReply () {
+  onSubmissionReply() {
     this.submissionReply.show(this.detail.model, {trigger: $('#submission-reply-btn')})
   },
 
-  onReply (message, trigger) {
+  onReply(message, trigger) {
     if (this.detail.model.get('for_submission')) {
       this.onSubmissionReply()
     } else {
@@ -149,30 +166,39 @@ const ConversationsRouter = Backbone.Router.extend({
     }
   },
 
-  onReplyAll (message, trigger) {
+  onReplyAll(message, trigger) {
     this._delegateReply(message, 'replyAll', trigger)
   },
 
-  _delegateReply (message, type, trigger) {
+  _delegateReply(message, type, trigger) {
     this.compose.show(this.detail.model, {to: type, trigger, message})
   },
 
-  onArchive (focusNext, trigger) {
-    const action = this.list.selectedMessage().get('workflow_state') === 'archived' ? 'mark_as_read' : 'archive'
-    const confirmMessage = action === 'archive'
-      ? I18n.t({
-          one: 'Are you sure you want to archive your copy of this conversation?',
-          other: 'Are you sure you want to archive your copies of these conversations?'
-        }, {count: this.list.selectedMessages.length})
-      : I18n.t({
-          one: 'Are you sure you want to unarchive this conversation?',
-          other: 'Are you sure you want to unarchive these conversations?'
-        }, {count: this.list.selectedMessages.length})
-    if (!confirm(confirmMessage)) {  // eslint-disable-line no-alert
+  onArchive(focusNext, trigger) {
+    const action =
+      this.list.selectedMessage().get('workflow_state') === 'archived' ? 'mark_as_read' : 'archive'
+    const confirmMessage =
+      action === 'archive'
+        ? I18n.t(
+            {
+              one: 'Are you sure you want to archive your copy of this conversation?',
+              other: 'Are you sure you want to archive your copies of these conversations?'
+            },
+            {count: this.list.selectedMessages.length}
+          )
+        : I18n.t(
+            {
+              one: 'Are you sure you want to unarchive this conversation?',
+              other: 'Are you sure you want to unarchive these conversations?'
+            },
+            {count: this.list.selectedMessages.length}
+          )
+    if (!confirm(confirmMessage)) {
+      // eslint-disable-line no-alert
       $(trigger).focus()
       return
     }
-    const messages = this.batchUpdate(action, function (m) {
+    const messages = this.batchUpdate(action, function(m) {
       const newState = action === 'mark_as_read' ? 'read' : 'archived'
       m.set('workflow_state', newState)
       this.header.onArchivedStateChange(m)
@@ -191,19 +217,27 @@ const ConversationsRouter = Backbone.Router.extend({
     $focusNext.focus()
   },
 
-  onDelete (focusNext, trigger) {
-    const confirmMsg = I18n.t({
-      one: 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.',
-      other: 'Are you sure you want to delete your copy of these conversations? This action cannot be undone.'
-    }, {count: this.list.selectedMessages.length})
+  onDelete(focusNext, trigger) {
+    const confirmMsg = I18n.t(
+      {
+        one:
+          'Are you sure you want to delete your copy of this conversation? This action cannot be undone.',
+        other:
+          'Are you sure you want to delete your copy of these conversations? This action cannot be undone.'
+      },
+      {count: this.list.selectedMessages.length}
+    )
     if (!confirm(confirmMsg)) {
       $(trigger).focus()
       return
     }
-    const delmsg = I18n.t({
-      one: 'Message Deleted!',
-      other: 'Messages Deleted!'
-    }, {count: this.list.selectedMessages.length})
+    const delmsg = I18n.t(
+      {
+        one: 'Message Deleted!',
+        other: 'Messages Deleted!'
+      },
+      {count: this.list.selectedMessages.length}
+    )
     const messages = this.batchUpdate('destroy')
     delete this.detail.model
     this.list.collection.remove(messages)
@@ -218,22 +252,24 @@ const ConversationsRouter = Backbone.Router.extend({
     $focusNext.focus()
   },
 
-  onCompose (e) {
+  onCompose(e) {
     this.compose.show(null, {trigger: '#compose-btn'})
   },
 
-  index () {
+  index() {
     return this.filter('')
   },
 
-  filter (state) {
-    const filters = this.filters = deparam(state)
+  filter(state) {
+    const filters = (this.filters = deparam(state))
     this.header.displayState(filters)
     this.selectConversation(null)
     this.list.selectedMessages = []
     this.list.collection.reset()
     if (filters.type === 'submission_comments') {
-      ['scope', 'filter', 'filter_mode', 'include_private_conversation_enrollments'].forEach(this.list.collection.deleteParam.bind(this.list.collection))
+      ;['scope', 'filter', 'filter_mode', 'include_private_conversation_enrollments'].forEach(
+        this.list.collection.deleteParam.bind(this.list.collection)
+      )
       this.list.collection.url = '/api/v1/users/self/activity_stream'
       this.list.collection.setParam('asset_type', 'Submission')
       if (filters.course) {
@@ -242,7 +278,9 @@ const ConversationsRouter = Backbone.Router.extend({
         this.list.collection.deleteParam('context_code')
       }
     } else {
-      ['context_code', 'asset_type', 'submission_user_id'].forEach(this.list.collection.deleteParam.bind(this.list.collection))
+      ;['context_code', 'asset_type', 'submission_user_id'].forEach(
+        this.list.collection.deleteParam.bind(this.list.collection)
+      )
       this.list.collection.url = '/api/v1/conversations'
       this.list.collection.setParam('scope', filters.type)
       this.list.collection.setParam('filter', this._currentFilter())
@@ -253,30 +291,36 @@ const ConversationsRouter = Backbone.Router.extend({
     this.compose.setDefaultCourse(filters.course)
   },
 
-  onMarkUnread () {
+  onMarkUnread() {
     return this.batchUpdate('mark_as_unread', m => m.toggleReadState(false))
   },
 
-  onMarkRead () {
+  onMarkRead() {
     return this.batchUpdate('mark_as_read', m => m.toggleReadState(true))
   },
 
-  onForward (message, trigger) {
+  onForward(message, trigger) {
     let model
     if (message) {
       model = this.detail.model.clone()
       model.handleMessages()
-      model.set('messages', _.filter(model.get('messages'), m =>
-        m.id === message.id ||
-        (_.includes(m.participating_user_ids, message.author_id) && m.created_at < message.created_at)
-      ))
+      model.set(
+        'messages',
+        _.filter(
+          model.get('messages'),
+          m =>
+            m.id === message.id ||
+            (_.includes(m.participating_user_ids, message.author_id) &&
+              m.created_at < message.created_at)
+        )
+      )
     } else {
       model = this.detail.model
     }
     this.compose.show(model, {to: 'forward', trigger})
   },
 
-  onStarToggle () {
+  onStarToggle() {
     const event = this.list.selectedMessage().get('starred') ? 'unstar' : 'star'
     const messages = this.batchUpdate(event, m => m.toggleStarred(event === 'star'))
     if (this.filters.type === 'starred') {
@@ -285,7 +329,7 @@ const ConversationsRouter = Backbone.Router.extend({
     }
   },
 
-  onFilter (filters) {
+  onFilter(filters) {
     // Update the hash. Replace if there isn't already a hash - we're in the
     // process of loading the page if so, and we wouldn't want to create a
     // spurious history entry by not doing so.
@@ -293,21 +337,21 @@ const ConversationsRouter = Backbone.Router.extend({
     return this.navigate(`filter=${$.param(filters)}`, {trigger: true, replace: !existingHash})
   },
 
-  onCourse (course) {
+  onCourse(course) {
     return this.list.updateCourse(course)
   },
 
-    // Internal: Determine if a reply was launched from another URL.
-    //
-    // Returns a boolean.
-  _isRemoteLaunch () {
+  // Internal: Determine if a reply was launched from another URL.
+  //
+  // Returns a boolean.
+  _isRemoteLaunch() {
     return !!window.location.search.match(/user_id/)
   },
 
-    // Internal: Open and populate the new message dialog from a remote launch.
-    //
-    // Returns nothing.
-  _replyFromRemote () {
+  // Internal: Open and populate the new message dialog from a remote launch.
+  //
+  // Returns nothing.
+  _replyFromRemote() {
     this.compose.show(null, {
       user: {
         id: this.param('user_id'),
@@ -318,7 +362,7 @@ const ConversationsRouter = Backbone.Router.extend({
     })
   },
 
-  _initCollections () {
+  _initCollections() {
     const gc = new GroupCollection()
     gc.setParam('include[]', 'can_message')
     this.courses = {
@@ -329,7 +373,7 @@ const ConversationsRouter = Backbone.Router.extend({
     return this.courses.favorites.fetch()
   },
 
-  _initViews () {
+  _initViews() {
     this._initListView()
     this._initDetailView()
     this._initHeaderView()
@@ -337,7 +381,7 @@ const ConversationsRouter = Backbone.Router.extend({
     this._initSubmissionCommentReplyDialog()
   },
 
-  _attachEvents () {
+  _attachEvents() {
     this.list.collection.on('change:selected', this.onSelected)
     this.header.on('compose', this.onCompose)
     this.header.on('reply', this.onReply)
@@ -369,16 +413,16 @@ const ConversationsRouter = Backbone.Router.extend({
     $(window).keydown(this.onKeyDown)
   },
 
-  onPageLoad (e) {
+  onPageLoad(e) {
     $('#main').css({display: 'block'})
   },
 
-  onSubmit (dfd) {
+  onSubmit(dfd) {
     this._incrementSending(1)
     return dfd.always(() => this._incrementSending(-1))
   },
 
-  onAddMessage (message, conversation) {
+  onAddMessage(message, conversation) {
     const model = this.list.collection.get(conversation.id)
     if (model && model.get('messages')) {
       message.context_name = model.messageCollection.last().get('context_name')
@@ -390,7 +434,7 @@ const ConversationsRouter = Backbone.Router.extend({
     }
   },
 
-  onSubmissionAddMessage (message, submission) {
+  onSubmissionAddMessage(message, submission) {
     const model = this.list.collection.findWhere({submission_id: submission.id})
     if (model && model.get('messages')) {
       model.get('messages').unshift(message)
@@ -401,20 +445,20 @@ const ConversationsRouter = Backbone.Router.extend({
     }
   },
 
-  onNewConversations (conversations) {},
+  onNewConversations(conversations) {},
 
-  _incrementSending (increment) {
+  _incrementSending(increment) {
     this.sendingCount += increment
     return this.header.toggleSending(this.sendingCount > 0)
   },
 
-  _currentFilter () {
+  _currentFilter() {
     let filter = this.searchTokens || []
     if (this.filters.course) filter = filter.concat(this.filters.course)
     return filter
   },
 
-  onSearch (tokens) {
+  onSearch(tokens) {
     this.list.collection.reset()
     this.searchTokens = tokens.length ? tokens : null
     if (this.filters.type === 'submission_comments') {
@@ -433,7 +477,7 @@ const ConversationsRouter = Backbone.Router.extend({
     return this.list.collection.fetch()
   },
 
-  _initListView () {
+  _initListView() {
     this.list = new MessageListView({
       collection: new MessageCollection(),
       el: $('.message-list'),
@@ -443,20 +487,20 @@ const ConversationsRouter = Backbone.Router.extend({
     this.list.render()
   },
 
-  _initDetailView () {
+  _initDetailView() {
     this.detail = new MessageDetailView({el: $('.message-detail')})
     this.detail.render()
   },
 
-  _initHeaderView () {
+  _initHeaderView() {
     const defaultFilter = 'inbox'
     const filters = {
-        inbox: I18n.t('Inbox'),
-        unread: I18n.t('Unread'),
-        starred: I18n.t('Starred'),
-        sent: I18n.t('Sent'),
-        archived: I18n.t('Archived'),
-        submission_comments: I18n.t('Submission Comments')
+      inbox: I18n.t('Inbox'),
+      unread: I18n.t('Unread'),
+      starred: I18n.t('Starred'),
+      sent: I18n.t('Sent'),
+      archived: I18n.t('Archived'),
+      submission_comments: I18n.t('Submission Comments')
     }
 
     // The onArchive function requires the filter to always be set in the url.
@@ -464,12 +508,12 @@ const ConversationsRouter = Backbone.Router.extend({
     // inbox, but we have to update the url here manually to match. Further
     // updates to the url are handled by the filter trigger and backbone history
     const hash = window.location.hash
-    const hashParams = hash.substring("#filter=".length)
+    const hashParams = hash.substring('#filter='.length)
     const filterType = decodeQueryString(hashParams).filter(i => i.type !== undefined)
     const validFilter = filterType.length === 1 && Object.keys(filters).includes(filterType[0].type)
 
     let initialFilter
-    if (hash.startsWith("#filter=") && validFilter) {
+    if (hash.startsWith('#filter=') && validFilter) {
       initialFilter = filterType[0].type
     } else {
       window.location.hash = `#filter=type=${defaultFilter}`
@@ -486,10 +530,10 @@ const ConversationsRouter = Backbone.Router.extend({
         initialFilter={initialFilter}
       />,
       document.getElementById('conversation_filter')
-    );
+    )
   },
 
-  _initComposeDialog () {
+  _initComposeDialog() {
     this.compose = new MessageFormDialog({
       courses: this.courses,
       folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID,
@@ -497,15 +541,16 @@ const ConversationsRouter = Backbone.Router.extend({
     })
   },
 
-  _initSubmissionCommentReplyDialog () {
+  _initSubmissionCommentReplyDialog() {
     this.submissionReply = new SubmissionCommentFormDialog()
   },
 
-  onKeyDown (e) {
+  onKeyDown(e) {
     const nodeName = e.target.nodeName.toLowerCase()
     if (nodeName === 'input' || nodeName === 'textarea') return
     const ctrl = e.ctrlKey || e.metaKey
-    if ((e.which === 65) && ctrl) { // ctrl-a
+    if (e.which === 65 && ctrl) {
+      // ctrl-a
       e.preventDefault()
       this.list.selectAll()
     }

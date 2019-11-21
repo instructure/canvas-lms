@@ -26,18 +26,18 @@ QUnit.module('PostAssignmentGradesTray PostTypes', suiteHooks => {
   let context
 
   function getLabel(text) {
-    return [...$container.querySelectorAll('label')].find($label =>
-      $label.textContent === text
-    )
+    return [...$container.querySelectorAll('label')].find($label => $label.textContent === text)
   }
 
   function getGradedPostType() {
-    const labelText = 'GradedGrades will be made visible to students with graded submissions'
+    const labelText =
+      'GradedStudents who have received a grade or a submission comment will be able to see their grade and/or submission comments.'
     return document.getElementById(getLabel(labelText).htmlFor)
   }
 
   function getEveryonePostType() {
-    const labelText = 'EveryoneGrades will be made visible to all students'
+    const labelText =
+      'EveryoneAll students will be able to see their grade and/or submission comments.'
     return document.getElementById(getLabel(labelText).htmlFor)
   }
 
@@ -68,13 +68,15 @@ QUnit.module('PostAssignmentGradesTray PostTypes', suiteHooks => {
 
   test('"Everyone" type includes description"', () => {
     mountComponent()
-    const labelText = 'EveryoneGrades will be made visible to all students'
+    const labelText =
+      'EveryoneAll students will be able to see their grade and/or submission comments.'
     ok(getLabel(labelText))
   })
 
   test('"Graded" type includes description"', () => {
     mountComponent()
-    const labelText = 'GradedGrades will be made visible to students with graded submissions'
+    const labelText =
+      'GradedStudents who have received a grade or a submission comment will be able to see their grade and/or submission comments.'
     ok(getLabel(labelText))
   })
 

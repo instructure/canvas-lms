@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from "../format-message";
-import locale from "../../locales/zh_HK.json";
-import "../rce/languages/zh_TW";
+import formatMessage from '../format-message'
+import locale from '../../locales/zh_HK.json'
+import '../rce/languages/zh_TW'
 
-formatMessage.addLocale({ "zh-Hant": locale });
+formatMessage.addLocale({'zh-Hant': locale})

@@ -264,7 +264,7 @@ QUnit.module('Gradebook#hideAggregateColumns', {
     return {
       indexedOverrides: Gradebook.prototype.indexedOverrides,
       indexedGradingPeriods: _.keyBy(this.gradingPeriods, 'id')
-    };
+    }
   },
 
   setupThis(options) {

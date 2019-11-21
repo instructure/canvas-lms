@@ -16,29 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ScrollToNewActivity} from '../scroll-to-new-activity';
-import {createAnimation, mockRegistryEntry} from './test-utils';
+import {ScrollToNewActivity} from '../scroll-to-new-activity'
+import {createAnimation, mockRegistryEntry} from './test-utils'
 
 it('only scrolls when new activity is above the screen', () => {
-  const {animation, animator, registry, store} = createAnimation(ScrollToNewActivity);
+  const {animation, animator, registry, store} = createAnimation(ScrollToNewActivity)
   const nais = [
-    mockRegistryEntry([], 'first'), mockRegistryEntry([], 'second'),
-    mockRegistryEntry([], 'third'), mockRegistryEntry([], 'fourth')];
-  registry.getAllNewActivityIndicatorsSorted.mockReturnValueOnce(nais);
-  animator.isAboveScreen.mockReturnValueOnce(false).mockReturnValue(true);
-  animation.uiDidUpdate();
-  expect(animator.scrollTo).toHaveBeenCalledWith('third-scrollable', 42);
-  expect(animator.scrollToTop).not.toHaveBeenCalled();
-  expect(store.dispatch).not.toHaveBeenCalled();
-});
+    mockRegistryEntry([], 'first'),
+    mockRegistryEntry([], 'second'),
+    mockRegistryEntry([], 'third'),
+    mockRegistryEntry([], 'fourth')
+  ]
+  registry.getAllNewActivityIndicatorsSorted.mockReturnValueOnce(nais)
+  animator.isAboveScreen.mockReturnValueOnce(false).mockReturnValue(true)
+  animation.uiDidUpdate()
+  expect(animator.scrollTo).toHaveBeenCalledWith('third-scrollable', 42)
+  expect(animator.scrollToTop).not.toHaveBeenCalled()
+  expect(store.dispatch).not.toHaveBeenCalled()
+})
 
 describe('new activity requires loading', () => {
   it('scrolls to top and dispatches loadPastUntilNewActivity', () => {
-    const {animation, animator, registry, store} = createAnimation(ScrollToNewActivity);
-    registry.getAllNewActivityIndicatorsSorted.mockReturnValueOnce([mockRegistryEntry([], 's')]);
-    animator.isAboveScreen.mockReturnValueOnce(false);
-    animation.uiDidUpdate();
-    expect(animator.scrollToTop).toHaveBeenCalled();
-    expect(store.dispatch).toHaveBeenCalled();
-  });
-});
+    const {animation, animator, registry, store} = createAnimation(ScrollToNewActivity)
+    registry.getAllNewActivityIndicatorsSorted.mockReturnValueOnce([mockRegistryEntry([], 's')])
+    animator.isAboveScreen.mockReturnValueOnce(false)
+    animation.uiDidUpdate()
+    expect(animator.scrollToTop).toHaveBeenCalled()
+    expect(store.dispatch).toHaveBeenCalled()
+  })
+})

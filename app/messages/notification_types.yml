@@ -132,6 +132,10 @@
       delay_for: <%= 60*60 %>
     - name: Submission Grade Changed
       delay_for: <%= 5*60 %>
+    - name: Submission Posted
+      delay_for: 0
+    - name: Submissions Posted
+      delay_for: 0
     - name: Quiz Regrade Finished
       delay_for: 0
 
@@ -260,6 +264,11 @@
       delay_for: 0
     - name: Blueprint Sync Complete
       delay_for: 0
+
 - category: Content Link Error
   notifications:
     - name: Content Link Error
+
+- category: Account Notification
+  notifications:
+    - name: Account Notification

@@ -17,62 +17,58 @@
  */
 
 import React from 'react'
-import { render, mount, shallow } from 'enzyme'
+import {render, mount, shallow} from 'enzyme'
 import AssignmentResult from '../AssignmentResult'
 
-const defaultProps = (props = {}) => (
-  Object.assign({
-    outcome: {
+const defaultProps = (props = {}) => ({
+  outcome: {
+    id: 1,
+    mastered: false,
+    calculation_method: 'highest',
+    ratings: [{description: 'My first rating'}, {description: 'My second rating'}],
+    results: [],
+    title: 'foo',
+    mastery_points: 3,
+    points_possible: 5
+  },
+  result: {
+    id: 1,
+    score: 2,
+    percent: 0.2,
+    assignment: {
       id: 1,
-      mastered: false,
-      calculation_method: 'highest',
-      ratings: [
-        { description: 'My first rating' },
-        { description: 'My second rating' }
-      ],
-      results: [],
-      title: 'foo',
-      mastery_points: 3,
-      points_possible: 5
-    },
-    result: {
-      id: 1,
-      score: 2,
-      percent: 0.2,
-      assignment: {
-        id: 1,
-        html_url: 'http://foo',
-        name: 'My assignment',
-        submission_types: 'online_quiz'
-      }
+      html_url: 'http://foo',
+      name: 'My assignment',
+      submission_types: 'online_quiz'
     }
-  }, props)
-)
+  },
+  ...props
+})
 
 it('renders the AlignmentResult component', () => {
-  const wrapper = shallow(<AssignmentResult {...defaultProps()}/>)
+  const wrapper = shallow(<AssignmentResult {...defaultProps()} />)
   expect(wrapper).toMatchSnapshot()
 })
 
 it('includes the assignment name', () => {
-  const wrapper = render(<AssignmentResult {...defaultProps()}/>)
+  const wrapper = render(<AssignmentResult {...defaultProps()} />)
   expect(wrapper.text()).toMatch('My assignment')
 })
 
 it('includes the ratings of the outcome', () => {
-  const wrapper = render(<AssignmentResult {...defaultProps()}/>)
+  const wrapper = render(<AssignmentResult {...defaultProps()} />)
   expect(wrapper.text()).toMatch('My second rating')
 })
 
 it('shows scores when points are not hidden', () => {
-  const wrapper = render(<AssignmentResult {...defaultProps()}/>)
+  const wrapper = render(<AssignmentResult {...defaultProps()} />)
   expect(wrapper.text()).toMatch('Your score: 1')
 })
 
 it('does not show scores when points are hidden', () => {
   const props = defaultProps()
   props.result.hide_points = true
-  const wrapper = render(<AssignmentResult {...props}/>)
+  const wrapper = render(<AssignmentResult {...props} />)
   expect(wrapper.text()).toMatch('Your score')
   expect(wrapper.text()).not.toMatch('Your score: 1')
 })
@@ -80,7 +76,7 @@ it('does not show scores when points are hidden', () => {
 it('falls back to using raw score if percent is not available', () => {
   const props = defaultProps()
   props.result.percent = null
-  const wrapper = render(<AssignmentResult {...props}/>)
+  const wrapper = render(<AssignmentResult {...props} />)
   expect(wrapper.text()).toMatch('Your score: 2')
 })
 
@@ -90,30 +86,26 @@ it('falls back to using mastery points if points possible is 0', () => {
     id: 1,
     mastered: false,
     calculation_method: 'highest',
-    ratings: [
-      { description: 'My first rating' },
-      { description: 'My second rating' }
-    ],
+    ratings: [{description: 'My first rating'}, {description: 'My second rating'}],
     results: [],
     title: 'foo',
     mastery_points: 3,
     points_possible: 0
   }
-  const wrapper = render(<AssignmentResult {...props}/>)
+  const wrapper = render(<AssignmentResult {...props} />)
   expect(wrapper.text()).toMatch('Your score: 0.6')
 })
-
 
 it('correctly rounds to two decimal places', () => {
   const props = defaultProps()
   props.result.percent = 0.257
-  const wrapper = render(<AssignmentResult {...props}/>)
+  const wrapper = render(<AssignmentResult {...props} />)
   expect(wrapper.text()).toMatch('Your score: 1.29')
 })
 
 it('renders unlinked result', () => {
   const props = defaultProps()
   props.result.assignment.html_url = ''
-  const wrapper = mount(<AssignmentResult {...props}/>)
-  expect(wrapper.find('IconHighlighter').exists()).toBe(true)
+  const wrapper = mount(<AssignmentResult {...props} />)
+  expect(wrapper.find('IconHighlighterLine').exists()).toBe(true)
 })

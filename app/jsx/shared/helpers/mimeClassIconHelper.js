@@ -17,33 +17,38 @@
  */
 
 import React from 'react'
+import {
+  IconAttachMediaLine,
+  IconCodeLine,
+  IconDocumentLine,
+  IconFolderLine,
+  IconFolderLockedLine,
+  IconImageLine,
+  IconMsExcelLine,
+  IconMsPptLine,
+  IconPdfLine,
+  IconPaperclipLine,
+  IconZippedLine
+} from '@instructure/ui-icons'
 
-import IconAttachMedia from '@instructure/ui-icons/lib/Line/IconAttachMedia'
-import IconDocument from '@instructure/ui-icons/lib/Line/IconDocument'
-import IconFolder from '@instructure/ui-icons/lib/Line/IconFolder'
-import IconFolderLocked from '@instructure/ui-icons/lib/Line/IconFolderLocked'
-import IconImage from '@instructure/ui-icons/lib/Line/IconImage'
-import IconMsExcel from '@instructure/ui-icons/lib/Line/IconMsExcel'
-import IconMsPpt from '@instructure/ui-icons/lib/Line/IconMsPpt'
-import IconPdf from '@instructure/ui-icons/lib/Line/IconPdf'
-import IconPaperclip from '@instructure/ui-icons/lib/Line/IconPaperclip'
-import IconZipped from '@instructure/ui-icons/lib/Line/IconZipped'
-
-export const DEFAULT_ICON = <IconPaperclip />
+export const DEFAULT_ICON = <IconPaperclipLine />
 
 export const ICON_TYPES = {
-  'audio': <IconAttachMedia />,
-  'doc': <IconDocument />,
-  'file': <IconPaperclip />,
-  'folder': <IconFolder />,
-  'folder-locked': <IconFolderLocked />,
-  'image': <IconImage />,
-  'pdf': <IconPdf />,
-  'ppt': <IconMsPpt />,
-  'text': <IconDocument />,
-  'video': <IconAttachMedia />,
-  'xls': <IconMsExcel />,
-  'zip': <IconZipped />
+  audio: <IconAttachMediaLine />,
+  code: <IconCodeLine />,
+  doc: <IconDocumentLine />,
+  file: <IconPaperclipLine />,
+  flash: <IconPaperclipLine />,
+  folder: <IconFolderLine />,
+  'folder-locked': <IconFolderLockedLine />,
+  html: <IconCodeLine />,
+  image: <IconImageLine />,
+  pdf: <IconPdfLine />,
+  ppt: <IconMsPptLine />,
+  text: <IconDocumentLine />,
+  video: <IconAttachMediaLine />,
+  xls: <IconMsExcelLine />,
+  zip: <IconZippedLine />
 }
 
 export function getIconByType(attachment_type) {

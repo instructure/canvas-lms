@@ -34,6 +34,41 @@ describe UserProfile do
       expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_PROFILE
     end
 
+    describe "direct_share flag enabled" do
+      it "should show shared content tab when user has any non-student enrollment" do
+        teacher_in_course(:active_all => true)
+        account.enable_feature!(:direct_share)
+        tabs = @teacher.profile.
+          tabs_available(@teacher, :root_account => account)
+        expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_CONTENT_SHARES
+      end
+
+      it "should show shared content tab when user has account membership" do
+        account_admin_user(account: account)
+        account.enable_feature!(:direct_share)
+        tabs = @admin.profile.tabs_available(@admin, :root_account => account)
+        expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_CONTENT_SHARES
+      end
+
+      it "should not show shared content tab when user has only student enrollments" do
+        student_in_course(:active_all => true)
+        account.enable_feature!(:direct_share)
+        tabs = @student.profile.
+          tabs_available(@student, :root_account => account)
+        expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_CONTENT_SHARES
+      end
+    end
+
+    describe "direct_share flag disabled" do
+      it "should not show shared content tab" do
+        teacher_in_course(:active_all => true)
+        account.disable_feature!(:direct_share)
+        tabs = @teacher.profile.
+          tabs_available(@teacher, :root_account => account)
+        expect(tabs.map { |t| t[:id] }).not_to include UserProfile::TAB_CONTENT_SHARES
+      end
+    end
+
     it "should be i18n'd" do
       student_in_course(:active_all => true)
       I18n.locale = :es

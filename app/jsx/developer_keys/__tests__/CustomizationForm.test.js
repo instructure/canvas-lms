@@ -34,20 +34,25 @@ function newProps() {
           tool_id: 'LTI 1.3 Test Tool',
           platform: 'canvas.instructure.com',
           settings: {
-            file_menu: {
-              url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
-              text: 'LTI 1.3 Test Tool (Course Nav)',
-              message_type: 'LtiResourceLinkRequest'
-            },
-            invalid_placement: {
-              url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
-              text: 'LTI 1.3 Test Tool (Course Nav)',
-              message_type: 'LtiResourceLinkRequest'
-            },
-            no_message_type: {
-              url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
-              text: 'LTI 1.3 Test Tool (Course Nav)'
-            }
+            placements: [
+              {
+                placement: 'file_menu',
+                url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
+                text: 'LTI 1.3 Test Tool (Course Nav)',
+                message_type: 'LtiResourceLinkRequest'
+              },
+              {
+                placement: 'invalid_placement',
+                url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
+                text: 'LTI 1.3 Test Tool (Course Nav)',
+                message_type: 'LtiResourceLinkRequest'
+              },
+              {
+                placement: 'no_message_type',
+                url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
+                text: 'LTI 1.3 Test Tool (Course Nav)'
+              }
+            ]
           }
         }
       ]
@@ -190,7 +195,7 @@ it('returns null if the placement does not exist', () => {
   expect(wrapper.instance().messageTypeFor('banana')).toBeFalsy()
 })
 
-it('returns null if the placement have a message type', () => {
+it('returns null if the placement does not have a message type', () => {
   wrapper = mount(<CustomizationForm {...newProps()} />)
   expect(wrapper.instance().messageTypeFor('no_message_type')).toBeFalsy()
 })

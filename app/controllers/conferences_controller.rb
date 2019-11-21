@@ -163,6 +163,7 @@ class ConferencesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
     return unless tab_enabled?(@context.class::TAB_CONFERENCES)
     return unless @current_user
+    log_api_asset_access([ "conferences", @context ], "conferences", "other")
     conferences = @context.grants_right?(@current_user, :manage_content) ?
       @context.web_conferences.active :
       @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)

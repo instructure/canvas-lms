@@ -26,7 +26,7 @@ class UserProfile < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_blank => true
 
   TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS,
-    TAB_PROFILE_SETTINGS, TAB_OBSERVEES = *0..10
+    TAB_PROFILE_SETTINGS, TAB_OBSERVEES, TAB_CONTENT_SHARES = *0..10
 
   BASE_TABS = [
     {
@@ -70,6 +70,7 @@ class UserProfile < ActiveRecord::Base
       end
       insert_profile_tab(tabs, user, opts)
       insert_eportfolios_tab(tabs, user)
+      insert_content_shares_tab(tabs, user, opts)
       insert_lti_tool_tabs(tabs, user, opts) if user && opts[:root_account]
       tabs = tabs.slice(0,2) if user&.fake_student?
       insert_observer_tabs(tabs, user)
@@ -95,9 +96,21 @@ class UserProfile < ActiveRecord::Base
     if user.eportfolios_enabled?
       tabs << {
         id: TAB_EPORTFOLIOS,
-        label:I18n.t('#tabs.eportfolios', "ePortfolios"),
+        label: I18n.t('#tabs.eportfolios', "ePortfolios"),
         css_class: 'eportfolios',
         href: :dashboard_eportfolios_path,
+        no_args: true
+      }
+    end
+  end
+
+  def insert_content_shares_tab(tabs, user, opts)
+    if user && opts[:root_account]&.feature_enabled?(:direct_share) && user.can_content_share?
+      tabs << {
+        id: TAB_CONTENT_SHARES,
+        label: I18n.t("Shared Content"),
+        css_class: 'content_shares',
+        href: :content_shares_profile_path,
         no_args: true
       }
     end

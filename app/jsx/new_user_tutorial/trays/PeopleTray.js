@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!new_user_tutorial'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Text} from '@instructure/ui-elements'
 import TutorialTrayContent from './TutorialTrayContent'
 
 const PeopleTray = () => (
@@ -28,11 +28,9 @@ const PeopleTray = () => (
     image="/images/tutorial-tray-images/people.svg"
   >
     <Text as="p">
-      {
-        I18n.t('Manage enrollment status, create groups, and add users from this page.')
-      }
+      {I18n.t('Manage enrollment status, create groups, and add users from this page.')}
     </Text>
   </TutorialTrayContent>
-);
+)
 
 export default PeopleTray

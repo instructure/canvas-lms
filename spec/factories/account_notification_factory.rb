@@ -28,6 +28,7 @@ module Factories
     @announcement.user = opts[:user] || User.create!
     @announcement.account_notification_roles.build(role_ids.map { |r_id| {account_notification_id: @announcement.id, role: Role.get_role_by_id(r_id)} }) unless role_ids.empty?
     @announcement.domain_specific = !!opts[:domain_specific]
+    @announcement.send_message = !!opts[:send_message]
     @announcement.save!
     @announcement
   end

@@ -21,7 +21,7 @@ module Lti
 #
 # @model LtiAssignment
 #     {
-#       "id": "Assignment",
+#       "id": "LtiAssignment",
 #       "description": "A Canvas assignment",
 #       "properties": {
 #         "id": {
@@ -106,7 +106,9 @@ module Lti
     end
 
     def assignment
-      @_assignment ||= api_find(Assignment, params[:assignment_id])
+       @_assignment ||= Assignment.find_by(lti_context_id: params[:assignment_id]) || api_find(Assignment, params[:assignment_id])
+      raise ActiveRecord::RecordNotFound unless @_assignment
+      @_assignment
     end
 
     def user
@@ -132,6 +134,11 @@ module Lti
           vendor_code: configuration.tool_vendor_code,
           product_code: configuration.tool_product_code,
           resource_type_code: configuration.tool_resource_type_code
+          # Don't add in context_type here -- this really just tests if the
+          # tool proxy has permissions to access the assignment. Better safe
+          # than sorry and allow it rather than have things break, since we
+          # could have mislabeled context_type as Account when it was really
+          # Course
         }
       end
       render_unauthorized_action unless codes && tool_proxy.matches?(codes)

@@ -19,9 +19,9 @@
 import React from 'react'
 import I18n from 'i18n!assignment_2_assignment_toggle_details'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
-import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
+import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 import apiUserContent from 'compiled/str/apiUserContent'
 import noContent from './SVG/NoReportsClipboard.svg'
 import {string} from 'prop-types'
@@ -35,6 +35,7 @@ function AssignmentToggleDetails(props) {
   return (
     <div className="a2-toggle-details-container">
       <ToggleDetails
+        defaultExpanded
         data-test-id="assignments-2-assignment-toggle-details"
         summary={<Text weight="bold">{I18n.t('Details')}</Text>}
       >

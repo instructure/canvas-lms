@@ -70,11 +70,19 @@ class StudentAssignmentPageV2
     end
 
     def comments_tab
-      fj('[role="presentation"]:contains("Comments")')
+      fj('[role="tab"]:contains("Comments")')
     end
 
     def comment_text_area
       f('textarea')
+    end
+
+    def record_upload_button
+      f("button[data-testid='media-modal-launch-button']")
+    end
+
+    def media_modal
+      f("span[aria-label='Upload Media']")
     end
 
     def leave_a_comment(comment)

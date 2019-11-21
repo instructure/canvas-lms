@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {Assignment} from '../../graphqlData/Assignment'
-import {bool, func} from 'prop-types'
 import {chunk} from 'lodash'
-import {DEFAULT_ICON, getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
+import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import elideString from '../../../../shared/helpers/elideString'
+import {func} from 'prop-types'
+import {getFileThumbnail} from '../../../../shared/helpers/fileHelper'
 import I18n from 'i18n!assignments_2_file_upload'
 import LoadingIndicator from '../../../shared/LoadingIndicator'
 import MoreOptions from './MoreOptions'
@@ -28,14 +30,14 @@ import React, {Component} from 'react'
 import {Submission} from '../../graphqlData/Submission'
 import {uploadFiles} from '../../../../shared/upload_file'
 
-import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import FileDrop from '@instructure/ui-forms/lib/components/FileDrop'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Billboard} from '@instructure/ui-billboard'
+import {Button} from '@instructure/ui-buttons'
+import {FileDrop} from '@instructure/ui-forms'
+import {Flex, Grid} from '@instructure/ui-layout'
+import {IconTrashLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-elements'
+import theme from '@instructure/canvas-theme'
 
 function submissionFileUploadUrl(assignment) {
   return `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
@@ -46,11 +48,11 @@ export default class FileUpload extends Component {
     assignment: Assignment.shape,
     createSubmissionDraft: func,
     submission: Submission.shape,
-    updateUploadingFiles: func,
-    uploadingFiles: bool
+    updateUploadingFiles: func
   }
 
   state = {
+    filesToUpload: [],
     messages: []
   }
 
@@ -63,6 +65,7 @@ export default class FileUpload extends Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    window.removeEventListener('message', this.handleLTIFiles)
   }
 
   getDraftAttachments = () => {
@@ -74,32 +77,64 @@ export default class FileUpload extends Component {
 
   handleLTIFiles = async e => {
     if (e.data.messageType === 'LtiDeepLinkingResponse') {
+      if (e.data.errormsg) {
+        this.context.setOnFailure(e.data.errormsg)
+        return
+      }
       await this.handleDropAccepted(e.data.content_items)
+    }
+
+    // Since LTI 1.0 handles its own message alerting we don't have to
+    if (e.data.messageType === 'A2ExternalContentReady') {
+      if (!e.data.errormsg) {
+        await this.handleDropAccepted(e.data.content_items)
+      }
     }
   }
 
+  handleCanvasFiles = async fileID => {
+    if (!fileID) {
+      this.context.setOnFailure(I18n.t('Error adding canvas file to submission draft'))
+      return
+    }
+    this.updateUploadingFiles(async () => {
+      try {
+        await this.createSubmissionDraft([fileID])
+      } catch (err) {
+        this.context.setOnFailure(I18n.t('Error updating submission draft'))
+      }
+    })
+  }
+
   handleDropAccepted = async files => {
-    if (this._isMounted) {
-      this.props.updateUploadingFiles(true)
+    if (!files.length) {
+      this.context.setOnFailure(I18n.t('Error adding files to submission draft'))
+      return
     }
 
-    if (files.length) {
-      const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
-
-      await this.props.createSubmissionDraft({
-        variables: {
-          id: this.props.submission.id,
-          attempt: this.props.submission.attempt || 1,
-          fileIds: this.getDraftAttachments()
-            .map(file => file._id)
-            .concat(newFiles.map(file => file.id))
-        }
-      })
-    }
-
-    if (this._isMounted) {
-      this.props.updateUploadingFiles(false)
-    }
+    this.setState(
+      {
+        filesToUpload: files.map((file, i) => {
+          if (file.url) {
+            return {isLoading: true, _id: `${i}-${file.url}`}
+          }
+          return {isLoading: true, _id: `${i}-${file.name}`}
+        })
+      },
+      () => {
+        this.context.setOnSuccess(I18n.t('Uploading files'))
+      }
+    )
+    this.updateUploadingFiles(async () => {
+      try {
+        const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
+        await this.createSubmissionDraft(newFiles.map(file => file.id))
+      } catch (err) {
+        this.context.setOnFailure(I18n.t('Error updating submission draft'))
+      } finally {
+        this.setState({filesToUpload: []})
+      }
+    })
   }
 
   handleDropRejected = () => {
@@ -113,8 +148,30 @@ export default class FileUpload extends Component {
     })
   }
 
+  updateUploadingFiles = async wrappedFunc => {
+    if (this._isMounted) {
+      this.props.updateUploadingFiles(true)
+    }
+    await wrappedFunc()
+    if (this._isMounted) {
+      this.props.updateUploadingFiles(false)
+    }
+  }
+
+  createSubmissionDraft = async fileIDs => {
+    await this.props.createSubmissionDraft({
+      variables: {
+        id: this.props.submission.id,
+        activeSubmissionType: 'online_upload',
+        attempt: this.props.submission.attempt || 1,
+        fileIds: this.getDraftAttachments()
+          .map(file => file._id)
+          .concat(fileIDs)
+      }
+    })
+  }
+
   handleRemoveFile = async e => {
-    e.preventDefault()
     const fileId = parseInt(e.currentTarget.id, 10)
     const fileIndex = this.getDraftAttachments().findIndex(
       file => parseInt(file._id, 10) === fileId
@@ -124,14 +181,17 @@ export default class FileUpload extends Component {
     await this.props.createSubmissionDraft({
       variables: {
         id: this.props.submission.id,
+        activeSubmissionType: 'online_upload',
         attempt: this.props.submission.attempt,
         fileIds: updatedFiles.map(file => file._id)
       }
     })
 
-    this.setState({
-      messages: []
-    })
+    if (this._isMounted) {
+      this.setState({
+        messages: []
+      })
+    }
 
     const focusElement =
       this.getDraftAttachments().length === 0 || fileIndex === 0
@@ -144,77 +204,73 @@ export default class FileUpload extends Component {
     document.getElementById(focusElement).focus()
   }
 
-  shouldDisplayThumbnail = file => {
-    return file.mimeClass === 'image' && file.thumbnailUrl
-  }
-
   renderUploadBox() {
     return (
       <div data-testid="upload-box">
-        <FileDrop
-          accept={
-            this.props.assignment.allowedExtensions.length
-              ? this.props.assignment.allowedExtensions
-              : ''
-          }
-          allowMultiple
-          enablePreview
-          id="inputFileDrop"
-          data-testid="input-file-drop"
-          label={
-            <Billboard
-              heading={I18n.t('Upload File')}
-              hero={DEFAULT_ICON}
-              message={
-                <Flex direction="column">
-                  {this.props.assignment.allowedExtensions.length ? (
-                    <FlexItem>
-                      {I18n.t('File permitted: %{fileTypes}', {
-                        fileTypes: this.props.assignment.allowedExtensions
-                          .map(ext => ext.toUpperCase())
-                          .join(', ')
-                      })}
-                    </FlexItem>
-                  ) : null}
-                  <FlexItem padding="small 0 0">
-                    <Text size="small">
-                      {I18n.t('Drag and drop, or click to browse your computer')}
-                    </Text>
-                    <MoreOptions
-                      assignmentID={this.props.assignment._id}
-                      courseID={this.props.assignment.env.courseId}
-                      userID={this.props.assignment.env.currentUser.id}
-                    />
-                  </FlexItem>
-                </Flex>
+        <Flex direction="column">
+          <Flex.Item margin="0 0 small 0" overflowY="visible">
+            <FileDrop
+              accept={
+                this.props.assignment.allowedExtensions.length
+                  ? this.props.assignment.allowedExtensions
+                  : ''
               }
+              allowMultiple
+              enablePreview
+              id="inputFileDrop"
+              data-testid="input-file-drop"
+              label={
+                <Billboard
+                  heading={I18n.t('Upload File')}
+                  hero={DEFAULT_ICON}
+                  message={
+                    <Flex direction="column">
+                      {this.props.assignment.allowedExtensions.length ? (
+                        <Flex.Item>
+                          {I18n.t('File permitted: %{fileTypes}', {
+                            fileTypes: this.props.assignment.allowedExtensions
+                              .map(ext => ext.toUpperCase())
+                              .join(', ')
+                          })}
+                        </Flex.Item>
+                      ) : null}
+                      <Flex.Item padding="small 0 0">
+                        <Text size="small">
+                          {I18n.t('Drag and drop, or click to browse your computer')}
+                        </Text>
+                      </Flex.Item>
+                    </Flex>
+                  }
+                />
+              }
+              messages={this.state.messages}
+              onDropAccepted={files => this.handleDropAccepted(files)}
+              onDropRejected={this.handleDropRejected}
             />
-          }
-          messages={this.state.messages}
-          onDropAccepted={this.handleDropAccepted}
-          onDropRejected={this.handleDropRejected}
-        />
+          </Flex.Item>
+          <Flex.Item padding="xx-small" textAlign="center">
+            <MoreOptions
+              assignmentID={this.props.assignment._id}
+              courseID={this.props.assignment.env.courseId}
+              handleCanvasFiles={this.handleCanvasFiles}
+              renderCanvasFiles
+              userID={this.props.assignment.env.currentUser.id}
+            />
+          </Flex.Item>
+        </Flex>
       </div>
     )
   }
 
   renderUploadedFile(file) {
+    if (file.isLoading) {
+      return <LoadingIndicator />
+    }
     return (
       <Billboard
         heading={I18n.t('Uploaded')}
         headingLevel="h3"
-        hero={
-          this.shouldDisplayThumbnail(file) ? (
-            <img
-              alt={I18n.t('%{filename} preview', {filename: file.displayName})}
-              height="75"
-              src={file.thumbnailUrl}
-              width="75"
-            />
-          ) : (
-            getIconByType(file.mimeClass)
-          )
-        }
+        hero={getFileThumbnail(file, 'large')}
         message={
           <div>
             <span aria-hidden title={file.displayName}>
@@ -222,7 +278,7 @@ export default class FileUpload extends Component {
             </span>
             <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
             <Button
-              icon={IconTrash}
+              icon={IconTrashLine}
               id={file._id}
               margin="0 0 0 x-small"
               onClick={this.handleRemoveFile}
@@ -239,7 +295,10 @@ export default class FileUpload extends Component {
   }
 
   renderUploadBoxAndUploadedFiles() {
-    const files = this.getDraftAttachments()
+    let files = this.getDraftAttachments()
+    if (this.state.filesToUpload.length) {
+      files = files.concat(this.state.filesToUpload)
+    }
     // The first two uploaded files are rendered on the same row as the upload box
     const firstFileRow = files.slice(0, 2)
     // All uploaded files after the first two are rendered on rows below the upload
@@ -247,45 +306,40 @@ export default class FileUpload extends Component {
     // and two rendered files and all subsequent rows having three rendered files
     const nextFileRows = files.length > 2 ? chunk(files.slice(2, files.length), 3) : []
     return (
-      <div data-testid="non-empty-upload">
-        <Grid>
-          <GridRow key={firstFileRow.map(file => file._id).join()}>
-            <GridCol width={4}>{this.renderUploadBox()}</GridCol>
-            {firstFileRow.map(file => (
-              <GridCol width={4} key={file._id} vAlign="bottom">
-                {this.renderUploadedFile(file)}
-              </GridCol>
-            ))}
-          </GridRow>
-          {nextFileRows.map(row => (
-            <GridRow key={row.map(file => file._id).join()}>
-              {row.map(file => (
-                <GridCol width={4} key={file._id} vAlign="bottom">
-                  {this.renderUploadedFile(file)}
-                </GridCol>
-              ))}
-            </GridRow>
+      <Grid>
+        <Grid.Row key="upload-box">
+          <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
+          {firstFileRow.map(file => (
+            <Grid.Col width={4} key={file._id} vAlign="bottom">
+              {this.renderUploadedFile(file)}
+            </Grid.Col>
           ))}
-        </Grid>
-      </div>
+        </Grid.Row>
+        {nextFileRows.map((row, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Grid.Row key={i}>
+            {row.map(file => (
+              <Grid.Col width={4} key={file._id} vAlign="bottom">
+                {this.renderUploadedFile(file)}
+              </Grid.Col>
+            ))}
+          </Grid.Row>
+        ))}
+      </Grid>
     )
+  }
+
+  shouldRenderFiles = () => {
+    return this.getDraftAttachments().length !== 0 || this.state.filesToUpload.length !== 0
   }
 
   render() {
     return (
-      <div data-testid="upload-pane">
-        {this.getDraftAttachments().length !== 0 ? (
-          this.renderUploadBoxAndUploadedFiles()
-        ) : (
-          <Grid>
-            <GridRow>
-              <GridCol width={4}>{this.renderUploadBox()}</GridCol>
-            </GridRow>
-          </Grid>
-        )}
-
-        {this.props.uploadingFiles && <LoadingIndicator />}
+      <div data-testid="upload-pane" style={{marginBottom: theme.variables.spacing.xxLarge}}>
+        {this.renderUploadBoxAndUploadedFiles()}
       </div>
     )
   }
 }
+
+FileUpload.contextType = AlertManagerContext

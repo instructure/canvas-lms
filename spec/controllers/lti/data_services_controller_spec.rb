@@ -41,6 +41,9 @@ describe Lti::DataServicesController do
     allow(Canvas::Security::ServicesJwt).to receive(:encryption_secret).and_return('setecastronomy92' * 2)
     allow(Canvas::Security::ServicesJwt).to receive(:signing_secret).and_return('donttell' * 10)
     allow(HTTParty).to receive(:send).and_return(double(body: subscription, code: 200))
+
+    root_account.lti_context_id = SecureRandom.uuid
+    root_account.save
   end
 
   describe '#create' do
@@ -49,7 +52,53 @@ describe Lti::DataServicesController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/create"}
       let(:params_overrides) do
-        { subscription: subscription, account_id: root_account.id }
+        { subscription: subscription, account_id: root_account.lti_context_id }
+      end
+    end
+
+    let(:action) { :create }
+
+    context do
+      let(:params_overrides) do
+        { subscription: subscription, account_id: root_account.lti_context_id }
+      end
+      it 'adds OwnerId and OwnerType if passed in for a tool' do
+        expect(Services::LiveEventsSubscriptionService).to receive(:create).with(any_args,
+          hash_including(subscription.merge(OwnerId: tool.global_id.to_s, OwnerType: 'external_tool'))
+        )
+        send_request
+      end
+    end
+
+    context do
+      let(:params_overrides) do
+        { subscription: subscription.merge(OwnerId: user.global_id), account_id: root_account.lti_context_id }
+      end
+      let(:user) { account_admin_user(account: root_account) }
+
+      it 'adds OwnerId and OwnerType if passed in for a person' do
+        expect(Services::LiveEventsSubscriptionService).to receive(:create).with(any_args,
+          hash_including(subscription.merge(OwnerId: user.global_id.to_s, OwnerType: 'person'))
+        )
+        send_request
+      end
+
+      context 'with non admin user' do
+        let(:user) { user_model }
+
+        it 'raises an unprocessable_entity' do
+          send_request
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context 'with not found user' do
+        let(:user) { OpenStruct.new(global_id: 'notfound') }
+
+        it 'raises a 404' do
+          send_request
+          expect(response).to have_http_status(:not_found)
+        end
       end
     end
   end
@@ -60,7 +109,7 @@ describe Lti::DataServicesController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/show"}
       let(:params_overrides) do
-        { subscription: subscription, account_id: root_account.id, id: 'testid' }
+        { account_id: root_account.lti_context_id, id: 'testid' }
       end
     end
   end
@@ -71,7 +120,88 @@ describe Lti::DataServicesController do
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/update"}
       let(:params_overrides) do
-        { subscription: subscription, account_id: root_account.id, id: 'testid' }
+        { subscription: subscription, account_id: root_account.lti_context_id, id: 'testid' }
+      end
+    end
+
+    let(:action) { :update }
+    let(:subId) { 'myid' }
+
+    context do
+      let(:params_overrides) do
+        { subscription: subscription, account_id: root_account.lti_context_id, id: subId }
+      end
+
+      it 'adds UpdatedBy and UpdatedByType if passed in for a tool' do
+        expect(Services::LiveEventsSubscriptionService).to receive(:update).with(any_args,
+          hash_including(UpdatedBy: tool.global_id.to_s, UpdatedByType: 'external_tool', Id: subId)
+        )
+        send_request
+      end
+    end
+
+    context do
+      let(:params_overrides) do
+        { subscription: subscription.merge(UpdatedBy: user.global_id), account_id: root_account.lti_context_id, id: subId }
+      end
+      let(:user) { account_admin_user(account: root_account) }
+
+      it 'adds UpdatedBy and UpdatedByType if passed in for a person' do
+        expect(Services::LiveEventsSubscriptionService).to receive(:update).with(any_args,
+          hash_including('UpdatedBy' => user.global_id.to_s, UpdatedByType: 'person', Id: subId)
+        )
+        send_request
+      end
+
+      context 'with non admin user' do
+        let(:user) { user_model }
+
+        it 'raises an unprocessable_entity' do
+          send_request
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context 'with not found user' do
+        let(:user) { OpenStruct.new(global_id: 'notfound') }
+
+        it 'raises a 404' do
+          send_request
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+  end
+
+  describe '#index' do
+    it_behaves_like 'lti services' do
+      let(:action) { :index }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/list"}
+      let(:params_overrides) do
+        { account_id: root_account.lti_context_id }
+      end
+    end
+  end
+
+  describe '#destroy' do
+    it_behaves_like 'lti services' do
+      let(:action) { :destroy }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/destroy"}
+      let(:params_overrides) do
+        { account_id: root_account.lti_context_id, id: 'testid' }
+      end
+    end
+  end
+
+  describe '#event_types_index' do
+    it_behaves_like 'lti services' do
+      let(:action) { :event_types_index }
+      let(:expected_mime_type) { described_class::MIME_TYPE }
+      let(:scope_to_remove) { 'https://canvas.instructure.com/lti/data_services/scope/list_event_types' }
+      let(:params_overrides) do
+        { account_id: root_account.lti_context_id, id: 'testid' }
       end
     end
   end

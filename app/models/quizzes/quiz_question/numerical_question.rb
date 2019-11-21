@@ -37,7 +37,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     # we use BigDecimal here to avoid rounding errors at the edge of the tolerance
     # e.g. in floating point, -11.7 with margin of 0.02 isn't inclusive of the answer -11.72
     begin
-      BigDecimal(val.gsub(separator, '.').gsub(delimiter, ''))
+      BigDecimal(val.gsub(delimiter, '').gsub(separator, '.'))
     rescue ArgumentError
       BigDecimal('0.0')
     end

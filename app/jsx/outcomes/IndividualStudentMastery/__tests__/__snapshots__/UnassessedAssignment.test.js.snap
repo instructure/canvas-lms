@@ -5,11 +5,17 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
   key="1"
 >
   <View
+    borderColor="default"
     debug={false}
     display="block"
+    focusColor="info"
+    focusPosition="offset"
+    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="small"
+    position="static"
+    shouldAnimateFocus={true}
   >
     <ApplyTheme
       immutable={false}

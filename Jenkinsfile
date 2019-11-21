@@ -24,15 +24,54 @@ def withGerritCredentials = { Closure command ->
   ]) { command() }
 }
 
-def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null ->
+def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null, String sourceRef = null ->
   withGerritCredentials({ ->
     println "Fetching ${repo} plugin"
     sh """
       mkdir -p ${path}/${customRepoDestination ?: repo}
       GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-        git archive --remote=ssh://$GERRIT_URL/${repo} master ${sourcePath == null ? '' : sourcePath} | tar -x -v -C ${path}/${customRepoDestination ?: repo}
+        git archive --remote=ssh://$GERRIT_URL/${repo} ${sourceRef == null ? 'master' : sourceRef} ${sourcePath == null ? '' : sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
     """
   })
+}
+
+def fullSuccessName(name) {
+  return "_successes/${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}-${name}-success"
+}
+
+def hasSuccess(name) {
+  copyArtifacts(filter: "_successes/*",
+                optional: true,
+                projectName: '/${JOB_NAME}',
+                parameters: "GERRIT_CHANGE_NUMBER=${env.GERRIT_CHANGE_NUMBER},GERRIT_PATCHSET_NUMBER=${GERRIT_PATCHSET_NUMBER}",
+                selector: lastCompleted())
+  if (fileExists("_successes")) {
+    archiveArtifacts(artifacts: "_successes/*",
+                    projectName: '/${JOB_NAME}')
+  }
+  return fileExists(fullSuccessName(name))
+}
+
+def saveSuccess(name) {
+  def success_name = fullSuccessName(name)
+  sh "mkdir -p _successes"
+  sh "echo 'success' >> ${success_name}"
+  archiveArtifacts(artifacts: "_successes/*",
+                   projectName: '/${JOB_NAME}')
+  echo "===> success saved /${env.JOB_NAME}: ${success_name}"
+}
+
+// runs the body if it has not previously succeeded.
+// if you don't want the success of the body to mark the
+// given name as successful, pass in save = false.
+def skipIfPreviouslySuccessful(name, save = true, body) {
+  if (hasSuccess(name)) {
+    echo "===> block already successful, skipping: ${fullSuccessName(name)}"
+  } else {
+    echo "===> running block: ${fullSuccessName(name)}"
+    body.call()
+    if (save) saveSuccess(name)
+  }
 }
 
 def build_parameters = [
@@ -46,7 +85,7 @@ def build_parameters = [
 ]
 
 pipeline {
-  agent { label 'docker' }
+  agent { label 'canvas-docker' }
 
   options {
     ansiColor('xterm')
@@ -62,13 +101,17 @@ pipeline {
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
+    CACHE_TAG = "canvas-lms:previous-image"
+    POSTGRES_CACHE_TAG = "canvas-lms:previous-postgres-image"
+    CASSANDRA_CACHE_TAG = "canvas-lms:previous-cassandra-image"
+    DYNAMODB_CACHE_TAG = "canvas-lms:previous-dynamodb-image"
   }
 
   stages {
     stage('Print Env Variables') {
       steps {
         timeout(time: 20, unit: 'SECONDS') {
-        sh 'printenv | sort'
+          sh 'printenv | sort'
         }
       }
     }
@@ -77,25 +120,30 @@ pipeline {
       steps {
         timeout(time: 3) {
           script {
-            /* send message to gerrit */
-            withGerritCredentials({ ->
-              sh '''
-                gerrit_message="\u2615 $JOB_BASE_NAME build started.\nTag: canvas-lms:$NAME\n$BUILD_URL"
-                ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
-                hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
-              '''
-            })
-
             fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
             println "Plugin list: ${gems}"
             /* fetch plugins */
-            gems.each { gem -> fetchFromGerrit(gem, 'gems/plugins') }
+            gems.each { gem ->
+              if (env.GERRIT_PROJECT == gem) {
+                /* this is the commit we're testing */
+                fetchFromGerrit(gem, 'gems/plugins', null, null, env.GERRIT_REFSPEC)
+              } else {
+                fetchFromGerrit(gem, 'gems/plugins')
+              }
+            }
             fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             sh '''
               mv gerrit_builder/canvas-lms/config/* config/
+              mv config/knapsack_rspec_report.json ./
+              rm config/cache_store.yml
               rmdir -p gerrit_builder/canvas-lms/config
               cp docker-compose/config/selenium.yml config/
+              cp -R docker-compose/config/new-jenkins config/new-jenkins
+              cp config/delayed_jobs.yml.example config/delayed_jobs.yml
+              cp config/domain.yml.example config/domain.yml
+              cp config/external_migration.yml.example config/external_migration.yml
+              cp config/outgoing_mail.yml.example config/outgoing_mail.yml
             '''
           }
         }
@@ -106,44 +154,60 @@ pipeline {
       when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' } }
       steps {
         timeout(time: 2) {
-          sh '''
-            git config user.name $GERRIT_EVENT_ACCOUNT_NAME
-            git config user.email $GERRIT_EVENT_ACCOUNT_EMAIL
+          script {
+            withGerritCredentials({ ->
+              sh '''
+                GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                  git fetch origin $GERRIT_BRANCH
 
-            # this helps current build issues where cleanup is needed before proceeding.
-            # however the later git rebase --abort should be enough once this has
-            # been on jenkins for long enough to hit all nodes, maybe a couple days?
-            if [ -d .git/rebase-merge ]; then
-              echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
-              git rebase --abort
-            fi
+                git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
+                git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
-            # store exit_status inline to  ensures the script doesn't exit here on failures
-            git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
-            if [ $exit_status != 0 ]; then
-              echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
-              git rebase --abort
-              exit $exit_status
-            fi
-          '''
+                # this helps current build issues where cleanup is needed before proceeding.
+                # however the later git rebase --abort should be enough once this has
+                # been on jenkins for long enough to hit all nodes, maybe a couple days?
+                if [ -d .git/rebase-merge ]; then
+                  echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
+                  git rebase --abort
+                  git checkout $GERRIT_REFSPEC
+                fi
+
+                # store exit_status inline to  ensures the script doesn't exit here on failures
+                git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
+                if [ $exit_status != 0 ]; then
+                  echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+                  git rebase --abort
+                  exit $exit_status
+                fi
+              '''
+            })
+          }
         }
       }
     }
 
     stage('Build Image') {
       steps {
-        timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
-          sh 'docker build -t $PATCHSET_TAG .'
+        skipIfPreviouslySuccessful("build-and-push-image", save = false) {
+          timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
+            dockerCacheLoad(image: "$CACHE_TAG")
+            sh '''
+              docker build -t $PATCHSET_TAG .
+              docker tag $PATCHSET_TAG $CACHE_TAG
+            '''
+          }
         }
       }
     }
 
     stage('Publish Patchset Image') {
       steps {
-        timeout(time: 5) {
-          // always push the patchset tag otherwise when a later
-          // patchset is merged this patchset tag is overwritten
-          sh 'docker push $PATCHSET_TAG'
+        skipIfPreviouslySuccessful("build-and-push-image") {
+          timeout(time: 5) {
+            // always push the patchset tag otherwise when a later
+            // patchset is merged this patchset tag is overwritten
+            sh 'docker push $PATCHSET_TAG'
+          }
         }
       }
     }
@@ -153,102 +217,138 @@ pipeline {
         // TODO: this is temporary until we can get some actual builds passing
         stage('Smoke Test') {
           steps {
-            timeout(time: 10) {
-              sh 'build/new-jenkins/docker-compose-build-up.sh'
-              sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-              sh 'build/new-jenkins/smoke-test.sh'
+            skipIfPreviouslySuccessful("smoke-test") {
+              timeout(time: 10) {
+                script {
+                  sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+                  def dbCommon = load 'build/new-jenkins/groovy/cache-migrations.groovy'
+                  dbCommon.createMigrateBuildUpCached()
+                  sh 'build/new-jenkins/smoke-test.sh'
+                  if (env.GERRIT_EVENT_TYPE == 'change-merged') {
+                    dbCommon.storeMigratedImages()
+                  }
+                }
+              }
             }
           }
         }
 
-        stage('Selenium Chrome') {
+        stage('Linters') {
           steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'selenium-chrome',
-              propagate: false,
-              parameters: build_parameters
-            )
+            skipIfPreviouslySuccessful("linters") {
+              build(
+                job: 'test-suites/linters',
+                propagate: false,
+                parameters: build_parameters
+              )
+            }
           }
         }
 
         stage('Vendored Gems') {
           steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'vendored-gems',
-              parameters: build_parameters
-            )
+            skipIfPreviouslySuccessful("vendored-gems") {
+              build(
+                job: 'test-suites/vendored-gems',
+                parameters: build_parameters
+              )
+            }
           }
         }
-
-        stage('Rspec') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'rspec',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Selenium Performance Chrome') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'selenium-performance-chrome',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Contract Tests') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'contract-tests',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Linters and JS') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'linters-and-js',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
-
-        stage('Xbrowser') {
-          steps {
-            // propagate set to false until we can get tests passing
-            build(
-              job: 'xbrowser',
-              propagate: false,
-              parameters: build_parameters
-            )
-          }
-        }
+/*
+ *  Don't run these on all patch sets until we have them ready to report results.
+ *  Uncomment stage to run when developing.
+ *       stage('Selenium Chrome') {
+ *         steps {
+ *           skipIfPreviouslySuccessful("selenium-chrome") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/selenium-chrome',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
+ *         }
+ *       }
+ *
+ *       stage('Rspec') {
+ *         steps {
+ *           skipIfPreviouslySuccessful("rspec") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/rspec',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
+ *         }
+ *       }
+ *
+ *       stage('Selenium Performance Chrome') {
+ *         steps {
+ *           skipIfPreviouslySuccessful("selenium-performance-chrome") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/selenium-performance-chrome',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
+ *         }
+ *       }
+ *
+ *       stage('Contract Tests') {
+ *         steps {
+ *           skipIfPreviouslySuccessful("contract-tests") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/contract-tests',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
+ *         }
+ *       }
+ *
+ *       stage('Frontend') {
+ *         steps {
+ *           skipIfPreviouslySuccessful("frontend") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/frontend',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
+ *         }
+ *       }
+ *
+ *       stage('Xbrowser') {
+ *         steps {
+ *           skipIfPreviouslySuccessful("xbrowser") {
+ *             // propagate set to false until we can get tests passing
+ *             build(
+ *               job: 'test-suites/xbrowser',
+ *               propagate: false,
+ *               parameters: build_parameters
+ *             )
+ *           }
+ *         }
+ *       }
+ */
       }
     }
 
     stage('Publish Merged Image') {
+      when { expression { env.GERRIT_EVENT_TYPE == 'change-merged' } }
       steps {
-        timeout(time: 5) {
+        timeout(time: 10) {
           script {
-            if (env.GERRIT_EVENT_TYPE == 'change-merged') {
-              sh '''
-                docker tag $PATCHSET_TAG $MERGE_TAG
-                docker push $MERGE_TAG
-              '''
-            }
+            sh '''
+              docker tag $PATCHSET_TAG $MERGE_TAG
+              docker push $MERGE_TAG
+            '''
+            dockerCacheStore(image: "$CACHE_TAG")
           }
         }
       }
@@ -256,32 +356,18 @@ pipeline {
   }
 
   post {
-    success {
+    failure {
       script {
-        withGerritCredentials({ ->
-          sh '''
-            gerrit_message="\u2713 $JOB_BASE_NAME build successful.\nTag: canvas-lms:$NAME\n$BUILD_URL"
-            ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
-              hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
-          '''
-        })
+        if ( env.GERRIT_EVENT_TYPE == 'change-merged' ) {
+          slackSend (channel: '#canvas_builds',
+            color: '#da0005',
+            message: "${env.JOB_NAME} failed on merge (<${env.BUILD_URL}|${env.BUILD_NUMBER}>)")
+        }
       }
     }
-
-    unsuccessful {
-      script {
-        withGerritCredentials({ ->
-          sh '''
-            gerrit_message="\u274C $JOB_BASE_NAME build failed.\nTag: canvas-lms:$NAME\n$BUILD_URL"
-            ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
-              hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
-          '''
-        })
-      }
-    }
-
     cleanup {
         sh 'build/new-jenkins/docker-cleanup.sh'
     }
   }
 }
+

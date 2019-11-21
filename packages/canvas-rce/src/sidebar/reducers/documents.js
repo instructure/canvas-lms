@@ -16,36 +16,53 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { REQUEST_DOCS, RECEIVE_DOCS, FAIL_DOCS } from "../actions/documents";
+import {REQUEST_DOCS, RECEIVE_DOCS, FAIL_DOCS} from '../actions/documents'
+import {CHANGE_CONTEXT} from '../actions/context'
 
 // manages the state for a specific collection. assumes the action is intended
 // for this collection (see collections.js)
-export default function documentsReducer(state = {}, action) {
+export default function documentsReducer(prevState = {}, action) {
+  const ctxt = action.payload && action.payload.contextType
+  const state = {...prevState}
+  if (ctxt && !state[ctxt]) {
+    state[ctxt] = {
+      files: [],
+      bookmark: null,
+      isLoading: false,
+      hasMore: true
+    }
+  }
   switch (action.type) {
     case REQUEST_DOCS:
-      // set loading flag to true
-      return { ...state, isLoading: true};
+      state[ctxt].isLoading = true
+      return state
 
     case RECEIVE_DOCS:
-      // add links to collection, store bookmark if more, resolve loading
-      return {
-        files: state.files.concat(action.files),
-        bookmark: action.bookmark,
+      // add to collection, store bookmark if more, resolve loading
+      state[ctxt] = {
+        files: state[ctxt].files.concat(action.payload.files),
+        bookmark: action.payload.bookmark,
         isLoading: false,
-        hasMore: !!action.bookmark
-      };
+        hasMore: !!action.payload.bookmark
+      }
+      return state
 
     case FAIL_DOCS: {
-      const overrides = {
+      state[ctxt] = {
         isLoading: false,
-        error: action.error
-      };
-      if (state.files.length == 0) {
-        overrides.bookmark = null;
+        error: action.payload.error
       }
-      return { ...state, ...overrides};
+      if (action.payload.files && action.payload.files.length === 0) {
+        state[ctxt].bookmark = null
+      }
+      return state
     }
+
+    case CHANGE_CONTEXT: {
+      return state
+    }
+
     default:
-      return state;
+      return prevState
   }
 }

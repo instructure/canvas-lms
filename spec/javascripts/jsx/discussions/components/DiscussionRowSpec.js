@@ -17,41 +17,45 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 import {merge} from 'lodash'
-import { DiscussionRow } from 'jsx/discussions/components/DiscussionRow'
+import {DiscussionRow} from 'jsx/discussions/components/DiscussionRow'
 
 QUnit.module('DiscussionRow component')
 
-const makeProps = (props = {}) => merge({
-  discussion: {
-    id: '1',
-    position: 1,
-    published: true,
-    title: 'Hello World',
-    message: 'Foo bar bar baz boop beep bop Foo',
-    posted_at: 'January 10, 2019 at 10:00 AM',
-    can_unpublish: true,
-    author: {
-      id: '5',
-      display_name: 'John Smith',
-      html_url: '',
-      avatar_image_url: null,
+const makeProps = (props = {}) =>
+  merge(
+    {
+      discussion: {
+        id: '1',
+        position: 1,
+        published: true,
+        title: 'Hello World',
+        message: 'Foo bar bar baz boop beep bop Foo',
+        posted_at: 'January 10, 2019 at 10:00 AM',
+        can_unpublish: true,
+        author: {
+          id: '5',
+          display_name: 'John Smith',
+          html_url: '',
+          avatar_image_url: null
+        },
+        read_state: 'unread',
+        unread_count: 0,
+        discussion_subentry_count: 5,
+        locked: false,
+        html_url: '',
+        user_count: 10,
+        last_reply_at: new Date(2018, 1, 14, 0, 0, 0, 0)
+      },
+      canPublish: false,
+      masterCourseData: {},
+      setCopyTo: () => {},
+      setSendToOpen: () => {},
+      DIRECT_SHARE_ENABLED: false
     },
-    read_state: 'unread',
-    unread_count: 0,
-    discussion_subentry_count: 5,
-    locked: false,
-    html_url: '',
-    user_count: 10,
-    last_reply_at: new Date(2018, 1, 14, 0, 0, 0, 0)
-  },
-  canPublish: false,
-  masterCourseData: {},
-  setCopyToOpen: () => {},
-  setSendToOpen: () => {},
-  DIRECT_SHARE_ENABLED: false
-}, props)
+    props
+  )
 
 test('renders the DiscussionRow component', () => {
   const tree = mount(<DiscussionRow {...makeProps()} />)
@@ -60,57 +64,60 @@ test('renders the DiscussionRow component', () => {
 })
 
 test('renders UnreadBadge if discussion has replies > 0', () => {
-  const discussion = { discussion_subentry_count: 5 }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {discussion_subentry_count: 5}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('UnreadBadge')
   ok(node.exists())
   tree.unmount()
 })
 
 test('renders Correct Screenreader message for locked discussions', () => {
-  const discussion = { locked: false, title: "blerp"}
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {locked: false, title: 'blerp'}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const instance = tree.instance() // Unintuitive but remember this is the message it will do not what it actually is
-  equal(instance.makeLockedSuccessFailMessages().successMessage, "Lock discussion blerp succeeded")
-  equal(instance.makeLockedSuccessFailMessages().failMessage, "Lock discussion blerp failed")
+  equal(instance.makeLockedSuccessFailMessages().successMessage, 'Lock discussion blerp succeeded')
+  equal(instance.makeLockedSuccessFailMessages().failMessage, 'Lock discussion blerp failed')
   tree.unmount()
 })
 
 test('renders Correct Screenreader message for unlocked discussions', () => {
-  const discussion = { locked: true, title: "blerp"}
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {locked: true, title: 'blerp'}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const instance = tree.instance() // Unintuitive but remember this is the message it will do not what it actually is
-  equal(instance.makeLockedSuccessFailMessages().successMessage, "Unlock discussion blerp succeeded")
-  equal(instance.makeLockedSuccessFailMessages().failMessage, "Unlock discussion blerp failed")
+  equal(
+    instance.makeLockedSuccessFailMessages().successMessage,
+    'Unlock discussion blerp succeeded'
+  )
+  equal(instance.makeLockedSuccessFailMessages().failMessage, 'Unlock discussion blerp failed')
   tree.unmount()
 })
 
 test('does not render UnreadBadge if discussion has replies == 0', () => {
-  const discussion = { discussion_subentry_count: 0 }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {discussion_subentry_count: 0}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('UnreadBadge')
   notOk(node.exists())
   tree.unmount()
 })
 
 test('renders ReadBadge if discussion is unread', () => {
-  const discussion = { read_state: "unread" }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {read_state: 'unread'}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('Badge')
   ok(node.exists())
 })
 
 test('does not render ReadBadge if discussion is read', () => {
-  const discussion = { read_state: "read" }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {read_state: 'read'}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('Badge')
   notOk(node.exists())
   tree.unmount()
 })
 
 test('renders ReadBadge if discussion has replies == 0', () => {
-  const discussion = { discussion_subentry_count: 0 }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {discussion_subentry_count: 0}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('UnreadBadge')
   notOk(node.exists())
   tree.unmount()
@@ -125,14 +132,14 @@ test('renders the subscription ToggleIcon', () => {
 })
 
 test('disables publish button when can_unpublish is false', () => {
-  const discussion = { can_unpublish: false }
+  const discussion = {can_unpublish: false}
   const tree = mount(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
   const node = tree.find('ToggleIcon .publish-button')
   strictEqual(node.props().children.props.disabled, true)
 })
 
 test('allows to publish even if you cannot unpublish', () => {
-  const discussion = { can_unpublish: false, published: false }
+  const discussion = {can_unpublish: false, published: false}
   const tree = mount(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
   const node = tree.find('ToggleIcon .publish-button')
   strictEqual(node.props().children.props.disabled, false)
@@ -146,10 +153,10 @@ test('renders the publish ToggleIcon', () => {
 })
 
 test('renders "Delayed until" date label if discussion is delayed', () => {
-  const delayedDate = new Date
+  const delayedDate = new Date()
   delayedDate.setYear(delayedDate.getFullYear() + 1)
-  const discussion = { delayed_post_at: delayedDate.toString() }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {delayed_post_at: delayedDate.toString()}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('.discussion-availability')
   ok(node.text().includes('Not available'))
   ok(node.exists())
@@ -166,18 +173,18 @@ test('renders a last reply at date', () => {
 })
 
 test('does not render last reply at date if there is none', () => {
-  const discussion = { last_reply_at: "" }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {last_reply_at: ''}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('.ic-discussion-row')
   ok(!node.text().includes('Last post at'))
   tree.unmount()
 })
 
 test('renders available until if approprate', () => {
-  const futureDate = new Date
+  const futureDate = new Date()
   futureDate.setYear(futureDate.getFullYear() + 1)
-  const discussion = { lock_at: futureDate }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {lock_at: futureDate}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('.discussion-availability')
   ok(node.exists())
   ok(node.text().includes('Available until'))
@@ -187,10 +194,10 @@ test('renders available until if approprate', () => {
 })
 
 test('renders locked at if appropriate', () => {
-  const pastDate = new Date
+  const pastDate = new Date()
   pastDate.setYear(pastDate.getFullYear() - 1)
-  const discussion = { lock_at: pastDate }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {lock_at: pastDate}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('.discussion-availability')
   ok(node.exists())
   ok(node.text().includes('Was locked at'))
@@ -214,7 +221,7 @@ test('renders due date if graded with a due date', () => {
   const props = makeProps({
     discussion: {
       assignment: {
-        due_at: '2018-07-01T05:59:00Z',
+        due_at: '2018-07-01T05:59:00Z'
       }
     }
   })
@@ -228,7 +235,7 @@ test('renders due date if graded with a due date', () => {
 test('renders to do date if ungraded with a to do date', () => {
   const props = makeProps({
     discussion: {
-      todo_date: '2018-07-01T05:59:00Z',
+      todo_date: '2018-07-01T05:59:00Z'
     }
   })
   const tree = mount(<DiscussionRow {...props} />)
@@ -247,93 +254,111 @@ test('renders neither a due or to do date if neither are available', () => {
 })
 
 test('renders the SectionsTooltip component', () => {
-  const discussion = { user_count: 200 }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
-  equal(tree.find('SectionsTooltip Text').text(), 'All Sections')
+  const discussion = {user_count: 200}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
+  equal(
+    tree
+      .find('SectionsTooltip Text')
+      .at(0)
+      .text(),
+    'All Sections'
+  )
   tree.unmount()
 })
 
 test('renders the SectionsTooltip component with sections', () => {
-  const discussion = { sections: [
-    { "id": 6, "course_id": 1, "name": "section 4", "user_count": 2 },
-    { "id": 5, "course_id": 1, "name": "section 2", "user_count": 1 }
-  ]}
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
-  equal(tree.find('SectionsTooltip Text').text(), '2 Sectionssection 4section 2')
+  const discussion = {
+    sections: [
+      {id: 6, course_id: 1, name: 'section 4', user_count: 2},
+      {id: 5, course_id: 1, name: 'section 2', user_count: 1}
+    ]
+  }
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
+  equal(
+    tree
+      .find('SectionsTooltip Text')
+      .at(0)
+      .text(),
+    '2 Sectionssection 4section 2'
+  )
   tree.unmount()
 })
 
 test('does not render the SectionsTooltip component on a graded discussion', () => {
-  const discussion = { user_count: 200, assignment: true }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {user_count: 200, assignment: true}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('SectionsTooltip')
   notOk(node.exists())
   tree.unmount()
 })
 
 test('does not render the SectionsTooltip component on a group discussion', () => {
-  const discussion = { user_count: 200, group_category_id: 13 }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion })} />)
+  const discussion = {user_count: 200, group_category_id: 13}
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('SectionsTooltip')
   notOk(node.exists())
 })
 
 test('does not render the SectionsTooltip component within a group context', () => {
-  const discussion = { user_count: 200 }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion, contextType: "group" })} />)
+  const discussion = {user_count: 200}
+  const tree = mount(<DiscussionRow {...makeProps({discussion, contextType: 'group'})} />)
   const node = tree.find('SectionsTooltip')
   notOk(node.exists())
   tree.unmount()
 })
 
 test('does not render the SectionsTooltip component in a blueprint course', () => {
-  const discussion = { user_count: 200 }
-  const tree = mount(<DiscussionRow {...makeProps({ discussion, isMasterCourse: true})} />)
+  const discussion = {user_count: 200}
+  const tree = mount(<DiscussionRow {...makeProps({discussion, isMasterCourse: true})} />)
   const node = tree.find('SectionsTooltip')
   notOk(node.exists())
   tree.unmount()
 })
 
-test('does not render master course lock icon if masterCourseData is not provided', (assert) => {
+test('does not render master course lock icon if masterCourseData is not provided', assert => {
   const masterCourseData = null
-  const rowRef = (row) => {
+  const rowRef = row => {
     notOk(row.masterCourseLock)
     done()
   }
-  const tree = mount(<DiscussionRow {...makeProps({ masterCourseData, rowRef })} />)
+  const tree = mount(<DiscussionRow {...makeProps({masterCourseData, rowRef})} />)
   notOk(tree.instance().masterCourseLock)
 })
 
-test('renders master course lock icon if masterCourseData is provided', (assert) => {
-  const masterCourseData = { isMasterCourse: true, masterCourse: { id: '1' } }
-  const rowRef = (row) => {
+test('renders master course lock icon if masterCourseData is provided', assert => {
+  const masterCourseData = {isMasterCourse: true, masterCourse: {id: '1'}}
+  const rowRef = row => {
     ok(row.masterCourseLock)
     done()
   }
-  const tree = mount(<DiscussionRow {...makeProps({ masterCourseData, rowRef })} />)
+  const tree = mount(<DiscussionRow {...makeProps({masterCourseData, rowRef})} />)
   ok(tree.instance().masterCourseLock)
   tree.unmount()
 })
 
 test('renders drag icon', () => {
   const tree = mount(<DiscussionRow {...makeProps({draggable: true})} />)
-  const node = tree.find('IconDragHandle')
+  const node = tree.find('IconDragHandleLine')
   ok(node.exists())
   tree.unmount()
 })
 
 test('does not render manage menu if not permitted', () => {
-  const tree = mount(<DiscussionRow {...makeProps({ displayManageMenu: false })} />)
+  const tree = mount(<DiscussionRow {...makeProps({displayManageMenu: false})} />)
   const node = tree.find('DiscussionManageMenu')
   notOk(node.exists())
   tree.unmount()
 })
 
 test('does not insert the manage menu list if we have not clicked it yet', () => {
-  const tree = mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    onMoveDiscussion: ()=>{}
-  })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        onMoveDiscussion: () => {}
+      })}
+    />
+  )
   // We still should show the menu thingy itself
   const menuNode = tree.find('DiscussionManageMenu')
   ok(menuNode.exists())
@@ -346,10 +371,14 @@ test('does not insert the manage menu list if we have not clicked it yet', () =>
 })
 
 test('manage menu items do appear upon click', () => {
-  const tree = mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    onMoveDiscussion: ()=>{}
-  })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        onMoveDiscussion: () => {}
+      })}
+    />
+  )
   const menuNode = tree.find('DiscussionManageMenu')
   ok(menuNode.exists())
   menuNode.find('button').simulate('click')
@@ -390,7 +419,7 @@ test('opens the copyTo tray when menu item is selected', () => {
   const props = makeProps({
     displayManageMenu: true,
     DIRECT_SHARE_ENABLED: true,
-    setCopyToOpen: copySpy,
+    setCopyTo: copySpy
   })
   const tree = mount(<DiscussionRow {...props} />)
   tree
@@ -398,7 +427,10 @@ test('opens the copyTo tray when menu item is selected', () => {
     .find('button')
     .simulate('click')
   document.querySelector('#copyTo-discussion-menu-option').click()
-  ok(copySpy.calledOnce)
+  deepEqual(copySpy.firstCall.args[0], {
+    open: true,
+    selection: {discussion_topics: [props.discussion.id]}
+  })
   tree.unmount()
 })
 
@@ -407,7 +439,7 @@ test('opens the sendTo tray when menu item is selected', () => {
   const props = makeProps({
     displayManageMenu: true,
     DIRECT_SHARE_ENABLED: true,
-    setSendToOpen: sendSpy
+    setSendTo: sendSpy
   })
   const tree = mount(<DiscussionRow {...props} />)
   tree
@@ -415,7 +447,13 @@ test('opens the sendTo tray when menu item is selected', () => {
     .find('button')
     .simulate('click')
   document.querySelector('#sendTo-discussion-menu-option').click()
-  ok(sendSpy.calledOnce)
+  deepEqual(sendSpy.firstCall.args[0], {
+    open: true,
+    selection: {
+      content_type: 'discussion_topic',
+      content_id: props.discussion.id
+    }
+  })
   tree.unmount()
 })
 
@@ -461,88 +499,134 @@ test('renders available date and delayed date on graded discussions', () => {
 })
 
 test('renders move-to in manage menu if permitted', () => {
-  const tree = mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    onMoveDiscussion: ()=>{}
-   })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        onMoveDiscussion: () => {}
+      })}
+    />
+  )
   const manageMenu = tree.find('DiscussionManageMenu')
-  const allKeys = manageMenu.props().menuOptions().map((option) => option.key)
+  const allKeys = manageMenu
+    .props()
+    .menuOptions()
+    .map(option => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'moveTo')
   tree.unmount()
 })
 
 test('renders pin item in manage menu if permitted', () => {
-  const tree = mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    displayPinMenuItem: true
-   })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        displayPinMenuItem: true
+      })}
+    />
+  )
   const manageMenu = tree.find('DiscussionManageMenu')
-  const allKeys = manageMenu.props().menuOptions().map((option) => option.key)
+  const allKeys = manageMenu
+    .props()
+    .menuOptions()
+    .map(option => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'togglepinned')
   tree.unmount()
 })
 
 test('renders duplicate item in manage menu if permitted', () => {
-  const tree = mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    displayDuplicateMenuItem: true
-   })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        displayDuplicateMenuItem: true
+      })}
+    />
+  )
   const manageMenu = tree.find('DiscussionManageMenu')
-  const allKeys = manageMenu.props().menuOptions().map((option) => option.key)
+  const allKeys = manageMenu
+    .props()
+    .menuOptions()
+    .map(option => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'duplicate')
   tree.unmount()
 })
 
 test('renders delete item in manage menu if permitted', () => {
-  const tree = mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    displayDeleteMenuItem: true
-   })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        displayDeleteMenuItem: true
+      })}
+    />
+  )
   const manageMenu = tree.find('DiscussionManageMenu')
-  const allKeys = manageMenu.props().menuOptions().map((option) => option.key)
+  const allKeys = manageMenu
+    .props()
+    .menuOptions()
+    .map(option => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'delete')
   tree.unmount()
 })
 
 test('renders lock item in manage menu if permitted', () => {
-  const tree = mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    displayLockMenuItem: true
-   })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        displayLockMenuItem: true
+      })}
+    />
+  )
   const manageMenu = tree.find('DiscussionManageMenu')
-  const allKeys = manageMenu.props().menuOptions().map((option) => option.key)
+  const allKeys = manageMenu
+    .props()
+    .menuOptions()
+    .map(option => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'togglelocked')
   tree.unmount()
 })
 
 test('renders mastery paths menu item if permitted', () => {
-  const tree=mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    discussion: {
-      assignment_id: 2
-    },
-    displayMasteryPathsMenuItem: true
-  })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        discussion: {
+          assignment_id: 2
+        },
+        displayMasteryPathsMenuItem: true
+      })}
+    />
+  )
   const manageMenu = tree.find('DiscussionManageMenu')
-  const allKeys = manageMenu.props().menuOptions().map((option) => option.key)
+  const allKeys = manageMenu
+    .props()
+    .menuOptions()
+    .map(option => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'masterypaths')
   tree.unmount()
 })
 
 test('renders mastery paths link if permitted', () => {
-  const tree=mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    discussion: {
-      assignment_id: 2
-    },
-    displayMasteryPathsLink: true
-  })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        discussion: {
+          assignment_id: 2
+        },
+        displayMasteryPathsLink: true
+      })}
+    />
+  )
   const node = tree.find('.discussion-index-mastery-paths-link')
   ok(node.exists())
   ok(node.text().includes('Mastery Paths'))
@@ -550,42 +634,58 @@ test('renders mastery paths link if permitted', () => {
 })
 
 test('renders ltiTool menu if there are some', () => {
-  const tree=mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    discussionTopicMenuTools:[{
-      base_url: "test.com",
-      canvas_icon_class: "icon-lti",
-      icon_url: "iconUrltest.com",
-      title: "discussion_topic_menu Text",
-    }]
-  })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        discussionTopicMenuTools: [
+          {
+            base_url: 'test.com',
+            canvas_icon_class: 'icon-lti',
+            icon_url: 'iconUrltest.com',
+            title: 'discussion_topic_menu Text'
+          }
+        ]
+      })}
+    />
+  )
   const manageMenu = tree.find('DiscussionManageMenu')
-  const allKeys = manageMenu.props().menuOptions().map((option) => option.key)
+  const allKeys = manageMenu
+    .props()
+    .menuOptions()
+    .map(option => option.key)
   equal(allKeys.length, 1)
   equal(allKeys[0], 'test.com')
   tree.unmount()
 })
 
 test('renders multiple ltiTool menu if there are multiple', () => {
-  const tree=mount(<DiscussionRow {...makeProps({
-    displayManageMenu: true,
-    discussionTopicMenuTools:[
-      {
-        base_url: "test.com",
-        canvas_icon_class: "icon-lti",
-        icon_url: "iconUrltest.com",
-        title: "discussion_topic_menu Text",
-      },
-      {
-        base_url: "test2.com",
-        canvas_icon_class: "icon-lti",
-        icon_url: "iconUrltest2.com",
-        title: "discussion_topic_menu otherText",
-      }
-    ]
-  })} />)
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        discussionTopicMenuTools: [
+          {
+            base_url: 'test.com',
+            canvas_icon_class: 'icon-lti',
+            icon_url: 'iconUrltest.com',
+            title: 'discussion_topic_menu Text'
+          },
+          {
+            base_url: 'test2.com',
+            canvas_icon_class: 'icon-lti',
+            icon_url: 'iconUrltest2.com',
+            title: 'discussion_topic_menu otherText'
+          }
+        ]
+      })}
+    />
+  )
   const manageMenu = tree.find('DiscussionManageMenu')
-  const allKeys = manageMenu.props().menuOptions().map((option) => option.key)
+  const allKeys = manageMenu
+    .props()
+    .menuOptions()
+    .map(option => option.key)
   equal(allKeys.length, 2)
   equal(allKeys[1], 'test2.com')
   tree.unmount()

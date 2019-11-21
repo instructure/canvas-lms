@@ -21,7 +21,6 @@ import SisValidationHelper from 'compiled/util/SisValidationHelper'
 import Backbone from 'Backbone'
 
 class AssignmentStub extends Backbone.Model {
-
   postToSIS = postToSisBoolean => {
     if (typeof postToSisBoolean === 'undefined') {
       return this.get('post_to_sis')

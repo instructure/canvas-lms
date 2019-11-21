@@ -15,23 +15,30 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import Avatar from '@instructure/ui-elements/lib/components/Avatar'
-import {Badge} from '@instructure/ui-elements'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+import {Avatar, Badge, Text} from '@instructure/ui-elements'
+import {Button} from '@instructure/ui-buttons'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 import {getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {SubmissionComment} from '../../graphqlData/SubmissionComment'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import {VideoPlayer} from '@instructure/ui-media-player'
 
 function CommentRow(props) {
   const {author, mediaObject, read} = props.comment
+  let mediaTracks = null
   if (mediaObject) {
     mediaObject.mediaSources.forEach(mediaSource => {
       mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
+    })
+    mediaTracks = mediaObject?.mediaTracks.map(track => {
+      return {
+        src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
+        label: track.locale,
+        type: track.kind,
+        language: track.locale
+      }
     })
   }
   return (
@@ -73,27 +80,7 @@ function CommentRow(props) {
             {attachment.displayName}
           </Button>
         ))}
-        {mediaObject && (
-          <VideoPlayer
-            tracks={[
-              {
-                src:
-                  'http://localhost:3000/media_objects/m-2bpCURwK6FnmB6kJzeuuF1PuboAraKdc/media_tracks/7',
-                label: 'en',
-                type: 'subtitles',
-                language: 'en'
-              },
-              {
-                src:
-                  'http://localhost:3000/media_objects/m-2bpCURwK6FnmB6kJzeuuF1PuboAraKdc/media_tracks/7',
-                label: 'fr',
-                type: 'subtitles',
-                language: 'fr'
-              }
-            ]}
-            sources={mediaObject.mediaSources}
-          />
-        )}
+        {mediaObject && <VideoPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />}
       </div>
     </div>
   )

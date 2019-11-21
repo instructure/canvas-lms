@@ -364,6 +364,13 @@ class DiscussionEntry < ActiveRecord::Base
   def create_participants
     self.class.connection.after_transaction_commit do
       scope = DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id)
+      if self.discussion_topic.root_topic?
+        group_ids = self.discussion_topic.group_category.groups.active.pluck(:id)
+        scope = scope.where("NOT EXISTS (?)",
+          GroupMembership.where("group_memberships.workflow_state <> 'deleted' AND
+            group_memberships.user_id=discussion_topic_participants.user_id AND
+            group_memberships.group_id IN (?)", group_ids))
+      end
       scope = scope.where("user_id<>?", self.user) if self.user
       scope.update_all("unread_entry_count = unread_entry_count + 1")
 

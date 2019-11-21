@@ -20,10 +20,10 @@ import I18n from 'i18n!announcements_v2'
 import React from 'react'
 import {bool} from 'prop-types'
 
-import View from '@instructure/ui-layout/lib/components/View'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-layout'
+import {Heading, Text} from '@instructure/ui-elements'
+import {PresentationContent} from '@instructure/ui-a11y'
+
 import AnnouncementHornSVGURL from '../../../../public/images/announcements/announcements-airhorn.svg'
 
 const AnnouncementEmptyState = props => (

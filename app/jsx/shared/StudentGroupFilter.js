@@ -17,7 +17,7 @@
  */
 
 import {arrayOf, func, shape, string} from 'prop-types'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
+import {FormField} from '@instructure/ui-form-field'
 import I18n from 'i18n!assignment'
 import React from 'react'
 
@@ -41,35 +41,37 @@ function StudentGroupFilter(props) {
   return (
     <FormField id="student-group-filter" label={props.label}>
       <select
-        onChange={(event) => {props.onChange(event.target.value)}}
+        onChange={event => {
+          props.onChange(event.target.value)
+        }}
         style={{
           margin: '0',
           width: '100%'
         }}
-        value={props.value || "0"}
+        value={props.value || '0'}
       >
         <option aria-disabled="true" disabled="disabled" key="0" value="0">
           {I18n.t('Select One')}
         </option>
-        {
-          props.categories.map(category => (
-            renderCategoryAndChildren(category)
-          ))
-        }
+        {props.categories.map(category => renderCategoryAndChildren(category))}
       </select>
     </FormField>
   )
 }
 
 StudentGroupFilter.propTypes = {
-  categories: arrayOf(shape({
-    id: string.isRequired,
-    groups: arrayOf(shape({
+  categories: arrayOf(
+    shape({
       id: string.isRequired,
+      groups: arrayOf(
+        shape({
+          id: string.isRequired,
+          name: string.isRequired
+        })
+      ),
       name: string.isRequired
-    })),
-    name: string.isRequired
-  })),
+    })
+  ),
   label: string.isRequired,
   onChange: func.isRequired,
   value: string

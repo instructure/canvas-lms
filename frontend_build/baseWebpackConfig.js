@@ -56,16 +56,17 @@ module.exports = {
     // This just reflects how big the 'main' entry is at the time of writing. Every
     // time we get it smaller we should change this to the new smaller number so it
     // only goes down over time instead of growing bigger over time
-    maxEntrypointSize: 990000,
+    maxEntrypointSize: 1200000,
     // This is how big our biggest js bundles are at the time of writing. We should
     // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
     // tracking them too. Then, as we work to get all chunks smaller, we should change
     // this number to the size of our biggest known asset and hopefully someday get
     // to where they are all under the default value of 250000 and then remove this
-    maxAssetSize: 1500000,
+    maxAssetSize: 1200000,
     assetFilter: assetFilename => {
       const thingsWeKnowAreWayTooBig = [
         'canvas-rce-async-chunk',
+        'canvas-rce-old-async-chunk',
         'permissions_index',
         'gradezilla',
         'screenreader_gradebook',
@@ -81,6 +82,7 @@ module.exports = {
     }
   },
   optimization: {
+    // concatenateModules: false, // uncomment if you want to get more accurate stuff from `yarn webpack:analyze`
     moduleIds: 'hashed',
     minimizer: [
       new TerserPlugin({
@@ -168,7 +170,9 @@ module.exports = {
       // it is a change that was backported and is fixed in instUI 6
       // the file is the same as the on published to npm but we added a
       // `require('newless')` to make it work
-      '@instructure/ui-themeable/lib$': path.resolve(__dirname, '../app/jsx/@instructure/ui-themeable/lib/themeable.js'),
+      './themeable$': path.resolve(__dirname, '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'),
+      '../themeable$': path.resolve(__dirname, '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'),
+      '@instructure/ui-themeable/es/themeable$': path.resolve(__dirname, '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'),
 
       'node_modules-version-of-backbone': require.resolve('backbone'),
       'node_modules-version-of-react-modal': require.resolve('react-modal'),
@@ -295,7 +299,8 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: null,
       DEPRECATION_SENTRY_DSN: null,
-      GIT_COMMIT: null
+      GIT_COMMIT: null,
+      ALWAYS_APPEND_UI_TESTABLE_LOCATORS: null
     }),
 
     // Only include timezone data starting from 2011 (canvaseption) to 15 years from now,

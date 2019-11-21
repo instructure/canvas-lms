@@ -240,6 +240,9 @@ class RubricAssociation < ActiveRecord::Base
       update_if_existing: update_if_existing
     )
     association.rubric = rubric
+    if association.rubric_id_changed? && association_object.is_a?(Assignment)
+      association_object.mark_downstream_changes(["rubric"])
+    end
     association.context = context
     association.skip_updating_points_possible = params.delete :skip_updating_points_possible
     association.update_attributes(params)

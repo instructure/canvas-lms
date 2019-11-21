@@ -117,7 +117,7 @@ class Feature
   #     after_state_change_proc:  ->(user, context, old_state, new_state) { ... }
   #   }
   VALID_STATES = %w(on allowed hidden disabled).freeze
-  VALID_APPLIES_TO = %w(Course Account RootAccount User).freeze
+  VALID_APPLIES_TO = %w(Course Account RootAccount User SiteAdmin).freeze
   VALID_ENVS = %i(development ci beta test production).freeze
 
   DISABLED_FEATURE = Feature.new.freeze
@@ -162,6 +162,8 @@ class Feature
 
   def applies_to_object(object)
     case @applies_to
+    when 'SiteAdmin'
+      object.is_a?(Account) && object.site_admin?
     when 'RootAccount'
       object.is_a?(Account) && object.root_account?
     when 'Account'
@@ -188,6 +190,7 @@ class Feature
       applicable_types << 'Course'
       applicable_types << 'RootAccount' if object.root_account?
       applicable_types << 'User' if object.site_admin?
+      applicable_types << 'SiteAdmin' if object.site_admin?
     elsif object.is_a?(Course)
       applicable_types << 'Course'
     elsif object.is_a?(User)
@@ -200,8 +203,8 @@ class Feature
     valid_states = %w(off on)
     valid_states << 'allowed' if context.is_a?(Account)
     (valid_states - [orig_state]).inject({}) do |transitions, state|
-      transitions[state] = { 'locked' => (state == 'allowed' && @applies_to == 'RootAccount' &&
-        context.is_a?(Account) && context.root_account? && !context.site_admin?) }
+      transitions[state] = { 'locked' => (state == 'allowed' && (@applies_to == 'RootAccount' &&
+        context.is_a?(Account) && context.root_account? && !context.site_admin? || @applies_to == "SiteAdmin")) }
       transitions
     end
   end

@@ -6,6 +6,9 @@
         "name": "Node",
         "possibleTypes": [
           {
+            "name": "Account"
+          },
+          {
             "name": "Assignment"
           },
           {
@@ -57,10 +60,124 @@
             "name": "Quiz"
           },
           {
+            "name": "Rubric"
+          },
+          {
             "name": "Section"
           },
           {
             "name": "Submission"
+          },
+          {
+            "name": "Term"
+          },
+          {
+            "name": "User"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "LegacyIDInterface",
+        "possibleTypes": [
+          {
+            "name": "Account"
+          },
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "AssignmentGroup"
+          },
+          {
+            "name": "AssignmentOverride"
+          },
+          {
+            "name": "Course"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "Enrollment"
+          },
+          {
+            "name": "ExternalTool"
+          },
+          {
+            "name": "ExternalUrl"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "GradingPeriod"
+          },
+          {
+            "name": "Group"
+          },
+          {
+            "name": "GroupMembership"
+          },
+          {
+            "name": "GroupSet"
+          },
+          {
+            "name": "MediaTrack"
+          },
+          {
+            "name": "Module"
+          },
+          {
+            "name": "ModuleExternalTool"
+          },
+          {
+            "name": "ModuleItem"
+          },
+          {
+            "name": "Outcome"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "PostPolicy"
+          },
+          {
+            "name": "ProficiencyRating"
+          },
+          {
+            "name": "Progress"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Rubric"
+          },
+          {
+            "name": "RubricAssessment"
+          },
+          {
+            "name": "RubricAssociation"
+          },
+          {
+            "name": "RubricCriterion"
+          },
+          {
+            "name": "RubricRating"
+          },
+          {
+            "name": "Section"
+          },
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "SubmissionComment"
+          },
+          {
+            "name": "SubmissionDraft"
           },
           {
             "name": "Term"
@@ -235,6 +352,18 @@
           },
           {
             "name": "SubmissionHistory"
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
+        "name": "TurnitinContext",
+        "possibleTypes": [
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "File"
           }
         ]
       },

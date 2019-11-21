@@ -36,14 +36,19 @@ describe ExternalContentController do
     it "js env is set correctly" do
 
       c = course_factory
-      post(:success, params: {service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
-           lti_version: 'LTI-1p0',
-           data: '',
-           content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')),
-           lti_msg: '',
-           lti_log: '',
-           lti_errormsg: '',
-           lti_errorlog: ''})
+      params = {
+        service: 'external_tool_dialog',
+        course_id: c.id,
+        lti_message_type: 'ContentItemSelection',
+        lti_version: 'LTI-1p0',
+        data: '',
+        content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')),
+        lti_msg: 'some lti message',
+        lti_log: 'some lti log',
+        lti_errormsg: 'some lti error message',
+        lti_errorlog: 'some lti error log'
+      }
+      post(:success, params: params)
 
       data = controller.js_env[:retrieved_data]
       expect(data).to_not be_nil
@@ -65,21 +70,12 @@ describe ExternalContentController do
       e = "external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti"
       expect(data.first.canvas_url).to end_with(e)
 
-    end
-
-    it 'renders the deep_linking_response template if assignments_2 is enabled' do
-      Account.default.enable_feature!(:assignments_2)
-
-      c = course_factory
-      post(:success, params: {service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
-           lti_version: 'LTI-1p0',
-           data: '',
-           content_items: File.read(Rails.root.join('spec', 'fixtures', 'lti', 'content_items.json')),
-           lti_msg: '',
-           lti_log: '',
-           lti_errormsg: '',
-           lti_errorlog: ''})
-      expect(response).to render_template('lti/ims/deep_linking/deep_linking_response')
+      env = controller.js_env
+      expect(env[:service]).to eq(params[:service])
+      expect(env[:message]).to eq(params[:lti_msg])
+      expect(env[:log]).to eq(params[:lti_log])
+      expect(env[:error_message]).to eq(params[:lti_errormsg])
+      expect(env[:error_log]).to eq(params[:lti_errorlog])
     end
 
     context 'external_tool service_id' do

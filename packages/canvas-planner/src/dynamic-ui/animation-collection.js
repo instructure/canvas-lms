@@ -26,120 +26,94 @@ import {
   FocusPriorItemOnDelete,
   ReturnFocusOnCancelEditing,
   // SetDismissedOpportunityFocus,
-
   ScrollToToday,
   ScrollToLoadedToday
-} from './animations';
+} from './animations'
 
 export class AnimationCollection {
   static actionsToAnimations = [
     {
-      expected: [
-        'CONTINUE_LOADING_INITIAL_ITEMS',
-        'START_LOADING_FUTURE_SAGA',
-        'GOT_DAYS_SUCCESS',
-      ],
-      animation: ContinueInitialLoad,
+      expected: ['CONTINUE_LOADING_INITIAL_ITEMS', 'START_LOADING_FUTURE_SAGA', 'GOT_DAYS_SUCCESS'],
+      animation: ContinueInitialLoad
     },
     {
-      expected: [
-        'SCROLL_TO_NEW_ACTIVITY',
-      ],
-      animation: ScrollToNewActivity,
+      expected: ['SCROLL_TO_NEW_ACTIVITY'],
+      animation: ScrollToNewActivity
     },
     {
-      expected: [
-        'START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA',
-        'GOT_DAYS_SUCCESS',
-      ],
+      expected: ['START_LOADING_PAST_UNTIL_NEW_ACTIVITY_SAGA', 'GOT_DAYS_SUCCESS'],
       animation: ScrollToLastLoadedNewActivity
     },
     {
-      expected: [
-        'SCROLL_INTO_PAST',
-        'START_LOADING_PAST_SAGA',
-        'GOT_DAYS_SUCCESS',
-      ],
-      animation: MaintainScrollPositionWhenScrollingIntoThePast,
+      expected: ['SCROLL_INTO_PAST', 'START_LOADING_PAST_SAGA', 'GOT_DAYS_SUCCESS'],
+      animation: MaintainScrollPositionWhenScrollingIntoThePast
     },
     {
       expected: [
         'GETTING_FUTURE_ITEMS', // checks if the load more button was initiator of this action
-        'GOT_DAYS_SUCCESS',
+        'GOT_DAYS_SUCCESS'
       ],
-      animation: FocusPriorItemOnLoadMore,
+      animation: FocusPriorItemOnLoadMore
     },
     {
-      expected: [
-        'SAVED_PLANNER_ITEM',
-      ],
-      animation: FocusItemOnSave,
+      expected: ['SAVED_PLANNER_ITEM'],
+      animation: FocusItemOnSave
     },
     {
-      expected: [
-        'OPEN_EDITING_PLANNER_ITEM',
-        'CANCELED_EDITING_PLANNER_ITEM',
-      ],
-      animation: ReturnFocusOnCancelEditing,
+      expected: ['OPEN_EDITING_PLANNER_ITEM', 'CANCELED_EDITING_PLANNER_ITEM'],
+      animation: ReturnFocusOnCancelEditing
     },
     {
-      expected: [
-        'DELETED_PLANNER_ITEM',
-      ],
-      animation: FocusPriorItemOnDelete,
+      expected: ['DELETED_PLANNER_ITEM'],
+      animation: FocusPriorItemOnDelete
     },
-
 
     // animations for the future. no, the format doesn't match.
     // [['DISMISSED_OPPORTUNITY',
     // ], SetDismissedOpportunityFocus],
 
     {
-      expected: [
-        'SCROLL_TO_TODAY',
-      ],
-      animation: ScrollToToday,
+      expected: ['SCROLL_TO_TODAY'],
+      animation: ScrollToToday
     },
     {
-      expected: [
-        'START_LOADING_PAST_UNTIL_TODAY_SAGA',
-        'GOT_DAYS_SUCCESS',
-      ],
+      expected: ['START_LOADING_PAST_UNTIL_TODAY_SAGA', 'GOT_DAYS_SUCCESS'],
       animation: ScrollToLoadedToday
     }
   ]
 
-  constructor (manager, actionsToAnimations) {
+  constructor(manager, actionsToAnimations) {
     actionsToAnimations.forEach(({expected: expectedEvents, animation: AnimationClass}) => {
-      this.animations.push(new AnimationClass(expectedEvents, manager));
-    });
+      this.animations.push(new AnimationClass(expectedEvents, manager))
+    })
   }
+
   animations = []
 
-  static expectedActionsFor (animationClass) {
+  static expectedActionsFor(animationClass) {
     const mapping = AnimationCollection.actionsToAnimations.find(entry => {
-      return entry.animation === animationClass;
-    });
-    return mapping.expected;
+      return entry.animation === animationClass
+    })
+    return mapping.expected
   }
 
-  acceptAction (action) {
+  acceptAction(action) {
     this.animations.forEach(animation => {
-      animation.acceptAction(action);
-    });
+      animation.acceptAction(action)
+    })
   }
 
-  uiWillUpdate () {
+  uiWillUpdate() {
     this.animations.forEach(animation => {
-      if (animation.isReady()) animation.invokeUiWillUpdate();
-    });
+      if (animation.isReady()) animation.invokeUiWillUpdate()
+    })
   }
 
-  uiDidUpdate () {
+  uiDidUpdate() {
     this.animations.forEach(animation => {
       if (animation.isReady()) {
-        animation.invokeUiDidUpdate();
+        animation.invokeUiDidUpdate()
       }
-    });
+    })
   }
 }

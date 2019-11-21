@@ -20,12 +20,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!shared_message_students'
 import axios from 'axios'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import Modal, {ModalBody, ModalFooter} from './components/InstuiModal'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
+import {Button} from '@instructure/ui-buttons'
+import {TextArea} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
+import Modal from './components/InstuiModal'
+import {FormField} from '@instructure/ui-form-field'
+import {Alert} from '@instructure/ui-alerts'
 
 class MessageStudents extends React.Component {
   static propTypes = {
@@ -215,7 +215,7 @@ class MessageStudents extends React.Component {
         <div className="MessageStudents__Alert">
           <Alert
             variant={variant}
-            closeButtonLabel={I18n.t('Close')}
+            renderCloseButtonLabel={I18n.t('Close')}
             onDismiss={this.handleAlertClose}
             transition="none"
           >
@@ -254,7 +254,7 @@ class MessageStudents extends React.Component {
           size="medium"
           onExited={this.props.onExited}
         >
-          <ModalBody>
+          <Modal.Body>
             {this.renderAlert(
               I18n.t('Your message was sent!'),
               'success',
@@ -280,11 +280,11 @@ class MessageStudents extends React.Component {
               </div>
               <div className="MessageStudents__FormField">
                 <TextInput
-                  label={I18n.t('Subject')}
+                  renderLabel={I18n.t('Subject')}
                   defaultValue={this.props.subject}
                   onChange={onTextChange('subject')}
                   messages={this.errorMessagesFor('subject')}
-                  disabled={this.state.sending || this.state.success}
+                  interaction={this.state.sending || this.state.success ? 'disabled' : 'enabled'}
                 />
               </div>
               <div className="MessageStudents__FormField">
@@ -297,8 +297,8 @@ class MessageStudents extends React.Component {
                 />
               </div>
             </form>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <Button disabled={this.state.sending || this.state.success} onClick={this.handleClose}>
               {I18n.t('Close')}
             </Button>
@@ -310,7 +310,7 @@ class MessageStudents extends React.Component {
             >
               {I18n.t('Send Message')}
             </Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </div>
     )

@@ -1411,21 +1411,27 @@ describe MasterCourses::MasterMigration do
       @copy_to2.update_attribute(:syllabus_body, child_syllabus1)
 
       master_syllabus1 = "<p>some original syllabus</p>"
-      @copy_from.update_attribute(:syllabus_body, master_syllabus1)
-      run_master_migration
-      expect(@copy_to1.reload.syllabus_body).to eq master_syllabus1 # use the master syllabus
-      expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1 # keep the existing one
+      Timecop.freeze(1.minute.from_now) do
+        @copy_from.update_attribute(:syllabus_body, master_syllabus1)
+        run_master_migration
+        expect(@copy_to1.reload.syllabus_body).to eq master_syllabus1 # use the master syllabus
+        expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1 # keep the existing one
+      end
 
       master_syllabus2 = "<p>some new syllabus</p>"
-      @copy_from.update_attribute(:syllabus_body, master_syllabus2)
-      run_master_migration
-      expect(@copy_to1.reload.syllabus_body).to eq master_syllabus2 # keep syncing
-      expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1
+      Timecop.freeze(2.minutes.from_now) do
+        @copy_from.update_attribute(:syllabus_body, master_syllabus2)
+        run_master_migration
+        expect(@copy_to1.reload.syllabus_body).to eq master_syllabus2 # keep syncing
+        expect(@copy_to2.reload.syllabus_body).to eq child_syllabus1
+      end
 
       child_syllabus2 = "<p>syllabus is a weird word</p>"
-      @copy_to1.update_attribute(:syllabus_body, child_syllabus2)
-      run_master_migration
-      expect(@copy_to1.reload.syllabus_body).to eq child_syllabus2 # preserve the downstream change
+      Timecop.freeze(3.minutes.from_now) do
+        @copy_to1.update_attribute(:syllabus_body, child_syllabus2)
+        run_master_migration
+        expect(@copy_to1.reload.syllabus_body).to eq child_syllabus2 # preserve the downstream change
+      end
     end
 
     it "should trigger folder locking data cache invalidation" do
@@ -1529,6 +1535,39 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
       expect(@copy_to2.discussion_topics.first).to be_present
+    end
+
+    it "should be able to unset group discussions (unless posted to already)" do
+      @copy_to1 = course_factory
+      @copy_to2 = course_factory(:active_all => true)
+      sub1 = @template.add_child_course!(@copy_to1)
+      sub2 = @template.add_child_course!(@copy_to2)
+
+      group_category = @copy_from.group_categories.create!(:name => 'a set')
+      topic = @copy_from.discussion_topics.create!(:title => "a group dis", :group_category => group_category)
+
+      run_master_migration
+
+      topic_to1 = @copy_to1.discussion_topics.where(:migration_id => mig_id(topic)).first
+      topic_to2 = @copy_to2.discussion_topics.where(:migration_id => mig_id(topic)).first
+      [topic_to1, topic_to2].each do |topic_to|
+        expect(topic_to.group_category).to be_present
+      end
+
+      student_in_course(:course => @copy_to2, :active_all => true)
+      group2 = @copy_to2.groups.create!(:group_category => topic_to2.group_category, :name => 'a group')
+      group2.add_user(@student)
+      topic_to2.child_topic_for(@student).reply_from(:user => @student, :text => "a entry")
+
+      Timecop.freeze(1.minute.from_now) do
+        topic.update_attribute(:group_category_id, nil)
+        run_master_migration
+      end
+      expect(topic_to1.reload.group_category).to eq nil
+      expect(topic_to2.reload.group_category).to be_present # has a reply so can't be unset
+
+      result2 = @migration.migration_results.where(:child_subscription_id => sub2).first
+      expect(result2.skipped_items).to eq [mig_id(topic)]
     end
 
     it "should link assignment rubrics on update" do
@@ -2085,6 +2124,41 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       expect(a_to.reload.external_tool_tag).to eq tag # don't change
+    end
+
+    context "caching" do
+      specs_require_cache(:redis_cache_store)
+
+      it "stuff" do
+        @copy_to = course_factory(:active_all => true)
+        student = user_factory(:active_all => true)
+        @copy_to.enroll_student(student, :enrollment_state => 'active')
+        @sub = @template.add_child_course!(@copy_to)
+
+        a = @copy_from.assignments.create!(:title => "some assignment")
+        q = @copy_from.quizzes.create!(:title => "some quiz")
+        run_master_migration
+
+        a_to = @copy_to.assignments.where(:migration_id => mig_id(a)).first
+        q_to = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
+        ares1 = a_to.context_module_tag_info(student, @copy_to, has_submission: false)
+        expect(ares1[:due_date]).to be_nil
+        qres1 = q_to.context_module_tag_info(student, @copy_to, has_submission: false)
+        expect(qres1[:due_date]).to be_nil
+        due_at = 1.day.from_now
+        Timecop.freeze(1.minute.from_now) do
+          a.update_attribute(:due_at, due_at)
+          q.update_attribute(:due_at, due_at)
+          run_master_migration
+        end
+        expect(a_to.reload.due_at.to_i).to eq due_at.to_i
+        ares2 = a_to.context_module_tag_info(student, @copy_to, has_submission: false)
+        expect(ares2[:due_date]).to eq due_at.iso8601
+
+        expect(q_to.reload.due_at.to_i).to eq due_at.to_i
+        qres2 = q_to.context_module_tag_info(student, @copy_to, has_submission: false)
+        expect(qres2[:due_date]).to eq due_at.iso8601
+      end
     end
 
     context "sharding" do

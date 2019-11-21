@@ -96,6 +96,7 @@ module Lti::Ims
         email: (user.email if page[:tool].include_email?),
         lis_person_sourcedid: (member_sourced_id(expander) if page[:tool].include_name?),
         user_id: user.past_lti_ids.first&.user_lti_id || user.lti_id,
+        lti11_legacy_user_id: Lti::Asset.opaque_identifier_for(user),
         roles: enrollment.lti_roles
       }.compact
     end

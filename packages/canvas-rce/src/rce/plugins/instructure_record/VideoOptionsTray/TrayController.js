@@ -19,11 +19,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+import bridge from '../../../../bridge'
+import {asVideoElement} from '../../shared/ContentSelection'
 import VideoOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
 
-export const VIDEO_SIZE_OPTIONS = { height: '432px', width: '768px' }
+export const VIDEO_SIZE_DEFAULT = {height: '225px', width: '400px'} // AKA "LARGE"
+export const AUDIO_PLAYER_SIZE = {width: '300px', height: '2.813rem'}
 
 export default class TrayController {
   constructor() {
@@ -49,6 +52,7 @@ export default class TrayController {
 
   showTrayForEditor(editor) {
     this._editor = editor
+    this.$videoContainer = editor.selection.getNode()
     this._shouldOpen = true
     this._renderTray()
   }
@@ -60,13 +64,40 @@ export default class TrayController {
   }
 
   _applyVideoOptions(videoOptions) {
-    const editor = this._editor
-    const $videoContainer = editor.selection.getNode()
-    $videoContainer.setAttribute("style",`height: ${VIDEO_SIZE_OPTIONS[videoOptions.videoSize].height}; width:${VIDEO_SIZE_OPTIONS[videoOptions.videoSize].width}`);
+    if (this.$videoContainer && this.$videoContainer.firstElementChild?.tagName === 'IFRAME') {
+      const styl = {
+        height: `${videoOptions.appliedHeight}px`,
+        width: `${videoOptions.appliedWidth}px`
+      }
+      this._editor.dom.setStyles(this.$videoContainer, styl)
+      this._editor.dom.setStyles(this.$videoContainer.firstElementChild, styl)
+
+      const title = videoOptions.titleText
+      this._editor.dom.setAttrib(this.$videoContainer, 'data-mce-p-title', title)
+      this._editor.dom.setAttrib(
+        this.$videoContainer,
+        'data-mce-p-data-titleText',
+        videoOptions.titleText
+      )
+      this._editor.dom.setAttrib(this.$videoContainer.firstElementChild, 'title', title)
+      this._editor.dom.setAttrib(
+        this.$videoContainer.firstElementChild,
+        'data-titleText',
+        videoOptions.titleText
+      )
+
+      // tell tinymce so the context toolbar resets
+      this._editor.fire('ObjectResized', {
+        target: this.$videoContainer,
+        width: videoOptions.appliedWidth,
+        height: videoOptions.appliedHeight
+      })
+    }
     this._dismissTray()
   }
 
   _dismissTray() {
+    this._editor.selection.select(this.$videoContainer)
     this._shouldOpen = false
     this._renderTray()
     this._editor = null
@@ -88,10 +119,12 @@ export default class TrayController {
     const element = (
       <VideoOptionsTray
         key={this._renderId}
+        videoOptions={asVideoElement(this.$videoContainer)}
         onEntered={() => {
           this._isOpen = true
         }}
         onExited={() => {
+          bridge.focusActiveEditor(false)
           this._isOpen = false
         }}
         onSave={videoOptions => {

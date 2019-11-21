@@ -20,10 +20,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 import classnames from 'classnames'
-import IconAnnouncement from '@instructure/ui-icons/lib/Line/IconAnnouncement'
-import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
-import IconDiscussion from '@instructure/ui-icons/lib/Line/IconDiscussion'
-import IconFolder from '@instructure/ui-icons/lib/Line/IconFolder'
+import {
+  IconAnnouncementLine,
+  IconAssignmentLine,
+  IconDiscussionLine,
+  IconFolderLine
+} from '@instructure/ui-icons'
 
 class DashboardCardAction extends React.Component {
   static displayName = 'DashboardCardAction'
@@ -49,13 +51,13 @@ class DashboardCardAction extends React.Component {
   renderIcon = iconClass => {
     switch (iconClass) {
       case 'icon-announcement':
-        return <IconAnnouncement size="x-small" />
+        return <IconAnnouncementLine size="x-small" />
       case 'icon-assignment':
-        return <IconAssignment size="x-small" />
+        return <IconAssignmentLine size="x-small" />
       case 'icon-discussion':
-        return <IconDiscussion size="x-small" />
+        return <IconDiscussionLine size="x-small" />
       case 'icon-folder':
-        return <IconFolder size="x-small" />
+        return <IconFolderLine size="x-small" />
       default:
         // fallback in case I missed one of the icons
         return <i className={iconClass} />

@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import View from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {speedGraderUrl} from '../../assignment/AssignmentApi'
@@ -115,7 +115,7 @@ export default class GradesGrid extends Component {
 
   setPage = page => {
     this.setState({currentPageIndex: page - 1})
-  };
+  }
 
   render() {
     const rows = this.state.pages[this.state.currentPageIndex]

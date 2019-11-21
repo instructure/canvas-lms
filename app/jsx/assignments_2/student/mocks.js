@@ -15,127 +15,72 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {addTypenameToDocument} from 'apollo-utilities'
+import glob from 'glob'
 import gql from 'graphql-tag'
-import {graphql} from 'graphql'
-import {makeExecutableSchema, addMockFunctionsToSchema} from 'graphql-tools'
-import {print} from 'graphql/language/printer'
-import schemaString from '../../../../schema.graphql'
 
-import {Assignment, AssignmentDefaultMocks} from './graphqlData/Assignment'
-import {AssignmentGroupDefaultMocks} from './graphqlData/AssignmentGroup'
-import {ErrorDefaultMocks} from './graphqlData/Error'
-import {ExternalToolDefaultMocks} from './graphqlData/ExternalTool'
-import {FileDefaultMocks} from './graphqlData/File'
-import {LockInfoDefaultMocks} from './graphqlData/LockInfo'
-import {MediaObjectDefaultMocks} from './graphqlData/MediaObject'
-import {MediaSourceDefaultMocks} from './graphqlData/MediaSource'
-import {ModuleDefaultMocks} from './graphqlData/Module'
-import {Submission, SubmissionDefaultMocks} from './graphqlData/Submission'
-import {SubmissionCommentDefaultMocks} from './graphqlData/SubmissionComment'
-import {SubmissionDraftDefaultMocks} from './graphqlData/SubmissionDraft'
-import {SubmissionHistoryDefaultMocks} from './graphqlData/SubmissionHistory'
-import {SubmissionInterfaceDefaultMocks} from './graphqlData/SubmissionInterface'
-import {UserDefaultMocks} from './graphqlData/User'
-import {UserGroupsDefaultMocks} from './graphqlData/UserGroups'
+import {Assignment} from './graphqlData/Assignment'
+import {Submission} from './graphqlData/Submission'
 
-function defaultMocks() {
-  return {
-    // Custom scalar types defined in our graphql schema
-    URL: () => 'http://graphql-mocked-url.com',
-    DateTime: () => null,
+import mockGraphqlQuery from '../../shared/graphql_query_mock'
 
-    // Custom mocks for type specific data we are querying
-    ...AssignmentDefaultMocks,
-    ...AssignmentGroupDefaultMocks,
-    ...ErrorDefaultMocks,
-    ...ExternalToolDefaultMocks,
-    ...FileDefaultMocks,
-    ...LockInfoDefaultMocks,
-    ...MediaObjectDefaultMocks,
-    ...MediaSourceDefaultMocks,
-    ...ModuleDefaultMocks,
-    ...SubmissionDefaultMocks,
-    ...SubmissionCommentDefaultMocks,
-    ...SubmissionDraftDefaultMocks,
-    ...SubmissionHistoryDefaultMocks,
-    ...SubmissionInterfaceDefaultMocks,
-    ...UserDefaultMocks,
-    ...UserGroupsDefaultMocks
+// Dynamically load and cache all of the `DefaultMocks` defined in `./graphqlData/*.js`
+let _dynamicDefaultMockImports = null
+async function loadDefaultMocks() {
+  if (_dynamicDefaultMockImports !== null) {
+    return _dynamicDefaultMockImports
   }
+
+  const filesToImport = glob.sync('./graphqlData/**.js', {cwd: './app/jsx/assignments_2/student'})
+  const defaultMocks = await Promise.all(
+    filesToImport.map(async file => {
+      const fileImport = await import(file)
+      return fileImport.DefaultMocks || {}
+    })
+  )
+  _dynamicDefaultMockImports = defaultMocks.filter(m => m !== undefined)
+  return _dynamicDefaultMockImports
 }
 
-function createMocks(overrides = []) {
-  const mocks = defaultMocks()
+const SUBMISSION_QUERY = gql`
+  query SubmissionQuery($submissionID: ID!) {
+    submission(id: "1") {
+      ...Submission
+    }
+  }
+  ${Submission.fragment}
+`
+
+const ASSIGNMENT_QUERY = gql`
+  query AssignmentQuery {
+    assignment(id: "1") {
+      ...Assignment
+      rubric {
+        id
+      }
+    }
+  }
+  ${Assignment.fragment}
+`
+
+// Small wrapper around mockGraphqlQuery which includes our default overrides
+export async function mockQuery(queryAST, overrides = [], variables = {}) {
   if (!Array.isArray(overrides)) {
     overrides = [overrides]
   }
-
-  overrides.forEach(overrideObj => {
-    if (typeof overrideObj !== 'object') {
-      throw new Error(`overrides must be an object, not ${typeof overrideObj}`)
-    }
-    Object.keys(overrideObj).forEach(key => {
-      const defaultFunction = mocks[key] || (() => {})
-      const defaultValues = defaultFunction()
-      const overrideFunction = overrideObj[key]
-      const overrideValues = overrideFunction()
-      mocks[key] = () => ({...defaultValues, ...overrideValues})
-    })
-  })
-
-  return mocks
-}
-
-/*
- * Mock the result of a graphql query based on the graphql schema for canvas
- * and some default values set specifically for assignments 2. For specifics,
- * see: https://www.apollographql.com/docs/graphql-tools/mocking/
- *
- * NOTE: You can mock an interface by passing in desired concrete __typename as
- *       an override. For example, if you are using the `Node` interface to
- *       query for a course, your override would look like this:
- *
- *       ```
- *       {
- *         Node: () => ({ __typename: 'Course'})
- *       }
- *       ```
- */
-export function mockQuery(query, overrides = [], variables = {}) {
-  // Turn the processed / normalized graphql-tag (gql) query back into a
-  // string that can be used to make a query using graphql.js. Using gql is
-  // super helpful for things like removing duplicate fragments, so we still
-  // want to use that when we are defining our queries.
-  const queryStr = print(addTypenameToDocument(query))
-  const schema = makeExecutableSchema({
-    typeDefs: schemaString,
-    resolverValidationOptions: {
-      requireResolversForResolveType: false
-    }
-  })
-  const mocks = createMocks(overrides)
-  addMockFunctionsToSchema({schema, mocks})
-  return graphql(schema, queryStr, null, null, variables) // Returns a promise
+  const defaultOverrides = await loadDefaultMocks()
+  const allOverrides = [...defaultOverrides, ...overrides]
+  return mockGraphqlQuery(queryAST, allOverrides, variables)
 }
 
 export async function mockAssignment(overrides = []) {
-  const query = gql`
-    query AssignmentQuery {
-      assignment(id: "1") {
-        ...Assignment
-      }
-    }
-    ${Assignment.fragment}
-  `
-  const result = await mockQuery(query, overrides)
+  const result = await mockQuery(ASSIGNMENT_QUERY, overrides)
   const assignment = result.data.assignment
 
   // TODO: Move env out of assignment and into react context.
   assignment.env = {
     assignmentUrl: 'mocked-assignment-url',
     courseId: '1',
-    currentUser: {id: '1', display_name: 'bob', avatar_url: 'awesome.avatar.url'},
+    currentUser: {id: '1', display_name: 'bob', avatar_image_url: 'awesome.avatar.url'},
     modulePrereq: null,
     moduleUrl: 'mocked-module-url'
   }
@@ -143,25 +88,8 @@ export async function mockAssignment(overrides = []) {
 }
 
 export async function mockSubmission(overrides = []) {
-  const query = gql`
-    query SubmissionQuery($submissionID: ID!) {
-      node(id: "1") {
-        ... on Submission {
-          ...Submission
-        }
-      }
-    }
-    ${Submission.fragment}
-  `
-  if (!Array.isArray(overrides)) {
-    overrides = [overrides]
-  }
-  overrides.push({
-    Node: () => ({__typename: 'Submission'})
-  })
-
-  const result = await mockQuery(query, overrides, {submissionID: '1'})
-  return result.data.node
+  const result = await mockQuery(SUBMISSION_QUERY, overrides, {submissionID: '1'})
+  return result.data.submission
 }
 
 export async function mockAssignmentAndSubmission(overrides = []) {

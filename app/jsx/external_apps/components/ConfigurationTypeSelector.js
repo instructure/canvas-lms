@@ -24,7 +24,7 @@ import PropTypes from 'prop-types'
 export default class ConfigurationTypeSelector extends React.Component {
   static propTypes = {
     handleChange: PropTypes.func.isRequired,
-    configurationType: PropTypes.string.isRequired,
+    configurationType: PropTypes.string.isRequired
   }
 
   componentDidMount() {

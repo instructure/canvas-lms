@@ -25,7 +25,7 @@ xsslint safeString.identifier i
 */
 
 const builders = {
-  year (options, htmlOptions) {
+  year(options, htmlOptions) {
     const step = options.startYear < options.endYear ? 1 : -1
     const $result = $('<select />', htmlOptions)
     if (options.includeBlank) $result.append('<option />')
@@ -36,7 +36,7 @@ const builders = {
     }
     return $result
   },
-  month (options, htmlOptions, dateSettings) {
+  month(options, htmlOptions, dateSettings) {
     const months = dateSettings.month_names
     const $result = $('<select />', htmlOptions)
     if (options.includeBlank) $result.append('<option />')
@@ -45,7 +45,7 @@ const builders = {
     }
     return $result
   },
-  day (options, htmlOptions) {
+  day(options, htmlOptions) {
     const $result = $('<select />', htmlOptions)
     if (options.includeBlank) $result.append('<option />')
     for (let i = 1; i <= 31; i++) {
@@ -57,7 +57,7 @@ const builders = {
 
 // generates something like rails' date_select/select_date
 // TODO: feature parity
-export default function dateSelect (name, options, htmlOptions = _.clone(options)) {
+export default function dateSelect(name, options, htmlOptions = _.clone(options)) {
   const validOptions = ['type', 'startYear', 'endYear', 'includeBlank', 'order']
   validOptions.forEach(opt => delete htmlOptions[opt])
 
@@ -88,7 +88,11 @@ export default function dateSelect (name, options, htmlOptions = _.clone(options
 
   const $result = $('<span>')
   // in coffeescript: for i in [0...options.order.length]
-  for (let i = 0, end = options.order.length, asc = end >= 0; asc ? i < end : i > end; asc ? i++ : i--) {
+  for (
+    let i = 0, end = options.order.length, asc = end >= 0;
+    asc ? i < end : i > end;
+    asc ? i++ : i--
+  ) {
     const type = options.order[i]
     const tName = name.replace(/(\]?)$/, `(${position[type]}i)$1`)
     const html = builders[type](options, {name: tName, ...htmlOptions}, dateSettings)

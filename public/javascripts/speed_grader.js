@@ -19,10 +19,10 @@
 /* global jsonData */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
+import {Alert} from '@instructure/ui-alerts'
+import {Button} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextArea} from '@instructure/ui-forms'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
 import StatusPill from 'jsx/grading/StatusPill'
@@ -36,15 +36,17 @@ import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
-import {isGraded, isHidden} from 'jsx/grading/helpers/SubmissionHelper'
+import {isGraded, isPostable} from 'jsx/grading/helpers/SubmissionHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
-import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
-import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
-import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
-import IconCheckMarkIndeterminate from '@instructure/ui-icons/lib/Line/IconCheckMarkIndeterminate'
-import Pill from '@instructure/ui-elements/lib/components/Pill'
+import {Tooltip} from '@instructure/ui-overlays'
+import {
+  IconUploadLine,
+  IconWarningLine,
+  IconCheckMarkIndeterminateLine
+} from '@instructure/ui-icons'
+import {Pill} from '@instructure/ui-elements'
 import round from 'compiled/util/round'
 import _ from 'underscore'
 import INST from './INST'
@@ -66,6 +68,7 @@ import SpeedgraderHelpers, {
   setupIsAnonymous,
   setupIsModerated
 } from './speed_grader_helpers'
+import SpeedGraderAlerts from 'jsx/speed_grader/SpeedGraderAlerts'
 import turnitinInfoTemplate from 'jst/_turnitinInfo'
 import turnitinScoreTemplate from 'jst/_turnitinScore'
 import vericiteInfoTemplate from 'jst/_vericiteInfo'
@@ -317,14 +320,19 @@ function mergeStudentsAndSubmission() {
     }
   }
 
+  // If we're using New Gradebook, we'll already have done the filtering by
+  // section on the server, so this is redundant (but not the worst thing in
+  // the world since we still need to send the user away if there are no
+  // students in the section). With Old Gradebook we still need to do it here.
   if (sectionToShow) {
     sectionToShow = sectionToShow.toString()
-    const tempArray = $.grep(
-      jsonData.studentsWithSubmissions,
-      student => $.inArray(sectionToShow, student.section_ids) != -1
+
+    const studentsInSection = jsonData.studentsWithSubmissions.filter(student =>
+      student.section_ids.includes(sectionToShow)
     )
-    if (tempArray.length) {
-      jsonData.studentsWithSubmissions = tempArray
+
+    if (studentsInSection.length > 0) {
+      jsonData.studentsWithSubmissions = studentsInSection
     } else {
       alert(
         I18n.t(
@@ -507,7 +515,6 @@ function setupPostPolicies() {
     sections: jsonData.context.active_course_sections,
     updateSubmission: EG.setOrUpdateSubmission,
     afterUpdateSubmission() {
-      renderPostGradesMenu()
       EG.showGrade()
     }
   })
@@ -720,15 +727,15 @@ function renderProgressIcon(attachment) {
   const mountPoint = document.getElementById('react_pill_container')
   const iconAndTipMap = {
     pending: {
-      icon: <IconUpload />,
+      icon: <IconUploadLine />,
       tip: I18n.t('Uploading Submission')
     },
     failed: {
-      icon: <IconWarning />,
+      icon: <IconWarningLine />,
       tip: I18n.t('Submission Failed to Submit')
     },
     default: {
-      icon: <IconCheckMarkIndeterminate />,
+      icon: <IconCheckMarkIndeterminateLine />,
       tip: I18n.t('No File Submitted')
     }
   }
@@ -751,7 +758,7 @@ function renderProgressIcon(attachment) {
 function renderHiddenSubmissionPill(submission) {
   const mountPoint = document.getElementById(SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT)
 
-  if (isHidden(submission)) {
+  if (isPostable(submission)) {
     ReactDOM.render(
       <Pill variant="warning" text={I18n.t('Hidden')} margin="0 0 small" />,
       mountPoint
@@ -1166,24 +1173,23 @@ function initGroupAssignmentMode() {
   }
 }
 
-function refreshGrades(cb) {
+function refreshGrades(callback) {
   const courseId = ENV.course_id
   const assignmentId = EG.currentStudent.submission.assignment_id
   const studentId = EG.currentStudent.submission[anonymizableUserId]
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}.json?include[]=submission_history`
   const currentStudentIDAsOfAjaxCall = EG.currentStudent[anonymizableId]
   $.getJSON(url, submission => {
-    if (currentStudentIDAsOfAjaxCall === EG.currentStudent[anonymizableId]) {
-      EG.currentStudent.submission = submission
-      EG.currentStudent.submission_state = SpeedgraderHelpers.submissionState(
-        EG.currentStudent,
-        ENV.grading_role
-      )
+    const studentToRefresh = window.jsonData.studentMap[currentStudentIDAsOfAjaxCall]
+    EG.setOrUpdateSubmission(submission)
+
+    EG.updateSelectMenuStatus(studentToRefresh)
+    if (studentToRefresh === EG.currentStudent) {
       EG.showGrade()
-      EG.updateSelectMenuStatus(EG.currentStudent)
-      if (cb) {
-        cb(submission)
-      }
+    }
+
+    if (callback) {
+      callback(submission)
     }
   })
 }
@@ -1345,7 +1351,7 @@ EG = {
     mergeStudentsAndSubmission()
 
     if (jsonData.GROUP_GRADING_MODE && !jsonData.studentsWithSubmissions.length) {
-      if (window.history.length === 1) {
+      if (SpeedgraderHelpers.getHistory().length === 1) {
         alert(
           I18n.t(
             'alerts.no_students_in_groups_close',
@@ -1360,22 +1366,36 @@ EG = {
             "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
           )
         )
-        window.history.back()
+        SpeedgraderHelpers.getHistory().back()
       }
     } else if (!jsonData.studentsWithSubmissions.length) {
-      alert(
-        I18n.t(
-          'alerts.no_active_students',
-          'Sorry, there are either no active students in the course or none are gradable by you.'
+      // If we're trying to load a section with no students, we already showed
+      // a "could not find any students in that section" alert and arranged
+      // for a reload of the page, so don't show a second alert--but also don't
+      // execute the else clause below this one since we don't want to set up
+      // the rest of SpeedGrader
+      if (sectionToShow == null) {
+        alert(
+          I18n.t(
+            'alerts.no_active_students',
+            'Sorry, there are either no active students in the course or none are gradable by you.'
+          )
         )
-      )
-      window.history.back()
+        SpeedgraderHelpers.getHistory().back()
+      }
     } else {
       $('#speed_grader_loading').hide()
       $('#gradebook_header, #full_width_container').show()
       initDropdown()
       initGroupAssignmentMode()
       setupHandleStatePopped()
+
+      if (ENV.student_group_reason_for_change != null) {
+        SpeedGraderAlerts.showStudentGroupChangeAlert({
+          selectedStudentGroup: ENV.selected_student_group,
+          reasonForChange: ENV.student_group_reason_for_change
+        })
+      }
       setupPostPolicies()
     }
   },
@@ -1390,10 +1410,10 @@ EG = {
     const queryParams = EG.parseDocumentQuery()
     if (queryParams && queryParams[anonymizableStudentId]) {
       initialStudentId = queryParams[anonymizableStudentId]
-    } else if (document.location.hash !== '') {
-      initialStudentId = extractStudentIdFromHash(document.location.hash)
+    } else if (SpeedgraderHelpers.getLocationHash() !== '') {
+      initialStudentId = extractStudentIdFromHash(SpeedgraderHelpers.getLocationHash())
     }
-    document.location.hash = ''
+    SpeedgraderHelpers.setLocationHash('')
 
     const attemptParam = utils.getParam('attempt')
     if (attemptParam) {
@@ -1500,9 +1520,9 @@ EG = {
     )
 
     if (behavior === HISTORY_PUSH) {
-      window.history.pushState(stateHash, '', url)
+      SpeedgraderHelpers.getHistory().pushState(stateHash, '', url)
     } else {
-      window.history.replaceState(stateHash, '', url)
+      SpeedgraderHelpers.getHistory().replaceState(stateHash, '', url)
     }
   },
 
@@ -1768,7 +1788,8 @@ EG = {
     isMostRecent
   ) {
     let $turnitinSimilarityScore = null
-    const showLegacyResubmit = isMostRecent && !submission.has_plagiarism_tool
+    const showLegacyResubmit =
+      isMostRecent && (jsonData.vericite_enabled || jsonData.turnitin_enabled)
 
     // build up new values based on this asset
     if (
@@ -2194,6 +2215,7 @@ EG = {
     if (isConcluded || isClosedForSubmission) {
       $full_width_container.addClass('with_enrollment_notice')
     }
+    EG.showDiscussion()
   },
 
   isStudentConcluded(student) {
@@ -2840,6 +2862,13 @@ EG = {
     return commentElement
   },
 
+  currentDisplayedSubmission() {
+    const displayedHistory = this.currentStudent.submission?.submission_history?.[
+      this.currentStudent.submission.currentSelectedIndex
+    ]
+    return displayedHistory?.submission || this.currentStudent.submission
+  },
+
   showDiscussion() {
     const that = this
     const commentRenderingOptions = {
@@ -2850,8 +2879,18 @@ EG = {
 
     $comments.html('')
 
+    const submission = EG.currentDisplayedSubmission()
     if (this.currentStudent.submission && this.currentStudent.submission.submission_comments) {
       $.each(this.currentStudent.submission.submission_comments, (i, comment) => {
+        if (ENV.group_comments_per_attempt) {
+          // Due to the fact that the unsubmitted attempt 0 submission is no longer viewable
+          // from the submission histories after the attempt 1 submission has been submitted,
+          // treat comments from attempt 0 and attempt 1 as if they were both on attempt 1.
+          if ((comment.attempt || 1) !== (submission.attempt || 1)) {
+            return
+          }
+        }
+
         const commentElement = that.renderComment(comment, commentRenderingOptions)
 
         if (commentElement) {
@@ -2914,6 +2953,11 @@ EG = {
       'submission[draft_comment]': draftComment,
       [`submission[${anonymizableId}]`]: EG.currentStudent[anonymizableId]
     }
+
+    if (ENV.group_comments_per_attempt) {
+      formData['submission[attempt]'] = EG.currentDisplayedSubmission().attempt
+    }
+
     if ($('#media_media_recording').data('comment_id')) {
       $.extend(formData, {
         'submission[media_comment_type]': $('#media_media_recording').data('comment_type'),
@@ -2970,11 +3014,17 @@ EG = {
     // stuff that comes back from ajax doesnt have a submission history but handleSubmissionSelectionChange
     // depends on it being there. so mimic it.
     if (typeof submission.submission_history === 'undefined') {
-      submission.submission_history = [
-        {
-          submission: $.extend(true, {}, submission)
-        }
-      ]
+      let historyIndex =
+        student.submission?.submission_history?.findIndex(history => {
+          const historySubmission = history.submission || history
+          if (historySubmission.attempt == null) {
+            return false
+          }
+          return historySubmission.attempt === submission.attempt
+        }) || 0
+      historyIndex = historyIndex === -1 ? 0 : historyIndex
+      submission.submission_history = Array.from({length: historyIndex + 1})
+      submission.submission_history[historyIndex] = {submission: $.extend(true, {}, submission)}
     }
 
     $.extend(true, student.submission, submission)
@@ -2996,6 +3046,10 @@ EG = {
         prov_grade.rubric_assessments = student.rubric_assessments
         prov_grade.submission_comments = submission.submission_comments
       }
+    }
+
+    if (ENV.post_policies_enabled) {
+      renderPostGradesMenu()
     }
 
     return student
@@ -3698,11 +3752,15 @@ function renderPostGradesMenu() {
   const {submissionsMap} = window.jsonData
   const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
 
-  const hasGrades = submissions.some(isGraded)
-  const allowHidingGrades = submissions.some(
+  const hasGradesOrPostableComments = submissions.some(
+    submission => isGraded(submission) || submission.has_postable_comments
+  )
+  const allowHidingGradesOrComments = submissions.some(
     submission => submission && submission.posted_at != null
   )
-  const allowPostingGrades = submissions.some(submission => submission && isHidden(submission))
+  const allowPostingGradesOrComments = submissions.some(
+    submission => submission && isPostable(submission)
+  )
 
   function onHideGrades() {
     EG.postPolicies.showHideAssignmentGradesTray({submissionsMap})
@@ -3713,9 +3771,9 @@ function renderPostGradesMenu() {
   }
 
   const props = {
-    allowHidingGrades,
-    allowPostingGrades,
-    hasGrades,
+    allowHidingGradesOrComments,
+    allowPostingGradesOrComments,
+    hasGradesOrPostableComments,
     onHideGrades,
     onPostGrades
   }

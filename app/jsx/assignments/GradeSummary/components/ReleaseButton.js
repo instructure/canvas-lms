@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {bool, func, oneOf} from 'prop-types'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconCheckMark from '@instructure/ui-icons/lib/Solid/IconCheckMark'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import {Button} from '@instructure/ui-buttons'
+import {IconCheckMarkSolid} from '@instructure/ui-icons'
+import {PresentationContent} from '@instructure/ui-a11y'
+import {Spinner} from '@instructure/ui-elements'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {
@@ -45,14 +45,15 @@ function startedButton(props) {
 
   return (
     <Button {...props} variant="light">
-      <Spinner size="x-small" title={title} /> <PresentationContent>{title}</PresentationContent>
+      <Spinner size="x-small" renderTitle={title} />
+      <PresentationContent>{title}</PresentationContent>
     </Button>
   )
 }
 
 function successButton(props) {
   return (
-    <Button {...props} icon={IconCheckMark} variant="light">
+    <Button {...props} icon={IconCheckMarkSolid} variant="light">
       {I18n.t('Grades Released')}
     </Button>
   )

@@ -16,61 +16,53 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import assert from "assert";
-import sanitizeEditorOptions from "../../src/rce/sanitizeEditorOptions";
+import assert from 'assert'
+import sanitizeEditorOptions from '../../src/rce/sanitizeEditorOptions'
 
-describe("sanitizeEditorOptions", () => {
+describe('sanitizeEditorOptions', () => {
   describe("changing options that canvas has that we don't support", () => {
-    it("changes nothing for inoffensive options", () => {
+    it('changes nothing for inoffensive options', () => {
       const rawOptions = {
-        plugins: ["link", "table"],
+        plugins: ['link', 'table'],
         toolbar: [
-          "bold,italic,underline,indent,superscript,subscript,bullist,numlist",
-          "table,link,unlink,instructure_image,ltr,rtl"
+          'bold,italic,underline,indent,superscript,subscript,bullist,numlist',
+          'table,link,unlink,instructure_image,ltr,rtl'
         ]
-      };
-      const cleanOptions = sanitizeEditorOptions(rawOptions);
-      assert.equal(cleanOptions.plugins[1], "table");
-      assert.equal(
-        cleanOptions.toolbar[1],
-        "table,link,unlink,instructure_image,ltr,rtl"
-      );
-    });
-  });
+      }
+      const cleanOptions = sanitizeEditorOptions(rawOptions)
+      assert.equal(cleanOptions.plugins[1], 'table')
+      assert.equal(cleanOptions.toolbar[1], 'table,link,unlink,instructure_image,ltr,rtl')
+    })
+  })
 
-  describe("replacing plugin configurations", () => {
-    describe("with external_plugins", () => {
-      let rawOptions = {};
+  describe('replacing plugin configurations', () => {
+    describe('with external_plugins', () => {
+      let rawOptions = {}
 
       beforeEach(() => {
         rawOptions = {
-          plugins: "table",
+          plugins: 'table',
           external_plugins: {
-            instructure_links:
-              "/javascripts/tinymce_plugins/instructure_links/plugin.js",
-            instructure_embed:
-              "/javascripts/tinymce_plugins/instructure_embed/plugin.js",
-            some_other_plugin: "http://example.com/custom/plugin"
+            instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',
+            instructure_embed: '/javascripts/tinymce_plugins/instructure_embed/plugin.js',
+            some_other_plugin: 'http://example.com/custom/plugin'
           }
-        };
-      });
+        }
+      })
 
       it("doesnt put instructure_embed through as a plugin because we don't supply that functionality", () => {
         // it's functionality will be replaced by the sidebar component
-        const cleanOptions = sanitizeEditorOptions(rawOptions);
-        assert.equal(
-          cleanOptions.external_plugins.instructure_embed,
-          undefined
-        );
-      });
+        const cleanOptions = sanitizeEditorOptions(rawOptions)
+        assert.equal(cleanOptions.external_plugins.instructure_embed, undefined)
+      })
 
-      it("leaves other custom external plugins in the config", () => {
-        const cleanOptions = sanitizeEditorOptions(rawOptions);
+      it('leaves other custom external plugins in the config', () => {
+        const cleanOptions = sanitizeEditorOptions(rawOptions)
         assert.equal(
           cleanOptions.external_plugins.some_other_plugin,
-          "http://example.com/custom/plugin"
-        );
-      });
-    });
-  });
-});
+          'http://example.com/custom/plugin'
+        )
+      })
+    })
+  })
+})

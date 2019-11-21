@@ -23,7 +23,7 @@ import {Select} from '@instructure/ui-forms'
 
 import {OverrideShape} from '../../assignmentData'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import {Flex} from '@instructure/ui-layout'
 
 export default class Filters extends React.Component {
   static propTypes = {
@@ -115,7 +115,7 @@ export default class Filters extends React.Component {
   render() {
     return (
       <Flex as="div" margin="medium 0 0 0" wrapItems>
-        <FlexItem>
+        <Flex.Item>
           <Select
             label={I18n.t('Assign To')}
             onChange={this.onChangeAssignTo}
@@ -123,8 +123,8 @@ export default class Filters extends React.Component {
           >
             {this.renderAssignToFilterOptions()}
           </Select>
-        </FlexItem>
-        <FlexItem margin="0 0 0 small">
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
           <Select
             label={I18n.t('attempts.filter', 'Attempts')}
             onChange={this.onChangeAttempt}
@@ -132,8 +132,8 @@ export default class Filters extends React.Component {
           >
             {this.renderAttemptFilterOptions()}
           </Select>
-        </FlexItem>
-        <FlexItem margin="0 0 0 small">
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 small">
           <Select
             label={I18n.t('Status')}
             onChange={this.onChangeStatus}
@@ -141,7 +141,7 @@ export default class Filters extends React.Component {
           >
             {this.renderStatusFilterOptions()}
           </Select>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }

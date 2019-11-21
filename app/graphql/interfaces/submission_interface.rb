@@ -20,9 +20,20 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
     @current_user = current_user
   end
 
-  def perform(submissions)
+  def load(submission)
+    # By default if we pass two submissions with the same id but a different
+    # attempt, they will get uniqued into a single submission before they reach
+    # the perform method. This breaks submission histories/versionable. Work
+    # around this by passing in the submission.id and submission.attempt to
+    # the perform method instead.
+    super([submission.global_id, submission.attempt])
+  end
+
+  def perform(submission_ids_and_attempts)
+    submission_ids = submission_ids_and_attempts.map(&:first)
+
     unread_count_hash = Submission.
-      where(id: submissions).
+      where(id: submission_ids).
       joins(:submission_comments).
       where(
         'NOT EXISTS (?)',
@@ -30,11 +41,34 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
           where('viewed_submission_comments.submission_comment_id=submission_comments.id').
           where(:user_id => @current_user)
       ).
-      group(:submission_id).
+      group(:submission_id, 'submission_comments.attempt').
       count
 
-    submissions.each { |s| fulfill(s, unread_count_hash[s.id] || 0) }
+    submission_ids_and_attempts.each do |submission_id, attempt|
+      relative_submission_id = Shard.relative_id_for(submission_id, Shard.current, Shard.current)
+
+      # Group attempts nil, zero, and one together as one set of unread counts
+      count = if (attempt || 0) <= 1
+        (unread_count_hash[[relative_submission_id, nil]] || 0) +
+        (unread_count_hash[[relative_submission_id, 0]] || 0) +
+        (unread_count_hash[[relative_submission_id, 1]] || 0)
+      else
+        unread_count_hash[[relative_submission_id, attempt]] || 0
+      end
+
+      fulfill([submission_id, attempt], count)
+    end
   end
+end
+
+class SubmissionRubricAssessmentFilterInputType < Types::BaseInputObject
+  graphql_name 'SubmissionRubricAssessmentFilterInput'
+
+  argument :for_attempt, Integer, <<~DESC, required: false, default_value: nil
+    What submission attempt the rubric assessment should be returned for. If not
+    specified, it will return the rubric assessment for the current submisssion
+    or submission history.
+  DESC
 end
 
 module Interfaces::SubmissionInterface
@@ -149,6 +183,11 @@ module Interfaces::SubmissionInterface
   field :posted, Boolean, method: :posted?, null: false
   field :state, Types::SubmissionStateType, method: :workflow_state, null: false
 
+  field :grade_hidden, Boolean, null: false
+  def grade_hidden
+    !submission.user_can_read_grade?(current_user, session)
+  end
+
   field :submission_status, String, null: true
   def submission_status
     if submission.submission_type == 'online_quiz'
@@ -166,10 +205,61 @@ module Interfaces::SubmissionInterface
   field :missing, Boolean, method: :missing?, null: true
   field :grade_matches_current_submission, Boolean,
     'was the grade given on the current submission (resubmission)', null: true
+  field :submission_type, Types::AssignmentSubmissionType, null: true
+
+
+  field :attachment, Types::FileType, null: true
+  def attachment
+    load_association(:attachment)
+  end
 
   field :attachments, [Types::FileType], null: true
   def attachments
     Loaders::IDLoader.for(Attachment).load_many(object.attachment_ids_for_version)
+  end
+
+  field :body, String, null: true
+  def body
+    Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+      Loaders::AssociationLoader.for(Assignment, :context).load(assignment).then do
+        Loaders::ApiContentAttachmentLoader.for(assignment.context).load(object.body).then do |preloaded_attachments|
+          GraphQLHelpers::UserContent.process(
+            object.body,
+            context: assignment.context,
+            in_app: context[:in_app],
+            request: context[:request],
+            preloaded_attachments: preloaded_attachments,
+            user: current_user
+          )
+        end
+      end
+    end
+  end
+
+  field :media_object, Types::MediaObjectType, null: true
+  def media_object
+    Loaders::MediaObjectLoader.load(object.media_comment_id)
+  end
+
+  field :turnitin_data, [Types::TurnitinDataType], null: true
+  def turnitin_data
+    return nil if object.turnitin_data.empty?
+
+    promises = object.turnitin_data.keys.
+      reject { |key| key == :last_processed_attempt }.
+      map do |asset_string|
+      Loaders::AssetStringLoader.load(asset_string).then do |turnitin_context|
+        next if turnitin_context.nil?
+
+        data = object.turnitin_data[asset_string]
+        {
+          target: turnitin_context,
+          score: data[:similarity_score],
+          status: data[:status]
+        }
+      end
+    end
+    Promise.all(promises).then(&:compact)
   end
 
   field :submission_draft, Types::SubmissionDraftType, null: true
@@ -180,4 +270,40 @@ module Interfaces::SubmissionInterface
       drafts.select { |draft| draft.submission_attempt == target_attempt }.first
     end
   end
+
+  field :rubric_assessments_connection, Types::RubricAssessmentType.connection_type, null: true do
+    argument :filter, SubmissionRubricAssessmentFilterInputType, required: false, default_value: {}
+  end
+  def rubric_assessments_connection(filter:)
+    filter = filter.to_h
+    target_attempt = filter[:for_attempt] || object.attempt
+
+    Promise.all([
+      load_association(:assignment),
+      load_association(:rubric_assessments)
+    ]).then do
+      assessments_needing_versions_loaded = submission.rubric_assessments.reject do |ra|
+        ra.artifact_attempt == target_attempt
+      end
+
+      versionable_loader_promise =
+        if assessments_needing_versions_loaded.empty?
+          Promise.resolve(nil)
+        else
+          Loaders::AssociationLoader.for(RubricAssessment, :versions).
+            load_many(assessments_needing_versions_loaded)
+        end
+
+      Promise.all([
+        versionable_loader_promise,
+        Loaders::AssociationLoader.for(Assignment, :rubric_association).load(submission.assignment),
+        Loaders::AssociationLoader.for(RubricAssessment, :rubric_association).
+          load_many(submission.rubric_assessments)
+      ]).then do
+        submission.visible_rubric_assessments_for(current_user, attempt: target_attempt)
+      end
+    end
+  end
+
+  field :url, Types::UrlType, null: true
 end

@@ -18,31 +18,39 @@
 import {arrayOf, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
 import {MediaSource} from './MediaSource'
+import {MediaTrack} from './MediaTrack'
 
 export const MediaObject = {
   fragment: gql`
     fragment MediaObject on MediaObject {
       id
+      _id
       mediaSources {
         ...MediaSource
+      }
+      mediaTracks {
+        ...MediaTrack
       }
       mediaType
       title
     }
     ${MediaSource.fragment}
+    ${MediaTrack.fragment}
   `,
 
   shape: shape({
     id: string.isRequired,
     mediaSources: arrayOf(MediaSource.shape),
     mediaType: string,
+    mediaTracks: arrayOf(MediaTrack.shape),
     title: string
   })
 }
 
-export const MediaObjectDefaultMocks = {
+export const DefaultMocks = {
   MediaObject: () => ({
     mediaSources: [{}],
+    mediaTracks: [{}],
     mediaType: 'video',
     title: 'Mocked Video'
   })

@@ -45,8 +45,8 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     window.ENV = {}
     QUnit.config.testTimeout = 2000
     fixtures.create()
-    sinon.stub(userSettings, 'contextGet')
-    sinon.stub(userSettings, 'contextSet')
+    sandbox.stub(userSettings, 'contextGet')
+    sandbox.stub(userSettings, 'contextSet')
     userSettings.contextGet
       .withArgs('sort_grade_columns_by')
       .returns({sortType: 'assignment_group'})
@@ -57,8 +57,6 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
 
   suiteHooks.afterEach(() => {
     asyncHelper.stop()
-    userSettings.contextGet.restore()
-    userSettings.contextSet.restore()
     Ember.run(App, 'destroy')
     QUnit.config.testTimeout = qunitTimeout
     window.ENV = originalENV
@@ -826,12 +824,10 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       }
       initializeApp()
       return asyncHelper.waitForRequests().then(() => {
-        sinon.stub(CourseGradeCalculator, 'calculate').returns('expected')
+        sandbox.stub(CourseGradeCalculator, 'calculate').returns('expected')
         student = srgb.get('students.firstObject')
       })
     })
-
-    hooks.afterEach(() => CourseGradeCalculator.calculate.restore())
 
     test('calculates grades using properties from the gradebook', () => {
       const grades = srgb.calculate(student)
@@ -908,12 +904,10 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       exampleGrades = createCourseGradesWithGradingPeriods()
       initializeApp()
       return asyncHelper.waitForRequests().then(() => {
-        sinon.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
+        sandbox.stub(CourseGradeCalculator, 'calculate').returns(exampleGrades)
         return (student = srgb.get('students.firstObject'))
       })
     })
-
-    hooks.afterEach(() => CourseGradeCalculator.calculate.restore())
 
     test('stores the current grade on the student when not including ungraded assignments', () => {
       const grades = srgb.calculateStudentGrade(student)
@@ -1128,7 +1122,6 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       )
       srgb.set('includeUngradedAssignments', false)
       strictEqual(updateIncludeUngradedAssignmentsSettingStub.callCount, 1)
-      updateIncludeUngradedAssignmentsSettingStub.restore()
     })
 
     test('updateIncludeUngradedAssignmentsSetting sets the userSetting for include_ungraded_assignments', () => {
@@ -1174,10 +1167,6 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       fetchCorrectEnrollmentsStub = sinon.stub(srgb, 'fetchCorrectEnrollments')
     })
 
-    hooks.afterEach(() => {
-      fetchCorrectEnrollmentsStub.restore()
-    })
-
     test('changing showConcludedEnrollments calls updateShowConcludedEnrollmentsSetting', () => {
       const updateShowConcludedEnrollmentsSettingStub = sinon.stub(
         srgb,
@@ -1185,23 +1174,20 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       )
       srgb.set('showConcludedEnrollments', false)
       strictEqual(updateShowConcludedEnrollmentsSettingStub.callCount, 1)
-      updateShowConcludedEnrollmentsSettingStub.restore()
     })
 
     test('updateShowConcludedEnrollmentsSetting uses the gradebook settings endpoint', () => {
-      const ajaxRequestSpy = sinon.stub(ajax, 'request')
+      const ajaxRequestSpy = sandbox.stub(ajax, 'request')
       srgb.set('showConcludedEnrollments', false)
       strictEqual(ajaxRequestSpy.firstCall.args[0].url, 'gradebook_settings')
-      ajaxRequestSpy.restore()
     })
 
     test('updateShowConcludedEnrollmentsSetting passes the updated setting state', () => {
-      const ajaxRequestSpy = sinon.stub(ajax, 'request')
+      const ajaxRequestSpy = sandbox.stub(ajax, 'request')
       srgb.set('showConcludedEnrollments', false)
       deepEqual(ajaxRequestSpy.firstCall.args[0].data.gradebook_settings, {
         show_concluded_enrollments: false
       })
-      ajaxRequestSpy.restore()
     })
   })
 
@@ -1253,24 +1239,21 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       const updateAllowFinalGradeOverrideStub = sinon.stub(srgb, 'updateAllowFinalGradeOverride')
       srgb.set('allowFinalGradeOverride', false)
       strictEqual(updateAllowFinalGradeOverrideStub.callCount, 1)
-      updateAllowFinalGradeOverrideStub.restore()
     })
 
     test('updateAllowFinalGradeOverride uses the course settings endpoint', () => {
-      const ajaxRequestSpy = sinon.stub(ajax, 'request')
+      const ajaxRequestSpy = sandbox.stub(ajax, 'request')
       const url = `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/settings`
       srgb.set('allowFinalGradeOverride', false)
       strictEqual(ajaxRequestSpy.firstCall.args[0].url, url)
-      ajaxRequestSpy.restore()
     })
 
     test('updateAllowFinalGradeOverride passes the updated setting state', () => {
-      const ajaxRequestSpy = sinon.stub(ajax, 'request')
+      const ajaxRequestSpy = sandbox.stub(ajax, 'request')
       srgb.set('allowFinalGradeOverride', false)
       deepEqual(ajaxRequestSpy.firstCall.args[0].data, {
         allow_final_grade_override: false
       })
-      ajaxRequestSpy.restore()
     })
   })
 
@@ -1389,11 +1372,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         })
       )
 
-      updateFinalGradeOverrideStub = sinon.stub(FinalGradeOverrideApi, 'updateFinalGradeOverride')
-    })
-
-    hooks.afterEach(() => {
-      updateFinalGradeOverrideStub.restore()
+      updateFinalGradeOverrideStub = sandbox.stub(FinalGradeOverrideApi, 'updateFinalGradeOverride')
     })
 
     test('given an invalid grade, final_grade_overrides is unchanged', () => {
@@ -1542,7 +1521,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     })
   })
 
-  QUnit.module('hideComments', hooks => {
+  QUnit.module('anonymizeStudents', hooks => {
     hooks.beforeEach(() => {
       initializeApp()
       return asyncHelper.waitForRequests()
@@ -1554,7 +1533,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
 
       return Ember.run(() => {
         srgb.set('selectedAssignment', assignment)
-        equal(srgb.get('hideComments'), false)
+        equal(srgb.get('anonymizeStudents'), false)
       })
     })
 
@@ -1564,7 +1543,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
 
       return Ember.run(() => {
         srgb.set('selectedAssignment', assignment)
-        equal(srgb.get('hideComments'), true)
+        equal(srgb.get('anonymizeStudents'), true)
       })
     })
   })

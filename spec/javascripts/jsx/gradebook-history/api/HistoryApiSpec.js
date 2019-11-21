@@ -67,9 +67,7 @@ test('getGradebookHistory requests with course and student', function() {
 test('getGradebookHistory requests with course, assignment, and grader', function() {
   const grader = '22'
   const assignment = '210'
-  const url = `/api/v1/audit/grade_change/courses/${
-    this.courseId
-  }/assignments/${assignment}/graders/${grader}`
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/assignments/${assignment}/graders/${grader}`
   HistoryApi.getGradebookHistory(this.courseId, {assignment, grader})
   strictEqual(this.getStub.callCount, 1)
   strictEqual(this.getStub.getCall(0).args[0], url)
@@ -78,9 +76,7 @@ test('getGradebookHistory requests with course, assignment, and grader', functio
 test('getGradebookHistory requests with course, assignment, and student', function() {
   const student = '23'
   const assignment = '210'
-  const url = `/api/v1/audit/grade_change/courses/${
-    this.courseId
-  }/assignments/${assignment}/students/${student}`
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/assignments/${assignment}/students/${student}`
   HistoryApi.getGradebookHistory(this.courseId, {assignment, student})
   strictEqual(this.getStub.callCount, 1)
   strictEqual(this.getStub.getCall(0).args[0], url)
@@ -89,9 +85,7 @@ test('getGradebookHistory requests with course, assignment, and student', functi
 test('getGradebookHistory requests with course, grader, and student', function() {
   const grader = '23'
   const student = '230'
-  const url = `/api/v1/audit/grade_change/courses/${
-    this.courseId
-  }/graders/${grader}/students/${student}`
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/graders/${grader}/students/${student}`
   HistoryApi.getGradebookHistory(this.courseId, {grader, student})
   strictEqual(this.getStub.callCount, 1)
   strictEqual(this.getStub.getCall(0).args[0], url)
@@ -101,9 +95,7 @@ test('getGradebookHistory requests with course, assignment, grader, and student'
   const grader = '22'
   const assignment = '220'
   const student = '2200'
-  const url = `/api/v1/audit/grade_change/courses/${
-    this.courseId
-  }/assignments/${assignment}/graders/${grader}/students/${student}`
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/assignments/${assignment}/graders/${grader}/students/${student}`
   HistoryApi.getGradebookHistory(this.courseId, {assignment, grader, student})
   strictEqual(this.getStub.callCount, 1)
   strictEqual(this.getStub.getCall(0).args[0], url)

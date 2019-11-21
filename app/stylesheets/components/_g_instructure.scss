@@ -158,6 +158,10 @@
   max-width: 100%;
 }
 
+.user_content iframe[data-media-id] {
+  background-color: #eee;
+}
+
 .reminder, .reminder-content {
   border: 1px solid #aaa;
   border-radius: 5px;

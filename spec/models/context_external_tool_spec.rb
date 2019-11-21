@@ -747,7 +747,7 @@ describe ContextExternalTool do
       tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
       tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
       tool3.save!
-      placements = Lti::ResourcePlacement::DEFAULT_PLACEMENTS + ['resource_selection']
+      placements = Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS + ['resource_selection']
       expect(ContextExternalTool.all_tools_for(@course, placements: placements).to_a).to eql([tool1, tool3].sort_by(&:name))
     end
 
@@ -777,7 +777,7 @@ describe ContextExternalTool do
       tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
       tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
       tool3.save!
-      placements = Lti::ResourcePlacement::DEFAULT_PLACEMENTS + ['resource_selection']
+      placements = Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS + ['resource_selection']
       expect(ContextExternalTool.all_tools_for(@course).placements(*placements).to_a).to eql([tool1, tool3].sort_by(&:name))
     end
 
@@ -801,9 +801,20 @@ describe ContextExternalTool do
       tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
       tool3.not_selectable = true
       tool3.save!
-      expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::DEFAULT_PLACEMENTS).to_a).to eql([tool1])
+      expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
     end
 
+    context 'when passed the legacy default placements' do
+      it "doesn't return tools with a developer key (LTI 1.3 tools)" do
+      tool1 = @course.context_external_tools.create!(
+        :name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret"
+      )
+      @course.context_external_tools.create!(
+        :name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret", :developer_key => DeveloperKey.create!
+      )
+      expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
+      end
+    end
   end
 
   describe "visible" do
@@ -1474,6 +1485,13 @@ describe ContextExternalTool do
         expect(tool.has_placement?(:link_selection)).to eq true
       end
 
+      it 'does not assume default placements for LTI 1.3 tools' do
+        tool = @course.context_external_tools.create!(
+          :name => "a", :domain => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret', developer_key: DeveloperKey.create!
+        )
+        expect(tool.has_placement?(:link_selection)).to eq false
+      end
+
       it 'returns false for module item if it is not selectable' do
         tool = @course.context_external_tools.create!(:name => "a", not_selectable: true, :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
         expect(tool.has_placement?(:link_selection)).to eq false
@@ -1575,6 +1593,43 @@ describe ContextExternalTool do
 
     end
 
+    describe '#feature_flag_enabled?' do
+      let(:tool) do
+        analytics_2_tool_factory
+      end
+
+      it 'should return true if the feature is enabled in context' do
+        @course.enable_feature!(:analytics_2)
+        expect(tool.feature_flag_enabled?(@course)).to be true
+      end
+
+      it 'should return true if the feature is enabled in higher context' do
+        Account.default.enable_feature!(:analytics_2)
+        expect(tool.feature_flag_enabled?(@course)).to be true
+      end
+
+      it 'should check the feature flag in the tool context if none provided' do
+        Account.default.enable_feature!(:analytics_2)
+        expect(tool.feature_flag_enabled?).to be true
+      end
+
+      it 'should return false if the feature is disabled' do
+        expect(tool.feature_flag_enabled?(@course)).to be false
+        expect(tool.feature_flag_enabled?).to be false
+      end
+
+      it "should return true if called on tools that aren't mapped to feature flags" do
+        other_tool = @course.context_external_tools.create!(
+          name: 'other_feature',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          url: 'http://example.com/launch',
+          tool_id: 'yo'
+        )
+        expect(other_tool.feature_flag_enabled?).to be true
+      end
+    end
+
     describe 'set_policy' do
       let(:tool) do
         @course.context_external_tools.create(
@@ -1623,6 +1678,22 @@ describe ContextExternalTool do
       tool.editor_button = { use_tray: "true" }
       json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
       expect(json[0][:use_tray]).to eq true
+    end
+
+    describe 'includes the description' do
+      it 'parsed into HTML' do
+        tool.editor_button = {}
+        tool.description = "the first paragraph.\n\nthe second paragraph."
+        json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+        expect(json[0][:description]).to eq "<p>the first paragraph.</p>\n\n<p>the second paragraph.</p>\n"
+      end
+
+      it 'with target="_blank" on links' do
+        tool.editor_button = {}
+        tool.description = "[link text](http://the.url)"
+        json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+        expect(json[0][:description]).to eq "<p><a href=\"http://the.url\" target=\"_blank\">link text</a></p>\n"
+      end
     end
   end
 end

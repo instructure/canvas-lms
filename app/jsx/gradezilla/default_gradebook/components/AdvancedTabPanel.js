@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {bool, func, shape} from 'prop-types'
-import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
-import View from '@instructure/ui-layout/lib/components/View'
+import {Checkbox} from '@instructure/ui-forms'
+import {View} from '@instructure/ui-layout'
 
 import I18n from 'i18n!gradezilla'
 

@@ -18,28 +18,31 @@
 
 import $ from 'jquery'
 
+import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
 import {waitFor} from '../support/Waiters'
 
-import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
-
-import 'jst/SetDefaultGradeDialog'
-import 'jst/_grading_box'
-
-const assignment = Object.freeze({
-  id: '2',
-  points_possible: 10,
-  name: 'an Assignment',
-  grading_type: 'points'
-})
-
-function closeDialog() {
-  Array.from(document.querySelectorAll('button'))
-    .find(node => node.innerText === 'close')
-    .click()
-}
-
-QUnit.module('SetDefaultGradeDialog', () => {
+QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
+  let assignment
   let dialog
+
+  suiteHooks.beforeEach(() => {
+    assignment = {
+      grading_type: 'points',
+      id: '2',
+      name: 'an Assignment',
+      points_possible: 10
+    }
+  })
+
+  function getDialog() {
+    return dialog.$dialog[0].closest('.ui-dialog')
+  }
+
+  function closeDialog() {
+    Array.from(getDialog().querySelectorAll('button'))
+      .find(node => node.innerText === 'close')
+      .click()
+  }
 
   test('#gradeIsExcused returns true if grade is EX', () => {
     dialog = new SetDefaultGradeDialog({assignment})
@@ -64,7 +67,11 @@ QUnit.module('SetDefaultGradeDialog', () => {
   test('#show text', () => {
     dialog = new SetDefaultGradeDialog({assignment})
     dialog.show()
-    ok(document.getElementById('default_grade_description').innerText.includes('same grade'))
+    ok(
+      getDialog()
+        .querySelector('#default_grade_description')
+        .innerText.includes('same grade')
+    )
     closeDialog()
   })
 
@@ -73,7 +80,9 @@ QUnit.module('SetDefaultGradeDialog', () => {
     dialog = new SetDefaultGradeDialog({assignment: percentAssignmentParams})
     dialog.show()
     ok(
-      document.getElementById('default_grade_description').innerText.includes('same percent grade')
+      getDialog()
+        .querySelector('#default_grade_description')
+        .innerText.includes('same percent grade')
     )
     closeDialog()
   })
@@ -81,17 +90,15 @@ QUnit.module('SetDefaultGradeDialog', () => {
   QUnit.module('submit behaviors', submitBehaviorHooks => {
     const context_id = '1'
     let alert
-    let server
-    let publishStub
 
     function clickSetDefaultGrade() {
-      Array.from(document.querySelectorAll('button[role="button"]'))
+      Array.from(getDialog().querySelectorAll('button[role="button"]'))
         .find(node => node.innerText === 'Set Default Grade')
         .click()
     }
 
     function respondWithPayload(payload) {
-      server.respondWith('POST', `/courses/${context_id}/gradebook/update_submission`, [
+      sandbox.server.respondWith('POST', `/courses/${context_id}/gradebook/update_submission`, [
         200,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload)
@@ -99,14 +106,9 @@ QUnit.module('SetDefaultGradeDialog', () => {
     }
 
     submitBehaviorHooks.beforeEach(() => {
-      server = sinon.createFakeServer({respondImmediately: true})
+      sandbox.server.respondImmediately = true
       alert = sinon.spy()
-      publishStub = sinon.stub($, 'publish')
-    })
-
-    submitBehaviorHooks.afterEach(() => {
-      publishStub.restore()
-      server.restore()
+      sandbox.stub($, 'publish')
     })
 
     test('submit reports number of students', async () => {
@@ -118,9 +120,9 @@ QUnit.module('SetDefaultGradeDialog', () => {
       const students = [{id: '3'}, {id: '4'}]
       dialog = new SetDefaultGradeDialog({assignment, students, context_id, alert})
       dialog.show()
-      await waitFor(() => document.getElementById('set_default_grade_form'))
+      await waitFor(() => getDialog())
       clickSetDefaultGrade()
-      await waitFor(() => !document.getElementById('set_default_grade_form'))
+      await waitFor(() => !getDialog())
       const {
         firstCall: {
           args: [message]
@@ -141,9 +143,9 @@ QUnit.module('SetDefaultGradeDialog', () => {
       // adjust page size so that we generate two requests
       dialog = new SetDefaultGradeDialog({assignment, students, context_id, page_size: 2, alert})
       dialog.show()
-      await waitFor(() => document.getElementById('set_default_grade_form'))
+      await waitFor(() => getDialog())
       clickSetDefaultGrade()
-      await waitFor(() => !document.getElementById('set_default_grade_form'))
+      await waitFor(() => !getDialog())
       const {
         firstCall: {
           args: [message]

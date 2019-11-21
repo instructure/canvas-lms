@@ -19,8 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ExternalToolDialog from '../ExternalToolDialog'
-import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
-import Transition from '@instructure/ui-motion/lib/components/Transition'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {Transition} from '@instructure/ui-motion'
 import {send} from '../../shared/rce/RceCommandShim'
 
 // jest.mock('../../deep_linking/ContentItemProcessor')
@@ -68,7 +68,8 @@ function fakeEditor() {
     selection: {
       getContent: jest.fn()
     },
-    getContent: jest.fn()
+    getContent: jest.fn(),
+    focus: () => {}
   }
 }
 
@@ -198,6 +199,12 @@ describe('open', () => {
     instance.open({name: 'foo', id: 2})
     expect(win.$).toHaveBeenCalledWith(instance.props.win)
     expect(bind).toHaveBeenCalledWith('externalContentReady', instance.handleExternalContentReady)
+  })
+
+  it('sets "data-lti-launch" attribute on iframe', async () => {
+    const instance = await getInstance(container)
+    instance.open({name: 'foo', id: 2})
+    expect(document.querySelector('iframe').getAttribute('data-lti-launch')).toBe('true')
   })
 
   describe('tray', () => {

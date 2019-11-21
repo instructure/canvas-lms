@@ -112,6 +112,10 @@ class DiscussionsIndex
       f('.discussions-index-manage-menu button', discussion(title))
     end
 
+    def manage_discussions_menu
+      f("ul[role='menu']")
+    end
+    
     def discussion_settings_button
       f('#discussion_settings')
     end

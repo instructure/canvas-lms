@@ -20,15 +20,14 @@ import I18n from 'i18n!blueprint_settingsSyncHistoryItem'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Heading, Text} from '@instructure/ui-elements'
 import FriendlyDatetime from 'jsx/shared/FriendlyDatetime'
 import SyncChange from './SyncChange'
 
 import propTypes from '../propTypes'
 
-const SyncHistoryItem = ({ migration, heading, ChangeComponent }) => {
-  const { created_at, comment, changes } = migration
+const SyncHistoryItem = ({migration, heading, ChangeComponent}) => {
+  const {created_at, comment, changes} = migration
   const date = Date.parse(created_at)
 
   return (
@@ -37,12 +36,18 @@ const SyncHistoryItem = ({ migration, heading, ChangeComponent }) => {
         <Heading level="h3">
           <FriendlyDatetime dateTime={date} format={I18n.t('#date.formats.full_with_weekday')} />
         </Heading>
-        <Text color="secondary" size="small">{I18n.t('%{count} pushed changes', { count: changes.length })}</Text>
+        <Text color="secondary" size="small">
+          {I18n.t('%{count} pushed changes', {count: changes.length})}
+        </Text>
       </header>
       {comment && <Text as="p" color="secondary" size="small">{`"${comment}"`}</Text>}
       <div role="grid">
         {changes.length ? heading : null}
-        {changes.length ? changes.map(change => <ChangeComponent key={`${change.asset_type}_${change.asset_id}`} change={change} />) : null}
+        {changes.length
+          ? changes.map(change => (
+              <ChangeComponent key={`${change.asset_type}_${change.asset_id}`} change={change} />
+            ))
+          : null}
       </div>
     </div>
   )
@@ -51,12 +56,12 @@ const SyncHistoryItem = ({ migration, heading, ChangeComponent }) => {
 SyncHistoryItem.propTypes = {
   migration: propTypes.migration.isRequired,
   ChangeComponent: PropTypes.func,
-  heading: PropTypes.node,
+  heading: PropTypes.node
 }
 
 SyncHistoryItem.defaultProps = {
   ChangeComponent: SyncChange,
-  heading: null,
+  heading: null
 }
 
 export default SyncHistoryItem

@@ -20,7 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import CourseItemRow from 'jsx/shared/components/CourseItemRow'
 import AnnouncementModel from 'compiled/models/Announcement'
-import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
+import {IconAssignmentLine} from '@instructure/ui-icons'
 
 QUnit.module('CourseItemRow component')
 
@@ -105,13 +105,13 @@ test('renders a drag handle if draggable: true', () => {
   const tree = mount(
     <CourseItemRow {...props} draggable connectDragSource={component => component} />
   )
-  const node = tree.find('IconDragHandle')
+  const node = tree.find('IconDragHandleLine')
   ok(node.exists())
 })
 
 test('renders inputted icon', () => {
-  const tree = mount(<CourseItemRow {...props} icon={<IconAssignment />} />)
-  const node = tree.find(IconAssignment)
+  const tree = mount(<CourseItemRow {...props} icon={<IconAssignmentLine />} />)
+  const node = tree.find(IconAssignmentLine)
   ok(node.exists())
 })
 

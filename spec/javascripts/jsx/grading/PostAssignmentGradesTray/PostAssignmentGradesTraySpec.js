@@ -243,6 +243,16 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         await show()
         strictEqual(getUnpostedCount().textContent, '1')
       })
+
+      test('submissions with postable comments and without a postedAt are counted', async () => {
+        context.submissions = [
+          {postedAt: new Date().toISOString(), hasPostableComments: true},
+          {postedAt: null, score: 1, workflowState: 'graded'},
+          {postedAt: null, score: null, workflowState: 'unsubmitted'}
+        ]
+        await show()
+        strictEqual(getUnpostedCount().textContent, '1')
+      })
     })
 
     QUnit.module('with no unposted submissions', unpostedSubmissionsHooks => {

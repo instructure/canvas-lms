@@ -6,6 +6,10 @@
       ga('set', 'title', <%= raw(@google_analytics_page_title.to_json) %>);
     <% end %>
     ga('send', 'pageview');
+    (window.requestIdleCallback || window.setTimeout)(function(){
+      var s=document.createElement('script'), m=document.getElementsByTagName('script')[0]
+      s.async=1; s.src='https://www.google-analytics.com/analytics.js'
+      m.parentNode.insertBefore(s,m)
+    });
   </script>
-  <script async src='https://www.google-analytics.com/analytics.js'></script>
 <% end %>

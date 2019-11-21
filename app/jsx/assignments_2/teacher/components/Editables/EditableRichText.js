@@ -20,9 +20,9 @@ import React from 'react'
 import {bool, string, func, oneOf} from 'prop-types'
 import apiUserContent from 'compiled/str/apiUserContent'
 
-import InPlaceEdit from '@instructure/ui-editable/lib/components/InPlaceEdit'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import View from '@instructure/ui-layout/lib/components/View'
+import {InPlaceEdit} from '@instructure/ui-editable'
+import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 

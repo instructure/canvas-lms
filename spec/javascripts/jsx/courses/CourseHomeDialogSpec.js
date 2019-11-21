@@ -37,55 +37,39 @@ QUnit.module('CourseHomeDialog', {
 
 const store = createStore({
   selectedDefaultView: 'modules',
-  savedDefaultView: 'modules',
+  savedDefaultView: 'modules'
 })
 
-const getDefaultProps = () => (
-  {
-    store,
-    onRequestClose: () => { },
-    wikiUrl: 'example.com',
-    courseId: '1',
-    open: true,
-    isPublishing: false,
-  }
-)
+const getDefaultProps = () => ({
+  store,
+  onRequestClose: () => {},
+  wikiUrl: 'example.com',
+  courseId: '1',
+  open: true,
+  isPublishing: false
+})
 
 test('Renders', () => {
-  const dialog = shallow(
-    <CourseHomeDialog {...getDefaultProps()} />
-  )
+  const dialog = shallow(<CourseHomeDialog {...getDefaultProps()} />)
   ok(dialog.exists())
 })
 
 test('enables wiki selection if front page is provided', () => {
   const isWikiDisabled = wrapper => wrapper.find({value: 'wiki'}).props().disabled
 
-  const noWiki = shallow(
-    <CourseHomeDialog {...getDefaultProps()} />
-  )
+  const noWiki = shallow(<CourseHomeDialog {...getDefaultProps()} />)
   ok(isWikiDisabled(noWiki), 'wiki radio should be disabled')
 
-  const hasWiki = shallow(
-    <CourseHomeDialog
-      {...getDefaultProps()}
-      wikiFrontPageTitle="Welcome"
-    />
-  )
+  const hasWiki = shallow(<CourseHomeDialog {...getDefaultProps()} wikiFrontPageTitle="Welcome" />)
   ok(!isWikiDisabled(hasWiki), 'wiki radio should be enabled')
 })
 
 const submitButton = wrapper => wrapper.find('Button').last()
 
-test('Saves the preference on submit', (assert) => {
+test('Saves the preference on submit', assert => {
   const onSubmit = sinon.spy()
 
-  const dialog = shallow(
-    <CourseHomeDialog
-      {...getDefaultProps()}
-      onSubmit={onSubmit}
-    />
-  )
+  const dialog = shallow(<CourseHomeDialog {...getDefaultProps()} onSubmit={onSubmit} />)
 
   store.setState({selectedDefaultView: 'assignments'})
   submitButton(dialog).simulate('click')
@@ -104,10 +88,7 @@ test('Saves the preference on submit', (assert) => {
 test('calls onRequestClose when cancel is clicked', () => {
   const onRequestClose = sinon.spy()
   const dialog = shallow(
-    <CourseHomeDialog
-      {...getDefaultProps()}
-      onRequestClose={onRequestClose}
-    />
+    <CourseHomeDialog {...getDefaultProps()} onRequestClose={onRequestClose} />
   )
   const cancelBtn = dialog.find('Button').at(1)
   equal(cancelBtn.props().children, 'Cancel')
@@ -117,19 +98,10 @@ test('calls onRequestClose when cancel is clicked', () => {
 
 test('save button disabled when publishing if modules selected', () => {
   store.setState({selectedDefaultView: 'modules'})
-  let dialog = shallow(
-    <CourseHomeDialog
-      {...getDefaultProps()}
-      isPublishing
-    />
-  )
+  let dialog = shallow(<CourseHomeDialog {...getDefaultProps()} isPublishing />)
   ok(submitButton(dialog).props().disabled, 'submit disabled when modules selected')
 
   store.setState({selectedDefaultView: 'feed'})
-  dialog = shallow(
-    <CourseHomeDialog
-      {...getDefaultProps()}
-    />
-  )
+  dialog = shallow(<CourseHomeDialog {...getDefaultProps()} />)
   ok(!submitButton(dialog).props().disabled, 'submit enabled when modules not selected')
 })

@@ -18,8 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import IconModuleSolid from '@instructure/ui-icons/lib/Solid/IconModule'
-import IconUploadLine from '@instructure/ui-icons/lib/Line/IconUpload'
+import {IconModuleSolid, IconUploadLine} from '@instructure/ui-icons'
 import I18n from 'i18n!modules_home_page'
 
 export default class ModulesHomePage extends React.Component {
@@ -31,7 +30,7 @@ export default class ModulesHomePage extends React.Component {
     onCreateButtonClick: () => {}
   }
 
-  render () {
+  render() {
     const importURL = window.ENV.CONTEXT_URL_ROOT + '/content_migrations'
     return (
       <ul className="ic-EmptyStateList">
@@ -43,9 +42,7 @@ export default class ModulesHomePage extends React.Component {
               onClick={this.props.onCreateButtonClick}
             >
               <IconModuleSolid className="ic-EmptyStateButton__SVG" />
-              <span className="ic-EmptyStateButton__Text">
-                {I18n.t('Create a new Module')}
-              </span>
+              <span className="ic-EmptyStateButton__Text">{I18n.t('Create a new Module')}</span>
             </button>
           </div>
         </li>
@@ -53,9 +50,7 @@ export default class ModulesHomePage extends React.Component {
           <div className="ic-EmptyStateList__BillboardWrapper">
             <a href={importURL} className="ic-EmptyStateButton">
               <IconUploadLine className="ic-EmptyStateButton__SVG" />
-              <span className="ic-EmptyStateButton__Text">
-                {I18n.t('Add existing content')}
-              </span>
+              <span className="ic-EmptyStateButton__Text">{I18n.t('Add existing content')}</span>
             </a>
           </div>
         </li>

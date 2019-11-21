@@ -17,18 +17,20 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import {mount} from 'enzyme'
 
-import IconEditLine from '@instructure/ui-icons/lib/Line/IconEdit'
-import IconEyeLine from '@instructure/ui-icons/lib/Line/IconEye'
+import {IconEditLine, IconEyeLine} from '@instructure/ui-icons'
 
 import ActionButtons from '../ActionButtons'
 
-const props = ({ showVisibilityToggle = true, developerKey =  {
-  id: '1',
-  api_key: 'test',
-  created_at: 'test'
-}} = {}) => {
+const props = ({
+  showVisibilityToggle = true,
+  developerKey = {
+    id: '1',
+    api_key: 'test',
+    created_at: 'test'
+  }
+} = {}) => {
   return {
     dispatch: jest.fn(),
     makeVisibleDeveloperKey: jest.fn(),
@@ -60,28 +62,43 @@ it('renders edit button for non lti keys', () => {
 })
 
 it('does render edit button for non lti keys', () => {
-  const wrapper = mount(<ActionButtons {...props({developerKey: {
-    id: '1',
-    api_key: 'test',
-    created_at: 'test',
-    is_lti_key: true
-  }})} />)
+  const wrapper = mount(
+    <ActionButtons
+      {...props({
+        developerKey: {
+          id: '1',
+          api_key: 'test',
+          created_at: 'test',
+          is_lti_key: true
+        }
+      })}
+    />
+  )
   expect(wrapper.find(IconEditLine).exists()).toBe(true)
 })
 
 it('warns the user when deleting a LTI key', () => {
   const oldConfirm = window.confirm
-  const wrapper = mount(<ActionButtons {...props({developerKey: {
-    id: '1',
-    api_key: 'test',
-    created_at: 'test',
-    is_lti_key: true
-  }})} />)
+  const wrapper = mount(
+    <ActionButtons
+      {...props({
+        developerKey: {
+          id: '1',
+          api_key: 'test',
+          created_at: 'test',
+          is_lti_key: true
+        }
+      })}
+    />
+  )
 
   window.confirm = jest.fn()
-  wrapper.find('Button').at(2).simulate('click')
+  wrapper
+    .find('Button')
+    .at(2)
+    .simulate('click')
   expect(window.confirm).toHaveBeenCalledWith(
-    "Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context."
+    'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
   )
   window.confirm = oldConfirm
 })

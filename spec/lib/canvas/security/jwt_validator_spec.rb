@@ -50,7 +50,7 @@ module Canvas::Security
     end
 
     before do |ex|
-      Rails.application.routes.default_url_options[:host] = 'example.com'
+      allow(Rails.application.routes).to receive(:default_url_options).and_return({:host => 'example.com'})
       unless ex.metadata[:skip_before]
         validator.validate
       end

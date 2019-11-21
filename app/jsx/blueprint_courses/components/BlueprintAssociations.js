@@ -21,16 +21,14 @@ import $ from 'jquery'
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 import 'compiled/jquery.rails_flash_notifications'
 
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import {Heading, Text, Spinner} from '@instructure/ui-elements'
+import {Alert} from '@instructure/ui-alerts'
+import {PresentationContent} from '@instructure/ui-a11y'
 
 import CoursePicker from './CoursePicker'
 import AssociationsTable from './AssociationsTable'
@@ -39,7 +37,7 @@ import actions from '../actions'
 import propTypes from '../propTypes'
 import FocusManager from '../focusManager'
 
-const { string, arrayOf, func, bool } = PropTypes
+const {string, arrayOf, func, bool} = PropTypes
 
 export default class BlueprintAssociations extends React.Component {
   static propTypes = {
@@ -60,20 +58,20 @@ export default class BlueprintAssociations extends React.Component {
     isSavingAssociations: bool.isRequired,
     hasUnsyncedChanges: bool.isRequired,
 
-    isExpanded: bool,
+    isExpanded: bool
   }
 
   static defaultProps = {
-    isExpanded: false,
+    isExpanded: false
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (!this.props.hasLoadedCourses) {
       this.props.loadCourses()
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (!this.props.isSavingAssociations && nextProps.isSavingAssociations) {
       $.screenReaderFlashMessage(I18n.t('Saving associations started'))
     }
@@ -87,21 +85,25 @@ export default class BlueprintAssociations extends React.Component {
     }
   }
 
-  onSelectedChanged = ({ added, removed }) => {
+  onSelectedChanged = ({added, removed}) => {
     if (added.length) this.props.addAssociations(added)
     if (removed.length) this.props.removeAssociations(removed)
   }
 
   focusManager = new FocusManager()
 
-  maybeRenderSyncWarning () {
-    const { hasUnsyncedChanges, existingAssociations, addedAssociations } = this.props
+  maybeRenderSyncWarning() {
+    const {hasUnsyncedChanges, existingAssociations, addedAssociations} = this.props
     if (hasUnsyncedChanges && existingAssociations.length > 0 && addedAssociations.length > 0) {
       return (
-        <Alert variant="warning" closeButtonLabel={I18n.t('Close')} margin="0 0 large">
+        <Alert variant="warning" renderCloseButtonLabel={I18n.t('Close')} margin="0 0 large">
           <p style={{margin: '0 -10px'}}>
             <Text weight="bold">{I18n.t('Warning:')}</Text>&nbsp;
-            <Text>{I18n.t('You have unsynced changes that will sync to all associated courses when a new association is saved.')}</Text>
+            <Text>
+              {I18n.t(
+                'You have unsynced changes that will sync to all associated courses when a new association is saved.'
+              )}
+            </Text>
           </p>
         </Alert>
       )
@@ -110,13 +112,13 @@ export default class BlueprintAssociations extends React.Component {
     return null
   }
 
-  renderLoadingOverlay () {
+  renderLoadingOverlay() {
     if (this.props.isSavingAssociations) {
       const title = I18n.t('Saving Associations')
       return (
         <div className="bca__overlay">
           <div className="bca__overlay__save-wrapper">
-            <Spinner title={title} />
+            <Spinner renderTitle={title} />
             <Text as="p">{title}</Text>
           </div>
         </div>
@@ -126,7 +128,7 @@ export default class BlueprintAssociations extends React.Component {
     return null
   }
 
-  render () {
+  render() {
     return (
       <div className="bca__wrapper">
         {this.maybeRenderSyncWarning()}
@@ -135,7 +137,9 @@ export default class BlueprintAssociations extends React.Component {
         <br />
         <div className="bca-course-associations">
           <CoursePicker
-            ref={(c) => { this.coursePicker = c }}
+            ref={c => {
+              this.coursePicker = c
+            }}
             courses={this.props.courses}
             terms={this.props.terms}
             subAccounts={this.props.subAccounts}
@@ -146,7 +150,9 @@ export default class BlueprintAssociations extends React.Component {
             isExpanded={this.props.isExpanded}
             detailsRef={this.focusManager.registerBeforeRef}
           />
-          <PresentationContent><hr /></PresentationContent>
+          <PresentationContent>
+            <hr />
+          </PresentationContent>
           <Heading level="h3">{I18n.t('Associated')}</Heading>
           <AssociationsTable
             existingAssociations={this.props.existingAssociations}
@@ -165,19 +171,25 @@ export default class BlueprintAssociations extends React.Component {
 }
 
 const connectState = state =>
-  Object.assign(select(state, [
-    'existingAssociations',
-    'addedAssociations',
-    'removedAssociations',
-    'courses',
-    'terms',
-    'subAccounts',
-    'hasLoadedCourses',
-    'isLoadingCourses',
-    'isLoadingAssociations',
-    'isSavingAssociations',
-  ]), {
-    hasUnsyncedChanges: !state.hasLoadedUnsyncedChanges || state.unsyncedChanges.length > 0,
-  })
+  Object.assign(
+    select(state, [
+      'existingAssociations',
+      'addedAssociations',
+      'removedAssociations',
+      'courses',
+      'terms',
+      'subAccounts',
+      'hasLoadedCourses',
+      'isLoadingCourses',
+      'isLoadingAssociations',
+      'isSavingAssociations'
+    ]),
+    {
+      hasUnsyncedChanges: !state.hasLoadedUnsyncedChanges || state.unsyncedChanges.length > 0
+    }
+  )
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedBlueprintAssociations = connect(connectState, connectActions)(BlueprintAssociations)
+export const ConnectedBlueprintAssociations = connect(
+  connectState,
+  connectActions
+)(BlueprintAssociations)

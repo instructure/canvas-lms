@@ -151,7 +151,9 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
         tray = getTray()
         tray.setAltText('Bill Murray, always amazing')
         tray.$doneButton.click()
-        expect($images[0].alt).toEqual('Bill Murray, always amazing')
+        expect(editors[0].$container.querySelector('img').getAttribute('alt')).toEqual(
+          'Bill Murray, always amazing'
+        )
       })
     })
 
@@ -164,13 +166,15 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
       it('clears the image element alt text', () => {
         tray.setIsDecorativeImage(true)
         tray.$doneButton.click()
-        expect($images[0].alt).toEqual('')
+        expect(editors[0].$container.querySelector('img').alt).toEqual('')
       })
 
       it('sets a data attribute to persist the option', () => {
         tray.setIsDecorativeImage(true)
         tray.$doneButton.click()
-        expect($images[0].getAttribute('data-is-decorative')).toEqual('true')
+        expect(
+          editors[0].$container.querySelector('img').getAttribute('data-is-decorative')
+        ).toEqual('true')
       })
     })
 
@@ -186,11 +190,15 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
       })
 
       it('updates the image element alt text', () => {
-        expect($images[0].alt).toEqual('Bill Murray, always amazing')
+        expect(editors[0].$container.querySelector('img').getAttribute('alt')).toEqual(
+          'Bill Murray, always amazing'
+        )
       })
 
       it('sets a data attribute to persist the option', () => {
-        expect($images[0].getAttribute('data-is-decorative')).toEqual('false')
+        expect(
+          editors[0].$container.querySelector('img').getAttribute('data-is-decorative')
+        ).toBeNull()
       })
     })
 
@@ -203,7 +211,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
       })
 
       it('removes the image', () => {
-        expect($images[0]).not.toBeInTheDocument()
+        expect(editors[0].$container.querySelector('img')).toBeNull()
       })
 
       it('replaces the image with a link', () => {

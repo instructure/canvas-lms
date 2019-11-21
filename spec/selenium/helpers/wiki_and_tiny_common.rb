@@ -159,7 +159,7 @@ module WikiAndTinyCommon
     fj('[role="presentation"]:contains("Images")').click
     fj('button:contains(" Upload a new image")').click
     alt_text = "image file"
-    name, path, data = get_file({:image => 'graded.png'}[:image])
+    _name, path, _data = get_file({:image => 'graded.png'}[:image])
     f("input[type='file']").send_keys(path)
     f("input[name='alt_text']").send_keys(alt_text)
     f("button[type='submit']").click
@@ -172,9 +172,13 @@ module WikiAndTinyCommon
     wait_for_ajax_requests
   end
 
-  def upload_image_to_files_in_rce
+  def upload_to_files_in_rce(image = false)
     fj('button:contains("Upload a new file")').click
-    name, path, data = get_file({:image => 'graded.png'}[:image])
+    if image == true
+      _name, path, _data = get_file({:image => 'graded.png'}[:image])
+    else
+      _name, path, _data = get_file({:text => 'foo.txt'}[:text])
+    end
     f("input[type='file']").send_keys(path)
     button = f("button[type='submit']")
     keep_trying_until { button.displayed? }
@@ -202,12 +206,34 @@ module WikiAndTinyCommon
     wait_for_ajax_requests
   end
 
+  def add_file_to_rce_next
+    title = "text_file.txt"
+    @root_folder = Folder.root_folders(@course).first
+    @text_file = @root_folder.attachments.create!(:filename => title,
+                                                  :context => @course) { |a| a.content_type = 'text/plain' }
+    get "/courses/#{@course.id}/pages/front-page/edit"
+    wait_for_tiny(f("form.edit-form .edit-content"))
+    selector = 'button[aria-label="Documents"]'
+    button = driver.execute_script("return document.querySelector('#{selector}')")
+    f('button[aria-label="More..."]').click unless button
+    f(selector).click
+    f('[role="menuitem"][title="Course Documents"]').click
+    fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')").click
+
+    force_click('form.edit-form button.submit')
+    wait_for_ajax_requests
+  end
+
   def tiny_rce_ifr_id
     f('.tox-editor-container iframe')['id']
   end
 
   def wiki_page_body_ifr_id
     f('.mce-container iframe')['id']
+  end
+
+  def rce_page_body_ifr_id
+    f('iframe.tox-edit-area__iframe')['id']
   end
 
   def wiki_page_editor_id

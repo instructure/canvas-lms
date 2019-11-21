@@ -18,6 +18,8 @@
 
 import {getStack, logCurrentContext, logTrackers} from './logging'
 
+const SLOW_SPEC_LIMIT = 1500
+
 const originalFunctions = {
   clearTimeout: window.clearTimeout,
   setTimeout: window.setTimeout
@@ -27,6 +29,7 @@ export default class AsyncTracker {
   constructor(options) {
     this._options = options
     this._trackers = []
+    this._currentContextTimer = null
 
     this._options.contextTracker.onContextStart(() => {
       this.setup()
@@ -60,6 +63,24 @@ export default class AsyncTracker {
   setup() {
     const {contextTracker, debugging, unmanagedBehaviorStrategy} = this._options
 
+    this._currentContextTimer = {}
+
+    this._currentContextTimer.timeoutId = originalFunctions.setTimeout.call(
+      window,
+      () => {
+        logTrackers(this._trackers, (type, trackersOfType) => ({
+          logType: 'warn',
+          message: `${trackersOfType.length} ${type}(s) have not yet resolved`
+        }))
+      },
+      SLOW_SPEC_LIMIT
+    )
+
+    this._currentContextTimer.clear = () => {
+      originalFunctions.clearTimeout.call(window, this._currentContextTimer.timeoutId)
+      this._currentContextTimer = null
+    }
+
     const addTimeoutTracker = tracker => {
       this._trackers.push(tracker)
     }
@@ -78,41 +99,43 @@ export default class AsyncTracker {
 
       addTimeoutTracker(tracker)
 
+      const trackerCallback = () => {
+        try {
+          if (typeof callback !== 'function') {
+            // TODO: remove this after figuring out why it is happening
+            logCurrentContext(tracker.currentContext, {
+              message: 'callback is not a function',
+              sourceStack: tracker.sourceStack
+            })
+          } else {
+            callback()
+          }
+        } catch (e) {
+          if (unmanagedBehaviorStrategy === 'wait' || unmanagedBehaviorStrategy === 'hurry') {
+            tracker.currentContext.addCriticalFailure(
+              'Unmanaged error in setTimeout callback',
+              tracker
+            )
+          }
+          throw e
+        }
+        removeTimeoutTracker(tracker)
+      }
+
       tracker.clear = () => {
         originalFunctions.clearTimeout.call(window, tracker.timeoutId)
       }
 
       tracker.hurry = () => {
         originalFunctions.clearTimeout.call(window, tracker.timeoutId)
-        tracker.listener()
+        try {
+          trackerCallback()
+        } catch (e) {
+          // Any errors have already been dealt with, but might have been re-thrown.
+        }
       }
 
-      tracker.timeoutId = originalFunctions.setTimeout.call(
-        window,
-        () => {
-          try {
-            if (typeof callback !== 'function') {
-              // TODO: remove this after figuring out why it is happening
-              logCurrentContext(tracker.currentContext, {
-                message: 'callback is not a function',
-                sourceStack: tracker.sourceStack
-              })
-            } else {
-              callback()
-            }
-          } catch (e) {
-            if (unmanagedBehaviorStrategy === 'wait') {
-              tracker.currentContext.addCriticalFailure(
-                'Unmanaged error in setTimeout callback',
-                tracker
-              )
-            }
-            throw e
-          }
-          removeTimeoutTracker(tracker)
-        },
-        duration
-      )
+      tracker.timeoutId = originalFunctions.setTimeout.call(window, trackerCallback, duration)
 
       return tracker.timeoutId
     }
@@ -127,6 +150,7 @@ export default class AsyncTracker {
     window.clearTimeout = originalFunctions.clearTimeout
     window.setTimeout = originalFunctions.setTimeout
     this._trackers = []
+    this._currentContextTimer.clear()
   }
 
   logUnmanagedBehavior() {
@@ -150,14 +174,27 @@ export default class AsyncTracker {
 
   async hurryUnmanagedBehavior() {
     return new Promise(resolve => {
+      const waits = []
+
       const maybeResolve = () => {
         if (this._trackers.length === 0) {
           resolve()
-        } else {
-          const sortedTrackers = [...this._trackers].sort((a, b) => a.duration - b.duration)
-          sortedTrackers.forEach(tracker => tracker.hurry())
+          return
         }
+
+        if (waits.length > 2) {
+          // Something keeps adding more timeouts. We have waited long enough.
+          this.clearUnmanagedBehavior()
+          resolve()
+          return
+        }
+
+        // Sort the timeouts so that the shortest are handled first.
+        const sortedTrackers = [...this._trackers].sort((a, b) => a.duration - b.duration)
+        sortedTrackers.forEach(tracker => tracker.hurry())
+        originalFunctions.setTimeout.call(window, maybeResolve, 0)
       }
+
       maybeResolve()
     })
   }
@@ -171,15 +208,37 @@ export default class AsyncTracker {
 
   async behaviorResolved() {
     return new Promise(resolve => {
+      const waits = []
+
       const maybeResolve = () => {
         if (this._trackers.length === 0) {
           resolve()
-        } else {
-          const durations = this._trackers.map(tracker => tracker.duration)
-          const highestDuration = Math.max(...durations)
-          originalFunctions.setTimeout.call(window, maybeResolve, highestDuration)
+          return
         }
+
+        if (waits.length > 2) {
+          // Something keeps adding more timeouts. We have waited long enough.
+          this.clearUnmanagedBehavior()
+          resolve()
+          return
+        }
+
+        const durations = this._trackers.map(tracker => tracker.duration)
+        const highestDuration = Math.max(...durations)
+        waits.push(highestDuration)
+        const totalWait = waits.reduce((sum, duration) => sum + duration, 0)
+
+        if (totalWait >= 1000) {
+          // These timeouts are huge. Ain't nobody got time for that.
+          this.clearUnmanagedBehavior()
+          resolve()
+          return
+        }
+
+        // Keep waiting to see if these async calls resolve.
+        originalFunctions.setTimeout.call(window, maybeResolve, highestDuration)
       }
+
       maybeResolve()
     })
   }

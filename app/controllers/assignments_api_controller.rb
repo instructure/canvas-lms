@@ -618,6 +618,7 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::Assignment
   include Api::V1::Submission
   include Api::V1::AssignmentOverride
+  include Api::V1::Quiz
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
@@ -634,7 +635,7 @@ class AssignmentsApiController < ApplicationController
   # @argument bucket [String, "past"|"overdue"|"undated"|"ungraded"|"unsubmitted"|"upcoming"|"future"]
   #   If included, only return certain assignments depending on due date and submission status.
   # @argument assignment_ids[] if set, return only assignments specified
-  # @argument order_by [String, "position"|"name"]
+  # @argument order_by [String, "position"|"name"|"due_at"]
   #   Determines the order of the assignments. Defaults to "position".
   # @argument post_to_sis [Boolean]
   #   Return only assignments that have post_to_sis set or not set.
@@ -700,9 +701,16 @@ class AssignmentsApiController < ApplicationController
       if assignment_topic&.pinned && !assignment_topic&.position.nil?
         new_assignment.discussion_topic.insert_at(assignment_topic.position + 1)
       end
-      # Include the updated positions in the response so the frontend can
-      # update them appropriately
-      result_json = assignment_json(new_assignment, @current_user, session)
+      # return assignment json based on requested result type
+      # Serializing an assignment into a quiz format is required by N.Q Quiz shells on Quizzes Page
+      result_json = if use_quiz_json?
+        quiz_json(new_assignment, @context, @current_user, session, {}, QuizzesNext::QuizSerializer)
+      else
+        # Include the updated positions in the response so the frontend can
+        # update them appropriately
+        assignment_json(new_assignment, @current_user, session)
+      end
+
       result_json['new_positions'] = positions_hash
       render :json => result_json
     else
@@ -712,6 +720,7 @@ class AssignmentsApiController < ApplicationController
 
   def get_assignments(user)
     if authorized_action(@context, user, :read)
+      log_api_asset_access([ "assignments", @context ], "assignments", "other")
       scope = Assignments::ScopedToUser.new(@context, user).scope.
         eager_load(:assignment_group).
         preload(:rubric_association, :rubric).
@@ -736,7 +745,16 @@ class AssignmentsApiController < ApplicationController
         end
         scope = scope.where(id: params[:assignment_ids])
       end
-      scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id")) if params[:order_by] == 'name'
+      case params[:order_by]
+      when 'name'
+        scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+      when 'due_at'
+        if @context.grants_right?(user, :read_as_admin)
+          scope = scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+        else
+          scope = scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+        end
+      end
 
       assignments = if params[:assignment_group_id].present?
         assignment_group_id = params[:assignment_group_id]
@@ -848,14 +866,24 @@ class AssignmentsApiController < ApplicationController
 
       locked = @assignment.locked_for?(@current_user, :check_policies => true)
       @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
+      log_api_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
-      render :json => assignment_json(@assignment, @current_user, session,
-                  submission: submissions,
-                  override_dates: override_dates,
-                  include_visibility: include_visibility,
-                  needs_grading_count_by_section: needs_grading_count_by_section,
-                  include_all_dates: include_all_dates,
-                  include_overrides: include_override_objects)
+      options = {
+        submission: submissions,
+        override_dates: override_dates,
+        include_visibility: include_visibility,
+        needs_grading_count_by_section: needs_grading_count_by_section,
+        include_all_dates: include_all_dates,
+        include_overrides: include_override_objects
+      }
+
+      result_json = if use_quiz_json?
+        quiz_json(@assignment, @context, @current_user, session, {}, QuizzesNext::QuizSerializer)
+      else
+        assignment_json(@assignment, @current_user, session, options)
+      end
+
+      render :json => result_json
     end
   end
 
@@ -1320,5 +1348,9 @@ class AssignmentsApiController < ApplicationController
 
   def course_copy_retry?
     target_course_for_duplicate != @context
+  end
+
+  def use_quiz_json?
+    params[:result_type] == 'Quiz' && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
   end
 end

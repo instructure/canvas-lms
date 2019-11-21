@@ -152,6 +152,7 @@ class ContextModulesApiController < ApplicationController
   # @returns [Module]
   def index
     if authorized_action(@context, @current_user, :read)
+      log_api_asset_access([ "modules", @context ], "modules", "other")
       route = polymorphic_url([:api_v1, @context, :context_modules])
       scope = @context.modules_visible_to(@student || @current_user)
 

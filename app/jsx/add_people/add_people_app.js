@@ -18,25 +18,24 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { bindActionCreators } from 'redux'
-import { connect, Provider } from 'react-redux'
+import {bindActionCreators} from 'redux'
+import {connect, Provider} from 'react-redux'
 import natcompare from 'compiled/util/natcompare'
-import { createStore, defaultState } from './store'
-import { actions } from './actions'
+import {createStore, defaultState} from './store'
+import {actions} from './actions'
 import reducer from './reducer'
 import AddPeople from './components/add_people'
 
 export default class AddPeopleApp {
-  constructor (root, props) {
-    this.root = root;                     // DOM node we render into
-    this.closer = this.close.bind(this);  // close us
-    this.onCloseCallback = props.onClose; // tell our parent
-    this.theme = props.theme || 'canvas';
-
+  constructor(root, props) {
+    this.root = root // DOM node we render into
+    this.closer = this.close.bind(this) // close us
+    this.onCloseCallback = props.onClose // tell our parent
+    this.theme = props.theme || 'canvas'
 
     // natural sort the sections by name
-    let sections = props.sections || [];
-    sections = sections.slice().sort(natcompare.byKey('name'));
+    let sections = props.sections || []
+    sections = sections.slice().sort(natcompare.byKey('name'))
 
     // create the store with its initial state
     // some values are default, some come from props
@@ -59,39 +58,46 @@ export default class AddPeopleApp {
       apiState: defaultState.apiState,
       userValidationResult: defaultState.userValidationResult,
       usersToBeEnrolled: defaultState.usersToBeEnrolled
-    });
+    })
 
     // when ConnectedApp is rendered, these state members are passed as props
-    function mapStateToProps (state) {
-      return { ...state };
+    function mapStateToProps(state) {
+      return {...state}
     }
-
 
     // when ConnectedApp is rendered, all the action dispatch functions are passed as props
     const mapDispatchToProps = dispatch => bindActionCreators(actions, dispatch)
 
     // connect our top-level component to redux
-    this.ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(AddPeople);
+    this.ConnectedApp = connect(
+      mapStateToProps,
+      mapDispatchToProps
+    )(AddPeople)
   }
-  open () {
-    this.render(true);
+
+  open() {
+    this.render(true)
   }
-  close () {
-    this.render(false);
+
+  close() {
+    this.render(false)
     if (typeof this.onCloseCallback === 'function') {
-      this.onCloseCallback();
+      this.onCloseCallback()
     }
   }
+
   // used by the roster page to decide if it has to requry for the course's
   // enrollees
-  usersHaveBeenEnrolled () {
-    return this.store.getState().usersEnrolled;
+  usersHaveBeenEnrolled() {
+    return this.store.getState().usersEnrolled
   }
-  unmount () {
-    ReactDOM.unmountComponentAtNode(this.root);
+
+  unmount() {
+    ReactDOM.unmountComponentAtNode(this.root)
   }
-  render (isOpen) {
-    const ConnectedApp = this.ConnectedApp;
+
+  render(isOpen) {
+    const ConnectedApp = this.ConnectedApp
     ReactDOM.render(
       <Provider store={this.store}>
         <ConnectedApp isOpen={isOpen} onClose={this.closer} theme={this.theme} />

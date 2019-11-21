@@ -18,6 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def ci_node_total = 10; // how many nodes to run on
 pipeline {
   agent none
   options {
@@ -29,24 +30,83 @@ pipeline {
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+    KNAPSACK_ENABLED = 1
+    KNAPSACK_GENERATE_REPORT = 'false'
+    KNAPSACK_TEST_FILE_PATTERN = '{spec,gems/plugins/*/spec_canvas}/**/*_spec.rb'
+    KNAPSACK_EXCLUDE_REGEX = '/selenium/'
+    KNAPSACK_TEST_DIR = 'spec'
+    RERUNS_RETRY = 1
+    MAX_FAIL = 50
   }
-  // Todo: This will run all rspec tests consecutively, still need to get parallel depending on runtime
   stages {
-    stage ('Rspec Tests') {
-      agent { label 'docker' }
+    stage ('Distribute Rspec Tests') {
       steps {
-        timeout(time: 60) {
-          sh 'printenv | sort'
-          sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-          // Todo: create script for rspec tests
-          // sh 'build/new-jenkins/rspec-tests.sh'
+        script {
+          def nodes = [:];
+          for(int i = 0; i < ci_node_total; i++) {
+            def index = i;
+            nodes["rspec set ${(i+1).toString().padLeft(2, '0')}"] = {
+              withEnv(["CI_NODE_INDEX=$index", "CI_NODE_TOTAL=$ci_node_total"]) {
+                node('canvas-docker') {
+                  stage("Running RSpec Set ${index}") {
+                    try {
+                      sh 'rm -rf ./tmp/spec_failures'
+                      checkout scm
+                      timeout(time: 60) {
+                        sh 'printenv | sort'
+                        sh 'build/new-jenkins/docker-compose-pull.sh'
+                        sh 'build/new-jenkins/docker-compose-build-up.sh'
+                        sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+                        sh 'build/new-jenkins/rspec-with-retries.sh'
+                      }
+                    }
+                    catch (ex) {
+                      // copy spec failures to local
+                      sh 'mkdir -p tmp'
+                      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp/spec_failures/'
+                      throw ex
+                    }
+                    finally {
+                      dir ('tmp') {
+                        stash name: "rspec_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
+                      }
+                      sh 'rm -rf ./tmp/spec_failures'
+                      sh 'build/new-jenkins/docker-cleanup.sh'
+                    }
+                  }
+                }
+              }
+            }
+          }
+          parallel(nodes);
         }
       }
-
-      post {
-        cleanup {
-          sh 'build/new-jenkins/docker-cleanup.sh'
+    }
+  }
+  post {
+    failure {
+      script {
+        node {
+          sh 'rm -rf ./compiled_failures'
+          def htmlFiles;
+          dir('compiled_failures') {
+            for(int i = 0; i < ci_node_total; i++) {
+              def index = i;
+              dir ("node_${index}") {
+                unstash "rspec_failures_${index}"
+              }
+            }
+            htmlFiles = findFiles glob: '**/index.html'
+          }
+          publishHTML target: [
+            allowMissing: false,
+            alwaysLinkToLastBuild: false,
+            keepAll: true,
+            reportDir: 'compiled_failures',
+            reportFiles: htmlFiles.join(','),
+            reportName: 'Test Failures'
+          ]
+          sh 'rm -rf ./compiled_failures'
         }
       }
     }

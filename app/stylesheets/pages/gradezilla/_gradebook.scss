@@ -572,6 +572,7 @@ $gradebook_cell_padding_top: 8px;
   justify-content: space-between;
 }
 
+.Grid__GradeCell__InvalidGrade,
 .Grid__GradeCell__OriginalityScore {
   align-items: center;
   box-sizing: border-box;
@@ -581,15 +582,25 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .Grid__GradeCell__InvalidGrade {
-  align-items: center;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  width: $cell-icon-width;
-
-  i.icon-warning {
-    color: $ic-color-danger;
+  i {
     padding-bottom: 2px; // match the icon container size from InstUI
+
+    &.icon-warning {
+      color: $ic-color-danger;
+    }
+  }
+}
+
+.Grid__GradeCell__OriginalityScore {
+  i {
+    &.icon-empty,
+    &.icon-oval-half {
+      color: $ic-color-danger;
+    }
+
+    &.icon-complete {
+      color: $ic-color-success;
+    }
   }
 }
 

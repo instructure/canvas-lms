@@ -16,47 +16,63 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_2_login_action_prompt'
-import React from 'react'
-
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import View from '@instructure/ui-layout/lib/components/View'
-
+import {Flex, View} from '@instructure/ui-layout'
+import I18n from 'i18n!assignments_2_login_action_prompt'
 import lockedSVG from '../SVG/Locked1.svg'
+import React from 'react'
+import {Text} from '@instructure/ui-elements'
 
 const navigateToLogin = () => {
   window.location.assign('/login')
 }
 
-function LoginActionPrompt() {
+function LoginActionPrompt(props) {
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
-      <FlexItem>
+      <Flex.Item>
         <View margin="medium" as="div">
           <img alt={I18n.t('Submission Locked Image')} src={lockedSVG} />
         </View>
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <Text margin="small" size="x-large">
           {I18n.t('Submission Locked')}
         </Text>
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <Text margin="small" size="medium">
-          {I18n.t('Log in to submit')}
+          {props.nonAcceptedEnrollment
+            ? I18n.t('Accept course invitation to participate in this assignment')
+            : I18n.t('Log in to submit')}
         </Text>
-      </FlexItem>
-      <FlexItem>
+      </Flex.Item>
+      <Flex.Item>
         <View margin="medium" as="div">
-          <Button variant="primary" onClick={navigateToLogin}>
-            {I18n.t('Log in')}
-          </Button>
+          {props.nonAcceptedEnrollment ? (
+            <a
+              href={`/courses/${ENV.COURSE_ID}/enrollment_invitation?accept=true`}
+              role="button"
+              className="Button"
+              data-method="POST"
+              data-url={`/courses/${ENV.COURSE_ID}/enrollment_invitation?accept=true`}
+            >
+              {I18n.t('Accept course invitation')}
+            </a>
+          ) : (
+            <Button variant="primary" onClick={navigateToLogin}>
+              {I18n.t('Log in')}
+            </Button>
+          )}
         </View>
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }
 
-export default React.memo(LoginActionPrompt)
+LoginActionPrompt.propTypes = {
+  nonAcceptedEnrollment: bool
+}
+
+export default LoginActionPrompt

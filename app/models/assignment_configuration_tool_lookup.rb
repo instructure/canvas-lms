@@ -18,6 +18,8 @@
 class AssignmentConfigurationToolLookup < ActiveRecord::Base
   SUBSCRIPTION_MANAGEMENT_STRAND = 'plagiarism-platform-subscription-management'
 
+  validates :context_type, presence: true
+
   belongs_to :tool, polymorphic: [:context_external_tool, message_handler: 'Lti::MessageHandler']
   belongs_to :assignment
   after_create :create_subscription
@@ -25,16 +27,22 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
 
   class << self
     def by_message_handler(message_handler, assignments)
-      product_family = message_handler.resource_handler.tool_proxy.product_family
+      product_family = message_handler.tool_proxy.product_family
       AssignmentConfigurationToolLookup.where(
         assignment: Array(assignments),
         tool_product_code: product_family.product_code,
         tool_vendor_code: product_family.vendor_code,
-        tool_resource_type_code: message_handler.resource_handler.resource_type_code
+        tool_resource_type_code: message_handler.resource_handler.resource_type_code,
+        context_type: message_handler.tool_proxy.context_type # Course or Account
       )
     end
 
+    # TODO: this method is not used. remove.
     def by_tool_proxy(tool_proxy)
+      by_tool_proxy_scope(tool_proxy).preload(:assignment).map(&:assignment)
+    end
+
+    def by_tool_proxy_scope(tool_proxy)
       message_handler = tool_proxy.resources.preload(:message_handlers).map(&:message_handlers).flatten.find do |mh|
         mh.capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
       end
@@ -42,7 +50,11 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
         tool_product_code: tool_proxy.product_family.product_code,
         tool_vendor_code: tool_proxy.product_family.vendor_code,
         tool_resource_type_code: message_handler&.resource_handler&.resource_type_code
-      ).preload(:assignment).map(&:assignment)
+        # this method is only used in
+        # app/controllers/lti/users_api_controller.rb#user_in_context to limit
+        # access. So we don't include context_type here, in case that breaks
+        # tools from working (if some course-level ACTLs as "Account")
+      )
     end
 
     def recreate_missing_subscriptions(account, message_handler)
@@ -51,7 +63,7 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
         "account_id: #{account.id}, handler_id: #{message_handler.id}"
       end
       Assignment.active.where(
-        context_id: Course.not_deleted.where(account: account).pluck(:id)
+        context_id: Course.not_deleted.where(root_account: account).pluck(:id)
       ).find_in_batches do |assignments|
         recreate_subscriptions(message_handler, assignments)
       end

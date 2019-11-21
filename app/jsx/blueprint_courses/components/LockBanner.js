@@ -17,10 +17,10 @@
  */
 
 import I18n from 'i18n!blueprint_coursesLockBanner'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import Alert from '@instructure/ui-alerts/lib/components/Alert'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Alert} from '@instructure/ui-alerts'
+import {Text} from '@instructure/ui-elements'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 import {formatLockObject} from '../LockItemFormat'
@@ -29,7 +29,7 @@ import propTypes from '../propTypes'
 export default class LockBanner extends Component {
   static propTypes = {
     isLocked: PropTypes.bool.isRequired,
-    itemLocks: propTypes.itemLocks,
+    itemLocks: propTypes.itemLocks
   }
 
   static defaultProps = {
@@ -38,11 +38,11 @@ export default class LockBanner extends Component {
       points: false,
       settings: false,
       due_dates: false,
-      availability_dates: false,
+      availability_dates: false
     }
   }
 
-  static setupRootNode () {
+  static setupRootNode() {
     const bannerNode = document.createElement('div')
     bannerNode.id = 'blueprint-lock-banner'
     bannerNode.setAttribute('style', 'margin-bottom: 2em')
@@ -50,17 +50,21 @@ export default class LockBanner extends Component {
     return contentNode.insertBefore(bannerNode, contentNode.firstChild)
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     if (this.props.isLocked && !prevProps.isLocked) {
-      $.screenReaderFlashMessage(I18n.t('%{attributes} locked', { attributes: formatLockObject(this.props.itemLocks) }))
+      $.screenReaderFlashMessage(
+        I18n.t('%{attributes} locked', {attributes: formatLockObject(this.props.itemLocks)})
+      )
     }
   }
 
-  render () {
+  render() {
     if (this.props.isLocked) {
       return (
         <Alert>
-          <Text weight="bold" size="small">{I18n.t('Locked:')}&nbsp;</Text>
+          <Text weight="bold" size="small">
+            {I18n.t('Locked:')}&nbsp;
+          </Text>
           <Text size="small">{formatLockObject(this.props.itemLocks)}</Text>
         </Alert>
       )

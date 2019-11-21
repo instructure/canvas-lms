@@ -18,7 +18,7 @@
 import React from 'react'
 import {bool, func, oneOf, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import {Flex, FlexItem} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-layout'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
@@ -117,7 +117,7 @@ export default class OverrideDates extends React.Component {
           wrapItems
           data-testid="OverrideDates"
         >
-          <FlexItem margin="0 x-small 0 0" as="div" grow width="30%">
+          <Flex.Item margin="0 x-small 0 0" as="div" grow width="30%">
             {this.renderDate(
               'due_at',
               I18n.t('Due'),
@@ -128,8 +128,8 @@ export default class OverrideDates extends React.Component {
               this.onValidateDue,
               this.invalidMessageDue
             )}
-          </FlexItem>
-          <FlexItem margin="0 x-small 0 0" as="div" grow width="30%">
+          </Flex.Item>
+          <Flex.Item margin="0 x-small 0 0" as="div" grow width="30%">
             {this.renderDate(
               'unlock_at',
               I18n.t('Available'),
@@ -140,8 +140,8 @@ export default class OverrideDates extends React.Component {
               this.onValidateUnlock,
               this.invalidMessageUnlock
             )}
-          </FlexItem>
-          <FlexItem margin="0 0 0 0" as="div" grow width="30%">
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 0" as="div" grow width="30%">
             {this.renderDate(
               'lock_at',
               I18n.t('Until'),
@@ -152,7 +152,7 @@ export default class OverrideDates extends React.Component {
               this.onValidateLock,
               this.invalidMessageLock
             )}
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </FormFieldGroup>
     )

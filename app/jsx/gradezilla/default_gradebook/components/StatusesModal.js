@@ -21,9 +21,9 @@ import ReactDOM from 'react-dom'
 import {func, shape, string} from 'prop-types'
 import update from 'immutability-helper'
 import I18n from 'i18n!gradezilla'
-import Button from '@instructure/ui-buttons/lib/components/Button'
-import Modal, {ModalBody, ModalFooter} from '../../../shared/components/InstuiModal'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Button} from '@instructure/ui-buttons'
+import Modal from '../../../shared/components/InstuiModal'
+import {Text} from '@instructure/ui-elements'
 import {statuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
 
@@ -138,17 +138,17 @@ class StatusesModal extends React.Component {
         contentRef={bindContentRef}
         shouldCloseOnDocumentClick={false}
       >
-        <ModalBody>
+        <Modal.Body>
           <ul className="Gradebook__StatusModalList">
             <Text>{this.renderListItems()}</Text>
           </ul>
-        </ModalBody>
+        </Modal.Body>
 
-        <ModalFooter>
+        <Modal.Footer>
           <Button ref={bindDoneButton} variant="primary" onClick={close}>
             {I18n.t('Done')}
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </Modal>
     )
   }
