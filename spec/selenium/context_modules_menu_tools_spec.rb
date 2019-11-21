@@ -168,4 +168,41 @@ describe "context modules" do
         expect(link).not_to be_displayed
       end
   end
+
+  context "module index tool placement" do
+    before do
+      course_with_teacher_logged_in
+
+      @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      @tool.module_index_menu = {:url => "http://www.example.com", :text => "Import Stuff"}
+      @tool.save!
+      @module1 = @course.context_modules.create!(:name => "module1")
+      @module2 = @course.context_modules.create!(:name => "module2")
+
+      Account.default.enable_feature!(:commons_favorites)
+    end
+
+    it "should be able to launch the index menu tool via the tray", custom_timeout: 60 do
+      get "/courses/#{@course.id}/modules"
+
+      gear = f(".header-bar .al-trigger")
+      gear.click
+      tool_link = f(".header-bar li.ui-menu-item a.menu_tool_link")
+      expect(tool_link).to include_text("Import Stuff")
+
+      tool_link.click
+      wait_for_ajaximations
+      tray = f("[role='dialog']")
+      expect(tray['aria-label']).to eq "Import Stuff"
+      iframe = tray.find_element(:css, "iframe")
+      expect(iframe['src']).to include("/courses/#{@course.id}/external_tools/#{@tool.id}")
+      query_params = Rack::Utils.parse_nested_query(URI.parse(iframe['src']).query)
+      expect(query_params["launch_type"]).to eq "module_index_menu"
+      expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "true"
+      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(
+        ["assignment", "audio", "discussion_topic", "document", "image", "module", "quiz", "page", "video"])
+      module_data = [@module1, @module2].map{|m| {"id" => m.id.to_s, "name" => m.name}}
+      expect(query_params["com_instructure_course_available_canvas_resources"].values).to match_array(module_data)
+    end
+  end
 end

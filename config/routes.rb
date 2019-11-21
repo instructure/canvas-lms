@@ -995,6 +995,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/folders/media', controller: :folders, action: :media_folder
       get 'courses/:course_id/folders/:id', controller: :folders, action: :show, as: 'course_folder'
       get 'media_objects', controller: 'media_objects', action: :index, as: :media_objects
+      get 'courses/:course_id/media_objects', controller: 'media_objects', action: :index, as: :course_media_objects
       put 'accounts/:account_id/courses', action: :batch_update
       post 'courses/:course_id/ping', action: :ping, as: 'course_ping'
 
@@ -2222,9 +2223,13 @@ CanvasRails::Application.routes.draw do
     scope(:controller => :context) do
       post 'media_objects', action: 'create_media_object', as: :create_media_object
     end
+
+    scope(:controller => :media_objects) do
+      put 'media_objects/:media_object_id', action: 'update_media_object', as: :update_media_object
+    end
   end
 
-  # this is not a "normal" api endpoint in the sense that it is not documented or
+    # this is not a "normal" api endpoint in the sense that it is not documented or
     # generally available to hosted customers. it also does not respect the normal
     # pagination options; however, jobs_controller already accepts `limit` and `offset`
     # paramaters and defines a sane default limit

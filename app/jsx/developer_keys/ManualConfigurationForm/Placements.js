@@ -18,7 +18,6 @@
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
-import $ from 'jquery'
 
 import {Select} from '@instructure/ui-forms'
 import {AccessibleContent} from '@instructure/ui-a11y'
@@ -41,16 +40,7 @@ export default class Placements extends React.Component {
     return Object.values(this.placementRefs).map(p => p.generateToolConfigurationPart())
   }
 
-  valid = () => {
-    if (Object.values(this.placementRefs).length === 0) {
-      $.flashError(I18n.t('Must have at least one placement defined.'))
-      return false
-    }
-    if (Object.values(this.placementRefs).some(p => !p.valid())) {
-      return false
-    }
-    return true
-  }
+  valid = () => Object.values(this.placementRefs).every(p => p.valid())
 
   placements(obj) {
     return obj.map(o => o.placement)

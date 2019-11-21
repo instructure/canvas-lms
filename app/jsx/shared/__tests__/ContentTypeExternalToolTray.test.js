@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import ContentTypeExternalToolTray from 'compiled/views/wiki/ContentTypeExternalToolTray'
+import ContentTypeExternalToolTray from '../ContentTypeExternalToolTray'
 
 describe('ContentTypeExternalToolTray', () => {
   const tool = {id: 1, base_url: 'https://one.lti.com/', title: 'First LTI'}
@@ -34,6 +34,7 @@ describe('ContentTypeExternalToolTray', () => {
         targetResourceType="page"
         allowItemSelection
         selectableItems={[{id: '1', name: 'module 1'}]}
+        open
         {...props}
       />
     )

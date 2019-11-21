@@ -40,6 +40,9 @@ import Publishable from 'compiled/models/Publishable'
 import PublishButtonView from 'compiled/views/PublishButtonView'
 import htmlEscape from './str/htmlEscape'
 import setupContentIds from 'jsx/modules/utils/setupContentIds'
+import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
+import {ltiState} from './lti/post_message/handleLtiPostMessage'
+import {monitorLtiMessages} from 'lti/messages'
 import get from 'lodash/get'
 import axios from 'axios'
 import {showFlashError} from 'jsx/shared/FlashAlert'
@@ -2500,6 +2503,63 @@ $(document).ready(function() {
   $contextModules.each(function() {
     modules.updateProgressionState($(this))
   })
+
+  function setExternalToolTray(tool, returnFocusTo) {
+    const handleDismiss = () => {
+      setExternalToolTray(null)
+      returnFocusTo.focus()
+      if (ltiState?.tray?.refreshOnClose) {
+        window.location.reload()
+      }
+    }
+
+    const moduleData = []
+    $('#context_modules .context_module').each(function() {
+      moduleData.push({
+        id: $(this)
+          .attr('id')
+          .substring('context_module_'.length),
+        name: $(this)
+          .find('.name')
+          .attr('title')
+      })
+    })
+
+    ReactDOM.render(
+      <ContentTypeExternalToolTray
+        tool={tool}
+        placement="module_index_menu"
+        acceptedResourceTypes={[
+          'assignment',
+          'audio',
+          'discussion_topic',
+          'document',
+          'image',
+          'module',
+          'quiz',
+          'page',
+          'video'
+        ]}
+        targetResourceType="module"
+        allowItemSelection
+        selectableItems={moduleData}
+        onDismiss={handleDismiss}
+        open={tool !== null}
+      />,
+      $('#external-tool-mount-point')[0]
+    )
+  }
+
+  function openExternalTool(ev) {
+    if (ev != null) {
+      ev.preventDefault()
+    }
+    const tool = ENV.MODULE_INDEX_TOOLS.find(t => t.id === ev.target.dataset.toolId)
+    setExternalToolTray(tool, $('.al-trigger')[0])
+  }
+
+  $('.module_index_tools .menu_tool_link').click(openExternalTool)
+  monitorLtiMessages()
 })
 
 export default modules

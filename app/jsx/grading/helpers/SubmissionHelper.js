@@ -24,9 +24,9 @@ export function isGraded(submission) {
   return (sub.score != null && sub.workflowState === 'graded') || sub.excused
 }
 
-export function isHidden(submission) {
+export function isPostable(submission) {
   const sub = camelize(submission)
-  return isGraded(sub) && !sub.postedAt
+  return !sub.postedAt && (isGraded(sub) || !!sub.hasPostableComments)
 }
 
 // This function returns an object containing plagiarism/originality-related

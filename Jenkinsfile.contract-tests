@@ -72,7 +72,26 @@ pipeline {
   }
 
   post {
+    failure {
+      sh 'mkdir -p spec_results'
+      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/. ./spec_results/'
+      script {
+        dir('spec_results') {
+          htmlFiles = findFiles glob: '**/index.html'
+        }
+
+        publishHTML(target: [
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: true,
+          reportDir: "spec_results",
+          reportFiles: htmlFiles.join(','),
+          reportName: 'Test Results'
+        ])
+      }
+    }
     cleanup {
+      sh 'rm -rf spec_results/'
       sh 'build/new-jenkins/docker-cleanup.sh'
     }
   }

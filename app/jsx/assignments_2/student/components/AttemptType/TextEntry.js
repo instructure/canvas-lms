@@ -237,7 +237,10 @@ export default class TextEntry extends React.Component {
   renderSubmission() {
     return (
       <View as="div" borderWidth="small" padding="xx-small" data-testid="text-submission">
-        <div dangerouslySetInnerHTML={{__html: this.props.submission.body}} />
+        <div
+          style={{wordBreak: 'break-word'}}
+          dangerouslySetInnerHTML={{__html: this.props.submission.body}}
+        />
       </View>
     )
   }

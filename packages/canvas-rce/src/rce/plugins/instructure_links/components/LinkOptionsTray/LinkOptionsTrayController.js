@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import bridge from '../../../../../bridge'
-import {getContentFromEditor} from '../../../shared/ContentSelection'
+import {getLinkContentFromEditor} from '../../../shared/ContentSelection'
 import LinkOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-link-options-tray-container'
@@ -69,7 +69,7 @@ export default class LinkOptionsTrayController {
   }
 
   _renderTray() {
-    const content = getContentFromEditor(this._editor, true)
+    const content = getLinkContentFromEditor(this._editor)
     if (this._shouldOpen) {
       /*
        * When the tray is being opened again, it should be rendered fresh

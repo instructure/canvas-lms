@@ -449,12 +449,13 @@ $(document).ready(function() {
       $section.fillTemplateData({
         data: {submission_id: id}
       })
-      $section.find('.section_content').empty()
+      const $sectionContent = $section.find('.section_content')
+      $sectionContent.empty()
       const $frame = $('#edit_content_templates')
         .find('.submission_preview')
         .clone()
       $frame.attr('src', url)
-      $section.append($frame)
+      $sectionContent.append($frame)
       $section.addClass('read_only')
       $(this).focus()
       $.screenReaderFlashMessageExclusive(I18n.t('submission added: %{title}', {title}))

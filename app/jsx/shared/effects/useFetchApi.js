@@ -69,7 +69,16 @@ export default function useFetchApi({
   convert, // allows you to convert the json response data into another format before calling success
   forceResult, // specify this to bypass the fetch and report this to success instead. meta is not called.
   params = {}, // url parameters
-  headers = {}, // additoinal request headers
+  headers = {}, // additional request headers
+
+  // Setting fetchAllpages makes useFetchApi continually fetch pages while the Link header indicates
+  // there is a next page. The success callback will be invoked for each page with a flattened array
+  // of the results accumulated thus far. The meta callback will also be called once for each page.
+  // If an error occurs on any page, the error callback will be called and pagination will stop. The
+  // loading callback will only be called with false when pagination ends. If any of the parameters
+  // change, the pagination starts over.
+  fetchAllPages = false,
+
   fetchOpts = {} // other options to pass to fetch
 }) {
   // useImmediate for deep comparisons and may help avoid browser flickering
@@ -87,26 +96,58 @@ export default function useFetchApi({
         loading,
         meta
       })
-      activeLoading(true)
-      doFetchApi({
-        path,
-        headers,
-        params,
-        fetchOpts: {signal, ...fetchOpts}
-      })
-        .then(({json, response, link}) => {
-          if (convert && json) json = convert(json)
-          activeLoading(false)
-          activeMeta({response, link})
-          activeSuccess(json)
-        })
-        .catch(err => {
-          activeLoading(false)
+
+      async function fetchLoop() {
+        try {
+          activeLoading(true)
+          let nextPage = false
+          let accummulatedResults = []
+          do {
+            const paramsWithPage = {...params}
+            if (nextPage) paramsWithPage.page = nextPage
+            // we don't want to flood the server with parallel requests, and we need to wait for the
+            // "next" link header before we know what the next page url is, so we actually want to
+            // await in the loop.
+            // eslint-disable-next-line no-await-in-loop
+            const {json, response, link} = await doFetchApi({
+              path,
+              headers,
+              params: paramsWithPage,
+              fetchOpts: {signal, ...fetchOpts}
+            })
+            const result = convert && json ? convert(json) : json
+            accummulatedResults = accummulatedResults.concat(result)
+
+            activeMeta({response, link})
+            if (fetchAllPages) {
+              activeSuccess(accummulatedResults)
+              nextPage = link?.next?.page
+            } else {
+              activeSuccess(result)
+            }
+          } while (nextPage)
+        } catch (err) {
           activeError(err)
-        })
+        } finally {
+          activeLoading(false)
+        }
+      }
+      fetchLoop()
       return abort
     },
-    [success, error, loading, meta, path, convert, headers, params, fetchOpts, forceResult],
+    [
+      success,
+      error,
+      loading,
+      meta,
+      path,
+      convert,
+      forceResult,
+      params,
+      headers,
+      fetchAllPages,
+      fetchOpts
+    ],
     {deep: true}
   )
 }

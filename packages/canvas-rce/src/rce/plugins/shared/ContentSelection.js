@@ -44,36 +44,33 @@ export function asImageEmbed($element) {
 }
 
 export function asLink($element, editor) {
-  const nodeName = $element.nodeName.toLowerCase()
-  if (nodeName !== 'a' || !$element.href) {
-    return null
-  }
-
-  if ($element.nodeName.toLowerCase() !== 'a' && editor) {
+  let $link = $element
+  if ($link.tagName !== 'A') {
     // the user may have selected some text that is w/in a link
     // but didn't include the <a>. Let's see if that's true
-    $element = editor.dom.getParent($element, 'a[href]')
+    $link = editor.dom.getParent($link, 'a[href]')
   }
-  if (!$element || $element.nodeName.toLowerCase() !== 'a' || !$element.href) {
+
+  if (!$link || $link.tagName !== 'A' || !$link.href) {
     return null
   }
 
-  const path = new URL($element.href).pathname
+  const path = new URL($link.href).pathname
   const type = FILE_DOWNLOAD_PATH_REGEX.test(path) ? FILE_LINK_TYPE : LINK_TYPE
   let displayAs = DISPLAY_AS_LINK
-  if ($element.classList.contains('auto_open')) {
+  if ($link.classList.contains('auto_open')) {
     displayAs = DISPLAY_AS_EMBED
-  } else if ($element.classList.contains('inline_disabled')) {
+  } else if ($link.classList.contains('inline_disabled')) {
     displayAs = DISPLAY_AS_EMBED_DISABLED
   }
 
   return {
-    $element,
+    $element: $link,
     displayAs,
-    text: $element.textContent,
+    text: editor.selection.getContent() || $link.textContent,
     type,
-    isPreviewable: $element.hasAttribute('data-canvas-previewable'),
-    url: $element.href
+    isPreviewable: $link.hasAttribute('data-canvas-previewable'),
+    url: $link.href
   }
 }
 
@@ -99,7 +96,7 @@ export function asVideoElement($element) {
 }
 
 function asText($element, editor) {
-  const text = editor && editor.selection.getNode().textContent
+  const text = editor && editor.selection.getContent({format: 'text'})
   if (!text) {
     return null
   }
@@ -149,6 +146,13 @@ export function getContentFromEditor(editor, expandSelection = false) {
   }
 
   return getContentFromElement($element, editor)
+}
+
+// if the selection is somewhere w/in a <a>,
+// find the <a> and return it's info
+export function getLinkContentFromEditor(editor) {
+  const $element = editor.selection.getNode()
+  return $element ? asLink($element, editor) : null
 }
 
 export function isFileLink($element, editor) {

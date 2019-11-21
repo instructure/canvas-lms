@@ -22,9 +22,14 @@ require_relative "../graphql_spec_helper"
 describe Types::GroupType do
   before(:once) do
     course_with_student(active_all: true)
+    @student_not_in_group = @student
+
+    student_in_course(active_all: true)
+    @student_in_group = @student
+
     @group_set = @course.group_categories.create! name: "asdf"
     @group = @group_set.groups.create! name: "group 1", context: @course
-    @membership = @group.add_user(@student)
+    @membership = @group.add_user(@student_in_group)
   end
 
   let(:group_type) { GraphQLTypeTester.new(@group, current_user: @teacher) }
@@ -41,12 +46,32 @@ describe Types::GroupType do
     expect(group_type.resolve("_id", current_user: user)).to be_nil
   end
 
-  describe Types::GroupMembershipType do
-    let(:group_membership_type) { GraphQLTypeTester.new(@membership, current_user: @teacher) }
-
+  describe "membersConnection" do
     it "works" do
-      expect(group_type.resolve("membersConnection { edges { node { user { _id } } } }")).to eq [@membership.user_id.to_s]
-      expect(group_type.resolve("membersConnection { edges { node { state } } }")).to eq [@membership.workflow_state]
+      expect(group_type.resolve("membersConnection { nodes { user { _id } } }")).to eq [@membership.user_id.to_s]
+      expect(group_type.resolve("membersConnection { nodes { state } }")).to eq [@membership.workflow_state]
+    end
+
+    it "requires permission" do
+      expect(
+        group_type.resolve("membersConnection { nodes { _id } }",
+                           current_user: @student_not_in_group)
+      ).to be_nil
+    end
+  end
+
+  describe "member" do
+    it "works" do
+      expect(
+        group_type.resolve(%|member(userId: "#{@student_in_group.id}") { _id }|)
+      ).to eq @membership.id.to_s
+    end
+
+    it "requires permission" do
+      expect(
+        group_type.resolve(%|member(userId: "#{@student_in_group.id}") { _id }|,
+                           current_user: @student_not_in_group)
+      ).to be_nil
     end
   end
 end

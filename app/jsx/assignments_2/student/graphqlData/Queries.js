@@ -29,7 +29,7 @@ import {UserGroups} from './UserGroups'
 export const EXTERNAL_TOOLS_QUERY = gql`
   query ExternalTools($courseID: ID!) {
     course(id: $courseID) {
-      externalToolsConnection(filter: {placement: homework_submission, state: public}) {
+      externalToolsConnection(filter: {placement: homework_submission}) {
         nodes {
           ...ExternalTool
         }

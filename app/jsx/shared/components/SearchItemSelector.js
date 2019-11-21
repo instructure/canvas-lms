@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!managed_course_selector'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {func, string} from 'prop-types'
 
 import CanvasAsyncSelect from './CanvasAsyncSelect'
@@ -57,6 +57,11 @@ export default function SearchItemSelector({
     isSearchableTerm
   })
 
+  useEffect(() => {
+    handleInputChanged({target: {value: ''}})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contextId])
+
   const searchParams = searchTerm.length === 0 ? {} : {term: searchTerm, search_term: searchTerm}
   if (contextId) searchParams.contextId = contextId
   itemSearchFunction({
@@ -91,7 +96,7 @@ export default function SearchItemSelector({
     ? I18n.t('No Results')
     : I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH})
   const itemOptions =
-    items === null || !searchableInput
+    items === null
       ? null
       : items.map(item => (
           <CanvasAsyncSelect.Option key={item.id} id={item.id}>

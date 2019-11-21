@@ -803,15 +803,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # Tread carefully — this method returns true for Teachers, TAs, and Designers
-  # in the course.
-  def user_is_admin?(user)
-    return unless user
-    fetch_on_enrollments('user_is_admin', user) do
-      self.enrollments.for_user(user).active_by_date.of_admin_type.exists?
-    end
-  end
-
   def user_is_instructor?(user)
     return unless user
     fetch_on_enrollments('user_is_instructor', user) do

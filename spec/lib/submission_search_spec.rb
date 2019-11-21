@@ -138,6 +138,12 @@ describe SubmissionSearch do
     expect(results).to eq [Submission.find_by(user: amanda)]
   end
 
+  it "returns nothing to randos" do
+    rando = User.create!
+    results = SubmissionSearch.new(assignment, rando, nil, {}).search
+    expect(results).to eq []
+  end
+
   # order by username tested above
   it 'orders by submission score' do
     assignment.grade_student(peter, score: 1, grader: teacher)

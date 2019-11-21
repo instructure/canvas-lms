@@ -18,6 +18,10 @@
 
 import {whitelist} from './messageTypes'
 
+// page-global storage for data relevant to LTI postMessage events
+const ltiState = {}
+export {ltiState}
+
 const handleLtiPostMessage = async e => {
   const {messageType, data} = e.data
   let handler

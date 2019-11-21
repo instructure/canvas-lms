@@ -623,6 +623,7 @@ class Assignment < ActiveRecord::Base
     run_at = @next_auto_peer_review_date || next_auto_peer_review_date
     return if run_at.blank?
 
+    run_at = 1.minute.from_now if run_at < 1.minute.from_now # delay immediate run in case associated objects are still being saved
     self.send_later_enqueue_args(:do_auto_peer_review, {
       :run_at => run_at,
       :on_conflict => :overwrite,
@@ -873,6 +874,7 @@ class Assignment < ActiveRecord::Base
     self.title ||= (self.assignment_group.default_assignment_name rescue nil) || "Assignment"
 
     self.infer_all_day
+    self.position = self.position_was if self.will_save_change_to_position? && self.position.nil? # don't allow setting to nil
 
     if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
       ensure_assignment_group(false)

@@ -19,7 +19,7 @@
 import formatMessage from '../../../format-message'
 import clickCallback from './clickCallback'
 import bridge from '../../../bridge'
-import {isFileLink} from '../shared/ContentSelection'
+import {isFileLink, asLink} from '../shared/ContentSelection'
 import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
 import {CREATE_LINK, EDIT_LINK} from './components/LinkOptionsDialog/LinkOptionsDialogController'
 
@@ -29,12 +29,6 @@ const PLUGIN_KEY = 'links'
 
 const getLink = function(editor, elm) {
   return editor.dom.getParent(elm, 'a[href]')
-}
-const getLinkIfCursorOnAnchorElement = function(editor) {
-  return (
-    getAnchorElement(editor, editor.selection.getNode()) ||
-    getAnchorElement(editor, editor.selection.getStart())
-  )
 }
 
 const getAnchorElement = function(editor, node) {
@@ -54,18 +48,14 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
       icon: 'link',
       fetch(callback) {
         let items
-        const link = getLinkIfCursorOnAnchorElement(ed)
-        if (link) {
+        const linkContents = asLink(ed.selection.getNode(), ed)
+        if (linkContents) {
           items = [
             {
               type: 'menuitem',
               text: formatMessage('Edit Link'),
               onAction: () => {
-                if (isFileLink(link)) {
-                  trayController.showTrayForEditor(ed)
-                } else {
-                  ed.execCommand('instructureLinkEdit')
-                }
+                trayController.showTrayForEditor(ed)
               }
             },
             {

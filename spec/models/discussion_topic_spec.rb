@@ -619,11 +619,13 @@ describe DiscussionTopic do
   describe "allow_student_discussion_topics setting" do
 
     before(:once) do
-      @topic = @course.discussion_topics.create!(:user => @teacher)
+      @topic = @course.discussion_topics.create!(:user => @teacher, :unlock_at => 1.week.from_now)
+      @admin = account_admin_user(:account => @course.root_account)
     end
 
     it "should allow students to create topics by default" do
       expect(@topic.check_policy(@teacher)).to include :create
+      expect(@topic.check_policy(@admin)).to include :create
       expect(@topic.check_policy(@student)).to include :create
       expect(@topic.check_policy(@course.student_view_student)).to include :create
     end
@@ -633,6 +635,7 @@ describe DiscussionTopic do
       @course.save!
       @topic.reload
       expect(@topic.check_policy(@teacher)).to include :create
+      expect(@topic.check_policy(@admin)).to include :create
       expect(@topic.check_policy(@student)).not_to include :create
       expect(@topic.check_policy(@course.student_view_student)).not_to include :create
     end

@@ -185,7 +185,7 @@ module Lti
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions?per_page=3",
                         {controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json',
-                         placements: Lti::ResourcePlacement::DEFAULT_PLACEMENTS, course_id: @course.id.to_s, per_page: '3'})
+                         placements: Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS, course_id: @course.id.to_s, per_page: '3'})
 
         json_next = follow_pagination_link('next', {
           controller: 'lti/lti_apps',

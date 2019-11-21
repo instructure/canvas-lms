@@ -105,3 +105,6 @@ All of these settings are contained for the **editor_button** placement:
     This sets the height (px) of the selection launch modal. Canvas may set a 
     maximum or minimum height that overrides this option.
 
+-   visibility: 'public', 'members', 'admins' (optional, 'public' by default)
+
+    This specifies what types of users will see the link in the editor. "public" means anyone accessing the course, "members" means only users enrolled in the course, and "admins" means only Teachers, TAs, Designers and account admins will see the link.

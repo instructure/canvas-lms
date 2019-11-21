@@ -74,6 +74,20 @@ describe('CanvasMediaPlayer', () => {
     expect(domQueries.getByText(sourceList[2], '3000')).toBeInTheDocument()
   })
 
+  it('handles string-type media_sources', () => {
+    // seen for audio files
+    const {getByText} = render(
+      <CanvasMediaPlayer
+        media_id="dummy_media_id"
+        media_sources="http://localhost:3000/files/797/download?download_frd=1"
+        type="audio"
+      />
+    )
+
+    // just make sure it doesn't blow up and renders the player
+    expect(getByText('Play')).toBeInTheDocument()
+  })
+
   it('renders loading if there are no media sources', () => {
     let component
     act(() => {

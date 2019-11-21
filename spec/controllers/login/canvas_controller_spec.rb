@@ -226,6 +226,50 @@ describe Login::CanvasController do
       p = Account.default.pseudonyms.active.by_unique_id(unique_id).first!
       expect(p.authentication_provider).to eq ap
     end
+
+    context 'should properly set the session[:login_aac]' do
+      it 'when an ldap authentication provider was used with identifier_format' do
+        user_with_pseudonym(:username => '12345', :active_all => 1)
+        @pseudonym.update_attribute(:sis_user_id, '12345')
+        aac1 = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+        expect_any_instantiation_of(aac1).to receive(:ldap_bind_result).once.
+          with('username', 'password').
+          and_return(nil)
+        aac2 = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+        expect_any_instantiation_of(aac2).to receive(:ldap_bind_result).once.
+          with('username', 'password').
+          and_return([{ 'uid' => ['12345'] }])
+
+        post 'create', params: {:pseudonym_session => {:unique_id => 'username', :password => 'password'}}
+        expect(session[:login_aac]).to eq aac2.id
+      end
+
+      it 'when an ldap authentication provider was used without an identifier_format' do
+        user_with_pseudonym(username: 'username', active_all: 1)
+        aac1 = Account.default.authentication_providers.create!(auth_type: 'ldap', identifier_format: nil)
+        expect_any_instantiation_of(aac1).to receive(:ldap_bind_result).once.
+          with('username', 'password').
+          and_return(nil)
+        aac2 = Account.default.authentication_providers.create!(auth_type: 'ldap', identifier_format: nil)
+        expect_any_instantiation_of(aac2).to receive(:ldap_bind_result).once.
+          with('username', 'password').
+          and_return([true])
+
+        post 'create', params: {pseudonym_session: {unique_id: 'username', password: 'password'}}
+        expect(session[:login_aac]).to eq aac2.id
+      end
+
+      it 'when canvas authentication was used' do
+        password = 'correct-horse-battery-staple'
+        user_with_pseudonym(:username => '12345', :active_all => 1, :password => password)
+        aac1 = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+        expect_any_instantiation_of(aac1).to receive(:ldap_bind_result).once.and_return(nil)
+        aac2 = Account.default.authentication_providers.find_by(auth_type: 'canvas')
+
+        post 'create', params: {:pseudonym_session => { :unique_id => '12345', :password => password}}
+        expect(session[:login_aac]).to eq aac2.id
+      end
+    end
   end
 
   context "trusted logins" do

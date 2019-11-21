@@ -46,12 +46,12 @@ const Tools = props => {
   }
 
   return (
-    <Tabs onRequestTabChange={handleTabChange}>
+    <Tabs onRequestTabChange={handleTabChange} margin="xx-small 0 0 0">
       {props.renderCanvasFiles && (
         <Tabs.Panel
           isSelected={selectedIndex === 0}
           key="CanvasFiles"
-          padding="0"
+          padding="xx-small 0"
           renderTitle={I18n.t('Canvas Files')}
         >
           <div style={tabContentStyle}>
@@ -67,7 +67,7 @@ const Tools = props => {
         <Tabs.Panel
           isSelected={selectedIndex === i + 1}
           key={tool._id}
-          padding="0"
+          padding="xx-small 0"
           renderTitle={tool.name}
         >
           <div style={tabContentStyle}>

@@ -25,6 +25,7 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Innspeling av lyd og bilde er ikkje tilgjengeleg."
   },
+  "audio_player_for_title_20cc70d": { "message": "Audiospelar for { title }" },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Opne automatisk i integrert førehandsvising (sjå førehandsvisinga etter lagring)"
   },
@@ -78,6 +79,7 @@
     "message": "standard numerisk ordna liste"
   },
   "describe_the_image_e65d2e32": { "message": "(Skildre bildet)" },
+  "describe_the_video_2fe8f46a": { "message": "(Skildre videoen)" },
   "dimensions_45ddb7b7": { "message": "Dimensjonar" },
   "directionality_ebcae6d0": { "message": "retningsgivande" },
   "disable_in_line_preview_2a675175": {
@@ -111,6 +113,7 @@
   "embed_image_1080badc": { "message": "Sett inn bilde" },
   "embed_options_tray_901cfd19": { "message": "Sett inn-meny" },
   "embed_preview_2d741e1f": { "message": "Sett inn-førehandsvising" },
+  "embed_video_a97a64af": { "message": "Integrer video" },
   "embed_video_code_703e10f2": { "message": "Sett inn videokode" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Feil under opplasting av video-/lydinnspeling"
@@ -307,6 +310,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Skjermlesarar brukar dette for å skildre innhaldet i eit bilde"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Brukt av skjermlesarar for å skildre videoen"
+  },
   "user_documents_c206e61f": { "message": "Brukardokument" },
   "user_images_b6490852": { "message": "Brukarbilder" },
   "user_media_14fbf656": { "message": "Brukarmedia" },
@@ -316,6 +322,8 @@
   "video_options_24ef6e5d": { "message": "Videoalternativ" },
   "video_options_tray_3b9809a5": { "message": "Menyalternativ for video" },
   "video_player_b371005": { "message": "Videoavspelar" },
+  "video_player_for_9e7d373b": { "message": "Videospelar for" },
+  "video_player_for_title_ffd9fbc4": { "message": "Videospelar for { title }" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Sjå hurtigtastar" },
   "webcam_fe91b20f": { "message": "Webkamera" },
   "width_492fec76": { "message": "Vidde" },

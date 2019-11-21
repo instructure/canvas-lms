@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo Attempting connection to dynamodb...
+for i in {1..60}; do
+  if [[ ! -z "$(nc -zv localhost 8000)" ]]; then
+    echo 'Dynamodb connected!' && exit
+  fi
+  sleep 1
+done
+echo Dynamodb is still down after 60 seconds.
+exit 1

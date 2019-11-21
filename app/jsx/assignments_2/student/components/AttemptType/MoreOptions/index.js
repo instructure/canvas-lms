@@ -27,7 +27,7 @@ import React from 'react'
 import UserGroupsQuery from './UserGroupsQuery'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-overlays'
 
 class MoreOptions extends React.Component {

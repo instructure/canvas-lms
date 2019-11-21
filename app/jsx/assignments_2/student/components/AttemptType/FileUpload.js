@@ -76,11 +76,19 @@ export default class FileUpload extends Component {
   }
 
   handleLTIFiles = async e => {
-    if (
-      e.data.messageType === 'LtiDeepLinkingResponse' ||
-      e.data.messageType === 'A2ExternalContentReady'
-    ) {
+    if (e.data.messageType === 'LtiDeepLinkingResponse') {
+      if (e.data.errormsg) {
+        this.context.setOnFailure(e.data.errormsg)
+        return
+      }
       await this.handleDropAccepted(e.data.content_items)
+    }
+
+    // Since LTI 1.0 handles its own message alerting we don't have to
+    if (e.data.messageType === 'A2ExternalContentReady') {
+      if (!e.data.errormsg) {
+        await this.handleDropAccepted(e.data.content_items)
+      }
     }
   }
 
@@ -104,14 +112,19 @@ export default class FileUpload extends Component {
       return
     }
 
-    this.setState({
-      filesToUpload: files.map(file => {
-        if (file.url) {
-          return {isLoading: true, _id: file.url}
-        }
-        return {isLoading: true, _id: file.name}
-      })
-    })
+    this.setState(
+      {
+        filesToUpload: files.map((file, i) => {
+          if (file.url) {
+            return {isLoading: true, _id: `${i}-${file.url}`}
+          }
+          return {isLoading: true, _id: `${i}-${file.name}`}
+        })
+      },
+      () => {
+        this.context.setOnSuccess(I18n.t('Uploading files'))
+      }
+    )
     this.updateUploadingFiles(async () => {
       try {
         const newFiles = await uploadFiles(files, submissionFileUploadUrl(this.props.assignment))
@@ -293,27 +306,26 @@ export default class FileUpload extends Component {
     // and two rendered files and all subsequent rows having three rendered files
     const nextFileRows = files.length > 2 ? chunk(files.slice(2, files.length), 3) : []
     return (
-      <div data-testid="non-empty-upload">
-        <Grid>
-          <Grid.Row key={firstFileRow.map(file => file._id).join()}>
-            <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
-            {firstFileRow.map(file => (
+      <Grid>
+        <Grid.Row key="upload-box">
+          <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
+          {firstFileRow.map(file => (
+            <Grid.Col width={4} key={file._id} vAlign="bottom">
+              {this.renderUploadedFile(file)}
+            </Grid.Col>
+          ))}
+        </Grid.Row>
+        {nextFileRows.map((row, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Grid.Row key={i}>
+            {row.map(file => (
               <Grid.Col width={4} key={file._id} vAlign="bottom">
                 {this.renderUploadedFile(file)}
               </Grid.Col>
             ))}
           </Grid.Row>
-          {nextFileRows.map(row => (
-            <Grid.Row key={row.map(file => file._id).join()}>
-              {row.map(file => (
-                <Grid.Col width={4} key={file._id} vAlign="bottom">
-                  {this.renderUploadedFile(file)}
-                </Grid.Col>
-              ))}
-            </Grid.Row>
-          ))}
-        </Grid>
-      </div>
+        ))}
+      </Grid>
     )
   }
 
@@ -324,15 +336,7 @@ export default class FileUpload extends Component {
   render() {
     return (
       <div data-testid="upload-pane" style={{marginBottom: theme.variables.spacing.xxLarge}}>
-        {this.shouldRenderFiles() ? (
-          this.renderUploadBoxAndUploadedFiles()
-        ) : (
-          <Grid>
-            <Grid.Row>
-              <Grid.Col width={4}>{this.renderUploadBox()}</Grid.Col>
-            </Grid.Row>
-          </Grid>
-        )}
+        {this.renderUploadBoxAndUploadedFiles()}
       </div>
     )
   }

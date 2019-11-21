@@ -81,7 +81,10 @@ class SubmissionsBaseController < ApplicationController
       submission_json_exclusions << :user_id
     end
 
-    if @submission.submission_type == "online_quiz" && @assignment.muted? && !@assignment.grants_right?(@current_user, :grade)
+    if @submission.submission_type == "online_quiz" &&
+        @submission.hide_grade_from_student? &&
+        !@assignment.grants_right?(@current_user, :grade)
+
       submission_json_exclusions << :body
     end
 

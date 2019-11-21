@@ -215,6 +215,10 @@ class CommunicationChannelsController < ApplicationController
   def confirm
     @nonce = params[:nonce]
     cc = CommunicationChannel.unretired.where('path_type != ?', CommunicationChannel::TYPE_PUSH).find_by_confirmation_code(@nonce)
+
+    # See if we can find it cross shard if it wasn't found on this shard
+    cc ||= @current_user && @current_user.communication_channels.unretired.where('path_type != ?', CommunicationChannel::TYPE_PUSH).find_by_confirmation_code(@nonce)
+
     @headers = false
     if cc && cc.path_type == 'email' && !EmailAddressValidator.valid?(cc.path)
       failed = true

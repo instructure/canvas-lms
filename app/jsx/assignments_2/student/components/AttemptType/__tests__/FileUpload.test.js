@@ -118,7 +118,7 @@ describe('FileUpload', () => {
         <FileUpload {...props} />
       </MockedProvider>
     )
-    const uploadRender = getByTestId('non-empty-upload')
+    const uploadRender = getByTestId('upload-pane')
     expect(uploadRender).toContainElement(getAllByText('foobarbaz')[0])
   })
 
@@ -133,7 +133,7 @@ describe('FileUpload', () => {
         <FileUpload {...props} />
       </MockedProvider>
     )
-    const uploadRender = getByTestId('non-empty-upload')
+    const uploadRender = getByTestId('upload-pane')
     expect(uploadRender).toContainElement(container.querySelector('img[alt="foobarbaz preview"]'))
   })
 
@@ -149,7 +149,7 @@ describe('FileUpload', () => {
         <FileUpload {...props} />
       </MockedProvider>
     )
-    const uploadRender = getByTestId('non-empty-upload')
+    const uploadRender = getByTestId('upload-pane')
 
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconPdf"]'))
     expect(container.querySelector('img[alt="foobarbaz preview"]')).toBeNull()
@@ -157,6 +157,7 @@ describe('FileUpload', () => {
 
   it('allows uploading multiple files at a time', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps()
     uploadFileModule.uploadFiles.mockResolvedValue([
       {id: '1', name: 'file1.jpg'},
@@ -165,7 +166,9 @@ describe('FileUpload', () => {
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -189,6 +192,7 @@ describe('FileUpload', () => {
   it('creates an error alert when the API fails to upload files', async () => {
     const mocks = await createGraphqlMocks()
     const setOnFailure = jest.fn()
+    const setOnSuccess = jest.fn()
     const props = await makeProps()
     uploadFileModule.uploadFiles.mock.results = () => {
       throw new Error('no')
@@ -196,7 +200,7 @@ describe('FileUpload', () => {
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider value={{setOnFailure}}>
+        <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
       </MockedProvider>
@@ -210,6 +214,7 @@ describe('FileUpload', () => {
 
   it('uploads files received through the LtiDeepLinkingResponse message event', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps({
       Submission: {attempt: 0}
     })
@@ -217,7 +222,9 @@ describe('FileUpload', () => {
 
     render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
 
@@ -274,10 +281,70 @@ describe('FileUpload', () => {
     expect(setOnFailure).toHaveBeenCalledWith('Error adding files to submission draft')
   })
 
+  it('creates an error alert when an error message is present in the Lti response', async () => {
+    const mocks = await createGraphqlMocks()
+    const setOnFailure = jest.fn()
+    const props = await makeProps()
+    render(
+      <MockedProvider mocks={mocks}>
+        <AlertManagerContext.Provider value={{setOnFailure}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
+      </MockedProvider>
+    )
+
+    const errormsg = 'oooh eeee this is an error message'
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'LtiDeepLinkingResponse',
+          errormsg
+        }
+      })
+    )
+
+    expect(setOnFailure).toHaveBeenCalledWith(errormsg)
+  })
+
+  it('does not create a submission draft when there is an error message present in the Lti response', async () => {
+    const mocks = await createGraphqlMocks()
+    const setOnFailure = jest.fn()
+    const props = await makeProps()
+    render(
+      <MockedProvider mocks={mocks}>
+        <AlertManagerContext.Provider value={{setOnFailure}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
+      </MockedProvider>
+    )
+
+    const errormsg = 'oooh eeee this is an error message'
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'LtiDeepLinkingResponse',
+          content_items: [
+            {
+              url: 'http://lemon.com',
+              title: 'LemonRules.txt',
+              mediaType: 'plain/txt'
+            }
+          ],
+          errormsg
+        }
+      })
+    )
+
+    expect(props.createSubmissionDraft).not.toHaveBeenCalled()
+  })
+
   // Byproduct of how the dummy submissions are being handled. Check out ViewManager
   // for some context around this
   it('creates a submission draft for the current attempt when not on attempt 0', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps({
       Submission: {attempt: 2}
     })
@@ -285,7 +352,9 @@ describe('FileUpload', () => {
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -306,6 +375,7 @@ describe('FileUpload', () => {
 
   it('creates a submission draft for attempt one when on attempt 0', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps({
       Submission: {attempt: 0}
     })
@@ -313,7 +383,9 @@ describe('FileUpload', () => {
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[type="file"]')
@@ -453,7 +525,7 @@ describe('FileUpload', () => {
     const props = await makeProps({
       Assignment: {allowedExtensions: ['jpg']}
     })
-    const {container, getByText, queryByTestId} = render(
+    const {container, getByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
       </MockedProvider>
@@ -464,17 +536,19 @@ describe('FileUpload', () => {
     uploadFiles(fileInput, [file])
 
     expect(getByText('Invalid file type')).toBeInTheDocument()
-    expect(queryByTestId('non-empty-upload')).toBeNull()
   })
 
   it('does not render an error when adding a file that is an allowed extension', async () => {
     const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
     const props = await makeProps({
       Assignment: {allowedExtensions: ['jpg']}
     })
     const {container, queryByText} = render(
       <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
     const fileInput = container.querySelector('input[id="inputFileDrop"]')

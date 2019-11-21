@@ -347,6 +347,7 @@ RSpec.configure do |config|
   config.include Factories
   config.include RequestHelper, type: :request
   config.include Onceler::BasicHelpers
+  config.include PGCollkeyHelper
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
   if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]

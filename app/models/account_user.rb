@@ -111,8 +111,25 @@ class AccountUser < ActiveRecord::Base
   end
 
   set_policy do
+    # NOTE: If modifying this, make sure `create_permissions_cache` stays accurate as well.
     given { |user| self.account.grants_right?(user, :manage_account_memberships) && is_subset_of?(user) }
     can :create and can :destroy
+  end
+
+  def self.create_permissions_cache(account_users, current_user, session)
+    # If we have a bunch of account_users that share the same account/role, we
+    # don't need to lookup the permissions for all of them. Only one per
+    # account/role to make things significantly faster.
+    account_users.distinct.pluck(:account_id, :role_id).each_with_object({}) do |obj, hash|
+      account_id, role_id = obj
+      account_user = account_users.where(account_id: account_id, role_id: role_id).first
+
+      # Create and destory are granted by the same conditions, no reason to do two
+      # grants_right? checks here.
+      permission = account_user.grants_right?(current_user, session, :destroy)
+      hash[[account_id, role_id]] = {create: permission, destroy: permission}
+      hash
+    end
   end
 
   def readable_type
@@ -152,9 +169,9 @@ class AccountUser < ActiveRecord::Base
     result
   end
 
-  def is_subset_of?(user)
+  def self.is_subset_of?(user, account, role)
     needed_permissions = RoleOverride.manageable_permissions(account).keys.inject({}) do |result, permission|
-      result[permission] = enabled_for?(account, permission)
+      result[permission] = RoleOverride.enabled_for?(account, permission, role, account)
       result
     end
     target_permissions = AccountUser.all_permissions_for(user, account)
@@ -164,6 +181,10 @@ class AccountUser < ActiveRecord::Base
       next false unless target_permission.present?
       (needed_permission - target_permission).empty?
     end
+  end
+
+  def is_subset_of?(user)
+    AccountUser.is_subset_of?(user, account, role)
   end
 
   def self.readable_type(type)

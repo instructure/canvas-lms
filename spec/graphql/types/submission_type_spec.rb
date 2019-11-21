@@ -471,6 +471,7 @@ describe Types::SubmissionType do
 
     before(:once) do
       @submission.turnitin_data[@submission.asset_string] = tii_data
+      @submission.turnitin_data[:last_processed_attempt] = 1
       @submission.save!
     end
 

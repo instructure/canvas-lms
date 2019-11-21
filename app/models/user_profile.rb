@@ -105,7 +105,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_content_shares_tab(tabs, user, opts)
-    if user && user.non_student_enrollment? && opts[:root_account]&.feature_enabled?(:direct_share)
+    if user && opts[:root_account]&.feature_enabled?(:direct_share) && user.can_content_share?
       tabs << {
         id: TAB_CONTENT_SHARES,
         label: I18n.t("Shared Content"),

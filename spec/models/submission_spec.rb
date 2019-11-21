@@ -3256,6 +3256,50 @@ describe Submission do
     end
   end
 
+  describe "scope: postable" do
+    subject(:submissions) { assignment.submissions.postable }
+
+    let(:assignment) { @course.assignments.create! }
+    let(:submission) { assignment.submissions.find_by(user: @student) }
+
+    it "does not include submissions that neither have grades nor hidden comments" do
+      submission.add_comment(author: @teacher, comment: "good job!", hidden: false)
+      is_expected.not_to include(submission)
+    end
+
+    it "includes submissions with hidden comments" do
+      submission.add_comment(author: @teacher, comment: "good job!", hidden: true)
+      is_expected.to include(submission)
+    end
+
+    it "includes submissions with a grade" do
+      assignment.grade_student(@student, grader: @teacher, grade: 10)
+      is_expected.to include(submission)
+    end
+
+    it "includes submissions that are excused" do
+      assignment.grade_student(@student, grader: @teacher, excused: true)
+      is_expected.to include(submission)
+    end
+  end
+
+  describe "scope: with_hidden_comments" do
+    subject(:submissions) { assignment.submissions.with_hidden_comments }
+
+    let(:assignment) { @course.assignments.create! }
+    let(:submission) { assignment.submissions.find_by(user: @student) }
+
+    it "does not include submissions without a hidden comment" do
+      submission.add_comment(author: @teacher, comment: "good job!", hidden: false)
+      is_expected.not_to include(submission)
+    end
+
+    it "includes submissions with hidden comments" do
+      submission.add_comment(author: @teacher, comment: "good job!", hidden: true)
+      is_expected.to include(submission)
+    end
+  end
+
   describe 'scope: anonymized' do
     subject(:submissions) { assignment.all_submissions.anonymized }
 

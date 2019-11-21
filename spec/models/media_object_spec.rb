@@ -227,4 +227,26 @@ describe MediaObject do
         expect(mo.title).to eq "Kaltura Title"
     end
   end
+
+  describe ".guaranteed_title" do
+    before :once do
+      @mo = media_object
+      @mo.title = nil
+      @mo.user_entered_title = nil
+    end
+
+    it "returns 'Untitled' if there is no title" do
+      expect(@mo.guaranteed_title).to eq "Untitled"
+    end
+
+    it "returns the title if available" do
+      @mo.title = "The title"
+      expect(@mo.guaranteed_title).to eq "The title"
+    end
+
+    it "returns the user_entered_title if available" do
+      @mo.user_entered_title = "User title"
+      expect(@mo.guaranteed_title).to eq "User title"
+    end
+  end
 end

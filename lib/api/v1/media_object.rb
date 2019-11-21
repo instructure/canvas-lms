@@ -16,22 +16,25 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+API_MEDIA_OBJECT_JSON_OPTS = {
+  :only => %w(media_id created_at media_type).freeze,
+}.freeze
+
 module Api::V1::MediaObject
+  def media_object_api_json(media_object, current_user, session, exclude = [])
+    api_json(media_object, current_user, session, API_MEDIA_OBJECT_JSON_OPTS).tap do |json|
+      json['title'] = media_object.guaranteed_title
+      json['can_add_captions'] = media_object.grants_right?(current_user, session, :add_captions)
+      json['media_sources'] = media_sources_json(media_object) unless exclude.include?('sources')
 
-  def media_object_api_json(media_object, current_user, session)
-    hash = {}
-    hash['user_entered_title'] = media_object.user_entered_title
-    hash['title'] = media_object.title
-    hash['media_id'] = media_object.media_id
-    hash['can_add_captions'] = media_object.grants_right?(current_user, session, :add_captions)
-    hash['media_sources'] = media_sources_json(media_object)
-
-    hash['media_tracks'] = media_object.media_tracks.map do |track|
-      api_json(track, current_user, session, :only => %w(kind created_at updated_at id locale)).tap do |json|
-        json.merge! :url => show_media_tracks_url(media_object.media_id, track.id)
+      unless exclude.include?('tracks')
+        json['media_tracks'] = media_object.media_tracks.map do |track|
+          api_json(track, current_user, session, :only => %w(kind created_at updated_at id locale)).tap do |json2|
+            json2[:url] = show_media_tracks_url(media_object.media_id, track.id)
+          end
+        end
       end
     end
-    hash
   end
 
   def media_sources_json(media_object)

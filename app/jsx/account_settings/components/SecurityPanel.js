@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
-import {bool, oneOf, string, func} from 'prop-types'
+import {bool, oneOf, string, func, number} from 'prop-types'
 import {Heading, Text, Spinner} from '@instructure/ui-elements'
 import {View, Grid} from '@instructure/ui-layout'
 import {Checkbox} from '@instructure/ui-forms'
@@ -31,8 +31,6 @@ import {
   setCspInherited
 } from '../actions'
 import {ConnectedWhitelist} from './Whitelist'
-
-import {CONFIG} from '../index'
 
 export class SecurityPanel extends Component {
   static propTypes = {
@@ -46,7 +44,9 @@ export class SecurityPanel extends Component {
     setCspInherited: func.isRequired,
     getCurrentWhitelist: func.isRequired,
     isSubAccount: bool,
-    whitelistsHaveLoaded: bool
+    whitelistsHaveLoaded: bool,
+    maxDomains: number.isRequired,
+    accountId: string.isRequired
   }
 
   static defaultProps = {
@@ -84,7 +84,7 @@ export class SecurityPanel extends Component {
                (e.g. *.instructure.com). Canvas and Instructure domains are included
                automatically and do not count against your 50 domain limit.`,
               {
-                max_domains: CONFIG.max_domains
+                max_domains: this.props.maxDomains
               }
             )}
           </Text>
@@ -123,6 +123,8 @@ export class SecurityPanel extends Component {
                   contextId={this.props.contextId}
                   isSubAccount={this.props.isSubAccount}
                   inherited={this.props.cspInherited}
+                  maxDomains={this.props.maxDomains}
+                  accountId={this.props.accountId}
                 />
               )}
             </Grid.Col>

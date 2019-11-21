@@ -45,10 +45,11 @@ export default class FakeEditor {
 
     this.dom = {
       getParent: (el, selector) => {
-        const parent = el && el.parentElement
-        const grandparent = parent && parent.parentElement
-        if (grandparent && grandparent.querySelector(selector) === parent) {
-          return parent
+        let ancestor = el && el.parentNode
+        while (ancestor) {
+          const candidate = ancestor.querySelector(selector)
+          if (candidate) return candidate
+          ancestor = ancestor.parentNode
         }
         return null
       },

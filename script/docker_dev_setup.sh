@@ -193,6 +193,12 @@ function setup_docker_environment {
     install_dory
     start_dory
   fi
+  if [ -f "docker-compose.override.yml" ]; then
+    message "docker-compose.override.yml exists, skipping copy of default configuration"
+  else
+    message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
+    cp config/docker-compose.override.yml.example docker-compose.override.yml
+  fi
 }
 
 function copy_docker_config {

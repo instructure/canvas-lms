@@ -18,6 +18,7 @@
 
 import fetchMock from 'fetch-mock'
 import fetchOutcomes, {fetchUrl} from '../fetchOutcomes'
+import NaiveFetchDispatch from '../NaiveFetchDispatch'
 
 describe('fetchOutcomes', () => {
   afterEach(() => {
@@ -206,6 +207,12 @@ describe('fetchOutcomes', () => {
   })
 
   describe('fetchUrl', () => {
+    let dispatch
+
+    beforeEach(() => {
+      dispatch = new NaiveFetchDispatch({activeRequestLimit: 2})
+    })
+
     const mockRequests = (first, second, third) => {
       fetchMock.mock('/first', {
         body: first,
@@ -233,40 +240,36 @@ describe('fetchOutcomes', () => {
       }
     }
 
-    it('combines result arrays', done => {
+    it('combines result arrays', () => {
       mockRequests([1, 'hello world', {foo: 'bar'}], [2, 'goodbye', {baz: 'bat'}])
-      fetchUrl('/first').then(resp => {
+      return fetchUrl('/first', dispatch).then(resp => {
         expect(resp).toEqual([1, 'hello world', {foo: 'bar'}, 2, 'goodbye', {baz: 'bat'}])
-        done()
       })
     })
 
-    it('combines result objects', done => {
+    it('combines result objects', () => {
       mockRequests({a: 'b', c: ['d', 'e', 'f']}, {g: 'h', c: ['i', 'j', 'k']})
-      fetchUrl('/first').then(resp => {
+      return fetchUrl('/first', dispatch).then(resp => {
         expect(resp).toEqual({a: 'b', c: ['d', 'e', 'f', 'i', 'j', 'k'], g: 'h'})
-        done()
       })
     })
 
-    it('handles three requests', done => {
+    it('handles three requests', () => {
       mockRequests({a: 'b', c: ['d', 'e', 'f']}, {g: 'h', c: ['i', 'j', 'k']}, {a: 'x'})
-      fetchUrl('/first').then(resp => {
+      return fetchUrl('/first', dispatch).then(resp => {
         expect(resp).toEqual({a: 'x', c: ['d', 'e', 'f', 'i', 'j', 'k'], g: 'h'})
-        done()
       })
     })
 
-    it('handles deeply nested objects', done => {
+    it('handles deeply nested objects', () => {
       mockRequests(
         {a: {b: {c: {d: ['e', 'f'], g: ['h', 'i'], j: 'k'}}}},
         {a: {b: {c: {d: ['e2', 'f2'], g: ['h2', 'i2'], j: 'k2'}}}}
       )
-      fetchUrl('/first').then(resp => {
+      return fetchUrl('/first', dispatch).then(resp => {
         expect(resp).toEqual({
           a: {b: {c: {d: ['e', 'f', 'e2', 'f2'], g: ['h', 'i', 'h2', 'i2'], j: 'k2'}}}
         })
-        done()
       })
     })
   })

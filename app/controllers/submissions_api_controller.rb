@@ -472,6 +472,10 @@ class SubmissionsApiController < ApplicationController
     end
 
     if params[:grouped].present?
+      if @context.root_account.feature_enabled?(:allow_postable_submission_comments) && @context.post_policies_enabled?
+        includes << "has_postable_comments"
+      end
+
       scope = (@section || @context).all_student_enrollments.
         preload(:root_account, :sis_pseudonym, :user => :pseudonyms).
         where(:user_id => student_ids).order(:user_id)
@@ -483,8 +487,17 @@ class SubmissionsApiController < ApplicationController
       if params[:workflow_state].present?
         submissions_scope = submissions_scope.where(:workflow_state => params[:workflow_state])
       end
-      submissions_scope = submissions_scope.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
-      submissions = submissions_scope.preload(:originality_reports, :quiz_submission).to_a
+
+      submission_preloads = [:originality_reports, :quiz_submission]
+      submission_preloads << :attachment unless params[:exclude_response_fields]&.include?("attachments")
+      submissions = submissions_scope.preload(submission_preloads).to_a
+
+      ActiveRecord::Associations::Preloader.new.preload(
+        submissions,
+        :submission_comments,
+        {select: [:hidden, :submission_id]}
+      )
+
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 

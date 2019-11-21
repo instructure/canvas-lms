@@ -161,6 +161,44 @@ RSpec.shared_examples 'a submission update action' do |controller|
             expect(submission_json["submission"]["body"]).to be_nil
           end
         end
+
+        context "when assignment posts manually" do
+          before do
+            PostPolicy.enable_feature!
+            course.enable_feature!(:new_gradebook)
+            assignment.post_policy.update!(post_manually: true)
+          end
+
+          it "does not render the submission body when submission is unposted" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            expect(submission_json["submission"]["body"]).to be_nil
+          end
+
+          it "does not render the submission body when updating What-If scores and submission is unposted" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body)
+            expect(submission_json["submission"]["body"]).to be_nil
+          end
+
+          it "renders the submission body when submission is posted" do
+            assignment.post_submissions
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            expect(submission_json["submission"]["body"]).to be_present
+          end
+
+          it "renders the submission body when updating What-If scores and submission is posted" do
+            assignment.post_submissions
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body)
+            expect(submission_json["submission"]["body"]).to be_present
+          end
+        end
       end
 
       context "current user is teacher" do
@@ -201,6 +239,28 @@ RSpec.shared_examples 'a submission update action' do |controller|
             put :update, params: params, format: :json
             submission_json = JSON.parse(response.body)
             expect(submission_json["submission"]["body"]).to eq submission.reload.body
+          end
+        end
+
+        context "when assignment posts manually" do
+          before do
+            PostPolicy.enable_feature!
+            course.enable_feature!(:new_gradebook)
+            assignment.post_policy.update!(post_manually: true)
+          end
+
+          it "renders the submission body when submission is unposted" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {comment: "hi"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            expect(submission_json["submission"]["body"]).to be_present
+          end
+
+          it "renders the submission body when updating What-If scores and submission is unposted" do
+            params = {assignment_id: assignment.id, course_id: course.id, submission: {student_entered_score: "2"}}.merge(resource_pair)
+            put :update, params: params, format: :json
+            submission_json = JSON.parse(response.body)
+            expect(submission_json["submission"]["body"]).to be_present
           end
         end
       end

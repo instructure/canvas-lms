@@ -19,6 +19,12 @@
 import {start} from '../index'
 
 describe('start', () => {
+  beforeEach(() => {
+    window.ENV = {
+      ACCOUNT: {id: '1234'}
+    }
+  })
+
   afterEach(() => {
     document.getElementById('fixtures').remove()
   })

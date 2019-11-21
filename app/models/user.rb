@@ -1815,6 +1815,17 @@ class User < ActiveRecord::Base
     end
   end
 
+  def account_membership?
+    return @_account_membership if defined?(@_account_membership)
+    @_account_membership = Rails.cache.fetch_with_batched_keys(['has_account_user', ApplicationController.region ].cache_key, batch_object: self, batched_keys: :account_users) do
+      self.account_users.shard(in_region_associated_shards).active.exists?
+    end
+  end
+
+  def can_content_share?
+    non_student_enrollment? || account_membership?
+  end
+
   def participating_current_and_concluded_course_ids
     cached_course_ids('current_and_concluded') do |enrollments|
       enrollments.current_and_concluded.not_inactive_by_date_ignoring_access

@@ -25,6 +25,7 @@ import fakeENV from 'helpers/fakeENV'
 import CyoeHelper from 'jsx/shared/conditional_release/CyoeHelper'
 import assertions from 'helpers/assertions'
 import 'helpers/jquery.simulate'
+import ReactDOM from 'react-dom'
 
 const fixtures = $('#fixtures')
 
@@ -432,20 +433,6 @@ test('renders mastery paths link for quiz if quiz has is released by a rule', ()
   equal(view.$('.mastery-path-icon').length, 1)
 })
 
-test('does not render direct share menu items when not DIRECT_SHARE_ENABLED', () => {
-  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz)
-  equal(view.$('.quiz-copy-to').length, 0)
-  equal(view.$('.quiz-send-to').length, 0)
-})
-
-test('renders direct share menu items when DIRECT_SHARE_ENABLED', () => {
-  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
-  equal(view.$('.quiz-copy-to').length, 1)
-  equal(view.$('.quiz-send-to').length, 1)
-})
-
 test('can duplicate when a quiz can be duplicated', () => {
   const quiz = createQuiz({
     id: 1,
@@ -549,4 +536,60 @@ test('displays failed to duplicate message when assignment failed to duplicate',
   })
   const view = createView(quiz)
   ok(view.$el.text().includes('Something went wrong with making a copy of "Foo"'))
+})
+
+QUnit.module('direct share', hooks => {
+  hooks.beforeEach(() => {
+    $('<div id="direct-share-mount-point">').appendTo('#fixtures')
+    fakeENV.setup({COURSE_ID: 123})
+    sinon.stub(ReactDOM, 'render')
+  })
+
+  hooks.afterEach(() => {
+    ReactDOM.render.restore()
+    fakeENV.teardown()
+    $('#direct-share-mount-point').remove()
+  })
+
+  test('does not render direct share menu items when not DIRECT_SHARE_ENABLED', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+    const view = createView(quiz)
+    equal(view.$('.quiz-copy-to').length, 0)
+    equal(view.$('.quiz-send-to').length, 0)
+  })
+
+  test('renders direct share menu items when DIRECT_SHARE_ENABLED', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    equal(view.$('.quiz-copy-to').length, 1)
+    equal(view.$('.quiz-send-to').length, 1)
+  })
+
+  test('opens and closes the Copy To tray', () => {
+    const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-copy-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentSelection, {quizzes: [1]})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
+
+  test('opens and closes the Send To tray', () => {
+    const quiz = createQuiz({id: '1', title: 'Foo', can_update: true})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-send-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentShare, {content_type: 'quiz', content_id: '1'})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
 })

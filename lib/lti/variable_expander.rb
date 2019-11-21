@@ -729,6 +729,15 @@ module Lti
                        USER_GUARD,
                        default_name: 'lis_person_contact_email_primary'
 
+    # Returns pronouns for the current user
+    # @example
+    #   ```
+    #   "She/Her"
+    #   ```
+    register_expansion 'com.instructure.Person.pronouns', [],
+                       -> { @current_user.pronouns },
+                       USER_GUARD,
+                       default_name: 'com_instructure_person_pronouns'
 
     # Returns the institution assigned email of the launching user.
     # @example
@@ -1295,17 +1304,20 @@ module Lti
                        USAGE_RIGHTS_GUARD
 
     # Returns the types of resources that can be imported to the current page, forwarded from the request.
-    # Value is an array of one or more values of: ["assignment", "assignment_group", "audio",
+    # Value is a comma-separated array of one or more values of: ["assignment", "assignment_group", "audio",
     # "discussion_topic", "document", "image", "module", "quiz", "page", "video"]
     #
     # @example
     #   ```
-    #   ["page"]
-    #   ["module"]
-    #   ["assignment", "discussion_topic", "page", "quiz", "module"]
+    #   "page"
+    #   "module"
+    #   "assignment,discussion_topic,page,quiz,module"
     #   ```
     register_expansion 'com.instructure.Course.accept_canvas_resource_types', [],
-                       -> { @request.parameters['com_instructure_course_accept_canvas_resource_types'] },
+                       -> {
+                         val = @request.parameters['com_instructure_course_accept_canvas_resource_types']
+                         val.is_a?(Array) ? val.join(",") : val
+                       },
                        default_name: 'com_instructure_course_accept_canvas_resource_types'
 
     # Returns the target resource type for the current page, forwarded from the request.

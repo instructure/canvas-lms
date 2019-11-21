@@ -36,6 +36,7 @@ export default class ActAsModal extends React.Component {
     user: PropTypes.shape({
       name: PropTypes.string,
       short_name: PropTypes.string,
+      pronouns: PropTypes.string,
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       avatar_image_url: PropTypes.string,
       sortable_name: PropTypes.string,
@@ -186,7 +187,10 @@ export default class ActAsModal extends React.Component {
                   <View as="div" size="small">
                     <View as="div" textAlign="center" padding="0 0 x-small 0">
                       <Text size="x-large" weight="light">
-                        {I18n.t('Act as %{name}', {name: user.short_name})}
+                        {I18n.t('Act as %{name}', {
+                          name: user.short_name
+                        })}
+                        {user.pronouns ? ` (${user.pronouns})` : null}
                       </Text>
                     </View>
                     <View as="div" textAlign="center">

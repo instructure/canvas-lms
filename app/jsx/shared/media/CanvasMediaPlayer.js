@@ -28,7 +28,7 @@ const byBitrate = (a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
 export default function CanvasMediaPlayer(props) {
   const sorted_sources = Array.isArray(props.media_sources)
     ? props.media_sources.sort(byBitrate)
-    : null
+    : props.media_sources
   const [media_sources, setMedia_sources] = useState(sorted_sources)
   const [retryTimerId, setRetryTimerId] = useState(0)
   const containerRef = useRef(null)

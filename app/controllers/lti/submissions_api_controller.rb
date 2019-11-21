@@ -94,7 +94,7 @@ module Lti
 #         },
 #         "attachments": {
 #           "description": "Files that are attached to the submission",
-#           "type": "File"
+#           "$ref": "File"
 #         }
 #       }
 #     }

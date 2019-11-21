@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
+import React, {Component, Suspense} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
-import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
+import {arrayOf, bool, func, objectOf, oneOf, shape, string, number} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
-import {Heading, List, Table} from '@instructure/ui-elements'
+import {Heading, List, Table, Spinner} from '@instructure/ui-elements'
 import {TextInput} from '@instructure/ui-forms'
 import {Flex, View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
+import {Tray} from '@instructure/ui-overlays'
 import {IconPlusSolid, IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Billboard} from '@instructure/ui-billboard'
@@ -33,7 +34,8 @@ import isValidDomain from 'is-valid-domain'
 import EmptyDesert from '../../shared/EmptyDesert'
 
 import {addDomain, removeDomain, copyInheritedIfNeeded} from '../actions'
-import {CONFIG} from '../index'
+
+const ViolationTray = React.lazy(() => import('./ViolationTray'))
 
 const PROTOCOL_REGEX = /^(?:(ht|f)tp(s?)\:\/\/)?/
 
@@ -51,7 +53,9 @@ export class Whitelist extends Component {
       effective: arrayOf(string),
       inherited: arrayOf(string),
       tools: objectOf(arrayOf(shape({id: string, name: string, account_id: string})))
-    }).isRequired
+    }).isRequired,
+    maxDomains: number.isRequired,
+    accountId: string.isRequired
   }
 
   static defaultProps = {
@@ -60,12 +64,15 @@ export class Whitelist extends Component {
 
   state = {
     addDomainInputValue: '',
-    errors: []
+    errors: [],
+    showViolationTray: false
   }
 
   deleteButtons = []
 
   addDomainBtn = null
+
+  closeViolationTray = () => this.setState({showViolationTray: false})
 
   validateInput = input => {
     const domainOnly = input.replace(PROTOCOL_REGEX, '')
@@ -120,7 +127,7 @@ export class Whitelist extends Component {
 
   render() {
     const domainLimitReached =
-      this.props.whitelistedDomains.account.length >= CONFIG.max_domains && !this.props.inherited
+      this.props.whitelistedDomains.account.length >= this.props.maxDomains && !this.props.inherited
     const toolsWhitelistKeys = this.props.whitelistedDomains.tools
       ? Object.keys(this.props.whitelistedDomains.tools)
       : []
@@ -131,14 +138,32 @@ export class Whitelist extends Component {
 
     return (
       <div>
-        <Heading margin="small 0" level="h4" as="h3" border="bottom">
-          {this.props.inherited
-            ? I18n.t('Whitelist')
-            : I18n.t('Whitelist (%{count}/%{max})', {
-                count: this.props.whitelistedDomains.account.length,
-                max: CONFIG.max_domains
-              })}
-        </Heading>
+        <View
+          as="div"
+          margin="none none small none"
+          padding="xxx-small"
+          background="primary"
+          borderWidth="none none small none"
+        >
+          <Flex justifyItems="space-between">
+            <Flex.Item>
+              <Heading margin="small" level="h4" as="h3">
+                {this.props.inherited
+                  ? I18n.t('Whitelist')
+                  : I18n.t('Whitelist (%{count}/%{max})', {
+                      count: this.props.whitelistedDomains.account.length,
+                      max: this.props.maxDomains
+                    })}
+              </Heading>
+            </Flex.Item>
+            <Flex.Item>
+              <Button variant="link" onClick={() => this.setState({showViolationTray: true})}>
+                {I18n.t('View Violation Log')}
+              </Button>
+            </Flex.Item>
+          </Flex>
+        </View>
+
         <form
           onSubmit={e => {
             e.preventDefault()
@@ -275,6 +300,21 @@ export class Whitelist extends Component {
             </Table>
           </View>
         )}
+        <Tray
+          label={I18n.t('Violation Log Tray')}
+          open={this.state.showViolationTray}
+          onDismiss={this.closeViolationTray}
+          size="medium"
+          placement="end"
+        >
+          <Suspense
+            fallback={
+              <Spinner size="large" margin="large auto" renderTitle={() => I18n.t('Loading')} />
+            }
+          >
+            <ViolationTray accountId={this.props.accountId} handleClose={this.closeViolationTray} />
+          </Suspense>
+        </Tray>
       </div>
     )
   }

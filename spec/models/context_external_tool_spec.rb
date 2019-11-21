@@ -747,7 +747,7 @@ describe ContextExternalTool do
       tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
       tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
       tool3.save!
-      placements = Lti::ResourcePlacement::DEFAULT_PLACEMENTS + ['resource_selection']
+      placements = Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS + ['resource_selection']
       expect(ContextExternalTool.all_tools_for(@course, placements: placements).to_a).to eql([tool1, tool3].sort_by(&:name))
     end
 
@@ -777,7 +777,7 @@ describe ContextExternalTool do
       tool3 = @course.context_external_tools.new(:name => "Third Tool", :consumer_key => "key", :shared_secret => "secret")
       tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
       tool3.save!
-      placements = Lti::ResourcePlacement::DEFAULT_PLACEMENTS + ['resource_selection']
+      placements = Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS + ['resource_selection']
       expect(ContextExternalTool.all_tools_for(@course).placements(*placements).to_a).to eql([tool1, tool3].sort_by(&:name))
     end
 
@@ -801,9 +801,20 @@ describe ContextExternalTool do
       tool3.settings[:resource_selection] = {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}.with_indifferent_access
       tool3.not_selectable = true
       tool3.save!
-      expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::DEFAULT_PLACEMENTS).to_a).to eql([tool1])
+      expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
     end
 
+    context 'when passed the legacy default placements' do
+      it "doesn't return tools with a developer key (LTI 1.3 tools)" do
+      tool1 = @course.context_external_tools.create!(
+        :name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret"
+      )
+      @course.context_external_tools.create!(
+        :name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret", :developer_key => DeveloperKey.create!
+      )
+      expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
+      end
+    end
   end
 
   describe "visible" do
@@ -1472,6 +1483,13 @@ describe ContextExternalTool do
       it 'returns true for module item if it has selectable, and a domain' do
         tool = @course.context_external_tools.create!(:name => "a", :domain => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
         expect(tool.has_placement?(:link_selection)).to eq true
+      end
+
+      it 'does not assume default placements for LTI 1.3 tools' do
+        tool = @course.context_external_tools.create!(
+          :name => "a", :domain => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret', developer_key: DeveloperKey.create!
+        )
+        expect(tool.has_placement?(:link_selection)).to eq false
       end
 
       it 'returns false for module item if it is not selectable' do

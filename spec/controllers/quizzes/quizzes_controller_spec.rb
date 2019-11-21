@@ -1165,6 +1165,18 @@ describe Quizzes::QuizzesController do
       assert_unauthorized
     end
 
+    it "should require view grade permissions to view a quiz submission" do
+      role = Role.find_by(name: 'TeacherEnrollment')
+      ['view_all_grades', 'manage_grades'].each do |permission|
+        RoleOverride.create!(permission: permission, enabled: false, context: @course.account, role: role)
+      end
+
+      user_session(@teacher)
+      quiz_submission = @quiz.generate_submission(@student)
+      get 'history', params: { course_id: @course.id, quiz_id: @quiz.id, quiz_submission_id: quiz_submission.id }
+      assert_unauthorized
+    end
+
     it "should redirect if there are no submissions for the user" do
       user_session(@student)
       get 'history', params: {:course_id => @course.id, :quiz_id => @quiz.id}

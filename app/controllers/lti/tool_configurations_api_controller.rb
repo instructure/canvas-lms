@@ -30,9 +30,10 @@
 #         },
 #         "settings": {
 #           "description": "The tool configuration JSON",
-#           "example": { name: "LTI 1.3 Tool" },
+#           "example": { "name": "LTI 1.3 Tool" },
 #           "type": "object"
 #         }
+#       }
 #     }
 
 class Lti::ToolConfigurationsApiController < ApplicationController

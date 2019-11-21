@@ -208,67 +208,95 @@ class ViewManager extends React.Component {
   }
 
   onNextSubmission = () => {
-    this.setState((state, props) => {
-      const opts = {state, props}
-      if (!this.hasNextSubmission(opts)) {
-        return null
-      }
+    this.setState(
+      (state, props) => {
+        const opts = {state, props}
+        if (!this.hasNextSubmission(opts)) {
+          return null
+        }
 
-      const currentIndex = this.getDisplayedSubmissionIndex(opts)
-      const nextAttempt = state.submissions[currentIndex + 1].attempt
-      return {displayedAttempt: nextAttempt}
-    })
+        const currentIndex = this.getDisplayedSubmissionIndex(opts)
+        const nextAttempt = state.submissions[currentIndex + 1].attempt
+        return {displayedAttempt: nextAttempt}
+      },
+      () => {
+        const assignment = this.getAssignment()
+        const submission = this.getDisplayedSubmission()
+        if (this.hasNextSubmission()) {
+          document.getElementById('view-next-attempt-button').focus()
+        } else if (
+          ['graded', 'submitted'].includes(submission.state) &&
+          (assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts)
+        ) {
+          document.getElementById('create-new-attempt-button').focus()
+        } else {
+          document.getElementById('view-previous-attempt-button').focus()
+        }
+      }
+    )
   }
 
   onPrevSubmission = () => {
-    this.setState((state, props) => {
-      const opts = {state, props}
+    this.setState(
+      (state, props) => {
+        const opts = {state, props}
 
-      // If we are already loading more submissions histories, we cannot go back
-      // any further until the graphql query is complete
-      if (state.loadingMore || !this.hasPrevSubmission(opts)) {
-        return null
-      }
+        // If we are already loading more submissions histories, we cannot go back
+        // any further until the graphql query is complete
+        if (state.loadingMore || !this.hasPrevSubmission(opts)) {
+          return null
+        }
 
-      const currentIndex = this.getDisplayedSubmissionIndex(opts)
-      if (currentIndex === 0) {
-        props.loadMoreSubmissionHistories()
-        return {loadingMore: true}
-      } else {
-        return {displayedAttempt: state.submissions[currentIndex - 1].attempt}
+        const currentIndex = this.getDisplayedSubmissionIndex(opts)
+        if (currentIndex === 0) {
+          props.loadMoreSubmissionHistories()
+          return {loadingMore: true}
+        } else {
+          return {displayedAttempt: state.submissions[currentIndex - 1].attempt}
+        }
+      },
+      () => {
+        if (this.hasPrevSubmission()) {
+          document.getElementById('view-previous-attempt-button').focus()
+        } else {
+          document.getElementById('view-next-attempt-button').focus()
+        }
       }
-    })
+    )
   }
 
   onStartNewAttempt = () => {
-    this.setState((state, props) => {
-      const opts = {state, props}
-      const submission = this.getDisplayedSubmission(opts)
+    this.setState(
+      (state, props) => {
+        const opts = {state, props}
+        const submission = this.getDisplayedSubmission(opts)
 
-      // Can only create a new dummy submission if we are on the newest submission
-      // and a dummy doesn't already exist, either because this was already called
-      // or because it was created for a submission draft.
-      if (
-        state.dummyNextSubmission ||
-        submission !== this.getLatestSubmission(opts) ||
-        submission.submissionDraft
-      ) {
-        return null
-      }
+        // Can only create a new dummy submission if we are on the newest submission
+        // and a dummy doesn't already exist, either because this was already called
+        // or because it was created for a submission draft.
+        if (
+          state.dummyNextSubmission ||
+          submission !== this.getLatestSubmission(opts) ||
+          submission.submissionDraft
+        ) {
+          return null
+        }
 
-      // This dummy submission isn't backed by a submission draft in the database
-      // at this point. Until the user does something like uploading a file which
-      // creates a real submission draft, this will exist only on the frontend,
-      // which is why we need to save it to the state so isn't forgotten about.
-      // Once the user does make a frd submission draft, the dummy submission in
-      // the state will be set back to null, and a new dummy submission will be
-      // created from that submission draft instead. See getDerviedStateFromProps.
-      const dummyNextSubmission = makeDummyNextSubmission(submission)
-      return {
-        dummyNextSubmission,
-        displayedAttempt: dummyNextSubmission.attempt
-      }
-    })
+        // This dummy submission isn't backed by a submission draft in the database
+        // at this point. Until the user does something like uploading a file which
+        // creates a real submission draft, this will exist only on the frontend,
+        // which is why we need to save it to the state so isn't forgotten about.
+        // Once the user does make a frd submission draft, the dummy submission in
+        // the state will be set back to null, and a new dummy submission will be
+        // created from that submission draft instead. See getDerviedStateFromProps.
+        const dummyNextSubmission = makeDummyNextSubmission(submission)
+        return {
+          dummyNextSubmission,
+          displayedAttempt: dummyNextSubmission.attempt
+        }
+      },
+      () => document.getElementById('view-previous-attempt-button').focus()
+    )
   }
 
   render() {

@@ -17,15 +17,13 @@
  */
 
 import {arrayOf, func} from 'prop-types'
-import ConnectorIcon from './ConnectorIcon'
 import I18n from 'i18n!move_select'
 import {itemShape, moveOptionsType} from './propTypes'
 import {positions} from './positions'
+import SelectPosition, {RenderSelect} from '../shared/helpers/SelectPosition'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import {FormField} from '@instructure/ui-form-field'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 
@@ -109,107 +107,57 @@ export default class MoveSelect extends React.Component {
     }
   }
 
-  renderSelect({label, onChange, options, className, selectOneDefault}) {
-    return (
-      <View margin="medium 0" display="block" className={className}>
-        <FormField id="move-select-form" label={<ScreenReaderContent>{label}</ScreenReaderContent>}>
-          <select
-            onChange={onChange}
-            style={{
-              margin: '0',
-              width: '100%'
-            }}
-          >
-            {selectOneDefault && <option>{I18n.t('Select one')}</option>}
-            {options}
-          </select>
-        </FormField>
-      </View>
-    )
-  }
-
   renderSelectGroup() {
-    const {selectedGroup} = this.state
+    const {selectedGroup, selectedPosition} = this.state
+    const {items} = this.props
     const selectPosition = !!(selectedGroup && selectedGroup.items && selectedGroup.items.length)
     const groups = this.getFilteredGroups(this.props)
     return (
       <div>
-        {this.renderSelect({
-          label: I18n.t('Group Select'),
-          className: 'move-select__group',
-          onChange: this.selectGroup,
-          options: groups.map(group => (
+        <RenderSelect
+          label={I18n.t('Group Select')}
+          className="move-select__group"
+          onChange={this.selectGroup}
+          options={groups.map(group => (
             <option key={group.id} value={group.id}>
               {group.title}
             </option>
-          )),
-          selectOneDefault: false
-        })}
-        {selectPosition ? this.renderSelectPosition(selectedGroup.items) : null}
-      </div>
-    )
-  }
-
-  renderSelectPosition(items) {
-    const {selectedPosition} = this.state
-    const selectSibling = !!(selectedPosition && selectedPosition.type === 'relative')
-    return (
-      <div>
-        {this.renderPlaceTitle()}
-        {this.renderSelect({
-          label: I18n.t('Position Select'),
-          className: 'move-select__position',
-          onChange: this.selectPosition,
-          options: Object.keys(positions).map(pos => (
-            <option key={pos} value={pos}>
-              {positions[pos].label}
-            </option>
-          )),
-          selectOneDefault: false
-        })}
-        {selectSibling ? (
-          <div>
-            <ConnectorIcon
-              aria-hidden
-              style={{position: 'absolute', transform: 'translate(-15px, -35px)'}}
-            />
-            {this.renderSelectSibling(items)}
-          </div>
+          ))}
+          selectOneDefault={false}
+        />
+        {selectPosition ? (
+          <SelectPosition
+            items={items}
+            siblings={selectedGroup.items}
+            selectedPosition={selectedPosition}
+            selectPosition={this.selectPosition}
+            selectSibling={this.selectSibling}
+          />
         ) : null}
       </div>
     )
   }
 
-  renderSelectSibling(items) {
-    const filteredItems = items.filter(item => item.id !== this.props.items[0].id)
-    return this.renderSelect({
-      label: I18n.t('Item Select'),
-      className: 'move-select__sibling',
-      onChange: this.selectSibling,
-      options: filteredItems.map((item, index) => (
-        <option key={item.id} value={index}>
-          {item.title}
-        </option>
-      )),
-      selectOneDefault: false
-    })
-  }
-
-  renderPlaceTitle() {
-    const title = this.props.moveOptions.groups
-      ? I18n.t('Place')
-      : I18n.t('Place "%{title}"', {title: this.props.items[0].title})
-    return <Text weight="bold">{title}</Text>
-  }
-
   render() {
-    const {siblings, groups} = this.props.moveOptions
+    const {groups, siblings} = this.props.moveOptions
+    const {items} = this.props
+    const {selectedPosition} = this.state
     return (
       <div className="move-select">
         {this.props.moveOptions.groupsLabel && (
           <Text weight="bold">{this.props.moveOptions.groupsLabel}</Text>
         )}
-        {groups ? this.renderSelectGroup() : this.renderSelectPosition(siblings)}
+        {groups ? (
+          this.renderSelectGroup()
+        ) : (
+          <SelectPosition
+            items={items}
+            siblings={siblings}
+            selectedPosition={selectedPosition}
+            selectPosition={this.selectPosition}
+            selectSibling={this.selectSibling}
+          />
+        )}
         {
           <View textAlign="end" display="block">
             <hr aria-hidden="true" />

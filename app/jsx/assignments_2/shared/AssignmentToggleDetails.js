@@ -35,6 +35,7 @@ function AssignmentToggleDetails(props) {
   return (
     <div className="a2-toggle-details-container">
       <ToggleDetails
+        defaultExpanded
         data-test-id="assignments-2-assignment-toggle-details"
         summary={<Text weight="bold">{I18n.t('Details')}</Text>}
       >

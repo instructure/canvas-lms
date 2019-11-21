@@ -337,10 +337,16 @@ QUnit.module('Gradebook Submissions', suiteHooks => {
       gradebook = createGradebook()
       gradebook.students = {1101: {id: '1101'}}
 
+      gradebook.assignments[2301] = {
+        grading_type: 'percent',
+        id: '2301',
+        name: 'Math Assignment',
+        published: true
+      }
+
       submission = {
         assignment_id: '2301',
         grade: '123.45',
-        gradingType: 'percent',
         submitted_at: '2015-05-04T12:00:00Z',
         user_id: '1101'
       }
@@ -405,6 +411,27 @@ QUnit.module('Gradebook Submissions', suiteHooks => {
       submission.hidden = false
       gradebook.updateSubmission(submission)
       strictEqual(getSubmission().hidden, false)
+    })
+
+    test('does not format grades when the assignment has not loaded', () => {
+      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      delete gradebook.assignments[2301]
+      gradebook.updateSubmission(submission)
+      strictEqual(GradeFormatHelper.formatGrade.callCount, 0)
+    })
+
+    test('does not format grades for Complete/Incomplete assignments', () => {
+      /*
+       * When the grades ('complete', 'incomplete') for these assignments
+       * are formatted, they are translated to the user's locale. This means
+       * they cannot be used in comparisons elsewhere in Gradebook. Prevent
+       * this from happening. Eventually, grades will be purely the persisted,
+       * data values from the database. And formatting will occur only in the UI.
+       */
+      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      gradebook.assignments[2301].grading_type = 'pass_fail'
+      gradebook.updateSubmission(submission)
+      strictEqual(GradeFormatHelper.formatGrade.callCount, 0)
     })
   })
 
