@@ -2008,6 +2008,73 @@ describe 'Submissions API', type: :request do
     end
   end
 
+  context "for_students grouped pagination" do
+    before(:once) do
+      @student1 = user_factory(active_all: true)
+      @student2 = user_factory(active_all: true)
+      course_with_teacher(active_all: true)
+      @section1 = @course.course_sections.create!(name: "test section")
+      @section2 = @course.course_sections.create!(name: "test section")
+      student_in_section(@section1, user: @student1, allow_multiple_enrollments: true)
+      student_in_section(@section2, user: @student1, allow_multiple_enrollments: true)
+      student_in_section(@section1, user: @student2, allow_multiple_enrollments: true)
+      @assignment = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15, only_visible_to_overrides: true)
+      submit_homework(@assignment, @student1)
+      submit_homework(@assignment, @student2)
+    end
+
+    before(:each) do
+      user_session(@teacher)
+    end
+
+    it "fills a page when a student has multiple enrollments" do
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students', format: 'json', course_id: @course.to_param },
+            { student_ids: 'all', grouped: true, per_page: 2, page: 1 })
+      expect(json.map{|u| u["user_id"]}).to eq [@student1.id, @student2.id]
+    end
+
+    it "does not duplicate a student with multiple enrollments when paging" do
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students', format: 'json', course_id: @course.to_param },
+            { student_ids: 'all', grouped: true, per_page: 1, page: 1 })
+      expect(json.map{|u| u["user_id"]}).to eq [@student1.id]
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students', format: 'json', course_id: @course.to_param },
+            { student_ids: 'all', grouped: true, per_page: 1, page: 2 })
+      expect(json.map{|u| u["user_id"]}).to eq [@student2.id]
+    end
+
+    it "prefers an active enrollment when a student has more than one" do
+      enrollments = @student1.enrollments
+      enrollments.first.complete
+      json = api_call(:get,
+            "/api/v1/courses/#{@course.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students', format: 'json', course_id: @course.to_param },
+            { student_ids: [@student1.id], assignment_ids: [@assignment.id], grouped: true })
+      row = json.detect { |row| row['user_id'] == @student1.id }
+      expect(row['section_id']).to eq enrollments.last.course_section_id
+    end
+
+    it "filters by section" do
+      json = api_call(:get,
+            "/api/v1/sections/#{@section2.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students', format: 'json', section_id: @section2.to_param },
+            { student_ids: 'all', grouped: true })
+      expect(json.map{|u| u["user_id"]}).to eq [@student1.id]
+    end
+
+    it "rejects an out-of-context user" do
+      api_call(:get,
+            "/api/v1/sections/#{@section2.id}/students/submissions.json",
+            { controller: 'submissions_api', action: 'for_students', format: 'json', section_id: @section2.to_param },
+            { student_ids: [@student1.id, @student2.id], grouped: true }, {}, { expected_status: 401 })
+    end
+  end
+
   context "show (differentiated_assignments)" do
     before do
       # set up course with DA and submit homework for an assignment
@@ -2478,6 +2545,15 @@ describe 'Submissions API', type: :request do
             { 'user_id' => @student3.id, 'assignment_id' => @assignment1.id, 'score' => 20 },
             { 'user_id' => @student3.id, 'assignment_id' => @assignment2.id, 'score' => nil },
         ]
+      end
+
+      it "does not show submissions for a user outside the course" do
+        rando = user_factory
+        api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/students/submissions",
+                         { :controller => 'submissions_api', :action => 'for_students',
+                           :format => 'json', :course_id => @course.to_param },
+                         { :student_ids => [rando.id] }, {}, { :expected_status => 401 })
+
       end
     end
 
