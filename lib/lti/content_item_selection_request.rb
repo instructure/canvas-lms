@@ -131,6 +131,7 @@ module Lti
       assignment_index_menu
       discussion_topic_index_menu
       module_index_menu
+      module_group_menu
       quiz_index_menu
       wiki_index_menu
     }.freeze

@@ -175,6 +175,7 @@ describe "context modules" do
 
       @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.module_index_menu = {:url => "http://www.example.com", :text => "Import Stuff"}
+      @tool.module_group_menu = {:url => "http://www.example.com", :text => "Import Stuff Here"}
       @tool.save!
       @module1 = @course.context_modules.create!(:name => "module1")
       @module2 = @course.context_modules.create!(:name => "module2")
@@ -187,7 +188,7 @@ describe "context modules" do
 
       gear = f(".header-bar .al-trigger")
       gear.click
-      tool_link = f(".header-bar li.ui-menu-item a.menu_tool_link")
+      tool_link = f(".header-bar li.ui-menu-item a.menu_tray_tool_link")
       expect(tool_link).to include_text("Import Stuff")
 
       tool_link.click
@@ -199,9 +200,33 @@ describe "context modules" do
       query_params = Rack::Utils.parse_nested_query(URI.parse(iframe['src']).query)
       expect(query_params["launch_type"]).to eq "module_index_menu"
       expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "true"
+      expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "module"
       expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(
         ["assignment", "audio", "discussion_topic", "document", "image", "module", "quiz", "page", "video"])
       module_data = [@module1, @module2].map{|m| {"id" => m.id.to_s, "name" => m.name}}
+      expect(query_params["com_instructure_course_available_canvas_resources"].values).to match_array(module_data)
+    end
+
+    it "should be able to launch the individual module menu tool via the tray", custom_timeout: 60 do
+      get "/courses/#{@course.id}/modules"
+
+      gear = f("#context_module_#{@module2.id} .al-trigger")
+      gear.click
+      tool_link = f("#context_module_#{@module2.id} li.ui-menu-item a.menu_tray_tool_link")
+      expect(tool_link).to include_text("Import Stuff Here")
+      tool_link.click
+      wait_for_ajaximations
+      tray = f("[role='dialog']")
+      expect(tray['aria-label']).to eq "Import Stuff Here"
+      iframe = tray.find_element(:css, "iframe")
+      expect(iframe['src']).to include("/courses/#{@course.id}/external_tools/#{@tool.id}")
+      query_params = Rack::Utils.parse_nested_query(URI.parse(iframe['src']).query)
+      expect(query_params["launch_type"]).to eq "module_group_menu"
+      expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "false"
+      expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "module"
+      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(
+        ["assignment", "audio", "discussion_topic", "document", "image", "module", "quiz", "page", "video"])
+      module_data = [@module2].map{|m| {"id" => m.id.to_s, "name" => m.name}} # just @module2
       expect(query_params["com_instructure_course_available_canvas_resources"].values).to match_array(module_data)
     end
   end
