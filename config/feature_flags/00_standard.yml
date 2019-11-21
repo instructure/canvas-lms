@@ -218,6 +218,9 @@ responsive_layout:
   description: This is a feature to allow the development of a responsive layout
   applies_to: RootAccount
   root_opt_in: true
+  environments:
+    development:
+      state: 'on'
 enable_i18n_features_in_outcomes_exports:
   state: hidden
   display_name: Enable i18n features in outcomes exports
