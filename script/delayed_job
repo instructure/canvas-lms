@@ -2,10 +2,20 @@
 
 ENV['RUNNING_AS_DAEMON'] = 'true'
 ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
+
 # We avoid loading the whole rails environment here, so that commands like
 # `status` and `start` return much faster.
 require 'bundler/setup'
 require_relative '../lib/canvas_yaml'
 require 'delayed_job'
 
-Delayed::CLI.new.run()
+puts "### Running: Delayed::CLI.new.run()"
+begin
+  # Note: if you pass "start" as the command line arg, this will
+  # run delayed jobs as a daemon and log to log/delayed_job.log. 
+  # If you pass "run" it will run in the foreground and log to stdout.
+  Delayed::CLI.new.run()
+rescue => e
+  puts "### Error: caught exception #{e.inspect}"
+end
+

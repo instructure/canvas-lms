@@ -122,7 +122,8 @@ COPY --chown=dockeruser:dockeruser . /app
 #COPY spec/javascripts /app/spec/javascripts
 #COPY spec/coffeescripts /app/spec/coffeescripts
 
-# Setup the Delayed Jobs service
+# Setup the Delayed Jobs so that it can be run as a service.
+# Note that in Heroku, we don't do this. See heroku.yml.
 RUN ln -s /app/script/canvas_init /etc/init.d/canvas_init \
     && update-rc.d canvas_init defaults
 

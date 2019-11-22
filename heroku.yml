@@ -24,5 +24,13 @@ run:
   web: bundle exec puma -C config/puma.rb
   worker:
     command:
-      - bundle exec script/canvas_init start
+      # Use: DELAYED_JOB_WORKERS and DELAYED_JOB_WORKER_MAX_MEMORY
+      # environment variables to control the delayed_job worker's behavior. See config/delayed_job.rb
+      #
+      # Note: if you try to daemonize the delayed_jobs worker by calling start instead of run 
+      # the Heroku dyno just crashes. Not sure why. But run does it in the foreground and logs
+      # to stdout, so this works nicely with Heroku worker dynos.
+      # See this class for details of start vs run:
+      # vendor/bundle/ruby/2.1.0/gems/inst-jobs-0.11.2/lib/delayed/cli.rb
+      - bundle exec script/canvas_init run
     image: web
