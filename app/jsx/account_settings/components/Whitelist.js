@@ -156,11 +156,13 @@ export class Whitelist extends Component {
                     })}
               </Heading>
             </Flex.Item>
-            <Flex.Item>
-              <Button variant="link" onClick={() => this.setState({showViolationTray: true})}>
-                {I18n.t('View Violation Log')}
-              </Button>
-            </Flex.Item>
+            {!this.props.isSubAccount && (
+              <Flex.Item>
+                <Button variant="link" onClick={() => this.setState({showViolationTray: true})}>
+                  {I18n.t('View Violation Log')}
+                </Button>
+              </Flex.Item>
+            )}
           </Flex>
         </View>
 
