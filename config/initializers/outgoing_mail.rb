@@ -23,6 +23,26 @@ Rails.configuration.to_prepare do
   IncomingMailProcessor::MailboxAccount.default_outgoing_email = HostUrl.outgoing_email_address
 end
 
+unless config[:delivery_override_address].blank?
+  Rails.logger.info "### Overriding all outgoing emails to be sent to: #{config[:delivery_override_address]} instead of the specified recipient. Intended for use in staging and dev."
+  class OverrideRecipientInterceptor
+    def initialize(email)
+      @to_email = email
+    end
+
+    def delivering_email(message)
+      original_recipient = message.to
+      message.to = [@to_email]
+      message.cc = nil
+      message.bcc = nil
+      #message['X-Original-Recipient']=original_recipient
+      message.body = "OVERRIDDEN EMAIL SEND. Original Recipient: #{original_recipient}\n-------------------\n#{message.body}"
+    end
+  end
+
+  ActionMailer::Base.register_interceptor(OverrideRecipientInterceptor.new(config[:delivery_override_address]))
+end
+
 # delivery_method can be :smtp, :sendmail, :letter_opener, or :test
 ActionMailer::Base.delivery_method = config[:delivery_method]
 
