@@ -95,6 +95,20 @@ describe('SubmissionManager', () => {
     expect(queryByText('Submit')).not.toBeInTheDocument()
   })
 
+  it('does not render the submit button if the assignment is locked', async () => {
+    const props = await mockAssignmentAndSubmission({
+      LockInfo: {isLocked: true},
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+    })
+    const {queryByText} = render(
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByText('Submit')).not.toBeInTheDocument()
+  })
+
   it('disables the submit button after it is pressed', async () => {
     const props = await mockAssignmentAndSubmission({
       Submission: SubmissionMocks.onlineUploadReadyToSubmit

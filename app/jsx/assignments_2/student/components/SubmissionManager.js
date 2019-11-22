@@ -223,7 +223,8 @@ export default class SubmissionManager extends Component {
       activeTypeMeetsCriteria &&
       !this.state.uploadingFiles &&
       !this.state.editingDraft &&
-      !context.nextButtonEnabled
+      !context.nextButtonEnabled &&
+      !this.props.assignment.lockInfo.isLocked
     )
   }
 
