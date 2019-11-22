@@ -23,8 +23,7 @@ import $ from 'jquery'
 const iframeStyle = {
   border: 'none',
   width: '100%',
-  height: '100%',
-  position: 'absolute'
+  flexGrow: 1
 }
 
 const toolShape = shape({
@@ -85,7 +84,14 @@ export default function ContentTypeExternalToolTray({
   const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`
   const title = tool ? tool.title : ''
   return (
-    <CanvasTray open={open} label={title} onDismiss={onDismiss} placement="end" size="regular">
+    <CanvasTray
+      open={open}
+      label={title}
+      onDismiss={onDismiss}
+      placement="end"
+      size="regular"
+      padding="0"
+    >
       <iframe
         data-testid="ltiIframe"
         style={iframeStyle}

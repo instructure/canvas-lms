@@ -37,17 +37,17 @@ export default function ExternalToolDialogTray(props) {
       size="regular"
     >
       <Flex direction="column" height="100vh">
-        <Flex.Item padding="small">
+        <Flex.Item padding="small medium">
           <Flex>
-            <Flex.Item margin="0 small 0 0">
-              <Button variant="icon" icon={IconXLine} onClick={onCloseButton} size="small">
-                <ScreenReaderContent>{closeLabel}</ScreenReaderContent>
-              </Button>
-            </Flex.Item>
             <Flex.Item grow shrink>
               <Heading ellipsis level="h3" as="h2">
                 {name}
               </Heading>
+            </Flex.Item>
+            <Flex.Item>
+              <Button variant="icon" icon={IconXLine} onClick={onCloseButton} size="small">
+                <ScreenReaderContent>{closeLabel}</ScreenReaderContent>
+              </Button>
             </Flex.Item>
           </Flex>
         </Flex.Item>

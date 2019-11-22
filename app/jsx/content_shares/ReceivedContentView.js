@@ -151,6 +151,7 @@ export default function ReceivedContentView() {
         label={I18n.t('Import...')}
         open={whichModalOpen === 'import'}
         placement="end"
+        padding="0 1.5rem"
         onDismiss={closeModal}
       >
         <CourseImportPanel contentShare={currentContentShare} onClose={closeModal} />
