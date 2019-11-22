@@ -171,12 +171,19 @@ export default class CommentTextArea extends Component {
         }
       })
 
-      this.setState({
-        commentText: '',
-        mediaObject: null,
-        currentFiles: [],
-        uploadingComments: false
-      })
+      this.setState(
+        {
+          commentText: '',
+          mediaObject: null,
+          currentFiles: [],
+          uploadingComments: false
+        },
+        () => {
+          if (this._commentTextBox) {
+            this._commentTextBox.focus()
+          }
+        }
+      )
     })
   }
 
@@ -229,6 +236,9 @@ export default class CommentTextArea extends Component {
                 label={<ScreenReaderContent>{I18n.t('Comment input box')}</ScreenReaderContent>}
                 onChange={this.onTextChange}
                 placeholder={I18n.t('Submit a Comment')}
+                ref={el => {
+                  this._commentTextBox = el
+                }}
                 resize="both"
                 value={this.state.commentText}
               />
