@@ -72,6 +72,26 @@ describe 'assignments' do
       end
     end
 
+    context "moduleSequenceFooter" do
+      before do
+        @assignment = @course.assignments.create!(submission_types: 'online_upload')
+
+        # add items to module
+        @module = @course.context_modules.create!(:name => "My Module")
+        @item_before = @module.add_item :type => 'assignment', :id => @course.assignments.create!(:title => 'assignment BEFORE this one').id
+        @module.add_item :type => 'assignment', :id => @assignment.id
+        @item_after = @module.add_item :type => 'assignment', :id => @course.assignments.create!(:title => 'assignment AFTER this one').id
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+      end
+
+      it "shows the module sequence footer" do
+        expect(f('.module-sequence-footer-button--previous')).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_before.id}")
+        expect(f('.module-sequence-footer-button--next a')).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_after.id}")
+      end
+    end
+
     context 'media assignments' do
       before(:once) do
         @assignment = @course.assignments.create!(
