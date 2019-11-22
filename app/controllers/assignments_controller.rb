@@ -120,12 +120,11 @@ class AssignmentsController < ApplicationController
           end
         end
 
+        submission_to_use_for_graphql = nil
         can_read_submissions = @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
         if can_read_submissions
-          @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
-          @current_user_submission = nil if @current_user_submission &&
-            !@current_user_submission.graded? &&
-            !@current_user_submission.submission_type
+          submission_to_use_for_graphql = @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
+          @current_user_submission = nil if @current_user_submission && !@current_user_submission.graded? && !@current_user_submission.submission_type
           if @current_user_submission
             Shackles.activate(:master) do
               @current_user_submission.send_later(:context_module_action)
@@ -168,9 +167,9 @@ class AssignmentsController < ApplicationController
         })
 
         if @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
-          submission = @assignment.submissions.find_by(user: @current_user)
-          graphql_submisison_id = @current_user_submission && CanvasSchema.id_from_object(@current_user_submission, CanvasSchema.resolve_type(submission, nil), nil)
-          js_env(SUBMISSION_ID: graphql_submisison_id)
+          if submission_to_use_for_graphql
+            js_env(SUBMISSION_ID: CanvasSchema.id_from_object(submission_to_use_for_graphql, CanvasSchema.resolve_type(submission_to_use_for_graphql, nil), nil))
+          end
           css_bundle :assignments_2_student
           js_bundle :assignments_2_show_student
           render html: '', layout: true
