@@ -18,45 +18,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def fullSuccessName(name) {
-  return "_successes/${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}-${name}-success"
-}
-
-def hasSuccess(name) {
-  copyArtifacts(filter: "_successes/*",
-                optional: true,
-                projectName: '/${JOB_NAME}',
-                parameters: "GERRIT_CHANGE_NUMBER=${env.GERRIT_CHANGE_NUMBER},GERRIT_PATCHSET_NUMBER=${GERRIT_PATCHSET_NUMBER}",
-                selector: lastCompleted())
-  if (fileExists("_successes")) {
-    archiveArtifacts(artifacts: "_successes/*",
-                    projectName: '/${JOB_NAME}')
-  }
-  return fileExists(fullSuccessName(name))
-}
-
-def saveSuccess(name) {
-  def success_name = fullSuccessName(name)
-  sh "mkdir -p _successes"
-  sh "echo 'success' >> ${success_name}"
-  archiveArtifacts(artifacts: "_successes/*",
-                   projectName: '/${JOB_NAME}')
-  echo "===> success saved /${env.JOB_NAME}: ${success_name}"
-}
-
-// runs the body if it has not previously succeeded.
-// if you don't want the success of the body to mark the
-// given name as successful, pass in save = false.
-def skipIfPreviouslySuccessful(name, save = true, body) {
-  if (hasSuccess(name)) {
-    echo "===> block already successful, skipping: ${fullSuccessName(name)}"
-  } else {
-    echo "===> running block: ${fullSuccessName(name)}"
-    body.call()
-    if (save) saveSuccess(name)
-  }
-}
-
 def build_parameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
   string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
@@ -81,8 +42,14 @@ def runBuildImageMaybe(save_success, block) {
     echo "skip building image requested"
   }
   else {
-    skipIfPreviouslySuccessful("build-and-push-image", save_success, block)
+    def skips = load 'build/new-jenkins/groovy/successes.groovy'
+    skips.skipIfPreviouslySuccessful("build-and-push-image", save_success, block)
   }
+}
+
+def skipIfPreviouslySuccessful(name, block) {
+    def skips = load 'build/new-jenkins/groovy/successes.groovy'
+    skips.skipIfPreviouslySuccessful(name, true, block)
 }
 
 pipeline {
