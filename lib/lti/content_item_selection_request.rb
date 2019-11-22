@@ -129,6 +129,7 @@ module Lti
 
     INDEX_MENU_TOOL_TYPES = %w{
       assignment_index_menu
+      assignment_group_menu
       discussion_topic_index_menu
       module_index_menu
       module_group_menu

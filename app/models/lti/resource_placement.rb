@@ -39,6 +39,7 @@ module Lti
                   :assignment_edit,
                   :assignment_menu,
                   :assignment_index_menu,
+                  :assignment_group_menu,
                   :assignment_selection,
                   :assignment_view,
                   :collaboration,

@@ -2405,6 +2405,8 @@ class ApplicationController < ActionController::Base
       :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
       :assignment_index_menu_tools => (@domain_root_account&.feature_enabled?(:commons_favorites) ?
         external_tools_display_hashes(:assignment_index_menu) : []),
+      :assignment_group_menu_tools => (@domain_root_account&.feature_enabled?(:commons_favorites) ?
+        external_tools_display_hashes(:assignment_group_menu) : []),
       :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
       :current_user_has_been_observer_in_this_course => current_user_has_been_observer_in_this_course,
