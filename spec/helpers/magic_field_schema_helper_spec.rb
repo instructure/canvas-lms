@@ -1,4 +1,4 @@
-require 'rails_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 # Specs in this file have access to a helper object that includes
 # the MagicFieldSchemaHelper. For example:
