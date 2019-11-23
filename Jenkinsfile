@@ -257,6 +257,19 @@ pipeline {
             }
           }
         }
+
+        stage('JS') {
+          steps {
+            skipIfPreviouslySuccessful("js") {
+              // propagate set to false until we can get tests passing
+              build(
+                job: 'test-suites/JS',
+                propagate: false,
+                parameters: build_parameters
+              )
+            }
+          }
+        }
 /*
  *  Don't run these on all patch sets until we have them ready to report results.
  *  Uncomment stage to run when developing.
@@ -312,18 +325,6 @@ pipeline {
  *         }
  *       }
  *
- *       stage('Frontend') {
- *         steps {
- *           skipIfPreviouslySuccessful("frontend") {
- *             // propagate set to false until we can get tests passing
- *             build(
- *               job: 'test-suites/frontend',
- *               propagate: false,
- *               parameters: build_parameters
- *             )
- *           }
- *         }
- *       }
  *
  *       stage('Xbrowser') {
  *         steps {
