@@ -356,6 +356,45 @@ PATH
       will_paginate (= 3.0.7)
 
 PATH
+  remote: gems/plugins/academic_benchmark
+  specs:
+    academic_benchmark (1.1.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/account_reports
+  specs:
+    account_reports (1.1.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/moodle_importer
+  specs:
+    moodle_importer (1.0.0)
+      moodle2cc (= 0.2.33)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/qti_exporter
+  specs:
+    qti_exporter (1.0.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
+  remote: gems/plugins/respondus_soap_endpoint
+  specs:
+    respondus_soap_endpoint (1.1.0)
+      rails (>= 3.2, < 4.3)
+      soap4r-middleware (= 0.8.3)
+      soap4r-ruby1.9 (= 2.0.0)
+
+PATH
+  remote: gems/plugins/simply_versioned
+  specs:
+    simply_versioned (1.0.0)
+      rails (>= 3.2, < 4.3)
+
+PATH
   remote: gems/rubocop-canvas
   specs:
     rubocop-canvas (1.0.0)
@@ -393,45 +432,6 @@ PATH
   remote: gems/workflow
   specs:
     workflow (0.0.1)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/academic_benchmark
-  specs:
-    academic_benchmark (1.1.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/account_reports
-  specs:
-    account_reports (1.1.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/moodle_importer
-  specs:
-    moodle_importer (1.0.0)
-      moodle2cc (= 0.2.33)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/qti_exporter
-  specs:
-    qti_exporter (1.0.0)
-      rails (>= 3.2, < 4.3)
-
-PATH
-  remote: gems/plugins/respondus_soap_endpoint
-  specs:
-    respondus_soap_endpoint (1.1.0)
-      rails (>= 3.2, < 4.3)
-      soap4r-middleware (= 0.8.3)
-      soap4r-ruby1.9 (= 2.0.0)
-
-PATH
-  remote: gems/plugins/simply_versioned
-  specs:
-    simply_versioned (1.0.0)
       rails (>= 3.2, < 4.3)
 
 GEM
@@ -561,6 +561,7 @@ GEM
     erubis (2.7.0)
     escape_code (0.2)
     eventmachine (1.0.4)
+    excon (0.69.1)
     execjs (1.4.0)
       multi_json (~> 1.0)
     extlib (0.9.16)
@@ -621,6 +622,11 @@ GEM
     hashery (1.3.0)
     headless (2.2.0)
     heapy (0.1.3)
+    heroics (0.0.25)
+      erubis (~> 2.0)
+      excon
+      moneta
+      multi_json (>= 1.9.2)
     hey (1.3.0)
     highline (1.6.1)
     hoe (3.8.1)
@@ -691,6 +697,7 @@ GEM
     mini_magick (4.2.7)
     mini_portile (0.6.2)
     minitest (4.7.5)
+    moneta (1.0.0)
     moodle2cc (0.2.33)
       builder
       instructure-happymapper (~> 0.5.10)
@@ -724,6 +731,9 @@ GEM
     parser (2.6.5.0)
       ast (~> 2.4.0)
     pg (0.18.4)
+    platform-api (2.2.0)
+      heroics (~> 0.0.25)
+      moneta (~> 1.0.0)
     polyglot (0.3.5)
     posix-spawn (0.3.8)
     powerpack (0.1.2)
@@ -1109,6 +1119,7 @@ DEPENDENCIES
   paginated_collection!
   parallel (= 1.4.1)
   pg (= 0.18.4)
+  platform-api
   polyglot (= 0.3.5)
   posix-spawn (= 0.3.8)
   protected_attributes (= 1.0.8)
