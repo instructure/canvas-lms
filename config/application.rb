@@ -18,12 +18,15 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
-# Make the .env variables available before waiting for before_configuration
-# so that we can get teh database environment variables setup properly
-# before anything has to connect.
+# Make the .env variables available before waiting for the
+# before_configuration hook to run so that we can get the database
+# environment variables setup properly before anything has to connect.
 # See: https://github.com/bkeepers/dotenv#note-on-load-order
 Dotenv::Railtie.load
 
+# This will take precendence over anything set in config/database.yml.
+# It's what Heroku uses to configure the database and we want to respect
+# that. 
 if ENV['DATABASE_URL']
   begin
     # Parse the database config environment variables out of the DATABASE_URL
@@ -39,6 +42,15 @@ if ENV['DATABASE_URL']
     # Note: if you want to get fancier, here is a good example of parsing out other
     # DB config stuff from the DATABASE_URL: https://gist.github.com/gullitmiranda/62082f2e47c364ef9617 
     # If you decide to set the pool through this, do it in config/puma.rb and config/initializers/database_connection.rb
+
+    # Do NOT make the test database configurable so that we don't accidentally run tests against the real DB!
+    if ENV["RAILS_ENV"] == 'test'
+      ENV['PGDATABASE']='canvas_test'
+      database_uri.path = '/'+ENV['PGDATABASE']
+      ENV['DATABASE_URL']=database_uri.to_s # Somewhere deep in rails code, this value is used over PGDATABASE, so update that too.
+      puts "### Running tests. Overridding DATABASE_URL config. Using #{ENV['DATABASE_URL']} instead."
+    end
+
   rescue URI::InvalidURIError
     raise "Invalid DATABASE_URL=#{ENV["DATABASE_URL"]}. Fatal error."
   end

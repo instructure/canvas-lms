@@ -11,8 +11,10 @@ common: &default_settings
   # we parse it into these PGXXX env vars in config/application.rb
   #
   # Keep this is mind b/c if a DATABASE_URL is set it will take precendence over any PGXXX variables!
+  # (except the database name in the test environment since we don't want to be able to override that 
+  #  and accidentally test against a real database)
   adapter: postgresql
-  timeout: 5000
+  timeout: <%= ENV.fetch('PGCONNECT_TIMEOUT', 5000) %>
   encoding: utf8
   host: <%= ENV['PGHOST'] %> 
   database: <%= ENV['PGDATABASE'] %>
@@ -25,12 +27,14 @@ development:
 
 test:
   <<: *default_settings
-  database: canvas_test_rails3_<%= ENV['TEST_ENV_NUMBER'] %>
-  shard1: canvas_test_rails3_shard1
-  shard2: canvas_test_rails3_shard2
-  test_shard_1: canvas_test_rails3_shard1
-  test_shard_2: canvas_test_rails3_shard2
-
+  # In order to run tests using: bundle exec rspec
+  # you must first setup the test database using:
+  # createdb -U canvas canvas_test
+  # psql -c 'GRANT ALL PRIVILEGES ON DATABASE canvas_test TO canvas' -d canvas_test
+  # psql -c 'GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO canvas' -d canvas_test
+  # psql -c 'GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO canvas' -d canvas_test
+  # RAILS_ENV=test bundle exec rails db:test:reset
+  database: canvas_test # Note: if DATABASE_URL is set, this is ignored and hard-coded in config/application.rb
 
 staging:
   <<: *default_settings
