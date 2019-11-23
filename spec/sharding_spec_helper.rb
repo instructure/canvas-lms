@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,13 +20,23 @@ require 'switchman/r_spec_helper'
 require_relative 'spec_helper'
 require_relative 'support/onceler/sharding'
 
-def specs_require_sharding
-  include Switchman::RSpecHelper
-  include Onceler::Sharding
+def has_sharding?
+  User.instance_method(:associated_shards).owner != User
+end
 
-  before :all do
-    Shard.with_each_shard do
-      Role.ensure_built_in_roles!
+def specs_require_sharding
+  if has_sharding?
+    include Switchman::RSpecHelper
+    include Onceler::Sharding
+
+    before :all do
+      Shard.with_each_shard do
+        Role.ensure_built_in_roles!
+      end
+    end
+  else
+    before(:once) do
+      skip 'Sharding specs fail without additional support from a multi-tenancy plugin'
     end
   end
 end
