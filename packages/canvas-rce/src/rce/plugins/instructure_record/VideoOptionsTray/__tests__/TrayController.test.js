@@ -183,12 +183,14 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
   describe('#_applyVideoOptions', () => {
     it('updates the video', () => {
+      const updateMediaObject = jest.fn()
       trayController.showTrayForEditor(editors[0])
       trayController._applyVideoOptions({
         displayAs: 'embed',
         appliedHeight: '101',
         appliedWidth: '201',
-        titleText: 'new title'
+        titleText: 'new title',
+        updateMediaObject
       })
       expect(getTray()).toBeNull() // the tray is closed
       const videoContainer = trayController.$videoContainer
@@ -197,14 +199,17 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(videoIframe.getAttribute('title')).toBe('new title')
       expect(videoContainer.style.height).toBe('101px')
       expect(videoContainer.style.width).toBe('201px')
+      expect(updateMediaObject).toHaveBeenCalled()
     })
 
     it('replaces the video with a link', () => {
+      const updateMediaObject = jest.fn()
       const ed = editors[0]
       trayController.showTrayForEditor(ed)
       trayController._applyVideoOptions({
         displayAs: 'link',
-        titleText: 'new <em>fancy</em> title'
+        titleText: 'new <em>fancy</em> title',
+        updateMediaObject
       })
       expect(getTray()).toBeNull() // the tray is closed
       const videoContainer = trayController.$videoContainer
@@ -213,6 +218,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(sel.tagName).toBe('A')
       expect(sel.getAttribute('href')).toBe('http://video.is.here/')
       expect(sel.innerHTML).toBe('new &lt;em&gt;fancy&lt;/em&gt; title') // see, html is not evaluated
+      expect(updateMediaObject).toHaveBeenCalled()
     })
   })
 })

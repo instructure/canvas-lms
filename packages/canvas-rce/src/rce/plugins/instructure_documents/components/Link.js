@@ -55,6 +55,7 @@ export default function Link(props) {
       text: props.display_name || props.filename, // because onClick only takes a single object
       content_type: props.content_type, // files have this
       // media_objects have these
+      title: props.title,
       type: props.type,
       embedded_iframe_url: props.embedded_iframe_url
     }

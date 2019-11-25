@@ -54,7 +54,8 @@ export default class TrayController {
     this._editor = editor
     this.$videoContainer = editor.selection.getNode()
     this._shouldOpen = true
-    this._renderTray()
+    const trayProps = bridge.trayProps.get(editor)
+    this._renderTray(trayProps)
   }
 
   hideTrayForEditor(editor) {
@@ -108,6 +109,10 @@ export default class TrayController {
         this.$videoContainer = null
       }
     }
+    videoOptions.updateMediaObject({
+      media_object_id: videoOptions.media_object_id,
+      title: videoOptions.titleText
+    })
     this._dismissTray()
   }
 
@@ -120,8 +125,11 @@ export default class TrayController {
     this._editor = null
   }
 
-  _renderTray() {
+  _renderTray(trayProps) {
     let vo = {}
+    // we will need this element when we do tracks but not for now.
+    // const $video = this._editor.selection.getNode()
+
     if (this._shouldOpen) {
       /*
        * When the tray is being opened again, it should be rendered fresh
@@ -148,6 +156,7 @@ export default class TrayController {
         }}
         onRequestClose={() => this._dismissTray()}
         open={this._shouldOpen}
+        trayProps={trayProps}
       />
     )
     ReactDOM.render(element, this.$container)

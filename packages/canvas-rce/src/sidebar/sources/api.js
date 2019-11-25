@@ -192,6 +192,14 @@ class RceApiSource {
     return this.apiPost(this.baseUri('media_objects'), headerFor(this.jwt), body)
   }
 
+  updateMediaObject(props, {media_object_id, title}) {
+    const uri = `${this.baseUri(
+      'media_objects',
+      props.host
+    )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
+    return this.apiPost(uri, headerFor(this.jwt), null, 'PUT')
+  }
+
   // fetches folders for the given context to upload files to
   fetchFolders(props, bookmark) {
     const headers = headerFor(this.jwt)
@@ -358,12 +366,12 @@ class RceApiSource {
   }
 
   // @private
-  apiPost(uri, headers, body) {
+  apiPost(uri, headers, body, method = 'POST') {
     headers = {...headers, 'Content-Type': 'application/json'}
     const fetchOptions = {
-      method: 'POST',
+      method,
       headers,
-      body: JSON.stringify(body)
+      body: body ? JSON.stringify(body) : undefined
     }
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, fetchOptions)
@@ -381,13 +389,14 @@ class RceApiSource {
       .then(checkStatus)
       .then(parseResponse)
       .catch(throwConnectionError)
-      .catch(_e => {
+      .catch(e => {
         this.alertFunc({
           text: formatMessage(
             'Something went wrong uploading, check your connection and try again.'
           ),
           variant: 'error'
         })
+        throw e
         // console.error(e) // eslint-disable-line no-console
       })
   }
