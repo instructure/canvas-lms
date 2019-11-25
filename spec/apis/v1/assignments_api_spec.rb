@@ -5253,6 +5253,37 @@ describe AssignmentsApiController, type: :request do
       expect(update_grade_value).to be true
     end
   end
+
+  context "points possible defaulting" do
+    it "should assume 0 for a new assignment" do
+      course_with_teacher(:active_all => true)
+      json = api_create_assignment_in_course(@course, {'name' => 'some name'})
+      a = Assignment.find(json["id"])
+      expect(a.points_possible).to eq 0
+    end
+
+    it "should assume 0 for a new assignment even if set to blank" do
+      course_with_teacher(:active_all => true)
+      json = api_create_assignment_in_course(@course, {'name' => 'some name', 'points_possible' => ''})
+      a = Assignment.find(json["id"])
+      expect(a.points_possible).to eq 0
+    end
+
+    it "should not set to 0 if not included in params for update" do
+      course_with_teacher(:active_all => true)
+      a = @course.assignments.create!(:points_possible => 5)
+      json = api_update_assignment_call(@course, a, {'name' => 'some new name'})
+      expect(a.points_possible).to eq 5
+      expect(a.name).to eq 'some new name'
+    end
+
+    it "should set to 0 if included in params for update and blank" do
+      course_with_teacher(:active_all => true)
+      a = @course.assignments.create!(:points_possible => 5)
+      json = api_update_assignment_call(@course, a, {'points_possible' => ''})
+      expect(a.points_possible).to eq 0
+    end
+  end
 end
 
 def api_get_assignments_index_from_course(course, params = {})
