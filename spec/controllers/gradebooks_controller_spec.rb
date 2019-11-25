@@ -1713,66 +1713,141 @@ describe GradebooksController do
       end
     end
 
-    it "allows adding comments for submission" do
-      user_session(@teacher)
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      @student = @course.enroll_user(User.create!(:name => "some user"))
-      post 'update_submission', params: {:course_id => @course.id, :submission =>
-        {:comment => "some comment",:assignment_id => @assignment.id, :user_id => @student.user_id}}
-      expect(response).to be_redirect
-      expect(assigns[:assignment]).to eql(@assignment)
-      expect(assigns[:submissions]).not_to be_nil
-      expect(assigns[:submissions].length).to eql(1)
-      expect(assigns[:submissions][0].submission_comments).not_to be_nil
-      expect(assigns[:submissions][0].submission_comments[0].comment).to eql("some comment")
-    end
-
-    it "allows attaching files to comments for submission" do
-      user_session(@teacher)
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      @student = @course.enroll_user(User.create!(:name => "some user"))
-      data = fixture_file_upload("docs/doc.doc", "application/msword", true)
-      post 'update_submission',
-        params: {:course_id => @course.id,
-        :attachments => { "0" => { :uploaded_data => data } },
-        :submission => { :comment => "some comment",
-                         :assignment_id => @assignment.id,
-                         :user_id => @student.user_id }}
-      expect(response).to be_redirect
-      expect(assigns[:assignment]).to eql(@assignment)
-      expect(assigns[:submissions]).not_to be_nil
-      expect(assigns[:submissions].length).to eql(1)
-      expect(assigns[:submissions][0].submission_comments).not_to be_nil
-      expect(assigns[:submissions][0].submission_comments[0].comment).to eql("some comment")
-      expect(assigns[:submissions][0].submission_comments[0].attachments.length).to eql(1)
-      expect(assigns[:submissions][0].submission_comments[0].attachments[0].display_name).to eql("doc.doc")
-    end
-
-    context 'media comments' do
-      before :each do
+    describe "adding comments" do
+      before do
         user_session(@teacher)
-        @assignment = @course.assignments.create!(title: 'some assignment')
-        @student = @course.enroll_user(User.create!(name: 'some user'))
+        @assignment = @course.assignments.create!(:title => "some assignment")
+        @student = @course.enroll_user(User.create!(:name => "some user"))
+      end
+
+      it "allows adding comments for submission" do
+        post 'update_submission', params: {:course_id => @course.id, :submission =>
+          {:comment => "some comment",:assignment_id => @assignment.id, :user_id => @student.user_id}}
+        expect(response).to be_redirect
+        expect(assigns[:assignment]).to eql(@assignment)
+        expect(assigns[:submissions]).not_to be_nil
+        expect(assigns[:submissions].length).to eql(1)
+        expect(assigns[:submissions][0].submission_comments).not_to be_nil
+        expect(assigns[:submissions][0].submission_comments[0].comment).to eql("some comment")
+      end
+
+      it "allows attaching files to comments for submission" do
+        data = fixture_file_upload("docs/doc.doc", "application/msword", true)
         post 'update_submission',
-          params: {
+          params: {:course_id => @course.id,
+          :attachments => { "0" => { :uploaded_data => data } },
+          :submission => { :comment => "some comment",
+                           :assignment_id => @assignment.id,
+                           :user_id => @student.user_id }}
+        expect(response).to be_redirect
+        expect(assigns[:assignment]).to eql(@assignment)
+        expect(assigns[:submissions]).not_to be_nil
+        expect(assigns[:submissions].length).to eql(1)
+        expect(assigns[:submissions][0].submission_comments).not_to be_nil
+        expect(assigns[:submissions][0].submission_comments[0].comment).to eql("some comment")
+        expect(assigns[:submissions][0].submission_comments[0].attachments.length).to eql(1)
+        expect(assigns[:submissions][0].submission_comments[0].attachments[0].display_name).to eql("doc.doc")
+      end
+
+      context "when post policies are not enabled" do
+        it "sets comment to hidden when assignment is muted" do
+          @assignment.mute!
+          post 'update_submission', params: {
             course_id: @course.id,
             submission: {
+              comment: "some comment",
               assignment_id: @assignment.id,
-              user_id: @student.user_id,
-              media_comment_id: 'asdfqwerty',
-              media_comment_type: 'audio'
+              user_id: @student.user_id
             }
-        }
-        @media_comment = assigns[:submissions][0].submission_comments[0]
+          }
+          expect(assigns[:submissions][0].submission_comments[0]).to be_hidden
+        end
+
+        it "does not set comment to hidden when assignment is unmuted" do
+          @assignment.unmute!
+          post 'update_submission', params: {
+            course_id: @course.id,
+            submission: {
+              comment: "some comment",
+              assignment_id: @assignment.id,
+              user_id: @student.user_id
+            }
+          }
+          expect(assigns[:submissions][0].submission_comments[0]).not_to be_hidden
+        end
       end
 
-      it 'allows media comments for submissions' do
-        expect(@media_comment).not_to be nil
-        expect(@media_comment.media_comment_id).to eql 'asdfqwerty'
+      context "when post policies are enabled" do
+        before do
+          PostPolicy.enable_feature!
+          @course.enable_feature!(:new_gradebook)
+        end
+
+        it "sets comment to hidden when assignment posts manually and is unposted" do
+          @assignment.ensure_post_policy(post_manually: true)
+          @assignment.hide_submissions
+          post 'update_submission', params: {
+            course_id: @course.id,
+            submission: {
+              comment: "some comment",
+              assignment_id: @assignment.id,
+              user_id: @student.user_id
+            }
+          }
+          expect(assigns[:submissions][0].submission_comments[0]).to be_hidden
+        end
+
+        it "does not set comment to hidden when assignment posts manually and submission is posted" do
+          @assignment.ensure_post_policy(post_manually: true)
+          @assignment.post_submissions
+          post 'update_submission', params: {
+            course_id: @course.id,
+            submission: {
+              comment: "some comment",
+              assignment_id: @assignment.id,
+              user_id: @student.user_id
+            }
+          }
+          expect(assigns[:submissions][0].submission_comments[0]).not_to be_hidden
+        end
+
+        it "does not set comment to hidden when assignment posts automatically" do
+          @assignment.ensure_post_policy(post_manually: false)
+          post 'update_submission', params: {
+            course_id: @course.id,
+            submission: {
+              comment: "some comment",
+              assignment_id: @assignment.id,
+              user_id: @student.user_id
+            }
+          }
+          expect(assigns[:submissions][0].submission_comments[0]).not_to be_hidden
+        end
       end
 
-      it 'includes the type in the media comment' do
-        expect(@media_comment.media_comment_type).to eql 'audio'
+      context 'media comments' do
+        before :each do
+          post 'update_submission',
+            params: {
+              course_id: @course.id,
+              submission: {
+                assignment_id: @assignment.id,
+                user_id: @student.user_id,
+                media_comment_id: 'asdfqwerty',
+                media_comment_type: 'audio'
+              }
+          }
+          @media_comment = assigns[:submissions][0].submission_comments[0]
+        end
+
+        it 'allows media comments for submissions' do
+          expect(@media_comment).not_to be nil
+          expect(@media_comment.media_comment_id).to eql 'asdfqwerty'
+        end
+
+        it 'includes the type in the media comment' do
+          expect(@media_comment.media_comment_type).to eql 'audio'
+        end
       end
     end
 
