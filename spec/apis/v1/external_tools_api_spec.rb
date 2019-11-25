@@ -546,7 +546,8 @@ describe ExternalToolsController, type: :request do
     et.assignment_group_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "assignment group menu", display_type: 'full_width', visibility: 'admins'}
     et.discussion_topic_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "discussion topic menu", display_type: 'full_width', visibility: 'admins'}
     et.discussion_topic_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "discussion topic index menu", display_type: 'full_width', visibility: 'admins'}
-    et.file_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
+    et.file_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "file menu", display_type: 'full_width', visibility: 'admins'}
+    et.file_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "file index menu", display_type: 'full_width', visibility: 'admins'}
     et.module_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "module menu", display_type: 'full_width', visibility: 'admins'}
     et.module_index_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "modules index menu", display_type: 'full_width', visibility: 'admins'}
     et.module_group_menu = {:url=>"http://www.example.com/ims/lti/resource", :text => "modules group menu", display_type: 'full_width', visibility: 'admins'}
@@ -737,8 +738,16 @@ describe ExternalToolsController, type: :request do
           "selection_height"=>400,
           "selection_width"=>800},
      "file_menu"=>
-         {"text"=>"module menu",
-          "label"=>"module menu",
+         {"text"=>"file menu",
+          "label"=>"file menu",
+          "url"=>"http://www.example.com/ims/lti/resource",
+          "visibility"=>'admins',
+          "display_type"=>'full_width',
+          "selection_height"=>400,
+          "selection_width"=>800},
+      "file_index_menu"=>
+        {"text"=>"file index menu",
+          "label"=>"file index menu",
           "url"=>"http://www.example.com/ims/lti/resource",
           "visibility"=>'admins',
           "display_type"=>'full_width',

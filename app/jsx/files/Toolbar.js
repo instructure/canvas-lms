@@ -34,6 +34,8 @@ import downloadStuffAsAZip from 'compiled/react_files/utils/downloadStuffAsAZip'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import RestrictedDialogForm from './RestrictedDialogForm'
 import 'compiled/jquery.rails_flash_notifications'
+import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
+import {ltiState} from '../../../public/javascripts/lti/post_message/handleLtiPostMessage'
 
 export default class Toolbar extends React.Component {
   static propTypes = {
@@ -128,6 +130,75 @@ export default class Toolbar extends React.Component {
     page(`/search?search_term=${searchTerm}`)
   }
 
+  renderTrayToolsMenu = () => {
+    if (this.props.indexExternalToolsForContext?.length > 0) {
+      return (
+        <div className="inline-block">
+          <a
+            className="al-trigger btn"
+            id="file_menu_link"
+            role="button"
+            tabIndex="0"
+            title={I18n.t('Files Menu')}
+            aria-label={I18n.t('Files Menu')}
+          >
+            <i className="icon-more" aria-hidden="true" />
+            <span className="screenreader-only">{I18n.t('Files Menu')}</span>
+          </a>
+          <ul className="al-options" role="menu">
+            {this.props.indexExternalToolsForContext.map(tool => (
+              <li key={tool.id} role="menuitem">
+                <a aria-label={tool.title} href="#" onClick={this.onLaunchTrayTool(tool)}>
+                  {this.iconForTrayTool(tool)}
+                  {tool.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div id="external-tool-mount-point" />
+        </div>
+      )
+    }
+  }
+
+  iconForTrayTool(tool) {
+    if (tool.canvas_icon_class) {
+      return <i className={tool.canvas_icon_class} />
+    } else if (tool.icon_url) {
+      return <img className="icon" alt="" src={tool.icon_url} />
+    }
+  }
+
+  onLaunchTrayTool = tool => e => {
+    if (e != null) {
+      e.preventDefault()
+    }
+    this.setExternalToolTray(tool, document.getElementById('file_menu_link'))
+  }
+
+  setExternalToolTray(tool, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setExternalToolTray(null)
+      returnFocusTo.focus()
+      if (ltiState?.tray?.refreshOnClose) {
+        window.location.reload()
+      }
+    }
+    ReactDOM.render(
+      <ContentTypeExternalToolTray
+        tool={tool}
+        placement="file_index_menu"
+        acceptedResourceTypes={['audio', 'document', 'image', 'video']}
+        targetResourceType="document" // maybe this isn't what we want but it's my best guess
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={handleDismiss}
+        open={tool !== null}
+      />,
+      document.getElementById('external-tool-mount-point')
+    )
+  }
+
   renderUploadAddFolderButtons(canManage) {
     if (this.props.showingSearchResults) {
       return null
@@ -155,6 +226,7 @@ export default class Toolbar extends React.Component {
             contextId={this.props.contextId}
             contextType={this.props.contextType}
           />
+          {this.renderTrayToolsMenu()}
         </div>
       )
     }

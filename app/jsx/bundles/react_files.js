@@ -17,5 +17,7 @@
  */
 
 import router from '../files/router'
+import {monitorLtiMessages} from 'lti/messages'
 
 router.start()
+monitorLtiMessages()

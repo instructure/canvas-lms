@@ -72,6 +72,9 @@ FilesApp.render = function() {
   const externalToolsForContext = filesEnv.contextFor({contextType, contextId})
     ? filesEnv.contextFor({contextType, contextId}).file_menu_tools
     : []
+  const indexExternalToolsForContext = filesEnv.contextFor({contextType, contextId})
+    ? filesEnv.contextFor({contextType, contextId}).file_index_menu_tools
+    : []
 
   return (
     <div>
@@ -111,6 +114,7 @@ FilesApp.render = function() {
         userCanManageFilesForContext={userCanManageFilesForContext}
         usageRightsRequiredForContext={usageRightsRequiredForContext}
         userCanRestrictFilesForContext={userCanRestrictFilesForContext}
+        indexExternalToolsForContext={indexExternalToolsForContext}
         getPreviewQuery={this.getPreviewQuery}
         getPreviewRoute={this.getPreviewRoute}
         modalOptions={{

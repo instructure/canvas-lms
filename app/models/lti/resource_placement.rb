@@ -51,6 +51,7 @@ module Lti
                   :discussion_topic_index_menu,
                   :editor_button,
                   :file_menu,
+                  :file_index_menu,
                   :global_navigation,
                   :homework_submission,
                   :link_selection,
