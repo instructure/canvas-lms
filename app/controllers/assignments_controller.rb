@@ -91,6 +91,40 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  def render_a2_student_view?
+    @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
+      (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+  end
+
+  def render_a2_student_view
+    submission = @assignment.submissions.find_by(user: @current_user)
+    graphql_submisison_id = nil
+    if submission
+      graphql_submisison_id = CanvasSchema.id_from_object(
+        submission,
+        CanvasSchema.resolve_type(submission, nil),
+        nil
+      )
+    end
+
+    assignment_prereqs =
+      if @locked && !@locked[:can_view]
+        context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+      else
+        {}
+      end
+
+    js_env({
+      ASSIGNMENT_ID: params[:id],
+      COURSE_ID: @context.id,
+      PREREQS: assignment_prereqs,
+      SUBMISSION_ID: graphql_submisison_id
+    })
+    css_bundle :assignments_2_student
+    js_bundle :assignments_2_show_student
+    render html: '', layout: true
+  end
+
   def show
     Shackles.activate(:slave) do
       @assignment ||= @context.assignments.find(params[:id])
@@ -120,11 +154,12 @@ class AssignmentsController < ApplicationController
           end
         end
 
-        submission_to_use_for_graphql = nil
         can_read_submissions = @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
         if can_read_submissions
-          submission_to_use_for_graphql = @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
-          @current_user_submission = nil if @current_user_submission && !@current_user_submission.graded? && !@current_user_submission.submission_type
+          @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
+          @current_user_submission = nil if @current_user_submission &&
+            !@current_user_submission.graded? &&
+            !@current_user_submission.submission_type
           if @current_user_submission
             Shackles.activate(:master) do
               @current_user_submission.send_later(:context_module_action)
@@ -133,6 +168,33 @@ class AssignmentsController < ApplicationController
         end
 
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
+
+        if render_a2_student_view?
+          render_a2_student_view
+          return
+        end
+
+        env = js_env({COURSE_ID: @context.id})
+        env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
+
+        if env[:SETTINGS][:filter_speed_grader_by_student_group]
+          eligible_categories = @context.group_categories.active
+          eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
+          env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, {include: ['groups']})
+
+          selected_group_id = @current_user.preferences.dig(:gradebook_settings, @context.id, 'filter_rows_by', 'student_group_id')
+          # If this is a group assignment and we had previously filtered by a
+          # group that isn't part of this assignment's group set, behave as if
+          # no group is selected.
+          if selected_group_id.present? && Group.active.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
+            env[:selected_student_group_id] = selected_group_id
+          end
+        end
+
+        @assignment_presenter = AssignmentPresenter.new(@assignment)
+        if @assignment_presenter.can_view_speed_grader_link?(@current_user) && !@assignment.unpublished?
+          env[:speed_grader_url] = context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id)
+        end
 
         if @assignment.quiz?
           return redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id)
@@ -147,122 +209,91 @@ class AssignmentsController < ApplicationController
           return content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type)
         end
 
+        add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
         @page_title = if @assignment.new_record?
           t(:new_assignment, "New Assignment")
         else
           @assignment.title
         end
-        add_crumb(@page_title, polymorphic_url([@context, @assignment]))
 
-        assignment_prereqs = if @locked && !@locked[:can_view]
-          context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
-        else
-          {}
+        rce_js_env
+        assignment_prereqs = {}
+        if @locked && !@locked[:can_view]
+          assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
         end
-
         js_env({
-          COURSE_ID: @context.id,
           ASSIGNMENT_ID: @assignment.id,
           PREREQS: assignment_prereqs
         })
 
-        if @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
-          if submission_to_use_for_graphql
-            js_env(SUBMISSION_ID: CanvasSchema.id_from_object(submission_to_use_for_graphql, CanvasSchema.resolve_type(submission_to_use_for_graphql, nil), nil))
+        if @context.feature_enabled?(:assignments_2_teacher) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
+          if can_do(@context, @current_user, :read_as_admin)
+            css_bundle :assignments_2_teacher
+            js_bundle :assignments_2_show_teacher
+            render html: '', layout: true
+            return
           end
-          css_bundle :assignments_2_student
-          js_bundle :assignments_2_show_student
-          render html: '', layout: true
-        elsif @context.feature_enabled?(:assignments_2_teacher) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) && can_do(@context, @current_user, :read_as_admin)
-          css_bundle :assignments_2_teacher
-          js_bundle :assignments_2_show_teacher
-          render html: '', layout: true
-        else
-          rce_js_env
-
-          env = js_env
-          env[:SETTINGS][:filter_speed_grader_by_student_group] = filter_speed_grader_by_student_group?
-
-          if env[:SETTINGS][:filter_speed_grader_by_student_group]
-            eligible_categories = @context.group_categories.active
-            eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
-            env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, {include: ['groups']})
-
-            selected_group_id = @current_user.preferences.dig(:gradebook_settings, @context.id, 'filter_rows_by', 'student_group_id')
-            # If this is a group assignment and we had previously filtered by a
-            # group that isn't part of this assignment's group set, behave as if
-            # no group is selected.
-            if selected_group_id.present? && Group.active.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
-              env[:selected_student_group_id] = selected_group_id
-            end
-          end
-
-          @assignment_presenter = AssignmentPresenter.new(@assignment)
-          if @assignment_presenter.can_view_speed_grader_link?(@current_user) && !@assignment.unpublished?
-            env[:speed_grader_url] = context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id)
-          end
-
-
-          # everything else here is only for the old assignment page and can be
-          # deleted once the :assignments_2 feature flag is deleted
-          @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.key?(:unlock_at) # removed to allow proper translation on show page
-
-          if can_read_submissions
-            @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
-          end
-
-          if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-            @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
-          else
-            @external_tools = []
-          end
-
-          permissions = {
-            context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
-            assignment: @assignment.rights_status(@current_user, session, :update, :submit),
-          }
-
-          @similarity_pledge = pledge_text
-
-          js_env({
-            EULA_URL: tool_eula_url,
-            EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
-            PERMISSIONS: permissions,
-            ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
-            SIMILARITY_PLEDGE: @similarity_pledge
-          })
-
-          set_master_course_js_env_data(@assignment, @context)
-          conditional_release_js_env(@assignment, includes: :rule)
-
-          @can_view_grades = @context.grants_right?(@current_user, session, :view_all_grades)
-          @downloadable_submissions = downloadable_submissions?(@current_user, @context, @assignment)
-          @can_grade = @assignment.grants_right?(@current_user, session, :grade)
-          if @can_view_grades || @can_grade
-            visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user).pluck(:user_id)
-            @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).to_a
-          end
-
-          # this will set @user_has_google_drive
-          user_has_google_drive
-
-          @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
-
-          @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
-
-          @show_locked_page = @locked && !@locked[:can_view]
-          if @show_locked_page
-            js_bundle :module_sequence_footer
-          else
-            css_bundle :assignments
-            js_bundle :assignment_show
-          end
-
-          render locals: {
-            eula_url: tool_eula_url,
-            show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
-          }, stream: can_stream_template?
         end
+
+        # everything else here is only for the old assignment page and can be
+        # deleted once the :assignments_2 feature flag is deleted
+        @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.key?(:unlock_at) # removed to allow proper translation on show page
+
+        if can_read_submissions
+          @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
+        end
+
+        if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
+          @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
+        else
+          @external_tools = []
+        end
+
+        permissions = {
+          context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
+          assignment: @assignment.rights_status(@current_user, session, :update, :submit),
+        }
+
+        @similarity_pledge = pledge_text
+
+        js_env({
+          EULA_URL: tool_eula_url,
+          EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
+          PERMISSIONS: permissions,
+          ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
+          SIMILARITY_PLEDGE: @similarity_pledge
+        })
+
+        set_master_course_js_env_data(@assignment, @context)
+        conditional_release_js_env(@assignment, includes: :rule)
+
+        @can_view_grades = @context.grants_right?(@current_user, session, :view_all_grades)
+        @downloadable_submissions = downloadable_submissions?(@current_user, @context, @assignment)
+        @can_grade = @assignment.grants_right?(@current_user, session, :grade)
+        if @can_view_grades || @can_grade
+          visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user).pluck(:user_id)
+          @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).to_a
+        end
+
+        # this will set @user_has_google_drive
+        user_has_google_drive
+
+        @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
+
+        @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
+
+        @show_locked_page = @locked && !@locked[:can_view]
+        if @show_locked_page
+          js_bundle :module_sequence_footer
+        else
+          css_bundle :assignments
+          js_bundle :assignment_show
+        end
+
+        render locals: {
+          eula_url: tool_eula_url,
+          show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
+        }, stream: can_stream_template?
       end
     end
   end
