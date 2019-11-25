@@ -270,6 +270,18 @@ pipeline {
           }
         }
 
+        stage ('Flakey Spec Catcher') {
+          steps {
+            skipIfPreviouslySuccessful("flakey_spec_catcheer") {
+              build(
+                job: 'test-suites/flakey-spec-catcher',
+                parameters: build_parameters,
+                propagate: false
+              )
+            }
+          }
+        }
+
         // keep this around in case there is changes to the subbuilds that need to happen
         // and you have no other way to test it except by running a test build.
         // stage('Test Subbuild') {

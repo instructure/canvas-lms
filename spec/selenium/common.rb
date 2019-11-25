@@ -89,7 +89,8 @@ if defined?(TestQueue::Runner::RSpec::LazyGroups)
 else
   RSpec.configure do |config|
     config.before :suite do
-      SeleniumDriverSetup.run
+      # For flakey spec catcher: if server and driver are already initialized, reuse instead of starting another instance
+      SeleniumDriverSetup.run unless SeleniumDriverSetup.server.present? && SeleniumDriverSetup.driver.present?
     end
   end
 end

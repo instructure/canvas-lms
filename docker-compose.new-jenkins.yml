@@ -28,7 +28,6 @@ services:
       KNAPSACK_TEST_DIR:
       KNAPSACK_GENERATE_REPORT:
 
-
   redis:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
 

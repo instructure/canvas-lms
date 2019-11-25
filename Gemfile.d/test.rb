@@ -67,4 +67,5 @@ group :test do
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
 
   gem 'knapsack', '1.18.0'
+  gem 'flakey_spec_catcher', require: false
 end
