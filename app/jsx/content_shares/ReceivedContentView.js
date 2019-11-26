@@ -128,7 +128,7 @@ export default function ReceivedContentView() {
     }
   }
 
-  if (error) throw new Error(I18n.t('Retrieval of Received Shares failed'))
+  if (error) throw new Error('Retrieval of Received Shares failed')
 
   return (
     <>
