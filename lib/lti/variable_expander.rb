@@ -1355,7 +1355,11 @@ module Lti
     #   [{"id":"3","name":"First Module"},{"id":"5","name":"Second Module"}]
     #   ```
     register_expansion 'com.instructure.Course.available_canvas_resources', [],
-                       -> { @request.parameters['com_instructure_course_available_canvas_resources']&.to_json },
+                       -> {
+                         val = @request.parameters['com_instructure_course_available_canvas_resources']
+                         val = val.values if val.is_a?(Hash)
+                         val&.to_json
+                       },
                        default_name: 'com_instructure_course_available_canvas_resources'
 
     private
