@@ -48,11 +48,11 @@ def createMigrateBuildUpCached() {
   if(successfullyLoadedFromCache()) {
     dockerUpWithoutBuild()
     sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-    commitMigratedImages()
   } else {
     sh 'build/new-jenkins/docker-compose-pull.sh'
     sh 'build/new-jenkins/docker-compose-build-up.sh'
     sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
   }
+  commitMigratedImages()
 }
 return this

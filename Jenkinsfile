@@ -270,6 +270,17 @@ pipeline {
             }
           }
         }
+
+        stage('Contract Tests') {
+          steps {
+            skipIfPreviouslySuccessful("contract-tests") {
+              build(
+                job: 'test-suites/contract-tests',
+                parameters: build_parameters
+              )
+            }
+          }
+        }
 /*
  *  Don't run these on all patch sets until we have them ready to report results.
  *  Uncomment stage to run when developing.
@@ -312,18 +323,6 @@ pipeline {
  *         }
  *       }
  *
- *       stage('Contract Tests') {
- *         steps {
- *           skipIfPreviouslySuccessful("contract-tests") {
- *             // propagate set to false until we can get tests passing
- *             build(
- *               job: 'test-suites/contract-tests',
- *               propagate: false,
- *               parameters: build_parameters
- *             )
- *           }
- *         }
- *       }
  *
  *
  *       stage('Xbrowser') {
