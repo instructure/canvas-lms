@@ -740,4 +740,23 @@ module Canvas::LiveEvents
     }
     post_event_stringified('grade_override', data, amended_context(course))
   end
+
+  def self.course_grade_change(score, old_score_values, enrollment)
+    data = {
+      user_id: enrollment.user_id,
+      course_id: enrollment.course_id,
+      workflow_state: score.workflow_state,
+      created_at: score.created_at,
+      updated_at: score.updated_at,
+      current_score: score.current_score,
+      old_current_score: old_score_values[:current_score],
+      final_score: score.final_score,
+      old_final_score: old_score_values[:final_score],
+      unposted_current_score: score.unposted_current_score,
+      old_unposted_current_score: old_score_values[:unposted_current_score],
+      unposted_final_score: score.unposted_final_score,
+      old_unposted_final_score: old_score_values[:unposted_final_score]
+    }
+    post_event_stringified('course_grade_change', data, amended_context(score.course))
+  end
 end
