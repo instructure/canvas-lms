@@ -12,6 +12,16 @@
 threads_count = ENV.fetch("RAILS_MAX_THREADS") { 5 }
 threads threads_count, threads_count
 
+# By default, workers accept all requests and queue them to pass to handlers.
+# When false, workers accept the number of simultaneous requests configured.
+#
+# Queueing requests generally improves performance, but can cause deadlocks if
+# the app is waiting on a request to itself. See https://github.com/puma/puma/issues/612
+#
+# When set to false this may require a reverse proxy to handle slow clients and
+# queue requests before they reach puma. This is due to disabling HTTP keepalive
+queue_requests ENV.fetch("PUMA_QUEUE_REQUESTS") { true }
+
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 #
 port        ENV.fetch("PORT") { 3000 }
