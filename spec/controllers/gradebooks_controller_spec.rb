@@ -871,38 +871,6 @@ describe GradebooksController do
             expect(allow_final_grade_override).to eq false
           end
 
-          # TODO: remove these specs once we no longer need the fallback behavior (GRADE-2124)
-          context "when the course setting is not set" do
-            before(:each) do
-              settings_without_override = @course.settings.dup
-              settings_without_override.delete(:allow_final_grade_override)
-
-              @course.settings = settings_without_override
-              @course.save!
-            end
-
-            it "sets allow_final_grade_override to true if the current user's preference is true" do
-              @teacher.preferences.deep_merge!({
-                gradebook_settings: {@course.id => {"show_final_grade_overrides" => "true"}}
-              })
-              get :show, params: { course_id: @course.id }
-              expect(allow_final_grade_override).to eq true
-            end
-
-            it "sets allow_final_grade_override to false if the current user's preference is false" do
-              @teacher.preferences.deep_merge!({
-                gradebook_settings: {@course.id => {"show_final_grade_overrides" => "false"}}
-              })
-              get :show, params: { course_id: @course.id }
-              expect(allow_final_grade_override).to eq false
-            end
-
-            it "sets allow_final_grade_override to false if the current user's preference does not exist" do
-              get :show, params: { course_id: @course.id }
-              expect(allow_final_grade_override).to eq false
-            end
-          end
-
           it "sets allow_final_grade_override to false when 'Final Grade Override' is not enabled" do
             @course.disable_feature!(:final_grades_override)
             get :show, params: { course_id: @course.id }
