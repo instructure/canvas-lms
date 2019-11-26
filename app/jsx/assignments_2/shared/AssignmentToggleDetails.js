@@ -31,7 +31,7 @@ AssignmentToggleDetails.propTypes = {
   description: string
 }
 
-function AssignmentToggleDetails(props) {
+export default function AssignmentToggleDetails(props) {
   return (
     <div className="a2-toggle-details-container">
       <ToggleDetails
@@ -57,5 +57,3 @@ function AssignmentToggleDetails(props) {
     </div>
   )
 }
-
-export default React.memo(AssignmentToggleDetails)

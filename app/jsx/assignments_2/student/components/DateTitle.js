@@ -25,9 +25,7 @@ import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
 import {Text, TruncateText} from '@instructure/ui-elements'
 
-function DateTitle(props) {
-  const {assignment, isSticky} = props
-
+export default function DateTitle({assignment, isSticky}) {
   return (
     <>
       <Heading margin="0 small 0 0" level="h1" as="h2" data-test-id="title">
@@ -61,5 +59,3 @@ DateTitle.propTypes = {
   assignment: Assignment.shape,
   isSticky: bool.isRequired
 }
-
-export default React.memo(DateTitle)

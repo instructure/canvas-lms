@@ -176,7 +176,7 @@ class Header extends React.Component {
                 assignment={this.props.assignment}
                 submission={this.props.submission}
                 forceLockStatus={
-                  !this.props.assignment.env.currentUser || this.props.assignment.env.modulePrereq
+                  !this.props.assignment.env.currentUser || !!this.props.assignment.env.modulePrereq
                 }
                 isCollapsed={this.state.isSticky}
               />

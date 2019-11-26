@@ -24,8 +24,7 @@ import lockedSVG from '../SVG/Locked.svg'
 import React from 'react'
 import {Text} from '@instructure/ui-elements'
 
-function LockedAssignment(props) {
-  const {assignment} = props
+export default function LockedAssignment({assignment}) {
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
       <Flex.Item>
@@ -46,5 +45,3 @@ function LockedAssignment(props) {
 LockedAssignment.propTypes = {
   assignment: Assignment.shape
 }
-
-export default React.memo(LockedAssignment)

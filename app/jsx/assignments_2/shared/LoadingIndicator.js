@@ -20,12 +20,10 @@ import React from 'react'
 import {Spinner} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-layout'
 
-function LoadingIndicator() {
+export default function LoadingIndicator() {
   return (
     <View as="div" height="100%" width="100%" textAlign="center">
       <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
     </View>
   )
 }
-
-export default React.memo(LoadingIndicator)

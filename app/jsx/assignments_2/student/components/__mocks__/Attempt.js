@@ -23,12 +23,10 @@ export const getCurrentAttempt = submission => {
   return submission && submission.attempt !== 0 ? submission.attempt : 1
 }
 
-function Attempt() {
+export default function Attempt() {
   return (
     <Text size="medium" weight="bold" data-test-id="attempt">
       Attempt 1
     </Text>
   )
 }
-
-export default React.memo(Attempt)

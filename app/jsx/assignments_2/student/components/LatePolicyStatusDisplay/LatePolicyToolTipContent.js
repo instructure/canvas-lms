@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-layout'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
 import AccessibleTipContent from './AccessibleTipContent'
 
-function LatePolicyToolTipContent(props) {
+export default function LatePolicyToolTipContent(props) {
   // TODO - At this point we really should just pass in the whole assignment and
   //        submission into this component and let it grab the data itself.
   const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
@@ -99,4 +99,3 @@ LatePolicyToolTipContent.propTypes = {
   pointsPossible: PropTypes.number.isRequired
 }
 
-export default React.memo(LatePolicyToolTipContent)
