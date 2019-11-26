@@ -125,7 +125,7 @@ class ApplicationController < ActionController::Base
     return {} unless request.format.html? || request.format == "*/*" || @include_js_env
 
     if hash.present? && @js_env_has_been_rendered
-      add_to_js_env(hash, (@js_env_data_we_need_to_render_later ||= {}), overwrite)
+      add_to_js_env(hash, @js_env_data_we_need_to_render_later, overwrite)
       return
     end
 
@@ -142,6 +142,7 @@ class ApplicationController < ActionController::Base
           view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor', false, { force_high_contrast: true }))
         ]
 
+        @js_env_data_we_need_to_render_later = {}
         @js_env = {
           ASSET_HOST: Canvas::Cdn.add_brotli_to_host_if_supported(request),
           active_brand_config_json_url: active_brand_config_url('json'),
