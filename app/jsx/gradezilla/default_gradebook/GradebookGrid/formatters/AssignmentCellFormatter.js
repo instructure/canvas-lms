@@ -75,7 +75,7 @@ function renderSimilarityIcon(similarityData) {
   } else if (similarity_score > 20) {
     iconClass = 'icon-oval-half icon-Solid'
   } else {
-    iconClass = 'icon-complete icon-Solid'
+    iconClass = 'icon-certified icon-Solid'
   }
 
   // xsslint safeString.identifier iconClass
