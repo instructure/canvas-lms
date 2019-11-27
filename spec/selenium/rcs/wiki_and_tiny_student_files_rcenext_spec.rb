@@ -103,6 +103,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @document_attachment2 = @course.attachments.build(:filename => 'foo2.txt', :folder => @root_folder)
       @document_attachment2.content_type = 'text/html'
       @document_attachment2.save!
+      @user_attachment = @user.attachments.build(:filename => 'bar.txt')
+      @user_attachment.content_type = 'text/html'
+      @user_attachment.save!
     end
 
     it "should show 2 documents when clicking course documents dropdown" do
@@ -112,6 +115,15 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       expect(course_document_links.count).to eq 2
       expect(tray_container).to include_text("foo.txt")
+    end
+
+    it "should show 1 document when clicking my documents dropdown" do
+      visit_front_page_edit(@course)
+      click_document_toolbar_button
+      click_user_documents
+
+      expect(course_document_links.count).to eq 1
+      expect(tray_container).to include_text("bar.txt")
     end
   end
 end

@@ -203,6 +203,10 @@ module RCENextPage
     f('[role="menuitem"][title="Course Documents"]')
   end
 
+  def user_documents
+    f('[role="menuitem"][title="My Documents"]')
+  end
+
   def upload_document_modal
     f('[role="dialog"][aria-label="Upload File"')
   end
@@ -456,6 +460,11 @@ module RCENextPage
 
   def click_course_documents
     course_documents.click
+    wait_for_ajaximations
+  end
+
+  def click_user_documents
+    user_documents.click
     wait_for_ajaximations
   end
 
