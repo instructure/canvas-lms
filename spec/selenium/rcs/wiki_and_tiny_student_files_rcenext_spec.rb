@@ -106,6 +106,12 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @user_attachment = @user.attachments.build(:filename => 'bar.txt')
       @user_attachment.content_type = 'text/html'
       @user_attachment.save!
+      @media_attachment1 = @course.attachments.build(:filename => 'foo.mp4', :folder => @root_folder)
+      @media_attachment1.content_type = 'video/mpeg'
+      @media_attachment1.save!
+      @media_attachment2 = @course.attachments.build(:filename => 'foo2.mp3', :folder => @root_folder)
+      @media_attachment2.content_type = 'audio/mpeg'
+      @media_attachment2.save!
     end
 
     it "should show 2 documents when clicking course documents dropdown" do
@@ -124,6 +130,15 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
 
       expect(course_document_links.count).to eq 1
       expect(tray_container).to include_text("bar.txt")
+    end
+
+    it "should show 2 media files when clicking course media dropdown" do
+      visit_front_page_edit(@course)
+      click_media_toolbar_button
+      click_course_media
+
+      expect(course_media_links.count).to eq 2
+      expect(tray_container).to include_text("foo.mp4")
     end
   end
 end

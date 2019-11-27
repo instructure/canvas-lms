@@ -116,6 +116,10 @@ module RCENextPage
     ff("[data-testid='instructure_links-Link']")
   end
 
+  def course_media_links
+    ff("[data-testid='instructure_links-Link']")
+  end
+
   def assignment_published_status
     # add selector
   end
@@ -193,6 +197,10 @@ module RCENextPage
 
   def upload_media_modal
     f('[role="dialog"][aria-label="Upload Media"')
+  end
+
+  def course_media
+    f('[role="menuitem"][title="Course Media"]')
   end
 
   def upload_document_button
@@ -450,6 +458,11 @@ module RCENextPage
 
   def click_upload_media
     upload_media_button.click
+    wait_for_ajaximations
+  end
+
+  def click_course_media
+    course_media.click
     wait_for_ajaximations
   end
 
