@@ -204,7 +204,7 @@
                 <span class="discussion-subtitle">
                   <%= t(:from_context, "From *%{context_name}*", {
                           :context_name => @topic.root_topic.context.short_name,
-                          :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\1</a>" }) %>
+                          :wrapper => "<a href='#{context_url(@topic.root_topic.context, :context_url)}'>\\1</a>" }) %>
                 </span>
               <% end %>
             </div>
