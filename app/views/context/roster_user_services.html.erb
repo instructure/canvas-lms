@@ -84,7 +84,7 @@
 <p>
   <%= t 'help.user_services', %{If other members choose, they can let you see which outside services they've linked to their Canvas account.  This can make it easier to coordinate group projects and also link up outside of class.} %>
 </p>
-<% if @current_user && @current_user.user_services.empty? %>
+<% if @current_user && @current_user.user_services.select{|s| feature_and_service_enabled?(s.service)}.empty? %>
   <p>
     <%= t 'help.no_services', %{You haven't linked your user profile to any external services.  You can link your Canvas account to services like Twitter.} %>
   </p>

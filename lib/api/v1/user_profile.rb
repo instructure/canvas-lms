@@ -50,6 +50,7 @@ module Api::V1::UserProfile
         user.user_services :
         user.user_services.visible
 
+      services = services.select{|s| feature_and_service_enabled?(s.service)}
       json[:user_services] = services.map { |s| user_service_json(s, current_user, session) }
     end
 
