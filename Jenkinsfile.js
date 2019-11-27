@@ -28,16 +28,6 @@ def setDockerUp () {
   }
 }
 
-def cleanupDocker () {
-  withEnv(['COMPOSE_FILE=docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml']) {
-    // Make sure to clean up the karma containers and image
-    sh 'docker-compose rm -fs karma'
-    sh 'docker rmi frontend_karma'
-    // Clean up all the other stuff
-    sh 'build/new-jenkins/docker-cleanup.sh'
-  }
-}
-
 def isMerge () {
   return env.GERRIT_EVENT_TYPE == 'change-merged'
 }
@@ -56,6 +46,13 @@ pipeline {
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
   stages {
+    // remove this after it runs for a little bit.
+    stage('temp-cleanup') {
+      steps {
+        sh 'build/new-jenkins/docker-cleanup.sh'
+      }
+    }
+
     stage('Setup') {
       steps {
         setDockerUp()
@@ -77,12 +74,12 @@ pipeline {
       parallel {
         stage('Jest') {
           steps {
-            sh 'build/new-jenkins/frontend/tests-jest.sh'
+            sh 'build/new-jenkins/js/tests-jest.sh'
           }
         }
         stage('Packages') {
           steps {
-            sh 'build/new-jenkins/frontend/tests-packages.sh'
+            sh 'build/new-jenkins/js/tests-packages.sh'
           }
         }
         stage('Karma - Spec Group - coffee') {
@@ -90,7 +87,7 @@ pipeline {
             JSPEC_GROUP = 'coffee'
           }
           steps {
-            sh 'build/new-jenkins/frontend/tests-karma.sh'
+            sh 'build/new-jenkins/js/tests-karma.sh'
           }
         }
         stage('Karma - Spec Group - jsa - A-F') {
@@ -98,7 +95,7 @@ pipeline {
             JSPEC_GROUP = 'jsa'
           }
           steps {
-            sh 'build/new-jenkins/frontend/tests-karma.sh'
+            sh 'build/new-jenkins/js/tests-karma.sh'
           }
         }
         stage('Karma - Spec Group - jsg - G') {
@@ -106,7 +103,7 @@ pipeline {
             JSPEC_GROUP = 'jsg'
           }
           steps {
-            sh 'build/new-jenkins/frontend/tests-karma.sh'
+            sh 'build/new-jenkins/js/tests-karma.sh'
           }
         }
         stage('Karma - Spec Group - jsh - H-Z') {
@@ -114,7 +111,7 @@ pipeline {
             JSPEC_GROUP = 'jsh'
           }
           steps {
-            sh 'build/new-jenkins/frontend/tests-karma.sh'
+            sh 'build/new-jenkins/js/tests-karma.sh'
           }
         }
       }
@@ -122,7 +119,7 @@ pipeline {
   }
   post {
     cleanup {
-      cleanupDocker()
+      sh 'build/new-jenkins/docker-cleanup.sh'
     }
   }
 }

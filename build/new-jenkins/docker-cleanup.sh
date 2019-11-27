@@ -10,7 +10,7 @@ docker-compose stop && docker-compose down --volumes --remove-orphans --rmi all
 # remove all containers
 docker rm --force --volumes $(docker ps --all --quiet) || true
 
-# delete all containers
+# delete all images
 docker rmi -f $(docker images --all --quiet) || true
 
 # remove any extra networks (errors saying unable to remove is ok)

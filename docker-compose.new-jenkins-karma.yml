@@ -5,6 +5,6 @@ services:
       - JSPEC_GROUP
     build:
       context: .
-      dockerfile: ./build/new-jenkins/frontend/Dockerfile-karma
+      dockerfile: ./build/new-jenkins/js/Dockerfile-karma
       args:
         image_name: $PATCHSET_TAG
