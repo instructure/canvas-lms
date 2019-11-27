@@ -321,7 +321,7 @@ export default class AssignmentListItemView extends Backbone.View
       return unless mountPoint
       ReactDOM.render(React.createElement(DirectShareUserModal, {
         open: open
-        courseId: ENV.COURSE_ID
+        courseId: ENV.COURSE_ID || ENV.COURSE.id
         contentShare: {content_type: 'assignment', content_id: @model.id}
         shouldReturnFocus: false
         onDismiss: dismissModal
@@ -343,7 +343,7 @@ export default class AssignmentListItemView extends Backbone.View
       return unless mountPoint
       ReactDOM.render(React.createElement(DirectShareCourseTray, {
         open: open
-        sourceCourseId: ENV.COURSE_ID
+        sourceCourseId: ENV.COURSE_ID || ENV.COURSE.id
         contentSelection: {assignments: [@model.id]}
         shouldReturnFocus: false
         onDismiss: dismissTray
