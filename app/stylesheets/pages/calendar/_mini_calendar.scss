@@ -112,7 +112,8 @@ $kyle-blue: #0081e3;
     color: var(--ic-brand-primary);
   }
   .fc-other-month {
-    color: #b4b3b3;
+    color: $ic-hint-text;
+    opacity: 1;
     @include vertical-gradient(#f6f6f6, #ebecec);
   }
   .fc-state-highlight {
