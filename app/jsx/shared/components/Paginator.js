@@ -20,6 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!paginator'
 import {Pagination} from '@instructure/ui-pagination'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 
 const Paginator = ({loadPage, page, pageCount, ...paginationProps}) => {
   if (pageCount <= 1) {
@@ -36,7 +37,8 @@ const Paginator = ({loadPage, page, pageCount, ...paginationProps}) => {
       {Array.from(Array(pageCount)).map((v, i) => (
         // eslint-disable-next-line react/no-array-index-key
         <Pagination.Page onClick={() => loadPage(i + 1)} key={i + 1} current={page === i + 1}>
-          {i + 1}
+          <PresentationContent>{i + 1}</PresentationContent>
+          <ScreenReaderContent>{I18n.t('Page %{page}', {page: i + 1})}</ScreenReaderContent>
         </Pagination.Page>
       ))}
     </Pagination>
