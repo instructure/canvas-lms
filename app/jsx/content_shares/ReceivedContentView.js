@@ -81,7 +81,7 @@ export default function ReceivedContentView() {
 
   function onRemove(share) {
     // eslint-disable-next-line no-alert
-    const shouldRemove = window.confirm(I18n.t('Are you sure you wan to remove this item?'))
+    const shouldRemove = window.confirm(I18n.t('Are you sure you want to remove this item?'))
     if (shouldRemove) {
       doFetchApi({path: `${sharesUrl}/${share.id}`, method: 'DELETE'})
         .then(() => removeShareFromList(share))
