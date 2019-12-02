@@ -1,0 +1,1070 @@
+{
+    "accessibility_checker_b3af1f6c": {
+        "message": "Verifica accessibilità"
+    },
+    "add_8523c19b": {
+        "message": "Aggiungi"
+    },
+    "add_cc_subtitles_55f0394e": {
+        "message": "Aggiungi CC/Sottotitoli"
+    },
+    "add_to_do_7537af64": {
+        "message": "Aggiungi elenco attività"
+    },
+    "add_to_do_7def3c37": {
+        "message": "Aggiungi elenco attività"
+    },
+    "address_3159962f": {
+        "message": "Indirizzo:"
+    },
+    "align_11050992": {
+        "message": "Allinea"
+    },
+    "align_center_ca078feb": {
+        "message": "Allinea al centro"
+    },
+    "align_left_e9f1f93b": {
+        "message": "Allinea a sinistra"
+    },
+    "align_right_9bad3ac1": {
+        "message": "Allinea a destra"
+    },
+    "alignment_and_indentation_f7de34bf": {
+        "message": "Allineamento e rientro"
+    },
+    "all_4321c3a1": {
+        "message": "Tutto"
+    },
+    "all_day_fb42c4fc": {
+        "message": "Tutto il giorno"
+    },
+    "all_items_loaded_aa256183": {
+        "message": "Tutti gli elementi caricati"
+    },
+    "alphabetical_55b5b4e0": {
+        "message": "Alfabetico"
+    },
+    "alt_text_611fb322": {
+        "message": "Testo alternativo"
+    },
+    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+        "message": "Si è verificato un errore durante il tentativo di eliminare l''opportunità."
+    },
+    "an_error_occurred_generating_the_file_preview_cf259955": {
+        "message": "Si è verificato un errore durante la generazione dell’anteprima file"
+    },
+    "announcement_fb4cb645": {
+        "message": "Annuncio"
+    },
+    "announcement_list_da155734": {
+        "message": "Elenco annuncio"
+    },
+    "announcements_a4b8ed4a": {
+        "message": "Annunci"
+    },
+    "apps_54d24a47": {
+        "message": "App"
+    },
+    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+        "message": "Vuoi eliminare questo elemento dell''agenda?"
+    },
+    "aspect_ratio_will_be_preserved_cb5fdfb8": {
+        "message": "Le proporzioni verranno mantenute"
+    },
+    "assignment_976578a8": {
+        "message": "Compito"
+    },
+    "assignments_1e02582c": {
+        "message": "Compiti"
+    },
+    "assignmenttype_title_6612d008": {
+        "message": "{ assignmentType } { title }."
+    },
+    "assignmenttype_title_all_day_on_datetime_9768903c": {
+        "message": "{ assignmentType } { title }, tutto il giorno il { datetime }."
+    },
+    "assignmenttype_title_at_datetime_478f0709": {
+        "message": "{ assignmentType } { title }, alle { datetime }."
+    },
+    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+        "message": "{ assignmentType } { title }, alle { datetime } fino alle { endTime }"
+    },
+    "assignmenttype_title_due_datetime_a112d8ff": {
+        "message": "{ assignmentType } { title }, scade { datetime }."
+    },
+    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+        "message": "{ assignmentType } { title } ha un''attività alle { datetime }."
+    },
+    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+        "message": "{ assignmentType } { title } è contrassegnato come fatto."
+    },
+    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+        "message": "{ assignmentType } { title } non è contrassegnato come fatto."
+    },
+    "assignmenttype_title_posted_datetime_cab69444": {
+        "message": "{ assignmentType } { title } pubblicato { datetime }."
+    },
+    "assignmenttype_title_reminder_datetime_33fa66d5": {
+        "message": "{ assignmentType } { title }, promemoria { datetime }."
+    },
+    "audio_and_video_recording_is_not_available_c7173efc": {
+        "message": "La registrazione audio e video non è disponibile."
+    },
+    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+        "message": "Aprire automaticamente un’anteprima in linea. (L’anteprima viene visualizzata solo dopo il salvataggio)"
+    },
+    "beginning_of_your_to_do_history_61ef2dce": {
+        "message": "Inizio della cronologia delle cose da fare"
+    },
+    "calendar_a8563bb2": {
+        "message": "Calendario:"
+    },
+    "calendar_event_89aadc1c": {
+        "message": "Evento del calendario"
+    },
+    "cancel_caeb1e68": {
+        "message": "Annulla"
+    },
+    "canvas_planner_98ed106": {
+        "message": "Canvas Planner"
+    },
+    "canvas_plugins_705a5016": {
+        "message": "Plug-in Canvas"
+    },
+    "choose_caption_file_9c45bc4e": {
+        "message": "Scegli un file di sottotitoli"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "cerchia elenco non ordinato"
+    },
+    "clear_selected_file_82388e50": {
+        "message": "Cancella file selezionato"
+    },
+    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+        "message": "Fai clic su una pagina per inserire un link a quella pagina."
+    },
+    "click_to_embed_imagename_c41ea8df": {
+        "message": "Clicca  per incorporare { imageName }"
+    },
+    "click_to_insert_a_link_into_the_editor_c19613aa": {
+        "message": "Fai clic per inserire un link nell''editor."
+    },
+    "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+        "message": "Chiudere un menu o una finestra di dialogo. Consente anche di tornare all’area dell’editor"
+    },
+    "close_d634289d": {
+        "message": "Chiudi"
+    },
+    "close_opportunity_center_popup_9907d981": {
+        "message": "Chiudi finestra a comparsa Centro opportunità"
+    },
+    "collaborations_5c56c15f": {
+        "message": "Collaborazioni"
+    },
+    "collapse_to_hide_types_1ab46d2e": {
+        "message": "Riduci per nascondere { types }"
+    },
+    "computer_1d7dfa6f": {
+        "message": "Computer"
+    },
+    "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
+        "message": "Il contenuto è ancora in fase di caricamento, se continui non sarà incorporato correttamente."
+    },
+    "content_subtype_5ce35e88": {
+        "message": "Sottocategoria di contenuto"
+    },
+    "content_type_2cf90d95": {
+        "message": "Tipo di contenuto"
+    },
+    "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+        "message": "{ count, plural,\n     =0 {0 parole}\n    one {1 parola}\n  other {# parole}\n}"
+    },
+    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+        "message": "{ count, plural,\n     =0 {# opportunità}\n    one {# opportunità}\n  other {# opportunità}\n}"
+    },
+    "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+        "message": "{ count, plural,\n    one {# elemento caricato}\n  other {# elementi caricati}\n}"
+    },
+    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {Mostra # elemento completato}\n  other {Mostra # elementi completati}\n}"
+    },
+    "course_8a63b4a3": {
+        "message": "Corso"
+    },
+    "course_documents_104d76e0": {
+        "message": "Documenti del corso"
+    },
+    "course_files_62deb8f8": {
+        "message": "File del corso"
+    },
+    "course_images_f8511d04": {
+        "message": "Immagini del corso"
+    },
+    "course_links_b56959b9": {
+        "message": "Link al corso"
+    },
+    "course_media_ec759ad": {
+        "message": "File multimediali del corso"
+    },
+    "course_navigation_dd035109": {
+        "message": "Esplorazione corso"
+    },
+    "course_to_do_bcbbab54": {
+        "message": "{ course } COSE DA FARE"
+    },
+    "current_volume_level_c55ab825": {
+        "message": "Livello di volume corrente"
+    },
+    "custom_6979cd81": {
+        "message": "Personalizzato"
+    },
+    "date_added_ed5ad465": {
+        "message": "Data aggiunta"
+    },
+    "date_at_time_dbdb1b99": {
+        "message": "Il { date } alle { time }"
+    },
+    "date_ee500367": {
+        "message": "Data"
+    },
+    "date_is_not_a_valid_date_4ef9f8ba": {
+        "message": "#{ date } non è una data valida."
+    },
+    "date_is_required_8660ec22": {
+        "message": "Data obbligatoria"
+    },
+    "date_published_371c4ad0": {
+        "message": "Data pubblicazione"
+    },
+    "date_time_d9fbf2d7": {
+        "message": "Data e ora:"
+    },
+    "decrease_indent_de6343ab": {
+        "message": "Riduci rientro"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "elenco non ordinato puntato predefinito"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "elenco ordinato numericamente predefinito"
+    },
+    "delete_a6efa79d": {
+        "message": "Elimina"
+    },
+    "describe_the_image_e65d2e32": {
+        "message": "(Descrivi l’immagine)"
+    },
+    "details_98a31b68": {
+        "message": "Dettagli"
+    },
+    "details_a6f427c3": {
+        "message": "Dettagli:"
+    },
+    "dimensions_45ddb7b7": {
+        "message": "Dimensioni"
+    },
+    "directionality_ebcae6d0": {
+        "message": "direzionalità"
+    },
+    "disable_in_line_preview_2a675175": {
+        "message": "Disattivare l’anteprima in linea."
+    },
+    "discussion_6719c51d": {
+        "message": "Discussione"
+    },
+    "discussions_a5f96392": {
+        "message": "Discussioni"
+    },
+    "discussions_index_6c36ced": {
+        "message": "Indice discussioni"
+    },
+    "dismiss_itemtitle_a9fae1b3": {
+        "message": "Ignora { itemTitle }"
+    },
+    "dismiss_opportunityname_5995176f": {
+        "message": "Ignora { opportunityName }"
+    },
+    "dismissed_8b0b1fc9": {
+        "message": "Ignorato"
+    },
+    "dismissed_opportunities_f0826640": {
+        "message": "Opportunità ignorate"
+    },
+    "display_options_315aba85": {
+        "message": "Visualizza opzioni"
+    },
+    "display_text_link_opens_in_a_new_tab_75e9afc9": {
+        "message": "Visualizza collegamento testuale (Si apre in una nuova scheda)"
+    },
+    "documents_81393201": {
+        "message": "Documenti"
+    },
+    "done_54e3d4b6": {
+        "message": "Fatto"
+    },
+    "drag_a_file_here_1bf656d5": {
+        "message": "Trascina qui un file"
+    },
+    "drag_a_file_here_39357b48": {
+        "message": "Trascina un file qui"
+    },
+    "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+        "message": "Trascina la selezione o fai clic per cercare nel tuo computer"
+    },
+    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+        "message": "Trascinare la maniglia. Usa frecce su e giù per ridimensionare"
+    },
+    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
+        "message": "Rilascia e rilascia oppure fai clic per sfogliare il computer"
+    },
+    "due_5d7267be": {
+        "message": "Scadenza:"
+    },
+    "due_date_124fdd99": {
+        "message": "Scadenza: { date }"
+    },
+    "due_multiple_dates_cc0ee3f5": {
+        "message": "Scadenza: Più date"
+    },
+    "due_when_7eed10c6": {
+        "message": "Scadenza: { when }"
+    },
+    "edit_c5fbea07": {
+        "message": "Modifica"
+    },
+    "edit_link_7f53bebb": {
+        "message": "Modifica collegamento"
+    },
+    "edit_title_72e5a21e": {
+        "message": "Modifica { title }"
+    },
+    "editor_statusbar_26ac81fc": {
+        "message": "Barra di stato dell’editor"
+    },
+    "embed_828fac4a": {
+        "message": "Incorpora"
+    },
+    "embed_code_314f1bd5": {
+        "message": "Incorpora codice"
+    },
+    "embed_image_1080badc": {
+        "message": "Incorpora immagine"
+    },
+    "embed_options_tray_901cfd19": {
+        "message": "Incorpora barra delle opzioni"
+    },
+    "embed_preview_2d741e1f": {
+        "message": "Incorpora anteprima"
+    },
+    "embed_video_code_703e10f2": {
+        "message": "Incorpora codice video"
+    },
+    "error_loading_grades_e0b38f4d": {
+        "message": "Errore durante il caricamento dei voti"
+    },
+    "error_loading_more_items_3f109d9f": {
+        "message": "Errore durante il caricamento di più elementi"
+    },
+    "error_loading_past_items_2881dbb1": {
+        "message": "Errore durante il caricamento degli elementi precedenti"
+    },
+    "error_uploading_video_audio_recording_16d9730a": {
+        "message": "Si è verificato un errore durante il collegamento della registrazione video/audio"
+    },
+    "excused_cf8792eb": {
+        "message": "Giustificato"
+    },
+    "expand_to_see_types_f5d29352": {
+        "message": "Espandi per vedere { types }"
+    },
+    "external_links_3d9f074e": {
+        "message": "Link esterni"
+    },
+    "extra_large_b6cdf1ff": {
+        "message": "Extra Large"
+    },
+    "failed_to_delete_to_do_64edff49": {
+        "message": "Impossibile eliminare attività"
+    },
+    "failed_to_get_new_activity_17e7ec7c": {
+        "message": "Impossibile trovare la nuova attività"
+    },
+    "failed_to_load_opportunities_52ab6404": {
+        "message": "Impossibile caricare le opportunità"
+    },
+    "failed_to_save_to_do_ddc7503b": {
+        "message": "Impossibile salvare attività"
+    },
+    "feedback_6dcc1991": {
+        "message": "Feedback"
+    },
+    "file_name_8fd421ff": {
+        "message": "Nome file"
+    },
+    "file_url_c12b64be": {
+        "message": "URL file"
+    },
+    "filename_file_icon_602eb5de": {
+        "message": "Icona file { filename }"
+    },
+    "filename_image_preview_6cef8f26": {
+        "message": "Anteprima immagine { filename }"
+    },
+    "filename_text_preview_e41ca2d8": {
+        "message": "Anteprima testo { filename }"
+    },
+    "files_c300e900": {
+        "message": "File"
+    },
+    "files_index_af7c662b": {
+        "message": "Indice file"
+    },
+    "finish_bc343002": {
+        "message": "Termina"
+    },
+    "focus_the_popup_context_toolbar_7979f4f8": {
+        "message": "Focalizza barra degli strumenti di contesto a comparsa"
+    },
+    "formatting_5b143aa8": {
+        "message": "Formattazione in corso"
+    },
+    "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
+        "message": "Trovati { count, plural,\n     =0 {# risultati}\n    one {# risultato}\n  other {# risultati}\n}"
+    },
+    "generating_preview_45b53be0": {
+        "message": "Generazione anteprima in corso..."
+    },
+    "go_to_card_view_dashboard_9d03970e": {
+        "message": "Vai alla dashboard Visualizzazione schede"
+    },
+    "go_to_the_editor_s_menubar_e6674c81": {
+        "message": "Vai alla barra dei menu dell''editor"
+    },
+    "go_to_the_editor_s_toolbar_a5cb875f": {
+        "message": "Vai alla barra degli strumenti dell''editor"
+    },
+    "graded_25cd3fcd": {
+        "message": "Valutato"
+    },
+    "grades_a61eba0a": {
+        "message": "Voti"
+    },
+    "grades_are_loading_c899652d": {
+        "message": "Voti in fase di caricamento"
+    },
+    "grades_loaded_5056277c": {
+        "message": "Voti caricati"
+    },
+    "group_files_4324f3df": {
+        "message": "File di gruppo"
+    },
+    "group_navigation_99f191a": {
+        "message": "Esplorazione gruppo"
+    },
+    "header_f28f73db": {
+        "message": "Intestazione"
+    },
+    "height_69b03e15": {
+        "message": "Altezza"
+    },
+    "image_options_5412d02c": {
+        "message": "Opzioni immagine"
+    },
+    "image_options_tray_90a46006": {
+        "message": "Barra opzioni immagine"
+    },
+    "images_7ce26570": {
+        "message": "Immagini"
+    },
+    "increase_indent_6d550a4a": {
+        "message": "Aumenta rientro"
+    },
+    "insert_equella_links_49a8dacd": {
+        "message": "Inserisci link Equella"
+    },
+    "insert_link_6dc23cae": {
+        "message": "Inserisci link"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Inserisci equazione matematica"
+    },
+    "invalid_file_c11ba11": {
+        "message": "File non valido"
+    },
+    "invalid_file_type_881cc9b2": {
+        "message": "Tipo file non valido"
+    },
+    "items_completed_items_plural_1_item_other_items_717d579f": {
+        "message": "{ items } elemento { items, plural,\n     =1 {completato}\n  other {elementi completati}\n}"
+    },
+    "keyboard_shortcuts_ed1844bd": {
+        "message": "Scelte rapide da tastiera"
+    },
+    "large_9c5e80e7": {
+        "message": "Grande"
+    },
+    "late_2be42b88": {
+        "message": "In ritardo"
+    },
+    "left_to_right_d6da6d7e": {
+        "message": "da sinistra a destra"
+    },
+    "link_7262adec": {
+        "message": "Link"
+    },
+    "link_options_a16b758b": {
+        "message": "Opzioni link"
+    },
+    "link_to_other_content_in_the_course_879163b5": {
+        "message": "Collega ad altro contenuto del corso."
+    },
+    "link_to_other_content_in_the_group_3fe25379": {
+        "message": "Collega ad altro contenuto del gruppo."
+    },
+    "links_14b70841": {
+        "message": "Link"
+    },
+    "load_more_35d33c7": {
+        "message": "Carica altro"
+    },
+    "load_more_a36f9cf9": {
+        "message": "Carica altro"
+    },
+    "load_more_results_460f49a9": {
+        "message": "Carica altri risultati"
+    },
+    "load_prior_dates_f2b0f6f0": {
+        "message": "Carica date precedenti"
+    },
+    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+        "message": "Caricamento di { count, plural,\n     =0 {# elementi}\n    one {# elemento}\n  other {# elementi}\n} eseguito"
+    },
+    "loading_25990131": {
+        "message": "Caricamento in corso..."
+    },
+    "loading_725811ca": {
+        "message": "caricamento"
+    },
+    "loading_bde52856": {
+        "message": "Caricamento"
+    },
+    "loading_failed_b3524381": {
+        "message": "Caricamento non riuscito..."
+    },
+    "loading_failed_e6a9d8ef": {
+        "message": "Caricamento non riuscito."
+    },
+    "loading_grades_c842c887": {
+        "message": "Caricamento voti"
+    },
+    "loading_media_f3455841": {
+        "message": "Caricamento contenuti multimediali"
+    },
+    "loading_past_items_ca499e75": {
+        "message": "Caricamento elementi precedenti"
+    },
+    "loading_planner_items_947a813d": {
+        "message": "Caricamento voci agenda"
+    },
+    "location_3b6ff307": {
+        "message": "Posizione:"
+    },
+    "looks_like_there_isn_t_anything_here_d9bcef49": {
+        "message": "Sembra non ci sia nulla qui"
+    },
+    "media_af190855": {
+        "message": "Elementi multimediali"
+    },
+    "medium_5a8e9ead": {
+        "message": "Medio"
+    },
+    "mic_a7f3d311": {
+        "message": "Microfono"
+    },
+    "miscellaneous_and_apps_f450a387": {
+        "message": "Varie e App"
+    },
+    "missing_1a256b3b": {
+        "message": "Mancante"
+    },
+    "missing_items_for_title_516511f8": {
+        "message": "Elementi mancanti per { title }"
+    },
+    "modules_c4325335": {
+        "message": "Moduli"
+    },
+    "must_be_at_least_width_x_height_px_41dc825e": {
+        "message": "Deve essere almeno { width } x { height }px"
+    },
+    "my_documents_77a74ff3": {
+        "message": "I miei documenti"
+    },
+    "my_files_eea33f44": {
+        "message": "I miei file"
+    },
+    "my_grades_98834476": {
+        "message": "I miei voti"
+    },
+    "my_images_427f9b0c": {
+        "message": "Le mi immagini"
+    },
+    "my_media_82bade11": {
+        "message": "I miei elementi multimediali"
+    },
+    "navigate_through_the_menu_or_toolbar_415a4e50": {
+        "message": "Naviga attraverso il menu o la barra degli strumenti"
+    },
+    "new_13daf639": {
+        "message": "Nuovo"
+    },
+    "new_activity_8b84847d": {
+        "message": "Nuova attività"
+    },
+    "new_activity_for_title_14c9c3af": {
+        "message": "Nuova attività per { title }"
+    },
+    "new_opportunities_7d349c4d": {
+        "message": "Nuove opportunità"
+    },
+    "next_month_749b1778": {
+        "message": "Mese successivo"
+    },
+    "next_page_d2a39853": {
+        "message": "Pagina successiva"
+    },
+    "no_alt_text_decorative_image_f318fc0e": {
+        "message": "Nessun testo alternativo (Immagine decorativa)"
+    },
+    "no_due_dates_assigned_e8f5bac8": {
+        "message": "Nessuna data di scadenza assegnata"
+    },
+    "no_grade_3b4d7f3e": {
+        "message": "Nessun voto"
+    },
+    "no_results_940393cf": {
+        "message": "Nessun risultato."
+    },
+    "no_results_found_for_filterterm_ad1b04c8": {
+        "message": "Nessun risultato trovato per { filterTerm }"
+    },
+    "no_results_found_for_term_1564c08e": {
+        "message": "Nessun risultato trovato per { term }."
+    },
+    "no_video_1ed00b26": {
+        "message": "Nessun video"
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "Nulla per ora"
+    },
+    "nothing_here_needs_attention_c4eaded6": {
+        "message": "Nessun elemento richiede attenzione."
+    },
+    "nothing_more_to_do_b665da42": {
+        "message": "Nessun''altra attività"
+    },
+    "nothing_new_needs_attention_3ac548d4": {
+        "message": "Nulla di nuovo richiede attenzione."
+    },
+    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+        "message": "Nulla in programma oggi. Selezione degli elementi più recenti."
+    },
+    "nothing_planned_today_selecting_next_item_f6718aa": {
+        "message": "Nulla in programma oggi. Selezione del prossimo elemento."
+    },
+    "nothing_planned_yet_8675ffe9": {
+        "message": "Ancora nulla programmato"
+    },
+    "numpoints_points_8621a43b": {
+        "message": "{ numPoints } punti"
+    },
+    "only_most_recent_grading_period_shown_f1ad6458": {
+        "message": "*Viene mostrato solo il periodo di valutazione più recente."
+    },
+    "open_this_keyboard_shortcuts_dialog_9658b83a": {
+        "message": "Apri questa finestra di dialogo delle scelte rapide da tastiera"
+    },
+    "opportunities_popup_f6703842": {
+        "message": "popup opportunità"
+    },
+    "optional_add_course_ef0d70fc": {
+        "message": "Facoltativo: Aggiungi corso"
+    },
+    "options_3ab0ea65": {
+        "message": "Opzioni"
+    },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "Elenchi ordinati e non ordinati"
+    },
+    "other_editor_shortcuts_may_be_found_at_404aba4a": {
+        "message": "Altre scorciatoie dell’editor possono essere trovate in"
+    },
+    "page_50c4823d": {
+        "message": "Pagina"
+    },
+    "pages_e5414c2c": {
+        "message": "Pagine"
+    },
+    "paragraph_5e5ad8eb": {
+        "message": "Paragrafo"
+    },
+    "pause_12af3bb4": {
+        "message": "Pausa"
+    },
+    "peer_review_74f26a13": {
+        "message": "Revisione paritaria"
+    },
+    "peer_review_for_itemtitle_358cb413": {
+        "message": "Riesame tra pari per { itemTitle }"
+    },
+    "people_b4ebb13c": {
+        "message": "Persone"
+    },
+    "play_1a47eaa7": {
+        "message": "Riproduci"
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Consenti a Canvas di accedere al tuo microfono e alla tua webcam."
+    },
+    "points_bceb5005": {
+        "message": "punti"
+    },
+    "points_points_63e59cce": {
+        "message": "{ points } punti"
+    },
+    "posted_when_a578f5ab": {
+        "message": "Postato: { when }"
+    },
+    "preformatted_d0670862": {
+        "message": "Preformattato"
+    },
+    "preview_a3f8f854": {
+        "message": "ANTEPRIMA"
+    },
+    "previous_month_bb1e3c84": {
+        "message": "Mese precedente"
+    },
+    "previous_page_928fc112": {
+        "message": "Pagina precedente"
+    },
+    "pts_699bd9aa": {
+        "message": "pt"
+    },
+    "published_c944a23d": {
+        "message": "pubblicato"
+    },
+    "published_when_302d8e23": {
+        "message": "Pubblicato: { when }"
+    },
+    "quiz_e0dcce8f": {
+        "message": "Quiz"
+    },
+    "quizzes_7e598f57": {
+        "message": "Quiz"
+    },
+    "record_7c9448b": {
+        "message": "Registra"
+    },
+    "record_upload_media_5fdce166": {
+        "message": "Registra/Carica file multimediali"
+    },
+    "recording_98da6bda": {
+        "message": "Registrazione"
+    },
+    "reminder_date_4564d12d": {
+        "message": "Promemoria: { date }"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "Rimuovi link"
+    },
+    "replies_4a8577c8": {
+        "message": "Risposte"
+    },
+    "rich_content_editor_2708ef21": {
+        "message": "Editor di contenuti avanzati"
+    },
+    "right_to_left_ec223c81": {
+        "message": "da destra a sinistra"
+    },
+    "save_11a80ec3": {
+        "message": "Salva"
+    },
+    "scroll_up_to_see_your_history_19b14cad": {
+        "message": "Scorrere per visualizzare la cronologia."
+    },
+    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+        "message": "Scorre fino all''elemento precedente con la nuova attività."
+    },
+    "search_280d00bd": {
+        "message": "Cerca"
+    },
+    "search_term_b2d2235": {
+        "message": "Cerca termine"
+    },
+    "select_app_3d08035a": {
+        "message": "Seleziona la App"
+    },
+    "select_language_7c93a900": {
+        "message": "Selezionare la lingua"
+    },
+    "selected_274ce24f": {
+        "message": "Selezionato"
+    },
+    "show_all_ae37d610": {
+        "message": "Mostra tutto"
+    },
+    "show_embed_options_ef8d7ef": {
+        "message": "Mostra opzioni Incorpora"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "Mostra opzioni immagine"
+    },
+    "show_link_options_545338fd": {
+        "message": "Mostra opzioni link"
+    },
+    "show_my_grades_ebd08684": {
+        "message": "Mostra I miei voti"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "Mostra opzioni video"
+    },
+    "size_b30e1077": {
+        "message": "Dimensioni"
+    },
+    "small_b070434a": {
+        "message": "Piccolo"
+    },
+    "small_header_168fb9f9": {
+        "message": "Breve intestazione"
+    },
+    "something_went_wrong_89195131": {
+        "message": "Si è verificato un errore."
+    },
+    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+        "message": "Si è verificato un problema durante l’accesso al tuo microfono o webcam."
+    },
+    "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
+        "message": "Qualcosa è andato storto e non so cosa mostrarti."
+    },
+    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
+        "message": "Qualcosa è andato storto, riprova dopo aver aggiornato la pagina"
+    },
+    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
+        "message": "Qualcosa è andato storto durante il caricamento, controlla la connessione e riprova."
+    },
+    "sort_by_e75f9e3e": {
+        "message": "Ordina per"
+    },
+    "square_unordered_list_b15ce93b": {
+        "message": "incornicia elenco non ordinato"
+    },
+    "start_over_f7552aa9": {
+        "message": "Inizia di nuovo"
+    },
+    "start_recording_9a65141a": {
+        "message": "Avvia registrazione"
+    },
+    "startdate_to_enddate_d245175b": {
+        "message": "{ startDate } a { endDate }"
+    },
+    "startdatetime_enddatetime_20abc10e": {
+        "message": "{ startDateTime } - { endDateTime }"
+    },
+    "startdatetime_endtime_49741bbe": {
+        "message": "{ startDateTime } - { endTime }"
+    },
+    "starttime_to_endtime_d7cc249d": {
+        "message": "{ startTime } a { endTime }"
+    },
+    "styles_2aa721ef": {
+        "message": "Stili"
+    },
+    "subheader_2b87606d": {
+        "message": "Sottotitolo"
+    },
+    "submit_a3cc6859": {
+        "message": "Invia"
+    },
+    "submitted_318fad53": {
+        "message": "Inviato"
+    },
+    "subscript_59744f96": {
+        "message": "Pedice"
+    },
+    "success_to_do_created_e34ed395": {
+        "message": "Operazione riuscita: Cose da fare create"
+    },
+    "superscript_8cb349a2": {
+        "message": "Apice"
+    },
+    "switch_to_raw_html_editor_4c9ac7de": {
+        "message": "Passa a editor html non elaborato"
+    },
+    "switch_to_rich_text_editor_35822d26": {
+        "message": "Passa a editor testo RTF"
+    },
+    "syllabus_f191f65b": {
+        "message": "Piano di studio"
+    },
+    "tab_arrows_4cf5abfc": {
+        "message": "TAB/Frecce"
+    },
+    "task_16b0ef38": {
+        "message": "Attività"
+    },
+    "text_7f4593da": {
+        "message": "Testo"
+    },
+    "the_date_and_time_this_to_do_is_due_74c823d4": {
+        "message": "Data e ora elemento elenco attività scaduta"
+    },
+    "there_are_no_points_associated_with_this_item_449c712a": {
+        "message": "Non ci sono punti associati a questo elemento"
+    },
+    "time_2b5aac58": {
+        "message": "Ora"
+    },
+    "title_ee03d132": {
+        "message": "Titolo"
+    },
+    "title_is_required_6ddcab69": {
+        "message": "titolo obbligatorio"
+    },
+    "to_be_posted_when_d24bf7dc": {
+        "message": "Da postare: { when }"
+    },
+    "to_do_1d554f36": {
+        "message": "Elenco attività"
+    },
+    "to_do_date_4b211ad0": {
+        "message": "Elenco attività: { date }"
+    },
+    "to_do_items_loading_d1cdfcd5": {
+        "message": "Caricamento elementi elenco attività"
+    },
+    "to_do_when_2783d78f": {
+        "message": "Elenco attività: { when }"
+    },
+    "today_76e10f9c": {
+        "message": "Oggi"
+    },
+    "today_at_date_8ac30d6": {
+        "message": "Oggi alle { date }"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "Domani"
+    },
+    "tomorrow_at_date_b53f2cf1": {
+        "message": "Domani alle { date }"
+    },
+    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
+        "message": "{ totalResults } risultati trovati, { numDisplayed } risultati attualmente visualizzati"
+    },
+    "tray_839df38a": {
+        "message": "Barra delle applicazioni"
+    },
+    "type_control_f9_to_access_image_options_text_a47e319f": {
+        "message": "digita Control F9 per accedere alle opzioni immagine. { text }"
+    },
+    "type_control_f9_to_access_link_options_text_4ead9682": {
+        "message": "digita Control F9 per accedere alle opzioni di collegamento. { text }"
+    },
+    "type_control_f9_to_access_table_options_text_92141329": {
+        "message": "digita Control F9 per accedere alle opzioni di tabella. { text }"
+    },
+    "unable_to_mark_as_complete_8141856d": {
+        "message": "Impossibile contrassegnare come completato."
+    },
+    "unpublished_dfd8801": {
+        "message": "non pubblicato"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Senza titolo"
+    },
+    "upload_document_253f0478": {
+        "message": "Carica documento"
+    },
+    "upload_error_f9c00e27": {
+        "message": "Errore di caricamento"
+    },
+    "upload_file_fd2361b8": {
+        "message": "Carica File"
+    },
+    "upload_image_6120b609": {
+        "message": "Carica immagine"
+    },
+    "upload_media_ce31135a": {
+        "message": "Carica file multimediali"
+    },
+    "upload_record_media_e4207d72": {
+        "message": "Carica/Registra file multimediali"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "elenco ordinato per lettera maiuscola"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "elenco ordinato per cifra romana maiuscola"
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+        "message": "Usato da screen reader per descrivere il contenuto di un’immagine"
+    },
+    "user_documents_c206e61f": {
+        "message": "Documenti utente"
+    },
+    "user_images_b6490852": {
+        "message": "Immagini utente"
+    },
+    "user_media_14fbf656": {
+        "message": "Elementi multimediali utente"
+    },
+    "video_audio_recording_uploaded_6af5d378": {
+        "message": "Registrazione video/audio caricata"
+    },
+    "video_options_24ef6e5d": {
+        "message": "Opzioni video"
+    },
+    "video_options_tray_3b9809a5": {
+        "message": "Barra delle opzioni video"
+    },
+    "video_player_b371005": {
+        "message": "Lettore video"
+    },
+    "view_keyboard_shortcuts_34d1be0b": {
+        "message": "Visualizza scelte rapide da tastiera"
+    },
+    "webcam_fe91b20f": {
+        "message": "Webcam"
+    },
+    "width_492fec76": {
+        "message": "Larghezza"
+    },
+    "width_and_height_must_be_numbers_110ab2e3": {
+        "message": "La larghezza e l''altezza devono essere numerici"
+    },
+    "width_x_height_px_ff3ccb93": {
+        "message": "{ width } x { height }px"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "Home page wiki"
+    },
+    "yesterday_at_date_1aa6d18e": {
+        "message": "Ieri alle { date }"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "Ieri"
+    },
+    "you_have_media_feedback_f5f9aba8": {
+        "message": "Hai un feedback sui file multimediali."
+    },
+    "you_must_provide_a_date_and_time_a86839d2": {
+        "message": "È necessario fornire data e ora."
+    },
+    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+        "message": "Sei tornato indietro alle tue prime cose da fare."
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "La tua webcam potrebbe già essere in uso."
+    }
+}
