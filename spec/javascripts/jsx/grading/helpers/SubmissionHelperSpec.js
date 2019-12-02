@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isPostable, extractSimilarityInfo} from 'jsx/grading/helpers/SubmissionHelper'
+import {
+  isPostable,
+  extractSimilarityInfo,
+  similarityIcon
+} from 'jsx/grading/helpers/SubmissionHelper'
 
 QUnit.module('SubmissionHelper', suiteHooks => {
   let submission
@@ -146,17 +150,18 @@ QUnit.module('SubmissionHelper', suiteHooks => {
         test('sorts scored entries by decreasing similarity score', () => {
           const entries = extractSimilarityInfo(submissionWithAttachments).entries
           const scoredEntries = entries.filter(entry => entry.data.status === 'scored')
-          deepEqual(scoredEntries.map(entry => entry.data.similarity_score), [75, 25])
+          deepEqual(
+            scoredEntries.map(entry => entry.data.similarity_score),
+            [75, 25]
+          )
         })
 
         test('sets the "id" field for each entry to the ID of the attachment for that entry', () => {
           const entries = extractSimilarityInfo(submissionWithAttachments).entries
-          deepEqual(entries.map(entry => entry.id), [
-            'attachment_2004',
-            'attachment_2003',
-            'attachment_2002',
-            'attachment_2001'
-          ])
+          deepEqual(
+            entries.map(entry => entry.id),
+            ['attachment_2004', 'attachment_2003', 'attachment_2002', 'attachment_2001']
+          )
         })
 
         test('uses data from the "attachment" field nested inside the attachment if present', () => {
@@ -260,6 +265,44 @@ QUnit.module('SubmissionHelper', suiteHooks => {
         }
       }
       strictEqual(extractSimilarityInfo(submissionWithNoSubmissions), null)
+    })
+  })
+
+  QUnit.module('.similarityIcon', () => {
+    const domParser = new DOMParser()
+    const icon = iconString =>
+      domParser.parseFromString(similarityIcon(iconString), 'text/xml').documentElement
+
+    const iconClasses = iconString => [...icon(iconString).classList]
+
+    test('returns an <i> element', () => {
+      strictEqual(icon({status: 'scored', similarity_score: 50}).nodeName, 'i')
+    })
+
+    test('returns a warning icon if the passed item has an "error" status', () => {
+      deepEqual(iconClasses({status: 'error'}), ['icon-warning'])
+    })
+
+    test('returns a clock icon if the passed item has an "pending" status', () => {
+      deepEqual(iconClasses({status: 'pending'}), ['icon-clock'])
+    })
+
+    test('returns an empty-but-solid icon if the passed item is scored above 60', () => {
+      deepEqual(iconClasses({status: 'scored', similarity_score: 80}), ['icon-empty', 'icon-Solid'])
+    })
+
+    test('returns a solid half-oval icon if the passed item is scored betwen 20 and 60', () => {
+      deepEqual(iconClasses({status: 'scored', similarity_score: 40}), [
+        'icon-oval-half',
+        'icon-Solid'
+      ])
+    })
+
+    test('returns a solid and certified icon if the passed item is scored up to 20', () => {
+      deepEqual(iconClasses({status: 'scored', similarity_score: 20}), [
+        'icon-certified',
+        'icon-Solid'
+      ])
     })
   })
 })

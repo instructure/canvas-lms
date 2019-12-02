@@ -900,3 +900,25 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     padding: 0;
   }
 }
+
+.similarity_score_container {
+  i {
+    &.icon-empty,
+    &.icon-oval-half {
+      color: $ic-color-danger;
+    }
+
+    &.icon-certified {
+      color: $ic-color-success;
+    }
+
+    &.icon-warning,
+    &.icon-clock {
+      cursor: pointer;
+    }
+  }
+
+  .turnitin_similarity_score {
+    color: $ic-color-dark;
+  }
+}

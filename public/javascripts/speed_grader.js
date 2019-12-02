@@ -36,7 +36,7 @@ import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
-import {isGraded, isPostable} from 'jsx/grading/helpers/SubmissionHelper'
+import {isGraded, isPostable, similarityIcon} from 'jsx/grading/helpers/SubmissionHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
@@ -1779,6 +1779,25 @@ EG = {
     }
   },
 
+  plagiarismIndicator({plagiarismAsset, reportUrl = null, tooltip} = {}) {
+    const {status, similarity_score} = plagiarismAsset
+
+    const $indicator = reportUrl != null ? $('<a />').attr('href', reportUrl) : $('<span />')
+    $indicator
+      .attr('title', tooltip)
+      .addClass('similarity_score_container')
+      .append($(similarityIcon(plagiarismAsset)))
+
+    if (status === 'scored') {
+      const $similarityScore = $('<span />')
+        .addClass('turnitin_similarity_score')
+        .html(htmlEscape(`${similarity_score}%`))
+      $indicator.append($similarityScore)
+    }
+
+    return $indicator
+  },
+
   populateTurnitin(
     submission,
     assetString,
@@ -1808,14 +1827,23 @@ EG = {
       })
       reportUrl += (reportUrl.includes('?') ? '&' : '?') + 'attempt=' + submission.attempt
 
-      $turnitinScoreContainer.html(
-        turnitinScoreTemplate({
-          state: `${turnitinAsset.state || 'no'}_score`,
+      if (ENV.new_gradebook_plagiarism_icons_enabled) {
+        const $indicator = this.plagiarismIndicator({
+          plagiarismAsset: turnitinAsset,
           reportUrl,
-          tooltip,
-          score: `${turnitinAsset.similarity_score}%`
+          tooltip
         })
-      )
+        $turnitinScoreContainer.empty().append($indicator)
+      } else {
+        $turnitinScoreContainer.html(
+          turnitinScoreTemplate({
+            state: `${turnitinAsset.state || 'no'}_score`,
+            reportUrl,
+            tooltip,
+            score: `${turnitinAsset.similarity_score}%`
+          })
+        )
+      }
     } else if (turnitinAsset.status) {
       // status == 'error' or status == 'pending'
       const pendingTooltip = I18n.t(
@@ -1826,14 +1854,23 @@ EG = {
           'turnitin.tooltip.error',
           'Similarity Score - See submission error details'
         )
-      $turnitinSimilarityScore = $(
-        turnitinScoreTemplate({
-          state: `submission_${turnitinAsset.status}`,
-          reportUrl: '#',
-          tooltip: turnitinAsset.status == 'error' ? errorTooltip : pendingTooltip,
-          icon: `/images/turnitin_submission_${turnitinAsset.status}.png`
+      const tooltip = turnitinAsset.status === 'error' ? errorTooltip : pendingTooltip
+
+      if (ENV.new_gradebook_plagiarism_icons_enabled) {
+        $turnitinSimilarityScore = this.plagiarismIndicator({
+          plagiarismAsset: turnitinAsset,
+          tooltip
         })
-      )
+      } else {
+        $turnitinSimilarityScore = $(
+          turnitinScoreTemplate({
+            icon: `/images/turnitin_submission_${turnitinAsset.status}.png`,
+            reportUrl: '#',
+            state: `submission_${turnitinAsset.status}`,
+            tooltip
+          })
+        )
+      }
       $turnitinScoreContainer.append($turnitinSimilarityScore)
       $turnitinSimilarityScore.click(event => {
         event.preventDefault()
@@ -1892,14 +1929,23 @@ EG = {
         tooltip = anonymousAssignmentDetailedReportTooltip
       }
 
-      $vericiteScoreContainer.html(
-        vericiteScoreTemplate({
-          state: `${vericiteAsset.state || 'no'}_score`,
+      if (ENV.new_gradebook_plagiarism_icons_enabled) {
+        const $indicator = this.plagiarismIndicator({
+          plagiarismAsset: vericiteAsset,
           reportUrl,
-          tooltip,
-          score: `${vericiteAsset.similarity_score}%`
+          tooltip
         })
-      )
+        $vericiteScoreContainer.empty().append($indicator)
+      } else {
+        $vericiteScoreContainer.html(
+          vericiteScoreTemplate({
+            state: `${vericiteAsset.state || 'no'}_score`,
+            reportUrl,
+            tooltip,
+            score: `${vericiteAsset.similarity_score}%`
+          })
+        )
+      }
     } else if (vericiteAsset.status) {
       // status == 'error' or status == 'pending'
       const pendingTooltip = I18n.t(
@@ -1910,14 +1956,22 @@ EG = {
           'vericite.tooltip.error',
           'VeriCite Similarity Score - See submission error details'
         )
-      $vericiteSimilarityScore = $(
-        vericiteScoreTemplate({
-          state: `submission_${vericiteAsset.status}`,
-          reportUrl: '#',
-          tooltip: vericiteAsset.status == 'error' ? errorTooltip : pendingTooltip,
-          icon: `/images/turnitin_submission_${vericiteAsset.status}.png`
+      const tooltip = vericiteAsset.status === 'error' ? errorTooltip : pendingTooltip
+      if (ENV.new_gradebook_plagiarism_icons_enabled) {
+        $vericiteSimilarityScore = this.plagiarismIndicator({
+          plagiarismAsset: vericiteAsset,
+          tooltip
         })
-      )
+      } else {
+        $vericiteSimilarityScore = $(
+          vericiteScoreTemplate({
+            icon: `/images/turnitin_submission_${vericiteAsset.status}.png`,
+            reportUrl: '#',
+            state: `submission_${vericiteAsset.status}`,
+            tooltip
+          })
+        )
+      }
       $vericiteScoreContainer.append($vericiteSimilarityScore)
       $vericiteSimilarityScore.click(event => {
         event.preventDefault()

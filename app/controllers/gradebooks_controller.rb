@@ -710,6 +710,9 @@ class GradebooksController < ApplicationController
         if new_gradebook_enabled?
           env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
           env[:post_policies_enabled] = true if @context.post_policies_enabled?
+          if @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
+            env[:new_gradebook_plagiarism_icons_enabled] = true
+          end
         end
 
         if @assignment.quiz

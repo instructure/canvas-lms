@@ -6352,6 +6352,14 @@ QUnit.module('SpeedGrader', rootHooks => {
           <span class='turnitin_info_container'></span>
         </div>
         <div id='submission_files_container'>
+          <div id='submission_files_list'>
+            <div id='submission_file_hidden' class='submission-file'>
+              <a class='submission-file-download icon-download'></a>
+              <span class='turnitin_score_container'></span>
+              <a class='display_name no-hover'></a>
+              <span id='react_pill_container'></span>
+            </div>
+          </div>
           <span class='turnitin_info_container'></span>
         </div>
         <a id='assignment_submission_originality_report_url' href='/orig/{{ user_id }}/{{ asset_string }}'></a>
@@ -6426,23 +6434,288 @@ QUnit.module('SpeedGrader', rootHooks => {
           SpeedGrader.EG.jsonReady()
         })
 
-        test('displays the report for the current submission', () => {
-          SpeedGrader.EG.currentStudent = {
-            ...student,
-            submission
-          }
-          SpeedGrader.EG.handleSubmissionSelectionChange()
-          strictEqual(document.querySelector(gradeSimilaritySelector).innerHTML.trim(), '60%')
+        QUnit.module('with new plagiarism icons active', newPlagiarismIconHooks => {
+          let attemptData
+          let oldAttemptData
+
+          const attemptKey = 'submission_1_2019-06-05T19:51:35Z'
+          const similarityScoreSelector =
+            '#grade_container .similarity_score_container .turnitin_similarity_score'
+
+          const similarityIconSelector = '#grade_container .similarity_score_container i'
+          const similarityIconClasses = () => [
+            ...document.querySelector(similarityIconSelector).classList
+          ]
+
+          newPlagiarismIconHooks.beforeEach(() => {
+            ENV.new_gradebook_plagiarism_icons_enabled = true
+            oldAttemptData = submission.submission_history[0].turnitin_data[attemptKey]
+
+            attemptData = {
+              similarity_score: 60,
+              status: 'error'
+            }
+
+            submission.submission_history[0].turnitin_data[attemptKey] = attemptData
+          })
+
+          newPlagiarismIconHooks.afterEach(() => {
+            delete ENV.new_gradebook_plagiarism_icons_enabled
+            submission.submission_history[0].turnitin_data[attemptKey] = oldAttemptData
+          })
+
+          test('shows a warning icon for plagiarism data in an error state', () => {
+            delete attemptData.similarity_score
+            attemptData.status = 'error'
+
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-warning'])
+          })
+
+          test('shows a clock icon for plagiarism data in a pending state', () => {
+            delete attemptData.similarity_score
+            attemptData.status = 'pending'
+
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-clock'])
+          })
+
+          test('shows a green certified icon if originality score is below 20 percent', () => {
+            attemptData.status = 'scored'
+            attemptData.similarity_score = 10
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-certified', 'icon-Solid'])
+          })
+
+          test('shows a half-full oval icon if originality score is between 20 and 60 percent', () => {
+            attemptData.status = 'scored'
+            attemptData.similarity_score = 40
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-oval-half', 'icon-Solid'])
+          })
+
+          test('shows a solid empty icon if originality score is above 60 percent', () => {
+            attemptData.status = 'scored'
+            attemptData.similarity_score = 70
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-empty', 'icon-Solid'])
+          })
+
+          test('shows the percent score for scored submissions', () => {
+            attemptData.status = 'scored'
+            attemptData.similarity_score = 70
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            strictEqual(document.querySelector(similarityScoreSelector).innerHTML.trim(), '70%')
+          })
         })
 
-        test('displays the report for a past submission', () => {
-          submission.submission_history[0].submitted_at = '2019-07-05T19:51:35Z'
-          SpeedGrader.EG.currentStudent = {
-            ...student,
-            submission
+        QUnit.module('with old plagiarism icons active', () => {
+          test('displays the report for the current submission', () => {
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            strictEqual(document.querySelector(gradeSimilaritySelector).innerHTML.trim(), '60%')
+          })
+
+          test('displays the report for a past submission', () => {
+            submission.submission_history[0].submitted_at = '2019-07-05T19:51:35Z'
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            strictEqual(document.querySelector(gradeSimilaritySelector).innerHTML.trim(), '80%')
+          })
+        })
+      })
+
+      QUnit.module('with a submission containing attachments', attachmentHooks => {
+        const versionedAttachmentData = [
+          {
+            attachment: {
+              display_name: 'fred.txt',
+              id: '1234'
+            }
           }
-          SpeedGrader.EG.handleSubmissionSelectionChange()
-          strictEqual(document.querySelector(gradeSimilaritySelector).innerHTML.trim(), '80%')
+        ]
+
+        const attachmentTurnitinData = {
+          attachment_1234: {status: 'error'}
+        }
+
+        attachmentHooks.beforeEach(() => {
+          submission.submission_history[0].versioned_attachments = versionedAttachmentData
+          submission.submission_history[0].turnitin_data = attachmentTurnitinData
+
+          window.jsonData = testJsonData
+          SpeedGrader.EG.jsonReady()
+        })
+
+        QUnit.module('with new plagiarism icons active', newPlagiarismIconHooks => {
+          // This is the inner "container" that holds both the icon and (if present) score text,
+          // and may be rendered as a link if the a valid report URL exists
+          const similarityContainerSelector =
+            '#submission_files_list .submission-file .turnitin_score_container .similarity_score_container'
+
+          const similarityScoreSelector =
+            '#submission_files_list .submission-file .turnitin_score_container .turnitin_similarity_score'
+          const similarityIconSelector =
+            '#submission_files_list .submission-file .turnitin_score_container i'
+
+          const similarityIconClasses = () => [
+            ...document.querySelector(similarityIconSelector).classList
+          ]
+
+          newPlagiarismIconHooks.beforeEach(() => {
+            ENV.new_gradebook_plagiarism_icons_enabled = true
+          })
+
+          newPlagiarismIconHooks.afterEach(() => {
+            delete ENV.new_gradebook_plagiarism_icons_enabled
+          })
+
+          test('shows a warning icon for plagiarism data in an error state', () => {
+            attachmentTurnitinData.attachment_1234.status = 'error'
+
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-warning'])
+          })
+
+          test('shows a clock icon for plagiarism data in a pending state', () => {
+            attachmentTurnitinData.attachment_1234.status = 'pending'
+
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-clock'])
+          })
+
+          test('shows a green certified icon if originality score is below 20 percent', () => {
+            attachmentTurnitinData.attachment_1234 = {
+              similarity_score: 10,
+              status: 'scored'
+            }
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-certified', 'icon-Solid'])
+          })
+
+          test('shows a half-full oval icon if originality score is between 20 and 60 percent', () => {
+            attachmentTurnitinData.attachment_1234 = {
+              similarity_score: 40,
+              status: 'scored'
+            }
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-oval-half', 'icon-Solid'])
+          })
+
+          test('shows a solid empty icon if originality score is above 60 percent', () => {
+            attachmentTurnitinData.attachment_1234 = {
+              similarity_score: 70,
+              status: 'scored'
+            }
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            deepEqual(similarityIconClasses(), ['icon-empty', 'icon-Solid'])
+          })
+
+          test('shows the percent score for scored submissions', () => {
+            attachmentTurnitinData.attachment_1234 = {
+              similarity_score: 70,
+              status: 'scored'
+            }
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            strictEqual(document.querySelector(similarityScoreSelector).innerHTML.trim(), '70%')
+          })
+
+          test('renders a link if a report URL is passed in', () => {
+            attachmentTurnitinData.attachment_1234 = {
+              similarity_score: 70,
+              status: 'scored'
+            }
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            strictEqual(document.querySelector(similarityContainerSelector).nodeName, 'A')
+          })
+
+          test('renders a non-link element if no report URL is passed in', () => {
+            attachmentTurnitinData.attachment_1234 = {
+              status: 'error'
+            }
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            strictEqual(document.querySelector(similarityContainerSelector).nodeName, 'SPAN')
+          })
+        })
+
+        QUnit.module('with old plagiarism icons active', () => {
+          const similarityScoreSelector =
+            '#submission_files_list .submission-file .turnitin_score_container .turnitin_similarity_score'
+
+          test('displays the report for the current submission', () => {
+            attachmentTurnitinData.attachment_1234 = {
+              similarity_score: 70,
+              status: 'scored'
+            }
+            SpeedGrader.EG.currentStudent = {
+              ...student,
+              submission
+            }
+            SpeedGrader.EG.handleSubmissionSelectionChange()
+            strictEqual(document.querySelector(similarityScoreSelector).innerHTML.trim(), '70%')
+          })
         })
       })
 

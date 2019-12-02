@@ -2443,6 +2443,30 @@ describe GradebooksController do
         expect(assigns[:js_env]).not_to include(:post_policies_enabled)
       end
     end
+
+    describe "new_gradebook_plagiarism_icons_enabled" do
+      it "is set to true if New Gradebook is on and New Gradebook Plagiarism Icons are on" do
+        @course.enable_feature!(:new_gradebook)
+        @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+
+        get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
+        expect(assigns[:js_env][:new_gradebook_plagiarism_icons_enabled]).to be true
+      end
+
+      it "is not set if New Gradebook is on but the New Gradebook Plagiarism Icons are off" do
+        @course.enable_feature!(:new_gradebook)
+
+        get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
+        expect(assigns[:js_env]).not_to include(:new_gradebook_plagiarism_icons_enabled)
+      end
+
+      it "is not set if New Gradebook is off" do
+        @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+
+        get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
+        expect(assigns[:js_env]).not_to include(:new_gradebook_plagiarism_icons_enabled)
+      end
+    end
   end
 
   describe "POST 'speed_grader_settings'" do
