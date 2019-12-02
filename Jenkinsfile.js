@@ -18,20 +18,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def setDockerUp () {
-  timeout(time: 60) {
-    echo 'Running containers'
-    sh 'docker ps'
-    sh 'printenv | sort'
-    sh 'build/new-jenkins/docker-compose-pull.sh'
-    sh 'build/new-jenkins/docker-compose-build-up.sh'
-  }
-}
-
 def isMerge () {
   return env.GERRIT_EVENT_TYPE == 'change-merged'
 }
-
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -40,7 +29,8 @@ pipeline {
   }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml'
+    COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
+
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
@@ -52,23 +42,19 @@ pipeline {
         sh 'build/new-jenkins/docker-cleanup.sh'
       }
     }
-
-    stage('Setup') {
-      steps {
-        setDockerUp()
-      }
-    }
     stage('Tests Setup') {
-      environment {
-        COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
-      }
       steps {
-        setDockerUp()
+        timeout(time: 60) {
+          echo 'Running containers'
+          sh 'docker ps'
+          sh 'printenv | sort'
+          sh 'build/new-jenkins/docker-compose-pull.sh'
+          sh 'build/new-jenkins/docker-compose-build-up.sh'
+        }
       }
     }
     stage('Tests') {
       environment {
-        COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
         COVERAGE = isMerge()
       }
       parallel {
