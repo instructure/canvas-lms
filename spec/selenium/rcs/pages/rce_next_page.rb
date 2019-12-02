@@ -308,15 +308,15 @@ module RCENextPage
   end
 
   def header_option
-    f('[role="menuitemcheckbox"][title="Header"]')
+    f('[role="menuitemcheckbox"][title="Heading 2"]')
   end
 
   def subheader_option
-    f('[role="menuitemcheckbox"][title=" Subheader"]')
+    f('[role="menuitemcheckbox"][title=" Heading 3"]')
   end
 
   def small_header_option
-    f('[role="menuitemcheckbox"][title=" Small header"]')
+    f('[role="menuitemcheckbox"][title=" Heading 4"]')
   end
 
   def preformatted_option
