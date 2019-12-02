@@ -53,7 +53,9 @@ class MarkDonePresenter
 
   def checked?
     return false unless has_requirement?
-    progression = @module.context_module_progressions.find{|p| p[:user_id] == @user.id}
+    progression = @module.context_module_progressions.loaded? ?
+      @module.context_module_progressions.find{|p| p[:user_id] == @user.id} :
+      @module.context_module_progressions.where(:user_id => @user.id).first
     return false unless progression
     !!progression.requirements_met.find {|r| r[:id] == @item.id && r[:type] == "must_mark_done" }
   end
