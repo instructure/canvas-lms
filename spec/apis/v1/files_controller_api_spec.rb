@@ -1083,6 +1083,20 @@ describe "Files API", type: :request do
       api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
     end
 
+    it 'should delete/replace a file tied to a quiz submission' do
+      course_with_student(:active_all => true)
+      quiz_model(:course => @course)
+      @quiz.update_attribute :one_question_at_a_time, true
+      @qs = @quiz.generate_submission(@student, false)
+
+      account_admin_user(account: @account)
+      @att.context = @qs
+      @att.save!
+      expect_any_instantiation_of(@att).to receive(:destroy_content_and_replace).once
+      @file_path_options[:replace] = true
+      api_call(:delete, @file_path, @file_path_options, {}, {}, expected_status: 200)
+    end
+
     it "should not be authorized to delete/replace a file" do
       course_with_teacher(active_all: true, user: user_with_pseudonym)
       @file_path_options[:replace] = true

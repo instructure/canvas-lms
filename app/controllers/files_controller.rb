@@ -1195,7 +1195,14 @@ class FilesController < ApplicationController
     if @context.is_a?(User)
       @context.can_masquerade?(@current_user, @domain_root_account)
     else
-      @context.grants_right?(@current_user, nil, :manage_files) &&
+      permission_context =
+        case @context
+        when Course, Account, Group
+          @context
+        else
+          @context.respond_to?(:context) ? @context.context : @context
+        end
+      permission_context.grants_right?(@current_user, nil, :manage_files) &&
         @domain_root_account.grants_right?(@current_user, nil, :become_user)
     end
   end
