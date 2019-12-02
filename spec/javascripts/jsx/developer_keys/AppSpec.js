@@ -50,8 +50,7 @@ function generateKeyList(numKeys = 10) {
 
 function initialApplicationState(list = null, inheritedList = null) {
   return {
-    createLtiKey: {isLtiKey: false},
-    createOrEditDeveloperKey: {},
+    createOrEditDeveloperKey: {isLtiKey: false},
     listDeveloperKeyScopes,
     listDeveloperKeys: {
       listDeveloperKeysPending: false,
@@ -229,9 +228,8 @@ test('displays the show more button', () => {
   const list = generateKeyList()
 
   const applicationState = {
-    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
-    createOrEditDeveloperKey: {},
+    createOrEditDeveloperKey: {isLtiKey: false},
     listDeveloperKeys: {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: false,
@@ -248,9 +246,8 @@ test('displays the show more button', () => {
 
 test('renders the list of developer_keys when there are some', () => {
   const applicationState = {
-    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
-    createOrEditDeveloperKey: {},
+    createOrEditDeveloperKey: {isLtiKey: false},
     listDeveloperKeys: {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: false,
@@ -273,9 +270,8 @@ test('renders the list of developer_keys when there are some', () => {
 
 test('displays the developer key on click of show key button', () => {
   const applicationState = {
-    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
-    createOrEditDeveloperKey: {},
+    createOrEditDeveloperKey: {isLtiKey: false},
     listDeveloperKeys: {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: false,
@@ -309,9 +305,8 @@ test('displays the developer key on click of show key button', () => {
 
 test('renders the spinner', () => {
   const applicationState = {
-    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
-    createOrEditDeveloperKey: {},
+    createOrEditDeveloperKey: {isLtiKey: false},
     listDeveloperKeys: {
       listDeveloperKeysPending: true,
       listDeveloperKeysSuccessful: false,
@@ -334,8 +329,7 @@ test('renders the spinner', () => {
 test('opens the key selection menu when the create button is clicked', () => {
   const applicationState = {
     listDeveloperKeyScopes,
-    createOrEditDeveloperKey: {},
-    createLtiKey: {isLtiKey: false},
+    createOrEditDeveloperKey: {isLtiKey: false},
     listDeveloperKeys: {
       listDeveloperKeysPending: true,
       listDeveloperKeysSuccessful: false,
@@ -389,9 +383,8 @@ test('does not have the create button on inherited tab', () => {
 
   const overrides = {
     applicationState: {
-      createLtiKey: {isLtiKey: false},
       listDeveloperKeyScopes,
-      createOrEditDeveloperKey: {},
+      createOrEditDeveloperKey: {isLtiKey: false},
       listDeveloperKeys: {
         listInheritedDeveloperKeysPending: true,
         listInheritedDeveloperKeysSuccessful: false,

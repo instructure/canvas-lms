@@ -27,7 +27,7 @@ function newProps(overrides = {}) {
     validScopes: {},
     validPlacements: [],
     dispatch: jest.fn(),
-    setLtiConfigurationMethod: jest.fn(),
+    updateConfigurationMethod: jest.fn(),
     configurationMethod: 'json',
     ...overrides
   }
@@ -53,8 +53,7 @@ describe('when configuration method is by JSON', () => {
   it('transitions to configuring by URL when the url option is selected', () => {
     const select = wrapper.find('Select')
     select.instance().props.onChange({}, {value: 'url'})
-    expect(wrapper.instance().props.dispatch).toHaveBeenCalled()
-    expect(wrapper.instance().props.setLtiConfigurationMethod).toHaveBeenCalled()
+    expect(wrapper.instance().props.updateConfigurationMethod).toHaveBeenCalled()
   })
 })
 
@@ -72,8 +71,7 @@ describe('when configuration method is by URL', () => {
   it('transitions to configuring by JSON when the json option is selected', () => {
     const select = wrapper.find('Select')
     select.instance().props.onChange({}, {value: 'json'})
-    expect(wrapper.instance().props.dispatch).toHaveBeenCalled()
-    expect(wrapper.instance().props.setLtiConfigurationMethod).toHaveBeenCalled()
+    expect(wrapper.instance().props.updateConfigurationMethod).toHaveBeenCalled()
   })
 })
 

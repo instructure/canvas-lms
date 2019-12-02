@@ -1222,16 +1222,16 @@ The submission history LTI2 service endpoint.
 
 ## com.instructure.Course.accept_canvas_resource_types
 Returns the types of resources that can be imported to the current page, forwarded from the request.
-Value is an array of one or more values of: ["assignment", "assignment_group", "audio",
+Value is a comma-separated array of one or more values of: ["assignment", "assignment_group", "audio",
 "discussion_topic", "document", "image", "module", "quiz", "page", "video"].
 
 **Availability**: *always*  
 **Launch Parameter**: *com_instructure_course_accept_canvas_resource_types*  
 
 ```
-["page"]
-["module"]
-["assignment", "discussion_topic", "page", "quiz", "module"]
+"page"
+"module"
+"assignment,discussion_topic,page,quiz,module"
 ```
 ## com.instructure.Course.canvas_resource_type
 Returns the target resource type for the current page, forwarded from the request.
@@ -1258,7 +1258,7 @@ True for Modules page and Assignment Groups page. False for other content index 
 true
 ```
 ## com.instructure.Course.available_canvas_resources
-Returns a list of content groups which can be selected, providing ID and name of each group,
+Returns a JSON-encoded list of content groups which can be selected, providing ID and name of each group,
 forwarded from the request.
 Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
 
@@ -1266,5 +1266,5 @@ Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
 **Launch Parameter**: *com_instructure_course_available_canvas_resources*  
 
 ```
-[{"id": "3", name: "First Module"}, {"id": "5", name: "Second Module"]
+[{"id":"3","name":"First Module"},{"id":"5","name":"Second Module"}]
 ```
