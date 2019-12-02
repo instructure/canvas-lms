@@ -155,6 +155,14 @@ describe PlannerController do
         my_event_id = @course.default_section.calendar_events.where(parent_calendar_event_id: event).pluck(:id).first
         expect(event_ids).not_to include event.id
         expect(event_ids).to include my_event_id
+
+        event.update_attributes(remove_child_events: true)
+
+        get :index
+        json = json_parse(response.body)
+        event_ids = json.select { |thing| thing['plannable_type'] == 'calendar_event' }.map { |thing| thing['plannable_id'] }
+        expect(event_ids).to include event.id
+        expect(event_ids).not_to include my_event_id
       end
 
       it "should show appointment group reservations" do
