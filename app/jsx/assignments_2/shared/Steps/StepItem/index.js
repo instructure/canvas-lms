@@ -119,7 +119,7 @@ class StepItem extends Component {
         <ApplyTheme
           theme={{
             [Button.theme]: {
-              iconColor: '#828587',
+              iconColor: '$ic-color-medium-darker',
               borderRadius: '2rem'
             }
           }}
