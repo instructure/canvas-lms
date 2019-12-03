@@ -38,13 +38,11 @@
 #         },
 #         "assignment": {
 #           "description": "The submission's assignment (see the assignments API) (optional)",
-#           "example": "Assignment",
-#           "type": "string"
+#           "$ref": "Assignment"
 #         },
 #         "course": {
 #           "description": "The submission's course (see the course API) (optional)",
-#           "example": "Course",
-#           "type": "string"
+#           "$ref": "Course"
 #         },
 #         "attempt": {
 #           "description": "This is the submission attempt number.",
@@ -124,8 +122,7 @@
 #         },
 #         "user": {
 #           "description": "The submissions user (see user API) (optional)",
-#           "example": "User",
-#           "type": "string"
+#           "$ref": "User"
 #         },
 #         "late": {
 #           "description": "Whether the submission was made after the applicable due date",
