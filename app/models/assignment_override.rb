@@ -120,8 +120,6 @@ class AssignmentOverride < ActiveRecord::Base
 
   # This method is meant to be used in an after_commit setting
   def update_cached_due_dates?
-    return false if assignment.blank?
-
     set_id_changed = previous_changes.key?(:set_id)
     set_type_changed_to_non_adhoc = previous_changes.key?(:set_type) && set_type != 'ADHOC'
     due_at_overridden_changed = previous_changes.key?(:due_at_overridden)
@@ -138,8 +136,11 @@ class AssignmentOverride < ActiveRecord::Base
 
   def update_cached_due_dates
     if update_cached_due_dates?
-      assignment.clear_cache_key(:availability)
-      DueDateCacher.recompute(assignment)
+      if self.assignment
+        assignment.clear_cache_key(:availability)
+        DueDateCacher.recompute(assignment)
+      end
+      self.quiz.clear_cache_key(:availability) if self.quiz
     end
   end
 

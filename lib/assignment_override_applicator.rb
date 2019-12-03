@@ -86,7 +86,7 @@ module AssignmentOverrideApplicator
   def self.overrides_for_assignment_and_user(assignment_or_quiz, user)
     RequestCache.cache("overrides_for_assignment_and_user", assignment_or_quiz, user) do
       Rails.cache.fetch_with_batched_keys(
-          ["overrides_for_assignment_and_user2", version_for_cache(assignment_or_quiz), assignment_or_quiz.cache_key(:availability)].cache_key,
+          ["overrides_for_assignment_and_user3", version_for_cache(assignment_or_quiz), assignment_or_quiz.cache_key(:availability)].cache_key,
           batch_object: user, batched_keys: [:enrollments, :groups]) do
         next [] if self.has_invalid_args?(assignment_or_quiz, user)
         context = assignment_or_quiz.context
@@ -315,7 +315,7 @@ module AssignmentOverrideApplicator
   # the same collapsed assignment or quiz, regardless of the user that ended up at that
   # set of overrides.
   def self.collapsed_overrides(assignment_or_quiz, overrides)
-    cache_key = [assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), self.overrides_hash(overrides)].cache_key
+    cache_key = ['collapsed_overrides', assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), self.overrides_hash(overrides)].cache_key
     RequestCache.cache('collapsed_overrides', cache_key) do
       Rails.cache.fetch(cache_key) do
         overridden_data = {}
