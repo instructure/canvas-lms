@@ -241,7 +241,7 @@ module DatesOverridable
     return {} unless user
     self.association(:context).target ||= context
     tag_info = Rails.cache.fetch_with_batched_keys(
-      ["context_module_tag_info2", user.cache_key(:enrollments), user.cache_key(:groups)].cache_key,
+      ["context_module_tag_info3", user.cache_key(:enrollments), user.cache_key(:groups)].cache_key,
       batch_object: self, batched_keys: :availability
     ) do
       hash = {}

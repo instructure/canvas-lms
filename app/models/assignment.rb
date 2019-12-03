@@ -2859,6 +2859,7 @@ class Assignment < ActiveRecord::Base
   def update_cached_due_dates
     return unless update_cached_due_dates?
     self.clear_cache_key(:availability)
+    self.quiz.clear_cache_key(:availability) if self.quiz?
 
     unless self.saved_by == :migration
       relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
@@ -3049,6 +3050,7 @@ class Assignment < ActiveRecord::Base
   def run_if_overrides_changed_later!(student_ids: nil, updating_user: nil)
     return if self.class.suspended_callback?(:update_cached_due_dates, :save)
     self.clear_cache_key(:availability)
+    self.quiz.clear_cache_key(:availability) if self.quiz?
 
     enqueuing_args = if student_ids
       { strand: "assignment_overrides_changed_for_students_#{self.global_id}" }
