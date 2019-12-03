@@ -46,7 +46,7 @@ export default function CourseImportPanel({contentShare, onClose, onImport}) {
           migration_type: 'canvas_cartridge_importer',
           settings: {
             content_export_id: contentShare.content_export.id,
-            insert_into_module_id: selectedModule?.id,
+            insert_into_module_id: selectedModule?.id || null,
             insert_into_module_type: contentShare.content_type,
             insert_into_module_position: selectedPosition
           }
@@ -54,6 +54,11 @@ export default function CourseImportPanel({contentShare, onClose, onImport}) {
       })
     )
     onImport(contentShare)
+  }
+
+  function handleSelectedCourse(course) {
+    setSelectedModule(null)
+    setSelectedCourse(course)
   }
 
   return (
@@ -66,8 +71,8 @@ export default function CourseImportPanel({contentShare, onClose, onImport}) {
       />
       <CourseAndModulePicker
         selectedCourseId={selectedCourse?.id}
-        setSelectedCourse={setSelectedCourse}
-        selectedModuleId={selectedModule?.id}
+        setSelectedCourse={handleSelectedCourse}
+        selectedModuleId={selectedModule?.id || null}
         setSelectedModule={setSelectedModule}
         setModuleItemPosition={setSelectedPosition}
       />

@@ -2331,6 +2331,18 @@
     classnames "^2"
     prop-types "^15"
 
+"@instructure/ui-text@6":
+  version "6.15.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-text/-/ui-text-6.15.0.tgz#0bceef3fb9a2b5640b54d5f00664a37cee4ce4ba"
+  integrity sha512-KXF73rRC/RkIcryWnHGNnQJi3JcGcGWjJLm0kaDljXCQBS25ypvURg9OCiSYhvyInFB7fLQFP1anAAY2UyPISQ==
+  dependencies:
+    "@babel/runtime" "^7.5.0"
+    "@instructure/console" "^6.15.0"
+    "@instructure/ui-react-utils" "^6.15.0"
+    "@instructure/ui-themeable" "^6.15.0"
+    classnames "^2"
+    prop-types "^15"
+
 "@instructure/ui-themeable@6", "@instructure/ui-themeable@^6.15.0", "@instructure/ui-themeable@^6.9.0":
   version "6.15.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-6.15.0.tgz#8ef3f08020731385d9df5d0213c10692e3a1cbd3"
