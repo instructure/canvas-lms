@@ -306,7 +306,6 @@
   <% end %>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 </div> <!-- #application -->
-
 <% if !Rails.env.development? && !Rails.env.test? %>
   <script>
     (function(apiKey){
@@ -323,9 +322,11 @@
             id:              '<%= lti_opaque_hash_for_current_user %>',
             name:            '<%= @current_user.name if @current_user%>',
             email:           '<%= @current_user.email  if @current_user%>',
-            school_name:     '<%= @current_user.school_name if @current_user %>',
-            course_id:       '<%= @context.id if @context%>',
-            is_student:      '<%= @is_student %>',
+            school_name:     '<%= Account.find(1).name %>',
+            course_id:       '<%= @context.id if @context and @context.class.name == "Course" %>',
+            is_student:      '<%= StudentEnrollment.where(user: @current_user).any? if @current_user %>',
+            is_teacher:      '<%= TeacherEnrollment.where(user: @current_user).any? if @current_user %>',
+            is_observer:     '<%= ObserverEnrollment.where(user: @current_user).any? if @current_user %>',
             full_path:       '<%= request.try(:fullpath)%>',
             rails_env:       '<%= Rails.env %>',
         }
@@ -337,7 +338,6 @@
         pendo.initialize({ visitor: visitor, account: account }); })('18d9cdc9-0b28-4f89-7c87-e4d3802e665f');
   </script>
 <% end %>
-
 <script type="text/javascript" async
  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
 </script>
