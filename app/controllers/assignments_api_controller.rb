@@ -415,8 +415,8 @@
 #           "description" : "(optional, Third Party unique identifier for Assignment)"
 #         },
 #         "integration_data": {
-#           "example": "12341234",
-#           "type" : "string",
+#           "example": {"5678": "0954"},
+#           "type" : "object",
 #           "description" : "(optional, Third Party integration data for assignment)"
 #         },
 #         "muted": {
@@ -425,8 +425,8 @@
 #         },
 #         "points_possible": {
 #           "description": "the maximum points possible for the assignment",
-#           "example": 12,
-#           "type": "integer"
+#           "example": 12.0,
+#           "type": "number"
 #         },
 #         "submission_types": {
 #           "description": "the types of submissions allowed for this assignment list containing one or more of the following: 'discussion_topic', 'online_quiz', 'on_paper', 'none', 'external_tool', 'online_text_entry', 'online_url', 'online_upload' 'media_recording'",
