@@ -203,6 +203,10 @@ module RCENextPage
     f('[role="menuitem"][title="Course Media"]')
   end
 
+  def user_media
+    f('[role="menuitem"][title="My Media"]')
+  end
+
   def upload_document_button
     f('[role="menuitem"][title="Upload Document"]')
   end
@@ -463,6 +467,11 @@ module RCENextPage
 
   def click_course_media
     course_media.click
+    wait_for_ajaximations
+  end
+
+  def click_user_media
+    user_media.click
     wait_for_ajaximations
   end
 
