@@ -58,6 +58,10 @@
               {{#unless front_page}}
                 <li><a href="#" class="icon-bookmark use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
               {{/unless}}
+              {{#if CAN.DIRECT_SHARE}}
+                <li><a href="#" class="icon-user direct-share-send-to-menu-item">{{#t}}Send To...{{/t}}</a></li>
+                <li><a href="#" class="icon-duplicate direct-share-copy-to-menu-item">{{#t}}Copy To...{{/t}}</a></li>
+              {{/if}}
               {{>ExternalTools/external_tools_menu wiki_page_menu_tools}}
             </ul>
           </div>
@@ -67,6 +71,7 @@
     <div class="page-changed-alert" role="alert" aria-atomic="true" aria-live="polite"></div>
   </div>
 </div>
+<div id="direct-share-mount-point"></div>
 {{/if}}
 
 <div class="show-content user_content clearfix">
