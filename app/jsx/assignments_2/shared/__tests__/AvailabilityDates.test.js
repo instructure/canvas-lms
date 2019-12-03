@@ -85,7 +85,7 @@ it('renders correctly if unlockAt and lockAt are set', async () => {
 
   // Rendered twice cause one of them is a screenreader only
   const expected =
-    'Available Jul 11, 2016 11:00pmAvailable Jul 11, 2016 11:00pm7/11/2016 until Jul 15, 2016 11:00pm until Jul 15, 2016 11:00pm7/15/2016'
+    'Available: Jul 11, 2016 11:00pmAvailable: Jul 11, 2016 11:00pm7/11/2016 until Jul 15, 2016 11:00pm until Jul 15, 2016 11:00pm7/15/2016'
   expect(element.text()).toEqual(expected)
 })
 

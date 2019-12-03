@@ -62,7 +62,7 @@ function currentSubmissionGrade(assignment, submission) {
       <Text size="small">
         {submission.submittedAt ? (
           <Flex justifyItems="end">
-            <Flex.Item padding="0 xx-small 0 0">{I18n.t('Submitted')}</Flex.Item>
+            <Flex.Item padding="0 xx-small 0 0">{I18n.t('Submitted:')}</Flex.Item>
             <Flex.Item>
               <FriendlyDatetime
                 dateTime={submission.submittedAt}
