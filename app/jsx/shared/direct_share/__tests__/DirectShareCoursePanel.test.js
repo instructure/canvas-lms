@@ -20,9 +20,13 @@ import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useManagedCourseSearchApi from 'jsx/shared/effects/useManagedCourseSearchApi'
+import useModuleCourseSearchApi, {
+  useCourseModuleItemApi
+} from 'jsx/shared/effects/useModuleCourseSearchApi'
 import DirectShareCoursePanel from '../DirectShareCoursePanel'
 
 jest.mock('jsx/shared/effects/useManagedCourseSearchApi')
+jest.mock('jsx/shared/effects/useModuleCourseSearchApi')
 
 describe('DirectShareCoursePanel', () => {
   let ariaLive
@@ -40,7 +44,10 @@ describe('DirectShareCoursePanel', () => {
 
   beforeEach(() => {
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
-      success([{id: 'abc', name: 'abc'}, {id: 'cde', name: 'cde'}])
+      success([
+        {id: 'abc', name: 'abc'},
+        {id: 'cde', name: 'cde'}
+      ])
     })
   })
 
@@ -119,6 +126,36 @@ describe('DirectShareCoursePanel', () => {
     expect(getByText(/success/)).toBeInTheDocument()
     expect(queryByText('Copy')).toBeNull()
     expect(getByText('Close')).toBeInTheDocument()
+  })
+
+  it('deletes the module and removes the position selector when a new course is selected', () => {
+    useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: '1', name: 'Module 1'},
+        {id: '2', name: 'Module 2'}
+      ])
+    })
+    const {getByText, getByLabelText, queryByText} = render(
+      <DirectShareCoursePanel
+        sourceCourseId="42"
+        contentSelection={{discussion_topics: ['1123']}}
+      />
+    )
+    const courseSelector = getByText(/select a course/i)
+    fireEvent.click(courseSelector)
+    fireEvent.click(getByText('abc'))
+    fireEvent.click(getByText(/select a module/i))
+    fireEvent.click(getByText(/Module 1/))
+    expect(getByText(/Position/)).toBeInTheDocument()
+    useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
+      success([{id: 'ghi', name: 'foo'}])
+    })
+    useCourseModuleItemApi.mockClear()
+    const input = getByLabelText(/select a course/i)
+    fireEvent.change(input, {target: {value: 'fo'}})
+    fireEvent.click(getByText('foo'))
+    expect(queryByText(/Position/)).not.toBeInTheDocument()
+    expect(useCourseModuleItemApi).not.toHaveBeenCalled()
   })
 
   describe('errors', () => {

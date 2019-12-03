@@ -52,25 +52,25 @@ export default function CourseAndModulePicker({
             itemSearchFunction={useManagedCourseSearchApi}
           />
         </Flex.Item>
-        <Flex.Item padding="small">
-          {selectedCourseId && (
+        {selectedCourseId && (
+          <Flex.Item padding="small">
             <SearchItemSelector
               onItemSelected={setSelectedModule}
               renderLabel={I18n.t('Select a Module (optional)')}
               itemSearchFunction={useModuleCourseSearchApi}
-              contextId={selectedCourseId}
+              contextId={selectedCourseId || null}
             />
-          )}
-        </Flex.Item>
-        <Flex.Item padding="small">
-          {selectedCourseId && selectedModuleId && (
+          </Flex.Item>
+        )}
+        {selectedCourseId && selectedModuleId && (
+          <Flex.Item padding="small">
             <ModulePositionPicker
-              courseId={selectedCourseId}
-              moduleId={selectedModuleId}
+              courseId={selectedCourseId || null}
+              moduleId={selectedModuleId || null}
               setModuleItemPosition={setModuleItemPosition}
             />
-          )}
-        </Flex.Item>
+          </Flex.Item>
+        )}
       </Flex>
     </>
   )
