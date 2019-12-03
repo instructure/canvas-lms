@@ -146,7 +146,7 @@ export default class FilePreview extends Component {
   renderUnavailablePreview(message) {
     return (
       <div style={{textAlign: 'center'}}>
-        <img alt={message} src={previewUnavailable} style={{width: '150px'}} />
+        <img alt="" src={previewUnavailable} style={{width: '150px'}} />
         <div
           style={{
             display: 'block',
