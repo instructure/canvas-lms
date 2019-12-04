@@ -29,15 +29,14 @@ pipeline {
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
-    // for now 1 until we stabilize some of the flaky specs
-    RERUNS_RETRY = 1
+    RERUNS_RETRY = 0 // no reruns
     MAX_FAIL = 5
   }
 
   stages {
     stage ('Selenium Performance Tests') {
       steps {
-        timeout(time: 30) {
+        timeout(time: 60) {
           checkout scm
           sh 'printenv | sort'
           sh 'build/new-jenkins/docker-compose-pull.sh'

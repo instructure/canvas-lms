@@ -274,21 +274,6 @@ pipeline {
  *         }
  *       }
  *
- *       stage('Selenium Performance Chrome') {
- *         steps {
- *           skipIfPreviouslySuccessful("selenium-performance-chrome") {
- *             // propagate set to false until we can get tests passing
- *             build(
- *               job: 'test-suites/selenium-performance-chrome',
- *               propagate: false,
- *               parameters: build_parameters
- *             )
- *           }
- *         }
- *       }
- *
- *
- *
  *       stage('Xbrowser') {
  *         steps {
  *           skipIfPreviouslySuccessful("xbrowser") {
