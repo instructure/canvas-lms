@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x -o errexit -o errtrace -o nounset -o pipefail
+set -o errexit -o errtrace
 
 export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Initial"
 

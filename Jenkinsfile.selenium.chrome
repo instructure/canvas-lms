@@ -36,8 +36,8 @@ pipeline {
     KNAPSACK_EXCLUDE_REGEX = '/performance/'
     KNAPSACK_TEST_DIR = 'spec'
     // for now 1 until we stabilize some of the flaky specs
-    RERUNS_RETRY = 1
-    MAX_FAIL = 80
+    RERUNS_RETRY = 2
+    MAX_FAIL = 100
   }
 
   stages {
@@ -47,13 +47,13 @@ pipeline {
           def nodes = [:];
           for(int i = 0; i < ci_node_total; i++) {
             def index = i;
-            nodes["selenium set ${(i+1).toString().padLeft(2, '0')}"] = {
+            nodes["selenium set ${(i).toString().padLeft(2, '0')}"] = {
               withEnv(["CI_NODE_INDEX=$index", "CI_NODE_TOTAL=$ci_node_total"]) {
                 node('canvas-docker') {
                   stage("Running Selenium Set ${index}") {
-                    sh 'build/new-jenkins/docker-cleanup.sh'
                     try {
                       checkout scm
+                      sh 'build/new-jenkins/docker-cleanup.sh'
                       sh 'rm -rf ./tmp/spec_failures'
                       timeout(time: 60) {
                         sh 'printenv | sort'
