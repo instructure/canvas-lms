@@ -207,7 +207,6 @@ pipeline {
             skipIfPreviouslySuccessful("linters") {
               build(
                 job: 'test-suites/linters',
-                propagate: false,
                 parameters: build_parameters
               )
             }
@@ -228,10 +227,8 @@ pipeline {
         stage('JS') {
           steps {
             skipIfPreviouslySuccessful("js") {
-              // propagate set to false until we can get tests passing
               build(
                 job: 'test-suites/JS',
-                propagate: false,
                 parameters: build_parameters
               )
             }
