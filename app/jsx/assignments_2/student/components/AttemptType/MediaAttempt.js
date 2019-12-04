@@ -134,7 +134,7 @@ export default class MediaAttempt extends React.Component {
   renderMediaUpload = () => (
     <View as="div" borderWidth="small">
       <UploadMedia
-        onComplete={this.onComplete}
+        onUploadComplete={this.onComplete}
         onDismiss={this.onDismiss}
         contextId={this.props.assignment.env.courseId}
         contextType="course"

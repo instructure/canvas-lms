@@ -139,7 +139,10 @@ describe('student view integration tests', () => {
     it('displays a loading indicator for each new file being uploaded', async () => {
       window.URL.createObjectURL = jest.fn()
       uploadFileModule.uploadFiles = jest.fn()
-      uploadFileModule.uploadFiles.mockReturnValueOnce([{id: '1', name: 'file1.jpg'}])
+      uploadFileModule.uploadFiles.mockReturnValueOnce([
+        {id: '1', name: 'file1.jpg'},
+        {id: '2', name: 'file2.jpg'}
+      ])
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
 
       const mocks = await createGraphqlMocks({
@@ -156,7 +159,10 @@ describe('student view integration tests', () => {
         </AlertManagerContext.Provider>
       )
 
-      const files = [new File(['foo'], 'file1.jpg', {type: 'image/jpg'})]
+      const files = [
+        new File(['foo'], 'file1.jpg', {type: 'image/jpg'}),
+        new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
+      ]
       const fileInput = await waitForElement(() =>
         container.querySelector('input[id="inputFileDrop"]')
       )

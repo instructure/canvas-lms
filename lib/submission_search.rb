@@ -67,6 +67,8 @@ class SubmissionSearch
     elsif @course.grants_right?(@searcher, @session, :read_grades)
       # a user can see their own submission
       search_scope.where(user_id: @searcher.id)
+    else
+      Submission.none # return nothing
     end
 
     if @options[:scored_less_than]

@@ -39,12 +39,6 @@ module AccountServices
             :description => "",
             :expose_to_ui => :service
         },
-        :linked_in => {
-            :name => I18n.t("LinkedIn"),
-            :description => "",
-            :expose_to_ui => :service,
-            :expose_to_ui_proc => proc { !!LinkedIn::Connection.config }
-        },
         :twitter => {
             :name => I18n.t("Twitter"),
             :description => "",

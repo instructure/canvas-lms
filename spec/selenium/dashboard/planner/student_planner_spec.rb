@@ -551,6 +551,22 @@ describe "student planner" do
       end
     end
 
+    it "allows account admins with content management rights to add todo dates" do
+      @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page')
+      admin = account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+      user_session(admin)
+
+      expect(@course.grants_right?(admin, :manage)).to eq false # sanity check
+      expect(@course.grants_right?(admin, :manage_content)).to eq true
+
+      get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
+      f('#student_planner_checkbox').click
+      wait_for_ajaximations
+      f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+      expect_new_page_load{fj('button:contains("Save")').click}
+      expect(@wiki.reload.todo_date).to be_present
+    end
+
     it "shows correct default time in an ungraded discussion" do
       Timecop.freeze(Time.zone.today) do
         @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: "here is a message", user: @teacher)

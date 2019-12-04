@@ -997,6 +997,7 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :read)
       load_course_right_side
       @account_users = @account.account_users.active
+      @account_user_permissions_cache = AccountUser.create_permissions_cache(@account_users, @current_user, session)
       ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
       order_hash = {}
       @account.available_account_roles.each_with_index do |role, idx|

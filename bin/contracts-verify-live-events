@@ -8,5 +8,6 @@ if [ -f "config/consul.yml" ]; then # canvas is running in docker
       --tag pact_live_events --format doc
 else
   RAILS_ENV=test bundle exec rspec spec/contracts/service_consumers/live_events \
-    --tag pact_live_events --format doc
+    --tag pact_live_events \
+    -O spec/spec.opts
 fi

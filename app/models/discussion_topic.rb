@@ -38,7 +38,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type, :assignment_id,
-                               :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating]
+                               :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating, :group_category_id]
   restrict_columns :state, [:workflow_state]
   restrict_assignment_columns
 
@@ -1085,7 +1085,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def context_allows_user_to_create?(user)
     return true unless context.respond_to?(:allow_student_discussion_topics)
-    return true if context.user_is_admin?(user)
+    return true if context.grants_right?(user, :read_as_admin)
     context.allow_student_discussion_topics
   end
 

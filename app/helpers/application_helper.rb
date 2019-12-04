@@ -23,19 +23,22 @@ module ApplicationHelper
   include LocaleSelection
   include Canvas::LockExplanation
 
+  def context_user_name_display(user)
+    name = user.try(:short_name) || user.try(:name)
+    if user.try(:pronouns)
+      "#{name} (#{user.pronouns})"
+    else
+      name
+    end
+  end
+
   def context_user_name(context, user)
     return nil unless user
-    return user.short_name if !context && user.respond_to?(:short_name)
-    user_id = user
-    user_id = user.id if user.is_a?(User) || user.is_a?(OpenObject)
+    return context_user_name_display(user) if user.respond_to?(:short_name)
+
+    user_id = user.is_a?(OpenObject) ? user.id : user
     Rails.cache.fetch(['context_user_name', context, user_id].cache_key, {:expires_in=>15.minutes}) do
-      user = user.respond_to?(:short_name) ? user : User.find(user_id)
-      name = user.short_name || user.name
-      if user.pronouns
-        "#{name} (#{user.pronouns})"
-      else
-        name
-      end
+      context_user_name_display(User.find(user_id))
     end
   end
 
@@ -271,20 +274,16 @@ module ApplicationHelper
     Rails.env.test? && ENV.fetch("DISABLE_CSS_TRANSITIONS", "1") == "1"
   end
 
-  def use_rtl?
-    I18n.rtl? || @current_user.try(:feature_enabled?, :force_rtl)
-  end
-
   # this is exactly the same as our sass helper with the same name
   # see: https://www.npmjs.com/package/sass-direction
   def direction(left_or_right)
-    use_rtl? ? {'left' => 'right', 'right' => 'left'}[left_or_right] : left_or_right
+    I18n.rtl? ? {'left' => 'right', 'right' => 'left'}[left_or_right] : left_or_right
   end
 
   def css_variant(opts = {})
     variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
     use_high_contrast = @current_user && @current_user.prefers_high_contrast? || opts[:force_high_contrast]
-    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') + (use_rtl? ? '_rtl' : '')
+    variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') + (I18n.rtl? ? '_rtl' : '')
   end
 
   def css_url_for(bundle_name, plugin=false, opts = {})

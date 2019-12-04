@@ -31,6 +31,7 @@ describe('contentInsertion', () => {
 
     editor = {
       content: '',
+      selectionContent: '',
       classes: '',
       isHidden: () => {
         return false
@@ -40,7 +41,11 @@ describe('contentInsertion', () => {
           return null
         },
         getContent: () => {
-          return ''
+          return editor.selectionContent
+        },
+        setContent: content => {
+          editor.selectionContent = content
+          editor.content = content
         },
         getEnd: () => {
           return node
@@ -108,6 +113,14 @@ describe('contentInsertion', () => {
       expect(editor.content).toEqual(
         '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
       )
+    })
+
+    it('respects the current selection building the link by delegating to tinymce', () => {
+      editor.execCommand = jest.fn()
+      editor.selection.setContent('link me')
+      contentInsertion.insertLink(editor, link)
+      expect(editor.execCommand).toHaveBeenCalled()
+      expect(editor.execCommand.mock.calls[0][0]).toBe('mceInsertLink')
     })
 
     it('can use url if no href', () => {
@@ -277,7 +290,7 @@ describe('contentInsertion', () => {
       const video = videoFromUpload()
       const result = contentInsertion.insertVideo(editor, video)
       expect(editor.insertContent).toHaveBeenCalledWith(
-        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="m-media-id" data-media-type="video" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block"></iframe>'
+        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="m-media-id" data-media-type="video" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block" title="Video player for filename.mov"></iframe>'
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -287,7 +300,7 @@ describe('contentInsertion', () => {
       const video = videoFromTray()
       const result = contentInsertion.insertVideo(editor, video)
       expect(editor.insertContent).toHaveBeenCalledWith(
-        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="17" data-media-type="video" src="/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&amp;type=video" style="width:400px;height:225px;display:inline-block" title="filename.mov"></iframe>'
+        '<iframe allow="fullscreen" allowfullscreen="" data-media-id="17" data-media-type="video" src="/media_objects_iframe?mediahref=%2Furl%2Fto%2Fcourse%2Ffile&amp;type=video" style="width:400px;height:225px;display:inline-block" title="Video player for filename.mov"></iframe>'
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -306,7 +319,7 @@ describe('contentInsertion', () => {
       const audio = audioFromUpload()
       const result = contentInsertion.insertAudio(editor, audio)
       expect(editor.insertContent).toHaveBeenCalledWith(
-        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:300px;height:2.813rem;display:inline-block"></iframe>'
+        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:300px;height:2.813rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
       )
       expect(result).toEqual('the inserted iframe')
     })
@@ -316,7 +329,7 @@ describe('contentInsertion', () => {
       const audio = audioFromTray()
       const result = contentInsertion.insertAudio(editor, audio)
       expect(editor.insertContent).toHaveBeenCalledWith(
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:300px;height:2.813rem;display:inline-block" title="filename.mp3"></iframe>'
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&amp;type=audio" style="width:300px;height:2.813rem;display:inline-block" title="Audio player for filename.mp3"></iframe>'
       )
       expect(result).toEqual('the inserted iframe')
     })

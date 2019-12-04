@@ -20,7 +20,7 @@
 #
 # @model AuthenticationProvider
 #     {
-#       "id": "1",
+#       "id": "AuthenticationProvider",
 #       "description": "",
 #       "properties": {
 #         "identifier_format": {
@@ -144,6 +144,7 @@
 #
 # @model FederatedAttributesConfig
 #     {
+#       "id" : "FederatedAttributesConfig",
 #       "description": "A mapping of Canvas attribute names to attribute names that a provider may send, in order to update the value of these attributes when a user logs in. The values can be a FederatedAttributeConfig, or a raw string corresponding to the \"attribute\" property of a FederatedAttributeConfig. In responses, full FederatedAttributeConfig objects are returned if JIT provisioning is enabled, otherwise just the attribute names are returned.",
 #       "properties": {
 #         "admin_roles": {
@@ -195,6 +196,7 @@
 #
 # @model FederatedAttributeConfig
 #     {
+#       "id": "FederatedAttributeConfig",
 #       "description": "A single attribute name to be federated when a user logs in",
 #       "properties": {
 #         "attribute": {

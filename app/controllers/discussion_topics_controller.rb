@@ -559,7 +559,7 @@ class DiscussionTopicsController < ApplicationController
       js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value]
     end
     if @context.root_account.feature_enabled?(:student_planner)
-      js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage)
+      js_hash[:STUDENT_PLANNER_ENABLED] = @context.grants_any_right?(@current_user, session, :manage_content)
     end
 
     if @topic.is_section_specific && @context.is_a?(Course)
@@ -1272,7 +1272,7 @@ class DiscussionTopicsController < ApplicationController
       return
     end
     return unless params[:todo_date]
-    if !authorized_action(@topic.context, @current_user, :manage)
+    if !authorized_action(@topic.context, @current_user, :manage_content)
       @errors[:todo_date] = t(:error_todo_date_unauthorized,
         "You do not have permission to add this topic to the student to-do list.")
     elsif (@topic.assignment || params[:assignment]) && !remove_assign

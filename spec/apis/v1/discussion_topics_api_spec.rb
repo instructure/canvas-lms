@@ -359,10 +359,9 @@ describe DiscussionTopicsController, type: :request do
     before :once do
       @attachment = create_attachment(@course)
       @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => @attachment)
-      @sub = create_subtopic(@topic, :title => "Sub topic", :message => "<p>i'm subversive</p>")
     end
 
-    let(:response_json) do
+    let(:topic_response_json) do
       {"read_state" => "read",
        "unread_count" => 0,
        "podcast_url" => "/feeds/topics/#{@topic.id}/enrollment_randomness.rss",
@@ -411,8 +410,6 @@ describe DiscussionTopicsController, type: :request do
                           'mime_class' => @attachment.mime_class,
                           'media_entry_id' => @attachment.media_entry_id
                          }],
-       "topic_children" => [@sub.id],
-       "group_topic_children" => [{"id" => @sub.id, "group_id" => @sub.context_id}],
        "discussion_type" => 'side_comment',
        "locked" => false,
        "can_lock" => true,
@@ -420,24 +417,49 @@ describe DiscussionTopicsController, type: :request do
        "locked_for_user" => false,
        "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
        "permissions" => {"delete" => true, "attach" => true, "update" => true, "reply" => true},
-       "group_category_id" => nil,
        "can_group" => true,
        "allow_rating" => false,
        "only_graders_can_rate" => false,
        "sort_by_rating" => false,
        "todo_date" => nil,
+       "group_category_id" => nil,
+       "topic_children" => [],
+       "group_topic_children" => [],
       }
+    end
+
+    let(:root_topic_response_json) do
+      topic_response_json.merge(
+        "group_category_id" => @group_category.id,
+        "topic_children" => [@sub.id],
+        "group_topic_children" => [{"id" => @sub.id, "group_id" => @sub.context_id}],
+        "subscription_hold" => "not_in_group_set"
+      )
     end
 
     describe "GET 'index'" do
       it "should return discussion topic list" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
-                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+          {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
 
-        expect(json.size).to eq 2
+        expect(json.size).to eq 1
         # get rid of random characters in podcast url
         json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-        expect(json.last).to eq response_json.merge("subscribed" => @sub.subscribed?(@user))
+        expect(json.last).to eq topic_response_json.merge("subscribed" => @topic.subscribed?(@user))
+      end
+
+      it "should return discussion topic list for root topics" do
+        @group_category = @course.group_categories.create(:name => 'watup')
+        @group = @group_category.groups.create!(:name => "group1", :context => @course)
+        @topic.update_attribute(:group_category, @group_category)
+        @sub = @topic.child_topics.first # create a sub topic the way we actually do - i.e. through groups
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                        {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+
+        expect(json.size).to eq 1
+        # get rid of random characters in podcast url
+        json.last["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+        expect(json.last).to eq root_topic_response_json.merge("subscribed" => @topic.subscribed?(@user))
       end
 
       it "should search discussion topics by title" do
@@ -454,7 +476,7 @@ describe DiscussionTopicsController, type: :request do
       it "should order topics by descending position by default" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
-        topics = [@topic3, @topic, @topic2, @sub]
+        topics = [@topic3, @topic, @topic2]
         topics.reverse.each_with_index do |topic, index|
           topic.position = index + 1
           topic.save!
@@ -469,7 +491,7 @@ describe DiscussionTopicsController, type: :request do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
 
-        topics = [@topic3, @topic, @topic2, @sub]
+        topics = [@topic3, @topic, @topic2]
         topic_reply_date = Time.zone.now - 1.day
         topics.each do |topic|
           topic.last_reply_at = topic_reply_date
@@ -489,7 +511,7 @@ describe DiscussionTopicsController, type: :request do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
 
-        topics = [@sub, @topic, @topic2, @topic3]
+        topics = [@topic, @topic2, @topic3]
         topic_reply_date = Time.zone.now - 1.day
         topics.each do |topic|
           topic.last_reply_at = topic_reply_date
@@ -507,10 +529,10 @@ describe DiscussionTopicsController, type: :request do
       it "should only include topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
-        [@topic, @sub, @topic2, @topic3].each do |topic|
+        [@topic, @topic2, @topic3].each do |topic|
           topic.save!
         end
-        [@sub, @topic2, @topic3].each(&:lock!)
+        [@topic2, @topic3].each(&:lock!)
         @topic2.update_attribute(:pinned, true)
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unlocked",
@@ -525,7 +547,7 @@ describe DiscussionTopicsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
                          :per_page => '10', :scope => 'locked'})
-        expect(json.size).to eq 3
+        expect(json.size).to eq 2
         links = response.headers['Link'].split(',')
         links.each do |link|
           expect(link).to match('scope=locked')
@@ -539,18 +561,18 @@ describe DiscussionTopicsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=unpinned",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
                          :per_page => '10', :scope => 'unpinned'})
-        expect(json.size).to eq 3
+        expect(json.size).to eq 2
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked,unpinned",
                         {:controller => 'discussion_topics', :action => 'index', :format => 'json', :course_id => @course.id.to_s,
                          :per_page => '10', :scope => 'locked,unpinned'})
-        expect(json.size).to eq 2
+        expect(json.size).to eq 1
       end
 
       it "should include all parameters in pagination urls" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
-        [@topic, @sub, @topic2, @topic3].each do |topic|
+        [@topic, @topic2, @topic3].each do |topic|
           topic.type = 'Announcement'
           topic.save!
         end
@@ -710,7 +732,34 @@ describe DiscussionTopicsController, type: :request do
 
         # get rid of random characters in podcast url
         json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
-        expect(json.sort.to_h).to eq response_json.merge("subscribed" => @topic.subscribed?(@user)).sort.to_h
+        expect(json.sort.to_h).to eq topic_response_json.merge("subscribed" => @topic.subscribed?(@user)).sort.to_h
+      end
+
+      it "should return an individual root topic" do
+        @group_category = @course.group_categories.create(:name => 'watup')
+        @group = @group_category.groups.create!(:name => "group1", :context => @course)
+        @topic.update_attribute(:group_category, @group_category)
+        @sub = @topic.child_topics.first # create a sub topic the way we actually do - i.e. through groups
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+          {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+
+        # get rid of random characters in podcast url
+        json["podcast_url"].gsub!(/_[^.]*/, '_randomness')
+        expect(json.sort.to_h).to eq root_topic_response_json.merge("subscribed" => @topic.subscribed?(@user)).sort.to_h
+      end
+
+      it "should not show information for a deleted child topic" do
+        @group_category = @course.group_categories.create(:name => 'watup')
+        @group = @group_category.groups.create!(:name => "group1", :context => @course)
+        @topic.update_attribute(:group_category, @group_category)
+        @sub = @topic.child_topics.first # create a sub topic the way we actually do - i.e. through groups
+        @group.destroy
+        @topic.refresh_subtopics
+        expect(@sub.reload).to be_deleted
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+          {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s})
+        expect(json["group_topic_children"]).to be_empty
+        expect(json["topic_children"]).to be_empty
       end
 
       it "should require course to be published for students" do
@@ -3204,14 +3253,6 @@ def create_topic(context, opts={})
   topic.save!
   topic.publish if topic.unpublished?
   topic
-end
-
-def create_subtopic(topic, opts={})
-  opts[:user] ||= @user
-  subtopic = topic.context.discussion_topics.build(opts)
-  subtopic.root_topic_id = topic.id
-  subtopic.save!
-  subtopic
 end
 
 def create_entry(topic, opts={})

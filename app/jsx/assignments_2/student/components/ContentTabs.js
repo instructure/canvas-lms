@@ -41,8 +41,6 @@ ContentTabs.propTypes = {
   submission: Submission.shape
 }
 
-// We should revisit this after the InstructureCon demo to ensure this is
-// accessible and in a class.
 function currentSubmissionGrade(assignment, submission) {
   const tabBarAlign = {
     position: 'absolute',
@@ -118,6 +116,7 @@ renderCommentsTab.propTypes = {
 
 function LoggedInContentTabs(props) {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0)
+  const [submissionFocus, setSubmissionFocus] = useState(null)
 
   function handleTabChange(event, {index}) {
     setSelectedTabIndex(index)
@@ -128,13 +127,23 @@ function LoggedInContentTabs(props) {
       {props.submission.state === 'graded' || props.submission.state === 'submitted'
         ? currentSubmissionGrade(props.assignment, props.submission)
         : null}
-      <Tabs onRequestTabChange={handleTabChange} variant="default">
+      <Tabs
+        onRequestTabChange={handleTabChange}
+        ref={el => {
+          setSubmissionFocus(el)
+        }}
+        variant="default"
+      >
         <Tabs.Panel
           key="attempt-tab"
           renderTitle={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
           selected={selectedTabIndex === 0}
         >
-          <SubmissionManager assignment={props.assignment} submission={props.submission} />
+          <SubmissionManager
+            assignment={props.assignment}
+            focusElement={submissionFocus}
+            submission={props.submission}
+          />
         </Tabs.Panel>
         <Tabs.Panel
           key="comments-tab"

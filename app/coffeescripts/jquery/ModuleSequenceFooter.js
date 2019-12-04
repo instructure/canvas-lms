@@ -59,30 +59,33 @@ $.fn.moduleSequenceFooter = function(options = {}) {
       !enabled
     )
 
-  // After fetching, @msfInstance will have the following
-  // @hide: bool
-  // @previous: Object
-  // @next : Object
-  this.msfInstance = new $.fn.moduleSequenceFooter.MSFClass(options)
-  this.msfInstance.fetch().done(() => {
-    if (this.msfInstance.hide) {
-      this.hide()
-      return
-    }
+  if (!this.data('msfInstance')) {
+    // After fetching, @msfInstance will have the following
+    // @hide: bool
+    // @previous: Object
+    // @next : Object
+    this.msfInstance = new $.fn.moduleSequenceFooter.MSFClass(options)
+    this.data('msfInstance', this.msfInstance)
+    this.msfInstance.fetch().done(() => {
+      if (this.msfInstance.hide) {
+        this.hide()
+        return
+      }
 
-    this.html(
-      template({
-        instanceNumber: this.msfInstance.instanceNumber,
-        previous: this.msfInstance.previous,
-        next: this.msfInstance.next
-      })
-    )
-    if (options && options.animation !== undefined) {
-      this.msfAnimation(options.animation)
-    }
-    this.show()
-    $(window).triggerHandler('resize')
-  })
+      this.html(
+        template({
+          instanceNumber: this.msfInstance.instanceNumber,
+          previous: this.msfInstance.previous,
+          next: this.msfInstance.next
+        })
+      )
+      if (options && options.animation !== undefined) {
+        this.msfAnimation(options.animation)
+      }
+      this.show()
+      $(window).triggerHandler('resize')
+    })
+  }
   return this
 }
 

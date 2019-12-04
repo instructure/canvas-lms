@@ -2749,6 +2749,12 @@ describe CoursesController do
       course_with_student_logged_in
       get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
       expect(response).to be_unauthorized
+
+      course_with_designer(name: 'course designer', course: @course)
+      user_session(@designer)
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
+      json = json_parse(response.body)
+      expect(json[0]).to include({'name' => 'search teacher'})
     end
 
     it 'requires the feature be enabled' do
@@ -2757,7 +2763,7 @@ describe CoursesController do
       expect(response).to be_forbidden
     end
 
-    it 'should return email, url avatar, and name' do
+    it 'should return email, url avatar (if avatars are enabled), and name' do
       user_session(@teacher)
       @search_context = @course
       course_with_teacher(name: 'course teacher')
@@ -2765,6 +2771,26 @@ describe CoursesController do
       get 'content_share_users', params: {course_id: @search_context.id, search_term: 'course'}
       json = json_parse(response.body)
       expect(json[0]).to include({'email' => nil, 'name' => 'course teacher', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+    end
+
+    it 'should search by name and email' do
+      user_session(@teacher)
+      @teacher.account.enable_service(:avatars)
+      user_model(name: "course teacher")
+      communication_channel_model(user: @user, path: 'course_teacher@test.edu')
+      course_with_teacher(user: @user, course: @course)
+
+      user_model(name: "course designer")
+      communication_channel_model(user: @user, path: 'course_designer@test.edu')
+      course_with_teacher(user: @user, course: @course)
+
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'course teacher'}
+      json = json_parse(response.body)
+      expect(json[0]).to include({'email' => 'course_teacher@test.edu', 'name' => 'course teacher', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
+
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'course_designer@test.edu'}
+      json = json_parse(response.body)
+      expect(json[0]).to include({'email' => 'course_designer@test.edu', 'name' => 'course designer', 'avatar_url' => "http://test.host/images/messages/avatar-50.png"})
     end
 
     it 'searches for teachers, TAs, and designers' do
@@ -2846,6 +2872,77 @@ describe CoursesController do
       get 'content_share_users', params: {course_id: @course.id, search_term: 'less privileged'}
       json = json_parse(response.body)
       expect(json.map{|user| user['name']}).to include('less privileged account admin')
+    end
+  end
+
+  describe 'POST update' do
+    it 'allows an admin to change visibility' do
+      admin = account_admin_user
+      course = Course.create!
+      user_session(admin)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).to eq true
+      expect(course.indexed).to eq true
+
+    end
+
+    it 'allows the teacher to change visibility' do
+      course = Course.create!
+      teacher = teacher_in_course(course: course, active_all: true).user
+      user_session(teacher)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).to eq true
+      expect(course.indexed).to eq true
+    end
+
+    it 'does not allow a teacher without the permission to change visibility' do
+      course = Course.create!
+      teacher = teacher_in_course(course: course, active_all: true).user
+      course.account.role_overrides.create!(role: Role.get_built_in_role('TeacherEnrollment'), permission: 'manage_course_visibility', enabled: false)
+      user_session(teacher)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).not_to eq true
+      expect(course.indexed).not_to eq true
+    end
+
+    it 'does not allow an account admin without the permission to change visibility' do
+      admin = account_admin_user_with_role_changes(:role_changes => {'manage_course_visibility' => false})
+      course = Course.create!
+      user_session(admin)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).not_to eq true
+      expect(course.indexed).not_to eq true
+    end
+
+    it 'allows a site admin to change visibility even if account admins cannot' do
+      site_admin = site_admin_user
+      account = Account.create(name: 'fake-o')
+      account_with_role_changes(:account => account, :role_changes => { 'manage_course_visibility' => false })
+      course = course_factory(:account => account)
+      user_session(site_admin)
+
+      post 'update', params: { id: course.id,
+                               course: { course_visibility: 'public', indexed: true }}
+
+      course.reload
+      expect(course.is_public).to eq true
+      expect(course.indexed).to eq true
     end
   end
 end

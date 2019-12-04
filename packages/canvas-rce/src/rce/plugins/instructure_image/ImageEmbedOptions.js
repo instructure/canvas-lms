@@ -76,7 +76,7 @@ export function fromImageEmbed($element) {
 }
 
 export function fromVideoEmbed($element) {
-  // $element will be the <span> tinuymce wraps around the iframe
+  // $element will be the <span> tinymce wraps around the iframe
   // that's hosting the video player
   let $videoElem = null
   let naturalWidth, naturalHeight
@@ -91,11 +91,13 @@ export function fromVideoEmbed($element) {
     }
   }
 
-  // because tinymce doesn't always put the title attribute on the iframe,
-  // but it does maintain it on the span it adds around it.
-  const title =
-    $element.firstElementChild.getAttribute('data-titleText') ||
-    $element.getAttribute('data-mce-p-data-titleText')
+  // because tinymce doesn't put the title attribute on the iframe,
+  // but maintains it on the span it adds around it.
+  const title = (
+    $element.firstElementChild.getAttribute('title') ||
+    $element.getAttribute('data-mce-p-title') ||
+    ''
+  ).replace(formatMessage('Video player for '), '')
   const rect = $element.getBoundingClientRect()
   const videoOptions = {
     titleText: title || '',

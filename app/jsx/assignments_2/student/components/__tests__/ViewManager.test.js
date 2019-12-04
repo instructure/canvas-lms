@@ -169,6 +169,80 @@ describe('ViewManager', () => {
       expect(getAllByText('Attempt 2')[0]).toBeInTheDocument()
     })
 
+    it('sets focus on the next submission button if there is a next submission when clicked', async () => {
+      const props = await makeProps({currentAttempt: 3})
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+      fireEvent.click(prevButton)
+
+      const mockElement = {
+        focus: jest.fn()
+      }
+      document.getElementById = jest.fn().mockReturnValue(mockElement)
+
+      const nextButton = getByText('View Next Submission')
+      fireEvent.click(nextButton)
+
+      await wait(() => {
+        expect(document.getElementById).toHaveBeenCalledWith('view-next-attempt-button')
+        expect(mockElement.focus).toHaveBeenCalled()
+      })
+    })
+
+    it('sets focus on the new attempt button if there is no next submission and more attempts are allowed when clicked', async () => {
+      const props = await makeProps({currentAttempt: 3})
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+
+      const mockElement = {
+        focus: jest.fn()
+      }
+      document.getElementById = jest.fn().mockReturnValue(mockElement)
+
+      const nextButton = getByText('View Next Submission')
+      fireEvent.click(nextButton)
+
+      await wait(() => {
+        expect(document.getElementById).toHaveBeenCalledWith('create-new-attempt-button')
+        expect(mockElement.focus).toHaveBeenCalled()
+      })
+    })
+
+    it('sets focus on the previous attempt button if there is no next submission and more attempts are not allowed when clicked', async () => {
+      const props = await makeProps({currentAttempt: 3})
+      props.initialQueryData.assignment.allowedAttempts = 3
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+
+      const mockElement = {
+        focus: jest.fn()
+      }
+      document.getElementById = jest.fn().mockReturnValue(mockElement)
+
+      const nextButton = getByText('View Next Submission')
+      fireEvent.click(nextButton)
+
+      await wait(() => {
+        expect(document.getElementById).toHaveBeenCalledWith('view-previous-attempt-button')
+        expect(mockElement.focus).toHaveBeenCalled()
+      })
+    })
+
     it('does not call loadMoreSubmissionHistories() when clicked', async () => {
       const props = await makeProps({currentAttempt: 2})
       const {getByText} = render(
@@ -262,6 +336,50 @@ describe('ViewManager', () => {
       const prevButton = getByText('View Previous Submission')
       fireEvent.click(prevButton)
       expect(getAllByText('Attempt 1')[0]).toBeInTheDocument()
+    })
+
+    it('sets focus on the previous attempt button if there is a previous attempt', async () => {
+      const props = await makeProps({currentAttempt: 3})
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+
+      const mockElement = {
+        focus: jest.fn()
+      }
+      document.getElementById = jest.fn().mockReturnValue(mockElement)
+
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+
+      await wait(() => {
+        expect(document.getElementById).toHaveBeenCalledWith('view-previous-attempt-button')
+        expect(mockElement.focus).toHaveBeenCalled()
+      })
+    })
+
+    it('sets focus on the next attempt button if there is no previous attempt', async () => {
+      const props = await makeProps({currentAttempt: 2})
+      const {getByText} = render(
+        <MockedProvider>
+          <ViewManager {...props} />
+        </MockedProvider>
+      )
+
+      const mockElement = {
+        focus: jest.fn()
+      }
+      document.getElementById = jest.fn().mockReturnValue(mockElement)
+
+      const prevButton = getByText('View Previous Submission')
+      fireEvent.click(prevButton)
+
+      await wait(() => {
+        expect(document.getElementById).toHaveBeenCalledWith('view-next-attempt-button')
+        expect(mockElement.focus).toHaveBeenCalled()
+      })
     })
 
     it('can navigate backwords from a dummy submission', async () => {
@@ -399,6 +517,28 @@ describe('ViewManager', () => {
           </MockedProvider>
         )
         expect(queryByText('Create New Attempt')).toBeInTheDocument()
+      })
+
+      it('sets focus on the previous attempt button when clicked', async () => {
+        const props = await makeProps({currentAttempt: 1})
+        const {getByText} = render(
+          <MockedProvider>
+            <ViewManager {...props} />
+          </MockedProvider>
+        )
+
+        const mockElement = {
+          focus: jest.fn()
+        }
+        document.getElementById = jest.fn().mockReturnValue(mockElement)
+
+        const newButton = getByText('Create New Attempt')
+        fireEvent.click(newButton)
+
+        await wait(() => {
+          expect(document.getElementById).toHaveBeenCalledWith('view-previous-attempt-button')
+          expect(mockElement.focus).toHaveBeenCalled()
+        })
       })
 
       it('is not displayed if you are not on the latest submission attempt', async () => {

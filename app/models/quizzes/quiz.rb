@@ -66,6 +66,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   before_save :build_assignment
   before_save :set_defaults
   after_save :update_assignment
+  before_save :check_if_needs_availability_cache_clear
   after_save :clear_availability_cache
   after_save :touch_context
   after_save :regrade_if_published
@@ -460,9 +461,15 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   protected :update_assignment
 
+  attr_reader :should_clear_availability_cache
+  def check_if_needs_availability_cache_clear
+    @should_clear_availability_cache ||= will_save_change_to_due_at? || will_save_change_to_lock_at? || will_save_change_to_unlock_at? || will_save_change_to_workflow_state?
+  end
+
   def clear_availability_cache
-    if saved_change_to_due_at? || saved_change_to_lock_at? || saved_change_to_unlock_at? || saved_change_to_workflow_state?
+    if self.should_clear_availability_cache && !self.saved_by == :migration
       self.clear_cache_key(:availability)
+      self.assignment.clear_cache_key(:availability) if self.assignment
     end
   end
 
@@ -1023,7 +1030,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   set_policy do
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) } #admins.include? user }
-    can :read_statistics and can :manage and can :read and can :update and can :create and can :submit and can :preview
+    can :manage and can :read and can :update and can :create and can :submit and can :preview
 
     given do |user, session|
       self.context.grants_right?(user, session, :manage_assignments) &&
@@ -1434,7 +1441,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   def run_if_overrides_changed!
     self.relock_modules!
     self.clear_cache_key(:availability)
-    self.assignment.relock_modules! if self.assignment
+    if self.assignment
+      self.assignment.clear_cache_key(:availability)
+      self.assignment.relock_modules!
+    end
   end
 
   # Assignment#run_if_overrides_changed_later! uses its keyword arguments, but

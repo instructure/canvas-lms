@@ -74,7 +74,6 @@ const LongDescriptionDialog = ({open, close, longDescription}) => {
       </Modal.Body>
     </Modal>
   )
-  /* eslint-enable react/no-danger */
 }
 LongDescriptionDialog.propTypes = {
   close: PropTypes.func.isRequired,
@@ -236,9 +235,7 @@ export default class Criterion extends React.Component {
           </div>
           {!(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null}
         </th>
-        <td className="ratings" colSpan={isSummary ? '2' : null}>
-          {ratings}
-        </td>
+        <td className="ratings">{ratings}</td>
         {hasPointsColumn && (
           <td className="criterion_points">
             {pointsElement()}

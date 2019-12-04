@@ -108,7 +108,6 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -272,7 +271,6 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -436,7 +434,6 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -624,7 +621,6 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -844,7 +840,6 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -1064,7 +1059,6 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Comments
       allowSaving={true}
@@ -1198,7 +1192,6 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Ratings
       assessing={false}
@@ -1401,7 +1394,6 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Ratings
       assessing={true}
@@ -1604,7 +1596,6 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Ratings
       assessing={false}
@@ -1818,7 +1809,6 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Ratings
       assessing={false}
@@ -2077,7 +2067,6 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Ratings
       assessing={true}
@@ -2336,7 +2325,6 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   </th>
   <td
     className="ratings"
-    colSpan={null}
   >
     <Ratings
       assessing={false}

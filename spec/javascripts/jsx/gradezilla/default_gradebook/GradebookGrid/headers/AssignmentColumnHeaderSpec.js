@@ -77,8 +77,8 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       },
 
       hideGradesAction: {
-        hasGrades: true,
-        hasGradesToHide: true,
+        hasGradesOrPostableComments: true,
+        hasGradesOrCommentsToHide: true,
         onSelect() {}
       },
 
@@ -90,8 +90,8 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       postGradesAction: {
         enabled: false,
         featureEnabled: false,
-        hasGrades: true,
-        hasGradesToPost: true,
+        hasGradesOrPostableComments: true,
+        hasGradesOrCommentsToPost: true,
         onSelect() {}
       },
 
@@ -1100,7 +1100,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
   QUnit.module('"Options" > "Post grades" action', hooks => {
     hooks.beforeEach(() => {
       props.postGradesAction.featureEnabled = true
-      props.postGradesAction.hasGradesToPost = true
+      props.postGradesAction.hasGradesOrCommentsToPost = true
     })
 
     QUnit.module('when post policies is enabled', () => {
@@ -1115,31 +1115,23 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       })
 
       test('has the text "All grades posted" when no submissions can be posted', () => {
-        props.postGradesAction.hasGradesToPost = false
+        props.postGradesAction.hasGradesOrCommentsToPost = false
         mountAndOpenOptionsMenu()
         ok(getMenuItem($menuContent, 'All grades posted'))
       })
 
-      test('has the text "No grades to post" when no submissions are graded', () => {
-        props.postGradesAction.hasGrades = false
+      test('has the text "No grades to post" when no submissions are graded or have comments', () => {
+        props.postGradesAction.hasGradesOrCommentsToPost = false
+        props.postGradesAction.hasGradesOrPostableComments = false
         mountAndOpenOptionsMenu()
         ok(getMenuItem($menuContent, 'No grades to post'))
       })
 
       test('is disabled when no submissions can be posted', () => {
-        props.postGradesAction.hasGradesToPost = false
+        props.postGradesAction.hasGradesOrCommentsToPost = false
         mountAndOpenOptionsMenu()
         strictEqual(
           getMenuItem($menuContent, 'All grades posted').getAttribute('aria-disabled'),
-          'true'
-        )
-      })
-
-      test('is disabled when no submissions are graded', () => {
-        props.postGradesAction.hasGrades = false
-        mountAndOpenOptionsMenu()
-        strictEqual(
-          getMenuItem($menuContent, 'No grades to post').getAttribute('aria-disabled'),
           'true'
         )
       })
@@ -1181,7 +1173,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
   QUnit.module('"Options" > "Hide grades" action', hooks => {
     hooks.beforeEach(() => {
       props.postGradesAction.featureEnabled = true
-      props.hideGradesAction.hasGradesToHide = true
+      props.hideGradesAction.hasGradesOrCommentsToHide = true
     })
 
     QUnit.module('when post policies is enabled', () => {
@@ -1196,31 +1188,23 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       })
 
       test('has the text "All grades hidden" when no submissions can be hidden', () => {
-        props.hideGradesAction.hasGradesToHide = false
+        props.hideGradesAction.hasGradesOrCommentsToHide = false
         mountAndOpenOptionsMenu()
         ok(getMenuItem($menuContent, 'All grades hidden'))
       })
 
-      test('has the text "No grades to hide" when no submissions are graded', () => {
-        props.hideGradesAction.hasGrades = false
+      test('has the text "No grades to hide" when no submissions are graded or have comments', () => {
+        props.hideGradesAction.hasGradesOrCommentsToHide = false
+        props.hideGradesAction.hasGradesOrPostableComments = false
         mountAndOpenOptionsMenu()
         ok(getMenuItem($menuContent, 'No grades to hide'))
       })
 
       test('is disabled when no submissions can be hidden', () => {
-        props.hideGradesAction.hasGradesToHide = false
+        props.hideGradesAction.hasGradesOrCommentsToHide = false
         mountAndOpenOptionsMenu()
         strictEqual(
           getMenuItem($menuContent, 'All grades hidden').getAttribute('aria-disabled'),
-          'true'
-        )
-      })
-
-      test('is disabled when no submissions are graded', () => {
-        props.hideGradesAction.hasGrades = false
-        mountAndOpenOptionsMenu()
-        strictEqual(
-          getMenuItem($menuContent, 'No grades to hide').getAttribute('aria-disabled'),
           'true'
         )
       })

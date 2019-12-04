@@ -77,13 +77,75 @@ describe('Upload Media', () => {
     })
   })
 
+  describe('only enable Submit button when ready', () => {
+    it('is disabled before ComputerPanel gets a file', () => {
+      const {getByText} = renderComponent({
+        tabs: {upload: true}
+      })
+      expect(getByText('Submit').closest('button')).toHaveAttribute('disabled')
+    })
+
+    it('is enabled once ComputerPanel has a file', () => {
+      const {getByText} = renderComponent({
+        tabs: {upload: true},
+        computerFile: {
+          lastModified: 1568991600840,
+          lastModifiedDate: new Date(1568991600840),
+          name: 'dummy-video.mp4',
+          size: 1875112,
+          type: 'video/mp4'
+        }
+      })
+      expect(getByText('Submit').closest('button')).not.toHaveAttribute('disabled')
+    })
+
+    it('is disabled before EmbedPanel has a value', () => {
+      const {getByText} = renderComponent({
+        tabs: {embed: true}
+      })
+      expect(getByText('Submit').closest('button')).toHaveAttribute('disabled')
+    })
+
+    it('is enabled once EmbedPanel has a value', () => {
+      const {getByText} = renderComponent({
+        tabs: {embed: true},
+        embedCode: 'embed me'
+      })
+      expect(getByText('Submit').closest('button')).not.toHaveAttribute('disabled')
+    })
+
+    // the submit button is not rendered for the record tab
+  })
+
   describe('on submitting results', () => {
-    it('calls onStartUpload', () => {
+    it('calls onStartUpload when uploading', async () => {
       const onStartUpload = jest.fn()
-      const {getByText} = renderComponent({onStartUpload})
+      const {getByText} = renderComponent({
+        onStartUpload,
+        tabs: {upload: true},
+        computerFile: {
+          lastModified: 1568991600840,
+          lastModifiedDate: new Date(1568991600840),
+          name: 'dummy-video.mp4',
+          size: 1875112,
+          type: 'video/mp4'
+        }
+      })
 
       fireEvent.click(getByText('Submit'))
       expect(onStartUpload).toHaveBeenCalled()
+    })
+
+    it('calls onEmbed when embedding', async () => {
+      const onEmbed = jest.fn()
+      const {getByText} = renderComponent({
+        onEmbed,
+        tabs: {embed: true},
+        embedCode: 'some embed code'
+      })
+
+      fireEvent.click(getByText('Submit'))
+      expect(onEmbed).toHaveBeenCalled()
     })
 
     // the rest is tested via saveMediaRecording.test.js

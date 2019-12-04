@@ -37,7 +37,7 @@ module Lti
         rh = create_resource_handler(tp)
         mh = create_message_handler(rh)
 
-        placements = ResourcePlacement::DEFAULT_PLACEMENTS
+        placements = ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS
         placements.each { |p| mh.placements.create!(placement: p) }
 
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
@@ -161,7 +161,7 @@ module Lti
         tp.bindings.create(context: account)
         rh = create_resource_handler(tp)
         mh = create_message_handler(rh)
-        ResourcePlacement::DEFAULT_PLACEMENTS.each { |p| mh.placements.create(placement: p) }
+        ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.each { |p| mh.placements.create(placement: p) }
         new_valid_external_tool(account)
 
         placements = %w(assignment_selection link_selection resource_selection)
@@ -182,7 +182,7 @@ module Lti
             tp.bindings.create(context: account)
             rh = create_resource_handler(tp)
             mh = create_message_handler(rh)
-            ResourcePlacement::DEFAULT_PLACEMENTS.each { |p| mh.placements.create(placement: p) }
+            ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.each { |p| mh.placements.create(placement: p) }
           end
           3.times { |_| new_valid_external_tool(account) }
 

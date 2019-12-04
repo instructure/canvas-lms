@@ -18,7 +18,7 @@
 import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {View} from '@instructure/ui-layout'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {string} from 'prop-types'
 
 function ErrorPageHeader(props) {

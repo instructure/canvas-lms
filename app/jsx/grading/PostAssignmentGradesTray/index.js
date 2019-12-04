@@ -30,7 +30,7 @@ import {
   postAssignmentGradesForSections,
   resolvePostAssignmentGradesStatus
 } from './Api'
-import {isHidden} from '../helpers/SubmissionHelper'
+import {isPostable} from '../helpers/SubmissionHelper'
 import {showFlashAlert} from '../../shared/FlashAlert'
 
 function initialShowState() {
@@ -175,7 +175,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       return null
     }
 
-    const unpostedCount = submissions.filter(submission => isHidden(submission)).length
+    const unpostedCount = submissions.filter(submission => isPostable(submission)).length
 
     return (
       <Tray

@@ -44,7 +44,8 @@ export default function CourseImportPanel({contentShare, onClose}) {
           migration_type: 'canvas_cartridge_importer',
           settings: {
             content_export_id: contentShare.content_export.id,
-            insert_into_module_id: selectedModule?.id
+            insert_into_module_id: selectedModule?.id,
+            insert_into_module_type: contentShare.content_type
           }
         }
       })

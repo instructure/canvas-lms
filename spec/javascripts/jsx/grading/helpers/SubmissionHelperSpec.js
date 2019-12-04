@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isHidden, extractSimilarityInfo} from 'jsx/grading/helpers/SubmissionHelper'
+import {isPostable, extractSimilarityInfo} from 'jsx/grading/helpers/SubmissionHelper'
 
 QUnit.module('SubmissionHelper', suiteHooks => {
   let submission
@@ -24,19 +24,21 @@ QUnit.module('SubmissionHelper', suiteHooks => {
   suiteHooks.beforeEach(() => {
     submission = {
       excused: false,
+      hasPostableComments: false,
       score: null,
+      submissionComments: [],
       workflowState: 'unsubmitted'
     }
   })
 
-  QUnit.module('.isHidden', () => {
+  QUnit.module('.isPostable', () => {
     QUnit.module('when submission is excused', excusedHooks => {
       excusedHooks.beforeEach(() => {
         submission.excused = true
       })
 
       test('returns true', () => {
-        strictEqual(isHidden(submission), true)
+        strictEqual(isPostable(submission), true)
       })
     })
 
@@ -44,17 +46,22 @@ QUnit.module('SubmissionHelper', suiteHooks => {
       test('is true when submission workflow state is graded and score is present', () => {
         submission.score = 1
         submission.workflowState = 'graded'
-        strictEqual(isHidden(submission), true)
+        strictEqual(isPostable(submission), true)
       })
 
-      test('is false when workflow state is not graded', () => {
+      test('is true when submission hasPostableComments is true', () => {
+        submission.hasPostableComments = true
+        strictEqual(isPostable(submission), true)
+      })
+
+      test('is false when workflow state is not graded and hasPostableComments is not true', () => {
         submission.score = 1
-        strictEqual(isHidden(submission), false)
+        strictEqual(isPostable(submission), false)
       })
 
-      test('is false when score is not present', () => {
+      test('is false when score is not present and hasPostableComments is not true', () => {
         submission.workflowState = 'graded'
-        strictEqual(isHidden(submission), false)
+        strictEqual(isPostable(submission), false)
       })
     })
   })

@@ -3789,50 +3789,51 @@ QUnit.module('SpeedGrader', rootHooks => {
               })
             })
 
-            test('passes the allowHidingGrades prop as true if any submissions are posted', () => {
+            test('passes the allowHidingGradesOrComments prop as true if any submissions are posted', () => {
               SpeedGrader.EG.jsonReady()
 
               const [SpeedGraderPostGradesMenu] = findRenderCall()
-              strictEqual(SpeedGraderPostGradesMenu.props.allowHidingGrades, true)
+              strictEqual(SpeedGraderPostGradesMenu.props.allowHidingGradesOrComments, true)
             })
 
-            test('passes the allowHidingGrades prop as false if no submissions are posted', () => {
+            test('passes the allowHidingGradesOrComments prop as false if no submissions are posted', () => {
               alphaSubmission.posted_at = null
               omegaSubmission.posted_at = null
 
               SpeedGrader.EG.jsonReady()
 
               const [SpeedGraderPostGradesMenu] = findRenderCall()
-              strictEqual(SpeedGraderPostGradesMenu.props.allowHidingGrades, false)
+              strictEqual(SpeedGraderPostGradesMenu.props.allowHidingGradesOrComments, false)
             })
 
-            test('passes the allowPostingGrades prop as true if any submissions are unposted', () => {
+            test('passes the allowPostingGradesOrComments prop as true if any submissions are postable', () => {
               alphaSubmission.posted_at = null
+              alphaSubmission.has_postable_comments = true
 
               SpeedGrader.EG.jsonReady()
 
               const [SpeedGraderPostGradesMenu] = findRenderCall()
-              strictEqual(SpeedGraderPostGradesMenu.props.allowPostingGrades, true)
+              strictEqual(SpeedGraderPostGradesMenu.props.allowPostingGradesOrComments, true)
             })
 
-            test('passes the allowPostingGrades prop as false if all submissions are posted', () => {
+            test('passes the allowPostingGradesOrComments prop as false if all submissions are posted', () => {
               SpeedGrader.EG.jsonReady()
 
               const [SpeedGraderPostGradesMenu] = findRenderCall()
-              strictEqual(SpeedGraderPostGradesMenu.props.allowPostingGrades, false)
+              strictEqual(SpeedGraderPostGradesMenu.props.allowPostingGradesOrComments, false)
             })
 
-            test('passes the hasGrades prop as true if any submissions are graded', () => {
+            test('passes the hasGradesOrPostableComments prop as true if any submissions are graded', () => {
               SpeedGrader.EG.jsonReady()
               const [SpeedGraderPostGradesMenu] = findRenderCall()
-              strictEqual(SpeedGraderPostGradesMenu.props.hasGrades, true)
+              strictEqual(SpeedGraderPostGradesMenu.props.hasGradesOrPostableComments, true)
             })
 
-            test('passes the hasGrades prop as false if no submissions are graded', () => {
+            test('passes the hasGradesOrPostableComments prop as false if no submissions are graded', () => {
               alphaSubmission.score = null
               SpeedGrader.EG.jsonReady()
               const [SpeedGraderPostGradesMenu] = findRenderCall()
-              strictEqual(SpeedGraderPostGradesMenu.props.hasGrades, false)
+              strictEqual(SpeedGraderPostGradesMenu.props.hasGradesOrPostableComments, false)
             })
           })
 

@@ -14,27 +14,41 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
 require_relative '../../common'
 
 module AssignmentsIndexPage
-    #------------------------------ Selectors -----------------------------
+  #------------------------------ Selectors -----------------------------
 
-    #------------------------------ Elements ------------------------------
-    def assignment_row(assignment_id)
-      f("#assignment_#{assignment_id}")
-    end
+  #------------------------------ Elements ------------------------------
 
-    def manage_assignment_menu(assignment_id)
-      f("#assign_#{assignment_id}_manage_link", assignment_row(assignment_id))
-    end
+  def assignments_rows
+    f('#ag-list')
+  end
 
-    def assignment_settings_menu(assignment_id)
-      f("#assignment_#{assignment_id}_settings_list")
-    end
+  def assignment_row(assignment_id)
+    f("#assignment_#{assignment_id}")
+  end
 
-    #------------------------------ Actions ------------------------------
-    def visit_assignments_index_page(course_id)
-      get "/courses/#{course_id}/assignments"
-    end
+  def manage_assignment_menu(assignment_id)
+    f("#assign_#{assignment_id}_manage_link", assignment_row(assignment_id))
+  end
+
+  def assignment_settings_menu(assignment_id)
+    f("#assignment_#{assignment_id}_settings_list")
+  end
+
+  def copy_assignment_menu_link(assignment_id)
+    f("#assignment_#{assignment_id}_settings_copy_to")
+  end
+
+  def send_assignment_menu_link(assignment_id)
+    f("#assignment_#{assignment_id}_settings_share_user")
+  end
+
+  #------------------------------ Actions --------------------------------
+
+  def visit_assignments_index_page(course_id)
+    get "/courses/#{course_id}/assignments"
+  end
+
 end

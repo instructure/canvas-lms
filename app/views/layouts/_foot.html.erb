@@ -1,5 +1,13 @@
 <%= InstFS.login_pixel(logged_in_user, session, request.host_with_port) if logged_in_user && !@files_domain %>
 
+<% if @js_env_data_we_need_to_render_later %>
+  <script>
+    Object.assign(
+      ENV,
+      <%= raw StringifyIds.recursively_stringify_ids(@js_env_data_we_need_to_render_later).to_json %>
+    )
+  </script>
+<% end %>
 <%= include_css_bundles %>
 <%= include_js_bundles %>
 <%= include_account_js %>

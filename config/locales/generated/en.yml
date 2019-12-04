@@ -654,8 +654,6 @@ en:
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: Allow course images to be assigned to a course and used on the dashboard cards.
   responsive_layout_54e4ca06: Responsive Layout
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: This is a feature to allow the development of a responsive layout
-  turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: Turn on RTL Even For Non-RTL Languages
-  this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: This is just a dev-only feature you can turn on to get a preview of how pages would look in a RTL environment, without having to change your language to one that is normally RTL
   enable_i18n_features_in_outcomes_exports_64bcf82b: Enable i18n features in outcomes exports
   enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: Enable byte_order_mark and semi_colon_field_separator user-level feature flags to be toggled on or off for outcomes exports.
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: Include Byte-Order Mark in compatible spreadsheet exports
@@ -717,6 +715,8 @@ en:
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray.
   course_favorites_from_dashboard_27a3515a: Course Favorites From Dashboard
   this_allows_the_user_to_unfavorite_a_course_direct_828d0587: This allows the user to unfavorite a course directly from its dashboard card.
+  import_commons_favorites_e68fce81: Import Commons Favorites
+  if_commons_is_installed_allows_importing_favorited_eff368f: If Commons is installed, allows importing favorited content items from within Canvas.
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
           to view a log of those events once a submission is made.
@@ -738,6 +738,8 @@ en:
   behaviour_change_related_to_the_bugfix_in_apg_122__63cfa767: Behaviour change related to the bugfix in APG-122. Do not allow custom columns to be created that are titled the same as gradebook importer reserved names, also ignore non-active custom columns on gradebook import as well as those that use reserved names.
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: Add Grading Scheme to Admin Grade Reports
   includes_grade_values_in_the_admin_grade_reports_a28200da: Includes grade values in the admin grade reports.
+  allow_postable_submission_comments_a301b742: Allow Postable Submission Comments
+  for_manually_posted_assignments_the_presence_of_a__8aabf3cc: For manually posted assignments, the presence of a submission comment not by the submission's own user will allow posting the assignment. Previously, this would have required a grade before posting could occur.
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   this_is_a_siteadmin_test_feature_flag_3ab5184: This is a SiteAdmin test Feature Flag
@@ -748,6 +750,8 @@ en:
   use_the_new_assignments_student_page_944262af: Use the new assignments student page
   pronouns_for_users_da46fb5: Pronouns for users
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: Allows users to pick pronouns that will be displayed after their name when it is shown in the user interface.
+  immediate_notifications_for_global_announcements_682f5a3d: Immediate notifications for global announcements
+  if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: If you turn this on, when an account admin goes to the page to create a global announcement, a checkbox will appear to send notification directly to users when announcement starts.
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_dc466585: |-
     Differentiate between system- and user-generated live events
@@ -1813,8 +1817,8 @@ en:
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: Complete registration by clicking the “finish the registration process” link sent to your email.
   must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: must be logged in and registered to perform that action
   please_log_in_to_view_this_content_eec6cd0: Please Log in to view this content
-  you_ll_need_to_accept_the_enrollment_invitation_be_f2ffe13: You'll need to accept the enrollment invitation before you can fully participate in this course, starting on %{date}.
-  you_ll_need_to_accept_the_enrollment_invitation_be_e3c86b26: You'll need to accept the enrollment invitation before you can fully participate in this course.
+  you_ll_need_to_accept_the_enrollment_invitation_be_441a617b: You'll need to *accept the enrollment invitation* before you can fully participate in this course, starting on %{date}.
+  you_ll_need_to_accept_the_enrollment_invitation_be_1e962788: You'll need to *accept the enrollment invitation* before you can fully participate in this course.
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: This course hasn’t started yet. You will not be able to participate in this course until %{date}.
   crumbs:
     site_admin: Site Admin
@@ -5017,7 +5021,6 @@ en:
         view_your_profile: view your profile
         google_drive: Google Drive
         skype: Skype
-        linkedin: LinkedIn
         twitter: Twitter
         delicious: Delicious
         diigo: Diigo
@@ -5028,7 +5031,6 @@ en:
         unregister_service: Unregister Service
         authorize_google_drive: Authorize Google Drive
         register_skype: Register Skype
-        authorize_linkedin: Authorize LinkedIn
         authorize_twitter: Authorize Twitter
         delicious_login: Delicious Login
         diigo_login: Diigo Login
@@ -5075,7 +5077,6 @@ en:
         update_settings: Update Settings
         authorize_google_drive: Authorize Google Drive Access
         save_skype_name: Save Skype Name
-        register_linkedin_account: Register Your LinkedIn Account
         authorize_twitter: Authorize Twitter Access
         save_login: Save Login
         new_access_token: New Access Token
@@ -5093,7 +5094,6 @@ en:
         other_services: Other Services
         google_drive_access: Google Drive Access
         share_skype_id: Share your Skype ID
-        linkedin_access: LinkedIn Access
         twitter_access: Twitter Access
         delicious_login: Delicious Login
         diigo_login: Diigo Login
@@ -5107,7 +5107,6 @@ en:
       no_registered_services: No Registered Services
       google_drive_description: Once you authorize us to see your Google Drive you'll be able to submit your assignments directly from Google Drive, and create and share documents with members of your classes.
       skype_description: Skype offers free online voice and video calls. Lots of students use Skype as a free, easy way to communicate. If you register your Skype Name and enable visibility, then other students can easily find your contact and call or add you using Skype.
-      linkedin_description: LinkedIn is a great resources for business networking, and can be helpful long after you've finished your education. If you have a LinkedIn account, you can register it here. Then if you allow fellow course/group members to see your registered services, they can easily invite you to link with them without having to search LinkedIn for your profile.
       twitter_description: |-
         Twitter is a service for posting and subscribing to short messages.
         If you have a Twitter account, you can register it here.  Then if you allow
@@ -6325,8 +6324,6 @@ en:
     service_not_enabled: That service has not been enabled
     google_drive_added: Google Drive account successfully added!
     oauth_fail: OAuth Request failed. Couldn't find valid request
-    linkedin_added: LinkedIn account successfully added!
-    linkedin_fail: LinkedIn authorization failed. Please try again
     twitter_added: Twitter access authorized!
     twitter_fail_whale: Twitter authorization failed. Please try again
     user_atom_feed: User Atom Feed (All Courses)
@@ -6936,6 +6933,7 @@ en:
   testing_state_effd4a82: Testing state
   received_cas_ticket_ea1bbeb: Received CAS Ticket
   validated_service_ticket_20d1fcec: Validated Service Ticket
+  user_is_from_unacceptable_domain_domain_b4b6fd1b: User is from unacceptable domain %{domain}.
   authentication_provider/ldap:
     test_host_unknown: 'Unknown host: %{host}'
     test_connection_timeout: Timeout when connecting
@@ -7380,6 +7378,7 @@ en:
     no_description: No Description
     no_comment: No Comment
   child_course_must_belong_to_the_same_root_account__66ed7b8e: Child course must belong to the same root account as master course
+  untitled_16aa4f2b: Untitled
   message:
     default_subject: Canvas Alert
   anonymous_re_submission_assignment_title_d9402721: 'Anonymous Re-Submission: %{assignment_title}'
@@ -7843,6 +7842,8 @@ en:
   catalog_manage_f57e50f3: Catalog - manage
   courses_add_edit_delete_aa2b55d3: Courses - add / edit / delete
   data_services_manage_9b8f96da: 'Data Services - manage '
+  change_course_visibility_eaa2ffc: Change course visibility
+  courses_change_visibility_9150ff1b: Courses - change visibility
   developer_keys_manage_806da2d: 'Developer Keys - manage '
   view_feature_settings_at_an_account_level_ec7f5e10: View feature settings at an account level
   feature_options_view_a170e80c: Feature Options - view
@@ -7982,7 +7983,6 @@ en:
       twitter: Twitter is a great resource for out-of-class communication.
       delicious: Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Delicious accounts to share links of similar interest.
       diigo: Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest.
-      linked_in: LinkedIn is a resource for business networking.  Many of the relationships you build while in school can also be helpful once you enter the workplace.
       skype: Skype is a free tool for online voice and video calls.
   web_conference:
     settings:
@@ -8983,7 +8983,6 @@ en:
   google_drive_7cb003c9: Google Drive
   google_docs_preview_9f41b23c: Google Docs Preview
   skype_18850ba7: Skype
-  linkedin_5726caca: LinkedIn
   twitter_fcef6b54: Twitter
   delicious_7f9ac66f: Delicious
   diigo_993c4646: Diigo
@@ -9064,6 +9063,7 @@ en:
   line_items_828f62cc: Line Items
   liveassessments_92d9edc0: LiveAssessments
   logins_9aee0cbe: Logins
+  media_objects_c2fa37cd: Media Objects
   modules_c4325335: Modules
   names_and_role_ebff0149: Names and Role
   notification_preferences_cf47083d: Notification Preferences
@@ -11299,7 +11299,7 @@ en:
     You will need to create a web application in the [Google Developer Console](%{google_url}).
     You should add %{callback_url} as a redirect URI.
     After you create your app, make a note of the Client ID and Client Secret, and enter them here.
-  to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: To restrict to users from specific Google Apps domain, enter the domain here.
+  to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: To restrict to users from specific Google Apps domains, enter the domain(s) here as a comma separated list. To restrict to a Google Apps user in general, you can enter '*'.
   google_apps_domain_eddc8dee: Google Apps Domain
   just_in_time_provisioning_382a0354: Just in Time Provisioning
   host_8be927e0: Host
@@ -11467,6 +11467,7 @@ en:
   no_items_in_module_21f111a2: No items in module
   delete_requirement_bce2d943: Delete requirement
   export_course_content_f4774b74: Export Course Content
+  modules_settings_a7066f13: Modules Settings
   last_export_899a04c5: 'Last Export:'
   select_indentation_d056bab8: Select indentation
   select_type_of_prerequisite_8d6fa902: Select type of prerequisite
@@ -11600,6 +11601,8 @@ en:
   creative_commons_licenses_7d557d9a: Creative Commons Licenses
   course_visibility_options_ca8ab3a8: Course Visibility Options
   syllabus_visibility_options_a81ef419: Syllabus Visibility Options
+  if_you_need_to_make_your_course_public_please_cont_7084c67b: If you need to make your course public please contact your administrator/support.
+  contact_your_administrator_if_you_need_to_change_c_9002a501: Contact your administrator if you need to change course visibility.
   organize_epub_by_content_type_default_is_by_module_6f44ae06: Organize epub by content type (default is by module).
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: Allow course content to be downloaded and viewed offline
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: can create, rename, and edit course pages by default
@@ -12228,6 +12231,7 @@ en:
   minimize_global_navigation_2d839351: Minimize global navigation
   click_to_report_profile_picture_370f9625: Click to report profile picture
   click_to_report_profile_picture_for_display_name_9ffbcc86: Click to report profile picture for %{display_name}
+  pronouns_d1cd8dd0: Pronouns
   i_ll_write_free_form_comments_when_assessing_stude_5cf50d06: I'll write free-form comments when assessing students
   remove_points_from_rubric_dcd4b585: Remove points from rubric
   don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: Don't post Outcomes results to Learning Mastery Gradebook
@@ -14980,9 +14984,19 @@ en:
                    automatically and do not count against your 50 domain limit.
   inherit_content_security_policy_94aff861: Inherit Content Security Policy
   enable_content_security_policy_8bd0b492: Enable Content Security Policy
+  blocked_domain_name_b5b93150: Blocked Domain Name
+  requested_bbdb5b26: Requested
+  last_attempt_7258ebd7: Last Attempt
+  add_to_whitelist_24f3f1ba: Add to Whitelist
+  csp_violations_337f8529: CSP Violations
+  add_hostname_to_the_whitelist_c808192e: Add %{hostname} to the whitelist
+  violation_log_491edd84: Violation Log
+  something_went_wrong_loading_the_violations_try_re_6e2fa92: Something went wrong loading the violations, try reloading the page.
+  no_violations_have_been_reported_977a08d1: No violations have been reported.
   invalid_domain_e810c1d: Invalid domain
   whitelist_e88fd8ed: Whitelist
   whitelist_count_max_26a270f: Whitelist (%{count}/%{max})
+  view_violation_log_e80ea322: View Violation Log
   you_have_reached_the_domain_limit_you_can_add_more_e5ccc070: You have reached the domain limit.  You can add more domains by deleting existing domains in your whitelist.
   whitelist_editing_is_disabled_when_security_settin_ab40cc90: Whitelist editing is disabled when security settings are inherited from a parent account.
   domain_name_6c783b0: Domain Name
@@ -14998,6 +15012,7 @@ en:
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
     NOTE: Associated tools are only listed once, even if they have
                     been installed in multiple subaccounts.
+  violation_log_tray_d4eff9f4: Violation Log Tray
   user_information_6353d7e1: User information
   full_name_14c958f7: 'Full Name:'
   display_name_6c2cfc58: 'Display Name:'
@@ -15228,6 +15243,7 @@ en:
   error_adding_canvas_file_to_submission_draft_de258021: Error adding canvas file to submission draft
   error_updating_submission_draft_1d40ade7: Error updating submission draft
   error_adding_files_to_submission_draft_6acac337: Error adding files to submission draft
+  uploading_files_5ff8f4fd: Uploading files
   upload_file_fd2361b8: Upload File
   file_permitted_filetypes_714e4e8d: 'File permitted: %{fileTypes}'
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: Drag and drop, or click to browse your computer
@@ -15305,7 +15321,9 @@ en:
   attempt_1_7ba3c30f: Attempt 1
   submission_locked_image_93aced38: Submission Locked Image
   submission_locked_a6074f8b: Submission Locked
+  accept_course_invitation_to_participate_in_this_as_b8342676: Accept course invitation to participate in this assignment
   log_in_to_submit_962106cf: Log in to submit
+  accept_course_invitation_b4c04fbb: Accept course invitation
   log_in_c9e240ef: Log in
   assignment_locked_with_prerequisite_5b8cb148: Assignment Locked with Prerequisite
   prerequisite_completion_period_c562d63: Prerequisite Completion Period
@@ -15642,6 +15660,8 @@ en:
     favorited_tooltip: Click to remove from the courses menu.
     nonfavorited_tooltip: Click to add to the courses menu.
   you_must_log_in_to_view_replies_9ccd4da0: You must log in to view replies
+  this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: This version of Gradebook is being replaced by an updated Gradebook on or before January 18, 2020.
+  learn_more_7a8d626: Learn More
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: Keep in mind, this submission will count for everyone in your %{groupType} group.
   license_help:
     content_license_help: Content Licensing Help
@@ -15959,7 +15979,6 @@ en:
   select_message_type_806b2dea: Select Message Type
   label_values_76f4b5fa: Label Values
   display_values_f517c73c: Display Values
-  must_have_at_least_one_placement_defined_1bc586c6: Must have at least one placement defined.
   remove_placement_90862c13: Remove %{placement}
   field_cannot_be_blank_afb5b332: Field cannot be blank.
   missing_required_fields_please_fill_in_all_require_1e10b2e9: Missing required fields. Please fill in all required fields.
@@ -16218,6 +16237,7 @@ en:
   link_selection_1486c5d0: Link Selection
   migration_selection_5f1c5f55: Migration Selection
   module_menu_3201af4e: Module Menu
+  modules_index_menu_c8748e7c: Modules Index Menu
   quiz_menu_4fcd5e61: Quiz Menu
   user_navigation_a097be0f: User Navigation
   page_menu_2f8bee0: Page Menu
@@ -16416,12 +16436,12 @@ en:
   out_of_pointspossible_3fb5ee20: Out of %{pointsPossible}
   manual_8c2665de: Manual
   muted_3ff94739: Muted
-  no_grades_to_post_91425bfd: No grades to post
   post_grades_3e692d46: Post grades
   all_grades_posted_616a85ab: All grades posted
-  no_grades_to_hide_6f51fc5b: No grades to hide
+  no_grades_to_post_91425bfd: No grades to post
   hide_grades_5ff26682: Hide grades
   all_grades_hidden_3092d5b5: All grades hidden
+  no_grades_to_hide_6f51fc5b: No grades to hide
   name_options_bc5c95ce: "%{name} Options"
   sort_by_72dbba9c: Sort by
   grade_low_to_high_1678b713: Grade - Low to High
@@ -16663,8 +16683,8 @@ en:
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: When posting grades for anonymous assignments, grades will be posted for everyone in the course. Anonymity will be removed.
   select_whether_to_post_for_all_submissions_or_only_b18d681f: Select whether to post for all submissions, or only graded ones.
   post_types_93ff86d9: Post types
-  grades_will_be_made_visible_to_all_students_1cc4d67e: Grades will be made visible to all students
-  grades_will_be_made_visible_to_students_with_grade_d83028d5: Grades will be made visible to students with graded submissions
+  all_students_will_be_able_to_see_their_grade_and_o_66c1beab: All students will be able to see their grade and/or submission comments.
+  students_who_have_received_a_grade_or_a_submission_7ef046cc: Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.
   at_least_one_section_must_be_selected_to_post_grad_2c140f52: At least one section must be selected to post grades by section.
   success_grades_have_been_posted_for_the_selected_s_54c73ef0: Success! Grades have been posted for the selected sections of %{assignmentName}.
   success_grades_have_been_posted_to_postedto_for_as_255bc974: Success! Grades have been posted to %{postedTo} for %{assignmentName}.
@@ -16773,7 +16793,6 @@ en:
   something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: Something went wrong accessing your mic or webcam.
   mic_a7f3d311: Mic
   webcam_fe91b20f: Webcam
-  untitled_16aa4f2b: Untitled
   finish_bc343002: Finish
   no_video_1ed00b26: No Video
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: Please allow Canvas to access your microphone and webcam.
@@ -16787,12 +16806,7 @@ en:
   duplicating_module_9727f5e4: Duplicating Module...
   move_item_failed_8e4c1db6: Move Item Failed
   close_move_tray_8609e988: close move tray
-  select_one_b647b384: Select one
   group_select_330df8bd: Group Select
-  position_select_c2dd3980: Position Select
-  item_select_fe0f320a: Item Select
-  place_b128fa94: Place
-  place_title_2c183274: Place "%{title}"
   at_the_top_fa836591: At the Top
   before_cb32fc0: Before..
   after_48b9d69: After..
@@ -17905,6 +17919,11 @@ en:
   content_share_started_successfully_2c37fb79: Content share started successfully
   error_starting_content_share_18fb1532: Error starting content share
   remove_name_624e06be: Remove %{name}
+  select_one_b647b384: Select one
+  item_select_fe0f320a: Item Select
+  place_b128fa94: Place
+  place_title_2c183274: Place "%{title}"
+  position_select_c2dd3980: Position Select
   yyyy_mm_dd_hh_mm_a01b6081: YYYY-MM-DD hh:mm
   other_1c6d9c79: Other
   wiki_6603e81b: Wiki

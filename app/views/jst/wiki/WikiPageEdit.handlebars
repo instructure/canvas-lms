@@ -48,7 +48,7 @@
           {{/if}}
         </select>
       </div>
-      {{#if ENV.STUDENT_PLANNER_ENABLED}}
+      {{#if ENV.CAN_SET_TODO_DATE}}
         <div class="controls">
           <label for="student_planner_checkbox" class="checkbox">
           <input value="1" type="checkbox" id="student_planner_checkbox" name="student_planner_checkbox" {{checkedIf todo_date}} />

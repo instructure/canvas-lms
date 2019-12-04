@@ -93,6 +93,7 @@ export default class ExternalToolPlacementButton extends React.Component {
       link_selection: I18n.t('Link Selection'),
       migration_selection: I18n.t('Migration Selection'),
       module_menu: I18n.t('Module Menu'),
+      module_index_menu: I18n.t('Modules Index Menu'),
       post_grades: I18n.t('Sync Grades'),
       quiz_menu: I18n.t('Quiz Menu'),
       student_context_card: I18n.t('Student Context Card'),

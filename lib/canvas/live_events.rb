@@ -631,7 +631,7 @@ module Canvas::LiveEvents
   def self.get_learning_outcome_result_data(result)
     {
       learning_outcome_id: result.learning_outcome_id,
-      mastery: result.learning_outcome_id,
+      mastery: result.mastery,
       score: result.score,
       created_at: result.created_at,
       attempt: result.attempt,

@@ -229,6 +229,7 @@ export default class StudentContextTray extends React.Component {
                             <Button
                               variant="link"
                               size="large"
+                              fluidWidth
                               href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
                               aria-label={I18n.t("Go to %{name}'s profile", {
                                 name: user.short_name + ' ' + user.pronouns

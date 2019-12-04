@@ -25,6 +25,7 @@ module Importers
     def self.process_migration_course_outline(data, migration)
       outline = data['course_outline'] ? data['course_outline']: nil
       return unless outline
+      return unless migration.import_object?('course_outline', outline['migration_id'])
       to_import = migration.to_import 'outline_folders'
 
       outline['root_folder'] = true

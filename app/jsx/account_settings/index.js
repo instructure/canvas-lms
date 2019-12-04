@@ -22,10 +22,6 @@ import {Provider} from 'react-redux'
 import {ConnectedSecurityPanel} from './components/SecurityPanel'
 import {configStore, defaultState} from './store'
 
-export const CONFIG = {
-  max_domains: 50
-}
-
 export function start(element, props = {}, state = defaultState) {
   const initialState = {...state}
   if (props.initialCspSettings) {
@@ -34,9 +30,14 @@ export function start(element, props = {}, state = defaultState) {
   }
   const store = configStore(initialState, props.api)
 
+  const config = {
+    maxDomains: 50,
+    accountId: window.ENV.ACCOUNT.id
+  }
+
   render(
     <Provider store={store}>
-      <ConnectedSecurityPanel {...props} />
+      <ConnectedSecurityPanel {...config} {...props} />
     </Provider>,
     element
   )

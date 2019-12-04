@@ -29,7 +29,6 @@ import SpeedgraderLinkView from 'compiled/views/assignments/SpeedgraderLinkView'
 import vddTooltip from 'compiled/util/vddTooltip'
 import MarkAsDone from 'compiled/util/markAsDone'
 import CyoeStats from '../conditional_release_stats/index'
-import 'compiled/jquery/ModuleSequenceFooter'
 import 'jquery.instructure_forms'
 import LockManager from '../blueprint_courses/apps/LockManager'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
@@ -91,6 +90,7 @@ function renderStudentGroupFilter() {
   }
 }
 
+const promiseToGetModuleSequenceFooter = import('compiled/jquery/ModuleSequenceFooter')
 $(() => {
   const $el = $('#assignment_publish_button')
   if ($el.length > 0) {
@@ -111,11 +111,13 @@ $(() => {
   }
 
   // Add module sequence footer
-  $('#sequence_footer').moduleSequenceFooter({
-    courseID: ENV.COURSE_ID,
-    assetType: 'Assignment',
-    assetID: ENV.ASSIGNMENT_ID,
-    location
+  promiseToGetModuleSequenceFooter.then(() => {
+    $('#sequence_footer').moduleSequenceFooter({
+      courseID: ENV.COURSE_ID,
+      assetType: 'Assignment',
+      assetID: ENV.ASSIGNMENT_ID,
+      location: window.location
+    })
   })
 
   return vddTooltip()

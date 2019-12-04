@@ -70,6 +70,10 @@ module Api::V1::Submission
       )
     end
 
+    if includes.include?("has_postable_comments")
+      hash["has_postable_comments"] = submission.submission_comments.select(&:hidden?).present?
+    end
+
     if includes.include?("submission_comments")
       published_comments = submission.comments_for(@current_user).published
       hash['submission_comments'] = submission_comments_json(published_comments, current_user)

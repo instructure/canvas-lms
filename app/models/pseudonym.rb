@@ -422,6 +422,7 @@ class Pseudonym < ActiveRecord::Base
     digest == digested_password
   end
 
+  attr_reader :ldap_authentication_provider_used
   def ldap_bind_result(password_plaintext)
     aps = case authentication_provider
           when AuthenticationProvider::LDAP
@@ -434,7 +435,10 @@ class Pseudonym < ActiveRecord::Base
     end
     aps.each do |config|
       res = config.ldap_bind_result(self.unique_id, password_plaintext)
-      return res if res
+      if res
+        @ldap_authentication_provider_used = config
+        return res
+      end
     end
     return nil
   end

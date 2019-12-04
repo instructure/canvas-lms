@@ -299,6 +299,16 @@ describe Message do
       expect{ message.deliver }.not_to raise_error
     end
 
+    it "logs stats on deliver" do
+      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.my_name",
+                                                             {short_stat: "message.deliver",
+                                                              tags: {path_type: "email", notification_name: 'my_name'}})
+
+      message = message_model(dispatch_at: Time.now - 1, notification_name: 'my_name', workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, path_type: 'email', user: @user)
+      expect(message).to receive(:dispatch).and_return(true)
+      @message.deliver
+    end
+
     context 'push' do
       before :once do
         user_model
@@ -654,7 +664,7 @@ describe Message do
     url = "a" * 256
     msg = Message.new
     msg.url = url
-    msg.save!
+    expect{ msg.save! }.to_not raise_error
   end
 
   describe "#context_context" do

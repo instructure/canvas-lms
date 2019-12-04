@@ -402,6 +402,7 @@ class ProfileController < ApplicationController
     @context = @profile
 
     short_name = params[:user] && params[:user][:short_name]
+    @user.pronouns = params[:pronouns] if params[:pronouns]
     @user.short_name = short_name if short_name && @user.user_can_edit_name?
     if params[:user_profile]
       user_profile_params = params[:user_profile].permit(:title, :bio)
@@ -472,7 +473,7 @@ class ProfileController < ApplicationController
   end
 
   def content_shares
-    raise not_found if !@domain_root_account.feature_enabled?(:direct_share) || !@current_user.non_student_enrollment?
+    raise not_found unless @domain_root_account.feature_enabled?(:direct_share) && @current_user.can_content_share?
 
     @user ||= @current_user
     set_active_tab 'content_shares'

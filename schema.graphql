@@ -1463,6 +1463,7 @@ type Group implements LegacyIDInterface & Node & Timestamped {
   _id: ID!
   createdAt: DateTime
   id: ID!
+  member(userId: ID!): GroupMembership
   membersConnection(
     """
     Returns the elements in the list that come after the specified cursor.

@@ -74,7 +74,8 @@ QUnit.module('SubmissionTray', hooks => {
         enteredScore: 10,
         excused: false,
         grade: '7',
-        gradedAt: null,
+        gradedAt: new Date().toISOString(),
+        hasPostableComments: false,
         id: '2501',
         late: false,
         missing: false,
@@ -83,7 +84,8 @@ QUnit.module('SubmissionTray', hooks => {
         score: 7,
         secondsLate: 0,
         submissionType: 'online_text_entry',
-        userId: '27'
+        userId: '27',
+        workflowState: 'graded'
       },
       updateSubmission() {},
       updateSubmissionComment() {},
@@ -94,6 +96,7 @@ QUnit.module('SubmissionTray', hooks => {
         gradingType: 'points',
         htmlUrl: 'http://htmlUrl/',
         id: '30',
+        moderatedGrading: false,
         muted: false,
         pointsPossible: 10,
         postManually: false,
@@ -294,6 +297,24 @@ QUnit.module('SubmissionTray', hooks => {
     })
   })
 
+  QUnit.module('when passing true for postPoliciesEnabled', contextHooks => {
+    contextHooks.beforeEach(() => {
+      defaultProps.postPoliciesEnabled = true
+    })
+
+    test('"Hidden" is displayed when a submission is graded and unposted', () => {
+      defaultProps.submission.workflowState = 'graded'
+      mountComponent()
+      ok(content.textContent.includes('Hidden'))
+    })
+
+    test('"Hidden" is displayed when a submission has comments and is unposted', () => {
+      defaultProps.submission.hasPostableComments = true
+      mountComponent()
+      ok(content.textContent.includes('Hidden'))
+    })
+  })
+
   test('shows avatar if avatar is not null', () => {
     const avatarUrl = 'http://bob_is_not_a_domain/me.jpg?filter=make_me_pretty'
     const gradesUrl = 'http://gradesUrl/'
@@ -332,13 +353,6 @@ QUnit.module('SubmissionTray', hooks => {
     defaultProps.isInNoGradingPeriod = true
     mountComponent()
     ok(content.textContent.includes('This submission is not in any grading period'))
-  })
-
-  test('passes along postPoliciesEnabled prop to SubmissionStatus', () => {
-    defaultProps.postPoliciesEnabled = true
-    defaultProps.submission.workflowState = 'graded'
-    mountComponent()
-    ok(content.textContent.includes('Hidden'))
   })
 
   test('shows student name', () => {

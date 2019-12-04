@@ -33,7 +33,7 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   alias_attribute :hosted_domain, :auth_filter
 
   def hosted_domain=(domain)
-    self.auth_filter = domain.presence
+    self.auth_filter = domain.presence&.strip
   end
 
   def self.login_attributes
@@ -54,11 +54,15 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
 
   def unique_id(token)
     id_token = claims(token)
-    if hosted_domain && id_token['hd'] != hosted_domain
-      # didn't make a "nice" exception for this, cause it should never happen.
-      # either we got MITM'ed (on the server side), or Google's docs lied;
-      # this check is just an extra precaution
-      raise "Non-matching hosted domain: #{id_token['hd'].inspect}"
+    if hosted_domain
+      if !id_token['hd']
+        # didn't make a "nice" exception for this, cause it should never happen.
+        # either we got MITM'ed (on the server side), or Google's docs lied;
+        # this check is just an extra precaution
+        raise "Google Apps user not received, but required"
+      elsif hosted_domain != '*' && !hosted_domains.include?(id_token['hd'])
+        raise OauthValidationError, t("User is from unacceptable domain %{domain}.", domain: id_token['hd'].inspect)
+      end
     end
     super
   end
@@ -77,7 +81,9 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
 
   def authorize_options
     result = { scope: scope_for_options }
-    result[:hd] = hosted_domain if hosted_domain
+    if hosted_domain
+      result[:hd] = hosted_domains.length == 1 ? hosted_domain : '*'
+    end
     result
   end
 
@@ -96,5 +102,9 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
 
   def token_url
     'https://accounts.google.com/o/oauth2/token'.freeze
+  end
+
+  def hosted_domains
+    hosted_domain.split(',').map(&:strip)
   end
 end

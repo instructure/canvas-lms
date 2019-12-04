@@ -618,7 +618,7 @@ class RCEWrapper extends React.Component {
   announceContextToolbars(editor) {
     editor.on('NodeChange', () => {
       const node = editor.selection.getNode()
-      if (isImageEmbed(node)) {
+      if (isImageEmbed(node, editor)) {
         if (this.announcing !== 1) {
           this.setState({
             announcement: formatMessage('type Control F9 to access image options. {text}', {
@@ -627,7 +627,7 @@ class RCEWrapper extends React.Component {
           })
           this.announcing = 1
         }
-      } else if (isFileLink(node)) {
+      } else if (isFileLink(node, editor)) {
         if (this.announcing !== 2) {
           this.setState({
             announcement: formatMessage('type Control F9 to access link options. {text}', {
@@ -636,7 +636,7 @@ class RCEWrapper extends React.Component {
           })
           this.announcing = 2
         }
-      } else if (isElementWithinTable(node)) {
+      } else if (isElementWithinTable(node, editor)) {
         if (this.announcing !== 3) {
           this.setState({
             announcement: formatMessage('type Control F9 to access table options. {text}', {

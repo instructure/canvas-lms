@@ -375,10 +375,9 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
         strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 1)
       })
 
-      test('does not display an unposted grade indicator when submission is graded and posted', () => {
-        submission.workflow_state = 'graded'
-        submission.posted_at = new Date()
-        strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 0)
+      test('displays an unposted grade indicator when a submission comment exists and is unposted', () => {
+        submission.hasPostableComments = true
+        strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 1)
       })
 
       test('does not display an unposted grade indicator when grade is posted', () => {
@@ -386,14 +385,15 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
         strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 0)
       })
 
-      test('does not display an unposted grade indicator when submission not graded', () => {
+      test('does not display an unposted grade indicator when submission has no grade nor comment', () => {
         submission.workflow_state = 'unsubmitted'
         strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 0)
       })
 
-      test('does not display an unposted grade indicator when submission does not have a score', () => {
+      test('does not display an unposted grade indicator when submission does not have a score nor postable comment', () => {
         submission.workflow_state = 'graded'
         submission.score = null
+        submission.hasPostableComments = false
         strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length, 0)
       })
     })

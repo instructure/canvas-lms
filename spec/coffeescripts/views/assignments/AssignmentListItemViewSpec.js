@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {getByText, queryByText, findByText, waitForElementToBeRemoved} from '@testing-library/dom'
+import fetchMock from 'fetch-mock'
 import Backbone from 'Backbone'
 import Assignment from 'compiled/models/Assignment'
 import Submission from 'compiled/models/Submission'
@@ -124,6 +126,7 @@ const createView = function(model, options) {
   options = {
     canManage: true,
     canReadGrades: false,
+    courseId: '42',
     ...options
   }
   ENV.PERMISSIONS = {
@@ -139,6 +142,7 @@ const createView = function(model, options) {
   ENV.POST_TO_SIS = options.post_to_sis
   ENV.DUPLICATE_ENABLED = options.duplicateEnabled
   ENV.DIRECT_SHARE_ENABLED = options.directShareEnabled
+  ENV.COURSE_ID = options.courseId
 
   const view = new AssignmentListItemView({
     model,
@@ -170,6 +174,10 @@ const genSetup = function(model = assignment1()) {
 const genTeardown = function() {
   fakeENV.teardown()
   $('#fixtures').empty()
+  // cleanup instui dialogs and trays that render in a portal outside of #fixtures
+  $('[role="dialog"]')
+    .closest('span[dir="ltr"]')
+    .remove()
 }
 
 QUnit.module('AssignmentListItemViewSpec', {
@@ -292,12 +300,23 @@ test('does not initialize sis toggle if sis enabled, can manage and is unpublish
   ok(!view.sisButtonView)
 })
 
-test('shows sharing and copying menu items if DIRECT_SHARE_ENABLED', function() {
-  const view = createView(this.model, {
-    directShareEnabled: true
-  })
-  ok(view.$('.send_assignment_to').length)
-  ok(view.$('.copy_assignment_to').length)
+test('opens and closes the direct share send to user dialog', async function() {
+  const view = createView(this.model, {directShareEnabled: true})
+  $('#fixtures').append('<div id="send-to-mount-point" />')
+  view.$('.send_assignment_to').click()
+  ok(await findByText(document.body, 'Send to:'))
+  getByText(document.body, 'Close').click()
+  await waitForElementToBeRemoved(() => queryByText(document.body, 'Send to:'))
+})
+
+test('opens and closes the direct share copy to course tray', async function() {
+  const view = createView(this.model, {directShareEnabled: true})
+  $('#fixtures').append('<div id="copy-to-mount-point" />')
+  view.$('.copy_assignment_to').click()
+  fetchMock.mock('/users/self/manageable_courses', [])
+  ok(await findByText(document.body, 'Select a Course'))
+  getByText(document.body, 'Close').click()
+  await waitForElementToBeRemoved(() => queryByText(document.body, 'Select a Course'))
 })
 
 test('does not show sharing and copying menu items if not DIRECT_SHARE_ENABLED', function() {

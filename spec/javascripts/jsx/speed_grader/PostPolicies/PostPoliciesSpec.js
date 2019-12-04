@@ -212,6 +212,7 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       const submission = {
         id: '93',
         assignment_id: '2301',
+        has_postable_comments: true,
         posted_at: new Date().toISOString(),
         score: 1.0,
         user_id: '441',
@@ -220,7 +221,12 @@ QUnit.module('SpeedGrader PostPolicies', suiteHooks => {
       postPolicies.showPostAssignmentGradesTray({submissions: [submission]})
       const {submissions} = postGradesShowArgs()
       deepEqual(submissions, [
-        {postedAt: submission.posted_at, score: 1.0, workflowState: submission.workflow_state}
+        {
+          hasPostableComments: true,
+          postedAt: submission.posted_at,
+          score: 1.0,
+          workflowState: submission.workflow_state
+        }
       ])
     })
 

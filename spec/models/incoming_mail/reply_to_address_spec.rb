@@ -20,7 +20,7 @@ require File.expand_path('../../sharding_spec_helper.rb', File.dirname(__FILE__)
 require File.expand_path('../../spec_helper.rb', File.dirname(__FILE__))
 
 describe IncomingMail::ReplyToAddress do
-  let(:expect_secure_id) { Canvas::Security.hmac_sha1(Shard.short_id_for(@shard1.global_id_for(42))) }
+  let(:expect_secure_id) { Canvas::Security.hmac_sha1(Shard.short_id_for(@shard1.global_id_for(42)))[0..15] }
 
   describe 'initialize' do
     it 'should persist the message argument' do
@@ -62,6 +62,21 @@ describe IncomingMail::ReplyToAddress do
         short_id = Shard.short_id_for(@shard1.global_id_for(42))
 
         expect(IncomingMail::ReplyToAddress.new(message).address).to eq "canvas+#{expect_secure_id}-#{short_id}-#{created_at.to_i}@example.com"
+      end
+
+      it 'should limit a reply-to address to 64 chars before @' do
+        message = double()
+
+        expect(message).to receive(:path_type).and_return('email')
+        expect(message).to receive(:context_type).and_return('Course')
+        expect(message).to receive(:id).twice.and_return(Shard::IDS_PER_SHARD-1)
+        @shard1.id = 123456
+        @shard1.save!
+        expect(message).to receive(:global_id).twice.and_return(@shard1.global_id_for(Shard::IDS_PER_SHARD-1))
+        created_at = 50.years.from_now
+        expect(message).to receive(:created_at).and_return(created_at)
+
+        expect(IncomingMail::ReplyToAddress.new(message).address.split('@').first.length < 64).to be_truthy
       end
     end
   end

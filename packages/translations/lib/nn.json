@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Innspeling av lyd og bilde er ikkje tilgjengeleg."
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "Audiospelar for { title }"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Opne automatisk i integrert førehandsvising (sjå førehandsvisinga etter lagring)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(Skildre bildet)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "(Skildre videoen)"
+    },
     "details_98a31b68": {
         "message": "Detaljar"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "Sett inn-førehandsvising"
+    },
+    "embed_video_a97a64af": {
+        "message": "Integrer video"
     },
     "embed_video_code_703e10f2": {
         "message": "Sett inn videokode"
@@ -1004,6 +1013,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Skjermlesarar brukar dette for å skildre innhaldet i eit bilde"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Brukt av skjermlesarar for å skildre videoen"
+    },
     "user_documents_c206e61f": {
         "message": "Brukardokument"
     },
@@ -1024,6 +1036,12 @@
     },
     "video_player_b371005": {
         "message": "Videoavspelar"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "Videospelar for"
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "Videospelar for { title }"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Sjå hurtigtastar"

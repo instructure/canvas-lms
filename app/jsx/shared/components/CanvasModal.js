@@ -22,7 +22,7 @@ import {string, node, func, oneOfType} from 'prop-types'
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex, View} from '@instructure/ui-layout'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-overlays'
 
 import ErrorBoundary from './ErrorBoundary'

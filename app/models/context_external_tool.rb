@@ -164,7 +164,10 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def has_placement?(type)
-    if Lti::ResourcePlacement::DEFAULT_PLACEMENTS.include? type.to_s
+    # Only LTI 1.0 tools (no developer key) support default placements
+    # (LTI 2 tools also, but those are not handled by this class)
+    if developer_key_id.blank? &&
+        Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include?(type.to_s)
       !!(self.selectable && (self.domain || self.url))
     else
       self.context_external_tool_placements.to_a.any?{|p| p.placement_type == type.to_s}
@@ -681,8 +684,11 @@ end
 
   scope :placements, lambda { |*placements|
     if placements.present?
-      default_placement_sql = if (placements.map(&:to_s) & Lti::ResourcePlacement::DEFAULT_PLACEMENTS).present?
-                          "(context_external_tools.not_selectable IS NOT TRUE AND
+      # Default placements are only applicable to LTI 1.0. Ignore
+      # LTI 1.3 tools with developer_key_id IS NULL
+      default_placement_sql = if (placements.map(&:to_s) & Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).present?
+                          "(context_external_tools.developer_key_id IS NULL AND
+                           context_external_tools.not_selectable IS NOT TRUE AND
                            ((COALESCE(context_external_tools.url, '') <> '' ) OR
                            (COALESCE(context_external_tools.domain, '') <> ''))) OR "
                         else

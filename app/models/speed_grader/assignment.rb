@@ -177,6 +177,10 @@ module SpeedGrader
           json.merge! provisional_grade_to_json(provisional_grade)
         end
 
+        if course.root_account.feature_enabled?(:allow_postable_submission_comments) && course.post_policies_enabled?
+          json[:has_postable_comments] = sub.submission_comments.select(&:hidden?).present?
+        end
+
         json[:submission_comments] = anonymous_moderated_submission_comments_json(
           assignment: assignment,
           course: course,

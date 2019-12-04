@@ -19,7 +19,7 @@
 import React from 'react'
 import {string} from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import I18n from 'i18n!modal'
 import {Modal} from '@instructure/ui-overlays'
 

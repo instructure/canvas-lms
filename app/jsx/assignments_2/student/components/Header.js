@@ -80,9 +80,6 @@ class Header extends React.Component {
 
   /* eslint-disable jsx-a11y/anchor-is-valid */
   renderFakeMostRecent = () => {
-    // This field is only for use in the InstructureCon demo and will be replaced;
-    // <a> tags without href elements are inaccessible by keyboard and should not normally
-    // be used, this is a quick and dirty measure that will not persist to consumer use.
     return (
       <Flex.Item as="div" align="end" textAlign="end">
         {I18n.t('Calculated by: ')}

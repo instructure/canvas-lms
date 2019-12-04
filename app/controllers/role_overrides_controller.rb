@@ -274,6 +274,7 @@ class RoleOverridesController < ApplicationController
   #     manage_assignments               -- [ TADo] Assignments and Quizzes - add / edit / delete
   #     manage_calendar                  -- [sTADo] Course Calendar - add / edit / delete events
   #     manage_content                   -- [ TADo] Course Content - add / edit / delete
+  #     manage_course_visibility         -- [ TAD ] Course - change visibility
   #     manage_files                     -- [ TADo] Course Files - add / edit / delete
   #     manage_grades                    -- [ TA  ] Grades - edit
   #     manage_groups                    -- [ TAD ] Groups - add / edit / delete

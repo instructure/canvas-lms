@@ -18,8 +18,29 @@
 
 import fetchMock from 'fetch-mock'
 import {renderHook} from '@testing-library/react-hooks'
-
+// eslint-disable-next-line import/no-nodejs-modules
+import EventEmitter from 'events'
 import useFetchApi from '../useFetchApi'
+
+// A lot of promises are involved here and we don't have access to them to know when they have all
+// been resolved, even with fetchMock.flush. So instead we have to wait for a function to be
+// called some number of times to know that the loading has been completed.
+function makeEventedFn({times = 1, arg}) {
+  const ee = new EventEmitter()
+  const promise = new Promise(resolve => ee.on('done', resolve))
+  let fn
+  if (arg !== undefined) {
+    fn = jest.fn(p => {
+      if (p === arg) ee.emit('done')
+    })
+  } else {
+    fn = jest.fn(() => {
+      times -= 1
+      if (times <= 0) ee.emit('done')
+    })
+  }
+  return [fn, promise]
+}
 
 describe('useFetchApi', () => {
   afterEach(() => {
@@ -339,5 +360,107 @@ describe('useFetchApi', () => {
     expect(fetchMock.done()).toBe(true)
     expect(success).not.toHaveBeenCalled()
     expect(error.mock.calls[0][0].response.status).toBe(401)
+  })
+
+  describe('fetchAllPages', () => {
+    it('fetches multiple pages if fetchAllPages is true', async () => {
+      const path = '/api'
+      fetchMock
+        .mock(path, {headers: {link: `<${path}?page=2>;rel="next"`}, body: ['a']})
+        .mock(`${path}?page=2`, {headers: {link: `<${path}?page=3>;rel="next"`}, body: ['b', 'c']})
+        .mock(`${path}?page=3`, ['d', 'e'])
+      const [loading, loadingDone] = makeEventedFn({arg: false})
+      const success = jest.fn()
+      const meta = jest.fn()
+      const error = jest.fn()
+      renderHook(() => useFetchApi({path, loading, success, meta, error, fetchAllPages: true}))
+      await loadingDone
+      expect(fetchMock.done()).toBe(true)
+      expect(loading).toHaveBeenCalledTimes(2)
+      expect(loading).toHaveBeenNthCalledWith(1, true)
+      expect(loading).toHaveBeenNthCalledWith(2, false)
+
+      expect(success).toHaveBeenCalledTimes(3)
+      expect(success).toHaveBeenNthCalledWith(1, ['a'])
+      expect(success).toHaveBeenNthCalledWith(2, ['a', 'b', 'c'])
+      expect(success).toHaveBeenNthCalledWith(3, ['a', 'b', 'c', 'd', 'e'])
+
+      expect(meta).toHaveBeenCalledTimes(3)
+      expect(meta.mock.calls[0][0]).toMatchObject({link: {next: {page: '2'}}})
+      expect(meta.mock.calls[1][0]).toMatchObject({link: {next: {page: '3'}}})
+      expect(meta.mock.calls[2][0]).toMatchObject({link: null})
+
+      expect(error).not.toHaveBeenCalled()
+    })
+
+    it('errors if any page fails', async () => {
+      const path = '/api'
+      fetchMock
+        .mock(path, {headers: {link: `<${path}?page=2>;rel="next"`}, body: ['a']})
+        .mock(`${path}?page=2`, 401)
+      const success = jest.fn()
+      const error = jest.fn()
+      const [loading, loadingDone] = makeEventedFn({arg: false})
+      renderHook(() => useFetchApi({path, loading, success, error, fetchAllPages: true}))
+      await loadingDone
+      expect(success).toHaveBeenCalledTimes(1)
+      expect(success).toHaveBeenCalledWith(['a'])
+      expect(error).toHaveBeenCalledTimes(1)
+      expect(error.mock.calls[0][0].message).toMatch(/unauthorized/i)
+    })
+
+    it('aborts and fetches again if fetchAllPages changes', async () => {
+      const path = '/api'
+      fetchMock.mock(
+        path,
+        {headers: {link: `<${path}?page=bar>;rel="next"`}, body: {foo: 'bar'}},
+        {overwriteRoutes: false}
+      )
+      const success = jest.fn()
+      const error = jest.fn()
+      const [loading, loadingDone] = makeEventedFn({arg: false})
+      const {rerender} = renderHook(
+        ({fetchAllPages}) => useFetchApi({path, loading, success, error, fetchAllPages}),
+        {initialProps: {fetchAllPages: true}}
+      )
+      rerender({fetchAllPages: false})
+      await loadingDone
+      expect(success).toHaveBeenCalledTimes(1)
+      expect(success).toHaveBeenCalledWith({foo: 'bar'}) // called with object instead of array with object
+      expect(error).not.toHaveBeenCalled()
+    })
+
+    it('calls convert on all pages of data', async () => {
+      const path = '/api'
+      fetchMock
+        .mock(path, {headers: {link: `<${path}?page=2>;rel="next"`}, body: [1]})
+        .mock(`${path}?page=2`, {headers: {link: `<${path}?page=3>;rel="next"`}, body: [2, 3]})
+        .mock(`${path}?page=3`, [4, 5])
+      const [loading, loadingDone] = makeEventedFn({arg: false})
+      const success = jest.fn()
+      const meta = jest.fn()
+      const error = jest.fn()
+      const convert = page => page.map(n => n + 10)
+      renderHook(() =>
+        useFetchApi({path, loading, success, meta, error, convert, fetchAllPages: true})
+      )
+      await loadingDone
+      expect(success).toHaveBeenCalledWith([11, 12, 13, 14, 15])
+    })
+
+    it('works with bookmarked pages', async () => {
+      const path = '/api'
+      fetchMock
+        .mock(path, {headers: {link: `<${path}?page=foo>;rel="next"`}, body: [1]})
+        .mock(`${path}?page=foo`, {headers: {link: `<${path}?page=bar>;rel="next"`}, body: [2, 3]})
+        .mock(`${path}?page=bar`, [4, 5])
+      const [loading, loadingDone] = makeEventedFn({arg: false})
+      const success = jest.fn()
+      const meta = jest.fn()
+      const error = jest.fn()
+      renderHook(() => useFetchApi({path, loading, success, meta, error, fetchAllPages: true}))
+      await loadingDone
+      expect(success).toHaveBeenCalledWith([1, 2, 3, 4, 5])
+    })
   })
 })

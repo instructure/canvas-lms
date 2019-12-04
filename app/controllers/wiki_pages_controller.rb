@@ -163,11 +163,13 @@ class WikiPagesController < ApplicationController
 
   private
   def wiki_pages_js_env(context)
+    wiki_index_menu_tools = @domain_root_account&.feature_enabled?(:commons_favorites) ? external_tools_display_hashes(:wiki_index_menu) : []
     @wiki_pages_env ||= {
       :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
-      :wiki_index_menu_tools => external_tools_display_hashes(:wiki_index_menu),
+      :wiki_index_menu_tools => wiki_index_menu_tools,
       :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}),
       :STUDENT_PLANNER_ENABLED => context.root_account.feature_enabled?(:student_planner),
+      :CAN_SET_TODO_DATE => context.root_account.feature_enabled?(:student_planner) && context.grants_right?(@current_user, session, :manage_content),
       :IMMERSIVE_READER_ENABLED => @domain_root_account&.feature_enabled?(:immersive_reader_wiki_pages),
     }
     js_env(@wiki_pages_env)

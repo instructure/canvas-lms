@@ -83,6 +83,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       id: '93',
       assignment_id: '2301',
       excused: false,
+      hasPostableComments: false,
       late_policy_status: null,
       posted_at: null,
       score: null,
@@ -362,34 +363,41 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
           strictEqual(component.props.postGradesAction.featureEnabled, true)
         })
 
-        test('sets hasGrades to true if at least one graded submission is graded', () => {
+        test('sets hasGradesOrPostableComments to true if at least one submission is graded', () => {
           submission.workflow_state = 'graded'
           submission.score = 1
           gradebook.gotChunkOfStudents([student])
           render()
-          strictEqual(component.props.postGradesAction.hasGrades, true)
+          strictEqual(component.props.postGradesAction.hasGradesOrPostableComments, true)
         })
 
-        test('sets hasGrades to false if no submissions are graded', () => {
+        test('sets hasGradesOrPostableComments to false if no submissions are graded', () => {
           gradebook.gotChunkOfStudents([student])
           render()
-          strictEqual(component.props.postGradesAction.hasGrades, false)
+          strictEqual(component.props.postGradesAction.hasGradesOrPostableComments, false)
         })
 
-        test('sets hasGradesToPost to true if at least one graded submission has no posted_at date', () => {
+        test('sets hasGradesOrCommentsToPost to true if at least one submission is graded and unposted', () => {
           submission.workflow_state = 'graded'
           submission.score = 1
           gradebook.gotChunkOfStudents([student])
           render()
-          strictEqual(component.props.postGradesAction.hasGradesToPost, true)
+          strictEqual(component.props.postGradesAction.hasGradesOrCommentsToPost, true)
         })
 
-        test('sets hasGradesToPost to false if all submissions have a posted_at date', () => {
+        test('sets hasGradesOrCommentsToPost to true if at least one submission has a postable comment and unposted', () => {
+          submission.has_postable_comments = true
+          gradebook.gotChunkOfStudents([student])
+          render()
+          strictEqual(component.props.postGradesAction.hasGradesOrCommentsToPost, true)
+        })
+
+        test('sets hasGradesOrCommentsToPost to false if all submissions have a posted_at date', () => {
           submission.posted_at = new Date('Wed Oct 1 1997')
 
           gradebook.gotChunkOfStudents([student])
           render()
-          strictEqual(component.props.postGradesAction.hasGradesToPost, false)
+          strictEqual(component.props.postGradesAction.hasGradesOrCommentsToPost, false)
         })
 
         test('sets newIconsEnabled to true if Gradebook has new_post_policy_icons_enabled set to true', () => {
@@ -447,31 +455,38 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
         sinon.stub(gradebook.postPolicies, 'showHideAssignmentGradesTray')
       })
 
-      test('sets hasGrades to true if at least one graded submission is graded', () => {
+      test('sets hasGradesOrPostableComments to true if at least one submission is graded', () => {
         submission.workflow_state = 'graded'
         submission.score = 1
         gradebook.gotChunkOfStudents([student])
         render()
-        strictEqual(component.props.hideGradesAction.hasGrades, true)
+        strictEqual(component.props.hideGradesAction.hasGradesOrPostableComments, true)
       })
 
-      test('sets hasGrades to false if no submissions are graded', () => {
+      test('sets hasGradesOrPostableComments to true if at least one submission has postable comments', () => {
+        submission.has_postable_comments = true
         gradebook.gotChunkOfStudents([student])
         render()
-        strictEqual(component.props.hideGradesAction.hasGrades, false)
+        strictEqual(component.props.hideGradesAction.hasGradesOrPostableComments, true)
       })
 
-      test('sets hasGradesToHide to true if at least one submission has a posted_at date', () => {
+      test('sets hasGradesOrPostableComments to false if no submissions are graded or have comments', () => {
         gradebook.gotChunkOfStudents([student])
         render()
-        strictEqual(component.props.hideGradesAction.hasGradesToHide, true)
+        strictEqual(component.props.hideGradesAction.hasGradesOrPostableComments, false)
       })
 
-      test('sets hasGradesToHide to false if no submission has a posted_at date', () => {
+      test('sets hasGradesOrCommentsToHide to true if at least one submission has a posted_at date', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.hideGradesAction.hasGradesOrCommentsToHide, true)
+      })
+
+      test('sets hasGradesOrCommentsToHide to false if no submission has a posted_at date', () => {
         submission.posted_at = null
         gradebook.gotChunkOfStudents([student])
         render()
-        strictEqual(component.props.hideGradesAction.hasGradesToHide, false)
+        strictEqual(component.props.hideGradesAction.hasGradesOrCommentsToHide, false)
       })
 
       test('includes a callback to show the "Hide Assignment Grades" tray', () => {

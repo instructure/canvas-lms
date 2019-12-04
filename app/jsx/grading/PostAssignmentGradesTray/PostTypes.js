@@ -44,7 +44,9 @@ export default function PostTypes({anonymousGrading, defaultValue, disabled, pos
           <>
             <Text>{I18n.t('Everyone')}</Text>
             <br />
-            <Text size="small">{I18n.t('Grades will be made visible to all students')}</Text>
+            <Text size="small">
+              {I18n.t('All students will be able to see their grade and/or submission comments.')}
+            </Text>
           </>
         }
         value={EVERYONE}
@@ -56,7 +58,9 @@ export default function PostTypes({anonymousGrading, defaultValue, disabled, pos
             <Text>{I18n.t('Graded')}</Text>
             <br />
             <Text size="small">
-              {I18n.t('Grades will be made visible to students with graded submissions')}
+              {I18n.t(
+                'Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.'
+              )}
             </Text>
           </>
         }

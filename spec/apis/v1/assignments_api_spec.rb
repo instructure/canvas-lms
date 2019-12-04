@@ -3191,6 +3191,14 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    it "should not be able to update position to nil" do
+      @assignment = @course.assignments.create!
+      json = api_update_assignment_call(@course, @assignment, {'position' => ''})
+      @assignment.reload
+      expect(json['position']).to eq 1
+      expect(@assignment.position).to eq 1
+    end
+
     it "should process html content in description on update" do
       @assignment = @course.assignments.create!
 

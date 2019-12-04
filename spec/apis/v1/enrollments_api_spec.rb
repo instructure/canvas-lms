@@ -794,11 +794,14 @@ describe EnrollmentsApiController, type: :request do
 
       found_enrollment_ids = []
       enrollment_num.times do |i|
-        page_num = i + 1
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?page=#{page_num}&per_page=1",
-          :controller=>"enrollments_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}",
-          :per_page => 1, :page => page_num)
-
+        if i == 0
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?per_page=1",
+            :controller => "enrollments_api", :action => "index", :format => "json",
+            :course_id => @course.id.to_s, :per_page => 1)
+        else
+          json = follow_pagination_link('next', {:controller => 'enrollments_api',
+            :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+        end
         id = json[0]["id"]
         id_already_found = found_enrollment_ids.include?(id)
         expect(id_already_found).to be_falsey
@@ -2112,18 +2115,18 @@ describe EnrollmentsApiController, type: :request do
           h
         end
         link_header = response.headers['Link'].split(',')
-        expect(link_header[0]).to match /page=1&per_page=1/ # current page
-        expect(link_header[1]).to match /page=2&per_page=1/ # next page
-        expect(link_header[2]).to match /page=1&per_page=1/ # first page
-        expect(link_header[3]).to match /page=2&per_page=1/ # last page
+        expect(link_header[0]).to match /page=first&per_page=1/ # current page
+        md = link_header[1].match(/page=(bookmark.*)&per_page=1/)  # next page
+        bookmark = md[1]
+        expect(bookmark).to be_present
+        expect(link_header[2]).to match /page=first&per_page=1/ # first page
         expect(json).to eql [enrollments[0]]
 
-        json = api_call(:get, "#{@path}?page=2&per_page=1", @params.merge(:page => 2.to_param, :per_page => 1.to_param))
+        json = api_call(:get, "#{@path}?page=#{bookmark}&per_page=1", @params.merge(:page => bookmark, :per_page => 1.to_param))
         link_header = response.headers['Link'].split(',')
-        expect(link_header[0]).to match /page=2&per_page=1/ # current page
-        expect(link_header[1]).to match /page=1&per_page=1/ # prev page
-        expect(link_header[2]).to match /page=1&per_page=1/ # first page
-        expect(link_header[3]).to match /page=2&per_page=1/ # last page
+        expect(link_header[0]).to match /page=#{bookmark}&per_page=1/ # current page
+        expect(link_header[1]).to match /page=first&per_page=1/ # first page
+        expect(link_header[2]).to match /page=#{bookmark}&per_page=1/ # last page
         expect(json).to eql [enrollments[1]]
       end
     end

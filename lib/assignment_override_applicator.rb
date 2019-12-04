@@ -86,7 +86,7 @@ module AssignmentOverrideApplicator
   def self.overrides_for_assignment_and_user(assignment_or_quiz, user)
     RequestCache.cache("overrides_for_assignment_and_user", assignment_or_quiz, user) do
       Rails.cache.fetch_with_batched_keys(
-          ["overrides_for_assignment_and_user", version_for_cache(assignment_or_quiz), assignment_or_quiz.cache_key(:availability)].cache_key,
+          ["overrides_for_assignment_and_user3", version_for_cache(assignment_or_quiz), assignment_or_quiz.cache_key(:availability)].cache_key,
           batch_object: user, batched_keys: [:enrollments, :groups]) do
         next [] if self.has_invalid_args?(assignment_or_quiz, user)
         context = assignment_or_quiz.context
@@ -128,8 +128,8 @@ module AssignmentOverrideApplicator
           overrides << adhoc.assignment_override if adhoc
 
           if ObserverEnrollment.observed_students(context, user).empty?
-            group = group_override(assignment_or_quiz, user)
-            overrides << group if group
+            groups = group_overrides(assignment_or_quiz, user)
+            overrides += groups if groups
             sections = section_overrides(assignment_or_quiz, user)
             overrides += sections if sections
           else
@@ -186,22 +186,22 @@ module AssignmentOverrideApplicator
     end
   end
 
-  def self.group_override(assignment_or_quiz, user)
+  def self.group_overrides(assignment_or_quiz, user)
     return nil unless assignment_or_quiz.is_a?(Assignment)
     group_category_id = assignment_or_quiz.group_category_id || assignment_or_quiz.discussion_topic.try(:group_category_id)
     return nil unless group_category_id
 
     if assignment_or_quiz.context.user_has_been_student?(user)
-      group = user.current_groups.where(:group_category_id => group_category_id).first
+      group = user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
     else
       group = assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
     end
 
     if group
       if assignment_or_quiz.assignment_overrides.loaded?
-        assignment_or_quiz.assignment_overrides.detect{|o| o.set_type == 'Group' && o.set_id == group.id}
+        assignment_or_quiz.assignment_overrides.select{|o| o.set_type == 'Group' && o.set_id == group.id}
       else
-        assignment_or_quiz.assignment_overrides.where(:set_type => 'Group', :set_id => group.id).first
+        assignment_or_quiz.assignment_overrides.where(:set_type => 'Group', :set_id => group.id).to_a
       end
     end
   end
@@ -315,7 +315,7 @@ module AssignmentOverrideApplicator
   # the same collapsed assignment or quiz, regardless of the user that ended up at that
   # set of overrides.
   def self.collapsed_overrides(assignment_or_quiz, overrides)
-    cache_key = [assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), self.overrides_hash(overrides)].cache_key
+    cache_key = ['collapsed_overrides', assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), self.overrides_hash(overrides)].cache_key
     RequestCache.cache('collapsed_overrides', cache_key) do
       Rails.cache.fetch(cache_key) do
         overridden_data = {}

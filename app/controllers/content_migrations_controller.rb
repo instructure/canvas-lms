@@ -276,6 +276,10 @@ class ContentMigrationsController < ApplicationController
   #   The id of a module in the target course. This will add all imported items
   #   (that can be added to a module) to the given module.
   #
+  # @argument settings[insert_into_module_type] [String,"assignment"|"discussion_topic"|"file"|"page"|"quiz"]
+  #   If provided (and +insert_into_module_id+ is supplied),
+  #   only add objects of the specified type to the module.
+  #
   # @argument settings[insert_into_module_position] [Integer]
   #   The (1-based) position to insert the imported items into the course
   #   (if +insert_into_module_id+ is supplied). If this parameter

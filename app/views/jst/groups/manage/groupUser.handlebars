@@ -1,6 +1,6 @@
 <div class="group-user-name ellipsis">
   <i class="icon-drag-handle" aria-hidden="true"></i>
-  {{name}}
+  {{name}} {{#if pronouns}}<i>({{pronouns}})</i>{{/if}}
 </div>
 {{#if is_inactive}}
   <span style="margin-left:0.5em" class="label"

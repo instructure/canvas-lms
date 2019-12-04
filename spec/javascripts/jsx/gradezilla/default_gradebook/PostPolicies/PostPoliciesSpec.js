@@ -253,6 +253,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       }
       submission = {
         assignment_id: '2301',
+        has_postable_comments: true,
         posted_at: new Date().toISOString(),
         score: 1.0,
         workflow_state: 'graded'
@@ -309,7 +310,12 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
       const [{submissions}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
       deepEqual(submissions, [
-        {postedAt: submission.posted_at, score: 1.0, workflowState: 'graded'}
+        {
+          hasPostableComments: true,
+          postedAt: submission.posted_at,
+          score: 1.0,
+          workflowState: 'graded'
+        }
       ])
     })
 

@@ -1689,6 +1689,59 @@ describe 'Submissions API', type: :request do
       expect(response).to be_forbidden
     end
 
+    describe "has_postable_comments" do
+      let(:assignment) { @course.assignments.create! }
+      let(:student1_sub) { assignment.submissions.find_by(user: @student1) }
+
+      before(:each) do
+        @course.root_account.enable_feature!(:allow_postable_submission_comments)
+        PostPolicy.enable_feature!
+        @course.enable_feature!(:new_gradebook)
+        assignment.ensure_post_policy(post_manually: true)
+      end
+
+      def student_json(params = {grouped: true, student_ids: [@student1.to_param]})
+        api_call(
+          :get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          {
+            controller: "submissions_api",
+            action: "for_students",
+            format: "json",
+            course_id: @course.to_param
+          },
+          params
+        ).first
+      end
+
+      it "is not included when allow_postable_submission_comments feature is not enabled" do
+        @course.root_account.disable_feature!(:allow_postable_submission_comments)
+        expect(student_json.fetch("submissions").first).not_to have_key "has_postable_comments"
+      end
+
+      it "is not included when Post Policies are not enabled" do
+        @course.disable_feature!(:new_gradebook)
+        expect(student_json.fetch("submissions").first).not_to have_key "has_postable_comments"
+      end
+
+      it "is not included when params[:grouped] is not present" do
+        submission_json = student_json({student_ids: [@student1.to_param]})
+        expect(submission_json).not_to have_key "has_postable_comments"
+      end
+
+      it "is true when unposted and hidden comments exist" do
+        student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
+        submission_json = student_json.fetch("submissions").find { |s| s.fetch("id") == student1_sub.id }
+        expect(submission_json.fetch("has_postable_comments")).to be true
+      end
+
+      it "is false when unposted and only non-hidden comments exist" do
+        student1_sub.add_comment(author: @student, comment: "fun assignment!", hidden: false)
+        submission_json = student_json.fetch("submissions").find { |s| s.fetch("id") == student1_sub.id }
+        expect(submission_json.fetch("has_postable_comments")).to be false
+      end
+    end
+
     context 'OriginalityReport' do
       it 'includes has_originality_report if the submission has an originality_report' do
         attachment_model

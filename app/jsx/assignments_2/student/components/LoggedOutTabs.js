@@ -17,46 +17,44 @@
  */
 
 import {Assignment} from '../graphqlData/Assignment'
+import {bool} from 'prop-types'
 import {Flex} from '@instructure/ui-layout'
 import I18n from 'i18n!assignments_2_logged_out_tabs'
 import LoginActionPrompt from './LoginActionPrompt'
 import React, {useState} from 'react'
+import RubricTab from './RubricTab'
 import {Tabs} from '@instructure/ui-tabs'
-import {Text} from '@instructure/ui-elements'
 
 LoggedOutTabs.propTypes = {
-  assignment: Assignment.shape
+  assignment: Assignment.shape.isRequired,
+  nonAcceptedEnrollment: bool
 }
 
-function LoggedOutTabs(props) {
-  const {selectedTabIndex, setSelectedTabIndex} = useState(0)
-
-  function handleTabChange(event, {index}) {
-    setSelectedTabIndex(index)
-  }
+export default function LoggedOutTabs(props) {
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
 
   return (
     <div>
-      <Tabs onRequestTabChange={handleTabChange} variant="default">
+      <Tabs onRequestTabChange={(event, {index}) => setSelectedTabIndex(index)} variant="default">
         {/* Always attempt 1, cause there is no submission for logged out users */}
         <Tabs.Panel renderTitle={I18n.t('Attempt 1')} selected={selectedTabIndex === 0}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <Flex.Item>
-              <LoginActionPrompt />
+              <LoginActionPrompt nonAcceptedEnrollment={props.nonAcceptedEnrollment} />
             </Flex.Item>
           </Flex>
         </Tabs.Panel>
 
-        <Tabs.Panel renderTitle={I18n.t('Rubric')} selected={selectedTabIndex === 1}>
-          <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-            <Flex.Item>
-              <Text>{`TODO: Input Rubric Content Here... ${props.assignment.title}`}</Text>
-            </Flex.Item>
-          </Flex>
-        </Tabs.Panel>
+        {props.assignment.rubric && (
+          <Tabs.Panel
+            key="rubrics-tab"
+            renderTitle={I18n.t('Rubric')}
+            selected={selectedTabIndex === 2}
+          >
+            <RubricTab rubric={props.assignment.rubric} />
+          </Tabs.Panel>
+        )}
       </Tabs>
     </div>
   )
 }
-
-export default React.memo(LoggedOutTabs)

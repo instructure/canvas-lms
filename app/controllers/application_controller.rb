@@ -121,16 +121,14 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {}, overwrite = false)
-    if hash.present? && @js_env_has_been_rendered
-      begin
-        raise "you tried to add something to js_env after js_env has been rendered. if you are streaming templates, you must js_env from the controller not the view"
-      rescue => e
-        ErrorReport.log_exception('js_env_with_streaming', e)
-        raise e unless Rails.env.production?
-      end
-    end
 
     return {} unless request.format.html? || request.format == "*/*" || @include_js_env
+
+    if hash.present? && @js_env_has_been_rendered
+      add_to_js_env(hash, (@js_env_data_we_need_to_render_later ||= {}), overwrite)
+      return
+    end
+
     # set some defaults
     unless @js_env
       benchmark("init @js_env") do
@@ -189,17 +187,21 @@ class ApplicationController < ActionController::Base
       end
     end
 
-    hash.each do |k,v|
-      if @js_env[k] && !overwrite
-        raise "js_env key #{k} is already taken"
-      else
-        @js_env[k] = v
-      end
-    end
+    add_to_js_env(hash, @js_env, overwrite)
 
     @js_env
   end
   helper_method :js_env
+
+  def add_to_js_env(hash, jsenv, overwrite)
+    hash.each do |k,v|
+      if jsenv[k] && !overwrite
+        raise "js_env key #{k} is already taken"
+      else
+        jsenv[k] = v
+      end
+    end
+  end
 
   def render_js_env
     res = StringifyIds.recursively_stringify_ids(js_env.clone).to_json
@@ -342,6 +344,11 @@ class ApplicationController < ActionController::Base
     css_bundle :blueprint_courses
 
     master_course = is_master ? @context : MasterCourses::MasterTemplate.master_course_for_child_course(@context)
+    if master_course.nil?
+      # somehow the is_child_course? value is cached but we can't actually find the subscription so clear the cache and bail
+      Rails.cache.delete(MasterCourses::ChildSubscription.course_cache_key(@context))
+      return
+    end
     bc_data = {
       isMasterCourse: is_master,
       isChildCourse: is_child,
@@ -946,13 +953,16 @@ class ApplicationController < ActionController::Base
       case state
       when :invited
         if @context_enrollment.available_at
-          flash[:html_notice] = mt "You'll need to accept the enrollment invitation before you can fully participate in this course, starting on %{date}.",
-            :date => datetime_string(@context_enrollment.available_at)
+          flash[:html_notice] = t("You'll need to *accept the enrollment invitation* before you can fully participate in this course, starting on %{date}.",
+            :wrapper => view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)),
+            :date => datetime_string(@context_enrollment.available_at))
         else
-          flash[:html_notice] = mt "You'll need to accept the enrollment invitation before you can fully participate in this course."
+          flash[:html_notice] = t("You'll need to *accept the enrollment invitation* before you can fully participate in this course.",
+            :wrapper => view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)))
         end
       when :accepted
-        flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.", :date => datetime_string(@context_enrollment.available_at))
+        flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.",
+          :date => datetime_string(@context_enrollment.available_at))
       end
     end
   end
@@ -1882,8 +1892,6 @@ class ApplicationController < ActionController::Base
         true
       elsif feature == :twitter
         !!Twitter::Connection.config
-      elsif feature == :linked_in
-        !!LinkedIn::Connection.config
       elsif feature == :diigo
         !!Diigo::Connection.config
       elsif feature == :google_drive

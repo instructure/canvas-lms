@@ -348,28 +348,6 @@ TEXT
           </div>
         </div>
       </li>
-      <li id="unregistered_service_linked_in" class="service" style="<%= hidden if services.include?("linked_in") || !feature_and_service_enabled?(:linked_in) %>">
-        <a href="#" class="btn btn-small"><%= image_tag "linked_in_icon.png", :alt => '' %> <%= t('links.linkedin', "LinkedIn") %></a>
-        <div style="display: none; text-align: <%= direction('left') %>;" class="content" title="<%= t('titles.authorize_linkedin', "Authorize LinkedIn") %>" id="unregistered_service_linked_in_dialog">
-          <div>
-            <%= image_tag "linked_in.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
-            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.linkedin_access', "LinkedIn Access") %></div>
-            <%= t(:linkedin_description, <<-TEXT)
-            LinkedIn is a great resources for business networking, and can be
-            helpful long after you've finished your education.
-            If you have a LinkedIn account, you can register it here.  Then if you
-            allow fellow course/group members to see your registered services, they
-            can easily invite you to link with them without having to search LinkedIn
-            for your profile.
-            TEXT
-            %>
-            <div class="clear"></div>
-          </div>
-          <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <a class="btn btn-primary" href="<%= oauth_url(:service => "linked_in", :return_to => settings_profile_url) %>"><%= t('buttons.register_linkedin_account', "Register Your LinkedIn Account") %></a>
-          </div>
-        </div>
-      </li>
       <li id="unregistered_service_twitter" class="service" style="<%= hidden if services.include?("twitter") || !feature_and_service_enabled?(:twitter) %>">
         <a href="#" class="btn btn-small"><%= image_tag "twitter_icon.png", :alt => '' %> <%= t('links.twitter', "Twitter") %></a>
         <div style="display: none; text-align: <%= direction('left') %>;" class="content" title="<%= t('titles.authorize_twitter', "Authorize Twitter") %>" id="unregistered_service_twitter_dialog">

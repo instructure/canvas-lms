@@ -22,6 +22,7 @@ import I18n from 'i18n!pages'
 import WikiPageCollection from 'compiled/collections/WikiPageCollection'
 import WikiPageIndexView from 'compiled/views/wiki/WikiPageIndexView'
 import 'jquery.cookie'
+import {monitorLtiMessages} from 'lti/messages'
 
 const deleted_page_title = $.cookie('deleted_page_title')
 if (deleted_page_title) {
@@ -52,3 +53,5 @@ ready(() => {
   $('#content').append(view.$el)
   view.render()
 })
+
+monitorLtiMessages()

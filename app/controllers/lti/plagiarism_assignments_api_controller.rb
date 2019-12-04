@@ -21,7 +21,7 @@ module Lti
 #
 # @model LtiAssignment
 #     {
-#       "id": "Assignment",
+#       "id": "LtiAssignment",
 #       "description": "A Canvas assignment",
 #       "properties": {
 #         "id": {

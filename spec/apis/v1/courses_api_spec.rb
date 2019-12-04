@@ -3168,7 +3168,7 @@ describe CoursesController, type: :request do
 
       describe "localized sorting" do
         before do
-          skip("require pg_collkey") unless ActiveRecord::Base.connection.extension_installed?(:pg_collkey)
+          skip_unless_pg_collkey_present
         end
 
         it "should use course-level locale setting for sorting" do

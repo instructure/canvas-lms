@@ -36,7 +36,7 @@ import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
-import {isGraded, isHidden} from 'jsx/grading/helpers/SubmissionHelper'
+import {isGraded, isPostable} from 'jsx/grading/helpers/SubmissionHelper'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition'
@@ -758,7 +758,7 @@ function renderProgressIcon(attachment) {
 function renderHiddenSubmissionPill(submission) {
   const mountPoint = document.getElementById(SPEED_GRADER_HIDDEN_SUBMISSION_PILL_MOUNT_POINT)
 
-  if (isHidden(submission)) {
+  if (isPostable(submission)) {
     ReactDOM.render(
       <Pill variant="warning" text={I18n.t('Hidden')} margin="0 0 small" />,
       mountPoint
@@ -3752,11 +3752,15 @@ function renderPostGradesMenu() {
   const {submissionsMap} = window.jsonData
   const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
 
-  const hasGrades = submissions.some(isGraded)
-  const allowHidingGrades = submissions.some(
+  const hasGradesOrPostableComments = submissions.some(
+    submission => isGraded(submission) || submission.has_postable_comments
+  )
+  const allowHidingGradesOrComments = submissions.some(
     submission => submission && submission.posted_at != null
   )
-  const allowPostingGrades = submissions.some(submission => submission && isHidden(submission))
+  const allowPostingGradesOrComments = submissions.some(
+    submission => submission && isPostable(submission)
+  )
 
   function onHideGrades() {
     EG.postPolicies.showHideAssignmentGradesTray({submissionsMap})
@@ -3767,9 +3771,9 @@ function renderPostGradesMenu() {
   }
 
   const props = {
-    allowHidingGrades,
-    allowPostingGrades,
-    hasGrades,
+    allowHidingGradesOrComments,
+    allowPostingGradesOrComments,
+    hasGradesOrPostableComments,
     onHideGrades,
     onPostGrades
   }
