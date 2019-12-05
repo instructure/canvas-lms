@@ -61,6 +61,14 @@ module CopyToTrayPage
     f("ul[role='listbox']")
   end
 
+  def placement_dropdown
+    f("select[data-testid='select-position']")
+  end
+
+  def placement_dropdown_options
+    placement_dropdown.find_all('option')
+  end
+
   # ------------------------------ Actions --------------------------------
 
 end

@@ -30,7 +30,7 @@ module AssignmentsIndexPage
   end
 
   def manage_assignment_menu(assignment_id)
-    f("#assign_#{assignment_id}_manage_link", assignment_row(assignment_id))
+    f("#assign_#{assignment_id}_manage_link")
   end
 
   def assignment_settings_menu(assignment_id)
