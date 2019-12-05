@@ -30,14 +30,22 @@ pipeline {
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     PACT_BROKER = credentials('PACT_BROKER')
+    
+    MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
+    CACHE_TAG = "canvas-lms:previous-image"
+    POSTGRES_CACHE_TAG = "canvas-lms:previous-postgres-image"
+    CASSANDRA_CACHE_TAG = "canvas-lms:previous-cassandra-image"
+    DYNAMODB_CACHE_TAG = "canvas-lms:previous-dynamodb-image"
   }
 
   stages {
     stage('Start Docker Images') {
       steps {
         timeout(time: 10) {
-          sh 'docker-compose build && docker-compose up -d'
-          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+          script {
+            def dbCommon = load 'build/new-jenkins/groovy/cache-migrations.groovy'
+            dbCommon.createMigrateBuildUpCached()
+          }
         }
       }
     }

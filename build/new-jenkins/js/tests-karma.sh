@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export COMPOSE_FILE="docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml"
+set -x -o errexit -o errtrace -o nounset -o pipefail
 
 NAME='tests-karma-'$JSPEC_GROUP
 

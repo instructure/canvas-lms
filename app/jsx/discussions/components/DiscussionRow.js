@@ -180,7 +180,7 @@ export class DiscussionRow extends Component {
         case 'toggleButton':
           break
         default:
-          throw new Error(I18n.t('Illegal element focus request'))
+          throw new Error('Illegal element focus request')
       }
       this.props.cleanDiscussionFocus()
     }
@@ -238,7 +238,7 @@ export class DiscussionRow extends Component {
         window.location = `${menuTool.base_url}&discussion_topics[]=${id}`
         break
       default:
-        throw new Error(I18n.t('Unknown manage discussion action encountered'))
+        throw new Error('Unknown manage discussion action encountered')
     }
   }
 

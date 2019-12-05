@@ -8,6 +8,11 @@ href="file.content_item.html" target="_blank">LTI
 Deep Linking</a> flow to select an LTI resource from an external tool and 
 associate it with a Canvas module item.
 
+Note: This placement is enabled by default in Canvas for LTI 1.1. It can be
+removed by using the `not_selectable` configuration option (see <a
+href="external_tools.html" target="_blank">External Tools API</a>). For LTI
+1.3, the placement will only be enabled if listed in the `placements` in the
+JSON configuration.
 
 ### Configuring
 For configuration examples and links to the specification, please refer to the <a 

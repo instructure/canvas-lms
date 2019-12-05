@@ -63,7 +63,7 @@
 #         "all_day": {
 #           "description": "the overridden all day flag (present if due_at is overridden)",
 #           "example": true,
-#           "type": "integer"
+#           "type": "boolean"
 #         },
 #         "all_day_date": {
 #           "description": "the overridden all day date (present if due_at is overridden)",

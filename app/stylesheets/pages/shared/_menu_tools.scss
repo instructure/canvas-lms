@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-a.menu_tool_link img.icon {
-  max-width: 16px;
+a.menu_tool_link, a.menu_tray_tool_link {
+  img.icon {
+    max-width: 16px;
+  }
 }

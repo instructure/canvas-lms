@@ -24,14 +24,15 @@ import {Flex, View} from '@instructure/ui-layout'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {List, Pill, Text} from '@instructure/ui-elements'
 import natcompare from 'compiled/util/natcompare'
+import TruncateWithTooltip from '../../shared/components/TruncateWithTooltip'
 import Outcome from './Outcome'
 import * as shapes from './shapes'
 
 const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup) => (
   <Flex justifyItems="space-between">
-    <Flex.Item padding="0 x-small 0 0">
+    <Flex.Item padding="0 x-small 0 0" size="0" grow>
       <Text size="large" weight="bold">
-        {outcomeGroup.title}
+        <TruncateWithTooltip>{outcomeGroup.title}</TruncateWithTooltip>
       </Text>
     </Flex.Item>
     <Flex.Item>

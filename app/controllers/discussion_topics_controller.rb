@@ -408,6 +408,8 @@ class DiscussionTopicsController < ApplicationController
             publish: user_can_moderate
           },
           discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
+          discussion_topic_index_menu_tools: (@domain_root_account&.feature_enabled?(:commons_favorites) ?
+            external_tools_display_hashes(:discussion_topic_index_menu) : []),
         }
         if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && @js_env&.dig(:COURSE_ID).blank?
           hash[:COURSE_ID] = @context.id.to_s

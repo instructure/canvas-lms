@@ -23,6 +23,8 @@ describe "/context_modules/index" do
   before :each do
     assign(:body_classes, [])
     assign(:menu_tools, Hash.new([]))
+    assign(:module_index_tools, [])
+    assign(:module_group_tools, [])
     assign(:collapsed_modules, [])
   end
 

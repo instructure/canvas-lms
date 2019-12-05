@@ -46,6 +46,7 @@ export default combineReducers({
   deleteFocusPending: deleteFocusReducer,
   discussions: createPaginatedReducer('discussions'),
   discussionTopicMenuTools: identity([]),
+  discussionTopicIndexMenuTools: identity([]),
   isSavingSettings: isSavingSettingsReducer,
   isSettingsModalOpen: isSettingsModalOpenReducer,
   masterCourseData: identity(null),

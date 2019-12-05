@@ -1,0 +1,1070 @@
+{
+    "accessibility_checker_b3af1f6c": {
+        "message": "Vérificateur d’accessibilité"
+    },
+    "add_8523c19b": {
+        "message": "Ajouter"
+    },
+    "add_cc_subtitles_55f0394e": {
+        "message": "Ajouter CC/Sous-titres"
+    },
+    "add_to_do_7537af64": {
+        "message": "Ajouter aux tâches à faire"
+    },
+    "add_to_do_7def3c37": {
+        "message": "Ajouter à faire"
+    },
+    "address_3159962f": {
+        "message": "Adresse :"
+    },
+    "align_11050992": {
+        "message": "Aligner"
+    },
+    "align_center_ca078feb": {
+        "message": "Centrer"
+    },
+    "align_left_e9f1f93b": {
+        "message": "Aligner à gauche"
+    },
+    "align_right_9bad3ac1": {
+        "message": "Aligner à droite"
+    },
+    "alignment_and_indentation_f7de34bf": {
+        "message": "Alignement et indentation"
+    },
+    "all_4321c3a1": {
+        "message": "Tous"
+    },
+    "all_day_fb42c4fc": {
+        "message": "Toute la journée"
+    },
+    "all_items_loaded_aa256183": {
+        "message": "Tous les éléments ont été chargés"
+    },
+    "alphabetical_55b5b4e0": {
+        "message": "Alphabétique"
+    },
+    "alt_text_611fb322": {
+        "message": "Texte alternatif"
+    },
+    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+        "message": "Une erreur s''est produite lors de la tentative de rejet de l''opportunité."
+    },
+    "an_error_occurred_generating_the_file_preview_cf259955": {
+        "message": "Une erreur s''est produite lors de la génération de l''aperçu du fichier"
+    },
+    "announcement_fb4cb645": {
+        "message": "Annonce"
+    },
+    "announcement_list_da155734": {
+        "message": "Liste des annonces"
+    },
+    "announcements_a4b8ed4a": {
+        "message": "Annonces"
+    },
+    "apps_54d24a47": {
+        "message": "Applications"
+    },
+    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+        "message": "Êtes-vous sûr de vouloir supprimer cet élément de planificateur ?"
+    },
+    "aspect_ratio_will_be_preserved_cb5fdfb8": {
+        "message": "Les proportions seront préservées."
+    },
+    "assignment_976578a8": {
+        "message": "Travaux"
+    },
+    "assignments_1e02582c": {
+        "message": "Travaux"
+    },
+    "assignmenttype_title_6612d008": {
+        "message": "{ assignmentType } { title }."
+    },
+    "assignmenttype_title_all_day_on_datetime_9768903c": {
+        "message": "{ assignmentType } { title }, toute la journée le { datetime }."
+    },
+    "assignmenttype_title_at_datetime_478f0709": {
+        "message": "{ assignmentType } { title }, à { datetime }."
+    },
+    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+        "message": "{ assignmentType } { title }, à { datetime } jusqu''à { endTime }"
+    },
+    "assignmenttype_title_due_datetime_a112d8ff": {
+        "message": "{ assignmentType } { title }, à rendre le { datetime }."
+    },
+    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+        "message": "{ assignmentType } { title } a un temps à faire à { datetime }."
+    },
+    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+        "message": "{ assignmentType } { title } est marqué comme étant fait."
+    },
+    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+        "message": "{ assignmentType } { title } n''est pas marqué comme étant fait."
+    },
+    "assignmenttype_title_posted_datetime_cab69444": {
+        "message": "{ assignmentType } { title } publié { datetime }."
+    },
+    "assignmenttype_title_reminder_datetime_33fa66d5": {
+        "message": "{ assignmentType } { title }, rappel { datetime }."
+    },
+    "audio_and_video_recording_is_not_available_c7173efc": {
+        "message": "L''enregistrement audio et vidéo n''est pas disponible."
+    },
+    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+        "message": "Ouvrir automatiquement un aperçu en ligne. (L''aperçu ne s''affiche qu''après l''enregistrement)"
+    },
+    "beginning_of_your_to_do_history_61ef2dce": {
+        "message": "Début de votre historique des choses à faire"
+    },
+    "calendar_a8563bb2": {
+        "message": "Calendrier :"
+    },
+    "calendar_event_89aadc1c": {
+        "message": "Événement de calendrier"
+    },
+    "cancel_caeb1e68": {
+        "message": "Annuler"
+    },
+    "canvas_planner_98ed106": {
+        "message": "Agenda Canvas"
+    },
+    "canvas_plugins_705a5016": {
+        "message": "Modules d’extension Canvas"
+    },
+    "choose_caption_file_9c45bc4e": {
+        "message": "Choisir le fichier de légende"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "liste non ordonnée à puces rondes"
+    },
+    "clear_selected_file_82388e50": {
+        "message": "Effacer le fichier sélectionné"
+    },
+    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+        "message": "Cliquez sur une page pour insérer un lien dans cette page."
+    },
+    "click_to_embed_imagename_c41ea8df": {
+        "message": "Cliquez pour intégrer { imageName }"
+    },
+    "click_to_insert_a_link_into_the_editor_c19613aa": {
+        "message": "Cliquez pour insérer un lien dans l''éditeur."
+    },
+    "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+        "message": "Fermer un menu ou une boîte de dialogue. Permet également de revenir à la zone d''édition."
+    },
+    "close_d634289d": {
+        "message": "Fermer"
+    },
+    "close_opportunity_center_popup_9907d981": {
+        "message": "Fermer la fenêtre pop-up du centre d''opportunités"
+    },
+    "collaborations_5c56c15f": {
+        "message": "Collaborations"
+    },
+    "collapse_to_hide_types_1ab46d2e": {
+        "message": "Réduisez pour masquer { types }"
+    },
+    "computer_1d7dfa6f": {
+        "message": "Ordinateur"
+    },
+    "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
+        "message": "Le contenu est toujours en cours de téléchargement, si vous continuez, il ne sera pas intégré correctement."
+    },
+    "content_subtype_5ce35e88": {
+        "message": "Sous-type de contenu"
+    },
+    "content_type_2cf90d95": {
+        "message": "Type de contenu"
+    },
+    "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+        "message": "{ count, plural,\n     =0 {0 mot}\n    one {1 mot}\n  other {# mots}\n}"
+    },
+    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+        "message": "{ count, plural,\n     =0 {# opportunités}\n    one {# opportunité}\n  other {# opportunités}\n}"
+    },
+    "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+        "message": "{ count, plural,\n    one {# élément chargé}\n  other {# éléments chargés}\n}"
+    },
+    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {Afficher # l''élément terminé}\n  other {Afficher # les éléments terminés}\n}"
+    },
+    "course_8a63b4a3": {
+        "message": "Cours"
+    },
+    "course_documents_104d76e0": {
+        "message": "Documents du cours"
+    },
+    "course_files_62deb8f8": {
+        "message": "Fichiers du cours"
+    },
+    "course_images_f8511d04": {
+        "message": "Images du cours"
+    },
+    "course_links_b56959b9": {
+        "message": "Liens du cours"
+    },
+    "course_media_ec759ad": {
+        "message": "Médias du cours"
+    },
+    "course_navigation_dd035109": {
+        "message": "Barre de navigation des cours"
+    },
+    "course_to_do_bcbbab54": {
+        "message": "{ course } À FAIRE"
+    },
+    "current_volume_level_c55ab825": {
+        "message": "Niveau de volume actuel"
+    },
+    "custom_6979cd81": {
+        "message": "Personnalisé"
+    },
+    "date_added_ed5ad465": {
+        "message": "Date ajoutée"
+    },
+    "date_at_time_dbdb1b99": {
+        "message": "le { date } à { time }"
+    },
+    "date_ee500367": {
+        "message": "Date"
+    },
+    "date_is_not_a_valid_date_4ef9f8ba": {
+        "message": "#{ date } n''est pas une date valide."
+    },
+    "date_is_required_8660ec22": {
+        "message": "Une date est requise"
+    },
+    "date_published_371c4ad0": {
+        "message": "Date de publication"
+    },
+    "date_time_d9fbf2d7": {
+        "message": "Date et heure :"
+    },
+    "decrease_indent_de6343ab": {
+        "message": "Diminuer le retrait"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "liste à puce non ordonnée par défaut"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "liste à puce ordonnée par défaut"
+    },
+    "delete_a6efa79d": {
+        "message": "Supprimer"
+    },
+    "describe_the_image_e65d2e32": {
+        "message": "(Décrire l’image)"
+    },
+    "details_98a31b68": {
+        "message": "Détails"
+    },
+    "details_a6f427c3": {
+        "message": "Détails :"
+    },
+    "dimensions_45ddb7b7": {
+        "message": "Dimensions"
+    },
+    "directionality_ebcae6d0": {
+        "message": "directionalité"
+    },
+    "disable_in_line_preview_2a675175": {
+        "message": "Désactiver la prévisualisation en ligne."
+    },
+    "discussion_6719c51d": {
+        "message": "Discussion"
+    },
+    "discussions_a5f96392": {
+        "message": "Discussions"
+    },
+    "discussions_index_6c36ced": {
+        "message": "Index des discussions"
+    },
+    "dismiss_itemtitle_a9fae1b3": {
+        "message": "Rejeter { itemTitle }"
+    },
+    "dismiss_opportunityname_5995176f": {
+        "message": "Rejeter { opportunityName }"
+    },
+    "dismissed_8b0b1fc9": {
+        "message": "Rejeté"
+    },
+    "dismissed_opportunities_f0826640": {
+        "message": "Occasions rejetées"
+    },
+    "display_options_315aba85": {
+        "message": "Afficher les options"
+    },
+    "display_text_link_opens_in_a_new_tab_75e9afc9": {
+        "message": "Afficher le lien textuel (s’ouvre dans un nouvel onglet)"
+    },
+    "documents_81393201": {
+        "message": "Documents"
+    },
+    "done_54e3d4b6": {
+        "message": "Terminé"
+    },
+    "drag_a_file_here_1bf656d5": {
+        "message": "Glisser un fichier ici"
+    },
+    "drag_a_file_here_39357b48": {
+        "message": "Glisser un fichier ici"
+    },
+    "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+        "message": "Glissez et déposez ou cliquez pour rechercher sur votre ordinateur"
+    },
+    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+        "message": "Glisser-déposer. Utiliser les flèches vers le haut et vers le bas pour redimensionner"
+    },
+    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
+        "message": "Glissez et déposez ou cliquez pour rechercher sur votre ordinateur"
+    },
+    "due_5d7267be": {
+        "message": "À rendre le :"
+    },
+    "due_date_124fdd99": {
+        "message": "À rendre le : { date }"
+    },
+    "due_multiple_dates_cc0ee3f5": {
+        "message": "À rendre le : Plusieurs dates"
+    },
+    "due_when_7eed10c6": {
+        "message": "À rendre le : { when }"
+    },
+    "edit_c5fbea07": {
+        "message": "Modifier"
+    },
+    "edit_link_7f53bebb": {
+        "message": "Modifier lien"
+    },
+    "edit_title_72e5a21e": {
+        "message": "Modifier { title }"
+    },
+    "editor_statusbar_26ac81fc": {
+        "message": "Barre d''état de l''éditeur"
+    },
+    "embed_828fac4a": {
+        "message": "Intégrer"
+    },
+    "embed_code_314f1bd5": {
+        "message": "Embarquer du code"
+    },
+    "embed_image_1080badc": {
+        "message": "Incorporer l’image"
+    },
+    "embed_options_tray_901cfd19": {
+        "message": "Menu Options d''intégration"
+    },
+    "embed_preview_2d741e1f": {
+        "message": "Intégrer l''aperçu"
+    },
+    "embed_video_code_703e10f2": {
+        "message": "Intégrer le code vidéo"
+    },
+    "error_loading_grades_e0b38f4d": {
+        "message": "Erreur de chargement des notes"
+    },
+    "error_loading_more_items_3f109d9f": {
+        "message": "Erreur lors du chargement des éléments supplémentaires"
+    },
+    "error_loading_past_items_2881dbb1": {
+        "message": "Erreur lors du chargement des éléments passés"
+    },
+    "error_uploading_video_audio_recording_16d9730a": {
+        "message": "Erreur lors de l’envoi de l’enregistrement audio/vidéo"
+    },
+    "excused_cf8792eb": {
+        "message": "Excusé"
+    },
+    "expand_to_see_types_f5d29352": {
+        "message": "Étendez pour afficher { types }"
+    },
+    "external_links_3d9f074e": {
+        "message": "Liens externes"
+    },
+    "extra_large_b6cdf1ff": {
+        "message": "Extra Large"
+    },
+    "failed_to_delete_to_do_64edff49": {
+        "message": "Échec de la suppression de la chose à faire"
+    },
+    "failed_to_get_new_activity_17e7ec7c": {
+        "message": "Échec de la récupération de nouvelles activités"
+    },
+    "failed_to_load_opportunities_52ab6404": {
+        "message": "Échec du chargement des opportunités"
+    },
+    "failed_to_save_to_do_ddc7503b": {
+        "message": "Échec de l''enregistrement de la chose à faire"
+    },
+    "feedback_6dcc1991": {
+        "message": "Commentaire"
+    },
+    "file_name_8fd421ff": {
+        "message": "Nom du fichier"
+    },
+    "file_url_c12b64be": {
+        "message": "URL du fichier"
+    },
+    "filename_file_icon_602eb5de": {
+        "message": "{ filename } icône de fichier"
+    },
+    "filename_image_preview_6cef8f26": {
+        "message": "{ filename } prévisualisation des images"
+    },
+    "filename_text_preview_e41ca2d8": {
+        "message": "{ filename } prévisualisation de texte"
+    },
+    "files_c300e900": {
+        "message": "Fichiers"
+    },
+    "files_index_af7c662b": {
+        "message": "Index des fichiers"
+    },
+    "finish_bc343002": {
+        "message": "Terminer"
+    },
+    "focus_the_popup_context_toolbar_7979f4f8": {
+        "message": "Focaliser la barre d''outils contextuelle du popup"
+    },
+    "formatting_5b143aa8": {
+        "message": "Formatage"
+    },
+    "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
+        "message": "{ count, plural,\n     =0 {# résultats}\n    one {# résultat}\n  other {# résultats}\n} trouvé(s)"
+    },
+    "generating_preview_45b53be0": {
+        "message": "Création de l''aperçu en cours..."
+    },
+    "go_to_card_view_dashboard_9d03970e": {
+        "message": "Aller au tableau de bord Carte affichage"
+    },
+    "go_to_the_editor_s_menubar_e6674c81": {
+        "message": "Aller à la barre de menu de l''éditeur"
+    },
+    "go_to_the_editor_s_toolbar_a5cb875f": {
+        "message": "Aller à la barre d''outils de l''éditeur"
+    },
+    "graded_25cd3fcd": {
+        "message": "Noté"
+    },
+    "grades_a61eba0a": {
+        "message": "Notes"
+    },
+    "grades_are_loading_c899652d": {
+        "message": "Les notes sont en train de charger"
+    },
+    "grades_loaded_5056277c": {
+        "message": "Notes chargées"
+    },
+    "group_files_4324f3df": {
+        "message": "Fichiers de groupe"
+    },
+    "group_navigation_99f191a": {
+        "message": "Barre de navigation des groupes"
+    },
+    "header_f28f73db": {
+        "message": "En-tête"
+    },
+    "height_69b03e15": {
+        "message": "Hauteur"
+    },
+    "image_options_5412d02c": {
+        "message": "Options d''image"
+    },
+    "image_options_tray_90a46006": {
+        "message": "Bac des options d''image"
+    },
+    "images_7ce26570": {
+        "message": "Images"
+    },
+    "increase_indent_6d550a4a": {
+        "message": "Augmenter le retrait"
+    },
+    "insert_equella_links_49a8dacd": {
+        "message": "Insérer des liens Equella"
+    },
+    "insert_link_6dc23cae": {
+        "message": "Insérer un lien"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Insérer une équation mathématique"
+    },
+    "invalid_file_c11ba11": {
+        "message": "Fichier non valide"
+    },
+    "invalid_file_type_881cc9b2": {
+        "message": "Type de fichier non valide"
+    },
+    "items_completed_items_plural_1_item_other_items_717d579f": {
+        "message": "{ items } terminé(s) { items, plural,\n     =1 {élément}\n  other {éléments}\n}"
+    },
+    "keyboard_shortcuts_ed1844bd": {
+        "message": "Raccourcis clavier"
+    },
+    "large_9c5e80e7": {
+        "message": "Grand"
+    },
+    "late_2be42b88": {
+        "message": "En retard"
+    },
+    "left_to_right_d6da6d7e": {
+        "message": "de gauche à droite"
+    },
+    "link_7262adec": {
+        "message": "Lien"
+    },
+    "link_options_a16b758b": {
+        "message": "Options de lien"
+    },
+    "link_to_other_content_in_the_course_879163b5": {
+        "message": "Lier à un autre contenu du cours."
+    },
+    "link_to_other_content_in_the_group_3fe25379": {
+        "message": "Lier à un autre contenu du groupe."
+    },
+    "links_14b70841": {
+        "message": "Liens"
+    },
+    "load_more_35d33c7": {
+        "message": "En charger plus"
+    },
+    "load_more_a36f9cf9": {
+        "message": "En charger plus"
+    },
+    "load_more_results_460f49a9": {
+        "message": "Charger plus de résultats"
+    },
+    "load_prior_dates_f2b0f6f0": {
+        "message": "Charger les dates précédentes"
+    },
+    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+        "message": "Chargé(s) { count, plural,\n     =0 {# éléments}\n    one {# élément}\n  other {# éléments}\n}"
+    },
+    "loading_25990131": {
+        "message": "Chargement..."
+    },
+    "loading_725811ca": {
+        "message": "chargement"
+    },
+    "loading_bde52856": {
+        "message": "Chargement"
+    },
+    "loading_failed_b3524381": {
+        "message": "Échec du chargement..."
+    },
+    "loading_failed_e6a9d8ef": {
+        "message": "Le chargement a échoué."
+    },
+    "loading_grades_c842c887": {
+        "message": "Chargement des notes"
+    },
+    "loading_media_f3455841": {
+        "message": "Chargement du contenu média"
+    },
+    "loading_past_items_ca499e75": {
+        "message": "Charger les éléments passés"
+    },
+    "loading_planner_items_947a813d": {
+        "message": "Téléchargement des éléments de l''agenda"
+    },
+    "location_3b6ff307": {
+        "message": "Lieu :"
+    },
+    "looks_like_there_isn_t_anything_here_d9bcef49": {
+        "message": "Apparemment, il n''y a rien ici."
+    },
+    "media_af190855": {
+        "message": "Média"
+    },
+    "medium_5a8e9ead": {
+        "message": "Moyen"
+    },
+    "mic_a7f3d311": {
+        "message": "Micro"
+    },
+    "miscellaneous_and_apps_f450a387": {
+        "message": "Divers et applications"
+    },
+    "missing_1a256b3b": {
+        "message": "Manquant"
+    },
+    "missing_items_for_title_516511f8": {
+        "message": "Éléments manquants pour { title }"
+    },
+    "modules_c4325335": {
+        "message": "Modules"
+    },
+    "must_be_at_least_width_x_height_px_41dc825e": {
+        "message": "Doit faire au moins { width } x { height } px"
+    },
+    "my_documents_77a74ff3": {
+        "message": "Mes documents"
+    },
+    "my_files_eea33f44": {
+        "message": "Mes fichiers"
+    },
+    "my_grades_98834476": {
+        "message": "Mes notes"
+    },
+    "my_images_427f9b0c": {
+        "message": "Mes images"
+    },
+    "my_media_82bade11": {
+        "message": "Mon Média"
+    },
+    "navigate_through_the_menu_or_toolbar_415a4e50": {
+        "message": "Naviguer dans le menu ou la barre d''outils"
+    },
+    "new_13daf639": {
+        "message": "Nouveau"
+    },
+    "new_activity_8b84847d": {
+        "message": "Nouvelle activité"
+    },
+    "new_activity_for_title_14c9c3af": {
+        "message": "Nouvelle activité pour { title }"
+    },
+    "new_opportunities_7d349c4d": {
+        "message": "Nouvelles opportunités"
+    },
+    "next_month_749b1778": {
+        "message": "Mois suivant"
+    },
+    "next_page_d2a39853": {
+        "message": "Page suivante"
+    },
+    "no_alt_text_decorative_image_f318fc0e": {
+        "message": "Pas de texte alternatif (image décorative)"
+    },
+    "no_due_dates_assigned_e8f5bac8": {
+        "message": "Pas de dates limites de rendu"
+    },
+    "no_grade_3b4d7f3e": {
+        "message": "Aucune note"
+    },
+    "no_results_940393cf": {
+        "message": "Aucun résultat."
+    },
+    "no_results_found_for_filterterm_ad1b04c8": {
+        "message": "Aucun résultat trouvé pour { filterTerm }"
+    },
+    "no_results_found_for_term_1564c08e": {
+        "message": "Aucun résultat pour { term }."
+    },
+    "no_video_1ed00b26": {
+        "message": "Pas de vidéo"
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "Rien pour l’instant"
+    },
+    "nothing_here_needs_attention_c4eaded6": {
+        "message": "Rien ici n''a besoin d''attention."
+    },
+    "nothing_more_to_do_b665da42": {
+        "message": "Rien d’autre à faire"
+    },
+    "nothing_new_needs_attention_3ac548d4": {
+        "message": "Aucune nouvelle info nécessitant votre attention"
+    },
+    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+        "message": "Rien de prévu aujourd''hui. Sélectionner l''élément le plus récent."
+    },
+    "nothing_planned_today_selecting_next_item_f6718aa": {
+        "message": "Rien de prévu aujourd''hui. Sélection de l''élément suivant"
+    },
+    "nothing_planned_yet_8675ffe9": {
+        "message": "Rien de prévu pour l''instant"
+    },
+    "numpoints_points_8621a43b": {
+        "message": "{ numPoints } points"
+    },
+    "only_most_recent_grading_period_shown_f1ad6458": {
+        "message": "*Seule la période de notation la plus récente est indiquée."
+    },
+    "open_this_keyboard_shortcuts_dialog_9658b83a": {
+        "message": "Ouvrir cette boîte de dialogues des raccourcis clavier"
+    },
+    "opportunities_popup_f6703842": {
+        "message": "opportunités pop-up"
+    },
+    "optional_add_course_ef0d70fc": {
+        "message": "Facultatif : Ajouter un cours"
+    },
+    "options_3ab0ea65": {
+        "message": "Options"
+    },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "Listes ordonnées et non ordonnées"
+    },
+    "other_editor_shortcuts_may_be_found_at_404aba4a": {
+        "message": "D''autres raccourcis de l''éditeur peuvent être trouvés à l''adresse suivante"
+    },
+    "page_50c4823d": {
+        "message": "Page"
+    },
+    "pages_e5414c2c": {
+        "message": "Pages"
+    },
+    "paragraph_5e5ad8eb": {
+        "message": "Paragraphe"
+    },
+    "pause_12af3bb4": {
+        "message": "Mettre en pause"
+    },
+    "peer_review_74f26a13": {
+        "message": "Révision par les pairs"
+    },
+    "peer_review_for_itemtitle_358cb413": {
+        "message": "Correction par un pair pour { itemTitle }"
+    },
+    "people_b4ebb13c": {
+        "message": "Personnes"
+    },
+    "play_1a47eaa7": {
+        "message": "Lecture"
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Veuillez autoriser Canvas à accéder à votre microphone et à votre webcam."
+    },
+    "points_bceb5005": {
+        "message": "points"
+    },
+    "points_points_63e59cce": {
+        "message": "{ points } points"
+    },
+    "posted_when_a578f5ab": {
+        "message": "Posté : { when }"
+    },
+    "preformatted_d0670862": {
+        "message": "Préformaté"
+    },
+    "preview_a3f8f854": {
+        "message": "PRÉVISUALISATION"
+    },
+    "previous_month_bb1e3c84": {
+        "message": "Mois précédent"
+    },
+    "previous_page_928fc112": {
+        "message": "Page précédente"
+    },
+    "pts_699bd9aa": {
+        "message": "pts"
+    },
+    "published_c944a23d": {
+        "message": "publié"
+    },
+    "published_when_302d8e23": {
+        "message": "Publié : { when }"
+    },
+    "quiz_e0dcce8f": {
+        "message": "Questionnaire"
+    },
+    "quizzes_7e598f57": {
+        "message": "Questionnaires"
+    },
+    "record_7c9448b": {
+        "message": "Enregistrer"
+    },
+    "record_upload_media_5fdce166": {
+        "message": "Enregistrement / Téléchargement de média"
+    },
+    "recording_98da6bda": {
+        "message": "Enregistrement"
+    },
+    "reminder_date_4564d12d": {
+        "message": "Rappel : { date }"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "Supprimer lien"
+    },
+    "replies_4a8577c8": {
+        "message": "Réponses"
+    },
+    "rich_content_editor_2708ef21": {
+        "message": "Éditeur de texte enrichi"
+    },
+    "right_to_left_ec223c81": {
+        "message": "de droite à gauche"
+    },
+    "save_11a80ec3": {
+        "message": "Enregistrer"
+    },
+    "scroll_up_to_see_your_history_19b14cad": {
+        "message": "Faites défiler vers le haut pour voir votre histoire !"
+    },
+    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+        "message": "Fait défiler jusqu''à l''élément précédent avec une nouvelle activité."
+    },
+    "search_280d00bd": {
+        "message": "Rechercher"
+    },
+    "search_term_b2d2235": {
+        "message": "Terme de recherche"
+    },
+    "select_app_3d08035a": {
+        "message": "Sélectionner une application"
+    },
+    "select_language_7c93a900": {
+        "message": "Sélectionner la langue"
+    },
+    "selected_274ce24f": {
+        "message": "Sélectionné"
+    },
+    "show_all_ae37d610": {
+        "message": "Tout montrer"
+    },
+    "show_embed_options_ef8d7ef": {
+        "message": "Afficher les options d''intégration"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "Afficher les options d''images"
+    },
+    "show_link_options_545338fd": {
+        "message": "Afficher les options de lien"
+    },
+    "show_my_grades_ebd08684": {
+        "message": "Afficher mes notes"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "Afficher les options vidéo"
+    },
+    "size_b30e1077": {
+        "message": "Taille"
+    },
+    "small_b070434a": {
+        "message": "Petit"
+    },
+    "small_header_168fb9f9": {
+        "message": "Petit en-tête"
+    },
+    "something_went_wrong_89195131": {
+        "message": "Un problème est survenu."
+    },
+    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+        "message": "Un problème est survenu lors de l’accès à votre micro ou webcam."
+    },
+    "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
+        "message": "Un problème est survenu et je n''ai rien à vous montrer."
+    },
+    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
+        "message": "Quelque chose s’est mal passé, réessayez après avoir réactualisé la page"
+    },
+    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
+        "message": "L’envoi a rencontré un problème, vérifiez l’état de votre connexion, puis réessayez."
+    },
+    "sort_by_e75f9e3e": {
+        "message": "Trier par"
+    },
+    "square_unordered_list_b15ce93b": {
+        "message": "liste non ordonnée à puces carrées"
+    },
+    "start_over_f7552aa9": {
+        "message": "Recommencer"
+    },
+    "start_recording_9a65141a": {
+        "message": "Démarrer l''enregistrement"
+    },
+    "startdate_to_enddate_d245175b": {
+        "message": "{ startDate } à { endDate }"
+    },
+    "startdatetime_enddatetime_20abc10e": {
+        "message": "{ startDateTime } - { endDateTime }"
+    },
+    "startdatetime_endtime_49741bbe": {
+        "message": "{ startDateTime } - { endTime }"
+    },
+    "starttime_to_endtime_d7cc249d": {
+        "message": "{ startTime } à { endTime }"
+    },
+    "styles_2aa721ef": {
+        "message": "Styles"
+    },
+    "subheader_2b87606d": {
+        "message": "Sous-en-tête"
+    },
+    "submit_a3cc6859": {
+        "message": "Soumettre"
+    },
+    "submitted_318fad53": {
+        "message": "Soumis"
+    },
+    "subscript_59744f96": {
+        "message": "En indice"
+    },
+    "success_to_do_created_e34ed395": {
+        "message": "Opération réussie : À faire créé"
+    },
+    "superscript_8cb349a2": {
+        "message": "En exposant"
+    },
+    "switch_to_raw_html_editor_4c9ac7de": {
+        "message": "Passer à l''éditeur html brut"
+    },
+    "switch_to_rich_text_editor_35822d26": {
+        "message": "Passer à l’éditeur de texte enrichi"
+    },
+    "syllabus_f191f65b": {
+        "message": "Programme"
+    },
+    "tab_arrows_4cf5abfc": {
+        "message": "TAB/Flèches"
+    },
+    "task_16b0ef38": {
+        "message": "Tâche"
+    },
+    "text_7f4593da": {
+        "message": "Texte"
+    },
+    "the_date_and_time_this_to_do_is_due_74c823d4": {
+        "message": "La date et l''heure à laquelle cela doit être fait est passé."
+    },
+    "there_are_no_points_associated_with_this_item_449c712a": {
+        "message": "Il n''y a aucun point associé à cet article"
+    },
+    "time_2b5aac58": {
+        "message": "Temps"
+    },
+    "title_ee03d132": {
+        "message": "Titre"
+    },
+    "title_is_required_6ddcab69": {
+        "message": "titre est obligatoire"
+    },
+    "to_be_posted_when_d24bf7dc": {
+        "message": "À poster : { when }"
+    },
+    "to_do_1d554f36": {
+        "message": "À faire"
+    },
+    "to_do_date_4b211ad0": {
+        "message": "À faire : { date }"
+    },
+    "to_do_items_loading_d1cdfcd5": {
+        "message": "Chargement des éléments de choses à faire"
+    },
+    "to_do_when_2783d78f": {
+        "message": "À faire : { when }"
+    },
+    "today_76e10f9c": {
+        "message": "Aujourd’hui"
+    },
+    "today_at_date_8ac30d6": {
+        "message": "Aujourd''hui à { date }"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "Demain"
+    },
+    "tomorrow_at_date_b53f2cf1": {
+        "message": "Demain à { date }"
+    },
+    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
+        "message": "{ totalResults } résultats, { numDisplayed } résultats affichés actuellement"
+    },
+    "tray_839df38a": {
+        "message": "Tiroir"
+    },
+    "type_control_f9_to_access_image_options_text_a47e319f": {
+        "message": "appuyez sur Control + F9 pour accéder aux options d''image. { text }"
+    },
+    "type_control_f9_to_access_link_options_text_4ead9682": {
+        "message": "appuyez sur Control + F9 pour accéder aux options de liens. { text }"
+    },
+    "type_control_f9_to_access_table_options_text_92141329": {
+        "message": "appuyez sur Control + F9 pour accéder aux options de tableau. { text }"
+    },
+    "unable_to_mark_as_complete_8141856d": {
+        "message": "Impossible de marquer comme terminé."
+    },
+    "unpublished_dfd8801": {
+        "message": "non publié(e)(s)"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Sans titre"
+    },
+    "upload_document_253f0478": {
+        "message": "Télécharger le document"
+    },
+    "upload_error_f9c00e27": {
+        "message": "Erreur de téléchargement"
+    },
+    "upload_file_fd2361b8": {
+        "message": "Envoyer fichier"
+    },
+    "upload_image_6120b609": {
+        "message": "Télécharger l’image"
+    },
+    "upload_media_ce31135a": {
+        "message": "Télécharger un fichier multimédia"
+    },
+    "upload_record_media_e4207d72": {
+        "message": "Envoyer/enregistrer un fichier multimédia"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "liste alphabétique ordonnée en majuscules"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "liste numérique ordonnée en chiffres romains majuscules"
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+        "message": "Utilisé par les lecteurs d''écran pour décrire le contenu d''une image"
+    },
+    "user_documents_c206e61f": {
+        "message": "Documents de l’utilisateur"
+    },
+    "user_images_b6490852": {
+        "message": "Images utilisateur"
+    },
+    "user_media_14fbf656": {
+        "message": "Utilisateurs Médias"
+    },
+    "video_audio_recording_uploaded_6af5d378": {
+        "message": "Enregistrement vidéo/audio envoyé"
+    },
+    "video_options_24ef6e5d": {
+        "message": "Options vidéo"
+    },
+    "video_options_tray_3b9809a5": {
+        "message": "Menu Options vidéo"
+    },
+    "video_player_b371005": {
+        "message": "Lecteur vidéo"
+    },
+    "view_keyboard_shortcuts_34d1be0b": {
+        "message": "Afficher les raccourcis clavier"
+    },
+    "webcam_fe91b20f": {
+        "message": "Webcam"
+    },
+    "width_492fec76": {
+        "message": "Largeur"
+    },
+    "width_and_height_must_be_numbers_110ab2e3": {
+        "message": "La largeur et la hauteur doivent être des nombres"
+    },
+    "width_x_height_px_ff3ccb93": {
+        "message": "{ width } x { height } px"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "Page d’accueil de Wiki"
+    },
+    "yesterday_at_date_1aa6d18e": {
+        "message": "Hier à { date }"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "Hier"
+    },
+    "you_have_media_feedback_f5f9aba8": {
+        "message": "Vous avez des réactions sur les médias."
+    },
+    "you_must_provide_a_date_and_time_a86839d2": {
+        "message": "Vous devez introduire une date et une heure."
+    },
+    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+        "message": "Vous êtes revenu à votre toute première chose à faire."
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Votre caméra peut être déjà en usage."
+    }
+}

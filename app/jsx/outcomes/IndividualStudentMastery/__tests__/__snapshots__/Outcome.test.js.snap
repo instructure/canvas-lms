@@ -131,23 +131,9 @@ exports[`renders correctly expanded 1`] = `
                   padding="0 x-small"
                   shrink={true}
                 >
-                  <TruncateText
-                    debounce={0}
-                    ellipsis="…"
-                    ignore={
-                      Array [
-                        " ",
-                        ".",
-                        ",",
-                      ]
-                    }
-                    maxLines={1}
-                    onUpdate={[Function]}
-                    position="end"
-                    truncate="character"
-                  >
+                  <TruncateWithTooltip>
                     My outcome
-                  </TruncateText>
+                  </TruncateWithTooltip>
                 </FlexItem>
               </Flex>
             </Text>
@@ -478,23 +464,9 @@ exports[`renders correctly expanded with no results 1`] = `
                   padding="0 x-small"
                   shrink={true}
                 >
-                  <TruncateText
-                    debounce={0}
-                    ellipsis="…"
-                    ignore={
-                      Array [
-                        " ",
-                        ".",
-                        ",",
-                      ]
-                    }
-                    maxLines={1}
-                    onUpdate={[Function]}
-                    position="end"
-                    truncate="character"
-                  >
+                  <TruncateWithTooltip>
                     My outcome
-                  </TruncateText>
+                  </TruncateWithTooltip>
                 </FlexItem>
               </Flex>
             </Text>
@@ -540,18 +512,21 @@ exports[`renders correctly expanded with no results 1`] = `
     size="medium"
     variant="unstyled"
   >
-    <UnassessedAssignment
-      assignment={
-        Object {
-          "assignment_id": 1,
-          "learning_outcome_id": 1,
-          "submission_types": "online_quiz",
-          "title": "My assignment",
-          "url": "www.example.com",
+    <ListItem
+      key="a1"
+    >
+      <UnassessedAssignment
+        assignment={
+          Object {
+            "assignment_id": 1,
+            "learning_outcome_id": 1,
+            "submission_types": "online_quiz",
+            "title": "My assignment",
+            "url": "www.example.com",
+          }
         }
-      }
-      key="1"
-    />
+      />
+    </ListItem>
   </List>
 </ToggleGroup>
 `;
@@ -653,23 +628,9 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
                   padding="0 x-small"
                   shrink={true}
                 >
-                  <TruncateText
-                    debounce={0}
-                    ellipsis="…"
-                    ignore={
-                      Array [
-                        " ",
-                        ".",
-                        ",",
-                      ]
-                    }
-                    maxLines={1}
-                    onUpdate={[Function]}
-                    position="end"
-                    truncate="character"
-                  >
+                  <TruncateWithTooltip>
                     My outcome
-                  </TruncateText>
+                  </TruncateWithTooltip>
                 </FlexItem>
               </Flex>
             </Text>
@@ -865,23 +826,9 @@ exports[`renders the Outcome component 1`] = `
                   padding="0 x-small"
                   shrink={true}
                 >
-                  <TruncateText
-                    debounce={0}
-                    ellipsis="…"
-                    ignore={
-                      Array [
-                        " ",
-                        ".",
-                        ",",
-                      ]
-                    }
-                    maxLines={1}
-                    onUpdate={[Function]}
-                    position="end"
-                    truncate="character"
-                  >
+                  <TruncateWithTooltip>
                     My outcome
-                  </TruncateText>
+                  </TruncateWithTooltip>
                 </FlexItem>
               </Flex>
             </Text>

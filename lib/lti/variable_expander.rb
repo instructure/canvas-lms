@@ -1346,16 +1346,20 @@ module Lti
                        -> { @request.parameters['com_instructure_course_allow_canvas_resource_selection'] },
                        default_name: 'com_instructure_course_allow_canvas_resource_selection'
 
-    # Returns a list of content groups which can be selected, providing ID and name of each group,
+    # Returns a JSON-encoded list of content groups which can be selected, providing ID and name of each group,
     # forwarded from the request.
     # Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
     #
     # @example
     #   ```
-    #   [{"id": "3", name: "First Module"}, {"id": "5", name: "Second Module"]
+    #   [{"id":"3","name":"First Module"},{"id":"5","name":"Second Module"}]
     #   ```
     register_expansion 'com.instructure.Course.available_canvas_resources', [],
-                       -> { @request.parameters['com_instructure_course_available_canvas_resources'] },
+                       -> {
+                         val = @request.parameters['com_instructure_course_available_canvas_resources']
+                         val = val.values if val.is_a?(Hash)
+                         val&.to_json
+                       },
                        default_name: 'com_instructure_course_available_canvas_resources'
 
     private

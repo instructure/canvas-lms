@@ -22,6 +22,7 @@ import {FormField} from '@instructure/ui-form-field'
 import {friendlyTypeName, getCurrentSubmissionType} from '../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '../../shared/LoadingIndicator'
+import LockedAssignment from './LockedAssignment'
 import React, {Component, lazy, Suspense} from 'react'
 import {Submission} from '../graphqlData/Submission'
 import SubmissionChoiceSVG from '../SVG/SubmissionChoice.svg'
@@ -37,10 +38,10 @@ const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
 export default class AttemptTab extends Component {
   static propTypes = {
     activeSubmissionType: string,
-    assignment: Assignment.shape,
+    assignment: Assignment.shape.isRequired,
     createSubmissionDraft: func,
     editingDraft: bool,
-    submission: Submission.shape,
+    submission: Submission.shape.isRequired,
     updateActiveSubmissionType: func,
     updateEditingDraft: func,
     updateUploadingFiles: func,
@@ -174,7 +175,9 @@ export default class AttemptTab extends Component {
   }
 
   render() {
-    if (this.props.assignment.submissionTypes.length > 1) {
+    if (this.props.assignment.lockInfo.isLocked && this.props.submission.state === 'unsubmitted') {
+      return <LockedAssignment assignment={this.props.assignment} />
+    } else if (this.props.assignment.submissionTypes.length > 1) {
       const submissionType = ['submitted', 'graded'].includes(this.props.submission.state)
         ? getCurrentSubmissionType(this.props.submission)
         : this.props.activeSubmissionType

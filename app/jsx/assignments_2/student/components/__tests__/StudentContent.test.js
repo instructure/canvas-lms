@@ -55,19 +55,6 @@ describe('Assignment Student Content View', () => {
     expect(queryByText('Availability Dates')).not.toBeInTheDocument()
   })
 
-  it('renders the availability dates if the assignment is locked', async () => {
-    const props = await mockAssignmentAndSubmission({
-      LockInfo: {isLocked: true}
-    })
-    const {queryByRole, getByText} = render(
-      <MockedProvider>
-        <StudentContent {...props} />
-      </MockedProvider>
-    )
-    expect(queryByRole('tablist')).not.toBeInTheDocument()
-    expect(getByText('Availability Dates')).toBeInTheDocument()
-  })
-
   describe('when the comments tab is clicked', () => {
     const makeMocks = async () => {
       const variables = {submissionAttempt: 0, submissionId: '1'}

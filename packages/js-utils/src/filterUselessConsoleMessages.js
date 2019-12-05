@@ -33,6 +33,8 @@ const consoleMessagesToIgnore = {
     'Warning: [Focusable] Exactly one focusable child is required (0 found).',
 
     /in Select \(created by CanvasSelect\)/,
+    'created by DateInput',
+    'created by Editable',
 
     // React 16.9+ generates these deprecation warnings but it doesn't do any good to hear about the ones for instUI. We can't do anything about them in this repo
     // Put any others we can't control here.
@@ -43,10 +45,10 @@ const consoleMessagesToIgnore = {
   ]
 }
 
-export function filterUselessConsoleMessages(orginalConsole = console) {
+export function filterUselessConsoleMessages(originalConsole = console) {
   Object.keys(consoleMessagesToIgnore).forEach(key => {
-    const original = orginalConsole[key]
-    orginalConsole[key] = function() {
+    const original = originalConsole[key]
+    originalConsole[key] = function() {
       const combinedMsg = Array.prototype.join.call(arguments)
       const shouldIgnore = pattern =>
         combinedMsg[typeof pattern === 'string' ? 'includes' : 'match'](pattern)

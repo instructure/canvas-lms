@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import url('https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&subset=latin-ext&display=swap');//  This needs to be the same as what's in the <link> in _head.html.erb
+@import url('https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&subset=latin-ext&display=swap'); //  This needs to be the same as what's in the <link> in _head.html.erb
 
 @import 'base/environment';
 @import 'components/ic-reset';
@@ -79,7 +79,8 @@ body#tinyrce {
   height: 100vh;
 }
 
-.Underline-All-Links__enabled a:not(.Button):not(.ui-button):not(.btn):not(.ui-button):not(.ui-tabs-anchor) {
+.Underline-All-Links__enabled
+  a:not(.Button):not(.ui-button):not(.btn):not(.ui-button):not(.ui-tabs-anchor) {
   text-decoration: underline;
 }
 
@@ -88,6 +89,7 @@ body#tinyrce {
   border-style: none;
 }
 
+[data-mce-p-data-media-id],
 iframe[data-media-id] {
   background-color: #eee;
 }

@@ -22,6 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import I18n from 'i18n!ImmersiveReader'
 import {showFlashError} from '../FlashAlert'
+import {defaultFetchOptions} from '@instructure/js-utils'
 
 /**
  * This comes from https://github.com/microsoft/immersive-reader-sdk/blob/master/assets/icon.svg
@@ -45,9 +46,7 @@ const LOGO = `
 function handleClick({title, content}, readerSDK) {
   ;(readerSDK || import('@microsoft/immersive-reader-sdk'))
     .then(({launchAsync}) => {
-      fetch('/api/v1/immersive_reader/authenticate', {
-        headers: {Accept: 'application/json'}
-      })
+      fetch('/api/v1/immersive_reader/authenticate', defaultFetchOptions)
         .then(response => response.json())
         .then(({token, subdomain}) => {
           const requestContent = {

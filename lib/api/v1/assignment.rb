@@ -512,6 +512,7 @@ module Api::V1::Assignment
 
     if @overrides_affected.to_i > 0 || cached_due_dates_changed
       assignment.clear_cache_key(:availability)
+      assignment.quiz.clear_cache_key(:availability) if assignment.quiz?
       DueDateCacher.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
     end
 
@@ -849,6 +850,12 @@ module Api::V1::Assignment
 
   def prepare_assignment_create_or_update(assignment, assignment_params, user, context = assignment.context)
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
+
+    if assignment_params[:points_possible].blank?
+      if assignment.new_record? || assignment_params.has_key?(:points_possible) # only change if they're deliberately updating to blank
+        assignment_params[:points_possible] = 0
+      end
+    end
 
     unless assignment.new_record?
       assignment.restore_attributes

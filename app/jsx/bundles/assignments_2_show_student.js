@@ -17,6 +17,20 @@
  */
 
 import renderAssignmentsApp from '../assignments_2/studentIndex'
+import $ from 'jquery'
 
-const elt = document.getElementById('content')
-renderAssignmentsApp(ENV, elt)
+$(() => {
+  renderAssignmentsApp(ENV, $('<div/>').appendTo('#content')[0])
+})
+
+import('compiled/jquery/ModuleSequenceFooter').then(() => {
+  $(() => {
+    $('<div id="module_sequence_footer" style="margin-top: 30px" />')
+      .appendTo('#content')
+      .moduleSequenceFooter({
+        assetType: 'Assignment',
+        assetID: ENV.ASSIGNMENT_ID,
+        courseID: ENV.COURSE_ID
+      })
+  })
+})

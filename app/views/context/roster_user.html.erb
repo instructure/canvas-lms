@@ -36,12 +36,12 @@
       <a href="<%= user_user_notes_path(@user) %>"> <%= t 'links.faculty_journal', "Faculty Journal" %></a>
     <% end %>
     <% if @context.is_a?(Course)%>
-      <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) %>
+      <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) && can_do(@context, @current_user, :view_all_grades) %>
         <a href="<%= user_course_teacher_activity_url(@user, @context) %>">
           <i class="icon-chat" aria-hidden="true"></i>
           <%= t 'links.teacher_activity', 'Student Interactions Report' %>
         </a>
-      <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
+      <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) && can_do(@context, @current_user, :view_all_grades) %>
         <%= link_to(user_student_teacher_activity_url(@current_user, @user)) do %>
           <i class="icon-chat" aria-hidden="true"></i>
           <%= t('Interactions Report') %>

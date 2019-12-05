@@ -46,7 +46,7 @@ const flipped = {
  * works exactly like our sass helper named the same thing
  * @param {String} "left" or "right"
  * @param {ElementToCheck}, will use the <html> element by default
- * @returns {String} 'ltr' or 'rtl' (or `undefined` if no DOM is present)
+ * @returns {String} 'left' or 'right' (or `undefined` if no DOM is present)
  */
 export function direction(leftOrRight, element) {
   if (leftOrRight !== 'left' && leftOrRight !== 'right')

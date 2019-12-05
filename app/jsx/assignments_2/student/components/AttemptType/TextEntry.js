@@ -27,6 +27,7 @@ import {IconDocumentLine, IconTextLine, IconTrashLine} from '@instructure/ui-ico
 import LoadingIndicator from '../../../shared/LoadingIndicator'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {View} from '@instructure/ui-layout'
+import {direction} from '../../../../shared/helpers/rtlHelper'
 
 export default class TextEntry extends React.Component {
   static propTypes = {
@@ -198,14 +199,8 @@ export default class TextEntry extends React.Component {
   }
 
   renderButtons() {
-    const buttonAlign = {
-      margin: '15px 0 0 0',
-      position: 'absolute',
-      right: '35px'
-    }
-
     return (
-      <div style={buttonAlign}>
+      <div style={{textAlign: direction('right')}}>
         <Button
           data-testid="cancel-text-entry"
           margin="0 xx-small 0 0"

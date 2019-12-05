@@ -25,7 +25,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
   include RCSSidebarPage
   include RCENextPage
 
-  context "wiki and tiny files as a student" do
+  context "wiki and tiny files in RCE Next" do
     before(:each) do
       Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
@@ -88,6 +88,69 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       click_user_images
       expect(user_image_links.count).to eq 1
       expect(tray_container).to include_text("bar.png")
+    end
+  end
+
+  context "wiki documents as teacher" do
+    before(:each) do
+      Account.default.enable_feature!(:rce_enhancements)
+      stub_rcs_config
+      course_with_teacher_logged_in
+      @root_folder = Folder.root_folders(@course).first
+      @document_attachment1 = @course.attachments.build(:filename => 'foo.txt', :folder => @root_folder)
+      @document_attachment1.content_type = 'text/html'
+      @document_attachment1.save!
+      @document_attachment2 = @course.attachments.build(:filename => 'foo2.txt', :folder => @root_folder)
+      @document_attachment2.content_type = 'text/html'
+      @document_attachment2.save!
+      @user_attachment = @user.attachments.build(:filename => 'bar.txt')
+      @user_attachment.content_type = 'text/html'
+      @user_attachment.save!
+      @media_attachment1 = @course.attachments.build(:filename => 'foo.mp4', :folder => @root_folder)
+      @media_attachment1.content_type = 'video/mpeg'
+      @media_attachment1.save!
+      @media_attachment2 = @course.attachments.build(:filename => 'foo2.mp3', :folder => @root_folder)
+      @media_attachment2.content_type = 'audio/mpeg'
+      @media_attachment2.save!
+      @user_attachment2 = @user.attachments.build(:filename => 'bar2.mp4')
+      @user_attachment2.content_type = 'video/mpeg'
+      @user_attachment2.save!
+    end
+
+    it "should show 2 documents when clicking course documents dropdown" do
+      visit_front_page_edit(@course)
+      click_document_toolbar_button
+      click_course_documents
+
+      expect(course_document_links.count).to eq 2
+      expect(tray_container).to include_text("foo.txt")
+    end
+
+    it "should show 1 document when clicking my documents dropdown" do
+      visit_front_page_edit(@course)
+      click_document_toolbar_button
+      click_user_documents
+
+      expect(course_document_links.count).to eq 1
+      expect(tray_container).to include_text("bar.txt")
+    end
+
+    it "should show 2 media files when clicking course media dropdown" do
+      visit_front_page_edit(@course)
+      click_media_toolbar_button
+      click_course_media
+
+      expect(course_media_links.count).to eq 2
+      expect(tray_container).to include_text("foo.mp4")
+    end
+
+    it "should show 1 media file when clicking my media dropdown" do
+      visit_front_page_edit(@course)
+      click_media_toolbar_button
+      click_user_media
+
+      expect(course_media_links.count).to eq 1
+      expect(tray_container).to include_text("bar2.mp4")
     end
   end
 end

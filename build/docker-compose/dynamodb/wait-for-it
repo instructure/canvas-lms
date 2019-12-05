@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 echo Attempting connection to dynamodb...
 for i in {1..60}; do
   if [[ ! -z "$(nc -zv localhost 8000)" ]]; then

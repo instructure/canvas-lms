@@ -51,11 +51,15 @@ export default class MediaAttempt extends React.Component {
   }
 
   state = {
-    mediaModalOpen: false
+    mediaModalOpen: false,
+    iframeURL: ''
   }
 
   onComplete = (err, data) => {
     this.props.updateUploadingFiles(true)
+    if (data.mediaObject.embedded_iframe_url) {
+      this.setState({iframeURL: data.mediaObject.embedded_iframe_url})
+    }
     this.props.createSubmissionDraft({
       variables: {
         id: this.props.submission.id,
@@ -79,6 +83,7 @@ export default class MediaAttempt extends React.Component {
         attempt: this.props.submission.attempt || 1
       }
     })
+    this.setState({iframeURL: ''})
   }
 
   renderMediaPlayer = (mediaObject, renderTrashIcon) => {
@@ -91,11 +96,34 @@ export default class MediaAttempt extends React.Component {
       type: track.kind,
       language: track.locale
     }))
+    const shouldRenderWithIframeURL = mediaObject.mediaSources.length === 0 && this.state.iframeURL
 
     return (
       <Flex direction="column" alignItems="center">
-        <Flex.Item data-testid="media-recording">
-          <VideoPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />
+        <Flex.Item data-testid="media-recording" width="100%">
+          {shouldRenderWithIframeURL ? (
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: '0',
+                paddingBottom: '56.25%' // 16:9 aspect ratio
+              }}
+            >
+              <iframe
+                src={this.state.iframeURL}
+                title="preview"
+                style={{
+                  position: 'absolute',
+                  border: 'none',
+                  minWidth: '100%',
+                  minHeight: '100%'
+                }}
+              />
+            </div>
+          ) : (
+            <VideoPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />
+          )}
         </Flex.Item>
         <Flex.Item overflowY="visible" margin="medium 0">
           <span aria-hidden title={mediaObject.title}>

@@ -28,6 +28,7 @@ import ToggleShowByView from 'compiled/views/assignments/ToggleShowByView'
 import _ from 'underscore'
 import splitAssetString from 'compiled/str/splitAssetString'
 import {getPrefetchedXHR} from '@instructure/js-utils'
+import {monitorLtiMessages} from 'lti/messages'
 
 const course = new Course({
   id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
@@ -122,3 +123,5 @@ getPrefetchedXHR('assignment_groups_url')
       assignmentGroups.getGrades()
     }
   })
+
+monitorLtiMessages()

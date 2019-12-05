@@ -87,6 +87,7 @@ module CanvasQuizStatistics::Analyzers
       answers = parse_answers do |_answer, answer_stats|
         answer_stats.merge!({
           responses: 0,
+          user_ids: [],
           user_names: []
         })
       end
@@ -133,6 +134,7 @@ module CanvasQuizStatistics::Analyzers
         end
         choices.each do |answer|
           answer[:responses] += 1
+          answer[:user_ids] << response[:user_id]
           answer[:user_names] << response[:user_name]
         end
       end

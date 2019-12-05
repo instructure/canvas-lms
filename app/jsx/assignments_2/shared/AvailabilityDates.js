@@ -29,7 +29,7 @@ function AvailabilityDates(props) {
     return (
       <>
         <FriendlyDatetime
-          prefix={longFmt ? I18n.t('Available') : ''}
+          prefix={longFmt ? I18n.t('Available:') : ''}
           dateTime={assignment.unlockAt}
           format={longFmt ? I18n.t('#date.formats.full') : I18n.t('#date.formats.short')}
         />

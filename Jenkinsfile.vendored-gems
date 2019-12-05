@@ -18,6 +18,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def getImageTagVersion() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return flags.getImageTagVersion()
+}
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -27,7 +32,7 @@ pipeline {
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
     // 'refs/changes/63/181863/8' -> '63.181863.8'
-    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
+    NAME = getImageTagVersion()
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
 

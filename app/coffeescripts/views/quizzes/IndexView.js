@@ -21,6 +21,10 @@ import _ from 'underscore'
 import Backbone from 'Backbone'
 import template from 'jst/quizzes/IndexView'
 import '../../jquery.rails_flash_notifications'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
+import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
 
 export default class IndexView extends Backbone.View {
   static initClass() {
@@ -35,7 +39,8 @@ export default class IndexView extends Backbone.View {
 
     this.prototype.events = {
       'keyup #searchTerm': 'keyUpSearch',
-      'mouseup #searchTerm': 'keyUpSearch'
+      'mouseup #searchTerm': 'keyUpSearch',
+      'click .header-bar-right .menu_tool_link': 'openExternalTool'
     }
 
     this.prototype.keyUpSearch = _.debounce(function() {
@@ -53,6 +58,7 @@ export default class IndexView extends Backbone.View {
       this.assignmentView.collection.length + this.openView.collection.length === 0
     this.options.hasAssignmentQuizzes = this.assignmentView.collection.length > 0
     this.options.hasOpenQuizzes = this.openView.collection.length > 0
+    this.quizIndexPlacements = ENV.quiz_index_menu_tools != null ? ENV.quiz_index_menu_tools : []
     return (this.options.hasSurveys = this.surveyView.collection.length > 0)
   }
 
@@ -90,6 +96,48 @@ export default class IndexView extends Backbone.View {
       {count: numQuizzes}
     )
     return $.screenReaderFlashMessageExclusive(msg)
+  }
+
+  toJSON() {
+    const json = super.toJSON(...arguments)
+    json.quizIndexPlacements = this.quizIndexPlacements
+    return json
+  }
+
+  openExternalTool(ev) {
+    if (ev != null) {
+      ev.preventDefault()
+    }
+    const tool = this.quizIndexPlacements.find(t => t.id === ev.target.dataset.toolId)
+    this.setExternalToolTray(tool, $('.al-trigger')[0])
+  }
+
+  reloadPage() {
+    window.location.reload()
+  }
+
+  setExternalToolTray(tool, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setExternalToolTray(null)
+      returnFocusTo.focus()
+      if (ltiState?.tray?.refreshOnClose) {
+        this.reloadPage()
+      }
+    }
+
+    ReactDOM.render(
+      <ContentTypeExternalToolTray
+        tool={tool}
+        placement="quiz_index_menu"
+        acceptedResourceTypes={['quiz']}
+        targetResourceType="quiz"
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={handleDismiss}
+        open={tool !== null}
+      />,
+      $('#external-tool-mount-point')[0]
+    )
   }
 }
 IndexView.initClass()

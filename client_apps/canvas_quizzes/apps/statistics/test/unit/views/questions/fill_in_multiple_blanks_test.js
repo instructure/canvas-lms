@@ -23,18 +23,18 @@ define(function(require) {
       id: '1',
       text: 'color',
       answers: [
-        { id: 'a1', text: 'red', responses: 4, correct: true, ratio: 100, user_names: ['One', 'Two', 'Three', 'Four']},
-        { id: 'a2', text: 'green', responses: 0, ratio: 0, user_names: []},
-        { id: 'a3', text: 'blue', responess: 0, ratio: 0, user_names: []},
+        { id: 'a1', text: 'red', responses: 4, correct: true, ratio: 100, user_ids: [1, 2, 3, 4], user_names: ['One', 'Two', 'Three', 'Four']},
+        { id: 'a2', text: 'green', responses: 0, ratio: 0, user_ids: [], user_names: []},
+        { id: 'a3', text: 'blue', responess: 0, ratio: 0, user_ids: [], user_names: []},
       ]
     },
     {
       id: '2',
       text: 'size',
       answers: [
-        { id: 'b1', text: 'S', responses: 1, ratio: 0, user_names: [] },
-        { id: 'b2', text: 'M', responses: 0, ratio: 0, user_names: [] },
-        { id: 'b3', text: 'L', responses: 3, correct: true, ratio: 75, user_names: ['One', 'Two', 'Three'] },
+        { id: 'b1', text: 'S', responses: 1, ratio: 0, user_ids: [], user_names: [] },
+        { id: 'b2', text: 'M', responses: 0, ratio: 0, user_ids: [], user_names: [] },
+        { id: 'b3', text: 'L', responses: 3, correct: true, ratio: 75, user_ids: [1, 2, 3], user_names: ['One', 'Two', 'Three'] },
       ]
     }
   ];

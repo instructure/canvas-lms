@@ -22,12 +22,13 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!IndividualStudentMasteryOutcome'
 import {View, Flex} from '@instructure/ui-layout'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {List, Pill, Text, TruncateText} from '@instructure/ui-elements'
+import {List, Pill, Text} from '@instructure/ui-elements'
 import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
 import UnassessedAssignment from './UnassessedAssignment'
 import OutcomePopover from './OutcomePopover'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import TruncateWithTooltip from '../../shared/components/TruncateWithTooltip'
 import * as shapes from './shapes'
 
 export default class Outcome extends React.Component {
@@ -66,7 +67,7 @@ export default class Outcome extends React.Component {
                     <OutcomePopover outcome={outcome} outcomeProficiency={outcomeProficiency} />
                   </Flex.Item>
                   <Flex.Item shrink padding="0 x-small">
-                    <TruncateText>{display_name || title}</TruncateText>
+                    <TruncateWithTooltip>{display_name || title}</TruncateWithTooltip>
                   </Flex.Item>
                 </Flex>
               </Text>
@@ -134,12 +135,9 @@ export default class Outcome extends React.Component {
             </List.Item>
           ))}
         {unassessed.map(assignment => (
-          <UnassessedAssignment
-            key={
-              assignment.assessment_id ? `a${assignment.assessment_id}` : assignment.assignment_id
-            }
-            assignment={assignment}
-          />
+          <List.Item key={`a${assignment.assignment_id}`}>
+            <UnassessedAssignment assignment={assignment} />
+          </List.Item>
         ))}
       </List>
     )

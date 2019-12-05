@@ -106,9 +106,11 @@ describe('doFetchApi', () => {
     expect(fetchOptions).toEqual({
       method: 'POST',
       body: 'the body',
+      credentials: 'same-origin',
       headers: {
         'X-CSRF-Token': 'the_token',
         Accept: expect.stringMatching(/application\/json\+canvas-string-ids/),
+        'X-Requested-With': 'XMLHttpRequest',
         foo: 'bar',
         baz: 'bing'
       },

@@ -2088,6 +2088,7 @@ class UsersController < ApplicationController
 
   def teacher_activity
     @teacher = User.find(params[:user_id])
+
     if @teacher == @current_user || authorized_action(@teacher, @current_user, :read_reports)
       @courses = {}
 
@@ -2096,7 +2097,7 @@ class UsersController < ApplicationController
         enrollments = student.student_enrollments.active.preload(:course).shard(student).to_a
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
-                           enrollment.course.grants_right?(@current_user, :read_reports) &&
+                           enrollment.course.grants_all_rights?(@current_user, :read_reports, :view_all_grades) &&
                            enrollment.course.apply_enrollment_visibility(enrollment.course.all_student_enrollments, @teacher).where(id: enrollment).first
           if should_include
             @courses[enrollment.course] = teacher_activity_report(@teacher, enrollment.course, [enrollment])
@@ -2113,12 +2114,11 @@ class UsersController < ApplicationController
         if !course.user_has_been_instructor?(@teacher)
           flash[:error] = t('errors.user_not_teacher', "That user is not a teacher in this course")
           redirect_to_referrer_or_default(root_url)
-        elsif authorized_action(course, @current_user, :read_reports)
+        elsif authorized_action(course, @current_user, :read_reports) && authorized_action(course, @current_user, :view_all_grades)
           enrollments = course.apply_enrollment_visibility(course.all_student_enrollments, @teacher)
           @courses[course] = teacher_activity_report(@teacher, course, enrollments)
         end
       end
-
     end
   end
 

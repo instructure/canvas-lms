@@ -7,10 +7,10 @@
     {{!-- Group Assignment selection --}}
     <label class="checkbox flush" for="has_group_category">
       {{#if inClosedGradingPeriod}}
-        {{checkbox "has_group_category"
+      {{checkbox "has_group_category"
           id="has_group_category"
           prefix=prefix
-          checked=groupCategoryId
+          checked=isGroupAssignment
           aria-role="option"
           aria-checked=ariaChecked
           aria-controls="group_category_options"
@@ -19,10 +19,10 @@
           disabled=hasGroupCategoryDisabled
         }}
       {{else}}
-        {{checkbox "has_group_category"
+      {{checkbox "has_group_category"
           id="has_group_category"
           prefix=prefix
-          checked=groupCategoryId
+          checked=isGroupAssignment
           aria-role="option"
           aria-checked=ariaChecked
           aria-controls="group_category_options"
@@ -36,9 +36,9 @@
     <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
       <div class="nested">
         {{#unless hideGradeIndividually}}
-          <label class="checkbox" for="assignment_grade_students_individually">
-            {{#if inClosedGradingPeriod}}
-              {{checkbox "grade_group_students_individually"
+        <label class="checkbox" for="assignment_grade_students_individually">
+          {{#if inClosedGradingPeriod}}
+          {{checkbox "grade_group_students_individually"
                 id="assignment_grade_students_individually"
                 prefix=prefix
                 checked=gradeGroupStudentsIndividually
@@ -46,60 +46,53 @@
                 aria-readonly="true"
                 disabled=gradeIndividuallyDisabled
               }}
-            {{else}}
-              {{checkbox "grade_group_students_individually"
+          {{else}}
+          {{checkbox "grade_group_students_individually"
                 id="assignment_grade_students_individually"
                 prefix=prefix
                 checked=gradeGroupStudentsIndividually
                 disabled=gradeIndividuallyDisabled
               }}
-            {{/if}}
-            {{#t "grade_group_students_individually"}}
-              Assign Grades to Each Student Individually
-            {{/t}}
-          </label>
+          {{/if}}
+          {{#t "grade_group_students_individually"}}
+          Assign Grades to Each Student Individually
+          {{/t}}
+        </label>
         {{/unless}}
 
         {{!-- Group selection --}}
-        <label id="assignment_group_category_id_label" for="group_category_id">
-          {{#t "group_set"}}Group Set{{/t}}
-        </label>
-        <select id="assignment_group_category_id"
-          name="{{#if nested}}assignment[group_category_id]{{else}}group_category_id{{/if}}"
-          {{#if inClosedGradingPeriod}}
-            readonly
-            aria-readonly="true"
-          {{/if}}
-          aria-labelledby="assignment_group_category_id_label"
-          {{disabledIf groupCategoryIdDisabled}}>
-          {{#each groupCategories}}
+        <div id="assignment_group_category">
+          <label id="assignment_group_category_id_label" for="group_category_id">
+            {{#t "group_set"}}Group Set{{/t}}
+          </label>
+          <select id="assignment_group_category_id"
+            name="{{#if nested}}assignment[group_category_id]{{else}}group_category_id{{/if}}"
+            {{#if inClosedGradingPeriod}} readonly aria-readonly="true" {{/if}}
+            aria-labelledby="assignment_group_category_id_label" {{disabledIf groupCategoryIdDisabled}}>
+            <option value="blank" {{selectedIf groupCategoryUnselected}}>{{#t}}Select a group category{{/t}}</option>
+            {{#each groupCategories}}
             <option value="{{id}}" {{selectedIf ../groupCategoryId this.id}}>
               {{name}}
             </option>
-          {{/each}}
-          <option value="blank" {{selectedIf originalGroupRemoved}}></option>
-        </select>
+            {{/each}}
+          </select>
+        </div>
         <div>
-          <button
-            class="Button"
-            type="button"
-            id="create_group_category_id"
-            {{disabledIf inClosedGradingPeriod}}
-            {{disabledIf groupCategoryIdDisabled}}
-            >
+          <button class="Button" type="button" id="create_group_category_id" {{disabledIf inClosedGradingPeriod}}
+            {{disabledIf groupCategoryIdDisabled}}>
             {{#t}}New Group Category{{/t}}
           </button>
         </div>
       </div>
     </div>
     {{#if groupCategoryLocked}}
-      <div class="group_category_locked_explanation alert assignment-edit-group-alert">
-        {{#if lockedMessage}}{{lockedMessage}}{{else}}
-          {{#t "group_category_locked_explanation"}}Students have already
-          submitted homework on this assignment, so group settings cannot be
-          changed.{{/t}}
-        {{/if}}
-      </div>
+    <div class="group_category_locked_explanation alert assignment-edit-group-alert">
+      {{#if lockedMessage}}{{lockedMessage}}{{else}}
+      {{#t "group_category_locked_explanation"}}Students have already
+      submitted homework on this assignment, so group settings cannot be
+      changed.{{/t}}
+      {{/if}}
+    </div>
     {{/if}}
   </div>
 </div>

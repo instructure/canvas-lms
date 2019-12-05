@@ -379,6 +379,8 @@ class FilesController < ApplicationController
         has_external_tools = !context.is_a?(Group) && tool_context
 
         file_menu_tools = (has_external_tools ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
+        file_index_menu_tools = (has_external_tools && @domain_root_account&.feature_enabled?(:commons_favorites)) ?
+          external_tools_display_hashes(:file_index_menu, tool_context) : []
 
         {
           asset_string: context.asset_string,
@@ -387,7 +389,8 @@ class FilesController < ApplicationController
           permissions: {
             manage_files: context.grants_right?(@current_user, session, :manage_files),
           },
-          file_menu_tools: file_menu_tools
+          file_menu_tools: file_menu_tools,
+          file_index_menu_tools: file_index_menu_tools
         }
       end
 

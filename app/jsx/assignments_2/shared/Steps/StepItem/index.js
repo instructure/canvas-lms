@@ -119,7 +119,7 @@ class StepItem extends Component {
         <ApplyTheme
           theme={{
             [Button.theme]: {
-              iconColor: '#828587',
+              iconColor: '$ic-color-medium-darker',
               borderRadius: '2rem'
             }
           }}
@@ -171,7 +171,7 @@ class StepItem extends Component {
     if (!Icon && status === 'complete') {
       return <IconCheckMarkSolid color="primary-inverse" />
     } else if (!Icon && status === 'unavailable') {
-      return <IconLockSolid color="error" />
+      return <IconLockSolid color="error" style={{display: 'flex'}} />
     } else if (typeof Icon === 'function') {
       return <Icon />
     } else if (Icon) {

@@ -894,13 +894,11 @@ class Assignment < ActiveRecord::Base
   protected :default_values
 
   def ensure_assignment_group(do_save = true)
+    return if assignment_group_id
     self.context.require_assignment_group
-    assignment_groups = self.context.assignment_groups.active
-    if !assignment_groups.map(&:id).include?(self.assignment_group_id)
-      self.assignment_group = assignment_groups.first
-      Shackles.activate(:master) do
-        save! if do_save
-      end
+    self.assignment_group = self.context.assignment_groups.active.first
+    if do_save
+      Shackles.activate(:master) { save! }
     end
   end
 
@@ -2859,6 +2857,7 @@ class Assignment < ActiveRecord::Base
   def update_cached_due_dates
     return unless update_cached_due_dates?
     self.clear_cache_key(:availability)
+    self.quiz.clear_cache_key(:availability) if self.quiz?
 
     unless self.saved_by == :migration
       relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides).inspect
@@ -3049,6 +3048,7 @@ class Assignment < ActiveRecord::Base
   def run_if_overrides_changed_later!(student_ids: nil, updating_user: nil)
     return if self.class.suspended_callback?(:update_cached_due_dates, :save)
     self.clear_cache_key(:availability)
+    self.quiz.clear_cache_key(:availability) if self.quiz?
 
     enqueuing_args = if student_ids
       { strand: "assignment_overrides_changed_for_students_#{self.global_id}" }

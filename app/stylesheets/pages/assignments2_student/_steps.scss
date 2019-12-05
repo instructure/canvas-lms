@@ -79,7 +79,7 @@
 .progression {
   flex: 1;
   height: 0.0625rem;
-  background: #8B969E;
+  background: $ic-color-medium;
 }
 
 .completeProgression {
@@ -89,7 +89,7 @@
   height: 0.125rem;
   offset-inline-start: 0;
   top: calc(50% - (0.125rem / 2));
-  background: #00AC18;
+  background: $shamrock;
   transition: transform 0.2s;
   transform-origin: left center;
 }

@@ -202,7 +202,7 @@ describe "student planner" do
       user_session(@student1)
     end
 
-    it "opens the sidebar to creata a new To-Do item.", priority: "1", test_id: 3263157 do
+    it "opens the sidebar to create a new To-Do item.", priority: "1", test_id: 3263157 do
       go_to_list_view
       todo_modal_button.click
       expect(todo_save_button).to be_displayed

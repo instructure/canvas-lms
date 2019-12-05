@@ -106,7 +106,7 @@ describe('ContentTabs', () => {
       </MockedProvider>
     )
 
-    expect(getByText('Submitted')).toBeInTheDocument()
+    expect(getByText('Submitted:')).toBeInTheDocument()
     expect(getByTestId('friendly-date-time')).toBeInTheDocument()
     expect(getByTestId('grade-display')).toBeInTheDocument()
   })
@@ -136,7 +136,7 @@ describe('ContentTabs', () => {
       </MockedProvider>
     )
 
-    expect(getByText('Submitted')).toBeInTheDocument()
+    expect(getByText('Submitted:')).toBeInTheDocument()
     expect(getByTestId('friendly-date-time')).toBeInTheDocument()
     expect(getByTestId('grade-display')).toBeInTheDocument()
   })
@@ -151,7 +151,7 @@ describe('ContentTabs', () => {
       </MockedProvider>
     )
 
-    expect(queryByText('Submitted')).toBeInTheDocument()
+    expect(queryByText('Submitted:')).toBeInTheDocument()
     expect(queryByTestId('friendly-date-time')).toBeInTheDocument()
     expect(queryByTestId('grade-display')).toBeInTheDocument()
     expect(queryByText('–/10 Points')).toBeInTheDocument()
@@ -165,7 +165,7 @@ describe('ContentTabs', () => {
       </MockedProvider>
     )
 
-    expect(queryByText('Submitted')).toBeNull()
+    expect(queryByText('Submitted:')).toBeNull()
     expect(queryByTestId('friendly-date-time')).toBeNull()
     expect(queryByTestId('grade-display')).toBeNull()
   })
