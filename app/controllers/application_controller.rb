@@ -459,7 +459,20 @@ class ApplicationController < ActionController::Base
   # retrieves the root account for the given domain
   def load_account
     @domain_root_account = request.env['canvas.domain_root_account'] || LoadAccount.default_domain_root_account
-    @files_domain = request.host_with_port != HostUrl.context_host(@domain_root_account) && HostUrl.is_file_host?(request.host_with_port)
+    # There is a bunch of logic in canvas to deal with multiple universities with their own domains and isolating
+    # files, routing to the proper databases, etc depending on the domain.  In our world, we don't have all that
+    # going on. There is one domain and we don't need to isolate things depending on the domain.
+    # 
+    # There were issues with the logic somewhere in all the layers of file handling where things
+    # infinitely redirected or redirected to the wrong URL when trying to load uploaded file images from HTML <img>
+    # elements. Commenting this out and always return true as a hack to fix it. This variable appears to mean
+    # "the request to this server is the one hosting the files". This hack short-circuits a ton of 
+    # places where the code tries to do different things if we're not on the same host as the one serving up files 
+    # (which we always are in our world). This would break things if we try to configure the files to be served
+    # differently, but it's too much work to figure out how this all works and fix our issue in a way that maintains
+    # that logic.
+    #@files_domain = request.host_with_port != HostUrl.context_host(@domain_root_account) && HostUrl.is_file_host?(request.host_with_port)
+    @files_domain = true
     @domain_root_account
   end
 
@@ -576,7 +589,9 @@ class ApplicationController < ActionController::Base
       path_params = request.path_parameters
       path_params[:format] = nil
       @headers = !!@current_user if @headers != false
-      @files_domain = @account_domain && @account_domain.host_type == 'files'
+      # See note above about this hack for this variable.
+      #@files_domain = @account_domain && @account_domain.host_type == 'files'
+      @files_domain = true
       format.html {
         return unless fix_ms_office_redirects
         store_location
