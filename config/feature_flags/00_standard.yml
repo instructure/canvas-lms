@@ -402,9 +402,6 @@ direct_share:
   description: This feature allows teachers to easily copy single items from
     one course to another, and to share a single item of content with other
     users so they can import those items into their courses as well.
-  environments:
-    production:
-      state: disabled
 filter_speed_grader_by_student_group:
   state: allowed
   applies_to: RootAccount

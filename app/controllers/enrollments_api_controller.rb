@@ -410,7 +410,8 @@ class EnrollmentsApiController < ApplicationController
                                     course_index_enrollments :
                                     user_index_enrollments
 
-      enrollments = enrollments.joins(:user).select("enrollments.*, users.sortable_name AS sortable_name")
+      enrollments = enrollments.joins(:user).select("enrollments.*").
+        order(:type, User.sortable_name_order_by_clause("users"), :id)
 
       has_courses = enrollments.where_clause.instance_variable_get(:@predicates).
         any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
@@ -463,11 +464,8 @@ class EnrollmentsApiController < ApplicationController
         end
       end
 
-      bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
-        {:type => {:skip_collation => true}, :sortable_name => {:type => :string, :null => false}}, :id)
-      collection = BookmarkedCollection.wrap(bookmarker, enrollments)
       enrollments = Api.paginate(
-        collection,
+        enrollments,
         self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
       ActiveRecord::Associations::Preloader.new.preload(enrollments, [:user, :course, :course_section, :root_account, :sis_pseudonym])
