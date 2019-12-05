@@ -144,7 +144,10 @@ USER dockeruser
 #    ... ommitted ...
 #    at Object.<anonymous> (/app/gems/canvas_i18nliner/bin/i18nliner:3:1)
 #Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works
-
+#
+# Passing the JS_BUILD_NO_UGLIFY variable into the build context will cause compile_assets to skip
+# uglify'ing the JS which takes several minutes (which only happens on production builds anyway).
+ARG JS_BUILD_NO_UGLIFY
 RUN cd /app/gems/canvas_i18nliner/ && npm install -dd \
     && bundle exec rake canvas:compile_assets --trace
 

@@ -19,6 +19,7 @@ build:
   config:
     RAILS_ENV: production
     DOMAIN: stagingportal-bebraven-dot-org.herokuapp.com
+    JS_BUILD_NO_UGLIFY: 1
 
 run:
   web: bundle exec puma -C config/puma.rb
