@@ -1,20 +1,18 @@
 {
-  "add_to_do_7537af64": { "message": "Aufgabe hinzufügen" },
-  "add_to_do_7def3c37": { "message": "Aufgabe hinzufügen" },
-  "address_3159962f": { "message": "Adresse:" },
-  "all_day_fb42c4fc": { "message": "Den ganzen Tag" },
-  "all_items_loaded_aa256183": { "message": "Alle Elemente geladen" },
+  "add_to_do_7537af64": {"message": "Aufgabe hinzufügen"},
+  "add_to_do_7def3c37": {"message": "Aufgabe hinzufügen"},
+  "address_3159962f": {"message": "Adresse:"},
+  "all_day_fb42c4fc": {"message": "Den ganzen Tag"},
+  "all_items_loaded_aa256183": {"message": "Alle Elemente geladen"},
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Beim Versuch, die Gelegenheit auszulassen, ist ein Fehler aufgetreten"
   },
-  "announcement_fb4cb645": { "message": "Ankündigung" },
+  "announcement_fb4cb645": {"message": "Ankündigung"},
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Möchten Sie diesen Plan wirklich löschen?"
   },
-  "assignment_976578a8": { "message": "Aufgabe" },
-  "assignmenttype_title_6612d008": {
-    "message": "{ assignmentType } { title }."
-  },
+  "assignment_976578a8": {"message": "Aufgabe"},
+  "assignmenttype_title_6612d008": {"message": "{ assignmentType } { title }."},
   "assignmenttype_title_all_day_on_datetime_9768903c": {
     "message": "{ assignmentType } { title }, den ganzen Tag am { datetime }."
   },
@@ -42,195 +40,143 @@
   "assignmenttype_title_reminder_datetime_33fa66d5": {
     "message": "{ assignmentType } { title }, Erinnerung { datetime }"
   },
-  "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Beginn Ihrer Aufgabenhistorie"
-  },
-  "calendar_a8563bb2": { "message": "Kalender:" },
-  "calendar_event_89aadc1c": { "message": "Kalenderereignis" },
-  "canvas_planner_98ed106": { "message": "Canvas-Plan" },
-  "close_d634289d": { "message": "Schließen" },
-  "close_opportunity_center_popup_9907d981": {
-    "message": "Fenster „Chancencenter“ schließen"
-  },
+  "beginning_of_your_to_do_history_61ef2dce": {"message": "Beginn Ihrer Aufgabenhistorie"},
+  "calendar_a8563bb2": {"message": "Kalender:"},
+  "calendar_event_89aadc1c": {"message": "Kalenderereignis"},
+  "canvas_planner_98ed106": {"message": "Canvas-Plan"},
+  "close_d634289d": {"message": "Schließen"},
+  "close_opportunity_center_popup_9907d981": {"message": "Fenster „Chancencenter“ schließen"},
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# Gelegenheiten}\n    one {# Gelegenheit}\n  other {# Gelegenheiten}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {# abgeschlossenes Element anzeigen}\n  other {# abgeschlossene Elemente anzeigen}\n}"
   },
-  "course_8a63b4a3": { "message": "Kurs" },
-  "course_to_do_bcbbab54": { "message": "{ course } ZU ERLEDIGEN" },
-  "date_at_time_dbdb1b99": { "message": "am { date } um { time }" },
-  "date_ee500367": { "message": "Datum" },
-  "date_is_not_a_valid_date_4ef9f8ba": {
-    "message": "#{ date } Ist kein gültiges Datum."
-  },
-  "date_is_required_8660ec22": { "message": "Datum ist erforderlich" },
-  "date_time_d9fbf2d7": { "message": "Datum und Uhrzeit:" },
-  "delete_a6efa79d": { "message": "Löschen" },
-  "details_98a31b68": { "message": "Details" },
-  "details_a6f427c3": { "message": "Details:" },
-  "discussion_6719c51d": { "message": "Diskussion" },
-  "dismiss_itemtitle_a9fae1b3": { "message": "{ itemTitle } verwerfen" },
-  "dismiss_opportunityname_5995176f": {
-    "message": "{ opportunityName } verwerfen"
-  },
-  "dismissed_8b0b1fc9": { "message": "Verworfen" },
-  "dismissed_opportunities_f0826640": { "message": "Verworfene Chancen" },
-  "due_5d7267be": { "message": "Fällig:" },
-  "due_date_124fdd99": { "message": "Fällig: { date }" },
-  "edit_c5fbea07": { "message": "Ändern" },
-  "edit_title_72e5a21e": { "message": "{ title } ändern" },
-  "error_loading_grades_e0b38f4d": { "message": "Fehler beim Laden der Noten" },
-  "error_loading_more_items_3f109d9f": {
-    "message": "Fehler beim Laden weiterer Objekte"
-  },
-  "error_loading_past_items_2881dbb1": {
-    "message": "Fehler beim Laden bisheriger Objekte"
-  },
-  "excused_cf8792eb": { "message": "Entschuldigt" },
-  "failed_to_delete_to_do_64edff49": {
-    "message": "Löschen der Aufgabe fehlgeschlagen"
-  },
-  "failed_to_get_new_activity_17e7ec7c": {
-    "message": "Fehler beim Abrufen einer neuen Tätigkeit"
-  },
-  "failed_to_load_opportunities_52ab6404": {
-    "message": "Laden von Chancen fehlgeschlagen"
-  },
-  "failed_to_save_to_do_ddc7503b": {
-    "message": "Speichern der Aufgabe fehlgeschlagen"
-  },
-  "feedback_6dcc1991": { "message": "Feedback" },
-  "go_to_card_view_dashboard_9d03970e": {
-    "message": "Zum Kartenansichts-Dashboard wechseln"
-  },
-  "graded_25cd3fcd": { "message": "Benotet" },
-  "grades_are_loading_c899652d": { "message": "Noten werden geladen" },
-  "grades_loaded_5056277c": { "message": "Noten geladen" },
+  "course_8a63b4a3": {"message": "Kurs"},
+  "course_to_do_bcbbab54": {"message": "{ course } ZU ERLEDIGEN"},
+  "date_at_time_dbdb1b99": {"message": "am { date } um { time }"},
+  "date_ee500367": {"message": "Datum"},
+  "date_is_not_a_valid_date_4ef9f8ba": {"message": "#{ date } Ist kein gültiges Datum."},
+  "date_is_required_8660ec22": {"message": "Datum ist erforderlich"},
+  "date_time_d9fbf2d7": {"message": "Datum und Uhrzeit:"},
+  "delete_a6efa79d": {"message": "Löschen"},
+  "details_98a31b68": {"message": "Details"},
+  "details_a6f427c3": {"message": "Details:"},
+  "discussion_6719c51d": {"message": "Diskussion"},
+  "dismiss_itemtitle_a9fae1b3": {"message": "{ itemTitle } verwerfen"},
+  "dismiss_opportunityname_5995176f": {"message": "{ opportunityName } verwerfen"},
+  "dismissed_8b0b1fc9": {"message": "Verworfen"},
+  "dismissed_opportunities_f0826640": {"message": "Verworfene Chancen"},
+  "due_5d7267be": {"message": "Fällig:"},
+  "due_date_124fdd99": {"message": "Fällig: { date }"},
+  "edit_c5fbea07": {"message": "Ändern"},
+  "edit_title_72e5a21e": {"message": "{ title } ändern"},
+  "error_loading_grades_e0b38f4d": {"message": "Fehler beim Laden der Noten"},
+  "error_loading_more_items_3f109d9f": {"message": "Fehler beim Laden weiterer Objekte"},
+  "error_loading_past_items_2881dbb1": {"message": "Fehler beim Laden bisheriger Objekte"},
+  "excused_cf8792eb": {"message": "Entschuldigt"},
+  "failed_to_delete_to_do_64edff49": {"message": "Löschen der Aufgabe fehlgeschlagen"},
+  "failed_to_get_new_activity_17e7ec7c": {"message": "Fehler beim Abrufen einer neuen Tätigkeit"},
+  "failed_to_load_opportunities_52ab6404": {"message": "Laden von Chancen fehlgeschlagen"},
+  "failed_to_save_to_do_ddc7503b": {"message": "Speichern der Aufgabe fehlgeschlagen"},
+  "feedback_6dcc1991": {"message": "Feedback"},
+  "go_to_card_view_dashboard_9d03970e": {"message": "Zum Kartenansichts-Dashboard wechseln"},
+  "graded_25cd3fcd": {"message": "Benotet"},
+  "grades_are_loading_c899652d": {"message": "Noten werden geladen"},
+  "grades_loaded_5056277c": {"message": "Noten geladen"},
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } Abgeschlossen { items, plural,\n     =1 { Element}\n  other { Elemente}\n}"
   },
-  "late_2be42b88": { "message": "Verspätet" },
-  "load_more_a36f9cf9": { "message": "Mehr laden" },
-  "load_prior_dates_f2b0f6f0": { "message": "Frühere Termine laden" },
+  "late_2be42b88": {"message": "Verspätet"},
+  "load_more_a36f9cf9": {"message": "Mehr laden"},
+  "load_prior_dates_f2b0f6f0": {"message": "Frühere Termine laden"},
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
     "message": "Geladene { count, plural,\n     =0 {# Elemente}\n    one {# Element}\n  other {# Elemente}\n}"
   },
-  "loading_25990131": { "message": "Wird geladen ..." },
-  "loading_725811ca": { "message": "Ladevorgang läuft" },
-  "loading_grades_c842c887": { "message": "Benoter werden geladen" },
-  "loading_past_items_ca499e75": {
-    "message": "Spätere Elemente werden geladen"
-  },
-  "loading_planner_items_947a813d": {
-    "message": "Planungselemente werden geladen."
-  },
-  "location_3b6ff307": { "message": "Standort:" },
+  "loading_25990131": {"message": "Wird geladen ..."},
+  "loading_725811ca": {"message": "Ladevorgang läuft"},
+  "loading_grades_c842c887": {"message": "Benoter werden geladen"},
+  "loading_past_items_ca499e75": {"message": "Spätere Elemente werden geladen"},
+  "loading_planner_items_947a813d": {"message": "Planungselemente werden geladen."},
+  "location_3b6ff307": {"message": "Standort:"},
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Sieht so aus, als wäre hier nichts."
   },
-  "missing_1a256b3b": { "message": "Fehlt" },
-  "missing_items_for_title_516511f8": {
-    "message": "Fehlende Elemente für { title }"
-  },
-  "my_grades_98834476": { "message": "Meine Noten" },
-  "new_13daf639": { "message": "Neu" },
-  "new_activity_8b84847d": { "message": "Neue Aktivität" },
-  "new_activity_for_title_14c9c3af": {
-    "message": "Neue Aktivität für { title }"
-  },
-  "new_opportunities_7d349c4d": { "message": "Neue Chancen" },
-  "next_month_749b1778": { "message": "Nächster Monat" },
-  "no_due_dates_assigned_e8f5bac8": {
-    "message": "Keine Fälligkeitsdaten zugewiesen"
-  },
-  "no_grade_3b4d7f3e": { "message": "Keine Note" },
-  "nothing_for_now_e3e3ce2a": { "message": "Zurzeit liegt nichts vor" },
-  "nothing_here_needs_attention_c4eaded6": {
-    "message": "Nichts, das beachtet werden muss."
-  },
-  "nothing_more_to_do_b665da42": { "message": "Nichts weiter zu tun." },
-  "nothing_new_needs_attention_3ac548d4": {
-    "message": "Nichts Neues, das beachtet werden muss"
-  },
+  "missing_1a256b3b": {"message": "Fehlt"},
+  "missing_items_for_title_516511f8": {"message": "Fehlende Elemente für { title }"},
+  "my_grades_98834476": {"message": "Meine Noten"},
+  "new_13daf639": {"message": "Neu"},
+  "new_activity_8b84847d": {"message": "Neue Aktivität"},
+  "new_activity_for_title_14c9c3af": {"message": "Neue Aktivität für { title }"},
+  "new_opportunities_7d349c4d": {"message": "Neue Chancen"},
+  "next_month_749b1778": {"message": "Nächster Monat"},
+  "no_due_dates_assigned_e8f5bac8": {"message": "Keine Fälligkeitsdaten zugewiesen"},
+  "no_grade_3b4d7f3e": {"message": "Keine Note"},
+  "nothing_for_now_e3e3ce2a": {"message": "Zurzeit liegt nichts vor"},
+  "nothing_here_needs_attention_c4eaded6": {"message": "Nichts, das beachtet werden muss."},
+  "nothing_more_to_do_b665da42": {"message": "Nichts weiter zu tun."},
+  "nothing_new_needs_attention_3ac548d4": {"message": "Nichts Neues, das beachtet werden muss"},
   "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
     "message": "Heute nichts geplant. Auswahl des letzten Elements."
   },
   "nothing_planned_today_selecting_next_item_f6718aa": {
     "message": "Heute nichts geplant. Auswahl des nächsten Element."
   },
-  "nothing_planned_yet_8675ffe9": { "message": "Noch nichts geplant" },
-  "numpoints_points_8621a43b": { "message": "{ numPoints } Punkte" },
+  "nothing_planned_yet_8675ffe9": {"message": "Noch nichts geplant"},
+  "numpoints_points_8621a43b": {"message": "{ numPoints } Punkte"},
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "* Nur der letzte Benotungszeitraum wird angezeigt."
   },
-  "opportunities_popup_f6703842": { "message": "Chancen-Popup-Fenster" },
-  "optional_add_course_ef0d70fc": { "message": "Optional: Kurs hinzufügen" },
-  "page_50c4823d": { "message": "Seite" },
-  "peer_review_74f26a13": { "message": "Kollegenkorrektur" },
-  "peer_review_for_itemtitle_358cb413": {
-    "message": "Kollegenüberprüfung für { itemTitle }"
-  },
-  "points_bceb5005": { "message": "Punkte" },
-  "points_points_63e59cce": { "message": "{ points } Punkte" },
-  "previous_month_bb1e3c84": { "message": "Vorheriger Monat" },
-  "pts_699bd9aa": { "message": "Pkte." },
-  "quiz_e0dcce8f": { "message": "Quiz" },
-  "reminder_date_4564d12d": { "message": "Erinnerung: { date }" },
-  "replies_4a8577c8": { "message": "Antworten" },
-  "save_11a80ec3": { "message": "Speichern" },
+  "opportunities_popup_f6703842": {"message": "Chancen-Popup-Fenster"},
+  "optional_add_course_ef0d70fc": {"message": "Optional: Kurs hinzufügen"},
+  "page_50c4823d": {"message": "Seite"},
+  "peer_review_74f26a13": {"message": "Kollegenkorrektur"},
+  "peer_review_for_itemtitle_358cb413": {"message": "Kollegenüberprüfung für { itemTitle }"},
+  "points_bceb5005": {"message": "Punkte"},
+  "points_points_63e59cce": {"message": "{ points } Punkte"},
+  "previous_month_bb1e3c84": {"message": "Vorheriger Monat"},
+  "pts_699bd9aa": {"message": "Pkte."},
+  "quiz_e0dcce8f": {"message": "Quiz"},
+  "reminder_date_4564d12d": {"message": "Erinnerung: { date }"},
+  "replies_4a8577c8": {"message": "Antworten"},
+  "save_11a80ec3": {"message": "Speichern"},
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Blättern Sie hoch, um Ihren Verlauf zu sehen!"
   },
   "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
     "message": "Blättert zum vorherigen Element mit neuer Aktivität."
   },
-  "show_all_ae37d610": { "message": "Allen zeigen" },
-  "show_my_grades_ebd08684": { "message": "Meine Noten anzeigen" },
-  "startdate_to_enddate_d245175b": {
-    "message": "{ startDate } bis { endDate }"
-  },
-  "startdatetime_enddatetime_20abc10e": {
-    "message": "{ startDateTime } - { endDateTime }"
-  },
-  "startdatetime_endtime_49741bbe": {
-    "message": "{ startDateTime } - { endTime }"
-  },
-  "starttime_to_endtime_d7cc249d": {
-    "message": "{ startTime } bis { endTime }"
-  },
-  "submitted_318fad53": { "message": "Abgegeben" },
-  "success_to_do_created_e34ed395": {
-    "message": "Erfolg: Aufgabenliste erstellt"
-  },
-  "task_16b0ef38": { "message": "Aufgabe" },
+  "show_all_ae37d610": {"message": "Allen zeigen"},
+  "show_my_grades_ebd08684": {"message": "Meine Noten anzeigen"},
+  "startdate_to_enddate_d245175b": {"message": "{ startDate } bis { endDate }"},
+  "startdatetime_enddatetime_20abc10e": {"message": "{ startDateTime } - { endDateTime }"},
+  "startdatetime_endtime_49741bbe": {"message": "{ startDateTime } - { endTime }"},
+  "starttime_to_endtime_d7cc249d": {"message": "{ startTime } bis { endTime }"},
+  "submitted_318fad53": {"message": "Abgegeben"},
+  "success_to_do_created_e34ed395": {"message": "Erfolg: Aufgabenliste erstellt"},
+  "task_16b0ef38": {"message": "Aufgabe"},
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Datum und Uhrzeit dieser Aufgabe sind fällig"
   },
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "Mit diesem Konto sind keine Punkte verknüpft."
   },
-  "time_2b5aac58": { "message": "Zeit" },
-  "title_ee03d132": { "message": "Titel" },
-  "title_is_required_6ddcab69": { "message": "Titel ist erforderlich" },
-  "to_do_1d554f36": { "message": "Zu erledigen" },
-  "to_do_date_4b211ad0": { "message": "Zu erledigen: { date }" },
-  "to_do_items_loading_d1cdfcd5": {
-    "message": "Zu erledigende Aufgaben werden geladen"
-  },
-  "today_76e10f9c": { "message": "Heute" },
-  "today_at_date_8ac30d6": { "message": "Heute, am { date }" },
-  "tomorrow_9a6c9a00": { "message": "Morgen" },
-  "tomorrow_at_date_b53f2cf1": { "message": "Morgen, am { date }" },
+  "time_2b5aac58": {"message": "Zeit"},
+  "title_ee03d132": {"message": "Titel"},
+  "title_is_required_6ddcab69": {"message": "Titel ist erforderlich"},
+  "to_do_1d554f36": {"message": "Zu erledigen"},
+  "to_do_date_4b211ad0": {"message": "Zu erledigen: { date }"},
+  "to_do_items_loading_d1cdfcd5": {"message": "Zu erledigende Aufgaben werden geladen"},
+  "today_76e10f9c": {"message": "Heute"},
+  "today_at_date_8ac30d6": {"message": "Heute, am { date }"},
+  "tomorrow_9a6c9a00": {"message": "Morgen"},
+  "tomorrow_at_date_b53f2cf1": {"message": "Morgen, am { date }"},
   "unable_to_mark_as_complete_8141856d": {
     "message": "Kann nicht als fertiggestellt markiert werden."
   },
-  "yesterday_at_date_1aa6d18e": { "message": "Gestern, am { date }" },
-  "yesterday_c6bd6abf": { "message": "Gestern" },
-  "you_have_media_feedback_f5f9aba8": {
-    "message": "Sie haben Medien-Feedback."
-  },
+  "yesterday_at_date_1aa6d18e": {"message": "Gestern, am { date }"},
+  "yesterday_c6bd6abf": {"message": "Gestern"},
+  "you_have_media_feedback_f5f9aba8": {"message": "Sie haben Medien-Feedback."},
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "Sie müssen ein Datum und eine Uhrzeit angeben."
   },

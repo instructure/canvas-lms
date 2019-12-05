@@ -1,20 +1,18 @@
 {
-  "add_to_do_7537af64": { "message": "Legg til gjøremål" },
-  "add_to_do_7def3c37": { "message": "Legg til gjøremål" },
-  "address_3159962f": { "message": "Adresse:" },
-  "all_day_fb42c4fc": { "message": "Hele dagen" },
-  "all_items_loaded_aa256183": { "message": "Alle elementer lastet opp" },
+  "add_to_do_7537af64": {"message": "Legg til gjøremål"},
+  "add_to_do_7def3c37": {"message": "Legg til gjøremål"},
+  "address_3159962f": {"message": "Adresse:"},
+  "all_day_fb42c4fc": {"message": "Hele dagen"},
+  "all_items_loaded_aa256183": {"message": "Alle elementer lastet opp"},
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Det skjedde en feil ved forsøket på å avvise muligheten."
   },
-  "announcement_fb4cb645": { "message": "Beskjed" },
+  "announcement_fb4cb645": {"message": "Beskjed"},
   "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
     "message": "Er du sikker på at du vil slette dette elementet fra planleggeren?"
   },
-  "assignment_976578a8": { "message": "Oppgave" },
-  "assignmenttype_title_6612d008": {
-    "message": "{ assignmentType } { title }."
-  },
+  "assignment_976578a8": {"message": "Oppgave"},
+  "assignmenttype_title_6612d008": {"message": "{ assignmentType } { title }."},
   "assignmenttype_title_all_day_on_datetime_9768903c": {
     "message": "{ assignmentType } { title }, hele dagen { datetime }."
   },
@@ -42,189 +40,137 @@
   "assignmenttype_title_reminder_datetime_33fa66d5": {
     "message": "{ assignmentType } { title }, påminnelse { datetime }."
   },
-  "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Begynnelsen av din gjøremålshistorie"
-  },
-  "calendar_a8563bb2": { "message": "Kalender:" },
-  "calendar_event_89aadc1c": { "message": "Kalenderhendelse" },
-  "canvas_planner_98ed106": { "message": "Canvas planlegger" },
-  "close_d634289d": { "message": "Lukk" },
-  "close_opportunity_center_popup_9907d981": {
-    "message": "Lukk boksen «Mulighetsmarked»"
-  },
+  "beginning_of_your_to_do_history_61ef2dce": {"message": "Begynnelsen av din gjøremålshistorie"},
+  "calendar_a8563bb2": {"message": "Kalender:"},
+  "calendar_event_89aadc1c": {"message": "Kalenderhendelse"},
+  "canvas_planner_98ed106": {"message": "Canvas planlegger"},
+  "close_d634289d": {"message": "Lukk"},
+  "close_opportunity_center_popup_9907d981": {"message": "Lukk boksen «Mulighetsmarked»"},
   "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
     "message": "{ count, plural,\n     =0 {# muligheter}\n    one {# mulighet}\n  other {# muligheter}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte elementer}\n}"
   },
-  "course_8a63b4a3": { "message": "Fag" },
-  "course_to_do_bcbbab54": { "message": "{ course } Å GJØRE" },
-  "date_at_time_dbdb1b99": { "message": "{ date } på { time }" },
-  "date_ee500367": { "message": "Dato" },
-  "date_is_not_a_valid_date_4ef9f8ba": {
-    "message": "#{ date } Er ikke en gyldig dato."
-  },
-  "date_is_required_8660ec22": { "message": "Dato kreves" },
-  "date_time_d9fbf2d7": { "message": "Dato og tid:" },
-  "delete_a6efa79d": { "message": "Slett" },
-  "details_98a31b68": { "message": "Detaljer" },
-  "details_a6f427c3": { "message": "Detaljer:" },
-  "discussion_6719c51d": { "message": "Diskusjon" },
-  "dismiss_itemtitle_a9fae1b3": { "message": "Avvise { itemTitle }" },
-  "dismiss_opportunityname_5995176f": {
-    "message": "Avvise { opportunityName }"
-  },
-  "dismissed_8b0b1fc9": { "message": "Avvist" },
-  "dismissed_opportunities_f0826640": { "message": "Avvist «Muligheter»" },
-  "due_5d7267be": { "message": "Frist:" },
-  "due_date_124fdd99": { "message": "Frist: { date }" },
-  "edit_c5fbea07": { "message": "Rediger" },
-  "edit_title_72e5a21e": { "message": "Rediger { title }" },
-  "error_loading_grades_e0b38f4d": {
-    "message": "Feil ved lasting av vurderinger"
-  },
-  "error_loading_more_items_3f109d9f": {
-    "message": "Feil under lasting av flere elementer"
-  },
-  "error_loading_past_items_2881dbb1": {
-    "message": "Feil under lasting av tidligere elementer"
-  },
-  "excused_cf8792eb": { "message": "Fritatt" },
-  "failed_to_delete_to_do_64edff49": {
-    "message": "Kunne ikke slette gjøremål"
-  },
-  "failed_to_get_new_activity_17e7ec7c": {
-    "message": "Kunne ikke få ny aktivitet"
-  },
-  "failed_to_load_opportunities_52ab6404": {
-    "message": "Kunne ikke laste muligheter"
-  },
-  "failed_to_save_to_do_ddc7503b": { "message": "Kunne ikke lagre gjøremål" },
-  "feedback_6dcc1991": { "message": "Tilbakemelding" },
-  "go_to_card_view_dashboard_9d03970e": {
-    "message": "Gå til Kortvisningsoversikten"
-  },
-  "graded_25cd3fcd": { "message": "Vurdert" },
-  "grades_are_loading_c899652d": { "message": "Vurderinger lastes opp" },
-  "grades_loaded_5056277c": { "message": "Vurderingerer lastet opp" },
+  "course_8a63b4a3": {"message": "Fag"},
+  "course_to_do_bcbbab54": {"message": "{ course } Å GJØRE"},
+  "date_at_time_dbdb1b99": {"message": "{ date } på { time }"},
+  "date_ee500367": {"message": "Dato"},
+  "date_is_not_a_valid_date_4ef9f8ba": {"message": "#{ date } Er ikke en gyldig dato."},
+  "date_is_required_8660ec22": {"message": "Dato kreves"},
+  "date_time_d9fbf2d7": {"message": "Dato og tid:"},
+  "delete_a6efa79d": {"message": "Slett"},
+  "details_98a31b68": {"message": "Detaljer"},
+  "details_a6f427c3": {"message": "Detaljer:"},
+  "discussion_6719c51d": {"message": "Diskusjon"},
+  "dismiss_itemtitle_a9fae1b3": {"message": "Avvise { itemTitle }"},
+  "dismiss_opportunityname_5995176f": {"message": "Avvise { opportunityName }"},
+  "dismissed_8b0b1fc9": {"message": "Avvist"},
+  "dismissed_opportunities_f0826640": {"message": "Avvist «Muligheter»"},
+  "due_5d7267be": {"message": "Frist:"},
+  "due_date_124fdd99": {"message": "Frist: { date }"},
+  "edit_c5fbea07": {"message": "Rediger"},
+  "edit_title_72e5a21e": {"message": "Rediger { title }"},
+  "error_loading_grades_e0b38f4d": {"message": "Feil ved lasting av vurderinger"},
+  "error_loading_more_items_3f109d9f": {"message": "Feil under lasting av flere elementer"},
+  "error_loading_past_items_2881dbb1": {"message": "Feil under lasting av tidligere elementer"},
+  "excused_cf8792eb": {"message": "Fritatt"},
+  "failed_to_delete_to_do_64edff49": {"message": "Kunne ikke slette gjøremål"},
+  "failed_to_get_new_activity_17e7ec7c": {"message": "Kunne ikke få ny aktivitet"},
+  "failed_to_load_opportunities_52ab6404": {"message": "Kunne ikke laste muligheter"},
+  "failed_to_save_to_do_ddc7503b": {"message": "Kunne ikke lagre gjøremål"},
+  "feedback_6dcc1991": {"message": "Tilbakemelding"},
+  "go_to_card_view_dashboard_9d03970e": {"message": "Gå til Kortvisningsoversikten"},
+  "graded_25cd3fcd": {"message": "Vurdert"},
+  "grades_are_loading_c899652d": {"message": "Vurderinger lastes opp"},
+  "grades_loaded_5056277c": {"message": "Vurderingerer lastet opp"},
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } fullførte { items, plural,\n     =1 {element}\n  other {elementer}\n}"
   },
-  "late_2be42b88": { "message": "Sent" },
-  "load_more_a36f9cf9": { "message": "Last mer" },
-  "load_prior_dates_f2b0f6f0": { "message": "Last inn tidligere datoer" },
+  "late_2be42b88": {"message": "Sent"},
+  "load_more_a36f9cf9": {"message": "Last mer"},
+  "load_prior_dates_f2b0f6f0": {"message": "Last inn tidligere datoer"},
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
     "message": "Lastet { count, plural,\n     =0 {# elementer}\n    one {# element}\n  other {# elementer}\n}"
   },
-  "loading_25990131": { "message": "Laster..." },
-  "loading_725811ca": { "message": "laster inn" },
-  "loading_grades_c842c887": { "message": "Laster inn tidligere vurderinger" },
-  "loading_past_items_ca499e75": { "message": "Laster tidligere elementer" },
-  "loading_planner_items_947a813d": { "message": "Laster elementplanlegger" },
-  "location_3b6ff307": { "message": "Sted:" },
-  "looks_like_there_isn_t_anything_here_d9bcef49": {
-    "message": "Ser ikke ut til at det er noe her"
-  },
-  "missing_1a256b3b": { "message": "Mangler" },
-  "missing_items_for_title_516511f8": {
-    "message": "Manglende elementer for { title }"
-  },
-  "my_grades_98834476": { "message": "Mine vurderinger" },
-  "new_13daf639": { "message": "Ny" },
-  "new_activity_8b84847d": { "message": "Ny aktivitet" },
-  "new_activity_for_title_14c9c3af": {
-    "message": "Ny aktivitet for { title }"
-  },
-  "new_opportunities_7d349c4d": { "message": "Nye muligheter" },
-  "next_month_749b1778": { "message": "Neste måned" },
-  "no_due_dates_assigned_e8f5bac8": {
-    "message": "Ingen forfallsdatoer tildelt"
-  },
-  "no_grade_3b4d7f3e": { "message": "Ingen vurdering" },
-  "nothing_for_now_e3e3ce2a": { "message": "Ingenting for øyeblikket" },
-  "nothing_here_needs_attention_c4eaded6": {
-    "message": "Ingenting her trenger tilsyn."
-  },
-  "nothing_more_to_do_b665da42": { "message": "Ingen flere gjøremål" },
-  "nothing_new_needs_attention_3ac548d4": {
-    "message": "Ingenting nytt trenger oppmerksomhet."
-  },
+  "loading_25990131": {"message": "Laster..."},
+  "loading_725811ca": {"message": "laster inn"},
+  "loading_grades_c842c887": {"message": "Laster inn tidligere vurderinger"},
+  "loading_past_items_ca499e75": {"message": "Laster tidligere elementer"},
+  "loading_planner_items_947a813d": {"message": "Laster elementplanlegger"},
+  "location_3b6ff307": {"message": "Sted:"},
+  "looks_like_there_isn_t_anything_here_d9bcef49": {"message": "Ser ikke ut til at det er noe her"},
+  "missing_1a256b3b": {"message": "Mangler"},
+  "missing_items_for_title_516511f8": {"message": "Manglende elementer for { title }"},
+  "my_grades_98834476": {"message": "Mine vurderinger"},
+  "new_13daf639": {"message": "Ny"},
+  "new_activity_8b84847d": {"message": "Ny aktivitet"},
+  "new_activity_for_title_14c9c3af": {"message": "Ny aktivitet for { title }"},
+  "new_opportunities_7d349c4d": {"message": "Nye muligheter"},
+  "next_month_749b1778": {"message": "Neste måned"},
+  "no_due_dates_assigned_e8f5bac8": {"message": "Ingen forfallsdatoer tildelt"},
+  "no_grade_3b4d7f3e": {"message": "Ingen vurdering"},
+  "nothing_for_now_e3e3ce2a": {"message": "Ingenting for øyeblikket"},
+  "nothing_here_needs_attention_c4eaded6": {"message": "Ingenting her trenger tilsyn."},
+  "nothing_more_to_do_b665da42": {"message": "Ingen flere gjøremål"},
+  "nothing_new_needs_attention_3ac548d4": {"message": "Ingenting nytt trenger oppmerksomhet."},
   "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
     "message": "Ingenting på programmet i dag. Velg det nyeste elementet."
   },
   "nothing_planned_today_selecting_next_item_f6718aa": {
     "message": "Ingenting på programmet i dag. Velger neste element."
   },
-  "nothing_planned_yet_8675ffe9": { "message": "Ingenting planlagt ennå" },
-  "numpoints_points_8621a43b": { "message": "{ numPoints } poeng" },
+  "nothing_planned_yet_8675ffe9": {"message": "Ingenting planlagt ennå"},
+  "numpoints_points_8621a43b": {"message": "{ numPoints } poeng"},
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Viser kun de seneste vurderingsperioder."
   },
-  "opportunities_popup_f6703842": { "message": "muligheter-boksen" },
-  "optional_add_course_ef0d70fc": { "message": "Valgfri: Legg til fag" },
-  "page_50c4823d": { "message": "Side" },
-  "peer_review_74f26a13": { "message": "Medelevvurdering" },
-  "peer_review_for_itemtitle_358cb413": {
-    "message": "Medelevvurdering for { itemTitle }"
-  },
-  "points_bceb5005": { "message": "poeng" },
-  "points_points_63e59cce": { "message": "{ points } poeng" },
-  "previous_month_bb1e3c84": { "message": "Forrige måned" },
-  "pts_699bd9aa": { "message": "Poeng" },
-  "quiz_e0dcce8f": { "message": "Test" },
-  "reminder_date_4564d12d": { "message": "Påminnelse: { date }" },
-  "replies_4a8577c8": { "message": "Svar" },
-  "save_11a80ec3": { "message": "Lagre" },
-  "scroll_up_to_see_your_history_19b14cad": {
-    "message": "Rull opp for å se historien din!"
-  },
+  "opportunities_popup_f6703842": {"message": "muligheter-boksen"},
+  "optional_add_course_ef0d70fc": {"message": "Valgfri: Legg til fag"},
+  "page_50c4823d": {"message": "Side"},
+  "peer_review_74f26a13": {"message": "Medelevvurdering"},
+  "peer_review_for_itemtitle_358cb413": {"message": "Medelevvurdering for { itemTitle }"},
+  "points_bceb5005": {"message": "poeng"},
+  "points_points_63e59cce": {"message": "{ points } poeng"},
+  "previous_month_bb1e3c84": {"message": "Forrige måned"},
+  "pts_699bd9aa": {"message": "Poeng"},
+  "quiz_e0dcce8f": {"message": "Test"},
+  "reminder_date_4564d12d": {"message": "Påminnelse: { date }"},
+  "replies_4a8577c8": {"message": "Svar"},
+  "save_11a80ec3": {"message": "Lagre"},
+  "scroll_up_to_see_your_history_19b14cad": {"message": "Rull opp for å se historien din!"},
   "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
     "message": "Ruller opp til forrige element med ny aktivitet."
   },
-  "show_all_ae37d610": { "message": "Vis alle" },
-  "show_my_grades_ebd08684": { "message": "Vis mine vurderinger" },
-  "startdate_to_enddate_d245175b": {
-    "message": "{ startDate } til { endDate }"
-  },
-  "startdatetime_enddatetime_20abc10e": {
-    "message": "{ startDateTime } - { endDateTime }"
-  },
-  "startdatetime_endtime_49741bbe": {
-    "message": "{ startDateTime } - { endTime }"
-  },
-  "starttime_to_endtime_d7cc249d": {
-    "message": "{ startTime } til { endTime }"
-  },
-  "submitted_318fad53": { "message": "Sendt inn" },
-  "success_to_do_created_e34ed395": {
-    "message": "Vellykket: Gjøremål opprettet"
-  },
-  "task_16b0ef38": { "message": "Oppgave" },
+  "show_all_ae37d610": {"message": "Vis alle"},
+  "show_my_grades_ebd08684": {"message": "Vis mine vurderinger"},
+  "startdate_to_enddate_d245175b": {"message": "{ startDate } til { endDate }"},
+  "startdatetime_enddatetime_20abc10e": {"message": "{ startDateTime } - { endDateTime }"},
+  "startdatetime_endtime_49741bbe": {"message": "{ startDateTime } - { endTime }"},
+  "starttime_to_endtime_d7cc249d": {"message": "{ startTime } til { endTime }"},
+  "submitted_318fad53": {"message": "Sendt inn"},
+  "success_to_do_created_e34ed395": {"message": "Vellykket: Gjøremål opprettet"},
+  "task_16b0ef38": {"message": "Oppgave"},
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Forfalls-dato og -tidspunkt for dette Gjøremål"
   },
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "Det er ingen poeng assosiert med dette punktet"
   },
-  "time_2b5aac58": { "message": "Tid" },
-  "title_ee03d132": { "message": "Tittel" },
-  "title_is_required_6ddcab69": { "message": "tittel er obligatorisk" },
-  "to_do_1d554f36": { "message": "Å gjøre" },
-  "to_do_date_4b211ad0": { "message": "Å gjøre: { date }" },
-  "to_do_items_loading_d1cdfcd5": { "message": "Å gjøre-elementer laster" },
-  "today_76e10f9c": { "message": "I dag" },
-  "today_at_date_8ac30d6": { "message": "I dag klokken { date }" },
-  "tomorrow_9a6c9a00": { "message": "I morgen" },
-  "tomorrow_at_date_b53f2cf1": { "message": "I morgen klokken { date }" },
-  "unable_to_mark_as_complete_8141856d": {
-    "message": "Kan ikke markere som fullført."
-  },
-  "yesterday_at_date_1aa6d18e": { "message": "I går klokken { date }" },
-  "yesterday_c6bd6abf": { "message": "I går" },
-  "you_have_media_feedback_f5f9aba8": {
-    "message": "Du har medietilbakemeldinger."
-  },
+  "time_2b5aac58": {"message": "Tid"},
+  "title_ee03d132": {"message": "Tittel"},
+  "title_is_required_6ddcab69": {"message": "tittel er obligatorisk"},
+  "to_do_1d554f36": {"message": "Å gjøre"},
+  "to_do_date_4b211ad0": {"message": "Å gjøre: { date }"},
+  "to_do_items_loading_d1cdfcd5": {"message": "Å gjøre-elementer laster"},
+  "today_76e10f9c": {"message": "I dag"},
+  "today_at_date_8ac30d6": {"message": "I dag klokken { date }"},
+  "tomorrow_9a6c9a00": {"message": "I morgen"},
+  "tomorrow_at_date_b53f2cf1": {"message": "I morgen klokken { date }"},
+  "unable_to_mark_as_complete_8141856d": {"message": "Kan ikke markere som fullført."},
+  "yesterday_at_date_1aa6d18e": {"message": "I går klokken { date }"},
+  "yesterday_c6bd6abf": {"message": "I går"},
+  "you_have_media_feedback_f5f9aba8": {"message": "Du har medietilbakemeldinger."},
   "you_must_provide_a_date_and_time_a86839d2": {
     "message": "Du må oppgi en dato og et klokkeslett."
   },
