@@ -31,9 +31,6 @@ describe BookmarkedCollection::SimpleBookmarker do
 
     @bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :name, :id)
     @date_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class, :date, :id)
-    @custom_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class,
-      {:unbobbed_name => {:type => :string, :null => false}}, :id)
-
     @bob = @example_class.create!(name: "bob")
     @bob2 = @example_class.create!(name: "Bob", date: DateTime.now.to_s)
     @joe = @example_class.create!(name: "joe")
@@ -63,10 +60,6 @@ describe BookmarkedCollection::SimpleBookmarker do
       expect(@date_bookmarker.validate(["bob"])).to be_falsey
       expect(@date_bookmarker.validate([DateTime.now, 1])).to eq true
       expect(@date_bookmarker.validate([DateTime.now.to_s, 1])).to eq true
-
-      # with custom stuff
-      expect(@custom_bookmarker.validate(["llib", 1])).to eq true
-      expect(@custom_bookmarker.validate([2, 1])).to be_falsey
     end
   end
 
@@ -104,38 +97,9 @@ describe BookmarkedCollection::SimpleBookmarker do
     it "should include the bookmark if and only if include_bookmark" do
       bookmark = @bookmarker.bookmark_for(@bob2)
       pager = double(current_bookmark: bookmark, include_bookmark: true)
-      expect(BookmarkedCollection).to receive(:best_unicode_collation_key).at_least(:once).and_call_original
       expect(@bookmarker.restrict_scope(@example_class, pager)).to eq(
         [@bob2, @bobby, @joe]
       )
     end
-
-    it "should skip collation if specified" do
-      @non_collated_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class,
-        {:name => {:skip_collation => true}}, :id)
-      pager = double(current_bookmark: nil)
-      expect(BookmarkedCollection).to receive(:best_unicode_collation_key).never
-      expect(@non_collated_bookmarker.restrict_scope(@example_class, pager)).to eq(
-        [@bill, @bob2, @bob, @bobby, @joe]
-      )
-    end
-
-    it "should work with custom columns" do
-      pager = double(current_bookmark: nil)
-      scope = @example_class.select("examples.*, replace(examples.name, 'bob', 'robert') AS unbobbed_name")
-      result = @custom_bookmarker.restrict_scope(scope, pager).to_a
-      expect(result).to eq(
-        [@bill, @bob2, @joe, @bob, @bobby]
-      )
-      @bob_with_custom = result[3]
-      expect(@bob_with_custom.unbobbed_name).to eq "robert"
-
-      bookmark = @custom_bookmarker.bookmark_for(@bob_with_custom)
-      pager2 = double(current_bookmark: bookmark, include_bookmark: false)
-      expect(@custom_bookmarker.restrict_scope(scope, pager2)).to eq(
-        [@bobby]
-      )
-    end
   end
-
 end
