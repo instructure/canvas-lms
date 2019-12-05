@@ -94,7 +94,7 @@ class PseudonymSession < Authlogic::Session::Base
     # have to call super first, as that's what loads attempted_record
     if too_many_attempts? || attempted_record.try(:audit_login, remote_ip, !invalid_password?) == :too_many_attempts
       self.too_many_attempts = true
-      errors.add(password_field, I18n.t('errors.max_attempts', 'Too many failed login attempts. Please try again later or contact your system administrator.'))
+      errors.add(password_field, I18n.t('errors.invalid_username_or_password_b60aa240', 'Invalid username or password'))
       return
     end
   end

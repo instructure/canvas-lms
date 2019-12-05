@@ -101,7 +101,7 @@ class Login::CanvasController < ApplicationController
     end
 
     if pseudonym == :too_many_attempts || @pseudonym_session.too_many_attempts?
-      unsuccessful_login t("Too many failed login attempts. Please try again later or contact your system administrator.")
+      unsuccessful_login t("Invalid username or password")
       return
     end
 
