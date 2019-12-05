@@ -922,7 +922,9 @@ class User < ActiveRecord::Base
     self.remove_from_root_account(:all)
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    self.save
+    if self.save
+      eportfolios.active.in_batches.destroy_all
+    end
   end
 
   # avoid extraneous callbacks when enrolled in multiple sections
@@ -948,6 +950,9 @@ class User < ActiveRecord::Base
         account_users = self.account_users.active.shard(self)
         has_other_root_accounts = false
         group_memberships_scope = self.group_memberships.active.shard(self)
+
+        # eportfolios will only be in the users home shard
+        eportfolio_scope = self.eportfolios.active
       else
         # make sure to do things on the root account's shard. but note,
         # root_account.enrollments won't include the student view user's
@@ -957,18 +962,22 @@ class User < ActiveRecord::Base
         enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
         user_observer_scope = self.as_student_observation_links.shard(self)
         user_observee_scope = self.as_observer_observation_links.shard(self)
+
         pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
 
         account_users = root_account.account_users.where(user_id: self).to_a +
           self.account_users.shard(root_account).where(:account_id => root_account.all_accounts).to_a
         has_other_root_accounts = self.associated_accounts.shard(self).where('accounts.id <> ?', root_account).exists?
         group_memberships_scope = self.group_memberships.active.shard(root_account.shard).joins(:group).where(:groups => {:root_account_id => root_account})
+
+        eportfolio_scope = self.eportfolios.active if self.shard == root_account.shard
       end
 
       self.delete_enrollments(enrollment_scope, updating_user: updating_user)
       group_memberships_scope.destroy_all
       user_observer_scope.destroy_all
       user_observee_scope.destroy_all
+      eportfolio_scope.in_batches.destroy_all if eportfolio_scope
       pseudonym_scope.each(&:destroy)
       account_users.each(&:destroy)
 
