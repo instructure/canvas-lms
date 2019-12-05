@@ -87,6 +87,12 @@ pipeline {
       steps {
         timeout(time: 3) {
           script {
+            if (env.CANVAS_LMS_REFSPEC) {
+              // the plugin builds require the canvas lms refspec to be different. so only
+              // set this refspec if the main build is requesting it to be set.
+              // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
+              build_parameters += string(name: 'CANVAS_LMS_REFSPEC', value: "${env.CANVAS_LMS_REFSPEC}")
+            }
             def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
             credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
@@ -245,6 +251,19 @@ pipeline {
             }
           }
         }
+
+        // keep this around in case there is changes to the subbuilds that need to happen
+        // and you have no other way to test it except by running a test build.
+        // stage('Test Subbuild') {
+        //   steps {
+        //     skipIfPreviouslySuccessful("test-subbuild") {
+        //       build(
+        //         job: 'test-suites/test-subbuild',
+        //         parameters: build_parameters
+        //       )
+        //     }
+        //   }
+        // }
 /*
  *  Don't run these on all patch sets until we have them ready to report results.
  *  Uncomment stage to run when developing.
