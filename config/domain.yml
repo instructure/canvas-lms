@@ -1,7 +1,9 @@
 common: &default_settings
-  # For heroku Review Apps, the HEROKU_APP_NAME holds the app DOMAIN.
-  # That should take precendence if both variables exist.
-  domain: <%= ENV.fetch('HEROKU_APP_NAME', ENV['DOMAIN']) %>
+  # For heroku Review Apps, the HEROKU_BRANCH will be set and we can construct the domain using the
+  # injected HEROKU_APP_NAME. Note that we check for the HEROKU_BRANCH variable and don't simply
+  # look for the HEROKU_APP_NAME in case Dyno Metadata is enabled on a non-review app:
+  # https://devcenter.heroku.com/articles/dyno-metadata
+  domain: <%= ENV['HEROKU_BRANCH'].nil? ? ENV['DOMAIN'] : "#{ENV['HEROKU_APP_NAME']}.herokuapp.com" %>
   ssl: true
 
 development:
