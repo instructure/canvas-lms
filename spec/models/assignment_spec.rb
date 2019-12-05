@@ -5673,18 +5673,84 @@ describe Assignment do
       expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
     end
 
-    it "should mark comments as hidden for submission zip uploads" do
-      @assignment = @course.assignments.create! name: "Mute Comment Test",
-                                                submission_types: %w(online_upload)
-      @assignment.update_attribute :muted, true
-      submit_homework(@student)
+    describe "newly-created comments" do
+      before(:each) do
+        @assignment = @course.assignments.create!(name: "Mute Comment Test", submission_types: %w(online_upload))
+      end
 
-      zip = zip_submissions
+      let(:zip) { zip_submissions }
+      let(:added_comment) { @assignment.submission_for_student(@student).submission_comments.last }
 
-      @assignment.generate_comments_from_files(zip.open.path, @user)
+      context "with post policies enabled" do
+        before(:each) do
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
+        end
 
-      submission = @assignment.submission_for_student(@student)
-      expect(submission.submission_comments.last.hidden).to eq true
+        context "for a manually-posted assignment" do
+          before(:each) do
+            @assignment.post_policy.update!(post_manually: true)
+          end
+
+          it "hides new comments if the submission is not posted" do
+            submit_homework(@student)
+
+            @assignment.generate_comments_from_files(zip.open.path, @user)
+            expect(added_comment).to be_hidden
+          end
+
+          it "shows new comments if the submission is posted" do
+            submit_homework(@student)
+            @assignment.post_submissions
+
+            @assignment.generate_comments_from_files(zip.open.path, @user)
+            expect(added_comment).not_to be_hidden
+          end
+        end
+
+        context "for a automatically-posted assignment" do
+          it "shows new comments if the submission is posted" do
+            submit_homework(@student)
+            @assignment.post_submissions
+
+            @assignment.generate_comments_from_files(zip.open.path, @user)
+            expect(added_comment).not_to be_hidden
+          end
+
+          it "hides new comments if the submission is graded but not posted" do
+            submit_homework(@student)
+            @assignment.grade_student(@student, grade: 1, grader: @teacher)
+            @assignment.hide_submissions
+
+            @assignment.generate_comments_from_files(zip.open.path, @user)
+            expect(added_comment).to be_hidden
+          end
+
+          it "shows new comments if the submission is neither graded nor posted" do
+            submit_homework(@student)
+
+            @assignment.generate_comments_from_files(zip.open.path, @user)
+            expect(added_comment).not_to be_hidden
+          end
+        end
+      end
+
+      context "with post policies not enabled" do
+        it "hides new comments when the assignment is muted" do
+          @assignment.mute!
+          submit_homework(@student)
+
+          @assignment.generate_comments_from_files(zip.open.path, @user)
+          expect(added_comment).to be_hidden
+        end
+
+        it "shows new comments when the assignment is not muted" do
+          submit_homework(@student)
+
+          @assignment.generate_comments_from_files(zip.open.path, @user)
+          expect(added_comment).not_to be_hidden
+        end
+      end
     end
   end
 
