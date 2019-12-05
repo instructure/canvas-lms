@@ -30,7 +30,7 @@ The <a href="http://www.imsglobal.org/spec/security/v1p0/" target="_blank">IMS S
 
  - https://canvas.instructure.com (Production environment launches)
  - https://canvas.beta.instructure.com (Beta environment launches)
- - https://canvas.beta.instructure.com (Test environment launches)
+ - https://canvas.test.instructure.com (Test environment launches)
 
  The request also includes a `login_hint` that is passed in the next step. Last, the request include the `target_link_uri` that has been configured on the Developer key; this is later used by the tool as a recommended final redirect.
 
@@ -38,9 +38,9 @@ The <a href="http://www.imsglobal.org/spec/security/v1p0/" target="_blank">IMS S
 ###Step 2: Authentication Response
  To complete authentication, tools are expected to send back an <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">authentication response</a> to an "OIDC Authorization end-point".  This can be a GET or POST. For cloud-hosted Canvas, regardless of the domain used by the client, the endpoint is always:
 
- - `https://canvas.instructure.com/api/lti/authorization_redirect` (if launched from a **production** environment)
- - `https://canvas.beta.instructure.com/api/lti/authorization_redirect` (if launched from a **beta** environment)
- - `https://canvas.test.instructure.com/api/lti/authorization_redirect` (if launched from a **test** environment)
+ - `https://canvas.instructure.com/api/lti/authorize_redirect` (if launched from a **production** environment)
+ - `https://canvas.beta.instructure.com/api/lti/authorize_redirect` (if launched from a **beta** environment)
+ - `https://canvas.test.instructure.com/api/lti/authorize_redirect` (if launched from a **test** environment)
   
  Among the <a href="<a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">required variables</a> the request should include:
 
