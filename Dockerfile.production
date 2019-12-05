@@ -153,7 +153,7 @@ USER dockeruser
 #Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works
 RUN mkdir -p /app/app/views/info/ \
     && mkdir -p /app/tmp/pids/ \
-    && cd /app/gems/canvas_i18nliner/ && npm install -dd \
+    && cd /app/gems/canvas_i18nliner/ && npm install \
     && bundle exec rake canvas:compile_assets --trace
 
 # Let either heroku.yml (for prod) or docker-compose.yml (for dev) specify the start command)
