@@ -808,6 +808,22 @@ describe User do
     expect(@user.workflow_state).to eq "deleted"
   end
 
+  it "destroys associated active eportfolios upon soft-deletion" do
+    user = User.create
+    user.eportfolios.create!
+    expect { user.destroy }.to change {
+      user.reload.eportfolios.active.count
+    }.from(1).to(0)
+  end
+
+  it "destroys associated active eportfolios when removed from root account" do
+    user = User.create
+    user.eportfolios.create!
+    expect { user.remove_from_root_account(Account.default) }.to change {
+      user.reload.eportfolios.active.count
+    }.from(1).to(0)
+  end
+
   it "should record deleted_at" do
     user = User.create
     user.destroy
