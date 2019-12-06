@@ -116,16 +116,16 @@ pipeline {
             }
             credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             sh '''
-              mv gerrit_builder/canvas-lms/config/* config/
-              mv config/knapsack_rspec_report.json ./
-              rm config/cache_store.yml
+              mv -v gerrit_builder/canvas-lms/config/* config/
+              mv -v config/knapsack_rspec_report.json ./
+              rm -v config/cache_store.yml
               rmdir -p gerrit_builder/canvas-lms/config
-              cp docker-compose/config/selenium.yml config/
-              cp -R docker-compose/config/new-jenkins config/new-jenkins
-              cp config/delayed_jobs.yml.example config/delayed_jobs.yml
-              cp config/domain.yml.example config/domain.yml
-              cp config/external_migration.yml.example config/external_migration.yml
-              cp config/outgoing_mail.yml.example config/outgoing_mail.yml
+              cp -v docker-compose/config/selenium.yml config/
+              cp -vR docker-compose/config/new-jenkins config/new-jenkins
+              cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml
+              cp -v config/domain.yml.example config/domain.yml
+              cp -v config/external_migration.yml.example config/external_migration.yml
+              cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml
             '''
           }
         }
