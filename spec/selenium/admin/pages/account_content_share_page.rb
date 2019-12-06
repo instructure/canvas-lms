@@ -48,11 +48,11 @@ module AccountContentSharePage
   end
 
   def unread_item_button_icon(item_name)
-    fj("button:contains('#{item_name} is unread, click to mark as read')")
+    fj("button:contains('#{item_name} mark as read')")
   end
 
   def read_item_button_icon(item_name)
-    fj("button:contains('#{item_name} has been read')")
+    fj("button:contains('#{item_name} mark as unread')")
   end
 
   def import_content_share
@@ -66,5 +66,5 @@ module AccountContentSharePage
   end
 
   # ---------------------- Methods -----------------------
-  
+
 end
