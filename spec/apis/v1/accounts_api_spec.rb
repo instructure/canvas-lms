@@ -69,6 +69,15 @@ describe "Accounts API", type: :request do
       ]
     end
 
+    it "doesn't return duplicates" do
+      role = custom_account_role("some role", :account => @a1)
+      @a1.account_users.create!(user: @user, role: role)
+
+      json = api_call(:get, "/api/v1/accounts.json",
+        { :controller => 'accounts', :action => 'index', :format => 'json' })
+      expect(json.map{|a| a['id']}).to match_array([@a1.id, @a2.id])
+    end
+
     it "doesn't include deleted accounts" do
       @a2.destroy
       json = api_call(:get, "/api/v1/accounts.json",

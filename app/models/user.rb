@@ -2725,9 +2725,9 @@ class User < ActiveRecord::Base
   end
 
   def adminable_accounts_scope
-    Account.shard(self.in_region_associated_shards).active.joins(:account_users).
-      where(account_users: {user_id: self.id}).
-      where.not(account_users: {workflow_state: 'deleted'})
+    # i couldn't get EXISTS (?) to work multi-shard, so this is happening instead
+    account_ids = self.account_users.active.shard(self.in_region_associated_shards).distinct.pluck(:account_id)
+    Account.active.where(:id => account_ids)
   end
 
   def adminable_accounts
