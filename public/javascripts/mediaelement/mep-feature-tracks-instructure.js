@@ -484,7 +484,7 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
         .prop('disabled', false)
         .attr('aria-label', label)
         .siblings('label')
-        .html(label)
+        .text(label)
 
       // auto select
       if (t.options.startLanguage == lang) {
@@ -525,51 +525,37 @@ import closedCaptionLanguages from 'jsx/shared/closedCaptionLanguages'
 
     addTrackButton(lang, label, src) {
       const t = this
+      const id = `${t.id}_captions_${lang}`
       if (label === '') {
         label = mejs.language.codes[lang] || lang
       }
 
-      // INSTRUCTURE added code
-      let deleteButtonHtml = ''
+      const $li = $('<li>')
+      $li
+        .append(
+          $('<input type="radio" disabled="disabled" aria-selected="false" tabindex="-1">')
+            .attr('name', `${t.id}_captions`)
+            .attr('id', id)
+            .attr('aria-label', label)
+            .val(lang)
+        )
+        .append(
+          $('<label aria-hidden="true">')
+            .attr('for', id)
+            .text(label)
+        )
+
       if (t.options.can_add_captions) {
-        deleteButtonHtml =
-          '<a href="#" role="button" data-remove="li" data-confirm="' +
-          htmlEscape(I18n.t('Are you sure you want to delete this track?')) +
-          '" data-url="' +
-          src +
-          '" tabindex="-1" aria-label="' +
-          htmlEscape(I18n.t('Delete track')) +
-          '"><span aria-hidden="true">×<span></a>'
+        $li.append(
+          $('<a href="#" role="button" data-remove="li" tabindex="-1">')
+            .attr('data-confirm', I18n.t('Are you sure you want to delete this track?'))
+            .attr('data-url', src)
+            .attr('aria-label', I18n.t('Delete track'))
+            .append($('<span aria-hidden="true">').text('x'))
+        )
       }
 
-      t.captionsButton.find('ul').append(
-        $(
-          '<li>' +
-            '<input type="radio" name="' +
-            t.id +
-            '_captions" id="' +
-            t.id +
-            '_captions_' +
-            lang +
-            '" value="' +
-            lang +
-            '" disabled="disabled" aria-selected="false" aria-label="' +
-            label +
-            ' (loading)" tabindex="-1" />' +
-            '<label for="' +
-            t.id +
-            '_captions_' +
-            lang +
-            '" aria-hidden="true">' +
-            label +
-            ' (loading)' +
-            '</label>' +
-            // INSTRUCTURE added code
-            deleteButtonHtml +
-            '</li>'
-        )
-      )
-
+      t.captionsButton.find('ul').append($li)
       t.adjustLanguageBox()
 
       // remove this from the dropdownlist (if it exists)
