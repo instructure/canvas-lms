@@ -5529,6 +5529,7 @@ el:
       rte_help: "<mrk mid=\"6144\" mtype=\"seg\">Περιοχή Rich Text.</mrk> <mrk mid=\"6145\" mtype=\"seg\">Πατήστε ALT+F8 για βοήθεια</mrk>"
   editor_button_6647db9c: "Κουμπί Επεξεργαστή"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Θα πρέπει να ρυθμιστούν είτε το url είτε το domain."
+  element_option_missing_error_an_element_to_attach__be433478: "<mrk mid=\"4293\" mtype=\"seg\">σφάλμα έλλειψης επιλογής «στοιχείο»:</mrk> <mrk mid=\"4294\" mtype=\"seg\">Θα πρέπει να οριστεί κάποιο στοιχείο για την προβολή TreeBrowserView κατά τη ρύθμιση της επιλογής σε «σωστό» στην προβολή BBTreeBrowserView</mrk>"
   email: 
     default_from_name: "Instructure Canvas"
   email_22a7d52d: "Ηλεκτρονική Διεύθυνση"
