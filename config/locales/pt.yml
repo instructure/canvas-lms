@@ -226,6 +226,8 @@ pt:
         partner_id: "ID do parceiro"
         partner_key: "Chave de parceiro"
   accept_2fdd362e: Aceitar
+  accept_course_invitation_b4c04fbb: "Aceitar o convite da disciplina"
+  accept_course_invitation_to_participate_in_this_as_b8342676: "Aceitar o convite da disciplina para participar desta tarefa"
   accept_grades_4d56a3dd: "Aceitar Classificações"
   accept_grades_by_gradername_7a98b969: "Aceitar classificações por %{graderName}"
   acceptable_use_policy_29a28124: "Política de Utilização Aceitável"
@@ -1764,6 +1766,7 @@ pt:
   add_group_c84f9e9d: "Adicionar grupo"
   add_group_set_f9809e11: "Adicionar conjunto de grupos"
   add_help_menu_links_de9fc34f: "Adicionar ligações de menu de ajuda"
+  add_hostname_to_the_whitelist_c808192e: "Adicionar %{hostname} à lista de permissões"
   add_icon_567dbcaa: "Adicionar ícone"
   add_link_5c01c1e8: "Adicionar Ligação"
   add_link_fc336ed6: "Adicionar ligação"
@@ -1811,6 +1814,7 @@ pt:
   add_theme_32fa3d50: "Adicionar tema"
   add_to_course_481a51c4: "Adicionar à disciplina ..."
   add_to_student_to_do_58e66b4b: "Adicionar ao aluno para fazer"
+  add_to_whitelist_24f3f1ba: "Adicionar à Lista de permissões"
   add_trigger_bc1a0fae: "Adicionar disparador"
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Adicionar utilizador pelo endereço de e-mail, ID de login ou ID do SIS."
   add_user_e73e8e50: "Adicionar usuário"
@@ -1954,6 +1958,7 @@ pt:
   all_student_groups_f74cd6c3: "Todos os Grupos de Alunos"
   all_students_have_taken_the_quiz_b558f8b4: "Todos os alunos fizeram o teste"
   all_students_have_taken_the_survey_494f9f42: "Todos os alunos fizeram o questionário"
+  all_students_will_be_able_to_see_their_grade_and_o_66c1beab: "Todos os alunos serão capazes de ver a sua nota e/ou comentários de submissão."
   all_submission_comments_have_been_marked_as_read_74c0683b: "Todos os comentários de envio foram marcados como lidos"
   all_submission_comments_have_been_marked_as_read_7595389d: "Todos os comentários de envio foram marcados como lidos."
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Todas as entregas tem de ter uma nota selecionada."
@@ -1987,6 +1992,7 @@ pt:
   allow_opt_out_of_inbox: "Permitir que os utilizadores optem por sair da Caixa de entrada de Conversas. Isso irá fazer com que todas as mensagens e notificações de conversas sejam enviadas como notificações ASAP para a conta de e-mail principal do utilizador, além de ocultar o ícone de mensagens não lidas da Caixa de entrada de conversas e ocultar as preferências de notificação de Conversas."
   allow_outcome_extra_credit_57c1e84e: "Permitir crédito extra de resultado"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Permitir a aceitação passiva dos Termos de Serviço"
+  allow_postable_submission_comments_a301b742: "Permitir Comentários de Submissão Possíveis"
   allow_reorder_dashboard_cards_78215947: "Permitir Reordenar Cartões do Painel"
   allow_replies_for_title_cfe7af6c: "Permitir respostas para %{title}"
   allow_rtl_users_to_see_rtl_interface_3c4f8b86: "Permitir que utilizadores RTL vejam a interface RTL"
@@ -3509,6 +3515,7 @@ pt:
   assignments_gradebook_f57c164a: "Tarefas, Livro de Notas"
   assignments_in_this_group_have_no_points_possible__3cd35922: "As tarefas incluídas neste grupo não têm pontos possíveis e não podem ser incluídas no cálculo das notas"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "As tarefas deste grupo não têm pontos possíveis e não podem ser incluídas no cálculo de notas."
+  assignments_index_menu_4088a035: "Menu Índice de Atribuições"
   assignments_list_fe3e54be: "Lista de tarefas"
   assignments_settings_30613d0c: "Definições de tarefas"
   assignments_speedgrader_2fbd6df4: "Tarefas, SpeedGrader"
@@ -3580,6 +3587,7 @@ pt:
   attention_aaca1f1d: Atenção!
   attribute_d9f3af72: Atributo
   attributes_locked_1a1a0f46: "%{attributes} Bloqueado"
+  audio_1c89b0c8: áudio
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Não é suportado conteúdo audio pelo seu dispositivo ou app."
   audio_dd489fcc: Áudio
   australia_61_eb9bb701: "Austrália (+61)"
@@ -3814,6 +3822,7 @@ pt:
     no_manifest: "Este Blackboard .zip não tem o ficheiro imsmanifest.xml na diretoria raiz."
   blank_38df4238: "em branco"
   blocked_by_running_migration_d8a57cb7: "Bloqueado pela atual migração"
+  blocked_domain_name_b5b93150: "Nome de domínio bloqueado"
   blue_daf8fea9: Azul
   blueprint_5cca2ef: Blueprint
   blueprint_course_associations_72c9609: "Associações de Disciplinas Blueprint"
@@ -4645,6 +4654,7 @@ pt:
   certificate_fingerprint_b376df90: "Impressão digital certificada"
   change_applied_89d1aa5a: "Alteração Aplicada"
   change_beginning_date_to_39dbd06e: "Alterar data de início para"
+  change_course_visibility_eaa2ffc: "Alterar a visibilidade da disciplina"
   change_dcaa253a: Alterar
   change_description_34c49853: "Alterar descrição"
   change_ending_date_to_d2cebd54: "Alterar data de fim para"
@@ -4806,6 +4816,7 @@ pt:
   close_warning_d61daf2c: "Fechar aviso"
   closed_for_comments_e395b42f: "Fechado para comentários"
   closes_5c6b4367: "Fecha:"
+  code_93e9abbb: código
   code_is_case_sensitive_d8175cad: "O Código é sensível a maiúsculas."
   cog_icon_69bdffd5: "Ícone cog"
   col_is_sorted_ascending_cc5152cc: "%{col} está classificado ascendente"
@@ -5175,6 +5186,7 @@ pt:
   confirmation_failed_please_try_again_ae566d37: "Falha na confirmação.  Tente novamente."
   consumer_key_57d9fcf1: "Chave do cliente"
   consumer_key_6f94ba11: "Chave do cliente"
+  contact_your_administrator_if_you_need_to_change_c_9002a501: "Contacte o seu administrador se precisar de alterar a visibilidade da disciplina."
   content_1440204b: Conteúdo
   content_changed_exceptions_e8bff81e: "Exceções de conteúdo alteradas:"
   content_choice_51f4ca0f: "Escolha de conteúdo"
@@ -5812,7 +5824,7 @@ pt:
       edit_assignment_settings: "Editar configurações de tarefa"
       speed_grader: "Speed Grader™"
     url_show: 
-      new_tab: "Este site tem de ser aberto numa nova janela do navegador."
+      new_tab: "Este sitio foi aberto em uma nova janela do navegador."
   context_modules_api: 
     invalid_position: "Posição inválida"
   context_modulespublic: 
@@ -7074,6 +7086,7 @@ pt:
   courses_account_72e4fca7: "Disciplinas (conta)"
   courses_account_navigation_f84fdec3: "Disciplinas (Navegação de Conta)"
   courses_add_edit_delete_aa2b55d3: "Disciplinas - adicionar/editar/eliminar"
+  courses_change_visibility_9150ff1b: "Disciplinas - mudar a visibilidade"
   courses_navigation_menu_b3638384: "Menu de Navegação da Disciplina"
   courses_over_time_41dc0428: "disciplina ao longo do tempo"
   courses_people_680bb173: "Disciplinas e Pessoas"
@@ -7202,6 +7215,7 @@ pt:
     syllabus: Programa
     users: Utilizadores
     wiki_pages: Páginas
+  csp_violations_337f8529: "Violações de CSP"
   css_ae1d10ce: CSS
   css_and_javascript_to_load_when_user_content_is_di_f86f73f5: "CSS e JavaScript para carregar quando o conteúdo do utilizador for apresentado nas apps nativas IOS ou Android"
   css_file_709e6a83: "Ficheiro CSS"
@@ -8151,6 +8165,8 @@ pt:
     unsubscribed_hint: "Não está inscrito neste tópico. Clique para se inscrever."
   discussions_a5f96392: Discussões
   discussions_create_94dff604: "Discussões - criar"
+  discussions_index_menu_42591bc9: "Menu Índice de Discussões"
+  discussions_menu_f18eb4a2: "Menu Discussões"
   discussions_moderate_d1e69c7e: "Discussões - moderada"
   discussions_post_62f64091: "Discussões - postar"
   discussions_tutorial_tray_4ef79bcc: "Bandeja de Tutoriais de Discussões"
@@ -8184,6 +8200,7 @@ pt:
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Não contabilizar esta tarefa na nota final."
   do_nothing_9672b478: "Não fazer nada"
   doc_50924b72: DOC
+  doc_c63509f8: doc
   docviewer_area_created_37502a31: "Área do Docviewer criada"
   docviewer_area_deleted_6e56d3ba: "Área do Docviewer eliminada"
   docviewer_area_updated_43f60b7e: "Área do Docviewer atualizada"
@@ -9330,6 +9347,7 @@ pt:
   field_cannot_be_blank_afb5b332: "O campo não pode ficar em branco."
   field_must_be_either_active_or_deleted_329a42a: "\"%{field}\" deve ser \"%{active}\" ou \"%{deleted}\""
   field_name_31fff38e: "Campo de Nome"
+  file_6863ad33: ficheiro
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Registe um bilhete para obter uma resposta pessoal da nossa equipa de suporte."
   file_already_exists_bdc61895: "O ficheiro já existe"
   file_attachment_8e7dbfd1: "Anexo de arquivo"
@@ -9538,6 +9556,7 @@ pt:
   first_reviewer_sortorder_e2184140: "Primeiro revisor %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, e %{others_count} outros"
   flash_6afbf65a: Flash
+  flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       O Flickr exibe imagens SafeSearch no domínio público da Creative Commons.
@@ -9571,6 +9590,7 @@ pt:
   for_course_level_users_deleting_a_course_is_part_o_932f7a98: "Para utilizadores em nível de disciplina, a exclusão de uma disciplina faz parte do estado da disciplina - gerir a permissão. No entanto, para utilizadores no nível da conta, a exclusão de uma disciplina exige essa permissão e Disciplina - adicionar/editar/eliminar. "
   for_development_of_features_for_new_gradebook_7ee1830f: "Para o desenvolvimento de recursos para o Novo Livro de classificação."
   for_each_late_62aecf41: "Para cada tardio"
+  for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Para trabalhos publicados manualmente, a presença de um comentário de submissão não pelo próprio utilizador do trabalho permitirá a publicação do trabalho. Anteriormente, isso teria exigido uma nota antes que o lançamento pudesse ocorrer."
   for_name_d5684bfd: "Para %{name}"
   for_title_69d92b3a: "para %{title}"
   forgot_password_f0c3fbac: "Esqueceu Palavra passe?"
@@ -11219,6 +11239,7 @@ pt:
       e depois voltar a Flash.
   html5_media_recorder_in_rce_bb59b78f: "Gravador de mídia HTML5 em RCE"
   html_editor_fb2ab713: "Editor HTML"
+  html_fc8563c6: html
   http_67e238b4: "http://"
   hungarian_fc7d30c9: Húngaro
   hungary_36_cd3e515b: "Hungria (+36)"
@@ -11271,6 +11292,7 @@ pt:
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Se um atributo estiver marcado apenas como aprovisionamento, então apenas será utilizado quando o Provisionamento Automático cria um novo utilizador, e não será mantido atualizado cada vez que o utilizador inicia sessão."
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Se ambas as notas - editar e notas - ver todas as notas estiverem desabilitadas, o Livro de notas ficará oculto da navegação da disciplina."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Se as duas Notas - editar e Notas - exibirem todas as notas estiverem desabilitadas, o Livro de notas ficará oculto na Navegação da disciplina."
+  if_commons_is_installed_allows_importing_favorited_eff368f: "Se o Commons estiver instalado, permite importar itens de conteúdo favoritos de dentro do Canvas."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Se desativada, a página Resultados será somente leitura e ocultará o botão Gerir Rubricas. O utilizador ainda pode acessar rubricas de atribuição individuais por meio de Atribuições."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Se desativado, o utilizador ainda poderá visualizar e baixar ficheiros em um ficheiro zip."
   if_disabled_user_will_still_have_access_to_course__6816d525: |-
@@ -11333,6 +11355,8 @@ pt:
         Os alunos verão os arquivos modificados em seus comentários para o envio.
       
         *Certifique-se de não alterar os nomes dos arquivos enviados, para que possamos reconhecê-los.*
+  if_you_need_to_make_your_course_public_please_cont_7084c67b: "Se você precisar tornar sua disciplina pública, entre em contato com seu administrador/suporte."
+  if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: "Se você ativar isso, quando um administrador de conta vai para a página para criar um anúncio global, uma caixa de seleção aparecerá para enviar uma notificação diretamente aos utilizadores quando o anúncio começar."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Se estava a utilizar outro sistema de gestão de disciplinas, deve ter coisas lá que gostaria de mover para o Canvas. Podemos ajudá-lo durante todo o processo de migração do seu conteúdo para o Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "Se desejar, pode mudar o nome de \"SIS\" para algo mais familiar para sua equipa"
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Se quiser manter os seus comentários não submetidos, por favor guarde-os antes de sair desta página."
@@ -11352,6 +11376,7 @@ pt:
   ignore_until_new_submission_90ba19b7: "Ignorar até novo envio"
   illegal_element_focus_request_b3cea847: "Solicitação de foco de elemento ilegal"
   image_8ad06: Imagem
+  image_c1c98202: imagem
   image_id_is_not_a_valid_id_7dd6bad6: "image_id não é uma ID válida"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url e image_id não conseguem ser definidas"
   image_url_is_not_a_valid_url_4e31c8b0: "image_url n~eo é um URL válido"
@@ -11363,10 +11388,12 @@ pt:
     invalid_file_type: "Tipo de ficheiro inválido %{type}. Os tipos permitidos incluem: %{type_list}"
     not_an_image: "O ficheiro selecionado não é uma imagem"
   images_documents_and_more_dccb362f: "Imagens, documentos e muito mais"
+  immediate_notifications_for_global_announcements_682f5a3d: "Notificações imediatas para anúncios globais"
   immediately_c128ede6: Imediatamente
   immersive_reader_failed_to_load_bc8d4dd4: "Falha ao carregar o leitor imersivo"
   import_1b31507: Importar
   import_a_set_of_outcomes_6b782192: "Importar um conjunto de resultados"
+  import_commons_favorites_e68fce81: "Importar Favoritos com Commons"
   import_content_b2fd6620: "Importar conteúdo"
   import_e929507b: Importar...
   import_learning_outcomes_36d28a2b: "Importar resultados de aprendizagem"
@@ -11809,6 +11836,7 @@ pt:
   language_6b3e2c7c: Idioma
   large_course_db3d58b: "Disciplina Ampla:"
   last_assessment_cd5659b6: "Última Avaliação: "
+  last_attempt_7258ebd7: "Última tentativa"
   last_changed_b544504d: "Última alteração:"
   last_changed_date_82f1ce56: "Última alteração: %{date}"
   last_day_attended_b72d623c: "Último dia atendido"
@@ -11891,6 +11919,7 @@ pt:
       view_all_or_customize: "Ver tudo ou personalizar"
     mobile_auth: 
       log_in_to_canvas: "Iniciar sessão no Canvas"
+  learn_more_7a8d626: "Aprender Mais"
   learn_more_about_collaborations_2978f66d: "Aprenda maissobre colaborações"
   learning_mastery_5fc34276: "Domínio de aprendizagem"
   learning_mastery_6ed4fd63: "A aprendendo Domínio..."
@@ -12519,6 +12548,7 @@ pt:
       submitting: "Enviando arquivo de mídia..."
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "A ligação foi ligada para conversação, por favor tente novamente mais tarde."
   media_over_time_d9332e25: "mídia ao longo do tempo"
+  media_record_not_available_f78c16dd: "Registro de mídia não disponível"
   media_recording_77cddc52: "Gravações de multimédia"
   media_recording_submission_b7fd1491: "Envio de gravação de multimédia"
   media_recording_submissions_require_a_media_id_to__ff740090: "%{media_recording} submissões requerem uma %{media_id} para submeter"
@@ -14611,7 +14641,9 @@ pt:
     requirements_changed: "Requisitos alterados"
   modules_b8f6aa9: módulos
   modules_c4325335: Módulos
+  modules_group_menu_4aae0d5f: "Menu Grupo de Módulos"
   modules_home_page_568c6bb9: "Módulos Página Inicial"
+  modules_index_menu_c8748e7c: "Menu Índice de Módulos"
   modules_item_controller: 
     max_score_complete: "obteve não mais do que *score*"
     max_score_incomplete: "tem de obter não mais do que *score*"
@@ -14623,6 +14655,7 @@ pt:
     must_submit_incomplete: "tem de enviar a tarefa"
     must_view_complete: "visualizou a página"
     must_view_incomplete: "tem de visualizar a página"
+  modules_settings_a7066f13: "Definições dos Módulos"
   modules_tutorial_tray_d58ac3cb: "Bandeja Tutorial de Módulos"
   month_s_5c17590e: Mês(es)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} a começar em %{time}"
@@ -15019,6 +15052,7 @@ pt:
   no_users_found_64a043ff: "Não foram encontrados utilizadores"
   no_users_were_selected_to_add_to_the_course_a51c6083: "Nenhum utilizador foi selecionado para adicionar à disciplina"
   no_video_1ed00b26: "Nenhum vídeo"
+  no_violations_have_been_reported_977a08d1: "Nenhuma violação foi relatada."
   no_way_to_export_gradebooks_provided_b4c2939d: "Não há maneira de exportar os livros de classificação fornecidos!"
   no_way_to_monitor_gradebook_exports_provided_b451236a: "Nenhuma maneira de monitorar exportações livro de classificação fornecido!"
   non_canvas_11f36d4a: "Não Canvas"
@@ -15908,6 +15942,7 @@ pt:
   pause_12af3bb4: Pausa
   paypal: 
     exception: "Ocorreu um erro, tente novamente mais tarde."
+  pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: "Atribuição de Revisão por Pares"
   peer_review_for_assignment_ce72fc52: "Revisão por colegas de %{assignment}"
@@ -15969,7 +16004,7 @@ pt:
   place_b128fa94: Colocar
   place_item_2acc18b9: "Lugar \"%{item}\""
   place_section_before_5b45714e: "Colocar \"%{section}\" antes:"
-  place_title_2c183274: "Lugar \"%{title}\""
+  place_title_2c183274: "Colocar \"%{title}\""
   placeholder_for_webhooks_access_in_canvas_catalog_b8c9d864: "Marcador de espaço para acesso a webhooks no Canvas Catalog."
   placement_values_c0a2cf56: "Valores de Colocação"
   placements_5b5e056b: Colocações
@@ -16947,11 +16982,11 @@ pt:
   progress_for_account_name_ef203250: "Progresso para %{account_name}"
   progress_loading_bar_a26b8861: "Barra de Progresso/Carregamento"
   project_groups_1fa0320b: "Grupos de projeto"
+  pronouns_d1cd8dd0: Pronomes
   pronouns_for_users_da46fb5: "Pronomes para utilizadores"
   pronouns_users_can_show_after_their_name_e80821c7: "Os utilizadores do Pronouns podem mostrar após o nome"
-  provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: |-
-      Fornecer um espaço para os utilizadores trabalharem em um único documento
-                  simultaneamente, dentro da sua disciplina Canvas.
+  provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: "Forneça um espaço para que os utilizadores trabalhem em um único documento\n\
+      \x20         simultaneamente, de dentro da sua disciplina Canvas.  "
   provide_a_space_for_users_to_work_on_a_single_goog_604cdf06: |-
       Fornecer um espaço para que os utilizadores trabalhem em um único Google Doc
       simultaneamente, dentro da sua disciplina Canvas.
@@ -17027,6 +17062,7 @@ pt:
     parent_signup: "Inscrição de pais"
   pts_51d69f4a: Pts
   pts_699bd9aa: pts
+  ptt_f7ff4c09: ptt
   public_a749f507: Público
   public_course_index_59270e80: "Índice de Disciplinas Públicas"
   public_courses_title: "Disciplinas públicas"
@@ -18460,6 +18496,7 @@ pt:
       practice_quizzes: "Testes práticos"
       surveys: Inquéritos
     toggle_message: "alternar visibilidade de teste"
+  quizzes_index_menu_1ce11b54: "Menu Índice de Testes"
   quizzes_next_importing_75e63f67: "Quizzes.Next Importar"
   quizzes_next_submission_history_c0f7cd20: "Quizzes.Next histórico de submissão"
   quizzes_public: 
@@ -18855,6 +18892,7 @@ pt:
   reports_account_settings_78f5336a: "Relatórios (definições da conta)"
   request_id_1499afb0: "ID de pedido"
   request_values_89976f2c: "Solicitar Valores"
+  requested_bbdb5b26: Solicitado
   require_an_access_code_600e06e8: "Código de acesso exigido"
   require_assignment_due_date_778b200d: "Exigir data limite de tarefa"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Os membros do grupo devem estar na mesma secção"
@@ -20695,6 +20733,7 @@ pt:
   something_went_wrong_creating_the_course_please_tr_431adff5: "Algo deu errado na criação de uma disciplina. É favor tentar novamente."
   something_went_wrong_d238c551: "Algo deu errado"
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Algo correu mal durante a desativação do utilizador. Por favor tente novamente mais tarde."
+  something_went_wrong_loading_the_violations_try_re_6e2fa92: "Algo correu mal ao carregar as violações, tente recarregar a página."
   something_went_wrong_please_try_again_6d337b6c: "Alguma coisa correu mal, por favor tente novamente."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Algo deu errado. Por favor, tente atualizar a página. Se o problema persistir, você pode tentar carregar um único grupo de alunos SpeedGrader ao usar a *definição Disciplina Grande*."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Algo deu errado. Por favor, tente atualizar a página. Se o problema persistir, pode haver muitos registros em \"%{assignmentTitle}\" para carregar SpeedGrader."
@@ -20977,6 +21016,7 @@ pt:
   students_must_complete_all_of_these_requirements_15fa97f7: "Os estudantes têm de completar todos estes requisitos"
   students_must_sign_up_in_groups_681206ac: "Alunos têm de iniciar sessão nos grupos"
   students_over_time_7ec52f7a: "alunos ao longo do tempo"
+  students_who_have_received_a_grade_or_a_submission_7ef046cc: "Os alunos que tenham recebido uma nota ou um comentário de submissão será capaz de ver a sua nota e/ou comentários de submissão."
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Alunos que fizeram o teste (%{count})"
     other: "Alunos que não fizeram o teste (%{count})"
@@ -21474,6 +21514,7 @@ pt:
   test_cluster_only_70e61c19: "Apenas cluster de teste"
   testing_state_effd4a82: "Estado de teste"
   text_7f4593da: Texto
+  text_df773ce4: texto
   text_document_eacbcdb7: "Documento de texto"
   text_entry_e1808b2f: "Entrada de texto"
   text_entry_submission_7b0ae0c5: "Envio de entrada de texto"
@@ -21879,6 +21920,7 @@ pt:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Este utilizador atualmente não consegue aceder à disciplina"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "Este utilizador atualmente não consegue aceder à disciplina"
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Este utilizador realizou ações enquanto o anónimo estava desativado"
+  this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "Esta versão do Livro de classificação está sendo substituída por um Livro de classificação atualizado em ou antes de 18 de janeiro de 2020."
   this_will_affect_every_customer_are_you_sure_a1e0cac6: "Isso afetará todos os clientes. Tem a certeza?"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Com isto poderá autenticar o Canvas para publicar notas no SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Isto vai aplicar estas alterações a toda a conta. Gostaria de continuar?"
@@ -22287,6 +22329,7 @@ pt:
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "Para impedir que os alunos criem grupos, desmarque a caixa de seleção Permitir que os alunos organizem seus próprios grupos nas Definições da disciplina."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "Para restringir a utilizadores de uma zona Clever específica, insira aqui o ID de zona Clever. É necessário para o Registo Clever Imediato para trabalhar num ambiente com múltiplos acessos."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Para restringir a utilizadores de um domínio do Google Apps específico, insira o domínio aqui."
+  to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "Para restringir a utilizadores de domínios específicos do Google Apps, digite o(s) domínio(s) aqui como uma lista separada por vírgulas. Para restringir a um utilizador do Google Apps em geral, você pode inserir ''*\"."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Para restringir a utilizadores do seu Azure Active Directory, insira o detentor aqui."
   to_search_and_view_notifications_for_a_user_users__becfb733: "Para pesquisar e visualizar notificações para um utilizador, a lista Utilizadores - visão também deve estar ativada."
   to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
@@ -22684,6 +22727,7 @@ pt:
   uploaded_media_bc29db35: "Mídia carregada"
   uploaded_over_time_d59abb68: "carregado ao longo do tempo"
   uploading_19e8a4e7: "A realizar carregamento"
+  uploading_files_5ff8f4fd: "Carregamento de ficheiros"
   uploading_submission_4c8d944b: "A carregar o envio"
   upper_limit_of_range_c454a8f2: "Limite superior do intervalo"
   upper_lower_56cad16c: "%{upper} - %{lower}"
@@ -22771,6 +22815,7 @@ pt:
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "ID do utilizador ou  ID SIS (a ID SIS ID deve ser identificada com sis_user_id:)"
   user_id_user_id_69a9e865: "ID do utilizador: %{user_id}"
   user_information_6353d7e1: "Informação do utilizador"
+  user_is_from_unacceptable_domain_domain_b4b6fd1b: "O utilizador é de domínio inaceitável %{domain}."
   user_is_now_group_leader_60ec9b98: "%{user} é líder fo grupo"
   user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "O utilizador não tem permissão para editar resultados globais"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} acabou de aceitar seu convite para participar na disciplina, %{course}. Função na disciplina: %{role_type}"
@@ -23241,6 +23286,7 @@ pt:
     buttons: 
       resubmit_to_vericite: "Voltar a submeter para VeriCite"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Pontuação de Similaridade - Ver relatório detalhado"
+  video_78335c71: vídeo
   video_b9f27375: Vídeo
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Não é suportado conteúdo vídeo pelo seu dispositivo ou app."
   video_player_b371005: "Reprodutor de vídeo"
@@ -23288,6 +23334,7 @@ pt:
   view_toolname_placements_4a5724d1: "Ver %{toolName} Colocações"
   view_user_groups_538f22b4: "Ver grupos de utilizadores"
   view_user_groups_d2bfa855: "Ver grupos de utilizadores"
+  view_violation_log_e80ea322: "Ver Registo de Violações"
   viewed_6b75c21e: Exibida
   viewing_folders_is_not_available_798a15e1: "Ver as pastas não disponíveis"
   viewsContextModules: 
@@ -23300,6 +23347,8 @@ pt:
     message_students_for_context: "Mensagem a alunos para %{context}"
     notices: 
       message_sent: "Mensagem enviada!"
+  violation_log_491edd84: "Registro de Violação"
+  violation_log_tray_d4eff9f4: "Bandeja de Registro de Violação"
   virtual_lectures_in_real_time_a1778dea: "Palestras virtuais em tempo real"
   visit_864b4060: Visitar
   visit_group_group_name_7a816081: "Visitar o grupo %{group_name}"
@@ -23603,6 +23652,7 @@ pt:
   wrong_answer_comments_14963a24: "Comentários de resposta incorreta"
   x_y_4a86b3ab: "%{x}/%{y}"
   xls_733452c1: XLS
+  xls_e593104b: xls
   xml_configuration_5ea1b942: "Configuração XML"
   yellow_4cf93785: Amarelo
   yes_3593c135: sim
@@ -23733,6 +23783,8 @@ pt:
   you_left_the_required_name_field_empty_8f9bce5c: "Você deixou o campo de nome obrigatório vazio."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "De certeza que vai querer alguns destes. Qual é a piada de ensinar uma disciplina se ninguém estiver a ouvir?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Vai precisar de um token atualizado, siga os passos nesta ligação, pode precisar de um especialista técnico para ajudar"
+  you_ll_need_to_accept_the_enrollment_invitation_be_1e962788: "Você precisará *aceitar o convite de inscrição* antes de poder participar totalmente desta disciplina."
+  you_ll_need_to_accept_the_enrollment_invitation_be_441a617b: "Você precisará *aceitar o convite de inscrição* antes de poder participar totalmente deste disciplina, começando em %{date}."
   you_ll_need_to_accept_the_enrollment_invitation_be_e3c86b26: "Você precisará aceitar o convite de inscrição antes de poder participar totalmente desta disciplina."
   you_ll_need_to_accept_the_enrollment_invitation_be_f2ffe13: "Você precisará aceitar o convite de inscrição antes de poder participar totalmente desta disciplina, a começar em %{date}."
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
@@ -23867,6 +23919,7 @@ pt:
     engine: 
       plugin_name: Zendesk
   zero_activity_title: "Nenhuma atividade"
+  zip_26961da: zip
   zip_argument_error: "É necessária uma pasta para fazer o carregamento de um ficheiro .zip."
   zip_file_description: "Plug-in de migração para descompactar arquivos .zip para disciplina, grupo ou ficheiros de utilizador"
   zip_file_display: "Importação de ficheiro"
