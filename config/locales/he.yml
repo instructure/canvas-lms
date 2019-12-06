@@ -7206,6 +7206,7 @@ he:
       או שהנך משתמש/ת חדש/ה 
       או ש"תנאי  השימוש" שונו מאז הסכמתך האחרונה. 
       יש להסכים לתנאי השימוש לפני שתמשיך/כי.
+  element_option_missing_error_an_element_to_attach__be433478: "שגיאת רכיב חסר ברשימת האפשרויות: הרכיב שיש לצרף ל  TreeBrowserView חייב להיות מצויין כאשר מגדירים את אפשרות ההפעלה ל'נכון' עבור BBTreeBrowserView."
   email: 
     default_from_name: "קנבס מבית Instructure"
   email_22a7d52d: "דואר אלקטרוני"
