@@ -76,6 +76,32 @@ describe "quizzes" do
       expect(f('#quiz_details')).to be_displayed
     end
 
+    it "should open and close the send to dialog" do
+      Account.default.enable_feature!(:direct_share)
+      @context = @course
+      quiz_model
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+      f('.al-trigger').click
+      f('.direct-share-send-to-menu-item').click
+      expect(fj('h2:contains(Send To...)')).to be_displayed
+      fj('button:contains(Cancel)').click
+      expect(f("body")).not_to contain_jqcss('h2:contains(Send To...)')
+      check_element_has_focus(f('.al-trigger'))
+    end
+
+    it "should open and close the copy to tray" do
+      Account.default.enable_feature!(:direct_share)
+      @context = @course
+      quiz_model
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+      f('.al-trigger').click
+      f('.direct-share-copy-to-menu-item').click
+      expect(fj('h2:contains(Copy To...)')).to be_displayed
+      fj('button:contains(Cancel)').click
+      expect(f("body")).not_to contain_jqcss('h2:contains(Copy To...)')
+      check_element_has_focus(f('.al-trigger'))
+    end
+
     it "should create a new question group", priority: "1", test_id: 210060 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button

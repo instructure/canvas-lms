@@ -18,6 +18,8 @@
 
 import I18n from 'i18n!quizzes.show'
 import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import MessageStudentsDialog from 'compiled/views/MessageStudentsDialog'
 import QuizArrowApplicator from 'quiz_arrows'
 import inputMethods from 'quiz_inputs'
@@ -33,6 +35,8 @@ import './jquery.instructure_misc_plugins' /* ifExists, confirmDelete */
 import './jquery.disableWhileLoading'
 import 'message_students' /* messageStudents */
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 
 $(document).ready(function() {
   if (ENV.QUIZ_SUBMISSION_EVENTS_URL) {
@@ -168,6 +172,42 @@ $(document).ready(function() {
       dialog.open()
     })
   })
+
+  function openSendTo(event, open = true) {
+    if (event) event.preventDefault()
+    ReactDOM.render(
+      <DirectShareUserModal
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentShare={{content_type: 'quiz', content_id: ENV.QUIZ.id}}
+        onDismiss={() => {
+          openSendTo(null, false)
+          $('.al-trigger').focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
+  $('.direct-share-send-to-menu-item').click(openSendTo)
+
+  function openCopyTo(event, open = true) {
+    if (event) event.preventDefault()
+    ReactDOM.render(
+      <DirectShareCourseTray
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentSelection={{quizzes: [ENV.QUIZ.id]}}
+        onDismiss={() => {
+          openCopyTo(null, false)
+          $('.al-trigger').focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
+  $('.direct-share-copy-to-menu-item').click(openCopyTo)
 
   $('#let_students_take_this_quiz_button').ifExists(function($link) {
     const $unlock_for_how_long_dialog = $('#unlock_for_how_long_dialog')

@@ -247,6 +247,20 @@
               <% end %>
               </li>
             <% end %>
+
+            <% if can_do(@quiz, @current_user, :manage) && @context.root_account.feature_enabled?(:direct_share) %>
+              <li role="presentation">
+                <a href="#" class="direct-share-send-to-menu-item">
+                  <i aria-hidden="true" class="icon-user"></i><%= t("Send To...") %>
+                </a>
+              </li>
+              <li role="presentation">
+                <a href="#" class="direct-share-copy-to-menu-item">
+                  <i aria-hidden="true" class="icon-duplicate"></i><%= t("Copy To...") %>
+                </a>
+              </li>
+            <% end %>
+
             <%= external_tools_menu_items((@quiz_menu_tools || []), {link_class: "menu_tool_link", settings_key: :quiz_menu, in_list: true, url_params: {:quizzes => [@quiz.id]}}) %>
           </ul>
         </div>
@@ -373,6 +387,8 @@
     <div id="quiz-submission-version-table"></div>
 
   </header>
+
+  <div id="direct-share-mount-point"></div>
 
   <% if @submission && @submission.completed? %>
     <%= render "quiz_submission_results" %>
