@@ -43,7 +43,8 @@ export default function ModulePositionPicker({courseId, moduleId, setModuleItemP
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    setModuleItemPosition(calculateDefaultPosition() + offset)
+    setSiblingPosition(1)
+    setModuleItemPosition(1 + offset)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId, moduleId])
 
@@ -55,10 +56,6 @@ export default function ModulePositionPicker({courseId, moduleId, setModuleItemP
     fetchAllPages: true,
     params
   })
-
-  function calculateDefaultPosition() {
-    return parseInt(moduleItems[0]?.position || siblingPosition, 10)
-  }
 
   if (error !== null) throw error
 
@@ -79,17 +76,17 @@ export default function ModulePositionPicker({courseId, moduleId, setModuleItemP
       case 'after':
         setOffset(1)
         // + 1 for the offset that won't be set yet by the time we need it
-        setModuleItemPosition(calculateDefaultPosition() + 1)
+        setModuleItemPosition(siblingPosition + 1)
         break
       case 'before':
         setOffset(0)
-        setModuleItemPosition(calculateDefaultPosition())
+        setModuleItemPosition(siblingPosition)
         break
     }
   }
 
   function handleSetSibling(e) {
-    const pos = parseInt(moduleItems[e.target.value]?.position, 10)
+    const pos = parseInt(e.target.value, 10) + 1
     setSiblingPosition(pos)
     setModuleItemPosition(pos + offset)
   }
