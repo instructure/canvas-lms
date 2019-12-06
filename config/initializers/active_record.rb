@@ -1658,3 +1658,12 @@ module DontExplicitlyNameColumnsBecauseOfIgnores
   end
 end
 ActiveRecord::Relation.prepend(DontExplicitlyNameColumnsBecauseOfIgnores)
+
+module PreserveShardAfterTransaction
+  def after_transaction_commit(&block)
+    shards = Shard.send(:active_shards)
+    shards[:delayed_jobs] = Shard.current.delayed_jobs_shard if ::ActiveRecord::Migration.open_migrations.positive?
+    super { Shard.activate(shards, &block) }
+  end
+end
+ActiveRecord::ConnectionAdapters::Transaction.prepend(PreserveShardAfterTransaction)
