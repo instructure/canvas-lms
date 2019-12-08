@@ -17,11 +17,13 @@
 require_relative '../common'
 require_relative 'page_objects/wiki_index_page'
 require_relative '../shared_components/copy_to_tray_page'
+require_relative '../shared_components/commons_fav_tray'
 
 describe 'course wiki pages' do
   include_context 'in-process server selenium tests'
   include CourseWikiIndexPage
   include CopyToTrayPage
+	include CommonsFavoriteTray
 
   let(:select_course_on_copy_tray) {
     course_search_dropdown.click
@@ -87,4 +89,33 @@ describe 'course wiki pages' do
       expect(wiki_page_item_settings_menu.text).not_to include('Copy to...')
     end
   end
+
+	context 'with commons fav FF ON' do
+		before(:each) do
+			@tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+			@tool.wiki_index_menu = {:url => "http://www.example.com", :text => "Commons Fav"}
+			@tool.save!
+			Account.default.enable_feature!(:commons_favorites)
+			course_with_teacher_logged_in
+      @course.save!
+			user_session(@teacher)
+			visit_course_wiki_index_page(@course.id)
+		end
+
+		it "should be able to launch index menu tool via the tray" do
+			page_index_menu_link.click
+			wait_for_ajaximations
+			page_index_menu_item_link("Commons Fav").click
+			wait_for_ajaximations
+
+			expect(commons_fav_tray.text).to include 'Commons Fav'
+			expect(tray_iframe['src']).to include "/courses/#{@course.id}/external_tools/#{@tool.id}"
+
+			placement_query_params = Rack::Utils.parse_nested_query(URI.parse(tray_iframe['src']).query)
+    	expect(placement_query_params["launch_type"]).to eq "wiki_index_menu"
+    	expect(placement_query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "false"
+    	expect(placement_query_params["com_instructure_course_canvas_resource_type"]).to eq "page"
+    	expect(placement_query_params["com_instructure_course_accept_canvas_resource_types"]).to eq ["page"]
+		end
+	end
 end

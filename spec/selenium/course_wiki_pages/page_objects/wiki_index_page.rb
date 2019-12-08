@@ -37,6 +37,14 @@ module CourseWikiIndexPage
       fj("li:contains('Copy to...')")
     end
 
+		def page_index_menu_link
+			fj("a:contains('Pages Settings')")
+		end
+
+		def page_index_menu_item_link(item_name)
+			fj("a:contains('#{item_name}')")
+		end
+
     #------------------------------ Actions ------------------------------
     def visit_course_wiki_index_page(course_id)
       get "/courses/#{course_id}/pages"
