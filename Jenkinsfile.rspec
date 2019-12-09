@@ -51,6 +51,7 @@ pipeline {
                   stage("Running RSpec Set ${index}") {
                     try {
                       sh 'rm -rf ./tmp/spec_failures'
+                      sh 'build/new-jenkins/docker-cleanup.sh'
                       checkout scm
                       timeout(time: 60) {
                         sh 'printenv | sort'

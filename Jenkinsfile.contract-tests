@@ -39,6 +39,14 @@ pipeline {
   }
 
   stages {
+    stage ('Pre-Cleanup') {
+      steps {
+        timeout(time: 2) {
+          sh 'build/new-jenkins/docker-cleanup.sh'
+        }
+      }
+    }
+
     stage('Start Docker Images') {
       steps {
         timeout(time: 10) {

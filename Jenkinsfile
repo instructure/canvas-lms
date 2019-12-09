@@ -83,6 +83,14 @@ pipeline {
       }
     }
 
+    stage ('Pre-Cleanup') {
+      steps {
+        timeout(time: 2) {
+          sh 'build/new-jenkins/docker-cleanup.sh'
+        }
+      }
+    }
+
     stage('Plugins and Config Files') {
       steps {
         timeout(time: 3) {

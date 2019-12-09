@@ -51,6 +51,7 @@ pipeline {
               withEnv(["CI_NODE_INDEX=$index", "CI_NODE_TOTAL=$ci_node_total"]) {
                 node('canvas-docker') {
                   stage("Running Selenium Set ${index}") {
+                    sh 'build/new-jenkins/docker-cleanup.sh'
                     try {
                       checkout scm
                       sh 'rm -rf ./tmp/spec_failures'

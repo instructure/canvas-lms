@@ -46,6 +46,14 @@ pipeline {
         }
       }
     }
+    
+    stage ('Pre-Cleanup') {
+      steps {
+        timeout(time: 2) {
+          sh 'build/new-jenkins/docker-cleanup.sh'
+        }
+      }
+    }
 
     stage('Gergich Setup') {
       steps {

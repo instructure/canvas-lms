@@ -34,6 +34,14 @@ pipeline {
   }
 
   stages {
+    stage ('Pre-Cleanup') {
+      steps {
+        timeout(time: 2) {
+          sh 'build/new-jenkins/docker-cleanup.sh'
+        }
+      }
+    }
+
     stage ('Selenium Performance Tests') {
       steps {
         timeout(time: 60) {
@@ -46,35 +54,35 @@ pipeline {
           sh 'build/new-jenkins/rspec-with-retries.sh performance'
         }
       }
+    }
+  }
 
-      post {
-        unsuccessful {
-          // copy spec failures to local
-          sh 'mkdir -p tmp'
-          sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
-          script {
-            def htmlFiles
-            // find all results files
-            dir ('tmp') {
-              htmlFiles = findFiles glob: '**/index.html'
-            }
-            // publish html
-            publishHTML target: [
-              allowMissing: false,
-              alwaysLinkToLastBuild: false,
-              keepAll: true,
-              reportDir: "tmp",
-              reportFiles: htmlFiles.join(','),
-              reportName: 'Test Failures'
-              ]
-          }
+  post {
+    unsuccessful {
+      // copy spec failures to local
+      sh 'mkdir -p tmp'
+      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
+      script {
+        def htmlFiles
+        // find all results files
+        dir ('tmp') {
+          htmlFiles = findFiles glob: '**/index.html'
         }
-
-        cleanup {
-          sh 'rm -rf ./tmp/spec_failures/'
-          sh 'build/new-jenkins/docker-cleanup.sh'
-        }
+        // publish html
+        publishHTML target: [
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: true,
+          reportDir: "tmp",
+          reportFiles: htmlFiles.join(','),
+          reportName: 'Test Failures'
+          ]
       }
+    }
+
+    cleanup {
+      sh 'rm -rf ./tmp/spec_failures/'
+      sh 'build/new-jenkins/docker-cleanup.sh'
     }
   }
 }
