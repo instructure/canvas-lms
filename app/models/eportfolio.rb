@@ -25,6 +25,11 @@ class Eportfolio < ActiveRecord::Base
   belongs_to :user
   validates_presence_of :user_id
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
+  # flagged_as_possible_spam => our internal filters have flagged this as spam, but
+  # an admin has not manually marked this as spam.
+  # marked_as_safe => an admin has manually marked this as safe.
+  # marked_as_spam => an admin has manually marked this as spam.
+  validates :spam_status, inclusion: ['flagged_as_possible_spam', 'marked_as_safe', 'marked_as_spam'], allow_nil: true
 
   workflow do
     state :active

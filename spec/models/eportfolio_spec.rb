@@ -19,6 +19,40 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Eportfolio do
+  context "validations" do
+    describe "spam_status" do
+      before(:once) do
+        @user = User.create!
+        @eportfolio = Eportfolio.new(user: @user, name: 'an eportfolio')
+      end
+
+      it "is valid when spam_status is nil" do
+        @eportfolio.spam_status = nil
+        expect(@eportfolio).to be_valid
+      end
+
+      it "is valid when spam_status is 'marked_as_spam'" do
+        @eportfolio.spam_status = 'marked_as_spam'
+        expect(@eportfolio).to be_valid
+      end
+
+      it "is valid when spam_status is 'marked_as_safe'" do
+        @eportfolio.spam_status = 'marked_as_safe'
+        expect(@eportfolio).to be_valid
+      end
+
+      it "is valid when spam_status is 'flagged_as_possible_spam'" do
+        @eportfolio.spam_status = 'flagged_as_possible_spam'
+        expect(@eportfolio).to be_valid
+      end
+
+      it "is invalid when spam_status is not nil, 'marked_as_spam', 'marked_as_safe', or 'flagged_as_possible_spam'" do
+        @eportfolio.spam_status = 'a_new_status'
+        expect(@eportfolio).to be_invalid
+      end
+    end
+  end
+
   describe "#ensure_defaults" do
     before(:once) do
       eportfolio
