@@ -47,6 +47,10 @@ class DiscussionTopicPresenter
       assignment.context.grants_right?(user, :manage_assignments))
   end
 
+  def can_direct_share?
+    topic.context.grants_right?(@user, :manage_content) && topic.context.root_account.feature_enabled?(:direct_share)
+  end
+
   # Public: Determine if the given user has permissions to view peer reviews.
   #
   # user - The user whose permissions we're testing.
