@@ -345,7 +345,7 @@ pipeline {
       }
     }
     cleanup {
-        sh 'build/new-jenkins/docker-cleanup.sh'
+        sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }
 }
