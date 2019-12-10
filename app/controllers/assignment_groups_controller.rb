@@ -101,10 +101,11 @@ class AssignmentGroupsController < ApplicationController
   # Returns the paginated list of assignment groups for the current context.
   # The returned groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"]
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"|"observed_users"]
   #  Associations to include with the group. "discussion_topic", "all_dates"
   #  "assignment_visibility" & "submission" are only valid if "assignments" is also included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
+  #  If "observed_users" is passed along with "assignments" and "submission", submissions for observed users will also be included as an array.
   #
   # @argument exclude_assignment_submission_types[] [String, "online_quiz"|"discussion_topic"|"wiki_page"|"external_tool"]
   #  If "assignments" are included, those with the specified submission types
@@ -137,7 +138,7 @@ class AssignmentGroupsController < ApplicationController
                       end
 
         if assignments.any? && include_params.include?('submission')
-          submissions = submissions_hash(['submission'], assignments)
+          submissions = submissions_hash(include_params, assignments)
         end
 
         respond_to do |format|
