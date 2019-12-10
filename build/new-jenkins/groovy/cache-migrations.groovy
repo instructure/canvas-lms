@@ -18,9 +18,9 @@
 
 // If the migrated images are not found, then it builds from database base images
 def loadMigratedImages() {
-  dockerCacheLoad(image: "$POSTGRES_CACHE_TAG")
-  dockerCacheLoad(image: "$CASSANDRA_CACHE_TAG")
-  dockerCacheLoad(image: "$DYNAMODB_CACHE_TAG")
+  dockerCacheLoad(image: "$POSTGRES_CACHE_TAG", prefix: "Canvas")
+  dockerCacheLoad(image: "$CASSANDRA_CACHE_TAG", prefix: "Canvas")
+  dockerCacheLoad(image: "$DYNAMODB_CACHE_TAG", prefix: "Canvas")
 }
 
 def successfullyLoadedFromCache() {
@@ -56,9 +56,9 @@ def commitMigratedImages() {
 }
 
 def storeMigratedImages() {
-  dockerCacheStore(image: "$POSTGRES_CACHE_TAG")
-  dockerCacheStore(image: "$CASSANDRA_CACHE_TAG")
-  dockerCacheStore(image: "$DYNAMODB_CACHE_TAG")
+  dockerCacheStore(image: "$POSTGRES_CACHE_TAG", prefix: "Canvas")
+  dockerCacheStore(image: "$CASSANDRA_CACHE_TAG", prefix: "Canvas")
+  dockerCacheStore(image: "$DYNAMODB_CACHE_TAG", prefix: "Canvas")
 }
 
 def createMigrateBuildUpCached() {
