@@ -83,9 +83,24 @@ module Types
       end
     end
 
-    field :groups, [GroupType], null: true
+    # TODO: deprecate this
+    #
+    # we should probably have some kind of top-level field called `self` or
+    # `currentUser` or `viewer` that holds this kind of info.
+    #
+    # (there is no way to view another user's groups via the REST API)
+    #
+    # alternatively, figure out what kind of permissions a person needs to view
+    # another user's groups?
+    field :groups, [GroupType], <<~DESC, null: true
+      **NOTE**: this only returns groups for the currently logged-in user.
+    DESC
     def groups
-      load_association(:current_groups)
+      if object == current_user
+        # FIXME: this only returns groups on the current shard.  it should
+        # behave like the REST API (see GroupsController#index)
+        load_association(:current_groups)
+      end
     end
 
     field :summary_analytics, StudentSummaryAnalyticsType, null: true do
