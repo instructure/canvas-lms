@@ -26,12 +26,6 @@ body {
   background: $ic-color-light;
   font-weight: 300;
 
-  @if not $use_responsive_layout {
-    &:not(.is-inside-submission-frame):not(.embedded):not(.dashboard-is-planner) {
-      min-width: 768px;
-    }
-  }
-
   &.no-headers, &.embedded {
     #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
     .ic-app-nav-toggle-and-crumbs { display: none; }
