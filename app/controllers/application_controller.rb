@@ -196,7 +196,6 @@ class ApplicationController < ActionController::Base
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
-          use_responsive_layout: use_responsive_layout?,
           use_rce_a11y_checker_notifications: @context.try(:feature_enabled?, :rce_a11y_checker_notifications),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
@@ -417,11 +416,6 @@ class ApplicationController < ActionController::Base
     @domain_root_account&.feature_enabled?(:k12)
   end
   helper_method :k12?
-
-  def use_responsive_layout?
-    @domain_root_account&.feature_enabled?(:responsive_layout)
-  end
-  helper_method :use_responsive_layout?
 
   def grading_periods?
     !!@context.try(:grading_periods?)
