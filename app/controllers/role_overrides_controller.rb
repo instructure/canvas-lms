@@ -242,6 +242,7 @@ class RoleOverridesController < ApplicationController
   #     manage_site_settings             -- Manage site-wide and plugin settings
   #     manage_user_logins               -- Users - manage login details
   #     manage_user_observers            -- Users - add / remove observers
+  #     moderate_user_content            -- Users - moderate user-created content
   #     read_course_content              -- Course Content - view
   #     read_course_list                 -- Courses - view list
   #     read_messages                    -- View notifications sent to users

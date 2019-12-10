@@ -46,6 +46,18 @@ class Eportfolio < ActiveRecord::Base
     self.save
   end
 
+  def flagged_as_possible_spam?
+    return false unless user&.account&.feature_enabled?(:eportfolio_moderation)
+
+    spam_status == 'flagged_as_possible_spam'
+  end
+
+  def spam?(include_possible_spam: true)
+    return false unless user&.account&.feature_enabled?(:eportfolio_moderation)
+
+    spam_status == 'marked_as_spam' || (include_possible_spam && spam_status == 'flagged_as_possible_spam')
+  end
+
   scope :active, -> { where("eportfolios.workflow_state<>'deleted'") }
 
   before_create :assign_uuid
@@ -58,13 +70,32 @@ class Eportfolio < ActiveRecord::Base
     given {|user| user && user.eportfolios_enabled? }
     can :create
 
-    given {|user| self.active? && self.user == user && user.eportfolios_enabled? }
-    can :read and can :manage and can :update and can :delete
+    # User is the author and eportfolios are enabled (whether this eportfolio
+    # is spam or not, the author can see it and delete it).
+    given { |user| self.active? && self.user == user && user.eportfolios_enabled? }
+    can :read and can :delete
 
-    given {|_| self.active? && self.public }
+    # If an eportfolio has been flagged as possible spam or marked as spam, don't let the author
+    # update it. If an admin marks the content as safe, the user will be able to make updates again,
+    # but we don't want to let the user make changes before an admin can review the content.
+    given { |user| self.active? && self.user == user && user.eportfolios_enabled? && !self.spam?}
+    can :update and can :manage
+
+    # The eportfolio is public and it hasn't been flagged or marked as spam.
+    given {|_| self.active? && self.public && !self.spam?}
     can :read
 
-    given {|_, session| self.active? && session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) }
+    # The eportfolio is private and the user has access to the private link
+    # (we know this by way of the session having the eportfolio id) and the
+    # eportfolio hasn't been flagged or marked as spam.
+    given {|_, session| self.active? && session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) && !self.spam?}
+    can :read
+
+    given { |user| self.active? && self.user != user && self.user&.grants_right?(user, :moderate_user_content) }
+    can :moderate
+
+    # The eportfolio is flagged or marked as spam and the user has permission to moderate it
+    given { |user| self.active? && self.spam? && self.user&.grants_right?(user, :moderate_user_content)}
     can :read
   end
 
