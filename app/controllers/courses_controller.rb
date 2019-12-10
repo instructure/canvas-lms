@@ -1112,9 +1112,9 @@ class CoursesController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_content)
 
     users_scope = User.where.not(id: @current_user.id).active.distinct
-    union_scope = teacher_scope(name_scope(users_scope)).
+    union_scope = teacher_scope(name_scope(users_scope), @context.root_account_id).
       union(
-        teacher_scope(email_scope(users_scope)),
+        teacher_scope(email_scope(users_scope), @context.root_account_id),
         admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
         admin_scope(email_scope(users_scope), @context.root_account_id).merge(Role.full_account_admin),
         admin_scope(name_scope(users_scope), @context.root_account_id).merge(Role.custom_account_admin_with_permission('manage_content')),
@@ -1133,8 +1133,11 @@ class CoursesController < ApplicationController
       where("accounts.id = ? OR accounts.root_account_id = ?", root_account_id, root_account_id)
   end
 
-  def teacher_scope(scope)
-    scope.joins(enrollments: :course).merge(Enrollment.active.of_admin_type).merge(Course.active)
+  def teacher_scope(scope, root_account_id)
+    scope.joins(enrollments: :course).
+      merge(Enrollment.active.of_admin_type).
+      merge(Course.active).
+      where(courses: {root_account_id: root_account_id})
   end
 
   def name_scope(scope)
