@@ -19,6 +19,11 @@
 <% eportfolio ||= nil %>
 <li id="portfolio_<%= eportfolio ? eportfolio.id : "blank" %>" style="<%= hidden unless eportfolio %> display: block; margin-bottom: 20px;">
   <a href="<%= eportfolio_path(eportfolio ? eportfolio.id : "{{ id }}") %>" class="icon-folder" style="font-size: 1.2em;"><span class="name"><%= eportfolio.name rescue nbsp %></span></a>
+  <% if eportfolio&.flagged_as_possible_spam? %>
+      &nbsp;<i class="icon-warning"></i>&nbsp;<%= t('Flagged as possible spam') %>
+  <% elsif eportfolio&.spam?(include_possible_spam: false) %>
+      &nbsp;<i class="icon-warning"></i>&nbsp;<%= t('Marked as spam') %>
+  <% end %>
   <div style="padding-<%= direction('left') %>: 30px;">
     <%= t(:entry_count, { :one => "*1* page", :other => "*%{count}* pages" },
           :count => (eportfolio.eportfolio_entries.length rescue 0),

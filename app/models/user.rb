@@ -1160,6 +1160,9 @@ class User < ActiveRecord::Base
 
     given { |user| user && user.as_observer_observation_links.where(user_id: self.id).exists? }
     can :read and can :read_as_parent
+
+    given { |user| self.check_accounts_right?(user, :moderate_user_content) }
+    can :moderate_user_content
   end
 
   def can_masquerade?(masquerader, account)

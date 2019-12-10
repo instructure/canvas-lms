@@ -57,6 +57,12 @@
     <div class="editing_box button-container">
       <button type="button" class="done_editing_button btn btn-primary"><%= t('buttons.done_editing', "Done Editing") %></button>
     </div>
+    <% if @portfolio.user.account&.feature_enabled?(:eportfolio_moderation) && !@portfolio.spam? && @portfolio.grants_right?(@current_user, :moderate) %>
+      <%= form_for @portfolio, url: eportfolio_path(@portfolio), html: { id: 'edit_eportfolio_spam_form' }  do |f| %>
+        <input type="hidden" name="eportfolio[spam_status]" value="marked_as_spam"/>
+        <button type="submit" class="btn btn-default"><%= t('Mark as spam') %></button>
+      <% end %>
+    <% end %>
     <a href="<%= eportfolio_entries_path(@portfolio) %>" class="add_page_url" style="display: none;">&nbsp;</a>
     <a href="<%= eportfolio_reorder_entries_url(@portfolio.id, @category.id) %>" class="reorder_pages_url" style="display:none;">&nbsp;</a>
   </div>
