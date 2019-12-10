@@ -59,7 +59,8 @@ describe MediaObjectsController do
           'title' => "Untitled",
           'media_type' => nil,
           'media_tracks' => [],
-          'media_sources' => [{"bitrate"=>12345, "label"=>"12 kbps", "src"=>"whatever man", "url"=>"whatever man"}]
+          'media_sources' => [{"bitrate"=>12345, "label"=>"12 kbps", "src"=>"whatever man", "url"=>"whatever man"}],
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/#{deleted_media_id}"
       })
     end
 
@@ -92,7 +93,8 @@ describe MediaObjectsController do
             "url"=>"whatever man"}],
           "media_tracks"=>[],
           "title"=>"The Title",
-          "media_type"=>"audio"
+          "media_type"=>"audio",
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test2"
         },
         {
           "can_add_captions"=>true,
@@ -105,7 +107,8 @@ describe MediaObjectsController do
             "url"=>"whatever man"}],
           "media_tracks"=>[],
           "title"=>"User Title",
-          "media_type"=>nil
+          "media_type"=>nil,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test3"
         },
 
         {
@@ -119,7 +122,8 @@ describe MediaObjectsController do
             "url"=>"whatever man"}],
           "media_tracks"=>[],
           "title"=>"Untitled",
-          "media_type"=>"video"
+          "media_type"=>"video",
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test"
         }
       ])
     end
@@ -149,7 +153,8 @@ describe MediaObjectsController do
           "media_id"=>"test",
           "media_tracks"=>[],
           "title"=>"Untitled",
-          "media_type"=>"video"
+          "media_type"=>"video",
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test"
         }
       ])
     end
@@ -171,7 +176,8 @@ describe MediaObjectsController do
             "src"=>"whatever man",
             "url"=>"whatever man"}],
           "title"=>"Untitled",
-          "media_type"=>"video"
+          "media_type"=>"video",
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test"
         }
       ])
     end
@@ -189,7 +195,8 @@ describe MediaObjectsController do
           "created_at"=>mo1.created_at.as_json,
           "media_id"=>"in_course",
           "title"=>"Untitled",
-          "media_type"=>nil
+          "media_type"=>nil,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/in_course"
         }
       ])
     end
@@ -204,7 +211,7 @@ describe MediaObjectsController do
       expect(response.status.to_s).to eq("404")
     end
 
-    it "will reutrn user's media of context_type isn't 'course'" do
+    it "will return user's media of context_type isn't 'course'" do
       course_with_teacher_logged_in
       mo1 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course", :user_entered_title => "AAA")
       mo2 = MediaObject.create!(:user_id => @user, :media_id => "not_in_course", :user_entered_title => "BBB")
@@ -217,14 +224,16 @@ describe MediaObjectsController do
           "created_at"=>mo1.created_at.as_json,
           "media_id"=>"in_course",
           "title"=>"AAA",
-          "media_type"=>nil
+          "media_type"=>nil,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/in_course"
         },
         {
           "can_add_captions"=>true,
           "created_at"=>mo2.created_at.as_json,
           "media_id"=>"not_in_course",
           "title"=>"BBB",
-          "media_type"=>nil
+          "media_type"=>nil,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/not_in_course"
         }
       ])
     end
