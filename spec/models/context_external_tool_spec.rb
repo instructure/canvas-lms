@@ -49,6 +49,76 @@ describe ContextExternalTool do
     end
   end
 
+  describe "#global_navigation_tools" do
+    subject do
+      ContextExternalTool.global_navigation_tools(
+        @root_account,
+        'admins',
+        user: global_nav_user,
+        context: global_nav_context
+      )
+    end
+
+    let(:global_nav_user) {}
+    let(:global_nav_context) {}
+    let(:required_permission) { 'some-permission' }
+
+    let!(:permission_required_tool) do
+      ContextExternalTool.create!(
+        context: @root_account,
+        name: 'Requires Permission',
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        domain: 'requires.permision.com',
+        settings: {
+          global_navigation: {
+            'required_permissions' => required_permission,
+            text: 'Global Navigation (permission checked)',
+            url: 'http://requires.permission.com'
+          }
+        }
+      )
+    end
+    let!(:no_permission_required_tool) do
+      ContextExternalTool.create!(
+        context: @root_account,
+        name: 'No Requires Permission',
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        domain: 'no.requires.permision.com',
+        settings: {
+          global_navigation: {
+            text: 'Global Navigation (no permission)',
+            url: 'http://no.requries.permission.com'
+          }
+        }
+      )
+    end
+
+    context 'when a user and context are provided' do
+      let(:global_nav_user) { @course.teachers.first }
+      let(:global_nav_context) { @course }
+
+      context 'when the current user has the required permission' do
+        let(:required_permission) { 'send_messages_all' }
+
+        before { @course.update!(workflow_state: "created") }
+
+        it { is_expected.to match_array [no_permission_required_tool, permission_required_tool] }
+      end
+
+      context 'when the current user does not have the required permission' do\
+        it { is_expected.to match_array [no_permission_required_tool] }
+      end
+    end
+
+    context 'when a user and context are not provided' do
+      let(:required_permission) { nil }
+
+      it { is_expected.to match_array [no_permission_required_tool, permission_required_tool] }
+    end
+  end
+
   describe '#login_or_launch_url' do
     let_once(:developer_key) { DeveloperKey.create! }
     let_once(:tool) do
