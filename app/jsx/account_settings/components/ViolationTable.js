@@ -19,11 +19,12 @@
 import React, {useState} from 'react'
 import I18n from 'i18n!csp_violation_table'
 import {Table} from '@instructure/ui-table'
-import FriendlyDatetime from '../../shared/FriendlyDatetime'
+import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconAddSolid} from '@instructure/ui-icons'
 import {showFlashAlert} from '../../shared/FlashAlert'
+import FriendlyDatetime from '../../shared/FriendlyDatetime'
 
 const HEADERS = [
   {
@@ -102,6 +103,14 @@ export default function ViolationTable({
       setSortBy(id)
       setAscending(true)
     }
+  }
+
+  if (sortedViolations.length < 1) {
+    return (
+      <Alert variant="info" margin="small">
+        {I18n.t('No violations have been reported.')}
+      </Alert>
+    )
   }
 
   return (

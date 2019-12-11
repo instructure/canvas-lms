@@ -82,6 +82,11 @@ describe('Violation Table', () => {
     expect(queryAllByText('clayd.dev')).toHaveLength(0)
   })
 
+  it('shows a info message when there are no violations present', async () => {
+    const {findByText} = render(<ViolationTable violations={[]} />)
+    expect(await findByText(/No violations/)).toBeInTheDocument()
+  })
+
   describe('adding to whitelist', () => {
     it('calls the addDomain prop when clicking the add button', async () => {
       const fakeAddDomain = jest.fn()
