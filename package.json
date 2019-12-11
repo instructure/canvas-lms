@@ -52,6 +52,7 @@
     "@instructure/ui-svg-images": "6",
     "@instructure/ui-table": "6",
     "@instructure/ui-tabs": "6",
+    "@instructure/ui-text": "6",
     "@instructure/ui-text-input": "6",
     "@instructure/ui-themeable": "6",
     "@instructure/ui-themes": "6",

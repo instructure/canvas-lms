@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, string, func} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 
 ConfirmActionButtonBar.propTypes = {
   // only buttons with labels will be displayed

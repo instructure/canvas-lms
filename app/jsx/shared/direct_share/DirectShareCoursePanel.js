@@ -52,13 +52,18 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
           select: contentSelection,
           settings: {
             source_course_id: sourceCourseId,
-            insert_into_module_id: selectedModule?.id,
+            insert_into_module_id: selectedModule?.id || null,
             insert_into_module_type: contentSelection ? Object.keys(contentSelection)[0] : null,
             insert_into_module_position: selectedPosition
           }
         }
       })
     )
+  }
+
+  function handleSelectedCourse(course) {
+    setSelectedModule(null)
+    setSelectedCourse(course)
   }
 
   return (
@@ -71,8 +76,8 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
       />
       <CourseAndModulePicker
         selectedCourseId={selectedCourse?.id}
-        setSelectedCourse={setSelectedCourse}
-        selectedModuleId={selectedModule?.id}
+        setSelectedCourse={handleSelectedCourse}
+        selectedModuleId={selectedModule?.id || null}
         setSelectedModule={setSelectedModule}
         setModuleItemPosition={setSelectedPosition}
       />
