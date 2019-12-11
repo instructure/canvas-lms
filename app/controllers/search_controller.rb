@@ -384,11 +384,17 @@ class SearchController < ApplicationController
     # bit of data per user, but this still isn't ideal
     users = @current_user.address_book.known_in_context(context)
     enrollment_counts = {:all => users.size}
+    enrollment_type_permissions = {}
+    course_model = nil
     users.each do |user|
       common_courses = @current_user.address_book.common_courses(user)
       next unless common_courses.key?(course[:id])
       roles = common_courses[course[:id]].uniq
       roles.each do |role|
+        unless enrollment_type_permissions.key? role
+          course_model ||= Course.find(course[:id])
+          enrollment_type_permissions[role] = course_model.rights_status(user, *course[:permissions].keys)
+        end
         enrollment_counts[role] ||= 0
         enrollment_counts[role] += 1
       end
@@ -396,10 +402,20 @@ class SearchController < ApplicationController
     avatar_url = avatar_url_for_group
     result = []
     synthetic_context = {:avatar_url => avatar_url, :type => :context, :permissions => course[:permissions]}
-    result << synthetic_context.merge({:id => "#{context}_teachers", :name => t(:enrollments_teachers, "Teachers"), :user_count => enrollment_counts['TeacherEnrollment']}) if enrollment_counts['TeacherEnrollment'].to_i > 0
-    result << synthetic_context.merge({:id => "#{context}_tas", :name => t(:enrollments_tas, "Teaching Assistants"), :user_count => enrollment_counts['TaEnrollment']}) if enrollment_counts['TaEnrollment'].to_i > 0
-    result << synthetic_context.merge({:id => "#{context}_students", :name => t(:enrollments_students, "Students"), :user_count => enrollment_counts['StudentEnrollment']}) if enrollment_counts['StudentEnrollment'].to_i > 0
-    result << synthetic_context.merge({:id => "#{context}_observers", :name => t(:enrollments_observers, "Observers"), :user_count => enrollment_counts['ObserverEnrollment']}) if enrollment_counts['ObserverEnrollment'].to_i > 0
+    {
+      teacher: t(:enrollments_teachers, "Teachers"),
+      ta: t(:enrollments_tas, "Teaching Assistants"),
+      student: t(:enrollments_students, "Students"),
+      observer: t(:enrollments_observers, "Observers"),
+    }.each do |key, translated_name|
+      next unless enrollment_counts["#{key.capitalize}Enrollment"].to_i > 0
+      result << synthetic_context.merge({
+        id: "#{context}_#{key}s",
+        name: translated_name,
+        user_count: enrollment_counts["#{key.capitalize}Enrollment"],
+        permissions: enrollment_type_permissions["#{key.capitalize}Enrollment"]
+      })
+    end
     result
   end
 

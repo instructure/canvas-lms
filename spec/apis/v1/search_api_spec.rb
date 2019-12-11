@@ -250,22 +250,42 @@ describe SearchController, type: :request do
       it "should return synthetic contexts within a course" do
         json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}&synthetic_contexts=1",
                 { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}", :synthetic_contexts => "1" })
-        json.each { |c| c.delete("avatar_url") }
+        json.each do |c|
+          if c["id"] == "course_#{@course.id}_teachers" || c["id"] == "course_#{@course.id}_students"
+            expect(c).to include("permissions")
+            c.delete("permissions")
+          end
+          c.delete("avatar_url")
+        end
         expect(json).to eql [
-          {"id" => "course_#{@course.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1, "permissions" => {}},
-          {"id" => "course_#{@course.id}_students", "name" => "Students", "type" => "context", "user_count" => 5, "permissions" => {}},
+          {"id" => "course_#{@course.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1},
+          {"id" => "course_#{@course.id}_students", "name" => "Students", "type" => "context", "user_count" => 5},
           {"id" => "course_#{@course.id}_sections", "name" => "Course Sections", "type" => "context", "item_count" => 2},
           {"id" => "course_#{@course.id}_groups", "name" => "Student Groups", "type" => "context", "item_count" => 1}
         ]
       end
 
       it "should return synthetic contexts within a section" do
-        json = api_call(:get, "/api/v1/search/recipients.json?context=section_#{@course.default_section.id}&synthetic_contexts=1",
-                { :controller => 'search', :action => 'recipients', :format => 'json', :context => "section_#{@course.default_section.id}", :synthetic_contexts => "1" })
-        json.each { |c| c.delete("avatar_url") }
+        json = api_call(
+          :get, "/api/v1/search/recipients.json?context=section_#{@course.default_section.id}&synthetic_contexts=1",
+          {
+            :controller => 'search',
+            :action => 'recipients',
+            :format => 'json',
+            :context => "section_#{@course.default_section.id}",
+            :synthetic_contexts => "1"
+          }
+        )
+        json.each do |c|
+          if c["id"] == "section_#{@course.default_section.id}_teachers" || c["id"] == "section_#{@course.default_section.id}_students"
+            expect(c).to include("permissions")
+            c.delete("permissions")
+          end
+          c.delete("avatar_url")
+        end
         expect(json).to eql [
-          {"id" => "section_#{@course.default_section.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1, "permissions" => {}},
-          {"id" => "section_#{@course.default_section.id}_students", "name" => "Students", "type" => "context", "user_count" => 4, "permissions" => {}}
+          {"id" => "section_#{@course.default_section.id}_teachers", "name" => "Teachers", "type" => "context", "user_count" => 1},
+          {"id" => "section_#{@course.default_section.id}_students", "name" => "Students", "type" => "context", "user_count" => 4}
         ]
       end
 
