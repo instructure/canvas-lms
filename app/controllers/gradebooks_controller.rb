@@ -496,11 +496,16 @@ class GradebooksController < ApplicationController
       assignment_ids = submissions.map { |submission| submission[:assignment_id] }
       users = @context.admin_visible_students.distinct.find(user_ids).index_by(&:id)
       assignments = @context.assignments.active.find(assignment_ids).index_by(&:id)
+      # `submissions` is not a collection of ActiveRecord Submission objects,
+      # so we pull the records here in order to check hide_grade_from_student?
+      # on each submission below.
+      submission_records = Submission.where(assignment_id: assignment_ids, user_id: user_ids)
 
       request_error_status = nil
       error = nil
       @submissions = []
       submissions.each do |submission|
+        submission_record = submission_records.find { |sub| sub.user_id == submission[:user_id].to_i }
         @assignment = assignments[submission[:assignment_id].to_i]
         @user = users[submission[:user_id].to_i]
 
@@ -537,7 +542,7 @@ class GradebooksController < ApplicationController
           end
           if [:comment, :media_comment_id, :comment_attachments].any? { |k| submission.key? k }
             submission[:commenter] = @current_user
-            submission[:hidden] = @assignment.muted?
+            submission[:hidden] = submission_record&.hide_grade_from_student?
 
             subs = @assignment.update_submission(@user, submission)
             apply_provisional_grade_filters!(submissions: subs, final: submission[:final]) if submission[:provisional]
