@@ -23,6 +23,8 @@ class EportfolioCategory < ActiveRecord::Base
   belongs_to :eportfolio
 
   before_save :infer_unique_slug
+  after_save :check_for_spam, if: -> { eportfolio.needs_spam_review? }
+
   validates_presence_of :eportfolio_id
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
 
@@ -39,4 +41,10 @@ class EportfolioCategory < ActiveRecord::Base
     end
   end
   protected :infer_unique_slug
+
+  private
+
+  def check_for_spam
+    eportfolio.flag_as_possible_spam! if eportfolio.title_contains_spam?(name)
+  end
 end

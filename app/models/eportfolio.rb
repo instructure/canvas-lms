@@ -22,6 +22,8 @@ class Eportfolio < ActiveRecord::Base
   has_many :eportfolio_entries, :dependent => :destroy
   has_many :attachments, :as => :context, :inverse_of => :context
 
+  after_save :check_for_spam, if: -> { needs_spam_review? }
+
   belongs_to :user
   validates_presence_of :user_id
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
@@ -77,4 +79,34 @@ class Eportfolio < ActiveRecord::Base
     cat
   end
   def self.serialization_excludes; [:uuid]; end
+
+  def title_contains_spam?(title)
+    Eportfolio.spam_criteria_regexp&.match?(title)
+  end
+
+  def flag_as_possible_spam!
+    update!(spam_status: "flagged_as_possible_spam")
+  end
+
+  def needs_spam_review?
+    active? && spam_status.nil? && user.account.feature_enabled?(:eportfolio_moderation)
+  end
+
+  def self.spam_criteria_regexp(type: :title)
+    setting_name = type == :title ? 'eportfolio_title_spam_keywords' : 'eportfolio_content_spam_keywords'
+    spam_keywords = Setting.get(setting_name, '').
+      split(',').
+      map(&:strip).
+      reject(&:empty?)
+    return nil if spam_keywords.blank?
+
+    escaped_keywords = spam_keywords.map { |token| Regexp.escape(token) }
+    /\b(#{escaped_keywords.join('|')})\b/i
+  end
+
+  private
+
+  def check_for_spam
+    flag_as_possible_spam! if title_contains_spam?(name)
+  end
 end

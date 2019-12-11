@@ -27,6 +27,8 @@ class EportfolioEntry < ActiveRecord::Base
   acts_as_list :scope => :eportfolio_category
   before_save :infer_unique_slug
   before_save :infer_comment_visibility
+  after_save :check_for_spam, if: -> { eportfolio.needs_spam_review? }
+
   after_save :update_portfolio
   validates_presence_of :eportfolio_id
   validates_presence_of :eportfolio_category_id
@@ -160,5 +162,25 @@ class EportfolioEntry < ActiveRecord::Base
       rendered_content = t(:click_through, "Click to view page content")
       entry.content   = Atom::Content::Html.new(rendered_content)
     end
+  end
+
+  private
+
+  def content_contains_spam?
+    content_regexp = Eportfolio.spam_criteria_regexp(type: :content)
+    return if content_regexp.blank?
+
+    content_bodies = content_sections.map do |section|
+      if section.is_a?(String)
+        section
+      elsif section.is_a?(Hash)
+        section[:content]
+      end
+    end
+    content_bodies.compact.any? { |content| content_regexp.match?(content) }
+  end
+
+  def check_for_spam
+    eportfolio.flag_as_possible_spam! if eportfolio.title_contains_spam?(name) || content_contains_spam?
   end
 end

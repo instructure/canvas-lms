@@ -1,0 +1,70 @@
+#
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
+describe EportfolioCategory do
+  let(:user) { User.create! }
+  let(:eportfolio) { Eportfolio.create!(name: "my file", user: user) }
+  let(:spam_status) { eportfolio.reload.spam_status }
+  let(:category) { eportfolio.eportfolio_categories.create!(name: "my category") }
+
+  describe "callbacks" do
+    describe "#check_for_spam" do
+      context "when the setting has a value and the release flag is enabled" do
+        before(:each) do
+          user.account.root_account.enable_feature!(:eportfolio_moderation)
+          Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
+        end
+
+        it "marks the owning portfolio as possible spam when the title matches one or more keywords" do
+          category.update!(name: "my bad category")
+          expect(spam_status).to eq "flagged_as_possible_spam"
+        end
+
+        it "does not mark as spam when the title matches no keywords" do
+          expect {
+            category.update!(name: "my great and notbad category")
+          }.not_to change { spam_status }
+        end
+
+        it "does not mark as spam if a spam_status already exists" do
+          eportfolio.update!(spam_status: "marked_as_safe")
+
+          expect {
+            category.update!(name: "actually a bad category")
+          }.not_to change { spam_status }
+        end
+      end
+
+      it "does not attempt to mark as spam when the setting is empty" do
+        user.account.root_account.enable_feature!(:eportfolio_moderation)
+        expect {
+          category.update!(name: "actually a bad category")
+        }.not_to change { spam_status }
+      end
+
+      it "does not attempt to mark as spam when the release flag is not enabled" do
+        Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
+        expect {
+          eportfolio.update!(name: "actually a bad page")
+        }.not_to change { spam_status }
+      end
+    end
+  end
+end
