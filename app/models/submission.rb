@@ -1913,20 +1913,6 @@ class Submission < ActiveRecord::Base
     self.assignment.grading_type
   end
 
-  # Note 2012-10-12:
-  #   Deprecating this method due to view code in the model. The only place
-  #   it appears to be used is in the _recent_feedback.html.erb partial.
-  def readable_grade
-    warn "[DEPRECATED] The Submission#readable_grade method will be removed soon"
-    return nil unless grade
-    case grading_type
-      when 'points'
-        "#{grade} out of #{assignment.points_possible}" rescue grade.capitalize
-      else
-        grade.capitalize
-    end
-  end
-
   def last_teacher_comment
     if association(:submission_comments).loaded?
       submission_comments.reverse.detect{ |com| !com.draft && com.author_id != user_id }
