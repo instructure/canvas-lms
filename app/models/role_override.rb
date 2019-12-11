@@ -957,7 +957,13 @@ class RoleOverride < ActiveRecord::Base
        :label_v2 => lambda { t("Users - view login IDs") },
        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment),
        :true_for => %w(AccountAdmin TeacherEnrollment TaEnrollment)
-   }
+     },
+     :view_learning_analytics => {
+       :label => lambda { t("View Learning Analytics (Beta)")},
+       :label_v2 => lambda { t('Learning Analytics (Beta) - view')},
+       :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment),
+       :true_for => []
+     }
     })
 
   ACCESS_TOKEN_SCOPE_PREFIX = 'https://api.instructure.com/auth/canvas'.freeze
