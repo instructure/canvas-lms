@@ -490,4 +490,42 @@ describe AccessToken do
 
   end
 
+  context 'broadcast policy' do
+    before(:once) do
+      Notification.create!(name: 'Manually Created Access Token Created')
+      Account.site_admin.enable_feature!(:notify_for_manually_created_access_tokens)
+      user_model
+    end
+
+    it 'should send a notification when a new manually created access token is created' do
+      access_token = AccessToken.create!(user: @user)
+      expect(access_token.messages_sent).to include('Manually Created Access Token Created')
+    end
+
+    it 'should send a notification when a manually created access token is regenerated' do
+      AccessToken.create!(user: @user)
+      access_token = AccessToken.last
+      access_token.regenerate_access_token
+      expect(access_token.messages_sent).to include('Manually Created Access Token Created')
+    end
+
+    it 'should not send a notification when a manually created access token is touched' do
+      AccessToken.create!(user: @user)
+      access_token = AccessToken.last
+      access_token.touch
+      expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
+    end
+
+    it 'should not send a notification when a new non-manually created access token is created' do
+      developer_key = DeveloperKey.create!
+      access_token = AccessToken.create!(user: @user, developer_key: developer_key)
+      expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
+    end
+
+    it 'should not send a notification if notify_for_manually_created_access_tokens is disabled' do
+      Account.site_admin.disable_feature!(:notify_for_manually_created_access_tokens)
+      access_token = AccessToken.create!(user: @user)
+      expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
+    end
+  end
 end
