@@ -71,4 +71,52 @@ describe Eportfolio do
       expect(@category.reload.eportfolio_entries).not_to be_empty
     end
   end
+
+  describe "callbacks" do
+    describe "#check_for_spam" do
+      let(:user) { User.create! }
+      let(:eportfolio) { Eportfolio.create!(name: "my file", user: user) }
+      let(:spam_status) { eportfolio.reload.spam_status }
+
+      context "when the setting has a value and the release flag is enabled" do
+        before(:each) do
+          user.account.root_account.enable_feature!(:eportfolio_moderation)
+          Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
+        end
+
+        it "marks as possible spam when the title matches one or more keywords" do
+          eportfolio.update!(name: "my verybad page")
+          expect(spam_status).to eq "flagged_as_possible_spam"
+        end
+
+        it "does not mark as spam when the title matches no keywords" do
+          expect {
+            eportfolio.update!(name: "my great and notbad page")
+          }.not_to change { spam_status }
+        end
+
+        it "does not mark as spam if a spam_status already exists" do
+          eportfolio.update!(spam_status: "marked_as_safe")
+
+          expect {
+            eportfolio.update!(name: "actually a bad page")
+          }.not_to change { spam_status }
+        end
+      end
+
+      it "does not attempt to mark as spam when the setting is empty" do
+        user.account.root_account.enable_feature!(:eportfolio_moderation)
+        expect {
+          eportfolio.update!(name: "actually a bad page")
+        }.not_to change { spam_status }
+      end
+
+      it "does not attempt to mark as spam when the release flag is not enabled" do
+        Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
+        expect {
+          eportfolio.update!(name: "actually a bad page")
+        }.not_to change { spam_status }
+      end
+    end
+  end
 end
