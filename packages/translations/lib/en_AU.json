@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Audio and Video recording is not available."
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "Audio player for { title }"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Automatically open an in-line preview. (Preview displays only after saving)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(Describe the image)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "(Describe the video)"
+    },
     "details_98a31b68": {
         "message": "Details"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "Embed Preview"
+    },
+    "embed_video_a97a64af": {
+        "message": "Embed Video"
     },
     "embed_video_code_703e10f2": {
         "message": "Embed Video Code"
@@ -460,9 +469,6 @@
     },
     "group_navigation_99f191a": {
         "message": "Group Navigation"
-    },
-    "header_f28f73db": {
-        "message": "Header"
     },
     "height_69b03e15": {
         "message": "Height"
@@ -833,9 +839,6 @@
     "small_b070434a": {
         "message": "Small"
     },
-    "small_header_168fb9f9": {
-        "message": "Small header"
-    },
     "something_went_wrong_89195131": {
         "message": "Something went wrong."
     },
@@ -877,9 +880,6 @@
     },
     "styles_2aa721ef": {
         "message": "Styles"
-    },
-    "subheader_2b87606d": {
-        "message": "Subheader"
     },
     "submit_a3cc6859": {
         "message": "Submit"
@@ -1010,6 +1010,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Used by screen readers to describe the content of an image"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Used by screen readers to describe the video"
+    },
     "user_documents_c206e61f": {
         "message": "User Documents"
     },
@@ -1030,6 +1033,12 @@
     },
     "video_player_b371005": {
         "message": "Video Player"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "Video player for "
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "Video player for { title }"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "View keyboard shortcuts"

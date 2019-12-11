@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Er is geen audio- en video-opname beschikbaar."
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "Audio-speler voor { title }"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Wordt automatisch geopend in een in-line voorbeeld. (Voorbeeld wordt pas na het opslaan weergegeven)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(Beschrijf de afbeelding)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "(beschrijf de video)"
+    },
     "details_98a31b68": {
         "message": "Details"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "Voorbeeld insluiten"
+    },
+    "embed_video_a97a64af": {
+        "message": "Video insluiten"
     },
     "embed_video_code_703e10f2": {
         "message": "Videocode insluiten"
@@ -460,9 +469,6 @@
     },
     "group_navigation_99f191a": {
         "message": "Groepsnavigatie"
-    },
-    "header_f28f73db": {
-        "message": "Koptekst"
     },
     "height_69b03e15": {
         "message": "Hoogte"
@@ -833,9 +839,6 @@
     "small_b070434a": {
         "message": "Klein"
     },
-    "small_header_168fb9f9": {
-        "message": "Kleine koptekst"
-    },
     "something_went_wrong_89195131": {
         "message": "Er is iets misgegaan."
     },
@@ -877,9 +880,6 @@
     },
     "styles_2aa721ef": {
         "message": "Stijlen"
-    },
-    "subheader_2b87606d": {
-        "message": "Subkoptekst"
     },
     "submit_a3cc6859": {
         "message": "Inleveren"
@@ -1010,6 +1010,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Gebruikt door schermlezers om de inhoud van een afbeelding te beschrijven"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Gebruikt door schermlezers om de video te beschrijven"
+    },
     "user_documents_c206e61f": {
         "message": "Gebruikersdocumenten"
     },
@@ -1030,6 +1033,12 @@
     },
     "video_player_b371005": {
         "message": "Videospeler"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "Videospeler voor "
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "Videospeler voor { title }"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Sneltoetsen bekijken"
