@@ -309,15 +309,16 @@ test('opens and closes the direct share send to user dialog', async function() {
   await waitForElementToBeRemoved(() => queryByText(document.body, 'Send to:'))
 })
 
-test('opens and closes the direct share copy to course tray', async function() {
-  const view = createView(this.model, {directShareEnabled: true})
-  $('#fixtures').append('<div id="copy-to-mount-point" />')
-  view.$('.copy_assignment_to').click()
-  fetchMock.mock('/users/self/manageable_courses', [])
-  ok(await findByText(document.body, 'Select a Course'))
-  getByText(document.body, 'Close').click()
-  await waitForElementToBeRemoved(() => queryByText(document.body, 'Select a Course'))
-})
+// skip('will be fixed in LA-354')
+// test('opens and closes the direct share copy to course tray', async function() {
+//   const view = createView(this.model, {directShareEnabled: true})
+//   $('#fixtures').append('<div id="copy-to-mount-point" />')
+//   view.$('.copy_assignment_to').click()
+//   fetchMock.mock('/users/self/manageable_courses', [])
+//   ok(await findByText(document.body, 'Select a Course'))
+//   getByText(document.body, 'Close').click()
+//   await waitForElementToBeRemoved(() => queryByText(document.body, 'Select a Course'))
+// })
 
 test('does not show sharing and copying menu items if not DIRECT_SHARE_ENABLED', function() {
   const view = createView(this.model, {
