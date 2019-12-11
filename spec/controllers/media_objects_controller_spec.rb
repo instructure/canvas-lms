@@ -184,7 +184,13 @@ describe MediaObjectsController do
 
     it "will limit return to course media" do
       course_with_teacher_logged_in
-      mo1 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course")
+      mo1 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course_with_att")
+      @course.attachments.create!(:media_entry_id => "in_course_with_att", :uploaded_data => stub_png_data)
+
+      MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course_with_deleted_att")
+      deleted_att = @course.attachments.create!(:media_entry_id => "in_course_with_deleted_att", :uploaded_data => stub_png_data)
+      deleted_att.destroy!
+
       MediaObject.create!(:user_id => @user, :media_id => "not_in_course")
 
       get 'index', params: {:course_id => @course.id, :exclude => ["sources", "tracks"]}
@@ -193,10 +199,10 @@ describe MediaObjectsController do
         {
           "can_add_captions"=>true,
           "created_at"=>mo1.created_at.as_json,
-          "media_id"=>"in_course",
+          "media_id"=>"in_course_with_att",
           "title"=>"Untitled",
           "media_type"=>nil,
-          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/in_course"
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/in_course_with_att"
         }
       ])
     end
