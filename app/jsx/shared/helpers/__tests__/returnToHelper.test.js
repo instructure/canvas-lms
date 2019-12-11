@@ -46,9 +46,16 @@ describe('returnToHelper', () => {
       )
     })
 
-    test('returns true for other urls', () => {
-      expect(isValid('https://github.com')).toEqual(true)
+    test('returns true for relative urls', () => {
       expect(isValid('/')).toEqual(true)
+    })
+
+    test('returns true for absolute urls in the same origin', () => {
+      expect(isValid(window.location.origin + '/courses/1/assignments')).toEqual(true)
+    })
+
+    test('returns false for absolute urls in a different origin', () => {
+      expect(isValid('http://evil.com')).toEqual(false)
     })
   })
 })

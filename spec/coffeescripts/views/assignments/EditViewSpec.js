@@ -36,6 +36,7 @@ import 'helpers/jquery.simulate'
 
 const s_params = 'some super secure params'
 const fixtures = document.getElementById('fixtures')
+const currentOrigin = window.location.origin
 
 const nameLengthHelper = function(
   view,
@@ -366,33 +367,39 @@ test('routes to discussion details normally', function() {
 })
 
 test('routes to return_to', function() {
-  const view = this.editView({html_url: 'http://foo'})
-  equal(view.locationAfterSave({return_to: 'http://bar'}), 'http://bar')
+  const view = this.editView({html_url: currentOrigin + '/foo'})
+  equal(view.locationAfterSave({return_to: currentOrigin + '/bar'}), currentOrigin + '/bar')
 })
 
 test('does not route to return_to with javascript protocol', function() {
-  const view = this.editView({html_url: 'http://foo'})
+  const view = this.editView({html_url: currentOrigin + '/foo'})
   // eslint-disable-next-line no-script-url
-  equal(view.locationAfterSave({return_to: 'javascript:alert(1)'}), 'http://foo')
+  equal(view.locationAfterSave({return_to: 'javascript:alert(1)'}), currentOrigin + '/foo')
 })
 
 test('cancels to env normally', function() {
-  ENV.CANCEL_TO = 'http://foo'
+  ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
-  equal(view.locationAfterCancel({}), 'http://foo')
+  equal(view.locationAfterCancel({}), currentOrigin + '/foo')
 })
 
 test('cancels to return_to', function() {
-  ENV.CANCEL_TO = 'http://foo'
+  ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
-  equal(view.locationAfterCancel({return_to: 'http://bar'}), 'http://bar')
+  equal(view.locationAfterCancel({return_to: currentOrigin + '/bar'}), currentOrigin + '/bar')
 })
 
 test('does not cancel to return_to with javascript protocol', function() {
-  ENV.CANCEL_TO = 'http://foo'
+  ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
   // eslint-disable-next-line no-script-url
-  equal(view.locationAfterCancel({return_to: 'javascript:alert(1)'}), 'http://foo')
+  equal(view.locationAfterCancel({return_to: 'javascript:alert(1)'}), currentOrigin + '/foo')
+})
+
+test('does not follow a cross-origin return_to', function() {
+  ENV.CANCEL_TO = currentOrigin + '/foo'
+  const view = this.editView()
+  equal(view.locationAfterCancel({return_to: 'http://evil.com'}), currentOrigin + '/foo')
 })
 
 test('disables fields when inClosedGradingPeriod', function() {
