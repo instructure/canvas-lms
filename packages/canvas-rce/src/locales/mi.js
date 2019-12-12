@@ -17,6 +17,6 @@
  */
 
 import formatMessage from '../format-message'
-import locale from '../../locales/mi.json'
+import locale from '@instructure/translations/lib/canvas-rce/mi.json'
 // no tinymce translations yet, will use english
 formatMessage.addLocale({mi: locale})

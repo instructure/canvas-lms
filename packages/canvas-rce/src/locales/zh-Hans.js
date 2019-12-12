@@ -17,7 +17,7 @@
  */
 
 import formatMessage from '../format-message'
-import locale from '../../locales/zh.json'
+import locale from '@instructure/translations/lib/canvas-rce/zh.json'
 import '../rce/languages/zh_CN'
 
 formatMessage.addLocale({'zh-Hans': locale})

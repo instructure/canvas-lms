@@ -15,50 +15,41 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import ar from '@instructure/translations/lib/canvas-planner/ar.json'
+import da from '@instructure/translations/lib/canvas-planner/da.json'
+import de from '@instructure/translations/lib/canvas-planner/de.json'
+import el from '@instructure/translations/lib/canvas-planner/el.json'
+import enAU from '@instructure/translations/lib/canvas-planner/en_AU.json'
+import enGB from '@instructure/translations/lib/canvas-planner/en_GB.json'
+import en from '@instructure/translations/lib/canvas-planner/en.json'
+import es from '@instructure/translations/lib/canvas-planner/es.json'
+import faIR from '@instructure/translations/lib/canvas-planner/fa_IR.json'
+import frCA from '@instructure/translations/lib/canvas-planner/fr_CA.json'
+import fr from '@instructure/translations/lib/canvas-planner/fr.json'
+import he from '@instructure/translations/lib/canvas-planner/he.json'
+import ht from '@instructure/translations/lib/canvas-planner/ht.json'
+import hu from '@instructure/translations/lib/canvas-planner/hu.json'
+import hy from '@instructure/translations/lib/canvas-planner/hy.json'
+import it from '@instructure/translations/lib/canvas-planner/it.json'
+import ja from '@instructure/translations/lib/canvas-planner/ja.json'
+import ko from '@instructure/translations/lib/canvas-planner/ko.json'
+import mi from '@instructure/translations/lib/canvas-planner/mi.json'
+import nl from '@instructure/translations/lib/canvas-planner/nl.json'
+import nn from '@instructure/translations/lib/canvas-planner/nn.json'
+import pl from '@instructure/translations/lib/canvas-planner/pl.json'
+import ptBR from '@instructure/translations/lib/canvas-planner/pt_BR.json'
+import pt from '@instructure/translations/lib/canvas-planner/pt.json'
+import ru from '@instructure/translations/lib/canvas-planner/ru.json'
+import sv from '@instructure/translations/lib/canvas-planner/sv.json'
+import tr from '@instructure/translations/lib/canvas-planner/tr.json'
+import ukUA from '@instructure/translations/lib/canvas-planner/uk_UA.json'
+import zhHans from '@instructure/translations/lib/canvas-planner/zh.json'
+import zhHant from '@instructure/translations/lib/canvas-planner/zh_HK.json'
 import {flipAll} from './flip-message'
-import ar from '../../locales/ar.json'
-import bg from '../../locales/bg.json'
-import cs from '../../locales/cs.json'
-import da from '../../locales/da.json'
-import de from '../../locales/de.json'
-import el from '../../locales/el.json'
-import enAU from '../../locales/en_AU.json'
-import enGB from '../../locales/en_GB.json'
-import en from '../../locales/en.json'
-import es from '../../locales/es.json'
-import faIR from '../../locales/fa_IR.json'
-import frCA from '../../locales/fr_CA.json'
-import fr from '../../locales/fr.json'
-import he from '../../locales/he.json'
-import ht from '../../locales/ht.json'
-import hu from '../../locales/hu.json'
-import hy from '../../locales/hy.json'
-import it from '../../locales/it.json'
-import ja from '../../locales/ja.json'
-import ko from '../../locales/ko.json'
-import mi from '../../locales/mi.json'
-import nl from '../../locales/nl.json'
-import nn from '../../locales/nn.json'
-import nb from '../../locales/no.json'
-import pl from '../../locales/pl.json'
-import ptBR from '../../locales/pt_BR.json'
-import pt from '../../locales/pt.json'
-import ro from '../../locales/ro.json'
-import ru from '../../locales/ru.json'
-import sq from '../../locales/sq.json'
-import sr from '../../locales/sr.json'
-import sv from '../../locales/sv.json'
-import tr from '../../locales/tr.json'
-import ukUA from '../../locales/uk_UA.json'
-import vi from '../../locales/vi.json'
-import zhHans from '../../locales/zh.json'
-import zhHant from '../../locales/zh_HK.json'
 
 export default {
   enflip: flipAll(en),
   ar,
-  bg,
-  cs,
   da,
   de,
   el,
@@ -79,18 +70,13 @@ export default {
   mi,
   nl,
   nn,
-  nb,
   pl,
   'pt-br': ptBR,
   pt,
-  ro,
   ru,
-  sq,
-  sr,
   sv,
   tr,
   'uk-ua': ukUA,
-  vi,
   'zh-cn': zhHans,
   'zh-tw': zhHant
 }

@@ -29,15 +29,14 @@ module.exports = {
       }
     ],
     [
-      '@instructure/babel-preset-pretranslated-format-message',
+      '@instructure/babel-preset-pretranslated-translations-package-format-message',
       {
-        translationsDir: 'locales',
+        translationsDir: 'lib/canvas-rce',
         extractDefaultTranslations: false
       }
     ]
   ],
   plugins: [
-    'inline-json-import',
     [
       'transform-inline-environment-variables',
       {

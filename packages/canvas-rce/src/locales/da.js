@@ -17,7 +17,7 @@
  */
 
 import formatMessage from '../format-message'
-import locale from '../../locales/da.json'
+import locale from '@instructure/translations/lib/canvas-rce/da.json'
 import '../rce/languages/da'
 
 formatMessage.addLocale({da: locale})
