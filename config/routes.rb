@@ -600,6 +600,7 @@ CanvasRails::Application.routes.draw do
     get :reports_tab
     get :settings
     get :admin_tools
+    get :eportfolio_moderation
     get 'search' => 'accounts#course_user_search', :as => :course_user_search
     post 'account_users' => 'accounts#add_account_user', as: :add_account_user
     delete 'account_users/:id' => 'accounts#remove_account_user', as: :remove_account_user

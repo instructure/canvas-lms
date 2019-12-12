@@ -1463,6 +1463,7 @@ class Account < ActiveRecord::Base
   TAB_ADMIN_TOOLS = 17
   TAB_SEARCH = 18
   TAB_BRAND_CONFIGS = 19
+  TAB_EPORTFOLIO_MODERATION = 20
 
   # site admin tabs
   TAB_PLUGINS = 14
@@ -1516,6 +1517,14 @@ class Account < ActiveRecord::Base
     tabs += external_tool_tabs(opts, user)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
     tabs << { :id => TAB_ADMIN_TOOLS, :label => t('#account.tab_admin_tools', "Admin Tools"), :css_class => 'admin_tools', :href => :account_admin_tools_path } if can_see_admin_tools_tab?(user)
+    if user && grants_right?(user, :moderate_user_content) && root_account.feature_enabled?(:eportfolio_moderation)
+      tabs << {
+        id: TAB_EPORTFOLIO_MODERATION,
+        label: t("ePortfolio Moderation"),
+        css_class: "eportfolio_moderation",
+        href: :account_eportfolio_moderation_path
+      }
+    end
     tabs << { :id => TAB_SETTINGS, :label => t('#account.tab_settings', "Settings"), :css_class => 'settings', :href => :account_settings_path }
     tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, :manage)
     tabs
