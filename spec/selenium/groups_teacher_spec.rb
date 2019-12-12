@@ -155,7 +155,7 @@ describe "new groups" do
     end
 
     it "should allow teachers to message unassigned students" do
-      skip('unstable, jira ticket to come')
+      skip('KNO-184')
       group_test_setup
 
       get "/courses/#{@course.id}/groups"
@@ -615,7 +615,7 @@ describe "new groups" do
 
     context "using clone group set modal" do
       it "should clone a group set including its groups and memberships" do
-        skip('unstable, jira ticket to come')
+        skip('KNO-185')
         group_test_setup(2,1,2)
         add_user_to_group(@students.first,@testgroup[0],true)
 
@@ -654,7 +654,7 @@ describe "new groups" do
       end
 
       it "should alert group set name is required and is already in use" do
-        skip('unstable, jira ticket to come')
+        skip('KNO-186')
         group_test_setup
 
         get "/courses/#{@course.id}/groups"
@@ -756,7 +756,7 @@ describe "new groups" do
         end
 
         it "should clone group set when deleting a group with submission" do
-          skip('unstable, jira ticket to come')
+          skip('KNO-187')
           group_test_setup
           add_user_to_group(@students.first,@testgroup.first)
           create_and_submit_assignment_from_group(@students.first)

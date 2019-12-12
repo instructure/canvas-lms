@@ -285,7 +285,7 @@ describe "student groups" do
       end
 
       it "add/remove plurality to the word 'student' if one student", priority: "2", test_id: 180723 do
-        skip('unstable, jira ticket to come')
+        skip('KNO-183')
         fln('Manage').click
         wait_for_ajaximations
 
