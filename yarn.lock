@@ -1497,6 +1497,25 @@
     escape-html "^1"
     prop-types "^15"
 
+"@instructure/ui-file-drop@6":
+  version "6.15.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-file-drop/-/ui-file-drop-6.15.0.tgz#ed0e70d58169cfacbf10d833bc5c26e8759936eb"
+  integrity sha512-zwbTMTWASANVU7kgzNKSx6WWK/5cjmvIXJMxaRvsDLvPKVMOmgJZPH4z/CxGMCaCIsu0lREb9ZMksXhVZ5jdWQ==
+  dependencies:
+    "@babel/runtime" "^7.5.0"
+    "@instructure/console" "^6.15.0"
+    "@instructure/ui-color-utils" "^6.15.0"
+    "@instructure/ui-form-field" "^6.15.0"
+    "@instructure/ui-react-utils" "^6.15.0"
+    "@instructure/ui-testable" "^6.15.0"
+    "@instructure/ui-themeable" "^6.15.0"
+    "@instructure/ui-utils" "^6.15.0"
+    "@instructure/ui-view" "^6.15.0"
+    "@instructure/uid" "^6.15.0"
+    classnames "^2"
+    keycode "^2"
+    prop-types "^15"
+
 "@instructure/ui-flex@6", "@instructure/ui-flex@^6.15.0":
   version "6.15.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-flex/-/ui-flex-6.15.0.tgz#943997d1423dbbe347790beb30b1ef0e9d8da1bb"

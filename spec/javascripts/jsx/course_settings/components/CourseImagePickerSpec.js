@@ -45,56 +45,6 @@ QUnit.module('CourseImagePicker Component', {
   }
 })
 
-test('dragging overlay modal appears when accepting a drag', function() {
-  const component = this.renderComponent()
-
-  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker')
-
-  TestUtils.Simulate.dragEnter(area, {
-    dataTransfer: {
-      types: ['Files']
-    }
-  })
-
-  ok(
-    TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 1,
-    'the dragging overlay appeared'
-  )
-})
-
-test('dragging overlay modal does not appear when denying a non-file drag', function() {
-  const component = this.renderComponent()
-
-  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker')
-
-  TestUtils.Simulate.dragEnter(area, {
-    dataTransfer: {
-      types: ['notFile']
-    }
-  })
-
-  ok(
-    TestUtils.scryRenderedDOMComponentsWithClass(component, 'DraggingOverlay').length === 0,
-    'the dragging overlay did not appear'
-  )
-})
-
-test('dragging overlay modal disappears when you leave the drag area', function() {
-  const component = this.renderComponent()
-
-  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker')
-
-  TestUtils.Simulate.dragEnter(area, {
-    dataTransfer: {
-      types: ['Files']
-    }
-  })
-
-  ok(component.state.draggingFile, 'draggingFile state is set')
-  TestUtils.Simulate.dragLeave(area)
-  ok(!component.state.draggingFile, 'draggingFile state is correctly false')
-})
-
 test('calls the handleFileUpload prop when drop occurs', function() {
   let called = false
   const handleFileUploadFunc = () => {
@@ -102,9 +52,13 @@ test('calls the handleFileUpload prop when drop occurs', function() {
   }
   const component = this.renderComponent({courseId: '101', handleFileUpload: handleFileUploadFunc})
 
-  const area = TestUtils.findRenderedDOMComponentWithClass(component, 'CourseImagePicker')
+  const area = TestUtils.findRenderedDOMComponentWithTag(component, 'label') // FileDrop's wrapped in a label
 
-  TestUtils.Simulate.drop(area)
+  TestUtils.Simulate.drop(area, {
+    dataTransfer: {
+      files: [{type: 'image/jpg', name: 'image.jpg', size: 10}]
+    }
+  })
 
   ok(called, 'handleFileUpload was called')
 })
