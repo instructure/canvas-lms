@@ -69,7 +69,6 @@ module.exports = {
         'canvas-rce-old-async-chunk',
         'permissions_index',
         'gradezilla',
-        'screenreader_gradebook',
         // This bundle got pushed over the limit by translations being added and
         // the simplest fix was to ignore it at the moment, to unblock selenium
         // tests for everyone. CORE-3106 will resolve this.
@@ -170,9 +169,18 @@ module.exports = {
       // it is a change that was backported and is fixed in instUI 6
       // the file is the same as the on published to npm but we added a
       // `require('newless')` to make it work
-      './themeable$': path.resolve(__dirname, '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'),
-      '../themeable$': path.resolve(__dirname, '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'),
-      '@instructure/ui-themeable/es/themeable$': path.resolve(__dirname, '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'),
+      './themeable$': path.resolve(
+        __dirname,
+        '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'
+      ),
+      '../themeable$': path.resolve(
+        __dirname,
+        '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'
+      ),
+      '@instructure/ui-themeable/es/themeable$': path.resolve(
+        __dirname,
+        '../app/jsx/@instructure/ui-themeable/es/themeable-with-newless.js'
+      ),
 
       'node_modules-version-of-backbone': require.resolve('backbone'),
       'node_modules-version-of-react-modal': require.resolve('react-modal'),
