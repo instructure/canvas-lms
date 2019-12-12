@@ -71,17 +71,26 @@
           </a>
         <% end %>
 
-        <% if @assignment_menu_tools.present? %>
+        <% if @assignment_menu_tools.present? || @can_direct_share %>
           <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
             <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
           </a>
           <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+            <% if @can_direct_share %>
+              <li role="presentation">
+                <a href="#" class="icon-user direct-share-send-to-menu-item"><%= t("Send To...") %></a>
+              </li>
+              <li role="presentation">
+                <a href="#" class="icon-duplicate direct-share-copy-to-menu-item"><%= t("Copy To...") %></a>
+              </li>
+            <% end %>
             <%= external_tools_menu_items(@assignment_menu_tools, {link_class: "menu_tool_link", settings_key: :assignment_menu, in_list: true, url_params: {:assignments => [@assignment.id]}}) %>
           </ul>
         <% end %>
       </div>
     </div>
+    <div id="direct-share-mount-point"></div>
   <% else %>
     <!--Student View-->
     <div class='assignment-title'>
