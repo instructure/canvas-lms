@@ -108,26 +108,26 @@ exports[`does not render end time if the same as start time 1`] = `
             >
               This Assignment is about awesome stuff
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
-              }
-              endTime={"2011-12-17T11:30:00.000Z"}
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="This Assignment is about awesome stuff"
-            />
           </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
+              }
+            }
+            endTime={"2011-12-17T11:30:00.000Z"}
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="This Assignment is about awesome stuff"
+          />
         </div>
       </div>
       <div
@@ -1712,25 +1712,25 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={true}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
-              }
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
           </Button>
+          <CalendarEventModal
+            allDay={true}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
+              }
+            }
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
@@ -1874,25 +1874,25 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
-              }
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
           </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
+              }
+            }
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
@@ -2065,25 +2065,25 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
-              }
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
           </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
+              }
+            }
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
@@ -2227,26 +2227,26 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
-              }
-              endTime={"2011-12-17T13:30:00.000Z"}
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
           </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
+              }
+            }
+            endTime={"2011-12-17T13:30:00.000Z"}
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
@@ -2390,25 +2390,25 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
-              }
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="I am a Calendar Event"
-            />
           </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
+              }
+            }
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="I am a Calendar Event"
+          />
         </div>
       </div>
       <div
@@ -5801,26 +5801,26 @@ exports[`renders the end time if available 1`] = `
             >
               This Assignment is about awesome stuff
             </PresentationContent>
-            <CalendarEventModal
-              allDay={false}
-              courseName="A Course about being Diffrient"
-              currentUser={
-                Object {
-                  "avatarUrl": "/picture/is/here",
-                  "color": "#00AC18",
-                  "displayName": "Jane",
-                  "id": "1",
-                }
-              }
-              endTime={"2011-12-17T13:30:00.000Z"}
-              html_url="http://example.com"
-              open={false}
-              requestClose={[Function]}
-              startTime={"2011-12-17T11:30:00.000Z"}
-              timeZone="America/Denver"
-              title="This Assignment is about awesome stuff"
-            />
           </Button>
+          <CalendarEventModal
+            allDay={false}
+            courseName="A Course about being Diffrient"
+            currentUser={
+              Object {
+                "avatarUrl": "/picture/is/here",
+                "color": "#00AC18",
+                "displayName": "Jane",
+                "id": "1",
+              }
+            }
+            endTime={"2011-12-17T13:30:00.000Z"}
+            html_url="http://example.com"
+            open={false}
+            requestClose={[Function]}
+            startTime={"2011-12-17T11:30:00.000Z"}
+            timeZone="America/Denver"
+            title="This Assignment is about awesome stuff"
+          />
         </div>
       </div>
       <div
