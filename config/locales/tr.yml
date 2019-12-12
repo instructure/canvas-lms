@@ -4513,7 +4513,7 @@ tr:
         upload_to: "Yüklenecek yer"
       import_quizzes_next_view: 
         import_quizzesNext_help_label: "Değerlendirmeyi Quizzes.Next oalrak içeri aktar"
-        import_quizzesNext_help_title: Quizzes.Next
+        import_quizzesNext_help_title: "Yeni Kısa Sınavlar"
         import_quizzesNext_help_title_icon: "Değerlendirmeyi Quizzes.Next oalrak içeri aktar"
         import_quizzes_Next: "Değerlendirme içeriklerini Quizzes.Next oalrak içeri aktar"
       overwrite_assessment_content: 
@@ -5145,6 +5145,7 @@ tr:
   copy_9748f9f: Kopyala
   copy_to_folder_32ecc3c3: "Klasöre Kopyala"
   copying_628a9607: Kopyalanıyor...
+  copyright_and_license_information_must_be_provided_5feffaf: "Yayınlanmadan önce dosyaların telif hakkı ve lisans bilgileri sağlanmalıdır."
   copyright_holder_66ee111: "Telif Sahibi:"
   correct_answer: "Doğru cevap. "
   correct_answer_5a6a57d1: "Doğru Cevap"
@@ -7884,6 +7885,8 @@ tr:
     new_quiz_statistics: "Yeni Kısa Sınav İstatistikleri Sayfası"
     post_grades: "Notları ÖBS'ye Gönder"
     quiz_log_auditing: "Kısa Sınav Kayıt Denetleme"
+    quizzes: 
+      next: "Yeni Kısa Sınavlar"
     student_groups: "Yeni Öğrenci Grubu Sayfası"
     student_outcome_gradebook: "Öğrenci Öğrenme Yeterlilik Not Defteri"
   features_2581da: Özellikler
@@ -9288,6 +9291,7 @@ tr:
   hide_correct_answers_at_2421b0aa: "Doğru Cevapları Şu zamanda Gizle"
   hide_correct_answers_at_b1a59408: "Doğru Cevapları Şu zamanda Gizle"
   hide_courses_without_enrollments_6df4dfad: "Kayıt olunmamış dersleri gizle"
+  hide_courses_without_students_fc6fc7a0: "Öğrencisi olmayan dersleri gizle"
   hide_e057ff36: Gizle
   hide_notes_column_7749f408: "Notlar Sütununu Gizle"
   hide_score_total_for_assessment_results_d0ef117f: "Sınav sonuçlarından toplam puanları gizle"
@@ -15503,6 +15507,8 @@ tr:
         description: "Yayından kaldır"
     options_2: 
       description: "Öğrenci uygunluğunu ayarla"
+  restrict_students_from_accessing_courses_after_end_7dd66bce: "Bitiş tarihinden sonra öğrenciler derslere erişemesin"
+  restrict_students_from_accessing_courses_before_st_f7c22c00: "Öğrenciler başlangıç ​​tarihinden önce derslere erişemesin"
   restricted_access_d3e99a39: "Erişim Engellendi"
   result_8f971a09: Sonuç
   resume_quiz_afeceb87: "Kısa Sınava Devam Et"
@@ -15854,6 +15860,8 @@ tr:
     enrollments_teachers: Öğretmenler
     student_groups: "Öğrenci Grupları"
   search_280d00bd: Ara
+  search_by_99d1ba5f: "Arama Kriteri"
+  search_by_student_name_26536097: "Öğrenci adına göre ara"
   search_by_title_or_author_273a8f49: "Başlık veya yazara göre ara"
   search_by_title_short_name_or_sis_id_fe84aa12: "Başlık, kısa ad ya da ÖBS ID'ye göre ara"
   search_by_user_dd3ad189: "Kullanıcıya göre ara"
@@ -15969,6 +15977,7 @@ tr:
   select_itemname_f70db487: "%{itemName} i Seçin"
   select_navigation_links_68e1e924: "Gezinme Bağlantılarını Seçin"
   select_one_8e0af564: "Birini Seçiniz"
+  select_sub_account_6704196a: "Alt Hesap Seçin"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "İlişkilendirmek istediğiniz dosyayı seçin veya \"Yeni Dosya\" yı seçerek br dosya ekleyin."
   selected_answer: "Bu cevabı seçtiniz."
   selected_subtree_a7693937: "Seçili %{subtree}"
@@ -16738,6 +16747,7 @@ tr:
   show_by_type_c5d61732: "Türe Göre Göster"
   show_concluded_enrollments_6a05544c: "Kaydı Sonlandırılmışları Göster"
   show_correct_answers_at_30c37e01: "Doğru Cevapları Şu zamanda Göster"
+  show_courses_from_8a087f63: "Hangi Dönem Dersleri Gösterilsin"
   show_deleted_replies_a2e0a36f: "Silinmiş yanıtları göster"
   show_inactive_enrollments_8f4c4824: "Etkin Olmayan Ders Kayıtlarını Göster"
   show_lti_2_configuration_ui_94ce35a9: "LTI 2 Yapılandırma UI sini Göster"
@@ -16745,10 +16755,12 @@ tr:
   show_more_af9cbc16: "Daha Fazla Göster"
   show_notes_column_22d2b6c1: "Notlar Sütununu Göster"
   show_one_question_at_a_time_271e346d: "Her seferinde bi soru göster"
+  show_only_blueprint_courses_9fb37b41: "Yalnızca şablon dersleri göster"
   show_question_details_b059df00: "Soru Ayrıntılarını Göster"
   show_rubric_dca783f2: "Değerlendirme Listesini Göster"
   show_student_names_dcb40934: "Öğrenci İsimlerini Göster"
   shuffle_answers_edb602b7: "Cevapları Karıştır"
+  similarity_detection_platform_9e424d70: "Benzerlik Tespit Platformu"
   simple_tls_45df2648: "Basit TLS"
   sis_agent_token_authentication_2a0b29e3: "SIS Agent Token Doğrulaması"
   sis_batch: 
@@ -16989,6 +17001,7 @@ tr:
   students_1b8cd07b: Öğrenciler
   students_being_observed_4de3e520: "Gözlemlenen Öğrenciler"
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Öğrenciler derse yalnızca bu tarihler arasında katılabilirler"
+  students_can_see_originality_score_797fe634: "Öğrenciler özgünlük puanlarını görebilir"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Ders sonladırıldıktan sonra öğrenciler kısa sınava verdikleri cevapları göremezler"
   students_have_either_already_taken_or_started_taki_a076336: "Öğrenciler zaten bu kısa sınavı aldılar yada yapmaya başladılar, bu yüzden düzenlerken dikkat etmelisiniz. Eğer kısa sınav soruları üzerinde belirgin değişiklikler yapacaksanız, bu kısa sınavın eski versiyonunu yapan öğrencilerin tekrardan değerlendirilmesini göz önünde bulundurmalısınız."
   students_who_have_taken_the_quiz_count_69dbbda0: 
@@ -17009,6 +17022,7 @@ tr:
     zero: "Anketi yapmayan öğrenciler"
   students_will_automatically_receive_full_credit_on_cc61df39: "anketi aldıktan sonra öğrenciler otomatik olarak tam kredi alırlar"
   students_with_no_submissions_title: "Gönderim yapmayan öğrenciler"
+  sub_account_daeadd0: "Alt Hesap"
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "İçinde dersler bulunan bir alt hesabı silemezsiniz"
@@ -17777,6 +17791,7 @@ tr:
   usage_rights_have_been_set_d1b433c7: "Kullanım hakları belirlendi."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Şuradaki dosyaların tamamı için kullanım hakları ayarlanacak:"
   use_default_890939b7: "Varsayılanı Kullan"
+  use_parent_account_setting_f25a721f: " Üst hesap ayarını kullan"
   used_by_permission_314a78dd: "İzinli Kullanıldı"
   user: 
     default_user_name: Kullanıcı
@@ -18449,6 +18464,7 @@ tr:
   you_can_review_the_submission_details_by_clicking__58a7753: "Aşağıdaki bağlantıya tıklayarak başvuru ayrıntılarını inceleyebilirsiniz:"
   you_can_t_delete_a_root_account_5673c62d: "root_account silemezsiniz."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "İçinde dersler bulunan bir alt hesabı silemezsiniz."
+  you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Altında hesap bulunan alt hesapları silemezsiniz."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Bu kullanıcının bilgilerinden bazılarını güncelleyebilirsiniz fakat isterlerse kendileri tekrar değiştirebilir."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Bu alt hesapta temaları düzenleyemezsiniz."
   you_currently_have_no_discussions_with_closed_comm_366a9dab: "Şu anda yorumlara kapalı bir tartışmanız yok"
