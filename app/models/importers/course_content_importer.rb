@@ -149,7 +149,12 @@ module Importers
           Importers::AssignmentImporter.process_migration(data, migration); migration.update_import_progress(80)
         end
 
-        Importers::ContextModuleImporter.process_migration(data, migration); migration.update_import_progress(85)
+        module_id = migration.migration_settings[:insert_into_module_id].presence
+        unless module_id && course.context_modules.where(:id => module_id).exists? # we're importing into a module so don't create new ones
+          Importers::ContextModuleImporter.process_migration(data, migration)
+        end
+
+        migration.update_import_progress(85)
         Importers::WikiPageImporter.process_migration_course_outline(data, migration)
         Importers::CalendarEventImporter.process_migration(data, migration)
 

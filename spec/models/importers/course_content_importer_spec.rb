@@ -507,6 +507,19 @@ describe Course do
       expect(@module.content_tags.order('position').pluck(:content_type)).to eq(%w(ContextModuleSubHeader Assignment))
     end
 
+    it "can insert items from one module to an existing module" do
+      migration = @course.content_migrations.build
+      @params["copy"].merge!("context_modules" => {"1864019962002" => true})
+      migration.migration_settings[:migration_ids_to_import] = @params
+      migration.migration_settings[:insert_into_module_id] = @module.id
+      migration.save!
+
+      Importers::CourseContentImporter.import_content(@course, @data, @params, migration)
+      expect(migration.migration_issues.count).to eq 0
+      expect(@course.context_modules.where.not(:migration_id => nil).count).to eq 0 # doesn't import other modules
+      expect(@module.content_tags.last.content.migration_id).to eq '1865116198002'
+    end
+
     it "inserts imported items into a module" do
       migration = @course.content_migrations.build
       migration.migration_settings[:migration_ids_to_import] = @params
