@@ -46,7 +46,7 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import {defaultFetchOptions} from '@instructure/js-utils'
 import I18n from 'i18n!UnreadCounts'
 
-const DEFAULT_POLL_INTERVAL = 60000
+const DEFAULT_POLL_INTERVAL = 120000
 
 function storageKeyFor(url) {
   const m = url.match(/\/api\/v1\/(.*)\/unread_count/)
