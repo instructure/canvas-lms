@@ -111,6 +111,14 @@ pipeline {
   }
 
   post {
+    success {
+      slackSend(
+        channel: env.SLACK_CHANNEL,
+        color: 'good',
+        message: "[${env.JOB_NAME}] <${env.BUILD_URL}|${env.BUILD_DISPLAY_NAME}> was successful."
+      )
+    }
+
     unsuccessful {
       // copy spec failures to local
       sh 'mkdir -p tmp'
@@ -131,6 +139,12 @@ pipeline {
           reportName: 'Test Failures'
           ]
       }
+
+      slackSend(
+        channel: env.SLACK_CHANNEL,
+        color: 'danger',
+        message: "[${env.JOB_NAME}] <${env.BUILD_URL}|${env.BUILD_DISPLAY_NAME}> was unsuccessful."
+      )
     }
 
     cleanup {
