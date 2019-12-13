@@ -28,14 +28,14 @@ jest.mock('jsx/shared/effects/useFetchApi')
 describe('view of received content', () => {
   let liveRegion
 
-  beforeAll(() => {
+  beforeEach(() => {
     liveRegion = document.createElement('div')
     liveRegion.id = 'flash_screenreader_holder'
     liveRegion.setAttribute('role', 'alert')
     document.body.appendChild(liveRegion)
   })
 
-  afterAll(() => {
+  afterEach(() => {
     if (liveRegion) liveRegion.remove()
   })
 
@@ -114,7 +114,7 @@ describe('view of received content', () => {
     expect(lastFetchCall[0]).toMatchObject({params: {page: 3}})
   })
 
-  it('displays a preview modal when requested', () => {
+  it('displays a preview modal when requested', async () => {
     const shares = [assignmentShare]
     fetchMock.put(`/api/v1/users/self/content_shares/${assignmentShare.id}`, {
       status: 200,
@@ -127,6 +127,7 @@ describe('view of received content', () => {
     const {getByText} = render(<ReceivedContentView />)
     fireEvent.click(getByText(/manage options/i))
     fireEvent.click(getByText('Preview'))
+    await act(() => fetchMock.flush(true))
     expect(document.querySelector('iframe')).toBeInTheDocument()
   })
 
@@ -140,6 +141,16 @@ describe('view of received content', () => {
     fireEvent.click(getByText(/manage options/i))
     fireEvent.click(getByText('Import'))
     expect(await findByText(/select a course/i)).toBeInTheDocument()
+  })
+
+  it('announces when new shares are loaded', () => {
+    const shares = [assignmentShare]
+    useFetchApi.mockImplementationOnce(({loading, success}) => {
+      loading(false)
+      success(shares)
+    })
+    const {getByText} = render(<ReceivedContentView />)
+    expect(getByText('1 shared item loaded.')).toBeInTheDocument()
   })
 
   describe('mark as read', () => {

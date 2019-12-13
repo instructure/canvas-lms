@@ -22,7 +22,7 @@ import tz from 'timezone'
 import _ from 'underscore'
 import $ from 'jquery'
 import 'jquery.instructure_date_and_time'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 class FriendlyDatetime extends Component {
   static propTypes = {

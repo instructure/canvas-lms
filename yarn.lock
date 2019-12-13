@@ -1209,6 +1209,20 @@
     keycode "^2"
     prop-types "^15"
 
+"@instructure/ui-avatar@6":
+  version "6.15.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-avatar/-/ui-avatar-6.15.0.tgz#1090bb3bce3ca80a72a20434be1c727ed8f29d17"
+  integrity sha512-3gQTVPdJ1/Z+tfSf5oOKc2wSW0XJtKdpSju+cl7iJq04ET7ot3/2uIxy9CuR9T1kMqxGe6Bh73QcndSaNoNRbA==
+  dependencies:
+    "@babel/runtime" "^7.5.0"
+    "@instructure/console" "^6.15.0"
+    "@instructure/ui-react-utils" "^6.15.0"
+    "@instructure/ui-testable" "^6.15.0"
+    "@instructure/ui-themeable" "^6.15.0"
+    "@instructure/ui-view" "^6.15.0"
+    classnames "^2"
+    prop-types "^15"
+
 "@instructure/ui-babel-preset@6", "@instructure/ui-babel-preset@^6":
   version "6.15.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-babel-preset/-/ui-babel-preset-6.15.0.tgz#b7086d721473719fae576513abb7907395f76a3f"
@@ -1875,6 +1889,27 @@
     "@instructure/uid" "^5.52.3"
     classnames "^2"
     keycode "^2"
+    prop-types "^15"
+
+"@instructure/ui-modal@6":
+  version "6.15.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-modal/-/ui-modal-6.15.0.tgz#8d06bdd9d719dc4070735be3ac418ea019418bfc"
+  integrity sha512-iMvZPy+ka80z+ADYFSD2ftnTV1IN3JTEVRsaiShuEWVj2AF0D43TAnCPKO9h7qMUc5avWDS2soOGcIrvlYF7OQ==
+  dependencies:
+    "@babel/runtime" "^7.5.0"
+    "@instructure/console" "^6.15.0"
+    "@instructure/ui-buttons" "^6.15.0"
+    "@instructure/ui-dialog" "^6.15.0"
+    "@instructure/ui-motion" "^6.15.0"
+    "@instructure/ui-overlays" "^6.15.0"
+    "@instructure/ui-portal" "^6.15.0"
+    "@instructure/ui-prop-types" "^6.15.0"
+    "@instructure/ui-react-utils" "^6.15.0"
+    "@instructure/ui-testable" "^6.15.0"
+    "@instructure/ui-themeable" "^6.15.0"
+    "@instructure/ui-utils" "^6.15.0"
+    "@instructure/ui-view" "^6.15.0"
+    classnames "^2"
     prop-types "^15"
 
 "@instructure/ui-motion@6", "@instructure/ui-motion@^6.15.0":
