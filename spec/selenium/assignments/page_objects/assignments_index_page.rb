@@ -45,10 +45,19 @@ module AssignmentsIndexPage
     f("#assignment_#{assignment_id}_settings_share_user")
   end
 
+  def assignment_groups_div
+    f('div.item-group-container')
+  end
+
+  def assignment_group_loading_spinner
+    f('div.loadingIndicator')
+  end
+
   #------------------------------ Actions --------------------------------
 
   def visit_assignments_index_page(course_id)
     get "/courses/#{course_id}/assignments"
+    wait_for(method: nil, timeout: 1) { assignment_group_loading_spinner.displayed? == false}
   end
 
 end

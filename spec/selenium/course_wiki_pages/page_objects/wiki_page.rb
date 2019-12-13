@@ -15,37 +15,33 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative '../../common'
 
-module SendToDialogPage
-  # ------------------------------ Selectors -----------------------------
+module CourseWikiPage
+  #------------------------------ Selectors -----------------------------
+
+  #------------------------------ Elements ------------------------------
   
-  def send_to_dialog_css_selector
-    "[role='dialog'][aria-label='Send To...']"
+  def wiki_page_body
+    f('body')
   end
 
-  # ------------------------------ Elements ------------------------------
-  
-  def send_to_dialog
-    f(send_to_dialog_css_selector)
+  def wiki_page_settings_button
+    fj("[role='button']:contains('Settings')")
   end
 
-  def user_search
-    f("input[placeholder='Begin typing to search']")
+  def wiki_page_send_to_menu
+    fj("li:contains('Send To...')")
   end
 
-  def user_dropdown(user_name)
-    fj("div span:contains(#{user_name})")
+  def wiki_page_copy_to_menu
+    fj("li:contains('Copy To...')")
   end
 
-  def send_button
-    fj("button:contains('Send')")
-  end
+  #------------------------------ Actions -------------------------------
 
-  def starting_send_operation_alert
-    f("[role=alert]")
+  def visit_wiki_page_view(course_id, page_title)
+    get "/courses/#{course_id}/pages/#{page_title}"
   end
-
-  # ------------------------------ Actions ------------------------------
 
 end

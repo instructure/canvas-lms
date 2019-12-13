@@ -37,13 +37,17 @@ module CourseWikiIndexPage
       fj("li:contains('Copy to...')")
     end
 
-		def page_index_menu_link
-			fj("a:contains('Pages Settings')")
-		end
+    def page_index_menu_link
+      fj("a:contains('Pages Settings')")
+    end
 
-		def page_index_menu_item_link(item_name)
-			fj("a:contains('#{item_name}')")
-		end
+    def page_index_menu_item_link(item_name)
+      fj("a:contains('#{item_name}')")
+    end
+
+    def wiki_index_loading_spinner
+      f('div.loading')
+    end
 
     #------------------------------ Actions ------------------------------
     def visit_course_wiki_index_page(course_id)
