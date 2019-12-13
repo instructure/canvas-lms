@@ -122,7 +122,7 @@ module Importers
         item.workflow_state = 'active'
       end
 
-      position = hash[:position] || hash[:order]
+      position = (hash[:position] || hash[:order])&.to_i
       if (item.new_record? || item.workflow_state_was == 'deleted') && migration.try(:last_module_position) # try to import new modules after current ones instead of interweaving positions
         position = migration.last_module_position + (position || 1)
       end

@@ -2504,7 +2504,7 @@ $(document).ready(function() {
     modules.updateProgressionState($(this))
   })
 
-  function setExternalToolTray(tool, moduleData, selectable, returnFocusTo, acceptedResourceTypes) {
+  function setExternalToolTray(tool, moduleData, selectable, returnFocusTo) {
     const handleDismiss = () => {
       setExternalToolTray(null)
       returnFocusTo.focus()
@@ -2517,7 +2517,17 @@ $(document).ready(function() {
       <ContentTypeExternalToolTray
         tool={tool}
         placement="module_index_menu"
-        acceptedResourceTypes={acceptedResourceTypes}
+        acceptedResourceTypes={[
+          'assignment',
+          'audio',
+          'discussion_topic',
+          'document',
+          'image',
+          'module',
+          'quiz',
+          'page',
+          'video'
+        ]}
         targetResourceType="module"
         allowItemSelection={selectable}
         selectableItems={moduleData}
@@ -2558,19 +2568,7 @@ $(document).ready(function() {
         name: module.find('.name').attr('title')
       })
     }
-
-    const resourceTypes = launchType === 'module_index_menu' ? ['module'] : [
-      'assignment',
-      'audio',
-      'discussion_topic',
-      'document',
-      'image',
-      'quiz',
-      'page',
-      'video'
-    ]
-
-    setExternalToolTray(tool, moduleData, false, $('.al-trigger')[0], resourceTypes)
+    setExternalToolTray(tool, moduleData, launchType == 'module_index_menu', $('.al-trigger')[0])
   }
 
   $('.menu_tray_tool_link').click(openExternalTool)
