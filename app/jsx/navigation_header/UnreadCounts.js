@@ -130,6 +130,12 @@ export default function UnreadCounts(props) {
     }
 
     async function poll() {
+      // if we get here when the page is hidden, don't actually fetch it now, wait until the page is refocused
+      if (document.hidden) {
+        document.addEventListener('visibilitychange', poll, {once: true})
+        return
+      }
+
       await getData()
       attempts += 1
       if (attempts < maxTries) timerId = setTimeout(poll, attempts * pollIntervalMs)
