@@ -69,6 +69,11 @@ pipeline {
             sh 'build/new-jenkins/js/tests-packages.sh'
           }
         }
+        stage('canvas_quizzes') {
+          steps {
+            sh 'build/new-jenkins/js/tests-quizzes.sh'
+          }
+        }
         stage('Karma - Spec Group - coffee') {
           environment {
             JSPEC_GROUP = 'coffee'
