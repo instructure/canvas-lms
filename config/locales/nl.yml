@@ -8007,7 +8007,7 @@ nl:
       discussion_podcast_feed_title: "Podcast-feed voor discussie"
       edit: Bewerken
       edit_current_message: "Huidig bericht bewerken"
-      edited_by: "Deze onderwerp is bewerkt door %{user}."
+      edited_by: "Deze aankondiging werd gewijzigd door %{user}."
       expand_replies: "Antwoorden uitvouwen"
       from_context: "Uit *%{context_name}*"
       initial_post_required: "Antwoorden zijn alleen zichtbaar voor hen die minimaal één antwoord hebben gepost."
@@ -11846,7 +11846,7 @@ nl:
   late_penalty_pointsdeducted_7033a095: "Sanctie indien te laat: %{pointsDeducted}"
   late_penalty_pointsdeducted_dac023ff: "Sanctie indien te laat: *%{pointsDeducted}*"
   late_percent_b91d01b3: "Laat: %{percent}"
-  late_policies_42bac80: "Laatste beleidslijnen"
+  late_policies_42bac80: "Te laat aanpak"
   late_policies_fd5dced6: Laatbeleid
   late_policies_updated_2ecf9aff: "Laatbeleid geüpdatet"
   late_policy_9d0e76b5: Laatbeleid
@@ -17840,7 +17840,7 @@ nl:
           multiple_choice: Meerkeuze
           multiple_dropdowns: "Meerdere vervolgkeuzelijsten"
           numerical: "Numeriek antwoord"
-          short_answer: "Lege velden invullen"
+          short_answer: "Leeg veld invullen"
           text_only: "Tekst (geen vraag)"
           true_false: Waar/Onwaar
         show_possible_answers: "Mogelijke antwoorden voor %{question} tonen"
@@ -23766,8 +23766,8 @@ nl:
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "Je bent je Canvas Thema aan het bewerken! De wijzigingen zijn nog niet toegepast."
   you_scored_a_score_a5dd5561: "Je hebt een %{score} gescoord."
   you_scored_d3e00111: "Je scoorde"
-  you_ve_been_enrolled_in_the_course_course_67b2e1b7: "Je bent inschreven voor de cursus %{course}."
-  you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Je bent inschreven voor de cursus %{course}. Cursusfunctie: %{role_type}"
+  you_ve_been_enrolled_in_the_course_course_67b2e1b7: "Je bent ingeschreven voor de cursus %{course}."
+  you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Je bent ingeschreven voor de cursus %{course}. Cursusfunctie: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Je hebt een accountfunctie gekregen voor de %{account} account op %{website}. Functietype: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Je bent uitgenodigd voor %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Je bent uitgenodigd voor %{course}. Cursusfunctie: %{role_type}"
@@ -23775,7 +23775,7 @@ nl:
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Je bent uitgenodigd om aan de cursus %{course} deel te nemen. Cursusfunctie: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Je bent uitgenodigd een medecursist te beoordelen %{reviewee}."
   you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Je bent voor een peerbeoordeling uitgenodigd voor %{reviewee}. De link %{link} hieronder volgen om ze te beoordelen."
-  you_ve_been_invited_to_the_course_course_2aac8140: "Je bent inschreven voor de cursus %{course}."
+  you_ve_been_invited_to_the_course_course_2aac8140: "Je bent ingeschreven voor de cursus %{course}."
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Je bent uitgenodigd voor de cursus %{course}. Cursusfunctie: %{role_type}"
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Je hebt een herinnering ontvangen om %{rubric}, %{context} te beoordelen."
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: "Je hebt de beoordelingscriteria bijgewerkt. Dat is van invloed op alle cursisten die eerder op basis van dit leerdoel zijn beoordeeld."
