@@ -1184,7 +1184,7 @@ is:
       about_google_docs: |-
           Forskoðun Google Docs gerir notendum kleift að skoða
           skjöl í Canvas án þess að þurfa að sækja þau og opna
-          með samsvarandi forriti (t.d. Word eða Excel).
+          með pörun forriti (t.d. Word eða Excel).
           
           Forskoðun Google Docs getur einnig sýnt skráartegundir
           sem forskoðun í Canvas styður ekki.
@@ -2422,8 +2422,8 @@ is:
   application: 
     errors: 
       feed_not_found: "Fann ekki streymi"
-      feed_private: "Samsvarandi yfirlit er nú einka og opinbert streymi eins og þetta mun ekki sjást lengur."
-      feed_private_course: "Samsvarandi námskeið er nú einka og opinbert streymi eins og þetta mun ekki sjást lengur."
+      feed_private: "Pörun yfirlit er nú einka og opinbert streymi eins og þetta mun ekki sjást lengur."
+      feed_private_course: "Pörun námskeið er nú einka og opinbert streymi eins og þetta mun ekki sjást lengur."
       feed_private_group: "Samsvörunarhópur er nú einkahópur og opinbert streymi eins og þetta mun ekki sjást lengur."
       feed_unpublished_course: "Aðgangur að streymi fyrir námskeiðið fæst ekki fyrr en það er birt."
       feed_unpublished_group: "Aðgangur að streymi fyrir hópinn fæst ekki fyrr en það er birt."
@@ -5039,7 +5039,7 @@ is:
         assessment_help_text: "Sum kerfi endurnýta auðkenni fyrir hvern nýjan útflutning. Það þýðir að ef þú flytur út tvo aðskilda spurningabanka, hafa þeir sama auðkenni. Til að missa ekki matsgögn aðgreinum við svona hluti, þrátt fyrir auðkennin. Ef þú velur þennan kost verður þetta öryggisatriði óvirkt og þá verða matsgögn skrifuð yfir fyrirverandi gögn með sama auðkenni."
         assessment_help_title: "\"Hjálp við mat á yfirritun\""
         assessment_help_title_icon: "Hjálpartákn fyrir mat á yfirritun"
-        overwrite_assessment_content: "Mat á yfirritun efnis með samsvarandi auðkenni"
+        overwrite_assessment_content: "Mat á yfirritun efnis með pörun auðkenni"
       question_bank: 
         aria_new_label: "Stofna nýjan spurningabanka"
         create_new_question: "-- Stofna nýjan spurningabanka --"
@@ -5713,7 +5713,7 @@ is:
   count_quizzes_found_e5e29bb4: 
     one: "1 próf fannst."
     other: "%{count} próf fundust."
-    zero: "Engin samsvarandi próf fundust."
+    zero: "Engin pörun próf fundust."
   count_recording_5ba8a655: "%{count} Upptaka"
   count_recordings_9f8e4148: "%{count} Upptökur"
   count_replies_a685c742: "%{count} svör"
@@ -5729,7 +5729,7 @@ is:
   count_sets_of_grading_periods_found_c8857ae9: 
     one: "1 sett einkunnatímabila fannst."
     other: "%{count} sett einkunnatímabila fundust."
-    zero: "Engin samsvarandi sett einkunnatímabila fundust."
+    zero: "Engin pörun sett einkunnatímabila fundust."
   count_students_30e46120: 
     one: "1 nemandi"
     other: "%{count} nemendur"
@@ -8537,7 +8537,7 @@ is:
   filetype_not_allowed_40556acb: "skráargerð ekki leyfð"
   filipino_33339264: Filippeyska
   fill_in_the_blank_answer_d83b83bb: "Fylltu inn í autt svar"
-  fill_in_the_blank_read_surrounding_text_1a6c73c7: "Fylltu í eyðuna, lestu textann umhverfis"
+  fill_in_the_blank_read_surrounding_text_1a6c73c7: "Eyðufylling, lestu textann umhverfis"
   filled_5d8c39e: Fylltur
   filter_9df28e5b: "Sía:"
   filter_announcements_by_unread_495eeeb3: "sía tilkynningar eftir ólesnum"
@@ -9573,8 +9573,8 @@ is:
         add_student: "Bæta nemanda við til að byrja."
         add_user: "Bæta notanda við til að byrja."
         greater_than_three: "Skráðu leitarorð sem er þrír stafir eða lengra"
-        no_matching_students: "Engir samsvarandi nemendur."
-        no_matching_users: "Engir samsvarandi notendur."
+        no_matching_students: "Engir pörun nemendur."
+        no_matching_users: "Engir pörun notendur."
         no_students: "Engir nemendur eru í hópnum eins og er."
         no_users: "Engir notendur eru í hópnum eins og er."
       groups: 
@@ -10945,8 +10945,8 @@ is:
   mastery_points_f1672cc: Leiknispunktar
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Tileinkunareinkunn sýnir hæstu einkunn fyrir metið verkefni eða próf."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Tileinkunareinkunn sýnir nýjasta metna verkefni eða próf."
-  matching_left_side_900f860b: "Samsvarandi vinstri hlið"
-  matching_right_side_920e71b2: "Samsvarandi hægri hlið"
+  matching_left_side_900f860b: "Pörun vinstri hlið"
+  matching_right_side_920e71b2: "Pörun hægri hlið"
   mathquill: 
     tabs: 
       arrows: Örvar
@@ -15120,8 +15120,8 @@ is:
   qti_display: QTI
   qti_export_from_date_8f018de5: "*QTI útflutningur frá %{date}*"
   qti_file_description: "QTI .zip skrá"
-  qti_img_matching_question: "Innflutt sasmsvarandi spurning er með myndir báðum megin en það er óstutt"
-  qti_img_matching_question_distractors: "Innflutt samsvarandi spurning hefur myndir í valkostum og ekki var hægt að laga það því hún inniheldur einnig villusvör"
+  qti_img_matching_question: "Innflutt pörun spurning er með myndir báðum megin en það er óstutt"
+  qti_img_matching_question_distractors: "Innflutt pörun spurning hefur myndir í valkostum og ekki var hægt að laga það því hún inniheldur einnig villusvör"
   qti_name: "QTI breytir"
   question_9121487: Spurning
   question_answered: Svarað
@@ -15726,7 +15726,7 @@ is:
           file_upload: "Nemendur geta hlaðið upp skrá fyrir svarið."
           fill_in_multiple_blanks: "Skráðu spurninguna og tilgreindu hvar hver eyða á að vera. Skilgreindu svo mögulega rétt svar fyrir hverja eyðu. Nemendur verða að skrifa svörin í textareit við hverja eyðu."
           formula_definition: "Næst þarftu að skrifa formúluna eða formúlurnar sem notaðar eru til að reikna rétta svarið. Notaðu sömu breytuheiti og fyrir ofan."
-          matching: "Myndaðu pör af samsvarandi gildum. Nemendur sjá gildin vinstra megin og verða að velja samsvarandi gildi hægra megin af fellilista. Margar línur geta haft sama svarið og þú getur bætt við villusvörum hægra megin."
+          matching: "Myndaðu pör af pörun gildum. Nemendur sjá gildin vinstra megin og verða að velja pörun gildi hægra megin af fellilista. Margar línur geta haft sama svarið og þú getur bætt við villusvörum hægra megin."
           missing_word: "Skilgreindu texta til að fara á fyrir og eftir fellingu, búðu til sett af mögulegum svörum og veldu eitt rétt svar."
           multi_answer_sets: "Í reitinn fyrir neðan, alls staðar þar sem þú vilt sýna svarreit, skrifaðu tilvísunarorð (engin bil) innan sviga"
           multiple_answers: "Þessi spurning mun sýna hakreit hjá hverju svari og nemandinn verður að velja ÖLL svörin sem þú merkir sem rétt."
@@ -15773,13 +15773,13 @@ is:
           essay: Ritgerðarspurning
           file_upload: "Upphleðsluskrá spurningar"
           fill_in_multiple_blanks: "Fylltu í eyðurnar"
-          matching: Samsvarandi
+          matching: Pörun
           missing_word: "Vantar orð"
-          multiple_answers: Fjölsvör
+          multiple_answers: Fjölsvar
           multiple_choice: Fjölval
           multiple_dropdowns: Fjölfellilistar
           numerical: Tölusvar
-          short_answer: "Fylltu í eyðuna"
+          short_answer: Eyðufylling
           text_only: "Texti (engin spurning)"
           true_false: Rétt/Rangt
         show_possible_answers: "Sýna möguleg svör við %{question}"
