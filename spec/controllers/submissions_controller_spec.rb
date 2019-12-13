@@ -770,6 +770,34 @@ describe SubmissionsController do
       expect(response).to redirect_to originality_report.originality_report_url
     end
 
+    context 'when there are multiple originality reports' do
+      let(:submission2) { assignment.submit_homework(test_student, body: 'hello world') }
+      let(:report_url2) { 'http://www.another-test-score.com/' }
+      let(:originality_report2) {
+        OriginalityReport.create!(attachment: nil,
+                                  submission: submission2,
+                                  originality_score: 0.4,
+                                  originality_report_url: report_url2)
+      }
+
+      it 'can use attempt number to find the report url for text entry submissions' do
+        originality_report2 # Create immediately
+        originality_report.update_attributes!(attachment: nil)
+        expect(submission2.id).to eq(submission.id) # submission2 is updated/reloaded with new version (last attempt number)
+        expect(submission2.attempt).to be > submission.attempt
+        get 'originality_report', params: {
+          course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id,
+          asset_string: submission.asset_string, attempt: 1
+        }
+        expect(response).to redirect_to originality_report.originality_report_url
+        get 'originality_report', params: {
+          course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id,
+          asset_string: submission.asset_string, attempt: 2
+        }
+        expect(response).to redirect_to originality_report2.originality_report_url
+      end
+    end
+
     it 'returns bad_request if submission_id is not an integer' do
       get 'originality_report', params: {
         course_id: assignment.context_id,

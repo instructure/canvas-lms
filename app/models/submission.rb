@@ -776,8 +776,13 @@ class Submission < ActiveRecord::Base
   end
 
   # Preload OriginalityReport before using this method
-  def originality_report_url(asset_string, user)
-    if asset_string == self.asset_string
+  def originality_report_url(asset_string, user, attempt=nil)
+    if attempt
+      version = versions.find{ |v| v.model&.attempt&.to_s == attempt.to_s }
+      return nil unless version
+      report = originality_reports.find_by(submission_time: version.model.submitted_at)
+      report&.report_launch_path
+    elsif asset_string == self.asset_string
       originality_reports.where(attachment_id: nil).first&.report_launch_path
     elsif self.grants_right?(user, :view_turnitin_report)
       requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string)
