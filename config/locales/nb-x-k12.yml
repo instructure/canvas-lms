@@ -12124,10 +12124,10 @@ nb-x-k12:
         tweet: "Canvas-varsel – kommentar: %{author} på %{assignment}, %{user}, %{context}."
     submission_grade_changed: 
       email: 
-        body: "Karakteren på din oppgave %{assignment_title} har blitt endret."
+        body: "Vurderingen på din oppgave, %{assignment_title}, har blitt endret."
         excused: "Denne oppgaven har blitt fritatt."
         html: 
-          body: "Karakteren på din oppgave %{assignment_title} har blitt endret."
+          body: "Vurderingen på din oppgave, %{assignment_title}, har blitt endret."
           excused: "Denne oppgaven har blitt fritatt."
           link_message: "Du kan gå gjennom oppgaven her"
           no_date_set: "Ingen dato satt"
@@ -12166,11 +12166,11 @@ nb-x-k12:
         tweet: "Canvas varsel – vurdering endret: %{date}"
     submission_graded: 
       email: 
-        body: "Oppgaven din %{assignment} har blitt karaktersatt."
+        body: "Oppgaven din, %{assignment}, har blitt vurdert."
         excused: "Denne oppgaven har blitt fritatt."
         graded_date: "vurdert: %{date}"
         html: 
-          body: "Oppgaven din %{assignment} har blitt karaktersatt."
+          body: "Oppgaven din, %{assignment}, har blitt vurdert."
           excused: "Denne oppgaven har blitt fritatt."
           graded_date: "vurdert: %{date}"
           link_message: "Du kan gå gjennom oppgaven her"
