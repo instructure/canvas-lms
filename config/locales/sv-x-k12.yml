@@ -681,7 +681,7 @@ sv-x-k12:
         grade_change: "Bedömningens ändringsaktivitet"
         mutations: GraphQL-mutationsaktivitet
         select_default: "Välj en loggtyp"
-      page_title: "Admin verktyg för %{account}"
+      page_title: "Adminverktyg för %{account}"
       user_date_range_search_form: 
         message_date_from: "Från datum"
         message_date_to: "Till datum"
@@ -13627,7 +13627,7 @@ sv-x-k12:
       description: "BigBlueBotton webb-konferenssupport"
       name: BigBlueButton
     big_blue_button_settings: 
-      description: "Du kommer behöva till gång till en [BigBlueButton](%{url}) instans."
+      description: "Du behöver åtkomst till en [BigBlueButton](%{url})-instans."
       domain_description: "**värdnamn** eller **ip-adress** för din BigBlueButton-installation (t.ex bigbluebutton.mycompany.com)"
       labels: 
         domain: Domän
