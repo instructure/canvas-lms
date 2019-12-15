@@ -96,6 +96,7 @@ describe 'assignments' do
       end
 
       it 'copy tray lists user managed courses' do
+        skip('LA-374')
         course_search_dropdown.click
         wait_for_animations
         expect(course_dropdown_list.text).to include 'First Course1'
@@ -103,6 +104,7 @@ describe 'assignments' do
       end
 
       it 'copy tray lists course modules' do
+        skip('LA-374')
         select_course
         module_search_dropdown.click
         wait_for_animations
@@ -111,6 +113,7 @@ describe 'assignments' do
       end
 
       it 'copy tray allows placement' do
+        skip('LA-374')
         select_course_and_module_in_tray
         placement_dropdown.click
 
@@ -140,6 +143,7 @@ describe 'assignments' do
       end
 
       it 'can send an item to another instructor' do
+        skip('LA-374')
         expect(received_table_rows[1].text).to include @assignment1.name
       end
     end

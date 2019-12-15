@@ -436,6 +436,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "returns change information from the blueprint side" do
+      skip('LA-376')
       json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
                  :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
                  :id => @migration.to_param, :course_id => @master.to_param, :action => 'migration_details')
@@ -459,6 +460,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "returns change information from the minion side" do
+      skip('LA-377')
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       minion = @minions.first
