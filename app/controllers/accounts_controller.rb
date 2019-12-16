@@ -1116,6 +1116,23 @@ class AccountsController < ApplicationController
     end
   end
 
+  def eportfolio_moderation
+    if authorized_action(@account, @current_user, :moderate_user_content)
+      return redirect_to account_settings_url(@account) unless @account.root_account.feature_enabled?(:eportfolio_moderation)
+
+      results_per_page = Setting.get('eportfolio_moderation_results_per_page', 1000)
+      spam_status_order = "CASE spam_status WHEN 'flagged_as_possible_spam' THEN 0 WHEN 'marked_as_spam' THEN 1 WHEN 'marked_as_safe' THEN 2 ELSE 3 END"
+      @eportfolios = Eportfolio.active.preload(:user).
+        joins(:user).
+        joins("JOIN #{UserAccountAssociation.quoted_table_name} ON eportfolios.user_id = user_account_associations.user_id AND user_account_associations.account_id = #{@account.id}").
+        where(spam_status: ["flagged_as_possible_spam", "marked_as_spam", "marked_as_safe"]).
+        where("EXISTS (?)", Eportfolio.where("user_id = users.id").where(spam_status: ['flagged_as_possible_spam', 'marked_as_spam'])).
+        merge(User.active).
+        order(Arel.sql(spam_status_order), Arel.sql("eportfolios.public DESC NULLS LAST"), updated_at: :desc).
+        paginate(per_page: results_per_page, page: params[:page])
+    end
+  end
+
   def turnitin_confirmation
     if authorized_action(@account, @current_user, :manage_account_settings)
       host = validated_turnitin_host(params[:turnitin_host])

@@ -72,6 +72,26 @@
 <% end %>
 
 <% if @owner_view %>
+  <% if @portfolio.flagged_as_possible_spam? %>
+    <p>
+      <div class="ic-flash-warning eportfolio_spam_message">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-warning"></i>
+        </div>
+        <%= t("This ePortfolio has been flagged as possible spam. Until it has been reviewed by an administrator, it will only be visible to you. Please contact an administrator if you have any questions.") %>
+      </div>
+    </p>
+  <% elsif @portfolio.spam?(include_possible_spam: false) %>
+    <p>
+      <div class="ic-flash-error eportfolio_spam_message">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-warning"></i>
+        </div>
+        <%= t("This ePortfolio has been identified as spam, and is only visible to you. Please contact an administrator if you have any questions.") %>
+      </div>
+    </p>
+  <% end %>
+
   <h2><%= t('headers.welcome', "Welcome to Your ePortfolio") %></h2>
   <p><%= t(:welcome, <<-DETAILS)
     If this is your first time here, you may want to pop up the wizard and see
@@ -213,6 +233,45 @@
 <% else %>
   <% if can_do(@portfolio, @current_user, :manage) %>
   <div style="float: <%= direction('right') %>; display: none;"><a href="#" class="edit_content_link icon-edit"><%= edit_link_text %></a></div>
+  <% end %>
+  <% if @portfolio.spam? && @portfolio.grants_right?(@current_user, :moderate)%>
+    <% if @portfolio.flagged_as_possible_spam? %>
+      <p>
+        <div class="ic-flash-warning eportfolio_spam_message">
+          <div class="ic-flash__icon" aria-hidden="true">
+            <i class="icon-warning"></i>
+          </div>
+          <%= t("This ePortfolio has been identified as possible spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe. Otherwise, you can confirm it as spam.") %>
+        </div>
+      </p>
+    <% else %>
+      <p>
+        <div class="ic-flash-error eportfolio_spam_message">
+          <div class="ic-flash__icon" aria-hidden="true">
+            <i class="icon-warning"></i>
+          </div>
+          <%= t("This ePortfolio has been identified as spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe.") %>
+        </div>
+      </p>
+    <% end %>
+  <% elsif @portfolio.flagged_as_possible_spam? && @portfolio.user == @current_user %>
+    <p>
+      <div class="ic-flash-warning eportfolio_spam_message">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-warning"></i>
+        </div>
+        <%= t("This ePortfolio has been flagged as possible spam. Until it has been reviewed by an administrator, it will only be visible to you. Please contact an administrator if you have any questions.") %>
+      </div>
+    </p>
+  <% elsif @portfolio.spam?(include_possible_spam: false) && @portfolio.user == @current_user %>
+    <p>
+      <div class="ic-flash-error eportfolio_spam_message">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-warning"></i>
+        </div>
+        <%= t("This ePortfolio has been identified as spam, and is only visible to you. Please contact an administrator if you have any questions.") %>
+      </div>
+    </p>
   <% end %>
   <h2 id="eportfolio_entry_<%= @page.id %>"><span class="name"><%= @page.name %></span></h2>
   <%= form_for @page, :url => eportfolio_entry_url(@portfolio, @page), :html => {:id => "edit_page_form" } do |f| %>

@@ -30,6 +30,7 @@ describe EportfoliosController do
 
   before :once do
     user_factory(active_all: true)
+    @user.account_users.create!(account: Account.default, role: student_role)
   end
 
   describe "GET 'user_index'" do
@@ -205,6 +206,82 @@ describe EportfoliosController do
         end
       end
     end
+
+    context "spam eportfolios" do
+      before(:once) do
+        @portfolio.user.account.enable_feature!(:eportfolio_moderation)
+        @portfolio.update!(public: true)
+      end
+
+      context "when the user is the author of the eportfolio" do
+        it "renders the eportfolio when it is spam" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          user_session(@user)
+          get :show, params: { id: @portfolio.id }
+
+          expect(response.status).to eq(200)
+        end
+      end
+
+      context "when the user is a non-admin, non-author of the eportfolio" do
+        before(:once) do
+          @other_user = user_model
+          @other_user.account_users.create!(account: Account.default, role: student_role)
+        end
+
+        it "is unauthorized when the eportfolio is spam" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          user_session(@other_user)
+          get :show, params: { id: @portfolio.id }
+
+          assert_unauthorized
+        end
+
+        it "renders the eportfolio when the eportfolio is spam and the release flag is disabled" do
+          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          user_session(@other_user)
+          get :show, params: { id: @portfolio.id }
+
+          expect(response.status).to eq(200)
+        end
+      end
+
+      context "when the user is an admin" do
+        before(:once) do
+          @admin = account_admin_user
+        end
+
+        it "renders the eportfolio when the eportfolio is spam and the admin has :moderate_user_content permissions" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          Account.default.role_overrides.create!(role: admin_role, enabled: true, permission: :moderate_user_content)
+          user_session(@admin)
+          get :show, params: { id: @portfolio.id }
+
+          expect(response.status).to eq(200)
+        end
+
+        it "is unauthorized when the eportfolio is spam and the admin does not have :moderate_user_content permissions" do
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          Account.default.role_overrides.create!(role: admin_role, enabled: false, permission: :moderate_user_content)
+          user_session(@admin)
+          get :show, params: { id: @portfolio.id }
+
+          assert_unauthorized
+        end
+
+        it "renders the eportfolio when the eportfolio is spam and the admin does " \
+        "not have :moderate_user_content permissions and the release flag is disabled" do
+          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
+          @portfolio.update!(spam_status: 'marked_as_spam')
+          Account.default.role_overrides.create!(role: admin_role, enabled: false, permission: :moderate_user_content)
+          user_session(@admin)
+          get :show, params: { id: @portfolio.id }
+
+          expect(response.status).to eq(200)
+        end
+      end
+    end
   end
 
   describe "PUT 'update'" do
@@ -220,6 +297,98 @@ describe EportfoliosController do
       expect(response).to be_redirect
       expect(assigns[:portfolio]).not_to be_nil
       expect(assigns[:portfolio].name).to eql("new title")
+    end
+
+    context "spam eportfolios" do
+      before(:once) do
+        @portfolio.user.account.enable_feature!(:eportfolio_moderation)
+      end
+
+      context "when the user is the author" do
+        it "can not make updates to the eportfolio if it has been flagged as possible spam" do
+          @portfolio.update!(spam_status: "flagged_as_possible_spam")
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
+          expect(response.status).to eq(401)
+        end
+
+        it "can make updates to the eportfolio if it has been flagged as possible spam and the release flag is disabled" do
+          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
+          @portfolio.update!(spam_status: "flagged_as_possible_spam")
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
+          expect(assigns[:portfolio].name).to eq("not spam i promise ;)")
+        end
+
+        it "can not make updates to the eportfolio if it has been marked as spam" do
+          @portfolio.update!(spam_status: "marked_as_spam")
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
+          expect(response.status).to eq(401)
+        end
+
+        it "can make updates to the eportfolio if it has been marked as spam and the release flag is disabled" do
+          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
+          @portfolio.update!(spam_status: "marked_as_spam")
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
+          expect(assigns[:portfolio].name).to eq("not spam i promise ;)")
+        end
+
+        it "can make updates to the eportfolio if it has been marked as safe" do
+          @portfolio.update!(spam_status: "marked_as_safe")
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "new title" } }
+          expect(response).to be_redirect
+          expect(assigns[:portfolio].name).to eq("new title")
+        end
+
+        it "cannot update the spam_status attribute" do
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "new title", spam_status: "marked_as_safe" } }
+          expect(response).to be_redirect
+          expect(assigns[:portfolio].spam_status).to eq(nil)
+        end
+
+        it "cannot update the spam_status attribute when the release flag is disabled" do
+          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
+          user_session(@user)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: "new title", spam_status: "marked_as_safe" } }
+          expect(response).to be_redirect
+          expect(assigns[:portfolio].spam_status).to eq(nil)
+        end
+      end
+
+      context "when the user is an admin" do
+        before(:once) do
+          @admin = account_admin_user
+        end
+
+        it "can change the spam_status attribute if granted the moderate_user_content permission" do
+          @portfolio.update!(spam_status: "marked_as_spam")
+          Account.default.role_overrides.create!(role: admin_role, enabled: true, permission: :moderate_user_content)
+          user_session(@admin)
+          put :update, params: { id: @portfolio.id, eportfolio: { spam_status: "marked_as_safe" } }
+          expect(response).to be_redirect
+          expect(assigns[:portfolio].spam_status).to eq("marked_as_safe")
+        end
+
+        it "cannot change any attrs besides spam_status if granted the moderate_user_content permission" do
+          Account.default.role_overrides.create!(role: admin_role, enabled: true, permission: :moderate_user_content)
+          user_session(@admin)
+          put :update, params: { id: @portfolio.id, eportfolio: { name: 'changed name' } }
+          expect(response).to be_redirect
+          expect(assigns[:portfolio].name).to eq(nil)
+        end
+
+        it "cannot change the spam_status attribute if not granted the moderate_user_content permission" do
+          @portfolio.update!(spam_status: "marked_as_spam")
+          Account.default.role_overrides.create!(role: admin_role, enabled: false, permission: :moderate_user_content)
+          user_session(@admin)
+          put :update, params: { id: @portfolio.id, eportfolio: { spam_status: "marked_as_safe" } }
+          assert_unauthorized
+        end
+      end
     end
   end
 

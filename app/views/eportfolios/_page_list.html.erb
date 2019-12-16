@@ -17,6 +17,35 @@
 %>
 
 <div id="section_pages">
+  <% if @portfolio.user.account&.feature_enabled?(:eportfolio_moderation) && @portfolio.grants_right?(@current_user, :moderate) %>
+    <% if @portfolio.spam? %>
+      <%= form_for @portfolio, url: eportfolio_path(@portfolio), html: { id: 'mark_eportfolio_safe_form', class: 'ic-Form-group' }  do |f| %>
+        <input type="hidden" name="eportfolio[spam_status]" value="marked_as_safe"/>
+        <button type="submit" class="Button Button--default button-sidebar-wide">
+          <i class="icon-check"></i>&nbsp;
+          <%= t('Mark as Safe') %>
+        </button>
+      <% end %>
+
+      <% if @portfolio.flagged_as_possible_spam? %>
+        <%= form_for @portfolio, url: eportfolio_path(@portfolio), html: { id: 'mark_eportfolio_spam_form' }  do |f| %>
+          <input type="hidden" name="eportfolio[spam_status]" value="marked_as_spam"/>
+          <button type="submit" class="Button Button--default button-sidebar-wide">
+            <i class="icon-flag"></i>&nbsp;
+            <%= t('Confirm as Spam') %>
+          </button>
+        <% end %>
+      <% end %>
+    <% else %>
+      <%= form_for @portfolio, url: eportfolio_path(@portfolio), html: { id: 'edit_eportfolio_spam_form' }  do |f| %>
+        <input type="hidden" name="eportfolio[spam_status]" value="marked_as_spam"/>
+        <button type="submit" class="Button button-sidebar-wide">
+          <i class="icon-flag"></i>&nbsp;
+          <%= t('Mark as Spam') %>
+        </button>
+      <% end %>
+    <% end %>
+  <% end %>
   <h2>
     <%= @category.name %>
     <% if can_do(@portfolio, @current_user, :manage) %>

@@ -171,6 +171,13 @@ class RoleOverride < ActiveRecord::Base
        :true_for => %w(AccountAdmin),
        :available_to => %w(AccountAdmin AccountMembership),
      },
+     :moderate_user_content => {
+       :label => lambda { t('permissions.moderate_user_content', "Moderate user content") },
+       :label_v2 => lambda { t("Users - moderate content") },
+       :account_only => true,
+       :true_for => %w(AccountAdmin),
+       :available_to => %w(AccountAdmin AccountMembership),
+     },
      :view_feature_flags => {
        :label => lambda { t("View feature settings at an account level") },
        :label_v2 => lambda { t("Feature Options - view") },
