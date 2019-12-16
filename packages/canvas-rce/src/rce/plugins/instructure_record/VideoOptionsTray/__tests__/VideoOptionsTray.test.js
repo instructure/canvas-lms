@@ -80,12 +80,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       renderComponent()
       expect(tray.titleText).toEqual('')
     })
-
-    it('is disabled when displaying the image as a link', () => {
-      renderComponent()
-      tray.setDisplayAs('link')
-      expect(tray.titleTextDisabled).toEqual(true)
-    })
   })
 
   describe('"Display Options" field', () => {

@@ -53,6 +53,12 @@ export default class FakeEditor {
         }
         return null
       },
+      setAttrib: (elem, attr, value) => {
+        elem.setAttribute(attr, value)
+      },
+      getAttrib: (elem, attr) => {
+        return elem.getAttribute(attr)
+      },
       setAttribs: (elem, hash) => {
         Object.keys(hash).forEach(k => {
           if (hash[k] == undefined) {
@@ -62,7 +68,14 @@ export default class FakeEditor {
           }
         })
       },
-      setStyles: (_elem, _hash) => {}
+      setStyles: (elem, hash) => {
+        Object.keys(hash).forEach(k => {
+          elem.style[k] = hash[k]
+        })
+      },
+      replace: (newelem, oldelem) => {
+        return oldelem.parentNode.replaceChild(newelem, oldelem)
+      }
     }
   }
 

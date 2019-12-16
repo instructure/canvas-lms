@@ -133,6 +133,7 @@ export default function VideoOptionsTray(props) {
 
   return (
     <Tray
+      key="video-options-tray"
       data-mce-component
       label={formatMessage('Video Options Tray')}
       onDismiss={onRequestClose}
@@ -166,7 +167,6 @@ export default function VideoOptionsTray(props) {
                 <Flex.Item padding="small">
                   <TextArea
                     aria-describedby="alt-text-label-tooltip"
-                    disabled={displayAs === 'link'}
                     height="4rem"
                     label={textAreaLabel}
                     onChange={handleTitleTextChange}
