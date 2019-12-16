@@ -20,7 +20,7 @@
 
 def ci_node_total = 20; // how many nodes to run on
 pipeline {
-  agent none
+  agent { label 'canvas-docker' }
   options {
     ansiColor('xterm')
   }
@@ -71,8 +71,9 @@ pipeline {
                       throw ex
                     }
                     finally {
+                      def reports = load 'build/new-jenkins/groovy/reports.groovy'
                       dir ('tmp') {
-                        stash name: "selenium_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
+                        reports.stashSpecFailures(index)
                       }
                       sh 'rm -rf ./tmp/spec_failures'
                       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
@@ -91,37 +92,8 @@ pipeline {
   post {
     failure {
       script {
-        node {
-          sh 'rm -rf ./compiled_failures'
-          def htmlFiles;
-          dir('compiled_failures') {
-            for(int i = 0; i < ci_node_total; i++) {
-              def index = i;
-              dir ("node_${index}") {
-                unstash "selenium_failures_${index}"
-              }
-            }
-            htmlFiles = findFiles glob: '**/index.html'
-
-            def indexHtml = "<body style=\"font-family:sans-serif;line-height:1.25;font-size:14px\">"
-            htmlFiles.each {
-              def spec = (it =~ /.*spec_failures\/(.*)\/index/)[0][1]
-              indexHtml += "<a href=\"${it}\">${spec}</a><br>"
-            }
-            indexHtml += "</body>"
-            writeFile file: "index.html", text: indexHtml
-          }
-
-          publishHTML target: [
-            allowMissing: false,
-            alwaysLinkToLastBuild: false,
-            keepAll: true,
-            reportDir: 'compiled_failures',
-            reportFiles: "index.html," + htmlFiles.join(','),
-            reportName: 'Test Failures'
-          ]
-          sh 'rm -rf ./compiled_failures'
-        }
+        def reports = load 'build/new-jenkins/groovy/reports.groovy'
+        reports.publishSpecFailuresAsHTML(ci_node_total)
       }
     }
   }

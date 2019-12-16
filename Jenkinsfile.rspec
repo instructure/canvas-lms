@@ -20,7 +20,7 @@
 
 def ci_node_total = 10; // how many nodes to run on
 pipeline {
-  agent none
+  agent { label 'canvas-docker' }
   options {
     ansiColor('xterm')
   }
@@ -68,8 +68,9 @@ pipeline {
                       throw ex
                     }
                     finally {
+                      def reports = load 'build/new-jenkins/groovy/reports.groovy'
                       dir ('tmp') {
-                        stash name: "rspec_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
+                        reports.stashSpecFailures(index)
                       }
                       sh 'rm -rf ./tmp/spec_failures'
                       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
@@ -87,28 +88,8 @@ pipeline {
   post {
     failure {
       script {
-        node {
-          sh 'rm -rf ./compiled_failures'
-          def htmlFiles;
-          dir('compiled_failures') {
-            for(int i = 0; i < ci_node_total; i++) {
-              def index = i;
-              dir ("node_${index}") {
-                unstash "rspec_failures_${index}"
-              }
-            }
-            htmlFiles = findFiles glob: '**/index.html'
-          }
-          publishHTML target: [
-            allowMissing: false,
-            alwaysLinkToLastBuild: false,
-            keepAll: true,
-            reportDir: 'compiled_failures',
-            reportFiles: htmlFiles.join(','),
-            reportName: 'Test Failures'
-          ]
-          sh 'rm -rf ./compiled_failures'
-        }
+        def reports = load 'build/new-jenkins/groovy/reports.groovy'
+        reports.publishSpecFailuresAsHTML(ci_node_total)
       }
     }
   }
