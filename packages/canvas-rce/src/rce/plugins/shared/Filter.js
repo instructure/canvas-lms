@@ -131,21 +131,23 @@ export default function Filter(props) {
             </Select>
           </Flex.Item>
 
-          <Flex.Item grow shrink margin="none none none xx-small">
-            <Select
-              label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
-              onChange={(e, selection) => {
-                onChange({sortValue: selection.value})
-              }}
-              selectedOption={sortValue}
-            >
-              <option value="date_added">{formatMessage('Date Added')}</option>
+          {contentSubtype !== 'all' && (
+            <Flex.Item grow shrink margin="none none none xx-small">
+              <Select
+                label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
+                onChange={(e, selection) => {
+                  onChange({sortValue: selection.value})
+                }}
+                selectedOption={sortValue}
+              >
+                <option value="date_added">{formatMessage('Date Added')}</option>
 
-              <option value="alphabetical">{formatMessage('Alphabetical')}</option>
+                <option value="alphabetical">{formatMessage('Alphabetical')}</option>
 
-              <option value="date_published">{formatMessage('Date Published')}</option>
-            </Select>
-          </Flex.Item>
+                <option value="date_published">{formatMessage('Date Published')}</option>
+              </Select>
+            </Flex.Item>
+          )}
         </Flex>
       )}
     </View>
