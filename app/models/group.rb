@@ -588,8 +588,10 @@ class Group < ActiveRecord::Base
     end
   end
 
-  def users_visible_to(user)
-    grants_right?(user, :read) ? users : users.none
+  def users_visible_to(user, opts={})
+    return users.none unless grants_right?(user, :read)
+
+    opts[:include_inactive] ? users : participating_users_in_context
   end
 
   # Helper needed by several permissions, use grants_right?(user, :participate)

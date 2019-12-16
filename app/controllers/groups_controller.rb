@@ -716,7 +716,11 @@ class GroupsController < ApplicationController
   #   results list. Must be at least 3 characters.
   #
   # @argument include[] [String, "avatar_url"]
-  #   - "avatar_url": Include users' avatar_urls.
+  #   "avatar_url": Include users' avatar_urls.
+  #
+  # @argument exclude_inactive [Boolean]
+  #   Whether to filter out inactive users from the results. Defaults to
+  #   false unless explicitly provided.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/1/users \
@@ -727,10 +731,13 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
 
     search_term = params[:search_term].presence
+
+    include_inactive = params[:exclude_inactive].present? ? !value_to_boolean(params[:exclude_inactive]) : true
+
     if search_term
-      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, {include_inactive_enrollments: include_inactive})
     else
-      users = UserSearch.scope_for(@context, @current_user)
+      users = UserSearch.scope_for(@context, @current_user, {include_inactive_enrollments: include_inactive})
     end
 
     includes = Array(params[:include])

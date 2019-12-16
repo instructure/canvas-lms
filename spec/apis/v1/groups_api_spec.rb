@@ -943,6 +943,33 @@ describe "Groups API", type: :request do
       json = api_call(:get, api_url + "?include[]=avatar_url", api_route.merge(include: ["avatar_url"]))
       expect(json.first['avatar_url']).to eq user.avatar_image_url
     end
+
+    it "honors the exclude_inactive query parameter" do
+      course_with_teacher(:active_all => true)
+      @group = @course.groups.create!(:name => 'Inactive user group')
+
+      inactive_user = user_factory
+      enrollment = @course.enroll_student(inactive_user)
+      enrollment.deactivate
+      @group.add_user(inactive_user, 'accepted')
+
+      @course.enroll_student(user_factory).accept!
+      @group.add_user(@user, 'accepted')
+
+      json = api_call(:get, "/api/v1/groups/#{@group.id}/users?exclude_inactive=true",
+                      api_route.merge({exclude_inactive: true, group_id: @group.id}))
+
+      expect(json.count).to eq 1
+      expect(json.first['id']).to eq @user.id
+
+      enrollment.reactivate
+
+      json = api_call(:get, "/api/v1/groups/#{@group.id}/users?exclude_inactive=true",
+                      api_route.merge({exclude_inactive: true, group_id: @group.id}))
+
+      expect(json.count).to eq 2
+      expect(json.first['id']).to eq inactive_user.id
+    end
   end
 
   context "group files" do

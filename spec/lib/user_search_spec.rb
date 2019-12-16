@@ -451,7 +451,7 @@ describe UserSearch do
       group = @course.groups.create!
       group.add_user(@student)
       account_admin_user
-      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['student']).to_a).to eq [@student]
+      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['student'], include_inactive_enrollments: true).to_a).to eq [@student]
       expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['teacher']).to_a).to be_empty
     end
 
