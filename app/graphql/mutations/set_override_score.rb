@@ -27,7 +27,7 @@ class Mutations::SetOverrideScore < Mutations::BaseMutation
 
   # grades is a +Score+ object, but for audit log purposes we want to log these
   # changes to the enrollment instead (Scores are invisible to users of Canvas)
-  def self.grades_log_entry(score)
+  def self.grades_log_entry(score, _context)
     score.enrollment
   end
 
