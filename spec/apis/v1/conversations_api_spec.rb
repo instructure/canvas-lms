@@ -1180,6 +1180,29 @@ describe ConversationsController, type: :request do
           expect(batch).to be_sent
           @other_students.each{|s| expect(s.conversations.last.conversation.shard).to eq @shard1 }
         end
+
+        it "should send async bulk messages correctly cross-shard" do
+          @shard1.activate do
+            @other_account = Account.create
+            course_factory(:active_all => true, :account => @other_account)
+            @other_course = @course
+            @other_students = n_students_in_course(3, :course => @other_course)
+            teacher_in_course(:active_all => true, :course => @other_course, :user => @me)
+          end
+          randos = @other_students.map{|cs| User.create!(:id => cs.local_id)} # create a default shard user with a matching local id
+
+          @user = @me
+          api_call(:post, "/api/v1/conversations",
+            { :controller => 'conversations', :action => 'create', :format => 'json' },
+            { :recipients => @other_students.map(&:id), :body => "test", :context_code => "course_#{@other_course.id}",
+              :group_conversation => "1", :bulk_message => "1", :mode => "async"
+            })
+          run_jobs
+          batch = @shard1.activate { ConversationBatch.last }
+          expect(batch).to be_sent
+          randos.each{|r| expect(r.conversations).to be_empty}
+          @other_students.each{|s| expect(s.conversations.last.conversation.shard).to eq @shard1 }
+        end
       end
     end
   end
