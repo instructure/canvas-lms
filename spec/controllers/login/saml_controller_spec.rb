@@ -568,6 +568,28 @@ SAML
       expect(response.status).to eq 400
       expect(ErrorReport.last.message).to eq "SAML2::UnsignedMessage"
     end
+
+    it "accepts an HTTP-POST message" do
+      account = account_with_saml
+      aac = account.authentication_providers.first
+      aac.settings[:signing_certificates] = certificates
+      aac.log_out_url = "https://idp.school.edu/logout"
+      aac.save!
+
+      logout_request = SAML2::LogoutRequest.new
+      logout_request.issuer = SAML2::NameID.new(aac.idp_entity_id)
+      logout_request.name_id = SAML2::NameID.new('cody')
+      logout_request.destination = ''
+      post_params = SAML2::Bindings::HTTP_POST.encode(logout_request)
+
+      controller.request.env['canvas.domain_root_account'] = account
+      expect_any_instance_of(SAML2::LogoutRequest).to receive(:signed?).and_return(true)
+      expect_any_instance_of(SAML2::LogoutRequest).to receive(:validate_signature).and_return([])
+      post :destroy, params: post_params
+
+      expect(response.status).to eq 302
+      expect(response.location).to match(%r{^https://idp.school.edu/logout})
+    end
   end
 
   context "login attributes" do

@@ -753,6 +753,7 @@ CanvasRails::Application.routes.draw do
 
   get 'login/saml' => 'login/saml#new', as: :saml_login_base
   get 'login/saml/logout' => 'login/saml#destroy'
+  post 'login/saml/logout' => 'login/saml#destroy'
   # deprecated alias
   get 'saml_logout' => 'login/saml#destroy'
   get 'login/saml/:id' => 'login/saml#new', as: :saml_login

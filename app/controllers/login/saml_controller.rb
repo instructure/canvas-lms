@@ -190,24 +190,39 @@ class Login::SamlController < ApplicationController
       logger.info "Received signed SAML LogoutRequest from #{message.issuer.id} using certificate #{fingerprint}"
     end
 
-    message, relay_state = SAML2::Bindings::HTTPRedirect.decode(request.url, public_key_used: log_key_used) do |m|
-      message = m
+    if request.post?
+      message, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
       aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
       return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
 
       # only require signatures for LogoutRequests, and only if the provider has a certificate on file
-      next unless message.is_a?(SAML2::LogoutRequest)
-      next if (certificates = aac.signing_certificates).blank?
-      certificates.map do |cert_base64|
-        certificate = OpenSSL::X509::Certificate.new(Base64.decode64(cert_base64))
-        key = certificate.public_key
-        key_to_certificate[key] = certificate
-        key
+      if message.is_a?(SAML2::LogoutRequest) && (certificates = aac.signing_certificates)
+        raise SAML2::UnsignedMessage unless message.signed?
+        unless (signature_errors = message.validate_signature(cert: certificates)).empty?
+          logger.debug("Failed to validate signature: #{signature_errors}")
+          raise SAML2::InvalidSignature
+        end
       end
+    else
+      message, relay_state = SAML2::Bindings::HTTPRedirect.decode(request.url, public_key_used: log_key_used) do |m|
+        message = m
+        aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
+        return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
+
+        # only require signatures for LogoutRequests, and only if the provider has a certificate on file
+        next unless message.is_a?(SAML2::LogoutRequest)
+        next if (certificates = aac.signing_certificates).blank?
+        certificates.map do |cert_base64|
+          certificate = OpenSSL::X509::Certificate.new(Base64.decode64(cert_base64))
+          key = certificate.public_key
+          key_to_certificate[key] = certificate
+          key
+        end
+      end
+      # the above block may have been skipped in specs due to stubbing
+      aac ||= @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
+      return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
     end
-    # the above block may have been skipped in specs due to stubbing
-    aac ||= @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
-    return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
 
     case message
     when SAML2::LogoutResponse
