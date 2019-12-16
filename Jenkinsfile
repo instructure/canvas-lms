@@ -263,9 +263,7 @@ pipeline {
         stage('Selenium Chrome') {
           steps {
             skipIfPreviouslySuccessful("selenium-chrome") {
-              // propagate set to false until we can get tests passing
               build(
-                propagate: false,
                 job: 'test-suites/selenium-chrome',
                 parameters: build_parameters
               )
@@ -276,9 +274,7 @@ pipeline {
         stage('Rspec') {
           steps {
             skipIfPreviouslySuccessful("rspec") {
-              // propagate set to false until we can get tests passing
               build(
-                propagate: false,
                 job: 'test-suites/rspec',
                 parameters: build_parameters
               )
