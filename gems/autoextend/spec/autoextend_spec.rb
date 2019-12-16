@@ -27,12 +27,39 @@ require 'autoextend'
 
 describe Autoextend do
   before do
-    module AutoextendSpec; end
+    module AutoextendSpec
+      module PrependHelper
+        def self.register_prepend(klass, id)
+          prepend_order = klass.class_variable_defined?(:@@prepend_order) ? klass.class_variable_get(:@@prepend_order) : []
+          prepend_order << id
+          klass.class_variable_set(:@@prepend_order, prepend_order)
+        end
+      end
+
+      module Prepend1
+        def self.prepended(klass)
+          PrependHelper.register_prepend(klass, 1)
+        end
+      end
+
+      module Prepend2
+        def self.prepended(klass)
+          PrependHelper.register_prepend(klass, 2)
+        end
+      end
+
+      module Prepend3
+        def self.prepended(klass)
+          PrependHelper.register_prepend(klass, 3)
+        end
+      end
+    end
   end
 
   after do
     Object.send(:remove_const, :AutoextendSpec)
     Autoextend.send(:extensions_hash).reject! { |k, _| k =~ /^AutoextendSpec::/ }
+    ActiveSupport::Dependencies.clear
   end
 
   it "should autoextend a class afterwards" do
@@ -77,6 +104,58 @@ describe Autoextend do
     end
   end
 
+  describe 'ordering' do
+    describe 'manually-loaded classes' do
+      it 'raises an error for unfufilliable after constraints' do
+        module AutoextendSpec::Ordering; end
+        expect do
+          Autoextend.hook(:"AutoextendSpec::Ordering", :"AutoextendSpec::Prepend3", method: :prepend, after: 'AutoextendSpec::Prepend2')
+          Autoextend.hook(:"AutoextendSpec::Ordering", :"AutoextendSpec::Prepend2", method: :prepend)
+        end.to raise_error(/Could not find/)
+      end
+
+      it 'raises an error for unfufilliable before constraints' do
+        module AutoextendSpec::Ordering; end
+        expect do
+          Autoextend.hook(:"AutoextendSpec::Ordering", :"AutoextendSpec::Prepend2", method: :prepend)
+          Autoextend.hook(:"AutoextendSpec::Ordering", :"AutoextendSpec::Prepend1", method: :prepend, before: 'AutoextendSpec::Prepend2')
+        end.to raise_error(/Already included/)
+      end
+
+      it 'includes in the correct order' do
+        module AutoextendSpec::Ordering; end
+
+        Autoextend.hook(:"AutoextendSpec::Ordering", :"AutoextendSpec::Prepend1", method: :prepend, before: 'AutoextendSpec::Prepend2')
+        Autoextend.hook(:"AutoextendSpec::Ordering", :"AutoextendSpec::Prepend2", method: :prepend)
+        Autoextend.hook(:"AutoextendSpec::Ordering", :"AutoextendSpec::Prepend3", method: :prepend, after: 'AutoextendSpec::Prepend2')
+
+        expect(AutoextendSpec::Ordering.class_variable_get(:@@prepend_order)).to eq([1, 2, 3])
+      end
+    end
+
+    describe 'auto-loaded classes' do
+      it 'raises an error for unfufilliable after constraints' do
+        Autoextend.hook(:"AutoextendSpec::TestModule", :"AutoextendSpec::Prepend3", method: :prepend, after: 'AutoextendSpec::Prepend2')
+
+        expect { _x = AutoextendSpec::TestModule }.to raise_error(/Could not find/)
+      end
+
+      it 'raises an error for unfufilliable before constraints' do
+        Autoextend.hook(:"AutoextendSpec::TestModule", :"AutoextendSpec::Prepend1", method: :prepend, before: 'AutoextendSpec::Prepend2')
+
+        expect { _x = AutoextendSpec::TestModule }.to raise_error(/Could not find/)
+      end
+
+      it 'includes in the correct order' do
+        Autoextend.hook(:"AutoextendSpec::TestModule", :"AutoextendSpec::Prepend1", method: :prepend, before: 'AutoextendSpec::Prepend2')
+        Autoextend.hook(:"AutoextendSpec::TestModule", :"AutoextendSpec::Prepend2", method: :prepend)
+        Autoextend.hook(:"AutoextendSpec::TestModule", :"AutoextendSpec::Prepend3", method: :prepend, after: 'AutoextendSpec::Prepend2')
+
+        expect(AutoextendSpec::TestModule.class_variable_get(:@@prepend_order)).to eq([1, 2, 3])
+      end
+    end
+  end
+
   it "should allow extending with a module instead of a module name" do
     class AutoextendSpec::Class; end
     module AutoextendSpec::MyExtension; end
@@ -84,9 +163,6 @@ describe Autoextend do
     expect(AutoextendSpec::Class.ancestors).to include AutoextendSpec::MyExtension
   end
 
-  # yes, this whole spec is awful and pollutes global state,
-  # but it's just one spec, and this file is small and should never
-  # be run in the same process as other specs
   describe "ActiveSupport" do
     it "should hook an autoloaded module" do
       hooked = 0
