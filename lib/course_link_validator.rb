@@ -274,8 +274,20 @@ class CourseLinkValidator
     :missing_item
   end
 
+  # whitelisted hosts will never be flagged as unavailable
+  def whitelisted?(url)
+    @whitelist ||= Setting.get('link_validator_whitelisted_hosts', '').split(',')
+    return false if @whitelist.empty?
+    host = URI.parse(url).host
+    @whitelist.include?(host)
+  rescue URI::InvalidURIError
+    false
+  end
+
   # ping the url and make sure we get a 200
   def reachable_url?(url)
+    return true if whitelisted?(url)
+
     @unavailable_photo_redirect_pattern ||= Regexp.new(Setting.get('unavailable_photo_redirect_pattern', 'yimg\.com/.+/photo_unavailable.png$'))
     redirect_proc = lambda do |response|
       # flickr does a redirect to this file when a photo is deleted/not found;
@@ -295,7 +307,7 @@ class CourseLinkValidator
       case response.code
       when /^2/ # 2xx code
         true
-      when "401", "403", "503"
+      when "401", "403", "429", "503"
         # we accept unauthorized and forbidden codes here because sometimes servers refuse to serve our requests
         # and someone can link to a site that requires authentication anyway - doesn't necessarily make it invalid
         true
