@@ -351,6 +351,7 @@ tr:
   account_id_2c3b4f15: "hesap id"
   account_id_73966078: account_id
   account_id_f6e26867: "Hesap Id"
+  account_level_settings_manage_4fca6f8e: "Hesap düzeyi ayarları - yönet"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "hesap adı"
   account_name_analytics_62bf60ae: "%{account.name} Analitikleri"
@@ -1785,8 +1786,10 @@ tr:
   admin_4d3ba42f: Yönetici
   admin_csv_f8d1b3eb: "Yönetici CSV"
   admin_navigation_menu_77b801a2: "Yönetici Gezinme Menüsü"
+  admin_tools_undelete_courses_d9bd8631: "Yönetici Araçları (Dersleri Silme İşlemini Geri Al)"
   admin_user_name_29dd115a: admin_user_name
   admins_3e1dce15: Yöneticiler
+  admins_add_remove_26811ce5: "Yöneticiler - ekle / sil"
   after_48b9d69: "..den sonra"
   after_4c71e718: Sonra
   after_date_981cd41b: "%{date}'dan sonra"
@@ -2033,6 +2036,7 @@ tr:
   announcements_a4b8ed4a: Duyurular
   announcements_list_c75fc413: "Duyurular Listesi"
   announcements_tutorial_tray_994287d6: "Duyurular Yönerge Yan Menüsü"
+  announcements_view_1019d00d: "Duyurular -göster"
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Eğitmenler tarafından bu ödevdeki tüm gönderilerde yapılan tüm ek notları SpeedGrader'da isimsiz yap"
   anonymous_e1b8ad27: Anonim
   anonymous_grading_ccb5045c: "İsimsiz Notlandırma"
@@ -5325,6 +5329,7 @@ tr:
   course_collaborations_dadb327e: "Ders İşbirlikleri"
   course_conferences_3d914c96: "Canlı Dersler"
   course_content_a92eca20: "Ders İçeriği"
+  course_content_view_5f68a57: "Ders İçeriği - göster"
   course_copy_argument_error: "Dersi kopyalamak için kaynak ders gerekmektedir."
   course_copy_description: "Canvas derslerini kopyalamak için aktarma eklentisi"
   course_copy_display: "Ders Kopyala"
@@ -6075,6 +6080,10 @@ tr:
       invalid_link: "Kullandığınız kayıt bağlantısı artık geçerli değil. Lütfen dersin öğretmeni ile iletişime geçip hala kayıtlı olduğunuzu doğrulayın."
   courses_43204aae: Dersler
   courses_navigation_menu_b3638384: "Dersler Gezinme Menüsü"
+  courses_undelete_1f689a97: "Dersler-silme işlemini geri al"
+  courses_view_change_logs_25af6a45: "Dersler-değişiklik kayıtlarını göster"
+  courses_view_list_47885585: "Dersler - listeyi göster"
+  courses_view_usage_reports_3daed8fe: "Dersler - kullanım raporlarını göster"
   create_132b3be1: Oluştur
   create_a_new_account_4cf7c0f9: "Yeni Bir Hesap Oluştur"
   create_a_new_module_6f31b0fe: "Yeni bir Modül Oluştur"
@@ -6973,6 +6982,7 @@ tr:
     unsubscribed_hint: "Bu başlığı takip etmiyorsunuz. Takip etmek için tıklayınız."
   discussions_a5f96392: Tartışmalar
   discussions_tutorial_tray_4ef79bcc: "Tartışmalar Yönerge Yan Menüsü"
+  discussions_view_c6818792: "Tartışmalar - göster"
   dismiss_dacdb625: Yoksay
   dismiss_this_5c74dddc: "Bunu Yoksay"
   display_as_e2a5c383: "Olarak göster"
@@ -7865,6 +7875,7 @@ tr:
       feature_options: "Özellik Seçenekleri"
       no_features_available: "Şu anda kullanılabilir özellik yok"
   feature_options_37a2c317: "Özellik Seçenekleri"
+  feature_options_view_a170e80c: "Özellik Seçenekleri - göster"
   features: 
     allow_opt_out_of_inbox: "Kullanıcıların gelen kutusunda ayrılmalarına izin ver"
     better_file_browsing: "Daha İyi Dosya Arama"
@@ -8705,6 +8716,9 @@ tr:
   graders_cannot_view_student_names_2e8d3ff9: "Not verenler öğrenci isimlerini göremez"
   grades_a61eba0a: Notlar
   grades_for_student_aff00ba: "%{student}'nin Notları"
+  grades_view_all_grades_8bf9f8d3: "Notlar - tüm notları göster"
+  grades_view_audit_trail_cc4c1fcc: "Notlar - Denetleme yolunu göster"
+  grades_view_change_logs_6bc1b959: "Notlar-değişiklik kayıtlarını göster"
   gradezilla: 
     course_average: "Dersin ortalaması"
     course_median: "Dersin medyanı"
@@ -9199,6 +9213,7 @@ tr:
       Her grup için takvim, wiki, tartışma ve biraz dosyalama alanı sağlanmaktadır. Gruplar bu belgeler
       üzerinde işbirliği yapabilir ve hatta web üzerinden canlı dersler düzenleyebilirler. Aslında daha çok
       proje odaklı olarak az sayıda öğrenci ile çalışabileceğiniz küçük bir derse benzetebiliriz.
+  groups_view_all_student_groups_39bd1b85: "Gruplar - yüm öğrenci gruplarını göster"
   handlebars_helpers: 
     time: 
       event: "%{date} %{time}"
@@ -12538,6 +12553,7 @@ tr:
       scheduling: Zamanlanıyor
   notification_preferences_cf47083d: "Bildirim Tercihleri"
   notifications_cbfa7704: Bildirimler
+  notifications_view_f9a60770: "Bildirimler - göster"
   notify_users_this_quiz_has_changed_c5b05995: "Kısa sınav değişikliği ile ilgili kullanıcıları bilgilendir"
   now_click_the_agenda_button_607fb40e: "Şimdi *Gündem* butonuna tıklayın"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Dersiniz hazır olduğuna göre muhtemelen artık bu denetim listesine ihtiyacınız olmayacak. Fakat daha sonra yeni bir şeyler denemek istersiniz diye veya dersinizin içeriğinde değişiklikler yaparken biraz yardıma ihtiyacınız olabilir diye hazır tutacağız."
@@ -13983,6 +13999,7 @@ tr:
       select_bank: "Soruları tanımlamak istediğiniz soru bankasını seçiniz:"
       show_details: "Soru Ayrıntılarını Göster"
   question_banks_45bdf347: "Soru Bankaları"
+  question_banks_view_and_link_e6d9cde2: "Soru bankaları - göster ve bağlantı oluştur"
   question_f06476d1: soru
   question_group_837b8014: "Soru Grubu"
   question_unanswered: "Henüz Cevaplanmadı"
@@ -15320,6 +15337,7 @@ tr:
     top_level: "-- Üst düzey --"
     ? "true"
     : Doğru
+  quizzes_view_submission_log_ec105e3e: "Kısa sınavlar - gönderi kayıtlarını göster"
   range_8760934b: "Aralık: "
   range_name_90614433: "Aralık adı"
   ratings_2433172b: Oranlar
@@ -15578,7 +15596,7 @@ tr:
       suspend_accounts: "Askıya alınmış hesaplar"
       undelete_courses: "Dersleri silme işlemini geri al"
       view_all_grades: "Tüm notları göster"
-      view_analytics: "Analiz sayfasını gör"
+      view_analytics: "Analitikler - sayfaları göster"
       view_course_changes: "Ders Değişiklik Kayıtlarını Göster"
       view_error_reports: "Hata raporlarını görsün"
       view_grade_changes: "Not Değişikliği Kayıtlarını Gör"
@@ -15725,6 +15743,7 @@ tr:
   save_11a80ec3: Kaydet
   save_changes_698abe77: "Değişiklikleri Kaydet"
   save_key_b4dede06: "Anahtarı Kaydet"
+  save_learning_mastery_82889d8b: "Öğrenme Yeterliliğini Kaydet"
   save_publish_36440725: "Kaydet & Yayınla"
   save_settings_cafe79a5: "Ayarları Kaydet"
   saving_d55dd90e: Kaydediliyor...
@@ -15865,11 +15884,13 @@ tr:
   search_by_title_or_author_273a8f49: "Başlık veya yazara göre ara"
   search_by_title_short_name_or_sis_id_fe84aa12: "Başlık, kısa ad ya da ÖBS ID'ye göre ara"
   search_by_user_dd3ad189: "Kullanıcıya göre ara"
+  search_courses_by_teacher_e9760a48: "Öğretmene göre ders ara..."
   search_entries_or_author_63fb0a86: "Girdi ya da yazar arayın"
   search_for_files_7541fb28: "Dosyaları ara"
   search_groups_or_people_6c15d6ad: "Grupları veya İnsanları Ara"
   search_people_44f36cd2: "Kişi ara ..."
   search_people_4782671a: "Kişi Ara"
+  search_permissions_915bbd09: "İzinlerde Ara"
   search_title_body_or_author_1d26711f: "Başlık, metin veya yazar ara"
   searching_b0207e7f: Aranıyor
   second_reviewer_90046c68: "2. Gözden geçiren"
@@ -16065,6 +16086,10 @@ tr:
         recaptcha_private_key: "ReCAPTCHA Özel Anahtarı"
         recaptcha_public_key: "ReCAPTCHA Genel Anahtarı"
   settings_5aa0fd0c: Ayarlar
+  settings_for_assignment_name_c19565e1: " %{name} Ödevi Ayarları"
+  settings_for_name_7731a33d: " %{name} Ayarları"
+  settings_for_tab_label_3bff4468: " %{tab_label} Ayarları"
+  settings_for_title_d3ca495: " %{title} Ayarları"
   setup_checklist_eb8b00b8: "Ayarlama Kontrol Listesi"
   shared: 
     account_notification: 
@@ -16747,7 +16772,7 @@ tr:
   show_by_type_c5d61732: "Türe Göre Göster"
   show_concluded_enrollments_6a05544c: "Kaydı Sonlandırılmışları Göster"
   show_correct_answers_at_30c37e01: "Doğru Cevapları Şu zamanda Göster"
-  show_courses_from_8a087f63: "Hangi Dönem Dersleri Gösterilsin"
+  show_courses_from_8a087f63: "Dönem Derslerini Göster"
   show_deleted_replies_a2e0a36f: "Silinmiş yanıtları göster"
   show_inactive_enrollments_8f4c4824: "Etkin Olmayan Ders Kayıtlarını Göster"
   show_lti_2_configuration_ui_94ce35a9: "LTI 2 Yapılandırma UI sini Göster"
@@ -16772,7 +16797,8 @@ tr:
     instructure_csv: "Instructure CSV veya CSV uzantılarının bulunduğu zip dosya formatında olmalıdır"
     upload_filename: "sis_upload_%{id}.zip"
   sis_export_title: "ÖBS Aktarımı"
-  sis_id_4495a887: "SIS ID"
+  sis_id_4495a887: "ÖBS ID"
+  sis_id_70eda157: "ÖBS ID:"
   sis_id_8c2029e1: "sis id"
   sis_import: 
     buttons: 
@@ -16786,6 +16812,7 @@ tr:
       imported_items: "İçe Aktarılmış Öğeler"
     import_counts: 
       accounts: "Hesaplar : %{account_count}"
+      admins: " %{admin_count}Yöneticiler"
       courses: "Dersler: %{course_count}"
       crosslists: "Çarpraz liste: %{crosslist_count}"
       enrollments: "Kayıtlı Kullanıcılar : %{enrollment_count}"
@@ -16962,6 +16989,8 @@ tr:
     inexact_answer: "%{lower_bound} ile %{upper_bound}"
     no_answer: "Cevap Yok"
   statistics_4573b730: İstatistikler
+  statistics_for_name_f4b7b0fc: " %{name} İstatistikleri"
+  statistics_view_b19458: "İstatistikler - göster"
   stats_9272cef3: İstatistikler
   status_e7fdbe06: Durum
   statuses_497dfa15: Durumlar
@@ -18200,12 +18229,14 @@ tr:
           Ders oluşturup ya da derslere kayıt oldukça, tüm sınıflarınızdan
           karşılıklı mesajlar göreceksiniz.
       unpublished_courses_message: |-
-          Henüz başlamamış bir veya daha fazla derse kaydoldunuz. Bu dersler
-          başladığında onlarla ilgili bilgiyi burada ve üst gezinme bölümünde
-          göreceksiniz. Bu arada, daha fazla derse kayıt yaptırabilir ya da
-          profilinizi ayarlayabilirsiniz.
+          Henüz başlamamış 1 veya daha fazla derse kayıtlısınız. Dersleriniz
+          aktif olur olmaz bilgilerini burada ve soldaki gezinme menüsünde göreceksiniz
+          Bu arada daha fazla derse kayıt olabilir
+          yada profil bilgilerinizi güncelleyebilirsiniz
       welcome_to_happiness: "Canvas'a Hoşgeldiniz"
   users_d1b60cb0: Kullanıcılar
+  users_view_list_861c7a3f: "Kullanıcılar - listeyi göster"
+  users_view_login_ids_a2e6a85: "Kullanıcılar - Giriş ID'lerini göster"
   validate: 
     is_required: "Bu alan zorunludur"
   validate_links_in_content_b1630fba: "İçerikteki Bağlantıları Doğrula"
