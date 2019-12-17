@@ -217,6 +217,7 @@ pipeline {
         }
 
         stage('Linters') {
+          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' } }
           steps {
             skipIfPreviouslySuccessful("linters") {
               build(
@@ -341,8 +342,14 @@ pipeline {
         }
       }
     }
+    success {
+      script {
+        def successes = load 'build/new-jenkins/groovy/successes.groovy'
+        successes.markBuildAsSuccessful()
+      }
+    }
     cleanup {
-        sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }
 }

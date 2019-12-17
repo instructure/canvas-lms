@@ -41,8 +41,6 @@ if ! git diff --exit-code schema.graphql; then
   gergich comment "{\"path\":\"schema.graphql\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
 fi
 
-gergich comment '{"path":"/COMMIT_MSG","position":0,"severity":"info","message":"from-new-jenkins"}'
-
 gergich status
 if [[ "$GERGICH_PUBLISH" == "1" ]]; then
   gergich publish
