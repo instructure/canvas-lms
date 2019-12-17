@@ -20,11 +20,15 @@ require_relative '../common'
 module CopyToTrayPage
 
   # ------------------------------ Selectors -----------------------------
+  
+  def copy_to_dialog_css_selector
+    "[role='dialog'][aria-label='Copy To...']"
+  end
 
-  # ------------------------------ Elements ------------------------------
+   # ------------------------------ Elements ------------------------------
 
   def copy_to_dialog
-    f("[role='dialog']")
+    f(copy_to_dialog_css_selector)
   end
 
   def course_search_dropdown

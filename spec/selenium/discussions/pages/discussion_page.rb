@@ -20,7 +20,14 @@ class Discussion
   class << self
     include SeleniumDependencies
 
-    # ---------------------- Controls ----------------------
+    # ---------------------- Selectors ---------------------
+
+    # ---------------------- Elements ----------------------
+    
+    def discussion_page_body
+      f('body')
+    end
+    
     def create_reply_button
       f('.discussion-reply-box')
     end
@@ -41,7 +48,19 @@ class Discussion
       fj('div:contains("Insert/edit media")')
     end
 
-    # ---------------------- Page ----------------------
+    def manage_discussion_button
+      fj("[role='button']:contains('Manage Discussion')")
+    end
+
+    def send_to_menuitem
+      fj("li:contains('Send To...')")
+    end
+
+    def copy_to_menuitem
+      fj("li:contains('Copy To...')")
+    end
+
+    # ---------------------- Actions ----------------------
     def visit(course, discussion)
       get("/courses/#{course.id}/discussion_topics/#{discussion.id}")
       wait_for_ajaximations

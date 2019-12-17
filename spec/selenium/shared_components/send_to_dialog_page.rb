@@ -18,11 +18,16 @@
 require_relative '../common'
 
 module SendToDialogPage
-  # ------------------------------ Selectors -----------------------------
+   # ------------------------------ Selectors -----------------------------
+
+  def send_to_dialog_css_selector
+    "[role='dialog'][aria-label='Send To...']"
+  end
 
   # ------------------------------ Elements ------------------------------
+  
   def send_to_dialog
-    f("[role='dialog']")
+    f(send_to_dialog_css_selector)
   end
 
   def user_search
