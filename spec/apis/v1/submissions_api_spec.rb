@@ -4150,28 +4150,9 @@ describe 'Submissions API', type: :request do
         expect(f.submission_context_code).to eq @course.asset_string
       end
 
-      context 'for url upload using DelayedJob' do
-        let(:json_response) do
-          preflight(url: 'http://example.com/test', filename: 'test.txt')
-          JSON.parse(response.body)
-        end
-
-        before { allow(InstFS).to receive(:enabled?).and_return(false) }
-
-        it "returns progress json" do
-          progress_json = {
-            "context_id" => @assignment.id,
-            "context_type" =>"Assignment",
-            "user_id" => @student1.id,
-            "tag" => "upload_via_url"
-          }
-          expect(json_response['progress']).to include progress_json
-        end
-      end
-
       context 'for url upload using InstFS' do
         let(:json_response) do
-          preflight(url: 'http://example.com/test')
+          preflight(url: 'http://example.com/test', comment: 'my comment')
           JSON.parse(response.body)
         end
 
@@ -4184,6 +4165,7 @@ describe 'Submissions API', type: :request do
           it 'encodes capture_params in the token' do
             capture_params = {
               "eula_agreement_timestamp" => nil,
+              "comment" => "my comment",
               "context_type" => "User",
               "context_id" => @student1.id.to_s,
               "user_id" => @student1.id.to_s,
@@ -4221,7 +4203,7 @@ describe 'Submissions API', type: :request do
 
       context 'for url upload using DelayedJob' do
         let(:json_response) do
-          preflight(url: 'http://example.com/test', filename: 'test.txt')
+          preflight(url: 'http://example.com/test', filename: 'test.txt', comment: 'hello comment')
           JSON.parse(response.body)
         end
 
@@ -4241,6 +4223,7 @@ describe 'Submissions API', type: :request do
           json_response
           job = Delayed::Job.order(:id).last
           expect(job.handler).to include Services::SubmitHomeworkService::SubmitWorker.name
+          expect(job.handler).to include 'hello comment'
         end
 
         it 'should enqueue the copy job when the submit_assignment parameter is false' do

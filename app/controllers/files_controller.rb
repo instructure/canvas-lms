@@ -914,7 +914,7 @@ class FilesController < ApplicationController
         homework_service = Services::SubmitHomeworkService.new(@attachment, progress)
 
         begin
-          homework_service.submit(params[:eula_agreement_timestamp])
+          homework_service.submit(params[:eula_agreement_timestamp], params[:comment])
           homework_service.success!
         rescue => error
           error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]

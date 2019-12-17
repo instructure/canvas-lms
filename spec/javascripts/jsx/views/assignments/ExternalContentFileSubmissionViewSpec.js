@@ -77,3 +77,10 @@ test('sends the eula agreement timestamp to the submission endpoint', () => {
   equal(spy.args[0][1].eula_agreement_timestamp, model.get('eula_agreement_timestamp'))
   ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
 })
+
+test('sends the comment to the submission endpoint', () => {
+  const spy = sandbox.spy(axios, 'post')
+  view.uploadFileFromUrl({}, model)
+  equal(spy.args[0][1].comment, model.get('comment'))
+  ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
+})

@@ -1352,10 +1352,12 @@ describe FilesController do
           let(:progress_params) do
             assignment_params.merge(
               progress_id: progress.id,
+              comment: comment,
               eula_agreement_timestamp: eula_agreement_timestamp
             )
           end
           let(:eula_agreement_timestamp) { '1522419910' }
+          let(:comment) { 'my assignment comment' }
           let(:request) { post "api_capture", params: progress_params }
 
           before do
@@ -1363,12 +1365,12 @@ describe FilesController do
           end
 
           it 'should submit the attachment if the submit_assignment flag is not provided' do
-            expect(homework_service).to receive(:submit).with(eula_agreement_timestamp)
+            expect(homework_service).to receive(:submit).with(eula_agreement_timestamp, comment)
             request
           end
 
           it 'should submit the attachment if the submit_assignment param is set to true' do
-            expect(homework_service).to receive(:submit).with(eula_agreement_timestamp)
+            expect(homework_service).to receive(:submit).with(eula_agreement_timestamp, comment)
             post "api_capture", params: progress_params.merge(submit_assignment: true)
           end
 
@@ -1381,6 +1383,12 @@ describe FilesController do
             request
             submission = Submission.where(assignment_id: assignment.id)
             expect(submission.first.turnitin_data[:eula_agreement_timestamp]).to eq(eula_agreement_timestamp)
+          end
+
+          it 'should save the comment' do
+            request
+            submission = Submission.where(assignment_id: assignment.id)
+            expect(submission.first.submission_comments.first.comment).to eq(comment)
           end
 
           it "returns a 201 http status" do
