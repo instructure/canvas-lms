@@ -23,6 +23,10 @@ class AssignmentPage
       get "/courses/#{course}/assignments/#{assignment}"
     end
 
+    def assignment_page_body
+      f('body')
+    end
+
     def submission_detail_link
       fj("a:contains('Submission Details')")
     end
@@ -54,6 +58,18 @@ class AssignmentPage
 
     def speedgrader_link
       f('a.icon-speed-grader')
+    end
+
+    def manage_assignment_button
+      fj("a[role=button]:contains('Manage')")
+    end
+
+    def send_to_menuitem
+      fj("li:contains('Send To...')")
+    end
+
+    def copy_to_menuitem
+      fj("li:contains('Copy To...')")
     end
   end
 end

@@ -15,6 +15,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative '../common'
 require_relative 'page_objects/assignments_index_page'
+require_relative 'page_objects/assignment_page'
 require_relative '../shared_components/copy_to_tray_page'
 require_relative '../shared_components/send_to_dialog_page'
 require_relative '../admin/pages/account_content_share_page'
@@ -86,17 +87,32 @@ describe 'assignments' do
 
     before(:each) do
       user_session(@teacher1)
-      visit_assignments_index_page(@course1.id)
     end
+
+    it 'allows user to send assignment from individual assignment page' do
+      AssignmentPage.visit(@course1.id, @assignment1.id)
+      AssignmentPage.manage_assignment_button.click
+      AssignmentPage.send_to_menuitem.click
+
+      expect(AssignmentPage.assignment_page_body).to contain_css(send_to_dialog_css_selector)
+    end
+
+    it 'allows user to copy assignment from individual assignment page' do
+      AssignmentPage.visit(@course1.id, @assignment1.id)
+      AssignmentPage.manage_assignment_button.click
+      AssignmentPage.copy_to_menuitem.click
+
+      expect(AssignmentPage.assignment_page_body).to contain_css(copy_to_dialog_css_selector)
+    end   
 
     context 'copy to' do
       before(:each) do
+        visit_assignments_index_page(@course1.id)
         manage_assignment_menu(@assignment1.id).click
         copy_assignment_menu_link(@assignment1.id).click
       end
 
       it 'copy tray lists user managed courses' do
-        skip('LA-374')
         course_search_dropdown.click
         wait_for_animations
         expect(course_dropdown_list.text).to include 'First Course1'
@@ -104,7 +120,6 @@ describe 'assignments' do
       end
 
       it 'copy tray lists course modules' do
-        skip('LA-374')
         select_course
         module_search_dropdown.click
         wait_for_animations
@@ -113,7 +128,6 @@ describe 'assignments' do
       end
 
       it 'copy tray allows placement' do
-        skip('LA-374')
         select_course_and_module_in_tray
         placement_dropdown.click
 
@@ -125,6 +139,7 @@ describe 'assignments' do
       end
 
       it 'copied assignment is present in destination course' do
+        skip "LA-374"
         copy_assignment_to_course2
         visit_assignments_index_page(@course2.id)
 
@@ -134,6 +149,7 @@ describe 'assignments' do
 
     context 'send to' do
       before(:each) do
+        visit_assignments_index_page(@course1.id)
         manage_assignment_menu(@assignment1.id).click
         send_assignment_menu_link(@assignment1.id).click
         send_item
@@ -143,7 +159,6 @@ describe 'assignments' do
       end
 
       it 'can send an item to another instructor' do
-        skip('LA-374')
         expect(received_table_rows[1].text).to include @assignment1.name
       end
     end
