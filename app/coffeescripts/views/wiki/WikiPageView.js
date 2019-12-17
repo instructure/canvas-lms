@@ -109,6 +109,21 @@ export default class WikiPageView extends Backbone.View {
     this.publishButtonView.$el.appendTo(this.$publishButton)
     this.publishButtonView.render()
 
+    // Attach the immersive reader button if enabled
+    const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+    if (immersive_reader_mount_point) {
+      import('jsx/shared/components/ImmersiveReader')
+        .then(ImmersiveReader => {
+          ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {
+            title: document.querySelector('.page-title').textContent,
+            content: document.querySelector('.show-content').innerHTML
+          })
+        })
+        .catch(e => {
+          console.log('Error loading immersive readers.', e)
+        })
+    }
+
     // attach/re-attach the sequence footer (if this is a course, but not the home page)
     if (!this.$sequenceFooter && !this.course_home && !!this.course_id) {
       if (!this.$sequenceFooter) this.$sequenceFooter = $('<div></div>').hide()
