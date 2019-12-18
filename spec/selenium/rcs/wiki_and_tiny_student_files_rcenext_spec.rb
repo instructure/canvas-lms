@@ -126,7 +126,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       expect(tray_container).to include_text("foo.txt")
     end
 
-    it "should show 1 document when clicking my documents dropdown" do
+    it "should show 1 document when clicking user documents dropdown" do
       visit_front_page_edit(@course)
       click_document_toolbar_button
       click_user_documents

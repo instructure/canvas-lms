@@ -172,7 +172,7 @@ module RCENextPage
   end
 
   def user_images
-    f('[role="menuitem"][title="My Images"]')
+    f('[role="menuitem"][title="User Images"]')
   end
 
   def upload_image_button
@@ -204,7 +204,7 @@ module RCENextPage
   end
 
   def user_media
-    f('[role="menuitem"][title="My Media"]')
+    f('[role="menuitem"][title="User Media"]')
   end
 
   def upload_document_button
@@ -216,7 +216,7 @@ module RCENextPage
   end
 
   def user_documents
-    f('[role="menuitem"][title="My Documents"]')
+    f('[role="menuitem"][title="User Documents"]')
   end
 
   def upload_document_modal

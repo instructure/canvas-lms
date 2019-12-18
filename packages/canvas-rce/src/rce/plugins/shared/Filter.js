@@ -49,7 +49,7 @@ export function useFilterSettings() {
 function fileLabelFromContext(contextType) {
   switch (contextType) {
     case 'user':
-      return formatMessage('My Files')
+      return formatMessage('User Files')
     case 'course':
       return formatMessage('Course Files')
     case 'group':

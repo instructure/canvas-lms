@@ -48,7 +48,7 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
           },
           {
             type: 'menuitem',
-            text: formatMessage('My Images'),
+            text: formatMessage('User Images'),
             onAction() {
               editor.focus(true)
               bridge.showTrayForPlugin(USER_PLUGIN_KEY)
