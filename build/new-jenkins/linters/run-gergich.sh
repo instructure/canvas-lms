@@ -9,6 +9,7 @@ inputs+=("--env GERGICH_KEY=$GERGICH_KEY")
 inputs+=("--env GERRIT_HOST=$GERRIT_HOST")
 inputs+=("--env GERRIT_PROJECT=$GERRIT_PROJECT")
 inputs+=("--env GERRIT_BRANCH=$GERRIT_BRANCH")
+inputs+=("--env GERRIT_EVENT_ACCOUNT_EMAIL=$GERRIT_EVENT_ACCOUNT_EMAIL")
 
 # the GERRIT_REFSPEC is required for the commit message to actually
 # send things to gergich
