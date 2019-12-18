@@ -27,26 +27,34 @@ describe "gradebook" do
   before(:each) { user_session(@teacher) }
 
   it "should handle multiple enrollments correctly" do
-    @course.enroll_student(@student_1, section: @other_section, allow_multiple_enrollments: true)
+    @course.enroll_student(@student_2, section: @course.default_section, allow_multiple_enrollments: true)
 
     get "/courses/#{@course.id}/gradebook"
+    # must start on All Sections
+    fj('.section-select-button:visible').click
+    fj('.section-select-menu:visible') # wait for options to be visible
+    f("label[for='section_option_']").click
 
-    meta_cells = find_slick_cells(0, f('.grid-canvas'))
+    meta_cells = find_slick_cells(1, f('.grid-canvas'))
     expect(meta_cells[0]).to include_text @course.default_section.display_name
     expect(meta_cells[0]).to include_text @other_section.display_name
 
     switch_to_section(@course.default_section)
-    meta_cells = find_slick_cells(0, f('.grid-canvas'))
-    expect(meta_cells[0]).to include_text @student_name_1
+    meta_cells = find_slick_cells(1, f('.grid-canvas'))
+    expect(meta_cells[0]).to include_text @student_name_2
 
     switch_to_section(@other_section)
     meta_cells = find_slick_cells(0, f('.grid-canvas'))
-    expect(meta_cells[0]).to include_text @student_name_1
+    expect(meta_cells[0]).to include_text @student_name_2
   end
 
   it "should allow showing only a certain section", priority: "1", test_id: 210024 do
     get "/courses/#{@course.id}/gradebook"
-    # grade the first assignment
+    # must start on All Sections
+    fj('.section-select-button:visible').click
+    fj('.section-select-menu:visible') # wait for options to be visible
+    f("label[for='section_option_']").click
+
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .b2', 0)
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .b2', 1)
 

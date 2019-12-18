@@ -50,13 +50,13 @@ describe 'quizzes with draft state' do
       expect(f('.ig-details .date-available')).to include_text 'Multiple Dates'
 
       # verify tooltips
-      driver.mouse.move_to f('.ig-details .date-available a')
+      driver.action.move_to(f('.ig-details .date-available a')).perform
       wait_for_ajaximations
       tooltip = fj('.ui-tooltip:visible')
       expect(tooltip).to include_text 'New Section'
       expect(tooltip).to include_text 'Everyone else'
 
-      driver.mouse.move_to f('.ig-details .date-due a')
+      driver.action.move_to(f('.ig-details .date-due a')).perform
       wait_for_ajaximations
       tooltip = fj('.ui-tooltip:visible')
       expect(tooltip).to include_text 'New Section'

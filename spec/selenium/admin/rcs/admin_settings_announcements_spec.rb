@@ -46,7 +46,7 @@ describe "settings tabs" do
       expect(notification.start_at.day).to eq 1
       expect(notification.end_at.day).to eq 15
       expect(f("#tab-announcements .announcement-details")).to include_text(displayed_username)
-      dismiss_flash_messages
+      dismiss_flash_messages_if_present
 
       # close the "user account" Tray that opened so we could read the displayed username
       f('body').click

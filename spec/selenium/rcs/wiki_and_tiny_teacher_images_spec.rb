@@ -88,6 +88,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should show images uploaded on the files tab in the image list" do
+      skip('investigate in CCI-182')
       wiki_page_tools_file_tree_setup(true, true)
       click_files_tab
       wait_for_ajaximations

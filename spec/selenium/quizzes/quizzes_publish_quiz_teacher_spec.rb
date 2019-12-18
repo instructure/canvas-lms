@@ -46,12 +46,12 @@ describe 'publishing a quiz' do
         end
 
         it 'changes the button\'s text to \'Published\'', priority: "1", test_id: 140649 do
-          driver.mouse.move_to f('#header')
+          driver.action.move_to(f('#header')).perform
           expect(f('#quiz-publish-link')).to include_text 'Published'
         end
 
         it 'changes the button text on hover to |Unpublish|', priority: "1", test_id: 398936 do
-          driver.mouse.move_to f('#quiz-publish-link')
+          driver.action.move_to(f('#quiz-publish-link')).perform
           expect(f('#quiz-publish-link')).to include_text 'Unpublish'
         end
 

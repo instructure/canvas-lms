@@ -123,7 +123,7 @@ describe 'taking a quiz' do
           begin
             fln('Quizzes').click
             driver.switch_to.alert.accept
-          rescue Selenium::WebDriver::Error::NoAlertOpenError
+          rescue Selenium::WebDriver::Error::NoSuchAlertError
             # Do nothing
           end
         end
@@ -134,14 +134,16 @@ describe 'taking a quiz' do
 
         it 'prompts for access code upon resuming the quiz', priority: "1", test_id: 421218 do
           skip_if_safari(:alert)
+          skip('investigate in CCI-182')
           start_and_exit_quiz do
-            expect_new_page_load { fj('a.ig-title', '#assignment-quizzes').click }
+            expect_new_page_load { f('a.ig-title', '#assignment-quizzes').click }
             expect_new_page_load { fln('Resume Quiz').click }
             verify_access_code_prompt
           end
         end
 
         it 'prompts for an access code upon resuming the quiz via the browser back button', priority: "1", test_id: 421222 do
+          skip('investigate in CCI-182')
           skip_if_safari(:alert)
           start_and_exit_quiz do
             expect_new_page_load { driver.navigate.back }

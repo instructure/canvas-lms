@@ -1015,7 +1015,7 @@ describe "context modules" do
 
       get "/courses/#{@course.id}/modules"
       expect(f(selector)).to include_text "Multiple Due Dates"
-      driver.mouse.move_to f("#{selector} a")
+      driver.action.move_to(f("#{selector} a")).perform
       wait_for_ajaximations
 
       tooltip = fj('.vdd_tooltip_content:visible')
@@ -1159,7 +1159,7 @@ describe "context modules" do
         wait_for_ajax_requests
         expect(tag.reload).to be_published
         refresh_page
-        driver.mouse.move_to f('i.icon-unpublish')
+        driver.action.move_to(f('i.icon-unpublish')).perform
         expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
         expect(tag).to be_published
       end

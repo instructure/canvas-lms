@@ -34,6 +34,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should add a file to the page and validate a student can see it" do
+      skip('investigate in CCI-182')
       create_session(@teacher.pseudonym)
 
       add_file_to_rce

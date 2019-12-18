@@ -71,6 +71,7 @@ describe "discussion assignments" do
       f('.announcement_cog').click
       fln('Delete').click
       driver.switch_to.alert.accept
+      wait_for_ajaximations
       assert_flash_notice_message("#{discussion_title} deleted successfully")
     end
   end
