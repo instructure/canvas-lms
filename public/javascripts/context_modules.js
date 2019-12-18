@@ -2550,15 +2550,9 @@ $(document).ready(function() {
     const moduleData = []
     if (launchType == 'module_index_menu') {
       // include all modules
-      $('#context_modules .context_module').each(function() {
-        moduleData.push({
-          id: $(this)
-            .attr('id')
-            .substring('context_module_'.length),
-          name: $(this)
-            .find('.name')
-            .attr('title')
-        })
+      moduleData.push({
+        course_id: ENV.COURSE_ID,
+        type: 'module'
       })
     } else if (launchType == 'module_group_menu') {
       // just include the one module whose menu we're on

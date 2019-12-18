@@ -62,8 +62,8 @@ describe 'assignments index menu tool placement' do
     expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "true"
     expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "assignment"
     expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to eq ["assignment"]
-    group_data = [@agroup1, @agroup2].map{|ag| {"id" => ag.id.to_s, "name" => ag.name}}
-    expect(query_params["com_instructure_course_available_canvas_resources"].values).to match_array(group_data)
+    expect(query_params["com_instructure_course_available_canvas_resources"].values).to eq [
+      {"course_id" => @course.id.to_s, "type" => "assignment_group"}] # will replace with the groups on the variable expansion
   end
 
   it "should be able to launch the group menu tool via the tray", custom_timeout: 60 do

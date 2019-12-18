@@ -1358,6 +1358,17 @@ module Lti
                        -> {
                          val = @request.parameters['com_instructure_course_available_canvas_resources']
                          val = val.values if val.is_a?(Hash)
+                         if val&.count == 1 && (course_id = val.first["course_id"])
+                           # replace with the data here because it's too much to pass in via the launch url
+                           case val.first["type"]
+                           when "module"
+                             val = Course.find(course_id).modules_visible_to(@current_user).pluck(:id, :name).
+                               map{|id, name| {"id" => id, "name" => name} }
+                           when "assignment_group"
+                             val = Course.find(course_id).assignment_groups.active.pluck(:id, :name).
+                               map{|id, name| {"id" => id, "name" => name} }
+                           end
+                         end
                          val&.to_json
                        },
                        default_name: 'com_instructure_course_available_canvas_resources'
