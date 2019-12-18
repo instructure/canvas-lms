@@ -26,6 +26,7 @@ import IndexView from 'compiled/views/quizzes/IndexView'
 import QuizCollection from 'compiled/collections/QuizCollection'
 import QuizOverrideLoader from 'compiled/models/QuizOverrideLoader'
 import vddTooltip from 'compiled/util/vddTooltip'
+import {monitorLtiMessages} from 'lti/messages'
 
 const QuizzesIndexRouter = Backbone.Router.extend({
   routes: {
@@ -108,3 +109,4 @@ const router = new QuizzesIndexRouter()
 Backbone.history.start()
 
 vddTooltip()
+monitorLtiMessages()

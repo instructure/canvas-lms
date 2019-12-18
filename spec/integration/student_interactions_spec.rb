@@ -33,7 +33,6 @@ describe "student interactions links" do
                             :active_enrollment => true
     @e.save!
     @teacher = u
-    user_session(@user, @pseudonym)
 
     user_model
     @student = @user
@@ -42,36 +41,70 @@ describe "student interactions links" do
     user_model
     @student2 = @user
     @course.enroll_student(@student2).accept
-  end
 
-  it "should show the student link on the student's page" do
-    get "/courses/#{@course.id}/users/#{@student.id}"
-    expect(response).to be_successful
-    expect(response.body).to match(/Interactions Report/)
-    expect(response.body).not_to match(/Student Interactions Report/)
-  end
-
-  it "should show the teacher link on the teacher's page" do
-    get "/courses/#{@course.id}/users/#{@teacher.id}"
-    expect(response).to be_successful
-    expect(response.body).to match(/Student Interactions Report/)
-  end
-
-  it "should show mail link for teachers" do
-    get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
-    expect(response).to be_successful
-    html = Nokogiri::HTML(response.body)
-    expect(html.css('.message_student_link')).not_to be_nil
-  end
-
-  it "should not show mail link for admins" do
     user_model
-    Account.site_admin.account_users.create!(user: @user)
-    user_session(@user)
-    get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
-    expect(response).to be_successful
-    html = Nokogiri::HTML(response.body)
-    expect(html.css('.message_student_link')).to be_empty
+    @ta = @user
+    @course.enroll_ta(@ta).accept
+
+  end
+
+  context "as a user without permissions to view grades" do
+    before(:each) do
+      ['view_all_grades', 'manage_grades'].each do |permission|
+        RoleOverride.create!(permission: permission, enabled: false, context: @course.account, role: ta_role)
+      end
+
+      user_session(@ta)
+    end
+
+    it "should not show the student link on the student's page" do
+      get "/courses/#{@course.id}/users/#{@student.id}"
+      expect(response).to be_successful
+      expect(response.body).not_to match(/Interactions Report/)
+      expect(response.body).not_to match(/Student Interactions Report/)
+    end
+
+    it "should not show the teacher link on the teacher's page" do
+      get "/courses/#{@course.id}/users/#{@teacher.id}"
+      expect(response).to be_successful
+      expect(response.body).not_to match(/Student Interactions Report/)
+    end
+  end
+
+  context "as a user with permissions to view grades" do
+    before(:each) do
+      user_session(@teacher)
+    end
+
+    it "should only show the student link on the student's page" do
+      get "/courses/#{@course.id}/users/#{@student.id}"
+      expect(response).to be_successful
+      expect(response.body).to match(/Interactions Report/)
+      expect(response.body).not_to match(/Student Interactions Report/)
+    end
+
+    it "should show the teacher link on the teacher's page" do
+      get "/courses/#{@course.id}/users/#{@teacher.id}"
+      expect(response).to be_successful
+      expect(response.body).to match(/Student Interactions Report/)
+    end
+
+    it "should show mail link for teachers" do
+      get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
+      expect(response).to be_successful
+      html = Nokogiri::HTML(response.body)
+      expect(html.css('.message_student_link')).not_to be_nil
+    end
+
+    it "should not show mail link for admins" do
+      user_model
+      Account.site_admin.account_users.create!(user: @user)
+      user_session(@user)
+      get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
+      expect(response).to be_successful
+      html = Nokogiri::HTML(response.body)
+      expect(html.css('.message_student_link')).to be_empty
+    end
   end
 end
 

@@ -62,7 +62,7 @@ function currentSubmissionGrade(assignment, submission) {
       <Text size="small">
         {submission.submittedAt ? (
           <Flex justifyItems="end">
-            <Flex.Item padding="0 xx-small 0 0">{I18n.t('Submitted')}</Flex.Item>
+            <Flex.Item padding="0 xx-small 0 0">{I18n.t('Submitted:')}</Flex.Item>
             <Flex.Item>
               <FriendlyDatetime
                 dateTime={submission.submittedAt}
@@ -122,6 +122,8 @@ function LoggedInContentTabs(props) {
     setSelectedTabIndex(index)
   }
 
+  const noRightLeftPadding = 'small none' // to make "submit" button edge line up with moduleSequenceFooter "next" button edge
+
   return (
     <div data-testid="assignment-2-student-content-tabs">
       {props.submission.state === 'graded' || props.submission.state === 'submitted'
@@ -136,6 +138,7 @@ function LoggedInContentTabs(props) {
       >
         <Tabs.Panel
           key="attempt-tab"
+          padding={noRightLeftPadding}
           renderTitle={I18n.t('Attempt %{attempt}', {attempt: getCurrentAttempt(props.submission)})}
           selected={selectedTabIndex === 0}
         >
@@ -147,6 +150,7 @@ function LoggedInContentTabs(props) {
         </Tabs.Panel>
         <Tabs.Panel
           key="comments-tab"
+          padding={noRightLeftPadding}
           selected={selectedTabIndex === 1}
           renderTitle={
             <span>
@@ -166,6 +170,7 @@ function LoggedInContentTabs(props) {
         {props.assignment.rubric && (
           <Tabs.Panel
             key="rubrics-tab"
+            padding={noRightLeftPadding}
             renderTitle={I18n.t('Rubric')}
             selected={selectedTabIndex === 2}
           >

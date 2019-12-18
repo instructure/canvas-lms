@@ -81,7 +81,7 @@ export default function ReceivedContentView() {
 
   function onRemove(share) {
     // eslint-disable-next-line no-alert
-    const shouldRemove = window.confirm(I18n.t('Are you sure you wan to remove this item?'))
+    const shouldRemove = window.confirm(I18n.t('Are you sure you want to remove this item?'))
     if (shouldRemove) {
       doFetchApi({path: `${sharesUrl}/${share.id}`, method: 'DELETE'})
         .then(() => removeShareFromList(share))
@@ -128,7 +128,7 @@ export default function ReceivedContentView() {
     }
   }
 
-  if (error) throw new Error(I18n.t('Retrieval of Received Shares failed'))
+  if (error) throw new Error('Retrieval of Received Shares failed')
 
   return (
     <>
@@ -151,6 +151,7 @@ export default function ReceivedContentView() {
         label={I18n.t('Import...')}
         open={whichModalOpen === 'import'}
         placement="end"
+        padding="0 1.5rem"
         onDismiss={closeModal}
       >
         <CourseImportPanel contentShare={currentContentShare} onClose={closeModal} />

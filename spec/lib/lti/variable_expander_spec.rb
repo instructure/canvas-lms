@@ -693,7 +693,7 @@ module Lti
       it 'has substitution for $com.instructure.Course.available_canvas_resources' do
         exp_hash = {test: '$com.instructure.Course.available_canvas_resources'}
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq [{"id"=>"1", "name"=>"item 1"}, {"id"=>"2", "name"=>"item 2"}]
+        expect(JSON.parse(exp_hash[:test])).to eq [{"id"=>"1", "name"=>"item 1"}, {"id"=>"2", "name"=>"item 2"}]
       end
 
       context 'context is a group' do

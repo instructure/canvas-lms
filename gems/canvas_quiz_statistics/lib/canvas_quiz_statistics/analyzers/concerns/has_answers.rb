@@ -75,6 +75,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
           end
         end
 
+        answer[:user_ids] << response[:user_id]
         answer[:user_names] << response[:user_name]
         answer[:responses] += 1
       end
@@ -114,6 +115,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
         text: text.to_s,
         correct: correct,
         responses: 0,
+        user_ids: [],
         user_names: []
       }
     end

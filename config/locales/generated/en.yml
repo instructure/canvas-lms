@@ -1771,7 +1771,6 @@ en:
   links:
     dashboard: My Dashboard
     errors:
-      4xx_feedback: Click here to tell us what you were looking for.
       feedback: Click here to tell us what happened
   application:
     notices:
@@ -8431,6 +8430,8 @@ en:
         error: 'Error:'
       404_message:
         title: Page Not Found
+        headings:
+          page: Page Not Found
       500_message:
         title: Page Error
         headings:
@@ -11120,7 +11121,7 @@ en:
   current_slack_api_key_9eba6a5: 'Current Slack Api Key:'
   new_slack_api_key_453d04d: New Slack Api Key
   personal_pronouns_7d271f52: Personal Pronouns
-  remove_pronouns_5ff760ff: Remove Pronouns
+  remove_pronouns_pronoun_c8b03d78: Remove Pronouns %{pronoun}
   add_pronouns_option_906ff625: Add pronouns option
   acceptable_use_policy_29a28124: Acceptable Use Policy
   license_type_6b74b543: License Type
@@ -11555,10 +11556,6 @@ en:
   move_to_dde1a5e1: Move to...
   remove_this_item_from_the_module_4b2ceab7: Remove this item from the module
   remove_f47dc62a: Remove
-  send_this_module_item_to_another_user_14d4fd60: Send this module item to another user...
-  send_to_b940900a: Send To...
-  copy_this_module_item_to_a_course_790a0cf4: Copy this module item to a course...
-  copy_to_64f8456b: Copy To...
   prerequisites_49659f16: 'Prerequisites:'
   open_title_in_a_new_window_b29fed77: Open %{title} in a new window
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: You are trying to launch insecure content from within a secure site (canvas). Some web browsers may prevent this content from loading.
@@ -14349,7 +14346,6 @@ en:
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} percent uploaded"
   filename_uploaded_successfully_edd8e825: "%{fileName} uploaded successfully!"
   usage_rights_have_been_set_d1b433c7: Usage rights have been set.
-  element_option_missing_error_an_element_to_attach__be433478: "`element` option missing error: An element to attach the TreeBrowserView to must be specified when setting the render option to 'true' for BBTreeBrowserView"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba:
     one: Are you sure you want to delete %{name}?
     other: Are you sure you want to delete these %{count} items?
@@ -15191,6 +15187,7 @@ en:
   select_group_to_grade_6df28d80: Select Group to Grade
   must_select_a_student_group_first_15c6a3cb: Must select a student group first
   no_content_5dbc9acf: No Content
+  available_2ed9f226: 'Available:'
   until_6437a827: " until"
   to_1126ab55: " to"
   available_until_3278ebe9: Available until
@@ -15213,8 +15210,6 @@ en:
   view_previous_submission_2b57bb85: View Previous Submission
   view_next_submission_d2a429d: View Next Submission
   create_new_attempt_19c96c03: Create New Attempt
-  warning_step_has_children_that_aren_t_stepitem_com_32a3f351: Warning Step has children that aren't StepItem components
-  warning_step_has_two_stepitems_with_a_status_of_in_77138e9e: 'Warning: Step has two StepItems with a status of in-progress'
   missing_1a256b3b: Missing
   late_2be42b88: Late
   more_modules_d9a9f003: More Modules
@@ -15291,6 +15286,7 @@ en:
   record_audio_video_d9993f6c: Record Audio/Video
   send_comment_4e05f2fb: Send Comment
   load_more_comments_dc00ac34: Load More Comments
+  submitted_d5ba370a: 'Submitted:'
   not_submitted_fff47f17: Not submitted
   you_cannot_leave_leave_comments_until_you_submit_t_d3dcb44c: You cannot leave leave comments until you submit the assignment
   attempt_attempt_d3911720: Attempt %{attempt}
@@ -15748,9 +15744,8 @@ en:
   there_was_a_problem_starting_import_operation_4c42c5e: There was a problem starting import operation
   content_share_preview_166f6562: Content Share Preview
   no_content_has_been_shared_with_you_667fde6c: No content has been shared with you.
-  are_you_sure_you_wan_to_remove_this_item_19f55b5f: Are you sure you wan to remove this item?
+  are_you_sure_you_want_to_remove_this_item_7887ce31: Are you sure you want to remove this item?
   there_was_an_error_removing_the_item_f8324776: There was an error removing the item
-  retrieval_of_received_shares_failed_6c5583e3: Retrieval of Received Shares failed
   received_content_53049822: Received Content
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: The list below is content that has been shared with you. You can preview the content, import it into your course, or remove it from the list.
   import_e929507b: Import...
@@ -16064,8 +16059,6 @@ en:
   you_currently_have_no_discussions_with_closed_comm_366a9dab: You currently have no discussions with closed comments
   to_close_comments_on_a_discussion_drag_a_discussio_85b27448: To close comments on a discussion, drag a discussion here, or select Close for Comments from the discussion settings menu.
   ordered_by_recent_activity_112d33d5: Ordered by Recent Activity
-  illegal_element_focus_request_b3cea847: Illegal element focus request
-  unknown_manage_discussion_action_encountered_92a8dfc0: Unknown manage discussion action encountered
   due_date_bf4eaf46: 'Due %{date} '
   last_post_at_date_bf77652f: Last post at %{date}
   not_available_until_date_3c1c73c2: Not available until %{date}
@@ -16098,7 +16091,9 @@ en:
   move_to_25d7ef11: Move To
   move_discussion_title_93ea7be1: Move discussion %{title}
   duplicate_discussion_title_6537ef4d: Duplicate discussion %{title}
+  send_to_b940900a: Send To...
   send_title_to_user_d952e233: Send %{title} to user
+  copy_to_64f8456b: Copy To...
   copy_title_to_course_2a41a2f4: Copy %{title} to course
   delete_discussion_title_a28df8b6: Delete discussion %{title}
   unread_c14cb06f: unread,
@@ -16121,6 +16116,7 @@ en:
   pinned_discussions_a55c0cea: Pinned Discussions
   closed_for_comments_e395b42f: Closed for Comments
   loading_discussions_8ed5fcd7: Loading Discussions
+  discussions_menu_f18eb4a2: Discussions Menu
   discussion_filter_5d68de61: Discussion Filter
   search_discussion_by_title_30466604: Search discussion by title
   search_by_title_or_author_273a8f49: Search by title or author...
@@ -16225,20 +16221,26 @@ en:
   assignment_view_1206a60b: Assignment View
   similarity_detection_dcada48: Similarity Detection
   assignment_menu_91fe3716: Assignment Menu
+  assignments_index_menu_4088a035: Assignments Index Menu
+  assignments_group_menu_c2522316: Assignments Group Menu
   collaboration_71c024f4: Collaboration
   course_assignments_menu_fa6aeb23: Course Assignments Menu
   course_home_sub_navigation_b1ee6b03: Course Home Sub Navigation
   course_navigation_dd035109: Course Navigation
   course_settings_sub_navigation_b95deae: Course Settings Sub Navigation
   discussion_topic_menu_3d4684c6: Discussion Topic Menu
+  discussions_index_menu_42591bc9: Discussions Index Menu
   editor_button_6647db9c: Editor Button
   file_menu_cc0ca54: File Menu
+  files_index_menu_c6961f14: Files Index Menu
   homework_submission_172e8354: Homework Submission
   link_selection_1486c5d0: Link Selection
   migration_selection_5f1c5f55: Migration Selection
   module_menu_3201af4e: Module Menu
   modules_index_menu_c8748e7c: Modules Index Menu
+  modules_group_menu_4aae0d5f: Modules Group Menu
   quiz_menu_4fcd5e61: Quiz Menu
+  quizzes_index_menu_1ce11b54: Quizzes Index Menu
   user_navigation_a097be0f: User Navigation
   page_menu_2f8bee0: Page Menu
   pages_index_menu_f391bf04: Pages Index Menu
@@ -16327,6 +16329,7 @@ en:
   edit_permissions_for_count_items_d65e3855:
     one: 'Edit permissions for: %{itemName}'
     other: Edit permissions for %{count} items
+  files_menu_86dddbc0: Files Menu
   add_folder_ba50d107: Add Folder
   count_items_selected_91814713:
     one: "%{count} item selected"
@@ -17897,6 +17900,7 @@ en:
   comment_failed_to_post_please_try_again_later_e2d19a0a: Comment failed to post! Please try again later.
   comment_submitted_d9934b: Comment submitted!
   immersive_reader_failed_to_load_bc8d4dd4: Immersive Reader Failed to Load
+  page_page_59070cd8: Page %{page}
   common_timezones_2b00baba: Common Timezones
   all_timezones_5e8afa7b: All Timezones
   unreadcount_unread_replies_509e167f: "%{unreadCount} unread replies"
@@ -17919,10 +17923,11 @@ en:
   content_share_started_successfully_2c37fb79: Content share started successfully
   error_starting_content_share_18fb1532: Error starting content share
   remove_name_624e06be: Remove %{name}
+  loading_additional_items_ed5f672d: Loading additional items...
   select_one_b647b384: Select one
   item_select_fe0f320a: Item Select
-  place_b128fa94: Place
   place_title_2c183274: Place "%{title}"
+  place_b128fa94: Place
   position_select_c2dd3980: Position Select
   yyyy_mm_dd_hh_mm_a01b6081: YYYY-MM-DD hh:mm
   other_1c6d9c79: Other
@@ -18388,6 +18393,7 @@ en:
   graders_cannot_view_each_other_s_names_b1fa7899: Graders cannot view each other's names
   anonymize_all_annotations_made_by_instructors_on_s_5540bc09: Anonymize all annotations made by instructors on submissions for this assignment in DocViewer
   i_agree_to_the_tool_s_end_user_license_agreement_1ba71197: I agree to the tool's *End-User License Agreement.*
+  select_a_group_category_295f7a34: Select a group category
   new_group_category_66be9cbd: New Group Category
   warning_for_improved_accessibility_of_reordering_a_5d0206c7: 'Warning: for improved accessibility of reordering assignments and groups, please use the Move To Dialog option found in the menu.'
   select_a_grading_period_aab25483: Select a Grading Period

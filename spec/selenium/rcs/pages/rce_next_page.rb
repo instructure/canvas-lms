@@ -112,6 +112,14 @@ module RCENextPage
     fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')")
   end
 
+  def course_document_links
+    ff("[data-testid='instructure_links-Link']")
+  end
+
+  def course_media_links
+    ff("[data-testid='instructure_links-Link']")
+  end
+
   def assignment_published_status
     # add selector
   end
@@ -191,12 +199,24 @@ module RCENextPage
     f('[role="dialog"][aria-label="Upload Media"')
   end
 
+  def course_media
+    f('[role="menuitem"][title="Course Media"]')
+  end
+
+  def user_media
+    f('[role="menuitem"][title="My Media"]')
+  end
+
   def upload_document_button
     f('[role="menuitem"][title="Upload Document"]')
   end
 
   def course_documents
     f('[role="menuitem"][title="Course Documents"]')
+  end
+
+  def user_documents
+    f('[role="menuitem"][title="My Documents"]')
   end
 
   def upload_document_modal
@@ -445,6 +465,16 @@ module RCENextPage
     wait_for_ajaximations
   end
 
+  def click_course_media
+    course_media.click
+    wait_for_ajaximations
+  end
+
+  def click_user_media
+    user_media.click
+    wait_for_ajaximations
+  end
+
   def click_upload_document
     upload_document_button.click
     wait_for_ajaximations
@@ -452,6 +482,11 @@ module RCENextPage
 
   def click_course_documents
     course_documents.click
+    wait_for_ajaximations
+  end
+
+  def click_user_documents
+    user_documents.click
     wait_for_ajaximations
   end
 

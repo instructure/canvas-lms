@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x -o errexit -o errtrace -o nounset -o pipefail
+
 ##
 # This script takes an en.json file for package translations, and sends it
 # through the translation process.  It will then push up any changes in translations

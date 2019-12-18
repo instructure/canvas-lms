@@ -59,7 +59,7 @@ it('does not render AvailabilityDates when sticky', async () => {
     }
   })
   const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky />)
-  expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(0)
+  expect(queryAllByText('Available: Jul 11, 2016 7:00pm')).toHaveLength(0)
 })
 
 it('renders AvailabilityDates when not sticky', async () => {
@@ -71,7 +71,7 @@ it('renders AvailabilityDates when not sticky', async () => {
   })
   const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky={false} />)
   // Reason why this is showing up twice is once for screenreader content and again for regular content
-  expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(2)
+  expect(queryAllByText('Available: Jul 11, 2016 7:00pm')).toHaveLength(2)
 })
 
 it('renders date correctly', async () => {

@@ -18,30 +18,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def setDockerUp () {
-  timeout(time: 60) {
-    echo 'Running containers'
-    sh 'docker ps'
-    sh 'printenv | sort'
-    sh 'build/new-jenkins/docker-compose-pull.sh'
-    sh 'build/new-jenkins/docker-compose-build-up.sh'
-  }
-}
-
-def cleanupDocker () {
-  withEnv(['COMPOSE_FILE=docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml']) {
-    // Make sure to clean up the karma containers and image
-    sh 'docker-compose rm -fs karma'
-    sh 'docker rmi frontend_karma'
-    // Clean up all the other stuff
-    sh 'build/new-jenkins/docker-cleanup.sh'
-  }
-}
-
 def isMerge () {
   return env.GERRIT_EVENT_TYPE == 'change-merged'
 }
-
 
 pipeline {
   agent { label 'canvas-docker' }
@@ -50,39 +29,43 @@ pipeline {
   }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml'
+    COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
+
     // 'refs/changes/63/181863/8' -> '63.181863.8'
     NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
   stages {
-    stage('Setup') {
+    // remove this after it runs for a little bit.
+    stage('temp-cleanup') {
       steps {
-        setDockerUp()
+        sh 'build/new-jenkins/docker-cleanup.sh'
       }
     }
     stage('Tests Setup') {
-      environment {
-        COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
-      }
       steps {
-        setDockerUp()
+        timeout(time: 60) {
+          echo 'Running containers'
+          sh 'docker ps'
+          sh 'printenv | sort'
+          sh 'build/new-jenkins/docker-compose-pull.sh'
+          sh 'build/new-jenkins/docker-compose-build-up.sh'
+        }
       }
     }
     stage('Tests') {
       environment {
-        COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
         COVERAGE = isMerge()
       }
       parallel {
         stage('Jest') {
           steps {
-            sh 'build/new-jenkins/frontend/tests-jest.sh'
+            sh 'build/new-jenkins/js/tests-jest.sh'
           }
         }
         stage('Packages') {
           steps {
-            sh 'build/new-jenkins/frontend/tests-packages.sh'
+            sh 'build/new-jenkins/js/tests-packages.sh'
           }
         }
         stage('Karma - Spec Group - coffee') {
@@ -90,7 +73,7 @@ pipeline {
             JSPEC_GROUP = 'coffee'
           }
           steps {
-            sh 'build/new-jenkins/frontend/tests-karma.sh'
+            sh 'build/new-jenkins/js/tests-karma.sh'
           }
         }
         stage('Karma - Spec Group - jsa - A-F') {
@@ -98,7 +81,7 @@ pipeline {
             JSPEC_GROUP = 'jsa'
           }
           steps {
-            sh 'build/new-jenkins/frontend/tests-karma.sh'
+            sh 'build/new-jenkins/js/tests-karma.sh'
           }
         }
         stage('Karma - Spec Group - jsg - G') {
@@ -106,7 +89,7 @@ pipeline {
             JSPEC_GROUP = 'jsg'
           }
           steps {
-            sh 'build/new-jenkins/frontend/tests-karma.sh'
+            sh 'build/new-jenkins/js/tests-karma.sh'
           }
         }
         stage('Karma - Spec Group - jsh - H-Z') {
@@ -114,7 +97,7 @@ pipeline {
             JSPEC_GROUP = 'jsh'
           }
           steps {
-            sh 'build/new-jenkins/frontend/tests-karma.sh'
+            sh 'build/new-jenkins/js/tests-karma.sh'
           }
         }
       }
@@ -122,7 +105,7 @@ pipeline {
   }
   post {
     cleanup {
-      cleanupDocker()
+      sh 'build/new-jenkins/docker-cleanup.sh'
     }
   }
 }

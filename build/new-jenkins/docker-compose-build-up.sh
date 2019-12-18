@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -x -o errexit -o errtrace -o nounset -o pipefail
 
 docker-compose build
 docker-compose up -d

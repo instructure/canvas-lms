@@ -17,9 +17,11 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import useManagedCourseSearchApi from 'jsx/shared/effects/useManagedCourseSearchApi'
-import useModuleCourseSearchApi from 'jsx/shared/effects/useModuleCourseSearchApi'
+import useModuleCourseSearchApi, {
+  useCourseModuleItemApi
+} from 'jsx/shared/effects/useModuleCourseSearchApi'
 import CourseAndModulePicker from '../CourseAndModulePicker'
 
 jest.mock('jsx/shared/effects/useManagedCourseSearchApi')
@@ -39,15 +41,73 @@ describe('CourseAndModulePicker', () => {
     if (ariaLive) ariaLive.remove()
   })
 
-  it('enables the module selector when a course is selected', () => {
+  it('shows course selector by default', () => {
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
-      success([{id: 'abc', name: 'abc'}, {id: 'cde', name: 'cde'}])
+      success([
+        {id: 'abc', name: 'abc'},
+        {id: 'cde', name: 'cde'}
+      ])
+    })
+    const setCourse = jest.fn()
+    const {getByText} = render(<CourseAndModulePicker setSelectedCourse={setCourse} />)
+    const selector = getByText(/select a course/i)
+    fireEvent.click(selector)
+    fireEvent.click(getByText('abc'))
+    expect(setCourse).toHaveBeenLastCalledWith({id: 'abc', name: 'abc'})
+  })
+
+  it('shows the course and module selector when a course is given', () => {
+    useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: 'abc', name: 'abc'},
+        {id: 'cde', name: 'cde'}
+      ])
     })
     useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
-      success([{id: '1', name: 'Module 1'}, {id: '2', name: 'Module 2'}])
+      success([
+        {id: '1', name: 'Module 1'},
+        {id: '2', name: 'Module 2'}
+      ])
     })
-    const {getByText} = render(<CourseAndModulePicker selectedCourseId="abc" />)
-    expect(getByText(/select a course/i)).toBeInTheDocument()
-    expect(getByText(/select a module/i)).toBeInTheDocument()
+    const setModule = jest.fn()
+    const {getByText} = render(
+      <CourseAndModulePicker selectedCourseId="abc" setSelectedModule={setModule} />
+    )
+    const selector = getByText(/select a module/i)
+    fireEvent.click(selector)
+    fireEvent.click(getByText('Module 1'))
+    expect(setModule).toHaveBeenLastCalledWith({id: '1', name: 'Module 1'})
+  })
+
+  it('shows the position selector when a module is given', () => {
+    useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: 'abc', name: 'abc'},
+        {id: 'cde', name: 'cde'}
+      ])
+    })
+    useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: '1', name: 'Module 1'},
+        {id: '2', name: 'Module 2'}
+      ])
+    })
+    useCourseModuleItemApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: 'a', title: 'Item 1', position: '5'},
+        {id: 'b', title: 'Item 2', position: '6'}
+      ])
+    })
+    const setPosition = jest.fn()
+    const {getByTestId} = render(
+      <CourseAndModulePicker
+        selectedCourseId="abc"
+        selectedModuleId="1"
+        setModuleItemPosition={setPosition}
+      />
+    )
+    const selector = getByTestId('select-position')
+    fireEvent.change(selector, {target: {value: 'top'}})
+    expect(setPosition).toHaveBeenLastCalledWith(1)
   })
 })

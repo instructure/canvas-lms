@@ -4,5 +4,5 @@ immersive_reader_wiki_pages:
   display_name: Microsoft Immersive Reader - Free Trial (Wiki Pages)
   description: |-
     Makes a Microsoft Immersive Reader link option show up on wiki pages.
-  applies_to: RootAccount
+  applies_to: Account
   root_opt_in: true

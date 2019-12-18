@@ -18,6 +18,7 @@
 
 import createDiscussionsIndex from 'jsx/discussions'
 import ready from '@instructure/ready'
+import {monitorLtiMessages} from 'lti/messages'
 
 ready(() => {
   const [contextType, contextId] = ENV.context_asset_string.split('_')
@@ -28,6 +29,7 @@ ready(() => {
     roles: ENV.current_user_roles,
     masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
     discussionTopicMenuTools: ENV.discussion_topic_menu_tools,
+    discussionTopicIndexMenuTools: ENV.discussion_topic_index_menu_tools,
     contextCodes: [ENV.context_asset_string],
     currentUserId: ENV.current_user.id,
     DIRECT_SHARE_ENABLED: ENV.DIRECT_SHARE_ENABLED,
@@ -37,3 +39,4 @@ ready(() => {
   })
   app.render()
 })
+monitorLtiMessages()

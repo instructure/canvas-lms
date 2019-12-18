@@ -90,7 +90,7 @@ describe('SelectPosition', () => {
         selectPosition={selectPosition}
       />
     )
-    fireEvent.change(getByTestId('select-position', {target: {value: 'After..'}}))
+    fireEvent.change(getByTestId('select-position'), {target: {value: 'after'}})
     expect(selectPosition).toHaveBeenCalled()
   })
 
@@ -107,7 +107,7 @@ describe('SelectPosition', () => {
         selectSibling={selectSibling}
       />
     )
-    fireEvent.change(getByTestId('select-sibling', {target: {value: 'Item 3'}}))
+    fireEvent.change(getByTestId('select-sibling'), {target: {value: 'Item 3'}})
     expect(selectSibling).toHaveBeenCalled()
   })
 })

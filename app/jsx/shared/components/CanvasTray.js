@@ -64,27 +64,35 @@ export default function CanvasTray({
 }) {
   return (
     <Tray label={label} onDismiss={onDismiss} {...otherTrayProps}>
-      <View as="div" padding={padding}>
-        <Flex padding="0 0 small 0">
-          <Flex.Item grow>
-            <Heading>{label}</Heading>
-          </Flex.Item>
-          <Flex.Item>
-            <CloseButton onClick={onDismiss}>{I18n.t('Close')}</CloseButton>
-          </Flex.Item>
-        </Flex>
-        <ErrorBoundary
-          errorComponent={
-            <GenericErrorPage
-              imageUrl={errorImageUrl}
-              errorSubject={errorSubject}
-              errorCategory={errorCategory}
-            />
-          }
-        >
-          {children}
-        </ErrorBoundary>
-      </View>
+      <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
+        <Flex.Item padding="small medium">
+          <Flex>
+            <Flex.Item grow shrink>
+              <Heading ellipsis level="h3" as="h2">
+                {label}
+              </Heading>
+            </Flex.Item>
+            <Flex.Item>
+              <CloseButton onClick={onDismiss} size="small">
+                {I18n.t('Close')}
+              </CloseButton>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+        <div style={{display: 'flex', flexDirection: 'column', flexGrow: 1, padding}}>
+          <ErrorBoundary
+            errorComponent={
+              <GenericErrorPage
+                imageUrl={errorImageUrl}
+                errorSubject={errorSubject}
+                errorCategory={errorCategory}
+              />
+            }
+          >
+            {children}
+          </ErrorBoundary>
+        </div>
+      </div>
     </Tray>
   )
 }

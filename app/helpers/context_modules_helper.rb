@@ -48,7 +48,8 @@ module ContextModulesHelper
   end
 
   def add_menu_tools_to_cache_key(cache_key)
-    tool_key = @menu_tools && @menu_tools.values.flatten.map(&:cache_key).join("/")
+    tool_key = @menu_tools ? @menu_tools.values.flatten.map(&:cache_key).join("/") : ""
+    tool_key += @module_group_tools.to_s if @module_group_tools.present?
     cache_key += Digest::MD5.hexdigest(tool_key) if tool_key.present?
     # should leave it alone if there are no tools
     cache_key

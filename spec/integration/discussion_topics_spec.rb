@@ -41,6 +41,19 @@ describe "discussion_topics" do
     expect(response).to be_successful
   end
 
+  it "should show a course name for group subtopics" do
+    course_with_student_logged_in(:active_all => true)
+    @course.update_attribute(:short_name, "some name")
+    group_assignment_discussion(course: @course)
+    @group.users << @user
+
+    get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
+    expect(response).to be_successful
+    doc = Nokogiri::HTML.parse(response.body)
+    link_text = doc.at_css("span.discussion-subtitle a").text
+    expect(link_text).to eq @course.short_name
+  end
+
   it "should not allow concluded students to update topic" do
     student_enrollment = course_with_student(:course => @course, :active_all => true)
     @topic = DiscussionTopic.new(:context => @course, :title => "will this work?", :user => @user)

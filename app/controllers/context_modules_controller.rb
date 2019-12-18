@@ -75,7 +75,9 @@ class ContextModulesController < ApplicationController
                                         :root_account => @domain_root_account, :current_user => @current_user).to_a
       placements.select { |p| @menu_tools[p] = tools.select{|t| t.has_placement? p} }
 
-      @module_index_tools = @domain_root_account&.feature_enabled?(:commons_favorites) ? external_tools_display_hashes(:module_index_menu) : []
+      favorites_enabled = @domain_root_account&.feature_enabled?(:commons_favorites)
+      @module_index_tools = favorites_enabled ? external_tools_display_hashes(:module_index_menu) : []
+      @module_group_tools = favorites_enabled ? external_tools_display_hashes(:module_group_menu) : []
 
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       js_env :course_id => @context.id,
@@ -87,7 +89,7 @@ class ContextModulesController < ApplicationController
            usage_rights_required: @context.usage_rights_required?,
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
         },
-        :MODULE_INDEX_TOOLS => @module_index_tools
+        :MODULE_TRAY_TOOLS => {:module_index_menu => @module_index_tools, :module_group_menu => @module_group_tools}
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)

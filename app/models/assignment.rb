@@ -894,13 +894,11 @@ class Assignment < ActiveRecord::Base
   protected :default_values
 
   def ensure_assignment_group(do_save = true)
+    return if assignment_group_id
     self.context.require_assignment_group
-    assignment_groups = self.context.assignment_groups.active
-    if !assignment_groups.map(&:id).include?(self.assignment_group_id)
-      self.assignment_group = assignment_groups.first
-      Shackles.activate(:master) do
-        save! if do_save
-      end
+    self.assignment_group = self.context.assignment_groups.active.first
+    if do_save
+      Shackles.activate(:master) { save! }
     end
   end
 

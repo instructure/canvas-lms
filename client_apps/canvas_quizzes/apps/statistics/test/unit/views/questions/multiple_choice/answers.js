@@ -19,7 +19,7 @@
 define(function(require) {
   var Subject = require('jsx!views/questions/multiple_choice/answers');
   var answerSetFixture = [
-      { id: 'a1', text: 'red', responses: 4, correct: true, ratio: 100, user_names: ['One', 'Two', 'Three', 'Four']},
+      { id: 'a1', text: 'red', responses: 4, correct: true, ratio: 100, user_ids: [1, 2, 3, 4], user_names: ['One', 'Two', 'Three', 'Four']},
       { id: 'a2', text: 'green', responses: 0, ratio: 0 },
       { id: 'a3', text: 'blue', responess: 0, ratio: 0 }];
 

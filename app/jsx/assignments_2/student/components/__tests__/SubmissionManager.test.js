@@ -22,6 +22,7 @@ import {fireEvent, render} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
+import StudentViewContext from '../Context'
 import SubmissionManager from '../SubmissionManager'
 import {SubmissionMocks} from '../../graphqlData/Submission'
 
@@ -69,6 +70,35 @@ describe('SubmissionManager', () => {
           body: 'some text here'
         }
       }
+    })
+    const {queryByText} = render(
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByText('Submit')).not.toBeInTheDocument()
+  })
+
+  it('does not render the submit button if we are not on the latest submission', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+    })
+    const {queryByText} = render(
+      <StudentViewContext.Provider value={{nextButtonEnabled: true}}>
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      </StudentViewContext.Provider>
+    )
+
+    expect(queryByText('Submit')).not.toBeInTheDocument()
+  })
+
+  it('does not render the submit button if the assignment is locked', async () => {
+    const props = await mockAssignmentAndSubmission({
+      LockInfo: {isLocked: true},
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
     })
     const {queryByText} = render(
       <MockedProvider>

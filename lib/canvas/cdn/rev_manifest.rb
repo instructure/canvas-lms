@@ -22,6 +22,12 @@ module Canvas
   module Cdn
     module RevManifest
       class << self
+        include ActiveSupport::Benchmarkable
+
+        # ActiveSupport::Benchmarkable#benchmark needs a `logger` defined
+        def logger
+          Rails.logger
+        end
 
         def include?(source)
           if webpack_request?(source)
@@ -93,27 +99,35 @@ module Canvas
         private
         def load_gulp_data_if_needed
           return if ActionController::Base.perform_caching && defined? @gulp_manifest
-          file = Rails.root.join('public', 'dist', 'rev-manifest.json')
-          if file.exist?
-            Rails.logger.debug "reading rev-manifest.json"
-            @gulp_manifest = JSON.parse(file.read).freeze
-          elsif Rails.env.production?
-            raise "you need to run `gulp rev` first"
-          else
-            @gulp_manifest = {}.freeze
+          RequestCache.cache("rev-manifest") do
+            benchmark("reading rev-manifest") do
+              file = Rails.root.join('public', 'dist', 'rev-manifest.json')
+              if file.exist?
+                Rails.logger.debug "reading rev-manifest.json"
+                @gulp_manifest = JSON.parse(file.read).freeze
+              elsif Rails.env.production?
+                raise "you need to run `gulp rev` first"
+              else
+                @gulp_manifest = {}.freeze
+              end
+              @gulp_revved_urls = Set.new(@gulp_manifest.values.map{|s| "/dist/#{s}" }).freeze
+            end
           end
-          @gulp_revved_urls = Set.new(@gulp_manifest.values.map{|s| "/dist/#{s}" }).freeze
         end
 
         def load_webpack_data_if_needed
           return if (ActionController::Base.perform_caching || webpack_prod?) && defined? @webpack_manifest
-          file = Rails.root.join('public', webpack_dir, 'webpack-manifest.json')
-          if file.exist?
-            Rails.logger.debug "reading #{file}"
-            @webpack_manifest = JSON.parse(file.read).freeze
-          else
-            raise "you need to run webpack" unless Rails.env.test?
-            @webpack_manifest = Hash.new(["Error: you need to run webpack"]).freeze
+          RequestCache.cache("webpack_manifest") do
+            benchmark("reading webpack_manifest") do
+              file = Rails.root.join('public', webpack_dir, 'webpack-manifest.json')
+              if file.exist?
+                Rails.logger.debug "reading #{file}"
+                @webpack_manifest = JSON.parse(file.read).freeze
+              else
+                raise "you need to run webpack" unless Rails.env.test?
+                @webpack_manifest = Hash.new(["Error: you need to run webpack"]).freeze
+              end
+            end
           end
         end
 

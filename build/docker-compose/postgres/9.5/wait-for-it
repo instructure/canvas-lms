@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 ip_address=`hostname -i`
 echo Attempting connection to postgres...
 for i in {1..60}; do

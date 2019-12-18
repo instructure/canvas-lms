@@ -125,6 +125,11 @@ if issue_ids.empty? && !gh_issue
   end
 end
 
+flag_name = (commit_message =~ /^flag\s{0,3}=\s{0,3}([a-zA-Z][\w\-]+)\s{0,3}$/)
+unless flag_name
+  comment "warn", 1, "y u no add release flag? ლ(ಠ益ಠლ)"
+end
+
 has_a_test_plan = commit_message =~ /test[ -]plan/i
 unless has_a_test_plan
   comment "warn", 3, "y u no add test plan? ლ(ಠ益ಠლ)"

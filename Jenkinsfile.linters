@@ -18,6 +18,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def getImageTagVersion() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return flags.getImageTagVersion()
+}
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -26,9 +31,11 @@ pipeline {
   
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml'
+    GERRIT_PROJECT = 'canvas-lms'
+    GERRIT_PORT = '29418'
+    GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
 
-    // 'refs/changes/63/181863/8' -> '63.181863.8'
-    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
+    NAME = getImageTagVersion()
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
   stages {
@@ -39,58 +46,69 @@ pipeline {
         }
       }
     }
-    // this is here because someone forgot to add the post cleanup in this build.
-    // remove this after it runs for a little bit.
-    stage('temp-cleanup') {
+
+    stage('Gergich Setup') {
       steps {
-        sh 'build/new-jenkins/docker-cleanup.sh'
+        timeout(time: 3) {
+          script {
+            def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+            credentials.fetchFromGerrit('gergich_user_config', '.')
+            sh 'cp ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config'
+            sh 'docker pull $PATCHSET_TAG'
+          }
+        }
       }
     }
 
-    stage("All Linters") {
-      parallel {
-        stage('rlint') {
-          steps {
-            sh 'build/new-jenkins/linters/run-rlint.sh'
-          }
-        }
-        stage('brakeman') {
-          steps {
-            sh 'build/new-jenkins/linters/run-brakeman.sh'
-          }
-        }
-        stage('master bouncer') {
-          steps {
-            sh 'build/new-jenkins/linters/run-master-bouncer.sh'
-          }
-        }
-        stage('commit message') {
-          steps {
-            sh 'build/new-jenkins/linters/run-commit-message.sh'
-          }
-        }
-        stage('tatl tael') {
-          steps {
-            sh 'build/new-jenkins/linters/run-tatl-tael.sh'
-          }
-        }
-        stage('ESLint - JSX') {
-          steps {
-            sh 'build/new-jenkins/linters/run-eslint.sh'
-          }
-        }
-        stage('Stylelint') {
-          steps {
-            sh 'build/new-jenkins/linters/run-stylelint.sh'
-          }
-        }
-        stage('XSSLint') {
-          steps {
-            sh 'build/new-jenkins/linters/run-xss.sh'
-          }
-        }
+    stage('Linters') {
+      steps {
+        sh 'build/new-jenkins/linters/run-gergich.sh'
       }
     }
+
+    stage('Master Bouncer') {
+      steps {
+        sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+      }
+    }
+
+    // until we can update gergich to allow us to separate the linters,
+    // these will be commented out
+    // stage('rlint') {
+    //   steps {
+    //     sh 'build/new-jenkins/linters/run-rlint.sh'
+    //   }
+    // }
+    // stage('brakeman') {
+    //   steps {
+    //     sh 'build/new-jenkins/linters/run-brakeman.sh'
+    //   }
+    // }
+    // stage('commit message') {
+    //   steps {
+    //     sh 'build/new-jenkins/linters/run-commit-message.sh'
+    //   }
+    // }
+    // stage('tatl tael') {
+    //   steps {
+    //     sh 'build/new-jenkins/linters/run-tatl-tael.sh'
+    //   }
+    // }
+    // stage('ESLint - JSX') {
+    //   steps {
+    //     sh 'build/new-jenkins/linters/run-eslint.sh'
+    //   }
+    // }
+    // stage('Stylelint') {
+    //   steps {
+    //     sh 'build/new-jenkins/linters/run-stylelint.sh'
+    //   }
+    // }
+    // stage('XSSLint') {
+    //   steps {
+    //     sh 'build/new-jenkins/linters/run-xss.sh'
+    //   }
+    // }
   }
 
   post {

@@ -20,10 +20,10 @@ import React from 'react'
 import {string, func, bool, arrayOf, node, shape} from 'prop-types'
 import I18n from 'i18n!selectPosition'
 import ConnectorIcon from '../../move_item/ConnectorIcon'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {FormField} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-layout'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {positions} from '../../move_item/positions'
 import {itemShape} from '../../move_item/propTypes'
 
@@ -50,6 +50,7 @@ export function RenderSelect({label, onChange, options, className, selectOneDefa
         <select
           data-testid={testId}
           onChange={onChange}
+          className="move-select-form"
           style={{
             margin: '0',
             width: '100%'
@@ -87,7 +88,7 @@ export default function SelectPosition({
   const positionSelected = !!(selectedPosition && selectedPosition.type === 'relative')
 
   function renderSelectSibling() {
-    const filteredItems = siblings.filter(item => item.id !== items[0].id)
+    const filteredItems = siblings.filter(item => item.id !== items[0]?.id)
     return (
       <RenderSelect
         label={I18n.t('Item Select')}
@@ -106,7 +107,7 @@ export default function SelectPosition({
 
   function renderPlaceTitle() {
     const title =
-      items.length > 1 ? I18n.t('Place') : I18n.t('Place "%{title}"', {title: items[0].title})
+      items.length === 1 ? I18n.t('Place "%{title}"', {title: items[0].title}) : I18n.t('Place')
     return <Text weight="bold">{title}</Text>
   }
 

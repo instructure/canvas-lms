@@ -60,7 +60,15 @@ function createHttpLink() {
 function createCache() {
   return new InMemoryCache({
     addTypename: true,
-    dataIdFromObject: object => object.id || null,
+    dataIdFromObject: object => {
+      if (object.id) {
+        return object.id
+      } else if (object._id && object.__typename) {
+        return object.__typename + object._id
+      } else {
+        return null
+      }
+    },
     fragmentMatcher: new IntrospectionFragmentMatcher({
       introspectionQueryResultData
     })

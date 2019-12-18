@@ -1,0 +1,1070 @@
+{
+    "accessibility_checker_b3af1f6c": {
+        "message": "المتحقق من إمكانية الوصول"
+    },
+    "add_8523c19b": {
+        "message": "إضافة"
+    },
+    "add_cc_subtitles_55f0394e": {
+        "message": "إضافة شرح مكتوب لأحداث العرض/أشرطة الترجمة"
+    },
+    "add_to_do_7537af64": {
+        "message": "إضافة قائمة مهام"
+    },
+    "add_to_do_7def3c37": {
+        "message": "إضافة قائمة مهام"
+    },
+    "address_3159962f": {
+        "message": "العنوان:"
+    },
+    "align_11050992": {
+        "message": "محاذاة"
+    },
+    "align_center_ca078feb": {
+        "message": "محاذاة إلى الوسط"
+    },
+    "align_left_e9f1f93b": {
+        "message": "محاذاة إلى اليسار"
+    },
+    "align_right_9bad3ac1": {
+        "message": "محاذاة إلى اليمين"
+    },
+    "alignment_and_indentation_f7de34bf": {
+        "message": "المحاذاة والمسافة البادئة"
+    },
+    "all_4321c3a1": {
+        "message": "الكل"
+    },
+    "all_day_fb42c4fc": {
+        "message": "طوال اليوم"
+    },
+    "all_items_loaded_aa256183": {
+        "message": "تم تحميل كافة العناصر"
+    },
+    "alphabetical_55b5b4e0": {
+        "message": "أبجدي"
+    },
+    "alt_text_611fb322": {
+        "message": "النص البديل"
+    },
+    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+        "message": "حدث خطأ أثناء محاولة تجاهل الفرصة."
+    },
+    "an_error_occurred_generating_the_file_preview_cf259955": {
+        "message": "حدث خطأ أثناء إنشاء معاينة للملف"
+    },
+    "announcement_fb4cb645": {
+        "message": "الإعلان"
+    },
+    "announcement_list_da155734": {
+        "message": "قائمة الإعلانات"
+    },
+    "announcements_a4b8ed4a": {
+        "message": "الإعلانات"
+    },
+    "apps_54d24a47": {
+        "message": "التطبيق"
+    },
+    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+        "message": "هل أنت متأكد أنك تريد حذف عنصر المخطط هذا؟"
+    },
+    "aspect_ratio_will_be_preserved_cb5fdfb8": {
+        "message": "سيتم الاحتفاظ بنسبة العرض إلى الارتفاع"
+    },
+    "assignment_976578a8": {
+        "message": "المهمة"
+    },
+    "assignments_1e02582c": {
+        "message": "المهام"
+    },
+    "assignmenttype_title_6612d008": {
+        "message": "{ assignmentType } { title }."
+    },
+    "assignmenttype_title_all_day_on_datetime_9768903c": {
+        "message": "{ assignmentType } { title }، كل اليوم في { datetime }."
+    },
+    "assignmenttype_title_at_datetime_478f0709": {
+        "message": "{ assignmentType } { title }، الساعة { datetime }."
+    },
+    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+        "message": "{ assignmentType } { title }، الساعة { datetime } حتى { endTime }"
+    },
+    "assignmenttype_title_due_datetime_a112d8ff": {
+        "message": "{ assignmentType } { title }، يستحق في { datetime }."
+    },
+    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+        "message": "{ assignmentType } { title } لديه وقت قائمة مهام في { datetime }."
+    },
+    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+        "message": "تم وضع علامة تم على { assignmentType } { title }."
+    },
+    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+        "message": "لم يتم وضع علامة تم على { assignmentType } { title }."
+    },
+    "assignmenttype_title_posted_datetime_cab69444": {
+        "message": "قام { assignmentType } { title } بنشر { datetime }."
+    },
+    "assignmenttype_title_reminder_datetime_33fa66d5": {
+        "message": "{ assignmentType } { title }، تذكير { datetime }."
+    },
+    "audio_and_video_recording_is_not_available_c7173efc": {
+        "message": "التسجيل الصوتي والمرئي غير متاح."
+    },
+    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+        "message": "افتح تلقائيًا معاينة داخلية. (لا تظهر المعاينة إلا بعد الحفظ)"
+    },
+    "beginning_of_your_to_do_history_61ef2dce": {
+        "message": "بداية سجل قائمة المهام الخاصة بك"
+    },
+    "calendar_a8563bb2": {
+        "message": "التقويم:"
+    },
+    "calendar_event_89aadc1c": {
+        "message": "حدث التقويم"
+    },
+    "cancel_caeb1e68": {
+        "message": "إلغاء"
+    },
+    "canvas_planner_98ed106": {
+        "message": "مخطِط Canvas"
+    },
+    "canvas_plugins_705a5016": {
+        "message": "المكونات الإضافية لـ Canvas"
+    },
+    "choose_caption_file_9c45bc4e": {
+        "message": "اختر ملف تسميات توضيحية"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "قائمة دائرية غير المرتبة"
+    },
+    "clear_selected_file_82388e50": {
+        "message": "مسح الملف المحدد"
+    },
+    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+        "message": "انقر فوق أي صفحة لإدراج ارتباط يؤدي إلى تلك الصفحة."
+    },
+    "click_to_embed_imagename_c41ea8df": {
+        "message": "انقر لتضمين { imageName }"
+    },
+    "click_to_insert_a_link_into_the_editor_c19613aa": {
+        "message": "انقر لإدراج ارتباط إلى المحرر."
+    },
+    "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+        "message": "إغلاق قائمة أو مربع حوار. يعيدك أيضًا إلى مساحة المحرر"
+    },
+    "close_d634289d": {
+        "message": "إغلاق"
+    },
+    "close_opportunity_center_popup_9907d981": {
+        "message": "إغلاق النافذة المنبثقة لمركز الفرص"
+    },
+    "collaborations_5c56c15f": {
+        "message": "الأعمال الجماعية"
+    },
+    "collapse_to_hide_types_1ab46d2e": {
+        "message": "الطي لإخفاء { types }"
+    },
+    "computer_1d7dfa6f": {
+        "message": "الكمبيوتر"
+    },
+    "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
+        "message": "لا يزال يتم تحميل المحتوى، إذا استمرت مشكلة عدم تضمين المحتوى بشكل سليم."
+    },
+    "content_subtype_5ce35e88": {
+        "message": "النوع الفرعي للمحتوى"
+    },
+    "content_type_2cf90d95": {
+        "message": "نوع المحتوى"
+    },
+    "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+        "message": "{ count, plural,\n     =0 {0 كلمات}\n    one {1 كلمة}\n  other {# من الكلمات}\n}"
+    },
+    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+        "message": "{ count, plural,\n     =0 {# من الفرص}\n    one {# فرصة}\n  other {# من الفرص}\n}"
+    },
+    "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+        "message": "{ count, plural,\n    one {# عنصر محمّل}\n  other {# من العناصر محمّلة}\n}"
+    },
+    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {إظهار # عنصر مكتمل}\n  other {إظهار # من العناصر المكتملة}\n}"
+    },
+    "course_8a63b4a3": {
+        "message": "المساق"
+    },
+    "course_documents_104d76e0": {
+        "message": "مستندات المساق"
+    },
+    "course_files_62deb8f8": {
+        "message": "ملفات المساق"
+    },
+    "course_images_f8511d04": {
+        "message": "صور المساق"
+    },
+    "course_links_b56959b9": {
+        "message": "روابط المساق"
+    },
+    "course_media_ec759ad": {
+        "message": "وسائط المساق"
+    },
+    "course_navigation_dd035109": {
+        "message": "التنقل عبر المساق"
+    },
+    "course_to_do_bcbbab54": {
+        "message": "قائمة مهام { course }"
+    },
+    "current_volume_level_c55ab825": {
+        "message": "مستوى الصوت الحالي"
+    },
+    "custom_6979cd81": {
+        "message": "مخصص"
+    },
+    "date_added_ed5ad465": {
+        "message": "تاريخ الإضافة"
+    },
+    "date_at_time_dbdb1b99": {
+        "message": "{ date } في { time }"
+    },
+    "date_ee500367": {
+        "message": "التاريخ"
+    },
+    "date_is_not_a_valid_date_4ef9f8ba": {
+        "message": "#{ date } ليس تاريخًا صالحًا."
+    },
+    "date_is_required_8660ec22": {
+        "message": "التاريخ مطلوب"
+    },
+    "date_published_371c4ad0": {
+        "message": "تاريخ النشر"
+    },
+    "date_time_d9fbf2d7": {
+        "message": "التاريخ والوقت:"
+    },
+    "decrease_indent_de6343ab": {
+        "message": "تقليل المسافة البادئة"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "قائمة افتراضية غير مرتبة بتعداد نقطي"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "قائمة افتراضية مرقمة غير مرتبة"
+    },
+    "delete_a6efa79d": {
+        "message": "حذف"
+    },
+    "describe_the_image_e65d2e32": {
+        "message": "(وصف الصورة)"
+    },
+    "details_98a31b68": {
+        "message": "التفاصيل"
+    },
+    "details_a6f427c3": {
+        "message": "التفاصيل:"
+    },
+    "dimensions_45ddb7b7": {
+        "message": "الأبعاد"
+    },
+    "directionality_ebcae6d0": {
+        "message": "الاتجاهية"
+    },
+    "disable_in_line_preview_2a675175": {
+        "message": "تعطيل المعاينة الداخلية."
+    },
+    "discussion_6719c51d": {
+        "message": "النقاش"
+    },
+    "discussions_a5f96392": {
+        "message": "النقاشات"
+    },
+    "discussions_index_6c36ced": {
+        "message": "فهرس المناقشات"
+    },
+    "dismiss_itemtitle_a9fae1b3": {
+        "message": "تجاهل { itemTitle }"
+    },
+    "dismiss_opportunityname_5995176f": {
+        "message": "تجاهل { opportunityName }"
+    },
+    "dismissed_8b0b1fc9": {
+        "message": "المستبعدة"
+    },
+    "dismissed_opportunities_f0826640": {
+        "message": "الفرص المستبعدة"
+    },
+    "display_options_315aba85": {
+        "message": "عرض الخيارات"
+    },
+    "display_text_link_opens_in_a_new_tab_75e9afc9": {
+        "message": "عرض ارتباط النص (يفتح في علامة تبويب جديدة)"
+    },
+    "documents_81393201": {
+        "message": "المستندات"
+    },
+    "done_54e3d4b6": {
+        "message": "تم"
+    },
+    "drag_a_file_here_1bf656d5": {
+        "message": "إفلات ملف هنا"
+    },
+    "drag_a_file_here_39357b48": {
+        "message": "إفلات ملف هنا"
+    },
+    "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+        "message": "اسحب وأفلت أو انقر لاستعراض الكمبيوتر الخاص بك"
+    },
+    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+        "message": "إفلات المؤشر. استخدم سهمي لأعلى ولأسفل لضبط الحجم"
+    },
+    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
+        "message": "اسحب وأفلت أو انقر لاستعراض الكمبيوتر الخاص بك"
+    },
+    "due_5d7267be": {
+        "message": "تاريخ الاستحقاق:"
+    },
+    "due_date_124fdd99": {
+        "message": "تاريخ الاستحقاق: { date }"
+    },
+    "due_multiple_dates_cc0ee3f5": {
+        "message": "تاريخ الاستحقاق: تواريخ متعددة"
+    },
+    "due_when_7eed10c6": {
+        "message": "تاريخ الاستحقاق: { when }"
+    },
+    "edit_c5fbea07": {
+        "message": "تحرير"
+    },
+    "edit_link_7f53bebb": {
+        "message": "تحرير الارتباط"
+    },
+    "edit_title_72e5a21e": {
+        "message": "تحرير { title }"
+    },
+    "editor_statusbar_26ac81fc": {
+        "message": "شريط حالة المحرر"
+    },
+    "embed_828fac4a": {
+        "message": "تضمين"
+    },
+    "embed_code_314f1bd5": {
+        "message": "تضمين تعليمات برمجية"
+    },
+    "embed_image_1080badc": {
+        "message": "تضمين صورة"
+    },
+    "embed_options_tray_901cfd19": {
+        "message": "علبة خيارات التضمين"
+    },
+    "embed_preview_2d741e1f": {
+        "message": "معاينة التضمين"
+    },
+    "embed_video_code_703e10f2": {
+        "message": "رمز تضمين الفيديو"
+    },
+    "error_loading_grades_e0b38f4d": {
+        "message": "خطأ أثناء تحميل الدرجات"
+    },
+    "error_loading_more_items_3f109d9f": {
+        "message": "حدث خطأ في تحميل المزيد من العناصر"
+    },
+    "error_loading_past_items_2881dbb1": {
+        "message": "حدث خطأ في تحميل العناصر السابقة"
+    },
+    "error_uploading_video_audio_recording_16d9730a": {
+        "message": "خطأ في تحميل تسجيل الفيديو/الصوت"
+    },
+    "excused_cf8792eb": {
+        "message": "معفى"
+    },
+    "expand_to_see_types_f5d29352": {
+        "message": "التوسيع لرؤية { types }"
+    },
+    "external_links_3d9f074e": {
+        "message": "الارتباطات الخارجية"
+    },
+    "extra_large_b6cdf1ff": {
+        "message": "كبير جداً"
+    },
+    "failed_to_delete_to_do_64edff49": {
+        "message": "تعذر حذف قائمة مهام"
+    },
+    "failed_to_get_new_activity_17e7ec7c": {
+        "message": "تعذر الحصول على نشاط جديد"
+    },
+    "failed_to_load_opportunities_52ab6404": {
+        "message": "تعذر تحميل الفرص"
+    },
+    "failed_to_save_to_do_ddc7503b": {
+        "message": "تعذر حفظ قائمة مهام"
+    },
+    "feedback_6dcc1991": {
+        "message": "الملاحظات"
+    },
+    "file_name_8fd421ff": {
+        "message": "اسم الملف"
+    },
+    "file_url_c12b64be": {
+        "message": "عنوان URL للملف"
+    },
+    "filename_file_icon_602eb5de": {
+        "message": "أيقونة الملف { filename }"
+    },
+    "filename_image_preview_6cef8f26": {
+        "message": "معاينة الصورة { filename }"
+    },
+    "filename_text_preview_e41ca2d8": {
+        "message": "معاينة النص { filename }"
+    },
+    "files_c300e900": {
+        "message": "الملفات"
+    },
+    "files_index_af7c662b": {
+        "message": "فهرس الملفات"
+    },
+    "finish_bc343002": {
+        "message": "إنهاء"
+    },
+    "focus_the_popup_context_toolbar_7979f4f8": {
+        "message": "التركيز على شريط أدوات مساق النافذة المنبثقة"
+    },
+    "formatting_5b143aa8": {
+        "message": "التنسيق"
+    },
+    "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
+        "message": "تم العثور على { count, plural,\n     =0 {# من النتائج}\n    one {# نتيجة}\n  other {# من النتائج}\n}"
+    },
+    "generating_preview_45b53be0": {
+        "message": "جارٍ إنشاء المعاينة..."
+    },
+    "go_to_card_view_dashboard_9d03970e": {
+        "message": "انتقل إلى لوحة عرض البطاقة"
+    },
+    "go_to_the_editor_s_menubar_e6674c81": {
+        "message": "الانتقال إلى شريط القوائم الخاص بالمحرر"
+    },
+    "go_to_the_editor_s_toolbar_a5cb875f": {
+        "message": "الانتقال إلى شريط الأدوات الخاص بالمحرر"
+    },
+    "graded_25cd3fcd": {
+        "message": "تم تقييم الدرجة"
+    },
+    "grades_a61eba0a": {
+        "message": "الدرجات"
+    },
+    "grades_are_loading_c899652d": {
+        "message": "جارٍ تحميل الدرجات"
+    },
+    "grades_loaded_5056277c": {
+        "message": "تم تحميل الدرجات"
+    },
+    "group_files_4324f3df": {
+        "message": "ملفات المجموعة"
+    },
+    "group_navigation_99f191a": {
+        "message": "التنقل عبر المجموعة"
+    },
+    "header_f28f73db": {
+        "message": "الرأس"
+    },
+    "height_69b03e15": {
+        "message": "الارتفاع"
+    },
+    "image_options_5412d02c": {
+        "message": "خيارات الصورة"
+    },
+    "image_options_tray_90a46006": {
+        "message": "علبة خيارات الصورة"
+    },
+    "images_7ce26570": {
+        "message": "الصور"
+    },
+    "increase_indent_6d550a4a": {
+        "message": "زيادة المسافة البادئة"
+    },
+    "insert_equella_links_49a8dacd": {
+        "message": "إدراج ارتباطات Equella"
+    },
+    "insert_link_6dc23cae": {
+        "message": "إدراج ارتباط"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "إدخال معادلة رياضية"
+    },
+    "invalid_file_c11ba11": {
+        "message": "ملف غير صالح"
+    },
+    "invalid_file_type_881cc9b2": {
+        "message": "نوع ملف غير صالح"
+    },
+    "items_completed_items_plural_1_item_other_items_717d579f": {
+        "message": "{ items } أكمل { items, plural,\n     =1 {عنصر}\n  other {من العناصر}\n}"
+    },
+    "keyboard_shortcuts_ed1844bd": {
+        "message": "اختصارات لوحة المفاتيح"
+    },
+    "large_9c5e80e7": {
+        "message": "كبير"
+    },
+    "late_2be42b88": {
+        "message": "متأخر"
+    },
+    "left_to_right_d6da6d7e": {
+        "message": "من اليسار لليمين"
+    },
+    "link_7262adec": {
+        "message": "ارتباط"
+    },
+    "link_options_a16b758b": {
+        "message": "خيارات الارتباط"
+    },
+    "link_to_other_content_in_the_course_879163b5": {
+        "message": "الربط بمحتوى آخر في المساق."
+    },
+    "link_to_other_content_in_the_group_3fe25379": {
+        "message": "الربط  بمحتوى آخر في المجموعة."
+    },
+    "links_14b70841": {
+        "message": "الارتباطات"
+    },
+    "load_more_35d33c7": {
+        "message": "تحميل المزيد"
+    },
+    "load_more_a36f9cf9": {
+        "message": "تحميل المزيد"
+    },
+    "load_more_results_460f49a9": {
+        "message": "تحميل المزيد من النتائج"
+    },
+    "load_prior_dates_f2b0f6f0": {
+        "message": "تحميل تواريخ سابقة"
+    },
+    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+        "message": "تم تحميل { count, plural,\n     =0 {# من العناصر}\n    one {# عنصر}\n  other {# من العناصر}\n}"
+    },
+    "loading_25990131": {
+        "message": "جارٍ التحميل..."
+    },
+    "loading_725811ca": {
+        "message": "يتم الآن التحميل"
+    },
+    "loading_bde52856": {
+        "message": "جارٍ التحميل"
+    },
+    "loading_failed_b3524381": {
+        "message": "فشل التحميل..."
+    },
+    "loading_failed_e6a9d8ef": {
+        "message": "فشل التحميل."
+    },
+    "loading_grades_c842c887": {
+        "message": "جارٍ تحميل الدرجات"
+    },
+    "loading_media_f3455841": {
+        "message": "جارٍ تحميل الوسائط"
+    },
+    "loading_past_items_ca499e75": {
+        "message": "جارٍ تحميل العناصر السابقة"
+    },
+    "loading_planner_items_947a813d": {
+        "message": "جارٍ تحميل عناصر المخطِط"
+    },
+    "location_3b6ff307": {
+        "message": "الموقع:"
+    },
+    "looks_like_there_isn_t_anything_here_d9bcef49": {
+        "message": "يبدو أنه لا يوجد أي شيء هنا"
+    },
+    "media_af190855": {
+        "message": "الوسائط"
+    },
+    "medium_5a8e9ead": {
+        "message": "متوسط"
+    },
+    "mic_a7f3d311": {
+        "message": "الميكروفون"
+    },
+    "miscellaneous_and_apps_f450a387": {
+        "message": "المتنوعات والتطبيقات"
+    },
+    "missing_1a256b3b": {
+        "message": "مفقود"
+    },
+    "missing_items_for_title_516511f8": {
+        "message": "عناصر مفقودة لـ { title }"
+    },
+    "modules_c4325335": {
+        "message": "الوحدات النمطية"
+    },
+    "must_be_at_least_width_x_height_px_41dc825e": {
+        "message": "يجب أن تكون { width } x { height } بكسل على الأقل."
+    },
+    "my_documents_77a74ff3": {
+        "message": "مستنداتي"
+    },
+    "my_files_eea33f44": {
+        "message": "ملفاتي"
+    },
+    "my_grades_98834476": {
+        "message": "درجاتي"
+    },
+    "my_images_427f9b0c": {
+        "message": "صوري"
+    },
+    "my_media_82bade11": {
+        "message": "الوسائط الخاصة بي"
+    },
+    "navigate_through_the_menu_or_toolbar_415a4e50": {
+        "message": "تنقل من خلال القائمة أو شريط الأدوات"
+    },
+    "new_13daf639": {
+        "message": "الجديدة"
+    },
+    "new_activity_8b84847d": {
+        "message": "نشاط جديد"
+    },
+    "new_activity_for_title_14c9c3af": {
+        "message": "نشاط جديد لـ { title }"
+    },
+    "new_opportunities_7d349c4d": {
+        "message": "الفرص الجديدة"
+    },
+    "next_month_749b1778": {
+        "message": "الشهر القادم"
+    },
+    "next_page_d2a39853": {
+        "message": "الصفحة التالية"
+    },
+    "no_alt_text_decorative_image_f318fc0e": {
+        "message": "لا يوجد نص بديل (صورة زينة)"
+    },
+    "no_due_dates_assigned_e8f5bac8": {
+        "message": "لم يتم تعيين تواريخ الاستحقاق"
+    },
+    "no_grade_3b4d7f3e": {
+        "message": "لا توجد أي درجة"
+    },
+    "no_results_940393cf": {
+        "message": "لا توجد نتائج."
+    },
+    "no_results_found_for_filterterm_ad1b04c8": {
+        "message": "لم يتم العثور على نتائج لـ { filterTerm }"
+    },
+    "no_results_found_for_term_1564c08e": {
+        "message": "لم يتم العثور على نتائج لـ { term }."
+    },
+    "no_video_1ed00b26": {
+        "message": "لا يوجد مقطع فيديو"
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "لا شيء موجود الآن"
+    },
+    "nothing_here_needs_attention_c4eaded6": {
+        "message": "لا شيء هنا يستدعي الاهتمام."
+    },
+    "nothing_more_to_do_b665da42": {
+        "message": "لا يوجد المزيد من قوائم المهام"
+    },
+    "nothing_new_needs_attention_3ac548d4": {
+        "message": "لا يوجد شيء جديد يستدعي الاهتمام."
+    },
+    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+        "message": "لم يتم اليوم تخطيط أي شيء. تحديد أحدث العناصر."
+    },
+    "nothing_planned_today_selecting_next_item_f6718aa": {
+        "message": "لم يتم اليوم تخطيط أي شيء. تحديد العنصر التالي."
+    },
+    "nothing_planned_yet_8675ffe9": {
+        "message": "لم يتم تخطيط أي شيء بعد"
+    },
+    "numpoints_points_8621a43b": {
+        "message": "{ numPoints } من النقاط"
+    },
+    "only_most_recent_grading_period_shown_f1ad6458": {
+        "message": "*إظهار أحدث فترة تقييم فقط."
+    },
+    "open_this_keyboard_shortcuts_dialog_9658b83a": {
+        "message": "افتح مربع حوار اختصارات لوحة المفاتيح هذا"
+    },
+    "opportunities_popup_f6703842": {
+        "message": "النافذة المنبثقة للفرص"
+    },
+    "optional_add_course_ef0d70fc": {
+        "message": "اختياري: إضافة مساق"
+    },
+    "options_3ab0ea65": {
+        "message": "خيارات"
+    },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "القوائم المرتبة وغير المرتبة"
+    },
+    "other_editor_shortcuts_may_be_found_at_404aba4a": {
+        "message": "يمكن العثور على اختصارات أخرى للمحرر على"
+    },
+    "page_50c4823d": {
+        "message": "صفحة"
+    },
+    "pages_e5414c2c": {
+        "message": "الصفحات"
+    },
+    "paragraph_5e5ad8eb": {
+        "message": "الفقرة"
+    },
+    "pause_12af3bb4": {
+        "message": "إيقاف مؤقت"
+    },
+    "peer_review_74f26a13": {
+        "message": "المراجعة النظيرة"
+    },
+    "peer_review_for_itemtitle_358cb413": {
+        "message": "مراجعة أقران ل{ itemTitle }"
+    },
+    "people_b4ebb13c": {
+        "message": "أشخاص"
+    },
+    "play_1a47eaa7": {
+        "message": "تشغيل"
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "يرجى السماح لـ Canvas بالوصول إلى الميكروفون وكاميرا الويب لديك."
+    },
+    "points_bceb5005": {
+        "message": "نقاط"
+    },
+    "points_points_63e59cce": {
+        "message": "{ points } من النقاط"
+    },
+    "posted_when_a578f5ab": {
+        "message": "المنشور: { when }"
+    },
+    "preformatted_d0670862": {
+        "message": "منسق مسبقًا"
+    },
+    "preview_a3f8f854": {
+        "message": "معاينة"
+    },
+    "previous_month_bb1e3c84": {
+        "message": "الشهر السابق"
+    },
+    "previous_page_928fc112": {
+        "message": "الصفحة السابقة"
+    },
+    "pts_699bd9aa": {
+        "message": "نقاط"
+    },
+    "published_c944a23d": {
+        "message": "تم النشر"
+    },
+    "published_when_302d8e23": {
+        "message": "تاريخ النشر: { when }"
+    },
+    "quiz_e0dcce8f": {
+        "message": "الاختبار الموجز"
+    },
+    "quizzes_7e598f57": {
+        "message": "الاختبارات الموجزة"
+    },
+    "record_7c9448b": {
+        "message": "تسجيل"
+    },
+    "record_upload_media_5fdce166": {
+        "message": "تسجيل/تحميل الوسائط"
+    },
+    "recording_98da6bda": {
+        "message": "جارٍ التسجيل"
+    },
+    "reminder_date_4564d12d": {
+        "message": "التذكير: { date }"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "إزالة الارتباط"
+    },
+    "replies_4a8577c8": {
+        "message": "ردود"
+    },
+    "rich_content_editor_2708ef21": {
+        "message": "محرر محتوى"
+    },
+    "right_to_left_ec223c81": {
+        "message": "من اليمين لليسار"
+    },
+    "save_11a80ec3": {
+        "message": "حفظ"
+    },
+    "scroll_up_to_see_your_history_19b14cad": {
+        "message": "قم بالتمرير للأعلى للاطلاع على السجل!"
+    },
+    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+        "message": "قم بالتمرير للأعلى إلى العنصر السابق الذي يحتوى على نشاط حديث."
+    },
+    "search_280d00bd": {
+        "message": "بحث"
+    },
+    "search_term_b2d2235": {
+        "message": "مصطلح البحث"
+    },
+    "select_app_3d08035a": {
+        "message": "حدد التطبيق"
+    },
+    "select_language_7c93a900": {
+        "message": "اختر اللغة"
+    },
+    "selected_274ce24f": {
+        "message": "تم التحديد"
+    },
+    "show_all_ae37d610": {
+        "message": "عرض الكل"
+    },
+    "show_embed_options_ef8d7ef": {
+        "message": "إظهار خيارات التضمين"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "إظهار خيارات الصورة"
+    },
+    "show_link_options_545338fd": {
+        "message": "إظهار خيارات الارتباطات"
+    },
+    "show_my_grades_ebd08684": {
+        "message": "إظهار درجاتي"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "إظهار خيارات الفيديو"
+    },
+    "size_b30e1077": {
+        "message": "الحجم"
+    },
+    "small_b070434a": {
+        "message": "صغير"
+    },
+    "small_header_168fb9f9": {
+        "message": "عنوان صغير"
+    },
+    "something_went_wrong_89195131": {
+        "message": "حدث خطأ ما."
+    },
+    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+        "message": "حدث خطأ ما أثناء الوصول إلى الميكروفون أو كاميرا الويب الخاصة بك."
+    },
+    "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
+        "message": "حدثت مشكلة ولا أعلم ماذا أعرض لك."
+    },
+    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
+        "message": "حدث خطأ ما، حاول مجدداً بعد تحديث الصفحة"
+    },
+    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
+        "message": "حدث خطأ ما في التحميل، تحقق من الاتصال ثم حاول مجدداً."
+    },
+    "sort_by_e75f9e3e": {
+        "message": "الفزر حسب"
+    },
+    "square_unordered_list_b15ce93b": {
+        "message": "قائمة مربعة غير مرتبة"
+    },
+    "start_over_f7552aa9": {
+        "message": "البدء مرة أخرى"
+    },
+    "start_recording_9a65141a": {
+        "message": "بدء التسجيل"
+    },
+    "startdate_to_enddate_d245175b": {
+        "message": "{ startDate } إلى { endDate }"
+    },
+    "startdatetime_enddatetime_20abc10e": {
+        "message": "{ startDateTime } - { endDateTime }"
+    },
+    "startdatetime_endtime_49741bbe": {
+        "message": "{ startDateTime } - { endTime }"
+    },
+    "starttime_to_endtime_d7cc249d": {
+        "message": "{ startTime } إلى { endTime }"
+    },
+    "styles_2aa721ef": {
+        "message": "الأنماط"
+    },
+    "subheader_2b87606d": {
+        "message": "العنوان الفرعي"
+    },
+    "submit_a3cc6859": {
+        "message": "إرسال"
+    },
+    "submitted_318fad53": {
+        "message": "تم الإرسال"
+    },
+    "subscript_59744f96": {
+        "message": "منخفض"
+    },
+    "success_to_do_created_e34ed395": {
+        "message": "نجاح: تم إنشاء قائمة مهام"
+    },
+    "superscript_8cb349a2": {
+        "message": "مرتفع"
+    },
+    "switch_to_raw_html_editor_4c9ac7de": {
+        "message": "التبديل إلي محرر html أولي"
+    },
+    "switch_to_rich_text_editor_35822d26": {
+        "message": "التبديل إلى محرر نص منسق"
+    },
+    "syllabus_f191f65b": {
+        "message": "المناهج"
+    },
+    "tab_arrows_4cf5abfc": {
+        "message": "ضغط/أسهم"
+    },
+    "task_16b0ef38": {
+        "message": "مهمة"
+    },
+    "text_7f4593da": {
+        "message": "نص"
+    },
+    "the_date_and_time_this_to_do_is_due_74c823d4": {
+        "message": "تاريخ ووقت استحقاق قائمة المهام تلك"
+    },
+    "there_are_no_points_associated_with_this_item_449c712a": {
+        "message": "لا توجد نقاط مقترنة بهذا العنصر"
+    },
+    "time_2b5aac58": {
+        "message": "الوقت"
+    },
+    "title_ee03d132": {
+        "message": "العنوان"
+    },
+    "title_is_required_6ddcab69": {
+        "message": "العنوان مطلوب"
+    },
+    "to_be_posted_when_d24bf7dc": {
+        "message": "المقرر نشره: { when }"
+    },
+    "to_do_1d554f36": {
+        "message": "قائمة المهام"
+    },
+    "to_do_date_4b211ad0": {
+        "message": "قائمة مهام: { date }"
+    },
+    "to_do_items_loading_d1cdfcd5": {
+        "message": "تحميل عناصر قائمة المهام"
+    },
+    "to_do_when_2783d78f": {
+        "message": "قائمة مهام: { when }"
+    },
+    "today_76e10f9c": {
+        "message": "اليوم"
+    },
+    "today_at_date_8ac30d6": {
+        "message": "اليوم الساعة { date }"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "غدًا"
+    },
+    "tomorrow_at_date_b53f2cf1": {
+        "message": "غدًا الساعة { date }"
+    },
+    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
+        "message": "تم العثور على { totalResults } من النتائج، { numDisplayed } من النتائج قيد العرض حاليًا"
+    },
+    "tray_839df38a": {
+        "message": "العلبة"
+    },
+    "type_control_f9_to_access_image_options_text_a47e319f": {
+        "message": "اضغط على Control F9 للوصول إلى اختيارات الصورة. { text }"
+    },
+    "type_control_f9_to_access_link_options_text_4ead9682": {
+        "message": "اضغط على Control F9 للوصول إلى اختيارات الرابط. { text }"
+    },
+    "type_control_f9_to_access_table_options_text_92141329": {
+        "message": "اضغط Control F9 للوصول إلى اختيارات الجدول. { text }"
+    },
+    "unable_to_mark_as_complete_8141856d": {
+        "message": "يتعذر وضع علامة مكتمل."
+    },
+    "unpublished_dfd8801": {
+        "message": "غير منشور"
+    },
+    "untitled_16aa4f2b": {
+        "message": "بدون عنوان"
+    },
+    "upload_document_253f0478": {
+        "message": "تحميل المستند"
+    },
+    "upload_error_f9c00e27": {
+        "message": "خطأ في التحميل"
+    },
+    "upload_file_fd2361b8": {
+        "message": "تحميل ملف"
+    },
+    "upload_image_6120b609": {
+        "message": "تحميل صورة"
+    },
+    "upload_media_ce31135a": {
+        "message": "تحميل الوسائط"
+    },
+    "upload_record_media_e4207d72": {
+        "message": "تحميل/تسجيل الوسائط"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "قائمة أبجدية مرتبة بأحرف كبيرة"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "قائمة بأرقام رومانية مرتبة بأحرف كبيرة"
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+        "message": "يستخدم بواسطة أدوات قراءة الشاشة لوصف محتوى الصور"
+    },
+    "user_documents_c206e61f": {
+        "message": "مستندات المستخدم"
+    },
+    "user_images_b6490852": {
+        "message": "صور المستخدمين"
+    },
+    "user_media_14fbf656": {
+        "message": "وسائط المستخدم"
+    },
+    "video_audio_recording_uploaded_6af5d378": {
+        "message": "تم تحميل تسجيل الفيديو/الصوت"
+    },
+    "video_options_24ef6e5d": {
+        "message": "خيارات الفيديو"
+    },
+    "video_options_tray_3b9809a5": {
+        "message": "علبة خيارات الفيديو"
+    },
+    "video_player_b371005": {
+        "message": "مشغل الفيديو"
+    },
+    "view_keyboard_shortcuts_34d1be0b": {
+        "message": "عرض اختصارات لوحة المفاتيح"
+    },
+    "webcam_fe91b20f": {
+        "message": "كاميرا الويب"
+    },
+    "width_492fec76": {
+        "message": "العرض"
+    },
+    "width_and_height_must_be_numbers_110ab2e3": {
+        "message": "يجب أن يكون العرض والارتفاع أرقاماً"
+    },
+    "width_x_height_px_ff3ccb93": {
+        "message": "{ width } x { height } بكسل"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "الصفحة الرئيسية لـ Wiki"
+    },
+    "yesterday_at_date_1aa6d18e": {
+        "message": "أمس الساعة { date }"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "أمس"
+    },
+    "you_have_media_feedback_f5f9aba8": {
+        "message": "لديك ملاحظات وسائط."
+    },
+    "you_must_provide_a_date_and_time_a86839d2": {
+        "message": "يجب عليك إدخال تاريخ ووقت."
+    },
+    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+        "message": "لقد قمت بالتمرير للخلف إلى أول قائمة مهام خاصة بك!"
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "قد تكون كاميرا الويب الخاصة بك قيد الاستخدام بالفعل."
+    }
+}

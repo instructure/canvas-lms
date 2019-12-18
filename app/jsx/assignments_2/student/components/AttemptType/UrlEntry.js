@@ -46,7 +46,8 @@ class UrlEntry extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (
-      this.props.submission?.submissionDraft?.url !== prevProps.submission?.submissionDraft?.url
+      this.props.submission?.submissionDraft?.url &&
+      this.props.submission.submissionDraft.url !== prevProps.submission?.submissionDraft?.url
     ) {
       this.updateInputState()
     }

@@ -366,7 +366,6 @@ describe "people" do
   end
 
   context "people as a TA" do
-
     before :once do
       course_with_ta(:active_all => true)
     end
@@ -400,6 +399,45 @@ describe "people" do
       get "/courses/#{@course.id}/users"
       index = ff('table.roster th').map(&:text).find_index('Login ID')
       expect(index).to be_nil
+    end
+
+    context "without view all grades permissions" do
+      before(:each) do
+        ['view_all_grades', 'manage_grades'].each do |permission|
+          RoleOverride.create!(permission: permission, enabled: false, context: @course.account, role: ta_role)
+        end
+      end
+
+      it "doesn't show the Interactions Report link without view all grades permissions" do
+        @student = create_user('student@test.com')
+        enroll_student(@student)
+        get "/courses/#{@course.id}/users/#{@student.id}"
+        expect(f("#content")).not_to contain_link("Interactions Report")
+      end
+
+      it "doesn't show the Student Interactions Report link without view all grades permissions" do
+        get "/courses/#{@course.id}/users/#{@ta.id}"
+        expect(f("#content")).not_to contain_link("Student Interactions Report")
+      end
+
+      context "with new profile flag enabled" do
+        before(:each) do
+          @course.account.settings[:enable_profiles] = true
+          @course.account.save!
+          @student = create_user('student@test.com')
+          enroll_student(@student)
+        end
+
+        it "doesn't show the Interactions Report link without permissions" do
+          get "/courses/#{@course.id}/users/#{@student.id}"
+          expect(f("#content")).not_to contain_link("Interactions Report")
+        end
+
+        it "doesn't show the Student Interactions Report link without permissions" do
+          get "/courses/#{@course.id}/users/#{@ta.id}"
+          expect(f("#content")).not_to contain_link("Student Interactions Report")
+        end
+      end
     end
   end
 

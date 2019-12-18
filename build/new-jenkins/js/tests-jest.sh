@@ -1,5 +1,5 @@
 #!/bin/bash
 
-export COMPOSE_FILE=./docker-compose.new-jenkins-web.yml
+set -x -o errexit -o errtrace -o nounset -o pipefail
 
 docker-compose run --name tests-jest -e COVERAGE web yarn test:jest --runInBand

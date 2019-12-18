@@ -44,7 +44,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #8B969E;
+  background: $ic-color-medium;
   border-radius: 100%;
   position: relative;
 }
@@ -52,7 +52,7 @@
 .complete {
   .step-item-pin {
     font-size: 0.75rem; /* sets the icon size bc we need smaller than theme can provide */
-    background: #00AC18;
+    background: $shamrock;
   }
 }
 .unavailable {
@@ -60,10 +60,10 @@
     font-weight: 700;
   }
   .step-item-pin {
-    border-color:#e52209;
+    border-color: $crimson;
     border-style: solid;
     border-width: 2px;
-    background: #ffffff;
+    background: $ic-color-light;
   }
 }
 
@@ -72,22 +72,22 @@
     font-size: 0.875rem;
   }
   .step-item-pin {
-    border-color:#C1C8CD;
+    border-color: $ic-color-medium;
     border-style: solid;
     border-width: 1px;
-    background: #ffffff;
+    background: $ic-color-light;
   }
 }
 
 .in-progress {
   .step-item-label {
     font-weight: 700;
-    color: #2D3B45;
+    color: $ic-color-dark;
   }
 
   .step-item-pin {
-    background: #FFFFFF;
-    border: 0.125rem solid #00AC18;
+    background: $ic-color-light;
+    border: 0.125rem solid $shamrock;
 
     /* if pin is complete, it pulses - should we make this an opt-in prop? */
     position: relative;
@@ -102,7 +102,7 @@
       right: -0.5rem; /* stylelint-disable-line property-blacklist */
       border-width: 0.125rem;
       border-style: solid;
-      border-color: #00AC18;
+      border-color: $shamrock;
       border-radius: 100%;
 
       /* set initial properties to animate in the pulse animation */

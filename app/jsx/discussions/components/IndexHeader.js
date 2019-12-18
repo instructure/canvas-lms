@@ -18,7 +18,7 @@
 
 import actions from '../actions'
 import {bindActionCreators} from 'redux'
-import {bool, func, string} from 'prop-types'
+import {bool, func, string, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {debounce} from 'lodash'
 import I18n from 'i18n!discussions_v2'
@@ -33,6 +33,9 @@ import {Grid, View} from '@instructure/ui-layout'
 import {IconPlusLine, IconSearchLine} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {TextInput} from '@instructure/ui-forms'
+import ReactDOM from 'react-dom'
+import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
+import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
 
 const filters = {
   all: I18n.t('All'),
@@ -46,6 +49,7 @@ export default class IndexHeader extends Component {
     contextId: string.isRequired,
     contextType: string.isRequired,
     courseSettings: propTypes.courseSettings,
+    discussionTopicIndexMenuTools: arrayOf(propTypes.discussionTopicMenuTools),
     fetchCourseSettings: func.isRequired,
     fetchUserSettings: func.isRequired,
     isSavingSettings: bool.isRequired,
@@ -87,6 +91,75 @@ export default class IndexHeader extends Component {
     leading: false,
     trailing: true
   })
+
+  renderTrayToolsMenu = () => {
+    if (this.props.discussionTopicIndexMenuTools?.length > 0) {
+      return (
+        <div className="inline-block">
+          <a
+            className="al-trigger btn"
+            id="discussion_menu_link"
+            role="button"
+            tabIndex="0"
+            title={I18n.t('Discussions Menu')}
+            aria-label={I18n.t('Discussions Menu')}
+          >
+            <i className="icon-more" aria-hidden="true" />
+            <span className="screenreader-only">{I18n.t('Discussions Menu')}</span>
+          </a>
+          <ul className="al-options" role="menu">
+            {this.props.discussionTopicIndexMenuTools.map(tool => (
+              <li key={tool.id} role="menuitem">
+                <a aria-label={tool.title} href="#" onClick={this.onLaunchTrayTool(tool)}>
+                  {this.iconForTrayTool(tool)}
+                  {tool.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div id="external-tool-mount-point" />
+        </div>
+      )
+    }
+  }
+
+  iconForTrayTool(tool) {
+    if (tool.canvas_icon_class) {
+      return <i className={tool.canvas_icon_class} />
+    } else if (tool.icon_url) {
+      return <img className="icon" alt="" src={tool.icon_url} />
+    }
+  }
+
+  onLaunchTrayTool = tool => e => {
+    if (e != null) {
+      e.preventDefault()
+    }
+    this.setExternalToolTray(tool, document.getElementById('discussion_settings'))
+  }
+
+  setExternalToolTray(tool, returnFocusTo) {
+    const handleDismiss = () => {
+      this.setExternalToolTray(null)
+      returnFocusTo.focus()
+      if (ltiState?.tray?.refreshOnClose) {
+        window.location.reload()
+      }
+    }
+    ReactDOM.render(
+      <ContentTypeExternalToolTray
+        tool={tool}
+        placement="discussion_topic_index_menu"
+        acceptedResourceTypes={['discussion_topic']}
+        targetResourceType="discussion_topic"
+        allowItemSelection={false}
+        selectableItems={[]}
+        onDismiss={handleDismiss}
+        open={tool !== null}
+      />,
+      document.getElementById('external-tool-mount-point')
+    )
+  }
 
   render() {
     return (
@@ -151,6 +224,8 @@ export default class IndexHeader extends Component {
                     isSavingSettings={this.props.isSavingSettings}
                   />
                 ) : null}
+                &nbsp;
+                {this.renderTrayToolsMenu()}
               </Grid.Col>
             </Grid.Row>
           </Grid>
@@ -164,6 +239,7 @@ const connectState = state => ({
   ...select(state, [
     'contextType',
     'contextId',
+    'discussionTopicIndexMenuTools',
     'permissions',
     'userSettings',
     'courseSettings',

@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -x
+
 archive_path=$1
 if [[ $archive_path ]]; then
 

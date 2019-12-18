@@ -1183,6 +1183,9 @@ ko:
     errors: 
       messages: 
         record_invalid: "유효성 검사 실패: %{errors}"
+        restrict_dependent_destroy: 
+          has_many: "의존하고 있는 %{record} 때문에 레코드를 삭제할 수 없습니다"
+          has_one: "의존하고 있는 %{record} 때문에 레코드를 삭제할 수 없습니다"
         taken: "이미 사용 중임"
   activity_13915493: 활동
   add_8523c19b: 추가
@@ -5313,6 +5316,8 @@ ko:
     registration_incomplete: "이 페이지를 보기 전에 이메일 주소를 확인해야 함"
     required: "필수 사항"
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
+    unsaved_changes: "저장하지 않은 변경 사항이 있습니다."
+    wrong_file_extension: "선택한 파일의 확장자 \"%{extension}\"는 제출이 허용되지 않습니다."
   everyone_854554dd: 모두
   everyone_else_6c6dc7b6: "나머지 모든 사람"
   everyone_else_cc5f6888: "다른 모든 사람"
@@ -6430,6 +6435,9 @@ ko:
     your_email_address: "이메일 주소"
   helpers: 
     accessible_date_format: "YYYY-MM-DD hh:mm"
+    accessible_date_only_format: YYYY-MM-DD
+    accessible_date_prompt: 형식
+    accessible_time_only_format: "hh:mm"
     course: 과목
     dashboard_helper: 
       announcement_details: "공지 사항 세부 정보"
@@ -6449,8 +6457,13 @@ ko:
       x_new_in_discussions: 
         one: "토론 *%{count}*개"
         other: "토론 *%{count}*개"
+    local: 로컬
     select: 
       prompt: "선택해 주십시오."
+    submit: 
+      create: "%{model} 새로 만들기"
+      submit: "%{model} 저장하기"
+      update: "%{model} 업데이트"
   hidden_14a032a7: 비공개
   hide_e057ff36: 숨기기
   hide_score_total_for_assessment_results_d0ef117f: "평가 결과에 대한 총점 숨기기"
@@ -13272,6 +13285,18 @@ ko:
   will_keep_the_latest_of_all_your_scores_431d23f9: "가장 마지막 점수를 보관"
   will_paginate: 
     next_label: "다음 &#8594;"
+    page_entries_info: 
+      multi_page: "전체 %{count}중 %{from} - %{to} %{model} 표시 중"
+      multi_page_html: "전체 <b>%{count}</b> 중 <b>%{from}&nbsp;-&nbsp;%{to}</b> %{model} 표시 중"
+      single_page: 
+        one: "1개의 %{model} 표시 중"
+        other: "모든 %{count}%{model} 표시 중"
+        zero: "%{model} 없음"
+      single_page_html: 
+        one: "<b>1</b> %{model} 표시 중"
+        other: "<b>모든&nbsp;%{count}</b> %{model} 표시 중"
+        zero: "%{model} 없음"
+    page_gap: "&hellip;"
     previous_label: "&#8592; 이전"
   wimba_conference: 
     external_urls: 

@@ -109,9 +109,16 @@ class EportfoliosController < ApplicationController
   end
 
   def update
-    if authorized_action(@portfolio, @current_user, :update)
+    update_params = if @portfolio.grants_right?(@current_user, session, :update)
+      eportfolio_params
+    elsif @portfolio.user.account&.feature_enabled?(:eportfolio_moderation) &&
+      @portfolio.grants_right?(@current_user, :moderate)
+      eportfolio_moderation_params
+    end
+
+    if update_params
       respond_to do |format|
-        if @portfolio.update_attributes(eportfolio_params)
+        if @portfolio.update_attributes(update_params)
           @portfolio.ensure_defaults
           flash[:notice] = t('notices.updated', "ePortfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
@@ -124,6 +131,8 @@ class EportfoliosController < ApplicationController
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
+    else
+      render_unauthorized_action
     end
   end
 
@@ -232,6 +241,10 @@ class EportfoliosController < ApplicationController
 
   def eportfolio_params
     params.require(:eportfolio).permit(:name, :public)
+  end
+
+  def eportfolio_moderation_params
+    params.require(:eportfolio).permit(:spam_status)
   end
 
   def get_eportfolio

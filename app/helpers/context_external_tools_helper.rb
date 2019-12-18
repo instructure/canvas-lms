@@ -45,7 +45,8 @@ module ContextExternalToolsHelper
 
     link_attrs =  {
       :href => tool[:base_url],
-      "data-tool-id" => tool[:id]
+      "data-tool-id" => tool[:id],
+      "data-tool-launch-type" => options[:settings_key]
     }
 
     link_attrs[:class] = options[:link_class] if options[:link_class]

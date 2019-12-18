@@ -2873,6 +2873,20 @@ describe CoursesController do
       json = json_parse(response.body)
       expect(json.map{|user| user['name']}).to include('less privileged account admin')
     end
+
+    it 'should not return users from other root accounts' do
+      user_session(@teacher)
+      a1_course = @course
+      a2 = Account.create!(name: 'other root account')
+      a2_admin = user_factory(name: 'account 2 admin')
+      a2_teacher = user_factory(name: 'account 2 teacher')
+      account_admin_user(account: a2, user: a2_admin)
+      course_with_teacher(name: 'account 2 teacher', account: a2, user: a2_teacher)
+
+      get 'content_share_users', params: {course_id: a1_course.id, search_term: 'account 2'}
+      json = json_parse(response.body)
+      expect(json.map{|user| user['name']}).not_to include('account 2 admin', 'account 2 teacher')
+    end
   end
 
   describe 'POST update' do

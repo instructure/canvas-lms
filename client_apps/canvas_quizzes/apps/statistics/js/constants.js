@@ -45,6 +45,7 @@ define({
     'responses',
     'answers',
     'position',
+    'user_ids',
     'user_names',
 
     // multiple-choice & true/false

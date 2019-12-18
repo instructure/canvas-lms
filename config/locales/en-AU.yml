@@ -226,6 +226,8 @@ en-AU:
         partner_id: "Partner ID"
         partner_key: "Partner Key"
   accept_2fdd362e: Accept
+  accept_course_invitation_b4c04fbb: "Accept course invitation"
+  accept_course_invitation_to_participate_in_this_as_b8342676: "Accept course invitation to participate in this assignment"
   accept_grades_4d56a3dd: "Accept Grades"
   accept_grades_by_gradername_7a98b969: "Accept grades by %{graderName}"
   acceptable_use_policy_29a28124: "Acceptable Use Policy"
@@ -1764,6 +1766,7 @@ en-AU:
   add_group_c84f9e9d: "Add Group"
   add_group_set_f9809e11: "Add Group Set"
   add_help_menu_links_de9fc34f: "Add help menu links"
+  add_hostname_to_the_whitelist_c808192e: "Add %{hostname} to the whitelist"
   add_icon_567dbcaa: "add icon"
   add_link_5c01c1e8: "Add Link"
   add_link_fc336ed6: "Add link"
@@ -1811,6 +1814,7 @@ en-AU:
   add_theme_32fa3d50: "Add Theme"
   add_to_course_481a51c4: "Add to course..."
   add_to_student_to_do_58e66b4b: "Add to student to-do"
+  add_to_whitelist_24f3f1ba: "Add to Whitelist"
   add_trigger_bc1a0fae: "Add Trigger"
   add_user_by_email_address_login_id_or_sis_id_7dd370dd: "Add user by Email Address, Login ID, or SIS ID."
   add_user_e73e8e50: "Add User"
@@ -1954,6 +1958,7 @@ en-AU:
   all_student_groups_f74cd6c3: "All Student Groups"
   all_students_have_taken_the_quiz_b558f8b4: "All Students have taken the quiz"
   all_students_have_taken_the_survey_494f9f42: "All Students have taken the survey"
+  all_students_will_be_able_to_see_their_grade_and_o_66c1beab: "All students will be able to see their grade and/or submission comments."
   all_submission_comments_have_been_marked_as_read_74c0683b: "All submission comments have been marked as read"
   all_submission_comments_have_been_marked_as_read_7595389d: "All submission comments have been marked as read."
   all_submissions_must_have_a_selected_grade_3a84e5a9: "All submissions must have a selected grade."
@@ -1987,6 +1992,7 @@ en-AU:
   allow_opt_out_of_inbox: "Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences."
   allow_outcome_extra_credit_57c1e84e: "Allow Outcome Extra Credit"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Allow passive acceptance of Terms of Service"
+  allow_postable_submission_comments_a301b742: "Allow Postable Submission Comments"
   allow_reorder_dashboard_cards_78215947: "Allow Reorder Dashboard Cards"
   allow_replies_for_title_cfe7af6c: "Allow replies for %{title}"
   allow_rtl_users_to_see_rtl_interface_3c4f8b86: "Allow RTL users to see RTL interface"
@@ -3514,6 +3520,7 @@ en-AU:
   assignments_gradebook_f57c164a: "Assignments, Gradebook"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Assignments in this group have no points possible and cannot be included in mark calculation"
   assignments_in_this_group_have_no_points_possible__ab0adb72: "Assignments in this group have no points possible and cannot be included in grade calculation."
+  assignments_index_menu_4088a035: "Assignments Index Menu"
   assignments_list_fe3e54be: "Assignments List"
   assignments_settings_30613d0c: "Assignments Settings"
   assignments_speedgrader_2fbd6df4: "Assignments, SpeedGrader"
@@ -3585,6 +3592,7 @@ en-AU:
   attention_aaca1f1d: Careful!
   attribute_d9f3af72: Attribute
   attributes_locked_1a1a0f46: "%{attributes} locked"
+  audio_1c89b0c8: audio
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Audio content is not supported by your device or app."
   audio_dd489fcc: Audio
   australia_61_eb9bb701: "Australia (+61)"
@@ -3819,6 +3827,7 @@ en-AU:
     no_manifest: "This Blackboard .zip has no imsmanifest.xml file in the root directory."
   blank_38df4238: blank
   blocked_by_running_migration_d8a57cb7: "Blocked by running migration"
+  blocked_domain_name_b5b93150: "Blocked Domain Name"
   blue_daf8fea9: Blue
   blueprint_5cca2ef: Blueprint
   blueprint_course_associations_72c9609: "Blueprint Course Associations"
@@ -4650,6 +4659,7 @@ en-AU:
   certificate_fingerprint_b376df90: "Certificate Fingerprint"
   change_applied_89d1aa5a: "Change Applied"
   change_beginning_date_to_39dbd06e: "Change beginning date to"
+  change_course_visibility_eaa2ffc: "Change course visibility"
   change_dcaa253a: Change
   change_description_34c49853: "Change description"
   change_ending_date_to_d2cebd54: "Change ending date to"
@@ -4811,6 +4821,7 @@ en-AU:
   close_warning_d61daf2c: "Close warning"
   closed_for_comments_e395b42f: "Closed for Comments"
   closes_5c6b4367: "Closes:"
+  code_93e9abbb: code
   code_is_case_sensitive_d8175cad: "Code is case sensitive."
   cog_icon_69bdffd5: "Cog icon"
   col_is_sorted_ascending_cc5152cc: "%{col} is sorted ascending"
@@ -5180,6 +5191,7 @@ en-AU:
   confirmation_failed_please_try_again_ae566d37: "Confirmation failed.  Please try again."
   consumer_key_57d9fcf1: "Consumer key"
   consumer_key_6f94ba11: "Consumer Key"
+  contact_your_administrator_if_you_need_to_change_c_9002a501: "Contact your administrator if you need to change course visibility."
   content_1440204b: Content
   content_changed_exceptions_e8bff81e: "Content changed exceptions:"
   content_choice_51f4ca0f: "Content Choice"
@@ -5817,7 +5829,7 @@ en-AU:
       edit_assignment_settings: "Edit Assignment Settings"
       speed_grader: "Speed Grader™"
     url_show: 
-      new_tab: "This site needs to be opened in a new browser window."
+      new_tab: "This site was opened in a new browser window."
   context_modules_api: 
     invalid_position: "Invalid position"
   context_modulespublic: 
@@ -7079,6 +7091,7 @@ en-AU:
   courses_account_72e4fca7: "Courses (Account)"
   courses_account_navigation_f84fdec3: "Courses (Account Navigation)"
   courses_add_edit_delete_aa2b55d3: "Courses - add / edit / delete"
+  courses_change_visibility_9150ff1b: "Courses - change visibility"
   courses_navigation_menu_b3638384: "Courses Navigation Menu"
   courses_over_time_41dc0428: "courses over time"
   courses_people_680bb173: "Courses & People"
@@ -7208,6 +7221,7 @@ en-AU:
     syllabus: Syllabus
     users: Users
     wiki_pages: Pages
+  csp_violations_337f8529: "CSP Violations"
   css_ae1d10ce: CSS
   css_and_javascript_to_load_when_user_content_is_di_f86f73f5: "CSS and JavaScript to load when user content is displayed in the canvas iOS or Android native apps"
   css_file_709e6a83: "CSS file"
@@ -8157,6 +8171,8 @@ en-AU:
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
   discussions_a5f96392: Discussions
   discussions_create_94dff604: "Discussions - create"
+  discussions_index_menu_42591bc9: "Discussions Index Menu"
+  discussions_menu_f18eb4a2: "Discussions Menu"
   discussions_moderate_d1e69c7e: "Discussions - moderate"
   discussions_post_62f64091: "Discussions - post"
   discussions_tutorial_tray_4ef79bcc: "Discussions Tutorial Tray"
@@ -8190,6 +8206,7 @@ en-AU:
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Do not count this assignment towards the final mark."
   do_nothing_9672b478: "Do Nothing"
   doc_50924b72: DOC
+  doc_c63509f8: doc
   docviewer_area_created_37502a31: "Docviewer area created"
   docviewer_area_deleted_6e56d3ba: "Docviewer area deleted"
   docviewer_area_updated_43f60b7e: "Docviewer area updated"
@@ -9339,6 +9356,7 @@ en-AU:
   field_cannot_be_blank_afb5b332: "Field cannot be blank."
   field_must_be_either_active_or_deleted_329a42a: "\"%{field}\" must be either \"%{active}\" or \"%{deleted}\""
   field_name_31fff38e: "Field Name"
+  file_6863ad33: file
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "File a ticket for a personal response from our support team."
   file_already_exists_bdc61895: "file already exists"
   file_attachment_8e7dbfd1: "File Attachment"
@@ -9547,6 +9565,7 @@ en-AU:
   first_reviewer_sortorder_e2184140: "First reviewer %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, and %{others_count} others"
   flash_6afbf65a: Flash
+  flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr displays SafeSearch images within the Creative Commons Public Domain.
@@ -9580,6 +9599,7 @@ en-AU:
   for_course_level_users_deleting_a_course_is_part_o_932f7a98: "For course-level users, deleting a course is part of the Course State - manage permission. However, for account-level users, deleting a course requires this permission and Course - add / edit / delete. "
   for_development_of_features_for_new_gradebook_7ee1830f: "For development of features for New Gradebook."
   for_each_late_62aecf41: "For each late"
+  for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "For manually posted assignments, the presence of a submission comment not by the submission's own user will allow posting the assignment. Previously, this would have required a grade before posting could occur."
   for_name_d5684bfd: "For %{name}"
   for_title_69d92b3a: "for %{title}"
   forgot_password_f0c3fbac: "Forgot Password?"
@@ -11233,6 +11253,7 @@ en-AU:
       then fall back to Flash.
   html5_media_recorder_in_rce_bb59b78f: "HTML5 Media Recorder in RCE"
   html_editor_fb2ab713: "HTML Editor"
+  html_fc8563c6: html
   http_67e238b4: "http://"
   hungarian_fc7d30c9: Hungarian
   hungary_36_cd3e515b: "Hungary (+36)"
@@ -11285,6 +11306,7 @@ en-AU:
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "If an attribute is marked as provisioning only, then it will only be used when Just in Time Provisioning creates a new user, and will not be kept up to date each time the user logs in."
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "If both Grades - edit​ and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation."
+  if_commons_is_installed_allows_importing_favorited_eff368f: "If Commons is installed, allows importing favourited content items from within Canvas."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "If disabled, the Outcomes page becomes read-only and hides the Manage Rubrics button. User can still access individual assignment rubrics through Assignments."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "If disabled, user can still view and download files into a zip file."
   if_disabled_user_will_still_have_access_to_course__6816d525: |-
@@ -11347,6 +11369,8 @@ en-AU:
         Students will see the modified files in their comments for the submission.
       
       *Make sure you don't change the names of the submission files so we can recognise them.*
+  if_you_need_to_make_your_course_public_please_cont_7084c67b: "If you need to make your course public please contact your administrator/support."
+  if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: "If you turn this on, when an account admin goes to the page to create a global announcement, a checkbox will appear to send notification directly to users when announcement starts."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "If you wish, you can rename \"SIS\" to something more familiar to your staff"
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "If you would like to keep your unsubmitted comments, please save them before navigating away from this page."
@@ -11366,6 +11390,7 @@ en-AU:
   ignore_until_new_submission_90ba19b7: "Ignore until new submission"
   illegal_element_focus_request_b3cea847: "Illegal element focus request"
   image_8ad06: Image
+  image_c1c98202: image
   image_id_is_not_a_valid_id_7dd6bad6: "image_id is not a valid ID."
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url and image_id cannot both be set."
   image_url_is_not_a_valid_url_4e31c8b0: "image_url is not a valid URL."
@@ -11377,10 +11402,12 @@ en-AU:
     invalid_file_type: "Invalid file type %{type}. Allowed types include: %{type_list}"
     not_an_image: "Selected file is not an image"
   images_documents_and_more_dccb362f: "Images, Documents, and more"
+  immediate_notifications_for_global_announcements_682f5a3d: "Immediate notifications for global announcements"
   immediately_c128ede6: Immediately
   immersive_reader_failed_to_load_bc8d4dd4: "Immersive Reader Failed to Load"
   import_1b31507: Import
   import_a_set_of_outcomes_6b782192: "Import a set of Outcomes"
+  import_commons_favorites_e68fce81: "Import Commons Favourites"
   import_content_b2fd6620: "Import Content"
   import_e929507b: Import...
   import_learning_outcomes_36d28a2b: "Import learning outcomes"
@@ -11838,6 +11865,7 @@ en-AU:
   language_6b3e2c7c: Language
   large_course_db3d58b: "Large Course:"
   last_assessment_cd5659b6: "Last Assessment: "
+  last_attempt_7258ebd7: "Last Attempt"
   last_changed_b544504d: "Last changed:"
   last_changed_date_82f1ce56: "Last changed: %{date}"
   last_day_attended_b72d623c: "Last day attended"
@@ -11920,6 +11948,7 @@ en-AU:
       view_all_or_customize: "View All or Customise"
     mobile_auth: 
       log_in_to_canvas: "Log In To Canvas"
+  learn_more_7a8d626: "Learn More"
   learn_more_about_collaborations_2978f66d: "Learn more about collaborations"
   learning_mastery_5fc34276: "Learning Mastery"
   learning_mastery_6ed4fd63: "Learning Mastery…"
@@ -12549,6 +12578,7 @@ en-AU:
       submitting: "Submitting Media File..."
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Media has been queued for conversion; please try again in a short time."
   media_over_time_d9332e25: "media over time"
+  media_record_not_available_f78c16dd: "Media record not available"
   media_recording_77cddc52: "Media Recording"
   media_recording_submission_b7fd1491: "Media Recording Submission"
   media_recording_submissions_require_a_media_id_to__ff740090: "%{media_recording} submissions require a %{media_id} to submit"
@@ -14642,7 +14672,9 @@ en-AU:
     requirements_changed: "Requirements Changed"
   modules_b8f6aa9: modules
   modules_c4325335: Modules
+  modules_group_menu_4aae0d5f: "Modules Group Menu"
   modules_home_page_568c6bb9: "Modules Home Page"
+  modules_index_menu_c8748e7c: "Modules Index Menu"
   modules_item_controller: 
     max_score_complete: "scored no more than a *score*"
     max_score_incomplete: "must score no more than a *score*"
@@ -14654,6 +14686,7 @@ en-AU:
     must_submit_incomplete: "must submit the assignment"
     must_view_complete: "viewed the page"
     must_view_incomplete: "must view the page"
+  modules_settings_a7066f13: "Modules Settings"
   modules_tutorial_tray_d58ac3cb: "Modules Tutorial Tray"
   month_s_5c17590e: Month(s)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} starting at %{time}"
@@ -15050,6 +15083,7 @@ en-AU:
   no_users_found_64a043ff: "No users found"
   no_users_were_selected_to_add_to_the_course_a51c6083: "No users were selected to add to the course"
   no_video_1ed00b26: "No Video"
+  no_violations_have_been_reported_977a08d1: "No violations have been reported."
   no_way_to_export_gradebooks_provided_b4c2939d: "No way to export gradebooks provided!"
   no_way_to_monitor_gradebook_exports_provided_b451236a: "No way to monitor gradebook exports provided!"
   non_canvas_11f36d4a: "Non Canvas"
@@ -15940,6 +15974,7 @@ en-AU:
   pause_12af3bb4: Pause
   paypal: 
     exception: "We're sorry, an error has occurred, please try again later."
+  pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: "Peer Review Assignment"
   peer_review_for_assignment_ce72fc52: "Peer Review for %{assignment}"
@@ -16980,11 +17015,11 @@ en-AU:
   progress_for_account_name_ef203250: "Progress for %{account_name}"
   progress_loading_bar_a26b8861: "Progress/loading bar"
   project_groups_1fa0320b: "Project Groups"
+  pronouns_d1cd8dd0: Pronouns
   pronouns_for_users_da46fb5: "Pronouns for users"
   pronouns_users_can_show_after_their_name_e80821c7: "Pronouns users can show after their name"
-  provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: |-
-      Provide a space for users to work on a single document
-                  simultaneously, from within your Canvas course.
+  provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: "Provide a space for users to work on a single document\n\
+      \x20         simultaneously, from within your Canvas course.  "
   provide_a_space_for_users_to_work_on_a_single_goog_604cdf06: |-
       Provide a space for users to work on a single Google Doc
       simultaneously, from within your Canvas course.
@@ -17060,6 +17095,7 @@ en-AU:
     parent_signup: "Parent Signup"
   pts_51d69f4a: Pts
   pts_699bd9aa: pts
+  ptt_f7ff4c09: ptt
   public_a749f507: Public
   public_course_index_59270e80: "Public Course Index"
   public_courses_title: "Public Courses"
@@ -18495,6 +18531,7 @@ en-AU:
       practice_quizzes: "Practice Quizzes"
       surveys: Surveys
     toggle_message: "toggle quiz visibility"
+  quizzes_index_menu_1ce11b54: "Quizzes Index Menu"
   quizzes_next_27c59ce3: Quizzes.Next
   quizzes_next_importing_75e63f67: "Quizzes.Next Importing"
   quizzes_next_submission_history_c0f7cd20: "Quizzes.Next submission history"
@@ -18892,6 +18929,7 @@ en-AU:
   reports_account_settings_78f5336a: "Reports (Account Settings)"
   request_id_1499afb0: "Request ID"
   request_values_89976f2c: "Request Values"
+  requested_bbdb5b26: Requested
   require_an_access_code_600e06e8: "Require an access code"
   require_assignment_due_date_778b200d: "Require assignment due date"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Require group members to be in the same section"
@@ -20732,6 +20770,7 @@ en-AU:
   something_went_wrong_creating_the_course_please_tr_431adff5: "Something went wrong creating the course. Please try again."
   something_went_wrong_d238c551: "Something went wrong"
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Something went wrong inactivating the user. Please try again later."
+  something_went_wrong_loading_the_violations_try_re_6e2fa92: "Something went wrong loading the violations, try reloading the page."
   something_went_wrong_please_try_again_6d337b6c: "Something went wrong; please try again."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Something went wrong. Please try refreshing the page. If the problem persists, you can try loading a single student group in SpeedGrader by using the *Large Course setting*."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Something went wrong. Please try refreshing the page. If the problem persists, there may be too many records on \"%{assignmentTitle}\" to load SpeedGrader."
@@ -21014,6 +21053,7 @@ en-AU:
   students_must_complete_all_of_these_requirements_15fa97f7: "Students must complete all of these requirements."
   students_must_sign_up_in_groups_681206ac: "Students must sign up in groups"
   students_over_time_7ec52f7a: "students over time"
+  students_who_have_received_a_grade_or_a_submission_7ef046cc: "Students who have received a grade or a submission comment will be able to see their grade and/or submission comments."
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Students who have taken the quiz (%{count})"
     other: "Students who have taken the quiz (%{count})"
@@ -21511,6 +21551,7 @@ en-AU:
   test_cluster_only_70e61c19: "Test Cluster Only"
   testing_state_effd4a82: "Testing state"
   text_7f4593da: Text
+  text_df773ce4: text
   text_document_eacbcdb7: "Text document"
   text_entry_e1808b2f: "Text Entry"
   text_entry_submission_7b0ae0c5: "Text Entry Submission"
@@ -21916,6 +21957,7 @@ en-AU:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "This user is currently not able to access the course."
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"This user is currently not able to access the course.\""
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "This user performed actions while anonymous was off"
+  this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "This version of Gradebook is being replaced by an updated Gradebook on or before January 18, 2020."
   this_will_affect_every_customer_are_you_sure_a1e0cac6: "This will affect every customer. Are you sure?"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "This will allow you to authenticate Canvas for posting grades to SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "This will apply these changes to your entire account. Would you like to proceed?"
@@ -22324,6 +22366,7 @@ en-AU:
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "To restrict students from creating groups, deselect the Let students organise their own groups checkbox in Course Settings."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "To restrict to users from a specific Clever district, enter the district's Clever ID here. This is required for Clever Instant Login to work in a multi-tenant environment."
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "To restrict to users from specific Google Apps domain, enter the domain here."
+  to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "To restrict to users from specific Google Apps domains, enter the domain(s) here as a comma separated list. To restrict to a Google Apps user in general, you can enter '*'."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "To restrict to users of your Azure Active Directory, enter your tenant here."
   to_search_and_view_notifications_for_a_user_users__becfb733: "To search and view notifications for a user, Users - view list must also be enabled."
   to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
@@ -22722,6 +22765,7 @@ en-AU:
   uploaded_media_bc29db35: "Uploaded Media"
   uploaded_over_time_d59abb68: "uploaded over time"
   uploading_19e8a4e7: Uploading
+  uploading_files_5ff8f4fd: "Uploading files"
   uploading_submission_4c8d944b: "Uploading Submission"
   upper_limit_of_range_c454a8f2: "Upper limit of range"
   upper_lower_56cad16c: "%{upper} - %{lower}"
@@ -22809,6 +22853,7 @@ en-AU:
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "User ID or SIS ID (SIS ID should be prepended with sis_user_id:)"
   user_id_user_id_69a9e865: "User ID: %{user_id}"
   user_information_6353d7e1: "User information"
+  user_is_from_unacceptable_domain_domain_b4b6fd1b: "User is from unacceptable domain %{domain}."
   user_is_now_group_leader_60ec9b98: "%{user} is now group leader."
   user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "User isn't allowed to edit global outcomes"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} just accepted their invitation to participate in the course, %{course}. Course role: %{role_type}"
@@ -23280,6 +23325,7 @@ en-AU:
     buttons: 
       resubmit_to_vericite: "Resubmit to VeriCite"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Similarity Score - See detailed report"
+  video_78335c71: video
   video_b9f27375: Video
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Video content is not supported by your device or app."
   video_player_b371005: "Video Player"
@@ -23327,6 +23373,7 @@ en-AU:
   view_toolname_placements_4a5724d1: "View %{toolName} Placements"
   view_user_groups_538f22b4: "View User Groups"
   view_user_groups_d2bfa855: "View user groups"
+  view_violation_log_e80ea322: "View Violation Log"
   viewed_6b75c21e: Viewed
   viewing_folders_is_not_available_798a15e1: "Viewing folders is not available"
   viewsContextModules: 
@@ -23339,6 +23386,8 @@ en-AU:
     message_students_for_context: "Message students for %{context}"
     notices: 
       message_sent: "Message Sent!"
+  violation_log_491edd84: "Violation Log"
+  violation_log_tray_d4eff9f4: "Violation Log Tray"
   virtual_lectures_in_real_time_a1778dea: "Virtual lectures in real-time"
   visit_864b4060: Visit
   visit_group_group_name_7a816081: "Visit group %{group_name}"
@@ -23642,6 +23691,7 @@ en-AU:
   wrong_answer_comments_14963a24: "Wrong answer comments"
   x_y_4a86b3ab: "%{x}/%{y}"
   xls_733452c1: XLS
+  xls_e593104b: xls
   xml_configuration_5ea1b942: "XML Configuration"
   yellow_4cf93785: Yellow
   yes_3593c135: "yes"
@@ -23774,6 +23824,8 @@ en-AU:
   you_left_the_required_name_field_empty_8f9bce5c: "You left the required name field empty."
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "You'll need a refresh token; follow the steps at this link. You may want a technical expert to help you."
+  you_ll_need_to_accept_the_enrollment_invitation_be_1e962788: "You'll need to *accept the enrolment invitation* before you can fully participate in this course."
+  you_ll_need_to_accept_the_enrollment_invitation_be_441a617b: "You'll need to *accept the enrolment invitation* before you can fully participate in this course, starting on %{date}."
   you_ll_need_to_accept_the_enrollment_invitation_be_e3c86b26: "You'll need to accept the enrolment invitation before you can fully participate in this course."
   you_ll_need_to_accept_the_enrollment_invitation_be_f2ffe13: "You'll need to accept the enrolment invitation before you can fully participate in this course, starting on %{date}."
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
@@ -23908,6 +23960,7 @@ en-AU:
     engine: 
       plugin_name: Zendesk
   zero_activity_title: "Zero Activity"
+  zip_26961da: zip
   zip_argument_error: "A .zip upload requires a folder to upload to."
   zip_file_description: "Migration plugin for unpacking .zip archives into course, group, or user files"
   zip_file_display: "File Import"

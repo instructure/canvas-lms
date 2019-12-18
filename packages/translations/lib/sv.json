@@ -1,0 +1,1070 @@
+{
+    "accessibility_checker_b3af1f6c": {
+        "message": "Tillgänglighetskontroll"
+    },
+    "add_8523c19b": {
+        "message": "Lägg till"
+    },
+    "add_cc_subtitles_55f0394e": {
+        "message": "Lägg till CC/undertext"
+    },
+    "add_to_do_7537af64": {
+        "message": "Lägg till att göra"
+    },
+    "add_to_do_7def3c37": {
+        "message": "Lägg till att göra"
+    },
+    "address_3159962f": {
+        "message": "Adress:"
+    },
+    "align_11050992": {
+        "message": "Justera"
+    },
+    "align_center_ca078feb": {
+        "message": "Centrera"
+    },
+    "align_left_e9f1f93b": {
+        "message": "Vänsterjustera"
+    },
+    "align_right_9bad3ac1": {
+        "message": "Högerjustera"
+    },
+    "alignment_and_indentation_f7de34bf": {
+        "message": "Justering och indrag"
+    },
+    "all_4321c3a1": {
+        "message": "Alla"
+    },
+    "all_day_fb42c4fc": {
+        "message": "Hela dagen"
+    },
+    "all_items_loaded_aa256183": {
+        "message": "Alla objekt inlästa"
+    },
+    "alphabetical_55b5b4e0": {
+        "message": "Alfabetisk"
+    },
+    "alt_text_611fb322": {
+        "message": "Alternativ text"
+    },
+    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+        "message": "Ett fel uppstod när möjligheten skulle avvisas."
+    },
+    "an_error_occurred_generating_the_file_preview_cf259955": {
+        "message": "Ett fel uppstod vid generering av förhandsvisning av filen."
+    },
+    "announcement_fb4cb645": {
+        "message": "Anslag"
+    },
+    "announcement_list_da155734": {
+        "message": "Anslagslista"
+    },
+    "announcements_a4b8ed4a": {
+        "message": "Anslag"
+    },
+    "apps_54d24a47": {
+        "message": "Appar"
+    },
+    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+        "message": "Vill du ta bort det här Planner-objektet?"
+    },
+    "aspect_ratio_will_be_preserved_cb5fdfb8": {
+        "message": "Bildförhållande kommer att behållas"
+    },
+    "assignment_976578a8": {
+        "message": "Uppgift"
+    },
+    "assignments_1e02582c": {
+        "message": "Uppgifter"
+    },
+    "assignmenttype_title_6612d008": {
+        "message": "{ assignmentType } { title }."
+    },
+    "assignmenttype_title_all_day_on_datetime_9768903c": {
+        "message": "{ assignmentType } { title }, hela dagen den { datetime }."
+    },
+    "assignmenttype_title_at_datetime_478f0709": {
+        "message": "{ assignmentType } { title }, kl. { datetime }."
+    },
+    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+        "message": "{ assignmentType } { title }, kl. { datetime } till { endTime }"
+    },
+    "assignmenttype_title_due_datetime_a112d8ff": {
+        "message": "{ assignmentType } { title }, förfaller { datetime }."
+    },
+    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
+        "message": "{ assignmentType } { title } har något planerat kl. { datetime }."
+    },
+    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+        "message": "{ assignmentType } { title } har markerats som klar."
+    },
+    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+        "message": "{ assignmentType } { title } har inte markerats som klar."
+    },
+    "assignmenttype_title_posted_datetime_cab69444": {
+        "message": "{ assignmentType } { title } publicerades { datetime }."
+    },
+    "assignmenttype_title_reminder_datetime_33fa66d5": {
+        "message": "{ assignmentType } { title }, påminnelse { datetime }."
+    },
+    "audio_and_video_recording_is_not_available_c7173efc": {
+        "message": "Ljud- och videoinspelning är inte tillgänglig."
+    },
+    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+        "message": "Öppna automatiskt en infogad förhandsvisning (Förhandsvisningen visas endast efter att den sparats)"
+    },
+    "beginning_of_your_to_do_history_61ef2dce": {
+        "message": "Början av din att göra-historik"
+    },
+    "calendar_a8563bb2": {
+        "message": "Kalender:"
+    },
+    "calendar_event_89aadc1c": {
+        "message": "Kalenderhändelse"
+    },
+    "cancel_caeb1e68": {
+        "message": "Avbryt"
+    },
+    "canvas_planner_98ed106": {
+        "message": "Canvas Planner"
+    },
+    "canvas_plugins_705a5016": {
+        "message": "Canvas-plugins"
+    },
+    "choose_caption_file_9c45bc4e": {
+        "message": "Välj undertextfil"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "cirkelmarkera oordnad lista"
+    },
+    "clear_selected_file_82388e50": {
+        "message": "Rensa vald fil"
+    },
+    "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+        "message": "Klicka på en sida för att infoga en länk till sidan."
+    },
+    "click_to_embed_imagename_c41ea8df": {
+        "message": "Klicka för att bädda in { imageName }"
+    },
+    "click_to_insert_a_link_into_the_editor_c19613aa": {
+        "message": "Klicka för att infoga en länk i redigeraren."
+    },
+    "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+        "message": "Stäng en meny eller dialogruta Tar dig också tillbaka till redigerarområdet"
+    },
+    "close_d634289d": {
+        "message": "Stäng"
+    },
+    "close_opportunity_center_popup_9907d981": {
+        "message": "Stäng popup-fönstret med möjlighetscentret"
+    },
+    "collaborations_5c56c15f": {
+        "message": "Samarbeten"
+    },
+    "collapse_to_hide_types_1ab46d2e": {
+        "message": "Minimera för att dölja { types }"
+    },
+    "computer_1d7dfa6f": {
+        "message": "Dator"
+    },
+    "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
+        "message": "Innehåll laddas fortfarande upp, om du fortsätter kommer det inte att bäddas in korrekt."
+    },
+    "content_subtype_5ce35e88": {
+        "message": "Underordnad innehållstyp"
+    },
+    "content_type_2cf90d95": {
+        "message": "Innehållstyp"
+    },
+    "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
+        "message": "{ count, plural,\n     =0 {0 ord}\n    one {1 ord}\n  other {# ord}\n}"
+    },
+    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+        "message": "{ count, plural,\n     =0 {# möjligheter}\n    one {# möjlighet}\n  other {# möjligheter}\n}"
+    },
+    "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+        "message": "{ count, plural,\n    one {# objekt laddat}\n  other {# objekt laddade}\n}"
+    },
+    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+        "message": "{ count, plural,\n    one {Visa # slutfört objekt}\n  other {Visa # slutförda objekt}\n}"
+    },
+    "course_8a63b4a3": {
+        "message": "Kurs"
+    },
+    "course_documents_104d76e0": {
+        "message": "Kursdokument"
+    },
+    "course_files_62deb8f8": {
+        "message": "Kursfiler"
+    },
+    "course_images_f8511d04": {
+        "message": "Kursbilder"
+    },
+    "course_links_b56959b9": {
+        "message": "Kurslänkar"
+    },
+    "course_media_ec759ad": {
+        "message": "Kursmedia"
+    },
+    "course_navigation_dd035109": {
+        "message": "Kursnavigering"
+    },
+    "course_to_do_bcbbab54": {
+        "message": "{ course } ATT GÖRA"
+    },
+    "current_volume_level_c55ab825": {
+        "message": "Aktuell volymnivå"
+    },
+    "custom_6979cd81": {
+        "message": "Anpassa"
+    },
+    "date_added_ed5ad465": {
+        "message": "Tillagt datum"
+    },
+    "date_at_time_dbdb1b99": {
+        "message": "{ date } kl. { time }"
+    },
+    "date_ee500367": {
+        "message": "Datum"
+    },
+    "date_is_not_a_valid_date_4ef9f8ba": {
+        "message": "#{ date } är inte ett giltigt datum."
+    },
+    "date_is_required_8660ec22": {
+        "message": "Datum krävs"
+    },
+    "date_published_371c4ad0": {
+        "message": "Publiceringsdatum"
+    },
+    "date_time_d9fbf2d7": {
+        "message": "Datum och tid:"
+    },
+    "decrease_indent_de6343ab": {
+        "message": "Minska indrag"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "punktmarkera oordnad lista som standard"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "numrera ordnad lista som standard"
+    },
+    "delete_a6efa79d": {
+        "message": "Ta bort"
+    },
+    "describe_the_image_e65d2e32": {
+        "message": "(Beskriv bilden)"
+    },
+    "details_98a31b68": {
+        "message": "Detaljer"
+    },
+    "details_a6f427c3": {
+        "message": "Detaljer:"
+    },
+    "dimensions_45ddb7b7": {
+        "message": "Dimensioner"
+    },
+    "directionality_ebcae6d0": {
+        "message": "Riktning"
+    },
+    "disable_in_line_preview_2a675175": {
+        "message": "Inaktivera infogad förhandsvisning."
+    },
+    "discussion_6719c51d": {
+        "message": "Diskussion"
+    },
+    "discussions_a5f96392": {
+        "message": "Diskussioner"
+    },
+    "discussions_index_6c36ced": {
+        "message": "Diskussionsindex"
+    },
+    "dismiss_itemtitle_a9fae1b3": {
+        "message": "Avvisa { itemTitle }"
+    },
+    "dismiss_opportunityname_5995176f": {
+        "message": "Avvisa { opportunityName }"
+    },
+    "dismissed_8b0b1fc9": {
+        "message": "Avvisade"
+    },
+    "dismissed_opportunities_f0826640": {
+        "message": "Avvisade möjligheter"
+    },
+    "display_options_315aba85": {
+        "message": "Visa alternativ"
+    },
+    "display_text_link_opens_in_a_new_tab_75e9afc9": {
+        "message": "Visa textlänk (öppnas i en ny flik)"
+    },
+    "documents_81393201": {
+        "message": "Dokument"
+    },
+    "done_54e3d4b6": {
+        "message": "Klar"
+    },
+    "drag_a_file_here_1bf656d5": {
+        "message": "Dra en fil hit"
+    },
+    "drag_a_file_here_39357b48": {
+        "message": "Dra en fil hit"
+    },
+    "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
+        "message": "Dra och släpp, eller klicka för att söka i din dator"
+    },
+    "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
+        "message": "Dra handtag. Använd upp- och nedpilarna för att ändra storlek"
+    },
+    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
+        "message": "Dra och släpp, eller klicka för att söka i din dator"
+    },
+    "due_5d7267be": {
+        "message": "Inlämningsdatum:"
+    },
+    "due_date_124fdd99": {
+        "message": "Inlämningsdatum: { date }"
+    },
+    "due_multiple_dates_cc0ee3f5": {
+        "message": "Förfallodatum: Flera datum"
+    },
+    "due_when_7eed10c6": {
+        "message": "Inlämningsdatum: { when }"
+    },
+    "edit_c5fbea07": {
+        "message": "Redigera"
+    },
+    "edit_link_7f53bebb": {
+        "message": "Redigera länk"
+    },
+    "edit_title_72e5a21e": {
+        "message": "Redigera { title }"
+    },
+    "editor_statusbar_26ac81fc": {
+        "message": "Statusfält för redigeraren"
+    },
+    "embed_828fac4a": {
+        "message": "Bädda in"
+    },
+    "embed_code_314f1bd5": {
+        "message": "Inbäddad kod"
+    },
+    "embed_image_1080badc": {
+        "message": "Bädda in bild"
+    },
+    "embed_options_tray_901cfd19": {
+        "message": "Bädda in alternativfält"
+    },
+    "embed_preview_2d741e1f": {
+        "message": "Bädda in förhandsvisning"
+    },
+    "embed_video_code_703e10f2": {
+        "message": "Bädda in videokod"
+    },
+    "error_loading_grades_e0b38f4d": {
+        "message": "Det gick inte att läsa in omdömen"
+    },
+    "error_loading_more_items_3f109d9f": {
+        "message": "Det gick inte att läsa in fler objekt"
+    },
+    "error_loading_past_items_2881dbb1": {
+        "message": "Det gick inte att läsa in tidigare objekt"
+    },
+    "error_uploading_video_audio_recording_16d9730a": {
+        "message": "Ett fel uppstod vid uppladdning av video-/ljudinspelningen"
+    },
+    "excused_cf8792eb": {
+        "message": "Ursäktad"
+    },
+    "expand_to_see_types_f5d29352": {
+        "message": "Expandera för att visa { types }"
+    },
+    "external_links_3d9f074e": {
+        "message": "Externa länkar"
+    },
+    "extra_large_b6cdf1ff": {
+        "message": "Extra stor"
+    },
+    "failed_to_delete_to_do_64edff49": {
+        "message": "Det gick inte att ta bort att göra"
+    },
+    "failed_to_get_new_activity_17e7ec7c": {
+        "message": "Det gick inte att hämta ny aktivitet"
+    },
+    "failed_to_load_opportunities_52ab6404": {
+        "message": "Det gick inte att läsa in möjligheter"
+    },
+    "failed_to_save_to_do_ddc7503b": {
+        "message": "Det gick inte att spara att göra"
+    },
+    "feedback_6dcc1991": {
+        "message": "Feedback"
+    },
+    "file_name_8fd421ff": {
+        "message": "Filnamn"
+    },
+    "file_url_c12b64be": {
+        "message": "Filens URL"
+    },
+    "filename_file_icon_602eb5de": {
+        "message": "{ filename } filikon"
+    },
+    "filename_image_preview_6cef8f26": {
+        "message": "{ filename } förhandsvisning av bild"
+    },
+    "filename_text_preview_e41ca2d8": {
+        "message": "{ filename } förhandsvisning av text"
+    },
+    "files_c300e900": {
+        "message": "Filer"
+    },
+    "files_index_af7c662b": {
+        "message": "Filindex"
+    },
+    "finish_bc343002": {
+        "message": "Avsluta"
+    },
+    "focus_the_popup_context_toolbar_7979f4f8": {
+        "message": "Fokusera verktygsfältets popupinnehåll"
+    },
+    "formatting_5b143aa8": {
+        "message": "Formaterar"
+    },
+    "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
+        "message": "Hittade { count, plural,\n     =0 {# resultat}\n    one {# resultat}\n  other {# resultat}\n}"
+    },
+    "generating_preview_45b53be0": {
+        "message": "Genererar förhandsvisning ..."
+    },
+    "go_to_card_view_dashboard_9d03970e": {
+        "message": "Gå till översikten Kortvy"
+    },
+    "go_to_the_editor_s_menubar_e6674c81": {
+        "message": "Gå till redigerarens menyfält"
+    },
+    "go_to_the_editor_s_toolbar_a5cb875f": {
+        "message": "Gå till redigerarens verktygsfält"
+    },
+    "graded_25cd3fcd": {
+        "message": "Har bedömts"
+    },
+    "grades_a61eba0a": {
+        "message": "Omdömen"
+    },
+    "grades_are_loading_c899652d": {
+        "message": "Omdömen läses in"
+    },
+    "grades_loaded_5056277c": {
+        "message": "Omdömen har lästs in"
+    },
+    "group_files_4324f3df": {
+        "message": "Gruppfiler"
+    },
+    "group_navigation_99f191a": {
+        "message": "Gruppnavigering"
+    },
+    "header_f28f73db": {
+        "message": "Rubrik"
+    },
+    "height_69b03e15": {
+        "message": "Höjd"
+    },
+    "image_options_5412d02c": {
+        "message": "Bildalternativ"
+    },
+    "image_options_tray_90a46006": {
+        "message": "Alternativfält för bilder"
+    },
+    "images_7ce26570": {
+        "message": "Bilder"
+    },
+    "increase_indent_6d550a4a": {
+        "message": "Öka indrag"
+    },
+    "insert_equella_links_49a8dacd": {
+        "message": "Infoga Equella-länkar"
+    },
+    "insert_link_6dc23cae": {
+        "message": "Infoga länk"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Infoga en matematisk ekvation"
+    },
+    "invalid_file_c11ba11": {
+        "message": "Ogiltig fil"
+    },
+    "invalid_file_type_881cc9b2": {
+        "message": "Ogiltig filtyp"
+    },
+    "items_completed_items_plural_1_item_other_items_717d579f": {
+        "message": "{ items } slutförda { items, plural,\n     =1 {objekt}\n  other {objekt}\n}"
+    },
+    "keyboard_shortcuts_ed1844bd": {
+        "message": "Kortkommandon"
+    },
+    "large_9c5e80e7": {
+        "message": "Stor"
+    },
+    "late_2be42b88": {
+        "message": "Sen"
+    },
+    "left_to_right_d6da6d7e": {
+        "message": "vänster till höger"
+    },
+    "link_7262adec": {
+        "message": "Länk"
+    },
+    "link_options_a16b758b": {
+        "message": "Länkalternativ"
+    },
+    "link_to_other_content_in_the_course_879163b5": {
+        "message": "Länka till annat innehåll i kursen."
+    },
+    "link_to_other_content_in_the_group_3fe25379": {
+        "message": "Länka till annat innehåll i gruppen."
+    },
+    "links_14b70841": {
+        "message": "Länkar"
+    },
+    "load_more_35d33c7": {
+        "message": "Läs in mer"
+    },
+    "load_more_a36f9cf9": {
+        "message": "Läs in mer"
+    },
+    "load_more_results_460f49a9": {
+        "message": "Läs in fler resultat"
+    },
+    "load_prior_dates_f2b0f6f0": {
+        "message": "Läs in tidigare datum"
+    },
+    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+        "message": "Läste in { count, plural,\n     =0 {# objekt}\n    one {# objekt}\n  other {# objekt}\n}"
+    },
+    "loading_25990131": {
+        "message": "Läser in ..."
+    },
+    "loading_725811ca": {
+        "message": "läser in"
+    },
+    "loading_bde52856": {
+        "message": "Läser in"
+    },
+    "loading_failed_b3524381": {
+        "message": "Det gick inte att läsa in ..."
+    },
+    "loading_failed_e6a9d8ef": {
+        "message": "Det gick inte att läsa in."
+    },
+    "loading_grades_c842c887": {
+        "message": "Läser in omdömen"
+    },
+    "loading_media_f3455841": {
+        "message": "Läser in media"
+    },
+    "loading_past_items_ca499e75": {
+        "message": "Läser in tidigare objekt"
+    },
+    "loading_planner_items_947a813d": {
+        "message": "Läser in Planner-objekt"
+    },
+    "location_3b6ff307": {
+        "message": "Plats:"
+    },
+    "looks_like_there_isn_t_anything_here_d9bcef49": {
+        "message": "Det verkar inte finnas något här"
+    },
+    "media_af190855": {
+        "message": "Media"
+    },
+    "medium_5a8e9ead": {
+        "message": "Medium"
+    },
+    "mic_a7f3d311": {
+        "message": "Mikrofon"
+    },
+    "miscellaneous_and_apps_f450a387": {
+        "message": "Övrigt och appar"
+    },
+    "missing_1a256b3b": {
+        "message": "Saknas"
+    },
+    "missing_items_for_title_516511f8": {
+        "message": "Objekt saknas för { title }"
+    },
+    "modules_c4325335": {
+        "message": "Moduler"
+    },
+    "must_be_at_least_width_x_height_px_41dc825e": {
+        "message": "Måste vara minst { width } x { height }pixlar"
+    },
+    "my_documents_77a74ff3": {
+        "message": "Mina dokument"
+    },
+    "my_files_eea33f44": {
+        "message": "Mina filer"
+    },
+    "my_grades_98834476": {
+        "message": "Mina omdömen"
+    },
+    "my_images_427f9b0c": {
+        "message": "Mina bilder"
+    },
+    "my_media_82bade11": {
+        "message": "Min media"
+    },
+    "navigate_through_the_menu_or_toolbar_415a4e50": {
+        "message": "Navigera via menyn eller verktygsfältet"
+    },
+    "new_13daf639": {
+        "message": "Ny"
+    },
+    "new_activity_8b84847d": {
+        "message": "Ny aktivitet"
+    },
+    "new_activity_for_title_14c9c3af": {
+        "message": "Ny aktivitet för { title }"
+    },
+    "new_opportunities_7d349c4d": {
+        "message": "Nya möjligheter"
+    },
+    "next_month_749b1778": {
+        "message": "Nästa månad"
+    },
+    "next_page_d2a39853": {
+        "message": "Nästa sida"
+    },
+    "no_alt_text_decorative_image_f318fc0e": {
+        "message": "Ingen alternativtext (dekorativ bild)"
+    },
+    "no_due_dates_assigned_e8f5bac8": {
+        "message": "Inga inlämningsdatum tilldelade"
+    },
+    "no_grade_3b4d7f3e": {
+        "message": "Ingen omdöme"
+    },
+    "no_results_940393cf": {
+        "message": "Inga resultat."
+    },
+    "no_results_found_for_filterterm_ad1b04c8": {
+        "message": "Inga resultat hittades för { filterTerm }"
+    },
+    "no_results_found_for_term_1564c08e": {
+        "message": "Inga resultat hittades för { term }."
+    },
+    "no_video_1ed00b26": {
+        "message": "Ingen video"
+    },
+    "nothing_for_now_e3e3ce2a": {
+        "message": "Inget just nu"
+    },
+    "nothing_here_needs_attention_c4eaded6": {
+        "message": "Inget behöver åtgärdas här."
+    },
+    "nothing_more_to_do_b665da42": {
+        "message": "Inget mer att göra"
+    },
+    "nothing_new_needs_attention_3ac548d4": {
+        "message": "Inget nytt som kräver uppmärksamhet."
+    },
+    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
+        "message": "Inget planerat i dag. Väljer det senaste objektet."
+    },
+    "nothing_planned_today_selecting_next_item_f6718aa": {
+        "message": "Inget planerat i dag. Väljer nästa objekt."
+    },
+    "nothing_planned_yet_8675ffe9": {
+        "message": "Inget planerat ännu"
+    },
+    "numpoints_points_8621a43b": {
+        "message": "{ numPoints } poäng"
+    },
+    "only_most_recent_grading_period_shown_f1ad6458": {
+        "message": "*Endast den senaste bedömningsperioden visas."
+    },
+    "open_this_keyboard_shortcuts_dialog_9658b83a": {
+        "message": "Öppna dialogrutan för detta kortkommando"
+    },
+    "opportunities_popup_f6703842": {
+        "message": "popupfönster med möjligheter"
+    },
+    "optional_add_course_ef0d70fc": {
+        "message": "Valfritt: Lägg till kurs"
+    },
+    "options_3ab0ea65": {
+        "message": "Alternativ"
+    },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "Ordnade och oordnade listor"
+    },
+    "other_editor_shortcuts_may_be_found_at_404aba4a": {
+        "message": "Andra genvägar till redigeraren kan hittas på"
+    },
+    "page_50c4823d": {
+        "message": "Sida"
+    },
+    "pages_e5414c2c": {
+        "message": "Sidor"
+    },
+    "paragraph_5e5ad8eb": {
+        "message": "Paragraf"
+    },
+    "pause_12af3bb4": {
+        "message": "Pausa"
+    },
+    "peer_review_74f26a13": {
+        "message": "kamratresponsuppgift"
+    },
+    "peer_review_for_itemtitle_358cb413": {
+        "message": "kamratresponsuppgift för { itemTitle }"
+    },
+    "people_b4ebb13c": {
+        "message": "Personer"
+    },
+    "play_1a47eaa7": {
+        "message": "Spela upp"
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Ge Canvas åtkomst till din mikrofon och webbkamera."
+    },
+    "points_bceb5005": {
+        "message": "poäng"
+    },
+    "points_points_63e59cce": {
+        "message": "{ points } poäng"
+    },
+    "posted_when_a578f5ab": {
+        "message": "Publicerad: { when }"
+    },
+    "preformatted_d0670862": {
+        "message": "Förformaterade"
+    },
+    "preview_a3f8f854": {
+        "message": "FÖRHANDSVISA"
+    },
+    "previous_month_bb1e3c84": {
+        "message": "Föregående månad"
+    },
+    "previous_page_928fc112": {
+        "message": "Föregående sida"
+    },
+    "pts_699bd9aa": {
+        "message": "poäng"
+    },
+    "published_c944a23d": {
+        "message": "publicerad"
+    },
+    "published_when_302d8e23": {
+        "message": "Publicerad: { when }"
+    },
+    "quiz_e0dcce8f": {
+        "message": "Quiz"
+    },
+    "quizzes_7e598f57": {
+        "message": "Quiz"
+    },
+    "record_7c9448b": {
+        "message": "Spela in"
+    },
+    "record_upload_media_5fdce166": {
+        "message": "Spela in/ladda upp media"
+    },
+    "recording_98da6bda": {
+        "message": "Inspelning"
+    },
+    "reminder_date_4564d12d": {
+        "message": "Påminnelse: { date }"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "Ta bort länk"
+    },
+    "replies_4a8577c8": {
+        "message": "Svar"
+    },
+    "rich_content_editor_2708ef21": {
+        "message": "Redigerare för formaterat innehåll"
+    },
+    "right_to_left_ec223c81": {
+        "message": "höger till vänster"
+    },
+    "save_11a80ec3": {
+        "message": "Spara"
+    },
+    "scroll_up_to_see_your_history_19b14cad": {
+        "message": "Bläddra uppåt för att se din historik."
+    },
+    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
+        "message": "Bläddrar uppåt till tidigare objekt med ny aktivitet."
+    },
+    "search_280d00bd": {
+        "message": "Sök"
+    },
+    "search_term_b2d2235": {
+        "message": "Sökterm"
+    },
+    "select_app_3d08035a": {
+        "message": "Välj app"
+    },
+    "select_language_7c93a900": {
+        "message": "Välj språk"
+    },
+    "selected_274ce24f": {
+        "message": "Markerade"
+    },
+    "show_all_ae37d610": {
+        "message": "Visa alla"
+    },
+    "show_embed_options_ef8d7ef": {
+        "message": "Visa inbäddningsalternativ"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "Visa bildalternativ"
+    },
+    "show_link_options_545338fd": {
+        "message": "Visa länkalternativ"
+    },
+    "show_my_grades_ebd08684": {
+        "message": "Visa mina omdömen"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "Visa videoalternativ"
+    },
+    "size_b30e1077": {
+        "message": "Storlek"
+    },
+    "small_b070434a": {
+        "message": "Liten"
+    },
+    "small_header_168fb9f9": {
+        "message": "Liten rubrik"
+    },
+    "something_went_wrong_89195131": {
+        "message": "Någonting gick fel."
+    },
+    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+        "message": "Något gick fel vid försök att komma åt din mikrofon eller webbkamera."
+    },
+    "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
+        "message": "Något gick fel och jag vet inte vad jag ska visa dig."
+    },
+    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
+        "message": "Något gick fel. Uppdatera sidan och försök igen."
+    },
+    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
+        "message": "Något gick fel under uppladdningen. Kontrollera din anslutning och försök igen."
+    },
+    "sort_by_e75f9e3e": {
+        "message": "Sortera efter"
+    },
+    "square_unordered_list_b15ce93b": {
+        "message": "fyrkantsmarkera oordnad lista"
+    },
+    "start_over_f7552aa9": {
+        "message": "Börja om"
+    },
+    "start_recording_9a65141a": {
+        "message": "Starta inspelning"
+    },
+    "startdate_to_enddate_d245175b": {
+        "message": "{ startDate } till { endDate }"
+    },
+    "startdatetime_enddatetime_20abc10e": {
+        "message": "{ startDateTime }/{ endDateTime }"
+    },
+    "startdatetime_endtime_49741bbe": {
+        "message": "{ startDateTime }/{ endTime }"
+    },
+    "starttime_to_endtime_d7cc249d": {
+        "message": "{ startTime } till { endTime }"
+    },
+    "styles_2aa721ef": {
+        "message": "Stilar"
+    },
+    "subheader_2b87606d": {
+        "message": "Underrubrik"
+    },
+    "submit_a3cc6859": {
+        "message": "Lämna in"
+    },
+    "submitted_318fad53": {
+        "message": "Skickad"
+    },
+    "subscript_59744f96": {
+        "message": "Nedsänkt"
+    },
+    "success_to_do_created_e34ed395": {
+        "message": "Klart: Skapade att göra-objekt"
+    },
+    "superscript_8cb349a2": {
+        "message": "Upphöjd"
+    },
+    "switch_to_raw_html_editor_4c9ac7de": {
+        "message": "Växla till rå HTML-redigerare"
+    },
+    "switch_to_rich_text_editor_35822d26": {
+        "message": "Växla till RTF-redigerare"
+    },
+    "syllabus_f191f65b": {
+        "message": "Kursöversikt"
+    },
+    "tab_arrows_4cf5abfc": {
+        "message": "FLIK/Pilar"
+    },
+    "task_16b0ef38": {
+        "message": "Uppgift"
+    },
+    "text_7f4593da": {
+        "message": "Text"
+    },
+    "the_date_and_time_this_to_do_is_due_74c823d4": {
+        "message": "Datum och tid dessa att göra-uppgifter ska vara klara"
+    },
+    "there_are_no_points_associated_with_this_item_449c712a": {
+        "message": "Inga poäng är kopplade till det här objektet"
+    },
+    "time_2b5aac58": {
+        "message": "Tid"
+    },
+    "title_ee03d132": {
+        "message": "Titel"
+    },
+    "title_is_required_6ddcab69": {
+        "message": "titel krävs"
+    },
+    "to_be_posted_when_d24bf7dc": {
+        "message": "För publicering: { when }"
+    },
+    "to_do_1d554f36": {
+        "message": "Att göra"
+    },
+    "to_do_date_4b211ad0": {
+        "message": "Att göra: { date }"
+    },
+    "to_do_items_loading_d1cdfcd5": {
+        "message": "Läser in att göra-objekt"
+    },
+    "to_do_when_2783d78f": {
+        "message": "Att göra: { when }"
+    },
+    "today_76e10f9c": {
+        "message": "I dag"
+    },
+    "today_at_date_8ac30d6": {
+        "message": "I dag kl. { date }"
+    },
+    "tomorrow_9a6c9a00": {
+        "message": "I morgon"
+    },
+    "tomorrow_at_date_b53f2cf1": {
+        "message": "I morgon kl. { date }"
+    },
+    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
+        "message": "{ totalResults } resultat hittades, { numDisplayed } resultat visas nu"
+    },
+    "tray_839df38a": {
+        "message": "Fack"
+    },
+    "type_control_f9_to_access_image_options_text_a47e319f": {
+        "message": "Skriv Control F9 för åtkomst till bildalternativ. { text }"
+    },
+    "type_control_f9_to_access_link_options_text_4ead9682": {
+        "message": "Skriv Control F9 för åtkomst till länkalternativ. { text }"
+    },
+    "type_control_f9_to_access_table_options_text_92141329": {
+        "message": "Skriv Control F9 för åtkomst till tabellalternativ. { text }"
+    },
+    "unable_to_mark_as_complete_8141856d": {
+        "message": "Det går inte att markera som färdig."
+    },
+    "unpublished_dfd8801": {
+        "message": "avpublicerad"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Namnlös"
+    },
+    "upload_document_253f0478": {
+        "message": "Ladda upp dokument"
+    },
+    "upload_error_f9c00e27": {
+        "message": "Uppladdningsfel"
+    },
+    "upload_file_fd2361b8": {
+        "message": "Ladda upp fil"
+    },
+    "upload_image_6120b609": {
+        "message": "Ladda upp bild"
+    },
+    "upload_media_ce31135a": {
+        "message": "Ladda upp media"
+    },
+    "upload_record_media_e4207d72": {
+        "message": "Ladda upp/spela in media"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "markera alfabetisk ordnad lista med versaler"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "markera ordnad lista med romerska siffror"
+    },
+    "url_22a5f3b8": {
+        "message": "URL"
+    },
+    "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+        "message": "Används av skärmläsare för att beskriva en bilds innehåll"
+    },
+    "user_documents_c206e61f": {
+        "message": "Användardokument"
+    },
+    "user_images_b6490852": {
+        "message": "Användarbilder"
+    },
+    "user_media_14fbf656": {
+        "message": "Användarmedia"
+    },
+    "video_audio_recording_uploaded_6af5d378": {
+        "message": "Video/ljudinspelning har laddats upp"
+    },
+    "video_options_24ef6e5d": {
+        "message": "Videoalternativ"
+    },
+    "video_options_tray_3b9809a5": {
+        "message": "Alternativfält för videor"
+    },
+    "video_player_b371005": {
+        "message": "Videospelare"
+    },
+    "view_keyboard_shortcuts_34d1be0b": {
+        "message": "Visa kortkommandon"
+    },
+    "webcam_fe91b20f": {
+        "message": "Webbkamera"
+    },
+    "width_492fec76": {
+        "message": "Bredd"
+    },
+    "width_and_height_must_be_numbers_110ab2e3": {
+        "message": "Bredd och höjd måste anges med siffror"
+    },
+    "width_x_height_px_ff3ccb93": {
+        "message": "{ width } x { height }pixlar"
+    },
+    "wiki_home_9cd54d0": {
+        "message": "Startsida Wiki"
+    },
+    "yesterday_at_date_1aa6d18e": {
+        "message": "I går kl. { date }"
+    },
+    "yesterday_c6bd6abf": {
+        "message": "I går"
+    },
+    "you_have_media_feedback_f5f9aba8": {
+        "message": "Du har mediefeedback."
+    },
+    "you_must_provide_a_date_and_time_a86839d2": {
+        "message": "Du måste ange ett datum och en tid."
+    },
+    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+        "message": "Du har bläddrat tillbaka till din allra första att göra-uppgift!"
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Din webbkamera kanske redan används."
+    }
+}

@@ -250,7 +250,6 @@ class WebConference < ActiveRecord::Base
     infer_conference_settings
     self.conference_type ||= config && config[:conference_type]
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
-    self.user_ids ||= (self.user_id || "").to_s
     self.added_user_ids ||= ""
     self.title ||= self.context.is_a?(Course) ? t('#web_conference.default_name_for_courses', "Course Web Conference") : t('#web_conference.default_name_for_groups', "Group Web Conference")
     self.start_at ||= self.started_at

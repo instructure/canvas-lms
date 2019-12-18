@@ -28,8 +28,8 @@ propTypes.permissions = shape({
 
 propTypes.discussionTopicMenuTools = shape({
   base_url: string.isRequired,
-  canvas_icon_class: string.isRequired,
-  icon_url: string.isRequired,
+  canvas_icon_class: string,
+  icon_url: string,
   title: string.isRequired
 })
 

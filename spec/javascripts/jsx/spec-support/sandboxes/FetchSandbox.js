@@ -32,6 +32,8 @@ import fetchMock from 'fetch-mock'
  * http://www.wheresrhys.co.uk/fetch-mock/
  */
 
+const ALLOWED_URL_REGEXES = [new RegExp('^https://sentry.insops.net')]
+
 export default class FetchSandbox {
   constructor(options) {
     this._options = options
@@ -43,8 +45,13 @@ export default class FetchSandbox {
   setup() {
     const {global, qunit} = this._options
     const {_fetchMock} = this
+    const {fetch: fetchReal} = global
 
     global.fetch = function fetch(...args) {
+      if (ALLOWED_URL_REGEXES.some(regex => regex.test(args[0]))) {
+        return fetchReal(...args)
+      }
+
       return _fetchMock.call(_fetchMock, ...args)
     }
 

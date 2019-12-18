@@ -17,6 +17,7 @@ require_relative '../common'
 require_relative 'page_objects/assignments_index_page'
 require_relative '../shared_components/copy_to_tray_page'
 require_relative '../shared_components/send_to_dialog_page'
+require_relative '../admin/pages/account_content_share_page'
 require_relative '../../spec_helper'
 
 describe 'assignments' do
@@ -25,6 +26,7 @@ describe 'assignments' do
   include AssignmentsIndexPage
   include CopyToTrayPage
   include SendToDialogPage
+	include AccountContentSharePage
 
   let(:setup) {
     # Two Courses
@@ -33,6 +35,8 @@ describe 'assignments' do
     # Two teachers
     @teacher1 = User.create!(:name => "First Teacher")
     @teacher2 = User.create!(:name => "Second Teacher")
+		@teacher2.accept_terms
+		@teacher2.register!
     # Teacher1 is enrolled in both courses, Teacher2 is in Course2 only
     @course1.enroll_teacher(@teacher1, :enrollment_state => 'active')
     @course2.enroll_teacher(@teacher1, :enrollment_state => 'active')
@@ -51,7 +55,8 @@ describe 'assignments' do
   let(:send_item) {
     user_search.click
     user_search.send_keys("teac")
-    user_dropdown.click(@teacher2.name)
+		wait_for_animations
+    user_dropdown(@teacher2.name).click
     send_button.click
     run_jobs
   }
@@ -88,17 +93,20 @@ describe 'assignments' do
       end
     end
 
-    # context 'send to' do
-    #   before(:each) do
-    #     manage_assignment_menu(@assignment1.id).click
-    #     send_assignment_menu_link(@assignment1.id).click
-    #   end
-    #   it 'directly shared item can be imported by recipient' do
-    #     skip('will be fixed in a new PS ADMIN-3012')
-    #     send_item
-    #     expect(starting_send_operation_alert).to include "Content share started successfully"
-    #   end
-    # end
+    context 'send to' do
+      before(:each) do
+        manage_assignment_menu(@assignment1.id).click
+        send_assignment_menu_link(@assignment1.id).click
+				send_item
+				run_jobs
+				user_session(@teacher2)
+		    visit_content_share_page
+      end
+
+      it 'can send an item to another instructor' do
+				expect(received_table_rows[1].text).to include (@assignment1.name)
+      end
+    end
   end
 
   context 'with direct share FF OFF' do

@@ -131,8 +131,8 @@ export default class UploadMedia extends React.Component {
         if (this.state.selectedPanel === PANELS.COMPUTER && this.state.subtitles.length > 0) {
           await saveClosedCaptions(data.mediaObject.media_object.media_id, this.state.subtitles)
         }
-        this.props.onDismiss && this.props.onDismiss()
         this.props.onUploadComplete && this.props.onUploadComplete(null, data)
+        this.props.onDismiss && this.props.onDismiss()
       } catch (ex) {
         // Handle error
         console.error(ex) // eslint-disable-line no-console

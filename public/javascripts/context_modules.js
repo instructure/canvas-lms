@@ -2504,7 +2504,7 @@ $(document).ready(function() {
     modules.updateProgressionState($(this))
   })
 
-  function setExternalToolTray(tool, returnFocusTo) {
+  function setExternalToolTray(tool, moduleData, selectable, returnFocusTo) {
     const handleDismiss = () => {
       setExternalToolTray(null)
       returnFocusTo.focus()
@@ -2512,18 +2512,6 @@ $(document).ready(function() {
         window.location.reload()
       }
     }
-
-    const moduleData = []
-    $('#context_modules .context_module').each(function() {
-      moduleData.push({
-        id: $(this)
-          .attr('id')
-          .substring('context_module_'.length),
-        name: $(this)
-          .find('.name')
-          .attr('title')
-      })
-    })
 
     ReactDOM.render(
       <ContentTypeExternalToolTray
@@ -2541,7 +2529,7 @@ $(document).ready(function() {
           'video'
         ]}
         targetResourceType="module"
-        allowItemSelection
+        allowItemSelection={selectable}
         selectableItems={moduleData}
         onDismiss={handleDismiss}
         open={tool !== null}
@@ -2554,11 +2542,36 @@ $(document).ready(function() {
     if (ev != null) {
       ev.preventDefault()
     }
-    const tool = ENV.MODULE_INDEX_TOOLS.find(t => t.id === ev.target.dataset.toolId)
-    setExternalToolTray(tool, $('.al-trigger')[0])
+    const launchType = ev.target.dataset.toolLaunchType
+    const tool = (ENV.MODULE_TRAY_TOOLS[launchType] || []).find(
+      t => t.id === ev.target.dataset.toolId
+    )
+
+    const moduleData = []
+    if (launchType == 'module_index_menu') {
+      // include all modules
+      $('#context_modules .context_module').each(function() {
+        moduleData.push({
+          id: $(this)
+            .attr('id')
+            .substring('context_module_'.length),
+          name: $(this)
+            .find('.name')
+            .attr('title')
+        })
+      })
+    } else if (launchType == 'module_group_menu') {
+      // just include the one module whose menu we're on
+      const module = $(ev.target).parents('.context_module')
+      moduleData.push({
+        id: module.attr('id').substring('context_module_'.length),
+        name: module.find('.name').attr('title')
+      })
+    }
+    setExternalToolTray(tool, moduleData, launchType == 'module_index_menu', $('.al-trigger')[0])
   }
 
-  $('.module_index_tools .menu_tool_link').click(openExternalTool)
+  $('.menu_tray_tool_link').click(openExternalTool)
   monitorLtiMessages()
 })
 
