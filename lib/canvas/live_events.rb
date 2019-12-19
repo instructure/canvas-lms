@@ -759,4 +759,20 @@ module Canvas::LiveEvents
     }
     post_event_stringified('course_grade_change', data, amended_context(score.course))
   end
+
+  def self.sis_batch_payload(batch)
+    {
+      sis_batch_id: batch.id,
+      account_id: batch.account_id,
+      workflow_state: batch.workflow_state
+    }
+  end
+
+  def self.sis_batch_created(batch)
+    post_event_stringified('sis_batch_created', sis_batch_payload(batch))
+  end
+
+  def self.sis_batch_updated(batch)
+    post_event_stringified('sis_batch_updated', sis_batch_payload(batch))
+  end
 end
