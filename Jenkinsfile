@@ -28,7 +28,8 @@ def build_parameters = [
   string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}"),
   string(name: 'GERRIT_CHANGE_COMMIT_MESSAGE', value: "${env.GERRIT_CHANGE_COMMIT_MESSAGE}"),
   string(name: 'GERRIT_HOST', value: "${env.GERRIT_HOST}"),
-  string(name: 'GERGICH_PUBLISH', value: "${env.GERGICH_PUBLISH}")
+  string(name: 'GERGICH_PUBLISH', value: "${env.GERGICH_PUBLISH}"),
+  string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}")
 ]
 
 def getImageTagVersion() {

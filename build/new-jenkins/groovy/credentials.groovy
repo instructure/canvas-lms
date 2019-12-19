@@ -22,6 +22,12 @@ def withGerritCredentials(block) {
   ]) { block.call() }
 }
 
+def withMasterBouncerCredentials(block) {
+  withCredentials([
+    string(credentialsId: 'master-bouncer-key', variable: 'MASTER_BOUNCER_KEY')
+  ]) { block.call() }
+}
+
 def fetchFromGerrit(String repo, String path, String customRepoDestination = null, String sourcePath = null, String sourceRef = null) {
   withGerritCredentials({ ->
     println "Fetching ${repo} plugin"
