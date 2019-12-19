@@ -36,7 +36,7 @@ pipeline {
     KNAPSACK_EXCLUDE_REGEX = '/performance/'
     KNAPSACK_TEST_DIR = 'spec'
     // for now 1 until we stabilize some of the flaky specs
-    RERUNS_RETRY = 2
+    RERUNS_RETRY = 3
     MAX_FAIL = 100
   }
 
