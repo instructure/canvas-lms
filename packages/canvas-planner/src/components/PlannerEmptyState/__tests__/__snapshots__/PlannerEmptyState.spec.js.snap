@@ -36,6 +36,7 @@ exports[`renders desert when completely empty 1`] = `
       disabled={false}
       iconPlacement="start"
       id="PlannerEmptyState_CardView"
+      isWithinText={true}
       linkRef={[Function]}
       onClick={[Function]}
       variant="default"

@@ -25,7 +25,8 @@ import select from '../../shared/select'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
-import {Checkbox, TextArea} from '@instructure/ui-forms'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-elements'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
@@ -166,7 +167,4 @@ const connectState = state =>
     'willIncludeCourseSettings'
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedMigrationOptions = connect(
-  connectState,
-  connectActions
-)(MigrationOptions)
+export const ConnectedMigrationOptions = connect(connectState, connectActions)(MigrationOptions)
