@@ -346,6 +346,7 @@ describe DiscussionEntriesController do
       allow(mock_client).to receive(:startSession)
       allow(mock_client).to receive(:mediaGet).and_return(nil)
       allow(mock_client).to receive(:flavorAssetGetByEntryId).and_return(nil)
+      allow(mock_client).to receive(:media_sources).and_return(nil)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_client)
 
       topic_with_media_reply
