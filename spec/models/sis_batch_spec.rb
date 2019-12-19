@@ -1207,4 +1207,45 @@ test_1,u1,student,active}
 
     end
   end
+
+  describe 'live events' do
+
+    def test_batch
+      allow(LiveEvents).to receive(:post_event)
+      SisBatch.create(account: @account, workflow_state: :initializing)
+    end
+
+    it 'should trigger live event when created' do
+      expect(LiveEvents).to receive(:post_event).with(hash_including({
+        event_name: 'sis_batch_created',
+        payload: hash_including({
+          account_id: @account.id.to_s,
+          workflow_state: "initializing"
+        }),
+      }))
+      test_batch
+    end
+
+    it 'should trigger live event when workflow state is updated' do
+      batch = test_batch
+      expect(LiveEvents).to receive(:post_event).with(hash_including({
+        event_name: 'sis_batch_updated',
+        payload: hash_including({
+          account_id: @account.id.to_s,
+          workflow_state: "failed"
+        }),
+      }))
+      batch.workflow_state = :failed
+      batch.save!
+    end
+
+    it 'should not trigger live event when workflow state is unchanged' do
+      batch = test_batch
+      expect(LiveEvents).not_to receive(:post_event).with(hash_including({
+        event_name: 'sis_batch_updated'
+      }))
+      batch.progress = 1
+      batch.save!
+    end
+  end
 end
