@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
 import {func, string} from 'prop-types'
 
-function ErrorTextInputForm(props) {
+export default function ErrorTextInputForm(props) {
   return (
     <View margin="small">
       <TextArea
@@ -54,5 +54,3 @@ ErrorTextInputForm.propTypes = {
   handleSubmitErrorReport: func.isRequired,
   handleChangeOptionalEmail: func.isRequired
 }
-
-export default React.memo(ErrorTextInputForm)

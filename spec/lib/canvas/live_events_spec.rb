@@ -239,6 +239,46 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe '.course_grade_change' do
+    before(:once) do
+      @user = User.create!
+      @course = Course.create!
+    end
+
+    let(:course_context) do
+      hash_including(
+        root_account_uuid: @course.root_account.uuid,
+        root_account_id: @course.root_account.global_id.to_s,
+        root_account_lti_guid: @course.root_account.lti_guid.to_s,
+        context_id: @course.global_id.to_s,
+        context_type: 'Course'
+      )
+    end
+
+    it 'should include the course context, current scores and old scores' do
+      enrollment_model
+      score = Score.new(
+        course_score: true, enrollment: @enrollment,
+        current_score: 5.0, final_score: 4.0, unposted_current_score: 3.0, unposted_final_score: 2.0
+      )
+
+      expected_body = hash_including(
+        current_score: 5.0, final_score: 4.0, unposted_current_score: 3.0, unposted_final_score: 2.0,
+        old_current_score: 1.0, old_final_score: 2.0, old_unposted_current_score: 3.0, old_unposted_final_score: 4.0,
+        course_id: @enrollment.course_id.to_s, user_id: @enrollment.user_id.to_s,
+        workflow_state: 'active'
+      )
+      expect_event('course_grade_change', expected_body, course_context)
+
+      Canvas::LiveEvents.course_grade_change(score, {
+        current_score: 1.0,
+        final_score: 2.0,
+        unposted_current_score: 3.0,
+        unposted_final_score: 4.0
+      }, score.enrollment)
+    end
+  end
+
   describe ".grade_changed" do
     let(:course_context) do
       hash_including(
@@ -646,6 +686,25 @@ describe Canvas::LiveEvents do
       ).once
 
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation', context: context)
+    end
+
+    it "should include enrollment data if provided" do
+      course_with_student
+
+      expect_event('asset_accessed', {
+        asset_name: "Unnamed Course",
+        asset_type: 'course',
+        asset_id: @course.global_id.to_s,
+        asset_subtype: 'assignments',
+        category: 'category',
+        role: 'role',
+        level: 'participation',
+        enrollment_id: @enrollment.id.to_s,
+        section_id: @enrollment.course_section_id.to_s
+      }, {compact_live_events: true}).once
+
+      Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation',
+        context: nil, context_membership: @enrollment)
     end
   end
 

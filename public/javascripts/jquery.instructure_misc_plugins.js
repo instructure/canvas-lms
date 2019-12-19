@@ -146,6 +146,7 @@ $.fn.confirmDelete = function(options) {
     if (options.dialog) {
       result = false
       const dialog_options = typeof options.dialog === 'object' ? options.dialog : {}
+      const confirmation_class = options.url.includes('assignments') ? 'btn-danger' : 'btn-primary'
       $dialog = $(options.message).dialog(
         $.extend(
           {},
@@ -161,7 +162,7 @@ $.fn.confirmDelete = function(options) {
               },
               {
                 text: I18n.t('#buttons.delete', 'Delete'),
-                class: 'btn-primary',
+                class: confirmation_class,
                 click() {
                   result = true
                   $(this).dialog('close')

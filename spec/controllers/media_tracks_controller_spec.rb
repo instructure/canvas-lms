@@ -53,6 +53,16 @@ describe MediaTracksController do
       post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => example_ttml_susceptible_to_xss}
       expect(response).to have_http_status(:unprocessable_entity)
     end
+
+    it "should validate :kind" do
+      post 'create', params: {:media_object_id => @mo.media_id, :kind => 'unkind', :locale => 'en', :content => '1'}
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it "should validate :locale" do
+      post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => '<img src="lolcats.gif">', :content => '1'}
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
   end
 
   describe "#show" do

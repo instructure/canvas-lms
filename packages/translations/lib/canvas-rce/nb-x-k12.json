@@ -23,6 +23,7 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Lyd og videoopptak er ikke tilgjengelig."
   },
+  "audio_player_for_title_20cc70d": { "message": "Lydspiller for { title }" },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Automatisk åpne en forhåndsvisning av prosesslinjen. (Forhåndsvisning vises etter lagring)"
   },
@@ -78,6 +79,7 @@
     "message": "standard numerisk-ordnet liste"
   },
   "describe_the_image_e65d2e32": { "message": "(Beskriv bildet)" },
+  "describe_the_video_2fe8f46a": { "message": "(Beskriv videoen)" },
   "dimensions_45ddb7b7": { "message": "Dimensjoner" },
   "directionality_ebcae6d0": { "message": "retning" },
   "disable_in_line_preview_2a675175": {
@@ -111,6 +113,7 @@
   "embed_image_1080badc": { "message": "Sett inn bilde" },
   "embed_options_tray_901cfd19": { "message": "Legg ved valgbrett" },
   "embed_preview_2d741e1f": { "message": "Legg ved forhåndsvisning" },
+  "embed_video_a97a64af": { "message": "Legg ved video" },
   "embed_video_code_703e10f2": { "message": "Legg ved videokode" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Avvik ved opplasting av video/ audio-innspilling"
@@ -147,7 +150,6 @@
   "grades_a61eba0a": { "message": "Vurderinger" },
   "group_files_4324f3df": { "message": "Gruppefiler" },
   "group_navigation_99f191a": { "message": "Gruppenavigering" },
-  "header_f28f73db": { "message": "Topptekst" },
   "height_69b03e15": { "message": "Høyde" },
   "image_options_5412d02c": { "message": "Bilde-alternativer" },
   "image_options_tray_90a46006": { "message": "Brett for bilde-alternativer" },
@@ -247,7 +249,6 @@
   "show_video_options_6ed3721a": { "message": "Vis videovalg" },
   "size_b30e1077": { "message": "Størrelse" },
   "small_b070434a": { "message": "Liten" },
-  "small_header_168fb9f9": { "message": "Liten overskrift" },
   "something_went_wrong_89195131": { "message": "Noe gikk galt." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Noe gikk galt da det skulle gi tilgang til mikrofonen eller webkameraet ditt"
@@ -266,7 +267,6 @@
   "start_over_f7552aa9": { "message": "Start på nytt" },
   "start_recording_9a65141a": { "message": "Start opptak" },
   "styles_2aa721ef": { "message": "Stiler" },
-  "subheader_2b87606d": { "message": "Underoverskrift" },
   "submit_a3cc6859": { "message": "Send inn" },
   "subscript_59744f96": { "message": "Senket skrift" },
   "superscript_8cb349a2": { "message": "Hevet skrift" },
@@ -313,6 +313,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Brukt av skjermlesere for å beskrive innholdet til et bilde"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Brukt av skjermlesere for å beskrive videoen"
+  },
   "user_documents_c206e61f": { "message": "Brukerdokumenter" },
   "user_images_b6490852": { "message": "Brukerbilder" },
   "user_media_14fbf656": { "message": "Brukermedie" },
@@ -322,6 +325,10 @@
   "video_options_24ef6e5d": { "message": "Videovalg" },
   "video_options_tray_3b9809a5": { "message": "Videovalgbrett" },
   "video_player_b371005": { "message": "Video avspiller" },
+  "video_player_for_9e7d373b": { "message": "Video avspiller for " },
+  "video_player_for_title_ffd9fbc4": {
+    "message": "Video avspiller for { title }"
+  },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Vis tastatur-snarveier" },
   "webcam_fe91b20f": { "message": "Webkamera" },
   "width_492fec76": { "message": "Bredd" },

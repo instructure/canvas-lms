@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Ljud- och videoinspelning är inte tillgänglig."
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "Ljudspelare för { title }"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Öppna automatiskt en infogad förhandsvisning (Förhandsvisningen visas endast efter att den sparats)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(Beskriv bilden)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "(Beskriv videon)"
+    },
     "details_98a31b68": {
         "message": "Detaljer"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "Bädda in förhandsvisning"
+    },
+    "embed_video_a97a64af": {
+        "message": "Bädda in videon"
     },
     "embed_video_code_703e10f2": {
         "message": "Bädda in videokod"
@@ -460,9 +469,6 @@
     },
     "group_navigation_99f191a": {
         "message": "Gruppnavigering"
-    },
-    "header_f28f73db": {
-        "message": "Rubrik"
     },
     "height_69b03e15": {
         "message": "Höjd"
@@ -833,9 +839,6 @@
     "small_b070434a": {
         "message": "Liten"
     },
-    "small_header_168fb9f9": {
-        "message": "Liten rubrik"
-    },
     "something_went_wrong_89195131": {
         "message": "Någonting gick fel."
     },
@@ -877,9 +880,6 @@
     },
     "styles_2aa721ef": {
         "message": "Stilar"
-    },
-    "subheader_2b87606d": {
-        "message": "Underrubrik"
     },
     "submit_a3cc6859": {
         "message": "Skicka in"
@@ -1010,6 +1010,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Används av skärmläsare för att beskriva en bilds innehåll"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Används av skärmläsare för att beskriva videon"
+    },
     "user_documents_c206e61f": {
         "message": "Användardokument"
     },
@@ -1030,6 +1033,12 @@
     },
     "video_player_b371005": {
         "message": "Videospelare"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "Videospelare för "
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "Videospelare för { title }"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Visa kortkommandon"

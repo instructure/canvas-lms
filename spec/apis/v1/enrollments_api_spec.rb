@@ -786,6 +786,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     it "should deterministically order enrollments for pagination" do
+      Account.site_admin.enable_feature!(:bookmarking_for_enrollments_index)
       enrollment_num = 10
       enrollment_num.times do
         u = user_with_pseudonym(name: "John Smith", sortable_name: "Smith, John")
@@ -794,11 +795,38 @@ describe EnrollmentsApiController, type: :request do
 
       found_enrollment_ids = []
       enrollment_num.times do |i|
-        page_num = i + 1
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?page=#{page_num}&per_page=1",
-          :controller=>"enrollments_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}",
-          :per_page => 1, :page => page_num)
+        if i == 0
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?per_page=1",
+            :controller => "enrollments_api", :action => "index", :format => "json",
+            :course_id => @course.id.to_s, :per_page => 1)
+        else
+          json = follow_pagination_link('next', {:controller => 'enrollments_api',
+            :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+        end
+        id = json[0]["id"]
+        id_already_found = found_enrollment_ids.include?(id)
+        expect(id_already_found).to be_falsey
+        found_enrollment_ids << id
+      end
+    end
 
+    it "should deterministically order enrollments for pagination with bookmarking not enabled" do
+      enrollment_num = 10
+      enrollment_num.times do
+        u = user_with_pseudonym(name: "John Smith", sortable_name: "Smith, John")
+        @course.enroll_user(u, 'StudentEnrollment', :enrollment_state => 'active')
+      end
+
+      found_enrollment_ids = []
+      enrollment_num.times do |i|
+        if i == 0
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?per_page=1",
+            :controller => "enrollments_api", :action => "index", :format => "json",
+            :course_id => @course.id.to_s, :per_page => 1)
+        else
+          json = follow_pagination_link('next', {:controller => 'enrollments_api',
+            :action => 'index', :format => 'json', :course_id => @course.id.to_s})
+        end
         id = json[0]["id"]
         id_already_found = found_enrollment_ids.include?(id)
         expect(id_already_found).to be_falsey
@@ -2070,6 +2098,65 @@ describe EnrollmentsApiController, type: :request do
 
     describe "pagination" do
       it "should properly paginate" do
+        Account.site_admin.enable_feature!(:bookmarking_for_enrollments_index)
+        json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
+        enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
+          res = res + @course.send("#{type}_enrollments").preload(:user)
+        }.map do |e|
+          h = {
+            'root_account_id' => e.root_account_id,
+            'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
+            'enrollment_state' => e.workflow_state,
+            'id' => e.id,
+            'user_id' => e.user_id,
+            'type' => e.type,
+            'role' => e.role.name,
+            'role_id' => e.role.id,
+            'course_section_id' => e.course_section_id,
+            'course_id' => e.course_id,
+            'user' => {
+              'name' => e.user.name,
+              'sortable_name' => e.user.sortable_name,
+              'short_name' => e.user.short_name,
+              'id' => e.user.id,
+              'created_at' => e.user.created_at.iso8601
+            },
+            'html_url' => course_user_url(@course, e.user),
+            'associated_user_id' => nil,
+            'updated_at' => e.updated_at.xmlschema,
+            'created_at' => e.created_at.xmlschema,
+            'start_at' => nil,
+            'end_at' => nil,
+            'last_activity_at' => nil,
+            'last_attended_at' => nil,
+            'total_activity_time' => 0
+          }
+          h['grades'] = {
+            'html_url' => course_student_grades_url(@course, e.user),
+            'final_score' => nil,
+            'current_score' => nil,
+            'final_grade' => nil,
+            'current_grade' => nil,
+          } if e.student?
+          h
+        end
+        link_header = response.headers['Link'].split(',')
+        expect(link_header[0]).to match /page=first&per_page=1/ # current page
+        md = link_header[1].match(/page=(bookmark.*)&per_page=1/)  # next page
+        bookmark = md[1]
+        expect(bookmark).to be_present
+        expect(link_header[2]).to match /page=first&per_page=1/ # first page
+        expect(json).to eql [enrollments[0]]
+
+        json = api_call(:get, "#{@path}?page=#{bookmark}&per_page=1", @params.merge(:page => bookmark, :per_page => 1.to_param))
+        link_header = response.headers['Link'].split(',')
+        expect(link_header[0]).to match /page=#{bookmark}&per_page=1/ # current page
+        expect(link_header[1]).to match /page=first&per_page=1/ # first page
+        expect(link_header[2]).to match /page=#{bookmark}&per_page=1/ # last page
+        expect(json).to eql [enrollments[1]]
+      end
+
+      it "should properly paginate with bookmarking not enabled" do
         json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
         enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
           res = res + @course.send("#{type}_enrollments").preload(:user)

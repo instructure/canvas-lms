@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-elements'
 import LatePolicyToolTipContent from './LatePolicyToolTipContent'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
-function LatePolicyStatusDisplay(props) {
+export default function LatePolicyStatusDisplay(props) {
   // TODO: actually pass the assignment and submission in here instead of all these
   //       separate props
   const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
@@ -80,4 +80,3 @@ LatePolicyStatusDisplay.propTypes = {
   pointsPossible: PropTypes.number.isRequired
 }
 
-export default React.memo(LatePolicyStatusDisplay)

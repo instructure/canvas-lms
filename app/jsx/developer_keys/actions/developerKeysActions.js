@@ -20,9 +20,7 @@ import $ from 'jquery'
 import axios from 'axios'
 import parseLinkHeader from '../../shared/parseLinkHeader'
 
-import ltiKeyActions from './ltiKeyActions'
-
-const actions = {...ltiKeyActions}
+const actions = {}
 
 actions.LIST_DEVELOPER_KEYS_START = 'LIST_DEVELOPER_KEYS_START'
 actions.listDeveloperKeysStart = payload => ({type: actions.LIST_DEVELOPER_KEYS_START, payload})
@@ -441,6 +439,80 @@ actions.deleteDeveloperKey = developerKey => dispatch => {
       dispatch(actions.deleteDeveloperKeySuccessful())
     })
     .catch(err => dispatch(actions.deleteDeveloperKeyFailed(err)))
+}
+
+actions.LTI_KEYS_SET_LTI_KEY = 'LTI_KEYS_SET_LTI_KEY'
+actions.ltiKeysSetLtiKey = payload => ({
+  type: actions.LTI_KEYS_SET_LTI_KEY,
+  payload
+})
+
+actions.RESET_LTI_STATE = 'RESET_LTI_STATE'
+actions.resetLtiState = () => ({type: actions.RESET_LTI_STATE})
+
+actions.saveLtiToolConfiguration = ({
+  account_id,
+  settings,
+  settings_url,
+  developer_key
+}) => dispatch => {
+  dispatch(actions.setEditingDeveloperKey(developer_key))
+
+  const url = `/api/lti/accounts/${account_id}/developer_keys/tool_configuration`
+
+  return axios
+    .post(url, {
+      tool_configuration: {
+        settings,
+        ...(settings_url ? {settings_url} : {})
+      },
+      developer_key
+    })
+    .then(response => {
+      const newKey = response.data.developer_key
+      newKey.tool_configuration = response.data.tool_configuration.settings
+      dispatch(actions.setEditingDeveloperKey(newKey))
+      dispatch(actions.listDeveloperKeysPrepend(newKey))
+      return response.data
+    })
+    .catch(error => {
+      dispatch(actions.setEditingDeveloperKey(false))
+      $.flashError(error.message)
+      throw error
+    })
+}
+
+actions.updateLtiKey = (
+  developerKey,
+  disabled_placements,
+  developerKeyId,
+  toolConfiguration,
+  customFields,
+  privacyLevel
+) => {
+  const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
+  return axios
+    .put(url, {
+      developer_key: {
+        name: developerKey.name,
+        notes: developerKey.notes,
+        email: developerKey.email,
+        scopes: developerKey.scopes,
+        redirect_uris: developerKey.redirect_uris
+      },
+      tool_configuration: {
+        custom_fields: customFields,
+        disabled_placements,
+        settings: toolConfiguration,
+        privacy_level: privacyLevel
+      }
+    })
+    .then(data => {
+      return data.data
+    })
+    .catch(error => {
+      $.flashError(error.message)
+    })
 }
 
 export default actions

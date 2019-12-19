@@ -475,8 +475,14 @@
     "description": "Title of Sidebar accordion tab containing links to group pages.",
     "message": "Group Navigation"
   },
-  "header_f28f73db": {
-    "message": "Header"
+  "heading_2_5b84eed2": {
+    "message": "Heading 2"
+  },
+  "heading_3_2c83de44": {
+    "message": "Heading 3"
+  },
+  "heading_4_b2e74be7": {
+    "message": "Heading 4"
   },
   "height_69b03e15": {
     "message": "Height"
@@ -852,9 +858,6 @@
   "small_b070434a": {
     "message": "Small"
   },
-  "small_header_168fb9f9": {
-    "message": "Small header"
-  },
   "something_went_wrong_89195131": {
     "message": "Something went wrong."
   },
@@ -896,9 +899,6 @@
   },
   "styles_2aa721ef": {
     "message": "Styles"
-  },
-  "subheader_2b87606d": {
-    "message": "Subheader"
   },
   "submit_a3cc6859": {
     "message": "Submit"

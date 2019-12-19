@@ -51,7 +51,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
 
     def log_entry_id(entry, field_name)
       override_entry_method = :"#{field_name}_log_entry"
-      entry = @mutation.send(override_entry_method, entry) if @mutation.respond_to?(override_entry_method)
+      entry = @mutation.send(override_entry_method, entry, @context) if @mutation.respond_to?(override_entry_method)
 
       domain_root_account = root_account_for(entry)
 

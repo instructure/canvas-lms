@@ -21,9 +21,10 @@ import React from 'react'
 import {string, node, func, oneOfType} from 'prop-types'
 
 import {CloseButton} from '@instructure/ui-buttons'
-import {Flex, View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 
 import ErrorBoundary from './ErrorBoundary'
 import GenericErrorPage from './GenericErrorPage'

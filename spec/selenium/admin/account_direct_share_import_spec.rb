@@ -42,13 +42,15 @@ describe "direct share page" do
   before :each do
     @export_1 = @course_1.content_exports.create!(settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment_1) => '1'}}})
     @export_2 = @course_1.content_exports.create!(settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment_1) => '1'}}})
-    @sent_share = @teacher_1.sent_content_shares.create! name: 'booga', content_export: @export_1, read_state: 'unread'
-    @received_share1 = @teacher_2.received_content_shares.create! name: 'booga', content_export: @export_1, sender: @teacher_1, read_state: 'unread'
-    @received_share2 = @teacher_2.received_content_shares.create! name: 'u read me', content_export: @export_2, sender: @teacher_1, read_state: 'unread'
+    @export_3 = @course_1.content_exports.create!(settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment_1) => '1'}}})
+    @sent_share = @teacher_1.sent_content_shares.create! name: 'a-unread share1', content_export: @export_1, read_state: 'unread'
+    @unread_share1 = @teacher_2.received_content_shares.create! name: 'a-unread share1', content_export: @export_1, sender: @teacher_1, read_state: 'unread'
+    @unread_share2 = @teacher_2.received_content_shares.create! name: 'b-unread share2', content_export: @export_2, sender: @teacher_1, read_state: 'unread'
+    @read_share = @teacher_2.received_content_shares.create! name: 'c-read share', content_export: @export_3, sender: @teacher_1, read_state: 'read'
     user_session @teacher_2
     visit_content_share_page
   end
-  
+
   it "notifies on user global nav profile avatar" do
     expect(global_nav_profile_link.text).to include '2 unread shares.'
   end
@@ -59,23 +61,32 @@ describe "direct share page" do
     expect(profile_tray_menu_items.text).to match /Shared Content/i
     expect(profile_tray_menu_items.text).to include '2 unread.'
   end
-  
-  it "displays new share on received tab" do
+
+  it "displays new share on received tab in most-recent-first order" do
     expect(content_share_main_content.text).to include 'Received Content'
-    expect(received_table_rows[1].text).to include 'u read me'
-    expect(received_table_rows[2].text).to include 'booga'
+    expect(received_table_rows[1].text).to include 'c-read share'
+    expect(received_table_rows[2].text).to include 'b-unread share2'
+    expect(received_table_rows[3].text).to include 'a-unread share1'
   end
 
-  it "marks a received item as read when clicked" do
-    expect(received_table_rows[1].text).to include 'u read me is unread, click to mark as read'
-    
-    unread_item_button_icon(@received_share2.name).click
+  it "marks an unread received item as read when clicked" do
+    expect(received_table_rows[3].text).to include 'a-unread share1 mark as read'
+
+    unread_item_button_icon(@unread_share1.name).click
     wait_for_ajaximations
-    expect(received_table_rows[1].text).to include 'u read me has been read'
+    expect(received_table_rows[3].text).to include 'a-unread share1 mark as unread'
+  end
+
+  it "marks a read received item as unread when clicked" do
+    expect(received_table_rows[1].text).to include 'c-read share mark as unread'
+
+    read_item_button_icon(@read_share.name).click
+    wait_for_ajaximations
+    expect(received_table_rows[1].text).to include 'c-read share mark as read'
   end
 
   it "displays manage item menu options" do
-    manage_received_item_button(@received_share2.name).click
+    manage_received_item_button(@read_share.name).click
 
     expect(received_item_actions_menu[0].text).to match(/Preview/i)
     expect(received_item_actions_menu[1].text).to match(/Import/i)
@@ -83,18 +94,18 @@ describe "direct share page" do
   end
 
   it "allows removal of a received item" do
-    manage_received_item_button(@received_share2.name).click
+    manage_received_item_button(@read_share.name).click
     remove_received_item.click
     driver.switch_to.alert.accept
     wait_for_ajaximations
-    expect(content_share_main_content.text).not_to include 'u read me'
+    expect(content_share_main_content.text).not_to include 'c-read share'
   end
 
   # it "launches the Import tray for a content share" do
   #   skip('will be fixed in a new PS ADMIN-3012')
-  #   manage_received_item_button(@received_share2.name).click
+  #   manage_received_item_button(@read_share.name).click
   #   import_content_share.click
-    
+
   #   expect(page_application_container).to contain_css("[role='dialog'][aria-label='Import...']")
-  # end
+  #end
 end

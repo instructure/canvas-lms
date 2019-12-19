@@ -25,7 +25,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import Scopes from './Scopes'
-import ToolConfiguration from './ToolConfiguration'
+import ToolConfigurationForm from './ToolConfigurationForm'
 
 const validationMessage = [
   {text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}
@@ -62,15 +62,14 @@ export default class NewKeyForm extends React.Component {
 
   render() {
     const {
-      createLtiKeyState,
+      isLtiKey,
       developerKey,
       editing,
       showRequiredMessages,
       updateToolConfiguration,
       updateToolConfigurationUrl,
       toolConfigurationUrl,
-      updateDeveloperKey,
-      showCustomizationMessages
+      updateDeveloperKey
     } = this.props
 
     return (
@@ -91,29 +90,22 @@ export default class NewKeyForm extends React.Component {
                   value={developerKey.name}
                   onChange={e => updateDeveloperKey('name', e.target.value)}
                   placeholder="Unnamed Tool"
-                  disabled={this.props.createLtiKeyState.customizing}
                 />
                 <TextInput
                   label={I18n.t('Owner Email:')}
                   name="developer_key[email]"
                   value={developerKey.email}
                   onChange={e => updateDeveloperKey('email', e.target.value)}
-                  disabled={this.props.createLtiKeyState.customizing}
                 />
                 <TextArea
-                  label={
-                    this.props.createLtiKeyState.isLtiKey
-                      ? I18n.t('* Redirect URIs:')
-                      : I18n.t('Redirect URIs:')
-                  }
+                  label={isLtiKey ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')}
                   name="developer_key[redirect_uris]"
                   value={developerKey.redirect_uris}
                   onChange={e => updateDeveloperKey('redirect_uris', e.target.value)}
                   resize="both"
                   messages={showRequiredMessages ? validationMessage : []}
-                  disabled={this.props.createLtiKeyState.customizing}
                 />
-                {!this.props.createLtiKeyState.isLtiKey && (
+                {!isLtiKey && (
                   <div>
                     <TextInput
                       label={I18n.t('Redirect URI (Legacy):')}
@@ -141,7 +133,6 @@ export default class NewKeyForm extends React.Component {
                   value={developerKey.notes}
                   onChange={e => updateDeveloperKey('notes', e.target.value)}
                   resize="both"
-                  disabled={this.props.createLtiKeyState.customizing}
                 />
                 {ENV.enableTestClusterChecks ? (
                   <Checkbox
@@ -149,28 +140,24 @@ export default class NewKeyForm extends React.Component {
                     name="developer_key[test_cluster_only]"
                     checked={developerKey.test_cluster_only}
                     onChange={this.handleTestClusterOnlyChange}
-                    disabled={this.props.createLtiKeyState.customizing}
                   />
                 ) : null}
               </FormFieldGroup>
             </Grid.Col>
             <Grid.Col width={8}>
-              {createLtiKeyState.isLtiKey ? (
-                <ToolConfiguration
+              {isLtiKey ? (
+                <ToolConfigurationForm
                   ref={this.setToolConfigRef}
-                  createLtiKeyState={createLtiKeyState}
-                  setEnabledScopes={this.props.setEnabledScopes}
-                  setDisabledPlacements={this.props.setDisabledPlacements}
-                  setLtiConfigurationMethod={this.props.setLtiConfigurationMethod}
-                  setPrivacyLevel={this.props.setPrivacyLevel}
-                  dispatch={this.props.dispatch}
                   toolConfiguration={this.props.tool_configuration}
                   editing={editing}
                   showRequiredMessages={showRequiredMessages}
                   updateToolConfiguration={updateToolConfiguration}
                   updateToolConfigurationUrl={updateToolConfigurationUrl}
                   toolConfigurationUrl={toolConfigurationUrl}
-                  showCustomizationMessages={showCustomizationMessages}
+                  configurationMethod={this.props.configurationMethod}
+                  updateConfigurationMethod={this.props.updateConfigurationMethod}
+                  validScopes={ENV.validLtiScopes}
+                  validPlacements={ENV.validLtiPlacements}
                 />
               ) : (
                 <Scopes
@@ -198,14 +185,7 @@ NewKeyForm.defaultProps = {
 NewKeyForm.propTypes = {
   dispatch: PropTypes.func.isRequired,
   listDeveloperKeyScopesSet: PropTypes.func.isRequired,
-  setDisabledPlacements: PropTypes.func.isRequired,
-  setLtiConfigurationMethod: PropTypes.func.isRequired,
-  setPrivacyLevel: PropTypes.func.isRequired,
-  setEnabledScopes: PropTypes.func.isRequired,
-  createLtiKeyState: PropTypes.shape({
-    isLtiKey: PropTypes.bool.isRequired,
-    customizing: PropTypes.bool.isRequired
-  }).isRequired,
+  isLtiKey: PropTypes.bool.isRequired,
   developerKey: PropTypes.shape({
     notes: PropTypes.string,
     icon_url: PropTypes.string,
@@ -237,5 +217,6 @@ NewKeyForm.propTypes = {
   updateToolConfigurationUrl: PropTypes.func,
   updateDeveloperKey: PropTypes.func.isRequired,
   toolConfigurationUrl: PropTypes.string.isRequired,
-  showCustomizationMessages: PropTypes.bool.isRequired
+  configurationMethod: PropTypes.string.isRequired,
+  updateConfigurationMethod: PropTypes.func.isRequired
 }

@@ -559,6 +559,19 @@ describe AssignmentsController do
       expect(assigns[:unlocked]).not_to be_nil
     end
 
+    it "does not show direct share options when disabled" do
+      user_session(@teacher)
+      get 'show', params: {course_id: @course.id, id: @assignment.id}
+      expect(assigns[:can_direct_share]).to eq false
+    end
+
+    it "shows direct share options when enabled" do
+      Account.default.enable_feature!(:direct_share)
+      user_session(@teacher)
+      get 'show', params: {course_id: @course.id, id: @assignment.id}
+      expect(assigns[:can_direct_share]).to eq true
+    end
+
     context 'when the assignment uses the plagiarism platform' do
       include_context 'lti2_spec_helper'
 

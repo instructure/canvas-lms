@@ -186,7 +186,7 @@ describe Types::AssignmentType do
             states: submitted,
             sectionIds: 42,
             enrollmentTypes: StudentEnrollment,
-            userSearch: foo,
+            userSearch: "foo",
             scoredLessThan: 3
             scoredMoreThan: 1
             gradingStatus: needs_grading
@@ -324,7 +324,7 @@ describe Types::AssignmentType do
             states: submitted,
             sectionIds: 42,
             enrollmentTypes: StudentEnrollment,
-            userSearch: foo,
+            userSearch: "foo",
             scoredLessThan: 3
             scoredMoreThan: 1
             gradingStatus: needs_grading

@@ -38,7 +38,7 @@ const violationsReducer = (state, action) => {
   }
 }
 
-export default function ViolationTray({handleClose, accountId}) {
+export default function ViolationTray({handleClose, accountId, addDomain, whitelistedDomains}) {
   const [state, dispatch] = useReducer(violationsReducer, {
     isLoading: true,
     isError: false,
@@ -77,7 +77,12 @@ export default function ViolationTray({handleClose, accountId}) {
             </Alert>
           )}
           {!state.isLoading && !state.isError && state.violations.length > 0 && (
-            <ViolationTable violations={state.violations} />
+            <ViolationTable
+              violations={state.violations}
+              whitelistedDomains={whitelistedDomains}
+              addDomain={addDomain}
+              accountId={accountId}
+            />
           )}
         </View>
       </View>

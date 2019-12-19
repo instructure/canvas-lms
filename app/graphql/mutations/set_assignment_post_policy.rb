@@ -47,4 +47,8 @@ class Mutations::SetAssignmentPostPolicy < Mutations::BaseMutation
 
     {post_policy: policy}
   end
+
+  def self.post_policy_log_entry(post_policy, _context)
+    post_policy.assignment
+  end
 end

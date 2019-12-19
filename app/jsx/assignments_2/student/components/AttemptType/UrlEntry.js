@@ -206,7 +206,7 @@ class UrlEntry extends React.Component {
               margin="small"
               onClick={() => window.open(this.props.submission.url)}
             >
-              {this.props.submission.url}
+              <span data-testid="url-submission-text">{this.props.submission.url}</span>
             </Link>
           </Text>
         </Flex.Item>

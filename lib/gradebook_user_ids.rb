@@ -32,7 +32,7 @@ class GradebookUserIds
 
   def user_ids
     if @column == "student"
-      sort_by_student_name
+      sort_by_student_field
     elsif @column =~ /assignment_\d+$/
       assignment_id = @column[/\d+$/]
       send("sort_by_assignment_#{@sort_by}", assignment_id)
@@ -48,12 +48,35 @@ class GradebookUserIds
 
   private
 
+  def sort_by_student_field
+    if ["name", "sortable_name"].include?(@sort_by)
+      sort_by_student_name
+    else
+      sort_by_pseudonym_field
+    end
+  end
+
   def sort_by_student_name
     students.
       order(Arel.sql("enrollments.type = 'StudentViewEnrollment'")).
       order_by_sortable_name(direction: @direction.to_sym).
       pluck(:id).
       uniq
+  end
+
+  def sort_by_pseudonym_field
+    # The sort keys integration_id and sis_user_id map to columns in Pseudonym,
+    # while login_id needs to be changed to unique_id
+    sort_field = @sort_by == "login_id" ? "unique_id" : @sort_by
+    sort_column = Pseudonym.best_unicode_collation_key("pseudonyms.#{sort_field}")
+
+     students.joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=users.id AND
+                    pseudonyms.workflow_state <> 'deleted'").
+       order(Arel.sql("#{sort_column} #{sort_direction} NULLS LAST")).
+       order(Arel.sql("pseudonyms.id IS NULL")).
+       order(Arel.sql("users.id #{sort_direction}")).
+       pluck(:id).
+       uniq
   end
 
   def sort_by_assignment_grade(assignment_id)

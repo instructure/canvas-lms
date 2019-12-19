@@ -21,8 +21,7 @@ import PropTypes from 'prop-types'
 
 import FriendlyDatetime from '../../shared/FriendlyDatetime'
 
-function AvailabilityDates(props) {
-  const {assignment, formatStyle} = props
+export default function AvailabilityDates({assignment, formatStyle}) {
   const longFmt = formatStyle === 'long'
 
   if (assignment.lockAt && assignment.unlockAt) {
@@ -72,5 +71,3 @@ AvailabilityDates.propTypes = {
 AvailabilityDates.defaultProps = {
   formatStyle: 'long'
 }
-
-export default React.memo(AvailabilityDates)

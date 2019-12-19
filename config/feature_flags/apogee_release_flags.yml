@@ -24,6 +24,15 @@ allow_postable_submission_comments:
     user will allow posting the assignment. Previously, this would have required a grade before posting could
     occur.
   applies_to: RootAccount
+new_gradebook_sort_options:
+  state: allowed
+  applies_to: Course
+  root_opt_in: true
+  display_name: Additional Sort Options for New Gradebook
+  description: Enables sorting by SIS ID, integration ID and login ID in New Gradebook.
+  environments:
+    production:
+      state: disabled
 eportfolio_moderation:
   state: hidden
   applies_to: RootAccount

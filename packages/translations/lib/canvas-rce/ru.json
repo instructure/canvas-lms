@@ -25,6 +25,7 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Запись аудио и видео недоступна."
   },
+  "audio_player_for_title_20cc70d": { "message": "Аудиоплеер для { title }" },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Автоматически открывать встроенный предварительный просмотр. (Предварительный просмотр отображается только после сохранения)"
   },
@@ -84,6 +85,7 @@
     "message": "нумерованный упорядоченный список по умолчанию"
   },
   "describe_the_image_e65d2e32": { "message": "(Опишите изображение)" },
+  "describe_the_video_2fe8f46a": { "message": "(опишите видео)" },
   "dimensions_45ddb7b7": { "message": "Размеры" },
   "directionality_ebcae6d0": { "message": "направленность" },
   "disable_in_line_preview_2a675175": {
@@ -117,6 +119,7 @@
   "embed_image_1080badc": { "message": "Вставить изображение" },
   "embed_options_tray_901cfd19": { "message": "Вставить лоток опций" },
   "embed_preview_2d741e1f": { "message": "Встроить предварительный просмотр" },
+  "embed_video_a97a64af": { "message": "Вставить видео" },
   "embed_video_code_703e10f2": { "message": "Вставить код видео" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Ошибка при загрузке видео-/аудиозаписи"
@@ -157,7 +160,6 @@
   "grades_a61eba0a": { "message": "Оценки" },
   "group_files_4324f3df": { "message": "Файлы группы" },
   "group_navigation_99f191a": { "message": "Навигация группы" },
-  "header_f28f73db": { "message": "Заголовок" },
   "height_69b03e15": { "message": "Высота" },
   "image_options_5412d02c": { "message": "Опции изображения" },
   "image_options_tray_90a46006": { "message": "Лоток опций изображения" },
@@ -265,7 +267,6 @@
   "show_video_options_6ed3721a": { "message": "Показать параметры видео" },
   "size_b30e1077": { "message": "Размер" },
   "small_b070434a": { "message": "Маленький" },
-  "small_header_168fb9f9": { "message": "Маленький заголовок" },
   "something_went_wrong_89195131": { "message": "Возникла проблема." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Сбой при попытке доступа к вашему микрофону или веб-камере."
@@ -286,7 +287,6 @@
   "start_over_f7552aa9": { "message": "Начать заново" },
   "start_recording_9a65141a": { "message": "Запустить запись" },
   "styles_2aa721ef": { "message": "Стили" },
-  "subheader_2b87606d": { "message": "Подзаголовок" },
   "submit_a3cc6859": { "message": "Отправить" },
   "subscript_59744f96": { "message": "Надпись снизу" },
   "superscript_8cb349a2": { "message": "Надпись сверху" },
@@ -333,6 +333,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Используется скринридерами для описания контента изображения"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Используется скринридерами для описания видео"
+  },
   "user_documents_c206e61f": { "message": "Документы пользователя" },
   "user_images_b6490852": { "message": "Изображения пользователя" },
   "user_media_14fbf656": { "message": "Пользовательское мультимедиа" },
@@ -342,6 +345,8 @@
   "video_options_24ef6e5d": { "message": "Параметры видео" },
   "video_options_tray_3b9809a5": { "message": "Лоток параметров видео" },
   "video_player_b371005": { "message": "Видео-плеер" },
+  "video_player_for_9e7d373b": { "message": "Видеоплеер для " },
+  "video_player_for_title_ffd9fbc4": { "message": "Видеоплеер для { title }" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Показать клавиши быстрого доступа"
   },

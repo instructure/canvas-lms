@@ -24,11 +24,8 @@ import {Flex} from '@instructure/ui-layout'
 
 const MAX_DISPLAYED_MODULES = 2
 
-function AssignmentGroupModuleNav(props) {
-  const {
-    assignment: {assignmentGroup, modules, env}
-  } = props
-
+export default function AssignmentGroupModuleNav({assignment}) {
+  const {assignmentGroup, modules, env} = assignment
   return (
     <Flex margin="0 0 large 0" direction="column">
       {modules.slice(0, MAX_DISPLAYED_MODULES).map(module => (
@@ -76,4 +73,3 @@ AssignmentGroupModuleNav.propTypes = {
   assignment: Assignment.shape
 }
 
-export default React.memo(AssignmentGroupModuleNav)

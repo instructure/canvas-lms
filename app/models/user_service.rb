@@ -220,14 +220,6 @@ class UserService < ActiveRecord::Base
     end
   end
 
-  def self.configured_services
-    [:google_drive, :twitter, :diigo]
-  end
-
-  def self.configured_service?(service)
-    configured_services.include?((service || "").to_sym)
-  end
-
   def self.service_type(type)
     if type == 'google_docs' || type == 'google_drive'
       'DocumentService'

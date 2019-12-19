@@ -44,7 +44,7 @@ const developerKey = {
   test_cluster_only: true
 }
 
-function formFieldOfTypeAndName(devKey, fieldType, name, isLtiKey, customizing) {
+function formFieldOfTypeAndName(devKey, fieldType, name, isLtiKey) {
   const component = TestUtils.renderIntoDocument(
     <DeveloperKeyFormFields
       availableScopes={{}}
@@ -52,11 +52,11 @@ function formFieldOfTypeAndName(devKey, fieldType, name, isLtiKey, customizing) 
       developerKey={devKey}
       dispatch={() => {}}
       listDeveloperKeyScopesSet={() => {}}
-      createLtiKeyState={{customizing, isLtiKey}}
+      isLtiKey={isLtiKey}
     />
   )
   return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).find(
-    elem => elem.name == `developer_key[${name}]`
+    elem => elem.name === `developer_key[${name}]`
   )
 }
 
@@ -120,21 +120,21 @@ test('does not include icon URL if lti key', () => {
 })
 
 test('populates the redirect uris if lti key', () => {
-  ok(formFieldOfTypeAndName(developerKey, 'textarea', 'redirect_uris', true))
+  ok(formFieldOfTypeAndName(developerKey, 'textarea', 'redirect_uris'))
 })
 
 test('populates the key name when lti key', () => {
-  const input = formFieldOfTypeAndName(developerKey, 'input', 'name', true)
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'name')
   equal(input.value, developerKey.name)
 })
 
 test('populates the key owner email when lti key', () => {
-  const input = formFieldOfTypeAndName(developerKey, 'input', 'email', true)
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'email')
   equal(input.value, developerKey.email)
 })
 
 test('populates the key notes when lti key', () => {
-  const textarea = formFieldOfTypeAndName(developerKey, 'textarea', 'notes', true)
+  const textarea = formFieldOfTypeAndName(developerKey, 'textarea', 'notes')
   equal(textarea.value, developerKey.notes)
 })
 
@@ -146,10 +146,10 @@ test('renders the tool configuration form if isLtiKey is true', () => {
       developerKey={developerKey}
       dispatch={() => {}}
       listDeveloperKeyScopesSet={() => {}}
-      createLtiKeyState={{customizing: false, isLtiKey: true}}
+      isLtiKey
     />
   )
-  ok(wrapper.find('ToolConfiguration').exists())
+  ok(wrapper.find('ToolConfigurationForm').exists())
 })
 
 test('renders the developer key scopes form if isLtiKey is false', () => {
@@ -160,7 +160,7 @@ test('renders the developer key scopes form if isLtiKey is false', () => {
       developerKey={developerKey}
       dispatch={() => {}}
       listDeveloperKeyScopesSet={() => {}}
-      createLtiKeyState={{customizing: false, isLtiKey: false}}
+      isLtiKey={false}
     />
   )
   ok(wrapper.find('Scopes').exists())

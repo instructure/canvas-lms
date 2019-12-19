@@ -2,7 +2,6 @@
 version: "2.3"
 services:
   web:
-    # use master if NAME is unavailable
     image: "${PATCHSET_TAG}"
     links:
       - postgres

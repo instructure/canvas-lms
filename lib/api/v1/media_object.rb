@@ -26,6 +26,7 @@ module Api::V1::MediaObject
       json['title'] = media_object.guaranteed_title
       json['can_add_captions'] = media_object.grants_right?(current_user, session, :add_captions)
       json['media_sources'] = media_sources_json(media_object) unless exclude.include?('sources')
+      json['embedded_iframe_url'] = media_object_iframe_url(media_object.media_id)
 
       unless exclude.include?('tracks')
         json['media_tracks'] = media_object.media_tracks.map do |track|

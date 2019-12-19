@@ -54,17 +54,19 @@ describe('content shares table', () => {
     expect(getByText('Discussion Topic')).toBeInTheDocument()
   })
 
-  it('renders no unread dot for read items', () => {
-    const {queryByTestId} = render(<ReceivedTable shares={[readDiscussionShare]} />)
-    expect(queryByTestId('received-table-row-unread')).toBeNull()
+  it('renders read status indicators for read items', () => {
+    const {getAllByText, queryByTestId} = render(<ReceivedTable shares={[readDiscussionShare]} />)
+    expect(queryByTestId('received-table-row-read')).toBeInTheDocument()
+    expect(getAllByText('A Course Discussion mark as unread')).toHaveLength(2)
   })
 
-  it('renders an unread dot for unread items', () => {
-    const {queryByTestId} = render(<ReceivedTable shares={[unreadDiscussionShare]} />)
+  it('renders unread status indicators for unread items', () => {
+    const {getAllByText, queryByTestId} = render(<ReceivedTable shares={[unreadDiscussionShare]} />)
     expect(queryByTestId('received-table-row-unread')).toBeInTheDocument()
+    expect(getAllByText('A Course Discussion mark as read')).toHaveLength(2)
   })
 
-  it('calls the onUpdate action if the unread dot is clicked on', () => {
+  it('uses onUpdate to mark as read if the unread dot is clicked on', () => {
     const onUpdate = jest.fn()
 
     const {getByTestId} = render(
@@ -72,6 +74,16 @@ describe('content shares table', () => {
     )
     fireEvent.click(getByTestId('received-table-row-unread'))
     expect(onUpdate).toHaveBeenCalledWith(unreadDiscussionShare.id, {read_state: 'read'})
+  })
+
+  it('calls onUpdate to mark as unread if read space is clicked on', () => {
+    const onUpdate = jest.fn()
+
+    const {getByTestId} = render(
+      <ReceivedTable shares={[readDiscussionShare]} onUpdate={onUpdate} />
+    )
+    fireEvent.click(getByTestId('received-table-row-read'))
+    expect(onUpdate).toHaveBeenCalledWith(unreadDiscussionShare.id, {read_state: 'unread'})
   })
 
   it('triggers handler for preview menu action', () => {

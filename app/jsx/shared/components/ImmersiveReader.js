@@ -71,7 +71,7 @@ function handleClick({title, content}, readerSDK) {
 export function ImmersiveReaderButton({content, readerSDK}) {
   return (
     <Button onClick={() => handleClick(content, readerSDK)} icon={<SVGIcon src={LOGO} />}>
-      Immersive Reader
+      {I18n.t('Immersive Reader')}
     </Button>
   )
 }

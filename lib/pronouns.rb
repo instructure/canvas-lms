@@ -28,7 +28,7 @@ module Pronouns
   end
 
   def clean_pronouns(string)
-    string.strip.presence
+    string&.strip.presence
   end
 
   def translate_pronouns(pronouns)

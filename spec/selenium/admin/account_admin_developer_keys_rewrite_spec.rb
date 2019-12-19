@@ -56,7 +56,7 @@ describe 'Developer Keys' do
       f("input[name='developer_key[icon_url]']").send_keys("/images/delete.png")
       click_enforce_scopes
       click_scope_group_checkbox
-      find_button("Save Key").click
+      find_button("Save").click
       expect(ff("#reactContent tbody tr").length).to eq 1
       expect(Account.default.developer_keys.count).to eq 1
       key = Account.default.developer_keys.last
@@ -77,7 +77,7 @@ describe 'Developer Keys' do
       replace_content(f("input[name='developer_key[icon_url]']"), "/images/add.png")
       click_enforce_scopes
       click_scope_group_checkbox
-      find_button("Save Key").click
+      find_button("Save").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1
       expect(Account.default.developer_keys.count).to eq 1
@@ -100,7 +100,7 @@ describe 'Developer Keys' do
       replace_content(f("input[name='developer_key[icon_url]']"), "/images/add.png")
       click_enforce_scopes
       click_scope_group_checkbox
-      find_button("Save Key").click
+      find_button("Save").click
 
       expect(ff("#reactContent tbody tr").length).to eq 1
       expect(Account.default.developer_keys.count).to eq 1
@@ -291,7 +291,7 @@ describe 'Developer Keys' do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
         expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconCheck']")
-        find_button("Save Key").click
+        find_button("Save").click
         wait_for_ajaximations
         expect(DeveloperKey.last.require_scopes).to eq true
       end
@@ -339,7 +339,7 @@ describe 'Developer Keys' do
       it "adds scopes to backend developer key via UI" do
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
-        find_button("Save Key").click
+        find_button("Save").click
         wait_for_ajaximations
         expect(DeveloperKey.last.scopes).to eq assignment_groups_scopes
       end
@@ -348,7 +348,7 @@ describe 'Developer Keys' do
         site_admin_logged_in
         expand_scope_group_by_filter('Assignment Groups', Account.default.id)
         click_scope_group_checkbox
-        find_button("Save Key").click
+        find_button("Save").click
         wait_for_ajaximations
         expect(DeveloperKey.last.scopes).to eq assignment_groups_scopes
       end
@@ -359,7 +359,7 @@ describe 'Developer Keys' do
         click_edit_icon
         filter_scopes_by_name('Assignment Groups')
         click_scope_group_checkbox
-        find_button("Save Key").click
+        find_button("Save").click
         wait_for_ajax_requests
         expect(developer_key_with_scopes.reload.scopes).to eq api_token_scopes
       end
@@ -370,7 +370,7 @@ describe 'Developer Keys' do
         find_button("API Key").click
         click_enforce_scopes
         click_select_all_readonly_checkbox
-        find_button("Save Key").click
+        find_button("Save").click
         wait_for_dev_key_modal_to_close
         click_edit_icon
         expect(all_endpoints_readonly_checkbox_selected?).to eq true
@@ -387,7 +387,7 @@ describe 'Developer Keys' do
 
       it "opens the developer key modal when open modal anchor is present" do
         get "/accounts/#{Account.default.id}/developer_keys#api_key_modal_opened"
-        expect(find_button("Save Key")).to be_present
+        expect(find_button("Save")).to be_present
       end
 
       it "displays flash alert if scopes aren't selected when enforce scopes toggled" do
@@ -397,7 +397,7 @@ describe 'Developer Keys' do
         wait_for_ajaximations
         click_enforce_scopes
         wait_for_ajaximations
-        find_button("Save Key").click
+        find_button("Save").click
         flash_holder = f("#flash_message_holder")
         keep_trying_until do
           expect(flash_holder.text).to eq 'At least one scope must be selected.' if flash_holder.text.present?
@@ -421,7 +421,7 @@ describe 'Developer Keys' do
         get "/accounts/#{Account.default.id}/developer_keys"
         click_edit_icon
         f("input[name='developer_key[email]']").send_keys('admin@example.com')
-        find_button("Save Key").click
+        find_button("Save").click
         wait_for_ajax_requests
         expect(developer_key_with_scopes.reload.email).to eq 'admin@example.com'
       end

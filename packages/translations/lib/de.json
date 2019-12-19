@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Audio- und Videoaufnahmen sind nicht verfügbar."
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "Audioplayer für { title }"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Eine Inline-Vorschau automatisch öffnen. (Vorschau wird erst nach dem Speichern angezeigt)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(Beschreiben Sie das Bild)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "(Beschreiben Sie das Video)"
+    },
     "details_98a31b68": {
         "message": "Details"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "Vorschau einbetten"
+    },
+    "embed_video_a97a64af": {
+        "message": "Video einbetten"
     },
     "embed_video_code_703e10f2": {
         "message": "Videocode einbetten"
@@ -460,9 +469,6 @@
     },
     "group_navigation_99f191a": {
         "message": "Gruppennavigation"
-    },
-    "header_f28f73db": {
-        "message": "Kopfzeile"
     },
     "height_69b03e15": {
         "message": "Höhe"
@@ -833,9 +839,6 @@
     "small_b070434a": {
         "message": "Klein"
     },
-    "small_header_168fb9f9": {
-        "message": "Kleine Überschrift"
-    },
     "something_went_wrong_89195131": {
         "message": "Etwas ging schief."
     },
@@ -877,9 +880,6 @@
     },
     "styles_2aa721ef": {
         "message": "Styles"
-    },
-    "subheader_2b87606d": {
-        "message": "Unterüberschrift"
     },
     "submit_a3cc6859": {
         "message": "Abgeben"
@@ -1010,6 +1010,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Verwendet von einem Screen-Reader zur Beschreibung des Contents eines Bilds"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Wird von Screenreadern verwendet, um das Video zu beschreiben."
+    },
     "user_documents_c206e61f": {
         "message": "Benutzer Dokumente"
     },
@@ -1030,6 +1033,12 @@
     },
     "video_player_b371005": {
         "message": "Videoplayer"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "Videoplayer für "
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "Videoplayer für { title }"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Tastenkombinationen anzeigen"

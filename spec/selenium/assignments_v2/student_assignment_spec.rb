@@ -103,6 +103,41 @@ describe 'as a student' do
       end
     end
 
+    context 'url assignments' do
+      before(:once) do
+        @assignment = @course.assignments.create!(
+          name: 'text assignment',
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: 'online_url'
+        )
+      end
+
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+      end
+
+      it 'should be able to be submitted' do
+        url_text = "www.google.com"
+        StudentAssignmentPageV2.create_url_draft(url_text)
+        StudentAssignmentPageV2.submit_assignment
+        expect(StudentAssignmentPageV2.url_submission_link).to include_text url_text
+      end
+
+      it 'should be able to be saved as a draft' do
+        url_text = "www.google.com"
+        StudentAssignmentPageV2.create_url_draft(url_text)
+
+        # This is to wait for the submit button to appear so that we know the draft
+        # has been saved. We are not clicking the button here.
+        StudentAssignmentPageV2.submit_button
+
+        refresh_page
+        expect(StudentAssignmentPageV2.url_text_box.attribute('value')).to include url_text
+      end
+    end
+
     context "moduleSequenceFooter" do
       before do
         @assignment = @course.assignments.create!(submission_types: 'online_upload')

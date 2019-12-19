@@ -35,6 +35,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should add an image to the page and validate a student can see it" do
+      skip('LA-365')
       create_session(@teacher.pseudonym)
       add_image_to_rce
 

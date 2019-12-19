@@ -1101,8 +1101,20 @@ class ExternalToolsController < ApplicationController
     end
 
     if @tool.use_1_3?
+      # generate URL to log in user and launch LTI 1.3 tool in one go
+      # only allow from API, and not from files domain, as /login/session_token does
+      return render_unauthorized_action unless @access_token
+      return render_unauthorized_action if HostUrl.is_file_host?(request.host_with_port)
+
+      login_pseudonym = @real_current_pseudonym || @current_pseudonym
+      session_token = SessionToken.new(
+        login_pseudonym.global_id,
+        current_user_id: @real_current_user ? @current_user.global_id : nil,
+        used_remember_me_token: true
+      ).to_s
+
       context_path = "#{@context.is_a?(Account) ? account_external_tools_url(@context) : course_external_tools_url(@context)}/#{@tool.id}"
-      render :json => { id: @tool.id, name: @tool.name, url: "#{login_session_token_url}?return_to=#{CGI.escape(context_path)}" }
+      render :json => { id: @tool.id, name: @tool.name, url: "#{context_path}?display=borderless&session_token=#{session_token}" }
     else
       # generate the launch
       opts = {

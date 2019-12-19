@@ -17,6 +17,8 @@
 
 import I18n from 'i18n!discussions'
 import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import Backbone from 'Backbone'
 import DiscussionTopic from '../../models/DiscussionTopic'
 import EntryView from '../DiscussionTopic/EntryView'
@@ -27,6 +29,8 @@ import assignmentRubricDialog from '../../widget/assignmentRubricDialog'
 import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
 import htmlEscape from 'str/htmlEscape'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 
 export default class TopicView extends Backbone.View {
   static initClass() {
@@ -42,7 +46,9 @@ export default class TopicView extends Backbone.View {
       'click .topic-subscribe-button': 'subscribeTopic',
       'click .topic-unsubscribe-button': 'unsubscribeTopic',
       'click .mark_all_as_read': 'markAllAsRead',
-      'click .mark_all_as_unread': 'markAllAsUnread'
+      'click .mark_all_as_unread': 'markAllAsUnread',
+      'click .direct-share-send-to-menu-item': 'openSendTo',
+      'click .direct-share-copy-to-menu-item': 'openCopyTo'
     }
 
     this.prototype.els = {
@@ -264,6 +270,38 @@ export default class TopicView extends Backbone.View {
     event.preventDefault()
     this.trigger('markAllAsUnread')
     return this.$announcementCog.focus()
+  }
+
+  openSendTo(event, open = true) {
+    if (event) event.preventDefault()
+    ReactDOM.render(
+      <DirectShareUserModal
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentShare={{content_type: 'discussion_topic', content_id: this.topic.id}}
+        onDismiss={() => {
+          this.openSendTo(null, false)
+          this.$announcementCog.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
+  openCopyTo(event, open = true) {
+    if (event) event.preventDefault()
+    ReactDOM.render(
+      <DirectShareCourseTray
+        open={open}
+        sourceCourseId={ENV.COURSE_ID}
+        contentSelection={{discussion_topics: [this.topic.id]}}
+        onDismiss={() => {
+          this.openCopyTo(null, false)
+          this.$announcementCog.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
   }
 
   handleKeyDown(e) {

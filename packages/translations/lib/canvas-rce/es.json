@@ -25,6 +25,9 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "La grabación de audio y video no está disponible."
   },
+  "audio_player_for_title_20cc70d": {
+    "message": "Reproductor de audio para { title }"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Abrir automáticamente una vista previa directa. (La vista previa solo se muestra después de guardar)"
   },
@@ -82,6 +85,7 @@
     "message": "lista numérica ordenada predeterminada"
   },
   "describe_the_image_e65d2e32": { "message": "(Describir la imagen)" },
+  "describe_the_video_2fe8f46a": { "message": "(Describir el video)" },
   "dimensions_45ddb7b7": { "message": "Dimensiones" },
   "directionality_ebcae6d0": { "message": "direccionalidad" },
   "disable_in_line_preview_2a675175": {
@@ -115,6 +119,7 @@
   "embed_image_1080badc": { "message": "Incorporar imagen" },
   "embed_options_tray_901cfd19": { "message": "Incrustar bandeja de opciones" },
   "embed_preview_2d741e1f": { "message": "Incrustar vista previa" },
+  "embed_video_a97a64af": { "message": "Incrustar video" },
   "embed_video_code_703e10f2": { "message": "Incrustar código de video" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Error al cargar grabación de video/audio"
@@ -153,7 +158,6 @@
   "grades_a61eba0a": { "message": "Calificaciones" },
   "group_files_4324f3df": { "message": "Archivos grupales" },
   "group_navigation_99f191a": { "message": "Navegación del grupo" },
-  "header_f28f73db": { "message": "Encabezado" },
   "height_69b03e15": { "message": "Altura" },
   "image_options_5412d02c": { "message": "Opciones de imagen" },
   "image_options_tray_90a46006": { "message": "Bandeja de opciones de imagen" },
@@ -259,7 +263,6 @@
   "show_video_options_6ed3721a": { "message": "Mostrar opciones de video" },
   "size_b30e1077": { "message": "Tamaño" },
   "small_b070434a": { "message": "Pequeño" },
-  "small_header_168fb9f9": { "message": "Encabezado pequeño" },
   "something_went_wrong_89195131": { "message": "Algo salió mal." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Algo salió mal al acceder al micrófono o cámara web."
@@ -278,7 +281,6 @@
   "start_over_f7552aa9": { "message": "Volver a empezar" },
   "start_recording_9a65141a": { "message": "Comenzar grabación" },
   "styles_2aa721ef": { "message": "Estilos" },
-  "subheader_2b87606d": { "message": "Subencabezado" },
   "submit_a3cc6859": { "message": "Entregar" },
   "subscript_59744f96": { "message": "Subíndice" },
   "superscript_8cb349a2": { "message": "Superíndice" },
@@ -325,6 +327,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Utilizado por los lectores de pantalla para describir el contenido de una imagen"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Usado por lectores de pantalla para describir el video"
+  },
   "user_documents_c206e61f": { "message": "Documentos del usuario" },
   "user_images_b6490852": { "message": "Imágenes del usuario" },
   "user_media_14fbf656": { "message": "multimedia del usuario" },
@@ -334,6 +339,10 @@
   "video_options_24ef6e5d": { "message": "Opciones de video" },
   "video_options_tray_3b9809a5": { "message": "Bandeja de opciones de video" },
   "video_player_b371005": { "message": "Reproductor de video" },
+  "video_player_for_9e7d373b": { "message": "Reproductor de video para " },
+  "video_player_for_title_ffd9fbc4": {
+    "message": "Reproductor de video para { title }"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Ver los accesos directos de teclado"
   },

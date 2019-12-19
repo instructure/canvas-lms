@@ -26,7 +26,13 @@ const consoleMessagesToIgnore = {
     /Function components cannot be given refs\. Attempts to access this ref will fail[\s\S]*in (CanvasInstUIModal|PopoverTrigger)/
   ],
   warn: [
-    // /Please update the following components/, // Uncomment this if all the react 16.9 deprecations are cluttering up the console and you want to focus on something else
+    // Uncomment the following line if all the react 16.9 deprecations are cluttering up
+    // the console and you want to focus on something else
+    // /Please update the following components/,
+
+    // The build logs have grown to over 250MB so in an interest of being able to use
+    // the build logs at all we're filtering out these general messages.
+    /is deprecated and will be removed/,
 
     // '@instructure/ui-select' itself generates this warning, we assume they will figure it out themselves
     /is experimental and its API could change significantly in a future release/,

@@ -36,10 +36,11 @@ pipeline {
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
   stages {
-    // remove this after it runs for a little bit.
-    stage('temp-cleanup') {
+    stage('Pre-Cleanup') {
       steps {
-        sh 'build/new-jenkins/docker-cleanup.sh'
+        timeout(time: 2) {
+          sh 'build/new-jenkins/docker-cleanup.sh'
+        }
       }
     }
     stage('Tests Setup') {
@@ -66,6 +67,11 @@ pipeline {
         stage('Packages') {
           steps {
             sh 'build/new-jenkins/js/tests-packages.sh'
+          }
+        }
+        stage('canvas_quizzes') {
+          steps {
+            sh 'build/new-jenkins/js/tests-quizzes.sh'
           }
         }
         stage('Karma - Spec Group - coffee') {
@@ -105,7 +111,7 @@ pipeline {
   }
   post {
     cleanup {
-      sh 'build/new-jenkins/docker-cleanup.sh'
+      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }
 }

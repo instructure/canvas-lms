@@ -25,6 +25,7 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Audio- und Videoaufnahmen sind nicht verfügbar."
   },
+  "audio_player_for_title_20cc70d": { "message": "Audioplayer für { title }" },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Eine Inline-Vorschau automatisch öffnen. (Vorschau wird erst nach dem Speichern angezeigt)"
   },
@@ -80,6 +81,7 @@
     "message": "Standardmäßig numerisch sortierte Liste"
   },
   "describe_the_image_e65d2e32": { "message": "(Beschreiben Sie das Bild)" },
+  "describe_the_video_2fe8f46a": { "message": "(Beschreiben Sie das Video)" },
   "dimensions_45ddb7b7": { "message": "Abmessungen" },
   "directionality_ebcae6d0": { "message": "Bündelung" },
   "disable_in_line_preview_2a675175": {
@@ -113,6 +115,7 @@
   "embed_image_1080badc": { "message": "Bild einbetten" },
   "embed_options_tray_901cfd19": { "message": "Optionsfach einbetten" },
   "embed_preview_2d741e1f": { "message": "Vorschau einbetten" },
+  "embed_video_a97a64af": { "message": "Video einbetten" },
   "embed_video_code_703e10f2": { "message": "Videocode einbetten" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Fehler beim Hochladen der Video-/Audioaufnahme"
@@ -149,7 +152,6 @@
   "grades_a61eba0a": { "message": "Noten" },
   "group_files_4324f3df": { "message": "Gruppendateien" },
   "group_navigation_99f191a": { "message": "Gruppennavigation" },
-  "header_f28f73db": { "message": "Kopfzeile" },
   "height_69b03e15": { "message": "Höhe" },
   "image_options_5412d02c": { "message": "Bildoptionen" },
   "image_options_tray_90a46006": { "message": "Fach für Bildoptionen" },
@@ -249,7 +251,6 @@
   "show_video_options_6ed3721a": { "message": "Videooptionen anzeigen" },
   "size_b30e1077": { "message": "Größe" },
   "small_b070434a": { "message": "Klein" },
-  "small_header_168fb9f9": { "message": "Kleine Überschrift" },
   "something_went_wrong_89195131": { "message": "Etwas ging schief." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Beim Zugriff auf Ihr Mikrofon oder Ihre Webcam ging etwas schief."
@@ -270,7 +271,6 @@
   "start_over_f7552aa9": { "message": "Nochmal beginnen" },
   "start_recording_9a65141a": { "message": "Aufzeichnung starten" },
   "styles_2aa721ef": { "message": "Styles" },
-  "subheader_2b87606d": { "message": "Unterüberschrift" },
   "submit_a3cc6859": { "message": "Abgeben" },
   "subscript_59744f96": { "message": "Abonnieren" },
   "superscript_8cb349a2": { "message": "Hochgestellt" },
@@ -317,6 +317,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Verwendet von einem Screen-Reader zur Beschreibung des Contents eines Bilds"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Wird von Screenreadern verwendet, um das Video zu beschreiben."
+  },
   "user_documents_c206e61f": { "message": "Benutzer Dokumente" },
   "user_images_b6490852": { "message": "Benutzerbilder" },
   "user_media_14fbf656": { "message": "Nutzer-Medien" },
@@ -326,6 +329,8 @@
   "video_options_24ef6e5d": { "message": "Videooptionen" },
   "video_options_tray_3b9809a5": { "message": "Fach für Videooptionen" },
   "video_player_b371005": { "message": "Videoplayer" },
+  "video_player_for_9e7d373b": { "message": "Videoplayer für " },
+  "video_player_for_title_ffd9fbc4": { "message": "Videoplayer für { title }" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Tastenkombinationen anzeigen"
   },

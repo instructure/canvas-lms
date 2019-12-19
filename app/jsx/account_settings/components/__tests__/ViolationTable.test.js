@@ -34,8 +34,16 @@ describe('Violation Table', () => {
     }
   ]
 
+  const getProps = overrides => ({
+    violations: VIOLATIONS,
+    whitelistedDomains: {account: []},
+    accountId: '123',
+    addDomain: () => {},
+    ...overrides
+  })
+
   it('shows each violation given on a row', async () => {
-    const {findAllByText} = render(<ViolationTable violations={VIOLATIONS} />)
+    const {findAllByText} = render(<ViolationTable {...getProps()} />)
 
     const results = await findAllByText(
       content => content.startsWith('Add') && content.endsWith('to the whitelist')
@@ -43,7 +51,7 @@ describe('Violation Table', () => {
     expect(results.length).toBe(2)
   })
   it('shows the domain name only for each violation', async () => {
-    const {findByText} = render(<ViolationTable violations={VIOLATIONS} />)
+    const {findByText} = render(<ViolationTable {...getProps()} />)
 
     const domainOne = await findByText('example.com')
     const domainTwo = await findByText('clayd.dev')
@@ -51,7 +59,7 @@ describe('Violation Table', () => {
     expect(domainTwo).toBeInTheDocument()
   })
   it('shows the date of the last violation', async () => {
-    const {findByText} = render(<ViolationTable violations={VIOLATIONS} />)
+    const {findByText} = render(<ViolationTable {...getProps()} />)
 
     const dateOne = await findByText('11/11/2019')
     const dateTwo = await findByText('11/12/2019')
@@ -59,11 +67,53 @@ describe('Violation Table', () => {
     expect(dateTwo).toBeInTheDocument()
   })
   it('shows how many attempts a violation has had', async () => {
-    const {findByText} = render(<ViolationTable violations={VIOLATIONS} />)
+    const {findByText} = render(<ViolationTable {...getProps()} />)
     const dateOne = await findByText('7')
     const dateTwo = await findByText('2')
     expect(dateOne).toBeInTheDocument()
     expect(dateTwo).toBeInTheDocument()
+  })
+
+  it('filters out any violations that currently exist in the whitelist', () => {
+    const {container, queryAllByText} = render(
+      <ViolationTable {...getProps({whitelistedDomains: {account: ['clayd.dev']}})} />
+    )
+    expect(container.querySelectorAll('th[scope=row]')).toHaveLength(1)
+    expect(queryAllByText('clayd.dev')).toHaveLength(0)
+  })
+
+  it('shows a info message when there are no violations present', async () => {
+    const {findByText} = render(<ViolationTable violations={[]} />)
+    expect(await findByText(/No violations/)).toBeInTheDocument()
+  })
+
+  describe('adding to whitelist', () => {
+    it('calls the addDomain prop when clicking the add button', async () => {
+      const fakeAddDomain = jest.fn()
+      const {findByText} = render(<ViolationTable {...getProps({addDomain: fakeAddDomain})} />)
+      const addButton = await findByText('Add clayd.dev to the whitelist')
+      fireEvent.click(addButton)
+      expect(fakeAddDomain).toHaveBeenCalledWith(
+        'account',
+        '123',
+        'clayd.dev',
+        expect.any(Function)
+      )
+    })
+
+    it('shows a flash message after adding a domain', async () => {
+      const fakeAddDomain = jest.fn((a, b, c, d) => d())
+      const fakeAlert = jest.fn()
+      const {findByText} = render(
+        <ViolationTable {...getProps({addDomain: fakeAddDomain, showAlert: fakeAlert})} />
+      )
+      const addButton = await findByText('Add clayd.dev to the whitelist')
+      fireEvent.click(addButton)
+      expect(fakeAlert).toHaveBeenCalledWith({
+        message: 'Success: You added clayd.dev to the whitelist.',
+        type: 'success'
+      })
+    })
   })
 
   describe('sorting', () => {
@@ -86,13 +136,15 @@ describe('Violation Table', () => {
     ]
 
     it('defaults to sorting descending based on the attempt count', () => {
-      const {container} = render(<ViolationTable violations={SORT_VIOLATIONS} />)
+      const {container} = render(<ViolationTable {...getProps({violations: SORT_VIOLATIONS})} />)
       const rows = Array.from(container.querySelectorAll('th[scope=row]')).map(x => x.textContent)
       expect(rows).toEqual(['example.com', 'instructure.com', 'clayd.dev'])
     })
 
     it('sorts based on the name when clicking the header (ascending and descending)', async () => {
-      const {findByText, container} = render(<ViolationTable violations={SORT_VIOLATIONS} />)
+      const {findByText, container} = render(
+        <ViolationTable {...getProps({violations: SORT_VIOLATIONS})} />
+      )
 
       const domainHeader = await findByText('Blocked Domain Name')
       fireEvent.click(domainHeader)
@@ -108,7 +160,9 @@ describe('Violation Table', () => {
     })
 
     it('sorts based on the date when clicking the header (ascending and descending)', async () => {
-      const {findByText, container} = render(<ViolationTable violations={SORT_VIOLATIONS} />)
+      const {findByText, container} = render(
+        <ViolationTable {...getProps({violations: SORT_VIOLATIONS})} />
+      )
 
       const dateHeader = await findByText('Last Attempt')
       fireEvent.click(dateHeader)
@@ -124,7 +178,9 @@ describe('Violation Table', () => {
     })
 
     it('sorts based on the attempts when clicking the header (ascending and descending)', async () => {
-      const {findByText, container} = render(<ViolationTable violations={SORT_VIOLATIONS} />)
+      const {findByText, container} = render(
+        <ViolationTable {...getProps({violations: SORT_VIOLATIONS})} />
+      )
 
       const dateHeader = await findByText('Requested')
       fireEvent.click(dateHeader)

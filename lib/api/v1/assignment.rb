@@ -761,6 +761,10 @@ module Api::V1::Assignment
       end
     end
 
+    if update_lockdown_browser?(assignment_params)
+      update_lockdown_browser_settings(assignment, assignment_params)
+    end
+
     apply_report_visibility_options!(assignment_params, assignment)
 
     assignment.updating_user = user
@@ -994,5 +998,43 @@ module Api::V1::Assignment
       'external_tool_tag_attributes' => strong_anything,
       'submission_types' => strong_anything
     ]
+  end
+
+  def update_lockdown_browser?(assignment_params)
+    %i[
+      require_lockdown_browser
+      require_lockdown_browser_for_results
+      require_lockdown_browser_monitor
+      lockdown_browser_monitor_data
+      access_code
+    ].any? {|key| assignment_params.key?(key) }
+  end
+
+  def update_lockdown_browser_settings(assignment, assignment_params)
+    settings = assignment.settings || {}
+    ldb_settings = settings['lockdown_browser'] || {}
+
+    if assignment_params.key?('require_lockdown_browser')
+      ldb_settings[:require_lockdown_browser] = value_to_boolean(assignment_params[:require_lockdown_browser])
+    end
+
+    if assignment_params.key?('require_lockdown_browser_for_results')
+      ldb_settings[:require_lockdown_browser_for_results] = value_to_boolean(assignment_params[:require_lockdown_browser_for_results])
+    end
+
+    if assignment_params.key?('require_lockdown_browser_monitor')
+      ldb_settings[:require_lockdown_browser_monitor] = value_to_boolean(assignment_params[:require_lockdown_browser_monitor])
+    end
+
+    if assignment_params.key?('lockdown_browser_monitor_data')
+      ldb_settings[:lockdown_browser_monitor_data] = assignment_params[:lockdown_browser_monitor_data]
+    end
+
+    if assignment_params.key?('access_code')
+      ldb_settings[:access_code] = assignment_params[:access_code]
+    end
+
+    settings[:lockdown_browser] = ldb_settings
+    assignment.settings = settings
   end
 end

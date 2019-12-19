@@ -158,7 +158,10 @@ class LearningOutcome < ActiveRecord::Base
     tag.mastery_score = opts[:mastery_score] if opts[:mastery_score]
     tag.save
 
-    create_missing_outcome_link(context) if context.is_a? Course
+    if context.is_a? Course
+      create_missing_outcome_link(context)
+      self.touch if MasterCourses::MasterTemplate.is_master_course?(context)
+    end
     tag
   end
 

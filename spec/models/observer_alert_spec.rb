@@ -92,6 +92,20 @@ describe ObserverAlert do
       expect(alert2.title).to include('Course grade: ')
     end
 
+    it 'creates only one alert per student if the student is enrolled in multiple sections per course' do
+      Enrollment.create!(
+        course_section: @course.course_sections.create!,
+        type: "StudentEnrollment",
+        user_id: @student1.id,
+        course: @course,
+        workflow_state: "active"
+      )
+      @assignment.grade_student(@student1, score: 90, grader: @teacher)
+      expect(
+        ObserverAlert.where(observer_alert_threshold: @threshold1, user_id: @student1.id).count
+      ).to equal(1)
+    end
+
     it 'doesnt create an alert if the old score was already above the threshold' do
       @assignment.grade_student(@student1, score: 100, grader: @teacher)
       @assignment.grade_student(@student2, score: 0, grader: @teacher)

@@ -25,6 +25,9 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Ääni- ja videoäänitys ei ole saatavissa."
   },
+  "audio_player_for_title_20cc70d": {
+    "message": "Äänisoitin kohteelle { title }"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Avaa automaattisesti tekstiin sidottu esikatselu. (Esikatselu näkyy vain tallentamisen jälkeen)"
   },
@@ -82,6 +85,7 @@
     "message": "numeerinen järjestetty oletuslista"
   },
   "describe_the_image_e65d2e32": { "message": "(Kuvaa kuva)" },
+  "describe_the_video_2fe8f46a": { "message": "(Kuvaa video)" },
   "dimensions_45ddb7b7": { "message": "Mitat" },
   "directionality_ebcae6d0": { "message": "suuntaisuus" },
   "disable_in_line_preview_2a675175": {
@@ -117,6 +121,7 @@
   "embed_image_1080badc": { "message": "Upota kuva" },
   "embed_options_tray_901cfd19": { "message": "Upota asetusten ilmoitusalue" },
   "embed_preview_2d741e1f": { "message": "Upota esikatselu" },
+  "embed_video_a97a64af": { "message": "Upota video" },
   "embed_video_code_703e10f2": { "message": "Upota videokoodi" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Virhe video-/ääninauhoituksen lataamisessa"
@@ -155,7 +160,6 @@
   "grades_a61eba0a": { "message": "Arvosanat" },
   "group_files_4324f3df": { "message": "Ryhmän tiedostot" },
   "group_navigation_99f191a": { "message": "Ryhmän navigointi" },
-  "header_f28f73db": { "message": "Otsikko" },
   "height_69b03e15": { "message": "Korkeus" },
   "image_options_5412d02c": { "message": "Kuva-asetukset" },
   "image_options_tray_90a46006": { "message": "Kuva-asetusten ilmoitusalue" },
@@ -255,7 +259,6 @@
   "show_video_options_6ed3721a": { "message": "Näytä videoasetukset" },
   "size_b30e1077": { "message": "Koko" },
   "small_b070434a": { "message": "Pieni" },
-  "small_header_168fb9f9": { "message": "Pieni otsikko" },
   "something_went_wrong_89195131": { "message": "Jotakin meni pieleen." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Jotakin meni pieleen, kun yritettiin käyttää mikrofoniasi tai verkkokameraasi."
@@ -276,7 +279,6 @@
   "start_over_f7552aa9": { "message": "Aloita alusta" },
   "start_recording_9a65141a": { "message": "Aloita nauhoitus" },
   "styles_2aa721ef": { "message": "Tyylit" },
-  "subheader_2b87606d": { "message": "Alaotsikko" },
   "submit_a3cc6859": { "message": "Lähetä" },
   "subscript_59744f96": { "message": "Alaindeksi" },
   "superscript_8cb349a2": { "message": "Yläindeksi" },
@@ -323,6 +325,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Näytönlukijat käyttävät kuvaamaan kuvan sisältöä"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Näytönlukijat käyttävät kuvaamaan videota"
+  },
   "user_documents_c206e61f": { "message": "Käyttäjän asiakirjat" },
   "user_images_b6490852": { "message": "Käyttäjän kuvat" },
   "user_media_14fbf656": { "message": "Käyttäjän tietoväline" },
@@ -332,6 +337,10 @@
   "video_options_24ef6e5d": { "message": "Videoasetukset" },
   "video_options_tray_3b9809a5": { "message": "Videoasetusten ilmoitusalue" },
   "video_player_b371005": { "message": "Videosoitin" },
+  "video_player_for_9e7d373b": { "message": "Videonauhuri kohteelle " },
+  "video_player_for_title_ffd9fbc4": {
+    "message": "Videonauhuri kohteelle { title }"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Näytä näppäimistön pikakuvakkeet"
   },

@@ -56,7 +56,7 @@ module NewCourseAddCourseModal
   end
 
   def select_subaccount(subaccount)
-    click_INSTUI_Select_option(subaccount_select, subaccount.to_param, :value)
+    click_INSTUI_Select_option(subaccount_select, subaccount.name)
   end
 
   def select_enrollment_term(term_text)

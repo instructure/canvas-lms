@@ -23,6 +23,10 @@ import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../sidebar/sources/fake'
 import CanvasContentTray from '../CanvasContentTray'
 
+jest.mock('../../../../../../../app/jsx/shared/rce/FileBrowser', () => {
+  return jest.fn(() => 'Files Browser')
+})
+
 describe('RCE Plugins > CanvasContentTray', () => {
   let component
   let props
@@ -132,6 +136,11 @@ describe('RCE Plugins > CanvasContentTray', () => {
     it('is the media panel for media content types', async () => {
       await showTrayForPlugin('course_media')
       expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
+    })
+
+    it('is the file browser for the all content type', async () => {
+      await showTrayForPlugin('all')
+      expect(component.getByTestId('instructure_links-FilesPanel')).toBeInTheDocument()
     })
   })
 

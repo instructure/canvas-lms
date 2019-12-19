@@ -166,5 +166,11 @@ describe Types::UserType do
         expect(@deleted_user_group_ids.include?(id)).to be false
       end
     end
+
+    it "only returns groups for current_user" do
+      expect(
+        user_type.resolve('groups { _id }', current_user: @teacher)
+      ).to be_nil
+    end
   end
 end

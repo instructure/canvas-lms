@@ -158,23 +158,6 @@
                     </td>
                   </tr>
 
-                  <% unless @account.non_canvas_auth_configured?
-                    # if the account has a authentication_provider,
-                    # we'll control this setting from that page
-                  %>
-                    <tr>
-                      <td>
-                        <%= settings.blabel :login_handle_name, en: "Login Label" %>
-                      </td>
-                      <td>
-                        <%= settings.text_field :login_handle_name,
-                                                value: @account.login_handle_name,
-                                                class: 'same-width-as-select',
-                                                placeholder: t(:login_handle_name_placeholder, "ex: Login, Username, or Student ID") %>
-                      </td>
-                    </tr>
-                  <% end %>
-
                   <tr>
                     <td><%= settings.blabel :trusted_referers, :en => "Trusted HTTP Referers" %></td>
                     <td>

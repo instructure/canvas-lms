@@ -163,7 +163,9 @@
     "description": "Title of Sidebar accordion tab containing links to group pages.",
     "message": "Group Navigation"
   },
-  "header_f28f73db": { "message": "Header" },
+  "heading_2_5b84eed2": { "message": "Heading 2" },
+  "heading_3_2c83de44": { "message": "Heading 3" },
+  "heading_4_b2e74be7": { "message": "Heading 4" },
   "height_69b03e15": { "message": "Height" },
   "image_options_5412d02c": { "message": "Image Options" },
   "image_options_tray_90a46006": { "message": "Image Options Tray" },
@@ -278,7 +280,6 @@
   "show_video_options_6ed3721a": { "message": "Show video options" },
   "size_b30e1077": { "message": "Size" },
   "small_b070434a": { "message": "Small" },
-  "small_header_168fb9f9": { "message": "Small header" },
   "something_went_wrong_89195131": { "message": "Something went wrong." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Something went wrong accessing your mic or webcam."
@@ -297,7 +298,6 @@
   "start_over_f7552aa9": { "message": "Start Over" },
   "start_recording_9a65141a": { "message": "Start Recording" },
   "styles_2aa721ef": { "message": "Styles" },
-  "subheader_2b87606d": { "message": "Subheader" },
   "submit_a3cc6859": { "message": "Submit" },
   "subscript_59744f96": { "message": "Subscript" },
   "superscript_8cb349a2": { "message": "Superscript" },

@@ -25,6 +25,9 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Lyd- og videooptagelse er ikke tilgængelig."
   },
+  "audio_player_for_title_20cc70d": {
+    "message": "Audioafspiller til { title }"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Åbn automatisk en in-line forhåndsvisning. (Forhåndsvisning vises kun, når filen er blevet gemt)"
   },
@@ -78,6 +81,7 @@
     "message": "standard numerisk sorteret liste"
   },
   "describe_the_image_e65d2e32": { "message": "(Beskriv billedet)" },
+  "describe_the_video_2fe8f46a": { "message": "(Beskriv videoen)" },
   "dimensions_45ddb7b7": { "message": "Dimensioner" },
   "directionality_ebcae6d0": { "message": "retningsbestemthed" },
   "disable_in_line_preview_2a675175": {
@@ -113,6 +117,7 @@
     "message": "Bakke til indlejringsindstillinger"
   },
   "embed_preview_2d741e1f": { "message": "Indlejr forhåndsvisning" },
+  "embed_video_a97a64af": { "message": "Indlejr video" },
   "embed_video_code_703e10f2": { "message": "Indlejr videokode" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Fejl ved upload af video- / lydoptagelse"
@@ -149,7 +154,6 @@
   "grades_a61eba0a": { "message": "Karakterer" },
   "group_files_4324f3df": { "message": "Gruppefiler" },
   "group_navigation_99f191a": { "message": "Gruppenavigation" },
-  "header_f28f73db": { "message": "Overskrift" },
   "height_69b03e15": { "message": "Højde" },
   "image_options_5412d02c": { "message": "Billedindstillinger" },
   "image_options_tray_90a46006": { "message": "Billedindstillinger-bakke" },
@@ -249,7 +253,6 @@
   "show_video_options_6ed3721a": { "message": "Vis videoindstillinger" },
   "size_b30e1077": { "message": "Størrelse" },
   "small_b070434a": { "message": "Lille" },
-  "small_header_168fb9f9": { "message": "Lille overskrift" },
   "something_went_wrong_89195131": { "message": "Noget gik galt." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Noget gik galt ved adgang til din mikrofon eller dit webcam."
@@ -268,7 +271,6 @@
   "start_over_f7552aa9": { "message": "Start forfra" },
   "start_recording_9a65141a": { "message": "Start optagelse" },
   "styles_2aa721ef": { "message": "Stile" },
-  "subheader_2b87606d": { "message": "Underoverskrift" },
   "submit_a3cc6859": { "message": "Aflever" },
   "subscript_59744f96": { "message": "Sænket skrift" },
   "superscript_8cb349a2": { "message": "Hævet skrift" },
@@ -315,6 +317,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Bruges af skærmlæsere til at beskrive et billedes indhold"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Bruges af skærmlæsere til at beskrive videoen"
+  },
   "user_documents_c206e61f": { "message": "Brugerdokumenter" },
   "user_images_b6490852": { "message": "Brugerbilleder" },
   "user_media_14fbf656": { "message": "Brugermedier" },
@@ -324,6 +329,10 @@
   "video_options_24ef6e5d": { "message": "Videoindstillinger" },
   "video_options_tray_3b9809a5": { "message": "Bakke for videoindstillinger" },
   "video_player_b371005": { "message": "Videoafspiller" },
+  "video_player_for_9e7d373b": { "message": "Videoafspiller til " },
+  "video_player_for_title_ffd9fbc4": {
+    "message": "Videoafspiller til { title }"
+  },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Se tastaturgenveje" },
   "webcam_fe91b20f": { "message": "Webcam" },
   "width_492fec76": { "message": "Bredde" },

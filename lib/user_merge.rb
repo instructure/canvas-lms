@@ -31,7 +31,7 @@ class UserMerge
     @data = []
   end
 
-  def into(target_user)
+  def into(target_user, merger: nil, source: nil)
     return unless target_user
     return if target_user == from_user
     raise 'cannot merge a test student' if from_user.preferences[:fake_student] || target_user.preferences[:fake_student]
@@ -41,6 +41,7 @@ class UserMerge
     from_user.associate_with_shard(target_user.shard, :shadow)
     target_user.shard.activate do
       @merge_data = UserMergeData.create!(user: target_user, from_user: from_user, workflow_state: 'merging')
+      @merge_data.items.create!(user: target_user, item_type: 'logs', item: {merger_id: merger.id, source: source}.to_s) if merger || source
 
       items = []
       if target_user.avatar_state == :none && from_user.avatar_state != :none

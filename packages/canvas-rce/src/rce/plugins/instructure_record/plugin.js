@@ -45,7 +45,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
 
           {
             type: 'menuitem',
-            text: formatMessage('My Media'),
+            text: formatMessage('User Media'),
             onAction() {
               ed.focus(true)
               bridge.showTrayForPlugin(USER_PLUGIN_KEY)

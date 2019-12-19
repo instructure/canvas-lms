@@ -23,6 +23,9 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Nagrania audio i wideo nie są dostępne."
   },
+  "audio_player_for_title_20cc70d": {
+    "message": "Odtwarzacz audio dla { title }"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Automatycznie otwórz pogląd w wierszu. (podgląd zostanie wyświetlony po zapisaniu)"
   },
@@ -80,6 +83,7 @@
     "message": "domyślna uporządkowana lista numeryczna"
   },
   "describe_the_image_e65d2e32": { "message": "(opisz obraz)" },
+  "describe_the_video_2fe8f46a": { "message": "(opisz wideo)" },
   "dimensions_45ddb7b7": { "message": "Wymiary" },
   "directionality_ebcae6d0": { "message": "Kierunkowość" },
   "disable_in_line_preview_2a675175": {
@@ -113,6 +117,7 @@
   "embed_image_1080badc": { "message": "Osadź obraz" },
   "embed_options_tray_901cfd19": { "message": "Osadź panel opcji" },
   "embed_preview_2d741e1f": { "message": "Osadź podgląd" },
+  "embed_video_a97a64af": { "message": "Osadź wideo" },
   "embed_video_code_703e10f2": { "message": "Osadź kod wideo" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Błąd podczas przesyłania nagrania wideo/audio"
@@ -151,7 +156,6 @@
   "grades_a61eba0a": { "message": "Oceny" },
   "group_files_4324f3df": { "message": "Pliki grupy" },
   "group_navigation_99f191a": { "message": "Nawigowanie po grupach" },
-  "header_f28f73db": { "message": "Nagłówek" },
   "height_69b03e15": { "message": "Wysokość" },
   "image_options_5412d02c": { "message": "Opcje obrazu" },
   "image_options_tray_90a46006": { "message": "Panel opcji obrazu" },
@@ -255,7 +259,6 @@
   "show_video_options_6ed3721a": { "message": "Pokaż opcje wideo" },
   "size_b30e1077": { "message": "Rozmiar" },
   "small_b070434a": { "message": "Mały" },
-  "small_header_168fb9f9": { "message": "Mały nagłówek" },
   "something_went_wrong_89195131": { "message": "Coś poszło nie tak." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Wystąpił problem z dostępem do kamery sieciowej lub mikrofonu."
@@ -276,7 +279,6 @@
   "start_over_f7552aa9": { "message": "Rozpocznij ponownie" },
   "start_recording_9a65141a": { "message": "Rozpocznij nagrywanie" },
   "styles_2aa721ef": { "message": "Style" },
-  "subheader_2b87606d": { "message": "Podnagłówek" },
   "submit_a3cc6859": { "message": "Prześlij" },
   "subscript_59744f96": { "message": "Indeks dolny" },
   "superscript_8cb349a2": { "message": "Indeks górny" },
@@ -325,6 +327,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Używane przez czytniki ekranu do opisania zawartości obrazu"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Używane przez czytniki ekranu do opisania zawartości wideo"
+  },
   "user_documents_c206e61f": { "message": "Dokumenty użytkownika" },
   "user_images_b6490852": { "message": "Zdjęcia użytkownika" },
   "user_media_14fbf656": { "message": "Multimedia użytkownika" },
@@ -334,6 +339,10 @@
   "video_options_24ef6e5d": { "message": "Opcje wideo" },
   "video_options_tray_3b9809a5": { "message": "Panel opcji wideo" },
   "video_player_b371005": { "message": "Odtwarzacz wideo" },
+  "video_player_for_9e7d373b": { "message": "Odtwarzacz wideo dla " },
+  "video_player_for_title_ffd9fbc4": {
+    "message": "Odtwarzacz wideo dla { title }"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Wyświetl skróty klawiszowe"
   },

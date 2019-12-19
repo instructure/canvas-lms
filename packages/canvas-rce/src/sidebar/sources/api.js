@@ -214,7 +214,8 @@ class RceApiSource {
   }
 
   fetchImages(props) {
-    const uri = props.bookmark || this.uriFor('images', props)
+    const images = props.images[props.contextType]
+    const uri = images.bookmark || this.uriFor('images', props)
     const headers = headerFor(this.jwt)
     return this.apiFetch(uri, headers)
   }

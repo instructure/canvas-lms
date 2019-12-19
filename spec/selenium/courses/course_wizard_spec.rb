@@ -17,10 +17,18 @@
 
 require_relative '../common'
 require_relative './pages/courses_home_page'
+require_relative './pages/course_settings_page'
+require_relative './pages/course_settings_navigation_page_component'
+require_relative './pages/course_left_nav_page_component'
+require_relative '../calendar/pages/calendar_page'
 
 describe 'course wizard' do
   include_context "in-process server selenium tests"
   include CoursesHomePage
+  include CourseSettingsPage
+  include CourseSettingsNavigationPageComponent
+  include CourseLeftNavPageComponent
+  include CalendarPage
 
   before(:each) do
     course_with_teacher_logged_in
@@ -77,39 +85,35 @@ describe 'course wizard' do
   end
 
   it "should complete 'Select Navigation Links' checklist item" do
-    skip_if_chrome('research - Over the time threshold')
-
+    skip('ADMIN-3018')
     # Navigate to Navigation tab
     go_to_checklist
-
     select_navigation_links
-
     wait_for_ajaximations
 
-    # Modify Navigation
-    f('#navigation_tab').click
-    f('.navitem.enabled.modules .al-trigger.al-trigger-gray').click
-    f('.navitem.enabled.modules .admin-links .disable_nav_item_link').click
-    f('#tab-navigation .btn').click
+    # Modify Navigation (But not really, you just need to visit and save)
+    visit_navigation_tab
+    save_course_navigation
 
+    # head back to course wizard and verify it is checked off
+    visit_course_home_link
     go_to_checklist
-
     expect(completed_checklist_item('select_navigation')).to be_displayed
   end
 
   it "should complete 'Add Course Calendar Events' checklist item" do
-    skip_if_chrome('research - Over the time threshold')
+    skip('ADMIN-3018')
 
     # Navigate to Calendar tab
     go_to_checklist
     add_course_calendar_events
 
     # Add Event
-    f("#create_new_event_link").click
-    wait_for_ajaximations
-    replace_content(f('#edit_calendar_event_form #calendar_event_title'), "Event")
-    f("#edit_calendar_event_form button.event_button").click
-    wait_for_ajaximations
+    create_new_calendar_event
+
+    add_calendar_event_title("Event")
+
+    submit_calendar_event_changes
 
     go_to_checklist
 
@@ -117,7 +121,7 @@ describe 'course wizard' do
   end
 
   it "should complete 'Publish the Course' checklist item" do
-    skip_if_chrome('research - Over the time threshold')
+    skip('ADMIN-3018')
 
     # Publish from Checklist
     go_to_checklist

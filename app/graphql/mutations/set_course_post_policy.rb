@@ -36,4 +36,8 @@ class Mutations::SetCoursePostPolicy < Mutations::BaseMutation
     course.apply_post_policy!(post_manually: input[:post_manually])
     {post_policy: course.default_post_policy}
   end
+
+  def self.post_policy_log_entry(post_policy, _context)
+    post_policy.course
+  end
 end

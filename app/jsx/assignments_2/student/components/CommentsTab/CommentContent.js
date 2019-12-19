@@ -29,7 +29,7 @@ import {SubmissionComment} from '../../graphqlData/SubmissionComment'
 import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
 import {useMutation} from 'react-apollo'
 
-function CommentContent(props) {
+export default function CommentContent(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
   const [markCommentsRead, {data, called: mutationCalled, error: mutationError}] = useMutation(
@@ -153,5 +153,3 @@ CommentContent.propTypes = {
   comments: arrayOf(SubmissionComment.shape).isRequired,
   submission: Submission.shape.isRequired
 }
-
-export default React.memo(CommentContent)

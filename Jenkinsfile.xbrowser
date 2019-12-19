@@ -32,6 +32,14 @@ pipeline {
   }
   // Todo: This will run all xbrowser tests consecutively, still need to get parallel depending on runtime
   stages {
+    stage ('Pre-Cleanup') {
+      steps {
+        timeout(time: 2) {
+          sh 'build/new-jenkins/docker-cleanup.sh'
+        }
+      }
+    }
+
     stage ('Xbrowser Tests') {
       agent { label 'canvas-docker' }
       steps {
@@ -44,34 +52,34 @@ pipeline {
           sh 'build/new-jenkins/xbrowser-test.sh'
         }
       }
+    }
+  }
 
-      post {
-        unsuccessful {
-          // copy spec failures to local
-          sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
-          script {
-            def htmlFiles
-            // find all results files
-            dir ('tmp') {
-              htmlFiles = findFiles glob: '**/index.html'
-            }
-            // publish html
-            publishHTML target: [
-              allowMissing: false,
-              alwaysLinkToLastBuild: false,
-              keepAll: true,
-              reportDir: "tmp",
-              reportFiles: htmlFiles.join(','),
-              reportName: 'Test Failures'
-            ]
-          }
+  post {
+    unsuccessful {
+      // copy spec failures to local
+      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
+      script {
+        def htmlFiles
+        // find all results files
+        dir ('tmp') {
+          htmlFiles = findFiles glob: '**/index.html'
         }
-
-        cleanup {
-          sh 'rm -rf ./tmp/spec_failures'
-          sh 'build/new-jenkins/docker-cleanup.sh'
-        }
+        // publish html
+        publishHTML target: [
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: true,
+          reportDir: "tmp",
+          reportFiles: htmlFiles.join(','),
+          reportName: 'Test Failures'
+        ]
       }
+    }
+
+    cleanup {
+      sh 'rm -rf ./tmp/spec_failures'
+      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }
 }

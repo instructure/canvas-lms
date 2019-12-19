@@ -21,6 +21,7 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "音频和视频录制不可用。"
   },
+  "audio_player_for_title_20cc70d": { "message": "{ title }的音频播放器" },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "自动打开在线预览。（预览仅在保存后显示）"
   },
@@ -70,6 +71,7 @@
   },
   "default_numerical_ordered_list_48dd3548": { "message": "默认数字有序列表" },
   "describe_the_image_e65d2e32": { "message": "（图像说明）" },
+  "describe_the_video_2fe8f46a": { "message": "（视频说明）" },
   "dimensions_45ddb7b7": { "message": "尺寸" },
   "directionality_ebcae6d0": { "message": "方向性" },
   "disable_in_line_preview_2a675175": { "message": "禁用在线预览。" },
@@ -101,6 +103,7 @@
   "embed_image_1080badc": { "message": "嵌入图片" },
   "embed_options_tray_901cfd19": { "message": "嵌入选项托盘" },
   "embed_preview_2d741e1f": { "message": "嵌入预览" },
+  "embed_video_a97a64af": { "message": "嵌入视频" },
   "embed_video_code_703e10f2": { "message": "嵌入视频代码" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "上传视频/音频录制文件时出错"
@@ -129,7 +132,6 @@
   "grades_a61eba0a": { "message": "评分" },
   "group_files_4324f3df": { "message": "小组文件" },
   "group_navigation_99f191a": { "message": "小组导航" },
-  "header_f28f73db": { "message": "标题" },
   "height_69b03e15": { "message": "高度" },
   "image_options_5412d02c": { "message": "图像选项" },
   "image_options_tray_90a46006": { "message": "图像选项托盘" },
@@ -225,7 +227,6 @@
   "show_video_options_6ed3721a": { "message": "显示视频选项" },
   "size_b30e1077": { "message": "大小" },
   "small_b070434a": { "message": "小" },
-  "small_header_168fb9f9": { "message": "小标题" },
   "something_went_wrong_89195131": { "message": "出了些问题。" },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "访问您的麦克风或网络摄像头时出错。"
@@ -244,7 +245,6 @@
   "start_over_f7552aa9": { "message": "重新开始" },
   "start_recording_9a65141a": { "message": "开始录制" },
   "styles_2aa721ef": { "message": "样式" },
-  "subheader_2b87606d": { "message": "子标题" },
   "submit_a3cc6859": { "message": "提交" },
   "subscript_59744f96": { "message": "下标" },
   "superscript_8cb349a2": { "message": "上标" },
@@ -287,6 +287,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "屏幕阅读器用它来描述图像内容"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "被屏幕阅读器用来描述视频"
+  },
   "user_documents_c206e61f": { "message": "用户文档" },
   "user_images_b6490852": { "message": "用户图像" },
   "user_media_14fbf656": { "message": "用户媒体" },
@@ -296,6 +299,8 @@
   "video_options_24ef6e5d": { "message": "视频选项" },
   "video_options_tray_3b9809a5": { "message": "视频选项托盘" },
   "video_player_b371005": { "message": "视频播放器" },
+  "video_player_for_9e7d373b": { "message": "的视频播放器 " },
+  "video_player_for_title_ffd9fbc4": { "message": "{ title }的视频播放器" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "查看键盘快捷键" },
   "webcam_fe91b20f": { "message": "网络摄像头" },
   "width_492fec76": { "message": "宽度" },

@@ -39,8 +39,8 @@ export default class ConfigureExternalToolButton extends React.Component {
     }
   }
 
-  getLaunchUrl = () => {
-    const toolConfigUrl = this.props.tool.tool_configuration.url
+  getLaunchUrl = toolConfiguration => {
+    const toolConfigUrl = toolConfiguration.url || toolConfiguration.target_link_uri
     return `${ENV.CONTEXT_BASE_URL}/external_tools/retrieve?url=${encodeURIComponent(
       toolConfigUrl
     )}&display=borderless`
@@ -104,7 +104,7 @@ export default class ConfigureExternalToolButton extends React.Component {
           </div>
         </div>
         <iframe
-          src={this.getLaunchUrl()}
+          src={this.getLaunchUrl(this.props.tool.tool_configuration)}
           title={I18n.t('Tool Configuration')}
           className="tool_launch"
           style={this.state.iframeStyle}

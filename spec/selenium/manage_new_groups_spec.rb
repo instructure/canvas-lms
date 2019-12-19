@@ -172,6 +172,7 @@ describe "manage groups" do
     end
 
     it "should allow a teacher to reassign a student with an accessible modal dialog" do
+      skip('KNO-190')
       students = groups_student_enrollment 2
       group_categories = create_categories(@course, 1)
       groups = add_groups_in_category(group_categories[0],2)
@@ -192,7 +193,6 @@ describe "manage groups" do
       expect(fj(".group-summary:visible:last").text).to eq "0 students"
 
       # Move the user from one group into the other
-
       f(".groups .group .group-user .group-user-actions").click
       fj(".edit-group-assignment:first").click
       f("div[aria-label='Move Student']") # wait for element

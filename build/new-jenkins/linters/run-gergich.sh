@@ -20,6 +20,11 @@ set -ex
 # the linters expect this to be here else it will just look at master
 export GERRIT_PATCHSET_REVISION=`git rev-parse HEAD`
 
+# we need to remove the hooks because compile_assets calls yarn install which will
+# try to create the .git commit hooks
+echo "" > ./script/install_hooks
+gergich capture custom:./build/gergich/compile_assets:Gergich::CompileAssets "rake canvas:compile_assets"
+
 gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint "node script/xsslint.js"
 gergich capture i18nliner "rake i18n:check"
 bundle exec ruby script/brakeman
@@ -35,12 +40,6 @@ if ! git diff --exit-code schema.graphql; then
   message="GraphQL Schema changes are not checked in: run 'bundle exec rails graphql:schema' to generate graphql.schema file"
   gergich comment "{\"path\":\"schema.graphql\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
 fi
-
-# this is here to remind us that we need to add this during compile once we
-# figure out the write issues with a mounted volume of gergich
-# bundle exec gergich capture custom:./build/gergich/compile_assets:Gergich::CompileAssets "rake canvas:compile_assets"
-
-gergich comment '{"path":"/COMMIT_MSG","position":0,"severity":"info","message":"from-new-jenkins"}'
 
 gergich status
 if [[ "$GERGICH_PUBLISH" == "1" ]]; then

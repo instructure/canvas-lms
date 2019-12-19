@@ -58,6 +58,14 @@ const developerKeysHandlers = {
     ...state,
     developerKey: action.payload,
     editing: !!action.payload
+  }),
+  [ACTION_NAMES.RESET_LTI_STATE]: state => ({
+    ...state,
+    isLtiKey: false
+  }),
+  [ACTION_NAMES.LTI_KEYS_SET_LTI_KEY]: (state, action) => ({
+    ...state,
+    isLtiKey: action.payload
   })
 }
 

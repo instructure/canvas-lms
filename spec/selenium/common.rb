@@ -262,9 +262,11 @@ shared_context "in-process server selenium tests" do
         "Unexpected end of JSON input",
         "The google.com/jsapi JavaScript loader is deprecat",
         "Uncaught Error: Not Found", # for canvas-rce when no backend is set up
+        "Uncaught Error: Minified React error #188",
         "Uncaught Error: Minified React error #200", # this is coming from canvas-rce, but we should fix it
         "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/",
-        "Access to XMLHttpRequest at 'http://www.example.com/' from origin"
+        "Access to XMLHttpRequest at 'http://www.example.com/' from origin",
+        "The user aborted a request" # The server doesn't respond fast enough sometimes and requests can be aborted. For example: when a closing a dialog.
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

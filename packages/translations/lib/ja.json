@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "オーディオとビデオの録音・録画は利用できません。"
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "{ title }のオーディオプレーヤー"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "インラインプレビューが自動的に開きます。(プレビューが表示されるのは保存後のみです)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(画像の説明)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "（ビデオを説明する）"
+    },
     "details_98a31b68": {
         "message": "詳細"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "プレビューの埋め込み"
+    },
+    "embed_video_a97a64af": {
+        "message": "ビデオを埋め込む"
     },
     "embed_video_code_703e10f2": {
         "message": "ビデオコードの埋め込み"
@@ -460,9 +469,6 @@
     },
     "group_navigation_99f191a": {
         "message": "グループ ナビゲーション"
-    },
-    "header_f28f73db": {
-        "message": "ヘッダー"
     },
     "height_69b03e15": {
         "message": "高さ"
@@ -833,9 +839,6 @@
     "small_b070434a": {
         "message": "小"
     },
-    "small_header_168fb9f9": {
-        "message": "小さいヘッダー"
-    },
     "something_went_wrong_89195131": {
         "message": "問題が発生しました。"
     },
@@ -877,9 +880,6 @@
     },
     "styles_2aa721ef": {
         "message": "スタイル"
-    },
-    "subheader_2b87606d": {
-        "message": "サブヘッダー"
     },
     "submit_a3cc6859": {
         "message": "提出"
@@ -1010,6 +1010,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "スクリーンリーダーが画像のコンテンツを説明するのに使用します"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "ビデオを説明する際にスクリーンリーダーが使用"
+    },
     "user_documents_c206e61f": {
         "message": "ユーザードキュメント"
     },
@@ -1030,6 +1033,12 @@
     },
     "video_player_b371005": {
         "message": "ビデオプレーヤー"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "（）のビデオプレーヤー "
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "{ title }のビデオプレーヤー"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "キーボードのショートカットを見る"

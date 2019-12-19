@@ -2300,13 +2300,12 @@ class Assignment < ActiveRecord::Base
       comment = {
         comment: t(:comment_from_files, {one: "See attached file", other: "See attached files"}, count: files.size),
         author: commenter,
-        hidden: muted?,
         attachments: attachments,
       }
       group, students = group_students(user)
       comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group
       find_or_create_submissions(students).map do |submission|
-        submission.add_comment(comment)
+        submission.add_comment(comment.merge(hidden: submission.hide_grade_from_student?))
       end
     end
     [comments.compact, @ignored_files]

@@ -53,9 +53,9 @@ QUnit.module('SimilarityScore', moduleHooks => {
       ok($container.querySelector('a').href.includes('/my_superlative_report'))
     })
 
-    test('shows a "complete"/checkmark icon when the similarity score is below 20%', () => {
+    test('shows a "certified" icon when the similarity score is below 20%', () => {
       mountComponent({similarityScore: 10})
-      ok($container.querySelector('svg[name=IconComplete]'))
+      ok($container.querySelector('svg[name=IconCertified]'))
     })
 
     test('shows a half-full circle icon when the similarity score is between 20% and 60%', () => {

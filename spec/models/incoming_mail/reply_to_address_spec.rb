@@ -20,7 +20,7 @@ require File.expand_path('../../sharding_spec_helper.rb', File.dirname(__FILE__)
 require File.expand_path('../../spec_helper.rb', File.dirname(__FILE__))
 
 describe IncomingMail::ReplyToAddress do
-  let(:expect_secure_id) { Canvas::Security.hmac_sha1(Shard.short_id_for(@shard1.global_id_for(42)))[0..15] }
+  let(:expect_secure_id) { Canvas::Security.hmac_sha1(Shard.short_id_for(@shard1.global_id_for(42))) }
 
   describe 'initialize' do
     it 'should persist the message argument' do
@@ -61,7 +61,7 @@ describe IncomingMail::ReplyToAddress do
 
         short_id = Shard.short_id_for(@shard1.global_id_for(42))
 
-        expect(IncomingMail::ReplyToAddress.new(message).address).to eq "canvas+#{expect_secure_id}-#{short_id}-#{created_at.to_i}@example.com"
+        expect(IncomingMail::ReplyToAddress.new(message).address).to eq "canvas+#{expect_secure_id[0..15]}-#{short_id}-#{created_at.to_i}@example.com"
       end
 
       it 'should limit a reply-to address to 64 chars before @' do
@@ -78,6 +78,15 @@ describe IncomingMail::ReplyToAddress do
 
         expect(IncomingMail::ReplyToAddress.new(message).address.split('@').first.length < 64).to be_truthy
       end
+
+      it 'should be a valid hmac in the reply address' do
+        message = double()
+        expect(message).to receive(:global_id).and_return(@shard1.global_id_for(42))
+        secure_id = IncomingMail::ReplyToAddress.new(message).secure_id
+        expect(secure_id.length).to eq 16
+        expect(secure_id).to eq expect_secure_id[0, 16]
+        expect(IncomingMail::MessageHandler.new.send(:valid_secure_id?, Shard.short_id_for(@shard1.global_id_for(42)), secure_id)).to be_truthy
+      end
     end
   end
 
@@ -88,7 +97,7 @@ describe IncomingMail::ReplyToAddress do
       message       = double()
       expect(message).to receive(:global_id).and_return(@shard1.global_id_for(42))
 
-      expect(IncomingMail::ReplyToAddress.new(message).secure_id).to eq expect_secure_id
+      expect(IncomingMail::ReplyToAddress.new(message).secure_id).to eq expect_secure_id[0, 16]
     end
   end
 

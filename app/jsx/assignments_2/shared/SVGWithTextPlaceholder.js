@@ -24,7 +24,7 @@ SVGWithTextPlaceholder.propTypes = {
   url: string.isRequired
 }
 
-function SVGWithTextPlaceholder(props) {
+export default function SVGWithTextPlaceholder(props) {
   return (
     <div className="svg-placeholder-container">
       <img alt="" src={props.url} style={{width: '200px'}} />
@@ -34,5 +34,3 @@ function SVGWithTextPlaceholder(props) {
     </div>
   )
 }
-
-export default React.memo(SVGWithTextPlaceholder)

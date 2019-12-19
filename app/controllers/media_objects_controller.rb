@@ -120,22 +120,27 @@ class MediaObjectsController < ApplicationController
   #
   # @returns [MediaObject]
   def index
+    scope = MediaObject.active.where(user: @current_user)
     if params[:course_id]
-      context = Course.find(params[:course_id])
+      course = Course.find(params[:course_id])
+      root_folder = Folder.root_folders(course).first
+      if root_folder.grants_right?(@current_user, :read_contents)
+        # return all media objects with one visible matching attachment in course
+        scope = scope.where(:context => course).
+          where("EXISTS (?)", Attachments::ScopedToUser.new(course, @current_user).scope.
+            where("attachments.media_entry_id=media_objects.media_id"))
+      else
+        return render_unauthorized_action # not allowed to view files in the course
+      end
     end
-
-    where_hash = {user: @current_user}
-    where_hash[:context] = context if context
 
     order_dir = params[:order] == "desc" ? "desc" : "asc"
     order_by = params[:sort] || "title"
     order_by = MediaObject.best_unicode_collation_key('COALESCE(user_entered_title, title)') if order_by == "title"
-    order_clause = {
-      order_by => order_dir
-    }
+    scope = scope.order(order_by => order_dir)
 
     exclude = params[:exclude] || []
-    media_objects = Api.paginate(MediaObject.where(where_hash).active.order(order_clause), self, api_v1_media_objects_url).
+    media_objects = Api.paginate(scope, self, api_v1_media_objects_url).
       map{ |mo| media_object_api_json(mo, @current_user, session, exclude)}
     render :json => media_objects
   end

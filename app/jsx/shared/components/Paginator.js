@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!paginator'
 import {Pagination} from '@instructure/ui-pagination'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const Paginator = ({loadPage, page, pageCount, ...paginationProps}) => {
   if (pageCount <= 1) {

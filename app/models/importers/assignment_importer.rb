@@ -311,12 +311,23 @@ module Importers
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
        :position, :peer_review_count,
-       :omit_from_final_grade, :intra_group_peer_reviews, :post_to_sis,
+       :omit_from_final_grade, :intra_group_peer_reviews,
        :grader_count, :grader_comments_visible_to_graders,
        :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
        :anonymous_instructor_annotations
       ].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
+      end
+      
+      if hash[:post_to_sis] && item.grading_type != 'not_graded' && AssignmentUtil.due_date_required_for_account?(context) &&
+        (item.due_at.nil? || (migration.date_shift_options && Canvas::Plugin.value_to_boolean(migration.date_shift_options[:remove_dates])))
+        # check if it's going to fail the weird post_to_sis validation requiring due dates
+        # either because the date is already nil or we're going to remove it later
+        migration.add_warning(
+          t("The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date.",
+            :assignment_name => item.title))
+      elsif !hash[:post_to_sis].nil?
+        item.post_to_sis = hash[:post_to_sis]
       end
 
       [:turnitin_enabled, :vericite_enabled].each do |prop|

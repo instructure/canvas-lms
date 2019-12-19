@@ -26,56 +26,116 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
-    // 'refs/changes/63/181863/8' -> '63.181863.8'
-    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
-    // for now 1 until we stabilize some of the flaky specs
-    RERUNS_RETRY = 1
+    GERRIT_PORT = '29418'
+    GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     MAX_FAIL = 5
+    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:master"
+    RERUNS_RETRY = 0 // no reruns
   }
 
   stages {
-    stage ('Selenium Performance Tests') {
+    stage ('Environment Variables') {
       steps {
-        timeout(time: 30) {
-          checkout scm
+        timeout(time: 2) {
           sh 'printenv | sort'
-          sh 'build/new-jenkins/docker-compose-pull.sh'
-          sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
-          sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-          sh 'build/new-jenkins/rspec-with-retries.sh performance'
         }
       }
+    }
 
-      post {
-        unsuccessful {
-          // copy spec failures to local
-          sh 'mkdir -p tmp'
-          sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
-          script {
-            def htmlFiles
-            // find all results files
-            dir ('tmp') {
-              htmlFiles = findFiles glob: '**/index.html'
-            }
-            // publish html
-            publishHTML target: [
-              allowMissing: false,
-              alwaysLinkToLastBuild: false,
-              keepAll: true,
-              reportDir: "tmp",
-              reportFiles: htmlFiles.join(','),
-              reportName: 'Test Failures'
-              ]
-          }
-        }
-
-        cleanup {
-          sh 'rm -rf ./tmp/spec_failures/'
+    stage ('Pre-Cleanup') {
+      steps {
+        timeout(time: 2) {
           sh 'build/new-jenkins/docker-cleanup.sh'
         }
       }
+    }
+
+    // Copied wholesale out of Jenkinsfile, this needs be abstracted if possible
+    stage('Checkout Plugins') {
+      steps {
+        timeout(time: 3) {
+          script {
+            def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+            credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
+            gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
+            println "Plugin list: ${gems}"
+
+            /* fetch plugins */
+            gems.each { gem ->
+              credentials.fetchFromGerrit(gem, 'gems/plugins')
+            }
+            credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
+
+            sh '''
+              mv -v gerrit_builder/canvas-lms/config/* config/
+              mv -v config/knapsack_rspec_report.json ./
+              rm -v config/cache_store.yml
+              rmdir -p gerrit_builder/canvas-lms/config
+              cp -v docker-compose/config/selenium.yml config/
+              cp -Rv docker-compose/config/new-jenkins config/new-jenkins
+              cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml
+              cp -v config/domain.yml.example config/domain.yml
+              cp -v config/external_migration.yml.example config/external_migration.yml
+              cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml
+            '''
+          }
+        }
+      }
+    }
+
+    stage ('Setup Containers') {
+      steps {
+        timeout(time: 20) {
+          sh 'build/new-jenkins/docker-compose-pull.sh'
+          sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+          sh 'build/new-jenkins/docker-compose-build-up.sh'
+        }
+      }
+    }
+
+    stage ('Setup Databases') {
+      steps {
+        timeout(time: 5) {
+          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+        }
+      }
+    }
+
+    stage ('Selenium Performance Tests') {
+      steps {
+        timeout(time: 60) {
+          sh 'build/new-jenkins/rspec-with-retries.sh performance'
+        }
+      }
+    }
+  }
+
+  post {
+    unsuccessful {
+      // copy spec failures to local
+      sh 'mkdir -p tmp'
+      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
+      script {
+        def htmlFiles
+        // find all results files
+        dir ('tmp') {
+          htmlFiles = findFiles glob: '**/index.html'
+        }
+        // publish html
+        publishHTML target: [
+          allowMissing: false,
+          alwaysLinkToLastBuild: false,
+          keepAll: true,
+          reportDir: "tmp",
+          reportFiles: htmlFiles.join(','),
+          reportName: 'Test Failures'
+          ]
+      }
+    }
+
+    cleanup {
+      sh 'rm -rf ./tmp/spec_failures/'
+      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }
 }

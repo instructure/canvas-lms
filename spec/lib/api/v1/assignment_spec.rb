@@ -442,4 +442,60 @@ describe "Api::V1::Assignment" do
       end
     end
   end
+
+  describe "update lockdown browser settings" do
+    let(:course) { Course.create! }
+    let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+
+    let(:initial_lockdown_browser_params) do
+      ActionController::Parameters.new({
+        'require_lockdown_browser' => 'true',
+        'require_lockdown_browser_for_results' => 'false',
+        'require_lockdown_browser_monitor' => 'true',
+        'lockdown_browser_monitor_data' => 'some monitor data',
+        'access_code' => 'magggic code'
+      })
+    end
+
+    let(:lockdown_browser_params) do
+      ActionController::Parameters.new({
+        'require_lockdown_browser_for_results' => 'true',
+        'lockdown_browser_monitor_data' => 'some monitor data cchanges',
+        'access_code' => 'magggic coddddde'
+      })
+    end
+
+    let(:assignment) do
+      course.assignments.create!(
+        title: 'hi',
+        moderated_grading: true,
+        grader_count: 1,
+        final_grader: teacher
+      )
+    end
+
+    before do
+      allow(course).to receive(:account_membership_allows).and_return(false)
+    end
+
+    it "creates and updates lockdown browser settings" do
+      api.update_api_assignment(assignment, initial_lockdown_browser_params, teacher)
+      expect(assignment.settings['lockdown_browser']).to eq(
+        'require_lockdown_browser' => true,
+        'require_lockdown_browser_for_results' => false,
+        'require_lockdown_browser_monitor' => true,
+        'lockdown_browser_monitor_data' => 'some monitor data',
+        'access_code' => 'magggic code'
+      )
+
+      api.update_api_assignment(assignment, lockdown_browser_params, teacher)
+      expect(assignment.settings['lockdown_browser']).to eq(
+        'require_lockdown_browser' => true,
+        'require_lockdown_browser_for_results' => true,
+        'require_lockdown_browser_monitor' => true,
+        'lockdown_browser_monitor_data' => 'some monitor data cchanges',
+        'access_code' => 'magggic coddddde'
+      )
+    end
+  end
 end

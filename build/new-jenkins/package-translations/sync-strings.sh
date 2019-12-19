@@ -22,9 +22,7 @@ for file in packages/translations/lib/*.json; do
 done
 
 # If there are no changes to commit, bail out
-git diff-index --quiet HEAD -- packages/translations/lib
-if [ $? -eq 0 ]
-then
+if [[ -z $(git status --porcelain | grep 'packages/translations/lib') ]]; then
   echo "No new translations to commit"
   exit 0
 fi
@@ -38,7 +36,7 @@ yarn lint
 popd
 
 git config --global user.name "Jenkins"
-git config --global user.email "hudson@instructure.com"
+git config --global user.email "svc.cloudjenkins@instructure.com"
 
 gitdir=$(git rev-parse --git-dir); scp -o StrictHostKeyChecking=no -i /usr/src/sshkeyfile -p -P 29418 "${SSH_USERNAME}@gerrit.instructure.com:hooks/commit-msg" "${gitdir}/hooks/"
 # Commit any changes into a temp branch then push to gerrit

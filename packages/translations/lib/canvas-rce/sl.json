@@ -25,6 +25,9 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Snemanje video- in zvočnih posnetkov ni na voljo."
   },
+  "audio_player_for_title_20cc70d": {
+    "message": "Predvajalnik zvoka za { title }"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Samodejno odpri v predogledu v vrstici. (Predogled se prikaže šele po shranjevanju)"
   },
@@ -84,6 +87,7 @@
     "message": "privzeti številčno urejeni seznam"
   },
   "describe_the_image_e65d2e32": { "message": "(Opiši sliko)" },
+  "describe_the_video_2fe8f46a": { "message": "(Opišite videoposnetek)" },
   "dimensions_45ddb7b7": { "message": "Mere" },
   "directionality_ebcae6d0": { "message": "usmerjenost" },
   "disable_in_line_preview_2a675175": {
@@ -117,6 +121,7 @@
   "embed_image_1080badc": { "message": "Vdelaj sliko" },
   "embed_options_tray_901cfd19": { "message": "Vrstica z možnostmi vdelave" },
   "embed_preview_2d741e1f": { "message": "Predogled vdelave" },
+  "embed_video_a97a64af": { "message": "Vdelajte videoposnetek" },
   "embed_video_code_703e10f2": { "message": "Vdelaj kodo videoposnetka" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Napaka pri nalaganju videoposnetka/zvočnega posnetka"
@@ -153,7 +158,6 @@
   "grades_a61eba0a": { "message": "Ocene" },
   "group_files_4324f3df": { "message": "Datoteke skupine" },
   "group_navigation_99f191a": { "message": "Navigacija po skupini" },
-  "header_f28f73db": { "message": "Glava" },
   "height_69b03e15": { "message": "Višina" },
   "image_options_5412d02c": { "message": "Možnosti slike" },
   "image_options_tray_90a46006": { "message": "Vrstica z možnostmi slike" },
@@ -257,7 +261,6 @@
   },
   "size_b30e1077": { "message": "Velikost" },
   "small_b070434a": { "message": "Majhna" },
-  "small_header_168fb9f9": { "message": "Majhna glava" },
   "something_went_wrong_89195131": { "message": "Prišlo je do težav." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Pri dostopu do vaše spletne kamere ali mikrofon je prišlo do težav."
@@ -278,7 +281,6 @@
   "start_over_f7552aa9": { "message": "Začnite znova" },
   "start_recording_9a65141a": { "message": "Zaženi snemanje" },
   "styles_2aa721ef": { "message": "Slogi" },
-  "subheader_2b87606d": { "message": "Podglava" },
   "submit_a3cc6859": { "message": "Pošlji" },
   "subscript_59744f96": { "message": "Podpisano" },
   "superscript_8cb349a2": { "message": "Nadpisano" },
@@ -325,6 +327,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Uporabljajo ga bralniki zaslona za opisovanje vsebine slike"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Uporabljajo ga bralniki zaslona za opisovanje videoposnetka"
+  },
   "user_documents_c206e61f": { "message": "Uporabniški dokumenti" },
   "user_images_b6490852": { "message": "Uporabniške slike" },
   "user_media_14fbf656": { "message": "Uporabnikovi mediji" },
@@ -336,6 +341,10 @@
     "message": "Vrstica z možnostmi videoposnetka"
   },
   "video_player_b371005": { "message": "Predvajalnik videoposnetkov" },
+  "video_player_for_9e7d373b": { "message": "Predvajalnik videoposnetkov za " },
+  "video_player_for_title_ffd9fbc4": {
+    "message": "Predvajalnik videoposnetkov za { title }"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Prikaži bližnjice na tipkovnici"
   },

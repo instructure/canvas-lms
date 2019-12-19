@@ -172,7 +172,7 @@ module RCENextPage
   end
 
   def user_images
-    f('[role="menuitem"][title="My Images"]')
+    f('[role="menuitem"][title="User Images"]')
   end
 
   def upload_image_button
@@ -204,7 +204,7 @@ module RCENextPage
   end
 
   def user_media
-    f('[role="menuitem"][title="My Media"]')
+    f('[role="menuitem"][title="User Media"]')
   end
 
   def upload_document_button
@@ -216,7 +216,7 @@ module RCENextPage
   end
 
   def user_documents
-    f('[role="menuitem"][title="My Documents"]')
+    f('[role="menuitem"][title="User Documents"]')
   end
 
   def upload_document_modal
@@ -308,15 +308,15 @@ module RCENextPage
   end
 
   def header_option
-    f('[role="menuitemcheckbox"][title="Header"]')
+    f('[role="menuitemcheckbox"][title="Heading 2"]')
   end
 
   def subheader_option
-    f('[role="menuitemcheckbox"][title=" Subheader"]')
+    f('[role="menuitemcheckbox"][title=" Heading 3"]')
   end
 
   def small_header_option
-    f('[role="menuitemcheckbox"][title=" Small header"]')
+    f('[role="menuitemcheckbox"][title=" Heading 4"]')
   end
 
   def preformatted_option

@@ -1543,6 +1543,7 @@ describe CoursesController do
       @account = Account.default
       role = custom_account_role 'lamer', :account => @account
       @account.role_overrides.create! :permission => 'manage_courses', :enabled => true, :role => role
+      @visperm = @account.role_overrides.create! :permission => 'manage_course_visibility', :enabled => true, :role => role
       user_factory
       @account.account_users.create!(user: @user, role: role)
       user_session @user
@@ -1562,6 +1563,45 @@ describe CoursesController do
 
       post 'create', params: { :account_id => @account.id, :course =>
           { :name => course.name, :lock_all_announcements => true } }
+    end
+
+    it "should set the visibility settings when we have permission" do
+      post 'create', params: {
+        :account_id => @account.id, :course => {
+          name: 'new course',
+          is_public: true,
+          public_syllabus: true,
+          is_public_to_auth_users: true,
+          public_syllabus_to_auth: true
+        }
+      }, format: :json
+
+      json = JSON.parse response.body
+      expect(json['is_public']).to be true
+      expect(json['public_syllabus']).to be true
+      expect(json['is_public_to_auth_users']).to be true
+      expect(json['public_syllabus_to_auth']).to be true
+    end
+
+    it "should NOT allow visibility to be set when we don't have permission" do
+      @visperm.enabled = false
+      @visperm.save
+
+      post 'create', params: {
+        :account_id => @account.id, :course => {
+          name: 'new course',
+          is_public: true,
+          public_syllabus: true,
+          is_public_to_auth_users: true,
+          public_syllabus_to_auth: true
+        }
+      }, format: :json
+
+      json = JSON.parse response.body
+      expect(json['is_public']).to be false
+      expect(json['public_syllabus']).to be false
+      expect(json['is_public_to_auth_users']).to be false
+      expect(json['public_syllabus_to_auth']).to be false
     end
   end
 

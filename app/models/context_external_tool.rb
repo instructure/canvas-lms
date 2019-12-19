@@ -855,8 +855,8 @@ end
     end
   end
 
-  def self.global_navigation_tools(root_account, visibility)
-    RequestCache.cache('global_navigation_tools', root_account, visibility) do
+  def self.global_navigation_tools(root_account, visibility, user: nil, context: nil, session: nil)
+    tools = RequestCache.cache('global_navigation_tools', root_account, visibility) do
       tools = root_account.context_external_tools.active.having_setting(:global_navigation).to_a
       if visibility == 'members'
         # reject the admin only tools
@@ -864,6 +864,11 @@ end
       end
       tools
     end
+
+    # We can't do permission checks unless we have a user and context
+    return tools unless user.present? && context.present?
+
+    tools.select { |t| t.permission_given?(:global_navigation, user, context, session) }
   end
 
   def self.global_navigation_menu_cache_key(root_account, visibility)

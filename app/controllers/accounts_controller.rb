@@ -1459,7 +1459,7 @@ class AccountsController < ApplicationController
                                    :self_enrollment, :show_scheduler, :sis_app_token, :sis_app_url,
                                    {:sis_assignment_name_length => [:value]}.freeze,
                                    {:sis_assignment_name_length_input => [:value]}.freeze,
-                                   {:sis_default_grade_export => [:value]}.freeze,
+                                   {:sis_default_grade_export => [:value, :locked]}.freeze,
                                    :sis_name,
                                    {:sis_require_assignment_due_date => [:value]}.freeze,
                                    {:sis_syncing => [:value, :locked]}.freeze,

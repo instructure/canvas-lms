@@ -27,13 +27,14 @@ import CourseAndModulePicker from 'jsx/shared/direct_share/CourseAndModulePicker
 
 CourseImportPanel.propTypes = {
   contentShare: contentShareShape.isRequired,
-  onClose: func
+  onClose: func,
+  onImport: func
 }
 
-export default function CourseImportPanel({contentShare, onClose}) {
+export default function CourseImportPanel({contentShare, onClose, onImport}) {
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [selectedModule, setSelectedModule] = useState(null)
-  const [selectedPosition, setSelectedPosition] = useState(1)
+  const [selectedPosition, setSelectedPosition] = useState(null)
   const [startImportOperationPromise, setStartImportOperationPromise] = useState(null)
 
   function startImportOperation() {
@@ -52,6 +53,7 @@ export default function CourseImportPanel({contentShare, onClose}) {
         }
       })
     )
+    onImport(contentShare)
   }
 
   function handleSelectedCourse(course) {
