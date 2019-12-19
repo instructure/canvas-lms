@@ -18,9 +18,9 @@
 
 class LearningOutcome < ActiveRecord::Base
   include Workflow
-  include OutcomeAttributes
   include MasterCourses::Restrictor
   restrict_columns :state, [:workflow_state]
+  self.ignored_columns = %i[migration_id_2 vendor_guid_2]
 
   belongs_to :context, polymorphic: [:account, :course]
   has_many :learning_outcome_results

@@ -52,12 +52,8 @@ module AccountReports
     private
 
     def vendor_guid_field(table, prefix: 'canvas_outcome_group')
-      guid_field, backup_field = %i[vendor_guid vendor_guid_2]
-      guid_field, backup_field = backup_field, guid_field if AcademicBenchmark.use_new_guid_columns?
-
       "COALESCE(
-        #{table}.#{guid_field},
-        #{table}.#{backup_field},
+        #{table}.vendor_guid,
         CONCAT('#{prefix}:', #{table}.id)
       )"
     end
