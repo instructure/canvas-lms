@@ -686,6 +686,27 @@ type Course implements AssignmentsConnectionInterface & LegacyIDInterface & Node
   """
   courseCode: String
   createdAt: DateTime
+  enrollmentsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): EnrollmentConnection
   externalToolsConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -1164,6 +1185,41 @@ type Enrollment implements LegacyIDInterface & Node & Timestamped {
   type: EnrollmentType!
   updatedAt: DateTime
   user: User
+}
+
+"""
+The connection type for Enrollment.
+"""
+type EnrollmentConnection {
+  """
+  A list of edges.
+  """
+  edges: [EnrollmentEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Enrollment]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type EnrollmentEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Enrollment
 }
 
 enum EnrollmentType {
