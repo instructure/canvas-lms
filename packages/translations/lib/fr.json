@@ -470,6 +470,15 @@
     "group_navigation_99f191a": {
         "message": "Barre de navigation des groupes"
     },
+    "heading_2_5b84eed2": {
+        "message": "En-tête 2"
+    },
+    "heading_3_2c83de44": {
+        "message": "En-tête 3"
+    },
+    "heading_4_b2e74be7": {
+        "message": "En-tête 4"
+    },
     "height_69b03e15": {
         "message": "Hauteur"
     },
@@ -602,20 +611,8 @@
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Doit faire au moins { width } x { height } px"
     },
-    "my_documents_77a74ff3": {
-        "message": "Mes documents"
-    },
-    "my_files_eea33f44": {
-        "message": "Mes fichiers"
-    },
     "my_grades_98834476": {
         "message": "Mes notes"
-    },
-    "my_images_427f9b0c": {
-        "message": "Mes images"
-    },
-    "my_media_82bade11": {
-        "message": "Mon Média"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviguer dans le menu ou la barre d''outils"

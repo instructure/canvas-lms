@@ -619,20 +619,8 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Must be at least { width } x { height }px"
   },
-  "my_documents_77a74ff3": {
-    "message": "My Documents"
-  },
-  "my_files_eea33f44": {
-    "message": "My Files"
-  },
   "my_grades_98834476": {
     "message": "My Grades"
-  },
-  "my_images_427f9b0c": {
-    "message": "My Images"
-  },
-  "my_media_82bade11": {
-    "message": "My Media"
   },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
@@ -1034,6 +1022,9 @@
   },
   "user_documents_c206e61f": {
     "message": "User Documents"
+  },
+  "user_files_78e21703": {
+    "message": "User Files"
   },
   "user_images_b6490852": {
     "message": "User Images"

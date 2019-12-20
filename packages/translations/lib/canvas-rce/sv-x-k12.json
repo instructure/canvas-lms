@@ -193,10 +193,6 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Måste vara minst { width } x { height }pixlar"
   },
-  "my_documents_77a74ff3": { "message": "Mina dokument" },
-  "my_files_eea33f44": { "message": "Mina filer" },
-  "my_images_427f9b0c": { "message": "Mina bilder" },
-  "my_media_82bade11": { "message": "Min media" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigera via menyn eller verktygsfältet"
   },
