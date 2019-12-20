@@ -85,6 +85,15 @@ describe BrokenLinkHelper, type: :controller do
     expect(send_broken_content!).to be true
   end
 
+  it 'should work with wiki pages set to the front page' do
+    wiki_page_model(context: @course, body: "<a href='/test_error'>bad link</a>")
+    @page.set_as_front_page!
+    @course.update_attribute(:default_view, 'wiki')
+    allow(request).to receive(:referer).and_return "/courses/#{@course.id}"
+    allow(request).to receive(:path).and_return "/test_error"
+    expect(send_broken_content!).to be true
+  end
+
   it 'should return true for unpublished content' do
     linked_assignment = @assignment
     assignment_model(course: @course).update_attributes(workflow_state: 'unpublished')

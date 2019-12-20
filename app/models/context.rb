@@ -238,6 +238,18 @@ module Context
     nil
   end
 
+  def self.get_front_wiki_page_for_course_from_url(url)
+    params = Rails.application.routes.recognize_path(url)
+    if params[:controller] == "courses" && params[:action] == "show"
+      course = Course.find(params[:id])
+      if course.default_view == "wiki"
+        course.wiki.front_page
+      end
+    end
+  rescue
+    nil
+  end
+
   def self.find_asset_by_url(url)
     object = nil
     params = Rails.application.routes.recognize_path(url)
@@ -245,6 +257,7 @@ module Context
     group = Group.find(params[:group_id]) if params[:group_id]
     user = User.find(params[:user_id]) if params[:user_id]
     context = course || group || user
+
     return nil unless context
     case params[:controller]
     when 'files'
