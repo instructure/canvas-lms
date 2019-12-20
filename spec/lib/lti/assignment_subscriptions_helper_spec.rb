@@ -76,6 +76,11 @@ describe Lti::AssignmentSubscriptionsHelper do
 
     it "includes all required event types" do
       expect(subscription_helper.assignment_subscription(@assignment.id)[:EventTypes]).to match_array event_types
+
+      Account.site_admin.enable_feature!(:system_and_user_generated_event_types)
+      expect(subscription_helper.assignment_subscription(@assignment.id)[:SystemEventTypes]).to match_array event_types
+      expect(subscription_helper.assignment_subscription(@assignment.id)[:UserEventTypes]).to match_array event_types
+      Account.site_admin.disable_feature!(:system_and_user_generated_event_types)
     end
 
     it 'uses the live-event format' do
