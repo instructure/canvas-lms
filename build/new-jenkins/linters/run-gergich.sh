@@ -21,6 +21,9 @@ set -ex
 # the linters expect this to be here else it will just look at master
 export GERRIT_PATCHSET_REVISION=`git rev-parse HEAD`
 
+# ensure we run the gergich comments with the Lint-Review label
+export GERGICH_REVIEW_LABEL="Lint-Review"
+
 # we need to remove the hooks because compile_assets calls yarn install which will
 # try to create the .git commit hooks
 echo "" > ./script/install_hooks
