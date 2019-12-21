@@ -16231,7 +16231,7 @@ de:
       description: |-
           Dieses Plugin ermöglicht, Gesamtnoten in einem Student Information System (SIS) zu veröffentlichen.  Falls diese Option aktiviert ist, erhält der Benutzer im Notenbuch eine Option, diese Noten zu veröffentlichen.  Dieser erscheint per POST-Anforderung an den angegebenen Veröffentlichungsendpunkt.  Jeder Typ hat sein eigenes Content-Format und einen eigenen Mime-Typ.  Die Antwort vom Endpunkt spielt keine Rolle und wird derzeit ignoriert.
           
-          Beispiel: Die von Instructure formatierte CSV-Datei POSTET an dem angegebenen Endpunkt eine CSV-Datei mit dem MIME-Typ „text/csv“, die folgende Spalten enthält: 
+          Beispiel: "Die von Instructure formatierte CSV-Datei POSTET an dem angegebenen Endpunkt eine CSV-Datei mit dem MIME-Typ „text/csv“, die folgende Spalten enthält: "
           
           „publisher_id“, „publisher_sis_id“, „course_id“, „course_sis_id“, „section_id“, „section_sis_id“, „student_id“, „student_sis_id“, „enrollment_id“, „enrollment_status“, „score“, „grade“
           
