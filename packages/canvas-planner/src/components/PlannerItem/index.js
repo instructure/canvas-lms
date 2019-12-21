@@ -19,7 +19,7 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 import {themeable, ApplyTheme} from '@instructure/ui-themeable'
 import {Text, Pill, Avatar} from '@instructure/ui-elements'
-import {Checkbox, CheckboxFacade} from '@instructure/ui-forms'
+import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
 import {

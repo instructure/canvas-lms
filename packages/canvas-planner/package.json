@@ -46,6 +46,7 @@
     "@instructure/ui-a11y": "6",
     "@instructure/ui-alerts": "6",
     "@instructure/ui-buttons": "6",
+    "@instructure/ui-checkbox": "6",
     "@instructure/ui-elements": "6",
     "@instructure/ui-form-field": "6",
     "@instructure/ui-forms": "6",
@@ -54,7 +55,11 @@
     "@instructure/ui-overlays": "6",
     "@instructure/ui-portal": "6",
     "@instructure/ui-prop-types": "6",
+    "@instructure/ui-react-utils": "6",
+    "@instructure/ui-select": "6",
     "@instructure/ui-tabs": "6",
+    "@instructure/ui-text-area": "6",
+    "@instructure/ui-text-input": "6",
     "@instructure/ui-themeable": "6",
     "@instructure/ui-toggle-details": "6",
     "@instructure/ui-utils": "6",
@@ -104,7 +109,10 @@
     "lint-staged": "^9",
     "mockdate": "^2.0.2",
     "moxios": "^0.4.0",
-    "redux-devtools-extension": "^2.13.2"
+    "redux-devtools-extension": "^2.13.2",
+    "@testing-library/dom": "^6",
+    "@testing-library/jest-dom": "^4",
+    "@testing-library/react": "^9"
   },
   "lint-staged": {
     "*.js": "eslint"

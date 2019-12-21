@@ -98,6 +98,19 @@ function findGradesTray(wrapper) {
   return wrapper.find('Tray').at(1)
 }
 
+let ariaLive
+
+beforeAll(() => {
+  ariaLive = document.createElement('div')
+  ariaLive.id = 'flash_screenreader_holder'
+  ariaLive.setAttribute('role', 'alert')
+  document.body.appendChild(ariaLive)
+})
+
+afterAll(() => {
+  if (ariaLive) ariaLive.remove()
+})
+
 it('renders the base component correctly with buttons and trays', () => {
   const wrapper = shallow(<PlannerHeader {...defaultProps()} />)
   expect(wrapper).toMatchSnapshot()
