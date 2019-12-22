@@ -101,11 +101,17 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties documents fetch initial documents to store', () => {
-    testHandler('fetchInitialDocs', documents, 'fetchInitialDocs')
+    testHandler('fetchInitialDocs', documents, 'fetchInitialDocs', {
+      sort: 'alphabetical',
+      order: 'asc'
+    })
   })
 
   it('ties documents fetch next documents to store', () => {
-    testHandler('fetchNextDocs', documents, 'fetchNextDocs')
+    testHandler('fetchNextDocs', documents, 'fetchNextDocs', {
+      sort: 'alphabetical',
+      order: 'asc'
+    })
   })
 
   it('ties context change context to store', () => {

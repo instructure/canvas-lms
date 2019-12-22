@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef} from 'react'
-import {arrayOf, bool, func, shape, string, objectOf} from 'prop-types'
+import {arrayOf, bool, func, shape, string, objectOf, oneOf} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message'
 
@@ -58,7 +58,7 @@ function renderLoadingError(_error) {
 }
 
 export default function DocumentsPanel(props) {
-  const {fetchInitialDocs, fetchNextDocs, contextType} = props
+  const {fetchInitialDocs, fetchNextDocs, contextType, sortBy} = props
   const documents = props.documents[contextType]
   const {hasMore, isLoading, error, files} = documents
   const lastItemRef = useRef(null)
@@ -68,22 +68,20 @@ export default function DocumentsPanel(props) {
     isLoading,
     lastItemRef,
 
-    onLoadInitial() {
-      fetchInitialDocs()
-    },
+    // noop, because the useEffect below will do the initial fetch
+    onLoadInitial() {},
 
     onLoadMore() {
-      fetchNextDocs()
+      fetchNextDocs(sortBy)
     },
 
     records: files
   })
 
   useEffect(() => {
-    if (hasMore && !isLoading && files.length === 0) {
-      fetchInitialDocs()
-    }
-  }, [contextType, files.length, hasMore, isLoading, fetchInitialDocs])
+    // change sort => refetch initial docs
+    fetchInitialDocs(sortBy)
+  }, [sortBy.sort, sortBy.order]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDocClick = file => {
     props.onLinkClick(file)
@@ -123,5 +121,9 @@ DocumentsPanel.propTypes = {
       isLoading: bool,
       error: string
     })
-  ).isRequired
+  ).isRequired,
+  sortBy: shape({
+    sort: oneOf(['date_added', 'alphabetical']).isRequired,
+    order: oneOf(['asc', 'desc']).isRequired
+  }).isRequired
 }

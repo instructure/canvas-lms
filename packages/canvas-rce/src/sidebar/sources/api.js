@@ -461,7 +461,7 @@ class RceApiSource {
         extra = '&content_types=video,audio'
         break
       case 'documents':
-        extra = '&exclude_content_types=image,video,audio'
+        extra = `&exclude_content_types=image,video,audio${getSortParams(props.sort, props.order)}`
         break
     }
     return `${this.baseUri(
@@ -469,6 +469,16 @@ class RceApiSource {
       host
     )}?contextType=${contextType}&contextId=${contextId}${extra}`
   }
+}
+
+function getSortParams(sort, order) {
+  let sortBy = sort
+  if (sortBy === 'date_added') {
+    sortBy = 'created_at'
+  } else if (sortBy === 'alphabetical') {
+    sortBy = 'name'
+  }
+  return `&sort=${sortBy}&order=${order}`
 }
 
 export default RceApiSource
