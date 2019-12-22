@@ -1,8 +1,29 @@
 {
+  "add_to_do_7537af64": { "message": "Yapılacaklar listesi ekle" },
+  "add_to_do_7def3c37": { "message": "Yapılacaklar listesi ekle" },
   "address_3159962f": { "message": "Adres:" },
   "all_day_fb42c4fc": { "message": "Tüm Gün" },
+  "all_items_loaded_aa256183": { "message": "Tüm öğeler yüklendi" },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Fırsatı gözardı etmeye çalışırken bir hata oluştu."
+  },
   "announcement_fb4cb645": { "message": "Duyuru" },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Bu planlayıcı öğesini silmek istediğinize emin misiniz?"
+  },
   "assignment_976578a8": { "message": "Ödev" },
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
+  },
+  "assignmenttype_title_all_day_on_datetime_9768903c": {
+    "message": "{ assignmentType } { title },  { datetime } da tüm gün."
+  },
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, { datetime } da."
+  },
+  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+    "message": "{ assignmentType } { title },  { datetime } ''da { endTime } ''a kadar"
+  },
   "calendar_a8563bb2": { "message": "Takvim:" },
   "calendar_event_89aadc1c": { "message": "Takvim Olayı" },
   "canvas_planner_98ed106": { "message": "Canvas Planlayıcı" },

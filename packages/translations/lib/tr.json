@@ -1,6 +1,18 @@
 {
+    "accessibility_checker_b3af1f6c": {
+        "message": "Erişilebilirlik Kontrolü"
+    },
     "add_8523c19b": {
         "message": "Ekle"
+    },
+    "add_cc_subtitles_55f0394e": {
+        "message": "Alt yazı ekle"
+    },
+    "add_to_do_7537af64": {
+        "message": "Yapılacaklar listesi ekle"
+    },
+    "add_to_do_7def3c37": {
+        "message": "Yapılacaklar listesi ekle"
     },
     "address_3159962f": {
         "message": "Adres:"
@@ -26,11 +38,20 @@
     "all_day_fb42c4fc": {
         "message": "Tüm Gün"
     },
+    "all_items_loaded_aa256183": {
+        "message": "Tüm öğeler yüklendi"
+    },
     "alphabetical_55b5b4e0": {
         "message": "Alfabetik"
     },
     "alt_text_611fb322": {
         "message": "Etiket Metni"
+    },
+    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+        "message": "Fırsatı gözardı etmeye çalışırken bir hata oluştu."
+    },
+    "an_error_occurred_generating_the_file_preview_cf259955": {
+        "message": "Dosya ön izlemesi oluşturulurken hata oluştu"
     },
     "announcement_fb4cb645": {
         "message": "Duyuru"
@@ -44,6 +65,9 @@
     "apps_54d24a47": {
         "message": "Uygulamalar"
     },
+    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+        "message": "Bu planlayıcı öğesini silmek istediğinize emin misiniz?"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Genişleme oranı korumalıdır"
     },
@@ -52,6 +76,18 @@
     },
     "assignments_1e02582c": {
         "message": "Ödevler"
+    },
+    "assignmenttype_title_6612d008": {
+        "message": "{ assignmentType } { title }."
+    },
+    "assignmenttype_title_all_day_on_datetime_9768903c": {
+        "message": "{ assignmentType } { title },  { datetime } da tüm gün."
+    },
+    "assignmenttype_title_at_datetime_478f0709": {
+        "message": "{ assignmentType } { title }, { datetime } da."
+    },
+    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
+        "message": "{ assignmentType } { title },  { datetime } ''da { endTime } ''a kadar"
     },
     "calendar_a8563bb2": {
         "message": "Takvim:"
@@ -68,6 +104,12 @@
     "canvas_plugins_705a5016": {
         "message": "Canvas Eklentileri"
     },
+    "circle_unordered_list_9e3a0763": {
+        "message": "sıralanmamoş listeyi yuvarlak içine al"
+    },
+    "clear_selected_file_82388e50": {
+        "message": "Seçili dosyayı temizle"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Herhangi bir sayfaya bağlantı eklemek için ilgili sayfaya tıklayın."
     },
@@ -77,11 +119,20 @@
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Düzenleyiciye bağlantı eklemek için tıklayın."
     },
+    "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+        "message": "Bir menü ya da diyalog kapatır. Ayrıca sizi düzenleme alanına götürür"
+    },
     "close_d634289d": {
         "message": "Kapat"
     },
     "collaborations_5c56c15f": {
         "message": "İşbirliğine Yönelik Çalışmalar"
+    },
+    "collapse_to_hide_types_1ab46d2e": {
+        "message": "{ types } gizlemek için daraltın"
+    },
+    "computer_1d7dfa6f": {
+        "message": "Bilgisayar"
     },
     "content_type_2cf90d95": {
         "message": "İçerik Tipi"

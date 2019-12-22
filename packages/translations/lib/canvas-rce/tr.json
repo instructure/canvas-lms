@@ -1,5 +1,7 @@
 {
+  "accessibility_checker_b3af1f6c": { "message": "Erişilebilirlik Kontrolü" },
   "add_8523c19b": { "message": "Ekle" },
+  "add_cc_subtitles_55f0394e": { "message": "Alt yazı ekle" },
   "align_11050992": { "message": "Hizala" },
   "align_center_ca078feb": { "message": "Ortala" },
   "align_left_e9f1f93b": { "message": "Sola dayalı" },
@@ -10,6 +12,9 @@
   "all_4321c3a1": { "message": "Tümü" },
   "alphabetical_55b5b4e0": { "message": "Alfabetik" },
   "alt_text_611fb322": { "message": "Etiket Metni" },
+  "an_error_occurred_generating_the_file_preview_cf259955": {
+    "message": "Dosya ön izlemesi oluşturulurken hata oluştu"
+  },
   "announcement_list_da155734": { "message": "Duyuru Listesi" },
   "announcements_a4b8ed4a": { "message": "Duyurular" },
   "apps_54d24a47": { "message": "Uygulamalar" },
@@ -19,6 +24,10 @@
   "assignments_1e02582c": { "message": "Ödevler" },
   "cancel_caeb1e68": { "message": "İptal" },
   "canvas_plugins_705a5016": { "message": "Canvas Eklentileri" },
+  "circle_unordered_list_9e3a0763": {
+    "message": "sıralanmamoş listeyi yuvarlak içine al"
+  },
+  "clear_selected_file_82388e50": { "message": "Seçili dosyayı temizle" },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Herhangi bir sayfaya bağlantı eklemek için ilgili sayfaya tıklayın."
   },
@@ -28,8 +37,15 @@
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Düzenleyiciye bağlantı eklemek için tıklayın."
   },
+  "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
+    "message": "Bir menü ya da diyalog kapatır. Ayrıca sizi düzenleme alanına götürür"
+  },
   "close_d634289d": { "message": "Kapat" },
   "collaborations_5c56c15f": { "message": "İşbirliğine Yönelik Çalışmalar" },
+  "collapse_to_hide_types_1ab46d2e": {
+    "message": "{ types } gizlemek için daraltın"
+  },
+  "computer_1d7dfa6f": { "message": "Bilgisayar" },
   "content_type_2cf90d95": { "message": "İçerik Tipi" },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
