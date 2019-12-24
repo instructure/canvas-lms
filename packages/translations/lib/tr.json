@@ -105,7 +105,7 @@
         "message": "Canvas Eklentileri"
     },
     "circle_unordered_list_9e3a0763": {
-        "message": "sıralanmamoş listeyi yuvarlak içine al"
+        "message": "sıralanmamış listeyi yuvarlak içine al"
     },
     "clear_selected_file_82388e50": {
         "message": "Seçili dosyayı temizle"
@@ -146,14 +146,32 @@
     "course_8a63b4a3": {
         "message": "Ders"
     },
+    "course_documents_104d76e0": {
+        "message": "Ders Belgeleri"
+    },
     "course_files_62deb8f8": {
         "message": "Ders Dosyaları"
+    },
+    "course_images_f8511d04": {
+        "message": "Ders Görselleri"
+    },
+    "course_links_b56959b9": {
+        "message": "Ders Bağlantıları"
+    },
+    "course_media_ec759ad": {
+        "message": "Ders Medyası"
     },
     "course_navigation_dd035109": {
         "message": "Ders Gezinme Menüsü"
     },
+    "current_volume_level_c55ab825": {
+        "message": "Mevcut Ses Seviyesi"
+    },
     "custom_6979cd81": {
         "message": "Özelleştir"
+    },
+    "date_added_ed5ad465": {
+        "message": "Eklendiği Tarih"
     },
     "date_ee500367": {
         "message": "Tarih"
@@ -395,6 +413,9 @@
     "title_is_required_6ddcab69": {
         "message": "başlık gereklidir"
     },
+    "to_be_posted_when_d24bf7dc": {
+        "message": "Gönderileceği zaman: { when }"
+    },
     "to_do_1d554f36": {
         "message": "Yapılacaklar"
     },
@@ -404,22 +425,91 @@
     "tomorrow_9a6c9a00": {
         "message": "Yarın"
     },
+    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
+        "message": "{ totalResults } rsonuç bulundu, { numDisplayed } sonuç halihazırda gösteriliyor"
+    },
+    "tray_839df38a": {
+        "message": "Yan menü"
+    },
+    "type_control_f9_to_access_image_options_text_a47e319f": {
+        "message": "görsel seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
+    },
+    "type_control_f9_to_access_link_options_text_4ead9682": {
+        "message": "Erişim bağlantısı seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
+    },
+    "type_control_f9_to_access_table_options_text_92141329": {
+        "message": "Erişim tablosu seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
+    },
     "unpublished_dfd8801": {
         "message": "yayınlanmadı"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Başlıksız"
+    },
+    "upload_document_253f0478": {
+        "message": "Belge Yükle"
     },
     "upload_file_fd2361b8": {
         "message": "Dosya Yükle"
     },
+    "upload_image_6120b609": {
+        "message": "Görsel Yükle"
+    },
     "upload_media_ce31135a": {
         "message": "Ortama Yükle"
     },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "Büyük harf alfabetik sıralı liste"
+    },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
+        "message": "Ekran okuyucuları tarafından bir görselin içeriğini açıklamak için kullanılır"
+    },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Ekran okuyucuları tarafından videoyu açıklamak için kullanılır"
+    },
+    "user_documents_c206e61f": {
+        "message": "Kullanıcı Belgeleri"
+    },
+    "user_images_b6490852": {
+        "message": "Kullanıcı Görselleri"
+    },
+    "user_media_14fbf656": {
+        "message": "Kullanıcı Medya Dosyası"
+    },
+    "video_options_24ef6e5d": {
+        "message": "Video Seçenekleri"
+    },
+    "video_options_tray_3b9809a5": {
+        "message": "Video Seçenekleri Yan Menüsü"
+    },
+    "video_player_b371005": {
+        "message": "Video Oynatıcı"
+    },
+    "view_keyboard_shortcuts_34d1be0b": {
+        "message": "Klavye Kısayollarını Göster"
+    },
+    "webcam_fe91b20f": {
+        "message": "Web Kamerası"
+    },
+    "width_492fec76": {
+        "message": "Genişlik"
+    },
+    "width_and_height_must_be_numbers_110ab2e3": {
+        "message": "Genişlik ve yükseklik rakam olmalı"
+    },
+    "width_x_height_px_ff3ccb93": {
+        "message": "{ width } x { height }px"
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki Ana Sayfası"
     },
     "yesterday_c6bd6abf": {
         "message": "Dün"
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Web kameranız kullanılıyor olabilir."
     }
 }
