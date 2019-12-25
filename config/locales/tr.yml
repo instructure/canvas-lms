@@ -7087,6 +7087,7 @@ tr:
   download_submissions_7454665f: "Gönderileri İndir"
   download_this_file_669f9174: "Bu dosyayı indir"
   draft_comment_b2376ea4: "Taslak yorum"
+  drag_a_file_here_39357b48: "Buraya bir Dosya Sürükleyin"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
   drag_and_drop_your_image_here_or_7fba7c14: "Görselinizi buraya sürükleyip bırakın ya da "
@@ -7171,6 +7172,7 @@ tr:
   edit_assignment_ebf22a72: "Ödevi Düzenle"
   edit_assignment_group_c04c4af0: "Ödev Grubunu Düzenle"
   edit_assignment_name_a8f7fae1: "%{name} Ödevini Düzenle"
+  edit_assignment_name_mastery_paths_40b50541: "%{name} Ödevi Yeterlilik Süreçlerini Düzenleyin"
   edit_bank_92eb8e14: "Düzenle %{bank}"
   edit_c5fbea07: Düzenle
   edit_collaboration_b014c18b: "İşbirliğini Düzenle"
@@ -7185,6 +7187,9 @@ tr:
   edit_group_c8679dba: "Grubu Düzenle"
   edit_item_details_c9a7b9c5: "Öğe ayrıntılarını düzenle"
   edit_key_name_5c7d2f46: "Anahtarı düzenle %{name}"
+  edit_mastery_paths_for_name_c9fc59f9: "%{name} için Yeterlilik Süreçlerini Düzenleyin"
+  edit_mastery_paths_for_title_3c0a15e1: "%{title} için Yeterlilik Süreçlerini Düzenleyin"
+  edit_mastery_paths_for_title_label_41d81451: "%{title_label} için Yeterlilik Süreçlerini Düzenleyin"
   edit_module_item_83258f6d: "Modülü/Öğeyi Düzenle"
   edit_name_cbdef0c2: "Düzenle %{name}"
   edit_outcome_867a0381: "Öğrenme Çıktısını Düzenle"
@@ -7306,6 +7311,8 @@ tr:
   email_is_invalid_or_in_use_4c3de5b9: "Eposta adresi ya geçersiz ya da kullanımda"
   email_is_required_736ac26b: "Eposta gereklidir"
   email_the_user_about_this_account_creation_e63f8759: "Oluşturulan hesap hakkında kullanıcıya eposta gönder"
+  embed_828fac4a: Göm
+  embed_video_code_703e10f2: "Video Kodunu Göm"
   embedded_images_598ff8da: gömülü_görseller
   ember_modules_description: "Ember'de yeniden yazılan Modüller. Harici konumlardan sürüklemeyi etkinleştirmek için gömülü sürükle bırak API'sini kullanır."
   enable_6f5d1328: Etkinleştir
@@ -7657,6 +7664,7 @@ tr:
   error_59293a2c: hata
   error_98e81528: Hata
   error_deleting_name_reason_11f9d399: "%{name}'i silerken hata oluştu: %{reason}"
+  error_in_mastery_paths_range_index_7d17ddac: "%{index}yeterlilik süreci aralığında %{error}"
   error_message_2b9d12ee: "Hata: %{message}"
   error_reports_7d6c8b1e: "Hata Raporları"
   error_uploading_file_e2d31b56: "Dosya yüklemesinde hata."
@@ -10195,7 +10203,8 @@ tr:
   marked_done_9fd646f: "Tamamlandı olarak işaretle"
   masquerade_as_name_8bb004c5: "%{name} kullanıcısının yerine geç"
   mastery_7ec348b5: Yeterlik
-  mastery_paths_cc4096c2: "Mastery Paths"
+  mastery_paths_breakdown_6e0b5fce: "Yeterlilik Süreçleri Dökümü"
+  mastery_paths_cc4096c2: "Yeterlilik Süreçleri"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Yeterlik puanı notlandırılmış ödev ya da kısa sınavın en yüksek puanını gösterir."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Yeterlik puanı en son notlandırılan ödev ya da kısa sınavı gösterir."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Yeterlik puanı en son notlandırılan ödev ya da kısa sınavı gösterir."
