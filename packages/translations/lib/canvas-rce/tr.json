@@ -46,6 +46,7 @@
     "message": "{ types } gizlemek için daraltın"
   },
   "computer_1d7dfa6f": { "message": "Bilgisayar" },
+  "content_subtype_5ce35e88": { "message": "İçerik Alt Türü" },
   "content_type_2cf90d95": { "message": "İçerik Tipi" },
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n    one {}\n  other {}\n}"
@@ -59,16 +60,25 @@
   "current_volume_level_c55ab825": { "message": "Mevcut Ses Seviyesi" },
   "custom_6979cd81": { "message": "Özelleştir" },
   "date_added_ed5ad465": { "message": "Eklendiği Tarih" },
+  "date_published_371c4ad0": { "message": "Yayınlama Tarihi" },
   "decrease_indent_de6343ab": { "message": "İçerden başlatma sınırını azalt" },
   "dimensions_45ddb7b7": { "message": "Tanımlamalar" },
   "discussions_a5f96392": { "message": "Tartışmalar" },
   "discussions_index_6c36ced": { "message": "Tartışma Başlıkları" },
+  "display_options_315aba85": { "message": "Gösterim Seçenekleri" },
+  "documents_81393201": { "message": "Belgeler" },
   "done_54e3d4b6": { "message": "Tamam" },
+  "drag_a_file_here_39357b48": { "message": "Buraya bir Dosya Sürükleyin" },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Teslim Tarihi: Birden Çok Gün" },
+  "edit_link_7f53bebb": { "message": "Bağlantıyı Düzenle" },
+  "embed_828fac4a": { "message": "Göm" },
   "embed_image_1080badc": { "message": "Görsel Ekle" },
+  "embed_options_tray_901cfd19": { "message": "Gömme Seçenekleri Yan Menüsü" },
+  "embed_preview_2d741e1f": { "message": "Gömme Önizleme" },
+  "embed_video_code_703e10f2": { "message": "Video Kodunu Göm" },
   "external_links_3d9f074e": { "message": "Harici Bağlantılar" },
   "files_c300e900": { "message": "Dosyalar" },
   "files_index_af7c662b": { "message": "Dosya Başlıkları" },
