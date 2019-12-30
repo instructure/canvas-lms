@@ -891,7 +891,8 @@ export function fetchMedia(state) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       let response
-      const bookmark = state.media[state.contextType] && state.media[state.contextType].bookmark
+      const bookmark =
+        (state.media[state.contextType] && state.media[state.contextType].bookmark) || 'media1'
       if (bookmark) {
         response = MEDIA[bookmark]
       }

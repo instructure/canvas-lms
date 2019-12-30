@@ -34,7 +34,8 @@ function getPanelProps(contextType, mediaprops) {
         hasMore: false,
         ...mediaprops
       }
-    }
+    },
+    sortBy: {sort: 'alphabetical', order: 'asc'}
   }
 }
 

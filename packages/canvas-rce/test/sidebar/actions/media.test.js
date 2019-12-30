@@ -25,6 +25,8 @@ import {
 } from '../../../src/sidebar/sources/fake'
 import alertHandler from '../../../src/rce/alertHandler'
 
+const sortBy = {sort: 'alphabetical', order: 'asc'}
+
 function getInitialState() {
   return {
     media: {
@@ -43,27 +45,29 @@ describe('Media actions', () => {
     sinon.restore()
   })
   describe('fetchMedia', () => {
-    it('fetches initial page if necessary', () => {
+    it('fetches initial page', () => {
       const dispatchSpy = sinon.spy()
       const getState = getInitialState
-      actions.fetchInitialMedia()(dispatchSpy, getState)
+      actions.fetchInitialMedia(sortBy)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('fetches next page if necessary', () => {
       const dispatchSpy = sinon.spy()
       const getState = getInitialState
-      actions.fetchNextMedia()(dispatchSpy, getState)
+      actions.fetchNextMedia(sortBy)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
-    it('skips the initial fetch on subsequent renders', () => {
+    it('always fetches initial fetch page', () => {
       const dispatchSpy = sinon.spy()
       const getState = () => {
         const state = getInitialState()
+        state.media.course.hasMore = false
+        state.media.course.isLoading = true
         state.media.course.files = [{one: '1'}, {two: '2'}, {three: '3'}]
         return state
       }
-      actions.fetchInitialMedia()(dispatchSpy, getState)
-      assert(!dispatchSpy.called)
+      actions.fetchInitialMedia(sortBy)(dispatchSpy, getState)
+      assert(dispatchSpy.called)
     })
     it('fetches if there is more to load', () => {
       const dispatchSpy = sinon.spy()
@@ -73,7 +77,7 @@ describe('Media actions', () => {
         state.media.course.hasMore = true
         return state
       }
-      actions.fetchNextMedia()(dispatchSpy, getState)
+      actions.fetchNextMedia(sortBy)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('does not fetch if requested but no more to load', () => {
@@ -84,7 +88,7 @@ describe('Media actions', () => {
         state.media.course.hasMore = false
         return state
       }
-      actions.fetchNextMedia()(dispatchSpy, getState)
+      actions.fetchNextMedia(sortBy)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
     it('fetches media', async () => {
@@ -97,11 +101,19 @@ describe('Media actions', () => {
         }
         return state
       }
-      await actions.fetchMedia()(dispatchSpy, getState)
+      await actions.fetchMedia(sortBy)(dispatchSpy, getState)
       assert(
         dispatchSpy.calledWith({type: actions.REQUEST_MEDIA, payload: {contextType: 'course'}})
       )
       assert(fetchMediaSpy.called)
+    })
+  })
+  describe('requestInitialMedia', () => {
+    it('returns the action object', () => {
+      assert.deepEqual(actions.requestInitialMedia('course'), {
+        type: actions.REQUEST_INITIAL_MEDIA,
+        payload: {contextType: 'course'}
+      })
     })
   })
   describe('requestMedia', () => {

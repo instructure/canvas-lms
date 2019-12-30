@@ -119,11 +119,17 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties media fetch initial media to store', () => {
-    testHandler('fetchInitialMedia', media, 'fetchInitialMedia')
+    testHandler('fetchInitialMedia', media, 'fetchInitialMedia', {
+      sort: 'alphabetical',
+      order: 'asc'
+    })
   })
 
   it('ties media fetch next media to store', () => {
-    testHandler('fetchNextMedia', media, 'fetchNextMedia')
+    testHandler('fetchNextMedia', media, 'fetchNextMedia', {
+      sort: 'alphabetical',
+      order: 'asc'
+    })
   })
 
   it('ties media update media object to store', () => {
