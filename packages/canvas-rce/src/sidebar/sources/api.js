@@ -455,7 +455,7 @@ class RceApiSource {
     let extra = ''
     switch (endpoint) {
       case 'images':
-        extra = '&content_types=image'
+        extra = `&content_types=image${getSortParams(props.sort, props.order)}`
         break
       case 'media': // when requesting media files via the documents endpoint
         extra = `&content_types=video,audio${getSortParams(props.sort, props.order)}`

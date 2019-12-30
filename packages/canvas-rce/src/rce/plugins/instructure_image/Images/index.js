@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef} from 'react'
-import {arrayOf, bool, func, objectOf, shape, string} from 'prop-types'
+import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
 import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
@@ -32,7 +32,7 @@ import ImageList from '../ImageList'
 import formatMessage from '../../../../format-message'
 
 export default function Images(props) {
-  const {fetchInitialImages, fetchNextImages, contextType} = props
+  const {fetchInitialImages, fetchNextImages, contextType, sortBy} = props
   const images = props.images[contextType]
   const {hasMore, isLoading, error, files} = images
   const lastItemRef = useRef(null)
@@ -42,22 +42,19 @@ export default function Images(props) {
     isLoading,
     lastItemRef,
 
-    onLoadInitial() {
-      fetchInitialImages()
-    },
+    onLoadInitial() {},
 
     onLoadMore() {
-      fetchNextImages()
+      fetchNextImages(sortBy)
     },
 
     records: files
   })
 
   useEffect(() => {
-    if (hasMore && !isLoading && files.length === 0) {
-      fetchInitialImages()
-    }
-  }, [contextType, files.length, hasMore, isLoading, fetchInitialImages])
+    // change sort => refetch initial docs
+    fetchInitialImages(sortBy)
+  }, [sortBy.sort, sortBy.order]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <View as="div" data-testid="instructure_links-ImagesPanel">
@@ -103,5 +100,9 @@ Images.propTypes = {
       error: string
     })
   ).isRequired,
+  sortBy: shape({
+    sort: oneOf(['date_added', 'alphabetical']).isRequired,
+    order: oneOf(['asc', 'desc']).isRequired
+  }),
   onImageEmbed: func.isRequired
 }

@@ -16,7 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ADD_IMAGE, REQUEST_IMAGES, RECEIVE_IMAGES, FAIL_IMAGES_LOAD} from '../actions/images'
+import {
+  ADD_IMAGE,
+  REQUEST_INITIAL_IMAGES,
+  REQUEST_IMAGES,
+  RECEIVE_IMAGES,
+  FAIL_IMAGES_LOAD
+} from '../actions/images'
 import {CHANGE_CONTEXT} from '../actions/context'
 
 export default function imagesReducer(prevState = {}, action) {
@@ -47,6 +53,15 @@ export default function imagesReducer(prevState = {}, action) {
       }
       return state
     }
+
+    case REQUEST_INITIAL_IMAGES:
+      state[ctxt] = {
+        files: [],
+        bookmark: null,
+        isLoading: true,
+        hasMore: true
+      }
+      return state
 
     case REQUEST_IMAGES:
       state[ctxt].isLoading = true
