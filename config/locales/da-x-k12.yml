@@ -12161,11 +12161,11 @@ da-x-k12:
         tweet: "Canvas-varsling - Vurderingsændring: %{date}"
     submission_graded: 
       email: 
-        body: "Din opgave, %{assignment}, er blevet bedømt."
+        body: "Din opgave, %{assignment} er blevet bedømt."
         excused: "Denne opgave er blevet fritaget."
         graded_date: "bedømt: %{date}"
         html: 
-          body: "Din opgave, %{assignment}, er blevet bedømt."
+          body: "Din opgave, %{assignment} er blevet bedømt."
           excused: "Denne opgave er blevet fritaget."
           graded_date: "bedømt: %{date}"
           link_message: "Du kan gennemse opgaven her"
