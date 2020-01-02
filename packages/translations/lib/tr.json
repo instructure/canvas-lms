@@ -104,6 +104,9 @@
     "canvas_plugins_705a5016": {
         "message": "Canvas Eklentileri"
     },
+    "choose_caption_file_9c45bc4e": {
+        "message": "Alt yazı dosyasını seçin"
+    },
     "circle_unordered_list_9e3a0763": {
         "message": "sıralanmamış listeyi yuvarlak içine al"
     },
@@ -215,6 +218,9 @@
     "done_54e3d4b6": {
         "message": "Tamam"
     },
+    "drag_a_file_here_1bf656d5": {
+        "message": "Buraya bir Dosya Sürükleyin"
+    },
     "drag_a_file_here_39357b48": {
         "message": "Buraya bir Dosya Sürükleyin"
     },
@@ -254,11 +260,38 @@
     "external_links_3d9f074e": {
         "message": "Harici Bağlantılar"
     },
+    "extra_large_b6cdf1ff": {
+        "message": "Ekstra Büyük"
+    },
+    "failed_to_delete_to_do_64edff49": {
+        "message": "Yapılacak öğesi silinemedi"
+    },
+    "failed_to_get_new_activity_17e7ec7c": {
+        "message": "Yeni etkinliği alma başarısız"
+    },
+    "failed_to_load_opportunities_52ab6404": {
+        "message": "Fırsatların yüklenmesi başarısız"
+    },
+    "failed_to_save_to_do_ddc7503b": {
+        "message": "Yapılacak öğesi kaydedilemedi"
+    },
+    "feedback_6dcc1991": {
+        "message": "Geribildirim"
+    },
+    "file_name_8fd421ff": {
+        "message": "Dosya adı"
+    },
+    "file_url_c12b64be": {
+        "message": "Dosya URL"
+    },
     "files_c300e900": {
         "message": "Dosyalar"
     },
     "files_index_af7c662b": {
         "message": "Dosya Başlıkları"
+    },
+    "finish_bc343002": {
+        "message": "Tamamla"
     },
     "generating_preview_45b53be0": {
         "message": "Oluşturma önizlemesi..."
@@ -271,6 +304,24 @@
     },
     "group_navigation_99f191a": {
         "message": "Grup Gezinme Menüsü"
+    },
+    "heading_2_5b84eed2": {
+        "message": "Başlık 2"
+    },
+    "heading_3_2c83de44": {
+        "message": "Başlık 3"
+    },
+    "heading_4_b2e74be7": {
+        "message": "Başlık 4"
+    },
+    "height_69b03e15": {
+        "message": "Yükseklik"
+    },
+    "image_options_5412d02c": {
+        "message": "Görsel Seçenekleri"
+    },
+    "image_options_tray_90a46006": {
+        "message": "Görsel Seçenekleri Yan Menüsü"
     },
     "images_7ce26570": {
         "message": "Görseller"
@@ -287,17 +338,29 @@
     "insert_math_equation_57c6e767": {
         "message": "Matematik Denklemi Ekle"
     },
+    "invalid_file_c11ba11": {
+        "message": "Geçersiz Dosya"
+    },
     "invalid_file_type_881cc9b2": {
         "message": "Geçersiz dosya türü"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Klavye Kısayolları"
     },
+    "large_9c5e80e7": {
+        "message": "Büyük"
+    },
     "late_2be42b88": {
         "message": "Geç"
     },
+    "left_to_right_d6da6d7e": {
+        "message": "soldan sağa"
+    },
     "link_7262adec": {
         "message": "Bağlantı"
+    },
+    "link_options_a16b758b": {
+        "message": "Bağlantı Seçenekleri"
     },
     "link_to_other_content_in_the_course_879163b5": {
         "message": "Ders içindeki başka bir içeriğe bağla."
@@ -307,6 +370,9 @@
     },
     "links_14b70841": {
         "message": "Bağlantılar"
+    },
+    "load_more_35d33c7": {
+        "message": "Daha Fazla Yükle"
     },
     "load_more_a36f9cf9": {
         "message": "Daha fazla yükle"
@@ -350,6 +416,9 @@
     "next_month_749b1778": {
         "message": "Sonraki Hafta"
     },
+    "next_page_d2a39853": {
+        "message": "Sonraki Sayfa"
+    },
     "no_results_940393cf": {
         "message": "Sonuç yok."
     },
@@ -382,6 +451,9 @@
     },
     "previous_month_bb1e3c84": {
         "message": "Önceki Hafta"
+    },
+    "previous_page_928fc112": {
+        "message": "Önceki Sayfa"
     },
     "pts_699bd9aa": {
         "message": "not"

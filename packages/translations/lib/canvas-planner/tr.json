@@ -40,6 +40,19 @@
   "due_5d7267be": { "message": "Bitiş:" },
   "edit_c5fbea07": { "message": "Düzenle" },
   "excused_cf8792eb": { "message": "Mazeretli" },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Yapılacak öğesi silinemedi"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Yeni etkinliği alma başarısız"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Fırsatların yüklenmesi başarısız"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Yapılacak öğesi kaydedilemedi"
+  },
+  "feedback_6dcc1991": { "message": "Geribildirim" },
   "graded_25cd3fcd": { "message": "Notlandırmalı" },
   "late_2be42b88": { "message": "Geç" },
   "load_more_a36f9cf9": { "message": "Daha fazla yükle" },
