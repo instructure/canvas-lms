@@ -251,8 +251,8 @@ describe "assignments" do
       let(:valid_name) { "Name" }
       let(:points) { "10" }
       let(:differentiate) { false }
-      let(:due_date_valid) { "Jan 1, 2020 at 11:59pm" }
-      let(:short_date) { "Jan 1, 2020" }
+      let(:due_date_valid) { "#{format_date_for_view(Time.zone.now + 3.years)} at 11:59pm" }
+      let(:short_date) { format_date_for_view(Time.zone.now + 3.years) }
       let(:error) { "" }
       let(:settings_enable) { {} }
       let(:name_length_invalid) { false }
