@@ -630,6 +630,12 @@ module Api::V1::Assignment
       update_params.delete('peer_reviews_assign_at')
     end
 
+    if update_params.key?("anonymous_peer_reviews")
+      if Canvas::Plugin.value_to_boolean(update_params["anonymous_peer_reviews"]) != assignment.anonymous_peer_reviews
+        ::AssessmentRequest.where(asset: assignment.submissions).update_all(updated_at: Time.now.utc)
+      end
+    end
+
     if update_params["submission_types"].is_a? Array
       update_params["submission_types"] = update_params["submission_types"].map do |type|
         # TODO: remove. this was temporary backward support for a hotfix
