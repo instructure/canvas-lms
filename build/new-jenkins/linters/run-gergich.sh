@@ -9,6 +9,7 @@ inputs+=("--env GERGICH_KEY=$GERGICH_KEY")
 inputs+=("--env GERRIT_HOST=$GERRIT_HOST")
 inputs+=("--env GERRIT_PROJECT=$GERRIT_PROJECT")
 inputs+=("--env GERRIT_BRANCH=$GERRIT_BRANCH")
+inputs+=("--env GERRIT_EVENT_ACCOUNT_EMAIL=$GERRIT_EVENT_ACCOUNT_EMAIL")
 
 # the GERRIT_REFSPEC is required for the commit message to actually
 # send things to gergich
@@ -19,6 +20,9 @@ set -ex
 
 # the linters expect this to be here else it will just look at master
 export GERRIT_PATCHSET_REVISION=`git rev-parse HEAD`
+
+# ensure we run the gergich comments with the Lint-Review label
+export GERGICH_REVIEW_LABEL="Lint-Review"
 
 # we need to remove the hooks because compile_assets calls yarn install which will
 # try to create the .git commit hooks

@@ -765,6 +765,12 @@ module Api::V1::Assignment
       update_lockdown_browser_settings(assignment, assignment_params)
     end
 
+    if update_params['allowed_attempts'].to_i == -1 && assignment.allowed_attempts.nil?
+      # if allowed_attempts is nil, the api json will replace it with -1 for some reason
+      # so if it's included in the json to update, we should just ignore it
+      update_params.delete('allowed_attempts')
+    end
+
     apply_report_visibility_options!(assignment_params, assignment)
 
     assignment.updating_user = user

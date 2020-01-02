@@ -470,6 +470,15 @@
     "group_navigation_99f191a": {
         "message": "Dewislen Crwydro Grwpiau"
     },
+    "heading_2_5b84eed2": {
+        "message": "Pennawd 2"
+    },
+    "heading_3_2c83de44": {
+        "message": "Pennawd 3"
+    },
+    "heading_4_b2e74be7": {
+        "message": "Pennawd 4"
+    },
     "height_69b03e15": {
         "message": "Uchder"
     },
@@ -602,20 +611,8 @@
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Yn gorfod bod o leiaf { width } x { height }px"
     },
-    "my_documents_77a74ff3": {
-        "message": "Fy Nogfennau"
-    },
-    "my_files_eea33f44": {
-        "message": "Fy Ffeiliau"
-    },
     "my_grades_98834476": {
         "message": "Fy Ngraddau"
-    },
-    "my_images_427f9b0c": {
-        "message": "Fy Nelweddau"
-    },
-    "my_media_82bade11": {
-        "message": "Fy Nghyfryngau"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Llywiwch trwy''r ddewislen neu''r bar offer"

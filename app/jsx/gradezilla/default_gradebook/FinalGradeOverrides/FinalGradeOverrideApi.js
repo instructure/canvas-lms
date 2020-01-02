@@ -18,7 +18,7 @@
 
 import axios from 'axios'
 import {camelize} from 'convert_case'
-import I18n from 'i18n!gradezilla'
+import I18n from 'i18n!finalGradeOverrideApi'
 
 import {createClient, gql} from '../../../canvas-apollo'
 import {showFlashAlert} from '../../../shared/FlashAlert'

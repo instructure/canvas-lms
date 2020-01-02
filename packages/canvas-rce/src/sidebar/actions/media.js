@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import alertHandler from '../../rce/alertHandler'
+import formatMessage from '../../format-message'
+
 export const REQUEST_MEDIA = 'REQUEST_MEDIA'
 export const RECEIVE_MEDIA = 'RECEIVE_MEDIA'
 export const FAIL_MEDIA = 'FAIL_MEDIA'
@@ -70,5 +73,22 @@ export function fetchInitialMedia() {
     if (media && media.hasMore && !media.isLoading && media.files && media.files.length === 0) {
       return dispatch(fetchMedia())
     }
+  }
+}
+
+// update the media object.
+// For now only supports the title
+export function updateMediaObject({media_object_id, title}) {
+  return (dispatch, getState) => {
+    const state = getState()
+    return state.source.updateMediaObject(state, {media_object_id, title}).catch(e => {
+      alertHandler.handleAlert({
+        text: formatMessage(
+          'Though your video will have the correct title in the browser, we failed to update it in the database.'
+        ),
+        variant: 'error'
+      })
+      throw e
+    })
   }
 }

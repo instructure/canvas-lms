@@ -209,6 +209,7 @@ class FileBrowser extends React.Component {
   formatFolderInfo(apiFolder, opts = {}) {
     const descriptor = apiFolder.locked_for_user ? I18n.t('Locked') : null
     const folder = {
+      api: apiFolder,
       id: apiFolder.id,
       collections: [],
       items: [],
@@ -234,6 +235,7 @@ class FileBrowser extends React.Component {
     const {collections} = this.state
     const context = collections[apiFile.folder_id].context
     const file = {
+      api: apiFile,
       id: apiFile.id,
       name: apiFile.display_name,
       thumbnail: apiFile.thumbnail_url,

@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def ci_node_total = 20; // how many nodes to run on
+def ci_node_total = 25; // how many nodes to run on
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -36,7 +36,7 @@ pipeline {
     KNAPSACK_EXCLUDE_REGEX = '/performance/'
     KNAPSACK_TEST_DIR = 'spec'
     // for now 1 until we stabilize some of the flaky specs
-    RERUNS_RETRY = 2
+    RERUNS_RETRY = 3
     MAX_FAIL = 100
   }
 
