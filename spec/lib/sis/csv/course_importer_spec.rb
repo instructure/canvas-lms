@@ -726,6 +726,15 @@ describe SIS::CSV::CourseImporter do
       expect(template2.child_subscriptions.active.pluck(:child_course_id)).to eq([c3.id])
     end
 
+    it "should give one warning per row" do
+      courses = (1..3).map{|x| @account.courses.create!(:sis_source_id => "acourse#{x}")}
+      rows = ["course_id,short_name,long_name,status,blueprint_course_id"] +
+        courses.map{|c| "#{c.sis_source_id},shortname,long name,active,missingid"}
+      importer = process_csv_data(*rows)
+      expected = courses.map{|c| "Unknown blueprint course \"missingid\" for course \"#{c.sis_source_id}\""}
+      expect(importer.errors.map(&:last)).to match_array(expected)
+    end
+
     it "should try to queue a migration afterwards" do
       account_admin_user(:active_all => true)
       c1 = @account.courses.create!(:sis_source_id => "acourse1")

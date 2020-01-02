@@ -277,7 +277,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         select("#{self.table_name}.*, courses.sis_source_id AS sis_source_id").to_a
       if templates.count != master_sis_ids.count
         (master_sis_ids - templates.map(&:sis_source_id)).each do |missing_id|
-          messages << "Unknown blueprint course \"#{missing_id}\""
+          associations[missing_id].each do |target_course_id|
+            messages << "Unknown blueprint course \"#{missing_id}\" for course \"#{target_course_id}\""
+          end
         end
       end
 
