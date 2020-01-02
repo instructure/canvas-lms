@@ -36,20 +36,19 @@ def getImageTagVersion() {
   return flags.getImageTagVersion()
 }
 
-def runBuildImageMaybe(save_success, block) {
+def runBuildImageMaybe(saveSuccess, block) {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
   if (flags.hasFlag('skip-docker-build')) {
-    echo "skip building image requested"
-  }
-  else {
+    echo "Skip building image requested"
+  } else {
     def skips = load 'build/new-jenkins/groovy/successes.groovy'
-    skips.skipIfPreviouslySuccessful("build-and-push-image", save_success, block)
+    skips.skipIfPreviouslySuccessful("build-and-push-image", saveSuccess, block)
   }
 }
 
 def skipIfPreviouslySuccessful(name, block) {
-    def skips = load 'build/new-jenkins/groovy/successes.groovy'
-    skips.skipIfPreviouslySuccessful(name, true, block)
+  def skips = load 'build/new-jenkins/groovy/successes.groovy'
+  skips.skipIfPreviouslySuccessful(name, true, block)
 }
 
 pipeline {
@@ -175,11 +174,14 @@ pipeline {
       steps {
         runBuildImageMaybe(false) {
           timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
-            dockerCacheLoad(image: "$CACHE_TAG")
-            sh '''
-              docker build -t $PATCHSET_TAG .
-              docker tag $PATCHSET_TAG $CACHE_TAG
-            '''
+            script {
+              def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+              if (!flags.hasFlag('skip-cache')) {
+                dockerCacheLoad(image: "$CACHE_TAG")
+              }
+              sh 'docker build -t $PATCHSET_TAG .'
+              sh 'docker tag $PATCHSET_TAG $CACHE_TAG'
+            }
           }
         }
       }
@@ -338,9 +340,11 @@ pipeline {
     failure {
       script {
         if ( env.GERRIT_EVENT_TYPE == 'change-merged' ) {
-          slackSend (channel: '#canvas_builds',
-            color: '#da0005',
-            message: "${env.JOB_NAME} failed on merge (<${env.BUILD_URL}|${env.BUILD_NUMBER}>)")
+          slackSend(
+            channel: '#canvas_builds',
+            color: 'danger',
+            message: "${env.JOB_NAME} failed on merge (<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
+          )
         }
       }
     }
@@ -355,4 +359,3 @@ pipeline {
     }
   }
 }
-

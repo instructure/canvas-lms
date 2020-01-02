@@ -16,50 +16,80 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// If the migrated images are not found, then it builds from database base images
-def loadMigratedImages() {
-  dockerCacheLoad(image: "$POSTGRES_CACHE_TAG", prefix: "Canvas")
-  dockerCacheLoad(image: "$CASSANDRA_CACHE_TAG", prefix: "Canvas")
-  dockerCacheLoad(image: "$DYNAMODB_CACHE_TAG", prefix: "Canvas")
+def log(message) {
+  echo "[cache-migrations.groovy]: ${message}"
 }
 
-def successfullyLoadedFromCache() {
-  return sh (
-    script:
-      '''
-        if [ ! -z "$(docker images -q $POSTGRES_CACHE_TAG 2> /dev/null)" ] &&\
-           [ ! -z "$(docker images -q $CASSANDRA_CACHE_TAG 2> /dev/null)" ] &&\
-           [ ! -z "$(docker images -q $DYNAMODB_CACHE_TAG 2> /dev/null)" ] ; then
-           echo 'loaded'
-        fi
-      ''',
-      returnStdout: true
-  ).trim() == 'loaded'
+def prefix() { return "Canvas" }
+def postgresImage() { return  "$POSTGRES_CACHE_TAG" }
+def cassandraImage() { return "$CASSANDRA_CACHE_TAG" }
+def dynamodbImage() { return "$DYNAMODB_CACHE_TAG" }
+
+def cacheLoadFailed() {
+  def key = 'loaded'
+  return sh(
+    script: """\
+      [ ! -z "\$(docker images -q ${postgresImage()} 2> /dev/null)" ] \
+        && [ ! -z "\$(docker images -q ${cassandraImage()} 2> /dev/null)" ] \
+        && [ ! -z "\$(docker images -q ${dynamodbImage()} 2> /dev/null)" ] \
+        && echo "${key}"
+    """,
+    returnStdout: true
+  ).trim() != key
 }
 
 def commitMigratedImages() {
-  def commitMessage = "Postgres migrated image for patchset $NAME"
-  sh 'docker commit -m \"$commitMessage\" `docker-compose ps -q postgres` $POSTGRES_CACHE_TAG'
-  commitMessage = "Cassandra migrated image for patchset $NAME"
-  sh 'docker commit -m \"$commitMessage\" `docker-compose ps -q cassandra` $CASSANDRA_CACHE_TAG'
-  commitMessage = "Dynamodb migrated image for patchset $NAME"
-  sh 'docker commit -m \"$commitMessage\" `docker-compose ps -q dynamodb` $DYNAMODB_CACHE_TAG'
+  def postgresMessage = "Postgres migrated image for patchset $NAME"
+  sh "docker commit -m \"${postgresMessage}\" \$(docker-compose ps -q postgres) ${postgresImage()}"
+
+  def cassandraMessage = "Cassandra migrated image for patchset $NAME"
+  sh "docker commit -m \"${cassandraMessage}\" \$(docker-compose ps -q cassandra) ${cassandraImage()}"
+
+  def dynamodbMessage = "Dynamodb migrated image for patchset $NAME"
+  sh "docker commit -m \"${dynamodbMessage}\" \$(docker-compose ps -q dynamodb) ${dynamodbImage()}"
+}
+
+def loadMigratedImages() {
+  dockerCacheLoad(image: postgresImage(), prefix: prefix())
+  dockerCacheLoad(image: cassandraImage(), prefix: prefix())
+  dockerCacheLoad(image: dynamodbImage(), prefix: prefix())
+}
+
+def pullAndBuild() {
+  sh 'build/new-jenkins/docker-compose-pull.sh'
+  sh 'docker-compose build'
+}
+
+def startAndMigrate() {
+  sh 'docker-compose up -d'
+  sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
 }
 
 def storeMigratedImages() {
-  dockerCacheStore(image: "$POSTGRES_CACHE_TAG", prefix: "Canvas")
-  dockerCacheStore(image: "$CASSANDRA_CACHE_TAG", prefix: "Canvas")
-  dockerCacheStore(image: "$DYNAMODB_CACHE_TAG", prefix: "Canvas")
+  dockerCacheStore(image: postgresImage(), prefix: prefix())
+  dockerCacheStore(image: cassandraImage(), prefix: prefix())
+  dockerCacheStore(image: dynamodbImage(), prefix: prefix())
 }
 
+// use cached images if available
 def createMigrateBuildUpCached() {
-  loadMigratedImages()
-  if(!successfullyLoadedFromCache()) {
-    sh 'build/new-jenkins/docker-compose-pull.sh'
-    sh 'docker-compose build'
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  if (flags.hasFlag('skip-cache')) {
+    log('Build cache is disabled! Ignoring any previously cached migrations and migrating from scratch.')
+    pullAndBuild()
+    startAndMigrate()
+  } else {
+    loadMigratedImages() // load images from docker cache
+
+    // detect if load was successfull, otherwise
+    if(cacheLoadFailed()) {
+      pullAndBuild() // build as normal
+    }
+
+    // migrate and commit images
+    startAndMigrate()
+    commitMigratedImages()
   }
-  sh 'docker-compose up -d'
-  sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-  commitMigratedImages()
 }
+
 return this
