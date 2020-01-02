@@ -88,8 +88,12 @@ export default class AdditionalSettings extends React.Component {
 
   handleSelectionHeightChange = e => {
     const value = e.target.value
+    const numVal = parseInt(value, 10)
     this.setState(state => ({
-      additionalSettings: {...state.additionalSettings, selection_height: parseInt(value, 10)}
+      additionalSettings: {
+        ...state.additionalSettings,
+        selection_height: !Number.isNaN(numVal) ? numVal : ''
+      }
     }))
   }
 
@@ -102,8 +106,12 @@ export default class AdditionalSettings extends React.Component {
 
   handleSelectionWidthChange = e => {
     const value = e.target.value
+    const numVal = parseInt(value, 10)
     this.setState(state => ({
-      additionalSettings: {...state.additionalSettings, selection_width: parseInt(value, 10)}
+      additionalSettings: {
+        ...state.additionalSettings,
+        selection_width: !Number.isNaN(numVal) ? numVal : ''
+      }
     }))
   }
 
