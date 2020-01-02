@@ -378,7 +378,14 @@ class ConversationsController < ApplicationController
     shard = Shard.current
     if params[:context_code].present?
       context = Context.find_by_asset_string(params[:context_code])
-      return render_error('context_code', 'invalid') unless valid_context?(context)
+
+      recipients_are_instructors = all_recipients_are_instructors?(context, @recipients)
+
+      if context.is_a?(Course) && !recipients_are_instructors && !context.grants_right?(@current_user, session, :send_messages)
+        return render_error("Unable to send messages to users in #{context.name}", '')
+      elsif !valid_context?(context)
+        return render_error('context_code', 'invalid')
+      end
 
       shard = context.shard
       context_type = context.class.name
@@ -1222,4 +1229,15 @@ class ConversationsController < ApplicationController
     false
   end
 
+  def all_recipients_are_instructors?(context, recipients)
+    if context.is_a?(Course)
+      all_recipients_are_instructors = true
+      recipients.each do |recipient|
+        all_recipients_are_instructors = false unless context.user_is_instructor?(recipient)
+      end
+      return all_recipients_are_instructors
+    end
+
+    false
+  end
 end

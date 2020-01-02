@@ -374,6 +374,14 @@ describe ConversationsController do
           end
         end
       end
+
+      it 'does not allow sending messages to other users in a group if the permission is disabled' do
+        user_session(@new_user1)
+        @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+        post 'create', params: { recipients: [@new_user2.id.to_s], body: 'ooo eee', group_conversation: 'true', context_code: @course.asset_string }
+
+        expect(response).not_to be_successful
+      end
     end
 
     it "should correctly infer context tags" do
