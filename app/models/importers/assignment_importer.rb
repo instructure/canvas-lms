@@ -197,7 +197,7 @@ module Importers
       if hash[:assignment_group_migration_id]
         item.assignment_group = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
       end
-      item.assignment_group ||= context.assignment_groups.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
+      item.assignment_group ||= context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
 
       if item.points_possible.to_i < 0
         item.points_possible = 0
@@ -318,7 +318,7 @@ module Importers
       ].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
-      
+
       if hash[:post_to_sis] && item.grading_type != 'not_graded' && AssignmentUtil.due_date_required_for_account?(context) &&
         (item.due_at.nil? || (migration.date_shift_options && Canvas::Plugin.value_to_boolean(migration.date_shift_options[:remove_dates])))
         # check if it's going to fail the weird post_to_sis validation requiring due dates
