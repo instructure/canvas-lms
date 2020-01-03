@@ -41,6 +41,12 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
     // Register commands
     ed.addCommand('instructureLinkCreate', clickCallback.bind(this, ed, CREATE_LINK))
     ed.addCommand('instructureLinkEdit', clickCallback.bind(this, ed, EDIT_LINK))
+    ed.addCommand('instructureTrayForLinks', (ui, plugin_key) => {
+      bridge.showTrayForPlugin(plugin_key)
+    })
+    ed.addCommand('instructureTrayToEditLink', (ui, editor) => {
+      trayController.showTrayForEditor(editor)
+    })
 
     // Register toolbar button
     ed.ui.registry.addMenuButton('instructure_links', {
@@ -55,7 +61,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
               type: 'menuitem',
               text: formatMessage('Edit Link'),
               onAction: () => {
-                trayController.showTrayForEditor(ed)
+                ed.execCommand('instructureTrayToEditLink', false, ed)
               }
             },
             {
@@ -80,7 +86,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
               text: formatMessage('Course Links'),
               onAction() {
                 ed.focus(true) // activate the editor without changing focus
-                bridge.showTrayForPlugin(PLUGIN_KEY)
+                ed.execCommand('instructureTrayForLinks', false, PLUGIN_KEY)
               }
             }
           ]
@@ -105,7 +111,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
     ed.ui.registry.addButton('instructure-link-options', {
       onAction(/* buttonApi */) {
         // show the tray
-        trayController.showTrayForEditor(ed)
+        ed.execCommand('instructureTrayToEditLink', false, ed)
       },
 
       text: formatMessage('Options'),

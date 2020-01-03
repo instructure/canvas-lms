@@ -29,6 +29,9 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
 
     // Register commands
     ed.addCommand('mceInstructureDocuments', clickCallback.bind(this, ed, document))
+    ed.addCommand('instructureTrayForDocuments', (ui, plugin_key) => {
+      bridge.showTrayForPlugin(plugin_key)
+    })
 
     const menuItems = [
       {
@@ -43,7 +46,7 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
         text: formatMessage('User Documents'),
         onAction() {
           ed.focus(true) // activate the editor without changing focus
-          bridge.showTrayForPlugin(USER_PLUGIN_KEY)
+          ed.execCommand('instructureTrayForDocuments', false, USER_PLUGIN_KEY)
         }
       }
     ]
@@ -53,7 +56,7 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
         text: formatMessage('Course Documents'),
         onAction() {
           ed.focus(true) // activate the editor without changing focus
-          bridge.showTrayForPlugin(COURSE_PLUGIN_KEY)
+          ed.execCommand('instructureTrayForDocuments', false, COURSE_PLUGIN_KEY)
         }
       })
     }

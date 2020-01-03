@@ -24,6 +24,10 @@ const trayController = new EmbedTrayController()
 
 tinymce.create('tinymce.plugins.InstructureEmbedsPlugin', {
   init(editor) {
+    editor.addCommand('instructureTrayToEditEmbed', (ui, ed) => {
+      trayController.showTrayForEditor(ed)
+    })
+
     /*
      * Register the Embed "Options" button that will open the Embed Options
      * tray.
@@ -32,7 +36,7 @@ tinymce.create('tinymce.plugins.InstructureEmbedsPlugin', {
     editor.ui.registry.addButton('instructure-embed-options', {
       onAction(/* buttonApi */) {
         // show the tray
-        trayController.showTrayForEditor(editor)
+        editor.execCommand('instructureTrayToEditEmbed', false, editor)
       },
 
       text: formatMessage('Options'),

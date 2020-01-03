@@ -179,5 +179,32 @@ describe 'as a student' do
         expect(StudentAssignmentPageV2.media_modal).to be_displayed
       end
     end
+
+    context 'with new rce' do
+      before(:once) do
+        Account.default.enable_feature!(:rce_enhancements)
+        @assignment = @course.assignments.create!(
+          name: 'assignment',
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: 'online_text_entry'
+        )
+      end
+
+      before(:each) do
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+        driver.manage.window.resize_to(1000, 800)
+      end
+
+      it "should clean up RCE when switching tabs" do
+        StudentAssignmentPageV2.start_text_entry_button.click
+        f('button[aria-label="More..."]').click
+        expect(f('.tox-toolbar__overflow')).to be_displayed
+
+        fj('[role="tab"]:contains("Comments")').click
+        expect(f('body')).not_to contain_css('.tox-toolbar__overflow')
+      end
+    end
   end
 end

@@ -33,6 +33,9 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
 
     // Register commands
     editor.addCommand('mceInstructureImage', clickCallback.bind(this, editor, document))
+    editor.addCommand('instructureTrayForImages', (ui, plugin_key) => {
+      bridge.showTrayForPlugin(plugin_key)
+    })
 
     // Register buttons
     editor.ui.registry.addMenuButton('instructure_image', {
@@ -51,7 +54,7 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
             text: formatMessage('User Images'),
             onAction() {
               editor.focus(true)
-              bridge.showTrayForPlugin(USER_PLUGIN_KEY)
+              editor.execCommand('instructureTrayForImages', false, USER_PLUGIN_KEY)
             }
           }
         ]
@@ -62,7 +65,7 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
             text: formatMessage('Course Images'),
             onAction() {
               editor.focus(true) // activate the editor without changing focus
-              bridge.showTrayForPlugin(COURSE_PLUGIN_KEY)
+              editor.execCommand('instructureTrayForImages', false, COURSE_PLUGIN_KEY)
             }
           })
         }
