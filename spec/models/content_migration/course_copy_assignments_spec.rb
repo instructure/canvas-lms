@@ -249,6 +249,25 @@ describe ContentMigration do
       expect(new_assignment.reload.allowed_extensions).to eq []
     end
 
+    it "should only auto-import into an active assignment group" do
+      assign = @copy_from.assignments.create!
+      run_export_and_import do |export|
+        export.selected_content = { 'assignments' => { mig_id(assign) => "1" } }
+      end
+      group = @copy_to.assignments.first.assignment_group
+      expect(group.name).to eq "Imported Assignments" # hi
+      group.destroy # bye
+
+      assign2 = @copy_from.assignments.create!
+      run_export_and_import do |export|
+        export.selected_content = { 'assignments' => { mig_id(assign2) => "1" } }
+      end
+      new_group = @copy_to.assignments.where(:migration_id => mig_id(assign2)).first.assignment_group
+      expect(new_group).to_not eq group
+      expect(new_group).to be_available
+      expect(new_group.name).to eq "Imported Assignments"
+    end
+
     describe "allowed_attempts copying" do
       it "copies nil over properly" do
         assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
