@@ -18,11 +18,7 @@
 
 class Loaders::MediaObjectLoader < GraphQL::Batch::Loader
   def perform(media_object_ids)
-    media_objects = MediaObject.by_media_id(media_object_ids)
-
-    hashed_media = media_objects.each_with_object({}) do |media_object, hsh|
-      hsh[media_object.media_id] = media_object
-    end
+    hashed_media = MediaObject.where(:media_id => media_object_ids.compact).to_a.index_by(&:media_id)
 
     media_object_ids.each do |media_id|
       fulfill(media_id, hashed_media[media_id])
