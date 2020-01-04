@@ -132,33 +132,20 @@ describe "Outcomes Import API", type: :request do
 
       it "requires the AcademicBenchmark config to be set" do
         stub_ab_config_with(nil)
-        # Since :partner_key is missing above, we default to using AB API v1.
-        # Once AB API v3 becomes default, switch the regex below to /needs partner_key and partner_id/
-        expect(request.call(type: request_type)["error"]).to match(/needs api_key and api_url/i)
+        expect(request.call(type: request_type)["error"]).to match(/needs partner_key and partner_id/i)
       end
 
-      context "requires the AcademicBenchmark config api_key or partner_key to be set" do
-        # Since :partner_key is missing below, we default to using AB API v1.
-        # Once AB API v3 becomes default, switch the regex below to /needs partner_key/
+      context "requires the AcademicBenchmark config partner_key to be set" do
         it "rejects a missing/nil key" do
-          stub_ab_config_with({ "api_url" => "http://a.real.url.com" })
-          expect(request.call(type: request_type)["error"]).to match(/needs api_key/i)
+          stub_ab_config_with({})
+          expect(request.call(type: request_type)["error"]).to match(/needs partner_key/i)
         end
-        # Since :partner_key is empty below, we default to using AB API v1.
-        # Once AB API v3 becomes default, switch the regex below to /needs partner_key/
         it "rejects a partner key that is the empty string" do
           stub_ab_config_with({
             partner_id: "instructure",
             partner_key: ""
           })
-          expect(request.call(type: request_type)["error"]).to match(/needs api_key/i)
-        end
-        it "rejects an api key that is the empty string" do
-          stub_ab_config_with({
-            "api_url" => "http://a.real.url.com",
-            "api_key" => ""
-          })
-          expect(request.call(type: request_type)["error"]).to match(/needs api_key/i)
+          expect(request.call(type: request_type)["error"]).to match(/needs partner_key/i)
         end
       end
 
@@ -391,71 +378,39 @@ describe "Outcomes Import API", type: :request do
     end
   end
 
-  describe "v1" do
-    def stub_ab_import
-      cm_mock = double("content_migration")
-      allow(cm_mock).to receive(:id).and_return(3)
-      allow(AcademicBenchmark).to receive(:import).and_return(cm_mock)
+  def stub_ab_import
+    cm_mock = double("content_migration")
+    allow(cm_mock).to receive(:id).and_return(3)
+    allow(AcademicBenchmark).to receive(:import).and_return(cm_mock)
+  end
+  include_examples "outcomes import" do
+    let(:description_key){ "description" }
+    let(:json_file) { "available_return_val.json" }
+    def stub_ab_api
+      standards_mock = double("standards")
+      allow(standards_mock).to receive(:authorities).
+        and_return(filename_to_hash("available_authorities.json").
+                map{ |a| AcademicBenchmarks::Standards::Authority.from_hash(a) })
+      allow(standards_mock).to receive(:authority_documents).
+        with(not_eq('CC').and(not_eq('NRC'))).
+        and_return(filename_to_hash("national_standards_authority_docs.json").
+                map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
+      allow(standards_mock).to receive(:authority_documents).
+        with('NRC').
+        and_return(filename_to_hash("ngss_nrc_authority_docs.json").
+                map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
+      allow(standards_mock).to receive(:authority_documents).
+        with('CC').
+        and_return(filename_to_hash("common_core_authority_docs.json").
+               map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
+      allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
     end
-    include_examples "outcomes import" do
-      let(:description_key){ "title" }
-      let(:json_file) { "available_return_val_v1.json" }
-      def stub_ab_api
-        api_mock = double("api")
-        allow(api_mock).to receive(:list_available_authorities).
-          and_return(filename_to_hash("api_list_authorities.json"))
-        allow(api_mock).to receive(:browse_guid).
-          and_return(filename_to_hash("api_browse_guid.json"))
-        allow(api_mock).to receive(:browse).
-          and_return(filename_to_hash("api_browse.json"))
-        allow(AcademicBenchmark::Api).to receive(:new).and_return(api_mock)
-      end
 
-      def stub_ab_config
-        stub_ab_config_with({
-          "api_key" => "<secret-key>",
-          "api_url" => "http://api.statestandards.com/services/rest/"
-        })
-      end
+    def stub_ab_config
+      stub_ab_config_with({
+        partner_key: "<secret-key>",
+        partner_id: "instructure"
+      })
     end
   end
-
-  describe "v3" do
-    def stub_ab_import
-      cm_mock = double("content_migration")
-      allow(cm_mock).to receive(:id).and_return(3)
-      allow(AcademicBenchmark).to receive(:import).and_return(cm_mock)
-    end
-    include_examples "outcomes import" do
-      let(:description_key){ "description" }
-      let(:json_file) { "available_return_val.json" }
-      def stub_ab_api
-        standards_mock = double("standards")
-        allow(standards_mock).to receive(:authorities).
-          and_return(filename_to_hash("available_authorities.json").
-                  map{ |a| AcademicBenchmarks::Standards::Authority.from_hash(a) })
-        allow(standards_mock).to receive(:authority_documents).
-          with(not_eq('CC').and not_eq('NRC')).
-          and_return(filename_to_hash("national_standards_authority_docs.json").
-                  map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-        allow(standards_mock).to receive(:authority_documents).
-          with('NRC').
-          and_return(filename_to_hash("ngss_nrc_authority_docs.json").
-                  map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-        allow(standards_mock).to receive(:authority_documents).
-          with('CC').
-          and_return(filename_to_hash("common_core_authority_docs.json").
-                 map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-        allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
-      end
-
-      def stub_ab_config
-        stub_ab_config_with({
-          partner_key: "<secret-key>",
-          partner_id: "instructure"
-        })
-      end
-    end
-  end
-
 end
