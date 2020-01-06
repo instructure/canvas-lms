@@ -47,20 +47,12 @@ export default class TotalGradeOverrideColumnHeader extends PureComponent {
         <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
             <Grid.Row>
-              <Grid.Col textAlign="center" width="auto">
-                <div className="Gradebook__ColumnHeaderIndicators" />
-              </Grid.Col>
-
               <Grid.Col textAlign="center">
                 <View className="Gradebook__ColumnHeaderDetail">
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {I18n.t('Override')}
                   </Text>
                 </View>
-              </Grid.Col>
-
-              <Grid.Col textAlign="center" width="auto">
-                <div className="Gradebook__ColumnHeaderAction" />
               </Grid.Col>
             </Grid.Row>
           </Grid>
