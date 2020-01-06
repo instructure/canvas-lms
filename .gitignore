@@ -82,3 +82,6 @@ docker-compose.local.*
 .nyc_output
 coverage-jest
 coverage-karma
+
+# generated graphql schema
+schema.graphql
