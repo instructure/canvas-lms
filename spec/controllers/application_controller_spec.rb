@@ -1614,6 +1614,24 @@ describe CoursesController do
         expect(params).to eq(include: [], includes: ['uuid'])
       end
     end
+
+    context 'with valid scopes and allow includes on dev key' do
+      let(:developer_key) { DeveloperKey.create!(require_scopes: true, allow_includes: true, scopes: ['url:GET|/api/v1/accounts']) }
+
+      it 'keeps includes for adequately scoped requests' do
+        user = user_model
+        token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
+        controller.instance_variable_set(:@access_token, token)
+        allow(controller).to receive(:request).and_return(double({
+          method: 'GET',
+          path: '/api/v1/accounts'
+        }))
+        params = { include: ['a'], includes: ['uuid', 'b']}
+        allow(controller).to receive(:params).and_return(params)
+        controller.send(:validate_scopes)
+        expect(params).to eq(include: ['a'], includes: ['uuid', 'b'])
+      end
+    end
   end
 end
 
