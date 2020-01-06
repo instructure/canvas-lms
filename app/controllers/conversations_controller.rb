@@ -392,6 +392,10 @@ class ConversationsController < ApplicationController
       context_id = context.id
     end
 
+    if context.is_a?(Course) && context.workflow_state != 'available'
+      return render_error('Course concluded', 'Unable to send messages')
+    end
+
     params[:recipients].each do |recipient|
       if recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/ && [nil, 'students', 'observers'].include?($2) &&
          !Context.find_by_asset_string($1).try(:grants_right?, @current_user, session, :send_messages_all)

@@ -237,6 +237,15 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
+    it 'should not allow creating conversations in concluded courses' do
+      user_session(@student)
+      @course.update!(workflow_state: 'completed')
+
+      post 'create', params: { recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string }
+      expect(response).not_to be_successful
+      expect(response.body).to include('Unable to send messages')
+    end
+
     it "should require permissions for sending to other students" do
       user_session(@student)
 
