@@ -5237,6 +5237,24 @@ describe Course do
     end
   end
 
+  describe 'grade weight notification' do
+    before :once do
+      course_with_student(:active_all => true, :active_cc => true)
+      n = Notification.create!(name: 'Grade Weight Changed', category: 'TestImmediately')
+      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+    end
+
+    it "sends a notification when the course scheme changes" do
+      @course.update_attribute(:apply_assignment_group_weights, true)
+      expect(@course.messages_sent['Grade Weight Changed']).to be_present
+    end
+
+    it "doesn't sends a notification when the course scheme doesn't functionally change" do
+      @course.update_attribute(:apply_assignment_group_weights, false) # already is functionally false but will still save a column explicitly
+      expect(@course.messages_sent['Grade Weight Changed']).to be_blank
+    end
+  end
+
   it "creates a scope that returns deleted courses" do
     @course1 = Course.create!
     @course1.workflow_state = 'deleted'
