@@ -39,4 +39,12 @@ def fetchFromGerrit(String repo, String path, String customRepoDestination = nul
   })
 }
 
+def withSentryCredentials(block) {
+  withCredentials([
+    string(credentialsId: 'SENTRY_DSN', variable: 'SENTRY_DSN'),
+    string(credentialsId: 'SENTRY_AUTH_TOKEN', variable: 'SENTRY_AUTH_TOKEN'),
+    string(credentialsId: 'DEPRECATION_SENTRY_DSN', variable: 'DEPRECATION_SENTRY_DSN')
+  ]) { block.call() }
+}
+
 return this
