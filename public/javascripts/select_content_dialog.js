@@ -522,10 +522,8 @@ $(document).ready(function() {
             submit(item_data)
           }
 
-          // Force the new assignment to set post_to_sis to false so that possible
-          // account validations do not prevent saving
           if (item_data['item[type]'] == 'assignment') {
-            data['assignment[post_to_sis]'] = false
+            data['assignment[post_to_sis]'] = ENV.DEFAULT_POST_TO_SIS
           }
           if (item_data['item[type]'] == 'attachment') {
             const file = $('#module_attachment_uploaded_data')[0].files[0]
