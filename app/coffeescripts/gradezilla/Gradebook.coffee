@@ -546,6 +546,7 @@ export default do ->
 
       dataLoader.gotStudentIds.then (response) =>
         @courseContent.students.setStudentIds(response.user_ids)
+        @courseContent.assignmentStudentVisibility = {}
         @buildRows()
 
       dataLoader.gotStudents.then () =>
