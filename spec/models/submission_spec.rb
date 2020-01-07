@@ -902,6 +902,15 @@ describe Submission do
       end
     end
 
+    it "sets grade_matches_current_submission to true when missing policy is applied" do
+      Timecop.freeze(1.day.from_now(@date)) do
+        submission.score = nil
+        submission.grade_matches_current_submission = false
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.grade_matches_current_submission).to be true
+      end
+    end
+
     it "sets the workflow state to 'graded' when submission is missing" do
       Timecop.freeze(1.day.from_now(@date)) do
         submission.score = nil

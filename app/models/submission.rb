@@ -1478,6 +1478,7 @@ class Submission < ActiveRecord::Base
 
     if late_policy&.missing_submission_deduction_enabled?
       if score.nil?
+        self.grade_matches_current_submission = true
         self.score = late_policy.points_for_missing(points_possible, grading_type)
         self.workflow_state = "graded"
       end
