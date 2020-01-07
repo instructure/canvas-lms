@@ -236,9 +236,6 @@
     "date_is_required_8660ec22": {
         "message": "Dato er obligatorisk"
     },
-    "date_published_371c4ad0": {
-        "message": "Dato publisert"
-    },
     "date_time_d9fbf2d7": {
         "message": "Dato og tidspunkt:"
     },
@@ -911,6 +908,9 @@
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Det er ingen poeng knytta til elementet"
     },
+    "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+        "message": "Sjølv om videoen din har rett tittel i nettlesaren, er den ikkje oppdatert i databasen."
+    },
     "time_2b5aac58": {
         "message": "Tidspunkt"
     },
@@ -1006,6 +1006,9 @@
     },
     "user_documents_c206e61f": {
         "message": "Brukardokument"
+    },
+    "user_files_78e21703": {
+        "message": "Brukarfiler"
     },
     "user_images_b6490852": {
         "message": "Brukarbilder"
