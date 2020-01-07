@@ -152,6 +152,21 @@ describe "announcements" do
       expect(f("#content")).not_to contain_css('.discussion-rate-action')
     end
 
+    it "does not display the Subscribe button after replying" do
+      announcement = @course.announcements.create!(title: 'Allow Replies', message: 'Reply Here')
+      get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
+
+      f('.discussion-reply-action').click
+      wait_for_ajaximations
+      wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
+      type_in_tiny('textarea', 'this is my reply')
+      submit_form('.discussion-reply-form')
+      wait_for_ajaximations
+
+      expect(f('.topic-unsubscribe-button')).not_to be_displayed
+      expect(f('.topic-subscribe-button')).not_to be_displayed
+    end
+
     context "section specific announcements" do
       before (:once) do
         course_with_teacher(active_course: true)

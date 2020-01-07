@@ -204,8 +204,10 @@ export default class TopicView extends Backbone.View {
         this.$addRootReply != null ? this.$addRootReply.show() : undefined
       )
       this.reply.on('save', entry => {
-        ENV.DISCUSSION.CAN_SUBSCRIBE = true
-        this.topic.set('subscription_hold', false)
+        if (!ENV.DISCUSSION.TOPIC.IS_ANNOUNCEMENT) {
+          ENV.DISCUSSION.CAN_SUBSCRIBE = true
+          this.topic.set('subscription_hold', false)
+        }
         this.setSubscribed(true)
         return this.trigger('addReply', entry)
       })
