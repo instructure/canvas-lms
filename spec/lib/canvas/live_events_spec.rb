@@ -551,6 +551,17 @@ describe Canvas::LiveEvents do
           ))
         Canvas::LiveEvents.submission_updated(submission)
       end
+
+      it 'should include late and missing flags' do
+        submission.update_attributes(late_policy_status: 'missing')
+
+        expect_event('submission_updated',
+          hash_including(
+            late: false,
+            missing: true
+          ))
+        Canvas::LiveEvents.submission_updated(submission)
+      end
     end
 
 
