@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useRef} from 'react'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message'
@@ -67,20 +67,12 @@ export default function MediaPanel(props) {
     hasMore,
     isLoading,
     lastItemRef,
-
-    onLoadInitial() {},
-
-    onLoadMore() {
-      fetchNextMedia(sortBy)
-    },
-
-    records: files
+    onLoadInitial: fetchInitialMedia,
+    onLoadMore: fetchNextMedia,
+    records: files,
+    contextType,
+    sortBy
   })
-
-  useEffect(() => {
-    // change sort => refetch initial files
-    fetchInitialMedia(sortBy)
-  }, [sortBy.sort, sortBy.order]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFileClick = file => {
     props.onMediaEmbed(file)

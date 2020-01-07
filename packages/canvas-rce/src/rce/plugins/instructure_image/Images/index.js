@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useRef} from 'react'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
 import {Flex, View} from '@instructure/ui-layout'
@@ -41,20 +41,12 @@ export default function Images(props) {
     hasMore,
     isLoading,
     lastItemRef,
-
-    onLoadInitial() {},
-
-    onLoadMore() {
-      fetchNextImages(sortBy)
-    },
-
-    records: files
+    onLoadInitial: fetchInitialImages,
+    onLoadMore: fetchNextImages,
+    records: files,
+    contextType,
+    sortBy
   })
-
-  useEffect(() => {
-    // change sort => refetch initial docs
-    fetchInitialImages(sortBy)
-  }, [sortBy.sort, sortBy.order]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <View as="div" data-testid="instructure_links-ImagesPanel">

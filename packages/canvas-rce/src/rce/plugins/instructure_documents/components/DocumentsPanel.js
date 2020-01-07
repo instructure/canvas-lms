@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useRef} from 'react'
 import {arrayOf, bool, func, shape, string, objectOf, oneOf} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message'
@@ -67,21 +67,12 @@ export default function DocumentsPanel(props) {
     hasMore,
     isLoading,
     lastItemRef,
-
-    // noop, because the useEffect below will do the initial fetch
-    onLoadInitial() {},
-
-    onLoadMore() {
-      fetchNextDocs(sortBy)
-    },
-
-    records: files
+    onLoadInitial: fetchInitialDocs,
+    onLoadMore: fetchNextDocs,
+    records: files,
+    contextType,
+    sortBy
   })
-
-  useEffect(() => {
-    // change sort => refetch initial docs
-    fetchInitialDocs(sortBy)
-  }, [sortBy.sort, sortBy.order]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDocClick = file => {
     props.onLinkClick(file)

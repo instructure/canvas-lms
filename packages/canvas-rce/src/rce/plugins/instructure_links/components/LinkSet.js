@@ -45,6 +45,8 @@ function IncrementalLoader(props) {
     hasMore: hasMore && fetchNextPage != null,
     isLoading,
     lastItemRef,
+    contextType: 'course',
+    sortBy: {sort: 'alphabetical', order: 'asc'}, // not actually used in the query, but a required param
 
     onLoadInitial() {
       if (fetchInitialPage) {
