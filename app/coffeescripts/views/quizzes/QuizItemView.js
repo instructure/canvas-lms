@@ -250,6 +250,10 @@ export default class ItemView extends Backbone.View {
     return ENV.PERMISSIONS.manage
   }
 
+  isStudent() {
+    return ENV.current_user_roles.includes('student')
+  }
+
   canDuplicate() {
     const userIsAdmin = _.includes(ENV.current_user_roles, 'admin')
     const canManage = this.canManage()
@@ -339,6 +343,10 @@ export default class ItemView extends Backbone.View {
     base.showDueDate = this.model.multipleDueDates() || this.model.singleSectionDueDate()
     base.name = this.model.name()
     base.isQuizzesNext = this.model.isQuizzesNext()
+    base.quizzesRespondusEnabled =
+      this.isStudent() &&
+      this.model.get('require_lockdown_browser') &&
+      this.model.get('quiz_type') === 'quizzes.next'
 
     base.is_locked =
       this.model.get('is_master_course_child_content') &&

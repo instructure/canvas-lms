@@ -34,6 +34,9 @@ import { matchingToolUrls } from './LtiAssignmentHelpers'
 isAdmin = () ->
   _.includes(ENV.current_user_roles, 'admin')
 
+isStudent = () ->
+  _.includes(ENV.current_user_roles, 'student')
+
 export default class Assignment extends Model
   @mixin DefaultUrlMixin
   resourceName: 'assignments'
@@ -682,3 +685,6 @@ export default class Assignment extends Model
 
   showGradersAnonymousToGradersCheckbox: =>
     @moderatedGrading() && @get('grader_comments_visible_to_graders')
+
+  quizzesRespondusEnabled: =>
+    @get('require_lockdown_browser') && @isQuizLTIAssignment() && isStudent()

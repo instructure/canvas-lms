@@ -197,7 +197,6 @@ describe "Api::V1::Assignment" do
       expect(json).not_to have_key "needs_grading_count"
     end
 
-
     context 'rubrics' do
       before do
         rubric_model({
@@ -245,6 +244,50 @@ describe "Api::V1::Assignment" do
         ra.save!
         json = api.assignment_json(assignment, user, session)
         expect(json['rubric_settings']['hide_points']).to eq true
+      end
+    end
+
+    describe 'N.Q respondus setting' do
+      context 'when N.Q respondus setting is on' do
+        before do
+          assignment.settings = {
+            'lockdown_browser' => {
+              'require_lockdown_browser' => true
+            }
+          }
+          assignment.save!
+        end
+
+        it 'serializes require_lockdown_browser to be true' do
+          json = api.assignment_json(assignment, user, session, {})
+          expect(json.key?('require_lockdown_browser')).to be_present
+          expect(json['require_lockdown_browser']).to be_truthy
+        end
+      end
+
+      context 'when N.Q respondus setting is off' do
+        before do
+          assignment.settings = {
+            'lockdown_browser' => {
+              'require_lockdown_browser' => false
+            }
+          }
+          assignment.save!
+        end
+
+        it 'serializes require_lockdown_browser to be false' do
+          json = api.assignment_json(assignment, user, session, {})
+          expect(json.key?('require_lockdown_browser')).to be_present
+          expect(json['require_lockdown_browser']).to be_falsy
+        end
+      end
+
+      context 'when N.Q respondus setting is off (default)' do
+        it 'serializes require_lockdown_browser to be false' do
+          json = api.assignment_json(assignment, user, session, {})
+          expect(json.key?('require_lockdown_browser')).to be_present
+          expect(json['require_lockdown_browser']).to be_falsy
+        end
       end
     end
   end
