@@ -74,7 +74,7 @@ module Lti::Messages
       @message.deep_linking_settings.accept_types = ACCEPT_TYPES[placement]
       @message.deep_linking_settings.accept_presentation_document_targets = DOCUMENT_TARGETS[placement]
       @message.deep_linking_settings.accept_media_types = MEDIA_TYPES[placement].join(',')
-      @message.deep_linking_settings.accept_multiple = false
+      @message.deep_linking_settings.accept_multiple = (placement == 'editor_button')
       @message.deep_linking_settings.auto_create = AUTO_CREATE[placement]
     end
 

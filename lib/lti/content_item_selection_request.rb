@@ -182,6 +182,7 @@ module Lti
         accept_media_types: %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).join(','),
         accept_presentation_document_targets: %w(embed frame iframe window).join(','),
         accept_unsigned: true,
+        accept_multiple: true,
         auto_create: false
       }
     end

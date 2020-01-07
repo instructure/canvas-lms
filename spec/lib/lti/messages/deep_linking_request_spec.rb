@@ -43,7 +43,7 @@ describe Lti::Messages::DeepLinkingRequest do
     subject { jws['https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings'] }
 
     it 'sets "accept_multiple" to false' do
-      expect(subject['accept_multiple']).to eq false
+      expect(subject['accept_multiple']).to eq true
     end
 
     it 'sets the "deep_link_return_url"' do
@@ -75,6 +75,10 @@ describe Lti::Messages::DeepLinkingRequest do
       it 'sets the correct "auto_create"' do
         expect(subject['auto_create']).to eq false
       end
+
+      it 'sets the correct "accept_multiple"' do
+        expect(subject['accept_multiple']).to eq false
+      end
     end
 
     context 'when resource type is "assignment_selection"' do
@@ -102,6 +106,10 @@ describe Lti::Messages::DeepLinkingRequest do
       it 'sets the correct "auto_create"' do
         expect(subject['auto_create']).to eq false
       end
+
+      it 'sets the correct "accept_multiple"' do
+        expect(subject['accept_multiple']).to eq false
+      end
     end
 
     context 'when resource type is "homework_submission"' do
@@ -121,6 +129,10 @@ describe Lti::Messages::DeepLinkingRequest do
 
       it 'sets the correct "auto_create"' do
         expect(subject['auto_create']).to eq false
+      end
+
+      it 'sets the correct "accept_multiple"' do
+        expect(subject['accept_multiple']).to eq false
       end
     end
 
@@ -143,6 +155,10 @@ describe Lti::Messages::DeepLinkingRequest do
 
       it 'sets the correct "auto_create"' do
         expect(subject['auto_create']).to eq false
+      end
+
+      it 'sets the correct "accept_multiple"' do
+        expect(subject['accept_multiple']).to eq false
       end
     end
 
