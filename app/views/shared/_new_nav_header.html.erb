@@ -133,6 +133,20 @@
               <% end %>
               </a>
             </li>
+            <li class="menu-item ic-app-header__menu-list-item">
+              <% tutapoint_url = SettingsService.get_settings(object: 'school', id: 1)['tutapoint_url'] %>
+              <% if @current_user && tutapoint_url %>
+                <%= button_to tutapoint_url, params: { username: @current_user.pseudonym&.unique_id,
+                    last_name: @current_user.last_name, first_name: @current_user.first_name, email: @current_user.email },
+                  id: "tutapoint-btn", class: "btn-link", form: {target: '_blank'} do %>
+                      <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
+                        <%= svg_icon :educators %>
+                      </div>
+                  <div class="menu-item__text"><%= t('Tutapoint') %></div>
+                <% end %>
+              <% end %>
+              </a>
+            </li>
           </ul>
         <%end%>
       </div>
