@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require 'sharding_spec_helper'
 
 describe CoursesController do
   describe "GET 'index'" do
@@ -2926,6 +2926,26 @@ describe CoursesController do
       get 'content_share_users', params: {course_id: a1_course.id, search_term: 'account 2'}
       json = json_parse(response.body)
       expect(json.map{|user| user['name']}).not_to include('account 2 admin', 'account 2 teacher')
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should still have a functional query when user is from another shard" do
+        @shard1.activate do
+          @cs_user = User.create!
+        end
+        @course.enroll_teacher(@cs_user, :enrollment_state => "active")
+        user_session(@cs_user)
+
+        sql = nil
+        allow(Api).to receive(:paginate) do |scope, _controller, _url|
+          sql = scope.to_sql
+        end
+
+        get 'content_share_users', params: {course_id: @course.id, search_term: 'hiyo'}
+        expect(sql).to_not include(@shard1.name) # can't just check for success since the query can still work depending on test shard setup
+      end
     end
   end
 
