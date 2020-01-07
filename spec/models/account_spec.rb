@@ -1829,4 +1829,29 @@ describe Account do
       end
     end
   end
+
+  context '#destroy on sub accounts' do
+    before :once do
+      @root_account = Account.create!
+      @sub_account = @root_account.sub_accounts.create!
+    end
+
+    it 'wont let you destroy if there are active sub accounts' do
+      @sub_account.sub_accounts.create!
+      expect { @sub_account.destroy! }.to raise_error ActiveRecord::RecordInvalid
+    end
+
+    it 'wont let you destroy if there are active courses' do
+      @sub_account.courses.create!
+      expect { @sub_account.destroy! }.to raise_error ActiveRecord::RecordInvalid
+    end
+
+    it 'destroys associated account users' do
+      account_user1 = @sub_account.account_users.create!(user: User.create!)
+      account_user2 = @sub_account.account_users.create!(user: User.create!)
+      @sub_account.destroy!
+      expect(account_user1.reload.workflow_state).to eq 'deleted'
+      expect(account_user2.reload.workflow_state).to eq 'deleted'
+    end
+  end
 end
