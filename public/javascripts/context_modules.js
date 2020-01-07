@@ -392,7 +392,8 @@ import 'compiled/jquery.rails_flash_notifications'
         var moduleSelectOptions = [];
         $("#context_modules .context_module").each(function() {
           var id = $(this).attr('id').substring('context_module_'.length);
-          var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
+          var selector = '[aria-controls="context_module_content_' + id + '"]'
+          var name = $(selector).attr('title')
           moduleSelectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
         });
         $('#move_module_item_module_select').empty();
@@ -430,7 +431,8 @@ import 'compiled/jquery.rails_flash_notifications'
             return;
           }
           var id = $(this).attr('id').substring('context_module_'.length);
-          var name = $(this).children('.header').children('.collapse_module_link').children('.name').text();
+          var selector = '[aria-controls="context_module_content_' + id + '"]'
+          var name = $(selector).attr('title')
           selectOptions.push('<option value="' + id + '">' + htmlEscape(name) + '</option>');
         });
 
