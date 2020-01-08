@@ -21,7 +21,7 @@ import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-layout'
 import {Heading, List, Spinner, Text} from '@instructure/ui-elements'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
 export default function CoursesTray({courses, hasLoaded}) {
   return (
@@ -35,13 +35,9 @@ export default function CoursesTray({courses, hasLoaded}) {
           courses
             .map(course => (
               <List.Item key={course.id}>
-                <Button
-                  variant="link"
-                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
-                  href={`/courses/${course.id}`}
-                >
+                <Link isWithinText={false} href={`/courses/${course.id}`}>
                   {course.name}
-                </Button>
+                </Link>
                 {course.enrollment_term_id > 1 && (
                   <Text as="div" size="x-small" weight="light">
                     {course.term.name}
@@ -54,13 +50,9 @@ export default function CoursesTray({courses, hasLoaded}) {
                 <hr role="presentation" />
               </List.Item>,
               <List.Item key="all">
-                <Button
-                  variant="link"
-                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
-                  href="/courses"
-                >
+                <Link isWithinText={false} href="/courses">
                   {I18n.t('All Courses')}
-                </Button>
+                </Link>
               </List.Item>
             ])
         ) : (

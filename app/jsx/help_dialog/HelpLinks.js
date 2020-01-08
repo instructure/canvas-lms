@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, arrayOf, shape, string, func} from 'prop-types'
 import I18n from 'i18n!HelpLinks'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {List, Spinner, Text} from '@instructure/ui-elements'
 
 export default function HelpLinks({links, hasLoaded, onClick}) {
@@ -29,8 +29,8 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
         links
           .map((link, index) => (
             <List.Item key={`link-${index}`}>
-              <Button
-                variant="link"
+              <Link
+                isWithinText={false}
                 href={link.url}
                 target="_blank"
                 rel="noopener"
@@ -43,7 +43,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                 theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
               >
                 {link.text}
-              </Button>
+              </Link>
               {link.subtext && (
                 <Text as="div" size="small">
                   {link.subtext}
@@ -60,13 +60,12 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                   <hr role="presentation" />
                 </List.Item>,
                 <List.Item key="customize">
-                  <Button
-                    variant="link"
-                    theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                  <Link
+                    isWithinText={false}
                     href="/accounts/self/settings#custom_help_link_settings"
                   >
                     {I18n.t('Customize this menu')}
-                  </Button>
+                  </Link>
                 </List.Item>
               ]
           )
