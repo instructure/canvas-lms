@@ -387,6 +387,37 @@ describe GradeCalculator do
       expect(e.reload.computed_final_score).to equal 50.0
     end
 
+    context 'live events' do
+      let(:assignment) { @course.assignments.create!(title: 'Assignment #1', points_possible: 10) }
+
+      before do
+        # Enroll student into two sections
+        section = @course.course_sections.create!(name: 'Section #2')
+        course_with_student(active_all: true, course: @course, user: @student,
+                            section: section, allow_multiple_enrollments: true)
+        assignment.grade_student(@student, grade: '5', grader: @teacher)
+      end
+
+      it 'emits one live event per student' do
+        expect(Canvas::LiveEvents).to receive(:course_grade_change).exactly(1).times \
+          do |score, old_score_values, enrollment|
+          expect(enrollment.user_id).to eq(@student.id)
+          expect(enrollment.course_id).to eq(@course.id)
+          expect(score.current_score).to eq(60)
+          expect(old_score_values[:current_score]).to eq(50)
+          expect(old_score_values[:final_score]).to eq(50)
+        end
+
+        assignment.grade_student(@student, grade: '6', grader: @teacher)
+      end
+
+      it 'does not emit a live event if the course grade does not change' do
+        expect(Canvas::LiveEvents).to_not receive(:course_grade_change)
+        assignment.grade_student(@student, grade: '5', grader: @teacher)
+        GradeCalculator.new([@user.id], @course.id).compute_scores
+      end
+    end
+
     def two_groups_two_assignments(g1_weight, a1_possible, g2_weight, a2_possible)
       @group = @course.assignment_groups.create!(:name => "some group", :group_weight => g1_weight)
       @assignment = @group.assignments.build(:title => "some assignments", :points_possible => a1_possible)
