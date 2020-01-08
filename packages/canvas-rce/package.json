@@ -3,7 +3,7 @@
   "version": "5.0.1",
   "description": "A component wrapping canvas's common tinymce usage",
   "main": "lib/index.js",
-  "module": "lib/index.js",
+  "module": "lib/modules/index.js",
   "scripts": {
     "i18n:extract": "format-message extract \"src*/**/*.js\" -g underscored_crc32 -o locales/en.json",
     "integration-test": "nightwatch --env integration",

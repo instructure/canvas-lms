@@ -30,10 +30,10 @@ shell.rm('-rf', 'lib/')
 const npm_bin_path = shell.exec('npm bin').trim()
 
 shell.echo('Building CommonJS version')
-shell.exec(`NODE_ENV=transpile ${npm_bin_path}/babel --out-dir lib src`)
+shell.exec(`TRANSFORM_IMPORTS=1 ${npm_bin_path}/babel --out-dir lib src`)
 
 shell.echo('Building ES Modules version')
-shell.exec(`${npm_bin_path}/babel --out-dir lib/modules src`)
+shell.exec(`ES_MODULES=1 ${npm_bin_path}/babel --out-dir lib/modules src`)
 
 shell.echo(`building pretranslated output in lib/translated in mulitple processes`)
 getTranslationList('canvas-rce')
