@@ -19,7 +19,7 @@
  */
 
 def isMerge () {
-  return env.GERRIT_EVENT_TYPE == 'change-merged'
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : ''
 }
 
 def getImageTagVersion() {
@@ -35,7 +35,7 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
-
+    COVERAGE = isMerge()
     NAME = getImageTagVersion()
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
@@ -44,7 +44,6 @@ pipeline {
       steps {
         timeout(time: 2) {
           sh 'build/new-jenkins/docker-cleanup.sh'
-          sh 'rm -rf ./tmp'
         }
       }
     }
@@ -56,37 +55,38 @@ pipeline {
           sh 'printenv | sort'
           sh 'build/new-jenkins/docker-compose-pull.sh'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
+          sh 'rm -rf ./tmp/*'
         }
       }
     }
     stage('Tests') {
-      environment {
-        COVERAGE = isMerge()
-      }
       parallel {
         stage('Jest') {
+          environment {
+            CONTAINER_NAME = 'tests-jest'
+          }
           steps {
             sh 'build/new-jenkins/js/tests-jest.sh'
           }
           post {
-              always {
-                sh 'mkdir -p ./tmp/jest'
-                sh 'docker cp $(docker ps -qa -f name=tests-jest):/usr/src/app/coverage-js ./tmp/jest'
-                sh 'ls -R ./tmp/jest | grep ".xml"'
-              }
+            always {
+              sh 'mkdir -p ./tmp/$CONTAINER_NAME'
+              sh 'docker cp $CONTAINER_NAME:/usr/src/app/coverage-js ./tmp/$CONTAINER_NAME/coverage-js'
+            }
           }
         }
         stage('Packages') {
+          environment {
+            CONTAINER_NAME = 'tests-packages'
+          }
           steps {
             sh 'build/new-jenkins/js/tests-packages.sh'
-
           }
           post {
-              always {
-                sh 'mkdir -p ./tmp/packages'
-                sh 'docker cp $(docker ps -qa -f name=tests-packages):/usr/src/app/packages ./tmp/packages/'
-                sh 'ls -R ./tmp/packages | grep ".xml"'
-              }
+            always {
+              sh 'mkdir -p ./tmp/$CONTAINER_NAME'
+              sh 'docker cp $CONTAINER_NAME:/usr/src/app/packages ./tmp/$CONTAINER_NAME/packages'
+            }
           }
         }
         stage('canvas_quizzes') {
@@ -97,65 +97,61 @@ pipeline {
         stage('Karma - Spec Group - coffee') {
           environment {
             JSPEC_GROUP = 'coffee'
+            CONTAINER_NAME = 'tests-karma-coffee'
           }
           steps {
             sh 'build/new-jenkins/js/tests-karma.sh'
-
           }
           post {
-              always {
-                sh 'mkdir -p ./tmp/$JSPEC_GROUP'
-                sh 'docker cp $(docker ps -qa -f name=$JSPEC_GROUP):/usr/src/app/coverage-js ./tmp/$JSPEC_GROUP'
-                sh 'ls -R ./tmp/$JSPEC_GROUP | grep ".xml"'
-              }
+            always {
+              sh 'mkdir -p ./tmp/$CONTAINER_NAME'
+              sh 'docker cp $CONTAINER_NAME:/usr/src/app/coverage-js ./tmp/$CONTAINER_NAME/coverage-js'
+            }
           }
         }
         stage('Karma - Spec Group - jsa - A-F') {
           environment {
             JSPEC_GROUP = 'jsa'
+            CONTAINER_NAME = 'tests-karma-jsa'
           }
           steps {
             sh 'build/new-jenkins/js/tests-karma.sh'
-
           }
           post {
-              always {
-                sh 'mkdir -p ./tmp/$JSPEC_GROUP'
-                sh 'docker cp $(docker ps -qa -f name=$JSPEC_GROUP):/usr/src/app/coverage-js ./tmp/$JSPEC_GROUP'
-                sh 'ls -R ./tmp/$JSPEC_GROUP | grep ".xml"'
-              }
+            always {
+              sh 'mkdir -p ./tmp/$CONTAINER_NAME'
+              sh 'docker cp $CONTAINER_NAME:/usr/src/app/coverage-js ./tmp/$CONTAINER_NAME/coverage-js'
+            }
           }
         }
         stage('Karma - Spec Group - jsg - G') {
           environment {
             JSPEC_GROUP = 'jsg'
+            CONTAINER_NAME = 'tests-karma-jsg'
           }
           steps {
             sh 'build/new-jenkins/js/tests-karma.sh'
-
           }
           post {
-              always {
-                sh 'mkdir -p ./tmp/$JSPEC_GROUP'
-                sh 'docker cp $(docker ps -qa -f name=$JSPEC_GROUP):/usr/src/app/coverage-js ./tmp/$JSPEC_GROUP'
-                sh 'ls -R ./tmp/$JSPEC_GROUP | grep ".xml"'
-              }
+            always {
+              sh 'mkdir -p ./tmp/$CONTAINER_NAME'
+              sh 'docker cp $CONTAINER_NAME:/usr/src/app/coverage-js ./tmp/$CONTAINER_NAME/coverage-js'
+            }
           }
         }
         stage('Karma - Spec Group - jsh - H-Z') {
           environment {
             JSPEC_GROUP = 'jsh'
+            CONTAINER_NAME = 'tests-karma-jsh'
           }
           steps {
             sh 'build/new-jenkins/js/tests-karma.sh'
-
           }
           post {
-              always {
-                sh 'mkdir -p ./tmp/$JSPEC_GROUP'
-                sh 'docker cp $(docker ps -qa -f name=$JSPEC_GROUP):/usr/src/app/coverage-js ./tmp/$JSPEC_GROUP'
-                sh 'ls -R ./tmp/$JSPEC_GROUP | grep ".xml"'
-              }
+            always {
+              sh 'mkdir -p ./tmp/$CONTAINER_NAME'
+              sh 'docker cp $CONTAINER_NAME:/usr/src/app/coverage-js ./tmp/$CONTAINER_NAME/coverage-js'
+            }
           }
         }
       }
@@ -164,7 +160,8 @@ pipeline {
   post {
     always {
       script {
-        junit allowEmptyResults: true, testResults: '**/coverage/*.xml,**/coverage-js/**/*.xml'
+        junit allowEmptyResults: true, testResults: '**/*.xml'
+        sh 'find ./tmp -path "*.xml"'
       }
     }
     cleanup {

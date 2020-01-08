@@ -2,4 +2,6 @@
 
 set -x -o errexit -o errtrace -o nounset -o pipefail
 
-docker-compose run --name tests-packages -e COVERAGE web yarn test:packages
+CONTAINER_NAME=${CONTAINER_NAME:-tests-packages}
+
+docker-compose run --name $CONTAINER_NAME -e COVERAGE web yarn test:packages
