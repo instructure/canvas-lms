@@ -70,6 +70,7 @@ export default class SubmissionTrayRadioInput extends React.Component {
 
   constructor(props) {
     super(props)
+
     const interval = props.latePolicy.lateSubmissionInterval
     this.numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
     this.numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)')
@@ -78,8 +79,19 @@ export default class SubmissionTrayRadioInput extends React.Component {
     })
 
     this.state = {
-      showNumberInput: props.value === 'late' && props.checked,
       numberInputValue: defaultDurationLate(interval, props.submission.secondsLate)
+    }
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const idOf = submission => submission && submission.id
+    const submissionHasChanged = idOf(this.props.submission) !== idOf(nextProps.submission)
+
+    if (nextProps.submission && submissionHasChanged) {
+      const interval = nextProps.latePolicy.lateSubmissionInterval
+      this.setState({
+        numberInputValue: defaultDurationLate(interval, nextProps.submission.secondsLate)
+      })
     }
   }
 
@@ -110,17 +122,15 @@ export default class SubmissionTrayRadioInput extends React.Component {
   }
 
   handleRadioInputChange = event => {
-    if (this.props.value === 'late') {
-      this.setState({showNumberInput: event.target.checked})
-    }
     this.props.onChange(event)
   }
 
   render() {
     const {
-      props: {color},
-      state: {showNumberInput}
+      props: {color}
     } = this
+
+    const showNumberInput = this.props.checked && this.props.value === 'late'
 
     return (
       <div className={this.radioInputClasses} style={styles({color, showNumberInput})}>
