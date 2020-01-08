@@ -298,7 +298,7 @@ class MediaObject < ActiveRecord::Base
   def ensure_attachment
     return if self.attachment_id
     sources = self.media_sources
-    return unless sources&.length
+    return unless sources.present?
 
     attachment = build_attachment({
       "context" => context,

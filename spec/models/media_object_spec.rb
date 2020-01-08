@@ -268,6 +268,14 @@ describe MediaObject do
       mo.retrieve_details
       expect(mo.media_type).to eql("")
     end
+
+    it "doesn't create the attachment until media_sources exist" do
+      allow(@mock_kaltura).to receive(:media_sources).and_return([])
+      mo = @media_object
+      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+      att = Attachment.where(:media_entry_id => mo[:media_id])
+      expect(att).to be_empty
+    end
   end
 
   describe ".guaranteed_title" do
