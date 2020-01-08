@@ -2099,8 +2099,10 @@ export default do ->
           submission = @getSubmission(studentId, assignment.id)
           # Ignore anonymous assignments when deciding whether to show the
           # "hidden" icon, as including them could reveal which students have
-          # and have not been graded
-          submission? && isPostable(submission) && !assignment.anonymize_students
+          # and have not been graded.
+          # Ignore 'not_graded' assignments as they are not counted into the
+          # student's grade, nor are they visible in the Gradebook.
+          submission? && isPostable(submission) && !assignment.anonymize_students && assignment.grading_type != 'not_graded'
         )
       else
         @filteredContentInfo.mutedAssignments
