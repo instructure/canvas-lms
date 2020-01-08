@@ -65,7 +65,7 @@ module Context
       user = entry.user || feed.user
       # If already existed and has been updated
       if entry.entry_changed? && entry.asset
-        entry.asset.update_attributes(
+        entry.asset.update(
           :title => entry.title,
           :message => entry.message
         )
@@ -77,7 +77,7 @@ module Context
         announcement.external_feed_id = feed.id
         announcement.user = user
         announcement.save
-        entry.update_attributes(:asset => announcement)
+        entry.update(:asset => announcement)
       end
     end
   end

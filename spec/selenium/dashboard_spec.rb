@@ -188,7 +188,7 @@ describe "dashboard" do
       # appointment group publish notification and signup notification
       appointment_participant_model(:course => @course, :participant => @group, :updating_user => @other_student)
       # appointment group update notification
-      @appointment_group.update_attributes(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
+      @appointment_group.update(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
 
       get "/"
       expect(ffj(".topic_message .communication_message.dashboard_notification").size).to eq 3
@@ -200,7 +200,7 @@ describe "dashboard" do
 
     describe "course menu" do
       before do
-        @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
+        @course.update(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
         Enrollment.update_all(:created_at => 1.minute.ago)
         get "/"
       end
@@ -347,7 +347,7 @@ describe "dashboard" do
       term.save!
       c1 = @course
       c1.name = 'a_soft_concluded_course'
-      c1.update_attributes!(:enrollment_term => term)
+      c1.update!(:enrollment_term => term)
       c1.reload
       get "/courses"
       expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
@@ -380,13 +380,13 @@ describe "dashboard" do
         course_with_student(:active_all => true)
         @c1 = @course
         @c1.name = 'a future course'
-        @c1.update_attributes!(:enrollment_term => term)
+        @c1.update!(:enrollment_term => term)
 
         course_with_student(:active_course => true, :user => @student)
         @c2 = @course
         @c2.name = "a restricted future course"
         @c2.restrict_student_future_view = true
-        @c2.update_attributes!(:enrollment_term => term)
+        @c2.update!(:enrollment_term => term)
       end
 
       before do

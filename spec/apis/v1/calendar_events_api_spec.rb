@@ -53,7 +53,7 @@ describe CalendarEventsApiController, type: :request do
     it 'should hide location attributes when user is not logged in a public course' do
       @me = nil
       @user = nil
-      @course.update_attributes(:is_public => true, :indexed => true)
+      @course.update(:is_public => true, :indexed => true)
       @course.calendar_events.create(
         :title => '2',
         :start_at => '2012-01-08 12:00:00',
@@ -69,7 +69,7 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it 'should show location attributes when user logged in a public course' do
-      @course.update_attributes(:is_public => true, :indexed => true)
+      @course.update(:is_public => true, :indexed => true)
       evt = @course.calendar_events.create(
         :title => '2',
         :start_at => '2012-01-08 12:00:00',
@@ -136,7 +136,7 @@ describe CalendarEventsApiController, type: :request do
         @e2 = @user.calendar_events.create!(:title => "today in AKST", :start_at => @akst.parse('2012-01-29 21:00:00')) { |c| c.context = @user }
         @e3 = @user.calendar_events.create!(:title => "tomorrow in AKST", :start_at => @akst.parse('2012-01-30 21:00:00')) { |c| c.context = @user }
 
-        @user.update_attributes! :time_zone => "Alaska"
+        @user.update! :time_zone => "Alaska"
       end
 
       it "shows today's events in user's timezone, even if UTC has crossed into tomorrow" do

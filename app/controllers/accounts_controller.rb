@@ -779,7 +779,7 @@ class AccountsController < ApplicationController
         render :json => @account.errors, :status => :unauthorized
       else
         success = @account.errors.empty?
-        success &&= @account.update_attributes(account_settings.merge(quota_settings)) rescue false
+        success &&= @account.update(account_settings.merge(quota_settings)) rescue false
 
         if success
           # Successfully completed
@@ -984,7 +984,7 @@ class AccountsController < ApplicationController
         # Set default Dashboard view
         set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
 
-        if @account.update_attributes(strong_account_params)
+        if @account.update(strong_account_params)
           update_user_dashboards
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account }

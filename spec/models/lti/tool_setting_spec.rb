@@ -71,11 +71,11 @@ module Lti
       let(:tool_setting) { subject }
 
       before do
-        message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
+        message_handler.update(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
         resource_handler.message_handlers = [message_handler]
         resource_handler.save!
 
-        tool_setting.update_attributes(resource_type_code: resource_handler.resource_type_code,
+        tool_setting.update(resource_type_code: resource_handler.resource_type_code,
                                        product_code: product_family.product_code,
                                        vendor_code: product_family.vendor_code)
       end

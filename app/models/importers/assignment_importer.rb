@@ -98,7 +98,7 @@ module Importers
         context: assignment.course
       )
 
-      tool_setting.update_attributes!(
+      tool_setting.update!(
         custom: ts_custom,
         custom_parameters: ts_custom_params,
         vendor_code: ts_vendor_code,

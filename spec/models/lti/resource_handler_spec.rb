@@ -47,8 +47,8 @@ module Lti
       let(:message_type) { 'custom-message-type' }
 
       before do
-        message_handler.update_attributes(message_type: message_type)
-        resource_handler.update_attributes(message_handlers: [message_handler])
+        message_handler.update(message_type: message_type)
+        resource_handler.update(message_handlers: [message_handler])
       end
 
       it 'returns the message handler with the specified type' do
@@ -56,13 +56,13 @@ module Lti
       end
 
       it 'does not return messages with a different type' do
-        message_handler.update_attributes(message_type: 'different-type')
+        message_handler.update(message_type: 'different-type')
         expect(resource_handler.find_message_by_type(message_type)).to be_nil
       end
     end
 
     describe '#self.by_product_family' do
-      before { resource_handler.update_attributes(tool_proxy: tool_proxy) }
+      before { resource_handler.update(tool_proxy: tool_proxy) }
 
       it 'returns resource handlers with specified product family and context' do
         resource_handlers = ResourceHandler.by_product_family([product_family], tool_proxy.context)
@@ -71,7 +71,7 @@ module Lti
 
       it 'does not return resource handlers with different product family' do
         pf = product_family.dup
-        pf.update_attributes(product_code: SecureRandom.uuid)
+        pf.update(product_code: SecureRandom.uuid)
         resource_handlers = ResourceHandler.by_product_family([pf], tool_proxy.context)
         expect(resource_handlers).not_to include resource_handler
       end

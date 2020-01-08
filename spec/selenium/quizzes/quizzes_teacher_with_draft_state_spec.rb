@@ -26,7 +26,7 @@ describe 'quizzes with draft state' do
 
   before(:each) do
     course_with_teacher_logged_in
-    @course.update_attributes(name: 'teacher course')
+    @course.update(name: 'teacher course')
     @course.save!
     @course.reload
     create_quiz_with_due_date

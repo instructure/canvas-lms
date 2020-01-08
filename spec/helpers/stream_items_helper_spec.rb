@@ -72,7 +72,7 @@ describe StreamItemsHelper do
       @group_assignment_discussion = group_assignment_discussion({ :course => @course })
       @group_assignment_discussion.update_attribute(:user, @teacher)
       assignment = @group_assignment_discussion.assignment
-      assignment.update_attributes({
+      assignment.update({
         :due_at => 30.days.from_now,
         :lock_at => 30.days.from_now,
         :unlock_at => 20.days.from_now

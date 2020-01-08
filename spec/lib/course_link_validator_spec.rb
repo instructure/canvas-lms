@@ -428,13 +428,13 @@ describe CourseLinkValidator do
       @assignment.unpublish!
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :unpublished_item
 
-      quiz_model(course: @course).update_attributes(workflow_state: 'created')
+      quiz_model(course: @course).update(workflow_state: 'created')
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq :unpublished_item
 
       quiz_model(course: @course).unpublish!
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq :unpublished_item
 
-      attachment_model(context: @course).update_attributes(locked: true)
+      attachment_model(context: @course).update(locked: true)
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :unpublished_item
     end
 

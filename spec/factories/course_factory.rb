@@ -124,7 +124,7 @@ module Factories
     submission_count.times do |s|
       assignment = @course.assignments.create!(:title => "test #{s} assignment")
       submission = assignment.submissions.find_by!(user: @student)
-      submission.update_attributes!(score: '5') if opts[:submission_points]
+      submission.update!(score: '5') if opts[:submission_points]
     end
   end
 

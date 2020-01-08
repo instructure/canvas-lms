@@ -43,7 +43,7 @@ describe "submissions" do
     end
 
     it "should let a student submit a text entry", priority: "1", test_id: 56015 do
-      @assignment.update_attributes(submission_types: "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       wait_for_new_page_load { f(".submit_assignment_link").click }
@@ -55,7 +55,7 @@ describe "submissions" do
     end
 
     it "should not let a student submit a text entry with no text entered", priority: "2", test_id: 238143 do
-      @assignment.update_attributes(submission_types: "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       wait_for_new_page_load { f(".submit_assignment_link").click }
@@ -68,7 +68,7 @@ describe "submissions" do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
-      @assignment.update_attributes(:submission_types => "online_text_entry")
+      @assignment.update(:submission_types => "online_text_entry")
       @assignment.grade_student(@student, grade: "0", grader: @teacher)
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -78,7 +78,7 @@ describe "submissions" do
     end
 
     it "should not allow blank submissions for text entry", priority: "1", test_id: 237026 do
-      @assignment.update_attributes(:submission_types => "online_text_entry")
+      @assignment.update(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
       assignment_form = f('#submit_online_text_entry_form')

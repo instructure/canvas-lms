@@ -570,7 +570,7 @@ describe GradebookExporter do
   context "with weighted assignment groups" do
     before(:once) do
       student_in_course active_all: true
-      @course.update_attributes(group_weighting_scheme: 'percent')
+      @course.update(group_weighting_scheme: 'percent')
 
       first_group = @course.assignment_groups.create!(name: "First Group", group_weight: 0.5)
       @course.assignment_groups.create!(name: "Second Group", group_weight: 0.5)

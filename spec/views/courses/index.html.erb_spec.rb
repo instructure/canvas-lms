@@ -48,7 +48,7 @@ describe "/courses/index" do
     term = EnrollmentTerm.new(:name => "term", :start_at => 1.week.from_now, :end_at => 1.month.from_now)
     course_with_student
     @course.restrict_student_future_view = true
-    @course.update_attributes!(:enrollment_term => term)
+    @course.update!(:enrollment_term => term)
 
     group_with_user(:user => @user, :group_context => @course)
     view_context

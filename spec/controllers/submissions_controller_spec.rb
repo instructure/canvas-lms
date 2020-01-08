@@ -782,7 +782,7 @@ describe SubmissionsController do
 
       it 'can use attempt number to find the report url for text entry submissions' do
         originality_report2 # Create immediately
-        originality_report.update_attributes!(attachment: nil)
+        originality_report.update!(attachment: nil)
         expect(submission2.id).to eq(submission.id) # submission2 is updated/reloaded with new version (last attempt number)
         expect(submission2.attempt).to be > submission.attempt
         get 'originality_report', params: {

@@ -500,7 +500,7 @@ describe AssignmentGroupsController do
         Factories::GradingPeriodHelper.new.create_for_group(group, {
           start_date: 2.days.ago, end_date: 2.days.from_now, close_date: 3.days.from_now
         })
-        @assignment1.update_attributes(due_at: 1.week.ago)
+        @assignment1.update(due_at: 1.week.ago)
       end
 
       it 'does not allow assignments in closed grading periods to be moved into different assignment groups' do

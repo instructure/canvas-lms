@@ -581,7 +581,7 @@ class GroupsController < ApplicationController
       end
       respond_to do |format|
         @group.transaction do
-          @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+          @group.update(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
           if attrs[:members]
             user_ids = Api.value_to_array(attrs[:members]).map(&:to_i).uniq
             if @group.context

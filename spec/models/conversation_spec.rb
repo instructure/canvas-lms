@@ -281,7 +281,7 @@ describe Conversation do
         @subscribed_guy.conversations.first.update_attribute(:workflow_state, "read")
         expect(@subscribed_guy.reload.unread_conversations_count).to eql 0
         expect(@subscribed_guy.conversations.unread.size).to eql 0
-        @unsubscribed_guy.conversations.first.update_attributes(:subscribed => false)
+        @unsubscribed_guy.conversations.first.update(:subscribed => false)
         expect(@unsubscribed_guy.reload.unread_conversations_count).to eql 0
         expect(@unsubscribed_guy.conversations.unread.size).to eql 0
 
@@ -361,11 +361,11 @@ describe Conversation do
       expect(subscription_guy.reload.unread_conversations_count).to eql 1
       expect(subscription_guy.conversations.unread.size).to eql 1
 
-      subscription_guy.conversations.first.update_attributes(:subscribed => false)
+      subscription_guy.conversations.first.update(:subscribed => false)
       expect(subscription_guy.reload.unread_conversations_count).to eql 0
       expect(subscription_guy.conversations.unread.size).to eql 0
 
-      archive_guy.conversations.first.update_attributes(:workflow_state => "archived", :subscribed => false)
+      archive_guy.conversations.first.update(:workflow_state => "archived", :subscribed => false)
       expect(archive_guy.conversations.archived.size).to eql 1
     end
 
@@ -376,23 +376,23 @@ describe Conversation do
       root_convo = Conversation.initiate([sender, flip_flopper_guy, archive_guy, subscription_guy], false)
       root_convo.add_message(sender, 'test')
 
-      flip_flopper_guy.conversations.first.update_attributes(:subscribed => false)
+      flip_flopper_guy.conversations.first.update(:subscribed => false)
       expect(flip_flopper_guy.reload.unread_conversations_count).to eql 0
       expect(flip_flopper_guy.conversations.unread.size).to eql 0
       # no new messages in the interim, he should stay "marked-as-read"
-      flip_flopper_guy.conversations.first.update_attributes(:subscribed => true)
+      flip_flopper_guy.conversations.first.update(:subscribed => true)
       expect(flip_flopper_guy.reload.unread_conversations_count).to eql 0
       expect(flip_flopper_guy.conversations.unread.size).to eql 0
 
-      subscription_guy.conversations.first.update_attributes(:subscribed => false)
-      archive_guy.conversations.first.update_attributes(:workflow_state => "archived", :subscribed => false)
+      subscription_guy.conversations.first.update(:subscribed => false)
+      archive_guy.conversations.first.update(:workflow_state => "archived", :subscribed => false)
 
       message = root_convo.add_message(sender, 'you wish you were subscribed!')
       message.update_attribute(:created_at, Time.now.utc + 1.minute)
       last_message_at = message.reload.created_at
 
-      subscription_guy.conversations.first.update_attributes(:subscribed => true)
-      archive_guy.conversations.first.update_attributes(:subscribed => true)
+      subscription_guy.conversations.first.update(:subscribed => true)
+      archive_guy.conversations.first.update(:subscribed => true)
 
       expect(subscription_guy.reload.unread_conversations_count).to eql 1
       expect(subscription_guy.conversations.unread.size).to eql 1
@@ -521,7 +521,7 @@ describe Conversation do
       recipient = recipients.last
       rconvo = recipient.conversations.first
       expect(rconvo.unread?).to be_truthy
-      rconvo.update_attributes(:subscribed => false)
+      rconvo.update(:subscribed => false)
       expect(rconvo.unread?).to be_falsey
 
       convo = sender.conversations.first
@@ -529,7 +529,7 @@ describe Conversation do
       message.update_attribute(:created_at, Time.now.utc + 1.minute)
 
       expect(rconvo.reload.unread?).to be_falsey
-      rconvo.update_attributes(:subscribed => true)
+      rconvo.update(:subscribed => true)
       expect(rconvo.unread?).to be_truthy
     end
 

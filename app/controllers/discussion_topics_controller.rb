@@ -1216,7 +1216,7 @@ class DiscussionTopicsController < ApplicationController
             @topic.assignment = nil
           end
         end
-        @topic.update_attributes(discussion_topic_hash)
+        @topic.update(discussion_topic_hash)
         @topic.root_topic.try(:save)
       end
       if !@topic.errors.any? && !@topic.root_topic.try(:errors).try(:any?)

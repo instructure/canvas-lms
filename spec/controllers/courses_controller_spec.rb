@@ -129,7 +129,7 @@ describe CoursesController do
         inactive_enroll = @course.enroll_student(@student, :section => section2, :allow_multiple_enrollments => true)
         inactive_enroll.deactivate
 
-        @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
+        @course.update(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
 
         user_session(@student)
 
@@ -206,13 +206,13 @@ describe CoursesController do
 
         # section date in past
         course1 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.from_now
-        course1.default_section.update_attributes(:end_at => 1.month.ago)
+        course1.default_section.update(:end_at => 1.month.ago)
         course1.offer!
         enrollment1 = course_with_student course: course1, user: @student, active_all: true
 
         # by section date, in future
         course2 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago
-        course2.default_section.update_attributes(:end_at => 1.month.from_now)
+        course2.default_section.update(:end_at => 1.month.from_now)
         course2.offer!
         enrollment2 = course_with_student course: course2, user: @student, active_all: true
 
@@ -790,9 +790,9 @@ describe CoursesController do
     it "should accept an enrollment for a restricted by dates course" do
       course_with_student_logged_in(:active_all => true)
 
-      @course.update_attributes(:restrict_enrollments_to_course_dates => true,
+      @course.update(:restrict_enrollments_to_course_dates => true,
                                 :start_at => Time.now + 2.weeks)
-      @enrollment.update_attributes(:workflow_state => 'invited', last_activity_at: nil)
+      @enrollment.update(:workflow_state => 'invited', last_activity_at: nil)
 
       post 'enrollment_invitation', params: {:course_id => @course.id, :accept => '1',
         :invitation => @enrollment.uuid}

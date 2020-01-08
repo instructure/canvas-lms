@@ -135,7 +135,7 @@ describe Lti::Messages::ResourceLinkRequest do
       let(:api_message) { 'Assignment not configured for external tool launches' }
 
       before do
-        assignment.update_attributes!(submission_types: 'none')
+        assignment.update!(submission_types: 'none')
       end
 
       it_behaves_like 'launch error check'
@@ -157,7 +157,7 @@ describe Lti::Messages::ResourceLinkRequest do
         let(:api_message) { 'Assignment not configured for launches with specified tool' }
 
         before do
-          assignment.update_attributes!(external_tool_tag_attributes: { content: different_tool })
+          assignment.update!(external_tool_tag_attributes: { content: different_tool })
         end
 
         it_behaves_like 'launch error check'
@@ -167,7 +167,7 @@ describe Lti::Messages::ResourceLinkRequest do
         let(:api_message) { 'Mismatched assignment vs resource link tool configurations' }
 
         before do
-          assignment.line_items.find(&:assignment_line_item?).resource_link.update_attributes!(context_external_tool: different_tool)
+          assignment.line_items.find(&:assignment_line_item?).resource_link.update!(context_external_tool: different_tool)
         end
 
         it_behaves_like 'launch error check'

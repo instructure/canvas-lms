@@ -38,7 +38,7 @@ describe "gradebook" do
     end
 
     it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419288 do
-      @assignment.update_attributes(points_possible: 1)
+      @assignment.update(points_possible: 1)
       get "/courses/#{@course.id}/gradebook"
       expect(f('button.gradebook-checkbox.gradebook-checkbox-pass')).to include_text('pass')
     end

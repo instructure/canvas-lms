@@ -166,7 +166,7 @@ describe Quizzes::QuizSubmission do
 
       context 'on a graded_survey' do
         it "should award all points for a graded_survey" do
-          @quiz.update_attributes(points_possible: 42, quiz_type: 'graded_survey')
+          @quiz.update(points_possible: 42, quiz_type: 'graded_survey')
 
           qs = @quiz.generate_submission(@student)
           qs.submission_data = { "question_1" => "wrong" }
@@ -500,19 +500,19 @@ describe Quizzes::QuizSubmission do
       expect(s.version_number).to eql(2)
       expect(s.kept_score).to eql(4.0)
 
-      q.update_attributes!(:scoring_policy => "keep_highest")
+      q.update!(:scoring_policy => "keep_highest")
       s.reload
       s.score = 3.0
       s.attempt = 3
       s.with_versioning(true, &:save!)
       expect(s.kept_score).to eql(5.0)
 
-      q.update_attributes!(scoring_policy: "keep_average")
+      q.update!(scoring_policy: "keep_average")
       s.reload
       s.with_versioning(true, &:save!)
       expect(s.kept_score).to eql(4.0)
 
-      q.update_attributes!(:scoring_policy => "keep_highest")
+      q.update!(:scoring_policy => "keep_highest")
       s.update_scores(:submission_version_number => 2, :fudge_points => 6.0)
       expect(s.kept_score).to eql(6.0)
     end
@@ -1437,7 +1437,7 @@ describe Quizzes::QuizSubmission do
       submission_data = { 'question_1' => 'Hello' }
       survey_with_submission(questions) { submission_data }
       teacher_in_course(course: @course, active_all: true)
-      @quiz.update_attributes(points_possible: 15, quiz_type: 'graded_survey')
+      @quiz.update(points_possible: 15, quiz_type: 'graded_survey')
       Quizzes::SubmissionGrader.new(@quiz_submission.reload).grade_submission
 
       expect(@quiz_submission).to be_completed

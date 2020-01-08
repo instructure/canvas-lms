@@ -136,7 +136,7 @@ describe UsersController, type: :request do
   end
 
   it 'should not crash when mixing items with/without due dates (users controller)' do
-    @a2.update_attributes(due_at: nil)
+    @a2.update(due_at: nil)
     api_call(:get, "/api/v1/users/self/todo",
              controller: "users", action: "todo_items", format: "json")
     expect(response).to be_successful
@@ -144,7 +144,7 @@ describe UsersController, type: :request do
 
   it 'should not crash when mixing items with/without due dates (courses controller)' do
     @teacher_course.enroll_student(@teacher).accept!
-    @a2.update_attributes(due_at: nil)
+    @a2.update(due_at: nil)
     Assignment.create!(context: @teacher_course, due_at: 1.day.from_now, title: 'text', submission_types: 'online_text_entry', points_possible: 15)
     api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
              controller: "courses", action: "todo_items",

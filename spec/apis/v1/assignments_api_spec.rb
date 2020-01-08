@@ -1757,7 +1757,7 @@ describe AssignmentsApiController, type: :request do
       let(:course) { Course.create!(name: 'test course', account: account) }
       let(:teacher) { teacher_in_course(course: course) }
 
-      before { account.update_attributes(root_account: root_account) }
+      before { account.update(root_account: root_account) }
 
       it "checks for tool installation in entire account chain" do
         user_session teacher
@@ -1845,7 +1845,7 @@ describe AssignmentsApiController, type: :request do
           let(:context) { raise 'Override in spec' }
 
           it 'sets the tool correctly' do
-            tool_proxy.update_attributes(context: context)
+            tool_proxy.update(context: context)
             allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
             Lti::ToolProxyBinding.create(context: context, tool_proxy: tool_proxy)
             api_create_assignment_in_course(

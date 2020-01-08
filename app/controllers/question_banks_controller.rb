@@ -134,7 +134,7 @@ class QuestionBanksController < ApplicationController
   def update
     @bank = @context.assessment_question_banks.find(params[:id])
     if authorized_action(@bank, @current_user, :update)
-      if @bank.update_attributes(bank_params)
+      if @bank.update(bank_params)
         @bank.reload
         render :json => @bank.as_json(:include => {:learning_outcome_alignments => {:include => {:learning_outcome => {:include_root => false}}}})
       else

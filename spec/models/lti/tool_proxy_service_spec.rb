@@ -426,7 +426,7 @@ module Lti
       let(:assignment) { course.assignments.create!(name: 'banana') }
       let(:assignment_two) do
         assignment_two = assignment.dup
-        assignment_two.update_attributes(lti_context_id: SecureRandom.uuid)
+        assignment_two.update(lti_context_id: SecureRandom.uuid)
         assignment_two
       end
       let(:subscription_id) { SecureRandom.uuid }

@@ -61,7 +61,7 @@ describe "assignments" do
     it "should not show submission data when muted" do
       assignment = @course.assignments.create!(:title => 'test assignment', :name => 'test assignment')
 
-      assignment.update_attributes(:submission_types => "online_url,online_upload")
+      assignment.update(:submission_types => "online_url,online_upload")
       submission = assignment.submit_homework(@student)
       submission.submission_type = "online_url"
       submission.save!
@@ -136,7 +136,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{locked_assignment.id}"
       expect(f('#content')).to include_text(format_date_for_view(unlock_time))
-      locked_assignment.update_attributes(:unlock_at => Time.now)
+      locked_assignment.update(:unlock_at => Time.now)
       refresh_page # to show the updated assignment
       expect(f('#content')).not_to include_text('This assignment is locked until')
     end
@@ -147,7 +147,7 @@ describe "assignments" do
       wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
       wait_for_ajaximations
       expect(f("#assignment_group_past #assignment_#{due_date_assignment.id}")).to be_displayed
-      due_date_assignment.update_attributes(:due_at => 2.days.from_now)
+      due_date_assignment.update(:due_at => 2.days.from_now)
       refresh_page # to show the updated assignment
       expect(f("#assignment_group_upcoming #assignment_#{due_date_assignment.id}")).to be_displayed
     end
@@ -187,7 +187,7 @@ describe "assignments" do
       end
 
       it "should allow submission when within override locks" do
-        @assignment.update_attributes(:submission_types => 'online_text_entry')
+        @assignment.update(:submission_types => 'online_text_entry')
         # Change unlock dates to be valid for submission
         @override.unlock_at = Time.now.utc - 1.days   # available now
         @override.save!
@@ -216,7 +216,7 @@ describe "assignments" do
       end
 
       it "should expand the comments box on click" do
-        @assignment.update_attributes(:submission_types => 'online_upload')
+        @assignment.update(:submission_types => 'online_upload')
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -231,7 +231,7 @@ describe "assignments" do
       it "should validate file upload restrictions" do
         filename_txt, fullpath_txt, data_txt, tempfile_txt = get_file("testfile4.txt")
         filename_zip, fullpath_zip, data_zip, tempfile_zip = get_file("testfile5.zip")
-        @assignment.update_attributes(:submission_types => 'online_upload', :allowed_extensions => '.txt')
+        @assignment.update(:submission_types => 'online_upload', :allowed_extensions => '.txt')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
 
@@ -259,7 +259,7 @@ describe "assignments" do
       end
 
       it "should have a google doc tab if google docs is enabled", priority: "1", test_id: 161884 do
-        @assignment.update_attributes(:submission_types => 'online_upload')
+        @assignment.update(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
         wait_for_animations
@@ -282,7 +282,7 @@ describe "assignments" do
           allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
 
           # create assignment
-          @assignment.update_attributes(:submission_types => 'online_upload')
+          @assignment.update(:submission_types => 'online_upload')
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           f('.submit_assignment_link').click
           f("a[href*='submit_google_doc_form']").click
@@ -313,7 +313,7 @@ describe "assignments" do
         allow(google_drive_connection).to receive(:authorized?).and_return(nil)
         allow_any_instance_of(ApplicationController).to receive(:google_drive_connection).and_return(google_drive_connection)
 
-        @assignment.update_attributes(:submission_types => 'online_upload')
+        @assignment.update(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
         f("a[href*='submit_google_doc_form']").click

@@ -79,7 +79,7 @@ class EportfolioEntriesController < ApplicationController
         entry_params[:eportfolio_category] = category
       end
       respond_to do |format|
-        if @entry.update_attributes!(entry_params)
+        if @entry.update!(entry_params)
           format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
           format.json { render :json => @entry }
         else

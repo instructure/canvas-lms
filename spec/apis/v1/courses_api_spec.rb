@@ -323,7 +323,7 @@ describe Api::V1::Course do
 
       it "should return blueprint restrictions by type" do
         template = MasterCourses::MasterTemplate.set_as_master_course(@course1)
-        template.update_attributes(:use_default_restrictions_by_type => true,
+        template.update(:use_default_restrictions_by_type => true,
           :default_restrictions_by_type =>
             {"Assignment" => {:points => true},
             "Quizzes::Quiz" => {:content => true}})
@@ -431,7 +431,7 @@ describe CoursesController, type: :request do
     course_with_student(:user => @user, :active_all => true)
     @course2 = @course
     @course2.update_attribute(:sis_source_id, 'TEST-SIS-ONE.2011')
-    @course2.update_attributes(:default_view => 'assignments')
+    @course2.update(:default_view => 'assignments')
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
@@ -1293,7 +1293,7 @@ describe CoursesController, type: :request do
 
       context "when an assignment is due in a closed grading period" do
         before(:once) do
-          @course.update_attributes(group_weighting_scheme: "equal")
+          @course.update(group_weighting_scheme: "equal")
           @grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
           term = @course.enrollment_term
           term.grading_period_group = @grading_period_group
@@ -1435,7 +1435,7 @@ describe CoursesController, type: :request do
 
       context "when an assignment is due in a closed grading period" do
         before :once do
-          @course.update_attributes(group_weighting_scheme: "equal")
+          @course.update(group_weighting_scheme: "equal")
           @grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
           term = @course.enrollment_term
           term.grading_period_group = @grading_period_group
@@ -3410,7 +3410,7 @@ describe CoursesController, type: :request do
 
   describe "#show" do
     it "should get individual course data" do
-      @course1.root_account.update_attributes(:default_time_zone => 'America/Los_Angeles')
+      @course1.root_account.update(:default_time_zone => 'America/Los_Angeles')
       json = api_call(:get, "/api/v1/courses/#{@course1.id}.json",
               { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json' })
 

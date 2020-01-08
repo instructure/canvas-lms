@@ -473,7 +473,7 @@ class AppointmentGroupsController < ApplicationController
     @group.contexts = contexts if contexts
     if authorized_action(@group, @current_user, :update)
       publish = params[:appointment_group].delete(:publish) == "1"
-      if (publish && params[:appointment_group].blank?) || @group.update_attributes(appointment_group_params)
+      if (publish && params[:appointment_group].blank?) || @group.update(appointment_group_params)
         @group.publish! if publish
         render :json => appointment_group_json(@group, @current_user, session)
       else

@@ -80,7 +80,7 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements"
 
       expect(f("#content")).not_to contain_css(".ic-announcement-row")
-      announcement.update_attributes(:delayed_post_at => nil)
+      announcement.update(:delayed_post_at => nil)
       announcement.reload
       refresh_page # in order to see the announcement
       expect(f(".ic-announcement-row h3")).to include_text(announcement_title)

@@ -391,7 +391,7 @@ class DiscussionEntry < ActiveRecord::Base
           end
         end
         if existing_topic_participant && !existing_topic_participant.subscribed? && !self.discussion_topic.subscription_hold(user, nil, nil)
-          existing_topic_participant.update_attributes!(:subscribed => true)
+          existing_topic_participant.update!(:subscribed => true)
         end
       end
     end

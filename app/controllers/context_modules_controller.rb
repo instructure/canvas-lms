@@ -648,7 +648,7 @@ class ContextModulesController < ApplicationController
       elsif params[:unpublish]
         @module.unpublish
       end
-      if @module.update_attributes(context_module_params)
+      if @module.update(context_module_params)
         json = @module.as_json(:include => :content_tags, :methods => :workflow_state, :permissions => {:user => @current_user, :session => session})
         json['context_module']['relock_warning'] = true if @module.relock_warning?
         render :json => json

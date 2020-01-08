@@ -42,7 +42,7 @@ describe "group weights" do
   before(:each) do
     course_with_teacher_logged_in
     student_in_course
-    @course.update_attributes(group_weighting_scheme: 'percent')
+    @course.update(group_weighting_scheme: 'percent')
     @group1 = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 50)
     @group2 = @course.assignment_groups.create!(name: 'second assignment group', group_weight: 50)
     @assignment1 = assignment_model({
@@ -69,7 +69,7 @@ describe "group weights" do
     @assignment2.grade_student @student, grade: 5, grader: @teacher
 
     @course.show_total_grade_as_points = true
-    @course.update_attributes(group_weighting_scheme: 'points')
+    @course.update(group_weighting_scheme: 'points')
 
     # Displays total column as points
     Gradebook.visit_gradebook(@course)
@@ -81,7 +81,7 @@ describe "group weights" do
     @assignment2.grade_student @student, grade: 5, grader: @teacher
 
     @course.show_total_grade_as_points = false
-    @course.update_attributes(group_weighting_scheme: 'percent')
+    @course.update(group_weighting_scheme: 'percent')
 
     # Displays total column as points
     Gradebook.visit_gradebook(@course)
@@ -92,7 +92,7 @@ describe "group weights" do
     before(:each) do
       course_with_teacher_logged_in
       student_in_course
-      @course.update_attributes(group_weighting_scheme: 'percent')
+      @course.update(group_weighting_scheme: 'percent')
       @group1 = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 50)
       @group2 = @course.assignment_groups.create!(name: 'second assignment group', group_weight: 50)
       @assignment1 = assignment_model({

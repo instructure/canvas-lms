@@ -48,22 +48,22 @@ class AccountReportRunner < ActiveRecord::Base
 
   def start
     @rows ||= []
-    self.update_attributes!(workflow_state: 'running', started_at: Time.now.utc)
+    self.update!(workflow_state: 'running', started_at: Time.now.utc)
   end
 
   def complete
     write_rows
-    self.update_attributes!(workflow_state: 'completed', ended_at: Time.now.utc)
+    self.update!(workflow_state: 'completed', ended_at: Time.now.utc)
   end
 
   def abort
     write_rows
-    self.update_attributes!(workflow_state: 'aborted', ended_at: Time.now.utc)
+    self.update!(workflow_state: 'aborted', ended_at: Time.now.utc)
   end
 
   def fail
     write_rows
-    self.update_attributes!(workflow_state: 'error', ended_at: Time.now.utc)
+    self.update!(workflow_state: 'error', ended_at: Time.now.utc)
   end
 
   scope :in_progress, -> {where(workflow_state: %w(running))}

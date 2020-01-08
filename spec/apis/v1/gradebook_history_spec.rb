@@ -161,7 +161,7 @@ describe Api::V1::GradebookHistory do
       let(:harness) {  GradebookHistoryHarness.new }
       let(:submission) do
         s = assignment.submit_homework(student)
-        s.update_attributes(graded_at: now, score: 90, grade: '90', grader: grader)
+        s.update(graded_at: now, score: 90, grade: '90', grader: grader)
         s
       end
       let(:course) do
@@ -188,7 +188,7 @@ describe Api::V1::GradebookHistory do
       @course.enroll_teacher(@grader2)
       @assignment = @course.assignments.create!(:title => "some assignment")
       @submission = @assignment.submit_homework(student1)
-      @submission.update_attributes(graded_at: now, grader_id: @grader1.id)
+      @submission.update(graded_at: now, grader_id: @grader1.id)
       @submission.score = 90
       @submission.grade = '90'
       @submission.grader = @grader2

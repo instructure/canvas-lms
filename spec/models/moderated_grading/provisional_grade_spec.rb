@@ -318,14 +318,14 @@ describe ModeratedGrading::ProvisionalGrade do
 
     it 'updates the graded_at timestamp when changing grade' do
       Timecop.freeze(@now) do
-        provisional_grade.update_attributes(grade: 'B')
+        provisional_grade.update(grade: 'B')
         expect(provisional_grade.graded_at).to eql @now
       end
     end
 
     it 'updates the graded_at timestamp when changing score' do
       Timecop.freeze(@now) do
-        provisional_grade.update_attributes(score: 80)
+        provisional_grade.update(score: 80)
         expect(provisional_grade.graded_at).to eql @now
       end
     end

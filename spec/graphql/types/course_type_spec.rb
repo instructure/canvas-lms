@@ -64,7 +64,7 @@ describe Types::CourseType do
       before(:once) do
         gpg = GradingPeriodGroup.create! title: "asdf",
           root_account: course.root_account
-        course.enrollment_term.update_attributes grading_period_group: gpg
+        course.enrollment_term.update grading_period_group: gpg
         @term1 = gpg.grading_periods.create! title: "past grading period",
         start_date: 2.weeks.ago,
           end_date: 1.weeks.ago
@@ -396,7 +396,7 @@ describe Types::CourseType do
 
   describe "term" do
     before(:once) do
-      course.enrollment_term.update_attributes(start_at: 1.month.ago)
+      course.enrollment_term.update(start_at: 1.month.ago)
     end
 
     it "works" do

@@ -294,7 +294,7 @@ describe RubricsController do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
 
-      @rubric_association_object.update_attributes(:migration_id => "#{MasterCourses::MIGRATION_ID_PREFIX}_blah")
+      @rubric_association_object.update(:migration_id => "#{MasterCourses::MIGRATION_ID_PREFIX}_blah")
       mc_course = Course.create!
       @template = MasterCourses::MasterTemplate.set_as_master_course(mc_course)
       sub = @template.add_child_course!(@course)

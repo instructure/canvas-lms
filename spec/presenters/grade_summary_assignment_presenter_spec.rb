@@ -62,7 +62,7 @@ describe GradeSummaryAssignmentPresenter do
 
     it 'returns when submission was automatically created by group assignment submission' do
       submission_two = @submission.dup
-      submission_two.update_attributes!(user: User.create!(name: 'second student'))
+      submission_two.update!(user: User.create!(name: 'second student'))
       AttachmentAssociation.create!(context: @submission, attachment_id: @attachment)
       AttachmentAssociation.create!(context: submission_two, attachment_id: @attachment)
       OriginalityReport.create(originality_score: 0.8,

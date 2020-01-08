@@ -107,7 +107,7 @@ describe 'CrocodocDocument' do
     end
 
     it "should not allow annotations if anonymous_peer_reviews" do
-      @submission.assignment.update_attributes anonymous_peer_reviews: true,
+      @submission.assignment.update anonymous_peer_reviews: true,
                                                peer_reviews: true
       expect(@crocodoc.permissions_for_user(@student)).to eq({
         :filter => 'none',

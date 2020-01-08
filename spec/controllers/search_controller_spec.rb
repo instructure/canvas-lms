@@ -77,7 +77,7 @@ describe SearchController do
       @course2.enroll_student(@user).accept
       @course2.update_attribute(:name, "course2")
       term = @course2.root_account.enrollment_terms.create! :name => "Fall", :end_at => 1.day.ago
-      @course2.update_attributes! :enrollment_term => term
+      @course2.update! :enrollment_term => term
       get 'recipients', params: {search: 'course', :messageable_only => true}
       expect(response.body).to include('course1')
       expect(response.body).not_to include('course2')
@@ -85,7 +85,7 @@ describe SearchController do
 
     it "should return an empty list when searching in a non-messageable context" do
       course_with_student_logged_in(:active_all => true)
-      @enrollment.update_attributes(workflow_state: 'deleted')
+      @enrollment.update(workflow_state: 'deleted')
       get 'recipients', params: {search: 'foo', :context => @course.asset_string}
       expect(response.body).to match /\[\]\z/
     end

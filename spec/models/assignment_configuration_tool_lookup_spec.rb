@@ -30,7 +30,7 @@ describe AssignmentConfigurationToolLookup do
     allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_response)
     allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: stub_response)
 
-    message_handler.update_attributes(capabilities: ["Canvas.placements.similarityDetection"])
+    message_handler.update(capabilities: ["Canvas.placements.similarityDetection"])
 
     resource_handler.message_handlers << message_handler
     tool_proxy.resources << resource_handler
@@ -214,17 +214,17 @@ describe AssignmentConfigurationToolLookup do
 
     describe '#configured_assignments' do
       it 'finds configured assignments when installed in an account' do
-        tool_proxy.update_attributes!(context: account)
+        tool_proxy.update!(context: account)
         expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
       end
 
       it 'finds configured assignments when installed in a root acocunt' do
-        tool_proxy.update_attributes!(context: root_account)
+        tool_proxy.update!(context: root_account)
         expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
       end
 
       it 'finds configured assignments when installed in a course' do
-        tool_proxy.update_attributes!(context: course)
+        tool_proxy.update!(context: course)
         expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment]
       end
 
@@ -233,7 +233,7 @@ describe AssignmentConfigurationToolLookup do
         second_assignment.tool_settings_tool = message_handler
         second_assignment.lti_context_id = SecureRandom.uuid
         second_assignment.save!
-        tool_proxy.update_attributes!(context: root_account)
+        tool_proxy.update!(context: root_account)
         expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment, second_assignment]
       end
     end

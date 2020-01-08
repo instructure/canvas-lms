@@ -356,7 +356,7 @@ module Lti
       let(:placement) { ResourcePlacement::SIMILARITY_DETECTION_LTI2 }
 
       it 'returns true when tool proxy root contains the enabled capability' do
-        message_handler.update_attributes!(capabilities: [])
+        message_handler.update!(capabilities: [])
         tool_proxy.raw_data['enabled_capability'] = [placement]
         tool_proxy.save!
         expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_truthy
@@ -365,12 +365,12 @@ module Lti
       it 'returns true when the message handler contains the enabled capability' do
         tool_proxy.raw_data['enabled_capability'] = []
         tool_proxy.save!
-        message_handler.update_attributes!(capabilities: [placement])
+        message_handler.update!(capabilities: [placement])
         expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_truthy
       end
 
       it 'returns false when the placement is not in the root or message handlers' do
-        message_handler.update_attributes!(capabilities: [])
+        message_handler.update!(capabilities: [])
         tool_proxy.raw_data['enabled_capability'] = []
         tool_proxy.save!
         expect(ToolProxy.capability_enabled_in_context?(course, placement)).to be_falsey

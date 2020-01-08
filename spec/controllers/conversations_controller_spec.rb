@@ -45,7 +45,7 @@ describe ConversationsController do
       conversation
 
       term = @course.root_account.enrollment_terms.create! :name => "Fall"
-      @course.update_attributes! :enrollment_term => term
+      @course.update! :enrollment_term => term
 
       get 'index'
       expect(response).to be_successful

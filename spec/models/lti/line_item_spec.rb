@@ -24,7 +24,7 @@ RSpec.describe Lti::LineItem, type: :model do
 
     it 'requires "score_maximum"' do
       expect do
-        line_item.update_attributes!(score_maximum: nil)
+        line_item.update!(score_maximum: nil)
       end.to raise_error(
         ActiveRecord::RecordInvalid,
         "Validation failed: Score maximum can't be blank, Score maximum is not a number"
@@ -33,13 +33,13 @@ RSpec.describe Lti::LineItem, type: :model do
 
     it 'requires "label"' do
       expect do
-        line_item.update_attributes!(label: nil)
+        line_item.update!(label: nil)
       end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Label can't be blank")
     end
 
     it 'requires "assignment"' do
       expect do
-        line_item.update_attributes!(assignment: nil)
+        line_item.update!(assignment: nil)
       end.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Assignment can't be blank")
     end
   end
@@ -56,7 +56,7 @@ RSpec.describe Lti::LineItem, type: :model do
     it 'returns true if the line item was created before all others in the resource' do
       line_item_one = line_item_model(resource_link: resource_link, assignment: assignment)
       line_item_two = line_item_model(resource_link: resource_link, assignment: assignment)
-      line_item_two.update_attributes!(created_at: line_item_one.created_at + 5.seconds)
+      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
 
       expect(line_item_one.assignment_line_item?).to eq true
     end
@@ -64,7 +64,7 @@ RSpec.describe Lti::LineItem, type: :model do
     it 'returns false if there is a link and the line item is not the first in the resource' do
       line_item_one = line_item_model(resource_link: resource_link, assignment: assignment)
       line_item_two = line_item_model(resource_link: resource_link, assignment: assignment)
-      line_item_two.update_attributes!(created_at: line_item_one.created_at + 5.seconds)
+      line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
 
       expect(line_item_two.assignment_line_item?).to eq false
     end

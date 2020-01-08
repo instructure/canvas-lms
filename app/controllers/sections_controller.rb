@@ -280,7 +280,7 @@ class SectionsController < ApplicationController
       end
 
       respond_to do |format|
-        if @section.update_attributes(course_section_params)
+        if @section.update(course_section_params)
           @context.touch
           flash[:notice] = t('section_updated', "Section successfully updated!")
           format.html { redirect_to course_section_url(@context, @section) }

@@ -109,14 +109,14 @@ describe "ActsAsUrl" do
   it "should_not_update_url_by_default" do
     @doc = Document.create!(:title => "Stable as Stone")
     @original_url = @doc.url
-    @doc.update_attributes :title => "New Unstable Madness"
+    @doc.update :title => "New Unstable Madness"
     expect(@original_url).to eq @doc.url
   end
 
   it "should_update_url_if_asked" do
     @moc = Mocument.create!(:title => "Original")
     @original_url = @moc.url
-    @moc.update_attributes :title => "New and Improved"
+    @moc.update :title => "New and Improved"
     expect(@original_url).to_not eq @moc.url
   end
 

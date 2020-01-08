@@ -24,7 +24,7 @@ describe SearchController, type: :request do
     @account = Account.default
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
-    @course.default_section.update_attributes(:name => "the section")
+    @course.default_section.update(:name => "the section")
     @other_section = @course.course_sections.create(:name => "the other section")
     @me = @user
 

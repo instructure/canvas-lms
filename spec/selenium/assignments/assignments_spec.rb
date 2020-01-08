@@ -809,7 +809,7 @@ describe "assignments" do
       end
 
       it "shows submission scores for students on index page", priority: "2", test_id: 647850 do
-        @assignment.update_attributes(points_possible: 15)
+        @assignment.update(points_possible: 15)
         @assignment.publish
         course_with_student_logged_in(active_all: true, course: @course)
         @assignment.grade_student(@student, grade: 14, grader: @teacher)
@@ -947,7 +947,7 @@ describe "assignments" do
       @course.start_at = nil
       @course.save!
       @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
-      @assignment.update_attributes(
+      @assignment.update(
         moderated_grading: true,
         grader_count: 1,
         final_grader: @teacher

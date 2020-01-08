@@ -753,7 +753,7 @@ describe GroupsController do
         @group.add_user(@student2)
         @group.add_user(@student3)
         @student2.enrollments.first.deactivate
-        @student3.enrollments.first.update_attributes(:start_at => 1.day.from_now, :end_at => 2.days.from_now) # technically "inactive" but not really
+        @student3.enrollments.first.update(:start_at => 1.day.from_now, :end_at => 2.days.from_now) # technically "inactive" but not really
       end
 
       it "include active status if requested" do

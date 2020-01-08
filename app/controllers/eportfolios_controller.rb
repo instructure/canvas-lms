@@ -118,7 +118,7 @@ class EportfoliosController < ApplicationController
 
     if update_params
       respond_to do |format|
-        if @portfolio.update_attributes(update_params)
+        if @portfolio.update(update_params)
           @portfolio.ensure_defaults
           flash[:notice] = t('notices.updated', "ePortfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }

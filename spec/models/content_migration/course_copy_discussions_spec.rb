@@ -317,7 +317,7 @@ describe ContentMigration do
 
     it "should not apply the late policy right away if shifting dates to the future" do
       graded_discussion_topic(context: @copy_from)
-      @assignment.update_attributes(:due_at => 3.days.ago, :points_possible => 4)
+      @assignment.update(:due_at => 3.days.ago, :points_possible => 4)
 
       [@copy_from, @copy_to].each do |course|
         course.create_late_policy(missing_submission_deduction_enabled: true, missing_submission_deduction: 25.0)

@@ -144,7 +144,7 @@ describe "interaction with grading periods" do
       end
 
       it 'should list an assignment from a current grading period when due date is updated', priority: "2", test_course: 576764 do
-        assignment.update_attributes(due_at: 3.days.from_now(now))
+        assignment.update(due_at: 3.days.from_now(now))
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
         expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')

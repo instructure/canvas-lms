@@ -182,7 +182,7 @@ RSpec.describe SubmissionComment do
     @comment = @submission.submission_comments.create!(valid_attributes)
     expect(a.recently_created).to eql(true)
     @comment.reload
-    @comment.update_attributes(:attachments => [a])
+    @comment.update(:attachments => [a])
     expect(@comment.attachment_ids).to eql(a.id.to_s)
   end
 
@@ -190,7 +190,7 @@ RSpec.describe SubmissionComment do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
     a.recently_created = false
     @comment = @submission.submission_comments.create!(valid_attributes)
-    @comment.update_attributes(:attachments => [a])
+    @comment.update(:attachments => [a])
     expect(@comment.attachment_ids).to eql("")
   end
 
@@ -244,7 +244,7 @@ This text has a http://www.google.com link in it...
     frd_comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
     expect(@submission.reload.last_comment_at.to_i).to eq frd_comment.created_at.to_i
 
-    draft_comment.update_attributes(:draft => false, :created_at => 2.days.from_now) # should re-run after update
+    draft_comment.update(:draft => false, :created_at => 2.days.from_now) # should re-run after update
     expect(@submission.reload.last_comment_at.to_i).to eq draft_comment.created_at.to_i
 
     draft_comment.destroy # should re-run after destroy

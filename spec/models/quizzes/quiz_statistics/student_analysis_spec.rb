@@ -132,7 +132,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     @user1 = User.create! :name => "some_user 1"
     student_in_course :course => @course, :user => @user1
     quiz = @course.quizzes.create!
-    quiz.update_attributes(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
+    quiz.update(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
     quiz.quiz_questions.create!(question_data: essay_question_data)
     quiz.generate_quiz_data
     quiz.save
@@ -509,7 +509,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   it 'should not show student names for anonymous submissions' do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!
-    q.update_attributes(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
+    q.update(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
     q.quiz_questions.create!(:question_data => {:name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100'}, {'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0'}]})
     q.generate_quiz_data
     q.save

@@ -79,7 +79,7 @@ module Canvas::MessageHelper
     raise 'Name is required' unless using[:name]
     n = Notification.where(name: using[:name]).first_or_initialize
     begin
-      n.update_attributes(:delay_for => using[:delay_for], :category => using[:category])
+      n.update(:delay_for => using[:delay_for], :category => using[:category])
     rescue => e
       if n.new_record?
         raise "New notification '#{using[:name]}' creation failed. Message: #{e.message}"

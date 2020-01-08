@@ -267,7 +267,7 @@ class OutcomesController < ApplicationController
     @outcome = @context.created_learning_outcomes.find(params[:id])
 
     respond_to do |format|
-      if @outcome.update_attributes(learning_outcome_params)
+      if @outcome.update(learning_outcome_params)
         flash[:notice] = t :successful_outcome_update, "Outcome successfully updated!"
         format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
         format.json { render :json => @outcome }

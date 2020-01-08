@@ -68,7 +68,7 @@ class GoogleDocsCollaboration < Collaboration
 
         user_param = service_user_id
         google_adapter_for_user.acl_add(self.document_id, [user_param])
-        collaborator.update_attributes(:authorized_service_user_id => service_user_id)
+        collaborator.update(:authorized_service_user_id => service_user_id)
       end
     else
       # no collaboration for this user, lets create it

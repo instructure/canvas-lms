@@ -793,7 +793,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "recomputes grades when changing overrides" do
-        @assignment.update_attributes! only_visible_to_overrides: true, points_possible: 10
+        @assignment.update! only_visible_to_overrides: true, points_possible: 10
         other_assignment = @course.assignments.create! points_possible: 10, context: @course
 
         student1 = @student

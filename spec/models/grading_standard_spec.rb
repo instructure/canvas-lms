@@ -314,7 +314,7 @@ describe GradingStandard do
         @root_account = Account.default
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @root_account)
-        @enrollment.update_attributes(workflow_state: "active")
+        @enrollment.update(workflow_state: "active")
         @root_account_standard = grading_standard_for(@root_account)
         @sub_account_standard = grading_standard_for(@sub_account)
         @course_standard = grading_standard_for(@course)
@@ -378,7 +378,7 @@ describe GradingStandard do
         @root_account = Account.default
         @sub_account = @root_account.sub_accounts.create!
         course_with_teacher(account: @sub_account)
-        @enrollment.update_attributes(workflow_state: "active")
+        @enrollment.update(workflow_state: "active")
         @root_account_standard = grading_standard_for(@root_account)
         @sub_account_standard = grading_standard_for(@sub_account)
         @course_standard = grading_standard_for(@course)

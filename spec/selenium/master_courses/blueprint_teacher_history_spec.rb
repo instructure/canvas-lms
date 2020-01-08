@@ -46,10 +46,10 @@ describe "master courses - child courses - sync history for teacher" do
     topic = @copy_from.discussion_topics.create!(title: "something")
     run_master_migration # run the full export initially
 
-    assmt.update_attributes(due_at: 3.days.from_now) # updated
-    topic.update_attributes(title: "something new") # updated but won't apply
+    assmt.update(due_at: 3.days.from_now) # updated
+    topic.update(title: "something new") # updated but won't apply
     topic_to = @copy_to.discussion_topics.first
-    topic_to.update_attributes(title: "something that won't get overwritten")
+    topic_to.update(title: "something that won't get overwritten")
     page = @copy_from.wiki_pages.create!(title: "page") # new object
 
     run_master_migration # run selective export

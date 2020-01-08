@@ -333,7 +333,7 @@ describe "speed grader submissions" do
 
       it "should successfully schedule resubmit when button is clicked", priority: "1", test_id: 283508 do
         account = @assignment.context.account
-        account.update_attributes(turnitin_account_id: 'test_account',
+        account.update(turnitin_account_id: 'test_account',
                                   turnitin_shared_secret: 'skeret',
                                   settings: account.settings.merge(enable_turnitin: true))
 

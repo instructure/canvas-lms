@@ -160,7 +160,7 @@ describe 'Speedgrader' do
       end
 
       it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
-        @assignment.update_attributes(points_possible: 1)
+        @assignment.update(points_possible: 1)
         refresh_page
         expect(Speedgrader.grade_input).to have_value('complete')
         expect(Speedgrader.points_possible_label).to include_text('(1 / 1)')
@@ -719,7 +719,7 @@ describe 'Speedgrader' do
     end
 
     it "shows dialog when attempting to mute and mutes" do
-      @assignment.update_attributes(muted: false)
+      @assignment.update(muted: false)
 
       Speedgrader.visit(@course.id, @assignment.id)
       f('#mute_link').click
@@ -730,7 +730,7 @@ describe 'Speedgrader' do
     end
 
     it "shows dialog when attempting to unmute and unmutes" do
-      @assignment.update_attributes(muted: true)
+      @assignment.update(muted: true)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
       f('#mute_link').click

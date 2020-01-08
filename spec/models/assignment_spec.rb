@@ -1057,7 +1057,7 @@ describe Assignment do
 
     it 'returns the name of the tool proxy' do
       expected_name = 'test name'
-      message_handler.tool_proxy.update_attributes!(name: expected_name)
+      message_handler.tool_proxy.update!(name: expected_name)
       setup_assignment_with_homework
       course.assignments << @assignment
       @assignment.tool_settings_tool = message_handler
@@ -3227,7 +3227,7 @@ describe Assignment do
 
     context "when assignment is anonymously graded" do
       before :once do
-        @assignment.update_attributes(moderated_grading: true, anonymous_grading: true, grader_count: 1)
+        @assignment.update(moderated_grading: true, anonymous_grading: true, grader_count: 1)
         @assignment.mute!
       end
 
@@ -3265,7 +3265,7 @@ describe Assignment do
 
     context "when assignment is anonymously graded and not moderated" do
       before :once do
-        @assignment.update_attributes(moderated_grading: false, anonymous_grading: true)
+        @assignment.update(moderated_grading: false, anonymous_grading: true)
         @assignment.mute!
       end
 
@@ -3281,7 +3281,7 @@ describe Assignment do
 
     context "when assignment is not anonymously graded" do
       before :once do
-        @assignment.update_attributes(moderated_grading: true, anonymous_grading: false, grader_count: 1)
+        @assignment.update(moderated_grading: true, anonymous_grading: false, grader_count: 1)
         @assignment.mute!
       end
 
@@ -3737,7 +3737,7 @@ describe Assignment do
       it "should not assign peer reviews to members of the same group when disabled" do
         @submissions = []
         gc = @course.group_categories.create! name: "Groupy McGroupface"
-        @a.update_attributes group_category_id: gc.id,
+        @a.update group_category_id: gc.id,
                              grade_group_students_individually: false
         users = create_users_in_course(@course, 8.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
         ["group_1", "group_2"].each do |group_name|
@@ -3755,7 +3755,7 @@ describe Assignment do
       it "should assign peer reviews to members of the same group when enabled" do
         @submissions = []
         gc = @course.group_categories.create! name: "Groupy McGroupface"
-        @a.update_attributes group_category_id: gc.id,
+        @a.update group_category_id: gc.id,
                              grade_group_students_individually: false
         users = create_users_in_course(@course, 8.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
         ["group_1", "group_2"].each do |group_name|
@@ -4092,7 +4092,7 @@ describe Assignment do
 
     context "letter grades" do
       before :once do
-        @assignment.update_attributes(:grading_type => 'letter_grade', :points_possible => 20)
+        @assignment.update(:grading_type => 'letter_grade', :points_possible => 20)
       end
 
       it "should update grades when assignment changes" do
@@ -4121,7 +4121,7 @@ describe Assignment do
 
     context "gpa scale grades" do
       before :once do
-        @assignment.update_attributes(:grading_type => 'gpa_scale', :points_possible => 20)
+        @assignment.update(:grading_type => 'gpa_scale', :points_possible => 20)
         @course.grading_standards.build({title: "GPA"})
         gs = @course.grading_standards.last
         gs.data = {"4.0" => 0.94,
@@ -4213,7 +4213,7 @@ describe Assignment do
 
       context "when the assignment is due in a closed grading period" do
         before(:once) do
-          @assignment.update_attributes(due_at: 4.weeks.ago)
+          @assignment.update(due_at: 4.weeks.ago)
         end
 
         it "is true for admins" do
@@ -4227,7 +4227,7 @@ describe Assignment do
 
       context "when the assignment is due in an open grading period" do
         before(:once) do
-          @assignment.update_attributes(due_at: 2.weeks.ago)
+          @assignment.update(due_at: 2.weeks.ago)
         end
 
         it "is true for admins" do
@@ -4241,7 +4241,7 @@ describe Assignment do
 
       context "when the assignment is due after all grading periods" do
         before(:once) do
-          @assignment.update_attributes(due_at: 1.day.from_now)
+          @assignment.update(due_at: 1.day.from_now)
         end
 
         it "is true for admins" do
@@ -4255,7 +4255,7 @@ describe Assignment do
 
       context "when the assignment is due before all grading periods" do
         before(:once) do
-          @assignment.update_attributes(due_at: 6.weeks.ago)
+          @assignment.update(due_at: 6.weeks.ago)
         end
 
         it "is true for admins" do
@@ -4269,7 +4269,7 @@ describe Assignment do
 
       context "when the assignment has no due date" do
         before(:once) do
-          @assignment.update_attributes(due_at: nil)
+          @assignment.update(due_at: nil)
         end
 
         it "is true for admins" do
@@ -4283,7 +4283,7 @@ describe Assignment do
 
       context "when the assignment is due in a closed grading period for a student" do
         before(:once) do
-          @assignment.update_attributes(due_at: 2.days.from_now)
+          @assignment.update(due_at: 2.days.from_now)
           override = @assignment.assignment_overrides.build
           override.set = @course.default_section
           override.override_due_at(4.weeks.ago)
@@ -4301,7 +4301,7 @@ describe Assignment do
 
       context "when the assignment is overridden with no due date for a student" do
         before(:once) do
-          @assignment.update_attributes(due_at: nil)
+          @assignment.update(due_at: nil)
           override = @assignment.assignment_overrides.build
           override.set = @course.default_section
           override.save!
@@ -4318,7 +4318,7 @@ describe Assignment do
 
       context "when the assignment has a deleted override in a closed grading period for a student" do
         before(:once) do
-          @assignment.update_attributes(due_at: 2.days.from_now)
+          @assignment.update(due_at: 2.days.from_now)
           override = @assignment.assignment_overrides.build
           override.set = @course.default_section
           override.override_due_at(4.weeks.ago)
@@ -4337,7 +4337,7 @@ describe Assignment do
 
       context "when the assignment is overridden with no due date and is only visible to overrides" do
         before(:once) do
-          @assignment.update_attributes(due_at: 4.weeks.ago, only_visible_to_overrides: true)
+          @assignment.update(due_at: 4.weeks.ago, only_visible_to_overrides: true)
           override = @assignment.assignment_overrides.build
           override.set = @course.default_section
           override.save!
@@ -4985,7 +4985,7 @@ describe Assignment do
         expect(@sub2.messages_sent['Submission Graded']).to be_present
         expect(@sub2.messages_sent['Submission Graded'].first.from_name).to eq @course.name
         expect(@sub2.messages_sent['Submission Grade Changed']).to be_nil
-        @sub2.update_attributes(:graded_at => Time.zone.now - 60*60)
+        @sub2.update(:graded_at => Time.zone.now - 60*60)
         @sub2 = @assignment.grade_student(@stu2, grade: 9, grader: @teacher).first
         expect(@sub2.messages_sent).not_to be_empty
         expect(@sub2.messages_sent['Submission Graded']).to be_nil
@@ -5017,7 +5017,7 @@ describe Assignment do
 
         it "should not notify students when their grade is changed if muted" do
           @sub2 = @assignment.grade_student(@stu2, grade: 8, grader: @teacher).first
-          @sub2.update_attributes(:graded_at => Time.zone.now - 60*60)
+          @sub2.update(:graded_at => Time.zone.now - 60*60)
           @sub2 = @assignment.grade_student(@stu2, grade: 9, grader: @teacher).first
           expect(@sub2.messages_sent).to be_empty
         end
@@ -6519,7 +6519,7 @@ describe Assignment do
       s1, s2 = @students
 
       gc = @course.group_categories.create! name: "Homework Groups"
-      @assignment.update_attributes group_category_id: gc.id,
+      @assignment.update group_category_id: gc.id,
                                     grade_group_students_individually: false
       g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
       g1.add_user(s1)
@@ -8792,7 +8792,7 @@ describe Assignment do
             score_maximum: previous_points_possible,
             resource_link: first_line_item.resource_link
           )
-          line_item_two.update_attributes!(created_at: first_line_item.created_at + 1.minute)
+          line_item_two.update!(created_at: first_line_item.created_at + 1.minute)
           assignment.title += " edit"
           assignment.points_possible += 10
           assignment.save!

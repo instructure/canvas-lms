@@ -36,7 +36,7 @@ class AlertsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_interaction_alerts)
       convert_recipients
       @alert = @context.alerts.find(params[:id])
-      if @alert.update_attributes(alert_params)
+      if @alert.update(alert_params)
         headers['Location'] = named_context_url(@context, :context_alert_url, @alert.id)
         render :json => @alert.as_json(:include => :criteria)
       else

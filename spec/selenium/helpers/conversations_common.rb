@@ -41,7 +41,7 @@ module ConversationsCommon
     term.root_account_id = @course.root_account_id
     term.save!
 
-    @course.update_attributes! :enrollment_term => term
+    @course.update! :enrollment_term => term
   end
 
   def conversation_elements

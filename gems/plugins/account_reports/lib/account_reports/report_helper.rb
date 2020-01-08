@@ -312,7 +312,7 @@ module AccountReports::ReportHelper
       return
     end
 
-    @account_report.update_attributes(total_lines: total_runners)
+    @account_report.update(total_lines: total_runners)
 
     args = {priority: Delayed::LOW_PRIORITY, max_attempts: 1, n_strand: ["account_report_runner", root_account.global_id]}
     @account_report.account_report_runners.find_each do |runner|
@@ -379,7 +379,7 @@ module AccountReports::ReportHelper
   end
 
   def compile_parallel_report(headers, files: nil)
-    @account_report.update_attributes(total_lines: @account_report.account_report_rows.count + 1)
+    @account_report.update(total_lines: @account_report.account_report_rows.count + 1)
     files ? compile_parallel_zip_report(files) : write_report_from_rows(headers)
     @account_report.delete_account_report_rows
   end
@@ -465,7 +465,7 @@ module AccountReports::ReportHelper
           updates = {}
           updates[:current_line] = lineno
           updates[:progress] = (lineno.to_f / (report.total_lines + 1) * 100).to_i if report.total_lines
-          report.update_attributes(updates)
+          report.update(updates)
           if report.workflow_state == 'deleted'
             report.workflow_state = 'aborted'
             report.save!

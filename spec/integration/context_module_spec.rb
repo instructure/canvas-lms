@@ -51,7 +51,7 @@ describe ContextModule do
       get "/courses/#{@course.id}/modules"
       expect(response.body).to match(/My Sub Header Title/)
 
-      content_tag.update_attributes(:title => "My New Title")
+      content_tag.update(:title => "My New Title")
 
       get "/courses/#{@course.id}/modules"
       expect(response.body).to match(/My New Title/)

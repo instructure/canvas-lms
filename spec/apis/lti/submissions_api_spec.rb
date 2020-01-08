@@ -56,7 +56,7 @@ module Lti
 
     let(:other_tool_proxy) do
       tp = tool_proxy.dup
-      tp.update_attributes(guid: other_tp_guid)
+      tp.update(guid: other_tp_guid)
       tp
     end
 

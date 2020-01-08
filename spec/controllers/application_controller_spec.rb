@@ -566,7 +566,7 @@ RSpec.describe ApplicationController do
           allow(content_tag).to receive(:id).and_return(42)
           allow(controller).to receive(:require_user) { user_model }
           allow(controller).to receive(:lti_launch_params) {{}}
-          content_tag.update_attributes!(context: assignment_model)
+          content_tag.update!(context: assignment_model)
         end
 
         context 'display_type == "full_width' do
@@ -632,7 +632,7 @@ RSpec.describe ApplicationController do
           allow(controller).to receive(:require_user) { user_model }
           controller.instance_variable_set(:@current_user, user)
           controller.instance_variable_set(:@domain_root_account, course.account)
-          content_tag.update_attributes!(context: assignment_model)
+          content_tag.update!(context: assignment_model)
         end
 
         describe 'LTI 1.3' do
@@ -651,7 +651,7 @@ RSpec.describe ApplicationController do
             tool.save!
 
             assignment = assignment_model(submission_types: 'external_tool', external_tool_tag: content_tag)
-            content_tag.update_attributes!(context: assignment)
+            content_tag.update!(context: assignment)
           end
 
           shared_examples_for 'a placement that caches the launch' do
@@ -745,7 +745,7 @@ RSpec.describe ApplicationController do
       context 'return_url' do
         before do
           controller.instance_variable_set(:"@context", course)
-          content_tag.update_attributes!(context: assignment_model)
+          content_tag.update!(context: assignment_model)
           allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
           allow(controller).to receive(:render)
           allow(controller).to receive(:lti_launch_params)

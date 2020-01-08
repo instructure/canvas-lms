@@ -520,7 +520,7 @@ describe Canvas::LiveEvents do
       end
 
       it 'should include the group_id if assignment is a group assignment' do
-        submission.update_attributes(group: group)
+        submission.update(group: group)
 
         expect_event('submission_created',
           hash_including(
@@ -543,7 +543,7 @@ describe Canvas::LiveEvents do
       end
 
       it 'should include the group_id if assignment is a group assignment' do
-        submission.update_attributes(group: group)
+        submission.update(group: group)
 
         expect_event('submission_updated',
           hash_including(
@@ -585,7 +585,7 @@ describe Canvas::LiveEvents do
       end
 
       it 'should include the group_id if assignment is a group assignment' do
-        submission.update_attributes(group: group)
+        submission.update(group: group)
 
         expect_event('plagiarism_resubmit',
           hash_including(

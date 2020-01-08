@@ -192,7 +192,7 @@ describe Api::V1::SisAssignment do
     context "mastery paths overrides" do
       it "uses a mastery paths due date as the course due date" do
         due_at = Time.zone.parse('2017-02-08 22:11:10')
-        assignment_1.update_attributes(due_at: nil)
+        assignment_1.update(due_at: nil)
         create_mastery_paths_override_for_assignment(assignment_1, due_at: due_at)
         assignments = Assignment.where(id: assignment_1.id).
           preload(:active_assignment_overrides)
@@ -204,7 +204,7 @@ describe Api::V1::SisAssignment do
 
       it "prefers the assignment due_at over an override" do
         assignment_due_at = Time.zone.parse('2017-03-08 22:11:10')
-        assignment_1.update_attributes(due_at: assignment_due_at)
+        assignment_1.update(due_at: assignment_due_at)
 
         override_due_at = Time.zone.parse('2017-02-08 22:11:10')
         create_mastery_paths_override_for_assignment(assignment_1, due_at: override_due_at)

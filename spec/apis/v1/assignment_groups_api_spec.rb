@@ -965,7 +965,7 @@ describe AssignmentGroupsApiController, type: :request do
         Factories::GradingPeriodHelper.new.create_for_group(@grading_period_group, {
           start_date: 2.weeks.ago, end_date: 2.days.ago, close_date: 1.day.ago
         })
-        @assignment_group.update_attributes(group_weight: 50)
+        @assignment_group.update(group_weight: 50)
       end
 
       context "as a teacher" do

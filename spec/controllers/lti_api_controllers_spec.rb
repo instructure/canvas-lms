@@ -367,7 +367,7 @@ XML
     end
 
     it "should fail if assignment has no points possible" do
-      @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
+      @assignment.update(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
       expect(response).to be_successful
       xml = Nokogiri::XML.parse(response.body)
@@ -376,7 +376,7 @@ XML
     end
 
     it "should pass if assignment has 0 points possible" do
-      @assignment.update_attributes(:points_possible => 0, :grading_type => 'percent')
+      @assignment.update(:points_possible => 0, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
       check_success
 
@@ -390,7 +390,7 @@ XML
 
 
     it "should notify users if it fails because the assignment has no points" do
-      @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
+      @assignment.update(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
       expect(response).to be_successful
       submissions = @assignment.submissions.where(user_id: @student).to_a
@@ -431,7 +431,7 @@ to because the assignment has no points possible.
 
     context "pass_fail zero point assignments" do
       it "should succeed with incomplete grade when score < 1" do
-        @assignment.update_attributes(:points_possible => 10, :grading_type => 'pass_fail')
+        @assignment.update(:points_possible => 10, :grading_type => 'pass_fail')
         make_call('body' => replace_result(score: '0.75', sourceid: nil))
         check_success
 
@@ -447,7 +447,7 @@ to because the assignment has no points possible.
       end
 
       it "should succeed with incomplete grade when score < 1 for a 0 point assignment" do
-        @assignment.update_attributes(:points_possible => 0, :grading_type => 'pass_fail')
+        @assignment.update(:points_possible => 0, :grading_type => 'pass_fail')
         make_call('body' => replace_result(score: '0.75', sourceid: nil))
         check_success
 
@@ -463,7 +463,7 @@ to because the assignment has no points possible.
       end
 
       it "should succeed with complete grade when score = 1" do
-        @assignment.update_attributes(:points_possible => 0, :grading_type => 'pass_fail')
+        @assignment.update(:points_possible => 0, :grading_type => 'pass_fail')
         make_call('body' => replace_result(score: '1', sourceid: nil))
         check_success
 
@@ -594,7 +594,7 @@ to because the assignment has no points possible.
   end
 
   it "should reject if the assignment is no longer a tool assignment" do
-    @assignment.update_attributes(:submission_types => 'online_upload')
+    @assignment.update(:submission_types => 'online_upload')
     @assignment.reload.external_tool_tag.destroy_permanently!
     make_call('body' => replace_result(score: '0.5'))
     check_failure('failure', 'Assignment is no longer associated with this tool')
@@ -806,7 +806,7 @@ to because the assignment has no points possible.
     end
 
     it "should reject if the assignment is no longer a tool assignment" do
-      @assignment.update_attributes(:submission_types => 'online_upload')
+      @assignment.update(:submission_types => 'online_upload')
       @assignment.reload.external_tool_tag.destroy_permanently!
       make_call('body' => update_result('0.5'))
       check_failure

@@ -190,7 +190,7 @@ class GroupMembershipsController < ApplicationController
       attrs.delete(:workflow_state) unless attrs[:workflow_state] == 'accepted'
 
       DueDateCacher.with_executing_user(@current_user) do
-        if @membership.update_attributes(attrs)
+        if @membership.update(attrs)
           render :json => group_membership_json(@membership, @current_user, session)
         else
           render :json => @membership.errors, :status => :bad_request

@@ -646,7 +646,7 @@ class ConversationsController < ApplicationController
   #     "participants": [{"id": 1, "name": "Joe", "full_name": "Joe TA"}]
   #   }
   def update
-    if @conversation.update_attributes(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
+    if @conversation.update(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
       render :json => conversation_json(@conversation, @current_user, session)
     else
       render :json => @conversation.errors, :status => :bad_request

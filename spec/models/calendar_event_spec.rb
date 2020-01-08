@@ -100,14 +100,14 @@ describe CalendarEvent do
 
     it "should retain all day flag when date is changed (calls :default_values)" do
       # Flag the event as all day
-      @event.update_attributes({ :start_at => @original_start_at, :end_at => @original_end_at, :all_day => true })
+      @event.update({ :start_at => @original_start_at, :end_at => @original_end_at, :all_day => true })
       expect(@event.all_day?).to be_truthy
       expect(@event.all_day_date.strftime("%Y-%m-%d")).to eq "2008-09-03"
       expect(@event.zoned_start_at.strftime("%H:%M")).to eq "00:00"
       expect(@event.end_at).to eql(@event.zoned_start_at)
 
       # Change the date but keep the all day flag as true
-      @event.update_attributes({ :start_at => @event.start_at - 1.day, :end_at => @event.end_at - 1.day, :all_day => true })
+      @event.update({ :start_at => @event.start_at - 1.day, :end_at => @event.end_at - 1.day, :all_day => true })
       expect(@event.all_day?).to be_truthy
       expect(@event.all_day_date.strftime("%Y-%m-%d")).to eq "2008-09-02"
       expect(@event.zoned_start_at.strftime("%H:%M")).to eq "00:00"
@@ -130,12 +130,12 @@ describe CalendarEvent do
 
     it "should not retain all day flag when times are changed (calls :default_values)" do
       # set the start and end to midnight and make sure all_day is automatically set
-      @event.update_attributes({ :start_at => @midnight, :end_at => @midnight })
+      @event.update({ :start_at => @midnight, :end_at => @midnight })
       expect(@event.all_day?).to be_truthy
       expect(@event.all_day_date.strftime("%Y-%m-%d")).to eq "2008-09-03"
 
       # set the start and end to different times and then make sure all_day is automatically unset
-      @event.update_attributes({ :start_at => @original_start_at, :end_at => @original_end_at })
+      @event.update({ :start_at => @original_start_at, :end_at => @original_end_at })
       expect(@event.all_day?).to be_falsey
     end
   end
@@ -409,7 +409,7 @@ describe CalendarEvent do
 
       context "with event date edited" do
         before :once do
-          @event1.update_attributes(start_at: Time.now, end_at: Time.now)
+          @event1.update(start_at: Time.now, end_at: Time.now)
         end
 
         context "edit notification" do
@@ -763,7 +763,7 @@ describe CalendarEvent do
     end
 
     it "should copy changed group attributes to existing appointments" do
-      @ag.update_attributes(:title => 'changed!', :description => "test\n123")
+      @ag.update(:title => 'changed!', :description => "test\n123")
       e = @ag.appointments.first.reload
       expect(e.title).to eql 'changed!'
       expect(e.description).to eql "test<br/>\r\n123"
@@ -782,7 +782,7 @@ describe CalendarEvent do
 
     it "should copy the group attributes to subsequent appointments" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course])
-      ag.update_attributes(
+      ag.update(
         :title => 'haha',
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
       )
@@ -791,7 +791,7 @@ describe CalendarEvent do
     end
 
     it "should ignore changes to locked attributes on the appointment" do
-      @appointment.update_attributes(:start_at => '2012-01-01 12:30:00', :title => 'you wish')
+      @appointment.update(:start_at => '2012-01-01 12:30:00', :title => 'you wish')
       expect(@appointment.title).to eql 'test'
       expect(@appointment.start_at).to eql Time.parse('2012-01-01 12:30:00Z')
     end
@@ -905,7 +905,7 @@ describe CalendarEvent do
         e1.reload
         events1 = e1.child_events.sort_by(&:id)
 
-        e1.update_attributes :child_event_data => [
+        e1.update :child_event_data => [
             {:start_at => "2012-01-01 13:00:00", :end_at => "2012-01-01 14:00:00", :context_code => @course.default_section.asset_string},
             {:start_at => "2012-01-02 12:00:00", :end_at => "2012-01-02 13:00:00", :context_code => s3.asset_string},
           ]
@@ -946,7 +946,7 @@ describe CalendarEvent do
         e1.updating_user = @user
         e1.save!
         e1.reload
-        e1.update_attributes :remove_child_events => true
+        e1.update :remove_child_events => true
         expect(e1.child_events.reload).to be_empty
       end
     end

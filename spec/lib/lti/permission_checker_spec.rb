@@ -55,7 +55,7 @@ describe Lti::PermissionChecker do
 
       let(:other_tp) do
         other_tp = tool_proxy.dup
-        other_tp.update_attributes(guid: SecureRandom.uuid, context: course)
+        other_tp.update(guid: SecureRandom.uuid, context: course)
         allow(other_tp).to receive(:active_in_context?) { true }
         allow(other_tp).to receive(:resources) { [double(message_handlers: [ message_handler ])] }
         other_tp
@@ -75,7 +75,7 @@ describe Lti::PermissionChecker do
       it "returns false if the requesting tool does not have the same access as the associated tool" do
         allow(other_tp).to receive(:resources).and_call_original
         other_tp.raw_data['tool_profile']['product_instance']['product_info']['product_family']['code'] = 'different'
-        other_tp.update_attributes(guid: SecureRandom.uuid, context: course)
+        other_tp.update(guid: SecureRandom.uuid, context: course)
         allow(other_tp).to receive(:active_in_context?) { true }
         expect(Lti::PermissionChecker.authorized_lti2_action?(tool: other_tp, context: assignment)).to eq false
       end

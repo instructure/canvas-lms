@@ -1698,7 +1698,7 @@ describe Quizzes::QuizzesController do
       # aka should handle the case where the quiz's assignment is nil/not present.
       user_session(@teacher)
       course_quiz
-      @quiz.update_attributes(quiz_type: 'survey')
+      @quiz.update(quiz_type: 'survey')
       # make sure the assignment doesn't exist
       @quiz.assignment = nil
       expect(@quiz.assignment).not_to be_present

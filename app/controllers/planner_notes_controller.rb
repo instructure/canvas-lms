@@ -210,7 +210,7 @@ class PlannerNotesController < ApplicationController
         update_params[:course] = nil
       end
     end
-    if note.update_attributes(update_params)
+    if note.update(update_params)
       Rails.cache.delete(planner_meta_cache_key)
       render json: planner_note_json(note, @current_user, session), status: :ok
     else

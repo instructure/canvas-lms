@@ -245,7 +245,7 @@ class RubricAssociation < ActiveRecord::Base
     end
     association.context = context
     association.skip_updating_points_possible = params.delete :skip_updating_points_possible
-    association.update_attributes(params)
+    association.update(params)
     association.association_object = association_object
     association
   end

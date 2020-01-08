@@ -649,7 +649,7 @@ class CalendarEventsApiController < ApplicationController
       if params_for_update[:description].present?
         params_for_update[:description] = process_incoming_html_content(params_for_update[:description])
       end
-      if @event.update_attributes(params_for_update)
+      if @event.update(params_for_update)
         render :json => event_json(@event, @current_user, session)
       else
         render :json => @event.errors, :status => :bad_request

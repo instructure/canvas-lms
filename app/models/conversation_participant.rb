@@ -356,7 +356,7 @@ class ConversationParticipant < ActiveRecord::Base
     StreamItem.send_later_if_production_enqueue_args(:generate_or_update, {:priority => 25}, self.conversation)
   end
 
-  def update_attributes(hash)
+  def update(hash)
     # subscribed= can update the workflow_state, but an explicit
     # workflow_state should trump that. so we do this first
     subscribed = (hash.has_key?(:subscribed) ? hash.delete(:subscribed) : hash.delete('subscribed'))

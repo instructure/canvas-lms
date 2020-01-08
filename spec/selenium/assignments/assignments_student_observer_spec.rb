@@ -50,7 +50,7 @@ describe "assignments" do
 
       context "with multiple section enrollments in same course" do
         it "should have the earliest 'lock until' date and the latest 'lock after' date" do
-          @assignment.update_attributes :lock_at => @lock_at + 22.days
+          @assignment.update :lock_at => @lock_at + 22.days
           @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section1, :enrollment_state => 'active')
           extend TextHelper
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
