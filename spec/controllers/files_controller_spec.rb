@@ -1240,6 +1240,12 @@ describe FilesController do
         expect(folder.attachments.first).not_to be_nil
       end
 
+      it "should populate the md5 column with the instfs sha512" do
+        post "api_capture", params: params.merge(sha512: 'deadbeef')
+        assert_status(201)
+        expect(folder.attachments.first.md5).to eq 'deadbeef'
+      end
+
       it "should include the attachment json in the response" do
         post "api_capture", params: params
         assert_status(201)
