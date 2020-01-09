@@ -23,9 +23,10 @@ import React from 'react'
 import {Billboard} from '@instructure/ui-billboard'
 import {Checkbox, TextInput} from '@instructure/ui-forms'
 import {Grid, View} from '@instructure/ui-layout'
-import {IconWarningLine, IconSearchLine} from '@instructure/ui-icons'
+import {IconWarningLine, IconSearchLine, IconInfoLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Spinner, Text} from '@instructure/ui-elements'
+import {Tooltip} from '@instructure/ui-overlays'
 
 import ScopesList from './ScopesList'
 
@@ -91,6 +92,8 @@ export default class Scopes extends React.Component {
 
   render() {
     const searchEndpoints = I18n.t('Search endpoints')
+    const {developerKey, updateDeveloperKey} = this.props
+
     return (
       <Grid>
         <Grid.Row rowSpacing="small">
@@ -119,6 +122,29 @@ export default class Scopes extends React.Component {
             </Grid.Col>
           ) : null}
         </Grid.Row>
+        {this.props.requireScopes && ENV.includesFeatureFlagEnabled && (
+          <Grid.Row>
+            <Grid.Col>
+              <Checkbox
+                label={
+                  <>
+                    <Text>{I18n.t('Allow Include Parameters ')}</Text>
+                    <Tooltip tip="description" on={['hover', 'focus']} variant="inverse">
+                      <span tabIndex="0">
+                        <IconInfoLine />
+                      </span>
+                    </Tooltip>
+                  </>
+                }
+                checked={developerKey.allow_includes}
+                onChange={e => {
+                  updateDeveloperKey('allow_includes', e.currentTarget.checked)
+                }}
+                data-automation="includes-checkbox"
+              />
+            </Grid.Col>
+          </Grid.Row>
+        )}
         {this.body()}
       </Grid>
     )
@@ -147,7 +173,8 @@ Scopes.propTypes = {
     scopes: PropTypes.arrayOf(PropTypes.string)
   }),
   requireScopes: PropTypes.bool,
-  onRequireScopesChange: PropTypes.func.isRequired
+  onRequireScopesChange: PropTypes.func.isRequired,
+  updateDeveloperKey: PropTypes.func.isRequired
 }
 
 Scopes.defaultProps = {
