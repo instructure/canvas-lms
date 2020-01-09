@@ -66,7 +66,8 @@ module Lti
           account: (account.site_admin? ? nil : account),
           is_lti_key: true,
           public_jwk_url: settings[:public_jwk_url],
-          public_jwk: settings[:public_jwk]
+          public_jwk: settings[:public_jwk],
+          scopes: settings[:scopes] || []
         )
         self.create!(
           developer_key: dk,
