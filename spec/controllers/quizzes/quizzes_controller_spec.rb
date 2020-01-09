@@ -535,7 +535,6 @@ describe Quizzes::QuizzesController do
     end
 
     it "assigns js_env for attachments if submission is present" do
-      require 'action_controller_test_process'
       user_session(@student)
       course_quiz !!:active
       submission = @quiz.generate_submission @student
@@ -550,7 +549,6 @@ describe Quizzes::QuizzesController do
 
     describe "js_env SUBMISSION_VERSIONS_URL" do
       before(:each) do
-        require 'action_controller_test_process'
         user_session(@student)
         course_quiz(true)
 

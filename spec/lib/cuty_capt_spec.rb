@@ -80,4 +80,13 @@ describe CutyCapt do
       }.not_to raise_error
     end
   end
+
+  describe ".snapshot_attachment_for_url" do
+    it "should return an attachment" do
+      path = File.join(self.class.fixture_path, "files/instructure.png")
+      expect(CutyCapt).to receive(:snapshot_url).and_yield(path)
+      attachment = CutyCapt.snapshot_attachment_for_url("blah")
+      expect(attachment).not_to be_nil
+    end
+  end
 end
