@@ -201,25 +201,6 @@ pipeline {
 
     stage('Parallel Run Tests') {
       parallel {
-        // TODO: this is temporary until we can get some actual builds passing
-        stage('Smoke Test') {
-          steps {
-            skipIfPreviouslySuccessful("smoke-test") {
-              timeout(time: 10) {
-                script {
-                  sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
-                  def dbCommon = load 'build/new-jenkins/groovy/cache-migrations.groovy'
-                  dbCommon.createMigrateBuildUpCached()
-                  sh 'build/new-jenkins/smoke-test.sh'
-                  if (env.GERRIT_EVENT_TYPE == 'change-merged') {
-                    dbCommon.storeMigratedImages()
-                  }
-                }
-              }
-            }
-          }
-        }
-
         stage('Linters') {
           when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' } }
           steps {
