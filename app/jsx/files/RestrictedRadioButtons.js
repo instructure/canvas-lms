@@ -83,7 +83,7 @@ class RestrictedRadioButtons extends React.Component {
     {
       ref: 'linkOnly',
       selectedOptionKey: 'link_only',
-      text: I18n.t('Not visible in student files'),
+      text: I18n.t('Only available to students with link'),
       iconClasses: 'icon-line icon-off RestrictedRadioButtons__icon',
       onChange() {
         this.updateBtnEnable()
