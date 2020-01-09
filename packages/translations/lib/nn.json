@@ -533,6 +533,15 @@
     "links_14b70841": {
         "message": "Lenker"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Liste er skjult."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Liste er skjult"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Liste utvida."
+    },
     "load_more_35d33c7": {
         "message": "Last fleire"
     },
@@ -997,6 +1006,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Bruk piltastane for å navigere mellom alternativa."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Skjermlesarar brukar dette for å skildre innhaldet i eit bilde"
