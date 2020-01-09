@@ -67,8 +67,10 @@ module LiveEvents
 
       def contract_message
         case event_subscriber
-        when PactConfig::Consumers::QUIZ_LTI
+        when PactConfig::LiveEventConsumers::QUIZ_LTI
           LiveEvents::PactHelper.quiz_lti_contract_for(event_name)
+        when PactConfig::LiveEventConsumers::OUTCOMES
+          LiveEvents::PactHelper.outcomes_contract_for(event_name)
         else
           raise ArgumentError, "Invalid event_subscriber: #{event_subscriber}"
         end
@@ -109,7 +111,11 @@ module LiveEvents
 
     class << self
       def quiz_lti_contract_for(event)
-        message_contract_for(PactConfig::Consumers::QUIZ_LTI, event)
+        message_contract_for(PactConfig::LiveEventConsumers::QUIZ_LTI, event)
+      end
+
+      def outcomes_contract_for(event)
+        message_contract_for(PactConfig::LiveEventConsumers::OUTCOMES, event)
       end
 
       private

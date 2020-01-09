@@ -24,7 +24,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
         event_name: 'quizzes_next_quiz_duplicated',
-        event_subscriber: PactConfig::Consumers::QUIZ_LTI
+        event_subscriber: PactConfig::LiveEventConsumers::QUIZ_LTI
       )
     end
 
