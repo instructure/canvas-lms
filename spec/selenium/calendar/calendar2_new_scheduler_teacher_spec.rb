@@ -57,6 +57,7 @@ describe "scheduler" do
       end
 
       it 'creates an Appointment Group with the feature flag ON', priority: "1", test_id: 2981262 do
+        skip('fix in KNO-214')
         title = 'my appt'
         location = 'office'
         start_time_text = '02'
