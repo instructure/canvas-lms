@@ -57,7 +57,6 @@ describe "scheduler" do
       end
 
       it 'creates an Appointment Group with the feature flag ON', priority: "1", test_id: 2981262 do
-        skip('fix in KNO-214')
         title = 'my appt'
         location = 'office'
         start_time_text = '02'
@@ -66,6 +65,7 @@ describe "scheduler" do
         get "/calendar"
 
         f('#create_new_event_link').click
+        wait_for_ajax_requests
         f('.edit_appointment_group_option').click
 
         set_value(f('input[name="title"]'), title)
