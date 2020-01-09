@@ -139,6 +139,7 @@ class DeveloperKeysController < ApplicationController
       :visible,
       :test_cluster_only,
       :require_scopes,
+      :allow_includes,
       scopes: []
     )
   end

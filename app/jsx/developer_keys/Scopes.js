@@ -129,7 +129,13 @@ export default class Scopes extends React.Component {
                 label={
                   <>
                     <Text>{I18n.t('Allow Include Parameters ')}</Text>
-                    <Tooltip tip="description" on={['hover', 'focus']} variant="inverse">
+                    <Tooltip
+                      tip={I18n.t(
+                        'Permit usage of all “includes” parameters for this developer key. "Includes" parameters may grant access to additional data not included in the scopes selected below.'
+                      )}
+                      on={['hover', 'focus']}
+                      variant="inverse"
+                    >
                       <span tabIndex="0">
                         <IconInfoLine />
                       </span>
