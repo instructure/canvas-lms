@@ -516,9 +516,8 @@ describe "Importing assignments" do
     end
 
     it "doesn't add a warning to the migratio if there is an active tool_proxy" do
-      tool_proxy_double = double("ToolProxy", preload: [tool_proxy])
       allow(Lti::ToolProxy).
-        to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) {tool_proxy_double}
+        to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) {[tool_proxy]}
       course_model
       migration = @course.content_migrations.create!
       @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => migration_id
