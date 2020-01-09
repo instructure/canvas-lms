@@ -65,10 +65,15 @@ export default class WikiPageIndexItemView extends Backbone.View {
   toJSON() {
     const json = super.toJSON(...arguments)
     json.CAN = {
-      MANAGE: !!this.WIKI_RIGHTS.manage,
-      PUBLISH: !!this.WIKI_RIGHTS.manage && this.contextName === 'courses',
-      // TODO: Consider allowing duplicating pages in other contexts
-      DUPLICATE: !!this.WIKI_RIGHTS.manage && this.contextName === 'courses'
+      MANAGE:
+        !!this.WIKI_RIGHTS.create_page ||
+        !!this.WIKI_RIGHTS.delete_page ||
+        !!this.WIKI_RIGHTS.publish_page ||
+        !!this.WIKI_RIGHTS.update,
+      PUBLISH: !!this.WIKI_RIGHTS.publish_page,
+      DUPLICATE: !!this.WIKI_RIGHTS.create_page && this.contextName === 'courses',
+      UPDATE: !!this.WIKI_RIGHTS.update,
+      DELETE: !!this.WIKI_RIGHTS.delete_page
     }
 
     json.DIRECT_SHARE_ENABLED = ENV.DIRECT_SHARE_ENABLED

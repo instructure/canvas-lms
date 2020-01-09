@@ -485,6 +485,9 @@ class Group < ActiveRecord::Base
     can :manage_content and
     can :manage_files and
     can :manage_wiki and
+    can :manage_wiki_create and
+    can :manage_wiki_delete and
+    can :manage_wiki_update and
     can :post_to_forum and
     can :create_collaborations and
     can :create_forum
@@ -543,6 +546,9 @@ class Group < ActiveRecord::Base
       can :manage_files and
       can :manage_students and
       can :manage_wiki and
+      can :manage_wiki_create and
+      can :manage_wiki_delete and
+      can :manage_wiki_update and
       can :moderate_forum and
       can :post_to_forum and
       can :create_forum and

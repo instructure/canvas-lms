@@ -685,7 +685,68 @@ class RoleOverride < ActiveRecord::Base
           'TeacherEnrollment',
           'DesignerEnrollment',
           'AccountAdmin'
-         ]
+         ],
+       :account_allows => lambda {|a| !a.root_account.feature_enabled?(:granular_permissions_wiki_pages)}
+    },
+    :manage_wiki_create => {
+      :label => lambda { t("Create pages") },
+      :label_v2 =>  lambda { t("Pages - Create") },
+      :available_to => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'TeacherlessStudentEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      :true_for => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'AccountAdmin'
+      ],
+      :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
+    },
+    :manage_wiki_delete => {
+      :label => lambda { t("Delete pages") },
+      :label_v2 =>  lambda { t("Pages - Delete") },
+      :available_to => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'TeacherlessStudentEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      :true_for => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'AccountAdmin'
+      ],
+      :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
+    },
+    :manage_wiki_update => {
+      :label => lambda { t("Update pages") },
+      :label_v2 =>  lambda { t("Pages - Update") },
+      :available_to => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'TeacherlessStudentEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      :true_for => [
+        'TaEnrollment',
+        'TeacherEnrollment',
+        'DesignerEnrollment',
+        'AccountAdmin'
+      ],
+      :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
     },
     :moderate_forum => {
       :label => lambda { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },

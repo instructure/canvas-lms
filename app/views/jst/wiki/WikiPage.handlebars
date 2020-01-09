@@ -56,7 +56,9 @@
                 <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>
               {{/if}}
               {{#unless front_page}}
-                <li><a href="#" class="icon-bookmark use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
+                {{#if CAN.UPDATE_CONTENT}}
+                  <li><a href="#" class="icon-bookmark use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
+                {{/if}}
               {{/unless}}
               {{#if CAN.DIRECT_SHARE}}
                 <li><a href="#" class="icon-user direct-share-send-to-menu-item">{{#t}}Send To...{{/t}}</a></li>

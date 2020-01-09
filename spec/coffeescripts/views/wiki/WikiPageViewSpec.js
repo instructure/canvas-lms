@@ -217,6 +217,7 @@ testRights('CAN (manage)', {
   contextAssetString: 'course_73',
   WIKI_RIGHTS: {
     read: true,
+    publish_page: true,
     manage: true
   },
   PAGE_RIGHTS: {
@@ -288,6 +289,7 @@ testRights('CAN (manage, course home page)', {
   course_home: true,
   WIKI_RIGHTS: {
     read: true,
+    publish_page: true,
     manage: true
   },
   PAGE_RIGHTS: {
