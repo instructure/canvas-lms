@@ -25,13 +25,14 @@ import {
   AUDIO_PLAYER_SIZE
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {isAudio} from './plugins/shared/fileTypeUtils'
+import {downloadToWrap} from '../common/fileUrl'
 
 export function renderLink(data, contents) {
   const linkAttrs = {...data}
   linkAttrs.href = linkAttrs.href || linkAttrs.url
   delete linkAttrs.url
   if (linkAttrs.href) {
-    linkAttrs.href = cleanUrl(linkAttrs.href)
+    linkAttrs.href = downloadToWrap(cleanUrl(linkAttrs.href), true)
   }
   linkAttrs.title = linkAttrs.title || formatMessage('Link')
   const children = contents || linkAttrs.text || linkAttrs.title

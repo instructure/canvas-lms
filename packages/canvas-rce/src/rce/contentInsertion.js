@@ -144,10 +144,10 @@ function decorateLinkWithEmbed(link) {
   const type = link.embed && link.embed.type
   link.class = classnames(link.class, {
     instructure_file_link: true,
-    instructure_scribd_file: type == 'scribd',
-    instructure_image_thumbnail: type == 'image',
-    instructure_video_link: type == 'video',
-    instructure_audio_link: type == 'audio',
+    instructure_scribd_file: type === 'scribd' || link['data-canvas-previewable'],
+    instructure_image_thumbnail: type === 'image',
+    instructure_video_link: type === 'video',
+    instructure_audio_link: type === 'audio',
     auto_open: link.embed && link.embed.autoOpenPreview,
     inline_disabled: link.embed && link.embed.disablePreview
   })

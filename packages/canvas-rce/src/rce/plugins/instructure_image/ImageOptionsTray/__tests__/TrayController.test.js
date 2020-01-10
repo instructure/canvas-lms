@@ -224,9 +224,9 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
         expect($link.href).toEqual($images[0].src)
       })
 
-      it('uses the image src for the link label', () => {
+      it('uses the image alt text for the link label', () => {
         const $link = editors[0].selection.getNode()
-        expect($link.textContent.trim()).toEqual($images[0].src)
+        expect($link.textContent.trim()).toEqual($images[0].alt)
       })
 
       it('sets focus on the editor', () => {
