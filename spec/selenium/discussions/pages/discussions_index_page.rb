@@ -117,7 +117,7 @@ class DiscussionsIndex
     end
 
     def discussion_settings_menu_items
-      ff("ul[role='menu'] li")
+      f("ul[role='menu']")
     end
 
     def discussion_menu_tool_link(tool_text)

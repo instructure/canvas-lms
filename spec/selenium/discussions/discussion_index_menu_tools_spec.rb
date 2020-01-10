@@ -34,7 +34,7 @@ describe 'discussion index menu tool placement' do
     DiscussionsIndex.visit(@course)
     DiscussionsIndex.discussion_menu_button.click
 
-    expect(DiscussionsIndex.discussion_settings_menu_items[0]).to include_text("Import Stuff")
+    expect(DiscussionsIndex.discussion_settings_menu_items).to include_text("Import Stuff")
 
     DiscussionsIndex.discussion_menu_tool_link("Import Stuff").click
     wait_for_ajaximations

@@ -23,6 +23,19 @@ module QuizzesIndexPage
     #------------------------------ Selectors -----------------------------
 
     #------------------------------ Elements ------------------------------
+    
+    def quiz_index_settings_button
+      fj("[role=button]:contains('Quiz Settings')")
+    end
+
+    def quiz_index_settings_menu_items
+      f("ul[role='menu']")
+    end
+
+    def quiz_index_settings_menu_tool_link(tool_text)
+      fj("a:contains('#{tool_text}')")
+    end
+
     def quiz_row(quiz_id)
       f("#summary_quiz_#{quiz_id}")
     end
@@ -33,6 +46,18 @@ module QuizzesIndexPage
 
     def quiz_settings_menu(quiz_id)
       f("ul[role='menu']#ui-id-#{quiz_id}-1")
+    end
+
+    def tool_dialog
+      f("div[role='dialog']")
+    end
+
+    def tool_dialog_header
+      f("div[role='dialog'] h2")
+    end
+
+    def tool_dialog_iframe
+      tool_dialog.find_element(:css, "iframe")
     end
 
     #------------------------------ Actions ------------------------------
