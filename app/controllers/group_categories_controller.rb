@@ -114,7 +114,7 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns [GroupCategory]
   def index
-    @categories = @context.group_categories.preload(:root_account)
+    @categories = @context.group_categories.preload(:root_account, :progresses)
     respond_to do |format|
       format.json do
         if authorized_action(@context, @current_user, :manage_groups)
