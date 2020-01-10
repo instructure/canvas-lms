@@ -48,6 +48,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       table.timestamps null: true
 
       table.string   :tag
+      table.integer  :max_attempts
     end
 
     add_index :delayed_jobs, [:priority, :run_at], :name => 'delayed_jobs_priority'
