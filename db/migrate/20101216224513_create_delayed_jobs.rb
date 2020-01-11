@@ -49,11 +49,14 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
 
       table.string   :tag
       table.integer  :max_attempts
+      table.string   :strand
     end
 
-    add_index :delayed_jobs, [:priority, :run_at], :name => 'delayed_jobs_priority'
-    add_index :delayed_jobs, [:queue], :name => 'delayed_jobs_queue'
+    # "nulls first" syntax is postgresql specific, and allows for more
+    # efficient querying for the next job
+    connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at, failed_at nulls first, locked_at nulls first, queue)")
     add_index :delayed_jobs, [:tag]
+    add_index :delayed_jobs, :strand
   end
 
   def self.down
