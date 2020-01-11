@@ -540,7 +540,7 @@
         "message": "Liste er skjult"
     },
     "list_expanded_efec2d0": {
-        "message": "Liste utvida."
+        "message": "Liste er utvida."
     },
     "load_more_35d33c7": {
         "message": "Last fleire"
@@ -688,6 +688,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "popup-menyen med val"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } er valt. Liste er skjult."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Valfri: Legg til emne"
