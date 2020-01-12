@@ -52,7 +52,7 @@ gem "aws-sdk-s3", '1.48.0', require: false
 gem "aws-sdk-sns", '1.19.0', require: false
 gem "aws-sdk-sqs", '1.22.0', require: false
 gem "aws-sdk-core", "3.68.1", require: false
-  gem "aws-partitions", "1.238.0", require: false # pinning transient dependency
+  gem 'aws-partitions', '1.263.0', require: false
 gem "aws-sdk-kms", "1.24.0", require: false
 gem "aws-sigv4", "1.1.0", require: false
 
