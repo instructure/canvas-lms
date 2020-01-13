@@ -344,6 +344,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "needs_grading_count", :default => 0
       t.text     "turnitin_settings"
       t.boolean  "muted", :default => false
+      t.integer  "group_category_id", :limit => 8
     end
 
     add_index "assignments", ["assignment_group_id"], :name => "index_assignments_on_assignment_group_id"
@@ -368,7 +369,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "context_type"
       t.integer  "size", :limit => 8
       t.integer  "folder_id", :limit => 8
-      t.integer  "enrollment_id", :limit => 8
       t.string   "content_type"
       t.text     "filename"
       t.string   "uuid"
@@ -402,11 +402,11 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "media_entry_id"
       t.string   "md5"
       t.string   "cached_scribd_thumbnail"
+      t.string   "encoding"
     end
 
     add_index "attachments", ["cloned_item_id"], :name => "index_attachments_on_cloned_item_id"
     add_index "attachments", ["context_id", "context_type"], :name => "index_attachments_on_context_id_and_context_type"
-    add_index "attachments", ["enrollment_id"], :name => "index_attachments_on_enrollment_id"
     add_index "attachments", ["folder_id"], :name => "index_attachments_on_folder_id"
     add_index "attachments", ["md5", "namespace"], :name => "index_attachments_on_md5_and_namespace"
     add_index "attachments", ["root_attachment_id"], :name => "index_attachments_on_root_attachment_id"
@@ -572,6 +572,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "cloned_item_id", :limit => 8
       t.integer  "associated_asset_id", :limit => 8
       t.string   "associated_asset_type"
+      t.boolean  "new_tab"
     end
 
     add_index "content_tags", ["content_id", "content_type"], :name => "index_content_tags_on_content_id_and_content_type"
@@ -960,6 +961,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "discussion_topics", ["root_topic_id"], :name => "index_discussion_topics_on_root_topic_id"
     add_index "discussion_topics", ["user_id"], :name => "index_discussion_topics_on_user_id"
     add_index "discussion_topics", ["workflow_state"], :name => "index_discussion_topics_on_workflow_state"
+    add_index :discussion_topics, [:assignment_id]
 
     create_table "enrollment_dates_overrides", :force => true do |t|
       t.integer  "enrollment_term_id", :limit => 8
@@ -1008,7 +1010,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "end_at"
       t.integer  "course_section_id", :limit => 8
       t.integer  "root_account_id", :limit => 8
-      t.string   "invitation_email"
       t.float    "computed_final_score"
       t.datetime "completed_at"
       t.boolean  "limit_priveleges_to_course_section"
@@ -1016,6 +1017,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.float    "computed_current_score"
       t.string   "grade_publishing_status", :default => "unpublished"
       t.datetime "last_publish_attempt_at"
+      t.text     "stuck_sis_fields"
+      t.text     "grade_publishing_message"
     end
 
     add_index "enrollments", ["course_id", "workflow_state"], :name => "index_enrollments_on_course_id_and_workflow_state"
@@ -1145,6 +1148,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "external_feeds", ["context_id", "context_type"], :name => "index_external_feeds_on_context_id_and_context_type"
     add_index "external_feeds", ["user_id"], :name => "index_external_feeds_on_user_id"
 
+    create_table :favorites do |t|
+      t.integer :user_id, :limit => 8
+      t.integer :context_id, :limit => 8
+      t.string :context_type
+
+      t.timestamps null: true
+    end
+
     create_table "folders", :force => true do |t|
       t.string   "name"
       t.text     "full_name"
@@ -1239,6 +1250,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "sis_name"
       t.string   "sis_batch_id"
       t.text     "stuck_sis_fields"
+      t.integer  "group_category_id", :limit => 8
     end
 
     add_index "groups", ["account_id"], :name => "index_groups_on_account_id"
@@ -1246,6 +1258,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "groups", ["id", "type"], :name => "index_groups_on_id_and_type"
     add_index "groups", ["wiki_id"], :name => "index_groups_on_wiki_id"
     add_index "groups", ["workflow_state"], :name => "index_groups_on_workflow_state"
+
+    create_table :group_categories do |t|
+      t.integer :context_id, :limit => 8
+      t.string :context_type
+      t.string :name
+      t.string :role
+      t.datetime :deleted_at
+      t.string :self_signup
+    end
 
     create_table "hashtags", :force => true do |t|
       t.string   "hashtag"
@@ -1538,17 +1559,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "updated_at"
       t.boolean  "password_auto_generated"
       t.datetime "deleted_at"
-      t.string   "deleted_unique_id"
-      t.string   "sis_source_id"
       t.string   "sis_batch_id"
       t.string   "sis_user_id"
       t.string   "sis_ssha"
       t.integer  "communication_channel_id", :limit => 8
       t.string   "login_path_to_ignore"
       t.integer  "sis_communication_channel_id", :limit => 8
+      t.text     "stuck_sis_fields"
     end
 
-    add_index "pseudonyms", ["account_id", "sis_source_id"], :name => "index_pseudonyms_on_account_id_and_sis_source_id"
     add_index "pseudonyms", ["communication_channel_id"], :name => "index_pseudonyms_on_communication_channel_id"
     add_index "pseudonyms", ["persistence_token"], :name => "index_pseudonyms_on_persistence_token"
     add_index "pseudonyms", ["single_access_token"], :name => "index_pseudonyms_on_single_access_token"
@@ -1848,6 +1867,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "processing_warnings", :limit => 16777215
       t.boolean  "batch_mode"
       t.integer  "batch_mode_term_id", :limit => 8
+      t.text     "options"
     end
 
     create_table "sis_cross_listed_sections", :force => true do |t|
@@ -2072,8 +2092,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index "users", ["avatar_state", "avatar_image_updated_at"], :name => "index_users_on_avatar_state_and_avatar_image_updated_at"
     add_index "users", ["creation_unique_id", "creation_sis_batch_id"], :name => "users_sis_creation"
-    add_index "users", ["sortable_name"], :name => "index_users_on_sortable_name"
     add_index "users", ["uuid"], :name => "index_users_on_uuid"
+    connection.execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (LOWER(sortable_name))")
 
     create_table "versions", :force => true do |t|
       t.integer  "versionable_id", :limit => 8
