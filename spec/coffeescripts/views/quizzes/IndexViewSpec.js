@@ -23,6 +23,7 @@ import NoQuizzesView from 'compiled/views/quizzes/NoQuizzesView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import 'helpers/jquery.simulate'
+import ReactDOM from 'react-dom'
 
 let fixtures = null
 const indexView = function(assignments, open, surveys) {
@@ -136,17 +137,25 @@ test('#hasSurveys if has surveys', () => {
   const view = indexView(null, null, surveys)
   ok(view.options.hasSurveys)
 })
-test("shows '+ Quiz' button if quiz lti enabled", () => {
+test("shows modified '+ Quiz' button if quiz lti enabled", () => {
   ENV.flags.quiz_lti_enabled = true
   const view = indexView(null, null, null)
-  const $button = view.$('.new_quiz_lti')
+  const $button = view.$('.choose-quiz-engine')
   equal($button.length, 1)
-  ok(/\?quiz_lti$/.test($button.attr('href')))
 })
-test("does not show '+ Quiz' button when quiz lti disabled", () => {
+test("does not show modified '+ Quiz' button when quiz lti disabled", () => {
   ENV.flags.quiz_lti_enabled = false
   const view = indexView(null, null, null)
-  equal(view.$('.new_quiz_lti').length, 0)
+  equal(view.$('.choose-quiz-engine').length, 0)
+})
+test('renders choose quiz engine modal', () => {
+  ENV.flags.quiz_lti_enabled = true
+  sinon.stub(ReactDOM, 'render')
+  const view = indexView(null, null, null)
+  view.$('.choose-quiz-engine').simulate('click')
+  const args = ReactDOM.render.firstCall.args
+  equal(args[0].props.setOpen, true)
+  ReactDOM.render.restore()
 })
 test('should render the view', () => {
   const assignments = new QuizCollection([

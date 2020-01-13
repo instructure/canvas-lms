@@ -8,24 +8,11 @@
   {{#ifAny permissions.create permissions.manage}}
     <div class="header-bar-right">
       {{#if flags.quiz_lti_enabled}}
-        <span class="new_quiz_lti_wrapper">
-          <a
-            href="{{ENV.URLS.new_assignment_url}}?quiz_lti"
-            class="new_quiz_lti btn icon-plus"
-            role="button"
-            title='{{#t}}Add Quiz{{/t}}'
-            aria-label='{{#t}}Add Quiz{{/t}}'
-          >{{#t}}Quiz{{/t}}</a>
-        </span>
-
-        <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
-          <input type="hidden" name="authenticity_token" />
-          <button class="btn btn-primary new-quiz-link"
-            title='{{#t}}Add Old Quiz{{/t}}'
-            aria-label='{{#t}}Add Old Quiz{{/t}}'>
-            <i class="icon-plus" />&nbsp;{{#t}}Old Quiz{{/t}}
-          </button>
-        </form>
+        <button class="btn btn-primary choose-quiz-engine"
+          title='{{#t}}Add Quiz{{/t}}'
+          aria-label='{{#t}}Add Quiz{{/t}}'>
+          <i class="icon-plus" />&nbsp;{{#t}}Quiz{{/t}}
+        </button>
       {{else}}
         <form class="new-quiz-form" action="{{urls.new_quiz_url}}" method="post">
           <input type="hidden" name="authenticity_token" />
@@ -79,6 +66,7 @@
 
 <div id="direct-share-mount-point" />
 <div id="external-tool-mount-point" />
+<div id="quiz-modal-mount-point" />
 
 <div class="item-group-container">
   {{#if hasNoQuizzes}}
