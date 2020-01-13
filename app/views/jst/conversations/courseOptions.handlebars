@@ -1,7 +1,9 @@
 <option value="">{{defaultOption}}</option>
-{{#favorites}}
-  {{>[conversations/courseOption]}}
-{{/favorites}}
+<optgroup data-content-type="{{t "Favorite Courses"}}" label="{{#t "course_options.favorite"}}Favorite Courses{{/t}}">
+  {{#favorites}}
+    {{>[conversations/courseOption]}}
+  {{/favorites}}
+</optgroup>
 <optgroup data-content-type="{{t "More Courses"}}" label="{{#t "course_options.more_courses"}}More Courses{{/t}}">
   {{#more}}
     {{>[conversations/courseOption]}}
