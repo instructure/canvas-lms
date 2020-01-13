@@ -52,14 +52,30 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       table.string   :strand
     end
 
-    # "nulls first" syntax is postgresql specific, and allows for more
-    # efficient querying for the next job
-    connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at, failed_at nulls first, locked_at nulls first, queue)")
     add_index :delayed_jobs, [:tag]
-    add_index :delayed_jobs, :strand
+    add_index :delayed_jobs, %w(run_at queue locked_at strand priority), :name => 'index_delayed_jobs_for_get_next'
+    add_index :delayed_jobs, %w(strand id), :name => 'index_delayed_jobs_on_strand'
+
+    create_table :failed_jobs do |t|
+      t.integer  "priority",    :default => 0
+      t.integer  "attempts",    :default => 0
+      t.string   "handler",     :limit => 512000
+      t.integer  "original_id", :limit => 8
+      t.text     "last_error"
+      t.string   "queue"
+      t.datetime "run_at"
+      t.datetime "locked_at"
+      t.datetime "failed_at"
+      t.string   "locked_by"
+      t.datetime "created_at"
+      t.datetime "updated_at"
+      t.string   "tag"
+      t.integer  "max_attempts"
+      t.string   "strand"
+    end
   end
 
   def self.down
-    drop_table :delayed_jobs
+    raise ActiveRecord::IrreversibleMigration
   end
 end
