@@ -38,6 +38,8 @@ const getAnchorElement = function(editor, node) {
 
 tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
   init(ed) {
+    const contextType = ed.settings.canvas_rce_user_context.type
+
     // Register commands
     ed.addCommand('instructureLinkCreate', clickCallback.bind(this, ed, CREATE_LINK))
     ed.addCommand('instructureLinkEdit', clickCallback.bind(this, ed, EDIT_LINK))
@@ -80,16 +82,19 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
               onAction: () => {
                 ed.execCommand('instructureLinkCreate')
               }
-            },
-            {
+            }
+          ]
+
+          if (contextType === 'course') {
+            items.splice(1, 0, {
               type: 'menuitem',
               text: formatMessage('Course Links'),
               onAction() {
                 ed.focus(true) // activate the editor without changing focus
                 ed.execCommand('instructureTrayForLinks', false, PLUGIN_KEY)
               }
-            }
-          ]
+            })
+          }
         }
         callback(items)
       },
