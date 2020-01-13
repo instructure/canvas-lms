@@ -284,6 +284,7 @@ describe "scheduler" do
       end
 
       it "should let me do so from the week view", priority: "1", test_id: 502483 do
+        skip('Fix in KNO-217')
         load_week_view
 
         scheduler_event.click
