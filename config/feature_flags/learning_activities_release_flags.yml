@@ -28,3 +28,8 @@ discussion_topic_performance_enhancement:
   environments:
     ci:
       state: 'on'
+syllabus_course_summary_option:
+  state: allowed
+  applies_to: SiteAdmin
+  display_name: Syllabus Course Summary Option
+  description: Make the Course Summary (list of assignments and events) optional in the syllabus
