@@ -223,19 +223,6 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     where(:id => questions).update_all(set)
   end
 
-  def migrate_file_links
-    Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_question(self)
-  end
-
-  def self.batch_migrate_file_links(ids)
-    questions = Quizzes::QuizQuestion.preload(:quiz, :assessment_question).where(:id => ids)
-    questions.each do |question|
-      if question.migrate_file_links
-        question.save
-      end
-    end
-  end
-
   alias_method :destroy_permanently!, :destroy
 
   def destroy
