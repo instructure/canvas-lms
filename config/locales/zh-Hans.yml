@@ -15503,7 +15503,7 @@ zh-Hans:
   number_to_grade_661b05dd: "%{number}评分"
   number_unsubmitted_145fefae: "%{number}未提交"
   numerical_answer_ec7120bf: 数值答案
-  nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered}%{numGroup} 已掌握"
+  nummastered_of_numgroup_mastered_b8113c9c: "已掌握%{numMastered}/%{numGroup}"
   numpoints_points_b1f0666a: "%{numPoints} 分值"
   o365_template_297a82f6: "O365 模板"
   o_224cf405: o
