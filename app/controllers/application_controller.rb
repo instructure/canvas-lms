@@ -595,7 +595,7 @@ class ApplicationController < ActionController::Base
       format.html {
         return unless fix_ms_office_redirects
         store_location
-        return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
+        return redirect_to login_url(params.slice(:authentication_provider)) if !@current_user
 
         if @context.is_a?(Course) && @context_enrollment
           start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
