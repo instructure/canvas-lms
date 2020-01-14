@@ -66,6 +66,7 @@ describe "quizzes questions" do
       expect(f('#editor_tabs')).to include_text("Link to other content in the course.")
 
       submit_form(question)
+      wait_for_ajaximations
       question = f("#question_#{quest1.id}")
       expect(question.find_element(:css, ".question_name")).to include_text('edited question')
       f('#show_question_details').click
