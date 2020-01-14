@@ -380,7 +380,7 @@ export default class Assignment extends Model
     return 'Assignment'
 
   objectTypeDisplayName: ->
-    return I18n.t('Quiz') if @isQuiz()
+    return I18n.t('Quiz') if @isQuiz() || @isQuizLTIAssignment()
     return I18n.t('Discussion Topic') if @isDiscussionTopic()
     return I18n.t('Page') if @isPage()
     return I18n.t('Assignment')
