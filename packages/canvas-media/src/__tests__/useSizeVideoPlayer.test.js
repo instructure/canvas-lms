@@ -45,11 +45,12 @@ function renderTestComponent(theFile, parentPanelRef, isLoading) {
 }
 
 function makeFauxParentPanel(
+  panelWidth = 1000,
   vwidth = DEFAULT_VIDEO_PLAYER_SIZE.width,
   vheight = DEFAULT_VIDEO_PLAYER_SIZE.height
 ) {
   return {
-    clientWidth: 1000,
+    clientWidth: panelWidth,
     querySelector: () => ({
       loadedmetadata: true,
       videoWidth: vwidth,
@@ -75,9 +76,15 @@ describe('useSizeVideoPlayer hook', () => {
       expect(getByText(`height=${DEFAULT_VIDEO_PLAYER_SIZE.height}`)).toBeInTheDocument()
     })
 
-    it('returns .75 parent width', () => {
+    it('returns .75 parent width in small container', () => {
+      const {getByText} = renderTestComponent({type: 'video'}, {current: makeFauxParentPanel(300)})
+      expect(getByText('width=225px')).toBeInTheDocument()
+      expect(getByText(`height=${undefined}`)).toBeInTheDocument()
+    })
+
+    it('returns 300px width in large container', () => {
       const {getByText} = renderTestComponent({type: 'video'}, {current: makeFauxParentPanel()})
-      expect(getByText('width=750px')).toBeInTheDocument()
+      expect(getByText('width=300px')).toBeInTheDocument()
       expect(getByText(`height=${undefined}`)).toBeInTheDocument()
     })
 
