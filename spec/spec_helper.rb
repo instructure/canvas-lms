@@ -905,7 +905,8 @@ RSpec.configure do |config|
       '2.5.1',
       '2.5.3',
       '2.6.0',
-      '2.6.2'
+      '2.6.2',
+      '2.6.5'
     ]
     skip("stubbing prepended class methods is broken in this version of ruby") if versions.include?(RUBY_VERSION)
   end
