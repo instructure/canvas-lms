@@ -1286,7 +1286,8 @@ class ApplicationController < ActionController::Base
         }
       end
 
-      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level, context: context)
+      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level,
+        context: context, context_membership: @context_membership)
 
       @accessed_asset
     end
@@ -1909,6 +1910,8 @@ class ApplicationController < ActionController::Base
         Canvas::Plugin.find(:vericite).try(:enabled?)
       elsif feature == :lockdown_browser
         Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
+      elsif AccountServices.allowable_services[feature]
+        true
       else
         false
       end
@@ -2606,6 +2609,7 @@ class ApplicationController < ActionController::Base
       @streaming_template = true
       false
     else
+      return value_to_boolean(params[:force_stream]) if params.key?(:force_stream)
       ::Canvas::DynamicSettings.find(tree: :private)["enable_template_streaming"] &&
         Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
     end

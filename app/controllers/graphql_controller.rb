@@ -36,6 +36,7 @@ class GraphQLController < ApplicationController
       domain_root_account: @domain_root_account,
       access_token: @access_token,
       in_app: in_app?,
+      deleted_models: {},
       request_id: (Thread.current[:context] || {})[:request_id],
       tracers: [
         Tracers::DatadogTracer.new(

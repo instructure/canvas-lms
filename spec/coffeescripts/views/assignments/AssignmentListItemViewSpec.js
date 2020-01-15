@@ -300,7 +300,7 @@ test('does not initialize sis toggle if sis enabled, can manage and is unpublish
   ok(!view.sisButtonView)
 })
 
-test('opens and closes the direct share send to user dialog', async function() {
+QUnit.skip('Fix in LA-383 - opens and closes the direct share send to user dialog', async function() {
   const view = createView(this.model, {directShareEnabled: true})
   $('#fixtures').append('<div id="send-to-mount-point" />')
   view.$('.send_assignment_to').click()
@@ -309,7 +309,7 @@ test('opens and closes the direct share send to user dialog', async function() {
   await waitForElementToBeRemoved(() => queryByText(document.body, 'Send to:'))
 })
 
-test('opens and closes the direct share copy to course tray', async function() {
+QUnit.skip('Fix in LA-354 - opens and closes the direct share copy to course tray', async function() {
   const view = createView(this.model, {directShareEnabled: true})
   $('#fixtures').append('<div id="copy-to-mount-point" />')
   view.$('.copy_assignment_to').click()

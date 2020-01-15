@@ -273,15 +273,17 @@ module Outcomes
         where(workflow_state: 'deleted')
       resurrect.update_all(workflow_state: 'active')
 
+      # add new parents before removing old to avoid deleting last link
+      # to an aligned outcome
+      existing_parent_ids = existing_links.pluck(:associated_asset_id)
+      new_parents = parents.reject { |p| existing_parent_ids.include?(p.id) }
+      new_parents.each { |p| p.add_outcome(outcome) }
+
       kill = existing_links.
         where.not(associated_asset_id: next_parent_ids).
         where(associated_asset_type: 'LearningOutcomeGroup').
         where(workflow_state: 'active')
       kill.destroy_all
-
-      existing_parent_ids = existing_links.pluck(:associated_asset_id)
-      new_parents = parents.reject { |p| existing_parent_ids.include?(p.id) }
-      new_parents.each { |p| p.add_outcome(outcome) }
     end
 
     def outcome_import_id

@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, lazy} from 'react'
+import React, {useState, lazy, useCallback} from 'react'
 import I18n from 'i18n!content_share'
 import CanvasLazyTray from 'jsx/shared/components/CanvasLazyTray'
 import ContentHeading from './ContentHeading'
 import ReceivedTable from './ReceivedTable'
 import PreviewModal from './PreviewModal'
-import {Spinner, Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Spinner} from '@instructure/ui-elements'
 import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 import Paginator from 'jsx/shared/components/Paginator'
@@ -42,8 +43,23 @@ export default function ReceivedContentView() {
 
   const sharesUrl = '/api/v1/users/self/content_shares'
 
+  const handleSetShares = useCallback(
+    data => {
+      setShares(data)
+      const message = I18n.t(
+        {
+          one: '1 shared item loaded.',
+          other: '%{count} shared items loaded.'
+        },
+        {count: data.length}
+      )
+      showFlashAlert({message, srOnly: true, type: 'info'})
+    },
+    [setShares]
+  )
+
   useFetchApi({
-    success: setShares,
+    success: handleSetShares,
     meta: setResponseMeta,
     error: setError,
     loading: setIsLoading,
@@ -69,9 +85,14 @@ export default function ReceivedContentView() {
       .catch(setError)
   }
 
+  function markRead(share) {
+    onUpdate(share.id, {read_state: 'read'})
+  }
+
   function onPreview(share) {
     setCurrentContentShare(share)
     setWhichModalOpen('preview')
+    markRead(share)
   }
 
   function onImport(share) {
@@ -151,10 +172,14 @@ export default function ReceivedContentView() {
         label={I18n.t('Import...')}
         open={whichModalOpen === 'import'}
         placement="end"
-        padding="0 1.5rem"
+        padding="0 medium"
         onDismiss={closeModal}
       >
-        <CourseImportPanel contentShare={currentContentShare} onClose={closeModal} />
+        <CourseImportPanel
+          contentShare={currentContentShare}
+          onClose={closeModal}
+          onImport={markRead}
+        />
       </CanvasLazyTray>
     </>
   )

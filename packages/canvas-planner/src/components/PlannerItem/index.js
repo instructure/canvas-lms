@@ -330,8 +330,8 @@ export class PlannerItem extends Component {
         >
           <ScreenReaderContent>{this.linkLabel()}</ScreenReaderContent>
           <PresentationContent>{this.props.title}</PresentationContent>
-          {this.renderCalendarEventModal()}
         </Button>
+        {this.renderCalendarEventModal()}
       </div>
     )
   }

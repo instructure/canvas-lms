@@ -779,10 +779,20 @@ class CoursesController < ApplicationController
         params_for_create.delete :storage_quota_mb
       end
 
+      # Hang on... caller may not have permission to manage course visibility
+      # settings. If not, make sure any attempt doesn't see the light of day.
+      unless course_permission_to?("manage_course_visibility", @account)
+        params_for_create.delete :public_syllabus
+        params_for_create.delete :is_public_to_auth_users
+        params_for_create.delete :public_syllabus_to_auth
+        params_for_create[:is_public] = false
+      end
+
       can_manage_sis = api_request? && @account.grants_right?(@current_user, :manage_sis)
       if can_manage_sis && value_to_boolean(params[:enable_sis_reactivation])
         @course = @domain_root_account.all_courses.where(
-          :sis_source_id => sis_course_id, :workflow_state => 'deleted').first
+          :sis_source_id => sis_course_id, :workflow_state => 'deleted'
+        ).first
         if @course
           @course.workflow_state = 'claimed'
           @course.account = @sub_account if @sub_account
@@ -1101,7 +1111,7 @@ class CoursesController < ApplicationController
     reject!('Search term required') unless params[:search_term]
     return unless authorized_action(@context, @current_user, :manage_content)
 
-    users_scope = User.where.not(id: @current_user.id).active.distinct
+    users_scope = User.shard(Shard.current).where.not(id: @current_user.id).active.distinct
     union_scope = teacher_scope(name_scope(users_scope), @context.root_account_id).
       union(
         teacher_scope(email_scope(users_scope), @context.root_account_id),

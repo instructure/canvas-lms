@@ -489,13 +489,21 @@ module Canvas::LiveEvents
     }, amended_context(submission.assignment.context))
   end
 
-  def self.asset_access(asset, category, role, level, context: nil)
+  def self.asset_access(asset, category, role, level, context: nil, context_membership: nil)
     asset_subtype = nil
     if asset.is_a?(Array)
       asset_subtype = asset[0]
       asset_obj = asset[1]
     else
       asset_obj = asset
+    end
+
+    enrollment_data = {}
+    if context_membership&.is_a?(Enrollment)
+      enrollment_data = {
+        enrollment_id: context_membership.id,
+        section_id: context_membership.course_section_id
+      }
     end
 
     post_event_stringified(
@@ -508,7 +516,7 @@ module Canvas::LiveEvents
         category: category,
         role: role,
         level: level
-      }.merge(LiveEvents::EventSerializerProvider.serialize(asset_obj)),
+      }.merge(LiveEvents::EventSerializerProvider.serialize(asset_obj)).merge(enrollment_data),
       amended_context(context)
     )
   end
@@ -733,22 +741,6 @@ module Canvas::LiveEvents
     post_event_stringified('grade_override', data, amended_context(course))
   end
 
-  def self.sis_batch_payload(batch)
-    {
-      sis_batch_id: batch.id,
-      account_id: batch.account_id,
-      workflow_state: batch.workflow_state
-    }
-  end
-
-  def self.sis_batch_created(batch)
-    post_event_stringified('sis_batch_created', sis_batch_payload(batch))
-  end
-
-  def self.sis_batch_updated(batch)
-    post_event_stringified('sis_batch_updated', sis_batch_payload(batch))
-  end
-
   def self.course_grade_change(score, old_score_values, enrollment)
     data = {
       user_id: enrollment.user_id,
@@ -766,5 +758,21 @@ module Canvas::LiveEvents
       old_unposted_final_score: old_score_values[:unposted_final_score]
     }
     post_event_stringified('course_grade_change', data, amended_context(score.course))
+  end
+
+  def self.sis_batch_payload(batch)
+    {
+      sis_batch_id: batch.id,
+      account_id: batch.account_id,
+      workflow_state: batch.workflow_state
+    }
+  end
+
+  def self.sis_batch_created(batch)
+    post_event_stringified('sis_batch_created', sis_batch_payload(batch))
+  end
+
+  def self.sis_batch_updated(batch)
+    post_event_stringified('sis_batch_updated', sis_batch_payload(batch))
   end
 end

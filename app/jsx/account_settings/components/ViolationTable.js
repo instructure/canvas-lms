@@ -19,10 +19,12 @@
 import React, {useState} from 'react'
 import I18n from 'i18n!csp_violation_table'
 import {Table} from '@instructure/ui-table'
-import FriendlyDatetime from '../../shared/FriendlyDatetime'
+import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {IconAddSolid} from '@instructure/ui-icons'
+import {showFlashAlert} from '../../shared/FlashAlert'
+import FriendlyDatetime from '../../shared/FriendlyDatetime'
 
 const HEADERS = [
   {
@@ -62,12 +64,25 @@ const getHostname = url => {
   return matches && matches[1]
 }
 
-export default function ViolationTable({violations}) {
+export default function ViolationTable({
+  violations,
+  addDomain,
+  accountId,
+  whitelistedDomains,
+  showAlert = showFlashAlert
+}) {
   const [sortBy, setSortBy] = useState('count') // Default to the most requested on top
   const [ascending, setAscending] = useState(false)
   const direction = ascending ? 'ascending' : 'descending'
 
-  const sortedViolations = [...(violations || [])].sort((a, b) => {
+  // Clear out any violations that are on the whitelist
+  // This should only happen when a violation from the log gets added
+  // to the whitelist
+  const filteredViolations = violations.filter(
+    v => !whitelistedDomains.account.includes(getHostname(v.uri))
+  )
+
+  const sortedViolations = [...(filteredViolations || [])].sort((a, b) => {
     if (a[sortBy] < b[sortBy]) {
       return -1
     }
@@ -88,6 +103,14 @@ export default function ViolationTable({violations}) {
       setSortBy(id)
       setAscending(true)
     }
+  }
+
+  if (sortedViolations.length < 1) {
+    return (
+      <Alert variant="info" margin="small">
+        {I18n.t('No violations have been reported.')}
+      </Alert>
+    )
   }
 
   return (
@@ -123,7 +146,21 @@ export default function ViolationTable({violations}) {
                 />
               </Table.Cell>
               <Table.Cell textAlign="center">
-                <Button variant="icon" size="small" icon={IconAddSolid}>
+                <Button
+                  variant="icon"
+                  size="small"
+                  icon={IconAddSolid}
+                  onClick={() => {
+                    addDomain('account', accountId, hostname, () => {
+                      showAlert({
+                        message: I18n.t('Success: You added %{hostname} to the whitelist.', {
+                          hostname
+                        }),
+                        type: 'success'
+                      })
+                    })
+                  }}
+                >
                   <ScreenReaderContent>
                     {I18n.t('Add %{hostname} to the whitelist', {hostname})}
                   </ScreenReaderContent>

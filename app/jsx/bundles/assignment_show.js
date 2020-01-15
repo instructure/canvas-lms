@@ -34,6 +34,8 @@ import LockManager from '../blueprint_courses/apps/LockManager'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 import StudentGroupFilter from '../shared/StudentGroupFilter'
 import SpeedGraderLink from '../shared/SpeedGraderLink'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 
 const lockManager = new LockManager()
 lockManager.init({itemType: 'assignment', page: 'show'})
@@ -128,6 +130,43 @@ $(() =>
     return MarkAsDone.toggle(this)
   })
 )
+
+function openSendTo(event, open = true) {
+  if (event) event.preventDefault()
+  ReactDOM.render(
+    <DirectShareUserModal
+      open={open}
+      sourceCourseId={ENV.COURSE_ID}
+      contentShare={{content_type: 'assignment', content_id: ENV.ASSIGNMENT_ID}}
+      onDismiss={() => {
+        openSendTo(null, false)
+        $('.al-trigger').focus()
+      }}
+    />,
+    document.getElementById('direct-share-mount-point')
+  )
+}
+
+function openCopyTo(event, open = true) {
+  if (event) event.preventDefault()
+  ReactDOM.render(
+    <DirectShareCourseTray
+      open={open}
+      sourceCourseId={ENV.COURSE_ID}
+      contentSelection={{assignments: [ENV.ASSIGNMENT_ID]}}
+      onDismiss={() => {
+        openCopyTo(null, false)
+        $('.al-trigger').focus()
+      }}
+    />,
+    document.getElementById('direct-share-mount-point')
+  )
+}
+
+$(() => {
+  $('.direct-share-send-to-menu-item').click(openSendTo)
+  $('.direct-share-copy-to-menu-item').click(openCopyTo)
+})
 
 // -- This is all for the _grade_assignment sidebar partial
 $(() => {

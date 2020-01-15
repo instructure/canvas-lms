@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import 'jquery.scrollToVisible'
 import tz from 'timezone'
@@ -30,6 +32,8 @@ import htmlEscape from 'str/htmlEscape'
 import {publish} from 'vendor/jquery.ba-tinypubsub'
 import 'prerequisites_lookup'
 import 'content_locks'
+import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
+import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
 
 export default class WikiPageView extends Backbone.View {
   static initClass() {
@@ -40,13 +44,16 @@ export default class WikiPageView extends Backbone.View {
     this.prototype.els = {
       '.publish-button': '$publishButton',
       '.header-bar-outer-container': '$headerBarOuterContainer',
-      '.page-changed-alert': '$pageChangedAlert'
+      '.page-changed-alert': '$pageChangedAlert',
+      '.al-trigger': '$gearMenu'
     }
 
     this.prototype.events = {
       'click .delete_page': 'deleteWikiPage',
       'click .use-as-front-page-menu-item': 'useAsFrontPage',
-      'click .unset-as-front-page-menu-item': 'unsetAsFrontPage'
+      'click .unset-as-front-page-menu-item': 'unsetAsFrontPage',
+      'click .direct-share-send-to-menu-item': 'openSendTo',
+      'click .direct-share-copy-to-menu-item': 'openCopyTo'
     }
 
     this.optionProperty('modules_path')
@@ -101,6 +108,21 @@ export default class WikiPageView extends Backbone.View {
     }
     this.publishButtonView.$el.appendTo(this.$publishButton)
     this.publishButtonView.render()
+
+    // Attach the immersive reader button if enabled
+    const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+    if (immersive_reader_mount_point) {
+      import('jsx/shared/components/ImmersiveReader')
+        .then(ImmersiveReader => {
+          ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {
+            title: document.querySelector('.page-title').textContent,
+            content: document.querySelector('.show-content').innerHTML
+          })
+        })
+        .catch(e => {
+          console.log('Error loading immersive readers.', e)
+        })
+    }
 
     // attach/re-attach the sequence footer (if this is a course, but not the home page)
     if (!this.$sequenceFooter && !this.course_home && !!this.course_id) {
@@ -183,6 +205,38 @@ export default class WikiPageView extends Backbone.View {
     return this.model.setFrontPage(() => $('#wiki_page_show .header-bar-right .al-trigger').focus())
   }
 
+  openSendTo(ev, open = true) {
+    if (ev) ev.preventDefault()
+    ReactDOM.render(
+      <DirectShareUserModal
+        open={open}
+        sourceCourseId={this.course_id}
+        contentShare={{content_type: 'page', content_id: this.model.id}}
+        onDismiss={() => {
+          this.openSendTo(null, false)
+          this.$gearMenu.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
+  openCopyTo(ev, open = true) {
+    if (ev) ev.preventDefault()
+    ReactDOM.render(
+      <DirectShareCourseTray
+        open={open}
+        sourceCourseId={this.course_id}
+        contentSelection={{pages: [this.model.id]}}
+        onDismiss={() => {
+          this.openCopyTo(null, false)
+          this.$gearMenu.focus()
+        }}
+      />,
+      document.getElementById('direct-share-mount-point')
+    )
+  }
+
   toJSON() {
     const json = super.toJSON(...arguments)
     json.modules_path = this.modules_path
@@ -201,7 +255,8 @@ export default class WikiPageView extends Backbone.View {
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
       READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions
     }
-    json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS
+    json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED && json.CAN.UPDATE_CONTENT
+    json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS || json.CAN.DIRECT_SHARE
     json.CAN.VIEW_TOOLBAR =
       json.CAN.VIEW_PAGES ||
       json.CAN.PUBLISH ||

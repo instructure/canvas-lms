@@ -36,7 +36,7 @@ import ErrorPageHeader from './ErrorPageHeader'
  * to our errors_controller endpoint to explain how the
  * error occured
  */
-class GenericErrorPage extends React.Component {
+export default class GenericErrorPage extends React.Component {
   static propTypes = {
     errorSubject: string,
     errorCategory: string,
@@ -152,5 +152,3 @@ class GenericErrorPage extends React.Component {
     )
   }
 }
-
-export default React.memo(GenericErrorPage)

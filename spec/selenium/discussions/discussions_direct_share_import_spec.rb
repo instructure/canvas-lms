@@ -16,31 +16,52 @@
 
 require_relative '../common'
 require_relative 'pages/discussions_index_page'
+require_relative 'pages/discussion_page'
+require_relative '../shared_components/copy_to_tray_page'
+require_relative '../shared_components/send_to_dialog_page'
 
 describe 'discussions' do
     include_context 'in-process server selenium tests'
+    include CopyToTrayPage
+    include SendToDialogPage
 
     context 'with direct share FF ON' do
-        before(:each) do
-            course_with_teacher_logged_in
-            @course.save!
-            @discussion1 = @course.discussion_topics.create!(
-                title: 'First Discussion',
-                message: 'What is this discussion about?',
-                user: @teacher,
-                pinned: false
-            )
-            Account.default.enable_feature!(:direct_share)
-            user_session(@teacher)
-            DiscussionsIndex.visit(@course)
-        end
-        
-        it 'shows direct share options' do
-            DiscussionsIndex.discussion_menu(@discussion1.title).click
+      before(:each) do
+        course_with_teacher_logged_in
+        @course.save!
+        @discussion1 = @course.discussion_topics.create!(
+            title: 'First Discussion',
+            message: 'What is this discussion about?',
+            user: @teacher,
+            pinned: false
+        )
+        Account.default.enable_feature!(:direct_share)
+        user_session(@teacher)
+      end
+      
+      it 'shows direct share options in index page' do
+        DiscussionsIndex.visit(@course)
+        DiscussionsIndex.discussion_menu(@discussion1.title).click
 
-            expect(DiscussionsIndex.manage_discussions_menu.text).to include('Send To...')
-            expect(DiscussionsIndex.manage_discussions_menu.text).to include('Copy To...')
-        end
+        expect(DiscussionsIndex.manage_discussions_menu.text).to include('Send To...')
+        expect(DiscussionsIndex.manage_discussions_menu.text).to include('Copy To...')
+      end
+
+      it 'allows user to send discussion from individual discussion page' do
+        Discussion.visit(@course, @discussion1)
+        Discussion.manage_discussion_button.click
+        Discussion.send_to_menuitem.click
+
+        expect(Discussion.discussion_page_body).to contain_css(send_to_dialog_css_selector)
+      end
+
+      it 'allows user to copy discussion from individual discussion page' do
+        Discussion.visit(@course, @discussion1)
+        Discussion.manage_discussion_button.click
+        Discussion.copy_to_menuitem.click
+
+        expect(Discussion.discussion_page_body).to contain_css(copy_to_dialog_css_selector)
+      end
     end
 
     context 'with direct share FF OFF' do

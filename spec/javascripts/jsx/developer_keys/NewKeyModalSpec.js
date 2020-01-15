@@ -31,10 +31,6 @@ const selectedScopes = [
 const fakeActions = {
   createOrEditDeveloperKey: () => {},
   editDeveloperKey: () => {},
-  ltiKeysSetDisabledPlacements: () => {},
-  ltiKeysSetEnabledScopes: () => {},
-  ltiKeysSetPrivacyLevel: () => {},
-  setLtiConfigurationMethod: () => {},
   resetLtiState: () => {},
   developerKeysModalClose: () => {}
 }
@@ -109,10 +105,7 @@ const validToolConfig = {
 
 const createLtiKeyState = {
   isLtiKey: false,
-  customizing: false,
-  toolConfiguration: {},
-  enabledScopes: ['https://www.test.com/lineitem'],
-  disabledPlacements: ['account_navigation']
+  toolConfiguration: {}
 }
 
 const createDeveloperKeyState = {
@@ -398,7 +391,6 @@ test('clears the lti key state when modal is closed', () => {
   const ltiStub = sinon.spy()
   const actions = Object.assign(fakeActions, {
     developerKeysModalClose: () => {},
-    ltiKeysSetCustomizing: () => {},
     resetLtiState: ltiStub
   })
 
@@ -418,40 +410,6 @@ test('clears the lti key state when modal is closed', () => {
   )
   wrapper.instance().closeModal()
   ok(ltiStub.called)
-  wrapper.unmount()
-})
-
-test('saves customizations', () => {
-  const ltiStub = sinon.spy()
-  const dispatchSpy = sinon.stub().resolves()
-  const actions = Object.assign(fakeActions, {
-    ltiKeysUpdateCustomizations: ltiStub
-  })
-
-  const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={actions}
-      store={{dispatch: dispatchSpy}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
-  )
-  wrapper.instance().saveCustomizations()
-  ok(
-    ltiStub.calledWith(
-      {scopes: ['https://www.test.com/lineitem']},
-      ['account_navigation'],
-      22,
-      {},
-      ''
-    )
-  )
   wrapper.unmount()
 })
 
@@ -488,18 +446,18 @@ test('flashes an error if redirect_uris is empty', () => {
 test('renders the saved toolConfiguration if it is present in state', () => {
   const ltiStub = sinon.spy()
   const actions = Object.assign(fakeActions, {
-    saveLtiToolConfiguration: () => ltiStub
+    saveLtiToolConfiguration: () => () => ({then: ltiStub})
   })
 
   const wrapper = mount(
     <DeveloperKeyModal
-      createLtiKeyState={{...createLtiKeyState, configurationMethod: 'manual', isLtiKey: true}}
+      createLtiKeyState={{...createLtiKeyState, configurationMethod: 'manual'}}
       availableScopes={{}}
       availableScopesPending={false}
       closeModal={() => {}}
       createOrEditDeveloperKeyState={{
         ...createDeveloperKeyState,
-        ...{developerKey: {...developerKey, tool_configuration: validToolConfig}}
+        ...{developerKey: {...developerKey, tool_configuration: validToolConfig}, isLtiKey: true}
       }}
       actions={actions}
       store={{dispatch: () => {}}}
@@ -520,7 +478,7 @@ test('renders the saved toolConfiguration if it is present in state', () => {
 test('clears state on modal close', () => {
   const ltiStub = sinon.spy()
   const actions = Object.assign(fakeActions, {
-    ltiKeysUpdateCustomizations: ltiStub
+    updateLtiKey: ltiStub
   })
 
   const wrapper = mount(

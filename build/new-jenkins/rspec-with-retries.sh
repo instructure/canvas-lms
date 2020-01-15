@@ -1,6 +1,8 @@
 #!/bin/bash
 
-set -x -o errexit -o errtrace -o nounset -o pipefail
+# no `-o nounset` nor `-o pipefail`  because this legacy script
+# has a lot of unset variables and needs to be addressed independently
+set -o errexit -o errtrace -o xtrace
 
 export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Initial"
 
@@ -48,6 +50,9 @@ while true; do
   $command >$pipe 2>&1 &
   command_pid=$!
 
+  # disable xtrace because the following block of code is overly verbose in our logs (IFS)
+  set +o xtrace
+
   while IFS= read line; do
     echo "$line" || exit 2
     if [[ $line =~ $rerun_line ]]; then
@@ -60,6 +65,9 @@ while true; do
       failed_relevant_spec_list+=("${BASH_REMATCH[1]}")
     fi
   done <$pipe
+
+  set -o xtrace # reenable xtrace
+
   wait $command_pid || last_status=$?
   [[ ! $reruns_started ]] && echo "FINISHED"
 

@@ -20,7 +20,7 @@
 
 def cleanupDocker () {
     COMPOSE_FILE = 'docker-compose.new-jenkins-package-translations.yml'
-    sh 'build/new-jenkins/docker-cleanup.sh'
+    sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
 }
 
 
@@ -34,6 +34,13 @@ pipeline {
     COMPOSE_FILE = 'docker-compose.new-jenkins-package-translations.yml'
   }
   stages {
+    stage('Pre-Cleanup') {
+      steps {
+        timeout(time: 2) {
+          cleanupDocker()
+        }
+      }
+    }
     stage('Sync Translations') {
       steps {
         withCredentials([

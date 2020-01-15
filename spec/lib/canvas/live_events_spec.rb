@@ -687,6 +687,25 @@ describe Canvas::LiveEvents do
 
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation', context: context)
     end
+
+    it "should include enrollment data if provided" do
+      course_with_student
+
+      expect_event('asset_accessed', {
+        asset_name: "Unnamed Course",
+        asset_type: 'course',
+        asset_id: @course.global_id.to_s,
+        asset_subtype: 'assignments',
+        category: 'category',
+        role: 'role',
+        level: 'participation',
+        enrollment_id: @enrollment.id.to_s,
+        section_id: @enrollment.course_section_id.to_s
+      }, {compact_live_events: true}).once
+
+      Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation',
+        context: nil, context_membership: @enrollment)
+    end
   end
 
   describe '.assignment_created' do

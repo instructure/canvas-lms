@@ -37,7 +37,14 @@ describe UserMerge do
       expect { UserMerge.from(user2).into(fake_student) }.to raise_error('cannot merge a test student')
     end
 
-    it 'should require mark as failed on failure users' do
+    it 'should log who did the user merge' do
+      merger = user_model
+      mergeme = UserMerge.from(user2)
+      mergeme.into(user1, merger: merger, source: 'this spec')
+      expect(mergeme.merge_data.items.where(item_type: 'logs').take.item).to eq "{:merger_id=>#{merger.id}, :source=>\"this spec\"}"
+    end
+
+    it 'should mark as failed on merge failures' do
       mergeme = UserMerge.from(user2)
       # make any method that gets called raise an error
       allow(mergeme).to receive(:copy_favorites).and_raise('boom')

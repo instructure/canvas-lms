@@ -98,6 +98,9 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     const velem = document.createElement('div')
     velem.setAttribute('id', mockVideoPlayers[i].id)
     velem.setAttribute('title', mockVideoPlayers[i].titleText)
+    velem.setAttribute('data-mce-p-src', 'http://video.is.here/')
+    const ifr = document.createElement('iframe')
+    velem.appendChild(ifr)
     return velem
   }
 
@@ -151,6 +154,8 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
       it('keeps the tray open', () => {
         expect(getTray()).not.toBeNull()
+
+        expect(trayController.$videoContainer).not.toBeNull()
       })
     })
   })
@@ -173,6 +178,47 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       // In effect, it does not explode.
       trayController.hideTrayForEditor(editors[0])
       expect(getTray()).toBeNull()
+    })
+  })
+
+  describe('#_applyVideoOptions', () => {
+    it('updates the video', () => {
+      const updateMediaObject = jest.fn()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '201',
+        titleText: 'new title',
+        updateMediaObject
+      })
+      expect(getTray()).toBeNull() // the tray is closed
+      const videoContainer = trayController.$videoContainer
+      const videoIframe = videoContainer.firstElementChild
+      expect(videoContainer.getAttribute('data-mce-p-title')).toBe('new title')
+      expect(videoIframe.getAttribute('title')).toBe('new title')
+      expect(videoContainer.style.height).toBe('101px')
+      expect(videoContainer.style.width).toBe('201px')
+      expect(updateMediaObject).toHaveBeenCalled()
+    })
+
+    it('replaces the video with a link', () => {
+      const updateMediaObject = jest.fn()
+      const ed = editors[0]
+      trayController.showTrayForEditor(ed)
+      trayController._applyVideoOptions({
+        displayAs: 'link',
+        titleText: 'new <em>fancy</em> title',
+        updateMediaObject
+      })
+      expect(getTray()).toBeNull() // the tray is closed
+      const videoContainer = trayController.$videoContainer
+      expect(videoContainer).toBe(null)
+      const sel = ed.selection.getNode()
+      expect(sel.tagName).toBe('A')
+      expect(sel.getAttribute('href')).toBe('http://video.is.here/')
+      expect(sel.innerHTML).toBe('new &lt;em&gt;fancy&lt;/em&gt; title') // see, html is not evaluated
+      expect(updateMediaObject).toHaveBeenCalled()
     })
   })
 })

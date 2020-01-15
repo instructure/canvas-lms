@@ -144,6 +144,25 @@ describe CourseLinkValidator do
     expect(issues).to be_empty
   end
 
+  describe "whitelisted?" do
+    before :once do
+      course_factory
+    end
+
+    it "returns false when Setting is absent" do
+      link_validator = CourseLinkValidator.new(@course)
+      expect(link_validator.whitelisted?('https://example.com/')).to eq false
+    end
+
+    it "accepts a comma-separated Setting" do
+      Setting.set('link_validator_whitelisted_hosts', 'foo.com,bar.com')
+      link_validator = CourseLinkValidator.new(@course)
+      expect(link_validator.whitelisted?('http://foo.com/foo')).to eq true
+      expect(link_validator.whitelisted?('http://bar.com/bar')).to eq true
+      expect(link_validator.whitelisted?('http://baz.com/baz')).to eq false
+    end
+  end
+  
   describe "insecure hosts" do
     def test_url(url)
       course_factory

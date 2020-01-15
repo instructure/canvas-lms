@@ -47,8 +47,8 @@ import ReactDOM from 'react-dom'
 import I18n from 'i18n!ajaxflashalert'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-elements'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-text'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Transition} from '@instructure/ui-motion'
 
 const messageHolderId = 'flashalert_message_holder' // specs fail if I reuse jquery's elements

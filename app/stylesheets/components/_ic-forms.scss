@@ -1936,13 +1936,12 @@ form.ic-Form-group { margin: 0; }
     box-sizing: border-box;
 
     .ic-Action-header__Primary {
-      flex: 1;
+      flex-grow: 1;
       margin-bottom: 0;
       box-sizing: border-box;
     }
 
     .ic-Action-header__Secondary {
-      flex: 1;
       box-sizing: border-box;
       text-align: direction(right);
       &--auto {
@@ -1959,7 +1958,11 @@ form.ic-Form-group { margin: 0; }
   }
 }
 
-.ic-Action-header__Heading { margin: 0; }
+.ic-Action-header__Heading {
+  margin: 0;
+  hyphens: auto;
+  word-break: break-all;
+}
 
 .ic-Action-header__Primary {
   margin-bottom: $ic-sp/2;

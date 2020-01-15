@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Anrejistreman Odyo/Videyo pa disponib."
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "Lektè odyo pou { title }"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Ovri otomatikman nan apèsi an liy. (Apèsi a ap afiche sèlman aprè anrejistreman an)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(Dekri imaj la)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "(Dekri videyo a)"
+    },
     "details_98a31b68": {
         "message": "Detay"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "Entegre Apèsi"
+    },
+    "embed_video_a97a64af": {
+        "message": "Entegre Videyo a"
     },
     "embed_video_code_703e10f2": {
         "message": "Entegre Kòb Videyo"
@@ -461,8 +470,14 @@
     "group_navigation_99f191a": {
         "message": "Navigasyon Gwoup"
     },
-    "header_f28f73db": {
-        "message": "Antèt"
+    "heading_2_5b84eed2": {
+        "message": "Antèt 2"
+    },
+    "heading_3_2c83de44": {
+        "message": "Antèt 3"
+    },
+    "heading_4_b2e74be7": {
+        "message": "Antèt 4"
     },
     "height_69b03e15": {
         "message": "Wotè"
@@ -596,20 +611,8 @@
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Dwe omwen { width } x { height }px"
     },
-    "my_documents_77a74ff3": {
-        "message": "Dokiman Mwen"
-    },
-    "my_files_eea33f44": {
-        "message": "Fichye Mwen"
-    },
     "my_grades_98834476": {
         "message": "Nòt Mwen"
-    },
-    "my_images_427f9b0c": {
-        "message": "Imaj Mwen"
-    },
-    "my_media_82bade11": {
-        "message": "Medya Mwen"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navige atravè meni oswa ba zouti a"
@@ -833,9 +836,6 @@
     "small_b070434a": {
         "message": "Piti"
     },
-    "small_header_168fb9f9": {
-        "message": "Ti antèt"
-    },
     "something_went_wrong_89195131": {
         "message": "Gen yon bagay ki mal fèt."
     },
@@ -877,9 +877,6 @@
     },
     "styles_2aa721ef": {
         "message": "Stil"
-    },
-    "subheader_2b87606d": {
-        "message": "Sou antèt"
     },
     "submit_a3cc6859": {
         "message": "Soumèt"
@@ -1010,6 +1007,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Itilize pa lektè ekran yo pou dekri kontni yon imaj"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Itilize pa lektè ekran pou dekri videyo a"
+    },
     "user_documents_c206e61f": {
         "message": "Dokiman Itilizatè"
     },
@@ -1030,6 +1030,12 @@
     },
     "video_player_b371005": {
         "message": "Lektè Videyo"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "Lektè videyo pou "
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "Lektè videyo pou { title }"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Afiche rakousi klavye"

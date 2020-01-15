@@ -1,14 +1,14 @@
 ---
 assignments_2_student:
   state: hidden
-  display_name: Assignments 2 Student View
+  display_name: Assignment Enhancements - Student
   description: Use the new assignments student page
   applies_to: Course
   root_opt_in: true
   beta: true
   environments:
-    production:
-      state: disabled
+    development:
+      state: on
 
 account_pronouns:
   state: hidden

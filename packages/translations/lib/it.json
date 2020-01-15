@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "La registrazione audio e video non è disponibile."
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "Riproduttore audio di { title }"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Aprire automaticamente un’anteprima in linea. (L’anteprima viene visualizzata solo dopo il salvataggio)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(Descrivi l’immagine)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "(Descrivi il video)"
+    },
     "details_98a31b68": {
         "message": "Dettagli"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "Incorpora anteprima"
+    },
+    "embed_video_a97a64af": {
+        "message": "Incorpora il video"
     },
     "embed_video_code_703e10f2": {
         "message": "Incorpora codice video"
@@ -461,8 +470,14 @@
     "group_navigation_99f191a": {
         "message": "Esplorazione gruppo"
     },
-    "header_f28f73db": {
-        "message": "Intestazione"
+    "heading_2_5b84eed2": {
+        "message": "Intestazione 2"
+    },
+    "heading_3_2c83de44": {
+        "message": "Intestazione 3"
+    },
+    "heading_4_b2e74be7": {
+        "message": "Intestazione 4"
     },
     "height_69b03e15": {
         "message": "Altezza"
@@ -596,20 +611,8 @@
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Deve essere almeno { width } x { height }px"
     },
-    "my_documents_77a74ff3": {
-        "message": "I miei documenti"
-    },
-    "my_files_eea33f44": {
-        "message": "I miei file"
-    },
     "my_grades_98834476": {
         "message": "I miei voti"
-    },
-    "my_images_427f9b0c": {
-        "message": "Le mi immagini"
-    },
-    "my_media_82bade11": {
-        "message": "I miei elementi multimediali"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviga attraverso il menu o la barra degli strumenti"
@@ -833,9 +836,6 @@
     "small_b070434a": {
         "message": "Piccolo"
     },
-    "small_header_168fb9f9": {
-        "message": "Breve intestazione"
-    },
     "something_went_wrong_89195131": {
         "message": "Si è verificato un errore."
     },
@@ -877,9 +877,6 @@
     },
     "styles_2aa721ef": {
         "message": "Stili"
-    },
-    "subheader_2b87606d": {
-        "message": "Sottotitolo"
     },
     "submit_a3cc6859": {
         "message": "Invia"
@@ -1010,6 +1007,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Usato da screen reader per descrivere il contenuto di un’immagine"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Usato dagli screen reader per descrivere il video"
+    },
     "user_documents_c206e61f": {
         "message": "Documenti utente"
     },
@@ -1030,6 +1030,12 @@
     },
     "video_player_b371005": {
         "message": "Lettore video"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "Riproduttore video per "
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "Riproduttore video per { title }"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Visualizza scelte rapide da tastiera"

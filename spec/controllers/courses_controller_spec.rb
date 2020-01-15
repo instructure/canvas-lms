@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require 'sharding_spec_helper'
 
 describe CoursesController do
   describe "GET 'index'" do
@@ -1543,6 +1543,7 @@ describe CoursesController do
       @account = Account.default
       role = custom_account_role 'lamer', :account => @account
       @account.role_overrides.create! :permission => 'manage_courses', :enabled => true, :role => role
+      @visperm = @account.role_overrides.create! :permission => 'manage_course_visibility', :enabled => true, :role => role
       user_factory
       @account.account_users.create!(user: @user, role: role)
       user_session @user
@@ -1562,6 +1563,45 @@ describe CoursesController do
 
       post 'create', params: { :account_id => @account.id, :course =>
           { :name => course.name, :lock_all_announcements => true } }
+    end
+
+    it "should set the visibility settings when we have permission" do
+      post 'create', params: {
+        :account_id => @account.id, :course => {
+          name: 'new course',
+          is_public: true,
+          public_syllabus: true,
+          is_public_to_auth_users: true,
+          public_syllabus_to_auth: true
+        }
+      }, format: :json
+
+      json = JSON.parse response.body
+      expect(json['is_public']).to be true
+      expect(json['public_syllabus']).to be true
+      expect(json['is_public_to_auth_users']).to be true
+      expect(json['public_syllabus_to_auth']).to be true
+    end
+
+    it "should NOT allow visibility to be set when we don't have permission" do
+      @visperm.enabled = false
+      @visperm.save
+
+      post 'create', params: {
+        :account_id => @account.id, :course => {
+          name: 'new course',
+          is_public: true,
+          public_syllabus: true,
+          is_public_to_auth_users: true,
+          public_syllabus_to_auth: true
+        }
+      }, format: :json
+
+      json = JSON.parse response.body
+      expect(json['is_public']).to be false
+      expect(json['public_syllabus']).to be false
+      expect(json['is_public_to_auth_users']).to be false
+      expect(json['public_syllabus_to_auth']).to be false
     end
   end
 
@@ -2886,6 +2926,26 @@ describe CoursesController do
       get 'content_share_users', params: {course_id: a1_course.id, search_term: 'account 2'}
       json = json_parse(response.body)
       expect(json.map{|user| user['name']}).not_to include('account 2 admin', 'account 2 teacher')
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should still have a functional query when user is from another shard" do
+        @shard1.activate do
+          @cs_user = User.create!
+        end
+        @course.enroll_teacher(@cs_user, :enrollment_state => "active")
+        user_session(@cs_user)
+
+        sql = nil
+        allow(Api).to receive(:paginate) do |scope, _controller, _url|
+          sql = scope.to_sql
+        end
+
+        get 'content_share_users', params: {course_id: @course.id, search_term: 'hiyo'}
+        expect(sql).to_not include(@shard1.name) # can't just check for success since the query can still work depending on test shard setup
+      end
     end
   end
 

@@ -46,7 +46,7 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import {defaultFetchOptions} from '@instructure/js-utils'
 import I18n from 'i18n!UnreadCounts'
 
-const DEFAULT_POLL_INTERVAL = 60000
+const DEFAULT_POLL_INTERVAL = 120000
 
 function storageKeyFor(url) {
   const m = url.match(/\/api\/v1\/(.*)\/unread_count/)
@@ -130,6 +130,12 @@ export default function UnreadCounts(props) {
     }
 
     async function poll() {
+      // if we get here when the page is hidden, don't actually fetch it now, wait until the page is refocused
+      if (document.hidden) {
+        document.addEventListener('visibilitychange', poll, {once: true})
+        return
+      }
+
       await getData()
       attempts += 1
       if (attempts < maxTries) timerId = setTimeout(poll, attempts * pollIntervalMs)

@@ -128,8 +128,8 @@ gem 'gepub', '1.0.4'
 gem 'imperium', '0.5.1', require: false
 gem 'academic_benchmarks', '0.0.11', require: false
 
-gem 'graphql', '1.9.11'
-gem 'graphql-batch', '0.4.1'
+gem 'graphql', '1.9.16'
+gem 'graphql-batch', '0.4.2'
 
 gem 'prawn-rails', '1.3.0'
 

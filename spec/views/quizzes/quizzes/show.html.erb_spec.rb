@@ -113,6 +113,38 @@ describe "/quizzes/quizzes/show" do
     expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_student'
   end
 
+  it 'should not render direct share menu options if disabled' do
+    course_with_teacher(active_all: true)
+    view_context
+    assign(:quiz, @course.quizzes.create!)
+    render 'quizzes/quizzes/show'
+    doc = Nokogiri::HTML(response)
+    expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
+  end
+
+  it 'should not render direct share menu options without manage permission' do
+    @account = Account.default
+    @account.enable_feature!(:direct_share)
+    @role = custom_teacher_role('No Manage')
+    @account.role_overrides.create!(permission: :manage_assignments, role: @role, enabled: false)
+    course_with_teacher(active_all: true, role: @role)
+    view_context
+    assign(:quiz, @course.quizzes.create!)
+    render 'quizzes/quizzes/show'
+    doc = Nokogiri::HTML(response)
+    expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
+  end
+
+  it 'renders direct share menu items when enabled with permission' do
+    Account.default.enable_feature!(:direct_share)
+    course_with_teacher(active_all: true)
+    view_context
+    assign(:quiz, @course.quizzes.create!)
+    render 'quizzes/quizzes/show'
+    doc = Nokogiri::HTML(response)
+    expect(doc.css('.direct-share-send-to-menu-item')).not_to be_empty
+  end
+
   it 'should render student partial for students' do
     course_with_student(active_all: true)
     quiz = @course.quizzes.build

@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Lyd og videoopptak er ikke tilgjengelig."
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "Lydspiller for { title }"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Automatisk åpne en forhåndsvisning av prosesslinjen. (Forhåndsvisning vises etter lagring)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(Beskriv bildet)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "(Beskriv videoen)"
+    },
     "details_98a31b68": {
         "message": "Detaljer"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "Legg ved forhåndsvisning"
+    },
+    "embed_video_a97a64af": {
+        "message": "Legg ved video"
     },
     "embed_video_code_703e10f2": {
         "message": "Legg ved videokode"
@@ -461,8 +470,14 @@
     "group_navigation_99f191a": {
         "message": "Gruppenavigering"
     },
-    "header_f28f73db": {
-        "message": "Topptekst"
+    "heading_2_5b84eed2": {
+        "message": "Overskrift 2"
+    },
+    "heading_3_2c83de44": {
+        "message": "Overskrift 3"
+    },
+    "heading_4_b2e74be7": {
+        "message": "Overskrift 4"
     },
     "height_69b03e15": {
         "message": "Høyde"
@@ -596,20 +611,8 @@
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Det må være minst { width } x { height }px"
     },
-    "my_documents_77a74ff3": {
-        "message": "Mine dokumenter"
-    },
-    "my_files_eea33f44": {
-        "message": "Mine filer"
-    },
     "my_grades_98834476": {
         "message": "Mine vurderinger"
-    },
-    "my_images_427f9b0c": {
-        "message": "Mine bilder"
-    },
-    "my_media_82bade11": {
-        "message": "Mitt medie"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviger gjennom menyen eller verktøylinjen"
@@ -833,9 +836,6 @@
     "small_b070434a": {
         "message": "Liten"
     },
-    "small_header_168fb9f9": {
-        "message": "Liten overskrift"
-    },
     "something_went_wrong_89195131": {
         "message": "Noe gikk galt."
     },
@@ -877,9 +877,6 @@
     },
     "styles_2aa721ef": {
         "message": "Stiler"
-    },
-    "subheader_2b87606d": {
-        "message": "Underoverskrift"
     },
     "submit_a3cc6859": {
         "message": "Send inn"
@@ -1010,6 +1007,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Brukt av skjermlesere for å beskrive innholdet til et bilde"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Brukt av skjermlesere for å beskrive videoen"
+    },
     "user_documents_c206e61f": {
         "message": "Brukerdokumenter"
     },
@@ -1030,6 +1030,12 @@
     },
     "video_player_b371005": {
         "message": "Video avspiller"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "Video avspiller for "
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "Video avspiller for { title }"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Vis tastatur-snarveier"

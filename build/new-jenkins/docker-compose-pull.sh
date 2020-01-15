@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x -o errexit -o errtrace -o nounset -o pipefail
+set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 # pull docker images (or build them if missing)
 REGISTRY_BASE=starlord.inscloudgate.net/jenkins
@@ -22,7 +22,7 @@ docker pull $REGISTRY_BASE/cassandra:2.2 || \
   docker push $REGISTRY_BASE/cassandra:2.2)
 
 # dynamodb-local
-#docker pull $REGISTRY_BASE/dynamodb-local || \
-  docker pull amazon/dynamodb-local && \
+docker pull $REGISTRY_BASE/dynamodb-local || \
+  (docker pull amazon/dynamodb-local && \
   docker tag amazon/dynamodb-local $REGISTRY_BASE/dynamodb-local && \
-  docker push $REGISTRY_BASE/dynamodb-local
+  docker push $REGISTRY_BASE/dynamodb-local)

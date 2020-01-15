@@ -161,10 +161,12 @@ export default class IndexMenu extends React.Component {
         window.location.reload()
       }
     }
-    const groupData = this.props.assignmentGroupsCollection.models.map(group => ({
-      id: group.get('id'),
-      name: group.get('name')
-    }))
+    const groupData = [
+      {
+        course_id: this.props.contextId,
+        type: 'assignment_group'
+      }
+    ]
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}

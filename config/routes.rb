@@ -1768,6 +1768,10 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/quizzes/:id/validate_access_code", action: :validate_access_code, as: 'course_quiz_validate_access_code'
     end
 
+    scope(controller: 'quizzes_next/quizzes_api') do
+      get "courses/:course_id/all_quizzes", action: :index, as: 'course_all_quizzes'
+    end
+
     scope(controller: 'quizzes/quiz_submission_users') do
       get "courses/:course_id/quizzes/:id/submission_users", action: :index, as: 'course_quiz_submission_users'
       post "courses/:course_id/quizzes/:id/submission_users/message", action: :message, as: 'course_quiz_submission_users_message'

@@ -52,6 +52,13 @@ module Lti
       allow(m).to receive(:use_1_3?).and_return(false)
       m
     end
+    let(:available_canvas_resources) {
+      [
+        {'id': '1', 'name': 'item 1'},
+        {'id': '2', 'name': 'item 2'}
+      ]
+    }
+
     let(:controller) do
       request_mock = double('request')
       allow(request_mock).to receive(:url).and_return('https://localhost')
@@ -62,10 +69,7 @@ module Lti
           'com_instructure_course_accept_canvas_resource_types': ['page', 'module'],
           'com_instructure_course_canvas_resource_type': 'page',
           'com_instructure_course_allow_canvas_resource_selection': 'true',
-          'com_instructure_course_available_canvas_resources': [
-            {'id': '1', 'name': 'item 1'},
-            {'id': '2', 'name': 'item 2'}
-          ]
+          'com_instructure_course_available_canvas_resources': available_canvas_resources
         }.with_indifferent_access
       )
       m = double('controller')
@@ -694,6 +698,32 @@ module Lti
         exp_hash = {test: '$com.instructure.Course.available_canvas_resources'}
         variable_expander.expand_variables!(exp_hash)
         expect(JSON.parse(exp_hash[:test])).to eq [{"id"=>"1", "name"=>"item 1"}, {"id"=>"2", "name"=>"item 2"}]
+      end
+
+      context 'modules resources expansion' do
+        let(:available_canvas_resources) { [{"course_id" => course.id, "type" => "module"}] }
+
+        it 'has special substitution to get all course modules for $com.instructure.Course.available_canvas_resources' do
+          course.save!
+          m1 = course.context_modules.create!(:name => "mod1")
+          m2 = course.context_modules.create!(:name => "mod2")
+          exp_hash = {test: '$com.instructure.Course.available_canvas_resources'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(JSON.parse(exp_hash[:test])).to eq [{"id"=>m1.id, "name"=>m1.name}, {"id"=>m2.id, "name"=>m2.name}]
+        end
+      end
+
+      context 'assignment groups resources expansion' do
+        let(:available_canvas_resources) { [{"course_id" => course.id, "type" => "assignment_group"}] }
+
+        it 'has special substitution to get all course modules for $com.instructure.Course.available_canvas_resources' do
+          course.save!
+          m1 = course.assignment_groups.create!(:name => "mod1")
+          m2 = course.assignment_groups.create!(:name => "mod2")
+          exp_hash = {test: '$com.instructure.Course.available_canvas_resources'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(JSON.parse(exp_hash[:test])).to eq [{"id"=>m1.id, "name"=>m1.name}, {"id"=>m2.id, "name"=>m2.name}]
+        end
       end
 
       context 'context is a group' do

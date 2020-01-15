@@ -200,8 +200,7 @@ function selectStepContainer(props, context) {
   return availableStepContainer({assignment, isCollapsed}, context)
 }
 
-function StepContainer(props) {
-  const {assignment, submission, isCollapsed, forceLockStatus} = props
+export default function StepContainer({assignment, submission, isCollapsed, forceLockStatus}) {
   return (
     <StudentViewContext.Consumer>
       {context =>
@@ -226,5 +225,3 @@ StepContainer.propTypes = {
   isCollapsed: bool,
   submission: Submission.shape
 }
-
-export default React.memo(StepContainer)

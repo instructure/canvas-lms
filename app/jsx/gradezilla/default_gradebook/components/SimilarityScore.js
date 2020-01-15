@@ -21,7 +21,7 @@ import {bool, number, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-layout'
 import {
-  IconCompleteSolid,
+  IconCertifiedSolid,
   IconEmptySolid,
   IconOvalHalfLine,
   IconClockLine,
@@ -57,7 +57,7 @@ export default class SimilarityScore extends PureComponent {
     } else if (similarityScore > 20) {
       statusIcon = <IconOvalHalfLine color="error" />
     } else {
-      statusIcon = <IconCompleteSolid color="success" />
+      statusIcon = <IconCertifiedSolid color="success" />
     }
 
     const displayScore = I18n.n(similarityScore, {precision: 1})

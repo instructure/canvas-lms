@@ -467,8 +467,14 @@
     "group_navigation_99f191a": {
         "message": "Gruppenavigering"
     },
-    "header_f28f73db": {
-        "message": "Topptekst"
+    "heading_2_5b84eed2": {
+        "message": "Overskrift 2"
+    },
+    "heading_3_2c83de44": {
+        "message": "Overskrift 3"
+    },
+    "heading_4_b2e74be7": {
+        "message": "Overskrift 4"
     },
     "height_69b03e15": {
         "message": "Høgde"
@@ -602,20 +608,8 @@
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Må vere minst { width } x { height }px"
     },
-    "my_documents_77a74ff3": {
-        "message": "Mine dokument"
-    },
-    "my_files_eea33f44": {
-        "message": "Mine filer"
-    },
     "my_grades_98834476": {
         "message": "Mine vurderingar"
-    },
-    "my_images_427f9b0c": {
-        "message": "Mine bilder"
-    },
-    "my_media_82bade11": {
-        "message": "Mine media"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviger gjennom menyen eller verktøylinja"
@@ -836,9 +830,6 @@
     "small_b070434a": {
         "message": "Liten"
     },
-    "small_header_168fb9f9": {
-        "message": "Liten overskrift"
-    },
     "something_went_wrong_89195131": {
         "message": "Noko gjekk gale."
     },
@@ -880,9 +871,6 @@
     },
     "styles_2aa721ef": {
         "message": "Stilar"
-    },
-    "subheader_2b87606d": {
-        "message": "Underoverskrift"
     },
     "submit_a3cc6859": {
         "message": "Send!"

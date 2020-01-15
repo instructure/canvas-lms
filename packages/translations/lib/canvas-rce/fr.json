@@ -27,6 +27,9 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "L''enregistrement audio et vidéo n''est pas disponible."
   },
+  "audio_player_for_title_20cc70d": {
+    "message": "Lecteur audio pour { title }"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Ouvrir automatiquement un aperçu en ligne. (L''aperçu ne s''affiche qu''après l''enregistrement)"
   },
@@ -88,6 +91,7 @@
     "message": "liste à puce ordonnée par défaut"
   },
   "describe_the_image_e65d2e32": { "message": "(Décrire l’image)" },
+  "describe_the_video_2fe8f46a": { "message": "(Décrivez la vidéo)" },
   "dimensions_45ddb7b7": { "message": "Dimensions" },
   "directionality_ebcae6d0": { "message": "directionalité" },
   "disable_in_line_preview_2a675175": {
@@ -121,6 +125,7 @@
   "embed_image_1080badc": { "message": "Incorporer l’image" },
   "embed_options_tray_901cfd19": { "message": "Menu Options d''intégration" },
   "embed_preview_2d741e1f": { "message": "Intégrer l''aperçu" },
+  "embed_video_a97a64af": { "message": "Intégrer la vidéo" },
   "embed_video_code_703e10f2": { "message": "Intégrer le code vidéo" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Erreur lors de l’envoi de l’enregistrement audio/vidéo"
@@ -161,7 +166,9 @@
   "grades_a61eba0a": { "message": "Notes" },
   "group_files_4324f3df": { "message": "Fichiers de groupe" },
   "group_navigation_99f191a": { "message": "Barre de navigation des groupes" },
-  "header_f28f73db": { "message": "En-tête" },
+  "heading_2_5b84eed2": { "message": "En-tête 2" },
+  "heading_3_2c83de44": { "message": "En-tête 3" },
+  "heading_4_b2e74be7": { "message": "En-tête 4" },
   "height_69b03e15": { "message": "Hauteur" },
   "image_options_5412d02c": { "message": "Options d''image" },
   "image_options_tray_90a46006": { "message": "Bac des options d''image" },
@@ -201,10 +208,6 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Doit faire au moins { width } x { height } px"
   },
-  "my_documents_77a74ff3": { "message": "Mes documents" },
-  "my_files_eea33f44": { "message": "Mes fichiers" },
-  "my_images_427f9b0c": { "message": "Mes images" },
-  "my_media_82bade11": { "message": "Mon Média" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviguer dans le menu ou la barre d''outils"
   },
@@ -269,7 +272,6 @@
   "show_video_options_6ed3721a": { "message": "Afficher les options vidéo" },
   "size_b30e1077": { "message": "Taille" },
   "small_b070434a": { "message": "Petit" },
-  "small_header_168fb9f9": { "message": "Petit en-tête" },
   "something_went_wrong_89195131": { "message": "Un problème est survenu." },
   "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
     "message": "Un problème est survenu lors de l’accès à votre micro ou webcam."
@@ -290,7 +292,6 @@
   "start_over_f7552aa9": { "message": "Recommencer" },
   "start_recording_9a65141a": { "message": "Démarrer l''enregistrement" },
   "styles_2aa721ef": { "message": "Styles" },
-  "subheader_2b87606d": { "message": "Sous-en-tête" },
   "submit_a3cc6859": { "message": "Soumettre" },
   "subscript_59744f96": { "message": "En indice" },
   "superscript_8cb349a2": { "message": "En exposant" },
@@ -339,6 +340,9 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Utilisé par les lecteurs d''écran pour décrire le contenu d''une image"
   },
+  "used_by_screen_readers_to_describe_the_video_37ebad25": {
+    "message": "Utilisé par les lecteurs d''écran pour décrire la vidéo"
+  },
   "user_documents_c206e61f": { "message": "Documents de l’utilisateur" },
   "user_images_b6490852": { "message": "Images utilisateur" },
   "user_media_14fbf656": { "message": "Utilisateurs Médias" },
@@ -348,6 +352,10 @@
   "video_options_24ef6e5d": { "message": "Options vidéo" },
   "video_options_tray_3b9809a5": { "message": "Menu Options vidéo" },
   "video_player_b371005": { "message": "Lecteur vidéo" },
+  "video_player_for_9e7d373b": { "message": "Lecteur vidéo pour " },
+  "video_player_for_title_ffd9fbc4": {
+    "message": "Lecteur vidéo pour { title }"
+  },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Afficher les raccourcis clavier"
   },

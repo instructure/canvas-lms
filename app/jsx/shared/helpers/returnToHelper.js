@@ -16,6 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function isValid(url) {
-  return !!url && !/^\s*javascript:/i.test(url) && !/^\s*data:/i.test(url)
+export function isValid(return_to) {
+  if (!return_to) {
+    return false
+  }
+  if (/^\s*javascript:/i.test(return_to) || /^\s*data:/i.test(return_to)) {
+    return false
+  }
+  const url = new URL(return_to, window.location.origin)
+  if (url.origin != window.location.origin) {
+    return false
+  }
+  return true
 }

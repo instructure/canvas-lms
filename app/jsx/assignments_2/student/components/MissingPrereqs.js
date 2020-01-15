@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-elements'
 
 import locked1SVG from '../SVG/Locked1.svg'
 
-function MissingPrereqs(props) {
+export default function MissingPrereqs(props) {
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
       <Flex.Item>
@@ -57,5 +57,3 @@ MissingPrereqs.propTypes = {
   preReqTitle: string.isRequired,
   preReqLink: string.isRequired
 }
-
-export default React.memo(MissingPrereqs)

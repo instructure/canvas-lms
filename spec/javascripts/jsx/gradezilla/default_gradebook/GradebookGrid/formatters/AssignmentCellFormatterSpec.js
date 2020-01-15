@@ -248,9 +248,9 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-oval-half'))
         })
 
-        test('includes a checkmark icon when below 20% similarity', () => {
+        test('includes a "certified" icon when below 20% similarity', () => {
           plagiarismEntry.similarity_score = 10
-          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-complete'))
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-certified'))
         })
       })
 
@@ -282,9 +282,9 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-oval-half'))
         })
 
-        test('includes a checkmark icon when below 20% similarity', () => {
+        test('includes a "certified" icon when below 20% similarity', () => {
           plagiarismEntry.similarity_score = 10
-          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-complete'))
+          ok(renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-certified'))
         })
       })
     })

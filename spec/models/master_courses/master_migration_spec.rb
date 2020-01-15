@@ -1717,6 +1717,36 @@ describe MasterCourses::MasterMigration do
       expect(lo_to).to be_present
     end
 
+    it "should copy a question bank alignment even if the outcome and bank have already been synced" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      default = @copy_from.root_outcome_group
+      @lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "whee", :workflow_state => 'active')
+      @lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2},
+        {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      @lo.save!
+      default.add_outcome(@lo)
+
+      @bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      aq = @bank.assessment_questions.create!(:question_data => {'question_name' => 'test question', 'question_type' => 'essay_question'})
+
+      run_master_migration
+
+      @lo_to = @copy_to.learning_outcomes.where(:migration_id => mig_id(@lo)).first
+      expect(@lo_to).to be_present
+      @bank_to = @copy_to.assessment_question_banks.where(:migration_id => mig_id(@bank)).first
+      expect(@bank_to).to be_present
+
+      Timecop.freeze(1.minute.from_now) do
+        @lo.align(@bank, @copy_from)
+      end
+
+      run_master_migration
+
+      expect(@bank_to.learning_outcome_alignments.first.learning_outcome).to eq @lo_to
+    end
+
     it "preserves account question bank references" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

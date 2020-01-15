@@ -18,10 +18,11 @@
 
 import React from 'react'
 import {string} from 'prop-types'
-import {Heading, Text} from '@instructure/ui-elements'
-import {Flex} from '@instructure/ui-layout'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
-import {PresentationContent} from '@instructure/ui-a11y'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 
 ContentHeading.propTypes = {
   svgUrl: string,

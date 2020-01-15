@@ -375,4 +375,14 @@ describe('ConnectedWhitelist', () => {
       expect(button).toBeDisabled()
     })
   })
+
+  describe('isSubAccount', () => {
+    it('does not show the option to view a violation log', () => {
+      const {queryByText} = renderWithRedux(
+        <ConnectedWhitelist context="account" contextId="1" maxDomains={50} isSubAccount />
+      )
+      const violationLogBtn = queryByText('View Violation Log')
+      expect(violationLogBtn).toBeNull()
+    })
+  })
 })

@@ -25,7 +25,7 @@ describe 'Submissions::ShowHelper' do
 
       def show
         @context = Course.find(params[:context_id])
-        @assignment = Assignment.find(params[:assignment_id])
+        @assignment = Assignment.where(:id => params[:assignment_id]).first
         render_user_not_found
       end
     end
@@ -59,6 +59,20 @@ describe 'Submissions::ShowHelper' do
         it 'render json with errors key' do
           json = JSON.parse(response.body)
           expect(json.key?('errors')).to be_truthy
+        end
+      end
+
+      context 'with no assignment' do
+        it 'shows a cromulent error' do
+          get :show, params: {context_id: @course.id, assignment_id: -9000}
+          expect(response).to redirect_to(course_url(@course))
+          expect(flash[:error]).to eq "The specified assignment could not be found"
+        end
+
+        it 'works with json too' do
+          get :show, params: {context_id: @course.id, assignment_id: -9000}, format: :json
+          json = JSON.parse(response.body)
+          expect(json['errors']).to eq "The specified assignment (-9000) could not be found"
         end
       end
     end

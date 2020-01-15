@@ -16,30 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def fullSuccessName(name) {
-  return "_successes/${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}-${name}-success"
+def successesFile() {
+  return "_buildmeta/${env.GERRIT_CHANGE_NUMBER}-${env.GERRIT_PATCHSET_NUMBER}-successes"
 }
 
 def hasSuccess(name) {
-  copyArtifacts(filter: "_successes/*",
+  copyArtifacts(filter: "_buildmeta/*",
                 optional: true,
                 projectName: '/${JOB_NAME}',
                 parameters: "GERRIT_CHANGE_NUMBER=${env.GERRIT_CHANGE_NUMBER},GERRIT_PATCHSET_NUMBER=${GERRIT_PATCHSET_NUMBER}",
                 selector: lastCompleted())
-  if (fileExists("_successes")) {
-    archiveArtifacts(artifacts: "_successes/*",
-                    projectName: '/${JOB_NAME}')
-  }
-  return fileExists(fullSuccessName(name))
+  archiveArtifacts(artifacts: "_buildmeta/*", allowEmptyArchive: true)
+  return fileExists(successesFile()) && readFile(successesFile()).contains("|$name|")
 }
 
 def saveSuccess(name) {
-  def success_name = fullSuccessName(name)
-  sh "mkdir -p _successes"
-  sh "echo 'success' >> ${success_name}"
-  archiveArtifacts(artifacts: "_successes/*",
-                   projectName: '/${JOB_NAME}')
-  echo "===> success saved /${env.JOB_NAME}: ${success_name}"
+  sh "mkdir -p _buildmeta"
+  sh "echo '|$name|' >> ${successesFile()}"
+  archiveArtifacts(artifacts: "_buildmeta/*")
+  echo "===> success saved /${env.JOB_NAME}: ${successesFile()}"
+  sh "cat ${successesFile()}"
 }
 
 // runs the body if it has not previously succeeded.
@@ -47,12 +43,17 @@ def saveSuccess(name) {
 // given name as successful, pass in save = false.
 def skipIfPreviouslySuccessful(name, save = true, body) {
   if (hasSuccess(name)) {
-    echo "===> block already successful, skipping: ${fullSuccessName(name)}"
+    echo "===> block already successful, skipping: ${successesFile()}"
   } else {
-    echo "===> running block: ${fullSuccessName(name)}"
+    echo "===> running block: ${successesFile()}"
     body.call()
     if (save) saveSuccess(name)
   }
+}
+
+def markBuildAsSuccessful() {
+  sh "rm -f ${successesFile()}"
+  saveSuccess("build")
 }
 
 return this

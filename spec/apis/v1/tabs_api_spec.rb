@@ -598,6 +598,28 @@ describe TabsController, type: :request do
         expect(tab['html_url']).to match(%r{^/users/[0-9]+/external_tools/[0-9]+\?display=borderless$})
         expect(tab['full_url']).to match(%r{^http.*users/[0-9]+/external_tools/[0-9]+\?display=borderless$})
       end
+
+      it "handles LTI 2 tools" do
+        course_model
+
+        expect(Lti::MessageHandler).to receive(:lti_apps_tabs).and_return([
+          {
+            :id => "dontcare",
+            :label => "dontcare",
+            :css_class => "dontcare",
+            :href => :course_basic_lti_launch_request_path,
+            :visibility => nil,
+            :external => true,
+            :hidden => false,
+            :args => {message_handler_id: 123, resource_link_fragment: "nav", course_id: @course.id}
+          }
+        ])
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
+                        { :controller => 'tabs', :action => 'index', :course_id => @course.id, :format => 'json'})
+        expect(json.to_json).not_to include('internal_server_error')
+        tab = json.find{|j| j['id'] == 'dontcare'}
+        expect(tab['html_url']).to eql("/courses/#{@course.id}/lti/basic_lti_launch_request/123?resource_link_fragment=nav")
+      end
     end
 
   end

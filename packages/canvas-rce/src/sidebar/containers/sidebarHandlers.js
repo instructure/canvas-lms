@@ -32,7 +32,7 @@ import {searchFlickr, openOrCloseFlickrForm} from '../actions/flickr'
 import {toggle as toggleFolder} from '../actions/files'
 import {openOrCloseNewPageForm} from '../actions/links'
 import {fetchInitialDocs, fetchNextDocs} from '../actions/documents'
-import {fetchInitialMedia, fetchNextMedia} from '../actions/media'
+import {fetchInitialMedia, fetchNextMedia, updateMediaObject} from '../actions/media'
 import {changeContext} from '../actions/context'
 
 export default function propsFromDispatch(dispatch) {
@@ -60,6 +60,7 @@ export default function propsFromDispatch(dispatch) {
     fetchNextDocs: () => dispatch(fetchNextDocs()),
     fetchInitialMedia: () => dispatch(fetchInitialMedia()),
     fetchNextMedia: () => dispatch(fetchNextMedia()),
+    updateMediaObject: new_values => dispatch(updateMediaObject(new_values)),
     onChangeContext: newContext => dispatch(changeContext(newContext))
   }
 }

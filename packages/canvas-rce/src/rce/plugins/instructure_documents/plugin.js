@@ -40,7 +40,7 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
       },
       {
         type: 'menuitem',
-        text: formatMessage('My Documents'),
+        text: formatMessage('User Documents'),
         onAction() {
           ed.focus(true) // activate the editor without changing focus
           bridge.showTrayForPlugin(USER_PLUGIN_KEY)

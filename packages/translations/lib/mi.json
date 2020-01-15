@@ -110,6 +110,9 @@
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Kaore i te wātea te Tāhopu me te Ataata."
     },
+    "audio_player_for_title_20cc70d": {
+        "message": "Kaitākaro ororongo mō { title }"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Aunoa huaki he arokite i roto i te raina. (Arokite whakātu anake i muri o te tiaki)"
     },
@@ -254,6 +257,9 @@
     "describe_the_image_e65d2e32": {
         "message": "(Whakāhuatia te āhua)"
     },
+    "describe_the_video_2fe8f46a": {
+        "message": "(Whakātu te ataata)"
+    },
     "details_98a31b68": {
         "message": "Ngā taipitopito"
     },
@@ -355,6 +361,9 @@
     },
     "embed_preview_2d741e1f": {
         "message": "Whakauru Arokite"
+    },
+    "embed_video_a97a64af": {
+        "message": "Whakauru Ataata"
     },
     "embed_video_code_703e10f2": {
         "message": "Whakauru Ataata Waehere"
@@ -461,8 +470,14 @@
     "group_navigation_99f191a": {
         "message": "Whakaterenga Rōpū"
     },
-    "header_f28f73db": {
-        "message": "Pane"
+    "heading_2_5b84eed2": {
+        "message": "Pane 2"
+    },
+    "heading_3_2c83de44": {
+        "message": "Pane 3"
+    },
+    "heading_4_b2e74be7": {
+        "message": "Pane 4"
     },
     "height_69b03e15": {
         "message": "Teitei"
@@ -596,20 +611,8 @@
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Me kia i te iti rawa { width } x { height }px"
     },
-    "my_documents_77a74ff3": {
-        "message": "Āku tuhinga"
-    },
-    "my_files_eea33f44": {
-        "message": "Aku Kōnae"
-    },
     "my_grades_98834476": {
         "message": "Aku Kōeke"
-    },
-    "my_images_427f9b0c": {
-        "message": "Āku Āhua"
-    },
-    "my_media_82bade11": {
-        "message": "Taku Pāpāho"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Whakatere i roto i te tahua paeutauta rānei"
@@ -833,9 +836,6 @@
     "small_b070434a": {
         "message": "Iti"
     },
-    "small_header_168fb9f9": {
-        "message": "Pane paku"
-    },
     "something_went_wrong_89195131": {
         "message": "I hē tētahi mea."
     },
@@ -877,9 +877,6 @@
     },
     "styles_2aa721ef": {
         "message": "Ngā Kāhua"
-    },
-    "subheader_2b87606d": {
-        "message": "Pane o raro"
     },
     "submit_a3cc6859": {
         "message": "Tuku"
@@ -1010,6 +1007,9 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Whakamahia e ngā kaipānui mata hei whakāhua i ngā ihirangi o te āhua"
     },
+    "used_by_screen_readers_to_describe_the_video_37ebad25": {
+        "message": "Whakamahia e ngā kaipānui mata hei whakāhua i te ataata"
+    },
     "user_documents_c206e61f": {
         "message": "Kaiwhakamahi Tuhinga"
     },
@@ -1030,6 +1030,12 @@
     },
     "video_player_b371005": {
         "message": "Kaitākaro Ataata"
+    },
+    "video_player_for_9e7d373b": {
+        "message": "Kaitākaro Ataata mō "
+    },
+    "video_player_for_title_ffd9fbc4": {
+        "message": "Kaitākaro Ataata mō { title }"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Titiro npapa patopato tapahi poto"

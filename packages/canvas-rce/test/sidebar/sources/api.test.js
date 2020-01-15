@@ -151,7 +151,10 @@ describe('sources/api', () => {
       return apiSource.fetchPage(uri).then(page => {
         assert.deepEqual(page, {
           bookmark: 'newBookmark',
-          links: [{href: 'link1', title: 'Link 1'}, {href: 'link2', title: 'Link 2'}]
+          links: [
+            {href: 'link1', title: 'Link 1'},
+            {href: 'link2', title: 'Link 2'}
+          ]
         })
       })
     })
@@ -163,7 +166,10 @@ describe('sources/api', () => {
       return apiSource.fetchPage(uri).then(page => {
         assert.deepEqual(page, {
           bookmark: 'newBookmark',
-          links: [{href: 'link1', title: 'Link 1'}, {href: 'link2', title: 'Link 2'}]
+          links: [
+            {href: 'link1', title: 'Link 1'},
+            {href: 'link2', title: 'Link 2'}
+          ]
         })
       })
     })
@@ -425,6 +431,14 @@ describe('sources/api', () => {
 
   describe('api mapping', () => {
     const body = {foo: 'bar'}
+    props.images = {
+      group: {
+        isLoading: false,
+        hasMore: true,
+        bookmark: null,
+        files: []
+      }
+    }
 
     it('can fetch folders', () => {
       fetchMock.mock(/\/folders\?/, {body})
@@ -436,6 +450,16 @@ describe('sources/api', () => {
 
     it('requests images from API', () => {
       fetchMock.mock(/\/documents\?.*content_types=image/, {body})
+      return apiSource.fetchImages(props).then(page => {
+        assert.deepEqual(page, body)
+        fetchMock.restore()
+      })
+    })
+
+    it('requests subsequent page of images from API', () => {
+      props.images.group.bookmark = 'mo.images'
+      fetchMock.mock(/\/documents\?.*content_types=image/, 'should not get here')
+      fetchMock.mock(/mo.images/, {body})
       return apiSource.fetchImages(props).then(page => {
         assert.deepEqual(page, body)
         fetchMock.restore()
@@ -561,6 +585,21 @@ describe('sources/api', () => {
         assert.ok(fetchMock.done())
         assert.ok(fetchMock.lastUrl() === expectedUrl)
         fetchMock.restore()
+      })
+    })
+  })
+
+  describe('media object apis', () => {
+    describe('updateMediaObject', () => {
+      it('PUTs to the media_object endpoint', async () => {
+        const uri = `/api/media_objects/m-id?user_entered_title=${encodeURIComponent('new title')}`
+        fetchMock.put(uri, '{"media_id": "m-id", "title": "new title"}')
+        const response = await apiSource.updateMediaObject(
+          {},
+          {media_object_id: 'm-id', title: 'new title'}
+        )
+        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.deepEqual(response, {media_id: 'm-id', title: 'new title'})
       })
     })
   })

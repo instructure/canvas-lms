@@ -5,6 +5,9 @@ common: &common
   username: postgres
   timeout: 5000
   prepared_statements: false
+  use_qualified_names: true
+  shard_name: public
+  schema_search_path: "''"
 
 production: &production
   <<: *common

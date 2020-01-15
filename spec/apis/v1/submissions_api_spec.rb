@@ -4138,6 +4138,12 @@ describe 'Submissions API', type: :request do
         assert_status(200)
       end
 
+      it "falls back to parsing the extension when an unknown type" do
+        @assignment.update_attributes(:allowed_extensions => ['beepboop'])
+        preflight(name: 'test.beepboop', size: 12345)
+        assert_status(200)
+      end
+
       it "uploads to a student's Submissions folder" do
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
         f = Attachment.last.folder

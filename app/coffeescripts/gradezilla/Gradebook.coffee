@@ -137,6 +137,7 @@ export default do ->
 
   getCourseFeaturesFromOptions = (options) ->
     {
+      additionalSortOptionsEnabled: options.additional_sort_options_enabled,
       finalGradeOverrideEnabled: options.final_grade_override_enabled
     }
 
@@ -1973,7 +1974,11 @@ export default do ->
       else
         return columnId
 
-    localeSort: (a, b, { asc = true } = {}) ->
+    localeSort: (a, b, { asc = true, nullsLast = false } = {}) ->
+      if nullsLast
+        return -1 if a? && !b?
+        return 1 if !a? && b?
+
       [b, a] = [a, b] unless asc
       natcompare.strings(a || '', b || '')
 
@@ -2022,7 +2027,7 @@ export default do ->
     sortByStudentColumn: (settingKey, direction) =>
       @sortRowsBy((a, b) =>
         asc = direction == 'ascending'
-        result = @localeSort(a[settingKey], b[settingKey], { asc })
+        result = @localeSort(a[settingKey], b[settingKey], { asc, nullsLast: true })
         result = @idSort(a, b, { asc }) if result == 0
         result
       )

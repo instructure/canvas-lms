@@ -203,8 +203,9 @@ describe "context modules" do
       expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "module"
       expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(
         ["assignment", "audio", "discussion_topic", "document", "image", "module", "quiz", "page", "video"])
-      module_data = [@module1, @module2].map{|m| {"id" => m.id.to_s, "name" => m.name}}
-      expect(query_params["com_instructure_course_available_canvas_resources"].values).to match_array(module_data)
+
+      expect(query_params["com_instructure_course_available_canvas_resources"].values).to eq [
+        {"course_id" => @course.id.to_s, "type" => "module"}] # will replace with the modules on the variable expansion
     end
 
     it "should be able to launch the individual module menu tool via the tray", custom_timeout: 60 do

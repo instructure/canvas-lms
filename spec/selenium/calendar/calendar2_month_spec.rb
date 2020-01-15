@@ -279,7 +279,7 @@ describe "calendar2" do
         hover_and_click '.delete_event_link'
         expect(f('.ui-dialog .ui-dialog-buttonset')).to be_displayed
         wait_for_ajaximations
-        hover_and_click '.ui-dialog:visible .btn-primary'
+        hover_and_click '.ui-dialog:visible .btn-danger'
         wait_for_ajaximations
         expect(f("#content")).not_to contain_css('.fc-event')
         # make sure it was actually deleted and not just removed from the interface

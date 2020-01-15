@@ -28,7 +28,7 @@ def build_parameters = [
   string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}"),
   string(name: 'GERRIT_CHANGE_COMMIT_MESSAGE', value: "${env.GERRIT_CHANGE_COMMIT_MESSAGE}"),
   string(name: 'GERRIT_HOST', value: "${env.GERRIT_HOST}"),
-  string(name: 'GERGICH_PUBLISH', value: "0")
+  string(name: 'GERGICH_PUBLISH', value: "${env.GERGICH_PUBLISH}")
 ]
 
 def getImageTagVersion() {
@@ -83,10 +83,24 @@ pipeline {
       }
     }
 
+    stage ('Pre-Cleanup') {
+      steps {
+        timeout(time: 2) {
+          sh 'build/new-jenkins/docker-cleanup.sh'
+        }
+      }
+    }
+
     stage('Plugins and Config Files') {
       steps {
         timeout(time: 3) {
           script {
+            if (env.CANVAS_LMS_REFSPEC) {
+              // the plugin builds require the canvas lms refspec to be different. so only
+              // set this refspec if the main build is requesting it to be set.
+              // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
+              build_parameters += string(name: 'CANVAS_LMS_REFSPEC', value: "${env.CANVAS_LMS_REFSPEC}")
+            }
             def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
             credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
             gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
@@ -100,18 +114,20 @@ pipeline {
                 credentials.fetchFromGerrit(gem, 'gems/plugins')
               }
             }
+            credentials.fetchFromGerrit('gergich_user_config', '.')
             credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             sh '''
-              mv gerrit_builder/canvas-lms/config/* config/
-              mv config/knapsack_rspec_report.json ./
-              rm config/cache_store.yml
+              mv -v gerrit_builder/canvas-lms/config/* config/
+              mv -v config/knapsack_rspec_report.json ./
+              rm -v config/cache_store.yml
               rmdir -p gerrit_builder/canvas-lms/config
-              cp docker-compose/config/selenium.yml config/
-              cp -R docker-compose/config/new-jenkins config/new-jenkins
-              cp config/delayed_jobs.yml.example config/delayed_jobs.yml
-              cp config/domain.yml.example config/domain.yml
-              cp config/external_migration.yml.example config/external_migration.yml
-              cp config/outgoing_mail.yml.example config/outgoing_mail.yml
+              cp -v docker-compose/config/selenium.yml config/
+              cp -vR docker-compose/config/new-jenkins config/new-jenkins
+              cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml
+              cp -v config/domain.yml.example config/domain.yml
+              cp -v config/external_migration.yml.example config/external_migration.yml
+              cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml
+              cp -v ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config/gergich_user_config.yml
             '''
           }
         }
@@ -203,6 +219,7 @@ pipeline {
         }
 
         stage('Linters') {
+          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' } }
           steps {
             skipIfPreviouslySuccessful("linters") {
               build(
@@ -245,48 +262,44 @@ pipeline {
             }
           }
         }
+
+        stage('Selenium Chrome') {
+          steps {
+            skipIfPreviouslySuccessful("selenium-chrome") {
+              build(
+                job: 'test-suites/selenium-chrome',
+                parameters: build_parameters
+              )
+            }
+          }
+        }
+
+        stage('Rspec') {
+          steps {
+            skipIfPreviouslySuccessful("rspec") {
+              build(
+                job: 'test-suites/rspec',
+                parameters: build_parameters
+              )
+            }
+          }
+        }
+
+        // keep this around in case there is changes to the subbuilds that need to happen
+        // and you have no other way to test it except by running a test build.
+        // stage('Test Subbuild') {
+        //   steps {
+        //     skipIfPreviouslySuccessful("test-subbuild") {
+        //       build(
+        //         job: 'test-suites/test-subbuild',
+        //         parameters: build_parameters
+        //       )
+        //     }
+        //   }
+        // }
 /*
  *  Don't run these on all patch sets until we have them ready to report results.
  *  Uncomment stage to run when developing.
- *       stage('Selenium Chrome') {
- *         steps {
- *           skipIfPreviouslySuccessful("selenium-chrome") {
- *             // propagate set to false until we can get tests passing
- *             build(
- *               job: 'test-suites/selenium-chrome',
- *               propagate: false,
- *               parameters: build_parameters
- *             )
- *           }
- *         }
- *       }
- *
- *       stage('Rspec') {
- *         steps {
- *           skipIfPreviouslySuccessful("rspec") {
- *             // propagate set to false until we can get tests passing
- *             build(
- *               job: 'test-suites/rspec',
- *               propagate: false,
- *               parameters: build_parameters
- *             )
- *           }
- *         }
- *       }
- *
- *       stage('Selenium Performance Chrome') {
- *         steps {
- *           skipIfPreviouslySuccessful("selenium-performance-chrome") {
- *             // propagate set to false until we can get tests passing
- *             build(
- *               job: 'test-suites/selenium-performance-chrome',
- *               propagate: false,
- *               parameters: build_parameters
- *             )
- *           }
- *         }
- *       }
- *
  *
  *
  *       stage('Xbrowser') {
@@ -331,8 +344,14 @@ pipeline {
         }
       }
     }
+    success {
+      script {
+        def successes = load 'build/new-jenkins/groovy/successes.groovy'
+        successes.markBuildAsSuccessful()
+      }
+    }
     cleanup {
-        sh 'build/new-jenkins/docker-cleanup.sh'
+      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }
 }

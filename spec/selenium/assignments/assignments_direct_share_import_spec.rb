@@ -15,6 +15,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative '../common'
 require_relative 'page_objects/assignments_index_page'
+require_relative 'page_objects/assignment_page'
 require_relative '../shared_components/copy_to_tray_page'
 require_relative '../shared_components/send_to_dialog_page'
 require_relative '../admin/pages/account_content_share_page'
@@ -26,7 +27,7 @@ describe 'assignments' do
   include AssignmentsIndexPage
   include CopyToTrayPage
   include SendToDialogPage
-	include AccountContentSharePage
+  include AccountContentSharePage
 
   let(:setup) {
     # Two Courses
@@ -35,14 +36,19 @@ describe 'assignments' do
     # Two teachers
     @teacher1 = User.create!(:name => "First Teacher")
     @teacher2 = User.create!(:name => "Second Teacher")
-		@teacher2.accept_terms
-		@teacher2.register!
+    @teacher2.accept_terms
+    @teacher2.register!
     # Teacher1 is enrolled in both courses, Teacher2 is in Course2 only
     @course1.enroll_teacher(@teacher1, :enrollment_state => 'active')
     @course2.enroll_teacher(@teacher1, :enrollment_state => 'active')
     @course2.enroll_teacher(@teacher2, :enrollment_state => 'active')
     # Assignment1 in Course1
     @assignment1 = @course1.assignments.create!(:title => 'Assignment First', :points_possible => 10)
+    # add a module to course2
+    @module1 = @course2.context_modules.create!(:name => "My Module1")
+    @item_before = @module1.add_item :type => 'assignment', :id => @course1.assignments.create!(:title => 'assignment BEFORE this one').id
+    @item_after = @module1.add_item :type => 'assignment', :id => @course1.assignments.create!(:title => 'assignment AFTER this one').id
+    @module2 = @course2.context_modules.create!(:name => "My Module2")
   }
 
   let(:copy_assignment_to_course2) {
@@ -52,13 +58,25 @@ describe 'assignments' do
     run_jobs
   }
 
+  let(:select_course) {
+    course_search_dropdown.click
+    course_dropdown_item(@course2.name).click
+  }
+
   let(:send_item) {
     user_search.click
     user_search.send_keys("teac")
-		wait_for_animations
+    wait_for_animations
     user_dropdown(@teacher2.name).click
     send_button.click
     run_jobs
+  }
+
+  let(:select_course_and_module_in_tray) {
+    course_search_dropdown.click
+    course_dropdown_item(@course2.name).click
+    module_search_dropdown.click
+    module_dropdown_item(@module1.name).click
   }
 
   context 'with direct share FF ON' do
@@ -69,11 +87,27 @@ describe 'assignments' do
 
     before(:each) do
       user_session(@teacher1)
-      visit_assignments_index_page(@course1.id)
     end
+
+    it 'allows user to send assignment from individual assignment page' do
+      AssignmentPage.visit(@course1.id, @assignment1.id)
+      AssignmentPage.manage_assignment_button.click
+      AssignmentPage.send_to_menuitem.click
+
+      expect(AssignmentPage.assignment_page_body).to contain_css(send_to_dialog_css_selector)
+    end
+
+    it 'allows user to copy assignment from individual assignment page' do
+      AssignmentPage.visit(@course1.id, @assignment1.id)
+      AssignmentPage.manage_assignment_button.click
+      AssignmentPage.copy_to_menuitem.click
+
+      expect(AssignmentPage.assignment_page_body).to contain_css(copy_to_dialog_css_selector)
+    end   
 
     context 'copy to' do
       before(:each) do
+        visit_assignments_index_page(@course1.id)
         manage_assignment_menu(@assignment1.id).click
         copy_assignment_menu_link(@assignment1.id).click
       end
@@ -85,7 +119,27 @@ describe 'assignments' do
         expect(course_dropdown_list.text).to include 'Second Course2'
       end
 
+      it 'copy tray lists course modules' do
+        select_course
+        module_search_dropdown.click
+        wait_for_animations
+        expect(module_dropdown_list.text).to include 'My Module1'
+        expect(module_dropdown_list.text).to include 'My Module2'
+      end
+
+      it 'copy tray allows placement' do
+        select_course_and_module_in_tray
+        placement_dropdown.click
+
+        @place_options_text = placement_dropdown_options
+        expect(@place_options_text[0].text).to include 'At the Top'
+        expect(@place_options_text[1].text).to include 'Before..'
+        expect(@place_options_text[2].text).to include 'After..'
+        expect(@place_options_text[3].text).to include 'At the Bottom'
+      end
+
       it 'copied assignment is present in destination course' do
+        skip "LA-374"
         copy_assignment_to_course2
         visit_assignments_index_page(@course2.id)
 
@@ -95,16 +149,17 @@ describe 'assignments' do
 
     context 'send to' do
       before(:each) do
+        visit_assignments_index_page(@course1.id)
         manage_assignment_menu(@assignment1.id).click
         send_assignment_menu_link(@assignment1.id).click
-				send_item
-				run_jobs
-				user_session(@teacher2)
-		    visit_content_share_page
+        send_item
+        run_jobs
+        user_session(@teacher2)
+        visit_content_share_page
       end
 
       it 'can send an item to another instructor' do
-				expect(received_table_rows[1].text).to include (@assignment1.name)
+        expect(received_table_rows[1].text).to include @assignment1.name
       end
     end
   end

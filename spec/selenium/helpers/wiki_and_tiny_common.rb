@@ -163,7 +163,7 @@ module WikiAndTinyCommon
     f("input[type='file']").send_keys(path)
     f("input[name='alt_text']").send_keys(alt_text)
     f("button[type='submit']").click
-    expect(f("body")).not_to contain_jqcss("input[type='file']:visible")
+    wait_for(method: nil, timeout: 5) { fj('button:contains(" Upload a new image")').displayed? }
     in_frame wiki_page_body_ifr_id do
       expect(f('#tinymce img')).to be_displayed
     end

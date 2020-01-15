@@ -3387,6 +3387,10 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     courseId: ID
   ): [Enrollment!]!
+
+  """
+  **NOTE**: this only returns groups for the currently logged-in user.
+  """
   groups: [Group!]
   id: ID!
   name: String

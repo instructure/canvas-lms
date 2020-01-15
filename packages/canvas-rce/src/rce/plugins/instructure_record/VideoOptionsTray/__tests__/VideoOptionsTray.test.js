@@ -42,6 +42,10 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         titleText: '',
         type: 'video-embed',
         videoSize: 'medium'
+      },
+      trayOptions: {
+        host: 'localhost:3001',
+        jwt: 'someuglyvalue'
       }
     }
   })
@@ -79,12 +83,6 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       props.videoOptions.titleText = ''
       renderComponent()
       expect(tray.titleText).toEqual('')
-    })
-
-    it('is disabled when displaying the image as a link', () => {
-      renderComponent()
-      tray.setDisplayAs('link')
-      expect(tray.titleTextDisabled).toEqual(true)
     })
   })
 

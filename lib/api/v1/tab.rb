@@ -51,9 +51,12 @@ module Api::V1::Tab
     end
 
     if tab[:args]
-      # If last argument is a hash (of options), we can't add on another options hash;
-      # we need to merge it into the existing options.
-      if tab[:args].last.is_a?(Hash) || tab[:args].last.is_a?(ActionController::Parameters)
+      if tab[:args].is_a?(Hash)
+        # LTI 2 tools have args as a hash rather than an array (see MessageHandler#lti_apps_tabs)
+        send(method, opts.merge(tab[:args].symbolize_keys))
+      elsif tab[:args].last.is_a?(Hash) || tab[:args].last.is_a?(ActionController::Parameters)
+        # If last argument is a hash (of options), we can't add on another options hash;
+        # we need to merge it into the existing options.
         # can't do tab[:args].last.merge(opts), that may convert :host to 'host'
         send(method, *tab[:args][0..-2], opts.merge(tab[:args].last))
       else

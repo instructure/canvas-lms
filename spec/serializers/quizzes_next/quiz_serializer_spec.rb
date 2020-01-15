@@ -45,7 +45,16 @@ describe QuizzesNext::QuizSerializer do
       assignment_group: group,
       due_at: Time.zone.now + 1.week,
       workflow_state: 'published',
-      duplicate_of: original_assignment
+      duplicate_of: original_assignment,
+      settings: {
+        lockdown_browser: {
+          require_lockdown_browser: true,
+          require_lockdown_browser_for_results: false,
+          require_lockdown_browser_monitor: true,
+          lockdown_browser_monitor_data: 'some text data',
+          access_code: 'magic code'
+        }
+      }
     )
   end
   let(:user) { User.create }
@@ -120,6 +129,36 @@ describe QuizzesNext::QuizSerializer do
   describe "#original_assignment_name" do
     it "serializes original_assignment_name" do
       expect(subject[:original_assignment_name]).to eq('some assignment 1')
+    end
+  end
+
+  describe "#require_lockdown_browser" do
+    it "serializes require_lockdown_browser" do
+      expect(subject[:require_lockdown_browser]).to be_truthy
+    end
+  end
+
+  describe "#require_lockdown_browser_for_results" do
+    it "serializes require_lockdown_browser_for_results" do
+      expect(subject[:require_lockdown_browser_for_results]).to be_falsy
+    end
+  end
+
+  describe "#require_lockdown_browser_monitor" do
+    it "serializes require_lockdown_browser_monitor" do
+      expect(subject[:require_lockdown_browser_monitor]).to be_truthy
+    end
+  end
+
+  describe "#lockdown_browser_monitor_data" do
+    it "serializes lockdown_browser_monitor_data" do
+      expect(subject[:lockdown_browser_monitor_data]).to eq 'some text data'
+    end
+  end
+
+  describe "#access_code" do
+    it "serializes access_code" do
+      expect(subject[:access_code]).to eq 'magic code'
     end
   end
 

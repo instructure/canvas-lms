@@ -422,7 +422,7 @@ var quizSubmission = (function() {
     },
 
     updateFinalSubmitButtonState() {
-      const allQuestionsAnswered = $('#question_list li:not(.answered)').length == 0
+      const allQuestionsAnswered = $('#question_list li:not(.answered, .text_only)').length == 0
       const lastQuizPage = $('#submit_quiz_form').hasClass('last_page')
       const thisQuestionAnswered = $('div.question.answered').length > 0
       const oneAtATime = quizSubmission.oneAtATime

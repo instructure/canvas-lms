@@ -157,6 +157,11 @@
                   <% end %>
                 <% end %>
 
+                <% if @discussion_presenter.can_direct_share? %>
+                  <li><a href="#", class="direct-share-send-to-menu-item"><i class="icon-user" aria-hidden="true"></i> <%= t("Send To...") %></a></li>
+                  <li><a href="#", class="direct-share-copy-to-menu-item"><i class="icon-duplicate" aria-hidden="true"></i> <%= t("Copy To...") %></a></li>
+                <% end %>
+
                 <% if can_do(@context, @current_user, :manage_content) %>
                   <%= external_tools_menu_items((@discussion_topic_menu_tools || []), {link_class: "menu_tool_link", settings_key: :discussion_topic_menu, in_list: true, url_params: {:discussion_topics => [@topic.id]}}) %>
                 <% end %>
@@ -341,6 +346,8 @@
   </div>
 
   <%= prefetch_assignment_external_tools %>
+
+  <div id="direct-share-mount-point"></div>
 
   <% if @headers != false %>
     <div id="module_sequence_footer"></div>

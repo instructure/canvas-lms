@@ -748,9 +748,9 @@ class RCEWrapper extends React.Component {
       ...options,
 
       block_formats: [
-        `${formatMessage('Header')}=h2`,
-        `${formatMessage('Subheader')}=h3`,
-        `${formatMessage('Small header')}=h4`,
+        `${formatMessage('Heading 2')}=h2`,
+        `${formatMessage('Heading 3')}=h3`,
+        `${formatMessage('Heading 4')}=h4`,
         `${formatMessage('Preformatted')}=pre`,
         `${formatMessage('Paragraph')}=p`
       ].join('; '),

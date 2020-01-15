@@ -15,41 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_relative 'autoextend/extension'
+
 module Autoextend
-  Extension = Struct.new(:const_name, :module, :method, :block, :singleton, :after_load, :optional, :used) do
-    def extend(const, source: nil)
-      return if after_load && source == :inherited
-      self.used = true
-
-      target = singleton ? const.singleton_class : const
-      if block
-        block.call(target)
-      else
-        mod = if self.module.is_a?(Module)
-                self.module
-              else
-                Object.const_get(self.module.to_s, false)
-              end
-        real_method = method
-        # if we're hooking a module, and that module was included/prepended into
-        # another module/class, we also get called on that class, so that the
-        # extension can also be included into it. It won't otherwise have the
-        # extension, because the extension target didn't have it when it was
-        # included in the class
-        if [:included, :prepended].include?(source) && const.name != const_name
-          real_method = :include
-        end
-        target.send(real_method, mod)
-      end
-    end
-  end
-  private_constant :Extension
-
   class << self
     def const_added(const, source:)
       const_name = const.is_a?(String) ? const : const.name
       return [] unless const_name
-      extensions_hash.fetch(const_name.to_sym, []).each do |extension|
+      extensions_list = extensions_hash.fetch(const_name.to_sym, [])
+      sorted_extensions(extensions_list).each do |extension|
         if const == const_name
           const = Object.const_get(const_name, false)
         end
@@ -93,17 +67,41 @@ module Autoextend
       singleton: false,
       after_load: false,
       optional: false,
+      before: [],
+      after: [],
       &block)
       raise ArgumentError, "block is required if module_name is not passed" if !module_name && !block
       raise ArgumentError, "cannot pass both a module_name and a block" if module_name && block
 
-      extension = Extension.new(const_name, module_name, method, block, singleton, after_load, optional)
+      extension = Extension.new(const_name,
+        module_name,
+        method,
+        block,
+        singleton,
+        after_load,
+        optional,
+        Array(before),
+        Array(after))
 
       const_extensions = extensions_hash[const_name.to_sym] ||= []
       const_extensions << extension
 
+      if module_name.is_a?(Module)
+        module_name = module_name.name
+      end
+
       # immediately extend the class if it's already defined
       if Object.const_defined?(const_name.to_s, false)
+        extension.before.each do |before_module|
+          if const_extensions.any? { |ext| ext.module_name == before_module }
+            raise "Already included #{before_module}; cannot include #{module_name} first"
+          end
+        end
+        extension.after.each do |after_module|
+          unless const_extensions.any? { |ext| ext.module_name == after_module }
+            raise "Could not find #{after_module}; cannot include #{module_name} after"
+          end
+        end
         extension.extend(Object.const_get(const_name.to_s, false))
       end
       nil
@@ -114,6 +112,29 @@ module Autoextend
     end
 
     private
+
+    def sorted_extensions(extensions_list)
+      cloned_list = extensions_list.dup
+      cloned_list.each do |ext|
+        ext.before.each do |before_module|
+          other_ext = cloned_list.find { |other| other.module_name == before_module }
+          raise "Could not find #{before_module} to include after #{ext.module_name}" unless other_ext
+          other_ext.after << ext.module_name
+        end
+        # This isn't needed to build the DAG, but it's useful for sanity
+        ext.after.each do |after_module|
+          other_ext = cloned_list.find { |other| other.module_name == after_module }
+          raise "Could not find #{after_module} to include before #{ext.module_name}" unless other_ext
+          other_ext.before << ext.module_name
+        end
+      end
+      # Let's avoid having extra copies of things for no reason (makes debugging easier)
+      cloned_list.each do |ext|
+        ext.before.uniq!
+        ext.after.uniq!
+      end
+      ExtensionArray.new(cloned_list).tsort
+    end
 
     def extensions_hash
       @extensions ||= {}

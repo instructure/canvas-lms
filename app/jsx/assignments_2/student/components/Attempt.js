@@ -27,8 +27,7 @@ export const getCurrentAttempt = submission => {
   return submission && submission.attempt !== 0 ? submission.attempt : 1
 }
 
-function Attempt(props) {
-  const {assignment, submission} = props
+export default function Attempt({assignment, submission}) {
   const current_attempt = getCurrentAttempt(submission)
   const {setOnSuccess} = useContext(AlertManagerContext)
 
@@ -53,4 +52,3 @@ Attempt.propTypes = {
   submission: Submission.shape
 }
 
-export default React.memo(Attempt)

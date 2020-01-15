@@ -28,7 +28,7 @@ pipeline {
   options {
     ansiColor('xterm')
   }
-  
+
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml'
     GERRIT_PROJECT = 'canvas-lms'
@@ -47,13 +47,18 @@ pipeline {
       }
     }
 
+    stage ('Pre-Cleanup') {
+      steps {
+        timeout(time: 2) {
+          sh 'build/new-jenkins/docker-cleanup.sh'
+        }
+      }
+    }
+
     stage('Gergich Setup') {
       steps {
         timeout(time: 3) {
           script {
-            def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
-            credentials.fetchFromGerrit('gergich_user_config', '.')
-            sh 'cp ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config'
             sh 'docker pull $PATCHSET_TAG'
           }
         }
@@ -113,7 +118,7 @@ pipeline {
 
   post {
     cleanup {
-      sh 'build/new-jenkins/docker-cleanup.sh'
+      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }
 }

@@ -44,6 +44,7 @@ describe "master courses banner" do
       end
 
       it "locks down the content and shows banner", priority:"2", test_id: 3248172 do
+        skip('LA-375')
         change_blueprint_settings(@master, content: true)
         get "/courses/#{@master.id}/pages/#{@original_page.id}"
         f('.bpc-lock-toggle button').click

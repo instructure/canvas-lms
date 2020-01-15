@@ -33,6 +33,8 @@ import assertions from 'helpers/assertions'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import 'helpers/jquery.simulate'
 
+const currentOrigin = window.location.origin
+
 const editView = function(opts = {}, discussOpts = {}) {
   const modelClass = opts.isAnnouncement ? Announcement : DiscussionTopic
   if (opts.withAssignment) {
@@ -176,36 +178,41 @@ test('does not render #podcast_has_student_posts_container for non-course contex
 })
 
 test('routes to discussion details normally', function() {
-  const view = this.editView({}, {html_url: 'http://foo'})
-  equal(view.locationAfterSave({}), 'http://foo')
+  const view = this.editView({}, {html_url: currentOrigin + '/foo'})
+  equal(view.locationAfterSave({}), currentOrigin + '/foo')
 })
 
 test('routes to return_to', function() {
-  const view = this.editView({}, {html_url: 'http://foo'})
-  equal(view.locationAfterSave({return_to: 'http://bar'}), 'http://bar')
+  const view = this.editView({}, {html_url: currentOrigin + '/foo'})
+  equal(view.locationAfterSave({return_to: currentOrigin + '/bar'}), currentOrigin + '/bar')
 })
 
 test('does not route to return_to with javascript protocol', function() {
-  const view = this.editView({}, {html_url: 'http://foo'})
-  equal(view.locationAfterSave({return_to: 'javascript:alert(1)'}), 'http://foo')
+  const view = this.editView({}, {html_url: currentOrigin + '/foo'})
+  equal(view.locationAfterSave({return_to: 'javascript:alert(1)'}), currentOrigin + '/foo')
+})
+
+test('does not route to return_to in remote origin', function() {
+  const view = this.editView({}, {html_url: currentOrigin + '/foo'})
+  equal(view.locationAfterSave({return_to: 'http://evil.com'}), currentOrigin + '/foo')
 })
 
 test('cancels to env normally', function() {
-  ENV.CANCEL_TO = 'http://foo'
+  ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
-  equal(view.locationAfterCancel({}), 'http://foo')
+  equal(view.locationAfterCancel({}), currentOrigin + '/foo')
 })
 
 test('cancels to return_to', function() {
-  ENV.CANCEL_TO = 'http://foo'
+  ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
-  equal(view.locationAfterCancel({return_to: 'http://bar'}), 'http://bar')
+  equal(view.locationAfterCancel({return_to: currentOrigin + '/bar'}), currentOrigin + '/bar')
 })
 
 test('does not cancel to return_to with javascript protocol', function() {
-  ENV.CANCEL_TO = 'http://foo'
+  ENV.CANCEL_TO = currentOrigin + '/foo'
   const view = this.editView()
-  equal(view.locationAfterCancel({return_to: 'javascript:alert(1)'}), 'http://foo')
+  equal(view.locationAfterCancel({return_to: 'javascript:alert(1)'}), currentOrigin + '/foo')
 })
 
 test('shows todo checkbox', function() {

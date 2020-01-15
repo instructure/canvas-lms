@@ -393,6 +393,10 @@ describe ContextModule do
         %w(one two three attach assign page quiz topic tool))
     end
 
+    it 'appends items to the beginning of a module' do
+      @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool], 1)
+      expect(@module.content_tags.pluck(:title)).to eq(%w(attach assign page quiz topic tool one two three))
+    end
 
     it "inserts items into a module" do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool], 2)
@@ -410,6 +414,26 @@ describe ContextModule do
       @module.insert_items([@attach, user_model, 'foo', @assign])
       expect(@module.content_tags.order(:position).pluck(:title)).to eq(
         %w(one two three attach assign))
+    end
+
+    it 'adds the item in the correct position when the existing items do not start at 1' do
+      @module.content_tags.update_all(['position = position + ?', 3])
+      @module.insert_items([@attach, @assign], 3)
+      expect(@module.content_tags.pluck(:title)).to eq(%w(one two attach assign three))
+    end
+
+    it 'adds the item in the correct position when the existing items have duplicate positions' do
+      @module.content_tags.find_by(title: 'two').update_attributes(position: 1)
+      @module.insert_items([@attach, @assign], 2)
+      expect(@module.content_tags.find_by(position: 2).title).to eq @attach.title
+      expect(@module.content_tags.find_by(position: 3).title).to eq @assign.title
+      expect(@module.content_tags.pluck(:title)).to eq(%w(one attach assign two three))
+    end
+
+    it 'ignores deleted items in the position calculation' do
+      @module.content_tags.find_by(title: 'two').destroy
+      @module.insert_items([@attach, @assign], 3)
+      expect(@module.content_tags.not_deleted.pluck(:title)).to eq(%w(one three attach assign))
     end
   end
 

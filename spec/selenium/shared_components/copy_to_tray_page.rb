@@ -18,13 +18,16 @@
 require_relative '../common'
 
 module CopyToTrayPage
-
   # ------------------------------ Selectors -----------------------------
+  
+  def copy_to_dialog_css_selector
+    "[role='dialog'][aria-label='Copy To...']"
+  end
 
   # ------------------------------ Elements ------------------------------
 
   def copy_to_dialog
-    f("[role='dialog']")
+    f(copy_to_dialog_css_selector)
   end
 
   def course_search_dropdown
@@ -37,16 +40,20 @@ module CopyToTrayPage
     main_span.find_element(:css, "input[role='combobox']")
   end
 
+  def dropdowns_in_tray
+    ff("input[role='combobox']")
+  end
+
   def course_dropdown_list
     f("ul[role='listbox']")
   end
 
   def course_dropdown_item(course_name)
-    fj("li:contains(#{course_name})")
+    fj("[role='option']:contains('#{course_name}')")
   end
 
   def module_dropdown_item(module_name)
-    fj("li:contains(#{module_name})")
+    fj("[role='option']:contains('#{module_name}')")
   end
 
   def copy_button
@@ -61,6 +68,19 @@ module CopyToTrayPage
     f("ul[role='listbox']")
   end
 
+  def placement_dropdown
+    f("select[data-testid='select-position']")
+  end
+
+  def placement_dropdown_options
+    placement_dropdown.find_all('option')
+  end
+
   # ------------------------------ Actions --------------------------------
+
+  # the course dropdown triggers a fetch that needs to then fetch the modules
+  def wait_for_module_search_dropdown
+    wait_for(method: nil, timeout: 1) { dropdowns_in_tray.count == 2}
+  end
 
 end

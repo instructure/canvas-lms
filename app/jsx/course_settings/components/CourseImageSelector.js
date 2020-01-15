@@ -31,7 +31,7 @@ let overflow = ''
 export default class CourseImageSelector extends React.Component {
   state = this.props.store.getState()
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.store.subscribe(() => this.setState(this.props.store.getState()))
     this.props.store.dispatch(Actions.getCourseImage(this.props.courseId))
     this.setState({gettingImage: true})
@@ -98,6 +98,8 @@ export default class CourseImageSelector extends React.Component {
           onDismiss={this.handleModalDismiss}
           onEnter={this.handleModalOpen}
           onExit={this.handleModalClose}
+          onDragOver={e => e.preventDefault()}
+          onDrop={e => e.preventDefault()}
         >
           <Modal.Body>
             <CourseImagePicker

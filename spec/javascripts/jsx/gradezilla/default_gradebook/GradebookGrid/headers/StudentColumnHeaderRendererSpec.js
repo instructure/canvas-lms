@@ -49,6 +49,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
     setFixtureHtml($container)
 
     gradebook = createGradebook({
+      additional_sort_options_enabled: false,
       login_handle_name: 'a_jones',
       sis_name: 'Example SIS'
     })
@@ -93,6 +94,17 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
     test('includes the login handle name from Gradebook', () => {
       render()
       equal(component.props.loginHandleName, 'a_jones')
+    })
+
+    test('sets includeAdditionalSortOptions to true if Gradebook enables additional sort options', () => {
+      gradebook.options.additional_sort_options_enabled = true
+      render()
+      strictEqual(component.props.includeAdditionalSortOptions, true)
+    })
+
+    test('sets includeAdditionalSortOptions to false if Gradebook does not enable additional sort options', () => {
+      render()
+      strictEqual(component.props.includeAdditionalSortOptions, false)
     })
 
     test('includes a callback for keyDown events', () => {
@@ -245,8 +257,80 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       strictEqual(component.props.sortBySetting.isSortColumn, false)
     })
 
-    test('includes the onSortBySortableNameAscending callback', () => {
+    test('includes the onSortBySortableName callback', () => {
       gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'ascending')
+      render()
+      component.props.sortBySetting.onSortBySortableName()
+      const expectedSetting = {
+        columnId: 'student',
+        direction: 'ascending',
+        settingKey: 'sortable_name'
+      }
+      deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+    })
+
+    test('includes the onSortBySisId callback', () => {
+      gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'ascending')
+      render()
+      component.props.sortBySetting.onSortBySisId()
+      const expectedSetting = {
+        columnId: 'student',
+        direction: 'ascending',
+        settingKey: 'sis_user_id'
+      }
+      deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+    })
+
+    test('includes the onSortByIntegrationId callback', () => {
+      gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'ascending')
+      render()
+      component.props.sortBySetting.onSortByIntegrationId()
+      const expectedSetting = {
+        columnId: 'student',
+        direction: 'ascending',
+        settingKey: 'integration_id'
+      }
+      deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+    })
+
+    test('includes the onSortByLoginId callback', () => {
+      gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'ascending')
+      render()
+      component.props.sortBySetting.onSortByLoginId()
+      const expectedSetting = {
+        columnId: 'student',
+        direction: 'ascending',
+        settingKey: 'login_id'
+      }
+      deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+    })
+
+    test('includes the onSortInAscendingOrder callback', () => {
+      gradebook.setSortRowsBySetting('assignment_2301', 'sortable_name', 'descending')
+      render()
+      component.props.sortBySetting.onSortInAscendingOrder()
+      const expectedSetting = {
+        columnId: 'student',
+        direction: 'ascending',
+        settingKey: 'sortable_name'
+      }
+      deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+    })
+
+    test('includes the onSortInDescendingOrder callback', () => {
+      gradebook.setSortRowsBySetting('assignment_2301', 'sortable_name', 'ascending')
+      render()
+      component.props.sortBySetting.onSortInDescendingOrder()
+      const expectedSetting = {
+        columnId: 'student',
+        direction: 'descending',
+        settingKey: 'sortable_name'
+      }
+      deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+    })
+
+    test('includes the onSortBySortableNameAscending callback', () => {
+      gradebook.setSortRowsBySetting('assignment_2301', 'sortable_name', 'descending')
       render()
       component.props.sortBySetting.onSortBySortableNameAscending()
       const expectedSetting = {
@@ -258,7 +342,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
     })
 
     test('includes the onSortBySortableNameDescending callback', () => {
-      gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'ascending')
+      gradebook.setSortRowsBySetting('assignment_2301', 'sortable_name', 'ascending')
       render()
       component.props.sortBySetting.onSortBySortableNameDescending()
       const expectedSetting = {

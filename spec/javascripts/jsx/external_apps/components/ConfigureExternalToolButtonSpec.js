@@ -45,6 +45,28 @@ QUnit.module('ConfigureExternalToolButton screenreader functionality', {
   }
 })
 
+test('uses the tool configuration "url" when present', () => {
+  const wrapper = mount(<ConfigureExternalToolButton tool={tool} modalIsOpen />)
+  ok(
+    wrapper
+      .instance()
+      .getLaunchUrl({url: 'https://my.tool.com', target_link_uri: 'https://advantage.tool.com'})
+      .includes('url=https%3A%2F%2Fmy.tool.com&display=borderless')
+  )
+  wrapper.unmount()
+})
+
+test('uses the tool configuration "target_link_uri" when "url" is not present', () => {
+  const wrapper = mount(<ConfigureExternalToolButton tool={tool} modalIsOpen />)
+  ok(
+    wrapper
+      .instance()
+      .getLaunchUrl({target_link_uri: 'https://advantage.tool.com'})
+      .includes('url=https%3A%2F%2Fadvantage.tool.com&display=borderless')
+  )
+  wrapper.unmount()
+})
+
 test('shows beginning info alert and adds styles to iframe', () => {
   const wrapper = mount(<ConfigureExternalToolButton tool={tool} modalIsOpen />)
   wrapper.instance().handleAlertFocus({target: {className: 'before'}})

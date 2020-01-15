@@ -415,7 +415,15 @@ RSpec.describe Outcomes::Import do
       it 'reassigns parents of existing outcome' do
         parent1.add_outcome(existing_outcome)
         importer.import_outcome(**outcome_attributes, parent_guids: 'parent2')
-          expect(parent1.child_outcome_links.active.map(&:content)).to be_empty
+        expect(parent1.child_outcome_links.active.map(&:content)).to be_empty
+        expect(parent2.child_outcome_links.active.map(&:content)).to include existing_outcome
+      end
+
+      it 'reassigns parents of an aligned outcome' do
+        outcome_with_rubric(outcome: existing_outcome)
+        parent1.add_outcome(existing_outcome)
+        importer.import_outcome(**outcome_attributes, parent_guids: 'parent2')
+        expect(parent1.child_outcome_links.active.map(&:content)).to be_empty
         expect(parent2.child_outcome_links.active.map(&:content)).to include existing_outcome
       end
 

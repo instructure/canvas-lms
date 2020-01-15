@@ -102,6 +102,12 @@ if only_affects_specs
   exit
 end
 
+touches_db_migrate_file = commit_files.any? { |f| f =~ %r{\Adb\/migrate/}}
+if touches_db_migrate_file
+  comment "warn", 1, "Your commit modifies migration files. Please review and follow the instructions in https://instructure.atlassian.net/wiki/spaces/CE/pages/49643724/Rails+Migrations, including completing an additional migration review."
+  exit
+end
+
 user_config_file = File.expand_path("../../gems/dr_diff/config/gergich_user_config.yml", __FILE__)
 if File.exists?(user_config_file)
   config = YAML.load_file(user_config_file) || {}
@@ -127,7 +133,7 @@ end
 
 flag_name = (commit_message =~ /^flag\s{0,3}=\s{0,3}([a-zA-Z][\w\-]+)\s{0,3}$/)
 unless flag_name
-  comment "warn", 1, "y u no add release flag? ლ(ಠ益ಠლ)"
+  comment "warn", 1, "ლ(ಠ益ಠლ) y u no add release flag? https://instructure.atlassian.net/wiki/spaces/CE/pages/603586589/Commit+Message+Release+Flags"
 end
 
 has_a_test_plan = commit_message =~ /test[ -]plan/i

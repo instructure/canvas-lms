@@ -64,6 +64,7 @@ const thePanels = {
   images: React.lazy(() => import('../instructure_image/Images')),
   documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
   media: React.lazy(() => import('../instructure_record/MediaPanel')),
+  all: React.lazy(() => import('./FileBrowser')),
   unknown: React.lazy(() => import('./UnknownFileTypePanel'))
 }
 /**
@@ -123,6 +124,12 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentType: 'links',
     contentSubtype: 'all',
     sortValue: 'date_added'
+  },
+  all: {
+    contextType: 'course',
+    contentType: 'course_files',
+    contentSubtype: 'all',
+    sortValue: 'alphabetical'
   }
 }
 

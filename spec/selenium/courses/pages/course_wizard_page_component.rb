@@ -76,6 +76,7 @@ module CourseWizardPageComponent
     f(incomplete_checklist_item_selector(item))
   end
 
+
   #----------------------- Actions/Methods ----------------------
   def close_course_wizard
     close_btn.click
