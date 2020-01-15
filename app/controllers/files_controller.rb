@@ -572,7 +572,7 @@ class FilesController < ApplicationController
           attachment.context_module_action(@current_user, :read)
         end
         format.html do
-          if attachment.locked_for?(@current_user)
+          if attachment.locked_for?(@current_user, :check_policies => true)
             render :show, status: :forbidden
           else
             if attachment.inline_content? && !attachment.canvadocable? && safer_domain_available? && !params[:fd_cookie_set]
