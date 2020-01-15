@@ -18,13 +18,38 @@
 
 import sanitizeUrl from '../sanitizeUrl'
 
-it('removes replaces javascript: scheme urls with about:blank', () => {
+it('replaces javascript: scheme urls with about:blank', () => {
   // eslint-disable-next-line no-script-url
   expect(sanitizeUrl('javascript:prompt(document.cookie);prompt(document.domain);')).toBe(
     'about:blank'
   )
 })
 
-it('leaves normal non-javascript: urls alone', () => {
+it('is not fooled by obfuscating the scheme with newlines and stuff', () => {
+  expect(sanitizeUrl('javascri\npt:prompt(document.cookie);prompt(document.domain);')).toBe(
+    'about:blank'
+  )
+})
+
+it('is not hoodwinked by mixed-case tomfoolery', () => {
+  // eslint-disable-next-line no-script-url
+  expect(sanitizeUrl('jaVascripT:prompt(document.cookie);prompt(document.domain);')).toBe(
+    'about:blank'
+  )
+})
+
+it('leaves normal non-javascript: http urls alone', () => {
   expect(sanitizeUrl('http://instructure.com')).toBe('http://instructure.com')
+})
+
+it('leaves normal non-javascript: https urls alone', () => {
+  expect(sanitizeUrl('https://instructure.com')).toBe('https://instructure.com')
+})
+
+it('leaves schemeless absolute urls alone', () => {
+  expect(sanitizeUrl('/index.html')).toBe('/index.html')
+})
+
+it('leaves relative urls alone', () => {
+  expect(sanitizeUrl('lolcats.gif')).toBe('lolcats.gif')
 })
