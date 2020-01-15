@@ -39,3 +39,8 @@ eportfolio_moderation:
   display_name: ePortfolio Moderation
   description: Flags new ePortfolio content matching specific keywords as possible spam, and allows
     administrators to either confirm flagged ePortfolios or mark them as safe.
+analytics2_api_access:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Analytics API Access
+  description: Enables new API endpoints for the course and user data provided by New Analytics.
