@@ -46,4 +46,8 @@ def forceRunCoverage() {
   return hasFlag('force-run-coverage')
 }
 
+def isForceFailure() {
+  return hasFlag('force-failure')
+}
+
 return this

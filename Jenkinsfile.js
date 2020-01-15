@@ -23,6 +23,11 @@ def runCoverage() {
   return env.RUN_COVERAGE == '1' || flags.forceRunCoverage() ? '1' : ''
 }
 
+def isForceFailure() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return flags.isForceFailure() ? "1" : ''
+}
+
 def getImageTagVersion() {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
   return flags.getImageTagVersion()
@@ -42,6 +47,7 @@ pipeline {
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
     COVERAGE = runCoverage()
+    FORCE_FAILURE = isForceFailure()
     NAME = getImageTagVersion()
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     SENTRY_URL="https://sentry.insops.net"
