@@ -274,7 +274,7 @@
   },
   "repository": "instructure/canvas-lms",
   "scripts": {
-    "test": "yarn test:packages && if [[ \"$COVERAGE\" == \"1\" ]]; then yarn test:jest:coverage --runInBand; else yarn test:jest --runInBand; fi && if [[ \"$COVERAGE\" == \"1\" ]]; then yarn test:karma; else yarn test:karma:concurrently; fi",
+    "test": "yarn test:packages && if [[ \"$COVERAGE\" ]]; then yarn test:jest:coverage --runInBand; else yarn test:jest --runInBand; fi && if [[ \"$COVERAGE\" ]]; then yarn test:karma; else yarn test:karma:concurrently; fi",
     "test:coverage": "script/generate_js_coverage",
     "test:watch": "concurrently --names \"jest,karma\" \"jest --watch .\" \"yarn test:karma:watch\"",
     "test:jest": "jest --color --runInBand",
@@ -285,7 +285,7 @@
     "test:karma:headless": "yarn run test:karma --browsers ChromeHeadlessNoSandbox",
     "test:karma:watch": "node --max-old-space-size=4096 ./node_modules/.bin/karma start",
     "test:karma:watch:headless": "yarn run test:karma:watch --browsers ChromeHeadlessNoSandbox",
-    "test:packages": "if [[ \"$COVERAGE\" == \"1\" ]]; then yarn workspace-run-serial test:coverage; else yarn workspace-run-serial test; fi",
+    "test:packages": "if [[ \"$COVERAGE\" ]]; then yarn workspace-run-serial test:coverage; else yarn workspace-run-serial test; fi",
     "build": "yarn run build:css && yarn run build:js",
     "build:watch": "concurrently --raw \"yarn build:css:watch\" \"yarn build:js:watch\"",
     "build:css": "brandable_css",

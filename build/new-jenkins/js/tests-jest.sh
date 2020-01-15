@@ -4,7 +4,7 @@ set -x -o errexit -o errtrace -o nounset -o pipefail
 
 CONTAINER_NAME=${CONTAINER_NAME:-tests-jest}
 EXTRA=""
-if [[ "$COVERAGE" == "1" ]]; then
+if [[ "${COVERAGE:-}" == "1" ]]; then
   EXTRA=":coverage"
 fi
 
