@@ -20,11 +20,12 @@ export function isValid(return_to) {
   if (!return_to) {
     return false
   }
-  if (/^\s*javascript:/i.test(return_to) || /^\s*data:/i.test(return_to)) {
+  const url = new URL(return_to, window.location.origin)
+  // eslint-disable-next-line no-script-url
+  if (url.protocol === 'javascript:' || url.protocol === 'data:') {
     return false
   }
-  const url = new URL(return_to, window.location.origin)
-  if (url.origin != window.location.origin) {
+  if (url.origin !== window.location.origin) {
     return false
   }
   return true
