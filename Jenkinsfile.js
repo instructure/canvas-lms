@@ -180,7 +180,7 @@ pipeline {
   post {
     always {
       script {
-        junit allowEmptyResults: true, testResults: '**/*.xml'
+        junit allowEmptyResults: true, testResults: 'tmp/**/*.xml'
         sh 'find ./tmp -path "*.xml"'
       }
     }
