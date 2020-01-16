@@ -135,7 +135,7 @@ pipeline {
     }
 
     stage('Rebase') {
-      when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' } }
+      when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms'} }
       steps {
         timeout(time: 2) {
           script {
