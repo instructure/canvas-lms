@@ -130,6 +130,19 @@
 
     {{>[assignments/submission_types_form]}}
 
+    {{#if assignment_attempts}}
+      <fieldset id="allowed_attempts_fields" class="control-group">
+        <div class="form-column-left">
+          {{#t "submission_attempts"}}Submission Attempts{{/t}}
+        </div>
+        <div class="form-column-right">
+          <div class="border border-trbl border-round">
+            <div id="allowed-attempts-target" />
+          </div>
+        </div>
+      </fieldset>
+    {{/if}}
+
     <fieldset id="similarity_detection_tools">
     </fieldset>
 
@@ -203,7 +216,6 @@
         </div>
       </fieldset>
     {{/if}}
-
   </div>
 
   {{#if canFreeze}}

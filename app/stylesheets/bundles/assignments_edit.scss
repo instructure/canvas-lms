@@ -278,3 +278,21 @@ div.form-column-right, div.overrides-column-right {
     width: initial;
   }
 }
+
+#allowed-attempts-target {
+  margin: 15px;
+
+  select {
+    margin: 0
+  }
+
+  label {
+    padding: 0;
+    margin: 0 0 18px 0;
+  }
+
+  // The hover looks weird in this case
+  label:hover {
+    background: none;
+  }
+}

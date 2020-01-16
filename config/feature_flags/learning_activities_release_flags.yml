@@ -15,6 +15,11 @@ assignments_2_teacher:
   environments:
     production:
       state: disabled
+assignment_attempts:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Assignment Allowed Attempts
+  description: Allow a teacher to set the number of allowed attempts on an assignment via the UI
 bookmarking_for_enrollments_index:
   state: allowed
   applies_to: RootAccount

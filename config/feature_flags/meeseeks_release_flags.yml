@@ -6,9 +6,6 @@ assignments_2_student:
   applies_to: Course
   root_opt_in: true
   beta: true
-  environments:
-    development:
-      state: on
 
 account_pronouns:
   state: hidden
