@@ -21,6 +21,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.up
+    connection.transaction(:requires_new => true) do
+      begin
+        execute("CREATE EXTENSION IF NOT EXISTS pg_collkey SCHEMA #{connection.shard.name}")
+      rescue ActiveRecord::StatementInvalid
+        raise ActiveRecord::Rollback
+      end
+    end
+
     create_table "abstract_courses", :force => true do |t|
       t.string   "sis_source_id"
       t.integer   "sis_batch_id", :limit => 8
@@ -73,6 +81,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "auth_filter"
       t.string   "requested_authn_context"
       t.datetime "last_timeout_failure"
+      t.text     "login_attribute"
     end
 
     add_index "account_authorization_configs", ["account_id"], :name => "index_account_authorization_configs_on_account_id"
@@ -381,6 +390,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "turnitin_settings"
       t.boolean  "muted", :default => false
       t.integer  "group_category_id", :limit => 8
+      t.boolean  "freeze_on_copy"
+      t.boolean  "copied"
     end
 
     add_index "assignments", ["assignment_group_id"], :name => "index_assignments_on_assignment_group_id"
@@ -535,6 +546,58 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "collaborators", ["collaboration_id"], :name => "index_collaborators_on_collaboration_id"
     add_index "collaborators", ["user_id"], :name => "index_collaborators_on_user_id"
 
+    create_table :collections do |t|
+      t.string :name
+      t.string :visibility, :default => "private"
+
+      t.string :context_type
+      t.integer :context_id, :limit => 8
+
+      t.string :workflow_state
+
+      t.timestamps null: true
+    end
+    add_index :collections, [:context_id, :context_type, :workflow_state, :visibility], :name => "index_collections_for_finding"
+
+    create_table :collection_items do |t|
+      t.integer :collection_item_data_id, :limit => 8
+      t.integer :collection_id, :limit => 8
+
+      t.string :workflow_state
+
+      t.text :description
+
+      t.timestamps null: true
+      t.integer :user_id, :limit => 8
+    end
+    add_index :collection_items, [:collection_id, :workflow_state]
+    add_index :collection_items, [:collection_item_data_id, :workflow_state], :name => "index_collection_items_on_data_id"
+
+    create_table :collection_item_datas do |t|
+      t.string :item_type
+
+      t.text :link_url
+
+      t.integer :root_item_id, :limit => 8
+
+      t.integer :post_count, :default => 0
+      t.integer :upvote_count, :default => 0
+
+      t.timestamps null: true
+      t.boolean :image_pending
+      t.integer :image_attachment_id, :limit => 8
+      t.text :image_url
+      t.text :html_preview
+    end
+
+    create_table :collection_item_upvotes do |t|
+      t.integer :collection_item_data_id, :limit => 8
+      t.integer :user_id, :limit => 8
+
+      t.timestamps null: true
+    end
+    add_index :collection_item_upvotes, [:collection_item_data_id, :user_id], :unique => true, :name => "index_collection_item_upvotes_join"
+
     create_table "communication_channels", :force => true do |t|
       t.string   "path"
       t.string   "path_type",                  :default => "email"
@@ -640,12 +703,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :has_resource_selection
       t.boolean :has_editor_button
       t.integer :cloned_item_id, :limit => 8
+      t.string :tool_id
     end
     add_index :context_external_tools, [:context_id, :context_type, :has_user_navigation], :name => "external_tools_user_navigation"
     add_index :context_external_tools, [:context_id, :context_type, :has_course_navigation], :name => "external_tools_course_navigation"
     add_index :context_external_tools, [:context_id, :context_type, :has_account_navigation], :name => "external_tools_account_navigation"
     add_index :context_external_tools, [:context_id, :context_type, :has_resource_selection], :name => "external_tools_resource_selection"
     add_index :context_external_tools, [:context_id, :context_type, :has_editor_button], :name => "external_tools_editor_button"
+    add_index :context_external_tools, [:tool_id]
 
     create_table "context_message_participants", :force => true do |t|
       t.integer  "user_id", :limit => 8
@@ -722,8 +787,20 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean "has_attachments", :default => false, :null => false
       t.boolean "has_media_objects", :default => false, :null => false
       t.text    "tags"
+      t.text    "root_account_ids"
     end
     add_index "conversations", ["private_hash"], :unique => true
+
+    create_table :conversation_batches do |t|
+      t.string :workflow_state
+      t.integer :user_id, :limit => 8
+      t.text :recipient_ids
+      t.integer :root_conversation_message_id, :limit => 8
+      t.text :conversation_message_ids
+      t.text :tags
+      t.timestamps null: true
+    end
+    add_index :conversation_batches, [:user_id, :workflow_state]
 
     create_table "conversation_participants" do |t|
       t.integer  "conversation_id", :limit => 8
@@ -867,6 +944,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "replacement_course_id", :limit => 8
       t.text     "stuck_sis_fields"
       t.text     "public_description"
+      t.string   "self_enrollment_code"
     end
 
     add_index "courses", ["abstract_course_id"], :name => "index_courses_on_abstract_course_id"
@@ -875,6 +953,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "courses", ["root_account_id"], :name => "index_courses_on_root_account_id"
     add_index :courses, [:template_course_id]
     add_index :courses, :uuid
+    add_index :courses, [:self_enrollment_code], :unique => true, :where => "self_enrollment_code IS NOT NULL"
 
     create_table "custom_field_values", :force => true do |t|
       t.integer  "custom_field_id", :limit => 8
@@ -943,7 +1022,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "user_id", :limit => 8
       t.string   "name"
       t.string   "redirect_uri"
+      t.string   "tool_id"
+      t.string   "icon_url"
     end
+    add_index :developer_keys, [:tool_id], :unique => true
 
     create_table "discussion_entries", :force => true do |t|
       t.text     "message"
@@ -1104,6 +1186,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "enrollments", ["user_id"], :name => "index_enrollments_on_user_id"
     add_index "enrollments", ["uuid"], :name => "index_enrollments_on_uuid"
     add_index "enrollments", ["workflow_state"], :name => "index_enrollments_on_workflow_state"
+    add_index :enrollments, [:associated_user_id], :where => "associated_user_id IS NOT NULL"
 
     create_table "eportfolio_categories", :force => true do |t|
       t.integer  "eportfolio_id", :limit => 8
@@ -1291,6 +1374,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "user_id", :limit => 8
       t.string   "uuid"
       t.integer  "sis_batch_id", :limit => 8
+      t.boolean  "moderator"
     end
 
     add_index "group_memberships", ["group_id"], :name => "index_group_memberships_on_group_id"
@@ -2044,6 +2128,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index "thumbnails", ["parent_id"], :name => "index_thumbnails_on_parent_id"
     add_index :thumbnails, [:id, :uuid]
+    add_index :thumbnails, [:parent_id, :thumbnail], :unique => true, :name => "index_thumbnails_size"
 
     create_table "user_account_associations", :force => true do |t|
       t.integer  "user_id", :limit => 8
@@ -2068,6 +2153,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
 
     add_index "user_notes", ["user_id", "workflow_state"], :name => "index_user_notes_on_user_id_and_workflow_state"
+
+    create_table :user_observers do |t|
+      t.integer :user_id, :limit => 8, :null => false
+      t.integer :observer_id, :limit => 8, :null => false
+    end
+    add_index :user_observers, [:user_id, :observer_id], :unique => true
+    add_index :user_observers, :observer_id
 
     create_table "user_services", :force => true do |t|
       t.integer  "user_id", :limit => 8
@@ -2127,11 +2219,17 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "browser_locale"
       t.integer  "unread_conversations_count", :default => 0
       t.text     "stuck_sis_fields"
+      t.text     "bio"
+      t.boolean  "public"
     end
 
     add_index "users", ["avatar_state", "avatar_image_updated_at"], :name => "index_users_on_avatar_state_and_avatar_image_updated_at"
     add_index "users", ["uuid"], :name => "index_users_on_uuid"
-    connection.execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (LOWER(sortable_name))")
+    if collkey = connection.extension_installed?(:pg_collkey)
+      execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (#{collkey}.collkey(sortable_name, 'root', true, 2, true))")
+    else
+      execute("CREATE INDEX index_users_on_sortable_name ON #{User.quoted_table_name} (CAST(LOWER(sortable_name) AS bytea))")
+    end
 
     create_table "versions", :force => true do |t|
       t.integer  "versionable_id", :limit => 8
@@ -2259,30 +2357,18 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       end
     end
 
-    create_trigger("enrollments_after_insert_row_when_new_workflow_state_active__tr", :generated => true, :compatibility => 1).
+    create_trigger("enrollments_after_insert_row_when_new_type_in_studentenrollm_tr", :generated => true, :compatibility => 1).
         on("enrollments").
         after(:insert).
-        where("NEW.workflow_state = 'active'") do
-      {:default=>"    UPDATE assignments SET needs_grading_count = needs_grading_count + 1\n    WHERE context_id = NEW.course_id\n      AND context_type = 'Course'\n      AND EXISTS (\n        SELECT 1\n        FROM submissions\n        WHERE user_id = NEW.user_id\n          AND assignment_id = assignments.id\n          AND ( submissions.submission_type IS NOT NULL AND (submissions.workflow_state = 'pending_review' OR (submissions.workflow_state = 'submitted' AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission) ) ) )\n        LIMIT 1\n      )\n      AND NOT EXISTS (SELECT 1 FROM enrollments WHERE workflow_state = 'active' AND user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id LIMIT 1);"}
+        where("(NEW.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND NEW.workflow_state = 'active')") do
+      {:default=>"      UPDATE assignments SET needs_grading_count = needs_grading_count + 1\n      WHERE context_id = NEW.course_id\n        AND context_type = 'Course'\n        AND EXISTS (\n          SELECT 1\n          FROM submissions\n          WHERE user_id = NEW.user_id\n            AND assignment_id = assignments.id\n            AND ( submissions.submission_type IS NOT NULL AND (submissions.workflow_state = 'pending_review' OR (submissions.workflow_state = 'submitted' AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission) ) ) )\n          LIMIT 1\n        )\n        AND NOT EXISTS (SELECT 1 FROM enrollments WHERE user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id AND (enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state = 'active') LIMIT 1);"}
     end
 
-    create_trigger("enrollments_after_update_row_when_new_workflow_state_old_wor_tr", :generated => true, :compatibility => 1).
+    create_trigger("enrollments_after_update_row_when_new_type_in_studentenrollm_tr", :generated => true, :compatibility => 1).
         on("enrollments").
         after(:update).
-        where("NEW.workflow_state <> OLD.workflow_state AND (NEW.workflow_state = 'active' OR OLD.workflow_state = 'active')") do
-      {:default=>"    UPDATE assignments SET needs_grading_count = needs_grading_count + CASE WHEN NEW.workflow_state = 'active' THEN 1 ELSE -1 END\n    WHERE context_id = NEW.course_id\n      AND context_type = 'Course'\n      AND EXISTS (\n        SELECT 1\n        FROM submissions\n        WHERE user_id = NEW.user_id\n          AND assignment_id = assignments.id\n          AND ( submissions.submission_type IS NOT NULL AND (submissions.workflow_state = 'pending_review' OR (submissions.workflow_state = 'submitted' AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission) ) ) )\n        LIMIT 1\n      )\n      AND NOT EXISTS (SELECT 1 FROM enrollments WHERE workflow_state = 'active' AND user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id LIMIT 1);"}
-    end
-
-    create_trigger("submissions_after_update_row_tr", :generated => true, :compatibility => 1).
-        on("submissions").
-        after(:update) do |t|
-      t.where("( OLD.submission_type IS NOT NULL AND (OLD.workflow_state = 'pending_review' OR (OLD.workflow_state = 'submitted' AND (OLD.score IS NULL OR NOT OLD.grade_matches_current_submission) ) ) ) <> ( NEW.submission_type IS NOT NULL AND (NEW.workflow_state = 'pending_review' OR (NEW.workflow_state = 'submitted' AND (NEW.score IS NULL OR NOT NEW.grade_matches_current_submission) ) ) )") do
-        <<-SQL_ACTIONS
-      UPDATE assignments
-      SET needs_grading_count = needs_grading_count + CASE WHEN ( NEW.submission_type IS NOT NULL AND (NEW.workflow_state = 'pending_review' OR (NEW.workflow_state = 'submitted' AND (NEW.score IS NULL OR NOT NEW.grade_matches_current_submission) ) ) ) THEN 1 ELSE -1 END
-      WHERE id = NEW.assignment_id;
-        SQL_ACTIONS
-      end
+        where("(NEW.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND NEW.workflow_state = 'active') <> (OLD.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND OLD.workflow_state = 'active')") do
+      {:default=>"      UPDATE assignments SET needs_grading_count = needs_grading_count + CASE WHEN NEW.workflow_state = 'active' THEN 1 ELSE -1 END\n      WHERE context_id = NEW.course_id\n        AND context_type = 'Course'\n        AND EXISTS (\n          SELECT 1\n          FROM submissions\n          WHERE user_id = NEW.user_id\n            AND assignment_id = assignments.id\n            AND ( submissions.submission_type IS NOT NULL AND (submissions.workflow_state = 'pending_review' OR (submissions.workflow_state = 'submitted' AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission) ) ) )\n          LIMIT 1\n        )\n        AND NOT EXISTS (SELECT 1 FROM enrollments WHERE user_id = NEW.user_id AND course_id = NEW.course_id AND id <> NEW.id AND (enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state = 'active') LIMIT 1);"}
     end
 
     create_trigger("submissions_after_insert_row_tr", :generated => true, :compatibility => 1).
@@ -2292,7 +2378,23 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         <<-SQL_ACTIONS
       UPDATE assignments
       SET needs_grading_count = needs_grading_count + 1
-      WHERE id = NEW.assignment_id;
+      WHERE id = NEW.assignment_id
+        AND context_type = 'Course'
+        AND EXISTS (SELECT 1 FROM enrollments WHERE user_id = NEW.user_id AND course_id = assignments.context_id AND (enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state = 'active') LIMIT 1);
+        SQL_ACTIONS
+      end
+    end
+
+    create_trigger("submissions_after_update_row_tr", :generated => true, :compatibility => 1).
+        on("submissions").
+        after(:update) do |t|
+      t.where("( NEW.submission_type IS NOT NULL AND (NEW.workflow_state = 'pending_review' OR (NEW.workflow_state = 'submitted' AND (NEW.score IS NULL OR NOT NEW.grade_matches_current_submission) ) ) ) <> ( OLD.submission_type IS NOT NULL AND (OLD.workflow_state = 'pending_review' OR (OLD.workflow_state = 'submitted' AND (OLD.score IS NULL OR NOT OLD.grade_matches_current_submission) ) ) )") do
+        <<-SQL_ACTIONS
+      UPDATE assignments
+      SET needs_grading_count = needs_grading_count + CASE WHEN ( NEW.submission_type IS NOT NULL AND (NEW.workflow_state = 'pending_review' OR (NEW.workflow_state = 'submitted' AND (NEW.score IS NULL OR NOT NEW.grade_matches_current_submission) ) ) ) THEN 1 ELSE -1 END
+      WHERE id = NEW.assignment_id
+        AND context_type = 'Course'
+        AND EXISTS (SELECT 1 FROM enrollments WHERE user_id = NEW.user_id AND course_id = assignments.context_id AND (enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state = 'active') LIMIT 1);
         SQL_ACTIONS
       end
     end
@@ -2303,6 +2405,9 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
         where("NEW.submission_id IS NOT NULL AND OLD.workflow_state <> NEW.workflow_state AND NEW.workflow_state = 'complete'") do
       "UPDATE submissions SET workflow_state = 'graded' WHERE id = NEW.submission_id;"
     end
+
+    add_foreign_key :collection_items, :users
+    add_foreign_key :collection_items, :collections
   end
 
   def self.down
