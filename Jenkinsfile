@@ -28,7 +28,8 @@ def build_parameters = [
   string(name: 'GERRIT_EVENT_ACCOUNT_EMAIL', value: "${env.GERRIT_EVENT_ACCOUNT_EMAIL}"),
   string(name: 'GERRIT_CHANGE_COMMIT_MESSAGE', value: "${env.GERRIT_CHANGE_COMMIT_MESSAGE}"),
   string(name: 'GERRIT_HOST', value: "${env.GERRIT_HOST}"),
-  string(name: 'GERGICH_PUBLISH', value: "${env.GERGICH_PUBLISH}")
+  string(name: 'GERGICH_PUBLISH', value: "${env.GERGICH_PUBLISH}"),
+  string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}")
 ]
 
 def getImageTagVersion() {
@@ -36,20 +37,19 @@ def getImageTagVersion() {
   return flags.getImageTagVersion()
 }
 
-def runBuildImageMaybe(save_success, block) {
+def runBuildImageMaybe(saveSuccess, block) {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
   if (flags.hasFlag('skip-docker-build')) {
-    echo "skip building image requested"
-  }
-  else {
+    echo "Skip building image requested"
+  } else {
     def skips = load 'build/new-jenkins/groovy/successes.groovy'
-    skips.skipIfPreviouslySuccessful("build-and-push-image", save_success, block)
+    skips.skipIfPreviouslySuccessful("build-and-push-image", saveSuccess, block)
   }
 }
 
 def skipIfPreviouslySuccessful(name, block) {
-    def skips = load 'build/new-jenkins/groovy/successes.groovy'
-    skips.skipIfPreviouslySuccessful(name, true, block)
+  def skips = load 'build/new-jenkins/groovy/successes.groovy'
+  skips.skipIfPreviouslySuccessful(name, true, block)
 }
 
 pipeline {
@@ -175,11 +175,14 @@ pipeline {
       steps {
         runBuildImageMaybe(false) {
           timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
-            dockerCacheLoad(image: "$CACHE_TAG")
-            sh '''
-              docker build -t $PATCHSET_TAG .
-              docker tag $PATCHSET_TAG $CACHE_TAG
-            '''
+            script {
+              def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+              if (!flags.hasFlag('skip-cache')) {
+                dockerCacheLoad(image: "$CACHE_TAG")
+              }
+              sh 'docker build -t $PATCHSET_TAG .'
+              sh 'docker tag $PATCHSET_TAG $CACHE_TAG'
+            }
           }
         }
       }
@@ -199,25 +202,6 @@ pipeline {
 
     stage('Parallel Run Tests') {
       parallel {
-        // TODO: this is temporary until we can get some actual builds passing
-        stage('Smoke Test') {
-          steps {
-            skipIfPreviouslySuccessful("smoke-test") {
-              timeout(time: 10) {
-                script {
-                  sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
-                  def dbCommon = load 'build/new-jenkins/groovy/cache-migrations.groovy'
-                  dbCommon.createMigrateBuildUpCached()
-                  sh 'build/new-jenkins/smoke-test.sh'
-                  if (env.GERRIT_EVENT_TYPE == 'change-merged') {
-                    dbCommon.storeMigratedImages()
-                  }
-                }
-              }
-            }
-          }
-        }
-
         stage('Linters') {
           when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' } }
           steps {
@@ -338,9 +322,11 @@ pipeline {
     failure {
       script {
         if ( env.GERRIT_EVENT_TYPE == 'change-merged' ) {
-          slackSend (channel: '#canvas_builds',
-            color: '#da0005',
-            message: "${env.JOB_NAME} failed on merge (<${env.BUILD_URL}|${env.BUILD_NUMBER}>)")
+          slackSend(
+            channel: '#canvas_builds',
+            color: 'danger',
+            message: "${env.JOB_NAME} failed on merge (<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
+          )
         }
       }
     }
@@ -355,4 +341,3 @@ pipeline {
     }
   }
 }
-

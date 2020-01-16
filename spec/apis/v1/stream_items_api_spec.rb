@@ -115,7 +115,7 @@ describe UsersController, type: :request do
         @course2.enroll_student(@student).accept!
         @dt1 = discussion_topic_model(:context => @course1)
         @dt2 = discussion_topic_model(:context => @course2)
-        @course2.update_attributes(:start_at => 2.weeks.ago, :conclude_at => 1.week.ago, :restrict_enrollments_to_course_dates => true)
+        @course2.update(:start_at => 2.weeks.ago, :conclude_at => 1.week.ago, :restrict_enrollments_to_course_dates => true)
       end
       json = api_call(:get, "/api/v1/users/self/activity_stream",
         { :controller => "users", :action => "activity_stream", :format => 'json' })
@@ -368,7 +368,7 @@ describe UsersController, type: :request do
   it "should format graded Submission with comments" do
     #set @domain_root_account
     @domain_root_account = Account.default
-    @domain_root_account.update_attributes(:default_time_zone => 'America/Denver')
+    @domain_root_account.update(:default_time_zone => 'America/Denver')
 
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
@@ -500,7 +500,7 @@ describe UsersController, type: :request do
   it "should format ungraded Submission with comments" do
     #set @domain_root_account
     @domain_root_account = Account.default
-    @domain_root_account.update_attributes(:default_time_zone => 'America/Denver')
+    @domain_root_account.update(:default_time_zone => 'America/Denver')
 
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')

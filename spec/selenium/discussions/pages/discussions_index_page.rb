@@ -112,6 +112,18 @@ class DiscussionsIndex
       f('.discussions-index-manage-menu button', discussion(title))
     end
 
+    def discussion_menu_button
+      f("#discussion_menu_link")
+    end
+
+    def discussion_settings_menu_items
+      f("ul[role='menu']")
+    end
+
+    def discussion_menu_tool_link(tool_text)
+      fj("li:contains(#{tool_text})")
+    end
+
     def manage_discussions_menu
       f("ul[role='menu']")
     end
@@ -150,6 +162,18 @@ class DiscussionsIndex
 
     def discussion_settings_submit_button
       f('#submit_discussion_settings')
+    end
+
+    def tool_dialog
+      f("div[role='dialog']")
+    end
+
+    def tool_dialog_header
+      f("div[role='dialog'] h2")
+    end
+
+    def tool_dialog_iframe
+      tool_dialog.find_element(:css, "iframe")
     end
 
     # ---------------------- Actions ----------------------

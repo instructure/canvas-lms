@@ -83,7 +83,7 @@ describe "groups" do
           category = course.group_categories.create!(name: 'category')
           course.groups.create!(name: "Test Group", group_category: category)
           course.groups.first.add_user student
-          course.update_attributes(conclude_at: 1.day.ago, workflow_state: 'completed')
+          course.update(conclude_at: 1.day.ago, workflow_state: 'completed')
 
           user_session(student)
           get "/groups/#{course.groups.first.id}"
@@ -105,7 +105,7 @@ describe "groups" do
           category = course.group_categories.create!(name: 'category')
           course.groups.create!(name: "Test Group", group_category: category)
           course.groups.first.add_user student
-          course.update_attributes(conclude_at: 1.day.ago, workflow_state: 'completed')
+          course.update(conclude_at: 1.day.ago, workflow_state: 'completed')
 
           user_session(teacher)
           url = "/groups/#{course.groups.first.id}"

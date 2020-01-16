@@ -333,7 +333,7 @@ class FoldersController < ApplicationController
           return unless authorized_action(parent_folder, @current_user, :manage_contents)
           folder_params[:parent_folder] = parent_folder
         end
-        if @folder.update_attributes(folder_params)
+        if @folder.update(folder_params)
           if !@folder.parent_folder_id || !@context.folders.where(id: @folder).first
             @folder.parent_folder = Folder.root_folders(@context).first
             @folder.save

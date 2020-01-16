@@ -194,6 +194,20 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "assignment overrides" do
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:assignment_override_created).once
+      assignment_override_model
+    end
+
+    it "posts update events" do
+      expect(Canvas::LiveEvents).to receive(:assignment_override_updated).once
+      assignment_override_model(:title => "original")
+      @override.title = "new title"
+      @override.save
+    end
+  end
+
   describe "submission" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:submission_created).once

@@ -375,7 +375,7 @@ describe ContextModuleProgression do
       expect(progression).to be_unlocked
 
       quiz_sub = quiz.generate_submission(@user)
-      quiz_sub.update_attributes(:score => 100, :workflow_state => 'complete', :submission_data => nil)
+      quiz_sub.update(:score => 100, :workflow_state => 'complete', :submission_data => nil)
       quiz_sub.with_versioning(&:save)
       expect(progression.reload).to be_started
 

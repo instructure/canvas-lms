@@ -1919,7 +1919,7 @@ class UsersController < ApplicationController
       @user.sortable_name_explicitly_set = user_params[:sortable_name].present?
 
       respond_to do |format|
-        if @user.update_attributes(user_params)
+        if @user.update(user_params)
           @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved') if admin_avatar_update
           @user.profile.save if @user.profile.changed?
           @user.save if admin_avatar_update || update_email

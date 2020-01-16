@@ -128,7 +128,7 @@ describe "course settings" do
       a.courses << @course
       a.settings[:self_enrollment] = 'manually_created'
       a.save!
-      @course.update_attributes(:self_enrollment => true)
+      @course.update(:self_enrollment => true)
       MasterCourses::MasterTemplate.set_as_master_course(@course)
       get "/courses/#{@course.id}/settings"
       expect(f('.self_enrollment_message')).to_not be_displayed

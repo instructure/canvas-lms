@@ -20,7 +20,7 @@ import I18n from 'i18n!ProfileTray'
 import React from 'react'
 import {arrayOf, bool, object, shape, string} from 'prop-types'
 import {Avatar, Badge, Heading, List, Text, Spinner} from '@instructure/ui-elements'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-layout'
 import LogoutButton from '../LogoutButton'
 import {AccessibleContent} from '@instructure/ui-a11y'
@@ -44,10 +44,12 @@ function ProfileTab({id, html_url, label, counts}) {
 
   return (
     <List.Item key={id}>
-      <Button variant="link" margin="none" href={html_url}>
-        {label}
-        {renderCountBadge()}
-      </Button>
+      <View as="div" margin="small 0">
+        <Link isWithinText={false} href={html_url}>
+          {label}
+          {renderCountBadge()}
+        </Link>
+      </View>
     </List.Item>
   )
 }
@@ -85,7 +87,7 @@ export default function ProfileTray(props) {
         <LogoutButton size="small" margin="medium 0 x-small 0" />
       </View>
       <hr role="presentation" />
-      <List variant="unstyled" margin="0" itemSpacing="small">
+      <List variant="unstyled" margin="none" itemSpacing="small">
         {loaded ? (
           tabs.map(tab => <ProfileTab key={tab.id} {...tab} counts={counts} />)
         ) : (

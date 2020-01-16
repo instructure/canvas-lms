@@ -21,7 +21,7 @@ import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-layout'
 import {Heading, List, Spinner} from '@instructure/ui-elements'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
 export default function AccountsTray({accounts, hasLoaded}) {
   return (
@@ -35,13 +35,9 @@ export default function AccountsTray({accounts, hasLoaded}) {
           accounts
             .map(account => (
               <List.Item key={account.id}>
-                <Button
-                  variant="link"
-                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
-                  href={`/accounts/${account.id}`}
-                >
+                <Link isWithinText={false} href={`/accounts/${account.id}`}>
                   {account.name}
-                </Button>
+                </Link>
               </List.Item>
             ))
             .concat([
@@ -49,13 +45,9 @@ export default function AccountsTray({accounts, hasLoaded}) {
                 <hr role="presentation" />
               </List.Item>,
               <List.Item key="all">
-                <Button
-                  variant="link"
-                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
-                  href="/accounts"
-                >
+                <Link isWithinText={false} href="/accounts">
                   {I18n.t('All Accounts')}
-                </Button>
+                </Link>
               </List.Item>
             ])
         ) : (

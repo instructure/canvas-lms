@@ -363,6 +363,14 @@ module RCENextPage
     fxpath('//div/input[@type="checkbox"]/..')
   end
 
+  def overflow_toolbar_selector
+    '.tox-toolbar__overflow'
+  end
+
+  def overflow_toolbar
+    f(overflow_toolbar_selector)
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion

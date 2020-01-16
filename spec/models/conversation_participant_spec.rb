@@ -103,17 +103,17 @@ describe ConversationParticipant do
     expect(conversation.starred).to be_falsey
   end
 
-  it "should support :starred in update_attributes" do
+  it "should support :starred in update" do
     sender       = user_factory
     recipient    = user_factory
     conversation = sender.initiate_conversation([recipient])
 
-    conversation.update_attributes(:starred => true)
+    conversation.update(:starred => true)
     conversation.save
     conversation.reload
     expect(conversation.starred).to be_truthy
 
-    conversation.update_attributes(:starred => false)
+    conversation.update(:starred => false)
     conversation.save
     conversation.reload
     expect(conversation.starred).to be_falsey

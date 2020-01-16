@@ -173,7 +173,7 @@ module Lti
       describe "POST #create with JWT access token" do
         let(:access_token) do
           aud = host rescue (@request || request).host
-          developer_key.update_attributes(vendor_code: vendor_code)
+          developer_key.update(vendor_code: vendor_code)
           Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id, reg_key: 'reg_key')
         end
         let(:request_headers) { {Authorization: "Bearer #{access_token}"} }

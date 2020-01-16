@@ -36,7 +36,7 @@ describe "allowed_attempts feature for assignments" do
 
         it "prevents submitting if the student has exceeded the max number of attempts" do
           submission = @assignment.submit_homework(@student, { body: "blah" })
-          submission.update_attributes(attempt: 2, submission_type: "online_text_entry")
+          submission.update(attempt: 2, submission_type: "online_text_entry")
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expect(f(".student-assignment-overview")).to include_text("Allowed Attempts")
           expect(f('.submit_assignment_link')).to be_disabled
@@ -70,11 +70,11 @@ describe "allowed_attempts feature for assignments" do
           @assignment = @course.assignments.create!({ name: "Test Assignment", allowed_attempts: 2 })
           @assignment.update_attribute(:submission_types, "online_text_entry")
           @submission = @assignment.submit_homework(@student, { body: "blah" })
-          @submission.update_attributes(submission_type: "online_text_entry")
+          @submission.update(submission_type: "online_text_entry")
         end
 
         it "prevents submitting if the student has exceeded the max number of attempts" do
-          @submission.update_attributes(attempt: 2)
+          @submission.update(attempt: 2)
           get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
           expect(f(".submission-details-header__info")).to include_text("Allowed Attempts")
           expect(fln("Re-submit Assignment")).to be_disabled
@@ -92,7 +92,7 @@ describe "allowed_attempts feature for assignments" do
           @assignment = @course.assignments.create!({ name: "Test Assignment", allowed_attempts: -1 })
           @assignment.update_attribute(:submission_types, "online_text_entry")
           @submission = @assignment.submit_homework(@student, { body: "blah" })
-          @submission.update_attributes(attempt: 2, submission_type: "online_text_entry")
+          @submission.update(attempt: 2, submission_type: "online_text_entry")
         end
 
         it "does not show the attempt data and allows submitting" do

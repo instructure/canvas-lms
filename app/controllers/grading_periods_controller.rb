@@ -139,7 +139,7 @@ class GradingPeriodsController < ApplicationController
       respond_to do |format|
 
         DueDateCacher.with_executing_user(@current_user) do
-          if grading_period(inherit: false).update_attributes(grading_period_params)
+          if grading_period(inherit: false).update(grading_period_params)
             format.json { render json: serialize_json_api(grading_period(inherit: false)) }
           else
             format.json do

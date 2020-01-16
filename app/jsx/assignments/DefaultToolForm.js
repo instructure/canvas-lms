@@ -43,9 +43,6 @@ const DefaultToolForm = props => {
     Object.values(definition.placements).find(placement => placement.url === props.toolUrl)
   )
 
-  const launchDefinitionUrl = () =>
-    `/api/v1/courses/${props.courseId}/lti_apps/launch_definitions?per_page=100&placements%5B%5D=assignment_selection&placements%5B%5D=resource_selection`
-
   const contentTitle = () => {
     if (toolMessageData) {
       return toolMessageData.content && toolMessageData.content.title
@@ -54,11 +51,13 @@ const DefaultToolForm = props => {
   }
   useEffect(() => {
     const fetchData = async () => {
-      const result = await axios.get(launchDefinitionUrl())
+      const result = await axios.get(
+        `/api/v1/courses/${props.courseId}/lti_apps/launch_definitions?per_page=100&placements%5B%5D=assignment_selection&placements%5B%5D=resource_selection`
+      )
       setLaunchDefinitions(result.data)
     }
     fetchData()
-  }, [launchDefinitionUrl])
+  }, [props.courseId])
 
   useEffect(() => {
     $('#default-tool').data('tool', defaultToolData)

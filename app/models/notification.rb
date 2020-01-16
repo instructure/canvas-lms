@@ -279,6 +279,7 @@ class Notification < ActiveRecord::Base
   # wherever), even if we continue to store the english string in the db
   # (it's actually just the titleized message template filename)
   def names
+    t 'names.manually_created_access_token_created', 'Manually Created Access Token Created'
     t 'names.account_user_notification', 'Account User Notification'
     t 'names.account_user_registration', 'Account User Registration'
     t 'names.assignment_changed', 'Assignment Changed'

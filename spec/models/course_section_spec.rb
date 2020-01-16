@@ -539,12 +539,12 @@ describe CourseSection, "moving to new course" do
     end
 
     it "should invalidate access if section is cross-listed" do
-      @course.update_attributes(:workflow_state => "available", :restrict_student_future_view => true,
+      @course.update(:workflow_state => "available", :restrict_student_future_view => true,
         :restrict_enrollments_to_course_dates => true, :start_at => 1.day.from_now)
       expect(@enrollment.enrollment_state.reload.restricted_access?).to eq true
 
       other_course = course_factory(active_all: true)
-      other_course.update_attributes(:restrict_enrollments_to_course_dates => true, :start_at => 1.day.from_now)
+      other_course.update(:restrict_enrollments_to_course_dates => true, :start_at => 1.day.from_now)
 
       @section.crosslist_to_course(other_course)
 

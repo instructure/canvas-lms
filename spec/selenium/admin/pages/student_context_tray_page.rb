@@ -42,7 +42,7 @@ module StudentContextTray
     end
 
     def todo_tray_dropdown_select_course(course_name)
-      fj("li[role=option]:contains('#{course_name}')")
+      fj("li[role=none] span[role=option]:contains('#{course_name}')")
     end
 
     def student_tray_quick_links

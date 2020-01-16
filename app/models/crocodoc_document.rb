@@ -52,7 +52,7 @@ class CrocodocDocument < ActiveRecord::Base
     end
 
     if response && response['uuid']
-      update_attributes :uuid => response['uuid'], :process_state => 'QUEUED'
+      update :uuid => response['uuid'], :process_state => 'QUEUED'
     elsif response.nil?
       raise "no response received"
     else

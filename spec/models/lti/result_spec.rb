@@ -26,7 +26,7 @@ RSpec.describe Lti::Result, type: :model do
 
     it 'requires "line_item"' do
       expect do
-        result.update_attributes!(line_item: nil)
+        result.update!(line_item: nil)
       end.to raise_error(
         ActiveRecord::RecordInvalid,
         "Validation failed: Line item can't be blank"
@@ -35,7 +35,7 @@ RSpec.describe Lti::Result, type: :model do
 
     it 'requires "user"' do
       expect do
-        result.update_attributes!(user: nil)
+        result.update!(user: nil)
       end.to raise_error(
         ActiveRecord::RecordInvalid,
         "Validation failed: User can't be blank"
@@ -44,7 +44,7 @@ RSpec.describe Lti::Result, type: :model do
 
     it 'requires the "activity_progress" be valid' do
       expect do
-        result.update_attributes!(activity_progress: 'Banana')
+        result.update!(activity_progress: 'Banana')
       end.to raise_error(
         ActiveRecord::RecordInvalid,
         "Validation failed: Activity progress is not included in the list"
@@ -53,7 +53,7 @@ RSpec.describe Lti::Result, type: :model do
 
     it 'requires the "grading_progress" be valid' do
       expect do
-        result.update_attributes!(grading_progress: 'Banana')
+        result.update!(grading_progress: 'Banana')
       end.to raise_error(
         ActiveRecord::RecordInvalid,
         "Validation failed: Grading progress is not included in the list"

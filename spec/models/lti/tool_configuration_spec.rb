@@ -383,9 +383,14 @@ module Lti
         }
       end
       let(:tool_configuration) { described_class.create_tool_config_and_key!(account, params) }
+      let(:scopes) { ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'] }
 
       it 'creates a dev key' do
         expect { described_class.create_tool_config_and_key! account, params }.to change(DeveloperKey, :count).by(1)
+      end
+
+      it 'adds scopes to dev key' do
+        expect(tool_configuration.developer_key.scopes).to eq(settings['scopes'])
       end
 
       it 'correctly sets custom_fields' do
@@ -432,6 +437,10 @@ module Lti
 
         it 'fetches JSON from the URL' do
           expect(tool_configuration.settings['target_link_uri']).to eq settings['target_link_uri']
+        end
+
+        it 'adds scopes to dev key' do
+          expect(tool_configuration.developer_key.scopes).to eq(settings['scopes'])
         end
 
         context 'when a timeout occurs' do

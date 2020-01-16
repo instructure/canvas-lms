@@ -224,7 +224,7 @@ module FloatScannerFix
     end
   end
 end
-Psych::ScalarScanner.prepend(FloatScannerFix)
+Psych::ScalarScanner.prepend(FloatScannerFix) unless RUBY_VERSION >= '2.5' # got pulled into psych for later rubies
 
 module ScalarTransformFix
   def to_guessed_type(value, quoted=false, options=nil)

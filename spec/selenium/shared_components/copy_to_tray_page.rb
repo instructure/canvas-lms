@@ -18,16 +18,25 @@
 require_relative '../common'
 
 module CopyToTrayPage
+
   # ------------------------------ Selectors -----------------------------
   
   def copy_to_dialog_css_selector
     "[role='dialog'][aria-label='Copy To...']"
   end
 
+  def import_dialog_css_selector
+    "[role='dialog'][aria-label='Import...']"
+  end
+
   # ------------------------------ Elements ------------------------------
 
   def copy_to_dialog
     f(copy_to_dialog_css_selector)
+  end
+
+  def import_dialog
+    f(import_dialog_css_selector)
   end
 
   def course_search_dropdown
@@ -45,7 +54,7 @@ module CopyToTrayPage
   end
 
   def course_dropdown_list
-    f("ul[role='listbox']")
+    ff("ul[role='listbox']")
   end
 
   def course_dropdown_item(course_name)
@@ -76,9 +85,20 @@ module CopyToTrayPage
     placement_dropdown.find_all('option')
   end
 
-  # ------------------------------ Actions --------------------------------
+  def import_button
+    fj("button:contains('Import')")
+  end
 
+  def copy_dialog_import_success_alert
+    copy_to_dialog.find_element(:css, "span[role='alert']")
+  end
+
+  def import_dialog_import_success_alert
+    import_dialog.find_element(:css, "span[role='alert']")
+  end
+  # ------------------------------ Actions --------------------------------
   # the course dropdown triggers a fetch that needs to then fetch the modules
+
   def wait_for_module_search_dropdown
     wait_for(method: nil, timeout: 1) { dropdowns_in_tray.count == 2}
   end

@@ -239,12 +239,10 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
     ]
 
     mountComponent({provisionalGrades})
-    deepEqual(wrapper.find('RadioInput').map(input => input.prop('value')), [
-      'custom',
-      '2',
-      '3',
-      '1'
-    ])
+    deepEqual(
+      wrapper.find('RadioInput').map(input => input.prop('value')),
+      ['custom', '2', '3', '1']
+    )
   })
 
   test('sorts provisional grades by scorer ID if anonymous grader ID is not present', () => {
@@ -271,12 +269,10 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
     ]
 
     mountComponent({provisionalGrades})
-    deepEqual(wrapper.find('RadioInput').map(input => input.prop('value')), [
-      'custom',
-      '3',
-      '2',
-      '1'
-    ])
+    deepEqual(
+      wrapper.find('RadioInput').map(input => input.prop('value')),
+      ['custom', '3', '2', '1']
+    )
   })
 
   test('calls formatSubmissionGrade to render a provisional grade', () => {

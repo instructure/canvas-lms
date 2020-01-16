@@ -45,7 +45,7 @@ describe ConversationsController do
       conversation
 
       term = @course.root_account.enrollment_terms.create! :name => "Fall"
-      @course.update_attributes! :enrollment_term => term
+      @course.update! :enrollment_term => term
 
       get 'index'
       expect(response).to be_successful
@@ -237,6 +237,15 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
+    it 'should not allow creating conversations in concluded courses' do
+      user_session(@student)
+      @course.update!(workflow_state: 'completed')
+
+      post 'create', params: { recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string }
+      expect(response).not_to be_successful
+      expect(response.body).to include('Unable to send messages')
+    end
+
     it "should require permissions for sending to other students" do
       user_session(@student)
 
@@ -373,6 +382,14 @@ describe ConversationsController do
             expect(cp.root_account_ids).to eq @account_id.to_s
           end
         end
+      end
+
+      it 'does not allow sending messages to other users in a group if the permission is disabled' do
+        user_session(@new_user1)
+        @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+        post 'create', params: { recipients: [@new_user2.id.to_s], body: 'ooo eee', group_conversation: 'true', context_code: @course.asset_string }
+
+        expect(response).not_to be_successful
       end
     end
 

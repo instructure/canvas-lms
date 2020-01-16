@@ -38,8 +38,9 @@ module Factories
 
   def stub_common_cartridge_url
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-    allow(Canvas::DynamicSettings).to receive(:find).with("common_cartridge_viewer", default_ttl: 5.minutes).and_return
-      ActiveSupport::HashWithIndifferentAccess.new({"app-host":"http://common-cartridge-viewer.netlify.com/"})
+    allow(Canvas::DynamicSettings).to receive(:find).with("common_cartridge_viewer", default_ttl: 5.minutes).and_return(
+			ActiveSupport::HashWithIndifferentAccess.new({"app-host":"http://common-cartridge-viewer.netlify.com/"})
+		)
   end
 
   def account_rcs_model(opts={})

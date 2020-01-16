@@ -881,11 +881,23 @@ class FilesController < ApplicationController
     @attachment = @context.shard.activate{ Attachment.where(context: @context).build }
 
     # service metadata
+    #
+    # NOTE: we're assigning the sha512 value from inst-fs to the md5 column.
+    # this is gross; ideally we'd rename the column to "hash" or "digest"
+    # instead of "md5", because that's how the column is acting now. but
+    # renaming on such a huge table is expensive :(
+    #
+    # TODO we could at least alias the md5 _column_ into a digest _property_
+    # and change code to refer to the digest instead of the md5. that won't
+    # help people that are using the database dump directly, though. they'll
+    # just need to be aware of the disconnect between name and use.
+    #
     @attachment.filename = params[:name]
     @attachment.display_name = params[:display_name] || params[:name]
     @attachment.size = params[:size]
     @attachment.content_type = params[:content_type]
     @attachment.instfs_uuid = params[:instfs_uuid]
+    @attachment.md5 = params[:sha512]
     @attachment.modified_at = Time.zone.now
 
     # check non-exempt quota usage now that we have an actual size
@@ -914,7 +926,7 @@ class FilesController < ApplicationController
         homework_service = Services::SubmitHomeworkService.new(@attachment, progress)
 
         begin
-          homework_service.submit(params[:eula_agreement_timestamp])
+          homework_service.submit(params[:eula_agreement_timestamp], params[:comment])
           homework_service.success!
         rescue => error
           error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]

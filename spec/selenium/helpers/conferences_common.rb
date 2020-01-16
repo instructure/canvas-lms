@@ -31,7 +31,8 @@ module ConferencesCommon
 
   def end_first_conference_in_list
     end_conference_button.click
-    close_modal_if_present
+    accept_alert
+    wait_for_ajaximations
   end
 
   def delete_recording_button(recording)
@@ -42,7 +43,8 @@ module ConferencesCommon
     conference = first_conference_in_list(new_conference_list)
     recording = first_recording_in_conference(conference)
     delete_recording_button(recording).click
-    close_modal_if_present
+    accept_alert
+    wait_for_ajaximations
   end
 
   def first_recording_in_conference(conference)

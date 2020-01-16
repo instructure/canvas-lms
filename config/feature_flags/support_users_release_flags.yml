@@ -1,0 +1,6 @@
+---
+notify_for_manually_created_access_tokens:
+  state: hidden
+  display_name: Send notifications when manually created access tokens are made
+  description: Send notifications when manually created access tokens are made
+  applies_to: SiteAdmin

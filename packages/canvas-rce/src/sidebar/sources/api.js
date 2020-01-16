@@ -455,13 +455,16 @@ class RceApiSource {
     let extra = ''
     switch (endpoint) {
       case 'images':
-        extra = '&content_types=image'
+        extra = `&content_types=image${getSortParams(props.sort, props.order)}`
         break
-      case 'media':
-        extra = '&content_types=video,audio'
+      case 'media': // when requesting media files via the documents endpoint
+        extra = `&content_types=video,audio${getSortParams(props.sort, props.order)}`
         break
       case 'documents':
-        extra = '&exclude_content_types=image,video,audio'
+        extra = `&exclude_content_types=image,video,audio${getSortParams(props.sort, props.order)}`
+        break
+      case 'media_objects': // when requesting media objects (this is the currently used branch)
+        extra = getSortParams(props.sort === 'alphabetical' ? 'title' : 'date', props.order)
         break
     }
     return `${this.baseUri(
@@ -469,6 +472,16 @@ class RceApiSource {
       host
     )}?contextType=${contextType}&contextId=${contextId}${extra}`
   }
+}
+
+function getSortParams(sort, order) {
+  let sortBy = sort
+  if (sortBy === 'date_added') {
+    sortBy = 'created_at'
+  } else if (sortBy === 'alphabetical') {
+    sortBy = 'name'
+  }
+  return `&sort=${sortBy}&order=${order}`
 }
 
 export default RceApiSource

@@ -1915,6 +1915,96 @@ test('when user is not ignoring warnings, the dialog has a onClose property whic
   dialog.cancel()
 })
 
+QUnit.module('#listHiddenAssignments', hooks => {
+  let gradebook
+  let gradedAssignment
+  let notGradedAssignment
+
+  hooks.beforeEach(() => {
+    gradedAssignment = {
+      assignment_group: {position: 1},
+      assignment_group_id: '1',
+      grading_type: 'online_text_entry',
+      id: '2301',
+      name: 'graded assignment',
+      position: 1,
+      published: true
+    }
+    notGradedAssignment = {
+      assignment_group: {position: 2},
+      assignment_group_id: '2',
+      grading_type: 'not_graded',
+      id: '2302',
+      name: 'not graded assignment',
+      position: 2,
+      published: true
+    }
+    const submissionsChunk = [
+      {
+        submissions: [
+          {
+            assignment_id: '2301',
+            id: '2501',
+            posted_at: null,
+            score: 10,
+            user_id: '1101',
+            workflow_state: 'graded'
+          },
+          {
+            assignment_id: '2302',
+            id: '2502',
+            posted_at: null,
+            score: 9,
+            user_id: '1101',
+            workflow_state: 'graded'
+          }
+        ],
+        user_id: '1101'
+      }
+    ]
+    gradebook = createGradebook({post_policies_enabled: true})
+    gradebook.assignments = {
+      2301: gradedAssignment,
+      2302: notGradedAssignment
+    }
+    gradebook.students = {
+      1101: {
+        id: '1101',
+        name: 'Adam Jones',
+        assignment_2301: {
+          assignment_id: '2301',
+          late: false,
+          missing: false,
+          excused: false,
+          seconds_late: 0,
+          user_id: '1101'
+        },
+        assignment_2302: {
+          assignment_id: '2302',
+          late: false,
+          missing: false,
+          excused: false,
+          seconds_late: 0,
+          user_id: '1101'
+        }
+      }
+    }
+    gradebook.gotSubmissionsChunk(submissionsChunk)
+    gradebook.setAssignmentsLoaded(true)
+    gradebook.setSubmissionsLoaded(true)
+  })
+
+  test('includes assignments when submission is postable', function() {
+    const hiddenAssignments = gradebook.listHiddenAssignments('1101')
+    ok(hiddenAssignments.find(assignment => assignment.id === gradedAssignment.id))
+  })
+
+  test('excludes "not_graded" assignments even when submission is postable', function() {
+    const hiddenAssignments = gradebook.listHiddenAssignments('1101')
+    notOk(hiddenAssignments.find(assignment => assignment.id === notGradedAssignment.id))
+  })
+})
+
 QUnit.module('Gradebook#showNotesColumn', {
   setup() {
     sandbox.stub(DataLoader, 'getDataForColumn')

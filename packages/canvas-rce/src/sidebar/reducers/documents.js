@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {REQUEST_DOCS, RECEIVE_DOCS, FAIL_DOCS} from '../actions/documents'
+import {REQUEST_INITIAL_DOCS, REQUEST_DOCS, RECEIVE_DOCS, FAIL_DOCS} from '../actions/documents'
 import {CHANGE_CONTEXT} from '../actions/context'
 
 // manages the state for a specific collection. assumes the action is intended
@@ -33,6 +33,15 @@ export default function documentsReducer(prevState = {}, action) {
     }
   }
   switch (action.type) {
+    case REQUEST_INITIAL_DOCS:
+      state[ctxt] = {
+        files: [],
+        bookmark: null,
+        isLoading: true,
+        hasMore: true
+      }
+      return state
+
     case REQUEST_DOCS:
       state[ctxt].isLoading = true
       return state

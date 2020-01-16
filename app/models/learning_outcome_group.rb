@@ -182,7 +182,11 @@ class LearningOutcomeGroup < ActiveRecord::Base
         group = scope.build :title => context.try(:name) || 'ROOT'
         group.building_default = true
         Shackles.activate(:master) do
-          group.save!
+          # during course copies/imports, observe may be disabled but import job will
+          # not be aware of this lazy object creation
+          ActiveRecord::Base.observers.enable LiveEventsObserver do
+            group.save!
+          end
         end
       end
       group

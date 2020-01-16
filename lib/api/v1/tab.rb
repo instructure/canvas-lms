@@ -37,7 +37,10 @@ module Api::V1::Tab
     hash[:visibility] = visibility(tab, hash)
     hash[:label] = tab[:label]
     hash[:type] = (tab[:external] && 'external') || 'internal'
-    hash[:url] = sessionless_launch_url(context, :id => tab[:args][1], :launch_type => 'course_navigation') if tab[:external] && tab[:args] && tab[:args].length > 1
+    if tab[:external] && tab[:args] && tab[:args].length > 1
+      launch_type = context.is_a?(Account) ? 'account_navigation' : 'course_navigation'
+      hash[:url] = sessionless_launch_url(context, id: tab[:args][1], launch_type: launch_type)
+    end
     api_json(hash, user, session)
   end
 

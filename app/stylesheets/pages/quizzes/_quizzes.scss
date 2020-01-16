@@ -156,13 +156,6 @@ li.quiz {
   overflow: visible;
 }
 
-.new_quiz_lti_wrapper {
-  display: inline-block;
-  margin-#{direction(right)}: 6px;
-  padding-#{direction(right)}: 10px;
-  border-#{direction(right)}: 1px solid $ic-color-medium-lighter;
-}
-
 .quiz-header {
   border-bottom: 1px solid #a4a4a4;
   overflow: hidden;

@@ -33,32 +33,34 @@ describe('contentRendering', () => {
 
     it('uses link data to build html', () => {
       const rendered = contentRendering.renderLink(link)
-      expect(rendered).toEqual('<a href="/some/path" title="Here Be Links">Click On Me</a>')
+      expect(rendered).toEqual('<a href="/some/path?wrap=1" title="Here Be Links">Click On Me</a>')
     })
 
     it('can use url if no href', () => {
       link.href = undefined
       const rendered = contentRendering.renderLink(link)
-      expect(rendered).toEqual('<a href="/other/path" title="Here Be Links">Click On Me</a>')
+      expect(rendered).toEqual('<a href="/other/path?wrap=1" title="Here Be Links">Click On Me</a>')
     })
 
     it("defaults title to 'Link'", () => {
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
-      expect(rendered).toEqual('<a href="/some/path" title="Link">Click On Me</a>')
+      expect(rendered).toEqual('<a href="/some/path?wrap=1" title="Link">Click On Me</a>')
     })
 
     it('defaults contents to title', () => {
       link.text = undefined
       const rendered = contentRendering.renderLink(link)
-      expect(rendered).toEqual('<a href="/some/path" title="Here Be Links">Here Be Links</a>')
+      expect(rendered).toEqual(
+        '<a href="/some/path?wrap=1" title="Here Be Links">Here Be Links</a>'
+      )
     })
 
     it("defaults contents to 'Link' if no title either", () => {
       link.text = undefined
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
-      expect(rendered).toEqual('<a href="/some/path" title="Link">Link</a>')
+      expect(rendered).toEqual('<a href="/some/path?wrap=1" title="Link">Link</a>')
     })
 
     it('renders the link with all attributes', () => {
@@ -72,9 +74,17 @@ describe('contentRendering', () => {
       const rendered = contentRendering.renderLink(doc, doc.text)
       expect(rendered).toEqual(
         '<a ' +
-          'href="/some/path" target="_blank" rel="noopener" title="Link" ' +
+          'href="/some/path?wrap=1" target="_blank" rel="noopener" title="Link" ' +
           'class="instructure_file_link instructure_scribd_file">' +
           'somefile.pdf</a>'
+      )
+    })
+
+    it('does not swizzle the url if not our host', () => {
+      link.href = 'http://example.com/some/path'
+      const rendered = contentRendering.renderLink(link)
+      expect(rendered).toEqual(
+        '<a href="http://example.com/some/path" title="Here Be Links">Click On Me</a>'
       )
     })
   })

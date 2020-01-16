@@ -39,7 +39,12 @@ describe('RCE > Common > Incremental Loading', () => {
       isLoading: false,
       onLoadInitial: jest.fn(),
       onLoadMore: jest.fn(),
-      records: []
+      records: [],
+      contextType: 'course',
+      sortBy: {
+        sort: 'alphabetical',
+        order: 'asc'
+      }
     }
   })
 
@@ -82,6 +87,10 @@ describe('RCE > Common > Incremental Loading', () => {
     component = render(<SpecComponent />, {container: $container})
   }
 
+  function rerenderComponent() {
+    component.rerender(<SpecComponent />)
+  }
+
   function buildRecords(count) {
     const records = []
     for (let i = loaderOptions.records.length; i < loaderOptions.records.length + count; i++) {
@@ -102,9 +111,35 @@ describe('RCE > Common > Incremental Loading', () => {
     renderComponent()
   }
 
-  it('loads initial records upon mounting', () => {
-    renderComponent()
-    expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(1)
+  describe('initial records query', () => {
+    it('is executed upon mounting', () => {
+      renderComponent()
+      expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(1)
+    })
+
+    it('is executed when sortBy changes', () => {
+      renderComponent()
+      expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(1)
+      loaderOptions.sortBy.sort = 'date_added'
+      rerenderComponent()
+      expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(2)
+    })
+
+    it('is executed when contextType changes', () => {
+      renderComponent()
+      expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(1)
+      loaderOptions.contextType = 'user'
+      rerenderComponent()
+      expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(2)
+    })
+
+    it('is not executed if nothing changes', () => {
+      renderComponent()
+      expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(1)
+
+      rerenderComponent()
+      expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('Loading Status', () => {

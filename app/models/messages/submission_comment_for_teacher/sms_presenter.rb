@@ -42,7 +42,7 @@ module Messages::SubmissionCommentForTeacher
           assignment_title: assignment.title,
           author_name: submission_comment.author.name,
           course_name: course.name,
-          user_name: submission.user.name
+          user_name: submission.user.short_name
         )
       end
     end

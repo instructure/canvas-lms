@@ -29,6 +29,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :wiki_page,
           :assignment,
           :assignment_group,
+          :assignment_override,
           :submission,
           :submission_comment,
           :attachment,

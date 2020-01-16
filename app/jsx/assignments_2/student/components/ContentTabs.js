@@ -85,7 +85,7 @@ function renderCommentsTab({assignment, submission}) {
     // TODO: Get design/product to get an updated SVG or something for this: COMMS-2255
     return (
       <SVGWithTextPlaceholder
-        text={I18n.t('You cannot leave leave comments until you submit the assignment')}
+        text={I18n.t('You cannot leave comments until you submit the assignment')}
         url={ClosedDiscussionSVG}
       />
     )

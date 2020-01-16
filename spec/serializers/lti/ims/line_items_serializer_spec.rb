@@ -76,7 +76,7 @@ RSpec.describe Lti::Ims::LineItemsSerializer do
     end
 
     it 'does not incude values that are nil' do
-      line_item.update_attributes!(resource_link: nil, tag: nil)
+      line_item.update!(resource_link: nil, tag: nil)
       expect(described_class.new(line_item, line_item_id).as_json).to eq(
         {
           id: line_item_id,

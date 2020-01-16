@@ -49,7 +49,7 @@ export function submitContentItem(contentItem) {
 
   const valid_submission = true
   if (contentItem['@type'] === 'LtiLinkItem') {
-    if ($('#submit_online_url_form').length) {
+    if ($('#submit_online_url_form, #submit_online_upload_form').length) {
       $('#external_tool_url').val(contentItem.url)
       $('#external_tool_submission_type').val('basic_lti_launch')
       var $link = $('<a/>', {href: contentItem.url}).text(contentItem.text || contentItem.title)

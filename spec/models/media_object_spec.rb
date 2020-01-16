@@ -218,12 +218,16 @@ describe MediaObject do
     end
 
     before :each do
-      mock_kaltura = double('CanvasKaltura::ClientV3')
-      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
-      allow(mock_kaltura).to receive(:media_sources).and_return(
+      @mock_kaltura = double('CanvasKaltura::ClientV3')
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
+      allow(@mock_kaltura).to receive(:startSession).and_return(nil)
+      allow(@mock_kaltura).to receive(:media_sources).and_return(
         [{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
           :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size =>"204", :fileExt=>"mp4"}]
       )
+      allow(@mock_kaltura).to receive(:mediaGet).and_return(@media_object)
+      allow(@mock_kaltura).to receive(:mediaTypeToSymbol).and_return("video")
+      allow(@mock_kaltura).to receive(:flavorAssetGetByEntryId).and_return([])
     end
 
     it "keeps the current title if already set" do
@@ -250,6 +254,27 @@ describe MediaObject do
       att = Attachment.find(mo[:attachment_id])
       expect(att).to be
       expect(att[:media_entry_id]).to eql mo[:media_id]
+    end
+
+    it "ensures retrieve_details adds '/' to media_type " do
+      mo = @media_object
+      mo.retrieve_details
+      expect(mo.media_type).to eql "video/*"
+    end
+
+    it "doesn't add '/' to media_type if blank" do
+      allow(@mock_kaltura).to receive(:mediaTypeToSymbol).and_return("")
+      mo = @media_object
+      mo.retrieve_details
+      expect(mo.media_type).to eql("")
+    end
+
+    it "doesn't create the attachment until media_sources exist" do
+      allow(@mock_kaltura).to receive(:media_sources).and_return([])
+      mo = @media_object
+      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+      att = Attachment.where(:media_entry_id => mo[:media_id])
+      expect(att).to be_empty
     end
   end
 

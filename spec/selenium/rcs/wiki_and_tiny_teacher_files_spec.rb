@@ -126,6 +126,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
     end
 
     it "should be able to upload a file and add the file to the rce" do
+      skip('investigate in CCI-182')
       add_file_to_rce
       check_file(f('#wiki_page_show a.instructure_file_link'))
     end

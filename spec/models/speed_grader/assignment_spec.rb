@@ -574,7 +574,7 @@ describe SpeedGrader::Assignment do
 
     it 'does not include concluded students when user preference is to not include' do
       Enrollment.find_by(user: @student1).conclude
-      @course.update_attributes!(conclude_at: 1.day.ago, start_at: 2.days.ago)
+      @course.update!(conclude_at: 1.day.ago, start_at: 2.days.ago)
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
       expect(json[:context][:students].count).to be 1
     end
@@ -582,7 +582,7 @@ describe SpeedGrader::Assignment do
     it 'includes concluded when user preference is to include' do
       @teacher.preferences[:gradebook_settings][@course.id]['show_concluded_enrollments'] = 'true'
       Enrollment.find_by(user: @student1).conclude
-      @course.update_attributes!(conclude_at: 1.day.ago, start_at: 2.days.ago)
+      @course.update!(conclude_at: 1.day.ago, start_at: 2.days.ago)
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
       expect(json[:context][:students].count).to be 2
     end
@@ -1586,17 +1586,17 @@ describe SpeedGrader::Assignment do
 
     it "includes 'has_originality_report' in the json for group assignments" do
       user_two = test_student.dup
-      user_two.update_attributes!(lti_context_id: SecureRandom.uuid)
+      user_two.update!(lti_context_id: SecureRandom.uuid)
       assignment.course.enroll_student(user_two)
 
       group = group_model(context: assignment.course)
-      group.update_attributes!(users: [user_two, test_student])
+      group.update!(users: [user_two, test_student])
 
       submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
       assignment.submit_homework(user_two, submission_type: 'online_upload', attachments: [attachment])
 
       assignment.submissions.each do |s|
-        s.update_attributes!(group: group, turnitin_data: {blah: 1})
+        s.update!(group: group, turnitin_data: {blah: 1})
       end
 
       report = OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)

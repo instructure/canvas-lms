@@ -872,12 +872,11 @@ export function getFile(id) {
 export function fetchDocs(state) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      let response
       const bookmark =
-        state.documents[state.contextType] && state.documents[state.contextType].bookmark
-      if (bookmark) {
-        response = DOCUMENTS[bookmark]
-      }
+        (state.documents[state.contextType] && state.documents[state.contextType].bookmark) ||
+        'documents1'
+
+      const response = DOCUMENTS[bookmark]
 
       if (response) {
         resolve(response)
@@ -892,7 +891,8 @@ export function fetchMedia(state) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       let response
-      const bookmark = state.media[state.contextType] && state.media[state.contextType].bookmark
+      const bookmark =
+        (state.media[state.contextType] && state.media[state.contextType].bookmark) || 'media1'
       if (bookmark) {
         response = MEDIA[bookmark]
       }

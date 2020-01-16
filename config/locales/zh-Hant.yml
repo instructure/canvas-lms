@@ -15511,7 +15511,7 @@ zh-Hant:
   number_to_grade_661b05dd: "%{number}以評分"
   number_unsubmitted_145fefae: "%{number}未提交"
   numerical_answer_ec7120bf: 數字答案
-  nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered}%{numGroup} 掌握"
+  nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered}/%{numGroup} 掌握"
   numpoints_points_b1f0666a: "%{numPoints} 分數"
   o365_template_297a82f6: "O365 範本"
   o_224cf405: o

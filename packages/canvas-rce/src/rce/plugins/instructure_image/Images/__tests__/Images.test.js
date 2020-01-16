@@ -40,6 +40,7 @@ describe('RCE "Images" Plugin > Images', () => {
         }
       },
       contextType: 'course',
+      sortBy: {sort: 'alphabetical', order: 'desc'},
       onImageEmbed() {}
     }
   })

@@ -44,7 +44,7 @@ class TokensController < ApplicationController
 
   def update
     @token = @current_user.access_tokens.find(params[:id])
-    if @token.update_attributes(access_token_params)
+    if @token.update(access_token_params)
       render :json => @token.as_json(:include_root => false, :methods => [:app_name,:visible_token])
     else
       render :json => @token.errors, :status => :bad_request

@@ -530,6 +530,8 @@ class RCEWrapper extends React.Component {
   }
 
   handleBlurRCE = event => {
+    this._forceCloseFloatingToolbar()
+
     if (event.relatedTarget === null) {
       // focus might be moving to tinymce
       this.handleBlur(event)
@@ -610,7 +612,24 @@ class RCEWrapper extends React.Component {
     this.getTextarea().style.resize = 'none'
     editor.on('Change', this.doAutoResize)
 
+    editor.on('blur', this._forceCloseFloatingToolbar)
+    editor.on('ExecCommand', this._forceCloseFloatingToolbar)
+
     this.announceContextToolbars(editor)
+  }
+
+  _forceCloseFloatingToolbar = () => {
+    if (this._elementRef) {
+      const moreButton = this._elementRef.querySelector(
+        '.tox-toolbar-overlord .tox-toolbar__group:last-child button:last-child'
+      )
+      if (moreButton?.getAttribute('aria-owns')) {
+        // the floating toolbar is open
+        moreButton.click() // close the floating toolbar
+        const editor = this.mceInstance() // return focus to the editor
+        editor?.focus() // eslint-disable-line no-unused-expressions
+      }
+    }
   }
 
   announcing = 0

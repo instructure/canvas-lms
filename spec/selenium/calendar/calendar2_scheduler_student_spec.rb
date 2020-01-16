@@ -284,6 +284,7 @@ describe "scheduler" do
       end
 
       it "should let me do so from the week view", priority: "1", test_id: 502483 do
+        skip('Fix in KNO-217')
         load_week_view
 
         scheduler_event.click
@@ -298,7 +299,7 @@ describe "scheduler" do
         load_agenda_view
 
         agenda_item.click
-        move_to_click('.event-details .unreserve_event_link')
+        f('.event-details .unreserve_event_link').click
         wait_for_ajaximations
         f('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
 

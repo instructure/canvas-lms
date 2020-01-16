@@ -53,7 +53,7 @@ describe "duplicate discussion" do
         before :once do
           course_with_teacher(:active_all => true)
           student_in_course(:active_all => true)
-          @course.update_attributes(:allow_student_discussion_editing => true,
+          @course.update(:allow_student_discussion_editing => true,
             :allow_student_discussion_topics=>true)
           @group_category = @course.group_categories.create!(:name => "Group Category")
           @group = @course.groups.create!(:group_category => @group_category, :name => "Group 1")

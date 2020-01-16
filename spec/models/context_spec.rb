@@ -144,7 +144,7 @@ describe Context do
     end
 
     it 'should find files' do
-      attachment_model(context: @course).update_attributes(locked: true)
+      attachment_model(context: @course).update(locked: true)
       expect(Context.find_asset_by_url("/courses/#{@course.id}/files?preview=#{@attachment.id}")).to eq @attachment
       expect(Context.find_asset_by_url("/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1")).to eq @attachment
       expect(Context.find_asset_by_url("/courses/#{@course.id}/file_contents/course%20files//#{@attachment.name}")).to eq @attachment

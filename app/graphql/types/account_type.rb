@@ -31,5 +31,16 @@ module Types
       # batch load it in a reasonable way.
       object.resolved_outcome_proficiency&.outcome_proficiency_ratings
     end
+
+    field :courses_connection, CourseType.connection_type, null: true
+    def courses_connection
+      return unless object.grants_right?(current_user, :read_course_list)
+      object.associated_courses
+    end
+
+    field :sub_accounts_connection, AccountType.connection_type, null: true
+    def sub_accounts_connection
+      object.sub_accounts.order(:id)
+    end
   end
 end

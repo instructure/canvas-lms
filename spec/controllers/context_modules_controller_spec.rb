@@ -78,6 +78,35 @@ describe ContextModulesController do
         expect(assigns[:modules]).to eq [@m2]
       end
     end
+
+    context "default post to SIS" do
+      before :once do
+        @course.account.tap do |a|
+          a.enable_feature! :new_sis_integrations
+          a.settings[:sis_syncing] = {locked: false, value: true}
+          a.settings[:sis_default_grade_export] = {locked: false, value: true}
+          a.save!
+        end
+      end
+
+      before :each do
+        user_session(@teacher)
+      end
+
+      it "is true if account setting is on" do
+        get 'index', params: {:course_id => @course.id}
+        expect(controller.js_env[:DEFAULT_POST_TO_SIS]).to eq true
+      end
+
+      it "is false if a due date is required" do
+        @course.account.tap do |a|
+          a.settings[:sis_require_assignment_due_date] = {locked: false, value: true}
+          a.save!
+        end
+        get 'index', params: {:course_id => @course.id}
+        expect(controller.js_env[:DEFAULT_POST_TO_SIS]).to eq false
+      end
+    end
   end
 
   describe "PUT 'update'" do

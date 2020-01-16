@@ -250,6 +250,7 @@ module Api::V1::Attachment
         if progress_context.is_a? Assignment
           additional_capture_params = {
             eula_agreement_timestamp: params[:eula_agreement_timestamp],
+            comment: params[:comment],
             submit_assignment: opts[:submit_assignment]
           }
         end
@@ -298,7 +299,7 @@ module Api::V1::Attachment
         )
 
         Services::SubmitHomeworkService.submit_job(
-          @attachment, progress, params[:eula_agreement_timestamp], executor, opts[:submit_assignment]
+          @attachment, progress, params[:eula_agreement_timestamp], params[:comment], executor, opts[:submit_assignment]
         )
 
         json = { progress: progress_json(progress, @current_user, session) }

@@ -395,7 +395,7 @@ class Quizzes::QuizzesController < ApplicationController
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
       @quiz.transaction do
-        @quiz.update_attributes!(quiz_params)
+        @quiz.update!(quiz_params)
         batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
       end
 

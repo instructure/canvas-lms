@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react'
-import {arrayOf, bool, func, objectOf, shape, string} from 'prop-types'
+import React, {useRef} from 'react'
+import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
 import {Flex, View} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
@@ -32,7 +32,7 @@ import ImageList from '../ImageList'
 import formatMessage from '../../../../format-message'
 
 export default function Images(props) {
-  const {fetchInitialImages, fetchNextImages, contextType} = props
+  const {fetchInitialImages, fetchNextImages, contextType, sortBy} = props
   const images = props.images[contextType]
   const {hasMore, isLoading, error, files} = images
   const lastItemRef = useRef(null)
@@ -41,23 +41,12 @@ export default function Images(props) {
     hasMore,
     isLoading,
     lastItemRef,
-
-    onLoadInitial() {
-      fetchInitialImages()
-    },
-
-    onLoadMore() {
-      fetchNextImages()
-    },
-
-    records: files
+    onLoadInitial: fetchInitialImages,
+    onLoadMore: fetchNextImages,
+    records: files,
+    contextType,
+    sortBy
   })
-
-  useEffect(() => {
-    if (hasMore && !isLoading && files.length === 0) {
-      fetchInitialImages()
-    }
-  }, [contextType, files.length, hasMore, isLoading, fetchInitialImages])
 
   return (
     <View as="div" data-testid="instructure_links-ImagesPanel">
@@ -103,5 +92,9 @@ Images.propTypes = {
       error: string
     })
   ).isRequired,
+  sortBy: shape({
+    sort: oneOf(['date_added', 'alphabetical']).isRequired,
+    order: oneOf(['asc', 'desc']).isRequired
+  }),
   onImageEmbed: func.isRequired
 }

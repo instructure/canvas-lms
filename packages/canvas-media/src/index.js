@@ -153,7 +153,6 @@ export default class UploadMedia extends React.Component {
 
     return (
       <Tabs
-        shouldFocusOnRender
         maxWidth="large"
         onRequestTabChange={(_, {index}) => {
           this.setState({selectedPanel: index})

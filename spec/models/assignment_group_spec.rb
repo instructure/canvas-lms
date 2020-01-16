@@ -198,7 +198,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due in a closed grading period" do
         before(:once) do
-          @assignment.update_attributes(due_at: 4.weeks.ago)
+          @assignment.update(due_at: 4.weeks.ago)
         end
 
         it "is true for admins" do
@@ -212,7 +212,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due in an open grading period" do
         before(:once) do
-          @assignment.update_attributes(due_at: 2.weeks.ago)
+          @assignment.update(due_at: 2.weeks.ago)
         end
 
         it "is true for admins" do
@@ -226,7 +226,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due after all grading periods" do
         before(:once) do
-          @assignment.update_attributes(due_at: 1.day.from_now)
+          @assignment.update(due_at: 1.day.from_now)
         end
 
         it "is true for admins" do
@@ -240,7 +240,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due before all grading periods" do
         before(:once) do
-          @assignment.update_attributes(due_at: 6.weeks.ago)
+          @assignment.update(due_at: 6.weeks.ago)
         end
 
         it "is true for admins" do
@@ -254,7 +254,7 @@ describe AssignmentGroup do
 
       context "when the assignment has no due date" do
         before(:once) do
-          @assignment.update_attributes(due_at: nil)
+          @assignment.update(due_at: nil)
         end
 
         it "is true for admins" do
@@ -268,7 +268,7 @@ describe AssignmentGroup do
 
       context "when the assignment is due in a closed grading period for a student" do
         before(:once) do
-          @assignment.update_attributes(due_at: 2.days.from_now)
+          @assignment.update(due_at: 2.days.from_now)
           override = @assignment.assignment_overrides.build
           override.set = @course.default_section
           override.override_due_at(4.weeks.ago)
@@ -286,7 +286,7 @@ describe AssignmentGroup do
 
       context "when the assignment is overridden with no due date for a student" do
         before(:once) do
-          @assignment.update_attributes(due_at: nil)
+          @assignment.update(due_at: nil)
           override = @assignment.assignment_overrides.build
           override.set = @course.default_section
           override.save!
@@ -303,7 +303,7 @@ describe AssignmentGroup do
 
       context "when the assignment is deleted and due in a closed grading period" do
         before(:once) do
-          @assignment.update_attributes(due_at: 4.weeks.ago)
+          @assignment.update(due_at: 4.weeks.ago)
           @assignment.destroy
         end
 
@@ -318,7 +318,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due in a closed grading period" do
         before(:once) do
-          @quiz.update_attributes(due_at: 4.weeks.ago)
+          @quiz.update(due_at: 4.weeks.ago)
         end
 
         it "is true for admins" do
@@ -332,7 +332,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due in an open grading period" do
         before(:once) do
-          @quiz.update_attributes(due_at: 2.weeks.ago)
+          @quiz.update(due_at: 2.weeks.ago)
         end
 
         it "is true for admins" do
@@ -346,7 +346,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due after all grading periods" do
         before(:once) do
-          @quiz.update_attributes(due_at: 1.day.from_now)
+          @quiz.update(due_at: 1.day.from_now)
         end
 
         it "is true for admins" do
@@ -360,7 +360,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due before all grading periods" do
         before(:once) do
-          @quiz.update_attributes(due_at: 6.weeks.ago)
+          @quiz.update(due_at: 6.weeks.ago)
         end
 
         it "is true for admins" do
@@ -374,7 +374,7 @@ describe AssignmentGroup do
 
       context "when the quiz has no due date" do
         before(:once) do
-          @quiz.update_attributes(due_at: nil)
+          @quiz.update(due_at: nil)
         end
 
         it "is true for admins" do
@@ -388,7 +388,7 @@ describe AssignmentGroup do
 
       context "when the quiz is due in a closed grading period for a student" do
         before(:once) do
-          @quiz.update_attributes(due_at: 2.days.from_now)
+          @quiz.update(due_at: 2.days.from_now)
           override = @quiz.assignment_overrides.build
           override.set = @course.default_section
           override.override_due_at(4.weeks.ago)
@@ -406,7 +406,7 @@ describe AssignmentGroup do
 
       context "when the quiz is overridden with no due date for a student" do
         before(:once) do
-          @quiz.update_attributes(due_at: nil)
+          @quiz.update(due_at: nil)
           override = @quiz.assignment_overrides.build
           override.set = @course.default_section
           override.save!
@@ -423,7 +423,7 @@ describe AssignmentGroup do
 
       context "when the quiz is deleted and due in a closed grading period" do
         before(:once) do
-          @quiz.update_attributes(due_at: 4.weeks.ago)
+          @quiz.update(due_at: 4.weeks.ago)
           @quiz.destroy
         end
 

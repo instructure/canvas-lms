@@ -225,7 +225,12 @@ export default createReactClass({
           {I18n.t('Add App')}
         </a>
 
-        <Modal open={this.state.modalIsOpen} onDismiss={this.closeModal} label={I18n.t('Add App')}>
+        <Modal 
+          open={this.state.modalIsOpen} 
+          onDismiss={this.closeModal}
+          label={I18n.t('Add App')}
+          shouldCloseOnDocumentClick={false}
+        >
           <Modal.Body>
             {this.errorMessage()}
             <form>{this.configOptions()}</form>

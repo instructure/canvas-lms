@@ -33,7 +33,7 @@ module Messages::SubmissionCommentForTeacher
           "Submission Comment: %{user_name}, %{assignment_title}, %{course_name}",
           assignment_title: assignment.title,
           course_name: course.name,
-          user_name: submission.user.name
+          user_name: submission.user.short_name
         )
       end
     end
@@ -59,7 +59,7 @@ module Messages::SubmissionCommentForTeacher
           "%{author_name} just made a new comment on the submission for %{user_name} for %{assignment_title}.",
           assignment_title: assignment.title,
           author_name: submission_comment.author_name,
-          user_name: submission.user.name
+          user_name: submission.user.short_name
         )
       end
     end

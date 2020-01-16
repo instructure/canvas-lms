@@ -170,6 +170,7 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
+          rce_js_env
           render_a2_student_view
           return
         end

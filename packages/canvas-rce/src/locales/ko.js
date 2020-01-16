@@ -17,7 +17,7 @@
  */
 
 import formatMessage from '../format-message'
-import locale from '../../locales/ko.json'
+import locale from '@instructure/translations/lib/canvas-rce/ko.json'
 import '../rce/languages/ko_KR'
 
 formatMessage.addLocale({ko: locale})

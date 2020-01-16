@@ -17,7 +17,7 @@
  */
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Checkbox} from '@instructure/ui-forms'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex, View} from '@instructure/ui-layout'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import I18n from 'i18n!react_developer_keys'

@@ -51,8 +51,8 @@ describe Types::RubricAssessmentType do
   end
 
   it 'requires permission to see the assessor' do
-    assignment.update_attributes(anonymous_peer_reviews: true)
-    rubric_assessment.update_attributes(assessment_type: 'no_reason')
+    assignment.update(anonymous_peer_reviews: true)
+    rubric_assessment.update(assessment_type: 'no_reason')
     expect(
       submission_type.resolve(
         'rubricAssessmentsConnection { nodes { assessor { _id } } }',

@@ -173,7 +173,7 @@ export default function ImageOptionsTray(props) {
                 <Flex.Item padding="small">
                   <TextArea
                     aria-describedby="alt-text-label-tooltip"
-                    disabled={isDecorativeImage || displayAs === 'link'}
+                    disabled={isDecorativeImage}
                     height="4rem"
                     label={textAreaLabel}
                     onChange={handleAltTextChange}

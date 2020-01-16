@@ -113,9 +113,9 @@ describe('RCE Plugins > Filter', () => {
     it('does not change sort value when changed', () => {
       selectContentType('User Files')
       selectContentSubtype('Documents')
-      selectSortBy('Date Published')
+      selectSortBy('Date Added')
       selectContentType('Links')
-      expect(currentFilterSettings.sortValue).toEqual('date_published')
+      expect(currentFilterSettings.sortValue).toEqual('date_added')
     })
   })
 
@@ -199,10 +199,10 @@ describe('RCE Plugins > Filter', () => {
 
     it('does not change sort value when changed', () => {
       selectContentSubtype('Documents')
-      selectSortBy('Date Published')
-      expect(currentFilterSettings.sortValue).toEqual('date_published')
+      selectSortBy('Date Added')
+      expect(currentFilterSettings.sortValue).toEqual('date_added')
       selectContentSubtype('Media')
-      expect(currentFilterSettings.sortValue).toEqual('date_published')
+      expect(currentFilterSettings.sortValue).toEqual('date_added')
     })
   })
 
@@ -227,13 +227,8 @@ describe('RCE Plugins > Filter', () => {
       expect(currentFilterSettings.sortValue).toEqual('alphabetical')
     })
 
-    it('sets sort value to "date_published" when "Date Published" is selected', () => {
-      selectSortBy('Date Published')
-      expect(currentFilterSettings.sortValue).toEqual('date_published')
-    })
-
     it('sets sort value to "date_added" when "Date Added" is selected', () => {
-      selectSortBy('Date Published')
+      selectSortBy('Alphabetical')
       selectSortBy('Date Added')
       expect(currentFilterSettings.sortValue).toEqual('date_added')
     })

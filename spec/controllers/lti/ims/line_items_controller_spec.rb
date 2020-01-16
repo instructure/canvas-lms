@@ -116,7 +116,7 @@ module Lti
           end
 
           it 'responds with 404 if course is concluded' do
-            course.update_attributes!(workflow_state: 'completed')
+            course.update!(workflow_state: 'completed')
             send_request
             expect(response).to be_not_found
           end
@@ -321,7 +321,7 @@ module Lti
         context do
           let(:line_item_two) do
             li = line_item_model(resource_link: resource_link, assignment: assignment)
-            li.update_attributes!(created_at: line_item.created_at + 5.seconds)
+            li.update!(created_at: line_item.created_at + 5.seconds)
             li
           end
           let(:line_item_id) { line_item_two.id }
@@ -341,7 +341,7 @@ module Lti
           let(:line_item) { assignment.line_items.first }
 
           it 'updates the assignment name if ResourceLink is absent' do
-            line_item.update_attributes!(resource_link: nil)
+            line_item.update!(resource_link: nil)
             send_request
             expect(line_item.reload.assignment.name).to eq new_label
           end

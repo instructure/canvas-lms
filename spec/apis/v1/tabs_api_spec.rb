@@ -200,8 +200,25 @@ describe TabsController, type: :request do
         uri = URI(tab['url'])
         expect(uri.path).to eq "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
         expect(uri.query).to include('id=')
+        expect(uri.query).to include('launch_type=course_navigation')
       end
     end
+
+    it 'launches account navigation external tools with launch_type=account_navigation' do
+      account_admin_user(:active_all => true)
+      @account = @user.account
+      @tool = @account.context_external_tools.new(name: "Ex", url: "http://example.com", consumer_key: "k", shared_secret: "s")
+      @tool.settings.merge!(account_navigation: { enabled: 'true', url: 'http://example.com' })
+      @tool.save!
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/tabs",
+                      controller: 'tabs', action: 'index', account_id: @account.to_param, format: 'json')
+      external_tabs = json.select {|tab| tab['type'] == 'external'}
+      expect(external_tabs.length).to eq 1
+      expect(external_tabs.first['url']).to match(
+        %r{/api/v1/accounts/#{@account.id}/external_tools/sessionless_launch\?.*launch_type=account_navigation}
+      )
+    end
+
 
     it "includes collaboration tab if configured" do
       course_with_teacher :active_all => true

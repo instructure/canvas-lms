@@ -65,6 +65,7 @@ describe "scheduler" do
         get "/calendar"
 
         f('#create_new_event_link').click
+        wait_for_ajax_requests
         f('.edit_appointment_group_option').click
 
         set_value(f('input[name="title"]'), title)

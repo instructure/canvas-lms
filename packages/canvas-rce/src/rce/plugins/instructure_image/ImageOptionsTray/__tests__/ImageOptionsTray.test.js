@@ -90,10 +90,10 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
       expect(tray.altTextDisabled).toEqual(true)
     })
 
-    it('is disabled when displaying the image as a link', () => {
+    it('is not disabled when displaying the image as a link', () => {
       renderComponent()
       tray.setDisplayAs('link')
-      expect(tray.altTextDisabled).toEqual(true)
+      expect(tray.altTextDisabled).toEqual(false)
     })
   })
 

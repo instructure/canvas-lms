@@ -250,7 +250,7 @@ class ConferencesController < ApplicationController
       respond_to do |format|
         params[:web_conference].try(:delete, :long_running)
         params[:web_conference].try(:delete, :conference_type)
-        if @conference.update_attributes(conference_params)
+        if @conference.update(conference_params)
           # TODO: ability to dis-invite people
           members.uniq.each do |u|
             @conference.add_invitee(u)

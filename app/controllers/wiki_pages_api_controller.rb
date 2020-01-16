@@ -326,7 +326,7 @@ class WikiPagesApiController < ApplicationController
     if authorized_action(@page, @current_user, :create)
       update_params = get_update_params(Set[:title, :body])
       assign_todo_date
-      if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
+      if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
         render :json => wiki_page_json(@page, @current_user, session)
@@ -398,7 +398,7 @@ class WikiPagesApiController < ApplicationController
     if perform_update
       assign_todo_date
       update_params = get_update_params
-      if !update_params.is_a?(Symbol) && @page.update_attributes(update_params) && process_front_page
+      if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
         apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)

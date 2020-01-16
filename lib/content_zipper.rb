@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require 'zip'
-require 'action_controller_test_process'
 require 'tmpdir'
 require 'set'
 

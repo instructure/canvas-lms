@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-layout'
 import {NumberInput} from '@instructure/ui-number-input'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
-import {RadioInput} from '@instructure/ui-forms'
+import {RadioInput} from '@instructure/ui-radio-input'
 
 import classnames from 'classnames'
 import round from 'coffeescripts/util/round'

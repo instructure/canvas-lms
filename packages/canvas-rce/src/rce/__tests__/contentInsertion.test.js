@@ -103,7 +103,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'image'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
+        '<a href="/some/path?wrap=1" title="Here Be Links" class="instructure_file_link instructure_image_thumbnail">Click On Me</a>'
       )
     })
 
@@ -111,7 +111,7 @@ describe('contentInsertion', () => {
       link.embed = {type: 'scribd'}
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a href="/some/path" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
+        '<a href="/some/path?wrap=1" title="Here Be Links" class="instructure_file_link instructure_scribd_file">Click On Me</a>'
       )
     })
 
@@ -127,7 +127,9 @@ describe('contentInsertion', () => {
       link.href = undefined
       link.url = '/other/path'
       contentInsertion.insertLink(editor, link)
-      expect(editor.content).toEqual('<a href="/other/path" title="Here Be Links">Click On Me</a>')
+      expect(editor.content).toEqual(
+        '<a href="/other/path?wrap=1" title="Here Be Links">Click On Me</a>'
+      )
     })
 
     it('cleans a url with no protocol', () => {

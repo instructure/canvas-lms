@@ -72,8 +72,16 @@ pipeline {
     }
 
     stage('Master Bouncer') {
+      when { expression { env.MASTER_BOUNCER_RUN == '1' && env.GERRIT_EVENT_TYPE == 'patchset-created' } }
       steps {
-        sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+        timeout(time: 3) {
+          script {
+            def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+            credentials.withMasterBouncerCredentials {
+              sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+            }
+          }
+        }
       }
     }
 

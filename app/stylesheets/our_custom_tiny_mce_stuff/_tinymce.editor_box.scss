@@ -31,7 +31,8 @@ a.youtube_link_to_box, link.youbute_link_to_box {
   background: transparent url(/images/cancel.png) no-repeat top left;
 }
 
-a.instructure_inline_media_comment {
+a.instructure_inline_media_comment,
+a.instructure_inline_media_comment.mce-item-anchor { // when old rce content is loaded in the new rce
   display: block;
   width: 270px !important;
   border: 1px solid #aaa;

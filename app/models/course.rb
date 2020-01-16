@@ -743,7 +743,10 @@ class Course < ActiveRecord::Base
     p.to { participating_students_by_date + participating_observers_by_date }
     p.whenever { |record|
       (record.available? && @grade_weight_changed) ||
-      record.changed_in_state(:available, :fields => :group_weighting_scheme)
+        (
+          record.changed_in_state(:available, :fields => :group_weighting_scheme) &&
+          record.saved_changes[:group_weighting_scheme] != [nil, "equal"] # not a functional change
+        )
     }
 
     p.dispatch :new_course

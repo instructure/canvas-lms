@@ -749,11 +749,11 @@ describe ContentMigration do
         allow(Lti::ToolProxy).to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) do
           Lti::ToolProxy.where(id: tool_proxy.id)
         end
-        product_family.update_attributes!(
+        product_family.update!(
           product_code: 'product_code',
           vendor_code: 'vendor_code'
         )
-        tool_proxy.update_attributes!(
+        tool_proxy.update!(
           resources: [resource_handler],
           context: @copy_to
         )

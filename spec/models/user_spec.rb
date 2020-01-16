@@ -2928,11 +2928,13 @@ describe User do
     end
 
     it 'caches results' do
-      sub_account = @account.sub_accounts.create!
-      sub_account.account_users.create!(:user => @user, :role => admin_role)
-      result = @user.roles(@account)
-      sub_account.destroy!
-      expect(@user.roles(@account)).to eq result
+      enable_cache do
+        sub_account = @account.sub_accounts.create!
+        sub_account.account_users.create!(:user => @user, :role => admin_role)
+        result = @user.roles(@account)
+        sub_account.destroy!
+        expect(@user.roles(@account)).to eq result
+      end
     end
 
     context 'exclude_deleted_accounts' do

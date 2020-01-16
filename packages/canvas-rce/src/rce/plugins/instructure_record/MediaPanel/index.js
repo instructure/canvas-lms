@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef} from 'react'
-import {arrayOf, bool, func, objectOf, shape, string} from 'prop-types'
+import React, {useRef} from 'react'
+import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message'
 
@@ -58,7 +58,7 @@ function renderLoadingError(_error) {
 }
 
 export default function MediaPanel(props) {
-  const {fetchInitialMedia, fetchNextMedia, contextType} = props
+  const {fetchInitialMedia, fetchNextMedia, contextType, sortBy} = props
   const media = props.media[contextType]
   const {hasMore, isLoading, error, files} = media
   const lastItemRef = useRef(null)
@@ -67,23 +67,12 @@ export default function MediaPanel(props) {
     hasMore,
     isLoading,
     lastItemRef,
-
-    onLoadInitial() {
-      fetchInitialMedia()
-    },
-
-    onLoadMore() {
-      fetchNextMedia()
-    },
-
-    records: files
+    onLoadInitial: fetchInitialMedia,
+    onLoadMore: fetchNextMedia,
+    records: files,
+    contextType,
+    sortBy
   })
-
-  useEffect(() => {
-    if (hasMore && !isLoading && files.length === 0) {
-      fetchInitialMedia()
-    }
-  }, [contextType, files.length, hasMore, isLoading, fetchInitialMedia])
 
   const handleFileClick = file => {
     props.onMediaEmbed(file)
@@ -123,5 +112,9 @@ MediaPanel.propTypes = {
       isLoading: bool,
       error: string
     })
-  ).isRequired
+  ).isRequired,
+  sortBy: shape({
+    sort: oneOf(['date_added', 'alphabetical']).isRequired,
+    order: oneOf(['asc', 'desc']).isRequired
+  })
 }

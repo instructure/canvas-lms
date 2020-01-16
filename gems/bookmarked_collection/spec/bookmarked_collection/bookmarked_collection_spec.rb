@@ -93,7 +93,7 @@ describe "BookmarkedCollection" do
 
     it "should apply any restriction block given to the scope" do
       course = @scope.order(:id).last
-      course.update_attributes(:name => 'Matching Name')
+      course.update(:name => 'Matching Name')
 
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope) do |scope|
         scope.where(:name => course.name)

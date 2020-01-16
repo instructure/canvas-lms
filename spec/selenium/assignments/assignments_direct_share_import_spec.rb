@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../common'
 require_relative 'page_objects/assignments_index_page'
 require_relative 'page_objects/assignment_page'
@@ -28,7 +29,7 @@ describe 'assignments' do
   include CopyToTrayPage
   include SendToDialogPage
   include AccountContentSharePage
-
+  
   let(:setup) {
     # Two Courses
     @course1 = Course.create!(:name => "First Course1")
@@ -93,7 +94,6 @@ describe 'assignments' do
       AssignmentPage.visit(@course1.id, @assignment1.id)
       AssignmentPage.manage_assignment_button.click
       AssignmentPage.send_to_menuitem.click
-
       expect(AssignmentPage.assignment_page_body).to contain_css(send_to_dialog_css_selector)
     end
 
@@ -101,9 +101,8 @@ describe 'assignments' do
       AssignmentPage.visit(@course1.id, @assignment1.id)
       AssignmentPage.manage_assignment_button.click
       AssignmentPage.copy_to_menuitem.click
-
       expect(AssignmentPage.assignment_page_body).to contain_css(copy_to_dialog_css_selector)
-    end   
+    end
 
     context 'copy to' do
       before(:each) do
@@ -114,15 +113,15 @@ describe 'assignments' do
 
       it 'copy tray lists user managed courses' do
         course_search_dropdown.click
-        wait_for_animations
-        expect(course_dropdown_list.text).to include 'First Course1'
-        expect(course_dropdown_list.text).to include 'Second Course2'
+
+        expect(course_dropdown_list[0].text).to include 'First Course1'
+        expect(course_dropdown_list[0].text).to include 'Second Course2'
       end
 
       it 'copy tray lists course modules' do
         select_course
         module_search_dropdown.click
-        wait_for_animations
+
         expect(module_dropdown_list.text).to include 'My Module1'
         expect(module_dropdown_list.text).to include 'My Module2'
       end
@@ -130,8 +129,8 @@ describe 'assignments' do
       it 'copy tray allows placement' do
         select_course_and_module_in_tray
         placement_dropdown.click
-
         @place_options_text = placement_dropdown_options
+        
         expect(@place_options_text[0].text).to include 'At the Top'
         expect(@place_options_text[1].text).to include 'Before..'
         expect(@place_options_text[2].text).to include 'After..'
@@ -139,27 +138,50 @@ describe 'assignments' do
       end
 
       it 'copied assignment is present in destination course' do
-        skip "LA-374"
+        # initiate the copy from Course2 to Course1
         copy_assignment_to_course2
-        visit_assignments_index_page(@course2.id)
-
-        expect(assignments_rows.text).to include 'Assignment First'
+        @migration1 = @course2.content_migrations.last
+        # the migration source course id is Course 1
+        expect(@migration1.source_course_id).to eq @course1.id
+        expect(@migration1.workflow_state).to eq "imported"
       end
     end
 
     context 'send to' do
       before(:each) do
         visit_assignments_index_page(@course1.id)
+        stub_common_cartridge_url
         manage_assignment_menu(@assignment1.id).click
         send_assignment_menu_link(@assignment1.id).click
         send_item
         run_jobs
         user_session(@teacher2)
-        visit_content_share_page
       end
 
-      it 'can send an item to another instructor' do
+      it 'can send an item to another instructor', custom_timeout: 30 do
+        visit_content_share_page
         expect(received_table_rows[1].text).to include @assignment1.name
+      end
+
+      context 'received item' do
+        before(:each) do
+          visit_content_share_page
+          manage_received_item_button(@assignment1.name).click
+        end
+
+        it 'can preview received item', custom_timeout: 30 do
+          preview_received_item.click
+          # can view the mocked preview page
+          expect(page_body.text).to include "Preview"
+        end
+
+        it 'can be imported into a course', custom_timeout: 30 do
+          import_content_share.click
+          select_course_and_module_in_tray
+          import_button.click
+          run_jobs
+          expect(import_dialog_import_success_alert.text).to include "Import started successfully"
+        end
       end
     end
   end

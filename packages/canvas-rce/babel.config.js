@@ -21,23 +21,20 @@ module.exports = {
       '@instructure/ui-babel-preset',
       {
         coverage: process.env.BABEL_ENV === 'test-node',
-        transformImports: false,
-        node: ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID,
-        esModules: !(
-          ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID
-        )
+        node: true,
+        transformImports: Boolean(process.env.TRANSFORM_IMPORTS),
+        esModules: Boolean(process.env.ES_MODULES)
       }
     ],
     [
-      '@instructure/babel-preset-pretranslated-format-message',
+      '@instructure/babel-preset-pretranslated-translations-package-format-message',
       {
-        translationsDir: 'locales',
+        translationsDir: 'lib/canvas-rce',
         extractDefaultTranslations: false
       }
     ]
   ],
   plugins: [
-    'inline-json-import',
     [
       'transform-inline-environment-variables',
       {

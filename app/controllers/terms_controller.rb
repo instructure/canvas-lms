@@ -134,7 +134,7 @@ class TermsController < ApplicationController
 
     term_params = params.require(:enrollment_term).permit(:name, :start_at, :end_at)
     DueDateCacher.with_executing_user(@current_user) do
-      if validate_dates(@term, term_params, overrides) && @term.update_attributes(term_params)
+      if validate_dates(@term, term_params, overrides) && @term.update(term_params)
         @term.set_overrides(@context, overrides)
         render :json => serialized_term
       else

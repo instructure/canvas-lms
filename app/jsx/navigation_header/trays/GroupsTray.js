@@ -21,7 +21,7 @@ import React from 'react'
 import {bool, arrayOf, shape, string} from 'prop-types'
 import {View} from '@instructure/ui-layout'
 import {Heading, List, Spinner} from '@instructure/ui-elements'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
 export default function GroupsTray({groups, hasLoaded}) {
   return (
@@ -35,13 +35,9 @@ export default function GroupsTray({groups, hasLoaded}) {
           groups
             .map(group => (
               <List.Item key={group.id}>
-                <Button
-                  variant="link"
-                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
-                  href={`/groups/${group.id}`}
-                >
+                <Link isWithinText={false} href={`/groups/${group.id}`}>
                   {group.name}
-                </Button>
+                </Link>
               </List.Item>
             ))
             .concat([
@@ -49,13 +45,9 @@ export default function GroupsTray({groups, hasLoaded}) {
                 <hr role="presentation" />
               </List.Item>,
               <List.Item key="all">
-                <Button
-                  variant="link"
-                  theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
-                  href="/groups"
-                >
+                <Link isWithinText={false} href="/groups">
                   {I18n.t('All Groups')}
-                </Button>
+                </Link>
               </List.Item>
             ])
         ) : (

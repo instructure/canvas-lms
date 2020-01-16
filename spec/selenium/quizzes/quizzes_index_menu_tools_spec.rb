@@ -15,9 +15,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative '../common'
 require_relative '../../spec_helper'
+require_relative 'page_objects/quizzes_index_page.rb'
 
 describe 'quiz index menu tool placement' do
   include_context 'in-process server selenium tests'
+  include QuizzesIndexPage
 
   before do
     course_with_teacher_logged_in
@@ -30,20 +32,16 @@ describe 'quiz index menu tool placement' do
   end
 
   it "should be able to launch the index menu tool via the tray", custom_timeout: 60 do
-    get "/courses/#{@course.id}/quizzes"
+    visit_quizzes_index_page(@course.id)
+    quiz_index_settings_button.click
+    expect(quiz_index_settings_menu_items).to include_text("Import Stuff")
 
-    gear = f(".header-bar .al-trigger")
-    gear.click
-    tool_link = f(".header-bar li.ui-menu-item a.menu_tool_link")
-    expect(tool_link).to include_text("Import Stuff")
-
-    tool_link.click
+    quiz_index_settings_menu_tool_link("Import Stuff").click
     wait_for_ajaximations
-    tray = f("[role='dialog']")
-    expect(tray['aria-label']).to eq "Import Stuff"
-    iframe = tray.find_element(:css, "iframe")
-    expect(iframe['src']).to include("/courses/#{@course.id}/external_tools/#{@tool.id}")
-    query_params = Rack::Utils.parse_nested_query(URI.parse(iframe['src']).query)
+    expect(tool_dialog_header.text).to eq "Import Stuff"
+    
+    expect(tool_dialog_iframe['src']).to include("/courses/#{@course.id}/external_tools/#{@tool.id}")
+    query_params = Rack::Utils.parse_nested_query(URI.parse(tool_dialog_iframe['src']).query)
     expect(query_params["launch_type"]).to eq "quiz_index_menu"
     expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "false"
     expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "quiz"

@@ -1256,7 +1256,7 @@ describe CommunicationChannelsController do
 
     it "should not re-send registration to a registered user when trying to re-send invitation for an unavailable course" do
       course_with_teacher_logged_in(active_all: true)
-      @course.update_attributes(:start_at => 1.week.from_now, :restrict_student_future_view => true,
+      @course.update(:start_at => 1.week.from_now, :restrict_student_future_view => true,
         :restrict_enrollments_to_course_dates => true)
 
       user_with_pseudonym(:active_all => true) # new user

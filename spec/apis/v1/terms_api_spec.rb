@@ -94,8 +94,8 @@ describe TermsApiController, type: :request do
 
     describe "ordering" do
       it "should order by start_at first" do
-        @term1.update_attributes(start_at: 1.day.ago, end_at: 5.days.from_now)
-        @term2.update_attributes(start_at: 2.days.ago, end_at: 6.days.from_now)
+        @term1.update(start_at: 1.day.ago, end_at: 5.days.from_now)
+        @term2.update(start_at: 2.days.ago, end_at: 6.days.from_now)
 
         json = get_terms
         expect(json.first['name']).to eq @term1.name
@@ -104,8 +104,8 @@ describe TermsApiController, type: :request do
 
       it "should order by end_at second" do
         start_at = 1.day.ago
-        @term1.update_attributes(start_at: start_at, end_at: 6.days.from_now)
-        @term2.update_attributes(start_at: start_at, end_at: 5.days.from_now)
+        @term1.update(start_at: start_at, end_at: 6.days.from_now)
+        @term2.update(start_at: start_at, end_at: 5.days.from_now)
 
         json = get_terms
         expect(json.first['name']).to eq @term1.name
@@ -115,8 +115,8 @@ describe TermsApiController, type: :request do
       it "should order by id last" do
         start_at = 1.day.ago
         end_at = 5.days.from_now
-        @term1.update_attributes(start_at: start_at, end_at: end_at)
-        @term2.update_attributes(start_at: start_at, end_at: end_at)
+        @term1.update(start_at: start_at, end_at: end_at)
+        @term2.update(start_at: start_at, end_at: end_at)
 
         json = get_terms
         expect(json.first['name']).to eq @term1.name
@@ -401,7 +401,7 @@ describe TermsController, type: :request do
       end
 
       it "allows removing sis_term_id with :manage_sis permission" do
-        @term1.update_attributes(sis_source_id: 'SIS Term 2')
+        @term1.update(sis_source_id: 'SIS Term 2')
         expect(@account.grants_right?(@user, :manage_sis)).to be_truthy
         json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
           { controller: 'terms', action: 'update', format: 'json', account_id: @account.to_param, id: @term1.to_param },

@@ -222,7 +222,7 @@ module Lti
       end
 
       before do
-        message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
+        message_handler.update(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
         resource_handler.message_handlers = [message_handler]
         resource_handler.save!
         lti_link.save!
@@ -235,13 +235,13 @@ module Lti
       end
 
       it 'succeeds if the tool is installed in the current course' do
-        tool_proxy.update_attributes(context: course)
+        tool_proxy.update(context: course)
         get 'resource', params: {course_id: course.id, resource_link_id: link_id}
         expect(response).to be_ok
       end
 
       it "succeeds if the tool is installed in the current course's account" do
-        tool_proxy.update_attributes(context: account)
+        tool_proxy.update(context: account)
         get 'resource', params: {course_id: course.id, resource_link_id: link_id}
         expect(response).to be_ok
       end
@@ -263,7 +263,7 @@ module Lti
         end
 
         it "responds with 400 if host name does not match" do
-          message_handler.update_attributes(launch_path: 'http://www.different.com')
+          message_handler.update(launch_path: 'http://www.different.com')
           get 'resource', params: {account_id: account.id, resource_link_id: link_id}
           expect(response).to be_bad_request
         end
@@ -272,7 +272,7 @@ module Lti
       context 'assignment' do
         let(:assignment) {course.assignments.create!(name: 'test')}
 
-        before {tool_proxy.update_attributes(context: course)}
+        before {tool_proxy.update(context: course)}
 
         it 'finds the specified assignment' do
           get 'resource', params: {course_id: course.id,
@@ -299,16 +299,16 @@ module Lti
       context 'search account chain' do
         let(:root_account) {Account.create!}
 
-        before {account.update_attributes(root_account: root_account)}
+        before {account.update(root_account: root_account)}
 
         it "succeeds if the tool is installed in the current account's root account" do
-          tool_proxy.update_attributes(context: root_account)
+          tool_proxy.update(context: root_account)
           get 'resource', params: {account_id: account.id, resource_link_id: link_id}
           expect(response).to be_ok
         end
 
         it "succeeds if the tool is installed in the current course's root account" do
-          tool_proxy.update_attributes(context: root_account)
+          tool_proxy.update(context: root_account)
           get 'resource', params: {course_id: course.id, resource_link_id: link_id}
           expect(response).to be_ok
         end

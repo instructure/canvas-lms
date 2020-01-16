@@ -138,7 +138,7 @@ describe "Gradezilla - Assignment Column" do
 
       # re-use the course and student setup from the describe block up-above
       # update assignment to be an anonymous assignment
-      @assignment.update_attributes(title: "Anon Assignment", anonymous_grading: true)
+      @assignment.update(title: "Anon Assignment", anonymous_grading: true)
 
       # visit new gradebook as teacher
       Gradezilla.visit(@course)

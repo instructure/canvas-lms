@@ -17,7 +17,7 @@
  */
 
 import formatMessage from '../format-message'
-import locale from '../../locales/fa_IR.json'
+import locale from '@instructure/translations/lib/canvas-rce/fa_IR.json'
 import '../rce/languages/fa_IR'
 
 formatMessage.addLocale({'fa-IR': locale})

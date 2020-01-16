@@ -70,7 +70,6 @@
   "current_volume_level_c55ab825": { "message": "Gjeldande volumnivå" },
   "custom_6979cd81": { "message": "Eigendefinert" },
   "date_added_ed5ad465": { "message": "Dato lagd til" },
-  "date_published_371c4ad0": { "message": "Dato publisert" },
   "decrease_indent_de6343ab": { "message": "Reduser innrykk" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "standard uordna liste med kulepunkt"
@@ -272,6 +271,9 @@
   "syllabus_f191f65b": { "message": "Emneoversikt" },
   "tab_arrows_4cf5abfc": { "message": "TAB/piltastar" },
   "text_7f4593da": { "message": "Tekst" },
+  "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+    "message": "Sjølv om videoen din har rett tittel i nettlesaren, er den ikkje oppdatert i databasen."
+  },
   "title_ee03d132": { "message": "Tittel" },
   "to_be_posted_when_d24bf7dc": { "message": "Vert posta: { when }" },
   "to_do_when_2783d78f": { "message": "Gjeremål: { when }" },
@@ -310,6 +312,7 @@
     "message": "Brukt av skjermlesarar for å skildre videoen"
   },
   "user_documents_c206e61f": { "message": "Brukardokument" },
+  "user_files_78e21703": { "message": "Brukarfiler" },
   "user_images_b6490852": { "message": "Brukarbilder" },
   "user_media_14fbf656": { "message": "Brukarmedia" },
   "video_audio_recording_uploaded_6af5d378": {

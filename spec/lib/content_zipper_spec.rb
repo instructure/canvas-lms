@@ -94,7 +94,7 @@ describe ContentZipper do
 
     it "should ignore undownloadable submissions" do
       course_with_student(active_all: true)
-      @user.update_attributes!(sortable_name: 'some_999_, _1234_guy')
+      @user.update!(sortable_name: 'some_999_, _1234_guy')
       assignment_model(course: @course)
       @assignment.submission_types="online_text_entry,media_recording"
       @assignment.save
@@ -121,7 +121,7 @@ describe ContentZipper do
 
     it "should zip up online_url submissions" do
       course_with_student(active_all: true)
-      @user.update_attributes!(sortable_name: 'some_999_, _1234_guy')
+      @user.update!(sortable_name: 'some_999_, _1234_guy')
       submission_model user: @user
       attachment = Attachment.new(display_name: 'my_download.zip')
       attachment.user = @teacher

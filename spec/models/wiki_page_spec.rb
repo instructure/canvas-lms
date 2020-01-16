@@ -29,7 +29,7 @@ describe WikiPage do
     p.notify_of_update = true
     p.save!
     expect(p.created_at).to be <= 3.days.ago
-    p.update_attributes(:body => "Awgawg")
+    p.update(:body => "Awgawg")
     expect(p.messages_sent).not_to be_nil
     expect(p.messages_sent).not_to be_empty
     expect(p.messages_sent["Updated Wiki Page"]).not_to be_nil
@@ -45,7 +45,7 @@ describe WikiPage do
     p.created_at = 3.days.ago
     p.notify_of_update = true
     p.save!
-    p.update_attributes(:body => "Awgawg")
+    p.update(:body => "Awgawg")
     expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@student)
   end
 
@@ -53,12 +53,12 @@ describe WikiPage do
     course_with_student(:active_all => true)
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
     NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
-    @course.update_attributes(:start_at => 2.days.from_now, :restrict_enrollments_to_course_dates => true)
+    @course.update(:start_at => 2.days.from_now, :restrict_enrollments_to_course_dates => true)
     p = @course.wiki_pages.create(:title => "some page")
     p.created_at = 3.days.ago
     p.notify_of_update = true
     p.save!
-    p.update_attributes(:body => "Awgawg")
+    p.update(:body => "Awgawg")
     expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not be_include(@student)
   end
 

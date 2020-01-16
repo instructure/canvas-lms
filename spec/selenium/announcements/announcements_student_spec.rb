@@ -80,7 +80,7 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements"
 
       expect(f("#content")).not_to contain_css(".ic-announcement-row")
-      announcement.update_attributes(:delayed_post_at => nil)
+      announcement.update(:delayed_post_at => nil)
       announcement.reload
       refresh_page # in order to see the announcement
       expect(f(".ic-announcement-row h3")).to include_text(announcement_title)
@@ -150,6 +150,21 @@ describe "announcements" do
       wait_for_ajaximations
 
       expect(f("#content")).not_to contain_css('.discussion-rate-action')
+    end
+
+    it "does not display the Subscribe button after replying" do
+      announcement = @course.announcements.create!(title: 'Allow Replies', message: 'Reply Here')
+      get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
+
+      f('.discussion-reply-action').click
+      wait_for_ajaximations
+      wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
+      type_in_tiny('textarea', 'this is my reply')
+      submit_form('.discussion-reply-form')
+      wait_for_ajaximations
+
+      expect(f('.topic-unsubscribe-button')).not_to be_displayed
+      expect(f('.topic-subscribe-button')).not_to be_displayed
     end
 
     context "section specific announcements" do

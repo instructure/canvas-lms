@@ -18,8 +18,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def isMerge () {
-  return env.GERRIT_EVENT_TYPE == 'change-merged'
+def runCoverage() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return env.GERRIT_EVENT_TYPE == 'change-merged' || flags.forceRunCoverage() ? '1' : ''
+}
+
+def getImageTagVersion() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return flags.getImageTagVersion()
+}
+
+def copyTestFiles(name, tests_dir, coverage_dir) {
+  sh "mkdir -p ./tmp/$name"
+  sh "docker cp \$(docker ps -qa -f name=$name):/usr/src/app/$tests_dir ./tmp/$name"
+  if (env.COVERAGE == "1") {
+    sh "mkdir -p ./tmp/$name-coverage"
+    sh "docker cp \$(docker ps -qa -f name=$name):/usr/src/app/$coverage_dir ./tmp/$name-coverage"
+  }
 }
 
 pipeline {
@@ -30,10 +45,12 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
-
-    // 'refs/changes/63/181863/8' -> '63.181863.8'
-    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
+    COVERAGE = runCoverage()
+    NAME = getImageTagVersion()
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+    SENTRY_URL="https://sentry.insops.net"
+    SENTRY_ORG="instructure"
+    SENTRY_PROJECT="master-javascript-build"
   }
   stages {
     stage('Pre-Cleanup') {
@@ -51,22 +68,36 @@ pipeline {
           sh 'printenv | sort'
           sh 'build/new-jenkins/docker-compose-pull.sh'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
+          sh 'rm -rf ./tmp/*'
         }
       }
     }
     stage('Tests') {
-      environment {
-        COVERAGE = isMerge()
-      }
       parallel {
         stage('Jest') {
+          environment {
+            CONTAINER_NAME = 'tests-jest'
+          }
           steps {
             sh 'build/new-jenkins/js/tests-jest.sh'
           }
+          post {
+            always {
+              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-jest')
+            }
+          }
         }
         stage('Packages') {
+          environment {
+            CONTAINER_NAME = 'tests-packages'
+          }
           steps {
             sh 'build/new-jenkins/js/tests-packages.sh'
+          }
+          post {
+            always {
+              copyTestFiles(env.CONTAINER_NAME, 'packages', 'packages')
+            }
           }
         }
         stage('canvas_quizzes') {
@@ -77,39 +108,82 @@ pipeline {
         stage('Karma - Spec Group - coffee') {
           environment {
             JSPEC_GROUP = 'coffee'
+            CONTAINER_NAME = 'tests-karma-coffee'
           }
           steps {
             sh 'build/new-jenkins/js/tests-karma.sh'
+          }
+          post {
+            always {
+              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
+            }
           }
         }
         stage('Karma - Spec Group - jsa - A-F') {
           environment {
             JSPEC_GROUP = 'jsa'
+            CONTAINER_NAME = 'tests-karma-jsa'
           }
           steps {
             sh 'build/new-jenkins/js/tests-karma.sh'
+          }
+          post {
+            always {
+              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
+            }
           }
         }
         stage('Karma - Spec Group - jsg - G') {
           environment {
             JSPEC_GROUP = 'jsg'
+            CONTAINER_NAME = 'tests-karma-jsg'
           }
           steps {
             sh 'build/new-jenkins/js/tests-karma.sh'
+          }
+          post {
+            always {
+              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
+            }
           }
         }
         stage('Karma - Spec Group - jsh - H-Z') {
           environment {
             JSPEC_GROUP = 'jsh'
+            CONTAINER_NAME = 'tests-karma-jsh'
           }
           steps {
             sh 'build/new-jenkins/js/tests-karma.sh'
           }
+          post {
+            always {
+              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
+            }
+          }
+        }
+      }
+    }
+    stage('Upload Coverage') {
+      when { expression { env.COVERAGE == '1' } }
+      steps {
+        timeout(time: 10) {
+          sh 'build/new-jenkins/js/coverage-report.sh'
+          archiveArtifacts(artifacts: 'coverage-report-js/**/*')
+          uploadCoverage([
+              uploadSource: "/coverage-report-js/report-html",
+              uploadDest: "canvas-lms-js/coverage"
+          ])
         }
       }
     }
   }
   post {
+    always {
+      script {
+        junit allowEmptyResults: true, testResults: 'tmp/**/*.xml'
+        sh 'find ./tmp -path "*.xml"'
+      }
+    }
     cleanup {
       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }

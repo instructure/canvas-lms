@@ -54,7 +54,7 @@ module AnnouncementsCommon
   end
 
   def update_attributes_and_validate(attribute, update_value, search_term = update_value, expected_results = 1)
-    what_to_create.last.update_attributes(attribute => update_value)
+    what_to_create.last.update(attribute => update_value)
     refresh_page # in order to get the new topic information
     replace_content(f('#searchTerm'), search_term)
     expect(ff('.ic-announcement-row').count).to eq expected_results

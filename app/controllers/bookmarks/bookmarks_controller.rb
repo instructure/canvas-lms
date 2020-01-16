@@ -131,7 +131,7 @@ class Bookmarks::BookmarksController < ApplicationController
   #
   # @returns Folder
   def update
-    if @bookmark.update_attributes(valid_params) && set_position
+    if @bookmark.update(valid_params) && set_position
       show
     else
       render_errors

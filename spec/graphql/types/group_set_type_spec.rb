@@ -55,7 +55,7 @@ describe Types::GroupSetType do
   end
 
   it "returns 'disabled' for null self_signup" do
-    @group_set.update_attributes! self_signup: nil
+    @group_set.update! self_signup: nil
     expect(group_set_type.resolve("selfSignup")).to eq "disabled"
   end
 end

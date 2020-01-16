@@ -47,13 +47,13 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
   >
     <PopoverTrigger>
       <Link
-        disabled={false}
+        color="link"
         iconPlacement="start"
-        linkRef={[Function]}
+        interaction="enabled"
+        isWithinText={true}
         onClick={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
-        variant="default"
       >
         <span
           style={
@@ -266,13 +266,13 @@ exports[`renders correctly with no results 1`] = `
   >
     <PopoverTrigger>
       <Link
-        disabled={false}
+        color="link"
         iconPlacement="start"
-        linkRef={[Function]}
+        interaction="enabled"
+        isWithinText={true}
         onClick={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
-        variant="default"
       >
         <span
           style={
@@ -482,13 +482,13 @@ exports[`renders the OutcomePopover component 1`] = `
   >
     <PopoverTrigger>
       <Link
-        disabled={false}
+        color="link"
         iconPlacement="start"
-        linkRef={[Function]}
+        interaction="enabled"
+        isWithinText={true}
         onClick={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
-        variant="default"
       >
         <span
           style={

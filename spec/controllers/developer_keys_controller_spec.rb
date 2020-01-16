@@ -76,6 +76,11 @@ describe DeveloperKeysController do
           expect(assigns.dig(:js_env, :validLtiPlacements)).to match_array Lti::ResourcePlacement::PLACEMENTS
         end
 
+        it 'includes the "includes parameter" release flag' do
+          get 'index', params: { account_id: Account.site_admin.id }
+          expect(assigns.dig(:js_env, :includesFeatureFlagEnabled)).to eq false
+        end
+
         describe "js bundles" do
           render_views
 
@@ -191,6 +196,11 @@ describe DeveloperKeysController do
           user_session(@admin)
         end
 
+        it 'allows setting "allow_includes"' do
+          post 'create', params: { account_id: root_account.id, developer_key: { scopes: valid_scopes, allow_includes: true } }
+          expect(DeveloperKey.find(json_parse['id']).allow_includes).to eq true
+        end
+
         it 'allows setting scopes' do
           post 'create', params: { account_id: root_account.id, developer_key: { scopes: valid_scopes } }
           expect(DeveloperKey.find(json_parse['id']).scopes).to match_array valid_scopes
@@ -241,6 +251,11 @@ describe DeveloperKeysController do
 
         before do
           user_session(@admin)
+        end
+
+        it 'allows setting "allow_includes"' do
+          put 'update', params: { id: developer_key.id, developer_key: { scopes: valid_scopes, allow_includes: false } }
+          expect(developer_key.reload.allow_includes).to eq false
         end
 
         it 'allows setting scopes for site admin keys' do
