@@ -28,13 +28,9 @@ def getImageTagVersion() {
   return flags.getImageTagVersion()
 }
 
-def copyTestFiles(name, tests_dir, coverage_dir) {
-  sh "mkdir -p ./tmp/$name"
-  sh "docker cp \$(docker ps -qa -f name=$name):/usr/src/app/$tests_dir ./tmp/$name"
-  if (env.COVERAGE == "1") {
-    sh "mkdir -p ./tmp/$name-coverage"
-    sh "docker cp \$(docker ps -qa -f name=$name):/usr/src/app/$coverage_dir ./tmp/$name-coverage"
-  }
+def copyFiles(docker_name, docker_dir, host_dir) {
+  sh "mkdir -p ./$host_dir"
+  sh "docker cp \$(docker ps -qa -f name=$docker_name):/usr/src/app/$docker_dir ./$host_dir"
 }
 
 pipeline {
@@ -83,7 +79,14 @@ pipeline {
           }
           post {
             always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-jest')
+              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+            }
+            success {
+              script {
+                if (env.COVERAGE == "1") {
+                  copyFiles(env.CONTAINER_NAME, 'coverage-jest', "./tmp/${env.CONTAINER_NAME}-coverage")
+                }
+              }
             }
           }
         }
@@ -96,7 +99,7 @@ pipeline {
           }
           post {
             always {
-              copyTestFiles(env.CONTAINER_NAME, 'packages', 'packages')
+              copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
             }
           }
         }
@@ -115,7 +118,14 @@ pipeline {
           }
           post {
             always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
+              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+            }
+            success {
+              script {
+                if (env.COVERAGE == "1") {
+                  copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
+                }
+              }
             }
           }
         }
@@ -129,7 +139,14 @@ pipeline {
           }
           post {
             always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
+              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+            }
+            success {
+              script {
+                if (env.COVERAGE == "1") {
+                  copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
+                }
+              }
             }
           }
         }
@@ -143,7 +160,14 @@ pipeline {
           }
           post {
             always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
+              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+            }
+            success {
+              script {
+                if (env.COVERAGE == "1") {
+                  copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
+                }
+              }
             }
           }
         }
@@ -157,7 +181,14 @@ pipeline {
           }
           post {
             always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
+              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+            }
+            success {
+              script {
+                if (env.COVERAGE == "1") {
+                  copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
+                }
+              }
             }
           }
         }
