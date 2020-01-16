@@ -46,3 +46,8 @@ gradebook_export_sort_order_bugfix:
   applies_to: SiteAdmin
   display_name: Gradebook Export Sort Order Bugfix (Tally-219)
   description: Changes the sort order of the gradebook export to more closely match the canvas documentation
+submissions_reupload_status_page:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Submissions Re-Upload Status Page
+  description: Allows the user to navigate away while submission re-uploads are processing

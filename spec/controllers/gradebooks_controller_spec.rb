@@ -1597,6 +1597,60 @@ describe GradebooksController do
     end
   end
 
+  describe "GET 'show_submissions_upload'" do
+    before :once do
+      course_factory
+      assignment_model
+    end
+
+    before :each do
+      Account.site_admin.enable_feature!(:submissions_reupload_status_page)
+      user_session(@teacher)
+    end
+
+    it "assigns the @assignment variable for the template" do
+      get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
+      expect(assigns[:assignment]).to eql(@assignment)
+    end
+
+    it "assigns the @progress variable for the template" do
+      progress = Progress.new(context: @assignment, completion: 100)
+      allow_any_instance_of(Assignment).to receive(:submission_reupload_progress).and_return(progress)
+      get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
+      expect(assigns[:progress]).to eql(progress)
+    end
+
+    it "redirects to the assignment page when the course does not allow gradebook uploads" do
+      allow_any_instance_of(Course).to receive(:allows_gradebook_uploads?).and_return(false)
+      get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
+      expect(response).to redirect_to course_assignment_url(@course, @assignment)
+    end
+
+    it "requires authentication" do
+      remove_user_session
+      get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
+      assert_unauthorized
+    end
+
+    it "grants authorization to teachers" do
+      get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
+      expect(response).to be_ok
+    end
+
+    it "returns unauthorized for students" do
+      user_session(@student)
+      get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
+      assert_unauthorized
+    end
+
+    it "returns not_found when the 'submissions_reupload_status_page' feature is off" do
+      Account.site_admin.disable_feature!(:submissions_reupload_status_page)
+      assert_page_not_found do
+        get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
+      end
+    end
+  end
+
   describe "POST 'update_submission'" do
     let(:json) { JSON.parse(response.body) }
 
