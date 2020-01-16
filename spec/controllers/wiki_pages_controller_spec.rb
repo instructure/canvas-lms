@@ -108,6 +108,27 @@ describe WikiPagesController do
     end
 
     describe "immersive reader" do
+      context 'in a sub account' do
+        before do
+          @root_account = Account.create!
+          @sub_account = @root_account.sub_accounts.create!
+
+          @root_account.allow_feature!(:immersive_reader_wiki_pages)
+          @sub_account.enable_feature!(:immersive_reader_wiki_pages)
+
+          @course = @sub_account.courses.create!
+          course_with_teacher(course: @course, active_all: true)
+          @page = @course.wiki_pages.create!(title: "immersive reader", body: "")
+          user_session @teacher
+        end
+
+        it "should render with the proper JS_ENV set" do
+          get 'show', params: {course_id: @course.id, id: @page.url}
+          expect(response).to be_successful
+          expect(controller.js_env[:IMMERSIVE_READER_ENABLED]).to be_truthy
+        end
+      end
+
       context "as a teacher" do
         before do
           course_with_teacher(active_all: true)

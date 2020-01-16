@@ -410,7 +410,7 @@ module Importers
         )
         active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
           context: context, vendor_code: vendor_code, product_code: product_code
-        ).preload(:tool_settings)
+        )
 
 
         if active_proxies.blank?

@@ -27,6 +27,7 @@ import * as flickr from '../../../src/sidebar/actions/flickr'
 import * as files from '../../../src/sidebar/actions/files'
 import * as documents from '../../../src/sidebar/actions/documents'
 import * as context from '../../../src/sidebar/actions/context'
+import * as media from '../../../src/sidebar/actions/media'
 
 describe('sidebarHandlers', () => {
   let handlers, dispatch
@@ -103,11 +104,26 @@ describe('sidebarHandlers', () => {
     testHandler('fetchInitialDocs', documents, 'fetchInitialDocs')
   })
 
-  it('ties documents fetch nest documents to store', () => {
+  it('ties documents fetch next documents to store', () => {
     testHandler('fetchNextDocs', documents, 'fetchNextDocs')
   })
 
   it('ties context change context to store', () => {
     testHandler('onChangeContext', context, 'changeContext', 'newContext')
+  })
+
+  it('ties media fetch initial media to store', () => {
+    testHandler('fetchInitialMedia', media, 'fetchInitialMedia')
+  })
+
+  it('ties media fetch next media to store', () => {
+    testHandler('fetchNextMedia', media, 'fetchNextMedia')
+  })
+
+  it('ties media update media object to store', () => {
+    testHandler('updateMediaObject', media, 'updateMediaObject', {
+      media_object_id: 'm-foo',
+      title: 'new title'
+    })
   })
 })

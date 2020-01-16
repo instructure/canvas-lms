@@ -53,7 +53,7 @@ pipeline {
     // Copied wholesale out of Jenkinsfile, this needs be abstracted if possible
     stage('Checkout Plugins') {
       steps {
-        timeout(time: 3) {
+        timeout(time: 10) {
           script {
             def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
             credentials.fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
@@ -111,9 +111,18 @@ pipeline {
   }
 
   post {
+    success {
+      slackSend(
+        channel: env.SLACK_CHANNEL,
+        color: 'good',
+        message: "[${env.JOB_NAME}] <${env.BUILD_URL}|${env.BUILD_DISPLAY_NAME}> was successful."
+      )
+    }
+
     unsuccessful {
       // copy spec failures to local
       sh 'mkdir -p tmp'
+      // [JIRA CCI-168]: need to handle web container never being spun up
       sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp'
       script {
         def htmlFiles
@@ -131,6 +140,12 @@ pipeline {
           reportName: 'Test Failures'
           ]
       }
+
+      slackSend(
+        channel: env.SLACK_CHANNEL,
+        color: 'danger',
+        message: "[${env.JOB_NAME}] <${env.BUILD_URL}|${env.BUILD_DISPLAY_NAME}> was unsuccessful."
+      )
     }
 
     cleanup {

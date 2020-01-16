@@ -13,7 +13,7 @@
     "test": "yarn test:mocha && yarn test:jest",
     "test:mocha": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/canvas-theme --require jsdom-global/register --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
     "test:mocha:one": "BABEL_ENV=test-node mocha --require @instructure/canvas-theme --require jsdom-global/register --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
-    "test:mocha:debug": "BABEL_ENV=test-node node --inspect-brk node_modules/.bin/mocha --require @instructure/canvas-theme --require jsdom-global/register --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
+    "test:mocha:debug": "BABEL_ENV=test-node mocha --inspect-brk --require @instructure/canvas-theme --require jsdom-global/register --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
     "test:jest": "jest --runInBand",
     "test:cafe": "yarn build:cafe && yarn test:cafe:only",
     "test:cafe:only": "testcafe chrome testcafe/**/*.test.js",
