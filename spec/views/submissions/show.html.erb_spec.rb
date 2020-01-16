@@ -171,6 +171,7 @@ describe "/submissions/show" do
           error: true,
           publication_overlap: 0,
           state: "failure",
+          status: "scored",
           object_id: "123456789",
           student_overlap: 90,
           similarity_score: 92
@@ -184,60 +185,84 @@ describe "/submissions/show" do
       assign(:submission, @submission)
     end
 
-    context "for turnitin" do
+    context "with new similarity icons enabled" do
+      before(:each) do
+        @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+      end
+
+      let(:icon_css_query) { "i.icon-empty" }
+
       it "is present when the plagiarism report is from turnitin" do
-        expect(html.css('.turnitin_score_container_caret').size).to eq 1
-      end
-
-      it "is present when the plagiarism report is blank (defaults to turnitin)" do
-        @submission.turnitin_data.delete(:provider)
-        expect(html.css('.turnitin_score_container_caret').size).to eq 1
-      end
-
-      it "is not present when the plagiarism report is from vericite" do
-        @submission.turnitin_data[:provider] = 'vericite'
-        expect(html.css('.turnitin_score_container_caret').size).to eq 0
-      end
-    end
-
-    context "for vericite" do
-      before :each do
-        @submission.turnitin_data[:provider] = 'vericite'
+        expect(html.css(icon_css_query).size).to eq 1
       end
 
       it "is present when the plagiarism report is from vericite" do
-        expect(html.css('.vericite_score_container_caret').size).to eq 1
+        @submission.turnitin_data[:provider] = "vericite"
+        expect(html.css(icon_css_query).size).to eq 1
       end
 
-      it "is not present when the plagiarism report is from turnitin" do
-        @submission.turnitin_data[:provider] = 'turnitin'
-        expect(html.css('.vericite_score_container_caret').size).to eq 0
+      it "is not present when there is no plagiarism report" do
+        @submission.turnitin_data = {}
+        expect(html.css(icon_css_query).size).to eq 0
       end
+    end
 
-      it "is not present when the plagiarism report is blank (defaults to turnitin)" do
-        @submission.turnitin_data.delete(:provider)
-        expect(html.css('.vericite_score_container_caret').size).to eq 0
-      end
+    context "with new similarity icons disabled" do
+      context "for turnitin" do
+        it "is present when the plagiarism report is from turnitin" do
+          expect(html.css('.turnitin_score_container_caret').size).to eq 1
+        end
 
-      context "when post policies are not enabled" do
-        it "is not present when the assignment is muted" do
-          @assignment.mute!
-          expect(html.css('.vericite_score_container_caret').size).to eq 0
+        it "is present when the plagiarism report is blank (defaults to turnitin)" do
+          @submission.turnitin_data.delete(:provider)
+          expect(html.css('.turnitin_score_container_caret').size).to eq 1
+        end
+
+        it "is not present when the plagiarism report is from vericite" do
+          @submission.turnitin_data[:provider] = 'vericite'
+          expect(html.css('.turnitin_score_container_caret').size).to eq 0
         end
       end
 
-      context "when post policies are enabled" do
-        before(:each) do
-          PostPolicy.enable_feature!
+      context "for vericite" do
+        before :each do
+          @submission.turnitin_data[:provider] = 'vericite'
         end
 
-        it "is present when the submission is posted" do
-          @submission.update!(posted_at: Time.zone.now)
+        it "is present when the plagiarism report is from vericite" do
           expect(html.css('.vericite_score_container_caret').size).to eq 1
         end
 
-        it "is not present when the submission is not posted" do
+        it "is not present when the plagiarism report is from turnitin" do
+          @submission.turnitin_data[:provider] = 'turnitin'
           expect(html.css('.vericite_score_container_caret').size).to eq 0
+        end
+
+        it "is not present when the plagiarism report is blank (defaults to turnitin)" do
+          @submission.turnitin_data.delete(:provider)
+          expect(html.css('.vericite_score_container_caret').size).to eq 0
+        end
+
+        context "when post policies are not enabled" do
+          it "is not present when the assignment is muted" do
+            @assignment.mute!
+            expect(html.css('.vericite_score_container_caret').size).to eq 0
+          end
+        end
+
+        context "when post policies are enabled" do
+          before(:each) do
+            PostPolicy.enable_feature!
+          end
+
+          it "is present when the submission is posted" do
+            @submission.update!(posted_at: Time.zone.now)
+            expect(html.css('.vericite_score_container_caret').size).to eq 1
+          end
+
+          it "is not present when the submission is not posted" do
+            expect(html.css('.vericite_score_container_caret').size).to eq 0
+          end
         end
       end
     end

@@ -311,6 +311,10 @@ class GradeSummaryPresenter
     @all_grading_periods ||= GradingPeriod.for(@context).order(:start_date).to_a
   end
 
+  def show_updated_plagiarism_icons?(plagiarism_data)
+    plagiarism_data.present? && @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
+  end
+
   private
 
   def all_groups

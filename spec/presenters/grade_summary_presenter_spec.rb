@@ -652,4 +652,35 @@ describe GradeSummaryPresenter do
       end
     end
   end
+
+  describe "#show_updated_plagiarism_icons?" do
+    let_once(:actual_plagiarism_data) do
+      {
+        provider: "turnitin",
+        submission_0: { status: "pending" }
+      }
+    end
+    let_once(:course) { Course.create! }
+    let_once(:student) { course.enroll_student(User.create!, enrollment_state: :active).user }
+    let_once(:presenter) { GradeSummaryPresenter.new(course, student, student.id) }
+
+    it "returns false if no plagiarism data is supplied" do
+      course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+      expect(presenter).not_to be_show_updated_plagiarism_icons(nil)
+    end
+
+    it "returns false if vacuous plagiarism data is supplied" do
+      course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+      expect(presenter).not_to be_show_updated_plagiarism_icons({})
+    end
+
+    it "returns false if the new_gradebook_plagiarism_indicator flag is not enabled on the root account" do
+      expect(presenter).not_to be_show_updated_plagiarism_icons(actual_plagiarism_data)
+    end
+
+    it "returns true if given plagiarism data and the new_gradebook_plagiarism_indicator flag is enabled" do
+      course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+      expect(presenter).to be_show_updated_plagiarism_icons(actual_plagiarism_data)
+    end
+  end
 end

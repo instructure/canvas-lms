@@ -153,3 +153,26 @@
   border-width: 1px;
   margin: 5px;
 }
+
+.turnitin_score_container {
+  vertical-align: middle;
+
+  &a {
+    text-decoration: none;
+  }
+
+  i {
+    &.icon-empty,
+    &.icon-oval-half {
+      color: $ic-color-danger;
+    }
+
+    &.icon-certified {
+      color: $ic-color-success;
+    }
+  }
+
+  .turnitin_similarity_score, .turnitin_similarity_score:hover {
+    color: $ic-color-dark;
+  }
+}
