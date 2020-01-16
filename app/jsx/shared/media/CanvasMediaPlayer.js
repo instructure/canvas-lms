@@ -20,12 +20,10 @@ import {oneOf, string} from 'prop-types'
 import I18n from 'i18n!CanvasMediaPlayer'
 import LoadingIndicator from '@instructure/canvas-media/lib/shared/LoadingIndicator'
 import {VideoPlayer} from '@instructure/ui-media-player'
-import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-layout'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 const byBitrate = (a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
-const MAX_ATTEMPTS = 5
 
 export default function CanvasMediaPlayer(props) {
   const sorted_sources = Array.isArray(props.media_sources)
@@ -33,7 +31,6 @@ export default function CanvasMediaPlayer(props) {
     : props.media_sources
   const [media_sources, setMedia_sources] = useState(sorted_sources)
   const [retryTimerId, setRetryTimerId] = useState(0)
-  const [retryAttempt, setRetryAttempt] = useState(0)
   const containerRef = useRef(null)
   const myIframeRef = useRef(null)
 
@@ -44,7 +41,7 @@ export default function CanvasMediaPlayer(props) {
   }, [])
 
   useEffect(() => {
-    if (!props.media_sources.length && retryAttempt < MAX_ATTEMPTS) {
+    if (!props.media_sources.length) {
       fetchSources()
     }
 
@@ -54,7 +51,7 @@ export default function CanvasMediaPlayer(props) {
     // The way this function is setup seems to break things when more exhaustive
     // deps are put in here.  We should investigate more in the future.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [retryAttempt])
+  }, [retryTimerId])
 
   useEffect(() => {
     const player = containerRef.current.querySelector('video')
@@ -81,17 +78,11 @@ export default function CanvasMediaPlayer(props) {
     if (resp && resp.media_sources && resp.media_sources.length) {
       setMedia_sources(resp.media_sources.sort(byBitrate))
     } else {
-      // they're not present yet, try again in a little bit
-      let tid = 0
-      const nextAttempt = retryAttempt + 1
-      if (nextAttempt < MAX_ATTEMPTS) {
-        tid = setTimeout(() => {
-          setRetryAttempt(nextAttempt)
-        }, 2 ** retryAttempt * 1000)
-      } else {
-        setRetryAttempt(nextAttempt)
-      }
-      setRetryTimerId(tid)
+      // if they're not present yet, try again in a little bit
+      await new Promise(resolve => {
+        const tid = setTimeout(resolve, 1000)
+        setRetryTimerId(tid)
+      })
     }
   }
 
@@ -155,22 +146,6 @@ export default function CanvasMediaPlayer(props) {
 
   const includeFullscreen = document.fullscreenEnabled && props.type === 'video'
 
-  function renderNoPlayer() {
-    if (retryAttempt < MAX_ATTEMPTS) {
-      return (
-        <LoadingIndicator
-          translatedTitle={I18n.t('Loading')}
-          size={props.type === 'audio' ? 'x-small' : 'large'}
-        />
-      )
-    }
-    return (
-      <Alert variant="error" margin="small">
-        {I18n.t('Failed retrieving media source')}
-      </Alert>
-    )
-  }
-
   return (
     <div ref={containerRef}>
       {media_sources.length ? (
@@ -180,7 +155,10 @@ export default function CanvasMediaPlayer(props) {
           controls={renderControls}
         />
       ) : (
-        renderNoPlayer()
+        <LoadingIndicator
+          translatedTitle={I18n.t('Loading')}
+          size={props.type === 'audio' ? 'x-small' : 'large'}
+        />
       )}
     </div>
   )

@@ -114,7 +114,6 @@ pipeline {
                 credentials.fetchFromGerrit(gem, 'gems/plugins')
               }
             }
-            credentials.fetchFromGerrit('gergich_user_config', '.')
             credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             sh '''
               mv -v gerrit_builder/canvas-lms/config/* config/
@@ -127,7 +126,6 @@ pipeline {
               cp -v config/domain.yml.example config/domain.yml
               cp -v config/external_migration.yml.example config/external_migration.yml
               cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml
-              cp -v ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config/gergich_user_config.yml
             '''
           }
         }

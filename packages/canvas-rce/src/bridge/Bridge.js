@@ -141,10 +141,6 @@ export default class Bridge {
     }
   }
 
-  insertFileLink = (link, fromTray = true) => {
-    return this.insertLink(link, fromTray)
-  }
-
   insertImage(image) {
     if (this.focusedEditor) {
       this.focusedEditor.insertImage(image)

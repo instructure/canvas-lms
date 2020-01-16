@@ -43,7 +43,6 @@ module Api::V1::AssignmentGroup
       # Preload assignments' post policies for Assignment#assignment_json.
       if assignments.present? && assignments.first.context.post_policies_enabled?
         ActiveRecord::Associations::Preloader.new.preload(assignments, :post_policy)
-        Assignment.preload_unposted_anonymous_submissions(assignments)
       end
 
       user_content_attachments = opts[:preloaded_user_content_attachments]

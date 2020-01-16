@@ -112,7 +112,6 @@ describe('RCE Plugins > Filter', () => {
 
     it('does not change sort value when changed', () => {
       selectContentType('User Files')
-      selectContentSubtype('Documents')
       selectSortBy('Date Published')
       selectContentType('Links')
       expect(currentFilterSettings.sortValue).toEqual('date_published')
@@ -198,7 +197,6 @@ describe('RCE Plugins > Filter', () => {
     })
 
     it('does not change sort value when changed', () => {
-      selectContentSubtype('Documents')
       selectSortBy('Date Published')
       expect(currentFilterSettings.sortValue).toEqual('date_published')
       selectContentSubtype('Media')
@@ -210,7 +208,6 @@ describe('RCE Plugins > Filter', () => {
     beforeEach(() => {
       renderComponent({userContextType: 'course'})
       selectContentType('Course Files')
-      selectContentSubtype('Documents')
     })
 
     it('is visible when the Content Type is "Files"', () => {

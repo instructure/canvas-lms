@@ -905,26 +905,3 @@ export function fetchMedia(state) {
     }, FAKE_TIMEOUT)
   })
 }
-
-export function updateMediaObject(state, {media_object_id, title}) {
-  // eslint-disable-next-line no-unused-vars
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve({
-        id: media_object_id,
-        title,
-        media_type: 'video',
-        date: '2019-10-29T13:08:36Z',
-        published: true
-      })
-    }, FAKE_TIMEOUT)
-  })
-}
-
-export function updateMediaObjectFailure() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject()
-    }, FAKE_TIMEOUT)
-  })
-}

@@ -1,18 +1,6 @@
 {
-    "accessibility_checker_b3af1f6c": {
-        "message": "Erişilebilirlik Kontrolü"
-    },
     "add_8523c19b": {
         "message": "Ekle"
-    },
-    "add_cc_subtitles_55f0394e": {
-        "message": "Alt yazı ekle"
-    },
-    "add_to_do_7537af64": {
-        "message": "Yapılacaklar listesi ekle"
-    },
-    "add_to_do_7def3c37": {
-        "message": "Yapılacaklar listesi ekle"
     },
     "address_3159962f": {
         "message": "Adres:"
@@ -38,20 +26,11 @@
     "all_day_fb42c4fc": {
         "message": "Tüm Gün"
     },
-    "all_items_loaded_aa256183": {
-        "message": "Tüm öğeler yüklendi"
-    },
     "alphabetical_55b5b4e0": {
         "message": "Alfabetik"
     },
     "alt_text_611fb322": {
         "message": "Etiket Metni"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Fırsatı gözardı etmeye çalışırken bir hata oluştu."
-    },
-    "an_error_occurred_generating_the_file_preview_cf259955": {
-        "message": "Dosya ön izlemesi oluşturulurken hata oluştu"
     },
     "announcement_fb4cb645": {
         "message": "Duyuru"
@@ -65,9 +44,6 @@
     "apps_54d24a47": {
         "message": "Uygulamalar"
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "Bu planlayıcı öğesini silmek istediğinize emin misiniz?"
-    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Genişleme oranı korumalıdır"
     },
@@ -76,18 +52,6 @@
     },
     "assignments_1e02582c": {
         "message": "Ödevler"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title },  { datetime } da tüm gün."
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }, { datetime } da."
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title },  { datetime } ''da { endTime } ''a kadar"
     },
     "calendar_a8563bb2": {
         "message": "Takvim:"
@@ -104,15 +68,6 @@
     "canvas_plugins_705a5016": {
         "message": "Canvas Eklentileri"
     },
-    "choose_caption_file_9c45bc4e": {
-        "message": "Alt yazı dosyasını seçin"
-    },
-    "circle_unordered_list_9e3a0763": {
-        "message": "sıralanmamış listeyi yuvarlak içine al"
-    },
-    "clear_selected_file_82388e50": {
-        "message": "Seçili dosyayı temizle"
-    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Herhangi bir sayfaya bağlantı eklemek için ilgili sayfaya tıklayın."
     },
@@ -122,23 +77,11 @@
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Düzenleyiciye bağlantı eklemek için tıklayın."
     },
-    "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
-        "message": "Bir menü ya da diyalog kapatır. Ayrıca sizi düzenleme alanına götürür"
-    },
     "close_d634289d": {
         "message": "Kapat"
     },
     "collaborations_5c56c15f": {
         "message": "İşbirliğine Yönelik Çalışmalar"
-    },
-    "collapse_to_hide_types_1ab46d2e": {
-        "message": "{ types } gizlemek için daraltın"
-    },
-    "computer_1d7dfa6f": {
-        "message": "Bilgisayar"
-    },
-    "content_subtype_5ce35e88": {
-        "message": "İçerik Alt Türü"
     },
     "content_type_2cf90d95": {
         "message": "İçerik Tipi"
@@ -152,38 +95,17 @@
     "course_8a63b4a3": {
         "message": "Ders"
     },
-    "course_documents_104d76e0": {
-        "message": "Ders Belgeleri"
-    },
     "course_files_62deb8f8": {
         "message": "Ders Dosyaları"
-    },
-    "course_images_f8511d04": {
-        "message": "Ders Görselleri"
-    },
-    "course_links_b56959b9": {
-        "message": "Ders Bağlantıları"
-    },
-    "course_media_ec759ad": {
-        "message": "Ders Medyası"
     },
     "course_navigation_dd035109": {
         "message": "Ders Gezinme Menüsü"
     },
-    "current_volume_level_c55ab825": {
-        "message": "Mevcut Ses Seviyesi"
-    },
     "custom_6979cd81": {
         "message": "Özelleştir"
     },
-    "date_added_ed5ad465": {
-        "message": "Eklendiği Tarih"
-    },
     "date_ee500367": {
         "message": "Tarih"
-    },
-    "date_published_371c4ad0": {
-        "message": "Yayınlama Tarihi"
     },
     "decrease_indent_de6343ab": {
         "message": "İçerden başlatma sınırını azalt"
@@ -209,20 +131,8 @@
     "discussions_index_6c36ced": {
         "message": "Tartışma Başlıkları"
     },
-    "display_options_315aba85": {
-        "message": "Gösterim Seçenekleri"
-    },
-    "documents_81393201": {
-        "message": "Belgeler"
-    },
     "done_54e3d4b6": {
         "message": "Tamam"
-    },
-    "drag_a_file_here_1bf656d5": {
-        "message": "Buraya bir Dosya Sürükleyin"
-    },
-    "drag_a_file_here_39357b48": {
-        "message": "Buraya bir Dosya Sürükleyin"
     },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
@@ -236,23 +146,8 @@
     "edit_c5fbea07": {
         "message": "Düzenle"
     },
-    "edit_link_7f53bebb": {
-        "message": "Bağlantıyı Düzenle"
-    },
-    "embed_828fac4a": {
-        "message": "Göm"
-    },
     "embed_image_1080badc": {
         "message": "Görsel Ekle"
-    },
-    "embed_options_tray_901cfd19": {
-        "message": "Gömme Seçenekleri Yan Menüsü"
-    },
-    "embed_preview_2d741e1f": {
-        "message": "Gömme Önizleme"
-    },
-    "embed_video_code_703e10f2": {
-        "message": "Video Kodunu Göm"
     },
     "excused_cf8792eb": {
         "message": "Mazeretli"
@@ -260,38 +155,11 @@
     "external_links_3d9f074e": {
         "message": "Harici Bağlantılar"
     },
-    "extra_large_b6cdf1ff": {
-        "message": "Ekstra Büyük"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Yapılacak öğesi silinemedi"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Yeni etkinliği alma başarısız"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Fırsatların yüklenmesi başarısız"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Yapılacak öğesi kaydedilemedi"
-    },
-    "feedback_6dcc1991": {
-        "message": "Geribildirim"
-    },
-    "file_name_8fd421ff": {
-        "message": "Dosya adı"
-    },
-    "file_url_c12b64be": {
-        "message": "Dosya URL"
-    },
     "files_c300e900": {
         "message": "Dosyalar"
     },
     "files_index_af7c662b": {
         "message": "Dosya Başlıkları"
-    },
-    "finish_bc343002": {
-        "message": "Tamamla"
     },
     "generating_preview_45b53be0": {
         "message": "Oluşturma önizlemesi..."
@@ -304,24 +172,6 @@
     },
     "group_navigation_99f191a": {
         "message": "Grup Gezinme Menüsü"
-    },
-    "heading_2_5b84eed2": {
-        "message": "Başlık 2"
-    },
-    "heading_3_2c83de44": {
-        "message": "Başlık 3"
-    },
-    "heading_4_b2e74be7": {
-        "message": "Başlık 4"
-    },
-    "height_69b03e15": {
-        "message": "Yükseklik"
-    },
-    "image_options_5412d02c": {
-        "message": "Görsel Seçenekleri"
-    },
-    "image_options_tray_90a46006": {
-        "message": "Görsel Seçenekleri Yan Menüsü"
     },
     "images_7ce26570": {
         "message": "Görseller"
@@ -338,29 +188,17 @@
     "insert_math_equation_57c6e767": {
         "message": "Matematik Denklemi Ekle"
     },
-    "invalid_file_c11ba11": {
-        "message": "Geçersiz Dosya"
-    },
     "invalid_file_type_881cc9b2": {
         "message": "Geçersiz dosya türü"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Klavye Kısayolları"
     },
-    "large_9c5e80e7": {
-        "message": "Büyük"
-    },
     "late_2be42b88": {
         "message": "Geç"
     },
-    "left_to_right_d6da6d7e": {
-        "message": "soldan sağa"
-    },
     "link_7262adec": {
         "message": "Bağlantı"
-    },
-    "link_options_a16b758b": {
-        "message": "Bağlantı Seçenekleri"
     },
     "link_to_other_content_in_the_course_879163b5": {
         "message": "Ders içindeki başka bir içeriğe bağla."
@@ -370,9 +208,6 @@
     },
     "links_14b70841": {
         "message": "Bağlantılar"
-    },
-    "load_more_35d33c7": {
-        "message": "Daha Fazla Yükle"
     },
     "load_more_a36f9cf9": {
         "message": "Daha fazla yükle"
@@ -407,6 +242,9 @@
     "modules_c4325335": {
         "message": "Modüller"
     },
+    "my_files_eea33f44": {
+        "message": "Dosyalarım"
+    },
     "new_13daf639": {
         "message": "Yeni"
     },
@@ -415,9 +253,6 @@
     },
     "next_month_749b1778": {
         "message": "Sonraki Hafta"
-    },
-    "next_page_d2a39853": {
-        "message": "Sonraki Sayfa"
     },
     "no_results_940393cf": {
         "message": "Sonuç yok."
@@ -451,9 +286,6 @@
     },
     "previous_month_bb1e3c84": {
         "message": "Önceki Hafta"
-    },
-    "previous_page_928fc112": {
-        "message": "Önceki Sayfa"
     },
     "pts_699bd9aa": {
         "message": "not"
@@ -515,9 +347,6 @@
     "title_is_required_6ddcab69": {
         "message": "başlık gereklidir"
     },
-    "to_be_posted_when_d24bf7dc": {
-        "message": "Gönderileceği zaman: { when }"
-    },
     "to_do_1d554f36": {
         "message": "Yapılacaklar"
     },
@@ -527,91 +356,22 @@
     "tomorrow_9a6c9a00": {
         "message": "Yarın"
     },
-    "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
-        "message": "{ totalResults } rsonuç bulundu, { numDisplayed } sonuç halihazırda gösteriliyor"
-    },
-    "tray_839df38a": {
-        "message": "Yan menü"
-    },
-    "type_control_f9_to_access_image_options_text_a47e319f": {
-        "message": "görsel seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
-    },
-    "type_control_f9_to_access_link_options_text_4ead9682": {
-        "message": "Erişim bağlantısı seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
-    },
-    "type_control_f9_to_access_table_options_text_92141329": {
-        "message": "Erişim tablosu seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
-    },
     "unpublished_dfd8801": {
         "message": "yayınlanmadı"
-    },
-    "untitled_16aa4f2b": {
-        "message": "Başlıksız"
-    },
-    "upload_document_253f0478": {
-        "message": "Belge Yükle"
     },
     "upload_file_fd2361b8": {
         "message": "Dosya Yükle"
     },
-    "upload_image_6120b609": {
-        "message": "Görsel Yükle"
-    },
     "upload_media_ce31135a": {
         "message": "Ortama Yükle"
     },
-    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
-        "message": "Büyük harf alfabetik sıralı liste"
-    },
     "url_22a5f3b8": {
         "message": "URL"
-    },
-    "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
-        "message": "Ekran okuyucuları tarafından bir görselin içeriğini açıklamak için kullanılır"
-    },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Ekran okuyucuları tarafından videoyu açıklamak için kullanılır"
-    },
-    "user_documents_c206e61f": {
-        "message": "Kullanıcı Belgeleri"
-    },
-    "user_images_b6490852": {
-        "message": "Kullanıcı Görselleri"
-    },
-    "user_media_14fbf656": {
-        "message": "Kullanıcı Medya Dosyası"
-    },
-    "video_options_24ef6e5d": {
-        "message": "Video Seçenekleri"
-    },
-    "video_options_tray_3b9809a5": {
-        "message": "Video Seçenekleri Yan Menüsü"
-    },
-    "video_player_b371005": {
-        "message": "Video Oynatıcı"
-    },
-    "view_keyboard_shortcuts_34d1be0b": {
-        "message": "Klavye Kısayollarını Göster"
-    },
-    "webcam_fe91b20f": {
-        "message": "Web Kamerası"
-    },
-    "width_492fec76": {
-        "message": "Genişlik"
-    },
-    "width_and_height_must_be_numbers_110ab2e3": {
-        "message": "Genişlik ve yükseklik rakam olmalı"
-    },
-    "width_x_height_px_ff3ccb93": {
-        "message": "{ width } x { height }px"
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki Ana Sayfası"
     },
     "yesterday_c6bd6abf": {
         "message": "Dün"
-    },
-    "your_webcam_may_already_be_in_use_6cd64c25": {
-        "message": "Web kameranız kullanılıyor olabilir."
     }
 }

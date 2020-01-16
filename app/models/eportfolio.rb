@@ -59,7 +59,6 @@ class Eportfolio < ActiveRecord::Base
   end
 
   scope :active, -> { where("eportfolios.workflow_state<>'deleted'") }
-  scope :flagged_or_marked_as_spam, -> { where(spam_status: ['flagged_as_possible_spam', 'marked_as_spam']) }
 
   before_create :assign_uuid
   def assign_uuid
@@ -68,7 +67,7 @@ class Eportfolio < ActiveRecord::Base
   protected :assign_uuid
 
   set_policy do
-    given { |user| user&.eportfolios_enabled? && !user.eportfolios.active.flagged_or_marked_as_spam.exists? }
+    given {|user| user && user.eportfolios_enabled? }
     can :create
 
     # User is the author and eportfolios are enabled (whether this eportfolio

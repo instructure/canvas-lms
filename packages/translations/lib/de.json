@@ -470,15 +470,6 @@
     "group_navigation_99f191a": {
         "message": "Gruppennavigation"
     },
-    "heading_2_5b84eed2": {
-        "message": "Überschrift 2"
-    },
-    "heading_3_2c83de44": {
-        "message": "Überschrift 3"
-    },
-    "heading_4_b2e74be7": {
-        "message": "Überschrift 4"
-    },
     "height_69b03e15": {
         "message": "Höhe"
     },
@@ -611,8 +602,20 @@
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Mindestgröße ist { width } x { height } px."
     },
+    "my_documents_77a74ff3": {
+        "message": "Meine Dokumente"
+    },
+    "my_files_eea33f44": {
+        "message": "Meine Dateien"
+    },
     "my_grades_98834476": {
         "message": "Meine Noten"
+    },
+    "my_images_427f9b0c": {
+        "message": "Meine Bilder"
+    },
+    "my_media_82bade11": {
+        "message": "Meine Medien"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigieren Sie durch das Menü oder die Symbolleiste"

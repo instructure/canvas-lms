@@ -43,8 +43,7 @@ export default class EditCalendarEventDetails {
         contexts: this.event.possibleContexts(),
         lockedTitle: this.event.lockedTitle,
         location_name: this.event.location_name,
-        date: this.event.startDate(),
-        is_child: this.event.object.parent_event_id != null
+        date: this.event.startDate()
       })
     )
     $(selector).append(this.$form)

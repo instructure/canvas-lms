@@ -54,8 +54,7 @@ export default class TrayController {
     this._editor = editor
     this.$videoContainer = editor.selection.getNode()
     this._shouldOpen = true
-    const trayProps = bridge.trayProps.get(editor)
-    this._renderTray(trayProps)
+    this._renderTray()
   }
 
   hideTrayForEditor(editor) {
@@ -66,67 +65,45 @@ export default class TrayController {
 
   _applyVideoOptions(videoOptions) {
     if (this.$videoContainer && this.$videoContainer.firstElementChild?.tagName === 'IFRAME') {
-      if (videoOptions.displayAs === 'embed') {
-        const styl = {
-          height: `${videoOptions.appliedHeight}px`,
-          width: `${videoOptions.appliedWidth}px`
-        }
-        this._editor.dom.setStyles(this.$videoContainer, styl)
-        this._editor.dom.setStyles(this.$videoContainer.firstElementChild, styl)
-
-        const title = videoOptions.titleText
-        this._editor.dom.setAttrib(this.$videoContainer, 'data-mce-p-title', title)
-        this._editor.dom.setAttrib(
-          this.$videoContainer,
-          'data-mce-p-data-titleText',
-          videoOptions.titleText
-        )
-        this._editor.dom.setAttrib(this.$videoContainer.firstElementChild, 'title', title)
-        this._editor.dom.setAttrib(
-          this.$videoContainer.firstElementChild,
-          'data-titleText',
-          videoOptions.titleText
-        )
-
-        // tell tinymce so the context toolbar resets
-        this._editor.fire('ObjectResized', {
-          target: this.$videoContainer,
-          width: videoOptions.appliedWidth,
-          height: videoOptions.appliedHeight
-        })
-      } else {
-        const href = this._editor.dom.getAttrib(this.$videoContainer, 'data-mce-p-src')
-        const title =
-          videoOptions.titleText ||
-          this._editor.dom.getAttrib(this.$videoContainer.firstElementChild, 'title')
-        const link = document.createElement('a')
-        link.setAttribute('href', href)
-        link.setAttribute('target', '_blank')
-        link.setAttribute('rel', 'noreferrer noopener')
-        link.textContent = title
-        this._editor.dom.replace(link, this.$videoContainer)
-        this._editor.selection.select(link)
-        this.$videoContainer = null
+      const styl = {
+        height: `${videoOptions.appliedHeight}px`,
+        width: `${videoOptions.appliedWidth}px`
       }
+      this._editor.dom.setStyles(this.$videoContainer, styl)
+      this._editor.dom.setStyles(this.$videoContainer.firstElementChild, styl)
+
+      const title = videoOptions.titleText
+      this._editor.dom.setAttrib(this.$videoContainer, 'data-mce-p-title', title)
+      this._editor.dom.setAttrib(
+        this.$videoContainer,
+        'data-mce-p-data-titleText',
+        videoOptions.titleText
+      )
+      this._editor.dom.setAttrib(this.$videoContainer.firstElementChild, 'title', title)
+      this._editor.dom.setAttrib(
+        this.$videoContainer.firstElementChild,
+        'data-titleText',
+        videoOptions.titleText
+      )
+
+      // tell tinymce so the context toolbar resets
+      this._editor.fire('ObjectResized', {
+        target: this.$videoContainer,
+        width: videoOptions.appliedWidth,
+        height: videoOptions.appliedHeight
+      })
     }
-    videoOptions.updateMediaObject({
-      media_object_id: videoOptions.media_object_id,
-      title: videoOptions.titleText
-    })
     this._dismissTray()
   }
 
   _dismissTray() {
-    if (this.$videoContainer) {
-      this._editor.selection.select(this.$videoContainer)
-    }
+    this._editor.selection.select(this.$videoContainer)
     this._shouldOpen = false
     this._renderTray()
     this._editor = null
   }
 
-  _renderTray(trayProps) {
-    let vo = {}
+  _renderTray() {
     // we will need this element when we do tracks but not for now.
     // const $video = this._editor.selection.getNode()
 
@@ -137,13 +114,12 @@ export default class TrayController {
        * be used for initial video options.
        */
       this._renderId++
-      vo = asVideoElement(this.$videoContainer)
     }
 
     const element = (
       <VideoOptionsTray
         key={this._renderId}
-        videoOptions={vo}
+        videoOptions={asVideoElement(this.$videoContainer)}
         onEntered={() => {
           this._isOpen = true
         }}
@@ -156,7 +132,6 @@ export default class TrayController {
         }}
         onRequestClose={() => this._dismissTray()}
         open={this._shouldOpen}
-        trayProps={trayProps}
       />
     )
     ReactDOM.render(element, this.$container)

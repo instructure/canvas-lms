@@ -25,7 +25,6 @@
   "audio_and_video_recording_is_not_available_c7173efc": {
     "message": "Audio and Video recording is not available."
   },
-  "audio_player_for_title_20cc70d": { "message": "Audio player for { title }" },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Automatically open an in-line preview. (Preview displays only after saving)"
   },
@@ -81,7 +80,6 @@
     "message": "default numerical ordered list"
   },
   "describe_the_image_e65d2e32": { "message": "(Describe the image)" },
-  "describe_the_video_2fe8f46a": { "message": "(Describe the video)" },
   "dimensions_45ddb7b7": { "message": "Dimensions" },
   "directionality_ebcae6d0": { "message": "directionality" },
   "disable_in_line_preview_2a675175": { "message": "Disable in-line preview." },
@@ -113,7 +111,6 @@
   "embed_image_1080badc": { "message": "Embed Image" },
   "embed_options_tray_901cfd19": { "message": "Embed Options Tray" },
   "embed_preview_2d741e1f": { "message": "Embed Preview" },
-  "embed_video_a97a64af": { "message": "Embed Video" },
   "embed_video_code_703e10f2": { "message": "Embed Video Code" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Error uploading video/audio recording"
@@ -148,9 +145,6 @@
   "grades_a61eba0a": { "message": "Grades" },
   "group_files_4324f3df": { "message": "Group Files" },
   "group_navigation_99f191a": { "message": "Group Navigation" },
-  "heading_2_5b84eed2": { "message": "Heading 2" },
-  "heading_3_2c83de44": { "message": "Heading 3" },
-  "heading_4_b2e74be7": { "message": "Heading 4" },
   "height_69b03e15": { "message": "Height" },
   "image_options_5412d02c": { "message": "Image Options" },
   "image_options_tray_90a46006": { "message": "Image Options Tray" },
@@ -188,6 +182,10 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Must be at least { width } x { height }px"
   },
+  "my_documents_77a74ff3": { "message": "My Documents" },
+  "my_files_eea33f44": { "message": "My Files" },
+  "my_images_427f9b0c": { "message": "My Images" },
+  "my_media_82bade11": { "message": "My Media" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },
@@ -310,9 +308,6 @@
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
     "message": "Used by screen readers to describe the content of an image"
   },
-  "used_by_screen_readers_to_describe_the_video_37ebad25": {
-    "message": "Used by screen readers to describe the video"
-  },
   "user_documents_c206e61f": { "message": "User Documents" },
   "user_images_b6490852": { "message": "User Images" },
   "user_media_14fbf656": { "message": "User Media" },
@@ -322,10 +317,6 @@
   "video_options_24ef6e5d": { "message": "Video Options" },
   "video_options_tray_3b9809a5": { "message": "Video Options Tray" },
   "video_player_b371005": { "message": "Video Player" },
-  "video_player_for_9e7d373b": { "message": "Video player for " },
-  "video_player_for_title_ffd9fbc4": {
-    "message": "Video player for { title }"
-  },
   "view_keyboard_shortcuts_34d1be0b": { "message": "View keyboard shortcuts" },
   "webcam_fe91b20f": { "message": "Webcam" },
   "width_492fec76": { "message": "Width" },

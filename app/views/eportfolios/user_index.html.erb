@@ -25,12 +25,10 @@
 
 <h1 class="screenreader-only"><%= t('headers.eportfolios', "ePortfolios") %></h1>
 <% provide :right_side do %>
-  <% if Eportfolio.new.grants_right?(@current_user, :create) %>
-    <a href="#" class="add_eportfolio_link btn button-sidebar-wide">
-      <i class="icon-add"></i>
-      <%= t('links.create', "Create an ePortfolio") %>
-    </a>
-  <% end %>
+  <a href="#" class="add_eportfolio_link btn button-sidebar-wide">
+    <i class="icon-add"></i>
+    <%= t('links.create', "Create an ePortfolio") %>
+  </a>
 <% end %>
 
 <% if @portfolios.empty? %>

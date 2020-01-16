@@ -148,9 +148,6 @@
   "grades_a61eba0a": { "message": "Marks" },
   "group_files_4324f3df": { "message": "Group Files" },
   "group_navigation_99f191a": { "message": "Group Navigation" },
-  "heading_2_5b84eed2": { "message": "Heading 2" },
-  "heading_3_2c83de44": { "message": "Heading 3" },
-  "heading_4_b2e74be7": { "message": "Heading 4" },
   "height_69b03e15": { "message": "Height" },
   "image_options_5412d02c": { "message": "Image Options" },
   "image_options_tray_90a46006": { "message": "Image Options Tray" },
@@ -188,6 +185,10 @@
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Must be at least { width } x { height }px"
   },
+  "my_documents_77a74ff3": { "message": "My Documents" },
+  "my_files_eea33f44": { "message": "My Files" },
+  "my_images_427f9b0c": { "message": "My Images" },
+  "my_media_82bade11": { "message": "My Media" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },

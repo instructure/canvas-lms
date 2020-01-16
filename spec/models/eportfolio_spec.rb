@@ -213,40 +213,6 @@ describe Eportfolio do
         end
       end
     end
-
-    describe ":create" do
-      it "cannot create if eportfolios are disabled" do
-        account = Account.default
-        account.settings[:enable_eportfolios] = false
-        account.save!
-        expect(Eportfolio.new.grants_right?(@student, :create)).to be false
-      end
-
-      it "cannot create if the user has another eportfolio flagged as possible spam" do
-        @eportfolio.update!(spam_status: 'flagged_as_possible_spam')
-        expect(Eportfolio.new.grants_right?(@student, :create)).to be false
-      end
-
-      it "cannot create if the user has another eportfolio marked as spam" do
-        @eportfolio.update!(spam_status: 'marked_as_spam')
-        expect(Eportfolio.new.grants_right?(@student, :create)).to be false
-      end
-
-      it "can create if the user has another eportfolio marked as safe" do
-        @eportfolio.update!(spam_status: 'marked_as_safe')
-        expect(Eportfolio.new.grants_right?(@student, :create)).to be true
-      end
-
-      it "can create if the user has another eportfolio not marked in any way" do
-        @eportfolio.update!(spam_status: nil)
-        expect(Eportfolio.new.grants_right?(@student, :create)).to be true
-      end
-
-      it "can create if the user has no other eportfolios" do
-        @eportfolio.destroy
-        expect(Eportfolio.new.grants_right?(@student, :create)).to be true
-      end
-    end
   end
 
   describe "#flagged_as_possible_spam?" do

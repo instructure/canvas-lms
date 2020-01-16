@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def ci_node_total = 15; // how many nodes to run on
+def ci_node_total = 10; // how many nodes to run on
 pipeline {
   agent { label 'canvas-docker' }
   options {

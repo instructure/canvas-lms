@@ -171,7 +171,6 @@ describe('FileBrowser', () => {
       const node = wrapper.find('TreeBrowser')
       expect(node.props().collections[0].collections).toEqual([1, 3])
       const expected = {
-        api: courseFolder(),
         collections: [2],
         items: [1],
         descriptor: null,
@@ -189,7 +188,6 @@ describe('FileBrowser', () => {
       expect(node.props().collections[1].collections).toEqual([2])
       expect(node.props().collections[1].items).toEqual([1])
       expect(node.props().items[1]).toEqual({
-        api: testFile(),
         id: 1,
         name: 'file 1',
         src: '/courses/1/files/1/preview',

@@ -17,30 +17,15 @@
  */
 
 import React from 'react'
-import {func} from 'prop-types'
 import {View} from '@instructure/ui-layout'
 
 // TODO: should find a better way to share this code
 import FileBrowser from '../../../../../../app/jsx/shared/rce/FileBrowser'
 
-RceFileBrowser.propTypes = {
-  onFileSelect: func.isRequired
-}
-
-export default function RceFileBrowser({onFileSelect}) {
-  function handleFileSelect(fileInfo) {
-    fileInfo.title = fileInfo.name
-    fileInfo.href = fileInfo.api.url
-    onFileSelect({
-      name: fileInfo.name,
-      title: fileInfo.name,
-      href: fileInfo.api.url
-    })
-  }
-
+export default function RceFileBrowser() {
   return (
     <View as="div" margin="medium" data-testid="instructure_links-FilesPanel">
-      <FileBrowser allowUpload={false} selectFile={handleFileSelect} />
+      <FileBrowser allowUpload={false} selectFile={args => console.log('file selected', args)} />
     </View>
   )
 }

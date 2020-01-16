@@ -872,7 +872,7 @@ describe Assignment do
 
   describe '#anonymize_students?' do
     before(:once) do
-      @assignment = @course.assignments.create!
+      @assignment = @course.assignments.build
     end
 
     it 'returns false when the assignment is not graded anonymously' do
@@ -881,69 +881,27 @@ describe Assignment do
 
     context 'when the assignment is anonymously graded' do
       before(:once) do
-        @assignment.update!(anonymous_grading: true)
+        @assignment.anonymous_grading = true
       end
 
-      context "when the assignment is moderated" do
-        before(:each) do
-          @assignment.moderated_grading = true
-        end
-
-        it 'returns true when the assignment is moderated and grades are unpublished' do
-          expect(@assignment).to be_anonymize_students
-        end
-
-        it 'returns false when the assignment is moderated and grades are published' do
-          @assignment.grades_published_at = Time.zone.now
-          expect(@assignment).not_to be_anonymize_students
-        end
+      it 'returns true when the assignment is muted' do
+        @assignment.muted = true
+        expect(@assignment).to be_anonymize_students
       end
 
-      context "when the assignment is unmoderated" do
-        context "when Post Policies is not enabled" do
-          it 'returns true when the assignment is muted' do
-            @assignment.mute!
-            expect(@assignment).to be_anonymize_students
-          end
+      it 'returns false when the assignment is unmuted' do
+        expect(@assignment).not_to be_anonymize_students
+      end
 
-          it 'returns false when the assignment is unmuted' do
-            @assignment.unmute!
-            expect(@assignment).not_to be_anonymize_students
-          end
-        end
+      it 'returns true when the assignment is moderated and grades are unpublished' do
+        @assignment.moderated_grading = true
+        expect(@assignment).to be_anonymize_students
+      end
 
-        context "when Post Policies is enabled" do
-          let(:course) { @assignment.course }
-          let(:active_student) { User.create! }
-          let(:student2) { User.create! }
-          let(:student3) { User.create! }
-
-          before(:each) do
-            course.enable_feature!(:new_gradebook)
-            PostPolicy.enable_feature!
-
-            course.enroll_student(active_student, workflow_state: :active)
-            course.enroll_student(student2, workflow_state: :active)
-            course.enroll_student(student3, workflow_state: :active)
-          end
-
-          it "returns true when at least one active student has an unposted submission" do
-            expect(@assignment).to be_anonymize_students
-          end
-
-          it "returns false when all active submissions are posted" do
-            student2.enrollments.find_by(course: course).conclude
-            student3.enrollments.find_by(course: course).deactivate
-
-            @assignment.post_submissions
-            expect(@assignment).not_to be_anonymize_students
-          end
-
-          it "returns false when all submissions are posted" do
-            @assignment.post_submissions
-            expect(@assignment).not_to be_anonymize_students
-          end
-        end
+      it 'returns false when the assignment is moderated and grades are published' do
+        @assignment.moderated_grading = true
+        @assignment.grades_published_at = Time.zone.now
+        expect(@assignment).not_to be_anonymize_students
       end
     end
   end

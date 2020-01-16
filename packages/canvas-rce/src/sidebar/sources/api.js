@@ -156,7 +156,7 @@ class RceApiSource {
 
   fetchMedia(props) {
     const media = props.media[props.contextType]
-    const uri = media.bookmark || this.uriFor('media_objects', props)
+    const uri = media.bookmark || this.uriFor('media', props)
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
@@ -190,14 +190,6 @@ class RceApiSource {
     }
 
     return this.apiPost(this.baseUri('media_objects'), headerFor(this.jwt), body)
-  }
-
-  updateMediaObject(props, {media_object_id, title}) {
-    const uri = `${this.baseUri(
-      'media_objects',
-      props.host
-    )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
-    return this.apiPost(uri, headerFor(this.jwt), null, 'PUT')
   }
 
   // fetches folders for the given context to upload files to
@@ -366,12 +358,12 @@ class RceApiSource {
   }
 
   // @private
-  apiPost(uri, headers, body, method = 'POST') {
+  apiPost(uri, headers, body) {
     headers = {...headers, 'Content-Type': 'application/json'}
     const fetchOptions = {
-      method,
+      method: 'POST',
       headers,
-      body: body ? JSON.stringify(body) : undefined
+      body: JSON.stringify(body)
     }
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, fetchOptions)
@@ -389,14 +381,13 @@ class RceApiSource {
       .then(checkStatus)
       .then(parseResponse)
       .catch(throwConnectionError)
-      .catch(e => {
+      .catch(_e => {
         this.alertFunc({
           text: formatMessage(
             'Something went wrong uploading, check your connection and try again.'
           ),
           variant: 'error'
         })
-        throw e
         // console.error(e) // eslint-disable-line no-console
       })
   }

@@ -57,7 +57,7 @@ class Assignment < ActiveRecord::Base
     anonymous_instructor_annotations
   ].freeze
 
-  attr_accessor :previous_id, :copying, :user_submitted, :grade_posting_in_progress, :unposted_anonymous_submissions
+  attr_accessor :previous_id, :copying, :user_submitted, :grade_posting_in_progress
   attr_reader :assignment_changed, :posting_params_for_notifications
   attr_writer :updating_user
 
@@ -1428,23 +1428,6 @@ class Assignment < ActiveRecord::Base
       { :wiki_page => :context_module_tags },
       { :quiz => :context_module_tags }
     ])
-  end
-
-  def self.preload_unposted_anonymous_submissions(assignments)
-    assignment_ids_with_unposted_anonymous_submissions = Assignment.
-      where(id: assignments, anonymous_grading: true).
-      where(
-        "EXISTS (?)", Submission.active.unposted.joins(user: :enrollments).
-          where("submissions.user_id = users.id").
-          where("submissions.assignment_id = assignments.id").
-          where("enrollments.course_id = assignments.context_id").
-          where(Enrollment.active_student_conditions)
-      ).
-      pluck(:id).to_set
-
-    assignments.each do |assignment|
-      assignment.unposted_anonymous_submissions = assignment_ids_with_unposted_anonymous_submissions.include?(assignment.id)
-    end
   end
 
   def touch_on_unlock_if_necessary
@@ -3183,27 +3166,14 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # If you're going to be checking this for multiple assignments, you may want
-  # to call .preload_unposted_anonymous_submissions on the lot of them first
   def anonymize_students?
     return false unless anonymous_grading?
 
     # Only anonymize students for moderated assignments if grades have not been published.
-    return !grades_published? if moderated_grading?
-
-    # If Post Policies isn't enabled, we can just check whether the assignment is muted.
-    return muted? unless course.post_policies_enabled?
-
-    # Otherwise, only anonymize students if there's at least one active student with
-    # an unposted submission.
-    unposted_anonymous_submissions?
+    # Only anonymize students for non-moderated assignments if the assignment is muted.
+    moderated_grading? ? !grades_published? : muted?
   end
   alias anonymize_students anonymize_students?
-
-  def unposted_anonymous_submissions?
-    Assignment.preload_unposted_anonymous_submissions([self]) unless defined? @unposted_anonymous_submissions
-    @unposted_anonymous_submissions
-  end
 
   def can_view_student_names?(user)
     return false if anonymize_students?

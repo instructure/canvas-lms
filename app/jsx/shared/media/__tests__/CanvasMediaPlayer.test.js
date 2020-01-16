@@ -17,10 +17,12 @@
  */
 
 import React from 'react'
-import {render, wait, waitForElement, act} from '@testing-library/react'
+import {render, waitForElement, act, cleanup} from '@testing-library/react'
 import {queries as domQueries} from '@testing-library/dom'
 import waitForExpect from 'wait-for-expect'
 import CanvasMediaPlayer, {sizeMediaPlayer} from '../CanvasMediaPlayer'
+
+afterEach(cleanup)
 
 const defaultMediaObject = (overrides = {}) => ({
   bitrate: '12345',
@@ -92,6 +94,7 @@ describe('CanvasMediaPlayer', () => {
       component = render(<CanvasMediaPlayer media_id="dummy_media_id" mediaSources={[]} />)
     })
     expect(component.getByText('Loading')).toBeInTheDocument()
+    component.unmount()
   })
 
   it('makes ajax call if no mediaSources are provided on load', async () => {
@@ -106,11 +109,12 @@ describe('CanvasMediaPlayer', () => {
     expect(await component.findByText('Play')).toBeInTheDocument()
     expect(fetch.mock.calls.length).toEqual(1)
     expect(fetch.mock.calls[0][0]).toEqual('/media_objects/dummy_media_id/info')
+    component.unmount()
   })
 
-  it('retries ajax call if no media_sources on first call', async () => {
+  it('retries ajax call if no mediaSources on first call', async () => {
     fetch.mockResponses(
-      [JSON.stringify({error: 'whoops'}), {status: 503}],
+      [JSON.stringify({media_sources: []}), {status: 503}],
       [JSON.stringify({media_sources: [defaultMediaObject()]}), {status: 200}]
     )
 
@@ -118,40 +122,12 @@ describe('CanvasMediaPlayer', () => {
     act(() => {
       component = render(<CanvasMediaPlayer media_id="dummy_media_id" />)
     })
+
     const playButton = await waitForElement(() => component.getByText('Play'))
 
     expect(playButton).toBeInTheDocument()
     expect(fetch.mock.calls.length).toEqual(2)
-  })
-
-  it('tries ajax call up to 5 times if no media_sources', async () => {
-    fetch.mockResponses(
-      [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 200}]
-    )
-    jest.useFakeTimers()
-    let component
-    await act(async () => {
-      component = render(<CanvasMediaPlayer media_id="dummy_media_id" />)
-      expect(component.getByText('Loading')).toBeInTheDocument()
-      jest.runAllTimers() // triggers useEffect
-      await wait() // render
-      jest.runAllTimers()
-      await wait()
-      jest.runAllTimers()
-      await wait()
-      jest.runAllTimers()
-      await wait()
-      jest.runAllTimers()
-    })
-    const erralert = await waitForElement(() =>
-      component.getByText('Failed retrieving media source')
-    )
-    expect(erralert).toBeInTheDocument()
-    expect(fetch.mock.calls.length).toEqual(5)
+    component.unmount()
   })
 
   it('still says "Loading" if we receive no info from backend', async () => {
@@ -167,8 +143,8 @@ describe('CanvasMediaPlayer', () => {
 
     // even after the server response came back, it should still say Loading
     expect(component.getByText('Loading')).toBeInTheDocument()
+    component.unmount()
   })
-
   describe('sizeMediaPlayer', () => {
     it('sets an audio player size', () => {
       const {width, height} = sizeMediaPlayer({}, 'audio', {})

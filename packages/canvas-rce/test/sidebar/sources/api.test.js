@@ -588,19 +588,4 @@ describe('sources/api', () => {
       })
     })
   })
-
-  describe('media object apis', () => {
-    describe('updateMediaObject', () => {
-      it('PUTs to the media_object endpoint', async () => {
-        const uri = `/api/media_objects/m-id?user_entered_title=${encodeURIComponent('new title')}`
-        fetchMock.put(uri, '{"media_id": "m-id", "title": "new title"}')
-        const response = await apiSource.updateMediaObject(
-          {},
-          {media_object_id: 'm-id', title: 'new title'}
-        )
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
-        assert.deepEqual(response, {media_id: 'm-id', title: 'new title'})
-      })
-    })
-  })
 })

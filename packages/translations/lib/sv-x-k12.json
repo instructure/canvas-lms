@@ -470,15 +470,6 @@
     "group_navigation_99f191a": {
         "message": "Gruppnavigering"
     },
-    "heading_2_5b84eed2": {
-        "message": "Rubrik 2"
-    },
-    "heading_3_2c83de44": {
-        "message": "Rubrik 3"
-    },
-    "heading_4_b2e74be7": {
-        "message": "Rubrik 4"
-    },
     "height_69b03e15": {
         "message": "Höjd"
     },
@@ -611,8 +602,20 @@
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Måste vara minst { width } x { height }pixlar"
     },
+    "my_documents_77a74ff3": {
+        "message": "Mina dokument"
+    },
+    "my_files_eea33f44": {
+        "message": "Mina filer"
+    },
     "my_grades_98834476": {
         "message": "Mina omdömen"
+    },
+    "my_images_427f9b0c": {
+        "message": "Mina bilder"
+    },
+    "my_media_82bade11": {
+        "message": "Min media"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigera via menyn eller verktygsfältet"

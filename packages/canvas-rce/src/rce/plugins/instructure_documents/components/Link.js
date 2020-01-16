@@ -35,7 +35,7 @@ import {isPreviewable} from '../../shared/Previewable'
 
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
-  const {filename, display_name, title, content_type, published, date} = props
+  const {filename, display_name, content_type, published, date} = props
   const Icon = getIconFromType(content_type)
   const color = published ? 'success' : 'primary'
   const dateString = formatMessage.date(Date.parse(date), 'long')
@@ -53,11 +53,7 @@ export default function Link(props) {
       target: '_blank',
       class: clazz,
       text: props.display_name || props.filename, // because onClick only takes a single object
-      content_type: props.content_type, // files have this
-      // media_objects have these
-      title: props.title,
-      type: props.type,
-      embedded_iframe_url: props.embedded_iframe_url
+      content_type: props.content_type
     }
     if (canPreview) {
       attrs['data-canvas-previewable'] = true
@@ -82,7 +78,7 @@ export default function Link(props) {
     dragHtml(e, renderLinkHtml(linkAttrs, linkAttrs.text))
   }
 
-  function handleDragEnd(_e) {
+  function handleDragEnd(e) {
     document.body.click()
   }
 
@@ -133,7 +129,7 @@ export default function Link(props) {
                 </Flex.Item>
                 <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
                   <View as="div" margin="0">
-                    {display_name || title || filename}
+                    {display_name || filename}
                   </View>
                   {dateString ? <View as="div">{dateString}</View> : null}
                 </Flex.Item>

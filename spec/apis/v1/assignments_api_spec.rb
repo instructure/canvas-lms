@@ -2531,17 +2531,6 @@ describe AssignmentsApiController, type: :request do
           call_create({due_at: nil, submission_types: "not_graded"}, 201)
           expect(@course.assignments.last.due_at).to be_nil
         end
-
-        it "ignores setting allowed_attempts to -1 when it's actually nil on the model" do
-          @assignment = @course.assignments.create!(:due_at => 3.days.ago.iso8601)
-          api_call_as_user(@current_user,
-            :put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-            {controller: "assignments_api", action: "update", format: "json", course_id: @course.id.to_s, id: @assignment.to_param},
-            { assignment: {description: "new description", allowed_attempts: -1} }, {},
-            { expected_status: 200 }
-          )
-          expect(@assignment.reload.description).to eq "new description"
-        end
       end
 
       context "when the user is an admin" do

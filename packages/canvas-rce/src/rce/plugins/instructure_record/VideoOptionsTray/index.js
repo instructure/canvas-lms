@@ -26,7 +26,6 @@ import {RadioInput, RadioInputGroup, Select, TextArea} from '@instructure/ui-for
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {Flex, View} from '@instructure/ui-layout'
 import {Tooltip, Tray} from '@instructure/ui-overlays'
-import {StoreProvider} from '../../shared/StoreContext'
 
 import {
   CUSTOM,
@@ -51,8 +50,6 @@ export default function VideoOptionsTray(props) {
   const [videoSize, setVideoSize] = useState(videoOptions.videoSize)
   const [videoHeight, setVideoHeight] = useState(currentHeight)
   const [videoWidth, setVideoWidth] = useState(currentWidth)
-
-  const {trayProps} = props
 
   const dimensionsState = useDimensionsState(videoOptions, {
     minHeight: MIN_HEIGHT,
@@ -81,7 +78,7 @@ export default function VideoOptionsTray(props) {
     }
   }
 
-  function handleSave(event, updateMediaObject) {
+  function handleSave(event) {
     event.preventDefault()
 
     let appliedHeight = videoHeight
@@ -92,12 +89,10 @@ export default function VideoOptionsTray(props) {
     }
 
     props.onSave({
-      media_object_id: props.videoOptions.id,
       titleText,
       appliedHeight,
       appliedWidth,
-      displayAs,
-      updateMediaObject
+      displayAs
     })
   }
 
@@ -137,120 +132,111 @@ export default function VideoOptionsTray(props) {
     (titleText === '' || (videoSize === CUSTOM && !dimensionsState.isValid))
 
   return (
-    <StoreProvider {...trayProps}>
-      {contentProps => (
-        <Tray
-          key="video-options-tray"
-          data-mce-component
-          label={formatMessage('Video Options Tray')}
-          onDismiss={onRequestClose}
-          onEntered={props.onEntered}
-          onExited={props.onExited}
-          open={open}
-          placement="end"
-          shouldCloseOnDocumentClick
-          shouldContainFocus
-          shouldReturnFocus
-        >
-          <Flex direction="column" height="100vh">
-            <Flex.Item as="header" padding="medium">
-              <Flex direction="row">
-                <Flex.Item grow shrink>
-                  <Heading as="h2">{formatMessage('Video Options')}</Heading>
-                </Flex.Item>
-
-                <Flex.Item>
-                  <CloseButton placemet="static" variant="icon" onClick={onRequestClose}>
-                    {formatMessage('Close')}
-                  </CloseButton>
-                </Flex.Item>
-              </Flex>
+    <Tray
+      data-mce-component
+      label={formatMessage('Video Options Tray')}
+      onDismiss={onRequestClose}
+      onEntered={props.onEntered}
+      onExited={props.onExited}
+      open={open}
+      placement="end"
+      shouldCloseOnDocumentClick
+      shouldContainFocus
+      shouldReturnFocus
+    >
+      <Flex direction="column" height="100vh">
+        <Flex.Item as="header" padding="medium">
+          <Flex direction="row">
+            <Flex.Item grow shrink>
+              <Heading as="h2">{formatMessage('Video Options')}</Heading>
             </Flex.Item>
 
-            <Flex.Item as="form" grow margin="none" shrink>
-              <Flex justifyItems="space-between" direction="column" height="100%">
-                <Flex.Item grow padding="small" shrink>
-                  <Flex direction="column">
-                    <Flex.Item padding="small">
-                      <TextArea
-                        aria-describedby="alt-text-label-tooltip"
-                        disabled={displayAs === 'link'}
-                        height="4rem"
-                        label={textAreaLabel}
-                        onChange={handleTitleTextChange}
-                        placeholder={formatMessage('(Describe the video)')}
-                        resize="vertical"
-                        value={titleText}
-                      />
-                    </Flex.Item>
-
-                    <Flex.Item margin="small none none none" padding="small">
-                      <RadioInputGroup
-                        description={formatMessage('Display Options')}
-                        name="display-video-as"
-                        onChange={handleDisplayAsChange}
-                        value={displayAs}
-                      >
-                        <RadioInput label={formatMessage('Embed Video')} value="embed" />
-
-                        <RadioInput
-                          label={formatMessage('Display Text Link (Opens in a new tab)')}
-                          value="link"
-                        />
-                      </RadioInputGroup>
-                    </Flex.Item>
-
-                    <Flex.Item margin="small none xx-small none">
-                      <View as="div" padding="small small xx-small small">
-                        <Select
-                          disabled={displayAs !== 'embed'}
-                          label={formatMessage('Size')}
-                          messages={messagesForSize}
-                          onChange={handleVideoSizeChange}
-                          selectedOption={videoSizeOption}
-                        >
-                          {videoSizes.map(size => (
-                            <option key={size} value={size}>
-                              {labelForImageSize(size)}
-                            </option>
-                          ))}
-                        </Select>
-                      </View>
-
-                      {videoSize === CUSTOM && (
-                        <View as="div" padding="xx-small small">
-                          <DimensionsInput
-                            dimensionsState={dimensionsState}
-                            disabled={displayAs !== 'embed'}
-                            minHeight={MIN_HEIGHT}
-                            minWidth={MIN_WIDTH}
-                          />
-                        </View>
-                      )}
-                    </Flex.Item>
-                  </Flex>
-                </Flex.Item>
-
-                <Flex.Item
-                  background="light"
-                  borderWidth="small none none none"
-                  padding="small medium"
-                  textAlign="end"
-                >
-                  <Button
-                    disabled={saveDisabled}
-                    onClick={event => handleSave(event, contentProps.updateMediaObject)}
-                    variant="primary"
-                  >
-                    {formatMessage('Done')}
-                  </Button>
-                </Flex.Item>
-              </Flex>
+            <Flex.Item>
+              <CloseButton placemet="static" variant="icon" onClick={onRequestClose}>
+                {formatMessage('Close')}
+              </CloseButton>
             </Flex.Item>
           </Flex>
-        </Tray>
-      )}
-    </StoreProvider>
+        </Flex.Item>
+
+        <Flex.Item as="form" grow margin="none" shrink>
+          <Flex justifyItems="space-between" direction="column" height="100%">
+            <Flex.Item grow padding="small" shrink>
+              <Flex direction="column">
+                <Flex.Item padding="small">
+                  <TextArea
+                    aria-describedby="alt-text-label-tooltip"
+                    disabled={displayAs === 'link'}
+                    height="4rem"
+                    label={textAreaLabel}
+                    onChange={handleTitleTextChange}
+                    placeholder={formatMessage('(Describe the video)')}
+                    resize="vertical"
+                    value={titleText}
+                  />
+                </Flex.Item>
+
+                <Flex.Item margin="small none none none" padding="small">
+                  <RadioInputGroup
+                    description={formatMessage('Display Options')}
+                    name="display-video-as"
+                    onChange={handleDisplayAsChange}
+                    value={displayAs}
+                  >
+                    <RadioInput label={formatMessage('Embed Video')} value="embed" />
+
+                    <RadioInput
+                      label={formatMessage('Display Text Link (Opens in a new tab)')}
+                      value="link"
+                    />
+                  </RadioInputGroup>
+                </Flex.Item>
+
+                <Flex.Item margin="small none xx-small none">
+                  <View as="div" padding="small small xx-small small">
+                    <Select
+                      disabled={displayAs !== 'embed'}
+                      label={formatMessage('Size')}
+                      messages={messagesForSize}
+                      onChange={handleVideoSizeChange}
+                      selectedOption={videoSizeOption}
+                    >
+                      {videoSizes.map(size => (
+                        <option key={size} value={size}>
+                          {labelForImageSize(size)}
+                        </option>
+                      ))}
+                    </Select>
+                  </View>
+
+                  {videoSize === CUSTOM && (
+                    <View as="div" padding="xx-small small">
+                      <DimensionsInput
+                        dimensionsState={dimensionsState}
+                        disabled={displayAs !== 'embed'}
+                        minHeight={MIN_HEIGHT}
+                        minWidth={MIN_WIDTH}
+                      />
+                    </View>
+                  )}
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+
+            <Flex.Item
+              background="light"
+              borderWidth="small none none none"
+              padding="small medium"
+              textAlign="end"
+            >
+              <Button disabled={saveDisabled} onClick={handleSave} variant="primary">
+                {formatMessage('Done')}
+              </Button>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+      </Flex>
+    </Tray>
   )
 }
 
@@ -266,11 +252,7 @@ VideoOptionsTray.propTypes = {
   onExited: func,
   onRequestClose: func.isRequired,
   onSave: func.isRequired,
-  open: bool.isRequired,
-  trayProps: shape({
-    host: string.isRequired,
-    jwt: string.isRequired
-  })
+  open: bool.isRequired
 }
 
 VideoOptionsTray.defaultProps = {
