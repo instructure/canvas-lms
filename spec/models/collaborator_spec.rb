@@ -63,10 +63,21 @@ describe Collaborator do
         messages_sent.keys).to include 'Collaboration Invitation'
     end
 
+    it 'should not notify members of a group that have not accepted the course enrollemnt' do
+      group = group_model(:name => 'Test group', :context => @course)
+      user = user_with_pseudonym(:active_all => true)
+      @course.enroll_student(user)
+      group.add_user(user, 'active')
+      @collaboration.update_members([], [group.id])
+      expect(@collaboration.collaborators.detect { |c| c.group_id.present? }.
+        messages_sent.keys).to be_empty
+    end
+
     it 'should not notify members of a group in an unpublished course' do
       group = group_model(:name => 'Test group', :context => @course)
       user = user_with_pseudonym(:active_all => true)
       @course.enroll_student(user)
+      user.enrollments.first.accept!
       @course.update_attribute(:workflow_state, 'claimed')
       group.add_user(user, 'active')
       @collaboration.update_members([], [group.id])
