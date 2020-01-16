@@ -72,6 +72,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string   "login_handle_name"
       t.string   "auth_filter"
       t.string   "requested_authn_context"
+      t.datetime "last_timeout_failure"
     end
 
     add_index "account_authorization_configs", ["account_id"], :name => "index_account_authorization_configs_on_account_id"
@@ -192,6 +193,14 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     end
     add_index :appointment_groups, [:context_id]
     add_index :appointment_groups, [:context_code]
+
+    create_table :appointment_group_contexts do |t|
+      t.references :appointment_group, :limit => 8
+      t.string :context_code
+      t.integer :context_id, :limit => 8
+      t.string :context_type
+      t.timestamps null: true
+    end
 
     create_table :appointment_group_sub_contexts do |t|
       t.references :appointment_group, :limit => 8
@@ -473,6 +482,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "external_feed_id", :limit => 8
       t.integer  "parent_calendar_event_id", :limit => 8
       t.string   "effective_context_code"
+      t.integer  "participants_per_appointment"
+      t.boolean  "override_participants_per_appointment"
     end
 
     add_index "calendar_events", ["cloned_item_id"], :name => "index_calendar_events_on_cloned_item_id"
@@ -551,6 +562,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.float :progress
       t.string :workflow_state
       t.timestamps null: true
+      t.integer :content_migration_id, :limit => 8
     end
 
     add_index :content_exports, [:course_id]
@@ -572,6 +584,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "attachment_id", :limit => 8
       t.integer  "overview_attachment_id", :limit => 8
       t.integer  "exported_attachment_id", :limit => 8
+      t.integer  "source_course_id", :limit => 8
     end
 
     create_table "content_tags", :force => true do |t|
@@ -853,6 +866,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "settings"
       t.integer  "replacement_course_id", :limit => 8
       t.text     "stuck_sis_fields"
+      t.text     "public_description"
     end
 
     add_index "courses", ["abstract_course_id"], :name => "index_courses_on_abstract_course_id"
@@ -943,12 +957,15 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "deleted_at"
       t.string   "migration_id"
       t.integer  "editor_id", :limit => 8
+      t.integer  "root_entry_id", :limit => 8
+      t.integer  "depth"
     end
 
     add_index "discussion_entries", ["attachment_id"], :name => "index_discussion_entries_on_attachment_id"
-    add_index "discussion_entries", ["discussion_topic_id"], :name => "index_discussion_entries_on_discussion_topic_id"
     add_index "discussion_entries", ["user_id"], :name => "index_discussion_entries_on_user_id"
     add_index :discussion_entries, :parent_id
+    add_index :discussion_entries, [:root_entry_id, :workflow_state, :created_at], :name => "index_discussion_entries_root_entry"
+    add_index :discussion_entries, [:discussion_topic_id, :updated_at, :created_at], :name => "index_discussion_entries_for_topic"
 
     create_table "discussion_entry_participants" do |t|
       t.integer "discussion_entry_id", :limit => 8
@@ -987,6 +1004,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean  "podcast_enabled"
       t.boolean  "podcast_has_student_posts"
       t.boolean  "require_initial_post"
+      t.string   "discussion_type"
     end
 
     add_index "discussion_topics", ["attachment_id"], :name => "index_discussion_topics_on_attachment_id"
@@ -999,6 +1017,19 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "discussion_topics", ["user_id"], :name => "index_discussion_topics_on_user_id"
     add_index "discussion_topics", ["workflow_state"], :name => "index_discussion_topics_on_workflow_state"
     add_index :discussion_topics, [:assignment_id]
+
+    # this is fixed in a later migration
+    # rubocop:disable Migration/PrimaryKey
+    create_table :discussion_topic_materialized_views, :id => false do |t|
+      t.integer :discussion_topic_id, :limit => 8
+      t.text :json_structure, :limit => 10.megabytes
+      t.text :participants_array, :limit => 10.megabytes
+      t.text :entry_ids_array, :limit => 10.megabytes
+
+      t.timestamps null: true
+      t.timestamp :generation_started_at
+    end
+    add_index :discussion_topic_materialized_views, :discussion_topic_id, :unique => true, :name => "index_discussion_topic_materialized_views"
 
     create_table "discussion_topic_participants" do |t|
       t.integer "discussion_topic_id", :limit => 8
@@ -1511,25 +1542,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "page_comments", ["page_id", "page_type"], :name => "index_page_comments_on_page_id_and_page_type"
     add_index "page_comments", ["user_id"], :name => "index_page_comments_on_user_id"
 
-    create_table "page_view_ranges", :force => true do |t|
-      t.integer  "context_id", :limit => 8
-      t.string   "context_type"
-      t.integer  "page_view_count"
-      t.integer  "page_participated_count"
-      t.integer  "total_interaction_seconds"
-      t.string   "workflow_state"
-      t.float    "mean_interaction_seconds"
-      t.integer  "developer_key_count"
-      t.datetime "start_at"
-      t.datetime "end_at"
-      t.text     "data"
-      t.datetime "created_at"
-      t.datetime "updated_at"
-    end
-
-    add_index "page_view_ranges", ["context_id", "context_type", "start_at", "end_at"], :name => "by_context_range"
-    add_index "page_view_ranges", ["workflow_state", "updated_at"], :name => "index_page_view_ranges_on_workflow_state_and_updated_at"
-
     create_table "page_views", :id => false, :force => true do |t|
       t.string   "request_id"
       t.string   "session_id"
@@ -1733,6 +1745,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "data",        :limit => 16777215
       t.datetime "created_at"
       t.datetime "updated_at"
+      t.integer  "account_id", :limit => 8
     end
 
     create_table "role_overrides", :force => true do |t|

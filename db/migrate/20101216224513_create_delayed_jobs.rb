@@ -99,6 +99,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.string   "tag"
       t.integer  "max_attempts"
       t.string   "strand"
+      t.integer  "shard_id", :limit => 8
     end
   end
 
