@@ -997,6 +997,10 @@ es:
         bryan_engagement: 
           enrollment_term_ids: 
             field: "Identificaciones del período de inscripción"
+    eportfolio_moderation: 
+      eportfolio_moderation_crumb: "Moderación del ePortfolio"
+      page_title: "Moderación del ePortfolio"
+      title: "Moderación del ePortfolio"
     excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1849,6 +1853,8 @@ es:
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: "Vista del administrador"
   administrator_f325c186: Administrador
+  administrators_and_author_only_flagged_as_possible_42345cba: "Solo administradores y autor (marcado como posible correo no deseado)"
+  administrators_and_author_only_marked_as_spam_184becce: "Solo administradores y autor (marcado como correo no deseado)"
   admins_3e1dce15: Administradores
   admins_add_remove_26811ce5: "Administradores: agregar/eliminar"
   advanced_36b35b8: Avanzado
@@ -2110,10 +2116,10 @@ es:
       Permite al usuario volver a enviar las invitaciones del curso.
   allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "Permite al usuario agregar estudiantes a un curso desde la página Cursos de la cuenta."
   allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: "Permite al usuario agregar profesores, diseñadores de cursos o profesores auxiliares a un curso desde la página Cursos de la cuenta."
-  allows_user_to_configure_alerts_in_course_settings_38675b12: "Permite al usuario configurar alertas en las configuraciones del curso. Las alertas son una funcionalidad que se usa raramente y que está diseñada para enviar un alerta a los estudiantes, profesores o administradores para activaciones específicas (por ejemplo, que no haya interacciones entre los estudiantes y los profesores durante 7 días). Se revisan cada día, y las notificaciones se enviarán al estudiante o al profesor hasta que el problema que generó la activación se resuelva."
+  allows_user_to_configure_alerts_in_course_settings_38675b12: "Permite al usuario configurar alertas en las configuraciones del curso. Las alertas son una funcionalidad que se usa raramente y que está diseñada para enviar un alerta a los estudiantes, profesores o administradores para activaciones específicas (por ejemplo, que no haya interacciones entre los estudiantes y los profesores durante 7 días). Se revisan cada día, y las notificaciones se enviarán al estudiante o al profesor hasta que el problema que generó la activación se resuelva."
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: "Permite al usuario configurar alertas en las configuraciones del curso. Las alertas son una funcionalidad raramente usada que está diseñada para enviar una alerta a estudiantes, profesores o administradores para activaciones específicas (por ejemplo, ninguna interacción entre estudiante y profesor durante 7 días). Se revisan cada día, y las notificaciones se enviarán al estudiante o al profesor hasta que el problema que generó la activación se resuelva."
   allows_user_to_configure_alerts_in_course_settings_806397b5: "Permite al usuario configurar alertas en las Configuraciones del curso. Las alertas son una funcionalidad raramente usada que está diseñada para enviar una alerta a estudiantes, profesores o administradores para activaciones específicas (por ejemplo, ninguna interacción entre estudiante y profesor durante 7 días). Se revisan cada día, y las notificaciones se enviarán al estudiante o al profesor hasta que el problema que generó la activación se resuelva."
-  allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "Permite al usuario configurar alertas en las Configuraciones del curso. Las alertas son una funcionalidad que se usa raramente y que está diseñada para enviar un alerta a los estudiantes, profesores o administradores para activaciones específicas (por ejemplo, que no haya interacciones entre los estudiantes y los profesores durante 7 días). Se revisan cada día, y las notificaciones se enviarán al estudiante o al profesor hasta que el problema que generó la activación se resuelva."
+  allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "Permite al usuario configurar alertas en las Configuraciones del curso. Las alertas son una funcionalidad que se usa raramente y que está diseñada para enviar un alerta a los estudiantes, profesores o administradores para activaciones específicas (por ejemplo, que no haya interacciones entre los estudiantes y los profesores durante 7 días). Se revisan cada día, y las notificaciones se enviarán al estudiante o al profesor hasta que el problema que generó la activación se resuelva."
   allows_user_to_create_accounts_for_new_users_with__30b55094: "Permite al usuario crear cuentas para nuevos usuarios con el botón Agregar personas (Add People) de nivel de la cuenta. Permite al usuario eliminar y fusionar usuarios en una cuenta. Permite al usuario modificar detalles de las cuentas de usuario como nombre, correo electrónico y zona horaria. Permite al usuario ver y modificar información de inicio de sesión de un usuario."
   allows_user_to_create_accounts_for_new_users_with__37a233d7: |-
       Permite al usuario crear cuentas para nuevos usuarios con el botón Agregar personas de nivel de la cuenta.
@@ -2559,6 +2565,7 @@ es:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Las respuestas se mostrarán tras su último intento"
   any_sub_account_ec7069f2: "Cualquier subcuenta"
   any_term_d49af19f: "Cualquier período"
+  anyone_with_a_direct_link_private_b3bc9661: "Cualquier persona con un enlace directo (privado)"
   anyone_with_the_url_9d7e5e07: "Cualquier persona que tenga la URL"
   api_7bd66e19: API
   api_key_eeeb2167: "Clave API"
@@ -3767,6 +3774,7 @@ es:
   authentications_log_ca16ce81: "Registro de autentificación"
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest enviado a IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse de IdP"
+  author_215203d2: Autor
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} acaba de hacer un nuevo comentario sobre la presentación de %{submission_submittor} para %{assignment}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} acaba de comentar en la entrega de %{user_name} para %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} acaba de comentar en la entrega de %{user_name} para %{assignment_title}."
@@ -3950,6 +3958,7 @@ es:
   bookmark_service: 
     default_title: "Sin título"
   bookmark_this_question_bank_dc414a82: "Marcar como favorito este Grupo de Preguntas"
+  bookmarking_for_enrollments_index_api_840be156: "Marcar la API del índice de inscripciones en favoritos"
   bookmarks_5b5b81c9: Favoritos
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Tanto Foros de discusión: crear como Foros de discusión: moderar permiten al usuario crear un foro de discusión en la página Foros de discusión. Si este permiso está habilitado, no se requiere Foros de discusión: crear. Para ver los foros de discusión de un curso, debe estar habilitado Foros de discusión: ver (Discussions - view). Para responder a un foro de discusión, también debe estar habilitado Foros de discusión: publicar (Discussions - post). Para editar los detalles de la tarea en un foro, también debe estar habilitado Tareas y exámenes: agregar/editar/eliminar (Assignments and Quizzes - add / edit / delete)."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
@@ -5226,6 +5235,7 @@ es:
   configure_individual_learning_paths_for_students_b_e2fce294: "Configurar rutas individuales de aprendizaje para los estudiantes sobre la base de los resultados de la evaluación."
   configure_tool_app_3b1bb50b: "¿Configurar la aplicación %{tool}?"
   configure_toolname_app_651371be: "Configurar la aplicación %{toolName}"
+  confirm_as_spam_2f8b7105: "Confirmar como correo no deseado"
   confirm_communication_channel_81c48d08: "Confirmar canal de comunicación"
   confirm_contact_method_29d6fe4b: "Confirmar el método de contacto"
   confirm_delete_6febeafb: "Confirmar eliminación"
@@ -6240,6 +6250,9 @@ es:
     one: "Se encontró 1 conjunto de períodos de calificación."
     other: "Se encontraron %{count} conjuntos de períodos de calificación."
     zero: "No se encontraron conjuntos de períodos de calificación que coincidieran."
+  count_shared_items_loaded_ef94ef6a: 
+    one: "1 ítem compartido cargado."
+    other: "%{count} Ítems compartidos cargados."
   count_students_30e46120: 
     one: "1 estudiante"
     other: "%{count} estudiantes"
@@ -7356,6 +7369,7 @@ es:
   current_total_67bf5f72: "Total actual:"
   current_volume_level_c55ab825: "Nivel de volumen actual"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Actualmente asignado a %{tokenName}, haga clic para eliminar"
+  currently_visible_to_e2f85345: "Actualmente visible para"
   curso_f0ee9b5: Curso
   curve_grades_b7a75443: "Aplicar curva de notas"
   curve_grades_dialog: 
@@ -7675,6 +7689,7 @@ es:
   deleted_content_exceptions_237e809d: "Excepciones de contenidos eliminadas:"
   deleted_content_referenced_in_this_resource_e42d1998: "Contenido eliminado que se menciona en este recurso:"
   deleting_6421031e: eliminando...
+  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Eliminar un usuario destruirá todos su ePortfolios. Alternativamente, los ePortfolios se pueden marcar individualmente como ‘correo no deseado’ o ‘seguros’ para modificar su visibilidad."
   deleting_assignment_22d5851d: "eliminando tarea"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Es necesario configurar los ajustes de Recaptcha en los sitios de demostración. Póngase en contacto con el administrador de su sitio para esta opción de Canvas."
@@ -8749,6 +8764,7 @@ es:
       add_submission: "Agregue la página para la entrega"
       download_eportfolio: "Descargar el portafolio electrónico"
       section_list: "Arrastre para arreglar, haga clic para editar"
+  eportfolio_3c009f9c: Eportfolio
   eportfolio_categories: 
     default_name: "Página nueva"
     errors: 
@@ -8765,6 +8781,7 @@ es:
     click_through: "Haga clic para ver el contenido de la página"
     default_content: "Aún no se ha agregado contenido"
     default_name: "Nombre de la página"
+  eportfolio_moderation_feb0ffd3: "Moderación del ePortfolio"
   eportfolio_settings_75ba1f9a: "Configuraciones del portafolio electrónico"
   eportfolios: 
     _page_section: 
@@ -9085,6 +9102,7 @@ es:
   everyone_854554dd: Todos
   everyone_else_6c6dc7b6: "Todos los demás"
   everyone_else_cc5f6888: "Todos los demás"
+  everyone_public_45ff1f25: "Todos (público)"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   exactly_one_rating_can_have_mastery_c1d87990: "Exactamente una calificación puede tener dominio"
@@ -9120,6 +9138,7 @@ es:
   expanded_f4493860: Expandido
   experimental_graphql_api_75c5eb8f: "API GraphQL EXPERIMENTAL."
   expires_at_6214b43f: "Vence el"
+  explanation_of_statuses_90a26d07: "Explicación de estados:"
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Exportar un cuestionario existente al nuevo formato Evaluaciones 2"
   export_course_content_f4774b74: "Exportar contenido del curso"
   export_de71cd8e: Exportar
@@ -9308,6 +9327,7 @@ es:
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Error al cargar el componente Historial de sincronización. ¿La conexión de su red funciona bien?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Error al cargar el componente Cambios no sincronizados. ¿La conexión de su red funciona bien?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Se ha producido un error. Reporte el siguiente código de error al administrador del sistema: ErrorReport:%{error};"
+  failed_retrieving_media_source_3f0cfd49: "Error al recuperar la fuente multimedia"
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Se ha producido un error. El reporte no pudo generar un archivo. Inténtelo de nuevo."
   failed_to_add_new_feed_ee1c5ea: "No se pudo agregar un nuevo feed"
   failed_to_change_last_attended_date_1e340ba6: "No se pudo cambiar la fecha de la última asistencia"
@@ -9423,6 +9443,7 @@ es:
   file_list_350d08df: "Lista de archivos"
   file_list_updated_38e2a5ad: "Se ha actualizado la lista de archivos"
   file_menu_cc0ca54: "Menú de archivo"
+  file_must_be_an_image_293567a8: "El archivo debe ser una umagen"
   file_name_2fe68ec1: "Nombre del archivo"
   file_name_8fd421ff: "Nombre del archivo"
   file_name_too_long_ea535796: "el nombre del archivo es demasiado largo"
@@ -9620,6 +9641,8 @@ es:
   first_reviewer_9ea05caa: "Primer evaluador"
   first_reviewer_sortorder_e2184140: "Primer evaluador %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, y %{others_count} otros"
+  flagged_as_possible_spam_ebbc4683: "Marcado como posible correo no deseado"
+  flags_new_eportfolio_content_matching_specific_key_a66af560: "Señala nuevo contenido del ePortfolio que coincida con palabras clave como posible correo no deseado, y permite a los administradores confirmar los ePortfolio identificados o marcarlos como seguros."
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
@@ -11386,7 +11409,7 @@ es:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Si no se ha seleccionado ninguno, enviar a todos los usuarios de la subcuenta)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Si no selecciona ninguno, mostrar a todos en la subcuenta completa)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Si no selecciona ninguno, mostrar a todos en la cuenta completa)"
-  if_statistics_view_or_users_manage_login_details_i_66608ce5: "Si se habilita Estadísticas: ver (Statistics - view) o Usuarios: administrar detalles de inicio de sesión (Users - manage login details), un usuario podrá generar la actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar deshabilitados."
+  if_statistics_view_or_users_manage_login_details_i_66608ce5: "Si se habilita Estadísticas: ver (Statistics - view) o Usuarios: administrar detalles de inicio de sesión (Users - manage login details), un usuario podrá generar la actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar deshabilitados."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Si Estadísticas: ver o Usuarios: administrar detalles de inicio de sesión están habilitados, un usuario podrá generar actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar desactivados."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Si la configuración de la cuenta Registro abierta está activada, los usuarios con este permiso pueden agregar estudiantes u observadores a un curso a través de la dirección de correo electrónico o identificador de inicio de sesión incluso si el estudiante o el observador aún no tienen una cuenta de Canvas."
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Si se deshabilita este permiso y se habilita Cursos: agregar/editar/eliminar (Courses - add / edit / delete), los usuarios pueden agregar un curso nuevo con el botón Agregar un curso nuevo (Add a New Course) en Configuraciones de la cuenta."
@@ -11405,7 +11428,7 @@ es:
       Si este permiso está habilitado, los usuarios no necesitan que el permiso Datos del SIS: leer esté habilitado. El permiso de cuenta anula el permiso del curso. Para dejar de permitir a los usuarios administrar las identificaciones del SIS a nivel del curso, deben estar deshabilitados Datos del SIS: administrar y Datos del SIS: leer.
       Para agregar usuarios a cursos a través de las identificaciones del SIS, también deben estar habilitados Usuarios: agregar/eliminar estudiantes de los cursos o Usuarios: agregar/eliminar profesores, diseñadores de cursos o profesores auxiliares de cursos.
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Si Usuarios: administrar detalles de inicio de sesión o Estadísticas: ver están habilitados, un usuario podrá generar actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar desactivados."
-  if_users_manage_login_details_or_statistics_view_i_c5c82003: "Si se habilita Usuarios: administrar detalles de inicio de sesión (Users - manage login details) o Estadísticas: ver (Statistics - view), un usuario podrá generar la actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar deshabilitados."
+  if_users_manage_login_details_or_statistics_view_i_c5c82003: "Si se habilita Usuarios: administrar detalles de inicio de sesión (Users - manage login details) o Estadísticas: ver (Statistics - view), un usuario podrá generar la actividad de inicio/cierre de sesión en Herramientas del administrador. Para ocultar la opción de la actividad de inicio/cierre de sesión en las Herramientas del administrador, estos dos permisos deben estar deshabilitados."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Si modifica el número de puntos posibles de la tarea, las calificaciones existentes serán automáticamente escaladas."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Si modifica el número de puntos posibles de la tarea, deberá calificarla de nuevo."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Si modifica el número de puntos posibles de la tarea, deberá calificar de nuevo cualquier otra entrega."
@@ -11456,6 +11479,7 @@ es:
   images_documents_and_more_dccb362f: "Imágenes, documentos y mucho más"
   immediate_notifications_for_global_announcements_682f5a3d: "Notificaciones inmediatas para los anuncios globales"
   immediately_c128ede6: Inmediatamente
+  immersive_reader_7b87538: "Lector inmersivo"
   immersive_reader_failed_to_load_bc8d4dd4: "Falló la carga del Lector inmersivo"
   import_1b31507: Importar
   import_a_set_of_outcomes_6b782192: "Importar un conjunto de resultados"
@@ -11985,6 +12009,7 @@ es:
       log_in_to_canvas: "Iniciar sesión en Canvas"
   learn_more_7a8d626: "Aprenda más"
   learn_more_about_collaborations_2978f66d: "Aprenda más sobre colaboraciones"
+  learning_analytics_beta_view_46deb4c8: "Analíticas del aprendizaje (Beta): ver"
   learning_mastery_5fc34276: "Dominio del aprendizaje"
   learning_mastery_6ed4fd63: "Dominio del aprendizaje..."
   learning_mastery_gradebook_description: |-
@@ -12502,8 +12527,14 @@ es:
   mark_as_done_6fa48d2f: "Marcar como hecho"
   mark_as_done_779556d7: "marcar como hecho"
   mark_as_read_e7de2ce3: "Marcar como leído"
+  mark_as_safe_c01fea35: "Marcar como seguro"
+  mark_as_spam_9c613d87: "Marcar como correo no deseado"
   mark_as_unread_4a413c41: "Marcar como no leído"
   mark_done_9d81bcd9: "Marcar como hecho"
+  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Marcado como ‘seguro’: Un administrador ha revisado este ePortfolio y lo ha marcado como seguro. Es visible para su audiencia de destino original."
+  marked_as_safe_f7f953df: "Marcado como seguro"
+  marked_as_spam_ab87846d: "Marcado como correo no deseado"
+  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Marcado como ‘correo no deseado’: Un administrador ha revisado este ePortfolio y lo ha marcado como correo no deseado. Solo está visible para el autor original y los administradores."
   marked_done_8f61ebb8: "marcado como hecho"
   marked_done_9fd646f: "Marcado como hecho"
   masquerade_as_name_8bb004c5: "Hacerse pasar por alguien %{name}"
@@ -14943,6 +14974,8 @@ es:
   need_a_canvas_account_221d18ed: "¿Necesita un cuenta de Canvas?"
   need_help_setting_up_your_course_2b763141: "¿Necesita ayuda para instalar su curso?"
   needs_grading_9143d47c: "Necesita calificación"
+  needs_review_flagged_as_possible_spam_233657fb: "Necesita revisión: marcado como posible correo no deseado"
+  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'Necesita revisión: marcado como posible ‘correo no deseado’: Los sistemas de Instructure han identificado que este ePortfolio es un posible correo no deseado y necesita revisión del administrador. Solo está visible para el autor original y los administradores."
   negative_points_fda45730: "Puntos negativos"
   netherlands_14ca4f6d: Holanda
   netherlands_31_63e4f1b9: "Holanda (+31)"
@@ -15157,6 +15190,7 @@ es:
   not_mastered_5c2f9968: "No dominado"
   not_now_97efd947: "Ahora no"
   not_published_73f7079: "No publicado"
+  not_reviewed_c38d9e97: "No revisado"
   not_signed_47acf472: "No firmado"
   not_starred_no_subject_click_to_star_adfefe93: "'No está destacado \"(Sin tema)\". Haga clic para destacar."
   not_starred_no_subject_click_to_star_dc91380: "No está destacado \"(Sin tema)\". Haga clic para destacar."
@@ -19089,6 +19123,7 @@ es:
       manage_wiki: "Manejar las wiki (agregar / editar / borrar páginas)"
       managed_jobs: "Administrar los trabajos del fondo"
       moderate_form: "Moderar foros de discusión (eliminar/editar otras publicaciones, bloquear temas)"
+      moderate_user_content: "Moderar contenido del usuario"
       post_to_forum: "Publicar a foros de discusión"
       read_course_content: "Ver contenido del curso"
       read_course_list: "Ver la lista de los cursos"
@@ -21348,6 +21383,7 @@ es:
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "¡Éxito! Las calificaciones se han publicado en %{postedTo} para %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "¡Logrado! Las calificaciones fueron publicadas en el libro de calificaciones."
   success_the_post_policy_for_name_has_been_updated_ea92283f: "¡Éxito! Se ha actualizado la política de publicaciones para %{name}."
+  success_you_added_hostname_to_the_whitelist_6061236e: "Éxito: Ha agregado a %{hostname} a la lista permitida."
   successfully_added_fb3e6008: "Agregado correctamente"
   successfully_created_a_set_38374719: "Se ha creado un conjunto exitosamente"
   successfully_deleted_discussion_title_a685f345: "Se eliminó el foro de discusión exitosamente %{title}"
@@ -21693,10 +21729,13 @@ es:
   the_selected_group_was_cleared_because_the_student_656e4f1c: "Se borró el grupo seleccionado porque el estudiante que solicitó no se encuentra en ningún grupo. Puede seleccionar un grupo en el Libro de calificaciones."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "La severidad del problema, según lo seleccionado por el usuario desde el menú desplegable."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "El icono de acceso directo a los dispositivos iOS/Android. 180x180 png"
+  the_specified_assignment_could_not_be_found_c5dc34ab: "No se pudo encontrar la tarea especificada"
+  the_specified_assignment_id_could_not_be_found_e4e64f5f: "No se pudo encontrar la tarea especificada (%{id})"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "el archivo especificado con file_id ya tiene un informe de originalidad"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "El usuario especificado (%{id}) no es un estudiante en este curso"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "El usuario especificado no es un estudiante en este curso"
   the_state_parameter_is_required_ffadf213: "El parámetro de estado es obligatorio"
+  the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "La configuración Sincronizar según SIS no se pudo habilitar para la tarea \"%{assignment_name}\" sin una fecha de entrega."
   the_term_has_ended_for_this_course_f0ab367: "El plazo ha terminado para este curso"
   the_title_cannot_be_longer_than_length_characters_7a822943: "El título no puede ser superior a %{length} caracteres"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "El título del siguiente banco de preguntas está truncado: \"%{title}\""
@@ -21850,6 +21889,10 @@ es:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Esto permite una navegación actualizada, un nuevo panel de control  y una apariencia más moderna y simple."
   this_enables_users_to_generate_and_download_course_4c69c531: "Esto permite que los usuarios generen y descarguen cursos en formato ePub."
   this_environment_is_currently_being_updated_with_a_235f1875: "En la actualidad, este entorno se está actualizando con una copia de los últimos datos de producción. Verifique más tarde."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Este ePortfolio se ha marcado como posible correo no deseado. Hasta que sea revisado por un administrador, solo será visible para usted. Contacte a un administrador si tiene alguna pregunta."
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Este ePortfolio se ha identificado como posible correo no deseado. Actualmente solo es visible para los administradores y el autor. Si está seguro de que este contenido no constituye correo no deseado, puede marcarlo como seguro. De lo contrario, puede confirmarlo como correo no deseado."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Este ePortfolio ha sido identificado como correo no deseado, solo es visible para usted. Contacte a un administrador si tiene alguna pregunta."
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Este ePortfolio se ha identificado como correo no deseado. Actualmente solo es visible para los administradores y el autor. Si está seguro de que este contenido no constituye correo no deseado, puede marcarlo como seguro."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Esta funcionalidad permite que los profesores copien fácilmente items individuales de un curso a otro, además de compartir un item individual de contenido con otros usuarios para que puedan importarlo también a sus cursos."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Esta funcionalidad no se puede deshabilitar porque hay al menos una subcuenta o curso con esta funcionalidad habilitada."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "No se puede habilitar esta funcionalidad mientras se encuentra habilitada la autodetección de separadores de campo"
@@ -22821,6 +22864,7 @@ es:
   upload_file_fd2361b8: "Cargar archivo"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Subir archivos presentados con las tareas a una carpeta especial de presentaciones solo para lectura"
   upload_gradebook_386a46c8: "Cargar el Libro de calificaciones"
+  upload_image_6120b609: "Cargar imagen"
   upload_media_ce31135a: "Cargar multimedia"
   upload_not_available_for_this_folder_8f8623c6: "Carga no disponible para esta carpeta"
   upload_successful_ca47465f: "Actualización exitosa"
@@ -22851,6 +22895,7 @@ es:
   use_arrow_keys_to_navigate_options_2021cc50: "Use las teclas de flecha para navegar entre las opciones."
   use_as_front_page_274a488b: "Utilizar como página de información"
   use_between_for_adding_multiple_users_26bff207: "Utilice \",\" entre medio para agregar múltiples usuarios."
+  use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Use los favoritos para marcar la paginación de API en el índice de inscripciones"
   use_default_890939b7: "Usar predeterminado"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Utilice las funciones experimentales antes de que se habiliten completamente en producción"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Utilizar la grabadora HTML5 en el Editor de contenido en lugar del flash"
@@ -23364,6 +23409,7 @@ es:
   users_manage_log_in_details_b944568b: "Usuarios: administrar detalles de inicio de sesión"
   users_manage_login_details_9462b30f: "Usuario:administrar detalles de inicio de sesión"
   users_matching_search_term_c604db9e: "Usuarios que coinciden con \"%{search_term}\""
+  users_moderate_content_36d6eed7: "Usuarios: moderar contenido"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Puede que los usuarios de lectores de pantalla tengan que apagar el cursor virtual con el fin de utilizar estos atajos del teclado"
   users_over_time_9a2ee74a: "Usuarios durante un período"
   users_view_list_861c7a3f: "Usuarios: ver lista"
@@ -23414,6 +23460,7 @@ es:
   view_grades_for_name_45aeb2f2: "Ver calificaciones para %{name}"
   view_grading_history_e64bb8fe: "Ver el historial de calificación"
   view_in_speedgrader_773b9d81: "Ver en SpeedGrader"
+  view_learning_analytics_beta_1c98a397: "Ver analíticas del aprendizaje (Beta)"
   view_login_ids_for_users_142bbe7a: "Ver los identificadores de inicio de sesión de los usuarios"
   view_longer_description_6b762087: "ver una descripción más detallada"
   view_name_app_62a2ad8e: "Ver la aplicación %{name}"
