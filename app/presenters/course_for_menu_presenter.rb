@@ -29,6 +29,7 @@ class CourseForMenuPresenter
   attr_reader :course
 
   def to_h
+    position = @user.dashboard_positions[course.asset_string]
     {
       longName: "#{course.name} - #{course.short_name}",
       shortName: course.nickname_for(@user),
@@ -42,7 +43,7 @@ class CourseForMenuPresenter
       id: course.id,
       isFavorited: course.favorite_for_user?(@user) && @user.account.feature_enabled?(:unfavorite_course_from_dashboard),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
-      position: @user.dashboard_positions[course.asset_string] || nil,
+      position: position.present? ? position.to_i : nil
     }.tap do |hash|
       if @opts[:tabs]
         tabs = course.tabs_available(@user, {
