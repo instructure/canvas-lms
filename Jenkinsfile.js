@@ -42,6 +42,26 @@ def copyFiles(docker_name, docker_dir, host_dir) {
   sh "docker cp \$(docker ps -qa -f name=$docker_name):/usr/src/app/$docker_dir ./$host_dir"
 }
 
+def withSentry(block) {
+  def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+  credentials.withSentryCredentials(block)
+}
+
+def runInSeriesOrParallel(is_series, stages_map) {
+  if (is_series) {
+    echo "running tests in series: ${stages_map.keys}"
+    stages_map.each { name, block ->
+      stage(name) {
+        block()
+      }
+    }
+  }
+  else {
+    echo "running tests in parallel: ${stages_map.keys}"
+    parallel(stages_map)
+  }
+}
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -72,136 +92,73 @@ pipeline {
       steps {
         timeout(time: 60) {
           sh 'build/new-jenkins/docker-compose-pull.sh'
-          sh 'build/new-jenkins/docker-compose-build-up.sh'
+          sh 'docker-compose build'
         }
       }
     }
-    stage('Tests') {
-      parallel {
-        stage('Jest') {
-          environment {
-            CONTAINER_NAME = 'tests-jest'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-jest.sh'
-          }
-          post {
-            always {
-              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-            }
-            success {
-              script {
-                if (env.COVERAGE == "1") {
+
+    stage('Test Stage Coordinator') {
+      steps {
+        script {
+          def tests = [:]
+
+          tests['Jest'] = {
+            withEnv(['CONTAINER_NAME=tests-jest']) {
+              try {
+                withSentry {
+                  sh 'build/new-jenkins/js/tests-jest.sh'
+                }
+                if (env.COVERAGE == '1') {
                   copyFiles(env.CONTAINER_NAME, 'coverage-jest', "./tmp/${env.CONTAINER_NAME}-coverage")
                 }
               }
+              finally {
+                copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+              }
             }
           }
-        }
-        stage('Packages') {
-          environment {
-            CONTAINER_NAME = 'tests-packages'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-packages.sh'
-          }
-          post {
-            always {
-              copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
+
+          tests['Packages'] = {
+            withEnv(['CONTAINER_NAME=tests-packages']) {
+              try {
+                withSentry {
+                  sh 'build/new-jenkins/js/tests-packages.sh'
+                }
+              }
+              finally {
+                copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
+              }
             }
           }
-        }
-        stage('canvas_quizzes') {
-          steps {
+          
+          tests['canvas_quizzes'] = {
             sh 'build/new-jenkins/js/tests-quizzes.sh'
           }
-        }
-        stage('Karma - Spec Group - coffee') {
-          environment {
-            JSPEC_GROUP = 'coffee'
-            CONTAINER_NAME = 'tests-karma-coffee'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-karma.sh'
-          }
-          post {
-            always {
-              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-            }
-            success {
-              script {
-                if (env.COVERAGE == "1") {
-                  copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
+          
+          ['coffee', 'jsa', 'jsg', 'jsh'].each { group ->
+            tests["Karma - Spec Group - ${group}"] = {
+              withEnv(["CONTAINER_NAME=tests-karma-${group}", "JSPEC_GROUP=${group}"]) {
+                try {
+                  withSentry {
+                    sh 'build/new-jenkins/js/tests-karma.sh'
+                  }
+                  if (env.COVERAGE == '1') {
+                    copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
+                  }
+                }
+                finally {
+                  copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
                 }
               }
             }
           }
-        }
-        stage('Karma - Spec Group - jsa - A-F') {
-          environment {
-            JSPEC_GROUP = 'jsa'
-            CONTAINER_NAME = 'tests-karma-jsa'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-karma.sh'
-          }
-          post {
-            always {
-              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-            }
-            success {
-              script {
-                if (env.COVERAGE == "1") {
-                  copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
-                }
-              }
-            }
-          }
-        }
-        stage('Karma - Spec Group - jsg - G') {
-          environment {
-            JSPEC_GROUP = 'jsg'
-            CONTAINER_NAME = 'tests-karma-jsg'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-karma.sh'
-          }
-          post {
-            always {
-              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-            }
-            success {
-              script {
-                if (env.COVERAGE == "1") {
-                  copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
-                }
-              }
-            }
-          }
-        }
-        stage('Karma - Spec Group - jsh - H-Z') {
-          environment {
-            JSPEC_GROUP = 'jsh'
-            CONTAINER_NAME = 'tests-karma-jsh'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-karma.sh'
-          }
-          post {
-            always {
-              copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
-            }
-            success {
-              script {
-                if (env.COVERAGE == "1") {
-                  copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
-                }
-              }
-            }
-          }
+
+          runInSeriesOrParallel(env.COVERAGE == '1', tests)
         }
       }
     }
+
+
     stage('Upload Coverage') {
       when { expression { env.COVERAGE == '1' } }
       steps {

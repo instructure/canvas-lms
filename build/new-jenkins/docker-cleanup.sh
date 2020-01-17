@@ -41,6 +41,20 @@ fi
 # this is here so we dont get a bunch of junk to get printed when parsing args
 set -x -o errexit -o errtrace -o nounset -o pipefail
 
+function docker_env_status {
+  echo "running docker images"
+  docker ps -a || true
+  echo "images locally"
+  docker images -a || true
+  echo "volumes left over"
+  docker volume ls || true
+  echo "networks left over"
+  docker network ls || true
+}
+
+echo "== status before clean"
+docker_env_status
+
 # sometimes things don't cleanup so run this a few times
 if [[ $ALLOW_FAILURE == "1" ]]; then
   docker-compose stop || true
@@ -64,11 +78,5 @@ docker rmi -f $(docker images --all --quiet) || true
 # remove any extra networks (errors saying unable to remove is ok)
 docker network rm $(docker network ls | grep "bridge" | awk '/ / { print $1 }') || true
 
-echo "running docker images"
-docker ps -a || true
-echo "images locally"
-docker images -a || true
-echo "volumes left over"
-docker volume ls || true
-echo "networks left over"
-docker network ls || true
+echo "== status after clean"
+docker_env_status
