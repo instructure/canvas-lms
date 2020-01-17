@@ -28,10 +28,15 @@
   }
 }
 
+// this duplicates the styles that item-groups .ig-header ig-header-title would deliver
+.assignment_group .ig-header-title {
+  flex: 1 1 auto;
+}
+// this duplicates the styles that ig-header-admin should be applying
 .ag-header-controls {
-  position: absolute;
-  top: 0;
-  #{direction(right)}: 0;
+  flex: 0 0 auto;
+  display: flex;
+  align-self: center;
 }
 
 .loadingIndicator {
@@ -157,9 +162,11 @@
   }
 }
 
+// duplicates the content_next.scss styles for the sortable handle
 .sortable-handle {
-  margin: direction-sides(0 0px 0 -30px);
-  padding: direction-sides(0 0px 0 30px);
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
   a {
     padding: 20px 0px 10px;
   }
@@ -194,10 +201,6 @@
 
 .ag-header-controls .tooltip_link {
   color: #3d454c;
-}
-
-#ag-list {
-  padding-bottom: 100px;
 }
 
 .row-fluid span.grade-display {

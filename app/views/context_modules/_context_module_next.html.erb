@@ -134,8 +134,8 @@
         <button
           aria-label="<%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %>"
           rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items"
-          class="add_module_item_link btn"><i class="icon-plus"></i><span class="screenreader-only"><%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %></span></button>
-        <button class="btn al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>">
+          class="add_module_item_link Button--icon-action"><i class="icon-plus"></i><span class="screenreader-only"><%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %></span></button>
+        <button class="Button--icon-action al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>">
           <i class="icon-more" aria-hidden="true"></i>
         </button>
         <ul class="al-options">
