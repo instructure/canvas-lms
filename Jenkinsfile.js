@@ -20,7 +20,7 @@
 
 def runCoverage() {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  return env.GERRIT_EVENT_TYPE == 'change-merged' || flags.forceRunCoverage() ? '1' : ''
+  return env.RUN_COVERAGE == '1' || flags.forceRunCoverage() ? '1' : ''
 }
 
 def getImageTagVersion() {
