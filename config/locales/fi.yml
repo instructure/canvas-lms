@@ -625,6 +625,10 @@ fi:
               header: "Aloitettu:"
     default_account_quotas_not_updated: "Oletustilin kiintiöitä ei päivitetty"
     default_account_quotas_updated: "Oletustilin kiintiöt päivitetty"
+    eportfolio_moderation: 
+      eportfolio_moderation_crumb: "ePortfolion valvonta"
+      page_title: "ePortfolion valvonta"
+      title: "ePortfolion valvonta"
     find_not_authorized: "Sinulla ei ole valtuuksia tämän %{type} käyttöön"
     find_not_found: "Ei löytynyt %{type} tällä tunnuksella"
     grade_export_csv_description: 
@@ -1225,6 +1229,8 @@ fi:
   admin_tray_3b680e7b: "Järjestelmävalvojan alue"
   admin_user_name_29dd115a: admin_user_name
   administrator_f325c186: Ylläpitäjä
+  administrators_and_author_only_flagged_as_possible_42345cba: "Vain järjestelmäkäyttäjä ja tekijä (merkitty mahdolliseksi roskapostiksi)"
+  administrators_and_author_only_marked_as_spam_184becce: "Vain järjestelmäkäyttäjät ja tekijät ja tekijä (merkitty mahdolliseksi roskapostiksi)"
   admins_3e1dce15: Järjestelmävalvojat
   admins_add_remove_26811ce5: "Pääkäyttäjät - lisää/poista"
   advanced_36b35b8: Edistynyt
@@ -1820,6 +1826,7 @@ fi:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Vastaukset näytetään sinulle viimeisen yrityksen jälkeen"
   any_sub_account_ec7069f2: "Mikä tahansa alitili"
   any_term_d49af19f: "Kaikki kaudet"
+  anyone_with_a_direct_link_private_b3bc9661: "Kaikki, joilla on suora linkki (yksityinen)"
   anyone_with_the_url_9d7e5e07: "Kaikki, joilla on URL"
   api_7bd66e19: API
   api_key_eeeb2167: API-avain
@@ -2776,6 +2783,7 @@ fi:
   authentication_with_provider_was_successful_but_no_6a194137: "Todennus palvelulla %{provider} onnistui, mutta ainutlaatuista tunnusta sisäänkirjautumista varten Canvasiin ei tarjottu."
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest lähetetty IdP:hen"
   authnresponse_from_idp_185037e9: "AuthnResponse IdP:stä"
+  author_215203d2: Laatija
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} antoi juuri uuden kommentin lähetykseen liittyen %{user_name} tehtävälle %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} antoi juuri uuden kommentin lähetykseen liittyen %{user_name} tehtävälle %{assignment_title}"
   author_s_name_b35e905a: "Tekijän nimi"
@@ -2934,6 +2942,7 @@ fi:
   bookmark_bank_46d729be: "Kirjanmerkki %{bank}"
   bookmark_service: 
     default_title: "Ei otsikkoa"
+  bookmarking_for_enrollments_index_api_840be156: "Index APIn rekisteröitymisten kirjanmerkintä"
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Sekä Keskustelut - luo ja Keskustelut - valvo sallivat käyttäjän luovan keskustelun Keskustelut-sivulla. Jos tämä käyttöoikeus on käytössä, Keskustelut - luo ei vaadita. Jos haluat tarkastella keskusteluita kurssilla, Keskustelut - tarkastele täytyy olla käytössä. Jos haluat vastata keskusteluun, Keskustelut - lähetä täytyy myös olla käytössä. Jos haluat muokata tehtävän tietoja keskustelussa, Tehtävät ja kyselyt - lisää/muokkaa/poista täytyy myös olla käytössä."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
       Sekä Keskustelut - luo ja Keskustelut - valvo sallii käyttäjän luovan keskustelun Keskustelut-sivulla. Jos tämä käyttöoikeus on käytössä, Keskustelut - luo on tarpeeton.
@@ -3952,6 +3961,7 @@ fi:
   configure_individual_learning_paths_for_students_b_e2fce294: "Konfiguroi yksilöllisiä oppimispolkuja opiskelijoille arvioinnin tulosten perusteella."
   configure_tool_app_3b1bb50b: "Konfiguroidaanko %{tool} sovellus?"
   configure_toolname_app_651371be: "Konfiguroi %{toolName} sovellus"
+  confirm_as_spam_2f8b7105: "Vahvista roskapostiksi"
   confirm_communication_channel_81c48d08: "Vahvista viestintäkanava"
   confirm_contact_method_29d6fe4b: "Vahvista yhteydenottotapa"
   confirm_delete_6febeafb: "Vahvista poista"
@@ -4737,6 +4747,9 @@ fi:
     one: "1 arvosanojen antojaksojen joukko löytyi."
     other: "%{count} arvosanojen antojaksojen joukkoa löytyi."
     zero: "Ei löytynyt arvosanojen antojaksojen täsmääviä joukkoja."
+  count_shared_items_loaded_ef94ef6a: 
+    one: "1 jaettu kohde ladattu."
+    other: "%{count} jaettu kohde ladattu."
   count_students_30e46120: 
     one: "1 opiskelija"
     other: "%{count} opiskelijaa"
@@ -5591,6 +5604,7 @@ fi:
   current_theme_62e5e8cf: "Nykyinen teema"
   current_volume_level_c55ab825: "Nykyinen määrän taso"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Kohdistettu parhaillaan kohteeseen %{tokenName}, poista napsauttamalla"
+  currently_visible_to_e2f85345: "Parhaillaan näkyvissä"
   curve_grades_b7a75443: Arvosanakäyrät
   curve_grades_dialog: 
     average_score: "Keskimääräinen pistemäärä"
@@ -5893,6 +5907,7 @@ fi:
   deleted_content_exceptions_237e809d: "Poistetun sisällön poikkeukset:"
   deleted_content_referenced_in_this_resource_e42d1998: "Poistettuun sisältöön viitattu tässä resurssissa:"
   deleting_6421031e: poistetaan...
+  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Käyttäjän poistaminen poistaa kaikki heiän ePortfolionsa. Vaihtoehtoisesti ePortfoliot voidaan merkitä yksilöllisesti roskapostiksi tai turvalliseksi niiden näkyvyyden muokkaamiseksi."
   deleting_assignment_22d5851d: "Tehtävää poistetaan"
   delicious_7f9ac66f: Delicious
   denmark_45_929d5d34: "Tanska (+45)"
@@ -6656,6 +6671,7 @@ fi:
       add_submission: "Lisää sivu lähetystä varten"
       download_eportfolio: "Lataa ePortfolio"
       section_list: "Järjestä vetämällä, muokkaa napsauttamalla"
+  eportfolio_3c009f9c: ePortfolio
   eportfolio_categories: 
     default_name: "Uusi sivu"
     errors: 
@@ -6672,6 +6688,7 @@ fi:
     click_through: "Tarkastele sivun sisältöä napsauttamalla"
     default_content: "Ei vielä lisättyä sisältöä"
     default_name: "Sivun nimi"
+  eportfolio_moderation_feb0ffd3: "ePortfolion valvonta"
   eportfolio_settings_75ba1f9a: "ePortfolion asetukset"
   eportfolios: 
     _page_section: 
@@ -6968,6 +6985,7 @@ fi:
   everyone_854554dd: Kaikki
   everyone_else_6c6dc7b6: "Kaikki muut"
   everyone_else_cc5f6888: "Kaikki muut"
+  everyone_public_45ff1f25: "Kaikki (julkinen)"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   exactly_one_rating_can_have_mastery_c1d87990: "Täsmälleen yhdellä arvosanalla on hallinta"
@@ -6994,6 +7012,7 @@ fi:
   expand_tutorial_tray_22630c49: "Laajenna opetusvideon aluetta"
   expanded_f4493860: Laajennettu
   expires_at_6214b43f: Erääntyy
+  explanation_of_statuses_90a26d07: "Tilojen selitys:"
   export_course_content_f4774b74: "Vie kurssin sisältö"
   export_de71cd8e: Vie
   export_failed_5d615d6d: "Vienti epäonnistui"
@@ -7072,6 +7091,7 @@ fi:
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Synkronointihistoriakomponentin lataaminen epäonnistui. Onko verkkoyhteytesi OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Synkronoimattomien muutosten komponentin lataus epäonnistui. Onko verkkoyhteytesi OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Epäonnistui, raportoi seuraava virhekoodi järjestelmäsi pääkäyttäjälle: Virheraportti:%{error};"
+  failed_retrieving_media_source_3f0cfd49: "Medialähteen nouto epäonnistui"
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Epäonnistui, raportti epäonnistui tiedoston luomisessa. Yritä uudelleen."
   failed_to_add_new_feed_ee1c5ea: "Uuden syötteen lisääminen epäonnistui"
   failed_to_change_last_attended_date_1e340ba6: "Viimeisen osallistumispäivän vaihtaminen epäonnistui"
@@ -7154,6 +7174,7 @@ fi:
   file_list_350d08df: Tiedostoluettelo
   file_list_updated_38e2a5ad: "Tiedostoluettelo päivitetty"
   file_menu_cc0ca54: Tiedostovalikko
+  file_must_be_an_image_293567a8: "Tiedoston täytyy olla kuva"
   file_name_2fe68ec1: "Tiedoston nimi"
   file_name_8fd421ff: "Tiedoston nimi"
   file_name_too_long_ea535796: "tiedoston nimi on liian pitkä"
@@ -7287,6 +7308,8 @@ fi:
   finnish_4df2923d: suomi
   first_last_name_9820d256: "Etunimi, sukunimi"
   first_name_d5c12500: Etunimi
+  flagged_as_possible_spam_ebbc4683: "Merkitty mahdolliseksi roskapostiksi"
+  flags_new_eportfolio_content_matching_specific_key_a66af560: "Merkitsee uuden ePortfolion sisällön täsmäyksen hakusanat mahdolliseksi roskapostiksi ja mahdollistaa jäjrestelmäkäyttäjiä joko vahvistamaan merkitys ePortfoliot tai merkitsemään ne turvallisiksi."
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
@@ -8499,6 +8522,7 @@ fi:
   images_documents_and_more_dccb362f: "Kuvat, asiakirjat, jne."
   immediate_notifications_for_global_announcements_682f5a3d: "Globaalien ilmoitusten välittömät saapumisilmoitukset"
   immediately_c128ede6: Välittömästi
+  immersive_reader_7b87538: "Upottava lukulaite"
   immersive_reader_failed_to_load_bc8d4dd4: "Upottavan lukulaitteen lataus epäonnistui"
   import_1b31507: Tuo
   import_a_set_of_outcomes_6b782192: "Tulosten tuonti"
@@ -8953,6 +8977,7 @@ fi:
       log_in_to_canvas: "Kirjaudu sisään Canvasiin"
   learn_more_7a8d626: "Lue lisää"
   learn_more_about_collaborations_2978f66d: "Lue lisää yhteistyöstä"
+  learning_analytics_beta_view_46deb4c8: "Oppimisanalyysi (Beta) -näkymä"
   learning_mastery_5fc34276: "Oppimisen hallinta"
   learning_mastery_6ed4fd63: "Oppimisen hallinta..."
   learning_mastery_gradebook_description: |-
@@ -9404,8 +9429,14 @@ fi:
   mark_as_done_6fa48d2f: "Merkitse valmiiksi"
   mark_as_done_779556d7: "merkitse valmiiksi"
   mark_as_read_e7de2ce3: "Merkitse luetuksi"
+  mark_as_safe_c01fea35: "Merkitse turvalliseksi."
+  mark_as_spam_9c613d87: "Merkitse roskapostiksi"
   mark_as_unread_4a413c41: "Merkitse lukemattomaksi"
   mark_done_9d81bcd9: "Merkitse valmiiksi"
+  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Merkitty turvalliseksi': Järjestelmäkäyttäjä on tarkastanut tämän ePortfolion ja merkinnyt sen roskapostiksi. Se on näkyissä vain tarkoitetulle yleisölle."
+  marked_as_safe_f7f953df: "Merkitty turvalliseksi"
+  marked_as_spam_ab87846d: "Merkitty roskapostiksi"
+  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Merkitty roskapostiksi': Järjestelmäkäyttäjä on tarkastanut tämän ePortfolion ja merkinnyt sen roskapostiksi. Se on näkyvissä vain alkuperäiselle tekijälle ja järjestelmäkäyttäjille."
   marked_done_9fd646f: "Merkitse valmiiksi"
   master_lock_590266b6: Päälukko
   mastered_34d4c857: Hallitaan
@@ -11331,6 +11362,8 @@ fi:
   near_mastery_f25174a4: "lähellä hallintaa"
   need_a_canvas_account_221d18ed: "Tarvitsetko Canvas-tilin?"
   needs_grading_9143d47c: "Täytyy arvostella"
+  needs_review_flagged_as_possible_spam_233657fb: "Tarvitsee tarkastelua: merkitty mahdolliseksi roskapostiksi"
+  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'Tarvitsee tarkastelua: merkitty mahdolliseksi roskapostiksi': Ohjaajan järjestelmät ovat tunnistaneet tämän ePortfolion mahdolliseksi roskapostiksi, ja se vaatii järjestelmäkäyttäjän tarkistusta. Se on näkyvissä vain alkuperäiselle tekijälle ja järjestelmäkäyttäjille."
   negative_points_fda45730: "Negatiiviset pisteet"
   netherlands_31_63e4f1b9: "Alankomaat (+31)"
   never_df100b49: "Ei koskaan"
@@ -11515,6 +11548,7 @@ fi:
   not_installed_37a21a76: "Ei asennettu"
   not_mastered_5c2f9968: "Ei hallittu"
   not_published_73f7079: "Ei julkaisu."
+  not_reviewed_c38d9e97: "Ei tarkastelttu"
   not_signed_47acf472: "Ei allekirjoitettu"
   not_starred_no_subject_click_to_star_adfefe93: "Ei merkitty tähdellä \"(Ei aihetta)\", napsauta antaaksesi tähti."
   not_starred_no_subject_click_to_star_dc91380: "Ei merkitty tähdellä \"(Ei aihetta)\", Napsauta antaaksesi tähti."
@@ -14651,6 +14685,7 @@ fi:
       manage_user_observers: "Hallitse havaitsijoita käyttäjille"
       managed_jobs: "Hallitse taustatöitä"
       moderate_form: "Valvo keskusteluita (poista/muokkaa muiden lähetyksiä, lukitse aiheita)"
+      moderate_user_content: "Valvo käyttäjän sisältöä"
       post_to_forum: "Lähetä keskusteluihin"
       read_course_content: "Tarkastele kurssin sisältöä"
       read_course_list: "Katso kurssiluetteloa"
@@ -16431,6 +16466,7 @@ fi:
   success_grades_have_been_posted_for_the_selected_s_54c73ef0: "Onnistui! Arvosanat on lähetetty valituille %{assignmentName} osalle."
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Onnistui! Arvosanat on lähetetty kohteeseen %{postedTo} kohteelle %{assignmentName}."
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Onnistui! Viimeinen käytäntö kohteelle %{name} on päivitetty."
+  success_you_added_hostname_to_the_whitelist_6061236e: "Onnistuminen: Lisäsit %{hostname} sallittujen luetteloon."
   successfully_added_fb3e6008: "Lisätty onnistuneesti"
   successfully_created_a_set_38374719: "Joukko luotu onnistuneesti"
   successfully_deleted_discussion_title_a685f345: "Keskustelu %{title} poistettu onnistuneesti"
@@ -16731,9 +16767,12 @@ fi:
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Aikataulutusvälineen avulla voi määrittää ajankohtia, joihin opiskelijat (tai opiskelijaryhmät) voivat rekisteröityä. Jos haluat aloittaa, napsauta alla olevaa painiketta."
   the_selected_group_was_cleared_because_the_student_656e4f1c: "Valittu ryhmä tyhjennettiin, koska pyytämäsi opiskelija ei ollut osa mitään ryhmää. Voit valita ryhmän arvosanakirjassa."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Pikakuvake iOS-/Android-laitteille. 180x180 png"
+  the_specified_assignment_could_not_be_found_c5dc34ab: "Määritettyä tehtävää ei löytynyt"
+  the_specified_assignment_id_could_not_be_found_e4e64f5f: "Määritettyä tehtävää (%{id}) ei löytynyt"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Määritetty käyttäjä (%{id}) ei ole opiskelija tällä kurssilla"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Määritetty käyttäjä ei ole opiskelija tällä kurssilla"
   the_state_parameter_is_required_ffadf213: "Tilan parametri vaaditaan"
+  the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Sync to SIS -asetuksia ei voitu ottaa käyttöön tehtävälle \"%{assignment_name}\" ilman määräpäivää"
   the_title_cannot_be_longer_than_length_characters_7a822943: "otsikko ei voi olla pidempi kuin %{length} merkkiä"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "Seuraavan kysymyspankin otsikko katkaistiin: \"%{title}\""
   the_tool_is_not_installed_in_the_course_or_account_1be7230b: "Työkalua ei ole asennettu kurssille tai tilille."
@@ -16856,6 +16895,10 @@ fi:
   this_email_address_is_unconfirmed_f0fc8c6e: "Tätä sähköpostiosoitetta ei ole vahvistettu"
   this_enables_users_to_generate_and_download_course_4c69c531: "Tämä mahdollistaa käyttäjien luovan ja lataavan kurssin ePubin."
   this_environment_is_currently_being_updated_with_a_235f1875: "Tätä ympäristöä päivitetään parhaillaan uusimmilla tuotantotiedoilla. Tarkista pian uudelleen."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Tämä ePortfolio on merkitty mahdolliseksi roskapostiksi. Se on nääkyvissä vain sinulle, kunnes järjestelmäkäyttäjä on tarkistanut sen. Jos sinulla on kysyttävää, ota yhteyttä järjestelmänvalvojaasi"
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Tämä ePortfolio on tunnistettu mahdolliseksi roskapostiksi. Se on parhaillaan näkyvissä vain järjestelmävalvojalle ja tekijälle. Jos olet varma siitä, että sisältöä ei ole roskapostia, merkitse se turvalliseksi. Muuten voit vaihvistaa sen roskapostiksi."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Tämä ePortfolio on tunnistettu roskapostiksi, ja se on näkyvissä vain sinulle. Jos sinulla on kysyttävää, ota yhteyttä järjestelmänvalvojaasi"
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Tämä ePortfolio on tunnistettu roskapostiksi. Se on parhaillaan näkyvissä vain järjestelmävalvojalle ja tekijälle. Jos olet varma siitä, että sisältöä ei ole roskapostia, merkitse se turvalliseksi."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Tämän ominaisuuden avulla opettajat voivat helposti kopioida yksittäisiä kohteita toisesta kurssista toiseen ja jakaa yksittäisen sisällön kohteen toisten käyttäjien kanssa, niin että ne voivat myös tuoda nämä kohteet kursseihin."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Tätä ominaisuutta ei voi poistaa käytöstä, koska on vähintään yksi alatili tai kurssi, joissa tämä ominaisuus on käytössä"
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Tätä ominaisuutta ei voida ottaa käyttöön, kun kenttäerottelijoiden automaattinen havainto on käytössä"
@@ -17721,6 +17764,7 @@ fi:
   upload_failed_a5dc91ec: "Lataus epäonnistui"
   upload_file_fd2361b8: "Lataa tiedosto"
   upload_gradebook_386a46c8: "Lataa arvosanakirja"
+  upload_image_6120b609: "Lisää kuva"
   upload_media_ce31135a: "Lataa mediaa"
   upload_not_available_for_this_folder_8f8623c6: "Lataus ei ole saatavissa tälle kansiolle"
   upload_successful_ca47465f: "Lataus onnistui"
@@ -17746,6 +17790,7 @@ fi:
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Käyttöoikeudet määritetään kaikille tiedostoille, jotka ovat kohteessa:"
   use_arrow_keys_to_navigate_options_2021cc50: "Siirry vaihtoehdoissa nuolinäppäinten avulla."
   use_as_front_page_274a488b: "Käytä etusivuna"
+  use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Käytä kirjanmerkintää API-sivutuksella rekisteröitymishakemistossa"
   use_default_890939b7: "Käytä oletusta"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Käytä kokeelliset ominaisuudet ennen kuin ne otetaan yleisesti käyttöön tuotannossa"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Käytä HTML5-tallenninta sisällön muokkaamisessa Flash-sovelluksen avulla"
@@ -18180,6 +18225,7 @@ fi:
   users_d1b60cb0: Käyttäjät
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Käyttäjät - luo havaitsijan yhdistämiskoodit opiskelijoille"
   users_manage_login_details_9462b30f: "Käyttäjät - hallitse sisäänkirjautumistietoja"
+  users_moderate_content_36d6eed7: "Käyttäjä - valvo sisältöä"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Näytönlukijan käyttäjien täytyy ehkä kytkeä virtuaalinen kohdistin pois päältä voidakseen käyttää näitä näppäimistön pikakuvakkeita."
   users_over_time_9a2ee74a: "käyttäjiä ajan mittaan"
   users_view_list_861c7a3f: "Käyttäjät - tarkastele luetteloa"
@@ -18221,6 +18267,7 @@ fi:
   view_gradebook_history_a9272918: "Näytä arvosanakirjan historia"
   view_grades_8d3bae6c: "Tarkastele arvosanoja"
   view_grades_for_name_45aeb2f2: "Tarkastele arvosanoja kohteelle %{name}"
+  view_learning_analytics_beta_1c98a397: "Näytä oppimisanalyysi (Beta)"
   view_login_ids_for_users_142bbe7a: "Näytä kirjautumistunnukset käyttäjille"
   view_longer_description_6b762087: "näytä pidempi kuvaus"
   view_name_app_62a2ad8e: "Näytä %{name} sovellus"
