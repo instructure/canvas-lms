@@ -1106,6 +1106,14 @@ module Lti
           expect(exp_hash[:test]).to eq '2015-05-21 17:01:36'
         end
 
+        it 'has substitution for $Canvas.course.endAt' do
+          course.conclude_at = '2019-04-21 17:01:36'
+          course.save!
+          exp_hash = {test: '$Canvas.course.endAt'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '2019-04-21 17:01:36'
+        end
+
         it 'has a functioning guard for $Canvas.term.name when term.name is not set' do
           term = course.enrollment_term
           exp_hash = {test: '$Canvas.term.name'}
