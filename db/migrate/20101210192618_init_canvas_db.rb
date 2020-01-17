@@ -556,6 +556,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.string :workflow_state
 
       t.timestamps null: true
+      t.integer :followers_count, :default => 0
+      t.integer :items_count, :default => 0
     end
     add_index :collections, [:context_id, :context_type, :workflow_state, :visibility], :name => "index_collections_for_finding"
 
@@ -565,7 +567,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
       t.string :workflow_state
 
-      t.text :description
+      t.text :user_comment
 
       t.timestamps null: true
       t.integer :user_id, :limit => 8
@@ -588,6 +590,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :image_attachment_id, :limit => 8
       t.text :image_url
       t.text :html_preview
+      t.string :title
+      t.text :description
     end
 
     create_table :collection_item_upvotes do |t|
@@ -688,7 +692,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer :context_id, :limit => 8
       t.string :context_type
       t.string :domain
-      t.string :url
+      t.string :url, :limit => 4.kilobytes
       t.string :shared_secret
       t.string :consumer_key
       t.string :name
@@ -704,6 +708,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.boolean :has_editor_button
       t.integer :cloned_item_id, :limit => 8
       t.string :tool_id
+      t.boolean :has_homework_submission
     end
     add_index :context_external_tools, [:context_id, :context_type, :has_user_navigation], :name => "external_tools_user_navigation"
     add_index :context_external_tools, [:context_id, :context_type, :has_course_navigation], :name => "external_tools_course_navigation"
@@ -834,6 +839,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "asset_id", :limit => 8
       t.string   "asset_type"
       t.text     "attachment_ids"
+      t.boolean  "has_attachments"
+      t.boolean  "has_media_objects"
     end
     add_index "conversation_messages", ["conversation_id", "created_at"]
     execute("CREATE INDEX index_conversation_messages_on_asset_id_and_asset_type ON #{ConversationMessage.quoted_table_name} (asset_id, asset_type) WHERE asset_id IS NOT NULL")
@@ -877,9 +884,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "root_account_id", :limit => 8
       t.integer  "enrollment_term_id", :limit => 8
       t.string   "section_code"
-      t.string   "long_section_code"
       t.string   "name"
-      t.string   "section_organization_name"
       t.boolean  "default_section"
       t.boolean  "accepting_enrollments"
       t.boolean  "can_manually_enroll"
@@ -954,6 +959,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :courses, [:template_course_id]
     add_index :courses, :uuid
     add_index :courses, [:self_enrollment_code], :unique => true, :where => "self_enrollment_code IS NOT NULL"
+    add_index :courses, :sis_source_id
 
     create_table "custom_field_values", :force => true do |t|
       t.integer  "custom_field_id", :limit => 8
@@ -1092,13 +1098,13 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "discussion_topics", ["attachment_id"], :name => "index_discussion_topics_on_attachment_id"
     add_index "discussion_topics", ["cloned_item_id"], :name => "index_discussion_topics_on_cloned_item_id"
     add_index "discussion_topics", ["context_code"], :name => "index_discussion_topics_on_context_code"
-    add_index "discussion_topics", ["context_id", "context_type"], :name => "index_discussion_topics_on_context_id_and_context_type"
     add_index "discussion_topics", ["context_id", "position"], :name => "index_discussion_topics_on_context_id_and_position"
     add_index "discussion_topics", ["id", "type"], :name => "index_discussion_topics_on_id_and_type"
     add_index "discussion_topics", ["root_topic_id"], :name => "index_discussion_topics_on_root_topic_id"
     add_index "discussion_topics", ["user_id"], :name => "index_discussion_topics_on_user_id"
     add_index "discussion_topics", ["workflow_state"], :name => "index_discussion_topics_on_workflow_state"
     add_index :discussion_topics, [:assignment_id]
+    add_index :discussion_topics, [:context_id, :context_type, :root_topic_id], :unique => true, :name => "index_discussion_topics_unique_subtopic_per_context"
 
     # this is fixed in a later migration
     # rubocop:disable Migration/PrimaryKey
@@ -1169,7 +1175,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "root_account_id", :limit => 8
       t.float    "computed_final_score"
       t.datetime "completed_at"
-      t.boolean  "limit_priveleges_to_course_section"
       t.boolean  "self_enrolled"
       t.float    "computed_current_score"
       t.string   "grade_publishing_status", :default => "unpublished"
@@ -1269,7 +1274,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime "start_at"
       t.datetime "end_at"
       t.string   "workflow_state"
-      t.string   "url"
+      t.string   "url", :limit => 4.kilobytes
       t.string   "author_name"
       t.string   "author_email"
       t.string   "author_url"
@@ -1384,13 +1389,10 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     create_table "groups", :force => true do |t|
       t.string   "name"
       t.string   "workflow_state"
-      t.integer  "groupable_id", :limit => 8
-      t.string   "groupable_type"
       t.datetime "created_at"
       t.datetime "updated_at"
       t.integer  "context_id", :limit => 8
       t.string   "context_type"
-      t.string   "type"
       t.string   "category"
       t.integer  "max_membership"
       t.string   "hashtag"
@@ -1410,11 +1412,12 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "sis_batch_id", :limit => 8
       t.text     "stuck_sis_fields"
       t.integer  "group_category_id", :limit => 8
+      t.text     "description"
+      t.integer  "avatar_attachment_id", :limit => 8
     end
 
     add_index "groups", ["account_id"], :name => "index_groups_on_account_id"
     add_index "groups", ["context_id", "context_type"], :name => "index_groups_on_context_id_and_context_type"
-    add_index "groups", ["id", "type"], :name => "index_groups_on_id_and_type"
     add_index "groups", ["wiki_id"], :name => "index_groups_on_wiki_id"
     add_index "groups", ["workflow_state"], :name => "index_groups_on_workflow_state"
 
@@ -1426,6 +1429,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.datetime :deleted_at
       t.string :self_signup
     end
+    add_index :group_categories, [:context_id, :context_type], :name => "index_group_categories_on_context"
+    add_index :group_categories, :role, :name => "index_group_categories_on_role"
 
     create_table "hashtags", :force => true do |t|
       t.string   "hashtag"
@@ -1988,14 +1993,6 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
 
     add_index "short_messages", ["user_id"], :name => "index_short_messages_on_user_id"
 
-    create_table "sis_batch_log_entries", :force => true do |t|
-      t.integer  "sis_batch_id", :limit => 8
-      t.string   "log_type"
-      t.text     "text"
-      t.datetime "created_at"
-      t.datetime "updated_at"
-    end
-
     create_table "sis_batches", :force => true do |t|
       t.integer  "account_id", :limit => 8
       t.string   "batch_id"
@@ -2013,6 +2010,8 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.integer  "batch_mode_term_id", :limit => 8
       t.text     "options"
     end
+    add_index :sis_batches, [:account_id, :created_at], :where => "workflow_state='created'", name: "index_sis_batches_pending_for_accounts"
+    add_index :sis_batches, [:account_id, :created_at], :name => "index_sis_batches_account_id_created_at"
 
     create_table "stream_item_instances", :force => true do |t|
       t.integer "user_id", :limit => 8
@@ -2141,6 +2140,18 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index "user_account_associations", ["account_id"], :name => "index_user_account_associations_on_account_id"
     add_index "user_account_associations", ["user_id"], :name => "index_user_account_associations_on_user_id"
 
+    create_table :user_follows do |t|
+      t.integer :following_user_id, :limit => 8
+      t.string  :followed_item_type
+      t.integer :followed_item_id, :limit => 8
+
+      t.timestamps null: true
+    end
+    # unique index of things a user is following, searchable by thing type
+    add_index :user_follows, [:following_user_id, :followed_item_type, :followed_item_id], :unique => true, :name => "index_user_follows_unique"
+    # the reverse index -- users who are following this thing
+    add_index :user_follows, [:followed_item_id, :followed_item_type], :name => "index_user_follows_inverse"
+
     create_table "user_notes", :force => true do |t|
       t.integer  "user_id", :limit => 8
       t.text     "note"
@@ -2221,6 +2232,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       t.text     "stuck_sis_fields"
       t.text     "bio"
       t.boolean  "public"
+      t.datetime "birthdate"
     end
 
     add_index "users", ["avatar_state", "avatar_image_updated_at"], :name => "index_users_on_avatar_state_and_avatar_image_updated_at"
@@ -2406,7 +2418,67 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
       "UPDATE submissions SET workflow_state = 'graded' WHERE id = NEW.submission_id;"
     end
 
-    add_foreign_key :collection_items, :users
+    create_trigger("collection_items_after_insert_row_tr", :generated => true, :compatibility => 1).
+        on("collection_items").
+        after(:insert) do |t|
+      t.where("NEW.workflow_state = 'active'") do
+        <<-SQL_ACTIONS
+      UPDATE collections
+      SET items_count = items_count + 1
+      WHERE id = NEW.collection_id;
+        SQL_ACTIONS
+      end
+    end
+
+    create_trigger("collection_items_after_update_row_tr", :generated => true, :compatibility => 1).
+        on("collection_items").
+        after(:update) do |t|
+      t.where("NEW.workflow_state <> OLD.workflow_state") do
+        <<-SQL_ACTIONS
+      UPDATE collections
+      SET items_count = items_count + CASE WHEN (NEW.workflow_state = 'active') THEN 1 ELSE -1 END
+      WHERE id = NEW.collection_id;
+        SQL_ACTIONS
+      end
+    end
+
+    create_trigger("collection_items_after_delete_row_tr", :generated => true, :compatibility => 1).
+        on("collection_items").
+        after(:delete) do |t|
+      t.where("OLD.workflow_state = 'active'") do
+        <<-SQL_ACTIONS
+      UPDATE collections
+      SET items_count = items_count - 1
+      WHERE id = OLD.collection_id;
+        SQL_ACTIONS
+      end
+    end
+
+    create_trigger("user_follows_after_insert_row_tr", :generated => true, :compatibility => 1).
+        on("user_follows").
+        after(:insert) do |t|
+      t.where("NEW.followed_item_type = 'Collection'") do
+        <<-SQL_ACTIONS
+      UPDATE collections
+      SET followers_count = followers_count + 1
+      WHERE id = NEW.followed_item_id;
+        SQL_ACTIONS
+      end
+    end
+
+    create_trigger("user_follows_after_delete_row_tr", :generated => true, :compatibility => 1).
+        on("user_follows").
+        after(:delete) do |t|
+      t.where("OLD.followed_item_type = 'Collection'") do
+        <<-SQL_ACTIONS
+      UPDATE collections
+      SET followers_count = followers_count - 1
+      WHERE id = OLD.followed_item_id;
+        SQL_ACTIONS
+      end
+    end
+
+    add_foreign_key :assignments, :group_categories
     add_foreign_key :collection_items, :collections
   end
 
