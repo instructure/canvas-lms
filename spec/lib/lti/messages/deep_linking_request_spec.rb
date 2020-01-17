@@ -42,10 +42,6 @@ describe Lti::Messages::DeepLinkingRequest do
   describe '#generate_post_payload_message' do
     subject { jws['https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings'] }
 
-    it 'sets "accept_multiple" to false' do
-      expect(subject['accept_multiple']).to eq true
-    end
-
     it 'sets the "deep_link_return_url"' do
       expect(subject['deep_link_return_url']).to eq deep_linking_return_url
     end
@@ -76,8 +72,8 @@ describe Lti::Messages::DeepLinkingRequest do
         expect(subject['auto_create']).to eq false
       end
 
-      it 'sets the correct "accept_multiple"' do
-        expect(subject['accept_multiple']).to eq false
+      it 'sets "accept_multiple to true"' do
+        expect(subject['accept_multiple']).to eq true
       end
     end
 
@@ -189,6 +185,10 @@ describe Lti::Messages::DeepLinkingRequest do
 
       it 'sets the correct "auto_create"' do
         expect(subject['auto_create']).to eq false
+      end
+
+      it 'sets "accept_multiple" to true ' do
+        expect(subject['accept_multiple']).to eq true
       end
     end
   end
