@@ -42,7 +42,12 @@ class CourseForMenuPresenter
       id: course.id,
       isFavorited: course.favorite_for_user?(@user) && @user.account.feature_enabled?(:unfavorite_course_from_dashboard),
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
-      position: @user.dashboard_positions[course.asset_string].to_i || nil,
+      position: if @user.dashboard_positions[course.asset_string].present? == true
+                    @user.dashboard_positions[course.asset_string].to_i
+                else
+                    nil
+                end
+       # @user.dashboard_positions[course.asset_string].to_i || nil,
     }.tap do |hash|
       if @opts[:tabs]
         tabs = course.tabs_available(@user, {
