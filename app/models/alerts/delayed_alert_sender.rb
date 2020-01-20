@@ -47,7 +47,7 @@ module Alerts
       student_ids = student_enrollments.map(&:user_id)
       return if student_ids.empty?
 
-      teacher_enrollments = course.instructor_enrollments.active_or_pending
+      teacher_enrollments = course.instructor_enrollments.active_or_pending_by_date
       teacher_ids = teacher_enrollments.map(&:user_id)
       return if teacher_ids.empty?
 
