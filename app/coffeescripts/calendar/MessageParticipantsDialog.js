@@ -132,7 +132,7 @@ export default class MessageParticipantsDialog {
     if (this.group) {
       data.tags = this.group.context_codes
     } else if (this.opts.timeslot) {
-      data.context_code = this.opts.timeslot.context_code
+      data.tags = this.opts.timeslot.all_context_codes.split(',')
     }
 
     const deferred = $.ajaxJSON(
@@ -147,12 +147,12 @@ export default class MessageParticipantsDialog {
     })
   }
 
-  messageSent = data => {
+  messageSent = () => {
     this.$form.dialog('close')
     $.flashMessage(I18n.t('messages_sent', 'Messages Sent'))
   }
 
-  messageFailed = data => {
+  messageFailed = () => {
     this.$form
       .find('.error')
       .text(
