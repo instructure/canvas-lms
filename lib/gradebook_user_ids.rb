@@ -49,7 +49,7 @@ class GradebookUserIds
   private
 
   def sort_by_student_field
-    if ["name", "sortable_name"].include?(@sort_by)
+    if ["name", "sortable_name"].include?(@sort_by) || !pseudonym_sort_field
       sort_by_student_name
     else
       sort_by_pseudonym_field
@@ -65,10 +65,7 @@ class GradebookUserIds
   end
 
   def sort_by_pseudonym_field
-    # The sort keys integration_id and sis_user_id map to columns in Pseudonym,
-    # while login_id needs to be changed to unique_id
-    sort_field = @sort_by == "login_id" ? "unique_id" : @sort_by
-    sort_column = Pseudonym.best_unicode_collation_key("pseudonyms.#{sort_field}")
+    sort_column = Pseudonym.best_unicode_collation_key("pseudonyms.#{pseudonym_sort_field}")
 
      students.joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=users.id AND
                     pseudonyms.workflow_state <> 'deleted'").
@@ -77,6 +74,16 @@ class GradebookUserIds
        order(Arel.sql("users.id #{sort_direction}")).
        pluck(:id).
        uniq
+  end
+
+  def pseudonym_sort_field
+    # The sort keys integration_id and sis_user_id map to columns in Pseudonym,
+    # while login_id needs to be changed to unique_id
+    {
+      "login_id" => "unique_id",
+      "sis_user_id" => "sis_user_id",
+      "integration_id" => "integration_id"
+    }.with_indifferent_access[@sort_by]
   end
 
   def sort_by_assignment_grade(assignment_id)
