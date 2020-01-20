@@ -996,6 +996,10 @@ sv:
         bryan_engagement: 
           enrollment_term_ids: 
             field: "ID för registrerings villkor"
+    eportfolio_moderation: 
+      eportfolio_moderation_crumb: "Moderering av e-portfölj"
+      page_title: "Moderering av e-portfölj"
+      title: "Moderering av e-portfölj"
     excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1852,6 +1856,8 @@ sv:
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: Administratörsvy
   administrator_f325c186: Admin
+  administrators_and_author_only_flagged_as_possible_42345cba: "Endast administratörer och författare (flaggad som potentiell skräppost)"
+  administrators_and_author_only_marked_as_spam_184becce: "Endast administratörer och författare (flaggad som skräppost)"
   admins_3e1dce15: Administratörer
   admins_add_remove_26811ce5: "Administratörer – lägg till/ta bort"
   advanced_36b35b8: Avancerad
@@ -2562,6 +2568,7 @@ sv:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Svaren visas efter ditt sista försök"
   any_sub_account_ec7069f2: "Alla underkonton"
   any_term_d49af19f: "Alla terminer"
+  anyone_with_a_direct_link_private_b3bc9661: "Alla med en direktlänk (privat)"
   anyone_with_the_url_9d7e5e07: "Alla med länken"
   api_7bd66e19: API
   api_key_eeeb2167: API-nyckel
@@ -3770,6 +3777,7 @@ sv:
   authentications_log_ca16ce81: Autentiseringslogg
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest skickad till IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse från IdP"
+  author_215203d2: Skapare
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} lämnade just en ny kommentar på inlämningen för %{submission_submittor} för %{assignment}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} kommenterade nyss inlämningen från %{user_name} för %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} kommenterade nyss inlämningen från %{user_name} för %{assignment_title}."
@@ -3956,6 +3964,7 @@ sv:
   bookmark_service: 
     default_title: "Ingen titel"
   bookmark_this_question_bank_dc414a82: "Bokmärk den här frågebanken"
+  bookmarking_for_enrollments_index_api_840be156: "API för bokmärkning av registreringsindex"
   bookmarks_5b5b81c9: Bokmärken
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Både Diskussioner – skapa och Diskussioner – moderera gör att användare kan skapa en diskussion på sidan Diskussioner. Om den här behörigheten aktiveras, behövs inte Diskussioner – skapa För att se diskussioner i en kurs måste Diskussioner – visa aktiveras. För att svara på en diskussion måste även Diskussioner – publicera inlägg aktiveras. För att redigera uppgiftsinformation för en diskussion måste även Uppgifter och Quiz – lägg till/redigera/ta bort aktiveras."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
@@ -5237,6 +5246,7 @@ sv:
   configure_individual_learning_paths_for_students_b_e2fce294: "Konfigurera individuella inlärningsmetoder för studenter baserat på bedömningsresultaten."
   configure_tool_app_3b1bb50b: "Konfigurera %{tool} app?"
   configure_toolname_app_651371be: "Konfigurera %{toolName} app"
+  confirm_as_spam_2f8b7105: "Bekräfta som skräppost"
   confirm_communication_channel_81c48d08: "Bekräfta kommunikationskanal"
   confirm_contact_method_29d6fe4b: "Bekräfta kontaktmetod"
   confirm_delete_6febeafb: "Bekräfta borttagning"
@@ -6252,6 +6262,9 @@ sv:
     one: "1 grupp med bedömningsperioder hittades."
     other: "%{count} grupper med bedömningsperioder hittades."
     zero: "Inga matchande grupper med bedömningsperioder hittades."
+  count_shared_items_loaded_ef94ef6a: 
+    one: "1 delat objekt har lästs in."
+    other: "%{count} delade objekt har lästs in."
   count_students_30e46120: 
     one: "1 student"
     other: "%{count} studenter"
@@ -7368,6 +7381,7 @@ sv:
   current_total_67bf5f72: "Nuvarande total:"
   current_volume_level_c55ab825: "Nuvarande volymnivå"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "För närvarande tilldelad till %{tokenName}, klicka för att ta bort"
+  currently_visible_to_e2f85345: "Visas för närvarande för"
   curso_f0ee9b5: Curso
   curve_grades_b7a75443: "Justera omdömen"
   curve_grades_dialog: 
@@ -7687,6 +7701,7 @@ sv:
   deleted_content_exceptions_237e809d: "Undantag för borttaget innehåll:"
   deleted_content_referenced_in_this_resource_e42d1998: "Den här resursen har referenser till borttaget innehåll:"
   deleting_6421031e: "raderar ..."
+  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Om du raderar användare förstörs alla deras e-portföljer. E-portföljer kan antingen märkas som skräppost eller som säkra för att modifiera deras synlighet."
   deleting_assignment_22d5851d: "tar bort uppgiften"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo sidor kräver att Recaptcha-inställningarna konfigureras. Vänligen kontakta din hemsidans administratör den här instansen på Canvas."
@@ -8764,6 +8779,7 @@ sv:
       add_submission: "Lägg till sida för inlämning"
       download_eportfolio: "Ladda ner ePortfolio"
       section_list: "Dra för att ordna, Klicka för att redigera"
+  eportfolio_3c009f9c: E-portfölj
   eportfolio_categories: 
     default_name: "Ny sida"
     errors: 
@@ -8780,6 +8796,7 @@ sv:
     click_through: "Klicka för att visa sidans innehåll"
     default_content: "Inget innehåll har lagts till"
     default_name: Sidnamn
+  eportfolio_moderation_feb0ffd3: "Moderering av e-portfölj"
   eportfolio_settings_75ba1f9a: ePortfolio-inställningar
   eportfolios: 
     _page_section: 
@@ -9100,6 +9117,7 @@ sv:
   everyone_854554dd: Alla
   everyone_else_6c6dc7b6: "Alla andra"
   everyone_else_cc5f6888: "Alla andra"
+  everyone_public_45ff1f25: "Alla (offentlig)"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   exactly_one_rating_can_have_mastery_c1d87990: "Exakt en bedömning kan ha måluppfyllelse"
@@ -9135,6 +9153,7 @@ sv:
   expanded_f4493860: Förstorad
   experimental_graphql_api_75c5eb8f: "EXPERIMENTELL GraphQL API."
   expires_at_6214b43f: "Förfaller den"
+  explanation_of_statuses_90a26d07: "Förklaring till statusar:"
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Exporera ett existerande quiz till Quizzes 2 format"
   export_course_content_f4774b74: "Exportera kursinnehåll"
   export_de71cd8e: Exportera
@@ -9323,6 +9342,7 @@ sv:
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Misslyckades med att ladda synkronisering-historik (Sync History) komponenten. Är din nätverksanslutning OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Misslyckades med att ladda ej synkroniserade ändringar (Unsynced Changes) komponenten. Är din nätverksanslutning OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Det gick inte, rapportera följande felkod till din systemadministratör: Felrapport:%{error};"
+  failed_retrieving_media_source_3f0cfd49: "Det gick inte att hämta mediekällan"
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Det gick inte, rapporten genererade ingen fil. Försök igen."
   failed_to_add_new_feed_ee1c5ea: "Det gick inte att lägga till nytt flöde"
   failed_to_change_last_attended_date_1e340ba6: "Det gick inte att ändra senaste närvarodatum"
@@ -9440,6 +9460,7 @@ sv:
   file_list_350d08df: Fillista
   file_list_updated_38e2a5ad: "Fillistan uppdaterad"
   file_menu_cc0ca54: Filmeny
+  file_must_be_an_image_293567a8: "Filen måste vara en bild"
   file_name_2fe68ec1: Filnamn
   file_name_8fd421ff: Filnamn
   file_name_too_long_ea535796: "filnamnet är för långt"
@@ -9637,6 +9658,8 @@ sv:
   first_reviewer_9ea05caa: "Första bedömaren"
   first_reviewer_sortorder_e2184140: "Första bedömaren %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, och %{others_count} andra"
+  flagged_as_possible_spam_ebbc4683: "Flaggad som potentiell skräppost"
+  flags_new_eportfolio_content_matching_specific_key_a66af560: "Flaggar nytt innehåll som matchar specifika nyckelord som potentiell skräppost i e-portföljer så att administratörer kan bekräfta flaggningen av e-portföljerna eller markera dem som säkra."
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
@@ -11479,6 +11502,7 @@ sv:
   images_documents_and_more_dccb362f: "Bilder, dokument och annat"
   immediate_notifications_for_global_announcements_682f5a3d: "Omedelbara aviseringar för globala anslag"
   immediately_c128ede6: Omedelbart
+  immersive_reader_7b87538: "Avancerad läsare"
   immersive_reader_failed_to_load_bc8d4dd4: "Den Avancerade läsaren lästes inte in"
   import_1b31507: Importera
   import_a_set_of_outcomes_6b782192: "Importera en uppsättning lärandemål"
@@ -12008,6 +12032,7 @@ sv:
       log_in_to_canvas: "Logga in på Canvas"
   learn_more_7a8d626: "Lär dig mer"
   learn_more_about_collaborations_2978f66d: "Lär dig mer om samarbeten"
+  learning_analytics_beta_view_46deb4c8: "Lärandeanalyser (beta) – visa"
   learning_mastery_5fc34276: Måluppfyllelse
   learning_mastery_6ed4fd63: "Måluppfyllelse ..."
   learning_mastery_gradebook_description: |-
@@ -12525,8 +12550,14 @@ sv:
   mark_as_done_6fa48d2f: "Markera som färdig"
   mark_as_done_779556d7: "markera som färdig"
   mark_as_read_e7de2ce3: "Markera som läst"
+  mark_as_safe_c01fea35: "Markera som säker"
+  mark_as_spam_9c613d87: "Markera som skräppost"
   mark_as_unread_4a413c41: "Markera som oläst"
   mark_done_9d81bcd9: "Markera som klar"
+  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Markerad som säker': En administratör har granskat e-portföljen och markerat den som säker. Den är synlig för de som den ursprungligen var avsedd för."
+  marked_as_safe_f7f953df: "Markerad som säker"
+  marked_as_spam_ab87846d: "Markerad som skräppost"
+  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Markerad som skräppost': En administratör har granskat e-portföljen och markerat den som skräppost. Den är endast synlig för den ursprungliga författaren och administratörer."
   marked_done_8f61ebb8: "markerad som färdig"
   marked_done_9fd646f: "Markera som klar"
   masquerade_as_name_8bb004c5: "Maskerad som %{name}"
@@ -14971,6 +15002,8 @@ sv:
   need_a_canvas_account_221d18ed: "Behöver du ett Canvas-konto?"
   need_help_setting_up_your_course_2b763141: "Behöver du hjälp med att skapa din kurs?"
   needs_grading_9143d47c: "Måste bedömas"
+  needs_review_flagged_as_possible_spam_233657fb: "Behöver granskning: flaggad som potentiell skräppost"
+  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'Behöver granskning: flaggad som potentiell skräppost': Instructures system har identifierat den här e-portföljen som potentiell skräppost och den behöver granskas av en administratör. Den är endast synlig för den ursprungliga författaren och administratörer."
   negative_points_fda45730: "Negativa poäng"
   netherlands_14ca4f6d: Nederländerna
   netherlands_31_63e4f1b9: "Nederländerna (+31)"
@@ -15185,6 +15218,7 @@ sv:
   not_mastered_5c2f9968: "Ej uppfyllt mål"
   not_now_97efd947: "Inte nu"
   not_published_73f7079: "Inte publicerad"
+  not_reviewed_c38d9e97: "Ej granskad"
   not_signed_47acf472: "Inte signerat"
   not_starred_no_subject_click_to_star_adfefe93: "'Inte favoritmarkerat \"(No Subject)\". Klicka för att favoritmarkera."
   not_starred_no_subject_click_to_star_dc91380: "Ej stjärnmärkt \"(No Subject)\". Klicka för att stjärnmärka."
@@ -19114,6 +19148,7 @@ sv:
       manage_wiki: "Hantera wiki (lägg till / redigera / radera sidor)"
       managed_jobs: "Hantera bakgrundsjobb"
       moderate_form: "Moderera diskussioner ( radera/redigera andras inlägg/lås ämnen)"
+      moderate_user_content: "Moderera användarinnehåll"
       post_to_forum: "Lägg upp i diskussioner"
       read_course_content: "Visa kursinnehåll"
       read_course_list: "Visa kurslista"
@@ -21378,6 +21413,7 @@ sv:
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Klart! Omdömen har publicerats på %{postedTo} för %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Lycka! Omdömena har publicerats i omdömesboken"
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Klart! Publiceringspolicyn för %{name} har uppdaterats."
+  success_you_added_hostname_to_the_whitelist_6061236e: "Klart: Du lade till %{hostname} i vitlistan."
   successfully_added_fb3e6008: "Lades till"
   successfully_created_a_set_38374719: "En uppsättning skapades"
   successfully_deleted_discussion_title_a685f345: "Diskussionen har tagits bort %{title}"
@@ -21725,10 +21761,13 @@ sv:
   the_selected_group_was_cleared_because_the_student_656e4f1c: "Den valda gruppen rensades eftersom studenten du begärde inte är med i någon grupp. Du kan välja en grupp i omdömesboken."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Problemets allvarlighetsgrad, valt av användaren från en rullgardinsmeny."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Genvägsikonen för iOS/Android-enheter. 180x180 png"
+  the_specified_assignment_could_not_be_found_c5dc34ab: "Det gick inte att hitta den angivna uppgiften"
+  the_specified_assignment_id_could_not_be_found_e4e64f5f: "Det gick inte att hitta den angivna uppgiften (%{id})"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "Den specifika filen med file_id har redan en originell rapport"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Den angivna användaren (%{id}) är inte en student i den här kursen"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Den angivna användaren är inte en student i den här kursen"
   the_state_parameter_is_required_ffadf213: "Delstatsparametern krävs"
+  the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Det gick inte att aktivera inställningen Synkronisera till SIS för uppgiften \"%{assignment_name}\" utan ett inlämningsdatum."
   the_term_has_ended_for_this_course_f0ab367: "Perioden har gått ut för den här kursen"
   the_title_cannot_be_longer_than_length_characters_7a822943: "Titeln får inte vara längre än %{length} tecken"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "Titeln på följande frågebank har trunkerats: ”%{title}\""
@@ -21883,6 +21922,10 @@ sv:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Det här aktiverar en uppdaterad navigering, ny översikt och ett enklare och mer modernt utseende och känsla."
   this_enables_users_to_generate_and_download_course_4c69c531: "Detta låter användare generera och ladda ner kursen som en ePub."
   this_environment_is_currently_being_updated_with_a_235f1875: "Miljön uppdateras för tillfället med en kopia av senaste produktionsdata. Återkom vid ett senare tillfälle."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Den här e-portföljen har flaggats som potentiell skräppost. Fram till att en administratör har granskat den kommer den endast att visas för dig. Kontakta en administratör om du har några frågor."
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Den här e-portföljen har identifierats som potentiell skräppost. För närvarande visas den endast för administratörer och författaren. Om du är säker på att innehållet inte är skräppost kan du markera det som säkert. I annat fall kan du markera det som skräppost."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Den här e-portföljen har identifierats som skräppost och visas endast för dig. Kontakta en administratör om du har några frågor."
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Den här e-portföljen har identifierats som skräppost. För närvarande visas den endast för administratörer och författaren. Om du är säker på att innehållet inte är skräppost kan du markera det som säkert."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Med den här funktionen kan lärare enkelt kopiera enskilda objekt från en kurs till en annan, och dela enskilda innehållsobjekt med andra användare så att de kan importera dessa objekt till sina kurser."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Den här funktionen kan inte inaktiveras eftersom det finns minst ett underkonto eller en kurs med den här funktionen aktiverad."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Den här funktionen kan inte aktiveras när autodetektering av fältseparatorer har aktiverats"
@@ -22855,6 +22898,7 @@ sv:
   upload_file_fd2361b8: "Ladda upp fil"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Ladda upp filer som skickats in med uppgifter till en speciell mapp som endast går att läsa"
   upload_gradebook_386a46c8: "Ladda upp bedömningsöversikt"
+  upload_image_6120b609: "Ladda upp bild"
   upload_media_ce31135a: "Ladda upp media"
   upload_not_available_for_this_folder_8f8623c6: "Uppladdning är inte tillgängligt för den här mappen"
   upload_successful_ca47465f: "Laddades upp"
@@ -22885,6 +22929,7 @@ sv:
   use_arrow_keys_to_navigate_options_2021cc50: "Använd piltangenterna för att navigera bland alternativen."
   use_as_front_page_274a488b: "Använd som framsida"
   use_between_for_adding_multiple_users_26bff207: "Använda ”,” mellan för att lägga till flera användare."
+  use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Använd bokmärkning för API-sidnumrering i registreringsindex"
   use_default_890939b7: "Använd standard"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Använd experimentella funktioner innan de aktiveras i produktion"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Använd HTML5-inspelare i innehållsredigeraren istället för Flash"
@@ -23401,6 +23446,7 @@ sv:
   users_manage_log_in_details_b944568b: "Användare – hantera inloggningsuppgifter"
   users_manage_login_details_9462b30f: "Användare – hantera inloggningsuppgifter"
   users_matching_search_term_c604db9e: "Matchande användare \"%{search_term}\""
+  users_moderate_content_36d6eed7: "Användare – moderera innehåll"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "De som använder skärmläsare kan behöva stänga av den virtuella markören för att använda dessa tangentbordsgenvägar"
   users_over_time_9a2ee74a: "användare med tiden"
   users_view_list_861c7a3f: "Användare – visa lista"
@@ -23451,6 +23497,7 @@ sv:
   view_grades_for_name_45aeb2f2: "Visa omdömen för %{name}"
   view_grading_history_e64bb8fe: "Visa betygshistorik"
   view_in_speedgrader_773b9d81: "Visa i SpeedGrader"
+  view_learning_analytics_beta_1c98a397: "Visa lärandeanalyser (beta)"
   view_login_ids_for_users_142bbe7a: "Visa inloggnings-ID:n för användare"
   view_longer_description_6b762087: "visa längre beskrivning"
   view_name_app_62a2ad8e: "Visa %{name} appen"

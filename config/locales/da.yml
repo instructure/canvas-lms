@@ -997,6 +997,10 @@ da:
         bryan_engagement: 
           enrollment_term_ids: 
             field: "Tilmeldingssemester id"
+    eportfolio_moderation: 
+      eportfolio_moderation_crumb: "Moderering af ePortfolio"
+      page_title: "Moderering af ePortfolio"
+      title: "Moderering af ePortfolio"
     excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1848,6 +1852,8 @@ da:
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: "Visning for admin"
   administrator_f325c186: Administrator
+  administrators_and_author_only_flagged_as_possible_42345cba: "Kun administratorer og forfatter (markeret som mulig spam)"
+  administrators_and_author_only_marked_as_spam_184becce: "Kun administratorer og forfatter (markeret som spam)"
   admins_3e1dce15: Administratorer
   admins_add_remove_26811ce5: "Admins - tilføj / fjern"
   advanced_36b35b8: Avanceret
@@ -2557,6 +2563,7 @@ da:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Svarene vises efter dit sidste forsøg"
   any_sub_account_ec7069f2: "Enhver underkonto"
   any_term_d49af19f: "Ethvert semester"
+  anyone_with_a_direct_link_private_b3bc9661: "Enhver med et direkte link (privat)"
   anyone_with_the_url_9d7e5e07: "Enhver med URL’en"
   api_7bd66e19: API
   api_key_eeeb2167: API-kode
@@ -3764,6 +3771,7 @@ da:
   authentications_log_ca16ce81: Autentifikationslog
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest sendt til IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse fra IdP"
+  author_215203d2: Forfatter
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} netop oprettet en ny kommentar til afleveringen for %{submission_submittor} til %{assignment}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} har lige kommenteret på afleveringen fra %{user_name} til %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} har lige kommenteret på afleveringen fra %{user_name} til %{assignment_title}."
@@ -3949,6 +3957,7 @@ da:
   bookmark_service: 
     default_title: "Ingen overskrift"
   bookmark_this_question_bank_dc414a82: "Gem denne spørgsmålsbank i bogmærker"
+  bookmarking_for_enrollments_index_api_840be156: "Bogmærke til Tilmeldingsindeks-API"
   bookmarks_5b5b81c9: Bogmærker
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Både ’Diskussioner - opret’ og ’Diskussioner - bedøm’ tillader en bruger at oprette en diskussion på diskussionssiden. Hvis denne tilladelse er aktiveret, er ’Diskussioner - opret’ ikke nødvendig. For at få vist diskussioner i et fag skal Diskussioner - vis være aktiveret. For at svare i en diskussion skal Diskussioner - slå op også være aktiveret. For at redigere opgaveoplysninger i en diskussion skal Opgaver og quizzer - tilføj/redigér/slet også være aktiveret."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
@@ -5220,6 +5229,7 @@ da:
   configure_individual_learning_paths_for_students_b_e2fce294: "Konfigurer individuelle læringsstier for studerende ud fra bedømmelsesresultater."
   configure_tool_app_3b1bb50b: "Konfigurer %{tool} app?"
   configure_toolname_app_651371be: "Konfigurer %{toolName} app"
+  confirm_as_spam_2f8b7105: "Bekræft som spam"
   confirm_communication_channel_81c48d08: "Bekræft kommunikationskanal"
   confirm_contact_method_29d6fe4b: "Bekræft kontaktmetode"
   confirm_delete_6febeafb: "Bekræft sletning"
@@ -6235,6 +6245,9 @@ da:
     one: "1 sæt karakterperioder fundet."
     other: "%{count} sæt karakterperioder fundet."
     zero: "Ingen matchende karakterperiodesæt fundet."
+  count_shared_items_loaded_ef94ef6a: 
+    one: "1 delt element indlæst."
+    other: "%{count} delte elementer indlæst."
   count_students_30e46120: 
     one: "1 studerende"
     other: "%{count} studerende"
@@ -7348,6 +7361,7 @@ da:
   current_total_67bf5f72: "Aktuelt samlet antal:"
   current_volume_level_c55ab825: "Nuværende lydstyrke"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "I øjeblikket tildelt til %{tokenName}, klik for at fjerne"
+  currently_visible_to_e2f85345: "I øjeblikket synlig for"
   curso_f0ee9b5: Curso
   curve_grades_b7a75443: Kurvekarakterer
   curve_grades_dialog: 
@@ -7667,6 +7681,7 @@ da:
   deleted_content_exceptions_237e809d: "Slettet indhold undtagelser:"
   deleted_content_referenced_in_this_resource_e42d1998: "Slettet indhold henvist til i denne ressource:"
   deleting_6421031e: "sletter ..."
+  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Sletning af en bruger sletter alle deres ePortfolios. Alternativt kan ePortfolios markeres individuelt som 'spam' eller 'sikker' for at ændre deres synlighed."
   deleting_assignment_22d5851d: "sletter en opgave"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demonstrationswebsteder kræver, at indstillinger til Recaptcha konfigureres. Kontakt din webstedsadministrator for denne Canvas-instans."
@@ -8745,6 +8760,7 @@ da:
       add_submission: "Føj side til afleveringen"
       download_eportfolio: "Download ePortfolio"
       section_list: "Træk for at omorganisere, klik for at redigere"
+  eportfolio_3c009f9c: ePortfolio
   eportfolio_categories: 
     default_name: "Ny side"
     errors: 
@@ -8761,6 +8777,7 @@ da:
     click_through: "Klik for at vise sideindholdet"
     default_content: "Der er ikke tilføjet indhold endnu"
     default_name: Sidenavn
+  eportfolio_moderation_feb0ffd3: "Moderering af ePortfolio"
   eportfolio_settings_75ba1f9a: "Indstillinger til ePortfolio"
   eportfolios: 
     _page_section: 
@@ -9081,6 +9098,7 @@ da:
   everyone_854554dd: Alle
   everyone_else_6c6dc7b6: "Alle andre"
   everyone_else_cc5f6888: "Alle andre"
+  everyone_public_45ff1f25: "Alle (offentlig)"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   exactly_one_rating_can_have_mastery_c1d87990: "Præcis en vurdering kan have opfyldelse af læringsmål"
@@ -9116,6 +9134,7 @@ da:
   expanded_f4493860: Udvidet
   experimental_graphql_api_75c5eb8f: "EKSPERIMENTEL GraphQL API."
   expires_at_6214b43f: "Udløber kl."
+  explanation_of_statuses_90a26d07: "Forklaring af statusser:"
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Eksporter en eksisterende test til nyt test 2-format"
   export_course_content_f4774b74: "Eksporter fagindhold"
   export_de71cd8e: Eksporter
@@ -9304,6 +9323,7 @@ da:
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Fejl ved læsning af Synkroniseringshistorik-komponent. Er din netværksforbindelse OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Fejl ved læsning af ikke-synkroniserede ændringer-komponent. Er din netværksforbindelse OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Lykkedes ikke. Rapporter følgende fejlkode til systemadministratoren: FejlRapport:%{error};"
+  failed_retrieving_media_source_3f0cfd49: "Kunne ikke hente mediekilden"
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Lykkedes ikke. Rapporten kunne ikke generere en fil. Prøv igen."
   failed_to_add_new_feed_ee1c5ea: "Kunne ikke tilføje nyt feed"
   failed_to_change_last_attended_date_1e340ba6: "Kunne ikke ændre dato for sidste tilstedeværelse"
@@ -9421,6 +9441,7 @@ da:
   file_list_350d08df: Filliste
   file_list_updated_38e2a5ad: "Filliste opdateret"
   file_menu_cc0ca54: Filmenu
+  file_must_be_an_image_293567a8: "Filen skal være et billede"
   file_name_2fe68ec1: Filnavn
   file_name_8fd421ff: Filnavn
   file_name_too_long_ea535796: "filnavn for langt"
@@ -9618,6 +9639,8 @@ da:
   first_reviewer_9ea05caa: "Første bedømmer"
   first_reviewer_sortorder_e2184140: "Første bedømmer %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, og %{others_count} andre"
+  flagged_as_possible_spam_ebbc4683: "Markeret som mulig spam"
+  flags_new_eportfolio_content_matching_specific_key_a66af560: "Markerer nyt ePortfolio-indhold, der matcher specifikke søgeord, som mulig spam og giver administratorer mulighed for enten at bekræfte markerede ePortfolios som spam eller markere dem som sikre."
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
@@ -11463,6 +11486,7 @@ da:
   images_documents_and_more_dccb362f: "Billeder, dokumenter og meget mere"
   immediate_notifications_for_global_announcements_682f5a3d: "Øjeblikkelige meddelelser for globale beskeder"
   immediately_c128ede6: Straks
+  immersive_reader_7b87538: "Immersive Reader"
   immersive_reader_failed_to_load_bc8d4dd4: "Immersive Reader kunne ikke indlæses"
   import_1b31507: Importer
   import_a_set_of_outcomes_6b782192: "Importer et sæt læringsudbytter"
@@ -11992,6 +12016,7 @@ da:
       log_in_to_canvas: "Log ind på Canvas"
   learn_more_7a8d626: "Lær mere"
   learn_more_about_collaborations_2978f66d: "Lær mere om samarbejder"
+  learning_analytics_beta_view_46deb4c8: "Learning Analytics (Beta) - vis"
   learning_mastery_5fc34276: "Opfyldelse af læringsmål"
   learning_mastery_6ed4fd63: "Opfyldelse af læringsmål ..."
   learning_mastery_gradebook_description: |-
@@ -12509,8 +12534,14 @@ da:
   mark_as_done_6fa48d2f: "Marker som færdig"
   mark_as_done_779556d7: "marker som færdig"
   mark_as_read_e7de2ce3: "Marker som læst"
+  mark_as_safe_c01fea35: "Marker som sikker"
+  mark_as_spam_9c613d87: "Marker som spam"
   mark_as_unread_4a413c41: "Marker som ulæst"
   mark_done_9d81bcd9: "Marker som færdig"
+  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Markeret som sikker': En administrator har gennemset denne ePortfolio og markeret den som sikker. Den er synlig for den oprindelige målgruppe."
+  marked_as_safe_f7f953df: "Markeret som sikker"
+  marked_as_spam_ab87846d: "Markeret som spam"
+  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Markeret som spam': En administrator har gennemset denne ePortfolio og markeret den som spam. Den er kun synlig for den oprindelige forfatter og administratorer."
   marked_done_8f61ebb8: "markring udført"
   marked_done_9fd646f: "Markeret som færdig"
   masquerade_as_name_8bb004c5: "Masker som %{name}"
@@ -14951,6 +14982,8 @@ da:
   need_a_canvas_account_221d18ed: "Har du brug for en Canvas-konto?"
   need_help_setting_up_your_course_2b763141: "Har du brug for hjælp til at konfigurere dit fag?"
   needs_grading_9143d47c: "Mangler bedømmelse"
+  needs_review_flagged_as_possible_spam_233657fb: "Skal gennemses: markeret som mulig spam"
+  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'Skal gennemses: markeret som mulig spam': Instructures systemer har identificeret denne ePortfolio som mulig spam, og den skal gennemses af en administrator. Den er kun synlig for den oprindelige forfatter og administratorer."
   negative_points_fda45730: "Negative point"
   netherlands_14ca4f6d: Holland
   netherlands_31_63e4f1b9: "Holland (+31)"
@@ -15165,6 +15198,7 @@ da:
   not_mastered_5c2f9968: "Ikke behersket"
   not_now_97efd947: "Ikke nu"
   not_published_73f7079: "Ikke offentliggjort"
+  not_reviewed_c38d9e97: "Ikke gennemset"
   not_signed_47acf472: "Ikke underskrevet"
   not_starred_no_subject_click_to_star_adfefe93: "'Ikke givet stjerne\"(Intet emne)\". Klik for at give stjerne."
   not_starred_no_subject_click_to_star_dc91380: "'kke givet stjerne\"(Intet emne)\". Klik for at give stjerne."
@@ -19099,6 +19133,7 @@ da:
       manage_wiki: "Administrér wiki (tilføj / rediger / slet sider)"
       managed_jobs: "Administrering af baggrundsjobs"
       moderate_form: "Bedøm diskussioner (slet / rediger andres indlæg, lås emner)"
+      moderate_user_content: "Moderer brugerindhold"
       post_to_forum: "Opslag til diskussioner"
       read_course_content: "Vis fagindhold"
       read_course_list: "Vis listen over fag"
@@ -21366,6 +21401,7 @@ da:
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Succes! Karakterer er blevet slået op på %{postedTo} for %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Succes! Karaktererne blev offentliggjort til karakteroversigten."
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Succes! Opslagspolitikken for %{name} er blevet opdateret."
+  success_you_added_hostname_to_the_whitelist_6061236e: "Succes: Du tilføjede %{hostname} til hvidlisten."
   successfully_added_fb3e6008: "Blev tilføjet"
   successfully_created_a_set_38374719: "Sæt oprettet succesfuldt"
   successfully_deleted_discussion_title_a685f345: "Diskussion blev slettet %{title}"
@@ -21713,10 +21749,13 @@ da:
   the_selected_group_was_cleared_because_the_student_656e4f1c: "Den valgte gruppe blev ryddet, fordi den studerende, du anmodede om, ikke er en del af nogen grupper. Du kan vælge en gruppe i karakteroversigten."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Problemets alvorlighed, ifølge brugerens valg på en dropdown-menu."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Genvejsikonet for iOS/Android-enheder. 180x180 png"
+  the_specified_assignment_could_not_be_found_c5dc34ab: "Den angivne opgave kunne ikke findes"
+  the_specified_assignment_id_could_not_be_found_e4e64f5f: "Den angivne opgave (%{id}) kunne ikke findes"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "den angivne fil med file_id har allerede en originalitetsrapport"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Den specificerede bruger (%{id}) er ikke en studerende i dette fag"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Den specificerede bruger er ikke en studerende i dette fag"
   the_state_parameter_is_required_ffadf213: "Regionsparameteret er påkrævet"
+  the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Indstillingen Synkronisering til SIS kunne ikke aktiveres for opgaven \"%{assignment_name}” uden en forfaldsdato."
   the_term_has_ended_for_this_course_f0ab367: "Semestret er slut for dette fag"
   the_title_cannot_be_longer_than_length_characters_7a822943: "Titlen må ikke være længere end %{length} tegn"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "Titlen på følgende spørgsmålsbank blev afkortet: \"%{title}\""
@@ -21871,6 +21910,10 @@ da:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette giver mulighed for en opdateret navigation, ny oversigt og et mere enkelt, mere moderne udseende og fornemmelse."
   this_enables_users_to_generate_and_download_course_4c69c531: "Dette giver brugere mulighed for at danne og downloade ePub."
   this_environment_is_currently_being_updated_with_a_235f1875: "Dette miljø opdateres for øjeblikket med en kopi af de seneste produktionsdata. Kom tilbage senere."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Denne ePortfolio er markeret som mulig spam. Indtil den er blevet gennemset af en administrator, er den kun synlig for dig. Kontakt en administrator, hvis du har spørgsmål."
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Denne ePortfolio er identificeret som mulig spam. Den er i øjeblikket kun synlig for administratorer og forfatter. Hvis du er sikker på, at dette indhold ikke er spam, kan du markere det som sikkert. Ellers kan du bekræfte det som spam."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Denne ePortfolio er identificeret som spam og er kun synlig for dig. Kontakt en administrator, hvis du har spørgsmål."
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Denne ePortfolio er identificeret som spam. Den er i øjeblikket kun synlig for administratorer og forfatter. Hvis du er sikker på, at dette indhold ikke er spam, kan du markere det som sikkert."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Denne funktion giver lærere let mulighed for at kopiere enkelte elementer fra et fag til et andet og dele et enkelt indholdselement med andre brugere, så de også kan importere disse elementer til deres fag."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Denne funktion kan ikke deaktiveres, fordi der er mindst en underkonto eller et fag med denne funktion aktiveret."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Denne funktion kan ikke aktiveres, mens autodetektering af feltseparatorer er aktiveret"
@@ -22841,6 +22884,7 @@ da:
   upload_file_fd2361b8: "Overfør fil"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Upload filer indsent med opgaver til en speciel skrivebeskyttet afleveringsmappe"
   upload_gradebook_386a46c8: "Upload karakteroversigt"
+  upload_image_6120b609: "Upload billede"
   upload_media_ce31135a: "Upload medier"
   upload_not_available_for_this_folder_8f8623c6: "Upload ikke tilgængelig for denne mappe"
   upload_successful_ca47465f: "Vellykket upload"
@@ -22871,6 +22915,7 @@ da:
   use_arrow_keys_to_navigate_options_2021cc50: "Brug piletasterne til at navigere indstillinger."
   use_as_front_page_274a488b: "Brug som forside"
   use_between_for_adding_multiple_users_26bff207: "Brug \",\" mellem for at tilføje flere brugere."
+  use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Brug bogmærkning til API-sideinddeling i Tilmeldingsindekset"
   use_default_890939b7: "Brug standard"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Brug eksperimentelle funktioner, før de generelt er blevet aktiveret i produktionen"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Brug HTML5-optager i Content Editor i stedet for Flash"
@@ -23385,6 +23430,7 @@ da:
   users_manage_log_in_details_b944568b: "Brugere - administrer loginoplysninger"
   users_manage_login_details_9462b30f: "Brugere - administrér loginoplysninger"
   users_matching_search_term_c604db9e: "Brugere som matcher \"%{search_term}\""
+  users_moderate_content_36d6eed7: "Brugere - moderer indhold"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Brugere af skærmlæsere skal muligvis slå den virtuelle markør fra for at bruge disse genvejstaster"
   users_over_time_9a2ee74a: "brugere over tid"
   users_view_list_861c7a3f: "Brugere - vis liste"
@@ -23435,6 +23481,7 @@ da:
   view_grades_for_name_45aeb2f2: "Vis karakterer for %{name}"
   view_grading_history_e64bb8fe: "Vis karakterhistorik"
   view_in_speedgrader_773b9d81: "Vis i SpeedGrader"
+  view_learning_analytics_beta_1c98a397: "Se Learning Analytics (Beta)"
   view_login_ids_for_users_142bbe7a: "Se brugeres login-ID’er"
   view_longer_description_6b762087: "vis længere beskrivelse"
   view_name_app_62a2ad8e: "Vis %{name} app"
