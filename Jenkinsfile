@@ -136,7 +136,7 @@ pipeline {
     }
 
     stage('Rebase') {
-      when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms'} }
+      when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms' } }
       steps {
         timeout(time: 2) {
           script {
@@ -204,7 +204,7 @@ pipeline {
     stage('Parallel Run Tests') {
       parallel {
         stage('Linters') {
-          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' } }
+          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms' } }
           steps {
             skipIfPreviouslySuccessful("linters") {
               build(
