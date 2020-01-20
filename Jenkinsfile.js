@@ -30,7 +30,11 @@ def isForceFailure() {
 
 def getImageTagVersion() {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  return flags.getImageTagVersion()
+  // total hack, we shouldnt do it like this. but until there is a better
+  // way of passing info across builds, this is path of least resistance..
+  // also, it didnt seem to work with multiple return statements, so i'll
+  // just go ahead and leave this monstrosity here.
+  return env.RUN_COVERAGE == '1' ? 'master' : flags.getImageTagVersion()
 }
 
 def copyFiles(docker_name, docker_dir, host_dir) {
@@ -59,18 +63,16 @@ pipeline {
       steps {
         timeout(time: 2) {
           sh 'build/new-jenkins/docker-cleanup.sh'
+          sh 'printenv | sort'
+          sh 'rm -rf ./tmp/*'
         }
       }
     }
     stage('Tests Setup') {
       steps {
         timeout(time: 60) {
-          echo 'Running containers'
-          sh 'docker ps'
-          sh 'printenv | sort'
           sh 'build/new-jenkins/docker-compose-pull.sh'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'rm -rf ./tmp/*'
         }
       }
     }
