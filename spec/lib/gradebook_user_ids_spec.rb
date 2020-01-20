@@ -304,6 +304,13 @@ describe GradebookUserIds do
           expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
         end
 
+        it "sorts by student sortable name ascending if passed an invalid sort_rows_by_setting_key for the column" do
+          # "grade" is invalid here because the "student" column cannot be sorted by grade
+          @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_setting_key] = "grade"
+          expected_user_ids = [@student1.id, @student4.id, @student3.id, @student2.id, @fake_student.id]
+          expect(gradebook_user_ids.user_ids).to eq(expected_user_ids)
+        end
+
         it "sorts by student sortable name descending" do
           @teacher.preferences[:gradebook_settings][@course.id][:sort_rows_by_direction] = "descending"
           expected_user_ids = [@student2.id, @student3.id, @student4.id, @student1.id, @fake_student.id]
