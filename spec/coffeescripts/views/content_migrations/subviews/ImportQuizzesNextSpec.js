@@ -25,15 +25,17 @@ QUnit.module('Import Quizzes Next', {})
 test('it should be accessible', assert => {
   const importQuizzesNext = new ImportQuizzesNextView({
     quizzesNextEnabled: true,
+    migrationDefault: false,
     model: new Backbone.Model()
   })
   const done = assert.async()
   assertions.isAccessible(importQuizzesNext, done, {a11yReport: true})
 })
 
-test('it should have checkbox enabled', () => {
+test('it should have checkbox enabled, and not checked', () => {
   const importQuizzesNext = new ImportQuizzesNextView({
     quizzesNextEnabled: true,
+    migrationDefault: false,
     model: new Backbone.Model()
   })
   importQuizzesNext.render()
@@ -41,16 +43,59 @@ test('it should have checkbox enabled', () => {
     importQuizzesNext.$el.find('#importQuizzesNext').is(':enabled'),
     'import to quizzes next is enabled'
   )
+  ok(
+    !importQuizzesNext.$el.find('#importQuizzesNext').is(':checked'),
+    'import to quizzes next is not checked'
+  )
 })
 
-test('it should have checkbox disabled', () => {
+test('it should have checkbox disabled, and not checked', () => {
   const importQuizzesNext = new ImportQuizzesNextView({
     quizzesNextEnabled: false,
+    migrationDefault: false,
     model: new Backbone.Model()
   })
   importQuizzesNext.render()
   ok(
     importQuizzesNext.$el.find('#importQuizzesNext').is(':disabled'),
     'import to quizzes next is disabled'
+  )
+  ok(
+    !importQuizzesNext.$el.find('#importQuizzesNext').is(':checked'),
+    'import to quizzes next is not checked'
+  )
+})
+
+test('it should have checkbox enabled, and checked', () => {
+  const importQuizzesNext = new ImportQuizzesNextView({
+    quizzesNextEnabled: true,
+    migrationDefault: true,
+    model: new Backbone.Model()
+  })
+  importQuizzesNext.render()
+  ok(
+    importQuizzesNext.$el.find('#importQuizzesNext').is(':enabled'),
+    'import to quizzes next is enabled'
+  )
+  ok(
+    importQuizzesNext.$el.find('#importQuizzesNext').is(':checked'),
+    'import to quizzes next is checked'
+  )
+})
+
+test('it should have checkbox disabled, and checked', () => {
+  const importQuizzesNext = new ImportQuizzesNextView({
+    model: new Backbone.Model(),
+    quizzesNextEnabled: false,
+    migrationDefault: true
+  })
+  importQuizzesNext.render()
+  ok(
+    importQuizzesNext.$el.find('#importQuizzesNext').is(':disabled'),
+    'import to quizzes next is disabled'
+  )
+  ok(
+    importQuizzesNext.$el.find('#importQuizzesNext').is(':checked'),
+    'import to quizzes next is checked'
   )
 })

@@ -20,6 +20,7 @@ import I18n from 'i18n!content_migrations'
 import $ from 'jquery'
 import DateShiftView from 'compiled/views/content_migrations/subviews/DateShiftView'
 import DaySubstitutionView from 'compiled/views/content_migrations/subviews/DaySubstitutionView'
+import ImportQuizzesNextView from 'compiled/views/content_migrations/subviews/ImportQuizzesNextView'
 import DaySubstitutionCollection from 'compiled/collections/DaySubstitutionCollection'
 import CollectionView from 'compiled/views/CollectionView'
 import template from 'jst/content_migrations/subviews/DaySubstitutionCollection'
@@ -36,14 +37,24 @@ const daySubCollectionView = new CollectionView({
   template
 })
 
+const content_migration = new ContentMigration()
+
 const dateShiftView = new DateShiftView({
-  model: new ContentMigration(),
+  model: content_migration,
   collection: daySubCollection,
   daySubstitution: daySubCollectionView,
   oldStartDate: ENV.OLD_START_DATE,
   oldEndDate: ENV.OLD_END_DATE,
   addHiddenInput: true
 })
+
+const importQuizzesNextView = new ImportQuizzesNextView({
+  model: content_migration,
+  quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
+  migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
+  questionBank: null
+})
+$('#new_quizzes_migrate').html(importQuizzesNextView.render().el)
 
 $('#date_shift').html(dateShiftView.render().el)
 dateShiftView.$oldStartDate.val(ENV.OLD_START_DATE).trigger('change')

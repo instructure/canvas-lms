@@ -341,6 +341,7 @@ class CoursesController < ApplicationController
   include SyllabusHelper
   include WebZipExportHelper
   include CoursesHelper
+  include NewQuizzesFeaturesHelper
 
   before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_action :require_user_or_observer, :only=>[:user_index]
@@ -2246,6 +2247,11 @@ class CoursesController < ApplicationController
     # For prepopulating the date fields
     js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose))
     js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose))
+    #
+    js_env(:QUIZZES_NEXT_ENABLED => new_quizzes_enabled?)
+    js_env(:NEW_QUIZZES_IMPORT => new_quizzes_import_enabled?)
+    js_env(:NEW_QUIZZES_MIGRATION => new_quizzes_migration_enabled?)
+    js_env(:NEW_QUIZZES_MIGRATION_DEFAULT => new_quizzes_migration_default)
   end
 
   def copy_course
@@ -2281,6 +2287,7 @@ class CoursesController < ApplicationController
         :context => @course, :migration_type => 'course_copy_importer',
         :initiated_source => api_request? ? (in_app? ? :api_in_app : :api) : :manual)
       @content_migration.migration_settings[:source_course_id] = @context.id
+      @content_migration.migration_settings[:import_quizzes_next] = true if params.dig(:settings, :import_quizzes_next)
       @content_migration.workflow_state = 'created'
       if (adjust_dates = params[:adjust_dates]) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
         params[:date_shift_options][adjust_dates[:operation]] = '1'
