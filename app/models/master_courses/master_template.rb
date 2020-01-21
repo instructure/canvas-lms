@@ -86,7 +86,10 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def destroy_subscriptions_later
-    self.send_later_if_production(:destroy_subscriptions)
+    self.send_later_if_production_enqueue_args(:destroy_subscriptions, {
+      :n_strand => ["master_courses_destroy_subscriptions", self.course.global_root_account_id],
+      :priority => Delayed::LOW_PRIORITY
+    })
   end
 
   def destroy_subscriptions
