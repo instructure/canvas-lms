@@ -53,4 +53,9 @@ describe CanvasSanitize do
     cleaned = Sanitize.clean("<a data-url=\"javascript:alert('bad')\">Link</a>", CanvasSanitize::SANITIZE)
     expect(cleaned).to eq("<a>Link</a>")
   end
+
+  it "sanitizes javascript protocol in data-item-href" do
+    cleaned = Sanitize.clean("<a data-item-href=\"javascript:alert('bad')\">Link</a>", CanvasSanitize::SANITIZE)
+    expect(cleaned).to eq("<a>Link</a>")
+  end
 end
