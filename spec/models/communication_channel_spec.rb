@@ -197,20 +197,6 @@ describe CommunicationChannel do
     expect(@cc3.confirmation_sent_count).to eql(1)
   end
 
-  context "can_notify?" do
-    it "should normally be able to be used" do
-      communication_channel_model
-      expect(@communication_channel).to be_can_notify
-    end
-
-    it "should not be able to be used if it has a policy to not use it" do
-      communication_channel_model
-      notification_policy_model(:frequency => "never", :communication_channel => @communication_channel)
-      @communication_channel.reload
-      expect(@communication_channel).not_to be_can_notify
-    end
-  end
-
   describe "by_email" do
     it "should return matching ccs case-insensitively" do
       @user = User.create!
