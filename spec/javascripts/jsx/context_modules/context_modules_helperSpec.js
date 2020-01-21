@@ -33,10 +33,23 @@ test('externalUrlLinkClick', () => {
     preventDefault: sinon.spy()
   }
   const elt = {
-    attr: sinon.spy()
+    attr: sinon.stub().returns('http://example.com')
   }
   Helper.externalUrlLinkClick(event, elt)
   ok(event.preventDefault.calledOnce, 'preventDefault not called')
   ok(elt.attr.calledWith('data-item-href'), 'elt.attr not called')
-  ok(Helper.setWindowLocation.calledOnce, 'window redirected')
+  ok(Helper.setWindowLocation.calledOnceWith('http://example.com'), 'window redirected')
+})
+
+test('externalUrlLinkClick sanitizeUrl', () => {
+  const event = {
+    preventDefault: sinon.spy()
+  }
+  const elt = {
+    // eslint-disable-next-line no-script-url
+    attr: sinon.stub().returns('javascript:alert("hi")')
+  }
+  Helper.externalUrlLinkClick(event, elt)
+  ok(event.preventDefault.calledOnce, 'preventDefault not called')
+  ok(Helper.setWindowLocation.calledOnceWith('about:blank'), 'redirect sanitized')
 })
