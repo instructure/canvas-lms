@@ -707,6 +707,7 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ],
       :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
+      :group => 'manage_wiki'
     },
     :manage_wiki_delete => {
       :label => lambda { t("Delete pages") },
@@ -727,6 +728,7 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ],
       :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
+      :group => 'manage_wiki'
     },
     :manage_wiki_update => {
       :label => lambda { t("Update pages") },
@@ -747,6 +749,7 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ],
       :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
+      :group => 'manage_wiki'
     },
     :moderate_forum => {
       :label => lambda { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },
@@ -1153,8 +1156,9 @@ class RoleOverride < ActiveRecord::Base
       :explicit   => false,
       :base_role_type => base_role,
       :enrollment_type => role.name,
-      :role_id => role.id
+      :role_id => role.id,
     }
+    generated_permission[:group] = default_data[:group] if default_data[:group].present?
 
     if default_data[:account_only]
       # note: built-in roles don't have an account so we need to remember to send it in explicitly

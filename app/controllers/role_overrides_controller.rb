@@ -365,9 +365,10 @@ class RoleOverridesController < ApplicationController
     end
 
     # allow setting permissions immediately through API
-    result = set_permissions_for(role, @context, params[:permissions])
-    unless result
-      return render json: {message: t('Permission must be enabled for someone')}, status: :bad_request
+    begin
+      set_permissions_for(role, @context, params[:permissions])
+    rescue BadPermissionSettingError => e
+      return render json: {message: e}, status: :bad_request
     end
 
     # Add base_role_type_label for this role
@@ -489,12 +490,13 @@ class RoleOverridesController < ApplicationController
         end
       end
     end
-    result = set_permissions_for(@role, @context, params[:permissions])
 
-    unless result
-      return render json: {message: t('Permission must be enabled for someone')}, status: :bad_request
+    begin
+      set_permissions_for(@role, @context, params[:permissions])
+      render :json => role_json(@context, @role, @current_user, session)
+    rescue BadPermissionSettingError => e
+      return render json: {message: e}, status: :bad_request
     end
-    render :json => role_json(@context, @role, @current_user, session)
   end
 
   def create
@@ -570,42 +572,70 @@ class RoleOverridesController < ApplicationController
   end
   protected :require_role
 
+  class BadPermissionSettingError < StandardError; end
+
   # Internal: Loop through and set permission on role given in params.
   #
   # role - The role to set permissions for.
   # context - The current context.
   # permissions - The permissions from the request params.
-  #
-  # Returns nothing.
   def set_permissions_for(role, context, permissions)
-    return true unless permissions.present?
+    return true if permissions.blank?
 
-    if role.course_role?
-      manageable_permissions = RoleOverride.manageable_permissions(context, role.base_role_type)
-    else
-      manageable_permissions = RoleOverride.manageable_permissions(context)
+    manageable_permissions =
+      if role.course_role?
+        RoleOverride.manageable_permissions(context, role.base_role_type)
+      else
+        RoleOverride.manageable_permissions(context)
+      end
+
+    # Hash of permission names and groups for easier updating. Make everything
+    # an array (even though only grouped permissions will have more then one
+    # element) so we can use the same logic for updating grouped and ungrouped permissions
+    grouped_permissions = Hash.new { |h, k| h[k] = [] }.with_indifferent_access
+    manageable_permissions.each do |permission_name, permission|
+      grouped_permissions[permission_name] << {name: permission_name, disable_locking: permission.key?(:group)}
+      if permission.key?(:group)
+        grouped_permissions[permission[:group]] << {name: permission_name, disable_locking: false}
+      end
     end
 
-    manageable_permissions.keys.each do |permission|
-      if settings = permissions[permission]
-        if !value_to_boolean(settings[:readonly])
-          if settings.has_key?(:enabled) && value_to_boolean(settings[:explicit])
-            override = value_to_boolean(settings[:enabled])
-          end
-          locked = value_to_boolean(settings[:locked]) if settings.key?(:locked)
-          applies_to_self = value_to_boolean(settings[:applies_to_self]) if settings.key? :applies_to_self
-          if settings.key? :applies_to_descendants
-            applies_to_descendants = value_to_boolean(settings[:applies_to_descendants])
-          end
+    RoleOverride.transaction do
+      permissions.each do |permission_or_group_name, permission_updates|
+        next if value_to_boolean(permission_updates[:readonly])
 
-          if applies_to_descendants == false && applies_to_self == false
-            return false
-          end
+        target_permissions = grouped_permissions[permission_or_group_name]
+        next if target_permissions.empty?
 
-          RoleOverride.manage_role_override(context, role, permission.to_s,
-                                            override: override, locked: locked,
-                                            applies_to_self: applies_to_self,
-                                            applies_to_descendants: applies_to_descendants)
+        if permission_updates.key?(:locked)
+          if target_permissions.any? { |permission| permission[:disable_locking] }
+            raise BadPermissionSettingError, t('Cannot change locked status on granular permission')
+          else
+            locked = value_to_boolean(permission_updates[:locked])
+          end
+        end
+
+        if permission_updates.key?(:enabled) && value_to_boolean(permission_updates[:explicit])
+          override = value_to_boolean(permission_updates[:enabled])
+        end
+
+        if permission_updates.key? :applies_to_self
+          applies_to_self = value_to_boolean(permission_updates[:applies_to_self])
+        end
+
+        if permission_updates.key? :applies_to_descendants
+          applies_to_descendants = value_to_boolean(permission_updates[:applies_to_descendants])
+        end
+
+        if applies_to_descendants == false && applies_to_self == false
+          raise BadPermissionSettingError, t('Permission must be enabled for someone')
+        end
+
+        target_permissions.each do |permission|
+          RoleOverride.manage_role_override(
+            context, role, permission[:name].to_s, override: override, locked: locked,
+            applies_to_self: applies_to_self, applies_to_descendants: applies_to_descendants
+          )
         end
       end
     end

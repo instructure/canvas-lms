@@ -54,6 +54,6 @@ module Api::V1::Role
     permission[:prior_default] = !!permission[:prior_default]
     permission.delete(:prior_default) unless permission[:explicit]
     permission.slice(:enabled, :locked, :readonly, :explicit, :prior_default,
-                     :applies_to_descendants, :applies_to_self)
+                     :applies_to_descendants, :applies_to_self, :group)
   end
 end
