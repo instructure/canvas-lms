@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import sanitizeUrl from 'jsx/shared/helpers/sanitizeUrl'
+
 const Helper = {}
 
 Helper.setWindowLocation = function(url) {
@@ -24,7 +26,7 @@ Helper.setWindowLocation = function(url) {
 
 Helper.externalUrlLinkClick = function(event, $elt) {
   event.preventDefault()
-  this.setWindowLocation($elt.attr('data-item-href'))
+  this.setWindowLocation(sanitizeUrl($elt.attr('data-item-href')))
 }.bind(Helper)
 
 export default Helper
