@@ -1113,6 +1113,27 @@ describe "Files API", type: :request do
     end
   end
 
+  describe "#reset_verifier" do
+    before :once do
+      @root = Folder.root_folders(@course).first
+      @att = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
+      @file_path = "/api/v1/files/#{@att.id}/reset_verifier"
+      @file_path_options = { :controller => "files", :action => "reset_verifier", :format => "json", :id => @att.id.to_param }
+    end
+
+    it "should let admin users reset verifiers" do
+      old_uuid = @att.uuid
+      account_admin_user(account: @account)
+      api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 200)
+      expect(@att.reload.uuid).to_not eq old_uuid
+    end
+
+    it "should not let non-admin users reset verifiers" do
+      course_with_teacher(course: @course, active_all: true, user: user_with_pseudonym)
+      api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 401)
+    end
+  end
+
   describe "#update" do
     before :once do
       @root = Folder.root_folders(@course).first

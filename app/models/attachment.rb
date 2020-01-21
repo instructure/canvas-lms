@@ -789,6 +789,11 @@ class Attachment < ActiveRecord::Base
   end
   protected :assign_uuid
 
+  def reset_uuid!
+    self.uuid = CanvasSlug.generate_securish_uuid
+    self.save!
+  end
+
   def inline_content?
     self.content_type.match(/\Atext/) || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
   end

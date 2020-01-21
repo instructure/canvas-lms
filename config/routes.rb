@@ -1655,6 +1655,7 @@ CanvasRails::Application.routes.draw do
       get 'files/:id', action: :api_show, as: 'attachment'
       delete 'files/:id', action: :destroy
       put 'files/:id', action: :api_update
+      post 'files/:id/reset_verifier', action: :reset_verifier
 
       # exists as an alias of GET for backwards compatibility
       #

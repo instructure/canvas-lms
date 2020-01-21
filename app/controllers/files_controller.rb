@@ -134,7 +134,7 @@ class FilesController < ApplicationController
   before_action :require_context, except: [
     :assessment_question_show, :image_thumbnail, :show_thumbnail,
     :create_pending, :s3_success, :show, :api_create, :api_create_success, :api_create_success_cors,
-    :api_show, :api_index, :destroy, :api_update, :api_file_status, :public_url, :api_capture
+    :api_show, :api_index, :destroy, :api_update, :api_file_status, :public_url, :api_capture, :reset_verifier
   ]
 
   before_action :check_file_access_flags, only: [:show_relative, :show]
@@ -147,7 +147,7 @@ class FilesController < ApplicationController
   prepend_around_action :load_pseudonym_from_policy, only: :create
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: [
-    :api_show, :api_create_success, :api_file_status, :api_update, :destroy
+    :api_show, :api_create_success, :api_file_status, :api_update, :destroy, :reset_verifier
   ]
 
   include Api::V1::Attachment
@@ -1200,6 +1200,31 @@ class FilesController < ApplicationController
       render :json => { :message => I18n.t('Cannot delete a file that has been submitted as part of an assignment') }, :status => :forbidden
     else
       render :json => { :message => I18n.t('Unauthorized to delete this file') }, :status => :unauthorized
+    end
+  end
+
+  # @API Reset link verifier
+  #
+  # Resets the link verifier. Any existing links to the file using
+  # the previous hard-coded "verifier" parameter will no longer
+  # automatically grant access.
+  #
+  # Must have manage files and become other users permissions
+  #
+  # @example_request
+  #
+  #   curl -X POST 'https://<canvas>/api/v1/files/<file_id>/reset_verifier' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns File
+  def reset_verifier
+    @attachment = Attachment.find(params[:id])
+    @context = @attachment.context
+    if can_replace_file?
+      @attachment.reset_uuid!
+      return render json: attachment_json(@attachment, @current_user, {}, {omit_verifier_in_app: true})
+    else
+      return render_unauthorized_action
     end
   end
 
