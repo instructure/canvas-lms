@@ -112,6 +112,16 @@ namespace :strongmind do
     )
   end
 
+  desc "Hide Destructive Course options"
+  task :hide_destructive_course_options => :environment do
+    SettingsService.update_settings(
+      id: '1',
+      setting: 'hide_destructive_course_options',
+      value: true,
+      object: "school"
+    )
+  end
+
   desc "redistribute due dates on courses after X start date"
   task :redistribute_date_dates_after => :environment do
     abort("No date specified in ENV") unless ENV['REDISTRIBUTE_AFTER']
