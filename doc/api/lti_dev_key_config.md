@@ -42,7 +42,7 @@ The <a href="http://www.imsglobal.org/spec/security/v1p0/" target="_blank">IMS S
  - `https://canvas.beta.instructure.com/api/lti/authorize_redirect` (if launched from a **beta** environment)
  - `https://canvas.test.instructure.com/api/lti/authorize_redirect` (if launched from a **test** environment)
   
- Among the <a href="<a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">required variables</a> the request should include:
+ Among the <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">required variables</a> the request should include:
 
  - a `redirect_uri`, which must match at least one configured on the developer key.
  - a `client_id` that matches the developer key. This must be <a href="#config-in-tool">registered in the tool</a> before the launch occurs.
