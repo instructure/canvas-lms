@@ -22274,7 +22274,7 @@ nl:
   tls_7a2eaba5: TLS
   to_1126ab55: " tot"
   to_35c6baa2: "tot "
-  to_51406be9: Naar
+  to_51406be9: Tot
   to_access_assignment_submissions_through_assignmen_30c5c8f2: "Om inleveringen van opdrachten te openen via Opdrachten of de Cijferlijst en deze weer te geven in SpeedGrader, moet Cijfers - alle cijfers weergeven of Cijfers - bewerken ook worden ingeschakeld."
   to_access_assignment_submissions_through_assignmen_ce438715: |-
       Voor toegang tot inleveringen van opdrachten via Opdrachten en SpeedGrader, moet Cijfers - bewerken ook zijn ingeschakeld.
@@ -22346,7 +22346,7 @@ nl:
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "Om door andere gebruikers gemaakte samenwerkingen te kunnen weergeven, bewerken en verwijderen, moet Cursusinhoud - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als Cursusinhoud - toevoegen/bewerken/verwijderen is ingeschakeld en Samenwerkingen voor cursisten - maken is uitgeschakeld, kan de gebruiker geen nieuwe samenwerkingen maken maar wel alle samenwerkingen weergeven, bewerken en verwijderen. Om cursisten toe te voegen aan een samenwerking, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om een cursusgroep toe te voegen aan een samenwerking, moet Groepen - alle cursistengroepen weergeven ook zijn ingeschakeld."
   to_be_added_2959cc72: "Toe te voegen"
   to_be_removed_d4b48586: "Te verwijderen"
-  to_c4c44f4b: naar
+  to_c4c44f4b: tot
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "Om sis_account_id te wijzigen, moet de gebruiker een manage_sis-machtiging hebben."
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: "Ga naar Cursuslink-validator om te controleren op andere verbroken links"
   to_check_for_other_broken_links_visit_the_validato_ba3b3f1e: "Ga naar %{validator_link} om te controleren op andere verbroken links"
