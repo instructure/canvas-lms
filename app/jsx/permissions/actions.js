@@ -95,25 +95,12 @@ actions.createNewRole = function(label, baseRole, context) {
 actions.updateRoleName = function(id, label, baseType) {
   return (dispatch, getState) => {
     apiClient
-      .updateRole(getState(), {id, label, base_role_type: baseType})
+      .updateRole(getState().contextId, id, {label, base_role_type: baseType})
       .then(res => {
         dispatch(actions.updateRole(res.data))
       })
       .catch(error => {
         showFlashError(I18n.t('Failed to update role name'))(error)
-      })
-  }
-}
-
-actions.updateRoleNameAndBaseType = function(id, label, baseType) {
-  return (dispatch, getState) => {
-    apiClient
-      .updateRole(getState(), {id, label, base_role_type: baseType})
-      .then(res => {
-        dispatch(actions.updateRole(res.data))
-      })
-      .catch(_ => {
-        $.screenReaderFlashMessage(I18n.t('Failed to update role name'))
       })
   }
 }
@@ -161,21 +148,6 @@ actions.tabChanged = function tabChanged(newContextType) {
   }
 }
 
-function changePermission(role, permissionName, enabled, locked, explicit) {
-  return {
-    ...role,
-    permissions: {
-      ...role.permissions,
-      [permissionName]: {
-        ...role.permissions[permissionName],
-        enabled,
-        locked,
-        explicit
-      }
-    }
-  }
-}
-
 actions.modifyPermissions = function modifyPermissions({
   name,
   id,
@@ -186,9 +158,8 @@ actions.modifyPermissions = function modifyPermissions({
 }) {
   return (dispatch, getState) => {
     const role = getState().roles.find(r => r.id === id)
-    const updatedRole = changePermission(role, name, enabled, locked, explicit)
     apiClient
-      .updateRole(getState(), updatedRole)
+      .updateRole(getState().contextId, id, {permissions: {[name]: {enabled, locked, explicit}}})
       .then(res => {
         const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
         dispatch(actions.updatePermissions({role: newRes}))

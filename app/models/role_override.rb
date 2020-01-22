@@ -30,10 +30,14 @@ class RoleOverride < ActiveRecord::Base
   after_save :clear_caches
 
   def clear_caches
-    self.account.send_later_if_production_enqueue_args(:clear_downstream_caches,
-      {:singleton => "clear_downstream_role_caches:#{self.account.global_id}"},
+    RoleOverride.clear_caches(self.account, self.role)
+  end
+
+  def self.clear_caches(account, role)
+    account.send_later_if_production_enqueue_args(:clear_downstream_caches,
+      {:singleton => "clear_downstream_role_caches:#{account.global_id}"},
       :role_overrides)
-    self.role.touch
+    role.touch
   end
 
   def must_apply_to_something
@@ -1206,7 +1210,10 @@ class RoleOverride < ActiveRecord::Base
         end
         role_override.save!
       elsif role_override
+        account = role_override.account
+        role = role_override.role
         role_override.destroy
+        RoleOverride.clear_caches(account, role)
         role_override = nil
       end
       role_override
