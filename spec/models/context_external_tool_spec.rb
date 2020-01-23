@@ -51,14 +51,16 @@ describe ContextExternalTool do
 
   describe "#global_navigation_tools" do
     subject do
-      ContextExternalTool.global_navigation_tools(
+      ContextExternalTool.filtered_global_navigation_tools(
         @root_account,
-        'admins',
-        user: global_nav_user,
-        context: global_nav_context
+        granted_permissions
       )
     end
 
+    let(:granted_permissions) {
+      ContextExternalTool.global_navigation_granted_permissions(root_account: @root_account,
+        user: global_nav_user, context: global_nav_context, session: nil)
+    }
     let(:global_nav_user) {}
     let(:global_nav_context) {}
     let(:required_permission) { 'some-permission' }
@@ -1472,17 +1474,20 @@ describe ContextExternalTool do
 
     it "should let account admins see admin tools" do
       account_admin_user(:account => @account, :active_all => true)
-      expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'admins'
+      expect(ContextExternalTool.global_navigation_granted_permissions(
+        root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'admins'
     end
 
     it "should let teachers see admin tools" do
       course_with_teacher(:account => @account, :active_all => true)
-      expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'admins'
+      expect(ContextExternalTool.global_navigation_granted_permissions(
+        root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'admins'
     end
 
     it "should not let students see admin tools" do
       course_with_student(:account => @account, :active_all => true)
-      expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'members'
+      expect(ContextExternalTool.global_navigation_granted_permissions(
+        root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'members'
     end
 
     it "should update the visibility cache if enrollments are updated or user is touched" do
@@ -1490,21 +1495,25 @@ describe ContextExternalTool do
       enable_cache(:redis_cache_store) do
         Timecop.freeze(time) do
           course_with_student(:account => @account, :active_all => true)
-          expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'members'
+          expect(ContextExternalTool.global_navigation_granted_permissions(
+            root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'members'
         end
 
         Timecop.freeze(time + 1.second) do
           course_with_teacher(:account => @account, :active_all => true, :user => @user)
-          expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'admins'
+          expect(ContextExternalTool.global_navigation_granted_permissions(
+            root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'admins'
         end
 
         Timecop.freeze(time + 2.second) do
           @user.teacher_enrollments.update_all(:workflow_state => 'deleted')
           # should not have affected the earlier cache
-          expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'admins'
+          expect(ContextExternalTool.global_navigation_granted_permissions(
+            root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'admins'
 
           @user.clear_cache_key(:enrollments)
-          expect(ContextExternalTool.global_navigation_visibility_for_user(@account, @user)).to eq 'members'
+          expect(ContextExternalTool.global_navigation_granted_permissions(
+            root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'members'
         end
       end
     end
@@ -1521,24 +1530,24 @@ describe ContextExternalTool do
           @member_tool.save!
           @other_tool = @account.context_external_tools.create!(:name => "c", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
 
-          @admin_cache_key = ContextExternalTool.global_navigation_menu_cache_key(@account, 'admins')
-          @member_cache_key = ContextExternalTool.global_navigation_menu_cache_key(@account, 'members')
+          @admin_cache_key = ContextExternalTool.global_navigation_menu_render_cache_key(@account, {:original_visibility => 'admins'})
+          @member_cache_key = ContextExternalTool.global_navigation_menu_render_cache_key(@account, {:original_visibility => 'members'})
         end
 
         Timecop.freeze(time + 1.second) do
           @other_tool.save!
           # cache keys should remain the same
-          expect(ContextExternalTool.global_navigation_menu_cache_key(@account, 'admins')).to eq @admin_cache_key
-          expect(ContextExternalTool.global_navigation_menu_cache_key(@account, 'members')).to eq @member_cache_key
+          expect(ContextExternalTool.global_navigation_menu_render_cache_key(@account, {:original_visibility => 'admins'})).to eq @admin_cache_key
+          expect(ContextExternalTool.global_navigation_menu_render_cache_key(@account, {:original_visibility => 'members'})).to eq @member_cache_key
         end
 
         Timecop.freeze(time + 2.second) do
           @admin_tool.global_navigation = nil
           @admin_tool.save!
           # should update the admin key
-          expect(ContextExternalTool.global_navigation_menu_cache_key(@account, 'admins')).not_to eq @admin_cache_key
+          expect(ContextExternalTool.global_navigation_menu_render_cache_key(@account, {:original_visibility => 'admins'})).not_to eq @admin_cache_key
           # should not update the members key
-          expect(ContextExternalTool.global_navigation_menu_cache_key(@account, 'members')).to eq @member_cache_key
+          expect(ContextExternalTool.global_navigation_menu_render_cache_key(@account, {:original_visibility => 'members'})).to eq @member_cache_key
         end
       end
     end
