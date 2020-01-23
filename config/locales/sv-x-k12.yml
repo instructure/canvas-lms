@@ -13947,7 +13947,7 @@ sv-x-k12:
       hide_rte_button_note: "(finns fortfarande kvar för inlämningar av konversationer/SpeedGrader/Mediainspelningar)"
       hints: 
         domain: "För lokala konton, använd \"www.kaltura.com\""
-        resource_domain: "För lokala konton, använd \"cdn.kaltura.com\"\""
+        resource_domain: "För lokala konton, använd \"cdn.kaltura.com\""
         rtmp_domain: "För lokala konton, använd \"www.kaltura.com\""
       kaltura_path_example: t.ex.
       kaltura_sis_explanation: "Om markerad kommer användare och kurs-SIS att skickas till Kaltura."
