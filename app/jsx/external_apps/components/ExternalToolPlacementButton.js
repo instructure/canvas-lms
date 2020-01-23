@@ -29,7 +29,6 @@ export default class ExternalToolPlacementButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
     type: PropTypes.string, // specify "button" if this is not a menu item
-    onClose: PropTypes.func,
     returnFocus: PropTypes.func.isRequired
   }
 
@@ -49,6 +48,12 @@ export default class ExternalToolPlacementButton extends React.Component {
 
   openModal = e => {
     e.preventDefault()
+
+    // Don't open the modal if it's already open
+    if (this.state.modalIsOpen) {
+      return
+    }
+
     if (this.props.tool.app_type === 'ContextExternalTool') {
       store.fetchWithDetails(this.props.tool).then(data => {
         const tool = _.extend(data, this.props.tool)
@@ -66,9 +71,7 @@ export default class ExternalToolPlacementButton extends React.Component {
   }
 
   closeModal = () => {
-    this.setState({modalIsOpen: false}, () => {
-      if (this.props.onClose) this.props.onClose()
-    })
+    this.setState({modalIsOpen: false})
     this.props.returnFocus()
   }
 
