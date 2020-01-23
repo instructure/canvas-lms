@@ -17908,7 +17908,7 @@ es:
           recompute: Recalcular
         correct_answer_comments: "Comentarios de respuestas correctas"
         distractor_instructions: "Escriba cada distractor en su propia línea"
-        equation_example: "p. ej., \"¿Qué es 5 más [x]?\"\""
+        equation_example: "p. ej., \"¿Qué es 5 más [x]?\""
         explanation: 
           generate_possible_solutions: "Por último, cree tantas combinaciones de variables y soluciones como necesite para su examen."
         explanations: 
@@ -17955,7 +17955,7 @@ es:
         links: 
           add_another_answer: "Agregue otra respuesta"
           need_help: "¿Necesita ayuda?"
-        multi_answer_sets_example: "p.ej., \"Las rosas son [color1], las violetas son [color2]\"\""
+        multi_answer_sets_example: "p.ej., \"Las rosas son [color1], las violetas son [color2]\""
         offer_combinations: "Ofrecer %{how_many} combinaciones posibles de valor (máx. %{max_combinations})"
         options: 
           only_one_correct: "Solo una respuesta correcta"
