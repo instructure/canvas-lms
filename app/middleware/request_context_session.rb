@@ -25,7 +25,13 @@ class RequestContextSession
     status, headers, body = @app.call(env)
 
     session_id = (env['rack.session.options'] || {})[:id]
-    ActionDispatch::Request.new(env).cookie_jar[:log_session_id] = session_id if session_id
+    if session_id
+      ActionDispatch::Request.new(env).cookie_jar[:log_session_id] = {
+        :value => session_id,
+        :secure => CanvasRails::Application.config.session_options[:secure],
+        :httponly => true
+      }
+    end
 
     [ status, headers, body ]
   end
