@@ -3074,6 +3074,9 @@ export default do ->
 
       @options.course_settings.filter_speed_grader_by_student_group && @getStudentGroupToShow() == '0'
 
+    showSimilarityScore: (assignment) =>
+      !!@options.show_similarity_score
+
     destroy: =>
       $(window).unbind('resize.fillWindowWithMe')
       $(document).unbind('gridready')
