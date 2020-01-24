@@ -115,7 +115,7 @@ describe "RCE Next autosave feature" do
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       saved_content = JSON.parse(saved_content)
-      expect(saved_content["content"]).to eql('<p>hello</p><p><br data-mce-bogus="1"></p>')
+      expect(saved_content["content"]).to eql("<p>hello</p>\n<p>&nbsp;</p>")
       driver.local_storage.clear
     end
 
