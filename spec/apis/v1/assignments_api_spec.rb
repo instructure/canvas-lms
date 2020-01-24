@@ -1556,7 +1556,7 @@ describe AssignmentsApiController, type: :request do
       expect_any_instantiation_of(@course).to receive(:vericite_enabled?).
         at_least(:once).and_return true
       @json = api_create_assignment_in_course(@course,
-        create_assignment_json(@group, @group_category).merge({'muted' => 'true'})
+        create_assignment_json(@group, @group_category)
        )
       @group_category.reload
       @assignment = Assignment.find @json['id']
@@ -1566,7 +1566,6 @@ describe AssignmentsApiController, type: :request do
       expect(@json['name']).to eq 'some assignment'
       expect(@json['course_id']).to eq @course.id
       expect(@json['description']).to eq 'assignment description'
-      expect(@json['muted']).to eq true
       expect(@json['lock_at']).to eq @assignment.lock_at.iso8601
       expect(@json['unlock_at']).to eq @assignment.unlock_at.iso8601
       expect(@json['automatic_peer_reviews']).to eq true
@@ -2452,9 +2451,7 @@ describe AssignmentsApiController, type: :request do
             course_id: @course.id.to_s
           },
           {
-            assignment: create_assignment_json(@group, @group_category)
-             .merge(params)
-             .except("muted")
+            assignment: create_assignment_json(@group, @group_category).merge(params)
           },
           {},
           { expected_status: expected_status }
@@ -3077,7 +3074,6 @@ describe AssignmentsApiController, type: :request do
                                                   :peer_reviews_due_at => Time.now,
                                                   :grading_type => 'percent',
                                                   :due_at => nil)
-        @assignment.update_attribute(:muted, false)
         @assignment.assignment_group = @start_group
         @assignment.group_category = @assignment.context.group_categories.create!(name: "foo")
         @assignment.save!
@@ -3097,7 +3093,6 @@ describe AssignmentsApiController, type: :request do
           'grading_type' => 'letter_grade',
           'due_at' => '2011-01-01T00:00:00Z',
           'position' => 1,
-          'muted' => true,
           'allowed_attempts' => 10
         })
         @assignment.reload
@@ -3125,11 +3120,6 @@ describe AssignmentsApiController, type: :request do
       it "updates the assignment's description" do
         expect(@assignment.description).to eq 'assignment description'
         expect(@json['description']).to eq 'assignment description'
-      end
-
-      it "updates the assignment's muted property" do
-        expect(@assignment.muted?).to eq true
-        expect(@json['muted']).to eq true
       end
 
       it "updates the assignment's position" do
@@ -4239,11 +4229,6 @@ describe AssignmentsApiController, type: :request do
         expect(@json['description']).to be_nil
       end
 
-      it "returns the mute status of the assignment" do
-        @json = api_get_assignment_in_course(@assignment,@course)
-        expect(@json["muted"]).to eql false
-      end
-
       it "translates assignment descriptions" do
         course_with_teacher(:active_all => true)
         should_translate_user_content(@course) do |content|
@@ -4907,18 +4892,6 @@ describe AssignmentsApiController, type: :request do
         :role_changes => {:manage_sis => true})
       update_from_params(@assignment, params, @admin)
       expect(@assignment.sis_source_id).to eq "BLAH"
-    end
-
-    it "unmuting publishes hidden comments" do
-      @assignment.mute!
-      @assignment.update_submission @student, comment: "blah blah blah", author: @teacher
-      sub = @assignment.submission_for_student(@student)
-      comment = sub.submission_comments.first
-      expect(comment.hidden?).to eql true
-
-      params = ActionController::Parameters.new({"muted" => "false"})
-      update_from_params(@assignment, params, @teacher)
-      expect(comment.reload.hidden?).to eql false
     end
 
     it "does not update anonymous grading if the anonymous marking feature flag is not set" do

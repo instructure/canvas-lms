@@ -420,8 +420,17 @@
 #           "description" : "(optional, Third Party integration data for assignment)"
 #         },
 #         "muted": {
+#           "deprecated": true,
+#           "deprecation_notice": "2020-02-26",
+#           "deprecation_effective": "2020-06-03",
+#           "deprecation_description": "Use hidden_submissions_count to determine whether an assignment has feedback that has not been posted to students.",
 #           "description": "For courses using Old Gradebook, indicates whether the assignment is muted. For courses using New Gradebook, true if the assignment has any unposted submissions, otherwise false. To see the posted status of submissions, check the 'posted_attribute' on Submission.",
 #           "type": "boolean"
+#         },
+#         "hidden_submissions_count": {
+#           "description": "The number of submissions that are unposted and have a grade or instructor comments.",
+#           "example": 1,
+#           "type": "integer"
 #         },
 #         "points_possible": {
 #           "description": "the maximum points possible for the assignment",
@@ -999,13 +1008,6 @@ class AssignmentsApiController < ApplicationController
   #   The assignment group id to put the assignment in.
   #   Defaults to the top assignment group in the course.
   #
-  # @deprecated_argument assignment[muted] [Boolean] NOTICE 2019-07-13 EFFECTIVE 2020-01-18
-  #   Whether this assignment is muted.
-  #   A muted assignment does not send change notifications
-  #   and hides grades from students.
-  #   Defaults to false.
-  #   May only be set if the course is using Old Gradebook.
-  #
   # @argument assignment[assignment_overrides][] [AssignmentOverride]
   #   List of overrides for the assignment.
   #
@@ -1190,13 +1192,6 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[assignment_group_id] [Integer]
   #   The assignment group id to put the assignment in.
   #   Defaults to the top assignment group in the course.
-  #
-  # @deprecated_argument assignment[muted] [Boolean] NOTICE 2019-07-13 EFFECTIVE 2020-01-18
-  #   Whether this assignment is muted.
-  #   A muted assignment does not send change notifications
-  #   and hides grades from students.
-  #   Defaults to false.
-  #   May only be set if the course is using Old Gradebook.
   #
   # @argument assignment[assignment_overrides][] [AssignmentOverride]
   #   List of overrides for the assignment.
