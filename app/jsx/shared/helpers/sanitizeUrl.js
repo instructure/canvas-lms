@@ -21,8 +21,9 @@
  * @param {string} url
  */
 export default function sanitizeUrl(url) {
-  const badSchemeRegex = /javascript:/
-  if (url.match(badSchemeRegex)) {
+  const parsedUrl = new URL(url, window.location.origin)
+  // eslint-disable-next-line no-script-url
+  if (parsedUrl.protocol === 'javascript:') {
     return 'about:blank'
   }
   return url
