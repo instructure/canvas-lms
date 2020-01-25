@@ -4749,7 +4749,7 @@ zh-Hans:
   changing_your_policy_now_will_affect_previously_gr_62063898: 现在更改策略将影响之前已评分的提交项。
   chars_written_max_character_length_len_fec9bd18: "%{chars} 书面，最大字符长度%{len}"
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: 学生的每个作业成绩的图表
-  chat_2153c6b7: 洽谈
+  chat_2153c6b7: 聊天
   check_back_in_a_little_while_17756399: 请稍后返回查看。
   check_back_later_c4234dbc: 稍后回来检查
   check_services_to_enable_8877c451: 检查服务以启用
@@ -9616,8 +9616,8 @@ zh-Hans:
       no_outcomes_found: 找不到结果
       no_rubric_outcomes_found: 找不到评分标准配置的结果
     titles: 
-      find_outcome: 查找评分标准
-  find_outcome_746cc57e: 查找评分标准
+      find_outcome: 查找結果
+  find_outcome_746cc57e: 查找結果
   find_questions_4930b38f: 寻找问题
   finish_bc343002: 完成
   finished_19aaf6f5: 已完成
@@ -17915,7 +17915,7 @@ zh-Hans:
               输入您的问题文本，然后定义空格所有可能的正确答案。  
               学生将看到问题，后跟一个小文本框用于键入其答案。
           text_only: 此"问题"将不会评分，但在引入一组相关问题时非常有用。
-          true_false: "输入您的问题文本，然后选择 True 或 False 作为正确答案。"
+          true_false: 输入您的问题文本，然后选择真或假作为正确答案。
           variable_definitions: 一旦您输入上述变量后，应看到这些变量在此处列出。您可以指定下面每个变量可能的值范围。
         general_answer_comments: 一般答案评论
         headers: 
@@ -17954,12 +17954,12 @@ zh-Hans:
           matching: 匹配
           missing_word: 缺字
           multiple_answers: 多个答案
-          multiple_choice: 多选
+          multiple_choice: 单选
           multiple_dropdowns: 多个下拉列表
           numerical: 数值答案
           short_answer: 填空题
           text_only: 文本（无问题）
-          true_false: True/False
+          true_false: 对/错
         show_possible_answers: "显示 %{question} 可能的答案"
         show_possible_answers_no_question: 显示可能的答案
         titles: 
