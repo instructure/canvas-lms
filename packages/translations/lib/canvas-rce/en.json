@@ -46,9 +46,11 @@
   "click_to_embed_imagename_c41ea8df": {
     "message": "Click to embed { imageName }"
   },
+  "click_to_hide_preview_3c707763": { "message": "Click to hide preview" },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Click to insert a link into the editor."
   },
+  "click_to_show_preview_faa27051": { "message": "Click to show preview" },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Close a menu or dialog. Also returns you to the editor area"
   },
@@ -146,6 +148,9 @@
     "message": "Focus the popup context toolbar"
   },
   "formatting_5b143aa8": { "message": "Formatting" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Found auto-saved content"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Found { count, plural,\n     =0 {# results}\n    one {# result}\n  other {# results}\n}"
   },
@@ -218,6 +223,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "No Alt Text (Decorative Image)"
   },
+  "no_e16d9132": { "message": "No" },
   "no_results_940393cf": { "message": "No results." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No results found for { filterTerm }"
@@ -249,6 +255,7 @@
   },
   "posted_when_a578f5ab": { "message": "Posted: { when }" },
   "preformatted_d0670862": { "message": "Preformatted" },
+  "preview_53003fd2": { "message": "Preview" },
   "preview_a3f8f854": { "message": "PREVIEW" },
   "previous_page_928fc112": { "message": "Previous Page" },
   "published_c944a23d": { "message": "published" },
@@ -261,6 +268,7 @@
   "record_upload_media_5fdce166": { "message": "Record/Upload Media" },
   "recording_98da6bda": { "message": "Recording" },
   "remove_link_d1f2f4d0": { "message": "Remove Link" },
+  "restore_auto_save_deccd84b": { "message": "Restore auto-save?" },
   "rich_content_editor_2708ef21": { "message": "Rich Content Editor" },
   "right_to_left_ec223c81": { "message": "right to left" },
   "save_11a80ec3": { "message": "Save" },
@@ -305,6 +313,9 @@
   "syllabus_f191f65b": { "message": "Syllabus" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Arrows" },
   "text_7f4593da": { "message": "Text" },
+  "there_is_auto_saved_content_that_differs_from_the__4716a452": {
+    "message": "There is auto-saved content that differs from the saved content. Would you like to load it instead?"
+  },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Though your video will have the correct title in the browser, we failed to update it in the database."
   },
@@ -367,6 +378,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Wiki Home" },
+  "yes_dde87d5": { "message": "Yes" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Your webcam may already be in use."
   }
