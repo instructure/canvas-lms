@@ -1227,7 +1227,7 @@ sv-x-k12:
       settings_crumb: Inställningar
       tab_admins: Administratörer
       tab_alerts: Notiser
-      tab_announcements: Anslag
+      tab_announcements: Meddelanden
       tab_external_tools: Appar
       tab_notifications: Aviseringar
       tab_quotas: Kvoter
@@ -2212,7 +2212,7 @@ sv-x-k12:
   announcement_type_b231573b: "Typ av anslag"
   announcement_update_failed_6a6ec9fe: "Det gick inte att uppdatera anslaget"
   announcements: 
-    announcements_crumb: Anslag
+    announcements_crumb: Meddelanden
     error_draft_state: "Det här ämnet kan inte ställas in som utkast eftersom det är ett anslag."
     feed_name: "%{course} Anslagsflöde"
     feed_title_course: "Anslag atomflöde"
@@ -2241,7 +2241,7 @@ sv-x-k12:
     podcast_feed_name: "%{course} Anslags podcastflöde"
     podcast_title_course: "Anslags podcastflöde"
     podcast_title_group: "Gruppanslagens podcastflöde"
-  announcements_a4b8ed4a: Anslag
+  announcements_a4b8ed4a: Meddelanden
   announcements_account_4e9df626: "Anslag (konto)"
   announcements_cannot_be_duplicated_2de8824c: "Anslag kan inte kopieras"
   announcements_deleted_successfully_7d77e9e1: "Anslag har tagits bort"
@@ -4994,7 +4994,7 @@ sv-x-k12:
         title: 
           enrollment_sis_defined: "Den här registreringen definierades av universitet och kan inte raderas"
         user_account_details: "Användarens kontoinformation"
-        user_grades: Omdömen
+        user_grades: Bedömningar
         user_only_view_section: "begränsa den här användaren till att endast se användare från samma sektion"
         user_view_all_sections: "låt den här användaren se alla kursanvändare"
       no_messages: "Inga meddelanden"
@@ -6311,7 +6311,7 @@ sv-x-k12:
   croatian_d713d655: Kroatiska
   crumbs: 
     access_report: Åtkomstrapport
-    announcements: Anslag
+    announcements: Meddelanden
     assignments: Uppgifter
     calendar_events: Kalenderhändelser
     collaborations: Samarbeten
@@ -6323,7 +6323,7 @@ sv-x-k12:
     eportfolio_welcome: "Välkommen till din ePortfolio"
     error_reports: Felrapporter
     files: Filer
-    grades: Omdömen
+    grades: Bedömningar
     grading_standards: Bedömning
     groups: Grupper
     jobs: Jobb
@@ -8665,7 +8665,7 @@ sv-x-k12:
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "Bedömningsöversikt och SpeedGrader kommer inte att vara tillgänglig om både Omdömen – redigera och Omdömen – visa alla omdömen är inaktiverade."
   gradebook_context_name_9dbae5bc: "Bedömningsöversikt – %{context_name}"
   gradebook_csvs: 
-    grades_filename: Omdömen
+    grades_filename: Bedömningar
   gradebook_export_failed_reason_2b0f6c53: "Exporten av bedömningsöversikten misslyckades: %{reason}"
   gradebook_export_started_723461b9: "Exporten av bedömningsöversikten påbörjades"
   gradebook_history_a3e8e0b4: "Historik för bedömningsöversikt"
@@ -8780,7 +8780,7 @@ sv-x-k12:
       incomplete: Ofullständig
     grading_box_extended: 
       labels: 
-        grade: Omdöme
+        grade: Bedömning
     history: 
       graded_on_submission: "Bedömd vid inlämning"
       regraded: "Ny bedömning"
@@ -8882,7 +8882,7 @@ sv-x-k12:
   graders_can_view_each_other_s_comments_d836b848: "Bedömare kan se varandras kommentarer"
   graders_cannot_view_each_other_s_names_b1fa7899: "Bedömare kan inte se andra bedömares namn"
   graders_cannot_view_student_names_2e8d3ff9: "Bedömare kan inte se elevernas namn"
-  grades_a61eba0a: Omdömen
+  grades_a61eba0a: Bedömningar
   grades_are_now_reverted_to_original_scores_e6deade1: "Omdömen har nu återgått till ursprungliga resultat"
   grades_are_now_showing_what_if_scores_711a8be2: "Omdömen visar nu tänk om-resultat"
   grades_cannot_be_modified_from_this_page_as_they_h_af66cd9f: "Bedömningar kan inte ändras från denna sida eftersom de redan har postats."
@@ -10186,7 +10186,7 @@ sv-x-k12:
       no_submission_created: "Det gick inte att skapa någon ny inlämning av uppgifter för det här lärandemålet."
     canvas: 
       migration: 
-        announcements: Anslag
+        announcements: Meddelanden
         assessment_question_banks: Frågebanker
         assignments: Uppgifter
         attachments: Filer
@@ -16595,7 +16595,7 @@ sv-x-k12:
         sections: "Sektioner:"
       index: 
         empty_student_selection: "Välj en elev att visa ytterligare information för här."
-        grades: Omdömen
+        grades: Bedömningar
         student_info: Elevinformation
         submissions_loading: "Elevens inlämningar håller fortfarande på att läsas in ..."
   search: 
@@ -18301,14 +18301,14 @@ sv-x-k12:
   table_of_contents_544d9471: Innehållsförteckning
   table_of_contents_d2d11ba6: Innehållsförteckning
   tabs: 
-    announcements: Anslag
+    announcements: Meddelanden
     assignments: Uppgifter
     collaborations: Samarbeten
     conferences: Konferenser
     discussions: Diskussioner
     eportfolios: ePortfolios
     files: Filer
-    grades: Omdömen
+    grades: Bedömningar
     home: Startsida
     modules: Moduler
     observees: Observerar
@@ -19014,7 +19014,7 @@ sv-x-k12:
   titles: 
     aligned_items: "Inriktade objekt"
     announcement: Anslag
-    announcements: Anslag
+    announcements: Meddelanden
     assignments: Uppgifter
     come_back_later: "Du har markerat den här frågan för att återkomma senare"
     discussion: Diskussion
@@ -19838,7 +19838,7 @@ sv-x-k12:
       unenroll_user: "Vill du verkligen ta bort registreringen av den här användaren?"
     could_not_find_url: "Det gick inte att hitta nedladdningslänk"
     crumbs: 
-      grades: Omdömen
+      grades: Bedömningar
       profile: "%{user}s profil"
     current_conference: 
       current_conference_text: "Du har blivit inbjuden att delta i **[%{conference}](%{link_to_conference})**. Den startade %{started_at} och har %{participant_count}."
@@ -19875,7 +19875,7 @@ sv-x-k12:
         teacher_activity: "Rapport över elevinteraktioner"
       no_grade: "inget omdöme"
       no_grades: "inget omdömen"
-      page_title: Omdömen
+      page_title: Bedömningar
       percent: Procent
       send_teacher_message: "Skicka meddelande till läraren"
       titles: 
@@ -19963,7 +19963,7 @@ sv-x-k12:
       terms_of_use: Användarvillkor
     no_self_registration: "Självregistrering har inte aktiverats för det här kontot"
     oauth_fail: "OAuth-begäran misslyckades. Kunde inte hitta giltig begäran"
-    page_title: Omdömen
+    page_title: Bedömningar
     scheduled_conference: 
       current_conference_text: "Du har blivit inbjuden att delta i %{conference}. Den startar %{starts_at}."
     service_not_enabled: "Den tjänsten har inte aktiverats"
