@@ -27,7 +27,7 @@ module Api::V1::QuizzesNext::Quiz
   private
 
   def klass(quiz)
-    return QuizzesNext::QuizSerializer if quiz.is_a?(Assignment)
+    return ::QuizzesNext::QuizSerializer if quiz.is_a?(Assignment)
 
     return Quizzes::QuizSerializer if quiz.is_a?(Quizzes::Quiz)
 
