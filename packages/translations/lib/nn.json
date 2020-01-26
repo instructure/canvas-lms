@@ -644,6 +644,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Ingen innleveringsfristar er sett opp"
     },
+    "no_e16d9132": {
+        "message": "Nei"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Inga vurdering"
     },
@@ -742,6 +745,9 @@
     },
     "preformatted_d0670862": {
         "message": "Førehandsformatert"
+    },
+    "preview_53003fd2": {
+        "message": "Førehandsvising"
     },
     "preview_a3f8f854": {
         "message": "Førehandsvisning"
@@ -1066,6 +1072,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki-startside"
+    },
+    "yes_dde87d5": {
+        "message": "Ja"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "I går på { date }"

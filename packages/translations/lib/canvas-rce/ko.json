@@ -56,10 +56,12 @@
   "loading_failed_b3524381": { "message": "Loading failed..." },
   "media_af190855": { "message": "미디어" },
   "modules_c4325335": { "message": "모듈" },
+  "no_e16d9132": { "message": "아니요" },
   "no_results_940393cf": { "message": "No results." },
   "options_3ab0ea65": { "message": "옵션" },
   "pages_e5414c2c": { "message": "페이지" },
   "people_b4ebb13c": { "message": "사용자" },
+  "preview_53003fd2": { "message": "미리 보기" },
   "quizzes_7e598f57": { "message": "퀴즈" },
   "record_7c9448b": { "message": "녹음/녹화" },
   "recording_98da6bda": { "message": "녹음/녹화" },
@@ -72,5 +74,6 @@
   "title_ee03d132": { "message": "제목" },
   "upload_file_fd2361b8": { "message": "파일 업로드" },
   "url_22a5f3b8": { "message": "URL" },
-  "wiki_home_9cd54d0": { "message": "위키 홈" }
+  "wiki_home_9cd54d0": { "message": "위키 홈" },
+  "yes_dde87d5": { "message": "예" }
 }

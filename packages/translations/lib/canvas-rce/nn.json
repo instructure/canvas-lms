@@ -193,6 +193,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Ingen alternativ tekst (dekorativt bilde)"
   },
+  "no_e16d9132": { "message": "Nei" },
   "no_results_940393cf": { "message": "Utan resultat. " },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultat funne for { filterTerm }"
@@ -218,6 +219,7 @@
   },
   "posted_when_a578f5ab": { "message": "Posta: { when }" },
   "preformatted_d0670862": { "message": "Førehandsformatert" },
+  "preview_53003fd2": { "message": "Førehandsvising" },
   "preview_a3f8f854": { "message": "Førehandsvisning" },
   "previous_page_928fc112": { "message": "Førre side" },
   "published_c944a23d": { "message": "publisert" },
@@ -331,6 +333,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Wiki-startside" },
+  "yes_dde87d5": { "message": "Ja" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Ditt webkamera kan allereie være i bruk"
   }

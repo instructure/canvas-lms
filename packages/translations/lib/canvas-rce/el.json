@@ -68,10 +68,12 @@
   "loading_failed_b3524381": { "message": "Η Φόρτωση Απέτυχε" },
   "media_af190855": { "message": "Δεδομένα" },
   "modules_c4325335": { "message": "Ενότητες" },
+  "no_e16d9132": { "message": "μη δημοσιευμένο" },
   "no_results_940393cf": { "message": "Δεν υπάρχουν Αποτελέσματα" },
   "options_3ab0ea65": { "message": "Επιλογές" },
   "pages_e5414c2c": { "message": "Σελίδες" },
   "people_b4ebb13c": { "message": "Κοινό" },
+  "preview_53003fd2": { "message": "Προεπισκόπηση" },
   "published_c944a23d": { "message": "δημοσιευμένο/α" },
   "quizzes_7e598f57": { "message": "Κουίζ" },
   "record_7c9448b": { "message": "Ηχογράφηση" },
@@ -91,5 +93,6 @@
   "upload_media_ce31135a": { "message": "Μεταφόρτωση Αρχείου Πολυμέσων" },
   "url_22a5f3b8": { "message": "URL" },
   "video_player_b371005": { "message": "Πρόγραμμα Αναπαραγωγής Βίντεο" },
-  "wiki_home_9cd54d0": { "message": "Αρχική Σελίδα Wiki" }
+  "wiki_home_9cd54d0": { "message": "Αρχική Σελίδα Wiki" },
+  "yes_dde87d5": { "message": "Ναι" }
 }

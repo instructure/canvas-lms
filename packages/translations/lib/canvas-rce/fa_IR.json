@@ -62,6 +62,7 @@
   "media_af190855": { "message": "رسانه" },
   "modules_c4325335": { "message": "ماژول ها" },
   "next_page_d2a39853": { "message": "صفحه بعد" },
+  "no_e16d9132": { "message": "خیر" },
   "no_results_940393cf": { "message": "No results." },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "باز کردن این کادر گفتکوی میانبرهای صفحه کلید"
@@ -69,6 +70,7 @@
   "options_3ab0ea65": { "message": "گزینه ها" },
   "pages_e5414c2c": { "message": "صفحه ها" },
   "people_b4ebb13c": { "message": "افراد" },
+  "preview_53003fd2": { "message": "پیش‌نمایش" },
   "previous_page_928fc112": { "message": "صفحه قبل" },
   "published_c944a23d": { "message": "منتشر شده" },
   "quizzes_7e598f57": { "message": "آزمون ها" },
@@ -90,5 +92,6 @@
   "upload_media_ce31135a": { "message": "بارگذاری رسانه" },
   "url_22a5f3b8": { "message": "نشانی اینترنتی" },
   "video_player_b371005": { "message": "پخش کننده فیلم" },
-  "wiki_home_9cd54d0": { "message": "صفحه اصلی ویکی" }
+  "wiki_home_9cd54d0": { "message": "صفحه اصلی ویکی" },
+  "yes_dde87d5": { "message": "بله" }
 }
