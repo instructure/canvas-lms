@@ -18,19 +18,15 @@
 
 import createPermissionsIndex from 'jsx/permissions'
 import {COURSE, ACCOUNT, ALL_ROLES_VALUE, ALL_ROLES_LABEL} from '../permissions/propTypes'
-import {getSortedRoles} from '../permissions/helper/utils'
+import {getSortedRoles, groupGranularPermissionsInRole} from '../permissions/helper/utils'
 import ready from '@instructure/ready'
 
 ready(() => {
   const root = document.querySelector('#content')
 
-  // We only want a 1-level flatten
+  // Edge does not support `.flat()` :(
   function flatten(arr) {
-    let result = []
-    arr.forEach(a => {
-      result = result.concat(a)
-    })
-    return result
+    return arr.reduce((acc, val) => acc.concat(val), [])
   }
 
   // The ENV variables containing the permissions are an array of:
@@ -38,6 +34,36 @@ ready(() => {
   // so we want to flatten this out to just the permissions.
   function flattenPermissions(permissionsFromEnv) {
     return flatten(permissionsFromEnv.map(item => item.group_permissions))
+  }
+
+  function groupGranularPermissions(permissions) {
+    const [permissionsList, groups] = permissions.reduce(
+      (acc, p) => {
+        const [permissionsList, groups] = acc // eslint-disable-line no-shadow
+
+        if (p.granular_permission_group) {
+          if (!groups[p.granular_permission_group]) {
+            groups[p.granular_permission_group] = []
+          }
+          groups[p.granular_permission_group].push(p)
+        } else {
+          permissionsList.push(p)
+        }
+
+        return acc
+      },
+      [[], {}]
+    )
+
+    Object.entries(groups).forEach(([group_name, group_permissions]) => {
+      permissionsList.push({
+        label: group_permissions[0].granular_permission_group_label,
+        permission_name: group_name,
+        granular_permissions: group_permissions
+      })
+    })
+
+    return permissionsList.sort((a, b) => a.label > b.label)
   }
 
   function markAndCombineArrays(courseArray, accountArray) {
@@ -65,10 +91,16 @@ ready(() => {
   accountAdmin.displayed = false
   accountAdmin.contextType = 'Account'
 
+  const roles = markAndCombineArrays(ENV.COURSE_ROLES, ENV.ACCOUNT_ROLES)
+  roles.forEach(role => groupGranularPermissionsInRole(role))
+
   const initialState = {
     contextId: ENV.ACCOUNT_ID, // This is at present always an account, I think?
-    permissions: markAndCombineArrays(permissions, flattenPermissions(ENV.ACCOUNT_PERMISSIONS)),
-    roles: getSortedRoles(markAndCombineArrays(ENV.COURSE_ROLES, ENV.ACCOUNT_ROLES), accountAdmin),
+    permissions: markAndCombineArrays(
+      groupGranularPermissions(permissions),
+      groupGranularPermissions(flattenPermissions(ENV.ACCOUNT_PERMISSIONS))
+    ),
+    roles: getSortedRoles(roles, accountAdmin),
     selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}]
   }
 

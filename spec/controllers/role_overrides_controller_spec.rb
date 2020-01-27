@@ -324,6 +324,30 @@ describe RoleOverridesController do
           expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys}).to eq true
         end
       end
+
+      context 'with granular permissions' do
+        before :each do
+          @account.root_account.enable_feature!(:granular_permissions_wiki_pages)
+          @grouped_permission = 'manage_wiki'
+          @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
+        end
+
+        it 'sets granular permissions information in the js_env' do
+          get 'index', params: {:account_id => @account.id}
+
+          wiki_permissions = []
+          [:ACCOUNT_PERMISSIONS, :COURSE_PERMISSIONS].each do |js_env_key|
+            assigns[:js_env][js_env_key].each_with_object(wiki_permissions) do |permission_group, list|
+              permission_group[:group_permissions].each do |permission|
+                list << permission if permission[:permission_name].to_s.start_with?("manage_wiki")
+              end
+            end
+          end
+
+          expect(wiki_permissions.map { |p| p[:granular_permission_group] }.uniq).to eq ['manage_wiki']
+          expect(wiki_permissions.map { |p| p[:granular_permission_group_label] }.uniq).to eq ['Manage Pages']
+        end
+      end
     end
   end
 end

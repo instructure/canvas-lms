@@ -653,6 +653,10 @@ class RoleOverridesController < ApplicationController
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
       hash = {:label =>
              p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, :permission_name => p[0]}
+      if p[1].key?(:group)
+        hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
+        hash[:granular_permission_group_label] = p[1][:group_label].call
+      end
 
       # Check to see if the base role name is in the list of other base role names in p[1]
       is_course_permission = !(Role::ENROLLMENT_TYPES & p[1][:available_to]).empty?
@@ -710,6 +714,11 @@ class RoleOverridesController < ApplicationController
       next if !context.root_account? && p[0].to_s == 'manage_developer_keys'
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
       hash = {:label => p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, :permission_name => p[0]}
+      if p[1].key?(:group)
+        hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
+        hash[:granular_permission_group_label] = p[1][:group_label].call
+      end
+
       if p[1][:account_only]
         if p[1][:account_only] == :site_admin
           site_admin[:group_permissions] << hash

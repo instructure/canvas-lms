@@ -707,7 +707,8 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ],
       :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
-      :group => 'manage_wiki'
+      :group => 'manage_wiki',
+      :group_label => lambda { t('Manage Pages') }
     },
     :manage_wiki_delete => {
       :label => lambda { t("Delete pages") },
@@ -728,7 +729,8 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ],
       :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
-      :group => 'manage_wiki'
+      :group => 'manage_wiki',
+      :group_label => lambda { t('Manage Pages') }
     },
     :manage_wiki_update => {
       :label => lambda { t("Update pages") },
@@ -749,7 +751,8 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ],
       :account_allows => lambda {|a| a.root_account.feature_enabled?(:granular_permissions_wiki_pages)},
-      :group => 'manage_wiki'
+      :group => 'manage_wiki',
+      :group_label => lambda { t('Manage Pages') }
     },
     :moderate_forum => {
       :label => lambda { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },
