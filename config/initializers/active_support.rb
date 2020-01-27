@@ -85,7 +85,7 @@ module IgnoreMonkeyPatchesInDeprecations
     return true if path&.start_with?(File.expand_path(File.dirname(__FILE__) + "/../../gems/activesupport-suspend_callbacks"))
     return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/support/blank_slate_protection.rb")
     return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/selenium/common.rb")
-    @switchman ||= File.expand_path('..', Gem.loaded_specs['switchman'].full_gem_path) + "/"
+    @switchman ||= File.expand_path(Gem.loaded_specs['switchman'].full_gem_path) + "/"
     return true if path&.start_with?(@switchman)
     return true if label == 'render' && path&.end_with?("application_controller.rb")
     return true if label == 'named_context_url' && path&.end_with?("application_controller.rb")
