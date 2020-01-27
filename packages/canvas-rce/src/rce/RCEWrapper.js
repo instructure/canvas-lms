@@ -740,6 +740,8 @@ class RCEWrapper extends React.Component {
         this.doAutoSave(e)
       })
 
+      this.cleanupAutoSave()
+
       try {
         const autosaved = this.getAutoSaved(this.autoSaveKey)
         if (autosaved && autosaved.content) {
@@ -752,8 +754,9 @@ class RCEWrapper extends React.Component {
             this.storage.removeItem(this.autoSaveKey)
           }
         }
-      } finally {
-        this.cleanupAutoSave()
+      } catch (ex) {
+        // log and ignore
+        console.error('Failed initializing rce autosave', ex)
       }
     }
   }

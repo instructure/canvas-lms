@@ -130,5 +130,21 @@ describe "RCE Next autosave feature" do
       expect(saved_content).to be_nil
       driver.local_storage.clear
     end
+
+    it "should clean up expired autosaved entries before prompting to restore" do
+      skip("all but one test fails with Selenium::WebDriver::Error::NoSuchAlertError, see LA-355")
+      create_and_edit_announcement
+      saved_content = driver.local_storage[autosave_key]
+      assert(saved_content)
+
+      Setting.set('rce_auto_save_max_age_ms', 10)
+
+      driver.navigate.refresh
+      accept_alert
+      wait_for_rce
+
+      expect(f('body')).not_to contain_css('[data-testid="RCE_RestoreAutoSaveModal"]')
+      driver.local_storage.clear
+    end
   end
 end
