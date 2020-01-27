@@ -418,7 +418,7 @@ class DiscussionTopicsController < ApplicationController
         append_sis_data(hash)
         js_env(hash)
         js_env({
-          DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :manage_content) && @domain_root_account&.feature_enabled?(:direct_share)
+          DIRECT_SHARE_ENABLED: @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage_content) && @domain_root_account&.feature_enabled?(:direct_share)
         }, true)
         set_tutorial_js_env
 
