@@ -93,7 +93,10 @@ module Lti::Messages
     def return_url
       @expander.controller.polymorphic_url(
         [@context, :deep_linking_response],
-        { modal: MODAL_PLACEMENTS.include?(placement) }
+        {
+          modal: MODAL_PLACEMENTS.include?(placement),
+          context_module_id: @opts[:context_module_id]
+        }.compact
       )
     end
   end

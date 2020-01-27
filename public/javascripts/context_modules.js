@@ -1775,7 +1775,7 @@ modules.initModuleManagement = function() {
         .parents('.context_module')
         .find('.name')
         .attr('title')
-      const options = {for_modules: true}
+      const options = {for_modules: true, context_module_id: id}
       options.select_button_text = I18n.t('buttons.add_item', 'Add Item')
       options.holder_name = name
       options.height = 550

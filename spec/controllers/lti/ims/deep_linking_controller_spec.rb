@@ -40,7 +40,8 @@ module Lti
             lti_endpoint: Rails.application.routes.url_helpers.polymorphic_url(
               [:retrieve, account, :external_tools],
               host: 'test.host'
-            )
+            ),
+            reload_page: false
           )
           subject
         end
@@ -222,6 +223,49 @@ module Lti
 
           it_behaves_like 'errors' do
             let(:response_message) { 'the JWT has expired' }
+          end
+        end
+
+        context 'when multiple content items are received' do
+          let(:course) { course_model }
+          let(:context_module) { course.context_modules.create!(:name => 'Test Module')}
+          let(:developer_key) do
+            key = DeveloperKey.create!(account: course.account)
+            key.generate_rsa_keypair!
+            key.developer_key_account_bindings.first.update!(
+              workflow_state: 'on'
+            )
+            key.save!
+            key
+          end
+
+          let(:context_external_tool) {
+            ContextExternalTool.create!(
+              context: course.account,
+              url: 'https://www.test.com',
+              name: 'test tool',
+              shared_secret: 'secret',
+              consumer_key: 'key',
+              developer_key: developer_key
+            )
+          }
+
+          let(:params) { super().merge({course_id: course.id, context_module_id: context_module.id})}
+          let(:content_items) {
+            [
+              { type: 'ltiResourceLink', url: 'http://tool.url', title: "Item 1"},
+              { type: 'ltiResourceLink', url: 'http://tool.url', title: "Item 2"},
+              { type: 'ltiResourceLink', url: 'http://tool.url', title: "Item 3"}
+            ]
+          }
+
+          it 'creates multiple modules items' do
+            course
+            user_session(@user)
+            context_external_tool
+            subject
+            is_expected.to be_success
+            expect(context_module.content_tags.count).to eq(3)
           end
         end
       end
