@@ -16,15 +16,75 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Not yet an API, for reasons outlined in MediaObjectsController
+# Partially an API
+
+# @API Media Objects
+# @subtopic Media Tracks
+#
+# Closed captions added to a video MediaObject
+#
+# @object MediaTrack
+#   {
+#     "id": 42,
+#     "user_id": 1,
+#     "media_object_id": 14,
+#     "kind": "subtitles",
+#     "locale": "es",
+#     "content": "1]\\n00:00:00,000 --> 00:00:01,251\nI'm spanish",
+#     "created_at": "Mon, 24 Feb 2020 16:04:02 EST -05:00",
+#     "updated_at": "Mon, 24 Feb 2020 16:59:05 EST -05:00",
+#     "webvtt_content": "WEBVTT\n\n1]\\n00:00:00.000 --> 00:00:01.251\nI'm spanish"
+#   }
+#
 class MediaTracksController < ApplicationController
   include Api::V1::MediaObject
 
   TRACK_SETTABLE_ATTRIBUTES = [:kind, :locale, :content].freeze
 
+  # @API List media tracks for a Media Object
+  #
+  # List the media tracks associated with a media object
+  #
+  # @argument include[] [String, "content"|"webvtt_content"|"updated_at"|"created_at"]
+  #   By default, index returns id, locale, kind, media_object_id, and user_id for each of the
+  #   result MediaTracks. Use include[] to
+  #   add additional fields. For example include[]=content
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/media_objects/<media_object_id>/media_tracks?include[]=content
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @returns [MediaTrack]
+  def index
+    @media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
+    return render_unauthorized_action unless @media_object
+
+    # assume that if I have access to the MediaObject, I can list its tracks
+    media_tracks = []
+    @media_object.media_tracks.where(user_id: @current_user.id).each do |t|
+      track = {
+        :id => t.id,
+        :locale => t.locale,
+        :kind => t.kind,
+        :media_object_id => t.media_object_id,
+        :user_id => t.user_id
+      }
+      if params[:include].present?
+        whitelist = ["content", "webvtt_content", "updated_at", "created_at"]
+        params[:include].each do |field|
+          track[field] = t[field] if whitelist.include? field
+        end
+      end
+      media_tracks << track
+    end
+
+    render :json => media_tracks
+  end
+
   # @{not an}API Create a media track
   #
-  # Create a new media track to be used as captions for different languages or deaf users. for more info, {https://developer.mozilla.org/en-US/docs/HTML/HTML_Elements/track read the MDN docs}
+  # Create a new media track to be used as captions for different languages or deaf users.
+  # For more info, {https://developer.mozilla.org/en-US/docs/HTML/HTML_Elements/track read the MDN docs}
   #
   # @argument kind [String, "subtitles"|"captions"|"descriptions"|"chapters"|"metadata"]
   #   Default is 'subtitles'.
@@ -91,4 +151,53 @@ class MediaTracksController < ApplicationController
     end
   end
 
+  # @API Update Media Tracks
+  #
+  # Replace the media tracks associated with a media object with
+  # the array of tracks provided in the body.
+  # Update will
+  # delete any existing tracks not listed,
+  # leave untouched any tracks with no content field,
+  # and update or create tracks with a content field.
+  #
+  # @argument include[] [String]
+  #   By default, index returns id and locale for each of the
+  #   result MediaTracks. Use include[] to
+  #   add additional fields. For example include[]=content
+  #   See #index for allowed values.
+  #
+  # @example_request
+  #   curl -X PUT https://<canvas>/api/v1/media_objects/<media_object_id>/mediatracksinclude[]=content \
+  #     -H 'Authorization: Bearer <token>'
+  #     -d '[{"locale": "en"}, {"locale": "af","content": "1\r\n00:00:00,000 --> 00:00:01,251\r\nThis is the content\r\n"}]'
+  #
+  # @returns [MediaTrackk]
+  def update
+    @media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
+    return render_unauthorized_action unless @media_object
+    return render_unauthorized_action unless @current_user
+
+    if @media_object.grants_all_rights?(@current_user, session, :add_captions, :delete_captions)
+      new_tracks = JSON.parse(request.body.read) || []
+      old_track_locales = @media_object.media_tracks.where(user_id: @current_user.id).pluck(:locale)
+
+      # delete the tracks that don't exist in the new set
+      removed_track_locales = old_track_locales - new_tracks.pluck('locale')
+      removed_tracks = @media_object.media_tracks.where(user_id: @current_user.id, locale: removed_track_locales)
+      removed_tracks.destroy_all
+
+      # create or update the new tracks
+      new_tracks.each do |t|
+        # if the new track coming from the client has no content, it hasn't been updated. Leave it alone.
+        next if t["content"].blank?
+
+
+        track = @media_object.media_tracks.where(user_id: @current_user.id, locale: t['locale']).first_or_initialize
+        track.update! ActionController::Parameters.new(t).permit(*TRACK_SETTABLE_ATTRIBUTES)
+      end
+      index
+    else
+      return render_unauthorized_action
+    end
+  end
 end
