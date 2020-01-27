@@ -60,7 +60,11 @@ class EffectiveDueDates
       hsh[assignment_id] ||= {}
       attributes = {}
       if include?(included, :due_at)
-        attributes[:due_at] = row["due_at"] && DateTime.parse(row["due_at"])
+        if CANVAS_RAILS5_2
+          attributes[:due_at] = row["due_at"] && DateTime.parse(row["due_at"])
+        else
+          attributes[:due_at] = row["due_at"]
+        end
       end
       if include?(included, :grading_period_id)
         attributes[:grading_period_id] = row["grading_period_id"] && row["grading_period_id"].to_i

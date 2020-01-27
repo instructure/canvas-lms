@@ -538,7 +538,11 @@ class UserMerge
           # the either user, but also so we don't destroy submissions in case
           # of a user split.
           to_move_ids = scope.graded.select(unique_id).where.not(unique_id => already_scope.graded.select(unique_id)).pluck(:id)
-          to_move_ids += scope.having_submission.select(unique_id).where.not(unique_id => already_scope.having_submission.select(unique_id), id: to_move_ids).pluck(:id)
+          to_move_ids += scope.having_submission.
+            select(unique_id).
+            where.not(unique_id => already_scope.having_submission.select(unique_id)).
+            where.not(id: to_move_ids).
+            pluck(:id)
           to_move = scope.where(id: to_move_ids).to_a
           move_back = already_scope.where(unique_id => to_move.map(&unique_id)).to_a
           merge_data.build_more_data(to_move, data: data) unless to_move.empty?

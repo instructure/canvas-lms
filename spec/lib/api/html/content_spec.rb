@@ -127,6 +127,7 @@ module Api
 
           child_account = Account.default.sub_accounts.create!(name: 'child account')
           child_account.root_account.settings[:sub_account_includes] = true
+          child_account.root_account.save!
 
           bc = child_account.build_brand_config({
             mobile_css_overrides: 'https://example.com/child/account.css',
