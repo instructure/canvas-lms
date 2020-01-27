@@ -63,7 +63,7 @@ describe('when configuration method is by URL', () => {
   })
 
   it('renders the tool configuration URL in a text input', () => {
-    const textInput = wrapper.find('TextInput').at(1)
+    const textInput = wrapper.find('TextInput')
     const expectedString = newProps().toolConfigurationUrl
     expect(textInput.html()).toEqual(expect.stringContaining(expectedString))
   })

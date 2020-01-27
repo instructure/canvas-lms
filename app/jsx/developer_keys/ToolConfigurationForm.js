@@ -20,7 +20,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Heading} from '@instructure/ui-elements'
-import {Select} from '@instructure/ui-select'
+// If we want to upgrade this Select to the new Inst UI Select in ui-select,
+// which is not backwards-compatible, we can use CanvasSelect.
+import {Select} from '@instructure/ui-forms'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {View, Grid} from '@instructure/ui-layout'
