@@ -138,7 +138,7 @@
               <% if @current_user && tutapoint_url %>
                 <%= button_to tutapoint_url, params: { username: @current_user.pseudonym&.unique_id,
                       last_name: @current_user.last_name, first_name: @current_user.first_name, email: @current_user.email,
-                      auth_key: SettingsService.get_settings(object: 'school', id: 1)['tutapoint_auth_key'], timezone: @current_user.time_zone.tzinfo.name },
+                      auth_key: SettingsService.get_settings(object: 'school', id: 1)['tutapoint_auth_key'], timezone: @current_user.timezone_name },
                     id: "tutapoint-btn", class: "btn-link", form: {target: '_blank'} do %>
                       <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
                         <%= svg_icon :educators %>
