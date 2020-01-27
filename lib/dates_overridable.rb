@@ -24,8 +24,8 @@ module DatesOverridable
   class NotOverriddenError < RuntimeError; end
 
   def self.included(base)
-    base.has_many :assignment_overrides, :dependent => :destroy
-    base.has_many :active_assignment_overrides, -> { where(workflow_state: 'active') }, class_name: 'AssignmentOverride'
+    base.has_many :assignment_overrides, :dependent => :destroy, inverse_of: base.table_name.singularize
+    base.has_many :active_assignment_overrides, -> { where(workflow_state: 'active') }, class_name: 'AssignmentOverride', inverse_of: base.table_name.singularize
     base.has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :dependent => :destroy
     base.has_many :all_assignment_override_students, class_name: 'AssignmentOverrideStudent', :dependent => :destroy
 

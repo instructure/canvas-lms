@@ -28,8 +28,8 @@ class AssignmentOverride < ActiveRecord::Base
 
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
 
-  belongs_to :assignment
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
+  belongs_to :assignment, inverse_of: :assignment_overrides
+  belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
   has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :inverse_of => :assignment_override, :dependent => :destroy, :validate => false
   validates_presence_of :assignment_version, :if => :assignment
