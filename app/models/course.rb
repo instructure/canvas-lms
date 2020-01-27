@@ -3001,6 +3001,7 @@ class Course < ActiveRecord::Base
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :public_syllabus_to_auth, :boolean => true, :default => false
   add_setting :course_format
+  add_setting :newquizzes_engine_selected
   add_setting :image_id
   add_setting :image_url
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
