@@ -82,7 +82,7 @@ gem 'icalendar', '2.5.3', require: false
 gem 'ims-lti', '2.3.0', require: 'ims'
 gem 'json_schemer', '0.2.7'
 gem 'simple_oauth', '0.3.1', require: false
-gem 'json', '2.2.0'
+gem 'json', '2.3.0'
 gem 'link_header', '0.0.8'
 gem 'oj', '3.3.9'
 gem 'json-jwt', '1.10.2', require: false
