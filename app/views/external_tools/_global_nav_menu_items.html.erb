@@ -16,10 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% visibility = ContextExternalTool.global_navigation_visibility_for_user(@domain_root_account, @current_user) %>
+<% granted_permissions = ContextExternalTool.global_navigation_granted_permissions(root_account: @domain_root_account,
+    user: @current_user, context: @context || @domain_root_account, session: session) %>
 
-<% cache([ContextExternalTool.global_navigation_menu_cache_key(@domain_root_account, visibility)]) do %>
-  <% tools = ContextExternalTool.global_navigation_tools(@domain_root_account, visibility, user: @current_user, context: @context || @domain_root_account, session: session) %>
+<% cache([ContextExternalTool.global_navigation_menu_render_cache_key(@domain_root_account, granted_permissions)]) do %>
+  <% tools = ContextExternalTool.filtered_global_navigation_tools(@domain_root_account, granted_permissions) %>
   <% tools.each do |tool|
       tool_display = tool.extension_setting('global_navigation', 'windowTarget') == '_blank' ? 'borderless' : nil
       tool_path = account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation', display: tool_display)
