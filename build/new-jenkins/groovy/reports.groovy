@@ -54,22 +54,20 @@ def stashSpecFailures(index) {
 
 def publishSpecFailuresAsHTML(ci_node_total) {
   sh 'rm -rf ./compiled_failures'
-  def htmlFiles;
+
   dir('compiled_failures') {
     for(int index = 0; index < ci_node_total; index++) {
       dir ("node_${index}") {
-        unstash "spec_failures_${index}"
+        try {
+          unstash "spec_failures_${index}"
+        } catch(err) {
+          println (err)
+        }
+
       }
     }
+    buildIndexPage();
     htmlFiles = findFiles glob: '**/index.html'
-
-    def indexHtml = "<body style=\"font-family:sans-serif;line-height:1.25;font-size:14px\">"
-    htmlFiles.each {
-      def spec = (it =~ /.*spec_failures\/(.*)\/index/)[0][1]
-      indexHtml += "<a href=\"${it}\">${spec}</a><br>"
-    }
-    indexHtml += "</body>"
-    writeFile file: "index.html", text: indexHtml
   }
 
   publishHTML target: [
@@ -77,10 +75,39 @@ def publishSpecFailuresAsHTML(ci_node_total) {
     alwaysLinkToLastBuild: false,
     keepAll: true,
     reportDir: 'compiled_failures',
-    reportFiles: "index.html," + htmlFiles.join(','),
+    reportFiles: htmlFiles.join(','),
     reportName: 'Test Failures'
   ]
   sh 'rm -rf ./compiled_failures'
+}
+
+def buildIndexPage() {
+  def indexHtml = "<body style=\"font-family:sans-serif;line-height:1.25;font-size:14px\">"
+  def htmlFiles;
+  htmlFiles = findFiles glob: '**/index.html'
+  if (htmlFiles.size()<1) {
+    indexHtml += "\\o/ yay good job, no failures"
+  } else {
+      Map<String, List<String>> failureCategory = [:]
+      htmlFiles.each { file ->
+        def category = file.getPath().split("/")[2]
+        if (failureCategory.containsKey("${category}")) {
+          failureCategory.get("${category}").add("${file}")
+        } else {
+          failureCategory.put("${category}", [])
+          failureCategory.get("${category}").add("${file}")
+        }
+      }
+      failureCategory.each {category, failures ->
+        indexHtml += "<h1>${category} Failures</h1>"
+        failures.each { failure ->
+          def spec = (failure =~ /.*spec_failures\/(.*)\/index/)[0][1]
+          indexHtml += "<a href=\"${failure}\">${spec}</a><br>"
+        }
+      }
+  }
+  indexHtml += "</body>"
+  writeFile file: "index.html", text: indexHtml
 }
 
 return this

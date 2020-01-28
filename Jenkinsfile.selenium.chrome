@@ -75,12 +75,14 @@ pipeline {
                         sh 'build/new-jenkins/rspec-with-retries.sh'
                       }
                     }
-                    catch (ex) {
-                      // copy spec failures to local
-                      sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp/spec_failures/'
-                      throw ex
-                    }
                     finally {
+                      // copy spec failures to local
+                      sh 'mkdir -p tmp'
+                      sh (
+                           script: 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp/spec_failures/',
+                           returnStatus: true
+                         )
+
                       def reports = load 'build/new-jenkins/groovy/reports.groovy'
                       reports.stashSpecFailures(index)
                       if (env.COVERAGE == '1') {
@@ -112,7 +114,7 @@ pipeline {
   }
 
   post {
-    failure {
+    always {
       script {
         def reports = load 'build/new-jenkins/groovy/reports.groovy'
         reports.publishSpecFailuresAsHTML(ci_node_total)
