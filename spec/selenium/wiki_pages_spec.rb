@@ -624,29 +624,4 @@ describe "Wiki Pages" do
       expect(f("iframe")).to be_present
     end
   end
-
-  context "MathML" do
-    include_context "public course as a logged out user"
-
-    it "should load mathjax in a page with <math>" do
-      skip('Unskip in ADMIN-2684')
-      title = "mathML"
-      public_course.wiki_pages.create!(
-        :title => title,
-        :body => "<math><mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup></math>"
-      )
-      get "/courses/#{public_course.id}/wiki/#{title}"
-      is_mathjax_loaded = driver.execute_script("return (typeof MathJax == 'object')")
-      expect(is_mathjax_loaded).to match(true)
-    end
-
-    it "should not load mathjax without <math>" do
-      title = "not_mathML"
-      public_course.wiki_pages.create!(:title => title, :body => "not mathML")
-      get "/courses/#{public_course.id}/wiki/#{title}"
-      is_mathjax_loaded = driver.execute_script("return (typeof MathJax == 'object')")
-      expect(is_mathjax_loaded).not_to match(true)
-
-    end
-  end
 end
