@@ -406,8 +406,10 @@ class ApplicationController < ActionController::Base
   def tool_dimensions
     tool_dimensions = {selection_width: '100%', selection_height: '100%'}
 
+    link_settings = @tag&.link_settings || {}
+
     tool_dimensions.each do |k, v|
-      tool_dimensions[k] = @tool.settings[k] || v
+      tool_dimensions[k] = link_settings[k.to_s] || @tool.settings[k] || v
       tool_dimensions[k] = tool_dimensions[k].to_s << 'px' unless tool_dimensions[k].to_s =~ /%|px/
     end
 
