@@ -508,6 +508,10 @@
                   <%= settings.check_box :enable_profiles, :checked => @account.settings[:enable_profiles] %>
                   <%= settings.label :enable_profiles, :en => "Enable Profiles" %>
                 </div>
+                <div>
+                  <%= settings.check_box :limit_parent_app_web_access, :checked => @account.settings[:limit_parent_app_web_access] %>
+                  <%= settings.label :limit_parent_app_web_access, :en => "Limit access to Canvas web from the Canvas Parent app" %>
+                </div>
               <% end %>
               <%# end of :manage_site_settings %>
 

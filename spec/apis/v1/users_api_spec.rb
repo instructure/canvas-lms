@@ -787,7 +787,11 @@ describe "Users API", type: :request do
          'integration_id' => nil,
          'login_id' => @other_user.pseudonym.unique_id,
          'locale' => nil,
-         'permissions' => {'can_update_name' => true, 'can_update_avatar' => false},
+         'permissions' => {
+           'can_update_name' => true,
+           'can_update_avatar' => false,
+           'limit_parent_app_web_access' => false,
+         },
          'email' => @other_user.email
       })
     end
@@ -804,7 +808,11 @@ describe "Users API", type: :request do
          'short_name' => @other_user.short_name,
          'locale' => nil,
          'effective_locale' => 'en',
-         'permissions' => {'can_update_name' => true, 'can_update_avatar' => false}
+         'permissions' => {
+           'can_update_name' => true,
+           'can_update_avatar' => false,
+           'limit_parent_app_web_access' => false,
+         },
       })
     end
 
@@ -813,12 +821,29 @@ describe "Users API", type: :request do
       Account.default.tap { |a| a.settings[:users_can_edit_name] = false }.save
       json = api_call(:get, "/api/v1/users/self",
                       { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
-      expect(json['permissions']).to eq({'can_update_name' => false, 'can_update_avatar' => false})
+      expect(json['permissions']).to eq({
+        'can_update_name' => false,
+        'can_update_avatar' => false,
+        'limit_parent_app_web_access' => false,
+      })
 
       Account.default.tap { |a| a.enable_service(:avatars) }.save
       json = api_call(:get, "/api/v1/users/self",
                       { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
-      expect(json['permissions']).to eq({'can_update_name' => false, 'can_update_avatar' => true})
+      expect(json['permissions']).to eq({
+        'can_update_name' => false,
+        'can_update_avatar' => true,
+        'limit_parent_app_web_access' => false,
+      })
+
+      Account.default.tap { |a| a.settings[:limit_parent_app_web_access] = true }.save
+      json = api_call(:get, "/api/v1/users/self",
+                      { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
+      expect(json['permissions']).to eq({
+        'can_update_name' => false,
+        'can_update_avatar' => true,
+        'limit_parent_app_web_access' => true,
+      })
     end
 
     it "should retrieve the right avatar permissions" do

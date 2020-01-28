@@ -943,7 +943,8 @@ class AccountsController < ApplicationController
             :include_integration_ids_in_gradebook_exports,
             :show_scheduler,
             :global_includes,
-            :gmail_domain
+            :gmail_domain,
+            :limit_parent_app_web_access,
           ].each do |key|
             params[:account][:settings].try(:delete, key)
           end
@@ -1472,6 +1473,7 @@ class AccountsController < ApplicationController
                                    :default_group_storage_quota, :default_group_storage_quota_mb,
                                    :default_user_storage_quota, :default_user_storage_quota_mb, :default_time_zone,
                                    :edit_institution_email, :enable_alerts, :enable_eportfolios, :enable_course_catalog,
+                                   :limit_parent_app_web_access,
                                    {:enable_offline_web_export => [:value]}.freeze,
                                    :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
                                    :equella_teaser, :external_notification_warning, :global_includes,
