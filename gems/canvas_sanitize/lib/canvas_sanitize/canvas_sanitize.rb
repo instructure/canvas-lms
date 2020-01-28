@@ -94,11 +94,14 @@ module CanvasSanitize #:nodoc:
   SANITIZE = {
       :elements => [
           'a', 'b', 'blockquote', 'br', 'caption', 'cite', 'code', 'col',
-          'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8',
+          'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
           'del', 'ins', 'iframe', 'font',
           'colgroup', 'dd', 'div', 'dl', 'dt', 'em', 'figure', 'figcaption', 'i', 'img', 'li', 'ol', 'p', 'pre',
           'q', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'sup', 'abbr', 'table', 'tbody', 'td',
           'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param', 'video', 'track', 'audio',
+          # added to unify tinymce and canvas_sanitize whitelists
+          'address', 'acronym', 'map', 'area','bdo', 'dfn', 'kbd', 'legend', 'samp', 'tt', 'var', 'big',
+          'article', 'aside', 'details', 'footer', 'header', 'nav', 'section', 'summary', 'time',
           # MathML
           'annotation', 'annotation-xml', 'maction', 'maligngroup', 'malignmark', 'math',
           'menclose', 'merror', 'mfenced', 'mfrac', 'mglyph', 'mi', 'mlabeledtr', 'mlongdiv',
