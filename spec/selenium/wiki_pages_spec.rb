@@ -154,29 +154,7 @@ describe "Wiki Pages" do
     end
   end
 
-  context "Index Page as a student" do
-    before do
-      course_with_student_logged_in
-    end
-
-    it "should display a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
-      page = @course.wiki_pages.create!(title: 'delete_deux')
-      # sets the workflow_state = deleted to act as a deleted page
-      page.workflow_state = 'deleted'
-      page.save!
-      get "/courses/#{@course.id}/pages/delete_deux"
-      expect_flash_message :warning
-    end
-
-    it "should display a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
-      skip('LA-373')
-      get "/courses/#{@course.id}/pages/non-existant"
-      expect_flash_message :warning
-    end
-  end
-
   context "Accessibility" do
-
     def check_header_focus(attribute)
       f("[data-sort-field='#{attribute}']").click
       wait_for_ajaximations
