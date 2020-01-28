@@ -267,6 +267,35 @@ module Lti
             is_expected.to be_success
             expect(context_module.content_tags.count).to eq(3)
           end
+
+          it 'does not pass launch dimensions' do
+            course
+            user_session(@user)
+            context_external_tool
+            subject
+            is_expected.to be_success
+            expect(context_module.content_tags[0][:link_settings]).to be(nil)
+          end
+
+          context 'when content items have iframe property' do
+            let(:content_items) {
+              [
+                { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: "Item 1"},
+                { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: "Item 2"},
+                { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: "Item 3"}
+              ]
+            }
+
+            it 'passes launch dimensions as link_settings' do
+              course
+              user_session(@user)
+              context_external_tool
+              subject
+              is_expected.to be_success
+              expect(context_module.content_tags[0][:link_settings]['selection_width']).to be(642)
+              expect(context_module.content_tags[0][:link_settings]['selection_height']).to be(842)
+            end
+          end
         end
       end
     end

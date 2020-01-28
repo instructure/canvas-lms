@@ -38,6 +38,14 @@ module Lti::Ims::Concerns
       return render_unauthorized_action unless authorized_action(context_module, @current_user, :update) && tool.present?
 
       content_items.each do |content_item|
+        # the iframe property in a deep linking response can contain
+        # link-specific launch dimensions, which if present overrides
+        # the dimensions set on the tool
+        launch_dimensions = {
+          selection_width: content_item[:iframe][:width],
+          selection_height: content_item[:iframe][:height]
+        } if content_item[:iframe]
+
         tag = context_module.add_item({
           type: 'context_external_tool',
           id: tool.id,
@@ -45,7 +53,8 @@ module Lti::Ims::Concerns
           indent: 0,
           url: content_item[:url],
           title: content_item[:title],
-          position: 1
+          position: 1,
+          link_settings: launch_dimensions
         })
         return render :json => tag.errors, :status => :bad_request unless tag&.valid?
         @context.touch
