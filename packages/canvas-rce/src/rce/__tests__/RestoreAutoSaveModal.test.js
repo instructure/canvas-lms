@@ -29,9 +29,7 @@ describe('RestoreAutoSaveModal', () => {
 
     expect(getByText('Found auto-saved content')).toBeInTheDocument()
     expect(
-      getByText(
-        'There is auto-saved content that differs from the saved content. Would you like to load it instead?'
-      )
+      getByText('Auto-saved content exists. Would you like to load the auto-saved content instead?')
     ).toBeInTheDocument()
     expect(getByText('Preview')).toBeInTheDocument()
     expect(getByText('Click to show preview')).toBeInTheDocument()
