@@ -26,6 +26,7 @@ describe 'course wiki pages' do
     include_context "public course as a logged out user"
 
     it "should load mathjax in a page with <math>" do
+      skip('LA-379')
       title = "mathML"
       public_course.wiki_pages.create!(
         :title => title,
