@@ -75,14 +75,6 @@ body {
       height: auto !important;
     }
   }
-
-  &.full-width.grades:not(.gradebook) { // Speedgrader
-
-    .ic-Layout-wrapper {
-        max-width: unset !important;
-        transform: unset !important;
-    }
-  }
 }
 
 // so we don't get the non-interactionable content
