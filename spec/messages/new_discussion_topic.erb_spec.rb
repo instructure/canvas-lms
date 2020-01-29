@@ -40,6 +40,15 @@ describe 'new_discussion_topic' do
         expect(message.body).to include("Discussion content is locked or not yet available")
       end
 
+      it "should send locked notification if module is locked for email" do
+        @module = @course.context_modules.create!(:unlock_at => 2.days.from_now)
+        @module.add_item(:id => @topic.id, :type => 'discussion_topic')
+        @topic.reload
+        enrollment = course_with_student
+        message = generate_message(notification_name, :email, @topic, :user => enrollment.user)
+        expect(message.body).to include("Discussion content is locked or not yet available")
+      end
+
       it "should send discussion notification with discussions content when unlocked for email" do
         @topic.update(
           unlock_at: nil,
