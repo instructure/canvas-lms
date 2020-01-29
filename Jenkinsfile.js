@@ -83,7 +83,7 @@ pipeline {
       steps {
         timeout(time: 2) {
           sh 'build/new-jenkins/docker-cleanup.sh'
-          sh 'printenv | sort'
+          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
           sh 'rm -rf ./tmp/*'
         }
       }
@@ -130,11 +130,11 @@ pipeline {
               }
             }
           }
-          
+
           tests['canvas_quizzes'] = {
             sh 'build/new-jenkins/js/tests-quizzes.sh'
           }
-          
+
           ['coffee', 'jsa', 'jsg', 'jsh'].each { group ->
             tests["Karma - Spec Group - ${group}"] = {
               withEnv(["CONTAINER_NAME=tests-karma-${group}", "JSPEC_GROUP=${group}"]) {
