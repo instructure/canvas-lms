@@ -500,6 +500,20 @@ describe "RCE next tests" do
       expect(upload_document_modal).to be_displayed
     end
 
+    it "should not include media upload option if disabled" do
+      double('CanvasKaltura::ClientV3')
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({
+        'hide_rte_button' => true
+      })
+      visit_front_page_edit(@course)
+      media_button = media_toolbar_button
+      media_button.click
+      menu_id = media_button.attribute('aria-owns')
+      expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
+      expect(menu_item_by_menu_id(menu_id, "User Media")).to be_displayed
+      expect(menu_items_by_menu_id(menu_id).length).to be(2)
+    end
+
     it "should close sidebar after drag and drop" do
       skip("kills many selenium tests. Address in CORE-3147")
       title = "Assignment-Title"
