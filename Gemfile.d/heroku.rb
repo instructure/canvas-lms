@@ -16,3 +16,7 @@ gem "logjam_agent", github: "beyond-z/logjam_agent"
 # Performance tuning halp!
 # See: https://devcenter.heroku.com/articles/scout
 gem 'scout_apm', require: false
+
+# Auto-scaling!
+# See: https://elements.heroku.com/addons/rails-autoscale
+gem 'rails_autoscale_agent', require: false

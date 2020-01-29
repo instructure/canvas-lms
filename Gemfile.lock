@@ -766,6 +766,8 @@ GEM
     rails_12factor (0.0.3)
       rails_serve_static_assets
       rails_stdout_logging
+    rails_autoscale_agent (0.7.0)
+      activesupport (>= 3.2)
     rails_serve_static_assets (0.0.5)
     rails_stdout_logging (0.0.5)
     railties (4.0.13)
@@ -1132,6 +1134,7 @@ DEPENDENCIES
   rails-observers (= 0.1.2)
   rails-patch-json-encode (= 0.0.1)
   rails_12factor
+  rails_autoscale_agent
   rake (= 10.5.0)
   ratom-nokogiri (= 0.10.4)
   rb-fchange
