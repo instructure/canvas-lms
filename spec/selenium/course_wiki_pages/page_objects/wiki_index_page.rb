@@ -49,8 +49,19 @@ module CourseWikiIndexPage
       f('div.loading')
     end
 
+    def add_new_page_button
+      f('a.btn.new_page')
+    end
+
     #------------------------------ Actions ------------------------------
     def visit_course_wiki_index_page(course_id)
       get "/courses/#{course_id}/pages"
+    end
+
+    #------------------------------ Methods ------------------------------
+    def check_header_focus(attribute)
+      f("[data-sort-field='#{attribute}']").click
+      wait_for_ajaximations
+      check_element_has_focus(f("[data-sort-field='#{attribute}']"))
     end
 end

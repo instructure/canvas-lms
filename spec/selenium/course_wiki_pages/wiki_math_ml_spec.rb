@@ -33,8 +33,9 @@ describe 'course wiki pages' do
         :body => "<math><mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup></math>"
       )
       visit_wiki_page_view(public_course.id, title)
+      wait_for_ajaximations
       is_mathjax_loaded = driver.execute_script("return (typeof MathJax == 'object')")
-      expect(is_mathjax_loaded).to match(true)
+      expect(is_mathjax_loaded).to be true
     end
 
     it "should not load mathjax without <math>" do
@@ -42,7 +43,7 @@ describe 'course wiki pages' do
       public_course.wiki_pages.create!(:title => title, :body => "not mathML")
       visit_wiki_page_view(public_course.id, title)
       is_mathjax_loaded = driver.execute_script("return (typeof MathJax == 'object')")
-      expect(is_mathjax_loaded).not_to match(true)
+      expect(is_mathjax_loaded).to be false
     end
   end
 end

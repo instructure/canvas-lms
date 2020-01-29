@@ -55,11 +55,27 @@ module CourseWikiPage
   def immersive_reader_btn
     fj("[type='button']:contains('Immersive Reader')")
   end
+  
+  def edit_page_title_input
+    f('input#title')
+  end
+
+  def tiny_mce_input
+    f('#tinymce')
+  end
+
+  def course_home_nav_menu
+    fj("a:contains('Home')")
+  end
 
   #------------------------------ Actions -------------------------------
 
   def visit_wiki_page_view(course_id, page_title)
     get "/courses/#{course_id}/pages/#{page_title}"
+  end
+
+  def visit_wiki_edit_page(course_id, page_title)
+    get "/courses/#{course_id}/pages/#{page_title}/edit"
   end
 
   def publish_wiki_page
