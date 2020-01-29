@@ -20,7 +20,7 @@ import I18n from 'i18n!course_and_module_picker'
 
 import React from 'react'
 import {func, string} from 'prop-types'
-import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 
 import useManagedCourseSearchApi from '../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi from '../effects/useModuleCourseSearchApi'
@@ -44,34 +44,30 @@ export default function CourseAndModulePicker({
 }) {
   return (
     <>
-      <Flex direction="column">
-        <Flex.Item padding="small">
-          <SearchItemSelector
-            onItemSelected={setSelectedCourse}
-            renderLabel={I18n.t('Select a Course')}
-            itemSearchFunction={useManagedCourseSearchApi}
-          />
-        </Flex.Item>
+      <View as="div" padding="0 0 small 0">
+        <SearchItemSelector
+          onItemSelected={setSelectedCourse}
+          renderLabel={I18n.t('Select a Course')}
+          itemSearchFunction={useManagedCourseSearchApi}
+        />
+      </View>
+      <View as="div" padding="0 0 small 0">
         {selectedCourseId && (
-          <Flex.Item padding="small">
-            <SearchItemSelector
-              onItemSelected={setSelectedModule}
-              renderLabel={I18n.t('Select a Module (optional)')}
-              itemSearchFunction={useModuleCourseSearchApi}
-              contextId={selectedCourseId || null}
-            />
-          </Flex.Item>
+          <SearchItemSelector
+            onItemSelected={setSelectedModule}
+            renderLabel={I18n.t('Select a Module (optional)')}
+            itemSearchFunction={useModuleCourseSearchApi}
+            contextId={selectedCourseId || null}
+          />
         )}
-        {selectedCourseId && selectedModuleId && (
-          <Flex.Item padding="small">
-            <ModulePositionPicker
-              courseId={selectedCourseId || null}
-              moduleId={selectedModuleId || null}
-              setModuleItemPosition={setModuleItemPosition}
-            />
-          </Flex.Item>
-        )}
-      </Flex>
+      </View>
+      {selectedCourseId && selectedModuleId && (
+        <ModulePositionPicker
+          courseId={selectedCourseId || null}
+          moduleId={selectedModuleId || null}
+          setModuleItemPosition={setModuleItemPosition}
+        />
+      )}
     </>
   )
 }
