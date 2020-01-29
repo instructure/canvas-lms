@@ -32,7 +32,7 @@ import './jquery.templateData' /* fillTemplateData */
 const GradebookUploader = {
   createGeneralFormatter(attribute) {
     return function(row, cell, value) {
-      return value ? value[attribute] : ''
+      return value ? htmlEscape(value[attribute]) : ''
     }
   },
 

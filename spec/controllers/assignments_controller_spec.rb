@@ -390,7 +390,7 @@ describe AssignmentsController do
       end
 
       before :each do
-        @assignment.update_attributes(
+        @assignment.update(
           moderated_grading: true,
           final_grader: @other_teacher,
           grader_count: 2
@@ -592,7 +592,7 @@ describe AssignmentsController do
 
       it "should assign 'similarity_pledge'" do
         pledge = 'I made this'
-        @course.account.update_attributes(turnitin_pledge: pledge)
+        @course.account.update(turnitin_pledge: pledge)
         get 'show', params: {:course_id => @course.id, :id => assignment.id}
         expect(assigns[:similarity_pledge]).to eq pledge
       end
@@ -621,7 +621,7 @@ describe AssignmentsController do
       a = @course.assignments.create(:title => "some assignment")
       pledge = 'tii pledge'
       allow_any_instance_of(Assignment).to receive(:turnitin_enabled?).and_return(true)
-      @course.account.update_attributes(turnitin_pledge: pledge)
+      @course.account.update(turnitin_pledge: pledge)
       get 'show', params: {:course_id => @course.id, :id => a.id}
       expect(assigns[:similarity_pledge]).to eq pledge
     end
@@ -1492,7 +1492,7 @@ describe AssignmentsController do
         allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
         allow(Lti::ToolProxy).to receive(:find_active_proxies_for_context).with(@course) { Lti::ToolProxy.where(id: tool_proxy.id) }
         tool_proxy.resources << resource_handler
-        tool_proxy.update_attributes!(context: @course)
+        tool_proxy.update!(context: @course)
 
         AssignmentConfigurationToolLookup.create!(
           assignment: @assignment,

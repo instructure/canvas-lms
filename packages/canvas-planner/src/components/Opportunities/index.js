@@ -20,7 +20,7 @@ import {themeable} from '@instructure/ui-themeable'
 import {scopeTab, AccessibleContent} from '@instructure/ui-a11y'
 import keycode from 'keycode'
 
-import {TabList} from '@instructure/ui-tabs'
+import {Tabs} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
 import {array, string, func, number, oneOfType} from 'prop-types'
 import Opportunity from '../Opportunity'
@@ -56,10 +56,17 @@ export class Opportunities extends Component {
     super(props)
 
     this.state = {
-      innerMaxHeight: 'auto'
+      innerMaxHeight: 'auto',
+      selectedIndex: 0
     }
     this.closeButtonRef = null
     this.tabPanelContentDiv = null
+  }
+
+  handleTabChange = (event, {index, id}) => {
+    this.setState({
+      selectedIndex: index
+    })
   }
 
   componentDidMount() {
@@ -187,6 +194,7 @@ export class Opportunities extends Component {
   }
 
   render() {
+    const {selectedIndex} = this.state
     return (
       <div
         id="opportunities_parent"
@@ -198,17 +206,22 @@ export class Opportunities extends Component {
         style={{maxHeight: this.props.maxHeight}}
       >
         {this.renderCloseButton()}
-        <TabList variant="minimal" focus={false}>
-          <TabList.Panel title={this.renderTitle('new')} maxHeight={this.state.innerMaxHeight}>
-            {this.renderNewOpportunities()}
-          </TabList.Panel>
-          <TabList.Panel
-            title={this.renderTitle('dismissed')}
+        <Tabs onRequestTabChange={this.handleTabChange}>
+          <Tabs.Panel
+            renderTitle={this.renderTitle('new')}
             maxHeight={this.state.innerMaxHeight}
+            selected={selectedIndex === 0}
+          >
+            {this.renderNewOpportunities()}
+          </Tabs.Panel>
+          <Tabs.Panel
+            renderTitle={this.renderTitle('dismissed')}
+            maxHeight={this.state.innerMaxHeight}
+            selected={selectedIndex === 1}
           >
             {this.renderDismissedOpportunities()}
-          </TabList.Panel>
-        </TabList>
+          </Tabs.Panel>
+        </Tabs>
       </div>
     )
   }

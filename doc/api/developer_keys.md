@@ -73,7 +73,7 @@ If the number of scopes required by the client exceeds this limitation, a second
 ### Canvas API Includes
 Several Canvas APIs allow specifying an `include` parameter. This parameter allows nesting resources in JSON responses. For example, a request to the [assignment index endpoint](assignments.html#method.assignments_api.index) could be made to include the submission objects for each assignment.
 
-Responses to requests made with a scoped access token do not support this functionality. When a request is made with a scoped token Canvas will ignore `include` and `includes` parameters.
+Responses to requests made with a scoped access token only support this functionality when the 'Allow Include Parameters' option is also enabled.  When this option is disabled, a request is made with a scoped token Canvas will ignore `include` and `includes` parameters.
 
 ### Developer Key Scope Changes
 During the lifetime of a developer key, scopes may be added or removed by account administrators. Below is a description of possible changes and how each will affect access tokens:

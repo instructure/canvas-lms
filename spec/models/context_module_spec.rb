@@ -423,7 +423,7 @@ describe ContextModule do
     end
 
     it 'adds the item in the correct position when the existing items have duplicate positions' do
-      @module.content_tags.find_by(title: 'two').update_attributes(position: 1)
+      @module.content_tags.find_by(title: 'two').update(position: 1)
       @module.insert_items([@attach, @assign], 2)
       expect(@module.content_tags.find_by(position: 2).title).to eq @attach.title
       expect(@module.content_tags.find_by(position: 3).title).to eq @assign.title

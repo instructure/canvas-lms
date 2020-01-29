@@ -236,7 +236,7 @@ module Lti
     #
     # @returns OriginalityReport
     def update
-      if @report.update_attributes(update_report_params)
+      if @report.update(update_report_params)
         @report.send_later_if_production(:copy_to_group_submissions!)
         render json: api_json(@report, @current_user, session)
       else

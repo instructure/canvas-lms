@@ -47,7 +47,7 @@ class MediaTracksController < ApplicationController
     @media_object = MediaObject.active.by_media_id(params[:media_object_id]).first
     if authorized_action(@media_object, @current_user, :add_captions)
       track = @media_object.media_tracks.where(user_id: @current_user.id, locale: params[:locale]).first_or_initialize
-      track.update_attributes! params.permit(*TRACK_SETTABLE_ATTRIBUTES)
+      track.update! params.permit(*TRACK_SETTABLE_ATTRIBUTES)
       render :json => media_object_api_json(@media_object, @current_user, session)
     end
   end

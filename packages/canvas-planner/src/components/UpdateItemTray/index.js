@@ -23,14 +23,16 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
-import {Select, TextArea, DateTimeInput} from '@instructure/ui-forms'
+import {DateTimeInput} from '@instructure/ui-forms'
+import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import moment from 'moment-timezone'
+import CanvasSelect from '../../CanvasSelect'
 import formatMessage from '../../format-message'
 
 import {courseShape} from '../plannerPropTypes'
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 export class UpdateItemTray extends Component {
   static propTypes = {
@@ -52,7 +54,7 @@ export class UpdateItemTray extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!_.isEqual(this.props.noteItem, nextProps.noteItem)) {
       const updates = this.getNoteUpdates(nextProps)
       this.setState({updates}, this.updateMessages)
@@ -96,20 +98,11 @@ export class UpdateItemTray extends Component {
   }
 
   handleChange = (field, value) => {
-    this.setState(
-      {
-        updates: {
-          ...this.state.updates,
-          [field]: value
-        }
-      },
-      this.updateMessages
-    )
+    this.setState(state => ({updates: {...state.updates, [field]: value}}), this.updateMessages)
   }
 
-  handleCourseIdChange = (e, option) => {
-    if (!option) return
-    let value = option.value
+  handleCourseIdChange = (e, value) => {
+    if (!value) return
     if (value === 'none') value = undefined
     this.handleChange('courseId', value)
   }
@@ -131,7 +124,7 @@ export class UpdateItemTray extends Component {
     this.handleChange('date', moment.tz(value, this.props.timeZone))
   }
 
-  invalidDateTimeMessage(rawDateValue, rawTimeValue) {
+  invalidDateTimeMessage(rawDateValue, _rawTimeValue) {
     let errmsg
     if (rawDateValue) {
       errmsg = formatMessage('#{date} is not a valid date.', {date: rawDateValue})
@@ -146,7 +139,7 @@ export class UpdateItemTray extends Component {
   onInvalidDateTimeMessage = this.invalidDateTimeMessage.bind(this)
 
   handleDeleteClick = () => {
-    // eslint-disable-next-line no-restricted-globals
+    // eslint-disable-next-line no-restricted-globals, no-alert
     if (confirm(formatMessage('Are you sure you want to delete this planner item?'))) {
       this.props.onDeletePlannerItem(this.props.noteItem)
     }
@@ -242,18 +235,18 @@ export class UpdateItemTray extends Component {
     const selectedOption = courseId ? courseOptions.find(o => o.value === courseId) : noneOption
 
     return (
-      <Select
-        id="to-do-item-course-select"
+      <CanvasSelect
         label={formatMessage('Course')}
-        selectedOption={selectedOption}
+        id="to-do-item-course-select"
+        value={selectedOption.value}
         onChange={this.handleCourseIdChange}
       >
         {[noneOption, ...courseOptions].map(props => (
-          <option key={props.value} value={props.value}>
+          <CanvasSelect.Option key={props.value} id={props.value} value={props.value}>
             {props.label}
-          </option>
+          </CanvasSelect.Option>
         ))}
-      </Select>
+      </CanvasSelect>
     )
   }
 

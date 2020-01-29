@@ -249,6 +249,37 @@ module Canvas::LiveEvents
     Assignment.where(:id => assignment_ids).each{|a| assignment_updated(a)}
   end
 
+  def self.get_assignment_override_data(override)
+    data_hash = {
+      assignment_override_id: override.id,
+      assignment_id: override.assignment_id,
+      due_at: override.due_at,
+      all_day: override.all_day,
+      all_day_date: override.all_day_date,
+      unlock_at: override.unlock_at,
+      lock_at: override.lock_at,
+      type: override.set_type,
+      workflow_state: override.workflow_state,
+    }
+
+    case override.set_type
+    when 'CourseSection'
+      data_hash[:course_section_id] = override.set_id
+    when 'Group'
+      data_hash[:group_id] = override.set_id
+    end
+
+    data_hash
+  end
+
+  def self.assignment_override_created(override)
+    post_event_stringified('assignment_override_created', get_assignment_override_data(override))
+  end
+
+  def self.assignment_override_updated(override)
+    post_event_stringified('assignment_override_updated', get_assignment_override_data(override))
+  end
+
   def self.get_submission_data(submission)
     {
       submission_id: submission.global_id,

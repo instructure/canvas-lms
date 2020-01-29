@@ -163,7 +163,7 @@ module Lti
       #
       # @returns LineItem
       def update
-        line_item.update_attributes!(line_item_params)
+        line_item.update!(line_item_params)
         update_assignment_title if line_item.assignment_line_item?
         render json: LineItemsSerializer.new(line_item, line_item_id(line_item)),
                content_type: MIME_TYPE
@@ -238,7 +238,7 @@ module Lti
 
       def update_assignment_title
         return if line_item_params[:label].blank?
-        line_item.assignment.update_attributes!(name: line_item_params[:label])
+        line_item.assignment.update!(name: line_item_params[:label])
       end
 
       def resource_link

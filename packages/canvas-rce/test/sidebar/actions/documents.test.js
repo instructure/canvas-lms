@@ -19,9 +19,11 @@ import assert from 'assert'
 import sinon from 'sinon'
 import * as actions from '../../../src/sidebar/actions/documents'
 
+const sortBy = {sort: 'alphabetical', order: 'asc'}
+
 describe('Documents actions', () => {
   describe('fetchDocuments', () => {
-    it('fetches initial page if necessary, part 1', () => {
+    it('fetches initial page', () => {
       const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
@@ -36,10 +38,10 @@ describe('Documents actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchInitialDocs()(dispatchSpy, getState)
+      actions.fetchInitialDocs(sortBy)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
-    it('fetches initial page if necessary, part 2', () => {
+    it('fetches subsequent page if necessary', () => {
       const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
@@ -54,43 +56,43 @@ describe('Documents actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextDocs()(dispatchSpy, getState)
+      actions.fetchNextDocs(sortBy)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
-    it('skips the fetch if subsequent renders', () => {
+    it('skips the fetch if currently loading', () => {
       const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           documents: {
             user: {
               files: [{one: '1'}, {two: '2'}, {three: '3'}],
+              bookmark: 'someurl',
               hasMore: true,
-              isLoading: false,
-              requested: true
+              isLoading: true
             }
           },
           contextType: 'user'
         }
       }
-      actions.fetchInitialDocs()(dispatchSpy, getState)
+      actions.fetchNextDocs(sortBy)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
-    it('fetches if requested and there are more to load', () => {
+    it('always fetches initial page', () => {
       const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           documents: {
             user: {
               files: [{one: '1'}, {two: '2'}, {three: '3'}],
-              hasMore: true,
-              bookmark: 'someurl',
-              isLoading: false
+              hasMore: false,
+              bookmark: null,
+              isLoading: true
             }
           },
           contextType: 'user'
         }
       }
-      actions.fetchNextDocs()(dispatchSpy, getState)
+      actions.fetchInitialDocs(sortBy)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('does not fetch if requested but no more to load', () => {
@@ -109,7 +111,7 @@ describe('Documents actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextDocs()(dispatchSpy, getState)
+      actions.fetchNextDocs(sortBy)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
   })

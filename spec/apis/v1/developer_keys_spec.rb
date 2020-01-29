@@ -90,6 +90,16 @@ describe DeveloperKeysController, type: :request do
       expect(json_parse.first.keys).to include 'tool_configuration'
     end
 
+    it 'should include "allow_includes"' do
+      a = Account.create!
+      allow_any_instance_of(DeveloperKeysController).to receive(:context_is_domain_root_account?).and_return(true)
+      user_session(account_admin_user(account: a))
+      d = DeveloperKey.create!(account: a)
+      d.update! visible: true
+      get "/api/v1/accounts/#{a.id}/developer_keys"
+      expect(json_parse.first.keys).to include 'allow_includes'
+    end
+
     it 'does not include `test_cluster_only` by default' do
       admin_session
       key = DeveloperKey.create!

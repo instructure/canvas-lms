@@ -84,7 +84,7 @@ describe PseudonymsController do
 
     it "rejects an expired password-change token" do
       @cc.forgot_password!
-      @cc.update_attributes :confirmation_code_expires_at => 1.hour.ago
+      @cc.update :confirmation_code_expires_at => 1.hour.ago
       post 'change_password', :params => { :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code, :pseudonym => {:password => '12341234', :password_confirmation => '12341234'} }
       assert_status(400)
     end
@@ -139,7 +139,7 @@ describe PseudonymsController do
 
     it "should not render confirm change password view for non-email channels" do
       @user.register
-      @cc.update_attributes(:path_type => 'sms')
+      @cc.update(:path_type => 'sms')
       get 'confirm_change_password', params: {:pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code}
       expect(response).to be_redirect
     end
@@ -151,7 +151,7 @@ describe PseudonymsController do
 
     it "should not render confirm change password view if token is expired" do
       @user.register
-      @cc.update_attributes :confirmation_code_expires_at => 1.hour.ago
+      @cc.update :confirmation_code_expires_at => 1.hour.ago
       get 'confirm_change_password', :params => { :pseudonym_id => @pseudonym.id, :nonce => @cc.confirmation_code }
       expect(response).to be_redirect
     end

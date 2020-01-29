@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
 import {asImageEmbed} from '../../shared/ContentSelection'
+import {renderLink} from '../../../contentRendering'
 import ImageOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-image-options-tray-container'
@@ -86,7 +87,11 @@ export default class TrayController {
         height: imageOptions.appliedHeight
       })
     } else {
-      const link = `<a href="${$img.src}" target="_blank">${$img.src}</a>`
+      const link = renderLink({
+        href: $img.src,
+        text: imageOptions.altText || $img.src,
+        target: '_blank'
+      })
       editor.selection.setContent(link)
     }
     this._dismissTray()

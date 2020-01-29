@@ -24,6 +24,7 @@ import '../../jquery.rails_flash_notifications'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
+import QuizEngineModal from 'jsx/quizzes/QuizEngineModal'
 import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
 
 export default class IndexView extends Backbone.View {
@@ -40,7 +41,8 @@ export default class IndexView extends Backbone.View {
     this.prototype.events = {
       'keyup #searchTerm': 'keyUpSearch',
       'mouseup #searchTerm': 'keyUpSearch',
-      'click .header-bar-right .menu_tool_link': 'openExternalTool'
+      'click .header-bar-right .menu_tool_link': 'openExternalTool',
+      'click .choose-quiz-engine': 'chooseQuizEngine'
     }
 
     this.prototype.keyUpSearch = _.debounce(function() {
@@ -102,6 +104,22 @@ export default class IndexView extends Backbone.View {
     const json = super.toJSON(...arguments)
     json.quizIndexPlacements = this.quizIndexPlacements
     return json
+  }
+
+  chooseQuizEngine() {
+    this.renderQuizEngineModal(true, $('.choose-quiz-engine'))
+  }
+
+  renderQuizEngineModal(setOpen, returnFocusTo) {
+    const handleDismiss = () => {
+      this.renderQuizEngineModal(false)
+      returnFocusTo && returnFocusTo.focus()
+    }
+
+    ReactDOM.render(
+      <QuizEngineModal onDismiss={handleDismiss} setOpen={setOpen} />,
+      $('#quiz-modal-mount-point')[0]
+    )
   }
 
   openExternalTool(ev) {

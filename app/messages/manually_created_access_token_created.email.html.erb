@@ -1,0 +1,15 @@
+<% define_content :link do %>
+  <%= settings_profile_url %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t "Access Token Created or Regenerated" %>
+<% end %>
+
+<%= t "A Canvas security token was just generated for your account. If you requested a user token, no further action is necessary. If you did not request a token or would like to manage your canvas access tokens, you can do so here:" %>
+
+<div>
+  <a href="<%= content(:link) %>">
+    <%= t "Manage User Settings" %>
+  </a>
+</div>

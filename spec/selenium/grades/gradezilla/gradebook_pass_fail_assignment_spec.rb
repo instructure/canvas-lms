@@ -40,7 +40,7 @@ describe "Gradezilla" do
     end
 
     it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419288 do
-      @assignment.update_attributes(points_possible: 1)
+      @assignment.update(points_possible: 1)
       Gradezilla.visit(@course)
       expect(Gradezilla::Cells.get_grade(@students[0], @assignment)).to eq 'Complete'
     end

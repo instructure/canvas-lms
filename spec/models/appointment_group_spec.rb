@@ -164,23 +164,23 @@ describe AppointmentGroup do
     end
 
     it "should allow additional appointments" do
-      expect(@ag.update_attributes(:new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])).to be_truthy
+      expect(@ag.update(:new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])).to be_truthy
       expect(@ag.appointments.size).to eql 2
     end
 
     it "should not allow invalid appointments" do
-      expect(@ag.update_attributes(:new_appointments => [['2012-01-01 14:00:00', '2012-01-01 13:00:00']])).to be_falsey
+      expect(@ag.update(:new_appointments => [['2012-01-01 14:00:00', '2012-01-01 13:00:00']])).to be_falsey
     end
 
     it "should not allow overlapping appointments" do
-      expect(@ag.update_attributes(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])).to be_falsey
+      expect(@ag.update(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])).to be_falsey
     end
 
     it "should update start_at/end_at when adding appointments" do
       expect(@ag.start_at).to eql @ag.appointments.map(&:start_at).min
       expect(@ag.end_at).to eql @ag.appointments.map(&:end_at).max
 
-      expect(@ag.update_attributes(:new_appointments => [
+      expect(@ag.update(:new_appointments => [
         ['2012-01-01 17:00:00', '2012-01-01 18:00:00'],
         ['2012-01-01 07:00:00', '2012-01-01 08:00:00']
       ])).to be_truthy
@@ -389,7 +389,7 @@ describe AppointmentGroup do
 
     it "should notify all participants when adding appointments", priority: "1", test_id: 193138 do
       @ag.publish!
-      @ag.update_attributes(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
+      @ag.update(:new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       expect(@ag.messages_sent).to be_include("Appointment Group Updated")
       expect(@ag.messages_sent["Appointment Group Updated"].map(&:user_id).sort.uniq).to eql [@student.id, @observer.id].sort
     end
@@ -453,12 +453,12 @@ describe AppointmentGroup do
     end
 
     it "should be nil if participants_per_appointment is nil" do
-      @ag.update_attributes :participants_per_appointment => nil
+      @ag.update :participants_per_appointment => nil
       expect(@ag.available_slots).to be_nil
     end
 
     it "should change if participants_per_appointment changes" do
-      @ag.update_attributes :participants_per_appointment => 1
+      @ag.update :participants_per_appointment => 1
       expect(@ag.available_slots).to eql 2
     end
 
@@ -466,12 +466,12 @@ describe AppointmentGroup do
       @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
       @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
       expect(@ag.reload.available_slots).to eql 2
-      @ag.update_attributes :participants_per_appointment => 1
+      @ag.update :participants_per_appointment => 1
       expect(@ag.reload.available_slots).to eql 1
     end
 
     it "should increase as appointments are added" do
-      @ag.update_attributes(:new_appointments => [["#{Time.now.year + 1}-01-01 14:00:00", "#{Time.now.year + 1}-01-01 15:00:00"]])
+      @ag.update(:new_appointments => [["#{Time.now.year + 1}-01-01 14:00:00", "#{Time.now.year + 1}-01-01 15:00:00"]])
       expect(@ag.available_slots).to eql 6
     end
 

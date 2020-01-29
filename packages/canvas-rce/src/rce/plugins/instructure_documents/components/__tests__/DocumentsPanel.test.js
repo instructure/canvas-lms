@@ -35,13 +35,15 @@ function getDocumentProps(contextType, docprops) {
   }
 }
 
-function renderComponent(props) {
-  return render(
+function renderComponent(props, renderer = render) {
+  return renderer(
     <DocumentsPanel
       {...getDocumentProps('course', {bookmark: 'http://next.docs'})}
+      sortBy={{sort: 'alphabetical', order: 'asc'}}
       fetchInitialDocs={() => {}}
       fetchNextDocs={() => {}}
       onLinkClick={() => {}}
+      contextType="course"
       {...props}
     />
   )
@@ -99,7 +101,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
       fetchInitialDocs
     })
 
-    expect(fetchInitialDocs).toHaveBeenCalled()
+    expect(fetchInitialDocs).toHaveBeenCalledTimes(1)
   })
 
   it('fetches more when the load more button is clicked', () => {
@@ -140,5 +142,19 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
     )
 
     expect(getByText('Loading')).toBeInTheDocument()
+  })
+
+  it('refetches initial docs when sorting changes', () => {
+    const fetchInitialDocs = jest.fn()
+    const {rerender} = renderComponent({
+      fetchInitialDocs
+    })
+    expect(fetchInitialDocs).toHaveBeenCalledTimes(1)
+
+    renderComponent({fetchInitialDocs}, rerender)
+    expect(fetchInitialDocs).toHaveBeenCalledTimes(1)
+
+    renderComponent({fetchInitialDocs, sortBy: {sort: 'date_added', order: 'desc'}}, rerender)
+    expect(fetchInitialDocs).toHaveBeenCalledTimes(2)
   })
 })

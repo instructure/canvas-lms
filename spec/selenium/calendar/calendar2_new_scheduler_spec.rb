@@ -112,9 +112,9 @@ describe "scheduler" do
       reserve_appointment_for(@student1, @student1, @app1)
       expect(@app1.appointments.first.workflow_state).to eq('locked')
       get "/calendar2"
-      move_to_click('.fc-event.scheduler-event')
+      f('.fc-event.scheduler-event').click
       wait_for_ajaximations
-      move_to_click('.unreserve_event_link')
+      f('.unreserve_event_link').click
       expect(f('#delete_event_dialog')).to be_present
       f('.ui-dialog-buttonset .btn-primary').click
       # save the changes so the appointment object is updated

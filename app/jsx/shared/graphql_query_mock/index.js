@@ -21,6 +21,9 @@ import {graphql} from 'graphql'
 import gql from 'graphql-tag'
 import {mergeWith} from 'lodash'
 import {print} from 'graphql/language/printer'
+
+// If file is not present locally, run `bundle exec rails graphql:schema`. This
+// file is generated automatically on a jenkins run
 import schemaString from '../../../../schema.graphql'
 
 // Mock our custom scalar values in the canvas graphql schema
@@ -75,7 +78,8 @@ async function createMocks(overrides = []) {
       if (!validTypes.has(key)) {
         const err =
           `The override "${key}" is not a valid graphql type. ` +
-          'Did you typo it or forget to update your graphql schema?'
+          'Did you typo it or forget to update your graphql schema? ' +
+          '`bundle exec rails graphql:schema`'
         throw new Error(err)
       }
 

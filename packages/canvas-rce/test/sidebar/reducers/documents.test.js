@@ -45,6 +45,24 @@ describe('Documents reducer', () => {
     })
   })
 
+  describe('REQUEST_INITIAL_DOCS', () => {
+    it('marks documents as loading', () => {
+      const action = {type: actions.REQUEST_INITIAL_DOCS, payload: {contextType: 'user'}}
+      assert(documentsReducer(state, action).user.isLoading)
+    })
+
+    it('marks documents as having more', () => {
+      const action = {type: actions.REQUEST_INITIAL_DOCS, payload: {contextType: 'user'}}
+      assert(documentsReducer(state, action).user.hasMore)
+    })
+
+    it('clears files', () => {
+      state.course.files = ['one', 'two']
+      const action = {type: actions.REQUEST_INITIAL_DOCS, payload: {contextType: 'course'}}
+      assert.equal(documentsReducer(state, action).course.files.length, 0)
+    })
+  })
+
   describe('RECEIVE_DOCS', () => {
     it('appends new fils to the existing array', () => {
       const action = {

@@ -36,6 +36,21 @@ class AccessToken < ActiveRecord::Base
 
   before_validation -> { self.developer_key ||= DeveloperKey.default }
 
+  has_a_broadcast_policy
+
+  set_broadcast_policy do |p|
+    p.dispatch :manually_created_access_token_created
+    p.to(&:user)
+    p.whenever do |access_token|
+      # Rescuse here to get past places where unit tests have the Features
+      # mocked out but are still creating an access token to make api calls
+      # with which triggers this block. This whole line can be removed when
+      # we remove the release flag.
+      next false unless Account.site_admin.feature_enabled?(:notify_for_manually_created_access_tokens) rescue false
+      access_token.crypted_token_previously_changed? && access_token.manually_created?
+    end
+  end
+
   # For user-generated tokens, purpose can be manually set.
   # For app-generated tokens, this should be generated based
   # on the scope defined in the auth process (scope has not
@@ -251,6 +266,10 @@ class AccessToken < ActiveRecord::Base
 
   def dev_key_account_id
     cached_developer_key.account_id
+  end
+
+  def manually_created?
+    cached_developer_key == DeveloperKey.default
   end
 
   private

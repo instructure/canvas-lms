@@ -385,7 +385,6 @@ class GradingPeriodSetCollection extends React.Component {
           closeForm={this.closeNewSetForm}
           urls={this.props.urls}
           enrollmentTerms={this.termsNotBelongingToActiveSets()}
-          readOnly={this.props.readOnly}
           addGradingPeriodSet={this.addGradingPeriodSet}
         />
       )

@@ -233,6 +233,8 @@
       delay_for: 0
     - name: Enrollment Notification
       delay_for: 0
+    - name: Manually Created Access Token Created
+      delay_for: 0
 
 - category: Student Appointment Signups
   notifications:

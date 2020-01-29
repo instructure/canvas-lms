@@ -255,7 +255,7 @@ describe UserSearch do
           end
 
           it 'will not match channels where the type is not email' do
-            cc.update_attributes!(:path_type => CommunicationChannel::TYPE_TWITTER)
+            cc.update!(:path_type => CommunicationChannel::TYPE_TWITTER)
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
 
@@ -451,7 +451,7 @@ describe UserSearch do
       group = @course.groups.create!
       group.add_user(@student)
       account_admin_user
-      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['student']).to_a).to eq [@student]
+      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['student'], include_inactive_enrollments: true).to_a).to eq [@student]
       expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['teacher']).to_a).to be_empty
     end
 

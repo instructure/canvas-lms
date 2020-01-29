@@ -23,7 +23,9 @@ import Scopes from '../Scopes'
 
 function props(pending = false, requireScopes = true, onRequireScopesChange = () => {}) {
   return {
-    developerKey: {},
+    developerKey: {
+      allow_includes: true
+    },
     availableScopes: {
       oauth: [
         {
@@ -54,6 +56,22 @@ function props(pending = false, requireScopes = true, onRequireScopesChange = ()
     onRequireScopesChange
   }
 }
+
+describe('when the "includes" checkbox FF is set in the ENV', () => {
+  let wrapper
+
+  beforeEach(() => {
+    window.ENV = {
+      includesFeatureFlagEnabled: true
+    }
+
+    wrapper = mount(<Scopes {...props()} />)
+  })
+
+  it('renders the "includes" checkbox', () => {
+    expect(wrapper.exists("[data-automation='includes-checkbox']")).toEqual(true)
+  })
+})
 
 it('renders a spinner if scope state is "pending"', () => {
   const wrapper = mount(<Scopes {...props(true)} />)

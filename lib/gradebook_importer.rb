@@ -599,7 +599,7 @@ class GradebookImporter
     is_semicolon_delimited = semicolon_delimited?(csv_file)
     csv_parse_options = {
       converters: %i(nil decimal_comma_to_period),
-      skip_lines: /^[;, ]*$/,
+      skip_lines: /^[;, ]+$/,
       col_sep: is_semicolon_delimited ? ";" : ","
     }
 

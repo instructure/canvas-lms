@@ -19,8 +19,10 @@ module BrokenLinkHelper
   def send_broken_content!
     # call when processing a 4xx error.
     # this will examine the referrer to see if we got here because of a bad link
-    return false unless request.referer
-    record = Context.find_asset_by_url(request.referer)
+    from_url = request.referer
+    return false unless from_url
+    record = Context.find_asset_by_url(from_url)
+    record ||= Context.get_front_wiki_page_for_course_from_url(from_url)
     return false unless record
     body = Nokogiri::HTML(Context.asset_body(record))
     anchor = body.css("a[href$='#{request.fullpath}']").text

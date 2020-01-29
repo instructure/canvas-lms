@@ -23,18 +23,27 @@ import * as waitForProcessing from 'jsx/gradezilla/uploads/wait_for_processing'
 
 const fixtures = document.getElementById('fixtures')
 
-QUnit.module('gradebook_uploads#createGeneralFormatter')
+QUnit.module('gradebook_uploads#createGeneralFormatter', hooks => {
+  let formatter
 
-test('formatter returns expected lookup value', () => {
-  const formatter = gradebook_uploads.createGeneralFormatter('foo')
-  const formatted = formatter(null, null, {foo: 'bar'})
-  equal(formatted, 'bar')
-})
+  hooks.beforeEach(() => {
+    formatter = gradebook_uploads.createGeneralFormatter('foo')
+  })
 
-test('formatter returns empty string when lookup value missing', () => {
-  const formatter = gradebook_uploads.createGeneralFormatter('foo')
-  const formatted = formatter(null, null, null)
-  equal(formatted, '')
+  test('formatter returns expected lookup value', () => {
+    const formatted = formatter(null, null, {foo: 'bar'})
+    equal(formatted, 'bar')
+  })
+
+  test('formatter returns empty string when lookup value missing', () => {
+    const formatted = formatter(null, null, null)
+    equal(formatted, '')
+  })
+
+  test('formatter escapes passed-in HTML', () => {
+    const formatted = formatter(null, null, {foo: 'bar & <baz>'})
+    equal(formatted, 'bar &amp; &lt;baz&gt;')
+  })
 })
 
 QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', hooks => {

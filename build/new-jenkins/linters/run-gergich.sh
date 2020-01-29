@@ -38,13 +38,6 @@ bundle exec ruby script/rlint
 bundle exec ruby script/eslint
 bundle exec ruby script/lint_commit_message
 
-RAILS_ENV=test bundle exec rails graphql:schema
-# if the generated file is different from the checked in file, fail
-if ! git diff --exit-code schema.graphql; then
-  message="GraphQL Schema changes are not checked in: run 'bundle exec rails graphql:schema' to generate graphql.schema file"
-  gergich comment "{\"path\":\"schema.graphql\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
-fi
-
 gergich status
 if [[ "$GERGICH_PUBLISH" == "1" ]]; then
   gergich publish

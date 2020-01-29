@@ -58,7 +58,7 @@ module Lti
 
       it 'requires unique productcode,vendorcode,rootaccount,developerkey combo' do
         dev_key = DeveloperKey.create(api_key:'testapikey')
-        subject.update_attributes(developer_key: dev_key, root_account: account)
+        subject.update(developer_key: dev_key, root_account: account)
         dup_subject = subject.dup
         dup_subject.save
         expect(dup_subject.errors.first).to eq [:product_code, "has already been taken"]

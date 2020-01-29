@@ -19,7 +19,7 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 import {themeable, ApplyTheme} from '@instructure/ui-themeable'
 import {Text, Pill, Avatar} from '@instructure/ui-elements'
-import {Checkbox, CheckboxFacade} from '@instructure/ui-forms'
+import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
 import {
@@ -34,6 +34,7 @@ import {
 } from '@instructure/ui-icons'
 import {arrayOf, bool, number, string, func, shape, object} from 'prop-types'
 import {momentObj} from 'react-moment-proptypes'
+// eslint-disable-next-line import/no-named-as-default
 import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
 import BadgeList from '../BadgeList'
 import CalendarEventModal from '../CalendarEventModal'

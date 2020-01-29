@@ -1169,6 +1169,15 @@ describe ApplicationHelper do
         helper.include_custom_meta_tags
         expect(headers['Content-Security-Policy']).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/"
       end
+
+      it "includes canvadocs domain if enabled" do
+        account.enable_csp!
+
+        allow(Canvadocs).to receive(:enabled?).and_return(true)
+        allow(Canvadocs).to receive(:config).and_return('base_url' => 'https://canvadocs.instructure.com/1')
+        helper.add_csp_for_root
+        expect(headers['Content-Security-Policy']).to eq "frame-src 'self' canvadocs.instructure.com localhost root_account.test root_account2.test"
+      end
     end
   end
 end

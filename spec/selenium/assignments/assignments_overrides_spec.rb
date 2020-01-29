@@ -194,7 +194,7 @@ describe "assignment groups" do
 
       get "/courses/#{@course.id}/assignments"
       expect(f('.assignment .assignment-date-due')).to include_text "Multiple Dates"
-      driver.mouse.move_to f(".assignment .assignment-date-due a")
+      driver.action.move_to(f(".assignment .assignment-date-due a")).perform
       wait_for_ajaximations
 
       tooltip = fj('.vdd_tooltip_content:visible')

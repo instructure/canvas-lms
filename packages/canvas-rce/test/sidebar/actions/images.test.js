@@ -20,6 +20,8 @@ import assert from 'assert'
 import sinon from 'sinon'
 import * as actions from '../../../src/sidebar/actions/images'
 
+const sortBy = {sort: 'alphabetical', order: 'asc'}
+
 describe('Image actions', () => {
   describe('createAddImage', () => {
     it('has the right action type', () => {
@@ -59,8 +61,6 @@ describe('Image actions', () => {
   })
 
   describe('fetchImages', () => {
-    let fakeStore
-
     it('fetches initial page if necessary, part 1', () => {
       const dispatchSpy = sinon.spy()
       const getState = () => {
@@ -76,7 +76,7 @@ describe('Image actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchInitialImages()(dispatchSpy, getState)
+      actions.fetchInitialImages(sortBy)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
 
@@ -95,26 +95,26 @@ describe('Image actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextImages()(dispatchSpy, getState)
+      actions.fetchNextImages(sortBy)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
 
-    it('skips the fetch if subsequent renders', () => {
+    it('skips the fetch if currently loading', () => {
       const dispatchSpy = sinon.spy()
       const getState = () => {
         return {
           images: {
             user: {
               files: [{one: '1'}, {two: '2'}, {three: '3'}],
+              bookmark: 'someurl',
               hasMore: true,
-              isLoading: false,
-              requested: true
+              isLoading: true
             }
           },
           contextType: 'user'
         }
       }
-      actions.fetchInitialImages()(dispatchSpy, getState)
+      actions.fetchNextImages(sortBy)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
 
@@ -133,7 +133,7 @@ describe('Image actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextImages()(dispatchSpy, getState)
+      actions.fetchNextImages(sortBy)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
 
@@ -153,7 +153,7 @@ describe('Image actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextImages()(dispatchSpy, getState)
+      actions.fetchNextImages(sortBy)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
   })

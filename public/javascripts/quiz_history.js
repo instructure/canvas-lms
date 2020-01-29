@@ -24,7 +24,7 @@ import './jquery.templateData'
 import './vendor/jquery.scrollTo'
 import 'compiled/behaviors/quiz_selectmenu'
 
-var parentWindow = {
+const parentWindow = {
   exists() {
     return window.parent && window.parent.INST
   },
@@ -53,7 +53,7 @@ var parentWindow = {
 
 const data = $('#submission_details').getTemplateData({textValues: ['version_number', 'user_id']})
 
-var scoringSnapshot = {
+const scoringSnapshot = {
   snapshot: {
     user_id: data.user_id || null,
     version_number: data.version_number,
@@ -111,7 +111,7 @@ var scoringSnapshot = {
           $question.addClass('modified_but_not_saved')
         }
         $question
-          .find('#question_input_hidden')
+          .find('.question_input_hidden')
           .val(question.points)
           .end()
           .find('.user_points :text')
@@ -218,7 +218,7 @@ const gradingForm = {
   },
 
   onScroll() {
-    const qNum = quizNavBar.activateCorrectLink()
+    quizNavBar.activateCorrectLink()
     quizNavBar.toggleDropShadow()
   },
 
@@ -233,7 +233,7 @@ const gradingForm = {
 }
 // end of gradingForm object
 
-var quizNavBar = {
+const quizNavBar = {
   index: 0,
   windowSize: 10,
   minWidth: 66,
@@ -241,14 +241,14 @@ var quizNavBar = {
   navItemWidth: 34,
 
   initialize() {
-    $('.user_points > .question_input').each(function(index) {
+    $('.user_points > .question_input').each(function(_index) {
       quizNavBar.updateStatusFor($(this))
     })
 
     if (ENV.GRADE_BY_QUESTION) {
-      const questionIndex = parseInt(parentWindow.get('active_question_index'))
+      const questionIndex = parseInt(parentWindow.get('active_question_index'), 10)
       const questionId = $('.q' + questionIndex).data('id')
-      if (!isNaN(questionId)) {
+      if (!Number.isNaN(questionId)) {
         scoringSnapshot.jumpDirectlyToQuestion(questionId)
       }
     }
@@ -312,7 +312,7 @@ var quizNavBar = {
     try {
       const questionId = $scoreInput.attr('data-question-id')
       const scoreValue = numberHelper.parse($scoreInput.val())
-      $('#quiz_nav_' + questionId).toggleClass('complete', !isNaN(scoreValue))
+      $('#quiz_nav_' + questionId).toggleClass('complete', !Number.isNaN(scoreValue))
     } catch (err) {
       // do nothing; if there's no status to update, continue with other execution
     }
@@ -348,7 +348,7 @@ var quizNavBar = {
     return qNum
   },
 
-  showQuestionsInWindow(startingIndex, endingIndex) {
+  showQuestionsInWindow(startingIndex, _endingIndex) {
     const $navWrapper = $('#quiz-nav-inner-wrapper')
     const leftPosition = quizNavBar.startingLeftPos - startingIndex * quizNavBar.navItemWidth
     const newPos = '' + leftPosition + 'px'
@@ -365,7 +365,7 @@ var quizNavBar = {
   },
 
   setScrollWindowPosition(currentIndex) {
-    if (isNaN(currentIndex)) {
+    if (Number.isNaN(currentIndex)) {
       currentIndex = 0
     }
     quizNavBar.index = currentIndex
@@ -433,7 +433,6 @@ $(document).ready(function() {
     '.question_holder .user_points .question_input,.question_holder .question_neutral_comment .question_comment_text textarea'
   ).change(function() {
     const $question = $(this).parents('.display_question')
-    const questionId = $question.attr('id')
     gradingForm.updateSnapshotFor($question)
     if ($(this).hasClass('question_input')) {
       const parsed = numberHelper.parse($(this).val())

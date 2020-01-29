@@ -542,7 +542,7 @@ describe DiscussionTopic do
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
-          @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
+          @course.update(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
           @topic = @group.discussion_topics.create(:title => "group topic")
           @topic.save!
 
@@ -555,8 +555,8 @@ describe DiscussionTopic do
           group_category = @course.group_categories.create(:name => "new cat")
           @group = @course.groups.create(:name => "group", :group_category => group_category)
           @group.add_user(@student1)
-          @course.update_attributes(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
-          @section.update_attributes(:start_at => 2.days.ago, :end_at => 2.days.from_now,
+          @course.update(:start_at => 2.days.ago, :conclude_at => 1.day.ago, :restrict_enrollments_to_course_dates => true)
+          @section.update(:start_at => 2.days.ago, :end_at => 2.days.from_now,
             :restrict_enrollments_to_section_dates => true)
           @topic = @group.discussion_topics.create(:title => "group topic")
           @topic.save!
@@ -1943,7 +1943,7 @@ describe DiscussionTopic do
       reply = @topic.reply_from(:user => @user, :text => "ohai")
       run_jobs
       expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 0
-      reply.update_attributes(:message => "i got that wrong before")
+      reply.update(:message => "i got that wrong before")
       expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 1
     end
 
@@ -2332,12 +2332,12 @@ describe DiscussionTopic do
     end
 
     it 'returns student entries if specified' do
-      @topic.update_attributes(podcast_has_student_posts: true)
+      @topic.update(podcast_has_student_posts: true)
       expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1, @entry2])
     end
 
     it 'only returns admin entries if specified' do
-      @topic.update_attributes(podcast_has_student_posts: false)
+      @topic.update(podcast_has_student_posts: false)
       expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1])
     end
 
@@ -2346,7 +2346,7 @@ describe DiscussionTopic do
       membership = group_with_user(group_category: @group_category, user: @student)
       @topic = @group.discussion_topics.create(title: "group topic", user: @teacher)
       @topic.discussion_entries.create(message: "some message", user: @student)
-      @topic.update_attributes(podcast_has_student_posts: false)
+      @topic.update(podcast_has_student_posts: false)
       expect(@topic.entries_for_feed(@student, true)).to_not be_empty
     end
   end

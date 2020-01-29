@@ -343,7 +343,7 @@ class ProfileController < ApplicationController
         user_params.delete(:short_name)
         user_params.delete(:sortable_name)
       end
-      if @user.update_attributes(user_params)
+      if @user.update(user_params)
         pseudonymed = false
         if params[:default_email_id].present?
           @email_channel = @user.communication_channels.email.active.where(id: params[:default_email_id]).first
@@ -373,7 +373,7 @@ class ProfileController < ApplicationController
             pseudonym_params.delete :password_confirmation
           end
           params[:pseudonym].delete :password_id
-          if !pseudonym_params.empty? && pseudonym_to_update && !pseudonym_to_update.update_attributes(pseudonym_params)
+          if !pseudonym_params.empty? && pseudonym_to_update && !pseudonym_to_update.update(pseudonym_params)
             pseudonymed = true
             flash[:error] = t('errors.profile_update_failed', "Login failed to update")
             format.html { redirect_to user_profile_url(@current_user) }

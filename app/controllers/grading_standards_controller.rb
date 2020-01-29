@@ -80,7 +80,7 @@ class GradingStandardsController < ApplicationController
     if authorized_action(@standard, @current_user, :manage)
       @standard.user = @current_user
       respond_to do |format|
-        if @standard.update_attributes(grading_standard_params)
+        if @standard.update(grading_standard_params)
           format.json { render json: standard_as_json(@standard) }
         else
           format.json { render json: @standard.errors, status: :bad_request }

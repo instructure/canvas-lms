@@ -38,22 +38,22 @@ class ParallelImporter < ActiveRecord::Base
 
   def start
     if workflow_state == 'retry'
-      self.update_attributes!(started_at: Time.now.utc)
+      self.update!(started_at: Time.now.utc)
     else
-      self.update_attributes!(:workflow_state => "running", :started_at => Time.now.utc)
+      self.update!(:workflow_state => "running", :started_at => Time.now.utc)
     end
   end
 
   def fail
-    self.update_attributes!(:workflow_state => "failed", :ended_at => Time.now.utc)
+    self.update!(:workflow_state => "failed", :ended_at => Time.now.utc)
   end
 
   def abort
-    self.update_attributes!(:workflow_state => "aborted", :ended_at => Time.now.utc)
+    self.update!(:workflow_state => "aborted", :ended_at => Time.now.utc)
   end
 
   def complete(opts={})
     updates = {:workflow_state => "completed", :ended_at => Time.now.utc}.merge(opts)
-    self.update_attributes!(updates)
+    self.update!(updates)
   end
 end

@@ -168,6 +168,7 @@ export default class NewKeyForm extends React.Component {
                   onRequireScopesChange={this.handleRequireScopesChange}
                   dispatch={this.props.dispatch}
                   listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
+                  updateDeveloperKey={updateDeveloperKey}
                 />
               )}
             </Grid.Col>

@@ -28,7 +28,7 @@ describe "assignments" do
   end
 
   def update_assignment_attributes(assignment, attribute, values, click_submit_link = true)
-    assignment.update_attributes(attribute => values)
+    assignment.update(attribute => values)
     get "/courses/#{@course.id}/assignments/#{assignment.id}"
     f('.submit_assignment_link').click if click_submit_link
   end
@@ -44,7 +44,7 @@ describe "assignments" do
     end
 
     it "should validate an assignment created with the type of discussion" do
-      @assignment.update_attributes(:submission_types => 'discussion_topic')
+      @assignment.update(:submission_types => 'discussion_topic')
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -53,7 +53,7 @@ describe "assignments" do
     end
 
     it "should validate an assignment created with the type of not graded" do
-      @assignment.update_attributes(:submission_types => 'not_graded')
+      @assignment.update(:submission_types => 'not_graded')
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       expect(f("#content")).not_to contain_css('.submit_assignment_link')

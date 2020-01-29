@@ -74,7 +74,7 @@ class CalendarEventsController < ApplicationController
   def edit
     @event = @context.calendar_events.find(params[:id])
     if @event.grants_right?(@current_user, session, :update)
-      @event.update_attributes!(params.permit(:title, :start_at, :end_at, :location_name, :location_address))
+      @event.update!(params.permit(:title, :start_at, :end_at, :location_name, :location_address))
     end
     if authorized_action(@event, @current_user, :update_content)
       render :new
@@ -87,7 +87,7 @@ class CalendarEventsController < ApplicationController
       respond_to do |format|
         params[:calendar_event][:time_zone_edited] = Time.zone.name if params[:calendar_event]
         @event.updating_user = @current_user
-        if @event.update_attributes(calendar_event_params)
+        if @event.update(calendar_event_params)
           log_asset_access(@event, "calendar", "calendar", 'participate')
           flash[:notice] = t 'notices.updated', "Event was successfully updated."
           format.html { redirect_to calendar_url_for(@context) }

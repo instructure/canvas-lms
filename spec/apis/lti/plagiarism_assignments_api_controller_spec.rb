@@ -29,7 +29,7 @@ module Lti
     before do
       allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
       allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
-      message_handler.update_attributes(capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2])
+      message_handler.update(capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2])
       tool_proxy.raw_data['security_contract']['tool_service'] = authorized_services
       tool_proxy.save!
       assignment.tool_settings_tool = message_handler
@@ -44,7 +44,7 @@ module Lti
       end
       let(:student) do
         student = create_users_in_course(course, 2, return_type: :record).first
-        student.update_attributes(lti_context_id: SecureRandom.uuid)
+        student.update(lti_context_id: SecureRandom.uuid)
         student
       end
       let(:assignment) do

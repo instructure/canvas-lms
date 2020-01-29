@@ -267,7 +267,7 @@ class OutcomesApiController < ApplicationController
     return unless authorized_action(@outcome, @current_user, :update)
 
     update_outcome_criterion(@outcome) if params[:mastery_points] || params[:ratings]
-    if @outcome.update_attributes(params.permit(*DIRECT_PARAMS))
+    if @outcome.update(params.permit(*DIRECT_PARAMS))
       render :json => outcome_json(@outcome, @current_user, session)
     else
       render :json => @outcome.errors, :status => :bad_request

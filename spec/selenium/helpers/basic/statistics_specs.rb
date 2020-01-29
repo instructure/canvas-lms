@@ -61,7 +61,7 @@ shared_examples_for "statistics basic tests" do
     it "should validate recently ended courses display" do
       skip('spec is broken on sub account level') if account != Account.default
       concluded_course = Course.create!(:name => 'concluded course', :account => account)
-      concluded_course.update_attributes(:conclude_at => 1.day.ago)
+      concluded_course.update(:conclude_at => 1.day.ago)
       get url
       validate_item_list(list_css[:ended], concluded_course.name)
     end

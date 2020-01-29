@@ -17,6 +17,9 @@
  */
 
 import React from 'react'
+
+// If file is not present locally, run `bundle exec rails graphql:schema`. This
+// file is generated automatically on a jenkins run
 import canvasSchemaString from '../../../schema.graphql'
 import ValidatedMockedProvider from './ValidatedMockedProvider'
 

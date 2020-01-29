@@ -42,6 +42,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.assignment_created(obj)
     when AssignmentGroup
       Canvas::LiveEvents.assignment_group_created(obj)
+    when AssignmentOverride
+      Canvas::LiveEvents.assignment_override_created(obj)
     when Submission
       Canvas::LiveEvents.submission_created(obj)
     when SubmissionComment
@@ -118,6 +120,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.assignment_updated(obj)
     when AssignmentGroup
       Canvas::LiveEvents.assignment_group_updated(obj)
+    when AssignmentOverride
+      Canvas::LiveEvents.assignment_override_updated(obj)
     when Attachment
       if attachment_eligible?(obj)
         if changes["display_name"]

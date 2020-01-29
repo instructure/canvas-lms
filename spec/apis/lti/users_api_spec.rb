@@ -44,7 +44,7 @@ module Lti
     before do
       allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
       allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
-      message_handler.update_attributes(capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2])
+      message_handler.update(capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2])
       tool_proxy.raw_data['security_contract']['tool_service'] = authorized_services
       tool_proxy.save!
       assignment.tool_settings_tool = message_handler
@@ -56,7 +56,7 @@ module Lti
       let(:canvas_id_endpoint) { "/api/lti/users/#{student.id}" }
       let(:student) do
         course_with_student(active_all: true, course: course)
-        @student.update_attributes(lti_context_id: SecureRandom.uuid)
+        @student.update(lti_context_id: SecureRandom.uuid)
         @student
       end
       let(:expected_student) do
@@ -80,7 +80,7 @@ module Lti
 
       it "verifies the tool is associated with at least one of the user's assignments" do
         second_course = Course.create!(name: 'second course')
-        assignment.update_attributes!(course: second_course)
+        assignment.update!(course: second_course)
         get canvas_id_endpoint, params: {id: student.id}, headers: request_headers
         expect(response).to be_unauthorized
       end
@@ -93,7 +93,7 @@ module Lti
 
       context 'course' do
         before do
-          tool_proxy.update_attributes!(context: course)
+          tool_proxy.update!(context: course)
         end
 
         it 'returns a user by lti id' do
@@ -152,7 +152,7 @@ module Lti
 
       let(:student_one) do
         student_in_course(course: group.context)
-        @student.update_attributes!(lti_context_id: student_lti_id)
+        @student.update!(lti_context_id: student_lti_id)
         @student
       end
 
@@ -163,12 +163,12 @@ module Lti
 
       let(:student_three) do
         student_in_course(course: group.context)
-        @student.update_attributes!(email: 'student@test.com')
+        @student.update!(email: 'student@test.com')
         @student
       end
 
       before do
-        group.context.update_attributes!(account: tool_proxy.account)
+        group.context.update!(account: tool_proxy.account)
         group.add_user(student_one, 'accepted')
         group.add_user(student_two, 'accepted')
         group.add_user(student_three, 'accepted')
@@ -184,13 +184,13 @@ module Lti
       end
 
       it 'responds with 401 if group is not in tool context' do
-        group.context.update_attributes!(account: account_model)
+        group.context.update!(account: account_model)
         get group_index_endpoint, headers: request_headers
         expect(response).to be_unauthorized
       end
 
       it 'responds with 401 if the group is not active' do
-        group.update_attributes!(workflow_state: 'deleted')
+        group.update!(workflow_state: 'deleted')
         get group_index_endpoint, headers: request_headers
         expect(response).to be_unauthorized
       end

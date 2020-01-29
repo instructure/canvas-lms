@@ -1801,11 +1801,12 @@ EG = {
         $assignment_submission_turnitin_report_url,
         $assignment_submission_originality_report_url
       )
-      const reportUrl = $.replaceTags(urlContainer.attr('href'), {
+      const tooltip = I18n.t('Similarity Score - See detailed report')
+      let reportUrl = $.replaceTags(urlContainer.attr('href'), {
         [anonymizableUserId]: submission[anonymizableUserId],
         asset_string: assetString
       })
-      const tooltip = I18n.t('Similarity Score - See detailed report')
+      reportUrl += (reportUrl.includes('?') ? '&' : '?') + 'attempt=' + submission.attempt
 
       $turnitinScoreContainer.html(
         turnitinScoreTemplate({

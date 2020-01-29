@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'action_controller_test_process'
-
 module Canvas::Migration::Worker
 
   class Base < Struct.new(:migration_id)

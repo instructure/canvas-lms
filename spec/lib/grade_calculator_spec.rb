@@ -369,7 +369,7 @@ describe GradeCalculator do
 
       expect(enrollment.computed_final_score).to equal 20.0
 
-      a2.update_attributes assignment_group: ag1
+      a2.update assignment_group: ag1
       expect(enrollment.reload.computed_final_score).to equal 50.0
     end
 

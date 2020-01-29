@@ -94,18 +94,20 @@ module AuthenticationMethods
   end
 
   def validate_scopes
-    if @access_token
-      developer_key = @access_token.developer_key
-      request_method = request.method.casecmp('HEAD') == 0 ? 'GET' : request.method.upcase
+    return unless @access_token
 
-      if developer_key.try(:require_scopes)
-        scope_patterns = @access_token.url_scopes_for_method(request_method).concat(AccessToken.always_allowed_scopes)
-        if scope_patterns.any? { |scope| scope =~ request.path }
+    developer_key = @access_token.developer_key
+    request_method = request.method.casecmp('HEAD') == 0 ? 'GET' : request.method.upcase
+
+    if developer_key.try(:require_scopes)
+      scope_patterns = @access_token.url_scopes_for_method(request_method).concat(AccessToken.always_allowed_scopes)
+      if scope_patterns.any? { |scope| scope =~ request.path }
+        unless developer_key.try(:allow_includes)
           filter_includes(:include)
           filter_includes(:includes)
-        else
-          raise AccessTokenScopeError
         end
+      else
+        raise AccessTokenScopeError
       end
     end
   end

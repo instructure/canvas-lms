@@ -19,11 +19,21 @@
 import {useEffect, useMemo, useRef} from 'react'
 
 export default function useIncrementalLoading(options) {
-  const {hasMore, isLoading, lastItemRef, onLoadInitial, onLoadMore, records} = options
+  const {
+    contextType,
+    hasMore,
+    isLoading,
+    lastItemRef,
+    sortBy,
+    onLoadInitial,
+    onLoadMore,
+    records
+  } = options
   const recordCountRef = useRef(records.length)
 
-  // Load initial content only upon mounting.
-  useEffect(onLoadInitial, [])
+  useEffect(() => {
+    onLoadInitial(sortBy)
+  }, [sortBy.sort, sortBy.order, contextType]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return useMemo(() => {
     const loader = {
@@ -31,17 +41,28 @@ export default function useIncrementalLoading(options) {
       isLoading,
       lastRecordsLoaded: records.length - recordCountRef.current,
       onLoadInitial,
+      sortBy,
+      contextType,
 
       onLoadMore() {
         if (lastItemRef.current) {
           lastItemRef.current.focus()
         }
-        onLoadMore()
+        onLoadMore(sortBy)
       }
     }
 
     recordCountRef.current = records.length
 
     return loader
-  }, [hasMore, isLoading, records.length, lastItemRef, onLoadInitial, onLoadMore])
+  }, [
+    sortBy,
+    contextType,
+    hasMore,
+    isLoading,
+    records.length,
+    lastItemRef,
+    onLoadInitial,
+    onLoadMore
+  ])
 }

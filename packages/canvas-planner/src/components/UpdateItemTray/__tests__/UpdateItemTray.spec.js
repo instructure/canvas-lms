@@ -36,6 +36,19 @@ const simpleItem = (opts = {}) => ({
   ...opts
 })
 
+let ariaLive
+
+beforeAll(() => {
+  ariaLive = document.createElement('div')
+  ariaLive.id = 'flash_screenreader_holder'
+  ariaLive.setAttribute('role', 'alert')
+  document.body.appendChild(ariaLive)
+})
+
+afterAll(() => {
+  if (ariaLive) ariaLive.remove()
+})
+
 afterEach(() => {
   jest.restoreAllMocks()
 })
@@ -76,7 +89,7 @@ it('renders Add To Do header when creating a new to do', () => {
 
 it('shows title inputs', () => {
   const wrapper = mount(<UpdateItemTray {...defaultProps} />)
-  expect(wrapper.find('TextInput')).toHaveLength(2)
+  expect(wrapper.find('TextInput')).toHaveLength(3)
   const input = wrapper.find('TextInput').first()
   input.find('input').simulate('change', {target: {value: 'New Text'}})
   expect(input.instance().props.value).toEqual('New Text')
@@ -275,7 +288,7 @@ it('does render the delete button if an item is specified', () => {
 
 it('renders just an optional option when no courses', () => {
   const wrapper = shallow(<UpdateItemTray {...defaultProps} />)
-  expect(wrapper.find('option')).toHaveLength(1)
+  expect(wrapper.find('CanvasSelectOption')).toHaveLength(1)
 })
 
 it('renders course options plus an optional option when provided with courses', () => {
@@ -288,7 +301,7 @@ it('renders course options plus an optional option when provided with courses', 
       ]}
     />
   )
-  expect(wrapper.find('option')).toHaveLength(3)
+  expect(wrapper.find('CanvasSelectOption')).toHaveLength(3)
 })
 
 it('invokes save callback with updated data', () => {
@@ -312,7 +325,7 @@ it('invokes save callback with updated data', () => {
   )
   wrapper.instance().handleTitleChange({target: {value: 'new title'}})
   wrapper.instance().handleDateChange({}, '2017-05-01T14:00:00Z')
-  wrapper.instance().handleCourseIdChange(null, {value: '43'})
+  wrapper.instance().handleCourseIdChange(null, '43')
   wrapper.instance().handleChange('details', 'new details')
   wrapper.instance().handleSave()
   expect(saveMock).toHaveBeenCalledWith({

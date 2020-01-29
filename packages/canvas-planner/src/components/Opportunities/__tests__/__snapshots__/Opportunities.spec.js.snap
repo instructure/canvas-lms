@@ -22,21 +22,20 @@ exports[`renders nothing if no opportunities 1`] = `
   >
     Close Opportunity Center popup
   </CloseButton>
-  <TabList
-    defaultSelectedIndex={0}
+  <Tabs
     elementRef={[Function]}
-    focus={false}
-    variant="minimal"
+    onRequestTabChange={[Function]}
+    shouldFocusOnRender={false}
+    variant="default"
   >
-    <TabPanel
-      disabled={false}
-      id={null}
+    <Panel
+      elementRef={[Function]}
+      isDisabled={false}
+      isSelected={false}
       labelledBy={null}
       maxHeight="auto"
       padding="small"
-      selected={false}
-      tabRef={[Function]}
-      title={
+      renderTitle={
         <AccessibleContent
           alt="New Opportunities"
           as="span"
@@ -44,21 +43,22 @@ exports[`renders nothing if no opportunities 1`] = `
           New
         </AccessibleContent>
       }
-      variant="simple"
+      selected={true}
+      textAlign="start"
+      variant="default"
     >
       <div>
         Nothing new needs attention.
       </div>
-    </TabPanel>
-    <TabPanel
-      disabled={false}
-      id={null}
+    </Panel>
+    <Panel
+      elementRef={[Function]}
+      isDisabled={false}
+      isSelected={false}
       labelledBy={null}
       maxHeight="auto"
       padding="small"
-      selected={false}
-      tabRef={[Function]}
-      title={
+      renderTitle={
         <AccessibleContent
           alt="Dismissed Opportunities"
           as="span"
@@ -66,13 +66,15 @@ exports[`renders nothing if no opportunities 1`] = `
           Dismissed
         </AccessibleContent>
       }
-      variant="simple"
+      selected={false}
+      textAlign="start"
+      variant="default"
     >
       <div>
         Nothing here needs attention.
       </div>
-    </TabPanel>
-  </TabList>
+    </Panel>
+  </Tabs>
 </div>
 `;
 
@@ -98,21 +100,20 @@ exports[`renders the base component correctly with one of each kind of opportuni
   >
     Close Opportunity Center popup
   </CloseButton>
-  <TabList
-    defaultSelectedIndex={0}
+  <Tabs
     elementRef={[Function]}
-    focus={false}
-    variant="minimal"
+    onRequestTabChange={[Function]}
+    shouldFocusOnRender={false}
+    variant="default"
   >
-    <TabPanel
-      disabled={false}
-      id={null}
+    <Panel
+      elementRef={[Function]}
+      isDisabled={false}
+      isSelected={false}
       labelledBy={null}
       maxHeight="auto"
       padding="small"
-      selected={false}
-      tabRef={[Function]}
-      title={
+      renderTitle={
         <AccessibleContent
           alt="New Opportunities"
           as="span"
@@ -120,7 +121,9 @@ exports[`renders the base component correctly with one of each kind of opportuni
           New
         </AccessibleContent>
       }
-      variant="simple"
+      selected={true}
+      textAlign="start"
+      variant="default"
     >
       <ol
         className="Opportunities-styles__list"
@@ -141,16 +144,15 @@ exports[`renders the base component correctly with one of each kind of opportuni
           />
         </li>
       </ol>
-    </TabPanel>
-    <TabPanel
-      disabled={false}
-      id={null}
+    </Panel>
+    <Panel
+      elementRef={[Function]}
+      isDisabled={false}
+      isSelected={false}
       labelledBy={null}
       maxHeight="auto"
       padding="small"
-      selected={false}
-      tabRef={[Function]}
-      title={
+      renderTitle={
         <AccessibleContent
           alt="Dismissed Opportunities"
           as="span"
@@ -158,7 +160,9 @@ exports[`renders the base component correctly with one of each kind of opportuni
           Dismissed
         </AccessibleContent>
       }
-      variant="simple"
+      selected={false}
+      textAlign="start"
+      variant="default"
     >
       <ol
         className="Opportunities-styles__list"
@@ -179,8 +183,8 @@ exports[`renders the base component correctly with one of each kind of opportuni
           />
         </li>
       </ol>
-    </TabPanel>
-  </TabList>
+    </Panel>
+  </Tabs>
 </div>
 `;
 
@@ -206,21 +210,20 @@ exports[`renders the right course with the right opportunity 1`] = `
   >
     Close Opportunity Center popup
   </CloseButton>
-  <TabList
-    defaultSelectedIndex={0}
+  <Tabs
     elementRef={[Function]}
-    focus={false}
-    variant="minimal"
+    onRequestTabChange={[Function]}
+    shouldFocusOnRender={false}
+    variant="default"
   >
-    <TabPanel
-      disabled={false}
-      id={null}
+    <Panel
+      elementRef={[Function]}
+      isDisabled={false}
+      isSelected={false}
       labelledBy={null}
       maxHeight="auto"
       padding="small"
-      selected={false}
-      tabRef={[Function]}
-      title={
+      renderTitle={
         <AccessibleContent
           alt="New Opportunities"
           as="span"
@@ -228,7 +231,9 @@ exports[`renders the right course with the right opportunity 1`] = `
           New
         </AccessibleContent>
       }
-      variant="simple"
+      selected={true}
+      textAlign="start"
+      variant="default"
     >
       <ol
         className="Opportunities-styles__list"
@@ -264,16 +269,15 @@ exports[`renders the right course with the right opportunity 1`] = `
           />
         </li>
       </ol>
-    </TabPanel>
-    <TabPanel
-      disabled={false}
-      id={null}
+    </Panel>
+    <Panel
+      elementRef={[Function]}
+      isDisabled={false}
+      isSelected={false}
       labelledBy={null}
       maxHeight="auto"
       padding="small"
-      selected={false}
-      tabRef={[Function]}
-      title={
+      renderTitle={
         <AccessibleContent
           alt="Dismissed Opportunities"
           as="span"
@@ -281,7 +285,9 @@ exports[`renders the right course with the right opportunity 1`] = `
           Dismissed
         </AccessibleContent>
       }
-      variant="simple"
+      selected={false}
+      textAlign="start"
+      variant="default"
     >
       <ol
         className="Opportunities-styles__list"
@@ -302,7 +308,7 @@ exports[`renders the right course with the right opportunity 1`] = `
           />
         </li>
       </ol>
-    </TabPanel>
-  </TabList>
+    </Panel>
+  </Tabs>
 </div>
 `;

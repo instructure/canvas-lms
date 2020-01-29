@@ -76,7 +76,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       term = Account.default.enrollment_terms.create!(:name => "termname")
       child_course1 = course_factory(:course_name => "immachildcourse1", :active_all => true)
       @teacher.update_attribute(:short_name, "displayname")
-      child_course1.update_attributes(:sis_source_id => "sisid", :course_code => "shortname", :enrollment_term => term)
+      child_course1.update(:sis_source_id => "sisid", :course_code => "shortname", :enrollment_term => term)
       child_course2 = course_factory(:course_name => "immachildcourse2")
       [child_course1, child_course2].each{|c| @template.add_child_course!(c)}
 
@@ -372,7 +372,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
       assmt_restricts = {:content => true, :points => true}
       page_restricts = {:content => true}
-      @template.update_attributes(:use_default_restrictions_by_type => true,
+      @template.update(:use_default_restrictions_by_type => true,
         :default_restrictions_by_type => {'Assignment' => assmt_restricts, 'WikiPage' => page_restricts})
 
       api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => assmt.id, :restricted => '1'}, {}, {:expected_status => 200})
@@ -389,7 +389,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
       assmt_restricts = {:content => true, :points => true}
       quiz_restricts = {:content => true}
-      @template.update_attributes(:use_default_restrictions_by_type => true,
+      @template.update(:use_default_restrictions_by_type => true,
         :default_restrictions_by_type => {'Assignment' => assmt_restricts, 'Quizzes::Quiz' => quiz_restricts})
 
       api_call(:put, @url, @params, {:content_type => 'assignment', :content_id => quiz_assmt.id, :restricted => '1'}, {}, {:expected_status => 200})

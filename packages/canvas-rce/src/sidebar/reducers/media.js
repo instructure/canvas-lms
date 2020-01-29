@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {REQUEST_MEDIA, RECEIVE_MEDIA, FAIL_MEDIA} from '../actions/media'
+import {REQUEST_INITIAL_MEDIA, REQUEST_MEDIA, RECEIVE_MEDIA, FAIL_MEDIA} from '../actions/media'
 import {CHANGE_CONTEXT} from '../actions/context'
 
 // manages the state for a specific collection. assumes the action is intended
@@ -33,6 +33,15 @@ export default function mediaReducer(prevState = {}, action) {
     }
   }
   switch (action.type) {
+    case REQUEST_INITIAL_MEDIA:
+      state[ctxt] = {
+        files: [],
+        bookmark: null,
+        isLoading: true,
+        hasMore: true
+      }
+      return state
+
     case REQUEST_MEDIA:
       state[ctxt].isLoading = true
       return state

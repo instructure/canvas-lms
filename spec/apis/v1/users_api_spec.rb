@@ -1692,13 +1692,13 @@ describe "Users API", type: :request do
 
       it "should be able to update a name without changing sortable name if sent together" do
         sortable = "Name, Sortable"
-        @student.update_attributes(:name => "Sortable Name", :sortable_name => sortable)
+        @student.update(:name => "Sortable Name", :sortable_name => sortable)
         api_call(:put, @path, @path_options, {
           :user => {:name => "Other Name", :sortable_name => sortable}
         })
         expect(@student.reload.sortable_name).to eq sortable
 
-        @student.update_attributes(:name => "Sortable Name", :sortable_name => sortable) # reset
+        @student.update(:name => "Sortable Name", :sortable_name => sortable) # reset
         api_call(:put, @path, @path_options, {:user => {:name => "Other Name"}}) # only send in the name
         expect(@student.reload.sortable_name).to eq "Name, Other" # should auto sync
       end

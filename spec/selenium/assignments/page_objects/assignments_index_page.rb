@@ -49,8 +49,36 @@ module AssignmentsIndexPage
     f('div.item-group-container')
   end
 
+  def manage_assignment_group_menu(assignment_group)
+    f("#ag_#{assignment_group}_manage_link")
+  end
+
+  def assignment_group_menu_tool_link(assignment_group)
+    f("#assignment_group_#{assignment_group} a.menu_tool_link")
+  end
+
   def assignment_group_loading_spinner
     f('div.loadingIndicator')
+  end
+
+  def tool_dialog
+    f("div[role='dialog']")
+  end
+
+  def tool_dialog_header
+    f("div[role='dialog'] h2")
+  end
+
+  def tool_dialog_iframe
+    tool_dialog.find_element(:css, "iframe")
+  end
+
+  def course_assignments_settings_button
+    f("#course_assignment_settings_link")
+  end
+
+  def course_assignments_settings_menu_items
+    ff("ul[role='menu'] li")
   end
 
   #------------------------------ Actions --------------------------------

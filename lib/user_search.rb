@@ -63,7 +63,7 @@ module UserSearch
       context.users_visible_to(searcher, include_prior_enrollments,
         enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).distinct
     else
-      context.users_visible_to(searcher).distinct
+      context.users_visible_to(searcher, include_inactive: include_inactive_enrollments).distinct
     end
   end
 

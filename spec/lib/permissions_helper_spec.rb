@@ -371,7 +371,7 @@ describe PermissionsHelper do
       concluded_teacher_term = Account.default.enrollment_terms.create!(:name => "concluded")
       concluded_teacher_term.set_overrides(Account.default, 'TeacherEnrollment' => { start_at: '2014-12-01', end_at: '2014-12-31' })
       concluded_teacher_enrollment = course_with_teacher(user: @user, active_all: true)
-      @course.update_attributes(:enrollment_term => concluded_teacher_term)
+      @course.update(:enrollment_term => concluded_teacher_term)
 
       expect(@user.precalculate_permissions_for_courses([@course], [:manage_calendar])).to eq({
         concluded_teacher_enrollment.global_course_id => {:manage_calendar => false, :read => true, :read_as_admin => true}
@@ -463,14 +463,14 @@ describe PermissionsHelper do
     it "should work with concluded-available permissions" do
       RoleOverride.create!(permission: 'moderate_forum', enabled: true, role: student_role, account: Account.default)
       concluded_student_enrollment = course_with_student(:active_all => true)
-      @course.update_attributes(:start_at => 1.month.ago, :conclude_at => 2.weeks.ago, :restrict_enrollments_to_course_dates => true)
+      @course.update(:start_at => 1.month.ago, :conclude_at => 2.weeks.ago, :restrict_enrollments_to_course_dates => true)
       expect(concluded_student_enrollment.reload).to be_completed
 
       concluded_teacher_term = Account.default.enrollment_terms.create!(:name => "concluded")
       concluded_teacher_term.set_overrides(Account.default, 'TeacherEnrollment' => { start_at: '2014-12-01', end_at: '2014-12-31' })
 
       concluded_teacher_enrollment = course_with_teacher(:user => @user, :active_all => true)
-      @course.update_attributes(:enrollment_term => concluded_teacher_term)
+      @course.update(:enrollment_term => concluded_teacher_term)
       expect(concluded_teacher_enrollment.reload).to be_completed
 
       active_student_enrollment = course_with_student(:user => @user, :active_all => true)

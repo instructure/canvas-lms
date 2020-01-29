@@ -30,7 +30,7 @@ module Lti
     before(:once) { attachment_model }
     before :each do
       course_factory(active_all: true)
-      message_handler.update_attributes(message_type: 'basic-lti-launch-request')
+      message_handler.update(message_type: 'basic-lti-launch-request')
       student_in_course active_all: true
       teacher_in_course active_all: true
 
@@ -78,7 +78,7 @@ module Lti
         @report = OriginalityReport.create!(report_initial_values)
         @endpoints[:show] = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id}"
         @endpoints[:alt_show] = "/api/lti/assignments/#{@assignment.id}/files/#{@attachment.id}/originality_report"
-        @assignment.course.update_attributes(account: tool_proxy.context)
+        @assignment.course.update(account: tool_proxy.context)
       end
 
       it "requires an lti access token" do
@@ -98,7 +98,7 @@ module Lti
         @assignment.save!
 
         new_tool_proxy = tool_proxy.deep_clone
-        new_tool_proxy.update_attributes(guid: SecureRandom.uuid)
+        new_tool_proxy.update(guid: SecureRandom.uuid)
 
         token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: new_tool_proxy.guid)
         other_helpers = {Authorization: "Bearer #{token}"}
@@ -191,7 +191,7 @@ module Lti
           @assignment.tool_settings_tool = message_handler
           @assignment.save!
           new_tool_proxy = tool_proxy.deep_clone
-          new_tool_proxy.update_attributes(guid: SecureRandom.uuid)
+          new_tool_proxy.update(guid: SecureRandom.uuid)
           token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: new_tool_proxy.guid)
           other_helpers = {Authorization: "Bearer #{token}"}
           allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
@@ -273,7 +273,7 @@ module Lti
         @report = OriginalityReport.create!(report_initial_values)
         @endpoints[:update] = "/api/lti/assignments/#{@assignment.id}/submissions/#{@submission.id}/originality_report/#{@report.id}"
         @endpoints[:update_alt] = "/api/lti/assignments/#{@assignment.id}/files/#{@attachment.id}/originality_report"
-        @assignment.course.update_attributes(account: account)
+        @assignment.course.update(account: account)
       end
 
       it "requires the tool proxy to be associated to the assignment" do
@@ -629,7 +629,7 @@ module Lti
 
     describe "POST assignments/:assignment_id/submissions/:submission_id/originality_report (#create)" do
       before do
-        @assignment.course.update_attributes(account: account)
+        @assignment.course.update(account: account)
       end
 
       it "creates an originality report when provided required params" do
@@ -712,8 +712,8 @@ module Lti
       end
 
       it "does not require an attachment if submission type includes online text entry" do
-        @submission.assignment.update_attributes!(submission_types: 'online_text_entry')
-        @submission.update_attributes!(body: 'some text')
+        @submission.assignment.update!(submission_types: 'online_text_entry')
+        @submission.update!(body: 'some text')
         score = 0.25
         post @endpoints[:create], params: {originality_report: {originality_score: score}}, headers: request_headers
 
@@ -722,7 +722,7 @@ module Lti
       end
 
       it "does not requre an attachment if submission type does not include online text entry" do
-        @submission.update_attributes!(body: 'some text')
+        @submission.update!(body: 'some text')
         score = 0.25
         post @endpoints[:create], params: {originality_report: {originality_score: score}}, headers: request_headers
         expect(response).to be_not_found
@@ -885,7 +885,7 @@ module Lti
 
         context 'when attempt is given' do
           before do
-            @submission.assignment.update_attributes!(submission_types: 'online_text_entry')
+            @submission.assignment.update!(submission_types: 'online_text_entry')
           end
 
           def create_version
@@ -974,7 +974,7 @@ module Lti
 
         context 'when attempt is not given' do
           it 'updates the first originality report created without an attachment' do
-            @submission.assignment.update_attributes!(submission_types: 'online_text_entry')
+            @submission.assignment.update!(submission_types: 'online_text_entry')
             originality_score = 50
             post @endpoints[:create],
                  params: {

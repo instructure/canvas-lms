@@ -331,5 +331,35 @@ describe "RCE Next toolbar features" do
         expect(wiki_body).to contain_css('pre')
       end
     end
+
+    describe 'floating toolbar' do
+      before(:each) do
+        create_wiki_page_with_text('hello')
+        visit_existing_wiki_edit(@course, 'hello')
+        driver.manage.window.resize_to(1000, 800)
+      end
+
+      it "should close on executing any command" do
+        more_toolbar_button.click
+        expect(overflow_toolbar).to be_displayed
+        click_list_toggle_button
+        click_bullet_list_button
+        expect(f('body')).not_to contain_css(overflow_toolbar_selector)
+      end
+
+      it "should close on losing focus" do
+        skip("Adding this test causes the previous one to fail. Go figure!?!")
+        in_frame rce_page_body_ifr_id do
+          f('#tinymce').send_keys('') # focus
+        end
+        more_toolbar_button.click
+        wait_for_animations
+        expect(overflow_toolbar).to be_displayed
+        f('#title').click
+        expect(f('body')).not_to contain_css(overflow_toolbar_selector)
+      end
+
+
+    end
   end
 end

@@ -234,7 +234,7 @@ describe Announcement do
       section2 = @course.course_sections.create!
       other_student = user_factory(:active_all => true)
       @course.enroll_student(other_student, :section => section2, :enrollment_state => 'active')
-      section2.update_attributes(:start_at => 2.months.ago, :end_at => 1.month.ago, :restrict_enrollments_to_section_dates => true)
+      section2.update(:start_at => 2.months.ago, :end_at => 1.month.ago, :restrict_enrollments_to_section_dates => true)
 
       notification_name = "New Announcement"
       n = Notification.create(:name => notification_name, :category => "TestImmediately")

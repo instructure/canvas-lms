@@ -30,7 +30,7 @@ describe 'new_discussion_topic' do
   include_examples "a message"
     context "locked discussions" do
       it "should send locked notification if availibility date is locked for email" do
-        @topic.update_attributes(
+        @topic.update(
           unlock_at: Time.zone.now + 3.days,
           lock_at: Time.zone.now + 6.days,
           message: "the content here of the discussion body"
@@ -41,7 +41,7 @@ describe 'new_discussion_topic' do
       end
 
       it "should send discussion notification with discussions content when unlocked for email" do
-        @topic.update_attributes(
+        @topic.update(
           unlock_at: nil,
           lock_at: nil,
           message: "the content here of the discussion body"
@@ -52,7 +52,7 @@ describe 'new_discussion_topic' do
       end
 
       it "should send locked notification if availibility date is locked for sms" do
-        @topic.update_attributes(
+        @topic.update(
           unlock_at: Time.zone.now + 3.days,
           lock_at: Time.zone.now + 6.days,
           message: "the content here of the discussion body"
@@ -63,7 +63,7 @@ describe 'new_discussion_topic' do
       end
 
       it "should send discussion notification with discussions content when unlocked sms" do
-        @topic.update_attributes(
+        @topic.update(
           unlock_at: nil,
           lock_at: nil,
           message: "the content here of the discussion body"
@@ -74,7 +74,7 @@ describe 'new_discussion_topic' do
       end
 
       it "should send locked notification if availibility date is locked for summary" do
-        @topic.update_attributes(
+        @topic.update(
           unlock_at: Time.zone.now + 3.days,
           lock_at: Time.zone.now + 6.days,
           message: "the content here of the discussion body"
@@ -85,7 +85,7 @@ describe 'new_discussion_topic' do
       end
 
       it "should send discussion notification with discussions content when unlocked summary" do
-        @topic.update_attributes(
+        @topic.update(
           unlock_at: nil,
           lock_at: nil,
           message: "the content here of the discussion body"

@@ -1016,6 +1016,10 @@ ru:
         bryan_engagement: 
           enrollment_term_ids: 
             field: "Идентификаторы условия регистрации"
+    eportfolio_moderation: 
+      eportfolio_moderation_crumb: "Модерирование ePortfolio"
+      page_title: "Модерирование ePortfolio"
+      title: "Модерирование ePortfolio"
     excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1876,6 +1880,8 @@ ru:
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: "Режим просмотра администратора"
   administrator_f325c186: Администратор
+  administrators_and_author_only_flagged_as_possible_42345cba: "Только администраторы и автор (помечено как «возможный спам»)"
+  administrators_and_author_only_marked_as_spam_184becce: "Только администраторы и автор (помечено как «спам»)"
   admins_3e1dce15: Администраторы
   admins_add_remove_26811ce5: "Админы - добавить / удалить"
   advanced_36b35b8: Продвинутый
@@ -2593,6 +2599,7 @@ ru:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Ответы будут показаны после того, как вы завершите последнюю попытку"
   any_sub_account_ec7069f2: "Любая субучетная запись"
   any_term_d49af19f: "Любой срок"
+  anyone_with_a_direct_link_private_b3bc9661: "Любой пользователь по прямой ссылке (частный доступ)"
   anyone_with_the_url_9d7e5e07: "Любой с URL-адресом"
   api_7bd66e19: API
   api_key_eeeb2167: "Ключ API"
@@ -3834,6 +3841,7 @@ ru:
   authentications_log_ca16ce81: "Журнал учета аутентификаций"
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest отправлено IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse от IdP"
+  author_215203d2: Автор
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} только что создал новый комментарий к отправке для %{submission_submittor} для %{assignment}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} только что добавил новый комментарий к отправке для %{user_name} для %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} только что добавил новый комментарий к отправке для %{user_name} для %{assignment_title}."
@@ -4020,6 +4028,7 @@ ru:
   bookmark_service: 
     default_title: "Без названия"
   bookmark_this_question_bank_dc414a82: "Добавить этот банк вопросов в закладки"
+  bookmarking_for_enrollments_index_api_840be156: "Установка закладок для зачислений API указателя"
   bookmarks_5b5b81c9: Закладки
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Оба параметра «Обсуждения - создать» и «Обсуждения - модерировать» позволяют пользователю создавать обсуждение на странице «Обсуждения». Если данное разрешение активно, параметр «Обсуждения - создать» не требуется. Для просмотра обсуждений в курсе необходимо активировать параметр «Обсуждения - просмотр». Чтобы ответить в обсуждении, необходимо также включить параметр «Обсуждения - разместить пост». Чтобы отредактировать сведения о задании в обсуждении, также должен быть включен параметр «Задания и тесты - добавить / редактировать / удалить»."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
@@ -5289,6 +5298,7 @@ ru:
   configure_individual_learning_paths_for_students_b_e2fce294: "Настроить индивидуальный путь обучения для студентов на основе результатов оценки."
   configure_tool_app_3b1bb50b: "Сконфигурировать приложение %{tool}?"
   configure_toolname_app_651371be: "Настроить приложение %{toolName}"
+  confirm_as_spam_2f8b7105: "Подтвердить как «спам»"
   confirm_communication_channel_81c48d08: "Подтвердите канал коммуникации"
   confirm_contact_method_29d6fe4b: "Подтвердите метод контакта"
   confirm_delete_6febeafb: "Подтвердить удаление"
@@ -6354,6 +6364,11 @@ ru:
     one: "Найден 1 набор периодов оценивания."
     other: "Найден %{count} набор периодов оценивания."
     zero: "Не найдено ни одного набора периодов оценивания."
+  count_shared_items_loaded_ef94ef6a: 
+    few: "%{count} Общедоступных элемента(-ов) загружены(-о)."
+    many: "%{count} Общедоступных элемента(-ов) загружены(-о)."
+    one: "Загружен 1 общедоступный элемент."
+    other: "%{count} Общедоступных элемента(-ов) загружены(-о)."
   count_students_30e46120: 
     few: "%{count} студента"
     many: "%{count} студентов"
@@ -7490,6 +7505,7 @@ ru:
   current_total_67bf5f72: "Текущий общий балл:"
   current_volume_level_c55ab825: "Уровень текущего объема"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "В настоящее время закреплено за %{tokenName}, нажмите, чтобы удалить"
+  currently_visible_to_e2f85345: "В настоящее время доступно для просмотра для"
   curso_f0ee9b5: Curso
   curve_grades_b7a75443: "Кривая оценок"
   curve_grades_dialog: 
@@ -7845,8 +7861,9 @@ ru:
   deleted_1be5ed1: Удалено
   deleted_ce03674d: удалено
   deleted_content_exceptions_237e809d: "Исключения удаленного контента:"
-  deleted_content_referenced_in_this_resource_e42d1998: "‘Удалено содержимое, на которое задана ссылка в этом ресурсе:\""
+  deleted_content_referenced_in_this_resource_e42d1998: "Удалено содержимое, на которое задана ссылка в этом ресурсе:"
   deleting_6421031e: удаление...
+  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Удаление пользователя приведет к удалению всех его ePortfolio. В качестве альтернативы ePortfolio можно индивидуально отметить как «спам» или «безопасное» для изменения режима доступа к ним для просмотра."
   deleting_assignment_22d5851d: "удаление задания"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Демонстрационные сайты требуют определения настроек Recaptcha. Обратитесь к администратору сайта с вопросами о данных настройках Canvas."
@@ -8944,6 +8961,7 @@ ru:
       add_submission: "Добавить страницу для отправки"
       download_eportfolio: "Загрузка ePortfolio"
       section_list: "Перетащите для упорядочивания, щелкните для редактирования"
+  eportfolio_3c009f9c: Eportfolio
   eportfolio_categories: 
     default_name: "Новая страница"
     errors: 
@@ -8960,6 +8978,7 @@ ru:
     click_through: "Щелкните, чтобы просмотреть содержимое страницы"
     default_content: "Содержание пока что не добавлено"
     default_name: "Название страницы"
+  eportfolio_moderation_feb0ffd3: "Модерирование ePortfolio"
   eportfolio_settings_75ba1f9a: "Параметры ePortfolio"
   eportfolios: 
     _page_section: 
@@ -9292,6 +9311,7 @@ ru:
   everyone_854554dd: Все
   everyone_else_6c6dc7b6: "Все остальные"
   everyone_else_cc5f6888: "Все остальные"
+  everyone_public_45ff1f25: "Кто угодно (общий доступ)"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   exactly_one_rating_can_have_mastery_c1d87990: "Только одна оценка может относиться к успеваемости"
@@ -9327,6 +9347,7 @@ ru:
   expanded_f4493860: "В развернутом виде"
   experimental_graphql_api_75c5eb8f: "ЭКСПЕРИМЕНТАЛЬНЫЙ GraphQL API."
   expires_at_6214b43f: Истекает
+  explanation_of_statuses_90a26d07: "Объяснение статусов:"
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Экспортировать сущуествующую контрольную работу в новый формат Quizzes 2"
   export_course_content_f4774b74: "Экспорт содержания курса"
   export_de71cd8e: Экспорт
@@ -9515,6 +9536,7 @@ ru:
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Не удалось загрузить компонент истории синхронизации. Подключение в вашей сети в порядке?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Не удалось загрузить компонент несинхронизированных изменений. Подключение в вашей сети в порядке?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Сбой, сообщите о следующем коде ошибке своему системному администратору: Отчет об ошибке:%{error};"
+  failed_retrieving_media_source_3f0cfd49: "Не удалось получить медиа-источник"
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Сбой, не удалось сгенерировать файл в отчете. Попробуйте еще раз."
   failed_to_add_new_feed_ee1c5ea: "Не удалось добавить новый источник"
   failed_to_change_last_attended_date_1e340ba6: "Не удалось изменить дату последнего посещения"
@@ -9632,6 +9654,7 @@ ru:
   file_list_350d08df: "Список файлов"
   file_list_updated_38e2a5ad: "Список файлов обновлен"
   file_menu_cc0ca54: "Меню Файл"
+  file_must_be_an_image_293567a8: "Это должен файл изображения"
   file_name_2fe68ec1: "Имя файла"
   file_name_8fd421ff: "Имя файла"
   file_name_too_long_ea535796: "имя файла слишком длинное"
@@ -9829,6 +9852,8 @@ ru:
   first_reviewer_9ea05caa: "Первый рецензент"
   first_reviewer_sortorder_e2184140: "Первый рецензент %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, и %{others_count} других"
+  flagged_as_possible_spam_ebbc4683: "Помечено как «возможный спам»"
+  flags_new_eportfolio_content_matching_specific_key_a66af560: "Отмечает новый контент ePortfolio, содержащий ключевые слова, как возможный спам, и позволяет администраторам подтверждать отмеченные ePortfolio или отмечать их как безопасные."
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
@@ -11714,6 +11739,7 @@ ru:
   images_documents_and_more_dccb362f: "Изображения, документы и проч."
   immediate_notifications_for_global_announcements_682f5a3d: "Немедленные оповещения для глобальных объявлений"
   immediately_c128ede6: Немедленно
+  immersive_reader_7b87538: "Immersive Reader"
   immersive_reader_failed_to_load_bc8d4dd4: "Загрузка Immersive Reader прошла неудачно"
   import_1b31507: Импортировать
   import_a_set_of_outcomes_6b782192: "Импортировать набор результатов"
@@ -12261,6 +12287,7 @@ ru:
       log_in_to_canvas: "Войти в систему Canvas"
   learn_more_7a8d626: "Узнать больше"
   learn_more_about_collaborations_2978f66d: "Узнайте больше о сотрудничестве"
+  learning_analytics_beta_view_46deb4c8: "Learning Analytics (бета-версия) - просмотр"
   learning_mastery_5fc34276: "Усвоение обучения"
   learning_mastery_6ed4fd63: "Владение учебным материалом…"
   learning_mastery_gradebook_description: |-
@@ -12784,8 +12811,14 @@ ru:
   mark_as_done_6fa48d2f: "Отметить как выполненное"
   mark_as_done_779556d7: "отметить как выполненное"
   mark_as_read_e7de2ce3: "Отметить как прочитанное"
+  mark_as_safe_c01fea35: "Помечено как «безопасное»"
+  mark_as_spam_9c613d87: "Пометить как «спам»"
   mark_as_unread_4a413c41: "Отметить как непрочитанное"
   mark_done_9d81bcd9: "Отметить как выполненное"
+  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Помечено как «безопасное»': администратор проверил это ePortfolio и пометил его как безопасное. Доступно для просмотра его изначальной целевой аудитории."
+  marked_as_safe_f7f953df: "Помечено как «безопасное»"
+  marked_as_spam_ab87846d: "Помечено как «спам»"
+  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Помечено как «спам»': администратор проверил это ePortfolio и пометил его как спам. Доступно для просмотра только для автора и администраторов."
   marked_done_8f61ebb8: "отмечено как выполненное"
   marked_done_9fd646f: "Отмечено как выполненное"
   masquerade_as_name_8bb004c5: "Выполнить подмену как %{name}"
@@ -15259,6 +15292,8 @@ ru:
   need_a_canvas_account_221d18ed: "Нужен аккаунт на Canvas?"
   need_help_setting_up_your_course_2b763141: "Нужна помощь в настройке вашего курса?"
   needs_grading_9143d47c: "Требует оценки"
+  needs_review_flagged_as_possible_spam_233657fb: "Необходима проверка: отмечено как «возможный спам»"
+  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'Необходима проверка: отмечено как «возможный спам»': системы Instructure квалифицировали это ePortfolio как возможный спам, оно нуждается в проверке со стороны администратора. Доступно для просмотра только для автора и администраторов."
   negative_points_fda45730: "Отрицательные баллы"
   netherlands_14ca4f6d: Нидерланды
   netherlands_31_63e4f1b9: "Нидерланды (+31)"
@@ -15473,6 +15508,7 @@ ru:
   not_mastered_5c2f9968: "Не усвоено"
   not_now_97efd947: "Не сейчас"
   not_published_73f7079: "Не опубликовано"
+  not_reviewed_c38d9e97: "Не проверено"
   not_signed_47acf472: "Не подписано"
   not_starred_no_subject_click_to_star_adfefe93: "'Без звезды \"(Без темы)\", Нажмите, чтоб отметить звездой."
   not_starred_no_subject_click_to_star_dc91380: "Без звезды \"(Без темы)\", Нажмите, чтоб отметить звездой."
@@ -16402,7 +16438,7 @@ ru:
   place_b128fa94: Разместить
   place_item_2acc18b9: "Поместить \"%{item}\""
   place_section_before_5b45714e: "Разместить \"%{section}\" до:"
-  place_title_2c183274: "Поместите \"%{title}\"\""
+  place_title_2c183274: "Поместите \"%{title}\""
   placeholder_for_webhooks_access_in_canvas_catalog_b8c9d864: "Заполнитель для доступа к вебхукам в каталоге Canvas."
   placement_values_c0a2cf56: "Значения размещения"
   placements_5b5e056b: Размещения
@@ -18164,7 +18200,7 @@ ru:
         links: 
           download_submissions: "Скачать все файлы"
       equations_help: 
-        equation_functions: "Помимо переменных также доступен набор полезных функций, которые можно использовать для создания полезных значений.  Например: %{example} Для просмотра объяснения определенной вспомогательной функции выберите ее в списке ниже:"
+        equation_functions: "Помимо переменных также доступен набор полезных функций, которые можно использовать для создания полезных значений.  Например: \"%{example} Для просмотра объяснения определенной вспомогательной функции выберите ее в списке ниже:\""
         equation_intro: "Вопросы с формулами основаны на наборе одной или нескольких формул, вычисленных последовательно. Можно определить промежуточные переменные в этих формулах, но цифровой результат последней формулы используется для создания правильного ответа. Например: %{example}. Итоговый ответ для этого набора формул — 71. Однако предварительно определенные переменные отсутствуют, поэтому у всех студентов будет один и тот же вопрос с одним и тем же ответом. См. вкладку \"переменные\" для получения дополнительной информации о переменных."
         equation_variables2: "Вы также можете задать переменные в своем тексте вопроса с помощью скобок (\"Чему равно [a] + [b]?\"). Для каждой переменной вы будете видеть \"значение-пример\", определяемое настройками переменных. Это позволит вам проверять свои расчеты и работоспособность формул. Например, если ваш вопрос выглядел как \"Чему равно [a] + 5?\", то вам будет предложено уточнить переменную \"a\". Если в примере значение для \"a\" было равно 5,2, вы можете записать следующее: %{example} С помощью этой формулы вы можете сгенерировать любое количество наборов решений, где значение \"a\" будет разным для каждого набора. Один учащийся может видеть вопрос \"Чему равно 5,2 + 5?\", а другой может видеть \"Чему равно 9 + 5?\"."
         links: 
@@ -19520,6 +19556,7 @@ ru:
       manage_wiki: "Управление вики (добавление / редактирование / удаление страниц)"
       managed_jobs: "Управление фоновыми заданиями"
       moderate_form: "Управление обсуждениями ( удаление / редактирование других записей, блокирование тем)"
+      moderate_user_content: "Модерировать пользовательский контент"
       post_to_forum: "Публикация в обсуждениях"
       read_course_content: "Просмотр содержания курса"
       read_course_list: "Просмотр списка курсов"
@@ -21837,6 +21874,7 @@ ru:
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Успешно! Оценки были опубликованы в %{postedTo} для %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Все прошло успешно! Оценки были опубликованы в Зачетной книжке."
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Успешно! Политика публикации для %{name} была обновлена."
+  success_you_added_hostname_to_the_whitelist_6061236e: "Успешно: Вы добавили %{hostname} в белый список."
   successfully_added_fb3e6008: "Успешно добавлено"
   successfully_created_a_set_38374719: "Набор успешно создан"
   successfully_deleted_discussion_title_a685f345: "Успешно удаленная дискуссия %{title}"
@@ -22188,10 +22226,13 @@ ru:
   the_selected_group_was_cleared_because_the_student_656e4f1c: "Выбранная группа была удалена, потому что запрошенный вами студент не входит ни в одну из групп. Вы можете выбрать группу в журнале оценок."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Серьезность вопроса выбирается пользователем из выпадающего меню."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Иконка ярлыка для устройств iOS/Android. 180x180 png"
+  the_specified_assignment_could_not_be_found_c5dc34ab: "Не удается найти указанное задание"
+  the_specified_assignment_id_could_not_be_found_e4e64f5f: "Не удается указанное задание (%{id})"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "для указанного файла с file_id уже имеется первоначальный отчет"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Указанный пользователь (%{id}) не является студентом этого курса"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Указанный пользователь не является студентом этого курса"
   the_state_parameter_is_required_ffadf213: "Необходимо ввести параметр состояния"
+  the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Настройка Sync to SIS не может быть активирована для задания \"%{assignment_name}\" без срока сдачи."
   the_term_has_ended_for_this_course_f0ab367: "Закончился срок для этого курса"
   the_title_cannot_be_longer_than_length_characters_7a822943: "Заголовок не может быть длиннее %{length} символов"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "Заголовок следующего банка вопросов укорочен: \"%{title}\""
@@ -22352,6 +22393,10 @@ ru:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Это включает обновленную навигацию, новую приборную панель и придает простой, более современный вид."
   this_enables_users_to_generate_and_download_course_4c69c531: "Это позволяет пользователям создавать и скачивать курс ePub."
   this_environment_is_currently_being_updated_with_a_235f1875: "В настоящее время эта среда обновляется до копии последних рабочих данных. Зайдите позже."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Это ePortfolio было помечено как «возможный спам». До тех пор, пока оно не будет проверено администратором, оно будет доступно для просмотра только вам. При наличии вопросов обращайтесь к администратору."
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Это ePortfolio было идентифицировано как «возможный спам». В настоящее время оно доступно для просмотра только для администраторов и автора. Если вы уверены, в том, что данный контент не является спамом, вы можете пометить его как «безопасное». Либо вы можете подтвердить, что это спам."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Это ePortfolio было идентифицировано как «спам», доступ к его просмотру имеется только у вас. При наличии вопросов обращайтесь к администратору."
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Это ePortfolio было идентифицировано как « спам». В настоящее время оно доступно для просмотра только для администраторов и автора. Если вы уверены, в том, что данный контент не является спамом, вы можете пометить его как «безопасное»."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Эта функция позволяет преподавателям без проблем копировать одиночные элементы из одного курса в другой и делиться одиночным элементом содержания с другими пользователями таким образом, чтобы они также могли импортировать эти элементы в свои курсы."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Данную функцию нельзя отключить, так как существует как минимум одна субучетная запись или курс с включенной функцией."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Эта функция не может быть активирована, пока активировано автораспознавание или разделители полей"
@@ -22850,7 +22895,7 @@ ru:
       Чтобы просмотреть пользовательские страницы, необходимо также включить параметр «Статистика - просмотр».
       Чтобы выступать в качестве других пользователей, должен быть включен параметр «Пользователи - выступать в качестве».
   to_edit_user_details_modify_login_details_or_chang_800e894d: "Чтобы отредактировать данные пользователя, изменить данные для входа или изменить пароли пользователей, также должен быть включен параметр «Пользователи - управление регистрационными данными». Чтобы просмотреть пользовательские страницы, необходимо также включить параметр «Статистика - просмотр». Чтобы выступать в качестве других пользователей, должен быть включен параметр «Пользователи - выступать в качестве»."
-  to_f0e90538: "‘Для:\""
+  to_f0e90538: "Для:"
   to_generate_a_pairing_code_from_a_student_s_user_d_28a10a61: "Чтобы создать код сопряжения со страницы студента «Сведения о пользователе», необходимо также включить разрешение «Пользователи - добавить / удалить студентов из курсов»."
   to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "Чтобы создать код сопряжения со страницы студента «Сведения о пользователе», необходимо также включить разрешение «Пользователи - добавить / удалить студентов из курсов»."
   to_generate_a_pairing_code_from_a_student_s_user_s_3dccb574: "Чтобы создать код сопряжения со страницы студента «Сведения Настройки пользователе», необходимо также включить разрешение «Пользователь - выступать в качестве». Чтобы создать код сопряжения со страницы студента «Сведения о пользователе», необходимо также включить разрешение «Пользователи - добавить / удалить студентов из курсов»."
@@ -23326,6 +23371,7 @@ ru:
   upload_file_fd2361b8: "Загрузить файл"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Загрузить файлы, представленные с заданиями в специальную папку для предоставленных материалов, которая существует только для чтения"
   upload_gradebook_386a46c8: "Загрузить табель успеваемости"
+  upload_image_6120b609: "Загрузить изображение"
   upload_media_ce31135a: "Загрузить медиа"
   upload_not_available_for_this_folder_8f8623c6: "Отправка недоступна для этой папки"
   upload_successful_ca47465f: "Успешно загружено"
@@ -23356,6 +23402,7 @@ ru:
   use_arrow_keys_to_navigate_options_2021cc50: "Используйте клавиши со стрелками для навигации по параметрам."
   use_as_front_page_274a488b: "Выбрать в качестве титульной страницы"
   use_between_for_adding_multiple_users_26bff207: "При добавлении нескольких пользователей для их разделения используйте символы \",\"."
+  use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Использовать установку закладок для разбивки на страницы API в указателе зачислений"
   use_default_890939b7: "Использовать настройки по умолчанию"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Используйте экспериментальные функции до того, как разрешать их для использования в производственных целях"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Используйте HTML5 Recorder в редакторе контента вместо Flash"
@@ -23885,6 +23932,7 @@ ru:
   users_manage_log_in_details_b944568b: "Пользователи - управление подробными сведениями регистрации"
   users_manage_login_details_9462b30f: "Пользователи - управление регистрационными данными"
   users_matching_search_term_c604db9e: "Пользователи с совпадением \"%{search_term}\""
+  users_moderate_content_36d6eed7: "Пользователи - модерировать контент"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Пользователям программ для чтения с экрана может потребоваться отключить виртуальный курсор, чтобы использовать эти сочетания клавиш"
   users_over_time_9a2ee74a: "пользователей в течение длительного времени"
   users_view_list_861c7a3f: "Пользователи - просмотреть список"
@@ -23935,6 +23983,7 @@ ru:
   view_grades_for_name_45aeb2f2: "Смотреть оценки по %{name}"
   view_grading_history_e64bb8fe: "Просмотр истории оценок"
   view_in_speedgrader_773b9d81: "Смотреть в SpeedGrader"
+  view_learning_analytics_beta_1c98a397: "Просмотр Learning Analytics (бета-версия)"
   view_login_ids_for_users_142bbe7a: "Показать идентификационные имена пользователей"
   view_longer_description_6b762087: "просмотреть полное описание"
   view_name_app_62a2ad8e: "Просмотреть приложение %{name}"

@@ -135,4 +135,22 @@ describe('Images reducer', () => {
       assert(images(state, action).user.isLoading)
     })
   })
+
+  describe('REQUEST_INITIAL_IMAGES', () => {
+    it('marks images as loading', () => {
+      const action = {type: actions.REQUEST_INITIAL_IMAGES, payload: {contextType: 'user'}}
+      assert(images(state, action).user.isLoading)
+    })
+
+    it('marks iamgess as having more', () => {
+      const action = {type: actions.REQUEST_INITIAL_IMAGES, payload: {contextType: 'user'}}
+      assert(images(state, action).user.hasMore)
+    })
+
+    it('clears files', () => {
+      state.course.files = ['one', 'two']
+      const action = {type: actions.REQUEST_INITIAL_IMAGES, payload: {contextType: 'course'}}
+      assert.equal(images(state, action).course.files.length, 0)
+    })
+  })
 })

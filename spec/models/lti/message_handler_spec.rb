@@ -233,11 +233,11 @@ module Lti
       end
 
       before do
-        message_handler.update_attributes(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
+        message_handler.update(message_type: MessageHandler::BASIC_LTI_LAUNCH_REQUEST)
       end
 
       it 'finds message handlers when tool is installed in current account' do
-        tool_proxy.update_attributes(context: account)
+        tool_proxy.update(context: account)
         mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
                                               product_code: jwt_body[:product_code],
                                               resource_type_code: jwt_body[:resource_type_code],
@@ -246,7 +246,7 @@ module Lti
       end
 
       it 'finds message handlers when tool is installed in current course' do
-        tool_proxy.update_attributes(context: course)
+        tool_proxy.update(context: course)
         mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
                                               product_code: jwt_body[:product_code],
                                               resource_type_code: jwt_body[:resource_type_code],
@@ -255,7 +255,7 @@ module Lti
       end
 
       it 'does not return message handlers with a different message_type' do
-        message_handler.update_attributes(message_type: 'banana')
+        message_handler.update(message_type: 'banana')
         mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
                                               product_code: jwt_body[:product_code],
                                               resource_type_code: jwt_body[:resource_type_code],
@@ -265,8 +265,8 @@ module Lti
 
       context 'account chain search' do
         it 'finds message handlers when tool is installed in course root account' do
-          course.update_attributes(root_account: account)
-          tool_proxy.update_attributes(context: account)
+          course.update(root_account: account)
+          tool_proxy.update(context: account)
           mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
                                                 product_code: jwt_body[:product_code],
                                                 resource_type_code: jwt_body[:resource_type_code],
@@ -276,7 +276,7 @@ module Lti
 
         it 'finds message handlers when tool is installed in account root account' do
           root_account = Account.create!
-          account.update_attributes(root_account: root_account)
+          account.update(root_account: root_account)
           mh = MessageHandler.by_resource_codes(vendor_code: jwt_body[:vendor_code],
                                                 product_code: jwt_body[:product_code],
                                                 resource_type_code: jwt_body[:resource_type_code],

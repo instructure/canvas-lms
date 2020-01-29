@@ -40,7 +40,7 @@ module Factories
 
   def appointment_model(opts={})
     appointment_group = opts[:appointment_group] || appointment_group_model(:sub_context => opts.delete(:sub_context))
-    appointment_group.update_attributes(:new_appointments => [[opts[:start_at] || Time.now.utc + 1.hour, opts[:end_at] || Time.now.utc + 1.hour]])
+    appointment_group.update(:new_appointments => [[opts[:start_at] || Time.now.utc + 1.hour, opts[:end_at] || Time.now.utc + 1.hour]])
     @appointment = appointment_group.new_appointments.first
     appointment_group.reload
     @appointment

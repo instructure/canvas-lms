@@ -265,7 +265,7 @@ class OutcomeGroupsApiController < ApplicationController
       render :json => 'error'.to_json, :status => :bad_request
       return
     end
-    @outcome_group.update_attributes(params.permit(:title, :description, :vendor_guid))
+    @outcome_group.update(params.permit(:title, :description, :vendor_guid))
     if params[:parent_outcome_group_id] && params[:parent_outcome_group_id] != @outcome_group.learning_outcome_group_id
       new_parent = context_outcome_groups.find(params[:parent_outcome_group_id])
       unless new_parent.adopt_outcome_group(@outcome_group)

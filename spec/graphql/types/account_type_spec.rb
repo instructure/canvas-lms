@@ -23,6 +23,8 @@ describe Types::AccountType do
   before(:once) do
     teacher_in_course(active_all: true)
     student_in_course(active_all: false)
+    account_admin_user
+    @sub_account = account_model parent_account: @course.root_account
   end
 
   let(:account) { @course.root_account }
@@ -42,5 +44,17 @@ describe Types::AccountType do
     expect(
       account_type.resolve('proficiencyRatingsConnection { nodes { _id } }').sort
     ).to eq OutcomeProficiencyRating.all.map { |r| r.id.to_s }.sort
+  end
+
+  it 'works for courses' do
+    expect(account_type.resolve('coursesConnection { nodes { _id } }', current_user: @admin)).to eq [@course.id.to_s]
+  end
+
+  it 'requires read_course_list permission' do
+    expect(account_type.resolve('coursesConnection { nodes { _id } }', current_user: @teacher)).to be_nil
+  end
+
+  it 'works for subaccounts' do
+    expect(account_type.resolve('subAccountsConnection { nodes { _id } }')).to eq [@sub_account.id.to_s]
   end
 end

@@ -89,12 +89,18 @@ export default class Placement extends React.Component {
 
   handleSelectionHeightChange = e => {
     const value = e.target.value
-    this.setState(state => ({placement: {...state.placement, selection_height: value}}))
+    const numVal = parseInt(value, 10)
+    this.setState(state => ({
+      placement: {...state.placement, selection_height: !Number.isNaN(numVal) ? numVal : ''}
+    }))
   }
 
   handleSelectionWidthChange = e => {
     const value = e.target.value
-    this.setState(state => ({placement: {...state.placement, selection_width: value}}))
+    const numVal = parseInt(value, 10)
+    this.setState(state => ({
+      placement: {...state.placement, selection_width: !Number.isNaN(numVal) ? numVal : ''}
+    }))
   }
 
   render() {

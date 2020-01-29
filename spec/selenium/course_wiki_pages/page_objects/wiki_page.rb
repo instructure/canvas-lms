@@ -19,9 +19,23 @@ require_relative '../../common'
 
 module CourseWikiPage
   #------------------------------ Selectors -----------------------------
+  def publish_btn_selector
+    '.btn-publish'
+  end
+
+  def published_btn_selector
+    '.btn-published'
+  end
 
   #------------------------------ Elements ------------------------------
-  
+  def publish_btn
+    f(publish_btn_selector)
+  end
+
+  def published_btn
+    f(published_btn_selector)
+  end
+
   def wiki_page_body
     f('body')
   end
@@ -38,10 +52,23 @@ module CourseWikiPage
     fj("li:contains('Copy To...')")
   end
 
+  def immersive_reader_btn
+    fj("[type='button']:contains('Immersive Reader')")
+  end
+
   #------------------------------ Actions -------------------------------
 
   def visit_wiki_page_view(course_id, page_title)
     get "/courses/#{course_id}/pages/#{page_title}"
   end
 
+  def publish_wiki_page
+    publish_btn.click
+    wait_for_ajaximations
+  end
+
+  def unpublish_wiki_page
+    published_btn.click
+    wait_for_ajaximations
+  end
 end

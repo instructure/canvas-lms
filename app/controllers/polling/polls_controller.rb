@@ -144,7 +144,7 @@ module Polling
       if authorized_action(@poll, @current_user, :update)
         poll_params.delete(:is_correct) if poll_params && poll_params[:is_correct].blank?
 
-        if @poll.update_attributes(poll_params)
+        if @poll.update(poll_params)
           render json: serialize_jsonapi(@poll)
         else
           render json: @poll.errors, status: :bad_request

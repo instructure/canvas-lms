@@ -238,6 +238,8 @@ class MediaObject < ActiveRecord::Base
 
     entry = client.mediaGet(self.media_id)
     media_type = client.mediaTypeToSymbol(entry[:mediaType]).to_s if entry
+    # attachment#build_content_types_sql assumes the content_type has a "/"
+    media_type = "#{media_type}/*" unless media_type.blank? || media_type.include?("/")
     assets = client.flavorAssetGetByEntryId(self.media_id) || []
     process_retrieved_details(entry, media_type, assets)
   end

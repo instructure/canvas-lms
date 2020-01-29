@@ -14,10 +14,15 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative '../../common'
 
 module AccountContentSharePage
+  
   # ---------------------- Elements ----------------------
+  def page_body
+    f('body')
+  end
 
   def content_share_main_content
     f('#content')
@@ -59,6 +64,14 @@ module AccountContentSharePage
     f("span[data-testid='import-menu-action']")
   end
 
+  def preview_received_item
+    fj("li:contains('Preview')")
+  end
+
+  def import_received_item
+    fj("li:contains('Import')")
+  end
+
   # ---------------------- Actions -----------------------
 
   def visit_content_share_page
@@ -66,5 +79,4 @@ module AccountContentSharePage
   end
 
   # ---------------------- Methods -----------------------
-
 end

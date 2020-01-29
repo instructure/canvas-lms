@@ -496,7 +496,7 @@ describe "context modules" do
 
       it "should show a tooltip for locked icon when module is locked", priority:"1", test_id: 255918 do
         go_to_modules
-        driver.mouse.move_to(f("#context_module_#{@module_2.id} .completion_status .icon-lock"), 0, 0)
+        driver.action.move_to(f("#context_module_#{@module_2.id} .completion_status .icon-lock"), 0, 0).perform
         expect(fj('.ui-tooltip:visible')).to include_text('Locked')
       end
 
@@ -525,7 +525,7 @@ describe "context modules" do
       it "shows a tooltip when hovering over a completed icon", priority: "1", test_id: 255915 do
         go_to_modules
         navigate_to_module_item(0, @assignment_1.title)
-        driver.mouse.move_to(f('.ig-header-admin .completion_status .icon-check'), 0, 0)
+        driver.action.move_to(f('.ig-header-admin .completion_status .icon-check'), 0, 0).perform
         expect(fj('.ui-tooltip:visible')).to include_text('Completed')
       end
 
@@ -571,14 +571,14 @@ describe "context modules" do
         it "shows tool tip text when hovering over the warning icon for a min score requirement", priority: "1", test_id: 255916 do
           grade_assignment(50)
           go_to_modules
-          driver.mouse.move_to(f('.ig-header-admin .completion_status .icon-minimize'), 0, 0)
+          driver.action.move_to(f('.ig-header-admin .completion_status .icon-minimize'), 0, 0).perform
           expect(fj('.ui-tooltip:visible')).to include_text('Started')
         end
 
         it "shows tooltip warning for a min score assignemnt", priority: "1", test_id: 255917 do
           grade_assignment(50)
           go_to_modules
-          driver.mouse.move_to(f('.ig-row .module-item-status-icon .icon-minimize'), 0, 0)
+          driver.action.move_to(f('.ig-row .module-item-status-icon .icon-minimize'), 0, 0).perform
           expect(fj('.ui-tooltip:visible')).to include_text('You scored a 50. Must score at least a 90.0.')
         end
 

@@ -92,7 +92,7 @@ class SubmissionComment < ActiveRecord::Base
   def publish_other_comments_in_this_group
     return unless saved_change_to_draft?
     update_other_comments_in_this_group do |comment|
-      comment.update_attributes(draft: draft)
+      comment.update(draft: draft)
     end
   end
 

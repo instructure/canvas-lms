@@ -406,7 +406,7 @@ describe RubricAssessmentsController do
       @assignment.submit_homework(@student1, :url => "http://www.google.com")
       @assignment.submit_homework(@student2, :url => "http://www.google.com")
       @assignment.submit_homework(@student3, :url => "http://www.google.com")
-      @assignment.update_attributes(:peer_review_count => 2)
+      @assignment.update(:peer_review_count => 2)
       res = @assignment.assign_peer_reviews
       expect(res).not_to be_empty
       # two of the six possible combinations have already been created

@@ -141,10 +141,7 @@ export default function Filter(props) {
                 selectedOption={sortValue}
               >
                 <option value="date_added">{formatMessage('Date Added')}</option>
-
                 <option value="alphabetical">{formatMessage('Alphabetical')}</option>
-
-                <option value="date_published">{formatMessage('Date Published')}</option>
               </Select>
             </Flex.Item>
           )}

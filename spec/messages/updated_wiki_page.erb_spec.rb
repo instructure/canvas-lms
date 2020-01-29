@@ -36,11 +36,11 @@ describe "updated_wiki_page" do
       context_module.add_item({:id => page.id, :type => 'wiki_page'})
       page.reload
 
-      context_module.update_attributes(
+      context_module.update(
         unlock_at: Time.zone.now + 3.days
       )
 
-      page.update_attributes(
+      page.update(
         body: "the content here of the Wiki Page body",
         could_be_locked: true
       )
@@ -56,11 +56,11 @@ describe "updated_wiki_page" do
       context_module.add_item({:id => page.id, :type => 'wiki_page'})
       page.reload
 
-      context_module.update_attributes(
+      context_module.update(
         unlock_at: Time.zone.now - 3.days
       )
 
-      page.update_attributes(
+      page.update(
         body: "the content here of the Wiki Page body",
         could_be_locked: true
       )

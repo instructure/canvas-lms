@@ -244,7 +244,7 @@ class SubmissionsBaseController < ApplicationController
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
       url = if type == 'originality_report'
-        @submission.originality_report_url(@asset_string, @current_user)
+        @submission.originality_report_url(@asset_string, @current_user, params[:attempt])
       else
         legacy_plagiarism_report(@submission, @asset_string, type)
       end

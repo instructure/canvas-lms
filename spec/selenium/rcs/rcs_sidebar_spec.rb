@@ -42,9 +42,11 @@ describe "RCS sidebar tests" do
 
       click_pages_accordion
       click_new_page_link
+      wait_for_ajaximations
       expect(new_page_name_input).to be_displayed
       new_page_name_input.send_keys(title)
       click_new_page_submit
+      wait_for_ajaximations
 
       in_frame wiki_page_body_ifr_id do
         expect(wiki_body_anchor.attribute('href')).to include title

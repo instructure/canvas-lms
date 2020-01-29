@@ -6354,9 +6354,9 @@ QUnit.module('SpeedGrader', rootHooks => {
         <div id='submission_files_container'>
           <span class='turnitin_info_container'></span>
         </div>
-        <a id='assignment_submission_originality_report_url' href='#'></a>
-        <a id='assignment_submission_turnitin_report_url' href='#{{ user_id }}/{{ asset_string }}'></a>
-        <a id='assignment_submission_vericite_report_url' href='#'></a>
+        <a id='assignment_submission_originality_report_url' href='/orig/{{ user_id }}/{{ asset_string }}'></a>
+        <a id='assignment_submission_turnitin_report_url' href='/tii/{{ user_id }}/{{ asset_string }}'></a>
+        <a id='assignment_submission_vericite_report_url' href='/vericite/{{ user_id }}/{{ asset_string }}'></a>
       `)
 
         fakeENV.setup({
@@ -6380,7 +6380,8 @@ QUnit.module('SpeedGrader', rootHooks => {
               grading_period_id: 8,
               id: '1',
               user_id: '1',
-              submission_type: 'online_text_entry'
+              submission_type: 'online_text_entry',
+              attempt: 2
             }
           ]
         }
@@ -6473,7 +6474,25 @@ QUnit.module('SpeedGrader', rootHooks => {
           }
           SpeedGrader.EG.handleSubmissionSelectionChange()
 
-          ok(document.querySelector(gradeSimilaritySelector).href.includes('#1/submission_1'))
+          ok(document.querySelector(gradeSimilaritySelector).href.includes('/tii/1/submission_1'))
+        })
+
+        test('includes the attempt ID for Originality Report submissions', () => {
+          submission.submission_history[0].turnitin_data = turnitinData
+          submission.submission_history[0].has_originality_score = true
+          submission.submission_history[0].has_originality_report = true
+
+          window.jsonData = testJsonData
+          SpeedGrader.EG.jsonReady()
+          SpeedGrader.EG.currentStudent = {
+            ...student,
+            submission
+          }
+          SpeedGrader.EG.handleSubmissionSelectionChange()
+
+          const destinationURL = new URL(document.querySelector(gradeSimilaritySelector).href)
+          strictEqual(destinationURL.pathname, '/orig/1/submission_1')
+          strictEqual(destinationURL.search, '?attempt=2')
         })
 
         test('links to a detailed report for VeriCite submissions', () => {
@@ -6529,7 +6548,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           SpeedGrader.EG.handleSubmissionSelectionChange()
 
           const destinationURL = new URL(document.querySelector(gradeSimilaritySelector).href)
-          strictEqual(destinationURL.hash, '#abcde/submission_1')
+          strictEqual(destinationURL.pathname, '/tii/abcde/submission_1')
         })
 
         test('does not link to a report for VeriCite submissions', () => {

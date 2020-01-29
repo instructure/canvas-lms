@@ -24,7 +24,7 @@ describe('Common file url utils', () => {
     let url
 
     beforeEach(() => {
-      const downloadUrl = '/some/path?download_frd=1'
+      const downloadUrl = '/some/path/download?download_frd=1'
       url = fileUrl.downloadToWrap(downloadUrl)
     })
 
@@ -46,6 +46,53 @@ describe('Common file url utils', () => {
 
     it('returns empty string for empty strings', () => {
       strictEqual(fileUrl.downloadToWrap(''), '')
+    })
+
+    it('skips swizzling the url if from a different host', () => {
+      const testurl = 'http://instructure.com/some/path'
+      url = fileUrl.downloadToWrap(testurl)
+      strictEqual(url, testurl)
+    })
+  })
+
+  // duplicate of above tests, but with asLink=true,
+  // plus the test that it removes /download from the path
+  describe('downloadToWrap as link', () => {
+    let url
+
+    beforeEach(() => {
+      const downloadUrl = '/some/path/download?download_frd=1'
+      url = fileUrl.downloadToWrap(downloadUrl, true)
+    })
+
+    it('removes download_frd from the query params', () => {
+      ok(!/download_frd/.test(url))
+    })
+
+    it('removes /download from the path', () => {
+      ok(!/\/download/.test(url))
+    })
+
+    it('adds wrap=1 to the query params', () => {
+      ok(/wrap=1/.test(url))
+    })
+
+    it('returns null if url is null', () => {
+      strictEqual(fileUrl.downloadToWrap(null, true), null)
+    })
+
+    it('returns undefined if url is undefined', () => {
+      strictEqual(fileUrl.downloadToWrap(undefined, true), undefined)
+    })
+
+    it('returns empty string for empty strings', () => {
+      strictEqual(fileUrl.downloadToWrap('', true), '')
+    })
+
+    it('skips swizzling the url if from a different host', () => {
+      const testurl = 'http://instructure.com/some/path'
+      url = fileUrl.downloadToWrap(testurl, true)
+      strictEqual(url, testurl)
     })
   })
 })

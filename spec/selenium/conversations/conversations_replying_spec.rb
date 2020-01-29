@@ -103,14 +103,14 @@ describe "conversations new" do
 
       it "should reply to message from mouse hover", priority: "2", test_id: 1069285 do
         go_to_inbox_and_select_message
-        driver.mouse.move_to(f('.message-content .message-item-view'))
+        driver.action.move_to(f('.message-content .message-item-view')).perform
         f('.message-info .reply-btn').click
         assert_number_of_recipients(1)
       end
 
       it "should reply to all from mouse hover", priority: "2", test_id: 1069836 do
         go_to_inbox_and_select_message
-        driver.mouse.move_to(f('.message-content .message-item-view'))
+        driver.action.move_to(f('.message-content .message-item-view')).perform
         f('.message-info .icon-settings').click
         f('.ui-menu-item .reply-all-btn').click
         assert_number_of_recipients(2)

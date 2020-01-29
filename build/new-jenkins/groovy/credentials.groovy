@@ -22,6 +22,12 @@ def withGerritCredentials(block) {
   ]) { block.call() }
 }
 
+def withMasterBouncerCredentials(block) {
+  withCredentials([
+    string(credentialsId: 'master-bouncer-key', variable: 'MASTER_BOUNCER_KEY')
+  ]) { block.call() }
+}
+
 def fetchFromGerrit(String repo, String path, String customRepoDestination = null, String sourcePath = null, String sourceRef = null) {
   withGerritCredentials({ ->
     println "Fetching ${repo} plugin"
@@ -31,6 +37,14 @@ def fetchFromGerrit(String repo, String path, String customRepoDestination = nul
         git archive --remote=ssh://$GERRIT_URL/${repo} ${sourceRef == null ? 'master' : sourceRef} ${sourcePath == null ? '' : sourcePath} | tar -x -v -C ${path}/${customRepoDestination ?: repo}
     """
   })
+}
+
+def withSentryCredentials(block) {
+  withCredentials([
+    string(credentialsId: 'SENTRY_DSN', variable: 'SENTRY_DSN'),
+    string(credentialsId: 'SENTRY_AUTH_TOKEN', variable: 'SENTRY_AUTH_TOKEN'),
+    string(credentialsId: 'DEPRECATION_SENTRY_DSN', variable: 'DEPRECATION_SENTRY_DSN')
+  ]) { block.call() }
 }
 
 return this

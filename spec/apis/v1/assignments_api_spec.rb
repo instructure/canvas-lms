@@ -1757,7 +1757,7 @@ describe AssignmentsApiController, type: :request do
       let(:course) { Course.create!(name: 'test course', account: account) }
       let(:teacher) { teacher_in_course(course: course) }
 
-      before { account.update_attributes(root_account: root_account) }
+      before { account.update(root_account: root_account) }
 
       it "checks for tool installation in entire account chain" do
         user_session teacher
@@ -1845,7 +1845,7 @@ describe AssignmentsApiController, type: :request do
           let(:context) { raise 'Override in spec' }
 
           it 'sets the tool correctly' do
-            tool_proxy.update_attributes(context: context)
+            tool_proxy.update(context: context)
             allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
             Lti::ToolProxyBinding.create(context: context, tool_proxy: tool_proxy)
             api_create_assignment_in_course(
@@ -4925,6 +4925,38 @@ describe AssignmentsApiController, type: :request do
       params = ActionController::Parameters.new({"anonymous_grading" => "true"})
       update_from_params(@assignment, params, @teacher)
       expect(@assignment.anonymous_grading).to be_falsey
+    end
+
+    context "when the assignment has peer reviews" do
+      before do
+        student2 = @course.enroll_user(User.create!, "StudentEnrollment", active_all: true).user
+        @assignment.update!(peer_reviews: true)
+        @assessment_request = AssessmentRequest.create!(
+          asset: @assignment.submission_for_student(@student),
+          user: @student,
+          assessor: student2,
+          assessor_asset: @assignment.submission_for_student(student2)
+        )
+      end
+
+      it "updates the updated_at of related AssessmentRequests when anonymous_peer_reviews changes" do
+        params = ActionController::Parameters.new({"anonymous_peer_reviews" => "1"})
+        expect {
+          update_from_params(@assignment, params, @teacher)
+        }.to change {
+          @assessment_request.reload.updated_at
+        }
+      end
+
+      it "does not update the updated_at of related AssessmentRequests when anonymous_peer_reviews does not change" do
+        @assignment.update!(anonymous_peer_reviews: true)
+        params = ActionController::Parameters.new({"anonymous_peer_reviews" => "1"})
+        expect {
+          update_from_params(@assignment, params, @teacher)
+        }.not_to change {
+          @assessment_request.reload.updated_at
+        }
+      end
     end
 
     context "when the anonymous marking feature flag is set" do

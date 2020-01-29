@@ -120,14 +120,8 @@ describe "discussions" do
           close_visible_dialog
           f('#edit_discussion_form_buttons .btn-primary[type=submit]').click
           wait_for_ajaximations
-          keep_trying_until do
-            expect(driver.execute_script(
-              "return $('.errorBox').filter('[id!=error_box_template]')"
-            )).to be_present
-          end
-          errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-          visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-          expect(visBoxes.first.text).to eq "Please create a group set"
+          error_box = f("div[role='alert'] .error_text")
+          expect(error_box.text).to eq "Please create a group set"
         end
       end
 

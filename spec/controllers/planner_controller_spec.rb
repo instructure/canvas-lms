@@ -156,7 +156,7 @@ describe PlannerController do
         expect(event_ids).not_to include event.id
         expect(event_ids).to include my_event_id
 
-        event.update_attributes(remove_child_events: true)
+        event.update(remove_child_events: true)
 
         get :index
         json = json_parse(response.body)
@@ -233,7 +233,7 @@ describe PlannerController do
         @current_user = @student
         reviewee = user_model
         differentiated_assignment(course: @course, peer_reviews: true, due_at: nil)
-        @override.update_attributes(due_at: Time.zone.now, due_at_overridden: true)
+        @override.update(due_at: Time.zone.now, due_at_overridden: true)
         add_section('section 2').enroll_user(reviewee, 'StudentEnrollment', 'active')
         create_section_override_for_assignment(@assignment, due_at: nil, course_section: @course_section)
         submission_model(assignment: @assignment, user: reviewee)

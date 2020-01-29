@@ -997,6 +997,10 @@ nl:
         bryan_engagement: 
           enrollment_term_ids: 
             field: Inschrijvingsperiode-ID
+    eportfolio_moderation: 
+      eportfolio_moderation_crumb: "ePortfolio modereren"
+      page_title: "ePortfolio modereren"
+      title: "ePortfolio modereren"
     excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1849,6 +1853,8 @@ nl:
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: Beheerweergave
   administrator_f325c186: Beheerder
+  administrators_and_author_only_flagged_as_possible_42345cba: "Alleen beheerders en auteur (gemarkeerd als mogelijke spam)"
+  administrators_and_author_only_marked_as_spam_184becce: "Alleen beheerders en auteur (gemarkeerd als spam)"
   admins_3e1dce15: Beheerders
   admins_add_remove_26811ce5: "Beheerders - toevoegen/verwijderen"
   advanced_36b35b8: Geavanceerd
@@ -2559,6 +2565,7 @@ nl:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "De antwoorden zullen na jouw laatste poging aangegeven worden."
   any_sub_account_ec7069f2: "Een subaccount"
   any_term_d49af19f: "Een periode"
+  anyone_with_a_direct_link_private_b3bc9661: "Iedereen met een rechtstreekse link (privé)"
   anyone_with_the_url_9d7e5e07: "Iedereen met de URL"
   api_7bd66e19: API
   api_key_eeeb2167: API-sleutel
@@ -3766,6 +3773,7 @@ nl:
   authentications_log_ca16ce81: Verificatielog
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest verzonden naar IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse vanuit IdP"
+  author_215203d2: Auteur
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} heeft zojuist een nieuwe opmerking gemaakt over de inlevering van %{submission_submittor} voor  %{assignment}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} heeft zojuist een nieuwe opmerking gemaakt bij de inlevering voor %{user_name} voor %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} heeft zojuist een nieuwe opmerking gemaakt bij de inlevering voor %{user_name} voor %{assignment_title}."
@@ -3952,6 +3960,7 @@ nl:
   bookmark_service: 
     default_title: "Geen titel"
   bookmark_this_question_bank_dc414a82: "Plaats een bladwijzer bij deze toetsbank"
+  bookmarking_for_enrollments_index_api_840be156: "Bladwijzer instellen voor Inschrijvingenindex-API"
   bookmarks_5b5b81c9: Bladwijzers
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Zowel met Discussies - maken als Discussies - modereren kan een gebruiker een discussie maken op de pagina Discussies. Als deze toestemming is ingeschakeld, is Discussies - maken niet vereist. Om discussies in een cursus weer te geven, moet Discussies - weergeven zijn ingeschakeld. Om discussies te beantwoorden, moet Discussies - posten ook zijn ingeschakeld. Om opdrachtdetails voor een discussie te bewerken, moet Opdrachten en toetsen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
@@ -5217,6 +5226,7 @@ nl:
   configure_individual_learning_paths_for_students_b_e2fce294: "Individuele cursuspaden configureren voor cursisten op basis van resultaten van opdracht."
   configure_tool_app_3b1bb50b: "%{tool} app configureren?"
   configure_toolname_app_651371be: "%{toolName} app configureren"
+  confirm_as_spam_2f8b7105: "Bevestigen als spam"
   confirm_communication_channel_81c48d08: "Communicatiekanaal bevestigen"
   confirm_contact_method_29d6fe4b: "Contactmethode bevestigen"
   confirm_delete_6febeafb: "Verwijdering bevestigen"
@@ -6232,6 +6242,9 @@ nl:
     one: "1 set beoordelingsperiodes gevonden"
     other: "%{count} set beoordelingsperiodes gevonden."
     zero: "Geen overeengekomen sets beoordelingsperiodes gevonden."
+  count_shared_items_loaded_ef94ef6a: 
+    one: "1 gedeeld item geladen."
+    other: "%{count} gedeelde items geladen."
   count_students_30e46120: 
     one: "1 cursist"
     other: "%{count} cursisten"
@@ -7344,6 +7357,7 @@ nl:
   current_total_67bf5f72: "Huidig totaal:"
   current_volume_level_c55ab825: "Huidig volumeniveau"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Momenteel toegewezen aan %{tokenName}, klik om te verwijderen"
+  currently_visible_to_e2f85345: "Momenteel zichtbaar voor"
   curso_f0ee9b5: Curso
   curve_grades_b7a75443: "Cijfers bijstellen"
   curve_grades_dialog: 
@@ -7663,6 +7677,7 @@ nl:
   deleted_content_exceptions_237e809d: "Uitzonderingen verwijderde inhoud:"
   deleted_content_referenced_in_this_resource_e42d1998: "Verwijderde inhoud waarnaar in deze resource wordt verwezen:"
   deleting_6421031e: "bezig met verwijderen..."
+  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Door een gebruiker te verwijderen gaan al zijn of haar ePortfolio's verloren. ePortfolio's kunnen ook afzonderlijk worden gemarkeerd als 'spam' of 'veilig' om de zichtbaarheid ervan te wijzigen."
   deleting_assignment_22d5851d: "opdracht verwijderen"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Recaptcha instellingen moeten voor demo sites geconfigureerd worden. Raadpleeg jouw sitebeheerder voor dit voorbeeld van Canvas."
@@ -8741,6 +8756,7 @@ nl:
       add_submission: "Pagina voor inzending toevoegen"
       download_eportfolio: "ePortfolio downloaden"
       section_list: "Slepen om te schikken, klikken om te bewerken"
+  eportfolio_3c009f9c: ePortfolio
   eportfolio_categories: 
     default_name: "Nieuwe pagina"
     errors: 
@@ -8757,6 +8773,7 @@ nl:
     click_through: "Klikken om de pagina-inhoud weer te geven"
     default_content: "Er is nog geen inhoud toegevoegd"
     default_name: Paginanaam
+  eportfolio_moderation_feb0ffd3: "ePortfolio modereren"
   eportfolio_settings_75ba1f9a: ePortfolio-instellingen
   eportfolios: 
     _page_section: 
@@ -9077,6 +9094,7 @@ nl:
   everyone_854554dd: Iedereen
   everyone_else_6c6dc7b6: "Alle anderen"
   everyone_else_cc5f6888: "Alle anderen"
+  everyone_public_45ff1f25: "Iedereen (openbaar)"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   exactly_one_rating_can_have_mastery_c1d87990: "Exact één beoordeling kan vakbeheersing hebben"
@@ -9112,6 +9130,7 @@ nl:
   expanded_f4493860: Uitgevouwen
   experimental_graphql_api_75c5eb8f: "EXPERIMENTELE GraphQL API."
   expires_at_6214b43f: "Vervalt op"
+  explanation_of_statuses_90a26d07: "Uitleg van status:"
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Exporteer een bestaande toets naar nieuwe indeling Quizzes versie 2"
   export_course_content_f4774b74: "Cursusinhoud exporteren"
   export_de71cd8e: Exporteren
@@ -9300,6 +9319,7 @@ nl:
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Laden van component Synchronisatiegeschiedenis is mislukt. Is je netwerkverbinding in orde?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Laden van component Niet-gesynchroniseerde wijzigingen is mislukt. Is je netwerkverbinding in orde?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Mislukt, geef de volgende foutcode aan uw systeembeheerder door: ErrorReport:%{error};"
+  failed_retrieving_media_source_3f0cfd49: "Ophalen van mediabron is mislukt"
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Mislukt, het rapport kon geen bestand genereren. Probeer het opnieuw."
   failed_to_add_new_feed_ee1c5ea: "Toevoegen van nieuwe feed mislukt"
   failed_to_change_last_attended_date_1e340ba6: "Wijzigen van datum laatste keer bijgewoond is mislukt"
@@ -9417,6 +9437,7 @@ nl:
   file_list_350d08df: Bestandslijst
   file_list_updated_38e2a5ad: "List met bestanden bijgewerkt"
   file_menu_cc0ca54: Bestandsmenu
+  file_must_be_an_image_293567a8: "Bestand moet een afbeelding zijn"
   file_name_2fe68ec1: Bestandsnaam
   file_name_8fd421ff: Bestandsnaam
   file_name_too_long_ea535796: "bestandsnaam te lang"
@@ -9614,6 +9635,8 @@ nl:
   first_reviewer_9ea05caa: "Eerste beoordelaar"
   first_reviewer_sortorder_e2184140: "Eerste beoordelaar %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, en %{others_count} anderen"
+  flagged_as_possible_spam_ebbc4683: "Gemarkeerd als mogelijke spam"
+  flags_new_eportfolio_content_matching_specific_key_a66af560: "Hiermee wordt nieuwe ePortfolio-inhoud die overeenkomt met specifieke trefwoorden als mogelijke spam gemarkeerd en hebben beheerders de mogelijkheid om gemarkeerde ePortfolio’s te bevestigen of om deze als veilig te markeren."
   flash_6afbf65a: "Flash "
   flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
@@ -11452,6 +11475,7 @@ nl:
   images_documents_and_more_dccb362f: "Afbeelingen, documenten en meer"
   immediate_notifications_for_global_announcements_682f5a3d: "Onmiddellijke meldingen voor algemene aankondigingen"
   immediately_c128ede6: Onmiddellijk
+  immersive_reader_7b87538: "Insluitende lezer"
   immersive_reader_failed_to_load_bc8d4dd4: "Insluitende lezer kan niet worden geladen"
   import_1b31507: Importeren
   import_a_set_of_outcomes_6b782192: "Een reeks leerdoelen importeren"
@@ -11978,6 +12002,7 @@ nl:
       log_in_to_canvas: "Aanmelden op Canvas"
   learn_more_7a8d626: "Meer informatie"
   learn_more_about_collaborations_2978f66d: "Meer informatie over samenwerkingen"
+  learning_analytics_beta_view_46deb4c8: "Learning Analytics (bèta) - bekijken"
   learning_mastery_5fc34276: "Vakbekwaamheid leren"
   learning_mastery_6ed4fd63: "Leren beheersen..."
   learning_mastery_gradebook_description: |-
@@ -12495,8 +12520,14 @@ nl:
   mark_as_done_6fa48d2f: "Markeren als gereed"
   mark_as_done_779556d7: "Markeren als gereed"
   mark_as_read_e7de2ce3: "Markeren als gelezen"
+  mark_as_safe_c01fea35: "Markeren als veilig"
+  mark_as_spam_9c613d87: "Markeren als spam"
   mark_as_unread_4a413c41: "Markeren als ongelezen"
   mark_done_9d81bcd9: "Gereed markeren"
+  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Gemarkeerd als veilig': Een beheerder heeft deze ePortfolio gecontroleerd en gemarkeerd als veilig. De ePortfolio is zichtbaar voor de oorspronkelijk bedoelde doelgroep."
+  marked_as_safe_f7f953df: "Gemarkeerd als veilig"
+  marked_as_spam_ab87846d: "Gemarkeerd als spam"
+  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Gemarkeerd als spam': Een beheerder heeft deze ePortfolio gecontroleerd en gemarkeerd als spam. De ePortfolio is alleen zichtbaar voor de oorspronkelijke auteur en beheerders."
   marked_done_8f61ebb8: "als gereed gemarkeerd"
   marked_done_9fd646f: "Gereed gemarkeerd"
   masquerade_as_name_8bb004c5: "Maskeren als %{name}"
@@ -14937,6 +14968,8 @@ nl:
   need_a_canvas_account_221d18ed: "Heb je een Canvas-account nodig?"
   need_help_setting_up_your_course_2b763141: "Hulp nodig bij het instellen van je cursus?"
   needs_grading_9143d47c: "Moet worden beoordeeld"
+  needs_review_flagged_as_possible_spam_233657fb: "Moet worden gecontroleerd: gemarkeerd als mogelijke spam"
+  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'Moet worden gecontroleerd: gemarkeerd als mogelijke spam': De systemen van Instructure hebben deze ePortfolio geïdentificeerd als mogelijke spam. Daarom moet de ePortfolio worden gecontroleerd door een beheerder. De ePortfolio is alleen zichtbaar voor de oorspronkelijke auteur en beheerders."
   negative_points_fda45730: "Negatieve punten"
   netherlands_14ca4f6d: Nederland
   netherlands_31_63e4f1b9: "Nederland (+31)"
@@ -15151,6 +15184,7 @@ nl:
   not_mastered_5c2f9968: "Niet gehaald"
   not_now_97efd947: "Nu niet"
   not_published_73f7079: "Niet gepubliceerd"
+  not_reviewed_c38d9e97: "Niet gecontroleerd"
   not_signed_47acf472: "Niet ondertekend"
   not_starred_no_subject_click_to_star_adfefe93: "'Niet met ster gemarkeerd \"(Geen Onderwerp)\", Klik om met ster te markeren."
   not_starred_no_subject_click_to_star_dc91380: "'Niet met ster gemarkeerd \"(Geen Onderwerp)\", Klik om met ster te markeren."
@@ -19086,6 +19120,7 @@ nl:
       manage_wiki: "Wiki beheren (pagina's toevoegen/bewerken/verwijderen)"
       managed_jobs: "Achtergrondtaken beheren"
       moderate_form: "Discussies modereren (berichten van anderen verwijderen/bewerken, onderwerpen vergrendelen)"
+      moderate_user_content: "Gebruikersinhoud modereren"
       post_to_forum: "Posten naar discussies"
       read_course_content: "Cursusinhoud weergeven"
       read_course_list: "De lijst met cursussen weergeven"
@@ -21353,6 +21388,7 @@ nl:
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Gelukt! Cijfers zijn gepost naar %{postedTo} voor %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Succes! Cijfers zijn in de nieuwe cijferlijst gepubliceerd."
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Gelukt! Het beleid voor posten van %{name} is bijgewerkt."
+  success_you_added_hostname_to_the_whitelist_6061236e: "Gelukt: Je hebt %{hostname} toegevoegd aan de whitelist."
   successfully_added_fb3e6008: "Toevoegen gelukt"
   successfully_created_a_set_38374719: "Set succesvol aangemaakt"
   successfully_deleted_discussion_title_a685f345: "De discussie is verwijderd %{title}"
@@ -21700,10 +21736,13 @@ nl:
   the_selected_group_was_cleared_because_the_student_656e4f1c: "De geselecteerde groep is leeggemaakt omdat de cursist die je hebt aangevraagd van geen enkele groep deel uitmaakt. Je kunt een groep selecteren in de Cijferlijst."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "De ernst van het probleem, zoals door de gebruiker geselecteerd via het vervolgkeuzemenu."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Het pictogram voor de snelkoppeling voor iOS/Android apparaten. 180 x 180 png"
+  the_specified_assignment_could_not_be_found_c5dc34ab: "Kan de opgegeven opdracht niet vinden"
+  the_specified_assignment_id_could_not_be_found_e4e64f5f: "Kan de opgegeven opdracht (%{id}) niet vinden"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "het opgegeven bestand met file_id heeft al een originaliteitrapport"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "De opgegeven gebruiker (%{id}) is geen cursist in deze cursus"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "De opgegeven gebruiker is geen cursist in deze cursus"
   the_state_parameter_is_required_ffadf213: "De staat parameter is verplicht"
+  the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "De instelling Synchroniseren met SIS kan niet zonder inleverdatum worden ingeschakeld voor de opdracht \"%{assignment_name}”."
   the_term_has_ended_for_this_course_f0ab367: "De periode is beëindigd voor deze cursus"
   the_title_cannot_be_longer_than_length_characters_7a822943: "De titel kan niet langer zijn dan %{length} tekens"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "De titel van de volgende toetsbank is afgekapt: \"%{title}\""
@@ -21858,6 +21897,10 @@ nl:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dit schakelt een bijgewerkte navigatie, nieuw dashboard en een eenvoudigere, moderne look en feel in."
   this_enables_users_to_generate_and_download_course_4c69c531: "Dit stelt gebruikers in staat om cursus ePub te genereren en downloaden."
   this_environment_is_currently_being_updated_with_a_235f1875: "Deze omgeving wordt momenteel bijgewerkt met een kopie van de laatste productiegegevens. Probeer het later nog eens."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Deze ePortfolio is gemarkeerd als mogelijke spam. Totdat deze door een beheerder is gecontroleerd, is de ePortfolio alleen voor jou zichtbaar. Neem contact op met een beheerder als je vragen hebt."
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Deze ePortfolio is geïdentificeerd als mogelijke spam. De ePortfolio is momenteel alleen zichtbaar voor beheerders en de auteur. Als je zeker weet dat de ePortfolio geen spam is, kunt je deze markeren als veilig. Anders kun je bevestigen dat het om spam gaat."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Deze ePortfolio is geïdentificeerd als spam en is alleen voor jou zichtbaar. Neem contact op met een beheerder als je vragen hebt."
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Deze ePortfolio is geïdentificeerd als spam. De ePortfolio is momenteel alleen zichtbaar voor beheerders en de auteur. Als je zeker weet dat de ePortfolio geen spam is, kunt je deze markeren als veilig."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Hiermee kunnen cursusleiders afzonderlijke items eenvoudig van de ene cursus naar de andere kopiëren en een afzonderlijk item delen met andere gebruikers zodat zij die items ook in hun cursussen kunnen importeren."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Deze functie kan niet worden uitgeschakeld omdat er minimaal één subaccount of cursus is waarvoor deze functie is ingeschakeld."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Deze functie kan niet worden ingeschakeld omdat automatische detectie van veldscheidingstekens is ingeschakeld"
@@ -22231,7 +22274,7 @@ nl:
   tls_7a2eaba5: TLS
   to_1126ab55: " tot"
   to_35c6baa2: "tot "
-  to_51406be9: Naar
+  to_51406be9: Tot
   to_access_assignment_submissions_through_assignmen_30c5c8f2: "Om inleveringen van opdrachten te openen via Opdrachten of de Cijferlijst en deze weer te geven in SpeedGrader, moet Cijfers - alle cijfers weergeven of Cijfers - bewerken ook worden ingeschakeld."
   to_access_assignment_submissions_through_assignmen_ce438715: |-
       Voor toegang tot inleveringen van opdrachten via Opdrachten en SpeedGrader, moet Cijfers - bewerken ook zijn ingeschakeld.
@@ -22303,7 +22346,7 @@ nl:
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "Om door andere gebruikers gemaakte samenwerkingen te kunnen weergeven, bewerken en verwijderen, moet Cursusinhoud - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als Cursusinhoud - toevoegen/bewerken/verwijderen is ingeschakeld en Samenwerkingen voor cursisten - maken is uitgeschakeld, kan de gebruiker geen nieuwe samenwerkingen maken maar wel alle samenwerkingen weergeven, bewerken en verwijderen. Om cursisten toe te voegen aan een samenwerking, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om een cursusgroep toe te voegen aan een samenwerking, moet Groepen - alle cursistengroepen weergeven ook zijn ingeschakeld."
   to_be_added_2959cc72: "Toe te voegen"
   to_be_removed_d4b48586: "Te verwijderen"
-  to_c4c44f4b: naar
+  to_c4c44f4b: tot
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "Om sis_account_id te wijzigen, moet de gebruiker een manage_sis-machtiging hebben."
   to_check_for_other_broken_links_visit_the_course_l_ace6921d: "Ga naar Cursuslink-validator om te controleren op andere verbroken links"
   to_check_for_other_broken_links_visit_the_validato_ba3b3f1e: "Ga naar %{validator_link} om te controleren op andere verbroken links"
@@ -22827,6 +22870,7 @@ nl:
   upload_file_fd2361b8: "Bestand uploaden"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Ingezonden bestanden met opdrachten uploaden naar een speciale map alleen-lezen met inzendingen."
   upload_gradebook_386a46c8: "Cijferlijst uploaden"
+  upload_image_6120b609: "Afbeelding uploaden"
   upload_media_ce31135a: "Media uploaden"
   upload_not_available_for_this_folder_8f8623c6: "Upload niet beschikbaar voor deze map"
   upload_successful_ca47465f: "Upload succesvol"
@@ -22857,6 +22901,7 @@ nl:
   use_arrow_keys_to_navigate_options_2021cc50: "Gebruik de pijltoetsen om door opties te navigeren."
   use_as_front_page_274a488b: "Als voorpagina gebruiken"
   use_between_for_adding_multiple_users_26bff207: "Gebruik \",\" tussen namen wanneer je meerdere gebruikers toevoegt."
+  use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Gebruik bladwijzers voor API-paginering in Inschrijvingenindex"
   use_default_890939b7: "Gebruik standaard"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Gebruik experimentele functies voordat ze in een productieomgeving worden gebruikt"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Gebruik HTML5-recorder in Rich Content Editor in plaats van Flash"
@@ -23369,6 +23414,7 @@ nl:
   users_manage_log_in_details_b944568b: "Gebruikers - aanmeldingsdetails beheren"
   users_manage_login_details_9462b30f: "Gebruikers - aanmeldingsdetails beheren"
   users_matching_search_term_c604db9e: "Gebruikers die overeenkomen met \"%{search_term}\""
+  users_moderate_content_36d6eed7: "Gebruikers - inhoud modereren"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Gebruikers van schermlezers moeten mogelijk de virtuele cursor uitschakelen om deze sneltoetsen te gebruiken"
   users_over_time_9a2ee74a: "gebruikers in de loop van de tijd"
   users_view_list_861c7a3f: "Gebruikers - lijst weergeven"
@@ -23419,6 +23465,7 @@ nl:
   view_grades_for_name_45aeb2f2: "Cijfers bekijken voor %{name}"
   view_grading_history_e64bb8fe: "Beoordelingsgeschiedenis weergeven"
   view_in_speedgrader_773b9d81: "In SpeedGrader weergeven"
+  view_learning_analytics_beta_1c98a397: "Learning Analytics (bèta) bekijken"
   view_login_ids_for_users_142bbe7a: "Inlog-ID's voor gebruikers weergeven"
   view_longer_description_6b762087: "langere beschrijving weergeven"
   view_name_app_62a2ad8e: "%{name} app weergeven"

@@ -537,9 +537,24 @@ class AccountsController < ApplicationController
   #   The filter to search by. "course" searches for course names, course codes,
   #   and SIS IDs. "teacher" searches for teacher names
   #
+  # @argument starts_before [Optional, Date]
+  #   If set, only return courses that start before the value (inclusive)
+  #   or their enrollment term starts before the value (inclusive)
+  #   or both the course's start_at and the enrollment term's start_at are set to null.
+  #   The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
+  #
+  # @argument ends_after [Optional, Date]
+  #   If set, only return courses that end after the value (inclusive)
+  #   or their enrollment term ends after the value (inclusive)
+  #   or both the course's end_at and the enrollment term's end_at are set to null.
+  #   The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
+  #
   # @returns [Course]
   def courses_api
     return unless authorized_action(@account, @current_user, :read_course_list)
+
+    starts_before = CanvasTime.try_parse(params[:starts_before])
+    ends_after = CanvasTime.try_parse(params[:ends_after])
 
     params[:state] ||= %w{created claimed available completed}
     params[:state] = %w{created claimed available completed deleted} if Array(params[:state]).include?('all')
@@ -607,6 +622,20 @@ class AccountsController < ApplicationController
       @courses = @courses.associated_courses
     elsif !params[:blueprint_associated].nil?
       @courses = @courses.not_associated_courses
+    end
+
+    if starts_before || ends_after
+      @courses = @courses.joins(:enrollment_term)
+      if starts_before
+        @courses = @courses.where("
+        (courses.start_at IS NULL AND enrollment_terms.start_at IS NULL)
+        OR courses.start_at <= ? OR enrollment_terms.start_at <= ?", starts_before, starts_before)
+      end
+      if ends_after
+        @courses = @courses.where("
+        (courses.conclude_at IS NULL AND enrollment_terms.end_at IS NULL)
+        OR courses.conclude_at >= ? OR enrollment_terms.end_at >= ?", ends_after, ends_after)
+      end
     end
 
     if params[:by_teachers].is_a?(Array)
@@ -750,7 +779,7 @@ class AccountsController < ApplicationController
         render :json => @account.errors, :status => :unauthorized
       else
         success = @account.errors.empty?
-        success &&= @account.update_attributes(account_settings.merge(quota_settings)) rescue false
+        success &&= @account.update(account_settings.merge(quota_settings)) rescue false
 
         if success
           # Successfully completed
@@ -955,7 +984,7 @@ class AccountsController < ApplicationController
         # Set default Dashboard view
         set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
 
-        if @account.update_attributes(strong_account_params)
+        if @account.update(strong_account_params)
           update_user_dashboards
           format.html { redirect_to account_settings_url(@account) }
           format.json { render :json => @account }

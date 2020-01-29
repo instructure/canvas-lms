@@ -46,7 +46,7 @@ describe BrokenLinkHelper, type: :controller do
   it 'should return false if the location is not found in the referrer body' do
     allow(request).to receive(:referer).and_return "/courses/#{@course.id}/assignments/#{@assignment.id}"
     allow(request).to receive(:path).and_return '/bad_link'
-    @assignment.update_attributes(description: 'stuff')
+    @assignment.update(description: 'stuff')
     expect(send_broken_content!).to be false
   end
 
@@ -85,10 +85,19 @@ describe BrokenLinkHelper, type: :controller do
     expect(send_broken_content!).to be true
   end
 
+  it 'should work with wiki pages set to the front page' do
+    wiki_page_model(context: @course, body: "<a href='/test_error'>bad link</a>")
+    @page.set_as_front_page!
+    @course.update_attribute(:default_view, 'wiki')
+    allow(request).to receive(:referer).and_return "/courses/#{@course.id}"
+    allow(request).to receive(:path).and_return "/test_error"
+    expect(send_broken_content!).to be true
+  end
+
   it 'should return true for unpublished content' do
     linked_assignment = @assignment
-    assignment_model(course: @course).update_attributes(workflow_state: 'unpublished')
-    linked_assignment.update_attributes(description: "<a href='/courses/#{@course.id}/assignments/#{@assignment.id}'>Unpublished Assignment</a>")
+    assignment_model(course: @course).update(workflow_state: 'unpublished')
+    linked_assignment.update(description: "<a href='/courses/#{@course.id}/assignments/#{@assignment.id}'>Unpublished Assignment</a>")
     allow(request).to receive(:referer).and_return "/courses/#{@course.id}/assignments/#{linked_assignment.id}"
     allow(request).to receive(:path).and_return "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(send_broken_content!).to be true
@@ -110,24 +119,24 @@ describe BrokenLinkHelper, type: :controller do
     end
 
     it 'should return :unpublished_item for unpublished content' do
-      @assignment.update_attributes(workflow_state: 'unpublished')
+      @assignment.update(workflow_state: 'unpublished')
       expect(error_type(@course, "/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :unpublished_item
 
-      quiz_model(course: @course).update_attributes(workflow_state: 'created')
+      quiz_model(course: @course).update(workflow_state: 'created')
       expect(error_type(@course, "/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq :unpublished_item
 
-      attachment_model(context: @course).update_attributes(locked: true)
+      attachment_model(context: @course).update(locked: true)
       expect(error_type(@course, "/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :unpublished_item
     end
 
     it 'should return :deleted for deleted content' do
-      @assignment.update_attributes(workflow_state: 'deleted')
+      @assignment.update(workflow_state: 'deleted')
       expect(error_type(@course, "/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :deleted
 
-      quiz_model(course: @course).update_attributes(workflow_state: 'deleted')
+      quiz_model(course: @course).update(workflow_state: 'deleted')
       expect(error_type(@course, "/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq :deleted
 
-      attachment_model(context: @course).update_attributes(file_state: 'deleted')
+      attachment_model(context: @course).update(file_state: 'deleted')
       expect(error_type(@course, "/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :deleted
     end
 

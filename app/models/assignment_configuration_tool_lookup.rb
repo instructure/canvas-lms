@@ -122,6 +122,6 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
     return unless lti_tool.instance_of? Lti::MessageHandler
     tool_proxy = lti_tool.resource_handler.tool_proxy
     subscription_helper = Lti::AssignmentSubscriptionsHelper.new(tool_proxy, assignment)
-    self.update_attributes(subscription_id: subscription_helper.create_subscription)
+    self.update(subscription_id: subscription_helper.create_subscription)
   end
 end

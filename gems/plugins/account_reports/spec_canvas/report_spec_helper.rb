@@ -23,7 +23,13 @@ require 'csv'
 module ReportSpecHelper
   def read_report(type = @type, options = {})
     account_report = run_report(type, options)
-    raise ErrorReport.last&.message if account_report.workflow_state == 'error'
+    if account_report.workflow_state == 'error'
+      error_report = ErrorReport.last
+      error_class =  error_report&.category&.constantize || ReportSpecHelperError
+      error = error_class.new(error_report&.message)
+      error.set_backtrace(error_report&.backtrace&.split("\n") || caller)
+      raise error
+    end
     parse_report(account_report, options)
   end
 
@@ -76,6 +82,8 @@ module ReportSpecHelper
     all_parsed.unshift(header) if options[:header]
     all_parsed
   end
+
+  class ReportSpecHelperError < StandardError; end
 end
 
 RSpec::Matchers.define :eq_stringified_array do |expected|

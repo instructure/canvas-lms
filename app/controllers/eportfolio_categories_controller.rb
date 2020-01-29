@@ -47,7 +47,7 @@ class EportfolioCategoriesController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:id])
       respond_to do |format|
-        if @category.update_attributes(eportfolio_category_params)
+        if @category.update(eportfolio_category_params)
           format.html { redirect_to eportfolio_category_url(@portfolio, @category) }
           format.json { render :json => @category }
         else

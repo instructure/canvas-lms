@@ -67,19 +67,26 @@ const thePanels = {
   all: React.lazy(() => import('./FileBrowser')),
   unknown: React.lazy(() => import('./UnknownFileTypePanel'))
 }
-/**
- * @param {contentType, contentSubType} filterSettings: key to which panel is desired
- * @param  contentProps: the props from connection to the redux store
- * @returns rendered component
- */
-function renderContentComponent({contentType, contentSubtype}, contentProps) {
-  let Component = null
-  if (contentType === 'links') {
-    Component = thePanels.links
+
+// Returns a Suspense wrapped lazy loaded component
+// pulled from useLazy's cache
+function DynamicPanel(props) {
+  let key = ''
+  if (props.contentType === 'links') {
+    key = 'links'
   } else {
-    Component = contentSubtype in thePanels ? thePanels[contentSubtype] : thePanels.unknown
+    key = props.contentSubtype in thePanels ? props.contentSubtype : 'unknown'
   }
-  return Component && <Component {...contentProps} />
+  const Component = thePanels[key]
+  return (
+    <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
+      <Component {...props} />
+    </Suspense>
+  )
+}
+
+function renderLoading() {
+  return formatMessage('Loading')
 }
 
 const FILTER_SETTINGS_BY_PLUGIN = {
@@ -87,49 +94,57 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contextType: 'user',
     contentType: 'user_files',
     contentSubtype: 'documents',
-    sortValue: 'date_added'
+    sortValue: 'date_added',
+    sortDir: 'desc'
   },
   course_documents: {
     contextType: 'course',
     contentType: 'course_files',
     contentSubtype: 'documents',
-    sortValue: 'date_added'
+    sortValue: 'date_added',
+    sortDir: 'desc'
   },
   user_images: {
     contextType: 'user',
     contentType: 'user_files',
     contentSubtype: 'images',
-    sortValue: 'date_added'
+    sortValue: 'date_added',
+    sortDir: 'desc'
   },
   course_images: {
     contextType: 'course',
     contentType: 'course_files',
     contentSubtype: 'images',
-    sortValue: 'date_added'
+    sortValue: 'date_added',
+    sortDir: 'desc'
   },
   user_media: {
     contextType: 'user',
     contentType: 'user_files',
     contentSubtype: 'media',
-    sortValue: 'date_added'
+    sortValue: 'date_added',
+    sortDir: 'desc'
   },
   course_media: {
     contextType: 'course',
     contentType: 'course_files',
     contentSubtype: 'media',
-    sortValue: 'date_added'
+    sortValue: 'date_added',
+    sortDir: 'desc'
   },
   links: {
     contextType: 'course',
     contentType: 'links',
     contentSubtype: 'all',
-    sortValue: 'date_added'
+    sortValue: 'date_added',
+    sortDir: 'desc'
   },
   all: {
     contextType: 'course',
     contentType: 'course_files',
     contentSubtype: 'all',
-    sortValue: 'alphabetical'
+    sortValue: 'alphabetical',
+    sortDir: 'asc'
   }
 }
 
@@ -140,6 +155,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
 export default function CanvasContentTray(props) {
   const [isOpen, setIsOpen] = useState(false)
   const [openCount, setOpenCount] = useState(0)
+  const [hasOpened, setHasOpened] = useState(false)
 
   const [filterSettings, setFilterSettings] = useFilterSettings()
 
@@ -178,11 +194,17 @@ export default function CanvasContentTray(props) {
     // this gets us a new instance everytime, which is necessary
     // to get the queries run so we have up to date data.
     setOpenCount(openCount + 1)
+    setHasOpened(false)
     props.onTrayClosing && props.onTrayClosing(false) // tell RCEWrapper we're closed
   }
 
   function handleFilterChange(newFilter, onChangeContext) {
-    setFilterSettings(newFilter)
+    const newFilterSettings = {...newFilter}
+    if (newFilterSettings.sortValue) {
+      newFilterSettings.sortDir = newFilterSettings.sortValue === 'alphabetical' ? 'asc' : 'desc'
+    }
+    setFilterSettings(newFilterSettings)
+
     if (newFilter.contentType) {
       let contextType, contextId
       switch (newFilter.contentType) {
@@ -197,10 +219,6 @@ export default function CanvasContentTray(props) {
       }
       onChangeContext({contextType, contextId})
     }
-  }
-
-  function renderLoading() {
-    return formatMessage('Loading')
   }
 
   return (
@@ -219,38 +237,44 @@ export default function CanvasContentTray(props) {
           onDismiss={handleDismissTray}
           onClose={handleCloseTray}
           onExit={handleExitTray}
+          onOpen={() => setHasOpened(true)}
         >
-          <Flex direction="column" display="block" height="100vh" overflowY="hidden">
-            <Flex.Item padding="medium" shadow="above">
-              <Flex margin="none none medium none">
-                <Flex.Item grow shrink>
-                  <Heading level="h2">{formatMessage('Add')}</Heading>
-                </Flex.Item>
+          {isOpen && hasOpened ? (
+            <Flex direction="column" display="block" height="100vh" overflowY="hidden">
+              <Flex.Item padding="medium" shadow="above">
+                <Flex margin="none none medium none">
+                  <Flex.Item grow shrink>
+                    <Heading level="h2">{formatMessage('Add')}</Heading>
+                  </Flex.Item>
 
-                <Flex.Item>
-                  <CloseButton placement="static" variant="icon" onClick={handleDismissTray}>
-                    {formatMessage('Close')}
-                  </CloseButton>
-                </Flex.Item>
-              </Flex>
+                  <Flex.Item>
+                    <CloseButton placement="static" variant="icon" onClick={handleDismissTray}>
+                      {formatMessage('Close')}
+                    </CloseButton>
+                  </Flex.Item>
+                </Flex>
 
-              <Filter
-                {...filterSettings}
-                userContextType={props.contextType}
-                onChange={newFilter => {
-                  handleFilterChange(newFilter, contentProps.onChangeContext)
-                }}
-              />
-            </Flex.Item>
+                <Filter
+                  {...filterSettings}
+                  userContextType={props.contextType}
+                  onChange={newFilter => {
+                    handleFilterChange(newFilter, contentProps.onChangeContext)
+                  }}
+                />
+              </Flex.Item>
 
-            <Flex.Item grow shrink margin="xx-small 0 0 0">
-              <ErrorBoundary>
-                <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
-                  {renderContentComponent(filterSettings, contentProps)}
-                </Suspense>
-              </ErrorBoundary>
-            </Flex.Item>
-          </Flex>
+              <Flex.Item grow shrink margin="xx-small 0 0 0">
+                <ErrorBoundary>
+                  <DynamicPanel
+                    contentType={filterSettings.contentType}
+                    contentSubtype={filterSettings.contentSubtype}
+                    sortBy={{sort: filterSettings.sortValue, order: filterSettings.sortDir}}
+                    {...contentProps}
+                  />
+                </ErrorBoundary>
+              </Flex.Item>
+            </Flex>
+          ) : null}
         </Tray>
       )}
     </StoreProvider>
@@ -287,6 +311,8 @@ CanvasContentTray.propTypes = {
   ...trayPropsMap
 }
 
+// the way we define trayProps, eslint doesn't recognize the following as props
+/* eslint-disable react/default-props-match-prop-types */
 CanvasContentTray.defaultProps = {
   canUploadFiles: false,
   filesTabDisabled: false,
@@ -294,3 +320,4 @@ CanvasContentTray.defaultProps = {
   source: null,
   themeUrl: null
 }
+/* eslint-enable react/default-props-match-prop-types */

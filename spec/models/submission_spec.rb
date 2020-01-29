@@ -902,6 +902,15 @@ describe Submission do
       end
     end
 
+    it "sets grade_matches_current_submission to true when missing policy is applied" do
+      Timecop.freeze(1.day.from_now(@date)) do
+        submission.score = nil
+        submission.grade_matches_current_submission = false
+        submission.apply_late_policy(@late_policy, @assignment)
+        expect(submission.grade_matches_current_submission).to be true
+      end
+    end
+
     it "sets the workflow state to 'graded' when submission is missing" do
       Timecop.freeze(1.day.from_now(@date)) do
         submission.score = nil
@@ -1491,7 +1500,7 @@ describe Submission do
 
       it "should send the correct message when an assignment is turned in on-time" do
         @assignment.workflow_state = "published"
-        @assignment.update_attributes(:due_at => Time.now + 1000)
+        @assignment.update(:due_at => Time.now + 1000)
 
         submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent.keys).to eq ['Assignment Submitted']
@@ -1509,12 +1518,12 @@ describe Submission do
         @course.enroll_user(normal_ta, "TaEnrollment", :enrollment_state => "active")
 
         n = Notification.where(:name => 'Assignment Submitted').first
-        n.update_attributes(:category => "TestImmediately")
+        n.update(:category => "TestImmediately")
         [limited_ta, normal_ta].each do |ta|
           NotificationPolicy.create(:notification => n, :communication_channel => ta.communication_channel, :frequency => "immediately")
         end
         @assignment.workflow_state = "published"
-        @assignment.update_attributes(:due_at => Time.now + 1000)
+        @assignment.update(:due_at => Time.now + 1000)
 
         submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent['Assignment Submitted'].map(&:user)).to eq [normal_ta]
@@ -1523,7 +1532,7 @@ describe Submission do
 
       it "should send the correct message when an assignment is turned in late" do
         @assignment.workflow_state = "published"
-        @assignment.update_attributes(:due_at => Time.now - 1000)
+        @assignment.update(:due_at => Time.now - 1000)
 
         submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent.keys).to eq ['Assignment Submitted Late']
@@ -2241,7 +2250,7 @@ describe Submission do
 
     let(:originality_report) do
       AttachmentAssociation.create!(context: submission, attachment_id: attachment)
-      submission.update_attributes(attachment_ids: attachment.id.to_s)
+      submission.update(attachment_ids: attachment.id.to_s)
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
     end
 
@@ -2262,7 +2271,7 @@ describe Submission do
 
       it "prioritizes recent originality report if multiple exist for an attachment" do
         AttachmentAssociation.create!(context: submission, attachment_id: attachment)
-        submission.update_attributes(attachment_ids: attachment.id.to_s)
+        submission.update(attachment_ids: attachment.id.to_s)
         first_report = OriginalityReport.create!(
           attachment: attachment,
           submission: submission,
@@ -2313,7 +2322,7 @@ describe Submission do
       end
 
       it 'does not cause error if originality score is nil' do
-        originality_report.update_attributes(originality_score: nil)
+        originality_report.update(originality_score: nil)
         expect{submission.originality_data}.not_to raise_error
       end
 
@@ -2338,8 +2347,8 @@ describe Submission do
       end
 
       it "finds originality data text entry submissions" do
-        submission.update_attributes!(attachment_ids: attachment.id.to_s)
-        originality_report.update_attributes!(attachment: nil)
+        submission.update!(attachment_ids: attachment.id.to_s)
+        originality_report.update!(attachment: nil)
         expect(submission.originality_data).to eq({
           OriginalityReport.submission_asset_key(submission) => {
             similarity_score: originality_report.originality_score,
@@ -2378,7 +2387,7 @@ describe Submission do
 
       it "includes attachment ids from 'attachment_id'" do
         submission = @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: attachments)
-        submission.update_attributes!(attachment_id: single_attachment)
+        submission.update!(attachment_id: single_attachment)
         expect(submission.attachment_ids_for_version).to match_array attachments.map(&:id) + [single_attachment.id]
       end
     end
@@ -2419,11 +2428,11 @@ describe Submission do
 
       it 'returns true for group reports' do
         user_two = test_student.dup
-        user_two.update_attributes!(lti_context_id: SecureRandom.uuid)
+        user_two.update!(lti_context_id: SecureRandom.uuid)
         assignment.course.enroll_student(user_two)
 
         group = group_model(context: assignment.course)
-        group.update_attributes!(users: [user_two, test_student])
+        group.update!(users: [user_two, test_student])
 
         submission = assignment.submit_homework(test_student, submission_type: 'online_upload', attachments: [attachment])
         submission_two = assignment.submit_homework(user_two, submission_type: 'online_upload', attachments: [attachment])
@@ -2432,7 +2441,7 @@ describe Submission do
         submission_two.update!(group: group)
 
         assignment.submissions.each do |s|
-          s.update_attributes!(group: group, turnitin_data: {blah: 1})
+          s.update!(group: group, turnitin_data: {blah: 1})
         end
 
         report = OriginalityReport.create!(originality_score: '1', submission: submission, attachment: attachment)
@@ -2483,8 +2492,27 @@ describe Submission do
       end
 
       it 'returns the report url for text entry submission reports' do
-        originality_report.update_attributes!(attachment: nil)
+        originality_report.update!(attachment: nil)
         expect(submission.originality_report_url(submission.asset_string, test_teacher)).to eq report_url
+      end
+
+      context 'when there are multiple originality reports' do
+        let(:submission2) { assignment.submit_homework(test_student, body: 'hello world') }
+        let(:report_url2) { 'http://www.another-test-score.com/' }
+        let(:originality_report2) {
+          OriginalityReport.create!(attachment: nil,
+                                    submission: submission2,
+                                    originality_score: 0.4,
+                                    originality_report_url: report_url2)
+        }
+
+        it 'can use attempt number to find the report url for text entry submissions' do
+          originality_report2
+          originality_report.update!(attachment: nil)
+          expect(submission2.attempt).to be > submission.attempt
+          expect(submission.originality_report_url(submission.asset_string, test_teacher, submission.attempt.to_s)).to eq report_url
+          expect(submission.originality_report_url(submission.asset_string, test_teacher, submission2.attempt.to_s)).to eq report_url2
+        end
       end
 
       it 'requires the :grade permission' do
@@ -3379,20 +3407,20 @@ describe Submission do
       end
 
       it 'excludes submission when it is excused and late_policy_status is missing' do
-        @submission.update_attributes(excused: true, late_policy_status: 'missing')
+        @submission.update(excused: true, late_policy_status: 'missing')
 
         expect(Submission.missing).to be_empty
       end
 
       it 'includes submission when late_policy_status is missing and assignment does not expect a submission' do
-        @submission.update_attributes(late_policy_status: 'missing')
+        @submission.update(late_policy_status: 'missing')
         @submission.assignment.update(submission_types: 'none')
 
         expect(Submission.missing).to include @submission
       end
 
       it 'excludes submission when due date has not passed' do
-        @submission.update_attributes(cached_due_date: 1.day.from_now(@now))
+        @submission.update(cached_due_date: 1.day.from_now(@now))
 
         expect(Submission.missing).to be_empty
       end
@@ -3627,7 +3655,7 @@ describe Submission do
       group = group_category.groups.create!(name: "A Team", context: @course)
       group.add_user(student1)
       group.add_user(student2)
-      assignment.update_attributes(group_category: group_category)
+      assignment.update(group_category: group_category)
 
       user_attachment = attachment_model(context: student1)
       assignment.submit_homework(student1, submission_type: "online_upload", attachments: [user_attachment])
@@ -6527,7 +6555,7 @@ describe Submission do
   end
 
   def setup_account_for_turnitin(account)
-    account.update_attributes(turnitin_account_id: 'test_account',
+    account.update(turnitin_account_id: 'test_account',
                               turnitin_shared_secret: 'skeret',
                               settings: account.settings.merge(enable_turnitin: true))
   end

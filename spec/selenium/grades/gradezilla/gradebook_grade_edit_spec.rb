@@ -162,7 +162,7 @@ describe "Gradezilla editing grades" do
     selected_cell = Gradezilla::Cells.grading_cell(@student_1, @second_assignment)
     selected_cell.click
 
-    driver.action.send_keys(%i[shift tab]).perform
+    driver.action.key_down(:shift).send_keys(:tab).key_up(:shift).perform
     driver.action.send_keys(:tab).perform
     driver.action.send_keys(:tab).perform
 

@@ -38,6 +38,47 @@ QUnit.module('Gradebook Student Group Filter Change Data Loading', suiteHooks =>
     setFixtureHtml($container)
 
     initialData = {
+      assignmentGroups: [
+        {
+          assignments: [
+            {
+              anonymize_students: false,
+              anonymous_grading: false,
+              assignment_visibility: [],
+              course_id: '1201',
+              grading_type: 'letter_grade',
+              html_url: 'http://canvas/courses/1201/assignments/2301',
+              id: '2301',
+              muted: false,
+              name: 'Math Assignment',
+              only_visible_to_overrides: false,
+              points_possible: 10,
+              published: true,
+              submission_types: ['online_text_entry']
+            },
+
+            {
+              anonymize_students: false,
+              anonymous_grading: false,
+              assignment_visibility: ['1102', '1104'],
+              course_id: '1201',
+              grading_type: 'letter_grade',
+              html_url: 'http://canvas/courses/1201/assignments/2302',
+              id: '2302',
+              muted: false,
+              name: 'English Assignment',
+              only_visible_to_overrides: true,
+              points_possible: 5,
+              published: false,
+              submission_types: ['online_text_entry']
+            }
+          ],
+          id: '2201',
+          name: 'Assignments',
+          position: 1
+        }
+      ],
+
       contextModules: [
         {id: '2601', position: 3, name: 'English'},
         {id: '2602', position: 1, name: 'Math'},
@@ -67,7 +108,10 @@ QUnit.module('Gradebook Student Group Filter Change Data Loading', suiteHooks =>
       context_id: '1201',
       context_modules_url: '/context-modules',
       custom_column_data_url: '/custom-column-data',
-      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
+      sections: [
+        {id: '2001', name: 'Freshmen'},
+        {id: '2002', name: 'Sophomores'}
+      ],
       settings: {
         filter_rows_by: {
           section_id: null
@@ -78,12 +122,18 @@ QUnit.module('Gradebook Student Group Filter Change Data Loading', suiteHooks =>
         {
           id: '1',
           name: 'Default Set',
-          groups: [{id: '1', name: 'Default Set 1'}, {id: '2', name: 'Default Set 2'}]
+          groups: [
+            {id: '1', name: 'Default Set 1'},
+            {id: '2', name: 'Default Set 2'}
+          ]
         },
         {
           id: '2',
           name: 'Alternate Set',
-          groups: [{id: '3', name: 'Alternate Set 1'}, {id: '4', name: 'Alternate Set 2'}]
+          groups: [
+            {id: '3', name: 'Alternate Set 1'},
+            {id: '4', name: 'Alternate Set 2'}
+          ]
         }
       ],
       students_stateless_url: '/students-url',
@@ -121,7 +171,7 @@ QUnit.module('Gradebook Student Group Filter Change Data Loading', suiteHooks =>
     // Load Grid Data
     dataLoadingWrapper.loadStudentIds(initialData.studentIds)
     dataLoadingWrapper.loadGradingPeriodAssignments(initialData.gradingPeriodAssignments)
-    dataLoadingWrapper.loadAssignmentGroups([])
+    dataLoadingWrapper.loadAssignmentGroups(initialData.assignmentGroups)
     dataLoadingWrapper.loadContextModules()
     dataLoadingWrapper.loadCustomColumns()
 
@@ -315,6 +365,13 @@ QUnit.module('Gradebook Student Group Filter Change Data Loading', suiteHooks =>
       test('updates grid rows for the loaded student ids', () => {
         dataLoadingWrapper.loadStudentIds(nextData.studentIds)
         strictEqual(document.body.querySelectorAll('.canvas_0 .slick-row').length, 4)
+      })
+
+      test('updates assignment student visibility', () => {
+        dataLoadingWrapper.loadStudentIds(nextData.studentIds)
+        dataLoadingWrapper.loadStudents(nextData.students)
+        const studentIds = Object.keys(gradebook.studentsThatCanSeeAssignment('2302'))
+        deepEqual(studentIds, ['1102', '1104'])
       })
     })
 

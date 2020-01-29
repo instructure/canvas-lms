@@ -31,7 +31,6 @@
 
 require 'resolv'
 require 'ipaddr'
-require 'action_controller_test_process'
 
 class CutyCapt
 
@@ -149,8 +148,6 @@ class CutyCapt
   end
 
   def self.snapshot_attachment_for_url(url)
-    require 'action_controller_test_process'
-
     attachment = nil
     self.snapshot_url(url, "png") do |file_path|
       # this is a really odd way to get Attachment the data it needs, which

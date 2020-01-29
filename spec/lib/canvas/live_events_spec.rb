@@ -520,7 +520,7 @@ describe Canvas::LiveEvents do
       end
 
       it 'should include the group_id if assignment is a group assignment' do
-        submission.update_attributes(group: group)
+        submission.update(group: group)
 
         expect_event('submission_created',
           hash_including(
@@ -543,7 +543,7 @@ describe Canvas::LiveEvents do
       end
 
       it 'should include the group_id if assignment is a group assignment' do
-        submission.update_attributes(group: group)
+        submission.update(group: group)
 
         expect_event('submission_updated',
           hash_including(
@@ -585,7 +585,7 @@ describe Canvas::LiveEvents do
       end
 
       it 'should include the group_id if assignment is a group assignment' do
-        submission.update_attributes(group: group)
+        submission.update(group: group)
 
         expect_event('plagiarism_resubmit',
           hash_including(
@@ -797,6 +797,64 @@ describe Canvas::LiveEvents do
         expect_event('assignment_group_created', expected_data).once
         Canvas::LiveEvents.assignment_group_created(assignment_group)
       end
+    end
+  end
+
+  describe 'assignment_override_updated' do
+    def base_override_hash(override)
+      {
+        assignment_override_id: override.id.to_s,
+        assignment_id: override.assignment.id.to_s,
+        due_at: override.due_at,
+        all_day: override.all_day,
+        all_day_date: override.all_day_date,
+        unlock_at: override.unlock_at,
+        lock_at: override.lock_at,
+        type: override.set_type,
+        workflow_state: override.workflow_state,
+      }.compact!
+    end
+
+    it 'triggers a live event with ADHOC assignment override details' do
+      course_with_student_submissions
+      assignment = @course.assignments.first
+      override = create_adhoc_override_for_assignment(assignment, @student)
+
+      expect_event('assignment_override_updated',
+        hash_including(base_override_hash(override).merge({
+          type: 'ADHOC',
+        }))).once
+
+      Canvas::LiveEvents.assignment_override_updated(override)
+    end
+
+    it 'triggers a live event with CourseSection assignment override details' do
+      course_with_student_submissions
+      assignment = @course.assignments.first
+      override = create_section_override_for_assignment(assignment)
+      section = override.set
+
+      expect_event('assignment_override_updated',
+        hash_including(base_override_hash(override).merge({
+          type: 'CourseSection',
+          course_section_id: section.id.to_s,
+        }))).once
+
+      Canvas::LiveEvents.assignment_override_updated(override)
+    end
+
+    it 'triggers a live event with Group assignment override details' do
+      course_with_student
+      assignment = group_assignment_discussion(course: @course).assignment
+      override = create_group_override_for_assignment(assignment, group: @group)
+
+      expect_event('assignment_override_updated',
+        hash_including(base_override_hash(override).merge({
+          type: 'Group',
+          group_id: override.set.id.to_s,
+        }))).once
+
+      Canvas::LiveEvents.assignment_override_updated(override)
     end
   end
 

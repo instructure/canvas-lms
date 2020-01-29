@@ -97,19 +97,19 @@ describe Gradebook::FinalGradeOverrides do
 
   it "includes scores for invited students" do
     @student_enrollment_1.scores.find_by!(course_score: true).update!(override_score: 89.1)
-    @student_enrollment_1.update_attributes(workflow_state: "invited", last_activity_at: nil)
+    @student_enrollment_1.update(workflow_state: "invited", last_activity_at: nil)
     expect(final_grade_overrides[@student_1.id][:course_grade][:percentage]).to equal(89.1)
   end
 
   it "includes scores for test students" do
     @test_student_enrollment.scores.find_by!(course_score: true).update!(override_score: 89.1)
-    @test_student_enrollment.update_attributes(workflow_state: "invited", last_activity_at: nil)
+    @test_student_enrollment.update(workflow_state: "invited", last_activity_at: nil)
     expect(final_grade_overrides[@test_student.id][:course_grade][:percentage]).to equal(89.1)
   end
 
   it "excludes scores for deleted students" do
     @student_enrollment_1.scores.find_by!(course_score: true).update!(override_score: 89.1)
-    @student_enrollment_1.update_attributes(workflow_state: "deleted")
+    @student_enrollment_1.update(workflow_state: "deleted")
     expect(final_grade_overrides).not_to have_key(@student_1.id)
   end
 

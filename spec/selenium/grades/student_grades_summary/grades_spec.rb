@@ -379,7 +379,7 @@ describe "grades" do
         @first_assignment.grade_student(s, grade: 4, grader: @teacher)
       end
       # but then prevent them at the course levels
-      @course.update_attributes(hide_distribution_graphs: true)
+      @course.update(hide_distribution_graphs: true)
 
       StudentGradesPage.visit_as_student(@course)
       expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")

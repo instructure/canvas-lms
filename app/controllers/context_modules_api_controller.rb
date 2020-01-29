@@ -425,7 +425,7 @@ class ContextModulesApiController < ApplicationController
       end
       relock_warning = @module.relock_warning?
 
-      if @module.update_attributes(module_parameters) && set_position
+      if @module.update(module_parameters) && set_position
         json = module_json(@module, @current_user, session, nil)
         json['relock_warning'] = true if relock_warning || @module.relock_warning?
         json['publish_warning'] = publish_warning.present?

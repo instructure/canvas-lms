@@ -50,6 +50,7 @@ module Api::V1::DeveloperKey
         hash['vendor_code'] = key.vendor_code
         hash['public_jwk'] = key.public_jwk
         hash['public_jwk_url'] = key.public_jwk_url
+        hash['allow_includes'] = key.allow_includes
       end
 
       if account_binding.present?

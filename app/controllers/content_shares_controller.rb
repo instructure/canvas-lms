@@ -272,7 +272,7 @@ class ContentSharesController < ApplicationController
   def update
     @content_share = @current_user.content_shares.find(params[:id])
     update_params = params.permit(:read_state)
-    if @content_share.update_attributes(update_params)
+    if @content_share.update(update_params)
       render json: content_share_json(@content_share, @current_user, session)
     else
       render json: @content_share.errors.to_json, :status => 400

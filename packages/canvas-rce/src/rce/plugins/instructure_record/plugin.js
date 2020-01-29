@@ -32,6 +32,10 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
     const contextType = ed.settings.canvas_rce_user_context.type
 
     ed.addCommand('instructureRecord', clickCallback.bind(this, ed, document))
+    ed.addCommand('instructureTrayForMedia', (ui, plugin_key) => {
+      bridge.showTrayForPlugin(plugin_key)
+    })
+
     ed.ui.registry.addMenuButton('instructure_record', {
       tooltip: formatMessage('Record/Upload Media'),
       icon: 'video',
@@ -48,7 +52,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
             text: formatMessage('User Media'),
             onAction() {
               ed.focus(true)
-              bridge.showTrayForPlugin(USER_PLUGIN_KEY)
+              ed.execCommand('instructureTrayForMedia', false, USER_PLUGIN_KEY)
             }
           }
         ]
@@ -59,7 +63,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
             text: formatMessage('Course Media'),
             onAction() {
               ed.focus(true) // activate the editor without changing focus
-              bridge.showTrayForPlugin(COURSE_PLUGIN_KEY)
+              ed.execCommand('instructureTrayForMedia', false, COURSE_PLUGIN_KEY)
             }
           })
         }

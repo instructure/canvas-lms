@@ -19,9 +19,14 @@
 import alertHandler from '../../rce/alertHandler'
 import formatMessage from '../../format-message'
 
+export const REQUEST_INITIAL_MEDIA = 'REQUEST_INITIAL_MEDIA'
 export const REQUEST_MEDIA = 'REQUEST_MEDIA'
 export const RECEIVE_MEDIA = 'RECEIVE_MEDIA'
 export const FAIL_MEDIA = 'FAIL_MEDIA'
+
+export function requestInitialMedia(contextType) {
+  return {type: REQUEST_INITIAL_MEDIA, payload: {contextType}}
+}
 
 export function requestMedia(contextType) {
   return {type: REQUEST_MEDIA, payload: {contextType}}
@@ -39,12 +44,12 @@ export function failMedia({error, contextType}) {
 // dispatches the start of the load, requests a page for the collection from
 // the source, then dispatches the loaded page to the store on success or
 // clears the load on failure
-export function fetchMedia() {
+export function fetchMedia(sortBy) {
   return (dispatch, getState) => {
     const state = getState()
     dispatch(requestMedia(state.contextType))
     return state.source
-      .fetchMedia(state)
+      .fetchMedia({...state, ...sortBy})
       .then(response => dispatch(receiveMedia({response, contextType: state.contextType})))
       .catch(error => dispatch(failMedia({error, contextType: state.contextType})))
   }
@@ -52,27 +57,26 @@ export function fetchMedia() {
 
 // fetches a page only if a page is not already being loaded and the
 // collection is not yet completely loaded
-export function fetchNextMedia() {
+export function fetchNextMedia(sortBy) {
   return (dispatch, getState) => {
     const state = getState()
     const media = state.media[state.contextType]
 
-    if (media && !media.isLoading && media.hasMore) {
-      return dispatch(fetchMedia())
+    if (!media?.isLoading && media?.hasMore) {
+      dispatch(requestMedia(state.contextType))
+      return dispatch(fetchMedia(sortBy))
     }
   }
 }
 
 // fetches the next page (subject to conditions on fetchNextMedia) only if the
 // collection is currently empty
-export function fetchInitialMedia() {
+export function fetchInitialMedia(sortBy) {
   return (dispatch, getState) => {
     const state = getState()
-    const media = state.media[state.contextType]
 
-    if (media && media.hasMore && !media.isLoading && media.files && media.files.length === 0) {
-      return dispatch(fetchMedia())
-    }
+    dispatch(requestInitialMedia(state.contextType))
+    return dispatch(fetchMedia(sortBy))
   }
 }
 

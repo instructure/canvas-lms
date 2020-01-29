@@ -50,7 +50,7 @@ export default class EditEventDetailsDialog {
     return this.event.possibleContexts().find(context => context.asset_string === code)
   }
 
-  setupTabs = () => {
+  setupTabs = async () => {
     // Set up the tabbed view of the dialog
     const tabs = dialog.find('#edit_event_tabs')
 
@@ -102,8 +102,28 @@ export default class EditEventDetailsDialog {
       // to-do pages / discussions cannot be created on the calendar
       tabs.tabs('remove', 3)
 
-      // don't show To Do tab if the planner isn't enabled
-      if (!ENV.STUDENT_PLANNER_ENABLED) tabs.tabs('remove', 2)
+      // don't show To Do tab if the planner isn't enabled or a user
+      // managed calendar isn't selected
+      const managedContexts = ENV.CALENDAR.MANAGE_CONTEXTS ? ENV.CALENDAR.MANAGE_CONTEXTS : []
+
+      const selectedContexts = []
+      const resp = await $.ajaxJSON('/api/v1/calendar_events/visible_contexts', 'GET')
+      resp.contexts.forEach(context => {
+        if (context.selected) selectedContexts.push(context.asset_string)
+      })
+
+      let shouldRenderTODO = false
+      for (let i = 0; i < selectedContexts.length; i++) {
+        for (let j = 0; j < managedContexts.length; j++) {
+          shouldRenderTODO = selectedContexts[i] === managedContexts[j]
+          if (shouldRenderTODO) break
+        }
+        if (shouldRenderTODO) break
+      }
+
+      if (!ENV.STUDENT_PLANNER_ENABLED || !shouldRenderTODO) {
+        tabs.tabs('remove', 2)
+      }
 
       // don't even show the assignments tab if the user doesn't have
       // permission to create them
@@ -147,7 +167,7 @@ export default class EditEventDetailsDialog {
     return false
   }
 
-  show = () => {
+  show = async () => {
     if (this.event.isAppointmentGroupEvent()) {
       return new EditApptCalendarEventDialog(this.event).show()
     } else {
@@ -216,7 +236,7 @@ export default class EditEventDetailsDialog {
           .data('form-widget', this.appointmentGroupDetailsForm)
       }
 
-      this.setupTabs()
+      await this.setupTabs()
 
       // TODO: select the tab that should be active
 

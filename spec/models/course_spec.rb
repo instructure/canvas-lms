@@ -392,7 +392,7 @@ describe Course do
 
     context "without term end date" do
       it "should know if it has been soft-concluded" do
-        @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
+        @course.update({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
         expect(@course).not_to be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -409,7 +409,7 @@ describe Course do
       end
 
       it "should know if it has been soft-concluded" do
-        @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
+        @course.update({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
         expect(@course).to be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -426,7 +426,7 @@ describe Course do
       end
 
       it "should know if it has been soft-concluded" do
-        @course.update_attributes({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
+        @course.update({:conclude_at => nil, :restrict_enrollments_to_course_dates => true })
         expect(@course).not_to be_soft_concluded
 
         @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -2603,7 +2603,7 @@ describe Course, "tabs_available" do
 
   context "a public course" do
     before :once do
-      course_factory(active_all: true).update_attributes(:is_public => true, :indexed => true)
+      course_factory(active_all: true).update(:is_public => true, :indexed => true)
       @course.announcements.create!(:title => 'Title', :message => 'Message')
       default_group = @course.root_outcome_group
       outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
@@ -4610,14 +4610,14 @@ describe Course, "student_view_student" do
   end
 
   it "should give fake student active student permissions even if enrollment wouldn't otherwise be active" do
-    @course.enrollment_term.update_attributes(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
+    @course.enrollment_term.update(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
     @fake_student = @course.student_view_student
     expect(@course.grants_right?(@fake_student, nil, :read_forum)).to be_truthy
   end
 
   it "should not update the fake student's enrollment state to 'invited' in a concluded course" do
     @course.student_view_student
-    @course.enrollment_term.update_attributes(:start_at => 4.days.ago, :end_at => 2.days.ago)
+    @course.enrollment_term.update(:start_at => 4.days.ago, :end_at => 2.days.ago)
     @fake_student = @course.student_view_student
     expect(@fake_student.enrollments.where(course_id: @course).map(&:workflow_state)).to eql(['active'])
   end
@@ -5234,6 +5234,24 @@ describe Course do
 
       expect(user1.communication_channel.delayed_messages.where(notification_id: @notification).count).to eq count1
       expect(user2.communication_channel.delayed_messages.where(notification_id: @notification).count).to eq count2 + 1
+    end
+  end
+
+  describe 'grade weight notification' do
+    before :once do
+      course_with_student(:active_all => true, :active_cc => true)
+      n = Notification.create!(name: 'Grade Weight Changed', category: 'TestImmediately')
+      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+    end
+
+    it "sends a notification when the course scheme changes" do
+      @course.update_attribute(:apply_assignment_group_weights, true)
+      expect(@course.messages_sent['Grade Weight Changed']).to be_present
+    end
+
+    it "doesn't sends a notification when the course scheme doesn't functionally change" do
+      @course.update_attribute(:apply_assignment_group_weights, false) # already is functionally false but will still save a column explicitly
+      expect(@course.messages_sent['Grade Weight Changed']).to be_blank
     end
   end
 

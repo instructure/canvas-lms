@@ -62,7 +62,7 @@ describe Types::UserType do
 
   context "avatarUrl" do
     before(:once) do
-      @student.update_attributes! avatar_image_url: 'not-a-fallback-avatar.png'
+      @student.update! avatar_image_url: 'not-a-fallback-avatar.png'
     end
 
     it "is nil when avatars are not enabled" do
@@ -76,7 +76,7 @@ describe Types::UserType do
 
     it "returns nil when a user has no avatar" do
       user.account.enable_service(:avatars)
-      user.update_attributes! avatar_image_url: nil
+      user.update! avatar_image_url: nil
       expect(user_type.resolve("avatarUrl")).to be_nil
     end
   end
@@ -130,7 +130,7 @@ describe Types::UserType do
 
   context "email" do
     before(:once) do
-      @student.update_attributes! email: "cooldude@example.com"
+      @student.update! email: "cooldude@example.com"
     end
 
     it "returns email for teachers/admins" do

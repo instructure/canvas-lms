@@ -28,7 +28,7 @@ module PactConfig
     ALL = Providers.constants.map { |c| Providers.const_get(c) }.freeze
   end
 
-  # Add new API and LiveEvents consumers to this Consumers module
+  # Add new API consumers to this module
   module Consumers
     my_broker_host = ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
     if my_broker_host.include?(EXTERNAL_BROKER_HOST)
@@ -45,6 +45,12 @@ module PactConfig
       SISTEMIC = 'Sistemic'.freeze
     end
     ALL = Consumers.constants.map { |c| Consumers.const_get(c) }.freeze
+  end
+
+  # Add new Live Events consumers to this module
+  module LiveEventConsumers
+    OUTCOMES = 'Outcomes'.freeze
+    QUIZ_LTI = 'Quiz LTI'.freeze
   end
 
   class << self

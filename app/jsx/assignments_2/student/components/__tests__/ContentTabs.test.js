@@ -202,7 +202,7 @@ describe('ContentTabs', () => {
 
     expect(queryByTestId('assignments_2_comment_attachment')).not.toBeInTheDocument()
     expect(
-      getByText('You cannot leave leave comments until you submit the assignment')
+      getByText('You cannot leave comments until you submit the assignment')
     ).toBeInTheDocument()
   })
 })

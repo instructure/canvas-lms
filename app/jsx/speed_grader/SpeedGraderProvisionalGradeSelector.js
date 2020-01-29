@@ -21,7 +21,7 @@ import {arrayOf, bool, func, number, objectOf, shape, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import {Heading, Text} from '@instructure/ui-elements'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {View} from '@instructure/ui-layout'
 

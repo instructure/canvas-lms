@@ -113,7 +113,12 @@ export default function ThemeCard(props) {
       </div>
       <div className="ic-ThemeCard-main">
         <div className="ic-ThemeCard-main__name">
-          <button type="button" className="ic-ThemeCard-name-button" onClick={props.open}>
+          <button
+            type="button"
+            className="ic-ThemeCard-name-button"
+            data-testid="themecard-name-button"
+            onClick={props.open}
+          >
             <span className="screenreader-only">
               {props.isActiveBrandConfig ? I18n.t('This is your current theme') : null}
               {I18n.t('Edit this theme in Theme Editor')}
@@ -126,6 +131,7 @@ export default function ThemeCard(props) {
             <button
               type="button"
               className="Button Button--icon-action"
+              data-testid="themecard-delete-button"
               onClick={props.startDeleting}
             >
               <span className="screenreader-only">{I18n.t('Delete theme')}</span>

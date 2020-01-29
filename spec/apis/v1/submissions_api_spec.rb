@@ -4017,7 +4017,7 @@ describe 'Submissions API', type: :request do
       end
 
       it "creates a online text submission" do
-        @assignment.update_attributes(:submission_types => 'online_text_entry')
+        @assignment.update(:submission_types => 'online_text_entry')
         json = do_submit(:submission_type => 'online_text_entry', :body => %{<p>
           This is <i>some</i> text. The <script src='evil.com'></script> sanitization will take effect.
         </p>})
@@ -4028,7 +4028,7 @@ describe 'Submissions API', type: :request do
       end
 
       it "processs html content in body" do
-        @assignment.update_attributes(:submission_types => 'online_text_entry')
+        @assignment.update(:submission_types => 'online_text_entry')
         should_process_incoming_user_content(@course) do |content|
           do_submit(:submission_type => 'online_text_entry', :body => content)
           @submission.body
@@ -4036,7 +4036,7 @@ describe 'Submissions API', type: :request do
       end
 
       it "creates a file upload submission" do
-        @assignment.update_attributes(:submission_types => 'online_upload')
+        @assignment.update(:submission_types => 'online_upload')
         a1 = attachment_model(:context => @user)
         a2 = attachment_model(:context => @user)
         json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
@@ -4047,7 +4047,7 @@ describe 'Submissions API', type: :request do
       end
 
       it "creates a media comment submission" do
-        @assignment.update_attributes(:submission_types => "media_recording")
+        @assignment.update(:submission_types => "media_recording")
         media_object(:media_id => "3232", :media_type => "audio")
         json = do_submit(:submission_type => "media_recording", :media_comment_id => "3232", :media_comment_type => "audio")
         expect(json['media_comment'].slice('media_id', 'media_type')).to eq({
@@ -4057,7 +4057,7 @@ describe 'Submissions API', type: :request do
       end
 
       it "copys files to the submissions folder if they're not there already" do
-        @assignment.update_attributes(:submission_types => 'online_upload')
+        @assignment.update(:submission_types => 'online_upload')
         a1 = attachment_model(:context => @user, :folder => @user.submissions_folder)
         a2 = attachment_model(:context => @user)
         json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
@@ -4072,7 +4072,7 @@ describe 'Submissions API', type: :request do
 
     context "submission file uploads" do
       before :once do
-        @assignment.update_attributes(:submission_types => 'online_upload')
+        @assignment.update(:submission_types => 'online_upload')
         @student1 = @student
         course_with_student(:course => @course)
         @context = @course
@@ -4127,19 +4127,19 @@ describe 'Submissions API', type: :request do
       end
 
       it "rejects uploading files when filetype is not allowed" do
-        @assignment.update_attributes(:allowed_extensions => ['doc'])
+        @assignment.update(:allowed_extensions => ['doc'])
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
         assert_status(400)
       end
 
       it "allows filetype when restricted and is correct filetype" do
-        @assignment.update_attributes(:allowed_extensions => ['txt'])
+        @assignment.update(:allowed_extensions => ['txt'])
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
         assert_status(200)
       end
 
       it "falls back to parsing the extension when an unknown type" do
-        @assignment.update_attributes(:allowed_extensions => ['beepboop'])
+        @assignment.update(:allowed_extensions => ['beepboop'])
         preflight(name: 'test.beepboop', size: 12345)
         assert_status(200)
       end
@@ -4150,28 +4150,9 @@ describe 'Submissions API', type: :request do
         expect(f.submission_context_code).to eq @course.asset_string
       end
 
-      context 'for url upload using DelayedJob' do
-        let(:json_response) do
-          preflight(url: 'http://example.com/test', filename: 'test.txt')
-          JSON.parse(response.body)
-        end
-
-        before { allow(InstFS).to receive(:enabled?).and_return(false) }
-
-        it "returns progress json" do
-          progress_json = {
-            "context_id" => @assignment.id,
-            "context_type" =>"Assignment",
-            "user_id" => @student1.id,
-            "tag" => "upload_via_url"
-          }
-          expect(json_response['progress']).to include progress_json
-        end
-      end
-
       context 'for url upload using InstFS' do
         let(:json_response) do
-          preflight(url: 'http://example.com/test')
+          preflight(url: 'http://example.com/test', comment: 'my comment')
           JSON.parse(response.body)
         end
 
@@ -4184,6 +4165,7 @@ describe 'Submissions API', type: :request do
           it 'encodes capture_params in the token' do
             capture_params = {
               "eula_agreement_timestamp" => nil,
+              "comment" => "my comment",
               "context_type" => "User",
               "context_id" => @student1.id.to_s,
               "user_id" => @student1.id.to_s,
@@ -4221,7 +4203,7 @@ describe 'Submissions API', type: :request do
 
       context 'for url upload using DelayedJob' do
         let(:json_response) do
-          preflight(url: 'http://example.com/test', filename: 'test.txt')
+          preflight(url: 'http://example.com/test', filename: 'test.txt', comment: 'hello comment')
           JSON.parse(response.body)
         end
 
@@ -4241,6 +4223,7 @@ describe 'Submissions API', type: :request do
           json_response
           job = Delayed::Job.order(:id).last
           expect(job.handler).to include Services::SubmitHomeworkService::SubmitWorker.name
+          expect(job.handler).to include 'hello comment'
         end
 
         it 'should enqueue the copy job when the submit_assignment parameter is false' do
@@ -4257,7 +4240,7 @@ describe 'Submissions API', type: :request do
     end
 
     it "rejects attachment ids not belonging to the user" do
-      @assignment.update_attributes(:submission_types => 'online_upload')
+      @assignment.update(:submission_types => 'online_upload')
       a1 = attachment_model(:context => @course)
       json = api_call(:post, @url, @args, { :submission => { :submission_type => "online_upload", :file_ids => [a1.id] } }, {}, :expected_status => 400)
       expect(json['message']).to eq 'No valid file ids given'

@@ -997,6 +997,10 @@ pt-BR:
         bryan_engagement: 
           enrollment_term_ids: 
             field: "IDs do Período de Inscrição"
+    eportfolio_moderation: 
+      eportfolio_moderation_crumb: "Moderação do ePortfolio"
+      page_title: "Moderação do ePortfolio"
+      title: "Moderação do ePortfolio"
     excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1849,6 +1853,8 @@ pt-BR:
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: "Visualização do administrador"
   administrator_f325c186: Administrador
+  administrators_and_author_only_flagged_as_possible_42345cba: "Apenas administradores e autor (sinalizado como possível spam)"
+  administrators_and_author_only_marked_as_spam_184becce: "Apenas administradores e autor (marcado como spam)"
   admins_3e1dce15: Administradores
   admins_add_remove_26811ce5: "Administradores - adicionar/remover"
   advanced_36b35b8: Avançado
@@ -2559,6 +2565,7 @@ pt-BR:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "As respostas serão mostradas após a última tentativa"
   any_sub_account_ec7069f2: "Qualquer subconta"
   any_term_d49af19f: "Qualquer termo"
+  anyone_with_a_direct_link_private_b3bc9661: "Qualquer um com um link direto (particular)"
   anyone_with_the_url_9d7e5e07: "Qualquer um com o URL"
   api_7bd66e19: API
   api_key_eeeb2167: "Chave API"
@@ -3766,6 +3773,7 @@ pt-BR:
   authentications_log_ca16ce81: "Registro de autenticações"
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest enviado para IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse de IdP"
+  author_215203d2: Autor
   author_just_made_a_new_comment_on_the_submission_f_35141ce7: "%{author} acabou de fazer um novo comentário sobre o envio de %{submission_submittor} para %{assignment}"
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name} acabou de fazer um novo comentário sobre o envio para %{user_name} para %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name} acabou de fazer um novo comentário sobre o envio para %{user_name} para %{assignment_title}."
@@ -3952,6 +3960,7 @@ pt-BR:
   bookmark_service: 
     default_title: "Sem título"
   bookmark_this_question_bank_dc414a82: "Marcar este Banco de Perguntas nos Favoritos"
+  bookmarking_for_enrollments_index_api_840be156: "Bookmarking para API de Índice de Matrículas"
   bookmarks_5b5b81c9: Favoritos
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Discussões - criar e Discussões - moderar permitem que um usuário crie uma discussão na página Discussões. Se esta permissão estiver habilitada, Discussões - criar não é requerido. Para visualizar discussões em um curso, Discussões - visualizar deve ser habilitada. Para responder uma discussão, Discussões - postar também deve ser habilitada. Para editar detalhes da tarefa em uma discussão, Tarefas e Questionários - adicionar/editar/excluir também deve ser habilitada."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
@@ -5217,6 +5226,7 @@ pt-BR:
   configure_individual_learning_paths_for_students_b_e2fce294: "Configure caminhos individuais de aprendizado para alunos baseado em resultados de avaliações."
   configure_tool_app_3b1bb50b: "Configurar aplicativo %{tool}?"
   configure_toolname_app_651371be: "Configurar aplicativo %{toolName}"
+  confirm_as_spam_2f8b7105: "Confirmar como spam"
   confirm_communication_channel_81c48d08: "Confirmar canal de comunicação"
   confirm_contact_method_29d6fe4b: "Confirmar método de contato"
   confirm_delete_6febeafb: "Confirmar exclusão"
@@ -6232,6 +6242,9 @@ pt-BR:
     one: "1 configuração de períodos de pontuação encontrada."
     other: "%{count} configurações de períodos de pontuação encontradas."
     zero: "Nenhuma configuração de períodos de pontuação correspondente encontrada."
+  count_shared_items_loaded_ef94ef6a: 
+    one: "1 item carregado compartilhado."
+    other: "%{count} itens compartilhados carregados."
   count_students_30e46120: 
     one: "1 aluno"
     other: "%{count} alunos"
@@ -7343,6 +7356,7 @@ pt-BR:
   current_total_67bf5f72: "Total atual:"
   current_volume_level_c55ab825: "Nível do volume atual"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Atualmente atribuído a %{tokenName}, clique para remover"
+  currently_visible_to_e2f85345: "Atualmente visível para"
   curso_f0ee9b5: Curso
   curve_grades_b7a75443: "Curvar notas"
   curve_grades_dialog: 
@@ -7662,6 +7676,7 @@ pt-BR:
   deleted_content_exceptions_237e809d: "Exceções de conteúdo excluídas:"
   deleted_content_referenced_in_this_resource_e42d1998: "Conteúdo excluído referenciado neste recurso:"
   deleting_6421031e: Excluindo...
+  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Excluir um usuário destruirá todos os seus ePortfolios. De outra forma, ePortfolios podem ser individualmente marcados como ‘spam’ ou ‘safe’ para modificar a visibilidade."
   deleting_assignment_22d5851d: "excluindo tarefa"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Sites demo requerem que configurações Recaptcha sejam definidas. Consulte o administrador do seu site para esta instância do Canvas."
@@ -8737,6 +8752,7 @@ pt-BR:
       add_submission: "Adicionar página para envio"
       download_eportfolio: "Baixar ePortfolio"
       section_list: "Arraste para organizar, clique para editar"
+  eportfolio_3c009f9c: Eportfolio
   eportfolio_categories: 
     default_name: "Nova página"
     errors: 
@@ -8753,6 +8769,7 @@ pt-BR:
     click_through: "Clique para exibir o conteúdo da página"
     default_content: "Nenhum conteúdo foi adicionado ainda"
     default_name: "Nome da página"
+  eportfolio_moderation_feb0ffd3: "Moderação do ePortfolio"
   eportfolio_settings_75ba1f9a: "Configurações do ePortfolio"
   eportfolios: 
     _page_section: 
@@ -9073,6 +9090,7 @@ pt-BR:
   everyone_854554dd: "Todo mundo"
   everyone_else_6c6dc7b6: "Todos os demais"
   everyone_else_cc5f6888: "Todos os demais"
+  everyone_public_45ff1f25: "Todos (públicos)"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   exactly_one_rating_can_have_mastery_c1d87990: "Exatamente uma avaliação pode ter domínio"
@@ -9110,6 +9128,7 @@ pt-BR:
   expanded_f4493860: Expandido
   experimental_graphql_api_75c5eb8f: "API GraphQL EXPERIMENTAL."
   expires_at_6214b43f: "Expira às"
+  explanation_of_statuses_90a26d07: "Explicação de status:"
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "Exportar um questionário existente para o formato dos Questionários 2"
   export_course_content_f4774b74: "Exportar conteúdo do curso"
   export_de71cd8e: Exportar
@@ -9298,6 +9317,7 @@ pt-BR:
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Falha ao carregar componente do Sincronizar Histórico. A sua conexão à rede está OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Falha ao carregar componente do Histórico Não Sincronizado. A sua conexão à rede está OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Ocorreu uma falha. Comunique o seguinte código de erro ao seu administrador de sistema: ErrorReport:%{error};"
+  failed_retrieving_media_source_3f0cfd49: "Falhou ao recuperar fonte da mídia"
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Falhou, o relatório falhou em gerar um arquivo. Por favor, tente novamente."
   failed_to_add_new_feed_ee1c5ea: "Falhou ao adicionar novo feed"
   failed_to_change_last_attended_date_1e340ba6: "Falhou ao alterar a última data de participação"
@@ -9415,6 +9435,7 @@ pt-BR:
   file_list_350d08df: "Lista de arquivos"
   file_list_updated_38e2a5ad: "Lista de arquivo atualizada"
   file_menu_cc0ca54: "Menu de Pastas"
+  file_must_be_an_image_293567a8: "Arquivo deve ser uma imagem"
   file_name_2fe68ec1: "Nome de Arquivo"
   file_name_8fd421ff: "Nome do arquivo"
   file_name_too_long_ea535796: "nome do arquivo longo demais"
@@ -9612,6 +9633,8 @@ pt-BR:
   first_reviewer_9ea05caa: "Primeiro avaliador"
   first_reviewer_sortorder_e2184140: "Primeiro avaliador %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, e %{others_count} outros"
+  flagged_as_possible_spam_ebbc4683: "Sinalizado como possível spam"
+  flags_new_eportfolio_content_matching_specific_key_a66af560: "Sinaliza novo conteúdo ePortfolio correspondendo palavras-chave específicas como possível spam, e permite que os administradores confirmem ePortfolios sinalizados ou marque-os como seguros."
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
@@ -11457,6 +11480,7 @@ pt-BR:
   images_documents_and_more_dccb362f: "Imagens, Documentos e mais"
   immediate_notifications_for_global_announcements_682f5a3d: "Notificações imediatas para anúncios globais"
   immediately_c128ede6: Imediatamente
+  immersive_reader_7b87538: "Leitor imersivo"
   immersive_reader_failed_to_load_bc8d4dd4: "Immersive Reader falhou em carregar"
   import_1b31507: Importar
   import_a_set_of_outcomes_6b782192: "Importar um conjunto de objetivos"
@@ -11983,6 +12007,7 @@ pt-BR:
       log_in_to_canvas: "Fazer login no Canvas"
   learn_more_7a8d626: "Aprender mais"
   learn_more_about_collaborations_2978f66d: "Aprenda mais sobre colaborações"
+  learning_analytics_beta_view_46deb4c8: "Análises de aprendizado (Beta) - visualizar"
   learning_mastery_5fc34276: "Domínio de Aprendizagem"
   learning_mastery_6ed4fd63: "Domínio de Aprendizagem..."
   learning_mastery_gradebook_description: |-
@@ -12500,8 +12525,14 @@ pt-BR:
   mark_as_done_6fa48d2f: "Marcar como concluído"
   mark_as_done_779556d7: "marcar como concluído"
   mark_as_read_e7de2ce3: "Marcar como lido"
+  mark_as_safe_c01fea35: "Marcado como seguro"
+  mark_as_spam_9c613d87: "Marcar como spam"
   mark_as_unread_4a413c41: "Marcar como não lido"
   mark_done_9d81bcd9: "Marcar como concluído"
+  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Marcado como seguro': Um administrador revisou este ePortfolio e o marcou como seguro. É visível à sua audiência pretendida original."
+  marked_as_safe_f7f953df: "Marcado como seguro"
+  marked_as_spam_ab87846d: "Marcado como spam"
+  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Marcado como spam': Um administrador revisou este ePortfolio e o marcou como spam. Só está visível ao autor original e administradores."
   marked_done_8f61ebb8: "marcado como concluido"
   marked_done_9fd646f: "Marcado como concluído"
   masquerade_as_name_8bb004c5: "Mascarar-se como %{name}"
@@ -14942,6 +14973,8 @@ pt-BR:
   need_a_canvas_account_221d18ed: "Precisa de uma Conta do Canvas?"
   need_help_setting_up_your_course_2b763141: "Precisa de ajuda ao configurar seu curso?"
   needs_grading_9143d47c: "Precisa de avaliação"
+  needs_review_flagged_as_possible_spam_233657fb: "Precisa de revisão: sinalizado como possível spam"
+  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'Precisa de revisão: sinalizado como possível spam': Sistemas da Instructure identificaram este ePortfolio como possível spam e precisa de revisão do administrador. Só está visível ao autor original e administradores."
   negative_points_fda45730: "Pontos negativos"
   netherlands_14ca4f6d: Holanda
   netherlands_31_63e4f1b9: "Holanda (+31)"
@@ -15156,6 +15189,7 @@ pt-BR:
   not_mastered_5c2f9968: "Não dominou"
   not_now_97efd947: "Agora não"
   not_published_73f7079: "Não publicado"
+  not_reviewed_c38d9e97: "Não revisado"
   not_signed_47acf472: "Não assinado"
   not_starred_no_subject_click_to_star_adfefe93: "'Não favoritado \"(Sem Assunto)\", Clique para favoritar."
   not_starred_no_subject_click_to_star_dc91380: "Não favoritado \"(Sem Assunto)\", Clique para favoritar."
@@ -19087,6 +19121,7 @@ pt-BR:
       manage_wiki: "Gerenciar (adicionar / editar /excluir) páginas do wiki"
       managed_jobs: "Gerenciar trabalhos em segundo plano"
       moderate_form: "Moderar fóruns (excluir/editar postagens de outras pessoas, travar assuntos)"
+      moderate_user_content: "Moderar conteúdo do usuário"
       post_to_forum: "Postar nos fóruns"
       read_course_content: "Visualizar conteúdo do curso"
       read_course_list: "Visualizar a lista de cursos"
@@ -21356,6 +21391,7 @@ pt-BR:
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Sucesso! Notas foram postadas em %{postedTo} para %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Sucesso! Notas foram publicadas para o livro de notas."
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Sucesso! A política de postagem para %{name} foi atualizada."
+  success_you_added_hostname_to_the_whitelist_6061236e: "Sucesso: Você adicionou %{hostname} à lista de permitidos."
   successfully_added_fb3e6008: "Adicionado com sucesso"
   successfully_created_a_set_38374719: "Uma configuração criada com sucesso"
   successfully_deleted_discussion_title_a685f345: "Fórum excluído com sucesso %{title}"
@@ -21703,10 +21739,13 @@ pt-BR:
   the_selected_group_was_cleared_because_the_student_656e4f1c: "O grupo selecionado foi limpo porque o aluno que você solicitou não faz parte de quaisquer grupos. Você pode selecionar um grupo no Boletim."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "A gravidade do problema, conforme selecionado pelo usuário a partir de um menu suspenso."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "O ícone de atalho para dispositivos iOS/Android. 180x180 png"
+  the_specified_assignment_could_not_be_found_c5dc34ab: "Não foi possível encontrar a tarefa especificada"
+  the_specified_assignment_id_could_not_be_found_e4e64f5f: "Não foi possível encontrar a tarefa especificada (%{id})"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "o arquivo especificado a file_id já possui um relatório de originalidade"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "O usuário especificado (%{id}) não é aluno deste curso"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "O usuário especificado não é aluno deste curso"
   the_state_parameter_is_required_ffadf213: "O parâmetro de estado é necessário"
+  the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "A configuração Sincronizar para SIS não pode ser habilitada para a tarefa “%{assignment_name}” sem uma data de vencimento."
   the_term_has_ended_for_this_course_f0ab367: "O termo terminou para este curso"
   the_title_cannot_be_longer_than_length_characters_7a822943: "O título não pode ter mais de %{length} caracteres"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "O título do seguinte banco de perguntas estava truncado: \"%{title}\""
@@ -21860,6 +21899,10 @@ pt-BR:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Isto ativa uma navegação atualizada, novo painel de controle e um visual e toque mais simples e moderno."
   this_enables_users_to_generate_and_download_course_4c69c531: "Isso permite que usuários gerem e baixem o ePub do curso."
   this_environment_is_currently_being_updated_with_a_235f1875: "Este ambiente está atualmente sendo atualizado com uma cópia dos últimos dados da produção. Verifique novamente mais tarde."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Este ePortfolio foi sinalizado como possível spam. Até que ele seja revisado por um administrador, ele só estará visível para você. Contate um administrador se tiver quaisquer perguntas."
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Este ePortfolio foi identificado como possível spam. Ele está visível apenas para administradores e o autor. Se tiver certeza de que este conteúdo não é spam, é possível marcá-lo como seguro. Caso contrário, é possível confirmá-lo como spam."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Este ePortfolio foi identificado como spam e só está visível para você. Contate um administrador se tiver quaisquer perguntas."
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Este ePortfolio foi identificado como spam. Ele está visível apenas para administradores e o autor. Se tiver certeza de que este conteúdo não é spam, é possível marcá-lo como seguro."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Esta funcionalidade permite que os professores facilmente copiem itens exclusivos de um curso para o outro, e compartilhem um único item de conteúdo com outros usuários para que possam importar tais itens em seus cursos."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Esta funcionalidade não pode ser desabilitada porque há ao menos uma subconta ou curso com esta funcionalidade habilitada."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Esta funcionalidade não pode ser habilitada enquanto a detecção automática dos separadores de campo estiver habilitada"
@@ -22827,6 +22870,7 @@ pt-BR:
   upload_file_fd2361b8: "Carregar arquivo"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Faça o upload dos arquivos enviados com atribuições para uma pasta  de Envios especial somente leitura"
   upload_gradebook_386a46c8: "Atualizar boletim"
+  upload_image_6120b609: "Carregar imagem"
   upload_media_ce31135a: "Fazer Upload de Mídia"
   upload_not_available_for_this_folder_8f8623c6: "Carregamento não disponível para esta pasta"
   upload_successful_ca47465f: "Atualização realizada com sucesso"
@@ -22857,6 +22901,7 @@ pt-BR:
   use_arrow_keys_to_navigate_options_2021cc50: "Use teclas de setas para navegar entre as opções."
   use_as_front_page_274a488b: "Utilizar como página inicial"
   use_between_for_adding_multiple_users_26bff207: "Use “,”no meio para adicionar diversos usuários."
+  use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Usar bookmarking para paginação de API no Índice de Matrículas"
   use_default_890939b7: "Utilizar o Padrão"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Use funcionalidades experimentais antes de serem geralmente habilitadas na produção"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Usar HTML5 Recorder no Editor de Conteúdo em vez de Flash"
@@ -23369,6 +23414,7 @@ pt-BR:
   users_manage_log_in_details_b944568b: "Usuários - gerenciar log em detalhes"
   users_manage_login_details_9462b30f: "Usuários - gerenciar detalhes de login"
   users_matching_search_term_c604db9e: "Usuários Correspondentes \"%{search_term}\""
+  users_moderate_content_36d6eed7: "Usuários - moderar conteúdo"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Usuários de leitores de telas podem precisar desligar o cursor virtual para utilizarem os atalhos de teclado"
   users_over_time_9a2ee74a: "usuários com o tempo"
   users_view_list_861c7a3f: "Usuários - visualizar lista"
@@ -23419,6 +23465,7 @@ pt-BR:
   view_grades_for_name_45aeb2f2: "Visualizar notas para %{name}"
   view_grading_history_e64bb8fe: "Exibir Histórico de Avaliação"
   view_in_speedgrader_773b9d81: "Vizualizar no SpeedGrader"
+  view_learning_analytics_beta_1c98a397: "Visualizar análises de aprendizado (Beta)"
   view_login_ids_for_users_142bbe7a: "Visualizar ids de login para usuários"
   view_longer_description_6b762087: "exibir descrição mais longa"
   view_name_app_62a2ad8e: "Visualizar %{name} aplicativo"

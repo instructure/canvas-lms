@@ -32,7 +32,7 @@ describe "enrollment_date_restrictions" do
 
     @enrollment2 = course_factory(:course_name => "Course 2", :active_all => 1)
 
-    @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => true)
+    @course.update(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => true)
     e2 = student_in_course(:user => @student, :active_all => 1)
     expect(e1.state).to eq :active
     expect(e1.state_based_on_date).to eq :active

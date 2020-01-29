@@ -59,17 +59,17 @@ describe SupportHelpers::Crocodoc::CrocodocFixer do
 
   let!(:crocodocument) do
     cd = shardattachment.create_crocodoc_document
-    cd.update_attributes(uuid: 'some stuff', process_state: 'ERROR')
+    cd.update(uuid: 'some stuff', process_state: 'ERROR')
     cd
   end
   let!(:crocodocument2) do
     cd = shardattachment2.create_crocodoc_document
-    cd.update_attributes(uuid: 'some stuff', process_state: 'ERROR')
+    cd.update(uuid: 'some stuff', process_state: 'ERROR')
     cd
   end
   let!(:crocodocument3) do
     cd = shardattachment3.create_crocodoc_document
-    cd.update_attributes(uuid: 'some stuff', process_state: 'PROCESSING')
+    cd.update(uuid: 'some stuff', process_state: 'PROCESSING')
     cd
   end
 
@@ -111,7 +111,7 @@ describe SupportHelpers::Crocodoc::CrocodocFixer do
     end
 
     it 'resubmits processing crodocodcs if stuck for more than a day' do
-      crocodocument3.update_attributes(updated_at: 4.days.ago)
+      crocodocument3.update(updated_at: 4.days.ago)
 
       fixer =
         SupportHelpers::Crocodoc::SubmissionFixer.new('email', nil, assignment2.id, student.id)

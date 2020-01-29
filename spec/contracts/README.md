@@ -110,3 +110,8 @@ You're also welcome to stop by the #test_advisory_board Slack channel!
 [Pact]: https://docs.pact.io/
 [https://inst-pact-broker.inseng.net]: https://inst-pact-broker.inseng.net
 [Test Advisory Board github repo]: https://github.com/instructure/test_advisory_board
+
+## Troubleshooting
+
+When adding contracts from a new repo (either as a producer or consumer), ensure that
+your versions of the pact-messages and pact gems are the same as they are in this repo

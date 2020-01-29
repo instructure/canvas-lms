@@ -552,7 +552,7 @@ describe "RCE next tests" do
         visit_existing_wiki_edit(@course, page_title)
         driver.switch_to.frame('wiki_page_body_ifr')
         f('table td').click # put the cursor in the table
-        f('body').send_keys [:control, :f9]
+        driver.action.key_down(:control).send_keys(:f9).key_up(:control).perform
 
         driver.switch_to.default_content
         expect(f('.tox-pop__dialog button[title="Table properties"]')).to eq(driver.switch_to.active_element)
@@ -565,7 +565,7 @@ describe "RCE next tests" do
         visit_existing_wiki_edit(@course, page_title)
         driver.switch_to.frame('wiki_page_body_ifr')
         f('a').click # put the cursor in the table
-        f('body').send_keys [:control, :f9]
+        driver.action.key_down(:control).send_keys(:f9).key_up(:control).perform
 
         driver.switch_to.default_content
         expect(f('.tox-pop__dialog button[title="Show link options"]')).to eq(driver.switch_to.active_element)

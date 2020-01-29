@@ -780,7 +780,7 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "should properly translate a video media comment in the discussion topic's message" do
-        @topic.update_attributes(
+        @topic.update(
           message: '<p><a id="media_comment_m-spHRwKY5ATHvPQAMKdZV_g" class="instructure_inline_media_comment video_comment" href="/media_objects/m-spHRwKY5ATHvPQAMKdZV_g">this is a media comment</a></p>'
         )
 
@@ -800,7 +800,7 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "should properly translate a audio media comment in the discussion topic's message" do
-        @topic.update_attributes(
+        @topic.update(
           message: '<p><a id="media_comment_m-QgvagKCQATEtJAAMKdZV_g" class="instructure_inline_media_comment audio_comment"></a>this is a media comment</p>'
         )
 
@@ -2624,7 +2624,7 @@ describe DiscussionTopicsController, type: :request do
       @reply3.change_read_state("read", @user)
       # have the teacher edit one of the student's replies
       @reply_reply1.editor = @teacher
-      @reply_reply1.update_attributes(:message => '<p>censored</p>')
+      @reply_reply1.update(:message => '<p>censored</p>')
 
       @all_entries.each &:reload
 

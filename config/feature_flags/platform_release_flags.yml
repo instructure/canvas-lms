@@ -19,3 +19,9 @@ live_event_lti_documentation:
   description: |-
     Show embedded documentation in Live Events LTI Tool
   applies_to: SiteAdmin
+developer_key_support_includes:
+  state: hidden
+  display_name: Developer Key Include Parameter Support
+  description: |-
+    Provides a flag on the Devloper Key to support Include Parameters on API requests
+  applies_to: SiteAdmin

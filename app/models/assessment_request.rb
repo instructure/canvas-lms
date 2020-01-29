@@ -147,7 +147,7 @@ class AssessmentRequest < ActiveRecord::Base
   def update_planner_override
     if saved_change_to_workflow_state? && workflow_state_before_last_save == 'assigned' && workflow_state == 'completed'
       override = PlannerOverride.find_by(plannable_id: self.id, plannable_type: 'AssessmentRequest', user: assessor)
-      override.update_attributes(marked_complete: true) if override.present?
+      override.update(marked_complete: true) if override.present?
     end
   end
 end

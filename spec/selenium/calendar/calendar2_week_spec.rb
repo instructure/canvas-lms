@@ -130,8 +130,7 @@ describe "calendar2" do
         events = ff('.fc-event')
 
         # Scroll the elements into view
-        events[0].location_once_scrolled_into_view
-        events[1].location_once_scrolled_into_view
+        scroll_into_view(".fc-event")
 
         # Drag object event onto target event
         driver.action.move_to(events[0]).click_and_hold.move_to(events[1]).release.perform

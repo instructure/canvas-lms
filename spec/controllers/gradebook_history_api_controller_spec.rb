@@ -49,10 +49,10 @@ describe GradebookHistoryApiController do
     @submission3 = @assignment1.submit_homework(student3)
     @submission4 = @assignment2.submit_homework(student)
 
-    @submission1.update_attributes!(:graded_at => Time.now, :grader_id => @grader.id, :score => 100)
-    @submission2.update_attributes!(:graded_at => Time.now, :grader_id => @super_grader.id, :score => 90)
-    @submission3.update_attributes!(:graded_at => (Time.now - 24.hours), :grader_id => @other_grader.id, :score => 80)
-    @submission4.update_attributes!(:graded_at => (Time.now - 24.hours), :grader_id => @other_grader.id, :score => 70)
+    @submission1.update!(:graded_at => Time.now, :grader_id => @grader.id, :score => 100)
+    @submission2.update!(:graded_at => Time.now, :grader_id => @super_grader.id, :score => 90)
+    @submission3.update!(:graded_at => (Time.now - 24.hours), :grader_id => @other_grader.id, :score => 80)
+    @submission4.update!(:graded_at => (Time.now - 24.hours), :grader_id => @other_grader.id, :score => 70)
   end
 
   before :each do

@@ -245,6 +245,14 @@ describe LearningOutcomeGroup do
 
       expect(root).not_to eq(course_root)
     end
+
+    it 'sends live events even when they have been otherwise disabled' do
+      expect(Canvas::LiveEvents).to receive(:learning_outcome_group_created)
+      ActiveRecord::Base.observers.disable LiveEventsObserver do
+        new_course = course_factory
+        LearningOutcomeGroup.find_or_create_root(new_course, true)
+      end
+    end
   end
 
   describe '#destroy' do

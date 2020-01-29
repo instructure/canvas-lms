@@ -27,6 +27,8 @@ describe "calendar2" do
     course_with_teacher(active_all: true, new_user: true)
     @student1 = User.create!(name: 'Student 1')
     @course.enroll_student(@student1).accept!
+    @student1.update!(preferences: {:selected_calendar_contexts => ["user_#{@student1.id}", "course_#{@course.id}"]})
+    @teacher.update!(preferences: {:selected_calendar_contexts => ["user_#{@teacher.id}", "course_#{@course.id}"]})
   end
 
   context "as the student" do
@@ -53,6 +55,7 @@ describe "calendar2" do
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-week td').click # click the first day of the month
+      wait_for_ajax_requests
       f('li[aria-controls="edit_planner_note_form_holder"]').click # the My To Do tab
       replace_content(f('#planner_note_date'), 0.days.from_now.to_date.iso8601)
       replace_content(f('#planner_note_title'), title)
@@ -221,6 +224,7 @@ describe "calendar2" do
     before :once do
       @course1 = @course
       @course2 = course_with_student(user: @user, active_all: true).course
+      @user.update!(preferences: {:selected_calendar_contexts => ["user_#{@user.id}", "course_#{@course1.id}", "course_#{@course2.id}"]})
     end
 
     before :each do
@@ -246,6 +250,7 @@ describe "calendar2" do
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-week td').click # click the first day of the month
+      wait_for_ajax_requests
       f('li[aria-controls="edit_planner_note_form_holder"]').click # the My To Do tab
       context_codes = ff('#planner_note_context option').map { |el| el['value'] }
       expect(context_codes).to match_array([@user.asset_string, @course2.asset_string])

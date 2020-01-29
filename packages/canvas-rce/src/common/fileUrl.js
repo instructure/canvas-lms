@@ -18,13 +18,19 @@
 
 import {parse, format} from 'url'
 
-export function downloadToWrap(url) {
+export function downloadToWrap(url, asLink = false) {
   if (!url) {
     return url
   }
   const parsed = parse(url, true)
+  if (parsed.host && window.location.host !== parsed.host) {
+    return url
+  }
   delete parsed.search
   delete parsed.query.download_frd
   parsed.query.wrap = 1
+  if (asLink) {
+    parsed.pathname = parsed.pathname.replace(/download$/, '')
+  }
   return format(parsed)
 }

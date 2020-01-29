@@ -19,18 +19,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-forms'
+import {Checkbox} from '@instructure/ui-checkbox'
 import I18n from 'i18n!NewGradingPeriodSetForm'
 import setsApi from 'compiled/api/gradingPeriodSetsApi'
 import EnrollmentTermInput from './EnrollmentTermInput'
 import {showFlashAlert} from '../shared/FlashAlert'
 
-class NewGradingPeriodSetForm extends React.Component {
+export default class NewGradingPeriodSetForm extends React.Component {
   static propTypes = {
     enrollmentTerms: PropTypes.array.isRequired,
     closeForm: PropTypes.func.isRequired,
     addGradingPeriodSet: PropTypes.func.isRequired,
-    readOnly: PropTypes.bool.isRequired,
     urls: PropTypes.shape({
       gradingPeriodSetsURL: PropTypes.string.isRequired
     }).isRequired
@@ -182,5 +181,3 @@ class NewGradingPeriodSetForm extends React.Component {
     )
   }
 }
-
-export default NewGradingPeriodSetForm

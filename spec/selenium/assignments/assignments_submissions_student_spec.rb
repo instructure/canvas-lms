@@ -43,7 +43,7 @@ describe "submissions" do
 
     it "should let a student submit a text entry", :xbrowser, priority: "1", test_id: 56015 do
       skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
-      @assignment.update_attributes(submission_types: "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f(".submit_assignment_link").click
@@ -55,7 +55,7 @@ describe "submissions" do
     end
 
     it "should not let a student submit a text entry with no text entered", priority: "2", test_id: 238143 do
-      @assignment.update_attributes(submission_types: "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       f(".submit_assignment_link").click
@@ -190,7 +190,7 @@ describe "submissions" do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
-      @assignment.update_attributes(:submission_types => "online_text_entry")
+      @assignment.update(:submission_types => "online_text_entry")
       @assignment.grade_student(@student, grade: "0", grader: @teacher)
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -203,7 +203,7 @@ describe "submissions" do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
-      @assignment.update_attributes(:submission_types => "on_paper")
+      @assignment.update(:submission_types => "on_paper")
       @assignment.grade_student(@student, grade: "0", grader: @teacher)
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -230,7 +230,7 @@ describe "submissions" do
     end
 
     it "should not allow blank submissions for text entry", priority: "1", test_id: 237026 do
-      @assignment.update_attributes(:submission_types => "online_text_entry")
+      @assignment.update(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
       assignment_form = f('#submit_online_text_entry_form')
@@ -252,7 +252,7 @@ describe "submissions" do
     it "should not allow a submission with only comments", priority: "1", test_id: 237027 do
       skip_if_safari(:alert)
       skip('flash alert is fragile, will be addressed in ADMIN-3015')
-      @assignment.update_attributes(:submission_types => "online_text_entry")
+      @assignment.update(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
 
@@ -435,7 +435,7 @@ describe "submissions" do
 
       it "should load submission lti tool on clicking tab" do
         tool = create_submission_tool
-        @assignment.update_attributes(submission_types: "online_upload")
+        @assignment.update(submission_types: "online_upload")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         f(".submit_assignment_link").click
@@ -447,7 +447,7 @@ describe "submissions" do
 
       it "should load submission lti tool on kb-nav to tab" do
         tool = create_submission_tool
-        @assignment.update_attributes(submission_types: "online_upload")
+        @assignment.update(submission_types: "online_upload")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
         f(".submit_assignment_link").click

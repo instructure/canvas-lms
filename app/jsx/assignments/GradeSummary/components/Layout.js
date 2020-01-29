@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-layout'
 import I18n from 'i18n!assignment_grade_summary'
 
@@ -127,7 +127,4 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Layout)
+export default connect(mapStateToProps, mapDispatchToProps)(Layout)

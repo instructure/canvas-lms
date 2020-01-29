@@ -20,10 +20,10 @@ if CANVAS_RAILS5_2
     gem 'loofah', '2.3.0'
     gem 'sprockets', '3.7.2' # 4.0 requires ruby 2.5
 else
-  gem 'rails', '6.0.0'
+  gem 'rails', '6.0.2.1'
 end
 
-gem 'rack', '2.0.7'
+gem 'rack', '2.0.8'
 
 gem 'oauth2', '1.4.2', require: false
 
@@ -36,7 +36,7 @@ gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_st
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '5.0.4'
-  gem 'scrypt', '3.0.6'
+  gem 'scrypt', '3.0.7'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'switchman', '1.14.7'
   gem 'open4', '1.3.4', require: false
@@ -52,7 +52,7 @@ gem "aws-sdk-s3", '1.48.0', require: false
 gem "aws-sdk-sns", '1.19.0', require: false
 gem "aws-sdk-sqs", '1.22.0', require: false
 gem "aws-sdk-core", "3.68.1", require: false
-  gem "aws-partitions", "1.238.0", require: false # pinning transient dependency
+  gem 'aws-partitions', '1.263.0', require: false
 gem "aws-sdk-kms", "1.24.0", require: false
 gem "aws-sigv4", "1.1.0", require: false
 
@@ -128,12 +128,13 @@ gem 'gepub', '1.0.4'
 gem 'imperium', '0.5.2', require: false
 gem 'academic_benchmarks', '0.0.11', require: false
 
-gem 'graphql', '1.9.16'
+gem 'graphql', '1.9.17'
 gem 'graphql-batch', '0.4.2'
 
 gem 'prawn-rails', '1.3.0'
 
 gem 'redcarpet', '3.5.0', require: false
+gem 'rack-test', '0.8.3'
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'

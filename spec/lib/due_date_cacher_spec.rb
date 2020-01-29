@@ -571,7 +571,7 @@ describe DueDateCacher do
           student2 = user_factory
           @course.enroll_student(student2, enrollment_state: 'active')
           submission2 = submission_model(assignment: @assignment, user: student2)
-          submission2.update_attributes(cached_due_date: nil)
+          submission2.update(cached_due_date: nil)
           student2.enrollments.find_by(course: @course).conclude
 
           DueDateCacher.new(@course, [@assignment]).recompute
@@ -625,7 +625,7 @@ describe DueDateCacher do
           student2 = user_factory
           @course.enroll_student(student2, enrollment_state: 'active')
           submission2 = submission_model(assignment: @assignment, user: student2)
-          submission2.update_attributes(cached_due_date: nil)
+          submission2.update(cached_due_date: nil)
           student2.enrollments.find_by(course: @course).conclude
 
           DueDateCacher.new(@course, [@assignment]).recompute

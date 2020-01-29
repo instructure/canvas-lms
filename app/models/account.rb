@@ -1131,9 +1131,12 @@ class Account < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
-    self.deleted_at = Time.now.utc
-    save!
+    self.transaction do
+      self.account_users.update_all(workflow_state: 'deleted')
+      self.workflow_state = 'deleted'
+      self.deleted_at = Time.now.utc
+      save!
+    end
   end
 
   def to_atom

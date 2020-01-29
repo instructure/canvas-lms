@@ -154,7 +154,7 @@ describe "courses" do
     it "should save quota when not changed" do
       # then try just saving it (without resetting it)
       course_with_admin_logged_in
-      @course.update_attributes!(storage_quota: 10.megabytes)
+      @course.update!(storage_quota: 10.megabytes)
       get "/courses/#{@course.id}/settings"
       form = f("#course_form")
       submit_form(form)
@@ -211,7 +211,7 @@ describe "courses" do
       user_logged_in
       enrollment = @course.enroll_ta(@user)
       enrollment.accept!
-      enrollment.update_attributes(:limit_privileges_to_course_section => true,
+      enrollment.update(:limit_privileges_to_course_section => true,
                                    :course_section => CourseSection.where(name: 'Two').first)
 
       # Test that only users in the approved section are displayed.
