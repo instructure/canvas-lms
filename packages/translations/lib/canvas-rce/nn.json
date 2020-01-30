@@ -26,6 +26,9 @@
     "message": "Innspeling av lyd og bilde er ikkje tilgjengeleg."
   },
   "audio_player_for_title_20cc70d": { "message": "Audiospelar for { title }" },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Auto-lagra innhald finst. Vil du laste inn auto-lagra innhald i staden for?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Opne automatisk i integrert førehandsvising (sjå førehandsvisinga etter lagring)"
   },
@@ -40,8 +43,14 @@
   "click_to_embed_imagename_c41ea8df": {
     "message": "Klikk for å sette inn { imageName }"
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Klikk for å skjule førehandsvising"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Klikk for å setje inn ei lenke i editoren. "
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Klikk for å vise førehandsvising"
   },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Om du lukkar menyen eller dialogen, kjem du tilbake til redigeringsområdet"
@@ -136,6 +145,7 @@
     "message": "Sentrer popup-menyen"
   },
   "formatting_5b143aa8": { "message": "Formatering" },
+  "found_auto_saved_content_3f6e4ca5": { "message": "Fann auto-lagra innhald" },
   "generating_preview_45b53be0": { "message": "Genererer førehandsvising..." },
   "go_to_the_editor_s_menubar_e6674c81": {
     "message": "Gå til menylinja i redigeringsprogrammet"
@@ -229,6 +239,7 @@
   "record_upload_media_5fdce166": { "message": "Ta opp / last opp media" },
   "recording_98da6bda": { "message": "Opptak" },
   "remove_link_d1f2f4d0": { "message": "Fjern lenke" },
+  "restore_auto_save_deccd84b": { "message": "Gjenopprette auto-lagring?" },
   "rich_content_editor_2708ef21": {
     "message": "Redigeringsprogram for rikt innhald"
   },
