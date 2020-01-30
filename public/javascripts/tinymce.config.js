@@ -100,10 +100,11 @@ export default class EditorConfig {
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css,
       browser_spellcheck: true,
       init_instance_callback: ed => {
-        $(`#${ed.id}`)
+        $(`#${ed.id}`) // eslint-disable-line no-undef
           .parent()
           .css('visibility', 'visible')
-      }
+      },
+      hide_media_upload: !!INST?.kalturaSettings?.hide_rte_button
     }
   }
 
@@ -142,7 +143,8 @@ export default class EditorConfig {
     if (
       this.instConfig &&
       this.instConfig.allowMediaComments &&
-      (this.instConfig.kalturaSettings && !this.instConfig.kalturaSettings.hide_rte_button)
+      this.instConfig.kalturaSettings &&
+      !this.instConfig.kalturaSettings.hide_rte_button
     ) {
       instructure_buttons += ' instructure_record'
     }

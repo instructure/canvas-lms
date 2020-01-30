@@ -617,4 +617,16 @@ module RCENextPage
   def click_decorative_options_checkbox
     decorative_options_checkbox.click
   end
+
+  def user_media_menu_item
+    fj('[role="menuitem"]:contains("User Media")')
+  end
+
+  def menu_items_by_menu_id(menu_id)
+    ffj("##{menu_id} [role='menuitem']")
+  end
+
+  def menu_item_by_menu_id(menu_id, item_label)
+    fj("##{menu_id}:contains('#{item_label}')")
+  end
 end
