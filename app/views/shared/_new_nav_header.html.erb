@@ -114,42 +114,47 @@
           <% end %>
         </ul>
 
-        <% if @current_user %>
-        <hr class="sm-divider" />
-          <ul class="ic-app-header__menu-list">
-            <li class="menu-item ic-app-header__menu-list-item">
-              <% if SettingsService.get_settings(object: 'school', id: 1)['helpcenter_on'] %>
-                <a id="global_nav_pendo_helpcenter_link" href="#helpcenter" class="ic-app-header__menu-list-link">
-                <div class="menu-item-icon-container" aria-hidden="true">
-                    <%= svg_icon :help %>
-                </div>
-                <div class="menu-item__text"><%= t('About') %></div>
-              <% else %>
-                <a id="global_nav_pendo_feedback_link" href="#feedback" class="ic-app-header__menu-list-link">
-                <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
-                    <%= svg_icon :sm_feedback %>
-                </div>
-                <div class="menu-item__text"><%= t('Feedback') %></div>
-              <% end %>
-              </a>
-            </li>
-            <li class="menu-item ic-app-header__menu-list-item">
-              <% tutapoint_url = SettingsService.get_settings(object: 'school', id: 1)['tutapoint_url'] %>
-              <% if @current_user && tutapoint_url %>
-                <%= button_to tutapoint_url, params: { username: @current_user.pseudonym&.unique_id,
-                      last_name: @current_user.last_name, first_name: @current_user.first_name, email: @current_user.email,
-                      auth_key: SettingsService.get_settings(object: 'school', id: 1)['tutapoint_auth_key'], timezone: @current_user.timezone_name },
-                    id: "tutapoint-btn", class: "btn-link", form: {target: '_blank'} do %>
-                      <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
-                        <%= svg_icon :educators %>
-                      </div>
-                  <div class="menu-item__text"><%= t('Tutapoint') %></div>
+        <% chat_widget = SettingsService.get_settings(object: 'school', id: 1)['chat_widget'] %>
+        <% if chat_widget %>
+          <%= chat_widget.html_safe %>
+        <% else %>
+          <% if @current_user %>
+          <hr class="sm-divider" />
+            <ul class="ic-app-header__menu-list">
+              <li class="menu-item ic-app-header__menu-list-item">
+                <% if SettingsService.get_settings(object: 'school', id: 1)['helpcenter_on'] %>
+                  <a id="global_nav_pendo_helpcenter_link" href="#helpcenter" class="ic-app-header__menu-list-link">
+                  <div class="menu-item-icon-container" aria-hidden="true">
+                      <%= svg_icon :help %>
+                  </div>
+                  <div class="menu-item__text"><%= t('About') %></div>
+                <% else %>
+                  <a id="global_nav_pendo_feedback_link" href="#feedback" class="ic-app-header__menu-list-link">
+                  <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
+                      <%= svg_icon :sm_feedback %>
+                  </div>
+                  <div class="menu-item__text"><%= t('Feedback') %></div>
                 <% end %>
-              <% end %>
-              </a>
-            </li>
-          </ul>
-        <%end%>
+                </a>
+              </li>
+              <li class="menu-item ic-app-header__menu-list-item">
+                <% tutapoint_url = SettingsService.get_settings(object: 'school', id: 1)['tutapoint_url'] %>
+                <% if @current_user && tutapoint_url %>
+                  <%= button_to tutapoint_url, params: { username: @current_user.pseudonym&.unique_id,
+                        last_name: @current_user.last_name, first_name: @current_user.first_name, email: @current_user.email,
+                        auth_key: SettingsService.get_settings(object: 'school', id: 1)['tutapoint_auth_key'], timezone: @current_user.timezone_name },
+                      id: "tutapoint-btn", class: "btn-link", form: {target: '_blank'} do %>
+                        <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
+                          <%= svg_icon :educators %>
+                        </div>
+                    <div class="menu-item__text"><%= t('Tutapoint') %></div>
+                  <% end %>
+                <% end %>
+                </a>
+              </li>
+            </ul>
+          <%end%>
+        <% end %>
       </div>
 
       <button type="button" id="distractionFreeToggle" class="Button Button--link ic-app-course-nav-toggle sm-btn-distraction-free" aria-live="polite" aria-label="Distraction Free Toggle" title="Distraction Free Toggle">

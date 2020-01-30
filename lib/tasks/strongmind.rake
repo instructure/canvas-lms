@@ -122,6 +122,19 @@ namespace :strongmind do
     )
   end
 
+  desc "Enable Chat Widget"
+  task :enable_chat_widget, [:widget_script] => :environment do |task, args|
+    chat_widget = args[:widget_script]
+    SettingsService.update_settings(
+      id: '1',
+      setting: "chat_widget",
+      value: chat_widget,
+      object: "school"
+    )
+
+    puts "Chat widget set to: #{chat_widget}"
+  end
+
   desc "redistribute due dates on courses after X start date"
   task :redistribute_date_dates_after => :environment do
     abort("No date specified in ENV") unless ENV['REDISTRIBUTE_AFTER']
