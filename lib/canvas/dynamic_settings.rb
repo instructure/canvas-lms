@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'canvas/dynamic_settings/cache'
+require_dependency 'fallback_memory_cache'
 require_dependency 'canvas/dynamic_settings/fallback_proxy'
 require_dependency 'canvas/dynamic_settings/prefix_proxy'
 require 'imperium'
@@ -28,6 +28,7 @@ module Canvas
 
     CONSUL_READ_OPTIONS = %i{recurse stale}.freeze
     KV_NAMESPACE = "config/canvas".freeze
+    CACHE_KEY_PREFIX = "dynamic_settings/".freeze
 
     class << self
       attr_accessor :config, :environment
@@ -124,7 +125,7 @@ module Canvas
       end
 
       def reset_cache!
-        Canvas::DynamicSettings::Cache.reset!
+        LocalCache.delete_matched(/^#{CACHE_KEY_PREFIX}/)
       end
     end
   end

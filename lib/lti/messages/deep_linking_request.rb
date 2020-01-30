@@ -55,6 +55,14 @@ module Lti::Messages
       'link_selection' => false
     }.freeze
 
+    ACCEPT_MULTIPLE = {
+      'migration_selection' => false,
+      'editor_button' => true,
+      'assignment_selection' => false,
+      'homework_submission' => false,
+      'link_selection' => true
+    }.freeze
+
     MODAL_PLACEMENTS = %w(editor_button assignment_selection link_selection migration_selection).freeze
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
@@ -74,7 +82,7 @@ module Lti::Messages
       @message.deep_linking_settings.accept_types = ACCEPT_TYPES[placement]
       @message.deep_linking_settings.accept_presentation_document_targets = DOCUMENT_TARGETS[placement]
       @message.deep_linking_settings.accept_media_types = MEDIA_TYPES[placement].join(',')
-      @message.deep_linking_settings.accept_multiple = false
+      @message.deep_linking_settings.accept_multiple = ACCEPT_MULTIPLE[placement]
       @message.deep_linking_settings.auto_create = AUTO_CREATE[placement]
     end
 

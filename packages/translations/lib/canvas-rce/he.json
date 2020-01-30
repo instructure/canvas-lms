@@ -59,6 +59,7 @@
   "loading_failed_b3524381": { "message": "טעינה נכשלה..." },
   "media_af190855": { "message": "מדיה" },
   "modules_c4325335": { "message": "מודולים" },
+  "no_e16d9132": { "message": "לא" },
   "no_results_940393cf": { "message": "אין תוצאות" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "פתיחת חלון דיאלוג של מקשי קיצור"
@@ -66,6 +67,7 @@
   "options_3ab0ea65": { "message": "אפשרויות" },
   "pages_e5414c2c": { "message": "דפים" },
   "people_b4ebb13c": { "message": "אנשים " },
+  "preview_53003fd2": { "message": "תצוגה מקדימה" },
   "published_c944a23d": { "message": "פורסם" },
   "quizzes_7e598f57": { "message": "בחנים" },
   "record_7c9448b": { "message": "הקלטה" },
@@ -84,5 +86,6 @@
   "upload_media_ce31135a": { "message": "העלאת מדיה" },
   "url_22a5f3b8": { "message": "כתובת דף אינטרנט" },
   "video_player_b371005": { "message": "נגן הוידאו" },
-  "wiki_home_9cd54d0": { "message": "דף הבית של וויקי" }
+  "wiki_home_9cd54d0": { "message": "דף הבית של וויקי" },
+  "yes_dde87d5": { "message": "כן" }
 }

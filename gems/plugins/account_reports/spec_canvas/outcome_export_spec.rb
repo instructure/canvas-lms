@@ -128,25 +128,17 @@ describe "Outcome Reports" do
 
       context 'with vendor guids' do
         before(:once) do
-          @root_group_1.update! vendor_guid: 'lion', vendor_guid_2: 'tiger'
-          @root_group_2.update! vendor_guid: 'bear'
-          @child_group_1_1.update! vendor_guid_2: 'monkey'
+          @root_group_1.update! vendor_guid: 'lion'
         end
 
         let(:guids) { report.map { |row| row['vendor_guid'] } }
 
-        it 'defaults to vendor_guid field when AcademicBenchmark.use_new_guid_columns? not set' do
-          allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return false
-          expect(guids).to include('lion', 'bear', 'monkey')
-        end
-
-        it 'defaults to vendor_guid_2 field when AcademicBenchmark.use_new_guid_columns? set' do
-          allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
-          expect(guids).to include('tiger', 'bear', 'monkey')
+        it 'defaults to vendor_guid' do
+          expect(guids).to include('lion')
         end
 
         it 'uses canvas id for vendor_guid if and only if vendor_guid is not present' do
-          expect(guids).to include("canvas_outcome_group:#{@child_group_2_1.id}")
+          expect(guids).to include("canvas_outcome_group:#{@child_group_1_1.id}")
         end
       end
 
@@ -241,28 +233,16 @@ describe "Outcome Reports" do
 
       context 'with vendor guids' do
         before(:once) do
-          @root_outcome_1.update! vendor_guid: 'lion', vendor_guid_2: 'tiger'
-          @root_outcome_2.update! vendor_guid: 'bear'
-          @root_outcome_3.update! vendor_guid: 'llama'
+          @root_outcome_1.update! vendor_guid: 'lion'
         end
 
-        it 'defaults to vendor_guid field when AcademicBenchmark.use_new_guid_columns? not set' do
-          allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return false
+        it 'defaults to vendor_guid' do
           expect(find_object(@root_outcome_1)['vendor_guid']).to eq 'lion'
-          expect(find_object(@root_outcome_2)['vendor_guid']).to eq 'bear'
-          expect(find_object(@root_outcome_3)['vendor_guid']).to eq 'llama'
-        end
-
-        it 'defaults to vendor_guid_2 field when AcademicBenchmark.use_new_guid_columns? set' do
-          allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return true
-          expect(find_object(@root_outcome_1)['vendor_guid']).to eq 'tiger'
-          expect(find_object(@root_outcome_2)['vendor_guid']).to eq 'bear'
-          expect(find_object(@root_outcome_3)['vendor_guid']).to eq 'llama'
         end
 
         it 'uses canvas id for vendor_guid if vendor_guid is not present' do
-          guid = "canvas_outcome:#{@root_outcome_4.id}"
-          expect(find_object(@root_outcome_4)['vendor_guid']).to eq guid
+          guid = "canvas_outcome:#{@root_outcome_2.id}"
+          expect(find_object(@root_outcome_2)['vendor_guid']).to eq guid
         end
       end
 

@@ -226,6 +226,7 @@ describe Lti::ContentItemSelectionRequest do
             'iframe',
             'window'
           )
+          expect(params['accept_multiple']).to eq("true")
         end
 
         it 'adds params for the resource_selection placement' do

@@ -23,7 +23,9 @@ import StudentColumnHeader from './StudentColumnHeader'
 function getProps(gradebook, options) {
   const columnId = 'student'
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
-  const {direction, settingKey} = sortRowsBySetting
+  const {columnId: currentColumnId, direction, settingKey} = sortRowsBySetting
+
+  const studentSettingKey = currentColumnId === 'student' ? settingKey : 'sortable_name'
 
   return {
     ref: options.ref,
@@ -64,10 +66,10 @@ function getProps(gradebook, options) {
         gradebook.setSortRowsBySetting(columnId, 'login_id', direction)
       },
       onSortInAscendingOrder: () => {
-        gradebook.setSortRowsBySetting(columnId, settingKey, 'ascending')
+        gradebook.setSortRowsBySetting(columnId, studentSettingKey, 'ascending')
       },
       onSortInDescendingOrder: () => {
-        gradebook.setSortRowsBySetting(columnId, settingKey, 'descending')
+        gradebook.setSortRowsBySetting(columnId, studentSettingKey, 'descending')
       },
       // sort functions with additional sort options disabled
       onSortBySortableNameAscending: () => {

@@ -28,7 +28,7 @@ module Login::Shared
   end
 
   def successful_login(user, pseudonym, otp_passed = false)
-    CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
+    reset_authenticity_token!
     Auditors::Authentication.record(pseudonym, 'login')
 
     # Since the user just logged in, we'll reset the context to include their info.
@@ -95,7 +95,7 @@ module Login::Shared
   end
 
   def logout_current_user
-    CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
+    reset_authenticity_token!
     Auditors::Authentication.record(@current_pseudonym, 'logout')
     Canvas::LiveEvents.logged_out
     Lti::LogoutService.queue_callbacks(@current_pseudonym)

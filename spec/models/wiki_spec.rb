@@ -151,10 +151,6 @@ describe Wiki do
       it 'should give update_page rights to students' do
         expect(@course.wiki.grants_right?(@user, :update_page)).to be_truthy
       end
-
-      it 'should give update_page_content rights to students' do
-        expect(@course.wiki.grants_right?(@user, :update_page_content)).to be_truthy
-      end
     end
   end
 

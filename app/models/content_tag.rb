@@ -193,6 +193,8 @@ class ContentTag < ActiveRecord::Base
         'quiz'
       elsif self.content && self.content.submission_types == 'discussion_topic'
         'discussion_topic'
+      elsif self&.content&.quiz_lti?
+        'lti-quiz'
       else
         'assignment'
       end

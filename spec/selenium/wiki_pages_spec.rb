@@ -20,6 +20,10 @@ require_relative 'helpers/wiki_and_tiny_common'
 require_relative 'helpers/public_courses_context'
 require_relative 'helpers/files_common'
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+# for this file
+RSpec.shared_examples "wiki_pages" do
 describe "Wiki Pages" do
   include_context "in-process server selenium tests"
   include FilesCommon
@@ -35,6 +39,7 @@ describe "Wiki Pages" do
     before do
       account_model
       course_with_teacher_logged_in :account => @account
+      set_granular_permission
     end
 
     it "should navigate to pages tab with no front page set", priority: "1", test_id: 126843 do
@@ -128,6 +133,7 @@ describe "Wiki Pages" do
     before do
       account_model
       course_with_teacher_logged_in
+      set_granular_permission
     end
 
     it "should edit page title from pages index", priority: "1", test_id: 126849 do
@@ -157,6 +163,7 @@ describe "Wiki Pages" do
   context "Index Page as a student" do
     before do
       course_with_student_logged_in
+      set_granular_permission
     end
 
     it "should display a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
@@ -176,7 +183,6 @@ describe "Wiki Pages" do
   end
 
   context "Accessibility" do
-
     def check_header_focus(attribute)
       f("[data-sort-field='#{attribute}']").click
       wait_for_ajaximations
@@ -193,6 +199,7 @@ describe "Wiki Pages" do
 
     before :each do
       user_session(@user)
+      set_granular_permission
     end
 
     it "returns focus to the header item clicked while sorting" do
@@ -464,9 +471,13 @@ describe "Wiki Pages" do
   end
 
   context "Insert RCE File" do
+    before do
+      course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
+      set_granular_permission
+    end
+
     it "should insert a file using RCE in the wiki page", priority: "1", test_id: 126673 do
       stub_rcs_config
-      course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
       @course.wiki_pages.create!(:title => "Bar")
       user_session(@user)
       file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
@@ -481,6 +492,7 @@ describe "Wiki Pages" do
     before do
       account_model
       course_with_student_logged_in account: @account
+      set_granular_permission
     end
 
     it "should lock page based on module date", priority: "1", test_id: 126845 do
@@ -529,6 +541,7 @@ describe "Wiki Pages" do
   context "Permissions" do
     before do
       course_with_teacher
+      set_granular_permission
     end
 
     it "displays public content to unregistered users", priority: "1", test_id: 270035 do
@@ -549,6 +562,7 @@ describe "Wiki Pages" do
   context "menu tools" do
     before do
       course_with_teacher_logged_in
+      set_granular_permission
       @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.wiki_page_menu = {:url => "http://www.example.com", :text => "Export Wiki Page"}
       @tool.save!
@@ -587,6 +601,8 @@ describe "Wiki Pages" do
     include_context "public course as a logged out user"
 
     it "should display wiki content", priority: "1", test_id: 270035 do
+      @coures = public_course
+      set_granular_permission
       title = "foo"
       public_course.wiki_pages.create!(:title => title, :body => "bar")
 
@@ -598,6 +614,7 @@ describe "Wiki Pages" do
   context "embed video in a Page" do
     before :each do
       course_with_teacher_logged_in :account => @account, :active_all => true
+      set_granular_permission
       @course.wiki_pages.create!(title: 'Page1')
     end
 
@@ -631,6 +648,8 @@ describe "Wiki Pages" do
     it "should load mathjax in a page with <math>" do
       skip('Unskip in ADMIN-2684')
       title = "mathML"
+      @course = public_course
+      set_granular_permission
       public_course.wiki_pages.create!(
         :title => title,
         :body => "<math><mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup></math>"
@@ -642,11 +661,26 @@ describe "Wiki Pages" do
 
     it "should not load mathjax without <math>" do
       title = "not_mathML"
+      @course = public_course
+      set_granular_permission
       public_course.wiki_pages.create!(:title => title, :body => "not mathML")
       get "/courses/#{public_course.id}/wiki/#{title}"
       is_mathjax_loaded = driver.execute_script("return (typeof MathJax == 'object')")
       expect(is_mathjax_loaded).not_to match(true)
 
     end
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "wiki_pages" do
+    let(:set_granular_permission) { @course.root_account.enable_feature!(:granular_permissions_wiki_pages) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "wiki_pages" do
+    let(:set_granular_permission) { @course.root_account.disable_feature!(:granular_permissions_wiki_pages) }
   end
 end

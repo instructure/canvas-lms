@@ -59,7 +59,7 @@
     "message": "{ count, plural,\n    one {Prikaži # zaključen element}\n  other {Prikaži # zaključene elemente}\n}"
   },
   "course_8a63b4a3": { "message": "Predmet" },
-  "course_to_do_bcbbab54": { "message": "{ course } SEZNAM OPRAVIL" },
+  "course_to_do_bcbbab54": { "message": "{ course } ČAKAJOČA OPRAVILA" },
   "date_at_time_dbdb1b99": { "message": "{ date } ob { time }" },
   "date_ee500367": { "message": "Datum" },
   "date_is_not_a_valid_date_4ef9f8ba": {
@@ -77,8 +77,8 @@
   },
   "dismissed_8b0b1fc9": { "message": "Opuščeno" },
   "dismissed_opportunities_f0826640": { "message": "Opuščene priložnosti" },
-  "due_5d7267be": { "message": "Rok:" },
-  "due_date_124fdd99": { "message": "Rok: { date }" },
+  "due_5d7267be": { "message": "Roki:" },
+  "due_date_124fdd99": { "message": "Roki: { date }" },
   "edit_c5fbea07": { "message": "Uredi" },
   "edit_title_72e5a21e": { "message": "Uredi { title }" },
   "error_loading_grades_e0b38f4d": { "message": "Napaka pri nalaganju ocen" },
@@ -200,7 +200,7 @@
   },
   "submitted_318fad53": { "message": "Poslano" },
   "success_to_do_created_e34ed395": {
-    "message": "Uspešno: Seznam opravil je ustvarjen."
+    "message": "Uspešno: Čakajoča opravila je ustvarjen."
   },
   "task_16b0ef38": { "message": "Opravilo" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
@@ -212,8 +212,8 @@
   "time_2b5aac58": { "message": "Čas" },
   "title_ee03d132": { "message": "Naslov" },
   "title_is_required_6ddcab69": { "message": "zahtevan je naslov" },
-  "to_do_1d554f36": { "message": "Seznam opravil" },
-  "to_do_date_4b211ad0": { "message": "Seznam opravil: { date }" },
+  "to_do_1d554f36": { "message": "Čakajoča opravila" },
+  "to_do_date_4b211ad0": { "message": "Čakajoča opravila: { date }" },
   "to_do_items_loading_d1cdfcd5": {
     "message": "Nalaganje elementov seznama opravil"
   },
@@ -233,6 +233,6 @@
     "message": "Predložiti morate datum in čas."
   },
   "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Z drsnikom ste se pomaknili na čisto prvi seznam opravil."
+    "message": "Z drsnikom ste se pomaknili na čisto prvi čakajoča opravila."
   }
 }

@@ -1221,6 +1221,14 @@ pt-BR:
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
+  number:
+    currency:
+      format:
+        delimiter: "."
+        separator: ","
+    format:
+      delimiter: "."
+      separator: ","
 ru:
   bigeasy_locale: ru_RU
   date:

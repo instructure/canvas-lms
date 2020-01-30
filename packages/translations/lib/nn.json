@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Audiospelar for { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Auto-lagra innhald finst. Vil du laste inn auto-lagra innhald i staden for?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Opne automatisk i integrert førehandsvising (sjå førehandsvisinga etter lagring)"
     },
@@ -149,8 +152,14 @@
     "click_to_embed_imagename_c41ea8df": {
         "message": "Klikk for å sette inn { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Klikk for å skjule førehandsvising"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Klikk for å setje inn ei lenke i editoren. "
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Klikk for å vise førehandsvising"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Om du lukkar menyen eller dialogen, kjem du tilbake til redigeringsområdet"
@@ -434,6 +443,9 @@
     "formatting_5b143aa8": {
         "message": "Formatering"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Fann auto-lagra innhald"
+    },
     "generating_preview_45b53be0": {
         "message": "Genererer førehandsvising..."
     },
@@ -644,6 +656,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Ingen innleveringsfristar er sett opp"
     },
+    "no_e16d9132": {
+        "message": "Nei"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Inga vurdering"
     },
@@ -743,6 +758,9 @@
     "preformatted_d0670862": {
         "message": "Førehandsformatert"
     },
+    "preview_53003fd2": {
+        "message": "Førehandsvising"
+    },
     "preview_a3f8f854": {
         "message": "Førehandsvisning"
     },
@@ -784,6 +802,9 @@
     },
     "replies_4a8577c8": {
         "message": "Svar"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Gjenopprette auto-lagring?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Redigeringsprogram for rikt innhald"
@@ -1066,6 +1087,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki-startside"
+    },
+    "yes_dde87d5": {
+        "message": "Ja"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "I går på { date }"

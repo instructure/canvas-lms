@@ -524,6 +524,13 @@ describe FilesController do
         get 'show', params: {:user_id => @student.id, :id => @attachment.id, :inline => 1}
         expect(response).to be_successful
       end
+
+      it "is successful when viewing as an admin even if locked" do
+        @file.locked = true
+        @file.save!
+        get 'show', params: {:course_id => @course.id, :id => @file.id}
+        expect(response).to be_successful
+      end
     end
 
     describe "canvadoc_session_url" do

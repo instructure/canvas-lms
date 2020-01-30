@@ -871,38 +871,6 @@ describe GradebooksController do
             expect(allow_final_grade_override).to eq false
           end
 
-          # TODO: remove these specs once we no longer need the fallback behavior (GRADE-2124)
-          context "when the course setting is not set" do
-            before(:each) do
-              settings_without_override = @course.settings.dup
-              settings_without_override.delete(:allow_final_grade_override)
-
-              @course.settings = settings_without_override
-              @course.save!
-            end
-
-            it "sets allow_final_grade_override to true if the current user's preference is true" do
-              @teacher.preferences.deep_merge!({
-                gradebook_settings: {@course.id => {"show_final_grade_overrides" => "true"}}
-              })
-              get :show, params: { course_id: @course.id }
-              expect(allow_final_grade_override).to eq true
-            end
-
-            it "sets allow_final_grade_override to false if the current user's preference is false" do
-              @teacher.preferences.deep_merge!({
-                gradebook_settings: {@course.id => {"show_final_grade_overrides" => "false"}}
-              })
-              get :show, params: { course_id: @course.id }
-              expect(allow_final_grade_override).to eq false
-            end
-
-            it "sets allow_final_grade_override to false if the current user's preference does not exist" do
-              get :show, params: { course_id: @course.id }
-              expect(allow_final_grade_override).to eq false
-            end
-          end
-
           it "sets allow_final_grade_override to false when 'Final Grade Override' is not enabled" do
             @course.disable_feature!(:final_grades_override)
             get :show, params: { course_id: @course.id }
@@ -2473,6 +2441,30 @@ describe GradebooksController do
       it "is not set if New Gradebook is not enabled" do
         get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
         expect(assigns[:js_env]).not_to include(:post_policies_enabled)
+      end
+    end
+
+    describe "new_gradebook_plagiarism_icons_enabled" do
+      it "is set to true if New Gradebook is on and New Gradebook Plagiarism Icons are on" do
+        @course.enable_feature!(:new_gradebook)
+        @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+
+        get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
+        expect(assigns[:js_env][:new_gradebook_plagiarism_icons_enabled]).to be true
+      end
+
+      it "is not set if New Gradebook is on but the New Gradebook Plagiarism Icons are off" do
+        @course.enable_feature!(:new_gradebook)
+
+        get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
+        expect(assigns[:js_env]).not_to include(:new_gradebook_plagiarism_icons_enabled)
+      end
+
+      it "is not set if New Gradebook is off" do
+        @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+
+        get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
+        expect(assigns[:js_env]).not_to include(:new_gradebook_plagiarism_icons_enabled)
       end
     end
   end

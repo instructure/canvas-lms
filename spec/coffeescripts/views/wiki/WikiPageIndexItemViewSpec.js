@@ -67,7 +67,7 @@ test('only shows direct share menu items if enabled', () => {
   const view = new WikiPageIndexItemView({
     model: new WikiPage(),
     collectionHasTodoDate: () => {},
-    WIKI_RIGHTS: {read: true, manage: true},
+    WIKI_RIGHTS: {read: true, manage: true, update: true},
     CAN: {MANAGE: true}
   })
   view.render()
@@ -101,7 +101,9 @@ testRights('CAN (manage course)', {
   contextName: 'courses',
   WIKI_RIGHTS: {
     read: true,
-    manage: true
+    manage: true,
+    publish_page: true,
+    create_page: true
   },
   CAN: {
     MANAGE: true,
@@ -114,7 +116,9 @@ testRights('CAN (manage group)', {
   contextName: 'groups',
   WIKI_RIGHTS: {
     read: true,
-    manage: true
+    manage: true,
+    publish_page: false,
+    create_page: true
   },
   CAN: {
     MANAGE: true,
@@ -136,5 +140,55 @@ testRights('CAN (null)', {
   CAN: {
     MANAGE: false,
     PUBLISH: false
+  }
+})
+
+// Tests for granular permissions, with manage permission removed
+
+testRights('CAN (create page - course)', {
+  contextName: 'courses',
+  WIKI_RIGHTS: {create_page: true},
+  CAN: {
+    MANAGE: true,
+    PUBLISH: false,
+    DUPLICATE: true,
+    UPDATE: false,
+    DELETE: false
+  }
+})
+
+testRights('CAN (create page - group)', {
+  contextName: 'groups',
+  WIKI_RIGHTS: {create_page: true},
+  CAN: {
+    MANAGE: true,
+    PUBLISH: false,
+    DUPLICATE: false,
+    UPDATE: false,
+    DELETE: false
+  }
+})
+
+testRights('CAN (delete page)', {
+  contextName: 'courses',
+  WIKI_RIGHTS: {delete_page: true},
+  CAN: {
+    MANAGE: true,
+    PUBLISH: false,
+    DUPLICATE: false,
+    UPDATE: false,
+    DELETE: true
+  }
+})
+
+testRights('CAN (update page)', {
+  contextName: 'courses',
+  WIKI_RIGHTS: {update: true, publish_page: true},
+  CAN: {
+    MANAGE: true,
+    PUBLISH: true,
+    DUPLICATE: false,
+    UPDATE: true,
+    DELETE: false
   }
 })

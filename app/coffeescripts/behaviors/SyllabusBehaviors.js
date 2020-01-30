@@ -226,7 +226,7 @@ function bindToMiniCalendar() {
 }
 
 // Binds to edit syllabus dom events
-const bindToEditSyllabus = function() {
+const bindToEditSyllabus = function(course_summary_enabled) {
   const $course_syllabus = $('#course_syllabus')
   $course_syllabus.data('syllabus_body', ENV.SYLLABUS_BODY)
   const $edit_syllabus_link = $('.edit_syllabus_link')
@@ -331,6 +331,9 @@ const bindToEditSyllabus = function() {
     },
 
     success(data) {
+      if (data.course.settings.syllabus_course_summary !== course_summary_enabled) {
+        return window.location.reload()
+      }
       /*
       xsslint safeString.property syllabus_body
       */

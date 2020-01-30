@@ -1,0 +1,7 @@
+---
+outcome_alignment_non_scoring_content:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Outcome alignment to non-scoring content
+  description: |-
+    Allows aligning outcomes to non-scoring content

@@ -79,6 +79,7 @@ import {isPostable} from 'jsx/grading/helpers/SubmissionHelper'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
 import {Button} from '@instructure/ui-buttons'
 import {IconSettingsSolid} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_date_and_time'
@@ -1516,13 +1517,18 @@ export default do ->
       )
 
     renderSettingsButton: =>
+      iconSettingsSolid = React.createElement(IconSettingsSolid)
+
       buttonMountPoint = document.getElementById('gradebook-settings-modal-button-container')
       buttonProps =
+        icon: iconSettingsSolid,
         id: 'gradebook-settings-button',
         variant: 'icon',
         onClick: @gradebookSettingsModal.open
-      iconSettingsSolid = React.createElement(IconSettingsSolid, { title: I18n.t('Gradebook Settings') })
-      @gradebookSettingsModalButton = renderComponent(Button, buttonMountPoint, buttonProps, iconSettingsSolid)
+
+      screenReaderContent = React.createElement(ScreenReaderContent, {}, I18n.t('Gradebook Settings'))
+      settingsTitle = I18n.t('Gradebook Settings')
+      @gradebookSettingsModalButton = renderComponent(Button, buttonMountPoint, buttonProps, screenReaderContent)
 
     renderStatusesModal: =>
       statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']")

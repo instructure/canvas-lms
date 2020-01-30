@@ -97,6 +97,58 @@ describe "course syllabus" do
     end
   end
 
+  context "syllabus course summary option" do
+    before :once do
+      course_with_teacher :active_all => true
+    end
+
+    before :each do
+      user_session @teacher
+    end
+
+    context "feature off" do
+      it "does not show the option" do
+        get "/courses/#{@course.id}/assignments/syllabus"
+        f('.edit_syllabus_link').click
+        wait_for_dom_ready
+        expect(f('#edit_course_syllabus_form')).not_to contain_css('#course_syllabus_course_summary')
+      end
+    end
+
+    context "feature on" do
+      before :once do
+        Account.site_admin.enable_feature! :syllabus_course_summary_option
+      end
+
+      it "toggles the course summary off" do
+        get "/courses/#{@course.id}/assignments/syllabus"
+        expect(f('#content')).to contain_css('#syllabusContainer')
+
+        f('.edit_syllabus_link').click
+        wait_for_dom_ready
+        expect(is_checked('#course_syllabus_course_summary')).to eq true
+        f('label[for="course_syllabus_course_summary"]').click
+        expect_new_page_load { find_button("Update Syllabus").click }
+        expect(f('#content')).not_to contain_css('#syllabusContainer')
+      end
+
+      it "toggles the course summary on" do
+        @course.syllabus_course_summary = false
+        @course.save!
+
+        get "/courses/#{@course.id}/assignments/syllabus"
+        expect(f('#content')).not_to contain_css('#syllabusContainer')
+
+        f('.edit_syllabus_link').click
+        wait_for_dom_ready
+        expect(is_checked('#course_syllabus_course_summary')).to eq false
+        f('label[for="course_syllabus_course_summary"]').click
+        expect_new_page_load { find_button("Update Syllabus").click }
+        expect(f('#content')).to contain_css('#syllabusContainer')
+      end
+    end
+  end
+
   context "when a public course is accessed" do
     include_context "public course as a logged out user"
 

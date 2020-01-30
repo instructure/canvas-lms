@@ -274,19 +274,13 @@ class WikiPage < ActiveRecord::Base
     given {|user| user && self.can_edit_page?(user)}
     can :update_content and can :read_revisions
 
-    given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :create_page)}
+    given {|user, session| user && self.wiki.grants_right?(user, session, :create_page)}
     can :create
 
     given {|user, session| user && self.can_edit_page?(user) && self.wiki.grants_right?(user, session, :update_page)}
     can :update and can :read_revisions
 
-    given {|user, session| user && self.can_edit_page?(user) && self.published? && self.wiki.grants_right?(user, session, :update_page_content)}
-    can :update_content and can :read_revisions
-
-    given {|user, session| user && self.can_edit_page?(user) && self.published? && self.wiki.grants_right?(user, session, :delete_page)}
-    can :delete
-
-    given {|user, session| user && self.can_edit_page?(user) && self.unpublished? && self.wiki.grants_right?(user, session, :delete_unpublished_page)}
+    given {|user, session| user && can_read_page?(user) && self.wiki.grants_right?(user, session, :delete_page)}
     can :delete
   end
 
@@ -298,8 +292,8 @@ class WikiPage < ActiveRecord::Base
   def can_edit_page?(user, session=nil)
     return false unless can_read_page?(user, session)
 
-    # wiki managers are always allowed to edit
-    return true if wiki.grants_right?(user, session, :manage)
+    # wiki managers are always allowed to edit.
+    return true if wiki.grants_right?(user, session, :update)
 
     roles = effective_roles
     # teachers implies all course admins (teachers, TAs, etc)
@@ -320,7 +314,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def available_for?(user, session=nil)
-    return true if wiki.grants_right?(user, session, :manage)
+    return true if wiki.grants_right?(user, session, :update)
 
     return false unless published? || (unpublished? && wiki.grants_right?(user, session, :view_unpublished_items))
     return false if locked_for?(user, :deep_check_if_needed => true)

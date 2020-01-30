@@ -80,7 +80,7 @@ module Canvas
 
         # pre-cache an entire tree
         tree_key = [tree, service, environment].compact.join("/")
-        subtree = Cache.fetch(tree_key + '/', ttl: ttl) do
+        subtree = LocalCache.fetch(CACHE_KEY_PREFIX + tree_key + '/', expires_in: ttl) do
           result = @kv_client.get(tree_key, :recurse, :stale)
           result.values if result&.status == 200
         end
@@ -89,12 +89,12 @@ module Canvas
         keys.each do |full_key|
           # these keys will have been populated (or not!) above; don't
           # actually try to fetch them
-          result = Cache.fetch(full_key)
+          result = LocalCache.fetch(CACHE_KEY_PREFIX + full_key)
           return result if result
         end
 
         fallback_keys.each do |full_key|
-          result = Cache.fetch(full_key, ttl: ttl) do
+          result = LocalCache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: ttl) do
             result = @kv_client.get(full_key, :stale)
             result.values if result&.status == 200
           end
@@ -102,7 +102,7 @@ module Canvas
         end
         nil
       rescue Imperium::TimeoutError => exception
-        Cache.fallback_fetch(keys.first).tap do |val|
+        LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
           if val
             Canvas::Errors.capture_exception(:consul, exception)
             val
@@ -169,7 +169,7 @@ module Canvas
             populate_cache("#{prefix}/#{k}", v, ttl)
           end
         else
-          Cache.insert(prefix, subtree, ttl: ttl)
+          LocalCache.write(CACHE_KEY_PREFIX + prefix, subtree, expires_in: ttl)
         end
       end
     end

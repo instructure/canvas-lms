@@ -293,6 +293,23 @@ describe Course do
       expect(migration.workflow_state).to eq('imported')
     end
 
+    it "automatically restores assignment groups for object assignment types (i.e. topics/quizzes)" do
+      params = {:copy => {"assignments" => {"gf455e2add230724ba190bb20c1491aa9" => true}}}
+      migration = build_migration(@course, params)
+      setup_import(@course, 'discussion_assignments.json', migration)
+      a1 = @course.assignments.where(:migration_id => "gf455e2add230724ba190bb20c1491aa9").take
+      a1.assignment_group.destroy!
+
+      # import again but just the discus
+      params = {:copy => {"discussion_topics" => {"g8bacee869e70bf19cd6784db3efade7e" => true}}}
+      migration = build_migration(@course, params)
+      setup_import(@course, 'discussion_assignments.json', migration)
+      dt = @course.discussion_topics.where(:migration_id => "g8bacee869e70bf19cd6784db3efade7e").take
+      expect(dt.assignment.assignment_group).to eq a1.assignment_group
+      expect(dt.assignment.assignment_group).to_not be_deleted
+      expect(a1.reload).to be_deleted # didn't restore the previously deleted assignment too
+    end
+
     context "when it is a Quizzes.Next migration" do
       let(:migration) do
         params = {:copy => {"everything" => true}}

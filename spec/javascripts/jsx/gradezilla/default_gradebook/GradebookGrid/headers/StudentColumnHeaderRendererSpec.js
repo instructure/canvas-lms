@@ -181,7 +181,10 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
     })
 
     test('sets sectionsEnabled to true when sections are in use', () => {
-      gradebook.gotSections([{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}])
+      gradebook.gotSections([
+        {id: '2001', name: 'Freshmen'},
+        {id: '2002', name: 'Sophomores'}
+      ])
       render()
       strictEqual(component.props.sectionsEnabled, true)
     })
@@ -194,7 +197,10 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
     test('sets studentGroupsEnabled to true when student groups are present', () => {
       gradebook.setStudentGroups([
         {
-          groups: [{id: '1', name: 'Default Group 1'}, {id: '2', name: 'Default Group 2'}],
+          groups: [
+            {id: '1', name: 'Default Group 1'},
+            {id: '2', name: 'Default Group 2'}
+          ],
           id: '1',
           name: 'Default Group'
         }
@@ -351,6 +357,58 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
         settingKey: 'sortable_name'
       }
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+    })
+
+    QUnit.module('when not currently sorting by the student column', () => {
+      test('defaults to the "sortable_name" key when "sort ascending" is selected', () => {
+        gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'descending')
+        render()
+        component.props.sortBySetting.onSortInAscendingOrder()
+        const expectedSetting = {
+          columnId: 'student',
+          direction: 'ascending',
+          settingKey: 'sortable_name'
+        }
+        deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+      })
+
+      test('defaults to the "sortable_name" key when "sort descending" is selected', () => {
+        gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'ascending')
+        render()
+        component.props.sortBySetting.onSortInDescendingOrder()
+        const expectedSetting = {
+          columnId: 'student',
+          direction: 'descending',
+          settingKey: 'sortable_name'
+        }
+        deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+      })
+    })
+
+    QUnit.module('when currently sorting by the student column', () => {
+      test('preserves the existing sort key when "sort ascending" is selected', () => {
+        gradebook.setSortRowsBySetting('student', 'integration_id', 'descending')
+        render()
+        component.props.sortBySetting.onSortInAscendingOrder()
+        const expectedSetting = {
+          columnId: 'student',
+          direction: 'ascending',
+          settingKey: 'integration_id'
+        }
+        deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+      })
+
+      test('preserves the existing sort key when "sort descending" is selected', () => {
+        gradebook.setSortRowsBySetting('student', 'integration_id', 'ascending')
+        render()
+        component.props.sortBySetting.onSortInDescendingOrder()
+        const expectedSetting = {
+          columnId: 'student',
+          direction: 'descending',
+          settingKey: 'integration_id'
+        }
+        deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
+      })
     })
 
     test('includes the "Sort by" settingKey', () => {

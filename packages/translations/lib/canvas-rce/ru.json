@@ -297,6 +297,9 @@
   "syllabus_f191f65b": { "message": "Содержание курса" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Стрелки" },
   "text_7f4593da": { "message": "Текст" },
+  "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+    "message": "Хотя у вашего видео правильный заголовок в браузере, нам не удалось обновить его в базе данных."
+  },
   "title_ee03d132": { "message": "Заголовок" },
   "to_be_posted_when_d24bf7dc": { "message": "Для размещения: { when }" },
   "to_do_when_2783d78f": { "message": "Задачи: { when }" },
@@ -335,6 +338,7 @@
     "message": "Используется скринридерами для описания видео"
   },
   "user_documents_c206e61f": { "message": "Документы пользователя" },
+  "user_files_78e21703": { "message": "Файлы пользователя" },
   "user_images_b6490852": { "message": "Изображения пользователя" },
   "user_media_14fbf656": { "message": "Пользовательское мультимедиа" },
   "video_audio_recording_uploaded_6af5d378": {

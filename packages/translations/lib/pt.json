@@ -914,6 +914,9 @@
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Não há pontos associados a este item"
     },
+    "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+        "message": "Embora o seu vídeo tenha o título correto no navegador, não o atualizámos na base de dados."
+    },
     "time_2b5aac58": {
         "message": "Hora"
     },
@@ -1009,6 +1012,9 @@
     },
     "user_documents_c206e61f": {
         "message": "Documentos do utilizador"
+    },
+    "user_files_78e21703": {
+        "message": "Ficheiros do utilizador"
     },
     "user_images_b6490852": {
         "message": "Imagens do utilizador"

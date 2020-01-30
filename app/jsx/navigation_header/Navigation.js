@@ -361,7 +361,7 @@ export default class Navigation extends React.Component {
             </div>
           </Tray>
         )}
-        {ENV.DIRECT_SHARE_ENABLED && (
+        {ENV.DIRECT_SHARE_ENABLED && ENV.current_user_id && (
           <UnreadComponent
             targetEl={
               this.unreadSharesCountElement ||

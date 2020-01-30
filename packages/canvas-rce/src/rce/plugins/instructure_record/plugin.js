@@ -43,12 +43,6 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
         const items = [
           {
             type: 'menuitem',
-            text: formatMessage('Upload/Record Media'),
-            onAction: () => ed.execCommand('instructureRecord')
-          },
-
-          {
-            type: 'menuitem',
             text: formatMessage('User Media'),
             onAction() {
               ed.focus(true)
@@ -65,6 +59,14 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
               ed.focus(true) // activate the editor without changing focus
               ed.execCommand('instructureTrayForMedia', false, COURSE_PLUGIN_KEY)
             }
+          })
+        }
+
+        if (!ed.getParam('hide_media_upload')) {
+          items.splice(1, 0, {
+            type: 'menuitem',
+            text: formatMessage('Upload/Record Media'),
+            onAction: () => ed.execCommand('instructureRecord')
           })
         }
 

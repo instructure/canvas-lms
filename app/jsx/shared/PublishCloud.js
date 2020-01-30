@@ -81,10 +81,13 @@ PublishCloud.render = function() {
           onClick={this.openRestrictedDialog}
           ref="publishCloud"
           className="btn-link published-status hiddenState"
-          title={I18n.t('Not visible in student files')}
-          aria-label={I18n.t('%{fileName} is not visible in student files - Click to modify', {
-            fileName
-          })}
+          title={I18n.t('Only available to students with link')}
+          aria-label={I18n.t(
+            '%{fileName} is only available to students with the link - Click to modify',
+            {
+              fileName
+            }
+          )}
         >
           <i className="icon-off icon-line" />
         </button>

@@ -156,6 +156,7 @@ class ApplicationController < ActionController::Base
           k12: k12?,
           use_responsive_layout: use_responsive_layout?,
           use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
+          rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
           DIRECT_SHARE_ENABLED: @domain_root_account.try(:feature_enabled?, :direct_share),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
@@ -185,6 +186,7 @@ class ApplicationController < ActionController::Base
         end
 
         @js_env[:lolcalize] = true if ENV['LOLCALIZE']
+        @js_env[:rce_auto_save_max_age_ms] = Setting.get('rce_auto_save_max_age_ms', 1.hour.to_i * 1000).to_i if @js_env[:rce_auto_save]
       end
     end
 

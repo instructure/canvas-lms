@@ -440,6 +440,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Термін виконання не призначено"
     },
+    "no_e16d9132": {
+        "message": "Ні"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Оцінка відсутня"
     },
@@ -502,6 +505,9 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } балів"
+    },
+    "preview_53003fd2": {
+        "message": "Попередній перегляд"
     },
     "previous_month_bb1e3c84": {
         "message": "Попередній місяць"
@@ -646,6 +652,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Домашня сторінка Wiki"
+    },
+    "yes_dde87d5": {
+        "message": "Так"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Вчора в { date }"

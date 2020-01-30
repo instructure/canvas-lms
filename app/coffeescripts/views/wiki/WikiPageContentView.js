@@ -77,7 +77,7 @@ export default class WikiPageContentView extends Backbone.View {
     json.CAN = {
       VIEW_ALL_PAGES: !!this.display_show_all_pages,
       VIEW_PAGES: !!this.WIKI_RIGHTS.read,
-      PUBLISH: !!this.WIKI_RIGHTS.manage && json.contextName === 'courses',
+      PUBLISH: !!this.WIKI_RIGHTS.publish_page,
       UPDATE_CONTENT: !!this.PAGE_RIGHTS.update || !!this.PAGE_RIGHTS.update_content,
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
       READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions

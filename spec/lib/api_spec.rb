@@ -850,6 +850,13 @@ describe Api do
     let(:response) { double('response', headers: {}) }
     let(:controller) { double('controller', request: request, response: response, params: {}) }
 
+    describe "#ordered_colection" do
+      it 'should order a relation' do
+        ordered = Api.ordered_collection(Course.all)
+        expect(ordered.to_sql).to include('ORDER BY "courses"."id"')
+      end
+    end
+
     describe "ordinal collection" do
       let(:collection) { [1, 2, 3] }
 

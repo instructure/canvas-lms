@@ -51,6 +51,13 @@ describe('GlobalNavigation', () => {
       expect(unreadComponent.mock.calls[0][0].dataUrl).toBe('/api/v1/conversations/unread_count')
     })
 
+    it('does not render the shares unread component when the user is not logged in', () => {
+      ENV.current_user_id = null
+      render(<Navigation unreadComponent={unreadComponent} />)
+      expect(unreadComponent).toHaveBeenCalledTimes(1)
+      expect(unreadComponent.mock.calls[0][0].dataUrl).toBe('/api/v1/conversations/unread_count')
+    })
+
     it('does not render the inbox unread component when user has opted out of notifications', () => {
       ENV.current_user_disabled_inbox = true
       render(<Navigation unreadComponent={unreadComponent} />)

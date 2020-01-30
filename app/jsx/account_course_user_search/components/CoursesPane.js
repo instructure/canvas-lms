@@ -107,7 +107,7 @@ class CoursesPane extends React.Component {
     this.setState(
       {
         errors: {},
-        draftFilters: {page: null, ...this.state.draftFilters, ...newFilters}
+        draftFilters: {...this.state.draftFilters, ...newFilters, page: null}
       },
       this.debouncedApplyFilters
     )

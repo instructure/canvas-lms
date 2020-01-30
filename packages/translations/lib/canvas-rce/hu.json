@@ -65,10 +65,12 @@
   "media_af190855": { "message": "Média" },
   "modules_c4325335": { "message": "Modulok" },
   "next_page_d2a39853": { "message": "Következő oldal" },
+  "no_e16d9132": { "message": "Nem" },
   "no_results_940393cf": { "message": "No results." },
   "options_3ab0ea65": { "message": "Beállítások" },
   "pages_e5414c2c": { "message": "Oldalak" },
   "people_b4ebb13c": { "message": "Résztvevők" },
+  "preview_53003fd2": { "message": "Előnézet" },
   "previous_page_928fc112": { "message": "Előző oldal" },
   "published_c944a23d": { "message": "publikált" },
   "quizzes_7e598f57": { "message": "Kvízek" },
@@ -87,5 +89,6 @@
   "upload_media_ce31135a": { "message": "Médiafájl feltöltése" },
   "url_22a5f3b8": { "message": "URL" },
   "video_player_b371005": { "message": "Videólejátszó" },
-  "wiki_home_9cd54d0": { "message": "Wiki kezdőlap" }
+  "wiki_home_9cd54d0": { "message": "Wiki kezdőlap" },
+  "yes_dde87d5": { "message": "Igen" }
 }

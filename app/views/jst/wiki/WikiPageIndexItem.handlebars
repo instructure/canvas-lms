@@ -22,35 +22,43 @@
       </a>
       <ul class="al-options">
         {{#unless cannot_edit_by_master_course}}
-          <li><a href="#" class="icon-edit edit-menu-item" title="{{#t}}Edit{{/t}}">{{#t}}Edit{{/t}}</a></li>
+          {{#if CAN.UPDATE}}
+            <li><a href="#" class="icon-edit edit-menu-item" title="{{#t}}Edit{{/t}}">{{#t}}Edit{{/t}}</a></li>
+          {{/if}}
         {{/unless}}
         {{#unless cannot_delete_by_master_course}}
-          <li>
-            <a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}"
-               title="{{#t}}Delete {{title}}{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>
-               {{#t}}Delete{{/t}}
-            </a>
-          </li>
+          {{#if CAN.DELETE}}
+            <li>
+              <a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}"
+                 title="{{#t}}Delete {{title}}{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>
+                 {{#t}}Delete{{/t}}
+              </a>
+            </li>
+          {{/if}}
         {{/unless}}
         {{#if front_page}}
-          <li>
-            <a href="#" class="unset-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
-               title="{{#t}}Remove as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
-                <i class="icon-remove-bookmark" aria-hidden="true">
-                 {{#t}}Remove as Front Page{{/t}}
-                </i>
-            </a>
-          </li>
+          {{#if CAN.UPDATE}}
+            <li>
+              <a href="#" class="unset-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
+                 title="{{#t}}Remove as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
+                  <i class="icon-remove-bookmark" aria-hidden="true">
+                   {{#t}}Remove as Front Page{{/t}}
+                  </i>
+              </a>
+            </li>
+          {{/if}}
         {{/if}}
         {{#unless front_page}}
-          <li>
-            <a href="#" class="use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
-               title="{{#t}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
-                <i class="icon-bookmark" aria-hidden="true">
-                  {{#t}}Use as Front Page{{/t}}
-                </i>
-            </a>
-          </li>
+          {{#if CAN.UPDATE}}
+            <li>
+              <a href="#" class="use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
+                 title="{{#t}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
+                  <i class="icon-bookmark" aria-hidden="true">
+                    {{#t}}Use as Front Page{{/t}}
+                  </i>
+              </a>
+            </li>
+          {{/if}}
         {{/unless}}
         {{#if CAN.DUPLICATE}}
           <li>

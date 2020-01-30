@@ -26,16 +26,12 @@ describe "Importing Learning Outcome Groups" do
   end
 
   it "should not generate a new outcome group when one already exists with the same guid" do
-    allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(false)
     log_data = {migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556", type: "learning_outcome_group",
                 title: "Stuff", description: "Detailed stuff"}
     Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 2
-    allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true)
-    Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
-    expect(@context.learning_outcome_groups.count).to eq 2
     existing_group = LearningOutcomeGroup.where(migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556").first
-    existing_group.write_attribute('migration_id_2', "779f2c13-ea41-4804-8d2c-64d46e429210")
+    existing_group.write_attribute('migration_id', "779f2c13-ea41-4804-8d2c-64d46e429210")
     existing_group.save!
     log_data[:migration_id] = "779f2c13-ea41-4804-8d2c-64d46e429210"
     Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)

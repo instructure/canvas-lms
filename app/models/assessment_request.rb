@@ -58,7 +58,12 @@ class AssessmentRequest < ActiveRecord::Base
     p.dispatch :peer_review_invitation
     p.to { self.assessor }
     p.whenever { |record|
-      record.assigned? && @send_reminder && !rubric_association
+      send_notification = record.assigned? && @send_reminder && !rubric_association
+      # Do not send notifications if the context is an unpublished course
+      # or if the asset is a submission and the assignment is unpublished
+      send_notification = false if self.context.is_a?(Course) && !self.context.workflow_state.in?(['available', 'completed'])
+      send_notification = false if self.asset.is_a?(Submission) && self.asset.assignment.workflow_state != "published"
+      send_notification
     }
   end
 

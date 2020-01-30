@@ -185,7 +185,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       WIKI_RIGHTS: ENV.WIKI_RIGHTS,
       PAGE_RIGHTS: {
         update: ENV.WIKI_RIGHTS.update_page,
-        update_content: ENV.WIKI_RIGHTS.update_page_content,
+        update_content: ENV.WIKI_RIGHTS.update_page,
         read_revisions: ENV.WIKI_RIGHTS.read_revisions
       }
     })
@@ -291,8 +291,8 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     const json = super.toJSON(...arguments)
     json.CAN = {
       CREATE: !!this.WIKI_RIGHTS.create_page,
-      MANAGE: !!this.WIKI_RIGHTS.manage,
-      PUBLISH: !!this.WIKI_RIGHTS.manage && this.contextName === 'courses'
+      MANAGE: !!this.WIKI_RIGHTS.update || !!this.WIKI_RIGHTS.delete_page,
+      PUBLISH: !!this.WIKI_RIGHTS.publish_page
     }
     json.CAN.VIEW_TOOLBAR = json.CAN.CREATE
     json.fetched = !!this.fetched

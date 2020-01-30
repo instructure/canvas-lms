@@ -914,6 +914,9 @@
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Er zijn geen punten gekoppeld aan dit item."
     },
+    "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+        "message": "Ook al krijgt je video de juiste titel in de browser, de video kon niet worden bijgewerkt in de database."
+    },
     "time_2b5aac58": {
         "message": "Tijd"
     },
@@ -1009,6 +1012,9 @@
     },
     "user_documents_c206e61f": {
         "message": "Gebruikersdocumenten"
+    },
+    "user_files_78e21703": {
+        "message": "Gebruikersbestanden"
     },
     "user_images_b6490852": {
         "message": "Gebruikersafbeeldingen"

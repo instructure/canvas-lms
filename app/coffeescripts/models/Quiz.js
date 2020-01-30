@@ -380,7 +380,8 @@ Quiz.prototype.defaults = {
   lock_at: null,
   unpublishable: true,
   points_possible: null,
-  post_to_sis: false
+  post_to_sis: false,
+  require_lockdown_browser: false
 }
 
 function __guard__(value, transform) {

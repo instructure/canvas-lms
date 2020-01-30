@@ -20,20 +20,45 @@
 
 def runCoverage() {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  return env.GERRIT_EVENT_TYPE == 'change-merged' || flags.forceRunCoverage() ? '1' : ''
+  return env.RUN_COVERAGE == '1' || flags.forceRunCoverage() ? '1' : ''
+}
+
+def isForceFailure() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return flags.isForceFailure() ? "1" : ''
 }
 
 def getImageTagVersion() {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
-  return flags.getImageTagVersion()
+  // total hack, we shouldnt do it like this. but until there is a better
+  // way of passing info across builds, this is path of least resistance..
+  // also, it didnt seem to work with multiple return statements, so i'll
+  // just go ahead and leave this monstrosity here.
+  return env.RUN_COVERAGE == '1' ? 'master' : flags.getImageTagVersion()
 }
 
-def copyTestFiles(name, tests_dir, coverage_dir) {
-  sh "mkdir -p ./tmp/$name"
-  sh "docker cp \$(docker ps -qa -f name=$name):/usr/src/app/$tests_dir ./tmp/$name"
-  if (env.COVERAGE == "1") {
-    sh "mkdir -p ./tmp/$name-coverage"
-    sh "docker cp \$(docker ps -qa -f name=$name):/usr/src/app/$coverage_dir ./tmp/$name-coverage"
+def copyFiles(docker_name, docker_dir, host_dir) {
+  sh "mkdir -p ./$host_dir"
+  sh "docker cp \$(docker ps -qa -f name=$docker_name):/usr/src/app/$docker_dir ./$host_dir"
+}
+
+def withSentry(block) {
+  def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+  credentials.withSentryCredentials(block)
+}
+
+def runInSeriesOrParallel(is_series, stages_map) {
+  if (is_series) {
+    echo "running tests in series: ${stages_map.keys}"
+    stages_map.each { name, block ->
+      stage(name) {
+        block()
+      }
+    }
+  }
+  else {
+    echo "running tests in parallel: ${stages_map.keys}"
+    parallel(stages_map)
   }
 }
 
@@ -46,6 +71,7 @@ pipeline {
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml:docker-compose.new-jenkins-karma.yml'
     COVERAGE = runCoverage()
+    FORCE_FAILURE = isForceFailure()
     NAME = getImageTagVersion()
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     SENTRY_URL="https://sentry.insops.net"
@@ -57,112 +83,82 @@ pipeline {
       steps {
         timeout(time: 2) {
           sh 'build/new-jenkins/docker-cleanup.sh'
+          sh 'printenv | sort'
+          sh 'rm -rf ./tmp/*'
         }
       }
     }
     stage('Tests Setup') {
       steps {
         timeout(time: 60) {
-          echo 'Running containers'
-          sh 'docker ps'
-          sh 'printenv | sort'
           sh 'build/new-jenkins/docker-compose-pull.sh'
-          sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'rm -rf ./tmp/*'
+          sh 'docker-compose build'
         }
       }
     }
-    stage('Tests') {
-      parallel {
-        stage('Jest') {
-          environment {
-            CONTAINER_NAME = 'tests-jest'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-jest.sh'
-          }
-          post {
-            always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-jest')
+
+    stage('Test Stage Coordinator') {
+      steps {
+        script {
+          def tests = [:]
+
+          tests['Jest'] = {
+            withEnv(['CONTAINER_NAME=tests-jest']) {
+              try {
+                withSentry {
+                  sh 'build/new-jenkins/js/tests-jest.sh'
+                }
+                if (env.COVERAGE == '1') {
+                  copyFiles(env.CONTAINER_NAME, 'coverage-jest', "./tmp/${env.CONTAINER_NAME}-coverage")
+                }
+              }
+              finally {
+                copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+              }
             }
           }
-        }
-        stage('Packages') {
-          environment {
-            CONTAINER_NAME = 'tests-packages'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-packages.sh'
-          }
-          post {
-            always {
-              copyTestFiles(env.CONTAINER_NAME, 'packages', 'packages')
+
+          tests['Packages'] = {
+            withEnv(['CONTAINER_NAME=tests-packages']) {
+              try {
+                withSentry {
+                  sh 'build/new-jenkins/js/tests-packages.sh'
+                }
+              }
+              finally {
+                copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
+              }
             }
           }
-        }
-        stage('canvas_quizzes') {
-          steps {
+          
+          tests['canvas_quizzes'] = {
             sh 'build/new-jenkins/js/tests-quizzes.sh'
           }
-        }
-        stage('Karma - Spec Group - coffee') {
-          environment {
-            JSPEC_GROUP = 'coffee'
-            CONTAINER_NAME = 'tests-karma-coffee'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-karma.sh'
-          }
-          post {
-            always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
+          
+          ['coffee', 'jsa', 'jsg', 'jsh'].each { group ->
+            tests["Karma - Spec Group - ${group}"] = {
+              withEnv(["CONTAINER_NAME=tests-karma-${group}", "JSPEC_GROUP=${group}"]) {
+                try {
+                  withSentry {
+                    sh 'build/new-jenkins/js/tests-karma.sh'
+                  }
+                  if (env.COVERAGE == '1') {
+                    copyFiles(env.CONTAINER_NAME, 'coverage-karma', "./tmp/${env.CONTAINER_NAME}-coverage")
+                  }
+                }
+                finally {
+                  copyFiles(env.CONTAINER_NAME, 'coverage-js', "./tmp/${env.CONTAINER_NAME}")
+                }
+              }
             }
           }
-        }
-        stage('Karma - Spec Group - jsa - A-F') {
-          environment {
-            JSPEC_GROUP = 'jsa'
-            CONTAINER_NAME = 'tests-karma-jsa'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-karma.sh'
-          }
-          post {
-            always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
-            }
-          }
-        }
-        stage('Karma - Spec Group - jsg - G') {
-          environment {
-            JSPEC_GROUP = 'jsg'
-            CONTAINER_NAME = 'tests-karma-jsg'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-karma.sh'
-          }
-          post {
-            always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
-            }
-          }
-        }
-        stage('Karma - Spec Group - jsh - H-Z') {
-          environment {
-            JSPEC_GROUP = 'jsh'
-            CONTAINER_NAME = 'tests-karma-jsh'
-          }
-          steps {
-            sh 'build/new-jenkins/js/tests-karma.sh'
-          }
-          post {
-            always {
-              copyTestFiles(env.CONTAINER_NAME, 'coverage-js', 'coverage-karma')
-            }
-          }
+
+          runInSeriesOrParallel(env.COVERAGE == '1', tests)
         }
       }
     }
+
+
     stage('Upload Coverage') {
       when { expression { env.COVERAGE == '1' } }
       steps {

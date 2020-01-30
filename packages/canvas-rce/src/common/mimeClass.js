@@ -77,6 +77,7 @@ export function mimeClass(file) {
         'audio/mid': 'audio',
         'audio/3gpp': 'audio',
         'audio/x-aiff': 'audio',
+        'audio/x-m4a': 'audio',
         'audio/x-mpegurl': 'audio',
         'audio/x-pn-realaudio': 'audio',
         'audio/x-wav': 'audio',
@@ -90,7 +91,9 @@ export function mimeClass(file) {
         'video/mp4': 'video',
         'video/webm': 'video',
         'application/x-shockwave-flash': 'flash'
-      }[contentType] || 'file'
+      }[contentType] ||
+      file.mime_class ||
+      'file'
     )
   }
 }

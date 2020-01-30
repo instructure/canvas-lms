@@ -2887,6 +2887,108 @@ describe 'Submissions API', type: :request do
       expect(json['excused']).to eq false
     end
 
+    context "group assignments" do
+      before do
+        @student2 = @course.enroll_student(User.create!, enrollment_state: :active).user
+        group_category = @course.group_categories.create!(name: "Category")
+        group = @course.groups.create!(name: "Group", group_category: group_category)
+        group.users = [@student, @student2]
+        @assignment.update!(group_category: group_category, grade_group_students_individually: false)
+      end
+
+      it "can set late policy status on a group member's submission" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          }, {
+            submission: {
+              late_policy_status: 'missing'
+            }
+          }
+        )
+
+        submission = @assignment.submission_for_student(@student2)
+        expect(submission.late_policy_status).to eq 'missing'
+      end
+
+      it "can set seconds_late_override on a group member's submission" do
+        seconds_late_override = 3.days
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: 'submissions_api',
+            action: 'update',
+            format: 'json',
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          }, {
+            submission: {
+              late_policy_status: 'late',
+              seconds_late_override: seconds_late_override
+            }
+          }
+        )
+
+        submission = @assignment.submission_for_student(@student2)
+        expect(submission.seconds_late).to eq seconds_late_override.to_i
+      end
+
+      it "does not excuse the whole group when excusing one group member" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          }, {
+            submission: {
+              excuse: "1",
+              late_policy_status: 'missing'
+            }
+          }
+        )
+
+        submission = @assignment.submission_for_student(@student2)
+        expect(submission).not_to be_excused
+      end
+
+      it "does not set late policy status for the whole group when assignment grades individually" do
+        @assignment.update!(grade_group_students_individually: true)
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          }, {
+            submission: {
+              late_policy_status: 'missing'
+            }
+          }
+        )
+
+        submission = @assignment.submission_for_student(@student2)
+        expect(submission.late_policy_status).not_to eq "missing"
+      end
+    end
+
     it "can set late policy status on a submission" do
       json = api_call(
         :put,

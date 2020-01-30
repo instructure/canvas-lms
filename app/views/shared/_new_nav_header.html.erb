@@ -93,16 +93,18 @@
               <div class="menu-item__text"><%= t('Dashboard') %></div>
             </a>
           </li>
-          <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('/courses') %>">
-            <a id="global_nav_courses_link" role="button" href="<%= courses_path %>" class="ic-app-header__menu-list-link">
-              <div class="menu-item-icon-container" aria-hidden="true">
-                <%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_courses_new_styles.svg") %>
-              </div>
-              <div class="menu-item__text">
-                <%= t('Courses') %>
-              </div>
-            </a>
-          </li>
+          <% if @current_user %>
+            <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('/courses') %>">
+              <a id="global_nav_courses_link" role="button" href="<%= courses_path %>" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container" aria-hidden="true">
+                  <%= render(partial: "shared/svg/#{'k12/' if k12?}svg_icon_courses_new_styles.svg") %>
+                </div>
+                <div class="menu-item__text">
+                  <%= t('Courses') %>
+                </div>
+              </a>
+            </li>
+          <% end %>
           <% if @current_user && @current_user.current_active_groups? %>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/groups') %>">
               <a id="global_nav_groups_link" role="button" href="/groups" class="ic-app-header__menu-list-link">

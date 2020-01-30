@@ -221,6 +221,8 @@ testRights('CAN (manage course)', {
   WIKI_RIGHTS: {
     read: true,
     create_page: true,
+    publish_page: true,
+    update: true,
     manage: true
   },
   CAN: {
@@ -235,6 +237,7 @@ testRights('CAN (manage group)', {
   WIKI_RIGHTS: {
     read: true,
     create_page: true,
+    update: true,
     manage: true
   },
   CAN: {
@@ -258,6 +261,28 @@ testRights('CAN (null)', {
   CAN: {
     CREATE: false,
     MANAGE: false,
+    PUBLISH: false
+  }
+})
+
+// Granular permissions tests
+
+testRights('CAN (read)', {
+  contextAssetString: 'course_73',
+  WIKI_RIGHTS: {update: true},
+  CAN: {
+    CREATE: false,
+    MANAGE: true,
+    PUBLISH: false
+  }
+})
+
+testRights('CAN (read)', {
+  contextAssetString: 'course_73',
+  WIKI_RIGHTS: {delete_page: true},
+  CAN: {
+    CREATE: false,
+    MANAGE: true,
     PUBLISH: false
   }
 })

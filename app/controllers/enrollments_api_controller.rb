@@ -410,7 +410,7 @@ class EnrollmentsApiController < ApplicationController
                                     course_index_enrollments :
                                     user_index_enrollments
 
-      use_bookmarking = Account.site_admin.feature_enabled?(:bookmarking_for_enrollments_index)
+      use_bookmarking = @domain_root_account&.feature_enabled?(:bookmarking_for_enrollments_index)
       enrollments = use_bookmarking ?
         enrollments.joins(:user).select("enrollments.*, users.sortable_name AS sortable_name") :
         enrollments.joins(:user).select("enrollments.*").

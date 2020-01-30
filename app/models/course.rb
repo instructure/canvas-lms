@@ -2356,8 +2356,8 @@ class Course < ActiveRecord::Base
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public, :is_public_to_auth_users, :public_syllabus,
       :public_syllabus_to_auth, :allow_student_wiki_edits, :show_public_context_messages,
-      :syllabus_body, :allow_student_forum_attachments, :lock_all_announcements,
-      :default_wiki_editing_roles, :allow_student_organized_groups,
+      :syllabus_body, :syllabus_course_summary, :allow_student_forum_attachments,
+      :lock_all_announcements, :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_total_grade_as_points, :allow_final_grade_override,
       :open_enrollment, :filter_speed_grader_by_student_group,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
@@ -2990,6 +2990,7 @@ class Course < ActiveRecord::Base
 
   add_setting :timetable_data, :arbitrary => true
   add_setting :syllabus_master_template_id
+  add_setting :syllabus_course_summary, :boolean => true, :default => true
   add_setting :syllabus_updated_at
 
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true

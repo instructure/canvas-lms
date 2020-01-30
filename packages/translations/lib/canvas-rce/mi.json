@@ -293,6 +293,9 @@
   "syllabus_f191f65b": { "message": "Marautanga" },
   "tab_arrows_4cf5abfc": { "message": "TAB/ngā pere" },
   "text_7f4593da": { "message": "Kuputuhi" },
+  "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+    "message": "Ahakoa tō ataata te taitara tika i roto i te tirotiro, i hapa te whakahou i roto i te pātengi raraunga."
+  },
   "title_ee03d132": { "message": "taitara" },
   "to_be_posted_when_d24bf7dc": { "message": "Hei whakairi: { when }" },
   "to_do_when_2783d78f": { "message": "Hei Mahi: { when }" },
@@ -331,6 +334,7 @@
     "message": "Whakamahia e ngā kaipānui mata hei whakāhua i te ataata"
   },
   "user_documents_c206e61f": { "message": "Kaiwhakamahi Tuhinga" },
+  "user_files_78e21703": { "message": "Ngā Kaiwhakamahi Kōnae" },
   "user_images_b6490852": { "message": "Ngā Āhua O Ngā Kaiwhakamahi" },
   "user_media_14fbf656": { "message": "Kaiwhakamahi Pāpāho" },
   "video_audio_recording_uploaded_6af5d378": {

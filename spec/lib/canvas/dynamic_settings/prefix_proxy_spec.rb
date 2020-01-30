@@ -25,7 +25,7 @@ module Canvas
       let(:proxy) { PrefixProxy.new('foo/bar', service: nil, tree: nil, default_ttl: 3.minutes, kv_client: client) }
 
       after(:each) do
-        Cache.reset!
+        LocalCache.clear
       end
 
       describe '.fetch(key, ttl: @default_ttl)' do
@@ -57,21 +57,21 @@ module Canvas
         end
 
         it 'must use the dynamic settings cache for previously fetched values' do
-          expect(Cache).to receive(:fetch).with('/', ttl: 3.minutes).ordered
-          expect(Cache).to receive(:fetch).with('foo/bar/baz').ordered
-          expect(Cache).to receive(:fetch).with('global/foo/bar/baz', ttl: 3.minutes).ordered
+          expect(LocalCache).to receive(:fetch).with(DynamicSettings::CACHE_KEY_PREFIX + '/', expires_in: 3.minutes).ordered
+          expect(LocalCache).to receive(:fetch).with(DynamicSettings::CACHE_KEY_PREFIX + 'foo/bar/baz').ordered
+          expect(LocalCache).to receive(:fetch).with(DynamicSettings::CACHE_KEY_PREFIX + 'global/foo/bar/baz', expires_in: 3.minutes).ordered
           proxy.fetch('baz')
         end
 
         it "must fall back to expired cached values when consul can't be contacted" do
-          Cache.store['foo/bar/baz'] = Cache::Value.new('qux', 3.minutes.ago)
+          LocalCache.write(DynamicSettings::CACHE_KEY_PREFIX + 'foo/bar/baz', 'qux', expires_in: -3.minutes)
           expect(client).to receive(:get).and_raise(Imperium::TimeoutError)
           val = proxy.fetch('baz')
           expect(val).to eq 'qux'
         end
 
         it "must log the connection failure when consul can't be contacted" do
-          Cache.store['foo/bar/baz'] = Cache::Value.new('qux', 3.minutes.ago)
+          LocalCache.write(DynamicSettings::CACHE_KEY_PREFIX + 'foo/bar/baz', 'qux', expires_in: -3.minutes)
           expect(Canvas::Errors).to receive(:capture_exception).
             with(:consul, an_instance_of(Imperium::TimeoutError))
           allow(client).to receive(:get).and_raise(Imperium::TimeoutError)

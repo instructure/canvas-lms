@@ -1918,8 +1918,6 @@ describe MasterCourses::MasterMigration do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
-      allow(AcademicBenchmark).to receive(:use_new_guid_columns?).and_return(true) # what is this
-
       lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "whee", :workflow_state => 'active')
       lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2},
         {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
@@ -1931,7 +1929,7 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
 
-      lo_to = @copy_to.created_learning_outcomes.where(:migration_id_2 => mig_id(lo)).first # what is that
+      lo_to = @copy_to.created_learning_outcomes.where(:migration_id => mig_id(lo)).first
 
       rub = Rubric.new(:context => @copy_from)
       rub.data = [{

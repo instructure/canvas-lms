@@ -1484,3 +1484,44 @@ QUnit.module('Assignment#showGradersAnonymousToGradersCheckbox', hooks => {
     equal(assignment.showGradersAnonymousToGradersCheckbox(), true)
   })
 })
+
+QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
+  let assignment
+
+  hooks.beforeEach(() => {
+    assignment = new Assignment()
+    fakeENV.setup({current_user_roles: []})
+  })
+
+  hooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('returns false if the assignment is not RLDB enabled', () => {
+    fakeENV.setup({current_user_roles: ['student']})
+    assignment.set('require_lockdown_browser', false)
+    assignment.set('is_quiz_lti_assignment', true)
+    equal(assignment.quizzesRespondusEnabled(), false)
+  })
+
+  test('returns false if the assignment is not a N.Q assignment', () => {
+    fakeENV.setup({current_user_roles: ['student']})
+    assignment.set('require_lockdown_browser', true)
+    assignment.set('is_quiz_lti_assignment', false)
+    equal(assignment.quizzesRespondusEnabled(), false)
+  })
+
+  test('returns false if the user is not a student', () => {
+    fakeENV.setup({current_user_roles: ['teacher']})
+    assignment.set('require_lockdown_browser', true)
+    assignment.set('is_quiz_lti_assignment', true)
+    equal(assignment.quizzesRespondusEnabled(), false)
+  })
+
+  test('returns true if the assignment is a RLDB enabled N.Q', () => {
+    fakeENV.setup({current_user_roles: ['student']})
+    assignment.set('require_lockdown_browser', true)
+    assignment.set('is_quiz_lti_assignment', true)
+    equal(assignment.quizzesRespondusEnabled(), true)
+  })
+})

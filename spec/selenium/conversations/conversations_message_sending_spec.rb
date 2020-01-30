@@ -199,6 +199,11 @@ describe "conversations new" do
       end
 
       it "should check and lock the bulk_message checkbox when over the max size", priority: "2", test_id: 206022 do
+        account_with_role_changes(
+          :account => @course.account,
+          :role => Role.where(name: 'StudentEnrollment').last,
+          :role_changes => {:send_messages_all => true}
+        )
         conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 
@@ -221,6 +226,11 @@ describe "conversations new" do
       end
 
       it "should leave the value the same as before after unlocking", priority: "2", test_id: 206023 do
+        account_with_role_changes(
+          :account => @course.account,
+          :role => Role.where(name: 'StudentEnrollment').last,
+          :role_changes => {:send_messages_all => true}
+        )
         conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 
@@ -241,13 +251,7 @@ describe "conversations new" do
       it "can compose a message to a single user", priority: "1", test_id: 117958 do
         conversations
         goto_compose_modal
-        fj('.btn.dropdown-toggle :contains("Select course")').click
-        wait_for_ajaximations
-
-        expect(f('.dropdown-menu.open')).to be_truthy
-
-        fj('.message-header-input .text:contains("Unnamed Course")').click
-        wait_for_ajaximations
+        select_message_course(@course)
 
         # check for auto complete to fill in 'first student'
         f('.ac-input-cell .ac-input').send_keys('first st')
@@ -274,13 +278,7 @@ describe "conversations new" do
 
           conversations
           goto_compose_modal
-          fj('.btn.dropdown-toggle :contains("Select course")').click
-          wait_for_ajaximations
-
-          f('.dropdown-menu.open')
-
-          fj('.message-header-input .text:contains("Unnamed Course")').click
-          wait_for_ajaximations
+          select_message_course(@course)
 
           f('.message-header-input .icon-address-book').click
           wait_for_ajaximations

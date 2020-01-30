@@ -22,7 +22,11 @@ import I18n from 'i18n!gradezilla'
 import htmlEscape from 'str/htmlEscape'
 import {extractDataTurnitin} from 'compiled/gradezilla/Turnitin'
 import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
-import {extractSimilarityInfo, isPostable} from '../../../../grading/helpers/SubmissionHelper'
+import {
+  extractSimilarityInfo,
+  isPostable,
+  similarityIcon
+} from '../../../../grading/helpers/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
 
 function getTurnitinState(submission) {
@@ -62,26 +66,6 @@ function formatGrade(submissionData, assignment, options) {
   return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions)
 }
 
-function renderSimilarityIcon(similarityData) {
-  const {status, similarity_score} = similarityData.entries[0].data
-
-  let iconClass
-  if (status === 'error') {
-    iconClass = 'icon-warning'
-  } else if (status === 'pending') {
-    iconClass = 'icon-clock'
-  } else if (similarity_score > 60) {
-    iconClass = 'icon-empty icon-Solid'
-  } else if (similarity_score > 20) {
-    iconClass = 'icon-oval-half icon-Solid'
-  } else {
-    iconClass = 'icon-certified icon-Solid'
-  }
-
-  // xsslint safeString.identifier iconClass
-  return `<i class="${iconClass}"></i>`
-}
-
 function renderStartContainer(options) {
   let content = ''
 
@@ -93,7 +77,7 @@ function renderStartContainer(options) {
     content += '<div class="Grid__GradeCell__InvalidGrade"><i class="icon-warning"></i></div>'
   } else if (options.similarityData != null) {
     // xsslint safeString.function renderSimilarityIcon
-    const similarityIconHtml = renderSimilarityIcon(options.similarityData)
+    const similarityIconHtml = similarityIcon(options.similarityData.entries[0].data)
     content += `<div class="Grid__GradeCell__OriginalityScore">${similarityIconHtml}</div>`
   }
 

@@ -62,10 +62,12 @@
   "loading_failed_b3524381": { "message": "Loading failed..." },
   "media_af190855": { "message": "Մուլտիմեդիա" },
   "modules_c4325335": { "message": "Մոդուլներ" },
+  "no_e16d9132": { "message": "Ոչ" },
   "no_results_940393cf": { "message": "No results." },
   "options_3ab0ea65": { "message": "Պարամետրեր" },
   "pages_e5414c2c": { "message": "Էջեր" },
   "people_b4ebb13c": { "message": "Մարդիկ" },
+  "preview_53003fd2": { "message": "Նախնական դիտում" },
   "published_c944a23d": { "message": "հրապարակված" },
   "quizzes_7e598f57": { "message": "Թեստեր" },
   "record_7c9448b": { "message": "Գրառում" },
@@ -82,5 +84,6 @@
   "upload_file_fd2361b8": { "message": "Բեռնել ֆայլը " },
   "url_22a5f3b8": { "message": "URL" },
   "video_player_b371005": { "message": "Տեսաձայնագրության նվագարկիչ" },
-  "wiki_home_9cd54d0": { "message": "Վիկիի տնային էջ" }
+  "wiki_home_9cd54d0": { "message": "Վիկիի տնային էջ" },
+  "yes_dde87d5": { "message": "Այո" }
 }

@@ -1,6 +1,5 @@
-# encoding: utf-8
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -28,18 +27,17 @@ describe AcademicBenchmark::Converter do
     @cm.converter_class = @plugin.settings['converter_class']
     @cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
     @cm.migration_settings[:import_immediately] = true
-    @cm.migration_settings[:base_url] = "http://example.com/"
     @cm.migration_settings[:migration_options] = {points_possible: 10, mastery_points: 6,
       ratings: [{description: 'Bad', points: 0}, {description: 'Awesome', points: 10}]}
     @cm.user = @user
     @cm.save!
 
-    @level_0_browse = File.join(File.dirname(__FILE__) + '/fixtures', 'example.json')
-    @a_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'a_levels_3.json')
-    @d_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'd_levels_3.json')
-    @j_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'j_levels_3.json')
-    @authority_list = File.join(File.dirname(__FILE__) + '/fixtures', 'auth_list.json')
-    @florida_auth_list = File.join(File.dirname(__FILE__) + '/fixtures', 'florida_auth_list.json')
+    current_settings = @plugin.settings
+    new_settings = current_settings.merge(:partner_id => "instructure", :partner_key => "secret")
+    allow(@plugin).to receive(:settings).and_return(new_settings)
+
+    @level_0_browse = File.join(File.dirname(__FILE__) + '/fixtures', 'api_all_standards_response.json')
+    @florida_auth_list = File.join(File.dirname(__FILE__) + '/fixtures', 'florida_auth_list_v3.json')
     File.open(@level_0_browse, 'r') do |file|
       @att = Attachment.create!(
         :filename => 'standards.json',
@@ -61,78 +59,85 @@ describe AcademicBenchmark::Converter do
 
   def verify_full_import
     @root_group = LearningOutcomeGroup.global_root_outcome_group
-    expect(@root_group.child_outcome_groups.count).to eq 1
+    expect(@root_group.child_outcome_groups.count).to eq 2
     a = @root_group.child_outcome_groups.first
-    expect(a.migration_id).to eq "aaaaaaaaaa"
-    expect(a.title).to eq "NGA Center/CCSSO"
+    expect(a.migration_id).to eq "CEC2CF6C-67AD-11DF-AB5F-995D9DFF4B22"
+    expect(a.title).to eq "CCSS.ELA-Literacy.CCRA.R - Reading"
     b = a.child_outcome_groups.first
-    expect(b.migration_id).to eq "bbbbbbbbbbbb"
-    expect(b.title).to eq "Common Core State Standards"
-    c = b.child_outcome_groups.first
-    expect(c.migration_id).to eq "cccccccccc"
-    expect(c.title).to eq "College- and Career-Readiness Standards and K-12 Mathematics"
-    d = c.child_outcome_groups.where(migration_id: "ddddddddd").first
-    expect(d.migration_id).to eq "ddddddddd"
-    expect(d.title).to eq "Kindergarten"
-    expect(d.low_grade).to eq "K"
-    expect(d.high_grade).to eq "K"
-    e = d.child_outcome_groups.first
-    expect(e.migration_id).to eq "eeeeeeeeeeee"
-    expect(e.title).to eq "K.CC - Counting and Cardinality"
-    expect(e.description).to eq "Counting and Cardinality"
-    expect(e.low_grade).to eq "K"
-    expect(e.high_grade).to eq "K"
-    f = e.child_outcome_groups.first
-    expect(f.migration_id).to eq "ffffffffffffff"
-    expect(f.title).to eq "Know number names and the count sequence."
-    expect(f.description).to eq "Know number names and the count sequence."
-    expect(f.low_grade).to eq "K"
-    expect(f.high_grade).to eq "K"
-    expect(f.child_outcome_links.count).to eq 3
-
-    g = LearningOutcome.global.where(migration_id: "ggggggggggggggggg").first
+    expect(b.migration_id).to eq "CEB79A48-67AD-11DF-AB5F-995D9DFF4B22"
+    expect(b.title).to eq "Key Ideas and Details"
+    g = LearningOutcome.global.where(migration_id: "CEB87C92-67AD-11DF-AB5F-995D9DFF4B22").first
     verify_rubric_criterion(g)
-    expect(g.short_description).to eq "K.CC.1"
-    expect(g.description).to eq "Count to 100 by ones and by tens."
-    g = LearningOutcome.global.where(migration_id: "hhhhhhhhhhhhhhhh").first
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.1"
+    expect(g.description).to eq "Read closely to determine what the text says explicitly and to make logical" \
+      " inferences from it; cite specific textual evidence when writing or speaking to support conclusions drawn" \
+      " from the text."
+    g = LearningOutcome.global.where(migration_id: "CEB8EE66-67AD-11DF-AB5F-995D9DFF4B22").first
     verify_rubric_criterion(g)
-    expect(g.short_description).to eq "K.CC.2"
-    expect(g.description).to eq "Count forward beginning from a given number within the known sequence (instead of having to begin at 1)."
-    g = LearningOutcome.global.where(migration_id: "iiiiiiiiiiiiiiiii").first
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.2"
+    expect(g.description).to eq "Determine central ideas or themes of a text and analyze their development;" \
+      " summarize the key supporting details and ideas."
+    g = LearningOutcome.global.where(migration_id: "CEB96684-67AD-11DF-AB5F-995D9DFF4B22").first
     verify_rubric_criterion(g)
-    expect(g.short_description).to eq "K.CC.3"
-    expect(g.description).to eq "Write numbers from 0 to 20. Represent a number of objects with a written numeral 0-20 (with 0 representing a count of no objects)."
-
-    j = c.child_outcome_groups.where(migration_id: "jjjjjjjjjjj").first
-    expect(j.migration_id).to eq "jjjjjjjjjjj"
-    expect(j.title).to eq "First Grade"
-    expect(j.low_grade).to eq "1"
-    expect(j.high_grade).to eq "1"
-    k = j.child_outcome_groups.last
-    expect(k.migration_id).to eq "kkkkkkkkkkk"
-    expect(k.title).to eq "1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé"
-    expect(k.description).to eq "zéééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
-    expect(k.low_grade).to eq "1"
-    expect(k.high_grade).to eq "1"
-    l = k.child_outcome_groups.first
-    expect(l.migration_id).to eq "lllllllll"
-    expect(l.title).to eq "Something else"
-    expect(l.description).to eq "Something else"
-    expect(l.low_grade).to eq "1"
-    expect(l.high_grade).to eq "1"
-    expect(l.child_outcome_links.count).to eq 1
-
-    m = LearningOutcome.global.where(migration_id: "mmmmmmmmmmm").first
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.3"
+    expect(g.description).to eq "Analyze how and why individuals, events, and ideas develop and interact over" \
+      " the course of a text."
+    g = LearningOutcome.global.where(migration_id: "CEBAB958-67AD-11DF-AB5F-995D9DFF4B22").first
     verify_rubric_criterion(g)
-    expect(m.short_description).to eq "1.DD.1"
-    expect(m.description).to eq "And something else"
-    expect(m.title).to eq "1.DD.1"
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.4"
+    expect(g.description).to eq "Interpret words and phrases as they are used in a text, including determining" \
+      " technical, connotative, and figurative meanings, and analyze how specific word choices shape meaning or tone."
+    g = LearningOutcome.global.where(migration_id: "CEBB9AA8-67AD-11DF-AB5F-995D9DFF4B22").first
+    verify_rubric_criterion(g)
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.5"
+    expect(g.description).to eq "Analyze the structure of texts, including how specific sentences, paragraphs," \
+      " and larger portions of the text (e.g., a section, chapter, scene, or stanza) relate to each other and" \
+      " the whole."
+    g = LearningOutcome.global.where(migration_id: "CEBC89F4-67AD-11DF-AB5F-995D9DFF4B22").first
+    verify_rubric_criterion(g)
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.6"
+    expect(g.description).to eq "Assess how point of view or purpose shapes the content and style of a text."
+    g = LearningOutcome.global.where(migration_id: "CEBDDCA0-67AD-11DF-AB5F-995D9DFF4B22").first
+    verify_rubric_criterion(g)
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.7"
+    expect(g.description).to eq "Integrate and evaluate content presented in diverse media and formats," \
+      " including visually and quantitatively, as well as in words."
+    g = LearningOutcome.global.where(migration_id: "CEBE4D52-67AD-11DF-AB5F-995D9DFF4B22").first
+    verify_rubric_criterion(g)
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.8"
+    expect(g.description).to eq "Delineate and evaluate the argument and specific claims in a text," \
+      " including the validity of the reasoning as well as the relevance and sufficiency of the evidence."
+    g = LearningOutcome.global.where(migration_id: "CEBF37B2-67AD-11DF-AB5F-995D9DFF4B22").first
+    verify_rubric_criterion(g)
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.9"
+    expect(g.description).to eq "Analyze how two or more texts address similar themes or topics in order" \
+      " to build knowledge or to compare the approaches the authors take."
+    g = LearningOutcome.global.where(migration_id: "CEC08B44-67AD-11DF-AB5F-995D9DFF4B22").first
+    verify_rubric_criterion(g)
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.R.10"
+    expect(g.description).to eq "Read and comprehend complex literary and informational texts independently" \
+      " and proficiently."
+    g = LearningOutcome.global.where(migration_id: "CEC49A36-67AD-11DF-AB5F-995D9DFF4B22").first
+    verify_rubric_criterion(g)
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.W.1"
+    expect(g.description).to eq "Write arguments to support claims in an analysis of substantive topics or" \
+      " texts, using valid reasoning and relevant and sufficient evidence."
+    g = LearningOutcome.global.where(migration_id: "CEC57CD0-67AD-11DF-AB5F-995D9DFF4B22").first
+    verify_rubric_criterion(g)
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.W.2"
+    expect(g.description).to eq "Write informative/explanatory texts to examine and convey complex ideas and" \
+      " information clearly and accurately through the effective selection, organization, and analysis of content."
+    g = LearningOutcome.global.where(migration_id: "CEC665B4-67AD-11DF-AB5F-995D9DFF4B22").first
+    verify_rubric_criterion(g)
+    expect(g.short_description).to eq "CCSS.ELA-Literacy.CCRA.W.3"
+    expect(g.description).to eq "Write narratives to develop real or imagined experiences or events" \
+      " using effective technique, well-chosen details, and well-structured event sequences."
   end
 
   def check_for_parent_num_duplication(outcome)
     parent = outcome.instance_variable_get('@parent')
-    if outcome.num && parent && parent.is_standard? && parent.title && outcome.num.include?(parent.title)
-      outcome.title == "#{parent.title}.#{outcome.num}"
+    if outcome.number && parent && parent.build_title && outcome.number.include?(parent.build_title)
+      outcome.title == "#{parent.title}.#{outcome.number}"
     else
       false
     end
@@ -165,107 +170,37 @@ describe AcademicBenchmark::Converter do
     expect(@cm.workflow_state).to eq 'failed'
   end
 
-  it "should fail if no file or authority set" do
-    @cm.attachment = nil
-    @cm.migration_settings[:no_archive_file] = true
-    @cm.save!
-
-    @cm.export_content
-    run_jobs
-    @cm.reload
-
-    expect(@cm.migration_issues.count).to eq 1
-    expect(@cm.migration_issues.first.description).to eq "No outcome file or authority given"
-    expect(@cm.workflow_state).to eq 'failed'
-  end
-
   context "using the API" do
     append_before do
-      @plugin.settings['api_key'] = "oioioi"
       @cm.attachment = nil
       @cm.migration_settings[:no_archive_file] = true
       @cm.migration_settings[:authorities] = ["CC"]
       @cm.save!
     end
 
-    def run_and_check
-      @cm.export_content
-      run_jobs
-      @cm.reload
-
-      expect(@cm.migration_issues.count).to eq 0
-      expect(@cm.workflow_state).to eq 'imported'
-
-      @root_group = LearningOutcomeGroup.global_root_outcome_group
-      expect(@root_group.child_outcome_groups.count).to eq 1
-      a = @root_group.child_outcome_groups.first
-      expect(a.migration_id).to eq "aaaaaaaaaa"
-    end
-
-    it "should fail with no API key" do
-      @plugin.settings['api_key'] = nil
+    it "should fail with no partner ID" do
+      @plugin.settings[:partner_id] = nil
+      @plugin.settings[:partner_key] = "a"
       @cm.export_content
       run_jobs
       @cm.reload
 
       expect(@cm.migration_issues.count).to eq 1
-      expect(@cm.migration_issues.first.description).to eq "An API key is required to use Academic Benchmarks"
+      expect(@cm.migration_issues.first.description).to eq "A partner ID is required to use Academic Benchmarks"
       expect(@cm.workflow_state).to eq 'failed'
     end
 
-    it "should fail with an empty string API key" do
-      @plugin.settings['api_key'] = ""
+    it "should fail with an empty string partner ID" do
+      current_settings = @plugin.settings
+      new_settings = current_settings.merge(:partner_id => "", :partner_key => "a")
+      allow(@plugin).to receive(:settings).and_return(new_settings)
       @cm.export_content
       run_jobs
       @cm.reload
 
       expect(@cm.migration_issues.count).to eq 1
-      expect(@cm.migration_issues.first.description).to eq "An API key is required to use Academic Benchmarks"
+      expect(@cm.migration_issues.first.description).to eq "A partner ID is required to use Academic Benchmarks"
       expect(@cm.workflow_state).to eq 'failed'
-    end
-
-    it "should use the API to get the set data with an authority short code" do
-      response = double()
-      allow(response).to receive(:body).and_return(File.read(@level_0_browse))
-      allow(response).to receive(:code).and_return("200")
-      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=3").and_return(response)
-
-      run_and_check
-      verify_full_import
-    end
-
-    it "should use the API to get the set data with a guid" do
-      @cm.migration_settings[:authorities] = nil
-      @cm.migration_settings[:guids] = ["aaaaaaaaaa"]
-      response = double('a_levels_3')
-      allow(response).to receive(:body).and_return(File.read(@a_levels_3))
-      allow(response).to receive(:code).and_return("200")
-      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=aaaaaaaaaa&levels=3").and_return(response)
-      responsed = double('d_levels_3')
-      allow(responsed).to receive(:body).and_return(File.read(@d_levels_3))
-      allow(responsed).to receive(:code).and_return("200")
-      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=ddddddddd&levels=3").and_return(responsed)
-      responsej = double('j_levels_3')
-      allow(responsej).to receive(:body).and_return(File.read(@j_levels_3))
-      allow(responsej).to receive(:code).and_return("200")
-      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=jjjjjjjjjjj&levels=3").and_return(responsej)
-
-      run_and_check
-      verify_full_import
-    end
-
-    it "should warn when api returns non-success" do
-      response = double()
-      allow(response).to receive(:body).and_return(%{{"status":"fail","ab_err":{"msg":"API key access violation.","code":"401"}}})
-      allow(response).to receive(:code).and_return("200")
-      expect(AcademicBenchmark::Api).to receive(:get_url).with("http://example.com/browse?api_key=oioioi&authority=CC&format=json&levels=3").and_return(response)
-
-      @cm.export_content
-      run_jobs
-      @cm.reload
-
-      expect(@cm.migration_settings[:last_error]).to be_nil
-      expect(@cm.workflow_state).to eq 'imported'
     end
   end
 
@@ -277,10 +212,28 @@ describe AcademicBenchmark::Converter do
   #
   # instead of this:
   #
-  #    LAFS.1.L.1.1.a instead of LAFS.1.L.LAFS.1.L.1.LAFS.1.L.1.1.a
+  #    LAFS.1.L.1.1.a
   #
   it "doesn't duplicate the base numbers when building a title" do
     json_data = JSON.parse(File.read(@florida_auth_list))
-    check_built_outcome(AcademicBenchmark::Standard.new(json_data))
+    AcademicBenchmarks::Standards::StandardsForest.new(json_data).trees.each do |tree|
+      tree.children.each do |outcome|
+        check_built_outcome(outcome)
+      end
+    end
+  end
+
+  it "raises error with invalid user id" do
+    expect { AcademicBenchmark.ensure_real_user(user_id: 0) }.to raise_error(Canvas::Migration::Error,
+      "Not importing academic benchmark data because no user found matching id '0'")
+  end
+
+  it "raises error when crendentials are not set" do
+    allow(AcademicBenchmark).to receive(:config).and_return({})
+    expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(Canvas::Migration::Error,
+      "Not importing academic benchmark data because the Academic Benchmarks Partner ID is not set")
+    allow(AcademicBenchmark).to receive(:config).and_return({partner_id: "user"})
+    expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(Canvas::Migration::Error,
+      "Not importing academic benchmark data because the Academic Benchmarks Partner key is not set")
   end
 end
