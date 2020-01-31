@@ -1974,7 +1974,7 @@ nn:
   allow_switching_to_the_new_assignments_page_9ac0ad93: "Tillat å byte til den nye oppgåvesida"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Tillat å sende varsel gjennom vår dispatch-kø"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Tillat at verktøyet får tilgang til IMS-namn og rolletildelingsteneste. "
-  allow_users_to_comment_45b8f753: "La brukarar få kommentere"
+  allow_users_to_comment_45b8f753: "La studentane få kommentere"
   allowed_attempts_4e229caa: "Tillatne forsøk"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Gir brukarar tilgang til Opptre som brukar-lenka på studentkontekstkort"
   allows_admin_user_to_view_account_statistics_341f00d9: "Gir adminbrukarar tilgang til å sjå kontostatistikk."
@@ -7396,7 +7396,7 @@ nn:
       topic_title: Emnetittel
       until: Til
       use_for_grading: Vurdert
-      users_must_post_before_seeing_replies: "Brukarane må poste innlegg før dei kan sjå svar"
+      users_must_post_before_seeing_replies: "Studentane må poste innlegg før dei kan sjå svar"
     entry: 
       authors_name: "Forfattaren sitt namn"
       delete_message: "Slett denne meldinga"
