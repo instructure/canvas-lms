@@ -162,6 +162,12 @@ class RequestThrottle
     @whitelist = @blacklist = nil
   end
 
+  # There is a bug with running LeakyBucket.lua.run(...) below in our production environment which is
+  # cloud based so we don't have access to the detailed redis config to try and workaround. 
+  # It leads to this error: OOM command not allowed when used memory > 'maxmemory'.
+  # For the time being we've disabled it using the setting below. This is fine since we don't expose 
+  # the API to anyone and don't have to worry about request throttling.
+  # See: https://github.com/antirez/redis/issues/6565
   def self.enabled?
     Setting.get("request_throttle.skip", "false") != 'true'
   end

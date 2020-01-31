@@ -13,7 +13,7 @@ services:
       POSTGRES_DB: canvas
 
   canvasredis:
-    image: redis:2.6
+    image: redis:5.0.6 
     networks:
       - bravendev
 

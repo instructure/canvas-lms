@@ -51,11 +51,14 @@ module Canvas::Redis
   rescue ::Redis::BaseConnectionError, SystemCallError, ::Redis::CommandError => e
     # We want to rescue errors such as "max number of clients reached", but not
     # actual logic errors such as trying to evalsha a script that doesn't
-    # exist.
-    # These are both CommandErrors, so we can only differentiate based on the
-    # exception message.
-    if e.is_a?(::Redis::CommandError) && e.message !~ /\bmax number of clients reached\b/
-      raise
+    # exist. The reason? If they are transient errors that recover on their own 
+    # it's more graceful to just behave as though the value wasn't cached instead of throwing.
+    #
+    # Note: Both types are CommandErrors, so we can only differentiate based on the exception message.
+    if e.is_a?(::Redis::CommandError)
+      if e.message !~ /\bmax number of clients reached\b/ && e.message !~ /\bOOM command not allowed when used memory\b/
+        raise
+      end
     end
 
     CanvasStatsd::Statsd.increment("redis.errors.all")
