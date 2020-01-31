@@ -126,7 +126,9 @@ export default class EditorConfig {
           .parent()
           .css('visibility', 'visible')
       },
-      hide_media_upload: !!INST?.kalturaSettings?.hide_rte_button
+      // if kalturaSettings is missing, we have no kaltura to upload to
+      // if present, user may have chosen to hide the button anyway.
+      show_media_upload: !!INST.kalturaSettings && !INST.kalturaSettings.hide_rte_button
     }
   }
 

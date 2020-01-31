@@ -499,7 +499,32 @@ describe "RCE next tests" do
       expect(upload_document_modal).to be_displayed
     end
 
-    it "should not include media upload option if disabled" do
+    it "schould include edia upload option if kaltura is enabled" do
+      double('CanvasKaltura::ClientV3')
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      visit_front_page_edit(@course)
+      media_button = media_toolbar_button
+      media_button.click
+      menu_id = media_button.attribute('aria-owns')
+      expect(menu_item_by_menu_id(menu_id, "Upload/Record Media")).to be_displayed
+      expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
+      expect(menu_item_by_menu_id(menu_id, "User Media")).to be_displayed
+      expect(menu_items_by_menu_id(menu_id).length).to be(3)
+    end
+
+    it "should not include media upload option if kaltura is disabled" do
+      double('CanvasKaltura::ClientV3')
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
+      visit_front_page_edit(@course)
+      media_button = media_toolbar_button
+      media_button.click
+      menu_id = media_button.attribute('aria-owns')
+      expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
+      expect(menu_item_by_menu_id(menu_id, "User Media")).to be_displayed
+      expect(menu_items_by_menu_id(menu_id).length).to be(2)
+    end
+
+    it "should not include media upload option if button is disabled" do
       double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({
         'hide_rte_button' => true
