@@ -173,6 +173,7 @@ nl:
   _start_from_a_template__a03ea3b3: "--Beginnen vanaf een Sjabloon--"
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} en {b} kunnen niet samen worden gebruikt"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Een rekenwaarde is niet gebruikt met deze rekenmethode"
+  a_canvas_security_token_was_just_generated_for_you_efeeac68: "Er is zojuist een Canvas Security-token voor je account gegenereerd. Als je een gebruikerstoken hebt aangevraagd, hoef je verder geen actie te ondernemen. Als je geen token hebt aangevraagd of als je Canvas-toegangstokens wilt beheren, kun je dat hier doen:"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Een bestand met de naam %{itemName} bestaat al in deze map."
   a_front_page_is_required_fd57b80: "Er is een voorpagina vereist"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Een compleet logo dat aan de rechter zijbalk van het Canvas dashboard verschijnt. Ideale grootte is 360 x 140 pixels. Toegelaten formaten: svg, png, jpeg, gif"
@@ -239,6 +240,7 @@ nl:
   access_report_80d28095: Toegangsrapport
   access_token_3be22221: Toegangstoken
   access_token_count_access_token_count_dfb5463c: "Aantal toegangstokens: %{access_token_count}"
+  access_token_created_or_regenerated_4ce9ed1f: "Toegangstoken gemaakt of opnieuw gegenereerd"
   access_token_is_valid_until_d2f048cf: "Toegangstoken is geldig tot"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Met behulp van toegangstokens kun je andere toepassingen toestaan om API-oproepen namens jou uit te voeren. Je kunt ook toegangstokens genereren en *de Canvas Open API* gebruiken om je eigen integraties te bedenken."
   accessible_sidebar_menu_b30baf97: "Zijbalkmenu toegankelijk"
@@ -1990,6 +1992,7 @@ nl:
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Importeren van QTI en Common Cartridge in New Quizzes toestaan."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Importeren van QTI en Common Cartridge toestaan in Quizzes.Next."
   allow_in_mastery_paths_5332c786: "Toestaan in meesterschapspaden"
+  allow_include_parameters_bf3d3230: "Include-parameters toestaan "
   allow_intra_group_peer_reviews_53f1e455: "Peerbeoordelingen binnen groepen toestaan"
   allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
       Zorg dat abonnementen op live gebeurtenissen ingesteld kunnen worden op geleverd
@@ -2023,6 +2026,7 @@ nl:
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Hiermee kunnen beheerders een logboek bekijken dat informatie bevat over alle onlangs uitgevoerde
       GraphQL-mutaties
+  allows_aligning_outcomes_to_non_scoring_content_537ce399: "Hiermee kunnen leerdoelen worden afgestemd op niet-scorende inhoud"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Beoordelaars toestaan het auditspoor van beoordelingen in SpeedGrader te bekijken voor anonieme of gemodereerde opdrachten."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Hiermee kun je aankondigingen voor een specifieke sectie maken"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Hiermee kun je discussies voor een specifieke sectie maken"
@@ -2046,7 +2050,9 @@ nl:
       Hiermee kan een gebruiker de link Aankondigingen in Cursusnavigatie openen.
       Hiermee kan een gebruiker cursusaankondigingen weergeven.
       Hiermee kan een gebruiker recente aankondigingen op de cursusstartpagina bekijken.
+  allows_user_to_access_the_attendance_tool_72ef0b68: "Hiermee kan de gebruiker de tool Aanwezigheid openen."
   allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Hiermee kan een gebruiker de zijbalk van blauwdrukcursussen openen. Hiermee kan een gebruiker inhoudsinstellingen voor blauwdrukcursussen beheren in Cursusinstellingen. Hiermee kan een gebruiker een gekoppelde cursus verwijderen. Hiermee kan een gebruiker vergrendelingsinstellingen voor een blauwdrukobject voor afzonderlijke opdrachten, pagina's of discussies bewerken."
+  allows_user_to_access_the_chat_tool_48d5f5c4: "Hiermee kan de gebruiker de tool Chatten openen."
   allows_user_to_access_the_files_tab_in_the_content_a5187929: "Hiermee kan een gebruiker het tabblad Bestanden in de inhoudselector openen."
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: "Hiermee kan een gebruiker het tabblad Cursussen herstellen in Beheerinstellingen openen."
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Hiermee kan een gebruiker het tabblad Cursussen herstellen in Beheerinstellingen openen."
@@ -2091,7 +2097,10 @@ nl:
       Hiermee kan een gebruiker opdrachtinstellingen beheren.
       Hiermee kan een gebruiker opdrachtgroepen aan een cursus toevoegen.
       Hiermee kan een gebruiker de weging van opdrachtgroepen in een cursus inschakelen en bewerken.
+  allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Hiermee kan de gebruiker gebeurtenissen toevoegen aan het dashboard Lijstweergave via het selectievakje Toevoegen aan to-do lijst van cursist. "
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Hiermee kan een gebruiker nieuwe opdrachten aan een module toevoegen."
+  allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Hiermee kan de gebruiker niet-beoordeelde discussies toevoegen aan het dashboard Lijstweergave via het selectievakje Toevoegen aan to-do lijst van cursist."
+  allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Hiermee kan de gebruiker pagina's toevoegen aan het dashboard Lijstweergave via het selectievakje Toevoegen aan to-do lijst van cursist."
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       Hiermee kan een gebruiker andere cursusleiders, cursusontwerpers en onderwijsassistenten toevoegen en verwijderen.
       Hiermee kan een gebruiker waarnemers toevoegen aan of verwijderen uit de cursus.
@@ -2160,6 +2169,7 @@ nl:
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Hiermee kan een gebruiker vergrendelingsinstellingen voor een blauwdrukobject bewerken op de indexpagina Discussies in een Blauwdruk-hoofdcursus."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Hiermee kan een gebruiker vergrendelingsinstellingen voor een blauwdrukobject bewerken op de pagina Bestanden in een Blauwdruk-hoofdcursus."
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Hiermee kan een gebruiker vergrendelingsinstellingen voor een blauwdrukobject bewerken op de indexpagina's Opdrachten en toetsen in een Blauwdruk-hoofdcursus."
+  allows_user_to_edit_conferences_61eb62e0: "Hiermee kan de gebruiker Vergaderingen bewerken."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Hiermee kan een gebruiker configuraties bewerken voor handmatig toegevoegde externe apps."
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Hiermee kan een gebruiker cijfers bewerken en opmerkingen toevoegen in SpeedGrader."
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: "Hiermee kan een gebruiker cijfers in de Cijferlijst bewerken. Hiermee kan een gebruiker cijferlijstgeschiedenis openen. Hiermee kan een gebruiker de Cijferlijst vakbeheersing openen (indien ingeschakeld)."
@@ -2231,6 +2241,7 @@ nl:
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Hiermee kan een gebruiker een bericht verzenden naar “Iedereen in [course name]” of “Iedereen in [course group]”."
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Hiermee kan een gebruiker berichten verzenden naar individuele cursisten."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "Hiermee kan een gebruiker een toets delen via Commons."
+  allows_user_to_share_course_items_directly_with_ot_b5a68ecc: "Hiermee kan de gebruiker cursusitems rechtstreeks met andere gebruikers delen. Hiermee kan de gebruiker afzonderlijke cursusitems naar een andere cursus kopiëren."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Hiermee kan een gebruiker de SIS-ID van een cursus bekijken."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Hiermee kan een gebruiker een link naar SpeedGrader weergeven vanuit opdrachten."
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -2323,6 +2334,7 @@ nl:
       Hiermee kan een gebruiker de link Discussies in Cursusnavigatie weergeven.
       Hiermee kan een gebruiker cursusdiscussies weergeven.
   allows_user_to_view_the_discussions_link_in_course_eb30f2d0: "Hiermee kan een gebruiker de link Discussies in Cursusnavigatie weergeven. Hiermee kan een gebruiker cursusdiscussies weergeven."
+  allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "Hiermee kan de gebruiker de pagina ePortfolio modereren bekijken en ePortfolio-spaminhoud beheren."
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "Hiermee kan een gebruiker de link naar het faculteitsnieuws in Globale navigatie weergeven."
   allows_user_to_view_the_group_home_pages_of_all_st_47f48a3e: "Hiermee kan een gebruiker de groepspagina's van alle groepen cursisten weergeven. Hiermee krijgen cursisten toegang tot andere groepen cursisten binnen een groepsreeks met een rechtstreekse link."
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
@@ -3490,6 +3502,7 @@ nl:
       labels: 
         assignments_summary: Cursusoverzicht
         syllabus_body: Syllabusbeschrijving
+        syllabus_course_summary: "Cursusoverzicht weergeven"
       links: 
         edit_syllabus_description: Bewerken
         jump_to_today: "Naar vandaag springen"
@@ -3897,6 +3910,7 @@ nl:
   blueprint_courses_create_edit_associate_delete_bf41988e: "Blauwdrukcursussen (maken/bewerken/koppelen/verwijderen)"
   blueprint_courses_is_an_account_level_feature_opti_38676924: "Blauwdrukcursussen zijn een functieoptie op accountniveau. Cursusrollen kunnen alleen blauwdrukcursussen beheren als deze als cursusleider, onderwijsassistent of ontwerper aan de blauwdrukcursus zijn toegevoegd. Voor toegang tot de zijbalk Blauwdrukcursussen moet Cursussen - cursussen toevoegen/bewerken/verwijderen zijn ingeschakeld. Als je een gekoppelde cursus wilt toevoegen, moet Cursussen - lijst weergeven en Cursussen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als je vergrendelingsinstellingen voor een blauwdrukobject wilt bewerken, moet Cursussen - toevoegen/bewerken/verwijderen zijn ingeschakeld."
   blueprint_courses_is_an_account_level_feature_opti_390ed2e7: "Blauwdrukcursussen zijn een functieoptie op accountniveau. Als je gekoppelde cursussen wilt toevoegen, moeten Blauwdrukcursussen - toevoegen/bewerken/koppelen/verwijderen en Cursussen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld."
+  blueprint_courses_is_an_account_level_feature_opti_3a0161d3: "Blauwdrukcursussen zijn een functieoptie op accountniveau. Cursusrollen kunnen alleen blauwdrukcursussen beheren als deze als cursusleider, onderwijsassistent of ontwerper aan de blauwdrukcursus zijn toegevoegd. Voor toegang tot de zijbalk Blauwdrukcursussen moet Cursussen - cursussen toevoegen/bewerken/verwijderen zijn ingeschakeld. Als je een gekoppelde cursus wilt toevoegen, moet Cursussen - lijst weergeven en Cursussen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als je vergrendelingsinstellingen voor een blauwdrukobject wilt bewerken, moet Cursussen - toevoegen/bewerken/verwijderen zijn ingeschakeld."
   blueprint_courses_is_an_account_level_feature_opti_3bf307d: "Blauwdrukcursussen zijn een functieoptie op accountniveau. Als je vergrendelingsinstellingen voor een blauwdrukobject wilt bewerken op de indexpagina Discussies, moet Cursussen - toevoegen/bewerken/verwijderen en Discussies - weergeven ook zijn ingeschakeld. Als deze machtiging niet is ingeschakeld en Cursussen - toevoegen/bewerken/verwijderen en Discussies - weergeven zijn ingeschakeld, kunnen vergrendelingsinstellingen voor een blauwdrukobject worden bewerkt voor afzonderlijke discussies."
   blueprint_courses_is_an_account_level_feature_opti_4c34e5d3: "Blauwdrukcursussen zijn een functieoptie op accountniveau. Als je vergrendelingsinstellingen voor een blauwdrukobject wilt bewerken vanaf de indexpagina Opdrachten, moet Cursussen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als deze machtiging niet is ingeschakeld, maar Cursussen - toevoegen/bewerken/verwijderen wel is ingeschakeld, kunnen vergrendelingsinstellingen voor een blauwdrukobject voor een opdracht worden beheerd vanaf de detailpagina van de opdracht. Als je vergrendelingsinstellingen voor een blauwdrukobject wilt bewerken voor een afzonderlijke toets of via de indexpagina Toetsen, moet Cursussen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld."
   blueprint_courses_is_an_account_level_feature_opti_4c9fa399: |-
@@ -3928,6 +3942,8 @@ nl:
       
       Als je vergrendelingsinstellingen voor een blauwdrukobject wilt bewerken vanaf de indexpagina Discussies, moet Discussies - modereren ook zijn ingeschakeld.
   blueprint_courses_must_be_enabled_for_an_account_b_4a79dc67: "Blauwdrukcursussen moeten voor een account worden ingeschakeld door een beheerder. Cursusrollen kunnen alleen inhoud van blauwdrukcursussen beheren als deze als cursusleider, onderwijsassistent of ontwerper aan de blauwdrukcursus zijn toegevoegd. Als deze instelling is uitgeschakeld en Discussies - weergeven is ingeschakeld, kan een gebruiker nog steeds de vergrendelingsinstellingen voor inhoud in afzonderlijke discussies in een Blauwdruk-hoofdcursus aanpassen."
+  blueprint_courses_must_be_enabled_for_an_account_b_4ef094f4: "Blauwdrukcursussen moeten voor een account worden ingeschakeld door een beheerder. Cursusrollen kunnen alleen inhoud van blauwdrukcursussen beheren als deze als cursusleider, onderwijsassistent of ontwerper aan de blauwdrukcursus zijn toegevoegd. Als deze instelling is uitgeschakeld en Discussies - weergeven is ingeschakeld, kan de gebruiker nog steeds de vergrendelingsinstellingen voor inhoud in afzonderlijke discussies in een Blauwdruk-hoofdcursus aanpassen."
+  blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: "Blauwdrukcursussen moeten voor een account worden ingeschakeld door een beheerder. Cursusrollen kunnen alleen inhoud van blauwdrukcursussen beheren als deze als cursusleider, onderwijsassistent of ontwerper aan de blauwdrukcursus zijn toegevoegd. Als deze machtiging is uitgeschakeld, kan een gebruiker nog steeds de vergrendelingsinstellingen voor inhoud op afzonderlijke pagina's in een blauwdrukhoofdcursus aanpassen."
   blueprint_courses_must_be_enabled_for_an_account_b_79b2d93e: |-
       Blauwdrukcursussen moeten voor een account worden ingeschakeld door een beheerder.
       Cursusrollen kunnen alleen inhoud van blauwdrukcursussen beheren als deze als cursusleider, onderwijsassistent of ontwerper aan de blauwdrukcursus zijn toegevoegd.
@@ -3962,6 +3978,7 @@ nl:
   bookmark_this_question_bank_dc414a82: "Plaats een bladwijzer bij deze toetsbank"
   bookmarking_for_enrollments_index_api_840be156: "Bladwijzer instellen voor Inschrijvingenindex-API"
   bookmarks_5b5b81c9: Bladwijzers
+  both_discussions_create_and_discussions_moderate_a_1c00baf0: "Zowel met Discussies - maken als Discussies - modereren kan de gebruiker een discussie maken op de pagina Discussies. Als deze toestemming is ingeschakeld, is Discussies - maken niet vereist. Om discussies in een cursus weer te geven, moet Discussies - weergeven zijn ingeschakeld. Om discussies te beantwoorden, moet Discussies - posten ook zijn ingeschakeld. Om opdrachtdetails voor een discussie te bewerken, moet Opdrachten en toetsen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld."
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Zowel met Discussies - maken als Discussies - modereren kan een gebruiker een discussie maken op de pagina Discussies. Als deze toestemming is ingeschakeld, is Discussies - maken niet vereist. Om discussies in een cursus weer te geven, moet Discussies - weergeven zijn ingeschakeld. Om discussies te beantwoorden, moet Discussies - posten ook zijn ingeschakeld. Om opdrachtdetails voor een discussie te bewerken, moet Opdrachten en toetsen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
       Met zowel Discussies - maken als Discussies - modereren kan een gebruiker een discussie maken op de pagina Discussies. Als deze toestemming is ingeschakeld, is Discussies - maken niet vereist.
@@ -4680,6 +4697,9 @@ nl:
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas is niet geconfigureerd voor ontvangst van aanmeldingen van %{issuer}."
   canvas_login_failure_message_4c922f2f: "Foutbericht in Canvas aanmelding"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Back-upcodes voor Canvas Multi-Factor-verificatie"
+  canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
+      Canvas heeft nu twee toetsengines. Kies de engine die
+              je wilt gebruiken.
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_description: "Deze instelling controleert of ouders verbinding kunnen maken met cursisten op je instituut door middel van de Canvas Parent mobiele app."
   canvas_parent_improved_description: "Deze instelling regelt of ouders die hun eigen Canvas Parent-accounts maken, verbinding kunnen maken met cursisten op je opleiding met behulp van de mobiele app Canvas Parent. Opmerking/let op: Ouders die zijn geregistreerd als Canvas-waarnemers kunnen de mobiele app Canvas Parent ook gebruiken wanneer deze functiemarkering is uitgeschakeld."
@@ -4742,6 +4762,7 @@ nl:
   change_sis_ids_3a47154d: "SIS-ID's wijzigen"
   changed_by_person_c39615e: "Gewijzigd door: %{person}"
   changed_item_1d16a85f: "Gewijzigd item"
+  changes_the_sort_order_of_the_gradebook_export_to__41b286fd: "Hiermee wordt de sorteervolgorde van exportbewerkingen vanuit de Cijferlijst gewijzigd om beter aan te sluiten bij de Canvas-documentatie"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Wijzigingen blijven van toepassing als je deze pagina verlaat."
   changes_you_made_may_not_be_saved_4e8db973: "Je wijzigingen worden niet opgeslagen."
   changing_course_dates_may_override_term_availabili_d92b10de: "Door cursusdatums te wijzigen kunnen beschikbaarheidsinstellingen voor periodes en plaatsing op de pagina Cursussen en Dashboard worden overschreven. Bevestig periodedatums voordat je cursusdatums gaat wijzigen."
@@ -4772,6 +4793,7 @@ nl:
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "Kies een bijnaam voor kleur of cursus of verplaats cursuskaart voor %{course}"
   choose_a_course_home_page_8059c7b: "Een startpagina voor de cursus kiezen"
   choose_a_csv_file_to_upload_9644480c: "Een CSV-bestand kiezen om te uploaden:"
+  choose_a_quiz_engine_8820d521: "Een toetsengine kiezen"
   choose_a_timezone_d9c52998: "Een bestand kiezen"
   choose_an_authentication_service_47dc8875: "Een verificatieservice kiezen"
   choose_and_publish_980812cb: "Kiezen en publiceren"
@@ -4791,6 +4813,7 @@ nl:
   choose_the_next_mastery_path_b035b727: "Kies het volgende leertraject"
   choose_usage_rights_33683854: "Gebruiksrechten kiezen..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' is geen geldige kleur"
+  classic_quizzes_dee3c7b7: "Klassieke toetsen"
   clear_2084585f: Wissen
   clear_selected_file_82388e50: "Verwijder geselecteerd bestand"
   clear_user_cache_ef079f7f: "Gebruikerscache wissen"
@@ -5989,6 +6012,7 @@ nl:
     course_options: 
       course_options: 
         concluded: Voltooid
+        favorite: "Favoriete cursussen"
         groups: Groepen
         more_courses: "Meer cursussen"
     hide: Verbergen
@@ -7809,6 +7833,7 @@ nl:
     save_key: "Sleutel opslaan"
     tool_id: "Hulpprogramma-ID:"
     vendor_code: "Leverancierscode (LTI 2):"
+  developer_key_include_parameter_support_58cbf874: "Ontwikkelaarssleutels ondersteunen Include-parameters"
   developer_key_is_an_external_tool_27c6166b: "Ontwikkelaarssleutel is een externe tool."
   developer_key_management_5a5866bd: "Beheer van ontwikkelaarssleutel"
   developer_key_management_and_scoping_97d928d5: "Beheer en bereik van ontwikkelaarssleutels"
@@ -7920,6 +7945,7 @@ nl:
   discussion_topic_a7bf935: discussieonderwerp
   discussion_topic_dc85ad4c: Discussieonderwerp
   discussion_topic_menu_3d4684c6: "Discussieonderwerp menu"
+  discussion_topic_performance_improvements_for_bibs_79a483ef: "Prestatieverbeteringen Discussieonderwerpen voor Bibsys"
   discussion_topic_will_be_available_starting_at_46aa7477: "Discussieonderwerp zal beschikbaar zijn vanaf"
   discussion_topic_will_be_available_until_f5e3abc8: "Discussieonderwerp zal beschikbaar zijn tot"
   discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "Gespreksonderwerp wordt voor datum weergegeven op de to-do lijst van de cursist"
@@ -8145,6 +8171,7 @@ nl:
       manually_mark_as_read: "Berichten handmatig markeren als gelezen"
       my_settings: "Mijn instellingen"
   discussion_topics_b35ac745: Discussieonderwerpen
+  discussion_topics_will_not_query_permissions_for_e_7570e632: "Discussieonderwerpen vragen niet om toestemming voor elke subdiscussie"
   discussion_unpinned_successfully_2cb6d951: "Vastzetten van discussie ongedaan gemaakt"
   discussions: 
     are_your_sure_delete: "Weet je zeker dat je deze vermelding wilt verwijderen?"
@@ -8638,6 +8665,7 @@ nl:
   enabled_links_be110215: "Ingeschakelde koppelingen"
   enabled_web_services_f620b2be: "Ingeschakelde webservices"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Hiermee kunnen plagiaatrapporten en vergelijkbaarheidsscores in het inleveringsvak voor Nieuwe cijferlijst worden weergegeven."
+  enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Hiermee schakel je API-eindpunten in voor de cursus en gebruikersgegevens die worden verstrekt door Nieuwe analyse."
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Mogelijkheid tot sorteren op SIS-ID, integratie-ID en aanmeldings-ID in de Nieuwe cijferlijst."
   encourage_class_participation_4e069479: "Klasdeelname aanmoedigen"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Versleutelde Sourcedids voor basisleerdoelen"
@@ -9359,6 +9387,7 @@ nl:
   fall_grading_period_final_score_56d96a8f: "Najaar beoordelingsperiode eindscore"
   fall_grading_period_id_74ef68e: "Najaar beoordelingsperiode ID"
   favicon_6e658914: Favicon
+  favorite_courses_fbd356f0: "Favoriete cursussen"
   favorites_c7e0207c: Favorieten
   feature_f5526584: Functie
   feature_flags: 
@@ -9496,6 +9525,7 @@ nl:
   filename_is_hidden_available_with_a_link_click_to__3e328e8f: "%{fileName} is verborgen. Beschikbaar met een link - Klik om te wijzigen"
   filename_is_locked_click_to_modify_bf711763: "%{fileName}  is vergrendeld - Klik om te wijzigen"
   filename_is_not_visible_in_student_files_click_to__aa2a0651: "%{fileName} is niet zichtbaar in cursistbestanden - Klik om te wijzigen"
+  filename_is_only_available_to_students_with_the_li_97190506: "%{fileName} is alleen beschikbaar voor cursisten met de link - Klik om te wijzigen"
   filename_is_published_click_to_modify_38a4a269: "%{fileName} is gepubliceerd - Klik om te wijzigen"
   filename_is_restricted_9aaf9250: "%{fileName} is %{restricted}"
   filename_is_restricted_click_to_modify_c0bb77f8: "%{fileName} is %{restricted} - Klik om te wijzigen"
@@ -9670,10 +9700,15 @@ nl:
   for_an_instant_answer_see_if_your_issue_is_address_48280e89: "Kijk voor een onmiddellijk antwoord of je probleem behandeld wordt in de *Canvas Guides*."
   for_best_results_crop_image_to_262px_wide_by_146px_af81a540: "Snijd voor het beste resultaat de afbeelding bij tot 262px breed en 146px hoog. JPG- , PNG- of GIF-bestandstypen geaccepteerd"
   for_course_level_users_deleting_a_course_is_part_o_932f7a98: "Voor gebruikers op cursusniveau maakt het verwijderen van een cursus deel uit van de machtiging Cursusstatus - beheren. Maar voor gebruikers op accountniveau is voor het verwijderen van een cursus deze machtiging plus Cursus - toevoegen/bewerken/verwijderen vereist. "
+  for_course_level_users_deleting_a_course_is_part_o_d134dea2: "Voor gebruikers op cursusniveau maakt het verwijderen van een cursus deel uit van de machtiging Cursusstatus - beheren. Maar voor een gebruiker op accountniveau is voor het verwijderen van een cursus deze machtiging plus Cursus - toevoegen/bewerken/verwijderen vereist. "
   for_development_of_features_for_new_gradebook_7ee1830f: "Voor het ontwikkelen van functies voor de nieuwe cijferlijst."
   for_each_late_62aecf41: "Voor elke datum"
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Voor handmatig geposte opdrachten geldt dat de aanwezigheid van een opmerking bij een inlevering die niet afkomstig is van degene die de inlevering heeft gedaan, de opdracht kan worden gepost. Voorheen was er een cijfer nodig om te kunnen posten."
   for_name_d5684bfd: "Voor %{name}"
+  for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
+      Voorlopig geldt dat als je beveiliging van
+              tools van derden, Speedgrader of CSV's voor analyse van antwoorden
+              van cursisten nodig hebt, dit de beste keuze is.
   for_title_69d92b3a: "voor %{title}"
   forgot_password_f0c3fbac: "Wachtwoord vergeten?"
   forgot_password_url_3f9c04b: "Wachtwoord URL vergeten"
@@ -10099,6 +10134,7 @@ nl:
   gradebook_csvs: 
     grades_filename: Cijfers
   gradebook_export_failed_reason_2b0f6c53: "Exporteren van cijferlijst mislukt: %{reason}"
+  gradebook_export_sort_order_bugfix_tally_219_62bfaacb: "Sorteervolgorde van bugfixes bij export vanuit Cijferlijst (Tally-219)"
   gradebook_export_started_723461b9: "Exporteren van cijferlijst gestart"
   gradebook_history_a3e8e0b4: "Geschiedenis van de cijferlijst"
   gradebook_history_b03f8524: "Geschiedenis van de cijferlijst..."
@@ -11383,6 +11419,7 @@ nl:
       
               Als de zichtbaarheid van een cursus is beperkt tot gebruikers die voor de cursus zijn ingeschreven,
               kan een gebruiker met deze machtiging cursusinhoud bekijken zonder voor de cursus te zijn ingeschreven.
+  if_disabled_user_will_still_have_access_to_course__d78fddc4: "Indien uitgeschakeld, heeft de gebruiker nog wel toegang tot Cursusinstellingen. De gebruiker kan geen specifieke inhoud van cursussen beheren zonder de juiste machtiging voor dat inhoudsitem. Als de zichtbaarheid van een cursus is beperkt tot gebruikers die voor de cursus zijn ingeschreven, kan de gebruiker met deze machtiging cursusinhoud bekijken zonder voor de cursus te zijn ingeschreven."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Indien ingeschakeld, wordt toegang tot LTI 1.3 en LTI Advantage ingeschakeld."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Indien ingeschakeld, is een hogere dan de maximaal mogelijke score die aan een rubriek kan worden gegeven, toegestaan."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Indien ingeschakeld, worden HTML-pagina's door Common Cartridge bij het importeren geconverteerd naar pagina's"
@@ -11404,6 +11441,7 @@ nl:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Als niemand geselecteerd is, dan aan de hele subaccount toesturen)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Als er geen wordt geselecteerd, dan aan iedereen in het gehele subaccount weergeven)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Als er geen wordt geselecteerd, dan aan iedereen in het gehele account weergeven)"
+  if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Als Statistieken - weergeven of Gebruikers - aanmeldingsdetails beheren is ingeschakeld, kan de gebruiker aanmeldings-/afmeldingsactiviteiten genereren in Beheertools. Om de optie voor aanmeldings-/afmeldingsactiviteiten in Beheertools te verbergen, moeten beide machtigingen worden uitgeschakeld."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Als Statistieken - weergeven of Gebruikers - aanmeldingsdetails beheren is ingeschakeld, kan een gebruiker aanmeldings-/afmeldingsactiviteiten genereren in Beheertools. Om de optie voor aanmeldings-/afmeldingsactiviteiten in Beheertools te verbergen, moeten beide machtigingen worden uitgeschakeld."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Als aanmeldingsdetails voor Statistieken - weergeven of Gebruikers - beheren is ingeschakeld, kan een gebruiker aanmeldings-/afmeldingsactiviteiten genereren in Beheertools. Om de optie voor aanmeldings-/afmeldingsactiviteiten in Beheertools te verbergen, moeten beide machtigingen worden uitgeschakeld."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Als de accountinstelling Open registratie is ingeschakeld, kunnen gebruikers met deze machtiging cursisten of waarnemers via een e-mailadres of aanmeldings-ID aan een cursus toevoegen, ook als de cursist of waarnemer nog geen Canvas-account heeft."
@@ -11414,6 +11452,8 @@ nl:
       in Accountinstellingen.
   if_this_permission_is_disabled_at_the_account_leve_39648abb: "Als deze machtiging is uitgeschakeld, kunnen gebruikers op accountniveau geen bestaande accountgroepen weergeven. Op cursusniveau kunnen gebruikers bestaande groepen, inclusief groepen die door cursisten zijn gemaakt, wel weergeven maar niet openen. Om groepen weer te geven moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om op acccountniveau groepen toe te voegen via CSV, moet SIS-gegevens - importeren ook zijn ingeschakeld."
   if_this_permission_is_disabled_at_the_account_leve_6a82182d: "Als deze machtiging is uitgeschakeld, kunnen gebruikers op accountniveau geen bestaande accountgroepen weergeven. Op cursusniveau kunnen gebruikers bestaande groepen, inclusief groepen die door cursisten zijn gemaakt, wel weergeven maar niet openen. Om groepen weer te geven, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om op acccountniveau groepen toe te voegen via CSV, moet SIS-gegevens - importeren ook zijn ingeschakeld."
+  if_this_permission_is_disabled_at_the_account_leve_b5f6dfa4: "Als deze machtiging is uitgeschakeld, kan de gebruiker op accountniveau geen bestaande accountgroepen weergeven. Op cursusniveau kan de gebruiker bestaande groepen, inclusief groepen die door cursisten zijn gemaakt, wel weergeven maar niet openen. Om groepen weer te geven, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om op acccountniveau groepen toe te voegen via CSV, moet SIS-gegevens - importeren ook zijn ingeschakeld."
+  if_this_permission_is_disabled_the_user_can_only_v_75dbf069: "Als deze machtiging is uitgeschakeld, kan de gebruiker alleen bestaande groepen weergevn, inclusief groepen die door cursisten zijn gemaakt."
   if_this_permission_is_disabled_users_can_only_view_b68143d5: "Als deze machtiging is uitgeschakeld, kunnen gebruikers alleen bestaande groepen weergevn, inclusief groepen die door cursisten zijn gemaakt."
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "Als deze machtiging is uitgeschakeld, kunnen gebruikers nog wel rubrieken maken of toevoegen aan opdrachten als Opdrachten en toetsen - toevoegen/bewerken/verwijderen is ingeschakeld."
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Als deze machtiging is uitgeschakeld, kunnen gebruikers nog wel goedgekeurde apps installeren via het Canvas App Center (indien ingeschakeld door je organisatie). Als deze machtiging is uitgeschakeld, kunnen gebruikers ook geen handmatig toegevoegde externe apps verwijderen."
@@ -11424,6 +11464,7 @@ nl:
       Om gebruikers aan cursussen toe te voegen via SIS-ID, moeten Gebruikers - cursisten toevoegen aan/verwijderen uit cursussen en/of Gebruikers - cursusleiders, cursusontwerpers of onderwijsassistenten toevoegen aan/verwijderen uit cursussen ook zijn ingeschakeld.
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Als Gebruikers - aanmeldingsdetails of Statistieken - weergeven is ingeschakeld, kan een gebruiker aanmeldings-/afmeldingsactiviteiten genereren in Beheertools. Om de optie voor aanmeldings-/afmeldingsactiviteiten in Beheertools te verbergen, moeten beide machtigingen worden uitgeschakeld."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Als Gebruikers - aanmeldingsdetails beheren of Statistieken - weergeven is ingeschakeld, kan een gebruiker aanmeldings-/afmeldingsactiviteiten genereren in Beheertools. Om de optie voor aanmeldings-/afmeldingsactiviteiten in Beheertools te verbergen, moeten beide machtigingen worden uitgeschakeld."
+  if_users_manage_login_details_or_statistics_view_i_cff4155d: "Als Gebruikers - aanmeldingsdetails beheren of Statistieken - weergeven is ingeschakeld, kan de gebruiker aanmeldings-/afmeldingsactiviteiten genereren in Beheertools. Om de optie voor aanmeldings-/afmeldingsactiviteiten in Beheertools te verbergen, moeten beide machtigingen worden uitgeschakeld."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Als je het aantal mogelijke punten voor een opdracht verandert, dan worden de bestaande cijfers automatisch geschaald."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Als je het aantal mogelijke punten voor een opdracht verandert dan moet je de opdracht opnieuw beoordelen."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Als je het aantal mogelijke punten voor een opdracht verandert dan moet je de opdracht opnieuw beoordelen."
@@ -12002,6 +12043,7 @@ nl:
       log_in_to_canvas: "Aanmelden op Canvas"
   learn_more_7a8d626: "Meer informatie"
   learn_more_about_collaborations_2978f66d: "Meer informatie over samenwerkingen"
+  learn_more_about_the_differences_a1217479: "Meer informatie over de verschillen."
   learning_analytics_beta_view_46deb4c8: "Learning Analytics (bèta) - bekijken"
   learning_mastery_5fc34276: "Vakbekwaamheid leren"
   learning_mastery_6ed4fd63: "Leren beheersen..."
@@ -12471,6 +12513,7 @@ nl:
   make_key_visible_5c03fa34: "Sleutel zichtbaar maken"
   make_new_settings_for_sis_integrations_visible_and_875039ca: "Maak nieuwe instellingen voor SIS-integraties zichtbaar en actief"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Zorg ervoor dat je de meest toepasselijke optie kiest omdat de scores van cursisten beïnvloed kunnen worden."
+  make_the_course_summary_list_of_assignments_and_ev_f739be33: "Maak het Cursusoverzicht (lijst met opdrachten en gebeurtenissen) optioneel in de syllabus"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Maak deze cursus openbaar zichtbaar (gegevens van cursisten blijven privé)"
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Hiermee wordt een link naar Microsoft Insluitende lezer op wiki-pagina's weergegeven."
   making_a_copy_of_original_assignment_name_8f029a9b: "Er wordt een kopie gemaakt van “%{original_assignment_name}”\""
@@ -12510,6 +12553,7 @@ nl:
   manage_update_23de23a1: "Update beheren"
   manage_update_for_toolname_f8e3b2fb: "Update voor %{toolName} beheren"
   manage_usage_rights_c5a8c216: "Gebruiksrechten beheren"
+  manage_user_settings_827ab12d: "Gebruikersinstellingen beheren"
   manage_your_course_details_664c335f: "Je cursusdetails beheren"
   manual_8c2665de: Handmatig
   manual_configuration_b586fe54: "Handmatige configuratie"
@@ -14976,6 +15020,7 @@ nl:
   never_df100b49: Nooit
   new_13daf639: Nieuw
   new_account_role_6e5c4964: "Nieuwe accountfunctie"
+  new_analytics_api_access_7eec1ead: "Toegang tot Nieuwe analyse-API"
   new_annotations_66932016: "Nieuwe aantekeningen"
   new_announcement_23af4598: "Nieuwe aankondiging"
   new_announcement_title_30ba7c1b: "Nieuwe aankondiging: %{title}"
@@ -15020,6 +15065,7 @@ nl:
   new_question_group_d9306280: "Nieuwe vraaggroep"
   new_quiz_34aacba6: "Nieuwe toets"
   new_quiz_statistics_desc: "De nieuwe pagina met statistieken van de toets voor een cursus inschakelen."
+  new_quizzes_dbda7e0a: "Nieuwe toetsen"
   new_quizzes_importing_c167dce0: "New Quizzes importeren"
   new_quizzes_on_the_quizzes_page_b21f338d: "Nieuwe toetsen op de pagina Toetsen"
   new_quizzes_submission_history_d81b477b: "Geschiedenis van inlevering van New Quizzes"
@@ -15380,6 +15426,7 @@ nl:
       group_assignment_submitted_late: "Groepsopdracht te laat ingezonden"
       group_membership_accepted: "Lidmaatschap aan groep geaccepteerd"
       group_membership_rejected: "Lidmaatschap aan groep geweigerd"
+      manually_created_access_token_created: "Handmatige toegangstoken gemaakt"
       merge_email_communication_channel: "E-mail communicatiekanaal samenvoegen"
       migration_import_failed: "Migratie-import mislukt"
       migration_import_finished: "Migratie-import voltooid"
@@ -15651,6 +15698,7 @@ nl:
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Alleen berichten plaatsen met een specifieke woordgroep in de titel"
   only_after_their_last_attempt_3593d101: "Alleen na de laatste poging"
   only_announcements_can_be_section_specific_1ff992a: "Alleen aankondigingen kunnen sectiespecifiek zijn"
+  only_available_to_students_with_link_107e2468: "Alleen beschikbaar voor cursisten met koppeling"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Alleen beschikbaar voor cursisten met een link. Niet zichtbaar in bestanden voor cursisten."
   only_course_announcements_and_discussions_can_be_s_924d4386: "Alleen cursusaankondigingen en discussies kunnen sectiespecifiek zijn"
   only_course_announcements_can_be_section_specific_eabcd6e0: "Alleen cursusaankondigingen kunnen sectiespecifiek zijn"
@@ -15743,6 +15791,7 @@ nl:
   out_of_points_possible_8ab14f7: "van %{points_possible}"
   out_of_pointspossible_3fb5ee20: "Vanuit %{pointsPossible}"
   out_of_pointspossible_c163105a: "van %{pointsPossible}"
+  outcome_alignment_to_non_scoring_content_3efa45fb: "Leerdoelen afstemmen op niet-scorende inhoud"
   outcome_da397d20: Leerdoel
   outcome_export_89229eb4: "Leerdoel exporteren"
   outcome_group_39fae76f: "Groepe van leerdoelen"
@@ -16080,6 +16129,7 @@ nl:
   permissions_365c49e: Machtigingen
   permissions_manage_9eea4f8f: "Machtigingen - beheren"
   permissions_v2_page_f96dde06: "Pagina Machtigingen V2"
+  permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Sta gebruik toe van alle “Include”-parameters voor deze ontwikkelaarssleutel. “Include\"-parameters kunnen toegang bieden naar extra gegevens die niet zijn opgenomen in de bereiken die hieronder zijn geselecteerd."
   persian_a8cadb95: Perzisch
   personal_pronouns_7d271f52: "Persoonlijke voornaamwoorden"
   peru_51_d3d38d1f: "Peru (+51)"
@@ -17098,6 +17148,7 @@ nl:
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Verstrek informatie over zelfstudie voor nieuwe gebruikers in een uitklapmenu."
   provider_attribute_b1cad655: "Provider kenmerk"
   provider_icon_5064fa6e: "Provider pictogram"
+  provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: "Geeft een vlag aan de Ontwikkelaarssleutel om Include-parameters in API-aanvragen te ondersteunen"
   provides_users_with_a_planner_dashboard_option_1e8d234d: "Geeft gebruikers met een optie voor het plannerdashboard weer."
   provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Geeft gebruikers een optie voor een To-Do lijst in het dashboard weer."
   provision_a_catalog_account_8cea67f6: "Een catalogusaccount voorzien"
@@ -19792,6 +19843,7 @@ nl:
   send_message_to_name_c8ac05fc: "Berichten sturen naar %{name}"
   send_notification_81773687: "Melding verzenden"
   send_notification_directly_to_users_when_announcem_c3aac61c: "Stuur melding rechtstreeks naar gebruikers wanneer de aankondiging start"
+  send_notifications_when_manually_created_access_to_a1631123: "Verstuur meldingen bij handmatig gemaakte toegangstokens"
   send_only_to_the_following_types_of_users_d8465c11: "Alleen inleveren aan de volgende typen gebruikers:"
   send_page_to_another_user_6ef5a7c1: "Stuur pagina naar een andere gebruiker"
   send_quiz_to_user_e8c47177: "Toets verzenden naar gebruiker"
@@ -21439,6 +21491,7 @@ nl:
   switzerland_41_f861e414: "Zwitserland (+41)"
   switzerland_f4f7137c: Zwitserland
   syllabus: Cursussyllabus
+  syllabus_course_summary_option_951a8144: "Optie Cursusoverzicht in de syllabus"
   syllabus_f191f65b: Syllabus
   syllabus_tutorial_tray_97e8ef82: "Zelfstudiemenu Syllabus"
   syllabus_visibility_options_a81ef419: "Zichtbaarheidsopties voor syllabus"
@@ -21644,6 +21697,7 @@ nl:
                      en worden niet meegerekend bij de limiet van 50 domeinen.
   the_course_link_validator_searches_course_content__563fa215: "De cursuskoppelingsvalidator doorzoekt cursusinhoud op ongeldige of onbereikbare links en afbeeldingen."
   the_course_link_validator_searches_through_course__76f0bc63: "De cursus linkvalidator zoekt door de cursusinhoud en retourneert elke ongeldige of niet reagerende link die hij tegenkomt. Let wel dat sommige links die als niet reagerend gevlagd worden gewoon ontoegankelijk zijn van onze servers en wel voor de cursisten zullen functioneren."
+  the_course_state_manage_permission_allows_the_user_1d9da094: "Met de machtiging Cursusstatus - beheren kan de gebruiker cursussen publiceren die geen modules bevatten. Om module-inhoud te publiceren of de publicatie ervan ongedaan te maken, moet Cursusinhoud - toevoegen/bewerken/verwijderen​ zijn ingeschakeld."
   the_course_state_manage_permission_allows_users_to_67e16652: "Met de machtiging Cursusstatus - beheren kunnen gebruikers cursussen publiceren die geen modules bevatten. Om module-inhoud te publiceren of de publicatie ervan ongedaan te maken, moet Cursusinhoud - toevoegen/bewerken/verwijderen​ zijn ingeschakeld."
   the_course_state_manage_permission_allows_users_to_a4fe62af: "Met de machtiging Cursusstatus - beheren kunnen gebruikers cursussen publiceren die geen modules bevatten. Om module-inhoud te publiceren of de publicatie ervan ongedaan te maken, moet Cursusinhoud - toevoegen/bewerken/verwijderen​ zijn ingeschakeld."
   the_course_status_buttons_unpublished_and_publishe_e2dca595: "De Cursusstatus-knoppen (niet-gepubliceerd en gepubliceerd) worden pas weergegeven nadat de inlevering van een cursist is ontvangen. De publicatie van cursussen kan niet ongedaan worden gemaakt bij inleveringen van cursisten."
@@ -21925,6 +21979,10 @@ nl:
   this_grade_has_negative_points_496400d4: "Deze beoordeling heeft negatieve punten"
   this_grade_is_invalid_8ab192c7: "Deze beoordeling is ongeldig"
   this_grade_is_unusually_high_60533c20: "Deze beoordeling is ongebruikelijk hoog"
+  this_has_more_question_types_like_hotspot_categori_620e9df6: |-
+      Deze versie heeft meer vraagtypen zoals hotspot,
+              categorisering, vergelijking en rangschikking. Er zijn ook
+              meer functies voor modereren en aanpassing.
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Deze afbeelding verschijnt als een achtergrond watermerk op je pagina. Geaccepteerde formaten: png, svg, gif, jpeg"
   this_is_a_blueprint_course_5e7b47fe: "Dit is een blauwdrukcursus"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dit is een door komma's gescheiden lijst van URL's die vertrouwd kunnen worden. Iedere vertrouwde URL in deze lijst zal de code voor CSRF overslaan wanneer je op Canvas aanmeldt."
@@ -21976,6 +22034,7 @@ nl:
       Deze machtiging heeft geen invloed op de mogelijkheid om toetsbanken op cursusniveau te beheren in Toetsen. Toetsbanken beheren is daarentegen afhankelijk van de machtiging Opdrachten en toetsen - toevoegen/bewerken/verwijderen.
       Voor het volledig beheer van toetsbanken moeten deze machtiging en Opdrachten en toetsen - toevoegen/bewerken/verwijderen beide zijn ingeschakeld.
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Deze machtiging heeft geen invloed op de mogelijkheid om toetsbanken op cursusniveau te beheren in Toetsen. Toetsbanken beheren is daarentegen afhankelijk van de machtiging Opdrachten en toetsen - toevoegen/bewerken/verwijderen. Voor het volledig beheer van toetsbanken moeten deze machtiging en Opdrachten en toetsen - toevoegen/bewerken/verwijderen beide zijn ingeschakeld."
+  this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Deze machtiging heeft geen invloed op de mogelijkheid om toetsbanken op cursusniveau te beheren in Toetsen. Toetsbanken beheren is daarentegen afhankelijk van de machtiging Opdrachten en toetsen - toevoegen/bewerken/verwijderen. Voor het volledig beheer van toetsbanken moeten deze machtiging en Opdrachten en toetsen - toevoegen/bewerken/verwijderen beide zijn ingeschakeld."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Deze machtiging is beschikbaar voor alle Canvas-accounts maar dan wel alleen voor organisaties die gekoppeld zijn aan een Canvas Catalog-account. Momenteel heeft de machtiging geen front-endeffecten, maar engineering adviseert de machtiging ingeschakeld te houden voor beheerders. Voor andere rollen kan de machtiging worden uitgeschakeld."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Deze machtiging heeft alleen betrekking op cursusaankondigingen. Voor het beheren van algemene aankondigingen moet Algemene aankondigingen - toevoegen/bewerken/verwijderen​ zijn ingeschakeld."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Deze machtiging is alleen bedoeld voor het toevoegen van gebruikers op accountniveau. Om gebruikers toe te voegen, moet Gebruikers - cursisten toevoegen aan/verwijderen uit cursussen of Gebruikers - cursusleiders, cursusontwerpers of onderwijsassistenten toevoegen aan/verwijderen uit cursussen ook zijn ingeschakeld."
@@ -22308,6 +22367,7 @@ nl:
   to_activate_this_communication_channel_enter_the_f_f465efc5: "Om dit communicatiekanaal te activeren, voer je de bevestigingscode van vier tekens in die verzonden is naar %{sms_number}."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "Om aankondigingen toe te voegen, moet Discussies - modereren ook zijn ingeschakeld. Om recente aankondigingen op de startpagina weer te geven, moet het selectievakje Recente aankondigingen op startpagina Cursus weergeven zijn ingeschakeld in Cursusinstellingen."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Om groepen toe te voegen, te bewerken of te verwijderen, moet Groepen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld."
+  to_add_students_to_a_moderation_set_grades_view_al_40f2b8eb: "Om cursisten toe te voegen aan een reeks voor modereren, moet Cijfers - alle cijfers weergeven ook zijn ingeschakeld."
   to_add_users_to_a_course_users_add_remove_students_1c4d63d7: "Om gebruikers toe te voegen, moet Gebruikers - cursisten toevoegen aan/verwijderen uit cursussen en/of Gebruikers - cursusleiders, cursusontwerpers of onderwijsassistenten toevoegen aan/verwijderen uit cursussen ook zijn ingeschakeld. Om de sectie van een cursist te bewerken, moeten Gesprekken - berichten naar individuele cursisten sturen en Gebruikers - cursisten toevoegen aan/verwijderen uit cursussen​ ook beide zijn ingeschakeld. Om de sectie van een cursusleider, cursusontwerper of onderwijsassistent te bewerken, moeten Gesprekken - berichten naar individuele cursisten sturen en Gebruikers - cursusleiders, cursusontwerpers of onderwijsassistenten toevoegen aan/verwijderen uit cursussen​ ook beide zijn ingeschakeld."
   to_add_users_to_a_course_users_add_remove_students_5036ad25: |-
       Om gebruikers toe te voegen, moet Gebruikers - cursisten toevoegen aan/verwijderen uit cursussen voor de cursus en/of Gebruikers - cursusleiders, cursusontwerpers of onderwijsassistenten toevoegen aan/verwijderen
@@ -22330,6 +22390,7 @@ nl:
       Om een langlopende vergadering te beëindigen, moet Cursusinhoud - toevoegen/bewerken/verwijderen​ zijn ingeschakeld.
       Als Cursusinhoud - toevoegen/bewerken/verwijderen is ingeschakeld en Onlinevergaderingen - maken is uitgeschakeld, kan de gebruiker nog steeds vergaderingen beheren.
       Met deze machtiging kan een gebruiker vergaderingen maken in cursussen en groepen.
+  to_allow_full_management_of_conferences_created_by_bece5de: "Om volledig beheer mogelijk te maken van vergaderingen die door de gebruiker of anderen zijn gemaakt, moet de machtiging Cursusinhoud ook zijn ingeschakeld. Om een langlopende vergadering te beëindigen, moet de machtiging Cursusinhoud zijn ingeschakeld. Als de machtiging Cursusinhoud is ingeschakeld en Onlinevergaderingen - maken is uitgeschakeld, kan de gebruiker nog steeds vergaderingen beheren. Met deze machtiging kan de gebruiker vergaderingen maken in cursussen en groepen."
   to_allow_full_management_of_conferences_created_by_eae032e7: "Om volledig beheer mogelijk te maken van vergaderingen die door de gebruiker of anderen zijn gemaakt, moet de machtiging Cursusinhoud ook zijn ingeschakeld. Om een langlopende vergadering te beëindigen, moet de machtiging Cursusinhoud zijn ingeschakeld. Als de machtiging Cursusinhoud is ingeschakeld en Onlinevergaderingen - maken is uitgeschakeld, kan de gebruiker nog steeds vergaderingen beheren. Met deze machtiging kan een gebruiker vergaderingen maken in cursussen en groepen."
   to_allow_full_management_of_conferences_created_by_feec1984: |-
       Om volledig beheer mogelijk te maken van vergaderingen die door de gebruiker of anderen zijn gemaakt, moet Cursusinhoud - toevoegen/bewerken/verwijderen​ ook zijn ingeschakeld.
@@ -22341,9 +22402,11 @@ nl:
       Om door andere gebruikers gemaakte samenwerkingen te kunnen weergeven, bewerken en verwijderen, moet Cursusinhoud - toevoegen/bewerken/verwijderen ook zijn ingeschakeld.
       Als Cursusinhoud - toevoegen/bewerken/verwijderen is ingeschakeld en Samenwerkingen voor cursisten - maken is uitgeschakeld, kan de gebruiker geen nieuwe samenwerkingen maken maar wel alle samenwerkingen weergeven, bewerken en verwijderen.
       Om cursisten toe te voegen aan een samenwerking, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om een cursusgroep toe te voegen aan een samenwerking, moet Groepen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld.
+  to_allow_view_edit_and_delete_functionality_of_col_47c4821d: "Om door andere gebruikers gemaakte samenwerkingen te kunnen weergeven, bewerken en verwijderen, moet Cursusinhoud - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als Cursusinhoud - toevoegen/bewerken/verwijderen is ingeschakeld en Samenwerkingen voor cursisten - maken is uitgeschakeld, kan de gebruiker geen nieuwe samenwerkingen maken maar wel alle samenwerkingen weergeven, bewerken en verwijderen. Om cursisten toe te voegen aan een samenwerking, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om een cursusgroep toe te voegen aan een samenwerking, moet Groepen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld."
   to_allow_view_edit_and_delete_functionality_of_col_84a2cd3a: "Om door andere gebruikers gemaakte samenwerkingen te kunnen weergeven, bewerken en verwijderen, moet Cursusinhoud - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als Cursusinhoud - toevoegen/bewerken/verwijderen is ingeschakeld en Samenwerkingen voor cursisten - maken is uitgeschakeld, kan de gebruiker geen nieuwe samenwerkingen maken maar wel alle samenwerkingen weergeven, bewerken en verwijderen. Om cursisten toe te voegen aan een samenwerking, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om een cursusgroep toe te voegen aan een samenwerking, moet Groepen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld."
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "Om door andere gebruikers gemaakte samenwerkingen te kunnen weergeven, bewerken en verwijderen, moet Cursusinhoud - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als Cursusinhoud - toevoegen/bewerken/verwijderen is ingeschakeld en Samenwerkingen voor cursisten - maken is uitgeschakeld, kan de gebruiker geen nieuwe samenwerkingen maken maar wel alle samenwerkingen weergeven, bewerken en verwijderen. Om cursisten toe te voegen aan een samenwerking, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om een cursusgroep toe te voegen aan een samenwerking, moet Groepen - alle cursistengroepen weergeven ook zijn ingeschakeld."
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "Om door andere gebruikers gemaakte samenwerkingen te kunnen weergeven, bewerken en verwijderen, moet Cursusinhoud - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als Cursusinhoud - toevoegen/bewerken/verwijderen is ingeschakeld en Samenwerkingen voor cursisten - maken is uitgeschakeld, kan de gebruiker geen nieuwe samenwerkingen maken maar wel alle samenwerkingen weergeven, bewerken en verwijderen. Om cursisten toe te voegen aan een samenwerking, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om een cursusgroep toe te voegen aan een samenwerking, moet Groepen - alle cursistengroepen weergeven ook zijn ingeschakeld."
+  to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "Om door andere gebruikers gemaakte samenwerkingen te kunnen weergeven, bewerken en verwijderen, moet Cursusinhoud - toevoegen/bewerken/verwijderen ook zijn ingeschakeld. Als Cursusinhoud - toevoegen/bewerken/verwijderen is ingeschakeld en Samenwerkingen voor cursisten - maken is uitgeschakeld, kan de gebruiker geen nieuwe samenwerkingen maken maar wel alle samenwerkingen weergeven, bewerken en verwijderen. Om cursisten toe te voegen aan een samenwerking, moet Gebruikers - lijst weergeven ook zijn ingeschakeld. Om een cursusgroep toe te voegen aan een samenwerking, moet Groepen - alle cursistengroepen weergeven ook zijn ingeschakeld."
   to_be_added_2959cc72: "Toe te voegen"
   to_be_removed_d4b48586: "Te verwijderen"
   to_c4c44f4b: tot
@@ -22443,9 +22506,11 @@ nl:
               Om het inleveringslogboek te kunnen zien, moet Toetsen - inleveringslogboek weergeven ook zijn ingeschakeld.
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "Om een toets te modereren, moet Opdrachten en toetsen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "Om een toets te modereren, moet Cijfers - bewerken ook zijn ingeschakeld."
+  to_moderate_grades_grades_select_final_grade_for_m_57d4f675: "Om te kunnen modereren, moet Cijfers - eindcijfer voor modereren selecteren ook zijn ingeschakeld. Om cijfers voor een opdracht te posten of verbergen, moet Cijfers - bewerken ook zijn ingeschakeld."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "Om te kunnen modereren, moet Cijfers - eindcijfer voor modereren selecteren ook zijn ingeschakeld."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "Om een cliënt-ID te verkrijgen, moet een accountbeheerder een LTI-ontwikkelaarssleutel genereren."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Sleep een discussie hiernaartoe om deze boven aan de pagina vast te zetten of selecteer Vastzetten (Pin) in het menu voor discussie-instellingen."
+  to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: "Om cijfers te posten of verbergen, moet Cijfers - bewerken ook zijn ingeschakeld."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "Voor een voorbeeld van Thema Editor Branding moet je *High Contrast UI* uitschakelen."
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "Om module-inhoud te publiceren of de publicatie ervan ongedaan te maken, moeten Cursussen - toevoegen/bewerken/verwijderen en Cursusinhoud - weergeven ook zijn ingeschakeld. De publicatie van module-items kan niet ongedaan worden gemaakt als er inleveringen van cursisten zijn."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
@@ -22453,6 +22518,8 @@ nl:
               De publicatie van module-items kan niet ongedaan worden gemaakt als er inleveringen van cursisten zijn.
   to_publish_and_unpublish_module_content_courses_ad_ae996413: "Om module-inhoud te publiceren of de publicatie ervan ongedaan te maken, moeten Cursussen - toevoegen/bewerken/verwijderen en Cursusinhoud - weergeven ook zijn ingeschakeld."
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "Om module-inhoud te publiceren of de publicatie ervan ongedaan te maken, moeten Cursussen - toevoegen/bewerken/verwijderen en Cursusinhoud - weergeven ook zijn ingeschakeld."
+  to_publish_final_grades_for_a_moderated_assignment_430368a0: "Om eindcijfers voor een gemodereerde opdracht te publiceren, moet Cijfers - bewerken ook zijn ingeschakeld. Om eindcijfers voor een gemodereerde opdracht te publiceren, moet Cijfers - bewerken ook zijn ingeschakeld."
+  to_publish_final_grades_for_a_moderated_assignment_713090cf: "Om eindcijfers voor een gemodereerde opdracht te publiceren, moet Cijfers - bewerken ook zijn ingeschakeld."
   to_publish_unpublish_module_content_course_content_efc294d4: "Om module-inhoud te publiceren of de publicatie ervan ongedaan te maken, moet Cursusinhoud - toevoegen/bewerken/verwijderen​ zijn ingeschakeld."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "Om een verwijderde cursus te herstellen, moeten Cursussen - verwijderen ongedaan maken en Cursusinhoud - weergeven ook zijn ingeschakeld."
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "Om te voorkomen dat cursisten groepen kunnen maken, schakelt u het selectievakje 'Toestaan dat cursisten hun eigen groepen indelen' in Cursusinstellingen uit."
@@ -22460,6 +22527,7 @@ nl:
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Om te beperken tot gebruikers voor bepaalde Google Apps domeinen, voer je het domein hier in."
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "Om te beperken tot gebruikers voor bepaalde Google Apps-domeinen, voer je de domeinen hier in als een door komma's gescheiden lijst. Als je je wilt beperken tot een Google Apps-gebruiker in het algemeen, kun je '*’ invoeren."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Om beperkt te blijven tot gebruikers van je Azure Active Directory, voer je tenant hier in."
+  to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "Om een gemodereerde opdracht in SpeedGrader te bekijken, moet Cijfers - bewerken ook zijn ingeschakeld."
   to_search_and_view_notifications_for_a_user_users__becfb733: "Voor het zoeken naar en weergeven van meldingen voor een gebruiker, moet gebruikers - lijst weergeven ook zijn ingeschakeld."
   to_search_and_view_notifications_for_a_user_users__fab7293a: "Om te zoeken naar en weergeven van meldingen voor een gebruiker, moet Gebruikers - weergeven ook zijn ingeschakeld."
   to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
@@ -22500,6 +22568,7 @@ nl:
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       Om discussies in een cursus weer te geven, moet Discussies - weergeven zijn ingeschakeld.
       Om discussies te beantwoorden, moet Discussies - posten ook zijn ingeschakeld. Om opdrachtdetails voor een discussie te bewerken, moet Opdrachten en toetsen - toevoegen/bewerken/verwijderen ook zijn ingeschakeld.
+  to_view_discussions_in_a_course_discussions_view_m_a1c78aa2: "Om discussies in een cursus weer te geven, moet Discussies - weergeven zijn ingeschakeld. Zowel met Discussies - maken als Discussies - modereren kan de gebruiker een discussie maken op de pagina Discussies. Om discussies te beheren, moet Discussies - modereren ook zijn ingeschakeld."
   to_view_discussions_in_a_course_discussions_view_m_aa57dee7: |-
       Om discussies in een cursus weer te geven, moet Discussies - weergeven zijn ingeschakeld.
               Zowel met Discussies - maken als Discussies - modereren kan een gebruiker een discussie maken op de pagina Discussies. Om discussies te beheren, moet Discussies - modereren ook zijn ingeschakeld.
@@ -23886,6 +23955,7 @@ nl:
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Je kunt geen secties toewijzen aan een onderwerp van een groepsdiscussie"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Je kunt niet aan een groep buiten de opdrachtgroep toewijzen."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Je kunt geen thema's bewerken in deze subaccount."
+  you_cannot_leave_comments_until_you_submit_the_ass_82c3ad79: "Je kunt pas opmerkingen achterlaten nadat je de opdracht hebt ingeleverd"
   you_cannot_leave_leave_comments_until_you_submit_t_d3dcb44c: "Je kunt pas opmerkingen achterlaten nadat je de opdracht hebt ingeleverd"
   you_cannot_publish_this_assignment_while_there_are_e3dee69a: "Je kunt deze opdracht niet publiceren als er fouten zijn"
   you_cannot_remove_this_enrollment_c87be1cb: "Je kunt deze inschrijving niet verwijderen"
