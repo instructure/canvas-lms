@@ -1504,6 +1504,29 @@ describe DiscussionTopic do
       expect(@student.submissions.first.submission_type).to eq 'discussion_topic'
     end
 
+    it "should create use entry time when groupless students are (for whatever reason) posting to a graded group discussion" do
+      group_category = @course.group_categories.create!(:name => "category")
+      @group1 = @course.groups.create!(:name => "group 1", :group_category => group_category)
+
+      @topic.group_category = group_category
+      @topic.save!
+
+      entry = @topic.reply_from(:user => @student, :text => "entry")
+      @student.reload
+      expect(@student.submissions).to be_empty
+
+      entry_time = 1.minute.ago
+      DiscussionEntry.where(:id => entry.id).update_all(:created_at => entry_time)
+      @assignment = assignment_model(:course => @course, :lock_at => 1.day.ago)
+      @topic.assignment = @assignment
+      @topic.save
+      @student.reload
+      expect(@student.submissions.size).to eq 1
+      sub = @student.submissions.first
+      expect(sub.submission_type).to eq 'discussion_topic'
+      expect(sub.submitted_at).to eq entry_time # the submission time should be backdated to the entry creation time
+    end
+
     it "should have the correct submission date if submission has comment" do
       @assignment = @course.assignments.create!(:title => "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
