@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Tenglar"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Listi dreginn saman."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Listi dreginn saman"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Listi víkkaður út."
+    },
     "load_more_35d33c7": {
         "message": "Hlaða meira"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "kostir sprettigluggi"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } valið. Listi dreginn saman."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Valkvætt: Bæta við námskeiði"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "Vefslóð"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Notaðu örvalyklana til að fara á milli valmöguleika."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Notað af skjálesurum til að lýsa efni myndar"

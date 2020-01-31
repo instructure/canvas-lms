@@ -114,6 +114,9 @@
     "message": "{ items } elemento { items, plural,\n     =1 {completato}\n  other {elementi completati}\n}"
   },
   "late_2be42b88": { "message": "In ritardo" },
+  "list_collapsed_9ac35920": { "message": "L’elenco si è compresso." },
+  "list_collapsed_dde87718": { "message": "L’elenco si è compresso." },
+  "list_expanded_efec2d0": { "message": "L’elenco si è espanso." },
   "load_more_a36f9cf9": { "message": "Carica altro" },
   "load_prior_dates_f2b0f6f0": { "message": "Carica date precedenti" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -166,6 +169,9 @@
     "message": "*Viene mostrato solo il periodo di valutazione più recente."
   },
   "opportunities_popup_f6703842": { "message": "popup opportunità" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } selezionato. L’elenco si è compresso."
+  },
   "optional_add_course_ef0d70fc": { "message": "Facoltativo: Aggiungi corso" },
   "page_50c4823d": { "message": "Pagina" },
   "peer_review_74f26a13": { "message": "Revisione paritaria" },
@@ -221,6 +227,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Domani alle { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Impossibile contrassegnare come completato."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Utilizza i tasti freccia per spostarti tra le opzioni."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Ieri alle { date }" },
   "yesterday_c6bd6abf": { "message": "Ieri" },

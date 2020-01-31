@@ -96,6 +96,9 @@
     "message": "{ items } 已完成 { items, plural,\n     =1 { 個項目}\n  other { 個項目}\n}"
   },
   "late_2be42b88": { "message": "逾期" },
+  "list_collapsed_9ac35920": { "message": "名單收起。" },
+  "list_collapsed_dde87718": { "message": "名單收起" },
+  "list_expanded_efec2d0": { "message": "名單展開。" },
   "load_more_a36f9cf9": { "message": "載入更多" },
   "load_prior_dates_f2b0f6f0": { "message": "載入先前日期" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -136,6 +139,9 @@
     "message": "*只顯示最近的評分期。"
   },
   "opportunities_popup_f6703842": { "message": "機會彈出視窗" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "已選擇 { option }。名單收起。"
+  },
   "optional_add_course_ef0d70fc": { "message": "可選：添加課程" },
   "page_50c4823d": { "message": "頁面" },
   "peer_review_74f26a13": { "message": "同儕互評" },
@@ -190,6 +196,9 @@
   "tomorrow_9a6c9a00": { "message": "明天" },
   "tomorrow_at_date_b53f2cf1": { "message": "明天 { date }" },
   "unable_to_mark_as_complete_8141856d": { "message": "無法標記為完成。" },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "使用箭頭鍵導航選項。"
+  },
   "yesterday_at_date_1aa6d18e": { "message": "昨天 { date }" },
   "yesterday_c6bd6abf": { "message": "昨天" },
   "you_have_media_feedback_f5f9aba8": { "message": "您有媒體反饋。" },

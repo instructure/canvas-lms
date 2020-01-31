@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "リンク"
     },
+    "list_collapsed_9ac35920": {
+        "message": "リストが破損しています。"
+    },
+    "list_collapsed_dde87718": {
+        "message": "リストが破損しています"
+    },
+    "list_expanded_efec2d0": {
+        "message": "リストが拡張されました。"
+    },
     "load_more_35d33c7": {
         "message": "もっと読み込む"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "機会ポップアップ"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } が選択されました。リストが破損しています。"
     },
     "optional_add_course_ef0d70fc": {
         "message": "オプション：コースの追加"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "矢印キーを使用してオプションを移動します。"
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "スクリーンリーダーが画像のコンテンツを説明するのに使用します"

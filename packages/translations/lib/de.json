@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Links"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Liste ausgeblendet."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Liste ausgeblendet"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Liste eingeblendet."
+    },
     "load_more_35d33c7": {
         "message": "Mehr laden"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "Chancen-Popup-Fenster"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } ausgewählt. Liste ausgeblendet."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Optional: Kurs hinzufügen"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Navigieren Sie mit den Pfeiltasten in den Optionen."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Verwendet von einem Screen-Reader zur Beschreibung des Contents eines Bilds"

@@ -114,6 +114,9 @@
     "message": "{ items } suoritettu { items, plural,\n     =1 {kohde}\n  other {kohdetta}\n}"
   },
   "late_2be42b88": { "message": "Myöhään" },
+  "list_collapsed_9ac35920": { "message": "Luettelo kutistettu." },
+  "list_collapsed_dde87718": { "message": "Luettelo kutistettu" },
+  "list_expanded_efec2d0": { "message": "Luettelo laajennettu." },
   "load_more_a36f9cf9": { "message": "Lataa lisää" },
   "load_prior_dates_f2b0f6f0": { "message": "Lataa edelliset päivämäärät" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -170,6 +173,9 @@
   "opportunities_popup_f6703842": {
     "message": "mahdollisuuksien ponnahdusikkuna"
   },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } valittu. Luettelo kutistettu."
+  },
   "optional_add_course_ef0d70fc": { "message": "Valinnainen: Lisää kurssi" },
   "page_50c4823d": { "message": "Sivu" },
   "peer_review_74f26a13": { "message": "Vertaisarviointi" },
@@ -223,6 +229,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Huomenna kohteessa { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Ei voitu merkitä valmiiksi."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Siirry vaihtoehdoissa nuolinäppäinten avulla."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Eilen { date }" },
   "yesterday_c6bd6abf": { "message": "Eilen" },

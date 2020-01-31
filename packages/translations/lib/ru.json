@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Ссылки"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Список свернут."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Список свернут"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Список развернут."
+    },
     "load_more_35d33c7": {
         "message": "Загрузить еще"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "всплывающее окно возможностей"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } выбрано. Список свернут."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Опционально: Добавить курс"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Используйте клавиши со стрелками для навигации по параметрам."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Используется скринридерами для описания контента изображения"

@@ -114,6 +114,9 @@
     "message": "{ items } lokið { items, plural,\n     =1 {atriði}\n  other {atriði}\n}"
   },
   "late_2be42b88": { "message": "Seint" },
+  "list_collapsed_9ac35920": { "message": "Listi dreginn saman." },
+  "list_collapsed_dde87718": { "message": "Listi dreginn saman" },
+  "list_expanded_efec2d0": { "message": "Listi víkkaður út." },
   "load_more_a36f9cf9": { "message": "Hlaða meira" },
   "load_prior_dates_f2b0f6f0": { "message": "Hlaða fyrri dagsetningum" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -162,6 +165,9 @@
     "message": "*Aðeins nýjasta einkunnatímabil sýnt."
   },
   "opportunities_popup_f6703842": { "message": "kostir sprettigluggi" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } valið. Listi dreginn saman."
+  },
   "optional_add_course_ef0d70fc": { "message": "Valkvætt: Bæta við námskeiði" },
   "page_50c4823d": { "message": "Síða" },
   "peer_review_74f26a13": { "message": "Jafningjamat" },
@@ -217,6 +223,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Á morgun klukkan { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Ekki tókst að merkja þetta sem fullklárað."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Notaðu örvalyklana til að fara á milli valmöguleika."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Í gær klukkan { date }" },
   "yesterday_c6bd6abf": { "message": "Í gær" },
