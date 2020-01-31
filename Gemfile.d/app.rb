@@ -123,7 +123,7 @@ gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.5.0'
-gem 'inst-jobs-statsd', '1.2.3'
+gem 'inst-jobs-statsd', '1.3.1'
 gem 'gepub', '1.0.4'
 gem 'imperium', '0.5.2', require: false
 gem 'vault', '0.13.0', require: false
