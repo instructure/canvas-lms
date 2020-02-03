@@ -121,7 +121,10 @@ class ContextModulesController < ApplicationController
       end
       add_body_class('padless-content')
       js_bundle :context_modules
-      js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
+      js_env(
+        CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
+        PROCESS_MULTIPLE_CONTENT_ITEMS: Account.site_admin.feature_enabled?(:process_multiple_content_items_modules_index)
+      )
       css_bundle :content_next, :context_modules2
       render stream: can_stream_template?
     end

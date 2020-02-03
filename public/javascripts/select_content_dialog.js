@@ -50,7 +50,7 @@ SelectContentDialog.deepLinkingListener = event => {
     event.data &&
     event.data.messageType === 'LtiDeepLinkingResponse'
   ) {
-    if (event.data.content_items.length > 1) {
+    if (event.data.content_items.length > 1 && ENV.process_multiple_content_items_modules_index) {
       processMultipleContentItems(event)
         .then(result => {
           const $dialog = $('#resource_selection_dialog')
