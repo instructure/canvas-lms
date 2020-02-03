@@ -278,6 +278,7 @@ describe AccountsController do
         :enable_turnitin => true,
         :admins_can_change_passwords => true,
         :admins_can_view_notifications => true,
+        :limit_parent_app_web_access => true,
       }}}
       @account.reload
       expect(@account.global_includes?).to be_falsey
@@ -285,6 +286,7 @@ describe AccountsController do
       expect(@account.enable_turnitin?).to be_falsey
       expect(@account.admins_can_change_passwords?).to be_falsey
       expect(@account.admins_can_view_notifications?).to be_falsey
+      expect(@account.limit_parent_app_web_access?).to be_falsey
     end
 
     it "should allow site_admin to update certain settings" do
@@ -298,6 +300,7 @@ describe AccountsController do
         :enable_turnitin => true,
         :admins_can_change_passwords => true,
         :admins_can_view_notifications => true,
+        :limit_parent_app_web_access => true,
       }}}
       @account.reload
       expect(@account.global_includes?).to be_truthy
@@ -305,6 +308,7 @@ describe AccountsController do
       expect(@account.enable_turnitin?).to be_truthy
       expect(@account.admins_can_change_passwords?).to be_truthy
       expect(@account.admins_can_view_notifications?).to be_truthy
+      expect(@account.limit_parent_app_web_access?).to be_truthy
     end
 
     it 'does not allow anyone to set unexpected settings' do

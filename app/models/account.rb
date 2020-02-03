@@ -252,6 +252,7 @@ class Account < ActiveRecord::Base
 
   add_setting :enable_course_catalog, :boolean => true, :root_only => true, :default => false
   add_setting :usage_rights_required, :boolean => true, :default => false, :inheritable => true
+  add_setting :limit_parent_app_web_access, boolean: true, default: false
 
 
   def settings=(hash)

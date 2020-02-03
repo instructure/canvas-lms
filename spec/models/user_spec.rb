@@ -3192,6 +3192,42 @@ describe User do
     end
   end
 
+  describe "limit_parent_app_web_access?" do
+    before(:once) do
+      user_with_pseudonym
+      @pseudonym.account.settings[:limit_parent_app_web_access] = nil
+      @pseudonym.account.save!
+    end
+
+    it "does not limit parent app web access by default" do
+      expect(@user.limit_parent_app_web_access?).to eq false
+    end
+
+    it "does limit if the pseudonym limits this" do
+      @pseudonym.account.settings[:limit_parent_app_web_access] = true
+      @pseudonym.account.save!
+      expect(@user.limit_parent_app_web_access?).to eq true
+    end
+
+    describe "multiple pseudonyms" do
+      before(:once) do
+        @other_account = Account.create :name => 'Other Account'
+        @other_account.settings[:limit_parent_app_web_access] = true
+        @other_account.save!
+        user_with_pseudonym(:user => @user, :account => @other_account)
+      end
+
+      it "limits if one pseudonym's account limits this" do
+        expect(@user.limit_parent_app_web_access?).to eq true
+      end
+
+      it "doesn't limit if only a deleted pseudonym's account limits this" do
+        @user.pseudonyms.where(account_id: @other_account).first.destroy
+        expect(@user.limit_parent_app_web_access?).to eq false
+      end
+    end
+  end
+
   describe 'generate_observer_pairing_code' do
     before(:once) do
       course_with_student
