@@ -155,7 +155,7 @@ class ApplicationController < ActionController::Base
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
           k12: k12?,
           use_responsive_layout: use_responsive_layout?,
-          use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
+          use_rce_enhancements: (@context.is_a?(User) ? @domain_root_account : @context).try(:feature_enabled?, :rce_enhancements),
           rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
           DIRECT_SHARE_ENABLED: @domain_root_account.try(:feature_enabled?, :direct_share),
           help_link_name: help_link_name,
