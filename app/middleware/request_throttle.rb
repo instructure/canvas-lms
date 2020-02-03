@@ -49,6 +49,7 @@ class RequestThrottle
 
     status, headers, response = nil
     throttled = false
+
     bucket = LeakyBucket.new(client_identifier(request))
 
     cost = bucket.reserve_capacity do
@@ -281,7 +282,7 @@ class RequestThrottle
     # round trips, and possibly more when we get a transaction conflict.
     # amount and reserve_cost are passed separately for logging purposes.
     def increment(amount, reserve_cost = 0, current_time = Time.now)
-      if client_identifier.blank? || !Canvas.redis_enabled?
+      if client_identifier.blank? || !Canvas.redis_enabled? || Setting.get("request_throttle.skip", "false") == "true"
         return
       end
 
