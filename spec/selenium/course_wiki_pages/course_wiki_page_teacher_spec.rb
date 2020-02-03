@@ -15,21 +15,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative '../common'
 require_relative 'page_objects/wiki_page'
+require_relative 'page_objects/wiki_index_page'
+require_relative '../helpers/wiki_pages_shared_examples'
 
 describe 'course wiki pages' do
   include_context 'in-process server selenium tests'
   include CourseWikiPage
+  include CourseWikiIndexPage
 
   context 'As a teacher' do
     before do
-      account_model
-      course_with_teacher_logged_in account: @account
+      course_with_teacher_logged_in
+      @page = @course.wiki_pages.create!(title: 'han')
     end
 
     it "should show immersive Reader button whether page is published or unpublished" do
       @course.root_account.enable_feature!(:immersive_reader_wiki_pages)
-      page = @course.wiki_pages.create!(title: 'han')
-      visit_wiki_page_view(@course.id, page.title)
+      visit_wiki_page_view(@course.id, @page.title)
 
       # verify unpublishing keeps the button on the page
       unpublish_wiki_page
@@ -38,6 +40,12 @@ describe 'course wiki pages' do
       # verify publishing keeps the button on the page
       publish_wiki_page
       expect(immersive_reader_btn).to be_displayed
+    end
+
+    context 'With granular permission on' do
+      it_behaves_like "wiki_pages_granular_permissions" do
+        let(:set_granular_permission) { @course.root_account.enable_feature!(:granular_permissions_wiki_pages) }
+      end
     end
   end
 end

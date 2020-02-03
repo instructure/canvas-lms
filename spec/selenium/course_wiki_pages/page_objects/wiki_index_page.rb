@@ -19,8 +19,31 @@ require_relative '../../common'
 
 module CourseWikiIndexPage
     #------------------------------ Selectors -----------------------------
+    def new_page_btn_selector
+      '.btn.new_page'
+    end
+
+    def edit_menu_item_selector
+      '.edit-menu-item'
+    end
+
+    def delete_menu_item_selctor
+      '.delete-menu-item'
+    end
+
+    def duplicate_wiki_page_menu_item_selector
+      '.duplicate-wiki-page'
+    end
 
     #------------------------------ Elements ------------------------------
+    def page_index_content_container
+      f('#content')
+    end
+
+    def page_index_new_page_btn
+      f(new_page_btn_selector)
+    end
+
     def page_item_row(page_title)
       fj("tr:contains[#{page_title}]")
     end
@@ -31,6 +54,14 @@ module CourseWikiIndexPage
 
     def wiki_page_item_settings_menu
       f("ul[role='menu']")
+    end
+
+    def page_index_more_options_menu_open
+      f('.ui-menu.ui-state-open')
+    end
+
+    def page_index_duplicate_wiki_page_menu_item
+      f(duplicate_wiki_page_menu_item_selector)
     end
 
     def copy_to_menu_item
@@ -56,6 +87,11 @@ module CourseWikiIndexPage
     #------------------------------ Actions ------------------------------
     def visit_course_wiki_index_page(course_id)
       get "/courses/#{course_id}/pages"
+    end
+
+    def click_manage_wiki_page_item_button(wiki_page_title)
+      f("a[aria-label='Settings for #{wiki_page_title}']").click
+      wait_for_ajaximations
     end
 
     #------------------------------ Methods ------------------------------
