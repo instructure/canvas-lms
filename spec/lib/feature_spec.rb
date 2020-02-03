@@ -169,6 +169,23 @@ describe Feature do
       expect(fd.default_transitions(t_user, 'off')).to eql({'on'=>{'locked'=>false}})
     end
   end
+
+  describe "remove_obsolete_flags" do
+    it "removes old feature flags for nonexistent features" do
+      # some hackery to circumvent the validation and create flags for nonexistent features
+      t_root_account.feature_flags.create!(feature: 'RA', state: 'on').tap do |flag|
+        FeatureFlag.where(id: flag.id).update_all(feature: 'nonexist')
+      end
+      t_root_account.feature_flags.create!(feature: 'RA', state: 'on').tap do |flag|
+        FeatureFlag.where(id: flag.id).update_all(feature: 'nonexist-old', updated_at: 90.days.ago)
+      end
+      t_root_account.feature_flags.create!(feature: 'RA', state: 'on')
+
+      Feature.remove_obsolete_flags
+      expect(t_root_account.feature_flags.where(feature: %w(RA nonexist nonexist-old)).pluck(:feature))
+        .to match_array(%w(RA nonexist))
+    end
+  end
 end
 
 describe "Feature.register" do
