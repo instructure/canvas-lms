@@ -22,7 +22,10 @@ class Mutations::CreateModule < Mutations::BaseMutation
   argument :name, String, required: true
   argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
 
-  field :module, Types::ModuleType, null: true
+  field :module, Types::ModuleType, null: true, resolver_method: :will_not_be_called
+  def will_not_be_called
+    # This is a silly workaround for https://github.com/rmosolgo/graphql-ruby/issues/2723
+  end
 
   def resolve(input:)
     course_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:course_id], "Course")
