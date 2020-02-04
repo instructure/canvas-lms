@@ -343,6 +343,9 @@ class ProfileController < ApplicationController
         user_params.delete(:short_name)
         user_params.delete(:sortable_name)
       end
+      if user_params[:pronouns].present? && @domain_root_account.pronouns.exclude?(user_params[:pronouns].strip)
+        user_params.delete(:pronouns)
+      end
       if @user.update(user_params)
         pseudonymed = false
         if params[:default_email_id].present?
