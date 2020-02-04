@@ -62,7 +62,6 @@ class AuthenticationProvider::GitHub < AuthenticationProvider::Oauth2
 
   def user(token)
     token.options[:user] ||= begin
-      token.options[:mode] = :query
       user = token.get('user').parsed
       if !user['email'] && authorize_options[:scope]
         user['email'] = token.get('user/emails').parsed.find { |e| e['primary'] }.try(:[], 'email')
