@@ -631,12 +631,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def context_module_action
-    if self.quiz && self.user
-      if self.score
-        self.quiz.context_module_action(self.user, :scored, self.kept_score)
-      end
-      if self.finished_at
-        self.quiz.context_module_action(self.user, :submitted)
+    self.class.connection.after_transaction_commit do
+      if self.quiz && self.user
+        if self.score
+          self.quiz.context_module_action(self.user, :scored, self.kept_score)
+        end
+        if self.finished_at
+          self.quiz.context_module_action(self.user, :submitted, self.kept_score) # pass in the score so we don't accidentally unset a min_score requirement
+        end
       end
     end
   end
