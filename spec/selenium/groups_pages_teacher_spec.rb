@@ -250,7 +250,12 @@ describe "groups" do
     end
 
     #-------------------------------------------------------------------------------------------------------------------
+    # We have the funky indenting here because we will remove this once the granular
+    # permission stuff is released, and I don't want to complicate the git history
+    # for this file
+    RSpec.shared_examples "group_pages_teacher_granular_permissions" do
     describe "pages page" do
+      before { set_granular_permission }
       it_behaves_like 'pages_page', :teacher
 
       it "should allow teachers to create a page", priority: "1", test_id: 289993 do
@@ -277,6 +282,19 @@ describe "groups" do
 
         get "/groups/#{new_group.id}/pages"
         expect(f('.index-content')).not_to contain_css('.wiki-page-link')
+      end
+    end
+    end
+
+    describe 'With granular permission on' do
+      it_behaves_like "group_pages_teacher_granular_permissions" do
+        let(:set_granular_permission) { @course.root_account.enable_feature!(:granular_permissions_wiki_pages) }
+      end
+    end
+
+    describe 'With granular permission off' do
+      it_behaves_like "group_pages_teacher_granular_permissions" do
+        let(:set_granular_permission) { @course.root_account.disable_feature!(:granular_permissions_wiki_pages) }
       end
     end
 

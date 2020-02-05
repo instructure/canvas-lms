@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.shared_examples "wiki_pages_granular_permissions" do
+RSpec.shared_examples "course_pages_granular_permissions" do
   def update_role_override(permission, role, is_enabled = true)
     RoleOverride.create!(
       permission: permission.to_s,
