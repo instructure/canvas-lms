@@ -76,7 +76,7 @@ class Notification < ActiveRecord::Base
   def self.reset_cache!
     @all = nil
     @all_by_id = nil
-    if ::Rails.env.test? && !@checked_partition
+    if ::Rails.env.test? && !@checked_partition && !ActiveRecord::Base.in_migration
       Messages::Partitioner.process # might have fallen out of date - but we should only check if we're actually running notification specs
       @checked_partition = true
     end
