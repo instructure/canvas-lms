@@ -73,16 +73,16 @@ describe AccountNotification do
 
   it "should allow closing an announcement" do
     @user.close_announcement(@announcement)
-    expect(@user.preferences[:closed_notifications]).to eq [@announcement.id]
+    expect(@user.get_preference(:closed_notifications)).to eq [@announcement.id]
     expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq []
   end
 
   it "should remove non-applicable announcements from user preferences" do
     @user.close_announcement(@announcement)
-    expect(@user.preferences[:closed_notifications]).to eq [@announcement.id]
+    expect(@user.get_preference(:closed_notifications)).to eq [@announcement.id]
     @announcement.destroy
     expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq []
-    expect(@user.preferences[:closed_notifications]).to eq []
+    expect(@user.get_preference(:closed_notifications)).to eq []
   end
 
   describe "sub accounts" do
@@ -493,7 +493,7 @@ describe AccountNotification do
       @shard1.activate do
         @user.close_announcement(@announcement)
       end
-      expect(@user.preferences[:closed_notifications]).to eq [@announcement.id]
+      expect(@user.get_preference(:closed_notifications)).to eq [@announcement.id]
       @shard1.activate do
         expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq []
       end

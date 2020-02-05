@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,16 +14,16 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-class PopulateFinalGradeOverrideCourseSetting < ActiveRecord::Migration[5.1]
-  tag :postdeploy
-
-  def up
-    if User.exists? # don't raise for a fresh install
-      raise "DataFixup::PopulateFinalGradeOverrideCourseSetting needs to be run on a previous release"
+#
+module DataFixup::SplitUpUserPreferences
+  def self.run(start_at, end_at)
+    User.find_ids_in_ranges(:start_at => start_at, :end_at => end_at) do |min_id, max_id|
+      User.where(:id => min_id..max_id).where("id < ? AND preferences IS NOT NULL", Shard::IDS_PER_SHARD).each do |u|
+        if u.needs_preference_migration?
+          u.migrate_preferences_if_needed
+          u.save
+        end
+      end
     end
-  end
-
-  def down
   end
 end

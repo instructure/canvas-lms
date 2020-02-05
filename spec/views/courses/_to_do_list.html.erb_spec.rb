@@ -49,8 +49,7 @@ describe "courses/_to_do_list.html.erb" do
         end
 
         @user = @teacher
-        @user.course_nicknames[@course.id] = "My Awesome Course"
-        @user.save!
+        @user.set_preference(:course_nicknames, @course.id, "My Awesome Course")
         view_context
         # title, course nickname, points, due date, number of submissions to grade
         render partial: "courses/to_do_list", locals: {contexts: nil, show_legacy_todo_list: true}
@@ -74,8 +73,7 @@ describe "courses/_to_do_list.html.erb" do
         allow(@teacher).to receive(:assignments_needing_grading).and_return(Assignment.where(id: @assignment.id))
         allow_any_instance_of(Assignments::NeedsGradingCountQuery).to receive(:manual_count).and_return(1000)
         @user = @teacher
-        @user.course_nicknames[@course.id] = "My Awesome Course"
-        @user.save!
+        @user.set_preference(:course_nicknames, @course.id, "My Awesome Course")
         view_context
         # title, course nickname, points, due date, number of submissions to grade
         render partial: "courses/to_do_list", locals: {contexts: nil, show_legacy_todo_list: true}
@@ -106,8 +104,7 @@ describe "courses/_to_do_list.html.erb" do
         @submission = submission_model(assignment: @assignment, body: "my submission")
         @submission.find_or_create_provisional_grade!(@teacher, grade: 5)
         @user = @teacher
-        @user.course_nicknames[@course.id] = "My Awesome Course"
-        @user.save!
+        @user.set_preference(:course_nicknames, @course.id, "My Awesome Course")
         view_context
         render partial: "courses/to_do_list", locals: {contexts: nil, show_legacy_todo_list: true}
         expect(response).to include "Moderate ModerateMe"

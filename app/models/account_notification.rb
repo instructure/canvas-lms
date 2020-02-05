@@ -122,13 +122,12 @@ class AccountNotification < ActiveRecord::Base
     end
 
     user.shard.activate do
-      closed_ids = user.preferences[:closed_notifications] || []
+      closed_ids = user.get_preference(:closed_notifications) || []
       # If there are ids marked as 'closed' that are no longer
       # applicable, they probably need to be cleared out.
       current_ids = current.map(&:id)
       if !(closed_ids - current_ids).empty?
-        closed_ids = user.preferences[:closed_notifications] &= current_ids
-        user.save!
+        user.set_preference(:closed_notifications, closed_ids & current_ids)
       end
       current.reject! { |announcement| closed_ids.include?(announcement.id) }
 

@@ -16,15 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class GradebookGradingPeriodAssignments
-  def initialize(course, settings)
+  def initialize(course, course_settings)
     raise "Context must be a course" unless course.is_a?(Course)
     raise "Context must have an id" unless course.id
 
     @course = course
-    @settings_for_course = settings.fetch(@course.id, {
+    @settings_for_course = course_settings || {
       'show_concluded_enrollments' => 'false',
       'show_inactive_enrollments' => 'false'
-    })
+    }
   end
 
   def to_h

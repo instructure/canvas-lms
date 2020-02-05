@@ -810,7 +810,7 @@ class CalendarEventsApiController < ApplicationController
   def visible_contexts
     get_context
     get_all_pertinent_contexts(include_groups: true, favorites_first: true)
-    selected_contexts = @current_user.preferences[:selected_calendar_contexts] || []
+    selected_contexts = @current_user.get_preference(:selected_calendar_contexts) || []
 
     contexts = @contexts.map do |context|
       context_data = {
@@ -839,8 +839,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def save_selected_contexts
-    @current_user.preferences[:selected_calendar_contexts] = params[:selected_contexts]
-    @current_user.save!
+    @current_user.set_preference(:selected_calendar_contexts, params[:selected_contexts])
     render json: {status: 'ok'}
   end
 

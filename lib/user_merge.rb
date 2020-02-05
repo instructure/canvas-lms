@@ -60,7 +60,12 @@ class UserMerge
       merge_data.items.create!(user: from_user, item_type: 'user_preferences', item: from_user.preferences)
       merge_data.items.create!(user: target_user, item_type: 'user_preferences', item: target_user.preferences)
 
-      prefs = shard_aware_preferences
+      if from_user.needs_preference_migration?
+        prefs = shard_aware_preferences
+      else
+        copy_migrated_preferences # uses new rows to store preferences
+        prefs = from_user.preferences
+      end
       target_user.preferences = target_user.preferences.merge(prefs)
       target_user.save if target_user.changed?
 
@@ -184,6 +189,13 @@ class UserMerge
     end
   end
 
+  def translate_course_id_or_asset_string(key)
+    id = key.is_a?(String) ? key.split('_').last : key
+    new_id = Shard.relative_id_for(id, from_user.shard, target_user.shard)
+    key.is_a?(String) ? [key.split('_').first, new_id].join('_') : new_id
+  end
+
+  # can remove when all preferences have been migrated
   def shard_aware_preferences
     return from_user.preferences if from_user.shard == target_user.shard
     preferences = from_user.preferences.dup
@@ -191,14 +203,47 @@ class UserMerge
       preferences.delete(pref)
       new_pref = {}
       from_user.preferences.dig(pref)&.each do |key, value|
-        id = key.is_a?(String) ? key.split('_').last : key
-        new_id = Shard.relative_id_for(id, from_user.shard, target_user.shard)
-        new_key = key.is_a?(String) ? [key.split('_').first, new_id].join('_') : new_id
+        new_key = translate_course_id_or_asset_string(key)
         new_pref[new_key] = value
       end
       preferences[pref] = new_pref unless new_pref.empty?
     end
     preferences
+  end
+
+  def copy_migrated_preferences
+    target_user.migrate_preferences_if_needed # may as well
+    from_values = from_user.user_preference_values.to_a
+    target_values = target_user.user_preference_values.to_a.index_by{|r| [r.key, r.sub_key]}
+
+    new_record_hashes = []
+    existing_record_updates = {}
+
+    from_values.each do |from_record|
+      key = from_record.key
+      sub_key = from_record.sub_key
+      value = from_record.value
+      if from_user.shard != target_user.shard
+        # tl;dr do the same thing as shard_aware_preferences
+        if key == "custom_colors"
+          value = Hash[value.map{|id, color| [translate_course_id_or_asset_string(id), color]}]
+        elsif key == "course_nicknames"
+          sub_key = translate_course_id_or_asset_string(sub_key)
+        end
+      end
+
+      if existing_record = target_values[[key, sub_key]]
+        existing_record_updates[existing_record] = value
+      else
+        new_record_hashes << {:user_id => target_user.id, :key => key, :sub_key => sub_key&.to_json, :value => value.to_yaml}
+      end
+    end
+    target_user.shard.activate do
+      UserPreferenceValue.bulk_insert(new_record_hashes)
+      existing_record_updates.each do |record, new_value|
+        UserPreferenceValue.where(:id => record).update_all(:value => new_value)
+      end
+    end
   end
 
   def populate_past_lti_ids

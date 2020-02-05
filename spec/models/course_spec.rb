@@ -5534,9 +5534,8 @@ end
 describe Course, "#apply_nickname_for!" do
   before(:once) do
     @course = Course.create! :name => 'some terrible name'
-    @user = User.new
-    @user.course_nicknames[@course.id] = 'nickname'
-    @user.save!
+    @user = User.create!
+    @user.set_preference(:course_nicknames, @course.id, 'nickname')
   end
 
   it "sets name to user's nickname (non-persistently)" do

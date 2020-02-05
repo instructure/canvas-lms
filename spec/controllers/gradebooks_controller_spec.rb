@@ -379,16 +379,14 @@ describe GradebooksController do
       end
 
       it "sort order of 'due_at' sorts by due date (null last), then title" do
-        @teacher.preferences[:course_grades_assignment_order] = { @course.id => :due_at }
-        @teacher.save!
+        @teacher.set_preference(:course_grades_assignment_order, @course.id, :due_at)
         get 'grade_summary', params: {course_id: @course.id, id: @student.id}
           expect(assignment_ids).to eq [assignment3, assignment2, assignment1].map(&:id)
       end
 
       context "sort by: title" do
         let!(:teacher_setup) do
-          @teacher.preferences[:course_grades_assignment_order] = { @course.id => :title }
-          @teacher.save!
+          @teacher.set_preference(:course_grades_assignment_order, @course.id, :title)
         end
 
         it "sorts assignments by title" do
@@ -406,7 +404,6 @@ describe GradebooksController do
 
       it "sort order of 'assignment_group' sorts by assignment group position, then assignment position" do
         @teacher.preferences[:course_grades_assignment_order] = { @course.id => :assignment_group }
-        @teacher.save!
         get 'grade_summary', params: {course_id: @course.id, id: @student.id}
           expect(assignment_ids).to eq [assignment1, assignment2, assignment3].map(&:id)
       end
@@ -433,8 +430,7 @@ describe GradebooksController do
         end
 
         let!(:teacher_setup) do
-          @teacher.preferences[:course_grades_assignment_order] = { @course.id => :module }
-          @teacher.save!
+          @teacher.set_preference(:course_grades_assignment_order, @course.id, :module)
         end
 
         it "sorts by module position, then context module tag position" do
@@ -1300,12 +1296,11 @@ describe GradebooksController do
       student1.update!(name: "Jon")
       student2 = student_in_course(active_all: true, name: "Ron").user
       student3 = student_in_course(active_all: true, name: "Don").user
-      @teacher.preferences[:gradebook_settings] = {}
-      @teacher.preferences[:gradebook_settings][@course.id] = {
+      @teacher.set_preference(:gradebook_settings, @course.global_id, {
         "sort_rows_by_column_id": "student",
         "sort_rows_by_setting_key": "name",
         "sort_rows_by_direction": "descending"
-      }
+      })
 
       user_session(@teacher)
       get :user_ids, params: {course_id: @course.id}, format: :json
@@ -2151,7 +2146,7 @@ describe GradebooksController do
               get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: @student}
               @teacher.reload
 
-              saved_group_id = @teacher.preferences.dig(:gradebook_settings, @course.id, "filter_rows_by", "student_group_id")
+              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_id")
               expect(saved_group_id).to eq group1.id.to_s
             end
 
@@ -2168,7 +2163,7 @@ describe GradebooksController do
 
           context "when the selected group stays the same" do
             before(:each) do
-              @teacher.preferences[:gradebook_settings] = {@course.id => {"filter_rows_by" => {"student_group_id" => group1.id}}}
+              @teacher.set_preference(:gradebook_settings, @course.global_id, {"filter_rows_by" => {"student_group_id" => group1.id}})
             end
 
             it "sets selected_student_group to the selected group's JSON representation" do
@@ -2186,14 +2181,14 @@ describe GradebooksController do
             let(:groupless_student) { @course.enroll_student(User.create!, enrollment_state: :active).user }
 
             before(:each) do
-              @teacher.preferences[:gradebook_settings] = {@course.id => {"filter_rows_by" => {"student_group_id" => group1.id}}}
+              @teacher.set_preference(:gradebook_settings, @course.global_id, {"filter_rows_by" => {"student_group_id" => group1.id}})
             end
 
             it "clears the selected group from the viewing user's preferences for the course" do
               get :speed_grader, params: {course_id: @course, assignment_id: @assignment, student_id: groupless_student}
               @teacher.reload
 
-              saved_group_id = @teacher.preferences.dig(:gradebook_settings, @course.id, "filter_rows_by", "student_group_id")
+              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_id")
               expect(saved_group_id).to be nil
             end
 
@@ -2304,7 +2299,7 @@ describe GradebooksController do
     end
 
     describe 'selected_section_id preference' do
-      let(:course_settings) { @teacher.reload.preferences.dig(:gradebook_settings, @course.id) }
+      let(:course_settings) { @teacher.reload.get_preference(:gradebook_settings, @course.global_id) }
 
       before(:each) do
         user_session(@teacher)
@@ -2326,10 +2321,8 @@ describe GradebooksController do
 
       context 'when a section has previously been selected' do
         before(:each) do
-          @teacher.preferences[:gradebook_settings] = {
-            @course.id => {filter_rows_by: {section_id: @course.course_sections.first.id}}
-          }
-          @teacher.save!
+          @teacher.set_preference(:gradebook_settings, @course.global_id,
+            {filter_rows_by: {section_id: @course.course_sections.first.id}})
         end
 
         it 'clears the selected section for the course if passed the value "all"' do
@@ -2367,7 +2360,7 @@ describe GradebooksController do
     it "saves the sort order in the user's preferences" do
       user_session(@teacher)
       post 'save_assignment_order', params: {course_id: @course.id, assignment_order: 'due_at'}
-      saved_order = @teacher.preferences[:course_grades_assignment_order][@course.id]
+      saved_order = @teacher.get_preference(:course_grades_assignment_order, @course.id)
       expect(saved_order).to eq(:due_at)
     end
   end

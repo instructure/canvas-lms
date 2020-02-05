@@ -142,7 +142,7 @@ describe Api::V1::Course do
     end
 
     it "includes the course nickname if one is set" do
-      @me.course_nicknames[@course1.id] = 'nickname'
+      @me.set_preference(:course_nicknames, @course1.id, 'nickname')
       json = @test_api.course_json(@course1, @me, {}, [], [])
       expect(json['name']).to eq 'nickname'
       expect(json['original_name']).to eq @course1.name
@@ -594,7 +594,7 @@ describe CoursesController, type: :request do
     c2 = course_with_student(user: @student, course_name: 'abc', active_all: true).course
     c3 = course_with_student(user: @student, course_name: 'jkl', active_all: true).course
     c4 = course_with_student(user: @student, course_name: 'xyz', active_all: true).course
-    @student.course_nicknames[c4.id] = 'ghi'; @student.save!
+    @student.set_preference(:course_nicknames, c4.id, 'ghi')
     json = api_call(:get, "/api/v1/courses.json", controller: 'courses', action: 'index', format: 'json')
     expect(json.map { |course| course['name'] }).to eq %w(abc def ghi jkl)
   end
@@ -705,8 +705,8 @@ describe CoursesController, type: :request do
     end
 
     it "should use the caller's course nickname, not the subject's" do
-      @student.course_nicknames[@course.id] = 'terrible'; @student.save!
-      @admin.course_nicknames[@course.id] = 'meh'; @admin.save!
+      @student.set_preference(:course_nicknames, @course.id, 'terrible')
+      @admin.set_preference(:course_nicknames, @course.id, 'meh')
       json = api_call_as_user(@admin, :get, "/api/v1/users/#{@student.id}/courses",
                               { :user_id => @student.to_param, :controller => 'courses', :action => 'user_index',
                                 :format => 'json' })

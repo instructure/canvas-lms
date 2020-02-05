@@ -135,12 +135,12 @@ describe GradebookGradingPeriodAssignments do
           end
 
           it 'optionally includes assignments assigned exclusively to concluded students' do
-            @settings[@course.id] = { 'show_concluded_enrollments' => 'true' }
+            @settings = { 'show_concluded_enrollments' => 'true' }
             expect(hash[@period2.id]).to include @assignment.id.to_s
           end
 
           it 'optionally excludes assignments assigned exclusively to concluded students' do
-            @settings[@course.id] = { 'show_concluded_enrollments' => 'false' }
+            @settings = { 'show_concluded_enrollments' => 'false' }
             expect(hash[@period2.id]).to be_nil
           end
         end
@@ -172,12 +172,12 @@ describe GradebookGradingPeriodAssignments do
           end
 
           it 'optionally includes assignments assigned exclusively to deactivated students' do
-            @settings[@course.id] = { 'show_inactive_enrollments' => 'true' }
+            @settings = { 'show_inactive_enrollments' => 'true' }
             expect(hash[@period2.id]).to include @assignment.id.to_s
           end
 
           it 'optionally excludes assignments assigned exclusively to deactivated students' do
-            @settings[@course.id] = { 'show_inactive_enrollments' => 'false' }
+            @settings = { 'show_inactive_enrollments' => 'false' }
             expect(hash[@period2.id]).to be_nil
           end
         end

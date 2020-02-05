@@ -497,13 +497,10 @@ describe GradebookExporter do
         student1_enrollment.deactivate
         student2_enrollment.deactivate
 
-        @teacher.preferences[:gradebook_settings] = {
-          @course.id => {
-            'show_inactive_enrollments' => 'true',
-            'show_concluded_enrollments' => 'false'
-          }
-        }
-        @teacher.save!
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+          'show_inactive_enrollments' => 'true',
+          'show_concluded_enrollments' => 'false'
+        })
       end
 
       it "includes inactive students" do
@@ -521,13 +518,10 @@ describe GradebookExporter do
       end
 
       it "does not include inactive students if show inactive enrollments is set to false" do
-        @teacher.preferences[:gradebook_settings] = {
-          @course.id => {
-            'show_inactive_enrollments' => 'false',
-            'show_concluded_enrollments' => 'false'
-          }
-        }
-        @teacher.save!
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+          'show_inactive_enrollments' => 'false',
+          'show_concluded_enrollments' => 'false'
+        })
         csv = exporter.to_csv
         rows = CSV.parse(csv, headers: true)
         expect([rows[1], rows[2]]).to match_array([nil, nil])

@@ -22,10 +22,8 @@ class GradebookSettingsController < ApplicationController
   before_action :authorize
 
   def update
-    deep_merge_gradebook_settings
-
     respond_to do |format|
-      if @current_user.save
+      if deep_merge_gradebook_settings
         format.json { render json: updated_settings, status: :ok }
       else
         format.json { render json: @current_user.errors, status: :unprocessable_entity }
@@ -86,25 +84,23 @@ class GradebookSettingsController < ApplicationController
     authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
   end
 
-  def gradebook_settings
-    @current_user.preferences.fetch(:gradebook_settings)
-  end
-
   def updated_settings
     {
       gradebook_settings: {
-        @context.id => gradebook_settings.fetch(@context.id),
-        colors: gradebook_settings.fetch(:colors, {})
+        @context.id => @course_settings,
+        colors: @color_settings
       }
     }
   end
 
   def deep_merge_gradebook_settings
-    @current_user.preferences.deep_merge!({
-      gradebook_settings: {
-       @context.id => nilify_strings(gradebook_settings_params.except(:colors).to_h),
-       colors: valid_colors(gradebook_settings_params.fetch('colors', {})).to_unsafe_h
-      }
-    })
+    @course_settings = @current_user.get_preference(:gradebook_settings, @context.global_id) || {}
+    @course_settings.deep_merge!(nilify_strings(gradebook_settings_params.except(:colors).to_h))
+
+    @color_settings = @current_user.get_preference(:gradebook_settings, :colors) || {}
+    @color_settings.deep_merge!(valid_colors(gradebook_settings_params.fetch('colors', {})).to_unsafe_h)
+
+    @current_user.set_preference(:gradebook_settings, @context.global_id, @course_settings) &&
+      @current_user.set_preference(:gradebook_settings, :colors, @color_settings)
   end
 end

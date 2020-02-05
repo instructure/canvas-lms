@@ -110,7 +110,7 @@ describe 'Account Notification API', type: :request do
     it "should close notifications" do
       json = api_call(:delete, @path, @api_params)
       @admin.reload
-      expect(@admin.preferences[:closed_notifications]).to eq [@a.id]
+      expect(@admin.get_preference(:closed_notifications)).to eq [@a.id]
 
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/account_notifications", @api_params.merge(action: 'user_index'),)
       expect(json.length).to eq 0

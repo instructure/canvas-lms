@@ -1582,7 +1582,9 @@ class UsersController < ApplicationController
       return render(json: { :message => "Invalid Page Name Provided" }, status: :bad_request)
     end
 
-    user.new_user_tutorial_statuses[params[:page_name]] = value_to_boolean(params[:collapsed])
+    statuses = user.new_user_tutorial_statuses
+    statuses[params[:page_name]] = value_to_boolean(params[:collapsed])
+    user.set_preference(:new_user_tutorial_statuses, statuses)
 
     respond_to do |format|
       format.json do
@@ -1690,16 +1692,17 @@ class UsersController < ApplicationController
       return render(json: { :message => "Invalid Hexcode Provided" }, status: :bad_request)
     end
 
+    colors = user.custom_colors
     user.shard.activate do
       # translate asset string to be relative to user's shard
       unless params[:hexcode].nil?
-        user.custom_colors[context.asset_string] = normalize_hexcode(params[:hexcode])
+        colors[context.asset_string] = normalize_hexcode(params[:hexcode])
       end
 
       respond_to do |format|
         format.json do
-          if user.save
-            render(json: { hexcode: user.custom_colors[context.asset_string]})
+          if user.set_preference(:custom_colors, colors)
+            render(json: { hexcode: colors[context.asset_string]})
           else
             render(json: user.errors, status: :bad_request)
           end
@@ -1776,7 +1779,7 @@ class UsersController < ApplicationController
       end
     end
 
-    user.dashboard_positions = user.dashboard_positions.merge(params[:dashboard_positions].to_unsafe_h)
+    user.set_dashboard_positions(user.dashboard_positions.merge(params[:dashboard_positions].to_unsafe_h))
 
     respond_to do |format|
       format.json do

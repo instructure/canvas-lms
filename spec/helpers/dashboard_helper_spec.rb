@@ -89,10 +89,11 @@ describe DashboardHelper do
         course2.enroll_student(user)
         course3.enroll_student(user)
         courses = [course1, course2, course3]
-        user.dashboard_positions[course1.asset_string] = 3
-        user.dashboard_positions[course2.asset_string] = 2
-        user.dashboard_positions[course3.asset_string] = 1
-        user.save!
+        user.set_dashboard_positions(
+          course1.asset_string => 3,
+          course2.asset_string => 2,
+          course3.asset_string => 1
+        )
         @current_user = user
         mapped_courses = map_courses_for_menu(courses)
         expect(mapped_courses.map {|h| h[:id]}).to eq [course3.id, course2.id, course1.id]
@@ -107,10 +108,11 @@ describe DashboardHelper do
         course2.enroll_student(user)
         course3.enroll_student(user)
         courses = [course1, course2, course3]
-        user.dashboard_positions[course1.asset_string] = 3
-        user.dashboard_positions[course2.asset_string] = "2"
-        user.dashboard_positions[course3.asset_string] = 1
-        user.save!
+        user.set_dashboard_positions(
+          course1.asset_string => 3,
+          course2.asset_string => "2",
+          course3.asset_string => 1
+        )
         @current_user = user
         mapped_courses = map_courses_for_menu(courses)
         expect(mapped_courses.map {|h| h[:id]}).to eq [course3.id, course2.id, course1.id]
@@ -125,10 +127,11 @@ describe DashboardHelper do
         course2.enroll_student(user)
         course3.enroll_student(user)
         courses = [course1, course2, course3]
-        user.dashboard_positions[course1.asset_string] = nil
-        user.dashboard_positions[course2.asset_string] = 2
-        user.dashboard_positions[course3.asset_string] = 1
-        user.save!
+        user.set_dashboard_positions(
+          course1.asset_string => nil,
+          course2.asset_string => 2,
+          course3.asset_string => 1
+        )
         @current_user = user
         mapped_courses = map_courses_for_menu(courses)
         expect(mapped_courses.map {|h| h[:id]}).to eq [course3.id, course2.id, course1.id]

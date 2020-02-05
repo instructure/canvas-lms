@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,16 +14,23 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-class PopulateFinalGradeOverrideCourseSetting < ActiveRecord::Migration[5.1]
-  tag :postdeploy
+#
+class CreateUserPreferenceValues < ActiveRecord::Migration[5.2]
+  tag :predeploy
 
   def up
-    if User.exists? # don't raise for a fresh install
-      raise "DataFixup::PopulateFinalGradeOverrideCourseSetting needs to be run on a previous release"
+    create_table :user_preference_values do |t|
+      t.integer :user_id, limit: 8, null: false
+      t.string :key, null: false
+      t.string :sub_key
+      t.text :value
     end
+
+    add_foreign_key :user_preference_values, :users
+    add_index :user_preference_values, [:user_id, :key, :sub_key], :unique => true, :name => "index_user_preference_values_on_keys"
   end
 
   def down
+    drop_table :user_preference_values
   end
 end

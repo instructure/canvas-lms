@@ -88,7 +88,7 @@ module SpeedGrader
 
     def initial_group
       @initial_group ||= begin
-        selected_group_id = current_user.preferences.dig(:gradebook_settings, course.id, 'filter_rows_by', 'student_group_id')
+        selected_group_id = current_user.get_preference(:gradebook_settings, course.global_id)&.dig('filter_rows_by', 'student_group_id')
         selected_group_id.present? ? Group.find_by(id: selected_group_id) : nil
       end
     end
