@@ -5,6 +5,13 @@ caps_site_admin_test_feature:
   display_name: This is a SiteAdmin test Feature Flag
   description: |-
     This flag will not cause any change in behavior.
+assignments_2_student:
+  state: hidden
+  display_name: Assignment Enhancements - Student
+  description: Use the new assignments student page
+  applies_to: Course
+  root_opt_in: true
+  beta: true
 assignments_2_teacher:
   state: hidden
   display_name: Assignments 2 Teacher View
