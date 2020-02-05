@@ -64,12 +64,12 @@ export default class EditCalendarEventView extends Backbone.View {
       if (picked_params.start_at) {
         picked_params.start_date = tz.format(
           $.fudgeDateForProfileTimezone(picked_params.start_at),
-          'date.formats.medium_with_weekday'
+          'date.formats.default'
         )
       } else {
         picked_params.start_date = tz.format(
           $.fudgeDateForProfileTimezone(picked_params.start_date),
-          'date.formats.medium_with_weekday'
+          'date.formats.default'
         )
       }
 
@@ -112,7 +112,7 @@ export default class EditCalendarEventView extends Backbone.View {
   render() {
     super.render(...arguments)
     this.$('.date_field').date_field({
-      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))}
+      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
     })
     this.$('.time_field').time_field()
     this.$('.date_start_end_row').each((_, row) => {

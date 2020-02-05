@@ -81,7 +81,7 @@ export default class EditToDoItemDetails extends ValidatedFormView {
     // set them up as appropriate variants of datetime_field
     $date.datetime_field({
       datepicker: {
-        dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))
+        dateFormat: datePickerFormat(I18n.t('#date.formats.default'))
       },
       dateOnly: true
     })
