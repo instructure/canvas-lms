@@ -18,15 +18,19 @@
 
 class AssignmentScoreStatisticsGenerator
   def self.update_score_statistics_in_singleton(course_id)
-    # The 60s delay below is in case lots of little grade calculator
+    # The delay below is in case lots of little grade calculator
     # updates come close together. Since we're a singleton, they won't
     # queue up additional jobs if one exists. Our goal is to try to
     # not run this potentially expensive query constantly.
+    # The random part of the delay is to make it not run for all courses in a
+    # term or all courses in a grading period at the same time.
+    min = Setting.get("minimum_seconds_wait_for_grade_statistics", 10).to_i
+    max = Setting.get("maximum_seconds_wait_for_grade_statistics", 130).to_i
     send_later_if_production_enqueue_args(
       :update_score_statistics,
       {
         singleton: "AssignmentScoreStatisticsGenerator:#{course_id}",
-        run_at: 60.seconds.from_now
+        run_at: rand(min..max).seconds.from_now
       },
       course_id
     )
