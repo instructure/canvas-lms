@@ -54,7 +54,8 @@ class AddCassandraPageViewTables < ActiveRecord::Migration[4.2]
         summarized            boolean,
         account_id            bigint,
         real_user_id          bigint,
-        http_method           text
+        http_method           text,
+        remote_ip             text
       ) #{compression_params}}
 
     cassandra.execute %{
