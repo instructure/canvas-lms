@@ -8,6 +8,14 @@ account_pronouns:
   applies_to: RootAccount
   root_opt_in: true
 
+confetti_for_assignments:
+  state: hidden
+  display_name: Confetti for On-Time Submissions
+  description: |-
+    Displays confetti for users that turn in an assignment prior
+    to the set due date.
+  applies_to: RootAccount
+
 mute_notifications_by_course:
   state: hidden
   display_name: Mute notifications by course
