@@ -46,6 +46,7 @@ class Notification < ActiveRecord::Base
 
   has_many :messages
   has_many :notification_policies, :dependent => :destroy
+  has_many :notification_policy_overrides, inverse_of: :notification, :dependent => :destroy
   before_save :infer_default_content
 
   scope :to_show_in_feed, -> { where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED) }
