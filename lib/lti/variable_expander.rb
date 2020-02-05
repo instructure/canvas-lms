@@ -521,7 +521,7 @@ module Lti
     # returns the current course end date.
     # @example
     #   ```
-    #   2018-01-15 00:00:00 -0700
+    #   2018-05-01 00:00:00 -0700
     #   ```
     register_expansion 'Canvas.course.endAt', [],
                        -> { @context.end_at },
