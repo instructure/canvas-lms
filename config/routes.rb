@@ -1206,7 +1206,12 @@ CanvasRails::Application.routes.draw do
         action: :select, as: 'select_provisional_grade'
     end
 
-    post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file, controller: :submission_comments_api
+    scope(controller: :submission_comments_api) do
+      post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file
+      put 'courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/:id', action: :update
+      delete 'courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/:id', action: :destroy
+    end
+
     post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/annotation_notification', action: :annotation_notification, controller: :submission_comments_api
 
     scope(controller: :gradebook_history_api) do
