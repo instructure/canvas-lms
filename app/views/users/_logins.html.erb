@@ -61,19 +61,19 @@
                 <td><%= datetime_string(pseudonym.try(:last_request_at)) || t('never', "never") %></td>
               </tr>
               <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <td scope="row"><%= before_label('current_login', 'Current login') %></td>
+                <td scope="row"><%= before_label('current_login', 'Last login') %></td>
                 <td><%= datetime_string(pseudonym.try(:current_login_at)) || t('never', "never") %></td>
               </tr>
               <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <td scope="row"><%= before_label('current_ip', 'Current login IP') %></td>
+                <td scope="row"><%= before_label('current_ip', 'Last login IP') %></td>
                 <td><%= pseudonym.try(:current_login_ip) || t('none', "none") %></td>
               </tr>
               <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <td scope="row"><%= before_label('last_login', 'Last login') %></td>
+                <td scope="row"><%= before_label('last_login', 'Previous login') %></td>
                 <td><%= datetime_string(pseudonym.try(:last_login_at)) || t('never', "never") %></td>
               </tr>
               <tr class='login_details' style="<%= hidden if pseudonyms.length > 1 || !pseudonym %>">
-                <td scope="row"><%= before_label('last_ip', 'Last login IP') %></td>
+                <td scope="row"><%= before_label('last_ip', 'Previous login IP') %></td>
                 <td><%= pseudonym.try(:last_login_ip) || t('none', "none") %></td>
               </tr>
             </table>
