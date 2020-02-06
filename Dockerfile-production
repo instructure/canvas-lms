@@ -28,7 +28,6 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
        libxmlsec1-dev \
        python-lxml \
        libicu-dev \
-  && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
