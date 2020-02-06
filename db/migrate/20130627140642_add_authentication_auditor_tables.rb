@@ -29,6 +29,7 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
       authentications_by_pseudonym
       authentications_by_account
       authentications_by_user
+      courses_by_course
       grade_changes_by_assignment
       grade_changes_by_course
       grade_changes_by_root_account_student
@@ -48,7 +49,19 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
         pseudonym_id          bigint,
         account_id            bigint,
         user_id               bigint,
-        event_type            text
+        event_type            text,
+        request_id            text
+      ) #{compression_params}}
+
+    cassandra.execute %{
+      CREATE TABLE courses (
+        id                    text PRIMARY KEY,
+        created_at            timestamp,
+        request_id            text,
+        course_id             bigint,
+        event_type            text,
+        user_id               bigint,
+        data                  text
       ) #{compression_params}}
 
     cassandra.execute %{
@@ -86,6 +99,7 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration[4.2]
     end
 
     cassandra.execute %{DROP TABLE authentications;}
+    cassandra.execute %{DROP TABLE courses;}
     cassandra.execute %{DROP TABLE grade_changes;}
   end
 end
