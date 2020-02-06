@@ -28,9 +28,9 @@ export function requestDocs(contextType) {
   return {type: REQUEST_DOCS, payload: {contextType}}
 }
 
-export function receiveDocs({response, contextType}) {
+export function receiveDocs({response, contextType, contextId}) {
   const {files, bookmark} = response
-  return {type: RECEIVE_DOCS, payload: {files, bookmark, contextType}}
+  return {type: RECEIVE_DOCS, payload: {files, bookmark, contextType, contextId}}
 }
 
 export function failDocs({error, contextType}) {
@@ -45,7 +45,11 @@ export function fetchDocs(sortBy) {
     const state = getState()
     return state.source
       .fetchDocs({...state, ...sortBy})
-      .then(response => dispatch(receiveDocs({response, contextType: state.contextType})))
+      .then(response =>
+        dispatch(
+          receiveDocs({response, contextType: state.contextType, contextId: state.contextId})
+        )
+      )
       .catch(error => dispatch(failDocs({error, contextType: state.contextType})))
   }
 }

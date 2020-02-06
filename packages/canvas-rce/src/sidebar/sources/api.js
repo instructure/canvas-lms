@@ -18,7 +18,7 @@
 
 import 'isomorphic-fetch'
 import {parse} from 'url'
-import {downloadToWrap} from '../../common/fileUrl'
+import {downloadToWrap, fixupFileUrl} from '../../common/fileUrl'
 import formatMessage from '../../format-message'
 import alertHandler from '../../rce/alertHandler'
 
@@ -64,7 +64,7 @@ function normalizeFileData(file) {
     display_name: file.name,
     ...file,
     // wrap the url
-    url: downloadToWrap(file.url)
+    href: downloadToWrap(file.href || file.url)
   }
 }
 
@@ -151,7 +151,12 @@ class RceApiSource {
   fetchDocs(props) {
     const documents = props.documents[props.contextType]
     const uri = documents.bookmark || this.uriFor('documents', props)
-    return this.apiFetch(uri, headerFor(this.jwt))
+    return this.apiFetch(uri, headerFor(this.jwt)).then(({bookmark, files}) => {
+      return {
+        bookmark,
+        files: files.map(f => fixupFileUrl(props.contextType, props.contextId, f))
+      }
+    })
   }
 
   fetchMedia(props) {
@@ -225,7 +230,12 @@ class RceApiSource {
     const images = props.images[props.contextType]
     const uri = images.bookmark || this.uriFor('images', props)
     const headers = headerFor(this.jwt)
-    return this.apiFetch(uri, headers)
+    return this.apiFetch(uri, headers).then(({bookmark, files}) => {
+      return {
+        bookmark,
+        files: files.map(f => fixupFileUrl(props.contextType, props.contextId, f))
+      }
+    })
   }
 
   preflightUpload(fileProps, apiProps) {
@@ -257,7 +267,6 @@ class RceApiSource {
       .then(uploadResults => {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
-      .then(normalizeFileData)
       .catch(_e => {
         this.alertFunc({
           text: formatMessage(
