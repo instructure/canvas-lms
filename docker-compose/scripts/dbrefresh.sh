@@ -3,9 +3,15 @@ echo "Refreshing your local dev database from the staging db"
  
 dbfilename='lms_staging_db_latest.sql.gz'
 
+docker-compose down
+docker volume rm canvas-lms_canvas-db
+docker-compose up -d canvasdb
+sleep 5 # wait for canvasdb container to be accepting connections
+
 aws s3 cp "s3://canvas-staging-db-dumps/$dbfilename" - | gunzip | sed -e "
 
-  s/https:\/\/stagingsso.bebraven.org/http:\/\/ssoweb:3002/g;
+  s/https:\/\/stagingsso.bebraven.org/http:\/\/platformweb:3020\/cas/g;
+  s/https:\/\/stagingplatform.bebraven.org/http:\/\/platformweb:3020/g;
   s/https:\/\/stagingjoin.bebraven.org/http:\/\/joinweb:3001/g;
 
   # Also fix up internal links in assignments to stay on staging as we navigate
