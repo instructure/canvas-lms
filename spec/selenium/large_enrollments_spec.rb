@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/gradezilla_common')
 
 
 describe "large enrollments", priority: "2" do
   include_context "in-process server selenium tests"
-  include GradebookCommon
+  include GradezillaCommon
 
   context "page links" do
 

@@ -16,11 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../helpers/gradezilla_common'
+require_relative '../pages/gradezilla_cells_page'
 require_relative '../pages/gradezilla_page'
 
 describe "Gradezilla" do
   include_context "in-process server selenium tests"
   include GradezillaCommon
+
+  let(:assignment) { @course.assignments.first }
 
   before(:once) do
     gradebook_data_setup
@@ -30,23 +33,19 @@ describe "Gradezilla" do
   before(:each) { user_session(@teacher) }
 
   it "should validate posting a comment to a graded assignment", priority: "1", test_id: 210046 do
-    pending('to be unpended when commenting functionality is added to the new gradebook submission tray')
     Gradezilla.visit(@course)
 
-    dialog = open_comment_dialog
-    set_value(dialog.find_element(:id, "add_a_comment"), @comment_text)
-    f("form.submission_details_add_comment_form.clearfix > button.btn").click
-    wait_for_ajax_requests
+    Gradezilla::Cells.open_tray(@student_1, assignment)
+    Gradezilla::GradeDetailTray.add_new_comment(@comment_text)
 
     # make sure it is still there if you reload the page
     refresh_page
 
-    comment = open_comment_dialog.find_element(:css, '.comment')
-    expect(comment).to include_text(@comment_text)
+    Gradezilla::Cells.open_tray(@student_1, assignment)
+    expect(Gradezilla::GradeDetailTray.comment(@comment_text)).to be_displayed
   end
 
   it "should let you post a group comment to a group assignment", priority: "1", test_id: 210047 do
-    pending('to be unpended when commenting functionality is added to the new gradebook submission tray')
     group_assignment = @course.assignments.create!({
                                                      title: 'group assignment',
                                                      due_at: (Time.zone.now + 1.week),
@@ -54,25 +53,22 @@ describe "Gradezilla" do
                                                      submission_types: 'online_text_entry',
                                                      assignment_group: @group,
                                                      group_category: GroupCategory.create!(name: "groups", context: @course),
-                                                     grade_group_students_individually: true
+                                                     grade_group_students_individually: false
                                                    })
+
     project_group = group_assignment.group_category.groups.create!(name: 'g1', context: @course)
     project_group.users << @student_1
     project_group.users << @student_2
 
     Gradezilla.visit(@course)
 
-    dialog = open_comment_dialog(3)
-    set_value(dialog.find_element(:id, "add_a_comment"), @comment_text)
-    dialog.find_element(:id, "group_comment").click
-    f("form.submission_details_add_comment_form.clearfix > button.btn").click
+    Gradezilla::Cells.open_tray(@student_1, group_assignment)
+    Gradezilla::GradeDetailTray.add_new_comment(@comment_text)
 
-    # wait for form submission to finish and dialog to close
-    expect(f(".submission_details_add_comment_form")).not_to be_displayed
+    Gradezilla::GradeDetailTray.close_tray_button.click
 
     # make sure it's on the other student's submission
-    open_comment_dialog(3, 1)
-    comment = fj(".submission_details_dialog:visible .comment")
-    expect(comment).to include_text(@comment_text)
+    Gradezilla::Cells.open_tray(@student_2, group_assignment)
+    expect(Gradezilla::GradeDetailTray.comment(@comment_text)).to be_displayed
   end
 end

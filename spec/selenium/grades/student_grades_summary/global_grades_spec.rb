@@ -18,7 +18,7 @@
 require_relative "../../common"
 require_relative "../pages/global_grades_page"
 require_relative "../pages/student_grades_page"
-require_relative "../pages/gradebook_page"
+require_relative "../pages/gradezilla_cells_page"
 require_relative "../pages/student_interactions_report_page"
 
 describe 'Global Grades' do
@@ -31,6 +31,7 @@ describe 'Global Grades' do
   SCORE5 = 47
 
   before(:once) do
+    Account.default.enable_feature!(:new_gradebook)
 
     now = Time.zone.now
 
@@ -183,7 +184,7 @@ describe 'Global Grades' do
       # verify url has correct course id
       expect(driver.current_url).to eq app_url + "/courses/#{@course_with_gp.id}/gradebook"
       # verify assignment score is correct
-      expect(Gradebook.student_total_grade(@student)).to eq("#{GRADE_CURRENT_GP.round(2)}%")
+      expect(Gradezilla::Cells.get_total_grade(@student)).to eq("#{GRADE_CURRENT_GP.round(2)}%")
     end
 
     it 'goes to student interactions report', priority: "1", test_id: 3500433 do

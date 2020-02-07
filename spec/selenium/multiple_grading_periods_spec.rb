@@ -17,11 +17,12 @@
 #
 
 require_relative './common'
-require_relative './helpers/gradebook_common'
+require_relative './grades/pages/gradezilla_page'
+require_relative './helpers/gradezilla_common'
 
 describe "interaction with grading periods" do
   include_context "in-process server selenium tests"
-  include GradebookCommon
+  include GradezillaCommon
 
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:get_gradebook) { get "/courses/#{@course.id}/gradebook" }
@@ -30,6 +31,14 @@ describe "interaction with grading periods" do
   context "gradebook" do
     before :once do
       gradebook_data_setup(grading_periods: [:future, :current])
+      Account.default.enable_feature!(:new_gradebook)
+
+      # Remove sections, as there is a bug when attempting to click on the
+      # Grading Period filter option. The Section filter option is clicked
+      # instead, for reasons unknown.
+      @course.course_sections.each do |section|
+        section.destroy unless section.default_section?
+      end
     end
 
     before :each do
@@ -43,18 +52,27 @@ describe "interaction with grading periods" do
     it "should display the correct grading period based on the GET param" do
       future_period = @course.grading_periods.detect{|gp| gp.start_date.future?}
       get "/courses/#{@course.id}/gradebook?grading_period_id=#{future_period.id}"
-      expect(f('.grading-period-select-button')).to include_text(future_period.title)
+      Gradezilla.select_view_dropdown
+      Gradezilla.select_filters
+      Gradezilla.select_view_filter("Grading Periods")
+      expect(Gradezilla.grading_period_dropdown).to have_value(future_period.title)
     end
 
     it "should display All Grading Periods when grading period id is set to 0" do
       get "/courses/#{@course.id}/gradebook?grading_period_id=0"
-      expect(f('.grading-period-select-button')).to include_text("All Grading Periods")
+      Gradezilla.select_view_dropdown
+      Gradezilla.select_filters
+      Gradezilla.select_view_filter("Grading Periods")
+      expect(Gradezilla.grading_period_dropdown).to have_value("All Grading Periods")
     end
 
     it "should display the current grading period without a GET param" do
       current_period = @course.grading_periods.detect{|gp| gp.start_date.past? && gp.end_date.future?}
       get "/courses/#{@course.id}/gradebook"
-      expect(f('.grading-period-select-button')).to include_text(current_period.title)
+      Gradezilla.select_view_dropdown
+      Gradezilla.select_filters
+      Gradezilla.select_view_filter("Grading Periods")
+      expect(Gradezilla.grading_period_dropdown).to have_value(current_period.title)
     end
 
     context "using grading period dropdown" do
@@ -66,18 +84,20 @@ describe "interaction with grading periods" do
 
       it 'filters assignments when different grading periods selected', test_id: 2528635, priority: "2" do
         get_gradebook
-        f('.grading-period-select-button').click
-        fj('.ui-menu-item label:contains("Course Period 1: future period")').click
-        wait_for_ajaximations
+        Gradezilla.select_view_dropdown
+        Gradezilla.select_filters
+        Gradezilla.select_view_filter("Grading Periods")
+        Gradezilla.select_grading_period("Course Period 1: future period")
         element = ff('.slick-header-column a').select { |a| a.text == 'second assignment' }
         expect(element.first).to be_displayed
       end
 
       it 'displays all assignments when all grading periods selected', test_id: 2528636, priority: "2" do
         get_gradebook
-        f('.grading-period-select-button').click
-        fj('.ui-menu-item label:contains("All Grading Periods")').click
-        wait_for_ajaximations
+        Gradezilla.select_view_dropdown
+        Gradezilla.select_filters
+        Gradezilla.select_view_filter("Grading Periods")
+        Gradezilla.select_grading_period("All Grading Periods")
 
         element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
         expect(element.first).to be_displayed

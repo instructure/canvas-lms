@@ -50,6 +50,10 @@ module Gradezilla
     fj('button span:contains("Save")')
   end
 
+  def self.grid
+    f('#gradebook_grid .container_1')
+  end
+
   # assignment header column elements
   def self.assignment_header_menu_element(id)
     f(".slick-header-column.assignment_#{id} .Gradebook__ColumnHeaderAction")

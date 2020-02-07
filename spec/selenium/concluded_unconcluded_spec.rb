@@ -15,12 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative './common'
+require_relative './grades/pages/gradezilla_cells_page'
+require_relative './grades/pages/gradezilla_grade_detail_tray_page'
 
 describe "concluded/unconcluded" do
   include_context "in-process server selenium tests"
 
   before do
+    Account.default.enable_feature!(:new_gradebook)
     username = "nobody@example.com"
     password = "asdfasdf"
     u = user_with_pseudonym :active_user => true,
@@ -44,41 +47,34 @@ describe "concluded/unconcluded" do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajax_requests
 
-    entry = f(".slick-cell.b2.f2")
-    expect(entry).to be_displayed
-    entry.click
-    expect(entry.find_element(:css, ".gradebook-cell-editable")).to be_displayed
+    cell = Gradezilla::Cells.grading_cell(@student, @assignment)
+    cell.click
+    expect(cell).to have_class('editable')
   end
 
   it "should not let the teacher edit the gradebook when concluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
 
-    entry = f(".slick-cell.b2.f2")
-    expect(entry).to be_displayed
-    entry.click
-    expect(entry.find_element(:css, ".gradebook-cell")).not_to have_class('gradebook-cell-editable')
+    cell = Gradezilla::Cells.grading_cell(@student, @assignment)
+    cell.click
+    expect(cell).not_to have_class('editable')
   end
 
   it "should let the teacher add comments to the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
 
-    entry = f(".slick-cell.b2.f2")
-    expect(entry).to be_displayed
-    driver.execute_script("$('.slick-cell.b2.f2').mouseover();")
-    entry.find_element(:css, ".gradebook-cell-comment").click
+    Gradezilla::Cells.open_tray(@student, @assignment)
     wait_for_ajaximations
-    expect(f(".submission_details_dialog")).to be_displayed
-    expect(f(".submission_details_dialog #add_a_comment")).to be_displayed
+    expect(Gradezilla::GradeDetailTray.new_comment_input).to be_displayed
   end
 
   it "should not let the teacher add comments to the gradebook when concluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
 
-    entry = f(".slick-cell.b2.f2")
-    expect(entry).to be_displayed
-    driver.execute_script("$('.slick-cell.b2.f2').mouseover();")
-    expect(entry.find_element(:css, ".gradebook-cell-comment")).not_to be_displayed
+    cell = Gradezilla::Cells.grading_cell(@student, @assignment)
+    cell.click
+    expect(cell).not_to contain_css(Gradezilla::Cells.grade_tray_button_selector)
   end
 end

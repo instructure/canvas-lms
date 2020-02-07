@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 require_relative '../feature_flag_helper'
+require_relative './grades/pages/gradezilla_page'
+require_relative './helpers/discussions_common'
 
 describe "sync grades to sis" do
   include FeatureFlagHelper
@@ -57,15 +58,23 @@ describe "sync grades to sis" do
   end
 
   context "gradebook_sync_grades" do
-    before :each do
-      @assignment = @course.assignments.create!(name: 'assignment', assignment_group: @assignment_group,
-                                                post_to_sis: true)
+    before(:once) do
+      plugin = Canvas::Plugin.find('grade_export')
+      plugin_setting = PluginSetting.find_by(name: plugin.id)
+      plugin_setting ||= PluginSetting.new(name: plugin.id, settings: plugin.default_settings)
+      plugin_setting.update(disabled: false)
     end
 
-    def get_post_grades_dialog
-      get "/courses/#{@course.id}/gradebook"
-      expect(f('.post-grades-placeholder > button')).to be_displayed
-      f('.post-grades-placeholder > button').click
+    before :each do
+      @assignment = @course.assignments.create!(name: 'assignment', assignment_group: @assignment_group,
+                                                post_to_sis: true, workflow_state: 'published')
+    end
+
+    def post_grades_dialog
+      Gradezilla.visit(@course)
+      Gradezilla.open_action_menu
+      expect(f('body')).to contain_css("[data-menu-id='post_grades_feature_tool']")
+      Gradezilla.action_menu_item_selector('post_grades_feature_tool').click
       wait_for_ajaximations
       expect(f('.post-grades-dialog')).to be_displayed
     end
@@ -76,7 +85,7 @@ describe "sync grades to sis" do
                                         title: 'Sync to SIS discussion',
                                         message: 'Discussion topic message',
                                         assignment: @assignment)
-      get_post_grades_dialog
+      post_grades_dialog
       expect(f('.assignments-to-post-count').text).to include("You are ready to sync 1 assignment")
     end
 
@@ -86,7 +95,7 @@ describe "sync grades to sis" do
                                         message: 'Discussion topic message',
                                         assignment: @assignment)
       due_at = Time.zone.now + 3.days
-      get_post_grades_dialog
+      post_grades_dialog
       expect(f('#assignment-errors').text).to include("1 Assignment with Errors")
       f(".assignment-due-at").send_keys(format_date_for_view(due_at))
       f(' .form-dialog-content').click

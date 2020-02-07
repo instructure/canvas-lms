@@ -17,13 +17,13 @@
 
 require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
-require_relative "../../helpers/gradebook_common"
+require_relative "../../helpers/gradezilla_common"
 require_relative "../../helpers/groups_common"
 require_relative '../pages/speedgrader_page.rb'
 
 describe "In speedgrader" do
   include_context "in-process server selenium tests"
-  include GradebookCommon
+  include GradezillaCommon
   include SpeedGraderCommon
   include GroupsCommon
 

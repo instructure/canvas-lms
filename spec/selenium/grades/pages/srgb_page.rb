@@ -32,6 +32,12 @@ class SRGB
       f('#switch_to_default_gradebook')
     end
 
+    def switch_to_default_gradebook
+      f('[data-component="GradebookSelector"] [role="combobox"]').click
+      wait_for_animations
+      fj("[role=\"option\"]:contains(\"Gradebook…\")").click
+    end
+
     def assignment_sorting_dropdown
       f(assignment_sort_order_selector)
     end
@@ -233,4 +239,3 @@ class SRGB
 
   end
 end
-
