@@ -1030,8 +1030,8 @@ class RoleOverride < ActiveRecord::Base
        :true_for => %w(AccountAdmin TeacherEnrollment TaEnrollment)
      },
      :view_learning_analytics => {
-       :label => lambda { t("View Learning Analytics (Beta)")},
-       :label_v2 => lambda { t('Learning Analytics (Beta) - view')},
+       :label => lambda { t("View Canvas Insights (Beta)")},
+       :label_v2 => lambda { t('Canvas Insights (Beta) - view')},
        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment),
        :true_for => []
      }
