@@ -105,13 +105,19 @@
 }
 
 .ic-item-row__meta-col {
-  // prevent flex from resizing this box, necessary because it has a sibling with flex-grow: 1
-  // that would otherwise steal width from this element, not the same as width: 200px
-  min-width: 230px;
-  max-width: 230px;
   display: flex;
   flex-direction: column;
   text-align: direction(right);
+
+  @include desktop-only {
+    & {
+      // prevent flex from resizing this box, necessary because it has a sibling
+      // with flex-grow: 1 that would otherwise steal width from this element,
+      // not the same as width: 200px
+      min-width: 230px;
+      max-width: 230px;
+    }
+  }
 
   .ic-item-row__meta-actions {
     height: 23px;
