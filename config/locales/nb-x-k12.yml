@@ -14386,7 +14386,7 @@ nb-x-k12:
   possible_score_5e0a328e: "Mulig: %{score}"
   possiblepoints_points_possible_5217ce4a: "%{possiblePoints} Mulige poenger"
   post_1e445890: Post
-  post_grades_39c52870: "Innlegg Vurderinger"
+  post_grades_39c52870: "Publiser vurderinger"
   post_grades_3e692d46: "Publiser vurderinger"
   post_grades_description: |-
       Send vurderinger gir lærere muligheten til å legge inn vurderinger i aktiverte SIS-systemer: PowerSchool,
