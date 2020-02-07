@@ -18,7 +18,10 @@
 
 import sinon from 'sinon'
 
-import FakeServer, {paramsFromRequest, pathFromRequest} from '../../../../__tests__/FakeServer'
+import FakeServer, {
+  paramsFromRequest,
+  pathFromRequest
+} from '../../../../shared/network/__tests__/FakeServer'
 import DataLoader from '../../../DataLoader'
 import CourseSettings from '../../CourseSettings'
 import FinalGradeOverrides from '../../FinalGradeOverrides'
@@ -64,19 +67,15 @@ describe('Gradebook DataLoader', () => {
     server = new FakeServer()
     server.for(urls.userIds).respond({status: 200, body: {user_ids: exampleData.studentIds}})
 
-    server
-      .for(urls.assignmentGroups)
-      .respond([
-        {status: 200, body: exampleData.assignmentGroups.slice(0, 2)},
-        {status: 200, body: exampleData.assignmentGroups.slice(2, 3)}
-      ])
+    server.for(urls.assignmentGroups).respond([
+      {status: 200, body: exampleData.assignmentGroups.slice(0, 2)},
+      {status: 200, body: exampleData.assignmentGroups.slice(2, 3)}
+    ])
 
-    server
-      .for(urls.contextModules)
-      .respond([
-        {status: 200, body: exampleData.contextModules.slice(0, 2)},
-        {status: 200, body: exampleData.contextModules.slice(2, 3)}
-      ])
+    server.for(urls.contextModules).respond([
+      {status: 200, body: exampleData.contextModules.slice(0, 2)},
+      {status: 200, body: exampleData.contextModules.slice(2, 3)}
+    ])
 
     server
       .for(urls.gradingPeriodAssignments)
@@ -96,12 +95,10 @@ describe('Gradebook DataLoader', () => {
       .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
       .respond([{status: 200, body: exampleData.submissions.slice(1, 3)}])
 
-    server
-      .for(urls.customColumns)
-      .respond([
-        {status: 200, body: exampleData.customColumns.slice(0, 2)},
-        {status: 200, body: exampleData.customColumns.slice(2, 3)}
-      ])
+    server.for(urls.customColumns).respond([
+      {status: 200, body: exampleData.customColumns.slice(0, 2)},
+      {status: 200, body: exampleData.customColumns.slice(2, 3)}
+    ])
 
     server
       .for(urls.customColumnData('2401'))

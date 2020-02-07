@@ -18,7 +18,8 @@
 
 import $ from 'jquery'
 import 'jquery.ajaxJSON'
-import cheaterDepaginate from '../../../shared/CheatDepaginator'
+
+import cheaterDepaginate from './CheatDepaginator'
 
 const ACTIVE_REQUEST_LIMIT = 12 // naive limit
 

@@ -17,12 +17,14 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!gradingPeriodSetsApi'
-import DateHelper from 'jsx/shared/helpers/dateHelper'
-import gradingPeriodsApi from './gradingPeriodsApi'
 import axios from 'axios'
-import Depaginate from 'jsx/shared/CheatDepaginator'
+
 import 'jquery.instructure_misc_helpers'
+import I18n from 'i18n!gradingPeriodSetsApi'
+
+import DateHelper from 'jsx/shared/helpers/dateHelper'
+import Depaginate from 'jsx/shared/network/CheatDepaginator'
+import gradingPeriodsApi from './gradingPeriodsApi'
 
 const listUrl = () => ENV.GRADING_PERIOD_SETS_URL
 

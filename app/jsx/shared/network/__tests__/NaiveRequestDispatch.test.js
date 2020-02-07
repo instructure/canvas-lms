@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FakeServer from '../../../../__tests__/FakeServer'
 import NaiveRequestDispatch from '../NaiveRequestDispatch'
+import FakeServer from './FakeServer'
 
 describe('Gradebook DataLoader NaiveRequestDispatch', () => {
   const URL = 'http://localhost/example'

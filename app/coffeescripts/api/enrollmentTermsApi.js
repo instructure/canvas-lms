@@ -16,7 +16,8 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import Depaginate from 'jsx/shared/CheatDepaginator'
+
+import Depaginate from 'jsx/shared/network/CheatDepaginator'
 
 const listUrl = () => ENV.ENROLLMENT_TERMS_URL
 

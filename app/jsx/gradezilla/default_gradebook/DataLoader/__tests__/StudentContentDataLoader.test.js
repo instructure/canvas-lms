@@ -18,13 +18,13 @@
 
 import sinon from 'sinon'
 
-import FakeServer, {paramsFromRequest} from '../../../../__tests__/FakeServer'
+import FakeServer, {paramsFromRequest} from '../../../../shared/network/__tests__/FakeServer'
+import NaiveRequestDispatch from '../../../../shared/network/NaiveRequestDispatch'
 import * as FlashAlert from '../../../../shared/FlashAlert'
 import * as FinalGradeOverrideApi from '../../FinalGradeOverrides/FinalGradeOverrideApi'
 import CourseSettings from '../../CourseSettings'
 import FinalGradeOverrides from '../../FinalGradeOverrides'
 import StudentContentDataLoader from '../StudentContentDataLoader'
-import NaiveRequestDispatch from '../NaiveRequestDispatch'
 
 describe('Gradebook StudentContentDataLoader', () => {
   const exampleData = {
@@ -581,12 +581,10 @@ describe('Gradebook StudentContentDataLoader', () => {
           .for(urls.students, {user_ids: exampleData.studentIds.slice(2, 3)})
           .respond({status: 200, body: exampleData.students.slice(2, 3)})
 
-        server
-          .for(urls.submissions, {student_ids: exampleData.studentIds.slice(0, 2)})
-          .respond([
-            {status: 200, body: exampleData.submissions.slice(0, 1)},
-            {status: 500, body: exampleData.submissions.slice(1, 2)}
-          ])
+        server.for(urls.submissions, {student_ids: exampleData.studentIds.slice(0, 2)}).respond([
+          {status: 200, body: exampleData.submissions.slice(0, 1)},
+          {status: 500, body: exampleData.submissions.slice(1, 2)}
+        ])
         server
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
           .respond([{status: 200, body: exampleData.submissions.slice(2, 3)}])
