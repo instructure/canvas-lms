@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 
-import Depaginate from 'jsx/shared/network/CheatDepaginator'
+import NaiveRequestDispatch from 'jsx/shared/network/NaiveRequestDispatch'
 
 const listUrl = () => ENV.ENROLLMENT_TERMS_URL
 
@@ -40,11 +40,15 @@ const deserializeTerms = termGroups =>
   )
 
 export default {
-  list(terms) {
+  list() {
     return new Promise((resolve, reject) => {
-      Depaginate(listUrl())
+      const dispatch = new NaiveRequestDispatch()
+      /* eslint-disable promise/catch-or-return */
+      dispatch
+        .getDepaginated(listUrl())
         .then(response => resolve(deserializeTerms(response)))
         .fail(error => reject(error))
+      /* eslint-enable promise/catch-or-return */
     })
   }
 }

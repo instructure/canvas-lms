@@ -23,7 +23,7 @@ import 'jquery.instructure_misc_helpers'
 import I18n from 'i18n!gradingPeriodSetsApi'
 
 import DateHelper from 'jsx/shared/helpers/dateHelper'
-import Depaginate from 'jsx/shared/network/CheatDepaginator'
+import NaiveRequestDispatch from 'jsx/shared/network/NaiveRequestDispatch'
 import gradingPeriodsApi from './gradingPeriodsApi'
 
 const listUrl = () => ENV.GRADING_PERIOD_SETS_URL
@@ -78,11 +78,15 @@ export default {
   deserializeSet,
 
   list() {
-    return new Promise((resolve, reject) =>
-      Depaginate(listUrl())
+    return new Promise((resolve, reject) => {
+      const dispatch = new NaiveRequestDispatch()
+      /* eslint-disable promise/catch-or-return */
+      dispatch
+        .getDepaginated(listUrl())
         .then(response => resolve(deserializeSets(response)))
         .fail(error => reject(error))
-    )
+      /* eslint-enable promise/catch-or-return */
+    })
   },
 
   create(set) {

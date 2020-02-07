@@ -24,7 +24,7 @@ import Backbone from 'Backbone'
 
 import I18n from 'i18n!calendar.edit'
 
-import Depaginate from 'jsx/shared/network/CheatDepaginator'
+import NaiveRequestDispatch from 'jsx/shared/network/NaiveRequestDispatch'
 import splitAssetString from '../str/splitAssetString'
 
 export default class CalendarEvent extends Backbone.Model {
@@ -82,7 +82,8 @@ export default class CalendarEvent extends Backbone.Model {
     }
 
     if (this.get('sections_url')) {
-      sectionsDfd = Depaginate(this.get('sections_url'))
+      const dispatch = new NaiveRequestDispatch()
+      sectionsDfd = dispatch.getDepaginated(this.get('sections_url'))
     }
 
     const combinedSuccess = (syncArgs = [], sectionsResp = []) => {
