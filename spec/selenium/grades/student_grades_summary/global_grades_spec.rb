@@ -31,8 +31,6 @@ describe 'Global Grades' do
   SCORE5 = 47
 
   before(:once) do
-    Account.default.enable_feature!(:new_gradebook)
-
     now = Time.zone.now
 
     # create a second term

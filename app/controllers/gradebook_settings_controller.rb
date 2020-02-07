@@ -94,7 +94,6 @@ class GradebookSettingsController < ApplicationController
     {
       gradebook_settings: {
         @context.id => gradebook_settings.fetch(@context.id),
-        # when new_gradebook is the only gradebook this can change to .fetch(:colors)
         colors: gradebook_settings.fetch(:colors, {})
       }
     }
@@ -104,7 +103,6 @@ class GradebookSettingsController < ApplicationController
     @current_user.preferences.deep_merge!({
       gradebook_settings: {
        @context.id => nilify_strings(gradebook_settings_params.except(:colors).to_h),
-       # when new_gradebook is the only gradebook this can change to .fetch('colors')
        colors: valid_colors(gradebook_settings_params.fetch('colors', {})).to_unsafe_h
       }
     })

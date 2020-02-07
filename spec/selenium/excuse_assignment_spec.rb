@@ -25,10 +25,6 @@ describe 'Excuse an Assignment' do
   include GradezillaCommon
   include GroupsCommon
 
-  before :once do
-    Account.default.enable_feature!(:new_gradebook)
-  end
-
   before do |example|
     unless example.metadata[:group]
       course_with_teacher_logged_in

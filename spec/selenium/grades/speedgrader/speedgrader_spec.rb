@@ -61,7 +61,6 @@ describe 'Speedgrader' do
   end
 
   before :once do
-    Account.default.enable_feature!(:new_gradebook)
     course_factory(active_all: true)
     @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Student_")
   end

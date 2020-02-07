@@ -20,7 +20,6 @@ require_relative '../sharding_spec_helper'
 
 describe GradebooksController do
   before :once do
-    Account.default.enable_feature!(:new_gradebook)
     course_with_teacher active_all: true
     @teacher_enrollment = @enrollment
     student_in_course active_all: true
@@ -689,7 +688,7 @@ describe GradebooksController do
       end
 
       it "renders default gradebook" do
-        get "show", params: { course_id: @course.id, version: "default", new_gradebook: "true" }
+        get "show", params: { course_id: @course.id, version: "default" }
         expect(response).to render_template("gradebooks/gradezilla/gradebook")
       end
     end
@@ -703,7 +702,7 @@ describe GradebooksController do
       end
 
       it "renders screenreader gradebook" do
-        get "show", params: { course_id: @course.id, version: "individual", new_gradebook: "true" }
+        get "show", params: { course_id: @course.id, version: "individual" }
         expect(response).to render_template("gradebooks/gradezilla/individual")
       end
     end
@@ -2077,11 +2076,6 @@ describe GradebooksController do
         expect(js_env[:grading_type]).to eq('percent')
       end
 
-      it 'sets new_gradebook_enabled to true' do
-        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-        expect(js_env[:new_gradebook_enabled]).to eq true
-      end
-
       it 'includes anonymous identities keyed by anonymous_id' do
         @assignment.update!(moderated_grading: true, grader_count: 2)
         anonymous_id = @assignment.create_moderation_grader(@teacher, occupy_slot: true).anonymous_id
@@ -2302,7 +2296,6 @@ describe GradebooksController do
     describe "new_gradebook_plagiarism_icons_enabled" do
       it "is set to true if New Gradebook Plagiarism Icons are on" do
         @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
-
         get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
         expect(assigns[:js_env][:new_gradebook_plagiarism_icons_enabled]).to be true
       end

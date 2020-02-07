@@ -430,7 +430,6 @@ describe "/gradebooks/grade_summary" do
 
     context "when post policies are enabled" do
       before(:once) do
-        course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 

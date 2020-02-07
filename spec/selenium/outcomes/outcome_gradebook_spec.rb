@@ -26,7 +26,6 @@ describe "outcome gradebook" do
 
   context "as a teacher" do
     before(:once) do
-      Account.default.enable_feature!(:new_gradebook)
       gradebook_data_setup
       @outcome1 = outcome_model(context: @course, title: 'outcome1')
       @outcome2 = outcome_model(context: @course, title: 'outcome2')

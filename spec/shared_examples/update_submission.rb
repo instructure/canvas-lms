@@ -49,7 +49,6 @@ RSpec.shared_examples 'a submission update action' do |controller|
       before(:once) do
         course.enroll_student(student)
         course.enroll_teacher(teacher)
-        course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -165,7 +164,6 @@ RSpec.shared_examples 'a submission update action' do |controller|
         context "when assignment posts manually" do
           before do
             PostPolicy.enable_feature!
-            course.enable_feature!(:new_gradebook)
             assignment.post_policy.update!(post_manually: true)
           end
 
@@ -245,7 +243,6 @@ RSpec.shared_examples 'a submission update action' do |controller|
         context "when assignment posts manually" do
           before do
             PostPolicy.enable_feature!
-            course.enable_feature!(:new_gradebook)
             assignment.post_policy.update!(post_manually: true)
           end
 

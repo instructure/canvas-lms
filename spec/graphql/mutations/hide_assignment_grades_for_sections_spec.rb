@@ -58,7 +58,6 @@ describe Mutations::HideAssignmentGradesForSections do
   end
 
   before(:each) do
-    course.enable_feature!(:new_gradebook)
     PostPolicy.enable_feature!
     @section1_student = section1.enroll_user(User.create!, "StudentEnrollment", "active").user
     @section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user

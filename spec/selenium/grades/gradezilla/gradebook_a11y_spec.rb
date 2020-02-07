@@ -31,7 +31,6 @@ describe "Gradezilla" do
   before(:once) { gradebook_data_setup }
 
   before do
-    Account.default.set_feature_flag!('new_gradebook', 'on')
     extra_setup
     user_session(@teacher)
   end

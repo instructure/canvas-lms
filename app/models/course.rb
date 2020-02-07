@@ -3400,7 +3400,7 @@ class Course < ActiveRecord::Base
   end
 
   def filter_speed_grader_by_student_group?
-    return false unless root_account.feature_enabled?(:filter_speed_grader_by_student_group) && feature_enabled?(:new_gradebook)
+    return false unless root_account.feature_enabled?(:filter_speed_grader_by_student_group)
     filter_speed_grader_by_student_group
   end
 
@@ -3480,7 +3480,7 @@ class Course < ActiveRecord::Base
   end
 
   def post_policies_enabled?
-    feature_enabled?(:new_gradebook) && PostPolicy.feature_enabled?
+    PostPolicy.feature_enabled?
   end
 
   private

@@ -331,7 +331,6 @@ describe Assignment do
 
         context "when post policies are enabled" do
           before(:each) do
-            @course.enable_feature!(:new_gradebook)
             PostPolicy.enable_feature!
           end
 
@@ -919,7 +918,6 @@ describe Assignment do
           let(:student3) { User.create! }
 
           before(:each) do
-            course.enable_feature!(:new_gradebook)
             PostPolicy.enable_feature!
 
             course.enroll_student(active_student, workflow_state: :active)
@@ -2156,7 +2154,6 @@ describe Assignment do
         end
 
         it "does not post the submission for a manually-posted assignment when post policies are enabled" do
-          course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
 
           assignment.post_policy.update!(post_manually: true)
@@ -2198,7 +2195,6 @@ describe Assignment do
       context "when post policies are enabled" do
         before(:once) do
           PostPolicy.enable_feature!
-          course.enable_feature!(:new_gradebook)
         end
 
         context "when assignment posts manually" do
@@ -2260,7 +2256,6 @@ describe Assignment do
       context "when post policies are enabled" do
         before(:once) do
           PostPolicy.enable_feature!
-          course.enable_feature!(:new_gradebook)
         end
 
         context "when assignment posts manually" do
@@ -3173,7 +3168,6 @@ describe Assignment do
     end
 
     it "defaults to muted when post policies are enabled" do
-      @course.enable_feature!(:new_gradebook)
       PostPolicy.enable_feature!
       expect(@course.assignments.create!).to be_muted
     end
@@ -5725,7 +5719,6 @@ describe Assignment do
 
       context "with post policies enabled" do
         before(:each) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 
@@ -6651,7 +6644,6 @@ describe Assignment do
 
       context "with post policies enabled" do
         before(:each) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 
@@ -8065,7 +8057,6 @@ describe Assignment do
     let(:assignment) { course.assignments.create!(title: 'hello') }
 
     context "when the post_policies feature flag is enabled" do
-      before(:each) { course.enable_feature!(:new_gradebook) }
       before(:each) { PostPolicy.enable_feature! }
 
       context "when the assignment has a post policy" do
@@ -8127,7 +8118,6 @@ describe Assignment do
       student1
       student2
 
-      @course.enable_feature!(:new_gradebook)
       PostPolicy.enable_feature!
     end
 

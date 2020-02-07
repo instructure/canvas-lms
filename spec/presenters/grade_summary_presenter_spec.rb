@@ -617,7 +617,6 @@ describe GradeSummaryPresenter do
 
     context "when post policies are enabled" do
       before(:once) do
-        course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
         assignment1.ensure_post_policy(post_manually: true)
         assignment2.ensure_post_policy(post_manually: false)

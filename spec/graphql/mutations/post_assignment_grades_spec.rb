@@ -55,7 +55,6 @@ describe Mutations::PostAssignmentGrades do
   end
 
   before(:each) do
-    course.enable_feature!(:new_gradebook)
     PostPolicy.enable_feature!
   end
 

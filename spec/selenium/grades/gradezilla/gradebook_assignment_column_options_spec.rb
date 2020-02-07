@@ -140,7 +140,7 @@ describe "Gradezilla - Assignment Column" do
       # update assignment to be an anonymous assignment
       @assignment.update(title: "Anon Assignment", anonymous_grading: true)
 
-      # visit new gradebook as teacher
+      # visit gradebook as teacher
       Gradezilla.visit(@course)
     end
 

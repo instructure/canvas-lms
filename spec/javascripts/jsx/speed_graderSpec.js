@@ -5649,7 +5649,6 @@ QUnit.module('SpeedGrader', rootHooks => {
           assignment_id: '17',
           course_id: '29',
           help_url: 'example.com/support',
-          new_gradebook_enabled: true,
           selected_section_id: '1',
           show_help_menu_item: false,
           RUBRIC_ASSESSMENT: {}
@@ -5937,16 +5936,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         window.jsonData = originalWindowJSONData
       })
 
-      test('initially selects the section in userSettings if ENV.new_gradebook_enabled is not true', () => {
-        SpeedGrader.EG.jsonReady()
-        SpeedGrader.setup()
-
-        const currentlyShowing = document.querySelector('#section_currently_showing')
-        strictEqual(currentlyShowing.innerText, 'The Third Section')
-      })
-
-      test('initially selects the section in ENV.selected_section_id if ENV.new_gradebook_enabled is true', () => {
-        window.ENV.new_gradebook_enabled = true
+      test('initially selects the section in ENV.selected_section_id', () => {
         window.ENV.selected_section_id = 2
 
         SpeedGrader.EG.jsonReady()
@@ -5956,7 +5946,6 @@ QUnit.module('SpeedGrader', rootHooks => {
         strictEqual(currentlyShowing.innerText, 'The Second Section')
 
         delete window.ENV.selected_section_id
-        delete window.ENV.new_gradebook_enabled
       })
 
       test('reloads SpeedGrader when the user selects a new section and ENV.settings_url is set', () => {
@@ -5978,26 +5967,6 @@ QUnit.module('SpeedGrader', rootHooks => {
         strictEqual(SpeedGraderHelpers.reloadPage.callCount, 1)
 
         window.ENV.settings_url = settingsURL
-      })
-
-      test('saves the selected section in userSettings when one is selected', () => {
-        SpeedGrader.EG.jsonReady()
-        SpeedGrader.setup()
-
-        $(sectionSelectPath).click()
-
-        const params = userSettings.contextSet.firstCall.args
-        deepEqual(params, ['grading_show_only_section', 2])
-      })
-
-      test('annuls the selected section in userSettings when "all sections" is selected', () => {
-        SpeedGrader.EG.jsonReady()
-        SpeedGrader.setup()
-
-        $(allSectionsSelectPath).click()
-
-        const [key] = userSettings.contextRemove.firstCall.args
-        strictEqual(key, 'grading_show_only_section')
       })
 
       test('posts the selected section to the settings URL when a specific section is selected', () => {
@@ -6022,7 +5991,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       QUnit.module('when a course loads with an empty section selected', emptySectionHooks => {
         emptySectionHooks.beforeEach(() => {
-          userSettings.contextGet.returns('4')
+          ENV.selected_section_id = '4'
           sandbox.stub(SpeedGrader.EG, 'changeToSection')
           sandbox.stub(window, 'alert')
         })
@@ -6030,6 +5999,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         emptySectionHooks.afterEach(() => {
           window.alert.restore()
           SpeedGrader.EG.changeToSection.restore()
+          delete ENV.selected_section_id
         })
 
         test('displays an alert indicating the section has no students', () => {
@@ -6053,14 +6023,15 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       QUnit.module('filtering by section', () => {
-        test('filters the list of students by the section ID specified in userSettings if set', () => {
+        test('filters the list of students by the section ID from the env', () => {
+          ENV.selected_section_id = '3'
           SpeedGrader.EG.jsonReady()
 
           strictEqual(window.jsonData.studentsWithSubmissions.length, 1)
+          delete ENV.selected_section_id
         })
 
-        test('does not filter the list of students if no section ID is specified in userSettings', () => {
-          userSettings.contextGet.returns(null)
+        test('does not filter the list of students if no section ID is specified', () => {
           SpeedGrader.EG.jsonReady()
           strictEqual(window.jsonData.studentsWithSubmissions.length, 2)
         })

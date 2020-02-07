@@ -22,7 +22,6 @@ describe GradeCalculator do
   before :each do
     course_with_student active_all: true
 
-    @course.enable_feature!(:new_gradebook)
     PostPolicy.enable_feature!
   end
 
@@ -172,7 +171,6 @@ describe GradeCalculator do
         @shard1.activate do
           account = Account.create!
           course_with_student(active_all: true, account: account, user: @user)
-          @course.enable_feature!(:new_gradebook)
           @course.update_attribute(:group_weighting_scheme, "percent")
           groups <<
             @course.assignment_groups.create!(name: "some group 1", group_weight: 50) <<
@@ -227,7 +225,6 @@ describe GradeCalculator do
         @shard1.activate do
           account = Account.create!
           course_with_student(active_all: true, account: account, user: @user)
-          @course.enable_feature!(:new_gradebook)
           @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
           @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
           @assignment2 = @course.assignments.create!(title: "Some Assignment2", points_possible: 10, assignment_group: @group)
@@ -246,7 +243,6 @@ describe GradeCalculator do
         @shard1.activate do
           account = Account.create!
           course_with_student(active_all: true, account: account, user: @user)
-          @course.enable_feature!(:new_gradebook)
           grading_period_set = account.grading_period_groups.create!
           grading_period_set.enrollment_terms << @course.enrollment_term
           @grading_period = grading_period_set.grading_periods.create!(

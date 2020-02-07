@@ -26,7 +26,6 @@ describe GradebookExporter do
   end
 
   def enable_final_grade_override!
-    @course.enable_feature!(:new_gradebook)
     @course.enable_feature!(:final_grades_override)
     @course.update!(allow_final_grade_override: true)
   end
@@ -149,7 +148,6 @@ describe GradebookExporter do
 
       context "when Final Grade Override is not enabled" do
         before(:once) do
-          @course.enable_feature!(:new_gradebook)
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: false)
         end
@@ -231,7 +229,6 @@ describe GradebookExporter do
 
       context "when post policies are enabled" do
         before(:once) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 
@@ -727,7 +724,6 @@ describe GradebookExporter do
 
       context "when final grade override is not allowed for the course" do
         before(:each) do
-          @course.enable_feature!(:new_gradebook)
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: false)
         end
@@ -845,7 +841,6 @@ describe GradebookExporter do
 
       context "when final grade override is not allowed for the course" do
         before(:each) do
-          @course.enable_feature!(:new_gradebook)
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: false)
         end

@@ -41,7 +41,6 @@ describe 'Gradebook frontend/backend calculators' do
     @courses.each_with_index do |course, course_index|
       grades = @unlucky_group[course_index]
 
-      course.enable_feature!(:new_gradebook)
       create_enrollments(course, student_data)
       group = course.assignment_groups.create! name: 'assignments'
       assignments = create_assignments(

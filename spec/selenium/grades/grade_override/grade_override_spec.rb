@@ -30,7 +30,6 @@ describe 'Final Grade Override' do
     @course.update!(grading_standard_enabled: true)
     @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Purple")
     @course.enable_feature!(:final_grades_override)
-    @course.enable_feature!(:new_gradebook)
 
     # create moderated assignment with teacher4 as final grader
     @assignment = @course.assignments.create!(
@@ -73,37 +72,35 @@ describe 'Final Grade Override' do
     end
   end
 
-  context "Gradezilla" do
-    it 'display override column in new gradebook', priority: '1', test_id: 3682130 do
+  it 'displays the override column', priority: '1', test_id: 3682130 do
+    user_session(@teacher)
+    Gradezilla.visit(@course)
+    Gradezilla.settings_cog_select
+    Gradezilla::Settings.click_advanced_tab
+    Gradezilla::Advanced.select_grade_override_checkbox
+    Gradezilla::Settings.click_update_button
+    expect(f(".slick-header-column[title='Override']")).to be_displayed
+  end
+
+  context 'with an overridden grade' do
+    before(:each) do
+      @course.update!(allow_final_grade_override: true)
+      @teacher.save
+
       user_session(@teacher)
       Gradezilla.visit(@course)
-      Gradezilla.settings_cog_select
-      Gradezilla::Settings.click_advanced_tab
-      Gradezilla::Advanced.select_grade_override_checkbox
-      Gradezilla::Settings.click_update_button
-      expect(f(".slick-header-column[title='Override']")).to be_displayed
+      Gradezilla::Cells.edit_override(@students.first, 90.0)
     end
 
-    context 'with an overridden grade' do
-      before(:each) do
-        @course.update!(allow_final_grade_override: true)
-        @teacher.save
+    it 'saves overridden grade in Gradezilla', priority: '1', test_id: 3682131 do
+      Gradezilla.visit(@course)
+      expect(Gradezilla::Cells.get_override_grade(@students.first)).to eql "A-"
+    end
 
-        user_session(@teacher)
-        Gradezilla.visit(@course)
-        Gradezilla::Cells.edit_override(@students.first, 90.0)
-      end
-
-      it 'saves overridden grade in Gradezilla', priority: '1', test_id: 3682131 do
-        Gradezilla.visit(@course)
-        expect(Gradezilla::Cells.get_override_grade(@students.first)).to eql "A-"
-      end
-
-      it 'displays overridden grade for student grades', priority: '1', test_id: 3682131 do
-        user_session(@students.first)
-        StudentGradesPage.visit_as_student(@course)
-        expect(StudentGradesPage.final_grade.text).to eql "90%"
-      end
+    it 'displays overridden grade for student grades', priority: '1', test_id: 3682131 do
+      user_session(@students.first)
+      StudentGradesPage.visit_as_student(@course)
+      expect(StudentGradesPage.final_grade.text).to eql "90%"
     end
   end
 end

@@ -27,7 +27,6 @@ describe "Gradezilla - message students who" do
 
   before(:once) { gradebook_data_setup }
   before do
-    Account.default.enable_feature!(:new_gradebook)
     user_session(@teacher)
   end
 

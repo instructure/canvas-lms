@@ -228,8 +228,6 @@ describe Course do
   describe "#allow_final_grade_override?" do
     before :once do
       @course = Account.default.courses.create!
-      @course.root_account.enable_feature!(:new_gradebook)
-      @course.enable_feature!(:new_gradebook)
     end
 
     before :each do
@@ -255,23 +253,16 @@ describe Course do
   describe "#filter_speed_grader_by_student_group?" do
     before :once do
       @course = Account.default.courses.create!
-      @course.root_account.enable_feature!(:new_gradebook)
-      @course.enable_feature!(:new_gradebook)
       @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
       @course.filter_speed_grader_by_student_group = true
     end
 
-    it "returns true when new gradebook is enabled and the setting is on" do
+    it "returns true when the setting is on" do
       expect(@course).to be_filter_speed_grader_by_student_group
     end
 
     it "returns false when setting is off" do
       @course.filter_speed_grader_by_student_group = false
-      expect(@course).not_to be_filter_speed_grader_by_student_group
-    end
-
-    it "returns false when new gradebook is disabled" do
-      @course.disable_feature!(:new_gradebook)
       expect(@course).not_to be_filter_speed_grader_by_student_group
     end
 
@@ -1305,7 +1296,6 @@ describe Course do
     let_once(:course) { Course.create! }
 
     context "when post policies are enabled" do
-      before(:once) { course.enable_feature!(:new_gradebook) }
       before(:once) { PostPolicy.enable_feature! }
 
       it "returns true if a policy with manual posting is attached to the course" do
@@ -1328,7 +1318,6 @@ describe Course do
     let_once(:course) { Course.create! }
 
     context "when post policies are enabled" do
-      before(:once) { course.enable_feature!(:new_gradebook) }
       before(:once) { PostPolicy.enable_feature! }
 
       it "sets the post policy for the course" do
@@ -1412,19 +1401,12 @@ describe Course do
   describe "#post_policies_enabled?" do
     let_once(:course) { Course.create! }
 
-    it "returns true when both post policies and new gradebook are enabled" do
+    it "returns true when post policies is enabled" do
       PostPolicy.enable_feature!
-      course.enable_feature!(:new_gradebook)
       expect(course).to be_post_policies_enabled
     end
 
-    it "returns false when post policies is enabled but new gradebook is not enabled" do
-      PostPolicy.enable_feature!
-      expect(course).not_to be_post_policies_enabled
-    end
-
     it "returns false when post policies is not enabled" do
-      course.enable_feature!(:new_gradebook)
       expect(course).not_to be_post_policies_enabled
     end
   end

@@ -314,17 +314,12 @@ function mergeStudentsAndSubmission() {
 
   // handle showing students only in a certain section.
   if (!jsonData.GROUP_GRADING_MODE) {
-    if (ENV.new_gradebook_enabled) {
-      sectionToShow = ENV.selected_section_id
-    } else {
-      sectionToShow = userSettings.contextGet('grading_show_only_section')
-    }
+    sectionToShow = ENV.selected_section_id
   }
 
-  // If we're using New Gradebook, we'll already have done the filtering by
-  // section on the server, so this is redundant (but not the worst thing in
-  // the world since we still need to send the user away if there are no
-  // students in the section). With Old Gradebook we still need to do it here.
+  // We have already have done the filtering by section on the server, so this
+  // is redundant (but not the worst thing in the world since we still need to
+  // send the user away if there are no students in the section).
   if (sectionToShow) {
     sectionToShow = sectionToShow.toString()
 
@@ -3625,15 +3620,6 @@ EG = {
   },
 
   changeToSection(sectionId) {
-    // Update the selected section in old gradebook
-    if (sectionId === 'all') {
-      // We're removing all filters and resetting to default
-      userSettings.contextRemove('grading_show_only_section')
-    } else {
-      userSettings.contextSet('grading_show_only_section', sectionId)
-    }
-
-    // ...and in new gradebook
     if (ENV.settings_url) {
       $.post(ENV.settings_url, {selected_section_id: sectionId}, () => {
         SpeedgraderHelpers.reloadPage()

@@ -249,12 +249,10 @@ module Gradezilla
 
   # actions
   def self.visit(course)
-    Account.default.enable_feature!(:new_gradebook)
     get "/courses/#{course.id}/gradebook/change_gradebook_version?version=default"
   end
 
   def self.visit_upload(course)
-    Account.default.enable_feature!(:new_gradebook)
     get "/courses/#{course.id}/gradebook_uploads/new"
   end
 

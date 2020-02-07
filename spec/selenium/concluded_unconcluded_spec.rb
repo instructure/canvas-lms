@@ -23,7 +23,6 @@ describe "concluded/unconcluded" do
   include_context "in-process server selenium tests"
 
   before do
-    Account.default.enable_feature!(:new_gradebook)
     username = "nobody@example.com"
     password = "asdfasdf"
     u = user_with_pseudonym :active_user => true,

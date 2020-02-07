@@ -284,7 +284,6 @@ describe SpeedGrader::Assignment do
       before(:each) do
         PostPolicy.enable_feature!
         @course.root_account.enable_feature!(:allow_postable_submission_comments)
-        @course.enable_feature!(:new_gradebook)
         @assignment.ensure_post_policy(post_manually: true)
       end
 
@@ -295,7 +294,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "is not included when Post Policies are not enabled" do
-        @course.disable_feature!(:new_gradebook)
+        PostPolicy.disable_feature!
         json = SpeedGrader::Assignment.new(@assignment, @teacher).json
         expect(json[:submissions].first).not_to have_key "has_postable_comments"
       end
@@ -473,7 +472,6 @@ describe SpeedGrader::Assignment do
 
       context "when post policies are enabled" do
         before(:each) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 
@@ -614,7 +612,6 @@ describe SpeedGrader::Assignment do
 
       context 'when a course has new gradeook and filter by student group enabled' do
         before(:once) do
-          @course.enable_feature!(:new_gradebook)
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
           @course.update!(filter_speed_grader_by_student_group: true)
         end
@@ -866,55 +863,40 @@ describe SpeedGrader::Assignment do
       user_session(teacher)
     end
 
-    context "for a course with New Gradebook enabled" do
-      before(:once) do
-        course.enable_feature!(:new_gradebook)
-      end
-
-      it "only returns students from the selected section if the user has selected one" do
-        teacher.preferences.deep_merge!(gradebook_settings: {
-          course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
-        })
-        expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
-      end
-
-      it "returns all eligible students if the user has not selected a section" do
-        expect(returned_student_ids).to match_array(all_course_student_ids)
-      end
-
-      it "returns all eligible students if the selected section is set to nil" do
-        teacher.preferences.deep_merge!(gradebook_settings: {
-          course.id => {'filter_rows_by' => {'section_id' => nil}}
-        })
-        expect(returned_student_ids).to match_array(all_course_student_ids)
-      end
-
-      context "when the user is filtering by both section and group" do
-        let_once(:group) do
-          category = course.group_categories.create!(name: "Group Set")
-          category.create_groups(2)
-
-          group = category.groups.first
-          group.add_user(section1_student)
-          group.add_user(section2_student)
-          group
-        end
-
-        it "restricts by both section and group when section_id and group_id are both specified" do
-          teacher.preferences.deep_merge!(gradebook_settings: {
-            course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s, 'student_group_id' => group.id.to_s}}
-          })
-          expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
-        end
-      end
+    it "only returns students from the selected section if the user has selected one" do
+      teacher.preferences.deep_merge!(gradebook_settings: {
+        course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
+      })
+      expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
     end
 
-    context "for a course not using New Gradebook" do
-      it "does not attempt to filter by section" do
+    it "returns all eligible students if the user has not selected a section" do
+      expect(returned_student_ids).to match_array(all_course_student_ids)
+    end
+
+    it "returns all eligible students if the selected section is set to nil" do
+      teacher.preferences.deep_merge!(gradebook_settings: {
+        course.id => {'filter_rows_by' => {'section_id' => nil}}
+      })
+      expect(returned_student_ids).to match_array(all_course_student_ids)
+    end
+
+    context "when the user is filtering by both section and group" do
+      let_once(:group) do
+        category = course.group_categories.create!(name: "Group Set")
+        category.create_groups(2)
+
+        group = category.groups.first
+        group.add_user(section1_student)
+        group.add_user(section2_student)
+        group
+      end
+
+      it "restricts by both section and group when section_id and group_id are both specified" do
         teacher.preferences.deep_merge!(gradebook_settings: {
-          course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s}}
+          course.id => {'filter_rows_by' => {'section_id' => section1.id.to_s, 'student_group_id' => group.id.to_s}}
         })
-        expect(returned_student_ids).to match_array(all_course_student_ids)
+        expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
       end
     end
   end
@@ -2979,7 +2961,6 @@ describe SpeedGrader::Assignment do
 
     context "when post policies are enabled" do
       before(:once) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 

@@ -33,10 +33,6 @@ describe 'Screenreader Gradebook Student Information' do
     assignment_1.grade_student(student, grade: 3, grader: teacher)
   end
 
-  before :once do
-    Account.default.enable_feature!(:new_gradebook)
-  end
-
   context 'in Student Information section' do
     before(:each) do
       course_setup

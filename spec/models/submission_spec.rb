@@ -921,7 +921,6 @@ describe Submission do
 
     describe "posting of missing submissions" do
       before(:once) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
         late_policy_factory(course: @course, missing: 50)
       end
@@ -1581,7 +1580,6 @@ describe Submission do
             category: "Grading",
             name: "Submission Posted"
           )
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
           @student.update!(email: "fakeemail@example.com")
           @student.email_channel.update!(workflow_state: :active)
@@ -1907,7 +1905,6 @@ describe Submission do
 
       context "when post policies feature is enabled" do
         before(:once) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 
@@ -2203,7 +2200,6 @@ describe Submission do
 
     context "when post policies feature is enabled" do
       before(:once) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -2887,7 +2883,6 @@ describe Submission do
 
     context 'when post policies are enabled' do
       before do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -4886,7 +4881,6 @@ describe Submission do
 
     context "when post policies are enabled" do
       before(:each) do
-        @assignment.course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -5000,7 +4994,6 @@ describe Submission do
 
     it "sets comment hidden to false if comment causes posting" do
       PostPolicy.enable_feature!
-      @course.enable_feature!(:new_gradebook)
       @assignment.ensure_post_policy(post_manually: false)
       @assignment.grade_student(@student, grader: @teacher, score: 5)
       @submission.update!(posted_at: nil)
@@ -5010,7 +5003,6 @@ describe Submission do
 
     it "does not set comment hidden to false if comment does not cause posting" do
       PostPolicy.enable_feature!
-      @course.enable_feature!(:new_gradebook)
       @assignment.ensure_post_policy(post_manually: true)
       @assignment.grade_student(@student, grader: @teacher, score: 5)
       @submission.update!(posted_at: nil)
@@ -5229,7 +5221,6 @@ describe Submission do
         end
 
         it "does not post the submission if post policies are enabled and the assignment is manually-posted" do
-          course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
 
           assignment.ensure_post_policy(post_manually: true)
@@ -6849,7 +6840,6 @@ describe Submission do
 
     context "when Post Policies are enabled" do
       before do
-        course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -6909,7 +6899,6 @@ describe Submission do
     subject(:submission) { @assignment.submissions.first }
 
     before do
-      @assignment.course.enable_feature!(:new_gradebook)
       PostPolicy.enable_feature!
     end
 

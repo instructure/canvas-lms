@@ -118,7 +118,6 @@ describe "courses/settings.html.erb" do
 
   describe "Large Course settings" do
     before :once do
-      @course.enable_feature!(:new_gradebook)
       @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
     end
 
@@ -130,12 +129,6 @@ describe "courses/settings.html.erb" do
       @course.root_account.disable_feature!(:filter_speed_grader_by_student_group)
       render
       expect(response).not_to have_tag "input#course_filter_speed_grader_by_student_group"
-    end
-
-    it "does not render when new gradebook is not enabled" do
-      @course.disable_feature!(:new_gradebook)
-      render
-      expect(response).not_to have_tag("label[for=course_large_course]")
     end
 
     it "has a Large Course label" do

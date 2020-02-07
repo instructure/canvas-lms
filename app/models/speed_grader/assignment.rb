@@ -419,7 +419,6 @@ module SpeedGrader
     end
 
     def section_id_filter
-      return nil unless course.feature_enabled?(:new_gradebook)
       current_user.preferences.dig(:gradebook_settings, course.id, 'filter_rows_by', 'section_id')
     end
   end

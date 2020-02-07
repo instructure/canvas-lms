@@ -31,7 +31,6 @@ describe "interaction with grading periods" do
   context "gradebook" do
     before :once do
       gradebook_data_setup(grading_periods: [:future, :current])
-      Account.default.enable_feature!(:new_gradebook)
 
       # Remove sections, as there is a bug when attempting to click on the
       # Grading Period filter option. The Section filter option is clicked

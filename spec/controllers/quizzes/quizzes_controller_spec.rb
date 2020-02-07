@@ -552,7 +552,6 @@ describe Quizzes::QuizzesController do
         user_session(@student)
         course_quiz(true)
 
-        @quiz.assignment.course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -1314,7 +1313,6 @@ describe Quizzes::QuizzesController do
 
     context "when post policies is enabled" do
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
 
         user_session(@student)
@@ -2584,7 +2582,6 @@ describe Quizzes::QuizzesController do
       end
 
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
 
         @quiz.assignment = assignment

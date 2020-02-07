@@ -35,7 +35,6 @@ describe 'Gradebook performance' do
     @courses = []
     (1..4).each do |i|
       course = course_factory(course_name: "My Course #{i}", active_course: true)
-      course.enable_feature!(:new_gradebook)
       @courses.push course
     end
     @course1 = @courses[0]
