@@ -93,6 +93,9 @@
     <div id="direct-share-mount-point"></div>
   <% else %>
     <!--Student View-->
+    <% if show_confetti %>
+      <%= render partial: "confetti" %>
+    <% end %>
     <div class='assignment-title'>
       <div class='title-content'>
         <h1 class="title">

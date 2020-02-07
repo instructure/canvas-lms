@@ -294,7 +294,8 @@ class AssignmentsController < ApplicationController
 
         render locals: {
           eula_url: tool_eula_url,
-          show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
+          show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user),
+          show_confetti: params[:confetti] == "true" && @domain_root_account&.feature_enabled?(:confetti_for_assignments)
         }, stream: can_stream_template?
       end
     end

@@ -6620,6 +6620,11 @@ concurrently@^4, concurrently@^4.1.2:
     tree-kill "^1.2.1"
     yargs "^12.0.5"
 
+confetti-js@^0.0.17:
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/confetti-js/-/confetti-js-0.0.17.tgz#f95ad3c265a2d1e905c3092ec830acdc06cf945a"
+  integrity sha512-fuXRujAzoOZ5D2mT2Mtytp094DANipXjB3fc+8T9wrhv9grXUWJwhpwTs3r2YfwFYeriouWySB1vkVpHTi2u+A==
+
 confusing-browser-globals@^1.0.7:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/confusing-browser-globals/-/confusing-browser-globals-1.0.9.tgz#72bc13b483c0276801681871d4898516f8f54fdd"

@@ -89,6 +89,7 @@
     "canvas_offline_course_viewer": "https://github.com/instructure/canvas_offline_course_viewer.git#1.2.0",
     "classnames": "^2.2.5",
     "color-slicer": "0.8.0",
+    "confetti-js": "^0.0.17",
     "create-react-class": "^15.6.3",
     "d3": "3.5.17",
     "formdata-polyfill": "^3.0.9",
