@@ -180,15 +180,15 @@ module Gradezilla
   end
 
   def self.show_grading_period_filter_element
-    fj('li:contains("Grading Periods")')
+    fxpath("//li[@role='none']//span[contains(text(), 'Grading Periods')]")
   end
 
   def self.show_module_filter_element
-    fj('li li:contains("Modules")')
+    fxpath("//li[@role='none']//span[contains(text(), 'Modules')]")
   end
 
   def self.show_section_filter_element
-    fj('li:contains("Sections")')
+    fxpath("//li[@role='none']//span[contains(text(), 'Sections')]")
   end
 
   def self.show_unpublished_assignments
