@@ -8353,7 +8353,7 @@ zh-Hans:
   dropdown_changed_state_to_expanded_517689c2: "下拉菜单将状态更改为%{expanded}。"
   dropdown_option_1_e6ff2fc: "下拉选项 1"
   dropdown_option_2_9766a346: "下拉选项 2"
-  dropped_38031953: 已丢弃
+  dropped_38031953: 未计分
   dropped_for_grading_purposes_46256461: 放弃评分的目的
   due_5d7267be: 到期：
   due_639f281d: "到期： "
@@ -9136,7 +9136,7 @@ zh-Hans:
   excuse_this_assignment_for_the_selected_student_af04e132: 对选择的学生豁免作业
   excused_3aab77: 请假
   excused_5877183c: 已请假！
-  excused_cf8792eb: 已请假
+  excused_cf8792eb: 已免除
   exit_d0c7b013: 退出
   exit_theme_editor_9ddd41bb: 退出主题编辑器
   expand_2f2fadbd: 展开
@@ -11971,7 +11971,7 @@ zh-Hans:
   last_pushed_update_last_export_at_9f634f7c: "上一次推送的更新：%{last_export_at}"
   last_used_f9457313: 上次使用日期：
   last_user_access_title: 上次用户访问
-  late_2be42b88: 迟到
+  late_2be42b88: 迟交
   late_8bd684b6: 迟交
   late_anonymous_assignment_a_student_has_submitted__60158b6a: "逾期匿名作业一个学生已提交 %{assignment_title}"
   late_anonymous_assignment_assignment_name_b541c517: "逾期匿名作业：%{assignment_name}"
@@ -14546,7 +14546,7 @@ zh-Hans:
   minimum_score_e6d1c134: 最低分数
   minutes_4aee5a41: 分钟
   minutes_per_slot_5b7169e5: 每个时段的分钟
-  missing_1a256b3b: 失踪
+  missing_1a256b3b: 未交
   missing_d59852a7: 缺失
   missing_eaddacbd: 缺失
   missing_percent_94534638: "缺少：%{percent}"
@@ -18004,7 +18004,7 @@ zh-Hans:
           fill_in_multiple_blanks: 填写多个空格
           matching: 匹配
           missing_word: 缺字
-          multiple_answers: 多个答案
+          multiple_answers: 多选
           multiple_choice: 单选
           multiple_dropdowns: 多个下拉列表
           numerical: 数值答案
