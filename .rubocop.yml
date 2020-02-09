@@ -8,7 +8,7 @@ AllCops:
   TargetRubyVersion: 2.3
 
 # our style changes: disabling style rules we aren't interested in
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: false
 Layout/ElseAlignment:
   Enabled: false
@@ -26,7 +26,7 @@ Layout/EmptyLinesAroundMethodBody:
   Enabled: false
 Layout/EmptyLinesAroundModuleBody:
   Enabled: false
-Layout/IndentHash:
+Layout/FirstHashElementIndentation:
   Enabled: false
 Layout/IndentationConsistency:
   Enabled: false
@@ -56,7 +56,7 @@ Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 Layout/SpaceInsideReferenceBrackets:
   Enabled: false
-Layout/TrailingBlankLines:
+Layout/TrailingEmptyLines:
   Enabled: false
 Layout/TrailingWhitespace:
   Enabled: false
@@ -93,7 +93,9 @@ Style/DoubleNegation:
   Enabled: false
 Style/TrailingCommaInArguments:
   Enabled: false
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+Style/TrailingCommaInHashLiteral:
   Enabled: false
 Style/MethodCallWithoutArgsParentheses:
   Enabled: false
@@ -102,7 +104,7 @@ Style/MethodCallWithArgsParentheses:
 Layout/DotPosition:
   Enabled: true
   EnforcedStyle: trailing
-Layout/AlignHash:
+Layout/HashAlignment:
   Enabled: false
 Style/Lambda:
   Enabled: false
@@ -194,7 +196,7 @@ Lint/UselessAssignment:
   Severity: convention
 Lint/Debugger:
   Severity: error
-Lint/EndAlignment:
+Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
   Severity: convention
 
@@ -212,7 +214,7 @@ Style/RescueModifier:
   Severity: warning
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
-Layout/IndentArray:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
 # these don't make sense pre-Rails 4
@@ -232,7 +234,7 @@ Performance/RegexpMatch:
 # Things we may want to tighten down later
 Metrics/AbcSize:
   Enabled: false
-Metrics/LineLength:
+Layout/LineLength:
   Max: 160
 Metrics/MethodLength:
   Max: 100
