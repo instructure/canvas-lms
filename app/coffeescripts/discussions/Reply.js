@@ -90,6 +90,7 @@ class Reply {
       focus: true,
       manageParent: true,
       tinyOptions: {
+        auto_focus: this.textArea.prop('id'),
         width: '100%'
       }
     })
