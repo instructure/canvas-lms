@@ -163,6 +163,13 @@
       </a>
     <% end %>
 
+    <% if @context_enrollment && @domain_root_account.try(:feature_enabled?, :mute_notifications_by_course) %>
+      <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
+        <i class="icon-alerts"></i>
+        <%= t('links.view_course_notification_settings', %{View Course Notifications}) %>
+      </a>
+    <% end %>
+
     <%= render :partial => 'to_do_list', :locals => {:contexts => [@context], :show_legacy_todo_list => !@context_enrollment&.student?} %>
     <%= render :partial => "group_list", :locals => {:group_list => @user_groups} %>
     <%= nbsp unless @current_user %>
