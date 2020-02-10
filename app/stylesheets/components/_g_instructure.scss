@@ -1788,6 +1788,7 @@ form.user_content_post_form {
 
 .nav-badge {
   @include ic-badge-maker;
+  margin-left: 5px;
   float: right;
 }
 
