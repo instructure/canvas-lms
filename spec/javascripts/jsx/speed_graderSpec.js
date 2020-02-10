@@ -2079,8 +2079,10 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
   })
 
-  QUnit.module('SpeedGrader - gateway timeout', {
-    setup() {
+  QUnit.module('when the gateway times out', contextHooks => {
+    let server
+
+    contextHooks.beforeEach(() => {
       fakeENV.setup({
         assignment_id: '17',
         course_id: '29',
@@ -2088,42 +2090,55 @@ QUnit.module('SpeedGrader', rootHooks => {
         help_url: 'example.com/support',
         show_help_menu_item: false
       })
-      this.server = sinon.fakeServer.create({respondImmediately: true})
+
+      server = sinon.fakeServer.create({respondImmediately: true})
       // in production, json responses that timeout receive html content type responses unfortunately
-      this.server.respondWith('GET', `${window.location.pathname}.json${window.location.search}`, [
+      server.respondWith('GET', `${window.location.pathname}.json${window.location.search}`, [
         504,
         {'Content-Type': 'text/html'},
         ''
       ])
       setupFixtures('<div id="speed_grader_timeout_alert"></div>')
-    },
-    teardown() {
+
+      sandbox.stub(SpeedGrader.EG, 'domReady')
+      ENV.assignment_title = 'Assignment Title'
+    })
+
+    contextHooks.afterEach(() => {
+      SpeedGrader.teardown()
       teardownFixtures()
-      this.server.restore()
+      server.restore()
       fakeENV.teardown()
-    }
-  })
+    })
 
-  test('shows an error when the gateway times out', function() {
-    sandbox.stub(SpeedGrader.EG, 'domReady')
-    ENV.assignment_title = 'Assignment Title'
-    SpeedGrader.setup()
-    const message = [
-      'Something went wrong. Please try refreshing the page. If the problem persists, you can try',
-      'loading a single student group in SpeedGrader by using the Large Course setting.'
-    ].join(' ')
-    strictEqual($('#speed_grader_timeout_alert').text(), message)
-    SpeedGrader.teardown()
-  })
+    test('shows an error', () => {
+      SpeedGrader.setup()
+      notEqual($('#speed_grader_timeout_alert').text(), '')
+    })
 
-  test('links to the course settings page', () => {
-    sandbox.stub(SpeedGrader.EG, 'domReady')
-    ENV.assignment_title = 'Assignment Title'
-    SpeedGrader.setup()
-    const $link = $('#speed_grader_timeout_alert a')
-    const url = new URL($link[0].href)
-    strictEqual(url.pathname, '/courses/29/settings')
-    SpeedGrader.teardown()
+    QUnit.module('when the filter_speed_grader_by_student_group feature is enabled', () => {
+      test('includes a link to the "large course" setting when the setting is not enabled', () => {
+        ENV.filter_speed_grader_by_student_group_feature_enabled = true
+        ENV.filter_speed_grader_by_student_group = false
+        SpeedGrader.setup()
+        const $link = $('#speed_grader_timeout_alert a')
+        const url = new URL($link[0].href)
+        strictEqual(url.pathname, '/courses/29/settings')
+      })
+
+      test('excludes a link to the "large course" setting when the setting is already enabled', () => {
+        ENV.filter_speed_grader_by_student_group_feature_enabled = true
+        ENV.filter_speed_grader_by_student_group = true
+        SpeedGrader.setup()
+        strictEqual($('#speed_grader_timeout_alert a').length, 0)
+      })
+    })
+
+    test('excludes a link to the "large course" setting when the filter_speed_grader_by_student_group feature is disabled', () => {
+      ENV.filter_speed_grader_by_student_group_feature_enabled = false
+      SpeedGrader.setup()
+      strictEqual($('#speed_grader_timeout_alert a').length, 0)
+    })
   })
 
   QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
@@ -5228,7 +5243,10 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       test('unselects existing grades when isNewGrade is passed', () => {
         EG.handleProvisionalGradeSelected({isNewGrade: true})
-        strictEqual(submission.provisional_grades.some(grade => grade.selected), false)
+        strictEqual(
+          submission.provisional_grades.some(grade => grade.selected),
+          false
+        )
       })
     })
 

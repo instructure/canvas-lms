@@ -746,6 +746,9 @@ class GradebooksController < ApplicationController
                                                             :user_id => "{{user_id}}"
         end
 
+        env[:filter_speed_grader_by_student_group_feature_enabled] =
+          @context.root_account.feature_enabled?(:filter_speed_grader_by_student_group)
+
         if @context.filter_speed_grader_by_student_group?
           env[:filter_speed_grader_by_student_group] = true
 

@@ -2119,6 +2119,18 @@ describe GradebooksController do
         expect(js_env[:final_grader_id]).to eql @teacher.id
       end
 
+      it "sets filter_speed_grader_by_student_group_feature_enabled to true when enabled" do
+        @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:filter_speed_grader_by_student_group_feature_enabled)).to be true
+      end
+
+      it "sets filter_speed_grader_by_student_group_feature_enabled to false when disabled" do
+        @course.root_account.disable_feature!(:filter_speed_grader_by_student_group)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:filter_speed_grader_by_student_group_feature_enabled)).to be false
+      end
+
       describe "student group filtering" do
         before(:each) do
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)

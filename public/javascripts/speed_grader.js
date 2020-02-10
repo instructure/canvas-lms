@@ -3673,11 +3673,19 @@ function setupSpeedGrader(gradingPeriods, speedGraderJsonResponse) {
 }
 
 function buildAlertMessage() {
-  const alertMessage = I18n.t(
-    'Something went wrong. Please try refreshing the page. If the problem persists, you can try loading a single student group in SpeedGrader by using the *Large Course setting*.',
-    {wrappers: [`<a href="/courses/${ENV.course_id}/settings#course_large_course">$1</a>`]}
-  )
-  return {__html: alertMessage.string}
+  let alertMessage
+  if (
+    ENV.filter_speed_grader_by_student_group_feature_enabled &&
+    !ENV.filter_speed_grader_by_student_group
+  ) {
+    alertMessage = I18n.t(
+      'Something went wrong. Please try refreshing the page. If the problem persists, you can try loading a single student group in SpeedGrader by using the *Large Course setting*.',
+      {wrappers: [`<a href="/courses/${ENV.course_id}/settings#course_large_course">$1</a>`]}
+    ).string
+  } else {
+    alertMessage = I18n.t('Something went wrong. Please try refreshing the page.')
+  }
+  return {__html: alertMessage}
 }
 
 function speedGraderJSONErrorFn(_data, xhr, _textStatus, _errorThrown) {
