@@ -176,7 +176,6 @@ describe "Wiki Pages" do
     end
 
     it "should display a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
-      skip('LA-373')
       get "/courses/#{@course.id}/pages/non-existant"
       expect_flash_message :warning
     end
@@ -384,7 +383,7 @@ describe "Wiki Pages" do
     end
   end
 end
-end 
+end
 # End shared_example block
 
 RSpec.describe 'With granular permission on' do
