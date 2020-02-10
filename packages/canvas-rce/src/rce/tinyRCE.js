@@ -33,6 +33,7 @@ import 'tinymce/plugins/lists/plugin'
 import 'tinymce/plugins/wordcount/plugin'
 import 'tinymce/plugins/paste/plugin'
 import 'tinymce/plugins/table/plugin'
+import 'tinymce/plugins/hr/plugin'
 
 // add custom plugins
 import './plugins/instructure-ui-icons/plugin'

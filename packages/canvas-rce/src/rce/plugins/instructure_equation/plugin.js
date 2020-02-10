@@ -27,6 +27,12 @@ tinymce.create('tinymce.plugins.InstructureEquation', {
 
     ed.addCommand('instructureEquation', clickCallback.bind(this, ed, document))
 
+    ed.ui.registry.addMenuItem('instructure_equation', {
+      text: formatMessage('Equation'),
+      icon: 'equation',
+      onAction: () => ed.execCommand('instructureEquation')
+    })
+
     ed.ui.registry.addToggleButton('instructure_equation', {
       tooltip: htmlEscape(
         formatMessage({

@@ -36,6 +36,39 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
       bridge.showTrayForPlugin(plugin_key)
     })
 
+    // Register menu items
+    ed.ui.registry.addNestedMenuItem('instructure_media', {
+      text: formatMessage('Media'),
+      icon: 'video',
+      getSubmenuItems: () => [
+        'instructure_upload_media',
+        'instructure_course_media',
+        'instructure_user_media'
+      ]
+    })
+    if (ed.getParam('show_media_upload')) {
+      ed.ui.registry.addMenuItem('instructure_upload_media', {
+        text: formatMessage('Record/Upload Media'),
+        onAction: () => ed.execCommand('instructureRecord')
+      })
+    }
+    if (contextType === 'course') {
+      ed.ui.registry.addMenuItem('instructure_course_media', {
+        text: formatMessage('Course Media'),
+        onAction: () => {
+          ed.focus(true)
+          ed.execCommand('instructureTrayForMedia', false, COURSE_PLUGIN_KEY)
+        }
+      })
+    }
+    ed.ui.registry.addMenuItem('instructure_user_media', {
+      text: formatMessage('User Media'),
+      onAction: () => {
+        ed.focus(true)
+        ed.execCommand('instructureTrayForMedia', false, USER_PLUGIN_KEY)
+      }
+    })
+
     ed.ui.registry.addMenuButton('instructure_record', {
       tooltip: formatMessage('Record/Upload Media'),
       icon: 'video',

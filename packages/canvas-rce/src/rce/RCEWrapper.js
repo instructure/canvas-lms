@@ -1093,7 +1093,6 @@ class RCEWrapper extends React.Component {
 
   render() {
     const {trayProps, ...mceProps} = this.props
-    mceProps.editorOptions.statusbar = false
 
     return (
       <div
