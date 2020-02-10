@@ -20,7 +20,6 @@ module SIS
   class AdminImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
 
       AccountUser.suspend_callbacks(:clear_user_cache) do
@@ -37,7 +36,7 @@ module SIS
       end
       User.clear_cache_keys(user_ids, :account_users)
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
-      @logger.debug("admin imported in #{Time.zone.now - start} seconds")
+
       importer.success_count
     end
 
@@ -59,8 +58,6 @@ module SIS
       end
 
       def process_admin(user_id: nil, account_id: nil, role_id: nil, role: nil, status: nil, root_account: nil)
-        @logger.debug("Processing admin #{[user_id, account_id, role_id, role, status, root_account].inspect}")
-
         raise ImportError, "No user_id given for admin" if user_id.blank?
         raise ImportError, "No status given for admin" if status.blank?
         raise ImportError, "No role_id or role given for admin" if role.blank? && role_id.blank?

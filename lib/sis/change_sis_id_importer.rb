@@ -20,7 +20,6 @@ module SIS
   class ChangeSisIdImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
 
       yield importer
@@ -40,8 +39,6 @@ module SIS
           touch_and_update_batch_ids types[key][:scope].where(id: batch)
         end
       end
-
-      @logger.debug("change sis id #{Time.zone.now - start} seconds")
 
       importer.success_count
     end
@@ -63,8 +60,6 @@ module SIS
       end
 
       def process_change_sis_id(data_change)
-        @logger.debug("Processing change_sis_id #{data_change.to_a.inspect}")
-
         raise ImportError, "No type given for change_sis_id" if data_change.type.blank?
         raise ImportError, "No old_id or old_integration_id given for change_sis_id" if data_change.old_id.blank? && data_change.old_integration_id.blank?
         raise ImportError, "No new_id or new_integration_id given for change_sis_id" if data_change.new_id.blank? && data_change.new_integration_id.blank?

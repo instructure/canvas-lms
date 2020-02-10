@@ -27,12 +27,6 @@ module SIS
         self.new_integration_id = new_integration_id
         self.type = type
       end
-
-      def to_a
-        [old_id, new_id, old_integration_id, new_integration_id, type]
-      end
     end
   end
 end
-
-
