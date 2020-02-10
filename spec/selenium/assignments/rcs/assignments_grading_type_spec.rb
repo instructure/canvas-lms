@@ -33,7 +33,7 @@ describe "assignments" do
     yield if block_given?
     f('.btn-primary[type=submit]').click
     wait_for_ajaximations
-    expect(f('.errorBox:not(#error_box_template)')).to include_text("Points possible must be 0 or more for selected grading type")
+    expect(f('.errorBox:not(#error_box_template)')).to include_text("Points possible must be greater than 0 for selected grading type")
   end
 
   before(:each) do

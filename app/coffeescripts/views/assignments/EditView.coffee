@@ -695,9 +695,9 @@ export default class EditView extends ValidatedFormView
   _validatePointsRequired: (data, errors) =>
     return errors unless ['percent','letter_grade','gpa_scale'].includes data.grading_type
 
-    if typeof data.points_possible != 'number' or data.points_possible < 0 or isNaN(data.points_possible)
+    if typeof data.points_possible != 'number' or data.points_possible <= 0 or isNaN(data.points_possible)
       errors["points_possible"] = [
-        message: I18n.t("Points possible must be 0 or more for selected grading type")
+        message: I18n.t("Points possible must be greater than 0 for selected grading type")
       ]
     errors
 
