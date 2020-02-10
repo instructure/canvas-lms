@@ -61,16 +61,14 @@ pipeline {
         //   }
         // }
 
-        // stage('Rspec') {
-        //   steps {
-        //     skipIfPreviouslySuccessful("rspec") {
-        //       build(
-        //         job: 'test-suites/rspec',
-        //         parameters: build_parameters
-        //       )
-        //     }
-        //   }
-        // }
+        stage('Rspec') {
+          steps {
+            build(
+              job: 'test-suites/rspec',
+              parameters: build_parameters
+            )
+          }
+        }
       }
     }
   }

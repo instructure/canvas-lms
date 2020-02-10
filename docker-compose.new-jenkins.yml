@@ -18,6 +18,7 @@ services:
       RANDOMIZE_SEQUENCES: 1
       RERUNS_RETRY:
       MAX_FAIL:
+      COVERAGE:
 
       # knapsack
       CI_NODE_TOTAL:

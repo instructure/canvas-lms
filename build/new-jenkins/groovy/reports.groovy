@@ -16,18 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def stashSpecCoverage(index) {
+  dir("tmp") {
+    stash name: "spec_coverage_${index}", includes: 'spec_coverage/**/*'
+  }
+}
+
+def publishSpecCoverageToS3(ci_node_total) {
+  sh 'rm -rf ./coverage_nodes'
+  dir('coverage_nodes') {
+    for(int index = 0; index < ci_node_total; index++) {
+      dir("node_${index}") {
+        unstash "spec_coverage_${index}"
+      }
+    }
+  }
+
+  sh './build/new-jenkins/rspec-coverage-report.sh'
+
+  archiveArtifacts(artifacts: 'coverage_nodes/**')
+  archiveArtifacts(artifacts: 'coverage/**')
+  uploadCoverage([
+      uploadSource: "/coverage",
+      uploadDest: "canvas-lms-rspec/coverage"
+  ])
+  sh 'rm -rf ./coverage_nodes'
+  sh 'rm -rf ./coverage'
+}
+
 // this method is to ensure that the stashing is done in a way that
 // is expected in publishSpecFailuresAsHTML
 def stashSpecFailures(index) {
-  stash name: "spec_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
+  dir("tmp") {
+    stash name: "spec_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
+  }
 }
 
 def publishSpecFailuresAsHTML(ci_node_total) {
   sh 'rm -rf ./compiled_failures'
   def htmlFiles;
   dir('compiled_failures') {
-    for(int i = 0; i < ci_node_total; i++) {
-      def index = i;
+    for(int index = 0; index < ci_node_total; index++) {
       dir ("node_${index}") {
         unstash "spec_failures_${index}"
       }

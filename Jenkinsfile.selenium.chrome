@@ -72,9 +72,7 @@ pipeline {
                     }
                     finally {
                       def reports = load 'build/new-jenkins/groovy/reports.groovy'
-                      dir ('tmp') {
-                        reports.stashSpecFailures(index)
-                      }
+                      reports.stashSpecFailures(index)
                       sh 'rm -rf ./tmp/spec_failures'
                       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
                     }
