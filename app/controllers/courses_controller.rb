@@ -1939,6 +1939,11 @@ class CoursesController < ApplicationController
           js_env(:SHOW_ANNOUNCEMENTS => true, :ANNOUNCEMENT_LIMIT => @context.home_page_announcement_limit)
         end
 
+        if @domain_root_account&.feature_enabled?(:mute_notifications_by_course) && params[:view] == 'notifications'
+          render_course_notification_settings
+          return
+        end
+
         @contexts = [@context]
         case @course_home_view
         when "wiki"
@@ -2037,6 +2042,12 @@ class CoursesController < ApplicationController
         render_unauthorized_action
       end
     end
+  end
+
+  def render_course_notification_settings
+    add_crumb(t("Course Notification Settings"))
+    js_bundle :course_notification_settings_show
+    render html: '', layout: true
   end
 
   def confirm_action
