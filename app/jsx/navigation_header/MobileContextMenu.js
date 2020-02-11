@@ -107,9 +107,12 @@ function srText(tab) {
 
 export default function MobileContextMenu({spinner, contextType, contextId}) {
   const [tabs, setTabs] = useState(null)
+  const [defaultContextType, defaultContextId] = splitAssetString(ENV.context_asset_string)
 
   useFetchApi({
-    path: `/api/v1/${encodeURIComponent(contextType)}/${encodeURIComponent(contextId)}/tabs`,
+    path: `/api/v1/${encodeURIComponent(contextType || defaultContextType)}/${encodeURIComponent(
+      contextId || defaultContextId
+    )}/tabs`,
     success: useCallback(r => setTabs(r), [])
   })
 
@@ -141,13 +144,6 @@ export default function MobileContextMenu({spinner, contextType, contextId}) {
 
 MobileContextMenu.propTypes = {
   spinner: node.isRequired,
-  contextType: string.isRequired,
-  contextId: string.isRequired
-}
-
-const [defaultContextType, defaultContextId] = splitAssetString(ENV.context_asset_string)
-
-MobileContextMenu.defaultProps = {
-  contextType: defaultContextType,
-  contextId: defaultContextId
+  contextType: string,
+  contextId: string
 }
