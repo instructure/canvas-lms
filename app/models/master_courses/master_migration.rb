@@ -263,6 +263,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       cm.migration_settings[:master_course_export_id] = export.id
       cm.migration_settings[:master_migration_id] = self.id
       cm.child_subscription_id = sub.id
+      cm.source_course_id = self.master_template.course_id # apparently this is how some lti tools try to track copied content :/
       cm.workflow_state = 'exported'
       cm.exported_attachment = export.attachment
       cm.user_id = export.user_id
