@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe 'RequestThrottle' do
-  let(:base_req) { { 'QUERY_STRING' => '', 'PATH_INFO' => '/' } }
+  let(:base_req) { { 'QUERY_STRING' => '', 'PATH_INFO' => '/', 'REQUEST_METHOD' => 'GET' } }
   let(:request_user_1) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session' => { user_id: 1 } }) }
   let(:request_user_2) { base_req.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'rack.session' => { user_id: 2 } }) }
   let(:token1) { AccessToken.create!(user: user_factory) }
@@ -63,6 +63,31 @@ describe 'RequestThrottle' do
 
     it "should fall back to ip" do
       expect(throttler.client_identifier(req(request_no_session))).to eq "ip:#{request_no_session['REMOTE_ADDR']}"
+    end
+
+    it "can find tool ids" do
+      tool = ContextExternalTool.create!(domain: 'domain', context: Account.default, consumer_key: 'key', shared_secret: 'secret', name: 'tool')
+      request_grade_passback = base_req.merge('REQUEST_METHOD' => 'POST', 'PATH_INFO' => "/api/lti/v1/tools/#{tool.id}/grade_passback")
+      expect(throttler.client_identifier(req(request_grade_passback))).to eq "tool:domain"
+    end
+
+    it "ignores non-ID tools" do
+      request_grade_passback = base_req.merge('REQUEST_METHOD' => 'POST', 'PATH_INFO' => "/api/lti/v1/tools/garbage/grade_passback")
+      expect(ContextExternalTool).to receive(:find_by).never
+      expect(throttler.client_identifier(req(request_grade_passback))).to eq nil
+    end
+
+    it "ignores non-existent tools" do
+      request_grade_passback = base_req.merge('REQUEST_METHOD' => 'POST', 'PATH_INFO' => "/api/lti/v1/tools/5/grade_passback")
+      expect(ContextExternalTool).to receive(:find_by).once.with(id: "5")
+      expect(throttler.client_identifier(req(request_grade_passback))).to eq nil
+    end
+
+    it "ignores non-POST to tools" do
+      tool = ContextExternalTool.create!(domain: 'domain', context: Account.default, consumer_key: 'key', shared_secret: 'secret', name: 'tool')
+      request_grade_passback = base_req.merge('REQUEST_METHOD' => 'GET', 'PATH_INFO' => "/api/lti/v1/tools/#{tool.id}/grade_passback")
+      expect(ContextExternalTool).to receive(:find_by).never
+      expect(throttler.client_identifier(req(request_grade_passback))).to eq nil
     end
   end
 
