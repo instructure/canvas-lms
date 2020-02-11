@@ -5554,7 +5554,80 @@ describe Submission do
           expect(comments).to match_array([@peer_review_comment, @student_comment, @teacher_comment])
         end
       end
+    end
 
+    context "when the assignment is a group peer-reviewed assignment" do
+      let_once(:student1) { @course.enroll_student(User.create!, active_all: true).user }
+      let_once(:student2) { @course.enroll_student(User.create!, active_all: true).user }
+      let_once(:student3) { @course.enroll_student(User.create!, active_all: true).user }
+      let_once(:student4) { @course.enroll_student(User.create!, active_all: true).user }
+
+      let_once(:group_category) do
+        group_category = @course.group_categories.create!(name: "a group")
+        group_category.create_groups(3)
+
+        group_category.groups.first.add_user(student1)
+        group_category.groups.second.add_user(student2)
+        group_category.groups.second.add_user(student3)
+        group_category.groups.third.add_user(student4)
+        group_category
+      end
+
+      let_once(:assignment) do
+        @course.assignments.create!(group_category: group_category, peer_reviews: true)
+      end
+
+      before(:once) do
+        assignment.submit_homework(student1, body: "I am student 1")
+        assignment.submit_homework(student2, body: "I am student 2")
+        assignment.submit_homework(student3, body: "I am student 3")
+        assignment.submit_homework(student4, body: "I am student 4")
+
+        assignment.assign_peer_review(student1, student2)
+        assignment.assign_peer_review(student1, student4)
+      end
+
+      context "when the assignment is manually posted" do
+        before(:once) do
+          assignment.post_policy.update!(post_manually: true)
+
+          # Call update_submission to post the comment (rather than add_comment)
+          # so that it gets propagated to other group members
+          student2_submission_params = {
+            assessment_request: AssessmentRequest.find_by(assessor: student1, user: student2),
+            author: student1,
+            comment: "good job",
+            group_comment: true
+          }
+          assignment.update_submission(student2, student2_submission_params)
+
+          student4_submission_params = {
+            assessment_request: AssessmentRequest.find_by(assessor: student1, user: student4),
+            author: student1,
+            comment: "bad job",
+            group_comment: true
+          }
+          assignment.update_submission(student4, student4_submission_params)
+        end
+
+        it "allows the specific recipient of the comment to view it" do
+          comment = SubmissionComment.find_by(submission: assignment.submission_for_student(student2), author: student1)
+
+          expect(comment).to be_grants_right(student2, :read)
+        end
+
+        it "allows other students in the recipient's group to view their respective comment" do
+          comment = SubmissionComment.find_by(submission: assignment.submission_for_student(student3), author: student1)
+
+          expect(comment).to be_grants_right(student3, :read)
+        end
+
+        it "does not allow assessed students in a different group to view the comment" do
+          comment = SubmissionComment.find_by(submission: assignment.submission_for_student(student2), author: student1)
+
+          expect(comment).not_to be_grants_right(student4, :read)
+        end
+      end
     end
 
     context "for a moderated assignment" do
