@@ -234,7 +234,7 @@ describe "speed grader" do
 
   context "multiple enrollments" do
     before(:each) do
-      student_in_course
+      student_in_course(active_all: true)
       @course_section = @course.course_sections.create!(name: "<h1>Other Section</h1>")
       @enrollment = @course.enroll_student(@student,
                                            enrollment_state: "active",
