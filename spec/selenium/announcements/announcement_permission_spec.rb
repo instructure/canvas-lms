@@ -94,7 +94,6 @@ describe 'announcement permissions' do
       end
 
       it "does not allow user to view announcements", priority: pick_priority(context, student: "1", observer: "1"), test_id: pick_test_id(context, student: "790700", observer: "790701") do
-        skip('KNO-193')
         get announcements_page
         assert_flash_notice_message course_page_disabled_notice
       end
