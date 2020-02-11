@@ -145,8 +145,20 @@ class RequestThrottle
         (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
         tag_identifier("user", AuthenticationMethods.user_id(request).presence),
         tag_identifier("session", session_id(request).presence),
+        tag_identifier("tool", tool_id(request)),
         tag_identifier("ip", request.ip)
       ].compact
+  end
+
+  def tool_id(request)
+    return unless (request.request_method_symbol == :post && request.fullpath =~ %r{/api/lti/v1/tools/([^/]+)/(?:ext_)?grade_passback})
+    tool_id = $1
+    return unless tool_id =~ Api::ID_REGEX
+    # yes, a db lookup, but we're only loading it for these two actions,
+    # and only if another identifier couldn't be found
+    tool = ContextExternalTool.find_by(id: tool_id)
+    return unless tool
+    tool.domain
   end
 
   def session_id(request)
