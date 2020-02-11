@@ -271,7 +271,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             next
           end
           strip_html_answers(question)
-          answer_item = question && question[:answers].detect { |a| a[:id] == answer[:answer_id] }
+          answer_item = question && question[:answers]&.detect { |a| a[:id] == answer[:answer_id] }
           answer_item ||= answer
           if question[:question_type] == 'fill_in_multiple_blanks_question'
             blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
