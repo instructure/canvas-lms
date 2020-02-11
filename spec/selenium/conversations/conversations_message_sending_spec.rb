@@ -199,11 +199,6 @@ describe "conversations new" do
       end
 
       it "should check and lock the bulk_message checkbox when over the max size", priority: "2", test_id: 206022 do
-        account_with_role_changes(
-          :account => @course.account,
-          :role => Role.where(name: 'StudentEnrollment').last,
-          :role_changes => {:send_messages_all => true}
-        )
         conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 
@@ -226,11 +221,6 @@ describe "conversations new" do
       end
 
       it "should leave the value the same as before after unlocking", priority: "2", test_id: 206023 do
-        account_with_role_changes(
-          :account => @course.account,
-          :role => Role.where(name: 'StudentEnrollment').last,
-          :role_changes => {:send_messages_all => true}
-        )
         conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 

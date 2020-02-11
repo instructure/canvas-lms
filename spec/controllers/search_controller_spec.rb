@@ -54,20 +54,6 @@ describe SearchController do
       expect(response.body).not_to include('bob')
     end
 
-    it "includes permissions" do
-      course_with_student_logged_in(:active_all => true)
-      @user.update_attribute(:name, 'Rick')
-      other = User.create(:name => 'Morty')
-      @course.enroll_student(other).tap do |e|
-        e.workflow_state = 'active'
-        e.save!
-      end
-
-      get 'recipients', params: {:context => @course.asset_string, :per_page => '20', :permissions => 'send_messages_all', :synthetic_contexts => true}
-      expect(response).to be_successful
-      expect(response.body).to include('permissions')
-    end
-
     it "should optionally show users who haven't finished registration" do
       course_with_student_logged_in(:active_all => true)
       @user.update_attribute(:name, 'billy')
