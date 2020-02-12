@@ -44,6 +44,7 @@ define [
       'sortupdate' : 'handleSortUpdate'
       'change #lock' : 'toggleLockingSelectedTopics'
       'click #delete' : 'destroySelectedTopics'
+      'click #pin' : 'togglePinningSelectedTopics'
       'click #edit_discussions_settings': 'toggleSettingsView'
 
     initialize: ->
@@ -170,6 +171,46 @@ define [
       if confirm message
         _(selectedTopics).invoke 'destroy'
         @toggleActionsForSelectedDiscussions()
+
+    togglePinningSelectedTopics: ->
+      selectedTopics = @selectedTopics().map (ann) -> ann.id
+
+      $.ajax({
+        url: "/api/v1/courses/" + ENV.COURSE_ID + "/announcements/bulk_pin",
+        data: {"announcement_ids[]": selectedTopics},
+        type: 'POST',
+        dataType: "json",
+        success: (response) ->
+          reordered = []
+          children = $('.discussionTopicIndexList').children()
+
+          $('.discussionTopicIndexList').children().each (child) ->
+            childID = $(this).data("id")
+            idx = response.findIndex (resp) ->
+                    resp.discussion_topic.id == childID
+
+            if response[idx] && response[idx].discussion_topic.pinned
+              $(this).find("#individual-pin").text("Unpin")
+              $(this).addClass("pinned-announcement")
+              $(this).find(".discussion-info-icons-pin").removeClass("invisible-pin")
+            else
+              $(this).find("#individual-pin").text("Pin to Top")
+              $(this).removeClass("pinned-announcement")
+              $(this).find(".discussion-info-icons-pin").addClass("invisible-pin")
+
+            reordered[idx] = $(this)
+
+          $('.discussionTopicIndexList').children().detach()
+
+          reordered.forEach (jq) ->
+            $('.discussionTopicIndexList').append(jq)
+        ,
+        error: () ->
+          $.flashError(
+            "Something went wrong!"
+          )
+        ,
+      });
 
     selectedTopics: ->
       @collection.filter (model) -> model.selected

@@ -63,6 +63,10 @@
              title="{{#t}}This topic is used for grading{{/t}}"
              class="icon-assignment"></i>
         {{/if}}
+
+        <i class="icon-pin discussion-info-icons-pin {{#unless pinned}}invisible-pin{{/unless}}">
+          <span class="screenreader-only">{{#t}}This topic is marked as pinned{{/t}}</span>
+        </i>
       </div>
       <div class="discussion-actions">
         {{#unless restricted_by_master_course}}
@@ -73,6 +77,19 @@
           </a>
 
           <ul class="al-options">
+            {{#if pinned}}
+              <li>
+                <a href="#" class="icon-pin individual-pin">
+                  {{#t}}Unpin{{/t}}
+                </a>
+              </li>
+            {{else}}
+              <li>
+                <a href="#" class="icon-pin individual-pin">
+                  {{#t}}Pin to Top{{/t}}
+                </a>
+              </li>
+            {{/if}}
             {{#if locked}}
                 {{#unless comments_disabled}}
                   <li>

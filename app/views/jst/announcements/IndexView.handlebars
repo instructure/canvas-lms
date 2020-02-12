@@ -38,6 +38,10 @@
         </a>
       {{/if}}
       <span id="actionsForSelectedDiscussions" class="screenreader-only">
+        <button id="pin" data-tooltip data-tooltip title="{{#t "pin"}}Pin{{/t}}" disabled="disabled">
+          <i class="icon-pin"></i>
+          <span class="screenreader-only">{{#t "pin"}}Pin{{/t}}</span>
+        </button>
         <input type="checkbox" id="lock" disabled="disabled"/>
         <label for="lock" data-tooltip title="{{#t "lock_for_comments"}}Lock for comments{{/t}}">
           <i class="icon-lock"></i>

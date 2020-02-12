@@ -49,6 +49,14 @@ $announcements_disscussion-summary-color: $ic-font-color-dark;
       background-color: $ic-bg-light-primary;
     }
 
+    &.pinned-announcement {
+      border-left: 5px solid #6BD2D8;
+    }
+
+    .invisible-pin {
+      display: none;
+    }
+
     .image-block-image {
       float: left;
     }
