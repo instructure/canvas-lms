@@ -79,7 +79,10 @@ module Pact::Canvas
       :site_admin_account,
       :students,
       :teachers,
-      :teacher_assistants
+      :teacher_assistants,
+      :mobile_courses,
+      :mobile_teacher,
+      :mobile_student
     )
 
     def self.seed!(opts: {})
@@ -93,6 +96,7 @@ module Pact::Canvas
       @account = opts[:account] || Account.default
       @course = opts[:course] || seed_course
       seed_users(opts)
+      @mobile_courses = seed_mobile
       enable_default_developer_key!
       enable_features
     end
@@ -244,5 +248,92 @@ module Pact::Canvas
       end
       parents
     end
+
+    # Set up a playground for mobile usage
+    #
+    # Student id 8, "Mobile Student"
+    # Teacher id 9, "Mobile Teacher"
+    # Courses with ids 2 and 3, "Mobile Course 1" and "Mobile Course 2".  The latter is favorited.
+    def seed_mobile
+      # Let's make a mobile student
+      mstudent_name = "Mobile Student"
+      mstudent_email = "MobileStudent@instructure.com"
+      mstudent = user_factory(active_all: true, name: mstudent_name)
+      mstudent.pseudonyms.create!(unique_id: mstudent_email, password: 'password', password_confirmation: 'password', sis_user_id: "SIS_#{mstudent_name}")
+      mstudent.email = mstudent_email
+      mstudent.accept_terms
+      mstudent.profile.bio="My Bio" # Add bio
+      mstudent.profile.save
+      mstudent.update(locale: "en", pronouns: "They/Them") # populate locale, pronouns
+      
+      # And a mobile teacher
+      mteacher_name = "Mobile Teacher"
+      mteacher_email = "MobileTeacher@instructure.com"
+      mteacher = user_factory(active_all: true, name: mteacher_name)
+      mteacher.pseudonyms.create!(unique_id: mteacher_email, password: 'password', password_confirmation: 'password', sis_user_id: "SIS_#{mteacher_name}")
+      mteacher.email = mteacher_email
+      mteacher.accept_terms
+      
+      # The logic below will stomp @course and perhaps a few other things.  
+      # We'll save them so that we can restore them later to their original value.
+      original_course = @course
+      
+      mcourses = []
+      # Now let's make 2 courses
+      2.times do |i|
+        index = i + 1
+        mcourse = course_factory(account: @account, active_course: true, course_name: "Mobile Course #{index}", is_public: true)
+        
+        # overriding these because the random uuid and lti_context_id won't work
+        # with contract tests until we are able to use Pact provider_params
+        # JHoag: I don't know if our mobile tests need this or not.  Just trying to follow a pattern.
+        #        I had to add the "-<index>" because these need to be unique
+        mcourse.lti_context_id = "9b4ef1eea0eb4c3498983e09a6ef88f1-#{index}"
+        mcourse.uuid = "eylMsUDGR6aQDPCO5kOE6AGyH6ePPZLfV7CN1dV2-#{index}"
+        mcourse.save!
+        
+        # Enroll our student and teacher in each course
+        mcourse.enroll_student(mstudent).accept!
+        mcourse.enroll_teacher(mteacher).accept!
+        mcourse.save!
+        
+        # Create grading periods for each course
+        create_grading_periods_for(mcourse, grading_periods: [:current, :future])
+        mcourse.save
+        
+        # Update our enrollments with last_activity_at, start_at and end_at
+        enrollment = mcourse.enrollments.detect {|e| e.user_id == 8}
+        enrollment.update(last_activity_at: 1.minute.ago)
+        enrollment.save
+        mcourse.enrollment_term.update!(start_at: 1.month.ago, end_at: 1.month.from_now)
+        
+        # Update our course to with license and conclude_at (which maps to end_at), enable grading
+        mcourse.update!(grading_standard_enabled: true, license: "private", conclude_at: 1.month.from_now)
+        
+        # All courses created after the initial favorite will be favorited, I think.  (course_spec.rb, L1607)
+        # So just favorite the last one.
+        if i == 1 
+          # puts "Favoriting #{mcourse.id}"
+          mstudent.favorites.create!(:context_type => "Course", :context => mcourse)
+          mstudent.favorites.first.save
+          mstudent.save!
+        end
+        
+        # Add start_at,  end_at to our course section
+        mcourse.course_sections.first.update(start_at: 1.month.ago, end_at: 1.month.from_now)
+        mcourses << mcourse
+      end
+
+      # Restore initial value of @course,  possibly others
+      @course = original_course
+      
+      # Record our mobile student and teacher
+      @mobile_student = mstudent
+      @mobile_teacher = mteacher
+
+      # Return our mobile courses
+      mcourses
+    end 
+
   end
 end
