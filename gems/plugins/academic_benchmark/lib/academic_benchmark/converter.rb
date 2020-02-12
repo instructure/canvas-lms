@@ -19,52 +19,47 @@ require 'academic_benchmarks'
 
 module AcademicBenchmark
   class Converter < Canvas::Migration::Migrator
+    COMMON_CORE_GUID = 'A83297F2-901A-11DF-A622-0C319DFF4B22'.freeze
+
     def initialize(settings={})
       super(settings, "academic_benchmark")
       @ratings_overrides = settings[:migration_options] || {}
       @course[:learning_outcomes] = []
-      @converter_v1 = ConverterV1.new(settings)
       @partner_id = settings[:partner_id]
       @partner_key = settings[:partner_key]
     end
 
     def export
-      if AcademicBenchmark.v3?
-        unless content_migration
-          raise Canvas::Migration::Error,
-            "Missing required content_migration settings"
-        end
-        unless Account.site_admin.grants_right?(content_migration.user, :manage_global_outcomes)
-          raise Canvas::Migration::Error,
-            "User isn't allowed to edit global outcomes"
-        end
+      unless content_migration
+        raise Canvas::Migration::Error,
+          "Missing required content_migration settings"
+      end
+      unless Account.site_admin.grants_right?(content_migration.user, :manage_global_outcomes)
+        raise Canvas::Migration::Error,
+          "User isn't allowed to edit global outcomes"
+      end
+      unless @archive_file
         unless @partner_id.present? || AcademicBenchmark.ensure_partner_id.nil?
           raise Canvas::Migration::Error, I18n.t("A partner ID is required to use Academic Benchmarks")
         end
         unless @partner_key.present? || AcademicBenchmark.ensure_partner_key.nil?
           raise Canvas::Migration::Error, I18n.t("A partner key is required to use Academic Benchmarks")
         end
-        if outcome_data.present?
-          if outcome_data.instance_of? AcademicBenchmarks::Standards::StandardsForest
-            outcome_data.trees.each do |t|
-              @course[:learning_outcomes] << t.root.build_outcomes(@ratings_overrides)
-            end
-          else
-            @course[:learning_outcomes] << outcome_data.root.build_outcomes(@ratings_overrides)
-          end
-        end
-        save_to_file
-        @course
-      else
-        @converter_v1.export
       end
+      if outcome_data.present?
+        if outcome_data.instance_of? AcademicBenchmarks::Standards::StandardsForest
+          outcome_data.trees.each do |t|
+            @course[:learning_outcomes] << t.root.build_outcomes(@ratings_overrides)
+          end
+        else
+          @course[:learning_outcomes] << outcome_data.root.build_outcomes(@ratings_overrides)
+        end
+      end
+      save_to_file
+      @course
     end
 
-    def post_process
-      unless AcademicBenchmark.v3?
-        @converter_v1.post_process
-      end
-    end
+    def post_process; end
 
     private
     def outcome_data

@@ -55,12 +55,12 @@ describe ConsulInitializer do
   describe "just from loading" do
     it "clears the DynamicSettings cache on reload" do
       Canvas::DynamicSettings.reset_cache!
-      Canvas::DynamicSettings::Cache.insert('service/key', 'value')
+      LocalCache.write(Canvas::DynamicSettings::CACHE_KEY_PREFIX + 'service/key', 'value')
       imperium = double('imperium', get: nil)
       allow(Canvas::DynamicSettings).to receive(:kv_client).and_return(imperium)
       expect(Canvas::DynamicSettings.find(tree: nil, service: 'service')['key']).to eq("value")
       Canvas::Reloader.reload!
-      expect(Canvas::DynamicSettings::Cache.store).to eq({})
+      expect(LocalCache.read(Canvas::DynamicSettings::CACHE_KEY_PREFIX + 'service/key')).to eq(nil)
     end
   end
 end

@@ -359,7 +359,15 @@ $context_module_bg_color: #f2f3f4;
     .icon-document {
       display: none;
     }
-    .icon-quiz {
+    .icon-quiz:not(.icon-Solid) {
+      display: inline-block;
+    }
+  }
+  &.lti-quiz {
+    .icon-document {
+      display: none;
+    }
+    .icon-Solid {
       display: inline-block;
     }
   }

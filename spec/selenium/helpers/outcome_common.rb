@@ -98,12 +98,8 @@ module OutcomeCommon
 
   def state_outcome
       state_outcome = [
-        'NGA Center/CCSSO',
-        'Common Core State Standards',
-        'College- and Career-Readiness Standards and K-12 Mathematics',
-        'First Grade',
-        '1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé',
-        'Something else'
+        'CCSS.ELA-Literacy.CCRA.R - Reading',
+        'Craft and Structure'
       ]
       state_outcome
   end

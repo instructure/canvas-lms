@@ -246,7 +246,6 @@ export default class PermissionButton extends Component {
             this.props.handleClick({
               name: this.props.permissionName,
               id: this.props.roleId,
-              enabled: this.props.permission.enabled,
               locked: false,
               explicit: false,
               inTray: this.props.inTray

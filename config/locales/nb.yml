@@ -173,6 +173,7 @@ nb:
   _start_from_a_template__a03ea3b3: "-- Begynn fra en mal --"
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} og {b} kan ikke brukes sammen"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Det brukes ikke kalkuleringsverdi med denne beregningsmetoden"
+  a_canvas_security_token_was_just_generated_for_you_efeeac68: "Et Canvas sikkerhet-symbol ble nettopp generert for kontoen din. Hvis du forespurte et brukersymbol er ingen ytterligere handlinger nødvendig. Hvis du ikke forespurte et symbol, eller ønsker å administrere sine Canvas-tilgangssymboler, kan du gjøre det her"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med navnet %{itemName} finnes allerede i denne mappen."
   a_front_page_is_required_fd57b80: "En Forside er nødvendig"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "En logo i full størrelse som vises i det høyre sidefeltet på Canvas-skrivebordet. Ideell størrelse er 360 x 140 piksler. Aksepterte format: svg, png, jpeg og gif"
@@ -239,6 +240,7 @@ nb:
   access_report_80d28095: Tilgangsrapport
   access_token_3be22221: Tilgangssymbol
   access_token_count_access_token_count_dfb5463c: "Få tilgang til antall tegn: %{access_token_count}"
+  access_token_created_or_regenerated_4ce9ed1f: "Tilgangssymbol opprettet eller regenerert"
   access_token_is_valid_until_d2f048cf: "Tilgangssymbol er gyldig frem til"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangssymbol kan brukes for å tillate andre applikasjoner til å gjøre API-oppkall på dine vegne. Du kan også generere tilgangssymboler og bruke *Canvas Open API* for å finne på dine egne integrasjoner."
   accessible_sidebar_menu_b30baf97: "Tilgjengelig sidestolpe-meny"
@@ -1990,6 +1992,7 @@ nb:
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Tillat å importere QTI og Common Cartridge inn i NY Quizzes."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillat å importere QTI og Common Cartridge in i Quizzes.Next."
   allow_in_mastery_paths_5332c786: "Tillat i læringsstier"
+  allow_include_parameters_bf3d3230: "Tillat Inkluder parameter "
   allow_intra_group_peer_reviews_53f1e455: "Tillat hverandrevurdering innad i gruppen"
   allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
       Tillat abonnement på live arrangementer som kan settes opp til å bli levert
@@ -2023,6 +2026,7 @@ nb:
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Lar administratorer se en logg som inneholder informasjon om alle nylige utførelser av
       GraphQL-mutasjoner
+  allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillater å innrette læringsmål til innhold som ikke scorer"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Tillater rådgiver å vise vurderingens overvåkingbrett i SpeedGrader for anonyme eller modererte oppgaver."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillater opprettelse av kunngjøringer for en bestemt seksjon"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Lar deg opprette diskusjoner for en spesifikk seksjon"
@@ -2046,7 +2050,9 @@ nb:
       Lar en bruker bruke kunngjøringer-lenken i emnenavigasjon.
       Lar en bruker vise kunngjøringer.
       Lar en bruker vise seneste kunngjøringer på startsiden for emner.
+  allows_user_to_access_the_attendance_tool_72ef0b68: "Lar brukeren bruke Oppmøte-verktøyet."
   allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Lar en bruker bruke sidepanelet for blueprint-emner. Lar en bruker administrere innholdsinnstillingene for blueprint-emne i Emneinnstillinger. Lar en bruker fjerne et tilknyttet emne. Lar en bruker redigere låseinnstillingene for blueprint på individuelle oppgaver, sider eller diskusjoner"
+  allows_user_to_access_the_chat_tool_48d5f5c4: "Lar brukeren bruke Chat-verktøyet."
   allows_user_to_access_the_files_tab_in_the_content_a5187929: "Lar en bruker bruke 'Filer'-fanen i innholdsvelgeren."
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: "Lar en bruker bruke gjenopprett emner-fanen i Administrasjonsverktøy"
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Lar en bruker bruke gjenopprett emner-fanen i Administrasjonsverktøy"
@@ -2091,7 +2097,10 @@ nb:
       Lar en bruker administrere oppgaveinnstillinger.
       Lar en bruker legge til oppgavegrupper i et emne.
       Lar en bruker aktivere og endre vekting av gruppeoppgave i et emne.
+  allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Lar brukeren legge til hendelser i Listevisning dashbord via avkryssingsboksen Legg til studentoppgave. "
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Lar en bruker legge til nye oppgaver i en modul."
+  allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Lar brukeren legge til ikke-karaktersatte diskusjoner i Listevisning dashbord via avkryssingsboksen Legg til studentoppgave."
+  allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Lar brukeren legge til sider i Listevisning dashbord via avkryssingsboksen Legg til studentoppgave."
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       Lar en bruker legge til/fjerne andre lærere, emnedesignere eller LA-er.
       Lar en bruker legge til/fjerne observatører i emnet.
@@ -2160,6 +2169,7 @@ nb:
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Lar en bruker redigere låseinnstillingene til innholdsfortegnelsen til diskusjoner i et blueprint master-emne."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Lar en bruker redigere låseinnstillingene på filer-siden i et blueprint master-emne."
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Lar en bruker redigere låseinnstillingene til innholdsfortegnelsene til oppgaver og tester i et blueprint master-emne."
+  allows_user_to_edit_conferences_61eb62e0: "Lar brukeren redigere Konferanser."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Lar en bruker redigere konfigurasjoner for eksterne apper som er lagt til manuelt."
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Lar en bruker redigere karakterer og legge inn kommentarer i SpeedGrader."
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: "Lar en bruker redigere karakterer i karakteroversikten. Lar en bruker bruke karakteroversiktens historikk. Lar en bruker bruke læringsmestrings karakteroversikt (om den er aktivert)."
@@ -2231,6 +2241,7 @@ nb:
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Lar en bruker sende en melding til “Alle i [course name] eller [course group]\"."
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Lar en bruker sende en melding til individuelle emnedeltakere."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "Lar en bruker dele en test til Commons."
+  allows_user_to_share_course_items_directly_with_ot_b5a68ecc: "Lar brukeren dele emne-elementer med andre brukere. Lar brukeren kopiere individuelle emne-elementer til et annet emne."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Lar en bruker vise et emnes SIS-ID."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Lar en bruker vise en lenke til SpeedGrader fra oppgaver."
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -2323,6 +2334,7 @@ nb:
       Lar en bruker vise diskusjoner-lenken i emnenavigasjon.
       Lar en bruker vise emnediskusjoner.
   allows_user_to_view_the_discussions_link_in_course_eb30f2d0: "Lar en bruker vise diskusjoner-lenken i emnenavigasjon. Lar en bruker vise emnediskusjoner."
+  allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "Lar brukere vise siden Moderering av ePortfolio og administere spaminnhold i ePortfolio."
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "Lar en bruker vise lærerprotokollen i global navigering."
   allows_user_to_view_the_group_home_pages_of_all_st_47f48a3e: "Lar en bruker vise gruppehjemmesidene til alle studentgrupper. Lar studenter bruke studentgrupper innenfor et gruppesett med en direkte lenke."
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
@@ -3490,6 +3502,7 @@ nb:
       labels: 
         assignments_summary: Emnesammendrag
         syllabus_body: Emneoversikt-beskrivelsen
+        syllabus_course_summary: "Vis emnesammendrag"
       links: 
         edit_syllabus_description: Rediger
         jump_to_today: "Hopp til i dag"
@@ -3894,6 +3907,7 @@ nb:
   blueprint_courses_create_edit_associate_delete_bf41988e: "Blueprint emner (opprett/rediger/assosier/slett)"
   blueprint_courses_is_an_account_level_feature_opti_38676924: "Blueprint-emner er et funksjonsvalg på kontonivå. Emneroller kan kun administrere blueprint-emner hvis de er lagt til blueprint-emnet som en lærer-, LA- eller designerrolle. For å bruke sidepanelet for blueprint-emner må 'Emner - legg til / rediger / slett emner' være aktivert. For å legge til tilknyttede emner må også 'Emner - vis liste' og 'Emner - legg til / rediger / slett' være aktivert. For å redigere låseinnstillinger for noen slags blueprint-objekttype må 'Emner - legg til / rediger / slett' være aktivert."
   blueprint_courses_is_an_account_level_feature_opti_390ed2e7: "Blueprint-emner er et funksjonsvalg på kontonivå. For å legge til tilknyttede emner må «Blueprint-emner - legg til / rediger / tilknytt / slett» og «Emner - legg til / rediger / slett» også være aktiverte."
+  blueprint_courses_is_an_account_level_feature_opti_3a0161d3: "Blueprint-emner er et funksjonsvalg på kontonivå. Emneroller kan kun administrere blueprint-emner hvis de er lagt til blueprint-emnet som en lærer-, LA- eller designerrolle. For å bruke sidepanelet for blueprint-emner må 'Emner - legg til / rediger / slett emner' være aktivert. For å legge til tilknyttede emner må også 'Emner - vis liste' og 'Emner - legg til / rediger / slett' være aktivert. For å redigere låseinnstillinger for noen slags blueprint-objekttype må 'Emner - legg til / rediger / slett' være aktivert."
   blueprint_courses_is_an_account_level_feature_opti_3bf307d: "Blueprint-emner er et funksjonsvalg på kontonivå. For å redigere låseinnstillinger på innholdsfortegnelsen til diskusjoner må 'Emner - legg til / rediger / slett' og 'Diskusjoner - vis' også være aktivert. Hvis denne tillatelsen ikke er aktivert og 'Emner - legg til / rediger / slett' og 'Diskusjoner - vis' er aktiverte, kan låseinnstillinger for blueprint redigeres på individuelle diskusjoner."
   blueprint_courses_is_an_account_level_feature_opti_4c34e5d3: "Blueprint-emner er et funksjonsvalg på kontonivå. For å redigere blueprint låseinnstillinger fra innholdsfortegnelsen til oppgaver må «Emner - legg til / rediger / slett» og «Emner - legg til / rediger / slett» være aktivert. Hvis denne tillatelsen ikke er aktivert og «Emner - legg til / rediger / slett» er aktivert, kan låseinnstillinger for blueprint for en oppgave administreres fra oppgavens detaljside. For å redigere låseinnstillinger på innholdsfortegnelsen til en spesifikk test må også «Emne - legg til / rediger / slett» være aktivert."
   blueprint_courses_is_an_account_level_feature_opti_4c9fa399: |-
@@ -3925,6 +3939,8 @@ nb:
       
       For å redigere låseinnstillinger for blueprint fra innholdsfortegnelsen til diskusjoner må 'Diskusjoner - moderer' også være aktivert.
   blueprint_courses_must_be_enabled_for_an_account_b_4a79dc67: "Blueprint-emner må være aktiverte for en konto av en administrator. Emneroller kan kun administrere innhold i blueprint-emner hvis de er lagt til blueprint-emnet som en lærer-, LA- eller designerrolle. Hvis denne innstillingen er deaktivert og 'Diskusjoner - vis' er aktivert er det fortsatt mulig for en bruker å justere låseinnstillingene for innhold på individuelle diskusjoner i et blueprint master-emne."
+  blueprint_courses_must_be_enabled_for_an_account_b_4ef094f4: "Blueprint-emner må være aktiverte for en konto av en administrator. Emneroller kan kun administrere innhold i blueprint-emner hvis de er lagt til blueprint-emnet som en lærer-, LA- eller designerrolle. Hvis denne innstillingen er deaktivert og 'Diskusjoner - vis' er aktivert, er det fortsatt mulig for brukeren å justere låseinnstillingene for innhold på individuelle diskusjoner i et blueprint master-emne."
+  blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: "Blueprint-emner må være aktiverte for en konto av en administrator. Emneroller kan kun administrere innhold i blueprint-emner hvis de er lagt til blueprint-emnet som en lærer-, LA- eller designerrolle. Hvis denne tillatelsen er deaktivert er det fortsatt mulig for en bruker å justere låseinnstillingene for innhold på individuelle sider i et blueprint master-emne."
   blueprint_courses_must_be_enabled_for_an_account_b_79b2d93e: |-
       Blueprint-emner må være aktiverte for en konto av en administrator.
       Emneroller kan kun administrere innhold i blueprint-emner hvis de er lagt til blueprint-emnet som en lærer-, LA- eller designerrolle.
@@ -3959,6 +3975,7 @@ nb:
   bookmark_this_question_bank_dc414a82: "Bokmerk denne spørsmålsbanken"
   bookmarking_for_enrollments_index_api_840be156: "Bokmerke for påmeldingsindeks API"
   bookmarks_5b5b81c9: Bokmerker
+  both_discussions_create_and_discussions_moderate_a_1c00baf0: "Både 'Diskusjoner - opprett' og 'Diskusjoner - moderer' lar brukeren lage en diskusjon på diskusjonsiden. Om tillatelser er aktivert, er ikke 'Diskusjoner - opprett' nødvendig. For å vise diskusjoner i et emne må 'Diskusjoner - vis' være aktivert. For å svare på diskusjoner må 'Diskusjoner - lag innlegg' også være aktivert. For å redigere oppgavedetaljer i en diskusjon må 'Oppgaver og tester - legg til / rediger / slett' også være aktivert."
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Både 'Diskusjoner - opprett' og 'Diskusjoner - moderer' lar en bruker lage en diskusjon på diskusjonsiden. Om tillatelser er aktivert, er ikke 'Diskusjoner - opprett' nødvendig. For å vise diskusjoner i et emne må 'Diskusjoner - vis' være aktivert. For å svare på diskusjoner må 'Diskusjoner - lag innlegg' også være aktivert. For å redigere oppgavedetaljer i en diskusjon må 'Oppgaver og tester - legg til / rediger / slett' også være aktivert."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
       Både 'Diskusjoner - opprett' og 'Diskusjoner - moderér' lar en bruker lage en diskusjon på diskusjonsiden. Om tillatelser er aktivert, er ikke 'Diskusjoner - opprett' nødvendig.
@@ -4679,6 +4696,9 @@ nb:
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikke konfigurert til å motta pålogginger fra %{issuer}."
   canvas_login_failure_message_4c922f2f: "Canvas pålogging feilmelding"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Reservekoder for lerret multifaktorautentisering"
+  canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
+      Canvas har nå to testmotorer. Vennligst velg hvilken
+              du ønsker å bruke.
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_description: "Denne innstillingen kontrollerer om foreldre kan kobles til studentene på din institusjon ved bruk av mobilappen Canvas Parent"
   canvas_parent_improved_description: "Innstillingene kontrollerer om foreldre som lager sine egne Canvas Parent-kontoer kan koble seg til studenter ved institusjonen med Canvas Parent mobilappen. Merknad: Foreldre som er registrert som Canvas-observatører kan bruke Canvas Parent mobilappen selv når denne funksjonen er deaktivert."
@@ -4741,6 +4761,7 @@ nb:
   change_sis_ids_3a47154d: "Endre SIS-IDer"
   changed_by_person_c39615e: "Endret av: %{person}"
   changed_item_1d16a85f: "Endret element"
+  changes_the_sort_order_of_the_gradebook_export_to__41b286fd: "Endrer sorteringsrekkefølgen til Karakterbok-eksporten for å stemme bedre overens med Canvas-dokumentasjonen"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Endringene vil fremdeles utføres dersom du forlater denne siden."
   changes_you_made_may_not_be_saved_4e8db973: "Det kan hende at endringene dine ikke ble lagret."
   changing_course_dates_may_override_term_availabili_d92b10de: "Å endre emnedato kan oppheve semestertilgjengelighet og plassering i Emnesiden og dashbord. Bekreft semesterdatoene før du modifiserer emnedatoene."
@@ -4771,6 +4792,7 @@ nb:
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "Velg en farge eller emne-kallenavn eller flytt emnekort for %{course}"
   choose_a_course_home_page_8059c7b: "Velg en startside for emnet"
   choose_a_csv_file_to_upload_9644480c: "Velg en CSV-fil å laste opp:"
+  choose_a_quiz_engine_8820d521: "Velg en testmotor"
   choose_a_timezone_d9c52998: "Velg en tidssone"
   choose_an_authentication_service_47dc8875: "Velg en autentiseringstjeneste"
   choose_and_publish_980812cb: "Velg og publiser"
@@ -4790,6 +4812,7 @@ nb:
   choose_the_next_mastery_path_b035b727: "Velg neste mestringsvei"
   choose_usage_rights_33683854: "Velg bruksrettigheter..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' er ikke en gyldig farge."
+  classic_quizzes_dee3c7b7: "Klassisk Quizzes"
   clear_2084585f: Tøm
   clear_selected_file_82388e50: "Fjern valgt fil"
   clear_user_cache_ef079f7f: "Tøm bruker-Cache"
@@ -5997,6 +6020,7 @@ nb:
     course_options: 
       course_options: 
         concluded: Avsluttet
+        favorite: Favorittemner
         groups: Grupper
         more_courses: "Flere emner"
     hide: Skjul
@@ -7818,6 +7842,7 @@ nb:
     save_key: "Lagre nøkkel"
     tool_id: "Verktøy-ID:"
     vendor_code: "Leverandørkode (LTI 2):"
+  developer_key_include_parameter_support_58cbf874: "Utviklernøkler inkluderer parameterstøtte"
   developer_key_is_an_external_tool_27c6166b: "Utviklernøkkelen er et eksternt verktøy."
   developer_key_management_5a5866bd: Utviklernøkkeladministrasjon
   developer_key_management_and_scoping_97d928d5: "Utviklernøkkel ledelse og rekkevidde"
@@ -7930,6 +7955,7 @@ nb:
   discussion_topic_a7bf935: diskusjonstema
   discussion_topic_dc85ad4c: Diskusjonstema
   discussion_topic_menu_3d4684c6: Diskusjonstema-meny
+  discussion_topic_performance_improvements_for_bibs_79a483ef: "Ytelsesforbedringer på Diskusjonstema for Bibsys"
   discussion_topic_will_be_available_starting_at_46aa7477: "Diskusjonstema blir tilgjengelig på"
   discussion_topic_will_be_available_until_f5e3abc8: "Diskusjonstema blir tilgjengelig til"
   discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "Diskusjonstema vil vises på studentenes oppgaveliste for dato"
@@ -8155,6 +8181,7 @@ nb:
       manually_mark_as_read: "Merk poster som lest manuelt"
       my_settings: "Mine innstillinger"
   discussion_topics_b35ac745: Diskusjonstemaer
+  discussion_topics_will_not_query_permissions_for_e_7570e632: "Diskusjonstemaer vil ikke be om tillatelse for hver under-diskusjon"
   discussion_unpinned_successfully_2cb6d951: "Fjernet festet status for diskusjon"
   discussions: 
     are_your_sure_delete: "Er du sikker på at du vil slette denne innlegget?"
@@ -8648,6 +8675,7 @@ nb:
   enabled_links_be110215: "Aktiverte lenker"
   enabled_web_services_f620b2be: "Påslåtte nett-tjenester"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer visning av plagiatrapporter og likhetsscore i innleveringsskuffen til Ny karakteroversikt."
+  enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-sluttpunkter for emnet og brukerdata fra Ny Analytics."
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Aktiverer sortering på SIS ID, integrasjons-ID og innloggings-ID i ny karakteroversikt."
   encourage_class_participation_4e069479: "Oppmuntre til klasse deltakelse"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Krypterte Sourcedids for grunnleggende læringsmål"
@@ -9373,6 +9401,7 @@ nb:
   fall_grading_period_final_score_56d96a8f: "Endelig resultat for høstens vurderingsperiode"
   fall_grading_period_id_74ef68e: "ID for høstens vurderingsperiode"
   favicon_6e658914: Favicon
+  favorite_courses_fbd356f0: Favorittemner
   favorites_c7e0207c: Favoritter
   feature_f5526584: Funksjon
   feature_flags: 
@@ -9508,6 +9537,7 @@ nb:
   filename_is_hidden_available_with_a_link_click_to__3e328e8f: "%{fileName} er skjult. Tilgjengelig med en link - Klikk for å endre"
   filename_is_locked_click_to_modify_bf711763: "%{fileName}  er låst - Klikk for å endre"
   filename_is_not_visible_in_student_files_click_to__aa2a0651: "%{fileName} er ikke synlig i studentfiler - klikk for å endre"
+  filename_is_only_available_to_students_with_the_li_97190506: "%{fileName} Er kun tilgjengelig for studenter lenken - Klikk for å modifisere"
   filename_is_published_click_to_modify_38a4a269: "%{fileName} er publisert - Klikk for å endre"
   filename_is_restricted_9aaf9250: "%{fileName} er %{restricted}"
   filename_is_restricted_click_to_modify_c0bb77f8: "%{fileName} er %{restricted} - Klikk for å endre"
@@ -9682,10 +9712,15 @@ nb:
   for_an_instant_answer_see_if_your_issue_is_address_48280e89: "For et umiddelbart svar, se om problemet ditt er omtalt i *Canvas-guidene*."
   for_best_results_crop_image_to_262px_wide_by_146px_af81a540: "For best resultat, beskjær bildet til 262 piksler bredt og 146 piksler høyt. Filtypene JPG, PNG eller GIF aksepteres"
   for_course_level_users_deleting_a_course_is_part_o_932f7a98: "For brukere på emnenivå er sletting av et emne en del av 'Emnestatus - administrer'-tillatelsen. Men, for brukere på kontonivå krever sletting av et emne denne tillatelsen samt 'Emne - legg til / rediger / slett'. "
+  for_course_level_users_deleting_a_course_is_part_o_d134dea2: "For brukere på emnenivå er sletting av et emne en del av 'Emnestatus - administrer'-tillatelsen. Men, for en bruker på kontonivå krever sletting av et emne denne tillatelsen samt 'Emne - legg til / rediger / slett'."
   for_development_of_features_for_new_gradebook_7ee1830f: "For utvikling av nye funksjoner i ny Karakterbok"
   for_each_late_62aecf41: "For hver gang etter fristen"
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Når det gjelder manuelt posterte oppdrag, kan ikke tilstedeværelsen av en innleveringkommentar som ikke er av innsenderens egen bruker tillate postering av oppgaven. Tidligere var det krav om å være vurdert før postering kunne skje."
   for_name_d5684bfd: "For %{name}"
+  for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
+      På nåværende tidspunkt, hvis du trenger sikkerhet fra
+              tredjepartsverktøy, Speedgrader, eller CSV-er for student
+              respons-analyser, er dette det beste valget.
   for_title_69d92b3a: "for %{title}"
   forgot_password_f0c3fbac: "Glemt passord?"
   forgot_password_url_3f9c04b: "URL for glemt passord"
@@ -10111,6 +10146,7 @@ nb:
   gradebook_csvs: 
     grades_filename: Karakterer
   gradebook_export_failed_reason_2b0f6c53: "Eksport av karakterbok mislykket: %{reason}"
+  gradebook_export_sort_order_bugfix_tally_219_62bfaacb: "Feilretting av sorteringsrekkefølge i Karakterbok-eksport (Tally-219)"
   gradebook_export_started_723461b9: "Eksport av karakterbok startet"
   gradebook_history_a3e8e0b4: "Historisk karakteroversikt"
   gradebook_history_b03f8524: "Karakteroversikt historie ..."
@@ -11404,6 +11440,7 @@ nb:
       
               Hvis emnesynlighet er begrenset til brukere som er registrert i emnet vil denne
               tillatelsen la en bruker vise emneinnhold uten å være registrert i emnet.
+  if_disabled_user_will_still_have_access_to_course__d78fddc4: "Hvis deaktivert vil brukeren fortsatt ha tilgang til emneinnstillinger. Brukeren kan ikke administrere spesifikt emneinnhold uten tilsvarende tillatelser for den innholdsartikkelen. Hvis emnesynlighet er begrenset til brukere som er registrert i emnet vil denne tillatelsen la brukeren vise emneinnhold uten å være registrert i emnet."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Om de er aktivert, vil tilgang til LTI 1,3 og LTI Fordel bli aktivert."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Når aktivert, tillater mer enn maksimalt mulig poeng på et resultat i en rubrikk."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Hvis aktivert, vil importører av Common Cartridge konvertere HTML-filer til sider"
@@ -11425,6 +11462,7 @@ nb:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(dersom ingen er valgt, send til samtlige i hele underkontoen)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(dersom ingen er valgt, vis til samtlige i hele underkontoen)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(dersom ingen er valgt, vis til alle i hele kontoen)"
+  if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Hvis «Statistikk - vis» eller «Brukere - administrere innloggingsdetaljer» er aktiverte vil brukeren kunne generere inn-/utloggingsaktivitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse tillatelsene være deaktiverte."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Hvis «Statistikk - vis» eller «Brukere - administrere innloggingsdetaljer» er aktiverte vil en bruker kunne generere inn-/utloggingsaktiveitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse tillatelsene være deaktiverte."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Hvis 'Statistikk - vis' eller 'Brukere - administrere innloggingsdetaljer' er aktiverte vil en bruker kunne generere inn-/utloggingsaktiveitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse tillatelsene være deaktiverte."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Hvis kontoinnstillingen 'Åpen registrering' er aktivert vil brukere med denne tillatelsen kunne legge til studenter og observatører til et emne via e-postadresse eller innloggings-ID, selv hvis studenten eller observatøren ikke allerede har en Canvas-konto."
@@ -11435,6 +11473,8 @@ nb:
       innstillinger.
   if_this_permission_is_disabled_at_the_account_leve_39648abb: "Hvis denne tillatelsen er deaktivert kan ikke brukere vise noen eksisterende kontogrupper på kontonivå. På emnenivå kan brukere vise, men ikke gå inn i, noen eksisterende grupper, inkludert grupper opprettet av studenter. For å vise grupper må 'Brukere - vis liste' også være aktivert. For å legge til grupper på kontonivå via CSV må 'SIS Data - importer' også være aktivert."
   if_this_permission_is_disabled_at_the_account_leve_6a82182d: "Hvis denne tillatelsen er deaktivert kan ikke brukere vise noen eksisterende kontogrupper på kontonivå. På emnenivå kan brukere vise, men ikke gå inn i, noen eksisterende grupper, inkludert grupper opprettet av studenter. For å vise grupper må 'Brukere - vis liste' også være aktivert. For å legge til grupper på kontonivå via CSV må 'SIS Data - importer' også være aktivert."
+  if_this_permission_is_disabled_at_the_account_leve_b5f6dfa4: "Hvis denne tillatelsen er deaktivert kan ikke brukeren vise noen eksisterende kontogrupper på kontonivå. På emnenivå kan brukeren vise, men ikke gå inn i, noen eksisterende grupper, inkludert grupper opprettet av studenter. For å vise grupper må 'Brukere - vis liste' også være aktivert. For å legge til grupper på kontonivå via CSV må 'SIS Data - importer' også være aktivert."
+  if_this_permission_is_disabled_the_user_can_only_v_75dbf069: "Hvis denne tillatelsen er deaktivert kan brukeren kun vise eksisterende grupper, inkludert grupper opprettet av studenter."
   if_this_permission_is_disabled_users_can_only_view_b68143d5: "Hvis denne tillatelsen er deaktivert kan brukere kun vise eksisterende grupper, inkludert grupper opprettet av studenter."
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "Hvis denne tillatelsen er deaktivert kan brukere fortsatt opprette eller legge til rubrikker til oppgaver hvis 'Oppgaver og tester - legg til / rediger / slett er aktivert."
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Hvis denne tillatelsen er deaktivert kan brukere fortsatt installere godkjente apper gjennom Canvas App Center (hvis dette er aktivert for din institusjon). Brukere kan heller ikke slette eksterne apper som er lagt til manuelt hvis denne tillatelsen er deaktivert."
@@ -11445,6 +11485,7 @@ nb:
       For å legge til brukere i emner via SIS-ID må 'Brukere - legg til / fjern studenter fra emner' og/eller 'Brukere - legg til / fjern lærere, emnedesignere eller LA-er fra emner' også være aktivert.
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Hvis 'Brukere - administrer innloggingsdetaljer' eller 'Statistikk - vis' er aktiverte vil en bruker kunne generere inn-/utloggingsaktiveitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse tillatelsene være deaktiverte."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Hvis «Brukere - administrer innloggingsdetaljer» eller «Statistikk - vis» er aktiverte vil en bruker kunne generere inn-/utloggingsaktiveitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse tillatelsene være deaktiverte."
+  if_users_manage_login_details_or_statistics_view_i_cff4155d: "Hvis «Brukere - administrer innloggingsdetaljer» eller «Statistikk - vis» er aktiverte vil brukeren kunne generere inn-/utloggingsaktivitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse tillatelsene være deaktiverte."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "Eksisterende karakterer blir automatisk skalert dersom du endrer mulige oppnåelige poeng på en oppgave. "
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Hvis du endrer mulige oppgavepoeng så må du revurdere oppgaven."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Hvis du endrer mulige oppgavepoeng, må du revurdere eventuelle innleveringer."
@@ -12022,6 +12063,7 @@ nb:
       log_in_to_canvas: "Logg inn på Canvas"
   learn_more_7a8d626: "Les mer"
   learn_more_about_collaborations_2978f66d: "Lær mer om samarbeid"
+  learn_more_about_the_differences_a1217479: "Ler mer om forskjellene"
   learning_analytics_beta_view_46deb4c8: "Læringsanalyser (Beta) - vis"
   learning_mastery_5fc34276: Læringsmestring
   learning_mastery_6ed4fd63: "Læringsmestring …"
@@ -12491,6 +12533,7 @@ nb:
   make_key_visible_5c03fa34: "Gjør nøkkel synlig"
   make_new_settings_for_sis_integrations_visible_and_875039ca: "Opprett nye innstillinger til SIS-integrasjoner som er synlige og aktive"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Vær sikker på at du velger det mest passende valget siden studentenes resultater KAN bli påvirket."
+  make_the_course_summary_list_of_assignments_and_ev_f739be33: "Gjør emnesammendrag (liste av oppgaver og hendelser) valgfritt i pensumet"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Sørg for at dette kurs er offentlig synlig (studentdata vil forbli privat)"
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Viser lenkevalget til et Microsoft Immersive Reader opp på en wiki-side."
   making_a_copy_of_original_assignment_name_8f029a9b: "Lager en kopi av \"%{original_assignment_name}\""
@@ -12530,6 +12573,7 @@ nb:
   manage_update_23de23a1: "Administrer oppdatering"
   manage_update_for_toolname_f8e3b2fb: "Administrer oppdatering for %{toolName}"
   manage_usage_rights_c5a8c216: "Administrer brukerrettigheter"
+  manage_user_settings_827ab12d: "Administrer brukerinnstillinger"
   manage_your_course_details_664c335f: "Administrer emnedetaljer"
   manual_8c2665de: Manuell
   manual_configuration_b586fe54: "Manuell konfigurasjon"
@@ -14991,6 +15035,7 @@ nb:
   never_df100b49: Aldri
   new_13daf639: Ny
   new_account_role_6e5c4964: "Ny konto Rolle"
+  new_analytics_api_access_7eec1ead: "API-tilgang Ny Analytics"
   new_annotations_66932016: "Nye merknader"
   new_announcement_23af4598: "Ny kunngjøring"
   new_announcement_title_30ba7c1b: "Ny kunngjøring: %{title}"
@@ -15035,6 +15080,7 @@ nb:
   new_question_group_d9306280: "Ny spørsmålsgruppe"
   new_quiz_34aacba6: "Ny test"
   new_quiz_statistics_desc: "Aktivere den nye quizstatistikkside for et kurs."
+  new_quizzes_dbda7e0a: "Ny Quizzes"
   new_quizzes_importing_c167dce0: "Ny Quizzes importering"
   new_quizzes_on_the_quizzes_page_b21f338d: "Ny Quizzes på Quizzes-siden"
   new_quizzes_submission_history_d81b477b: "Ny Quizzes innleveringshistorie"
@@ -15395,6 +15441,7 @@ nb:
       group_assignment_submitted_late: "Gruppeoppgave levert for sent"
       group_membership_accepted: "Gruppemedlemskap godkjent"
       group_membership_rejected: "Gruppemedlemskap avvist"
+      manually_created_access_token_created: "Manuelt opprettede tilgangssymbol laget"
       merge_email_communication_channel: "Slå sammen e-postadressen med"
       migration_import_failed: "Flytteimport feilet"
       migration_import_finished: "Flytteimport ferdig"
@@ -15666,6 +15713,7 @@ nb:
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Legg kun til poster med en spesifikk frase i tittelen"
   only_after_their_last_attempt_3593d101: "Bare etter deres siste forsøk"
   only_announcements_can_be_section_specific_1ff992a: "Kun kunngjøringer kan være seksjon-spesifikke"
+  only_available_to_students_with_link_107e2468: "Kun tilgjengelig for studenter med lenken."
   only_available_to_students_with_link_not_visible_i_b21ec391: "Åpent kun for studenter med lenke. Ikke synlig i student filer."
   only_course_announcements_and_discussions_can_be_s_924d4386: "Kun emnekunngjøringer og diskusjoner kan være seksjonspesifikk"
   only_course_announcements_can_be_section_specific_eabcd6e0: "Bare emnekunngjøringer kan være seksjonspesifikke"
@@ -15758,6 +15806,7 @@ nb:
   out_of_points_possible_8ab14f7: "av %{points_possible}"
   out_of_pointspossible_3fb5ee20: "Av %{pointsPossible}"
   out_of_pointspossible_c163105a: "ut av %{pointsPossible}"
+  outcome_alignment_to_non_scoring_content_3efa45fb: "Innretter læremål til innhold som ikke scorer"
   outcome_da397d20: Læringsmål
   outcome_export_89229eb4: Læringsmåleksport
   outcome_group_39fae76f: Læringsmålsgruppe
@@ -16095,6 +16144,7 @@ nb:
   permissions_365c49e: Tillatelser
   permissions_manage_9eea4f8f: "Tillatelser - administrer"
   permissions_v2_page_f96dde06: "Tillatelser V2-side"
+  permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Tillater bruk av alle “inkluder” parameter for denne utviklernøkkelen. “inkluderer” parametre kan gi tilgang til tilleggsdata som ikke er inkludert i omfanget valg nedenfor."
   persian_a8cadb95: Persisk
   personal_pronouns_7d271f52: "Personlige pronomen"
   peru_51_d3d38d1f: "Peru (+51)"
@@ -16681,7 +16731,7 @@ nb:
   post_comment_a5a430a6: "Post kommentar"
   post_grade_to_sis_disabled_click_to_toggle_6ee5ff3: "Innlegg Vurderinger til SIS er deaktivert. Klikk for å skifte."
   post_grade_to_sis_enabled_click_to_toggle_82da8ce8: "Innlegg Vurderinger til SIS aktivert. Klikk for å skifte."
-  post_grades_39c52870: "Innlegg Vurderinger"
+  post_grades_39c52870: "Publiser vurderinger"
   post_grades_3e692d46: "Publiser karakterer"
   post_grades_description: |-
       Innlegg Vurderinger gir lærere muligheten til å legge inn vurderinger i aktiverte SIS-systemer: PowerSchool,
@@ -17113,6 +17163,7 @@ nb:
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Oppgi informasjon til veiledningen for nye brukere i en undermeny."
   provider_attribute_b1cad655: "Leverandør av attributt"
   provider_icon_5064fa6e: Leverandør-ikon
+  provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: "Gir et flagg på utviklernøkkelen for å støtte Inkluder parameter på API-forespørsler"
   provides_users_with_a_planner_dashboard_option_1e8d234d: "Gir brukerne en planlegger som dashbord-alternativ."
   provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Gir brukere et gjøremålsliste-alternativ i instrumentpanelet."
   provision_a_catalog_account_8cea67f6: "Klargjør en Catalog-konto"
@@ -19806,6 +19857,7 @@ nb:
   send_message_to_name_c8ac05fc: "Send melding til %{name}"
   send_notification_81773687: "Sende melding"
   send_notification_directly_to_users_when_announcem_c3aac61c: "Sende melding direkte til brukere når kunngjøringen begynner"
+  send_notifications_when_manually_created_access_to_a1631123: "Send meldinger når manuelt opprettede tilgangssymboler er laget"
   send_only_to_the_following_types_of_users_d8465c11: "Send kun til følgende typer brukere:"
   send_page_to_another_user_6ef5a7c1: "Send side til annen bruker"
   send_quiz_to_user_e8c47177: "Send quiz til bruker"
@@ -21460,6 +21512,7 @@ nb:
   switzerland_41_f861e414: "Sveits (+41)"
   switzerland_f4f7137c: Sveits
   syllabus: Emneoversikt
+  syllabus_course_summary_option_951a8144: "Valg for sammendrag av emnepensum"
   syllabus_f191f65b: Emneoversikt
   syllabus_tutorial_tray_97e8ef82: "Emneplan Tutorial Tray"
   syllabus_visibility_options_a81ef419: "Valg for emneoversiktsynlighet"
@@ -21665,6 +21718,7 @@ nb:
                    automatisk teller ikke mot begrensningen på 50 domener.
   the_course_link_validator_searches_course_content__563fa215: "Emnelenke-validatoren søker etter emneinnhold for ugyldige eller ikke tilgjengelige lenker og bilder."
   the_course_link_validator_searches_through_course__76f0bc63: "Lenke-validator for emner søker gjennom emneinnholdet og rapporterer hver lenke som er ugyldig eller ikke responderer. Merk at noen lenker er flagget som at de ikke svarer, de er kun utilgjengelig fra våre servere og vil fremdeles fungere for studentene."
+  the_course_state_manage_permission_allows_the_user_1d9da094: "'Emnestatus - administrer tillatelser' lar brukeren publisere emner som ikke inneholder moduler. For å publisere/fjerne modulinnhold må «Emneinnhold - legg til / rediger / slett» være aktivert."
   the_course_state_manage_permission_allows_users_to_67e16652: "'Emnestatus - administrer tillatelser' lar brukere publisere emner som ikke inneholder moduler. For å publisere/fjerne modulinnhold må 'Emneinnhold - legg til / rediger / slett' være aktivert."
   the_course_state_manage_permission_allows_users_to_a4fe62af: "'Emnestatus - administrer tillatelser' lar brukere publisere emner som ikke inneholder moduler. For å publisere/fjerne modulinnhold må «Emneinnhold - legg til / rediger / slett» være aktivert."
   the_course_status_buttons_unpublished_and_publishe_e2dca595: "'Emnestatus'-knappene (ikke publisert og publisert) vises kun frem til en studentinnlevering er mottatt. Emner kan ikke fjernes hvis den har studentinnleveringer."
@@ -21946,6 +22000,10 @@ nb:
   this_grade_has_negative_points_496400d4: "Denne karakteren har negative poeng"
   this_grade_is_invalid_8ab192c7: "Denne karakteren er ugyldig"
   this_grade_is_unusually_high_60533c20: "Denne karakteren er uvanlig høy"
+  this_has_more_question_types_like_hotspot_categori_620e9df6: |-
+      Dette har flere spørsmålstyper som hotspot,
+              kategorisering, samsvar, og rekkefølge. Den har også
+              flere funksjonere for moderering og lokalisering.
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Dette bildet vises som vannmerke i bakgrunnen på siden din. Godkjente formater: png, svg, gif, jpeg"
   this_is_a_blueprint_course_5e7b47fe: "Dette er et Blueprint-emne"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er en kommaseparert liste over URL's til å stole på. Tillit til URL'er i denne listen vil hoppe over CSRF symbolet ved pålogging til Canvas"
@@ -21997,6 +22055,7 @@ nb:
       Denne tillatelsen påvirker ikke muligheten til å administrere spørsmålsbanker i tester på emnenivå. I stedet er 'Administrer spørsmålsbanker' avhengig av 'Oppgaver og tester - legg til / rediger / slett'-tillatelsen.
       For full administrering av spørsmålsbanker i emner må både denne tillatelsen og 'Oppgaver og tester - legg til / rediger / slett' være aktiverte.
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Denne tillatelsen påvirker ikke muligheten til å administrere spørsmålsbanker i tester på emnenivå. I stedet er 'Administrer spørsmålsbanker' avhengig av 'Oppgaver og tester - legg til / rediger / slett'-tillatelsen. For full administrering av spørsmålsbanker i emner må både denne tillatelsen og 'Oppgaver og tester - legg til / rediger / slett' være aktiverte."
+  this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Denne tillatelsen påvirker ikke muligheten til å administrere spørsmålsbanker i tester på emnenivå. I stedet er 'Administrer spørsmålsbanker' avhengig av 'Oppgaver og tester - legg til / rediger / slett'-tillatelsen. For full administrering av spørsmålsbanker i emner må både denne tillatelsen og 'Oppgaver og tester - legg til / rediger / slett' være aktiverte."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Denne tillatelsen er tilgjengelig for alle Canvas-kontoer men er kun i bruk for institusjoner tilknyttet en Canvas Catalog-konto. Tillatelsen har per i dag ingen effekt på front-end men teknikeravdelingen foreslår at tillatelsen forblir aktivert for administratorer. Tillatelsen kan deaktiveres for andre roller."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Denne tillatelsen påvirker kun emnekunngjøring; for å administrere globale kunngjøringer må 'Globale kunngjøringer - legg til / rediger / slett' være aktivert."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Denne tillatelsen kontrollerer kun det å legge til brukere på kontonivå. For å legge til brukere i emner må «Brukere - legg til / fjern studenter fra emner» eller «Brukere - legg til / fjern lærere, emnedesignere eller LA-er fra emner» være aktivert."
@@ -22329,6 +22388,7 @@ nb:
   to_activate_this_communication_channel_enter_the_f_f465efc5: "For å aktivere denne kommunikasjonskanalen, skriv inn bekreftelseskode på fire tegn sendt til nr %{sms_number}."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "For å legge til kunngjøringer må 'Diskusjoner - moderer' også være aktivert. For å vise seneste kunngjøringer på hjemmesiden må avmerkingsboksen 'Vis seneste kunngjøringer' på Hjemmesiden for emner være merket i emneinnstillinger."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "For å legge til, redigere eller slette grupper må 'Grupper - legg til / rediger / slett også være aktivert."
+  to_add_students_to_a_moderation_set_grades_view_al_40f2b8eb: "For å legge til studenter til et modereringssett må 'Karakterer - vis alle karakterer' også være aktivert."
   to_add_users_to_a_course_users_add_remove_students_1c4d63d7: "For å legge til brukere i et emne må 'Brukere - legg til / fjern studenter fra emner' og/eller 'Brukere - legg til / fjern lærere, emnedesignere eller LA-er fra emner' også være aktivert. For å redigere en students seksjon må både 'Samtaler - send meldinger til individuelle emnedeltakere' og 'Brukere - legg til / fjern studenter fra emner' også være aktiverte. For å redigere en lærer, emnedesigner eller LA sin seksjon må både 'Samtaler - send meldinger til individuelle emnedeltakere' og 'Brukere - legg til / fjern lærere, emnedesignere fra emner' også være aktiverte."
   to_add_users_to_a_course_users_add_remove_students_5036ad25: |-
       For å legge til brukere i emner må 'Brukere - legg til / fjern studenter fra emner' for emnet og/eller 'Brukere - legg til / fjern lærere, emnedesignere eller LA-er fra emner'
@@ -22351,6 +22411,7 @@ nb:
       For å avslutte en konferanse som har pågått lang tid må 'Emneinnhold - legg til / rediger / slett' være aktivert.
       Hvis 'Emneinnhold - legg til / rediger / slett' er aktivert og 'Webkonferanser - opprett' er deaktivert kan brukeren fortsatt administrere konferanser.
       Denne tillatelsen kontrollerer en brukers mulighet til å opprette konferanser i emner og grupper.
+  to_allow_full_management_of_conferences_created_by_bece5de: "For å tillate full administrering av konferanser opprettet av brukeren eller andre, må 'Tillatelse til emneinnhold ' også være aktivert. For å avslutte en konferanse som har pågått over lang tid må 'Tillatelse til emneinnhold' være aktivert. Hvis 'Tillatelse til emneinnhold' er aktivert og 'Webkonferanser - opprett' er deaktivert, kan brukeren fortsatt administrere konferanser. Denne tillatelsen kontrollerer brukerens mulighet til å opprette konferanser i emner og grupper."
   to_allow_full_management_of_conferences_created_by_eae032e7: "For å tillate full administrering av konferanser opprettet av brukeren eller andre, må 'Tillatelse til emneinnhold ' også være aktivert. For å avslutte en konferanse som har pågått over lang tid må 'Tillatelse til emneinnhold' være aktivert. Hvis 'Tillatelse til emneinnhold' er aktivert og 'Webkonferanser - opprett' er deaktivert kan brukeren fortsatt administrere konferanser. Denne tillatelsen kontrollerer en brukers mulighet til å opprette konferanser i emner og grupper."
   to_allow_full_management_of_conferences_created_by_feec1984: |-
       For å tillate full administrering av konferanser opprettet av brukeren eller andre må 'Emneinnhold - legg til / rediger / slett' også være aktivert.
@@ -22362,9 +22423,11 @@ nb:
       For å tillate vis-, rediger- og slett-funksjonalitet i samarbeider opprettet av brukere må 'Emneinnhold - legg til / rediger / slett' også være aktivert.
       Hvis 'Emneinnhold - legg til / rediger / slett' er aktivert og 'Studentsamarbeid - opprett' er deaktivert vil brukeren ikke ha muligheten til å opprette nye samarbeider men vil kunne vise, redigere og slette alle samarbeider.
       For å legge til studenter til et samarbeid må 'Brukere - vis liste' også være aktivert. For å legge til en emnegruppe til et samarbeid må 'Grupper - legg til / rediger / slett også være aktivert.
+  to_allow_view_edit_and_delete_functionality_of_col_47c4821d: "For å tillate vis-, rediger- og slett-funksjonalitet i samarbeider opprettet av brukere må 'Emneinnhold - legg til / rediger / slett' også være aktivert. Hvis 'Emneinnhold - legg til / rediger / slett' er aktivert og 'Studentsamarbeid - opprett' er deaktivert, vil brukeren ikke ha muligheten til å opprette nye samarbeider men vil kunne vise, redigere og slette alle samarbeider. For å legge til studenter til et samarbeid må 'Brukere - vis liste' også være aktivert. For å legge til en emnegruppe til et samarbeid må 'Grupper - legg til / rediger / slett også være aktivert."
   to_allow_view_edit_and_delete_functionality_of_col_84a2cd3a: "For å tillate vis-, rediger- og slett-funksjonalitet i samarbeider opprettet av brukere må 'Emneinnhold - legg til / rediger / slett' også være aktivert. Hvis 'Emneinnhold - legg til / rediger / slett' er aktivert og 'Studentsamarbeid - opprett' er deaktivert vil brukeren ikke ha muligheten til å opprette nye samarbeider men vil kunne vise, redigere og slette alle samarbeider. For å legge til studenter til et samarbeid må 'Brukere - vis liste' også være aktivert. For å legge til en emnegruppe til et samarbeid må 'Grupper - legg til / rediger / slett også være aktivert."
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "For å tillate vis/rediger/slett-funksjonalitet i samarbeider opprettet av brukere må 'Emneinnhold - legg til / rediger / slett' også være aktivert. Hvis 'Emneinnhold - legg til / rediger / slett' er aktivert og 'Studentsamarbeid - opprett' er deaktivert vil brukeren ikke ha muligheten til å opprette nye samarbeider men vil kunne vise/redigere/slette alle samarbeider. For å legge til studenter til et samarbeid må 'Brukere - vis liste' også være aktivert. For å legge til en emnegruppe til et samarbeid må 'Grupper - vis alle studentgrupper' også være aktivert."
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "For å tillate vis, rediger, slett-funksjonalitet i samarbeider opprettet av brukere må 'Emneinnhold - legg til / rediger / slett' også være aktivert. Hvis 'Emneinnhold - legg til / rediger / slett' er aktivert og 'Studentsamarbeid - opprett' er deaktivert vil brukeren ikke ha muligheten til å opprette nye samarbeider men vil kunne vise, redigere,slette alle samarbeider. For å legge til studenter til et samarbeid må 'Brukere - vis liste' også være aktivert. For å legge til en emnegruppe til et samarbeid må 'Grupper - vis alle studentgrupper' også være aktivert."
+  to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "For å tillate vis, rediger, slett-funksjonalitet i samarbeider opprettet av brukere må 'Emneinnhold - legg til / rediger / slett' også være aktivert. Hvis 'Emneinnhold - legg til / rediger / slett' er aktivert og 'Studentsamarbeid - opprett' er deaktivert, vil brukeren ikke ha muligheten til å opprette nye samarbeider men vil kunne vise, redigere,slette alle samarbeider. For å legge til studenter til et samarbeid må 'Brukere - vis liste' også være aktivert. For å legge til en emnegruppe til et samarbeid må 'Grupper - vis alle studentgrupper' også være aktivert."
   to_be_added_2959cc72: "Skal legges til"
   to_be_removed_d4b48586: Fjernes
   to_c4c44f4b: til
@@ -22464,9 +22527,11 @@ nb:
               For å vise innleveringslogg, tester - vis innleveringslogg må også være aktivert.
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "For å moderere en test må 'Oppgaver og tester - legg til / rediger / slett' også være aktivert."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "For å moderere en test må 'Karakterer - rediger' også være aktivert."
+  to_moderate_grades_grades_select_final_grade_for_m_57d4f675: "For å moderere karakterer, ‘karakterer - vis endelig karakter’ for moderering må også være aktivert. For å publisere eller skjule karakterer for en oppgave, må «Karakter - rediger» også være aktivert."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "For å moderere karakterer, ‘karakterer - vis endelig karakter’ for moderering må også være aktivert."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "For å motta en klient-ID, trenger en konto-admin å generere en LTI-utviklernøkkel."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "For å feste en diskusjon på toppen av siden, dra og slipp diskusjonstråden hit eller velg Fest fra instillingsmenyen for diskusjoner."
+  to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: "For å publisere eller skjule karakterer, må «Karakter - rediger» også være aktivert."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å forhåndsvise Theme Editor merke, må du *slå av høy kontrast UI*."
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "For å publisere og fjerne modulinnhold må «Emner - legg til / rediger / slett» og «Emneinnhold - vis» også være aktiverte. Modulelementer kan ikke fjernes hvis det er studentinnleveringer tilstede."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
@@ -22474,6 +22539,8 @@ nb:
               Modulelementer kan ikke fjernes hvis det er studentinnleveringer tilstede.
   to_publish_and_unpublish_module_content_courses_ad_ae996413: "For å publisere og fjerne modulinnhold må «Emner - legg til / rediger / slett» og «Emneinnhold - vis» også være aktiverte."
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "for å publisere og fjerne modulinnhold må 'Emner - legg til / rediger / slett' og 'Emneinnhold - vis' også være aktiverte."
+  to_publish_final_grades_for_a_moderated_assignment_430368a0: "For å publisere siste karakterer for en moderert oppgave, må «Karakter - rediger» også være aktivert. For å publisere eller skjule karakterer for en moderert oppgave, må «Karakter - rediger» også være aktivert."
+  to_publish_final_grades_for_a_moderated_assignment_713090cf: "For å publisere siste karakterer for en moderert oppgave, må «Karakter - rediger» også være aktivert."
   to_publish_unpublish_module_content_course_content_efc294d4: "For å publisere/fjerne modulinnhold må 'Emneinnhold - legg til / rediger / slett' være aktivert."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "For å gjenopprette et slettet emne må både 'Emner - angre sletting' og 'Emneinnhold - vis' også være aktiverte."
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "For å forhindre at studenter oppretter grupper, fjern merkingen fra avmerkingsboksen 'La studenter organisere egne grupper' i emneinnstillinger."
@@ -22481,6 +22548,7 @@ nb:
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Skriv inn domenet her for å begrense brukere fra et spesifikt Google Apps domene."
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "Skriv inn domenet her men komma for å separere listen, for å begrense brukere fra spesifikke Google Apps domer. For å begrense brukere fra Google Apps i hovedsak, kan du legge inn «*»."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "Skriv inn flerbruker-ID'en din her for å begrense brukere av din Azure Active-mappe."
+  to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "For å gå gjennom en moderert oppgave i Speedgrader, må “Karakterer - rediger' også være aktivert."
   to_search_and_view_notifications_for_a_user_users__becfb733: "For å søke gjennom og vise varslinger for en bruker må 'Brukere - vis liste' også være aktivert."
   to_search_and_view_notifications_for_a_user_users__fab7293a: "For å søke gjennom og vise varslinger for en bruker må «Brukere - vis liste» også være aktivert."
   to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
@@ -22521,6 +22589,7 @@ nb:
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       For å vise diskusjoner i et emne må 'Diskusjoner - vis' være aktivert.
       For å svare på diskusjoner må 'Diskusjoner - lag innlegg' også være aktivert. For å redigere oppgavedetaljer i en diskusjon må 'Oppgaver og tester - legg til / rediger / slett' også være aktivert.
+  to_view_discussions_in_a_course_discussions_view_m_a1c78aa2: "For å vise diskusjoner i et emne må 'Diskusjoner - vis' være aktivert. Både 'Diskusjoner - opprett' og 'Diskusjoner - moderer' lar en brukeren lage en diskusjon på diskusjonsiden. For å administrere diskusjoner må 'Diskusjoner - moderer' også være aktivert."
   to_view_discussions_in_a_course_discussions_view_m_aa57dee7: |-
       For å vise diskusjoner i et emne må 'Diskusjoner - vis' være aktivert.
               Både 'Diskusjoner - opprett' og 'Diskusjoner - moderer' lar en bruker lage en diskusjon på diskusjonsiden. For å administrere diskusjoner må 'Diskusjoner - moderer' også være aktivert.
@@ -23907,6 +23976,7 @@ nb:
   you_cannot_assign_sections_to_a_group_discussion_t_fec73e05: "Du kan ikke tildele seksjoner til et gruppediskusjonsemne"
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Du kan ikke tildele til en gruppe utenfor oppgavens bestemte gruppe"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan ikke redigere temaer på denne underkontoen."
+  you_cannot_leave_comments_until_you_submit_the_ass_82c3ad79: "Du kan ikke legge inn kommentarer før du leverer inn oppgaven"
   you_cannot_leave_leave_comments_until_you_submit_t_d3dcb44c: "Du kan ikke legg inn kommentarer før du leverer inn oppgaven"
   you_cannot_publish_this_assignment_while_there_are_e3dee69a: "Du kan ikke publisere denne oppgaven når det er avvik"
   you_cannot_remove_this_enrollment_c87be1cb: "Du  kan ikke fjerne denne emnepåmeldingen."

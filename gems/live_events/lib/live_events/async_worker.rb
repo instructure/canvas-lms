@@ -98,7 +98,7 @@ module LiveEvents
           total_bytes = (r.is_a?(Hash) && r[:total_bytes]) || 0
           while @queue.size > 0 && total_bytes < MAX_BYTE_THRESHOLD
             r = @queue.pop
-            break if r == :stop
+            break if r == :stop || (records.size == 1 && records.first == :stop)
 
             if r[:total_bytes] + total_bytes > MAX_BYTE_THRESHOLD
               # put back on queue, will overflow kinesis put byte limit

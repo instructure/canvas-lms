@@ -277,6 +277,9 @@
   "syllabus_f191f65b": { "message": "المناهج" },
   "tab_arrows_4cf5abfc": { "message": "ضغط/أسهم" },
   "text_7f4593da": { "message": "نص" },
+  "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+    "message": "بالرغم من أن مقطع الفيديو الخاص بك سيشتمل على العنوان الصحيح في المستعرض، لم نتمكن من تحديثه في قاعدة البيانات."
+  },
   "title_ee03d132": { "message": "العنوان" },
   "to_be_posted_when_d24bf7dc": { "message": "المقرر نشره: { when }" },
   "to_do_when_2783d78f": { "message": "قائمة مهام: { when }" },
@@ -315,6 +318,7 @@
     "message": "يستخدم بواسطة أدوات قراءة الشاشة لوصف الفيديو"
   },
   "user_documents_c206e61f": { "message": "مستندات المستخدم" },
+  "user_files_78e21703": { "message": "ملفات المستخدمين" },
   "user_images_b6490852": { "message": "صور المستخدمين" },
   "user_media_14fbf656": { "message": "وسائط المستخدم" },
   "video_audio_recording_uploaded_6af5d378": {

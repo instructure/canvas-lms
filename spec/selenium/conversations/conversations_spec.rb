@@ -95,7 +95,9 @@ describe "conversations new" do
       # Verify course filter names
       dropdown_array = ff('#course-filter-bs .text')
       expect(dropdown_array[0]).to include_text('All Courses')
-      expect(dropdown_array[1]).to include_text(@course.name)
+      expect(dropdown_array[1]).to include_text('Favorite Courses')
+      dropdown_array[1].click
+      expect(f('.dropdown-menu .inner [role="group"] .text')).to include_text(@course.name)
     end
 
     it "should have a type dropdown", priority: "1", test_id: 446594 do

@@ -76,16 +76,20 @@ module BroadcastPolicies
       # When Post Policies aren't enabled, the assignment handles notifications
       # via the Assignment Unmuted notification.
       return false unless assignment.course.post_policies_enabled? &&
-        submission.grade_posting_in_progress
+        submission.grade_posting_in_progress &&
+        context_sendable?
 
       submission.reload
       posted_recently?
     end
 
     private
+    def context_sendable?
+      course.available? && !course.concluded?
+    end
+
     def broadcasting_grades?
-      course.available? &&
-      !course.concluded? &&
+      context_sendable? &&
       submission.posted? &&
       assignment.published? &&
       submission.quiz_submission_id.nil? &&

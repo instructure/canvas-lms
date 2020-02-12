@@ -17,7 +17,7 @@
  */
 
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {Suspense} from 'react'
 import {Editor} from '@tinymce/tinymce-react'
 import uniqBy from 'lodash/uniqBy'
 
@@ -25,6 +25,7 @@ import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Alert} from '@instructure/ui-alerts'
+import {Spinner} from '@instructure/ui-elements'
 
 import formatMessage from '../format-message'
 import * as contentInsertion from './contentInsertion'
@@ -45,6 +46,8 @@ import {
   VIDEO_SIZE_DEFAULT,
   AUDIO_PLAYER_SIZE
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
+
+const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 
 const ASYNC_FOCUS_TIMEOUT = 250
 
@@ -119,6 +122,39 @@ function isElementWithinTable(node) {
   return false
 }
 
+// determines if localStorage is available for our use.
+// see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
+function storageAvailable() {
+  let storage
+  try {
+    storage = window.localStorage
+    const x = '__storage_test__'
+    storage.setItem(x, x)
+    storage.removeItem(x)
+    return true
+  } catch (e) {
+    return (
+      e instanceof DOMException &&
+      // everything except Firefox
+      (e.code === 22 ||
+        // Firefox
+        e.code === 1014 ||
+        // test name field too, because code might not be present
+        // everything except Firefox
+        e.name === 'QuotaExceededError' ||
+        // Firefox
+        e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+      // acknowledge QuotaExceededError only if there's something already stored
+      storage &&
+      storage.length !== 0
+    )
+  }
+}
+
+function renderLoading() {
+  return formatMessage('Loading')
+}
+
 let alertIdValue = 0
 
 @themeable(theme, styles)
@@ -128,6 +164,10 @@ class RCEWrapper extends React.Component {
   }
 
   static propTypes = {
+    autosave: PropTypes.shape({
+      enabled: PropTypes.bool,
+      rce_auto_save_max_age_ms: PropTypes.number
+    }),
     confirmFunc: PropTypes.func,
     defaultContent: PropTypes.string,
     editorOptions: PropTypes.object,
@@ -150,7 +190,8 @@ class RCEWrapper extends React.Component {
 
   static defaultProps = {
     trayProps: null,
-    languages: [{id: 'en', label: 'English'}]
+    languages: [{id: 'en', label: 'English'}],
+    autosave: {enabled: false}
   }
 
   static skinCssInjected = false
@@ -178,7 +219,9 @@ class RCEWrapper extends React.Component {
       KBShortcutModalOpen: false,
       focused: false,
       messages: [],
-      announcement: null
+      announcement: null,
+      confirmAutoSave: false,
+      autoSavedContent: ''
     }
 
     alertHandler.alertFunc = this.addAlert
@@ -616,6 +659,10 @@ class RCEWrapper extends React.Component {
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
 
     this.announceContextToolbars(editor)
+
+    if (this.isAutoSaving) {
+      this.initAutoSave(editor)
+    }
   }
 
   _forceCloseFloatingToolbar = () => {
@@ -682,6 +729,122 @@ class RCEWrapper extends React.Component {
       }
     }
   }
+
+  /* ********** autosave support *************** */
+  initAutoSave = editor => {
+    this.storage = window.localStorage
+    if (this.storage) {
+      editor.on('change', this.doAutoSave)
+      editor.on('blur', this.doAutoSave)
+      window.addEventListener('unload', e => {
+        this.doAutoSave(e)
+      })
+
+      try {
+        const autosaved = this.getAutoSaved(this.autoSaveKey)
+        if (autosaved && autosaved.content) {
+          if (autosaved.content !== editor.getContent({format: 'raw', no_events: true})) {
+            this.setState({
+              confirmAutoSave: true,
+              autoSavedContent: autosaved.content
+            })
+          } else {
+            this.storage.removeItem(this.autoSaveKey)
+          }
+        }
+      } finally {
+        this.cleanupAutoSave()
+      }
+    }
+  }
+
+  // remove any autosaved value that's too old
+
+  cleanupAutoSave = (deleteAll = false) => {
+    const expiry = deleteAll
+      ? Date.now()
+      : Date.now() - this.props.autosave.rce_auto_save_max_age_ms
+    let i = 0
+    let key
+    while ((key = this.storage.key(i++))) {
+      if (/^rceautosave:/.test(key)) {
+        const autosaved = this.getAutoSaved(key)
+        if (autosaved && autosaved.autosaveTimestamp < expiry) {
+          this.storage.removeItem(key)
+        }
+      }
+    }
+  }
+
+  restoreAutoSave = ans => {
+    this.setState({confirmAutoSave: false}, () => {
+      const editor = this.mceInstance()
+      if (ans) {
+        editor.setContent(this.state.autoSavedContent, {format: 'raw'})
+      }
+      this.storage.removeItem(this.autoSaveKey)
+    })
+  }
+
+  getAutoSaved(key) {
+    let autosaved = null
+    try {
+      autosaved = JSON.parse(this.storage.getItem(key))
+    } catch (_ex) {
+      this.storage.removeItem(this.autoSaveKey)
+    }
+    return autosaved
+  }
+
+  // only autosave if the feature flag is set, and there is only 1 RCE on the page
+  // the latter condition is necessary because the popup RestoreAutoSaveModal
+  // is lousey UX when there are >1
+  get isAutoSaving() {
+    return (
+      this.props.autosave.enabled &&
+      document.querySelectorAll('.rce-wrapper').length === 1 &&
+      storageAvailable()
+    )
+  }
+
+  get autoSaveKey() {
+    return `rceautosave:${window.location.href}:${this._textareaEl.id}`
+  }
+
+  doAutoSave = (e, retry = false) => {
+    const editor = this.mceInstance()
+    // if the editor is empty don't save
+    if (editor.dom.isEmpty(editor.getBody())) {
+      return
+    }
+    // if no changes have been made,
+    // delete and don't save
+    if (!editor.isDirty()) {
+      this.storage.removeItem(this.autoSaveKey)
+      return
+    }
+
+    const content = editor.getContent({format: 'raw', no_events: true})
+    try {
+      this.storage.setItem(
+        this.autoSaveKey,
+        JSON.stringify({
+          autosaveTimestamp: Date.now(),
+          content
+        })
+      )
+    } catch (ex) {
+      if (!retry) {
+        // probably failed because there's not enough space
+        // delete up all the other entries and try again
+        this.cleanupAutoSave(true)
+        this.doAutoSave(e, true)
+      } else {
+        console.error('Autosave failed:', ex) // eslint-disable-line no-console
+      }
+    }
+  }
+  /* *********** end autosave support *************** */
 
   onWordCountUpdate = e => {
     this.setState(state => {
@@ -984,6 +1147,16 @@ class RCEWrapper extends React.Component {
           onDismiss={this.closeKBShortcutModal}
           open={this.state.KBShortcutModalOpen}
         />
+        {this.state.confirmAutoSave ? (
+          <Suspense fallback={<Spinner renderTitle={renderLoading} size="small" />}>
+            <RestoreAutoSaveModal
+              savedContent={this.state.autoSavedContent}
+              open={this.state.confirmAutoSave}
+              onNo={() => this.restoreAutoSave(false)}
+              onYes={() => this.restoreAutoSave(true)}
+            />
+          </Suspense>
+        ) : null}
         <Alert
           screenReaderOnly
           liveRegion={() => document.getElementById('flash_screenreader_holder')}

@@ -111,8 +111,8 @@
   "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
     "message": "Za brskanje po računalniku povlecite in spustite ali kliknite"
   },
-  "due_multiple_dates_cc0ee3f5": { "message": "Rok: Več datumov" },
-  "due_when_7eed10c6": { "message": "Rok: { when }" },
+  "due_multiple_dates_cc0ee3f5": { "message": "Roki: Več datumov" },
+  "due_when_7eed10c6": { "message": "Roki: { when }" },
   "edit_link_7f53bebb": { "message": "Uredi povezavo" },
   "editor_statusbar_26ac81fc": { "message": "Vrstica stanja urejevalnika" },
   "embed_828fac4a": { "message": "Vdelaj" },
@@ -291,9 +291,12 @@
   "syllabus_f191f65b": { "message": "Učni načrt" },
   "tab_arrows_4cf5abfc": { "message": "ZAVIHEK/puščične tipke" },
   "text_7f4593da": { "message": "Besedilo" },
+  "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+    "message": "Čeprav bo vaš videoposnetek v brskalniku imel pravilen naslov, ga v zbirki podatkov nismo uspeli posodobiti."
+  },
   "title_ee03d132": { "message": "Naslov" },
   "to_be_posted_when_d24bf7dc": { "message": "Za objavo: { when }" },
-  "to_do_when_2783d78f": { "message": "Seznam opravil: { when }" },
+  "to_do_when_2783d78f": { "message": "Čakajoča opravila: { when }" },
   "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
     "message": "{ totalResults } najdenih rezultatov, od tega jih je trenutno prikazanih { numDisplayed }."
   },
@@ -329,6 +332,7 @@
     "message": "Uporabljajo ga bralniki zaslona za opisovanje videoposnetka"
   },
   "user_documents_c206e61f": { "message": "Uporabniški dokumenti" },
+  "user_files_78e21703": { "message": "Uporabniške datoteke" },
   "user_images_b6490852": { "message": "Uporabniške slike" },
   "user_media_14fbf656": { "message": "Uporabnikovi mediji" },
   "video_audio_recording_uploaded_6af5d378": {

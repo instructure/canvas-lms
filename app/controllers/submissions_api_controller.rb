@@ -820,11 +820,21 @@ class SubmissionsApiController < ApplicationController
         @submissions ||= [@submission]
       end
       if submission.key?(:late_policy_status) || submission.key?(:seconds_late_override)
-        @submission.late_policy_status = submission[:late_policy_status] if submission.key?(:late_policy_status)
-        if @submission.late_policy_status == 'late' && submission[:seconds_late_override].present?
-          @submission.seconds_late_override = submission[:seconds_late_override]
+        excused = Canvas::Plugin.value_to_boolean(submission[:excuse])
+        grade_group_students = !(@assignment.grade_group_students_individually || excused)
+
+        if grade_group_students
+          _, students = @assignment.group_students(@user)
+          @submissions = @assignment.find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item))
         end
-        @submission.save!
+
+        @submissions.each do |sub|
+          sub.late_policy_status = submission[:late_policy_status] if submission.key?(:late_policy_status)
+          if sub.late_policy_status == "late" && submission[:seconds_late_override].present?
+            sub.seconds_late_override = submission[:seconds_late_override]
+          end
+          sub.save!
+        end
       end
 
       assessment = params[:rubric_assessment]

@@ -42,12 +42,12 @@ const karmaConfig = {
   junitReporter: {
     outputDir: 'coverage-js/junit-reports',
     outputFile: `karma-${process.env.JSPEC_GROUP || 'all'}.xml`,
-    useBrowserName: false, // don't add browser name to report and classes names
+    useBrowserName: false // don't add browser name to report and classes names
   },
   specReporter: {
     maxLogLines: 50, // limit number of lines logged per test
     suppressErrorSummary: false, // print error summary
-    showSpecTiming: true, // print the time elapsed for each spec
+    showSpecTiming: true // print the time elapsed for each spec
   },
 
   port: 9876,
@@ -104,14 +104,14 @@ const karmaConfig = {
   files: [
     {pattern: 'spec/javascripts/webpack_spec_index.js', included: true, served: true},
     {pattern: 'spec/javascripts/fixtures/*', included: false, served: true},
-    {pattern: 'public/dist/brandable_css/**/*.css', included: false, served: true},
+    {pattern: 'public/dist/brandable_css/**/*.css', included: false, served: true}
   ],
 
   preprocessors: {
     'spec/javascripts/webpack_spec_index.js': ['webpack']
   },
 
-  webpack: require('./webpack.test.config'),
+  webpack: require('./webpack.test.config')
 }
 
 // For faster local debugging in karma, only add istanbul cruft you've explicity set the "COVERAGE" environment variable
@@ -126,15 +126,21 @@ if (process.env.COVERAGE) {
     test: /\.(js|coffee)$/,
     use: {
       loader: 'istanbul-instrumenter-loader',
-      options: { esModules: true, produceSourceMap: true }
+      options: {esModules: true, produceSourceMap: true}
     },
     enforce: 'post',
-    exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|translations|vendor|custom_moment_locales|custom_timezone_locales))/,
+    exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|translations|vendor|custom_moment_locales|custom_timezone_locales))/
   })
 }
 
-module.exports = function (config) {
+module.exports = function(config) {
   // config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
   karmaConfig.logLevel = config.LOG_INFO
   config.set(karmaConfig)
+  // Allow passing in FORCED_FAILURE=true env variable to force failures in karma specs
+  config.set({
+    client: {
+      args: process.env.FORCE_FAILURE === '1' ? ['FORCE_FAILURE'] : []
+    }
+  })
 }

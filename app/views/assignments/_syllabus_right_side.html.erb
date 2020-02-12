@@ -18,18 +18,21 @@
 
 <% course_home ||= false %>
 <div id="sidebar_content">
-  <% current = Time.zone.today
-    first_day_of_month = Date.new(y=current.year, m=current.month, d=1)
-    last_day_of_previous_month = first_day_of_month - 1
-    current = first_day_of_month
-    last_day_of_month = (first_day_of_month >> 1) - 1
-    first_day = last_day_of_previous_month - last_day_of_previous_month.wday + I18n.dow_offset
-  %>
-  <%= render partial: 'calendars/mini_calendar', locals: {current: current, first_day: first_day, mini_css: 'static/mini_calendar_sidebar.css' } %>
-  <% if @context.weighted_grading_periods? %>
-    <%= render partial: 'courses/sidebar_periods_weighting', object: GradingPeriod.for(@context) %>
-  <% else %>
-    <%= render partial: 'courses/sidebar_weighting', object: @groups %>
+  <% if @context.syllabus_course_summary? || !Account.site_admin.feature_enabled?(:syllabus_course_summary_option) %>
+    <% current = Time.zone.today
+      first_day_of_month = Date.new(y=current.year, m=current.month, d=1)
+      last_day_of_previous_month = first_day_of_month - 1
+      current = first_day_of_month
+      last_day_of_month = (first_day_of_month >> 1) - 1
+      first_day = last_day_of_previous_month - last_day_of_previous_month.wday + I18n.dow_offset
+    %>
+    <%= render partial: 'calendars/mini_calendar', locals: {current: current, first_day: first_day, mini_css: 'static/mini_calendar_sidebar.css' } %>
+
+    <% if @context.weighted_grading_periods? %>
+      <%= render partial: 'courses/sidebar_periods_weighting', object: GradingPeriod.for(@context) %>
+    <% else %>
+      <%= render partial: 'courses/sidebar_weighting', object: @groups %>
+    <% end %>
   <% end %>
 </div>
 <%= render partial: 'shared/wiki_sidebar' %>

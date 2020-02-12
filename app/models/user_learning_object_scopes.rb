@@ -177,8 +177,10 @@ module UserLearningObjectScopes
       limit: limit, **opts) do |assignment_scope|
       assignments = assignment_scope.due_between_for_user(due_after, due_before, self)
       assignments = assignments.need_submitting_info(id, limit) if purpose == 'submitting'
-      assignments = assignments.submittable.or(assignments.where('assignments.due_at > ?', Time.zone.now)) if purpose == 'submitting'
       assignments = assignments.having_submissions_for_user(id) if purpose == 'submitted'
+      if purpose == 'submitting'
+        assignments = assignments.submittable.or(assignments.where('assignments.user_due_date > ?', Time.zone.now))
+      end
       assignments = assignments.not_locked unless include_locked
       assignments
     end

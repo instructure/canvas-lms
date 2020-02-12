@@ -93,7 +93,7 @@ $('#loading_indicator').replaceWith('<img src="/images/ajax-reload-animated.gif"
 // Binding to the mini calendar must take place after sidebar initializes,
 // so this must be done on dom ready
 $(() => {
-  SyllabusBehaviors.bindToEditSyllabus()
+  SyllabusBehaviors.bindToEditSyllabus(true)
   SyllabusBehaviors.bindToMiniCalendar()
 })
 

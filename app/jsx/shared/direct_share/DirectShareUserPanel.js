@@ -52,6 +52,7 @@ export default function DirectShareUserPanel({
     <ContentShareUserSearchSelector
       courseId={courseId || ENV.COURSE_ID || ENV.COURSE.id}
       onUserSelected={onUserSelected}
+      selectedUsers={selectedUsers}
       renderBeforeInput={renderSelectedUserTags}
     />
   )

@@ -287,6 +287,9 @@
   "syllabus_f191f65b": { "message": "Kursöversikt" },
   "tab_arrows_4cf5abfc": { "message": "FLIK/Pilar" },
   "text_7f4593da": { "message": "Text" },
+  "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+    "message": "Din video har korrekt titel i webbläsaren, men den uppdaterades inte i databasen."
+  },
   "title_ee03d132": { "message": "Titel" },
   "to_be_posted_when_d24bf7dc": { "message": "För publicering: { when }" },
   "to_do_when_2783d78f": { "message": "Att göra: { when }" },
@@ -325,6 +328,7 @@
     "message": "Används av skärmläsare för att beskriva videon"
   },
   "user_documents_c206e61f": { "message": "Användardokument" },
+  "user_files_78e21703": { "message": "Användarfiler" },
   "user_images_b6490852": { "message": "Användarbilder" },
   "user_media_14fbf656": { "message": "Användarmedia" },
   "video_audio_recording_uploaded_6af5d378": {

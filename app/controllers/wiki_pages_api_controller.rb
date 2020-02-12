@@ -275,7 +275,7 @@ class WikiPagesApiController < ApplicationController
 
       wiki_pages = Api.paginate(scope, self, pages_route)
 
-      if @context.wiki.grants_right?(@current_user, :manage)
+      if @context.wiki.grants_right?(@current_user, :update)
         mc_status = setup_master_course_restrictions(wiki_pages, @context)
       end
       render :json => wiki_pages_json(wiki_pages, @current_user, session, :master_course_status => mc_status)
@@ -391,13 +391,15 @@ class WikiPagesApiController < ApplicationController
     perform_update = false
     if @page.new_record?
       perform_update = true if authorized_action(@page, @current_user, [:create])
+      allowed_fields = Set[:title, :body]
     elsif authorized_action(@page, @current_user, [:update, :update_content])
       perform_update = true
+      allowed_fields = Set[]
     end
 
     if perform_update
       assign_todo_date
-      update_params = get_update_params
+      update_params = get_update_params(allowed_fields)
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
         log_asset_access(@page, "wiki", @wiki, 'participate')
         @page.context_module_action(@current_user, @context, :contributed)
@@ -541,8 +543,6 @@ class WikiPagesApiController < ApplicationController
         @page.workflow_state = 'active'
         @set_front_page = true
         @set_as_front_page = true
-      else
-        @page.workflow_state = @wiki.grants_right?(@current_user, session, :manage) ? 'unpublished' : 'active'
       end
     end
   end
@@ -592,7 +592,7 @@ class WikiPagesApiController < ApplicationController
 
     # check user permissions
     rejected_fields = Set[]
-    if @wiki.grants_right?(@current_user, session, :manage)
+    if @wiki.grants_right?(@current_user, session, :update)
       allowed_fields.clear
     else
       if workflow_state && workflow_state != @page.workflow_state

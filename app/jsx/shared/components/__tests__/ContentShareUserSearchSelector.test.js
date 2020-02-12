@@ -42,7 +42,7 @@ describe('ContentShareUserSearchSelector', () => {
   })
 
   it('initially searches with an empty search term', () => {
-    render(<ContentShareUserSearchSelector courseId="42" />)
+    render(<ContentShareUserSearchSelector courseId="42" onUserSelected={() => {}} />)
     expect(useContentShareUserSearchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         courseId: '42',
@@ -53,13 +53,17 @@ describe('ContentShareUserSearchSelector', () => {
 
   it('renders a loading spinner while searching', () => {
     useContentShareUserSearchApi.mockImplementationOnce(({loading}) => loading(true))
-    const {getByText, getByLabelText} = render(<ContentShareUserSearchSelector courseId="42" />)
+    const {getByText, getByLabelText} = render(
+      <ContentShareUserSearchSelector courseId="42" onUserSelected={() => {}} />
+    )
     fireEvent.click(getByLabelText(/send to/i))
     expect(getByText(/loading/i)).toBeInTheDocument()
   })
 
   it('renders a loading spinner and searches with a specific search term when typed', () => {
-    const {getAllByText, getByLabelText} = render(<ContentShareUserSearchSelector courseId="42" />)
+    const {getAllByText, getByLabelText} = render(
+      <ContentShareUserSearchSelector courseId="42" onUserSelected={() => {}} />
+    )
     const selectInput = getByLabelText(/send to/i)
     fireEvent.click(selectInput)
     fireEvent.change(selectInput, {target: {value: 'abc'}})
@@ -89,5 +93,28 @@ describe('ContentShareUserSearchSelector', () => {
     act(() => jest.runAllTimers()) // let the debounce happen
     fireEvent.click(getByText('shrek'))
     expect(handleUserSelected).toHaveBeenCalledWith({id: 'foo', name: 'shrek'})
+  })
+
+  it('hides already-selected users from search result options', () => {
+    const alreadySelectedUsers = [{id: 'bar', name: 'extra shrek'}]
+    const {getByText, getByLabelText, queryByText} = render(
+      <ContentShareUserSearchSelector
+        courseId="42"
+        onUserSelected={() => {}}
+        selectedUsers={alreadySelectedUsers}
+      />
+    )
+    const selectInput = getByLabelText(/send to/i)
+    fireEvent.click(selectInput)
+    useContentShareUserSearchApi.mockImplementationOnce(({success}) =>
+      success([
+        {id: 'foo', name: 'shrek'},
+        {id: 'bar', name: 'extra shrek'}
+      ])
+    )
+    fireEvent.change(selectInput, {target: {value: 'shr'}})
+    act(() => jest.runAllTimers()) // let the debounce happen
+    expect(getByText('shrek')).toBeInTheDocument()
+    expect(queryByText('extra shrek')).not.toBeInTheDocument()
   })
 })

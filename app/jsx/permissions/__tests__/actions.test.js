@@ -282,40 +282,6 @@ describe('api actions', () => {
     })
   })
 
-  it('updateRoleNameAndBaseType dispatches updateRole', done => {
-    const mockDispatch = jest.fn()
-    const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
-    const getState = () => state
-    actions.updateRoleNameAndBaseType('1', 'steven', 'StudentRoll')(mockDispatch, getState)
-    moxiosWait(() => {
-      const request = moxios.requests.mostRecent()
-      request
-        .respondWith({
-          status: 200,
-          response: {
-            id: '9',
-            role: 'steven',
-            label: 'steven',
-            base_role_type: 'StudentEnrollment',
-            workflow_state: 'active'
-          }
-        })
-        .then(() => {
-          expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'UPDATE_ROLE',
-            payload: {
-              id: '9',
-              role: 'steven',
-              label: 'steven',
-              base_role_type: 'StudentEnrollment',
-              workflow_state: 'active'
-            }
-          })
-          done()
-        })
-    })
-  })
-
   it('createNewRole dispatches addTraySavingFail', done => {
     const mockDispatch = jest.fn()
     const state = {contextId: 1, permissions: PERMISSIONS, roles: []}

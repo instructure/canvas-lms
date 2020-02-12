@@ -213,7 +213,7 @@
         "message": "Navigacija po predmetu"
     },
     "course_to_do_bcbbab54": {
-        "message": "{ course } SEZNAM OPRAVIL"
+        "message": "{ course } ČAKAJOČA OPRAVILA"
     },
     "current_volume_level_c55ab825": {
         "message": "Trenutna raven glasnosti"
@@ -321,16 +321,16 @@
         "message": "Za brskanje po računalniku povlecite in spustite ali kliknite"
     },
     "due_5d7267be": {
-        "message": "Rok:"
+        "message": "Roki:"
     },
     "due_date_124fdd99": {
-        "message": "Rok: { date }"
+        "message": "Roki: { date }"
     },
     "due_multiple_dates_cc0ee3f5": {
-        "message": "Rok: Več datumov"
+        "message": "Roki: Več datumov"
     },
     "due_when_7eed10c6": {
-        "message": "Rok: { when }"
+        "message": "Roki: { when }"
     },
     "edit_c5fbea07": {
         "message": "Uredi"
@@ -885,7 +885,7 @@
         "message": "Podpisano"
     },
     "success_to_do_created_e34ed395": {
-        "message": "Uspešno: Seznam opravil je ustvarjen."
+        "message": "Uspešno: Čakajoča opravila je ustvarjen."
     },
     "superscript_8cb349a2": {
         "message": "Nadpisano"
@@ -914,6 +914,9 @@
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "S tem elementom niso povezane nobene točke."
     },
+    "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+        "message": "Čeprav bo vaš videoposnetek v brskalniku imel pravilen naslov, ga v zbirki podatkov nismo uspeli posodobiti."
+    },
     "time_2b5aac58": {
         "message": "Čas"
     },
@@ -927,16 +930,16 @@
         "message": "Za objavo: { when }"
     },
     "to_do_1d554f36": {
-        "message": "Seznam opravil"
+        "message": "Čakajoča opravila"
     },
     "to_do_date_4b211ad0": {
-        "message": "Seznam opravil: { date }"
+        "message": "Čakajoča opravila: { date }"
     },
     "to_do_items_loading_d1cdfcd5": {
         "message": "Nalaganje elementov seznama opravil"
     },
     "to_do_when_2783d78f": {
-        "message": "Seznam opravil: { when }"
+        "message": "Čakajoča opravila: { when }"
     },
     "today_76e10f9c": {
         "message": "Danes"
@@ -1010,6 +1013,9 @@
     "user_documents_c206e61f": {
         "message": "Uporabniški dokumenti"
     },
+    "user_files_78e21703": {
+        "message": "Uporabniške datoteke"
+    },
     "user_images_b6490852": {
         "message": "Uporabniške slike"
     },
@@ -1065,7 +1071,7 @@
         "message": "Predložiti morate datum in čas."
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "Z drsnikom ste se pomaknili na čisto prvi seznam opravil."
+        "message": "Z drsnikom ste se pomaknili na čisto prvi čakajoča opravila."
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Vaša spletna kamera je morda že v uporabi."

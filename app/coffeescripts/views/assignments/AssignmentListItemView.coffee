@@ -85,7 +85,6 @@ export default class AssignmentListItemView extends Backbone.View
   initialize: ->
     super
     @initializeChildViews()
-
     # we need the following line in order to access this view later
     @model.assignmentView = @
 
@@ -220,6 +219,8 @@ export default class AssignmentListItemView extends Backbone.View
 
     data.cyoe = CyoeHelper.getItemData(data.id, @isGraded() && (!@model.isQuiz() || data.is_quiz_assignment))
     data.return_to = encodeURIComponent window.location.pathname
+
+    data.quizzesRespondusEnabled = @model.quizzesRespondusEnabled()
 
     data.DIRECT_SHARE_ENABLED = !!ENV.DIRECT_SHARE_ENABLED
 

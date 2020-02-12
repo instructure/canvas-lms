@@ -123,10 +123,12 @@
   "media_af190855": { "message": "Medya" },
   "modules_c4325335": { "message": "Modüller" },
   "next_page_d2a39853": { "message": "Sonraki Sayfa" },
+  "no_e16d9132": { "message": "Hayır" },
   "no_results_940393cf": { "message": "Sonuç yok." },
   "options_3ab0ea65": { "message": "Seçenekler" },
   "pages_e5414c2c": { "message": "Sayfalar" },
   "people_b4ebb13c": { "message": "Katılımcılar" },
+  "preview_53003fd2": { "message": "Önizleme" },
   "previous_page_928fc112": { "message": "Önceki Sayfa" },
   "published_c944a23d": { "message": "yayınlandı" },
   "quizzes_7e598f57": { "message": "Kısa sınavlar" },
@@ -188,6 +190,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Wiki Ana Sayfası" },
+  "yes_dde87d5": { "message": "Evet" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Web kameranız kullanılıyor olabilir."
   }

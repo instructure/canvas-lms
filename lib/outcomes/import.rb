@@ -17,8 +17,6 @@
 
 module Outcomes
   module Import
-    include OutcomeImporter
-
     class InvalidDataError < RuntimeError; end
     class DataFormatError < RuntimeError; end
 
@@ -181,9 +179,7 @@ module Outcomes
 
     def non_vendor_guid_changes?(model)
       model.has_changes_to_save? && !(model.changes_to_save.length == 1 &&
-        model.changes_to_save.key?(
-          AcademicBenchmark.use_new_guid_columns? ? 'vendor_guid_2' : 'vendor_guid'
-        ))
+        model.changes_to_save.key?('vendor_guid'))
     end
 
     def find_prior_outcome(outcome)
@@ -200,7 +196,7 @@ module Outcomes
         end
       else
         vendor_guid = outcome[:vendor_guid]
-        prior = LearningOutcome.where(vendor_clause(vendor_guid)).active_first.first
+        prior = LearningOutcome.where(vendor_guid: vendor_guid).active_first.first
         return prior if prior
         LearningOutcome.new(vendor_guid: vendor_guid)
       end
@@ -208,11 +204,10 @@ module Outcomes
 
     def find_prior_group(group)
       vendor_guid = group[:vendor_guid]
-      clause = vendor_clause(group[:vendor_guid])
-      prior = LearningOutcomeGroup.where(context: context).where(clause).active_first.first
+      prior = LearningOutcomeGroup.where(context: context).where(vendor_guid: vendor_guid).active_first.first
       return prior if prior
 
-      match = /canvas_outcome_group:(\d+)/.match(group[:vendor_guid])
+      match = /canvas_outcome_group:(\d+)/.match(vendor_guid)
       if match
         canvas_id = match[1]
         begin
@@ -246,7 +241,7 @@ module Outcomes
 
       guids = object[:parent_guids].strip.split
       LearningOutcomeGroup.where(context: context, outcome_import_id: outcome_import_id).
-        where(plural_vendor_clause(guids)).
+        where(vendor_guid: guids).
         tap do |parents|
           if parents.length < guids.length
             missing = guids - parents.map(&:vendor_guid)

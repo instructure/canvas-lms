@@ -18,20 +18,26 @@
 
 import I18n from 'i18n!user_search_selector'
 import React, {useState} from 'react'
-import {func, string} from 'prop-types'
+import {arrayOf, func, string} from 'prop-types'
 
 import CanvasAsyncSelect from './CanvasAsyncSelect'
 import useDebouncedSearchTerm from '../hooks/useDebouncedSearchTerm'
 import useContentShareUserSearchApi from '../effects/useContentShareUserSearchApi'
 import UserSearchSelectorItem from './UserSearchSelectorItem'
+import {basicUser} from '../proptypes/user'
 
 ContentShareUserSearchSelector.propTypes = {
   courseId: string.isRequired,
-  onUserSelected: func, // (basicUser) => {} (see proptypes/user.js)
+  onUserSelected: func.isRequired, // (basicUser) => {} (see proptypes/user.js)
+  selectedUsers: arrayOf(basicUser),
   ...(() => {
     const {renderLabel, ...restOfSelectPropTypes} = CanvasAsyncSelect.propTypes
     return restOfSelectPropTypes
   })()
+}
+
+ContentShareUserSearchSelector.defaultProps = {
+  selectedUsers: []
 }
 
 const MINIMUM_SEARCH_LENGTH = 3
@@ -41,6 +47,7 @@ const isSearchableTerm = term => term.length >= MINIMUM_SEARCH_LENGTH
 export default function ContentShareUserSearchSelector({
   courseId,
   onUserSelected,
+  selectedUsers,
   ...restOfSelectProps
 }) {
   const [searchedUsers, setSearchedUsers] = useState(null)
@@ -64,7 +71,7 @@ export default function ContentShareUserSearchSelector({
   function handleUserSelected(_ev, id) {
     if (searchedUsers === null) return
     const user = searchedUsers.find(u => u.id === id)
-    if (onUserSelected) onUserSelected(user)
+    onUserSelected(user)
     setInputValue('')
   }
 
@@ -92,11 +99,14 @@ export default function ContentShareUserSearchSelector({
 
   let userOptions = []
   if (searchedUsers !== null && isSearchableTerm(inputValue)) {
-    userOptions = searchedUsers.map(user => (
-      <CanvasAsyncSelect.Option key={user.id} id={user.id} value={user.id}>
-        <UserSearchSelectorItem user={user} />
-      </CanvasAsyncSelect.Option>
-    ))
+    const selectedUsersIds = selectedUsers.map(user => user.id)
+    userOptions = searchedUsers
+      .filter(user => !selectedUsersIds.includes(user.id))
+      .map(user => (
+        <CanvasAsyncSelect.Option key={user.id} id={user.id} value={user.id}>
+          <UserSearchSelectorItem user={user} />
+        </CanvasAsyncSelect.Option>
+      ))
   }
 
   return (

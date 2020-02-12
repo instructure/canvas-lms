@@ -71,7 +71,7 @@ class CalendarsController < ApplicationController
         :can_make_reservation => context.grants_right?(@current_user, :participate_as_student),
         :can_update_todo_date => context.grants_right?(@current_user, session, :manage_content),
         :can_update_discussion_topic => context.grants_right?(@current_user, session, :moderate_forum),
-        :can_update_wiki_page => context.grants_right?(@current_user, session, :manage_wiki),
+        :can_update_wiki_page => context.grants_right?(@current_user, session, :update),
         :concluded => (context.is_a? Course) ? context.concluded? : false
       }
       if context.respond_to?("course_sections")

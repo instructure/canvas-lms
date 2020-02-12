@@ -115,6 +115,9 @@
   "audio_player_for_title_20cc70d": {
     "message": "Audio player for { title }"
   },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Auto-saved content exists. Would you like to load the auto-saved content instead?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Automatically open an in-line preview. (Preview displays only after saving)"
   },
@@ -151,8 +154,14 @@
   "click_to_embed_imagename_c41ea8df": {
     "message": "Click to embed { imageName }"
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Click to hide preview"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Click to insert a link into the editor."
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Click to show preview"
   },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Close a menu or dialog. Also returns you to the editor area"
@@ -438,6 +447,9 @@
   "formatting_5b143aa8": {
     "message": "Formatting"
   },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Found auto-saved content"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Found { count, plural,\n     =0 {# results}\n    one {# result}\n  other {# results}\n}"
   },
@@ -655,6 +667,9 @@
   "no_due_dates_assigned_e8f5bac8": {
     "message": "No Due Dates Assigned"
   },
+  "no_e16d9132": {
+    "message": "No"
+  },
   "no_grade_3b4d7f3e": {
     "message": "No Grade"
   },
@@ -758,6 +773,9 @@
   "preformatted_d0670862": {
     "message": "Preformatted"
   },
+  "preview_53003fd2": {
+    "message": "Preview"
+  },
   "preview_a3f8f854": {
     "message": "PREVIEW"
   },
@@ -800,6 +818,9 @@
   },
   "replies_4a8577c8": {
     "message": "Replies"
+  },
+  "restore_auto_save_deccd84b": {
+    "message": "Restore auto-save?"
   },
   "rich_content_editor_2708ef21": {
     "message": "Rich Content Editor"
@@ -1082,6 +1103,9 @@
   },
   "wiki_home_9cd54d0": {
     "message": "Wiki Home"
+  },
+  "yes_dde87d5": {
+    "message": "Yes"
   },
   "yesterday_at_date_1aa6d18e": {
     "message": "Yesterday at { date }"

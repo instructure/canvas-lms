@@ -126,3 +126,23 @@ function similarityEntryComparator(a, b) {
   // Otherwise, just compare by status.
   return orderedStatuses.indexOf(aStatus || 'none') - orderedStatuses.indexOf(bStatus || 'none')
 }
+
+export function similarityIcon(similarityData) {
+  const {status, similarity_score} = similarityData
+
+  let iconClass
+  if (status === 'error') {
+    iconClass = 'icon-warning'
+  } else if (status === 'pending') {
+    iconClass = 'icon-clock'
+  } else if (similarity_score > 60) {
+    iconClass = 'icon-empty icon-Solid'
+  } else if (similarity_score > 20) {
+    iconClass = 'icon-oval-half icon-Solid'
+  } else {
+    iconClass = 'icon-certified icon-Solid'
+  }
+
+  // xsslint safeString.identifier iconClass
+  return `<i class="${iconClass}"></i>`
+}

@@ -513,6 +513,15 @@ returns the current course start date.
 ```
 2018-01-15 00:00:00 -0700
 ```
+## Canvas.course.endAt
+returns the current course end date.
+
+**Availability**: *when launched in a course*
+
+
+```
+2019-05-10 00:00:00 -0600
+```
 ## Canvas.course.workflowState
 returns the current course workflow state. Workflow states of "claimed" or "created"
 indicate an unpublished course.

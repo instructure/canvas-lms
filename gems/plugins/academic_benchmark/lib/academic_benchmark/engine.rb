@@ -28,9 +28,7 @@ module AcademicBenchmark
               :settings_partial => 'academic_benchmark/plugin_settings',
               :hide_from_users => true,
               :settings => {
-                :api_key => nil,
-                :api_url => AcademicBenchmark::Api::API_BASE_URL,
-                :common_core_guid => AcademicBenchmark::ConverterV1::COMMON_CORE_GUID,
+                :common_core_guid => AcademicBenchmark::Converter::COMMON_CORE_GUID,
                 :partner_id => nil,
                 :partner_key => nil,
                 :worker => 'CCWorker',

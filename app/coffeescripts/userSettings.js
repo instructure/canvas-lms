@@ -44,9 +44,13 @@ function addTokens(method, ...tokens) {
   return function(key, value) {
     const stringifiedValue = JSON.stringify(value)
     const joinedTokens = tokens.map(token => userSettings.globalEnv[token]).join('_')
-    const res = localStorage[`${method}Item`](`_${joinedTokens}_${key}`, stringifiedValue)
-    if (res === 'undefined') return undefined
-    if (res) return JSON.parse(res)
+    try {
+      const res = localStorage[`${method}Item`](`_${joinedTokens}_${key}`, stringifiedValue)
+      if (res === 'undefined') return undefined
+      if (res) return JSON.parse(res)
+    } catch (_ex) {
+      return undefined
+    }
   }
 }
 

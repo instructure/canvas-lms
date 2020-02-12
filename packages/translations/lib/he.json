@@ -374,6 +374,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "לא הוגדרו תאריכי יעד"
     },
+    "no_e16d9132": {
+        "message": "לא"
+    },
     "no_grade_3b4d7f3e": {
         "message": "ללא ציון"
     },
@@ -436,6 +439,9 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } נקודות"
+    },
+    "preview_53003fd2": {
+        "message": "תצוגה מקדימה"
     },
     "previous_month_bb1e3c84": {
         "message": "החודש הקודם"
@@ -577,6 +583,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "דף הבית של וויקי"
+    },
+    "yes_dde87d5": {
+        "message": "כן"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "אתמול, בתאריך { date }"

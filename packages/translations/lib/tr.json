@@ -416,6 +416,9 @@
     "next_page_d2a39853": {
         "message": "Sonraki Sayfa"
     },
+    "no_e16d9132": {
+        "message": "Hayır"
+    },
     "no_results_940393cf": {
         "message": "Sonuç yok."
     },
@@ -445,6 +448,9 @@
     },
     "points_points_63e59cce": {
         "message": "{ points } puan"
+    },
+    "preview_53003fd2": {
+        "message": "Önizleme"
     },
     "previous_month_bb1e3c84": {
         "message": "Önceki Hafta"
@@ -604,6 +610,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki Ana Sayfası"
+    },
+    "yes_dde87d5": {
+        "message": "Evet"
     },
     "yesterday_c6bd6abf": {
         "message": "Dün"

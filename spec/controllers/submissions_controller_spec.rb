@@ -597,6 +597,23 @@ describe SubmissionsController do
       expect(body['published_score']).to be nil
     end
 
+    it "renders json without scores for students on muted quizzes" do
+      quiz = @context.quizzes.create!
+      quiz.workflow_state = "available"
+      quiz.quiz_questions.create!({ question_data: test_quiz_data.first })
+      quiz.save!
+      quiz.assignment.update!(muted: true)
+
+      quiz_submission = quiz.generate_submission(@student)
+      Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
+
+      user_session(@student)
+      request.accept = Mime[:json].to_s
+      get :show, params: {course_id: @context.id, assignment_id: quiz.assignment.id, id: @student.id}, format: :json
+      expect(body['id']).to eq quiz_submission.submission.id
+      expect(body['body']).to be nil
+    end
+
     it "renders the page for submitting student" do
       user_session(@student)
       @assignment.update!(anonymous_grading: true, muted: true)

@@ -307,6 +307,7 @@ module Api
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
   def self.paginate(collection, controller, base_url, pagination_args = {}, response_args = {})
+    collection = ordered_collection(collection)
     collection = paginate_collection!(collection, controller, pagination_args)
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
@@ -316,6 +317,13 @@ module Api
     else
       collection
     end
+  end
+
+  def self.ordered_collection(collection)
+    if collection.is_a?(ActiveRecord::Relation) && collection.order_values.blank?
+      collection = collection.order(collection.primary_key.to_sym)
+    end
+    collection
   end
 
   # Returns collection as the first return value, and the meta information hash

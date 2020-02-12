@@ -150,7 +150,7 @@ QUnit.module('SubmissionTrayRadioInput', hooks => {
 
     test('renders NumberInput when value is changed to "late"', () => {
       wrapper = mountComponent({value: 'late', checked: false})
-      radioInput().simulate('change', {target: {checked: true}})
+      wrapper.setProps({checked: true})
       strictEqual(numberInput().length, 1)
     })
 
@@ -213,6 +213,21 @@ QUnit.module('SubmissionTrayRadioInput', hooks => {
         checked: true,
         latePolicy: {lateSubmissionInterval: 'hour'},
         submission: {latePolicyStatus: 'late', secondsLate}
+      })
+      strictEqual(numberInput().props().value, '48.07')
+    })
+
+    test('updates value when the submission changes', () => {
+      // two days and four minutes in seconds
+      const secondsLate = 173040
+      wrapper = mountComponent({
+        value: 'late',
+        checked: true,
+        latePolicy: {lateSubmissionInterval: 'hour'},
+        submission: {id: '2501', latePolicyStatus: 'late', secondsLate: 0}
+      })
+      wrapper.setProps({
+        submission: {id: '2502', latePolicyStatus: 'late', secondsLate}
       })
       strictEqual(numberInput().props().value, '48.07')
     })

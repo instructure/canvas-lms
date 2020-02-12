@@ -95,6 +95,7 @@ describe LiveEvents::AsyncWorker do
     end
 
     it "should time batch write" do
+      skip('PLAT-5353')
       results_double = double
       results = OpenStruct.new(records: results_double)
       allow(results_double).to receive(:each_with_index).and_return([])

@@ -31,7 +31,6 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml'
-    GERRIT_PROJECT = 'canvas-lms'
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
 

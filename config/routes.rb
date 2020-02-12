@@ -753,6 +753,7 @@ CanvasRails::Application.routes.draw do
 
   get 'login/saml' => 'login/saml#new', as: :saml_login_base
   get 'login/saml/logout' => 'login/saml#destroy'
+  post 'login/saml/logout' => 'login/saml#destroy'
   # deprecated alias
   get 'saml_logout' => 'login/saml#destroy'
   get 'login/saml/:id' => 'login/saml#new', as: :saml_login
@@ -1654,6 +1655,7 @@ CanvasRails::Application.routes.draw do
       get 'files/:id', action: :api_show, as: 'attachment'
       delete 'files/:id', action: :destroy
       put 'files/:id', action: :api_update
+      post 'files/:id/reset_verifier', action: :reset_verifier
 
       # exists as an alias of GET for backwards compatibility
       #

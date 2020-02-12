@@ -180,6 +180,7 @@ cy:
     two: "%{count} Pwynt"
   a_and_b_cannot_be_used_together_77ee6a2a: "Does dim modd defnyddio {a} a {b} gyda'i gilydd"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Does dim gwerth cyfrifo yn cael ei ddefnyddio gyda’r dull cyfrifo hwn"
+  a_canvas_security_token_was_just_generated_for_you_efeeac68: "Mae tocyn diogelwch Canvas newydd gael ei greu ar gyfer eich cyfrif. Os gwnaethoch chi ofyn am docyn defnyddiwr, does dim angen gwneud dim. Os na wnaethoch chi ofyn am docyn, neu os hoffech chi reoli eich tocynnau mynediad canvas, gallwch wneud hynny yma:"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Mae ffeil o’r enw %{itemName} eisoes yn bodoli yn y ffolder hon."
   a_front_page_is_required_fd57b80: "Mae’n rhaid rhoi Tudalen Flaen"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Logo maint llawn sy’n ymddangos yn y bar ar ochr dde dangosfwrdd Canvas. Y maint delfrydol yw 360 x 140 picsel. Y fformatau sy’n cael eu derbyn: svg, png, jpeg, gif"
@@ -235,6 +236,7 @@ cy:
   access_report_80d28095: "Adroddiad Mynediad"
   access_token_3be22221: "Tocyn Mynediad"
   access_token_count_access_token_count_dfb5463c: "Nifer y Tocynnau Mynediad: %{access_token_count}"
+  access_token_created_or_regenerated_4ce9ed1f: "Tocyn Mynediad wedi'i Greu neu Ail-greu"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Mae modd defnyddio tocynnau mynediad i adael i raglenni eraill wneud galwadau API ar eich rhan. Gallwch hefyd greu tocynnau mynediad a *defnyddio Open API Canvas* i feddwl am eich prosesau integreiddio eich hun."
   accessible_sidebar_menu_b30baf97: "Dewislen Bar Ochr Hygyrch"
   accordion_section_1_7888782d: "Adran 1 yr Acordion"
@@ -1746,6 +1748,7 @@ cy:
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Galluogi mewngludo Common Cartridge a QTI i New Quizzes."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Galluogi mewngludo Common Cartridge a QTI i Quizzes.Next."
   allow_in_mastery_paths_5332c786: "Caniatáu mewn llwybrau meistroli"
+  allow_include_parameters_bf3d3230: "Caniatáu Cynnwys Paramedrau "
   allow_intra_group_peer_reviews_53f1e455: "Caniatáu adolygiadau gan gyd-fyfyrwyr o fewn y grŵp"
   allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
       Caniatáu i Danysgrifio i Ddigwyddiad Byw gael ei osod fel ei fod yn cael ei ddarparu
@@ -1778,6 +1781,7 @@ cy:
   allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
       Yn caniatáu i weinyddwyr weld log yn cynnwys gwybodaeth am yr holl newidiadau
       GraphQL sydd wedi'u rhedeg yn ddiweddar
+  allows_aligning_outcomes_to_non_scoring_content_537ce399: "Yn caniatáu cysoni deilliannau cynnwys sydd ddim yn cadw sgôr"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Yn gadael i aseswyr weld yr ardal archwilio asesiadau yn SpeedGrader ar gyfer aseiniadau dienw neu aseiniadau wedi’u safoni."
   allows_creating_discussions_for_a_specific_section_6bf44036: "Yn gadael i drafodaethau gael eu creu ar gyfer adran benodol"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Yn gadael i athrawon, dylunwyr cyrsiau a chynorthwywyr dysgu gael mynediad at yr adnodd Sgwrsio."
@@ -1798,7 +1802,9 @@ cy:
       Yn gadael i ddefnyddiwr gael mynediad at y ddolen Cyhoeddiadau yn y ddewislen Crwydro’r Cwrs.
       Yn gadael i ddefnyddiwr weld cyhoeddiadau cwrs.
       Yn gadael i ddefnyddiwr weld cyhoeddiadau diweddar ar dudalen hafan y cwrs.
+  allows_user_to_access_the_attendance_tool_72ef0b68: "Yn gadael i ddefnyddiwr gael mynediad at yr adnodd Presenoldeb."
   allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Yn gadael i ddefnyddiwr gael mynediad at Far Ochr y Cyrsiau Glasbrint. Yn gadael i ddefnyddiwr reoli gosodiadau cynnwys Cyrsiau Glasbrint yng Ngosodiadau Cwrs. Yn gadael i ddefnyddiwr dynnu cwrs cysylltiedig. Yn gadael i ddefnyddiwr olygu gosodiadau cloi glasbrint ar aseiniadau unigol, tudalennau, neu drafodaethau"
+  allows_user_to_access_the_chat_tool_48d5f5c4: "Yn gadael i ddefnyddiwr gael mynediad at yr adnodd Sgwrsio."
   allows_user_to_access_the_files_tab_in_the_content_a5187929: "Yn gadael i ddefnyddiwr gael mynediad at y tab Ffeiliau yn y Dewisydd Cynnwys."
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: "Yn gadael i ddefnyddiwr gael mynediad at y tab Adfer Cyrsiau yn Adnoddau Gweinyddol."
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Yn gadael i ddefnyddiwr gael mynediad at y tab Adfer Cyrsiau yn yr Adnoddau Gweinyddol"
@@ -1843,7 +1849,10 @@ cy:
       Yn gadael i ddefnyddiwr reoli gosodiadau aseiniadau.
       Yn gadael i ddefnyddiwr ychwanegu grwpiau aseiniadau at gwrs.
       Yn gadael i ddefnyddiwr alluogi a golygu pwysoliad grwpiau aseiniadau mewn cwrs.
+  allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Yn gadael i ddefnyddiwr ychwanegu digwyddiadau at y Dangosfwrdd Gwedd Rhestr drwy'r blwch ticio Ychwanegu at y Tasgau sydd gan Fyfyriwr i’w Gwneud."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Yn gadael i ddefnyddiwr ychwanegu aseiniadau newydd at fodiwl."
+  allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Yn gadael i ddefnyddiwr ychwanegu trafodaethau heb eu graddio at y Dangosfwrdd Gwedd Rhestr drwy'r blwch ticio Ychwanegu at y Tasgau sydd gan Fyfyriwr i’w Gwneud."
+  allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Yn gadael i ddefnyddiwr ychwanegu tudalennau at y Dangosfwrdd Gwedd Rhestr drwy'r blwch ticio Ychwanegu at y Tasgau sydd gan Fyfyriwr i’w Gwneud."
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       Yn gadael i ddefnyddiwr ychwanegu/tynnu athrawon, dylunwyr cyrsiau, neu gynorthwywyr dysgu eraill.
       Yn gadael i ddefnyddiwr dynnu/ychwanegu arsyllwyr at y cwrs.
@@ -1912,6 +1921,7 @@ cy:
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Yn gadael i ddefnyddiwr olygu gosodiadau cloi glasbrint ar y dudalen mynegai Trafodaethau mewn cwrs meistr Glasbrint."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Yn gadael i ddefnyddiwr olygu gosodiadau cloi glasbrint ar y dudalen Ffeiliau mewn cwrs meistr Glasbrint."
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Yn gadael i ddefnyddiwr olygu gosodiadau clo glasbrint ar y tudalennau mynegai Aseiniadau a Chwisiau mewn cwrs meistr Glasbrint."
+  allows_user_to_edit_conferences_61eb62e0: "Yn gadael i ddefnyddiwr olygu Cynadleddau."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Yn gadael i ddefnyddiwr olygu ffurfweddiadau apiau allanol sydd heb gael eu hychwanegu’n awtomatig."
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Yn gadael i ddefnyddiwr olygu graddau ac ychwanegu sylwadau yn SpeedGrader."
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: "Yn gadael i ddefnyddiwr olygu graddau yn y Llyfr Graddau. Yn gadael i ddefnyddiwr gael mynediad at Hanes y Llyfr Graddau. Yn gadael i ddefnyddiwr gael mynediad at y Llyfr Graddau Meistroli Dysgu (os yw wedi’i alluogi)."
@@ -1983,6 +1993,7 @@ cy:
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Yn gadael i ddefnyddiwr anfon neges at “Pawb yn [course name]” neu “Pawb yn [course group].”"
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Yn gadael i ddefnyddiwr anfon negeseuon at aelodau unigol o’r cwrs."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "Yn gadael i ddefnyddiwr rhannu cwis gyda Commons."
+  allows_user_to_share_course_items_directly_with_ot_b5a68ecc: "Yn gadael i ddefnyddiwr rannu eitemau cwrs yn uniongyrchol â defnyddwyr eraill. Yn gadael i ddefnyddiwr gopïo eitemau cwrs unigol i gwrs arall."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Yn gadael i ddefnyddiwr weld ID SIS cwrs."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "Yn gadael i ddefnyddiwr weld dolen i SpeedGrader o’r aseiniadau."
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
@@ -2075,6 +2086,7 @@ cy:
       Yn gadael i ddefnyddiwr weld y ddolen Trafodaethau yn y ddewislen Crwydro’r Cwrs.
       Yn gadael i ddefnyddiwr weld trafodaethau cwrs.
   allows_user_to_view_the_discussions_link_in_course_eb30f2d0: "Yn gadael i ddefnyddiwr weld y ddolen Trafodaethau yn y ddewislen Crwydro’r Cwrs. Yn gadael i ddefnyddiwr weld trafodaethau cwrs."
+  allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "Yn gadael i ddefnyddiwr weld y dudalen Cymedroli e-Bortffolio a rheoli cynnwys sbam yr e-Bortffolio."
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "Yn gadael i ddefnyddiwr weld dolen y Nodiadau Cyfadran yn y ddewislen Crwydro’r Safle Cyfan."
   allows_user_to_view_the_group_home_pages_of_all_st_47f48a3e: "Yn gadael i ddefnyddiwr weld tudalennau hafan grŵp pob grŵp myfyrwyr. Yn gadael i fyfyrwyr gael mynediad at grwpiau myfyrwyr eraill o fewn set grŵp gan ddefnyddio dolen uniongyrchol."
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
@@ -3097,6 +3109,7 @@ cy:
       labels: 
         assignments_summary: "Crynodeb o’r Cwrs"
         syllabus_body: "Disgrifiad o’r Maes Llafur"
+        syllabus_course_summary: "Dangos Crynodeb Cwrs"
       links: 
         edit_syllabus_description: Golygu
         jump_to_today: "Neidio i Heddiw"
@@ -3468,6 +3481,7 @@ cy:
   blueprint_courses_create_edit_associate_delete_bf41988e: "Cyrsiau Glasbrint (creu / golygu / cysylltu / dileu)"
   blueprint_courses_is_an_account_level_feature_opti_38676924: "Mae Cyrsiau Glasbrint yn opsiwn nodwedd ar lefel y cyfrif. Dim ond os ydyn nhw wedi cael eu hychwanegu at Gyrsiau Glasbrint fel athro, cynorthwyydd dysgu neu ddylunydd y gall rolau cwrs reoli Cyrsiau Glasbrint. I gael mynediad at far ochr y Cyrsiau Glasbrint, rhaid i’r adran Cyrsiau - ychwanegu / golygu / dileu cyrsiau fod wedi cael ei galluogi. I ychwanegu cwrs cysylltiedig, rhaid i’r adran Cyrsiau - gweld rhestr a’r adran Cyrsiau - ychwanegu / golygu / dileu fod wedi cael eu galluogi hefyd. I olygu gosodiadau cloi ar unrhyw fath o wrthrych glasbrint, rhaid i’r adran Cyrsiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi."
   blueprint_courses_is_an_account_level_feature_opti_390ed2e7: "Mae Cyrsiau Glasbrint yn opsiwn nodwedd ar lefel y cyfrif. I ychwanegu cyrsiau cysylltiedig, rhaid i’r adrannau Cyrsiau Glasbrint - ychwanegu / golygu / cysylltu / dileu a Cyrsiau - ychwanegu / golygu / dileu fod wedi cael eu galluogi hefyd."
+  blueprint_courses_is_an_account_level_feature_opti_3a0161d3: "Mae Cyrsiau Glasbrint yn opsiwn nodwedd ar lefel y cyfrif. Dydy rolau cwrs ddim ond yn gallu rheoli Cyrsiau Glasbrint os ydyn nhw wedi cael eu hychwanegu at Gwrs Glasbrint mewn rôl thro, cynorthwyydd dosbarth neu ddylunydd. I gael mynediad at far ochr y Cyrsiau Glasbrint, rhaid i’r adran Cyrsiau - ychwanegu / golygu / dileu cyrsiau fod wedi cael ei galluogi. I ychwanegu cwrs cysylltiedig, rhaid i’r adran Cyrsiau - gweld rhestr a’r adran Cyrsiau - ychwanegu / golygu / dileu fod wedi cael eu galluogi hefyd. I olygu gosodiadau cloi ar unrhyw fath o wrthrych glasbrint, rhaid i’r adran Cyrsiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi."
   blueprint_courses_is_an_account_level_feature_opti_3bf307d: "Mae Cyrsiau Glasbrint yn opsiwn nodwedd ar lefel y cyfrif. I olygu gosodiadau clo glasbrint ar y dudalen mynegai Trafodaethau, rhaid i’r adran Cyrsiau - ychwanegu / golygu / dileu a’r adran Trafodaethau - gweld fod wedi cael eu galluogi. Os nad yw’r hawl hon wedi cael ei galluogi, a bod yr adran Cyrsiau - ychwanegu / golygu / dileu a’r adran Trafodaethau - gweld wedi cael eu galluogi, mae modd golygu gosodiadau cloi glasbrint ar drafodaethau unigol."
   blueprint_courses_is_an_account_level_feature_opti_4c34e5d3: "Mae Cyrsiau Glasbrint yn opsiwn nodwedd ar lefel y cyfrif. Er mwyn golygu gosodiadau clo glasbrint o'r dudalen mynegai Aseiniadau, rhaid i'r adran Cyrsiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi. Os nad ydy'r hawl hwn wedi ei alluogi, a bod yr adran Cyrsiau - ychwanegu / golygu / dileu wedi cael ei alluogi, gellir rheoli gosodiadau clo glasbrint ar gyfer aseiniad o dudalen manylion yr aseiniad. I olygu gosodiadau clo glasbrint ar gwis unigol, neu ar y dudalen mynegai Cwisiau, rhaid i’r adran Cyrsiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd."
   blueprint_courses_is_an_account_level_feature_opti_4c9fa399: |-
@@ -3499,6 +3513,8 @@ cy:
       
       I olygu gosodiadau cloi glasbrint o dudalen mynegai’r Trafodaethau, rhaid i’r adran Thrafodaethau - safoni fod wedi cael ei galluogi.
   blueprint_courses_must_be_enabled_for_an_account_b_4a79dc67: "Rhaid i gyrsiau Glasbrint gael eu galluogi ar gyfer cyfrif gan weinyddwr. Dim ond os ydyn nhw wedi cael eu hychwanegu at Gyrsiau Glasbrint fel athro, cynorthwyydd dysgu neu ddylunydd y gall rolau cwrs reoli cynnwys Cyrsiau Glasbrint. Os ydy'r gosodiad hwn wedi'i analluogi, a bod yr adran Trafodaethau - gweld wedi'i galluogi, gall defnyddwyr addasu gosodiadau clo cynnwys ar drafodaethau unigol mewn cwrs meistr Glasbrint."
+  blueprint_courses_must_be_enabled_for_an_account_b_4ef094f4: "Rhaid i gyrsiau Glasbrint gael eu galluogi ar gyfer cyfrif gan weinyddwr. Dim ond os ydyn nhw wedi cael eu hychwanegu at Gyrsiau Glasbrint fel athro, cynorthwyydd dysgu neu ddylunydd y gall rolau cwrs reoli cynnwys Cyrsiau Glasbrint. Os ydy'r gosodiad hwn wedi'i analluogi, a bod yr adran Trafodaethau - gweld wedi'i galluogi, gall y defnyddiwr addasu gosodiadau clo cynnwys ar drafodaethau unigol mewn cwrs meistr Glasbrint."
+  blueprint_courses_must_be_enabled_for_an_account_b_5ab5b804: "Rhaid i gyrsiau Glasbrint gael eu galluogi ar gyfer cyfrif gan weinyddwr. Dim ond os ydyn nhw wedi cael eu hychwanegu at Gyrsiau Glasbrint fel athro, cynorthwyydd dysgu neu ddylunydd y gall rolau cwrs reoli cynnwys Cyrsiau Glasbrint. Os yw’r hawl hon wedi cael ei hanalluogi, mae modd i ddefnyddiwr addasu’r gosodiadau cloi cynnwys ar dudalennau unigol mewn cwrs meistr Glasbrint."
   blueprint_courses_must_be_enabled_for_an_account_b_79b2d93e: |-
       Rhaid i gyrsiau Glasbrint gael eu galluogi ar gyfer cyfrif gan weinyddwr.
       Dim ond os ydyn nhw wedi cael eu hychwanegu at Gyrsiau Glasbrint fel athro, cynorthwyydd dysgu neu ddylunydd y gall rolau Cwrs reoli cynnwys Cyrsiau Glasbrint.
@@ -3531,6 +3547,7 @@ cy:
     default_title: "Dim Teitl"
   bookmarking_for_enrollments_index_api_840be156: "Nod tudalen ar gyfer API Mynegai Ymrestriadau"
   bookmarks_5b5b81c9: "Nodau tudalen"
+  both_discussions_create_and_discussions_moderate_a_1c00baf0: "Mae Trafodaethau - creu a Trafodaethau - safoni yn gadael i'r defnyddiwr greu trafodaeth yn y dudalen Trafodaethau. Os yw’r hawl hwn wedi’i alluogi, does dim angen yr adran Trafodaethau - creu. Er mwyn gweld trafodaethau mewn cwrs, rhaid i’r adran Trafodaethau - gweld fod wedi’i galluogi. I ymateb i drafodaeth, rhaid i’r adran Trafodaethau - postio fod wedi cael ei galluogi hefyd. I olygu manylion aseiniad ar drafodaeth, rhaid i’r adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd."
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Mae Trafodaethau - creu a Trafodaethau - safoni yn gadael i ddefnyddiwr greu trafodaeth yn y dudalen Trafodaethau. Os yw’r hawl hwn wedi’i alluogi, does dim angen yr adran Trafodaethau - creu. Er mwyn gweld trafodaethau mewn cwrs, rhaid i’r adran Trafodaethau - gweld fod wedi’i galluogi. I ymateb i drafodaeth, rhaid i’r adran Trafodaethau - postio fod wedi cael ei galluogi hefyd. I olygu manylion aseiniad ar drafodaeth, rhaid i’r adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd."
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
       Mae Trafodaethau - creu a Trafodaethau - safoni yn gadael i ddefnyddiwr greu trafodaeth yn y dudalen Trafodaethau. Os yw’r hawl hwn wedi’i alluogi, does dim angen yr adran Trafodaethau - creu.
@@ -4162,6 +4179,9 @@ cy:
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Dydy Canvas ddim wedi’i ffurfweddu i gael manylion adnabod gan %{issuer}."
   canvas_login_failure_message_4c922f2f: "Neges methu mewngofnodi i Canvas"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Codau wrth gefn ar gyfer proses ddilysu sawl cam Canvas"
+  canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
+      Canvas now has two quiz engines. Dewiswch pa
+              yr hoffech chi ei ddefnyddio.
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_improved_description: "Mae’r gosodiad hwn yn rheoli a yw rhieni sy’n creu eu cyfrifon eu hunain ar gyfer Canvas Parent yn gallu cysylltu â myfyrwyr yn eich sefydliad drwy ddefnyddio ap symudol Canvas Parent. Nodyn: Mae rhieni sydd wedi cofrestru fel Arsyllwyr Canvas yn gallu defnyddio ap symudol Canvas Parent hyd yn oed pan fydd fflag y nodwedd hon wedi’i hanalluogi."
   canvas_revision_unknown: Dieithr
@@ -4219,6 +4239,7 @@ cy:
   change_sis_ids_3a47154d: "Newid IDs SIS"
   changed_by_person_c39615e: "Wedi newid gan: %{person}"
   changed_item_1d16a85f: "Eitem wedi’i Newid"
+  changes_the_sort_order_of_the_gradebook_export_to__41b286fd: "Yn newid trefn allgludo'r llyfr graddau fel ei fod yn cyfateb yn agosach â dogfennau canvas"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Bydd y newidiadau’n dal yn berthnasol os byddwch chi’n gadael y dudalen hon."
   changes_you_made_may_not_be_saved_4e8db973: "Mae’n bosib na fydd y newidiadau rydych wedi’u gwneud yn cael eu cadw."
   changing_course_dates_may_override_term_availabili_d92b10de: "Mae’n bosib y bydd newid dyddiadau cyrsiau yn diystyru gosodiadau ar gael tymor a safle yn y dudalen Cyrsiau a’r Dangosfwrdd. Cadarnhewch ddyddiadau’r tymor cyn addasu dyddiadau cwrs."
@@ -4245,6 +4266,7 @@ cy:
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "Dewiswch liw neu ffugenw cwrs, neu symudwch gerdyn cwrs ar gyfer %{course}"
   choose_a_course_home_page_8059c7b: "Dewiswch dudalen Hafan y Cwrs"
   choose_a_csv_file_to_upload_9644480c: "Dewiswch ffeil CSV i’w llwytho i fyny:"
+  choose_a_quiz_engine_8820d521: "Dewiswch Beiriant Cwisiau"
   choose_an_authentication_service_47dc8875: "Dewiswch wasanaeth dilysu"
   choose_and_publish_980812cb: "Dewis a Chyhoeddi"
   choose_assignment_b0132c5e: "-- Dewiswch aseiniad --"
@@ -4263,6 +4285,7 @@ cy:
   choose_the_next_mastery_path_b035b727: "Dewiswch y llwybr meistroli nesaf"
   choose_usage_rights_33683854: "Dewiswch hawliau defnyddio..."
   chosencolor_is_not_a_valid_color_5d542cc: "Dydy '%{chosenColor}' ddim yn lliw dilys."
+  classic_quizzes_dee3c7b7: "Classic Quizzes"
   clear_2084585f: Clirio
   clear_selected_file_82388e50: "Clirio'r ffeil dan sylw"
   clear_user_cache_ef079f7f: "Clirio Storfa Defnyddiwr"
@@ -5305,6 +5328,7 @@ cy:
     course_options: 
       course_options: 
         concluded: "Wedi dirwyn i ben"
+        favorite: "Hoff Gyrsiau"
         groups: Grwpiau
         more_courses: "Mwy o Gyrsiau"
     hide: Cuddio
@@ -6961,6 +6985,7 @@ cy:
     redirect_uris: "URI Ailgyfeirio:"
     save_key: "Cadw Allwedd"
     vendor_code: "Cod Gwerthwr (LTI 2):"
+  developer_key_include_parameter_support_58cbf874: "Allwedd Datblygwr yn Cynnwys Cymorth Paramedr"
   developer_key_is_an_external_tool_27c6166b: "Mae'r allwedd datblygwr yn adnodd allanol."
   developer_key_management_5a5866bd: "Rheoli Allweddi Datblygwyr"
   developer_key_management_and_scoping_97d928d5: "Sgôp a rheoli allweddi datblygwr"
@@ -7061,6 +7086,7 @@ cy:
   discussion_topic_a7bf935: "pwnc trafod"
   discussion_topic_dc85ad4c: "Pwnc Trafod"
   discussion_topic_menu_3d4684c6: "Dewislen Pwnc Trafod"
+  discussion_topic_performance_improvements_for_bibs_79a483ef: "Gwelliannau i berfformiad Pynciau Trafod ar gyfer Bibsys"
   discussion_topic_will_be_available_starting_at_46aa7477: "Bydd y Pwnc Trafod ar gael, gan ddechrau am"
   discussion_topic_will_be_available_until_f5e3abc8: "Bydd y Pwnc Trafod ar gael tan"
   discussion_topic_will_show_on_student_to_do_list_f_1c9e6286: "Bydd y Pwnc Trafod yn ymddangos ar restr tasgau myfyriwr ar gyfer y dyddiad hwnnw"
@@ -7252,6 +7278,7 @@ cy:
       manually_mark_as_read: "Marcio postiadau eich hun fel rhai sydd wedi’u darllen"
       my_settings: "Fy Ngosodiadau i"
   discussion_topics_b35ac745: "Pynciau Trafod"
+  discussion_topics_will_not_query_permissions_for_e_7570e632: "Ni fydd Pynciau Trafod yn ymholi hawliau ar gyfer pob is-drafodaeth"
   discussions: 
     are_your_sure_delete: "Ydych chi’n siŵr eich bod am ddileu’r cofnod hwn?"
     author_link: 
@@ -7691,6 +7718,7 @@ cy:
   enabled_links_be110215: "Dolenni wedi’u Galluogi"
   enabled_web_services_f620b2be: "Gwasanaethau Gwe wedi’u Galluogi"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Galluogi dangos adroddiadau llên-ladrata a sgorau tebygrwydd yn ardal gyflwyniadau'r Llyfr Graddau Newydd."
+  enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Yn galluogi pwyntiau gorffen API newydd ar gyfer y cwrs a data defnyddwyr wedi'i ddarparu gan Ddadansoddiadau Newydd."
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Galluogi trefnu yn ôl ID SIS, ID integreiddio ac ID mewngofnodi yn y Llyfr Graddio Newydd."
   encourage_class_participation_4e069479: "Annog i gymryd rhan fel dosbarth"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Sourcedid wedi’i Amgryptio ar gyfer Deilliannau Sylfaenol"
@@ -8298,6 +8326,7 @@ cy:
   fall_grading_period_final_score_56d96a8f: "Sgôr derfynol cyfnod graddio’r hydref"
   fall_grading_period_id_74ef68e: "Id cyfnod graddio’r hydref"
   favicon_6e658914: Favicon
+  favorite_courses_fbd356f0: "Hoff Gyrsiau"
   favorites_c7e0207c: Ffefrynnau
   feature_f5526584: Nodwedd
   feature_flags: 
@@ -8398,6 +8427,7 @@ cy:
   filename_is_hidden_available_with_a_link_click_to__3e328e8f: "%{fileName} wedi cuddio. Ar gael gyda dolen - Cliciwch i addasu"
   filename_is_locked_click_to_modify_bf711763: "%{fileName}  wedi Cloi - Cliciwch i addasu"
   filename_is_not_visible_in_student_files_click_to__aa2a0651: "Dydy %{fileName} ddim yn ymddangos mewn ffeiliau myfyrwyr – Cliciwch i addasu hyn"
+  filename_is_only_available_to_students_with_the_li_97190506: "Dydy %{fileName} ddim ond ar gael i fyfyrwyr sydd â'r ddolen - Clicio i addasu"
   filename_is_published_click_to_modify_38a4a269: "%{fileName} wedi Cyhoeddi - Cliciwch i addasu"
   filename_is_restricted_9aaf9250: "%{fileName} yn %{restricted}"
   filename_is_restricted_click_to_modify_c0bb77f8: "%{fileName} %{restricted} - Cliciwch i addasu"
@@ -8533,9 +8563,14 @@ cy:
   for_an_instant_answer_see_if_your_issue_is_address_48280e89: "I gael ateb ar unwaith, darllenwch *Ganllawiau Canvas* i weld a ydyn nhw’n rhoi sylw i’r mater hwnnw."
   for_best_results_crop_image_to_262px_wide_by_146px_af81a540: "I gael y canlyniadau gorau, mae angen i chi leihau’r ddelwedd i 262px o led a 146px o uchder. Mae ffeiliau JPG, PNG neu GIF yn cael eu derbyn"
   for_course_level_users_deleting_a_course_is_part_o_932f7a98: "Ar gyfer defnyddwyr lefel y cwrs, mae dileu cwrs yn rhan o’r adran Cyflwr y Cwrs - rheoli hawliau. Ond, ar gyfer defnyddwyr lefel y cyfrif, mae dileu cwrs yn gofyn cael yr hawl hon a’r Cwrs - ychwanegu / golygu / dileu. "
+  for_course_level_users_deleting_a_course_is_part_o_d134dea2: "Ar gyfer defnyddwyr lefel y cwrs, mae dileu cwrs yn rhan o’r adran Cyflwr y Cwrs - rheoli hawliau. Ond, ar gyfer defnyddiwr lefel y cyfrif, mae angen cael yr hawl hwn a Cwrs - ychwanegu / golygu / dileu er mwyn dileu cwrs. "
   for_each_late_62aecf41: "Ar gyfer pob un sy’n hwyr"
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Ar gyfer aseiniadau sy’n cael eu postio gennych chi’ch hun, os bydd sylwadau ar y cyflwyniad gan rywun heblaw defnyddiwr y cyflwyniad, bydd hyn yn caniatáu postio’r aseiniad. Cyn hynny, byddai’n rhaid cael gradd cyn bod modd postio."
   for_name_d5684bfd: "Ar gyfer %{name}"
+  for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
+      Ar hyn o bryd, os ydych chi angen diogelwch o
+              adnoddau trydydd parti, Speedgrader, neu CSVs ar gyfer dadansoddi atebion myfyrwyr,
+              mae hwn yn ddewis gwell.
   for_title_69d92b3a: "ar gyfer %{title}"
   forgot_password_f0c3fbac: "Wedi anghofio cyfrinair?"
   forgot_password_url_3f9c04b: "URL Wedi anghofio’r cyfrinair"
@@ -8818,6 +8853,7 @@ cy:
   gradebook_csvs: 
     grades_filename: Graddau
   gradebook_export_failed_reason_2b0f6c53: "Wedi methu allgludo llyfr graddau: %{reason}"
+  gradebook_export_sort_order_bugfix_tally_219_62bfaacb: "Trwsio Trefn Allgludo'r Llyfr Graddau (Tally-219)"
   gradebook_export_started_723461b9: "Wedi dechrau’r broses o allgludo llyfr graddau"
   gradebook_history_a3e8e0b4: "Hanes Llyfr Graddau"
   gradebook_history_b03f8524: "Hanes Llyfr Graddau..."
@@ -9736,6 +9772,7 @@ cy:
       
               Os yw’r gallu i weld cwrs wedi’i gyfyngu i ddefnyddwyr sydd wedi ymrestru ar y cwrs, mae’r hawl hon yn
               gadael i ddefnyddiwr weld cynnwys cwrs heb orfod bod wedi ymrestru ar y cwrs.
+  if_disabled_user_will_still_have_access_to_course__d78fddc4: "Os yw wedi’i analluogi, bydd defnyddwyr yn dal i gael mynediad at Osodiadau’r Cwrs. Does dim modd i ddefnyddiwr reoli cynnwys cyrsiau unigol heb yr hawl priodol ar gyfer yr eitem cynnwys honnw. Os yw'r opsiwn i weld cwrs wedi'i gyfyngu i ddefnyddwyr sydd wedi ymrestru ar y cwrs, mae'r hawl hwn yn gadael i'r ddefnyddiwr weld cynnwys y cwrs heb orfod bod wedi ymrestru ar y cwrs."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Os yw wedi’i alluogi, bydd mynediad at LTI 1.3 ac LTI Advantage wedi’i alluogi."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Os yw’r nodwedd hon wedi’i galluogi, bydd yn bosib rhoi mwy na’r sgôr uchaf posib ar gyfer Deilliant mewn cyfarwyddyd sgorio."
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Os yw’r nodwedd hon wedi’i galluogi, bydd mewngludwyr Common Cartridge yn gallu trosi ffeiliau HTML yn Dudalennau"
@@ -9754,6 +9791,7 @@ cy:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Os nad oes dim byd wedi’i ddewis, anfon at bawb yn yr isgyfrif cyfan)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Os nad oes dim byd wedi’i ddewis, dangos i bawb yn yr is-gyfrif cyfan)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Os nad oes dim byd wedi’i ddewis, dangos i bawb yn y cyfrif cyfan)"
+  if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Os yw'r adrannau Ystadegau - gweld neu Defnyddwyr - rheoli manylion mewngofnodi wedi'u galluogi, bydd y defnyddiwr yn gallu creu gweithgarwch mewngofnodi/allgofnodi yn Adnoddau Gweinyddol. I guddio'r opsiwn gweithgarwch mewngofnodi/allgofnodi yn yr Adnoddau Gweinyddol, mae angen i’r ddwy hawl hyn fod wedi cael eu hanalluogi."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Os yw'r adrannau Ystadegau - gweld neu Defnyddwyr - rheoli manylion mewngofnodi wedi'u galluogi, bydd defnyddiwr yn gallu creu gweithgarwch mewngofnodi/allgofnodi yn Adnoddau Gweinyddol. I guddio'r opsiwn gweithgarwch mewngofnodi/allgofnodi yn yr Adnoddau Gweinyddol, mae angen i’r ddwy hawl hyn fod wedi cael eu hanalluogi."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Os yw’r adran Ystadegau - gweld neu’r adran Defnyddwyr - rheoli manylion mewngofnodi wedi eu galluogi, bydd defnyddiwr yn gallu creu gweithgarwch mewngofnodi/allgofnodi yn yr Adnoddau Gweinyddol. I guddio'r opsiwn gweithgarwch mewngofnodi/allgofnodi yn yr Adnoddau Gweinyddol, mae angen i’r ddwy hawl hyn fod wedi cael eu hanalluogi."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Os yw’r gosodiad cyfrif Cofrestru Agored wedi’i alluogi, bydd defnyddwyr sydd â'r hawl hon yn gallu ychwanegu myfyrwyr neu arsyllwyr at gwrs gan ddefnyddio cyfeiriad e-bost neu ID mewngofnodi, hyd yn oed os nad oes gan y myfyriwr neu arsyllwr gyfrif Canvas yn barod."
@@ -9764,6 +9802,8 @@ cy:
       Cyfrif.
   if_this_permission_is_disabled_at_the_account_leve_39648abb: "Os yw’r hawl hon wedi’i hanalluogi, ar lefel y cyfrif, does dim modd i ddefnyddwyr weld unrhyw grwpiau cyfrif sy’n bodoli’n barod. Ar lefel y cwrs, mae modd i ddefnyddwyr weld, ond ddim i gael mynediad at, unrhyw grwpiau sy’n bodoli’n barod, gan gynnwys grwpiau sydd wedi cael eu creu gan fyfyrwyr. I weld grwpiau, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd. I ychwanegu grwpiau ar lefel y cyfrif gan ddefnyddio CSV, rhaid i’r adran Data SIS - mewngludo fod wedi cael ei galluogi hefyd."
   if_this_permission_is_disabled_at_the_account_leve_6a82182d: "Os yw’r hawl hon wedi’i hanalluogi, ar lefel y cyfrif, does dim modd i ddefnyddwyr weld unrhyw grwpiau cyfrif sy’n bodoli’n barod. Ar lefel y cwrs, mae modd i ddefnyddwyr weld, ond ddim i gael mynediad at, unrhyw grwpiau sy’n bodoli’n barod, gan gynnwys grwpiau sydd wedi cael eu creu gan fyfyrwyr. Er mwyn gweld grwpiau, rhaid i’r adran Defnyddwyr - gweld fod wedi cael ei galluogi hefyd. I ychwanegu grwpiau ar lefel y cyfrif gan ddefnyddio CSV, rhaid i’r adran Data SIS - mewngludo fod wedi cael ei galluogi hefyd."
+  if_this_permission_is_disabled_at_the_account_leve_b5f6dfa4: "Os ydy'r hawl hwn wedi'i analluogi, ar lefel y cyfrif, does dim modd i'r defnyddiwr weld unrhyw grwpiau cyfrifon sy'n bodoli'n barod. Ar lefel y cyfrif, mae modd i'r defnyddiwr weld, ond nid gael mynediad at, unrhyw grwpiau sy'n bodoli'n barod, gan gynnwys grwpiau wedi'u creu gan fyfyrwyr. Er mwyn gweld grwpiau, rhaid i’r adran Defnyddwyr - gweld fod wedi cael ei galluogi hefyd. I ychwanegu grwpiau ar lefel y cyfrif gan ddefnyddio CSV, rhaid i’r adran Data SIS - mewngludo fod wedi cael ei galluogi hefyd."
+  if_this_permission_is_disabled_the_user_can_only_v_75dbf069: "Os ydy'r hawl hwn wedi'i analluogi, dim ond gweld grwpiau sy'n bodoli'n barod y mae modd i'r defnyddiwr wneud, gan gynnwys grwpiau wedi'u creu gan fyfyrwyr."
   if_this_permission_is_disabled_users_can_only_view_b68143d5: "Os yw’r hawl hwn wedi’i analluogi, dim ond grwpiau sy’n bodoli’n barod fydd ar gael i ddefnyddwyr eu gweld, gan gynnwys grwpiau sydd wedi cael eu creu gan fyfyrwyr."
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "Os yw’r hawl hon wedi’i hanalluogi, bydd defnyddwyr yn dal i allu creu neu ychwanegu cyfarwyddiadau sgorio at aseiniadau os yw’r adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu wedi cael ei galluogi."
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: "Os yw’r hawl hon wedi’i hanalluogi, bydd defnyddwyr yn dal i allu gosod apiau sydd wedi’u cymeradwyo gan ddefnyddio’r Canvas App Center (os yw wedi cael ei alluogi ar gyfer eich sefydliad). Yn ogystal, os yw’r hawl hon wedi’i hanalluogi, ni fydd modd i ddefnyddwyr ddileu apiau allanol sydd heb gael eu hychwanegu’n awtomatig."
@@ -9774,6 +9814,7 @@ cy:
       I ychwanegu defnyddwyr at gyrsiau gan ddefnyddio ID SIS, rhaid i’r adran Defnyddwyr - ychwanegu / tynnu defnyddwyr o gyrsiau a/neu’r adran Defnyddwyr - ychwanegu / tynnu athrawon, dylunwyr cyrsiau, neu gynorthwywyr dysgu o gyrsiau fod wedi cael eu galluogi hefyd.
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Os yw’r adran Defnyddwyr - rheoli manylion mewngofnodi neu’r adran Ystadegau - gweld wedi cael eu galluogi, bydd defnyddiwr yn gallu creu gweithgarwch mewngofnodi/allgofnodi yn yr Adnoddau Gweinyddol. I guddio'r opsiwn gweithgarwch mewngofnodi/allgofnodi yn yr Adnoddau Gweinyddol, mae angen i’r ddwy hawl hyn fod wedi cael eu hanalluogi."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Os yw'r adrannau Defnyddwyr - rheoli manylion mewngofnodi neu Ystadegau - gweld wedi'u galluogi, bydd defnyddiwr yn gallu creu gweithgarwch mewngofnodi/allgofnodi yn Adnoddau Gweinyddol. I guddio'r opsiwn gweithgarwch mewngofnodi/allgofnodi yn yr Adnoddau Gweinyddol, mae angen i’r ddwy hawl hyn fod wedi cael eu hanalluogi."
+  if_users_manage_login_details_or_statistics_view_i_cff4155d: "Os yw'r adrannau Defnyddwyr - rheoli manylion mewngofnodi neu Ystadegau - gweld wedi'u galluogi, bydd y defnyddiwr yn gallu creu gweithgarwch mewngofnodi/allgofnodi yn Adnoddau Gweinyddol. I guddio'r opsiwn gweithgarwch mewngofnodi/allgofnodi yn yr Adnoddau Gweinyddol, mae angen i’r ddwy hawl hyn fod wedi cael eu hanalluogi."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Os byddwch chi’n newid y pwyntiau sy’n bosib ar gyfer aseiniad, bydd yn rhaid i chi ailraddio’r aseiniad."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "Os byddwch chi’n newid y pwyntiau sy’n bosib ar gyfer aseiniad, bydd yn rhaid i chi ailraddio unrhyw gyflwyniadau."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Os na fyddwch chi’n dewis hawliau defnyddio yn awr, bydd y ffeil hon yn cael ei dad-gyhoeddi ar ôl iddi gael ei llwytho i fyny."
@@ -10296,6 +10337,7 @@ cy:
       log_in_to_canvas: "Mewngofnodi i Canvas"
   learn_more_7a8d626: "Dysgu mwy"
   learn_more_about_collaborations_2978f66d: "Dysgu mwy am gydweithrediadau"
+  learn_more_about_the_differences_a1217479: "Dysgwch fwy am y gwahaniaethau."
   learning_analytics_beta_view_46deb4c8: "Dadansoddiadau Dysgu (Beta) - gweld"
   learning_mastery_5fc34276: "Meistroli Dysgu"
   learning_mastery_6ed4fd63: "Meistroli Dysgu..."
@@ -10720,6 +10762,7 @@ cy:
   make_key_developername_visible_97c404bf: "Dangos allwedd %{developerName}"
   make_key_invisible_e66af89: "Gwneud allwedd yn gudd"
   make_key_visible_5c03fa34: "Gwneud allwedd yn weladwy"
+  make_the_course_summary_list_of_assignments_and_ev_f739be33: "Gwneud y Crynodeb Cwrs (rhestr o aseiniadau a digwyddiadau) yn opsiynol yn y maes llafur"
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Yn gwneud i opsiwn dolen Darllenydd Ymdrwythol Microsoft ymddangos ar dudalennau wici."
   making_a_copy_of_original_assignment_name_8f029a9b: "Gwneud copi o \"%{original_assignment_name}\""
   making_a_copy_of_originalassignmentname_b7268992: "Gwneud copi o \"%{originalAssignmentName}\""
@@ -10757,6 +10800,7 @@ cy:
   manage_update_23de23a1: "Rheoli Diweddaru"
   manage_update_for_toolname_f8e3b2fb: "Rheoli diweddaru ar gyfer %{toolName}"
   manage_usage_rights_c5a8c216: "Rheoli Hawliau Defnyddio"
+  manage_user_settings_827ab12d: "Rheoli Gosodiadau Defnyddiwr"
   manage_your_course_details_664c335f: "Rheoli manylion eich cwrs"
   manual_8c2665de: Llawlyfr
   manual_configuration_b586fe54: "Ffurfweddu eich Hun"
@@ -12896,6 +12940,7 @@ cy:
   netherlands_31_63e4f1b9: "Yr Iseldiroedd (+31)"
   never_df100b49: Byth
   new_account_role_6e5c4964: "Rôl Cyfrif Newydd"
+  new_analytics_api_access_7eec1ead: "Mynediad Dadansoddiadau API Newydd"
   new_announcement_23af4598: "Cyhoeddiad Newydd"
   new_announcement_title_30ba7c1b: "Cyhoeddiad newydd: %{title}"
   new_announcement_title_course_da7c0ca6: "%{title} cyhoeddiad newydd, %{course}"
@@ -12935,6 +12980,7 @@ cy:
   new_question_9107c469: "Cwestiwn Newydd"
   new_question_group_d9306280: "Grŵp Cwestiynau Newydd"
   new_quiz_34aacba6: "Cwis Newydd"
+  new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_importing_c167dce0: "Mewngludo New Quizzes"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes ar y dudalen Gwisiau"
   new_quizzes_submission_history_d81b477b: "Hanes cyflwyno New Quizzes"
@@ -13273,6 +13319,7 @@ cy:
       group_assignment_submitted_late: "Aseiniad Grŵp wedi’i gyflwyno’n hwyr"
       group_membership_accepted: "Aelodaeth Grŵp wedi'i derbyn"
       group_membership_rejected: "Aelodaeth Grŵp wedi'i gwrthod"
+      manually_created_access_token_created: "Tocyn Mynediad wedi'i Greu eich Hun"
       merge_email_communication_channel: "Cyfuno Sianel Gyfathrebu E-bost"
       migration_import_failed: "Wedi methu mewngludo’r ffeiliau mudo"
       migration_import_finished: "Wedi gorffen mewngludo’r ffeiliau mudo"
@@ -13517,6 +13564,7 @@ cy:
   only_account_administrators_can_change_this_settin_149f8fe3: "Dim ond gweinyddwyr cyfrif all newid y gosodiad hwn."
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: "Ychwanegu dim ond postiadau sy’n cynnwys geiriau penodol yn y teitl"
   only_after_their_last_attempt_3593d101: "Dim ond Ar ôl eu Hymgais Ddiwethaf"
+  only_available_to_students_with_link_107e2468: "Dim ond ar gael i fyfyrwyr sydd â dolen"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Dim ond ar gael i fyfyrwyr sydd â dolen. Ddim yn ymddangos mewn ffeiliau myfyrwyr."
   only_course_announcements_and_discussions_can_be_s_924d4386: "Dim ond cyhoeddiadau a thrafodaethau cwrs all fod yn benodol i adrannau"
   only_once_after_each_attempt_cc842738: "Dim ond Unwaith ar ôl pob Ymgais"
@@ -13600,6 +13648,7 @@ cy:
   out_of_points_possible_8ab14f7: "allan o %{points_possible}"
   out_of_pointspossible_3fb5ee20: "Allan o %{pointsPossible}"
   out_of_pointspossible_c163105a: "allan o %{pointsPossible}"
+  outcome_alignment_to_non_scoring_content_3efa45fb: "Cysoni deilliannau cynnwys sydd ddim yn cadw sgôr"
   outcome_da397d20: Deilliant
   outcome_export_89229eb4: "Allgludo Deilliant"
   outcome_group_39fae76f: "Grŵp Deilliannau"
@@ -13915,6 +13964,7 @@ cy:
     provision_catalog: "Darparu catalog"
   permissions_365c49e: Hawliau
   permissions_manage_9eea4f8f: "Hawliau - rheoli"
+  permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Caniatáu defnyddio pob paramedr \"cynnwys\" ar gyfer yr allwedd datblygwr hon. Gall paramedrau \"cynnwys\" ganiatáu mynediad at ddata ychwanegol sydd ddim wedi'i gynnwys yn y cwmpasau a ddewiswyd isod."
   persian_a8cadb95: Persieg
   personal_pronouns_7d271f52: "Rhagenwau Personol"
   peru_51_d3d38d1f: "Periw (+51)"
@@ -14821,6 +14871,7 @@ cy:
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Rhowch wybodaeth diwtorial ar gyfer defnyddwyr newydd mewn basged naid."
   provider_attribute_b1cad655: "Priodoledd Darparwr"
   provider_icon_5064fa6e: "Eicon Darparwr"
+  provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: "Rhoi fflag ar yr Allwedd Datblygwr i gefnogi Cynnwys Paramedrau ar geisiadau API"
   provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Yn rhoi opsiwn Dangosfwrdd Rhestr Tasgau i’w Gwneud i ddefnyddwyr."
   provision_a_catalog_account_8cea67f6: "Darparu Cyfrif Catalog"
   provision_a_quiz_next_service_c7c6bd87: "Darparu Gwasanaeth Quiz.Next"
@@ -17242,6 +17293,7 @@ cy:
   send_message_to_name_c8ac05fc: "Anfon neges at %{name}"
   send_notification_81773687: "Anfon hysbysiad"
   send_notification_directly_to_users_when_announcem_c3aac61c: "Anfon hysbysiad yn syth at ddefnyddwyr pan mae cyhoeddiad yn dechrau"
+  send_notifications_when_manually_created_access_to_a1631123: "Anfon hysbysiadau pan mae tocynnau mynediad yn cael eu creu"
   send_only_to_the_following_types_of_users_d8465c11: "Anfon at y mathau canlynol o ddefnyddwyr yn unig:"
   send_page_to_another_user_6ef5a7c1: "Anfon tudalen at ddefnyddiwr arall"
   send_quiz_to_user_e8c47177: "Anfon Cwis at Ddefnyddiwr"
@@ -18651,6 +18703,7 @@ cy:
   switch_to_group_group_name_786b913b: "Newid i grŵp %{group_name}"
   switzerland_41_f861e414: "Y Swistir (+41)"
   syllabus: "Maes Llafur y Cwrs"
+  syllabus_course_summary_option_951a8144: "Opsiwn Crynodeb Maes Llafur Cwrs"
   syllabus_f191f65b: "Maes Llafur"
   syllabus_tutorial_tray_97e8ef82: "Ardal Tiwtorial Maes Llafur"
   syllabus_visibility_options_a81ef419: "Opsiynau Gweld Maes Llafur"
@@ -18843,6 +18896,7 @@ cy:
                      awtomatig ac nid ydynt yn cyfri tuag at eich uchafswm parthau o 50.
   the_course_link_validator_searches_course_content__563fa215: "Mae dilysydd dolen cwrs yn chwilio drwy gynnwys y cwrs am ddolenni a delweddau annilys neu nad oes modd eu cyrraedd."
   the_course_link_validator_searches_through_course__76f0bc63: "Mae dilysydd dolen cwrs yn chwilio drwy gynnwys y cwrs ac yn dychwelyd pob dolen annilys neu sydd ddim yn ymateb y daw ar ei thraws. Cofiwch nad ydy rhai dolenni sydd wedi'u fflagio fel rhai sydd ddim yn ymateb ar gael ar ein gweinyddion ni ac y byddant yn dal i weithio i fyfyrwyr."
+  the_course_state_manage_permission_allows_the_user_1d9da094: "Cyflwr y Cwrs - mae rheoli hawliau yn gadael i'r defnyddiwr gyhoeddi cyrsiau sydd ddim yn cynnwys modiwlau. I gyhoeddi a dad-gyhoeddi cynnwys modiwl, rhaid i'r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi."
   the_course_state_manage_permission_allows_users_to_67e16652: "Mae’r adran Cyflwr y Cwrs -  rheoli hawliau yn gadael i ddefnyddwyr gyhoeddi cyrsiau sydd ddim yn cynnwys modiwlau. I gyhoeddi/dad-gyhoeddi cynnwys modiwl, rhaid i’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu  fod wedi cael ei galluogi."
   the_course_state_manage_permission_allows_users_to_a4fe62af: "Mae’r adran Cyflwr y Cwrs -  rheoli hawliau yn gadael i ddefnyddwyr gyhoeddi cyrsiau sydd ddim yn cynnwys modiwlau. I gyhoeddi a dad-gyhoeddi cynnwys modiwl, rhaid i'r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi."
   the_course_status_buttons_unpublished_and_publishe_e2dca595: "Dydy’r botymau Statws y Cwrs (heb ei gyhoeddi ac wedi’i gyhoeddi) ddim ond yn ymddangos nes bod cyflwyniad myfyriwr wedi cael ei dderbyn. Does dim modd i gyrsiau gyda chyflwyniadau myfyrwyr gael eu dad-gyhoeddi."
@@ -19105,6 +19159,10 @@ cy:
   this_grade_has_negative_points_496400d4: "Mae’r radd hon yn cynnwys pwyntiau negatif"
   this_grade_is_invalid_8ab192c7: "Mae’r radd hon yn annilys"
   this_grade_is_unusually_high_60533c20: "Mae’r radd hon yn anarferol o uchel"
+  this_has_more_question_types_like_hotspot_categori_620e9df6: |-
+      Mae gan hwn fwy o fathau o gwestiynau fel poethfannau,
+              categoreiddio, cyfateb, a threfnu. Mae ganddo hefyd
+              ragor o nodweddion safoni a chymhwyso.
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Mae’r ddelwedd hon yn ymddangos fel marc dŵr yn y cefndir ar eich tudalen. Dyma’r fformatau sy’n cael eu derbyn: png, svg, gif, jpeg"
   this_is_a_blueprint_course_5e7b47fe: "Mae’r cwrs hwn yn un glasbrint"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Mae hon yn rhestr wedi’i gwahanu gydag atalnodau o URLs dibynadwy. Wrth ymddiried mewn unrhyw URL yn y rhestr hon, bydd y tocyn CSRF yn cael ei anwybyddu wrth fewngofnodi i Canvas."
@@ -19150,6 +19208,7 @@ cy:
       Dydy’r hawl hon ddim yn effeithio ar y gallu i reoli banciau cwestiynau lefel y cwrs yn yr adran Cwisiau. Yn hytrach, mae Rheoli Banciau Cwestiynau yn ddibynnol ar hawl yr adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu.
       I reoli banciau cwestiynau cwrs yn llawn, rhai i’r hawl hon a’r adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu fod wedi cael eu galluogi.
   this_permission_does_not_affect_ability_to_manage__6e6a37b8: "Dydy’r hawl hon ddim yn effeithio ar y gallu i reoli banciau cwestiynau lefel y cwrs yn yr adran Cwisiau. Yn hytrach, mae Rheoli Banciau Cwestiynau yn ddibynnol ar hawl yr adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu. I reoli banciau cwestiynau cwrs yn llawn, rhai i’r hawl hon a’r adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu fod wedi cael eu galluogi."
+  this_permission_does_not_affect_the_ability_to_man_f6aa3f8a: "Dydy'r hawl hwn ddim yn effeithio ar y gallu i reoli banciau cwestiynau lefel y cwrs yn Quizzes. Yn hytrach, mae Rheoli Banciau Cwestiynau yn ddibynnol ar hawl yr adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu. I reoli banciau cwestiynau cwrs yn llawn, rhai i’r hawl hon a’r adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu fod wedi cael eu galluogi."
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "Mae’r hawl hon ar gael i bob cyfrif Canvas ond nid yw ond yn cael ei defnyddio gan sefydliadau sy’n gysylltiedig â chyfrif Catalog Canvas. Does gan yr hawl ddim effeithiau pen blaen ar hyn o bryd, ond mae’r adran peirianneg yn awgrymu y dylai’r hawl aros ar waith ar gyfer gweinyddwyr. Ar gyfer rolau eraill mae modd analluogi’r hawl."
   this_permission_only_affects_course_announcements__6bc2b0a5: "Dim ond ar gyhoeddiadau cwrs y mae’r hawl hon yn effeithio, i reoli cyhoeddiadau cyffredinol, rhaid i’r adran Cyhoeddiadau Cyffredinol - ychwanegu / golygu / dileu fod wedi cael ei galluogi."
   this_permission_only_controls_adding_users_at_the__5a2463b1: "Dim ond rheoli ychwanegu defnyddwyr at lefel y cwrs y mae’r hawl hon. I ychwanegu defnyddwyr at gwrs, rhaid i'r adrannau Defnyddwyr - ychwanegu/tynnu myfyrwyr o gwrs neu Defnyddwyr - ychwanegu/tynnu, athrawon, dylunwyr cyrsiau neu gynorthwywyr dysgu o gyrsiau at y cwrs fod wedi cael eu galluogi."
@@ -19478,6 +19537,7 @@ cy:
   to_activate_this_communication_channel_enter_the_f_f465efc5: "I roi'r sianel gyfathrebu hon ar waith, rhowch y cod cadarnhau 4 nod a anfonwyd i %{sms_number}."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "I ychwanegu cyhoeddiadau, rhaid i’r adran Trafodaethau - safoni fod wedi cael ei galluogi hefyd. I weld cyhoeddiadau diweddar ar y dudalen hafan, rhaid i’r blwch Dangos cyhoeddiadau diweddar ar dudalen hafan y Cwrs fod wedi cael ei ddewis yng Ngosodiadau’r Cwrs."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "I ychwanegu, golygu, neu ddileu grwpiau, rhaid i’r adran Grwpiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi."
+  to_add_students_to_a_moderation_set_grades_view_al_40f2b8eb: "Er mwyn ychwanegu myfyrwyr at set safoni, rhaid i’r adran Graddau - gweld pob gradd fod wedi cael ei galluogi hefyd."
   to_add_users_to_a_course_users_add_remove_students_1c4d63d7: "I ychwanegu defnyddwyr i gwrs, rhaid adrannau Defnyddwyr - ychwanegu/tynnu myfyrwyr o gyrsiau a neu Defnyddwyr - ychwanegu/tynnu, athrawon, dylunwyr cyrsiau neu gynorthwywyr dysgu o gwrs fod wedi cael eu galluogi. Er mwyn golygu adran myfyriwr, rhaid i'r adran Sgyrsiau - anfon negeseuon at aelod unigol o gwrs a Defnyddwyr - ychwanegu/tynnu myfyrwyr o gyrsiau fod wedi cael eu galluogi hefyd. Er mwyn golygu adran athro, dylunydd cyrsiau neu gynorthwyydd dosbarth, rhaid i'r adrannau Sgyrsiau - anfon negeseuon at aelod unigol o gwrs a Defnyddwyr - ychwanegu/tynnu athrawon, dylunwyr cyrsiau neu gynorthwywyr dysgu o gwrs fod wedi cael eu galluogi."
   to_add_users_to_a_course_users_add_remove_students_5036ad25: |-
       I ychwanegu defnyddwyr at gwrs, rhaid i’r adran Defnyddwyr - ychwanegu / tynnu myfyrwyr o gyrsiau ar gyfer y cwrs a/neu’r adran  Defnyddwyr - ychwanegu / tynnu athrawon, dylunwyr cyrsiau, neu gynorthwywyr dysgu o gyrsiau
@@ -19500,6 +19560,7 @@ cy:
       I ddirwyn cynhadledd hir i ben, rhaid i’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi.
       Os yw’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu wedi cael ei galluogi a bod yr adran Gwe-gynadleddau - creu wedi cael ei hanalluogi, bydd defnyddwyr yn dal i allu rheoli cynadleddau.
       Mae’r hawl hon yn rheoli gallu defnyddiwr i greu cynadleddau mewn cyrsiau a grwpiau.
+  to_allow_full_management_of_conferences_created_by_bece5de: "Er mwyn caniatáu rheolaeth lawn o gynadleddau a grëwyd gan ddefnyddwyr eraill, rhaid i'r adran Cynnwys Cwrs - hawl fod wedi cael ei galluogi hefyd. Er mwyn dirwyn cynhadledd hir i ben, rhaid i'r adran Cynnwys Cwrs - hawl fod wedi cael ei galluogi. Os ydy'r adran Cynnwys Cwrs - hawl wedi'i alluogi a'r adran Cynadleddau Gwe - creu wedi'i hanalluogi, gall y defnyddiwr reoli cynadleddau o hyd. Mae'r hawl hwn yn rheoli gallu'r defnyddiwr i greu cynadleddau mewn cyrsiau a grwpiau."
   to_allow_full_management_of_conferences_created_by_eae032e7: "Er mwyn caniatáu rheolaeth lawn o gynadleddau a grëwyd gan ddefnyddwyr eraill, rhaid i'r adran Cynnwys Cwrs - hawl fod wedi cael ei galluogi hefyd. Er mwyn dirwyn cynhadledd hir i ben, rhaid i'r adran Cynnwys Cwrs - hawl fod wedi cael ei galluogi. Os ydy'r adran Cynnwys Cwrs - hawl wedi'i alluogi a'r adran Cynadleddau Gwe - creu wedi'i hanalluogi, gall defnyddwyr reoli cynadleddau o hyd. Mae’r hawl hon yn rheoli gallu defnyddiwr i greu cynadleddau mewn cyrsiau a grwpiau."
   to_allow_full_management_of_conferences_created_by_feec1984: |-
       I ganiatáu rheolaeth lawn o gynhadledd sydd wedi cael ei chreu gan y defnyddiwr neu gan rywun arall, rhaid i’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd.
@@ -19511,9 +19572,11 @@ cy:
       I ganiatáu swyddogaeth gweld, golygu, a dileu cydweithrediadau sydd wedi cael eu creu gan ddefnyddwyr eraill, rhaid i’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd.
       Os yw’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu wedi cael ei galluogi a bod yr adran Cydweithrediadau Myfyrwyr - creu wedi cael ei hanalluogi, ni fydd modd i ddefnyddwyr greu cydweithrediadau newydd ond bydd modd gweld, golygu, a dileu’r holl gydweithrediadau.
       I ychwanegu myfyrwyr at gydweithrediad, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd. I ychwanegu grŵp cwrs at gydweithrediad, rhaid i’r adran Grwpiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd.
+  to_allow_view_edit_and_delete_functionality_of_col_47c4821d: "I ganiatáu swyddogaeth gweld, golygu, a dileu cydweithrediadau sydd wedi cael eu creu gan ddefnyddwyr eraill, rhaid i’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd. Os ydy'r adran Cynnwys Cwrs - ychwanegu / golygu / dileu wedi'i galluogi ar adran Cydweithrediadau Myfyrwyr - creu wedi'i hanalluogi, ni fydd y defnyddiwr yn gallu creu cydweithrediadau newydd ond bydd yn gallu gweld , golygu a dileu bod cydweithrediad. I ychwanegu myfyrwyr at gydweithrediad, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd. I ychwanegu grŵp cwrs at gydweithrediad, rhaid i’r adran Grwpiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd."
   to_allow_view_edit_and_delete_functionality_of_col_84a2cd3a: "I ganiatáu swyddogaeth gweld, golygu, a dileu cydweithrediadau sydd wedi cael eu creu gan ddefnyddwyr eraill, rhaid i’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd. Os yw’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu wedi cael ei galluogi a bod yr adran Cydweithrediadau Myfyrwyr - creu wedi cael ei hanalluogi, ni fydd modd i ddefnyddwyr greu cydweithrediadau newydd ond bydd modd gweld, golygu, a dileu’r holl gydweithrediadau. I ychwanegu myfyrwyr at gydweithrediad, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd. I ychwanegu grŵp cwrs at gydweithrediad, rhaid i’r adran Grwpiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd."
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "I ganiatáu swyddogaeth gweld/golygu/dileu cydweithrediadau sydd wedi cael eu creu gan ddefnyddwyr eraill, rhaid i’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi. Os yw’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu wedi cael ei galluogi a bod yr adran Cydweithrediadau Myfyrwyr - creu wedi cael ei hanalluogi, ni fydd modd i ddefnyddwyr greu cydweithrediadau newydd ond bydd modd gweld/golygu/dileu’r holl gydweithrediadau. I ychwanegu myfyrwyr at gydweithrediad, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd. I ychwanegu grŵp cwrs at gydweithrediad, rhaid i’r adran Grŵp - gweld pob grŵp myfyrwyr fod wedi cael ei galluogi hefyd."
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "Er mwyn caniatáu ymarferoldeb gweld golygu dileu o gydweithrediadau a grëwyd gan ddefnyddwyr eraill, rhaid i'r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd. Os ydy'r adran Cynnwys Cwrs - ychwanegu / golygu / dileu wedi'i galluogi ar adran Cydweithrediadau Myfyrwyr - creu wedi'i hanalluogi, ni fydd y defnyddiwr yn gallu creu cydweithrediadau newydd ond bydd yn gallu gweld golygu a dileu bod cydweithrediad. I ychwanegu myfyrwyr at gydweithrediad, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd. Er mwyn grŵp cyrsiau at gydweithrediad, rhaid i’r adran Grŵp - gweld pob grŵp myfyrwyr fod wedi cael ei galluogi hefyd."
+  to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "Er mwyn caniatáu ymarferoldeb gweld golygu dileu o gydweithrediadau a grëwyd gan ddefnyddwyr eraill, rhaid i'r adran Cynnwys Cwrs - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd. Os ydy'r adran Cynnwys Cwrs - ychwanegu / golygu / dileu wedi'i galluogi ar adran Cydweithrediadau Myfyrwyr - creu wedi'i hanalluogi, ni fydd y defnyddiwr yn gallu creu cydweithrediadau newydd ond bydd yn gallu gweld golygu a dileu bod cydweithrediad. I ychwanegu myfyrwyr at gydweithrediad, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd. Er mwyn grŵp cyrsiau at gydweithrediad, rhaid i’r adran Grŵp - gweld pob grŵp myfyrwyr fod wedi cael ei galluogi hefyd."
   to_be_added_2959cc72: "I’w ychwanegu"
   to_be_removed_d4b48586: "I’w dynnu"
   to_c4c44f4b: at
@@ -19612,9 +19675,11 @@ cy:
               I weld y log cyflwyno, rhaid galluogi Cwisiau - gweld log cyflwyno hefyd.
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "I safoni cwis, rhaid i’r adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "I safoni cwis, rhaid i’r adran Graddau - golygu fod wedi cael ei galluogi hefyd."
+  to_moderate_grades_grades_select_final_grade_for_m_57d4f675: "Er mwyn safoni graddau, rhaid i’r adran Graddau - dewis gradd derfynol ar gyfer safoni fod wedi’i galluogi. Er mwyn cyhoeddi neu guddio graddau aseiniad, rhaid i’r adran Graddau - golygu wedi’i galluogi hefyd."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "Er mwyn safoni graddau, rhaid i’r adran Graddau - dewis gradd derfynol ar gyfer safoni fod wedi’i galluogi."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "I gael ID cleient, bydd angen i weinyddwr y cyfrif greu allwedd defnyddiwr LTI."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "I binio trafodaeth i frig y dudalen, gallwch lusgo trafodaeth yma neu ddewis Pinio yn y ddewislen ar gyfer gosodiadau trafodaeth."
+  to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: "Er mwyn cyhoeddi neu guddio graddau, rhaid i’r adran Graddau - golygu wedi’i galluogi hefyd."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "I weld rhagolwg o frand y Golygydd Thema, bydd angen i chi *ddiffodd y nodwedd cyferbynnedd uchel ar gyfer rhyngwyneb y defnyddiwr*."
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "Er mwyn cyhoeddi a dad-gyhoeddi cynnwys modiwl, rhaid i’r adrannau Cyrsiau - ychwanegu / golygu / dileu a Cynnwys Cwrs - gweld fod wedi cael eu galluogi hefyd. Does dim modd dad-gyhoeddi eitemau modiwl os oes gwaith wedi’i gyflwyno gan fyfyrwyr."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
@@ -19622,6 +19687,8 @@ cy:
       Does dim modd dad-gyhoeddi eitemau modiwl os oes gwaith wedi’i gyflwyno gan fyfyrwyr.
   to_publish_and_unpublish_module_content_courses_ad_ae996413: "Er mwyn cyhoeddi a dad-gyhoeddi cynnwys modiwl, rhaid i’r adrannau Cyrsiau - ychwanegu / golygu / dileu a Cynnwys Cwrs - gweld fod wedi cael eu galluogi hefyd."
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "I gyhoeddi a dad-gyhoeddi cynnwys modiwl, rhaid i’r adran Cyrsiau - ychwanegu / golygu / dileu a’r adran Cynnwys Cwrs - gweld fod wedi cael eu galluogi hefyd."
+  to_publish_final_grades_for_a_moderated_assignment_430368a0: "Er mwyn cyhoeddi graddau terfynol aseiniad wedi’i safoni, rhaid i’r adran Graddau - golygu wedi’i galluogi hefyd. Er mwyn cyhoeddi neu guddio graddau aseiniad wedi’i safoni, rhaid i’r adran Graddau - golygu wedi’i galluogi hefyd."
+  to_publish_final_grades_for_a_moderated_assignment_713090cf: "Er mwyn cyhoeddi graddau terfynol aseiniad wedi’i safoni, rhaid i’r adran Graddau - golygu wedi’i galluogi hefyd."
   to_publish_unpublish_module_content_course_content_efc294d4: "I gyhoeddi/dad-gyhoeddi cynnwys modiwl, rhaid i’r adran Cynnwys Cwrs - ychwanegu / golygu / dileu  fod wedi cael ei galluogi."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "I adfer cwrs sydd wedi cael ei ddileu, rhaid i’r adran Cyrsiau - dad-ddileu a’r adran Cynnwys Cwrs - gweld fod wedi cael eu galluogi hefyd."
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "I gyfyngu ar allu myfyrwyr i greu grwpiau, tynnwch y tic o’r blwch Gadael i fyfyrwyr drefnu eu grwpiau eu hunain yng Ngosodiadau’r Cwrs."
@@ -19629,6 +19696,7 @@ cy:
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "I gyfyngu i ddefnyddwyr o barth Google Apps penodol, rhowch y parth yma."
   to_restrict_to_users_from_specific_google_apps_dom_72aec2d5: "I gyfyngu i ddefnyddwyr o barthau Google Apps penodol, rhowch y parth(au) yma ar ffurf rhestr wedi'i gwahanu gydag atalnodau. I gyfyngu i ddefnyddiwr Google Apps yn gyffredinol, gallwch roi '*'."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "I gyfyngu i ddefnyddwyr Azure Active Directory, rhowch eich tenant yma."
+  to_review_a_moderated_assignment_in_speedgrader_gr_33227412: "Er mwyn adolygu aseiniad wedi'i safoni yn SpeedGrader, rhaid i’r adran Graddau - golygu fod wedi cael ei galluogi hefyd."
   to_search_and_view_notifications_for_a_user_users__becfb733: "I chwilio am hysbysiadau ar gyfer defnyddiwr a’u gweld, rhaid i’r adran Defnyddwyr - gweld rhestr fod wedi cael ei galluogi hefyd."
   to_search_and_view_notifications_for_a_user_users__fab7293a: "Er mwyn chwilio a gweld hysbysiadau ar gyfer defnyddiwr, rhaid i’r adran Defnyddwyr - gweld fod wedi cael ei galluogi."
   to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
@@ -19668,6 +19736,7 @@ cy:
   to_view_discussions_in_a_course_discussions_view_m_7c986cd2: |-
       I weld trafodaethau mewn cwrs, rhaid i’r adran Trafodaethau - gweld fod wedi cael ei galluogi.
       I ymateb i drafodaeth, rhaid i’r adran Trafodaethau - postio fod wedi cael ei galluogi hefyd. I olygu manylion aseiniad ar drafodaeth, rhaid i’r adran Aseiniadau a Chwisiau - ychwanegu / golygu / dileu fod wedi cael ei galluogi hefyd.
+  to_view_discussions_in_a_course_discussions_view_m_a1c78aa2: "Er mwyn gweld trafodaethau mewn cwrs, rhaid i’r adran Trafodaethau - gweld fod wedi’i galluogi. Mae Trafodaethau - creu a Trafodaethau - safoni yn gadael i'r defnyddiwr greu trafodaeth yn y dudalen Trafodaethau. I reoli trafodaethau, rhaid i’r adran Trafodaethau - safoni fod wedi cael ei galluogi hefyd."
   to_view_discussions_in_a_course_discussions_view_m_aa57dee7: |-
       Er mwyn gweld trafodaethau mewn cwrs, rhaid i’r adran Trafodaethau - gweld fod wedi’i galluogi.
       Mae Trafodaethau - creu a Trafodaethau - safoni yn gadael i ddefnyddiwr greu trafodaeth yn y dudalen Trafodaethau. I reoli trafodaethau, rhaid i’r adran Trafodaethau - safoni fod wedi cael ei galluogi hefyd.
@@ -20937,6 +21006,7 @@ cy:
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: "Gallwch weld eich graddau ar sail sgoriau Beth-os er mwyn gwybod sut bydd aseiniadau sydd ar y gweill neu sydd wedi’u hailgyflwyno yn effeithio ar y graddau. Gallwch brofi sgoriau ar gyfer aseiniad sydd eisoes yn cynnwys sgôr, neu aseiniad sydd heb gael ei raddio eto."
   you_cannot_assign_to_a_group_outside_of_the_assign_7869eb3b: "Does dim modd i chi neilltuo i grŵp sydd ddim yn rhan o set grwpiau’r aseiniad"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Does dim modd i chi olygu themâu ar yr isgyfrif hwn."
+  you_cannot_leave_comments_until_you_submit_the_ass_82c3ad79: "Does dim modd i chi adael sylw nes eich bod wedi cyflwyno'r aseiniad"
   you_cannot_leave_leave_comments_until_you_submit_t_d3dcb44c: "Does dim modd i chi adael sylw nes eich bod wedi cyflwyno'r aseiniad"
   you_cannot_publish_this_assignment_while_there_are_e3dee69a: "Does dim modd i chi gyhoeddi’r aseiniad hwn tra bod gwallau"
   you_cannot_remove_this_enrollment_c87be1cb: "Does dim modd i chi dynnu’r ymrestriad hwn."

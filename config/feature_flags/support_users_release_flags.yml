@@ -4,3 +4,8 @@ notify_for_manually_created_access_tokens:
   display_name: Send notifications when manually created access tokens are made
   description: Send notifications when manually created access tokens are made
   applies_to: SiteAdmin
+granular_permissions_wiki_pages:
+  applies_to: RootAccount
+  description: Granular permissions for managing wiki pages
+  display_name: Granular permissions for managing wiki pages
+  state: hidden

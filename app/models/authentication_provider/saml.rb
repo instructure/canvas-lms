@@ -299,6 +299,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     sp = SAML2::ServiceProvider.new
     sp.single_logout_services << SAML2::Endpoint.new("#{HostUrl.protocol}://#{hosts.first}/login/saml/logout",
                                                      SAML2::Bindings::HTTPRedirect::URN)
+    sp.single_logout_services << SAML2::Endpoint.new("#{HostUrl.protocol}://#{hosts.first}/login/saml/logout",
+                                                     SAML2::Bindings::HTTP_POST::URN)
 
     hosts.each_with_index do |host, i|
       sp.assertion_consumer_services << SAML2::Endpoint::Indexed.new("#{HostUrl.protocol}://#{host}/login/saml",

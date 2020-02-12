@@ -746,8 +746,14 @@ en:
   flags_new_eportfolio_content_matching_specific_key_a66af560: Flags new ePortfolio content matching specific keywords as possible spam, and allows administrators to either confirm flagged ePortfolios or mark them as safe.
   new_analytics_api_access_7eec1ead: New Analytics API Access
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: Enables new API endpoints for the course and user data provided by New Analytics.
+  gradebook_export_sort_order_bugfix_tally_219_62bfaacb: Gradebook Export Sort Order Bugfix (Tally-219)
+  changes_the_sort_order_of_the_gradebook_export_to__41b286fd: Changes the sort order of the gradebook export to more closely match the canvas documentation
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
+  rce_auto_save_f004fba9: RCE Auto-Save
+  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+    If RCE Enhancements are also enabled,
+    the RCE will auto-save your work as you go
   this_is_a_siteadmin_test_feature_flag_3ab5184: This is a SiteAdmin test Feature Flag
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: This flag will not cause any change in behavior.
   assignments_2_teacher_view_3cd3aeda: Assignments 2 Teacher View
@@ -756,12 +762,16 @@ en:
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: Use bookmarking for API pagination in Enrollments Index
   discussion_topic_performance_improvements_for_bibs_79a483ef: Discussion Topic performance improvements for Bibsys
   discussion_topics_will_not_query_permissions_for_e_7570e632: Discussion Topics will not query permissions for every sub-discussion
+  syllabus_course_summary_option_951a8144: Syllabus Course Summary Option
+  make_the_course_summary_list_of_assignments_and_ev_f739be33: Make the Course Summary (list of assignments and events) optional in the syllabus
   assignment_enhancements_student_557372ab: Assignment Enhancements - Student
   use_the_new_assignments_student_page_944262af: Use the new assignments student page
   pronouns_for_users_da46fb5: Pronouns for users
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: Allows users to pick pronouns that will be displayed after their name when it is shown in the user interface.
   immediate_notifications_for_global_announcements_682f5a3d: Immediate notifications for global announcements
   if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: If you turn this on, when an account admin goes to the page to create a global announcement, a checkbox will appear to send notification directly to users when announcement starts.
+  outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
+  allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_dc466585: |-
     Differentiate between system- and user-generated live events
@@ -775,6 +785,7 @@ en:
   developer_key_include_parameter_support_58cbf874: Developer Key Include Parameter Support
   provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: Provides a flag on the Devloper Key to support Include Parameters on API requests
   send_notifications_when_manually_created_access_to_a1631123: Send notifications when manually created access tokens are made
+  granular_permissions_for_managing_wiki_pages_3ed89a84: Granular permissions for managing wiki pages
   announcement_successfully_created_731a707f: Announcement successfully created
   announcement_creation_failed_f7d227f5: Announcement creation failed
   announcement_successfully_updated_7bc5130: Announcement successfully updated
@@ -1695,6 +1706,13 @@ en:
             sis_default:
               parameters:
                 note: "*Term settings only impact Courses, Sections, Enrollments, and X list CSV files."
+    unitek:
+      unitek_campus_vue_attendance:
+        parameters:
+          account_reports:
+            excelsior:
+              outcome:
+                text: 'SIS ID:'
     wssu:
       user_access:
         parameters:
@@ -2036,6 +2054,7 @@ en:
           To add some comments, click the "Edit" link at the top.
       labels:
         syllabus_body: Syllabus Description
+        syllabus_course_summary: Show Course Summary
         assignments_summary: Course Summary
       buttons:
         update_syllabus: Update Syllabus
@@ -3127,6 +3146,7 @@ en:
         less: less...
     course_options:
       course_options:
+        favorite: Favorite Courses
         more_courses: More Courses
         concluded: Concluded
         groups: Groups
@@ -7907,6 +7927,12 @@ en:
   rubrics_add_edit_delete_8299eff7: Rubrics - add / edit / delete
   manage_add_edit_delete_pages_5c73f2fb: Manage (add / edit / delete) pages
   pages_add_edit_delete_4c690ec6: Pages - add / edit / delete
+  create_pages_581a4d59: Create pages
+  pages_create_7be4852c: Pages - Create
+  delete_pages_ab60f58: Delete pages
+  pages_delete_ce201950: Pages - Delete
+  update_pages_c91d7ba: Update pages
+  pages_update_6c1750af: Pages - Update
   discussions_moderate_d1e69c7e: Discussions - moderate
   discussions_post_62f64091: Discussions - post
   view_announcements_b6d6d819: View announcements
@@ -8535,12 +8561,6 @@ en:
   user_696f4d6a: user
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: A partner ID is required to use Academic Benchmarks
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: A partner key is required to use Academic Benchmarks
-  user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: User isn't allowed to edit global outcomes
-  an_api_key_is_required_to_use_academic_benchmarks_26011dd6: An API key is required to use Academic Benchmarks
-  no_outcome_file_or_authority_given_c90f9c5f: No outcome file or authority given
-  the_provided_academic_benchmark_file_has_an_error_4ad2c631: The provided Academic Benchmark file has an error
-  couldn_t_update_standards_for_authority_auth_81206187: Couldn't update standards for authority %{auth}
-  couldn_t_find_an_authority_to_update_44d9407e: Couldn't find an authority to update
   name: Academic Benchmark Importer
   failed_please_report_the_following_error_code_to_y_42248d60: 'Failed, please report the following error code to your system administrator: ErrorReport:%{error};'
   failed_the_report_failed_to_generate_a_file_please_60a6582d: Failed, the report failed to generate a file. Please try again.
@@ -11963,6 +11983,7 @@ en:
   click_here_it_s_free_eeccb9cb: Click Here, It's Free!
   forgot_password_f0c3fbac: Forgot Password?
   login_with_provider_3fd3998e: Login with %{provider}
+  error_logging_in_error_msg_f61efaa3: 'Error logging in: %{error_msg}'
   create_account_263ec6: Create Account
   log_out_379ba28a: Log Out
   logged_out_724b3717: Logged Out
@@ -12399,13 +12420,9 @@ en:
       labels:
         partner_id: Partner ID
         partner_key: Partner Key
-        api_url: Api Url
-        api_key: API Key
         common_core_guid: Common Core GUID (optional)
-      api_url_description: "(e.g. %{url})"
       common_core_guid: "(e.g. %{guid})"
-  these_credentials_are_for_academic_benchmark_api_v_324baaa4: These credentials are for Academic Benchmark API v3. Leaving the Partner Key empty will default the importer to use Academic Benchmark API v1.
-  these_credentials_are_for_academic_benchmark_api_v_952718b1: These credentials are for Academic Benchmark API v1, which will be deprecated in a future release.
+  these_credentials_are_for_academic_benchmark_api_v_a3845be7: These credentials are for Academic Benchmark API v3.
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: This report shows all the courses for a given term. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, account id, account sis id, account name, storage used in MB, and sum of all files in MB. The storage used reflects all files that go against the courses quota. The sum of all files in the course is the sum of all files that are in the course regardless of impact to the courses quota.
   example_84698b7d: Example
   configuration_location_ee0f6592: Configuration Location
@@ -12642,6 +12659,13 @@ en:
       labels:
         enabled: Enabled (must enable QTI Converter as well)
   provision_a_quiz_next_service_c7c6bd87: Provision a Quiz.Next Service
+  provisioned_lti_account_e7f156c1: Provisioned LTI Account
+  api_host_ddaf400e: 'API Host:'
+  service_c3d74594: 'Service:'
+  lti_launch_af082dc3: 'LTI Launch:'
+  the_lti_tool_was_deleted_on_3727da23: The LTI Tool was deleted on
+  click_here_to_restore_the_tool_4ff358ae: "*Click here* to restore the tool"
+  beta_lti_launch_c200ffdf: 'Beta LTI Launch:'
   there_are_no_announcements_for_this_course_5ee649c3: There are no announcements for this course.
   back_to_table_of_contents_d878b315: Back to Table of Contents
   back_to_announcements_1036e43e: Back to Announcements
@@ -16367,7 +16391,7 @@ en:
   moving_a4d552df: Moving...
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: Before publishing, you must set usage rights on your files.
   unpublish_9f2d730b: Unpublish
-  not_visible_in_student_files_22f11883: Not visible in student files
+  only_available_to_students_with_link_107e2468: Only available to students with link
   schedule_student_availability_332154a: Schedule student availability
   available_from_587ce92f: Available From
   available_from_date_43b5e11d: Available From Date
@@ -17599,7 +17623,7 @@ en:
   body_9f663faf: Body
   editing_permissions_for_name_3503e235: 'Editing permissions for: %{name}'
   filename_is_restricted_click_to_modify_c0bb77f8: "%{fileName} is %{restricted} - Click to modify"
-  filename_is_not_visible_in_student_files_click_to__aa2a0651: "%{fileName} is not visible in student files - Click to modify"
+  filename_is_only_available_to_students_with_the_li_97190506: "%{fileName} is only available to students with the link - Click to modify"
   filename_is_published_click_to_modify_38a4a269: "%{fileName} is Published - Click to modify"
   filename_is_unpublished_click_to_modify_7e731102: "%{fileName} is Unpublished - Click to modify"
   filename_is_restricted_9aaf9250: "%{fileName} is %{restricted}"
@@ -18063,6 +18087,8 @@ en:
   failed_to_update_domain_lookup_b2437cf7: Failed to update domain lookup
   update_name_6581781d: Update %{name}
   update_domain_account_lookup_9c89440d: Update Domain Account Lookup
+  assessment_loading_50ce6e70: Assessment Loading
+  assessment_failed_to_load_ad238b36: Assessment Failed to Load
   bulk_migration:
     confirm:
       delete_credential: Are you sure you want to remove these credentials?
@@ -18314,6 +18340,7 @@ en:
   change_ending_date_to_d2cebd54: Change ending date to
   checked_883b93fd: checked
   remove_recipient_name_a6b83cef: Remove recipient %{name}
+  favorite_courses_fbd356f0: Favorite Courses
   more_courses_5ebbe998: More Courses
   concluded_courses_94782e21: Concluded Courses
   no_subject_970aad80: No subject

@@ -518,6 +518,15 @@ module Lti
                        -> { @context.start_at },
                        COURSE_GUARD
 
+    # returns the current course end date.
+    # @example
+    #   ```
+    #   2018-01-15 00:00:00 -0700
+    #   ```
+    register_expansion 'Canvas.course.endAt', [],
+                       -> { @context.end_at },
+                       COURSE_GUARD
+
     # returns the current course workflow state. Workflow states of "claimed" or "created"
     # indicate an unpublished course.
     # @example

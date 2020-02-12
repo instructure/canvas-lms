@@ -93,9 +93,17 @@ class GradebookExporter
 
     assignments = select_in_grading_period calc.assignments
 
-    assignments = assignments.sort_by do |a|
-      [a.assignment_group_id, a.position || 0, a.due_at || CanvasSort::Last, a.title]
+    if Account.site_admin.feature_enabled?(:gradebook_export_sort_order_bugfix)
+      ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_group)
+      assignments.sort_by! do |a|
+        [a.assignment_group.position, a.position || 0, a.due_at || CanvasSort::Last, a.title]
+      end
+    else
+      assignments.sort_by! do |a|
+        [a.assignment_group_id, a.position || 0, a.due_at || CanvasSort::Last, a.title]
+      end
     end
+
     groups = calc.groups
 
     read_only = I18n.t('csv.read_only_field', '(read only)')

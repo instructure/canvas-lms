@@ -914,6 +914,9 @@
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Non ci sono punti associati a questo elemento"
     },
+    "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+        "message": "Anche se il tuo video avrà il titolo corretto nel browser, non siamo riusciti ad aggiornarlo nel database."
+    },
     "time_2b5aac58": {
         "message": "Ora"
     },
@@ -1009,6 +1012,9 @@
     },
     "user_documents_c206e61f": {
         "message": "Documenti utente"
+    },
+    "user_files_78e21703": {
+        "message": "File utente"
     },
     "user_images_b6490852": {
         "message": "Immagini utente"

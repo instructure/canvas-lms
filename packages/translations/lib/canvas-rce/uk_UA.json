@@ -102,6 +102,7 @@
   "media_af190855": { "message": "Носій інформації" },
   "modules_c4325335": { "message": "Розділи" },
   "next_page_d2a39853": { "message": "Наступна Сторінка" },
+  "no_e16d9132": { "message": "Ні" },
   "no_results_940393cf": { "message": "Результати відсутні." },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Вікрити діалогове вікно гарячих клавіш"
@@ -109,6 +110,7 @@
   "options_3ab0ea65": { "message": "Параметри" },
   "pages_e5414c2c": { "message": "Сторінки" },
   "people_b4ebb13c": { "message": "Люди" },
+  "preview_53003fd2": { "message": "Попередній перегляд" },
   "previous_page_928fc112": { "message": "Попередня сторінка" },
   "published_c944a23d": { "message": "опубліковано" },
   "quizzes_7e598f57": { "message": "Контрольні Роботи" },
@@ -130,5 +132,6 @@
   "upload_media_ce31135a": { "message": "Завантажити медіа контент" },
   "url_22a5f3b8": { "message": "URL" },
   "video_player_b371005": { "message": "Відеопрогравач" },
-  "wiki_home_9cd54d0": { "message": "Домашня сторінка Wiki" }
+  "wiki_home_9cd54d0": { "message": "Домашня сторінка Wiki" },
+  "yes_dde87d5": { "message": "Так" }
 }

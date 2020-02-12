@@ -36,6 +36,37 @@ describe GradebookExporter do
       GradebookExporter.new(@course, @teacher, opts)
     end
 
+    describe "assignment group order" do
+      before(:once) do
+        Account.site_admin.enable_feature!(:gradebook_export_sort_order_bugfix)
+
+        student_in_course(course: @course, active_all: true)
+
+        # The assignment groups are created out of order on purpose. The old code would order by assignment_group.id, so
+        # by creating the assignment groups out of order, we should get ids that are out of order. The new code orders
+        # using assignment_group.position which is guaranteed to be there in the model.
+        @first_group = @course.assignment_groups.create!(name: "first group", position: 1)
+        @last_group = @course.assignment_groups.create!(name: "last group", position: 3)
+        @second_group = @course.assignment_groups.create!(name: "second group", position: 2)
+
+        @assignments = []
+        @assignments[0] = @course.assignments.create!(name: "First group assignment", assignment_group: @first_group)
+        @assignments[2] = @course.assignments.create!(name: "last group assignment", assignment_group: @last_group)
+        @assignments[1] = @course.assignments.create!(name: "second group assignment", assignment_group: @second_group)
+      end
+
+      it "returns assignments ordered first by assignment group position" do
+        csv = GradebookExporter.new(@course, @teacher).to_csv
+        rows = CSV.parse(csv, headers: true)
+
+        # Our assignments should be columns 4, 5, and 6
+        assignment_headers = rows.headers[4,3]
+        expected_headers = @assignments.map { |a| "#{a.name} (#{a.id})" }
+
+        expect(assignment_headers).to eq(expected_headers)
+      end
+    end
+
     describe "custom columns" do
       before(:once) do
         first_column = @course.custom_gradebook_columns.create! title: "Custom Column 1"

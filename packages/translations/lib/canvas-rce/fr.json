@@ -303,6 +303,9 @@
   "syllabus_f191f65b": { "message": "Programme" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Flèches" },
   "text_7f4593da": { "message": "Texte" },
+  "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+    "message": "Bien que votre vidéo aura le bon titre dans le navigateur, nous n''avons pas pu mettre ce dernier à jour dans la base de données."
+  },
   "title_ee03d132": { "message": "Titre" },
   "to_be_posted_when_d24bf7dc": { "message": "À poster : { when }" },
   "to_do_when_2783d78f": { "message": "À faire : { when }" },
@@ -343,6 +346,7 @@
     "message": "Utilisé par les lecteurs d''écran pour décrire la vidéo"
   },
   "user_documents_c206e61f": { "message": "Documents de l’utilisateur" },
+  "user_files_78e21703": { "message": "Fichiers utilisateur" },
   "user_images_b6490852": { "message": "Images utilisateur" },
   "user_media_14fbf656": { "message": "Utilisateurs Médias" },
   "video_audio_recording_uploaded_6af5d378": {

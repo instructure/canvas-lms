@@ -147,6 +147,8 @@ module ConversationsCommon
     wait_for_ajaximations
     if is_group
       fj("a:contains('Groups')", message_course).click
+    else
+      fj("a:contains('Favorite Courses')", message_course).click
     end
     fj("a:contains('#{new_course}')", message_course).click
   end

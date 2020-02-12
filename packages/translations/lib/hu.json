@@ -215,6 +215,9 @@
     "next_page_d2a39853": {
         "message": "Következő oldal"
     },
+    "no_e16d9132": {
+        "message": "Nem"
+    },
     "no_results_940393cf": {
         "message": "No results."
     },
@@ -238,6 +241,9 @@
     },
     "points_bceb5005": {
         "message": "pontszám"
+    },
+    "preview_53003fd2": {
+        "message": "Előnézet"
     },
     "previous_month_bb1e3c84": {
         "message": "Előző hónap"
@@ -319,6 +325,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki kezdőlap"
+    },
+    "yes_dde87d5": {
+        "message": "Igen"
     },
     "yesterday_c6bd6abf": {
         "message": "Tegnap"

@@ -914,6 +914,9 @@
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "没有与此项目相关的分数"
     },
+    "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
+        "message": "虽然您的视频在浏览器里会有正确标题，但我们无法在数据库里更新。"
+    },
     "time_2b5aac58": {
         "message": "时间"
     },
@@ -1008,6 +1011,9 @@
         "message": "被屏幕阅读器用来描述视频"
     },
     "user_documents_c206e61f": {
+        "message": "用户文档"
+    },
+    "user_files_78e21703": {
         "message": "用户文档"
     },
     "user_images_b6490852": {

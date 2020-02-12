@@ -21,6 +21,7 @@
 def build_parameters = [
   string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
   string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
+  string(name: 'GERRIT_PROJECT', value: "${env.GERRIT_PROJECT}"),
   string(name: 'GERRIT_BRANCH', value: "${env.GERRIT_BRANCH}"),
   string(name: 'GERRIT_CHANGE_NUMBER', value: "${env.GERRIT_CHANGE_NUMBER}"),
   string(name: 'GERRIT_PATCHSET_NUMBER', value: "${env.GERRIT_PATCHSET_NUMBER}"),
@@ -135,7 +136,7 @@ pipeline {
     }
 
     stage('Rebase') {
-      when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' } }
+      when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms' } }
       steps {
         timeout(time: 2) {
           script {
@@ -203,7 +204,7 @@ pipeline {
     stage('Parallel Run Tests') {
       parallel {
         stage('Linters') {
-          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' } }
+          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms' } }
           steps {
             skipIfPreviouslySuccessful("linters") {
               build(

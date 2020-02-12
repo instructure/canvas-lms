@@ -1452,3 +1452,61 @@ test('renders assignment icon for other assignments', () => {
   const view = createView(model)
   equal(view.$('i.icon-assignment').length, 1)
 })
+
+QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
+  hooks.beforeEach(() => {
+    fakeENV.setup({current_user_roles: []})
+  })
+
+  hooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  test('returns false if the assignment is not RLDB enabled', () => {
+    fakeENV.setup({current_user_roles: ['student']})
+    const model = buildAssignment({
+      id: 1,
+      require_lockdown_browser: false,
+      is_quiz_lti_assignment: true
+    })
+    const view = createView(model)
+    const json = view.toJSON()
+    equal(json.quizzesRespondusEnabled, false)
+  })
+
+  test('returns false if the assignment is not a N.Q assignment', () => {
+    fakeENV.setup({current_user_roles: ['student']})
+    const model = buildAssignment({
+      id: 1,
+      require_lockdown_browser: true,
+      is_quiz_lti_assignment: false
+    })
+    const view = createView(model)
+    const json = view.toJSON()
+    equal(json.quizzesRespondusEnabled, false)
+  })
+
+  test('returns false if the user is not a student', () => {
+    fakeENV.setup({current_user_roles: ['teacher']})
+    const model = buildAssignment({
+      id: 1,
+      require_lockdown_browser: true,
+      is_quiz_lti_assignment: true
+    })
+    const view = createView(model)
+    const json = view.toJSON()
+    equal(json.quizzesRespondusEnabled, false)
+  })
+
+  test('returns true if the assignment is a RLDB enabled N.Q', () => {
+    fakeENV.setup({current_user_roles: ['student']})
+    const model = buildAssignment({
+      id: 1,
+      require_lockdown_browser: true,
+      is_quiz_lti_assignment: true
+    })
+    const view = createView(model)
+    const json = view.toJSON()
+    equal(json.quizzesRespondusEnabled, true)
+  })
+})

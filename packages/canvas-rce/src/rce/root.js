@@ -49,3 +49,8 @@ export function renderIntoDiv(target, props, renderCallback) {
   // pass it back
   renderCallback && renderCallback(renderedComponent)
 }
+
+// Adding this event listener fixes LA-212. I have no idea why. In Safari it
+// lets the user scroll the iframe via the mouse wheel without having to resize
+// the RCE or the window or something else first.
+if (window) window.addEventListener('wheel', () => {})

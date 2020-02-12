@@ -41,3 +41,8 @@ analytics2_api_access:
   applies_to: RootAccount
   display_name: New Analytics API Access
   description: Enables new API endpoints for the course and user data provided by New Analytics.
+gradebook_export_sort_order_bugfix:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Gradebook Export Sort Order Bugfix (Tally-219)
+  description: Changes the sort order of the gradebook export to more closely match the canvas documentation

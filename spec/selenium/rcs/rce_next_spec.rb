@@ -491,7 +491,6 @@ describe "RCE next tests" do
     end
 
     it "should open upload document modal when clicking upload option" do
-      skip('Causing flakiness - CORE-3186')
       visit_front_page_edit(@course)
 
       click_document_toolbar_button
