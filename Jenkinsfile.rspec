@@ -102,7 +102,7 @@ pipeline {
       steps {
         script {
           def reports = load 'build/new-jenkins/groovy/reports.groovy'
-          reports.publishSpecCoverageToS3(ci_node_total)
+          reports.publishSpecCoverageToS3(ci_node_total, "canvas-lms-rspec")
         }
       }
     }

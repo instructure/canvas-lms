@@ -22,7 +22,7 @@ def stashSpecCoverage(index) {
   }
 }
 
-def publishSpecCoverageToS3(ci_node_total) {
+def publishSpecCoverageToS3(ci_node_total, coverage_type) {
   sh 'rm -rf ./coverage_nodes'
   dir('coverage_nodes') {
     for(int index = 0; index < ci_node_total; index++) {
@@ -38,7 +38,7 @@ def publishSpecCoverageToS3(ci_node_total) {
   archiveArtifacts(artifacts: 'coverage/**')
   uploadCoverage([
       uploadSource: "/coverage",
-      uploadDest: "canvas-lms-rspec/coverage"
+      uploadDest: "$coverage_type/coverage"
   ])
   sh 'rm -rf ./coverage_nodes'
   sh 'rm -rf ./coverage'

@@ -50,16 +50,14 @@ pipeline {
           }
         }
 
-        // stage('Selenium Chrome') {
-        //   steps {
-        //     skipIfPreviouslySuccessful("selenium-chrome") {
-        //       build(
-        //         job: 'test-suites/selenium-chrome',
-        //         parameters: build_parameters
-        //       )
-        //     }
-        //   }
-        // }
+        stage('Selenium Chrome') {
+          steps {
+            build(
+              job: 'test-suites/selenium-chrome',
+              parameters: build_parameters
+            )
+          }
+        }
 
         stage('Rspec') {
           steps {
