@@ -38,9 +38,8 @@ pipeline {
     stage('Checkout and clean') {
       steps {
         timeout(time: 5) {
-          checkout scm
           sh 'build/new-jenkins/docker-cleanup.sh'
-          sh 'rm -rf ./tmp/spec_failures'
+          sh 'rm -rf ./tmp/'
         }
       }
     }
@@ -65,9 +64,30 @@ pipeline {
     stage("Running Selenium Specs") {
       steps {
         timeout(time: 60) {
-          sh 'docker-compose exec -T web flakey_spec_catcher --repeat=$FSC_REPEAT_FACTOR'
+          sh (
+            script: 'docker-compose exec -T web flakey_spec_catcher --repeat=$FSC_REPEAT_FACTOR --output=/usr/src/app/tmp/fsc.out',
+            returnStatus: true
+          )
         }
       }
+    }
+
+    stage("Copy and Archive output") {
+      steps {
+        sh 'mkdir -p tmp'
+        sh (
+          script: 'docker cp $(docker-compose ps -q web):/usr/src/app/tmp/fsc.out ./tmp/fsc.out',
+          returnStatus: true
+        )
+        archiveArtifacts(artifacts: 'tmp/fsc.out', allowEmptyArchive: true)
+      }
+    }
+  }
+
+  post {
+    cleanup {
+      sh 'rm -rf ./tmp/'
+      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }
 }
