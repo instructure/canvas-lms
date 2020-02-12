@@ -20,7 +20,7 @@
     asset.contexts.first.name :
     asset.contexts_for_user(user).map(&:name).join(", ") %>
 <% if asset.available_slots -%>
-<%= before_label :slots_remaining, "Available time slots" %> <%= asset.available_slots %>
+<%= before_label :slots_remaining, "Available time slots" %> <%= asset.available_slots(current_only: true) %>
 <% end -%>
 
 <%= t :instructions, "Sign up for a time slot at the following link: %{link}", :link => content(:link) %>
