@@ -26,4 +26,12 @@ const preventDuplicateSubmissions = () =>
     $(this).trigger('submit.rails')
   })
 
-$(document).ready(() => preventDuplicateSubmissions())
+const enableAccessCodeSubmitButton = () =>
+  $('.access_code_form')
+    .find('button')
+    .prop('disabled', false)
+
+$(document).ready(() => {
+  enableAccessCodeSubmitButton()
+  preventDuplicateSubmissions()
+})
