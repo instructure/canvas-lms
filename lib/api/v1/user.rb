@@ -133,6 +133,7 @@ module Api::V1::User
         zone = user.time_zone || @domain_root_account.try(:default_time_zone) || Time.zone
         json[:time_zone] = zone.name
       end
+      json[:is_online] = user.is_online?
     end
   end
 
