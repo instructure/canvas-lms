@@ -397,6 +397,24 @@ describe LiveEventsObserver do
         expect_any_instance_of(CourseProgress).to receive(:completed?).and_return(false)
         context_module_progression.update_attribute(:workflow_state, 'completed')
       end
+
+      it "should still post even when weird requirements_met unsetting happens" do
+        page = course.wiki_pages.create!(:title => "page")
+        tag = context_module.add_item(:id => page.id, :type => 'wiki_page')
+        context_module.completion_requirements = {tag.id => {:type => 'must_view'}}
+        context_module.save!
+
+        expect(Canvas::LiveEvents).to receive(:course_completed).with(anything)
+        ContextModuleProgression.transaction(requires_new: true) do
+          # complete it
+          context_module_progression.update_attributes(:workflow_state => 'completed',
+            :requirements_met => [{:id => tag.id, :type => 'must_view'}])
+          # sneakily remove the requiremets met because terribleness
+          context_module_progression.update_attributes(:requirements_met => [])
+        end
+        # event fires off now but it should ignore the missing requirements_met in the db and
+        # use the ones that were present when the completion happened
+      end
     end
 
     context "the tag_type is not context_module or context_module_progression" do
