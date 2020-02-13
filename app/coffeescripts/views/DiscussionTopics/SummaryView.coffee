@@ -41,7 +41,7 @@ define [
       'click' : 'openOnClick'
       'click .icon-lock':  'toggleLocked'
       'click .icon-trash': 'onDelete'
-      'click .icon-pin': 'togglePinned'
+      'click .individual-pin': 'togglePinned'
 
     els:
       '.discussion-actions .al-trigger' : '$gearButton'
