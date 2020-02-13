@@ -18,9 +18,6 @@ end
 namespace :canvas do
   desc "Compile javascript and css assets."
   task :compile_assets do |t, args|
-    # Make sure we have an up to date app/jsx/fragmentTypes.json file created
-    # (for apollo client js code / cache)
-    Rake::Task['graphql:schema'].invoke
 
     # opt out
     npm_install = ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
