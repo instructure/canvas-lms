@@ -85,4 +85,3 @@ coverage-karma
 
 # generated graphql schema
 schema.graphql
-app/jsx/fragmentTypes.json
