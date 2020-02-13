@@ -19,14 +19,15 @@
 class CourseProgress
   include Rails.application.routes.url_helpers
 
-  attr_accessor :course, :user, :read_only
+  attr_accessor :course, :user, :read_only, :overridden_requirements_met
 
   # use read_only to avoid triggering more progression evaluations
-  def initialize(course, user, read_only: false, preloaded_progressions: nil)
+  def initialize(course, user, read_only: false, preloaded_progressions: nil, overridden_requirements_met: nil)
     @course = course
     @user = user
     @read_only = read_only
     @preloaded_progressions = preloaded_progressions
+    @overridden_requirements_met = overridden_requirements_met
   end
 
   def modules
@@ -103,7 +104,9 @@ class CourseProgress
   def requirements_completed
     # find the list of requirements that have been recorded as met for this module, then
     # select only those requirements that are current, and filter out any duplicates
-    @_requirements_completed ||= module_progressions.flat_map { |cmp| cmp.requirements_met }.
+    @_requirements_completed ||= module_progressions.flat_map { |cmp|
+        (overridden_requirements_met && overridden_requirements_met[cmp.id]) || cmp.requirements_met
+      }.
       select { |req| requirements.include?(req) }.
       uniq
   end
