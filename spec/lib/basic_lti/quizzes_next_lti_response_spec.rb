@@ -51,6 +51,8 @@ describe BasicLTI::QuizzesNextLtiResponse do
 
   let(:timestamp) { 1.day.ago.iso8601(3) }
 
+  let(:text) { "" }
+
   let(:xml) do
     request_xml(source_id, launch_url, "0.12")
   end
@@ -84,11 +86,14 @@ describe BasicLTI::QuizzesNextLtiResponse do
                   <textString>#{grade}</textString>
                 </resultScore>
                 <resultData>
-                  <text>#{timestamp}</text>
+                  <text>#{text}</text>
                   <url>#{launch_url}</url>
                 </resultData>
               </result>
             </resultRecord>
+            <submissionDetails>
+              <submittedAt>#{timestamp}</submittedAt>
+            </submissionDetails>
           </replaceResultRequest>
         </imsx_POXBody>
       </imsx_POXEnvelopeRequest>
@@ -146,7 +151,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
       expect(request.body).to eq '<replaceResultResponse />'
     end
 
-    it "reads 'submitted_at' from resultData" do
+    it "reads 'submitted_at' from submissionDetails" do
       BasicLTI::BasicOutcomes.process_request(tool, xml)
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.submitted_at).to eq timestamp
@@ -248,10 +253,10 @@ describe BasicLTI::QuizzesNextLtiResponse do
         allow(BasicLTI::QuizzesNextVersionedSubmission).to receive(:new).and_return(quiz_lti_submission)
       end
 
-      context 'when json passed includes only submitted_at' do
-        let(:timestamp) { "{ \"submitted_at\" : \"#{1.day.ago.iso8601(3)}\" }" }
+      context 'when submissionDetails passed includes submitted_at' do
+        let(:timestamp) { 1.day.ago.iso8601(3) }
 
-        it "reads 'submitted_at' from resultData" do
+        it "reads 'submitted_at' from submissionDetails" do
           BasicLTI::BasicOutcomes.process_request(tool, xml)
           submission = assignment.submissions.where(user_id: @user.id).first
           expect(submission.submitted_at).to eq timestamp
@@ -263,19 +268,21 @@ describe BasicLTI::QuizzesNextLtiResponse do
         end
       end
 
-      context 'when json passed includes submitted_at and reopened (true)' do
-        let(:timestamp) { "{ \"submitted_at\" : \"#{1.day.ago.iso8601(3)}\", \"reopened\" : true }" }
+      context 'when submissionDetails includes submitted_at and json includes reopened (true)' do
+        let(:text) { "{ \"reopened\" : true }" }
+        let(:timestamp) { 1.day.ago.iso8601(3) }
 
-        it "reads 'submitted_at' from resultData" do
+        it "reads 'submitted_at' from submissionDetails" do
           expect(quiz_lti_submission).to receive(:revert_history).with(launch_url, -tool.id).and_call_original
           BasicLTI::BasicOutcomes.process_request(tool, xml)
         end
       end
 
       context 'when json passed includes submitted_at and reopened (false)' do
-        let(:timestamp) { "{ \"submitted_at\" : \"#{1.day.ago.iso8601(3)}\", \"reopened\" : false }" }
+        let(:text) { "{ \"reopened\" : false }" }
+        let(:timestamp) { 1.day.ago.iso8601(3) }
 
-        it "reads 'submitted_at' from resultData" do
+        it "reads 'submitted_at' from submissionDetails" do
           expect(quiz_lti_submission).not_to receive(:revert_history)
           BasicLTI::BasicOutcomes.process_request(tool, xml)
         end
