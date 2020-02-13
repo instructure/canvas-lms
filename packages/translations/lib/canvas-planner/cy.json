@@ -114,6 +114,9 @@
     "message": "{ items } eitem { items, plural,\n     =1 {wedi’i chwblhau}\n  other {eitem}\n} wedi’i chwblhau"
   },
   "late_2be42b88": { "message": "Yn Hwyr" },
+  "list_collapsed_9ac35920": { "message": "Rhestr wedi crebachu." },
+  "list_collapsed_dde87718": { "message": "Rhestr wedi crebachu" },
+  "list_expanded_efec2d0": { "message": "Rhestr wedi ehangu." },
   "load_more_a36f9cf9": { "message": "Llwytho mwy" },
   "load_prior_dates_f2b0f6f0": { "message": "Llwytho dyddiadau blaenorol" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -168,6 +171,9 @@
     "message": "*Dim ond y cyfnod graddio diweddaraf sy’n ymddangos."
   },
   "opportunities_popup_f6703842": { "message": "neidlen cyfleoedd" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } wedi dewis. Rhestr wedi crebachu."
+  },
   "optional_add_course_ef0d70fc": { "message": "Dewisol: Ychwanegu Cwrs" },
   "page_50c4823d": { "message": "Tudalen" },
   "peer_review_74f26a13": { "message": "Adolygiad gan Gyd-fyfyrwyr" },
@@ -223,6 +229,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Yfory am { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Heb allu marcio fod hyn wedi’i gwblhau."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Defnyddiwch fysellau saeth i symud drwy''r opsiynau."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Ddoe am { date }" },
   "yesterday_c6bd6abf": { "message": "Ddoe" },

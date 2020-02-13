@@ -19,7 +19,10 @@
 import _ from 'underscore'
 
 import {underscore} from 'convert_case'
-import FakeServer, {jsonBodyFromRequest, pathFromRequest} from 'jsx/__tests__/FakeServer'
+import FakeServer, {
+  jsonBodyFromRequest,
+  pathFromRequest
+} from 'jsx/shared/network/__tests__/FakeServer'
 import {
   DEFAULT_LATE_POLICY_DATA,
   fetchLatePolicy,

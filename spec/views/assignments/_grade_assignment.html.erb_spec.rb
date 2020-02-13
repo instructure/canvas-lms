@@ -25,9 +25,9 @@ describe '_grade_assignment' do
 
   before :each do
     view_context(@course, @ta)
-    assignment = @course.assignments.create!(title: 'an assignment')
-    assign(:assignment, assignment)
-    assign(:assignment_presenter, AssignmentPresenter.new(assignment))
+    @assignment = @course.assignments.create!(title: 'an assignment')
+    assign(:assignment, @assignment)
+    assign(:assignment_presenter, AssignmentPresenter.new(@assignment))
   end
 
   describe "SpeedGrader link mount point" do
@@ -69,6 +69,42 @@ describe '_grade_assignment' do
       @course.account.role_overrides.create!(permission: 'manage_grades', role: ta_role, enabled: false)
       render partial: 'assignments/grade_assignment'
       expect(response).not_to have_tag("div#student_group_filter_mount_point")
+    end
+  end
+
+  describe "View Uploads Status link" do
+    let(:progress) { Progress.new(context: @assignment, completion: 100) }
+
+    before :each do
+      Account.site_admin.enable_feature!(:submissions_reupload_status_page)
+    end
+
+    it "is displayed when the user can manage grades" do
+      allow(@assignment).to receive(:submission_reupload_progress).and_return(progress)
+      assign(:can_grade, true)
+      render partial: "assignments/grade_assignment"
+      expect(response.body).to include "View Uploads Status"
+    end
+
+    it "is not displayed when the user cannot manage grades" do
+      allow(@assignment).to receive(:submission_reupload_progress).and_return(progress)
+      assign(:can_grade, false)
+      render partial: "assignments/grade_assignment"
+      expect(response.body).not_to include "View Uploads Status"
+    end
+
+    it "is not displayed when no submissions have been uploaded" do
+      assign(:can_grade, true)
+      render partial: "assignments/grade_assignment"
+      expect(response.body).not_to include "View Uploads Status"
+    end
+
+    it "is not displayed when the 'submissions_reupload_status_page' feature flag is off" do
+      Account.site_admin.disable_feature!(:submissions_reupload_status_page)
+      allow(@assignment).to receive(:submission_reupload_progress).and_return(progress)
+      assign(:can_grade, true)
+      render partial: "assignments/grade_assignment"
+      expect(response.body).not_to include "View Uploads Status"
     end
   end
 end

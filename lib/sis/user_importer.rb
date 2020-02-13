@@ -20,7 +20,6 @@ module SIS
   class UserImporter < BaseImporter
 
     def process(messages, login_only: false)
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger, messages)
       User.skip_updating_account_associations do
         User.process_as_sis(@sis_options) do
@@ -36,7 +35,7 @@ module SIS
       User.update_account_associations(importer.users_to_update_account_associations)
       importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) {|ids| Pseudonym.where(id: ids).update_all(sis_batch_id: @batch.id)}
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
-      @logger.debug("Users took #{Time.zone.now - start} seconds")
+
       importer.success_count
     end
 
@@ -64,8 +63,6 @@ module SIS
 
       # Pass a single instance of SIS::Models::User
       def add_user(user, login_only: false)
-        @logger.debug("Processing User #{(login_only ? user.login_array : user.to_a).inspect}")
-
         raise ImportError, "No user_id given for a user" if user.user_id.blank?
         raise ImportError, "No login_id given for user #{user.user_id}" if user.login_id.blank?
         raise ImportError, "Improper status for user #{user.user_id}" unless user.status =~ /\A(active|deleted)/i
@@ -117,8 +114,6 @@ module SIS
         return unless any_left_to_process?
         while !@batched_users.empty?
           user_row = @batched_users.shift
-          @logger.debug("Processing User #{user_row.inspect}")
-
           pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
           pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
           pseudo_by_integration = nil

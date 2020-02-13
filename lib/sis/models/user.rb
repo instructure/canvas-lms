@@ -62,18 +62,6 @@ module SIS
         hash
       end
 
-      def login_array
-        [existing_user_id, existing_integration_id, existing_canvas_user_id,
-         root_account_id, user_id.to_s, login_id.to_s, email, password.to_s,
-         ssha_password.to_s, integration_id.to_s, authentication_provider_id]
-      end
-
-      def to_a
-        [user_id.to_s, login_id.to_s, status, first_name, last_name, email,
-         password.to_s, ssha_password.to_s, integration_id.to_s, short_name,
-         full_name, sortable_name, authentication_provider_id]
-      end
-
       def login_row_info
         [existing_user_id: existing_user_id, existing_integration_id: existing_integration_id,
          existing_canvas_user_id: existing_canvas_user_id, root_account_id: root_account_id,
@@ -92,5 +80,3 @@ module SIS
     end
   end
 end
-
-

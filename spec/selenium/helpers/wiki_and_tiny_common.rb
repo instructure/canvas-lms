@@ -61,7 +61,6 @@ module WikiAndTinyCommon
   end
 
   def add_text_to_tiny(text)
-    clear_wiki_rce
     type_in_tiny('textarea.body', text + " ") # space is necessary for html to render in tinymce
     in_frame wiki_page_body_ifr_id do
       f('#tinymce').send_keys(:backspace) # delete the space added above for accurate asserting

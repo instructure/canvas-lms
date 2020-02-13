@@ -79,7 +79,7 @@ pipeline {
     stage('Print Env Variables') {
       steps {
         timeout(time: 20, unit: 'SECONDS') {
-          sh 'printenv | sort'
+          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
         }
       }
     }
@@ -265,6 +265,18 @@ pipeline {
               build(
                 job: 'test-suites/rspec',
                 parameters: build_parameters
+              )
+            }
+          }
+        }
+
+        stage ('Flakey Spec Catcher') {
+          steps {
+            skipIfPreviouslySuccessful("flakey_spec_catcheer") {
+              build(
+                job: 'test-suites/flakey-spec-catcher',
+                parameters: build_parameters,
+                propagate: false
               )
             }
           }

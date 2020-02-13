@@ -41,7 +41,7 @@ describe "/submissions/show_preview" do
     expect(response.body).to match(/.*www\.example\.com.*/)
   end
 
-  it "should give a user-friendly explaination why there's no preview" do
+  it "should give a user-friendly explanation why there's no preview" do
     course_with_student
     view_context
     a = @course.assignments.create!(:title => "some assignment", :submission_types => 'on_paper')
@@ -64,5 +64,61 @@ describe "/submissions/show_preview" do
     assign(:submission, submission)
     render template: "submissions/show_preview", locals: {anonymize_students: assignment.anonymize_students?}
     expect(response.body.include?("%22submission_id%22:#{submission.id}")).to be true
+  end
+
+  describe "originality score" do
+    let(:course) { Course.create! }
+    let(:assignment) { course.assignments.create!(title: "an assignment", submission_types: "online_text_entry") }
+    let(:student) { course.enroll_student(User.create!, activate_all: true).user }
+    let(:teacher) { course.enroll_teacher(User.create!, activate_all: true).user }
+    let(:submission) { assignment.submit_homework(student, submission_type: "online_text_entry", body: "zzzz") }
+
+    let(:output) { Nokogiri::HTML.fragment(response.body) }
+
+    before(:each) do
+      allow(assignment).to receive(:turnitin_enabled?).and_return(true)
+      user_session(teacher)
+
+      assign(:assignment, assignment)
+      assign(:context, course)
+      assign(:current_user, teacher)
+      assign(:submission, submission)
+    end
+
+    context "when the New Gradebook Plagiarism Indicator feature is enabled" do
+      before(:each) { course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator) }
+
+      it "renders a similarity icon if the submission possesses similarity data" do
+        submission.originality_reports.create!(
+          originality_score: 10,
+          workflow_state: "scored"
+        )
+
+        render template: "submissions/show_preview"
+        expect(output.at_css("i.icon-certified")).to be_present
+      end
+
+      it "does not render an icon if there is no similarity data" do
+        render template: "submissions/show_preview"
+        expect(output.at_css("i.icon-certified")).not_to be_present
+      end
+    end
+
+    context "when the New Gradebook Plagiarism Indicator feature is disabled" do
+      it "renders a similarity icon if the submission possesses similarity data" do
+        submission.originality_reports.create!(
+          originality_score: 10,
+          workflow_state: "scored"
+        )
+
+        render template: "submissions/show_preview"
+        expect(output.at_css(".turnitin_score_container")).to be_present
+      end
+
+      it "does not render an icon if there is no similarity data" do
+        render template: "submissions/show_preview"
+        expect(output.css(".turnitin_score_container")).not_to be_present
+      end
+    end
   end
 end

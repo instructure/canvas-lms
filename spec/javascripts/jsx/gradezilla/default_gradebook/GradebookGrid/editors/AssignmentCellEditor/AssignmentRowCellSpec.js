@@ -67,7 +67,13 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
         }
       },
       enterGradesAs: 'points',
-      gradingScheme: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]],
+      gradingScheme: [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['F', 0.0]
+      ],
       isSubmissionTrayOpen: false,
       onGradeSubmission() {},
       onToggleSubmissionTrayOpen() {},
@@ -153,6 +159,24 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
         strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
+      test('does not render a SimilarityIndicator when no similarity data is present', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__GradeCell__OriginalityScore').length, 0)
+      })
+
+      test('does not render a SimilarityIndicator when data is present but the pending grade is invalid', () => {
+        props.pendingGradeInfo = {excused: false, grade: null, valid: false}
+        props.submission.similarityInfo = {status: 'pending'}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__GradeCell__OriginalityScore').length, 0)
+      })
+
+      test('renders a SimilarityIndicator when similarity data is present and the pending grade is not invalid', () => {
+        props.submission.similarityInfo = {similarityScore: 60, status: 'scored'}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__GradeCell__OriginalityScore').length, 1)
+      })
+
       test('renders the GradeCell div with the "points" class', () => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__GradeCell').hasClass('points'), true)
@@ -208,6 +232,24 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
         strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
+      test('does not render a SimilarityIndicator when no similarity data is present', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__GradeCell__OriginalityScore').length, 0)
+      })
+
+      test('does not render a SimilarityIndicator when data is present but the pending grade is invalid', () => {
+        props.pendingGradeInfo = {excused: false, grade: null, valid: false}
+        props.submission.similarityInfo = {status: 'pending'}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__GradeCell__OriginalityScore').length, 0)
+      })
+
+      test('renders a SimilarityIndicator when similarity data is present and the pending grade is not invalid', () => {
+        props.submission.similarityInfo = {similarityScore: 60, status: 'scored'}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__GradeCell__OriginalityScore').length, 1)
+      })
+
       test('renders the GradeCell div with the "percent" class', () => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__GradeCell').hasClass('percent'), true)
@@ -256,6 +298,24 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
+      })
+
+      test('does not render a SimilarityIndicator when no similarity data is present', () => {
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__GradeCell__OriginalityScore').length, 0)
+      })
+
+      test('does not render a SimilarityIndicator when data is present but the pending grade is invalid', () => {
+        props.pendingGradeInfo = {excused: false, grade: null, valid: false}
+        props.submission.similarityInfo = {status: 'pending'}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__GradeCell__OriginalityScore').length, 0)
+      })
+
+      test('renders a SimilarityIndicator when similarity data is present and the pending grade is not invalid', () => {
+        props.submission.similarityInfo = {similarityScore: 60, status: 'scored'}
+        wrapper = mountComponent()
+        strictEqual(wrapper.find('.Grid__GradeCell__OriginalityScore').length, 1)
       })
 
       test('renders the GradeCell div with the "gradingScheme" class', () => {
@@ -355,7 +415,7 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
 
         test('Tab on the invalid grade indicator skips SlickGrid default behavior', () => {
           wrapper = mountComponent()
-          wrapper.instance().invalidGradeIndicator.focus()
+          wrapper.instance().startContainerIndicator.focus()
           const continueHandling = simulateKeyDown(9, false) // tab to tray button trigger
           strictEqual(continueHandling, false)
         })
@@ -369,7 +429,34 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
 
         test('Shift+Tab on the invalid grade indicator does not skip SlickGrid default behavior', () => {
           wrapper = mountComponent()
-          wrapper.instance().invalidGradeIndicator.focus()
+          wrapper.instance().startContainerIndicator.focus()
+          const continueHandling = simulateKeyDown(9, true) // shift+tab out of grid
+          equal(typeof continueHandling, 'undefined')
+        })
+      })
+
+      QUnit.module('when similarity data is present', contextHooks => {
+        contextHooks.beforeEach(() => {
+          props.submission.similarityInfo = {similarityScore: 60, status: 'scored'}
+        })
+
+        test('Tab on the similarity icon skips SlickGrid default behavior', () => {
+          wrapper = mountComponent()
+          wrapper.instance().startContainerIndicator.focus()
+          const continueHandling = simulateKeyDown(9, false) // tab to tray button trigger
+          strictEqual(continueHandling, false)
+        })
+
+        test('Shift+Tab on the grade input skips SlickGrid default behavior', () => {
+          wrapper = mountComponent()
+          wrapper.instance().gradeInput.focus()
+          const continueHandling = simulateKeyDown(9, true) // shift+tab back to indicator
+          strictEqual(continueHandling, false)
+        })
+
+        test('Shift+Tab on the similarity icon does not skip SlickGrid default behavior', () => {
+          wrapper = mountComponent()
+          wrapper.instance().startContainerIndicator.focus()
           const continueHandling = simulateKeyDown(9, true) // shift+tab out of grid
           equal(typeof continueHandling, 'undefined')
         })

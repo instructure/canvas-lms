@@ -19,6 +19,8 @@
 <% css_bundle :submission %>
 
 <% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : submission_author_name_for(@assessment_request) %>
+<% show_updated_plagiarism_icons = @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator) %>
+
 <% provide :page_title do %><%= join_title @assignment.title, t("Submission Preview") %><% end %>
 <% if @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic %>
   <div style="width: 600px; margin: 10px auto;">
@@ -113,7 +115,12 @@
       <option aria-label="<%= t("Assignment %{assignment} submission Paper View", :assignment=> @assignment.title) %>" value="paper"><%= t('Paper View') %></option>
       <option aria-label="<%= t("Assignment %{assignment} submission Plain Text View", :assignment=> @assignment.title) %>" value="plain_text"><%= t('Plain Text View') %></option>
     </select>
-    <%= render :partial => 'submissions/originality_score', locals: { attachment: nil } %>
+    <%=
+      render partial: 'submissions/originality_score', locals: {
+        attachment: nil,
+        show_updated_icons: show_updated_plagiarism_icons
+      }
+    %>
   </div>
   <div id="submission_preview" class="paper user_content">
     <%= user_content(@submission.body) %>
@@ -158,7 +165,12 @@
         </div>
 
         <div class="file-upload-submission-turnitin">
-           <%= render :partial => 'submissions/originality_score', locals: { attachment: attachment } %>
+          <%=
+            render partial: 'submissions/originality_score', locals: {
+              attachment: attachment,
+              show_updated_icons: show_updated_plagiarism_icons
+            }
+          %>
         </div>
 
         <div class="file-upload-submission-attachment">

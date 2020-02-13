@@ -148,6 +148,14 @@ describe EportfoliosController do
         expect(response).to be_successful
         expect(assigns[:page]).not_to be_nil
       end
+
+      describe "js_env" do
+        it "sets SKIP_ENHANCING_USER_CONTENT to true" do
+          @portfolio.eportfolio_categories.create!(name: "Home")
+          get 'show', params: {id: @portfolio.id, view: "preview"}
+          expect(assigns.dig(:js_env, :SKIP_ENHANCING_USER_CONTENT)).to be true
+        end
+      end
     end
 
     describe "assigns[:owner_url]" do

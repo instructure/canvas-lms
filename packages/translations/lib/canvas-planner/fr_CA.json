@@ -116,6 +116,9 @@
     "message": "{ items } terminé { items, plural,\n     =1 {élément}\n  other {éléments}\n}"
   },
   "late_2be42b88": { "message": "En retard" },
+  "list_collapsed_9ac35920": { "message": "Liste réduite." },
+  "list_collapsed_dde87718": { "message": "Liste réduite" },
+  "list_expanded_efec2d0": { "message": "Liste développée." },
   "load_more_a36f9cf9": { "message": "En charger plus" },
   "load_prior_dates_f2b0f6f0": { "message": "Charger les dates précédentes" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -174,6 +177,9 @@
   "opportunities_popup_f6703842": {
     "message": "Fenêtre contextuelle des possibilités"
   },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } sélectionné. Liste réduite."
+  },
   "optional_add_course_ef0d70fc": {
     "message": "Facultatif : Ajouter un cours"
   },
@@ -229,6 +235,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Demain à { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Impossible de marquer comme Terminé."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Utiliser les touches directionnelles pour naviguer entre les options."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Hier à { date }" },
   "yesterday_c6bd6abf": { "message": "Hier" },

@@ -29,7 +29,8 @@ const env = {
   error_message: 'error message',
   error_log: 'error log',
   DEEP_LINKING_POST_MESSAGE_ORIGIN: '*',
-  lti_endpoint: 'https://www.test.com/retrieve'
+  lti_endpoint: 'https://www.test.com/retrieve',
+  close_dialog: false
 }
 let oldEnv = {}
 

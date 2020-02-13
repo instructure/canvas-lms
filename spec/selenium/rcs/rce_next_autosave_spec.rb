@@ -68,7 +68,6 @@ describe "RCE Next autosave feature" do
     end
 
     it "should autosave" do
-      skip("all but one test fails with Selenium::WebDriver::Error::NoSuchAlertError, see LA-355")
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
@@ -76,7 +75,6 @@ describe "RCE Next autosave feature" do
     end
 
     it "should prompt to restore autosaved conent" do
-      skip("all but one test fails with Selenium::WebDriver::Error::NoSuchAlertError, see LA-355")
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
@@ -97,7 +95,6 @@ describe "RCE Next autosave feature" do
 
     # localStorage in chrome is limitedto 5120k, and that seems to include the key
     it "should handle quota exceeded" do
-      skip("all but one test fails with Selenium::WebDriver::Error::NoSuchAlertError, see LA-355")
       get '/'
       driver.local_storage.clear
       driver.local_storage['xyzzy'] = 'x'*5119*1024 + 'x'*1000
@@ -108,19 +105,17 @@ describe "RCE Next autosave feature" do
     end
 
     it "should make room if quota is exceeded due to other rce auto save data" do
-      # did not skip this one, because it exercises the most of the tests here
       get '/'
       driver.local_storage.clear
       driver.local_storage[autosave_key('http://some/url', 'id')] = make_autosave_entry('x'*5119*1024 + 'x'*921)
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       saved_content = JSON.parse(saved_content)
-      expect(saved_content["content"]).to eql('<p>hello</p><p><br data-mce-bogus="1"></p>')
+      expect(saved_content["content"]).to eql("<p>hello</p>\n<p>&nbsp;</p>")
       driver.local_storage.clear
     end
 
     it "should clean up expired autosaved entries" do
-      skip("all but one test fails with Selenium::WebDriver::Error::NoSuchAlertError, see LA-355")
       Setting.set('rce_auto_save_max_age_ms', 10)
       get '/'
       driver.local_storage[autosave_key('http://some/url', 'id')] = make_autosave_entry("anything")
@@ -128,6 +123,22 @@ describe "RCE Next autosave feature" do
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key('http://some/url', 'id')]
       expect(saved_content).to be_nil
+      driver.local_storage.clear
+    end
+
+    it "should clean up expired autosaved entries before prompting to restore" do
+      # skip("all but one test fails with Selenium::WebDriver::Error::NoSuchAlertError, see LA-355")
+      create_and_edit_announcement
+      saved_content = driver.local_storage[autosave_key]
+      assert(saved_content)
+
+      Setting.set('rce_auto_save_max_age_ms', 10)
+
+      driver.navigate.refresh
+      accept_alert
+      wait_for_rce
+
+      expect(f('body')).not_to contain_css('[data-testid="RCE_RestoreAutoSaveModal"]')
       driver.local_storage.clear
     end
   end

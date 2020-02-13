@@ -439,12 +439,7 @@ class GradebooksController < ApplicationController
 
   def set_gradebook_env
     set_student_context_cards_js_env
-    env = old_gradebook_env
-
-    if new_gradebook_enabled?
-      env = env.deep_merge(new_gradebook_env)
-    end
-
+    env = old_gradebook_env.deep_merge(new_gradebook_env)
     js_env(env)
   end
 
@@ -623,22 +618,54 @@ class GradebooksController < ApplicationController
 
   def submissions_zip_upload
     return unless authorized_action(@context, @current_user, :manage_grades)
+
+    assignment = @context.assignments.active.find(params[:assignment_id])
+
     unless @context.allows_gradebook_uploads?
-      flash[:error] = t('errors.not_allowed', "This course does not allow score uploads.")
-      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      flash[:error] = t("This course does not allow score uploads.")
+      redirect_to named_context_url(@context, :context_assignment_url, assignment.id)
       return
     end
-    @assignment = @context.assignments.active.find(params[:assignment_id])
+
     if !params[:submissions_zip] || params[:submissions_zip].is_a?(String)
-      flash[:error] = t('errors.missing_file', "Could not find file to upload")
-      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      flash[:error] = t("Could not find file to upload")
+      redirect_to named_context_url(@context, :context_assignment_url, assignment.id)
       return
     end
-    @comments, @failures = @assignment.generate_comments_from_files(params[:submissions_zip].path, @current_user)
+
+    if Account.site_admin.feature_enabled?(:submissions_reupload_status_page)
+      submission_zip_params = {uploaded_data: params[:submissions_zip]}
+      assignment.generate_comments_from_files_later(submission_zip_params, @current_user)
+
+      redirect_to named_context_url(@context, :submissions_upload_context_gradebook_url, assignment.id)
+      return
+    end
+
+    @assignment = assignment
+    @comments, @failures = @assignment.generate_comments_from_files_legacy(params[:submissions_zip].path, @current_user)
     flash[:notice] = t('notices.uploaded',
                        { :one => "Files and comments created for 1 submission",
                          :other => "Files and comments created for %{count} submissions" },
                        :count => @comments.length)
+  end
+
+  def show_submissions_upload
+    return render status: :not_found unless Account.site_admin.feature_enabled?(:submissions_reupload_status_page)
+
+    return unless authorized_action(@context, @current_user, :manage_grades)
+
+    @assignment = @context.assignments.active.find(params[:assignment_id])
+
+    unless @context.allows_gradebook_uploads?
+      flash[:error] = t("This course does not allow score uploads.")
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
+      return
+    end
+
+    @progress = @assignment.submission_reupload_progress
+
+    css_bundle :show_submissions_upload
+    render :show_submissions_upload
   end
 
   def speed_grader
@@ -678,7 +705,7 @@ class GradebooksController < ApplicationController
           CONTEXT_ACTION_SOURCE: :speed_grader,
           can_view_audit_trail: @assignment.can_view_audit_trail?(@current_user),
           settings_url: speed_grader_settings_course_gradebook_path,
-          new_gradebook_enabled: new_gradebook_enabled?,
+          new_gradebook_enabled: true,
           force_anonymous_grading: force_anonymous_grading?(@assignment),
           anonymous_identities: @assignment.anonymous_grader_identities_by_anonymous_id,
           final_grader_id: @assignment.final_grader_id,
@@ -707,12 +734,10 @@ class GradebooksController < ApplicationController
           env[:current_anonymous_id] = @assignment.moderation_graders.find_by!(user_id: @current_user.id).anonymous_id
         end
 
-        if new_gradebook_enabled?
-          env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
-          env[:post_policies_enabled] = true if @context.post_policies_enabled?
-          if @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
-            env[:new_gradebook_plagiarism_icons_enabled] = true
-          end
+        env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
+        env[:post_policies_enabled] = true if @context.post_policies_enabled?
+        if @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
+          env[:new_gradebook_plagiarism_icons_enabled] = true
         end
 
         if @assignment.quiz
@@ -931,16 +956,6 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def new_gradebook_enabled?
-    # params[:new_gradebook] is a development-only convenience for engineers.
-    # This param should never be used outside of development.
-    if Rails.env.development? && params.include?(:new_gradebook)
-      params[:new_gradebook] == "true"
-    else
-      @context.feature_enabled?(:new_gradebook)
-    end
-  end
-
   def new_gradebook_development_enabled?
     # params[:new_gradebook_development] is a development-only convenience for engineers.
     # This param should never be used outside of development.
@@ -960,19 +975,11 @@ class GradebooksController < ApplicationController
   end
 
   def render_default_gradebook
-    if new_gradebook_enabled?
-      render "gradebooks/gradezilla/gradebook"
-    else
-      render :gradebook
-    end
+    render "gradebooks/gradezilla/gradebook"
   end
 
   def render_individual_gradebook
-    if new_gradebook_enabled?
-      render "gradebooks/gradezilla/individual"
-    else
-      render :screenreader
-    end
+    render "gradebooks/gradezilla/individual"
   end
 
   def percentage(weight)

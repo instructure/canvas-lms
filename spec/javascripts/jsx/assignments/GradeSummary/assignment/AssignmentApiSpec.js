@@ -17,7 +17,10 @@
  */
 
 import * as AssignmentApi from 'jsx/assignments/GradeSummary/assignment/AssignmentApi'
-import FakeServer, {paramsFromRequest, pathFromRequest} from 'jsx/__tests__/FakeServer'
+import FakeServer, {
+  paramsFromRequest,
+  pathFromRequest
+} from 'jsx/shared/network/__tests__/FakeServer'
 
 QUnit.module('GradeSummary AssignmentApi', suiteHooks => {
   let server

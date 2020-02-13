@@ -10249,7 +10249,7 @@ nl:
         due: Inleverdatum
         grades: "Cijfers voor %{student}"
         name: Naam
-        out_of: Vanuit
+        out_of: Totaalscore
         score: Score
         submission_progress_status: "Voortgangsstatus inlevering"
       icons: 

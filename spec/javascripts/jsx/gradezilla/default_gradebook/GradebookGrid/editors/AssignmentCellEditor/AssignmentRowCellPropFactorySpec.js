@@ -116,7 +116,13 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
     test('.gradingScheme is the grading scheme for the assignment', () => {
       const gradingScheme = {
         id: '2801',
-        data: [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]],
+        data: [
+          ['😂', 0.9],
+          ['🙂', 0.8],
+          ['😐', 0.7],
+          ['😢', 0.6],
+          ['💩', 0]
+        ],
         title: 'Emoji Grades'
       }
       gradebook.getAssignment('2301').grading_standard_id = '2801'
@@ -233,6 +239,47 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
 
     test('.submission.userId is the student id', () => {
       strictEqual(getProps().submission.userId, '1101')
+    })
+
+    QUnit.module('.submission.similarityInfo', () => {
+      test('is null when not showing similarity scores in Gradebook', () => {
+        strictEqual(getProps().submission.similarityInfo, null)
+      })
+
+      QUnit.module('when showing similarity scores in Gradebook', showSimilarityScoreHooks => {
+        showSimilarityScoreHooks.beforeEach(() => {
+          sinon.stub(gradebook, 'showSimilarityScore').returns(true)
+        })
+
+        showSimilarityScoreHooks.afterEach(() => {
+          gradebook.showSimilarityScore.restore()
+        })
+
+        test('is null when the submission has no similarity data', () => {
+          strictEqual(getProps().submission.similarityInfo, null)
+        })
+
+        test('is set to the first entry returned by extractSimilarityInfo if data is present', () => {
+          const submission = {
+            assignment_id: '2301',
+            entered_grade: '7.8',
+            entered_score: 7.8,
+            excused: false,
+            grade: '6.8',
+            id: '2501',
+            score: 6.8,
+            submission_type: 'online_text_entry',
+            turnitin_data: {
+              submission_2501: {status: 'scored', similarity_score: 75}
+            },
+            user_id: '1101'
+          }
+
+          sinon.stub(gradebook, 'getSubmission').returns(submission)
+          deepEqual(getProps().submission.similarityInfo, {status: 'scored', similarityScore: 75})
+          gradebook.getSubmission.restore()
+        })
+      })
     })
 
     test('.submissionIsUpdating is true when a valid pending grade exists', () => {

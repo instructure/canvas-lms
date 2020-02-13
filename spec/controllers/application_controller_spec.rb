@@ -829,32 +829,40 @@ RSpec.describe ApplicationController do
         expect(assigns[:lti_launch].params["custom_test_token"]).to be_present
       end
 
-      it 'uses selection_width and selection_height if provided' do
-        allow(controller).to receive(:named_context_url).and_return(tool.url)
-        allow(controller).to receive(:render)
-        allow(controller).to receive_messages(js_env:[])
-        controller.instance_variable_set(:"@context", course)
-        allow(content_tag).to receive(:id).and_return(42)
-        controller.send(:content_tag_redirect, course, content_tag, nil)
+      context 'tool dimensions' do
+        before do
+          allow(controller).to receive(:named_context_url).and_return(tool.url)
+          allow(controller).to receive(:render)
+          allow(controller).to receive_messages(js_env:[])
+          controller.instance_variable_set(:"@context", course)
+          allow(content_tag).to receive(:id).and_return(42)
+        end
 
-        expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '500px'
-        expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq '300px'
-      end
+        it 'uses selection_width and selection_height if provided' do
+          controller.send(:content_tag_redirect, course, content_tag, nil)
 
-      it 'appends px to tool dimensions only when needed' do
-        tool.settings = {}
-        tool.save!
-        content_tag = ContentTag.create(content: tool, url: tool.url)
+          expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '500px'
+          expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq '300px'
+        end
 
-        allow(controller).to receive(:named_context_url).and_return(tool.url)
-        allow(controller).to receive(:render)
-        allow(controller).to receive_messages(js_env:[])
-        controller.instance_variable_set(:"@context", course)
-        allow(content_tag).to receive(:id).and_return(42)
-        controller.send(:content_tag_redirect, course, content_tag, nil)
+        it 'uses selection_width and selection_height from the ContentTag if provided' do
+          content_tag.update_attributes(link_settings: {selection_width: 543, selection_height: 321})
+          controller.send(:content_tag_redirect, course, content_tag, nil)
 
-        expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '100%'
-        expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq '100%'
+          expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '543px'
+          expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq '321px'
+        end
+
+        it 'appends px to tool dimensions only when needed' do
+          tool.settings = {}
+          tool.save!
+          content_tag = ContentTag.create(content: tool, url: tool.url)
+
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+
+          expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '100%'
+          expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq '100%'
+        end
       end
     end
 

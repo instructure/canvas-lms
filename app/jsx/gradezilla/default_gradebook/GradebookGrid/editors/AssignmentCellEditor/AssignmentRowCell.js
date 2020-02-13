@@ -27,6 +27,7 @@ import I18n from 'i18n!gradezilla'
 
 import AssignmentGradeInput from '../AssignmentGradeInput'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'
+import SimilarityIndicator from '../SimilarityIndicator'
 
 const themeOverrides = {
   [Button.theme]: {
@@ -70,6 +71,10 @@ export default class AssignmentRowCell extends Component {
       enteredScore: number,
       excused: bool.isRequired,
       id: string,
+      similarityInfo: shape({
+        similarityScore: number,
+        status: string.isRequired
+      }),
       userId: string.isRequired
     }).isRequired,
     submissionIsUpdating: bool.isRequired
@@ -85,8 +90,8 @@ export default class AssignmentRowCell extends Component {
     this.bindContainerRef = ref => {
       this.contentContainer = ref
     }
-    this.bindInvalidGradeIndicatorRef = ref => {
-      this.invalidGradeIndicator = ref
+    this.bindStartContainerIndicatorRef = ref => {
+      this.startContainerIndicator = ref
     }
     this.bindGradeInput = ref => {
       this.gradeInput = ref
@@ -116,7 +121,7 @@ export default class AssignmentRowCell extends Component {
   }
 
   handleKeyDown = event => {
-    const indicatorHasFocus = this.invalidGradeIndicator === document.activeElement
+    const indicatorHasFocus = this.startContainerIndicator === document.activeElement
     const inputHasFocus = this.contentContainer.contains(document.activeElement)
     const trayButtonHasFocus = this.trayButton === document.activeElement
 
@@ -127,7 +132,7 @@ export default class AssignmentRowCell extends Component {
       }
     }
 
-    const hasPreviousElement = trayButtonHasFocus || (inputHasFocus && this.invalidGradeIndicator)
+    const hasPreviousElement = trayButtonHasFocus || (inputHasFocus && this.startContainerIndicator)
     const hasNextElement = inputHasFocus || indicatorHasFocus
 
     // Tab
@@ -176,12 +181,21 @@ export default class AssignmentRowCell extends Component {
 
     const gradeIsInvalid = this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid
 
+    const {similarityInfo} = this.props.submission
+    const showSimilarityIcon = !gradeIsInvalid && similarityInfo != null
+
     return (
       <ApplyTheme theme={themeOverrides}>
         <div className={`Grid__GradeCell ${this.props.enterGradesAs}`}>
           <div className="Grid__GradeCell__StartContainer">
             {gradeIsInvalid && (
-              <InvalidGradeIndicator elementRef={this.bindInvalidGradeIndicatorRef} />
+              <InvalidGradeIndicator elementRef={this.bindStartContainerIndicatorRef} />
+            )}
+            {showSimilarityIcon && (
+              <SimilarityIndicator
+                elementRef={this.bindStartContainerIndicatorRef}
+                similarityInfo={similarityInfo}
+              />
             )}
           </div>
 

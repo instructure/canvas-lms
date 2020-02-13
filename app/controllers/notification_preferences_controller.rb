@@ -76,7 +76,7 @@ class NotificationPreferencesController < ApplicationController
   end
 
   # @API Get a preference
-  # Fetch the preference for the given notification for the given communicaiton channel
+  # Fetch the preference for the given notification for the given communication channel
   # @returns NotificationPreference
   def show
     render json: { notification_preferences: [notification_policy_json(NotificationPolicy.find_or_update_for(@cc, params[:notification]), @current_user, session)] }

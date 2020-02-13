@@ -20,7 +20,6 @@ module SIS
   class SectionImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       CourseSection.suspend_callbacks(:delete_enrollments_later_if_deleted) do
         Course.skip_updating_account_associations do
@@ -47,7 +46,7 @@ module SIS
           end
         end
       end
-      @logger.debug("Sections took #{Time.zone.now - start} seconds")
+
       importer.success_count
     end
 
@@ -72,8 +71,6 @@ module SIS
       end
 
       def add_section(section_id, course_id, name, status, start_date=nil, end_date=nil, integration_id=nil)
-        @logger.debug("Processing Section #{[section_id, course_id, name, status, start_date, end_date].inspect}")
-
         raise ImportError, "No section_id given for a section in course #{course_id}" if section_id.blank?
         raise ImportError, "No course_id given for a section #{section_id}" if course_id.blank?
         raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank? && status =~ /\Aactive/i

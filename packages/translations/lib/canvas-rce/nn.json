@@ -37,6 +37,9 @@
   "choose_caption_file_9c45bc4e": { "message": "Vel undertekstfil" },
   "circle_unordered_list_9e3a0763": { "message": "sirkulær uordna liste" },
   "clear_selected_file_82388e50": { "message": "Fjern vald fil" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Fjern vald fil: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Klikk på eit sidenamn for å sette inn ei lenke til sida. "
   },

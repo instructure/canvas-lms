@@ -114,6 +114,9 @@
     "message": "{ items } fullgjorda { items, plural,\n     =1 {objekt}\n  other {objekt}\n}"
   },
   "late_2be42b88": { "message": "Sen" },
+  "list_collapsed_9ac35920": { "message": "Listan komprimerades." },
+  "list_collapsed_dde87718": { "message": "Listan komprimerades" },
+  "list_expanded_efec2d0": { "message": "Listan utökades." },
   "load_more_a36f9cf9": { "message": "Läs in mer" },
   "load_prior_dates_f2b0f6f0": { "message": "Läs in tidigare datum" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -164,6 +167,9 @@
     "message": "*Endast den senaste bedömningsperioden visas."
   },
   "opportunities_popup_f6703842": { "message": "popupfönster med möjligheter" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } valda. Listan komprimerades."
+  },
   "optional_add_course_ef0d70fc": { "message": "Valfritt: Lägg till kurs" },
   "page_50c4823d": { "message": "Sida" },
   "peer_review_74f26a13": { "message": "Kamratresponsuppgifter" },
@@ -221,6 +227,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "I morgon kl. { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Det går inte att markera som fullgjord."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Använd piltangenterna för att navigera bland alternativen."
   },
   "yesterday_at_date_1aa6d18e": { "message": "I går kl. { date }" },
   "yesterday_c6bd6abf": { "message": "I går" },

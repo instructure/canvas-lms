@@ -18009,7 +18009,7 @@ pt-BR:
           students_select_multiple: "Os alunos escolhem múltiplas respostas"
         question_type: 
           calculated: "Pergunta de fórmula"
-          essay: "Pergunta de ensaio"
+          essay: "Pergunta dissertativa"
           file_upload: "Pergunta de envio de arquivo"
           fill_in_multiple_blanks: "Preencher múltiplas lacunas"
           matching: Correspondência
@@ -20872,7 +20872,7 @@ pt-BR:
   someone_bbbc538b: Alguém
   someone_just_made_a_new_comment_on_the_anonymous_s_3627de61: "Alguém acabou de fazer um novo comentário sobre o envio anônimo para o Aluno (%{user_id}) para %{assignment_title}"
   someone_just_made_a_new_comment_on_the_anonymous_s_a2e944fc: "Alguém acabou de fazer um novo comentário sobre o envio anônimo para o Aluno (%{user_id}) para %{assignment_title}."
-  something_broke_unexpectedly_6d3720ee: "Algo se partiu se forma inesperada."
+  something_broke_unexpectedly_6d3720ee: "Algo se partiu de maneira inesperada."
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Tem algo com defeito, mas posso contornar isso por enquanto"
   something_went_wrong_89195131: "Algo deu errado."
   something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: "Algo deu errado ao acessar a sua webcam ou microfone."

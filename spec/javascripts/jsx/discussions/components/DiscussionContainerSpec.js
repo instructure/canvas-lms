@@ -48,20 +48,22 @@ test('renders the component', () => {
 })
 
 QUnit.module('for pinned discussions', () => {
-  test('renders the component Ordered by Recent Activity text', () => {
+  test('renders the component Ordered by Recent Activity text when not pinned', () => {
     const props = defaultProps()
+    props.discussions = []
     props.pinned = undefined
-    const tree = shallow(<DiscussionsContainer {...props} />)
+    const tree = mount(<DiscussionsContainer {...props} />)
     const node = tree.find('.recent-activity-text-container')
     ok(node.exists())
   })
 
-  test('will not render the component Ordered by Recent Activity text', () => {
+  test('will not render the component Ordered by Recent Activity text when pinned', () => {
     const props = defaultProps()
+    props.discussions = []
     props.pinned = true
-    const tree = shallow(<DiscussionsContainer {...defaultProps()} />)
+    const tree = mount(<DiscussionsContainer {...props} />)
     const node = tree.find('.recent-activity-text-container')
-    ok(node.exists())
+    notOk(node.exists())
   })
 })
 
@@ -124,7 +126,10 @@ test('discussionTarget canDrop returns true if assignment due_at is in the futur
 test('connected mapStateToProps filters out filtered discussions', () => {
   const state = {}
   const ownProps = {
-    discussions: [{id: 1, filtered: true}, {id: 2, filtered: false}]
+    discussions: [
+      {id: 1, filtered: true},
+      {id: 2, filtered: false}
+    ]
   }
   const connectedProps = mapState(state, ownProps)
   deepEqual(connectedProps.discussions, [{id: 2, filtered: false}])

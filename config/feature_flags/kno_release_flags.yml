@@ -1,0 +1,34 @@
+---
+account_pronouns:
+  state: hidden
+  display_name: Pronouns for users
+  description: |-
+    Allows users to pick pronouns that will be displayed after
+    their name when it is shown in the user interface.
+  applies_to: RootAccount
+  root_opt_in: true
+
+confetti_for_assignments:
+  state: hidden
+  display_name: Confetti for On-Time Submissions
+  description: |-
+    Displays confetti for users that turn in an assignment prior
+    to the set due date.
+  applies_to: RootAccount
+
+mute_notifications_by_course:
+  state: hidden
+  display_name: Mute notifications by course
+  description: |-
+    Allows users to mute notifications on a course level granularity.
+  applies_to: RootAccount
+
+notification_for_global_announcement:
+  state: hidden
+  display_name: Immediate notifications for global announcements
+  description: |-
+    If you turn this on, when an account admin goes to the page to
+    create a global announcement, a checkbox will appear to send
+    notification directly to users when announcement starts.
+  applies_to: RootAccount
+  root_opt_in: true

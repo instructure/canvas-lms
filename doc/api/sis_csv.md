@@ -533,7 +533,7 @@ YYYY-MM-DDTHH:MM:SSZ</td>
 <td>text</td>
 <td></td>
 <td></td>
-<td>The SIS id of a pre-existing Blueprint course. When provided, 
+<td>The SIS id of a pre-existing Blueprint course. When provided,
 the current course will be set up to receive updates from the blueprint course.
 Requires Blueprint Courses feature.
 To remove the Blueprint Course link you can pass 'dissociate' in place of the id.
@@ -1194,8 +1194,8 @@ first matching provider).</p>
 <td>root_account</td>
 <td>text</td>
 <td></td>
-<td></td>
-<td>The domain of the account to search for the user.</td>
+<td>✓&#42;</td>
+<td>The domain of the account to search for the user. This field is required when identifying a user in a trusted account.</td>
 </tr>
 <tr>
 <td>email</td>

@@ -20,13 +20,12 @@ module SIS
   class GroupImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       Group.process_as_sis(@sis_options) do
         yield importer
       end
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
-      @logger.debug("Groups took #{Time.zone.now - start} seconds")
+
       importer.success_count
     end
 
@@ -44,7 +43,6 @@ module SIS
       end
 
       def add_group(group_id, group_category_id, account_id, course_id, name, status)
-        @logger.debug("Processing Group #{[group_id, group_category_id, account_id, course_id, name, status].inspect}")
         raise ImportError, "No group_id given for a group." unless group_id
         raise ImportError, "No name given for group #{group_id}." if name.blank?
         # closed and completed are no longer valid states. Leaving these for

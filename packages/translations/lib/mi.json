@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Hononga"
     },
+    "list_collapsed_9ac35920": {
+        "message": "I hinga te rārangi."
+    },
+    "list_collapsed_dde87718": {
+        "message": "I hinga te rārangi"
+    },
+    "list_expanded_efec2d0": {
+        "message": "I whānuitia te rarangi."
+    },
     "load_more_35d33c7": {
         "message": "Tukuake nui atu"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "ngā wāhanga pakū-ake"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } kua tīpakotia. I hinga te rārangi."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Kāre Herea: Tāpiri akoranga"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Whakamahia ngā kī pere pere hei whakawhiti i nga wāhanga."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Whakamahia e ngā kaipānui mata hei whakāhua i ngā ihirangi o te āhua"

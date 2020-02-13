@@ -26,13 +26,14 @@
 
   <% if @current_student_submissions.present? %>
     <% if @assignment.submission_types && @assignment.submission_types.match(/(online_upload|online_text_entry|online_url)/) && @downloadable_submissions %>
-      <div>
+      <li>
         <%= render :partial => 'submissions/submission_download' %>
         <a href="<%= context_url(@context, :context_assignment_submissions_url, @assignment.id, :zip => 1) %>"
           id="download_submission_button"
           class="download_submissions_link icon-download">
           <%= t 'links.download_submissions', "Download Submissions" %>
         </a>
+
         <% if @can_grade %>
           <a href="#" class="upload_submissions_link icon-upload" style="<%= hidden unless @assignment.submissions_downloaded? %>">
             <%= t 'links.reupload_submissions', "Re-Upload Submissions" %>
@@ -58,6 +59,14 @@
         <% end %>
       </li>
     <% end %>
+  <% end %>
+
+  <% if @can_grade && @assignment.submission_reupload_progress.present? && Account.site_admin.feature_enabled?(:submissions_reupload_status_page) %>
+    <li>
+      <a href="<%= context_url(@context, :show_submissions_upload_context_gradebook_url, @assignment) %>" class="icon-clock">
+        <%= t "View Uploads Status" %>
+      </a>
+    </li>
   <% end %>
 
   <% if @can_grade && @assignment.has_peer_reviews? %>

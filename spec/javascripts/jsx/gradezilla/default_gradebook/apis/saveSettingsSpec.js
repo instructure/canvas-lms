@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FakeServer, {formBodyFromRequest, pathFromRequest} from 'jsx/__tests__/FakeServer'
+import FakeServer, {
+  formBodyFromRequest,
+  pathFromRequest
+} from 'jsx/shared/network/__tests__/FakeServer'
 import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook', suiteHooks => {

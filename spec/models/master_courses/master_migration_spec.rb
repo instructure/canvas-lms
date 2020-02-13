@@ -192,6 +192,7 @@ describe MasterCourses::MasterMigration do
       att_to = @copy_to.attachments.where(:migration_id => mig_id(att)).first
       expect(att_to).to be_present
       cm1 = @migration.migration_results.first.content_migration
+      expect(cm1.source_course_id).to eq @copy_from.id
       expect(cm1.migration_settings[:imported_assets]["DiscussionTopic"]).to eq topic_to.id.to_s
       expect(cm1.migration_settings[:imported_assets]["Attachment"]).to eq att_to.id.to_s
 

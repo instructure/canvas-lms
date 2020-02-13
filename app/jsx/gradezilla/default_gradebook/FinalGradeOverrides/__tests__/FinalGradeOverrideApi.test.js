@@ -18,7 +18,7 @@
 
 import sinon from 'sinon'
 
-import FakeServer from '../../../../__tests__/FakeServer'
+import FakeServer from '../../../../shared/network/__tests__/FakeServer'
 import * as FlashAlert from '../../../../shared/FlashAlert'
 import * as FinalGradeOverrideApi from '../FinalGradeOverrideApi'
 

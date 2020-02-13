@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Łącza"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Lista zwinięta."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Lista zwinięta"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Rozszerzono listę."
+    },
     "load_more_35d33c7": {
         "message": "Wczytaj więcej"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "okienko wyskakujące z okazjami"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "Wybrano { option }. Lista zwinięta."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Opcjonalnie: Dodaj kurs"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Użyj klawiszy strzałek do nawigowania po opcjach."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Używane przez czytniki ekranu do opisania zawartości obrazu"

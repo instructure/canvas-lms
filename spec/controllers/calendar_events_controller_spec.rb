@@ -85,6 +85,13 @@ describe CalendarEventsController do
       get 'new', params: {user_id: @teacher.id}
       expect(@controller.js_env[:RECURRING_CALENDAR_EVENTS_ENABLED]).to be(true)
     end
+
+    it "allows usingrce enhancements on a user's calendar if the account allows them to" do
+      Account.default.enable_feature!(:rce_enhancements)
+      user_session(@teacher)
+      get 'new', params: {user_id: @teacher.id}
+      expect(@controller.js_env[:use_rce_enhancements]).to be(true)
+    end
   end
 
   describe "POST 'create'" do

@@ -218,7 +218,9 @@ CanvasRails::Application.routes.draw do
     post :link_enrollment
     post :update_nav
     resource :gradebook do
+      get 'submissions_upload/:assignment_id' => 'gradebooks#show_submissions_upload', as: :show_submissions_upload
       post 'submissions_upload/:assignment_id' => 'gradebooks#submissions_zip_upload', as: :submissions_upload
+
       collection do
         get :change_gradebook_version
         get :blank_submission

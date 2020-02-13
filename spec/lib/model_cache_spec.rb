@@ -46,8 +46,12 @@ describe ModelCache do
   after(:all) do
     ModelCache.keys.delete('TestModelCacheUser')
     ModelCache.keys.delete('TestModelCachePseudonym')
-    ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(TestModelCacheUser)
-    ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(TestModelCachePseudonym)
+    if CANVAS_RAILS5_2
+      # Rails 6 started using WeakRefs for this, so it automatically starts ignoring classes
+      # that have been removed
+      ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(TestModelCacheUser)
+      ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(TestModelCachePseudonym)
+    end
     Object.send(:remove_const, :TestModelCacheUser)
     Object.send(:remove_const, :TestModelCachePseudonym)
   end

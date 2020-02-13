@@ -23,6 +23,19 @@ module Gradezilla
     class << self
       include SeleniumDependencies
 
+      # ---------- Student Cells ---------------
+      def student_cell_selector(student)
+        ".slick-row.student_#{student.id} .student-name"
+      end
+
+      def student_cell(student)
+        f(student_cell_selector(student))
+      end
+
+      def student_cell_name_link(student)
+        f("#{student_cell_selector(student)} .student-grades-link")
+      end
+
       # ---------- Grading Cells ---------------
       def grading_cell_selector(student, assignment)
         ".slick-row.student_#{student.id} .slick-cell.assignment_#{assignment.id}"
@@ -48,8 +61,12 @@ module Gradezilla
         f("#{grading_cell_selector(student, assignment)} .Grid__GradeCell__#{menu_selector}Menu button")
       end
 
+      def grade_tray_button_selector
+        '.Grid__GradeCell__Options button'
+      end
+
       def grade_tray_button
-        f('.Grid__GradeCell__Options button')
+        f(grade_tray_button_selector)
       end
 
       def get_grade(student, assignment)
@@ -96,10 +113,6 @@ module Gradezilla
       end
 
       def open_tray(student, assignment)
-        # ie has narrow columns hiding the grade_tray_button
-        if driver.browser == :internet_explorer
-          driver.execute_script("arguments[0].setAttribute('style', 'width: 150px')", grading_cell(student, assignment))
-        end
         grading_cell(student, assignment).click
         grade_tray_button.click
         Gradezilla::GradeDetailTray.submission_tray_full_content

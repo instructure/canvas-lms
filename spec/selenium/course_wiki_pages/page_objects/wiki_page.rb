@@ -27,6 +27,18 @@ module CourseWikiPage
     '.btn-published'
   end
 
+  def edit_btn_selector
+    '.edit-wiki'
+  end
+
+  def more_options_btn_selector
+    '.al-trigger'
+  end
+
+  def delete_page_menu_item_selector
+    '.delete_page'
+  end
+
   #------------------------------ Elements ------------------------------
   def publish_btn
     f(publish_btn_selector)
@@ -34,6 +46,22 @@ module CourseWikiPage
 
   def published_btn
     f(published_btn_selector)
+  end
+
+  def published_status_published
+    f('.published-status.published')
+  end
+
+  def wiki_page_show
+    f('#wiki_page_show')
+  end
+
+  def more_options_btn
+    f(more_options_btn_selector)
+  end
+
+  def wiki_page_more_options_menu_open
+    f('.ui-menu.ui-state-open')
   end
 
   def wiki_page_body
@@ -55,11 +83,27 @@ module CourseWikiPage
   def immersive_reader_btn
     fj("[type='button']:contains('Immersive Reader')")
   end
+  
+  def edit_page_title_input
+    f('input#title')
+  end
+
+  def tiny_mce_input
+    f('#tinymce')
+  end
+
+  def course_home_nav_menu
+    fj("a:contains('Home')")
+  end
 
   #------------------------------ Actions -------------------------------
 
   def visit_wiki_page_view(course_id, page_title)
     get "/courses/#{course_id}/pages/#{page_title}"
+  end
+
+  def visit_wiki_edit_page(course_id, page_title)
+    get "/courses/#{course_id}/pages/#{page_title}/edit"
   end
 
   def publish_wiki_page
@@ -69,6 +113,11 @@ module CourseWikiPage
 
   def unpublish_wiki_page
     published_btn.click
+    wait_for_ajaximations
+  end
+
+  def click_more_options_menu
+    more_options_btn.click
     wait_for_ajaximations
   end
 end

@@ -629,3 +629,15 @@ $outcome-border: 1px solid #BCC2CA;
   margin-bottom: 10px;
   font-size: 0.8em;
 }
+
+.turnitin_score_container
+  i {
+    &.icon-empty,
+    &.icon-oval-half {
+      color: $ic-color-danger;
+    }
+
+    &.icon-certified {
+      color: $ic-color-success;
+    }
+  }

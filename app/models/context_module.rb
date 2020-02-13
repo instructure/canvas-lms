@@ -638,6 +638,7 @@ class ContextModule < ActiveRecord::Base
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = 'unpublished' if added_item.new_record?
+      added_item.link_settings = params[:link_settings]
       added_item.save
       added_item
     elsif params[:type] == 'context_module_sub_header' || params[:type] == 'sub_header'

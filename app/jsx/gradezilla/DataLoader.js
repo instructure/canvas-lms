@@ -17,7 +17,8 @@
  */
 
 import $ from 'jquery'
-import NaiveRequestDispatch from './default_gradebook/DataLoader/NaiveRequestDispatch'
+
+import NaiveRequestDispatch from '../shared/network/NaiveRequestDispatch'
 import StudentContentDataLoader from './default_gradebook/DataLoader/StudentContentDataLoader'
 
 function getStudentIds(courseId) {

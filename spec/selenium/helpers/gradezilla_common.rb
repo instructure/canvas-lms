@@ -18,6 +18,67 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module GradezillaCommon
+  shared_context 'reusable_gradebook_course' do
+    let(:test_course)       { course_factory(active_course: true) }
+    let(:teacher)           { user_factory(active_all: true) }
+    let(:student)           { user_factory(active_all: true) }
+    let(:concluded_student) { user_factory(name: 'Concluded Student', active_all: true) }
+    let(:observer)          { user_factory(active_all: true) }
+    let(:enroll_teacher_and_students) do
+      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(concluded_student, 'StudentEnrollment', enrollment_state: 'completed')
+    end
+    let(:assignment_group_1) { test_course.assignment_groups.create! name: 'Group 1' }
+    let(:assignment_group_2) { test_course.assignment_groups.create! name: 'Group 2' }
+    let(:assignment_1) do
+      test_course.assignments.create!(
+        title: 'Points Assignment',
+        grading_type: 'points',
+        points_possible: 10,
+        submission_types: 'online_text_entry',
+        due_at: 2.days.ago,
+        assignment_group: assignment_group_1
+      )
+    end
+    let(:assignment_2) do
+      test_course.assignments.create!(
+        title: 'Percent Assignment',
+        grading_type: 'percent',
+        points_possible: 10,
+      )
+    end
+    let(:assignment_3) do
+      test_course.assignments.create!(
+        title: 'Complete/Incomplete Assignment',
+        grading_type: 'pass_fail',
+        points_possible: 10
+      )
+    end
+    let(:assignment_4) do
+      test_course.assignments.create!(
+        title: 'Letter Grade Assignment',
+        grading_type: 'letter_grade',
+        points_possible: 10
+      )
+    end
+    let(:assignment_5) do
+      test_course.assignments.create!(
+        title: 'Zero Points Possible',
+        grading_type: 'points',
+        points_possible: 0,
+        assignment_group: assignment_group_2
+      )
+    end
+    let(:student_submission) do
+      assignment_1.submit_homework(
+        student,
+        submission_type: 'online_text_entry',
+        body: 'Hello!'
+      )
+    end
+  end
+
   def init_course_with_students(num = 1)
     course_with_teacher(active_all: true)
 
@@ -55,17 +116,6 @@ module GradezillaCommon
     set_value(grade_input, grade)
     grade_input.send_keys(:return)
     wait_for_ajaximations
-  end
-
-  def open_comment_dialog(x=0, y=0)
-    cell = f("#gradebook_grid .container_1 .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})")
-    cell.click
-    fj('.Grid__GradeCell__Options button:visible', cell).click
-    f('#ShowSubmissionDetailsAction').click
-    # the dialog fetches the comments async after it displays and then innerHTMLs the whole
-    # thing again once it has fetched them from the server, completely replacing it
-    wait_for_ajax_requests
-    fj('.submission_details_dialog:visible')
   end
 
   def final_score_for_row(row)
@@ -281,4 +331,3 @@ module GradezillaCommon
     end
   end
 end
-

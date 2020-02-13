@@ -84,27 +84,6 @@ describe ProfileController do
       expect(@cc.reload.position).to eq 2
     end
 
-    it "should allow changing pronouns" do
-      user_session(@user, @pseudonym)
-      expect(@user.pronouns).to eq nil
-      put 'update', params: {:user => {:pronouns => "  He/Him "}}, format: 'json'
-      expect(response).to be_successful
-      @user.reload
-      expect(@user.read_attribute(:pronouns)).to eq "he_him"
-      expect(@user.pronouns).to eq "He/Him"
-    end
-
-    it "should allow unsetting pronouns" do
-      user_session(@user, @pseudonym)
-      @user.pronouns = " Dude/Guy  "
-      @user.save!
-      expect(@user.pronouns).to eq "Dude/Guy"
-      put 'update', params: {:user => {:pronouns => ''}}, format: 'json'
-      expect(response).to be_successful
-      @user.reload
-      expect(@user.pronouns).to eq nil
-    end
-
     it "should clear email cache" do
       enable_cache do
         @user.email # prime cache
@@ -113,6 +92,44 @@ describe ProfileController do
         put 'update', params: {:user_id => @user.id, :default_email_id => @cc2.id}, format: 'json'
         expect(response).to be_successful
         expect(@user.email).to eq @cc2.path
+      end
+    end
+
+    describe "personal pronouns" do
+      before :once do
+        @user.account.enable_feature!(:account_pronouns)
+        @user.account.settings = { :can_add_pronouns => true }
+        @user.account.save!
+      end
+
+      it "should allow changing pronouns" do
+        user_session(@user, @pseudonym)
+        expect(@user.pronouns).to eq nil
+        put 'update', params: {:user => {:pronouns => "  He/Him "}}, format: 'json'
+        expect(response).to be_successful
+        @user.reload
+        expect(@user.read_attribute(:pronouns)).to eq "he_him"
+        expect(@user.pronouns).to eq "He/Him"
+      end
+
+      it "should allow unsetting pronouns" do
+        user_session(@user, @pseudonym)
+        @user.pronouns = " Dude/Guy  "
+        @user.save!
+        expect(@user.pronouns).to eq "Dude/Guy"
+        put 'update', params: {:user => {:pronouns => ''}}, format: 'json'
+        expect(response).to be_successful
+        @user.reload
+        expect(@user.pronouns).to eq nil
+      end
+
+      it "should not allow setting pronouns not on the approved list" do
+        user_session(@user, @pseudonym)
+        expect(@user.pronouns).to eq nil
+        put 'update', params: {:user => {:pronouns => "Pro/Noun"}}, format: 'json'
+        expect(response).to be_successful
+        @user.reload
+        expect(@user.pronouns).to eq nil
       end
     end
 

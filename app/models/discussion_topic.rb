@@ -1133,7 +1133,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def ensure_submission(user, only_update=false)
-    topic = self.root_topic? ? self.child_topic_for(user) : self
+    topic = (self.root_topic? && self.child_topic_for(user)) || self
 
     submission = Submission.active.where(assignment_id: self.assignment_id, user_id: user).first
     unless only_update || (submission && submission.submission_type == 'discussion_topic' && submission.workflow_state != 'unsubmitted')

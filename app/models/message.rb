@@ -474,13 +474,13 @@ class Message < ActiveRecord::Base
     return nil unless template
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
-    @output_buffer = nil
+    @output_buffer = ActionView::OutputBuffer.new
     inner_html = eval(ActionView::Template::Handlers::ERB::Erubi.new(template, :bufvar => '@output_buffer').src, binding, template_path)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", binding
     setter.call(inner_html)
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
-    @output_buffer = nil
+    @output_buffer = ActionView::OutputBuffer.new
     eval(ActionView::Template::Handlers::ERB::Erubi.new(File.read(layout_path)).src, binding, layout_path)
   ensure
     @i18n_scope = orig_i18n_scope

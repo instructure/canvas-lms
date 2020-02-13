@@ -52,7 +52,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
         ]
 
         if (contextType === 'course') {
-          items.splice(1, 0, {
+          items.splice(0, 0, {
             type: 'menuitem',
             text: formatMessage('Course Media'),
             onAction() {
@@ -62,8 +62,8 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
           })
         }
 
-        if (!ed.getParam('hide_media_upload')) {
-          items.splice(1, 0, {
+        if (ed.getParam('show_media_upload')) {
+          items.splice(0, 0, {
             type: 'menuitem',
             text: formatMessage('Upload/Record Media'),
             onAction: () => ed.execCommand('instructureRecord')

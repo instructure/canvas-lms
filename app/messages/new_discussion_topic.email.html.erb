@@ -16,8 +16,7 @@
 
 <p><strong><%= asset.title %></strong></p>
 
-<% available_from = asset.available_from_for(user) %>
-<% if available_from && available_from > Time.now.utc %>
+<% if !asset.available_for?(user, :check_policies => true) %>
   <%= t("Discussion content is locked or not yet available") %>
 <% else %>
   <%= html_to_simple_html(asset.message,

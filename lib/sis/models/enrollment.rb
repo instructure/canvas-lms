@@ -60,10 +60,6 @@ module SIS
         status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive|\Adeleted_last_completed/i
       end
 
-      def to_a
-        [course_id.to_s, section_id.to_s, user_id.to_s, role, role_id, status, start_date, end_date, associated_user_id, root_account_id]
-      end
-
       def row_info
         [course_id: course_id,
          section_id: section_id,
@@ -81,5 +77,3 @@ module SIS
     end
   end
 end
-
-

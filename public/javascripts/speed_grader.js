@@ -79,6 +79,7 @@ import './jquery.instructure_forms' /* ajaxJSONFiles */
 import './jquery.doc_previews' /* loadDocPreview */
 import './jquery.instructure_date_and_time' /* datetimeString */
 import 'jqueryui/dialog'
+import 'jqueryui/menu'
 import './jquery.instructure_misc_helpers' /* replaceTags */
 import './jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
 import './jquery.keycodes'

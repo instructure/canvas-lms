@@ -103,6 +103,10 @@ function handleYoutubeLink() {
 trackEvent('Route', window.location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/')
 const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
 export function enhanceUserContent() {
+  if (ENV.SKIP_ENHANCING_USER_CONTENT) {
+    return
+  }
+
   const $content = $('#content')
   $('.user_content:not(.enhanced):visible').addClass('unenhanced')
   $('.user_content.unenhanced:visible')

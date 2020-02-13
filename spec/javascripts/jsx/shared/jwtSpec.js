@@ -17,7 +17,7 @@
  */
 
 import * as jwt from 'jsx/shared/jwt'
-import FakeServer from 'jsx/__tests__/FakeServer'
+import FakeServer from 'jsx/shared/network/__tests__/FakeServer'
 
 QUnit.module('JWT', () => {
   QUnit.module('.refreshFn() returned function', hooks => {

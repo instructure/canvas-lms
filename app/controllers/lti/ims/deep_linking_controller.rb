@@ -23,23 +23,27 @@ module Lti
       protect_from_forgery except: [:deep_linking_response], with: :exception
 
       include Concerns::DeepLinkingServices
+      include Concerns::DeepLinkingModules
 
       before_action :require_context
       before_action :validate_jwt
 
       def deep_linking_response
+        add_module_items
         # Set content items and messaging values in JS env
         js_env({
-          content_items: deep_linking_jwt["#{CLAIM_PREFIX}content_items"],
+          content_items: content_items,
           message: messaging_value('msg'),
           log: messaging_value('log'),
           error_message: messaging_value('errormsg'),
           error_log: messaging_value('errorlog'),
-          lti_endpoint: polymorphic_url([:retrieve, @context, :external_tools])
+          lti_endpoint: polymorphic_url([:retrieve, @context, :external_tools]),
+          reload_page: multiple_module_items?
         }.compact)
 
         render layout: 'bare'
       end
+
     end
   end
 end

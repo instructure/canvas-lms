@@ -37,6 +37,8 @@
     "peer_review"
   end
 
+  show_updated_plagiarism_icons = @assignment.context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
+
   js_env({
     :RUBRIC_ASSESSMENT => {
       assessment_type: assessment_type,
@@ -130,10 +132,19 @@
         <% if can_do(@submission, @current_user, :view_turnitin_report) %>
           <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) &&
             @submission.turnitin_data[:provider] == nil && turnitin_score[:similarity_score] %>
-            <span class="turnitin_score_container">
-              <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
-              <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %>%</a>
-            </span>
+            <% if show_updated_plagiarism_icons %>
+              <%=
+                render partial: 'shared/originality_score_icon', locals: {
+                  plagiarism_data: turnitin_score,
+                  report_url: context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string),
+                }
+              %>
+            <% else %>
+              <span class="turnitin_score_container">
+                <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
+                <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %>%</a>
+              </span>
+            <% end %>
           <% end %>
         <% end %>
         <% elsif @submission.hide_grade_from_student? %>
@@ -141,15 +152,26 @@
         <% end %>
         <% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && @submission.posted? %>
           <% if (vericite_score = @submission.vericite_data(true)[@submission.asset_string]) && @submission.turnitin_data[:provider] == :vericite && vericite_score[:similarity_score] %>
-            <span class="turnitin_score_container">
-              <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>
-              <a href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" title="Similarity score -- more information" class="tooltip not_external turnitin_similarity_score <%= vericite_score[:state] %>_score">
-                <%= vericite_score[:similarity_score] %>%
-                <span class="tooltip_wrap right">
-                  <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
-                </span>
-              </a>
-            </span>
+            <% if show_updated_plagiarism_icons %>
+              <%=
+                render partial: 'shared/originality_score_icon', locals: {
+                  plagiarism_data: vericite_score,
+                  report_title: t("Similarity score -- more information"),
+                  report_url: context_url(@context, :context_assignment_submission_vericite_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string),
+                  tooltip_text: t("See VeriCite results")
+                }
+              %>
+            <% else %>
+              <span class="turnitin_score_container">
+                <span class="vericite_score_container_caret <%= vericite_score[:state] %>_score"></span>
+                <a href="<%= context_url(@context, :context_assignment_submission_vericite_report_url, @submission.assignment_id, @submission.user_id, @submission.asset_string) %>" target="_blank" title="Similarity score -- more information" class="tooltip not_external turnitin_similarity_score <%= vericite_score[:state] %>_score">
+                  <%= vericite_score[:similarity_score] %>%
+                  <span class="tooltip_wrap right">
+                    <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
+                  </span>
+                </a>
+              </span>
+            <% end %>
           <% end %>
         <% end %>
         <% if @assignment.rubric_association && (

@@ -2298,13 +2298,7 @@ class Assignment < ActiveRecord::Base
     scope.to_a.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
   end
 
-  # Takes a zipped file full of assignment comments/annotated assignments
-  # and generates comments on each assignment's submission.  Quietly
-  # ignore (for now) files that don't make sense to us.  The convention
-  # for file naming (how we're sending it down to the teacher) is
-  # last_name_first_name_user_id_attachment_id.
-  # extension
-  def generate_comments_from_files(filename, commenter)
+  def generate_comments_from_files_legacy(filename, commenter)
     zip_extractor = ZipExtractor.new(filename)
     # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
     @ignored_files = []
@@ -2326,6 +2320,83 @@ class Assignment < ActiveRecord::Base
       end
     end
     [comments.compact, @ignored_files]
+  end
+
+  # Takes a zipped file full of assignment comments/annotated assignments
+  # and generates comments on each assignment's submission.  Quietly
+  # ignore (for now) files that don't make sense to us.  The convention
+  # for file naming (how we're sending it down to the teacher) is
+  # last_name_first_name_user_id_attachment_id.
+  # extension
+  def generate_comments_from_files_later(attachment_data, user)
+    progress = Progress.create!(context: self, tag: "submissions_reupload") do |p|
+      p.user = user
+    end
+
+    attachment = user.attachments.create!(attachment_data)
+    progress.process_job(self, :generate_comments_from_files, {}, attachment, user, progress)
+    progress
+  end
+
+  def generate_comments_from_files(_, attachment, commenter, progress)
+    file = attachment.open(need_local_file: true)
+    zip_extractor = ZipExtractor.new(file.path)
+    # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
+    @ignored_files = []
+    file_map = zip_extractor.unzip_files.map { |f| infer_comment_context_from_filename(f) }.compact
+    files_for_user = file_map.group_by { |f| f[:user] }
+
+    comments = []
+
+    files_for_user.each do |user, files|
+      attachments = files.map do |g|
+        FileInContext.attach(self, g[:filename], g[:display_name])
+      end
+
+      comment_attr = {
+        comment: t(:comment_from_files, {one: "See attached file", other: "See attached files"}, count: files.size),
+        author: commenter,
+        attachments: attachments,
+      }
+
+      group, students = group_students(user)
+      comment_attr[:group_comment_id] = CanvasSlug.generate_securish_uuid if group
+
+      find_or_create_submissions(students).each do |submission|
+        hidden = submission.hide_grade_from_student?
+        comments.push(submission.add_comment(comment_attr.merge(hidden: hidden)))
+      end
+    end
+
+    results = {comments: [], ignored_files: @ignored_files}
+
+    comments.each do |comment|
+      attachments = comment.attachments.map do |comment_attachment|
+        {
+          display_name: comment_attachment.display_name,
+          filename: comment_attachment.filename,
+          id: comment_attachment.id
+        }
+      end
+
+      submission = {
+        user_id: comment.submission.user_id,
+        user_name: comment.submission.user.name
+      }
+
+      results[:comments].push({
+        attachments: attachments,
+        id: comment.id,
+        submission: submission
+      })
+    end
+
+    progress.set_results(results)
+    attachment.destroy!
+  end
+
+  def submission_reupload_progress
+    Progress.where(context_type: "Assignment", context_id: self, tag: "submissions_reupload").last
   end
 
   def group_category_name

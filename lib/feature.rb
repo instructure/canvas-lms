@@ -222,6 +222,13 @@ class Feature
     return nil unless fd
     fd.transitions(user, context, orig_state)
   end
+
+  def self.remove_obsolete_flags
+    valid_features = self.definitions.keys
+    cutoff = Setting.get('obsolete_feature_flag_cutoff_days', 60).to_i.days.ago
+    delete_scope = FeatureFlag.where('updated_at<?', cutoff).where.not(feature: valid_features)
+    while delete_scope.limit(1000).delete_all > 0; end
+  end
 end
 
 FeatureFlags::Loader.load_feature_flags

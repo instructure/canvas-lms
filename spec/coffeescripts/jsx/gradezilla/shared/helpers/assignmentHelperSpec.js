@@ -44,14 +44,9 @@ const generateAssignment = function(options) {
   options = options || {}
   return _.defaults(options, {
     name: 'assignment',
-    due_at: new Date('Mon May 11 2015'),
-    effectiveDueDates: {}
+    due_at: new Date('Mon May 11 2015')
   })
 }
-const generateEffectiveDueDates = () => ({
-  '1': {due_at: 'Mon May 11 2015'},
-  '2': {due_at: 'Tue May 12 2015'}
-})
 
 test('compares assignments by due date', () => {
   const assignment1 = generateAssignment()
@@ -90,72 +85,7 @@ test('ignores case when comparing by name', () => {
   ok(comparisonVal > 0)
 })
 
-test('compares by due date overrides if dates are both null', () => {
-  const assignment1 = generateAssignment({due_at: null})
-  assignment1.effectiveDueDates = generateEffectiveDueDates()
-  const assignment2 = generateAssignment({due_at: null})
-  const comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-  ok(comparisonVal < 0)
-})
-
-test('hasMultipleDueDates returns false when provided an empty object', () => {
-  const assignment = {}
-  notOk(assignmentHelper.hasMultipleDueDates(assignment))
-})
-
-test('hasMultipleDueDates returns false when there is only 1 unique effective due date', () => {
-  const assignment = generateAssignment({due_at: null})
-  assignment.effectiveDueDates = {'1': {due_at: 'Mon May 11 2015'}}
-  notOk(assignmentHelper.hasMultipleDueDates(assignment))
-})
-
-test('hasMultipleDueDates returns true when provided overrides with a length greater than 1', () => {
-  const assignment = generateAssignment({due_at: null})
-  assignment.effectiveDueDates = generateEffectiveDueDates()
-  ok(assignmentHelper.hasMultipleDueDates(assignment))
-})
-
-test(
-  'treats assignments with a single override with a null date as' +
-    '"greater" than assignments with multiple overrides',
-  () => {
-    const assignment1 = generateAssignment({due_at: null})
-    assignment1.effectiveDueDates = {'1': {due_at: null}}
-    const assignment2 = generateAssignment({due_at: null})
-    assignment2.effectiveDueDates = {
-      '1': {due_at: null},
-      '2': {due_at: 'Mon May 11 2015'}
-    }
-    const comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-    ok(comparisonVal > 0)
-  }
-)
-
-test('compares by name if dates are both null and both have multiple overrides', () => {
-  const assignment1 = {
-    name: 'Banana',
-    due_at: null
-  }
-  assignment1.effectiveDueDates = {
-    '1': {due_at: null},
-    '2': {due_at: 'Mon May 11 2015'}
-  }
-  const assignment2 = {
-    name: 'Apple',
-    due_at: null
-  }
-  assignment2.effectiveDueDates = {
-    '1': {due_at: null},
-    '2': {due_at: 'Mon May 11 2015'}
-  }
-  let comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-  ok(comparisonVal > 0)
-  assignment2.name = 'Carrot'
-  comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-  ok(comparisonVal < 0)
-})
-
-test('compares by name if dates are both null and neither have due date overrides', () => {
+test('compares by name if dates are both null', () => {
   const assignment1 = {
     name: 'Banana',
     due_at: null
@@ -175,7 +105,7 @@ test('treats assignments with the same dates and names as equal', () => {
   const assignment1 = generateAssignment()
   const assignment2 = generateAssignment()
   const comparisonVal = assignmentHelper.compareByDueDate(assignment1, assignment2)
-  ok(comparisonVal === 0)
+  strictEqual(comparisonVal, 0)
 })
 
 test('handles one due_at passed in as string and another passed in as date', () => {
@@ -245,7 +175,7 @@ test('treats assignments with the same position and group position as equal', ()
     position: 1
   }
   const comparisonVal = assignmentHelper.compareByAssignmentGroup(assignment1, assignment2)
-  ok(comparisonVal === 0)
+  strictEqual(comparisonVal, 0)
 })
 
 QUnit.module('assignmentHelper#gradeByGroup', hooks => {

@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Lyen"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Lis ratresi."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Lis ratresi"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Lis elaji."
+    },
     "load_more_35d33c7": {
         "message": "Chaje Plis"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "opòtinite afiche"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } seleksyone. Lis ratresi."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Opsyonèl: Ajoute Kou"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Itilize tout fllèch yo pou ka navige nan opsyon yo."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Itilize pa lektè ekran yo pou dekri kontni yon imaj"

@@ -20,10 +20,8 @@ module SIS
   class GradePublishingResultsImporter < BaseImporter
 
     def process
-      start = Time.now
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
-      @logger.debug("Grade publishing results took #{Time.now - start} seconds")
       return importer.success_count
     end
 
@@ -39,8 +37,6 @@ module SIS
       end
 
       def add_grade_publishing_result(enrollment_id, grade_publishing_status, message=nil)
-        @logger.debug("Processing grade publishing result #{[enrollment_id, grade_publishing_status].inspect}")
-
         raise ImportError, "No enrollment_id given" if enrollment_id.blank?
         raise ImportError, "No grade_publishing_status given for enrollment #{enrollment_id}" if grade_publishing_status.blank?
         raise ImportError, "Improper grade_publishing_status \"#{grade_publishing_status}\" for enrollment #{enrollment_id}" unless %w{ published error }.include?(grade_publishing_status.downcase)

@@ -37,7 +37,7 @@ pipeline {
     stage ('Environment Variables') {
       steps {
         timeout(time: 2) {
-          sh 'printenv | sort'
+          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
         }
       }
     }

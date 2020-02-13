@@ -17,7 +17,7 @@
 
 require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
-require_relative "../../helpers/gradebook_common"
+require_relative "../../helpers/gradezilla_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/groups_common"
 require_relative "../pages/speedgrader_page"
@@ -25,7 +25,7 @@ require_relative "../pages/speedgrader_page"
 describe "speed grader" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
-  include GradebookCommon
+  include GradezillaCommon
   include SpeedGraderCommon
   include GroupsCommon
 
@@ -234,7 +234,7 @@ describe "speed grader" do
 
   context "multiple enrollments" do
     before(:each) do
-      student_in_course
+      student_in_course(active_all: true)
       @course_section = @course.course_sections.create!(name: "<h1>Other Section</h1>")
       @enrollment = @course.enroll_student(@student,
                                            enrollment_state: "active",

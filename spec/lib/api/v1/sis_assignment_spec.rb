@@ -224,7 +224,7 @@ describe Api::V1::SisAssignment do
       before do
         @student1 = student_in_course(course: course, workflow_state: 'active').user
         @student2 = student_in_course(course: course, workflow_state: 'active').user
-        managed_pseudonym(@student2, sis_user_id: 'SIS_ID_2')
+        managed_pseudonym(@student2, sis_user_id: 'SIS_ID_2', account: Account.default)
 
         due_at = Time.zone.parse('2017-02-08 22:11:10')
         @override = create_adhoc_override_for_assignment(assignment_1, [@student1, @student2], due_at: due_at)

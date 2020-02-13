@@ -343,6 +343,25 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect { @quiz.statistics_csv('student_analysis', {}) }.not_to raise_error
     end
 
+    it 'should not error out when answers is null in a text_only_question' do
+      @quiz.quiz_questions.create!(:question_data => { :name => "text_only_question",
+        :question_type => 'text_only_question',
+        :question_text => "[num1]",
+        :answers => nil
+      })
+
+      @quiz.generate_quiz_data
+      @quiz.save!
+
+      qs = @quiz.generate_submission(@student)
+      qs.submission_data = {
+        "question_#{@quiz.quiz_questions[1].id}" => 'Pretend this is an essay question!'
+      }
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+
+      expect { @quiz.statistics_csv('student_analysis', {}) }.not_to raise_error
+    end
+
     it 'should include primary domain if trust exists' do
       account2 = Account.create!
       allow(HostUrl).to receive(:context_host).and_return('school')

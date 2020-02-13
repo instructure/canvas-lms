@@ -28,7 +28,7 @@ pipeline {
   options {
     ansiColor('xterm')
   }
-  
+
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml'
     GERRIT_PROJECT = 'canvas-lms'
@@ -43,7 +43,7 @@ pipeline {
     stage('Print Env Variables') {
       steps {
         timeout(time: 20, unit: 'SECONDS') {
-          sh 'printenv | sort'
+          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
         }
       }
     }

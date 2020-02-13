@@ -128,6 +128,49 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    describe "hidden_submissions_count attribute" do
+      before do
+        PostPolicy.enable_feature!
+        assignment.course.enable_feature!(:new_gradebook)
+        @student = assignment.course.enroll_student(User.create!, enrollment_state: :active).user
+        @teacher = assignment.course.enroll_teacher(User.create!, enrollment_state: :active).user
+        assignment.ensure_post_policy(post_manually: true)
+      end
+
+      it "counts submissions that are unposted and have a grade" do
+        assignment.grade_student(@student, grader: @teacher, score: 10)
+        json = api.assignment_json(assignment, @teacher, session)
+        expect(json["hidden_submissions_count"]).to be 1
+      end
+
+      it "does not count submissions that are unposted and have only visible comments" do
+        submission = assignment.submissions.find_by(user: @student)
+        submission.add_comment(author: @student, comment: "this assignment rocks!")
+        json = api.assignment_json(assignment, @teacher, session)
+        expect(json["hidden_submissions_count"]).to be 0
+      end
+
+      it "does not count posted submissions" do
+        assignment.ensure_post_policy(post_manually: false)
+        assignment.grade_student(@student, grader: @teacher, score: 10)
+        json = api.assignment_json(assignment, @teacher, session)
+        expect(json["hidden_submissions_count"]).to be 0
+      end
+
+      context "when allow_postable_submission_comments feature is enabled" do
+        before do
+          assignment.course.root_account.enable_feature!(:allow_postable_submission_comments)
+        end
+
+        it "counts submissions that are unposted and have a hidden comment" do
+          submission = assignment.submissions.find_by(user: @student)
+          submission.add_comment(author: @teacher, comment: "good jerb!", hidden: true)
+          json = api.assignment_json(assignment, @teacher, session)
+          expect(json["hidden_submissions_count"]).to be 1
+        end
+      end
+    end
+
     context "for an assignment" do
       it "provides a submissions download URL" do
         json = api.assignment_json(assignment, user, session)
@@ -432,56 +475,6 @@ describe "Api::V1::Assignment" do
           assignment.allowed_extensions = ["docx"]
           expect(api).to be_assignment_editable_fields_valid(assignment, user)
         end
-      end
-    end
-  end
-
-  describe "muting and unmuting assignments" do
-    let(:course) { Course.create! }
-    let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
-
-    let(:mute_params) { ActionController::Parameters.new({"muted" => "true"}) }
-    let(:unmute_params) { ActionController::Parameters.new({"muted" => "false"}) }
-
-    before(:each) do
-      allow(course).to receive(:account_membership_allows).and_return(false)
-    end
-
-    context "with a moderated assignment" do
-      let(:assignment) do
-        course.assignments.create!(
-          title: 'hi',
-          moderated_grading: true,
-          grader_count: 1,
-          final_grader: teacher
-        )
-      end
-
-      it "allows the assignment to be unmuted when grades are published" do
-        assignment.update!(grades_published_at: Time.zone.now)
-        expect(api.update_api_assignment(assignment, unmute_params, teacher)).to be :ok
-      end
-
-      it "does not allow the assignment to be unmuted when grades are not published" do
-        expect(api.update_api_assignment(assignment, unmute_params, teacher)).to be false
-      end
-
-      it "allows the assignment to be muted when grades are not published" do
-        assignment.unmute!
-        expect(api.update_api_assignment(assignment, mute_params, teacher)).to be :ok
-      end
-    end
-
-    context "with a non-moderated assignment" do
-      let(:assignment) { course.assignments.create!(title: 'hi2') }
-
-      it "always allows a non-moderated assignment to be unmuted" do
-        assignment.mute!
-        expect(api.update_api_assignment(assignment, unmute_params, teacher)).to be :ok
-      end
-
-      it "always allows a non-moderated assignment to be muted" do
-        expect(api.update_api_assignment(assignment, mute_params, teacher)).to be :ok
       end
     end
   end

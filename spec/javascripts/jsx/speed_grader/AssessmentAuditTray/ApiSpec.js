@@ -17,7 +17,7 @@
  */
 
 import Api from 'jsx/speed_grader/AssessmentAuditTray/Api'
-import FakeServer, {pathFromRequest} from 'jsx/__tests__/FakeServer'
+import FakeServer, {pathFromRequest} from 'jsx/shared/network/__tests__/FakeServer'
 
 QUnit.module('AssessmentAuditTray Api', suiteHooks => {
   let api

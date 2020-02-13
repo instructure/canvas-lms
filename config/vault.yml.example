@@ -1,0 +1,9 @@
+production:
+  addr: "https://vault.domain.com"
+  token_path: /path/to/vault/token
+test:
+  addr: "https://vault.test.domain"
+  token_path: s.wOrq9dO9kzOcuvB06CMviJhZ
+development:
+  addr: "https://vault.dev.domain"
+  token: s.wOrq9dO9kzOcuvB06CMviJhZ

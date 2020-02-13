@@ -50,6 +50,10 @@ module Gradezilla
     fj('button span:contains("Save")')
   end
 
+  def self.grid
+    f('#gradebook_grid .container_1')
+  end
+
   # assignment header column elements
   def self.assignment_header_menu_element(id)
     f(".slick-header-column.assignment_#{id} .Gradebook__ColumnHeaderAction")
@@ -180,15 +184,15 @@ module Gradezilla
   end
 
   def self.show_grading_period_filter_element
-    fj('li:contains("Grading Periods")')
+    fxpath("//li[@role='none']//span[contains(text(), 'Grading Periods')]")
   end
 
   def self.show_module_filter_element
-    fj('li li:contains("Modules")')
+    fxpath("//li[@role='none']//span[contains(text(), 'Modules')]")
   end
 
   def self.show_section_filter_element
-    fj('li:contains("Sections")')
+    fxpath("//li[@role='none']//span[contains(text(), 'Sections')]")
   end
 
   def self.show_unpublished_assignments

@@ -155,7 +155,6 @@ describe "new groups" do
     end
 
     it "should allow teachers to message unassigned students" do
-      skip('KNO-184')
       group_test_setup
 
       get "/courses/#{@course.id}/groups"
@@ -941,7 +940,7 @@ describe "new groups" do
           ff('.edit-group-assignment').last.click
           wait_for_ajaximations
           click_option('.move-select .move-select__group select', "#{@testgroup.first.name}")
-          
+
           sleep 0.3 # have to wait for instUI animations
           ff('.move-select button[type="submit"]').last.click
 

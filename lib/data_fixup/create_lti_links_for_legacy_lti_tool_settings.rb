@@ -18,7 +18,10 @@
 module DataFixup::CreateLtiLinksForLegacyLtiToolSettings
 
   def self.run
-    Lti::ToolSetting.where.not(product_code: nil, vendor_code: nil, resource_type_code: nil, resource_link_id: nil).find_each do |tool_setting|
+    Lti::ToolSetting.where.not(product_code: nil).
+      where.not(vendor_code: nil).
+      where.not(resource_type_code: nil).
+      where.not(resource_link_id: nil).find_each do |tool_setting|
       Lti::Link.transaction do
         originality_report = OriginalityReport.find_by(link_id: tool_setting.resource_link_id)
         link = Lti::Link.create_with({

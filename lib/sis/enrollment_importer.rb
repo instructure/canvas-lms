@@ -22,7 +22,6 @@ module SIS
   class EnrollmentImporter < BaseImporter
 
     def process(messages)
-      start = Time.zone.now
       i = Work.new(@batch, @root_account, @logger, messages)
 
       Enrollment.skip_touch_callbacks(:course) do
@@ -38,7 +37,7 @@ module SIS
           end
         end
       end
-      @logger.debug("Raw enrollments took #{Time.zone.now - start} seconds")
+
       i.enrollments_to_update_sis_batch_ids.uniq.sort.in_groups_of(1000, false) do |batch|
         Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch.id)
       end
@@ -77,7 +76,6 @@ module SIS
       i.roll_back_data.push(*new_data)
       SisBatchRollBackData.bulk_insert_roll_back_data(i.roll_back_data)
 
-      @logger.debug("Enrollments with batch operations took #{Time.zone.now - start} seconds")
       i.success_count + i.enrollments_to_delete.count
     end
 
@@ -130,7 +128,6 @@ module SIS
         enrollment_info = nil
         while !@enrollment_batch.empty?
           enrollment_info = @enrollment_batch.shift
-          @logger.debug("Processing Enrollment #{enrollment_info.to_a.inspect}")
 
           @last_section = @section if @section
           @last_course = @course if @course

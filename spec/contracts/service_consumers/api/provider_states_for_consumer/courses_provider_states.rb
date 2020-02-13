@@ -57,5 +57,22 @@ PactConfig::Consumers::ALL.each do |consumer|
         Assignment.create!(context: @course, title: "Missing Assignment", due_at: Time.zone.now - 2)
       end
     end
+
+    # broadly used provider state for mobile
+    # Student ID: 8 || Name: "Mobile Student"
+    # Course IDs: 2,3
+    provider_state 'a student with 2 courses' do
+      set_up do
+          # Add a graded assignment to each mobile course
+          mcourses = Pact::Canvas.base_state.mobile_courses
+          mstudent = Pact::Canvas.base_state.mobile_student
+          mteacher = Pact::Canvas.base_state.mobile_teacher
+          mcourses.each do |x|
+            assignment = x.assignments.create!(title: "Assignment1", due_at: 2.days.ago, points_possible: 10)
+            assignment.grade_student(mstudent, grader: mteacher, score: 8)
+          end
+      end
+    end
+
   end
 end

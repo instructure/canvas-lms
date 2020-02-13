@@ -46,8 +46,8 @@ module Types
 
     global_id_field :id
 
-    field :module, Types::ModuleType, null: true
-    def module
+    field :module, Types::ModuleType, null: true, resolver_method: :module_resolver
+    def module_resolver
       load_association(:context_module)
     end
 
@@ -60,8 +60,8 @@ module Types
         )
     end
 
-   field :next, Types::ModuleItemType, null: true
-   def next
+   field :next, Types::ModuleItemType, null: true, resolver_method: :next_resolver
+   def next_resolver
      Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
        ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
          index = visible_tag_ids.index(content_tag.id)

@@ -40,6 +40,7 @@ import './jquery.instructure_misc_plugins' /* showIf */
 import './jquery.keycodes'
 import './jquery.loadingImg'
 import './jquery.templateData'
+import processMultipleContentItems from 'jsx/deep_linking/processors/processMultipleContentItems'
 
 const SelectContentDialog = {}
 
@@ -49,29 +50,56 @@ SelectContentDialog.deepLinkingListener = event => {
     event.data &&
     event.data.messageType === 'LtiDeepLinkingResponse'
   ) {
-    processSingleContentItem(event)
-      .then(result => {
-        const $dialog = $('#resource_selection_dialog')
-        const tool = $('#context_external_tools_select .tools .tool.selected').data('tool')
+    if (event.data.content_items.length > 1 && ENV.process_multiple_content_items_modules_index) {
+      processMultipleContentItems(event)
+        .then(result => {
+          const $dialog = $('#resource_selection_dialog')
+          $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
+          $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
 
-        $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
-        $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
+          if (result.every(item => item.type !== 'ltiResourceLink')) {
+            $.flashError(I18n.t('Selected content contains non-LTI links.'))
+            return
+          }
 
-        if (result.type !== 'ltiResourceLink') {
-          $.flashError(I18n.t('Selected content is not an LTI link.'))
-          return
-        }
+          if (event.data.reloadpage) {
+            window.location.reload()
+          }
+        })
+        .catch(e => {
+          $.flashError(I18n.t('Error retrieving content'))
+          // eslint-disable-next-line no-console
+          console.error(e)
+        })
+        .finally(() => {
+          const $dialog = $('#resource_selection_dialog')
+          $dialog.dialog('close')
+        })
+    } else {
+      processSingleContentItem(event)
+        .then(result => {
+          const $dialog = $('#resource_selection_dialog')
+          $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
+          $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
 
-        SelectContentDialog.handleContentItemResult(result, tool)
-      })
-      .catch(e => {
-        $.flashError(I18n.t('Error retrieving content'))
-        console.error(e)
-      })
-      .finally(() => {
-        const $dialog = $('#resource_selection_dialog')
-        $dialog.dialog('close')
-      })
+          if (result.type !== 'ltiResourceLink') {
+            $.flashError(I18n.t('Selected content is not an LTI link.'))
+            return
+          }
+
+          const tool = $('#context_external_tools_select .tools .tool.selected').data('tool')
+          SelectContentDialog.handleContentItemResult(result, tool)
+        })
+        .catch(e => {
+          $.flashError(I18n.t('Error retrieving content'))
+          // eslint-disable-next-line no-console
+          console.error(e)
+        })
+        .finally(() => {
+          const $dialog = $('#resource_selection_dialog')
+          $dialog.dialog('close')
+        })
+    }
   }
 }
 
@@ -281,6 +309,9 @@ SelectContentDialog.Events = {
         tool.definition_id
       )
       url = url + '?placement=' + placement_type + '&secure_params=' + $('#secure_params').val()
+      if ($('#select_context_content_dialog').data('context_module_id')) {
+        url += '&context_module_id=' + $('#select_context_content_dialog').data('context_module_id')
+      }
       $dialog.find('iframe').attr('src', url)
       $(window).on('beforeunload', SelectContentDialog.beforeUnloadHandler)
     } else {
@@ -307,6 +338,7 @@ $(document).ready(function() {
     const dialog_title =
       options.dialog_title || I18n.t('titles.add_item_to_module', 'Add Item to Module')
     const allow_external_urls = for_modules
+    $dialog.data('context_module_id', options.context_module_id)
     $dialog.data('submitted_function', options.submit)
     $dialog.find('.context_module_content').showIf(for_modules)
     $dialog.find('.holder_name').text(holder_name)

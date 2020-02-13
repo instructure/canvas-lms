@@ -1,0 +1,63 @@
+<%
+# Copyright (C) 2020 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
+  hide_score ||= false
+  report_url ||= nil
+  report_title ||= nil
+  tooltip_text ||= nil
+
+  score = plagiarism_data[:status] == "scored" ? plagiarism_data[:similarity_score] : nil
+  icon_class = case plagiarism_data[:status]
+    when "error"
+      "icon-warning"
+    when "pending"
+      "icon-clock"
+    when "scored"
+      score_icon = if score > 60
+        "icon-empty"
+      elsif score > 20
+        "icon-oval-half"
+      else
+        "icon-certified"
+      end
+      "#{score_icon} icon-Solid"
+    end
+%>
+
+<% if icon_class.present? %>
+  <%
+      tag_name = report_url.present? ? :a : :span
+      tag_params = {class: "turnitin_score_container tooltip"}
+      tag_params[:href] = report_url if report_url.present?
+      tag_params[:title] = report_title if report_title.present?
+  %>
+
+  <%= tag.send(tag_name, **tag_params) do %>
+    <i class="<%= icon_class %>"></i>
+    <% if score.present? && !hide_score %>
+      <span class="turnitin_similarity_score"><%= score %>%</span>
+    <% end %>
+
+    <% if tooltip_text.present? %>
+      <span class="tooltip_wrap right">
+        <span class="tooltip_text"><%= tooltip_text %></span>
+      </span>
+    <% end %>
+  <% end %>
+<% end %>

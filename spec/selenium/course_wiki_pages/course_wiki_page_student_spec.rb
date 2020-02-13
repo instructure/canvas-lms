@@ -21,20 +21,15 @@ describe 'course wiki pages' do
   include_context 'in-process server selenium tests'
   include CourseWikiPage
 
-  context "Index Page as a student" do
-    before(:each) do
-      @course = Course.create!(:name => "First Course1")
-      @student = User.create!(:name => "First Student")
-      @student.accept_terms
-      @student.register!
-      @course.enroll_student(@student, :enrollment_state => 'active')
+  before do
+    course_with_student_logged_in
+  end
 
+  context "Index Page as a student" do
+    before do
       @page = @course.wiki_pages.create!(title: 'delete_deux')
       # sets the workflow_state = deleted to act as a deleted page
-      @page.workflow_state = 'deleted'
-      @page.save!
-
-      user_session(@student)
+      @page.update(workflow_state: 'deleted')
     end
 
     it "should display a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do

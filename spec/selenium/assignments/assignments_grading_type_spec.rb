@@ -134,6 +134,6 @@ describe "assignments" do
     AssignmentCreateEditPage.assignment_save_button.click
     wait_for_ajaximations
     expect(f('.errorBox:not(#error_box_template)')).
-      to include_text('Points possible must be 0 or more for selected grading type')
+      to include_text('Points possible must be greater than 0 for selected grading type')
   end
 end

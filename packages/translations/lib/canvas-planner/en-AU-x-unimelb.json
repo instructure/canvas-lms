@@ -108,6 +108,9 @@
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
   "late_2be42b88": { "message": "Late" },
+  "list_collapsed_9ac35920": { "message": "List collapsed." },
+  "list_collapsed_dde87718": { "message": "List collapsed" },
+  "list_expanded_efec2d0": { "message": "List expanded." },
   "load_more_a36f9cf9": { "message": "Load more" },
   "load_prior_dates_f2b0f6f0": { "message": "Load prior dates" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -156,6 +159,9 @@
     "message": "*Only most recent grading period shown."
   },
   "opportunities_popup_f6703842": { "message": "opportunities popup" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } selected. List collapsed."
+  },
   "optional_add_course_ef0d70fc": { "message": "Optional: Add Subject" },
   "page_50c4823d": { "message": "Page" },
   "peer_review_74f26a13": { "message": "Peer Review" },
@@ -211,6 +217,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Tomorrow at { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Unable to mark as complete."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Use arrow keys to navigate options."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Yesterday at { date }" },
   "yesterday_c6bd6abf": { "message": "Yesterday" },

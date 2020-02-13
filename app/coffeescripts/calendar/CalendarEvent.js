@@ -21,9 +21,11 @@ import {Spinner} from '@instructure/ui-elements'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
-import splitAssetString from '../str/splitAssetString'
-import Depaginate from 'jsx/shared/CheatDepaginator'
+
 import I18n from 'i18n!calendar.edit'
+
+import NaiveRequestDispatch from 'jsx/shared/network/NaiveRequestDispatch'
+import splitAssetString from '../str/splitAssetString'
 
 export default class CalendarEvent extends Backbone.Model {
   urlRoot = '/api/v1/calendar_events/'
@@ -80,7 +82,8 @@ export default class CalendarEvent extends Backbone.Model {
     }
 
     if (this.get('sections_url')) {
-      sectionsDfd = Depaginate(this.get('sections_url'))
+      const dispatch = new NaiveRequestDispatch()
+      sectionsDfd = dispatch.getDepaginated(this.get('sections_url'))
     }
 
     const combinedSuccess = (syncArgs = [], sectionsResp = []) => {

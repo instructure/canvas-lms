@@ -20,7 +20,6 @@ module SIS
   class XlistImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       Course.suspend_callbacks(:update_enrollments_later) do
         Course.process_as_sis(@sis_options) do
@@ -32,7 +31,7 @@ module SIS
         end
       end
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
-      @logger.debug("Crosslists took #{Time.zone.now - start} seconds")
+
       importer.success_count
     end
 
@@ -50,8 +49,6 @@ module SIS
       end
 
       def add_crosslist(xlist_course_id, section_id, status)
-        @logger.debug("Processing CrossListing #{[xlist_course_id, section_id, status].inspect}")
-
         raise ImportError, "No xlist_course_id given for a cross-listing" if xlist_course_id.blank?
         raise ImportError, "No section_id given for a cross-listing" if section_id.blank?
         raise ImportError, "Improper status \"#{status}\" for a cross-listing" unless status =~ /\A(active|deleted)\z/i

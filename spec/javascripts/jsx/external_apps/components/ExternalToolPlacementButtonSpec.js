@@ -48,3 +48,19 @@ test('renders as a button when specified', () => {
   )
   equal(wrapper.find('a').props().role, 'button')
 })
+
+test('does not attempt to open an opened modal', () => {
+  const wrapper = shallow(
+    <ExternalToolPlacementButton
+      type="button"
+      tool={{
+        app_type: 'ContextExternalTool',
+        name: 'A Tool'
+      }}
+      returnFocus={() => {}}
+    />
+  )
+
+  wrapper.setState({modalIsOpen: true})
+  ok(wrapper.find('a').simulate('click', {preventDefault: () => {}}))
+})

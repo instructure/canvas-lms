@@ -46,6 +46,7 @@ class Notification < ActiveRecord::Base
 
   has_many :messages
   has_many :notification_policies, :dependent => :destroy
+  has_many :notification_policy_overrides, inverse_of: :notification, :dependent => :destroy
   before_save :infer_default_content
 
   scope :to_show_in_feed, -> { where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED) }
@@ -76,6 +77,10 @@ class Notification < ActiveRecord::Base
   def self.reset_cache!
     @all = nil
     @all_by_id = nil
+    if ::Rails.env.test? && !@checked_partition && !ActiveRecord::Base.in_migration
+      Messages::Partitioner.process # might have fallen out of date - but we should only check if we're actually running notification specs
+      @checked_partition = true
+    end
   end
 
   def duplicate

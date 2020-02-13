@@ -1,0 +1,73 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/environment";
+
+$spacing-medium: 1.5rem;
+$spacing-small: 0.75rem;
+
+.TopLinks {
+  border-block-end: 1px solid $ic-border-light;
+  padding-block-end: $spacing-medium;
+}
+
+.TopLinks a:not(:last-child) {
+  margin-inline-end: $spacing-small;
+}
+
+.Alert.ic-flash-success,
+.Alert.ic-flash-error,
+.Alert.ic-flash-info {
+  box-shadow: none;
+  margin-block-start: $spacing-medium;
+  width: 100%;
+}
+
+.Heading {
+  margin-block-start: $spacing-medium;
+}
+
+.NoUploads {
+  text-align: center;
+}
+
+$svg-width: 338.1px;
+$svg-height: 250px;
+
+.NoUploads__svg {
+  background-image: url('/images/404_notfound.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: $ic-sp*2;
+  margin-block-start: $ic-sp*2;
+  background-size: $svg-width * 2/3 $svg-height * 2/3;
+  min-height: $svg-height * 2/3;
+}
+
+@include breakpoint(mini-tablet) {
+  .NoUploads__svg {
+    background-size: $svg-width $svg-height;
+    min-height: $svg-height;
+  }
+}
+
+table.ic-Table th,
+table.ic-Table td {
+  font-weight: normal;
+  vertical-align: top;
+}

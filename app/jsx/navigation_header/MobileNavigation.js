@@ -23,7 +23,7 @@ import {Tray} from '@instructure/ui-overlays'
 import preventDefault from 'compiled/fn/preventDefault'
 import I18n from 'i18n!MobileNavigation'
 import {View} from '@instructure/ui-layout'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 
 const MobileContextMenu = React.lazy(() => import('./MobileContextMenu'))
 const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))

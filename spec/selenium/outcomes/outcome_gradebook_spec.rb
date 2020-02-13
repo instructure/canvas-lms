@@ -15,17 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/gradebook_common'
+require_relative '../grades/pages/gradezilla_page'
+require_relative '../grades/setup/gradebook_setup'
+require_relative '../helpers/gradezilla_common'
 
 describe "outcome gradebook" do
   include_context "in-process server selenium tests"
-  include GradebookCommon
+  include GradezillaCommon
+  include GradebookSetup
 
   context "as a teacher" do
     before(:once) do
+      Account.default.enable_feature!(:new_gradebook)
       gradebook_data_setup
       @outcome1 = outcome_model(context: @course, title: 'outcome1')
       @outcome2 = outcome_model(context: @course, title: 'outcome2')
+      show_sections_filter(@teacher)
     end
 
     before(:each) do
@@ -36,9 +41,26 @@ describe "outcome gradebook" do
       clear_local_storage
     end
 
+    def select_learning_mastery
+      f('.assignment-gradebook-container .gradebook-menus button').click
+      f('span[data-menu-item-id="learning-mastery"]').click
+    end
+
+    def section_filter
+      f('[data-component="SectionFilter"] [role="combobox"]')
+    end
+
+    def select_section(menu_item_name)
+      section_filter.click
+      wait_for_animations
+      fj("[role=\"option\"]:contains(\"#{menu_item_name}\")").click
+      wait_for_ajaximations
+    end
+
     it "should not be visible by default" do
-      get "/courses/#{@course.id}/gradebook"
-      expect(f("#content")).not_to contain_css('.gradebook-navigation')
+      Gradezilla.visit(@course)
+      f('.assignment-gradebook-container .gradebook-menus button').click
+      expect(f("#content")).not_to contain_css('span[data-menu-item-id="learning-mastery"]')
     end
 
     context "when enabled" do
@@ -47,10 +69,11 @@ describe "outcome gradebook" do
       end
 
       it "should be visible" do
-        get "/courses/#{@course.id}/gradebook"
-        expect(ff('.gradebook-navigation')).to have_size 1
+        Gradezilla.visit(@course)
+        Gradezilla.gradebook_menu_element.click
+        expect(f('span[data-menu-item-id="learning-mastery"]')).not_to be_nil
+        f('span[data-menu-item-id="learning-mastery"]').click
 
-        f('a[data-id=outcome]').click
         expect(f('.outcome-gradebook-container')).not_to be_nil
       end
 
@@ -72,7 +95,7 @@ describe "outcome gradebook" do
 
       it "filter out students without results" do
         get "/courses/#{@course.id}/gradebook"
-        f('a[data-id=outcome]').click
+        select_learning_mastery
         three_students
 
         f('#no_results_students').click
@@ -86,7 +109,7 @@ describe "outcome gradebook" do
 
       it "filter out outcomes without results" do
         get "/courses/#{@course.id}/gradebook"
-        f('a[data-id=outcome]').click
+        select_learning_mastery
         two_outcomes
 
         f('#no_results_outcomes').click
@@ -98,7 +121,7 @@ describe "outcome gradebook" do
 
       it "filter out outcomes and students without results" do
         get "/courses/#{@course.id}/gradebook"
-        f('a[data-id=outcome]').click
+        select_learning_mastery
         two_outcomes
         three_students
 
@@ -128,7 +151,7 @@ describe "outcome gradebook" do
 
       it 'outcomes without results filter preserved after page refresh' do
         get "/courses/#{@course.id}/gradebook"
-        f('a[data-id=outcome]').click
+        select_learning_mastery
         wait_for_ajax_requests
 
         expect(f('#no_results_outcomes').selected?).to be false
@@ -143,7 +166,7 @@ describe "outcome gradebook" do
 
       it 'students without results filter preserved after page refresh' do
         get "/courses/#{@course.id}/gradebook"
-        f('a[data-id=outcome]').click
+        select_learning_mastery
         wait_for_ajax_requests
 
         expect(f('#no_results_outcomes').selected?).to be false
@@ -158,7 +181,7 @@ describe "outcome gradebook" do
 
       it 'outcomes and students without results filter preserved after page refresh' do
         get "/courses/#{@course.id}/gradebook"
-        f('a[data-id=outcome]').click
+        select_learning_mastery
         wait_for_ajax_requests
 
         expect(f('#no_results_outcomes').selected?).to be false
@@ -190,7 +213,7 @@ describe "outcome gradebook" do
 
         it 'keeps course mean after outcomes without results filter enabled' do
           get "/courses/#{@course.id}/gradebook"
-          f('a[data-id=outcome]').click
+          select_learning_mastery
           wait_for_ajax_requests
 
           # mean
@@ -207,7 +230,7 @@ describe "outcome gradebook" do
 
         it "displays course mean and median" do
           get "/courses/#{@course.id}/gradebook"
-          f('a[data-id=outcome]').click
+          select_learning_mastery
           wait_for_ajax_requests
 
           # mean
@@ -222,11 +245,7 @@ describe "outcome gradebook" do
           expect(medians).to contain_exactly("2", "3")
 
           # switch to first section
-          f('.section-select-button').click
-          section = @course.course_sections.first.id
-          fj("label[for='section_option_#{section}']").click
-          # not sure why two clicks are needed ...
-          fj("label[for='section_option_#{section}']").click
+          select_section(@course.course_sections.first.name)
           wait_for_ajax_requests
 
           # median
@@ -234,9 +253,7 @@ describe "outcome gradebook" do
           expect(medians).to contain_exactly("2.5", "2.5")
 
           # switch to second section
-          f('.section-select-button').click
-          section = @course.course_sections.second.id
-          fj("label[for='section_option_#{section}']").click
+          select_section(@course.course_sections.second.name)
           wait_for_ajax_requests
 
           # refresh page
@@ -262,7 +279,7 @@ describe "outcome gradebook" do
 
         it "displays rating description for course mean" do
           get "/courses/#{@course.id}/gradebook"
-          f('a[data-id=outcome]').click
+          select_learning_mastery
           wait_for_ajax_requests
 
           # all but one result are non-scoring, so we display score
@@ -274,35 +291,29 @@ describe "outcome gradebook" do
         end
       end
 
-      it "should allow showing only a certain section" do
-        get "/courses/#{@course.id}/gradebook"
-        f('a[data-id=outcome]').click
+      it "allows showing only a certain section" do
+        Gradezilla.visit(@course)
+        f('.assignment-gradebook-container .gradebook-menus button').click
+        f('span[data-menu-item-id="learning-mastery"]').click
+
         expect(ff('.outcome-student-cell-content')).to have_size 3
 
-        choose_section = ->(name) do
-          fj('.section-select-button:visible').click
-          fj(".section-select-menu:visible a:contains('#{name}')").click
-          wait_for_ajaximations
-        end
+        select_section('All Sections')
+        expect(section_filter).to have_value("All Sections")
 
-        choose_section.call "All Sections"
-        expect(fj('.section-select-button:visible')).to include_text("All Sections")
+        select_section(@other_section.name)
+        expect(section_filter).to have_value(@other_section.name)
 
-        choose_section.call @other_section.name
-        expect(fj('.section-select-button:visible')).to include_text(@other_section.name)
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # verify that it remembers the section to show across page loads
-        get "/courses/#{@course.id}/gradebook"
-        expect(fj('.section-select-button:visible')).to include_text @other_section.name
+        Gradezilla.visit(@course)
+        expect(section_filter).to have_value(@other_section.name)
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # now verify that you can set it back
 
-        fj('.section-select-button:visible').click
-        expect(fj('.section-select-menu:visible')).to be_displayed
-        f("label[for='section_option_']").click
-        expect(fj('.section-select-button:visible')).to include_text "All Sections"
+        select_section('All Sections')
 
         expect(ff('.outcome-student-cell-content')).to have_size 3
       end
@@ -310,7 +321,7 @@ describe "outcome gradebook" do
       it "should handle multiple enrollments correctly" do
         @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
-        get "/courses/#{@course.id}/gradebook"
+        Gradezilla.visit(@course)
 
         meta_cells = find_slick_cells(0, f('.grid-canvas'))
         expect(meta_cells[0]).to include_text @course.default_section.display_name

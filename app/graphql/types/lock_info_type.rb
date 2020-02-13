@@ -39,7 +39,11 @@ module Types
       lock_info[:object]
     end
 
-    field :module, ModuleType, null: true
+    field :module, ModuleType, null: true, resolver_method: :lockable_module
+    def lockable_module
+      object.module
+    end
+
     field :lock_at, DateTimeType, null: true
     field :unlock_at, DateTimeType, null: true
     field :can_view, Boolean, null: true

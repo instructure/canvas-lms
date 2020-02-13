@@ -31,7 +31,8 @@ module DataFixup::EnsureRootAttachmentFilename
           end
         end
       end
-      Attachment.where.not(root_attachment_id: nil, filename: nil, workflow_state: 'broken').find_in_batches do |batch|
+      Attachment.where.not(root_attachment_id: nil).
+        where.not(filename: nil).where.not(workflow_state: 'broken').find_in_batches do |batch|
         Shackles.activate(:master) do
           Attachment.where(id: batch).update_all(filename: nil)
         end

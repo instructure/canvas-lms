@@ -20,7 +20,6 @@ module SIS
   class CourseImporter < BaseImporter
 
     def process(messages)
-      start = Time.zone.now
       courses_to_update_sis_batch_id = []
       course_ids_to_update_associations = [].to_set
       blueprint_associations = {}
@@ -42,7 +41,6 @@ module SIS
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
       MasterCourses::MasterTemplate.create_associations_from_sis(@root_account, blueprint_associations, messages, @batch_user)
 
-      @logger.debug("Courses took #{Time.zone.now - start} seconds")
       importer.success_count
     end
 
@@ -64,8 +62,6 @@ module SIS
 
       def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id, course_format, blueprint_course_id, grade_passback_setting)
         state_changes = []
-        @logger.debug("Processing Course #{[course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name].inspect}")
-
         raise ImportError, "No course_id given for a course" if course_id.blank?
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?

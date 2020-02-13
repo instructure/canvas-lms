@@ -5,6 +5,13 @@ caps_site_admin_test_feature:
   display_name: This is a SiteAdmin test Feature Flag
   description: |-
     This flag will not cause any change in behavior.
+assignments_2_student:
+  state: hidden
+  display_name: Assignment Enhancements - Student
+  description: Use the new assignments student page
+  applies_to: Course
+  root_opt_in: true
+  beta: true
 assignments_2_teacher:
   state: hidden
   display_name: Assignments 2 Teacher View
@@ -15,6 +22,11 @@ assignments_2_teacher:
   environments:
     production:
       state: disabled
+assignment_attempts:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Assignment Allowed Attempts
+  description: Allow a teacher to set the number of allowed attempts on an assignment via the UI
 bookmarking_for_enrollments_index:
   state: allowed
   applies_to: RootAccount
