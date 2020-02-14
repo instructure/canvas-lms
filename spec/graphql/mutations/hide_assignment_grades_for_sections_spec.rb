@@ -67,12 +67,6 @@ describe Mutations::HideAssignmentGradesForSections do
   context "when user has grade permission" do
     let(:context) { { current_user: teacher } }
 
-    it "requires that the PostPolicy feature be enabled" do
-      PostPolicy.disable_feature!
-      result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
-      expect(result.dig("errors", 0, "message")).to eql "Post Policies feature not enabled"
-    end
-
     it "requires that assignmentId be passed in the query" do
       result = execute_query(mutation_str(section_ids: [section1.id]), context)
       expected_error = "'assignmentId' on InputObject 'HideAssignmentGradesForSectionsInput' is required"
