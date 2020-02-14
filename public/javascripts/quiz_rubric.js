@@ -19,10 +19,14 @@
 import I18n from 'i18n!quizzes.rubric'
 import $ from 'jquery'
 import 'jqueryui/dialog'
-import 'rubricEditBinding' // event handler for rubricEditDataReady
 
-var quizRubric = {
-  ready() {
+const quizRubric = {
+  async loadBindings() {
+    await import('rubricEditBinding') // event handler for rubricEditDataReady
+  },
+
+  async ready() {
+    await this.loadBindings()
     const $dialog = $('#rubrics.rubric_dialog')
     $dialog.dialog({
       title: I18n.t('titles.details', 'Assignment Rubric Details'),
@@ -42,25 +46,25 @@ var quizRubric = {
     return $loading
   },
 
-  replaceLoadingDialog(html, $loading) {
+  async replaceLoadingDialog(html, $loading) {
+    await this.loadBindings()
     $('body').append(html)
     $loading.dialog('close')
     $loading.remove()
     quizRubric.ready()
   },
 
-  createRubricDialog(url, preloadedHtml) {
+  async createRubricDialog(url, preloadedHtml) {
     const $dialog = $('#rubrics.rubric_dialog')
     if ($dialog.length) {
-      quizRubric.ready()
+      await quizRubric.ready()
     } else {
       const $loading = quizRubric.buildLoadingDialog()
       if (preloadedHtml === undefined || preloadedHtml === null) {
-        $.get(url, html => {
-          quizRubric.replaceLoadingDialog(html, $loading)
-        })
+        const html = await $.get(url)
+        await quizRubric.replaceLoadingDialog(html, $loading)
       } else {
-        quizRubric.replaceLoadingDialog(preloadedHtml, $loading)
+        await quizRubric.replaceLoadingDialog(preloadedHtml, $loading)
       }
     }
   }

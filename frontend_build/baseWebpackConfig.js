@@ -74,8 +74,7 @@ module.exports = {
         // This bundle got pushed over the limit by translations being added and
         // the simplest fix was to ignore it at the moment, to unblock selenium
         // tests for everyone. CORE-3106 will resolve this.
-        'quizzes_bundle',
-        'quiz_show'
+        'quizzes_bundle'
       ]
       return (
         assetFilename.endsWith('.js') &&
