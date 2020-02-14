@@ -271,8 +271,9 @@ pipeline {
         }
 
         stage ('Flakey Spec Catcher') {
-          steps {
-            skipIfPreviouslySuccessful("flakey_spec_catcheer") {
+          when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' } }
+           steps {
+            skipIfPreviouslySuccessful("flakey_spec_catcher") {
               build(
                 job: 'test-suites/flakey-spec-catcher',
                 parameters: build_parameters,

@@ -63,7 +63,7 @@ pipeline {
 
     stage("Running Selenium Specs") {
       steps {
-        timeout(time: 60) {
+        timeout(time: 30) {
           sh (
             script: 'docker-compose exec -T web flakey_spec_catcher --repeat=$FSC_REPEAT_FACTOR --output=/usr/src/app/tmp/fsc.out',
             returnStatus: true
