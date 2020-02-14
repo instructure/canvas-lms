@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Reproductor de audio para { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Hay contenido guardado automáticamente. ¿Desea cargar el contenido guardado automáticamente?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Abrir automáticamente una vista previa directa. (La vista previa solo se muestra después de guardar)"
     },
@@ -149,8 +152,14 @@
     "click_to_embed_imagename_c41ea8df": {
         "message": "Haga clic para incluir { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Hacer clic para ocultar la vista previa"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Haz clic para insertar un enlace en el editor."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Hacer clic para mostrar la vista previa"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Cerrar un menú o diálogo. También lo vuelve a llevar al área de editor"
@@ -434,6 +443,9 @@
     "formatting_5b143aa8": {
         "message": "Formato"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Se encontró contenido guardado automáticamente"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Se encontraron { count, plural,\n     =0 {# resultados}\n    one {# resultado}\n  other {# resultados}\n}"
     },
@@ -647,6 +659,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "No hay fechas de entrega asignadas"
     },
+    "no_e16d9132": {
+        "message": "No"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Sin calificación"
     },
@@ -749,6 +764,9 @@
     "preformatted_d0670862": {
         "message": "Previamente formateado"
     },
+    "preview_53003fd2": {
+        "message": "Vista previa"
+    },
     "preview_a3f8f854": {
         "message": "VISTA PREVIA"
     },
@@ -790,6 +808,9 @@
     },
     "replies_4a8577c8": {
         "message": "Respuestas"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "¿Desea restablecer el guardado automático?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de Contenido Enriquecido"
@@ -1072,6 +1093,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Página de Inicio de Wiki"
+    },
+    "yes_dde87d5": {
+        "message": "Sí"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Ayer a las { date }"

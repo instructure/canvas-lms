@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Lecteur audio pour { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Le contenu enregistré automatiquement existe. Désirez-vous charger le contenu enregistré automatiquement à la place?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Ouvrir automatiquement un aperçu en ligne. (L''aperçu ne s''affiche qu''après l''enregistrement)"
     },
@@ -149,8 +152,14 @@
     "click_to_embed_imagename_c41ea8df": {
         "message": "Cliquer pour incorporer { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Cliquer pour masquer les Aperçus"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Cliquez pour insérer un lien dans l’éditeur."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Cliquer pour afficher les Aperçus"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Fermer un menu ou une boîte de dialogue. Vous renvoie également à la zone d''édition"
@@ -434,6 +443,9 @@
     "formatting_5b143aa8": {
         "message": "Formatage"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Contenu enregistré automatiquement trouvé"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Trouvé { count, plural,\n     =0 {# résultats}\n    one {# résultat}\n  other {# résultats}\n}"
     },
@@ -647,6 +659,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Aucune date d''échéance assignée"
     },
+    "no_e16d9132": {
+        "message": "Non"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Non noté"
     },
@@ -749,6 +764,9 @@
     "preformatted_d0670862": {
         "message": "Préformaté"
     },
+    "preview_53003fd2": {
+        "message": "Aperçu"
+    },
     "preview_a3f8f854": {
         "message": "PRÉVISUALISER"
     },
@@ -790,6 +808,9 @@
     },
     "replies_4a8577c8": {
         "message": "Réponses"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Restaurer l''enregistrement automatique?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Éditeur de texte enrichi"
@@ -1072,6 +1093,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Page d’accueil de Wiki"
+    },
+    "yes_dde87d5": {
+        "message": "Oui"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Hier à { date }"

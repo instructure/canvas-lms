@@ -24,6 +24,9 @@
     "message": "Ljud- och videoinspelning är inte tillgänglig."
   },
   "audio_player_for_title_20cc70d": { "message": "Ljudspelare för { title }" },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Automatiskt sparat innehåll finns. Vill du läsa in det automatiskt sparade innehållet istället?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Öppna automatiskt en infogad förhandsvisning (Förhandsvisningen visas endast efter att den sparats)"
   },
@@ -40,8 +43,14 @@
   "click_to_embed_imagename_c41ea8df": {
     "message": "Klicka för att bädda in { imageName }"
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Klicka för att dölja förhandsgranskning"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Klicka för att infoga en länk i redigeraren."
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Klicka för att visa förhandsgranskning"
   },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Stäng en meny eller dialogruta Tar dig också tillbaka till redigerarområdet"
@@ -140,6 +149,9 @@
     "message": "Fokusera verktygsfältets popupinnehåll"
   },
   "formatting_5b143aa8": { "message": "Formaterar" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Hittade automatiskt sparat innehåll"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Hittade { count, plural,\n     =0 {# resultat}\n    one {# resultat}\n  other {# resultat}\n}"
   },
@@ -202,6 +214,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Ingen alternativtext (dekorativ bild)"
   },
+  "no_e16d9132": { "message": "Nej" },
   "no_results_940393cf": { "message": "Inga resultat." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Inga resultat hittades för { filterTerm }"
@@ -230,6 +243,7 @@
   },
   "posted_when_a578f5ab": { "message": "Publicerad: { when }" },
   "preformatted_d0670862": { "message": "Förformaterade" },
+  "preview_53003fd2": { "message": "Förhandsvisa" },
   "preview_a3f8f854": { "message": "FÖRHANDSVISA" },
   "previous_page_928fc112": { "message": "Föregående sida" },
   "published_c944a23d": { "message": "publicerad" },
@@ -239,6 +253,9 @@
   "record_upload_media_5fdce166": { "message": "Spela in/ladda upp media" },
   "recording_98da6bda": { "message": "Inspelning" },
   "remove_link_d1f2f4d0": { "message": "Ta bort länk" },
+  "restore_auto_save_deccd84b": {
+    "message": "Vill du återställa funktionen Spara automatiskt?"
+  },
   "rich_content_editor_2708ef21": {
     "message": "Redigerare för formaterat innehåll"
   },
@@ -349,6 +366,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }pixlar" },
   "wiki_home_9cd54d0": { "message": "Startsida Wiki" },
+  "yes_dde87d5": { "message": "Ja" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Din webbkamera kanske redan används."
   }

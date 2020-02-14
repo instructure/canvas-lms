@@ -22,6 +22,9 @@
     "message": "音频和视频录制不可用。"
   },
   "audio_player_for_title_20cc70d": { "message": "{ title }的音频播放器" },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "存在自动保存的内容。是否要改为加载自动保存的内容？"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "自动打开在线预览。（预览仅在保存后显示）"
   },
@@ -34,9 +37,11 @@
     "message": "单击任何页面以插入指向该页面的链接。"
   },
   "click_to_embed_imagename_c41ea8df": { "message": "单击以嵌入{ imageName }" },
+  "click_to_hide_preview_3c707763": { "message": "单击以隐藏预览" },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "单击以插入指向编辑器的链接。"
   },
+  "click_to_show_preview_faa27051": { "message": "单击以显示预览" },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "关闭菜单或对话框。并带您返回至编辑器区域"
   },
@@ -122,6 +127,7 @@
     "message": "聚焦弹出窗口内容工具栏"
   },
   "formatting_5b143aa8": { "message": "格式化" },
+  "found_auto_saved_content_3f6e4ca5": { "message": "找到自动保存的内容" },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "查找 { count, plural,\n     =0 {# 结果}\n    one {# 结果}\n  other {# 结果}\n}"
   },
@@ -178,6 +184,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "无 Alt 文字（装饰图像）"
   },
+  "no_e16d9132": { "message": "否" },
   "no_results_940393cf": { "message": "无结果。" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "未找到{ filterTerm }的结果"
@@ -202,6 +209,7 @@
   },
   "posted_when_a578f5ab": { "message": "发布日期：{ when }" },
   "preformatted_d0670862": { "message": "预定义格式" },
+  "preview_53003fd2": { "message": "预览" },
   "preview_a3f8f854": { "message": "预览" },
   "previous_page_928fc112": { "message": "上一页" },
   "published_c944a23d": { "message": "已发布" },
@@ -211,6 +219,7 @@
   "record_upload_media_5fdce166": { "message": "记录/上传媒体" },
   "recording_98da6bda": { "message": "录制" },
   "remove_link_d1f2f4d0": { "message": "删除链接" },
+  "restore_auto_save_deccd84b": { "message": "是否恢复自动保存？" },
   "rich_content_editor_2708ef21": { "message": "富内容编辑器" },
   "right_to_left_ec223c81": { "message": "从右至左" },
   "save_11a80ec3": { "message": "保存" },
@@ -311,6 +320,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "维基主页" },
+  "yes_dde87d5": { "message": "是" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "您的网络摄像头可能正在使用中。"
   }

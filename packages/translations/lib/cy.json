@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Chwaraewr sain ar gyfer { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Mae cynnwys sydd wedi’i gadw’n awtomatig yn bodoli. Hoffech chi lwytho’r cynnwys sydd wedi’i gadw’n awtomatig?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Agor rhagolwg mewn-llinell yn awtomatig. (Dim ond ar ôl cadw mae''r rhagolwg i''w weld)"
     },
@@ -149,8 +152,14 @@
     "click_to_embed_imagename_c41ea8df": {
         "message": "Cliciwch i blannu { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Cliciwch i guddio rhagolwg"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Cliciwch i fewnosod dolen i’r nodwedd golygu."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Cliciwch i ddangos rhagolwg"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Cau dewislen neu ddeialog. Hefyd yn mynd a chi''n ôl i''r ardal olygu"
@@ -434,6 +443,9 @@
     "formatting_5b143aa8": {
         "message": "Fformatio"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Wedi dod o hyd i gynnwys sydd wedi’i gadw’n awtomatig"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Wedi canfod { count, plural,\n     =0 {# canlyniad}\n    one {# canlyniad}\n  other {# canlyniad}\n}"
     },
@@ -647,6 +659,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Does dim Dyddiadau Erbyn wedi’u neilltuo"
     },
+    "no_e16d9132": {
+        "message": "Na"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Dim Gradd"
     },
@@ -749,6 +764,9 @@
     "preformatted_d0670862": {
         "message": "Wedi''i fformatio’n barod"
     },
+    "preview_53003fd2": {
+        "message": "Rhagolwg"
+    },
     "preview_a3f8f854": {
         "message": "RHAGOLWG"
     },
@@ -790,6 +808,9 @@
     },
     "replies_4a8577c8": {
         "message": "Ateb"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Adfer cadw’n awtomatig?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Golygydd Cynnwys Cyfoethog"
@@ -1072,6 +1093,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Hafan Wici"
+    },
+    "yes_dde87d5": {
+        "message": "Iawn"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Ddoe am { date }"

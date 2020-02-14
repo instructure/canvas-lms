@@ -28,6 +28,9 @@
   "audio_player_for_title_20cc70d": {
     "message": "Reprodutor de áudio para { title }"
   },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Conteúdo com salvamento automático existe. Gostaria de carregar o conteúdo com salvamento automático em seu lugar?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Automaticamente abre uma pré-visualização em linha. (Pré-visualização obtida apenas após salvar)"
   },
@@ -44,8 +47,14 @@
   "click_to_embed_imagename_c41ea8df": {
     "message": "Clique para incorporar { imageName }"
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Clique para ocultar a pré-visualização"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Clique para inserir um link no editor."
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Clique para mostrar a pré-visualização"
   },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Feche um menu ou diálogo. Também lhe retorna para a área do editor"
@@ -142,6 +151,9 @@
     "message": "Foca a barra de ferramentas de contexto"
   },
   "formatting_5b143aa8": { "message": "Formatação" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Encontrou conteúdo com salvamento automático"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Encontrou { count, plural,\n     =0 {# resultados}\n    one {# resultado}\n  other {# resultados}\n}"
   },
@@ -204,6 +216,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Sem texto alt (imagem decorativa)"
   },
+  "no_e16d9132": { "message": "Não" },
   "no_results_940393cf": { "message": "Sem resultados." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nenhum resultado encontrado para { filterTerm }"
@@ -232,6 +245,7 @@
   },
   "posted_when_a578f5ab": { "message": "Postado: { when }" },
   "preformatted_d0670862": { "message": "Pré-formatado" },
+  "preview_53003fd2": { "message": "Pré-visualização" },
   "preview_a3f8f854": { "message": "PRÉ-VISUALIZAÇÃO" },
   "previous_page_928fc112": { "message": "Página anterior" },
   "published_c944a23d": { "message": "publicado" },
@@ -241,6 +255,9 @@
   "record_upload_media_5fdce166": { "message": "Gravar/fazer upload de mídia" },
   "recording_98da6bda": { "message": "Gravação" },
   "remove_link_d1f2f4d0": { "message": "Remover link" },
+  "restore_auto_save_deccd84b": {
+    "message": "Restaurar salvamento automático?"
+  },
   "rich_content_editor_2708ef21": { "message": "Editor de conteúdo avançado" },
   "right_to_left_ec223c81": { "message": "direita à esquerda" },
   "save_11a80ec3": { "message": "Salvar" },
@@ -351,6 +368,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Página inicial do wiki" },
+  "yes_dde87d5": { "message": "Sim" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Sua webcam já pode estar em uso."
   }

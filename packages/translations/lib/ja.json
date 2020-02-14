@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "{ title }のオーディオプレーヤー"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "自動保存されたコンテンツが存在します。自動保存されたコンテンツを代わりにロードしますか？"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "インラインプレビューが自動的に開きます。(プレビューが表示されるのは保存後のみです)"
     },
@@ -149,8 +152,14 @@
     "click_to_embed_imagename_c41ea8df": {
         "message": "クリックして{ imageName }を埋め込みます"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "クリックしてプレビューを非表示にする"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "クリックすると、エディタにリンクが挿入されます。"
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "クリックしてプレビューを表示する"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "メニューまたはダイアログを閉じます。またエディタエリアに戻ります"
@@ -434,6 +443,9 @@
     "formatting_5b143aa8": {
         "message": "フォーマット"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "自動保存されたコンテンツが見つかりました"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "{ count, plural,\n     =0 {# 結果}\n    one {# 1つの結果}\n  other {# 結果}\n}が見つかりました"
     },
@@ -647,6 +659,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "期日指定なし"
     },
+    "no_e16d9132": {
+        "message": "いいえ"
+    },
     "no_grade_3b4d7f3e": {
         "message": "成績なし"
     },
@@ -749,6 +764,9 @@
     "preformatted_d0670862": {
         "message": "フォーマット済み"
     },
+    "preview_53003fd2": {
+        "message": "プレビュー"
+    },
     "preview_a3f8f854": {
         "message": "プレビュー"
     },
@@ -790,6 +808,9 @@
     },
     "replies_4a8577c8": {
         "message": "返信"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "自動保存したものを復元しますか？"
     },
     "rich_content_editor_2708ef21": {
         "message": "リッチ コンテンツ エディタ"
@@ -1072,6 +1093,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki ホーム"
+    },
+    "yes_dde87d5": {
+        "message": "はい"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "昨日{ date }にて"

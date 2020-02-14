@@ -28,6 +28,9 @@
   "audio_player_for_title_20cc70d": {
     "message": "Predvajalnik zvoka za { title }"
   },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Obstaja samodejno shranjena vsebina. Ali želite namesto tega naložiti samodejno shranjeno vsebino?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Samodejno odpri v predogledu v vrstici. (Predogled se prikaže šele po shranjevanju)"
   },
@@ -46,8 +49,14 @@
   "click_to_embed_imagename_c41ea8df": {
     "message": "Kliknite, da vdelate { imageName }."
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Kliknite, da skrijete predogled"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Kliknite, da vstavite povezavo v urejevalnik."
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Kliknite, da prikažete predogled"
   },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Zapri meni ali pogovorno okno Prav tako vas vrne v območje urejevalnika"
@@ -144,6 +153,9 @@
     "message": "Osredotoči na pojavno orodno vrstico v priročnem meniju"
   },
   "formatting_5b143aa8": { "message": "Oblikovanje" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Našli smo samodejno shranjeno vsebina"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Najdeno (najden) je { count, plural,\n     =0 {# rezultatov}\n    one {# rezultat }\n  other {# rezultatov}\n}"
   },
@@ -206,6 +218,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Brez nadomestnega besedila (dekorativna slika)"
   },
+  "no_e16d9132": { "message": "Ne" },
   "no_results_940393cf": { "message": "Ni rezultatov." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ni najdenih rezultatov za { filterTerm }"
@@ -234,6 +247,7 @@
   },
   "posted_when_a578f5ab": { "message": "Objavljeno: { when }" },
   "preformatted_d0670862": { "message": "Predoblikovano" },
+  "preview_53003fd2": { "message": "Predogled" },
   "preview_a3f8f854": { "message": "PREDOGLED" },
   "previous_page_928fc112": { "message": "Prejšnja stran" },
   "published_c944a23d": { "message": "objavljeno" },
@@ -243,6 +257,9 @@
   "record_upload_media_5fdce166": { "message": "Posnemi/naloži medije" },
   "recording_98da6bda": { "message": "Snemanje" },
   "remove_link_d1f2f4d0": { "message": "Odstrani povezavo" },
+  "restore_auto_save_deccd84b": {
+    "message": "Obnovim samodejno shranjeno vsebino?"
+  },
   "rich_content_editor_2708ef21": { "message": "Urejevalnik" },
   "right_to_left_ec223c81": { "message": "z desne proti levi" },
   "save_11a80ec3": { "message": "Shrani" },
@@ -357,6 +374,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height } px" },
   "wiki_home_9cd54d0": { "message": "Glavna stran wiki" },
+  "yes_dde87d5": { "message": "Da" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Vaša spletna kamera je morda že v uporabi."
   }

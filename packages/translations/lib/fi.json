@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Äänisoitin kohteelle { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Automaattisesti tallennettua sisältöä on olemassa. Haluaisitko ladata automaattisesti tallennetun sisällön tämän sijasta?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Avaa automaattisesti tekstiin sidottu esikatselu. (Esikatselu näkyy vain tallentamisen jälkeen)"
     },
@@ -149,8 +152,14 @@
     "click_to_embed_imagename_c41ea8df": {
         "message": "Upota { imageName } napsauttamalla"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Piilota esikatselu napsauttamalla"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Lisää linkki editoriin napsauttamalla."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Näytä esikatselu napsauttamalla"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Sulje valikko tai valintaikkuna Palauttaa sinut myös editorialueelle"
@@ -434,6 +443,9 @@
     "formatting_5b143aa8": {
         "message": "Muotoillaan"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Löytyi automaattisesti tallennettua sisältöä"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Löytyi { count, plural,\n     =0 {# tulosta}\n    one {# tulos}\n  other {# tulosta}\n}"
     },
@@ -647,6 +659,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Määräpäiviä ei ole kohdistettu"
     },
+    "no_e16d9132": {
+        "message": "Ei"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Ei arvosanaa"
     },
@@ -749,6 +764,9 @@
     "preformatted_d0670862": {
         "message": "Esimuotoiltu"
     },
+    "preview_53003fd2": {
+        "message": "Esikatsele"
+    },
     "preview_a3f8f854": {
         "message": "ESIKATSELE"
     },
@@ -790,6 +808,9 @@
     },
     "replies_4a8577c8": {
         "message": "Vastausta"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Palautetetaanko automaattinen tallennus?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Rikas sisältöeditori"
@@ -1072,6 +1093,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki Home"
+    },
+    "yes_dde87d5": {
+        "message": "Kyllä"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Eilen { date }"

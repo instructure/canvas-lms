@@ -26,6 +26,9 @@
     "message": "Audio- und Videoaufnahmen sind nicht verfügbar."
   },
   "audio_player_for_title_20cc70d": { "message": "Audioplayer für { title }" },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Automatisch gespeicherte Inhalte vorhanden. Möchten Sie lieber die automatisch gespeicherten Inhalte laden?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Eine Inline-Vorschau automatisch öffnen. (Vorschau wird erst nach dem Speichern angezeigt)"
   },
@@ -42,9 +45,11 @@
   "click_to_embed_imagename_c41ea8df": {
     "message": "{ imageName } durch Anklicken einbetten"
   },
+  "click_to_hide_preview_3c707763": { "message": "Vorschau ausblenden" },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Einfügen eines Links in den Editor"
   },
+  "click_to_show_preview_faa27051": { "message": "Vorschau einblenden" },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Menü oder Dialogfeld schließen. Bringt Sie zurück zum Editor-Bereich"
   },
@@ -138,6 +143,9 @@
     "message": "Fokus auf die eingeblendete Kontext-Symbolleiste"
   },
   "formatting_5b143aa8": { "message": "Formatierung" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Automatisch gespeicherte Inhalte gefunden"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Gefundene { count, plural,\n     =0 {# Ergebnisse}\n    one {# Ergebnisse}\n  other {# Ergebnisse}\n}"
   },
@@ -198,6 +206,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Kein alternativer Text (Dekoratives Bild)"
   },
+  "no_e16d9132": { "message": "Nein" },
   "no_results_940393cf": { "message": "Keine Ergebnisse." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Es wurden keine Ergebnisse für { filterTerm } gefunden."
@@ -226,6 +235,7 @@
   },
   "posted_when_a578f5ab": { "message": "Gepostet am: { when }" },
   "preformatted_d0670862": { "message": "Vorformatiert" },
+  "preview_53003fd2": { "message": "Vorschau" },
   "preview_a3f8f854": { "message": "VORSCHAU" },
   "previous_page_928fc112": { "message": "Vorherige Seite" },
   "published_c944a23d": { "message": "veröffentlicht" },
@@ -235,6 +245,9 @@
   "record_upload_media_5fdce166": { "message": "Medien aufzeichnen/hochladen" },
   "recording_98da6bda": { "message": "Aufzeichnung" },
   "remove_link_d1f2f4d0": { "message": "Link entfernen" },
+  "restore_auto_save_deccd84b": {
+    "message": "Automatisches Speichern wiederherstellen"
+  },
   "rich_content_editor_2708ef21": { "message": "Rich-Content-Editor" },
   "right_to_left_ec223c81": { "message": "Von rechts nach links" },
   "save_11a80ec3": { "message": "Speichern" },
@@ -343,6 +356,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height } px" },
   "wiki_home_9cd54d0": { "message": "Wiki-Startseite" },
+  "yes_dde87d5": { "message": "Ja" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Ihre Webcam wird möglicherweise bereits benutzt."
   }

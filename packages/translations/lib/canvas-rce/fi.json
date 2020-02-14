@@ -28,6 +28,9 @@
   "audio_player_for_title_20cc70d": {
     "message": "Äänisoitin kohteelle { title }"
   },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Automaattisesti tallennettua sisältöä on olemassa. Haluaisitko ladata automaattisesti tallennetun sisällön tämän sijasta?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Avaa automaattisesti tekstiin sidottu esikatselu. (Esikatselu näkyy vain tallentamisen jälkeen)"
   },
@@ -44,8 +47,14 @@
   "click_to_embed_imagename_c41ea8df": {
     "message": "Upota { imageName } napsauttamalla"
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Piilota esikatselu napsauttamalla"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Lisää linkki editoriin napsauttamalla."
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Näytä esikatselu napsauttamalla"
   },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Sulje valikko tai valintaikkuna Palauttaa sinut myös editorialueelle"
@@ -146,6 +155,9 @@
     "message": "Kohdista ponnahdussisällön työkalupalkki"
   },
   "formatting_5b143aa8": { "message": "Muotoillaan" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Löytyi automaattisesti tallennettua sisältöä"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Löytyi { count, plural,\n     =0 {# tulosta}\n    one {# tulos}\n  other {# tulosta}\n}"
   },
@@ -206,6 +218,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Ei Alt Text (Koristekuva)"
   },
+  "no_e16d9132": { "message": "Ei" },
   "no_results_940393cf": { "message": "Ei tuloksia." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Tuloksia ei löytynyt kohteelle { filterTerm }"
@@ -234,6 +247,7 @@
   },
   "posted_when_a578f5ab": { "message": "Lähetetty: { when }" },
   "preformatted_d0670862": { "message": "Esimuotoiltu" },
+  "preview_53003fd2": { "message": "Esikatsele" },
   "preview_a3f8f854": { "message": "ESIKATSELE" },
   "previous_page_928fc112": { "message": "Edellinen sivu" },
   "published_c944a23d": { "message": "julkaistu" },
@@ -243,6 +257,9 @@
   "record_upload_media_5fdce166": { "message": "Nauhoita/lataa mediaa" },
   "recording_98da6bda": { "message": "Nauhoitetaan" },
   "remove_link_d1f2f4d0": { "message": "Poista linkki" },
+  "restore_auto_save_deccd84b": {
+    "message": "Palautetetaanko automaattinen tallennus?"
+  },
   "rich_content_editor_2708ef21": { "message": "Rikas sisältöeditori" },
   "right_to_left_ec223c81": { "message": "oikealta vasemmalle" },
   "save_11a80ec3": { "message": "Tallenna" },
@@ -353,6 +370,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Wiki Home" },
+  "yes_dde87d5": { "message": "Kyllä" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Verkkokamerasi saattaa olla jo käytössä."
   }

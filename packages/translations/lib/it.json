@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Riproduttore audio di { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Contenuto salvataggio automatico esistente. Caricare al suo posto il contenuto salvato automaticamente?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Aprire automaticamente un’anteprima in linea. (L’anteprima viene visualizzata solo dopo il salvataggio)"
     },
@@ -149,8 +152,14 @@
     "click_to_embed_imagename_c41ea8df": {
         "message": "Clicca  per incorporare { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Fai clic per nascondere anteprima"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Fai clic per inserire un link nell''editor."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Fai clic per mostrare anteprima"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Chiudere un menu o una finestra di dialogo. Consente anche di tornare all’area dell’editor"
@@ -434,6 +443,9 @@
     "formatting_5b143aa8": {
         "message": "Formattazione in corso"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Trovato contenuto salvato automaticamente"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Trovati { count, plural,\n     =0 {# risultati}\n    one {# risultato}\n  other {# risultati}\n}"
     },
@@ -647,6 +659,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Nessuna data di scadenza assegnata"
     },
+    "no_e16d9132": {
+        "message": "No"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Nessun voto"
     },
@@ -749,6 +764,9 @@
     "preformatted_d0670862": {
         "message": "Preformattato"
     },
+    "preview_53003fd2": {
+        "message": "Anteprima"
+    },
     "preview_a3f8f854": {
         "message": "ANTEPRIMA"
     },
@@ -790,6 +808,9 @@
     },
     "replies_4a8577c8": {
         "message": "Risposte"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Ripristinare salvataggio automatico?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor di contenuti avanzati"
@@ -1072,6 +1093,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Home page wiki"
+    },
+    "yes_dde87d5": {
+        "message": "Sì"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Ieri alle { date }"
