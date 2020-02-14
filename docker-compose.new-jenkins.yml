@@ -30,7 +30,7 @@ services:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
 
   postgres:
-    image: starlord.inscloudgate.net/jenkins/postgis:9.5-2.5
+    image: starlord.inscloudgate.net/jenkins/postgis:$POSTGRES-2.5
     environment:
       POSTGRES_PASSWORD: sekret
 

@@ -25,18 +25,12 @@ def getImageTagVersion() {
 
 pipeline {
   agent { label 'canvas-docker' }
-  options {
-    ansiColor('xterm')
-  }
+  options { ansiColor('xterm') }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins-web.yml'
-    GERRIT_PORT = '29418'
-    GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
-
-    NAME = getImageTagVersion()
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
   }
+
   stages {
     stage('Print Env Variables') {
       steps {

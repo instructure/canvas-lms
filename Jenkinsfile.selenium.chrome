@@ -30,20 +30,15 @@ def getImageTagVersion() {
 
 pipeline {
   agent { label 'canvas-docker' }
-  options {
-    ansiColor('xterm')
-  }
+  options { ansiColor('xterm') }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
-    NAME = getImageTagVersion()
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     KNAPSACK_ENABLED = 1
     KNAPSACK_GENERATE_REPORT = 'false'
     KNAPSACK_TEST_FILE_PATTERN = '{spec/selenium,gems/plugins/*/spec_canvas/selenium}/**/*_spec.rb'
     KNAPSACK_EXCLUDE_REGEX = '/performance/'
     KNAPSACK_TEST_DIR = 'spec'
-    // for now 1 until we stabilize some of the flaky specs
     RERUNS_RETRY = 3
     MAX_FAIL = 100
     COVERAGE = runCoverage()
@@ -60,7 +55,12 @@ pipeline {
           for(int i = 0; i < ci_node_total; i++) {
             def index = i;
             nodes["selenium set ${(i).toString().padLeft(2, '0')}"] = {
-              withEnv(["TEST_ENV_NUMBER=$index", "CI_NODE_INDEX=$index"]) {
+              withEnv([
+                "POSTGRES=$POSTGRES",
+                "RUBY_PASSENGER=$RUBY_PASSENGER",
+                "TEST_ENV_NUMBER=$index",
+                "CI_NODE_INDEX=$index",
+              ]) {
                 node('canvas-docker') {
                   stage("Running Selenium Set ${index}") {
                     try {
@@ -81,10 +81,10 @@ pipeline {
                     finally {
                       // copy spec failures to local
                       sh 'mkdir -p tmp'
-                      sh (
-                           script: 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp/spec_failures/',
-                           returnStatus: true
-                         )
+                      sh(
+                        script: 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp/spec_failures/',
+                        returnStatus: true
+                      )
 
                       def reports = load 'build/new-jenkins/groovy/reports.groovy'
                       reports.stashSpecFailures(index)
@@ -100,7 +100,7 @@ pipeline {
               }
             }
           }
-          parallel(nodes);
+          parallel(nodes)
         }
       }
     }

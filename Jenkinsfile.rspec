@@ -30,14 +30,10 @@ def getImageTagVersion() {
 
 pipeline {
   agent { label 'canvas-docker' }
-  options {
-    ansiColor('xterm')
-  }
+  options { ansiColor('xterm') }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
-    NAME = getImageTagVersion()
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     KNAPSACK_ENABLED = 1
     KNAPSACK_GENERATE_REPORT = 'false'
     KNAPSACK_TEST_FILE_PATTERN = '{spec,gems/plugins/*/spec_canvas}/**/*_spec.rb'
@@ -47,8 +43,9 @@ pipeline {
     MAX_FAIL = 50
     COVERAGE = runCoverage()
   }
+
   stages {
-    stage ('Distribute Rspec Tests') {
+    stage ('Distribute RSpec Tests') {
       steps {
         script {
           stash name: "build-scripts", includes: 'build/**/*'
@@ -58,7 +55,12 @@ pipeline {
           for(int i = 0; i < ci_node_total; i++) {
             def index = i;
             nodes["rspec set ${(i).toString().padLeft(2, '0')}"] = {
-              withEnv(["TEST_ENV_NUMBER=$index", "CI_NODE_INDEX=$index"]) {
+              withEnv([
+                "CI_NODE_INDEX=$index",
+                "POSTGRES=$POSTGRES",
+                "RUBY_PASSENGER=$RUBY_PASSENGER",
+                "TEST_ENV_NUMBER=$index"
+              ]) {
                 node('canvas-docker') {
                   stage("Running RSpec Set ${index}") {
                     try {
@@ -95,7 +97,7 @@ pipeline {
               }
             }
           }
-          parallel(nodes);
+          parallel(nodes)
         }
       }
     }
@@ -110,6 +112,7 @@ pipeline {
       }
     }
   }
+
   post {
     failure {
       script {

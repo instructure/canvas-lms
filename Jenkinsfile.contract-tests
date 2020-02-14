@@ -20,22 +20,11 @@
 
 pipeline {
   agent { label 'canvas-docker' }
-  options {
-    ansiColor('xterm')
-  }
+  options { ansiColor('xterm') }
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
-    // 'refs/changes/63/181863/8' -> '63.181863.8'
-    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
-    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     PACT_BROKER = credentials('PACT_BROKER')
-    
-    MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
-    CACHE_TAG = "canvas-lms:previous-image"
-    POSTGRES_CACHE_TAG = "canvas-lms:previous-postgres-image"
-    CASSANDRA_CACHE_TAG = "canvas-lms:previous-cassandra-image"
-    DYNAMODB_CACHE_TAG = "canvas-lms:previous-dynamodb-image"
   }
 
   stages {

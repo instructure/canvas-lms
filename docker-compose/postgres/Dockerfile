@@ -1,4 +1,5 @@
-FROM postgis/postgis:9.5-2.5
+ARG POSTGRES_VERSION=9.5
+FROM postgis/postgis:$POSTGRES_VERSION-2.5
 
 RUN echo "max_locks_per_transaction = 640" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample \
  && echo "max_stack_depth = 5MB" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample \

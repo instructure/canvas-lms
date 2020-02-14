@@ -4,6 +4,7 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 # pull docker images (or build them if missing)
 REGISTRY_BASE=starlord.inscloudgate.net/jenkins
+POSTGIS=${POSTGIS:-2.5}
 
 # redis
 docker pull $REGISTRY_BASE/redis:alpine || \
@@ -12,9 +13,9 @@ docker pull $REGISTRY_BASE/redis:alpine || \
   docker push $REGISTRY_BASE/redis:alpine)
 
 # postgres database with postgis preinstalled
-docker pull $REGISTRY_BASE/postgis:9.5-2.5 || \
-  (docker build -t $REGISTRY_BASE/postgis:9.5-2.5 build/docker-compose/database/9.5 && \
-  docker push $REGISTRY_BASE/postgis:9.5-2.5)
+docker pull $REGISTRY_BASE/postgis:$POSTGRES-$POSTGIS || \
+  (docker build -t $REGISTRY_BASE/postgis:$POSTGRES-$POSTGIS build/docker-compose/postgres && \
+  docker push $REGISTRY_BASE/postgis:$POSTGRES-$POSTGIS)
 
 # cassandra:2:2
 docker pull $REGISTRY_BASE/cassandra:2.2 || \
