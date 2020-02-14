@@ -2486,9 +2486,9 @@ export default do ->
 
       SubmissionCommentApi.createSubmissionComment(@options.context_id, assignmentId, studentId, commentData)
         .then(@updateSubmissionComments)
-        .then(FlashAlert.showFlashSuccess I18n.t 'Successfully posted the comment')
+        .then(FlashAlert.showFlashSuccess I18n.t 'Successfully saved the comment')
         .catch(=> @setCommentsUpdating(false))
-        .catch(FlashAlert.showFlashError I18n.t 'There was a problem posting the comment')
+        .catch(FlashAlert.showFlashError I18n.t 'There was a problem saving the comment')
 
     apiUpdateSubmissionComment: (updatedComment, commentId) =>
       SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
