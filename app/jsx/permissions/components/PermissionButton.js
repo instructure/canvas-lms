@@ -17,16 +17,22 @@
  */
 
 import I18n from 'i18n!permission_button'
-import PropTypes from 'prop-types'
+import {func, bool, string} from 'prop-types'
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {Text} from '@instructure/ui-elements'
-import {IconPublishSolid, IconTroubleLine, IconLockSolid} from '@instructure/ui-icons'
+import {
+  IconPublishSolid,
+  IconTroubleLine,
+  IconLockSolid,
+  IconOvalHalfSolid
+} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-layout'
 import {Menu} from '@instructure/ui-menu'
+import {IconButton} from '@instructure/ui-buttons'
 
 import actions from '../actions'
-import propTypes from '../propTypes'
+import propTypes, {ENABLED_FOR_NONE, ENABLED_FOR_ALL, ENABLED_FOR_PARTIAL} from '../propTypes'
 
 const MENU_ID_DEFAULT = 1
 const MENU_ID_ENABLED = 2
@@ -36,17 +42,17 @@ const MENU_ID_DISABLED_AND_LOCKED = 5
 
 export default class PermissionButton extends Component {
   static propTypes = {
-    cleanFocus: PropTypes.func.isRequired,
-    fixButtonFocus: PropTypes.func.isRequired,
-    handleClick: PropTypes.func.isRequired,
-    inTray: PropTypes.bool.isRequired,
+    cleanFocus: func.isRequired,
+    fixButtonFocus: func.isRequired,
+    handleClick: func.isRequired,
+    inTray: bool.isRequired,
     permission: propTypes.rolePermission.isRequired,
-    permissionName: PropTypes.string.isRequired,
-    permissionLabel: PropTypes.string.isRequired,
-    roleLabel: PropTypes.string,
-    roleId: PropTypes.string.isRequired,
-    setFocus: PropTypes.bool.isRequired,
-    onFocus: PropTypes.func.isRequired
+    permissionName: string.isRequired,
+    permissionLabel: string.isRequired,
+    roleLabel: string,
+    roleId: string.isRequired,
+    setFocus: bool.isRequired,
+    onFocus: func.isRequired
   }
 
   static defaultProps = {
@@ -57,14 +63,14 @@ export default class PermissionButton extends Component {
     showMenu: false
   }
 
-  componentDidMount = () => {
+  componentDidMount() {
     if (this.props.setFocus) {
       this.button.focus()
       this.props.cleanFocus()
     }
   }
 
-  componentDidUpdate = () => {
+  componentDidUpdate() {
     if (this.props.setFocus) {
       this.button.focus()
       this.props.cleanFocus()
@@ -75,10 +81,6 @@ export default class PermissionButton extends Component {
     this.button = c
   }
 
-  openMenu = () => {
-    this.setState({showMenu: true})
-  }
-
   closeMenu = () => {
     this.setState({showMenu: false}, () =>
       this.props.fixButtonFocus({
@@ -87,6 +89,14 @@ export default class PermissionButton extends Component {
         inTray: this.props.inTray
       })
     )
+  }
+
+  toggleMenu = () => {
+    if (this.state.showMenu) {
+      this.closeMenu()
+      return
+    }
+    this.setState({showMenu: true})
   }
 
   checkedSelection(enabled, locked, explicit) {
@@ -103,49 +113,50 @@ export default class PermissionButton extends Component {
     }
   }
 
-  renderButton = () => {
-    // We cannot set this as the id, as when this button is a trigger for the
-    // instui menu component, it eats the id from this button and replaces it
-    // with it's own id. We only have this here for selenium testing
-    let classes = `${this.props.permissionName}_${this.props.inTray ? 'tray' : 'table'}_button`
-    if (this.props.permission.readonly) {
-      classes += ' ic-disabled_permission_button'
+  renderButton() {
+    const {enabled} = this.props.permission
+
+    function stateIcon() {
+      if (enabled === ENABLED_FOR_NONE) return IconTroubleLine
+      if (enabled === ENABLED_FOR_ALL) return IconPublishSolid
+      if (enabled === ENABLED_FOR_PARTIAL) return IconOvalHalfSolid
     }
 
+    const stateColor = enabled === ENABLED_FOR_NONE ? 'danger' : 'success'
+
     return (
-      <button
-        aria-label={this.renderAllyScreenReaderTag({
+      <IconButton
+        elementRef={this.setupButtonRef}
+        onClick={this.toggleMenu}
+        onFocus={this.props.onFocus}
+        interaction={this.props.permission.readonly ? 'disabled' : 'enabled'}
+        size="large"
+        withBackground={false}
+        withBorder={false}
+        color={stateColor}
+        screenReaderLabel={this.renderAllyScreenReaderTag({
           permission: this.props.permission,
           permissionLabel: this.props.permissionLabel,
           roleLabel: this.props.roleLabel
         })}
-        className={classes}
-        ref={this.setupButtonRef}
-        onClick={this.state.showMenu ? this.closeMenu : this.openMenu}
-        disabled={this.props.permission.readonly}
-        onFocus={this.props.onFocus}
       >
-        {this.props.permission.enabled ? (
-          <Text color="success">
-            <IconPublishSolid size="x-small" />
-          </Text>
-        ) : (
-          <Text color="error">
-            <IconTroubleLine size="x-small" />
-          </Text>
-        )}
-      </button>
+        {stateIcon()}
+      </IconButton>
     )
   }
 
-  renderAllyScreenReaderTag = ({permission, permissionLabel, roleLabel}) => {
+  renderAllyScreenReaderTag({permission, permissionLabel, roleLabel}) {
     const {enabled, locked} = permission
     let status = ''
-    if (enabled && !locked) {
+    if (enabled === ENABLED_FOR_ALL && !locked) {
       status = I18n.t('Enabled')
-    } else if (enabled && locked) {
+    } else if (enabled === ENABLED_FOR_ALL && locked) {
       status = I18n.t('Enabled and Locked')
-    } else if (!enabled && !locked) {
+    } else if (enabled === ENABLED_FOR_PARTIAL && !locked) {
+      status = I18n.t('Partially enabled')
+    } else if (enabled === ENABLED_FOR_PARTIAL && locked) {
+      status = I18n.t('Partially enabled and Locked')
+    } else if (enabled === ENABLED_FOR_NONE && !locked) {
       status = I18n.t('Disabled')
     } else {
       status = I18n.t('Disabled and Locked')
@@ -153,112 +164,114 @@ export default class PermissionButton extends Component {
     return `${status} ${permissionLabel} ${roleLabel}`
   }
 
-  renderMenu = button => (
-    <Menu
-      placement="bottom center"
-      trigger={button}
-      defaultShow={!this.props.inTray}
-      onSelect={this.props.inTray ? () => {} : this.closeMenu}
-      onDismiss={this.props.inTray ? () => {} : this.closeMenu}
-      onBlur={this.props.inTray ? () => {} : this.closeMenu}
-      shouldFocusTriggerOnClose={false}
-    >
-      <Menu.Group
-        label=""
-        selected={[
-          this.checkedSelection(
-            this.props.permission.enabled,
-            this.props.permission.locked,
-            this.props.permission.explicit
-          )
-        ]}
+  renderMenu(button) {
+    return (
+      <Menu
+        placement="bottom center"
+        trigger={button}
+        defaultShow={!this.props.inTray}
+        onSelect={this.props.inTray ? () => {} : this.closeMenu}
+        onDismiss={this.props.inTray ? () => {} : this.closeMenu}
+        onBlur={this.props.inTray ? () => {} : this.closeMenu}
+        shouldFocusTriggerOnClose={false}
       >
-        <Menu.Item
-          id="permission_table_enable_menu_item"
-          value={MENU_ID_ENABLED}
-          onClick={() =>
-            this.props.handleClick({
-              name: this.props.permissionName,
-              id: this.props.roleId,
-              enabled: true,
-              locked: false,
-              explicit: true,
-              inTray: this.props.inTray
-            })
-          }
+        <Menu.Group
+          label=""
+          selected={[
+            this.checkedSelection(
+              this.props.permission.enabled,
+              this.props.permission.locked,
+              this.props.permission.explicit
+            )
+          ]}
         >
-          <Text>{I18n.t('Enable')}</Text>
-        </Menu.Item>
-        <Menu.Item
-          id="permission_table_enable_and_lock_menu_item"
-          value={MENU_ID_ENABLED_AND_LOCKED}
-          onClick={() =>
-            this.props.handleClick({
-              name: this.props.permissionName,
-              id: this.props.roleId,
-              enabled: true,
-              locked: true,
-              explicit: true,
-              inTray: this.props.inTray
-            })
-          }
-        >
-          <Text>{I18n.t('Enable and Lock')}</Text>
-        </Menu.Item>
-        <Menu.Item
-          id="permission_table_disable_menu_item"
-          value={MENU_ID_DISABLED}
-          onClick={() =>
-            this.props.handleClick({
-              name: this.props.permissionName,
-              id: this.props.roleId,
-              enabled: false,
-              locked: false,
-              explicit: true,
-              inTray: this.props.inTray
-            })
-          }
-        >
-          <Text as="span">{I18n.t('Disable')}</Text>
-        </Menu.Item>
-        <Menu.Item
-          id="permission_table_disable_and_lock_menu_item"
-          value={MENU_ID_DISABLED_AND_LOCKED}
-          onClick={() =>
-            this.props.handleClick({
-              name: this.props.permissionName,
-              id: this.props.roleId,
-              enabled: false,
-              locked: true,
-              explicit: true,
-              inTray: this.props.inTray
-            })
-          }
-        >
-          <Text>{I18n.t('Disable and Lock')}</Text>
-        </Menu.Item>
+          <Menu.Item
+            id="permission_table_enable_menu_item"
+            value={MENU_ID_ENABLED}
+            onClick={() =>
+              this.props.handleClick({
+                name: this.props.permissionName,
+                id: this.props.roleId,
+                enabled: true,
+                locked: false,
+                explicit: true,
+                inTray: this.props.inTray
+              })
+            }
+          >
+            <Text>{I18n.t('Enable')}</Text>
+          </Menu.Item>
+          <Menu.Item
+            id="permission_table_enable_and_lock_menu_item"
+            value={MENU_ID_ENABLED_AND_LOCKED}
+            onClick={() =>
+              this.props.handleClick({
+                name: this.props.permissionName,
+                id: this.props.roleId,
+                enabled: true,
+                locked: true,
+                explicit: true,
+                inTray: this.props.inTray
+              })
+            }
+          >
+            <Text>{I18n.t('Enable and Lock')}</Text>
+          </Menu.Item>
+          <Menu.Item
+            id="permission_table_disable_menu_item"
+            value={MENU_ID_DISABLED}
+            onClick={() =>
+              this.props.handleClick({
+                name: this.props.permissionName,
+                id: this.props.roleId,
+                enabled: false,
+                locked: false,
+                explicit: true,
+                inTray: this.props.inTray
+              })
+            }
+          >
+            <Text as="span">{I18n.t('Disable')}</Text>
+          </Menu.Item>
+          <Menu.Item
+            id="permission_table_disable_and_lock_menu_item"
+            value={MENU_ID_DISABLED_AND_LOCKED}
+            onClick={() =>
+              this.props.handleClick({
+                name: this.props.permissionName,
+                id: this.props.roleId,
+                enabled: false,
+                locked: true,
+                explicit: true,
+                inTray: this.props.inTray
+              })
+            }
+          >
+            <Text>{I18n.t('Disable and Lock')}</Text>
+          </Menu.Item>
 
-        <Menu.Separator />
-        <Menu.Item
-          id="permission_table_use_default_menu_item"
-          value={MENU_ID_DEFAULT}
-          onClick={() =>
-            this.props.handleClick({
-              name: this.props.permissionName,
-              id: this.props.roleId,
-              locked: false,
-              explicit: false,
-              inTray: this.props.inTray
-            })
-          }
-        >
-          <View as="div" textAlign="center">
-            <Text>{I18n.t('Use Default')}</Text>
-          </View>
-        </Menu.Item>
-      </Menu.Group>
-    </Menu>
-  )
+          <Menu.Separator />
+          <Menu.Item
+            id="permission_table_use_default_menu_item"
+            value={MENU_ID_DEFAULT}
+            onClick={() =>
+              this.props.handleClick({
+                name: this.props.permissionName,
+                id: this.props.roleId,
+                locked: false,
+                explicit: false,
+                inTray: this.props.inTray
+              })
+            }
+          >
+            <View as="div" textAlign="center">
+              <Text>{I18n.t('Use Default')}</Text>
+            </View>
+          </Menu.Item>
+        </Menu.Group>
+      </Menu>
+    )
+  }
 
   render() {
     // Note: for performance, we do not initialize the menu button at all until

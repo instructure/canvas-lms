@@ -157,7 +157,4 @@ const mapDispatchToProps = {
   hideTray: actions.hideAllTrays
 }
 
-export const ConnectedPermissionTray = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PermissionTray)
+export const ConnectedPermissionTray = connect(mapStateToProps, mapDispatchToProps)(PermissionTray)

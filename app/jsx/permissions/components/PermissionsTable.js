@@ -35,7 +35,7 @@ import {View} from '@instructure/ui-layout'
 
 import actions from '../actions'
 import {ConnectedPermissionButton} from './PermissionButton'
-import propTypes from '../propTypes'
+import propTypes, {ENABLED_FOR_NONE} from '../propTypes'
 
 export default class PermissionsTable extends Component {
   static propTypes = {
@@ -53,29 +53,17 @@ export default class PermissionsTable extends Component {
   // just a heads up: these likely break in RTL. the best thing would be to
   // change the css so you don't manually have to scroll the table in JS but
   // if you do have to do this in JS, you need to use something like
-  // 'normalize-scroll-left' from npm (grep for where we use it in the graebook)
+  // 'normalize-scroll-left' from npm (grep for where we use it in the gradebook)
   // so that it works cross browser in RTL
-  fixScroll = (leftOffset, leftScroll) => {
+  fixScroll = e => {
     if (!this.contentWrapper) return
     const sidebarWidth = 300
+    const leftScroll = this.contentWrapper.scrollLeft
+    const leftOffset = e.target.closest('td,th').offsetLeft
     if (leftOffset - sidebarWidth < leftScroll) {
       const newScroll = Math.max(0, leftScroll - sidebarWidth)
       this.contentWrapper.scrollLeft = newScroll
     }
-  }
-
-  fixScrollButton = e => {
-    if (!this.contentWrapper) return
-    const leftOffset = e.target.offsetParent.offsetLeft
-    const leftScroll = this.contentWrapper.scrollLeft
-    this.fixScroll(leftOffset, leftScroll)
-  }
-
-  fixScrollHeader = e => {
-    if (!this.contentWrapper) return
-    const leftOffset = e.target.offsetParent.offsetParent.offsetLeft
-    const leftScroll = this.contentWrapper.scrollLeft
-    this.fixScroll(leftOffset, leftScroll)
   }
 
   toggleExpanded(permission) {
@@ -130,7 +118,7 @@ export default class PermissionsTable extends Component {
                     id={`role_${role.id}`}
                     variant="link"
                     onClick={() => this.openRoleTray(role)}
-                    onFocus={this.fixScrollHeader}
+                    onFocus={this.fixScroll}
                     size="small"
                     theme={{smallPadding: '0', smallHeight: 'normal'}}
                   >
@@ -206,7 +194,7 @@ export default class PermissionsTable extends Component {
           <td key={role.id}>
             <div className="ic-permissions__cell-content">
               <Checkbox
-                checked={role.permissions[permission.permission_name].enabled}
+                checked={role.permissions[permission.permission_name].enabled !== ENABLED_FOR_NONE}
                 disabled={role.permissions[permission.permission_name].readonly}
                 label={<ScreenReaderContent>{permission.label}</ScreenReaderContent>}
                 onChange={() =>
@@ -244,7 +232,7 @@ export default class PermissionsTable extends Component {
                       roleId={role.id}
                       roleLabel={role.label}
                       inTray={false}
-                      onFocus={this.fixScrollButton}
+                      onFocus={this.fixScroll}
                     />
                   </div>
                 </td>
