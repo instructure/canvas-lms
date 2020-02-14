@@ -1325,6 +1325,7 @@ en-AU:
         help_link_text: "Text to display for link"
         help_link_url: URL
         include_students_in_global_survey: "Include students in global surveys"
+        limit_parent_app_web_access: "Limit access to Canvas web from the Canvas Parent app"
         lock_all_announcements: "Disable comments on announcements"
         locked: "Lock this setting for sub-accounts and courses."
         locked_for_sub_accounts: "Lock this setting for sub-accounts"
@@ -1980,6 +1981,7 @@ en-AU:
   all_users_associated_with_this_institution_d29850be: "All users associated with this institution"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "All weights must be greater than or equal to 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Allow a moderator to review multiple independent grades for selected submissions"
+  allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Allow a teacher to set the number of allowed attempts on an assignment via the UI"
   allow_bb7ce9b1: Allow
   allow_bulk_grade_export_to_sis_e11a6e66: "Allow Bulk Grade Export to SIS"
   allow_comments_a1f45d8: "Allow Comments"
@@ -1992,6 +1994,7 @@ en-AU:
   allow_final_grade_override_a21a79ee: "Allow Final Grade Override"
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Allow importing of QTI and Common Cartridge into New Quizzes."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Allow importing of QTI and Common Cartridge into Quizzes.Next."
+  allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Allow importing of third party packages into New Quizzes"
   allow_in_mastery_paths_5332c786: "Allow in mastery paths"
   allow_include_parameters_bf3d3230: "Allow Include Parameters "
   allow_intra_group_peer_reviews_53f1e455: "Allow intra-group peer reviews"
@@ -1999,6 +2002,7 @@ en-AU:
       Allow Live Event Subscription to be set to be delivered
       via HTTPS webhooks
   allow_lor_tools: "Allow users to view and use external tools configured for LOR."
+  allow_migration_of_quizzes_during_course_copy_and__35d80756: "Allow migration of quizzes during course copy and import"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Allow moderator to review multiple independent grades for selected submissions"
   allow_multiple_attempts_e67a0a37: "Allow Multiple Attempts"
   allow_opt_out_of_inbox: "Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences."
@@ -2047,6 +2051,7 @@ en-AU:
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Allows the duplicating of objects in Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Allows the duplication of Calendar Events"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Allows the scheduling of recurring calendar events"
+  allows_the_user_to_navigate_away_while_submission__276d73b7: "Allows the user to navigate away while submission re-uploads are processing"
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Allows user to access and edit the Admin settings in Commons. Allows user to create and manage Groups. Allows user to manage shared resources in the account."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Allows user to access SpeedGrader from an assignment."
   allows_user_to_access_the_announcements_link_in_co_2783579a: "Allows user to access the Announcements link in Course Navigation. Allows user to view course announcements. Allows user to view recent announcements on the course home page."
@@ -2819,6 +2824,7 @@ en-AU:
     titles: 
       assignment_rubric_details: "Assignment Rubric Details"
   assignment_976578a8: Assignment
+  assignment_allowed_attempts_7e3d43ee: "Assignment Allowed Attempts"
   assignment_assignment_submission_paper_view_8a4c9776: "Assignment %{assignment} submission Paper View"
   assignment_assignment_submission_plain_text_view_b217d372: "Assignment %{assignment} submission Plain Text View"
   assignment_comments_e43ed898: "Assignment Comments"
@@ -2927,6 +2933,7 @@ en-AU:
   assignment_path_selected_e80191d1: "Assignment Path Selected"
   assignment_preview_3833e819: "%{assignment} preview"
   assignment_selection_6bff05c4: "Assignment Selection"
+  assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Submissions Uploaded"
   assignment_title_82b4422e: "Assignment Title:"
   assignment_title_8a707dd2: "assignment title"
   assignment_title_e3192978: "Assignment: %{title}"
@@ -3105,6 +3112,7 @@ en-AU:
       notify_content_change: "Notify users that this content has changed"
       points_possible: Points
       post_to_sis: "Include this assignment's grades when posting to your school's Student Information System"
+      submission_attempts: "Submission Attempts"
       warnings: 
         assignment_is_frozen: "Some settings have been administratively locked."
     errors: 
@@ -3847,6 +3855,7 @@ en-AU:
   back_2900f52a: Back
   back_to_announcements_1036e43e: "Back to Announcements"
   back_to_app_center_95420d83: "Back to App Centre"
+  back_to_assignment_1df86a69: "Back to Assignment"
   back_to_ref_title_377ea1f0: "Back to %{ref_title}"
   back_to_table_of_contents_d878b315: "Back to Table of Contents"
   back_to_title_39e7a8f4: "Back to %{title}"
@@ -3882,6 +3891,7 @@ en-AU:
   beginning_date_2d2a29ac: "Beginning date"
   behaviour_change_related_to_the_bugfix_in_apg_122__63cfa767: "Behaviour change related to the bugfix in APG-122. Do not allow custom columns to be created that are titled the same as gradebook importer reserved names, also ignore non-active custom columns on gradebook import as well as those that use reserved names."
   behind_31e4e0fe: Behind
+  being_processed_by_plagiarism_service_2269be71: "Being processed by plagiarism service"
   belarusian_b2f19c76: Belarusian
   belgium_32_e5f5b598: "Belgium (+32)"
   belgium_ef8739b6: Belgium
@@ -6175,6 +6185,7 @@ en-AU:
   costa_rica_97d66afe: "Costa Rica"
   could_not_duplicate_discussion_953ed67f: "Could not duplicate discussion"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Could not find an LTI configuration for client ID %{clientId}"
+  could_not_find_file_to_upload_2af12953: "Could not find file to upload"
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Could not find the existing user for login with SIS ID %{user_id}, skipping"
   could_not_save_chosencolor_741b74ce: "Could not save '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Couldn't adjust dates on assignment %{name} (ID %{id})"
@@ -6222,6 +6233,12 @@ en-AU:
   count_files_updated_4570a8a: 
     one: "1 file updated"
     other: "%{count} files updated"
+  count_files_were_attached_to_the_following_user_su_a0dae4e6: 
+    one: "(1) file was attached to the following user submission"
+    other: "(%{count}) files were attached to the following user submissions"
+  count_files_were_ignored_2f9c054a: 
+    one: "(1) file was ignored"
+    other: "(%{count}) files were ignored"
   count_hidden_e8d2c57c: "%{count} hidden"
   count_images_found_for_term_a93635ed: "%{count} images found for %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -7260,6 +7277,7 @@ en-AU:
   create_new_e0946c49: "Create new"
   create_new_group_set_13b1f62a: "Create New Group Set"
   create_new_submission_e6b7c18d: "Create New Submission"
+  create_pages_581a4d59: "Create pages"
   create_slots_71dbb2f8: "Create Slots"
   create_theme_based_on_40651ed3: "Create theme based on"
   create_theme_based_on_name_7b1bd318: "Create theme based on %{name}"
@@ -7685,6 +7703,7 @@ en-AU:
   delete_my_account_41060aad: "Delete My Account"
   delete_outcome_cc6546f1: "Delete Outcome"
   delete_outcome_group_6b399d34: "Delete Outcome Group"
+  delete_pages_ab60f58: "Delete pages"
   delete_prerequisite_5e97bdf4: "Delete prerequisite"
   delete_prerequisite_title_19741947: "Delete prerequisite %{title}"
   delete_proficiency_rating_5436ee08: "Delete proficiency rating"
@@ -7913,6 +7932,7 @@ en-AU:
   disable_and_lock_7d0ef0e8: "Disable and Lock"
   disable_content_security_policy_8660a787: "Disable Content Security Policy"
   disable_extra_filter_options_1d1cdc02: "disable extra filter options"
+  disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Disable New Quiz importing and migration checkboxes, defaulting them to enabled"
   disable_scope_6ba4e4d4: "Disable scope"
   disable_sync_to_name_10c371dc: "Disable Sync to %{name}"
   disable_toolname_44d6397c: "Disable %{toolName}"
@@ -7922,6 +7942,7 @@ en-AU:
   disabled_by_default_7d822dcb: "Disabled by Default"
   disabled_in_course_settings_d15ee35d: "* Disabled in Course Settings"
   disabled_links_b3bdea99: "Disabled Links"
+  disabled_not_visible_to_students_2c9d693f: "Disabled. Not visible to students."
   disabled_not_visible_to_students_48d4a90d: "Disabled. Not visible to students"
   disabling_f594bda: Disabling...
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Disabling Post to SIS is not available for non-published courses"
@@ -8354,6 +8375,7 @@ en-AU:
   done_54e3d4b6: Done
   done_8af51c9b: Done.
   done_editing_9f7379d9: "Done Editing"
+  done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "Done! We took the files you uploaded and attached them with a short comment to each user's submission page for this assignment. The students will get a notification that a new comment was added."
   down_5831a426: Down
   download_as_zip_5dae7f19: "Download as Zip"
   download_assignment_submissions_41e50ee7: "Download Assignment Submissions"
@@ -9062,6 +9084,7 @@ en-AU:
   error_loading_grade_history_try_again_36465d2c: "Error loading grade history. Try again?"
   error_loading_gradebook_history_try_again_19032437: "Error loading gradebook history. Try again?"
   error_loading_groups_2a3dd72d: "Error loading groups"
+  error_logging_in_error_msg_f61efaa3: "Error logging in: %{error_msg}"
   error_message_2b9d12ee: "Error: %{message}"
   error_rendering_duplicated_module_db821097: "Error rendering duplicated module"
   error_reports_7d6c8b1e: "Error Reports"
@@ -9075,6 +9098,7 @@ en-AU:
   error_sending_submission_comment_dc15d24f: "Error sending submission comment"
   error_sending_submission_d32dc075: "Error sending submission"
   error_starting_content_share_18fb1532: "Error starting content share"
+  error_submitting_to_plagiarism_service_9b0748cb: "Error submitting to plagiarism service"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Error submitting to plagiarism service. You may resubmit from SpeedGrader."
   error_updating_submission_draft_1d40ade7: "Error updating submission draft"
   error_uploading_file_e2d31b56: "Error uploading file."
@@ -10728,6 +10752,7 @@ en-AU:
       grading_scheme_info: "View/Edit Grading Scheme"
   grading_standards_b73bfa72: "Grading Standards"
   grading_type_type_7d8b42d7: "Marking Type: %{type}"
+  granular_permissions_for_managing_wiki_pages_3ed89a84: "Granular permissions for managing wiki pages"
   graph_bar_b5daa23d: "Graph bar"
   graph_of_grades_for_each_assignment_4c44d4d1: "Graph of grades for each assignment"
   graph_of_student_page_views_and_participation_over_4a1d4803: "Graph of student page views and participation over time"
@@ -11458,6 +11483,9 @@ en-AU:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "If disabled, user will still have access to Course Settings. User cannot manage individual course content without the appropriate permission for that content item. If course visibility is limited to users enrolled in the course, this permission allows the user to view course content without being enrolled in the course."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "If enabled, access to LTI 1.3 and LTI Advantage will be enabled."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "If enabled, allows more than the maximum possible score on an Outcome to be given on a rubric."
+  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+      If enabled, Canvas will allow tools to return multiple content items
+      in a single request at the course modules page
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "If enabled, Common Cartridge importers will convert HTML files into Pages"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "If enabled, content designers must provide copyright and license information for files before they are published. This only applies if Better File Browsing is also enabled."
   if_enabled_copyright_and_license_information_must__2a551827: "If enabled, copyright and licence information must be provided for files before they are published."
@@ -11477,6 +11505,9 @@ en-AU:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(If none are selected, send to everyone in the entire sub-account.)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(If none are selected, show to everyone in the entire sub-account)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(If none are selected, show to everyone in the entire account)"
+  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+      If RCE Enhancements are also enabled,
+      the RCE will auto-save your work as you go
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "If Statistics - view or Users - manage login details is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "If Statistics - view or Users - manage login details is enabled, a user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "If Statistics - view​ or Users - manage login details is enabled, a user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled."
@@ -14949,6 +14980,7 @@ en-AU:
     one: "Must achieve mastery at least one time. Scores above mastery will be averaged to calculate final score."
     other: "Must achieve mastery at least %{count} times. Scores above mastery will be averaged to calculate final score."
   must_be_a_number_0_e6ec3e78: "Must be a number > 0"
+  must_be_a_number_e1dfe68a: "Must be a number"
   must_be_a_valid_number_59f0069: "Must be a valid number"
   must_be_after_start_date_95e251a3: "must be after start date"
   must_be_between_availability_dates_ceaca984: "must be between availability dates"
@@ -15124,8 +15156,12 @@ en-AU:
   new_quiz_statistics_desc: "Enable the new quiz statistics page for a course."
   new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_importing_c167dce0: "New Quizzes Importing"
+  new_quizzes_migration_during_course_import_copy_e9dd124e: "New Quizzes migration during course import/copy"
+  new_quizzes_migration_enabled_by_default_5f9bcc81: "New Quizzes migration enabled by default"
+  new_quizzes_migration_required_7854aa1a: "New Quizzes migration required"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes on the Quizzes page"
   new_quizzes_submission_history_d81b477b: "New Quizzes submission history"
+  new_quizzes_third_party_importing_1e1b696d: "New Quizzes third party importing"
   new_rating_canceled_eed3c4ff: "New Rating Canceled"
   new_rating_created_54125331: "New Rating Created"
   new_sis_integrations: |-
@@ -15177,6 +15213,7 @@ en-AU:
   no_content_5dbc9acf: "No Content"
   no_content_has_been_added_f36bab43: "* No content has been added"
   no_content_has_been_shared_with_you_667fde6c: "No content has been shared with you."
+  no_content_not_visible_to_students_905f8996: "No content. Not visible to students."
   no_content_not_visible_to_students_b59f4867: "No content. Not visible to students"
   no_courses_favorited_4e69fd63: "No courses favourited"
   no_courses_found_12d68a74: "No courses found"
@@ -15241,6 +15278,7 @@ en-AU:
   no_submission_for_assignment_a9cb6fe2: "No submission for %{assignment}"
   no_submission_for_assignmenttitle_243bd1f4: "No submission for %{assignmentTitle}"
   no_submissions_164cea23: "No submissions"
+  no_submissions_have_been_uploaded_2fb02710: "No Submissions Have Been Uploaded"
   no_terms_eab5ee7b: "No Terms"
   no_tls_618add1a: "No TLS"
   no_unassigned_terms_deb7b76b: "No unassigned terms"
@@ -15642,6 +15680,8 @@ en-AU:
   number_between_1_and_16_inclusive_31f5468d: "number between 1 and 16 inclusive"
   number_more_a46966: "%{number} More..."
   number_of_allowed_attempts_3d10b740: "Number of allowed attempts"
+  number_of_attempts_b0994c2f: "Number of Attempts"
+  number_of_attempts_must_be_a_number_greater_than_0_a915568c: "Number of attempts must be a number greater than 0"
   number_of_graders_cde8dd54: "Number of graders"
   number_of_respondents_e1e7e8b: "Number of Respondents"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Number of scores to ignore for each student"
@@ -15768,6 +15808,7 @@ en-AU:
   oops_something_went_wrong_with_making_a_copy_of_or_7e9d6695: "Oops! Something went wrong with making a copy of \"%{originalAssignmentName}\""
   oops_something_went_wrong_with_migrating_name_acdbc98b: "Oops! Something went wrong with migrating \"%{name}\""
   oops_there_was_a_problem_loading_content_locks_4ab29a2a: "Oops, there was a problem loading content locks."
+  oops_there_was_a_problem_re_uploading_submissions__276cb8a1: "Oops, there was a problem re-uploading submissions. Check the zip file for issues and try again."
   open_color_picker_f117df0a: "Open Colour Picker"
   open_complete_incomplete_menu_cfe2033b: "Open Complete/Incomplete menu"
   open_discussion_title_for_comments_6baa3fa: "Open discussion %{title} for comments"
@@ -16107,11 +16148,14 @@ en-AU:
           Overwrite these changes?
       unsaved_changes: "You have unsaved changes. Do you want to continue without saving these changes?"
   pages_add_edit_delete_4c690ec6: "Pages - add / edit / delete"
+  pages_create_7be4852c: "Pages - Create"
+  pages_delete_ce201950: "Pages - Delete"
   pages_e5414c2c: Pages
   pages_front_page_9ce5188: "Pages Front Page"
   pages_index_menu_f391bf04: "Pages Index Menu"
   pages_settings_968392a3: "Pages Settings"
   pages_tutorial_tray_169464a9: "Pages Tutorial Tray"
+  pages_update_6c1750af: "Pages - Update"
   paginated_collection: 
     no_items: "No items."
   paginated_list: 
@@ -16856,6 +16900,7 @@ en-AU:
   privacy_level_f0ec09a3: "Privacy Level"
   private_3883d133: Private
   proceed_f3d33864: Proceed
+  process_multiple_content_items_from_course_modules_6de90fd8: "Process multiple content items from course modules page"
   processing_2fcc9739: Processing
   product_name: Canvas
   proficiency_rating_6346119f: "Proficiency Rating"
@@ -18840,6 +18885,7 @@ en-AU:
   ratings_2433172b: Ratings
   ratio_answered_correctly_b0c1e7d: "%{ratio}% answered correctly"
   ratio_responded_correctly_6d890107: "%{ratio}% responded correctly"
+  rce_auto_save_f004fba9: "RCE Auto-Save"
   rce_contents_replace_description: "Enable RCE full text replace from LTI's"
   rce_contents_replace_display_name: "RCE Contents Replace"
   rce_enhancements_5701e06: "RCE Enhancements"
@@ -19079,6 +19125,7 @@ en-AU:
   rename_this_page_554f0583: "Rename this Page"
   rename_this_section_73065edd: "Rename this Section"
   rename_this_section_bcbb6741: "Rename this section"
+  renamed_from_filename_7675db05: "renamed from %{filename}"
   renderDatepickerTime: 
     datepicker: 
       titles: 
@@ -19842,6 +19889,7 @@ en-AU:
   selected_274ce24f: Selected
   selected_all_courses_9cfef57f: "Selected all courses"
   selected_answer: "You selected this answer."
+  selected_content_contains_non_lti_links_f9dfd762: "Selected content contains non-LTI links."
   selected_content_is_not_an_lti_link_11780d96: "Selected content is not an LTI link."
   selected_course_course_a581f834: "Selected course %{course}"
   selected_external_tool_tool_bae095ba: "Selected external tool %{tool}"
@@ -19970,6 +20018,7 @@ en-AU:
       \x20                 Adjust number of ratings, mastery level, points, and colours.\n\n\
       \x20               "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook. Adjust number of ratings, mastery level, points, and colours."
+  sets_the_default_option_for_course_copy_and_import_36147e78: "Sets the default option for course copy and importing to New Quizzes"
   setting_failed_to_load_try_refreshing_c24bf008: "Setting failed to load, try refreshing."
   settings: 
     recaptcha_settings: 
@@ -20803,6 +20852,7 @@ en-AU:
   similarity_detection_platform_9e424d70: "Similarity Detection Platform"
   similarity_score_more_information_b7010a87: "Similarity score -- more information"
   similarity_score_see_detailed_report_a113dac0: "Similarity Score - See detailed report"
+  similarityscore_similarity_score_52236e85: "%{similarityScore}% similarity score"
   simple_tls_45df2648: "Simple TLS"
   singapore_65_b4927585: "Singapore (+65)"
   singapore_a145e422: Singapore
@@ -21470,6 +21520,7 @@ en-AU:
   submissions_folder_9db8dadf: "Submissions Folder"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "submissions folders must be created in User or Group context"
   submissions_posted_title_course_43677dba: "Submissions Posted: %{title}, %{course}"
+  submissions_re_upload_status_page_6cdbc96d: "Submissions Re-Upload Status Page"
   submissions_view_and_make_comments_cafaf361: "Submissions - view and make comments"
   submit_a3cc6859: Submit
   submit_a_comment_7edbf648: "Submit a Comment"
@@ -21978,10 +22029,12 @@ en-AU:
   there_were_a_total_of_count_warnings_6405df1e: "There was a total of %{count} warnings."
   there_were_errors_with_the_form_errors_ab5b559a: "There were errors with the form: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "There were several possible matches with the import. Please resolve them below."
+  there_were_some_files_we_didn_t_know_what_to_do_wi_6156913f: "There were some files we didn't know what to do with. They have not been added to anyone's submission page."
   there_wereerrors_with_your_import_please_examine_y_e11cda62: "There %{wereErrors} with your import, please examine your file and attempt the upload again. Check your email for more details."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "These backup codes can be used if your multi-factor authentication device is unavailable. Please print them out and keep them in a safe location, like your wallet."
   these_credentials_are_for_academic_benchmark_api_v_324baaa4: "These credentials are for Academic Benchmark API v3. Leaving the Partner Key empty will default the importer to use Academic Benchmark API v1."
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "These credentials are for Academic Benchmark API v1, which will be deprecated in a future release."
+  these_credentials_are_for_academic_benchmark_api_v_a3845be7: "These credentials are for Academic Benchmark API v3."
   these_domains_have_automatically_been_added_to_you_cef51600: |-
       These domains have automatically been added to your whitelist.
                     If you wish to remove them, you should remove the associated tool.
@@ -22022,6 +22075,7 @@ en-AU:
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "This attachment has been unpublished by the author."
   this_conference_may_be_recorded_f76deeeb: "This conference may be recorded."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "This course cannot be added to the courses menu at this time."
+  this_course_does_not_allow_score_uploads_4b35fe07: "This course does not allow score uploads."
   this_course_has_concluded_7995a84c: "This course has concluded"
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "This course hasn’t started yet. You will not be able to participate in this course until %{date}."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "This course is claimed and ready, but you'll need to finish the registration process before you can publish the course.  You should have received an email from Canvas with a link to finish the process.  Be sure to check your spam box."
@@ -22629,6 +22683,7 @@ en-AU:
   to_share_a_discussion_to_commons_course_content_ad_962c5e53: "To share a discussion to Commons, Course Content - add / edit / delete must also be enabled."
   to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "To share a Discussion to Commons, Discussions - view​ must also be enabled."
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: "To share a Discussion to Commons, Discussions - view must also be enabled."
+  to_upload_some_submissions_for_this_assignment_cli_22368328: "To upload some submissions for this assignment, click on the \"Back to Assignment\" button above."
   to_view_a_course_outcomes_page_as_read_only_course_5bb7241f: |-
       To view a Course Outcomes page as read-only, Course Content - view must be enabled.
       To import learning outcomes from the Outcomes page, Rubrics - add / edit / delete must also be enabled.
@@ -22989,6 +23044,7 @@ en-AU:
   update_details_6abfed16: "Update Details"
   update_how_we_process_sis_imports_8195bf77: "Update how we process SIS imports"
   update_link_b7cab181: "Update link"
+  update_pages_c91d7ba: "Update pages"
   update_rating_6d29c2ef: "Update Rating"
   update_tool_7d48ef2a: "Update %{tool}"
   update_your_notification_settings_ed9564f3: "Update your notification settings"
@@ -23644,6 +23700,7 @@ en-AU:
   view_the_assignment_e61ca4fc: "View the assignment"
   view_this_message_in_conversations_5a16bc9f: "View this message in Conversations"
   view_toolname_placements_4a5724d1: "View %{toolName} Placements"
+  view_uploads_status_4c836211: "View Uploads Status"
   view_user_groups_538f22b4: "View User Groups"
   view_user_groups_d2bfa855: "View user groups"
   view_violation_log_e80ea322: "View Violation Log"
@@ -23691,6 +23748,7 @@ en-AU:
   watermark_c93fae0d: Watermark
   watermark_opacity_ce3d3097: "Watermark Opacity"
   watermarks_other_images_e970fc6a: "Watermarks & Other Images"
+  we_are_currently_processing_your_files_this_may_ta_e67433a7: "We are currently processing your files. This may take a while depending on the file size of the submissions. You may navigate away from this screen and check back later by clicking on the \"View Upload Status\" link on the assignment page, or refresh this page to see the status."
   we_couldn_t_find_that_page_34068c1d: "We couldn't find that page!"
   we_emailed_a_confirmation_link_to_email_address_cl_e5f1d2ae: "We emailed a confirmation link to %{email_address}. Click the link in that email to finish registering. Make sure to check your spam box in case it got filtered."
   we_found_a_different_version_of_product_name_insta_3a645773: "We found a different version of \"%{product_name}\" installed for your course. If this tool fails to work as intended, try reregistering or reinstalling it."
