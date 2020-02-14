@@ -199,6 +199,8 @@ class RCEWrapper extends React.Component {
   constructor(props) {
     super(props)
 
+    this.editor = null // my tinymce editor instance
+
     // interface consistent with editorBox
     this.get_code = this.getCode
     this.set_code = this.setCode
@@ -363,7 +365,7 @@ class RCEWrapper extends React.Component {
       if (width > defaultImageSize && image.width > image.height) {
         width = defaultImageSize
         height = (image.height * width) / image.width
-      } else if (height > defaultImageSize && image.height > image.width) {
+      } else if (height > defaultImageSize) {
         height = defaultImageSize
         width = (image.width * height) / image.height
       }
@@ -427,6 +429,9 @@ class RCEWrapper extends React.Component {
   }
 
   mceInstance() {
+    if (this.editor) {
+      return this.editor
+    }
     const editors = this.props.tinymce.editors || []
     return editors.filter(ed => ed.id === this.props.textareaId)[0]
   }
@@ -448,7 +453,7 @@ class RCEWrapper extends React.Component {
     this.props.handleUnmount && this.props.handleUnmount()
   }
 
-  onRemove() {
+  onRemove = () => {
     Bridge.detachEditor(this)
     this.props.onRemove && this.props.onRemove(this)
   }
@@ -502,7 +507,7 @@ class RCEWrapper extends React.Component {
     return this.state.focused
   }
 
-  handleFocus() {
+  handleFocus(_event) {
     if (!this.state.focused) {
       this.setState({focused: true})
       Bridge.focusEditor(this)
@@ -586,17 +591,17 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  handleFocusEditor() {
+  handleFocusEditor = (event, _editor) => {
     // use .active to put a focus ring around the content area
     // when the editor has focus. This isn't perfect, but it's
     // what we've got for now.
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.add('active')
 
-    this.handleFocus()
+    this.handleFocus(event)
   }
 
-  handleBlurEditor(event) {
+  handleBlurEditor = (event, _editor) => {
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.remove('active')
     this.handleBlur(event)
@@ -640,8 +645,10 @@ class RCEWrapper extends React.Component {
     editor.on('keydown', this.handleShortcutKeyShortcut)
   }
 
-  onInit(_e, editor) {
+  onInit = (_event, editor) => {
     editor.rceWrapper = this
+    this.editor = editor
+
     this.initKeyboardShortcuts(this._elementRef, editor)
     if (document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
@@ -1122,13 +1129,13 @@ class RCEWrapper extends React.Component {
           textareaName={mceProps.name}
           init={this.wrapOptions(mceProps.editorOptions)}
           initialValue={mceProps.defaultContent}
-          onInit={this.onInit.bind(this)}
-          onClick={this.handleFocusEditor.bind(this)}
-          onKeypress={this.handleFocusEditor.bind(this)}
-          onActivate={this.handleFocusEditor.bind(this)}
-          onRemove={this.onRemove.bind(this)}
-          onFocus={this.handleFocusEditor.bind(this)}
-          onBlur={this.handleBlurEditor.bind(this)}
+          onInit={this.onInit}
+          onClick={this.handleFocusEditor}
+          onKeypress={this.handleFocusEditor}
+          onActivate={this.handleFocusEditor}
+          onRemove={this.onRemove}
+          onFocus={this.handleFocusEditor}
+          onBlur={this.handleBlurEditor}
           onNodeChange={this.onNodeChange}
         />
         <StatusBar
