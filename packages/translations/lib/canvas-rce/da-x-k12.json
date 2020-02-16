@@ -28,6 +28,9 @@
   "audio_player_for_title_20cc70d": {
     "message": "Audioafspiller til { title }"
   },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Der findes automatisk gemt indhold. Vil du indlæse det automatisk gemte indhold i stedet?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Åbn automatisk en in-line forhåndsvisning. (Forhåndsvisning vises kun, når filen er blevet gemt)"
   },
@@ -42,8 +45,14 @@
   "click_to_embed_imagename_c41ea8df": {
     "message": "Klik for at integrere { imageName }"
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Klik for at skjule forhåndsvisning"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Klik for at indsætte et link i editoren."
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Klik for at vise forhåndsvisning"
   },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Luk en menu eller dialog. Sender dig også tilbage til redigeringsområdet"
@@ -140,6 +149,9 @@
     "message": "Fokusér popup-kontekstværktøjslinjen"
   },
   "formatting_5b143aa8": { "message": "Formatering" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Fundet automatisk gemt indhold"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Fandt { count, plural,\n     =0 {# resultater}\n    one {# resultat}\n  other {# resultater}\n}"
   },
@@ -200,6 +212,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Ingen alt-tekst (dekorativt billede)"
   },
+  "no_e16d9132": { "message": "Nej" },
   "no_results_940393cf": { "message": "Ingen resultater." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultater fundet for { filterTerm }"
@@ -228,6 +241,7 @@
   },
   "posted_when_a578f5ab": { "message": "Slået op: { when }" },
   "preformatted_d0670862": { "message": "Præformatteret" },
+  "preview_53003fd2": { "message": "Eksempel" },
   "preview_a3f8f854": { "message": "FORHÅNDSVISNING" },
   "previous_page_928fc112": { "message": "Forrige side" },
   "published_c944a23d": { "message": "Offentliggjort" },
@@ -237,6 +251,9 @@
   "record_upload_media_5fdce166": { "message": "Optag/overfør medier" },
   "recording_98da6bda": { "message": "Optagelse" },
   "remove_link_d1f2f4d0": { "message": "Fjern link" },
+  "restore_auto_save_deccd84b": {
+    "message": "Gendan automatisk gemt indhold?"
+  },
   "rich_content_editor_2708ef21": { "message": "Rich Content Editor" },
   "right_to_left_ec223c81": { "message": "højre til venstre" },
   "save_11a80ec3": { "message": "Gem" },
@@ -343,6 +360,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height } px" },
   "wiki_home_9cd54d0": { "message": "Wiki startside" },
+  "yes_dde87d5": { "message": "Ja" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Dit webcam kan allerede være i brug."
   }

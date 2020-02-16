@@ -491,6 +491,9 @@
     "height_69b03e15": {
         "message": "Høgde"
     },
+    "image_8ad06": {
+        "message": "Bilde"
+    },
     "image_options_5412d02c": {
         "message": "Alternativ for bilde"
     },
@@ -502,6 +505,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Auk innrykk"
+    },
+    "insert_593145ef": {
+        "message": "Set inn"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Sett inn Equella-lenker"

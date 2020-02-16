@@ -137,11 +137,17 @@
     "group_navigation_99f191a": {
         "message": "Πλοήγηση στην Ομάδα"
     },
+    "image_8ad06": {
+        "message": "Εικόνα"
+    },
     "images_7ce26570": {
         "message": "Εικόνες"
     },
     "increase_indent_6d550a4a": {
         "message": "Αύξηση Εσοχής Κειμένου"
+    },
+    "insert_593145ef": {
+        "message": "Εισαγωγή"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Εισαγωγή Συνδέσμων τύπου Equella"

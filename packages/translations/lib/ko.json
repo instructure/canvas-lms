@@ -125,11 +125,17 @@
     "group_navigation_99f191a": {
         "message": "그룹 탐색"
     },
+    "image_8ad06": {
+        "message": "이미지"
+    },
     "images_7ce26570": {
         "message": "이미지"
     },
     "increase_indent_6d550a4a": {
         "message": "들여쓰기 확대"
+    },
+    "insert_593145ef": {
+        "message": "삽입"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Insert Equella Links"
