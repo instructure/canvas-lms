@@ -102,6 +102,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Vis lenketekst (opnast i ny fane)"
   },
+  "document_678cd7bf": { "message": "Dokument" },
   "documents_81393201": { "message": "Dokument" },
   "done_54e3d4b6": { "message": "Fullført" },
   "drag_a_file_here_1bf656d5": { "message": "Dra ei fil hit" },
@@ -126,6 +127,7 @@
   "embed_preview_2d741e1f": { "message": "Sett inn-førehandsvising" },
   "embed_video_a97a64af": { "message": "Integrer video" },
   "embed_video_code_703e10f2": { "message": "Sett inn videokode" },
+  "equation_1c5ac93c": { "message": "Likning" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Feil under opplasting av video-/lydinnspeling"
   },
