@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../feature_flag_helper'
-require_relative './grades/pages/gradezilla_page'
+require_relative './grades/pages/gradebook_page'
 require_relative './helpers/discussions_common'
 
 describe "sync grades to sis" do
@@ -71,10 +71,10 @@ describe "sync grades to sis" do
     end
 
     def post_grades_dialog
-      Gradezilla.visit(@course)
-      Gradezilla.open_action_menu
+      Gradebook.visit(@course)
+      Gradebook.open_action_menu
       expect(f('body')).to contain_css("[data-menu-id='post_grades_feature_tool']")
-      Gradezilla.action_menu_item_selector('post_grades_feature_tool').click
+      Gradebook.action_menu_item_selector('post_grades_feature_tool').click
       wait_for_ajaximations
       expect(f('.post-grades-dialog')).to be_displayed
     end

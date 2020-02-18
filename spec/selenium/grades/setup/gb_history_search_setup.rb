@@ -16,10 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../setup/gradebook_setup'
-require_relative '../../helpers/gradezilla_common'
+require_relative '../../helpers/gradebook_common'
 
 module GradebookHistorySetup
-  include GradezillaCommon
+  include GradebookCommon
   include GradebookSetup
 
   def gb_history_setup(number_of_history_records)

@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../grades/pages/gradezilla_page'
+require_relative '../grades/pages/gradebook_page'
 require_relative '../grades/setup/gradebook_setup'
-require_relative '../helpers/gradezilla_common'
+require_relative '../helpers/gradebook_common'
 
 describe "outcome gradebook" do
   include_context "in-process server selenium tests"
-  include GradezillaCommon
+  include GradebookCommon
   include GradebookSetup
 
   context "as a teacher" do
@@ -57,7 +57,7 @@ describe "outcome gradebook" do
     end
 
     it "should not be visible by default" do
-      Gradezilla.visit(@course)
+      Gradebook.visit(@course)
       f('.assignment-gradebook-container .gradebook-menus button').click
       expect(f("#content")).not_to contain_css('span[data-menu-item-id="learning-mastery"]')
     end
@@ -68,8 +68,8 @@ describe "outcome gradebook" do
       end
 
       it "should be visible" do
-        Gradezilla.visit(@course)
-        Gradezilla.gradebook_menu_element.click
+        Gradebook.visit(@course)
+        Gradebook.gradebook_menu_element.click
         expect(f('span[data-menu-item-id="learning-mastery"]')).not_to be_nil
         f('span[data-menu-item-id="learning-mastery"]').click
 
@@ -291,7 +291,7 @@ describe "outcome gradebook" do
       end
 
       it "allows showing only a certain section" do
-        Gradezilla.visit(@course)
+        Gradebook.visit(@course)
         f('.assignment-gradebook-container .gradebook-menus button').click
         f('span[data-menu-item-id="learning-mastery"]').click
 
@@ -306,7 +306,7 @@ describe "outcome gradebook" do
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # verify that it remembers the section to show across page loads
-        Gradezilla.visit(@course)
+        Gradebook.visit(@course)
         expect(section_filter).to have_value(@other_section.name)
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
@@ -320,7 +320,7 @@ describe "outcome gradebook" do
       it "should handle multiple enrollments correctly" do
         @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
-        Gradezilla.visit(@course)
+        Gradebook.visit(@course)
 
         meta_cells = find_slick_cells(0, f('.grid-canvas'))
         expect(meta_cells[0]).to include_text @course.default_section.display_name

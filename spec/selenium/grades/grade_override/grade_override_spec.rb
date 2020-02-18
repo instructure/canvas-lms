@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
-require_relative '../pages/gradezilla_page'
-require_relative '../pages/gradezilla/settings'
-require_relative '../pages/gradezilla_cells_page'
+require_relative '../pages/gradebook_page'
+require_relative '../pages/gradebook/settings'
+require_relative '../pages/gradebook_cells_page'
 require_relative '../pages/srgb_page'
 require_relative '../pages/student_grades_page'
 
@@ -74,11 +74,11 @@ describe 'Final Grade Override' do
 
   it 'displays the override column', priority: '1', test_id: 3682130 do
     user_session(@teacher)
-    Gradezilla.visit(@course)
-    Gradezilla.settings_cog_select
-    Gradezilla::Settings.click_advanced_tab
-    Gradezilla::Advanced.select_grade_override_checkbox
-    Gradezilla::Settings.click_update_button
+    Gradebook.visit(@course)
+    Gradebook.settings_cog_select
+    Gradebook::Settings.click_advanced_tab
+    Gradebook::Advanced.select_grade_override_checkbox
+    Gradebook::Settings.click_update_button
     expect(f(".slick-header-column[title='Override']")).to be_displayed
   end
 
@@ -88,13 +88,13 @@ describe 'Final Grade Override' do
       @teacher.save
 
       user_session(@teacher)
-      Gradezilla.visit(@course)
-      Gradezilla::Cells.edit_override(@students.first, 90.0)
+      Gradebook.visit(@course)
+      Gradebook::Cells.edit_override(@students.first, 90.0)
     end
 
-    it 'saves overridden grade in Gradezilla', priority: '1', test_id: 3682131 do
-      Gradezilla.visit(@course)
-      expect(Gradezilla::Cells.get_override_grade(@students.first)).to eql "A-"
+    it 'saves overridden grade in Gradebook', priority: '1', test_id: 3682131 do
+      Gradebook.visit(@course)
+      expect(Gradebook::Cells.get_override_grade(@students.first)).to eql "A-"
     end
 
     it 'displays overridden grade for student grades', priority: '1', test_id: 3682131 do

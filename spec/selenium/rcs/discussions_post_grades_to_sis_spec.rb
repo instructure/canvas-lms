@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../grades/pages/gradezilla_page'
+require_relative '../grades/pages/gradebook_page'
 require_relative '../helpers/discussions_common'
 
 describe "sync grades to sis" do
@@ -70,11 +70,11 @@ describe "sync grades to sis" do
     end
 
     def post_grades_dialog
-      Gradezilla.visit(@course)
-      Gradezilla.open_action_menu
-      expect(Gradezilla.action_menu_item_selector('post_grades_feature_tool')).to be_displayed
+      Gradebook.visit(@course)
+      Gradebook.open_action_menu
+      expect(Gradebook.action_menu_item_selector('post_grades_feature_tool')).to be_displayed
 
-      Gradezilla.action_menu_item_selector('post_grades_feature_tool').click
+      Gradebook.action_menu_item_selector('post_grades_feature_tool').click
       wait_for_ajaximations
       expect(f('.post-grades-dialog')).to be_displayed
     end
