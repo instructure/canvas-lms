@@ -65,7 +65,7 @@ pipeline {
       steps {
         timeout(time: 30) {
           sh (
-            script: 'docker-compose exec -T web flakey_spec_catcher --repeat=$FSC_REPEAT_FACTOR --output=/usr/src/app/tmp/fsc.out',
+            script: 'docker-compose exec -T web flakey_spec_catcher --repeat=$FSC_REPEAT_FACTOR --output=/usr/src/app/tmp/fsc.out --use-parent',
             returnStatus: true
           )
         }
