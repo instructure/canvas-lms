@@ -99,6 +99,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :recalculate_progressions_if_sections_changed
   after_save :sync_attachment_with_publish_state
   after_update :clear_streams_if_not_published
+  after_update :clear_non_applicable_stream_items
   after_create :create_participant
   after_create :create_materialized_view
 
@@ -919,6 +920,31 @@ class DiscussionTopic < ActiveRecord::Base
   def clear_streams_if_not_published
     if !self.published?
       self.clear_stream_items
+    end
+  end
+
+  def clear_non_applicable_stream_items
+    # either changed sections or made section specificness
+    return unless self.is_section_specific? ? @sections_changed : !self.is_section_specific_before_last_save
+
+    remaining_participants = participants
+    user_ids = []
+    stream_item&.stream_item_instances&.find_each do |item|
+      applicable = remaining_participants.any? { |p| p.id == item.user_id }
+      unless applicable
+        user_ids.push(item.user_id)
+        item.destroy
+      end
+    end
+
+    if stream_item && user_ids.any?
+      StreamItemCache.send_later_if_production_enqueue_args(
+        :invalidate_all_recent_stream_items,
+        { :priority => Delayed::LOW_PRIORITY },
+        user_ids,
+        stream_item.context_type,
+        stream_item.context_id
+      )
     end
   end
 

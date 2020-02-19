@@ -1096,6 +1096,26 @@ describe DiscussionTopic do
       expect { @course.discussion_topics.create!(:title => "topic", :user => @teacher) }.to change { @student.stream_item_instances.count }.by(1)
     end
 
+    it "should remove stream items from users removed from the discussion" do
+      section1 = @course.course_sections.create!
+      section2 = @course.course_sections.create!
+      student1 = create_enrolled_user(@course, section1, :name => 'student 1', :enrollment_type => 'StudentEnrollment')
+      student2 = create_enrolled_user(@course, section2, :name => 'student 2', :enrollment_type => 'StudentEnrollment')
+      topic = @course.discussion_topics.create!(title: "Ben Loves Panda", user: @teacher)
+      add_section_to_topic(topic, section1)
+      add_section_to_topic(topic, section2)
+      topic.save!
+      topic.publish!
+      expect(student1.stream_item_instances.count).to eq 1
+      expect(student2.stream_item_instances.count).to eq 1
+
+      expect {
+        topic.update!(course_sections: [section1])
+      }.to change { student1.stream_item_instances.count }.by(0).and change {
+        student2.stream_item_instances.count
+      }.from(1).to(0)
+    end
+
     it "should not send stream items to students if the topic isn't published" do
       topic = nil
       expect { topic = @course.discussion_topics.create!(:title => "secret topic", :user => @teacher, :workflow_state => 'unpublished') }.to change { @student.stream_item_instances.count }.by(0)
