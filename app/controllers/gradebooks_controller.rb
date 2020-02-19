@@ -975,11 +975,11 @@ class GradebooksController < ApplicationController
   end
 
   def render_default_gradebook
-    render "gradebooks/gradezilla/gradebook"
+    render "gradebooks/gradebook"
   end
 
   def render_individual_gradebook
-    render "gradebooks/gradezilla/individual"
+    render "gradebooks/individual"
   end
 
   def percentage(weight)
