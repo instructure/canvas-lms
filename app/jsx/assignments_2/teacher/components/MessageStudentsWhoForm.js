@@ -27,7 +27,7 @@ import {TextArea, Select} from '@instructure/ui-forms'
 import {TextInput} from '@instructure/ui-text-input'
 
 import {TeacherAssignmentShape} from '../assignmentData'
-import {hasSubmission} from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
+import {hasSubmission} from '../../../gradebook/shared/helpers/messageStudentsWhoHelper'
 
 export default class MessageStudentsWhoForm extends React.Component {
   static propTypes = {

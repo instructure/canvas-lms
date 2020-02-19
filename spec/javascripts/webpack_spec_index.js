@@ -112,7 +112,7 @@ if (process.env.JSPEC_PATH) {
   if (!process.env.JSPEC_GROUP || process.env.JSPEC_GROUP === 'jsa') {
     requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/[a-f].*Spec$/))
   }
-  // run all the gradebook/grading/gradezilla tests on their own
+  // run all the gradebook/grading tests on their own
   if (!process.env.JSPEC_GROUP || process.env.JSPEC_GROUP === 'jsg') {
     requireAll(require.context('./jsx', !!'includeSubdirectories', /^\.\/g.*Spec/))
   }

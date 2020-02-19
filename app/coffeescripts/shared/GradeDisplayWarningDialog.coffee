@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from 'i18n!gradezillaGradeDisplayWarningDialog'
+import I18n from 'i18n!gradebookGradeDisplayWarningDialog'
 import $ from 'jquery'
 import gradeDisplayWarningDialogTemplate from 'jst/GradeDisplayWarningDialog'
 import 'jqueryui/dialog'

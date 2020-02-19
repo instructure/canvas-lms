@@ -22,8 +22,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Paginator from '../shared/components/Paginator'
 import UserSettings from 'compiled/userSettings'
-import Gradebook from 'compiled/gradezilla/Gradebook'
-import OutcomeGradebookView from 'compiled/views/gradezilla/OutcomeGradebookView'
+import Gradebook from 'compiled/gradebook/Gradebook'
+import OutcomeGradebookView from 'compiled/views/gradebook/OutcomeGradebookView'
 
 const getGradebookTab = () => UserSettings.contextGet('gradebook_tab')
 
