@@ -13358,7 +13358,7 @@ nn:
   models_to_include_9fb154ca: "Modellar til inkludering"
   moderate_assignment_ccb00173: "Moderer %{assignment}"
   moderate_assignment_name_cf59e0a7: "Moderer %{assignment_name}"
-  moderate_d0c85e92: Moderer
+  moderate_d0c85e92: Moderat
   moderate_grades_4f43f85d: "Moderer karakterar"
   moderated_assignment_12873e87: "Moderert oppgåve"
   moderated_assignments_must_be_manually_posted_unti_39545855: "Modererte oppgåver må postast manuelt fram til vurderingsresultat er sendt ut."
