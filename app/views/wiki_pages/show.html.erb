@@ -24,3 +24,10 @@
   <%= render "shared/mark_as_done" %>
 <% end %>
 <div id="wiki_page_show"></div>
+<% if @context.root_account.feature_enabled?(:outcome_alignment_non_scoring_content) %>
+<%= render partial: 'shared/outcome_alignments',
+    locals: {
+      artifact: @page,
+      context: @context,
+      empty_set_heading: t('Align outcomes to this page') } %>
+<% end %>
