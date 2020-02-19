@@ -165,7 +165,7 @@
 
     <% if @context_enrollment && @domain_root_account.try(:feature_enabled?, :mute_notifications_by_course) %>
       <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
-        <i class="icon-alerts"></i>
+        <i class="icon-<%= @course_notifications_enabled ? "unmuted" : "muted" %>"></i>
         <%= t('links.view_course_notification_settings', %{View Course Notifications}) %>
       </a>
     <% end %>

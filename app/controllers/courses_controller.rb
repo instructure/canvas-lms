@@ -1881,6 +1881,7 @@ class CoursesController < ApplicationController
           @context_membership = @context_enrollment # for AUA
           @context_enrollment.course = @context
           @context_enrollment.user = @current_user
+          @course_notifications_enabled = NotificationPolicyOverride.enabled_for(@current_user, @context)
         end
       end
 
