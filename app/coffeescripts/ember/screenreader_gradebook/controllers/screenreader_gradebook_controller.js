@@ -210,8 +210,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   hideOutcomes: (() => !get(window, 'ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled')).property(),
 
-  gradezilla: (() => get(window, 'ENV.GRADEBOOK_OPTIONS.gradezilla')).property(),
-
   showDownloadSubmissionsButton: function() {
     const hasSubmittedSubmissions = this.get('selectedAssignment.has_submitted_submissions')
     const whitelist = ['online_upload', 'online_text_entry', 'online_url']
@@ -461,9 +459,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.on('init'),
 
   renderGradebookMenu: function() {
-    if (!this.get('gradezilla')) {
-      return
-    }
     const mountPoint = document.querySelector('[data-component="GradebookSelector"]')
     if (!mountPoint) {
       return

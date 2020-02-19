@@ -16,18 +16,10 @@ You should have received a copy of the GNU Affero General Public License along
 with this program. If not, see <http://www.gnu.org/licenses/>.
 }}
 
-{{#if gradezilla}}
-  {{partial "gradezillaHeader"}}
-{{else}}
-  {{partial "header"}}
-{{/if}}
+{{partial "gradezillaHeader"}}
 
 {{#ic-tabs}}
-  {{#if gradezilla}}
   <div {{bind-attr class="hideOutcomes"}} style="display: none;">
-  {{else}}
-  <div {{bind-attr class="hideOutcomes"}}>
-  {{/if}}
     {{#ic-tab-list}}
       {{#ic-tab}}{{#t 'assignments'}}Assignments{{/t}}{{/ic-tab}}
       {{#ic-tab}}{{#t 'learning_mastery'}}Learning Mastery{{/t}}{{/ic-tab}}
