@@ -19,6 +19,8 @@ module Lti::Ims::Providers
   class MembershipsProvider
     include Api::V1::User
 
+    MAX_PAGE_SIZE = 50
+
     attr_reader :context, :controller, :tool
 
     def self.unwrap(wrapped)
@@ -205,10 +207,13 @@ module Lti::Ims::Providers
     end
 
     def pagination_args
+      # Set a default page size to use if no page size is given in the request
+      pagination_args = { default_per_page: MAX_PAGE_SIZE }
+
       # Treat LTI's `limit` param as override of std `per_page` API pagination param. Is no LTI override for `page`.
-      pagination_args = {}
       if limit > 0
-        pagination_args[:per_page] = [limit, Api.max_per_page].min
+        pagination_args[:per_page] = [limit, MAX_PAGE_SIZE].min
+
         # Ensure page size reset isn't accidentally clobbered by other pagination API params
         clear_request_param :per_page
       end
