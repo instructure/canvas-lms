@@ -71,7 +71,8 @@ class AnnouncementsApiController < ApplicationController
     courses = api_find_all(Course, @course_ids)
     return unless courses.all? { |course| authorized_action(course, @current_user, :read_announcements) }
 
-    scope = Announcement.where(:context_type => 'Course', :context_id => courses)
+    expired_announcements = courses.map { |course| course.expired_announcements.pluck(:id) }.flatten
+    scope = Announcement.where(:context_type => 'Course', :context_id => courses).where("discussion_topics.id NOT IN (?)", expired_announcements)
 
     include_unpublished = courses.all? { |course| course.grants_right?(@current_user, :view_unpublished_items) }
     scope = if include_unpublished && !value_to_boolean(params[:active_only])
