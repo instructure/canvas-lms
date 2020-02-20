@@ -25,6 +25,7 @@
 <% end %>
 <div id="wiki_page_show"></div>
 <% if @context.root_account.feature_enabled?(:outcome_alignment_non_scoring_content) %>
+<% js_bundle :outcome_alignments %>
 <%= render partial: 'shared/outcome_alignments',
     locals: {
       artifact: @page,

@@ -20,6 +20,7 @@ module CanvasOutcomesHelper
   def set_outcomes_alignment_js_env(artifact, context, props)
     artifact_type = artifact_type_lookup(artifact)
     domain, jwt = extract_domain_jwt(context.root_account, 'outcome_alignment_sets.create')
+    return if domain.nil? || jwt.nil?
 
     _, protocol = get_host_and_protocol_from_request()
     host_url = "#{protocol}://#{domain}" if domain.present?
