@@ -288,8 +288,10 @@ class DiscussionTopicsController < ApplicationController
 
     return child_topic if is_child_topic?
 
-    scope = if params[:only_announcements]
-              ancmts = @context.active_announcements
+    scope = if params[:expired_announcements] && @context.is_a?(Course)
+              @context.expired_announcements.order(created_at: :desc)
+            elsif params[:only_announcements]
+              ancmts = @context.is_a?(Course) ? @context.non_expired_announcements : @context.active_announcements
               params[:order_by] ? ancmts : ancmts.order("pinned DESC NULLS LAST")
             else
               @context.active_discussion_topics.only_discussion_topics
@@ -426,6 +428,10 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session, override_dates: false)
       end
       (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
+      if @topic.is_announcement
+        expiration_date = SettingsService.get_settings(object: 'announcement', id: @topic.id)["expiration_date"]
+        hash[:ATTRIBUTES][:expiration_date] = DateTime.parse(expiration_date) if expiration_date
+      end
       hash[:ATTRIBUTES][:can_group] = @topic.can_group?
       handle_assignment_edit_params(hash[:ATTRIBUTES])
 

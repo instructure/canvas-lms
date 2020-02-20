@@ -77,21 +77,42 @@
       <li>{{#t "try_disabling_the_unread_filters"}}Try disabling the "Unread" filter.{{/t}}</li>
     </ul>
   </div>
+  <h3 class="announcement-heading">Active</h3>
   <ul class="discussionTopicIndexList" role="list" aria-label="announcements"></ul>
+
+  {{#if options.expired_announcements}}
+    <h3 class="announcement-heading expired">Expired</h3>
+    {{#if options.expired_announcements.length}}
+      <ul id="expired-announcements"></ul>
+    {{else}}
+      <h5 style="padding-left: 1.5rem;">
+        {{#t "there_are_no_announcements_show"}}No announcements have expired{{/t}}
+      </h5>
+    {{/if}}
+  {{/if}}
 {{else}}
-  {{#if lastPageFetched}}
-    <div style="margin:auto; text-align: center;  margin-top: 80px">
-      <h1>
-        {{#t "there_are_no_announcements_show"}}There are no announcements to show{{/t}}
-      </h1>
-      {{#if options.permissions.create}}
-        <a href="{{new_topic_url}}" class="btn btn-large btn-primary">
-          <i class="icon-plus"></i>
-          {{#t}}Announcement{{/t}}
-        </a>
-      {{/if}}
-    </div>
+  {{#if options.expired_announcements.length }}
+    <h3 class="announcement-heading">Active</h3>
+    <h5 style="padding-left: 1.5rem;">
+      {{#t "there_are_no_announcements_show"}}There are no announcements to show{{/t}}
+    </h5>
+    <h3 class="announcement-heading expired">Expired</h3>
+    <ul id="expired-announcements"></ul>
   {{else}}
-    <h1>{{#t "loading"}}Loading...{{/t}}</h1>
+    {{#if lastPageFetched}}
+      <div style="margin:auto; text-align: center;  margin-top: 80px">
+        <h1>
+          {{#t "there_are_no_announcements_show"}}There are no announcements to show{{/t}}
+        </h1>
+        {{#if options.permissions.create}}
+          <a href="{{new_topic_url}}" class="btn btn-large btn-primary">
+            <i class="icon-plus"></i>
+            {{#t}}Announcement{{/t}}
+          </a>
+        {{/if}}
+      </div>
+    {{else}}
+      <h1>{{#t "loading"}}Loading...{{/t}}</h1>
+    {{/if}}
   {{/if}}
 {{/ifAll}}

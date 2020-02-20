@@ -34,7 +34,7 @@ gem 'encrypted_cookie_store-instructure', '1.2.6', require: 'encrypted_cookie_st
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.6.0'
-  gem 'scrypt', '3.0.5'
+  gem 'scrypt'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'

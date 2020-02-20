@@ -21,7 +21,21 @@
 
 $announcements_disscussion-summary-color: $ic-font-color-dark;
 
-.discussionTopicIndexList {
+.announcement-heading {
+  font-weight: 600;
+
+  &.expired {
+    margin-top: 1.5rem;
+  }
+}
+
+#expired-announcements {
+  .discussion-topic {
+    opacity: 0.5;
+  }
+}
+
+.discussionTopicIndexList, #expired-announcements {
   .discussion-actions {
     display: inline-block;
     padding: $ic-sp 0 0;

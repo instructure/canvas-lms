@@ -24,8 +24,9 @@ define [
   'jst/announcements/IndexView'
   'compiled/views/PaginatedView'
   'compiled/views/DiscussionTopics/SummaryView'
+  'compiled/views/DiscussionTopics/ExpiredAnnouncementsSummaryView'
   'compiled/collections/AnnouncementsCollection'
-], ($, DiscussionsSettingsView, UserSettingsView, I18n, _, template, PaginatedView, DiscussionTopicSummaryView, AnnouncementsCollection) ->
+], ($, DiscussionsSettingsView, UserSettingsView, I18n, _, template, PaginatedView, DiscussionTopicSummaryView, ExpiredAnnouncementsSummaryView, AnnouncementsCollection) ->
 
   class IndexView extends PaginatedView
 
@@ -63,6 +64,7 @@ define [
     afterRender: ->
       @$('#discussionsFilter').buttonset()
       @renderList()
+      @createExpiredAnnouncementsList()
       @toggleActionsForSelectedDiscussions()
       this
 
@@ -123,6 +125,19 @@ define [
           model: discussionTopic
           permissions: @options.permissions
         @$('.discussionTopicIndexList').append view.render().el
+
+    createExpiredAnnouncementsList: () =>
+      if @options.expired_announcements
+        for expired_option in @options.expired_announcements.models
+          @addExpiredAnnouncementsToList(expired_option)
+        
+    
+    addExpiredAnnouncementsToList: (discussionTopic) =>
+      if @modelMeetsFilterRequirements(discussionTopic)
+        view = new ExpiredAnnouncementsSummaryView
+          model: discussionTopic
+          permissions: @options.permissions
+        @$('#expired-announcements').append view.render().el
 
     fetchedNextPage: =>
       $list = @$('.discussionTopicIndexList')

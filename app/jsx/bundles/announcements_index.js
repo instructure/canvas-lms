@@ -17,11 +17,13 @@
  */
 
 import AnnouncementsCollection from 'compiled/collections/AnnouncementsCollection'
+import ExpiredAnnouncementsCollection from 'compiled/collections/ExpiredAnnouncementsCollection'
 import ExternalFeedCollection from 'compiled/collections/ExternalFeedCollection'
 import IndexView from 'compiled/views/announcements/IndexView'
 import ExternalFeedsIndexView from 'compiled/views/ExternalFeeds/IndexView'
 
 const collection = new AnnouncementsCollection()
+const expiredCollection = ENV.current_user_roles.includes("student") ? undefined : new ExpiredAnnouncementsCollection()
 
 if (ENV.permissions.create) {
   const externalFeeds = new ExternalFeedCollection()
@@ -35,7 +37,14 @@ if (ENV.permissions.create) {
 new IndexView({
   collection,
   permissions: ENV.permissions,
-  atom_feed_url: ENV.atom_feed_url
+  atom_feed_url: ENV.atom_feed_url,
+  expired_announcements: expiredCollection
 })
 
-collection.fetch()
+if (expiredCollection) {
+  expiredCollection.fetch().then(() => {
+    collection.fetch()
+  })
+} else {
+  collection.fetch()
+}

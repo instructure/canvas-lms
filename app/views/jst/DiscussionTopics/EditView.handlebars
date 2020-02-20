@@ -143,6 +143,31 @@
                      data-tooltip='{"position":"top","force_position":"true"}'
                      title="{{accessibleDateFormat}}" />
             </label>
+
+            {{! Expire Dates}}
+            <label class="checkbox" for="expire_posting">
+              {{checkbox "expire_posting"
+                checked=expire_posting
+                class="element_toggler"
+                aria-controls="discussion_topic_expire_post_container"}}
+              {{#t "expire_posting"}}Expire posting{{/t}}
+            </label>
+            <label class="screenreader-only" id="discussion_topic_expire_post_accessible_label">
+              {{#t}}Set Post Expiration Date{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <label id="discussion_topic_expire_post_container"
+                   style="{{hiddenUnless exipire_posting}}"
+                   class="checkbox">
+              {{#t "expire_at"}}Expire At{{/t}}
+              <input type="text"
+                     class="datetime_field input-medium"
+                     name="post_expiration_date"
+                     value="{{datetimeFormatted expiration_date}}"
+                     aria-labelledby="discussion_topic_expire_post_accessible_label"
+                     data-tooltip='{"position":"top","force_position":"true"}'
+                     title="{{accessibleDateFormat}}" />
+            </label>
           {{/if}}
           <label class="checkbox" for="require_initial_post">
             {{checkbox "require_initial_post"}}
