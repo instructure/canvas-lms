@@ -19,7 +19,9 @@ import {render, fireEvent} from '@testing-library/react'
 import Confetti from '../Confetti'
 import React from 'react'
 import {mockRender, mockClear} from 'confetti-js'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
+jest.mock('jsx/shared/FlashAlert')
 jest.genMockFromModule('confetti-js')
 jest.useFakeTimers()
 
@@ -39,6 +41,17 @@ describe('Confetti', () => {
     expect(mockClear).not.toHaveBeenCalled()
     jest.advanceTimersByTime(3000)
     expect(mockClear).toHaveBeenCalled()
+  })
+
+  describe('screenreader content', () => {
+    it('announces the text', () => {
+      render(<Confetti />)
+      jest.advanceTimersByTime(2500)
+      expect(showFlashAlert).toHaveBeenCalledWith({
+        message: 'Great work! From the Canvas developers',
+        srOnly: true
+      })
+    })
   })
 
   describe('keyboard clearing', () => {

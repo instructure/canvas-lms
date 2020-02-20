@@ -19,6 +19,8 @@
 import React from 'react'
 import ConfettiGenerator from 'confetti-js'
 import getRandomConfettiFlavor from '../utils/confettiFlavor'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
+import I18n from 'i18n!confetti'
 
 export default function Confetti() {
   React.useEffect(() => {
@@ -53,6 +55,12 @@ export default function Confetti() {
 
     document.body.addEventListener('keydown', clearConfettiOnSpaceOrEscape)
     confetti.render()
+    setTimeout(() => {
+      showFlashAlert({
+        message: I18n.t('Great work! From the Canvas developers'),
+        srOnly: true
+      })
+    }, 2500)
 
     // Automatically clear animation after 3 seconds, avoiding 5 second window
     // defined by WCAG Success Criterion 2.2.2: Pause, Stop, Hide.
