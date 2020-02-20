@@ -16,9 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '../../shared/components/AlertManager'
+import axios from 'axios'
+import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
+import GenericErrorPage from '../../shared/components/GenericErrorPage'
 import I18n from 'i18n!courses'
-import React, {Component} from 'react'
+import LoadingIndicator from '../../shared/LoadingIndicator'
 import PleaseWaitWristWatch from './SVG/PleaseWaitWristWatch.svg'
+import React, {Component} from 'react'
 
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -27,16 +32,60 @@ import {Text} from '@instructure/ui-text'
 
 export default class CourseNotificationSettings extends Component {
   state = {
+    errored: false,
+    loading: true,
     enabled: true
   }
 
-  handleClick = () => {
-    this.setState(prevState => {
-      return {enabled: !prevState.enabled}
+  componentDidMount() {
+    this.getNotificationsEnabled()
+  }
+
+  getNotificationsEnabled = async () => {
+    const resp = await axios.get(
+      `/api/v1/users/self/courses/${ENV.COURSE.id}/notifications_enabled`
+    )
+    this.setState({
+      errored: resp?.status !== 200,
+      loading: false,
+      enabled: resp?.data?.enabled
+    })
+  }
+
+  updateNotificationsEnabled = async () => {
+    // optimistically toggle button while waiting for response
+    this.setState(prevState => ({enabled: !prevState.enabled}))
+
+    const resp = await axios.put(
+      `/api/v1/users/self/courses/${ENV.COURSE.id}/enable_notifications`,
+      {enable: !this.state.enabled}
+    )
+    if (resp?.status !== 200) {
+      this.context.setOnFailure(I18n.t('Failed to update course notification settings'))
+      this.setState(prevState => ({enabled: !prevState.enabled}))
+      return
+    }
+
+    this.setState({
+      enabled: resp?.data?.enabled
     })
   }
 
   render() {
+    if (this.state.loading) {
+      return <LoadingIndicator />
+    }
+
+    if (this.state.errored) {
+      return (
+        <GenericErrorPage
+          imageUrl={errorShipUrl}
+          errorSubject={I18n.t('Course Notification Settings initial query error')}
+          errorCategory={I18n.t('Course Notification Settings Error Page')}
+        />
+      )
+    }
+
     return (
       <Flex direction="column">
         <Flex.Item>
@@ -49,7 +98,7 @@ export default class CourseNotificationSettings extends Component {
             size="small"
             variant="toggle"
             checked={this.state.enabled}
-            onChange={this.handleClick}
+            onChange={this.updateNotificationsEnabled}
           />
         </Flex.Item>
         <Flex.Item>
@@ -81,3 +130,5 @@ export default class CourseNotificationSettings extends Component {
     )
   }
 }
+
+CourseNotificationSettings.contextType = AlertManagerContext

@@ -15,18 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import $ from 'jquery'
-import AlertManager from '../shared/components/AlertManager'
-import CourseNotificationSettings from '../courses/notification_settings/CourseNotificationSettings'
+import I18n from 'i18n!courses'
 import React from 'react'
-import ReactDom from 'react-dom'
+import {Spinner} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 
-$(() => {
-  ReactDom.render(
-    <AlertManager>
-      <CourseNotificationSettings />
-    </AlertManager>,
-    $('<div/>').appendTo('#content')[0]
+export default function LoadingIndicator() {
+  return (
+    <View as="div" height="100%" width="100%" textAlign="center">
+      <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
+    </View>
   )
-})
+}
