@@ -27,6 +27,14 @@ high_contrast:
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
   autoexpand: true
+disable_celebrations:
+  state: hidden
+  display_name:
+    features.hide_celebrations: Disable Celebration Animations
+  description:
+    disable_celebrations_description: |-
+      Enabling this feature hides all celebration animations.
+  applies_to: User
 underline_all_links:
   state: allowed
   display_name: Underline Links

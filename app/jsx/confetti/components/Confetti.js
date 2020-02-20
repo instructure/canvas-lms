@@ -24,6 +24,10 @@ import I18n from 'i18n!confetti'
 
 export default function Confetti() {
   React.useEffect(() => {
+    if (window.ENV.disable_celebrations) {
+      return
+    }
+
     let forcefulCleanup
     let clearConfettiOnSpaceOrEscape
     let confetti

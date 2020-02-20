@@ -3218,4 +3218,22 @@ describe User do
       expect(pairing_code.code).to eq '123abc'
     end
   end
+
+  describe "#prefers_no_celebrations?" do
+    let(:user) { user_model }
+
+    it "returns false by default" do
+      expect(user.prefers_no_celebrations?).to eq false
+    end
+
+    context "user has opted out of celebrations" do
+      before :each do
+        user.enable_feature!(:disable_celebrations)
+      end
+
+      it "returns true" do
+        expect(user.prefers_no_celebrations?).to eq true
+      end
+    end
+  end
 end

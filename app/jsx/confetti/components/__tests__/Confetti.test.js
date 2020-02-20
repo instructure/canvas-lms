@@ -69,4 +69,23 @@ describe('Confetti', () => {
       expect(mockClear).toHaveBeenCalled()
     })
   })
+
+  describe('user has disabled celebrations', () => {
+    let env
+    beforeEach(() => {
+      env = window.ENV
+      window.ENV = {
+        disable_celebrations: true
+      }
+    })
+
+    afterEach(() => {
+      window.ENV = env
+    })
+
+    it('does not render confetti', () => {
+      render(<Confetti />)
+      expect(mockRender).not.toHaveBeenCalled()
+    })
+  })
 })
