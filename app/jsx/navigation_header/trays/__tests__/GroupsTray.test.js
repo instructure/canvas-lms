@@ -55,7 +55,7 @@ describe('GroupsTray', () => {
     getByText('Group2')
   })
 
-  it('renders all courses link', () => {
+  it('renders all groups link', () => {
     const {getByText} = render(<GroupsTray {...props} />)
     getByText('All Groups')
   })
