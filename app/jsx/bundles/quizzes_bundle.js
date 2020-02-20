@@ -22,7 +22,6 @@ import QuizArrowApplicator from 'quiz_arrows'
 import 'quizzes'
 import 'supercalc'
 import 'quiz_rubric'
-import 'compiled/quizzes/access_code'
 
 ready(() => {
   $('#show_question_details').on('click', function() {
