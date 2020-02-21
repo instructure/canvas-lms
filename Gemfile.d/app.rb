@@ -81,13 +81,13 @@ gem 'inst-jobs-autoscaling', '1.0.5'
 gem 'inst-jobs-statsd', '1.3.1'
 gem 'json', '2.3.0'
 gem 'json_schemer', '0.2.9'
-gem 'json-jwt', '1.10.2', require: false
+gem 'json-jwt', '1.11.0', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
   gem 'mini_mime', '1.0.2', require: false
 gem 'marginalia', '1.8.0', require: false
 gem 'mime-types', '3.3.1'
-gem 'mini_magick', '4.9.5'
+gem 'mini_magick', '4.10.1'
 gem 'multi_json', '1.13.1'
 gem 'net-ldap', '0.16.2', require: false
 gem 'nokogiri', '1.10.8', require: false
