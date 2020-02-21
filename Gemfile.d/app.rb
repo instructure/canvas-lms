@@ -43,12 +43,12 @@ gem 'aws-sdk-sqs', '1.23.1', require: false
 gem 'aws-sdk-kms', '1.29.0', require: false
 gem 'aws-sigv4', '1.1.0', require: false
 gem 'barby', '0.6.8', require: false
-  gem 'rqrcode', '1.1.1', require: false
+  gem 'rqrcode', '1.1.2', require: false
   gem 'chunky_png', '1.3.11', require: false
 gem 'bcrypt', '3.1.13'
 gem 'brotli', '0.2.3', require: false
 gem 'browser', '3.0.3', require: false
-gem 'builder', '3.2.3'
+gem 'builder', '3.2.4'
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
 gem 'canvas_webex', '0.17'
@@ -56,11 +56,11 @@ gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.11.1', require: false
-gem 'gepub', '1.0.4'
+gem 'gepub', '1.0.10'
 gem 'graphql', '1.9.17'
 gem 'graphql-batch', '0.4.2'
 gem 'hashery', '2.1.2', require: false
-gem 'highline', '2.0.2', require: false
+gem 'highline', '2.0.3', require: false
 gem 'httparty', '0.17.1'
 gem 'i18n', '1.0.0'
 gem 'i18nliner', '0.1.1'
@@ -80,19 +80,19 @@ gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.32.0', require: false
 gem 'inst-jobs-statsd', '1.3.1'
 gem 'json', '2.3.0'
-gem 'json_schemer', '0.2.7'
+gem 'json_schemer', '0.2.9'
 gem 'json-jwt', '1.10.2', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
   gem 'mini_mime', '1.0.2', require: false
 gem 'marginalia', '1.8.0', require: false
-gem 'mime-types', '3.3.0'
+gem 'mime-types', '3.3.1'
 gem 'mini_magick', '4.9.5'
 gem 'multi_json', '1.13.1'
-gem 'net-ldap', '0.16.1', require: false
-gem 'nokogiri', '1.10.4', require: false
+gem 'net-ldap', '0.16.2', require: false
+gem 'nokogiri', '1.10.8', require: false
 gem 'oauth', '0.5.4', require: false
-gem 'oauth2', '1.4.2', require: false
+gem 'oauth2', '1.4.4', require: false
 gem 'oj', '3.3.9'
 gem 'parallel', '1.18.0', require: false
   gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
