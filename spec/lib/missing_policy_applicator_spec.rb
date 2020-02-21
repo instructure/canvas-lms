@@ -121,6 +121,18 @@ describe MissingPolicyApplicator do
       expect(submission.workflow_state).to eql 'graded'
     end
 
+    it 'ignores submissions for unpublished assignments' do
+      assignment = create_recent_assignment
+      assignment.unpublish
+      late_policy_missing_enabled
+      applicator.apply_missing_deductions
+
+      submission = @course.submissions.first
+
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
+    end
+
     context "updated timestamps" do
       before(:once) do
         @frozen_now = now
