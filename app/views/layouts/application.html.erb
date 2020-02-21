@@ -327,6 +327,7 @@
             is_student:      '<%= StudentEnrollment.where(user: @current_user).any? if @current_user %>',
             is_teacher:      '<%= TeacherEnrollment.where(user: @current_user).any? if @current_user %>',
             is_observer:     '<%= ObserverEnrollment.where(user: @current_user).any? if @current_user %>',
+            is_admin:        '<%= @current_user.adminable_accounts.any? if @current_user %>',
             full_path:       '<%= request.try(:fullpath)%>',
             rails_env:       '<%= Rails.env %>',
         }
