@@ -97,8 +97,8 @@ gem 'oj', '3.3.9'
 gem 'parallel', '1.18.0', require: false
   gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'prawn-rails', '1.3.0'
-gem 'rack', '2.0.8'
-gem 'rack-test', '0.8.3'
+gem 'rack', '2.2.2'
+gem 'rack-test', '1.1.0'
 gem 'rake', '12.3.1'
 gem 'rails-observers', '0.1.5'
 gem 'ratom-nokogiri', '0.10.8', require: false
