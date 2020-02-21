@@ -88,7 +88,7 @@ gem 'mail', '2.7.1', require: false
 gem 'marginalia', '1.8.0', require: false
 gem 'mime-types', '3.3.1'
 gem 'mini_magick', '4.10.1'
-gem 'multi_json', '1.13.1'
+gem 'multi_json', '1.14.1'
 gem 'net-ldap', '0.16.2', require: false
 gem 'nokogiri', '1.10.8', require: false
 gem 'oauth', '0.5.4', require: false
