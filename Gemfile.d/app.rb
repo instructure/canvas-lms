@@ -72,7 +72,7 @@ gem 'ims-lti', '2.3.0', require: 'ims'
 gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
-  gem 'dogstatsd-ruby', '4.5.0'
+  gem 'dogstatsd-ruby', '4.7.0'
 gem 'inst-jobs', '0.15.15'
   gem 'fugit', '1.3.3', require: false
     gem 'et-orbi', '1.2.2', require: false
