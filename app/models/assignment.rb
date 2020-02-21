@@ -2756,6 +2756,14 @@ class Assignment < ActiveRecord::Base
     )
   }
 
+  scope :quiz_lti, -> {
+    where(:submission_types => "external_tool").joins(:external_tool_tag).
+      where(:content_tags => {:content_type => "ContextExternalTool"}).
+      where("EXISTS (?)", ContextExternalTool.quiz_lti.
+        where("context_external_tools.id=content_tags.content_id").select(:id)
+      )
+  }
+
   def overdue?
     due_at && due_at <= Time.zone.now
   end
