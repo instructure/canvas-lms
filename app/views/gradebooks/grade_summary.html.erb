@@ -348,7 +348,7 @@
                 <% if @presenter.show_updated_plagiarism_icons?(turnitin) %>
                   <%=
                     render partial: "shared/originality_score_icon", locals: {
-                      hide_score: true,
+                      hide_score: false,
                       plagiarism_data: turnitin,
                       report_title: anchor_title,
                       report_url: url
@@ -379,7 +379,7 @@
               <% if @presenter.show_updated_plagiarism_icons?(vericite) %>
                 <%=
                   render partial: "shared/originality_score_icon", locals: {
-                    hide_score: true,
+                    hide_score: false,
                     plagiarism_data: vericite,
                     report_title: t("VeriCite similarity score -- more information"),
                     report_url: url,

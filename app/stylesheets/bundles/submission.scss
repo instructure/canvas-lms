@@ -170,6 +170,10 @@
     &.icon-certified {
       color: $ic-color-success;
     }
+
+    &.icon-clock {
+      color: $ic-color-dark;
+    }
   }
 
   .turnitin_similarity_score, .turnitin_similarity_score:hover {

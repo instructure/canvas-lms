@@ -51,7 +51,7 @@
   <%= tag.send(tag_name, **tag_params) do %>
     <i class="<%= icon_class %>"></i>
     <% if score.present? && !hide_score %>
-      <span class="turnitin_similarity_score"><%= score %>%</span>
+      <span class="turnitin_similarity_score"><%= I18n.n(score, precision: 1) %>%</span>
     <% end %>
 
     <% if tooltip_text.present? %>

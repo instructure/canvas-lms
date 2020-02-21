@@ -630,7 +630,7 @@ $outcome-border: 1px solid #BCC2CA;
   font-size: 0.8em;
 }
 
-.turnitin_score_container
+.turnitin_score_container {
   i {
     &.icon-empty,
     &.icon-oval-half {
@@ -641,3 +641,8 @@ $outcome-border: 1px solid #BCC2CA;
       color: $ic-color-success;
     }
   }
+
+  .turnitin_similarity_score {
+    color: $ic-color-dark;
+  }
+}
