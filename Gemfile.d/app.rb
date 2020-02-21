@@ -114,7 +114,7 @@ gem 'safe_yaml', '1.0.5', require: false
 gem 'saml2', '3.0.8'
   gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
 gem 'sanitize', '2.1.1', require: false
-gem 'sentry-raven', '2.11.3', require: false
+gem 'sentry-raven', '2.13.0', require: false
 gem 'shackles', '1.4.2'
 gem 'simple_oauth', '0.3.1', require: false
 gem 'switchman', '1.14.9'
