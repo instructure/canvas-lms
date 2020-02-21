@@ -4683,6 +4683,46 @@ describe Assignment do
     end
   end
 
+  describe "scope :type_quiz_lti" do
+    context "with a quiz_lti assignment" do
+      before :once do
+        assignment_model(:submission_types => "external_tool", :course => @course)
+        tool = @c.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+        @a.external_tool_tag_attributes = { :content => tool }
+        @a.save!
+      end
+
+      it "includes the quiz_lti quiz" do
+        expect(Assignment.type_quiz_lti).not_to be_empty
+      end
+    end
+
+    context "without any quiz_lti assignments" do
+      before :once do
+        assignment_model(:submission_types => "external_tool", :course => @course)
+        tool = @c.context_external_tools.create!(
+          :name => 'Some.Other.Tool',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'some-other-tool-id',
+          :url => 'http://example.com/launch'
+        )
+        @a.external_tool_tag_attributes = { :content => tool }
+        @a.save!
+      end
+
+      it "returns an empty scope" do
+        expect(Assignment.type_quiz_lti).to be_empty
+      end
+    end
+  end
+
   describe "linked submissions" do
     shared_examples_for "submittable" do
       before :once do

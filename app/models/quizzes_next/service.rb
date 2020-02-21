@@ -21,9 +21,9 @@ module QuizzesNext
     end
 
     def self.active_lti_assignments_for_course(course, selected_assignment_ids: nil)
-      scope = course.assignments.active.where(:submission_types => 'external_tool')
+      scope = course.assignments.active.type_quiz_lti
       scope = scope.where(:id => selected_assignment_ids) if selected_assignment_ids
-      scope.to_a.select(&:quiz_lti?)
+      scope.to_a
     end
 
     def self.assignment_duplicated?(assignment_hash)

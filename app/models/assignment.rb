@@ -106,6 +106,16 @@ class Assignment < ActiveRecord::Base
   scope :anonymous, -> { where(anonymous_grading: true) }
   scope :moderated, -> { where(moderated_grading: true) }
   scope :auditable, -> { anonymous.or(moderated) }
+  scope :type_quiz_lti, -> {
+    joins(:external_tool_tag).
+      joins(<<-SQL).
+        INNER JOIN #{ContextExternalTool.quoted_table_name}
+        ON content_tags.content_type='ContextExternalTool'
+        AND context_external_tools.id = content_tags.content_id
+      SQL
+      merge(ContextExternalTool.quiz_lti).
+      distinct
+  }
 
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
