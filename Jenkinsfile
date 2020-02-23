@@ -144,25 +144,27 @@ pipeline {
                   // end of hack (covid)
                 }
               }
-              credentials.fetchFromGerrit('gergich_user_config', '.')
-              credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
+            credentials.fetchFromGerrit('gergich_user_config', '.')
+            credentials.fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
 
-              sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
-              sh 'mv -v config/knapsack_rspec_report.json ./'
-              sh 'rm -v config/cache_store.yml'
-              sh 'rmdir -p gerrit_builder/canvas-lms/config'
-              sh 'cp -v docker-compose/config/selenium.yml config/'
-              sh 'cp -vR docker-compose/config/new-jenkins config/new-jenkins'
-              sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
-              sh 'cp -v config/domain.yml.example config/domain.yml'
-              sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
-              sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
-              sh 'cp -v ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config/gergich_user_config.yml'
-            }
+            sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
+            sh 'rm -v config/cache_store.yml'
+            sh 'rmdir -p gerrit_builder/canvas-lms/config'
+            sh 'rm -v config/database.yml'
+            sh 'rm -v config/security.yml'
+            sh 'rm -v config/selenium.yml'
+            sh 'cp -v docker-compose/config/selenium.yml config/'
+            sh 'cp -vR docker-compose/config/new-jenkins/* config/'
+            sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
+            sh 'cp -v config/domain.yml.example config/domain.yml'
+            sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
+            sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
+            sh 'cp -v ./gergich_user_config/gergich_user_config.yml ./gems/dr_diff/config/gergich_user_config.yml'
           }
         }
       }
     }
+  }
 
     stage('Rebase') {
       when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' && env.GERRIT_PROJECT == 'canvas-lms' } }

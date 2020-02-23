@@ -65,6 +65,6 @@ group :test do
   gem 'pact_broker-client', '1.25.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
 
-  gem 'knapsack', '1.18.0'
+  gem 'parallel_tests'
   gem 'flakey_spec_catcher', require: false
 end

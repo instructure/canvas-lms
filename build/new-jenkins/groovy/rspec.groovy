@@ -35,8 +35,9 @@ def runSeleniumSuite(total, index) {
       'selenium',
       config().selenium_max_fail,
       config().selenium_reruns_retry,
-      '{spec/selenium,gems/plugins/*/spec_canvas/selenium}/**/*_spec.rb',
-      '/performance/'
+      '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
+      '.*/performance',
+      '4'
   )
 }
 
@@ -48,8 +49,9 @@ def runRSpecSuite(total, index) {
       'rspec',
       config().rspec_max_fail,
       config().rspec_reruns_retry,
-      '{spec,gems/plugins/*/spec_canvas}/**/*_spec.rb',
-      '/selenium/'
+      '^./(spec|gems/plugins/.*/spec_canvas)/',
+      '.*/selenium',
+      '8'
   )
 }
 
@@ -61,19 +63,17 @@ def _runRspecTestSuite(
     max_fail,
     reruns_retry,
     test_file_pattern,
-    exclude_regex) {
+    exclude_regex,
+    docker_processes) {
   withEnv([
-      "TEST_ENV_NUMBER=$index",
       "CI_NODE_INDEX=$index",
-      "CI_NODE_TOTAL=$total",
       "COMPOSE_FILE=$compose",
       "RERUNS_RETRY=$reruns_retry",
       "MAX_FAIL=$max_fail",
-      "KNAPSACK_ENABLED=1",
-      "KNAPSACK_GENERATE_REPORT='false'",
-      "KNAPSACK_TEST_DIR=spec",
-      "KNAPSACK_TEST_FILE_PATTERN=$test_file_pattern",
-      "KNAPSACK_EXCLUDE_REGEX=$exclude_regex"
+      "TEST_PATTERN=$test_file_pattern",
+      "EXCLUDE_TESTS=$exclude_regex",
+      "CI_NODE_TOTAL=$total",
+      "DOCKER_PROCESSES=$docker_processes"
   ]) {
     try {
       sh 'rm -rf ./tmp'
@@ -85,16 +85,13 @@ def _runRspecTestSuite(
         sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
         sh 'build/new-jenkins/docker-compose-build-up.sh'
         sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
-        sh 'build/new-jenkins/rspec-with-retries.sh'
+        sh 'build/new-jenkins/rspec_parallel_dockers.sh'
       }
     }
     finally {
       // copy spec failures to local
-      sh 'mkdir -p tmp'
-      sh(
-          script: 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp/spec_failures/',
-          returnStatus: true
-      )
+      sh 'mkdir -p tmp/spec_failures'
+      sh 'build/new-jenkins/rspec_copy_failures.sh'
 
       def reports = load 'build/new-jenkins/groovy/reports.groovy'
       reports.stashSpecFailures(prefix, index)

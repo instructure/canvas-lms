@@ -137,38 +137,41 @@ module ErrorContext
 
     def start
       Rails.logger.capture_messages!
-      start_capturing_video! if capture_video? && !ErrorSummary.discard_remaining?
+      # TODO: does not work with new docker builds
+      # start_capturing_video! if capture_video? && !ErrorSummary.discard_remaining?
     end
 
     def finish
       if discard?
-        discard_video! if capturing_video?
+        # TODO: does not work with new docker builds
+        # discard_video! if capturing_video?
       else
         save_screenshot! if capture_screenshot?
-        save_video! if capturing_video?
+        # TODO: does not work with new docker builds
+        # save_video! if capturing_video?
       end
     end
 
-    def capturing_video?
-      @capturing_video
-    end
+    # def capturing_video?
+    #   @capturing_video
+    # end
 
-    def start_capturing_video!
-      @capturing_video = true
-      SeleniumDriverSetup.headless.video.start_capture
-    end
+    # def start_capturing_video!
+    #   @capturing_video = true
+    #   SeleniumDriverSetup.headless.video.start_capture
+    # end
 
     def save_screenshot!
       SeleniumDriverSetup.driver.save_screenshot(File.join(errors_path, screenshot_name))
     end
 
-    def save_video!
-      SeleniumDriverSetup.headless.video.stop_and_save(File.join(errors_path, screen_capture_name))
-    end
+    # def save_video!
+    #   SeleniumDriverSetup.headless.video.stop_and_save(File.join(errors_path, screen_capture_name))
+    # end
 
-    def discard_video!
-      SeleniumDriverSetup.headless.video.stop_and_discard
-    end
+    # def discard_video!
+    #   SeleniumDriverSetup.headless.video.stop_and_discard
+    # end
 
     def log_messages
       Rails.logger.captured_messages
@@ -179,12 +182,12 @@ module ErrorContext
     end
 
     def capture_screenshot?
-      selenium? && !SeleniumDriverSetup.saucelabs_test_run?
+      selenium?
     end
 
-    def capture_video?
-      selenium? && SeleniumDriverSetup.run_headless?
-    end
+    # def capture_video?
+    #   selenium? && SeleniumDriverSetup.run_headless?
+    # end
 
     def js_errors
       return unless selenium?
@@ -219,8 +222,8 @@ module ErrorContext
       "screenshot.png" if capture_screenshot? && !discard?
     end
 
-    def screen_capture_name
-      "capture.mp4" if capture_video? && !discard?
-    end
+    # def screen_capture_name
+    #   "capture.mp4" if capture_video? && !discard?
+    # end
   end
 end

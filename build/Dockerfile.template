@@ -38,6 +38,7 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
        unzip \
        pbzip2 \
        fontforge \
+       parallel \
 <% end -%>
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
@@ -111,6 +112,7 @@ USER docker
 COPY --chown=docker:docker Gemfile         ${APP_HOME}
 COPY --chown=docker:docker Gemfile.d       ${APP_HOME}Gemfile.d
 COPY --chown=docker:docker config          ${APP_HOME}config
+COPY --chown=docker:docker build/new-jenkins  ${APP_HOME}build/new-jenkins
 COPY --chown=docker:docker gems            ${APP_HOME}gems
 COPY --chown=docker:docker packages        ${APP_HOME}packages
 COPY --chown=docker:docker script          ${APP_HOME}script
