@@ -92,7 +92,7 @@ def buildIndexPage() {
   } else {
       Map<String, List<String>> failureCategory = [:]
       htmlFiles.each { file ->
-        def category = file.getPath().split("/")[2]
+        def category = file.getPath().split("/")[3]
         if (failureCategory.containsKey("${category}")) {
           failureCategory.get("${category}").add("${file}")
         } else {

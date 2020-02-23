@@ -342,6 +342,7 @@ describe SpeedGrader::Assignment do
     end
 
     it "creates a non-annotatable DocViewer session for Discussion attachments" do
+      skip('Fix in TALLY-790')
       course = student_in_course(active_all: true).course
       assignment = assignment_model(course: course)
       assignment.anonymous_grading = true
@@ -363,6 +364,7 @@ describe SpeedGrader::Assignment do
     end
 
     it "creates DocViewer session anonymous instructor annotations if assignment has it set" do
+      skip('Fix in TALLY-790')
       course = student_in_course(active_all: true).course
       assignment = assignment_model(course: course)
       attachment = attachment_model(
@@ -385,6 +387,7 @@ describe SpeedGrader::Assignment do
     end
 
     it "passes enrollment type to DocViewer" do
+      skip('Fix in TALLY-790')
       course = student_in_course(active_all: true).course
       assignment = assignment_model(course: course)
       attachment = attachment_model(
@@ -406,6 +409,7 @@ describe SpeedGrader::Assignment do
     end
 
     it "passes submission id to DocViewer" do
+      skip('Fix in TALLY-790')
       course = student_in_course(active_all: true).course
       assignment = assignment_model(course: course)
       attachment = attachment_model(

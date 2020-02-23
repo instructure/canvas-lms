@@ -41,7 +41,7 @@ def appendStagesAsBuildNodes(nodes,
     // it gets the correct number
     def index = i;
     // we cant use String.format, so... yea
-    def stage_name = "$stage_name_prefix ${index + 1}"
+    def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     nodes[stage_name] = {
       node('canvas-docker') {
         // make sure to unstash

@@ -7,7 +7,7 @@
 build/
 !build/vendor/woff-code-latest.zip
 !build/gergich/
-!build/new-jenkins/package-translations
+!build/new-jenkins/
 docker-compose/
 !docker-compose/config/*
 docker-compose.local.*.yml
