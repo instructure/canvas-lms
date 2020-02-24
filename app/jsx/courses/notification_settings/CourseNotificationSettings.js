@@ -56,19 +56,27 @@ export default class CourseNotificationSettings extends Component {
     // optimistically toggle button while waiting for response
     this.setState(prevState => ({enabled: !prevState.enabled}))
 
-    const resp = await axios.put(
-      `/api/v1/users/self/courses/${ENV.COURSE.id}/enable_notifications`,
-      {enable: !this.state.enabled}
-    )
-    if (resp?.status !== 200) {
-      this.context.setOnFailure(I18n.t('Failed to update course notification settings'))
-      this.setState(prevState => ({enabled: !prevState.enabled}))
-      return
-    }
+    try {
+      const resp = await axios.put(
+        `/api/v1/users/self/courses/${ENV.COURSE.id}/enable_notifications`,
+        {enable: !this.state.enabled}
+      )
+      if (resp?.status !== 200) {
+        this.handleError()
+        return
+      }
 
-    this.setState({
-      enabled: resp?.data?.enabled
-    })
+      this.setState({
+        enabled: resp?.data?.enabled
+      })
+    } catch (error) {
+      this.handleError(error.message)
+    }
+  }
+
+  handleError = () => {
+    this.context.setOnFailure(I18n.t('Failed to update course notification settings'))
+    this.setState(prevState => ({enabled: !prevState.enabled}))
   }
 
   render() {
@@ -88,7 +96,7 @@ export default class CourseNotificationSettings extends Component {
 
     return (
       <Flex direction="column">
-        <Flex.Item>
+        <Flex.Item overflowY="visible">
           <Heading>{I18n.t('Course Notification Settings')}</Heading>
         </Flex.Item>
         <Flex.Item margin="large 0 small 0" padding="xx-small">
