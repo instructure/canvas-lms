@@ -34,7 +34,8 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
     title: a.title,
     message: a.message,
     posted_at: a.delayed_post_at || a.posted_at,
-    url: a.url
+    url: a.url,
+    pinned: a.pinned
   })
 
   axios.get(url).then(response =>

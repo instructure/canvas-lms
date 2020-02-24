@@ -306,7 +306,7 @@ class DiscussionTopicsController < ApplicationController
     scope = if params[:order_by] == 'recent_activity'
               scope.by_last_reply_at
             elsif params[:only_announcements]
-              scope.by_posted_at
+              scope.order("pinned DESC NULLS LAST").by_posted_at
             else
               scope.by_position_legacy
             end

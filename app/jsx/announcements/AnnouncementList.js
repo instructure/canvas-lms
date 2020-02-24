@@ -36,7 +36,8 @@ export default class AnnouncementList extends React.Component {
           title: PropTypes.string.isRequired,
           message: PropTypes.string.isRequired,
           posted_at: PropTypes.string.isRequired,
-          url: PropTypes.string.isRequired
+          url: PropTypes.string.isRequired,
+          pinned: PropTypes.bool.isRequired
         })
       )
     }
@@ -47,7 +48,7 @@ export default class AnnouncementList extends React.Component {
 
     renderAnnouncement () {
       return this.props.announcements.map(c => (
-        <tr key={c.id}>
+        <tr key={c.id} className={c.pinned ? "AnnouncementList__pinned" : ""}>
           <td>
             <ToggleDetails summary={TextHelper.truncateText(c.title, { max: 100 })} className="AnnouncementList__message">
               <p dangerouslySetInnerHTML={{__html: c.message}}/>
@@ -64,7 +65,7 @@ export default class AnnouncementList extends React.Component {
     renderTable () {
       if (this.props.announcements.length) {
         return (
-          <Table caption={I18n.t('Recent Announcements')} striped="rows">
+          <Table caption={I18n.t('Active Announcements')} striped="rows">
             <tbody>
               {this.renderAnnouncement()}
             </tbody>

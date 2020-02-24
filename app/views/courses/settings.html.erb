@@ -431,7 +431,7 @@
               </div>
             <% end %>
             <%= f.check_box :show_announcements_on_home_page, :disabled => !can_manage %>
-            <%= f.label :show_announcements_on_home_page, :en => "Show recent announcements on Course home page" %><br/>
+            <%= f.label :show_announcements_on_home_page, :en => "Show active announcements on Course home page" %><br/>
             <%= f.select :home_page_announcement_limit, options_for_select(1..15, @context.home_page_announcement_limit || 3), {}, {:disabled => !can_manage || !@context.show_announcements_on_home_page?, :style => 'width: 75px'} %>
             <%= f.label :home_page_announcement_limit, :en => 'Number of announcements shown on the homepage' %><br/>
             <%= f.check_box :allow_student_forum_attachments, :disabled => !can_manage %>
