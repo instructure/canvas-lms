@@ -2327,6 +2327,7 @@ describe Course, "tabs_available" do
   context "teachers" do
     before :once do
       course_with_teacher(:active_all => true)
+      @course.root_account.enable_feature!(:rubrics_in_course_navigation)
     end
 
     it "should return the defaults if nothing specified" do
@@ -2392,13 +2393,21 @@ describe Course, "tabs_available" do
     it "should not hide tabs for completed teacher enrollments" do
       @user.enrollments.where(:course_id => @course).first.complete!
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      expect(tab_ids).to eql(Course.default_tabs.map{|t| t[:id] })
+      # When enrollment is complete, users lose the :manage_rubrics permission
+      default_tabs = Course.default_tabs.map{|t| t[:id] }.reject{|id| id == Course::TAB_RUBRICS }
+      expect(tab_ids).to eql(default_tabs)
     end
 
     it "should not include Announcements without read_announcements rights" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_announcements', :enabled => false)
       tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).map{|t| t[:id] }
       expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
+    end
+
+    it "should not include Rubrics when the rubrics_in_course_navigation FF is disabled" do
+      @course.root_account.disable_feature!(:rubrics_in_course_navigation)
+      tab_ids = @course.tabs_available(@teacher)
+      expect(tab_ids).to_not include(Course::TAB_RUBRICS)
     end
   end
 
@@ -4013,6 +4022,19 @@ describe Course, 'tabs_available' do
     expect(tabs.map{|t| t[:id]}).to include(tool.asset_string)
   end
 
+  context 'rubrics tab' do
+    it 'hides the tab when the FF is not enabled' do
+      @course.root_account.disable_feature!(:rubrics_in_course_navigation)
+      tab_ids = @course.tabs_available(@teacher).map{|t| t[:id]}
+      expect(tab_ids).not_to include(Course::TAB_RUBRICS)
+    end
+
+    it 'does not hide the tab when the FF is enabled' do
+      @course.root_account.enable_feature!(:rubrics_in_course_navigation)
+      tab_ids = @course.tabs_available(@teacher).map{|t| t[:id]}
+      expect(tab_ids).to include(Course::TAB_RUBRICS)
+    end
+  end
 end
 
 describe Course, 'scoping' do

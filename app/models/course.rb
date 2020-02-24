@@ -2655,6 +2655,7 @@ class Course < ActiveRecord::Base
   TAB_OUTCOMES = 15
   TAB_COLLABORATIONS = 16
   TAB_COLLABORATIONS_NEW = 17
+  TAB_RUBRICS = 18
 
   def self.default_tabs
     [{
@@ -2711,6 +2712,11 @@ class Course < ActiveRecord::Base
       :label => t('#tabs.outcomes', "Outcomes"),
       :css_class => 'outcomes',
       :href => :course_outcomes_path
+    }, {
+      :id => TAB_RUBRICS,
+       :label => t('#tabs.rubrics', "Rubrics"),
+       :css_class => 'rubrics',
+       :href => :course_rubrics_path
     }, {
       :id => TAB_QUIZZES,
       :label => t('#tabs.quizzes', "Quizzes"),
@@ -2799,6 +2805,12 @@ class Course < ActiveRecord::Base
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       tabs << settings_tab
 
+      # remove rubrics tab if FF is not enabled
+      # remove conditional when FF is enabled on all root accounts
+      unless self.root_account.feature_enabled?(:rubrics_in_course_navigation)
+        tabs.delete_if {|t| t[:id] == TAB_RUBRICS}
+      end
+
       if opts[:only_check]
         tabs = tabs.select { |t| opts[:only_check].include?(t[:id]) }
       end
@@ -2866,6 +2878,7 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_DISCUSSIONS], :read_forum, :post_to_forum, :create_forum, :moderate_forum)
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
+        delete_unless.call([TAB_RUBRICS], :manage_rubrics)
 
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }

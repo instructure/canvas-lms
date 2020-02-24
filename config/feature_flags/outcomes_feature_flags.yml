@@ -5,3 +5,10 @@ outcome_alignment_non_scoring_content:
   display_name: Outcome alignment to non-scoring content
   description: |-
     Allows aligning outcomes to non-scoring content
+rubrics_in_course_navigation:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Rubrics in course navigation
+  description: |-
+    Includes rubrics in the course sidebar navigation
+  touch_context: true
