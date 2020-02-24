@@ -43,6 +43,7 @@ describe Submission do
   it { is_expected.to validate_numericality_of(:points_deducted).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_numericality_of(:seconds_late_override).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(["none", "missing", "late"]).allow_nil }
+  it { is_expected.to validate_inclusion_of(:cached_tardiness).in_array(["missing", "late"]).allow_nil }
 
   it { is_expected.to delegate_method(:auditable?).to(:assignment).with_prefix(true) }
   it { is_expected.to delegate_method(:can_be_moderated_grader?).to(:assignment).with_prefix(true) }
