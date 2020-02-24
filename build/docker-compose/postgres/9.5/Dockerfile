@@ -29,6 +29,7 @@ RUN apt-get update --quiet=2 \
   && make \
   && make install \
   && cp ~/pg_collkey-${PG_COLLKEY_VERSION}/pg_collkey--${PG_COLLKEY_VERSION}.sql /usr/share/postgresql/9.5/extension \
+  && cp ~/pg_collkey-${PG_COLLKEY_VERSION}/pg_collkey.control /usr/share/postgresql/9.5/extension \
   && apt-get remove -qqy \
     build-essential \
     ca-certificates \
