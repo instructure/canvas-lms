@@ -72,6 +72,7 @@ class AnnouncementsApiController < ApplicationController
     return unless courses.all? { |course| authorized_action(course, @current_user, :read_announcements) }
 
     expired_announcements = courses.map { |course| course.expired_announcements.pluck(:id) }.flatten
+    expired_announcements = expired_announcements.empty? ? [0] : expired_announcements
     scope = Announcement.where(
       :context_type => 'Course',
       :context_id => courses
