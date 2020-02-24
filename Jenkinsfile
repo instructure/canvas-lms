@@ -276,8 +276,7 @@ pipeline {
             skipIfPreviouslySuccessful("flakey_spec_catcher") {
               build(
                 job: 'test-suites/flakey-spec-catcher',
-                parameters: build_parameters,
-                propagate: false
+                parameters: build_parameters
               )
             }
           }
