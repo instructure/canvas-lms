@@ -189,7 +189,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
   describe('#_applyVideoOptions', () => {
     it('updates the video', () => {
-      const updateMediaObject = jest.fn()
+      const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
       trayController._applyVideoOptions({
         displayAs: 'embed',
@@ -209,7 +209,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
     })
 
     it('replaces the video with a link', () => {
-      const updateMediaObject = jest.fn()
+      const updateMediaObject = jest.fn().mockResolvedValue()
       const ed = editors[0]
       trayController.showTrayForEditor(ed)
       trayController._applyVideoOptions({

@@ -108,11 +108,21 @@ export default class TrayController {
         this._editor.selection.select(link)
         this.$videoContainer = null
       }
+      videoOptions
+        .updateMediaObject({
+          media_object_id: videoOptions.media_object_id,
+          title: videoOptions.titleText,
+          subtitles: videoOptions.subtitles
+        })
+        .then(_r => {
+          if (this.$videoContainer && videoOptions.displayAs === 'embed') {
+            this.$videoContainer.firstElementChild.contentWindow.location.reload()
+          }
+        })
+        .catch(ex => {
+          console.error('failed updating video captions', ex) // eslint-disable-line no-console
+        })
     }
-    videoOptions.updateMediaObject({
-      media_object_id: videoOptions.media_object_id,
-      title: videoOptions.titleText
-    })
     this._dismissTray()
   }
 
@@ -127,8 +137,6 @@ export default class TrayController {
 
   _renderTray(trayProps) {
     let vo = {}
-    // we will need this element when we do tracks but not for now.
-    // const $video = this._editor.selection.getNode()
 
     if (this._shouldOpen) {
       /*

@@ -25,18 +25,19 @@ import {IconAddLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 
 import ClosedCaptionCreatorRow from './ClosedCaptionCreatorRow'
-import shortId from '../shared/shortid'
 
 // TODO:
 //   - Limit file creation
-//   - Get current subtitles from API
-//   - Upload new subtitles via API
-//   - Download existing subtitles via download button
-//   - Delete existing subtitles locally and via API
 
 export default class ClosedCaptionPanel extends Component {
   static propTypes = {
     liveRegion: func.isRequired,
+    subtitles: arrayOf(
+      shape({
+        locale: string.isRequired,
+        file: shape({name: string.isRequired}).isRequired
+      })
+    ),
     updateSubtitles: func.isRequired,
     uploadMediaTranslations: shape({
       UploadMediaStrings: objectOf(string),
@@ -45,17 +46,21 @@ export default class ClosedCaptionPanel extends Component {
     languages: arrayOf(
       shape({
         id: string,
-        label: string
+        language: string
       })
     ).isRequired
   }
 
-  state = {
-    addingNewClosedCaption: true,
-    newSelectedFile: null,
-    newSelectedLanguage: null,
-    subtitles: [],
-    announcement: null
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      addingNewClosedCaption: !props?.subtitles?.length, // if there are none, show the + button
+      newSelectedFile: null,
+      newSelectedLanguage: null,
+      subtitles: props.subtitles || [],
+      announcement: null
+    }
   }
 
   componentDidUpdate() {
@@ -80,8 +85,7 @@ export default class ClosedCaptionPanel extends Component {
       this.setState(prevState => {
         const subtitles = prevState.subtitles.concat([
           {
-            id: shortId(),
-            language: prevState.newSelectedLanguage.id,
+            locale: prevState.newSelectedLanguage.id,
             file: newFile,
             isNew: true
           }
@@ -107,7 +111,7 @@ export default class ClosedCaptionPanel extends Component {
     if (this.state.newSelectedFile) {
       this.setState(prevState => {
         const subtitles = prevState.subtitles.concat([
-          {id: shortId(), language: lang.id, file: prevState.newSelectedFile, isNew: true}
+          {locale: lang.id, file: prevState.newSelectedFile, isNew: true}
         ])
         this.props.updateSubtitles(subtitles)
         return {
@@ -126,30 +130,20 @@ export default class ClosedCaptionPanel extends Component {
     }
   }
 
-  onRowDelete = subtitle => {
-    if (subtitle.id) {
-      this.setState(prevState => {
-        const deletedLang = this.props.languages.find(l => l.id === subtitle.id)
-        const subtitles = prevState.subtitles.filter(s => s.id !== subtitle.id)
-        this.props.updateSubtitles(subtitles)
-        return {
-          subtitles,
-          addingNewClosedCaption: subtitles.length > 0 ? prevState.addingNewClosedCaption : true,
-          announcement: formatMessage(
-            this.props.uploadMediaTranslations.UploadMediaStrings.DELETED_CAPTION,
-            {lang: deletedLang?.label}
-          )
-        }
-      })
-    } else {
-      // should never get here
-      this.setState({
-        addingNewClosedCaption: true,
-        newSelectedFile: null,
-        newSelectedLanguage: null,
-        announcement: null
-      })
-    }
+  onRowDelete = locale => {
+    this.setState(prevState => {
+      const deletedLang = this.props.languages.find(l => l.id === locale)
+      const subtitles = prevState.subtitles.filter(s => s.locale !== locale)
+      this.props.updateSubtitles(subtitles)
+      return {
+        subtitles,
+        addingNewClosedCaption: subtitles.length > 0 ? prevState.addingNewClosedCaption : true,
+        announcement: formatMessage(
+          this.props.uploadMediaTranslations.UploadMediaStrings.DELETED_CAPTION,
+          {lang: deletedLang?.label}
+        )
+      }
+    })
   }
 
   render() {
@@ -169,16 +163,15 @@ export default class ClosedCaptionPanel extends Component {
         <View display="inline-block">
           {this.state.subtitles.map(cc => (
             <ClosedCaptionCreatorRow
-              key={cc.id}
+              key={cc.locale}
               liveRegion={this.props.liveRegion}
               uploadMediaTranslations={this.props.uploadMediaTranslations}
               onDeleteRow={this.onRowDelete}
               onLanguageSelected={this.onLanguageSelected}
               onFileSelected={this.onFileSelected}
               languages={this.props.languages}
-              selectedLanguage={this.props.languages.find(l => l.id === cc.language)}
+              selectedLanguage={this.props.languages.find(l => l.id === cc.locale)}
               selectedFile={cc.file}
-              rowId={cc.id}
             />
           ))}
         </View>
@@ -190,7 +183,10 @@ export default class ClosedCaptionPanel extends Component {
               onDeleteRow={this.onRowDelete}
               onLanguageSelected={this.onLanguageSelected}
               onFileSelected={this.onFileSelected}
-              languages={this.props.languages}
+              languages={this.props.languages.filter(candidate_lang => {
+                // remove already selected languages form the list
+                return !this.state.subtitles.find(st => st.locale === candidate_lang.id)
+              })}
               selectedLanguage={this.state.newSelectedLanguage}
               selectedFile={this.state.newSelectedFile}
             />

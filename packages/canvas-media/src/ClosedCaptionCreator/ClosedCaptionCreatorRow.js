@@ -30,7 +30,6 @@ import CanvasSelect from '../shared/CanvasSelect'
 
 export default class ClosedCaptionCreatorRow extends Component {
   static propTypes = {
-    rowId: string,
     languages: arrayOf(
       shape({
         id: string,
@@ -54,7 +53,7 @@ export default class ClosedCaptionCreatorRow extends Component {
   }
 
   handleDeleteRow = _e => {
-    this.props.onDeleteRow({id: this.props.rowId})
+    this.props.onDeleteRow(this.props.selectedLanguage.id)
   }
 
   get isReadonly() {

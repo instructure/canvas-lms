@@ -95,6 +95,9 @@ class MediaTracksController < ApplicationController
   # @argument content [String]
   #   The contents of the track, in SRT or WebVTT format
   #
+  # @argument exclude[] [String, "tracks"]
+  #   Exclude the given fields in the response.
+  #
   # @example_request
   #     curl https://<canvas>/media_objects/<media_object_id>/media_tracks \
   #         -F kind='subtitles' \
@@ -108,7 +111,8 @@ class MediaTracksController < ApplicationController
     if authorized_action(@media_object, @current_user, :add_captions)
       track = @media_object.media_tracks.where(user_id: @current_user.id, locale: params[:locale]).first_or_initialize
       track.update! params.permit(*TRACK_SETTABLE_ATTRIBUTES)
-      render :json => media_object_api_json(@media_object, @current_user, session)
+      exclude = params[:exclude] || []
+      render :json => media_object_api_json(@media_object, @current_user, session, exclude)
     end
   end
 
@@ -161,13 +165,12 @@ class MediaTracksController < ApplicationController
   # and update or create tracks with a content field.
   #
   # @argument include[] [String]
-  #   By default, index returns id and locale for each of the
-  #   result MediaTracks. Use include[] to
-  #   add additional fields. For example include[]=content
-  #   See #index for allowed values.
+  #   Retuns a listing of the resulting set of MediaTracks.
+  #   Like List Media Objects, use the include[] parameter to
+  #   add additional fields.
   #
   # @example_request
-  #   curl -X PUT https://<canvas>/api/v1/media_objects/<media_object_id>/mediatracksinclude[]=content \
+  #   curl -X PUT https://<canvas>/api/v1/media_objects/<media_object_id>/mediatracks?include[]=content \
   #     -H 'Authorization: Bearer <token>'
   #     -d '[{"locale": "en"}, {"locale": "af","content": "1\r\n00:00:00,000 --> 00:00:01,251\r\nThis is the content\r\n"}]'
   #

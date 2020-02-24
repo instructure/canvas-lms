@@ -81,11 +81,10 @@ export function fetchInitialMedia(sortBy) {
 }
 
 // update the media object.
-// For now only supports the title
-export function updateMediaObject({media_object_id, title}) {
+export function updateMediaObject({media_object_id, title, subtitles}) {
   return (dispatch, getState) => {
     const state = getState()
-    return state.source.updateMediaObject(state, {media_object_id, title}).catch(e => {
+    const moupdate = state.source.updateMediaObject(state, {media_object_id, title}).catch(e => {
       alertHandler.handleAlert({
         text: formatMessage(
           'Though your video will have the correct title in the browser, we failed to update it in the database.'
@@ -94,5 +93,13 @@ export function updateMediaObject({media_object_id, title}) {
       })
       throw e
     })
+
+    if (ENV.FEATURES.cc_in_rce_video_tray) {
+      const ccupdate = state.source.updateClosedCaptions(state, {media_object_id, subtitles})
+
+      return Promise.all([moupdate, ccupdate])
+    } else {
+      return moupdate
+    }
   }
 }

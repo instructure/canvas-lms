@@ -88,7 +88,7 @@ describe('ClosedCaptionPanel', () => {
     expect(getByTestId('CC-CreatorRow-chosen')).toBeInTheDocument()
     expect(getByText('add new caption')).toBeInTheDocument()
     expect(updateSubtitles).toHaveBeenCalledWith(
-      expect.arrayContaining([expect.objectContaining({language: 'fr'})])
+      expect.arrayContaining([expect.objectContaining({locale: 'fr'})])
     )
   })
 
