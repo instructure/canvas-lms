@@ -51,12 +51,6 @@ class DelayedMessage < ActiveRecord::Base
     end
   end
 
-  def formatted_summary
-    (summary || '').
-        gsub(/\n/, "<br />\n").
-        gsub(/(\s\s+)/) { |str| str.gsub(/\s/, '&nbsp;') }
-  end
-
   scope :for, lambda { |context|
     case context
     when :daily
@@ -74,17 +68,7 @@ class DelayedMessage < ActiveRecord::Base
     end
   }
 
-  scope :by, lambda { |field| order(field) }
-
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
-
-  scope :to_summarize, -> {
-    where("delayed_messages.workflow_state='pending' and delayed_messages.send_at<=?", Time.now.utc)
-  }
-
-  scope :next_to_summarize, -> {
-    where(:workflow_state => 'pending').order(:send_at).limit(1)
-  }
 
   include Workflow
 
@@ -100,8 +84,6 @@ class DelayedMessage < ActiveRecord::Base
     state :sent
   end
 
-  def linked_name=(name)
-  end
 
   # This sets up a message and parses it internally.  Any template can
   # have these variables to build a message.  The most important one will
