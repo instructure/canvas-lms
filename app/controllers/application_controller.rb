@@ -66,6 +66,8 @@ class ApplicationController < ActionController::Base
   after_filter :set_response_headers
   after_filter :update_enrollment_last_activity_at
 
+  around_filter :extra_logging
+
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
     crumb = <<-END
@@ -2387,4 +2389,60 @@ class ApplicationController < ActionController::Base
       return result
     end
   end
+
+  private
+  def extra_logging
+    # Clean out things we can't JSONify so it doesn't crash.
+    def filter_hash(main_hash)
+      main_hash.each_with_object({}) do |(k, v), h|
+        # remove cookie values so we don't clutter the logs
+        if(k.to_s.downcase.include? 'cookie')
+          next
+        end
+        if(v.is_a?(Hash))
+          ch = filter_hash(v)
+          h[k] = ch
+        elsif(v.is_a?(Array))
+          h[k] = v.map do |e|
+            e.is_a?(Hash) ? filter_hash(e) : e
+          end
+        elsif(v.is_a?(String))
+          h[k] = v
+        elsif(v.is_a?(Integer))
+          h[k] = v
+        end
+      end
+    end
+
+    # Collect what we can before the code runs.
+    data = {
+      'request' => {
+        'method' => request.method,
+        'headers' => filter_hash(request.headers.env),
+        'ip' => request.ip,
+        'fullpath' => request.fullpath,
+        'remote_ip' => request.remote_ip,
+        'id' => RequestContextGenerator.request_id,
+      },
+      'api_request' => @api_request,
+      'action_name' => @_action_name,
+      'session' => session.to_hash,
+      'response' => {
+        'code' => response.code,
+      },
+      'user' => @current_user,
+    }
+
+    yield
+
+  rescue Exception => error
+    data['error_msg'] = error.to_s
+    data['response']['code'] = response_code_for_rescue(error) || 500
+
+    # Crash away
+    raise
+  ensure
+    Rails.logger.info(data.to_json)
+  end
+
 end
