@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,10 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class DeleteDuplicateNotificationEndpoints < ActiveRecord::Migration[4.2]
+class AddUniqueIndexToNotificationEndoint < ActiveRecord::Migration[4.2]
   tag :postdeploy
+  disable_ddl_transaction!
 
   def up
-    DataFixup::DeleteDuplicateNotificationEndpoints.send_later_if_production_enqueue_args(:run, :priority => Delayed::LOW_PRIORITY)
+    DataFixup::DeleteDuplicateNotificationEndpoints.run
+    add_index :notification_endpoints, [:access_token_id, :arn], algorithm: :concurrently,
+              where: "workflow_state='active'"
   end
 end
