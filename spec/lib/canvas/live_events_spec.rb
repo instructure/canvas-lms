@@ -609,6 +609,45 @@ describe Canvas::LiveEvents do
       end
     end
 
+    describe ".submissions_bulk_updated" do
+      before(:each) do
+        # This creates a course with a single student and a number of assignments
+        # equal to the value of "submissions"
+        course_with_student_submissions(submissions: 3)
+      end
+
+      let(:submissions) do
+        @student.submissions.order(:id)
+      end
+
+      it "emits a submission_updated event for each passed submission" do
+        expect_event('submission_updated',
+          hash_including(
+            :submission_id
+          )).exactly(3).times
+
+        Canvas::LiveEvents.submissions_bulk_updated(submissions)
+      end
+
+      it "includes the ID of an affected submission in each event" do
+        aggregate_failures do
+          expect_event('submission_updated',
+            hash_including(
+              submission_id: submissions.first.global_id.to_s
+            )).ordered
+          expect_event('submission_updated',
+            hash_including(
+              submission_id: submissions.second.global_id.to_s
+            )).ordered
+          expect_event('submission_updated',
+            hash_including(
+              submission_id: submissions.third.global_id.to_s
+            )).ordered
+
+          Canvas::LiveEvents.submissions_bulk_updated(submissions)
+        end
+      end
+    end
 
     describe '.submission_comment_created' do
       it 'should trigger a submission comment created live event' do

@@ -83,3 +83,9 @@ gradebook_dataloader_improvements:
       state: on
     test:
       state: on
+missing_policy_applicator_emits_live_events:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Missing Policy Applicator Emits Live Events
+  description: Allows the missing policy applicator to emit submission_updated live events for each submission
+    marked as missing.
