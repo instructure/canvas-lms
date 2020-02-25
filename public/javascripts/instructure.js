@@ -431,7 +431,10 @@ $(function() {
         .loadingImage({image_size: 'small'})
         .hide()
       $.ajaxJSON(
-        $link.attr('href').replace(/\/download/, ''),
+        $link
+          .attr('href')
+          .replace(/\/download|wrap=1/, '')
+          .replace(/[?&]wrap=1/, ''),
         'GET',
         {},
         data => {
