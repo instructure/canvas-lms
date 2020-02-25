@@ -62,8 +62,8 @@ gem 'graphql-batch', '0.4.2'
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '2.0.3', require: false
 gem 'httparty', '0.18.0'
-gem 'i18n', '1.0.0'
-gem 'i18nliner', '0.1.1'
+gem 'i18n', '1.8.2'
+gem 'i18nliner', '0.1.2'
   gem 'ruby2ruby', '2.4.4', require: false
   gem 'ruby_parser', '3.14.2', require: false
 gem 'icalendar', '2.6.1', require: false
