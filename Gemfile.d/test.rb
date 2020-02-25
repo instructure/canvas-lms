@@ -60,10 +60,10 @@ group :test do
   gem 'headless', '2.3.1', require: false
   gem 'escape_code', '0.2', require: false
   gem 'luminosity_contrast', '0.2.1'
-  gem 'pact', '1.43.1'
+  gem 'pact', '1.49.0'
+    gem 'pact-mock_service', '3.5.0', require: false
   gem 'pact-messages', '0.2.0'
-  gem 'pact_broker-client'
-  gem 'pact-mock_service', '3.2.1'
+  gem 'pact_broker-client', '1.25.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
 
   gem 'knapsack', '1.18.0'
