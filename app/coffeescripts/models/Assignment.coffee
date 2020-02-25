@@ -360,7 +360,8 @@ export default class Assignment extends Model
     @set 'published', newPublished
 
   useNewQuizIcon: () =>
-    ENV.FLAGS && ENV.FLAGS.newquizzes_on_quiz_page && @isQuizLTIAssignment()
+    ENV.FLAGS && ENV.FLAGS.newquizzes_on_quiz_page &&
+      (@isQuiz() && isStudent() || @isQuizLTIAssignment())
 
   position: (newPosition) ->
     return @get('position') || 0 unless arguments.length > 0
@@ -380,7 +381,8 @@ export default class Assignment extends Model
     return 'Assignment'
 
   objectTypeDisplayName: ->
-    return I18n.t('Quiz') if @isQuiz() || @isQuizLTIAssignment()
+    return I18n.t('Quiz') if @isQuiz() || (@isQuizLTIAssignment() && isStudent())
+    return I18n.t('New Quiz') if @isQuizLTIAssignment()
     return I18n.t('Discussion Topic') if @isDiscussionTopic()
     return I18n.t('Page') if @isPage()
     return I18n.t('Assignment')

@@ -343,6 +343,8 @@ export default class ItemView extends Backbone.View {
     base.showDueDate = this.model.multipleDueDates() || this.model.singleSectionDueDate()
     base.name = this.model.name()
     base.isQuizzesNext = this.model.isQuizzesNext()
+    base.useQuizzesNextIcon = this.model.isQuizzesNext() || this.isStudent()
+    base.isQuizzesNextAndNotStudent = this.model.isQuizzesNext() && !this.isStudent()
     base.quizzesRespondusEnabled =
       this.isStudent() &&
       this.model.get('require_lockdown_browser') &&
