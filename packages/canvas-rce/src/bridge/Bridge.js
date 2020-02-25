@@ -158,7 +158,10 @@ export default class Bridge {
 
   insertImagePlaceholder(fileMetaProps) {
     if (this.focusedEditor) {
-      this.focusedEditor.insertImagePlaceholder(fileMetaProps)
+      // don't insert a placeholder if the user has selected content
+      if (!this.existingContentToLink()) {
+        this.focusedEditor.insertImagePlaceholder(fileMetaProps)
+      }
     } else {
       console.warn('clicked sidebar image without a focused editor')
     }

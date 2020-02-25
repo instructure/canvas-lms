@@ -88,6 +88,32 @@ describe "RCE next tests" do
 
       in_frame rce_page_body_ifr_id do
         expect(wiki_body_anchor.attribute('title')).to include title
+        expect(wiki_body_anchor.text).to eq title
+      end
+    end
+
+    it "should respect selected text when creating link in body", ignore_js_errors: true do
+      title = "test_page"
+      unpublished = false
+      edit_roles = "public"
+
+      create_wiki_page(title, unpublished, edit_roles)
+
+      visit_front_page_edit(@course)
+      wait_for_tiny(edit_wiki_css)
+      insert_tiny_text('select me')
+
+      select_all_in_tiny(f('#wiki_page_body'))
+
+      click_links_toolbar_button
+      click_course_links
+
+      click_pages_accordion
+      click_course_item_link(title)
+
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('title')).to include title
+        expect(wiki_body_anchor.text).to eq "select me"
       end
     end
 
