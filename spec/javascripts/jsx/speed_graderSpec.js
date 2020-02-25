@@ -2766,24 +2766,6 @@ QUnit.module('SpeedGrader', rootHooks => {
         strictEqual(mountPoint.textContent, 'SpeedGrader Settings')
       })
 
-      QUnit.module('when post policies are not enabled', () => {
-        test('sets up the "Mute Assignment" dialog', () => {
-          SpeedGrader.setup()
-          SpeedGrader.EG.domReady()
-
-          // There's no easy way to distinguish between dialogs, so look for
-          // their individual buttons instead
-          ok(document.querySelector('.btn-mute'))
-        })
-
-        test('sets up the "Unmute Assignment" dialog', () => {
-          SpeedGrader.setup()
-          SpeedGrader.EG.domReady()
-
-          ok(document.querySelector('.btn-unmute'))
-        })
-      })
-
       QUnit.module('when post policies are enabled', postPolicyHooks => {
         postPolicyHooks.beforeEach(() => {
           ENV.post_policies_enabled = true
@@ -3851,17 +3833,6 @@ QUnit.module('SpeedGrader', rootHooks => {
               strictEqual(SpeedGraderPostGradesMenu.props.hasGradesOrPostableComments, false)
             })
           })
-
-          test('is not called if ENV.post_policies_enabled is not true', () => {
-            ENV.post_policies_enabled = false
-            sinon.spy(ReactDOM, 'render')
-
-            SpeedGrader.EG.jsonReady()
-
-            notOk(findRenderCall())
-
-            ReactDOM.render.restore()
-          })
         })
 
         QUnit.module('when SpeedGrader is loaded with no students', noStudentsHooks => {
@@ -4408,14 +4379,6 @@ QUnit.module('SpeedGrader', rootHooks => {
             })
             notOk(getPostOrHideGradesButton())
           })
-        })
-
-        test('does not attempt to render a hypothetical post/hide grades menu if post policies is not enabled', () => {
-          SpeedGrader.EG.setOrUpdateSubmission({
-            user_id: alphaStudent.id,
-            posted_at: new Date().toISOString()
-          })
-          notOk(getPostOrHideGradesButton())
         })
       })
 
@@ -7080,11 +7043,6 @@ QUnit.module('SpeedGrader', rootHooks => {
               notOk(mountPoint.innerText.includes('HIDDEN'))
             })
           })
-        })
-
-        test('is not shown if post policies are not enabled', () => {
-          SpeedGrader.EG.showGrade()
-          notOk(mountPoint.innerText.includes('HIDDEN'))
         })
       })
     })

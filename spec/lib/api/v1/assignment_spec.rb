@@ -89,14 +89,6 @@ describe "Api::V1::Assignment" do
       expect(json["post_manually"]).to be true
     end
 
-    it "does not include the assignment's post policy when feature disabled" do
-      PostPolicy.disable_feature!
-      assignment.post_policy.update!(post_manually: true)
-
-      json = api.assignment_json(assignment, user, session)
-      expect(json).not_to have_key "post_manually"
-    end
-
     it "returns nil for planner override when flag is passed and there is no override" do
       json = api.assignment_json(assignment, user, session, {include_planner_override: true})
       expect(json.key?('planner_override')).to be_present

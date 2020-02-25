@@ -510,52 +510,6 @@ describe GradeCalculator do
             end
           end
         end
-
-        context "when post policies are not enabled" do
-          before :each do
-            PostPolicy.disable_feature!
-            @assignment2.mute!
-          end
-
-          it "should ignore muted assignments by default" do
-            # should have same scores as previous spec despite having a grade
-            @assignment2.grade_student(@user, grade: "500", grader: @teacher)
-            @user.reload
-            expect(@user.enrollments.first.computed_current_score).to equal(50.0)
-            expect(@user.enrollments.first.computed_final_score).to equal(25.0)
-          end
-
-          it "should ignore muted grade for current grade calculation, even when weighted" do
-            # should have same scores as previous spec despite having a grade
-            @assignment2.grade_student(@user, grade: "500", grader: @teacher)
-            @course.group_weighting_scheme = "percent"
-            @course.save!
-            @user.reload
-            expect(@user.enrollments.first.computed_current_score).to equal(50.0)
-            expect(@user.enrollments.first.computed_final_score).to equal(25.0)
-          end
-
-          it "should be possible to compute grades with muted assignments" do
-            @assignment2.unmute!
-            @assignment.mute!
-
-            @course.update_attribute(:group_weighting_scheme, "percent")
-            calc = GradeCalculator.new([@user.id], @course.id, ignore_muted: false)
-            scores = calc.compute_scores.first
-            expect(scores[:current][:grade]).to equal 50.0
-            expect(scores[:final][:grade]).to equal 25.0
-          end
-
-          it "saves unmuted scores" do
-            @assignment.mute!
-            calc = GradeCalculator.new [@user.id],
-                                       @course.id
-            calc.compute_and_save_scores
-            score = Enrollment.where(user_id: @user.id, course_id: @course.id).first.find_score(course_score: true)
-            expect(score.unposted_current_score).to equal 50.0
-            expect(score.current_score).to be_nil
-          end
-        end
       end
     end
 

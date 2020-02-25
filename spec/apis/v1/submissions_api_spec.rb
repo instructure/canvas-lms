@@ -1718,11 +1718,6 @@ describe 'Submissions API', type: :request do
         expect(student_json.fetch("submissions").first).not_to have_key "has_postable_comments"
       end
 
-      it "is not included when Post Policies are not enabled" do
-        PostPolicy.disable_feature!
-        expect(student_json.fetch("submissions").first).not_to have_key "has_postable_comments"
-      end
-
       it "is not included when params[:grouped] is not present" do
         submission_json = student_json({student_ids: [@student1.to_param]})
         expect(submission_json).not_to have_key "has_postable_comments"

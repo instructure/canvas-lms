@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+import {
+  createGradebook,
+  setFixtureHtml
+} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook > Students', suiteHooks => {
   let $container
@@ -24,6 +27,7 @@ QUnit.module('Gradebook > Students', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
+    setFixtureHtml($container)
   })
 
   suiteHooks.afterEach(() => {

@@ -2219,34 +2219,6 @@ describe Assignment do
           end
         end
       end
-
-      context "when post policies are not enabled" do
-        before(:once) do
-          PostPolicy.disable_feature!
-        end
-
-        context "when assignment is muted" do
-          before(:each) do
-            assignment.mute!
-          end
-
-          it "inserts a record" do
-            expect(Auditors::GradeChange::Stream).to receive(:insert).once
-            assignment.grade_student(student, grade: 10, grader: teacher)
-          end
-        end
-
-        context "when assignment is unmuted" do
-          before(:each) do
-            assignment.unmute!
-          end
-
-          it "inserts a record" do
-            expect(Auditors::GradeChange::Stream).to receive(:insert).once
-            assignment.grade_student(student, grade: 10, grader: teacher)
-          end
-        end
-      end
     end
 
     describe "grade change live events" do
@@ -2276,34 +2248,6 @@ describe Assignment do
 
           it "emits two events when grading: one for grading and one for posting" do
             expect(Canvas::LiveEvents).to receive(:grade_changed).twice
-            assignment.grade_student(student, grade: 10, grader: teacher)
-          end
-        end
-      end
-
-      context "when post policies are not enabled" do
-        before(:once) do
-          PostPolicy.disable_feature!
-        end
-
-        context "when assignment is muted" do
-          before(:each) do
-            assignment.mute!
-          end
-
-          it "emits an event" do
-            expect(Canvas::LiveEvents).to receive(:grade_changed).once
-            assignment.grade_student(student, grade: 10, grader: teacher)
-          end
-        end
-
-        context "when assignment is unmuted" do
-          before(:each) do
-            assignment.unmute!
-          end
-
-          it "emits an event" do
-            expect(Canvas::LiveEvents).to receive(:grade_changed).once
             assignment.grade_student(student, grade: 10, grader: teacher)
           end
         end
@@ -8340,14 +8284,6 @@ describe Assignment do
         end
       end
 
-      it "does not update the assignment's muted status when post policies are not enabled" do
-        PostPolicy.disable_feature!
-        assignment.mute!
-
-        assignment.post_submissions
-        expect(assignment).to be_muted
-      end
-
       describe "context module progressions" do
         let(:context_module) { @course.context_modules.create! }
         let(:student1) { @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
@@ -8458,12 +8394,6 @@ describe Assignment do
           expect(@course).to receive(:recompute_student_scores).with([student1.id])
           assignment.hide_submissions(submission_ids: [student1_submission.id])
         end
-      end
-
-      it "does not update the assignment's muted status when post policies are not enabled" do
-        PostPolicy.disable_feature!
-        assignment.hide_submissions
-        expect(assignment).not_to be_muted
       end
     end
   end

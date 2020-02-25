@@ -268,11 +268,7 @@ QUnit.module('Gradebook#initialize', () => {
   QUnit.module('with dataloader stubs', moduleHooks => {
     moduleHooks.beforeEach(() => {
       stubDataLoader()
-      $fixtures.innerHTML = `
-        <div id="search-filter-container">
-          <input type="text" />
-        </div>
-      `
+      setFixtureHtml($fixtures)
     })
 
     moduleHooks.afterEach(() => {
@@ -1170,8 +1166,13 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
     gradebook.setContextModules([{id: '2601', name: 'Algebra', position: 1}])
   }
 
+  suiteHooks.beforeEach(() => {
+    setFixtureHtml($fixtures)
+  })
+
   suiteHooks.afterEach(() => {
     gradebook.destroy()
+    $fixtures.innerHTML = ''
   })
 
   QUnit.module('initialization', () => {
@@ -1642,11 +1643,7 @@ test('returns false if sorting by custom and there is a custom column order stor
 
 QUnit.module('Gradebook#renderSearchFilter', {
   setup() {
-    $fixtures.innerHTML = `
-      <div id="search-filter-container">
-        <input type="text" />
-      </div>
-    `
+    setFixtureHtml($fixtures)
     this.gradebook = createGradebook()
     this.gradebook.setStudentsLoaded(true)
     this.gradebook.setSubmissionsLoaded(true)
@@ -1775,6 +1772,8 @@ QUnit.module('Gradebook', () => {
 
   QUnit.module('#switchTotalDisplay()', hooks => {
     hooks.beforeEach(() => {
+      setFixtureHtml($fixtures)
+
       // Stub this here so the AJAX calls in Dataloader don't get stubbed too
       sandbox.stub($, 'ajaxJSON')
 
@@ -1784,6 +1783,7 @@ QUnit.module('Gradebook', () => {
     hooks.afterEach(() => {
       UserSettings.contextRemove('warned_about_totals_display')
       gradebook.destroy()
+      $fixtures.innerHTML = ''
     })
 
     function createAndStubGradebook() {
@@ -2742,7 +2742,7 @@ test('re-renders the view options menu after request rejects', function() {
 QUnit.module('Gradebook#updateSectionFilterVisibility', {
   setup() {
     const sectionsFilterContainerSelector = 'sections-filter-container'
-    $fixtures.innerHTML = `<div id="${sectionsFilterContainerSelector}"></div>`
+    setFixtureHtml($fixtures)
     this.container = $fixtures.querySelector(`#${sectionsFilterContainerSelector}`)
     const sections = [
       {id: '2001', name: 'Freshmen / First-Year'},
@@ -2910,7 +2910,7 @@ test('reloads student data after saving settings', function() {
 QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
   setup() {
     const sectionsFilterContainerSelector = 'grading-periods-filter-container'
-    $fixtures.innerHTML = `<div id="${sectionsFilterContainerSelector}"></div>`
+    setFixtureHtml($fixtures)
     this.container = $fixtures.querySelector(`#${sectionsFilterContainerSelector}`)
     this.gradebook = createGradebook({
       grading_period_set: {
@@ -2978,7 +2978,7 @@ test('removes the filter when the "view grading period filter" option is turned 
 QUnit.module('Gradebook#updateModulesFilterVisibility', {
   setup() {
     const modulesFilterContainerSelector = 'modules-filter-container'
-    $fixtures.innerHTML = `<div id="${modulesFilterContainerSelector}"></div>`
+    setFixtureHtml($fixtures)
     this.container = $fixtures.querySelector(`#${modulesFilterContainerSelector}`)
     this.gradebook = createGradebook()
     this.gradebook.setContextModules([
@@ -3013,7 +3013,7 @@ test('does not render when filter is not selected', function() {
 QUnit.module('Gradebook#updateAssignmentGroupFilterVisibility', {
   setup() {
     const agfContainer = 'assignment-group-filter-container'
-    $fixtures.innerHTML = `<div id="${agfContainer}"></div>`
+    setFixtureHtml($fixtures)
     this.container = $fixtures.querySelector(`#${agfContainer}`)
     this.gradebook = createGradebook()
     this.gradebook.setAssignmentGroups([
@@ -3052,7 +3052,7 @@ QUnit.module('Gradebook#updateStudentGroupFilterVisibility', hooks => {
 
   hooks.beforeEach(() => {
     const studentGroupFilterContainerSelector = 'student-group-filter-container'
-    $fixtures.innerHTML = `<div id="${studentGroupFilterContainerSelector}"></div>`
+    setFixtureHtml($fixtures)
     container = $fixtures.querySelector(`#${studentGroupFilterContainerSelector}`)
 
     const studentGroups = [
@@ -3167,6 +3167,7 @@ QUnit.module('Gradebook#updateStudentGroupFilterVisibility', hooks => {
 
 QUnit.module('Menus', {
   setup() {
+    setFixtureHtml($fixtures)
     this.gradebook = createGradebook({
       context_allows_gradebook_uploads: true,
       export_gradebook_csv_url: 'http://someUrl',
@@ -3175,13 +3176,6 @@ QUnit.module('Menus', {
     })
     this.gradebook.postGradesLtis = []
     this.gradebook.postGradesStore = {}
-    $fixtures.innerHTML = `
-      <div id="application"></div>
-      <span data-component="ViewOptionsMenu"></span>
-      <span data-component="ActionMenu"></span>
-      <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
-      <span data-component="StatusesModal" />
-    `
   },
 
   teardown() {
@@ -3886,15 +3880,13 @@ test('excludes assignments from other assignment groups when filtering by an ass
 
 QUnit.module('Gradebook Grid Events', function(suiteHooks) {
   suiteHooks.beforeEach(function() {
-    $fixtures.innerHTML = `
-      <div id="application">
-        <span data-component="GridColor"></span>
-        <div id="gradebook_grid"></div>
-        <div id="example-gradebook-cell">
-          <a class="student-grades-link" href="#">Student Name</a>
-        </div>
+    setFixtureHtml($fixtures)
+
+    $fixtures.innerHTML += `
+      <div id="example-gradebook-cell">
+        <a class="student-grades-link" href="#">Student Name</a>
       </div>
-    `
+-    `
 
     this.studentColumnHeader = {
       focusAtEnd: sinon.spy(),
@@ -3912,6 +3904,7 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
 
   suiteHooks.afterEach(function() {
     this.gradebook.destroy()
+    $fixtures.innerHTML = ''
   })
 
   this.triggerEvent = function(eventName, event, location) {
@@ -4492,11 +4485,13 @@ QUnit.module('Gradebook#updateTotalGradeColumn', hooks => {
 QUnit.module('Gradebook Rows', () => {
   QUnit.module('#buildRows', () => {
     test('invalidates the grid', () => {
+      setFixtureHtml($fixtures)
       const gradebook = createGradebook()
       sinon.spy(gradebook.gradebookGrid, 'invalidate')
       gradebook.buildRows()
       strictEqual(gradebook.gradebookGrid.invalidate.callCount, 1)
       gradebook.destroy()
+      $fixtures.innerHTML = ''
     })
   })
 })
@@ -5182,7 +5177,13 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
   }
 
   suiteHooks.beforeEach(() => {
+    setFixtureHtml($fixtures)
     stubDataLoader()
+  })
+
+  suiteHooks.afterEach(() => {
+    gradebook.destroy()
+    $fixtures.innerHTML = ''
   })
 
   QUnit.module('#getCourseGradingScheme', () => {
@@ -5295,6 +5296,7 @@ QUnit.module('Gradebook#updateColumnsAndRenderGradebookSettingsModal', moduleHoo
   let gradebook
 
   moduleHooks.beforeEach(() => {
+    setFixtureHtml($fixtures)
     gradebook = createGradebook()
     sinon.stub(gradebook, 'updateColumns')
     sinon.stub(gradebook, 'renderGradebookSettingsModal')
@@ -5302,6 +5304,7 @@ QUnit.module('Gradebook#updateColumnsAndRenderGradebookSettingsModal', moduleHoo
 
   moduleHooks.afterEach(() => {
     gradebook.destroy()
+    $fixtures.innerHTML = ''
   })
 
   test('calls updateColumns', () => {
@@ -5545,8 +5548,7 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
     this.server = sinon.createFakeServer({respondImmediately: true})
     this.server.respondWith([200, {}, ''])
 
-    const fixtures = document.getElementById('fixtures')
-    fixtures.innerHTML = '<div id="grading-periods-filter-container"></div>'
+    setFixtureHtml($fixtures)
 
     this.gradebook = createGradebook({
       grading_period_set: {
@@ -5570,6 +5572,7 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
 
   teardown() {
     this.server.restore()
+    $fixtures.innerHTML = ''
   }
 })
 
@@ -5643,8 +5646,7 @@ QUnit.module('Gradebook#updateCurrentModule', {
     this.server = sinon.createFakeServer({respondImmediately: true})
     this.server.respondWith([200, {}, ''])
 
-    const fixtures = document.getElementById('fixtures')
-    fixtures.innerHTML = '<div id="modules-filter-container"></div>'
+    setFixtureHtml($fixtures)
 
     this.gradebook = createGradebook({
       settings: {
@@ -5742,8 +5744,7 @@ QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
     this.server = sinon.createFakeServer({respondImmediately: true})
     this.server.respondWith([200, {}, ''])
 
-    const fixtures = document.getElementById('fixtures')
-    fixtures.innerHTML = '<div id="assignment-group-filter-container"></div>'
+    setFixtureHtml($fixtures)
 
     this.gradebook = createGradebook({
       settings: {
@@ -5922,7 +5923,7 @@ QUnit.module('Gradebook', () => {
     let options
 
     hooks.beforeEach(() => {
-      $fixtures.innerHTML = '<span data-component="ActionMenu"><button /></span>'
+      setFixtureHtml($fixtures)
       options = {
         context_allows_gradebook_uploads: true,
         currentUserId: '123',
@@ -5968,16 +5969,7 @@ QUnit.module('Gradebook', () => {
     let currentFilters
 
     hooks.beforeEach(() => {
-      $fixtures.innerHTML = `
-        <div id="assignment-group-filter-container"></div>
-        <div id="grading-periods-filter-container"></div>
-        <div id="modules-filter-container"></div>
-        <div id="sections-filter-container"></div>
-        <div id="student-group-filter-container"></div>
-        <div id="search-filter-container">
-          <input type="text" />
-        </div>
-      `
+      setFixtureHtml($fixtures)
       currentFilters = ['assignmentGroups', 'modules', 'gradingPeriods', 'sections']
       gradebook = createGradebook({
         grading_period_set: {
@@ -6407,15 +6399,7 @@ test('re-sorts the grid rows', function() {
 
 QUnit.module('Gradebook#onGridBlur', {
   setup() {
-    $fixtures.innerHTML = `
-      <div id="application">
-        <div id="wrapper">
-          <div id="StudentTray__Container"></div>
-          <span data-component="GridColor"></span>
-          <div id="gradebook_grid"></div>
-        </div>
-      </div>
-    `
+    setFixtureHtml($fixtures)
 
     this.gradebook = createGradebook()
     this.gradebook.gridData.rows = [{id: '1101'}]
@@ -6504,12 +6488,7 @@ test('does not blur the grid when clicking on another grid cell', function() {
 
 QUnit.module('GridColor', {
   setup() {
-    $fixtures.innerHTML = `
-      <div id="application">
-        <span data-component="GridColor"></span>
-        <div id="gradebook_grid"></div>
-      </div>
-    `
+    setFixtureHtml($fixtures)
   },
 
   teardown() {
@@ -6567,7 +6546,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
   suiteHooks.beforeEach(() => {
     moxios.install()
     moxios.stubRequest(url, {status: 200, response: {submission_comments: []}})
-    $fixtures.innerHTML = `<div id="${mountPointId}"></div><div id="application"></div>`
+    setFixtureHtml($fixtures)
     gradebook = createGradebook({
       default_grading_standard: defaultGradingScheme
     })
@@ -6903,13 +6882,6 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
     notOk(props.pendingGradeInfo)
   })
 
-  test('sets postPoliciesEnabled to false when post_policies_enabled is false', () => {
-    gradebook.options.post_policies_enabled = false
-    gradebook.setSubmissionTrayState(true, '1101', '2301')
-    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
-    strictEqual(props.postPoliciesEnabled, false)
-  })
-
   test('sets postPoliciesEnabled to true when post_policies_enabled is true', () => {
     gradebook.options.post_policies_enabled = true
     gradebook.setSubmissionTrayState(true, '1101', '2301')
@@ -6991,7 +6963,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     const url = '/api/v1/courses/1/assignments/2/submissions/3'
     moxios.stubRequest(url, {status: 200, response: {submission_comments: []}})
     this.mountPointId = 'StudentTray__Container'
-    $fixtures.innerHTML = `<div id="${this.mountPointId}"></div><div id="application"></div>`
+    setFixtureHtml($fixtures)
     this.gradebook = createGradebook()
     this.gradebook.setAssignments({
       2301: {
@@ -7096,7 +7068,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
 
   hooks.beforeEach(() => {
     mountPointId = 'StudentTray__Container'
-    $fixtures.innerHTML = `<div id="${mountPointId}"></div><div id="application"></div>`
+    setFixtureHtml($fixtures)
     moxios.install()
     const url = '/api/v1/courses/1/assignments/2301/submissions/1101?include=submission_comments'
     moxios.stubRequest(url, {status: 200, response: {submission_comments: []}})
@@ -8974,11 +8946,13 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
   }
 
   hooks.beforeEach(() => {
+    setFixtureHtml($fixtures)
     sinon.stub(ReactDOM, 'render')
   })
 
   hooks.afterEach(() => {
     ReactDOM.render.restore()
+    $fixtures.innerHTML = ''
   })
 
   test('renders the GradebookSettingsModal component', () => {
@@ -9021,7 +8995,7 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
   test('passes the postPolicies object as the prop of the same name', () => {
     gradebook = createGradebook()
     gradebook.renderGradebookSettingsModal()
-    propEqual(gradebookSettingsModalProps().postPolicies, gradebook.postPolicies)
+    strictEqual(gradebookSettingsModalProps().postPolicies, gradebook.postPolicies)
   })
 
   QUnit.module('.onCourseSettingsUpdated prop', propHooks => {
@@ -9145,13 +9119,7 @@ QUnit.module('Gradebook#showAnonymousSpeedGraderAlertForURL', hooks => {
   }
 
   hooks.beforeEach(() => {
-    $fixtures.innerHTML = `
-      <div id="application">
-        <div id="wrapper">
-          <div data-component='AnonymousSpeedGraderAlert'></div>
-        </div>
-      </div>
-    `
+    setFixtureHtml($fixtures)
   })
 
   hooks.afterEach(() => {
@@ -9174,13 +9142,7 @@ QUnit.module('Gradebook#hideAnonymousSpeedGraderAlert', hooks => {
   let gradebook
 
   hooks.beforeEach(() => {
-    $fixtures.innerHTML = `
-      <div id="application">
-        <div id="wrapper">
-          <div data-component='AnonymousSpeedGraderAlert'></div>
-        </div>
-      </div>
-    `
+    setFixtureHtml($fixtures)
 
     sinon.stub(ReactDOM, 'unmountComponentAtNode')
   })
@@ -9219,15 +9181,7 @@ QUnit.module('Gradebook', () => {
         '{}'
       ])
 
-      $fixtures.innerHTML = `
-        <div id="application">
-          <div id="wrapper">
-            <div id="StudentTray__Container"></div>
-            <span data-component="GridColor"></span>
-            <div id="gradebook_grid"></div>
-          </div>
-        </div>
-      `
+      setFixtureHtml($fixtures)
     })
 
     hooks.afterEach(() => {
@@ -9563,26 +9517,6 @@ QUnit.module('Gradebook', () => {
         sinon.spy(gradebook.postPolicies, 'initialize')
         gradebook.initialize()
         strictEqual(gradebook.postPolicies.initialize.callCount, 1)
-      })
-    })
-
-    QUnit.module('when Post Policies is not enabled', contextHooks => {
-      contextHooks.beforeEach(() => {
-        options.post_policies_enabled = false
-        gradebook = createGradebook(options)
-      })
-
-      test('does not attach the Post Policies feature module to Gradebook', () => {
-        strictEqual(gradebook.postPolicies, null)
-      })
-
-      test('ignores Post Policies when Gradebook initializes', () => {
-        try {
-          gradebook.initialize()
-          ok(true, 'Gradebook does not attempt to initialize absent Post Policies')
-        } catch (error) {
-          notOk(error)
-        }
       })
     })
   })

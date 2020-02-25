@@ -36,7 +36,13 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
     document.body.appendChild($fixture)
     setFixtureHtml($fixture)
 
-    const defaultGradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]]
+    const defaultGradingScheme = [
+      ['A', 0.9],
+      ['B', 0.8],
+      ['C', 0.7],
+      ['D', 0.6],
+      ['F', 0.0]
+    ]
     gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
     sinon.stub(gradebook, 'saveSettings')
 
@@ -299,15 +305,10 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
       ok(renderCell().classList.contains('ungraded'))
     })
 
-    test('includes the "muted" class when the assignment is muted', () => {
-      gradebook.getAssignment('2301').muted = true
-      ok(renderCell().classList.contains('muted'))
-    })
-
     test('does not include the "muted" class when post policies are enabled', () => {
       gradebook.options.post_policies_enabled = true
       gradebook.getAssignment('2301').muted = true
-      ok(renderCell().classList.contains('muted'))
+      notOk(renderCell().classList.contains('muted'))
     })
 
     test('escapes html in the grade', () => {

@@ -35,7 +35,13 @@ export function createGradebook(options = {}) {
     },
 
     currentUserId: '1',
-    default_grading_standard: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]],
+    default_grading_standard: [
+      ['A', 0.9],
+      ['B', 0.8],
+      ['C', 0.7],
+      ['D', 0.6],
+      ['F', 0.0]
+    ],
     editable: true,
     export_gradebook_csv_url: 'http://example.com/export',
     final_grade_override_enabled: false,
@@ -46,7 +52,13 @@ export function createGradebook(options = {}) {
     grading_schemes: [
       {
         id: '2801',
-        data: [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]],
+        data: [
+          ['😂', 0.9],
+          ['🙂', 0.8],
+          ['😐', 0.7],
+          ['😢', 0.6],
+          ['💩', 0]
+        ],
         title: 'Emoji Grades'
       }
     ],
@@ -55,7 +67,7 @@ export function createGradebook(options = {}) {
     new_gradebook_development_enabled: true,
     outcome_gradebook_enabled: false,
     post_grades_ltis: [],
-    post_policies_enabled: false,
+    post_policies_enabled: true,
     publish_to_sis_enabled: false,
     sections: [],
     settings: {
@@ -89,8 +101,9 @@ export function setFixtureHtml($fixture) {
     <div id="application">
       <div id="wrapper">
         <div data-component="GridColor"></div>
-        <div data-component="ViewOptionsMenu"></div>
-        <div data-component="ActionMenu"></div>
+        <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
+        <span data-component="ViewOptionsMenu"></span>
+        <span data-component="ActionMenu"></span>
         <div id="assignment-group-filter-container"></div>
         <div id="grading-periods-filter-container"></div>
         <div id="modules-filter-container"></div>

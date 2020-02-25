@@ -51,7 +51,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
     document.body.appendChild($container)
 
     gradebookOptions = {
-      post_policies_enabled: false
+      post_policies_enabled: true
     }
   })
 
@@ -433,13 +433,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
           const [{onExited}] = gradebook.postPolicies.showPostAssignmentGradesTray.lastCall.args
           strictEqual(onExited, onSelectCallback)
         })
-      })
-
-      test('sets featureEnabled to false when Post Policies is not enabled', () => {
-        gradebookOptions.post_policies_enabled = false
-        buildGradebook()
-        render()
-        strictEqual(component.props.postGradesAction.featureEnabled, false)
       })
     })
 

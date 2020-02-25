@@ -47,7 +47,6 @@ QUnit.module('GradebookGrid', suiteHooks => {
 
   suiteHooks.afterEach(() => {
     gradebookGrid.destroy()
-    gradebook.destroy()
     $container.remove()
   })
 

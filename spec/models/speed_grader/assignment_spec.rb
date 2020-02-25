@@ -293,12 +293,6 @@ describe SpeedGrader::Assignment do
         expect(json[:submissions].first).not_to have_key "has_postable_comments"
       end
 
-      it "is not included when Post Policies are not enabled" do
-        PostPolicy.disable_feature!
-        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-        expect(json[:submissions].first).not_to have_key "has_postable_comments"
-      end
-
       it "is true when unposted, hidden comments exist, and postable comments feature is enabled" do
         student1_sub = @assignment.submissions.find_by!(user: @student_1)
         student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)

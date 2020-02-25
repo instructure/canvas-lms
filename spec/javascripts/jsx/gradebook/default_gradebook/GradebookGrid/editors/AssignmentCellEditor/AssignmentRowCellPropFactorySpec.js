@@ -17,9 +17,13 @@
  */
 
 import AssignmentRowCellPropFactory from 'jsx/gradebook/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
-import {createGradebook} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
+import {
+  createGradebook,
+  setFixtureHtml
+} from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
+  let $container
   let gradebook
 
   QUnit.module('#getProps()', hooks => {
@@ -31,6 +35,9 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
     }
 
     hooks.beforeEach(() => {
+      $container = document.body.appendChild(document.createElement('div'))
+      setFixtureHtml($container)
+
       gradebook = createGradebook({context_id: '1201'})
       gradebook.gradebookGrid.gridSupport = {
         helper: {
@@ -66,6 +73,7 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
 
     hooks.afterEach(() => {
       gradebook.destroy()
+      $container.remove()
     })
 
     test('.assignment.id is the id on the assignment', () => {

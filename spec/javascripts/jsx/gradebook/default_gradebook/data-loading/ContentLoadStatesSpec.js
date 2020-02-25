@@ -18,19 +18,25 @@
 
 import {
   createGradebook,
+  setFixtureHtml,
   stubDataLoader
 } from 'jsx/gradebook/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
+  let $container
   let gradebook
 
   suiteHooks.beforeEach(() => {
+    $container = document.body.appendChild(document.createElement('div'))
+    setFixtureHtml($container)
+
     gradebook = createGradebook()
     stubDataLoader()
   })
 
   suiteHooks.afterEach(() => {
     gradebook.destroy()
+    $container.remove()
   })
 
   QUnit.module('when Gradebook is initialized', hooks => {
