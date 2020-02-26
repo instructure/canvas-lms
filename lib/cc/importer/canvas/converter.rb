@@ -74,6 +74,9 @@ module CC::Importer::Canvas
 
       # for master course sync
       @course[:deletions] = @settings[:deletions] if @settings[:deletions].present?
+      Rails.cache.delete("#{settings["content_migration"].context_id}_vendor")
+      vendor =  @manifest.at_xpath('//vendor/name')
+      Rails.cache.write("#{settings["content_migration"].context_id}_vendor", vendor.try(:children).try(:first).try(:text)) if vendor
 
       #close up shop
       save_to_file

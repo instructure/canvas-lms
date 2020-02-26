@@ -159,4 +159,16 @@ namespace :strongmind do
     end
   end
 
+  desc "Enable third party cartridge imports"
+  task :third_party_imports, [:value] => :environment do |task, args|
+    value = args[:value] == "false" ? false : true
+    SettingsService.update_settings(
+      id: '1',
+      setting: "third_party_imports",
+      value: value,
+      object: "school"
+    )
+
+    puts "3rd party setting is #{value}"
+  end
 end
