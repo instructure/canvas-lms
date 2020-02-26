@@ -17,6 +17,7 @@
 
 require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
+require_relative '../pages/moderate_page'
 require_relative "../pages/speedgrader_page"
 
 describe "SpeedGrader" do
@@ -24,6 +25,8 @@ describe "SpeedGrader" do
   include SpeedGraderCommon
 
   before(:once) do
+    PostPolicy.enable_feature!
+
     # a course with 1 teacher
     @teacher1 = course_with_teacher(name: 'Teacher1', active_all: true).user
     @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
@@ -105,19 +108,35 @@ describe "SpeedGrader" do
     end
 
     it 'prevents unmuting the assignment before grades are posted', priority: '2', test_id: 3493531 do
-      user_session(@teacher2)
+      @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true).first
+      @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
+
+      user_session(@teacher1)
+      ModeratePage.visit(@course.id, @moderated_assignment.id)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+
       Speedgrader.visit(@course.id, @moderated_assignment.id)
 
-      expect(Speedgrader.mute_button.attribute('data-muted')).to eq 'true'
-      expect(Speedgrader.mute_button.attribute('class')).to include 'disabled'
+      Speedgrader.click_post_or_hide_grades_button
+      expect(Speedgrader.no_grades_to_post_button).to be_displayed
     end
 
     it 'allows unmuting the assignment after grades are posted', priority: '2', test_id: 3493531 do
-      user_session(@teacher2)
-      @moderated_assignment.update!(grades_published_at: Time.zone.now)
+      @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true).first
+      @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
+
+      user_session(@teacher1)
+      ModeratePage.visit(@course.id, @moderated_assignment.id)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+
+      ModeratePage.click_release_grades_button
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+
       Speedgrader.visit(@course.id, @moderated_assignment.id)
 
-      expect(Speedgrader.mute_button.attribute('class')).not_to include 'disabled'
+      Speedgrader.click_post_or_hide_grades_button
+      expect(Speedgrader.post_grades_link).to be_displayed
     end
 
     it 'allows adding provisional grades', priority: '2', test_id: 3505172 do

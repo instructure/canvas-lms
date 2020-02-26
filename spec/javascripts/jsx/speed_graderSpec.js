@@ -2690,10 +2690,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           show_help_menu_item: false
         })
 
-        setupFixtures(`
-        <span id="mute_dialog"></span>
-        <span id="unmute_dialog"></span>
-      `)
+        setupFixtures()
       })
 
       hooks.afterEach(function() {
@@ -2764,26 +2761,6 @@ QUnit.module('SpeedGrader', rootHooks => {
         SpeedGrader.setup()
         const mountPoint = document.getElementById('speed_grader_settings_mount_point')
         strictEqual(mountPoint.textContent, 'SpeedGrader Settings')
-      })
-
-      QUnit.module('when post policies are enabled', postPolicyHooks => {
-        postPolicyHooks.beforeEach(() => {
-          ENV.post_policies_enabled = true
-        })
-
-        test('does not set up the "Mute Assignment" dialog', () => {
-          SpeedGrader.setup()
-          SpeedGrader.EG.domReady()
-
-          notOk(document.querySelectorAll('.btn-mute').length)
-        })
-
-        test('does not set up the "Unmute Assignment" dialog', () => {
-          SpeedGrader.setup()
-          SpeedGrader.EG.domReady()
-
-          notOk(document.querySelectorAll('.btn-unmute').length)
-        })
       })
     })
 

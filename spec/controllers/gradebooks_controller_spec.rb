@@ -2218,24 +2218,6 @@ describe GradebooksController do
       end
     end
 
-    it 'sets disable_unmute_assignment to false if the assignment is not muted' do
-      @assignment.update!(muted: false)
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:disable_unmute_assignment]).to eq false
-    end
-
-    it 'sets disable_unmute_assignment to false if assignment grades have been published' do
-      @assignment.update!(grades_published_at: Time.zone.now)
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:disable_unmute_assignment]).to eq false
-    end
-
-    it 'sets disable_unmute_assignment to true if assignment muted and grades not published' do
-      @assignment.update!(muted: true, grades_published_at: nil, moderated_grading: true, grader_count: 1)
-      get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
-      expect(assigns[:disable_unmute_assignment]).to eq true
-    end
-
     describe 'current_anonymous_id' do
       before(:each) do
         user_session(@teacher)

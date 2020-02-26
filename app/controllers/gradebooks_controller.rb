@@ -689,7 +689,6 @@ class GradebooksController < ApplicationController
     end
 
     @can_comment_on_submission = !@context.completed? && !@context_enrollment.try(:completed?)
-    @disable_unmute_assignment = @assignment.muted && !@assignment.grades_published?
 
     respond_to do |format|
 
@@ -782,8 +781,7 @@ class GradebooksController < ApplicationController
         js_env(env)
 
         render :speed_grader, locals: {
-          anonymize_students: @assignment.anonymize_students?,
-          post_policies_enabled: env[:post_policies_enabled]
+          anonymize_students: @assignment.anonymize_students?
         }
       end
 

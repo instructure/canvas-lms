@@ -45,18 +45,8 @@
           <i class="icon-gradebook" aria-hidden="true"></i>
           <span class="screenreader-only" aria-hidden="true"><%= t("Gradebook") %></span>
         </a>
-        <% if post_policies_enabled %>
-          <span id="speed_grader_post_grades_menu_mount_point"></span>
-        <% else %>
-          <button type="button" data-muted="<%= @assignment.muted? %>" id="mute_link"
-            class="Button Button--icon-action gradebookActions__Button<%= @disable_unmute_assignment ? " disabled" : "" %>" title="<%= t('Mute/Unmute Assignment') %>">
-            <i class=<%= @assignment.muted? ? "icon-muted" : "icon-unmuted"  %> aria-hidden="true"></i>
-            <span class="screenreader-only" aria-hidden="true">
-              <%= @assignment.muted? ? t("Unmute Assignment") : t("Mute Assignment") %>
-            </span>
-          </button>
-        <% end %>
 
+        <span id="speed_grader_post_grades_menu_mount_point"></span>
         <span id="speed_grader_settings_mount_point"></span>
       </div>
       <div class="assignmentDetails">
@@ -224,7 +214,7 @@
             <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
             <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
               <div id="grade_container">
-                <%= render partial: "grading_box_extended", locals: {assignment: @assignment, post_policies_enabled: post_policies_enabled} %>
+                <%= render partial: "grading_box_extended", locals: {assignment: @assignment} %>
                 <span class="turnitin_score_container"></span>
                 <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
                 <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
@@ -420,10 +410,7 @@
     <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.save_settings', "Save Settings") %></button>
   </div>
 </form>
-<% unless post_policies_enabled %>
-  <%= render :partial => "shared/mute_dialog" %>
-  <%= render :partial => "shared/unmute_dialog" %>
-<% end %>
+
 <ul id="section-menu" class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-selectmenu-open" style="display:none;" role="listbox" aria-activedescendant="section-menu-link">
   <li role="presentation" class="ui-selectmenu-item">
     <a href="#" tabindex="-1" role="option" aria-selected="true" id="section-menu-link">

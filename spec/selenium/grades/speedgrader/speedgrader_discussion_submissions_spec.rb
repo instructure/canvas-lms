@@ -22,6 +22,8 @@ describe "speed grader - discussion submissions" do
   include_context "in-process server selenium tests"
 
   before(:each) do
+    PostPolicy.enable_feature!
+
     course_with_teacher_logged_in
     outcome_with_rubric
     @assignment = @course.assignments.create(

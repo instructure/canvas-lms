@@ -26,6 +26,10 @@ describe "speed grader - grade display" do
   include_context "late_policy_course_setup"
   include GradebookCommon
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   context "grade display" do
     POINTS = 10.0
     GRADE = 3.0
