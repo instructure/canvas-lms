@@ -84,7 +84,7 @@ export default function useFetchApi({
   // useImmediate for deep comparisons and may help avoid browser flickering
   useImmediate(
     () => {
-      if (forceResult !== undefined) {
+      if (typeof forceResult !== 'undefined') {
         success(forceResult)
         return
       }

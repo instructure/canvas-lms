@@ -82,22 +82,4 @@ describe SIS::Models::Enrollment do
       expect(subject).to be_valid_status
     end
   end
-
-  it 'outputs properties in the correct order in an array' do
-    subject.course_id = 'course_id'
-    subject.section_id = 'section_id'
-    subject.user_id = 'user_id'
-    subject.role = 'role'
-    subject.role_id = 'role_id'
-    subject.status = 'status'
-    subject.start_date = 'start_date'
-    subject.end_date = 'end_date'
-    subject.associated_user_id = 'associated_user_id'
-    subject.root_account_id = 'root_account_id'
-    subject.limit_section_privileges = 'limit_section_privileges'
-    expect(subject.to_a).to eq ['course_id', 'section_id', 'user_id', 'role',
-                                'role_id', 'status', 'start_date', 'end_date',
-                                'associated_user_id', 'root_account_id']
-  end
-
 end

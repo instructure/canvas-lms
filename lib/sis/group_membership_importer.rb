@@ -20,11 +20,10 @@ module SIS
   class GroupMembershipImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
-      @logger.debug("Group Users took #{Time.zone.now - start} seconds")
+
       importer.success_count
     end
 
@@ -44,7 +43,6 @@ module SIS
       def add_group_membership(user_id, group_id, status)
         user_id = user_id.to_s
         group_id = group_id.to_s
-        @logger.debug("Processing Group User #{[user_id, group_id, status].inspect}")
         raise ImportError, "No group_id given for a group user" if group_id.blank?
         raise ImportError, "No user_id given for a group user" if user_id.blank?
         raise ImportError, "Improper status \"#{status}\" for a group user" unless status =~ /\A(accepted|deleted)/i

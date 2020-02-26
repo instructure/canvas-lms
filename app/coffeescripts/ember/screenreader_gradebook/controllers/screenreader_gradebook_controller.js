@@ -31,10 +31,10 @@ import tz from 'timezone'
 import AssignmentDetailsDialog from '../../../AssignmentDetailsDialog'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
 import {updateWithSubmissions, scopeToUser} from 'jsx/gradebook/EffectiveDueDates'
-import outcomeGrid from '../../../gradebook/OutcomeGradebookGrid'
+import outcomeGrid from '../../../gradezilla/OutcomeGradebookGrid'
 import ic_submission_download_dialog from '../../shared/components/ic_submission_download_dialog_component'
 import CalculationMethodContent from '../../../models/grade_summary/CalculationMethodContent'
-import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
+import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap'
 import GradeOverrideEntry from '../../../../jsx/grading/GradeEntry/GradeOverrideEntry'
 import GradingPeriodsApi from '../../../api/gradingPeriodsApi'
 import GradingPeriodSetsApi from '../../../api/gradingPeriodSetsApi'
@@ -49,8 +49,6 @@ const {get, set, setProperties} = Ember
 // http://emberjs.com/api/classes/Ember.Controller.html
 // http://emberjs.com/api/classes/Ember.ArrayController.html
 // http://emberjs.com/api/classes/Ember.ObjectController.html
-
-const gradingPeriodIsClosed = gradingPeriod => new Date(gradingPeriod.close_date) < new Date()
 
 function studentsUniqByEnrollments(...args) {
   let hiddenNameCounter = 1
@@ -113,8 +111,8 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
     if (
       currentProgress &&
-      (currentProgress.progress.workflow_state !== 'completed' &&
-        currentProgress.progress.workflow_state !== 'failed')
+      currentProgress.progress.workflow_state !== 'completed' &&
+      currentProgress.progress.workflow_state !== 'failed'
     ) {
       const attachmentProgress = {
         progress_id: currentProgress.progress.id,
@@ -330,9 +328,10 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       $('#gradebook-export').prop('disabled', true)
       $('#last-exported-gradebook').hide()
 
-      return $.ajaxJSON(ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url, 'GET').then(
-        attachment_progress => this.pollGradebookCsvProgress(attachment_progress)
-      )
+      return $.ajaxJSON(
+        ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url,
+        'GET'
+      ).then(attachment_progress => this.pollGradebookCsvProgress(attachment_progress))
     },
 
     gradeUpdated(submissions) {

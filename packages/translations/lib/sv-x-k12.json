@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Länkar"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Listan komprimerades."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Listan komprimerades"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Listan utökades."
+    },
     "load_more_35d33c7": {
         "message": "Läs in mer"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "popupfönster med möjligheter"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } valda. Listan komprimerades."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Valfritt: Lägg till kurs"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Använd piltangenterna för att navigera bland alternativen."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Används av skärmläsare för att beskriva en bilds innehåll"

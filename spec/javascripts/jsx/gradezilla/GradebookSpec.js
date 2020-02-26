@@ -62,7 +62,10 @@ test('normalizes the grading period set from the env', () => {
   const options = {
     grading_period_set: {
       id: '1501',
-      grading_periods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+      grading_periods: [
+        {id: '701', weight: 50},
+        {id: '702', weight: 50}
+      ],
       weighted: true
     }
   }
@@ -78,7 +81,10 @@ test('sets grading period set to null when not defined in the env', () => {
 })
 
 test('when sections are loaded and there is no secondary info configured, set it to "section"', () => {
-  const sections = [{id: 1, name: 'Section 1'}, {id: 2, name: 'Section 2'}]
+  const sections = [
+    {id: 1, name: 'Section 1'},
+    {id: 2, name: 'Section 2'}
+  ]
   const gradebook = createGradebook({sections})
 
   strictEqual(gradebook.getSelectedSecondaryInfo(), 'section')
@@ -99,7 +105,10 @@ test('when zero sections are loaded and there is no secondary info configured, s
 })
 
 test('when sections are loaded and there is secondary info configured, do not change it', () => {
-  const sections = [{id: 1, name: 'Section 1'}, {id: 2, name: 'Section 2'}]
+  const sections = [
+    {id: 1, name: 'Section 1'},
+    {id: 2, name: 'Section 2'}
+  ]
   const settings = {
     student_column_secondary_info: 'login_id'
   }
@@ -171,14 +180,20 @@ QUnit.module('Gradebook#gotCustomColumnDataChunk', {
 })
 
 test('updates students with custom column data', function() {
-  const data = [{user_id: '1101', content: 'example'}, {user_id: '1102', content: 'sample'}]
+  const data = [
+    {user_id: '1101', content: 'example'},
+    {user_id: '1102', content: 'sample'}
+  ]
   this.gradebook.gotCustomColumnDataChunk('2401', data)
   equal(this.gradebook.students[1101].custom_col_2401, 'example')
   equal(this.gradebook.students[1102].custom_col_2401, 'sample')
 })
 
 test('invalidates rows for related students', function() {
-  const data = [{user_id: '1101', content: 'example'}, {user_id: '1102', content: 'sample'}]
+  const data = [
+    {user_id: '1101', content: 'example'},
+    {user_id: '1102', content: 'sample'}
+  ]
   this.gradebook.gotCustomColumnDataChunk('2401', data)
   strictEqual(this.gradebook.invalidateRowsForStudentIds.callCount, 1)
   const [studentIds] = this.gradebook.invalidateRowsForStudentIds.lastCall.args
@@ -193,7 +208,10 @@ test('ignores students without custom column data', function() {
 })
 
 test('invalidates rows after updating students', function() {
-  const data = [{user_id: '1101', content: 'example'}, {user_id: '1102', content: 'sample'}]
+  const data = [
+    {user_id: '1101', content: 'example'},
+    {user_id: '1102', content: 'sample'}
+  ]
   this.gradebook.invalidateRowsForStudentIds.callsFake(() => {
     equal(this.gradebook.students[1101].custom_col_2401, 'example')
     equal(this.gradebook.students[1102].custom_col_2401, 'sample')
@@ -293,10 +311,16 @@ QUnit.module('Gradebook#calculateStudentGrade', {
     const assignments = [{id: '201', points_possible: 10, omit_from_final_grade: false}]
     Object.assign(gradebook, {
       assignmentGroups: [{id: '301', group_weight: 60, rules: {}, assignments}],
-      gradingPeriods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+      gradingPeriods: [
+        {id: '701', weight: 50},
+        {id: '702', weight: 50}
+      ],
       gradingPeriodSet: {
         id: '1501',
-        gradingPeriods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+        gradingPeriods: [
+          {id: '701', weight: 50},
+          {id: '702', weight: 50}
+        ],
         weighted: true
       },
       effectiveDueDates: {
@@ -2724,7 +2748,10 @@ QUnit.module('Gradebook#updateSectionFilterVisibility', {
     const sectionsFilterContainerSelector = 'sections-filter-container'
     $fixtures.innerHTML = `<div id="${sectionsFilterContainerSelector}"></div>`
     this.container = $fixtures.querySelector(`#${sectionsFilterContainerSelector}`)
-    const sections = [{id: '2001', name: 'Freshmen / First-Year'}, {id: '2002', name: 'Sophomores'}]
+    const sections = [
+      {id: '2001', name: 'Freshmen / First-Year'},
+      {id: '2002', name: 'Sophomores'}
+    ]
     this.gradebook = createGradebook({sections})
     this.gradebook.sections_enabled = true
     this.gradebook.setSelectedViewOptionsFilters(['sections'])
@@ -3034,12 +3061,18 @@ QUnit.module('Gradebook#updateStudentGroupFilterVisibility', hooks => {
 
     const studentGroups = [
       {
-        groups: [{id: '1', name: 'First Group Set 1'}, {id: '2', name: 'First Group Set 2'}],
+        groups: [
+          {id: '1', name: 'First Group Set 1'},
+          {id: '2', name: 'First Group Set 2'}
+        ],
         id: '1',
         name: 'First Group Set'
       },
       {
-        groups: [{id: '3', name: 'Second Group Set 1'}, {id: '4', name: 'Second Group Set 2'}],
+        groups: [
+          {id: '3', name: 'Second Group Set 1'},
+          {id: '4', name: 'Second Group Set 2'}
+        ],
         id: '2',
         name: 'Second Group Set'
       }
@@ -3294,7 +3327,10 @@ test('includes the row index when invalidating the grid row', function() {
 test('does not update rows when the given student is not already included', function() {
   this.gradebook.updateStudentRow({id: '1104', name: 'Dana Smith'})
   equal(typeof this.gradebook.gridData.rows[-1], 'undefined')
-  deepEqual(this.gradebook.gridData.rows.map(row => row.id), ['1101', '1102', '1103'])
+  deepEqual(
+    this.gradebook.gridData.rows.map(row => row.id),
+    ['1101', '1102', '1103']
+  )
 })
 
 test('does not invalidate rows when the given student is not already included', function() {
@@ -3309,7 +3345,10 @@ QUnit.module('sortByStudentColumn', {
 })
 
 test('sorts the gradebook rows', function() {
-  this.gradebook.gridData.rows = [{id: '3', sortable_name: 'Z'}, {id: '4', sortable_name: 'A'}]
+  this.gradebook.gridData.rows = [
+    {id: '3', sortable_name: 'Z'},
+    {id: '4', sortable_name: 'A'}
+  ]
   this.gradebook.sortByStudentColumn('sortable_name', 'ascending')
   const [firstRow, secondRow] = this.gradebook.gridData.rows
 
@@ -3318,7 +3357,10 @@ test('sorts the gradebook rows', function() {
 })
 
 test('sorts the gradebook rows descending', function() {
-  this.gradebook.gridData.rows = [{id: '3', sortable_name: 'A'}, {id: '4', sortable_name: 'Z'}]
+  this.gradebook.gridData.rows = [
+    {id: '3', sortable_name: 'A'},
+    {id: '4', sortable_name: 'Z'}
+  ]
   this.gradebook.sortByStudentColumn('sortable_name', 'descending')
   const [firstRow, secondRow] = this.gradebook.gridData.rows
 
@@ -3357,7 +3399,10 @@ QUnit.module('sortByCustomColumn', {
 })
 
 test('sorts the gradebook rows', function() {
-  this.gradebook.gridData.rows = [{id: '3', custom_col_501: 'Z'}, {id: '4', custom_col_501: 'A'}]
+  this.gradebook.gridData.rows = [
+    {id: '3', custom_col_501: 'Z'},
+    {id: '4', custom_col_501: 'A'}
+  ]
   this.gradebook.sortByCustomColumn('custom_col_501', 'ascending')
   const [firstRow, secondRow] = this.gradebook.gridData.rows
 
@@ -3366,7 +3411,10 @@ test('sorts the gradebook rows', function() {
 })
 
 test('sorts the gradebook rows descending', function() {
-  this.gradebook.gridData.rows = [{id: '4', custom_col_501: 'A'}, {id: '3', custom_col_501: 'Z'}]
+  this.gradebook.gridData.rows = [
+    {id: '4', custom_col_501: 'A'},
+    {id: '3', custom_col_501: 'Z'}
+  ]
   this.gradebook.sortByCustomColumn('custom_col_501', 'descending')
   const [firstRow, secondRow] = this.gradebook.gridData.rows
 
@@ -3755,31 +3803,46 @@ QUnit.module('Gradebook#filterAssignments', {
 
 test('excludes "not_graded" assignments', function() {
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  strictEqual(assignments.findIndex(assignment => assignment.id === '2303'), -1)
+  strictEqual(
+    assignments.findIndex(assignment => assignment.id === '2303'),
+    -1
+  )
 })
 
 test('excludes "unpublished" assignments when "showUnpublishedAssignments" is false', function() {
   this.gradebook.gridDisplaySettings.showUnpublishedAssignments = false
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  strictEqual(assignments.findIndex(assignment => assignment.id === '2302'), -1)
+  strictEqual(
+    assignments.findIndex(assignment => assignment.id === '2302'),
+    -1
+  )
 })
 
 test('includes "unpublished" assignments when "showUnpublishedAssignments" is true', function() {
   this.gradebook.gridDisplaySettings.showUnpublishedAssignments = true
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  notEqual(assignments.findIndex(assignment => assignment.id === '2302'), -1)
+  notEqual(
+    assignments.findIndex(assignment => assignment.id === '2302'),
+    -1
+  )
 })
 
 test('excludes "attendance" assignments when "show_attendance" is false', function() {
   this.gradebook.show_attendance = false
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  strictEqual(assignments.findIndex(assignment => assignment.id === '2304'), -1)
+  strictEqual(
+    assignments.findIndex(assignment => assignment.id === '2304'),
+    -1
+  )
 })
 
 test('includes "attendance" assignments when "show_attendance" is true', function() {
   this.gradebook.show_attendance = true
   const assignments = this.gradebook.filterAssignments(this.assignments)
-  notEqual(assignments.findIndex(assignment => assignment.id === '2304'), -1)
+  notEqual(
+    assignments.findIndex(assignment => assignment.id === '2304'),
+    -1
+  )
 })
 
 test('includes assignments from all grading periods when not filtering by grading period', function() {
@@ -4105,7 +4168,10 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
 
 QUnit.module('Gradebook#onGridKeyDown', {
   setup() {
-    const columns = [{id: 'student', type: 'student'}, {id: 'assignment_2301', type: 'assignment'}]
+    const columns = [
+      {id: 'student', type: 'student'},
+      {id: 'assignment_2301', type: 'assignment'}
+    ]
     this.gradebook = createGradebook()
     this.grid = {
       getColumns() {
@@ -5072,10 +5138,22 @@ QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
 })
 
 QUnit.module('Gradebook Grading Schemes', suiteHooks => {
-  const defaultGradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['E', 0.5]]
+  const defaultGradingScheme = [
+    ['A', 0.9],
+    ['B', 0.8],
+    ['C', 0.7],
+    ['D', 0.6],
+    ['E', 0.5]
+  ]
   const gradingScheme = {
     id: '2801',
-    data: [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]],
+    data: [
+      ['😂', 0.9],
+      ['🙂', 0.8],
+      ['😐', 0.7],
+      ['😢', 0.6],
+      ['💩', 0]
+    ],
     title: 'Emoji Grades'
   }
 
@@ -5913,7 +5991,10 @@ QUnit.module('Gradebook', () => {
             {id: '1402', title: 'Grading Period #2'}
           ]
         },
-        sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
+        sections: [
+          {id: '2001', name: 'Freshmen'},
+          {id: '2002', name: 'Sophomores'}
+        ],
         sections_enabled: true,
         settings: {
           filter_columns_by: {
@@ -6478,7 +6559,13 @@ test('is rendered on renderGridColor', () => {
 QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
   const url = '/api/v1/courses/1/assignments/2/submissions/3'
   const mountPointId = 'StudentTray__Container'
-  const defaultGradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['E', 0.5]]
+  const defaultGradingScheme = [
+    ['A', 0.9],
+    ['B', 0.8],
+    ['C', 0.7],
+    ['D', 0.6],
+    ['E', 0.5]
+  ]
   let gradebook
 
   suiteHooks.beforeEach(() => {
@@ -6838,12 +6925,18 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
     requireStudentGroupHooks.beforeEach(() => {
       const studentGroups = [
         {
-          groups: [{id: '1', name: 'First Group Set 1'}, {id: '2', name: 'First Group Set 2'}],
+          groups: [
+            {id: '1', name: 'First Group Set 1'},
+            {id: '2', name: 'First Group Set 2'}
+          ],
           id: '1',
           name: 'First Group Set'
         },
         {
-          groups: [{id: '3', name: 'Second Group Set 1'}, {id: '4', name: 'Second Group Set 2'}],
+          groups: [
+            {id: '3', name: 'Second Group Set 1'},
+            {id: '4', name: 'Second Group Set 2'}
+          ],
           id: '2',
           name: 'Second Group Set'
         }
@@ -7681,7 +7774,10 @@ QUnit.module('Gradebook#applyLatePolicy', {
     this.gradingStandard = [['A', 0]]
     this.gradebook = createGradebook({grading_standard: this.gradingStandard})
     this.gradebook.gradingPeriodSet = {
-      gradingPeriods: [{id: 100, isClosed: true}, {id: 101, isClosed: false}]
+      gradingPeriods: [
+        {id: 100, isClosed: true},
+        {id: 101, isClosed: false}
+      ]
     }
     this.latePolicyApplicator = sandbox
       .stub(LatePolicyApplicator, 'processSubmission')
@@ -8012,7 +8108,13 @@ QUnit.module('Gradebook', () => {
     let renderSubmissionTrayStub
 
     hooks.beforeEach(() => {
-      const defaultGradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['E', 0.5]]
+      const defaultGradingScheme = [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['E', 0.5]
+      ]
       gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
       gradebook.setAssignments({
         2301: {

@@ -106,6 +106,9 @@
     "message": "{ items } eleman { items, plural,\n     =1 {eleman}\n  other {konplete}\n}"
   },
   "late_2be42b88": { "message": "An reta" },
+  "list_collapsed_9ac35920": { "message": "Lis ratresi." },
+  "list_collapsed_dde87718": { "message": "Lis ratresi" },
+  "list_expanded_efec2d0": { "message": "Lis elaji." },
   "load_more_a36f9cf9": { "message": "Chaje plis" },
   "load_prior_dates_f2b0f6f0": { "message": "Chaje dat avan" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -154,6 +157,9 @@
     "message": "*Peryòd notasyon ki pi resan an ki afiche sèlman."
   },
   "opportunities_popup_f6703842": { "message": "opòtinite afiche" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } seleksyone. Lis ratresi."
+  },
   "optional_add_course_ef0d70fc": { "message": "Opsyonèl: Ajoute Kou" },
   "page_50c4823d": { "message": "Paj" },
   "peer_review_74f26a13": { "message": "Revisyon Kamarad" },
@@ -205,6 +211,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Demen a { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Enposib pou make kòm konplè."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Itilize tout fllèch yo pou ka navige nan opsyon yo."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Yè a { date }" },
   "yesterday_c6bd6abf": { "message": "Yè" },

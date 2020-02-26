@@ -28,6 +28,7 @@ export default function datePickerFormat(format) {
     .adjustFormat(quoteLiteralStrings(format))
     .replace(/%Y/, 'yy') // Year (eg. 2017)
     .replace(/%b/, 'M') // Month (eg. May)
+    .replace(/%m/, 'm') // Month (eg. 3)
     .replace(/%-?d/, 'd') // Day of Month (eg. 3)
     .replace(/%a/, 'D') // Day of week (eg. Wed)
     .replace(/%-?[lk]|:|%M|%P/g, '') // Remove time info*

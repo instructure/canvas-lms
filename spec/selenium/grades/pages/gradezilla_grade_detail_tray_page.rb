@@ -19,7 +19,6 @@ require_relative '../../common'
 require_relative 'post_grades_tray_page'
 require_relative 'hide_grades_tray_page'
 
-
 module Gradezilla
   module GradeDetailTray
     extend SeleniumDependencies
@@ -28,6 +27,10 @@ module Gradezilla
 
     def self.submission_tray_full_content
       f('#SubmissionTray__Content')
+    end
+
+    def self.close_tray_button
+      fj("button:contains('Close submission tray')")
     end
 
     def self.avatar

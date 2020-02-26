@@ -358,6 +358,60 @@ it('UPDATE_PERMISSIONS sets explicit in the store', () => {
   expect(newState.roles).toEqual(expectedState)
 })
 
+it('UPDATE_PERMISSIONS groups granular permissions in roles', () => {
+  const originalState = {roles: [{id: '1', permissions: {}}]}
+
+  const payload = {
+    role: {
+      id: '1',
+      permissions: {
+        granular_1: {
+          enabled: true,
+          explicit: true,
+          group: 'granular_permission_group',
+          locked: false
+        },
+        granular_2: {
+          enabled: true,
+          explicit: true,
+          group: 'granular_permission_group',
+          locked: false
+        }
+      }
+    }
+  }
+
+  const expectedState = [
+    {
+      id: '1',
+      permissions: {
+        granular_1: {
+          enabled: true,
+          explicit: true,
+          group: 'granular_permission_group',
+          locked: false
+        },
+        granular_2: {
+          enabled: true,
+          explicit: true,
+          group: 'granular_permission_group',
+          locked: false
+        },
+        granular_permission_group: {
+          built_from_granular_permissions: true,
+          enabled: true,
+          explicit: true,
+          locked: false,
+          readonly: false
+        }
+      }
+    }
+  ]
+
+  const newState = reduce(actions.updatePermissions(payload), originalState)
+  expect(newState.roles).toEqual(expectedState)
+})
+
 it('UPDATE_ROLE updates the label correct', () => {
   const originalState = {
     roles: [
@@ -400,6 +454,7 @@ it('ADD_NEW_ROLE updates the label correct', () => {
         role: 'StudentEnrollment',
         workflow_state: 'active',
         displayed: true,
+        permissions: {},
         contextType: COURSE
       },
       {
@@ -409,6 +464,7 @@ it('ADD_NEW_ROLE updates the label correct', () => {
         role: 'AccountMembership',
         workflow_state: 'active',
         displayed: false,
+        permissions: {},
         contextType: ACCOUNT
       }
     ]
@@ -420,6 +476,7 @@ it('ADD_NEW_ROLE updates the label correct', () => {
     role: 'venk grumpy',
     workflow_state: 'active',
     displayed: false,
+    permissions: {},
     contextType: COURSE
   }
   const newState = reduce(actions.addNewRole(payload), originalState)
@@ -431,6 +488,7 @@ it('ADD_NEW_ROLE updates the label correct', () => {
       role: 'StudentEnrollment',
       workflow_state: 'active',
       displayed: true,
+      permissions: {},
       contextType: COURSE
     },
     {
@@ -440,6 +498,7 @@ it('ADD_NEW_ROLE updates the label correct', () => {
       role: 'venk grumpy',
       workflow_state: 'active',
       displayed: true,
+      permissions: {},
       contextType: COURSE
     },
     {
@@ -449,9 +508,70 @@ it('ADD_NEW_ROLE updates the label correct', () => {
       role: 'AccountMembership',
       workflow_state: 'active',
       displayed: false,
+      permissions: {},
       contextType: ACCOUNT
     }
   ]
+  expect(newState.roles).toEqual(expectedState)
+})
+
+it('ADD_NEW_ROLE groups granular role permissions', () => {
+  const originalState = {roles: [{id: '1', permissions: {}, contextType: COURSE, displayed: true}]}
+
+  const payload = {
+    id: '2',
+    permissions: {
+      granular_1: {
+        enabled: true,
+        explicit: true,
+        group: 'granular_permission_group',
+        locked: false
+      },
+      granular_2: {
+        enabled: true,
+        explicit: true,
+        group: 'granular_permission_group',
+        locked: false
+      }
+    }
+  }
+
+  const expectedState = [
+    {
+      id: '1',
+      permissions: {},
+      contextType: COURSE,
+      displayed: true
+    },
+    {
+      id: '2',
+      contextType: COURSE,
+      displayed: true,
+      permissions: {
+        granular_1: {
+          enabled: true,
+          explicit: true,
+          group: 'granular_permission_group',
+          locked: false
+        },
+        granular_2: {
+          enabled: true,
+          explicit: true,
+          group: 'granular_permission_group',
+          locked: false
+        },
+        granular_permission_group: {
+          built_from_granular_permissions: true,
+          enabled: true,
+          explicit: true,
+          locked: false,
+          readonly: false
+        }
+      }
+    }
+  ]
+
+  const newState = reduce(actions.addNewRole(payload), originalState)
   expect(newState.roles).toEqual(expectedState)
 })
 
@@ -465,6 +585,7 @@ it('ADD_NEW_ROLE correctly adds account level role', () => {
         role: 'StudentEnrollment',
         workflow_state: 'active',
         displayed: false,
+        permissions: {},
         contextType: COURSE
       },
       {
@@ -474,6 +595,7 @@ it('ADD_NEW_ROLE correctly adds account level role', () => {
         role: 'AccountMembership',
         workflow_state: 'active',
         displayed: true,
+        permissions: {},
         contextType: ACCOUNT
       }
     ]
@@ -485,6 +607,7 @@ it('ADD_NEW_ROLE correctly adds account level role', () => {
     role: 'venk grumpy',
     workflow_state: 'active',
     displayed: false,
+    permissions: {},
     contextType: ACCOUNT
   }
   const newState = reduce(actions.addNewRole(payload), originalState)
@@ -496,6 +619,7 @@ it('ADD_NEW_ROLE correctly adds account level role', () => {
       role: 'StudentEnrollment',
       workflow_state: 'active',
       displayed: false,
+      permissions: {},
       contextType: COURSE
     },
     {
@@ -505,6 +629,7 @@ it('ADD_NEW_ROLE correctly adds account level role', () => {
       role: 'AccountMembership',
       workflow_state: 'active',
       displayed: true,
+      permissions: {},
       contextType: ACCOUNT
     },
     {
@@ -514,6 +639,7 @@ it('ADD_NEW_ROLE correctly adds account level role', () => {
       role: 'venk grumpy',
       workflow_state: 'active',
       displayed: true,
+      permissions: {},
       contextType: ACCOUNT
     }
   ]

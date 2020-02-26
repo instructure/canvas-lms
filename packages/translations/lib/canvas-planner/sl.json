@@ -112,6 +112,9 @@
     "message": "{ items } zaključen(-ih) { items, plural,\n     =1 {element}\n  other {elementov}\n}"
   },
   "late_2be42b88": { "message": "Zamuda" },
+  "list_collapsed_9ac35920": { "message": "Seznam je strnjen." },
+  "list_collapsed_dde87718": { "message": "Seznam je strnjen" },
+  "list_expanded_efec2d0": { "message": "Seznam je razširjen." },
   "load_more_a36f9cf9": { "message": "Naloži več" },
   "load_prior_dates_f2b0f6f0": { "message": "Naloži predhodne datume" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -164,6 +167,9 @@
     "message": "*Prikazano je le najnovejše ocenjevalno obdobje."
   },
   "opportunities_popup_f6703842": { "message": "pojavno okno za priložnosti" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } je izbran(a/o). Seznam je strnjen."
+  },
   "optional_add_course_ef0d70fc": { "message": "Izbirno: Dodaj predmet" },
   "page_50c4823d": { "message": "Stran" },
   "peer_review_74f26a13": { "message": "Ocenjevanje kolegov" },
@@ -223,6 +229,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Jutri ob { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Ni bilo mogoče označiti kot zaključeno."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Po možnostih se premikajte s puščičnima tipkama."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Včeraj ob { date }" },
   "yesterday_c6bd6abf": { "message": "Včeraj" },

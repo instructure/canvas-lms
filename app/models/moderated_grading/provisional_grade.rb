@@ -184,6 +184,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   def publish_rubric_assessments!
     self.rubric_assessments.each do |provisional_assessment|
       rubric_association = provisional_assessment.rubric_association
+      # This case arises when a rubric is deleted.
+      next if rubric_association.nil?
 
       params = {
         artifact: submission,

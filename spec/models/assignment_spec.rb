@@ -5720,7 +5720,7 @@ describe Assignment do
         @assignment = @course.assignments.create!(name: "Mute Comment Test", submission_types: %w(online_upload))
       end
 
-      let(:zip) { zip_submissions }
+      let(:zip) { zip_submissions_legacy }
       let(:added_comment) { @assignment.submission_for_student(@student).submission_comments.last }
 
       context "with post policies enabled" do
@@ -5737,7 +5737,7 @@ describe Assignment do
           it "hides new comments if the submission is not posted" do
             submit_homework(@student)
 
-            @assignment.generate_comments_from_files(zip.open.path, @user)
+            @assignment.generate_comments_from_files_legacy(zip.open.path, @user)
             expect(added_comment).to be_hidden
           end
 
@@ -5745,7 +5745,7 @@ describe Assignment do
             submit_homework(@student)
             @assignment.post_submissions
 
-            @assignment.generate_comments_from_files(zip.open.path, @user)
+            @assignment.generate_comments_from_files_legacy(zip.open.path, @user)
             expect(added_comment).not_to be_hidden
           end
         end
@@ -5755,7 +5755,7 @@ describe Assignment do
             submit_homework(@student)
             @assignment.post_submissions
 
-            @assignment.generate_comments_from_files(zip.open.path, @user)
+            @assignment.generate_comments_from_files_legacy(zip.open.path, @user)
             expect(added_comment).not_to be_hidden
           end
 
@@ -5764,14 +5764,14 @@ describe Assignment do
             @assignment.grade_student(@student, grade: 1, grader: @teacher)
             @assignment.hide_submissions
 
-            @assignment.generate_comments_from_files(zip.open.path, @user)
+            @assignment.generate_comments_from_files_legacy(zip.open.path, @user)
             expect(added_comment).to be_hidden
           end
 
           it "shows new comments if the submission is neither graded nor posted" do
             submit_homework(@student)
 
-            @assignment.generate_comments_from_files(zip.open.path, @user)
+            @assignment.generate_comments_from_files_legacy(zip.open.path, @user)
             expect(added_comment).not_to be_hidden
           end
         end
@@ -5782,14 +5782,14 @@ describe Assignment do
           @assignment.mute!
           submit_homework(@student)
 
-          @assignment.generate_comments_from_files(zip.open.path, @user)
+          @assignment.generate_comments_from_files_legacy(zip.open.path, @user)
           expect(added_comment).to be_hidden
         end
 
         it "shows new comments when the assignment is not muted" do
           submit_homework(@student)
 
-          @assignment.generate_comments_from_files(zip.open.path, @user)
+          @assignment.generate_comments_from_files_legacy(zip.open.path, @user)
           expect(added_comment).not_to be_hidden
         end
       end
@@ -6493,7 +6493,7 @@ describe Assignment do
     end
   end
 
-  describe '#generate_comments_from_files' do
+  describe '#generate_comments_from_files_legacy' do
     before :once do
       @students = create_users_in_course(@course, 3, return_type: :record)
 
@@ -6505,9 +6505,9 @@ describe Assignment do
       s1 = @students.first
       submit_homework(s1)
 
-      zip = zip_submissions
+      zip = zip_submissions_legacy
 
-      comments, ignored = @assignment.generate_comments_from_files(
+      comments, ignored = @assignment.generate_comments_from_files_legacy(
         zip.open.path,
         @teacher)
 
@@ -6526,9 +6526,9 @@ describe Assignment do
       g1.add_user(s2)
 
       submit_homework(s1)
-      zip = zip_submissions
+      zip = zip_submissions_legacy
 
-      comments, _ = @assignment.generate_comments_from_files(
+      comments, _ = @assignment.generate_comments_from_files_legacy(
         zip.open.path,
         @teacher)
 
@@ -6544,16 +6544,180 @@ describe Assignment do
       att = submit_homework(s1)
       sub = @assignment.submissions.where(:user_id => s1).first
 
-      zip = zip_submissions
+      zip = zip_submissions_legacy
       filename = Zip::File.new(zip.open).entries.map(&:name).first
       expect(filename).to eq "anon_#{sub.anonymous_id}_#{att.id}_homework.pdf"
 
-      comments, ignored = @assignment.generate_comments_from_files(
+      comments, ignored = @assignment.generate_comments_from_files_legacy(
         zip.open.path,
         @teacher)
 
       expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
       expect(ignored).to be_empty
+    end
+  end
+
+  describe "generating comments from files" do
+    let(:attachment_data) { {uploaded_data: stub_file_data("submissions.zip", "", "application/zip")} }
+
+    before :once do
+      Account.site_admin.enable_feature!(:submissions_reupload_status_page)
+      @students = create_users_in_course(@course, 3, return_type: :record)
+
+      @assignment = @course.assignments.create! name: "zip upload test",
+                                                submission_types: %w(online_upload)
+    end
+
+    def zip_submissions
+      zip = Attachment.new filename: 'submissions.zip'
+      zip.user = @teacher
+      zip.workflow_state = 'to_be_zipped'
+      zip.context = @assignment
+      zip.save!
+
+      # add all submissions from the assignment to the zip file
+      ContentZipper.process_attachment(zip, @teacher)
+      raise "zip failed" if zip.workflow_state != "zipped"
+
+      # return a tempfile for use in generating comments
+      zip.open
+    end
+
+    def generate_comments(user)
+      tempfile = zip_submissions
+
+      # create an uploaded file with the zipped submissions, as would be uploaded by the user
+      uploaded_data = ActionDispatch::Http::UploadedFile.new(tempfile: tempfile, filename: "submissions.zip")
+
+      @assignment.generate_comments_from_files_later(
+        {uploaded_data: uploaded_data},
+        user
+      )
+
+      # invoke the job that was created by the previous step
+      job = Delayed::Job.where(tag: "Assignment#generate_comments_from_files").order(:id).last
+      job.invoke_job
+    end
+
+    it "should work for individuals" do
+      s1 = @students.first
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+      results = @assignment.submission_reupload_progress.results
+
+      expect(results[:comments].map { |c| c[:submission][:user_id] }).to eq [s1.id]
+      expect(results[:ignored_files]).to be_empty
+    end
+
+    it "should work for groups" do
+      s1, s2 = @students
+
+      gc = @course.group_categories.create! name: "Homework Groups"
+      @assignment.update group_category_id: gc.id,
+                                    grade_group_students_individually: false
+      g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
+      g1.add_user(s1)
+      g1.add_user(s2)
+
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+      results = @assignment.submission_reupload_progress.results
+      submission_user_ids = results[:comments].map { |c| c[:submission][:user_id] }
+
+      expect(submission_user_ids.sort).to eq [s1.id, s2.id]
+    end
+
+    it "excludes student names from filenames when anonymous grading is enabled" do
+      @assignment.update!(anonymous_grading: true)
+
+      s1 = @students.first
+      submit_homework(s1)
+
+      generate_comments(@teacher)
+      results = @assignment.submission_reupload_progress.results
+
+      expect(results[:comments].map { |c| c[:submission][:user_id] }).to eq [s1.id]
+      expect(results[:ignored_files]).to be_empty
+    end
+
+    describe "newly-created comments" do
+      before(:each) do
+        @assignment = @course.assignments.create!(name: "Mute Comment Test", submission_types: %w(online_upload))
+      end
+
+      let(:added_comment) { @assignment.submission_for_student(@student).submission_comments.last }
+
+      context "with post policies enabled" do
+        before(:each) do
+          @course.enable_feature!(:new_gradebook)
+          PostPolicy.enable_feature!
+        end
+
+        context "for a manually-posted assignment" do
+          before(:each) do
+            @assignment.post_policy.update!(post_manually: true)
+          end
+
+          it "hides new comments if the submission is not posted" do
+            submit_homework(@student)
+            generate_comments(@user)
+            expect(added_comment).to be_hidden
+          end
+
+          it "shows new comments if the submission is posted" do
+            submit_homework(@student)
+            @assignment.post_submissions
+
+            generate_comments(@user)
+            expect(added_comment).not_to be_hidden
+          end
+        end
+
+        context "for a automatically-posted assignment" do
+          it "shows new comments if the submission is posted" do
+            submit_homework(@student)
+            @assignment.post_submissions
+
+            generate_comments(@user)
+            expect(added_comment).not_to be_hidden
+          end
+
+          it "hides new comments if the submission is graded but not posted" do
+            submit_homework(@student)
+            @assignment.grade_student(@student, grade: 1, grader: @teacher)
+            @assignment.hide_submissions
+
+            generate_comments(@user)
+            expect(added_comment).to be_hidden
+          end
+
+          it "shows new comments if the submission is neither graded nor posted" do
+            submit_homework(@student)
+
+            generate_comments(@user)
+            expect(added_comment).not_to be_hidden
+          end
+        end
+      end
+
+      context "with post policies not enabled" do
+        it "hides new comments when the assignment is muted" do
+          @assignment.mute!
+          submit_homework(@student)
+
+          generate_comments(@user)
+          expect(added_comment).to be_hidden
+        end
+
+        it "shows new comments when the assignment is not muted" do
+          submit_homework(@student)
+
+          generate_comments(@user)
+          expect(added_comment).not_to be_hidden
+        end
+      end
     end
   end
 
@@ -9034,7 +9198,7 @@ describe Assignment do
     a
   end
 
-  def zip_submissions
+  def zip_submissions_legacy
     zip = Attachment.new filename: 'submissions.zip'
     zip.user = @teacher
     zip.workflow_state = 'to_be_zipped'

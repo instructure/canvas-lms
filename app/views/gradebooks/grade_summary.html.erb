@@ -350,9 +350,20 @@
                 end
               %>
               <% if url && url != '#' %>
-                <a title="<%= anchor_title %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank" data-tooltip="left">
-                  <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png", :alt => alt_text) : image_tag("blank.png", :alt => '') %>
-                </a>
+                <% if @presenter.show_updated_plagiarism_icons?(turnitin) %>
+                  <%=
+                    render partial: "shared/originality_score_icon", locals: {
+                      hide_score: true,
+                      plagiarism_data: turnitin,
+                      report_title: anchor_title,
+                      report_url: url
+                    }
+                  %>
+                <% else %>
+                  <a title="<%= anchor_title %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank" data-tooltip="left">
+                    <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png", :alt => alt_text) : image_tag("blank.png", :alt => '') %>
+                  </a>
+                <% end %>
               <% end %>
             <% end %>
             <% if @presenter.vericite_enabled? && !assignment_presenter.originality_report? %>
@@ -370,15 +381,27 @@
                 end
               %>
 
-              <span class="turnitin_score_container" style="<%= 'visibility: hidden;' if !vericite %>">
-                <span class="vericite_score_container_caret <%= vericite && vericite[:state] %>_score"></span>
-                <a title="<%= t('titles.vericite_score', "VeriCite similarity score -- more information") %>" href="<%= url %>" target="_blank" class="tooltip not_external turnitin_similarity_score <%= vericite && vericite[:state] %>_score">
-                  <%= vericite && vericite[:similarity_score] %>%
-                  <span class="tooltip_wrap right">
-                    <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
-                  </span>
-                </a>
-              </span>
+              <% if @presenter.show_updated_plagiarism_icons?(vericite) %>
+                <%=
+                  render partial: "shared/originality_score_icon", locals: {
+                    hide_score: true,
+                    plagiarism_data: vericite,
+                    report_title: t("VeriCite similarity score -- more information"),
+                    report_url: url,
+                    tooltip_text: t("See VeriCite results")
+                  }
+                %>
+              <% else %>
+                <span class="turnitin_score_container" style="<%= 'visibility: hidden;' if !vericite %>">
+                  <span class="vericite_score_container_caret <%= vericite && vericite[:state] %>_score"></span>
+                  <a title="<%= t('titles.vericite_score', "VeriCite similarity score -- more information") %>" href="<%= url %>" target="_blank" class="tooltip not_external turnitin_similarity_score <%= vericite && vericite[:state] %>_score">
+                    <%= vericite && vericite[:similarity_score] %>%
+                    <span class="tooltip_wrap right">
+                      <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
+                    </span>
+                  </a>
+                </span>
+              <% end %>
             <% end %>
           <% end %>
         <% end %>

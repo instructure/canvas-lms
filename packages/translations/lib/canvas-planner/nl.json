@@ -114,6 +114,9 @@
     "message": "{ items } voltooid(e) { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
   "late_2be42b88": { "message": "Te laat" },
+  "list_collapsed_9ac35920": { "message": "Lijst samengevouwen." },
+  "list_collapsed_dde87718": { "message": "Lijst samengevouwen" },
+  "list_expanded_efec2d0": { "message": "Lijst uitgevouwen." },
   "load_more_a36f9cf9": { "message": "Meer laden" },
   "load_prior_dates_f2b0f6f0": { "message": "Eerdere datums laden" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -164,6 +167,9 @@
     "message": "*Alleen meest recente beoordelingsperiode wordt weergegeven."
   },
   "opportunities_popup_f6703842": { "message": "mogelijkheden popup" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } geselecteerd. Lijst samengevouwen."
+  },
   "optional_add_course_ef0d70fc": { "message": "Optioneel: Cursus toevoegen" },
   "page_50c4823d": { "message": "Pagina" },
   "peer_review_74f26a13": { "message": "Peerbeoordeling" },
@@ -219,6 +225,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Morgen om { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Kan dit niet als voltooid markeren."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Gebruik de pijltoetsen om door opties te navigeren."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Gisteren om { date }" },
   "yesterday_c6bd6abf": { "message": "Gisteren" },

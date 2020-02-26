@@ -1324,6 +1324,7 @@ da:
         help_link_text: "Tekst som vises til link"
         help_link_url: URL
         include_students_in_global_survey: "Inkluder studerende i generelle spørgeundersøgelser"
+        limit_parent_app_web_access: "Begræns adgangen til Canvas-web fra Canvas Parent-appen"
         lock_all_announcements: "Deaktiver kommentarer på beskeder"
         locked: "Lås denne indstilling for underkonto og fag"
         locked_for_sub_accounts: "Lås denne indstillinger for underkonti"
@@ -1978,6 +1979,7 @@ da:
   all_users_associated_with_this_institution_d29850be: "Alle brugere, der er tilknyttet til denne institution"
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Alle vægtninger skal være større end eller lig med 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Giv en moderator tilladelse til at evaluere flere uafhængige karakterer for de valgte afleveringer"
+  allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Lader en lærer angive antallet af tilladte forsøg på en opgave via grænsefladen"
   allow_bb7ce9b1: Tillad
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad bulkeksport af karakterer til SIS"
   allow_comments_a1f45d8: "Tillad kommentarer"
@@ -1990,6 +1992,7 @@ da:
   allow_final_grade_override_a21a79ee: "Tillad tilsidesættelse af endelig karakter"
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Tillad import af QTI og Common Cartridge til New Quizzes."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillad import af QTI og Common Cartridge i Quizzes.Next."
+  allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Tillad import af tredjeparts-pakker til New Quizzes."
   allow_in_mastery_paths_5332c786: "Tillad i læringsstier"
   allow_include_parameters_bf3d3230: "Tillad Inkluder parametre "
   allow_intra_group_peer_reviews_53f1e455: "Tillad interne peer review"
@@ -1997,6 +2000,7 @@ da:
       Tillad, at abonnementer til live-begivenheder indstilles til at blive leveret
       via HTTPS-webhooks
   allow_lor_tools: "Giv brugerne mulighed for at se og bruge eksterne værktøjer, der er konfigureret til LOR."
+  allow_migration_of_quizzes_during_course_copy_and__35d80756: "Tillad overførsel af test under kopiering og import af fag"
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Tillad moderator at gennemse flere uafhængige karakterer for udvalgte afleveringer"
   allow_multiple_attempts_e67a0a37: "Tillad flere forsøg"
   allow_opt_out_of_inbox: "Tillad, at brugere melder sig fra Diskussioner-indbakken Dette vil medføre, at alle beskeder og meddelelser i diskussioner sendes som hurtigst muligt-meddelelser til brugerens primære e-mail, Diskussioner-indbakkens ikon for ulæste meddelelser skjules i indbakken og Diskussionens meddelelsesindstillinger skjules."
@@ -2041,6 +2045,7 @@ da:
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Tillader duplikering af objekter i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillader duplikering af kalenderbegivenheder"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillad planlægning af tilbagevendende kalenderbegivenheder"
+  allows_the_user_to_navigate_away_while_submission__276d73b7: "Lader brugeren navigere væk, mens afleveringen bliver genindsendt"
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Gør det muligt for en bruger at få adgang til og redigere admin-indstillinger i Commons. Gør det muligt for en bruger at oprette og administrere grupper. Gør det muligt for en bruger at administrere delte ressourcer på kontoen."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Gør det muligt for en bruger at få adgang til SpeedGrader fra en opgave."
   allows_user_to_access_the_announcements_link_in_co_2783579a: "Gør det muligt for en bruger at få adgang til linket Beskeder i Fagnavigation. Gør det muligt for en bruger at få vist fagbeskeder. Gør det muligt for en bruger at få vist nylige beskeder på startsiden."
@@ -2811,6 +2816,7 @@ da:
     titles: 
       assignment_rubric_details: "Opgave rubrik-detaljer"
   assignment_976578a8: Opgave
+  assignment_allowed_attempts_7e3d43ee: "Tilladte forsøg for opgaven"
   assignment_assignment_submission_paper_view_8a4c9776: "Opgave %{assignment} indsendelse papirvisning"
   assignment_assignment_submission_plain_text_view_b217d372: "Opgave %{assignment} indsendelse almindelig tekstvisning"
   assignment_comments_e43ed898: Opgavekommentarer
@@ -2918,6 +2924,7 @@ da:
   assignment_path_selected_e80191d1: "Opgavesti valgt"
   assignment_preview_3833e819: "%{assignment} forhåndsvisning"
   assignment_selection_6bff05c4: Opgavevalg
+  assignment_submissions_uploaded_ba0dbc84: "%{assignment}: Afleveringer uploadet"
   assignment_title_82b4422e: "Opgavetitel:"
   assignment_title_8a707dd2: opgavetitel
   assignment_title_e3192978: "Opgave: %{title}"
@@ -3096,6 +3103,7 @@ da:
       notify_content_change: "Informer brugere om, at dette indhold er blevet ændret"
       points_possible: Point
       post_to_sis: "Inkluder denne opgaves karakterer, når du lægger dem ud på de studerendes informationssystem"
+      submission_attempts: Afleveringsforsøg
       warnings: 
         assignment_is_frozen: "Nogle indstillinger er blevet låst på administrationsniveau."
     errors: 
@@ -3837,6 +3845,7 @@ da:
   back_2900f52a: Tilbage
   back_to_announcements_1036e43e: "Tilbage til beskeder"
   back_to_app_center_95420d83: "Tilbage til App Center"
+  back_to_assignment_1df86a69: "Tilbage til opgave"
   back_to_ref_title_377ea1f0: "Tilbage til %{ref_title}"
   back_to_table_of_contents_d878b315: "Tilbage til indholdsfortegnelse"
   back_to_title_39e7a8f4: "Tilbage til %{title}"
@@ -3871,6 +3880,7 @@ da:
   beginning_date_2d2a29ac: Begyndelsesdato
   behaviour_change_related_to_the_bugfix_in_apg_122__63cfa767: "Adfærdsændring relateret til fejlrettelse i APG-122. Tillad ikke, at der oprettes brugerdefinerede kolonner, der har samme titel som reserverede navne i karakteroversigt-importøren, og ignorér desuden ikke-aktive brugerdefinerede kolonner ved karakteroversigt-import samt dem, der bruger reserverede navne."
   behind_31e4e0fe: Bag
+  being_processed_by_plagiarism_service_2269be71: "Behandles af plagieringstjenesten"
   belarusian_b2f19c76: Hviderussisk
   belgium_32_e5f5b598: "Belgien (+32)"
   belgium_ef8739b6: Belgien
@@ -6158,6 +6168,7 @@ da:
   costa_rica_97d66afe: "Costa Rica"
   could_not_duplicate_discussion_953ed67f: "Kunne ikke duplikere diskussion"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Kunne ikke finde en LTI-konfiguration for klient-id %{clientId}"
+  could_not_find_file_to_upload_2af12953: "Kunne ikke finde den fil, der skal uploades"
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Kunne ikke finde den eksisterende bruger til at logge ind med SIS-ID %{user_id}, springer over"
   could_not_save_chosencolor_741b74ce: "Kunne ikke gemme '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Kunne ikke justere datoer for opgave %{name} (ID %{id})"
@@ -6205,6 +6216,12 @@ da:
   count_files_updated_4570a8a: 
     one: "1 fil opdateret"
     other: "%{count} filer opdaterede"
+  count_files_were_attached_to_the_following_user_su_a0dae4e6: 
+    one: "(1) fil blev vedhæftet til følgende brugeraflevering"
+    other: "(%{count}) filer blev vedhæftet til følgende brugerafleveringer"
+  count_files_were_ignored_2f9c054a: 
+    one: "(1) fil blev ignoreret"
+    other: "(%{count}) filer blev ignoreret"
   count_hidden_e8d2c57c: "%{count} skjult"
   count_images_found_for_term_a93635ed: "%{count} billeder fundet for %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -7239,6 +7256,7 @@ da:
   create_new_discussions_6ab69da2: "Opret nye diskussioner"
   create_new_e0946c49: "Opret ny"
   create_new_group_set_13b1f62a: "Opret nyt gruppesæt"
+  create_pages_581a4d59: "Opret sider"
   create_slots_71dbb2f8: "Opret tidsrum"
   create_theme_based_on_40651ed3: "Opret tema baseret på"
   create_theme_based_on_name_7b1bd318: "Opret tema baseret på %{name}"
@@ -7664,6 +7682,7 @@ da:
   delete_my_account_41060aad: "Slet min konto"
   delete_outcome_cc6546f1: "Slet læringsudbytte"
   delete_outcome_group_6b399d34: "Slet gruppe for læringsudbytte"
+  delete_pages_ab60f58: "Slet sider"
   delete_prerequisite_5e97bdf4: "Slet forudsætning"
   delete_prerequisite_title_19741947: "Slet forudsætning %{title}"
   delete_proficiency_rating_5436ee08: "Slet færdighedsbedømmelse"
@@ -7892,6 +7911,7 @@ da:
   disable_and_lock_7d0ef0e8: "Deaktiver og lås"
   disable_content_security_policy_8660a787: "Deaktiver politik for indholdsikkerhed"
   disable_extra_filter_options_1d1cdc02: "deaktiver ekstra filterindstillinger"
+  disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deaktiver afkrydsningsfelter for import og overførsel af New Quizzes, indstil som standard til aktiveret"
   disable_scope_6ba4e4d4: "Deaktiver omfang"
   disable_sync_to_name_10c371dc: "Deaktiver synkronisering til %{name}"
   disable_toolname_44d6397c: "Deaktiver %{toolName}"
@@ -7901,6 +7921,7 @@ da:
   disabled_by_default_7d822dcb: "Deaktiveret som standard"
   disabled_in_course_settings_d15ee35d: "* Deaktiveret i fagindstillinger"
   disabled_links_b3bdea99: "Deaktiverede links"
+  disabled_not_visible_to_students_2c9d693f: "Deaktiveret. Ikke synlig for studerende."
   disabled_not_visible_to_students_48d4a90d: "Deaktiveret. Ikke synlig for studerende"
   disabling_f594bda: "Deaktiverer ..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Deaktivering af Slå op til SIS er ikke tilgængelig for ikke-offentliggjorte fag"
@@ -8331,6 +8352,7 @@ da:
   done_54e3d4b6: Udført
   done_8af51c9b: Færdig.
   done_editing_9f7379d9: "Redigering færdig"
+  done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "Færdig! Vi tog de filer, du uploadede, og vedhæftede dem med en kort kommentar til hver brugers afleveringsside for denne opgave. De studerende får en meddelelse om, at en ny kommentar er blevet tilføjet."
   down_5831a426: Ned
   download_as_zip_5dae7f19: "Download som zip"
   download_assignment_submissions_41e50ee7: "Download opgaveafleveringer"
@@ -9040,6 +9062,7 @@ da:
   error_loading_grade_history_try_again_36465d2c: "Fejl ved indlæsning af karakterhistorik. Prøv igen?"
   error_loading_gradebook_history_try_again_19032437: "Fejl ved indlæsning af Karakterbog-historik. Prøv igen?"
   error_loading_groups_2a3dd72d: "Fejl ved indlæsning af grupper"
+  error_logging_in_error_msg_f61efaa3: "Fejl ved indlogning: %{error_msg}"
   error_message_2b9d12ee: "Fejl: %{message}"
   error_rendering_duplicated_module_db821097: "Fejl ved gengivelse af duplikeret modul"
   error_reports_7d6c8b1e: Fejlrapporter
@@ -9053,6 +9076,7 @@ da:
   error_sending_submission_comment_dc15d24f: "Fejl ved afsendelse af afleveringskommentar"
   error_sending_submission_d32dc075: "Fejl ved indsendelse af aflevering"
   error_starting_content_share_18fb1532: "Fejl ved påbegyndelse af indholdsdeling"
+  error_submitting_to_plagiarism_service_9b0748cb: "Fejl ved indsendelse til plagieringstjeneste"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Fejl ved indsendelse til plagieringstjeneste. Du kan indsende fra SpeedGrader igen."
   error_updating_submission_draft_1d40ade7: "Fejl ved opdatering af afleveringsudkast"
   error_uploading_file_e2d31b56: "Fejl under upload af fil"
@@ -10706,6 +10730,7 @@ da:
       grading_scheme_info: "Vis/rediger karakterordning"
   grading_standards_b73bfa72: Karakterstandarder
   grading_type_type_7d8b42d7: "Karaktertype: %{type}"
+  granular_permissions_for_managing_wiki_pages_3ed89a84: "Granulære tilladelser til styring af wikisider"
   graph_bar_b5daa23d: Graflinje
   graph_of_grades_for_each_assignment_4c44d4d1: "Diagram over karakterer for hver opgave"
   graph_of_student_page_views_and_participation_over_4a1d4803: "Diagram over studerendes sidevisninger og deltagelse over tid"
@@ -11433,6 +11458,9 @@ da:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Hvis dette er deaktiveret, har brugeren stadig adgang til Fagindstillinger. Brugeren kan ikke administrere enkelt fagindhold uden den passende tilladelse for det pågældende indholdselement. Hvis fagsynlighed er begrænset til brugere, der er tilmeldt faget, så giver denne tilladelse brugeren mulighed for at se fagindhold uden at være tilmeldt faget."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Hvis aktiveret, vil adgang til LTI 1.3 og LTI Advantage blive aktiveret."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Hvis aktiveret, tillades mere end det maksimalt mulige resultat på et læringsudbytte, der skal angives på en rubrik."
+  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+      Hvis aktiveret, lader Canvas værktøjer returnere flere indholdselementer
+      i en enkelt anmodning på siden med fagmoduler
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Hvis aktiveret, vil Common Cartridge-importører konvertere HTML-filer til sider"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Hvis aktiveret skal indholdsdesignere oplyse copyright og licensoplysninger for filer, inden de udgives. Gælder kun, hvis Better File Browsing også er aktiveret."
   if_enabled_copyright_and_license_information_must__2a551827: "Hvis aktiveret, skal der gives ophavsrets- og licensoplysninger for filer, før de offentliggøres."
@@ -11452,6 +11480,9 @@ da:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Send til alle i hele underkontoen, hvis der ikke vælges nogen)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Vis til alle i hele underkontoen, hvis der ikke vælges noget)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Vis til alle i hele kontoen, hvis der ikke vælges noget)"
+  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+      Hvis RCE-forbedringer også er aktiveret,
+      gemmer RCE automatisk dit arbejde hen ad vejen
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Hvis statistik - vis eller Brugere - administrer loginoplysninger er aktiveret, kan brugeren generere login- / logoutaktivitet i Admin-værktøjer. For at skjule valgmuligheden login-/logoutaktivitet i Administratorværktøjer skal begge af disse tilladelser være deaktiveret."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Hvis Statistik - vis eller Brugere - administrer loginoplysninger er aktiveret, kan en bruger generere login-/logoutaktivitet i Administratorværktøjer. For at skjule valgmuligheden login-/logoutaktivitet i Administratorværktøjer skal begge af disse tilladelser være deaktiveret."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Hvis Statistik - vis eller Brugere - administrér loginoplysninger er aktiveret, kan en bruger generere login-/logoutaktivitet i Administratorværktøjer. For at skjule valgmuligheden login-/logoutaktivitet i Administratorværktøjer skal begge af disse tilladelser være deaktiveret."
@@ -14906,6 +14937,7 @@ da:
     one: "Skal opnå opfyldelse af læringsmål mindst en gang. Der tages et gennemsnit af resultater for opfyldelse af læringsmål for at beregne det endelige resultat."
     other: "Skal opnå opfyldelse af læringsmål mindst %{count} gange. Resultater for opfyldelse af læringsmål beregnes som gennemsnit for at nå frem til det endelige resultat."
   must_be_a_number_0_e6ec3e78: "Skal være et tal >= 0"
+  must_be_a_number_e1dfe68a: "Skal være et tal"
   must_be_a_valid_number_59f0069: "Skal være et gyldigt tal"
   must_be_after_start_date_95e251a3: "skal være efter startdatoen"
   must_be_between_availability_dates_ceaca984: "skal være mellem ledige datoer"
@@ -15081,8 +15113,12 @@ da:
   new_quiz_statistics_desc: "Aktiver ny quiz statistikside for et kursus."
   new_quizzes_dbda7e0a: "Nye test"
   new_quizzes_importing_c167dce0: "New Quizzes importerer"
+  new_quizzes_migration_during_course_import_copy_e9dd124e: "New Quizzes-overførsel under fagimport / -kopiering"
+  new_quizzes_migration_enabled_by_default_5f9bcc81: "New Quizzes-overførsel aktiveret som standard"
+  new_quizzes_migration_required_7854aa1a: "New Quizzes-overførsel påkrævet"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes på siden Tests"
   new_quizzes_submission_history_d81b477b: "New Quizzes afleveringshistorik"
+  new_quizzes_third_party_importing_1e1b696d: "New Quizzes-import fra tredjepart"
   new_rating_canceled_eed3c4ff: "Ny bedømmelse annulleret"
   new_rating_created_54125331: "Ny bedømmelse oprettet"
   new_sis_integrations: |-
@@ -15134,6 +15170,7 @@ da:
   no_content_5dbc9acf: "Intet indhold"
   no_content_has_been_added_f36bab43: "* Der er ikke blevet tilføjet indhold"
   no_content_has_been_shared_with_you_667fde6c: "Intet indhold er blevet delt med dig."
+  no_content_not_visible_to_students_905f8996: "Intet indhold. Ikke synlig for studerende."
   no_content_not_visible_to_students_b59f4867: "Intet indhold. Ikke synlig for studerende"
   no_courses_favorited_4e69fd63: "Ingen fag som favorit"
   no_courses_found_12d68a74: "Der er ikke fundet fag"
@@ -15198,6 +15235,7 @@ da:
   no_submission_for_assignment_a9cb6fe2: "Ingen indsendelse for %{assignment}"
   no_submission_for_assignmenttitle_243bd1f4: "Ingen indsendelse for %{assignmentTitle}"
   no_submissions_164cea23: "Ingen afleveringer"
+  no_submissions_have_been_uploaded_2fb02710: "Ingen afleveringer er blevet uploadet"
   no_terms_eab5ee7b: "Ingen semestre"
   no_tls_618add1a: "Ingen TLS"
   no_unassigned_terms_deb7b76b: "Ingen utildelte betingelser"
@@ -15599,6 +15637,8 @@ da:
   number_between_1_and_16_inclusive_31f5468d: "tal mellem 1 og 16 inklusive"
   number_more_a46966: "%{number} Mere..."
   number_of_allowed_attempts_3d10b740: "Antal tilladte forsøg"
+  number_of_attempts_b0994c2f: "Antal forsøg"
+  number_of_attempts_must_be_a_number_greater_than_0_a915568c: "Antal forsøg skal være større end 0."
   number_of_graders_cde8dd54: "Antal bedømmere"
   number_of_respondents_e1e7e8b: "Antal respondenter"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Antal resultater, der skal ignoreres for hver studerende"
@@ -15725,6 +15765,7 @@ da:
   oops_something_went_wrong_with_making_a_copy_of_or_7e9d6695: "Ups! Noget gik galt med at lave en kopi af \"%{originalAssignmentName}\""
   oops_something_went_wrong_with_migrating_name_acdbc98b: "Ups! Noget gik galt med overførslen af \"%{name}\""
   oops_there_was_a_problem_loading_content_locks_4ab29a2a: "Ups, der opstod et problem ved indlæsning af indholdslåse."
+  oops_there_was_a_problem_re_uploading_submissions__276cb8a1: "Hovsa, der opstod et problem ved gen-upload af afleveringer. Kontroller, om zip-filen har problemer, og prøv igen."
   open_color_picker_f117df0a: "Åbn farvevalg"
   open_complete_incomplete_menu_cfe2033b: "Åbn færdig/ufuldstændig menu"
   open_discussion_title_for_comments_6baa3fa: "Åbn diskussion %{title} for kommentarer"
@@ -16060,11 +16101,14 @@ da:
           Overskriv disse ændringer?
       unsaved_changes: "Du har ændringer, der ikke er gemt. Vil du fortsætte uden at gemme disse ændringer?"
   pages_add_edit_delete_4c690ec6: "Sider - tilføj / rediger / slet"
+  pages_create_7be4852c: "Sider - opret"
+  pages_delete_ce201950: "Sider - slet"
   pages_e5414c2c: Sider
   pages_front_page_9ce5188: "Sider forside"
   pages_index_menu_f391bf04: "Indeksmenu for sider"
   pages_settings_968392a3: "Indstillinger for Sider"
   pages_tutorial_tray_169464a9: "Sider selvstudiumområde"
+  pages_update_6c1750af: "Sider - opdater"
   paginated_collection: 
     no_items: "Ingen elementer."
   paginated_list: 
@@ -16809,6 +16853,7 @@ da:
   privacy_level_f0ec09a3: Fortrolighedsniveau
   private_3883d133: Privat
   proceed_f3d33864: Fortsæt
+  process_multiple_content_items_from_course_modules_6de90fd8: "Behandl flere indholdselementer fra siden med fagmoduler"
   processing_2fcc9739: Behandler
   product_name: Canvas
   proficiency_rating_6346119f: Færdighedsvurdering
@@ -18786,6 +18831,7 @@ da:
   ratings_2433172b: Bedømmelser
   ratio_answered_correctly_b0c1e7d: "%{ratio}% besvaret korrekt"
   ratio_responded_correctly_6d890107: "%{ratio}% svarede korrekt"
+  rce_auto_save_f004fba9: "RCE auto-gem"
   rce_contents_replace_description: "Aktiver RCE fuldtekst udskift fra LTI’er"
   rce_contents_replace_display_name: "RCE-indhold udskift"
   rce_enhancements_5701e06: RCE-forbedringer
@@ -19025,6 +19071,7 @@ da:
   rename_this_page_554f0583: "Omdøb denne side"
   rename_this_section_73065edd: "Omdøb denne sektion"
   rename_this_section_bcbb6741: "Omdøb denne sektion"
+  renamed_from_filename_7675db05: "omdøbt fra %{filename}"
   renderDatepickerTime: 
     datepicker: 
       titles: 
@@ -19787,6 +19834,7 @@ da:
   selected_274ce24f: Valgt
   selected_all_courses_9cfef57f: "Vælg alle fag"
   selected_answer: "Du valgte dette svar."
+  selected_content_contains_non_lti_links_f9dfd762: "Udvalgt indhold indeholder ikke-LTI-links."
   selected_content_is_not_an_lti_link_11780d96: "Udvalgt indhold er ikke et LTI-link."
   selected_course_course_a581f834: "Valgt fag %{course}"
   selected_external_tool_tool_bae095ba: "Valgt eksternt værktøj %{tool}"
@@ -19915,6 +19963,7 @@ da:
       \x20                 Juster antallet af bedømmelser, opfyldelsesniveau, point og farver.\n\n\
       \x20               "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Opstil, hvordan dine færdighedsbedømmelser vises inden for karakteroversigten over opfyldelse af læringsmål. Juster antallet af bedømmelser, opfyldelsesniveau, point og farver."
+  sets_the_default_option_for_course_copy_and_import_36147e78: "Indstiller standardindstillingen for fagkopiering og -import til New Quizzes"
   setting_failed_to_load_try_refreshing_c24bf008: "Det lykkedes ikke at indlæse indstillingen, prøv at opdatere."
   settings: 
     recaptcha_settings: 
@@ -20742,6 +20791,7 @@ da:
   similarity_detection_platform_9e424d70: Ligheds-opdagelsesplatform
   similarity_score_more_information_b7010a87: "Originalitetsscore - mere information"
   similarity_score_see_detailed_report_a113dac0: "Originalitetsscore - Se detaljeret rapport"
+  similarityscore_similarity_score_52236e85: "%{similarityScore}% lighedsscore"
   simple_tls_45df2648: "Enkel TLS"
   singapore_65_b4927585: "Singapore (+65)"
   singapore_a145e422: Singapore
@@ -21403,6 +21453,7 @@ da:
   submissions_folder_9db8dadf: Afleveringsmappe
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "afleveringsmapper skal være oprettet i Bruger eller Gruppesammenhæng"
   submissions_posted_title_course_43677dba: "Afleveringer indsendt: %{title}, %{course}"
+  submissions_re_upload_status_page_6cdbc96d: "Statusside for genindsendelse af afleveringer"
   submissions_view_and_make_comments_cafaf361: "Afleveringer - vis og kommenter"
   submit_a3cc6859: Aflever
   submit_a_comment_7edbf648: "Indsend en kommentar"
@@ -21909,10 +21960,12 @@ da:
   there_were_a_total_of_count_warnings_6405df1e: "Der var i alt %{count} advarsler."
   there_were_errors_with_the_form_errors_ab5b559a: "Der opstod fejl med formularen: %{errors}"
   there_were_several_possible_matches_with_the_impor_ad58bcd0: "Der var flere mulige match med importen. Løs dem nedenfor."
+  there_were_some_files_we_didn_t_know_what_to_do_wi_6156913f: "Der var nogle filer, vi ikke vidste, hvad vi skulle gøre med. De er ikke blevet tilføjet til nogens afleveringsside."
   there_wereerrors_with_your_import_please_examine_y_e11cda62: "Der %{wereErrors} i din import, du bedes undersøge din fil og forsøge at uploade den igen. Tjek din e-mail for flere detaljer."
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: "Disse sikkerhedskoder kan bruges, hvis din multi-faktor-autentifikation ikke er tilgængelig. Udskriv dem og behold dem på et sikkert sted, fx i din pung."
   these_credentials_are_for_academic_benchmark_api_v_324baaa4: "Disse legitimationsoplysninger er for Academic Benchmark API v3. Hvis Partner-nøglen er tom, vil importøren som standard bruge Academic Benchmark API v1."
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "Disse legitimationsoplysninger er for Academic Benchmark API v1, som vil blive udfaset i en fremtidig version."
+  these_credentials_are_for_academic_benchmark_api_v_a3845be7: "Disse legitimationsoplysninger er for Academic Benchmark API v3."
   these_domains_have_automatically_been_added_to_you_cef51600: |-
       Disse domæner er blevet automatisk tilføjet til din hvidliste.
                     Hvis du ønsker at fjerne dem, skal du fjerne det tilknyttede værktøj.
@@ -21953,6 +22006,7 @@ da:
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Denne vedhæftede fil er blevet fjernet af forfatteren."
   this_conference_may_be_recorded_f76deeeb: "Konferencen optages muligvis."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Faget kan ikke føjes til menuen på nuværende tidspunkt."
+  this_course_does_not_allow_score_uploads_4b35fe07: "Faget tillader ikke uploads af resultater."
   this_course_has_concluded_7995a84c: "Dette fag er afsluttet"
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Faget er endnu ikke startet. Du kan ikke deltage i dette fag før %{date}."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Dette fag er taget og klart, men du skal afslutte registreringsprocessen, inden du kan offentliggøre faget. Du burde have modtaget en e-mail fra Canvas med et link til at afslutte processen. Husk at tjekke din mappe med uønsket post."
@@ -22560,6 +22614,7 @@ da:
   to_share_a_discussion_to_commons_course_content_ad_962c5e53: "For at dele en diskussion med Commons skal Fagindhold - tilføj/redigér/slet også være aktiveret."
   to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "For at dele en diskussion med Commons skal Diskussioner - vis også være aktiveret."
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: "For at dele en diskussion med Commons skal Diskussioner - vis også være aktiveret."
+  to_upload_some_submissions_for_this_assignment_cli_22368328: "For at uploade nogle afleveringer til denne opgave skal du klikke på knappen \"Tilbage til opgave\" ovenfor."
   to_view_a_course_outcomes_page_as_read_only_course_5bb7241f: |-
       For at få vist siden Fagets læringsudbytte som skrivebeskyttet skal Fagindhold - vis være aktiveret.
       For at importere læringsudbytte fra siden Læringsudbytte skal Rubrikker - tilføj/redigér/slet også være aktiveret.
@@ -22917,6 +22972,7 @@ da:
   update_details_6abfed16: Opdateringsdetaljer
   update_how_we_process_sis_imports_8195bf77: "Opdater, hvordan vi behandler SIS-importen"
   update_link_b7cab181: "Opdater link"
+  update_pages_c91d7ba: "Opdater sider"
   update_rating_6d29c2ef: "Opdater bedømmelse"
   update_tool_7d48ef2a: "Opdater %{tool}"
   update_your_notification_settings_ed9564f3: "Opdater dine notifikationsindstillinger"
@@ -23572,6 +23628,7 @@ da:
   view_the_assignment_e61ca4fc: "Vis opgaven"
   view_this_message_in_conversations_5a16bc9f: "Vis denne besked i Diskussioner"
   view_toolname_placements_4a5724d1: "Vis %{toolName} placeringer"
+  view_uploads_status_4c836211: "Se uploads-status"
   view_user_groups_538f22b4: "Vis brugergrupper"
   view_user_groups_d2bfa855: "Vis brugergrupper"
   view_violation_log_e80ea322: "Se overtrædelseslog"
@@ -23619,6 +23676,7 @@ da:
   watermark_c93fae0d: Vandmærke
   watermark_opacity_ce3d3097: "Vandmærke uigennemsigtighed"
   watermarks_other_images_e970fc6a: "Vandmærker & andre billeder"
+  we_are_currently_processing_your_files_this_may_ta_e67433a7: "Vi behandler i øjeblikket dine filer. Dette kan tage lidt tid afhængigt af afleveringernes filstørrelse. Du kan navigere væk fra dette skærmbillede og tjekke senere ved at klikke på linket \"Vis upload-status\" på opgavesiden eller opdatere denne side for at se status."
   we_couldn_t_find_that_page_34068c1d: "Vi kunne ikke finde siden!"
   we_emailed_a_confirmation_link_to_email_address_cl_e5f1d2ae: "Vi sendte en e-mail med bekræftelseslink til %{email_address}. Klik på linket i den pågældende e-mail for at afslutte registreringen. Sørg for at tjekke din mappe til uønsket post i tilfælde af, at den blev filtreret."
   we_found_a_different_version_of_product_name_insta_3a645773: "Vi fandt en anden version af \"%{product_name}\" installeret til dit fag. Hvis dette værktøj ikke fungerer som det skal, skal du prøve at genregistrere eller genindstallere det."

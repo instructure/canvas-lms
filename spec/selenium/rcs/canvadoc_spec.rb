@@ -16,12 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
-require_relative '../helpers/gradebook_common'
+require_relative '../helpers/gradezilla_common'
 
 
 describe 'Canvadoc' do
   include_context "in-process server selenium tests"
-  include GradebookCommon
+  include GradezillaCommon
 
   before :once do
     PluginSetting.create! :name => 'canvadocs',

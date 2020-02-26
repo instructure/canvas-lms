@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Links"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Lista recolhida."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Lista recolhida"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Lista expandida."
+    },
     "load_more_35d33c7": {
         "message": "Carregar mais"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "popup oportunidades"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } selecionado. Lista recolhida."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Opcional: Adicionar Disciplina"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Use as teclas de seta para navegar pelas opções."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Usado por leitores de tela para descrever o conteúdo de uma imagem"

@@ -19,7 +19,8 @@ require_relative '../../common'
 require_relative '../../assignments/page_objects/assignment_page'
 require_relative '../../assignments/page_objects/assignment_create_edit_page'
 require_relative '../pages/moderate_page'
-require_relative '../pages/gradebook_page'
+require_relative '../pages/gradezilla_cells_page'
+require_relative '../pages/gradezilla_page'
 require_relative '../pages/student_grades_page'
 
 describe 'Moderated Marking' do
@@ -122,11 +123,11 @@ describe 'Moderated Marking' do
       wait_for_ajaximations
 
       # go to gradebook
-      Gradebook.visit_gradebook(@moderated_course)
+      Gradezilla.visit(@moderated_course)
 
       # expect grades to be shown
-      expect(Gradebook.grading_cell_attributes(0, 0).text).to eq('15')
-      expect(Gradebook.grading_cell_attributes(0, 1).text).to eq('12')
+      expect(Gradezilla::Cells.get_grade(@student1, @moderated_assignment)).to eq('15')
+      expect(Gradezilla::Cells.get_grade(@student2, @moderated_assignment)).to eq('12')
     end
 
     it 'post to student allows viewing final grade as student', priority: '1', test_id: 3513992 do

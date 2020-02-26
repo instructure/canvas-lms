@@ -18,8 +18,8 @@
 
 module DataFixup::SetAccountSettingEnableTurnitin
   def self.run
-    Account.where.not(turnitin_account_id: nil,
-                      turnitin_crypted_secret: nil).find_each do |account|
+    Account.where.not(turnitin_account_id: nil).
+        where.not(turnitin_crypted_secret: nil).find_each do |account|
       account.settings[:enable_turnitin] = true
       account.save!
     end

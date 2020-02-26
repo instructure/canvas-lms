@@ -1174,18 +1174,6 @@ class Quizzes::Quiz < ActiveRecord::Base
     context.teacher_enrollments.map(&:user)
   end
 
-  def migrate_file_links
-    Quizzes::QuizQuestionLinkMigrator.migrate_file_links_in_quiz(self)
-  end
-
-  def self.batch_migrate_file_links(ids)
-    Quizzes::Quiz.where(:id => ids).each do |quiz|
-      if quiz.migrate_file_links
-        quiz.save
-      end
-    end
-  end
-
   def self.lockdown_browser_plugin_enabled?
     Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| Canvas::Plugin.value_to_boolean(p.settings[:enabled]) }
   end

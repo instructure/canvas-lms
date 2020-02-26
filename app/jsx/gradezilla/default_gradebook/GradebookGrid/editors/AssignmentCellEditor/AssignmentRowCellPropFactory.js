@@ -16,9 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {extractSimilarityInfo} from '../../../../../grading/helpers/SubmissionHelper'
+
 function isTrayOpen(gradebook, student, assignment) {
   const {open, studentId, assignmentId} = gradebook.getSubmissionTrayState()
   return open && studentId === student.id && assignmentId === assignment.id
+}
+
+function similarityInfoToShow(submission) {
+  const allSimilarityInfo = extractSimilarityInfo(submission)
+
+  if (allSimilarityInfo?.entries?.length > 0) {
+    const {similarity_score, status} = allSimilarityInfo.entries[0].data
+
+    return {
+      similarityScore: similarity_score,
+      status
+    }
+  }
+
+  return null
 }
 
 export default class AssignmentRowCellPropFactory {
@@ -31,6 +48,11 @@ export default class AssignmentRowCellPropFactory {
     const assignment = this.gradebook.getAssignment(editorOptions.column.assignmentId)
     const submission = this.gradebook.getSubmission(student.id, assignment.id)
 
+    let similarityInfo = null
+    if (this.gradebook.showSimilarityScore()) {
+      similarityInfo = similarityInfoToShow(submission)
+    }
+
     const cleanSubmission = {
       assignmentId: assignment.id,
       enteredGrade: submission.entered_grade,
@@ -40,6 +62,7 @@ export default class AssignmentRowCellPropFactory {
       id: submission.id,
       rawGrade: submission.rawGrade,
       score: submission.score,
+      similarityInfo,
       userId: student.id
     }
 

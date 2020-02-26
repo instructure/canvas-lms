@@ -112,6 +112,9 @@
     "message": "{ items } Abgeschlossen { items, plural,\n     =1 { Element}\n  other { Elemente}\n}"
   },
   "late_2be42b88": { "message": "Verspätet" },
+  "list_collapsed_9ac35920": { "message": "Liste ausgeblendet." },
+  "list_collapsed_dde87718": { "message": "Liste ausgeblendet" },
+  "list_expanded_efec2d0": { "message": "Liste eingeblendet." },
   "load_more_a36f9cf9": { "message": "Mehr laden" },
   "load_prior_dates_f2b0f6f0": { "message": "Frühere Termine laden" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -166,6 +169,9 @@
     "message": "* Nur der letzte Benotungszeitraum wird angezeigt."
   },
   "opportunities_popup_f6703842": { "message": "Chancen-Popup-Fenster" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } ausgewählt. Liste ausgeblendet."
+  },
   "optional_add_course_ef0d70fc": { "message": "Optional: Kurs hinzufügen" },
   "page_50c4823d": { "message": "Seite" },
   "peer_review_74f26a13": { "message": "Kollegenkorrektur" },
@@ -225,6 +231,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Morgen, am { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Kann nicht als fertiggestellt markiert werden."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Navigieren Sie mit den Pfeiltasten in den Optionen."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Gestern, am { date }" },
   "yesterday_c6bd6abf": { "message": "Gestern" },

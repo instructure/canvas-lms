@@ -28,7 +28,7 @@
 #       "id": "Feature",
 #       "description": "",
 #       "properties": {
-#         "name": {
+#         "feature": {
 #           "description": "The symbolic name of the feature, used in FeatureFlags",
 #           "example": "fancy_wickets",
 #           "type": "string"

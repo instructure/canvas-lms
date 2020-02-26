@@ -18,6 +18,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def runCoverage() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return env.RUN_COVERAGE == '1' || flags.forceRunCoverage() ? '1' : ''
+}
+
+def getImageTagVersion() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return env.RUN_COVERAGE == '1' ? 'master' : flags.getImageTagVersion()
+}
+
 def ci_node_total = 15; // how many nodes to run on
 pipeline {
   agent { label 'canvas-docker' }
@@ -27,8 +37,7 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml'
-    // 'refs/changes/63/181863/8' -> '63.181863.8'
-    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
+    NAME = getImageTagVersion()
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
     KNAPSACK_ENABLED = 1
     KNAPSACK_GENERATE_REPORT = 'false'
@@ -37,6 +46,7 @@ pipeline {
     KNAPSACK_TEST_DIR = 'spec'
     RERUNS_RETRY = 1
     MAX_FAIL = 50
+    COVERAGE = runCoverage()
   }
   stages {
     stage ('Distribute Rspec Tests') {
@@ -46,15 +56,16 @@ pipeline {
           for(int i = 0; i < ci_node_total; i++) {
             def index = i;
             nodes["rspec set ${(i).toString().padLeft(2, '0')}"] = {
-              withEnv(["CI_NODE_INDEX=$index", "CI_NODE_TOTAL=$ci_node_total"]) {
+              withEnv(["TEST_ENV_NUMBER=$index", "CI_NODE_INDEX=$index", "CI_NODE_TOTAL=$ci_node_total"]) {
                 node('canvas-docker') {
                   stage("Running RSpec Set ${index}") {
                     try {
-                      sh 'rm -rf ./tmp/spec_failures'
+                      sh 'rm -rf ./tmp'
                       checkout scm
                       sh 'build/new-jenkins/docker-cleanup.sh'
+                      sh 'mkdir -p tmp'
                       timeout(time: 60) {
-                        sh 'printenv | sort'
+                        sh 'build/new-jenkins/print-env-excluding-secrets.sh'
                         sh 'build/new-jenkins/docker-compose-pull.sh'
                         sh 'build/new-jenkins/docker-compose-build-up.sh'
                         sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
@@ -63,16 +74,17 @@ pipeline {
                     }
                     catch (ex) {
                       // copy spec failures to local
-                      sh 'mkdir -p tmp'
                       sh 'docker cp $(docker-compose ps -q web):/usr/src/app/log/spec_failures/ ./tmp/spec_failures/'
                       throw ex
                     }
                     finally {
                       def reports = load 'build/new-jenkins/groovy/reports.groovy'
-                      dir ('tmp') {
-                        reports.stashSpecFailures(index)
+                      reports.stashSpecFailures(index)
+                      if (env.COVERAGE == '1') {
+                        sh 'docker cp $(docker-compose ps -q web):/usr/src/app/coverage/ ./tmp/spec_coverage/'
+                        reports.stashSpecCoverage(index)
                       }
-                      sh 'rm -rf ./tmp/spec_failures'
+                      sh 'rm -rf ./tmp'
                       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
                     }
                   }
@@ -81,6 +93,16 @@ pipeline {
             }
           }
           parallel(nodes);
+        }
+      }
+    }
+
+    stage('Upload Coverage') {
+      when { expression { env.COVERAGE == '1' } }
+      steps {
+        script {
+          def reports = load 'build/new-jenkins/groovy/reports.groovy'
+          reports.publishSpecCoverageToS3(ci_node_total, "canvas-lms-rspec")
         }
       }
     }

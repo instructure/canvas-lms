@@ -382,6 +382,30 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(real_assessment.data).to eq provisional_assessment.data
     end
 
+    it "does not error when a rubric has been deleted after an assessment took place" do
+      outcome_with_rubric(course: course)
+      association = @rubric.associate_with(assignment, course, purpose: 'grading', use_for_grading: true)
+
+      submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
+
+      association.assess(
+        user: student,
+        assessor: scorer,
+        artifact: provisional_grade,
+        assessment: {
+          assessment_type: 'grading',
+          :"criterion_#{@rubric.criteria_object.first.id}" => {
+            points: 3,
+            comments: "good 4 u"
+          }
+        }
+      )
+
+      @rubric.destroy!
+      expect { provisional_grade.publish! }.not_to raise_error
+    end
+
     it "posts learning outcome results" do
       outcome_with_rubric(course: course)
       association = @rubric.associate_with(assignment, course, purpose: 'grading', use_for_grading: true)

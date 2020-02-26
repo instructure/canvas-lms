@@ -45,10 +45,6 @@ export default class ExternalToolsTableRow extends React.Component {
     return this.props.tool.lti_version === '1.3'
   }
 
-  onModalClose = () => {
-    this.button.focus()
-  }
-
   nameClassNames = () => classMunger('external_tool', {muted: this.props.tool.enabled === false})
 
   disabledFlag = () => {
@@ -104,12 +100,14 @@ export default class ExternalToolsTableRow extends React.Component {
     if (opts.passFocusUp) {
       this.props.setFocusAbove()
     } else {
-      this.button.focus()
+      this.focus()
     }
   }
 
   focus() {
-    this.button.focus()
+    if (this.button) {
+      this.button.focus()
+    }
   }
 
   renderButtons = () => {
@@ -169,7 +167,6 @@ export default class ExternalToolsTableRow extends React.Component {
               <ExternalToolPlacementButton
                 ref="externalToolPlacementButton"
                 tool={tool}
-                onClose={this.onModalClose}
                 returnFocus={this.returnFocus}
               />
               <ReregisterExternalToolButton

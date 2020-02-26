@@ -1,0 +1,93 @@
+#!/usr/bin/env groovy
+
+/*
+ * Copyright (C) 2019 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+def getImageTagVersion() {
+  def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
+  return flags.getImageTagVersion()
+}
+
+pipeline {
+  agent { label 'canvas-docker' }
+
+  options { ansiColor('xterm') }
+
+  environment {
+    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml:docker-compose.new-jenkins-flakey-spec-catcher.yml'
+    NAME = getImageTagVersion()
+    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+  }
+
+  stages {
+    stage('Checkout and clean') {
+      steps {
+        timeout(time: 5) {
+          sh 'build/new-jenkins/docker-cleanup.sh'
+          sh 'rm -rf ./tmp/'
+        }
+      }
+    }
+
+    stage('Print Env Variables') {
+      steps {
+        sh 'build/new-jenkins/print-env-excluding-secrets.sh'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        timeout(time: 20) {
+          sh 'build/new-jenkins/docker-compose-pull.sh'
+          sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+          sh 'build/new-jenkins/docker-compose-build-up.sh'
+          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+        }
+      }
+    }
+
+    stage("Running Selenium Specs") {
+      steps {
+        timeout(time: 60) {
+          sh (
+            script: 'docker-compose exec -T web flakey_spec_catcher --repeat=$FSC_REPEAT_FACTOR --output=/usr/src/app/tmp/fsc.out',
+            returnStatus: true
+          )
+        }
+      }
+    }
+
+    stage("Copy and Archive output") {
+      steps {
+        sh 'mkdir -p tmp'
+        sh (
+          script: 'docker cp $(docker-compose ps -q web):/usr/src/app/tmp/fsc.out ./tmp/fsc.out',
+          returnStatus: true
+        )
+        archiveArtifacts(artifacts: 'tmp/fsc.out', allowEmptyArchive: true)
+      }
+    }
+  }
+
+  post {
+    cleanup {
+      sh 'rm -rf ./tmp/'
+      sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+    }
+  }
+}

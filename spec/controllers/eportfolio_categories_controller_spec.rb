@@ -62,6 +62,14 @@ describe EportfolioCategoriesController do
       expect(assigns[:category]).to eql(@category)
     end
 
+    describe "js_env" do
+      it "sets SKIP_ENHANCING_USER_CONTENT to true" do
+        user_session(@user)
+        get 'show', params: {eportfolio_id: @portfolio.id, category_name: @category.slug}
+        expect(assigns.dig(:js_env, :SKIP_ENHANCING_USER_CONTENT)).to be true
+      end
+    end
+
     context "spam eportfolios" do
       before(:once) do
         @portfolio.user.account.enable_feature!(:eportfolio_moderation)

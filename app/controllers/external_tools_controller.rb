@@ -459,7 +459,7 @@ class ExternalToolsController < ApplicationController
       jwt_body = Canvas::Security.decode_jwt(secure_params)
       link_params[:ext][:lti_assignment_id] = jwt_body[:lti_assignment_id] if jwt_body[:lti_assignment_id]
     end
-    opts = {launch_url: launch_url, link_params: link_params, launch_token: launch_token}
+    opts = {launch_url: launch_url, link_params: link_params, launch_token: launch_token, context_module_id: params[:context_module_id]}
     @return_url ||= url_for(@context)
     message_type = tool.extension_setting(selection_type, 'message_type') if selection_type
     log_asset_access(@tool, "external_tools", "external_tools") if post_live_event

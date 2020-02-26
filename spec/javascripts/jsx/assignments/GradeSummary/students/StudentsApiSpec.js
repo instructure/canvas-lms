@@ -17,7 +17,10 @@
  */
 
 import * as StudentsApi from 'jsx/assignments/GradeSummary/students/StudentsApi'
-import FakeServer, {paramsFromRequest, pathFromRequest} from 'jsx/__tests__/FakeServer'
+import FakeServer, {
+  paramsFromRequest,
+  pathFromRequest
+} from 'jsx/shared/network/__tests__/FakeServer'
 
 QUnit.module('GradeSummary StudentsApi', suiteHooks => {
   let server
@@ -78,13 +81,11 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
         {display_name: 'Dana Smith', id: '1114', provisional_grades: [provisionalGradesData[3]]}
       ]
 
-      server
-        .for(url)
-        .respond([
-          {status: 200, body: [studentsData[0]]},
-          {status: 200, body: [studentsData[1]]},
-          {status: 200, body: studentsData.slice(2)}
-        ])
+      server.for(url).respond([
+        {status: 200, body: [studentsData[0]]},
+        {status: 200, body: [studentsData[1]]},
+        {status: 200, body: studentsData.slice(2)}
+      ])
 
       loadedProvisionalGrades = []
       loadedStudents = []
@@ -204,7 +205,10 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
     test('normalizes provisional grade grader ids', async () => {
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
-      deepEqual(grades.map(grade => grade.graderId), ['1101', '1102', '1101', '1102'])
+      deepEqual(
+        grades.map(grade => grade.graderId),
+        ['1101', '1102', '1101', '1102']
+      )
     })
 
     test('uses anonymous grader id for provisional grades when graders are anonymous', async () => {
@@ -214,37 +218,55 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
       }
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
-      deepEqual(grades.map(grade => grade.graderId), ['abcd1', 'abcd2', 'abcd3', 'abcd4'])
+      deepEqual(
+        grades.map(grade => grade.graderId),
+        ['abcd1', 'abcd2', 'abcd3', 'abcd4']
+      )
     })
 
     test('includes provisional grade ids', async () => {
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
-      deepEqual(grades.map(grade => grade.grade), ['A', 'B', 'C', 'B-'])
+      deepEqual(
+        grades.map(grade => grade.grade),
+        ['A', 'B', 'C', 'B-']
+      )
     })
 
     test('includes provisional grade grades', async () => {
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
-      deepEqual(grades.map(grade => grade.grade), ['A', 'B', 'C', 'B-'])
+      deepEqual(
+        grades.map(grade => grade.grade),
+        ['A', 'B', 'C', 'B-']
+      )
     })
 
     test('includes provisional grade scores', async () => {
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
-      deepEqual(grades.map(grade => grade.score), [10, 9, 8, 8.9])
+      deepEqual(
+        grades.map(grade => grade.score),
+        [10, 9, 8, 8.9]
+      )
     })
 
     test('sets selection state on provisional grades', async () => {
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
-      deepEqual(grades.map(grade => grade.selected), [false, false, true, false])
+      deepEqual(
+        grades.map(grade => grade.selected),
+        [false, false, true, false]
+      )
     })
 
     test('includes associated student id', async () => {
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
-      deepEqual(grades.map(grade => grade.studentId), ['1111', '1112', '1112', '1114'])
+      deepEqual(
+        grades.map(grade => grade.studentId),
+        ['1111', '1112', '1112', '1114']
+      )
     })
 
     test('uses anonymous id for associated students when anonymous', async () => {
@@ -254,17 +276,18 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
       }
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
-      deepEqual(grades.map(grade => grade.studentId), ['abcd1', 'abcd2', 'abcd2', 'abcd4'])
+      deepEqual(
+        grades.map(grade => grade.studentId),
+        ['abcd1', 'abcd2', 'abcd2', 'abcd4']
+      )
     })
 
     test('calls onFailure when a request fails', async () => {
       server.unsetResponses(url)
-      server
-        .for(url)
-        .respond([
-          {status: 200, body: [studentsData[0]]},
-          {status: 500, body: {error: 'server error'}}
-        ])
+      server.for(url).respond([
+        {status: 200, body: [studentsData[0]]},
+        {status: 500, body: {error: 'server error'}}
+      ])
 
       try {
         await loadStudents()
@@ -275,12 +298,10 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
 
     test('does not send additional requests when one fails', async () => {
       server.unsetResponses(url)
-      server
-        .for(url)
-        .respond([
-          {status: 200, body: [studentsData[0]]},
-          {status: 500, body: {error: 'server error'}}
-        ])
+      server.for(url).respond([
+        {status: 200, body: [studentsData[0]]},
+        {status: 500, body: {error: 'server error'}}
+      ])
 
       try {
         await loadStudents()

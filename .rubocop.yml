@@ -104,8 +104,6 @@ Layout/DotPosition:
   EnforcedStyle: trailing
 Layout/AlignHash:
   Enabled: false
-Layout/AlignParameters:
-  Enabled: false
 Style/Lambda:
   Enabled: false
 Style/WhileUntilModifier:

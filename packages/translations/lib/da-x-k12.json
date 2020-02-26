@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Links"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Listen skjult."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Listen skjult"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Liste udvidet."
+    },
     "load_more_35d33c7": {
         "message": "Indlæs flere"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "muligheder popup"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } valgt. Listen skjult."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Valgfrit: Tilføj fag"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Brug piletasterne til at navigere indstillinger."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Bruges af skærmlæsere til at beskrive et billedes indhold"

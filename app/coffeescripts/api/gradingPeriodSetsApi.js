@@ -17,12 +17,14 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import I18n from 'i18n!gradingPeriodSetsApi'
-import DateHelper from 'jsx/shared/helpers/dateHelper'
-import gradingPeriodsApi from './gradingPeriodsApi'
 import axios from 'axios'
-import Depaginate from 'jsx/shared/CheatDepaginator'
+
 import 'jquery.instructure_misc_helpers'
+import I18n from 'i18n!gradingPeriodSetsApi'
+
+import DateHelper from 'jsx/shared/helpers/dateHelper'
+import NaiveRequestDispatch from 'jsx/shared/network/NaiveRequestDispatch'
+import gradingPeriodsApi from './gradingPeriodsApi'
 
 const listUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
@@ -76,11 +78,15 @@ export default {
   deserializeSet,
 
   list() {
-    return new Promise((resolve, reject) =>
-      Depaginate(listUrl())
+    return new Promise((resolve, reject) => {
+      const dispatch = new NaiveRequestDispatch()
+      /* eslint-disable promise/catch-or-return */
+      dispatch
+        .getDepaginated(listUrl())
         .then(response => resolve(deserializeSets(response)))
         .fail(error => reject(error))
-    )
+      /* eslint-enable promise/catch-or-return */
+    })
   },
 
   create(set) {

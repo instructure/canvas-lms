@@ -38,6 +38,14 @@ module Lti::Ims::Concerns
       value.presence
     end
 
+    def content_items
+      @content_items ||= deep_linking_jwt["#{CLAIM_PREFIX}content_items"]
+    end
+
+    def tool
+      @tool ||= @context.root_account.context_external_tools.active.find_by(developer_key: deep_linking_jwt.developer_key)
+    end
+
     class DeepLinkingJwt
       include ActiveModel::Validations
 
@@ -50,6 +58,10 @@ module Lti::Ims::Concerns
 
       def [](key)
         verified_jwt[key]
+      end
+
+      def developer_key
+        @developer_key ||= DeveloperKey.find_cached(client_id)
       end
 
       private
@@ -111,10 +123,6 @@ module Lti::Ims::Concerns
         account = @context.respond_to?(:account) ? @context.account : @context
         errors.add(:developer_key, 'Developer key inactive in context') unless developer_key.binding_on_in_account?(account)
         errors.add(:developer_key, 'Developer key inactive') unless developer_key.workflow_state == 'active'
-      end
-
-      def developer_key
-        @developer_key ||= DeveloperKey.find_cached(client_id)
       end
 
       def client_id

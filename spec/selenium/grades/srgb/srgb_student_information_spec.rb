@@ -15,14 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
+require_relative '../../helpers/gradezilla_common'
 require_relative '../pages/srgb_page'
-require_relative '../pages/gradebook_page'
+require_relative '../pages/gradezilla_cells_page'
 
 describe 'Screenreader Gradebook Student Information' do
   include_context 'in-process server selenium tests'
   include_context 'reusable_gradebook_course'
-  include GradebookCommon
+  include GradezillaCommon
 
   let(:srgb_page) { SRGB }
   let(:course_setup) do
@@ -31,6 +31,10 @@ describe 'Screenreader Gradebook Student Information' do
     assignment_5
     student_submission
     assignment_1.grade_student(student, grade: 3, grader: teacher)
+  end
+
+  before :once do
+    Account.default.enable_feature!(:new_gradebook)
   end
 
   context 'in Student Information section' do
@@ -54,8 +58,8 @@ describe 'Screenreader Gradebook Student Information' do
       srgb_page.select_student(student)
       expect(srgb_page.final_grade.text).to eq("30% (3 / 10 points)")
       expect(srgb_page.assign_subtotal_grade.text).to eq("30% (3 / 10)")
-      expect_new_page_load { srgb_page.switch_to_default_gradebook_link.click }
-      expect(Gradebook.cell_graded?("30%", 4, 0)).to be true
+      expect_new_page_load { srgb_page.switch_to_default_gradebook }
+      expect(Gradezilla::Cells.get_total_grade(student)).to eq('30%')
     end
 
     context 'displays no points possible warning' do

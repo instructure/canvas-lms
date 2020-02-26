@@ -33,7 +33,6 @@ describe "Gradezilla - post grades to SIS" do
   end
 
   before(:each) do
-    Account.default.set_feature_flag!('new_gradebook', 'on')
     user_session(@teacher)
   end
 

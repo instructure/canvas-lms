@@ -379,13 +379,14 @@ class RCEWrapper extends React.Component {
       width = `${fileMetaProps.name.length}rem`
       height = '1rem'
     }
+    // this used to be an image with src="data:image/gif...", but it got autosaved as src="blob:"
+    // which cannot be restored. Now it doesn't delete with one click of BS, but that should
+    // only be necessary if the upload fails, and we should take care of that for the user anyway.
     const markup = `
-    <img
-      alt="${formatMessage('Loading...')}"
-      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+    <div
       data-placeholder-for="${fileMetaProps.name}"
-      style="width: ${width}; height: ${height}; border: solid 1px #8B969E;"
-    />`
+      style="width: ${width}; height: ${height}; border: solid 1px #8B969E; background: #c2c2c2; display:inline-block; padding:5px 0 0 5px"
+    >${formatMessage('Loading...')}</div>`
 
     this.insertCode(markup)
   }
@@ -740,10 +741,12 @@ class RCEWrapper extends React.Component {
         this.doAutoSave(e)
       })
 
+      this.cleanupAutoSave()
+
       try {
         const autosaved = this.getAutoSaved(this.autoSaveKey)
         if (autosaved && autosaved.content) {
-          if (autosaved.content !== editor.getContent({format: 'raw', no_events: true})) {
+          if (autosaved.content !== editor.getContent({no_events: true})) {
             this.setState({
               confirmAutoSave: true,
               autoSavedContent: autosaved.content
@@ -752,8 +755,9 @@ class RCEWrapper extends React.Component {
             this.storage.removeItem(this.autoSaveKey)
           }
         }
-      } finally {
-        this.cleanupAutoSave()
+      } catch (ex) {
+        // log and ignore
+        console.error('Failed initializing rce autosave', ex)
       }
     }
   }
@@ -780,7 +784,7 @@ class RCEWrapper extends React.Component {
     this.setState({confirmAutoSave: false}, () => {
       const editor = this.mceInstance()
       if (ans) {
-        editor.setContent(this.state.autoSavedContent, {format: 'raw'})
+        editor.setContent(this.state.autoSavedContent, {})
       }
       this.storage.removeItem(this.autoSaveKey)
     })
@@ -824,7 +828,7 @@ class RCEWrapper extends React.Component {
       return
     }
 
-    const content = editor.getContent({format: 'raw', no_events: true})
+    const content = editor.getContent({no_events: true})
     try {
       this.storage.setItem(
         this.autoSaveKey,

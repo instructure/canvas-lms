@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "الارتباطات"
     },
+    "list_collapsed_9ac35920": {
+        "message": "تم طي القائمة."
+    },
+    "list_collapsed_dde87718": {
+        "message": "تم طي القائمة"
+    },
+    "list_expanded_efec2d0": {
+        "message": "تم توسيع القائمة."
+    },
     "load_more_35d33c7": {
         "message": "تحميل المزيد"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "النافذة المنبثقة للفرص"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "تم تحديد { option }. تم طي القائمة."
     },
     "optional_add_course_ef0d70fc": {
         "message": "اختياري: إضافة مساق"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "استخدم مفاتيح الأسهم للتنقل بين الخيارات."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "يستخدم بواسطة أدوات قراءة الشاشة لوصف محتوى الصور"

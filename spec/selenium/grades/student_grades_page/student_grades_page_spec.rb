@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
+require_relative '../../helpers/gradezilla_common'
 require_relative '../pages/student_grades_page'
 
 describe "gradebook - logged in as a student" do

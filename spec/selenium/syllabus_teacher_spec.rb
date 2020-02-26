@@ -24,7 +24,7 @@ describe "course syllabus" do
   include FilesCommon
 
   def add_assignment(title, points)
-    #assignment data
+    # assignment data
     assignment = assignment_model({
                                       :course => @course,
                                       :title => title,
@@ -85,7 +85,7 @@ describe "course syllabus" do
     it "should validate Jump to Today works on the mini calendar", priority:"1", test_id: 237017 do
       2.times { f('.next_month_link').click }
       f('.jump_to_today_link').click
-      expect(f('.mini_month .today')).to have_attribute('id', "mini_day_#{Time.now.strftime('%Y_%m_%d')}")
+      expect(f('.mini_month .today')).to have_attribute('id', "mini_day_#{Time.zone.now.strftime('%Y_%m_%d')}")
     end
 
     describe "Accessibility" do
@@ -93,58 +93,6 @@ describe "course syllabus" do
         skip('see CNVS-39931')
         f('.edit_syllabus_link').click
         check_element_has_focus(f('.jump_to_today_link'))
-      end
-    end
-  end
-
-  context "syllabus course summary option" do
-    before :once do
-      course_with_teacher :active_all => true
-    end
-
-    before :each do
-      user_session @teacher
-    end
-
-    context "feature off" do
-      it "does not show the option" do
-        get "/courses/#{@course.id}/assignments/syllabus"
-        f('.edit_syllabus_link').click
-        wait_for_dom_ready
-        expect(f('#edit_course_syllabus_form')).not_to contain_css('#course_syllabus_course_summary')
-      end
-    end
-
-    context "feature on" do
-      before :once do
-        Account.site_admin.enable_feature! :syllabus_course_summary_option
-      end
-
-      it "toggles the course summary off" do
-        get "/courses/#{@course.id}/assignments/syllabus"
-        expect(f('#content')).to contain_css('#syllabusContainer')
-
-        f('.edit_syllabus_link').click
-        wait_for_dom_ready
-        expect(is_checked('#course_syllabus_course_summary')).to eq true
-        f('label[for="course_syllabus_course_summary"]').click
-        expect_new_page_load { find_button("Update Syllabus").click }
-        expect(f('#content')).not_to contain_css('#syllabusContainer')
-      end
-
-      it "toggles the course summary on" do
-        @course.syllabus_course_summary = false
-        @course.save!
-
-        get "/courses/#{@course.id}/assignments/syllabus"
-        expect(f('#content')).not_to contain_css('#syllabusContainer')
-
-        f('.edit_syllabus_link').click
-        wait_for_dom_ready
-        expect(is_checked('#course_syllabus_course_summary')).to eq false
-        f('label[for="course_syllabus_course_summary"]').click
-        expect_new_page_load { find_button("Update Syllabus").click }
-        expect(f('#content')).to contain_css('#syllabusContainer')
       end
     end
   end

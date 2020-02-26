@@ -536,6 +536,15 @@
     "links_14b70841": {
         "message": "Dolenni"
     },
+    "list_collapsed_9ac35920": {
+        "message": "Rhestr wedi crebachu."
+    },
+    "list_collapsed_dde87718": {
+        "message": "Rhestr wedi crebachu"
+    },
+    "list_expanded_efec2d0": {
+        "message": "Rhestr wedi ehangu."
+    },
     "load_more_35d33c7": {
         "message": "Llwytho Mwy"
     },
@@ -685,6 +694,9 @@
     },
     "opportunities_popup_f6703842": {
         "message": "neidlen cyfleoedd"
+    },
+    "option_selected_list_collapsed_e00180ff": {
+        "message": "{ option } wedi dewis. Rhestr wedi crebachu."
     },
     "optional_add_course_ef0d70fc": {
         "message": "Dewisol: Ychwanegu Cwrs"
@@ -1003,6 +1015,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "use_arrow_keys_to_navigate_options_2021cc50": {
+        "message": "Defnyddiwch fysellau saeth i symud drwy''r opsiynau."
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Yn cael ei ddefnyddio gan ddarllenwyr sgrin i ddisgrifio cynnwys delwedd"

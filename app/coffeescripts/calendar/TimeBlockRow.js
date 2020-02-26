@@ -45,7 +45,7 @@ export default class TimeBlockRow {
     this.$end_time = this.$row.find("input[name='end_time']")
 
     const $date_field = this.$date.date_field({
-      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))}
+      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
     })
     $date_field.change(this.validate)
     this.$start_time.time_field().change(this.validate)

@@ -53,19 +53,9 @@ QUnit.module('SimilarityScore', moduleHooks => {
       ok($container.querySelector('a').href.includes('/my_superlative_report'))
     })
 
-    test('shows a "certified" icon when the similarity score is below 20%', () => {
-      mountComponent({similarityScore: 10})
-      ok($container.querySelector('svg[name=IconCertified]'))
-    })
-
-    test('shows a half-full circle icon when the similarity score is between 20% and 60%', () => {
-      mountComponent({similarityScore: 40})
+    test('displays an icon corresponding to the passed-in similarity data', () => {
+      mountComponent()
       ok($container.querySelector('svg[name=IconOvalHalf]'))
-    })
-
-    test('shows a filled circle icon when the similarity score is above 60%', () => {
-      mountComponent({similarityScore: 70})
-      ok($container.querySelector('svg[name=IconEmpty]'))
     })
   })
 

@@ -20,14 +20,9 @@ import React, {PureComponent} from 'react'
 import {bool, number, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-layout'
-import {
-  IconCertifiedSolid,
-  IconEmptySolid,
-  IconOvalHalfLine,
-  IconClockLine,
-  IconWarningLine
-} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-elements'
+
+import SimilarityIcon from './SimilarityIcon'
 
 import I18n from 'i18n!gradezilla'
 
@@ -42,23 +37,15 @@ export default class SimilarityScore extends PureComponent {
   render() {
     const {hasAdditionalData, reportUrl, similarityScore, status} = this.props
 
-    let statusIcon
     let statusMessage
     if (status === 'error') {
-      statusIcon = <IconWarningLine size="x-small" />
       statusMessage = I18n.t(
         'Error submitting to plagiarism service. You may resubmit from SpeedGrader.'
       )
     } else if (status === 'pending') {
-      statusIcon = <IconClockLine size="x-small" />
       statusMessage = I18n.t('Submission is being processed by plagiarism service.')
-    } else if (similarityScore > 60) {
-      statusIcon = <IconEmptySolid color="error" />
-    } else if (similarityScore > 20) {
-      statusIcon = <IconOvalHalfLine color="error" />
-    } else {
-      statusIcon = <IconCertifiedSolid color="success" />
     }
+    const statusIcon = <SimilarityIcon similarityScore={similarityScore} status={status} />
 
     const displayScore = I18n.n(similarityScore, {precision: 1})
     return (

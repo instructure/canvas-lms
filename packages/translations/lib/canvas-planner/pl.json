@@ -112,6 +112,9 @@
     "message": "{ items } ukończył(a) { items, plural,\n     =1 {element}\n  other {elementy}\n}"
   },
   "late_2be42b88": { "message": "Późno" },
+  "list_collapsed_9ac35920": { "message": "Lista zwinięta." },
+  "list_collapsed_dde87718": { "message": "Lista zwinięta" },
+  "list_expanded_efec2d0": { "message": "Rozszerzono listę." },
   "load_more_a36f9cf9": { "message": "Załaduj więcej" },
   "load_prior_dates_f2b0f6f0": { "message": "Wczytaj wcześniejsze daty" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -165,6 +168,9 @@
   },
   "opportunities_popup_f6703842": {
     "message": "okienko wyskakujące z okazjami"
+  },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "Wybrano { option }. Lista zwinięta."
   },
   "optional_add_course_ef0d70fc": { "message": "Opcjonalnie: Dodaj kurs" },
   "page_50c4823d": { "message": "Strona" },
@@ -223,6 +229,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Jutro o godz. { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Nie można oznaczyć jako ukończone."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Użyj klawiszy strzałek do nawigowania po opcjach."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Wczoraj o godz. { date }" },
   "yesterday_c6bd6abf": { "message": "Wczoraj" },

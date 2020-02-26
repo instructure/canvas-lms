@@ -46,11 +46,71 @@ const defaultProps = () => ({
       displayed: true
     }
   ],
+  modifyPermissions: () => {},
   setAndOpenRoleTray: () => {},
   setAndOpenPermissionTray: () => {},
   permissions: [
     {permission_name: 'permission_1', label: 'Permission 1', contextType: COURSE, displayed: true},
     {permission_name: 'permission_2', label: 'Permission 2', contextType: COURSE, displayed: true}
+  ]
+})
+
+const granularPermissionProps = () => ({
+  roles: [
+    {
+      id: '1',
+      label: 'Role 1',
+      base_role_type: 'lead',
+      permissions: {
+        granular_1: {
+          enabled: true,
+          explicit: true,
+          group: 'granular_permission_group',
+          locked: false,
+          readonly: false
+        },
+        granular_2: {
+          enabled: true,
+          explicit: true,
+          group: 'granular_permission_group',
+          locked: false,
+          readonly: false
+        },
+        granular_permission_group: {
+          built_from_granular_permissions: true,
+          enabled: true,
+          explicit: true,
+          locked: false,
+          readonly: false
+        }
+      },
+      displayed: true
+    }
+  ],
+  modifyPermissions: () => {},
+  setAndOpenRoleTray: () => {},
+  setAndOpenPermissionTray: () => {},
+  permissions: [
+    {
+      permission_name: 'granular_permission_group',
+      label: 'Grouped Granular Permission',
+      contextType: COURSE,
+      displayed: true,
+      granular_permissions: [
+        {
+          permission_name: 'granular_1',
+          label: 'Granular 1',
+          granular_permission_group: 'granular_permission_group',
+          granular_permission_group_label: 'Grouped Permission Label'
+        },
+        {
+          permission_name: 'granular_2',
+          label: 'Granular 2',
+          granular_permission_group: 'granular_permission_group',
+          granular_permission_group_label: 'Grouped Permission Label'
+        }
+      ]
+    }
   ]
 })
 
@@ -76,4 +136,26 @@ it('calls setAndOpenPermissionTray on clicking one of the side headers', () => {
   expect(node).toHaveLength(1)
   node.at(0).simulate('click')
   expect(setAndOpenPermissionTrayMock).toHaveBeenCalledWith(props.permissions[0])
+})
+
+it('displays granular permissions when the expand button is pressed', () => {
+  const props = granularPermissionProps()
+  const tree = shallow(<PermissionsTable {...props} />)
+  const expand_button = tree.find('[data-testid="expand_granular_permission_group"]')
+  expect(expand_button).toHaveLength(1)
+  expand_button.at(0).simulate('click')
+
+  const table_permissions = tree.find('.ic-permissions__left-header__col-wrapper')
+  expect(table_permissions).toHaveLength(3)
+
+  const button1 = table_permissions.at(0)
+  const button2 = table_permissions.at(1)
+  const button3 = table_permissions.at(2)
+
+  // Rendering the expand button and the permission name here, why it looks wierd
+  expect(button1.render().text()).toEqual(
+    'Expand Grouped Granular PermissionGrouped Granular Permission'
+  )
+  expect(button2.render().text()).toEqual('Granular 1')
+  expect(button3.render().text()).toEqual('Granular 2')
 })

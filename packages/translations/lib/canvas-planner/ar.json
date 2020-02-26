@@ -106,6 +106,9 @@
     "message": "{ items } أكمل { items, plural,\n     =1 {عنصر}\n  other {من العناصر}\n}"
   },
   "late_2be42b88": { "message": "متأخر" },
+  "list_collapsed_9ac35920": { "message": "تم طي القائمة." },
+  "list_collapsed_dde87718": { "message": "تم طي القائمة" },
+  "list_expanded_efec2d0": { "message": "تم توسيع القائمة." },
   "load_more_a36f9cf9": { "message": "تحميل المزيد" },
   "load_prior_dates_f2b0f6f0": { "message": "تحميل تواريخ سابقة" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -156,6 +159,9 @@
     "message": "*إظهار أحدث فترة تقييم فقط."
   },
   "opportunities_popup_f6703842": { "message": "النافذة المنبثقة للفرص" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "تم تحديد { option }. تم طي القائمة."
+  },
   "optional_add_course_ef0d70fc": { "message": "اختياري: إضافة مساق" },
   "page_50c4823d": { "message": "صفحة" },
   "peer_review_74f26a13": { "message": "المراجعة النظيرة" },
@@ -211,6 +217,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "غدًا الساعة { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "يتعذر وضع علامة مكتمل."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "استخدم مفاتيح الأسهم للتنقل بين الخيارات."
   },
   "yesterday_at_date_1aa6d18e": { "message": "أمس الساعة { date }" },
   "yesterday_c6bd6abf": { "message": "أمس" },

@@ -58,6 +58,98 @@ describe RoleOverridesController do
     expect(@account.roles.where(name: 'NewRole').first).to be_inactive
   end
 
+  describe 'update' do
+    before :each do
+      @role_name = 'NewRole'
+      @permission = 'read_reports'
+      @role = @account.roles.build(:name => @role_name)
+      @role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
+      @role.workflow_state = 'active'
+      @role.save!
+    end
+
+    def update_permissions(permissions)
+      put('update', params: {account_id: @account.id, id: @role.id, permissions: permissions})
+    end
+
+    it 'should let you update a permission' do
+      update_permissions({@permission => { enabled: true, explicit: true }})
+      override = RoleOverride.last
+      expect(override.permission).to eq @permission
+      expect(override.role_id).to eq @role.id
+      expect(override.enabled).to eq true
+    end
+
+    it 'should return an error if the updated permission is invalid' do
+      resp = update_permissions({@permission => { applies_to_descendants: false, applies_to_self: false }})
+      expect(resp.status).to eq 400
+      expect(resp.body).to include("Permission must be enabled for someone")
+      expect(RoleOverride.count).to eq 0
+    end
+
+    it 'should not commit any changes if any permission update fails' do
+      updates = {
+        manage_students: { enabled: true, explicit: true },
+        read_reports: { applies_to_descendants: false, applies_to_self: false },
+      }
+      resp = update_permissions(updates)
+      expect(resp.status).to eq 400
+      expect(resp.body).to include("Permission must be enabled for someone")
+      expect(RoleOverride.count).to eq 0
+    end
+
+    describe 'grouped permissions' do
+      before :each do
+        @account.root_account.enable_feature!(:granular_permissions_wiki_pages)
+        @grouped_permission = 'manage_wiki'
+        @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
+      end
+
+      it 'should update all permissions in a group' do
+        update_permissions({@grouped_permission => { enabled: true, explicit: true }})
+        expect(RoleOverride.count).to eq 3
+        expect(RoleOverride.pluck(:permission)).to match_array @granular_permissions
+        expect(RoleOverride.pluck(:role_id)).to match_array Array.new(3, @role.id)
+        expect(RoleOverride.pluck(:enabled)).to match_array Array.new(3, true)
+      end
+
+      it 'should allow locking all permissions in a group' do
+        update_permissions({@grouped_permission => { locked: true }})
+        expect(RoleOverride.count).to eq 3
+        expect(RoleOverride.pluck(:locked)).to match_array Array.new(3, true)
+      end
+
+      it 'should allow updating an individual permissions that belongs to a group' do
+        update_permissions({@granular_permissions[0] => { enabled: true, explicit: true }})
+        expect(RoleOverride.count).to eq 1
+
+        override = RoleOverride.last
+        expect(override.permission).to eq @granular_permissions[0]
+        expect(override.role_id).to eq @role.id
+        expect(override.enabled).to eq true
+      end
+
+      it 'should not allow locking an individual permissions that belongs to a group' do
+        resp = update_permissions({@granular_permissions[0] => { locked: true }})
+        expect(resp.status).to eq 400
+        expect(resp.body).to include("Cannot change locked status on granular permission")
+        expect(RoleOverride.count).to eq 0
+      end
+
+      it 'should handle updating a group and individual permission in the same group in one request' do
+        updates = {
+          @grouped_permission => { enabled: true, explicit: true },
+          @granular_permissions[0] => { enabled: false, explicit: true },
+        }
+        update_permissions(updates)
+        expect(RoleOverride.count).to eq 3
+        expect(RoleOverride.pluck(:permission)).to match_array @granular_permissions
+        expect(RoleOverride.pluck(:role_id)).to match_array Array.new(3, @role.id)
+        expect(RoleOverride.pluck(:enabled)).to match_array [true, true, false]
+      end
+    end
+  end
+
   describe "create" do
     before :each do
       @role_name = 'NewRole'
@@ -230,6 +322,30 @@ describe RoleOverridesController do
           get 'index', params: {:account_id => @account.id}
           expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first.dig(:permissions).keys).to include(:manage_developer_keys)
           expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys}).to eq true
+        end
+      end
+
+      context 'with granular permissions' do
+        before :each do
+          @account.root_account.enable_feature!(:granular_permissions_wiki_pages)
+          @grouped_permission = 'manage_wiki'
+          @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
+        end
+
+        it 'sets granular permissions information in the js_env' do
+          get 'index', params: {:account_id => @account.id}
+
+          wiki_permissions = []
+          [:ACCOUNT_PERMISSIONS, :COURSE_PERMISSIONS].each do |js_env_key|
+            assigns[:js_env][js_env_key].each_with_object(wiki_permissions) do |permission_group, list|
+              permission_group[:group_permissions].each do |permission|
+                list << permission if permission[:permission_name].to_s.start_with?("manage_wiki")
+              end
+            end
+          end
+
+          expect(wiki_permissions.map { |p| p[:granular_permission_group] }.uniq).to eq ['manage_wiki']
+          expect(wiki_permissions.map { |p| p[:granular_permission_group_label] }.uniq).to eq ['Manage Pages']
         end
       end
     end

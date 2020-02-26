@@ -1,8 +1,7 @@
 <%= t "New Topic for %{course}", :course => asset.context.name %>
 <%= asset.title %>
 
-<% available_from = asset.available_from_for(user) %>
-<% if available_from && available_from > Time.now.utc %>
+<% if !asset.available_for?(user, :check_policies => true) %>
     <%= t("Content not available") %>
 <% else %>
     <%= HtmlTextHelper.strip_and_truncate(asset.message, :max_length => 50) %>

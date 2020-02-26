@@ -358,6 +358,60 @@ describe "/gradebooks/grade_summary" do
         end
       end
     end
+
+    context "when the New Gradebook Plagiarism Indicator feature is enabled" do
+      before(:each) do
+        course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
+        assignment.submit_homework(student, submission_type: "online_text_entry", body: "hi")
+
+        assign(:presenter, presenter)
+        assign(:current_user, teacher)
+      end
+
+      let(:assignment) { course.assignments.create!(submission_types: 'online_upload') }
+      let(:submission) { assignment.submission_for_student(student) }
+      let(:presenter) { GradeSummaryPresenter.new(course, teacher, student.id) }
+      let(:icon_css_query) { "i.icon-empty" }
+
+      let(:turnitin_data) do
+        {
+          "submission_#{submission.id}" => {
+            similarity_score: 80.0,
+            web_overlap: 5.0,
+            publication_overlap: 0.0,
+            student_overlap: 0.0,
+            state: "failure",
+            status: "scored"
+          }
+        }
+      end
+
+      it "displays an updated plagiarism indicator when the assignment uses Turnitin" do
+        allow(presenter).to receive(:turnitin_enabled?).and_return(true)
+        submission.update!(turnitin_data: turnitin_data)
+
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag(icon_css_query)
+      end
+
+      it "displays an updated plagiarism indicator when the assignment uses Vericite" do
+        allow(presenter).to receive(:vericite_enabled?).and_return(true)
+        submission.update!(turnitin_data: turnitin_data.merge({ provider: "vericite" }))
+
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag(icon_css_query)
+      end
+
+      it "displays an updated plagiarism indicator when the assignment has an originality report" do
+        submission.originality_reports.create!(
+          workflow_state: 'scored',
+          originality_score: 80
+        )
+
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag(icon_css_query)
+      end
+    end
   end
 
   describe "hidden indicator" do

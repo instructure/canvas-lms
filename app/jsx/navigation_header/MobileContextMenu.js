@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {string, shape, node} from 'prop-types'
-import {View} from '@instructure/ui-layout'
+import React, {useState, useCallback} from 'react'
+import I18n from 'i18n!MobileNavigation'
+import {string, node} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {List, Text} from '@instructure/ui-elements'
-import {asJson, defaultFetchOptions} from '@instructure/js-utils'
+import {Text} from '@instructure/ui-text'
+import {Grid} from '@instructure/ui-grid'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
+import useFetchApi from 'jsx/shared/effects/useFetchApi'
 import splitAssetString from 'compiled/str/splitAssetString'
 import {
   IconHomeLine,
@@ -53,7 +55,8 @@ import {
   IconPostToSisLine,
   IconAnalyticsLine,
   IconAdminLine,
-  IconHourGlassLine
+  IconHourGlassLine,
+  IconOffLine
 } from '@instructure/ui-icons'
 
 const icons = {
@@ -96,75 +99,51 @@ const icons = {
 
 const getIcon = tab => icons[tab.id] || (tab.type === 'external' ? IconLtiLine : IconEmptyLine)
 
-function ContextTab({tab, active_context_tab}) {
-  const Icon = getIcon(tab)
+function srText(tab) {
+  if (tab.hidden) return I18n.t('Disabled. Not visible to students.')
+  if (tab.unused) return I18n.t('No content. Not visible to students.')
+  return ''
+}
+
+export default function MobileContextMenu({spinner, contextType, contextId}) {
+  const [tabs, setTabs] = useState(null)
+  const [defaultContextType, defaultContextId] = splitAssetString(ENV.context_asset_string)
+
+  useFetchApi({
+    path: `/api/v1/${encodeURIComponent(contextType || defaultContextType)}/${encodeURIComponent(
+      contextId || defaultContextId
+    )}/tabs`,
+    success: useCallback(r => setTabs(r), [])
+  })
+
+  if (tabs === null) return spinner
+
+  const tabsToDisplay = tabs.filter(t => !(t.type === 'external' && t.hidden))
+
   return (
-    <List.Item>
-      <View display="block" borderWidth="0 0 small 0" padding="x-small 0">
-        <Button icon={Icon} variant="link" href={tab.html_url} fluidWidth>
-          {active_context_tab === tab.id ? <Text weight="bold">{tab.label}</Text> : tab.label}
-        </Button>
-      </View>
-    </List.Item>
+    <Grid vAlign="middle" rowSpacing="none">
+      {tabsToDisplay.map(tab => {
+        const Icon = getIcon(tab)
+        const isTabOff = tab.hidden || tab.unused
+        const isCurrentTab = ENV?.active_context_tab === tab.id
+        return (
+          <Grid.Row key={tab.id}>
+            <Grid.Col width="auto">
+              <Button icon={Icon} variant="link" href={tab.html_url}>
+                <Text weight={isCurrentTab ? 'bold' : 'normal'}>{tab.label}</Text>
+                {isTabOff && <ScreenReaderContent>{'- ' + srText(tab)}</ScreenReaderContent>}
+              </Button>
+            </Grid.Col>
+            <Grid.Col>{isTabOff && <IconOffLine />}</Grid.Col>
+          </Grid.Row>
+        )
+      })}
+    </Grid>
   )
 }
-ContextTab.propTypes = {
-  active_context_tab: string,
-  tab: shape({
-    html_url: string.isRequired,
-    label: string.isRequired,
-    id: string.isRequired
-  }).isRequired
-}
-ContextTab.defaultProps = {
-  active_context_tab: ENV && ENV.active_context_tab
-}
 
-const [contextType, contextId] = splitAssetString(ENV.context_asset_string)
-
-export default class MobileContextMenu extends React.Component {
-  static propTypes = {
-    spinner: node.isRequired,
-    contextType: string.isRequired,
-    contextId: string.isRequired
-  }
-
-  static defaultProps = {
-    contextType,
-    contextId
-  }
-
-  state = {
-    tabs: [],
-    tabsHaveLoaded: false
-  }
-
-  componentWillMount() {
-    this.fetchTabs()
-  }
-
-  async fetchTabs() {
-    const url = `/api/v1/${encodeURIComponent(this.props.contextType)}/${encodeURIComponent(
-      this.props.contextId
-    )}/tabs`
-    const storedTabs = sessionStorage.getItem(url)
-    if (storedTabs) {
-      this.setState({tabs: JSON.parse(storedTabs), tabsHaveLoaded: true})
-    }
-    const tabs = await asJson(fetch(url, defaultFetchOptions))
-    this.setState({tabs, tabsHaveLoaded: true})
-    sessionStorage.setItem(url, JSON.stringify(tabs))
-  }
-
-  render() {
-    return this.state.tabsHaveLoaded ? (
-      <List variant="unstyled">
-        {this.state.tabs.map(tab => (
-          <ContextTab key={tab.id} tab={tab} />
-        ))}
-      </List>
-    ) : (
-      this.props.spinner
-    )
-  }
+MobileContextMenu.propTypes = {
+  spinner: node.isRequired,
+  contextType: string,
+  contextId: string
 }

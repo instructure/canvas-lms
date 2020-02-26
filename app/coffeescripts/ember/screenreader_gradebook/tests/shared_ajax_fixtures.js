@@ -427,6 +427,7 @@ const assignmentGroups = [
         submission_types: ['none'],
         due_at: '2013-09-01T10:00:00Z',
         position: 9,
+        published: true,
         assignment_group_id: '2'
       }
     ]
@@ -607,7 +608,10 @@ const submissions = [
   }
 ]
 
-const sections = [{id: '1', name: 'Vampires and Demons'}, {id: '2', name: 'Slayers and Scoobies'}]
+const sections = [
+  {id: '1', name: 'Vampires and Demons'},
+  {id: '2', name: 'Slayers and Scoobies'}
+]
 
 const customColumns = [
   {
@@ -633,7 +637,10 @@ const outcomeRollupsRaw = {
   rollups: [
     {
       links: {user: '1'},
-      scores: [{links: {outcome: '1'}, score: 5}, {links: {outcome: '2'}, score: 4}]
+      scores: [
+        {links: {outcome: '1'}, score: 5},
+        {links: {outcome: '2'}, score: 4}
+      ]
     },
     {
       links: {user: '2'},
@@ -658,7 +665,7 @@ export default {
   sections,
   outcomes,
   outcome_rollups: outcomeRollups,
-  create(overrides) {
+  create() {
     window.ENV = {
       current_user_id: 1,
       context_asset_string: 'course_1',

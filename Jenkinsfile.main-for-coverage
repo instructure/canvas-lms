@@ -34,7 +34,7 @@ pipeline {
     stage('Print Env Variables') {
       steps {
         timeout(time: 20, unit: 'SECONDS') {
-          sh 'printenv | sort'
+          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
         }
       }
     }
@@ -49,28 +49,24 @@ pipeline {
             )
           }
         }
-        
-        // stage('Selenium Chrome') {
-        //   steps {
-        //     skipIfPreviouslySuccessful("selenium-chrome") {
-        //       build(
-        //         job: 'test-suites/selenium-chrome',
-        //         parameters: build_parameters
-        //       )
-        //     }
-        //   }
-        // }
 
-        // stage('Rspec') {
-        //   steps {
-        //     skipIfPreviouslySuccessful("rspec") {
-        //       build(
-        //         job: 'test-suites/rspec',
-        //         parameters: build_parameters
-        //       )
-        //     }
-        //   }
-        // }
+        stage('Selenium Chrome') {
+          steps {
+            build(
+              job: 'test-suites/selenium-chrome',
+              parameters: build_parameters
+            )
+          }
+        }
+
+        stage('Rspec') {
+          steps {
+            build(
+              job: 'test-suites/rspec',
+              parameters: build_parameters
+            )
+          }
+        }
       }
     }
   }

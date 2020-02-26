@@ -20,7 +20,6 @@ module SIS
   class UserObserverImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
 
       Enrollment.skip_touch_callbacks(:course) do
@@ -36,8 +35,6 @@ module SIS
       end
 
       User.update_account_associations(importer.users_to_update_account_associations.to_a)
-
-      @logger.debug("User Observers took #{Time.zone.now - start} seconds")
 
       importer.success_count
     end
@@ -57,8 +54,6 @@ module SIS
       end
 
       def process_user_observer(observer_id, student_id, status)
-        @logger.debug("Processing user_observer #{[observer_id, student_id, status].inspect}")
-
         raise ImportError, "No observer_id given for a user observer" if observer_id.blank?
         raise ImportError, "No user_id given for a user observer" if student_id.blank?
         raise ImportError, "Can't observe yourself user #{student_id}" if student_id == observer_id

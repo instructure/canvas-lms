@@ -73,7 +73,15 @@ describe Lti::Messages::DeepLinkingRequest do
       end
 
       it 'sets "accept_multiple to true"' do
-        expect(subject['accept_multiple']).to eq true
+        expect(subject['accept_multiple']).to eq false
+      end
+
+      context 'when "process_multiple_content_items_modules_index" is enabled' do
+        before { Account.site_admin.enable_feature!(:process_multiple_content_items_modules_index) }
+
+        it 'sets "accept_multiple to true"' do
+          expect(subject['accept_multiple']).to eq true
+        end
       end
     end
 

@@ -1,0 +1,26 @@
+---
+new_quizzes_migration:
+  display_name: New Quizzes migration during course import/copy
+  description: Allow migration of quizzes during course copy and import
+  applies_to: RootAccount
+  state: hidden
+  beta: true
+new_quizzes_third_party_imports:
+  state: allowed
+  display_name: New Quizzes third party importing
+  description: Allow importing of third party packages into New Quizzes
+  applies_to: RootAccount
+  state: hidden
+  beta: true
+migrate_to_new_quizzes_by_default:
+  display_name: New Quizzes migration enabled by default
+  description: Sets the default option for course copy and importing to New Quizzes
+  applies_to: RootAccount
+  state: hidden
+  beta: true
+require_migration_to_new_quizzes:
+  display_name: New Quizzes migration required
+  description:  Disable New Quiz importing and migration checkboxes, defaulting them to enabled
+  applies_to: RootAccount
+  state: hidden
+  beta: true

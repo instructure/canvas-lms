@@ -32,15 +32,36 @@ const exec = promisify(require('child_process').exec)
 const yarnFile = fs.readFileSync('yarn.lock', 'utf8')
 const yarnJson = lockfile.parse(yarnFile)
 
+function isInstuiPackageSpec(packageSpec) {
+  const nonUiPackages = [
+    '@instructure/babel-plugin-themeable-styles',
+    '@instructure/canvas-theme',
+    '@instructure/command-utils',
+    '@instructure/config-loader',
+    '@instructure/debounce',
+    '@instructure/pkg-utils',
+    '@instructure/postcss-themeable-styles',
+    '@instructure/uid'
+  ]
+  return (
+    packageSpec.startsWith('@instructure/ui-') ||
+    nonUiPackages.some(name => packageSpec.match(name))
+  )
+}
+
 let versionToPutInCommitMsg
-console.log('Removing "@instructure/ui-" entries from yarn.lock and configuring package.json "resolutions" for all instUI stuff...')
+console.log(
+  'Removing InstUI entries from yarn.lock and configuring package.json "resolutions" for all instUI stuff...'
+)
 const promises = Object.keys(yarnJson.object)
-  .filter(k => k.startsWith('@instructure/ui-'))
+  .filter(k => isInstuiPackageSpec(k))
   .map(async k => {
     delete yarnJson.object[k]
     const pkgName = `@${k.split('@')[1]}`
     if (!packageJson.resolutions[pkgName]) {
-      const latestReleaseOnRegistry = versionToPutInCommitMsg = (await exec(`npm view ${pkgName} dist-tags.latest`)).stdout.trim()
+      const latestReleaseOnRegistry = (versionToPutInCommitMsg = (
+        await exec(`npm view ${pkgName} dist-tags.latest`)
+      ).stdout.trim())
       packageJson.resolutions[pkgName] = `${latestReleaseOnRegistry}`
     }
   })
@@ -52,9 +73,12 @@ Promise.all(promises).then(async () => {
   await exec(`yarn --ignore-scripts`)
   console.log('Cleaning up "resolutions" from package.json...')
   await exec(`git checkout package.json`)
+  console.log('running yarn again')
   await exec(`yarn`)
   await exec(`git add yarn.lock`)
   console.log('Commiting changes...')
   await exec(`git commit -m "upgrade instUI to ${versionToPutInCommitMsg}"`)
-  console.log(`Made a commit to upgrade instUI to ${versionToPutInCommitMsg}. You should push it to gerrit.`)
+  console.log(
+    `Made a commit to upgrade instUI to ${versionToPutInCommitMsg}. You should push it to gerrit.`
+  )
 })

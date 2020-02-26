@@ -25,3 +25,10 @@ developer_key_support_includes:
   description: |-
     Provides a flag on the Devloper Key to support Include Parameters on API requests
   applies_to: SiteAdmin
+process_multiple_content_items_modules_index:
+  state: hidden
+  display_name: Process multiple content items from course modules page
+  description: |-
+    If enabled, Canvas will allow tools to return multiple content items
+    in a single request at the course modules page
+  applies_to: SiteAdmin

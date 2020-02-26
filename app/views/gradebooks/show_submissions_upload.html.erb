@@ -1,0 +1,160 @@
+<%
+# Copyright (C) 2020 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
+  @page_title = t("%{assignment}: Submissions Uploaded", assignment: @assignment.title)
+  @comments = []
+  @ignored_files = []
+
+  @finished = @progress && @progress.workflow_state == "completed"
+  @failed = @progress && @progress.workflow_state == "failed"
+  @pending = @progress && @progress.pending?
+
+  if @progress && @progress.workflow_state == "completed"
+    @comments = @progress.results[:comments]
+    @ignored_files = @progress.results[:ignored_files]
+  end
+%>
+
+<% provide :page_title do %><%= @page_title %><% end %>
+
+<div class="TopLinks">
+  <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>" class="btn">
+    <i class="icon-arrow-left"></i>
+    <%= t("Back to Assignment") %>
+  </a>
+
+  <a href="<%= context_url(@context, :context_gradebook_url) %>" class="btn">
+    <%= t("Gradebook") %>
+  </a>
+</div>
+
+<% if @progress.nil? %>
+  <div class="NoUploads">
+    <div class="NoUploads__svg"></div>
+
+    <h2 class="Heading"><%= t("No Submissions Have Been Uploaded") %></h2>
+
+    <p><%= t('To upload some submissions for this assignment, click on the "Back to Assignment" button above.') %></p>
+  </div>
+<% else %>
+  <h2 class="Heading"><%= @page_title %></h2>
+<% end %>
+
+<% if @pending %>
+  <div class="Alert ic-flash-info">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-info"></i>
+    </div>
+
+    <p><%= t(<<-TEXT)
+      We are currently processing your files. This may take a while depending on the file size of the submissions.
+      You may navigate away from this screen and check back later by clicking on the "View Upload Status" link on
+      the assignment page, or refresh this page to see the status.
+      TEXT
+    %></p>
+  </div>
+<% elsif @failed %>
+  <div class="Alert ic-flash-error">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-no"></i>
+    </div>
+
+    <p><%= t("Oops, there was a problem re-uploading submissions. Check the zip file for issues and try again.") %></p>
+  </div>
+<% elsif @finished %>
+  <div class="Alert ic-flash-success">
+    <div class="ic-flash__icon" aria-hidden="true">
+      <i class="icon-check"></i>
+    </div>
+
+    <p><%= t(<<-TEXT)
+      Done! We took the files you uploaded and attached them with a short comment
+      to each user's submission page for this assignment. The students will get a
+      notification that a new comment was added.
+      TEXT
+    %></p>
+  </div>
+
+  <% if @comments.any? %>
+    <%
+      heading = t({
+        one: "(1) file was attached to the following user submission",
+        other: "(%{count}) files were attached to the following user submissions"
+      }, count: @comments.size)
+    %>
+
+    <h3 class="Heading"><%= heading %></h3>
+
+    <table class="ic-Table" id="student-files">
+      <thead>
+        <tr>
+          <th scope="col"><%= t('Student') %></th>
+          <th scope="col"><%= t('File') %></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @comments.each do |comment| %>
+          <tr>
+            <th scope="row">
+              <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, comment[:submission][:user_id]) %>"><%= comment[:submission][:user_name] %></a>
+            </th>
+
+            <td>
+              <% last_index = comment[:attachments].size - 1 %>
+
+              <% comment[:attachments].each_with_index do |file, index| -%>
+                <% renamed = file[:filename] != file[:display_name] %>
+
+                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, comment[:submission][:user_id], download: file[:id], comment_id: comment[:id]) %>"><%= file[:display_name] %></a><%= "," unless renamed || index == last_index %>
+
+                <% if renamed -%>
+                  <small>(<%= t("renamed from %{filename}", filename: file[:filename]) %>)</small><%= "," unless index == last_index %>
+                <%- end %>
+              <%- end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <% if @ignored_files.any? %>
+    <%
+      heading = t({
+        one: "(1) file was ignored",
+        other: "(%{count}) files were ignored"
+      }, count: @ignored_files.size)
+    %>
+
+    <h3 class="Heading"><%= heading %></h3>
+
+    <p><%= t(<<-TEXT)
+      There were some files we didn't know what to do with. They have not been
+      added to anyone's submission page.
+      TEXT
+    %></p>
+
+    <ul id="ignored-files">
+    <% @ignored_files.each do |ignored_file| %>
+      <li><%= ignored_file.match(/\/([^\/]*)\z/)[1].to_s %></li>
+    <% end %>
+    </ul>
+  <% end %>
+<% end %>

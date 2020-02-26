@@ -20,7 +20,6 @@ module SIS
   class AbstractCourseImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       AbstractCourse.process_as_sis(@sis_options) do
         yield importer
@@ -30,7 +29,6 @@ module SIS
       end
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
 
-      @logger.debug("AbstractCourses took #{Time.zone.now - start} seconds")
       importer.success_count
     end
 
@@ -47,8 +45,6 @@ module SIS
       end
 
       def add_abstract_course(abstract_course_id, short_name, long_name, status, term_id=nil, account_id=nil, fallback_account_id=nil)
-        @logger.debug("Processing AbstractCourse #{[abstract_course_id, short_name, long_name, status, term_id, account_id, fallback_account_id].inspect}")
-
         raise ImportError, "No abstract_course_id given for an abstract course" if abstract_course_id.blank?
         raise ImportError, "No short_name given for abstract course #{abstract_course_id}" if short_name.blank?
         raise ImportError, "No long_name given for abstract course #{abstract_course_id}" if long_name.blank?

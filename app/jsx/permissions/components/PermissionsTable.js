@@ -24,7 +24,11 @@ import $ from 'jquery'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
 import 'compiled/jquery.rails_flash_notifications'
 
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {IconExpandSolid, IconExpandStartSolid} from '@instructure/ui-icons'
+
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-elements'
 import {Tooltip} from '@instructure/ui-overlays'
 import {View} from '@instructure/ui-layout'
@@ -33,16 +37,10 @@ import actions from '../actions'
 import {ConnectedPermissionButton} from './PermissionButton'
 import propTypes from '../propTypes'
 
-const rowTypes = {
-  create: I18n.t('create'),
-  read: I18n.t('read'),
-  update: I18n.t('update'),
-  delete: I18n.t('delete')
-}
-
 export default class PermissionsTable extends Component {
   static propTypes = {
     roles: arrayOf(propTypes.role).isRequired,
+    modifyPermissions: func.isRequired,
     permissions: arrayOf(propTypes.permission).isRequired,
     setAndOpenRoleTray: func.isRequired,
     setAndOpenPermissionTray: func.isRequired
@@ -80,17 +78,20 @@ export default class PermissionsTable extends Component {
     this.fixScroll(leftOffset, leftScroll)
   }
 
-  toggleExpanded(id) {
-    return () => {
-      const expanded = Object.assign(this.state.expanded)
-      expanded[id] = !expanded[id]
-      if (expanded[id]) {
-        $.screenReaderFlashMessage(I18n.t('4 rows added'))
+  toggleExpanded(permission) {
+    this.setState(prevState => {
+      const expanded = {...prevState.expanded}
+      expanded[permission.permission_name] = !expanded[permission.permission_name]
+
+      const count = permission.granular_permissions.length
+      if (expanded[permission.permission_name]) {
+        $.screenReaderFlashMessage(I18n.t('%{count} rows added', {count}))
       } else {
-        $.screenReaderFlashMessage(I18n.t('4 rows removed'))
+        $.screenReaderFlashMessage(I18n.t('%{count} rows removed', {count}))
       }
-      this.setState({expanded})
-    }
+
+      return {expanded}
+    })
   }
 
   openRoleTray(role) {
@@ -145,17 +146,25 @@ export default class PermissionsTable extends Component {
   }
 
   renderLeftHeader(perm) {
+    const expanded = this.state.expanded[perm.permission_name]
+
     return (
       <th scope="row" className="ic-permissions__main-left-header" aria-label={perm.label}>
         <div className="ic-permissions__left-header__col-wrapper">
           <div className="ic-permissions__header-content">
-            {/*
-            This button is for the expanding of permissions.  When we get more granular
-            we will uncomment this to allow that functionality to still stand
-            <button onClick={this.toggleExpanded(perm.permission_name)}>
-              {this.state.expanded[perm.permission_name] ? 'v' : '>'}
-            </button>
-            */}
+            {perm.granular_permissions && (
+              <IconButton
+                data-testid={`expand_${perm.permission_name}`}
+                onClick={() => this.toggleExpanded(perm)}
+                screenReaderLabel={
+                  expanded
+                    ? I18n.t('Expand %{permission}', {permission: perm.label})
+                    : I18n.t('Shrink %{permission}', {permission: perm.label})
+                }
+              >
+                {expanded ? <IconExpandSolid /> : <IconExpandStartSolid />}
+              </IconButton>
+            )}
             <View maxWidth="17rem" as="div" padding="small">
               <Button
                 variant="link"
@@ -173,20 +182,43 @@ export default class PermissionsTable extends Component {
     )
   }
 
-  renderExapndedRows() {
-    return Object.keys(rowTypes).map(rowType => (
-      <tr key={rowType}>
+  renderExapndedRows(perm) {
+    return perm.granular_permissions.map(permission => (
+      <tr key={permission.label}>
         <th scope="row" className="ic-permissions__left-header__expanded">
           <div className="ic-permissions__left-header__col-wrapper">
             <div className="ic-permissions__header-content">
-              <Text>{rowTypes[rowType]}</Text>
+              <View maxWidth="17rem" as="div" padding="small">
+                <Button
+                  variant="link"
+                  onClick={() => this.props.setAndOpenPermissionTray(perm)}
+                  id={`permission_${permission.permission_name}`}
+                  theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+                  fluidWidth
+                >
+                  {permission.label}
+                </Button>
+              </View>
             </div>
           </div>
         </th>
         {this.props.roles.map(role => (
           <td key={role.id}>
             <div className="ic-permissions__cell-content">
-              <input type="checkbox" aria-label="toggle sub-permission" />
+              <Checkbox
+                checked={role.permissions[permission.permission_name].enabled}
+                disabled={role.permissions[permission.permission_name].readonly}
+                label={<ScreenReaderContent>{permission.label}</ScreenReaderContent>}
+                onChange={() =>
+                  this.props.modifyPermissions({
+                    enabled: !role.permissions[permission.permission_name].enabled,
+                    explicit: true,
+                    id: role.id,
+                    name: permission.permission_name
+                  })
+                }
+                value={permission.label}
+              />
             </div>
           </td>
         ))}
@@ -218,7 +250,7 @@ export default class PermissionsTable extends Component {
                 </td>
               ))}
             </tr>
-            {this.state.expanded[perm.permission_name] && this.renderExapndedRows()}
+            {this.state.expanded[perm.permission_name] && this.renderExapndedRows(perm)}
           </tbody>
         ))}
       </table>
@@ -243,6 +275,7 @@ function mapStateToProps(state, ownProps) {
 }
 
 const mapDispatchToProps = {
+  modifyPermissions: actions.modifyPermissions,
   setAndOpenRoleTray: actions.setAndOpenRoleTray,
   setAndOpenPermissionTray: actions.setAndOpenPermissionTray
 }

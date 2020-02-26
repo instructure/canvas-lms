@@ -118,6 +118,9 @@
     "message": "{ items } { items, plural,\n     =1 {ítem}\n  other {ítems}\n} completado(s)"
   },
   "late_2be42b88": { "message": "Atrasado" },
+  "list_collapsed_9ac35920": { "message": "Lista colapsada." },
+  "list_collapsed_dde87718": { "message": "Lista colapsada" },
+  "list_expanded_efec2d0": { "message": "Lista expandida." },
   "load_more_a36f9cf9": { "message": "Cargar más" },
   "load_prior_dates_f2b0f6f0": { "message": "Cargar fechas anteriores" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -172,6 +175,9 @@
   "opportunities_popup_f6703842": {
     "message": "Ventana emergente de oportunidades"
   },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } seleccionado. Lista colapsada."
+  },
   "optional_add_course_ef0d70fc": { "message": "Opcional: Agregar curso" },
   "page_50c4823d": { "message": "Página" },
   "peer_review_74f26a13": { "message": "Revisión entre pares" },
@@ -225,6 +231,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Mañana a las { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "No se puede marcar como completada."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Use las teclas de flecha para navegar entre las opciones."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Ayer a las { date }" },
   "yesterday_c6bd6abf": { "message": "Ayer" },

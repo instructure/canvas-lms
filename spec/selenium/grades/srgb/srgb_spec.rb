@@ -16,14 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../helpers/gradebook_common'
+require_relative '../../helpers/gradezilla_common'
+require_relative '../pages/gradezilla_cells_page'
 require_relative '../pages/srgb_page'
 require_relative '../pages/grading_curve_page'
 
 describe "Screenreader Gradebook" do
   include_context 'in-process server selenium tests'
   include_context 'reusable_gradebook_course'
-  include GradebookCommon
+  include GradezillaCommon
 
   let(:default_gradebook) { "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2" }
   let(:button_type_submit) { f('.button_type_submit') }
@@ -34,6 +35,10 @@ describe "Screenreader Gradebook" do
   let(:grading_value) { f('.grading_value') }
   let(:gradebook_cell_css) { '.gradebook-cell' }
   let(:view_grading_history) { f("a[href='/courses/#{@course.id}/gradebook/history']") }
+
+  before :once do
+    Account.default.enable_feature!(:new_gradebook)
+  end
 
   def active_element
     driver.switch_to.active_element
@@ -173,8 +178,8 @@ describe "Screenreader Gradebook" do
     button_type_submit.click
 
     get default_gradebook
-    grade = gradebook_column_array(gradebook_cell_css)
-    expect(grade.count assign1_default_points.to_s).to eq(num_of_students)
+    expect(Gradezilla::Cells.get_grade(@students[0], @assign1)).to eq('1')
+    expect(Gradezilla::Cells.get_grade(@students[1], @assign1)).to eq('1')
   end
 
   it 'can select an assignment', priority: '1', test_id: 163998 do
@@ -256,9 +261,6 @@ describe "Screenreader Gradebook" do
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'true')
-
-    get default_gradebook
-    expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).to have_class 'muted'
   end
 
   it 'can unmute assignments', priority: '1', test_id: 288859 do
@@ -274,9 +276,6 @@ describe "Screenreader Gradebook" do
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
     expect(f('.student_assignment.editable')).to have_attribute('data-muted', 'false')
-
-    get default_gradebook
-    expect(fj('.slick-header-columns .slick-header-column:eq(2) a')).not_to have_class 'muted'
   end
 
   it 'can message students who... ', priority: '1', test_id: 164002 do
@@ -298,17 +297,6 @@ describe "Screenreader Gradebook" do
 
     assignment.grade_student(@students[0], grade: 15, grader: @teacher)
     assignment.grade_student(@students[1], grade: 5, grader: @teacher)
-    get default_gradebook
-    f('a.assignment_header_drop').click
-    ff('.gradebook-header-menu a').find{|a| a.text == "Assignment Details"}.click
-
-    data = [
-      'Average Score: 10',
-      'High Score: 15',
-      'Low Score: 5',
-      'Total Graded Submissions: 2 submissions'
-    ]
-    expect(f('#assignment-details-dialog-stats-table').text.split(/\n/)).to eq data
 
     SRGB.visit(@course.id)
     click_option '#student_select', @students[0].name
@@ -324,16 +312,6 @@ describe "Screenreader Gradebook" do
 
     before(:each) do
       user_session(@teacher)
-    end
-
-    it "switches to srgb", priority: '1', test_id: 615682 do
-      get "/courses/#{@course.id}/gradebook"
-      f("#change_gradebook_version_link_holder").click
-      expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
-      refresh_page
-      expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
-      f(".span12 a").click
-      expect(f("#change_gradebook_version_link_holder")).to be_displayed
     end
 
     it "shows sections in drop-down", priority: '1', test_id: 615680 do

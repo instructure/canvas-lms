@@ -295,7 +295,15 @@ class ViewManager extends React.Component {
           displayedAttempt: dummyNextSubmission.attempt
         }
       },
-      () => document.getElementById('view-previous-attempt-button').focus()
+      () => {
+        if (this.hasPrevSubmission()) {
+          document.getElementById('view-previous-attempt-button').focus()
+        } else {
+          document
+            .querySelector('button[data-test-id=assignments-2-assignment-toggle-details]')
+            .focus()
+        }
+      }
     )
   }
 

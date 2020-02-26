@@ -64,6 +64,24 @@ describe "CanvasHttp" do
 
       assert_requested(stubbed)
     end
+
+    it "escapes filename for multipart" do
+      url = "www.example.com/a"
+      file_contents = "file contents"
+      form_data = { "dangling\"quote.txt" => StringIO.new(file_contents) }
+
+      stubbed = stub_request(:post, url).with do |req|
+        expect(req.headers['Content-Type']).to match(%r{\Amultipart/form-data})
+        expect(req.body.lines[1]).to match('Content-Disposition: form-data; name="dangling%22quote.txt"; filename="dangling%22quote.txt"')
+        expect(req.body.lines[2]).to match('Content-Transfer-Encoding: binary')
+        expect(req.body.lines[3]).to match('Content-Type: text/plain')
+        expect(req.body.lines[5]).to match('file contents')
+      end.to_return(:status => 200)
+
+      CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
+
+      assert_requested(stubbed)
+    end
   end
 
   describe ".get" do

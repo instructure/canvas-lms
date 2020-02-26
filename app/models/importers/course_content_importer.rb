@@ -166,7 +166,8 @@ module Importers
 
         # be very explicit about draft state courses, but be liberal toward legacy courses
         if course.wiki.has_no_front_page
-          if migration.for_course_copy? && (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
+          if migration.for_course_copy? && !migration.for_master_course_import? &&
+              (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
             mig_id = migration.content_export.create_key(source.wiki.front_page)
             if new_front_page = course.wiki_pages.where(migration_id: mig_id).first
               course.wiki.set_front_page_url!(new_front_page.url)

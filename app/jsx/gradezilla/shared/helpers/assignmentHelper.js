@@ -16,30 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-
-function uniqueEffectiveDueDates(assignment) {
-  const dueDates = _.map(assignment.effectiveDueDates, dueDateInfo => {
-    const dueAt = dueDateInfo.due_at
-    return dueAt ? new Date(dueAt) : dueAt
-  })
-
-  return _.uniq(dueDates, date => (date ? date.toString() : date))
-}
-
-function getDueDateFromAssignment(assignment) {
-  if (assignment.due_at) {
-    return new Date(assignment.due_at)
-  }
-
-  const dueDates = uniqueEffectiveDueDates(assignment)
-  return dueDates.length === 1 ? dueDates[0] : null
-}
-
 const assignmentHelper = {
   compareByDueDate(a, b) {
-    let aDate = getDueDateFromAssignment(a)
-    let bDate = getDueDateFromAssignment(b)
+    let aDate = a.due_at == null ? null : new Date(a.due_at)
+    let bDate = b.due_at == null ? null : new Date(b.due_at)
     const aDateIsNull = aDate === null
     const bDateIsNull = bDate === null
     if (aDateIsNull && !bDateIsNull) {
@@ -47,16 +27,6 @@ const assignmentHelper = {
     }
     if (!aDateIsNull && bDateIsNull) {
       return -1
-    }
-    if (aDateIsNull && bDateIsNull) {
-      const aHasMultipleDates = this.hasMultipleDueDates(a)
-      const bHasMultipleDates = this.hasMultipleDueDates(b)
-      if (aHasMultipleDates && !bHasMultipleDates) {
-        return -1
-      }
-      if (!aHasMultipleDates && bHasMultipleDates) {
-        return 1
-      }
     }
     aDate = +aDate
     bDate = +bDate
@@ -69,10 +39,6 @@ const assignmentHelper = {
       return aName > bName ? 1 : -1
     }
     return aDate - bDate
-  },
-
-  hasMultipleDueDates(assignment) {
-    return uniqueEffectiveDueDates(assignment).length > 1
   },
 
   getComparator(arrangeBy) {

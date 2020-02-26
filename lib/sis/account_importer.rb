@@ -20,7 +20,6 @@ module SIS
   class AccountImporter < BaseImporter
 
     def process
-      start = Time.zone.now
       importer = Work.new(@batch, @root_account, @logger)
       Account.suspend_callbacks(:update_account_associations_if_changed) do
         Account.process_as_sis(@sis_options) do
@@ -32,7 +31,6 @@ module SIS
       end
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
 
-      @logger.debug("Accounts took #{Time.zone.now - start} seconds")
       importer.success_count
     end
 
@@ -50,8 +48,6 @@ module SIS
       end
 
       def add_account(account_id, parent_account_id, status, name, integration_id)
-        @logger.debug("Processing Account #{[account_id, parent_account_id, status, name].inspect}")
-
         raise ImportError, "No account_id given for an account" if account_id.blank?
         return if @batch.skip_deletes? && status =~ /deleted/i
 

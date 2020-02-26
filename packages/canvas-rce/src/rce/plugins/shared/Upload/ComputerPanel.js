@@ -176,7 +176,9 @@ export default function ComputerPanel({
               }}
               icon={IconTrashLine}
             >
-              <ScreenReaderContent>{formatMessage('Clear selected file')}</ScreenReaderContent>
+              <ScreenReaderContent>
+                {formatMessage('Clear selected file: {filename}', {filename: theFile.name})}
+              </ScreenReaderContent>
             </Button>
           </Flex.Item>
 

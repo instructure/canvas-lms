@@ -40,6 +40,7 @@ import deparam from '../../util/deparam'
 import SisValidationHelper from '../../util/SisValidationHelper'
 import SimilarityDetectionTools from 'jsx/assignments/AssignmentConfigurationTools'
 import ModeratedGradingFormFieldGroup from 'jsx/assignments/ModeratedGradingFormFieldGroup'
+import AllowedAttemptsWithState from 'jsx/assignments/allowed_attempts/AllowedAttemptsWithState'
 import DefaultToolForm, { toolSubmissionType } from 'jsx/assignments/DefaultToolForm'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 import * as returnToHelper from '../../../jsx/shared/helpers/returnToHelper'
@@ -77,6 +78,7 @@ export default class EditView extends ValidatedFormView
   GRADED_ASSIGNMENT_FIELDS = '#graded_assignment_fields'
   EXTERNAL_TOOL_SETTINGS = '#assignment_external_tool_settings'
   DEFAULT_EXTERNAL_TOOL_CONTAINER = '#default_external_tool_container'
+  ALLOWED_ATTEMPTS_CONTAINER = '#allowed_attempts_fields'
   GROUP_CATEGORY_SELECTOR = '#group_category_selector'
   PEER_REVIEWS_FIELDS = '#assignment_peer_reviews_fields'
   EXTERNAL_TOOLS_URL = '#assignment_external_tool_tag_attributes_url'
@@ -119,6 +121,7 @@ export default class EditView extends ValidatedFormView
     els["#{EXTERNAL_TOOLS_CONTENT_TYPE}"] = '$externalToolsContentType'
     els["#{EXTERNAL_TOOLS_CONTENT_ID}"] = '$externalToolsContentId'
     els["#{DEFAULT_EXTERNAL_TOOL_CONTAINER}"] = '$defaultExternalToolContainer'
+    els["#{ALLOWED_ATTEMPTS_CONTAINER}"] = '$allowedAttemptsContainer'
     els["#{ASSIGNMENT_POINTS_POSSIBLE}"] = '$assignmentPointsPossible'
     els["#{ASSIGNMENT_POINTS_CHANGE_WARN}"] = '$pointsChangeWarning'
     els["#{CONDITIONAL_RELEASE_TARGET}"] = '$conditionalReleaseTarget'
@@ -175,7 +178,7 @@ export default class EditView extends ValidatedFormView
     ["assignment_group_id","grading_type","submission_type","submission_types",
       "points_possible","allowed_extensions","peer_reviews","peer_review_count",
       "automatic_peer_reviews","group_category_id","grade_group_students_individually",
-      "turnitin_enabled", "vericite_enabled"]
+      "turnitin_enabled", "vericite_enabled", "allowed_attempts"]
 
   handlePointsChange:(ev) =>
     ev.preventDefault()
@@ -256,6 +259,11 @@ export default class EditView extends ValidatedFormView
           if setting_from_cache == "1" || setting_from_cache == "0"
             setting_from_cache = parseInt setting_from_cache
           if setting_from_cache && (!@assignment.get(setting)? || @assignment.get(setting)?.length == 0)
+            @assignment.set(setting, setting_from_cache)
+          # special case for allowed_attempts because it defaults to -1
+          if setting_from_cache && setting == "allowed_attempts"
+            setting_from_cache = parseInt(setting_from_cache, 10)
+            setting_from_cache = -1 if Number.isNaN(setting_from_cache)
             @assignment.set(setting, setting_from_cache)
         )
       if @assignment.submissionTypes().length == 0
@@ -340,6 +348,7 @@ export default class EditView extends ValidatedFormView
     @$peerReviewsFields.toggleAccessibly subVal != 'external_tool'
     @$similarityDetectionTools.toggleAccessibly subVal == 'online' && ENV.PLAGIARISM_DETECTION_PLATFORM
     @$defaultExternalToolContainer.toggleAccessibly subVal == 'default_external_tool'
+    @$allowedAttemptsContainer.toggleAccessibly subVal == 'online' || subVal == 'external_tool'
     if subVal == 'online'
       @handleOnlineSubmissionTypeChange()
 
@@ -355,6 +364,7 @@ export default class EditView extends ValidatedFormView
     @$groupCategoryBox = $("#{GROUP_CATEGORY_BOX}")
     @$anonymousGradingBox = $("#{ANONYMOUS_GRADING_BOX}")
     @renderModeratedGradingFormFieldGroup()
+    @renderAllowedAttempts()
     @$graderCommentsVisibleToGradersBox = $('#assignment_grader_comment_visibility')
     @$gradersAnonymousToGradersLabel = $('label[for="assignment_graders_anonymous_to_graders"]')
 
@@ -397,6 +407,7 @@ export default class EditView extends ValidatedFormView
 
     _.extend data,
       use_rce_enhancements: ENV?.use_rce_enhancements
+      assignment_attempts: ENV?.FEATURES?.assignment_attempts
       kalturaEnabled: ENV?.KALTURA_ENABLED or false
       postToSISEnabled: ENV?.POST_TO_SIS or false
       postToSISName: ENV.SIS_NAME
@@ -593,6 +604,7 @@ export default class EditView extends ValidatedFormView
     errors = @_validatePointsPossible(data, errors)
     errors = @_validatePointsRequired(data, errors)
     errors = @_validateExternalTool(data, errors)
+    errors = @_validateAllowedAttempts(data, errors)
     data2 =
       assignment_overrides: @dueDateOverrideView.getAllDates(),
       postToSIS: data.post_to_sis == '1'
@@ -700,6 +712,16 @@ export default class EditView extends ValidatedFormView
       ]
     errors
 
+  _validateAllowedAttempts: (data, errors) =>
+    return errors unless ENV?.FEATURES?.assignment_attempts
+    return errors if @lockedItems.settings # field will be disabled and not submitted
+    value = parseInt(data.allowed_attempts, 10)
+    unless value > 0 || value == -1
+      errors['allowed_attempts'] = [
+        message: I18n.t 'Number of attempts must be a number greater than 0'
+      ]
+    errors
+
   redirectAfterSave: ->
     window.location = @locationAfterSave(deparam())
 
@@ -795,3 +817,13 @@ export default class EditView extends ValidatedFormView
     formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
     mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
     ReactDOM.render(formFieldGroup, mountPoint)
+
+  renderAllowedAttempts: ->
+    return if !ENV?.FEATURES?.assignment_attempts
+    props = {
+      limited: @model.get('allowed_attempts') > 0
+      attempts: @model.get('allowed_attempts')
+      locked: !!@lockedItems.settings
+    }
+    mountPoint = document.querySelector('#allowed-attempts-target')
+    ReactDOM.render(React.createElement(AllowedAttemptsWithState, props), mountPoint)

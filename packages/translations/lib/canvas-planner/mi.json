@@ -114,6 +114,9 @@
     "message": "{ items } kua oti { items, plural,\n     =1 {tūemi}\n  other {ngā tūemi}\n}"
   },
   "late_2be42b88": { "message": "Tūreiti" },
+  "list_collapsed_9ac35920": { "message": "I hinga te rārangi." },
+  "list_collapsed_dde87718": { "message": "I hinga te rārangi" },
+  "list_expanded_efec2d0": { "message": "I whānuitia te rarangi." },
   "load_more_a36f9cf9": { "message": "whakawaha a atu" },
   "load_prior_dates_f2b0f6f0": { "message": "Uta ngā rā o mua" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -164,6 +167,9 @@
     "message": "* Ko te wā poto noa kua whakāturia."
   },
   "opportunities_popup_f6703842": { "message": "ngā wāhanga pakū-ake" },
+  "option_selected_list_collapsed_e00180ff": {
+    "message": "{ option } kua tīpakotia. I hinga te rārangi."
+  },
   "optional_add_course_ef0d70fc": { "message": "Kāre Herea: Tāpiri akoranga" },
   "page_50c4823d": { "message": "Whārangi" },
   "peer_review_74f26a13": { "message": "Hoa arotake" },
@@ -223,6 +229,9 @@
   "tomorrow_at_date_b53f2cf1": { "message": "Apopo kī { date }" },
   "unable_to_mark_as_complete_8141856d": {
     "message": "Kaore e taea te tohu kua oti."
+  },
+  "use_arrow_keys_to_navigate_options_2021cc50": {
+    "message": "Whakamahia ngā kī pere pere hei whakawhiti i nga wāhanga."
   },
   "yesterday_at_date_1aa6d18e": { "message": "Inanahi nei kī { date }" },
   "yesterday_c6bd6abf": { "message": "Inanahi" },

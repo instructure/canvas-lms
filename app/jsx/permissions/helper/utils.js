@@ -107,3 +107,44 @@ export function getSortedRoles(roles, accountAdmin) {
   }
   return orderedRoles
 }
+
+/*
+ * Takes a role and creates a new permission for any groups of granular permissions
+ * in that role, based on the permission group name.
+ */
+export function groupGranularPermissionsInRole(role) {
+  const groups = {}
+  Object.values(role.permissions).forEach(permission => {
+    const group_name = permission.group
+    if (group_name) {
+      if (!groups[group_name]) {
+        groups[group_name] = {
+          enabled: [],
+          explicit: [],
+          locked: [],
+          readonly: [],
+          granular_permissions: []
+        }
+      }
+
+      // We need to get all of hte pemrissions in a group, to determin
+      // what the button status will be for the encompasing permission
+      groups[group_name].enabled.push(permission.enabled)
+      groups[group_name].explicit.push(permission.explicit)
+      groups[group_name].locked.push(permission.locked)
+      groups[group_name].readonly.push(permission.readonly)
+      groups[group_name].granular_permissions.push(permission)
+    }
+  })
+
+  Object.entries(groups).forEach(([group_name, group]) => {
+    // TODO: enabled will need 3 states, for the partially enabled button UI
+    role.permissions[group_name] = {
+      built_from_granular_permissions: true,
+      enabled: group.enabled.some(bool => bool),
+      explicit: group.explicit.some(bool => bool),
+      locked: group.locked.every(bool => bool),
+      readonly: group.readonly.some(bool => bool)
+    }
+  })
+}
