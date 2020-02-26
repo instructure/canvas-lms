@@ -40,10 +40,14 @@ module InstFS
     end
 
     def authenticated_url(attachment, options={})
-
       query_params = { token: access_jwt(access_path(attachment), options) }
       query_params[:download] = 1 if options[:download]
       access_url(attachment, query_params)
+    end
+
+    def authenticated_metadata_url(attachment, options={})
+      query_params = { token: access_jwt(metadata_path(attachment), options) }
+      metadata_url(attachment, query_params)
     end
 
     def logout_url(user)
@@ -196,6 +200,10 @@ module InstFS
       service_url(access_path(attachment), query_params)
     end
 
+    def metadata_url(attachment, query_params)
+      service_url(metadata_path(attachment), query_params)
+    end
+
     def thumbnail_url(attachment, query_params)
       service_url(thumbnail_path(attachment), query_params)
     end
@@ -214,6 +222,10 @@ module InstFS
         res += "/#{encoded_display_name}"
       end
       res
+    end
+
+    def metadata_path(attachment)
+      "/files/#{attachment.instfs_uuid}/metadata"
     end
 
     def thumbnail_path(attachment)
