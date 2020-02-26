@@ -3333,7 +3333,7 @@ es:
       assignment_locked: "Actualmente, esta tarea está bloqueada."
       attempts: Intentos
       available_from: "Disponible desde"
-      date_time_by: "%{date} por %{time}"
+      date_time_by: "%{date} a las %{time}"
       defaults: 
         no_content: "Sin contenido"
       due: "Fecha de entrega"
@@ -22142,7 +22142,7 @@ es:
     count_minutes_ago: 
       one: "hace 1 minuto"
       other: "hace %{count} minutos"
-    due_date: "%{date} por %{time}"
+    due_date: "%{date} a las %{time}"
     event: "%{date} a las %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
