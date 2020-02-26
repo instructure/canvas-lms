@@ -10175,7 +10175,7 @@ pt:
   gradebook_csvs: 
     grades_filename: Notas
   gradebook_export_failed_reason_2b0f6c53: "Exportar livro de avaliação falhou: %{reason}"
-  gradebook_export_sort_order_bugfix_tally_219_62bfaacb: "Gradebook Export Sort Order Bugfix (Tally-219)"
+  gradebook_export_sort_order_bugfix_tally_219_62bfaacb: "Correção de erro da ordem de classificação do Boletim (Tally-219)"
   gradebook_export_started_723461b9: "Exportar livro de avaliação iniciado"
   gradebook_history_a3e8e0b4: "Histórico do livro de notas"
   gradebook_history_b03f8524: "Histórico do livro de avaliação..."
