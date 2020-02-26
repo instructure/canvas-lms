@@ -336,6 +336,25 @@ pipeline {
         }
       }
     }
+
+    stage('Dependency Check') {
+      when { expression { env.GERRIT_EVENT_TYPE == 'change-merged' } }
+      steps {
+        script {
+          def reports = load 'build/new-jenkins/groovy/reports.groovy'
+          reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
+        }
+      }
+    }
+
+    stage('Mark Build as Successful') {
+      steps {
+        script {
+          def successes = load 'build/new-jenkins/groovy/successes.groovy'
+          successes.markBuildAsSuccessful()
+        }
+      }
+    }
   }
 
   post {
@@ -348,12 +367,6 @@ pipeline {
             message: "${env.JOB_NAME} failed on merge (<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
           )
         }
-      }
-    }
-    success {
-      script {
-        def successes = load 'build/new-jenkins/groovy/successes.groovy'
-        successes.markBuildAsSuccessful()
       }
     }
     cleanup {
