@@ -10603,7 +10603,7 @@ ar:
   gradebook_and_speedgrader_will_be_inaccessible_if__4de0e869: "سيكون دفتر الدرجات وSpeedGrader غير قابل للوصول في حالة تعطيل كل من الدرجات - تحرير والدرجات - عرض كل الدرجات."
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "سيكون دفتر الدرجات وSpeedGrader غير قابل للوصول إذا كان كل من الدرجات - تحرير والدرجات - عرض كل الدرجات معطلة."
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "سيكون دفتر الدرجات وSpeedGrader غير قابل للوصول إذا كان كل من الدرجات - تحرير والدرجات - عرض كل الدرجات معطلة."
-  gradebook_context_name_9dbae5bc: "Gradebook - %{context_name}"
+  gradebook_context_name_9dbae5bc: "دفتر الدرجات - %{context_name}"
   gradebook_csvs: 
     grades_filename: الدرجات
   gradebook_export_failed_reason_2b0f6c53: "فشل تصدير دفتر الدرجات: %{reason}"
@@ -10612,12 +10612,12 @@ ar:
   gradebook_history_a3e8e0b4: "سجل دفتر الدرجات"
   gradebook_history_b03f8524: "سجل دفتر الدرجات..."
   gradebook_import_reserved_names_bugfix_apg_122_32a77a18: "إصلاح خطأ الأسماء المحجوزة في تصدير دفتر الدرجات (APG-122)"
-  gradebook_individual_view_8846598e: "Gradebook: عرض فردي"
+  gradebook_individual_view_8846598e: "دفتر الدرجات: عرض فردي"
   gradebook_performance_764d8b3d: "أداء دفتر الدرجات"
   gradebook_settings_b45c6df9: "إعدادات دفتر الدرجات"
   gradebook_settings_updated_fef63d60: "تم تحديث إعدادات دفتر الدرجات"
   gradebook_speedgrader_66cb7a6a: "دفتر الدرجات، SpeedGrader"
-  gradebook_tutorial_tray_d835c750: "علبة برنامج Gradebook التعليمي"
+  gradebook_tutorial_tray_d835c750: "علبة برنامج دفتر الدرجات التعليمي"
   gradebook_uploads: 
     errors: 
       select_an_option: "الرجاء تحديد خيار"
