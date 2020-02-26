@@ -691,6 +691,20 @@ describe SIS::CSV::CourseImporter do
       expect(importer.errors.map(&:last)).to include("Cannot associate course \"#{ac.sis_source_id}\" - is associated to another blueprint course")
     end
 
+    it "should give a warning when trying to associate to a course not in the account chain" do
+      sub_account = @account.sub_accounts.create!
+      mc2 = sub_account.courses.create!(:sis_source_id => "otheraccountmastercourse")
+      template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
+
+      ac = @account.courses.create!(:sis_source_id => "otheraccountcoursetoassociate")
+
+      importer = process_csv_data(
+        "course_id,short_name,long_name,status,blueprint_course_id",
+        "#{ac.sis_source_id},shortname,long name,active,#{mc2.sis_source_id}"
+      )
+      expect(importer.errors.map(&:last)).to include("Cannot associate course \"#{ac.sis_source_id}\" - is not in the same or lower account as the blueprint course")
+    end
+
     it "shouldn't fail if a course is already associated to the target" do
       ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
       @template.add_child_course!(ac)
