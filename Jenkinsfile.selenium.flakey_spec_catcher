@@ -86,7 +86,7 @@ def executeFlakeySpecCatcher(prefix = 'main') {
   finally {
     sh "mkdir -p tmp/$prefix"
     sh (
-      script: "docker cp \$(docker-compose ps -q flakey-spec-catcher):/usr/src/app/tmp/fsc.out ./tmp/$prefix/fsc.out",
+      script: "docker cp \$(docker-compose ps -q web):/usr/src/app/tmp/fsc.out ./tmp/$prefix/fsc.out",
       returnStatus: true
     )
     archiveArtifacts(artifacts: "tmp/$prefix/fsc.out", allowEmptyArchive: true)
