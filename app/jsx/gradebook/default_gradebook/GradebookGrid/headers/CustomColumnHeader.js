@@ -32,7 +32,7 @@ export default class CustomColumnHeader extends ColumnHeader {
     return (
       <div className="Gradebook__ColumnHeaderContent">
         <span
-          className="Gradebook__ColumnHeaderDetail"
+          className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine"
           style={{textAlign: 'center', width: '100%'}}
         >
           <Text tag="span" size="x-small">

@@ -49,7 +49,11 @@ function AssignmentGroupDetail({assignmentGroup, weightedGroups}) {
     )
   }
 
-  return <span className="Gradebook__ColumnHeaderDetail">{assignmentGroup.name}</span>
+  return (
+    <span className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine">
+      {assignmentGroup.name}
+    </span>
+  )
 }
 
 AssignmentGroupDetail.propTypes = {

@@ -108,7 +108,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
               </Grid.Col>
 
               <Grid.Col textAlign="center">
-                <View className="Gradebook__ColumnHeaderDetail">
+                <View className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine">
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {I18n.t('Total')}
                   </Text>

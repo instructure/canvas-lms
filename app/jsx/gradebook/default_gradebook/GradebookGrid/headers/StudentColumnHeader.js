@@ -257,7 +257,10 @@ export default class StudentColumnHeader extends ColumnHeader {
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
             <Grid.Row>
               <Grid.Col textAlign="start">
-                <View className="Gradebook__ColumnHeaderDetail" padding="0 0 0 small">
+                <View
+                  className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine"
+                  padding="0 0 0 small"
+                >
                   <Text fontStyle="normal" size="x-small" weight="bold">
                     {I18n.t('Student Name')}
                   </Text>

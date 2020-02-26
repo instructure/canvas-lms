@@ -104,13 +104,15 @@ export default do ->
   isAdmin = =>
     _.includes(ENV.current_user_roles, 'admin')
 
+  HEADER_START_AND_END_WIDTHS_IN_PIXELS = 36
   IS_ADMIN = isAdmin()
 
   htmlDecode = (input) ->
     input && new DOMParser().parseFromString(input, "text/html").documentElement.textContent
 
   testWidth = (text, minWidth, maxWidth) ->
-    width = Math.max(TextMeasure.getWidth(text), minWidth)
+    padding = HEADER_START_AND_END_WIDTHS_IN_PIXELS * 2
+    width = Math.max(TextMeasure.getWidth(text) + padding, minWidth)
     Math.min width, maxWidth
 
   renderComponent = (reactClass, mountPoint, props = {}, children = null) ->
