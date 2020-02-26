@@ -16,11 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import NotificationSettings from '../courses/notification_settings'
+import AlertManager from '../../shared/components/AlertManager'
+import {ApolloProvider, createClient} from '../../canvas-apollo'
+import CourseNotificationSettingsQuery from './CourseNotificationSettingsQuery'
 import React from 'react'
-import ReactDom from 'react-dom'
 
-$(() => {
-  ReactDom.render(<NotificationSettings />, $('<div/>').appendTo('#content')[0])
-})
+const client = createClient()
+
+export default function NotificationSettings() {
+  return (
+    <ApolloProvider client={client}>
+      <AlertManager>
+        <CourseNotificationSettingsQuery courseId={ENV.COURSE.id} />
+      </AlertManager>
+    </ApolloProvider>
+  )
+}

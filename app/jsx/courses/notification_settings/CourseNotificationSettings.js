@@ -17,13 +17,12 @@
  */
 
 import {AlertManagerContext} from '../../shared/components/AlertManager'
-import axios from 'axios'
-import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
-import GenericErrorPage from '../../shared/components/GenericErrorPage'
+import {bool, string} from 'prop-types'
 import I18n from 'i18n!courses'
-import LoadingIndicator from '../../shared/LoadingIndicator'
+import {Mutation} from 'react-apollo'
 import PleaseWaitWristWatch from './SVG/PleaseWaitWristWatch.svg'
 import React, {Component} from 'react'
+import {UPDATE_COURSE_NOTIFICATION_PREFERENCES} from './graphqlData/Mutations'
 
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -31,110 +30,91 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 
 export default class CourseNotificationSettings extends Component {
+  static propTypes = {
+    courseId: string.isRequired,
+    enabled: bool.isRequired
+  }
+
   state = {
-    errored: false,
-    loading: true,
-    enabled: true
+    enabled: this.props.enabled
   }
 
-  componentDidMount() {
-    this.getNotificationsEnabled()
+  handleUpdateComplete(data) {
+    if (data.updateNotificationPreferences.errors) {
+      this.context.setOnFailure(I18n.t('Failed to update course notification settings'))
+      this.setState(prevState => ({enabled: !prevState.enabled}))
+    } else {
+      this.context.setOnSuccess(I18n.t('Course notification settings updated'))
+    }
   }
 
-  getNotificationsEnabled = async () => {
-    const resp = await axios.get(
-      `/api/v1/users/self/courses/${ENV.COURSE.id}/notifications_enabled`
-    )
-    this.setState({
-      errored: resp?.status !== 200,
-      loading: false,
-      enabled: resp?.data?.enabled
+  updateNotificationPreferences = mutationFunc => {
+    // optimistically toggle button
+    this.setState(prevState => {
+      mutationFunc({
+        variables: {
+          courseId: this.props.courseId,
+          enabled: !prevState.enabled
+        }
+      })
+      return {enabled: !prevState.enabled}
     })
   }
 
-  updateNotificationsEnabled = async () => {
-    // optimistically toggle button while waiting for response
-    this.setState(prevState => ({enabled: !prevState.enabled}))
-
-    try {
-      const resp = await axios.put(
-        `/api/v1/users/self/courses/${ENV.COURSE.id}/enable_notifications`,
-        {enable: !this.state.enabled}
-      )
-      if (resp?.status !== 200) {
-        this.handleError()
-        return
-      }
-
-      this.setState({
-        enabled: resp?.data?.enabled
-      })
-    } catch (error) {
-      this.handleError(error.message)
-    }
-  }
-
-  handleError = () => {
-    this.context.setOnFailure(I18n.t('Failed to update course notification settings'))
-    this.setState(prevState => ({enabled: !prevState.enabled}))
-  }
+  renderCourseNotificationSettings = mutationFunc => (
+    <Flex direction="column">
+      <Flex.Item>
+        <Heading>{I18n.t('Course Notification Settings')}</Heading>
+      </Flex.Item>
+      <Flex.Item margin="large 0 small 0" padding="xx-small">
+        <Checkbox
+          data-testid="enable-notifications-toggle"
+          label={I18n.t('Enable Notifications')}
+          size="small"
+          variant="toggle"
+          checked={this.state.enabled}
+          onChange={() => this.updateNotificationPreferences(mutationFunc)}
+        />
+      </Flex.Item>
+      <Flex.Item>
+        <Text>
+          {this.state.enabled
+            ? I18n.t(
+                'You are currently receiving notifications for this course. To disable course notifications, use the toggle above.'
+              )
+            : I18n.t(
+                'You will not receive any course notifications at this time. To enable course notifications, use the toggle above.'
+              )}
+        </Text>
+      </Flex.Item>
+      <Flex.Item margin="large 0 medium 0">
+        <div style={{textAlign: 'center'}}>
+          <Text size="large">
+            {I18n.t(
+              'Granular course notification settings will be configurable here in the future.'
+            )}
+          </Text>
+        </div>
+      </Flex.Item>
+      <Flex.Item>
+        <div style={{textAlign: 'center'}}>
+          <img alt="" src={PleaseWaitWristWatch} style={{width: '200px'}} />
+        </div>
+      </Flex.Item>
+    </Flex>
+  )
 
   render() {
-    if (this.state.loading) {
-      return <LoadingIndicator />
-    }
-
-    if (this.state.errored) {
-      return (
-        <GenericErrorPage
-          imageUrl={errorShipUrl}
-          errorSubject={I18n.t('Course Notification Settings initial query error')}
-          errorCategory={I18n.t('Course Notification Settings Error Page')}
-        />
-      )
-    }
-
     return (
-      <Flex direction="column">
-        <Flex.Item overflowY="visible">
-          <Heading>{I18n.t('Course Notification Settings')}</Heading>
-        </Flex.Item>
-        <Flex.Item margin="large 0 small 0" padding="xx-small">
-          <Checkbox
-            data-testid="enable-notifications-toggle"
-            label={I18n.t('Enable Notifications')}
-            size="small"
-            variant="toggle"
-            checked={this.state.enabled}
-            onChange={this.updateNotificationsEnabled}
-          />
-        </Flex.Item>
-        <Flex.Item>
-          <Text>
-            {this.state.enabled
-              ? I18n.t(
-                  'You are currently receiving notifications for this course. To disable course notifications, use the toggle above.'
-                )
-              : I18n.t(
-                  'You will not receive any course notifications at this time. To enable course notifications, use the toggle above.'
-                )}
-          </Text>
-        </Flex.Item>
-        <Flex.Item margin="large 0 medium 0">
-          <div style={{textAlign: 'center'}}>
-            <Text size="large">
-              {I18n.t(
-                'Granular course notification settings will be configurable here in the future.'
-              )}
-            </Text>
-          </div>
-        </Flex.Item>
-        <Flex.Item>
-          <div style={{textAlign: 'center'}}>
-            <img alt="" src={PleaseWaitWristWatch} style={{width: '200px'}} />
-          </div>
-        </Flex.Item>
-      </Flex>
+      <Mutation
+        mutation={UPDATE_COURSE_NOTIFICATION_PREFERENCES}
+        onCompleted={data => this.handleUpdateComplete(data)}
+        onError={() =>
+          this.context.setOnFailure(I18n.t('Failed to update course notification settings'))
+        }
+      >
+        {mutationFunc => this.renderCourseNotificationSettings(mutationFunc)}
+      </Mutation>
     )
   }
 }

@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import gql from 'graphql-tag'
 
-import $ from 'jquery'
-import NotificationSettings from '../courses/notification_settings'
-import React from 'react'
-import ReactDom from 'react-dom'
-
-$(() => {
-  ReactDom.render(<NotificationSettings />, $('<div/>').appendTo('#content')[0])
-})
+export const COURSE_NOTIFICATIONS_ENABLED_QUERY = gql`
+  query GetNotificationPreferences($courseId: ID!) {
+    course(id: $courseId) {
+      notificationPreferencesEnabled
+    }
+  }
+`

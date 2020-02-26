@@ -15,36 +15,57 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import axios from 'axios'
+import AlertManager from '../../../shared/components/AlertManager'
 import CourseNotificationSettings from '../CourseNotificationSettings'
+import {fireEvent, render} from '@testing-library/react'
+import {MockedProvider} from '@apollo/react-testing'
+import mockGraphqlQuery from '../../../shared/graphql_query_mock'
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {UPDATE_COURSE_NOTIFICATION_PREFERENCES} from '../graphqlData/Mutations'
 
-beforeEach(() => {
-  window.ENV = {
-    COURSE: {
-      id: 1337
-    }
-  }
-
-  jest.spyOn(axios, 'get').mockReturnValue({
-    status: 200,
-    data: {enabled: true}
+async function createGraphqlMocks() {
+  const enabledResult = await mockGraphqlQuery(UPDATE_COURSE_NOTIFICATION_PREFERENCES, [], {
+    courseId: 1,
+    enabled: true
   })
-
-  jest.spyOn(axios, 'put').mockImplementation((url, parameters) => {
-    const resp = {
-      status: 200,
-      data: parameters
-    }
-    return Promise.resolve(resp)
+  const disabledResult = await mockGraphqlQuery(UPDATE_COURSE_NOTIFICATION_PREFERENCES, [], {
+    courseId: 1,
+    enabled: false
   })
-})
+  return [
+    {
+      request: {
+        query: UPDATE_COURSE_NOTIFICATION_PREFERENCES,
+        variables: {
+          courseId: '1',
+          enabled: true
+        }
+      },
+      result: enabledResult
+    },
+    {
+      request: {
+        query: UPDATE_COURSE_NOTIFICATION_PREFERENCES,
+        variables: {
+          courseId: '1',
+          enabled: false
+        }
+      },
+      result: disabledResult
+    }
+  ]
+}
 
 describe('Course Notification Settings', () => {
-  it('renders the correct message', async () => {
-    const {findByText, findByTestId} = render(<CourseNotificationSettings />)
+  it('updates correctly', async () => {
+    const mocks = await createGraphqlMocks()
+    const {findByText, findByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <AlertManager>
+          <CourseNotificationSettings enabled courseId="1" />
+        </AlertManager>
+      </MockedProvider>
+    )
 
     expect(await findByTestId('enable-notifications-toggle')).toBeInTheDocument()
     expect(
