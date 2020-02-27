@@ -2361,7 +2361,11 @@ sv:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Gör det möjligt för användaren att se användarens SIS-ID:n på sidan Personer i en kurs."
   allows_users_to_edit_conferences_2d3c960c: "Gör det möjligt för användaren att redigera konferenser."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Tillåt användare att aktivera alternativet \"Starta SpeedGrader filtrerad efter studentgrupp\" för kurser på sidan kursinställningar. När alternativet är aktiverad och en studentgrupp har valts i nya omdömesboken, SpeedGrader läses endast studenter i den valda gruppen in."
+  allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Låter användare tysta aviseringar på kursnivå."
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Låt användare välja pronomen som visas efter deras namn i användargränssnittet."
+  allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
+      Låt användare välja pronomen som visas
+      efter deras namn i användargränssnittet.
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillåt användare med internationella telefonnummer att ta emot meddelanden från Canvas."
   alumno_88c80e37: Alumno
   always_3a59e701: Alltid
@@ -4635,6 +4639,7 @@ sv:
   cannot_be_present_when_account_id_is_present_f7d9b51f: "kan inte finnas om account_id finns"
   cannot_be_present_when_course_id_is_present_785e6a59: "kan inte finnas om course_id finns"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Det går inte att åsidosätta inlämningsdatum till ett datum i en stängd bedömningsperiod"
+  cannot_change_locked_status_on_granular_permission_6f13bf4f: "Det går inte att ändra låsstatus på en detaljerad behörighet."
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Det går inte att ändra rollnamnet till %{label}: används redan"
   cannot_change_the_default_term_name_edc2279b: "Det går inte att ändra förinställt namn för terminen"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Det går inte att ändra ett åsidosatt  inlämningsdatum i en stängd bedömningsperiod"
@@ -4716,6 +4721,7 @@ sv:
   canvas_files_889a274f: Canvas-filer
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_id_f42f6ad: Canvas-ID
+  canvas_insights_beta_view_4cf67797: "Canvas Insights (beta) – visa"
   canvas_introduction_video_2d81f3ad: "Canvas introduktionsvideo"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas försöker hämta inlämningarna. Försök igen senare."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas är inte konfigurerad för att ta emot inloggningar från %{issuer}."
@@ -5271,6 +5277,7 @@ sv:
     type_disabled_error: "Den här sortens konferens är inte längre aktiverad för den här Canvas-platsen"
   conferences_a0a8984b: Konferenser
   conferences_tutorial_tray_6f071ce2: "Självstudiefack för konferenser"
+  confetti_for_on_time_submissions_394e16ce: "Konfetti för tidsmässiga inlämningar"
   config_url_e96ceaf3: "Konfigurera URL"
   configurate_tool_app_5a721f2c: "Konfigurera %{tool} App?"
   configuration_location_ee0f6592: Konfigureringsplats
@@ -6296,6 +6303,8 @@ sv:
   count_results_displayed_ed39a0f0: 
     one: "Ett resultat visas"
     other: "%{count} resultat visas"
+  count_rows_added_dacc9daf: "%{count} tillagda rader"
+  count_rows_removed_c6ff7bc: "%{count} borttagna rader"
   count_sections_466dcd5c: 
     one: "1 sektion"
     other: "%{count} sektioner"
@@ -7128,6 +7137,7 @@ sv:
         new_announcement: "Nytt anslag"
         student_view: "Studentens vy"
         view_course_calendar: "Visa kurskalender"
+        view_course_notification_settings: "Visa kursaviseringar"
         view_course_stream: "Visa kursflöde"
       re_sending: "Skickar igen ..."
       send_done: "Klar! Meddelandet kan ta några minuter."
@@ -8326,6 +8336,9 @@ sv:
   display_totals_for_all_grading_periods_option_4a72586: "Visa totalsumma för alternativet Alla bedömningsperioder"
   display_values_f517c73c: "Visa värden"
   displaying_to_students_b1e92058: "Visa för studenter"
+  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+      Visar konfetti för användare som lämnar in en uppgift före
+      inlämningsdatumet.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Fördelning av nuvarande kursbetyg utspritt över alla anmälda elever
       i avdelningskurser
@@ -9199,6 +9212,7 @@ sv:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Ta fram listan av gruppmedlemmar för %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Förstora eller minska kalendrar"
   expand_or_collapse_undated_items_b901de09: "Förstora elle minska odaterade föremål"
+  expand_permission_b45bf097: "Expandera %{permission}"
   expand_permission_c61d5958: "Ta fram behörighet"
   expand_subdiscussion_cd226ed4: "Ta fram underdiskussion"
   expand_tutorial_tray_22630c49: "Ta fram självstudiefack"
@@ -11540,6 +11554,10 @@ sv:
         
         *Ändra inte namnet på de inlämnade filerna så att vi kan känna igen dem.*
   if_you_need_to_make_your_course_public_please_cont_7084c67b: "Om du vill föra din kurs offentlig kontaktar du din administratör/support."
+  if_you_turn_this_on_when_an_account_admin_goes_to__42e74f56: |-
+      Om du aktiverar dessa visas en kryssruta som kontoadministratörer
+      kan välja när de skapar ett globalt anslag
+      för att skicka aviseringar direkt till användaren när anslaget startar.
   if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: "Om du aktiverar dessa ser kontoadministratörer, som gått till sidan för att skapa ett globalt anslag, en kryssruta för att skicka aviseringar direkt till användare när ett anslag startar."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Om du tidigare använt något annat kurshanteringssystem har du förmodligen material där som du vill flytta över till Canvas. Vi kan vägleda dig genom processen så att du enkelt kan migrera ditt innehåll till Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "Om du vill, kan du ändra namnet ”SIS” till något som passar dina medarbetare bättre"
@@ -12607,6 +12625,7 @@ sv:
   manage_module_name_dfe16816: "Hantera %{module_name}"
   manage_name_7f55f792: "Hantera %{name}"
   manage_options_for_name_83278ad0: "Hantera alternativ för %{name}"
+  manage_pages_4d2adeb6: "Hantera sidor"
   manage_profile_pictures_40c958ce: "Hantera profilbilder"
   manage_rubrics_5d274f6a: "Hantera matriser"
   manage_snapshots_1dc4b79d: "Hantera ögonblicksbilder"
@@ -15003,6 +15022,7 @@ sv:
     students_will_see: "Studenter kommer att kunna se att den här uppgiften har tystats."
     submission_comments: Inlämningskommentarer
     sure_you_want_to_mute: "Vill du verkligen tysta den här uppgiften? Medan den här uppgiften är tystad kommer studenter inte att få nya aviseringar om eller kunna se:"
+  mute_notifications_by_course_440e18be: "Tysta aviseringar efter kurs"
   mute_unmute_assignment_62608e44: "Tysta/av-tysta uppgift"
   muted_283cfa0f: (tystad)
   muted_3ff94739: Tystad
@@ -15116,7 +15136,7 @@ sv:
   new_file_135ae520: "[Ny fil]"
   new_file_added_for_name_a5ec3156: "En ny fil har lagts till %{name}"
   new_goodies_coming_soon_15d4f7fa: "Nya godsaker kommer snart!"
-  new_gradebook_297f7e2d: "Ny bedömningsöversikt"
+  new_gradebook_297f7e2d: "Nya bedömningsöversikten"
   new_gradebook_development_f3741168: "Ny betygsboks utveckling"
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Med Ny bedömningsöversikt kan du använda nyss utgivna förbättringar av bedömningsöversikten."
   new_gradebook_history_b4367fc7: "Ny betygboks historik"
@@ -15210,7 +15230,7 @@ sv:
   no_final_grade_selected_3595c9c: "Inget slutbetyg har valts"
   no_grade_3fa326c: "inget omdöme"
   no_grade_assigned_90e531f5: "Inga betyg tilldelade."
-  no_grade_for_assignment_97c9bc75: "Inget omdöme för %{assignment}"
+  no_grade_for_assignment_97c9bc75: "Ingen omdöme för %{assignment}"
   no_grade_for_assignmenttitle_83baad53: "Inget omdöme för %{assignmentTitle}"
   no_graded_submissions_e40c957a: "Inga bedömda inlämningar"
   no_graders_with_that_name_found_d8204d90: "Inga bedömare med det namnet hittades"
@@ -16151,6 +16171,8 @@ sv:
   parent_signup_b7c6bf0a: "Registrering för förälder"
   parents_sign_up_here_f0aa8f4f: "Föräldrar registrerar sig här"
   partially_anonymous_483a892d: "Delvis anonym"
+  partially_enabled_and_locked_9a39d38a: "Delvis aktiverad och låst"
+  partially_enabled_cd506819: "Delvis aktiverad"
   participation_af2598: Deltagande
   participations_1823832d: Deltagare
   pass_2a8c4f07: godkänd
@@ -16749,6 +16771,7 @@ sv:
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points}/%{possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Möjliga poäng måste vara 0 eller mer för den valda bedömningstypen"
+  points_possible_must_be_greater_than_0_for_selecte_5708da1b: "Möjliga poäng måste vara större än 0 för den valda bedömningstypen"
   points_possible_points_fda3b111: "%{points_possible} poäng"
   points_pts_e5596bf7: "%{points} poäng"
   points_range_rating_pts_ab9c8540: "%{points}%{range_rating} poäng"
@@ -19490,9 +19513,9 @@ sv:
   score_student_points_possible_points_78360e86: "Poäng {{student_points}}/{{possible_points}}"
   score_to_keep_e89e4fa5: "Poäng att spara"
   scored_less_than_2427896c: "Fick sämre resultat än"
-  scored_less_than_cutoff_on_assignment_5f5c4303: "Poäng lägre poäng än %{cutoff} för %{assignment}"
+  scored_less_than_cutoff_on_assignment_5f5c4303: "Poäng mindre än %{cutoff} för %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "Poäng mindre än %{score} för %{assignmentTitle}"
-  scored_more_than_cutoff_on_assignment_f422fec: "Poäng högre poäng än %{cutoff} för %{assignment}"
+  scored_more_than_cutoff_on_assignment_f422fec: "Poäng högre än %{cutoff} för %{assignment}"
   scored_more_than_d1646bd5: "Fick bättre resultat än"
   scored_more_than_score_on_assignmenttitle_2afa1d32: "Poäng högre än %{score} för %{assignmentTitle}"
   screenreader_gradebook: 
@@ -19770,6 +19793,7 @@ sv:
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Se vissa LTI verktyg* som fungerar utmärkt med Canvas."
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Se några LTI-verktyg som fungerar bra med Canvas."
   see_turnitin_results_cd9d4a6c: "Se Turnitin-resultat"
+  see_vericite_results_b44dd8c8: "Se VeriCite resultat"
   select_1e849959: "[ Välj ]"
   select_a_course_4710371f: "Välj en kurs"
   select_a_grading_period_5ea50f1: "Välj en bedömningsperiod ..."
@@ -20792,6 +20816,7 @@ sv:
   showing_all_announcements_36ff0cec: "Visar alla meddelanden"
   showing_all_discussions_7e09f4b7: "Visar alla diskussioner"
   showing_all_sets_of_grading_periods_6c160874: "Visar alla uppsättningar med bedömningsperioder"
+  shrink_permission_74b01aed: "Dölj %{permission}"
   shuffle_answers_edb602b7: "Blanda svaren"
   signup_type_8b4506f3: Bokningstyp
   similarity_detection_dcada48: Likhetsidentifiering
@@ -20955,6 +20980,7 @@ sv:
   something_went_wrong_please_try_again_6d337b6c: "Nägot fick fel, vänligen försök igen."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Något gick fel. Försök att uppdatera sidan. Om problemet kvarstår kan du försöka läsa in en enskild studentgrupp i SpeedGrader via *inställningar för stor kurs*."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Någonting gick fel. Vänligen försök att uppdatera sidan. Om problemet kvarstår kan det finnas för många poster på ””%{assignmentTitle}” för att ladda SpeedGrader."
+  something_went_wrong_please_try_refreshing_the_pag_689be273: "Någonting gick fel. Vänligen försök att uppdatera sidan."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Något gick fel när användaren skulle återaktiveras. Försök igen senare."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Något gick fel när användarens roll skulle uppdateras. Försök igen senare."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Något gick fel när du försökte synkronisera betyg med studentinformationssystemet. Försök igen senare."
@@ -21525,6 +21551,7 @@ sv:
   successfully_posted_the_comment_12d95d56: "Kommentaren har publicerats"
   successfully_resubmitted_to_turnitin_c908de0f: "Inlämnad på nytt till turnitin."
   successfully_resubmitted_to_vericite_dab924b6: "Inlämnad på nytt till VeriCite."
+  successfully_saved_the_comment_c87681fd: "Kommentaren sparades"
   successfully_updated_the_comment_946360d5: "Kommentaren har uppdaterats"
   sum_of_all_files_in_mb_2b705055: "summa av alla filer i Mb"
   summary_statistics_f74852a5: Sammanfattningsstatistik
@@ -21934,6 +21961,7 @@ sv:
   there_was_a_problem_posting_the_comment_75d15646: "Det uppstod ett problem vid publicering av kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Det gick inte att publicera omdömet."
   there_was_a_problem_releasing_grades_fa0ae6: "Det gick inte att publicera omdömen."
+  there_was_a_problem_saving_the_comment_d94cbac9: "Det gick inte att spara kommentaren"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Det gick inte att spara bedömningen."
   there_was_a_problem_saving_the_grades_5e61f9e2: "Det gick inte att spara bedömningarna."
   there_was_a_problem_saving_the_grading_period_243bed6c: "Ett problem uppstod när bedömningsperioden skulle sparas"
@@ -23596,6 +23624,7 @@ sv:
   vericite_info: 
     buttons: 
       resubmit_to_vericite: "Skicka in igen till VeriCite"
+  vericite_similarity_score_more_information_7df9ea5c: "VeriCite likhetsresultat -- mer information"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Likhetspoäng – se detaljerad rapport"
   video_78335c71: video
   video_b9f27375: Video
@@ -23612,6 +23641,7 @@ sv:
   view_app_configurations_52b52441: "Visa appkonfigurationer"
   view_audit_trail_12f774b6: "Visa redovisningsspårning"
   view_ba339f93: Visa
+  view_canvas_insights_beta_fe446d71: "Visa Canvas Insights (beta)"
   view_conditional_content_settings_a2dca270: "Visa inställningar gör villkorligt innehåll"
   view_course_analytics_eefe6b2: "Visa analys av kurs"
   view_faculty_journals_ad0e8c8f: "Visa lärarjournaler"
