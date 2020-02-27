@@ -25,7 +25,7 @@ import {createCourseGradesWithGradingPeriods} from 'spec/jsx/gradebook/GradeCalc
 import SRGBController from '../../controllers/screenreader_gradebook_controller'
 import userSettings from '../../../../userSettings'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
-import * as FinalGradeOverrideApi from '../../../../../jsx/gradezilla/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
+import * as FinalGradeOverrideApi from '../../../../../jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 import 'vendor/jquery.ba-tinypubsub'
 import AsyncHelper from '../AsyncHelper'
 

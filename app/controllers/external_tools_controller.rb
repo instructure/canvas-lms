@@ -725,9 +725,14 @@ class ExternalToolsController < ApplicationController
   #   "_blank"	Launches the external tool in a new window or tab.
   #   "_self"	(Default) Launches the external tool in an iframe inside of Canvas.
   #
-  # @argument course_navigation[default] [Boolean]
-  #   Whether the navigation option will show in the course by default or
-  #   whether the teacher will have to explicitly enable it
+  # @argument course_navigation[default] [String, "disabled"|"enabled"]
+  #   If set to "disabled" the tool will not appear in the course navigation
+  #   until a teacher explicitly enables it.
+  #
+  #   If set to "enabled" the tool will appear in the course navigation
+  #   without requiring a teacher to explicitly enable it.
+  #
+  #   defaults to "enabled"
   #
   # @argument course_navigation[display_type] [String]
   #   The layout type to use when launching the tool. Must be
@@ -854,7 +859,6 @@ class ExternalToolsController < ApplicationController
   #        -F 'custom_fields[key1]=value1' \
   #        -F 'custom_fields[key2]=value2' \
   #        -F 'course_navigation[text]=Course Materials' \
-  #        -F 'course_navigation[default]=false'
   #        -F 'course_navigation[enabled]=true'
   #
   # @example_request

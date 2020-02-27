@@ -24,8 +24,7 @@ describe('contentRendering', () => {
     let link
     beforeEach(() => {
       link = {
-        href: '/some/path',
-        url: '/other/path',
+        href: '/users/2/files/17/download?verifier=xyzzy',
         title: 'Here Be Links',
         text: 'Click On Me'
       }
@@ -33,26 +32,33 @@ describe('contentRendering', () => {
 
     it('uses link data to build html', () => {
       const rendered = contentRendering.renderLink(link)
-      expect(rendered).toEqual('<a href="/some/path?wrap=1" title="Here Be Links">Click On Me</a>')
+      expect(rendered).toEqual(
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+      )
     })
 
     it('can use url if no href', () => {
+      link.url = link.href
       link.href = undefined
       const rendered = contentRendering.renderLink(link)
-      expect(rendered).toEqual('<a href="/other/path?wrap=1" title="Here Be Links">Click On Me</a>')
+      expect(rendered).toEqual(
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+      )
     })
 
     it("defaults title to 'Link'", () => {
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
-      expect(rendered).toEqual('<a href="/some/path?wrap=1" title="Link">Click On Me</a>')
+      expect(rendered).toEqual(
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Click On Me</a>'
+      )
     })
 
     it('defaults contents to title', () => {
       link.text = undefined
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/some/path?wrap=1" title="Here Be Links">Here Be Links</a>'
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Here Be Links</a>'
       )
     })
 
@@ -60,13 +66,15 @@ describe('contentRendering', () => {
       link.text = undefined
       link.title = undefined
       const rendered = contentRendering.renderLink(link)
-      expect(rendered).toEqual('<a href="/some/path?wrap=1" title="Link">Link</a>')
+      expect(rendered).toEqual(
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Link">Link</a>'
+      )
     })
 
     it('renders the link with all attributes', () => {
       const doc = {
         class: 'instructure_file_link instructure_scribd_file',
-        href: '/some/path',
+        href: '/users/2/files/17/download?verifier=xyzzy',
         target: '_blank',
         rel: 'noopener',
         text: 'somefile.pdf'
@@ -74,17 +82,25 @@ describe('contentRendering', () => {
       const rendered = contentRendering.renderLink(doc, doc.text)
       expect(rendered).toEqual(
         '<a ' +
-          'href="/some/path?wrap=1" target="_blank" rel="noopener" title="Link" ' +
+          'href="/users/2/files/17/download?verifier=xyzzy" target="_blank" rel="noopener" title="Link" ' +
           'class="instructure_file_link instructure_scribd_file">' +
           'somefile.pdf</a>'
       )
     })
 
     it('does not swizzle the url if not our host', () => {
-      link.href = 'http://example.com/some/path'
+      link.href = 'http://example.com/users/2/files/17/download?verifier=xyzzy'
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="http://example.com/some/path" title="Here Be Links">Click On Me</a>'
+        '<a href="http://example.com/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
+      )
+    })
+
+    it('replaces a preview link with download', () => {
+      link.href = '/users/2/files/17/preview?verifier=xyzzy'
+      const rendered = contentRendering.renderLink(link)
+      expect(rendered).toEqual(
+        '<a href="/users/2/files/17/download?verifier=xyzzy" title="Here Be Links">Click On Me</a>'
       )
     })
   })
@@ -93,7 +109,7 @@ describe('contentRendering', () => {
     let image
     beforeEach(() => {
       image = {
-        href: '/some/path',
+        href: '/users/2/files/17/download?verifier=xyzzy',
         url: '/other/path',
         title: 'Here Be Images'
       }
@@ -101,7 +117,9 @@ describe('contentRendering', () => {
 
     it('builds image html from image data', () => {
       const rendered = contentRendering.renderImage(image)
-      expect(rendered).toEqual('<img alt="Here Be Images" src="/some/path"/>')
+      expect(rendered).toEqual(
+        '<img alt="Here Be Images" src="/users/2/files/17/preview?verifier=xyzzy"/>'
+      )
     })
 
     it('uses url if no href', () => {
@@ -114,7 +132,7 @@ describe('contentRendering', () => {
       image.title = undefined
       image.display_name = 'foo'
       const rendered = contentRendering.renderImage(image)
-      expect(rendered).toEqual('<img alt="foo" src="/some/path"/>')
+      expect(rendered).toEqual('<img alt="foo" src="/users/2/files/17/preview?verifier=xyzzy"/>')
     })
 
     it('includes optional other attributes', () => {
@@ -125,7 +143,7 @@ describe('contentRendering', () => {
       }
       const rendered = contentRendering.renderImage(image)
       expect(rendered).toEqual(
-        '<img alt="Here Be Images" src="/some/path" foo="bar" style="max-width:100px;max-height:17rem"/>'
+        '<img alt="Here Be Images" src="/users/2/files/17/preview?verifier=xyzzy" foo="bar" style="max-width:100px;max-height:17rem"/>'
       )
     })
 
@@ -138,14 +156,14 @@ describe('contentRendering', () => {
 
       const rendered = contentRendering.renderLinkedImage(linkElem, image)
       expect(rendered).toEqual(
-        '<a href="http://example.com" data-mce-href="http://example.com"><img alt="Here Be Images" src="/some/path"/></a>'
+        '<a href="http://example.com" data-mce-href="http://example.com"><img alt="Here Be Images" src="/users/2/files/17/preview?verifier=xyzzy"/></a>'
       )
     })
     it('renders a linked image if object has link property', () => {
       image.link = 'http://someurl'
       const rendered = contentRendering.renderImage(image)
       expect(rendered).toEqual(
-        '<a href="http://someurl" target="_blank" rel="noopener noreferrer"><img alt="Here Be Images" src="/some/path"/></a>'
+        '<a href="http://someurl" target="_blank" rel="noopener noreferrer"><img alt="Here Be Images" src="/users/2/files/17/preview?verifier=xyzzy"/></a>'
       )
     })
   })

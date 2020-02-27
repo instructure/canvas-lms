@@ -274,7 +274,11 @@ class SubmissionsController < SubmissionsBaseController
         log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
         format.html do
           flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
-          redirect_to course_assignment_url(@context, @assignment)
+          if @submission.past_due? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
+            redirect_to course_assignment_url(@context, @assignment)
+          else
+            redirect_to course_assignment_url(@context, @assignment, :confetti => true)
+          end
         end
         format.json do
           if api_request?

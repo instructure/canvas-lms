@@ -34,7 +34,6 @@ RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
        unzip \
        pbzip2 \
        fontforge \
-  && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
@@ -100,6 +99,5 @@ RUN mkdir -p .yardoc \
 USER docker
 # update Gemfile.lock in cases where a lock file was pulled in during the `COPY . $APP_HOME` step
 RUN bundle lock --local --conservative
-
 # TODO: switch to canvas:compile_assets_dev once we stop using this Dockerfile in production/e2e
 RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets

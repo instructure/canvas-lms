@@ -527,7 +527,6 @@ describe User do
   describe "#recent_feedback" do
     let_once(:post_policies_course) do
       course = Course.create!(workflow_state: :available)
-      course.enable_feature!(:new_gradebook)
       PostPolicy.enable_feature!
       course
     end
@@ -538,34 +537,12 @@ describe User do
       assignment
     end
 
-    let_once(:old_course) { Course.create!(workflow_state: :available) }
-    let_once(:unmuted_assignment) { old_course.assignments.create!(points_possible: 10) }
-    let_once(:muted_assignment) do
-      assignment = old_course.assignments.create!(points_possible: 10)
-      assignment.mute!
-      assignment
-    end
-
     let_once(:student) { User.create! }
     let_once(:teacher) { User.create! }
 
     before(:once) do
-      [post_policies_course, old_course].each do |course|
-        course.enroll_student(student, enrollment_state: :active)
-        course.enroll_teacher(teacher, enrollment_state: :active)
-      end
-    end
-
-    context "for a non-Post Policies course" do
-      it "does not include recent feedback for muted assignments" do
-        muted_assignment.grade_student(student, grader: teacher, score: 10)
-        expect(student.recent_feedback).to be_empty
-      end
-
-      it "includes recent feedback for unmuted assignments" do
-        unmuted_assignment.grade_student(student, grader: teacher, score: 10)
-        expect(student.recent_feedback).to contain_exactly(unmuted_assignment.submission_for_student(student))
-      end
+      post_policies_course.enroll_student(student, enrollment_state: :active)
+      post_policies_course.enroll_teacher(teacher, enrollment_state: :active)
     end
 
     context "for a course with Post Policies enabled" do
@@ -598,27 +575,28 @@ describe User do
       end
     end
 
-    context "when considering both types of courses simultaneously" do
-      it "only returns feedback for posted submissions and unmuted assignments" do
-        muted_assignment.grade_student(student, grader: teacher, score: 10)
-        unmuted_assignment.grade_student(student, grader: teacher, score: 10)
-        auto_posted_assignment.grade_student(student, grader: teacher, score: 10)
-        manual_posted_assignment.grade_student(student, grader: teacher, score: 10)
+    it "only returns feedback for posted submissions" do
+      auto_posted_assignment.grade_student(student, grader: teacher, score: 10)
+      manual_posted_assignment.grade_student(student, grader: teacher, score: 10)
 
-        expect(student.recent_feedback).to contain_exactly(
-          unmuted_assignment.submission_for_student(student),
-          auto_posted_assignment.submission_for_student(student)
-        )
-      end
+      expect(student.recent_feedback).to contain_exactly(
+        auto_posted_assignment.submission_for_student(student)
+      )
+    end
 
-      it "only returns feedback for specific courses if specified" do
-        unmuted_assignment.grade_student(student, grader: teacher, score: 10)
-        auto_posted_assignment.grade_student(student, grader: teacher, score: 10)
+    it "only returns feedback for specific courses if specified" do
+      other_course = Course.create!(workflow_state: :available)
+      other_course.enroll_student(student, enrollment_state: :active)
+      other_course.enroll_teacher(teacher, enrollment_state: :active)
+      auto_assignment = other_course.assignments.create!(points_possible: 10)
+      manual_assignment = other_course.assignments.create!(points_possible: 10)
+      manual_assignment.post_policy.update!(post_manually: true)
 
-        expect(student.recent_feedback(contexts: [post_policies_course])).to contain_exactly(
-          auto_posted_assignment.submission_for_student(student)
-        )
-      end
+      auto_assignment.grade_student(student, grader: teacher, score: 10)
+
+      expect(student.recent_feedback(contexts: [other_course])).to contain_exactly(
+        auto_assignment.submission_for_student(student)
+      )
     end
 
     it "includes recent feedback for student view users" do
@@ -3238,6 +3216,24 @@ describe User do
       @student.generate_observer_pairing_code
       pairing_code = @student.generate_observer_pairing_code
       expect(pairing_code.code).to eq '123abc'
+    end
+  end
+
+  describe "#prefers_no_celebrations?" do
+    let(:user) { user_model }
+
+    it "returns false by default" do
+      expect(user.prefers_no_celebrations?).to eq false
+    end
+
+    context "user has opted out of celebrations" do
+      before :each do
+        user.enable_feature!(:disable_celebrations)
+      end
+
+      it "returns true" do
+        expect(user.prefers_no_celebrations?).to eq true
+      end
     end
   end
 end

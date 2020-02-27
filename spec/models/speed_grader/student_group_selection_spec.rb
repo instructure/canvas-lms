@@ -22,7 +22,6 @@ describe SpeedGrader::StudentGroupSelection do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true, user_name: "some user")
 
-    @course.enable_feature!(:new_gradebook)
     @course.update!(filter_speed_grader_by_student_group: true)
 
     category.create_groups(3)

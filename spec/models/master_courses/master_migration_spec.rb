@@ -1051,6 +1051,31 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.active_context_modules.where(:name => "module 2 B").first!.content_tags.active.map { |tag| tag.content.id }).to eq [to_assignment_2.id]
     end
 
+    it "should not restore content tags in a deleted module" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      mod = @copy_from.context_modules.create!(:name => "module")
+      assmt = @copy_from.assignments.create!(:title => "assignment")
+      tag = mod.add_item({:id => assmt.id, :type => 'assignment'})
+
+      run_master_migration
+
+      tag_to = @copy_to.context_module_tags.first
+      mod_to = @copy_to.context_modules.first
+      mod_to.destroy
+      expect(tag_to.reload).to be_deleted
+
+      Timecop.freeze(1.minute.from_now) do
+        [mod, assmt, tag].each(&:touch) # re-migrate everything
+      end
+
+      run_master_migration
+
+      expect(mod_to.reload).to be_deleted
+      expect(tag_to.reload).to be_deleted
+    end
+
     it "overwrites/removes availability dates and settings when pushing a locked quiz" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

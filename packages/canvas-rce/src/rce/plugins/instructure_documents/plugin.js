@@ -33,6 +33,37 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
       bridge.showTrayForPlugin(plugin_key)
     })
 
+    // Register menu items
+    ed.ui.registry.addNestedMenuItem('instructure_document', {
+      text: formatMessage('Document'),
+      icon: 'document',
+      getSubmenuItems: () => [
+        'instructure_upload_document',
+        'instructure_course_document',
+        'instructure_user_document'
+      ]
+    })
+    ed.ui.registry.addMenuItem('instructure_upload_document', {
+      text: formatMessage('Upload Document'),
+      onAction: () => ed.execCommand('mceInstructureDocuments')
+    })
+    if (contextType === 'course') {
+      ed.ui.registry.addMenuItem('instructure_course_document', {
+        text: formatMessage('Course Documents'),
+        onAction: () => {
+          ed.focus(true)
+          ed.execCommand('instructureTrayForDocuments', false, COURSE_PLUGIN_KEY)
+        }
+      })
+    }
+    ed.ui.registry.addMenuItem('instructure_user_document', {
+      text: formatMessage('User Documents'),
+      onAction: () => {
+        ed.focus(true)
+        ed.execCommand('instructureTrayForDocuments', false, USER_PLUGIN_KEY)
+      }
+    })
+
     const menuItems = [
       {
         type: 'menuitem',

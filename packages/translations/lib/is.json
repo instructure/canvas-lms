@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Hljóðspilari fyrir { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Sjálfvirkt vistað efni er til. Viltu hlaða inn sjálfvirkt vistuðu efni í staðinn?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Opna sjálfkrafa forskoðun í línu. (Forskoðun sést ekki fyrr en búið er að vista)"
     },
@@ -143,14 +146,23 @@
     "clear_selected_file_82388e50": {
         "message": "Hreinsa valda skrá"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Hreinsa valda skrá: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Smelltu á einhverja síðu til að setja inn tengil á síðuna."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Smella til að fella inn { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Smelltu til að fela forskoðun"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Smellið til að setja tengil inn í ritilinn."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Smelltu til að sýna forskoðun"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Loka valmynd eða svarglugga. Fer líka með þig aftur í ritilssvæðið"
@@ -299,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Sýna textatengil (opnast í nýjum flipa)"
     },
+    "document_678cd7bf": {
+        "message": "Skjal"
+    },
     "documents_81393201": {
         "message": "Skjöl"
     },
@@ -364,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Fella inn myndbandskóða"
+    },
+    "equation_1c5ac93c": {
+        "message": "Jafna"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Villa við að hlaða inn einkunnum"
@@ -434,6 +452,9 @@
     "formatting_5b143aa8": {
         "message": "Forsníð"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Sjálfvirkt vistað efni fannst"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Fann { count, plural,\n     =0 {# niðurstöður}\n    one {# niðurstaða}\n  other {# niðurstöður}\n}"
     },
@@ -479,6 +500,9 @@
     "height_69b03e15": {
         "message": "Hæð"
     },
+    "image_8ad06": {
+        "message": "Mynd"
+    },
     "image_options_5412d02c": {
         "message": "Valkostir myndar"
     },
@@ -490,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Auka inndrag"
+    },
+    "insert_593145ef": {
+        "message": "Setja inn"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Setja inn Equella tengla"
@@ -647,6 +674,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Engum skiladagsetningum úthlutað"
     },
+    "no_e16d9132": {
+        "message": "Nei"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Engin einkunn"
     },
@@ -749,6 +779,9 @@
     "preformatted_d0670862": {
         "message": "Forsniðnir"
     },
+    "preview_53003fd2": {
+        "message": "Forskoðun"
+    },
     "preview_a3f8f854": {
         "message": "FORSKOÐA"
     },
@@ -790,6 +823,9 @@
     },
     "replies_4a8577c8": {
         "message": "Svör"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Endurheimta sjálfvirka vistun?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Rich Content ritill"
@@ -1072,6 +1108,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki-heima"
+    },
+    "yes_dde87d5": {
+        "message": "Já"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "Í gær klukkan { date }"

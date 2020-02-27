@@ -23,6 +23,10 @@ Oj.default_options = { mode: :rails, escape_mode: :xss_safe, bigdecimal_as_decim
 
 ActiveSupport::JSON::Encoding.time_precision = 0
 
+# This overrides the behavior defined in:
+# activesupport/lib/active_support/core_ext/object/json.rb. We use BigDecimal
+# in quiz numerical questions. See specs around numerical question answers in
+# spec/apis/v1/quizzes/quiz_submission_questions_api_spec.rb
 class BigDecimal
   remove_method :as_json
 

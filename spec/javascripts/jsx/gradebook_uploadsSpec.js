@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import gradebook_uploads from 'gradebook_uploads'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
-import * as waitForProcessing from 'jsx/gradezilla/uploads/wait_for_processing'
+import * as waitForProcessing from 'jsx/gradebook/uploads/wait_for_processing'
 
 const fixtures = document.getElementById('fixtures')
 

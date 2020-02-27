@@ -229,7 +229,6 @@ describe 'dashcards' do
       end
 
       it 'should customize dashcard color by selecting from color palette', priority: "1", test_id: 238196 do
-        skip('test task ticket created: ADMIN-2962')
         # Gets the default background color
         old_color = @user.reload.custom_colors.fetch("course_#{@course.id}")
 

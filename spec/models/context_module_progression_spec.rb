@@ -165,7 +165,6 @@ describe ContextModuleProgression do
       let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
 
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
         @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
         @submission = assignment.submit_homework(@user, body: "my homework")
@@ -190,35 +189,6 @@ describe ContextModuleProgression do
 
       it "evaluates requirements when grade has posted" do
         @submission.update!(score: 100, posted_at: 1.second.ago)
-        progression = @module.context_module_progressions.find_by(user: @user)
-        requirement = {id: tag.id, type: "min_score", min_score: 90.0}
-        expect(progression.requirements_met).to include requirement
-      end
-    end
-
-    context "when post policies not enabled" do
-      let(:assignment) { @course.assignments.create! }
-      let(:tag) { @module.add_item({id: assignment.id, type: "assignment"}) }
-
-      before(:each) do
-        PostPolicy.disable_feature!
-        @module.update!(completion_requirements: {tag.id => {type: "min_score", min_score: 90}})
-        @submission = assignment.submit_homework(@user, body: "my homework")
-      end
-
-      it "does not evaluate requirements when assignment is muted" do
-        assignment.mute!
-        assignment.reload
-        @submission.update!(score: 100)
-        progression = @module.context_module_progressions.find_by(user: @user)
-        requirement = {id: tag.id, type: "min_score", min_score: 90.0, score: nil}
-        expect(progression.incomplete_requirements).to include requirement
-      end
-
-      it "evaluates requirements when assignment is not muted" do
-        assignment.unmute!
-        assignment.reload
-        @submission.update!(score: 100)
         progression = @module.context_module_progressions.find_by(user: @user)
         requirement = {id: tag.id, type: "min_score", min_score: 90.0}
         expect(progression.requirements_met).to include requirement

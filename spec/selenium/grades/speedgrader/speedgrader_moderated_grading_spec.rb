@@ -16,11 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../helpers/speed_grader_common'
-require_relative '../../helpers/gradezilla_common'
+require_relative '../../helpers/gradebook_common'
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
-  include GradezillaCommon
+  include GradebookCommon
   include SpeedGraderCommon
 
   before(:once) do

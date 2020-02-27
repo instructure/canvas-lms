@@ -31,15 +31,15 @@ import tz from 'timezone'
 import AssignmentDetailsDialog from '../../../AssignmentDetailsDialog'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
 import {updateWithSubmissions, scopeToUser} from 'jsx/gradebook/EffectiveDueDates'
-import outcomeGrid from '../../../gradezilla/OutcomeGradebookGrid'
+import outcomeGrid from '../../../gradebook/OutcomeGradebookGrid'
 import ic_submission_download_dialog from '../../shared/components/ic_submission_download_dialog_component'
 import CalculationMethodContent from '../../../models/grade_summary/CalculationMethodContent'
-import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap'
+import SubmissionStateMap from 'jsx/gradebook/SubmissionStateMap'
 import GradeOverrideEntry from '../../../../jsx/grading/GradeEntry/GradeOverrideEntry'
 import GradingPeriodsApi from '../../../api/gradingPeriodsApi'
 import GradingPeriodSetsApi from '../../../api/gradingPeriodSetsApi'
-import GradebookSelector from 'jsx/gradezilla/individual-gradebook/components/GradebookSelector'
-import {updateFinalGradeOverride} from '../../../../jsx/gradezilla/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
+import GradebookSelector from 'jsx/gradebook/individual-gradebook/components/GradebookSelector'
+import {updateFinalGradeOverride} from '../../../../jsx/gradebook/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 import 'jquery.instructure_date_and_time'
 import 'vendor/jquery.ba-tinypubsub'
 
@@ -209,8 +209,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     `${get(window, 'ENV.GRADEBOOK_OPTIONS.change_gradebook_version_url')}`).property(),
 
   hideOutcomes: (() => !get(window, 'ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled')).property(),
-
-  gradezilla: (() => get(window, 'ENV.GRADEBOOK_OPTIONS.gradezilla')).property(),
 
   showDownloadSubmissionsButton: function() {
     const hasSubmittedSubmissions = this.get('selectedAssignment.has_submitted_submissions')
@@ -461,9 +459,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.on('init'),
 
   renderGradebookMenu: function() {
-    if (!this.get('gradezilla')) {
-      return
-    }
     const mountPoint = document.querySelector('[data-component="GradebookSelector"]')
     if (!mountPoint) {
       return

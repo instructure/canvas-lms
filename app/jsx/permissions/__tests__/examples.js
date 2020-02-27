@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {COURSE, ACCOUNT} from '../propTypes'
+import {COURSE, ACCOUNT, ENABLED_FOR_ALL} from '../propTypes'
 
 const PERMISSIONS = [
   {
@@ -46,7 +46,7 @@ const PERMISSIONS = [
 ]
 
 const BASIC_ROLE_PERMISSION = {
-  enabled: true,
+  enabled: ENABLED_FOR_ALL,
   explicit: true,
   locked: true,
   readonly: true,

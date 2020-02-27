@@ -16,14 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative './common'
-require_relative './grades/pages/gradezilla_cells_page'
-require_relative './grades/pages/gradezilla_grade_detail_tray_page'
+require_relative './grades/pages/gradebook_cells_page'
+require_relative './grades/pages/gradebook_grade_detail_tray_page'
 
 describe "concluded/unconcluded" do
   include_context "in-process server selenium tests"
 
   before do
-    Account.default.enable_feature!(:new_gradebook)
     username = "nobody@example.com"
     password = "asdfasdf"
     u = user_with_pseudonym :active_user => true,
@@ -47,7 +46,7 @@ describe "concluded/unconcluded" do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajax_requests
 
-    cell = Gradezilla::Cells.grading_cell(@student, @assignment)
+    cell = Gradebook::Cells.grading_cell(@student, @assignment)
     cell.click
     expect(cell).to have_class('editable')
   end
@@ -56,7 +55,7 @@ describe "concluded/unconcluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
 
-    cell = Gradezilla::Cells.grading_cell(@student, @assignment)
+    cell = Gradebook::Cells.grading_cell(@student, @assignment)
     cell.click
     expect(cell).not_to have_class('editable')
   end
@@ -64,17 +63,17 @@ describe "concluded/unconcluded" do
   it "should let the teacher add comments to the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
 
-    Gradezilla::Cells.open_tray(@student, @assignment)
+    Gradebook::Cells.open_tray(@student, @assignment)
     wait_for_ajaximations
-    expect(Gradezilla::GradeDetailTray.new_comment_input).to be_displayed
+    expect(Gradebook::GradeDetailTray.new_comment_input).to be_displayed
   end
 
   it "should not let the teacher add comments to the gradebook when concluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
 
-    cell = Gradezilla::Cells.grading_cell(@student, @assignment)
+    cell = Gradebook::Cells.grading_cell(@student, @assignment)
     cell.click
-    expect(cell).not_to contain_css(Gradezilla::Cells.grade_tray_button_selector)
+    expect(cell).not_to contain_css(Gradebook::Cells.grade_tray_button_selector)
   end
 end

@@ -19,23 +19,23 @@ group :test do
   gem 'rails-dom-testing', '2.0.3'
   gem 'rails-controller-testing', '1.0.4'
 
-  gem 'gergich', '1.1.0', require: false
+  gem 'gergich', '1.2.0', require: false
   gem 'dotenv', '2.7.5', require: false
   gem 'testingbot', require: false
   gem 'brakeman', require: false
   gem 'simplecov', '0.15.1', require: false
     gem 'docile', '1.1.5', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
-  gem 'puma', '4.2.1'
+  gem 'puma', '4.3.1'
 
   gem 'rspec', '3.9.0'
   gem 'rspec_around_all', '0.2.0'
   gem 'rspec-rails', '3.9.0'
   gem 'rspec-collection_matchers', '1.2.0'
-  gem 'rspec-support', '3.9.0'
+  gem 'rspec-support', '3.9.2'
   gem 'rspec-expectations', '3.9.0'
-  gem 'rspec-mocks', '3.9.0'
-  gem 'shoulda-matchers', '4.1.2'
+  gem 'rspec-mocks', '3.9.1'
+  gem 'shoulda-matchers', '4.3.0'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
     gem 'rubocop', '0.52.1', require: false
@@ -48,22 +48,22 @@ group :test do
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
   gem 'selenium-webdriver', '3.141.5926'
     gem 'childprocess', '1.0.1', require: false
-  gem 'webdrivers', '~> 4.0', require: false
+  gem 'webdrivers', '4.2.0', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test-queue', github: 'instructure/test-queue', ref: 'd35166408df3a5396cd809e85dcba175136a69ba', require: false
   gem 'testrailtagging', '0.3.8.7', require: false
 
-  gem 'webmock', '3.7.6', require: false
+  gem 'webmock', '3.8.2', require: false
     gem 'crack', '0.4.3', require: false
   gem 'timecop', '0.9.1'
   gem 'jira_ref_parser', '1.0.1'
   gem 'headless', '2.3.1', require: false
   gem 'escape_code', '0.2', require: false
   gem 'luminosity_contrast', '0.2.1'
-  gem 'pact', '1.43.1'
+  gem 'pact', '1.49.0'
+    gem 'pact-mock_service', '3.5.0', require: false
   gem 'pact-messages', '0.2.0'
-  gem 'pact_broker-client'
-  gem 'pact-mock_service', '3.2.1'
+  gem 'pact_broker-client', '1.25.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
 
   gem 'knapsack', '1.18.0'

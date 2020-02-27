@@ -196,12 +196,10 @@
           <span class="submission-details-header__time <%='late' if @submission.late? %> <%= 'hidden' unless @submission.submitted_at %>">
             <%= submission_author_name_for @assessment_request %> <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
           </span>
-          <% if @context.feature_enabled?(:new_gradebook) %>
-            <% if @submission.late? %>
-              <span class="submission-late-pill"></span>
-            <% elsif @submission.missing? %>
-              <span class="submission-missing-pill"></span>
-            <% end %>
+          <% if @submission.late? %>
+            <span class="submission-late-pill"></span>
+          <% elsif @submission.missing? %>
+            <span class="submission-missing-pill"></span>
           <% end %>
           <% if @assignment.allowed_attempts&.> 0 %>
             <div class="submission-details-header__attempts_info">

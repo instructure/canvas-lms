@@ -572,7 +572,7 @@ describe "RCE next tests" do
         rce.send_keys [:alt, :f9]
 
         expect(f('.tox-menubar')).to be_displayed
-        expect(fj('.tox-menubar button:contains("File")')).to eq(driver.switch_to.active_element)
+        expect(fj('.tox-menubar button:contains("Edit")')).to eq(driver.switch_to.active_element)
       end
 
       it "should focus the toolbar with alt-f10" do

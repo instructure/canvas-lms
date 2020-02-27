@@ -26,6 +26,9 @@
     "message": "Запись аудио и видео недоступна."
   },
   "audio_player_for_title_20cc70d": { "message": "Аудиоплеер для { title }" },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Существует сохраненное в автоматическом режиме содержимое. Вы хотите загрузить сохраненное в автоматическом режиме содержимое?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Автоматически открывать встроенный предварительный просмотр. (Предварительный просмотр отображается только после сохранения)"
   },
@@ -38,14 +41,23 @@
     "message": "заключить неупорядоченный список в круг"
   },
   "clear_selected_file_82388e50": { "message": "Очистить выбранный файл" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Удалить выбранный файл: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Щелкните любую страницу, чтобы вставить ссылку в эту страницу."
   },
   "click_to_embed_imagename_c41ea8df": {
     "message": "Щелкните, чтобы внедрить { imageName }"
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Нажмите, чтобы скрыть предпросмотр"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Нажмите, чтобы вставить ссылку в редактор."
+  },
+  "click_to_show_preview_faa27051": {
+    "message": "Нажмите, чтобы показать предпросмотр"
   },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Закройте меню или диалог. Также возвращает вас в область редактора"
@@ -96,6 +108,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Показать текстовую ссылку (открывается в новой вкладке)"
   },
+  "document_678cd7bf": { "message": "Документ" },
   "documents_81393201": { "message": "Документы" },
   "done_54e3d4b6": { "message": "Готово" },
   "drag_a_file_here_1bf656d5": { "message": "Перетащите файл сюда" },
@@ -120,6 +133,7 @@
   "embed_preview_2d741e1f": { "message": "Встроить предварительный просмотр" },
   "embed_video_a97a64af": { "message": "Вставить видео" },
   "embed_video_code_703e10f2": { "message": "Вставить код видео" },
+  "equation_1c5ac93c": { "message": "Формула" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Ошибка при загрузке видео-/аудиозаписи"
   },
@@ -144,6 +158,9 @@
     "message": "Сконцентрироваться на всплывающей контекстной панели инструментов"
   },
   "formatting_5b143aa8": { "message": "Форматирование" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Найдено сохраненное в автоматическом режиме содержимое"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Найдено { count, plural,\n     =0 {# результата(-ов)}\n    one {# результат}\n  other {# результата(-ов)}\n}"
   },
@@ -163,10 +180,12 @@
   "heading_3_2c83de44": { "message": "Заголовок 3" },
   "heading_4_b2e74be7": { "message": "Заголовок 4" },
   "height_69b03e15": { "message": "Высота" },
+  "image_8ad06": { "message": "Изображение" },
   "image_options_5412d02c": { "message": "Опции изображения" },
   "image_options_tray_90a46006": { "message": "Лоток опций изображения" },
   "images_7ce26570": { "message": "Изображения" },
   "increase_indent_6d550a4a": { "message": "Увеличить отступ" },
+  "insert_593145ef": { "message": "Вставить" },
   "insert_equella_links_49a8dacd": { "message": "Вставить ссылки на Equella" },
   "insert_link_6dc23cae": { "message": "Вставить ссылку" },
   "insert_math_equation_57c6e767": {
@@ -210,6 +229,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Нет альтернативного текста (декоративное изображение)"
   },
+  "no_e16d9132": { "message": "Нет" },
   "no_results_940393cf": { "message": "Нет результатов." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Не найдены результаты для { filterTerm }"
@@ -238,6 +258,7 @@
   },
   "posted_when_a578f5ab": { "message": "Размещено: { when }" },
   "preformatted_d0670862": { "message": "Предварительно форматированный" },
+  "preview_53003fd2": { "message": "Предпросмотр" },
   "preview_a3f8f854": { "message": "ПРЕДПРОСМОТР" },
   "previous_page_928fc112": { "message": "Предыдущая страница" },
   "published_c944a23d": { "message": "опубликовано" },
@@ -249,6 +270,7 @@
   },
   "recording_98da6bda": { "message": "Запись" },
   "remove_link_d1f2f4d0": { "message": "Удалить ссылку" },
+  "restore_auto_save_deccd84b": { "message": "Восстановить автосохранение?" },
   "rich_content_editor_2708ef21": {
     "message": "Редактор форматированного текста"
   },
@@ -359,6 +381,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }пикселов" },
   "wiki_home_9cd54d0": { "message": "Домашняя страница вики" },
+  "yes_dde87d5": { "message": "Да" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Ваша веб-камера может уже использоваться."
   }

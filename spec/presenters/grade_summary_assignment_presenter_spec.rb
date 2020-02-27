@@ -244,7 +244,6 @@ describe GradeSummaryAssignmentPresenter do
     end
 
     context "when post policies are enabled" do
-      before(:each) { @course.enable_feature!(:new_gradebook) }
       before(:each) { PostPolicy.enable_feature! }
 
       context "when assignment posts manually" do

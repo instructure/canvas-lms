@@ -43,6 +43,7 @@ describe Submission do
   it { is_expected.to validate_numericality_of(:points_deducted).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_numericality_of(:seconds_late_override).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(["none", "missing", "late"]).allow_nil }
+  it { is_expected.to validate_inclusion_of(:cached_tardiness).in_array(["missing", "late"]).allow_nil }
 
   it { is_expected.to delegate_method(:auditable?).to(:assignment).with_prefix(true) }
   it { is_expected.to delegate_method(:can_be_moderated_grader?).to(:assignment).with_prefix(true) }
@@ -921,7 +922,6 @@ describe Submission do
 
     describe "posting of missing submissions" do
       before(:once) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
         late_policy_factory(course: @course, missing: 50)
       end
@@ -1581,7 +1581,6 @@ describe Submission do
             category: "Grading",
             name: "Submission Posted"
           )
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
           @student.update!(email: "fakeemail@example.com")
           @student.email_channel.update!(workflow_state: :active)
@@ -1907,7 +1906,6 @@ describe Submission do
 
       context "when post policies feature is enabled" do
         before(:once) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 
@@ -2203,7 +2201,6 @@ describe Submission do
 
     context "when post policies feature is enabled" do
       before(:once) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -2887,7 +2884,6 @@ describe Submission do
 
     context 'when post policies are enabled' do
       before do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -4886,7 +4882,6 @@ describe Submission do
 
     context "when post policies are enabled" do
       before(:each) do
-        @assignment.course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -5000,7 +4995,6 @@ describe Submission do
 
     it "sets comment hidden to false if comment causes posting" do
       PostPolicy.enable_feature!
-      @course.enable_feature!(:new_gradebook)
       @assignment.ensure_post_policy(post_manually: false)
       @assignment.grade_student(@student, grader: @teacher, score: 5)
       @submission.update!(posted_at: nil)
@@ -5010,7 +5004,6 @@ describe Submission do
 
     it "does not set comment hidden to false if comment does not cause posting" do
       PostPolicy.enable_feature!
-      @course.enable_feature!(:new_gradebook)
       @assignment.ensure_post_policy(post_manually: true)
       @assignment.grade_student(@student, grader: @teacher, score: 5)
       @submission.update!(posted_at: nil)
@@ -5229,7 +5222,6 @@ describe Submission do
         end
 
         it "does not post the submission if post policies are enabled and the assignment is manually-posted" do
-          course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
 
           assignment.ensure_post_policy(post_manually: true)
@@ -5563,7 +5555,80 @@ describe Submission do
           expect(comments).to match_array([@peer_review_comment, @student_comment, @teacher_comment])
         end
       end
+    end
 
+    context "when the assignment is a group peer-reviewed assignment" do
+      let_once(:student1) { @course.enroll_student(User.create!, active_all: true).user }
+      let_once(:student2) { @course.enroll_student(User.create!, active_all: true).user }
+      let_once(:student3) { @course.enroll_student(User.create!, active_all: true).user }
+      let_once(:student4) { @course.enroll_student(User.create!, active_all: true).user }
+
+      let_once(:group_category) do
+        group_category = @course.group_categories.create!(name: "a group")
+        group_category.create_groups(3)
+
+        group_category.groups.first.add_user(student1)
+        group_category.groups.second.add_user(student2)
+        group_category.groups.second.add_user(student3)
+        group_category.groups.third.add_user(student4)
+        group_category
+      end
+
+      let_once(:assignment) do
+        @course.assignments.create!(group_category: group_category, peer_reviews: true)
+      end
+
+      before(:once) do
+        assignment.submit_homework(student1, body: "I am student 1")
+        assignment.submit_homework(student2, body: "I am student 2")
+        assignment.submit_homework(student3, body: "I am student 3")
+        assignment.submit_homework(student4, body: "I am student 4")
+
+        assignment.assign_peer_review(student1, student2)
+        assignment.assign_peer_review(student1, student4)
+      end
+
+      context "when the assignment is manually posted" do
+        before(:once) do
+          assignment.post_policy.update!(post_manually: true)
+
+          # Call update_submission to post the comment (rather than add_comment)
+          # so that it gets propagated to other group members
+          student2_submission_params = {
+            assessment_request: AssessmentRequest.find_by(assessor: student1, user: student2),
+            author: student1,
+            comment: "good job",
+            group_comment: true
+          }
+          assignment.update_submission(student2, student2_submission_params)
+
+          student4_submission_params = {
+            assessment_request: AssessmentRequest.find_by(assessor: student1, user: student4),
+            author: student1,
+            comment: "bad job",
+            group_comment: true
+          }
+          assignment.update_submission(student4, student4_submission_params)
+        end
+
+        it "allows the specific recipient of the comment to view it" do
+          comment = SubmissionComment.find_by(submission: assignment.submission_for_student(student2), author: student1)
+
+          expect(comment).to be_grants_right(student2, :read)
+        end
+
+        it "allows other students in the recipient's group to view their respective comment" do
+          comment = SubmissionComment.find_by(submission: assignment.submission_for_student(student3), author: student1)
+
+          expect(comment).to be_grants_right(student3, :read)
+        end
+
+        it "does not allow assessed students in a different group to view the comment" do
+          comment = SubmissionComment.find_by(submission: assignment.submission_for_student(student2), author: student1)
+
+          expect(comment).not_to be_grants_right(student4, :read)
+        end
+      end
     end
 
     context "for a moderated assignment" do
@@ -6849,7 +6914,6 @@ describe Submission do
 
     context "when Post Policies are enabled" do
       before do
-        course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -6909,7 +6973,6 @@ describe Submission do
     subject(:submission) { @assignment.submissions.first }
 
     before do
-      @assignment.course.enable_feature!(:new_gradebook)
       PostPolicy.enable_feature!
     end
 

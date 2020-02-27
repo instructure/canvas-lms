@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "{ title }的音频播放器"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "存在自动保存的内容。是否要改为加载自动保存的内容？"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "自动打开在线预览。（预览仅在保存后显示）"
     },
@@ -143,14 +146,23 @@
     "clear_selected_file_82388e50": {
         "message": "清除所选文件"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "清除所选文件：{ filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "单击任何页面以插入指向该页面的链接。"
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "单击以嵌入{ imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "单击以隐藏预览"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "单击以插入指向编辑器的链接。"
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "单击以显示预览"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "关闭菜单或对话框。并带您返回至编辑器区域"
@@ -299,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "显示文本链接（在新标签页中打开）"
     },
+    "document_678cd7bf": {
+        "message": "文档"
+    },
     "documents_81393201": {
         "message": "文档"
     },
@@ -364,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "嵌入视频代码"
+    },
+    "equation_1c5ac93c": {
+        "message": "等式"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "加载评分时出错"
@@ -434,6 +452,9 @@
     "formatting_5b143aa8": {
         "message": "格式化"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "找到自动保存的内容"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "查找 { count, plural,\n     =0 {# 结果}\n    one {# 结果}\n  other {# 结果}\n}"
     },
@@ -479,6 +500,9 @@
     "height_69b03e15": {
         "message": "高度"
     },
+    "image_8ad06": {
+        "message": "图片"
+    },
     "image_options_5412d02c": {
         "message": "图像选项"
     },
@@ -490,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "增加缩进"
+    },
+    "insert_593145ef": {
+        "message": "插入"
     },
     "insert_equella_links_49a8dacd": {
         "message": "插入 Equella 链接"
@@ -647,6 +674,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "未指定截止日期"
     },
+    "no_e16d9132": {
+        "message": "否"
+    },
     "no_grade_3b4d7f3e": {
         "message": "没有评分"
     },
@@ -749,6 +779,9 @@
     "preformatted_d0670862": {
         "message": "预定义格式"
     },
+    "preview_53003fd2": {
+        "message": "预览"
+    },
     "preview_a3f8f854": {
         "message": "预览"
     },
@@ -790,6 +823,9 @@
     },
     "replies_4a8577c8": {
         "message": "回复"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "是否恢复自动保存？"
     },
     "rich_content_editor_2708ef21": {
         "message": "富内容编辑器"
@@ -1072,6 +1108,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "维基主页"
+    },
+    "yes_dde87d5": {
+        "message": "是"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "昨天 { date }"

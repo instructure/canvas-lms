@@ -17,7 +17,7 @@
 
 require_relative "../../common"
 require_relative "../../helpers/speed_grader_common"
-require_relative "../../helpers/gradezilla_common"
+require_relative "../../helpers/gradebook_common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/groups_common"
 require_relative "../pages/speedgrader_page"
@@ -25,7 +25,7 @@ require_relative "../pages/speedgrader_page"
 describe "speed grader" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
-  include GradezillaCommon
+  include GradebookCommon
   include SpeedGraderCommon
   include GroupsCommon
 

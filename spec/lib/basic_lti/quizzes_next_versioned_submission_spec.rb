@@ -331,7 +331,6 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
     describe "submission posting" do
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 

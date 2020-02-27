@@ -34,5 +34,41 @@ class NotificationPolicyOverride < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course]
   belongs_to :notification, inverse_of: :notification_policy_overrides
 
-end
+  def self.enable_for_context(user, context, enable: true)
+    user.shard.activate do
+      workflow_state = enable ? 'active' : 'disabled'
+      cc_ids = user.communication_channels.pluck(:id)
+      connection = NotificationPolicyOverride.connection
+      values = cc_ids.map! do |cc_id|
+        vals = [
+          connection.quote(context.id),
+          connection.quote(context.class.name),
+          connection.quote(cc_id),
+          connection.quote(workflow_state),
+          connection.quote(Time.zone.now),
+          connection.quote(Time.zone.now)
+        ]
+        "(#{vals.join(',')})"
+      end
 
+      connection.execute(<<~SQL)
+        INSERT INTO #{NotificationPolicyOverride.quoted_table_name}
+          (context_id, context_type, communication_channel_id, workflow_state, created_at, updated_at)
+          VALUES #{values.join(",")}
+          ON CONFLICT (context_id, context_type, communication_channel_id) WHERE notification_id IS NULL
+          DO UPDATE SET
+            workflow_state = excluded.workflow_state,
+            updated_at = excluded.updated_at
+          WHERE notification_policy_overrides.workflow_state<>excluded.workflow_state;
+      SQL
+    end
+  end
+
+  def self.enabled_for(user, context)
+    !(find_all_for(user, context).where(notification_id: nil).take&.workflow_state == 'disabled')
+  end
+
+  def self.find_all_for(user, context)
+    NotificationPolicyOverride.where(communication_channel_id: user.communication_channels, context: context)
+  end
+end

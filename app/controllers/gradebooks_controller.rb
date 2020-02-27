@@ -705,7 +705,6 @@ class GradebooksController < ApplicationController
           CONTEXT_ACTION_SOURCE: :speed_grader,
           can_view_audit_trail: @assignment.can_view_audit_trail?(@current_user),
           settings_url: speed_grader_settings_course_gradebook_path,
-          new_gradebook_enabled: true,
           force_anonymous_grading: force_anonymous_grading?(@assignment),
           anonymous_identities: @assignment.anonymous_grader_identities_by_anonymous_id,
           final_grader_id: @assignment.final_grader_id,
@@ -745,6 +744,9 @@ class GradebooksController < ApplicationController
                                                             @assignment.quiz.id,
                                                             :user_id => "{{user_id}}"
         end
+
+        env[:filter_speed_grader_by_student_group_feature_enabled] =
+          @context.root_account.feature_enabled?(:filter_speed_grader_by_student_group)
 
         if @context.filter_speed_grader_by_student_group?
           env[:filter_speed_grader_by_student_group] = true
@@ -820,7 +822,6 @@ class GradebooksController < ApplicationController
       })
 
       # Showing a specific section should always display the "Sections" filter
-      # in New Gradebook
       ensure_section_view_filter_enabled if section_to_show.present?
       @current_user.save!
     end
@@ -918,7 +919,7 @@ class GradebooksController < ApplicationController
 
     visible_sections = @context.sections_visible_to(@current_user)
 
-    new_gradebook_options = {
+    gradebook_options = {
       additional_sort_options_enabled: @context.feature_enabled?(:new_gradebook_sort_options),
       colors: gradebook_settings.fetch(:colors, {}),
 
@@ -929,7 +930,6 @@ class GradebooksController < ApplicationController
 
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
       graded_late_submissions_exist: graded_late_submissions_exist,
-      gradezilla: true,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       late_policy: @context.late_policy.as_json(include_root: false),
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
@@ -939,11 +939,11 @@ class GradebooksController < ApplicationController
     }
 
     if @context.post_policies_enabled?
-      new_gradebook_options[:post_manually] = @context.post_manually?
-      new_gradebook_options[:new_post_policy_icons_enabled] = @context.root_account.feature_enabled?(:new_post_policy_icons)
+      gradebook_options[:post_manually] = @context.post_manually?
+      gradebook_options[:new_post_policy_icons_enabled] = @context.root_account.feature_enabled?(:new_post_policy_icons)
     end
 
-    {GRADEBOOK_OPTIONS: new_gradebook_options}
+    {GRADEBOOK_OPTIONS: gradebook_options}
   end
 
   def gradebook_version
@@ -975,11 +975,11 @@ class GradebooksController < ApplicationController
   end
 
   def render_default_gradebook
-    render "gradebooks/gradezilla/gradebook"
+    render "gradebooks/gradebook"
   end
 
   def render_individual_gradebook
-    render "gradebooks/gradezilla/individual"
+    render "gradebooks/individual"
   end
 
   def percentage(weight)

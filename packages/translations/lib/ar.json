@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "مشغل الصوت لـ { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "المحتوى المحفوظ تلقائياً موجود. هل ترغب في تحميل المحتوى المحفوظ تلقائياً بدلاً من ذلك؟"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "افتح تلقائيًا معاينة داخلية. (لا تظهر المعاينة إلا بعد الحفظ)"
     },
@@ -143,14 +146,23 @@
     "clear_selected_file_82388e50": {
         "message": "مسح الملف المحدد"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "مسح الملف المحدد: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "انقر فوق أي صفحة لإدراج ارتباط يؤدي إلى تلك الصفحة."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "انقر لتضمين { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "انقر لإخفاء المعاينة"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "انقر لإدراج ارتباط إلى المحرر."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "انقر لإظهار المعاينة"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "إغلاق قائمة أو مربع حوار. يعيدك أيضًا إلى مساحة المحرر"
@@ -299,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "عرض ارتباط النص (يفتح في علامة تبويب جديدة)"
     },
+    "document_678cd7bf": {
+        "message": "مستند"
+    },
     "documents_81393201": {
         "message": "المستندات"
     },
@@ -364,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "رمز تضمين الفيديو"
+    },
+    "equation_1c5ac93c": {
+        "message": "معادلة"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "خطأ أثناء تحميل الدرجات"
@@ -434,6 +452,9 @@
     "formatting_5b143aa8": {
         "message": "التنسيق"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "تم العثور على محتوى محفوظ تلقائياً"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "تم العثور على { count, plural,\n     =0 {# من النتائج}\n    one {# نتيجة}\n  other {# من النتائج}\n}"
     },
@@ -479,6 +500,9 @@
     "height_69b03e15": {
         "message": "الارتفاع"
     },
+    "image_8ad06": {
+        "message": "صورة"
+    },
     "image_options_5412d02c": {
         "message": "خيارات الصورة"
     },
@@ -490,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "زيادة المسافة البادئة"
+    },
+    "insert_593145ef": {
+        "message": "إدخال"
     },
     "insert_equella_links_49a8dacd": {
         "message": "إدراج ارتباطات Equella"
@@ -647,6 +674,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "لم يتم تعيين تواريخ الاستحقاق"
     },
+    "no_e16d9132": {
+        "message": "لا"
+    },
     "no_grade_3b4d7f3e": {
         "message": "لا توجد أي درجة"
     },
@@ -749,6 +779,9 @@
     "preformatted_d0670862": {
         "message": "منسق مسبقًا"
     },
+    "preview_53003fd2": {
+        "message": "معاينة"
+    },
     "preview_a3f8f854": {
         "message": "معاينة"
     },
@@ -790,6 +823,9 @@
     },
     "replies_4a8577c8": {
         "message": "ردود"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "استعادة الحفظ التلقائي؟"
     },
     "rich_content_editor_2708ef21": {
         "message": "محرر محتوى"
@@ -1072,6 +1108,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "الصفحة الرئيسية لـ Wiki"
+    },
+    "yes_dde87d5": {
+        "message": "نعم"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "أمس الساعة { date }"

@@ -124,6 +124,7 @@
 class ContentMigrationsController < ApplicationController
   include Api::V1::ContentMigration
   include Api::V1::ExternalTools
+  include NewQuizzesFeaturesHelper
 
   before_action :require_context
   before_action :require_auth
@@ -174,9 +175,11 @@ class ContentMigrationsController < ApplicationController
 
       js_env(:SHOW_SELECT => should_show_course_copy_dropdown)
       js_env(:CONTENT_MIGRATIONS_EXPIRE_DAYS => ContentMigration.expire_days)
-      js_env(:QUIZZES_NEXT_CONFIGURED_ROOT => @context.root_account.feature_allowed?(:quizzes_next) &&
-             @context.root_account.feature_enabled?(:import_to_quizzes_next))
-      js_env(:QUIZZES_NEXT_ENABLED => @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?)
+      js_env(:QUIZZES_NEXT_ENABLED => new_quizzes_enabled?)
+      js_env(:NEW_QUIZZES_IMPORT => new_quizzes_import_enabled?)
+      js_env(:NEW_QUIZZES_MIGRATION => new_quizzes_migration_enabled?)
+      js_env(:NEW_QUIZZES_IMPORT_THIRD => new_quizzes_import_third_party?)
+      js_env(:NEW_QUIZZES_MIGRATION_DEFAULT => new_quizzes_migration_default)
       set_tutorial_js_env
     end
   end

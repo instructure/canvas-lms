@@ -16,15 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../helpers/gradezilla_common'
-require_relative '../pages/gradezilla_cells_page'
+require_relative '../../helpers/gradebook_common'
+require_relative '../pages/gradebook_cells_page'
 require_relative '../pages/srgb_page'
 require_relative '../pages/grading_curve_page'
 
 describe "Screenreader Gradebook" do
   include_context 'in-process server selenium tests'
   include_context 'reusable_gradebook_course'
-  include GradezillaCommon
+  include GradebookCommon
 
   let(:default_gradebook) { "/courses/#{@course.id}/gradebook/change_gradebook_version?version=2" }
   let(:button_type_submit) { f('.button_type_submit') }
@@ -35,10 +35,6 @@ describe "Screenreader Gradebook" do
   let(:grading_value) { f('.grading_value') }
   let(:gradebook_cell_css) { '.gradebook-cell' }
   let(:view_grading_history) { f("a[href='/courses/#{@course.id}/gradebook/history']") }
-
-  before :once do
-    Account.default.enable_feature!(:new_gradebook)
-  end
 
   def active_element
     driver.switch_to.active_element
@@ -178,8 +174,8 @@ describe "Screenreader Gradebook" do
     button_type_submit.click
 
     get default_gradebook
-    expect(Gradezilla::Cells.get_grade(@students[0], @assign1)).to eq('1')
-    expect(Gradezilla::Cells.get_grade(@students[1], @assign1)).to eq('1')
+    expect(Gradebook::Cells.get_grade(@students[0], @assign1)).to eq('1')
+    expect(Gradebook::Cells.get_grade(@students[1], @assign1)).to eq('1')
   end
 
   it 'can select an assignment', priority: '1', test_id: 163998 do

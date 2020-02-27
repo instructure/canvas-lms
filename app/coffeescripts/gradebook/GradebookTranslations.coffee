@@ -14,15 +14,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 import I18n from 'i18n!gradebooktranslations'
 
 export default GRADEBOOK_TRANSLATIONS =
+    submission_tooltip_unpublished_assignment: I18n.t('This assignment is unpublished')
     submission_tooltip_dropped: I18n.t('Dropped for grading purposes')
-    submission_tooltip_late: I18n.t('Submitted late')
+    submission_tooltip_excused: I18n.t('Assignment Excused')
+    submission_tooltip_late: I18n.t('Submitted Late')
+    submission_tooltip_missing: I18n.t('Missing Submission')
     submission_tooltip_anonymous: I18n.t('Anonymous')
     submission_tooltip_moderated: I18n.t('Moderated Assignment')
-    submission_tooltip_muted: I18n.t('Assignment muted')
+    submission_tooltip_muted: I18n.t('Assignment Muted')
     submission_tooltip_resubmitted: I18n.t('Resubmitted since last graded')
     submission_tooltip_ungraded: I18n.t('Not factored into grading')
     submission_tooltip_online_url: I18n.t("URL Submission")

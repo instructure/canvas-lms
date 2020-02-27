@@ -2388,7 +2388,11 @@ ru:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Позволяет пользователю просматривать SIS-идентификаторы пользователя на странице курса «Люди»."
   allows_users_to_edit_conferences_2d3c960c: "Позволяет пользователям редактировать конференции."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Позволяет пользователям активировать опцию «Запуск SpeedGrader с фильтрацией по группам студентов» для курсов на странице настройки курсов. В случае активации и выбора группы студентов в Новом журнале оценок SpeedGrader будет загружать только студентов в выбранную группу."
+  allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Позволяет пользователям отключать уведомления по уровню детализации информации о курсе."
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Позволяет пользователям выбрать местоимения, которые будут отображаться после их имени при его показе в пользовательском интерфейсе."
+  allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
+      Позволяет пользователям выбирать местоимения, которые будут отображаться после
+      их имен, когда они отображаются в пользовательском интерфейсе.
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Позволяет пользователям с международными телефонными номерами получать текстовые сообщения от Canvas."
   alumno_88c80e37: Alumno
   always_3a59e701: Всегда
@@ -4691,6 +4695,7 @@ ru:
   cannot_be_present_when_account_id_is_present_f7d9b51f: "не может присутствовать,  если присутствует account_id"
   cannot_be_present_when_course_id_is_present_785e6a59: "не может присутствовать,  если присутствует course_id"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Невозможно изменить новую дату истечения срока выполнения на дату в закрытом периоде оценки успеваемости"
+  cannot_change_locked_status_on_granular_permission_6f13bf4f: "Невозможно изменить заблокированный статус по разрешению детализации"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Невозможно изменить название роли для %{label}: уже используется"
   cannot_change_the_default_term_name_edc2279b: "Невозможно изменить имя термина по умолчанию"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Невозможно изменить новую дату истечения срока выполнения на дату в закрытом периоде оценки успеваемости"
@@ -4772,6 +4777,7 @@ ru:
   canvas_files_889a274f: "Файлы Canvas"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_id_f42f6ad: "Canvas ID"
+  canvas_insights_beta_view_4cf67797: "Canvas Insights (бета) - просмотр"
   canvas_introduction_video_2d81f3ad: "Ознакомительное видео Canvas"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas пытается найти отправки. Проверьте еще раз позднее."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas не сконфигурировано для получения данных входа в систему из %{issuer}."
@@ -5323,6 +5329,7 @@ ru:
     type_disabled_error: "Этот тип конференции больше не включен для этого сайта Canvas"
   conferences_a0a8984b: Конференции
   conferences_tutorial_tray_6f071ce2: "Лоток справки по конференциям"
+  confetti_for_on_time_submissions_394e16ce: "Похвала за своевременную отправку"
   config_url_e96ceaf3: "Настройка URL-адреса"
   configurate_tool_app_5a721f2c: "Настроить приложение %{tool}?"
   configuration_location_ee0f6592: "Местоположение конфигурации"
@@ -6400,6 +6407,8 @@ ru:
     many: "%{count} результатов отображено"
     one: "1 результат отображено"
     other: "%{count} результатов отображено"
+  count_rows_added_dacc9daf: "%{count} строк(-и) добавлено"
+  count_rows_removed_c6ff7bc: "%{count} строк(-и) удалено"
   count_sections_466dcd5c: 
     few: "%{count} Разделы"
     many: "%{count} Разделы"
@@ -7258,6 +7267,7 @@ ru:
         new_announcement: "Новое объявление"
         student_view: "Вид с позиции студента"
         view_course_calendar: "Просмотреть календарь курса"
+        view_course_notification_settings: "Просмотр уведомлений по курсу"
         view_course_stream: "Просмотреть поток курса"
       re_sending: "Повторная отправка..."
       send_done: "Готово. Сообщение может занять несколько минут."
@@ -8508,6 +8518,9 @@ ru:
   display_totals_for_all_grading_periods_option_4a72586: "Отображаемые суммарные значения для опции «Все периоды оценки успеваемости»"
   display_values_f517c73c: "Отобразить значения"
   displaying_to_students_b1e92058: "Показывается студентам"
+  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+      Отображает похвалу для пользователей, которые выполнили отправку до
+      установленной даты сдачи.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Распределение текущих оценок по курсам для всех зарегистрированных студентов
               на курсах отдела.
@@ -9397,6 +9410,7 @@ ru:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Развернуть список участников группы для %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Развернуть или свернуть календари"
   expand_or_collapse_undated_items_b901de09: "Развернуть или свернуть элементы без даты"
+  expand_permission_b45bf097: "Развернуть %{permission}"
   expand_permission_c61d5958: "Расширить разрешение"
   expand_subdiscussion_cd226ed4: "Развернуть под-дискуссию"
   expand_tutorial_tray_22630c49: "Развернуть лоток справки"
@@ -11781,6 +11795,10 @@ ru:
       
       *Убедитесь, что имена файлов подписок не изменены, чтобы их можно было распознать.*
   if_you_need_to_make_your_course_public_please_cont_7084c67b: "Если вам необходимо сделать ваш курс открытым, обратитесь к своему администратору/ в службу поддержки."
+  if_you_turn_this_on_when_an_account_admin_goes_to__42e74f56: |-
+      Если вы активируете этот параметр, когда администратор учетной записи переходит на страницу
+      для создания глобального объявления, появится окно флажка для отправки
+      оповещения напрямую пользователям при начале объявления.
   if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: "Если вы активируете этот параметр, когда администратор учетной записи переходит на страницу для создания глобального объявления, появится окно флажка для отправки оповещения напрямую пользователям при начале объявления."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Если вы используете другую систему управления курсами, вероятно, вам потребуется переместить что-либо в Canvas. Мы поможем вам разобраться в процессе перемещения содержимого в Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "При желании можно переименовать «SIS» во что-то более знакомое"
@@ -12872,6 +12890,7 @@ ru:
   manage_module_name_dfe16816: "Управлять %{module_name}"
   manage_name_7f55f792: "Управлять %{name}"
   manage_options_for_name_83278ad0: "Управление опциями для %{name}"
+  manage_pages_4d2adeb6: "Управление страницами"
   manage_profile_pictures_40c958ce: "Управление изображениями профиля"
   manage_rubrics_5d274f6a: "Управление рубриками"
   manage_snapshots_1dc4b79d: "Управление снэпшотами"
@@ -15297,6 +15316,7 @@ ru:
     students_will_see: "Студенты смогут видеть, что звук этого задания отключен."
     submission_comments: "Комментарии отправки"
     sure_you_want_to_mute: "Действительно хотите отключить звук этого задания? Пока звук этого задания отключен, студенты не будут получать новые уведомления и не смогут просматривать:"
+  mute_notifications_by_course_440e18be: "Отключить уведомления по курсу"
   mute_unmute_assignment_62608e44: "Включить/выключить звук задания"
   muted_283cfa0f: (отключено)
   muted_3ff94739: "Звук отключен"
@@ -16457,6 +16477,8 @@ ru:
   parent_signup_b7c6bf0a: "Регистрация на родительском уровне"
   parents_sign_up_here_f0aa8f4f: "Регистрация для родителей здесь"
   partially_anonymous_483a892d: "Частично анонимный"
+  partially_enabled_and_locked_9a39d38a: "Частично активировано и заблокировано"
+  partially_enabled_cd506819: "Частично активировано"
   participation_af2598: Участие
   participations_1823832d: Участия
   pass_2a8c4f07: сдал
@@ -17056,6 +17078,7 @@ ru:
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Для выбранного типа оценки возможные баллы должны быть не ниже 0"
+  points_possible_must_be_greater_than_0_for_selecte_5708da1b: "Возможное количество баллов должно быть больше 0 для выбранного типа оценивания"
   points_possible_points_fda3b111: "%{points_possible} Баллы"
   points_pts_e5596bf7: "%{points} баллы"
   points_range_rating_pts_ab9c8540: "%{points}%{range_rating} баллы"
@@ -19910,9 +19933,9 @@ ru:
   score_student_points_possible_points_78360e86: "Оценка {{student_points}}/{{possible_points}}"
   score_to_keep_e89e4fa5: "Оценка для сохранения"
   scored_less_than_2427896c: "Оценено меньше"
-  scored_less_than_cutoff_on_assignment_5f5c4303: "Оценено меньше чем %{cutoff} по %{assignment}"
+  scored_less_than_cutoff_on_assignment_5f5c4303: "Оценка ниже %{cutoff} по %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "Оценка ниже %{score} по %{assignmentTitle}"
-  scored_more_than_cutoff_on_assignment_f422fec: "Оценено больше чем %{cutoff} по %{assignment}"
+  scored_more_than_cutoff_on_assignment_f422fec: "Оценка выше %{cutoff} по %{assignment}"
   scored_more_than_d1646bd5: "Оценено больше"
   scored_more_than_score_on_assignmenttitle_2afa1d32: "Оценка выше %{score} по %{assignmentTitle}"
   screenreader_gradebook: 
@@ -20196,6 +20219,7 @@ ru:
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Просмотреть некоторые инструметы LTI*, прекрасно работающие с Canvas."
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Просмотрите некоторые инструменты LTI, которые отлично работают с Canvas."
   see_turnitin_results_cd9d4a6c: "См. результаты Turnitin"
+  see_vericite_results_b44dd8c8: "См. результаты VeriCite"
   select_1e849959: "[ Выбрать ]"
   select_a_course_4710371f: "Выбрать курс"
   select_a_grading_period_5ea50f1: "Выбрать период выставления оценок..."
@@ -21242,6 +21266,7 @@ ru:
   showing_all_announcements_36ff0cec: "Показывать все объявления"
   showing_all_discussions_7e09f4b7: "Показать все обсуждения"
   showing_all_sets_of_grading_periods_6c160874: "Показаны все наборы периодов оценивания."
+  shrink_permission_74b01aed: "Свернуть %{permission}"
   shuffle_answers_edb602b7: "Изменить порядок ответов"
   signup_type_8b4506f3: "Тип регистрации"
   similarity_detection_dcada48: "Обнаружение сходства"
@@ -21402,6 +21427,7 @@ ru:
   something_went_wrong_please_try_again_6d337b6c: "Что-то пошло не так, повторите попытку."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Возникла проблема. Попробуйте перезагрузить страницу. Если проблема сохраняется, вы можете попробовать загрузить группу из одного студента в SpeedGrader с помощью *настройки Большой курс*."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Возникла проблема. Попробуйте перезагрузить страницу. Если проблема не устранена, причиной этого может быть слишком большое число записей в \"%{assignmentTitle}\" для загрузки SpeedGrader."
+  something_went_wrong_please_try_refreshing_the_pag_689be273: "Возникла проблема. Попробуйте перезагрузить страницу."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Что-то пошло не так при повторной активации пользователя. Пожалуйста, повторите попытку позже."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Что-то пошло неправильно во время обновления роли пользователя. Пожалуйста, повторите попытку позже."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Что-то пошло не так при попытке синхронизации оценок с информационной системой обучения. Попробуйте еще раз позже."
@@ -21990,6 +22016,7 @@ ru:
   successfully_posted_the_comment_12d95d56: "Комментарий успешно размещен"
   successfully_resubmitted_to_turnitin_c908de0f: "Повторно отправлено в Turnitin."
   successfully_resubmitted_to_vericite_dab924b6: "Успешно повторно отправлено в VeriCite."
+  successfully_saved_the_comment_c87681fd: "Комментарий успешно сохранен"
   successfully_updated_the_comment_946360d5: "Комментарий успешно обновлен"
   sum_of_all_files_in_mb_2b705055: "сумма всех файлов в МБ"
   summary_statistics_f74852a5: "Сводные статистические данные"
@@ -22409,6 +22436,7 @@ ru:
   there_was_a_problem_posting_the_comment_75d15646: "Возникла проблема при размещении комментария"
   there_was_a_problem_publishing_grades_b0b9202f: "Возникла проблема при опубликовании оценок."
   there_was_a_problem_releasing_grades_fa0ae6: "Возникла проблема при публикации оценок."
+  there_was_a_problem_saving_the_comment_d94cbac9: "Возникла проблема при сохранении комментария"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Возникла проблема при сохранении оценки."
   there_was_a_problem_saving_the_grades_5e61f9e2: "При сохранении оценок произошла ошибка."
   there_was_a_problem_saving_the_grading_period_243bed6c: "Возникла проблема при сохранении периода оценивания."
@@ -24086,6 +24114,7 @@ ru:
   vericite_info: 
     buttons: 
       resubmit_to_vericite: "Повторно отправить в VeriCite"
+  vericite_similarity_score_more_information_7df9ea5c: "Оценка сходства VeriCite -- более подробная информация"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Коэффициент сходства - См. подробный отчет"
   video_78335c71: видео
   video_b9f27375: Видео
@@ -24102,6 +24131,7 @@ ru:
   view_app_configurations_52b52441: "Просмотреть конфигурации приложения"
   view_audit_trail_12f774b6: "Просмотреть журнал аудита"
   view_ba339f93: Просмотреть
+  view_canvas_insights_beta_fe446d71: "Просмотр Canvas Insights (бета)"
   view_conditional_content_settings_a2dca270: "Просмотр параметров условного контента"
   view_course_analytics_eefe6b2: "Отобразить аналитику для курса"
   view_faculty_journals_ad0e8c8f: "Просмотреть журнал преподавателей"

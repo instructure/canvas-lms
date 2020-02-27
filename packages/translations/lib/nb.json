@@ -113,6 +113,9 @@
     "audio_player_for_title_20cc70d": {
         "message": "Lydspiller for { title }"
     },
+    "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+        "message": "Automatisk lagret innhold finnes. Ønsker du å laste det automatisk lagrede innholdet i stedet?"
+    },
     "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
         "message": "Automatisk åpne en forhåndsvisning av prosesslinjen. (Forhåndsvisning vises etter lagring)"
     },
@@ -143,14 +146,23 @@
     "clear_selected_file_82388e50": {
         "message": "Fjern valgt fil"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Fjern valgt fil: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Klikk på en side for å sette inn en lenke til den siden."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Klikk for å bygge inn { imageName }"
     },
+    "click_to_hide_preview_3c707763": {
+        "message": "Klikk for å skjule forhåndsvisning"
+    },
     "click_to_insert_a_link_into_the_editor_c19613aa": {
         "message": "Klikk for å sette inn en kobling i redigeringsprogrammet."
+    },
+    "click_to_show_preview_faa27051": {
+        "message": "Klikk for å vise forhåndsvisning"
     },
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Lukk en meny eller dialog. Returnerer deg også til redigeringsområdet"
@@ -299,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Vis tekstlenke (Åpnes i en ny fane)"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokumenter"
     },
@@ -364,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Legg ved videokode"
+    },
+    "equation_1c5ac93c": {
+        "message": "Ligning"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Kunne ikke laste inn karakterer"
@@ -434,6 +452,9 @@
     "formatting_5b143aa8": {
         "message": "Formatering"
     },
+    "found_auto_saved_content_3f6e4ca5": {
+        "message": "Fant automatisk lagret innhold"
+    },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Fant { count, plural,\n     =0 {# resultater}\n    one {# resultat}\n  other {# resultater}\n}"
     },
@@ -479,6 +500,9 @@
     "height_69b03e15": {
         "message": "Høyde"
     },
+    "image_8ad06": {
+        "message": "Bilde"
+    },
     "image_options_5412d02c": {
         "message": "Bilde-alternativer"
     },
@@ -490,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Øk innrykk"
+    },
+    "insert_593145ef": {
+        "message": "Sett inn"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Sett inn Equella-koblinger"
@@ -647,6 +674,9 @@
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Ingen forfallsdatoer tildelt"
     },
+    "no_e16d9132": {
+        "message": "Nei"
+    },
     "no_grade_3b4d7f3e": {
         "message": "Ingen karakter"
     },
@@ -749,6 +779,9 @@
     "preformatted_d0670862": {
         "message": "Forhåndsformattert"
     },
+    "preview_53003fd2": {
+        "message": "Forhåndsvisning"
+    },
     "preview_a3f8f854": {
         "message": "FORHÅNDSVISNING"
     },
@@ -790,6 +823,9 @@
     },
     "replies_4a8577c8": {
         "message": "Svar"
+    },
+    "restore_auto_save_deccd84b": {
+        "message": "Gjenopprette automatisk lagring?"
     },
     "rich_content_editor_2708ef21": {
         "message": "Rich innholdsredigering"
@@ -1072,6 +1108,9 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wikiforside"
+    },
+    "yes_dde87d5": {
+        "message": "Ja"
     },
     "yesterday_at_date_1aa6d18e": {
         "message": "I går på { date }"

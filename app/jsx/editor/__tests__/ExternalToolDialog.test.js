@@ -208,12 +208,12 @@ describe('open', () => {
   })
 
   describe('tray', () => {
-    it('does not set height or width for iframe', async () => {
+    it('sets height and width for iframe to 100%', async () => {
       const instance = await getInstance(container)
       instance.open({name: 'foo', id: 2, use_tray: true})
       const style = document.querySelector('iframe').style
-      expect(style.height).toBe('')
-      expect(style.width).toBe('')
+      expect(style.height).toBe('100%')
+      expect(style.width).toBe('100%')
     })
   })
 })

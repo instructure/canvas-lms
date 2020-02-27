@@ -82,20 +82,11 @@ describe "Api::V1::Assignment" do
     end
 
     it "includes the assignment's post policy when feature enabled" do
-      assignment.course.enable_feature!(:new_gradebook)
       PostPolicy.enable_feature!
       assignment.post_policy.update!(post_manually: true)
 
       json = api.assignment_json(assignment, user, session)
       expect(json["post_manually"]).to be true
-    end
-
-    it "does not include the assignment's post policy when feature disabled" do
-      PostPolicy.disable_feature!
-      assignment.post_policy.update!(post_manually: true)
-
-      json = api.assignment_json(assignment, user, session)
-      expect(json).not_to have_key "post_manually"
     end
 
     it "returns nil for planner override when flag is passed and there is no override" do
@@ -131,7 +122,6 @@ describe "Api::V1::Assignment" do
     describe "hidden_submissions_count attribute" do
       before do
         PostPolicy.enable_feature!
-        assignment.course.enable_feature!(:new_gradebook)
         @student = assignment.course.enroll_student(User.create!, enrollment_state: :active).user
         @teacher = assignment.course.enroll_teacher(User.create!, enrollment_state: :active).user
         assignment.ensure_post_policy(post_manually: true)

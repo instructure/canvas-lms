@@ -199,6 +199,25 @@ describe NotificationPolicy do
       NotificationPolicy.setup_for(@user, params)
     end
 
+    it "should update send_observed_names_in_notifications when included" do
+      user_model
+      communication_channel_model
+      params = { :channel_id => @communication_channel.id }
+      params[:root_account] = Account.default
+      params[:user] = { :send_observed_names_in_notifications => 'true' }
+      NotificationPolicy.setup_for(@user, params)
+      expect(@user.send_observed_names_in_notifications?).to eq true
+      params[:user] = { :send_observed_names_in_notifications => 'false' }
+      NotificationPolicy.setup_for(@user, params)
+      expect(@user.send_observed_names_in_notifications?).to eq false
+
+      # Verify KNO-298
+      params[:root_account].settings[:allow_sending_scores_in_emails] = false
+      params[:user] = { :send_observed_names_in_notifications => 'true' }
+      NotificationPolicy.setup_for(@user, params)
+      expect(@user.send_observed_names_in_notifications?).to eq true
+    end
+
     it "should set all notification entries within the same category" do
       user_model
       communication_channel_model

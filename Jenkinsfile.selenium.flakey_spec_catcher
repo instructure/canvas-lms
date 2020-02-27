@@ -18,9 +18,79 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@groovy.transform.Field
+def result_test_count = -1
+@groovy.transform.Field
+def result_node_count = -1
+
 def getImageTagVersion() {
   def flags = load 'build/new-jenkins/groovy/commit-flags.groovy'
   return flags.getImageTagVersion()
+}
+
+def computeTestCount() {
+  // oops, probably should have added an easier way to _count_ tests...
+  sh 'rm -rf tmp'
+  sh 'mkdir tmp'
+  sh 'chmod 777 tmp'
+  sh """
+    docker run --volume \$WORKSPACE/.git:/usr/src/app/.git \
+               --volume \$WORKSPACE/tmp:/usr/src/app/tmp \
+               \$PATCHSET_TAG \
+        bundle exec flakey_spec_catcher --use-parent --dry-run-quiet > tmp/test_list
+  """
+  def raw_result = readFile('tmp/test_list').trim()
+  echo "raw result from catcher: \n====\n$raw_result\n===="
+  def test_count = 0
+  if (raw_result) {
+    test_count = raw_result.split('\n').length
+  }
+  echo "expected tests to run: $test_count"
+  result_test_count = test_count
+}
+
+def computeDistributedCount() {
+  if (result_test_count < 0)
+    throw IllegalStateException("call computeTestCount() first")
+  // this type of distributed thing always needs a hard cutoff
+  if (env.DISTRIBUTED_CUT_OFF.toInteger() < result_test_count)
+    throw IllegalStateException("unable to process more than ${env.DISTRIBUTED_CUT_OFF} tests")
+  if (result_test_count == 0) {
+    result_node_count = 0
+  }
+  else {
+    // force a round down
+    // this will have the following node counts.
+    // test  | nodes
+    // 1-14  | 1
+    // 15-24 | 2
+    // 25-34 | 3
+    // ...
+    def distributed_offset = env.DISTRIBUTED_OFFSET.toInteger()
+    def distributed_factor = env.DISTRIBUTED_FACTOR.toInteger()
+    result_node_count = (int) ((result_test_count + distributed_offset) / distributed_factor)
+  }
+}
+
+def executeFlakeySpecCatcher(prefix = 'main') {
+  sh 'rm -rf tmp'
+  try {
+    timeout(60) {
+      sh 'build/new-jenkins/docker-compose-pull.sh'
+      sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+      sh 'build/new-jenkins/docker-compose-build-up.sh'
+      sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+      sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
+    }
+  }
+  finally {
+    sh "mkdir -p tmp/$prefix"
+    sh (
+      script: "docker cp \$(docker-compose ps -q web):/usr/src/app/tmp/fsc.out ./tmp/$prefix/fsc.out",
+      returnStatus: true
+    )
+    archiveArtifacts(artifacts: "tmp/$prefix/fsc.out", allowEmptyArchive: true)
+  }
 }
 
 pipeline {
@@ -32,6 +102,14 @@ pipeline {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml:docker-compose.new-jenkins-flakey-spec-catcher.yml'
     NAME = getImageTagVersion()
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+
+    // there will be a node for every 10 tests
+    DISTRIBUTED_FACTOR = '10'
+    // this causes distribution to trigger at an offset
+    DISTRIBUTED_OFFSET = '5'
+    // if someone is trying to update more than these amount of tests, then just fail.
+    // that will be at DISTRIBUTED_CUT_OFF / DISTRIBUTED_FACTOR nodes.
+    DISTRIBUTED_CUT_OFF = '300'
   }
 
   stages {
@@ -50,36 +128,54 @@ pipeline {
       }
     }
 
-    stage('Build') {
+    stage("Compute Build Distribution") {
       steps {
-        timeout(time: 20) {
-          sh 'build/new-jenkins/docker-compose-pull.sh'
-          sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
-          sh 'build/new-jenkins/docker-compose-build-up.sh'
-          sh 'build/new-jenkins/docker-compose-create-migrate-database.sh'
+        script {
+          computeTestCount()
+          computeDistributedCount()
+          echo "expected nodes to run on for $result_test_count tests: $result_node_count"
         }
       }
     }
 
-    stage("Running Selenium Specs") {
+    stage("Run Flakey Spec Catcher") {
+      when { expression { result_test_count > 0 } }
       steps {
-        timeout(time: 60) {
-          sh (
-            script: 'docker-compose exec -T web flakey_spec_catcher --repeat=$FSC_REPEAT_FACTOR --output=/usr/src/app/tmp/fsc.out',
-            returnStatus: true
-          )
+        script {
+          if (result_node_count <= 1) {
+            echo "running on this node"
+            executeFlakeySpecCatcher()
+          }
+          else {
+            echo "running on multiple nodes: $result_node_count"
+            def nodes = [:];
+            for(int i = 0; i < result_node_count; i++) {
+              // make sure to create a new index variable so this value gets
+              // captured by the lambda for FSC_NODE_INDEX
+              def index = i
+              def node_number = (index).toString().padLeft(2, '0')
+              nodes["flakey set $node_number"] = {
+                withEnv(["FSC_NODE_TOTAL=$result_node_count", "FSC_NODE_INDEX=$index"]) {
+                  node('canvas-docker') {
+                    stage("Running Flakey Set $node_number") {
+                      try {
+                        sh 'rm -rf ./tmp'
+                        checkout scm
+                        sh 'build/new-jenkins/docker-cleanup.sh'
+                        executeFlakeySpecCatcher("node$node_number")
+                      }
+                      finally {
+                        sh 'rm -rf ./tmp'
+                        sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            parallel(nodes);
+          }
         }
-      }
-    }
-
-    stage("Copy and Archive output") {
-      steps {
-        sh 'mkdir -p tmp'
-        sh (
-          script: 'docker cp $(docker-compose ps -q web):/usr/src/app/tmp/fsc.out ./tmp/fsc.out',
-          returnStatus: true
-        )
-        archiveArtifacts(artifacts: 'tmp/fsc.out', allowEmptyArchive: true)
       }
     }
   }

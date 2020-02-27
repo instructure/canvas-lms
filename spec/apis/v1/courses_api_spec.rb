@@ -3725,7 +3725,6 @@ describe CoursesController, type: :request do
       end
 
       it "should update settings" do
-        @course.enable_feature!(:new_gradebook)
         @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
         @course.enable_feature!(:final_grades_override)
         expect(Auditors::Course).to receive(:record_updated).

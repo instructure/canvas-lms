@@ -124,11 +124,7 @@
       <tr>
         <th scope="col"><%= t('headers.name', "Name") %></th>
         <th scope="col"><%= t('headers.due', "Due") %></th>
-
-        <% if @context.feature_enabled?(:new_gradebook) %>
-          <th scope="col" class="status"><%= t('Status') %></th>
-        <% end %>
-
+        <th scope="col" class="status"><%= t('Status') %></th>
         <th scope="col" class="assignment_score"><%= t('headers.score', "Score") %></th>
         <th scope="col" class="possible"><%= t('headers.out_of', "Out of") %></th>
         <th scope="col"><span class="screenreader-only"><%= t('headers.details', "Details") %></span></th>
@@ -170,15 +166,14 @@
           <% end %>
         </td>
 
-        <% if @context.feature_enabled?(:new_gradebook) %>
-          <td class="status" scope="row">
-            <% if assignment_presenter.missing? %>
-              <span class="submission-missing-pill"></span>
-            <% elsif assignment_presenter.late? %>
-              <span class="submission-late-pill"></span>
-            <% end %>
-          </td>
-        <% end %>
+        <td class="status" scope="row">
+          <% if assignment_presenter.missing? %>
+            <span class="submission-missing-pill"></span>
+          <% elsif assignment_presenter.late? %>
+            <span class="submission-late-pill"></span>
+          <% end %>
+        </td>
+
         <td class="assignment_score" title="<%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>">
           <div style="position: relative; height: 100%;" class="score_holder">
             <% if !assignment_presenter.upload_status.present?  %>
@@ -353,7 +348,7 @@
                 <% if @presenter.show_updated_plagiarism_icons?(turnitin) %>
                   <%=
                     render partial: "shared/originality_score_icon", locals: {
-                      hide_score: true,
+                      hide_score: false,
                       plagiarism_data: turnitin,
                       report_title: anchor_title,
                       report_url: url
@@ -384,7 +379,7 @@
               <% if @presenter.show_updated_plagiarism_icons?(vericite) %>
                 <%=
                   render partial: "shared/originality_score_icon", locals: {
-                    hide_score: true,
+                    hide_score: false,
                     plagiarism_data: vericite,
                     report_title: t("VeriCite similarity score -- more information"),
                     report_url: url,

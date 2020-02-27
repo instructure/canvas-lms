@@ -114,12 +114,5 @@ describe PostPolicy do
         expect(Setting.get("post_policies_enabled", false)).to eq "true"
       end
     end
-
-    describe ".disable_feature!" do
-      it "sets the post_policies_enabled setting to 'false'" do
-        PostPolicy.disable_feature!
-        expect(Setting.get("post_policies_enabled", false)).to eq "false"
-      end
-    end
   end
 end

@@ -42,6 +42,7 @@ export default function(ed, document) {
     // but it also does the upload. We need to separate them if we
     // want to stay within the redux approach
     const handleStartUpload = fileProps => {
+      Bridge.focusEditor(ed.rceWrapper)
       Bridge.insertImagePlaceholder(fileProps)
       handleDismiss()
     }

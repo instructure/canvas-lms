@@ -24,6 +24,7 @@ export default class CopyCourseView extends MigrationView
   @child 'courseFindSelect', '.courseFindSelect'
   @child 'dateShift', '.dateShift'
   @child 'selectContent', '.selectContent'
+  @child 'importQuizzesNext', '.importQuizzesNext'
 
   initialize: ->
     super

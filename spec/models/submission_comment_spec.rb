@@ -146,7 +146,6 @@ RSpec.describe SubmissionComment do
 
     context "post policies" do
       before(:once) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 
@@ -761,7 +760,6 @@ This text has a http://www.google.com link in it...
 
     context "post policies" do
       before(:once) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
       end
 

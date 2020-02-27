@@ -1529,6 +1529,10 @@ class User < ActiveRecord::Base
     !!feature_enabled?(:high_contrast)
   end
 
+  def prefers_no_celebrations?
+    !!feature_enabled?(:disable_celebrations)
+  end
+
   def manual_mark_as_read?
     !!preferences[:manual_mark_as_read]
   end

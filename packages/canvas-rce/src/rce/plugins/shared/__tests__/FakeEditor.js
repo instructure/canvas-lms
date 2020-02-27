@@ -19,6 +19,7 @@
 export default class FakeEditor {
   constructor() {
     this._$container = null
+    this.rceWrapper = {}
 
     this._selectedNode = null
 

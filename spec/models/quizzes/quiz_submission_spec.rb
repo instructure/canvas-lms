@@ -754,7 +754,6 @@ describe Quizzes::QuizSubmission do
       end
 
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
 
         student_in_course

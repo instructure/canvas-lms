@@ -78,12 +78,21 @@ const QuizzesIndexRouter = Backbone.Router.extend({
   },
 
   loadOverrides() {
-    const quizModels = ['assignment', 'open', 'surveys'].reduce(
-      (out, quizType) => out.concat(this.quizzes[quizType].collection.models),
-      []
-    )
+    const newQuizzes = []
+    const classicQuizzes = []
+    const quizTypes = ['assignment', 'open', 'surveys']
+    quizTypes.forEach(quizType => {
+      this.quizzes[quizType].collection.models.forEach(model => {
+        if (model.attributes.quiz_type === 'quizzes.next') {
+          newQuizzes.push(model)
+        } else {
+          classicQuizzes.push(model)
+        }
+      })
+    })
 
-    return QuizOverrideLoader.loadQuizOverrides(quizModels, ENV.URLS.assignment_overrides)
+    QuizOverrideLoader.loadQuizOverrides(newQuizzes, ENV.URLS.new_quizzes_assignment_overrides)
+    return QuizOverrideLoader.loadQuizOverrides(classicQuizzes, ENV.URLS.assignment_overrides)
   },
 
   createQuizItemGroupView(collection, title, type) {

@@ -91,4 +91,15 @@ describe('RCE "Links" Plugin > LinkOptionsDialog > LinkOptionsDialogController',
       expect(bridge.insertLink).toHaveBeenCalledWith({}, false)
     })
   })
+
+  describe('Done', () => {
+    it('focuses the editor on saving the new link', () => {
+      dialogController.showDialogForEditor(editor, 'create')
+      const lodd = getDialog('create')
+      lodd.setText('link text')
+      lodd.setLink('http://example.com')
+      lodd.$doneButton.click()
+      expect(bridge.focusEditor).toHaveBeenCalledWith(editor.rceWrapper)
+    })
+  })
 })

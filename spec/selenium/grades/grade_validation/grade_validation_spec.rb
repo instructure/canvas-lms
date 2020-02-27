@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
-require_relative '../pages/gradezilla_page'
+require_relative '../pages/gradebook_page'
 
 describe 'Gradebook frontend/backend calculators' do
   include_context 'in-process server selenium tests'
@@ -41,7 +41,6 @@ describe 'Gradebook frontend/backend calculators' do
     @courses.each_with_index do |course, course_index|
       grades = @unlucky_group[course_index]
 
-      course.enable_feature!(:new_gradebook)
       create_enrollments(course, student_data)
       group = course.assignment_groups.create! name: 'assignments'
       assignments = create_assignments(
@@ -98,9 +97,9 @@ describe 'Gradebook frontend/backend calculators' do
       # need to expand and bring all rows into view in order to scrape
       driver.manage.window.resize_to(2000,900)
       user_session(@teacher)
-      Gradezilla.visit(@courses[i])
-      @frontend_grades = Gradezilla.scores_scraped
-      @backend_grades = Gradezilla.scores_api(@courses[i])
+      Gradebook.visit(@courses[i])
+      @frontend_grades = Gradebook.scores_scraped
+      @backend_grades = Gradebook.scores_api(@courses[i])
       @diff = @frontend_grades - @backend_grades
 
       @diff.each do |entry|

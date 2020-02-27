@@ -32,6 +32,8 @@ function roundedNumber(val) {
   return I18n.n(round(val, round.DEFAULT))
 }
 
+const MINIMUM_SCHEME_VALUE_DIFFERENCE = 0.01
+
 $(document).ready(() => {
   $('.add_standard_link').click(event => {
     event.preventDefault()
@@ -627,80 +629,158 @@ $(document).ready(() => {
       .parents('.grading_standard_row')
       .find('.standard_value')
       .val(I18n.n(val))
+
     if (isNaN(val)) {
       val = null
     }
+
     let lastVal = val || 100
     let prevVal = val || 0
     const $list = $standard.find('.grading_standard_row:not(.blank,.to_delete)')
+
+    /*
+     * Starting at the top of the list, traverse each row. Use `lastVal` to hold
+     * the assigned minimum point value for the current row so that each
+     * subsequent row is able to reference it while calculating its own minimum
+     * point value.
+     */
     for (
       var idx = $list.index($(this).parents('.grading_standard_row')) + 1;
       idx < $list.length;
       idx++
     ) {
       var $row = $list.eq(idx)
+
+      // Parse the given point value from the input of the current row.
       var points = numberHelper.parse($row.find('.standard_value').val())
+
       if (isNaN(points)) {
         points = null
       }
+
       if (idx == $list.length - 1) {
+        // When the current row is the last row, the minimum point value must be 0.
         points = 0
-      } else if (!points || points > lastVal - 0.1) {
+      } else if (!points || points > lastVal - MINIMUM_SCHEME_VALUE_DIFFERENCE) {
+        /*
+         * When the current row is NOT the last row, and the minimum point value is
+         * either absent or is too close (higher value than 0.01 less than the
+         * previous value), change the minimum point value to be one point less
+         * than the minimum point value of the next-higher row.
+         */
         points = parseInt(lastVal) - 1
       }
+
       $row.find('.standard_value').val(I18n.n(points))
       lastVal = points
     }
+
+    /*
+     * Starting at the bottom of the list, traverse each row. Use `prevVal` to hold
+     * the assigned minimum point value for the current row so that each
+     * subsequent row is able to reference it while calculating its own minimum
+     * point value.
+     */
     for (var idx = $list.index($(this).parents('.grading_standard_row')) - 1; idx >= 0; idx--) {
       var $row = $list.eq(idx)
+
+      // Parse the given point value from the input of the current row.
       var points = numberHelper.parse($row.find('.standard_value').val())
+
       if (isNaN(points)) {
         points = null
       }
+
       if (idx == $list.length - 1) {
+        // When the current row is the last row, the minimum point value must be 0.
         points = 0
-      } else if (!points || points < prevVal + 0.1) {
+      } else if (!points || points < prevVal + MINIMUM_SCHEME_VALUE_DIFFERENCE) {
+        /*
+         * When the current row is NOT the last row, and the minimum point value is
+         * either absent or is too close (higher value than 0.01 less than the
+         * previous value), change the minimum point value to be one point less
+         * than the minimum point value of the next-higher row.
+         */
         points = parseInt(prevVal) + 1
       }
+
       prevVal = points
       $row.find('.standard_value').val(I18n.n(points))
     }
+
+    /*
+     * Starting at the top of the list, traverse each row. Use `lastVal` to hold
+     * the assigned minimum point value for the current row so that each
+     * subsequent row is able to reference it while calculating its own minimum
+     * point value.
+     */
     lastVal = 100
     $list.each(function(idx) {
+      // Parse the given point value from the input of the current row.
       let points = numberHelper.parse(
         $(this)
           .find('.standard_value')
           .val()
       )
+
       var idx = $list.index(this)
       if (isNaN(points)) {
         points = null
       }
+
       if (idx == $list.length - 1) {
+        // When the current row is the last row, the minimum point value must be 0.
         points = 0
-      } else if (!points || points > lastVal - 0.1) {
+      } else if (!points || points > lastVal - MINIMUM_SCHEME_VALUE_DIFFERENCE) {
+        /*
+         * When the current row is NOT the last row, and the minimum point value is
+         * either absent or is too close (higher value than 0.01 less than the
+         * previous value), change the minimum point value to be one point less
+         * than the minimum point value of the next-higher row.
+         */
         points = parseInt(lastVal) - 1
       }
+
       $(this)
         .find('.standard_value')
         .val(I18n.n(points))
       lastVal = points
     })
+
+    /*
+     * Starting at the bottom of the list, traverse each row. Use `prevVal` to hold
+     * the assigned minimum point value for the current row so that each
+     * subsequent row is able to reference it while calculating its own minimum
+     * point value.
+     */
     prevVal = 0
     for (var idx = $list.length - 1; idx >= 0; idx--) {
       var $row = $list.eq(idx)
+
+      // Parse the given point value from the input of the current row.
       var points = numberHelper.parse($row.find('.standard_value').val())
+
       if (isNaN(points)) {
         points = null
       }
+
       if (idx == $list.length - 1) {
+        // When the current row is the last row, the minimum point value must be 0.
         points = 0
-      } else if ((!points || points < prevVal + 0.1) && points != 0) {
+      } else if ((!points || points < prevVal + MINIMUM_SCHEME_VALUE_DIFFERENCE) && points != 0) {
+        /*
+         * When the current row is NOT the last row, and the minimum point value is
+         * either absent or is too close (higher value than 0.01 less than the
+         * previous value), change the minimum point value to be one point more
+         * than the minimum point value of the next-lower row.
+         */
         points = parseInt(prevVal) + 1
       }
+
       prevVal = points
       $row.find('.standard_value').val(I18n.n(points))
     }
+
     $list.each(function(idx) {
       const $prev = $list.eq(idx - 1)
       let min_score = 0

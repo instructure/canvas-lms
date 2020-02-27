@@ -1,6 +1,6 @@
 <div id="assignment_group_{{id}}" data-id="{{id}}" class="assignment_group">
 
-  <div class="ig-header" style="position:relative;">
+  <div class="ig-header">
     {{#if ENV.PERMISSIONS.manage}}
       <span class="sortable-handle">
         <i class="icon-drag-handle" aria-hidden="true"></i>
@@ -73,7 +73,7 @@
       {{#if ENV.PERMISSIONS.manage}}
         <a
           href="#"
-          class="btn add_assignment"
+          class="add_assignment Button--icon-action"
           title='{{#t}}Add Assignment to {{name}}{{/t}}'
         >
           {{! icon is separate from <a> tag because it is the only visible content in the button }}
@@ -82,7 +82,7 @@
         </a>
 
         <div class="inline-block">
-          <a id="ag_{{id}}_manage_link" class="al-trigger btn" href="#" tabindex="0" role="button">
+          <a id="ag_{{id}}_manage_link" class="al-trigger Button--icon-action" href="#" tabindex="0" role="button">
             <span class="screenreader-only">{{#t}}Manage {{name}}{{/t}}</span>
             <i class="icon-more" aria-hidden="true"></i>
           </a>

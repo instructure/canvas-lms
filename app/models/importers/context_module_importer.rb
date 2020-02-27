@@ -116,6 +116,12 @@ module Importers
       migration.add_imported_item(item)
       item.name = hash[:title] || hash[:description]
       item.mark_as_importing!(migration)
+
+      if item.deleted? && migration.for_master_course_import? &&
+          migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("manually_deleted")
+        return # it's been deleted downstream, just leave it (and any imported items) alone and return
+      end
+
       if hash[:workflow_state] == 'unpublished'
         item.workflow_state = 'unpublished' if item.new_record? || item.deleted? || migration.for_master_course_import? # otherwise leave it alone
       else

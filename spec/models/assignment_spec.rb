@@ -331,7 +331,6 @@ describe Assignment do
 
         context "when post policies are enabled" do
           before(:each) do
-            @course.enable_feature!(:new_gradebook)
             PostPolicy.enable_feature!
           end
 
@@ -919,7 +918,6 @@ describe Assignment do
           let(:student3) { User.create! }
 
           before(:each) do
-            course.enable_feature!(:new_gradebook)
             PostPolicy.enable_feature!
 
             course.enroll_student(active_student, workflow_state: :active)
@@ -2156,7 +2154,6 @@ describe Assignment do
         end
 
         it "does not post the submission for a manually-posted assignment when post policies are enabled" do
-          course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
 
           assignment.post_policy.update!(post_manually: true)
@@ -2198,7 +2195,6 @@ describe Assignment do
       context "when post policies are enabled" do
         before(:once) do
           PostPolicy.enable_feature!
-          course.enable_feature!(:new_gradebook)
         end
 
         context "when assignment posts manually" do
@@ -2223,34 +2219,6 @@ describe Assignment do
           end
         end
       end
-
-      context "when post policies are not enabled" do
-        before(:once) do
-          PostPolicy.disable_feature!
-        end
-
-        context "when assignment is muted" do
-          before(:each) do
-            assignment.mute!
-          end
-
-          it "inserts a record" do
-            expect(Auditors::GradeChange::Stream).to receive(:insert).once
-            assignment.grade_student(student, grade: 10, grader: teacher)
-          end
-        end
-
-        context "when assignment is unmuted" do
-          before(:each) do
-            assignment.unmute!
-          end
-
-          it "inserts a record" do
-            expect(Auditors::GradeChange::Stream).to receive(:insert).once
-            assignment.grade_student(student, grade: 10, grader: teacher)
-          end
-        end
-      end
     end
 
     describe "grade change live events" do
@@ -2260,7 +2228,6 @@ describe Assignment do
       context "when post policies are enabled" do
         before(:once) do
           PostPolicy.enable_feature!
-          course.enable_feature!(:new_gradebook)
         end
 
         context "when assignment posts manually" do
@@ -2281,34 +2248,6 @@ describe Assignment do
 
           it "emits two events when grading: one for grading and one for posting" do
             expect(Canvas::LiveEvents).to receive(:grade_changed).twice
-            assignment.grade_student(student, grade: 10, grader: teacher)
-          end
-        end
-      end
-
-      context "when post policies are not enabled" do
-        before(:once) do
-          PostPolicy.disable_feature!
-        end
-
-        context "when assignment is muted" do
-          before(:each) do
-            assignment.mute!
-          end
-
-          it "emits an event" do
-            expect(Canvas::LiveEvents).to receive(:grade_changed).once
-            assignment.grade_student(student, grade: 10, grader: teacher)
-          end
-        end
-
-        context "when assignment is unmuted" do
-          before(:each) do
-            assignment.unmute!
-          end
-
-          it "emits an event" do
-            expect(Canvas::LiveEvents).to receive(:grade_changed).once
             assignment.grade_student(student, grade: 10, grader: teacher)
           end
         end
@@ -3173,7 +3112,6 @@ describe Assignment do
     end
 
     it "defaults to muted when post policies are enabled" do
-      @course.enable_feature!(:new_gradebook)
       PostPolicy.enable_feature!
       expect(@course.assignments.create!).to be_muted
     end
@@ -4745,6 +4683,46 @@ describe Assignment do
     end
   end
 
+  describe "scope :type_quiz_lti" do
+    context "with a quiz_lti assignment" do
+      before :once do
+        assignment_model(:submission_types => "external_tool", :course => @course)
+        tool = @c.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+        @a.external_tool_tag_attributes = { :content => tool }
+        @a.save!
+      end
+
+      it "includes the quiz_lti quiz" do
+        expect(Assignment.type_quiz_lti).not_to be_empty
+      end
+    end
+
+    context "without any quiz_lti assignments" do
+      before :once do
+        assignment_model(:submission_types => "external_tool", :course => @course)
+        tool = @c.context_external_tools.create!(
+          :name => 'Some.Other.Tool',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'some-other-tool-id',
+          :url => 'http://example.com/launch'
+        )
+        @a.external_tool_tag_attributes = { :content => tool }
+        @a.save!
+      end
+
+      it "returns an empty scope" do
+        expect(Assignment.type_quiz_lti).to be_empty
+      end
+    end
+  end
+
   describe "linked submissions" do
     shared_examples_for "submittable" do
       before :once do
@@ -5725,7 +5703,6 @@ describe Assignment do
 
       context "with post policies enabled" do
         before(:each) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 
@@ -6651,7 +6628,6 @@ describe Assignment do
 
       context "with post policies enabled" do
         before(:each) do
-          @course.enable_feature!(:new_gradebook)
           PostPolicy.enable_feature!
         end
 
@@ -8065,7 +8041,6 @@ describe Assignment do
     let(:assignment) { course.assignments.create!(title: 'hello') }
 
     context "when the post_policies feature flag is enabled" do
-      before(:each) { course.enable_feature!(:new_gradebook) }
       before(:each) { PostPolicy.enable_feature! }
 
       context "when the assignment has a post policy" do
@@ -8127,7 +8102,6 @@ describe Assignment do
       student1
       student2
 
-      @course.enable_feature!(:new_gradebook)
       PostPolicy.enable_feature!
     end
 
@@ -8350,14 +8324,6 @@ describe Assignment do
         end
       end
 
-      it "does not update the assignment's muted status when post policies are not enabled" do
-        PostPolicy.disable_feature!
-        assignment.mute!
-
-        assignment.post_submissions
-        expect(assignment).to be_muted
-      end
-
       describe "context module progressions" do
         let(:context_module) { @course.context_modules.create! }
         let(:student1) { @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
@@ -8468,12 +8434,6 @@ describe Assignment do
           expect(@course).to receive(:recompute_student_scores).with([student1.id])
           assignment.hide_submissions(submission_ids: [student1_submission.id])
         end
-      end
-
-      it "does not update the assignment's muted status when post policies are not enabled" do
-        PostPolicy.disable_feature!
-        assignment.hide_submissions
-        expect(assignment).not_to be_muted
       end
     end
   end

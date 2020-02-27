@@ -152,7 +152,7 @@ shared_examples_for "file uploads api" do
     s3_storage!
     # step 1, preflight
     json = preflight({ :name => filename })
-    expect(json['upload_url']).to eq "https://no-bucket.s3.us-east-1.amazonaws.com"
+    expect(json['upload_url']).to eq "https://no-bucket.s3.amazonaws.com"
     attachment = Attachment.order(:id).last
     redir = json['upload_params']['success_action_redirect']
     exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""

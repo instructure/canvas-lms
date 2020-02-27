@@ -122,7 +122,8 @@ module Context
     possible_types = {
       files: -> { self.respond_to?(:attachments) && self.attachments.active.exists? },
       modules: -> { self.respond_to?(:context_modules) && self.context_modules.active.exists? },
-      quizzes: -> { self.respond_to?(:quizzes) && self.quizzes.active.exists? },
+      quizzes: -> { (self.respond_to?(:quizzes) && self.quizzes.active.exists?) ||
+        (self.respond_to?(:assignments) && self.assignments.active.quiz_lti.exists?) },
       assignments: -> { self.respond_to?(:assignments) && self.assignments.active.exists? },
       pages: -> { self.respond_to?(:wiki_pages) && self.wiki_pages.active.exists? },
       conferences: -> { self.respond_to?(:web_conferences) && self.web_conferences.active.exists? },

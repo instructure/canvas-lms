@@ -2079,8 +2079,10 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
   })
 
-  QUnit.module('SpeedGrader - gateway timeout', {
-    setup() {
+  QUnit.module('when the gateway times out', contextHooks => {
+    let server
+
+    contextHooks.beforeEach(() => {
       fakeENV.setup({
         assignment_id: '17',
         course_id: '29',
@@ -2088,42 +2090,55 @@ QUnit.module('SpeedGrader', rootHooks => {
         help_url: 'example.com/support',
         show_help_menu_item: false
       })
-      this.server = sinon.fakeServer.create({respondImmediately: true})
+
+      server = sinon.fakeServer.create({respondImmediately: true})
       // in production, json responses that timeout receive html content type responses unfortunately
-      this.server.respondWith('GET', `${window.location.pathname}.json${window.location.search}`, [
+      server.respondWith('GET', `${window.location.pathname}.json${window.location.search}`, [
         504,
         {'Content-Type': 'text/html'},
         ''
       ])
       setupFixtures('<div id="speed_grader_timeout_alert"></div>')
-    },
-    teardown() {
+
+      sandbox.stub(SpeedGrader.EG, 'domReady')
+      ENV.assignment_title = 'Assignment Title'
+    })
+
+    contextHooks.afterEach(() => {
+      SpeedGrader.teardown()
       teardownFixtures()
-      this.server.restore()
+      server.restore()
       fakeENV.teardown()
-    }
-  })
+    })
 
-  test('shows an error when the gateway times out', function() {
-    sandbox.stub(SpeedGrader.EG, 'domReady')
-    ENV.assignment_title = 'Assignment Title'
-    SpeedGrader.setup()
-    const message = [
-      'Something went wrong. Please try refreshing the page. If the problem persists, you can try',
-      'loading a single student group in SpeedGrader by using the Large Course setting.'
-    ].join(' ')
-    strictEqual($('#speed_grader_timeout_alert').text(), message)
-    SpeedGrader.teardown()
-  })
+    test('shows an error', () => {
+      SpeedGrader.setup()
+      notEqual($('#speed_grader_timeout_alert').text(), '')
+    })
 
-  test('links to the course settings page', () => {
-    sandbox.stub(SpeedGrader.EG, 'domReady')
-    ENV.assignment_title = 'Assignment Title'
-    SpeedGrader.setup()
-    const $link = $('#speed_grader_timeout_alert a')
-    const url = new URL($link[0].href)
-    strictEqual(url.pathname, '/courses/29/settings')
-    SpeedGrader.teardown()
+    QUnit.module('when the filter_speed_grader_by_student_group feature is enabled', () => {
+      test('includes a link to the "large course" setting when the setting is not enabled', () => {
+        ENV.filter_speed_grader_by_student_group_feature_enabled = true
+        ENV.filter_speed_grader_by_student_group = false
+        SpeedGrader.setup()
+        const $link = $('#speed_grader_timeout_alert a')
+        const url = new URL($link[0].href)
+        strictEqual(url.pathname, '/courses/29/settings')
+      })
+
+      test('excludes a link to the "large course" setting when the setting is already enabled', () => {
+        ENV.filter_speed_grader_by_student_group_feature_enabled = true
+        ENV.filter_speed_grader_by_student_group = true
+        SpeedGrader.setup()
+        strictEqual($('#speed_grader_timeout_alert a').length, 0)
+      })
+    })
+
+    test('excludes a link to the "large course" setting when the filter_speed_grader_by_student_group feature is disabled', () => {
+      ENV.filter_speed_grader_by_student_group_feature_enabled = false
+      SpeedGrader.setup()
+      strictEqual($('#speed_grader_timeout_alert a').length, 0)
+    })
   })
 
   QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
@@ -2749,24 +2764,6 @@ QUnit.module('SpeedGrader', rootHooks => {
         SpeedGrader.setup()
         const mountPoint = document.getElementById('speed_grader_settings_mount_point')
         strictEqual(mountPoint.textContent, 'SpeedGrader Settings')
-      })
-
-      QUnit.module('when post policies are not enabled', () => {
-        test('sets up the "Mute Assignment" dialog', () => {
-          SpeedGrader.setup()
-          SpeedGrader.EG.domReady()
-
-          // There's no easy way to distinguish between dialogs, so look for
-          // their individual buttons instead
-          ok(document.querySelector('.btn-mute'))
-        })
-
-        test('sets up the "Unmute Assignment" dialog', () => {
-          SpeedGrader.setup()
-          SpeedGrader.EG.domReady()
-
-          ok(document.querySelector('.btn-unmute'))
-        })
       })
 
       QUnit.module('when post policies are enabled', postPolicyHooks => {
@@ -3836,17 +3833,6 @@ QUnit.module('SpeedGrader', rootHooks => {
               strictEqual(SpeedGraderPostGradesMenu.props.hasGradesOrPostableComments, false)
             })
           })
-
-          test('is not called if ENV.post_policies_enabled is not true', () => {
-            ENV.post_policies_enabled = false
-            sinon.spy(ReactDOM, 'render')
-
-            SpeedGrader.EG.jsonReady()
-
-            notOk(findRenderCall())
-
-            ReactDOM.render.restore()
-          })
         })
 
         QUnit.module('when SpeedGrader is loaded with no students', noStudentsHooks => {
@@ -4393,14 +4379,6 @@ QUnit.module('SpeedGrader', rootHooks => {
             })
             notOk(getPostOrHideGradesButton())
           })
-        })
-
-        test('does not attempt to render a hypothetical post/hide grades menu if post policies is not enabled', () => {
-          SpeedGrader.EG.setOrUpdateSubmission({
-            user_id: alphaStudent.id,
-            posted_at: new Date().toISOString()
-          })
-          notOk(getPostOrHideGradesButton())
         })
       })
 
@@ -5228,7 +5206,10 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       test('unselects existing grades when isNewGrade is passed', () => {
         EG.handleProvisionalGradeSelected({isNewGrade: true})
-        strictEqual(submission.provisional_grades.some(grade => grade.selected), false)
+        strictEqual(
+          submission.provisional_grades.some(grade => grade.selected),
+          false
+        )
       })
     })
 
@@ -5631,7 +5612,6 @@ QUnit.module('SpeedGrader', rootHooks => {
           assignment_id: '17',
           course_id: '29',
           help_url: 'example.com/support',
-          new_gradebook_enabled: true,
           selected_section_id: '1',
           show_help_menu_item: false,
           RUBRIC_ASSESSMENT: {}
@@ -5919,16 +5899,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         window.jsonData = originalWindowJSONData
       })
 
-      test('initially selects the section in userSettings if ENV.new_gradebook_enabled is not true', () => {
-        SpeedGrader.EG.jsonReady()
-        SpeedGrader.setup()
-
-        const currentlyShowing = document.querySelector('#section_currently_showing')
-        strictEqual(currentlyShowing.innerText, 'The Third Section')
-      })
-
-      test('initially selects the section in ENV.selected_section_id if ENV.new_gradebook_enabled is true', () => {
-        window.ENV.new_gradebook_enabled = true
+      test('initially selects the section in ENV.selected_section_id', () => {
         window.ENV.selected_section_id = 2
 
         SpeedGrader.EG.jsonReady()
@@ -5938,7 +5909,6 @@ QUnit.module('SpeedGrader', rootHooks => {
         strictEqual(currentlyShowing.innerText, 'The Second Section')
 
         delete window.ENV.selected_section_id
-        delete window.ENV.new_gradebook_enabled
       })
 
       test('reloads SpeedGrader when the user selects a new section and ENV.settings_url is set', () => {
@@ -5960,26 +5930,6 @@ QUnit.module('SpeedGrader', rootHooks => {
         strictEqual(SpeedGraderHelpers.reloadPage.callCount, 1)
 
         window.ENV.settings_url = settingsURL
-      })
-
-      test('saves the selected section in userSettings when one is selected', () => {
-        SpeedGrader.EG.jsonReady()
-        SpeedGrader.setup()
-
-        $(sectionSelectPath).click()
-
-        const params = userSettings.contextSet.firstCall.args
-        deepEqual(params, ['grading_show_only_section', 2])
-      })
-
-      test('annuls the selected section in userSettings when "all sections" is selected', () => {
-        SpeedGrader.EG.jsonReady()
-        SpeedGrader.setup()
-
-        $(allSectionsSelectPath).click()
-
-        const [key] = userSettings.contextRemove.firstCall.args
-        strictEqual(key, 'grading_show_only_section')
       })
 
       test('posts the selected section to the settings URL when a specific section is selected', () => {
@@ -6004,7 +5954,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       QUnit.module('when a course loads with an empty section selected', emptySectionHooks => {
         emptySectionHooks.beforeEach(() => {
-          userSettings.contextGet.returns('4')
+          ENV.selected_section_id = '4'
           sandbox.stub(SpeedGrader.EG, 'changeToSection')
           sandbox.stub(window, 'alert')
         })
@@ -6012,6 +5962,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         emptySectionHooks.afterEach(() => {
           window.alert.restore()
           SpeedGrader.EG.changeToSection.restore()
+          delete ENV.selected_section_id
         })
 
         test('displays an alert indicating the section has no students', () => {
@@ -6035,14 +5986,15 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       QUnit.module('filtering by section', () => {
-        test('filters the list of students by the section ID specified in userSettings if set', () => {
+        test('filters the list of students by the section ID from the env', () => {
+          ENV.selected_section_id = '3'
           SpeedGrader.EG.jsonReady()
 
           strictEqual(window.jsonData.studentsWithSubmissions.length, 1)
+          delete ENV.selected_section_id
         })
 
-        test('does not filter the list of students if no section ID is specified in userSettings', () => {
-          userSettings.contextGet.returns(null)
+        test('does not filter the list of students if no section ID is specified', () => {
           SpeedGrader.EG.jsonReady()
           strictEqual(window.jsonData.studentsWithSubmissions.length, 2)
         })
@@ -7091,11 +7043,6 @@ QUnit.module('SpeedGrader', rootHooks => {
               notOk(mountPoint.innerText.includes('HIDDEN'))
             })
           })
-        })
-
-        test('is not shown if post policies are not enabled', () => {
-          SpeedGrader.EG.showGrade()
-          notOk(mountPoint.innerText.includes('HIDDEN'))
         })
       })
     })

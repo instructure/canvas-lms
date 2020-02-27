@@ -106,6 +106,16 @@ class Assignment < ActiveRecord::Base
   scope :anonymous, -> { where(anonymous_grading: true) }
   scope :moderated, -> { where(moderated_grading: true) }
   scope :auditable, -> { anonymous.or(moderated) }
+  scope :type_quiz_lti, -> {
+    joins(:external_tool_tag).
+      joins(<<-SQL).
+        INNER JOIN #{ContextExternalTool.quoted_table_name}
+        ON content_tags.content_type='ContextExternalTool'
+        AND context_external_tools.id = content_tags.content_id
+      SQL
+      merge(ContextExternalTool.quiz_lti).
+      distinct
+  }
 
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
@@ -2754,6 +2764,14 @@ class Assignment < ActiveRecord::Base
       "workflow_state = 'migrating' AND duplication_started_at < ?",
       Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
     )
+  }
+
+  scope :quiz_lti, -> {
+    where(:submission_types => "external_tool").joins(:external_tool_tag).
+      where(:content_tags => {:content_type => "ContextExternalTool"}).
+      where("EXISTS (?)", ContextExternalTool.quiz_lti.
+        where("context_external_tools.id=content_tags.content_id").select(:id)
+      )
   }
 
   def overdue?

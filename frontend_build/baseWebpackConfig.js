@@ -69,7 +69,7 @@ module.exports = {
         'canvas-rce-old-async-chunk',
         'permissions_index',
         // The Gradebook bundles will be reduced in size as a part of GRADE-942.
-        'gradezilla',
+        'gradebook',
         'screenreader_gradebook',
         // This bundle got pushed over the limit by translations being added and
         // the simplest fix was to ignore it at the moment, to unblock selenium

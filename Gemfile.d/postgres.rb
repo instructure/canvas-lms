@@ -16,5 +16,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :postgres do
-  gem 'pg', '1.1.4'
+  gem 'pg', '1.2.2'
 end

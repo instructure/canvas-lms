@@ -16,5 +16,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :sqlite do
-  gem 'sqlite3', '1.4.1'
+  gem 'sqlite3', '1.4.2'
 end

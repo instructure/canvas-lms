@@ -1696,7 +1696,6 @@ describe 'Submissions API', type: :request do
       before(:each) do
         @course.root_account.enable_feature!(:allow_postable_submission_comments)
         PostPolicy.enable_feature!
-        @course.enable_feature!(:new_gradebook)
         assignment.ensure_post_policy(post_manually: true)
       end
 
@@ -1716,11 +1715,6 @@ describe 'Submissions API', type: :request do
 
       it "is not included when allow_postable_submission_comments feature is not enabled" do
         @course.root_account.disable_feature!(:allow_postable_submission_comments)
-        expect(student_json.fetch("submissions").first).not_to have_key "has_postable_comments"
-      end
-
-      it "is not included when Post Policies are not enabled" do
-        @course.disable_feature!(:new_gradebook)
         expect(student_json.fetch("submissions").first).not_to have_key "has_postable_comments"
       end
 
@@ -3524,7 +3518,6 @@ describe 'Submissions API', type: :request do
 
     before(:once) do
       PostPolicy.enable_feature!
-      course.enable_feature!(:new_gradebook)
       @user = teacher
     end
 

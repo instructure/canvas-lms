@@ -28,6 +28,9 @@
   "audio_player_for_title_20cc70d": {
     "message": "Audio-speler voor { title }"
   },
+  "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
+    "message": "Er is automatisch opgeslagen inhoud aanwezig. Wil je liever  de automatisch opgeslagen inhoud laden?"
+  },
   "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
     "message": "Wordt automatisch geopend in een in-line voorbeeld. (Voorbeeld wordt pas na het opslaan weergegeven)"
   },
@@ -40,15 +43,22 @@
   "clear_selected_file_82388e50": {
     "message": "Verwijder geselecteerd bestand"
   },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Verwijder geselecteerd bestand: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Klik op een pagina om een link op die pagina in te voegen."
   },
   "click_to_embed_imagename_c41ea8df": {
     "message": "Klikken om { imageName } in te sluiten"
   },
+  "click_to_hide_preview_3c707763": {
+    "message": "Klik om voorbeeld te verbergen"
+  },
   "click_to_insert_a_link_into_the_editor_c19613aa": {
     "message": "Klik om een koppeling in te voegen in de editor."
   },
+  "click_to_show_preview_faa27051": { "message": "Klik om voorbeeld te tonen" },
   "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
     "message": "Sluit een menu of dialoogvenster. Hierdoor keert u bovendien terug naar het editorgebied"
   },
@@ -98,6 +108,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Tekstkoppeling weergeven (Opent in een nieuw tabblad)"
   },
+  "document_678cd7bf": { "message": "Document" },
   "documents_81393201": { "message": "Documenten" },
   "done_54e3d4b6": { "message": "Gereed" },
   "drag_a_file_here_1bf656d5": { "message": "Sleep een bestand hierheen" },
@@ -122,6 +133,7 @@
   "embed_preview_2d741e1f": { "message": "Voorbeeld insluiten" },
   "embed_video_a97a64af": { "message": "Video insluiten" },
   "embed_video_code_703e10f2": { "message": "Videocode insluiten" },
+  "equation_1c5ac93c": { "message": "Vergelijking" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Fout bij het uploaden van video/audio-opnames"
   },
@@ -148,6 +160,9 @@
     "message": "Focus op de popup-contextwerkbalk"
   },
   "formatting_5b143aa8": { "message": "Opmaak" },
+  "found_auto_saved_content_3f6e4ca5": {
+    "message": "Automatisch opgeslagen inhoud gevonden"
+  },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "{ count, plural,\n     =0 {# resultaten}\n    one {# resultaat}\n  other {# resultaten}\n} gevonden"
   },
@@ -167,10 +182,12 @@
   "heading_3_2c83de44": { "message": "Koptekst 3" },
   "heading_4_b2e74be7": { "message": "Koptekst 4" },
   "height_69b03e15": { "message": "Hoogte" },
+  "image_8ad06": { "message": "Afbeelding" },
   "image_options_5412d02c": { "message": "Beeldopties" },
   "image_options_tray_90a46006": { "message": "Beeldoptiescel" },
   "images_7ce26570": { "message": "Afbeeldingen" },
   "increase_indent_6d550a4a": { "message": "Inspringen vergroten" },
+  "insert_593145ef": { "message": "Invoegen" },
   "insert_equella_links_49a8dacd": {
     "message": "Equella-koppelingen invoegen"
   },
@@ -214,6 +231,7 @@
   "no_alt_text_decorative_image_f318fc0e": {
     "message": "Geen Alt-tekst (decoratieve afbeelding)"
   },
+  "no_e16d9132": { "message": "Nee" },
   "no_results_940393cf": { "message": "Geen resultaten." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Geen resultaten gevonden voor { filterTerm }"
@@ -242,6 +260,7 @@
   },
   "posted_when_a578f5ab": { "message": "Geplaatst: { when }" },
   "preformatted_d0670862": { "message": "Voorgeformatteerd" },
+  "preview_53003fd2": { "message": "Voorbeeld" },
   "preview_a3f8f854": { "message": "VOORBEELD" },
   "previous_page_928fc112": { "message": "Vorige pagina" },
   "published_c944a23d": { "message": "gepubliceerd" },
@@ -251,6 +270,9 @@
   "record_upload_media_5fdce166": { "message": "Media opnemen/uploaden" },
   "recording_98da6bda": { "message": "Bezig met opnemen" },
   "remove_link_d1f2f4d0": { "message": "Link verwijderen" },
+  "restore_auto_save_deccd84b": {
+    "message": "Automatisch opslaan herstellen?"
+  },
   "rich_content_editor_2708ef21": { "message": "Rich Content Editor" },
   "right_to_left_ec223c81": { "message": "rechts naar links" },
   "save_11a80ec3": { "message": "Opslaan" },
@@ -359,6 +381,7 @@
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Wiki Home" },
+  "yes_dde87d5": { "message": "Ja" },
   "your_webcam_may_already_be_in_use_6cd64c25": {
     "message": "Mogelijk is je webcam al in gebruik."
   }

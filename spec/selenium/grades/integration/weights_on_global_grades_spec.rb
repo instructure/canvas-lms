@@ -19,7 +19,7 @@ require_relative '../pages/global_grades_page'
 require_relative './weighting_setup'
 require_relative './a_gradebook_shared_example'
 
-describe 'gradezilla' do
+describe 'gradebook' do
   include_context "in-process server selenium tests"
   include WeightingSetup
 

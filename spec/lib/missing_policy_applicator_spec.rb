@@ -290,7 +290,6 @@ describe MissingPolicyApplicator do
       let(:submission) { assignment.submissions.first }
 
       before(:each) do
-        @course.enable_feature!(:new_gradebook)
         PostPolicy.enable_feature!
 
         late_policy_missing_enabled
