@@ -25,6 +25,7 @@
 #     dispatch(:name)
 #     to { some_list }
 #     whenever { |obj| obj.something == condition }
+#     data { root_account_id: account.id}
 #   end
 # end
 #
@@ -34,6 +35,7 @@
 #   dispatch :new_assignment
 #   to { self.students }
 #   whenever { |record| record.just_created }
+#   data { course_id: self.context.id, root_account_id: self.context.root_account_id }
 # end
 #
 # set_broadcast_policy do
@@ -43,6 +45,7 @@
 #     record.workflow_state_changed?
 #     # ... some field-wise comparison
 #   }
+#   data { course_id: self.context.id, root_account_id: self.context.root_account_id }
 # end
 #
 # u = User.first

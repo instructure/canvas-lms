@@ -96,7 +96,7 @@ class Notification < ActiveRecord::Base
   protected :infer_default_content
 
   # Public: create (and dispatch, and queue delayed) a message
-  #  for this notication, associated with the given asset, sent to the given recipients
+  #  for this notification, associated with the given asset, sent to the given recipients
   #
   # asset - what the message applies to. An assignment, a discussion, etc.
   # to_list - a list of who to send the message to. the list can contain Users, User ids, or communication channels

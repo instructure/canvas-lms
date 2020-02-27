@@ -37,7 +37,7 @@ class NotificationMessageCreator
   end
 
   # Public: create (and dispatch, and queue delayed) a message
-  # for this notication, associated with the given asset, sent to the given recipients
+  # for this notification, associated with the given asset, sent to the given recipients
   #
   # asset - what the message applies to. An assignment, a discussion, etc.
   # to_list - a list of who to send the message to. the list can contain Users, User ids, or CommunicationChannels
@@ -63,6 +63,9 @@ class NotificationMessageCreator
     # Looping on users and channels might be a bad thing. If you had a User and their CommunicationChannel in
     # the to_list (which currently never happens, I think), duplicate messages could be sent.
     to_user_channels.each do |user, channels|
+      # asset_filtered_by_user is used for the asset (ie assignment, announcement)
+      # to filter users out that do not apply to the notification like when a due
+      # date is different for a specific user when using variable due dates.
       next unless asset_filtered_by_user(user)
       user_locale = infer_locale(
         :user => user,
@@ -114,6 +117,28 @@ class NotificationMessageCreator
     !delayed_messages.any?{ |message| message.frequency == 'daily' }
   end
 
+  # Notifications are enabled for a user in a course by default, but can be
+  # disabled for notifications. The broadcast_policy needs to pass both the
+  # course_id and the root_account_id to the set_broadcast_policy block for us
+  # to be able to look up if it should be disabled. root_account_id is used
+  # right now to look up the feature flag, but it can also be used to set
+  # root_account_id on the message, or look up policy overrides in the future.
+  # A user can disable notifications for a course with a notification policy
+  # override.
+  def notifications_enabled_for_course?(user)
+    return true unless @notification.summarizable?
+    course_id = @message_data&.dig(:course_id)
+    root_account_id = @message_data&.dig(:root_account_id)
+    if course_id && root_account_id
+      a = Account.new(id: root_account_id)
+      course = Course.new(id: course_id)
+      if a.feature_enabled?(:mute_notifications_by_course)
+        return NotificationPolicyOverride.enabled_for(user, course)
+      end
+    end
+    true
+  end
+
   def build_fallback_for(user)
     fallback_channel = immediate_channels_for(user).find{ |cc| cc.path_type == 'email'}
     return unless fallback_channel
@@ -149,6 +174,7 @@ class NotificationMessageCreator
 
   def build_immediate_messages_for(user, channels=immediate_channels_for(user).reject(&:unconfirmed?))
     return [] unless asset_filtered_by_user(user)
+    return [] unless notifications_enabled_for_course?(user)
     messages = []
     message_options = message_options_for(user)
     channels.reject!{ |channel| ['email', 'sms'].include?(channel.path_type) } if @notification.summarizable? && too_many_messages_for?(user)
@@ -199,6 +225,7 @@ class NotificationMessageCreator
     # Why could an inactive email channel stop us here? We handle that later! And could still send
     # notifications without it!
     return [] if channel && !channel.active? && !too_many_messages_for?(user)
+    return [] unless notifications_enabled_for_course?(user)
 
     # If any channel has a policy, even policy-less channels don't get the notification based on the
     # notification default frequency. Is that right?
