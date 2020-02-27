@@ -20,7 +20,7 @@
     "test:cafe:all": "yarn build:cafe && testcafe chrome,firefox,safari testcafe/**/*.test.js",
     "test:cafe:debug": "testcafe --inspect-brk chrome testcafe/**/*.test.js",
     "test:watch": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/canvas-theme --require @babel/register --watch",
-    "test:coverage": "cross-env BABEL_ENV=test-node nyc -r html -r json node_modules/.bin/mocha 'test/**/*.test.js'",
+    "test:coverage": "cross-env BABEL_ENV=test-node nyc -r html -r json node_modules/.bin/mocha -r jsdom-global/register 'test/**/*.test.js'",
     "test:jest:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "debug": "BABEL_ENV=test-node inspect _mocha --no-timeouts --debug-brk 'test/**/*.test.js' --require @instructure/canvas-theme --require @babel/register",
     "demo": "webpack -p",
