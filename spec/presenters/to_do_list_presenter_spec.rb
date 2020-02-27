@@ -138,5 +138,22 @@ describe 'ToDoListPresenter' do
       # basically checking that ToDoListPresenter.initialize didn't raise and error
       expect(presenter).not_to be_nil
     end
+
+    it "returns the correct submission_path for peer reviews" do
+      view_stub = double('view')
+      allow(view_stub).to receive(:course_assignment_submission_path).and_return('path/to/submission')
+
+      course1.assignments.last.update({anonymous_peer_reviews: false})
+      presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
+
+      expect(presenter.needs_reviewing.last.submission_path).to eq 'path/to/submission'
+    end
+
+    it "returns the correct submission_path for anonymous peer reviews" do
+      course1.assignments.last.update({anonymous_peer_reviews: true})
+      presenter = ToDoListPresenter.new(nil, reviewer, [course1])
+
+      expect(presenter.needs_reviewing.last.submission_path).to include('anonymous_submissions')
+    end
   end
 end
