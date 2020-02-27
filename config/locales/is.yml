@@ -2264,7 +2264,11 @@ is:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Leyfir notanda að skoða SIS-auðkenni í fólk síðu námskeiðs."
   allows_users_to_edit_conferences_2d3c960c: "Gerir notendum kleift að breyta ráðstefnum."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Leyfa notendum að virkja „Ræsa SpeedGrader síað eftir nemendahópum“ valkostinn fyrir námskeið á námskeiðsstillingasíðunni. Þegar virkt og nemendahópur hefur verið valinn í nýrri einkunnabók, hleður SpeedGrader aðeins nemendum í völdum hóp."
+  allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Gerir notendum kleift að slökkva á tilkynningum eftir námskeiðsstigi."
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Gerir notendum kleift að velja fornöfn sem verða sýnd á eftir nafninu þeirra þegar það er sýnd í notendaviðmóti."
+  allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
+      Leyfir notendum að velja fornöfn sem koma á eftir
+      nafni þeirra þegar það birtist í notendaviðmóti.
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gera notendum með alþjóðleg símanúmer kleift að fá textaboð frá Canvas."
   alumno_88c80e37: Alumno
   always_3a59e701: Alltaf
@@ -4321,6 +4325,7 @@ is:
   cannot_be_present_when_account_id_is_present_f7d9b51f: "getur ekki verið til staðar þegar account_id er til staðar"
   cannot_be_present_when_course_id_is_present_785e6a59: "getur ekki verið til staðar þegar course_id er til staðar"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Ekki hægt að breyta hunsuðum skiladegi  innan lokaðs matstímabils"
+  cannot_change_locked_status_on_granular_permission_6f13bf4f: "Ekki er hægt að breyta lokaðri stöðu með gefinni sérheimild"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Ekki er hægt að breyta hlutverkaheiti í %{label}: það er þegar í notkun"
   cannot_change_the_default_term_name_edc2279b: "Ekki er hægt að breyta sjálfgefnu hugtaki"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Ekki hægt að breyta skiladegi hunsunar á lokuðu matstímabili"
@@ -4401,6 +4406,7 @@ is:
   canvas_files_889a274f: "Canvas skrár"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_id_f42f6ad: Canvas-auðkenni
+  canvas_insights_beta_view_4cf67797: "Canvas Insights (Beta) - skoða"
   canvas_introduction_video_2d81f3ad: Canvas-kynningarmyndband
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas reynir að endurheimta innsendingar. Komdu aftur síðar."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ekki stillt til að taka við innskráningum frá %{issuer}."
@@ -4915,6 +4921,7 @@ is:
     type_disabled_error: "Þessi tegund ráðstefnu er ekki lengur heimil fyrir þetta Canvas-svæði"
   conferences_a0a8984b: Ráðstefnur
   conferences_tutorial_tray_6f071ce2: "Leiðbeiningar með ráðstefnum"
+  confetti_for_on_time_submissions_394e16ce: "Glitpappír fyrir skil sem koma fyrir settan tíma"
   config_url_e96ceaf3: Stillingarvefslóð
   configuration_location_ee0f6592: Stillingarstaður
   configuration_type_25a084a4: "Tegund stillingar"
@@ -5840,6 +5847,8 @@ is:
   count_results_displayed_ed39a0f0: 
     one: "Ein niðurstaða sýnd"
     other: "%{count} niðurstöður sýndar"
+  count_rows_added_dacc9daf: "%{count} röðum bætt við"
+  count_rows_removed_c6ff7bc: "%{count} raðir fjarlægðar"
   count_sections_466dcd5c: 
     one: "1 fylki"
     other: "%{count} Fylki"
@@ -6506,6 +6515,7 @@ is:
         new_announcement: "Ný tilkynning"
         student_view: Nemandasýn
         view_course_calendar: "Skoða námskeiðsdagatal"
+        view_course_notification_settings: "Skoða tilkynningar frá námskeiði"
         view_course_stream: "Skoða námskeiðsstreymi"
       re_sending: Endursendi...
       send_done: "Búið! Skilaboðin geta tekið nokkrar mínútur."
@@ -7594,6 +7604,9 @@ is:
   display_totals_for_all_grading_periods_option_4a72586: "Sýna samtölur fyrir valkostinn Öll einkunnatímabil"
   display_values_f517c73c: "Sýna gildi"
   displaying_to_students_b1e92058: "Sýni nemendum"
+  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+      Kastar glitpappír fyrir þá notendur sem skila inn verkefni fyrir
+      settan skiladag.
   district_id_6f408184: "Auðkenni héraðs"
   divide_into_equal_slots_of_input_value_minutes_fca83452: "Skipta í jafnstórar raufar með %{input_value} mínútum."
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Skipta í jafnstórar raufar með %{num_minutes} mínútum. *Byrja*"
@@ -8399,6 +8412,7 @@ is:
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Stækka/fella %{title} níðurstöðuhóp, nemandi nær tileinkuninni %{mastery_count} af %{count} niðurstöðum"
   expand_global_navigation_2c28d5d4: "Stækka aðalvalmynd"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Stækka lista hópmeðlima í %{groupName}"
+  expand_permission_b45bf097: "Víkka %{permission}"
   expand_permission_c61d5958: "Útvíkka leyfi"
   expand_subdiscussion_cd226ed4: "Stækka undirumræður"
   expand_tutorial_tray_22630c49: "Stækka leiðbeiningar"
@@ -10105,6 +10119,10 @@ is:
       
         *Gættu þess að breyta ekki skráarheitum svo hægt verði að þekkja þær aftur.*
   if_you_need_to_make_your_course_public_please_cont_7084c67b: "Ef þú þarft að gera námskeiðið opinbert skaltu hafa samband við kerfisstjóra/stuðning."
+  if_you_turn_this_on_when_an_account_admin_goes_to__42e74f56: |-
+      Sé virkt mun alltaf birtast gátreitur þegar kerfisstjóri fer á síðu til að
+      setja inn altæka tilkynningu sem sendir
+      boð beint á notendur þegar tilkynning hefst.
   if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: "Ef kveikt er á þessu birtist gátreitur til að senda tilkynningar beint til notenda þegar tilkynningar hefjast þegar reikningsstjóri fer á síðuna til að búa til altæka tilkynningu."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Ef þú hefur verið að nota annað umsjónarkerfi námskeiðs viltu sennilega færa efni þaðan yfir í Canvas. Við getum farið yfir ferli afritunar efnis í Canvas með þér."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "Ef þú vilt, geturðu nefnt \"SIS\" nafni sem starfsfólki þínu kynni að vera tamara á tungu"
@@ -11097,6 +11115,7 @@ is:
   manage_module_name_dfe16816: "Stjórna %{module_name}"
   manage_name_7f55f792: "Stjórna %{name}"
   manage_options_for_name_83278ad0: "Stjórna valkostum fyrir %{name}"
+  manage_pages_4d2adeb6: "Stjórna síðum"
   manage_profile_pictures_40c958ce: "Umsjón með upplýsingamyndum"
   manage_rubrics_5d274f6a: "Umsjón með matsviðmiði"
   manage_snapshots_1dc4b79d: "Umsjón með skyndimyndum"
@@ -13156,6 +13175,7 @@ is:
     students_will_see: "Nemendur geta séð að þetta verkefni er óvirkt."
     submission_comments: "Athugasemdir við skil"
     sure_you_want_to_mute: "Viltu örugglega óvirkja þetta verkefni? Meðan verkefnið er óvirkt, fá nemendur hvorki nýjar tilkynningar um það né geta séð:"
+  mute_notifications_by_course_440e18be: "Slökkva á tilkynningum eftir námskeiði"
   mute_unmute_assignment_62608e44: "Óvirkja/virkja verkefni"
   muted_283cfa0f: (óvirkt)
   muted_3ff94739: Óvirkt
@@ -14243,6 +14263,8 @@ is:
   parent_signup_b7c6bf0a: "Skráning foreldris"
   parents_sign_up_here_f0aa8f4f: "Foreldrar skrái sig hérna"
   partially_anonymous_483a892d: "Nafnlaust að hluta"
+  partially_enabled_and_locked_9a39d38a: "Virkt að hluta til og læst"
+  partially_enabled_cd506819: "Virkt að hluta til"
   participation_af2598: Þátttaka
   participations_1823832d: Þátttökur
   pass_2a8c4f07: staðið
@@ -14808,6 +14830,7 @@ is:
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Mögulegir punktar verða að vera 0 eða hærri fyrir valdar einkunnategundir"
+  points_possible_must_be_greater_than_0_for_selecte_5708da1b: "Tiltæk stig verða vera yfir 0 fyrir valda einkunnagjöf"
   points_possible_points_fda3b111: "%{points_possible} punktar"
   points_pts_e5596bf7: "%{points} punktar"
   points_range_rating_pts_ab9c8540: "%{points}%{range_rating} Punktar"
@@ -17469,6 +17492,7 @@ is:
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Sjá nokkur LTI tól* sem svínvirka með Canvas."
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Sjá LTI verkfæri sem virka vel með Canvas."
   see_turnitin_results_cd9d4a6c: "Sjá niðurstöður Turnitin"
+  see_vericite_results_b44dd8c8: "Sjá VeriCite-niðurstöður"
   select_1e849959: "[ Velja]"
   select_a_course_4710371f: "Veldu námskeið"
   select_a_grading_period_5ea50f1: "Velja einkunnatímabil..."
@@ -18355,6 +18379,7 @@ is:
   showing_all_announcements_36ff0cec: "Sýna allar tilkynningar"
   showing_all_discussions_7e09f4b7: "Sýna allar umræður"
   showing_all_sets_of_grading_periods_6c160874: "Sýna öll sett einkunnatímabila."
+  shrink_permission_74b01aed: "Minnka %{permission}"
   shuffle_answers_edb602b7: "Stokka svör"
   signup_type_8b4506f3: Skráningartegund
   similarity_detection_dcada48: Líkindagreining
@@ -18483,6 +18508,7 @@ is:
   something_went_wrong_loading_the_violations_try_re_6e2fa92: "Eitthvað mistókst við að hlaða inn brotum, prufaðu að endurhlaða síðunni."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Eitthvað fór úrskeiðis. Reyndu að endurglæða síðuna. Ef vandamálið er viðvarandi geturðu prufað að hlaða inn einum nemendahópi SpeedGrader með því að nota *Stórt námskeið stillinguna*."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Eitthvað fór úrskeiðis. Reyndu að endurglæða síðuna. Ef vandamálið er viðvarandi kunna að vera of margar skrár á „%{assignmentTitle}“ til að hægt sé að hlaða SpeedGrader."
+  something_went_wrong_please_try_refreshing_the_pag_689be273: "Eitthvað fór úrskeiðis. Reyndu að endurglæða síðuna."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Eitthvað fór úrskeiðis við endurvirkjun notandans. Reyndu aftur síðar."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Eitthvað fór úrskeiðis við uppfærslu hlutverks notandans. Reyndu aftur síðar."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Eitthvað fór úrskeiðis þegar reynt var að samhæfa einkunnir við upplýsingakerfi nemenda. Reyndu aftur síðar."
@@ -19019,6 +19045,7 @@ is:
   successfully_posted_the_comment_12d95d56: "Athugasemd var birt"
   successfully_resubmitted_to_turnitin_c908de0f: "Endurframlagt í Turnitin."
   successfully_resubmitted_to_vericite_dab924b6: "Endurframlagt í VeriCite."
+  successfully_saved_the_comment_c87681fd: "Vistun athugasemda tókst"
   successfully_updated_the_comment_946360d5: "Athugasemd var uppfærð"
   sum_of_all_files_in_mb_2b705055: "summa allra skráa í MB"
   summary_statistics_f74852a5: Samtölur
@@ -19399,6 +19426,7 @@ is:
   there_was_a_problem_posting_the_comment_75d15646: "Vandamál kom upp við að birta athugasemdina."
   there_was_a_problem_publishing_grades_b0b9202f: "Vandamál kom upp við birtingu einkunna."
   there_was_a_problem_releasing_grades_fa0ae6: "Vandamál kom upp við sendingu einkunna."
+  there_was_a_problem_saving_the_comment_d94cbac9: "Ekki tókst að vista athugasemd"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Vandamál kom upp við að vista einkunnina."
   there_was_a_problem_saving_the_grades_5e61f9e2: "Vandamál kom upp við að vista einkunnirnar."
   there_was_a_problem_saving_the_grading_period_243bed6c: "Vandamál kom upp við að vista einkunnatímabil"
@@ -20966,6 +20994,7 @@ is:
   vericite_info: 
     buttons: 
       resubmit_to_vericite: "Endursenda til VeriCite"
+  vericite_similarity_score_more_information_7df9ea5c: "Líkindaeinkunn VeriCite - meiri upplýsingar"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Líkindaeinkunn - Sjá ítarlega skýrslu"
   video_78335c71: myndband
   video_b9f27375: Myndband
@@ -20982,6 +21011,7 @@ is:
   view_app_configurations_52b52441: "Skoða forritsstillingar"
   view_audit_trail_12f774b6: "Skoða lista"
   view_ba339f93: Skoða
+  view_canvas_insights_beta_fe446d71: "Opna Canvas Insights (Beta)"
   view_course_analytics_eefe6b2: "Skoða greiningar námskeiðs"
   view_faculty_journals_ad0e8c8f: "Skoða kennaradagála"
   view_feature_settings_at_an_account_level_ec7f5e10: "Skoða eiginleikastillingar á reikningsstigi"
@@ -21488,7 +21518,7 @@ is:
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Þú hefur fengið áminningu um að meta %{rubric}, %{context}."
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: "Þú hefur uppfært einkunnaviðmiðanirnar; Þetta mun hafa áhrif á alla nemendur sem áður voru metnir með því að nota þessa niðurstöðu"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Þér verður endurbeint á innskráningarsíðu þar sem þú þarft að skrá þig inn með aðgangsskilríkjum barns þíns."
-  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Þér verður endurbeint til Einkunnabókar meðan skráin er í upphleðslu. Ef þú ert með stóra CSV-skrá getur tekið nokkrar mínútur að uppfæra breytingar. Til að ekki verði skrifað yfir gögn skaltu staðfesta að upphleðslu sé lokið og að Einkunnabók sé rétt, áður en frekari breytingar eru gerðar."
+  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Þú verður færð/ur yfir í Einkunnabók meðan verið er að hlaða skrá þinni upp. Sé CSV-skráin stór gætu breytingar þínar tekið nokkrar mínútur í að uppfæra sig. Til að koma í veg fyrir að þú skrifir yfir gögn skaltu fyrst staðfesta að upphleðslunni sé lokið og að einkunnabókin sé rétt áður en þú gerir einhverjar breytingar."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       Þú þarft að stofna [nýtt smáforrit á Facebook](%{facebook_url}), og heimila innskráningumeð  Client OAuth
       í ítarstillingum. Ákvarðaðu %{callback_url} sem gilda OAuth beiningarslóð.
