@@ -37,3 +37,11 @@ syllabus_course_summary_option:
   applies_to: SiteAdmin
   display_name: Syllabus Course Summary Option
   description: Make the Course Summary (list of assignments and events) optional in the syllabus
+la_620_old_rce_init_fix:
+  state: hidden
+  display_name: RCE Initialization Fix
+  description: |-
+    Under some conditions, the legacy RCE fails to initialize because tinymce hasn't added the
+    editor instance to its internal list when the RCE requires it.
+  applies_to: SiteAdmin
+  root_opt_in: true
