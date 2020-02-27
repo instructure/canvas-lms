@@ -24,7 +24,14 @@ import CommentsTab from '../CommentsTab'
 import {CREATE_SUBMISSION_COMMENT} from '../../graphqlData/Mutations'
 import {mockAssignmentAndSubmission, mockQuery, mockSubmission} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
-import {render, waitForElement, fireEvent, wait, act} from '@testing-library/react'
+import {
+  act,
+  fireEvent,
+  render,
+  wait,
+  waitForDomChange,
+  waitForElement
+} from '@testing-library/react'
 import React from 'react'
 import {SUBMISSION_COMMENT_QUERY} from '../../graphqlData/Queries'
 
@@ -114,6 +121,7 @@ describe('CommentsTab', () => {
     )
     const textArea = await waitForElement(() => getByPlaceholderText('Submit a Comment'))
     fireEvent.change(textArea, {target: {value: 'lion'}})
+    await waitForDomChange({textArea})
     fireEvent.click(getByText('Send Comment'))
 
     await wait(() =>
@@ -129,7 +137,7 @@ describe('CommentsTab', () => {
         <CommentsTab {...props} />
       </MockedProvider>
     )
-    expect(await waitForElement(() => getByTestId('comments-container'))).toBeInTheDocument()
+    await wait(() => expect(getByTestId('comments-container')).toBeInTheDocument())
   })
 
   it('renders Load More Comments button when pages remain', async () => {

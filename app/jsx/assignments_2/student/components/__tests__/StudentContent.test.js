@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, wait} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
@@ -78,13 +78,13 @@ describe('Assignment Student Content View', () => {
     it('renders Comments', async () => {
       const mocks = await makeMocks()
       const props = await mockAssignmentAndSubmission()
-      const {getAllByText, findByText} = render(
+      const {getAllByText, getByText} = render(
         <MockedProvider mocks={mocks}>
           <StudentContent {...props} />
         </MockedProvider>
       )
-      fireEvent.click(getAllByText('Comments')[0])
-      expect(await findByText('Send Comment')).toBeInTheDocument()
+      fireEvent.click(await getAllByText('Comments')[0])
+      await wait(() => expect(getByText('Send Comment')).toBeInTheDocument())
     })
 
     it('renders spinner while lazy loading comments', async () => {

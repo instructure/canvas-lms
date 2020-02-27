@@ -284,7 +284,7 @@
     "test": "yarn test:packages && if [[ \"$COVERAGE\" ]]; then yarn test:jest:coverage --runInBand; else yarn test:jest --runInBand; fi && if [[ \"$COVERAGE\" ]]; then yarn test:karma; else yarn test:karma:concurrently; fi",
     "test:coverage": "script/generate_js_coverage",
     "test:watch": "concurrently --names \"jest,karma\" \"jest --watch .\" \"yarn test:karma:watch\"",
-    "test:jest": "jest --color --runInBand",
+    "test:jest": "jest --color",
     "test:jest:coverage": "NODE_OPTIONS=\"--max_old_space_size=8192\" jest --color --coverage",
     "test:jest:debug": "inspect node_modules/.bin/jest --runInBand",
     "test:karma": "yarn run test:karma:watch --single-run",

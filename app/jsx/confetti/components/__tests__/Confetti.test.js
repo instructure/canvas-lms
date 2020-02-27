@@ -18,11 +18,11 @@
 import {render, fireEvent} from '@testing-library/react'
 import Confetti from '../Confetti'
 import React from 'react'
-import {mockRender, mockClear} from 'confetti-js'
+import {mockRender, mockClear} from '../__mocks__/confetti-js'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
 jest.mock('jsx/shared/FlashAlert')
-jest.genMockFromModule('confetti-js')
+jest.genMockFromModule('../__mocks__/confetti-js')
 jest.useFakeTimers()
 
 describe('Confetti', () => {
