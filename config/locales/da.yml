@@ -2356,7 +2356,11 @@ da:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Giver brugeren mulighed for at se bruger-SIS-ID'er på et fags deltager-side."
   allows_users_to_edit_conferences_2d3c960c: "Gør det muligt for brugere at redigere konferencer."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Tillader brugere at aktivere \"Start SpeedGrader Filtreret efter studiegruppe\" i fag på siden med fagindstillinger. Når aktiveret, og en studiegruppe er valgt i Ny karakteroversigt, så vil SpeedGrader kun indlæse studerende i den valgte gruppe."
+  allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Lader brugere slå feedback fra på fagniveau."
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Lader brugere vælge pronomener, der vises efter deres navn, når det vises i brugergrænsefladen."
+  allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
+      Lader brugere vælge pronomener, der vises efter
+      deres navn, når det vises i brugergrænsefladen.
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gør det muligt for brugere med internationale telefonnumre at modtage tekstmeddelelser fra Canvas."
   alumno_88c80e37: Alumno
   always_3a59e701: Altid
@@ -4622,6 +4626,7 @@ da:
   cannot_be_present_when_account_id_is_present_f7d9b51f: "kan ikke være til stede, når account_id er til stede"
   cannot_be_present_when_course_id_is_present_785e6a59: "kan ikke være til stede, når course_id er til stede"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan ikke ændre en tilsidesæt forfaldsdato til en dato inden for en lukket karakterperiode"
+  cannot_change_locked_status_on_granular_permission_6f13bf4f: "Kan ikke ændre den låste status med detaljeret tilladelse"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Kan ikke ændre rollenavn til %{label}: allerede i brug"
   cannot_change_the_default_term_name_edc2279b: "Kan ikke ændre standardnavnet for semestret"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan ikke ændre forfaldsdatoen på en tilsidesættelse i en lukket karakterperiode"
@@ -4703,6 +4708,7 @@ da:
   canvas_files_889a274f: Canvas-filer
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_id_f42f6ad: "Canvas ID"
+  canvas_insights_beta_view_4cf67797: "Canvas Insights (Beta) - vis"
   canvas_introduction_video_2d81f3ad: "Canvas introduktionsvideo"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas forsøger at hente afleveringerne. Kom tilbage senere."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikke konfigureret til at modtage logins fra %{issuer}."
@@ -5254,6 +5260,7 @@ da:
     type_disabled_error: "Denne konferencetype er ikke længere aktiveret til denne Canvas-side"
   conferences_a0a8984b: Konferencer
   conferences_tutorial_tray_6f071ce2: "Selvstudiumområde for konferencer"
+  confetti_for_on_time_submissions_394e16ce: "Konfetti for rettidige indsendelser"
   config_url_e96ceaf3: "Konfig URL"
   configurate_tool_app_5a721f2c: "Konfigurere %{tool} app?"
   configuration_location_ee0f6592: Konfigurationsplacering
@@ -6279,6 +6286,8 @@ da:
   count_results_displayed_ed39a0f0: 
     one: "Der vises et resultat"
     other: "%{count} viste resultater"
+  count_rows_added_dacc9daf: "%{count} rækker tilføjet"
+  count_rows_removed_c6ff7bc: "%{count} rækker fjernet"
   count_sections_466dcd5c: 
     one: "1 sektion"
     other: "%{count} Sektioner"
@@ -7111,6 +7120,7 @@ da:
         new_announcement: "Ny besked"
         student_view: "Visning for studerende"
         view_course_calendar: "Se fagkalender"
+        view_course_notification_settings: "Vis fagmeddelelser"
         view_course_stream: "Vis fagets seneste aktiviteter"
       re_sending: "Gensender ..."
       send_done: "Færdig! Beskeden tager muligvis få minutter."
@@ -8306,6 +8316,9 @@ da:
   display_totals_for_all_grading_periods_option_4a72586: "Vis muligheden for samlet resultat for alle karakterperioder"
   display_values_f517c73c: "Vis værdier"
   displaying_to_students_b1e92058: "Vises til studerende"
+  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+      Viser konfetti for brugere, der afleverer en opgave forud
+      for den indstillede afleveringsdato.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Distrubtion af nuværende karaktere i kurser over alle tilmeldte studrende
       i afdelingskurser.
@@ -9180,6 +9193,7 @@ da:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Udvid listen over gruppemedlemmer for %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Udfold eller sammenfold kalendere"
   expand_or_collapse_undated_items_b901de09: "Udfold eller sammenfold udaterede elementer"
+  expand_permission_b45bf097: "Udvid %{permission}"
   expand_permission_c61d5958: "Udvid tilladelse"
   expand_subdiscussion_cd226ed4: "Udvid underdiskussion"
   expand_tutorial_tray_22630c49: "Udvid selvstudiumområde"
@@ -11524,6 +11538,10 @@ da:
       
         *Sørg for, at du ikke ændrer afleveringsfilernes navne, så vi kan genkende dem.*
   if_you_need_to_make_your_course_public_please_cont_7084c67b: "Hvis du vil offentliggøre dit fag, skal du kontakte din administrator / support."
+  if_you_turn_this_on_when_an_account_admin_goes_to__42e74f56: |-
+      Hvis du slår dette til: Når en kontoadministrator går til siden til
+      oprettelse en global besked, så vises der et afkrydsningsfelt for at sende
+      meddelelsen direkte til brugerne, når beskeden starter.
   if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: "Hvis du tænder for dette, vises der på kontoadministratorens side til at oprette en global besked et afkrydsningsfelt for at sende en meddelelse direkte til brugerne, når en besked starter."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Hvis du har brugt et andet system til fagadministration, har du sikkert ting og sager deri, som du gerne vil flytte over i Canvas. Vi kan sammen gennemgå processen for nemt at overføre dit indhold ind i Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "Hvis du vil, kan du omdøbe \"SIS\" til noget mere velkendt for dine medarbejdere"
@@ -12591,6 +12609,7 @@ da:
   manage_module_name_dfe16816: "Administrering af %{module_name}"
   manage_name_7f55f792: "Administrering af %{name}"
   manage_options_for_name_83278ad0: "Administrer indstillinger for %{name}"
+  manage_pages_4d2adeb6: "Administrering af sider"
   manage_profile_pictures_40c958ce: "Administrering af profilbilleder"
   manage_rubrics_5d274f6a: "Administrering af rubrikker"
   manage_snapshots_1dc4b79d: "Administrering af øjebliksbilleder"
@@ -14983,6 +15002,7 @@ da:
     students_will_see: "Studerende vil være i stand til at se, at denne opgave er tilbageholdt."
     submission_comments: Afleveringskommentarer
     sure_you_want_to_mute: "Er du sikker på, at du vil tilbageholde denne opgave? Når opgaven er ilbageholdt, vil de studerende ikke modtage nye meddelelser om eller være i stand til at se:"
+  mute_notifications_by_course_440e18be: "Tilbagehold feedback efter fag"
   mute_unmute_assignment_62608e44: "Tilbagehold / offentliggør opgave"
   muted_283cfa0f: (tilbageholdt)
   muted_3ff94739: Tilbageholdt
@@ -16130,6 +16150,8 @@ da:
   parent_signup_b7c6bf0a: Forældretilmelding
   parents_sign_up_here_f0aa8f4f: "Forældre tilmelder sig her"
   partially_anonymous_483a892d: "Delvis anonym"
+  partially_enabled_and_locked_9a39d38a: "Delvist aktiveret og låst"
+  partially_enabled_cd506819: "Delvist aktiveret"
   participation_af2598: Deltagelse
   participations_1823832d: Deltagelser
   pass_2a8c4f07: bestået
@@ -16730,6 +16752,7 @@ da:
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Mulige point skal være 0 eller mere for valgt karaktertype"
+  points_possible_must_be_greater_than_0_for_selecte_5708da1b: "Mulige point skal være større end 0 for valgt karaktertype"
   points_possible_points_fda3b111: "%{points_possible} Points"
   points_pts_e5596bf7: "%{points} point"
   points_range_rating_pts_ab9c8540: "%{points}%{range_rating} point"
@@ -19755,6 +19778,7 @@ da:
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Se nogle LTI-værktøjer*, som fungerer fint med Canvas."
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Se nogle LTI-værktøjer, der fungerer godt med Canvas."
   see_turnitin_results_cd9d4a6c: "Se Turninit-resultater"
+  see_vericite_results_b44dd8c8: "Se VeriCite-resultater"
   select_1e849959: "[ Vælg ]"
   select_a_course_4710371f: "Vælg et fag"
   select_a_grading_period_5ea50f1: "Vælg en karakterperiode ..."
@@ -20785,6 +20809,7 @@ da:
   showing_all_announcements_36ff0cec: "Viser alle beskeder"
   showing_all_discussions_7e09f4b7: "Viser alle diskussioner"
   showing_all_sets_of_grading_periods_6c160874: "Vis alle karakterperiodeseæt."
+  shrink_permission_74b01aed: "Formindsk %{permission}"
   shuffle_answers_edb602b7: "Bland svar"
   signup_type_8b4506f3: Tilmeldingstype
   similarity_detection_dcada48: Ligheds-opdagelse
@@ -20945,6 +20970,7 @@ da:
   something_went_wrong_please_try_again_6d337b6c: "Noget gik galt, prøv venligst igen."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Noget gik galt. Prøv at opdatere siden. Hvis problemet fortsætter, kan du prøve at indlæse en enkelt studiegruppe i SpeedGrader ved at bruge indstillingen *Stort fag*."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Noget gik galt. Prøv at opdatere siden. Hvis problemet fortsætter, kan der være for mange poster på \"%{assignmentTitle}\" for at indlæse SpeedGrader."
+  something_went_wrong_please_try_refreshing_the_pag_689be273: "Noget gik galt. Prøv at opdatere siden."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Noget gik galt under genaktivering af brugeren. Prøv igen senere."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Noget gik galt under opdatering af brugerens rolle. Prøv igen senere."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Der gik noget galt ved synkronisering af karakterer til de studerendes informationssystem Prøv venligst igen senere."
@@ -21513,6 +21539,7 @@ da:
   successfully_posted_the_comment_12d95d56: "Kommentaren blev lagt ud"
   successfully_resubmitted_to_turnitin_c908de0f: "Afleveret til turnitin igen."
   successfully_resubmitted_to_vericite_dab924b6: "Afleveret til VeriCite igen."
+  successfully_saved_the_comment_c87681fd: "Kommentaren blev gemt"
   successfully_updated_the_comment_946360d5: "Kommentaren blev opdateret"
   sum_of_all_files_in_mb_2b705055: "summen af alle filer i MB"
   summary_statistics_f74852a5: "Oversigt over statistik"
@@ -21922,6 +21949,7 @@ da:
   there_was_a_problem_posting_the_comment_75d15646: "Der opstod et problem ved indsendelse af kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Der opstod et problem ved offentliggørelse af diskussioner."
   there_was_a_problem_releasing_grades_fa0ae6: "Der opstod et problem under frigivelse af karakterer."
+  there_was_a_problem_saving_the_comment_d94cbac9: "Der opstod et problem, da kommentaren skulle gemmes"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Der opstod et problem ved lagring af karakteren."
   there_was_a_problem_saving_the_grades_5e61f9e2: "Der opstod et problem ved lagring af karaktererne."
   there_was_a_problem_saving_the_grading_period_243bed6c: "Der opstod et problem ved lagring af karakterperioden"
@@ -23580,6 +23608,7 @@ da:
   vericite_info: 
     buttons: 
       resubmit_to_vericite: "Aflever igen til VeriCite"
+  vericite_similarity_score_more_information_7df9ea5c: "VeriCite originalitetsscore -- mere information"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Originalitetsscore - Se detaljeret rapport"
   video_78335c71: video
   video_b9f27375: Video
@@ -23596,6 +23625,7 @@ da:
   view_app_configurations_52b52441: "Vis app-konfigurationer"
   view_audit_trail_12f774b6: "Se revisionsspor"
   view_ba339f93: Vis
+  view_canvas_insights_beta_fe446d71: "Vis Canvas Insights (beta)"
   view_conditional_content_settings_a2dca270: "Se betinget indholdsindstillinger"
   view_course_analytics_eefe6b2: "Vis fag-statistik"
   view_faculty_journals_ad0e8c8f: "Vis undervisernotater"
