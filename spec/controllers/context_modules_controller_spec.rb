@@ -1053,6 +1053,18 @@ describe ContextModulesController do
       assert_redirected_to controller: 'discussion_topics', action: 'edit', id: topic.id, anchor: 'mastery-paths-editor'
     end
 
+    it "should redirect to the assignment edit mastery paths page for new quizzes" do
+      tool = @course.context_external_tools.create! tool_id: ContextExternalTool::QUIZ_LTI, name: 'Q.N',
+                                                    consumer_key: '1', shared_secret: '1', domain: 'quizzes.example.com'
+      assignment = @course.assignments.create!
+      assignment.quiz_lti!
+      assignment.save!
+      item = @mod.add_item type: 'assignment', id: assignment.id
+
+      get 'item_redirect_mastery_paths', params: {course_id: @course.id, id: item.id}
+      assert_redirected_to controller: 'assignments', action: 'edit', id: assignment.id, anchor: 'mastery-paths-editor'
+    end
+
     it "should 404 if module item is not a graded type" do
       page = @course.wiki_pages.create title: "test"
       item = @mod.add_item type: 'page', id: page.id
