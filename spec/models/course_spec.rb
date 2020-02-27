@@ -951,8 +951,17 @@ describe Course do
         expect(c.grants_right?(@teacher, :read)).to be_truthy
       end
 
+      it "should grant read_rubric to date-completed teacher" do
+        make_date_completed
+        expect(c.grants_right?(@teacher, :read_rubrics)).to be_truthy
+      end
+
       it "should grant :read_outcomes to teachers in the course" do
         expect(c.grants_right?(@teacher, :read_outcomes)).to be_truthy
+      end
+
+      it "should grant :read_rubric to teachers in the course" do
+        expect(c.grants_right?(@teacher, :read_rubrics)).to be_truthy
       end
     end
 
@@ -2393,9 +2402,7 @@ describe Course, "tabs_available" do
     it "should not hide tabs for completed teacher enrollments" do
       @user.enrollments.where(:course_id => @course).first.complete!
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-      # When enrollment is complete, users lose the :manage_rubrics permission
-      default_tabs = Course.default_tabs.map{|t| t[:id] }.reject{|id| id == Course::TAB_RUBRICS }
-      expect(tab_ids).to eql(default_tabs)
+      expect(tab_ids).to eql(Course.default_tabs.map{|t| t[:id] })
     end
 
     it "should not include Announcements without read_announcements rights" do

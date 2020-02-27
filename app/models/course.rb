@@ -1485,7 +1485,7 @@ class Course < ActiveRecord::Base
     # Active admins (Teacher/TA/Designer)
     given { |user| (self.available? || self.created? || self.claimed?) && user &&
       fetch_on_enrollments("has_active_admin_enrollment", user) { enrollments.for_user(user).of_admin_type.active_by_date.exists? } }
-    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags
+    can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags and can :read_rubrics
 
     # Teachers and Designers can delete/reset, but not TAs
     given { |user| !self.deleted? && !self.sis_source_id && user &&
@@ -1512,7 +1512,7 @@ class Course < ActiveRecord::Base
       !self.deleted? && user &&
         fetch_on_enrollments("has_completed_admin_enrollment", user) { enrollments.for_user(user).of_admin_type.completed_by_date.exists? }
     end
-    can [:read, :read_as_admin, :use_student_view, :read_outcomes, :view_unpublished_items]
+    can [:read, :read_as_admin, :use_student_view, :read_outcomes, :view_unpublished_items, :read_rubrics]
 
     # overrideable permissions for concluded users
     RoleOverride.concluded_permission_types.each do |permission, details|
@@ -2878,7 +2878,7 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_DISCUSSIONS], :read_forum, :post_to_forum, :create_forum, :moderate_forum)
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
-        delete_unless.call([TAB_RUBRICS], :manage_rubrics)
+        delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
 
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }
