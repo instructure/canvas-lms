@@ -75,7 +75,7 @@ def computeDistributedCount() {
 def executeFlakeySpecCatcher(prefix = 'main') {
   sh 'rm -rf tmp'
   try {
-    timeout(60) {
+    timeout(30) {
       sh 'build/new-jenkins/docker-compose-pull.sh'
       sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
       sh 'build/new-jenkins/docker-compose-build-up.sh'
