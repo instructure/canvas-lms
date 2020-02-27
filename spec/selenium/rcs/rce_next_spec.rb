@@ -499,7 +499,7 @@ describe "RCE next tests" do
       expect(upload_document_modal).to be_displayed
     end
 
-    it "schould include edia upload option if kaltura is enabled" do
+    it "should include media upload option if kaltura is enabled" do
       double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
       visit_front_page_edit(@course)
@@ -557,6 +557,27 @@ describe "RCE next tests" do
       driver.action.drag_and_drop(source, dest).perform
 
       expect(f('body')).not_to contain_css('[data-testid="CanvasContentTray"]')
+    end
+
+    it "should add a title attribute to an inserted iframe" do
+      # as typically happens when embedding media, like a youtube video
+      double('CanvasKaltura::ClientV3')
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      visit_front_page_edit(@course)
+
+      click_media_toolbar_button
+      click_upload_media
+      click_embed_media_tab
+      code_box = embed_code_textarea
+      code_box.click
+      code_box.send_keys('<iframe src="https://example.com/"></iframe>')
+      click_upload_media_submit_button
+      wait_for_animations
+
+      fj('button:contains("Save")').click # save the page
+      wait_for_ajaximations
+
+      expect(f('iframe[title="embedded content"][src="https://example.com/"]')).to be_displayed
     end
 
     describe "keyboard shortcuts" do

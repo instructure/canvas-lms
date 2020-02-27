@@ -329,12 +329,29 @@ class RCEWrapper extends React.Component {
     this.contentInserted(element)
   }
 
-  // inserting an iframe in tinymce (as is often the case with
-  // embedded content) causes it to wrap it in a span
-  // and it's often inserted into a <p> on top of that.  Find the
-  // iframe and use it to flash the indicator.
   insertEmbedCode(code) {
     const editor = this.mceInstance()
+    // tinymce treats iframes uniquely, and doesn't like adding attributes
+    // once it's in the editor, and I'd rather not parse the incomming html
+    // string with a regex, so let's create a temp copy, then add a title
+    // attribute if one doesn't exist. This will let screenreaders announce
+    // that there's some embedded content helper
+    // From what I've read, "title" is more reliable than "aria-label" for
+    // elements like iframes and embeds.
+    const temp = document.createElement('div')
+    temp.innerHTML = code
+    const code_elem = temp.firstElementChild
+    if (code_elem) {
+      if (!code_elem.hasAttribute('title') && !code_elem.hasAttribute('aria-label')) {
+        code_elem.setAttribute('title', formatMessage('embedded content'))
+      }
+      code = code_elem.outerHTML
+    }
+
+    // inserting an iframe in tinymce (as is often the case with
+    // embedded content) causes it to wrap it in a span
+    // and it's often inserted into a <p> on top of that.  Find the
+    // iframe and use it to flash the indicator.
     const element = contentInsertion.insertContent(editor, code)
     const ifr = element && element.querySelector && element.querySelector('iframe')
     if (ifr) {
