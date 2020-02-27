@@ -39,6 +39,9 @@
     "message": "rhestr cylchoedd sydd ddim mewn trefn"
   },
   "clear_selected_file_82388e50": { "message": "Clirio''r ffeil dan sylw" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Clirio''r ffeil dan sylw: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Cliciwch unrhyw dudalen i fewnosod dolen i’r dudalen honno."
   },
@@ -101,6 +104,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Dangos Dolen Testun (Yn agor mewn tab newydd)"
   },
+  "document_678cd7bf": { "message": "Dogfen" },
   "documents_81393201": { "message": "Dogfennau" },
   "done_54e3d4b6": { "message": "Wedi gorffen" },
   "drag_a_file_here_1bf656d5": { "message": "Llusgwch ffeil yma" },
@@ -125,6 +129,7 @@
   "embed_preview_2d741e1f": { "message": "Plannu Rhagolwg" },
   "embed_video_a97a64af": { "message": "Plannu Fideo" },
   "embed_video_code_703e10f2": { "message": "Plannu Cod Fideo" },
+  "equation_1c5ac93c": { "message": "Hafaliad" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Gwall wrth lwytho fideo/recordiad sain i fyny"
   },
@@ -167,10 +172,12 @@
   "heading_3_2c83de44": { "message": "Pennawd 3" },
   "heading_4_b2e74be7": { "message": "Pennawd 4" },
   "height_69b03e15": { "message": "Uchder" },
+  "image_8ad06": { "message": "Delwedd" },
   "image_options_5412d02c": { "message": "Opsiynau Delwedd" },
   "image_options_tray_90a46006": { "message": "Ardal Opsiynau Delwedd" },
   "images_7ce26570": { "message": "Delweddau" },
   "increase_indent_6d550a4a": { "message": "Cynyddu mewnoliad" },
+  "insert_593145ef": { "message": "Mewnosod" },
   "insert_equella_links_49a8dacd": { "message": "Mewnosod Dolenni Equella" },
   "insert_link_6dc23cae": { "message": "Mewnosod Dolen" },
   "insert_math_equation_57c6e767": {

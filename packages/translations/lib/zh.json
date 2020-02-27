@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "清除所选文件"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "清除所选文件：{ filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "单击任何页面以插入指向该页面的链接。"
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "显示文本链接（在新标签页中打开）"
     },
+    "document_678cd7bf": {
+        "message": "文档"
+    },
     "documents_81393201": {
         "message": "文档"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "嵌入视频代码"
+    },
+    "equation_1c5ac93c": {
+        "message": "等式"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "加载评分时出错"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "高度"
     },
+    "image_8ad06": {
+        "message": "图片"
+    },
     "image_options_5412d02c": {
         "message": "图像选项"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "增加缩进"
+    },
+    "insert_593145ef": {
+        "message": "插入"
     },
     "insert_equella_links_49a8dacd": {
         "message": "插入 Equella 链接"

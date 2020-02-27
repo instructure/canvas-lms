@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Cancella file selezionato"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Cancella file selezionato: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Fai clic su una pagina per inserire un link a quella pagina."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Visualizza collegamento testuale (Si apre in una nuova scheda)"
     },
+    "document_678cd7bf": {
+        "message": "Documento"
+    },
     "documents_81393201": {
         "message": "Documenti"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Incorpora codice video"
+    },
+    "equation_1c5ac93c": {
+        "message": "Equazione"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Errore durante il caricamento dei voti"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Altezza"
     },
+    "image_8ad06": {
+        "message": "Immagine"
+    },
     "image_options_5412d02c": {
         "message": "Opzioni immagine"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Aumenta rientro"
+    },
+    "insert_593145ef": {
+        "message": "Inserisci"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Inserisci link Equella"

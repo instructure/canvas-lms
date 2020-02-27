@@ -39,6 +39,9 @@
     "message": "Ungeordnete Liste einkreisen"
   },
   "clear_selected_file_82388e50": { "message": "Ausgewählte Datei löschen" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Ausgewählte Datei löschen: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Um einen Link auf einer Seite einzufügen, klicken Sie auf die entsprechende Seite."
   },
@@ -97,6 +100,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Text-Link anzeigen (wird in einem neuen Tab geöffnet)"
   },
+  "document_678cd7bf": { "message": "Dokument" },
   "documents_81393201": { "message": "Dokumente" },
   "done_54e3d4b6": { "message": "Fertig" },
   "drag_a_file_here_1bf656d5": { "message": "Eine Datei hierher ziehen" },
@@ -121,6 +125,7 @@
   "embed_preview_2d741e1f": { "message": "Vorschau einbetten" },
   "embed_video_a97a64af": { "message": "Video einbetten" },
   "embed_video_code_703e10f2": { "message": "Videocode einbetten" },
+  "equation_1c5ac93c": { "message": "Gleichung" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Fehler beim Hochladen der Video-/Audioaufnahme"
   },
@@ -163,10 +168,12 @@
   "heading_3_2c83de44": { "message": "Überschrift 3" },
   "heading_4_b2e74be7": { "message": "Überschrift 4" },
   "height_69b03e15": { "message": "Höhe" },
+  "image_8ad06": { "message": "Bild" },
   "image_options_5412d02c": { "message": "Bildoptionen" },
   "image_options_tray_90a46006": { "message": "Fach für Bildoptionen" },
   "images_7ce26570": { "message": "Bilder" },
   "increase_indent_6d550a4a": { "message": "Einzug vergrößern" },
+  "insert_593145ef": { "message": "Einfügen" },
   "insert_equella_links_49a8dacd": { "message": "Equella-Links einfügen" },
   "insert_link_6dc23cae": { "message": "Link einfügen" },
   "insert_math_equation_57c6e767": { "message": "Math. Gleichung einfügen" },

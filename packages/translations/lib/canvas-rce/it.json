@@ -41,6 +41,9 @@
     "message": "cerchia elenco non ordinato"
   },
   "clear_selected_file_82388e50": { "message": "Cancella file selezionato" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Cancella file selezionato: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Fai clic su una pagina per inserire un link a quella pagina."
   },
@@ -105,6 +108,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Visualizza collegamento testuale (Si apre in una nuova scheda)"
   },
+  "document_678cd7bf": { "message": "Documento" },
   "documents_81393201": { "message": "Documenti" },
   "done_54e3d4b6": { "message": "Fatto" },
   "drag_a_file_here_1bf656d5": { "message": "Trascina qui un file" },
@@ -129,6 +133,7 @@
   "embed_preview_2d741e1f": { "message": "Incorpora anteprima" },
   "embed_video_a97a64af": { "message": "Incorpora il video" },
   "embed_video_code_703e10f2": { "message": "Incorpora codice video" },
+  "equation_1c5ac93c": { "message": "Equazione" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Si è verificato un errore durante il collegamento della registrazione video/audio"
   },
@@ -173,10 +178,12 @@
   "heading_3_2c83de44": { "message": "Intestazione 3" },
   "heading_4_b2e74be7": { "message": "Intestazione 4" },
   "height_69b03e15": { "message": "Altezza" },
+  "image_8ad06": { "message": "Immagine" },
   "image_options_5412d02c": { "message": "Opzioni immagine" },
   "image_options_tray_90a46006": { "message": "Barra opzioni immagine" },
   "images_7ce26570": { "message": "Immagini" },
   "increase_indent_6d550a4a": { "message": "Aumenta rientro" },
+  "insert_593145ef": { "message": "Inserisci" },
   "insert_equella_links_49a8dacd": { "message": "Inserisci link Equella" },
   "insert_link_6dc23cae": { "message": "Inserisci link" },
   "insert_math_equation_57c6e767": {

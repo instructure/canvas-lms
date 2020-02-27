@@ -41,6 +41,9 @@
     "message": "заключить неупорядоченный список в круг"
   },
   "clear_selected_file_82388e50": { "message": "Очистить выбранный файл" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Удалить выбранный файл: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Щелкните любую страницу, чтобы вставить ссылку в эту страницу."
   },
@@ -105,6 +108,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Показать текстовую ссылку (открывается в новой вкладке)"
   },
+  "document_678cd7bf": { "message": "Документ" },
   "documents_81393201": { "message": "Документы" },
   "done_54e3d4b6": { "message": "Готово" },
   "drag_a_file_here_1bf656d5": { "message": "Перетащите файл сюда" },
@@ -129,6 +133,7 @@
   "embed_preview_2d741e1f": { "message": "Встроить предварительный просмотр" },
   "embed_video_a97a64af": { "message": "Вставить видео" },
   "embed_video_code_703e10f2": { "message": "Вставить код видео" },
+  "equation_1c5ac93c": { "message": "Формула" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Ошибка при загрузке видео-/аудиозаписи"
   },
@@ -175,10 +180,12 @@
   "heading_3_2c83de44": { "message": "Заголовок 3" },
   "heading_4_b2e74be7": { "message": "Заголовок 4" },
   "height_69b03e15": { "message": "Высота" },
+  "image_8ad06": { "message": "Изображение" },
   "image_options_5412d02c": { "message": "Опции изображения" },
   "image_options_tray_90a46006": { "message": "Лоток опций изображения" },
   "images_7ce26570": { "message": "Изображения" },
   "increase_indent_6d550a4a": { "message": "Увеличить отступ" },
+  "insert_593145ef": { "message": "Вставить" },
   "insert_equella_links_49a8dacd": { "message": "Вставить ссылки на Equella" },
   "insert_link_6dc23cae": { "message": "Вставить ссылку" },
   "insert_math_equation_57c6e767": {

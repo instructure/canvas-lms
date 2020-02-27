@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Clirio''r ffeil dan sylw"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Clirio''r ffeil dan sylw: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Cliciwch unrhyw dudalen i fewnosod dolen i’r dudalen honno."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Dangos Dolen Testun (Yn agor mewn tab newydd)"
     },
+    "document_678cd7bf": {
+        "message": "Dogfen"
+    },
     "documents_81393201": {
         "message": "Dogfennau"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Plannu Cod Fideo"
+    },
+    "equation_1c5ac93c": {
+        "message": "Hafaliad"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Gwall wrth lwytho graddau"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Uchder"
     },
+    "image_8ad06": {
+        "message": "Delwedd"
+    },
     "image_options_5412d02c": {
         "message": "Opsiynau Delwedd"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Cynyddu mewnoliad"
+    },
+    "insert_593145ef": {
+        "message": "Mewnosod"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Mewnosod Dolenni Equella"

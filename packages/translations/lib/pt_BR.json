@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Limpar arquivo selecionado"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Limpar arquivo selecionado: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Clique em qualquer página para inserir um link para para essa página."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Exibir link de texto (abre em uma nova aba)"
     },
+    "document_678cd7bf": {
+        "message": "Documento"
+    },
     "documents_81393201": {
         "message": "Documentos"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Incorporar código de vídeo"
+    },
+    "equation_1c5ac93c": {
+        "message": "Equação"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Erro ao carregar notas"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Altura"
     },
+    "image_8ad06": {
+        "message": "Imagem"
+    },
     "image_options_5412d02c": {
         "message": "Opções de imagem"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Aumentar recuo"
+    },
+    "insert_593145ef": {
+        "message": "Inserir"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Inserir links Equella"

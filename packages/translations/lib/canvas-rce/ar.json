@@ -39,6 +39,9 @@
   "choose_caption_file_9c45bc4e": { "message": "اختر ملف تسميات توضيحية" },
   "circle_unordered_list_9e3a0763": { "message": "قائمة دائرية غير المرتبة" },
   "clear_selected_file_82388e50": { "message": "مسح الملف المحدد" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "مسح الملف المحدد: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "انقر فوق أي صفحة لإدراج ارتباط يؤدي إلى تلك الصفحة."
   },
@@ -95,6 +98,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "عرض ارتباط النص (يفتح في علامة تبويب جديدة)"
   },
+  "document_678cd7bf": { "message": "مستند" },
   "documents_81393201": { "message": "المستندات" },
   "done_54e3d4b6": { "message": "تم" },
   "drag_a_file_here_1bf656d5": { "message": "إفلات ملف هنا" },
@@ -121,6 +125,7 @@
   "embed_preview_2d741e1f": { "message": "معاينة التضمين" },
   "embed_video_a97a64af": { "message": "تضمين الفيديو" },
   "embed_video_code_703e10f2": { "message": "رمز تضمين الفيديو" },
+  "equation_1c5ac93c": { "message": "معادلة" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "خطأ في تحميل تسجيل الفيديو/الصوت"
   },
@@ -161,10 +166,12 @@
   "heading_3_2c83de44": { "message": "العنوان 3" },
   "heading_4_b2e74be7": { "message": "العنوان 4" },
   "height_69b03e15": { "message": "الارتفاع" },
+  "image_8ad06": { "message": "صورة" },
   "image_options_5412d02c": { "message": "خيارات الصورة" },
   "image_options_tray_90a46006": { "message": "علبة خيارات الصورة" },
   "images_7ce26570": { "message": "الصور" },
   "increase_indent_6d550a4a": { "message": "زيادة المسافة البادئة" },
+  "insert_593145ef": { "message": "إدخال" },
   "insert_equella_links_49a8dacd": { "message": "إدراج ارتباطات Equella" },
   "insert_link_6dc23cae": { "message": "إدراج ارتباط" },
   "insert_math_equation_57c6e767": { "message": "إدخال معادلة رياضية" },

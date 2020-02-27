@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Clear selected file"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Clear selected file: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Click any page to insert a link to that page."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Display Text Link (Opens in a new tab)"
     },
+    "document_678cd7bf": {
+        "message": "Document"
+    },
     "documents_81393201": {
         "message": "Documents"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Embed Video Code"
+    },
+    "equation_1c5ac93c": {
+        "message": "Equation"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Error loading grades"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Height"
     },
+    "image_8ad06": {
+        "message": "Image"
+    },
     "image_options_5412d02c": {
         "message": "Image Options"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Increase indent"
+    },
+    "insert_593145ef": {
+        "message": "Insert"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Insert Equella Links"

@@ -41,6 +41,9 @@
     "message": "rengasta järjestämätön luettelo"
   },
   "clear_selected_file_82388e50": { "message": "Tyhjennä valittu tiedosto" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Tyhjennä valittu tiedosto: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Lisää linkki tuolle sivulle napsauttamalla mitä tahansa sivua."
   },
@@ -105,6 +108,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Näytä tekstilinkki (avautuu uudessa välilehdessä)"
   },
+  "document_678cd7bf": { "message": "Asiakirja" },
   "documents_81393201": { "message": "Asiakirjat" },
   "done_54e3d4b6": { "message": "Valmis" },
   "drag_a_file_here_1bf656d5": { "message": "Vedä tiedosto tähän" },
@@ -131,6 +135,7 @@
   "embed_preview_2d741e1f": { "message": "Upota esikatselu" },
   "embed_video_a97a64af": { "message": "Upota video" },
   "embed_video_code_703e10f2": { "message": "Upota videokoodi" },
+  "equation_1c5ac93c": { "message": "Yhtälö" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Virhe video-/ääninauhoituksen lataamisessa"
   },
@@ -175,10 +180,12 @@
   "heading_3_2c83de44": { "message": "Otsikko 3" },
   "heading_4_b2e74be7": { "message": "Otsikko 4" },
   "height_69b03e15": { "message": "Korkeus" },
+  "image_8ad06": { "message": "Kuva" },
   "image_options_5412d02c": { "message": "Kuva-asetukset" },
   "image_options_tray_90a46006": { "message": "Kuva-asetusten ilmoitusalue" },
   "images_7ce26570": { "message": "Kuvat" },
   "increase_indent_6d550a4a": { "message": "Suurenna sisennystä" },
+  "insert_593145ef": { "message": "Aseta" },
   "insert_equella_links_49a8dacd": { "message": "Lisää Equella-linkit" },
   "insert_link_6dc23cae": { "message": "Lisää linkki" },
   "insert_math_equation_57c6e767": { "message": "Lisää matemaattinen kaava" },

@@ -33,6 +33,9 @@
   "choose_caption_file_9c45bc4e": { "message": "Chwazi fichye soutit" },
   "circle_unordered_list_9e3a0763": { "message": "Antoure lis ki pa òdone" },
   "clear_selected_file_82388e50": { "message": "Efase fichye seleksyone" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Efase fichye seleksyone: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Klike sou nenpòt paj pou ensere yon lyen nan paj sa a."
   },
@@ -89,6 +92,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Lyen Afichaj Tèks (Ouvri nan yon nouvo onglè)"
   },
+  "document_678cd7bf": { "message": "Dokiman" },
   "documents_81393201": { "message": "Dokiman" },
   "done_54e3d4b6": { "message": "Fini" },
   "drag_a_file_here_1bf656d5": { "message": "Deplase yon fichye la a" },
@@ -113,6 +117,7 @@
   "embed_preview_2d741e1f": { "message": "Entegre Apèsi" },
   "embed_video_a97a64af": { "message": "Entegre Videyo a" },
   "embed_video_code_703e10f2": { "message": "Entegre Kòb Videyo" },
+  "equation_1c5ac93c": { "message": "Ekwasyon" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Erè nan transfè anrejistreman videyo/odyo"
   },
@@ -151,10 +156,12 @@
   "heading_3_2c83de44": { "message": "Antèt 3" },
   "heading_4_b2e74be7": { "message": "Antèt 4" },
   "height_69b03e15": { "message": "Wotè" },
+  "image_8ad06": { "message": "Imaj" },
   "image_options_5412d02c": { "message": "Opsyon Imaj" },
   "image_options_tray_90a46006": { "message": "Plato Opsyon Imaj" },
   "images_7ce26570": { "message": "Imaj" },
   "increase_indent_6d550a4a": { "message": "Ogmante endantasyon" },
+  "insert_593145ef": { "message": "Ensere" },
   "insert_equella_links_49a8dacd": { "message": "Ensere lyen Equella" },
   "insert_link_6dc23cae": { "message": "Ensere Lyen" },
   "insert_math_equation_57c6e767": { "message": "Ensere Ekwasyon Matematik" },

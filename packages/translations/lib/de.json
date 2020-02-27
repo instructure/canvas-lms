@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Ausgewählte Datei löschen"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Ausgewählte Datei löschen: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Um einen Link auf einer Seite einzufügen, klicken Sie auf die entsprechende Seite."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Text-Link anzeigen (wird in einem neuen Tab geöffnet)"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokumente"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Videocode einbetten"
+    },
+    "equation_1c5ac93c": {
+        "message": "Gleichung"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Fehler beim Laden der Noten"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Höhe"
     },
+    "image_8ad06": {
+        "message": "Bild"
+    },
     "image_options_5412d02c": {
         "message": "Bildoptionen"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Einzug vergrößern"
+    },
+    "insert_593145ef": {
+        "message": "Einfügen"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Equella-Links einfügen"

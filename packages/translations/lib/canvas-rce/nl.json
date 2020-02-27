@@ -43,6 +43,9 @@
   "clear_selected_file_82388e50": {
     "message": "Verwijder geselecteerd bestand"
   },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Verwijder geselecteerd bestand: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Klik op een pagina om een link op die pagina in te voegen."
   },
@@ -105,6 +108,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Tekstkoppeling weergeven (Opent in een nieuw tabblad)"
   },
+  "document_678cd7bf": { "message": "Document" },
   "documents_81393201": { "message": "Documenten" },
   "done_54e3d4b6": { "message": "Gereed" },
   "drag_a_file_here_1bf656d5": { "message": "Sleep een bestand hierheen" },
@@ -129,6 +133,7 @@
   "embed_preview_2d741e1f": { "message": "Voorbeeld insluiten" },
   "embed_video_a97a64af": { "message": "Video insluiten" },
   "embed_video_code_703e10f2": { "message": "Videocode insluiten" },
+  "equation_1c5ac93c": { "message": "Vergelijking" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Fout bij het uploaden van video/audio-opnames"
   },
@@ -177,10 +182,12 @@
   "heading_3_2c83de44": { "message": "Koptekst 3" },
   "heading_4_b2e74be7": { "message": "Koptekst 4" },
   "height_69b03e15": { "message": "Hoogte" },
+  "image_8ad06": { "message": "Afbeelding" },
   "image_options_5412d02c": { "message": "Beeldopties" },
   "image_options_tray_90a46006": { "message": "Beeldoptiescel" },
   "images_7ce26570": { "message": "Afbeeldingen" },
   "increase_indent_6d550a4a": { "message": "Inspringen vergroten" },
+  "insert_593145ef": { "message": "Invoegen" },
   "insert_equella_links_49a8dacd": {
     "message": "Equella-koppelingen invoegen"
   },

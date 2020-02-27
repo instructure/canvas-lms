@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "清除所選擇的檔案"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "清除所選擇的檔案：{ filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "按一下任何頁面，以向該頁面中插入一個連結。"
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "顯示文字連結（在新標籤中開啟）"
     },
+    "document_678cd7bf": {
+        "message": "文件"
+    },
     "documents_81393201": {
         "message": "文件"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "嵌入影片代碼"
+    },
+    "equation_1c5ac93c": {
+        "message": "方程式"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "載入成績時發生錯誤"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "高度"
     },
+    "image_8ad06": {
+        "message": "影像"
+    },
     "image_options_5412d02c": {
         "message": "影像選項"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "增加縮排"
+    },
+    "insert_593145ef": {
+        "message": "插入"
     },
     "insert_equella_links_49a8dacd": {
         "message": "插入 Equella 連結"

@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Počisti izbrano datoteko."
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Počisti izbrano datoteko: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Kliknite katero koli stran, da vstavite povezavo na to stran."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Prikaži besedilno povezavo (se odpre v novem zavihku)"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokumenti"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Vdelaj kodo videoposnetka"
+    },
+    "equation_1c5ac93c": {
+        "message": "Enačba"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Napaka pri nalaganju ocen"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Višina"
     },
+    "image_8ad06": {
+        "message": "Slika"
+    },
     "image_options_5412d02c": {
         "message": "Možnosti slike"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Povečaj zamik"
+    },
+    "insert_593145ef": {
+        "message": "Vstavi"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Vstavi povezave storitve EQUELLA"

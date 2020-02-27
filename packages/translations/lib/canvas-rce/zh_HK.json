@@ -33,6 +33,9 @@
   "choose_caption_file_9c45bc4e": { "message": "選擇字幕檔案" },
   "circle_unordered_list_9e3a0763": { "message": "圓形無序清單" },
   "clear_selected_file_82388e50": { "message": "清除所選擇的檔案" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "清除所選擇的檔案：{ filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "按一下任何頁面，以向該頁面中插入一個連結。"
   },
@@ -85,6 +88,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "顯示文字連結（在新標籤中開啟）"
   },
+  "document_678cd7bf": { "message": "文件" },
   "documents_81393201": { "message": "文件" },
   "done_54e3d4b6": { "message": "已完成" },
   "drag_a_file_here_1bf656d5": { "message": "拖曳檔案到此處。" },
@@ -109,6 +113,7 @@
   "embed_preview_2d741e1f": { "message": "嵌入預覽" },
   "embed_video_a97a64af": { "message": "嵌入影片" },
   "embed_video_code_703e10f2": { "message": "嵌入影片代碼" },
+  "equation_1c5ac93c": { "message": "方程式" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "上傳錄製的影片/音訊時發生錯誤"
   },
@@ -141,10 +146,12 @@
   "heading_3_2c83de44": { "message": "標題 3" },
   "heading_4_b2e74be7": { "message": "標題 4" },
   "height_69b03e15": { "message": "高度" },
+  "image_8ad06": { "message": "影像" },
   "image_options_5412d02c": { "message": "影像選項" },
   "image_options_tray_90a46006": { "message": "影像選項收集箱" },
   "images_7ce26570": { "message": "影像" },
   "increase_indent_6d550a4a": { "message": "增加縮排" },
+  "insert_593145ef": { "message": "插入" },
   "insert_equella_links_49a8dacd": { "message": "插入 Equella 連結" },
   "insert_link_6dc23cae": { "message": "插入連結" },
   "insert_math_equation_57c6e767": { "message": "插入數學方程式" },

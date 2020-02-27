@@ -39,6 +39,9 @@
   },
   "circle_unordered_list_9e3a0763": { "message": "丸い番号無しリスト" },
   "clear_selected_file_82388e50": { "message": "選択したファイルを消去する" },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "選択されたファイルを削除：{ filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "ページをクリックして、そのページにリンクを挿入します。"
   },
@@ -103,6 +106,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "テキストリンクを表示する (新しいタブが開きます)"
   },
+  "document_678cd7bf": { "message": "ドキュメント" },
   "documents_81393201": { "message": "ドキュメント" },
   "done_54e3d4b6": { "message": "完了" },
   "drag_a_file_here_1bf656d5": { "message": "ファイルをここにドラッグする" },
@@ -127,6 +131,7 @@
   "embed_preview_2d741e1f": { "message": "プレビューの埋め込み" },
   "embed_video_a97a64af": { "message": "ビデオを埋め込む" },
   "embed_video_code_703e10f2": { "message": "ビデオコードの埋め込み" },
+  "equation_1c5ac93c": { "message": "方程式" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "映像/オーディオ録音のアップロード中にエラーが発生しました"
   },
@@ -169,10 +174,12 @@
   "heading_3_2c83de44": { "message": "見出し3" },
   "heading_4_b2e74be7": { "message": "見出し4" },
   "height_69b03e15": { "message": "高さ" },
+  "image_8ad06": { "message": "画像" },
   "image_options_5412d02c": { "message": "画像オプション" },
   "image_options_tray_90a46006": { "message": "画像オプショントレイ" },
   "images_7ce26570": { "message": "画像" },
   "increase_indent_6d550a4a": { "message": "インデント" },
+  "insert_593145ef": { "message": "挿入" },
   "insert_equella_links_49a8dacd": {
     "message": "Equella リンクを挿入してください"
   },

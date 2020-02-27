@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Fjern valgt fil"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Fjern valgt fil: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Klikk på en side for å sette inn en lenke til den siden."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Vis tekstlenke (Åpnes i en ny fane)"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokumenter"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Legg ved videokode"
+    },
+    "equation_1c5ac93c": {
+        "message": "Ligning"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Kunne ikke laste inn karakterer"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Høyde"
     },
+    "image_8ad06": {
+        "message": "Bilde"
+    },
     "image_options_5412d02c": {
         "message": "Bilde-alternativer"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Øk innrykk"
+    },
+    "insert_593145ef": {
+        "message": "Sett inn"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Sett inn Equella-koblinger"

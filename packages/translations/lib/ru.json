@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "Очистить выбранный файл"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "Удалить выбранный файл: { filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "Щелкните любую страницу, чтобы вставить ссылку в эту страницу."
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Показать текстовую ссылку (открывается в новой вкладке)"
     },
+    "document_678cd7bf": {
+        "message": "Документ"
+    },
     "documents_81393201": {
         "message": "Документы"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "Вставить код видео"
+    },
+    "equation_1c5ac93c": {
+        "message": "Формула"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "Ошибка загрузки оценок"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "Высота"
     },
+    "image_8ad06": {
+        "message": "Изображение"
+    },
     "image_options_5412d02c": {
         "message": "Опции изображения"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Увеличить отступ"
+    },
+    "insert_593145ef": {
+        "message": "Вставить"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Вставить ссылки на Equella"

@@ -146,6 +146,9 @@
     "clear_selected_file_82388e50": {
         "message": "選択したファイルを消去する"
     },
+    "clear_selected_file_filename_2fe8a58e": {
+        "message": "選択されたファイルを削除：{ filename }"
+    },
     "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
         "message": "ページをクリックして、そのページにリンクを挿入します。"
     },
@@ -308,6 +311,9 @@
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "テキストリンクを表示する (新しいタブが開きます)"
     },
+    "document_678cd7bf": {
+        "message": "ドキュメント"
+    },
     "documents_81393201": {
         "message": "ドキュメント"
     },
@@ -373,6 +379,9 @@
     },
     "embed_video_code_703e10f2": {
         "message": "ビデオコードの埋め込み"
+    },
+    "equation_1c5ac93c": {
+        "message": "方程式"
     },
     "error_loading_grades_e0b38f4d": {
         "message": "成績の読み込み中にエラー"
@@ -491,6 +500,9 @@
     "height_69b03e15": {
         "message": "高さ"
     },
+    "image_8ad06": {
+        "message": "画像"
+    },
     "image_options_5412d02c": {
         "message": "画像オプション"
     },
@@ -502,6 +514,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "インデント"
+    },
+    "insert_593145ef": {
+        "message": "挿入"
     },
     "insert_equella_links_49a8dacd": {
         "message": "Equella リンクを挿入してください"

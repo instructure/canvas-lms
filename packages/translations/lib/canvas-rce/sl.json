@@ -43,6 +43,9 @@
     "message": "nerazvrščeni seznam s krogi"
   },
   "clear_selected_file_82388e50": { "message": "Počisti izbrano datoteko." },
+  "clear_selected_file_filename_2fe8a58e": {
+    "message": "Počisti izbrano datoteko: { filename }"
+  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Kliknite katero koli stran, da vstavite povezavo na to stran."
   },
@@ -107,6 +110,7 @@
   "display_text_link_opens_in_a_new_tab_75e9afc9": {
     "message": "Prikaži besedilno povezavo (se odpre v novem zavihku)"
   },
+  "document_678cd7bf": { "message": "Dokument" },
   "documents_81393201": { "message": "Dokumenti" },
   "done_54e3d4b6": { "message": "Dokončano" },
   "drag_a_file_here_1bf656d5": { "message": "Datoteko povlecite sem" },
@@ -131,6 +135,7 @@
   "embed_preview_2d741e1f": { "message": "Predogled vdelave" },
   "embed_video_a97a64af": { "message": "Vdelajte videoposnetek" },
   "embed_video_code_703e10f2": { "message": "Vdelaj kodo videoposnetka" },
+  "equation_1c5ac93c": { "message": "Enačba" },
   "error_uploading_video_audio_recording_16d9730a": {
     "message": "Napaka pri nalaganju videoposnetka/zvočnega posnetka"
   },
@@ -173,10 +178,12 @@
   "heading_3_2c83de44": { "message": "Glava 3" },
   "heading_4_b2e74be7": { "message": "Glava 4" },
   "height_69b03e15": { "message": "Višina" },
+  "image_8ad06": { "message": "Slika" },
   "image_options_5412d02c": { "message": "Možnosti slike" },
   "image_options_tray_90a46006": { "message": "Vrstica z možnostmi slike" },
   "images_7ce26570": { "message": "Slike" },
   "increase_indent_6d550a4a": { "message": "Povečaj zamik" },
+  "insert_593145ef": { "message": "Vstavi" },
   "insert_equella_links_49a8dacd": {
     "message": "Vstavi povezave storitve EQUELLA"
   },
