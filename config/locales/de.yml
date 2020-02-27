@@ -2329,7 +2329,11 @@ de:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Erlaubt einem Benutzer, die Benutzer-SIS-IDs auf der Seite „Kursteilnehmer“ anzuzeigen."
   allows_users_to_edit_conferences_2d3c960c: "Erlaubt es Benutzern, Konferenzen zu ändern."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Ermöglicht Benutzern, die Option „SpeedGrader gefiltert nach Studentengruppe starten“ für Kurse auf der Einstellungsseite zu aktivieren. Wenn sie aktiviert ist und eine Studentengruppe in „Neues Notenbuch“ ausgewählt wurde, wird SpeedGrader nur Studenten der ausgewählten Gruppe laden."
+  allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Ermöglicht es Benutzern, Benachrichtigungen auf Kursebene stummzuschalten."
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Ermöglicht es Benutzern, Pronomen auszuwählen, die nach ihrem Namen angezeigt werden, wenn er in der Benutzeroberfläche angezeigt wird."
+  allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
+      Benutzern erlauben, Pronomen zu wählen, die nach
+      Ihrem Namen auf der Benutzeroberfläche angezeigt werden.
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Erlaubt Benutzern mit int. Telefonnummern, Textnachrichten von Canvas zu erhalten."
   alumno_88c80e37: Alumno
   always_3a59e701: Immer
@@ -4591,6 +4595,7 @@ de:
   cannot_be_present_when_account_id_is_present_f7d9b51f: "darf nicht vorhanden sein, wenn account_id vorhanden ist"
   cannot_be_present_when_course_id_is_present_785e6a59: "darf nicht vorhanden sein, wenn course_id vorhanden ist"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Die Fälligkeit einer Außerkraftsetzung kann nicht in einen Termin innerhalb eines abgeschlossenen Benotungszeitraums geändert werden."
+  cannot_change_locked_status_on_granular_permission_6f13bf4f: "Gesperrter Status kann nicht auf granulare Erlaubnis hin geändert werden"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Rollenname in %{label} kann nicht geändert werden: bereits in Gebrauch"
   cannot_change_the_default_term_name_edc2279b: "Der Standardname des Semesters kann nicht geändert werden."
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Die Fälligkeit einer Außerkraftsetzung innerhalb eines abgeschlossenen Benotungszeitraums kann nicht geändert werden."
@@ -4672,6 +4677,7 @@ de:
   canvas_files_889a274f: Canvas-Dateien
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_id_f42f6ad: Canvas-ID
+  canvas_insights_beta_view_4cf67797: "Canvas Insights (Beta) – Anzeigen"
   canvas_introduction_video_2d81f3ad: Canvas-Einführungsvideo
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas versucht, der Angaben abzurufen. Bitte schauen Sie später noch einmal nach."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Die Leinwand ist nicht dafür konfiguriert, Anmeldungen von %{issuer} zu erhalten."
@@ -5219,6 +5225,7 @@ de:
     type_disabled_error: "Dieser Konferenztyp ist für diese Canvas-Website nicht länger verfügbar."
   conferences_a0a8984b: Konferenzen
   conferences_tutorial_tray_6f071ce2: Konferenzen-Übungsfach
+  confetti_for_on_time_submissions_394e16ce: "Konfetti für pünktliche Abgaben"
   config_url_e96ceaf3: "URL konfigurieren"
   configurate_tool_app_5a721f2c: "%{tool}-Anwendung konfigurieren?"
   configuration_location_ee0f6592: Konfigurationsort
@@ -6179,11 +6186,11 @@ de:
     one: "1 Datei aktualisiert"
     other: "%{count} Dateien aktualisiert"
   count_files_were_attached_to_the_following_user_su_a0dae4e6: 
-    one: "(1) Datei wurde an die folgende Benutzerabgabe angehängt."
-    other: "(%{count}) Dateien wurden an die folgenden Benutzerabgaben angehängt."
+    one: "(1) Datei wurde an die folgende Benutzerabgabe angehängt."
+    other: "(%{count}) Dateien wurden an die folgenden Benutzerabgaben angehängt."
   count_files_were_ignored_2f9c054a: 
-    one: "(1) Datei wurde ignoriert."
-    other: "(%{count}) Dateien wurden ignoriert."
+    one: "(1) Datei wurde ignoriert."
+    other: "(%{count}) Dateien wurden ignoriert."
   count_hidden_e8d2c57c: "%{count} ausgeblendet"
   count_images_found_for_term_a93635ed: "%{count} Bilder wurden für %{term} gefunden."
   count_items_deleted_successfully_a287aa53: 
@@ -6240,6 +6247,8 @@ de:
   count_results_displayed_ed39a0f0: 
     one: "Ein Ergebnis angezeigt"
     other: "%{count} Ergebnisse angezeigt"
+  count_rows_added_dacc9daf: "%{count} Zeilen hinzugefügt"
+  count_rows_removed_c6ff7bc: "%{count} Zeilen entfernt"
   count_sections_466dcd5c: 
     one: "1 Abschnitt"
     other: "%{count} Abschnitte"
@@ -7069,6 +7078,7 @@ de:
         new_announcement: "Neue Ankündigung"
         student_view: Studentenansicht
         view_course_calendar: "Kurskalender anzeigen"
+        view_course_notification_settings: "Kursbenachrichtigungen anzeigen"
         view_course_stream: "Kurs-Stream anzeigen"
       re_sending: "Wird erneut versendet ..."
       send_done: "Fertig. Die Meldung kann einige Minuten dauern."
@@ -8267,6 +8277,9 @@ de:
   display_totals_for_all_grading_periods_option_4a72586: "Option zur Anzeige der Summen für alle Benotungszeiträume"
   display_values_f517c73c: "Werte anzeigen"
   displaying_to_students_b1e92058: "Den Studenten anzeigen"
+  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+      Zeigt Konfetti für Benutzer, die eine Aufgabe vor
+      dem Fälligkeitstermin abgeben.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Verteilung von aktuellen Noten in Kursen auf alle in Abteilungskursen
               eingeschriebene Studenten.
@@ -9135,6 +9148,7 @@ de:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Liste der Gruppenmitglieder für %{groupName} erweitern"
   expand_or_collapse_calendars_9854b0d0: "Kalender maximieren oder minimieren"
   expand_or_collapse_undated_items_b901de09: "Nicht datierte Elemente maximieren oder minimieren"
+  expand_permission_b45bf097: "%{permission} einblenden"
   expand_permission_c61d5958: "Berechtigung erweitern"
   expand_subdiscussion_cd226ed4: "Subdiskussion erweitern"
   expand_tutorial_tray_22630c49: "Übungsfach einblenden"
@@ -11461,6 +11475,10 @@ de:
       
         *Bitte achten Sie darauf, dass die Namen der Abgabedateien unverändert bleiben, sodass eine eindeutige Zuordnung möglich ist.*
   if_you_need_to_make_your_course_public_please_cont_7084c67b: "Wenn Sie Ihren Kurs veröffentlichen möchten, wenden Sie sich bitte an Ihren Administrator/Support."
+  if_you_turn_this_on_when_an_account_admin_goes_to__42e74f56: |-
+      Falls Sie dies einschalten, wird, wenn ein Kontoadministrator auf die Seite geht, um
+      eine globale Ankündigung zu machen, ein Kontrollkästchen angezeigt, an das
+      die Benachrichtigung direkt an die Benutzer sendet, wenn die Ankündigung beginnt.
   if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: "Wenn Sie dies einschalten, erscheint ein Kontrollkästchen, wenn ein Kontoadmin auf die Seite geht, um eine globale Ankündigung zu erstellen, so dass bei Beginn der Ankündigung eine Benachrichtigung direkt an die Benutzer gesendet wird."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Wenn Sie bisher ein anderes Kursmanagementsystem verwendet haben, verfügen Sie dort wahrscheinlich über Material, das Sie nach Canvas übertragen möchten. Wir zeigen Ihnen, wie Sie Ihre Inhalte bequem zu Canvas migrieren können."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "Wenn Sie möchten, können Sie „SIS“ einen Ihren Mitarbeitern vertrauteren Namen geben"
@@ -12523,6 +12541,7 @@ de:
   manage_module_name_dfe16816: "%{module_name} verwalten"
   manage_name_7f55f792: "%{name} verwalten"
   manage_options_for_name_83278ad0: "Optionen für %{name} verwalten"
+  manage_pages_4d2adeb6: "Verwalten von Seiten"
   manage_profile_pictures_40c958ce: "Profilbilder verwalten"
   manage_rubrics_5d274f6a: "Bewertungsschemata verwalten"
   manage_snapshots_1dc4b79d: "Snapshots verwalten"
@@ -14915,6 +14934,7 @@ de:
     students_will_see: "Die Studenten können sehen, dass diese Aufgabe stummgeschaltet ist."
     submission_comments: Abgabekommentare
     sure_you_want_to_mute: "Möchten Sie diese Aufgabe wirklich stummschalten? Solange diese Aufgabe stummgeschaltet ist, erhalten die Studenten keine neuen Benachrichtigungen und sehen nicht:"
+  mute_notifications_by_course_440e18be: "Benachrichtigungen kursweise stummschalten"
   mute_unmute_assignment_62608e44: "Aufgabe stumm/laut schalten"
   muted_283cfa0f: (stummgeschaltet)
   muted_3ff94739: Stummgeschaltet
@@ -15566,7 +15586,7 @@ de:
   number_more_a46966: "%{number} Mehr ..."
   number_of_allowed_attempts_3d10b740: "Anzahl der zulässigen Versuche"
   number_of_attempts_b0994c2f: "Die Anzahl der Versuche"
-  number_of_attempts_must_be_a_number_greater_than_0_a915568c: "Die Anzahl der Versuche muss größer als 0 sein."
+  number_of_attempts_must_be_a_number_greater_than_0_a915568c: "Die Anzahl der Versuche muss größer als 0 sein."
   number_of_graders_cde8dd54: "Anzahl der Benoter"
   number_of_respondents_e1e7e8b: "Anzahl der Befragten"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Anzahl der für jeden Schüler zu ignorierenden Ergebnisse"
@@ -16029,14 +16049,14 @@ de:
           Änderungen überschreiben?
       unsaved_changes: "Es liegen nicht gespeicherte Änderungen von Ihnen vor. Möchten Sie fortfahren, ohne die Änderungen zu speichern?"
   pages_add_edit_delete_4c690ec6: "Seiten – hinzufügen/bearbeiten/löschen"
-  pages_create_7be4852c: "Seiten – Erstellen"
-  pages_delete_ce201950: "Seiten – Löschen"
+  pages_create_7be4852c: "Seiten – Erstellen"
+  pages_delete_ce201950: "Seiten – Löschen"
   pages_e5414c2c: Seiten
   pages_front_page_9ce5188: "Seiten – Startseite"
   pages_index_menu_f391bf04: Seitenindex-Menü
   pages_settings_968392a3: Seiteneinstellungen
   pages_tutorial_tray_169464a9: "Seiten Übungsfach"
-  pages_update_6c1750af: "Seiten – Aktualisieren"
+  pages_update_6c1750af: "Seiten – Aktualisieren"
   paginated_collection: 
     no_items: "Keine Elemente"
   paginated_list: 
@@ -16058,6 +16078,8 @@ de:
   parent_signup_b7c6bf0a: Eltern-Anmeldung
   parents_sign_up_here_f0aa8f4f: "Eltern bitte hier anmelden"
   partially_anonymous_483a892d: "Teilweise Anonym"
+  partially_enabled_and_locked_9a39d38a: "Teilweise aktiviert und gesperrt"
+  partially_enabled_cd506819: "Teilweise aktiviert"
   participation_af2598: Teilnahme
   participations_1823832d: Teilnahmen
   pass_2a8c4f07: bestehen
@@ -16650,6 +16672,7 @@ de:
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Für den ausgewählten Benotungstyp muss der Wert für die möglichen Punkte 0 oder höher sein."
+  points_possible_must_be_greater_than_0_for_selecte_5708da1b: "Für die ausgewählte Benotungsart müssen die möglichen Punkte größer als 0 sein."
   points_possible_points_fda3b111: "%{points_possible} Punkte"
   points_pts_e5596bf7: "%{points} Pkte."
   points_should_be_strictly_decreasing_l_r_18f26f87: "Die Punkte müssen stringent abnehmen: %{l} <= %{r}"
@@ -19666,6 +19689,7 @@ de:
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Sehen Sie sich einige LTI-Tools an*, die großartig mit Canvas zusammenarbeiten."
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Einige LTI-Tools funktionieren großartig mit Canvas."
   see_turnitin_results_cd9d4a6c: "Turnitin-Ergebnisse ansehen"
+  see_vericite_results_b44dd8c8: "VeriCite-Ergebnisse ansehen"
   select_1e849959: "[ Bitte auswählen ]"
   select_a_course_4710371f: "Einen Kurs auswählen"
   select_a_grading_period_5ea50f1: "Einen Benotungszeitraum wählen ..."
@@ -20692,6 +20716,7 @@ de:
   showing_all_announcements_36ff0cec: "Alle Ankündigungen zeigen"
   showing_all_discussions_7e09f4b7: "Alle Diskussionen zeigen"
   showing_all_sets_of_grading_periods_6c160874: "Alle Sets von Benotungszeiträumen werden angezeigt."
+  shrink_permission_74b01aed: "%{permission} verkleinern"
   shuffle_answers_edb602b7: "Antworten mischen"
   signup_type_8b4506f3: "Art der Anmeldung"
   similarity_detection_dcada48: Ähnlichkeitserkennung
@@ -20851,6 +20876,7 @@ de:
   something_went_wrong_please_try_again_6d337b6c: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es noch einmal."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Etwas ging schief. Versuchen Sie die Seite zu aktualisieren. Falls das Problem weiterbesteht, können Sie versuchen, eine einzelne Studentengruppe in SpeedGrader unter Nutzung der *Einstellung „Großer Kurs“* zu laden."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Etwas ging schief. Versuchen Sie die Seite zu aktualisieren. Falls das Problem weiterbesteht, gibt es möglicherweise zu viele Datensätze auf „%{assignmentTitle}“, um SpeedGrader zu laden."
+  something_went_wrong_please_try_refreshing_the_pag_689be273: "Etwas ging schief. Versuchen Sie die Seite zu aktualisieren."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Bei der Reaktivierung des Anwenders ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Bei der Aktualisierung der Rolle des Benutzers ist ein Fehler aufgetreten. Bitte versuchen Sie es später nochmal."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Beim Synchronisieren der Noten mit dem Studenteninformationssystem ist ein Fehler aufgetreten. Bitte versuchen Sie es später noch einmal."
@@ -21416,6 +21442,7 @@ de:
   successfully_posted_the_comment_12d95d56: "Kommentar gepostet"
   successfully_resubmitted_to_turnitin_c908de0f: "Erneut an Turnitin übermittelt."
   successfully_resubmitted_to_vericite_dab924b6: "Erneut an VeriCite übermittelt."
+  successfully_saved_the_comment_c87681fd: "Kommentar erfolgreich gespeichert"
   successfully_updated_the_comment_946360d5: "Kommentar aktualisiert"
   sum_of_all_files_in_mb_2b705055: "Summe aller Dateien in MB"
   summary_statistics_f74852a5: Zusammenfassungsstatisitik
@@ -21824,6 +21851,7 @@ de:
   there_was_a_problem_posting_the_comment_75d15646: "Problem beim Posten des Kommentars"
   there_was_a_problem_publishing_grades_b0b9202f: "Es gab ein Problem beim Veröffentlichen von Noten."
   there_was_a_problem_releasing_grades_fa0ae6: "Beim Veröffentlichen der Noten gab es ein Problem."
+  there_was_a_problem_saving_the_comment_d94cbac9: "Problem beim Speichern des Kommentars"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Beim Speichern der Note ist ein Problem aufgetreten."
   there_was_a_problem_saving_the_grades_5e61f9e2: "Beim Speichern der Noten ist ein Problem aufgetreten."
   there_was_a_problem_saving_the_grading_period_243bed6c: "Beim Speichern des Benotungszeitraums ist ein Problem aufgetreten."
@@ -23479,6 +23507,7 @@ de:
   vericite_info: 
     buttons: 
       resubmit_to_vericite: "Erneut bei VeriCite einreichen"
+  vericite_similarity_score_more_information_7df9ea5c: "VeriCite-Similarity-Score – weitere Informationen"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Similarity-Score – detaillierten Bericht anzeigen"
   video_78335c71: Video
   video_b9f27375: Video
@@ -23495,6 +23524,7 @@ de:
   view_app_configurations_52b52441: "App-Konfigurationen anzeigen"
   view_audit_trail_12f774b6: "Prüfpfad anzeigen"
   view_ba339f93: Ansehen
+  view_canvas_insights_beta_fe446d71: "Canvas Insights (Beta) anzeigen"
   view_conditional_content_settings_a2dca270: "Einstellungen für vorläufigen Inhalt ansehen"
   view_course_analytics_eefe6b2: "Kursanalysen anzeigen"
   view_faculty_journals_ad0e8c8f: "Fakultätsjournale anzeigen"
@@ -24022,7 +24052,7 @@ de:
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Sie haben eine Erinnerung erhalten, folgende Bewertungen vorzunehmen: %{rubric}, %{context}."
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: "Sie haben die Bewertungskriterien aktualisiert; dies wirkt sich auf alle Studenten aus, die zuvor anhand dieses Ergebnis bewertet wurden."
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Sie werden zu einer Anmeldeseite weitergeleitet, wo Sie sich mit den Angaben Ihres Kindes anmelden müssen."
-  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Sie werden nach „Notenbuch“ umgeleitet, während Ihre Datei hochgeladen wird. Bei einer großen CSV-Datei, kann die Übernahme Ihrer Änderungen ein paar Minuten dauern. Um ein Überschreiben zu verhindern, bestätigen Sie bitte, dass das Hochladen beendet und das „Notenbuch“ korrekt ist, bevor Sie weitere Änderungen vornehmen."
+  you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Sie werden nach „Notenbuch“ weitergeleitet, während Ihre Datei hochgeladen wird. Bei einer großen CSV-Datei, kann die Übernahme Ihrer Änderungen ein paar Minuten dauern. Um das Überschreiben von Daten zu verhindern, bestätigen Sie bitte, dass das Hochladen beendet und das „Notenbuch“ korrekt ist, bevor Sie weitere Änderungen vornehmen."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       Sie müssen eine [neue App auf Facebook](%{facebook_url}) erstellen und die Client-OAuth-Anmeldung in den „Erweiterten
       Einstellungen“ aktivieren. Sie sollten %{callback_url} als gültigen OAuth-URL zur Weiterleitung konfigurieren.
