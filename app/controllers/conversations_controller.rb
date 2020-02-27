@@ -880,6 +880,11 @@ class ConversationsController < ApplicationController
   #
   def add_message
     get_conversation(true)
+
+    if @conversation.conversation.context.is_a?(Course) && @conversation.conversation.context.workflow_state == 'completed'
+      return render json: {message: "Unable to send messages in a concluded course"}, status: :unauthorized
+    end
+
     if @conversation.conversation.replies_locked_for?(@current_user)
       return render_unauthorized_action
     end

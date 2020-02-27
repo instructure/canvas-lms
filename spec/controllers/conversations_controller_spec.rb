@@ -555,6 +555,15 @@ describe ConversationsController do
       student = message.recipients.first
       expect(student.user_notes.size).to eq 1
     end
+
+    it "should not allow new messages in concluded courses" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      @course.update!({workflow_state: 'completed'})
+
+      post 'add_message', params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+      assert_unauthorized
+    end
   end
 
   describe "POST 'add_recipients'" do
