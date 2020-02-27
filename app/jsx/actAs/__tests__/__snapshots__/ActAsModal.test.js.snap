@@ -668,13 +668,16 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                 buttonRef={[Function]}
                 cursor="pointer"
                 data-method="post"
-                fluidWidth={false}
+                display="inline-block"
+                elementRef={[Function]}
                 href="/users/5/masquerade"
                 margin="large 0 0 0"
                 onClick={[Function]}
                 size="medium"
+                textAlign="center"
                 type="button"
                 variant="primary"
+                withBackground={true}
               >
                 Proceed
               </Button>

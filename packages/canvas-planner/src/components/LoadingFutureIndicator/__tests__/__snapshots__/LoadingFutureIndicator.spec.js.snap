@@ -49,14 +49,16 @@ exports[`renders load more by default 1`] = `
   >
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       margin="0"
       onClick={[Function]}
       size="medium"
+      textAlign="center"
       type="button"
       variant="link"
+      withBackground={true}
     >
       Load more
     </Button>
@@ -147,14 +149,16 @@ exports[`shows an Alert when there's a query error 1`] = `
     </div>
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       margin="0"
       onClick={[Function]}
       size="medium"
+      textAlign="center"
       type="button"
       variant="link"
+      withBackground={true}
     >
       Load more
     </Button>

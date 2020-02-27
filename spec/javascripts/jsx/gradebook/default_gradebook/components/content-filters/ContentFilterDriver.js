@@ -36,7 +36,7 @@ export default class ContentFilterDriver {
   }
 
   get $input() {
-    return this.$element.querySelector('input[role="combobox"]')
+    return this.$element.querySelector('input[role="button"]')
   }
 
   get $optionsList() {

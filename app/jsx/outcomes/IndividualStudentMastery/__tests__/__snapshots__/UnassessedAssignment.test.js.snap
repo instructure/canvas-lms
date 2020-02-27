@@ -21,7 +21,7 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(Button__eHiXd): Object {
+          Symbol(Button__MTA0NDg4): Object {
             "fontWeight": "700",
             "linkColor": "#68777D",
           },
@@ -30,13 +30,14 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="www.example.com"
         icon={[Function]}
         margin="0"
         size="medium"
+        textAlign="center"
         theme={
           Object {
             "mediumHeight": "normal",
@@ -45,6 +46,7 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         example
          (

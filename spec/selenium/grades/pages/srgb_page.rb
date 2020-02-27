@@ -33,7 +33,7 @@ class SRGB
     end
 
     def switch_to_default_gradebook
-      f('[data-component="GradebookSelector"] [role="combobox"]').click
+      f('[data-component="GradebookSelector"] input').click
       wait_for_animations
       fj("[role=\"option\"]:contains(\"Gradebook…\")").click
     end

@@ -37,12 +37,13 @@ exports[`renders 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://example.com"
         margin="0"
         size="large"
+        textAlign="center"
         theme={
           Object {
             "largeHeight": "normal",
@@ -51,18 +52,20 @@ exports[`renders 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         event title
       </Button>
     </Heading>
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[MockFunction]}
       placement="end"
       size="small"
-      variant="icon"
+      type="button"
     >
       Close
     </CloseButton>
@@ -274,12 +277,13 @@ exports[`renders with allDay 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://example.com"
         margin="0"
         size="large"
+        textAlign="center"
         theme={
           Object {
             "largeHeight": "normal",
@@ -288,18 +292,20 @@ exports[`renders with allDay 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         event title
       </Button>
     </Heading>
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[MockFunction]}
       placement="end"
       size="small"
-      variant="icon"
+      type="button"
     >
       Close
     </CloseButton>
@@ -511,12 +517,13 @@ exports[`renders with only the startTime 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://example.com"
         margin="0"
         size="large"
+        textAlign="center"
         theme={
           Object {
             "largeHeight": "normal",
@@ -525,18 +532,20 @@ exports[`renders with only the startTime 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         event title
       </Button>
     </Heading>
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[MockFunction]}
       placement="end"
       size="small"
-      variant="icon"
+      type="button"
     >
       Close
     </CloseButton>
@@ -748,12 +757,13 @@ exports[`renders with user displayName for calendar 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://example.com"
         margin="0"
         size="large"
+        textAlign="center"
         theme={
           Object {
             "largeHeight": "normal",
@@ -762,18 +772,20 @@ exports[`renders with user displayName for calendar 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         event title
       </Button>
     </Heading>
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[MockFunction]}
       placement="end"
       size="small"
-      variant="icon"
+      type="button"
     >
       Close
     </CloseButton>
@@ -985,12 +997,13 @@ exports[`renders without address 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://example.com"
         margin="0"
         size="large"
+        textAlign="center"
         theme={
           Object {
             "largeHeight": "normal",
@@ -999,18 +1012,20 @@ exports[`renders without address 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         event title
       </Button>
     </Heading>
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[MockFunction]}
       placement="end"
       size="small"
-      variant="icon"
+      type="button"
     >
       Close
     </CloseButton>
@@ -1189,12 +1204,13 @@ exports[`renders without details 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://example.com"
         margin="0"
         size="large"
+        textAlign="center"
         theme={
           Object {
             "largeHeight": "normal",
@@ -1203,18 +1219,20 @@ exports[`renders without details 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         event title
       </Button>
     </Heading>
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[MockFunction]}
       placement="end"
       size="small"
-      variant="icon"
+      type="button"
     >
       Close
     </CloseButton>
@@ -1406,12 +1424,13 @@ exports[`renders without location 1`] = `
     >
       <Button
         as="button"
-        buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://example.com"
         margin="0"
         size="large"
+        textAlign="center"
         theme={
           Object {
             "largeHeight": "normal",
@@ -1420,18 +1439,20 @@ exports[`renders without location 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         event title
       </Button>
     </Heading>
     <CloseButton
-      buttonRef={[Function]}
+      as="button"
+      cursor="pointer"
       margin="0"
       offset="x-small"
       onClick={[MockFunction]}
       placement="end"
       size="small"
-      variant="icon"
+      type="button"
     >
       Close
     </CloseButton>

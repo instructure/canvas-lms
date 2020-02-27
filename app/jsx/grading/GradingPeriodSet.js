@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import _ from 'underscore'
+import _ from 'lodash'
 import {Button} from '@instructure/ui-buttons'
 import axios from 'axios'
 import I18n from 'i18n!GradingPeriodSet'
@@ -47,7 +47,7 @@ const anyPeriodsOverlap = function(periods) {
 }
 
 const isValidDate = function(date) {
-  return Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date.getTime())
+  return Object.prototype.toString.call(date) === '[object Date]' && !_.isNaN(date.getTime())
 }
 
 const validatePeriods = function(periods, weighted) {
@@ -55,7 +55,7 @@ const validatePeriods = function(periods, weighted) {
     return [I18n.t('All grading periods must have a title')]
   }
 
-  if (weighted && _.some(periods, period => isNaN(period.weight) || period.weight < 0)) {
+  if (weighted && _.some(periods, period => _.isNaN(period.weight) || period.weight < 0)) {
     return [I18n.t('All weights must be greater than or equal to 0')]
   }
 
@@ -98,13 +98,9 @@ const getShowGradingPeriodRef = function(period) {
   return `show-grading-period-${period.id}`
 }
 
-const getEditGradingPeriodRef = function(period) {
-  return `edit-grading-period-${period.id}`
-}
+const {shape, string, array, bool, func} = PropTypes
 
-const {shape, number, string, array, bool, func} = PropTypes
-
-class GradingPeriodSet extends React.Component {
+export default class GradingPeriodSet extends React.Component {
   static propTypes = {
     gradingPeriods: array.isRequired,
     terms: array.isRequired,
@@ -137,27 +133,31 @@ class GradingPeriodSet extends React.Component {
     }).isRequired
   }
 
-  state = {
-    title: this.props.set.title,
-    weighted: !!this.props.set.weighted,
-    displayTotalsForAllGradingPeriods: this.props.set.displayTotalsForAllGradingPeriods,
-    gradingPeriods: sortPeriods(this.props.gradingPeriods),
-    newPeriod: {
-      period: null,
-      saving: false
-    },
-    editPeriod: {
-      id: null,
-      saving: false
+  constructor(props) {
+    super(props)
+    this.state = {
+      title: this.props.set.title,
+      weighted: !!this.props.set.weighted,
+      displayTotalsForAllGradingPeriods: this.props.set.displayTotalsForAllGradingPeriods,
+      gradingPeriods: sortPeriods(this.props.gradingPeriods),
+      newPeriod: {
+        period: null,
+        saving: false
+      },
+      editPeriod: {
+        id: null,
+        saving: false
+      }
     }
+    this._refs = {}
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.newPeriod.period && !this.state.newPeriod.period) {
-      this.refs.addPeriodButton.focus()
+      this._refs.addPeriodButton.focus()
     } else if (isEditingPeriod(prevState) && !isEditingPeriod(this.state)) {
       const period = {id: prevState.editPeriod.id}
-      this.refs[getShowGradingPeriodRef(period)].refs.editButton.focus()
+      this._refs[getShowGradingPeriodRef(period)]._refs.editButton.focus()
     }
   }
 
@@ -184,10 +184,10 @@ class GradingPeriodSet extends React.Component {
       })
   }
 
-  setTerms = () => _.where(this.props.terms, {gradingPeriodGroupId: this.props.set.id})
+  setTerms = () => _.filter(this.props.terms, {gradingPeriodGroupId: this.props.set.id})
 
   termNames = () => {
-    const names = _.pluck(this.setTerms(), 'displayName')
+    const names = _.map(this.setTerms(), 'displayName')
     if (names.length > 0) {
       return I18n.t('Terms: ') + names.join(', ')
     } else {
@@ -207,8 +207,10 @@ class GradingPeriodSet extends React.Component {
   }
 
   removeGradingPeriod = idToRemove => {
-    const periods = _.reject(this.state.gradingPeriods, period => period.id === idToRemove)
-    this.setState({gradingPeriods: periods})
+    this.setState(oldState => {
+      const gradingPeriods = _.reject(oldState.gradingPeriods, period => period.id === idToRemove)
+      return {gradingPeriods}
+    })
   }
 
   showNewPeriodForm = () => {
@@ -222,12 +224,12 @@ class GradingPeriodSet extends React.Component {
       this.setNewPeriod({saving: true})
       gradingPeriodsApi
         .batchUpdate(this.props.set.id, periods)
-        .then(periods => {
+        .then(pds => {
           $.flashMessage(I18n.t('All changes were saved'))
           this.removeNewPeriodForm()
-          this.changePeriods(periods)
+          this.changePeriods(pds)
         })
-        .catch(_ => {
+        .catch(_err => {
           $.flashError(I18n.t('There was a problem saving the grading period'))
           this.setNewPeriod({saving: false})
         })
@@ -243,8 +245,10 @@ class GradingPeriodSet extends React.Component {
   }
 
   setNewPeriod = attr => {
-    const period = $.extend(true, {}, this.state.newPeriod, attr)
-    this.setState({newPeriod: period})
+    this.setState(oldState => {
+      const newPeriod = $.extend(true, {}, oldState.newPeriod, attr)
+      return {newPeriod}
+    })
   }
 
   editPeriod = period => {
@@ -252,20 +256,21 @@ class GradingPeriodSet extends React.Component {
   }
 
   updatePeriod = period => {
-    const periods = _.reject(this.state.gradingPeriods, _period => period.id === _period.id).concat(
-      [period]
-    )
+    const periods = _.reject(
+      this.state.gradingPeriods,
+      _period => period.id === _period.id
+    ).concat([period])
     const validations = validatePeriods(periods, this.state.weighted)
     if (_.isEmpty(validations)) {
       this.setEditPeriod({saving: true})
       gradingPeriodsApi
         .batchUpdate(this.props.set.id, periods)
-        .then(periods => {
+        .then(pds => {
           $.flashMessage(I18n.t('All changes were saved'))
           this.setEditPeriod({id: null, saving: false})
-          this.changePeriods(periods)
+          this.changePeriods(pds)
         })
-        .catch(_ => {
+        .catch(_err => {
           $.flashError(I18n.t('There was a problem saving the grading period'))
           this.setNewPeriod({saving: false})
         })
@@ -281,8 +286,10 @@ class GradingPeriodSet extends React.Component {
   }
 
   setEditPeriod = attr => {
-    const period = $.extend(true, {}, this.state.editPeriod, attr)
-    this.setState({editPeriod: period})
+    this.setState(oldState => {
+      const editPeriod = $.extend(true, {}, oldState.editPeriod, attr)
+      return {editPeriod}
+    })
   }
 
   renderEditButton = () => {
@@ -290,7 +297,9 @@ class GradingPeriodSet extends React.Component {
       const disabled = isActionsDisabled(this.state, this.props)
       return (
         <Button
-          ref="editButton"
+          elementRef={ref => {
+            this._refs.editButton = ref
+          }}
           variant="icon"
           disabled={disabled}
           onClick={this.editSet}
@@ -310,7 +319,9 @@ class GradingPeriodSet extends React.Component {
       const disabled = isActionsDisabled(this.state, this.props)
       return (
         <Button
-          ref="deleteButton"
+          elementRef={ref => {
+            this._refs.deleteButton = ref
+          }}
           variant="icon"
           disabled={disabled}
           onClick={this.promptDeleteSet}
@@ -336,8 +347,18 @@ class GradingPeriodSet extends React.Component {
     if (!this.props.expanded) return null
 
     return (
-      <div ref="setBody" className="ig-body">
-        <div className="GradingPeriodList" ref="gradingPeriodList">
+      <div
+        ref={ref => {
+          this._refs.setBody = ref
+        }}
+        className="ig-body"
+      >
+        <div
+          className="GradingPeriodList"
+          ref={ref => {
+            this._refs.gradingPeriodList = ref
+          }}
+        >
           {this.renderGradingPeriods()}
         </div>
         {this.renderNewPeriod()}
@@ -355,7 +376,9 @@ class GradingPeriodSet extends React.Component {
             className="GradingPeriodList__period--editing pad-box"
           >
             <GradingPeriodForm
-              ref="editPeriodForm"
+              ref={ref => {
+                this._refs.editPeriodForm = ref
+              }}
               period={period}
               weighted={this.state.weighted}
               disabled={this.state.editPeriod.saving}
@@ -368,7 +391,9 @@ class GradingPeriodSet extends React.Component {
         return (
           <GradingPeriod
             key={`show-grading-period-${period.id}`}
-            ref={getShowGradingPeriodRef(period)}
+            ref={ref => {
+              this._refs[getShowGradingPeriodRef(period)] = ref
+            }}
             period={period}
             weighted={this.state.weighted}
             actionsDisabled={actionsDisabled}
@@ -399,7 +424,9 @@ class GradingPeriodSet extends React.Component {
       <div className="GradingPeriodList__new-period center-xs border-rbl border-round-b">
         <Button
           variant="link"
-          ref="addPeriodButton"
+          elementRef={ref => {
+            this._refs.addPeriodButton = ref
+          }}
           disabled={disabled}
           aria-label={I18n.t('Add Grading Period')}
           onClick={this.showNewPeriodForm}
@@ -416,7 +443,9 @@ class GradingPeriodSet extends React.Component {
     <div className="GradingPeriodList__new-period--editing border border-rbl border-round-b pad-box">
       <GradingPeriodForm
         key="new-grading-period"
-        ref="newPeriodForm"
+        ref={ref => {
+          this._refs.newPeriodForm = ref
+        }}
         weighted={this.state.weighted}
         disabled={this.state.newPeriod.saving}
         onSave={this.saveNewPeriod}
@@ -430,7 +459,13 @@ class GradingPeriodSet extends React.Component {
     const arrow = this.props.expanded ? 'down' : 'right'
     return (
       <div className={`GradingPeriodSet--${setStateSuffix}`}>
-        <div className="ItemGroup__header" ref="toggleSetBody" onClick={this.toggleSetBody}>
+        <div
+          className="ItemGroup__header"
+          ref={ref => {
+            this._refs.toggleSetBody = ref
+          }}
+          onClick={this.toggleSetBody}
+        >
           <div>
             <div className="ItemGroup__header__title">
               <button
@@ -442,7 +477,12 @@ class GradingPeriodSet extends React.Component {
               >
                 <i className={`icon-mini-arrow-${arrow}`} />
               </button>
-              <h2 ref="title" className="GradingPeriodSet__title">
+              <h2
+                ref={ref => {
+                  this._refs.title = ref
+                }}
+                className="GradingPeriodSet__title"
+              >
                 {this.props.set.title}
               </h2>
             </div>
@@ -455,5 +495,3 @@ class GradingPeriodSet extends React.Component {
     )
   }
 }
-
-export default GradingPeriodSet

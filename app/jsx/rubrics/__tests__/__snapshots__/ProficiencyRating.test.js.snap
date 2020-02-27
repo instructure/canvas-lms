@@ -51,7 +51,6 @@ exports[`renders the ProficiencyRating component 1`] = `
       display="block"
       inputContainerRef={[Function]}
       inputRef={[Function]}
-      interaction="enabled"
       isRequired={false}
       messages={null}
       onBlur={[Function]}
@@ -64,6 +63,7 @@ exports[`renders the ProficiencyRating component 1`] = `
           Change description
         </ScreenReaderContent>
       }
+      shouldNotWrap={false}
       size="medium"
       textAlign="start"
       type="text"
@@ -82,7 +82,6 @@ exports[`renders the ProficiencyRating component 1`] = `
       display="block"
       inputContainerRef={[Function]}
       inputRef={[Function]}
-      interaction="enabled"
       isRequired={false}
       messages={null}
       onBlur={[Function]}
@@ -95,6 +94,7 @@ exports[`renders the ProficiencyRating component 1`] = `
           Change points
         </ScreenReaderContent>
       }
+      shouldNotWrap={false}
       size="medium"
       textAlign="start"
       type="text"
@@ -150,13 +150,15 @@ exports[`renders the ProficiencyRating component 1`] = `
       <PopoverTrigger>
         <Button
           as="button"
-          buttonRef={[Function]}
           cursor="pointer"
-          fluidWidth={false}
+          display="inline-block"
+          elementRef={[Function]}
           margin="0"
           size="medium"
+          textAlign="center"
           type="button"
           variant="link"
+          withBackground={true}
         >
           <div>
             <span
@@ -263,13 +265,16 @@ exports[`renders the ProficiencyRating component 1`] = `
         buttonRef={[Function]}
         cursor="pointer"
         disabled={false}
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         icon={<IconTrashLine />}
         margin="0"
         onClick={[Function]}
         size="medium"
+        textAlign="center"
         type="button"
         variant="icon"
+        withBackground={true}
       >
         <ScreenReaderContent
           as="span"

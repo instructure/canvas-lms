@@ -126,14 +126,14 @@ it('renders out the title as a Text when not given an href prop', () => {
 
 it('renders unique text for dismiss button', () => {
   const wrapper = mount(<ToDoItem {...getDefaultProps()} />)
-  const dismissButton = wrapper.find('.ToDoSidebarItem__Close').find('Button')
+  const dismissButton = wrapper.find('.ToDoSidebarItem__Close').find('button')
   expect(dismissButton.text()).toBe('Dismiss Introduction to Board Games')
 })
 
 it('calls the handleDismissClick prop when the dismiss X is clicked', () => {
   const handleDismissClick = jest.fn()
   const wrapper = mount(<ToDoItem {...getDefaultProps()} handleDismissClick={handleDismissClick} />)
-  const btn = wrapper.find('Button')
+  const btn = wrapper.find('button')
   btn.simulate('click')
   expect(handleDismissClick).toHaveBeenCalledWith(
     expect.objectContaining({

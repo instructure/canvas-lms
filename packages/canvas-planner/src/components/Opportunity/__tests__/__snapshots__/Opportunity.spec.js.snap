@@ -19,10 +19,12 @@ exports[`renders the base component correctly 1`] = `
         as="button"
         buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://www.non_default_url.com"
         margin="0"
         size="medium"
+        textAlign="center"
         theme={
           Object {
             "mediumHeight": "normal",
@@ -31,6 +33,7 @@ exports[`renders the base component correctly 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         this is a description about the opportunity
       </Button>
@@ -83,16 +86,18 @@ exports[`renders the base component correctly 1`] = `
   >
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       icon={[Function]}
       margin="0"
       onClick={[Function]}
       size="small"
+      textAlign="center"
       title="Dismiss this is a description about the opportunity"
       type="button"
       variant="icon"
+      withBackground={true}
     >
       <ScreenReaderContent
         as="span"
@@ -123,10 +128,12 @@ exports[`renders the base component correctly with 0 points 1`] = `
         as="button"
         buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://www.non_default_url.com"
         margin="0"
         size="medium"
+        textAlign="center"
         theme={
           Object {
             "mediumHeight": "normal",
@@ -135,6 +142,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         this is a description about the opportunity
       </Button>
@@ -187,16 +195,18 @@ exports[`renders the base component correctly with 0 points 1`] = `
   >
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       icon={[Function]}
       margin="0"
       onClick={[Function]}
       size="small"
+      textAlign="center"
       title="Dismiss this is a description about the opportunity"
       type="button"
       variant="icon"
+      withBackground={true}
     >
       <ScreenReaderContent
         as="span"
@@ -227,10 +237,12 @@ exports[`renders the base component correctly without points 1`] = `
         as="button"
         buttonRef={[Function]}
         cursor="pointer"
-        fluidWidth={false}
+        display="inline-block"
+        elementRef={[Function]}
         href="http://www.non_default_url.com"
         margin="0"
         size="medium"
+        textAlign="center"
         theme={
           Object {
             "mediumHeight": "normal",
@@ -239,6 +251,7 @@ exports[`renders the base component correctly without points 1`] = `
         }
         type="button"
         variant="link"
+        withBackground={true}
       >
         this is a description about the opportunity
       </Button>
@@ -277,16 +290,18 @@ exports[`renders the base component correctly without points 1`] = `
   >
     <Button
       as="button"
-      buttonRef={[Function]}
       cursor="pointer"
-      fluidWidth={false}
+      display="inline-block"
+      elementRef={[Function]}
       icon={[Function]}
       margin="0"
       onClick={[Function]}
       size="small"
+      textAlign="center"
       title="Dismiss this is a description about the opportunity"
       type="button"
       variant="icon"
+      withBackground={true}
     >
       <ScreenReaderContent
         as="span"

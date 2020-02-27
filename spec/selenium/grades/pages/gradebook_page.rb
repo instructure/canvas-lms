@@ -513,7 +513,7 @@ module Gradebook
   end
 
   def self.grading_period_dropdown_selector
-    '#grading-periods-filter-container [role="combobox"]'
+    '#grading-periods-filter-container input'
   end
 
   def self.grading_period_dropdown
@@ -521,15 +521,15 @@ module Gradebook
   end
 
   def self.section_dropdown
-    f('#sections-filter-container [role="combobox"]')
+    f('#sections-filter-container input')
   end
 
   def self.module_dropdown
-    f('#modules-filter-container [role="combobox"]')
+    f('#modules-filter-container input')
   end
 
   def self.student_group_dropdown
-    f('#student-group-filter-container [role="combobox"]')
+    f('#student-group-filter-container input')
   end
 
   def self.filter_menu_item(menu_item_name)

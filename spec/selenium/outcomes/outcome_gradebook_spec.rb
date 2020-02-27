@@ -46,7 +46,7 @@ describe "outcome gradebook" do
     end
 
     def section_filter
-      f('[data-component="SectionFilter"] [role="combobox"]')
+      f('[data-component="SectionFilter"] input')
     end
 
     def select_section(menu_item_name)
