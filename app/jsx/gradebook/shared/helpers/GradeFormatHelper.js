@@ -97,7 +97,7 @@ function excused() {
 }
 
 function formatPointsGrade(score) {
-  return I18n.n(score, {precision: 2, strip_insignificant_zeros: true})
+  return I18n.n(round(score, 2), {precision: 2, strip_insignificant_zeros: true})
 }
 
 function formatPercentageGrade(score, options) {
