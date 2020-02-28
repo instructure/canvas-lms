@@ -53,6 +53,10 @@ class GroupMembership < ActiveRecord::Base
 
   attr_writer :updating_user
 
+  def course_broadcast_data
+    group.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :new_context_group_membership
     p.to { self.user }
@@ -64,6 +68,7 @@ class GroupMembership < ActiveRecord::Base
         record.group&.can_participate?(self.user) &&
         record.sis_batch_id.blank?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :new_context_group_membership_invitation
     p.to { self.user }
@@ -75,14 +80,17 @@ class GroupMembership < ActiveRecord::Base
         record.group&.can_participate?(self.user) &&
         record.sis_batch_id.blank?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :group_membership_accepted
     p.to { self.user }
     p.whenever {|record| record.changed_state(:accepted, :requested) }
+    p.data { course_broadcast_data }
 
     p.dispatch :group_membership_rejected
     p.to { self.user }
     p.whenever {|record| record.changed_state(:rejected, :requested) }
+    p.data { course_broadcast_data }
 
     p.dispatch :new_student_organized_group
     p.to { self.group.context.participating_admins }
@@ -93,6 +101,7 @@ class GroupMembership < ActiveRecord::Base
       record.group.group_memberships.count == 1 &&
       record.group.student_organized?
     }
+    p.data { course_broadcast_data }
   end
 
   def assign_uuid

@@ -48,12 +48,17 @@ class AssessmentRequest < ActiveRecord::Base
     true
   end
 
+  def course_broadcast_data
+    context&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :rubric_assessment_submission_reminder
     p.to { self.assessor }
     p.whenever { |record|
       record.assigned? && @send_reminder && rubric_association
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :peer_review_invitation
     p.to { self.assessor }
@@ -65,6 +70,7 @@ class AssessmentRequest < ActiveRecord::Base
       send_notification = false if self.asset.is_a?(Submission) && self.asset.assignment.workflow_state != "published"
       send_notification
     }
+    p.data { course_broadcast_data }
   end
 
   scope :incomplete, -> { where(:workflow_state => 'assigned') }

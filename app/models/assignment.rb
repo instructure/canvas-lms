@@ -1082,6 +1082,10 @@ class Assignment < ActiveRecord::Base
     remove_assignment_updated_flag
   end
 
+  def course_broadcast_data
+    context&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
     p.to { |assignment|
@@ -1094,6 +1098,7 @@ class Assignment < ActiveRecord::Base
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_due_date_changed?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :assignment_changed
     p.to { |assignment|
@@ -1103,6 +1108,7 @@ class Assignment < ActiveRecord::Base
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_changed?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :assignment_created
     p.to { |assignment|
@@ -1112,6 +1118,7 @@ class Assignment < ActiveRecord::Base
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_created?
     }
+    p.data { course_broadcast_data }
     p.filter_asset_by_recipient { |assignment, user|
       assignment.overridden_for(user, skip_clone: true)
     }
@@ -1124,16 +1131,23 @@ class Assignment < ActiveRecord::Base
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_unmuted?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :submissions_posted
     p.to { |assignment|
       assignment.course.participating_instructors
     }
-    p.data(&:posting_params_for_notifications)
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_submissions_posted?
     }
+    p.data do |record|
+      if record.posting_params_for_notifications.present?
+        record.posting_params_for_notifications.merge(course_broadcast_data)
+      else
+        course_broadcast_data
+      end
+    end
   end
 
   def notify_of_update=(val)

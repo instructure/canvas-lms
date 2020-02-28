@@ -23,6 +23,10 @@ class Collaborator < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  def course_broadcast_data
+    group&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :collaboration_invitation
     p.to {
@@ -48,6 +52,7 @@ class Collaborator < ActiveRecord::Base
         record.just_created && record.collaboration
       end
     }
+    p.data { course_broadcast_data }
   end
 
   def context

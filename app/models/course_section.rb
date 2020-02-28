@@ -135,6 +135,10 @@ class CourseSection < ActiveRecord::Base
     User.where(id: all_enrollments.select(:user_id)).touch_all
   end
 
+  def broadcast_data
+    { course_id: course_id, root_account_id: root_account_id }
+  end
+
   set_policy do
     given { |user, session| self.course.grants_right?(user, session, :manage_sections) }
     can :read and can :create and can :update and can :delete

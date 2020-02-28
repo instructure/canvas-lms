@@ -29,11 +29,16 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
     run.save!
   end
 
+  def course_broadcast_data
+    quiz.context&.broadcast_data
+  end
+
   has_a_broadcast_policy
   set_broadcast_policy do |policy|
     policy.dispatch :quiz_regrade_finished
     policy.to { teachers }
     policy.whenever { |run| run.send_messages? }
+    policy.data { course_broadcast_data }
   end
 
   def send_messages?

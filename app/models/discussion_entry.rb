@@ -61,18 +61,24 @@ class DiscussionEntry < ActiveRecord::Base
     state :deleted
   end
 
+  def course_broadcast_data
+    discussion_topic.context&.broadcast_data
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_entry
     p.to { subscribers - [user] }
     p.whenever { |record|
       record.just_created && record.active?
     }
+    p.data { course_broadcast_data }
 
     p.dispatch :announcement_reply
     p.to { discussion_topic.user }
     p.whenever { |record|
       record.discussion_topic.is_announcement && record.just_created && record.active?
     }
+    p.data { course_broadcast_data }
   end
 
   on_create_send_to_streams do

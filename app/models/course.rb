@@ -739,6 +739,10 @@ class Course < ActiveRecord::Base
     current_users
   end
 
+  def broadcast_data
+    { course_id: id, root_account_id: root_account_id }
+  end
+
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { participating_students_by_date + participating_observers_by_date }
@@ -749,6 +753,7 @@ class Course < ActiveRecord::Base
           record.saved_changes[:group_weighting_scheme] != [nil, "equal"] # not a functional change
         )
     }
+    p.data { broadcast_data }
 
     p.dispatch :new_course
     p.to { self.root_account.account_users.active }
@@ -759,6 +764,7 @@ class Course < ActiveRecord::Base
          record.name != Course.default_name)
       )
     }
+    p.data { broadcast_data }
   end
 
   def self.default_name

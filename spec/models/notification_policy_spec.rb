@@ -76,7 +76,7 @@ describe NotificationPolicy do
     Notification.create! :name => "Hello",
                          :subject => "Hello",
                          :category => "TestImmediately"
-    allow_any_instance_of(Message).to receive(:get_template).and_return("here's a free <%= data.favorite_soda %>")
+    allow_any_instance_of(Message).to receive(:get_template).and_return("here's a free id <%= data.course_id %>")
     class DataTest < ActiveRecord::Base
       self.table_name = :courses
 
@@ -94,7 +94,7 @@ describe NotificationPolicy do
           u
         }
         whenever { true }
-        data { {:favorite_soda => 'mtn dew'} }
+        data { {course_id: 'this is a real course_id', root_account_id: Account.default.id} }
       end
       def root_account
         Account.default
@@ -107,7 +107,7 @@ describe NotificationPolicy do
     dt.save!
     msg = dt.messages_sent["Hello"].find { |m| m.to == "blarg@example.com" }
     expect(msg).not_to be_nil
-    expect(msg.body).to include "mtn dew"
+    expect(msg.body).to include "this is a real course_id"
   end
 
   context "named scopes" do

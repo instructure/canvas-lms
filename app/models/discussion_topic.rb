@@ -1184,6 +1184,10 @@ class DiscussionTopic < ActiveRecord::Base
     notification_context.available?
   end
 
+  def course_broadcast_data
+    context&.broadcast_data
+  end
+
   has_a_broadcast_policy
 
   set_broadcast_policy do |p|
@@ -1193,6 +1197,7 @@ class DiscussionTopic < ActiveRecord::Base
       record.send_notification_for_context? and
       ((record.just_created && record.active?) || record.changed_state(:active, !record.is_announcement ? :unpublished : :post_delayed))
     }
+    p.data { course_broadcast_data }
   end
 
   def delay_posting=(val); end
