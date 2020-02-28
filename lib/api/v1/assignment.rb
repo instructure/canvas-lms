@@ -207,14 +207,6 @@ module Api::V1::Assignment
                                              opts[:preloaded_user_content_attachments] || {})
     end
 
-    root_account = assignment.context.root_account
-    hidden_submissions_scope = if root_account.feature_enabled?(:allow_postable_submission_comments)
-      assignment.submissions.postable
-    else
-      assignment.submissions.graded
-    end
-    hash["hidden_submissions_count"] = hidden_submissions_scope.where(posted_at: nil).count
-
     can_manage = assignment.context.grants_any_right?(user, :manage, :manage_grades, :manage_assignments)
     hash['muted'] = assignment.muted?
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)

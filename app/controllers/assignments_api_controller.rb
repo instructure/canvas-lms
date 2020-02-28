@@ -423,14 +423,9 @@
 #           "deprecated": true,
 #           "deprecation_notice": "2020-02-26",
 #           "deprecation_effective": "2020-06-03",
-#           "deprecation_description": "Use hidden_submissions_count to determine whether an assignment has feedback that has not been posted to students.",
+#           "deprecation_description": "A new attribute will be included in a future release to determine whether an assignment has feedback that has not been posted to students.",
 #           "description": "For courses using Old Gradebook, indicates whether the assignment is muted. For courses using New Gradebook, true if the assignment has any unposted submissions, otherwise false. To see the posted status of submissions, check the 'posted_attribute' on Submission.",
 #           "type": "boolean"
-#         },
-#         "hidden_submissions_count": {
-#           "description": "The number of submissions that are unposted and have a grade or instructor comments.",
-#           "example": 1,
-#           "type": "integer"
 #         },
 #         "points_possible": {
 #           "description": "the maximum points possible for the assignment",
