@@ -126,7 +126,8 @@ module Importers
       return item if item.deleted?
 
       log = hash[:learning_outcome_group] || context.root_outcome_group
-      log.add_outcome(item)
+      outcome_link = log.add_outcome(item, migration_id: hash[:migration_id])
+      migration.add_imported_item(outcome_link)
 
       if hash[:alignments] && !previously_imported
         alignments = hash[:alignments].sort_by{|a| a[:position].to_i}
