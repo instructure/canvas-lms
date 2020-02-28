@@ -2181,7 +2181,11 @@ nb-x-k12:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Tillatt brukere å se brukernes SIS ID i et fagets deltakerside."
   allows_users_to_edit_conferences_2d3c960c: "Lar en bruker redigere konferanser."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Lar brukere aktivere valget «Lanser SpeedGrader Filtrert etter Elevgruppe» for faget på innstillings-siden for faget. Hvis aktiv, og en elevgruppe er valg i Ny vurderingsoversikt, SpeedGrader vil bare laster inn elever i den valgte gruppen."
+  allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Tillater brukere å dempe varslinger på detaljert fagnivå."
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Gir brukerne mulighet til å velge pronomen som vil vises etter navnet deres når det vises i brukergrensesnittet."
+  allows_users_to_pick_pronouns_that_will_be_display_870b94e0: |-
+      Gir brukerne mulighet til å velge pronomen som vil vises etter
+      navnet deres når det vises i brukergrensesnittet.
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillater brukere med internasjonale telefonnumre å motta tekstmeldinger fra Canvas."
   alumno_88c80e37: Alumno
   always_3a59e701: Alltid
@@ -4175,6 +4179,7 @@ nb-x-k12:
   cannot_be_present_when_account_id_is_present_f7d9b51f: "kan ikke være til stede når account_id er til stede"
   cannot_be_present_when_course_id_is_present_785e6a59: "kan ikke være til stede når course_id er til stede"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan ikke endre en opphevet forfallsdato innenfor en stengt vurderingsperiode"
+  cannot_change_locked_status_on_granular_permission_6f13bf4f: "Kan ikke endre låst status på granulær tillatelse"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Kan ikke endre rollenavn %{label}: allerede i bruk"
   cannot_change_the_default_term_name_edc2279b: "Kan ikke forandre standard uttrykksnavn"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan ikke endre en forfallsdato med oppheving i en stengt vurderingsperiode"
@@ -4252,6 +4257,7 @@ nb-x-k12:
   canvas_files_889a274f: Canvas-filer
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_id_f42f6ad: Canvas-ID
+  canvas_insights_beta_view_4cf67797: "Canvas Innsikt (Beta) - vise"
   canvas_introduction_video_2d81f3ad: "Canvas introduksjonsvideo"
   canvas_is_attempting_to_retreive_the_submissions_p_4d47973d: "Canvas prøver å hente innleveringene. Kom tilbake senere."
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikke konfigurert til å motta pålogginger fra %{issuer}."
@@ -4743,6 +4749,7 @@ nb-x-k12:
     type_disabled_error: "Denne type konferanse er ikke lenger mulig med denne Canvas-installasjonen"
   conferences_a0a8984b: Konferanser
   conferences_tutorial_tray_6f071ce2: "Konferanser Tutorial Tray"
+  confetti_for_on_time_submissions_394e16ce: "Konfetti for rett-tidig innleveringer"
   config_url_e96ceaf3: "Konfig URL"
   configuration_location_ee0f6592: Konfigurasjonslokalisasjon
   configuration_type_25a084a4: Konfigurasjonstype
@@ -5629,6 +5636,8 @@ nb-x-k12:
   count_results_displayed_ed39a0f0: 
     one: "Et resultat vist"
     other: "%{count} resultater vist"
+  count_rows_added_dacc9daf: "%{count} rader lagt til"
+  count_rows_removed_c6ff7bc: "%{count} rader slettet"
   count_sections_466dcd5c: 
     one: "1 seksjon"
     other: "%{count} Seksjoner"
@@ -6284,6 +6293,7 @@ nb-x-k12:
         new_announcement: "Ny beskjed"
         student_view: Elevvisning
         view_course_calendar: "Vis fagkalender"
+        view_course_notification_settings: "Vis varsler for faginnhold"
         view_course_stream: "Se fagstrøm"
       re_sending: "Sender på nytt..."
       send_done: "Utført! Meldingen kan ta noen minutter."
@@ -7353,6 +7363,9 @@ nb-x-k12:
   display_totals_for_all_grading_periods_option_4a72586: "Vis summer for alternativet Alle Vurderingsperioder"
   display_values_f517c73c: "Vis verdier"
   displaying_to_students_b1e92058: "Viser til elever"
+  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+      Viser konfetti for brukere som leverer oppgaver før
+      bestemt forfallsdato.
   district_id_6f408184: Distrikt-ID
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Del inn i like luker på %{num_minutes} minutter. *Gå*"
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "Del inn like timeavtaler (verdier i minutter)"
@@ -8141,6 +8154,7 @@ nb-x-k12:
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Utvid/minsk %{title} målgruppen, eleven har oppnådd ekspertise i %{mastery_count} av %{count} mål"
   expand_global_navigation_2c28d5d4: "Utvid global navigasjon"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Utvid listen over gruppemedlemmer for %{groupName}"
+  expand_permission_b45bf097: "Utvid %{permission}"
   expand_permission_c61d5958: "Utvid tillatelse"
   expand_subdiscussion_cd226ed4: "Utvid underdiskusjon"
   expand_tutorial_tray_22630c49: "Utvid lærebrettet (Tutorial Tray)"
@@ -9770,6 +9784,10 @@ nb-x-k12:
       
         *Pass på at du ikke endrer navnene på de innleverte filene slik at vi kan gjenkjenne dem.*
   if_you_need_to_make_your_course_public_please_cont_7084c67b: "Trenger du å gjøre fagene dine offentlige, ta kontakt med administratoren din."
+  if_you_turn_this_on_when_an_account_admin_goes_to__42e74f56: |-
+      Slår du denne på dukker det opp en avmerkingsboks når en konto-admin går til siden for
+      å opprette globale beskjeder, for å sende
+      varslinger direkte til brukere når beskjeden begynner.
   if_you_turn_this_on_when_an_account_admin_goes_to__c1173b32: "Slår du denne på dukker det opp en avmerkingsboks når en konto-admin går til siden for å opprette globale beskjeder, for å sende varslinger direkte til brukere når beskjeden begynner."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Om du har brukt en annen læringsplattform har du sikkert saker der som du ønsker å flytte over til Canvas. Vi kan vise deg prosessen med hvordan man enkelt flytter innholdet over til Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "Dersom du ønsker det, kan du gi «SIS» nytt navn til og velge noe dine ansatte er bedre kjent med"
@@ -10720,6 +10738,7 @@ nb-x-k12:
   manage_module_name_dfe16816: "Administrer %{module_name}"
   manage_name_7f55f792: "Administrer %{name}"
   manage_options_for_name_83278ad0: "Administrer alternativer for %{name}"
+  manage_pages_4d2adeb6: "Administrer sider"
   manage_profile_pictures_40c958ce: "Administrer profil-bilder"
   manage_rubrics_5d274f6a: "Administrer vurderingskriterier"
   manage_snapshots_1dc4b79d: "Administrer øyeblikksbilder"
@@ -12778,6 +12797,7 @@ nb-x-k12:
     students_will_see: "Elevene vil være i stand til å se at denne oppgaven har blitt skjult."
     submission_comments: Innleveringskommentarer
     sure_you_want_to_mute: "Er du sikker på at du vil skjule denne oppgaven? Mens oppgaven er skjult, vil elevene ikke motta nye varsler om eller kunne se:"
+  mute_notifications_by_course_440e18be: "Dempe varslinger etter fag"
   mute_unmute_assignment_62608e44: "skjul/gjenåpne oppgaven"
   muted_283cfa0f: (skjult)
   muted_3ff94739: Skjult
@@ -13838,6 +13858,8 @@ nb-x-k12:
   parent_signup_b7c6bf0a: "Påmelding for foreldre"
   parents_sign_up_here_f0aa8f4f: "Foreldre kan melde seg på her"
   partially_anonymous_483a892d: "Delvis anonym"
+  partially_enabled_and_locked_9a39d38a: "Delvis aktivert og låst"
+  partially_enabled_cd506819: "Delvis aktivert"
   participation_af2598: Deltakelse
   participations_1823832d: Deltakelser
   pass_2a8c4f07: bestå
@@ -14392,6 +14414,7 @@ nb-x-k12:
   points_possible_44cb4190: "/ %{points_possible}"
   points_possible_720fc8fd: "%{points} / %{possible}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Antall mulige poeng må være 0 eller mer for valgt vurderingstype"
+  points_possible_must_be_greater_than_0_for_selecte_5708da1b: "Antall mulige poeng må være større enn 0 for valgt vurderingstype"
   points_possible_points_fda3b111: "%{points_possible} Poeng"
   points_pts_e5596bf7: "%{points} poeng"
   points_should_be_strictly_decreasing_l_r_18f26f87: "Poeng bør være strengt minkende: %{l} <= %{r}"
@@ -16743,7 +16766,7 @@ nb-x-k12:
   score_similarity_score_2c25b94b: "%{score}% likhetsscore"
   score_student_points_possible_points_78360e86: "Resultat {{student_points}}/{{possible_points}}"
   scored_less_than_2427896c: "Fikk resultat lavere enn"
-  scored_less_than_cutoff_on_assignment_5f5c4303: "Fikk resultat lavere enn %{cutoff} på %{assignment}"
+  scored_less_than_cutoff_on_assignment_5f5c4303: "Fikk et resultat lavere enn %{cutoff} på %{assignment}"
   scored_less_than_score_on_assignmenttitle_5a011033: "Fikk et resultat lavere enn %{score} på %{assignmentTitle}"
   scored_more_than_cutoff_on_assignment_f422fec: "Fikk resultat høyere enn %{cutoff} på %{assignment}"
   scored_more_than_d1646bd5: "Fikk resultat høyere enn"
@@ -17002,6 +17025,7 @@ nb-x-k12:
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Se noen LTI-verktøy* som fungerer bra med Canvas."
   see_some_lti_tools_that_work_great_with_canvas_53e92091: "Se noen LTI-verktøy som fungerer bra med Canvas."
   see_turnitin_results_cd9d4a6c: "Se Turnitin-resultater"
+  see_vericite_results_b44dd8c8: "Se VeriCite resultater"
   select_1e849959: "[ Velg ]"
   select_a_course_4710371f: "Velg et fag"
   select_a_grading_period_5ea50f1: "Velg en vurderingsperiode..."
@@ -17837,6 +17861,7 @@ nb-x-k12:
   showing_all_announcements_36ff0cec: "Viser alle beskjeder"
   showing_all_discussions_7e09f4b7: "Viser alle diskusjoner"
   showing_all_sets_of_grading_periods_6c160874: "Viser alle sett med vurderingsperioder"
+  shrink_permission_74b01aed: "Mindre %{permission}"
   shuffle_answers_edb602b7: "Bland svar"
   signup_type_8b4506f3: Påmeldingsmetode
   similarity_detection_dcada48: Likhetsgjenkjenning
@@ -17961,6 +17986,7 @@ nb-x-k12:
   something_went_wrong_loading_the_violations_try_re_6e2fa92: "Det gikk noe galt ved lasting av bruddene, prøv å laste siden på nytt."
   something_went_wrong_please_try_refreshing_the_pag_3f651814: "Noe gikk galt. Vennligst prøv å oppdatere siden. Hvis problemet vedvarer kan du prøve å laste en enkelt elevgruppe i SpeedGrader ved å bruke *innstillinger for store fag*."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Noe gikk galt. Vennligst prøv å oppdatere siden. Hvis problemet vedvarer kan det være for mange poster \"%{assignmentTitle}\" å laste SpeedGrader."
+  something_went_wrong_please_try_refreshing_the_pag_689be273: "Noe gikk galt. Vennligst prøv å oppdatere siden."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Noe gikk galt med å re-aktivere brukeren. Vennligst forsøk igjen senere."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Noe gikk galt under oppdateringen av brukerrollen. Vennligst forsøk igjen senere."
   something_went_wrong_when_trying_to_sync_grades_to_592c4c35: "Noe gikk galt ved et forsøk på å synkronisere vurderinger til elevinformasjonssystemet. Vennligst prøv igjen senere."
@@ -18477,6 +18503,7 @@ nb-x-k12:
   successfully_posted_the_comment_12d95d56: "Postet kommentaren vellykket"
   successfully_resubmitted_to_turnitin_c908de0f: "Levert til Turnitin på nytt."
   successfully_resubmitted_to_vericite_dab924b6: "Levert til VeriCite på nytt.."
+  successfully_saved_the_comment_c87681fd: "Lagret kommentar"
   successfully_updated_the_comment_946360d5: "Kommentar oppdatert"
   sum_of_all_files_in_mb_2b705055: "summen av alle filer i MB"
   summary_statistics_f74852a5: "Sammendrag statistikk"
@@ -18848,6 +18875,7 @@ nb-x-k12:
   there_was_a_problem_posting_the_comment_75d15646: "Det oppstod et problem med å poste kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Det oppstod et problem under publisering av vurderinger."
   there_was_a_problem_releasing_grades_fa0ae6: "Kunne ikke publisere vurderingene."
+  there_was_a_problem_saving_the_comment_d94cbac9: "Det oppsto et problem med lagring av kommentaren"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Kunne ikke lagre vurdering."
   there_was_a_problem_saving_the_grades_5e61f9e2: "Det oppstod et problem under lagring av vurderingene."
   there_was_a_problem_saving_the_grading_period_243bed6c: "Det oppstod et problem under lagring av vurderingsperioden"
@@ -20350,6 +20378,7 @@ nb-x-k12:
   vericite_info: 
     buttons: 
       resubmit_to_vericite: "Lever på nytt til VeriCite"
+  vericite_similarity_score_more_information_7df9ea5c: "VeriCite likhetsresultat – mer informasjon"
   vericite_similarity_score_see_detailed_report_390ab687: "VeriCite likhetsresultat - se detaljert rapport"
   video_78335c71: video
   video_b9f27375: Video
@@ -20364,6 +20393,7 @@ nb-x-k12:
   view_app_configurations_52b52441: "Vis applikasjonskonfigurasjoner"
   view_audit_trail_12f774b6: "Vis revisjonsspor"
   view_ba339f93: Vis
+  view_canvas_insights_beta_fe446d71: "Vis Canvas Innsikt (Beta)"
   view_course_analytics_eefe6b2: "Vis Fag Analytics"
   view_faculty_journals_ad0e8c8f: "Vis lærerprotokollene"
   view_feature_settings_at_an_account_level_ec7f5e10: "Vis funksjonsinnstillinger på et kontonivå"
