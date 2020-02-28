@@ -754,11 +754,20 @@ RSpec.describe ApplicationController do
           allow(controller).to receive(:polymorphic_url).and_return('host/quizzes')
         end
 
-        it 'is set to quizzes page when launched from quizzes page' do
-          allow(controller.request).to receive(:referer).and_return('courses/1/quizzes')
-          controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
-          controller.send(:content_tag_redirect, course, content_tag, nil)
-          expect(assigns[:return_url]).to eq 'host/quizzes'
+        context 'is set to quizzes page when launched from quizzes page' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/quizzes')
+            controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/quizzes'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/quizzes')
+            controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/quizzes'
+          end
         end
 
         it 'is set to quizzes page when launched from assignments/new' do
