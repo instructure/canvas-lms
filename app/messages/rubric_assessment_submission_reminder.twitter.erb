@@ -1,4 +1,8 @@
 <% define_content :link do -%>
-  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user_id) %>
+  <%=
+    asset.submission.assignment.anonymous_peer_reviews? ?
+      polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :anonymous_submission], anonymous_id: asset.submission.anonymous_id) :
+      polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user_id)
+  %>
 <% end -%>
 <%= t :tweet, "Canvas Alert - Reminder: assess %{rubric}, %{context}", :rubric => asset.submission.assignment.title, :context => asset.rubric_association.context.name %>
