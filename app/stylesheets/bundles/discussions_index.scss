@@ -26,11 +26,12 @@
   padding-#{direction(left)}: 10px;
 }
 
-.pinned-discussions-v2__wrapper {
+.pinned-discussions-v2__wrapper,
+.unpinned-discussions-v2__wrapper {
   padding: 10px;
   border: 1px solid $ic-border-color;
   border-bottom: 0px;
-  background-color: #f9f9f9;
+  background-color: $ic-color-light;
 }
 
 .toggle-button {
@@ -77,14 +78,7 @@
 .closed-for-comments-discussions-v2__wrapper {
   padding: 10px;
   border: 1px solid $ic-border-color;
-  background-color: #f9f9f9;
-}
-
-.unpinned-discussions-v2__wrapper{
-  padding: 10px;
-  border: 1px solid $ic-border-color;
-  border-bottom: 0px;
-  background-color: #f9f9f9;
+  background-color: $ic-color-light;
 }
 
 .discussions-v2__spinnerWrapper {
@@ -105,7 +99,8 @@
   justify-content: center;
   align-items: center;
   background-color: $ic-color-light;
-  border: 1px dashed #ccc;
+  border: 0.125rem dashed $ic-border-color;
+  border-radius: 0.5rem;
 
   // flip the discussion images horizontally in RTL
   @include direction-if(rtl) {

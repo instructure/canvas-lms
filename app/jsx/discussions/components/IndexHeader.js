@@ -165,7 +165,7 @@ export default class IndexHeader extends Component {
     return (
       <View display="block">
         <Flex wrapItems wrap="wrap" justifyItems="end">
-          <Flex.Item>
+          <Flex.Item grow>
             <FormField
               id="discussion-filter"
               label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
@@ -189,9 +189,7 @@ export default class IndexHeader extends Component {
           <Flex.Item grow margin="0 0 0 small">
             <TextInput
               label={
-                <ScreenReaderContent>
-                  {I18n.t('Search discussion by title')}
-                </ScreenReaderContent>
+                <ScreenReaderContent>{I18n.t('Search discussion by title')}</ScreenReaderContent>
               }
               placeholder={I18n.t('Search by title or author...')}
               icon={() => <IconSearchLine />}
@@ -252,7 +250,4 @@ const selectedActions = [
   'toggleModalOpen'
 ]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
-export const ConnectedIndexHeader = connect(
-  connectState,
-  connectActions
-)(IndexHeader)
+export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)
