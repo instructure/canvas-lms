@@ -58,7 +58,10 @@ export default class UnsyncedChanges extends Component {
           <Heading level="h3">{heading}</Heading>
         </header>
         <div className="bcs__unsynced-item__table">
-          <Table caption={<ScreenReaderContent>{heading}</ScreenReaderContent>}>
+          <Table
+            margin="medium auto"
+            caption={<ScreenReaderContent>{heading}</ScreenReaderContent>}
+          >
             <thead className="screenreader-only">
               <tr>
                 <th scope="col">
@@ -91,7 +94,4 @@ export default class UnsyncedChanges extends Component {
 
 const connectState = state => select(state, ['unsyncedChanges'])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedUnsyncedChanges = connect(
-  connectState,
-  connectActions
-)(UnsyncedChanges)
+export const ConnectedUnsyncedChanges = connect(connectState, connectActions)(UnsyncedChanges)

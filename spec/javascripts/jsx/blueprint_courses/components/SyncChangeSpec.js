@@ -19,6 +19,7 @@
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import SyncChange from 'jsx/blueprint_courses/components/SyncChange'
+import {Pill} from '@instructure/ui-elements'
 import getSampleData from '../getSampleData'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
@@ -56,8 +57,8 @@ test('toggles isExpanded on click', () => {
 test('displays the correct exception count', () => {
   const props = defaultProps()
   const tree = shallow(<SyncChange {...props} />)
-  const pill = tree.find('.pill')
-  equal(pill.at(0).text(), '3 exceptions')
+  const pill = tree.find(Pill).render()
+  equal(pill.text(), '3 exceptions')
 })
 
 test('displays the correct exception types', () => {
