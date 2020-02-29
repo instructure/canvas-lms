@@ -56,7 +56,7 @@ gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.9', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.12.2', require: false
-gem 'gepub', '1.0.10'
+gem 'gepub', '1.0.11'
 gem 'graphql', '1.9.17'
 gem 'graphql-batch', '0.4.2'
 gem 'hashery', '2.1.2', require: false
@@ -80,7 +80,7 @@ gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.32.0', require: false
 gem 'inst-jobs-statsd', '1.3.1'
 gem 'json', '2.3.0'
-gem 'json_schemer', '0.2.9'
+gem 'json_schemer', '0.2.10'
 gem 'json-jwt', '1.11.0', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
