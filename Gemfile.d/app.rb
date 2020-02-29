@@ -34,14 +34,14 @@ gem 'after_transaction_commit', '2.0.0'
 gem 'authlogic', '5.0.4'
   gem 'scrypt', '3.0.7'
 gem 'aws-sdk-core', '3.90.1', require: false
-  gem 'aws-partitions', '1.275.0', require: false
-gem 'aws-sdk-dynamodb', '1.43.0'
+  gem 'aws-partitions', '1.279.0', require: false
+gem 'aws-sdk-dynamodb', '1.44.0'
 gem 'aws-sdk-kinesis', '1.20.0', require: false
 gem 'aws-sdk-s3', '1.60.2', require: false
 gem 'aws-sdk-sns', '1.21.0', require: false
 gem 'aws-sdk-sqs', '1.23.1', require: false
 gem 'aws-sdk-kms', '1.29.0', require: false
-gem 'aws-sigv4', '1.1.0', require: false
+gem 'aws-sigv4', '1.1.1', require: false
 gem 'barby', '0.6.8', require: false
   gem 'rqrcode', '1.1.2', require: false
   gem 'chunky_png', '1.3.11', require: false
