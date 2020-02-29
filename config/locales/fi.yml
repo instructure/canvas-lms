@@ -2023,7 +2023,7 @@ fi:
     gpa_scale_explainer: "Mikä on GPA-asteikon arvosanojen anto?"
     grading_type_options: 
       gpa_scale: GPA-asteikko
-      letter_grade: "Kirjeen arvosana"
+      letter_grade: Kirjainarvosana
       not_graded: "Ei arvosteltu"
       pass_fail: Valmis/keskeneräinen
       percent: Prosenttiosuus
@@ -12974,7 +12974,7 @@ fi:
       headers: 
         notification_preferences: Ilmoitusasetukset
       page_title: Ilmoitusasetukset
-      weekly_notification_range: "Viikoittaiset ilmoitukset lähetetään %{weekday}  %{start_time} ja %{end_time} välillä."
+      weekly_notification_range: "Viikoittaiset ilmoitukset lähetetään %{weekday} %{start_time} ja %{end_time} välillä."
     confirming_contact: "Vahvistetaan ..."
     confirms: 
       delete_access_key: "Haluatko varmasti poistaa tämän käyttöavaimen?"
