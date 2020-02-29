@@ -32,14 +32,6 @@ bookmarking_for_enrollments_index:
   applies_to: RootAccount
   display_name: Bookmarking for Enrollments Index API
   description: Use bookmarking for API pagination in Enrollments Index
-discussion_topic_performance_enhancement:
-  state: allowed
-  applies_to: SiteAdmin
-  display_name: Discussion Topic performance improvements for Bibsys
-  description: Discussion Topics will not query permissions for every sub-discussion
-  environments:
-    ci:
-      state: 'on'
 syllabus_course_summary_option:
   state: allowed
   applies_to: SiteAdmin

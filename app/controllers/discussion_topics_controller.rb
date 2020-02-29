@@ -647,45 +647,24 @@ class DiscussionTopicsController < ApplicationController
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       if @topic.for_group_discussion?
+        @groups = @topic.group_category.groups.active
+        if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
+          override_groups = @groups.joins("INNER JOIN #{AssignmentOverride.quoted_table_name}
+            ON assignment_overrides.set_type = 'Group' AND assignment_overrides.set_id = groups.id").
+            merge(AssignmentOverride.active).
+            where(assignment_overrides: {assignment_id: @topic.assignment_id})
+          if override_groups.present?
+            @groups = override_groups
+          end
+        end
+        topics = @topic.child_topics
+        unless @context.grants_right?(@current_user, session, :read_as_admin)
+          @groups = @groups.joins(:group_memberships).merge(GroupMembership.active).where(group_memberships: {user_id: @current_user})
+          topics = topics.where(context_type: 'Group', context_id: @groups)
+        end
 
-        if Account.site_admin.feature_enabled?(:discussion_topic_performance_enhancement)
-          @groups = @topic.group_category.groups.active
-          if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
-            override_groups = @groups.joins("INNER JOIN #{AssignmentOverride.quoted_table_name}
-              ON assignment_overrides.set_type = 'Group' AND assignment_overrides.set_id = groups.id").
-              merge(AssignmentOverride.active).
-              where(assignment_overrides: {assignment_id: @topic.assignment_id})
-            if override_groups.present?
-              @groups = override_groups
-            end
-          end
-          topics = @topic.child_topics
-          unless @context.grants_right?(@current_user, session, :read_as_admin)
-            @groups = @groups.joins(:group_memberships).merge(GroupMembership.active).where(group_memberships: {user_id: @current_user})
-            topics = topics.where(context_type: 'Group', context_id: @groups)
-          end
-
-          @group_topics = @groups.order(:id).map do |group|
-            {:group => group, :topic => topics.find{|t| t.context == group} }
-          end
-        else
-          group_scope = @topic.group_category.groups.active
-          if @topic.for_assignment? && @topic.assignment.only_visible_to_overrides?
-            @groups = group_scope.where(:id => @topic.assignment.assignment_overrides.active.where(:set_type => "Group").pluck(:set_id)).to_a
-            if @groups.empty?
-              @groups = group_scope.to_a # revert to default if we're not using Group overrides
-            end
-          else
-            @groups = group_scope.to_a
-          end
-          @groups.select!{ |g| g.grants_any_right?(@current_user, session, :post_to_forum, :read_as_admin) }
-          @groups.sort_by!(&:id)
-          topics = @topic.child_topics.to_a
-          topics = topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
-
-          @group_topics = @groups.map do |group|
-            {:group => group, :topic => topics.find{|t| t.context == group} }
-          end
+        @group_topics = @groups.order(:id).map do |group|
+          {:group => group, :topic => topics.find{|t| t.context == group} }
         end
       end
 
