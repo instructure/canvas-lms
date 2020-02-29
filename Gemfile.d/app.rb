@@ -102,7 +102,7 @@ gem 'rack-test', '1.1.0'
 gem 'rake', '12.3.1'
 gem 'rails-observers', '0.1.5'
 gem 'ratom-nokogiri', '0.10.8', require: false
-gem 'rdiscount', '1.6.8', require: false
+gem 'rdiscount', '2.2.0.1', require: false
 gem 'redcarpet', '3.5.0', require: false
 gem 'retriable', '1.4.1'
 gem 'ritex', '1.0.1', require: false
