@@ -124,7 +124,7 @@ gem 'twilio-ruby', '5.31.1', require: false
 gem 'tzinfo', '1.2.5'
 gem 'vault', '0.13.0', require: false
 gem 'vericite_api', '1.5.3'
-gem 'will_paginate', '3.2.1', require: false # required for folio-pagination
+gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
 
 path 'gems' do
   gem 'activesupport-suspend_callbacks'
