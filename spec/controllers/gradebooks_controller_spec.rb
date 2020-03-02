@@ -20,6 +20,8 @@ require_relative '../sharding_spec_helper'
 
 describe GradebooksController do
   before :once do
+    PostPolicy.enable_feature!
+
     course_with_teacher active_all: true
     @teacher_enrollment = @enrollment
     student_in_course active_all: true
@@ -196,7 +198,6 @@ describe GradebooksController do
     end
 
     it "includes the post_policies_enabled in the ENV" do
-      PostPolicy.enable_feature!
       user_session(@teacher)
       get :grade_summary, params: { course_id: @course.id, id: @student.id }
       expect(assigns[:js_env][:post_policies_enabled]).to be true
@@ -288,7 +289,7 @@ describe GradebooksController do
     it "includes muted assignments" do
       user_session(@student)
       assignment = @course.assignments.create!(title: "Example Assignment")
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       get 'grade_summary', params: {course_id: @course.id, id: @student.id}
       expect(assigns[:js_env][:assignment_groups].first[:assignments].size).to eq 1
       expect(assigns[:js_env][:assignment_groups].first[:assignments].first[:muted]).to eq true
@@ -297,7 +298,7 @@ describe GradebooksController do
     it "does not include scores of unposted submissions" do
       user_session(@student)
       assignment = @course.assignments.create!
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       assignment.grade_student(@student, grade: 10, grader: @teacher)
       get 'grade_summary', params: {course_id: @course.id, id: @student.id}
       submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
@@ -307,7 +308,7 @@ describe GradebooksController do
     it "does not include excused of unposted submissions" do
       user_session(@student)
       assignment = @course.assignments.create!
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       assignment.grade_student(@student, grade: 10, grader: @teacher)
       get 'grade_summary', params: {course_id: @course.id, id: @student.id}
       submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
@@ -317,7 +318,7 @@ describe GradebooksController do
     it "does not include workflow_state of unposted submissions" do
       user_session(@student)
       assignment = @course.assignments.create!
-      assignment.mute!
+      assignment.ensure_post_policy(post_manually: true)
       assignment.grade_student(@student, grade: 10, grader: @teacher)
       get 'grade_summary', params: {course_id: @course.id, id: @student.id}
       submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
@@ -805,15 +806,9 @@ describe GradebooksController do
         end
       end
 
-      it "sets post_policies_enabled to true when Post Policies are enabled" do
-        PostPolicy.enable_feature!
+      it "sets post_policies_enabled to true" do
         get :show, params: { course_id: @course.id }
         expect(gradebook_options[:post_policies_enabled]).to be(true)
-      end
-
-      it "sets post_policies_enabled to false when Post Policies are not enabled" do
-        get :show, params: { course_id: @course.id }
-        expect(gradebook_options[:post_policies_enabled]).to be(false)
       end
 
       it "sets show_similarity_score to true when the New Gradebook Plagiarism Indicator feature flag is enabled" do
@@ -834,63 +829,29 @@ describe GradebooksController do
         expect(api_max_per_page).to eq(50)
       end
 
-      describe "post_policies_enabled" do
-        it "is set to true if post policies are enabled" do
-          PostPolicy.enable_feature!
-
-          get :show, params: {course_id: @course.id}
-          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_policies_enabled]).to be true
-        end
-
-        it "is set to false if post policies are disabled" do
-          get :show, params: {course_id: @course.id}
-          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_policies_enabled]).to be false
-        end
-      end
-
       describe "new_post_policy_icons_enabled" do
-        it "is set to true if the course has Post Policies and the New Post Policy Icons root account feature flag enabled" do
-          PostPolicy.enable_feature!
+        it "is set to true when the New Post Policy Icons root account feature flag enabled" do
           @course.root_account.enable_feature!(:new_post_policy_icons)
-
           get :show, params: {course_id: @course.id}
           expect(gradebook_options[:new_post_policy_icons_enabled]).to be true
         end
 
-        it "is set to false if the New Post Policy Icons root account feature flag is not enabled" do
-          PostPolicy.enable_feature!
-
+        it "is set to false when the New Post Policy Icons root account feature flag is not enabled" do
           get :show, params: {course_id: @course.id}
           expect(gradebook_options[:new_post_policy_icons_enabled]).to be false
-        end
-
-        it "is not present if the course does not have Post Policies enabled" do
-          @course.root_account.enable_feature!(:new_post_policy_icons)
-
-          get :show, params: {course_id: @course.id}
-          expect(gradebook_options).not_to include(:new_post_policy_icons_enabled)
         end
       end
 
       describe "post_manually" do
-        it "is set to true if post policies are enabled and the course is manually-posted" do
-          PostPolicy.enable_feature!
-
+        it "is set to true when the course is manually-posted" do
           @course.default_post_policy.update!(post_manually: true)
           get :show, params: {course_id: @course.id}
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_manually]).to be true
         end
 
-        it "is set to false if post policies are enabled and the course is not manually-posted" do
-          PostPolicy.enable_feature!
-
+        it "is set to false when the course is not manually-posted" do
           get :show, params: {course_id: @course.id}
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_manually]).to be false
-        end
-
-        it "is not included if post policies are not enabled" do
-          get :show, params: {course_id: @course.id}
-          expect(assigns[:js_env][:GRADEBOOK_OPTIONS]).not_to have_key(:post_manually)
         end
       end
 
@@ -1597,79 +1558,45 @@ describe GradebooksController do
         expect(assigns[:submissions][0].submission_comments[0].attachments[0].display_name).to eql("doc.doc")
       end
 
-      context "when post policies are not enabled" do
-        it "sets comment to hidden when assignment is muted" do
-          @assignment.mute!
-          post 'update_submission', params: {
-            course_id: @course.id,
-            submission: {
-              comment: "some comment",
-              assignment_id: @assignment.id,
-              user_id: @student.user_id
-            }
+      it "sets comment to hidden when assignment posts manually and is unposted" do
+        @assignment.ensure_post_policy(post_manually: true)
+        @assignment.hide_submissions
+        post 'update_submission', params: {
+          course_id: @course.id,
+          submission: {
+            comment: "some comment",
+            assignment_id: @assignment.id,
+            user_id: @student.user_id
           }
-          expect(assigns[:submissions][0].submission_comments[0]).to be_hidden
-        end
-
-        it "does not set comment to hidden when assignment is unmuted" do
-          @assignment.unmute!
-          post 'update_submission', params: {
-            course_id: @course.id,
-            submission: {
-              comment: "some comment",
-              assignment_id: @assignment.id,
-              user_id: @student.user_id
-            }
-          }
-          expect(assigns[:submissions][0].submission_comments[0]).not_to be_hidden
-        end
+        }
+        expect(assigns[:submissions][0].submission_comments[0]).to be_hidden
       end
 
-      context "when post policies are enabled" do
-        before do
-          PostPolicy.enable_feature!
-        end
-
-        it "sets comment to hidden when assignment posts manually and is unposted" do
-          @assignment.ensure_post_policy(post_manually: true)
-          @assignment.hide_submissions
-          post 'update_submission', params: {
-            course_id: @course.id,
-            submission: {
-              comment: "some comment",
-              assignment_id: @assignment.id,
-              user_id: @student.user_id
-            }
+      it "does not set comment to hidden when assignment posts manually and submission is posted" do
+        @assignment.ensure_post_policy(post_manually: true)
+        @assignment.post_submissions
+        post 'update_submission', params: {
+          course_id: @course.id,
+          submission: {
+            comment: "some comment",
+            assignment_id: @assignment.id,
+            user_id: @student.user_id
           }
-          expect(assigns[:submissions][0].submission_comments[0]).to be_hidden
-        end
+        }
+        expect(assigns[:submissions][0].submission_comments[0]).not_to be_hidden
+      end
 
-        it "does not set comment to hidden when assignment posts manually and submission is posted" do
-          @assignment.ensure_post_policy(post_manually: true)
-          @assignment.post_submissions
-          post 'update_submission', params: {
-            course_id: @course.id,
-            submission: {
-              comment: "some comment",
-              assignment_id: @assignment.id,
-              user_id: @student.user_id
-            }
+      it "does not set comment to hidden when assignment posts automatically" do
+        @assignment.ensure_post_policy(post_manually: false)
+        post 'update_submission', params: {
+          course_id: @course.id,
+          submission: {
+            comment: "some comment",
+            assignment_id: @assignment.id,
+            user_id: @student.user_id
           }
-          expect(assigns[:submissions][0].submission_comments[0]).not_to be_hidden
-        end
-
-        it "does not set comment to hidden when assignment posts automatically" do
-          @assignment.ensure_post_policy(post_manually: false)
-          post 'update_submission', params: {
-            course_id: @course.id,
-            submission: {
-              comment: "some comment",
-              assignment_id: @assignment.id,
-              user_id: @student.user_id
-            }
-          }
-          expect(assigns[:submissions][0].submission_comments[0]).not_to be_hidden
-        end
+        }
+        expect(assigns[:submissions][0].submission_comments[0]).not_to be_hidden
       end
 
       context 'media comments' do
@@ -2377,7 +2304,7 @@ describe GradebooksController do
               points_possible: 10,
               submission_types: ['online_upload'],
               omit_from_final_grade: true,
-              muted: false
+              muted: true
             }
           ],
         },
@@ -2410,7 +2337,7 @@ describe GradebooksController do
             points_possible: 10,
             submission_types: ['online_upload'],
             omit_from_final_grade: false,
-            muted: false
+            muted: true
           }
         ],
       },
