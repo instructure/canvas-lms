@@ -322,6 +322,11 @@ pipeline {
       steps {
         timeout(time: 10) {
           script {
+            // Retriggers won't have an image to tag/push, pull that image if doesn't exist
+            // If image is not found it will return NULL
+            if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
+              sh 'docker pull $PATCHSET_TAG'
+            }
             sh '''
               docker tag $PATCHSET_TAG $MERGE_TAG
               docker push $MERGE_TAG
