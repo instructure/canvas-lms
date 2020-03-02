@@ -1142,6 +1142,21 @@ describe PlannerController do
           end
         end
       end
+
+      context "date ranges" do
+        let(:start_date) { Time.parse("2020-01-1T00:00:00") }
+        let(:end_date) { Time.parse("2020-01-1T23:59:59Z") }
+
+        it "only returns items between (inclusive) the specified dates" do
+          pn = planner_note_model(course: @course, todo_date: end_date)
+          calendar_event_model(start_at: end_date + 1.second)
+          get :index, params: {:start_date => start_date.iso8601, :end_date => end_date.iso8601}
+          response_json = json_parse(response.body)
+          expect(response_json.length).to eq 1
+          note = response_json.detect { |i| i["plannable_type"] == 'planner_note' }
+          expect(note["plannable"]["title"]).to eq pn.title
+        end
+      end
     end
   end
 end
