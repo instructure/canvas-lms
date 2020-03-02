@@ -497,7 +497,6 @@ function initDropdown() {
 }
 
 function setupPostPolicies() {
-  if (!ENV.post_policies_enabled) return
   const {jsonData} = window
   const gradesPublished = !jsonData.moderated_grading || jsonData.grades_published_at != null
 
@@ -2980,9 +2979,7 @@ EG = {
       }
     }
 
-    if (ENV.post_policies_enabled) {
-      renderPostGradesMenu()
-    }
+    renderPostGradesMenu()
 
     return student
   },
@@ -3130,10 +3127,8 @@ EG = {
       $score.text('')
     }
 
-    if (ENV.post_policies_enabled) {
-      if (ENV.MANAGE_GRADES || (jsonData.context.concluded && ENV.READ_AS_ADMIN)) {
-        renderHiddenSubmissionPill(submission)
-      }
+    if (ENV.MANAGE_GRADES || (jsonData.context.concluded && ENV.READ_AS_ADMIN)) {
+      renderHiddenSubmissionPill(submission)
     }
     EG.updateStatsInHeader()
   },

@@ -2256,20 +2256,6 @@ describe GradebooksController do
       end
     end
 
-    describe "post_policies_enabled" do
-      it "is set to true if the Post Policies feature is enabled" do
-        PostPolicy.enable_feature!
-
-        get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
-        expect(assigns[:js_env][:post_policies_enabled]).to be true
-      end
-
-      it "is not set if the Post Policies feature is not enabled" do
-        get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
-        expect(assigns[:js_env]).not_to include(:post_policies_enabled)
-      end
-    end
-
     describe "new_gradebook_plagiarism_icons_enabled" do
       it "is set to true if New Gradebook Plagiarism Icons are on" do
         @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
