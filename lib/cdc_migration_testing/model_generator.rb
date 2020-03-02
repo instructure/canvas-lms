@@ -123,28 +123,58 @@ class ModelGenerator
   # It is not avoided by skipping validations or callbacks, so we have to fill
   # in those _id columns.
   def get_partman_attributes(model)
-    partman_columns = find_partman_columns(model)
+    relation_names = find_partman_columns(model)
     attributes = {}
-    partman_columns.each do |column|
-      attributes[column.name] = 1
+    relation_names.each do |relation_name|
+      attributes[relation_name + '_id'] = 1
+      attributes[relation_name + '_type'] = polymorphic_class_name(model, relation_name)
     end
 
     attributes
   end
 
   def find_partman_columns(model)
-    model.columns.select do |column|
+    model.columns.map { |column|
       is_partman_column = false
+      relation_name = nil
 
       # Look for a column name that ends with _id, then look for a matching
       # column that ends with _type.
       if column.name.end_with?("_id")
-        model_name = column.name[0..-4]
-        is_partman_column = !!model.columns.index { |col| col.name == model_name + '_type' }
+        column_without_suffix = column.name[0..-4]
+        is_partman_column = model.columns.any?{ |col| col.name == column_without_suffix + '_type' }
+        relation_name = column_without_suffix if is_partman_column
       end
 
-      is_partman_column
+      relation_name
+    }.compact
+  end
+
+  # This method tries to find a valid class name to fill in for columns that store
+  # the class name in a polymorphic relationship. (E.g., the 'context_type' column.)
+  # Uses "Account" as a default value.
+  def polymorphic_class_name(model, relation_name)
+    class_name = 'Account'
+    reflections = model.reflections[relation_name].options[:polymorphic] rescue nil
+    reflections&.each do |reflection|
+      # These key/value pairs look like { underscored_name: 'ClassName' }.
+      # A value is only given if underscored_name does not describe a class.
+      # If a value is there, that is the class name.
+      if reflection.is_a? Hash
+        class_name = reflection.values.first
+        break
+      end
+
+      # If a value was not given, turn underscored_name into a class name.
+      classified_name = ActiveSupport::Inflector.classify(reflection)
+      # Check if the class name exists.
+      if ActiveSupport::Inflector.constantize(classified_name)
+        class_name = classified_name
+        break
+      end
     end
+
+    class_name
   end
 
   def get_postgres_non_nullable_attributes(model)

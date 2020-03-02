@@ -235,6 +235,38 @@ describe ModelGenerator do
         run_and_ignore_exceptions
       end
     end
+
+    context 'that has a polymorphic association' do
+      class AssociatedWithSampleModel < ActiveRecord::Base
+        belongs_to :context, polymorphic: [:sample_model, :user]
+        belongs_to :named_relationship, polymorphic: [named: 'Course']
+
+        self.table_name =  'users'
+      end
+
+      let(:columns) {[]} # Don't care about SampleModel's columns for this one.
+      let(:models) { [ AssociatedWithSampleModel ] }
+
+      it 'finds an underscored class name' do
+        allow(AssociatedWithSampleModel).to receive(:columns).and_return([
+          double('id', name: 'context_id', type: :integer, null: :false, default_function: false),
+          double('type', name: 'context_type', type: :string, null: false, default_function: false),
+          double('named id', name: 'named_relationship_id', type: :integer, null: :false, default_function: false),
+          double('named type', name: 'named_relationship_type', type: :string, null: false, default_function: false)
+        ])
+
+        expect(AssociatedWithSampleModel)
+          .to receive(:new)
+          .with hash_including({
+            'context_id' => 1,
+            'context_type' => 'SampleModel',
+            'named_relationship_id' => 1,
+            'named_relationship_type' => 'Course'
+          })
+
+        run_and_ignore_exceptions
+      end
+    end
   end
 
   context 'with a tableless model' do
