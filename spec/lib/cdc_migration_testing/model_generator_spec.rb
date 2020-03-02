@@ -153,9 +153,13 @@ describe ModelGenerator do
           hash_coder = double('hash coder', object_class: Hash)
           hash_column = double('hash column', type: :text, coder: hash_coder)
 
+          object_coder = double('object coder', object_class: Object)
+          object_column = double('object column', type: :string, coder: object_coder)
+
           allow(SampleModel).to receive(:attribute_types).and_return({
             'array_col' => array_column,
             'hash_col' => hash_column,
+            'obj_col' => object_column
           })
         end
 
@@ -169,6 +173,10 @@ describe ModelGenerator do
           run_and_ignore_exceptions
         end
 
+        it 'fills in an Object' do
+          expect(SampleModel).to receive(:new).with hash_including('obj_col' => instance_of(Hash))
+          run_and_ignore_exceptions
+        end
       end
     end
 
@@ -190,6 +198,20 @@ describe ModelGenerator do
 
       it 'fills in a date' do
         expect(SampleModel).to receive(:new).with hash_including('birthdate' => instance_of(ActiveSupport::TimeWithZone))
+        run_and_ignore_exceptions
+      end
+    end
+
+    context 'having json columns' do
+      let(:columns) {[
+        double("json column", name: 'json', type: :json, null: false, default_function: false),
+        double("jsonb column", name: 'jsonb', type: :json, null: false, default_function: false)
+      ]}
+
+      it 'fills in a hash' do
+        expect(SampleModel)
+          .to receive(:new)
+          .with hash_including('json' => {foo: 'bar'}, 'jsonb' => {foo: 'bar'})
         run_and_ignore_exceptions
       end
     end

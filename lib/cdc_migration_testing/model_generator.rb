@@ -160,13 +160,15 @@ class ModelGenerator
       case column.type
       when :integer
         attributes[column.name] = 1
+      when :decimal, :float
+        attributes[column.name] = 0.9
       when :string, :text
         attributes[column.name] = string_or_serializable_object(model, column)
       when :boolean
         attributes[column.name] = false
       when :datetime
         attributes[column.name] = Time.zone.now
-      when :json
+      when :json, :jsonb
         attributes[column.name] = {foo: 'bar'}
       else
         raise "Model #{model.name} has no fixture and no default value for column '#{column.name}' of type '#{column.type}'"
@@ -181,7 +183,7 @@ class ModelGenerator
     # to be encoded/decoded into a Hash, Array, etc. by ActiveRecord.
     if defined? model.attribute_types[column.name].coder
       case model.attribute_types[column.name].coder.object_class.name
-      when 'Hash'
+      when 'Hash', 'Object'
         {foo: 'bar'}
       when 'Array'
         ['foo']
