@@ -16,6 +16,14 @@ confetti_for_assignments:
     to the set due date.
   applies_to: RootAccount
 
+deprecate_sms:
+  state: hidden
+  display_name: Restrict SMS to Select Types
+  description: |-
+    Disables SMS notifications for all types except announcements and
+    grade changes.
+  applies_to: RootAccount
+
 mute_notifications_by_course:
   state: hidden
   display_name: Mute notifications by course
