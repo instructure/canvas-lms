@@ -220,7 +220,9 @@ class ModelGenerator
         ['foo']
       end
     else
-      'default'
+      char_limit = 8
+      char_limit = [column.limit, char_limit].min if column.limit
+      'a' * char_limit
     end
   end
 

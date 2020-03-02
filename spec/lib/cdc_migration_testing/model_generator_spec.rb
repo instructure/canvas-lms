@@ -129,19 +129,24 @@ describe ModelGenerator do
 
     context 'having string columns' do
       let(:columns) {[
-        double("string column", name: 'name', type: :string, null: false, default_function: false),
-        double("text column", name: 'description', type: :text, null: false, default_function: false),
-        double("array column", name: 'array_col', type: :text, null: false, default_function: false),
-        double("hash column", name: 'hash_col', type: :text, null: false, default_function: false),
-        double("object column", name: 'obj_col', type: :string, null: false, default_function: false),
+        double("string column", name: 'name', type: :string, null: false, default_function: false, limit: 255),
+        double("text column", name: 'description', type: :text, null: false, default_function: false, limit: nil),
+        double("array column", name: 'array_col', type: :text, null: false, default_function: false, limit: nil),
+        double("hash column", name: 'hash_col', type: :text, null: false, default_function: false, limit: nil),
+        double("object column", name: 'obj_col', type: :string, null: false, default_function: false, limit: 255),
         double("short string", name: 'middle_initial', type: :string, null: false, default_function: false, limit: 1)
       ]}
 
       it 'fills in strings' do
         expect(SampleModel).to receive(:new).with hash_including({
-          'name' => 'default',
-          'description' => 'default'
+          'name' => 'aaaaaaaa',
+          'description' => 'aaaaaaaa'
         })
+        run_and_ignore_exceptions
+      end
+
+      it 'respects the character limit' do
+        expect(SampleModel).to receive(:new).with hash_including('middle_initial' => 'a')
         run_and_ignore_exceptions
       end
 
@@ -222,7 +227,7 @@ describe ModelGenerator do
 
       let(:models) { [ SampleModel ] }
       let(:columns) {[
-        double('inheritance column', name: 'type', type: :string, null: false, default_function: false)
+        double('inheritance column', name: 'type', type: :string, null: false, default_function: false, limit: 255)
       ]}
 
       it 'fills in the type column' do
@@ -250,9 +255,9 @@ describe ModelGenerator do
       it 'finds an underscored class name' do
         allow(AssociatedWithSampleModel).to receive(:columns).and_return([
           double('id', name: 'context_id', type: :integer, null: :false, default_function: false),
-          double('type', name: 'context_type', type: :string, null: false, default_function: false),
+          double('type', name: 'context_type', type: :string, null: false, default_function: false, limit: 255),
           double('named id', name: 'named_relationship_id', type: :integer, null: :false, default_function: false),
-          double('named type', name: 'named_relationship_type', type: :string, null: false, default_function: false)
+          double('named type', name: 'named_relationship_type', type: :string, null: false, default_function: false, limit: 255)
         ])
 
         expect(AssociatedWithSampleModel)
