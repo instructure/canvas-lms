@@ -194,4 +194,17 @@ describe ModelGenerator do
       end
     end
   end
+
+  context 'with a tableless model' do
+    class TablelessModel < Tableless
+    end
+
+    let(:models) { [ TablelessModel ] }
+
+    it 'does not throw an error' do
+      expect {
+        generator.run
+      }.not_to raise_error
+    end
+  end
 end

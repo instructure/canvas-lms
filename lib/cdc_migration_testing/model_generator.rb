@@ -42,7 +42,7 @@ class ModelGenerator
   def create_models
     self.model_queue.each do
       model = self.model_queue.shift()
-      next if !table?(model) || records?(model.table_name_prefix + model.table_name)
+      next if !model.table_exists? || records?(model.table_name_prefix + model.table_name)
       begin
         create_model(model)
       # If there's a foreign key error, put this model back at the end of the
@@ -195,12 +195,6 @@ class ModelGenerator
     FIXTURES_BASEDIR + '/' + model.name.underscore + '.rb'
   end
 
-  def table?(model)
-    # Calling model.columns will look in the database for the model's table
-    # info. This seems to be the most sure-fire way to check if a model can be
-    # persisted.
-    !!(model.columns rescue nil)
-  end
 
   def records?(table_name)
     ActiveRecord::Base.connection.exec_query("SELECT * FROM #{Shard.current.name}.#{table_name}").any?
