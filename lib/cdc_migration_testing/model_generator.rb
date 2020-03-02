@@ -109,6 +109,7 @@ class ModelGenerator
   def generate_model(model)
     required_attributes = get_postgres_non_nullable_attributes(model)
     required_attributes.merge! get_partman_attributes(model)
+    required_attributes.merge! set_inheritance_column(model)
 
     begin
       model.new(required_attributes).save!(validate: false)
@@ -197,6 +198,11 @@ class ModelGenerator
     FIXTURES_BASEDIR + '/' + model.name.underscore + '.rb'
   end
 
+  def set_inheritance_column(model)
+    attrs = {}
+    attrs = {'type' => model.descendants.first.name} if model.has_attribute?(:type)
+    attrs
+  end
 
   def records?(table_name)
     ActiveRecord::Base.connection.exec_query("SELECT * FROM #{Shard.current.name}.#{table_name}").any?

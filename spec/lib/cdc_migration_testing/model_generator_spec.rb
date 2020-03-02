@@ -215,6 +215,26 @@ describe ModelGenerator do
         run_and_ignore_exceptions
       end
     end
+
+    context 'that inherits another model' do
+      class SampleModelExtender < SampleModel
+      end
+
+      let(:models) { [ SampleModel ] }
+      let(:columns) {[
+        double('inheritance column', name: 'type', type: :string, null: false, default_function: false)
+      ]}
+
+      it 'fills in the type column' do
+        allow(SampleModel).to receive(:has_attribute?).with(:type).and_return(true)
+        expect(SampleModel).to receive(:new).with hash_including('type' => 'SampleModelExtender')
+
+        # ActiveRecord::Base.descendants was being overridden from earlier, causing a problem.
+        allow(SampleModel).to receive(:descendants).and_call_original
+
+        run_and_ignore_exceptions
+      end
+    end
   end
 
   context 'with a tableless model' do
