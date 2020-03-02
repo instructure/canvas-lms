@@ -121,6 +121,7 @@ class ContextController < ApplicationController
     log_asset_access([ "roster", @context ], 'roster', 'other')
 
     if @context.is_a?(Course)
+      return unless tab_enabled?(Course::TAB_PEOPLE)
       if @context.concluded?
         sections = @context.course_sections.active.select([:id, :course_id, :name, :end_at, :restrict_enrollments_to_section_dates]).preload(:course)
         concluded_sections = sections.select{|s| s.concluded?}.map{|s| "section_#{s.id}"}
