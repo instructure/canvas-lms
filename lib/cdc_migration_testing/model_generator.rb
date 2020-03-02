@@ -22,6 +22,7 @@ class ModelGenerator
   attr_accessor :model_queue
 
   def initialize
+    Rails.application.eager_load!
     @model_queue = ActiveRecord::Base.descendants
   end
 
