@@ -228,25 +228,32 @@ class StreamItem < ActiveRecord::Base
 
   def self.generate_or_update(object)
     item = nil
-    StreamItem.unique_constraint_retry do
-      # we can't coalesce messages that weren't ever saved to the DB
-      if !new_message?(object)
-        item = object.stream_item
-      end
-      if item
-        item.regenerate!(object)
-      else
-        item = self.new
-        item.generate_data(object)
-        item.save!
-        # prepopulate the reverse association
-        # (mostly useful for specs that regenerate stream items
-        #  multiple times without reloading the asset)
-        if !new_message?(object)
-          object.stream_item = item
+    # we can't coalesce messages that weren't ever saved to the DB
+    if !new_message?(object)
+      item = object.stream_item
+    end
+    if item
+      item.regenerate!(object)
+    else
+      item = self.new
+      item.generate_data(object)
+      StreamItem.unique_constraint_retry do |retry_count|
+        if retry_count == 0
+          item.save!
+        else
+          item = nil # if it fails just carry on - it got created somewhere else so grab it later
         end
       end
+      item ||= object.reload.stream_item
+
+      # prepopulate the reverse association
+      # (mostly useful for specs that regenerate stream items
+      #  multiple times without reloading the asset)
+      if !new_message?(object)
+        object.stream_item = item
+      end
     end
+
     item
   end
 
