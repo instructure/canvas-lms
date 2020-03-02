@@ -102,6 +102,53 @@ describe AssignmentsApiController, type: :request do
       expect(json.first).to have_key('in_closed_grading_period')
     end
 
+    describe "hidden_submissions_count" do
+      before(:each) do
+        @course.root_account.enable_feature!(:allow_postable_submission_comments)
+        @course.assignments.create!(title: "Example Assignment")
+      end
+
+      it "does not include hidden_submissions_count in the response" do
+        json = api_get_assignments_index_from_course(@course)
+        expect(json.first).not_to have_key('hidden_submissions_count')
+      end
+
+      context "when include_hidden_submissions_count=false" do
+        it "does not preload hidden submission counts" do
+          expect(Assignment).not_to receive(:preload_hidden_submissions_count)
+          api_get_assignments_index_from_course(@course, include_hidden_submissions_count: false)
+        end
+
+        it "does not include hidden_submissions_count in the response" do
+          json = api_get_assignments_index_from_course(@course, include_hidden_submissions_count: false)
+          expect(json.first).not_to have_key('hidden_submissions_count')
+        end
+      end
+
+
+      context "when include_hidden_submissions_count=true" do
+        it "preloads the hidden submission counts to avoid N+1s" do
+          expect(Assignment).to receive(:preload_hidden_submissions_count).once.and_call_original
+          api_get_assignments_index_from_course(@course, include_hidden_submissions_count: true)
+        end
+
+        it "includes hidden_submissions_count in the response when the user can manage assignments" do
+          json = api_get_assignments_index_from_course(@course, include_hidden_submissions_count: true)
+          expect(json.first).to have_key('hidden_submissions_count')
+        end
+
+        it "does not include hidden_submissions_count in the response when the user cannot manage assignments" do
+          @course.root_account.role_overrides.create!(
+            permission: 'manage_assignments',
+            role: teacher_role,
+            enabled: false
+          )
+          json = api_get_assignments_index_from_course(@course, include_hidden_submissions_count: true)
+          expect(json.first).not_to have_key('hidden_submissions_count')
+        end
+      end
+    end
+
     it "includes due_date_required in returned json" do
       @course.assignments.create!(title: "Example Assignment")
       json = api_get_assignments_index_from_course(@course)
@@ -4295,6 +4342,101 @@ describe AssignmentsApiController, type: :request do
           'sort_by_rating' => false,
           'todo_date' => nil,
         })
+      end
+
+      describe "hidden_submissions_count" do
+        before(:each) do
+          @course.root_account.enable_feature!(:allow_postable_submission_comments)
+          @user = @teacher
+          @assignment = @course.assignments.create!(title: "Example Assignment")
+        end
+
+        it "does not include hidden_submissions_count in the response" do
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+            {
+              controller: "assignments_api",
+              action: "show",
+              format: "json",
+              course_id: @course.id.to_s,
+              id: @assignment.id.to_s
+            }
+          )
+          expect(json).not_to have_key('hidden_submissions_count')
+        end
+
+        it "does not include hidden_submissions_count in the response when include_hidden_submissions_count=false" do
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+            {
+              controller: "assignments_api",
+              action: "show",
+              format: "json",
+              course_id: @course.id.to_s,
+              id: @assignment.id.to_s,
+              include_hidden_submissions_count: false
+            }
+          )
+          expect(json).not_to have_key('hidden_submissions_count')
+        end
+
+        context "when include_hidden_submissions_count=true" do
+          it "includes hidden_submissions_count in the response if the user can manage assignments" do
+            json = api_call(
+              :get,
+              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+              {
+                controller: "assignments_api",
+                action: "show",
+                format: "json",
+                course_id: @course.id.to_s,
+                id: @assignment.id.to_s,
+                include_hidden_submissions_count: true
+              }
+            )
+            expect(json).to have_key('hidden_submissions_count')
+          end
+
+          it "does not include hidden_submissions_count in the response if the user cannot manage assignments" do
+            @course.root_account.role_overrides.create!(
+              permission: 'manage_assignments',
+              role: teacher_role,
+              enabled: false
+            )
+            json = api_call(
+              :get,
+              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+              {
+                controller: "assignments_api",
+                action: "show",
+                format: "json",
+                course_id: @course.id.to_s,
+                id: @assignment.id.to_s,
+                include_hidden_submissions_count: true
+              }
+            )
+            expect(json).not_to have_key('hidden_submissions_count')
+          end
+
+          it "does not include hidden_submissions_count in the response for students" do
+            @user = @student
+            json = api_call(
+              :get,
+              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}.json",
+              {
+                controller: "assignments_api",
+                action: "show",
+                format: "json",
+                course_id: @course.id.to_s,
+                id: @assignment.id.to_s,
+                include_hidden_submissions_count: true
+              }
+            )
+            expect(json).not_to have_key('hidden_submissions_count')
+          end
+        end
       end
 
       it "fulfills module progression requirements" do

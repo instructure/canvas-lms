@@ -104,6 +104,10 @@ module Api::V1::Assignment
       due_dates = EffectiveDueDates.for_course(assignments.first.context, assignments)
     end
 
+    if opts[:include_hidden_submissions_count]
+      Assignment.preload_hidden_submissions_count(assignments)
+    end
+
     assignments.map do |assignment|
       json = assignment_json(assignment, user, session, opts)
       unless json.key? 'in_closed_grading_period'
@@ -120,7 +124,8 @@ module Api::V1::Assignment
       override_dates: true,
       needs_grading_count_by_section: false,
       exclude_response_fields: [],
-      include_planner_override: false
+      include_planner_override: false,
+      include_hidden_submissions_count: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -205,6 +210,10 @@ module Api::V1::Assignment
                                              @context || assignment.context,
                                              user,
                                              opts[:preloaded_user_content_attachments] || {})
+    end
+
+    if opts[:include_hidden_submissions_count] && assignment.context.grants_right?(user, :manage_assignments)
+      hash["hidden_submissions_count"] = assignment.hidden_submissions_count
     end
 
     can_manage = assignment.context.grants_any_right?(user, :manage, :manage_grades, :manage_assignments)
