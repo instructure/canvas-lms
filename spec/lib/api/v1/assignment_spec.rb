@@ -119,6 +119,48 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    describe "hidden_submissions_count attribute" do
+      before do
+        PostPolicy.enable_feature!
+        @student = assignment.course.enroll_student(User.create!, enrollment_state: :active).user
+        @teacher = assignment.course.enroll_teacher(User.create!, enrollment_state: :active).user
+        assignment.ensure_post_policy(post_manually: true)
+      end
+
+      it "counts submissions that are unposted and have a grade" do
+        assignment.grade_student(@student, grader: @teacher, score: 10)
+        json = api.assignment_json(assignment, @teacher, session, include_hidden_submissions_count: true)
+        expect(json["hidden_submissions_count"]).to be 1
+      end
+
+      it "does not count submissions that are unposted and have only visible comments" do
+        submission = assignment.submissions.find_by(user: @student)
+        submission.add_comment(author: @student, comment: "this assignment rocks!")
+        json = api.assignment_json(assignment, @teacher, session, include_hidden_submissions_count: true)
+        expect(json["hidden_submissions_count"]).to be 0
+      end
+
+      it "does not count posted submissions" do
+        assignment.ensure_post_policy(post_manually: false)
+        assignment.grade_student(@student, grader: @teacher, score: 10)
+        json = api.assignment_json(assignment, @teacher, session, include_hidden_submissions_count: true)
+        expect(json["hidden_submissions_count"]).to be 0
+      end
+
+      context "when allow_postable_submission_comments feature is enabled" do
+        before do
+          assignment.course.root_account.enable_feature!(:allow_postable_submission_comments)
+        end
+
+        it "counts submissions that are unposted and have a hidden comment" do
+          submission = assignment.submissions.find_by(user: @student)
+          submission.add_comment(author: @teacher, comment: "good jerb!", hidden: true)
+          json = api.assignment_json(assignment, @teacher, session, include_hidden_submissions_count: true)
+          expect(json["hidden_submissions_count"]).to be 1
+        end
+      end
+    end
+
     context "for an assignment" do
       it "provides a submissions download URL" do
         json = api.assignment_json(assignment, user, session)
@@ -280,6 +322,21 @@ describe "Api::V1::Assignment" do
           expect(json['require_lockdown_browser']).to be_falsy
         end
       end
+    end
+  end
+
+  describe "#assignments_json" do
+    let(:api) { AssignmentApiHarness.new }
+    let(:assignments) { [assignment_model] }
+
+    it "preloads hidden submissions count when passed include_hidden_submissions_count: true" do
+      expect(Assignment).to receive(:preload_hidden_submissions_count).once.and_call_original
+      api.assignments_json(assignments, user_model, nil, include_hidden_submissions_count: true)
+    end
+
+    it "does not preload hidden submissions count when not passed include_hidden_submissions_count" do
+      expect(Assignment).not_to receive(:preload_hidden_submissions_count)
+      api.assignments_json(assignments, user_model, nil)
     end
   end
 

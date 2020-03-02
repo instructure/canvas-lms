@@ -423,9 +423,14 @@
 #           "deprecated": true,
 #           "deprecation_notice": "2020-02-26",
 #           "deprecation_effective": "2020-06-03",
-#           "deprecation_description": "A new attribute will be included in a future release to determine whether an assignment has feedback that has not been posted to students.",
+#           "deprecation_description": "Use hidden_submissions_count to determine whether an assignment has feedback that has not been posted to students.",
 #           "description": "For courses using Old Gradebook, indicates whether the assignment is muted. For courses using New Gradebook, true if the assignment has any unposted submissions, otherwise false. To see the posted status of submissions, check the 'posted_attribute' on Submission.",
 #           "type": "boolean"
+#         },
+#         "hidden_submissions_count": {
+#           "description": "If the requesting user has assignment management rights, returns the number of submissions that are unposted and have a grade or instructor comments.",
+#           "example": 1,
+#           "type": "integer"
 #         },
 #         "points_possible": {
 #           "description": "the maximum points possible for the assignment",
@@ -643,6 +648,9 @@ class AssignmentsApiController < ApplicationController
   #   Determines the order of the assignments. Defaults to "position".
   # @argument post_to_sis [Boolean]
   #   Return only assignments that have post_to_sis set or not set.
+  # @argument include_hidden_submissions_count [Boolean]
+  #   Include the hidden_submissions_count on returned assignments. Defaults to
+  #   false. Ignored if the user does not have assignment management rights.
   # @returns [Assignment]
   def index
     error_or_array= get_assignments(@current_user)
@@ -799,6 +807,11 @@ class AssignmentsApiController < ApplicationController
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
+      include_hidden_submissions_count = value_to_boolean(params[:include_hidden_submissions_count])
+      if include_hidden_submissions_count
+        Assignment.preload_hidden_submissions_count(assignments)
+      end
+
       if @context.grants_right?(user, :manage_assignments)
         Assignment.preload_can_unpublish(assignments)
       end
@@ -817,17 +830,21 @@ class AssignmentsApiController < ApplicationController
         needs_grading_course_proxy = @context.grants_right?(user, session, :manage_grades) ?
           Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user) : nil
 
-        assignment_json(assignment, user, session,
-                        submission: submission, override_dates: override_dates,
-                        include_visibility: include_visibility,
-                        assignment_visibilities: visibility_array,
-                        needs_grading_count_by_section: needs_grading_count_by_section,
-                        needs_grading_course_proxy: needs_grading_course_proxy,
-                        include_all_dates: include_all_dates,
-                        bucket: params[:bucket],
-                        include_overrides: include_override_objects,
-                        preloaded_user_content_attachments: preloaded_attachments
-                        )
+        assignment_json(
+          assignment,
+          user,
+          session,
+          submission: submission, override_dates: override_dates,
+          include_visibility: include_visibility,
+          assignment_visibilities: visibility_array,
+          needs_grading_count_by_section: needs_grading_count_by_section,
+          needs_grading_course_proxy: needs_grading_course_proxy,
+          include_all_dates: include_all_dates,
+          bucket: params[:bucket],
+          include_overrides: include_override_objects,
+          preloaded_user_content_attachments: preloaded_attachments,
+          include_hidden_submissions_count: include_hidden_submissions_count
+        )
       end
       hashes
     end
@@ -845,6 +862,9 @@ class AssignmentsApiController < ApplicationController
   #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
   # @argument all_dates [Boolean]
   #   All dates associated with the assignment, if applicable
+  # @argument include_hidden_submissions_count [Boolean]
+  #   Include the hidden_submissions_count on returned assignments. Defaults to
+  #   false. Ignored if the user does not have assignment management rights.
   # @returns Assignment
   def show
     @assignment = api_find(@context.active_assignments.preload(:assignment_group, :rubric_association, :rubric), params[:id])
@@ -867,6 +887,7 @@ class AssignmentsApiController < ApplicationController
 
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
+      include_hidden_submissions_count = value_to_boolean(params[:include_hidden_submissions_count])
 
       locked = @assignment.locked_for?(@current_user, :check_policies => true)
       @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
@@ -878,7 +899,8 @@ class AssignmentsApiController < ApplicationController
         include_visibility: include_visibility,
         needs_grading_count_by_section: needs_grading_count_by_section,
         include_all_dates: include_all_dates,
-        include_overrides: include_override_objects
+        include_overrides: include_override_objects,
+        include_hidden_submissions_count: include_hidden_submissions_count
       }
 
       result_json = if use_quiz_json?
