@@ -370,6 +370,13 @@ const ConversationsRouter = Backbone.Router.extend({
       all: new CourseCollection(),
       groups: gc
     }
+
+    // This is to prevent the submenu from flickering as much since it re-renders after each paginated
+    // request comes in. It pulls in more courses per request to limit the number of needed renders.
+    //
+    // If time permits, one better solution is to change the menu/submenu render to use react
+    // without JQuery with the goal of separating the render of the submenu's components.
+    this.courses.all.setParam('per_page', '50')
     return this.courses.favorites.fetch()
   },
 
