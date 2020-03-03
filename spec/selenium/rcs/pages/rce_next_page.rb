@@ -646,4 +646,12 @@ module RCENextPage
   def upload_media_submit_button
     f('[aria-label="Upload Media"] button[type="submit"]')
   end
+
+  def switch_to_html_view
+    fj('button:contains("Switch to raw html editor")').click
+  end
+
+  def switch_to_editor_view
+    fj('button:contains("Switch to rich text editor")').click
+  end
 end

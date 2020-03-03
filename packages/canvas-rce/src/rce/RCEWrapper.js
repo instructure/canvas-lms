@@ -398,14 +398,13 @@ class RCEWrapper extends React.Component {
       width = `${fileMetaProps.name.length}rem`
       height = '1rem'
     }
-    // this used to be an image with src="data:image/gif...", but it got autosaved as src="blob:"
-    // which cannot be restored. Now it doesn't delete with one click of BS, but that should
-    // only be necessary if the upload fails, and we should take care of that for the user anyway.
     const markup = `
-    <div
+    <img
+      alt="${formatMessage('Loading...')}"
+      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
       data-placeholder-for="${fileMetaProps.name}"
-      style="width: ${width}; height: ${height}; border: solid 1px #8B969E; background: #c2c2c2; display:inline-block; padding:5px 0 0 5px"
-    >${formatMessage('Loading...')}</div>`
+      style="width: ${width}; height: ${height}; border: solid 1px #8B969E;"
+    />`
 
     this.insertCode(markup)
   }
@@ -770,10 +769,12 @@ class RCEWrapper extends React.Component {
       try {
         const autosaved = this.getAutoSaved(this.autoSaveKey)
         if (autosaved && autosaved.content) {
-          if (autosaved.content !== editor.getContent({no_events: true})) {
+          const editorContent = editor.getContent({no_events: true})
+          const autosavedContent = this.patchAutosavedContent(autosaved.content)
+          if (autosaved.content !== editorContent) {
             this.setState({
               confirmAutoSave: true,
-              autoSavedContent: autosaved.content
+              autoSavedContent: autosavedContent
             })
           } else {
             this.storage.removeItem(this.autoSaveKey)
@@ -812,6 +813,19 @@ class RCEWrapper extends React.Component {
       }
       this.storage.removeItem(this.autoSaveKey)
     })
+  }
+
+  // if a placeholder image shows up in autosaved content, we have to remove it
+  // because the data url gets converted to a blob, which is not valid when restored.
+  // besides, the placeholder is intended to be temporary while the file
+  // is being uploaded
+  patchAutosavedContent(content) {
+    const temp = document.createElement('div')
+    temp.innerHTML = content
+    temp.querySelectorAll('img[data-placeholder-for]').forEach(placeholder => {
+      placeholder.parentElement.removeChild(placeholder)
+    })
+    return temp.innerHTML
   }
 
   getAutoSaved(key) {
