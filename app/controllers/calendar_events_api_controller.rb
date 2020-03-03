@@ -962,6 +962,9 @@ class CalendarEventsApiController < ApplicationController
   #   A unique identifier that can be used to update the event at a later time
   #   If one is not specified, an identifier will be generated based on the start and end times
   #
+  # @argument events[][title] [Optional, String]
+  #   Title for the meeting. If not present, will default to the associated course's name
+  #
   def set_course_timetable_events
     get_context
     if authorized_action(@context, @current_user, :manage_calendar)

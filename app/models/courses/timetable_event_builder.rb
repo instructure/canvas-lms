@@ -69,6 +69,7 @@ module Courses
     # with :start_at, :end_at required
     # and optionally :location_name (other attributes could be added here if so desired)
     # :code can be used to give it a unique identifier for syncing (otherwise will be generated based on the times)
+    # :title can be used to give a title to the event (otherwise a the name of the associated course will be used)
     def create_or_update_events(event_hashes)
       timetable_codes = event_hashes.map{|h| h[:code]}
       raise "timetable codes can't be blank" if timetable_codes.any?(&:blank?)
