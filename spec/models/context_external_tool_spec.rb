@@ -49,6 +49,95 @@ describe ContextExternalTool do
     end
   end
 
+  describe '#permission_given?' do
+    let(:required_permission)  { 'some-permission' }
+    let(:launch_type) { 'some-launch-type' }
+    let(:tool) do
+      ContextExternalTool.create!(
+        context: @root_account,
+        name: 'Requires Permission',
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        domain: 'requires.permision.com',
+        settings: {
+          global_navigation: {
+            'required_permissions' => required_permission,
+            text: 'Global Navigation (permission checked)',
+            url: 'http://requires.permission.com'
+          },
+          assignment_selection: {
+            'required_permissions' => required_permission,
+            text: 'Assignment selection',
+            url: 'http://requires.permission.com'
+          },
+          course_navigation: {
+            text: 'Course Navigation',
+            url: 'https://doesnot.requirepermission.com'
+          }
+        }
+      )
+    end
+    let(:course) { course_with_teacher(account: @root_account).context }
+    let(:user) { course.teachers.first }
+    let(:context) { course }
+
+    subject { tool.permission_given?(launch_type, user, context) } 
+
+    context 'when the placement does not require a specific permission' do
+      let(:launch_type) { 'course_navigation' }
+
+      it { is_expected.to eq true }
+
+      context 'and the context is blank' do
+        let(:launch_type) { 'course_navigation' }
+        let(:context) { nil }
+
+        it { is_expected.to eq true }
+      end
+    end
+
+    context 'when the placement does require a specific permission' do
+      context 'and the context is blank' do
+        let(:required_permission) { 'view_group_pages' }
+        let(:launch_type) { 'assignment_selection' }
+        let(:context) { nil }
+
+        it { is_expected.to eq false }
+      end
+
+      context 'and the user has the needed permission in the context' do
+        let(:required_permission) { 'view_group_pages' }
+        let(:launch_type) { 'assignment_selection' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the user does not have the needed permission in the context' do
+        let(:required_permission) { 'view_learning_analytics' }
+        let(:launch_type) { 'assignment_selection' }
+
+        it { is_expected.to eq false }
+      end
+
+      context 'and the placement is "global_navigation"' do
+        context 'and the user has an enrollment with the needed permission' do
+          let(:required_permission) { 'view_group_pages' }
+          let(:launch_type) { 'global_navigation' }
+
+          it { is_expected.to eq true }
+        end
+
+        context 'and the user does not have an enrollment with the needed permission' do
+          let(:required_permission) { 'view_learning_analytics' }
+          let(:launch_type) { 'global_navigation' }
+
+          it { is_expected.to eq false }
+        end
+      end
+    end
+
+  end
+
   describe "#global_navigation_tools" do
     subject do
       ContextExternalTool.filtered_global_navigation_tools(
