@@ -1776,6 +1776,9 @@ class UsersController < ApplicationController
       position = Integer(val) rescue nil
       if position.nil?
         return render(json: { :message => "Invalid position provided" }, status: :bad_request)
+      elsif position.abs > 1_000
+        # validate that the value used is less than unreasonable, but without any real effort
+        return render(json: { message: "Position #{position} is too high. Your dashboard cards can probably be sorted with numbers 1-5, you could even use a 0." }, status: :bad_request)
       end
     end
 

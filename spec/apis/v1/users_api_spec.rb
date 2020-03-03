@@ -2304,6 +2304,28 @@ describe "Users API", type: :request do
     end
 
     describe "PUT dashboard positions" do
+      it "should error when trying to use a large number" do
+        course1 = course_factory(active_all: true)
+        course2 = course_factory(active_all: true)
+
+        json = api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/dashboard_positions",
+          { controller: "users", action: "set_dashboard_positions", format: "json",
+            id: @user.to_param
+          },
+          {
+            dashboard_positions: {
+              "course_#{course1.id}" => 2000,
+              "course_#{course2.id}" => 13,
+            }
+          },
+          {},
+          { expected_status: 400 }
+        )
+        expect(json['message']).to eq 'Position 2000 is too high. Your dashboard cards can probably be sorted with numbers 1-5, you could even use a 0.'
+      end
+
       it "should allow setting dashboard positions" do
         course1 = course_factory(active_all: true)
         course2 = course_factory(active_all: true)
