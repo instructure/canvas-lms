@@ -107,7 +107,7 @@ describe "SpeedGrader" do
       )
     end
 
-    it 'prevents unmuting the assignment before grades are posted', priority: '2', test_id: 3493531 do
+    it 'prevents posting grades before they are released', priority: '2', test_id: 3493531 do
       @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true).first
       @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
 
@@ -121,7 +121,7 @@ describe "SpeedGrader" do
       expect(Speedgrader.no_grades_to_post_button).to be_displayed
     end
 
-    it 'allows unmuting the assignment after grades are posted', priority: '2', test_id: 3493531 do
+    it 'allows posting grades after they are released', priority: '2', test_id: 3493531 do
       @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true).first
       @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
 

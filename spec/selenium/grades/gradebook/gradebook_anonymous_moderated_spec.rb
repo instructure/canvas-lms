@@ -18,14 +18,17 @@
 require_relative '../pages/gradebook_cells_page'
 require_relative '../pages/gradebook_page'
 require_relative '../pages/gradebook_grade_detail_tray_page'
+require_relative '../pages/moderate_page'
 
 describe 'New Gradebook' do
   include_context 'in-process server selenium tests'
 
   before(:once) do
+    PostPolicy.enable_feature!
+
     # create a course with a teacher
     @teacher1 = course_with_teacher(course_name: 'Course1', active_all: true).user
-    @student1 = student_in_course.user
+    @student1 = student_in_course(active_all: true).user
   end
 
   context 'with an anonymous assignment' do
@@ -47,6 +50,8 @@ describe 'New Gradebook' do
         points_possible: 10
       )
 
+      @anonymous_assignment.grade_student(@student1, grade: '2', grader: @teacher1)
+
       user_session(@teacher1)
       Gradebook.visit(@course)
     end
@@ -56,23 +61,15 @@ describe 'New Gradebook' do
       expect(Gradebook::GradeDetailTray.grade_input).to have_attribute('disabled', 'true')
     end
 
-    it 'existing assignment is muted when anonymous-grading is enabled', priority: '1', test_id: 3500572 do
-      expect(@non_anonymous_assignment.muted?).to be false
-      # make the assignment anonymous
-      @non_anonymous_assignment.update!(anonymous_grading: true)
-
-      expect(@non_anonymous_assignment.muted?).to be true
-    end
-
-    it 'causes score cells to be greyed out with grades invisible when assignment is muted', priority: '1', test_id: 3504000 do
+    it 'causes score cells to be greyed out with grades invisible when grades are not posted', priority: '1', test_id: 3504000 do
       grid_cell = Gradebook::Cells.grid_assignment_row_cell(@student1, @anonymous_assignment)
       class_attribute_fetched = grid_cell.attribute('class')
       expect(class_attribute_fetched).to include 'grayed-out'
       expect(Gradebook::Cells.get_grade(@student1, @anonymous_assignment)).to eq ''
     end
 
-    it 'causes score cells to be not greyed out with grades visible when assignment is unmuted', priority: '1', test_id: 3504000 do
-      Gradebook.toggle_assignment_muting(@anonymous_assignment.id)
+    it 'causes score cells to be not greyed out with grades visible when grades are posted', priority: '1', test_id: 3504000 do
+      Gradebook.manually_post_grades(@anonymous_assignment, 'Everyone')
       Gradebook::Cells.edit_grade(@student1, @anonymous_assignment, '12')
       expect(Gradebook::Cells.get_grade(@student1, @anonymous_assignment)).to eq '12'
     end
@@ -80,8 +77,8 @@ describe 'New Gradebook' do
 
   context 'with a moderated assignment' do
     before(:once) do
-      # enroll a second teacher
       @teacher2 = course_with_teacher(course: @course, name: 'Teacher2', active_all: true).user
+      @teacher3 = course_with_teacher(course: @course, name: 'Teacher3', active_all: true).user
     end
 
     before(:each) do
@@ -97,35 +94,36 @@ describe 'New Gradebook' do
       )
 
       # give a grade as non-final grader
-      @student1_submission = @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher2, provisional: true).first
-
+      @moderated_assignment.grade_student(@student1, grade: '2', grader: @teacher2, provisional: true)
+      @moderated_assignment.grade_student(@student1, grade: '3', grader: @teacher3, provisional: true)
     end
 
-    it 'displays "MUTED" in the assignment', priority: '1', test_id: 3496196 do
-      user_session(@teacher2)
-      Gradebook.visit(@course)
-
-      expect(Gradebook.select_assignment_header_secondary_label(@moderated_assignment.name).text).to include 'MUTED'
-    end
-
-    it 'prevents unmuting the assignment before grades are posted', prirotiy: '1', test_id: 3496196 do
-      user_session(@teacher2)
-      Gradebook.visit(@course)
-      Gradebook.click_assignment_header_menu(@moderated_assignment.id)
-      wait_for_ajaximations
-
-      expect(Gradebook.assignment_menu_selector('Unmute Assignment').attribute('aria-disabled')).to eq 'true'
-    end
-
-    it 'allows unmuting the assignment after grades are posted', priority: '1', test_id: 3496196 do
-      user_session(@teacher2)
-      @moderated_assignment.update!(grades_published_at: Time.zone.now)
+    it 'prevents posting grades before they are released', priority: '1', test_id: 3496196 do
+      user_session(@teacher1)
+      ModeratePage.visit(@course.id, @moderated_assignment.id)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
 
       Gradebook.visit(@course)
       Gradebook.click_assignment_header_menu(@moderated_assignment.id)
       wait_for_ajaximations
 
-      expect(Gradebook.assignment_menu_selector('Unmute Assignment').attribute('aria-disabled')).to be nil
+      expect(Gradebook.assignment_menu_selector('No grades to post')).to be_displayed
+    end
+
+    it 'allows posting grades after they are released', priority: '1', test_id: 3496196 do
+      user_session(@teacher1)
+      ModeratePage.visit(@course.id, @moderated_assignment.id)
+      ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+
+      ModeratePage.click_release_grades_button
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+
+      Gradebook.visit(@course)
+      Gradebook.click_assignment_header_menu(@moderated_assignment.id)
+      wait_for_ajaximations
+
+      expect(Gradebook.assignment_menu_selector('Post grades')).to be_displayed
     end
 
     context "causes editing grades to be" do
@@ -137,10 +135,10 @@ describe 'New Gradebook' do
       it "not allowed until grades are posted", priority: "1", test_id: 3501496 do
         grid_cell = Gradebook::Cells.grid_assignment_row_cell(@student1, @moderated_assignment)
         class_attribute_fetched = grid_cell.attribute('class')
-        expect(class_attribute_fetched).to include 'muted grayed-out cannot_edit'
+        expect(class_attribute_fetched).to include 'grayed-out cannot_edit'
       end
 
-      it "allowed if grades are posted ",priority: "1", test_id: 3501496 do
+      it "allowed if grades are posted", priority: "1", test_id: 3501496 do
         @moderated_assignment.update!(grades_published_at: Time.zone.now)
         @moderated_assignment.unmute!
         refresh_page
