@@ -1549,11 +1549,6 @@ CanvasRails::Application.routes.draw do
       put 'users/self/communication_channels/:communication_channel_id/notification_preference_categories/:category', action: :update_preferences_by_category
     end
 
-    scope(controller: :notification_preference_overrides) do
-      get 'users/self/courses/:course_id/notifications_enabled', action: :enabled_for_context
-      put 'users/self/courses/:course_id/enable_notifications', action: :enable
-    end
-
     scope(controller: :comm_messages_api) do
       get 'comm_messages', action: :index, as: 'comm_messages'
     end
