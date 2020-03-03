@@ -70,11 +70,11 @@ class AccountNotification < ActiveRecord::Base
     if root_account.site_admin?
       current = self.for_account(root_account)
     else
-      course_ids = user.enrollments.active_or_pending.shard(user).distinct.pluck(:course_id) # fetch sharded course ids
+      course_ids = user.enrollments.active_or_pending.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
       # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
       all_account_ids = Course.where(:id => course_ids).not_deleted.
         distinct.pluck(:account_id, :root_account_id).flatten.uniq
-      all_account_ids += user.account_users.active.shard(user).
+      all_account_ids += user.account_users.active.shard(user.in_region_associated_shards).
         joins(:account).where(accounts: {workflow_state: 'active'}).
         distinct.pluck(:account_id).uniq
       all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
@@ -94,8 +94,8 @@ class AccountNotification < ActiveRecord::Base
       unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
         # choose enrollments and account users to inspect
         if announcement.account.site_admin?
-          enrollments = user.enrollments.shard(user).active_or_pending.distinct.select(:role_id).to_a
-          account_users = user.account_users.shard(user).distinct.select(:role_id).to_a
+          enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.select(:role_id).to_a
+          account_users = user.account_users.shard(user.in_region_associated_shards).distinct.select(:role_id).to_a
         else
           announcement.shard.activate do
             sub_account_ids_map[announcement.account_id] ||=
@@ -140,7 +140,7 @@ class AccountNotification < ActiveRecord::Base
         end
       end
 
-      roles = user.enrollments.shard(user).active_or_pending.distinct.pluck(:type)
+      roles = user.enrollments.shard(user.in_region_associated_shards).active_or_pending.distinct.pluck(:type)
 
       if roles == ['StudentEnrollment'] && !root_account.include_students_in_global_survey?
         current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }
