@@ -598,11 +598,21 @@ class Message < ActiveRecord::Base
       return nil
     end
 
+    check_acct = user&.account || Account.site_admin
+    if path_type == 'sms' && check_acct.feature_enabled?(:deprecate_sms)
+      if Notification.types_to_send_in_sms.exclude?(notification_name)
+        InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
+                                     short_stat: 'message.skip',
+                                     tags: {path_type: path_type, notification_name: notification_name})
+        self.destroy
+        return nil
+      end
+    end
+
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{notification_name}",
                                  short_stat: 'message.deliver',
                                  tags: {path_type: path_type, notification_name: notification_name})
 
-    check_acct = user&.account || Account.site_admin
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
     else
