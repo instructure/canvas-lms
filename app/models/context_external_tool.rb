@@ -19,6 +19,7 @@ require 'redcarpet'
 class ContextExternalTool < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
+  include PermissionsHelper
 
   has_many :content_tags, :as => :content
   has_many :context_external_tool_placements, :autosave => true
@@ -805,7 +806,28 @@ end
     if (required_permissions_str = self.extension_setting(launch_type, 'required_permissions'))
       # if configured with a comma-separated string of permissions, will only show the link
       # if all permissions are granted
-      required_permissions_str.split(",").map(&:to_sym).all?{|p| context&.grants_right?(user, session, p)}
+      required_permissions_str.split(",").map(&:to_sym).all? do |p|
+        permission_given = context&.grants_right?(user, session, p)
+
+        # Global navigation tools are always installed in the root account.
+        # This means if the current user is using a course-based role, the
+        # standard `grants_right?` call to the context (always the root account)
+        # will always fail.
+        #
+        # If this is the scenario, check to see if the user has any active enrollments
+        # in the account with the required permission. If they do, grant access.
+        if !permission_given &&
+          context.present? &&
+          launch_type.to_s == Lti::ResourcePlacement::GLOBAL_NAVIGATION.to_s
+        then
+          permission_given = manageable_enrollments_by_permission(
+            p,
+            user.enrollments_for_account_and_sub_accounts(context.root_account)
+          ).present?
+        end
+
+        permission_given
+      end
     else
       true
     end
