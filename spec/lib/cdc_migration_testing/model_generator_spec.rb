@@ -33,10 +33,6 @@ describe ModelGenerator do
   context 'with an out-of-order model list' do
     let(:models) { [ User, EnrollmentTerm, Course, AuthenticationProvider, Account] }
 
-    it 'should populate the model_queue when initialized' do
-      expect(generator.model_queue).to eq(models)
-    end
-
     it 'should populate models when run' do
       models.each { |model| expect(model.any?).to be false }
 

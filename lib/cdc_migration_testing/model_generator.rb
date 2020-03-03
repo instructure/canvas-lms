@@ -19,38 +19,47 @@
 class ModelGenerator
 
   FIXTURES_BASEDIR = 'lib/cdc_migration_testing/fixtures'.freeze
-  attr_accessor :model_queue
+  attr_reader :generated_count, :fixture_count, :skipped_count, :iteration_count
 
   def initialize
     Rails.application.eager_load!
     @model_queue = ActiveRecord::Base.descendants
+    @generated_count = @fixture_count = @skipped_count = @iteration_count = 0
+  end
+
+  def queue_length
+    @model_queue.length
   end
 
   def run
     loop do
-      last_queue_length = self.model_queue.length
+      last_queue_length = @model_queue.length
       create_models
-      break if self.model_queue.empty?
+      @iteration_count+=1
+      break if @model_queue.empty?
       # If no models were created in that run (so the queue length didn't change),
       # something is preventing it from advancing.
-      raise "Couldn't generate all necessary models." if last_queue_length == self.model_queue.length
+      raise "Couldn't generate all necessary models." if last_queue_length == @model_queue.length
     end
-    Rails.logger.info "Finished generating models"
   end
 
   private
 
   def create_models
-    self.model_queue.each do
-      model = self.model_queue.shift()
-      next if !model.table_exists? || records?(model.table_name_prefix + model.table_name)
+    @model_queue.each do
+      model = @model_queue.shift()
+      if !model.table_exists? || records?(model.table_name_prefix + model.table_name)
+        @skipped_count+=1
+        next
+      end
+
       begin
         create_model(model)
       # If there's a foreign key error, put this model back at the end of the
       # queue and try again later so that the prerequisite models can
       # be created first. This takes several cycles, but finishes eventually.
       rescue ActiveRecord::InvalidForeignKey
-        self.model_queue.push(model)
+        @model_queue.push(model)
       rescue StandardError => e
       raise <<~ERROR
         Couldn't create a #{model.name}. If one can't be generated, you
@@ -89,6 +98,7 @@ class ModelGenerator
       require Rails.root.join(model_file_path)
       created_model = CdcFixtures.send("create_#{model.class_name.underscore}".to_sym)
       created_model.save!(validate: false)
+      @fixture_count+=1
     rescue ActiveRecord::RecordInvalid => e
       raise <<~NOSAVE
       Couldn't save the #{model.name} returned by the self.create method in
@@ -114,8 +124,13 @@ class ModelGenerator
 
     begin
       model.new(required_attributes).save!(validate: false)
+      @generated_count+=1
     rescue ActiveRecord::ReadOnlyRecord
+      @skipped_count +=1
       # If we just tried to create a read-only record, ignore it.
+      # AssignmentStudentVisibility, (and possibly other models?) don't
+      # allow creating records directly for some reason. These are not
+      # important tables and can be safely ignored.
     end
   end
 
@@ -214,11 +229,13 @@ class ModelGenerator
     # A "coder" is defined if the column is a string or text type, but is going
     # to be encoded/decoded into a Hash, Array, etc. by ActiveRecord.
     if defined? model.attribute_types[column.name].coder
-      case model.attribute_types[column.name].coder.object_class.name
+      class_name = model.attribute_types[column.name].coder.object_class.name
+      case class_name
       when 'Hash', 'Object'
         {foo: 'bar'}
       when 'Array'
         ['foo']
+      else raise "Model #{model.name} has serializable column #{column.name} of unknown type #{class_name}"
       end
     else
       char_limit = 8
