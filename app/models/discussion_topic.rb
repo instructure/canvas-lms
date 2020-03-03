@@ -99,7 +99,8 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :recalculate_progressions_if_sections_changed
   after_save :sync_attachment_with_publish_state
   after_update :clear_streams_if_not_published
-  after_update :clear_non_applicable_stream_items
+  after_update :clear_non_applicable_stream_items_for_sections
+  after_update :clear_non_applicable_stream_items_for_delayed_posts
   after_create :create_participant
   after_create :create_materialized_view
 
@@ -181,7 +182,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def set_schedule_delayed_transitions
-    if self.delayed_post_at? && self.delayed_post_at_changed?
+    @delayed_post_at_changed = self.delayed_post_at_changed?
+    if self.delayed_post_at? && @delayed_post_at_changed
       @should_schedule_delayed_post = true
       self.workflow_state = 'post_delayed' if [:migration, :after_migration].include?(self.saved_by) && self.delayed_post_at > Time.now
     end
@@ -923,7 +925,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def clear_non_applicable_stream_items
+  def clear_non_applicable_stream_items_for_sections
     # either changed sections or made section specificness
     return unless self.is_section_specific? ? @sections_changed : !self.is_section_specific_before_last_save
 
@@ -936,7 +938,21 @@ class DiscussionTopic < ActiveRecord::Base
         item.destroy
       end
     end
+    self.clear_stream_item_cache_for(user_ids)
+  end
 
+  def clear_non_applicable_stream_items_for_delayed_posts
+    user_ids = []
+    if self.is_announcement && self.delayed_post_at? && @delayed_post_at_changed && self.delayed_post_at > Time.now
+      stream_item&.stream_item_instances&.find_each do |item|
+        user_ids.push(item.user_id)
+        item.destroy
+      end
+    end
+    self.clear_stream_item_cache_for(user_ids)
+  end
+
+  def clear_stream_item_cache_for(user_ids)
     if stream_item && user_ids.any?
       StreamItemCache.send_later_if_production_enqueue_args(
         :invalidate_all_recent_stream_items,

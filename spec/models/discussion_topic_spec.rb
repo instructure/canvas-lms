@@ -1116,6 +1116,18 @@ describe DiscussionTopic do
       }.from(1).to(0)
     end
 
+    it "should remove stream items from users if updated to a delayed post in the future" do
+      announcement = @course.announcements.create!(title: 'Lemon Loves Panda', message: 'Because panda is home')
+
+      expect(@student.stream_item_instances.count).to eq 1
+
+      announcement.delayed_post_at = 5.days.from_now
+      announcement.workflow_state = 'post_delayed'
+      announcement.save!
+
+      expect(@student.stream_item_instances.count).to eq 0
+    end
+
     it "should not send stream items to students if the topic isn't published" do
       topic = nil
       expect { topic = @course.discussion_topics.create!(:title => "secret topic", :user => @teacher, :workflow_state => 'unpublished') }.to change { @student.stream_item_instances.count }.by(0)
