@@ -2,7 +2,7 @@
 version: "2.3"
 services:
   web:
-    image: "${PATCHSET_TAG}"
+    image: $PATCHSET_TAG
     links:
       - postgres
       - redis
@@ -11,10 +11,7 @@ services:
     environment:
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       RAILS_ENV: test
-      RAILS_DB_NAME_TEST: 'canvas_test'
-      RAILS_DB_HOST: postgres
-      RAILS_DB_PASSWORD: ''
-      DATABASE_URL: "postgres://postgres@postgres:5432/canvas_test"
+      DATABASE_URL: postgres://postgres:sekret@postgres:5432/canvas_test
       RANDOMIZE_SEQUENCES: 1
       RERUNS_RETRY:
       MAX_FAIL:
@@ -33,7 +30,9 @@ services:
     image: starlord.inscloudgate.net/jenkins/redis:alpine
 
   postgres:
-    image: starlord.inscloudgate.net/jenkins/postgres:9.5
+    image: starlord.inscloudgate.net/jenkins/postgis:9.5-2.5
+    environment:
+      POSTGRES_PASSWORD: sekret
 
   cassandra:
     image: starlord.inscloudgate.net/jenkins/cassandra:2.2

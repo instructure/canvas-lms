@@ -1,6 +1,7 @@
 common: &common
   adapter: postgresql
   host: postgres
+  password: sekret
   encoding: utf8
   username: postgres
   timeout: 5000
@@ -19,8 +20,8 @@ development:
 
 test:
   <<: *common
-  database: canvas_test_rails3_<%= ENV['TEST_ENV_NUMBER'] %>
-  shard1: canvas_test_rails3_shard1
-  shard2: canvas_test_rails3_shard2
-  test_shard_1: canvas_test_rails3_shard1
-  test_shard_2: canvas_test_rails3_shard2
+  database: canvas_test
+  shard1: canvas_test_shard_1
+  shard2: canvas_test_shard_2
+  test_shard_1: canvas_test_shard_1
+  test_shard_2: canvas_test_shard_2
