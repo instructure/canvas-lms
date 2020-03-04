@@ -91,6 +91,10 @@ if [[ $CLEAN_ALL == "1" ]]; then
   docker system prune --all --force --volumes
 else
   # delete most the things!
+  dangling_image_ids=$(docker images --filter "dangling=true" -q --no-trunc)
+  if [[ $dangling_image_ids != "" ]]; then
+    docker rmi --force $dangling_image_ids
+  fi
   regex=()
   regex+=(--regexp="REPOSITORY:TAG")
   for allowed in "${whitelist[@]}"; do
