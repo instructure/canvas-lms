@@ -139,10 +139,6 @@ module Gradebook
     f(".grade", cell)
   end
 
-  def self.dialog_save_mute_setting
-    f("button[data-action$='mute']")
-  end
-
   def self.link_previous_grade_export
     f('span[data-menu-id="previous-export"]')
   end
@@ -157,10 +153,6 @@ module Gradebook
 
   def self.gradebook_view_menu_button
     f('[data-component="ViewOptionsMenu"] button')
-  end
-
-  def self.total_cell_mute_icon
-    f('.total-cell .icon-off')
   end
 
   def self.total_cell_warning_icon
@@ -476,10 +468,6 @@ module Gradebook
     menu_item.attribute('aria-checked')
   end
 
-  def self.total_cell_mute_icon_select
-    total_cell_mute_icon
-  end
-
   def self.total_cell_warning_icon_select
     total_cell_warning_icon
   end
@@ -696,8 +684,6 @@ module Gradebook
       menu_item_id = 'curve-grades'
     elsif menuitem =~ /(set(\-?\s?default\-?\s?grade)?)/i
       menu_item_id = 'set-default-grade'
-    elsif menuitem =~ /(mute)/i
-      menu_item_id = 'assignment-muter'
     elsif menuitem =~ /(download(\-?\s?submission)?)/i
       menu_item_id = 'download-submissions'
 
@@ -748,13 +734,6 @@ module Gradebook
 
   def self.select_assignment_header_cell_label_element(name)
     assignment_header_cell_label_element(name)
-  end
-
-  # assignment mute toggle
-  def self.toggle_assignment_muting(assignment_id)
-    click_assignment_header_menu_element(assignment_id, 'mute')
-    dialog_save_mute_setting.click
-    wait_for_ajaximations
   end
 
   def self.click_assignment_group_header_options(group_name, sort_type)

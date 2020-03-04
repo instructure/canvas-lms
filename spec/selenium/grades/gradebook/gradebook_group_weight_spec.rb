@@ -39,6 +39,10 @@ describe "Gradebook - group weights" do
     wait_for_ajax_requests
   end
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   before(:each) do
     course_with_teacher_logged_in
     student_in_course
@@ -112,6 +116,9 @@ describe "Gradebook - group weights" do
                                         assignment_group: @group2
                                       })
       @course.reload
+
+      @assignment1.grade_student @student, grade: 20, grader: @teacher
+      @assignment2.grade_student @student, grade: 5, grader: @teacher
     end
 
     it 'should display a warning icon in the total column', priority: '1', test_id: 164013 do
@@ -123,24 +130,17 @@ describe "Gradebook - group weights" do
       @course.apply_assignment_group_weights = false
       @course.save!
       Gradebook.visit(@course)
-
       expect(f("body")).not_to contain_css('.icon-warning')
     end
 
-    it 'should display mute icon in total column if an assignment is muted' do
+    it 'should display "hidden" icon in total column if an assignment has unposted submissions' do
+      @assignment1.submissions.update_all(posted_at: nil)
       Gradebook.visit(@course)
-      Gradebook.toggle_assignment_muting(@assignment2.id)
-
       expect(Gradebook.content_selector).to contain_jqcss('.total-cell .icon-off')
     end
 
-    it 'should not display mute icon in total column if an assignment is unmuted' do
-      @assignment2.muted = true
-      @assignment2.save!
-
+    it 'should not display "hidden" icon in total column if no assignments have unposted submissions' do
       Gradebook.visit(@course)
-      Gradebook.toggle_assignment_muting(@assignment2.id)
-
       expect(Gradebook.content_selector).not_to contain_jqcss('.total-cell .icon-off')
     end
   end
