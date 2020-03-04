@@ -90,7 +90,7 @@ gem 'mime-types', '3.3.1'
 gem 'mini_magick', '4.10.1'
 gem 'multi_json', '1.14.1'
 gem 'net-ldap', '0.16.2', require: false
-gem 'nokogiri', '1.10.8', require: false
+gem 'nokogiri', '1.10.9', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
 gem 'oj', '3.10.2'
