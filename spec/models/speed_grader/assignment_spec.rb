@@ -284,17 +284,10 @@ describe SpeedGrader::Assignment do
 
     describe "has_postable_comments" do
       before(:each) do
-        @course.root_account.enable_feature!(:allow_postable_submission_comments)
         @assignment.ensure_post_policy(post_manually: true)
       end
 
-      it "is not included when allow_postable_submission_comments feature is not enabled" do
-        @course.root_account.disable_feature!(:allow_postable_submission_comments)
-        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-        expect(json[:submissions].first).not_to have_key "has_postable_comments"
-      end
-
-      it "is true when unposted, hidden comments exist, and postable comments feature is enabled" do
+      it "is true when submission is unposted and hidden comments exist" do
         student1_sub = @assignment.submissions.find_by!(user: @student_1)
         student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
         json = SpeedGrader::Assignment.new(@assignment, @teacher).json
@@ -302,16 +295,7 @@ describe SpeedGrader::Assignment do
         expect(submission_json["has_postable_comments"]).to be true
       end
 
-      it "is not present when unposted, hidden comments exist, and postable comments feature is not enabled" do
-        @course.root_account.disable_feature!(:allow_postable_submission_comments)
-        student1_sub = @assignment.submissions.find_by!(user: @student_1)
-        student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
-        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
-        expect(submission_json).not_to have_key "has_postable_comments"
-      end
-
-      it "is false when unposted and only non-hidden comments exist" do
+      it "is false when submission is unposted and only non-hidden comments exist" do
         student1_sub = @assignment.submissions.find_by!(user: @student_1)
         student1_sub.add_comment(author: @student1, comment: "good job!", hidden: false)
         json = SpeedGrader::Assignment.new(@assignment, @teacher).json

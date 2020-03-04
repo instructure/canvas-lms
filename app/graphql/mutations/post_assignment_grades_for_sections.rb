@@ -49,16 +49,8 @@ class Mutations::PostAssignmentGradesForSections < Mutations::BaseMutation
 
     visible_enrollments = course.apply_enrollment_visibility(course.student_enrollments, current_user, sections)
 
-    submissions_scope = if input[:graded_only] && course.root_account.feature_enabled?(:allow_postable_submission_comments)
-      assignment.submissions.postable
-    elsif input[:graded_only]
-      assignment.submissions.graded
-    else
-      assignment.submissions
-    end
-
+    submissions_scope = input[:graded_only] ? assignment.submissions.postable : assignment.submissions
     submissions_scope = submissions_scope.joins(user: :enrollments).merge(visible_enrollments)
-
     progress = course.progresses.new(tag: "post_assignment_grades_for_sections")
 
     posting_params = {
