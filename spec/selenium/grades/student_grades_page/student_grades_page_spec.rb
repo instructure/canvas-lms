@@ -21,6 +21,10 @@ require_relative '../pages/student_grades_page'
 describe "gradebook - logged in as a student" do
   include_context "in-process server selenium tests"
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   # Helpers
   def backend_group_helper
     Factories::GradingPeriodGroupHelper.new

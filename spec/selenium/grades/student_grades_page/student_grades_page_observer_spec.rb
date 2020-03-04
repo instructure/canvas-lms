@@ -21,6 +21,10 @@ describe "gradebook" do
   include_context "in-process server selenium tests"
   include GradebookCommon
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   context "as an observer" do
     before(:each) do
       user_with_pseudonym
