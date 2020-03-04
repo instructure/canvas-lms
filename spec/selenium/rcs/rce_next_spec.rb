@@ -505,6 +505,7 @@ describe "RCE next tests" do
       visit_front_page_edit(@course)
       media_button = media_toolbar_button
       media_button.click
+      wait_for_animations
       menu_id = media_button.attribute('aria-owns')
       expect(menu_item_by_menu_id(menu_id, "Upload/Record Media")).to be_displayed
       expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
@@ -518,6 +519,7 @@ describe "RCE next tests" do
       visit_front_page_edit(@course)
       media_button = media_toolbar_button
       media_button.click
+      wait_for_animations
       menu_id = media_button.attribute('aria-owns')
       expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
       expect(menu_item_by_menu_id(menu_id, "User Media")).to be_displayed
@@ -532,6 +534,7 @@ describe "RCE next tests" do
       visit_front_page_edit(@course)
       media_button = media_toolbar_button
       media_button.click
+      wait_for_animations
       menu_id = media_button.attribute('aria-owns')
       expect(menu_item_by_menu_id(menu_id, "Course Media")).to be_displayed
       expect(menu_item_by_menu_id(menu_id, "User Media")).to be_displayed
