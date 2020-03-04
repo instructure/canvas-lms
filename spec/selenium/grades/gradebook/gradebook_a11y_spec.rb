@@ -28,7 +28,10 @@ describe "Gradebook" do
   let(:extra_setup) { }
   let(:students) { @course.students }
 
-  before(:once) { gradebook_data_setup }
+  before :once do
+    gradebook_data_setup
+    PostPolicy.enable_feature!
+  end
 
   before do
     extra_setup
@@ -365,13 +368,6 @@ describe "Gradebook" do
 
     it 'is placed on assignment header trigger upon "set default grade" dialog close' do
       Gradebook.click_assignment_header_menu_element(assignment.id, 'set default grade')
-      Gradebook.close_open_dialog
-
-      check_element_has_focus Gradebook.assignment_header_menu_trigger_element(assignment.title)
-    end
-
-    it 'is placed on assignment header trigger upon "assignment muting" dialog close' do
-      Gradebook.click_assignment_header_menu_element(assignment.id, 'assignment muter')
       Gradebook.close_open_dialog
 
       check_element_has_focus Gradebook.assignment_header_menu_trigger_element(assignment.title)
