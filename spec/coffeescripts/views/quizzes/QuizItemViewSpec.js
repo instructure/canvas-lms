@@ -600,6 +600,20 @@ QUnit.module('direct share', hooks => {
     clearTimeout(args[0].props.onDismiss())
     equal(ReactDOM.render.lastCall.args[0].props.open, false)
   })
+
+  test('uses the correct content_type for new quizzes', () => {
+    const quiz = createQuiz({id: '1', title: 'Foo', can_update: true, quiz_type: 'quizzes.next'})
+    const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
+    view.$(`.al-trigger`).simulate('click')
+    view.$(`.quiz-send-to`).simulate('click')
+    const args = ReactDOM.render.firstCall.args
+    equal(args[0].props.open, true)
+    equal(args[0].props.sourceCourseId, 123)
+    deepEqual(args[0].props.contentShare, {content_type: 'assignment', content_id: '1'})
+
+    clearTimeout(args[0].props.onDismiss())
+    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+  })
 })
 
 QUnit.module('Quiz#quizzesRespondusEnabled', hooks => {

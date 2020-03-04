@@ -217,11 +217,13 @@ export default class ItemView extends Backbone.View {
 
   renderSendToTray(open) {
     const quizId = this.model.get('id')
+    const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
+    const contentType = isOldQuiz ? 'quiz' : 'assignment'
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
         sourceCourseId={ENV.COURSE_ID}
-        contentShare={{content_type: 'quiz', content_id: quizId}}
+        contentShare={{content_type: contentType, content_id: quizId}}
         onDismiss={() => {
           this.renderSendToTray(false)
           return setTimeout(() => this.$settingsButton.focus(), 100)
@@ -251,7 +253,7 @@ export default class ItemView extends Backbone.View {
   }
 
   isStudent() {
-    return (ENV.current_user_roles && ENV.current_user_roles.includes('student'))
+    return ENV.current_user_roles && ENV.current_user_roles.includes('student')
   }
 
   canDuplicate() {
