@@ -1476,6 +1476,9 @@ class Assignment < ActiveRecord::Base
   def touch_assignment_and_submittable
     self.touch
     self.submittable_object&.touch
+    if self.submittable_object.is_a?(DiscussionTopic) && self.submittable_object.root_topic?
+      self.submittable_object.child_topics.touch_all
+    end
   end
 
   def low_level_locked_for?(user, opts={})
