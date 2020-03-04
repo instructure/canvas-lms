@@ -43,7 +43,7 @@ class QuizzesNext::QuizzesApiController < ApplicationController
       ].cache_key
 
       value = Rails.cache.fetch(cache_key) do
-        api_route = api_v1_course_quizzes_url(@context)
+        api_route = api_v1_course_all_quizzes_url(@context)
         @quizzes = Api.paginate(all_quizzes, self, api_route)
 
         {
