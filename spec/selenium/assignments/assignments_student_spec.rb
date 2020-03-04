@@ -24,8 +24,11 @@ describe "assignments" do
   include GoogleDriveCommon
   include AssignmentsCommon
 
-  context "as a student" do
+  before :once do
+    PostPolicy.enable_feature!
+  end
 
+  context "as a student" do
     before(:each) do
       course_with_student_logged_in
     end
@@ -61,7 +64,7 @@ describe "assignments" do
     it "should not show submission data when muted" do
       assignment = @course.assignments.create!(:title => 'test assignment', :name => 'test assignment')
 
-      assignment.update(:submission_types => "online_url,online_upload")
+      assignment.update(:submission_types => "online_url,online_upload", muted: false)
       submission = assignment.submit_homework(@student)
       submission.submission_type = "online_url"
       submission.save!
