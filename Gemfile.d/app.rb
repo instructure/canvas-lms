@@ -93,7 +93,7 @@ gem 'net-ldap', '0.16.2', require: false
 gem 'nokogiri', '1.10.9', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
-gem 'oj', '3.10.2'
+gem 'oj', '3.10.5'
 gem 'parallel', '1.19.1', require: false
   gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'prawn-rails', '1.3.0'
