@@ -144,7 +144,7 @@ pipeline {
             credentials.withGerritCredentials({ ->
               sh '''
                 GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                  git fetch origin $GERRIT_BRANCH
+                  git fetch origin $GERRIT_BRANCH:$GERRIT_BRANCH
 
                 git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
                 git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
