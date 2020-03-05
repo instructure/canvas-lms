@@ -29,7 +29,7 @@ import {useQuery} from 'react-apollo'
 export default function RubricsQuery(props) {
   const {loading, error, data} = useQuery(RUBRIC_QUERY, {
     variables: {
-      rubricID: props.assignment.rubric.id,
+      assignmentLid: props.assignment._id,
       submissionID: props.submission.id,
       courseID: props.assignment.env.courseId,
       submissionAttempt: props.submission.attempt
@@ -55,7 +55,7 @@ export default function RubricsQuery(props) {
       assessments={data.submission?.rubricAssessmentsConnection?.nodes}
       key={props.submission.attempt}
       proficiencyRatings={data.course.account?.proficiencyRatingsConnection?.nodes}
-      rubric={data.rubric}
+      rubric={data.assignment.rubric}
     />
   )
 }
