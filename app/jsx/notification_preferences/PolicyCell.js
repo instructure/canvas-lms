@@ -19,8 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
+import {Flex} from '@instructure/ui-flex'
+import {IconNoLine} from '@instructure/ui-icons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 export default class PolicyCell extends React.Component {
   static renderAt(elt, props) {
@@ -32,6 +35,8 @@ export default class PolicyCell extends React.Component {
     category: PropTypes.string,
     channelId: PropTypes.string,
     buttonData: PropTypes.array,
+    disabled: PropTypes.bool,
+    disabledTooltipText: PropTypes.string,
     onValueChanged: PropTypes.func
   }
 
@@ -70,16 +75,33 @@ export default class PolicyCell extends React.Component {
 
   render() {
     return (
-      <RadioInputGroup
-        name={Math.floor(1 + Math.random() * 0x10000).toString()}
-        description=""
-        variant="toggle"
-        size="small"
-        defaultValue={this.props.selection}
-        onChange={(e, val) => this.handleValueChanged(val)}
-      >
-        {this.renderRadioInputs()}
-      </RadioInputGroup>
+      <Flex justifyItems="center">
+        <Flex.Item>
+          {this.props.disabled ? (
+            <Tooltip
+              renderTip={this.props.disabledTooltipText}
+              placement="end"
+              on={['click', 'hover', 'focus']}
+            >
+              <span data-testid="notification-type-disabled">
+                <IconNoLine />
+                <ScreenReaderContent>Unavailable</ScreenReaderContent>
+              </span>
+            </Tooltip>
+          ) : (
+            <RadioInputGroup
+              name={Math.floor(1 + Math.random() * 0x10000).toString()}
+              description=""
+              variant="toggle"
+              size="small"
+              defaultValue={this.props.selection}
+              onChange={(e, val) => this.handleValueChanged(val)}
+            >
+              {this.renderRadioInputs()}
+            </RadioInputGroup>
+          )}
+        </Flex.Item>
+      </Flex>
     )
   }
 }

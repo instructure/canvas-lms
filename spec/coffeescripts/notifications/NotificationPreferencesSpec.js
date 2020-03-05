@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import NotificationPreferences from 'compiled/notifications/NotificationPreferences'
+import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('NotificationPreferences')
 
 test('tooltip instance was added', () => {
-  const options = {update_url: '/profile/communication_update'}
-  const nps = new NotificationPreferences(options)
   const $np = $('#notification-preferences')
   const freq = $np.find('.frequency')
   const inst = $(freq).tooltip('instance')
@@ -65,7 +65,13 @@ test('policyCellProps with twitter', () => {
   equal(props.buttonData.length, 2)
 })
 
-test('policyCellProps with sms', () => {
+test('policyCellProps with sms_deprecation', () => {
+  fakeENV.setup()
+  ENV.NOTIFICATION_PREFERENCES_OPTIONS = {
+    deprecate_sms_enabled: true,
+    allowed_sms_categories: ['announcement', 'grading']
+  }
+
   const options = {update_url: '/profile/communication_update'}
   const nps = new NotificationPreferences(options)
   const category = {category: 'helloworld'}
@@ -74,5 +80,7 @@ test('policyCellProps with sms', () => {
     id: 42
   }
   const props = nps.policyCellProps(category, channel)
-  equal(props.buttonData.length, 2)
+  equal(props.disabled, true)
+  equal(props.disabledTooltipText, 'This notification type is not supported in SMS')
+  fakeENV.teardown()
 })
