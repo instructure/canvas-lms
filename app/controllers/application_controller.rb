@@ -1773,6 +1773,10 @@ class ApplicationController < ActionController::Base
       if (ref.include?('assignments/new') || ref =~ /courses\/[0-9]+\/quizzes/i) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
         return polymorphic_url([@context, :quizzes])
       end
+
+      if ref =~ /courses\/[0-9]+\/gradebook/i
+        return polymorphic_url([@context, :gradebook])
+      end
     end
     named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
   end

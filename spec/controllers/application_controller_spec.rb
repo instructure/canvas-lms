@@ -754,6 +754,22 @@ RSpec.describe ApplicationController do
           allow(controller).to receive(:polymorphic_url).and_return('host/quizzes')
         end
 
+        context 'is set to gradebook page when launched from graedbook page' do
+          it 'for small id' do
+            allow(controller.request).to receive(:referer).and_return('courses/1/gradebook')
+            expect(controller).to receive(:polymorphic_url).with([course, :gradebook]).and_return('host/gradebook')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/gradebook'
+          end
+
+          it 'for large id' do
+            allow(controller.request).to receive(:referer).and_return('courses/100/gradebook')
+            expect(controller).to receive(:polymorphic_url).with([course, :gradebook]).and_return('host/gradebook')
+            controller.send(:content_tag_redirect, course, content_tag, nil)
+            expect(assigns[:return_url]).to eq 'host/gradebook'
+          end
+        end
+
         context 'is set to quizzes page when launched from quizzes page' do
           it 'for small id' do
             allow(controller.request).to receive(:referer).and_return('courses/1/quizzes')
