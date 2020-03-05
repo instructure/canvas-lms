@@ -1671,31 +1671,6 @@ class Assignment < ActiveRecord::Base
     users.uniq
   end
 
-  def set_default_grade(options={})
-    score = self.grade_to_score(options[:default_grade])
-    grade = self.score_to_grade(score)
-    submissions_to_save = []
-    self.context.students.find_in_batches do |students|
-      submissions = find_or_create_submissions(students)
-      submissions_to_save.concat(submissions.select  { !submissions.score || (options[:overwrite_existing_grades] && submissions.score != score) })
-    end
-
-    Submission.active.where(id: submissions_to_save).update_all({
-      :score => score,
-      :grade => grade,
-      :published_score => score,
-      :published_grade => grade,
-      :workflow_state => 'graded',
-      :graded_at => Time.zone.now.utc
-    }) unless submissions_to_save.empty?
-
-    Rails.logger.debug "GRADES: recalculating because assignment #{global_id} had default grade set (#{options.inspect})"
-    self.context.recompute_student_scores
-    student_ids = context.student_ids
-    User.clear_cache_keys(student_ids, :submissions)
-    send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
-  end
-
   def title_with_id
     "#{title} (#{id})"
   end

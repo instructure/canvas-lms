@@ -4971,27 +4971,10 @@ describe Assignment do
         expect(@sub2.messages_sent['Submission Grade Changed'].first.from_name).to eq @course.name
       end
 
-      it "should notify affected students on a mass-grade change" do
-        skip "CNVS-5969 - Setting a default grade should send a 'Submission Graded' notification"
-        @assignment.set_default_grade(:default_grade => 10)
-        msg_sub1 = @assignment.submissions.detect{|s| s.id = @sub1.id}
-        expect(msg_sub1.messages_sent).not_to be_nil
-        expect(msg_sub1.messages_sent['Submission Grade Changed']).not_to be_nil
-        msg_sub2 = @assignment.submissions.detect{|s| s.id = @sub2.id}
-        expect(msg_sub2.messages_sent).not_to be_nil
-        expect(msg_sub2.messages_sent['Submission Graded']).not_to be_nil
-      end
-
       describe 'while they are muted' do
         before(:once) { @assignment.mute! }
 
         specify { expect(@assignment).to be_muted }
-
-        it "should not notify affected students on a mass-grade change if muted" do
-          skip "CNVS-5969 - Setting a default grade should send a 'Submission Graded' notification"
-          @assignment.set_default_grade(:default_grade => 10)
-          expect(@assignment.messages_sent).to be_empty
-        end
 
         it "should not notify students when their grade is changed if muted" do
           @sub2 = @assignment.grade_student(@stu2, grade: 8, grader: @teacher).first
