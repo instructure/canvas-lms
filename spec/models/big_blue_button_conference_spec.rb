@@ -107,6 +107,7 @@ describe BigBlueButtonConference do
 
   describe 'plugin setting recording_enabled is enabled' do
     let(:get_recordings_fixture){File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_two.json'))}
+    let(:get_recordings_bulk_fixture){File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_bulk.json'))}
 
     before do
       allow(WebConference).to receive(:plugins).and_return([
@@ -216,6 +217,22 @@ describe BigBlueButtonConference do
         allow(@bbb).to receive(:send_request).and_return({:returncode=>"SUCCESS", :deleted=>"true"})
         response = @bbb.delete_recording(recording_id)
         expect(response[:deleted]).to eq true
+      end
+    end
+
+    describe "recording preloading" do
+      it "should load up all recordings in a single api call" do
+        @bbb2 = BigBlueButtonConference.create!(:context => @bbb.context, :user => @bbb.user, :user_settings => @bbb.user_settings)
+        allow(@bbb).to receive(:conference_key).and_return('instructure_web_conference_somemeetingkey1')
+        allow(@bbb2).to receive(:conference_key).and_return('instructure_web_conference_somemeetingkey2')
+
+        response = JSON.parse(get_recordings_bulk_fixture, {symbolize_names: true})
+        allow(BigBlueButtonConference).to receive(:send_request).and_return(response)
+
+        BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
+        [@bbb, @bbb2].each{|c| expect(c).to_not receive(:send_request)} # shouldn't need to send individual requests anymore
+        expect(@bbb.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
+        expect(@bbb2.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting2"])
       end
     end
   end
