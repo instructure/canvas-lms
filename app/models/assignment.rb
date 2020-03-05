@@ -1123,16 +1123,6 @@ class Assignment < ActiveRecord::Base
       assignment.overridden_for(user, skip_clone: true)
     }
 
-    p.dispatch :assignment_unmuted
-    p.to { |assignment|
-      BroadcastPolicies::AssignmentParticipants.new(assignment).to
-    }
-    p.whenever { |assignment|
-      BroadcastPolicies::AssignmentPolicy.new(assignment).
-        should_dispatch_assignment_unmuted?
-    }
-    p.data { course_broadcast_data }
-
     p.dispatch :submissions_posted
     p.to { |assignment|
       assignment.course.participating_instructors
@@ -3391,7 +3381,6 @@ class Assignment < ActiveRecord::Base
 
       previously_unposted_submissions.each do |submission|
         submission.grade_posting_in_progress = true
-        # Need to broadcast assignment_unmuted here.
         submission.broadcast_notifications
         submission.grade_posting_in_progress = false
       end

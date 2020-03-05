@@ -73,8 +73,6 @@ module BroadcastPolicies
     end
 
     def should_dispatch_submission_posted?
-      # When Post Policies aren't enabled, the assignment handles notifications
-      # via the Assignment Unmuted notification.
       return false unless assignment.course.post_policies_enabled? &&
         submission.grade_posting_in_progress &&
         context_sendable?

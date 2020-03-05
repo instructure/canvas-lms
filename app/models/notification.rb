@@ -487,7 +487,6 @@ EOS
 Includes:
 
 * Assignment/submission grade entered/changed
-* Un-muted assignment grade
 * Grade weight changed
 EOS
     when 'Late Grading'

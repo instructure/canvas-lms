@@ -5107,43 +5107,6 @@ describe Assignment do
       end
     end
 
-    context "assignment unmuted" do
-      let(:assignment) { @course.assignments.create! }
-
-      before :once do
-        @assignment_unmuted_notification = Notification.create(name: "Assignment Unmuted")
-        @student.update!(email: "fakeemail@example.com")
-        @student.email_channel.update!(workflow_state: :active)
-      end
-
-      it "should create a message when an assignment is unmuted" do
-        assignment.mute!
-
-        expect {
-          assignment.unmute!
-        }.to change {
-          DelayedMessage.where(
-            communication_channel: @student.email_channel,
-            notification: @assignment_unmuted_notification
-          ).count
-        }.by(1)
-      end
-
-      it "should not create a message in an unpublished course" do
-        @course.update!(workflow_state: "created")
-        assignment.mute!
-
-        expect {
-          assignment.unmute!
-        }.not_to change {
-          DelayedMessage.where(
-            communication_channel: @student.email_channel,
-            notification: @assignment_unmuted_notification
-          ).count
-        }
-      end
-    end
-
     context "varied due date notifications" do
       before :once do
         @teacher.communication_channels.create(:path => "teacher@instructure.com").confirm!

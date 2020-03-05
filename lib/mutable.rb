@@ -16,26 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Mutable
-
-  attr_accessor :recently_unmuted
-
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
-
-  module ClassMethods
-    def declare_mutable_broadcast_policy(options)
-      policy       = options[:policy]
-      participants = options[:participants]
-
-      policy.dispatch :assignment_unmuted
-      policy.to { participants }
-      policy.whenever do |record|
-        @recently_unmuted
-      end
-    end
-  end
-
   def mute!
     return if muted?
     self.update_attribute(:muted, true)
@@ -48,16 +28,9 @@ module Mutable
   def unmute!
     return unless muted?
     self.update_attribute(:muted, false)
-    broadcast_unmute_event
     post_submissions if respond_to?(:post_submissions)
     ensure_post_policy(post_manually: false) if respond_to?(:ensure_post_policy)
     true
-  end
-
-  def broadcast_unmute_event
-    @recently_unmuted = true
-    self.save!
-    @recently_unmuted = false
   end
 
   protected
