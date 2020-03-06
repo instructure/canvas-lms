@@ -43,7 +43,7 @@ group :test do
   gem 'rubocop-rspec', '1.22.2', require: false
 
   gem 'once-ler', '0.1.4'
-  gem 'sauce_whisk', '0.1.0'
+  gem 'sauce_whisk', '0.2.2'
 
   gem 'selenium-webdriver', '3.142.7'
     gem 'childprocess', '3.0.0', require: false
