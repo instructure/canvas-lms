@@ -135,7 +135,7 @@ test('passes the textarea height into tinyOptions', () => {
   const taHeight = '123'
   const textarea = {offsetHeight: taHeight}
   const opts = {defaultContent: 'default text'}
-  const props = RCELoader.createRCEProps(textarea, opts)
+  RCELoader.createRCEProps(textarea, opts)
   equal(opts.tinyOptions.height, taHeight)
 })
 
@@ -158,17 +158,35 @@ test('renders with rce', function() {
   ok(this.rce.renderIntoDiv.calledWith(this.$div.get(0)))
 })
 
-test('yields editor to callback', function() {
-  const cb = sinon.spy()
+test('yields editor to callback,', function(assert) {
+  const done = assert.async()
+  const cb = (textarea, rce) => {
+    equal(textarea, this.$textarea.get(0))
+    equal(rce, this.editor)
+    done()
+  }
   RCELoader.loadOnTarget(this.$div, {}, cb)
-  ok(cb.calledWith(this.$textarea.get(0), this.editor))
 })
 
-test('ensures yielded editor has call and focus methods', function() {
-  const cb = sinon.spy()
+test('yields editor to callback, la_620_old_rce_init_fix feature enabled', function(assert) {
+  ENV.FEATURES.la_620_old_rce_init_fix = true
+  const done = assert.async()
+  const cb = (textarea, rce) => {
+    equal(textarea, this.$textarea.get(0))
+    equal(rce, this.editor)
+    done()
+  }
   RCELoader.loadOnTarget(this.$div, {}, cb)
-  equal(typeof this.editor.call, 'function')
-  equal(typeof this.editor.focus, 'function')
+})
+
+test('ensures yielded editor has call and focus methods', function(assert) {
+  const done = assert.async()
+  const cb = (textarea, rce) => {
+    equal(typeof rce.call, 'function')
+    equal(typeof rce.focus, 'function')
+    done()
+  }
+  RCELoader.loadOnTarget(this.$div, {}, cb)
 })
 
 QUnit.module('loadSidebarOnTarget', {
@@ -209,7 +227,7 @@ test('yields sidebar to callback', function() {
 })
 
 test('ensures yielded sidebar has show and hide methods', function() {
-  const cb = sinon.spy()
+  const cb = () => {}
   RCELoader.loadSidebarOnTarget(this.$div, cb)
   equal(typeof this.sidebar.show, 'function')
   equal(typeof this.sidebar.hide, 'function')
