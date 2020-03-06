@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative '../sharding_spec_helper'
 require_relative '../lib/validates_as_url'
 
 describe Submission do
@@ -3281,7 +3281,7 @@ describe Submission do
   end
 
   describe "scope: postable" do
-    subject(:submissions) { assignment.submissions.postable }
+    subject(:submissions) { Submission.postable.where(assignment_id: assignment) }
 
     let(:assignment) { @course.assignments.create! }
     let(:submission) { assignment.submissions.find_by(user: @student) }
@@ -3304,6 +3304,12 @@ describe Submission do
     it "includes submissions that are excused" do
       assignment.grade_student(@student, grader: @teacher, excused: true)
       is_expected.to include(submission)
+    end
+
+    it "does not include soft-deleted excused submmissions" do
+      assignment.grade_student(@student, grader: @teacher, excused: true)
+      submission.update!(workflow_state: "deleted")
+      is_expected.not_to include(submission)
     end
   end
 
@@ -5896,7 +5902,6 @@ describe Submission do
     end
 
     context "sharding" do
-      require_relative '../sharding_spec_helper'
       specs_require_sharding
 
       it "serializes relative to current scope's shard" do
@@ -7043,6 +7048,16 @@ describe Submission do
       @assignment.mute!
       check_cache_clear do
         @assignment.unmute!
+      end
+    end
+  end
+  
+  describe "postable scope" do
+    specs_require_sharding
+    
+    it "should work cross-shard" do
+      @shard1.activate do
+        expect(@assignment.submissions.postable.to_sql).to_not include(@shard1.name)
       end
     end
   end

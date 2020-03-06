@@ -144,7 +144,11 @@ class Submission < ActiveRecord::Base
 
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
-  scope :postable, -> { graded.union(with_hidden_comments) }
+  scope :postable, -> {
+    all.primary_shard.activate do
+      active.graded.union(with_hidden_comments)
+    end
+  }
   scope :with_hidden_comments, -> {
     where("EXISTS (?)", SubmissionComment.where("submission_id = submissions.id AND hidden = true"))
   }
