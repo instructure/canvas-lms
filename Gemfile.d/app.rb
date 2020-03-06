@@ -99,7 +99,7 @@ gem 'parallel', '1.19.1', require: false
 gem 'prawn-rails', '1.3.0'
 gem 'rack', '2.2.2'
 gem 'rack-test', '1.1.0'
-gem 'rake', '12.3.1'
+gem 'rake', '13.0.1'
 gem 'rails-observers', '0.1.5'
 gem 'ratom-nokogiri', '0.10.8', require: false
 gem 'rdiscount', '2.2.0.1', require: false
