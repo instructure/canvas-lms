@@ -1331,6 +1331,13 @@ describe AssignmentsController do
       expect(assigns[:assignment]).to eql(@assignment)
     end
 
+    it "should set 'ROOT_OUTCOME_GROUP' in js_env" do
+      user_session @teacher
+      get 'edit', params: {:course_id => @course.id, :id => @assignment.id}
+
+      expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).not_to be_nil
+    end
+
     it "bootstraps the correct assignment info to js_env" do
       user_session(@teacher)
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
