@@ -17,6 +17,7 @@
  */
 
 // manage groups is for the add_group_category dialog
+import ready from '@instructure/ready'
 import Assignment from 'compiled/models/Assignment'
 import EditHeaderView from 'compiled/views/assignments/EditHeaderView'
 import EditView from 'compiled/views/assignments/EditView'
@@ -96,4 +97,6 @@ const editHeaderView = new EditHeaderView({
   }
 })
 
-editHeaderView.render()
+ready(() => {
+  editHeaderView.render()
+})
