@@ -47,6 +47,10 @@ describe Api::V1::Submission do
   let(:submission) { assignment.submissions.create!(user: user) }
   let(:provisional_grade) { submission.provisional_grades.create!(scorer: teacher) }
 
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   describe '#provisional_grade_json' do
     describe 'speedgrader_url' do
       it "links to the speed grader for a student's submission" do
@@ -504,15 +508,7 @@ describe Api::V1::Submission do
         fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
       end
 
-      it "is included if the owning course has post policies enabled" do
-        posted_at = Time.zone.now
-        submission.update!(posted_at: posted_at)
-
-        PostPolicy.enable_feature!
-        expect(json.fetch('posted_at')).to eq posted_at
-      end
-
-      it "is included if the owning course does not have post policies enabled" do
+      it "is included" do
         posted_at = Time.zone.now
         submission.update!(posted_at: posted_at)
 
@@ -556,21 +552,16 @@ describe Api::V1::Submission do
     end
   end
 
-  describe '#submission_zip' do
+  describe "#submission_zip" do
     let(:attachment) { fake_controller.submission_zip(assignment) }
 
-    it 'locks the attachment if the assignment is anonymous and muted' do
-      assignment.muted = true
-      assignment.anonymous_grading = true
+    it "locks the attachment if the assignment anonymizes students" do
+      allow(assignment).to receive(:anonymize_students?).and_return(true)
       expect(attachment).to be_locked
     end
 
-    it 'does not lock the attachment if the assignment is anonymous and unmuted' do
-      assignment.anonymous_grading = true
-      expect(attachment).not_to be_locked
-    end
-
     it 'does not lock the attachment if the assignment is not anonymous' do
+      allow(assignment).to receive(:anonymize_students?).and_return(false)
       expect(attachment).not_to be_locked
     end
   end
