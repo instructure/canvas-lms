@@ -48,7 +48,7 @@ describe('ContentTabs', () => {
     expect(await findByText(tooltipText)).toBeInTheDocument()
   })
 
-  it('redners the RadioInputGroup when not disabled', async () => {
+  it('renders the RadioInputGroup when not disabled', async () => {
     const props = createMockProps()
     const {findByText} = render(<PolicyCell {...props} />)
 
