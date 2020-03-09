@@ -146,7 +146,7 @@ class Submission < ActiveRecord::Base
 
   scope :postable, -> {
     all.primary_shard.activate do
-      active.graded.union(with_hidden_comments)
+      graded.union(with_hidden_comments)
     end
   }
   scope :with_hidden_comments, -> {

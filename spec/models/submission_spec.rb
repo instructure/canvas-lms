@@ -3247,7 +3247,7 @@ describe Submission do
   end
 
   describe "scope: postable" do
-    subject(:submissions) { Submission.postable.where(assignment_id: assignment) }
+    subject(:submissions) { assignment.submissions.postable }
 
     let(:assignment) { @course.assignments.create! }
     let(:submission) { assignment.submissions.find_by(user: @student) }
@@ -3274,12 +3274,6 @@ describe Submission do
     it "includes submissions that are excused" do
       assignment.grade_student(@student, grader: @teacher, excused: true)
       is_expected.to include(submission)
-    end
-
-    it "does not include soft-deleted excused submmissions" do
-      assignment.grade_student(@student, grader: @teacher, excused: true)
-      submission.update!(workflow_state: "deleted")
-      is_expected.not_to include(submission)
     end
   end
 

@@ -59,7 +59,7 @@ class Assignment < ActiveRecord::Base
 
   attr_accessor :previous_id, :copying, :user_submitted, :grade_posting_in_progress, :unposted_anonymous_submissions
   attr_reader :assignment_changed, :posting_params_for_notifications
-  attr_writer :updating_user, :hidden_submissions_count
+  attr_writer :updating_user
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
@@ -1459,24 +1459,6 @@ class Assignment < ActiveRecord::Base
     assignments.each do |assignment|
       assignment.unposted_anonymous_submissions = assignment_ids_with_unposted_anonymous_submissions.include?(assignment.id)
     end
-  end
-
-  def self.preload_hidden_submissions_count(assignments)
-    hidden_submissions_by_assignment_id = Submission.postable.
-      where(assignment_id: assignments, posted_at: nil).
-      group(:assignment_id).
-      count
-
-    assignments.each do |assignment|
-      hidden_count = hidden_submissions_by_assignment_id[assignment.id] || 0
-      assignment.hidden_submissions_count = hidden_count
-    end
-  end
-
-  def hidden_submissions_count
-    Assignment.preload_hidden_submissions_count([self]) unless defined?(@hidden_submissions_count)
-
-    @hidden_submissions_count
   end
 
   def touch_on_unlock_if_necessary
