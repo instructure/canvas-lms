@@ -51,6 +51,8 @@ pipeline {
     stage ('Distribute Rspec Tests') {
       steps {
         script {
+          stash name: "build-scripts", includes: 'build/**/*'
+          stash name: "build-yml", includes: 'docker-compose.*.yml'
           def nodes = [:];
           def ci_node_total = env.CI_NODE_TOTAL as Integer
           for(int i = 0; i < ci_node_total; i++) {
@@ -61,7 +63,8 @@ pipeline {
                   stage("Running RSpec Set ${index}") {
                     try {
                       sh 'rm -rf ./tmp'
-                      checkout scm
+                      unstash name: "build-scripts"
+                      unstash name: "build-yml"
                       sh 'build/new-jenkins/docker-cleanup.sh'
                       sh 'mkdir -p tmp'
                       timeout(time: 60) {
