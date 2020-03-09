@@ -253,7 +253,7 @@ pipeline {
             skipIfPreviouslySuccessful("selenium-chrome") {
               build(
                 job: 'test-suites/selenium-chrome',
-                parameters: build_parameters
+                parameters: build_parameters + string(name: 'CI_NODE_TOTAL', value: env.SELENIUM_CI_NODE_TOTAL)
               )
             }
           }
@@ -264,7 +264,7 @@ pipeline {
             skipIfPreviouslySuccessful("rspec") {
               build(
                 job: 'test-suites/rspec',
-                parameters: build_parameters
+                parameters: build_parameters + string(name: 'CI_NODE_TOTAL', value: env.RSPEC_CI_NODE_TOTAL)
               )
             }
           }

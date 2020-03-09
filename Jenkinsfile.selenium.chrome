@@ -28,7 +28,6 @@ def getImageTagVersion() {
   return env.RUN_COVERAGE == '1' ? 'master' : flags.getImageTagVersion()
 }
 
-def ci_node_total = 25; // how many nodes to run on
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -55,10 +54,11 @@ pipeline {
       steps {
         script {
           def nodes = [:];
+          def ci_node_total = env.CI_NODE_TOTAL as Integer
           for(int i = 0; i < ci_node_total; i++) {
             def index = i;
             nodes["selenium set ${(i).toString().padLeft(2, '0')}"] = {
-              withEnv(["TEST_ENV_NUMBER=$index", "CI_NODE_INDEX=$index", "CI_NODE_TOTAL=$ci_node_total"]) {
+              withEnv(["TEST_ENV_NUMBER=$index", "CI_NODE_INDEX=$index"]) {
                 node('canvas-docker') {
                   stage("Running Selenium Set ${index}") {
                     try {
@@ -107,7 +107,7 @@ pipeline {
       steps {
         script {
           def reports = load 'build/new-jenkins/groovy/reports.groovy'
-          reports.publishSpecCoverageToS3(ci_node_total, "canvas-lms-selenium")
+          reports.publishSpecCoverageToS3(env.CI_NODE_TOTAL, "canvas-lms-selenium")
         }
       }
     }
@@ -117,7 +117,7 @@ pipeline {
     always {
       script {
         def reports = load 'build/new-jenkins/groovy/reports.groovy'
-        reports.publishSpecFailuresAsHTML(ci_node_total)
+        reports.publishSpecFailuresAsHTML(env.CI_NODE_TOTAL as Integer)
       }
     }
   }
