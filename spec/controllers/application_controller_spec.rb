@@ -136,6 +136,16 @@ RSpec.describe ApplicationController do
         expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
       end
 
+      it "sets the env var to false when the context is a group" do
+        root_account = double(global_id: 1, open_registration?: true, settings: {})
+        allow(root_account).to receive(:feature_enabled?).and_return(false)
+        allow(root_account).to receive(:feature_enabled?).with(:direct_share).and_return(true)
+        allow(HostUrl).to receive_messages(file_host: 'files.example.com')
+        controller.instance_variable_set(:@domain_root_account, root_account)
+        controller.instance_variable_set(:@context, group_model)
+        expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+      end
+
       it "sets the env var to false when FF is disabled" do
         root_account = double(global_id: 1, open_registration?: true, settings: {})
         allow(root_account).to receive(:feature_enabled?).and_return(false)
