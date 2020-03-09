@@ -26,7 +26,15 @@ describe Messages::AssignmentSubmitted::SMSPresenter do
   let(:student) do
     course_with_user("StudentEnrollment", course: course, name: "Adam Jones", active_all: true).user
   end
-  let(:submission) { assignment.submit_homework(student) }
+  let(:submission) do
+    @submission = assignment.submit_homework(student)
+    assignment.grade_student(student, grade: 5, grader: teacher)
+    @submission.reload
+  end
+
+  before :once do
+    PostPolicy.enable_feature!
+  end
 
   describe "Presenter instance" do
     let(:message) { Message.new(context: submission, user: teacher) }
@@ -47,6 +55,7 @@ describe Messages::AssignmentSubmitted::SMSPresenter do
       end
 
       it "#subject includes the name of the student when grades have been posted" do
+        submission
         assignment.unmute!
         expect(presenter.subject).to include("Adam Jones")
       end
@@ -71,6 +80,7 @@ describe Messages::AssignmentSubmitted::SMSPresenter do
       end
 
       it "#body includes the name of the student when grades have been posted" do
+        submission
         assignment.unmute!
         expect(message.body).to include("Adam Jones")
       end
