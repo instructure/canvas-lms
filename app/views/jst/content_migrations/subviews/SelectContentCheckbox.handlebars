@@ -1,14 +1,22 @@
-<div class="radio">
-  <label>
-    <input type="radio" name="selective_import" value=false>
-    {{#t "select_all_content"}}All content{{/t}}
-  </label>
-</div>
+{{#if ENV.HIDE_DESTRUCTIVE_COURSE_OPTIONS}}
+  <div class="radio">
+    <label>
+      <input type="radio" name="selective_import" value=true checked>
+      {{#t "select_specific_content"}}Select specific content{{/t}}
+    </label>
+  </div>
+{{else}}
+  <div class="radio">
+    <label>
+      <input type="radio" name="selective_import" value=false>
+      {{#t "select_all_content"}}All content{{/t}}
+    </label>
+  </div>
 
-<div class="radio">
-  <label>
-    <input type="radio" name="selective_import" value=true>
-    {{#t "select_specific_content"}}Select specific content{{/t}}
-  </label>
-</div>
-
+  <div class="radio">
+    <label>
+      <input type="radio" name="selective_import" value=true>
+      {{#t "select_specific_content"}}Select specific content{{/t}}
+    </label>
+  </div>
+{{/if}}

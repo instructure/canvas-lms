@@ -41,6 +41,7 @@ define [
 
     validations: -> 
       errors = {}
+      @model.set 'selective_import', true if ENV.HIDE_DESTRUCTIVE_COURSE_OPTIONS
       selective_import = @model.get('selective_import')
 
       if selective_import == null || selective_import == undefined
