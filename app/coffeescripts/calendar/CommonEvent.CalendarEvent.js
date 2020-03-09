@@ -185,7 +185,14 @@ Object.assign(CalendarEvent.prototype, {
     }
 
     const names = ((this.calendarEvent && this.calendarEvent.child_events) || []).map(
-      child_event => child_event.user && child_event.user.sortable_name
+      child_event => {
+        if (child_event.user) {
+          return child_event.user.sortable_name
+        } else if (child_event.group) {
+          return child_event.group.name
+        }
+        return null
+      }
     )
     let sorted = names.sort((a, b) => natcompare.strings(a, b))
 

@@ -17,6 +17,7 @@
  */
 
 import Calendar from 'compiled/calendar/Calendar'
+import CalendarEvent from 'compiled/calendar/CommonEvent.CalendarEvent'
 import I18n from 'i18n!calendar'
 import fcUtil from 'compiled/util/fcUtil'
 import moment from 'moment'
@@ -25,6 +26,7 @@ import denver from 'timezone/America/Denver'
 import fixtures from 'helpers/fixtures'
 import $ from 'jquery'
 import {subscribe} from 'vendor/jquery.ba-tinypubsub'
+import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Calendar', {
   setup() {
@@ -32,6 +34,7 @@ QUnit.module('Calendar', {
     tz.changeZone(denver, 'America/Denver')
     fixtures.setup()
     sinon.stub($, 'getJSON')
+    fakeENV.setup()
   },
   teardown() {
     tz.restore(this.snapshot)
@@ -41,6 +44,7 @@ QUnit.module('Calendar', {
     }
     fixtures.teardown()
     $.getJSON.restore()
+    fakeENV.teardown()
   }
 })
 const makeMockDataSource = () => ({
@@ -180,4 +184,32 @@ test('gets appointment groups when show scheduler activated', () => {
   })
   ok(mockDataSource.getAppointmentGroups.called)
   ok(mockDataSource.getEvents.called)
+})
+
+test('displays group name in tooltip', () => {
+  fakeENV.setup({CALENDAR: {BETTER_SCHEDULER: true}})
+  const cal = makeCal()
+  const $eventDiv = $(
+    '<div class="event"><div class="fc-title"></div><div class="fc-content"></div></div>'
+  ).appendTo('#fixtures')
+  const now = moment()
+  const data = {
+    start_at: now,
+    end_at: now,
+    child_events: [
+      {
+        group: {
+          name: 'Foobar'
+        }
+      }
+    ],
+    appointment_group_url: '/foo/bar'
+  }
+  const event = new CalendarEvent(data, {calendar_event_url: '/foo/bar'})
+  cal.eventRender(event, $eventDiv, 'month')
+  ok(
+    $($eventDiv)
+      .attr('title')
+      .includes('Reserved By:  Foobar')
+  )
 })
