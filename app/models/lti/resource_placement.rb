@@ -28,6 +28,7 @@ module Lti
     POST_GRADES = 'post_grades'
     RESOURCE_SELECTION = 'resource_selection'
     SIMILARITY_DETECTION = 'similarity_detection'
+    GLOBAL_NAVIGATION = 'global_navigation'.freeze
 
     SIMILARITY_DETECTION_LTI2 = 'Canvas.placements.similarityDetection'
 
