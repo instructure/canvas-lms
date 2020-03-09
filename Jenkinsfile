@@ -228,7 +228,15 @@ pipeline {
           when { expression { env.GERRIT_EVENT_TYPE != 'change-merged' && env.GERRIT_PROJECT == 'canvas-lms' && !isCovid() } }
           steps {
             skipIfPreviouslySuccessful("linters") {
-              build(job: 'test-suites/linters', parameters: buildParameters)
+              script {
+                sh 'build/new-jenkins/linters/run-gergich.sh'
+                if (env.MASTER_BOUNCER_RUN == '1' && env.GERRIT_EVENT_TYPE == 'patchset-created') {
+                  def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
+                  credentials.withMasterBouncerCredentials {
+                    sh 'build/new-jenkins/linters/run-master-bouncer.sh'
+                  }
+                }
+              }
             }
           }
         }
