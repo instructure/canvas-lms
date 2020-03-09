@@ -85,12 +85,18 @@ define [
           other: '%{count} replies.'
         }, count: @model.get('discussion_subentry_count'))
 
-        summary: @model.summary()
+        summary: $.trim(@model.summary())
 
     render: ->
       super
       @$el.attr @attributes()
       this
+
+    afterRender: ->
+      $('.discussion-summary').each (index, item) ->
+        # This +1 is to account for a discrepancy in the scrollHeight of a single-line announcement in Firefox.
+        if item.scrollHeight && (item.offsetHeight + 1) < item.scrollHeight
+          $(this).addClass('truncated-summary')
 
     toggleSelected: ->
       @model.selected = !@model.selected

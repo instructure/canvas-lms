@@ -9,7 +9,7 @@
 
 <div class="discussion-column image-block">
   <div class="image-block-content">
-    <div>
+    <div class="sm-announcement-content">
       <div class="image-block-image" aria-hidden="true">
         {{>avatar author}}
       </div>
@@ -17,7 +17,9 @@
       {{#if author}}
         <a class="discussion-author" href="{{author.html_url}}">{{author.display_name}}</a>
       {{/if}}
-      <div class="discussion-summary ellipsis">{{summary}}</div>
+      {{#if summary}}
+        <div class="discussion-summary">{{summary}}</div>
+      {{/if}}
     </div>
     <div class="discussion-actions-container">
       <div class="discussion-unread-container">

@@ -78,12 +78,12 @@
     </ul>
   </div>
   <h3 class="announcement-heading">Active</h3>
-  <ul class="discussionTopicIndexList" role="list" aria-label="announcements"></ul>
+  <ul class="discussionTopicIndexList sm-announcements" role="list" aria-label="announcements"></ul>
 
   {{#if options.expired_announcements}}
     <h3 class="announcement-heading expired">Expired</h3>
     {{#if options.expired_announcements.length}}
-      <ul id="expired-announcements"></ul>
+      <ul id="expired-announcements" class="sm-announcements"></ul>
     {{else}}
       <h5 style="padding-left: 1.5rem;">
         {{#t "there_are_no_expired_announcements"}}No announcements have expired{{/t}}
@@ -97,7 +97,7 @@
       {{#t "there_are_no_announcements_show"}}There are no announcements to show{{/t}}
     </h5>
     <h3 class="announcement-heading expired">Expired</h3>
-    <ul id="expired-announcements"></ul>
+    <ul id="expired-announcements" class="sm-announcements"></ul>
   {{else}}
     {{#if lastPageFetched}}
       <div style="margin:auto; text-align: center;  margin-top: 80px">
