@@ -548,6 +548,7 @@ class Submission < ActiveRecord::Base
   end
 
   def can_read_submission_user_name?(user, session)
+    return false if self.assignment.anonymize_students?
     !self.assignment.anonymous_peer_reviews? ||
         self.user_id == user.id ||
         self.assignment.context.grants_right?(user, session, :view_all_grades)
