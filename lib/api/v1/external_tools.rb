@@ -30,6 +30,7 @@ module Api::V1::ExternalTools
     methods += extension_types
     only = %w(id name description url domain consumer_key created_at updated_at description)
     only << 'allow_membership_service_access' if tool.context.root_account.feature_enabled?(:membership_service_for_lti_tools)
+    only << 'is_rce_favorite' if tool.can_be_rce_favorite?
     json = api_json(tool, user, session,
                   :only => only,
                   :methods => methods

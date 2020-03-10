@@ -1165,6 +1165,21 @@ describe ExternalToolsController do
       expect(assigns[:tool].shared_secret).to eq "secret"
     end
 
+    it "accepts is_rce_favorite parameter" do
+      user_session(account_admin_user)
+      post 'create', params: {
+        :account_id => @course.account.id,
+        :external_tool => {
+          :name => "tool name",
+          :url => "http://example.com",
+          :consumer_key => "key",
+          :shared_secret => "secret",
+          :editor_button => {url: "http://example.com", enabled: true},
+          :is_rce_favorite => true}}, :format => "json"
+      expect(response).to be_successful
+      expect(assigns[:tool].is_rce_favorite).to eq true
+    end
+
     it "sets the oauth_compliant setting" do
       user_session(@teacher)
       external_tool_settings = {name: "tool name",
@@ -1533,6 +1548,16 @@ describe ExternalToolsController do
 
       expect(response).to be_successful
       expect(@tool.reload.allow_membership_service_access).to be_falsey
+    end
+
+    it "accepts is_rce_favorite parameter" do
+      user_session(account_admin_user)
+      @tool = new_valid_tool(@course.root_account)
+      @tool.editor_button = {url: 'http://example.com', icon_url: 'http://example.com', enabled: true}
+      @tool.save!
+      put :update, params: {account_id: @course.root_account.id, external_tool_id: @tool.id, external_tool: {is_rce_favorite: true}}, :format => "json"
+      expect(response).to be_successful
+      expect(assigns[:tool].is_rce_favorite).to eq true
     end
   end
 

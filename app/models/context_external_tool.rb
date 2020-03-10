@@ -175,6 +175,12 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
+  def can_be_rce_favorite?
+    self.context.respond_to?(:root_account?) &&
+    self.context.root_account? &&
+    !self.editor_button.nil?
+  end
+
   def sync_placements!(placements)
     old_placements = self.context_external_tool_placements.pluck(:placement_type)
     placements_to_delete = Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) - placements
@@ -465,7 +471,7 @@ class ContextExternalTool < ActiveRecord::Base
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
     self.root_account ||= context.root_account
-
+    self.is_rce_favorite &&= self.can_be_rce_favorite?
     ContextExternalTool.normalize_sizes!(self.settings)
 
     Lti::ResourcePlacement::PLACEMENTS.each do |type|

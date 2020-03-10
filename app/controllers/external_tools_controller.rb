@@ -62,6 +62,7 @@ class ExternalToolsController < ApplicationController
   #        "updated_at": "2037-07-28T19:38:31Z",
   #        "privacy_level": "anonymous",
   #        "custom_fields": {"key": "value"},
+  #        "is_rce_favorite": false
   #        "account_navigation": {
   #             "canvas_icon_class": "icon-lti",
   #             "icon_url": "...",
@@ -281,6 +282,7 @@ class ExternalToolsController < ApplicationController
   # @response_field updated_at Timestamp of last update
   # @response_field privacy_level What information to send to the external tool, "anonymous", "name_only", "public"
   # @response_field custom_fields Custom fields that will be sent to the tool consumer
+  # @response_field is_rce_favorite Boolean determining whether this tool should be in a preferred location in the RCE.
   # @response_field account_navigation The configuration for account navigation links (see create API for values)
   # @response_field assignment_selection The configuration for assignment selection links (see create API for values)
   # @response_field course_home_sub_navigation The configuration for course home navigation links (see create API for values)
@@ -669,6 +671,11 @@ class ExternalToolsController < ApplicationController
   # @argument custom_fields[field_name] [String]
   #   Custom fields that will be sent to the tool consumer; can be used
   #   multiple times
+  #
+  # @argument is_rce_favorite [Boolean]
+  #   Whether this tool should appear in a preferred location in the RCE.
+  #   This only applies to tools in root account contexts that have an editor
+  #   button placement.
   #
   # @argument account_navigation[url] [String]
   #   The url of the external tool for account navigation
@@ -1181,7 +1188,7 @@ class ExternalToolsController < ApplicationController
     attrs = Lti::ResourcePlacement.valid_placements
     attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id,
-              :oauth_compliant]
+              :oauth_compliant, :is_rce_favorite]
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
 
     attrs.each do |prop|
