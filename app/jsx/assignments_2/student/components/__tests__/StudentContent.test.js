@@ -75,7 +75,9 @@ describe('Assignment Student Content View', () => {
       return mocks
     }
 
-    it('renders Comments', async () => {
+    // https://instructure.atlassian.net/browse/USERS-385
+    // eslint-disable-next-line jest/no-disabled-tests
+    it.skip('renders Comments', async () => {
       const mocks = await makeMocks()
       const props = await mockAssignmentAndSubmission()
       const {getAllByText, getByText} = render(
