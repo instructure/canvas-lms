@@ -976,6 +976,19 @@ describe GradebooksController do
           expect(returned_section_ids).to contain_exactly(@course.default_section.id)
         end
       end
+
+      describe "include_speed_grader_in_assignment_header_menu" do
+        it "is set to true when the feature flag of the same name is true" do
+          Account.site_admin.enable_feature!(:include_speed_grader_in_assignment_header_menu)
+          get :show, params: {course_id: @course.id}
+          expect(gradebook_options.fetch(:include_speed_grader_in_assignment_header_menu)).to be true
+        end
+
+        it "is set to false when the feature flag of the same name is false" do
+          get :show, params: {course_id: @course.id}
+          expect(gradebook_options.fetch(:include_speed_grader_in_assignment_header_menu)).to be false
+        end
+      end
     end
 
     describe "csv" do

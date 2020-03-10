@@ -916,6 +916,7 @@ class GradebooksController < ApplicationController
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
       graded_late_submissions_exist: graded_late_submissions_exist,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
+      include_speed_grader_in_assignment_header_menu: Account.site_admin.feature_enabled?(:include_speed_grader_in_assignment_header_menu),
       late_policy: @context.late_policy.as_json(include_root: false),
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       post_policies_enabled: @context.post_policies_enabled?,
