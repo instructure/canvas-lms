@@ -427,7 +427,8 @@ analytics_2:
   state: hidden
   applies_to: Course
   display_name: New Course and User Analytics
-  description: Show new analytics for course and user data
+  description: Show new analytics for course and user data. Data may take 24
+    hours to appear in New Analytics after setting this feature flag to ON.
   after_state_change_proc: analytics_2_after_state_change_hook
 new_gradebook_plagiarism_indicator:
   state: hidden
