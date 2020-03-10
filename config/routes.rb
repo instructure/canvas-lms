@@ -2401,6 +2401,11 @@ CanvasRails::Application.routes.draw do
       delete "/accounts/:account_id/data_services/:id", action: :destroy, as: :data_services_destroy
     end
 
+    # Account Lookup service
+    scope(controller: 'lti/account_lookup') do
+      get "/accounts/:account_id", action: :show
+    end
+
     # Names and Roles Provisioning (NRPS) v2 Service
     scope(controller: 'lti/ims/names_and_roles') do
       get "courses/:course_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :course_index, as: :course_names_and_roles

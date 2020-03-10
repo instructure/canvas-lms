@@ -253,7 +253,12 @@ class DeveloperKey < ActiveRecord::Base
     binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, self.id)
 
     # If no explicity set bindings were found check for 'allow' bindings
-    binding || DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, self.id, false)
+    binding ||= DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, self.id, false)
+
+    # Check binding not for wrong account (on different shard)
+    return nil if binding && binding.shard.id != binding_account.shard.id
+
+    binding
   end
 
   def owner_account

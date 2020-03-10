@@ -758,6 +758,19 @@ describe DeveloperKey do
       end
       let(:sa_account_binding) { sa_developer_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
 
+      context 'when the developer key and account are on different, non site-admin shards' do
+        it "doesn't return a binding for an account with the same local ID on a different shard" do
+          expect(root_account.shard.id).to_not eq(@shard2.id)
+          @shard2.activate do
+            account = Account.find_by(id: root_account.local_id)
+            account ||= Account.create!(id: root_account.local_id)
+            shard2_developer_key = DeveloperKey.create!(name: 'Shard 2 Key', account_id: account.id)
+            expect(shard2_developer_key.account_binding_for(account)).to_not be_nil
+            expect(shard2_developer_key.account_binding_for(root_account)).to be_nil
+          end
+        end
+      end
+
       context 'when developer key binding is on the site admin shard' do
         it 'finds the site admin binding if it is set to "on"' do
           root_account_binding.update!(workflow_state: 'on')
