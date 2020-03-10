@@ -64,11 +64,11 @@ pipeline {
                 node('canvas-docker') {
                   stage("Running RSpec Set ${index}") {
                     try {
-                      sh 'rm -rf ./tmp'
+                      sh 'rm -vrf ./tmp'
                       unstash name: "build-scripts"
                       unstash name: "build-yml"
                       sh 'build/new-jenkins/docker-cleanup.sh'
-                      sh 'mkdir -p tmp'
+                      sh 'mkdir -vp tmp'
                       timeout(time: 60) {
                         sh 'build/new-jenkins/print-env-excluding-secrets.sh'
                         sh 'build/new-jenkins/docker-compose-pull.sh'
@@ -89,7 +89,7 @@ pipeline {
                         sh 'docker cp $(docker-compose ps -q web):/usr/src/app/coverage/ ./tmp/spec_coverage/'
                         reports.stashSpecCoverage(index)
                       }
-                      sh 'rm -rf ./tmp'
+                      sh 'rm -vrf ./tmp'
                       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
                     }
                   }

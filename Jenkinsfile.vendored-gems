@@ -78,7 +78,7 @@ pipeline {
     }
 
     cleanup {
-      sh 'rm -rf ./spec_results/'
+      sh 'rm -vrf ./spec_results/'
       sh 'build/new-jenkins/docker-cleanup.sh --allow-failure'
     }
   }

@@ -23,7 +23,7 @@ def stashSpecCoverage(index) {
 }
 
 def publishSpecCoverageToS3(ci_node_total, coverage_type) {
-  sh 'rm -rf ./coverage_nodes'
+  sh 'rm -vrf ./coverage_nodes'
   dir('coverage_nodes') {
     for(int index = 0; index < ci_node_total; index++) {
       dir("node_${index}") {
@@ -40,8 +40,8 @@ def publishSpecCoverageToS3(ci_node_total, coverage_type) {
       uploadSource: "/coverage",
       uploadDest: "$coverage_type/coverage"
   ])
-  sh 'rm -rf ./coverage_nodes'
-  sh 'rm -rf ./coverage'
+  sh 'rm -vrf ./coverage_nodes'
+  sh 'rm -vrf ./coverage'
 }
 
 // this method is to ensure that the stashing is done in a way that
@@ -53,7 +53,7 @@ def stashSpecFailures(index) {
 }
 
 def publishSpecFailuresAsHTML(ci_node_total) {
-  sh 'rm -rf ./compiled_failures'
+  sh 'rm -vrf ./compiled_failures'
 
   dir('compiled_failures') {
     for(int index = 0; index < ci_node_total; index++) {
@@ -78,7 +78,7 @@ def publishSpecFailuresAsHTML(ci_node_total) {
     reportFiles: htmlFiles.join(','),
     reportName: 'Test Failures'
   ]
-  sh 'rm -rf ./compiled_failures'
+  sh 'rm -vrf ./compiled_failures'
 }
 
 def buildIndexPage() {
@@ -112,7 +112,7 @@ def buildIndexPage() {
 
 def snykCheckDependencies(projectImage, projectDirectory) {
   def projectContainer = sh(script: "docker run -d -it -v snyk_volume:${projectDirectory} ${projectImage}", returnStdout: true).trim()
-  _runSnyk(
+  runSnyk(
     projectContainer,
     projectDirectory,
     'canvas-lms:ruby',
@@ -121,15 +121,15 @@ def snykCheckDependencies(projectImage, projectDirectory) {
     './snyk_ruby'
   )
   archiveArtifacts(artifacts: '**/snyk*')
-  sh 'rm -r ./snyk_ruby'
+  sh 'rm -vr ./snyk_ruby'
 }
 
-def _runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageManagerFile, extractedReportsDirectory) {
+def runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageManagerFile, extractedReportsDirectory) {
   def credentials = load 'build/new-jenkins/groovy/credentials.groovy'
   credentials.withSnykCredentials({ ->
     def RC = sh(
       script: """
-        set +e -x
+        set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
         docker run --rm \
           -v snyk_volume:/project \
           -eSNYK_TOKEN \
@@ -137,7 +137,8 @@ def _runSnyk(projectContainer, projectDirectory, projectName, snykImage, package
            ${snykImage} test \
           --project-name=${projectName} \
           --file=${packageManagerFile}
-      """, returnStatus: true
+      """,
+      returnStatus: true
     )
     // Snyk returns a 1 if vulnerabilities are found; we don't want this to fail the build
     // If the return code is not 0 or 1, it's a build error and should throw an exception
@@ -145,18 +146,18 @@ def _runSnyk(projectContainer, projectDirectory, projectName, snykImage, package
       error "Snyk dependency check for ${projectName} failed with an unrecognized return code: $RC"
     }
   })
-  this._extractSnykReports(projectContainer, projectDirectory, extractedReportsDirectory)
+  this.extractSnykReports(projectContainer, projectDirectory, extractedReportsDirectory)
 }
 
-def _extractSnykReports(projectContainer, projectDirectory, destinationDirectory) {
-    sh """
-      set +e -x
-      mkdir -p ${destinationDirectory}
-      docker cp ${projectContainer}:${projectDirectory}/snyk-error.log ${destinationDirectory}/snyk-error.log
-      docker cp ${projectContainer}:${projectDirectory}/snyk-result.json ${destinationDirectory}/snyk-result.json
-      docker cp ${projectContainer}:${projectDirectory}/snyk_report.css ${destinationDirectory}/snyk_report.css
-      docker cp ${projectContainer}:${projectDirectory}/snyk_report.html ${destinationDirectory}/snyk_report.html
-    """
+def extractSnykReports(projectContainer, projectDirectory, destinationDirectory) {
+  sh """
+    set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+    mkdir -vp ${destinationDirectory}
+    docker cp ${projectContainer}:${projectDirectory}/snyk-error.log ${destinationDirectory}/snyk-error.log
+    docker cp ${projectContainer}:${projectDirectory}/snyk-result.json ${destinationDirectory}/snyk-result.json
+    docker cp ${projectContainer}:${projectDirectory}/snyk_report.css ${destinationDirectory}/snyk_report.css
+    docker cp ${projectContainer}:${projectDirectory}/snyk_report.html ${destinationDirectory}/snyk_report.html
+  """
 }
 
 return this
