@@ -391,11 +391,14 @@ describe('sources/api', () => {
         preflightProps.upload_url = 'instfs-upload-url'
         const fileId = '123'
         const response = {
-          location: `http://canvas/api/v1/files/${fileId}?foo=bar`
+          location: `http://canvas/api/v1/files/${fileId}?foo=bar`,
+          uuid: 'xyzzy'
         }
         fetchMock.mock(preflightProps.upload_url, response)
-        return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
+        return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
           sinon.assert.calledWith(apiSource.getFile, fileId)
+          assert.equal(response.uuid, 'xyzzy')
+          assert.equal(response.url, 'file-url')
         })
       })
     })
