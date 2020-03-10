@@ -44,6 +44,13 @@ RSpec.describe Lti::LineItem, type: :model do
     end
   end
 
+  context 'on create' do
+    it 'should add a root account id' do
+      line_item = line_item_model
+      expect(line_item.root_account).not_to be_nil
+    end
+  end
+
   describe '#assignment_line_item?' do
     let(:resource_link) { resource_link_model }
     let(:line_item) { line_item_model }
