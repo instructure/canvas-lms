@@ -138,21 +138,21 @@ describe NotificationPolicy do
       end
 
       it "should have a scope to differentiate by frequency" do
-        expect(NotificationPolicy.by(:immediately)).to eq [@n1]
-        expect(NotificationPolicy.by(:daily)).to eq [@n2]
-        expect(NotificationPolicy.by(:weekly)).to eq [@n3]
-        expect(NotificationPolicy.by(:never)).to eq [@n4]
+        expect(NotificationPolicy.by_frequency(:immediately)).to eq [@n1]
+        expect(NotificationPolicy.by_frequency(:daily)).to eq [@n2]
+        expect(NotificationPolicy.by_frequency(:weekly)).to eq [@n3]
+        expect(NotificationPolicy.by_frequency(:never)).to eq [@n4]
       end
 
       it "should be able to differentiate by several frequencies at once" do
-        expect(NotificationPolicy.by([:immediately, :daily])).to be_include(@n1)
-        expect(NotificationPolicy.by([:immediately, :daily])).to be_include(@n2)
+        expect(NotificationPolicy.by_frequency([:immediately, :daily])).to be_include(@n1)
+        expect(NotificationPolicy.by_frequency([:immediately, :daily])).to be_include(@n2)
       end
 
       it "should be able to combine an array of frequencies with a for scope" do
-        expect(NotificationPolicy.for(@user).by([:daily, :weekly])).to be_include(@n2)
-        expect(NotificationPolicy.for(@user).by([:daily, :weekly])).to be_include(@n3)
-        expect(NotificationPolicy.for(@user).by([:daily, :weekly])).not_to be_include(@n1)
+        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).to be_include(@n2)
+        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).to be_include(@n3)
+        expect(NotificationPolicy.for(@user).by_frequency([:daily, :weekly])).not_to be_include(@n1)
       end
     end
 
@@ -170,19 +170,19 @@ describe NotificationPolicy do
 
       n1 = notification_policy_model
 
-      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq []
 
       n1.update_attribute(:frequency, 'never')
-      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq []
 
       n1.update_attribute(:frequency, 'daily')
-      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq [n1]
 
       n1.update_attribute(:frequency, 'weekly')
-      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
+      policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq [n1]
     end
 

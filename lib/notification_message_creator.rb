@@ -144,7 +144,7 @@ class NotificationMessageCreator
     return unless fallback_channel
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
-      fallback_policy = fallback_channel.notification_policies.by('daily').where(:notification_id => nil).first
+      fallback_policy = fallback_channel.notification_policies.by_frequency('daily').where(:notification_id => nil).first
       fallback_policy ||= fallback_channel.notification_policies.create!(frequency: 'daily')
     end
 
