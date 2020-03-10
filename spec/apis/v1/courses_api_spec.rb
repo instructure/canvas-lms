@@ -30,6 +30,10 @@ class TestCourseApi
 end
 
 describe Api::V1::Course do
+  before :once do
+    PostPolicy.enable_feature!
+  end
+
   describe '#course_json' do
     before :once do
       @test_api = TestCourseApi.new
@@ -213,6 +217,7 @@ describe Api::V1::Course do
     describe "current_grading_period_scores" do
       before(:each) do
         @course.grading_standard_enabled = true
+        @course.default_post_policy.update!(post_manually: false)
         create_grading_periods_for(@course, grading_periods: [:current, :future])
 
         current_assignment = @course.assignments.create!(
@@ -221,13 +226,15 @@ describe Api::V1::Course do
           points_possible: 10
         )
         current_assignment.grade_student(@student, grader: @teacher, score: 2)
+        current_assignment.unmute!
+
         unposted_current_assignment = @course.assignments.create!(
           title: "Current",
           due_at: 2.days.ago,
-          points_possible: 10,
-          muted: true
+          points_possible: 10
         )
         unposted_current_assignment.grade_student(@student, grader: @teacher, score: 9)
+        unposted_current_assignment.mute!
 
         future_assignment = @course.assignments.create!(
           title: "Future",
@@ -235,6 +242,7 @@ describe Api::V1::Course do
           points_possible: 10,
         )
         future_assignment.grade_student(@student, grader: @teacher, score: 7)
+        future_assignment.unmute!
 
         @course.save!
         @me = @teacher
