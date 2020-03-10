@@ -391,6 +391,11 @@ body.primary-nav-expanded {
     transition-duration: .24s;
     transition-property: opacity;
     transition-timing-function: ease-in;
+    // add ellipsis when text is too long
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 65%;
 
     &::after {
       display: none;
