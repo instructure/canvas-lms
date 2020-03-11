@@ -1755,6 +1755,8 @@ end
 
 describe Course, "gradebook_to_csv" do
   before :once do
+    PostPolicy.enable_feature!
+
     course_with_student active_all: true
     teacher_in_course active_all: true
   end
@@ -2134,7 +2136,7 @@ describe Course, "gradebook_to_csv" do
     expect(rows.length).to eq 4
   end
 
-  it "should include muted if any assignments are muted" do
+  it "should include manual posting if any assignments are manually-posted" do
       course_factory(active_all: true)
       @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
       student_in_course(:user => @user1)
@@ -2146,12 +2148,12 @@ describe Course, "gradebook_to_csv" do
       @user1.pseudonym.save!
       @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
-      @assignment.muted = true
-      @assignment.save!
+      @assignment.ensure_post_policy(post_manually: true)
       @assignment.grade_student(@user1, grade: "10", grader: @teacher)
       @assignment.grade_student(@user2, grade: "9", grader: @teacher)
       @assignment.grade_student(@user3, grade: "9", grader: @teacher)
       @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+      @assignment2.ensure_post_policy(post_manually: false)
       @course.recompute_student_scores
       @course.reload
 
@@ -2164,7 +2166,7 @@ describe Course, "gradebook_to_csv" do
       expect(rows[0][3]).to eq 'SIS Login ID'
       expect(rows[0][4]).to eq 'Section'
       expect(rows[1][0]).to eq nil
-      expect(rows[1][5]).to eq 'Muted'
+      expect(rows[1][5]).to eq 'Manual Posting'
       expect(rows[1][6]).to eq nil
       expect(rows[2][2]).to eq nil
       expect(rows[2][3]).to eq nil
