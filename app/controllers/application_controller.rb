@@ -1770,12 +1770,16 @@ class ApplicationController < ActionController::Base
     # but we still use the assignment#new page to create the quiz.
     # also handles launch from existing quiz on quizzes page.
     if ref.present? && @assignment&.quiz_lti?
-      if (ref.include?('assignments/new') || ref =~ /courses\/[0-9]+\/quizzes/i) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+      if (ref.include?('assignments/new') || ref =~ /courses\/\d+\/quizzes/i) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
         return polymorphic_url([@context, :quizzes])
       end
 
-      if ref =~ /courses\/[0-9]+\/gradebook/i
+      if ref =~ /courses\/\d+\/gradebook/i
         return polymorphic_url([@context, :gradebook])
+      end
+
+      if ref =~ /courses\/\d+$/i
+        return polymorphic_url([@context])
       end
     end
     named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
